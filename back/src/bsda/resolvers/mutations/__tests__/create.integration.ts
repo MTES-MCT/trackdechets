@@ -116,7 +116,7 @@ describe("Mutation.Bsda.create", () => {
         cap: "A cap",
         plannedOperationCode: "D 9",
         company: {
-          siret: "11111111111111",
+          siret: "3".repeat(14),
           name: "destination",
           address: "address",
           contact: "contactEmail",
@@ -315,7 +315,7 @@ describe("Mutation.Bsda.create", () => {
         cap: "A cap",
         plannedOperationCode: "D 9",
         company: {
-          siret: "11111111111111",
+          siret: "3".repeat(14),
           name: "destination",
           address: "address",
           contact: "contactEmail",
@@ -325,7 +325,7 @@ describe("Mutation.Bsda.create", () => {
       },
       transporter: {
         company: {
-          siret: "11111111111112",
+          siret: "21111111111112",
           name: "The Transporter",
           address: "Rue du bsda",
           contact: "Un transporter",
@@ -386,7 +386,7 @@ describe("Mutation.Bsda.create", () => {
         cap: "A cap",
         plannedOperationCode: "D 9",
         company: {
-          siret: "11111111111111",
+          siret: "3".repeat(14),
           name: "destination",
           address: "address",
           contact: "contactEmail",
@@ -396,7 +396,7 @@ describe("Mutation.Bsda.create", () => {
       },
       transporter: {
         company: {
-          siret: "11111111111112",
+          siret: "21111111111112",
           name: "The Transporter",
           address: "Rue du bsda",
           contact: "Un transporter",
@@ -464,7 +464,7 @@ describe("Mutation.Bsda.create", () => {
         cap: "A cap",
         plannedOperationCode: "D 9",
         company: {
-          siret: "11111111111111",
+          siret: "3".repeat(14),
           name: "destination",
           address: "address",
           contact: "contactEmail",

@@ -32,3 +32,4 @@ jobs:
           environment: recette
           sourcemaps: ./back/dist/src ./front/build/assets
           projects: trackdechets-api trackdechets-front
+          ignore_missing: true

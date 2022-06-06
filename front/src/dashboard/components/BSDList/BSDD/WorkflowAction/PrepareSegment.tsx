@@ -17,7 +17,13 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 import { WorkflowActionProps } from "./WorkflowAction";
 import TdSwitch from "common/components/Switch";
 import { GET_BSDS, GET_DETAIL_FORM } from "common/queries";
-import { Loader, FieldTransportModeSelect } from "common/components";
+import {
+  Loader,
+  FieldTransportModeSelect,
+  RedErrorMessage,
+} from "common/components";
+import * as yup from "yup";
+import { transporterSchema } from "form/bsdd/utils/schema";
 
 const PREPARE_SEGMENT = gql`
   mutation prepareSegment(
@@ -31,6 +37,8 @@ const PREPARE_SEGMENT = gql`
   }
   ${segmentFragment}
 `;
+
+const validationSchema = yup.object({ transporter: transporterSchema });
 
 export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = useState(false);
@@ -89,6 +97,7 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
         >
           <Formik
             initialValues={initialValues}
+            validationSchema={validationSchema}
             onSubmit={values => {
               const { transporter, ...rst } = values;
               const { validityLimit } = transporter;
@@ -176,6 +185,7 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
                       id="id_receipt"
                       className="td-input"
                     />
+                    <RedErrorMessage name="transporter.receipt" />
                     <label htmlFor="id_department">Département</label>
                     <Field
                       type="text"
@@ -183,20 +193,27 @@ export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
                       id="id_department"
                       className="td-input"
                     />
-                    <label htmlFor="id_validityLimit">Limite de validité</label>
+                    <RedErrorMessage name="transporter.department" />
+                    <label htmlFor="id_validityLimit">
+                      Limite de validité (optionnel)
+                    </label>
                     <Field
                       name="transporter.validityLimit"
                       component={DateInput}
                       id="id_validityLimit"
                       className="td-input"
                     />
-                    <label htmlFor="id_numberPlate">Immatriculation</label>
+                    <RedErrorMessage name="transporter.validityLimit" />
+                    <label htmlFor="id_numberPlate">
+                      Immatriculation (optionnel)
+                    </label>
                     <Field
                       type="text"
                       name="transporter.numberPlate"
                       id="id_numberPlate"
                       className="td-input"
                     />
+                    <RedErrorMessage name="transporter.numberPlate" />
                   </div>
                 )}
                 {error && <NotificationError apolloError={error} />}

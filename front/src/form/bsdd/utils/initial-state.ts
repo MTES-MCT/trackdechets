@@ -156,11 +156,14 @@ export function getInitialState(f?: Form | null): FormInput {
       consistence: f?.wasteDetails?.consistence ?? Consistence.Solid,
       pop: f?.wasteDetails?.pop ?? false,
       isDangerous: f?.wasteDetails?.isDangerous ?? false,
+      parcelNumbers: f?.wasteDetails?.parcelNumbers ?? [],
+      analysisReferences: f?.wasteDetails?.analysisReferences ?? [],
+      landIdentifiers: f?.wasteDetails?.landIdentifiers ?? [],
       packagings: null, // deprecated
       otherPackaging: null, // deprecated
       numberOfPackages: null, // deprecated
     },
-    appendix2Forms: f?.appendix2Forms ?? [],
+    grouping: f?.grouping ?? [],
     ecoOrganisme: f?.ecoOrganisme
       ? getInitialEcoOrganisme(f?.ecoOrganisme)
       : null,

@@ -176,7 +176,7 @@ export function toIncomingWaste(
 
 export function toIncomingWastes(
   form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
-    appendix2Forms: Form[];
+    grouping: { initialForm: Form }[];
   } & { transportSegments: TransportSegment[] },
   sirets: string[]
 ): IncomingWaste[] {
@@ -281,7 +281,7 @@ export function toOutgoingWaste(
 
 export function toOutgoingWastes(
   form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
-    appendix2Forms: Form[];
+    grouping: { initialForm: Form }[];
   } & { transportSegments: TransportSegment[] },
   sirets: string[]
 ): OutgoingWaste[] {
@@ -383,7 +383,7 @@ export function toTransportedWaste(
 
 export function toTransportedWastes(
   form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
-    appendix2Forms: Form[];
+    grouping: { initialForm: Form }[];
   } & { transportSegments: TransportSegment[] },
   sirets: string[]
 ): TransportedWaste[] {
@@ -489,7 +489,7 @@ export function toManagedWaste(
 
 export function toManagedWastes(
   form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
-    appendix2Forms: Form[];
+    grouping: { initialForm: Form }[];
   } & { transportSegments: TransportSegment[] }
 ): ManagedWaste[] {
   const bsdd = formToBsdd(form);
@@ -581,7 +581,7 @@ export function toAllWaste(
 
 export function toAllWastes(
   form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
-    appendix2Forms: Form[];
+    grouping: { initialForm: Form }[];
   } & { transportSegments: TransportSegment[] },
   sirets: string[]
 ): AllWaste[] {

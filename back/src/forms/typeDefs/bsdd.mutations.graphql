@@ -15,7 +15,10 @@ type Mutation {
   saveForm("Payload du BSD" formInput: FormInput!): Form
     @deprecated(reason: "Utiliser createForm / updateForm selon le besoin")
 
-  "Met à jour la plaque d'immatriculation ou le champ libre du transporteur"
+  """
+  Met à jour la plaque d'immatriculation ou le champ libre du transporteur.
+  Disponible pour le Bsdd au statut SEALED ou SIGNED_BY_PRODUCER.
+  """
   updateTransporterFields(
     "ID d'un BSD"
     id: ID!
@@ -86,6 +89,8 @@ type Mutation {
     pop
   }
   ```
+  Lorsqu'un courtier ou un négociant est présent sur le BSDD, les informations de contact,
+  ainsi que le numéro, la limite de validité et le département du récépissé sont obligatoires.
   """
   markAsSealed("ID d'un BSD" id: ID!): Form
 

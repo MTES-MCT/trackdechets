@@ -8,11 +8,11 @@ const graphqlTypes = [
   "enums",
   "unions",
   "inputObjects",
-  "scalars"
+  "scalars",
 ];
 
 function makeReference(apiId) {
-  return graphqlTypes.map(t =>
+  return graphqlTypes.map((t) =>
     path.join("reference", "api-reference", apiId, t)
   );
 }
@@ -24,11 +24,11 @@ const referenceDefs = [
   { id: "bsff", label: "Fluides Frigorigènes" },
   { id: "bsda", label: "Amiante" },
   { id: "user-company", label: "Utilisateurs et Établissements" },
-  { id: "registre", label: "Registre" }
+  { id: "registre", label: "Registre" },
 ];
 
 const apiReference = referenceDefs.map(({ id, label }) => ({
-  [label]: makeReference(id)
+  [label]: makeReference(id),
 }));
 
 module.exports = {
@@ -42,14 +42,11 @@ module.exports = {
             "tutoriels/quickstart/create-account",
             "tutoriels/quickstart/access-token",
             "tutoriels/quickstart/first-query",
-            "tutoriels/quickstart/first-bsd"
-          ]
+            "tutoriels/quickstart/first-bsd",
+          ],
         },
         {
-          "Usage Courant": [
-            "tutoriels/courant/query-bordereaux",
-           
-          ],
+          "Usage Courant": ["tutoriels/courant/query-bordereaux"],
         },
         {
           Exemples: [
@@ -58,7 +55,8 @@ module.exports = {
                 "tutoriels/examples/bsdd/acheminement-direct",
                 "tutoriels/examples/bsdd/multi-modal",
                 "tutoriels/examples/bsdd/entreposage-provisoire",
-                "tutoriels/examples/bsdd/import-bsd-papier"
+                "tutoriels/examples/bsdd/regroupement",
+                "tutoriels/examples/bsdd/import-bsd-papier",
               ],
               BSDASRI: [
                 "tutoriels/examples/bsdasri/acheminement-direct",
@@ -66,19 +64,19 @@ module.exports = {
                 "tutoriels/examples/bsdasri/acheminement-direct-ecoorganisme",
                 "tutoriels/examples/bsdasri/signature-code-secret",
                 "tutoriels/examples/bsdasri/signature-code-secret-ecoorganisme",
-                "tutoriels/examples/bsdasri/synthese"
+                "tutoriels/examples/bsdasri/synthese",
               ],
               BSVHU: ["tutoriels/examples/bsvhu/vhu-vers-broyeur"],
               BSFF: ["tutoriels/examples/bsff/collecte-petites-quantites"],
               BSDA: [
                 "tutoriels/examples/bsda/collecte-chantier",
                 "tutoriels/examples/bsda/collecte-chantier-particulier",
-                "tutoriels/examples/bsda/groupement"
-              ]
-            }
-          ]
-        }
-      ]
+                "tutoriels/examples/bsda/groupement",
+              ],
+            },
+          ],
+        },
+      ],
     },
     {
       Guides: [
@@ -87,8 +85,8 @@ module.exports = {
         "guides/pdf",
         "guides/registre",
         "guides/sirene",
-        "guides/oauth2"
-      ]
+        "guides/oauth2",
+      ],
     },
     {
       Référence: [
@@ -98,13 +96,12 @@ module.exports = {
             {
               type: "link",
               label: "Changelog",
-              href:
-                "https://github.com/MTES-MCT/trackdechets/blob/master/Changelog.md"
-            }
-          ]
+              href: "https://github.com/MTES-MCT/trackdechets/blob/master/Changelog.md",
+            },
+          ],
         },
         {
-          Statuts: ["reference/statuts/bsdd", "reference/statuts/bsdasri"]
+          Statuts: ["reference/statuts/bsdd", "reference/statuts/bsdasri"],
         },
         "reference/multi-bsd",
         "reference/environments/environments",
@@ -114,11 +111,11 @@ module.exports = {
         "reference/validation",
         "reference/errors",
         "reference/notifications",
-        "reference/limitations"
-      ]
+        "reference/limitations",
+      ],
     },
     {
-      Concepts: ["concepts/api-ui", "concepts/graphql"]
-    }
-  ]
+      Concepts: ["concepts/api-ui", "concepts/graphql"],
+    },
+  ],
 };

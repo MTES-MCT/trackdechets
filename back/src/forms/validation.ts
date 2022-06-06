@@ -5,8 +5,7 @@ import {
   QuantityType,
   WasteAcceptationStatus,
   Prisma,
-  CompanyVerificationStatus,
-  Status
+  CompanyVerificationStatus
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
@@ -20,14 +19,12 @@ import {
 } from "../common/constants";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
-  AppendixFormInput,
+  CompanyInput,
   PackagingInfo,
   Packagings
 } from "../generated/graphql/types";
 import { isCollector, isWasteProcessor } from "../companies/validation";
-import { getFinalDestinationSiret, getFormOrFormNotFound } from "./database";
 import {
-  FormAlreadyInAppendix2,
   MISSING_COMPANY_NAME,
   MISSING_COMPANY_SIRET,
   INVALID_SIRET_LENGTH,
@@ -46,6 +43,7 @@ import {
   isSiret,
   isFRVat
 } from "../common/constants/companySearchHelpers";
+import { searchCompany } from "../companies/search";
 // set yup default error messages
 configureYup();
 
@@ -95,6 +93,9 @@ type WasteDetails = Pick<
   | "wasteDetailsQuantityType"
   | "wasteDetailsConsistence"
   | "wasteDetailsPop"
+  | "wasteDetailsParcelNumbers"
+  | "wasteDetailsAnalysisReferences"
+  | "wasteDetailsLandIdentifiers"
 >;
 
 type Transporter = Pick<
@@ -112,6 +113,32 @@ type Transporter = Pick<
   | "transporterNumberPlate"
   | "transporterCustomInfo"
   | "transporterCompanyVatNumber"
+>;
+
+type Trader = Pick<
+  Prisma.FormCreateInput,
+  | "traderCompanyName"
+  | "traderCompanySiret"
+  | "traderCompanyAddress"
+  | "traderCompanyContact"
+  | "traderCompanyPhone"
+  | "traderCompanyMail"
+  | "traderReceipt"
+  | "traderDepartment"
+  | "traderValidityLimit"
+>;
+
+type Broker = Pick<
+  Prisma.FormCreateInput,
+  | "brokerCompanyName"
+  | "brokerCompanySiret"
+  | "brokerCompanyAddress"
+  | "brokerCompanyContact"
+  | "brokerCompanyPhone"
+  | "brokerCompanyMail"
+  | "brokerReceipt"
+  | "brokerDepartment"
+  | "brokerValidityLimit"
 >;
 
 type ReceivedInfo = Pick<
@@ -370,6 +397,54 @@ const packagingInfoFn = (isDraft: boolean) =>
       )
   });
 
+const parcelCommonInfos = yup
+  .object({
+    city: yup.string().required("Parcelle: la ville est obligatoire"),
+    postalCode: yup
+      .string()
+      .required("Parcelle: le code postal est obligatoire")
+  })
+  .test(
+    "no-unknown",
+    "Parcelle: impossible d'avoir à la fois des coordonnées GPS et un numéro de parcelle",
+    (value, testContext) => {
+      const { fields } = testContext.schema;
+      const known = Object.keys(fields);
+      const unknownKeys: string[] = Object.keys(value || {}).filter(
+        key => known.indexOf(key) === -1
+      );
+
+      return unknownKeys.every(key => value[key] == null);
+    }
+  );
+const parcelNumber = yup.object({
+  prefix: yup
+    .string()
+    .min(1)
+    .max(5)
+    .required("Parcelle: le préfixe est obligatoire"),
+  section: yup
+    .string()
+    .min(1)
+    .max(5)
+    .required("Parcelle: la section est obligatoire"),
+  number: yup
+    .string()
+    .min(1)
+    .max(5)
+    .required("Parcelle: le numéro de parcelle est obligatoire")
+});
+const parcelCoordinates = yup.object({
+  x: yup.number().required("Parcelle: la coordonnée X est obligatoire"),
+  y: yup.number().required("Parcelle: la coordonnée Y est obligatoire")
+});
+const parcelInfos = yup.lazy(value => {
+  if (value.prefix || value.section || value.number) {
+    return parcelCommonInfos.concat(parcelNumber);
+  }
+  return parcelCommonInfos.concat(parcelCoordinates);
+});
+
 // 3 - Dénomination du déchet
 // 4 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
 // 5 - Conditionnement
@@ -444,7 +519,10 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
             `Un déchet avec un code comportant un astérisque est forcément dangereux`
           ),
       otherwise: () => yup.boolean()
-    })
+    }),
+    wasteDetailsParcelNumbers: yup.array().of(parcelInfos as any),
+    wasteDetailsAnalysisReferences: yup.array().of(yup.string()),
+    wasteDetailsLandIdentifiers: yup.array().of(yup.string())
   });
 
 export const wasteDetailsSchema = wasteDetailsSchemaFn(false);
@@ -539,6 +617,155 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
         ),
       transporterValidityLimit: yup.date().nullable()
     });
+
+export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
+  yup.object({
+    traderCompanySiret: yup
+      .string()
+      .notRequired()
+      .nullable()
+      .matches(/^$|^\d{14}$/, {
+        message: `Négociant: ${INVALID_SIRET_LENGTH}`
+      }),
+    traderCompanyName: yup.string().when("traderCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_NAME}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    traderCompanyAddress: yup.string().when("traderCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_ADDRESS}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    traderCompanyContact: yup.string().when("traderCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_CONTACT}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    traderCompanyPhone: yup.string().when("traderCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_PHONE}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    traderCompanyMail: yup
+      .string()
+      .email()
+      .when("traderCompanySiret", {
+        is: siret => siret?.length === 14,
+        then: schema =>
+          schema
+            .ensure()
+            .requiredIf(!isDraft, `Négociant: ${MISSING_COMPANY_EMAIL}`),
+        otherwise: schema => schema.notRequired().nullable()
+      }),
+    traderReceipt: yup.string().when("traderCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, "Négociant: Numéro de récepissé obligatoire"),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    traderDepartment: yup.string().when("traderCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, "Négociant : Département obligatoire"),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    traderValidityLimit: yup.date().when("traderCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema.requiredIf(!isDraft, "Négociant : Date de validité obligatoire"),
+      otherwise: schema => schema.notRequired().nullable()
+    })
+  });
+
+export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
+  yup.object({
+    brokerCompanySiret: yup
+      .string()
+      .notRequired()
+      .nullable()
+      .matches(/^$|^\d{14}$/, {
+        message: `Courtier : ${INVALID_SIRET_LENGTH}`
+      }),
+    brokerCompanyName: yup.string().when("brokerCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_NAME}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    brokerCompanyAddress: yup.string().when("brokerCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_ADDRESS}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    brokerCompanyContact: yup.string().when("brokerCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_CONTACT}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    brokerCompanyPhone: yup.string().when("brokerCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_PHONE}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    brokerCompanyMail: yup.string().when("brokerCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, `Courtier : ${MISSING_COMPANY_EMAIL}`),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    brokerReceipt: yup.string().when("brokerCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, "Courtier : Numéro de récepissé obligatoire"),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    brokerDepartment: yup.string().when("brokerCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema
+          .ensure()
+          .requiredIf(!isDraft, "Courtier : Département obligatoire"),
+      otherwise: schema => schema.notRequired().nullable()
+    }),
+    brokerValidityLimit: yup.date().when("brokerCompanySiret", {
+      is: siret => siret?.length === 14,
+      then: schema =>
+        schema.requiredIf(!isDraft, "Courtier : Date de validité obligatoire"),
+      otherwise: schema => schema.notRequired().nullable()
+    })
+  });
 
 // 8 - Collecteur-transporteur
 // 9 - Déclaration générale de l’émetteur du bordereau :
@@ -994,7 +1221,9 @@ const baseFormSchemaFn = (isDraft: boolean) =>
     .concat(ecoOrganismeSchema)
     .concat(recipientSchemaFn(isDraft))
     .concat(wasteDetailsSchemaFn(isDraft))
-    .concat(transporterSchemaFn(isDraft));
+    .concat(transporterSchemaFn(isDraft))
+    .concat(traderSchemaFn(isDraft))
+    .concat(brokerSchemaFn(isDraft));
 
 export const sealedFormSchema = baseFormSchemaFn(false);
 export const draftFormSchema = baseFormSchemaFn(true);
@@ -1142,41 +1371,76 @@ export async function checkCompaniesType(form: Form) {
 }
 
 /**
- * @param appendix2Forms bordereaux annexés
- * @param form bordereau de regroupement existant
+ * Constraints on CompanyInput that apply to intermediary company input
+ * - SIRET is mandatory
+ * - only french companies are allowed
  */
-export async function validateAppendix2Forms(
-  appendix2FormsInput: AppendixFormInput[],
-  form?: Partial<Pick<Form, "id" | "emitterCompanySiret">>
-) {
-  const appendix2Forms = await Promise.all(
-    appendix2FormsInput.map(({ id }) => getFormOrFormNotFound({ id }))
-  );
+const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
+  siret: yup
+    .string()
+    .required("Le N°SIRET est obligatoire pour une entreprise intermédiaire"),
+  contact: yup.string().required(),
+  vatNumber: yup
+    .string()
+    .notRequired()
+    .nullable()
+    .test(
+      "is-fr-vat",
+      "Seul les numéros de TVA en France sont valides",
+      vat => !vat || (isVat(vat) && isFRVat(vat))
+    ),
+  address: yup.string().notRequired().nullable(),
+  name: yup.string().notRequired().nullable(),
+  phone: yup.string().notRequired().nullable(),
+  mail: yup.string().notRequired().nullable(),
+  country: yup.string().notRequired().nullable() // ignored in db schema
+});
 
-  for (const appendix2 of appendix2Forms) {
-    if (appendix2.appendix2RootFormId) {
-      if (
-        !form?.id ||
-        (form?.id && appendix2.appendix2RootFormId !== form.id)
-      ) {
-        // the form has already been grouped into another one
-        throw new FormAlreadyInAppendix2(appendix2.id);
-      }
-    } else {
-      if (appendix2.status !== Status.AWAITING_GROUP) {
-        throw new UserInputError(
-          `Le bordereau ${appendix2.id} n'est pas en attente de regroupement`
-        );
-      }
-    }
-    const appendix2DestinationSiret = await getFinalDestinationSiret(appendix2);
+/**
+ * Validate intermediary input and convert it to Prisma IntermediaryFormAssociationCreateInput :
+ * - an intermediary company should be identified by a SIRET (french only) or VAT number
+ * - address and name from SIRENE database takes precedence over user input data
+ */
+async function validateIntermediaryInput(
+  company: CompanyInput
+): Promise<Prisma.IntermediaryFormAssociationCreateManyFormInput> {
+  const { siret, vatNumber, contact, phone, mail } =
+    await intermediarySchema.validate(company);
+  const companySearchResult = await searchCompany(siret || vatNumber);
 
-    if (form?.emitterCompanySiret !== appendix2DestinationSiret) {
+  return {
+    siret: siret!, // presence of SIRET is validated in intermediarySchema
+    vatNumber,
+    address: companySearchResult?.address ?? "",
+    name: companySearchResult?.name ?? "",
+    contact,
+    phone,
+    mail
+  };
+}
+
+export function validateIntermediariesInput(
+  companies: CompanyInput[]
+): Promise<Prisma.IntermediaryFormAssociationCreateManyFormInput[]> {
+  for (const companyInput of companies) {
+    if (!companyInput.siret && !companyInput.vatNumber) {
       throw new UserInputError(
-        `Le bordereau ${appendix2.id} n'est pas en possession du nouvel émetteur`
+        "intermediairies doit obligatoirement spécifier soit un siret soit un numéro de TVA intracommunautaire"
       );
     }
   }
+  // check we do not add the same SIRET twice
+  const intermediarySirets = companies.map(c => c.siret || c.vatNumber);
+  const hasDuplicate = intermediarySirets.reduce((acc, curr, idx) => {
+    return acc || intermediarySirets.indexOf(curr) !== idx;
+  }, false);
+  if (hasDuplicate) {
+    throw new UserInputError(
+      "Vous ne pouvez pas ajouter le même établissement en intermédiaire plusieurs fois"
+    );
+  }
 
-  return appendix2Forms;
+  return Promise.all(
+    companies.map(company => validateIntermediaryInput(company))
+  );
 }

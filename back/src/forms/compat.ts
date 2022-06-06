@@ -166,7 +166,7 @@ export function simpleFormToBsdd(
  */
 export function formWithTempStorageToBsdd(
   form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
-    appendix2Forms: Form[];
+    grouping: { initialForm: Form }[];
   } & { transportSegments: TransportSegment[] }
 ): Bsdd & { forwarding: Bsdd & { grouping: Bsdd[] } } {
   const temporaryStorage = form.temporaryStorageDetail;
@@ -305,20 +305,24 @@ export function formWithTempStorageToBsdd(
     ...reexpedition,
     forwarding: {
       ...initial,
-      grouping: form.appendix2Forms.map(f => simpleFormToBsdd(f))
+      grouping: form.grouping.map(({ initialForm }) =>
+        simpleFormToBsdd(initialForm)
+      )
     }
   };
 }
 
 export function formToBsdd(
   form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
-    appendix2Forms: Form[];
+    grouping: { initialForm: Form }[];
   } & { transportSegments: TransportSegment[] }
 ): Bsdd & { grouping: Bsdd[] } & { forwarding: Bsdd & { grouping: Bsdd[] } } {
   let grouping: Bsdd[] = [];
 
-  if (form.appendix2Forms) {
-    grouping = form.appendix2Forms.map(f => simpleFormToBsdd(f));
+  if (form.grouping) {
+    grouping = form.grouping.map(({ initialForm }) =>
+      simpleFormToBsdd(initialForm)
+    );
   }
 
   if (form.temporaryStorageDetail) {

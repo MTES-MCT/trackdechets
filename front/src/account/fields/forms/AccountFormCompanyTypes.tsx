@@ -73,7 +73,7 @@ export default function AccountFormCompanyTypes({
           {loading && <div>Envoi en cours...</div>}
 
           {props.errors[name] && (
-            <RedErrorMessage name="phone">{props.errors[name]}</RedErrorMessage>
+            <RedErrorMessage name={name}>{props.errors[name]}</RedErrorMessage>
           )}
           {error && <InlineError apolloError={error} />}
 

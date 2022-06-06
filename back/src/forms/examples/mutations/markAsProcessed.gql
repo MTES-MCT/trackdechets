@@ -2,5 +2,6 @@ mutation MarkAsProcessed($id: ID!, $processedInfo: ProcessedFormInput!) {
   markAsProcessed(id: $id, processedInfo: $processedInfo) {
     id
     status
+    quantityReceived
   }
 }

@@ -62,7 +62,8 @@ describe("appendix2Forms resolver", () => {
       opt: {
         emitterCompanySiret: emitterCompany.siret,
         emitterCompanyAddress: "40 boulevard Voltaire 13001 Marseille",
-        recipientCompanySiret: collectorCompany.siret
+        recipientCompanySiret: collectorCompany.siret,
+        quantityReceived: 1
       }
     });
 
@@ -70,7 +71,12 @@ describe("appendix2Forms resolver", () => {
       ownerId: collector.id,
       opt: {
         emitterCompanySiret: collectorCompany.siret,
-        appendix2Forms: { connect: { id: appendix2.id } }
+        grouping: {
+          create: {
+            initialFormId: appendix2.id,
+            quantity: appendix2.quantityReceived
+          }
+        }
       }
     });
 
@@ -114,14 +120,20 @@ describe("appendix2Forms resolver", () => {
         emitterWorkSiteAddress: "Rue du chantier",
         emitterWorkSiteCity: "Annonay",
         emitterWorkSitePostalCode: "07100",
-        recipientCompanySiret: collectorCompany.siret
+        recipientCompanySiret: collectorCompany.siret,
+        quantityReceived: 1
       }
     });
     const regroupementForm = await formFactory({
       ownerId: collector.id,
       opt: {
         emitterCompanySiret: collectorCompany.siret,
-        appendix2Forms: { connect: { id: appendix2.id } }
+        grouping: {
+          create: {
+            initialFormId: appendix2.id,
+            quantity: appendix2.quantityReceived
+          }
+        }
       }
     });
 

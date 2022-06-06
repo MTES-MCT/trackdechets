@@ -524,6 +524,7 @@ export default function AccountCompanyAdd() {
                       type="text"
                       name="codeNaf"
                       className={`td-input ${styles.textField}`}
+                      disabled={isForcedTransporter(companyInfos)}
                     />
                   )}
                 </div>

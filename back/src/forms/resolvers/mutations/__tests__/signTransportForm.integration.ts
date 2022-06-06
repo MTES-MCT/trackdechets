@@ -5,6 +5,7 @@ import {
 } from "../../../../generated/graphql/types";
 import {
   formFactory,
+  toIntermediaryCompany,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -30,7 +31,7 @@ const SIGN_TRANSPORT_FORM = `
 `;
 
 describe("signTransportForm", () => {
-  afterAll(resetDatabase);
+  afterEach(resetDatabase);
 
   it("should sign transport", async () => {
     const emitter = await userWithCompanyFactory("ADMIN");
@@ -307,6 +308,50 @@ describe("signTransportForm", () => {
         input: {
           takenOverAt: takenOverAt.toISOString() as unknown as Date,
           takenOverBy: transporter.user.name
+        },
+        securityCode: 9999
+      }
+    });
+
+    expect(errors).not.toBeUndefined();
+  });
+
+  it("should throw an error if signed by an intermediary", async () => {
+    const temporaryStorage = await userWithCompanyFactory("ADMIN");
+    const intermediary = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("ADMIN");
+    const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+    const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+    const form = await formFactory({
+      ownerId: temporaryStorage.user.id,
+      opt: {
+        status: "SIGNED_BY_TEMP_STORER",
+        recipientCompanySiret: temporaryStorage.company.siret,
+        recipientCompanyName: temporaryStorage.company.name,
+        temporaryStorageDetail: {
+          create: {
+            emittedAt: emittedAt,
+            emittedBy: temporaryStorage.user.name,
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name
+          }
+        },
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary.company)]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(intermediary.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "signTransportForm">,
+      MutationSignTransportFormArgs
+    >(SIGN_TRANSPORT_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          takenOverAt: takenOverAt.toISOString() as unknown as Date,
+          takenOverBy: intermediary.user.name
         },
         securityCode: 9999
       }

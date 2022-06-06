@@ -190,11 +190,24 @@ input CreateFormInput {
   "Courtier"
   broker: BrokerInput
 
-  "Annexe 2"
+  "Annexe 2 - Deprecated : utiliser grouping"
   appendix2Forms: [AppendixFormInput!]
+    @deprecated(reason: "Utiliser `grouping`")
+
+  "Bordereaux que celui-ci regroupe (Annexe 2) - Permet une utilisation partielle du bordereau initial"
+  grouping: [InitialFormFractionInput!]
+
   ecoOrganisme: EcoOrganismeInput
 
   temporaryStorageDetail: TemporaryStorageDetailInput
+
+  """
+  Liste d'entreprises intermédiaires. Un intermédiaire est une entreprise qui prend part à la gestion du déchet,
+  mais pas à la responsabilité de la traçabilité (entreprise de travaux, bureau d'étude, maitre d'oeuvre,
+  collectivité, etc.) Il pourra lire ce bordereau, sans étape de signature.
+  L'adresse et la raison sociale seront ignorés car seront automatiquement remplis à partir des données publiques de l'INSEE pour le SIRET
+  """
+  intermediaries: [CompanyInput!]
 }
 
 "Payload de mise à jour d'un bordereau"
@@ -230,11 +243,24 @@ input UpdateFormInput {
   "Courtier"
   broker: BrokerInput
 
-  "Annexe 2"
+  "Annexe 2 - Deprecated : utiliser grouping"
   appendix2Forms: [AppendixFormInput!]
+    @deprecated(reason: "Utiliser `grouping`")
+
+  "Bordereaux que celui-ci regroupe (Annexe 2) - Permet une utilisation partielle du bordereau initial"
+  grouping: [InitialFormFractionInput!]
+
   ecoOrganisme: EcoOrganismeInput
 
   temporaryStorageDetail: TemporaryStorageDetailInput
+
+  """
+  Liste d'entreprises intermédiaires. Un intermédiaire est une entreprise qui prend part à la gestion du déchet,
+  mais pas à la responsabilité de la traçabilité (entreprise de travaux, bureau d'étude, maitre d'oeuvre,
+  collectivité, etc.) Il pourra lire ce bordereau, sans étape de signature.
+  L'adresse et la raison sociale seront ignorés car seront automatiquement remplis à partir des données publiques de l'INSEE pour le SIRET
+  """
+  intermediaries: [CompanyInput!]
 }
 
 "Payload de création d'un BSD"
@@ -270,8 +296,13 @@ input FormInput {
   "Courtier"
   broker: BrokerInput
 
-  "Annexe 2"
+  "Annexe 2 - Deprecated : utiliser grouping"
   appendix2Forms: [AppendixFormInput!]
+    @deprecated(reason: "Utiliser `grouping`")
+
+  "Bordereaux que celui-ci regroupe (Annexe 2) - Permet une utilisation partielle du bordereau initial"
+  grouping: [InitialFormFractionInput!]
+
   ecoOrganisme: EcoOrganismeInput
 
   temporaryStorageDetail: TemporaryStorageDetailInput
@@ -281,14 +312,20 @@ input FormInput {
 input AppendixFormInput {
   "Identifiant unique du bordereau"
   id: ID!
+}
 
+"""
+Fraction d'un bordereau ajouté en annexe 2 d'un bordereau de regroupement
+"""
+input InitialFormFractionInput {
+  "Bordereau annexé"
+  form: AppendixFormInput!
   """
-  N° de bordereau
-
-  Déprécié : L'id du bordereau doit être utilisé comme identifiant (paramètre id).
-  Le readableId permet de le récupérer via la query form.
+  Quantité du bordereau initial affectée au bordereau de regroupement. Si omis,
+  la totalité de la quantité restante est affectée. La quantité renseignée ne peut
+  pas être supérieure à la quantité restante.
   """
-  readableId: ID
+  quantity: Float
 }
 
 "Payload de liaison d'un BSD à un eco-organisme"
@@ -529,6 +566,39 @@ input WasteDetailsInput {
   dont le code ne comporte pas d'astérisque.
   """
   isDangerous: Boolean
+
+  """
+  Utilisé en cas de bordereau de terre excavée ou sédiment.
+  La ou les parcelles cadastrales du lieu de production des terres excavées et sédiments avec leurs identifications,
+  ou, en cas de domaine non cadastré, l'identification précise du lieu géographique de production
+  """
+  parcelNumbers: [ParcelNumberInput!]
+
+  "Numéros de référence(s) d'analyse(s)"
+  analysisReferences: [String!]
+
+  "Identifiant(s) du ou des terrains lorsque les terres ont été extraites d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6"
+  landIdentifiers: [String!]
+}
+
+"""
+Payload lié au numéro de parcelle cadastrale
+"""
+input ParcelNumberInput {
+  "Ville"
+  city: String!
+  "Code postal"
+  postalCode: String!
+  "Prefixe cadastral"
+  prefix: String
+  "Numéro de section cadastrale"
+  section: String
+  "Numéro de parcelle cadastrale"
+  number: String
+  "Coordonnée X au format Lambert II, à utiliser uniquement en cas de domaine non cadastré"
+  x: Float
+  "Coordonnée Y au format Lambert II, à utiliser uniquement en cas de domaine non cadastré"
+  y: Float
 }
 
 """

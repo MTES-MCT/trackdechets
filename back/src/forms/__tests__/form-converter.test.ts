@@ -263,7 +263,8 @@ test("expandFormFromDb", () => {
     noTraceability: form.noTraceability,
     nextDestination: null,
     currentTransporterSiret: form.currentTransporterSiret,
-    nextTransporterSiret: form.nextTransporterSiret
+    nextTransporterSiret: form.nextTransporterSiret,
+    intermediaries: []
   };
 
   expect(expanded).toEqual(expected);
@@ -352,7 +353,10 @@ describe("flattenFormInput", () => {
       wasteDetailsQuantityType: null,
       wasteDetailsConsistence: null,
       wasteDetailsPop: null,
-      wasteDetailsIsDangerous: null
+      wasteDetailsIsDangerous: null,
+      wasteDetailsAnalysisReferences: null,
+      wasteDetailsParcelNumbers: null,
+      wasteDetailsLandIdentifiers: null
     };
 
     expect(flattened).toEqual(expected);
@@ -374,7 +378,10 @@ describe("flattenFormInput", () => {
       wasteDetailsPop: null,
       wasteDetailsIsDangerous: null,
       wasteDetailsQuantity: null,
-      wasteDetailsQuantityType: null
+      wasteDetailsQuantityType: null,
+      wasteDetailsParcelNumbers: null,
+      wasteDetailsAnalysisReferences: null,
+      wasteDetailsLandIdentifiers: null
     });
   });
 

@@ -17,6 +17,7 @@
     "constant-case": "^3.0.3",
     "copy-text-to-clipboard": "^3.0.1",
     "date-fns": "^2.28.0",
+    "decimal.js-light": "^2.5.1",
     "env-cmd": "^10.0.1",
     "formik": "2.2.5",
     "graphql": "^16.0.2",

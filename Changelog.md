@@ -5,6 +5,45 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.06.1] ~06/06/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout par l'API d'entreprises intermédiaires sur un bsdd via `Form.intermediaries` et `FormInput.intermediaries` dans l'API GraphQL. L'intermédiaire peut créer et mettre à jour un bordereau via l'API [PR 1331](https://github.com/MTES-MCT/trackdechets/pull/1331)
+- Possibilité d'ajouter des numéros de parcelles et des références d'analyses sur le BSDD [PR 1417](https://github.com/MTES-MCT/trackdechets/pull/1417)
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+- Fractionnement d'un BSDD dans plusieurs annexes 2 :
+  - Dépréciation des champs :
+    - `Form.appendix2Forms: [Appendix2Form!]` : remplacé par `Form.grouping: [InitialFormFraction!]`
+    - `CreateFormInput.appendix2Forms: [AppendixFormInput!]` : remplacé par `CreateFormInput.grouping: [InitialFormFractionInput!]`
+    - `UpdateFormInput.appendix2Forms: [AppendixFormInput!]` : remplacé par `UpdateFormInput.grouping: [InitialFormFractionInput!]`
+  - Modification du type de retour de `Form.groupedIn: Form` qui devient `Form.groupedIn: [FormFraction!]`
+  - Ajout des types :
+    - `InitialFormFraction`
+    - `FormFraction`
+    - `InitialFormFractionInput`
+  - Suppression de `AppendixFormInput.readableId` qui était un champ déjà déprécié
+- Les informations de contact et de récépissé des courtiers et négociants sont désormais obligatoires lorsqu'un courtier ou un négociant apparait sur un BSDD. [PR 1418](https://github.com/MTES-MCT/trackdechets/pull/1418/)
+
+#### :nail_care: Améliorations
+
+- Auto-remplissage du pays et du numéro TVA éventuel pour le PDF des BSDD (transporteurs identifiés par TVA) [PR 1399](https://github.com/MTES-MCT/trackdechets/pull/1399)
+- Permettre d'éditer les champs Bsdd champ libre et plaques d'immatriculations pour le statut SIGNED_BY_PRODUCER [PR 1416](https://github.com/MTES-MCT/trackdechets/pull/1416)
+- Restreindre les changements de type d'établissement à Transporteur seulement quand un établissement est identifié par un numéro de TVA. [PR 1390](https://github.com/MTES-MCT/trackdechets/pull/1390)
+- Sélecteur d'établissement dans l'édition d'un BSD [PR 1424](https://github.com/MTES-MCT/trackdechets/pull/1424)
+  - Auto-completion du pays en fonction du numéro TVA quand on sélectionne un transporteur étranger.
+  - Dédoublonnage établissements dans la recherche
+  - Exclusion des Établissements fermés dans les résultats de recherche
+  - Empêcher de choisir manuellement FR quand un transporteur étranger est sélectionné
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2022.05.1] ~16/05/2022
 
 #### :rocket: Nouvelles fonctionnalités

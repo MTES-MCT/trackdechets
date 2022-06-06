@@ -331,7 +331,7 @@ describe("Mutation markAsResealed", () => {
       },
       tempStorageOpts: {
         // this SIRET is not registered in TD
-        destinationCompanySiret: "11111111111111"
+        destinationCompanySiret: "3".repeat(14)
       }
     });
 
@@ -344,7 +344,7 @@ describe("Mutation markAsResealed", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination après entreposage provisoire ou reconditionnement qui a été renseignée en case 14 (SIRET 11111111111111) n'est pas inscrite sur Trackdéchets`
+        message: `L'installation de destination après entreposage provisoire ou reconditionnement qui a été renseignée en case 14 (SIRET 33333333333333) n'est pas inscrite sur Trackdéchets`
       })
     ]);
   });

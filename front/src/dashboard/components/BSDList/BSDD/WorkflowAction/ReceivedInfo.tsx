@@ -29,12 +29,12 @@ export const textConfig: {
   },
   [WasteAcceptationStatus.Refused]: {
     validationText:
-      "En refusant ce déchet, je le retourne à son producteur. Un mail automatique Trackdéchets, informera le producteur de ce refus, accompagné du BSD en pdf. L'inspection des ICPE et ma société en recevront une copie",
+      "En refusant ce déchet, je le retourne à son producteur. Un mail automatique Trackdéchets, informera le producteur de ce refus, accompagné du récépissé en PDF. L'inspection des ICPE et ma société en recevront une copie",
     refusalReasonText: "Motif du refus",
   },
   [WasteAcceptationStatus.PartiallyRefused]: {
     validationText:
-      "En validant, je confirme la réception des déchets pour la quantité indiquée dans ce bordereau. Un mail automatique Trackdéchets informera le producteur de ce refus partiel, accompagné du BSD en pdf. L'inspection des ICPE et ma société en recevront une copie",
+      "En validant, je confirme la réception des déchets pour la quantité indiquée dans ce bordereau. Un mail automatique Trackdéchets informera le producteur de ce refus partiel, accompagné du récépissé en PDF. L'inspection des ICPE et ma société en recevront une copie",
     refusalReasonText: "Motif du refus partiel",
   },
 };

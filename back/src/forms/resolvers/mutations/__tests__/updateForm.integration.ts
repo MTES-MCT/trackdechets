@@ -1,9 +1,11 @@
+import { EmitterType, Status, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
 import {
   companyFactory,
   formFactory,
+  toIntermediaryCompany,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -13,7 +15,7 @@ import {
   MutationUpdateFormArgs,
   UpdateFormInput
 } from "../../../../generated/graphql/types";
-import { EmitterType, Status } from "@prisma/client";
+import * as validation from "../../../validation";
 
 const UPDATE_FORM = `
   mutation UpdateForm($updateFormInput: UpdateFormInput!) {
@@ -37,6 +39,9 @@ const UPDATE_FORM = `
           postalCode
           infos
         }
+        company {
+          siret
+        }
       }
       temporaryStorageDetail {
         destination {
@@ -49,11 +54,30 @@ const UPDATE_FORM = `
       appendix2Forms {
         id
       }
+      grouping {
+        quantity
+        form {
+          id
+        }
+      }
+      intermediaries {
+        siret
+        name
+      }
     }
   }
 `;
 
+const validateSpy = jest.spyOn(validation, "validateIntermediariesInput");
+const validateIntermediariesInputMock = jest.fn();
+validateSpy.mockImplementation((...args) =>
+  validateIntermediariesInputMock(...args)
+);
+
 describe("Mutation.updateForm", () => {
+  beforeEach(() => {
+    validateIntermediariesInputMock.mockReset();
+  });
   afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
@@ -150,7 +174,7 @@ describe("Mutation.updateForm", () => {
     ]);
   });
 
-  it.each(["emitter", "trader", "recipient", "transporter"])(
+  it.each(["emitter", "trader", "broker", "recipient", "transporter"])(
     "should allow %p to update a draft form",
     async role => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -178,7 +202,7 @@ describe("Mutation.updateForm", () => {
     }
   );
 
-  it.each(["emitter", "trader", "recipient", "transporter"])(
+  it.each(["emitter", "trader", "broker", "recipient", "transporter"])(
     "should allow %p to update a sealed form",
     async role => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -186,7 +210,19 @@ describe("Mutation.updateForm", () => {
         ownerId: user.id,
         opt: {
           [`${role}CompanySiret`]: company.siret,
-          status: "SEALED"
+          status: "SEALED",
+          ...(["trader", "broker"].includes(role)
+            ? {
+                [`${role}CompanyName`]: "Trader or Broker",
+                [`${role}CompanyContact`]: "Mr Trader or Broker",
+                [`${role}CompanyMail`]: "traderbroker@trackdechets.fr",
+                [`${role}CompanyAddress`]: "Wall street",
+                [`${role}CompanyPhone`]: "00 00 00 00 00",
+                [`${role}Receipt`]: "receipt",
+                [`${role}Department`]: "07",
+                [`${role}ValidityLimit`]: new Date("2023-01-01")
+              }
+            : {})
         }
       });
 
@@ -255,7 +291,7 @@ describe("Mutation.updateForm", () => {
       // try to remove user's company from the form
       emitter: {
         company: {
-          siret: "11111111111111"
+          siret: "3".repeat(14)
         }
       }
     };
@@ -263,9 +299,11 @@ describe("Mutation.updateForm", () => {
       variables: { updateFormInput }
     });
 
-    expect(errors).toMatchObject([
+    expect(errors).toEqual([
       expect.objectContaining({
-        extensions: { code: ErrorCode.FORBIDDEN },
+        extensions: expect.objectContaining({
+          code: ErrorCode.FORBIDDEN
+        }),
         message: "Vous ne pouvez pas enlever votre établissement du bordereau"
       })
     ]);
@@ -462,6 +500,242 @@ describe("Mutation.updateForm", () => {
     });
 
     expect(data.updateForm.ecoOrganisme).toBeNull();
+  });
+
+  it("should add the first intermediary on an existing ", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret
+      }
+    });
+    validateIntermediariesInputMock.mockResolvedValueOnce([
+      toIntermediaryCompany(intermediary.company)
+    ]);
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          intermediaries: [toIntermediaryCompany(intermediary.company)]
+        }
+      }
+    });
+    // replace the previous
+    expect(data.updateForm.intermediaries).toEqual([
+      expect.objectContaining({
+        name: intermediary.company.name,
+        siret: intermediary.company.siret
+      })
+    ]);
+  });
+
+  it("should update the intermediary (twice)", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary2 = await userWithCompanyFactory(UserRole.MEMBER);
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary.company)]
+        }
+      }
+    });
+    validateIntermediariesInputMock.mockResolvedValueOnce([
+      toIntermediaryCompany(intermediary2.company)
+    ]);
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          emitter: {
+            type: "OTHER"
+          },
+          intermediaries: [toIntermediaryCompany(intermediary2.company)]
+        }
+      }
+    });
+    // replace the previous
+    expect(data.updateForm.intermediaries).toEqual([
+      expect.objectContaining({
+        name: intermediary2.company.name,
+        siret: intermediary2.company.siret
+      })
+    ]);
+    validateIntermediariesInputMock.mockResolvedValueOnce([
+      toIntermediaryCompany(intermediary2.company),
+      toIntermediaryCompany(intermediary.company)
+    ]);
+    //update a 2nd time
+    const { data: data2 } = await mutate<Pick<Mutation, "updateForm">>(
+      UPDATE_FORM,
+      {
+        variables: {
+          updateFormInput: {
+            id: form.id,
+            emitter: {
+              type: "OTHER"
+            },
+            intermediaries: [
+              toIntermediaryCompany(intermediary2.company),
+              toIntermediaryCompany(intermediary.company)
+            ]
+          }
+        }
+      }
+    );
+
+    expect(data2.updateForm.intermediaries).toEqual([
+      {
+        name: intermediary2.company.name,
+        siret: intermediary2.company.siret
+      },
+      {
+        name: intermediary.company.name,
+        siret: intermediary.company.siret
+      }
+    ]);
+  });
+
+  it("should remove the intermediary when input is an empty array", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary.company)]
+        }
+      }
+    });
+    const { mutate } = makeClient(user);
+
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          emitter: {
+            type: "OTHER"
+          },
+          intermediaries: []
+        }
+      }
+    });
+
+    expect(data.updateForm.intermediaries).toEqual([]);
+  });
+
+  it("should remove the intermediary when input intermediaries is null", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary.company)]
+        }
+      }
+    });
+    const { mutate } = makeClient(user);
+
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          emitter: {
+            type: "OTHER"
+          },
+          intermediaries: null
+        }
+      }
+    });
+
+    expect(data.updateForm.intermediaries).toEqual([]);
+  });
+
+  it("should not update the intermediary when no input", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary.company)]
+        }
+      }
+    });
+    const { mutate } = makeClient(user);
+
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          emitter: {
+            type: "OTHER"
+          }
+        }
+      }
+    });
+
+    expect(data.updateForm.intermediaries).toEqual([
+      {
+        name: intermediary.company.name,
+        siret: intermediary.company.siret
+      }
+    ]);
+  });
+
+  it("should update a form as an intermediary", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary.company)]
+        }
+      }
+    });
+
+    const updateFormInput = {
+      id: form.id,
+      wasteDetails: {
+        name: "things"
+      }
+    };
+    const { mutate } = makeClient(intermediary.user);
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    expect(data.updateForm.wasteDetails).toMatchObject(
+      updateFormInput.wasteDetails
+    );
+    expect(data.updateForm.intermediaries).toEqual([
+      {
+        name: intermediary.company.name,
+        siret: intermediary.company.siret
+      }
+    ]);
   });
 
   it("should update a form", async () => {
@@ -728,14 +1002,16 @@ describe("Mutation.updateForm", () => {
       ownerId: user.id,
       opt: {
         status: "GROUPED",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
     const toBeAppendixForm = await formFactory({
       ownerId: user.id,
       opt: {
         status: "AWAITING_GROUP",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -745,7 +1021,12 @@ describe("Mutation.updateForm", () => {
         emitterType: EmitterType.APPENDIX2,
         status: "SEALED",
         emitterCompanySiret: ttr.siret,
-        appendix2Forms: { connect: { id: appendixForm.id } }
+        grouping: {
+          create: {
+            initialFormId: appendixForm.id,
+            quantity: appendixForm.quantityReceived
+          }
+        }
       }
     });
 
@@ -780,7 +1061,8 @@ describe("Mutation.updateForm", () => {
       ownerId: user.id,
       opt: {
         status: "GROUPED",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -790,7 +1072,12 @@ describe("Mutation.updateForm", () => {
         status: "SEALED",
         emitterCompanySiret: ttr.siret,
         emitterType: EmitterType.APPENDIX2,
-        appendix2Forms: { connect: { id: appendixForm.id } }
+        grouping: {
+          create: {
+            initialFormId: appendixForm.id,
+            quantity: appendixForm.quantityReceived
+          }
+        }
       }
     });
 
@@ -808,42 +1095,116 @@ describe("Mutation.updateForm", () => {
     expect(data.updateForm.wasteDetails.code).toEqual("01 03 04*");
   });
 
-  it("should disallow linking an appendix 2 form if the emitter of the regroupement form is not the recipient of the initial form", async () => {
-    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
-    const initialAppendix2 = await formFactory({
-      ownerId: user.id,
-      opt: { status: Status.AWAITING_GROUP, recipientCompanySiret: ttr.siret }
-    });
+  it(
+    "should disallow linking an appendix 2 form if the emitter of the regroupement" +
+      " form is not the recipient of the initial form (using UpdateFormInput.appendix2Forms)",
+    async () => {
+      const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+      const initialAppendix2 = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.AWAITING_GROUP,
+          recipientCompanySiret: ttr.siret,
+          quantityReceived: 1
+        }
+      });
 
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: Status.SEALED,
-        emitterCompanySiret: ttr.siret,
-        emitterType: EmitterType.APPENDIX2,
-        appendix2Forms: { connect: [{ id: initialAppendix2.id }] }
-      }
-    });
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.SEALED,
+          emitterCompanySiret: ttr.siret,
+          emitterType: EmitterType.APPENDIX2,
+          grouping: {
+            create: {
+              initialFormId: initialAppendix2.id,
+              quantity: initialAppendix2.quantityReceived
+            }
+          }
+        }
+      });
 
-    const wannaBeAppendix2 = await formFactory({
-      ownerId: (await userFactory()).id,
-      opt: { status: Status.AWAITING_GROUP }
-    });
+      const wannaBeAppendix2 = await formFactory({
+        ownerId: (await userFactory()).id,
+        opt: { status: Status.AWAITING_GROUP }
+      });
 
-    const updateFormInput = {
-      id: form.id,
-      appendix2Forms: [{ id: wannaBeAppendix2.id }]
-    };
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "createForm">>(UPDATE_FORM, {
-      variables: { updateFormInput }
-    });
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: `Le bordereau ${wannaBeAppendix2.id} n'est pas en possession du nouvel émetteur`
-      })
-    ]);
-  });
+      const updateFormInput = {
+        id: form.id,
+        appendix2Forms: [{ id: wannaBeAppendix2.id }]
+      };
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<Pick<Mutation, "createForm">>(
+        UPDATE_FORM,
+        {
+          variables: { updateFormInput }
+        }
+      );
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: `Le bordereau ${wannaBeAppendix2.id} n'est pas en possession du nouvel émetteur`
+        })
+      ]);
+    }
+  );
+
+  it(
+    "should disallow linking an appendix 2 form if the emitter of the regroupement" +
+      " form is not the recipient of the initial form (using UpdateFormInput.grouping)",
+    async () => {
+      const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+      const initialAppendix2 = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.AWAITING_GROUP,
+          recipientCompanySiret: ttr.siret,
+          quantityReceived: 1
+        }
+      });
+
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.SEALED,
+          emitterCompanySiret: ttr.siret,
+          emitterType: EmitterType.APPENDIX2,
+          grouping: {
+            create: {
+              initialFormId: initialAppendix2.id,
+              quantity: initialAppendix2.quantityReceived
+            }
+          }
+        }
+      });
+
+      const wannaBeAppendix2 = await formFactory({
+        ownerId: (await userFactory()).id,
+        opt: { status: Status.AWAITING_GROUP, quantityReceived: 1 }
+      });
+
+      const updateFormInput: UpdateFormInput = {
+        id: form.id,
+        grouping: [
+          {
+            form: { id: wannaBeAppendix2.id },
+            quantity: wannaBeAppendix2.quantityReceived
+          }
+        ]
+      };
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<Pick<Mutation, "createForm">>(
+        UPDATE_FORM,
+        {
+          variables: { updateFormInput }
+        }
+      );
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: `Le bordereau ${wannaBeAppendix2.id} n'est pas en possession du nouvel émetteur`
+        })
+      ]);
+    }
+  );
 
   it("should not be possible to change emitter.type when existing appendix2Forms is not empty", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
@@ -852,7 +1213,8 @@ describe("Mutation.updateForm", () => {
       ownerId: user.id,
       opt: {
         status: "GROUPED",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -862,7 +1224,12 @@ describe("Mutation.updateForm", () => {
         status: "DRAFT",
         emitterCompanySiret: ttr.siret,
         emitterType: EmitterType.APPENDIX2,
-        appendix2Forms: { connect: { id: appendixForm.id } }
+        grouping: {
+          create: {
+            initialFormId: appendixForm.id,
+            quantity: appendixForm.quantityReceived
+          }
+        }
       }
     });
 
@@ -886,45 +1253,103 @@ describe("Mutation.updateForm", () => {
     ]);
   });
 
-  it("should not be possible to add appendix2Forms to an existing form which emitter.type is not APPENDIX2", async () => {
-    const { user, company: producer } = await userWithCompanyFactory("MEMBER");
+  it(
+    "should not be possible to add appendix2Forms to an existing form" +
+      " which emitter.type is not APPENDIX2 (using UpdateFormInput.appendix2Forms)",
+    async () => {
+      const { user, company: producer } = await userWithCompanyFactory(
+        "MEMBER"
+      );
 
-    const appendixForm = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: "AWAITING_GROUP",
-        recipientCompanySiret: producer.siret
-      }
-    });
-
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: "DRAFT",
-        emitterCompanySiret: producer.siret,
-        emitterType: EmitterType.PRODUCER
-      }
-    });
-
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<
-      Pick<Mutation, "updateForm">,
-      MutationUpdateFormArgs
-    >(UPDATE_FORM, {
-      variables: {
-        updateFormInput: {
-          id: form.id,
-          appendix2Forms: [{ id: appendixForm.id }]
+      const appendixForm = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "AWAITING_GROUP",
+          recipientCompanySiret: producer.siret
         }
-      }
-    });
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message:
-          "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
-      })
-    ]);
-  });
+      });
+
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "DRAFT",
+          emitterCompanySiret: producer.siret,
+          emitterType: EmitterType.PRODUCER
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "updateForm">,
+        MutationUpdateFormArgs
+      >(UPDATE_FORM, {
+        variables: {
+          updateFormInput: {
+            id: form.id,
+            appendix2Forms: [{ id: appendixForm.id }]
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+        })
+      ]);
+    }
+  );
+
+  it(
+    "should not be possible to add appendix2Forms to an existing form" +
+      " which emitter.type is not APPENDIX2 (using UpdateFormInput.grouping)",
+    async () => {
+      const { user, company: producer } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+
+      const appendixForm = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "AWAITING_GROUP",
+          recipientCompanySiret: producer.siret,
+          quantityReceived: 1
+        }
+      });
+
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "DRAFT",
+          emitterCompanySiret: producer.siret,
+          emitterType: EmitterType.PRODUCER
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "updateForm">,
+        MutationUpdateFormArgs
+      >(UPDATE_FORM, {
+        variables: {
+          updateFormInput: {
+            id: form.id,
+            grouping: [
+              {
+                form: { id: appendixForm.id },
+                quantity: appendixForm.quantityReceived
+              }
+            ]
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+        })
+      ]);
+    }
+  );
 
   it("should be possible to change both emitter.type and set appendix2Forms to []", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
@@ -933,7 +1358,8 @@ describe("Mutation.updateForm", () => {
       ownerId: user.id,
       opt: {
         status: "GROUPED",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -943,7 +1369,12 @@ describe("Mutation.updateForm", () => {
         status: "DRAFT",
         emitterCompanySiret: ttr.siret,
         emitterType: EmitterType.APPENDIX2,
-        appendix2Forms: { connect: { id: appendixForm.id } }
+        grouping: {
+          create: {
+            initialFormId: appendixForm.id,
+            quantity: appendixForm.quantityReceived
+          }
+        }
       }
     });
 
@@ -961,16 +1392,62 @@ describe("Mutation.updateForm", () => {
       }
     });
     expect(data.updateForm.appendix2Forms).toEqual([]);
+    expect(data.updateForm.grouping).toEqual([]);
   });
 
-  it("should be possible to re-associate same appendix2", async () => {
+  it("should be possible to change both emitter.type and set grouping to []", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
+    const appendixForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
+      }
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: ttr.siret,
+        emitterType: EmitterType.APPENDIX2,
+        grouping: {
+          create: {
+            initialFormId: appendixForm.id,
+            quantity: appendixForm.quantityReceived
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          emitter: { type: EmitterType.PRODUCER },
+          grouping: []
+        }
+      }
+    });
+    expect(data.updateForm.appendix2Forms).toEqual([]);
+    expect(data.updateForm.grouping).toEqual([]);
+  });
+
+  it("should be possible to re-associate same appendix2 (using UpdateFormInput.appendix2Forms)", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
 
     const appendixForm = await formFactory({
       ownerId: user.id,
       opt: {
         status: "AWAITING_GROUP",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -1009,6 +1486,151 @@ describe("Mutation.updateForm", () => {
       }
     });
     expect(data2.updateForm.appendix2Forms).toHaveLength(1);
+  });
+
+  it("should be possible to re-associate same appendix2 (using UpdateFormInput.grouping)", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
+    const appendixForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "AWAITING_GROUP",
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
+      }
+    });
+
+    const groupingForm1 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: ttr.siret,
+        emitterType: EmitterType.APPENDIX2
+      }
+    });
+
+    const groupingForm2 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: ttr.siret,
+        emitterType: EmitterType.APPENDIX2
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: groupingForm1.id,
+          grouping: [
+            {
+              form: { id: appendixForm.id },
+              quantity: 0.8
+            }
+          ]
+        }
+      }
+    });
+    expect(data.updateForm.grouping).toHaveLength(1);
+
+    const { data: data2 } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: groupingForm2.id,
+          grouping: [
+            {
+              form: { id: appendixForm.id },
+              quantity: 0.2
+            }
+          ]
+        }
+      }
+    });
+    expect(data2.updateForm.grouping).toHaveLength(1);
+
+    const { data: data3 } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: groupingForm2.id,
+          grouping: [
+            {
+              form: { id: appendixForm.id },
+              quantity: 0.2
+            }
+          ]
+        }
+      }
+    });
+    expect(data3.updateForm.grouping).toHaveLength(1);
+  }, 30000);
+
+  it("should default to quantity left when no quantity is specified in grouping", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
+    const appendix2Form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "AWAITING_GROUP",
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1,
+        quantityGrouped: 0.2
+      }
+    });
+
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SEALED,
+        recipientCompanySiret: ttr.siret,
+        grouping: {
+          create: {
+            quantity: 0.2,
+            initialFormId: appendix2Form.id
+          }
+        }
+      }
+    });
+
+    const groupingForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: ttr.siret,
+        emitterType: EmitterType.APPENDIX2
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput: UpdateFormInput = {
+      id: groupingForm.id,
+      grouping: [{ form: { id: appendix2Form.id } }]
+    };
+
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(data.updateForm.grouping).toEqual([
+      expect.objectContaining({ form: { id: appendix2Form.id }, quantity: 0.8 })
+    ]);
+
+    const updatedAppendix2Form = await prisma.form.findFirst({
+      where: { id: appendix2Form.id }
+    });
+
+    expect(updatedAppendix2Form.quantityGrouped).toEqual(
+      updatedAppendix2Form.quantityReceived
+    );
   });
 
   it("should not be possible to set isDangerous=false with a waste code containing an *", async () => {
@@ -1067,5 +1689,49 @@ describe("Mutation.updateForm", () => {
       variables: { updateFormInput }
     });
     expect(data.updateForm.wasteDetails.isDangerous).toBe(true);
+  });
+
+  it("should perform update in transaction", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: ttr.siret,
+        emitterType: EmitterType.APPENDIX2,
+        wasteDetailsCode: "01 03 04*"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          wasteDetails: {
+            code: "01 03 05*"
+          },
+          // throw an exception in appendix 2 association
+          appendix2Forms: [{ id: "does-not-exist" }]
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le bordereau avec l'identifiant "does-not-exist" n'existe pas.`
+      })
+    ]);
+
+    const updatedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
+
+    // check form has not been updated
+    expect(updatedForm.wasteDetailsCode).toEqual("01 03 04*");
   });
 });

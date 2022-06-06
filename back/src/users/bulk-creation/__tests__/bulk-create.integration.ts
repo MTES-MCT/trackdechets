@@ -1,6 +1,10 @@
-import { resetDatabase } from "../../../../integration-tests/helper";
+import {
+  resetCache,
+  resetDatabase
+} from "../../../../integration-tests/helper";
 import prisma from "../../../prisma";
 import * as mailsHelper from "../../../mailer/mailing";
+import * as sirene from "../sirene";
 import { companyFactory, userFactory } from "../../../__tests__/factories";
 import { bulkCreate, Opts } from "../index";
 
@@ -8,16 +12,17 @@ import { bulkCreate, Opts } from "../index";
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
 
-jest.mock("../sirene", () => ({
-  sirenify: jest.fn(company =>
-    Promise.resolve({
-      ...company,
-      name: "NAME FROM SIRENE",
-      address: "40 boulevard Volatire 13001 Marseille",
-      codeNaf: "62.01Z"
-    })
-  )
-}));
+const sireneSpy = jest.spyOn(sirene, "sirenify");
+sireneSpy.mockImplementation(company =>
+  Promise.resolve({
+    ...company,
+    name: "NAME FROM SIRENE",
+    address: "40 boulevard Volatire 13001 Marseille",
+    codeNaf: "62.01Z",
+    latitude: 1,
+    longitude: 1
+  })
+);
 
 export interface CompanyInfo {
   etablissement: {
@@ -74,7 +79,10 @@ describe("bulk create users and companies from csv files", () => {
     expect(associations).toHaveLength(associationCount);
   }
 
-  afterEach(() => resetDatabase());
+  afterEach(async () => {
+    await resetDatabase();
+    await resetCache();
+  });
 
   test("create companies and users from scratch", async () => {
     await bulkCreateIdempotent();

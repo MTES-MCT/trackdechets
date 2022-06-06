@@ -10,6 +10,8 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../database";
 import { checkIsCompanyMember } from "../../../users/permissions";
+import { countries } from "../../../common/constants/companySearchHelpers";
+import { checkVAT } from "jsvat";
 
 const MAX_FAVORITES = 10;
 
@@ -163,6 +165,7 @@ async function getRecentPartners(
       return forms.map(form => ({
         name: form[`${lowerType}CompanyName`],
         siret: form[`${lowerType}CompanySiret`],
+        vatNumber: form[`${lowerType}CompanyVatNumber`],
         address: form[`${lowerType}CompanyAddress`],
         contact: form[`${lowerType}CompanyContact`],
         phone: form[`${lowerType}CompanyPhone`],
@@ -187,9 +190,19 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
   const favorites: CompanyFavorite[] = (
     await getRecentPartners(user.id, company.siret, type)
   )
-    // Remove duplicates (by company siret)
+    // Remove duplicates (by company siret or VAT)
     .reduce<CompanyFavorite[]>((prev, cur) => {
-      if (prev.find(el => el.siret === cur.siret) == null) {
+      if (
+        prev.find(
+          el =>
+            el.siret === cur.siret ||
+            (el.vatNumber && cur.vatNumber && el.vatNumber === cur.vatNumber)
+        ) == null
+      ) {
+        // compute codePaysEtrangerEtablissement
+        cur.codePaysEtrangerEtablissement = !cur.vatNumber
+          ? "FR"
+          : checkVAT(cur.vatNumber, countries)?.country?.isoCode.short;
         return prev.concat([cur]);
       }
       return prev;
@@ -205,7 +218,11 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
   const isMatchingType = matchesFavoriteType(company, type);
   // their company is not included in the results yet
   const isAlreadyListed = favorites.find(
-    favorite => favorite.siret === company.siret
+    favorite =>
+      favorite.siret === company.siret ||
+      (favorite.vatNumber &&
+        company.vatNumber &&
+        favorite.vatNumber === company.vatNumber)
   );
   if (isMatchingType && !isAlreadyListed) {
     favorites.push({
@@ -215,7 +232,10 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
       address: company.address,
       contact: user.name,
       phone: user.phone,
-      mail: user.email
+      mail: user.email,
+      codePaysEtrangerEtablissement: !company.vatNumber
+        ? "FR"
+        : checkVAT(company.vatNumber, countries)?.country?.isoCode.short
     });
   }
 

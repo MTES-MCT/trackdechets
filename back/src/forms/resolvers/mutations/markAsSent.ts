@@ -41,18 +41,15 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
     formUpdateInput
   });
 
-  // mark appendix2Forms as GROUPED
-  const appendix2Forms = await getFormRepository(user).findAppendix2FormsById(
-    form.id
-  );
+  const { findAppendix2FormsById, updateAppendix2Forms } =
+    getFormRepository(user);
+
+  const appendix2Forms = await findAppendix2FormsById(form.id);
 
   if (appendix2Forms.length > 0) {
-    const promises = appendix2Forms.map(appendix => {
-      return transitionForm(user, appendix, {
-        type: EventType.MarkAsGrouped
-      });
-    });
-    await Promise.all(promises);
+    // mark appendix2Forms as GROUPED if all its grouping forms are sealed
+    // and quantityGrouped is equal to quantityReceived
+    await updateAppendix2Forms(appendix2Forms);
   }
 
   return expandFormFromDb(resentForm);

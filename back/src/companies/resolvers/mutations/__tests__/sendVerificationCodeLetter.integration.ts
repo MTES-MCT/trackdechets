@@ -51,7 +51,7 @@ describe("mutation sendVerificationCodeLetter", () => {
 
     const { mutate } = makeClient(admin);
     const { errors } = await mutate(SEND_VERIFICATION_CODE_LETTER, {
-      variables: { input: { siret: "11111111111111" } }
+      variables: { input: { siret: "31111111111112" } }
     });
     expect(errors).toEqual([
       expect.objectContaining({

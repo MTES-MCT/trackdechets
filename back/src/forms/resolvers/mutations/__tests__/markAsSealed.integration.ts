@@ -74,7 +74,7 @@ describe("Mutation.markAsSealed", () => {
     );
   });
 
-  it.each(["emitter", "recipient", "trader", "transporter"])(
+  it.each(["emitter", "recipient", "trader", "broker", "transporter"])(
     "%p of the BSD can seal it",
     async role => {
       const companyType = (role: string) =>
@@ -96,6 +96,18 @@ describe("Mutation.markAsSealed", () => {
           [`${role}CompanySiret`]: company.siret,
           ...(role !== "recipient"
             ? { recipientCompanySiret: (await destinationFactory()).siret }
+            : {}),
+          ...(["trader", "broker"].includes(role)
+            ? {
+                [`${role}CompanyName`]: "Trader or Broker",
+                [`${role}CompanyContact`]: "Mr Trader or Broker",
+                [`${role}CompanyMail`]: "traderbroker@trackdechets.fr",
+                [`${role}CompanyAddress`]: "Wall street",
+                [`${role}CompanyPhone`]: "00 00 00 00 00",
+                [`${role}Receipt`]: "receipt",
+                [`${role}Department`]: "07",
+                [`${role}ValidityLimit`]: new Date("2023-01-01")
+              }
             : {})
         }
       });
@@ -126,11 +138,6 @@ describe("Mutation.markAsSealed", () => {
   it("the eco-organisme of the BSD can seal it", async () => {
     const emitterCompany = await companyFactory();
     const recipientCompany = await destinationFactory();
-    const traderCompany = await companyFactory({
-      companyTypes: {
-        set: [CompanyType.TRADER]
-      }
-    });
 
     const { user, company: ecoOrganismeCompany } = await userWithCompanyFactory(
       "MEMBER"
@@ -151,7 +158,6 @@ describe("Mutation.markAsSealed", () => {
         emitterType: "OTHER",
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
-        traderCompanySiret: traderCompany.siret,
         ecoOrganismeSiret: eo.siret,
         ecoOrganismeName: eo.name
       }
@@ -490,19 +496,22 @@ describe("Mutation.markAsSealed", () => {
     const destination = await destinationFactory();
     const appendix2 = await formFactory({
       ownerId: user.id,
-      opt: { status: "AWAITING_GROUP" }
+      opt: { status: "AWAITING_GROUP", quantityReceived: 1 }
     });
+
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
         emitterCompanySiret: company.siret,
-        recipientCompanySiret: destination.siret
+        recipientCompanySiret: destination.siret,
+        grouping: {
+          create: {
+            initialFormId: appendix2.id,
+            quantity: appendix2.quantityReceived
+          }
+        }
       }
-    });
-    await prisma.form.update({
-      where: { id: form.id },
-      data: { appendix2Forms: { connect: [{ id: appendix2.id }] } }
     });
 
     const { mutate } = makeClient(user);
@@ -802,5 +811,89 @@ describe("Mutation.markAsSealed", () => {
     });
 
     expect(sendMailSpy).not.toHaveBeenCalled();
+  });
+
+  it("should throw a ValidationError if missing broker contact info", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.PRODUCER]
+    });
+    const recipient = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR]
+    });
+
+    const broker = await companyFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.DRAFT,
+        emitterCompanySiret: emitter.siret,
+        recipientCompanySiret: recipient.siret,
+        brokerCompanySiret: broker.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.\n" +
+          "Erreur(s): Courtier : Le nom de l'entreprise est obligatoire\n" +
+          "Courtier : L'adresse de l'entreprise est obligatoire\n" +
+          "Courtier : Le contact dans l'entreprise est obligatoire\n" +
+          "Courtier : Le téléphone de l'entreprise est obligatoire\n" +
+          "Courtier : L'email de l'entreprise est obligatoire\n" +
+          "Courtier : Numéro de récepissé obligatoire\n" +
+          "Courtier : Département obligatoire\n" +
+          "Courtier : Date de validité obligatoire"
+      })
+    ]);
+  });
+
+  it("should throw a ValidationError if missing trader contact info", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: [CompanyType.PRODUCER]
+    });
+    const recipient = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR]
+    });
+
+    const broker = await companyFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.DRAFT,
+        emitterCompanySiret: emitter.siret,
+        recipientCompanySiret: recipient.siret,
+        traderCompanySiret: broker.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.\n" +
+          "Erreur(s): Négociant: Le nom de l'entreprise est obligatoire\n" +
+          "Négociant: L'adresse de l'entreprise est obligatoire\n" +
+          "Négociant: Le contact dans l'entreprise est obligatoire\n" +
+          "Négociant: Le téléphone de l'entreprise est obligatoire\n" +
+          "Négociant: L'email de l'entreprise est obligatoire\n" +
+          "Négociant: Numéro de récepissé obligatoire\n" +
+          "Négociant : Département obligatoire\n" +
+          "Négociant : Date de validité obligatoire"
+      })
+    ]);
   });
 });

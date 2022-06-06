@@ -30,7 +30,7 @@
     "bulk-create-account:dev": "ts-node src/users/bulk-creation/index.ts",
     "index-elastic-search": "node dist/src/scripts/bin/indexElasticSearch.js",
     "index-elastic-search:dev": "ts-node -r dotenv/config ./src/scripts/bin/indexElasticSearch.ts",
-    "reindex-bsd": "node dist/src/scripts/bin/reindexBsd.ts $bsdId",
+    "reindex-bsd": "node dist/src/scripts/bin/reindexBsd.js $bsdId",
     "reindex-bsd:dev": "ts-node -r dotenv/config ./src/scripts/bin/reindexBsd.ts $bsdId",
     "watch:queue": "nodemon -r dotenv/config --watch src --exec \"ts-eager\" --inspect=0.0.0.0:9230 src/queue/consumer.ts -e ts,tsx",
     "queue": "node dist/src/queue/consumer.js"
@@ -74,6 +74,7 @@
     "dataloader": "^2.0.0",
     "date-fns": "^2.14.0",
     "dd-trace": "^1.5.0",
+    "decimal.js-light": "^2.5.1",
     "exceljs": "^4.1.0",
     "express": "^4.17.1",
     "express-rate-limit": "^5.5.0",

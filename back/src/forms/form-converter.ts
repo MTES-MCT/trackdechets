@@ -46,7 +46,8 @@ import {
   FormRevisionRequestWasteDetails,
   FormRevisionRequestTemporaryStorageDetail,
   FormRevisionRequestDestination,
-  FormRevisionRequestRecipient
+  FormRevisionRequestRecipient,
+  ParcelNumber
 } from "../generated/graphql/types";
 import { extractPostalCode } from "../utils";
 
@@ -176,7 +177,18 @@ function flattenWasteDetailsInput(input: { wasteDetails?: WasteDetailsInput }) {
     wasteDetailsName: chain(input.wasteDetails, w => w.name),
     wasteDetailsConsistence: chain(input.wasteDetails, w => w.consistence),
     wasteDetailsPop: chain(input.wasteDetails, w => w.pop),
-    wasteDetailsIsDangerous: chain(input.wasteDetails, w => w.isDangerous)
+    wasteDetailsIsDangerous: chain(input.wasteDetails, w => w.isDangerous),
+    wasteDetailsParcelNumbers: chain(input.wasteDetails, w =>
+      undefinedOrDefault(w.parcelNumbers, [])
+    ),
+    wasteDetailsAnalysisReferences: chain(
+      input.wasteDetails,
+      w => w.analysisReferences
+    ),
+    wasteDetailsLandIdentifiers: chain(
+      input.wasteDetails,
+      w => w.landIdentifiers
+    )
   };
 }
 
@@ -610,7 +622,10 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       quantityType: form.wasteDetailsQuantityType,
       consistence: form.wasteDetailsConsistence,
       pop: form.wasteDetailsPop,
-      isDangerous: form.wasteDetailsIsDangerous
+      isDangerous: form.wasteDetailsIsDangerous,
+      parcelNumbers: form.wasteDetailsParcelNumbers as ParcelNumber[],
+      analysisReferences: form.wasteDetailsAnalysisReferences,
+      landIdentifiers: form.wasteDetailsLandIdentifiers
     }),
     trader: nullIfNoValues<Trader>({
       company: nullIfNoValues<FormCompany>({
@@ -659,6 +674,7 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
     receivedAt: form.receivedAt,
     signedAt: form.signedAt,
     quantityReceived: form.quantityReceived,
+    quantityGrouped: form.quantityGrouped,
     processingOperationDone: form.processingOperationDone,
     processingOperationDescription: form.processingOperationDescription,
     processedBy: form.processedBy,
@@ -677,7 +693,8 @@ export function expandFormFromDb(form: PrismaForm): GraphQLForm {
       })
     }),
     currentTransporterSiret: form.currentTransporterSiret,
-    nextTransporterSiret: form.nextTransporterSiret
+    nextTransporterSiret: form.nextTransporterSiret,
+    intermediaries: []
   };
 }
 
@@ -692,7 +709,8 @@ export function expandAppendix2FormFromDb(
     recipient,
     signedAt,
     quantityReceived,
-    processingOperationDone
+    processingOperationDone,
+    quantityGrouped
   } = expandFormFromDb(prismaForm);
 
   const hasPickupSite = emitter?.workSite?.postalCode?.length > 0;
@@ -708,6 +726,7 @@ export function expandAppendix2FormFromDb(
     signedAt,
     recipient,
     quantityReceived,
+    quantityGrouped,
     processingOperationDone
   };
 }

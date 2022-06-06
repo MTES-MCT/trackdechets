@@ -60,7 +60,10 @@ const searchResponseToCompany = (
     libelleNaf: etablissement.activitePrincipaleEtablissement
       ? libelleFromCodeNaf(etablissement.activitePrincipaleEtablissement)
       : "",
-    statutDiffusionEtablissement: etablissement.statutDiffusionEtablissement
+    statutDiffusionEtablissement: etablissement.statutDiffusionEtablissement,
+    // La variable codePaysEtrangerEtablissement commence toujours par 99 si elle est renseignée dans la base sirene INSEE
+    // Les 3 caractères suivants sont le code du pays étranger.
+    codePaysEtrangerEtablissement: etablissement.codePaysEtrangerEtablissement
   };
 
   const isEntrepreneurIndividuel =

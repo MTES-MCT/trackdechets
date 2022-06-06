@@ -5,16 +5,19 @@ import { ErrorCode } from "../../../../common/errors";
 import {
   companyFactory,
   formFactory,
+  toIntermediaryCompany,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
 import {
+  CreateFormInput,
   Mutation,
-  MutationCreateFormArgs
+  MutationCreateFormArgs,
+  ParcelNumber
 } from "../../../../generated/graphql/types";
-import { EmitterType, Status } from "@prisma/client";
+import { EmitterType, Status, UserRole } from "@prisma/client";
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
@@ -81,9 +84,29 @@ const CREATE_FORM = `
           quantity
         }
         isDangerous
+        parcelNumbers {
+          city
+          postalCode
+          prefix
+          section
+          number
+          x
+          y
+        }
       }
       appendix2Forms {
         id
+      }
+      grouping {
+        quantity
+        form {
+          id
+        }
+      }
+      intermediaries {
+        name
+        siret
+        contact
       }
     }
   }
@@ -153,6 +176,101 @@ describe("Mutation.createForm", () => {
       expect(data.createForm.id).toBeTruthy();
     }
   );
+
+  it("should allow an intermediary company to create a form", async () => {
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER, {
+      companyTypes: {
+        set: ["TRANSPORTER"]
+      }
+    });
+    const search = require("../../../../companies/search");
+    const searchCompanyMock = jest.spyOn(search, "searchCompany");
+    searchCompanyMock.mockResolvedValueOnce({
+      siret: intermediary.company.siret,
+      name: intermediary.company.name,
+      statutDiffusionEtablissement: "O",
+      address: intermediary.company.address
+    });
+    const intermediaryCreation = toIntermediaryCompany(intermediary.company);
+    const { mutate } = makeClient(intermediary.user);
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          intermediaries: [intermediaryCreation]
+        }
+      }
+    });
+
+    expect(data.createForm.intermediaries).toEqual([
+      expect.objectContaining({
+        name: intermediary.company.name,
+        siret: intermediary.company.siret,
+        contact: intermediaryCreation.contact
+      })
+    ]);
+  });
+
+  it("should not allow to create a form with a foreign intermediary", async () => {
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER, {
+      companyTypes: {
+        set: ["TRANSPORTER"]
+      },
+      vatNumber: "BE0541696005"
+    });
+    const { mutate } = makeClient(intermediary.user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          intermediaries: [
+            {
+              vatNumber: "BE0541696005",
+              name: "Belgian Co",
+              contact: "Benoit"
+            }
+          ]
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Seul les numéros de TVA en France sont valides",
+        extensions: {
+          code: "BAD_USER_INPUT"
+        }
+      })
+    ]);
+  });
+
+  it("should not allow to create a form with an intermediary with only a FR VAT number but no SIRET", async () => {
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER, {
+      companyTypes: {
+        set: ["TRANSPORTER"]
+      },
+      vatNumber: "FR87850019464"
+    });
+    const { mutate } = makeClient(intermediary.user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          intermediaries: [
+            {
+              vatNumber: "FR87850019464",
+              name: "Belgian Co",
+              contact: "Benoit"
+            }
+          ]
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Le N°SIRET est obligatoire pour une entreprise intermédiaire",
+        extensions: {
+          code: "BAD_USER_INPUT"
+        }
+      })
+    ]);
+  });
 
   it("should allow an eco-organisme to create a form", async () => {
     const { user, company: eo } = await userWithCompanyFactory("MEMBER", {
@@ -296,6 +414,48 @@ describe("Mutation.createForm", () => {
     expect(data.createForm.temporaryStorageDetail).toBeTruthy();
   });
 
+  it("should create a form with parcel numbers", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const parcelNumbers: ParcelNumber[] = [
+      {
+        city: "Paris",
+        postalCode: "75001",
+        x: 12000,
+        y: 12000
+      },
+      {
+        city: "Paris",
+        postalCode: "75001",
+        number: "0039",
+        prefix: "000",
+        section: "OS"
+      }
+    ];
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      wasteDetails: {
+        parcelNumbers
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+
+    expect(data.createForm.wasteDetails.parcelNumbers[0]).toMatchObject(
+      parcelNumbers[0]
+    );
+    expect(data.createForm.wasteDetails.parcelNumbers[1]).toMatchObject(
+      parcelNumbers[1]
+    );
+  });
+
   it("should return an error when creating a form with a temporary storage detail but no temp storage flag", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -335,7 +495,7 @@ describe("Mutation.createForm", () => {
       },
       recipient: {
         company: {
-          siret: "11111111111111"
+          siret: "3".repeat(14)
         }
       }
     };
@@ -576,14 +736,15 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
-  it("should allow creating a form with an appendix 2", async () => {
+  it("should allow creating a form with an appendix 2 (using CreateFormInput.appendix2Forms)", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
 
     const appendix2 = await formFactory({
       ownerId: user.id,
       opt: {
         status: "AWAITING_GROUP",
-        recipientCompanySiret: ttr.siret
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
       }
     });
 
@@ -597,91 +758,294 @@ describe("Mutation.createForm", () => {
       appendix2Forms: [{ id: appendix2.id }]
     };
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<Pick<Mutation, "createForm">>(
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+
+    expect(errors).toEqual(undefined);
+    expect(data.createForm.appendix2Forms[0].id).toBe(appendix2.id);
+  });
+
+  it("should allow creating a form with an appendix 2 (using CreateFormInput.grouping)", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
+
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "AWAITING_GROUP",
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
+      }
+    });
+
+    const createFormInput = {
+      emitter: {
+        type: EmitterType.APPENDIX2,
+        company: {
+          siret: ttr.siret
+        }
+      },
+      grouping: [{ form: { id: appendix2.id }, quantity: 0.5 }]
+    };
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+
+    expect(errors).toEqual(undefined);
+    expect(data.createForm.grouping).toEqual([
+      { form: { id: appendix2.id }, quantity: 0.5 }
+    ]);
+  });
+
+  it("should allow consuming a BSDD in several appendix2", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
+
+    const initialForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "AWAITING_GROUP",
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
+      }
+    });
+
+    const createFormInput = {
+      emitter: {
+        type: EmitterType.APPENDIX2,
+        company: {
+          siret: ttr.siret
+        }
+      },
+      grouping: [{ form: { id: initialForm.id }, quantity: 0.5 }]
+    };
+    const { mutate } = makeClient(user);
+    const {
+      data: { createForm: groupementForm1 }
+    } = await mutate<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
       CREATE_FORM,
       {
         variables: { createFormInput }
       }
     );
 
-    expect(errors).toEqual(undefined);
-    expect(data.createForm.appendix2Forms[0].id).toBe(appendix2.id);
+    expect(groupementForm1.grouping).toEqual([
+      { form: { id: initialForm.id }, quantity: 0.5 }
+    ]);
+
+    const {
+      data: { createForm: groupementForm2 }
+    } = await mutate<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
+      CREATE_FORM,
+      {
+        variables: { createFormInput }
+      }
+    );
+
+    expect(groupementForm2.grouping).toEqual([
+      { form: { id: initialForm.id }, quantity: 0.5 }
+    ]);
+
+    const updatedInitialForm = await prisma.form.findUnique({
+      where: { id: initialForm.id }
+    });
+
+    expect(updatedInitialForm.quantityGrouped).toEqual(1);
   });
 
-  it("should disallow creating a form with an appendix 2 if the appendix2 form is already part of another appendix", async () => {
-    const { user, company } = await userWithCompanyFactory("ADMIN");
+  it(
+    "should disallow creating a form with an appendix 2 if the appendix2" +
+      " form is already part of another appendix (using CreateFormInput.appendix2Forms)",
+    async () => {
+      const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
 
-    const appendix2 = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: "AWAITING_GROUP"
-      }
-    });
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: "DRAFT",
-        recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
-      }
-    });
-    await prisma.form.update({
-      where: { id: form.id },
-      data: { appendix2Forms: { connect: [{ id: appendix2.id }] } }
-    });
-
-    const createFormInput = {
-      emitter: {
-        type: EmitterType.APPENDIX2,
-        company: {
-          siret: company.siret
+      const appendix2 = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "AWAITING_GROUP",
+          recipientCompanySiret: ttr.siret,
+          quantityReceived: 1
         }
-      },
-      appendix2Forms: [{ id: appendix2.id }]
-    };
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
-      variables: { createFormInput }
-    });
+      });
+      await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "DRAFT",
+          recipientCompanyName: ttr.name,
+          recipientCompanySiret: ttr.siret,
+          grouping: {
+            create: {
+              initialFormId: appendix2.id,
+              quantity: appendix2.quantityReceived
+            }
+          }
+        }
+      });
 
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: `Le bordereau ${appendix2.id} est déjà associé à un autre bordereau dans le cadre d'un regroupement avec annexe 2`,
-        extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
+      const createFormInput = {
+        emitter: {
+          type: EmitterType.APPENDIX2,
+          company: {
+            siret: ttr.siret
+          }
+        },
+        appendix2Forms: [{ id: appendix2.id }]
+      };
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<Pick<Mutation, "createForm">>(
+        CREATE_FORM,
+        {
+          variables: { createFormInput }
+        }
+      );
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: `Le bordereau ${appendix2.readableId} a déjà été regroupé en totalité`,
+          extensions: expect.objectContaining({
+            code: ErrorCode.BAD_USER_INPUT
+          })
         })
-      })
-    ]);
-  });
+      ]);
+    }
+  );
 
-  it("should disallow linking an appendix 2 form if the emitter of the regroupement form is not the recipient of the initial form", async () => {
-    const appendix2 = await formFactory({
-      ownerId: (await userFactory()).id,
-      opt: { status: Status.AWAITING_GROUP }
-    });
-    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+  it(
+    "should disallow creating a form with an appendix 2 if the quantity we try to group" +
+      " is greater than the quantity available (using CreateFormInput.grouping)",
+    async () => {
+      const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
 
-    const createFormInput = {
-      emitter: {
-        type: EmitterType.APPENDIX2,
-        company: {
-          siret: ttr.siret
+      const appendix2 = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "AWAITING_GROUP",
+          recipientCompanySiret: ttr.siret,
+          quantityReceived: 1
         }
-      },
-      appendix2Forms: [{ id: appendix2.id }]
-    };
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
-      variables: { createFormInput }
-    });
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: `Le bordereau ${appendix2.id} n'est pas en possession du nouvel émetteur`
-      })
-    ]);
-  });
+      });
+      await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "DRAFT",
+          recipientCompanyName: ttr.name,
+          recipientCompanySiret: ttr.siret,
+          grouping: {
+            create: {
+              initialFormId: appendix2.id,
+              quantity: 0.8
+            }
+          }
+        }
+      });
 
-  it("should disallow linking an appendix2 form that is not awaiting groupement", async () => {
+      const createFormInput = {
+        emitter: {
+          type: EmitterType.APPENDIX2,
+          company: {
+            siret: ttr.siret
+          }
+        },
+        // trying to group 0.5 of this form but the quantity left
+        // to group is equal to 0.2 = 1 - 0.8
+        grouping: [{ form: { id: appendix2.id }, quantity: 0.5 }]
+      };
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<Pick<Mutation, "createForm">>(
+        CREATE_FORM,
+        {
+          variables: { createFormInput }
+        }
+      );
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: `La quantité restante à regrouper sur le BSDD ${appendix2.readableId} est de 0.200 T. Vous tentez de regrouper 0.5 T.`,
+          extensions: expect.objectContaining({
+            code: ErrorCode.BAD_USER_INPUT
+          })
+        })
+      ]);
+    }
+  );
+
+  it(
+    "should disallow linking an appendix 2 form if the emitter of the regroupement" +
+      " form is not the recipient of the initial form (using CreateFormInput.appendix2Forms)",
+    async () => {
+      const appendix2 = await formFactory({
+        ownerId: (await userFactory()).id,
+        opt: { status: Status.AWAITING_GROUP }
+      });
+      const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
+      const createFormInput = {
+        emitter: {
+          type: EmitterType.APPENDIX2,
+          company: {
+            siret: ttr.siret
+          }
+        },
+        appendix2Forms: [{ id: appendix2.id }]
+      };
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<Pick<Mutation, "createForm">>(
+        CREATE_FORM,
+        {
+          variables: { createFormInput }
+        }
+      );
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: `Le bordereau ${appendix2.id} n'est pas en possession du nouvel émetteur`
+        })
+      ]);
+    }
+  );
+
+  it(
+    "should disallow linking an appendix 2 form if the emitter of the regroupement" +
+      " form is not the recipient of the initial form (using CreateFormInput.grouping)",
+    async () => {
+      const appendix2 = await formFactory({
+        ownerId: (await userFactory()).id,
+        opt: { status: Status.AWAITING_GROUP, quantityReceived: 1 }
+      });
+      const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
+      const createFormInput: CreateFormInput = {
+        emitter: {
+          type: EmitterType.APPENDIX2,
+          company: {
+            siret: ttr.siret
+          }
+        },
+        grouping: [
+          { form: { id: appendix2.id }, quantity: appendix2.quantityReceived }
+        ]
+      };
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<Pick<Mutation, "createForm">>(
+        CREATE_FORM,
+        {
+          variables: { createFormInput }
+        }
+      );
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: `Le bordereau ${appendix2.id} n'est pas en possession du nouvel émetteur`
+        })
+      ]);
+    }
+  );
+
+  it("should disallow linking an appendix2 form that is not awaiting groupement (using CreateFormInput.appendix2Forms)", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
     const appendix2 = await formFactory({
       ownerId: user.id,
@@ -708,7 +1072,40 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
-  it("should disallow linking an appendix2 form to a BSDD which emitter type is not APPENDIX2", async () => {
+  it("should disallow linking an appendix2 form that is not awaiting groupement (using CreateFormInput.grouping)", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SENT,
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
+      }
+    });
+
+    const createFormInput: CreateFormInput = {
+      emitter: {
+        type: EmitterType.APPENDIX2,
+        company: {
+          siret: ttr.siret
+        }
+      },
+      grouping: [
+        { form: { id: appendix2.id }, quantity: appendix2.quantityReceived }
+      ]
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le bordereau ${appendix2.id} n'est pas en attente de regroupement`
+      })
+    ]);
+  });
+
+  it("should disallow linking an appendix2 form to a BSDD which emitter type is not APPENDIX2 (using CreateFormInput.appendix2Forms)", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
     const appendix2 = await formFactory({
       ownerId: user.id,
@@ -734,6 +1131,132 @@ describe("Mutation.createForm", () => {
           "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
       })
     ]);
+  });
+
+  it("should disallow linking an appendix2 form to a BSDD which emitter type is not APPENDIX2 (using CreateFormInput.grouping)", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.AWAITING_GROUP,
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
+      }
+    });
+
+    const createFormInput: CreateFormInput = {
+      emitter: {
+        type: "PRODUCER",
+        company: {
+          siret: ttr.siret
+        }
+      },
+      grouping: [
+        { form: { id: appendix2.id }, quantity: appendix2.quantityReceived }
+      ]
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+      })
+    ]);
+  });
+
+  it("should throw error when trying to set both appendix2Forms and grouping", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.AWAITING_GROUP,
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
+      }
+    });
+
+    const createFormInput: CreateFormInput = {
+      emitter: {
+        type: "APPENDIX2",
+        company: {
+          siret: ttr.siret
+        }
+      },
+      grouping: [
+        { form: { id: appendix2.id }, quantity: appendix2.quantityReceived }
+      ],
+      appendix2Forms: [{ id: appendix2.id }]
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous pouvez renseigner soit `appendix2Forms` soit `grouping` mais pas les deux"
+      })
+    ]);
+  });
+
+  it("should default to quantity left when no quantity is specified in grouping", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.AWAITING_GROUP,
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1,
+        quantityGrouped: 0.2
+      }
+    });
+
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SEALED,
+        recipientCompanySiret: ttr.siret,
+        grouping: {
+          create: {
+            quantity: 0.2,
+            initialFormId: appendix2.id
+          }
+        }
+      }
+    });
+
+    const createFormInput: CreateFormInput = {
+      emitter: {
+        type: "APPENDIX2",
+        company: {
+          siret: ttr.siret
+        }
+      },
+      grouping: [{ form: { id: appendix2.id } }]
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+
+    expect(data.createForm.grouping).toEqual([
+      expect.objectContaining({
+        quantity: 0.8,
+        form: expect.objectContaining({ id: appendix2.id })
+      })
+    ]);
+
+    const updatedAppendix2 = await prisma.form.findUnique({
+      where: { id: appendix2.id }
+    });
+
+    expect(updatedAppendix2.quantityGrouped).toEqual(
+      updatedAppendix2.quantityReceived
+    );
   });
 
   it("should set isDangerous to `true` when specifying a waste code ending with *", async () => {
@@ -837,5 +1360,39 @@ describe("Mutation.createForm", () => {
       }
     });
     expect(data?.createForm?.id).toBeDefined();
+  });
+
+  it("should perform form creation in transaction", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+
+    const formCountBeforeCreation = await prisma.form.count();
+    expect(formCountBeforeCreation).toEqual(0);
+
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          // let's throw an error in appendix2 association that happens
+          // after form creation in the mutation. Form creation should
+          // be rolled back
+          grouping: [{ form: { id: "does-not-exist" }, quantity: 1 }]
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le bordereau avec l'identifiant "does-not-exist" n'existe pas.`
+      })
+    ]);
+
+    // check form has not been created
+    const formCountAfterCreationAttempt = await prisma.form.count();
+    expect(formCountAfterCreationAttempt).toEqual(0);
   });
 });

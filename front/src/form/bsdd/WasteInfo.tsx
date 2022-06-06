@@ -12,13 +12,38 @@ import React, { useEffect } from "react";
 import Appendix2MultiSelect from "./components/appendix/Appendix2MultiSelect";
 import AppendixInfo from "./components/appendix/AppendixInfo";
 import Packagings from "./components/packagings/Packagings";
+import { ParcelNumbersSelector } from "./components/parcel-number/ParcelNumber";
 import { WasteCodeSelect, wasteCodeValidator } from "./components/waste-code";
 import "./WasteInfo.scss";
 
 type Values = {
-  wasteDetails: { code: string; packagings: string[] };
+  wasteDetails: {
+    code: string;
+    packagings: string[];
+    parcelNumbers: any[];
+    landIdentifiers: string[];
+    analysisReferences: string[];
+  };
   emitter: { company: { siret: string }; type: string };
 };
+
+const SOIL_CODES = [
+  "17 05 03*",
+  "17 05 04",
+  "17 05 05*",
+  "17 05 06",
+  "01 03 99",
+  "01 05 04",
+  "01 05 05*",
+  "01 05 06*",
+  "01 05 07",
+  "01 05 08",
+  "01 05 99",
+  "02 01 01",
+  "02 01 99",
+  "20 02 02",
+];
+
 export default connect<{}, Values>(function WasteInfo(props) {
   const { values, setFieldValue } = props.formik;
 
@@ -206,6 +231,22 @@ export default connect<{}, Values>(function WasteInfo(props) {
 
         <RedErrorMessage name="wasteDetails.onuCode" />
       </div>
+
+      {SOIL_CODES.includes(values.wasteDetails.code) ||
+      values.wasteDetails.parcelNumbers?.length ||
+      values.wasteDetails.landIdentifiers?.length ||
+      values.wasteDetails.analysisReferences?.length ? (
+        <>
+          <h4 className="form__section-heading">Terres et sédiments</h4>
+
+          <div className="form__row">
+            <Field
+              component={ParcelNumbersSelector}
+              name="wasteDetails.parcelNumbers"
+            />
+          </div>
+        </>
+      ) : null}
     </>
   );
 });

@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { Client, RequestParams } from "@elastic/elasticsearch";
-import { BsdType } from "../generated/graphql/types";
+import { BsdType, FormCompany } from "../generated/graphql/types";
 import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
 import prisma from "../prisma";
@@ -46,6 +46,7 @@ export interface BsdElastic {
   destinationReceptionWeight: number;
   destinationOperationCode: string;
   destinationOperationDate: number;
+  intermediaries?: FormCompany[];
 
   isDraftFor: string[];
   isForActionFor: string[];
@@ -281,6 +282,18 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   // établissements pour lesquelles ce BSD doit apparaitre sur le registre de déchets gérés
   isManagedWasteFor: {
     type: "keyword"
+  },
+  intermediaries: {
+    properties: {
+      name: { type: "text" },
+      siret: { type: "keyword" },
+      address: { type: "text" },
+      country: { type: "text" },
+      contact: { type: "text" },
+      phone: { type: "text" },
+      mail: { type: "text" },
+      vatNumber: { type: "keyword" }
+    }
   }
 };
 

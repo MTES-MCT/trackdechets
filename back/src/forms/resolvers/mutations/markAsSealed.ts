@@ -33,15 +33,11 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
 
   const formRepository = getFormRepository(user);
 
-  // mark appendix2Forms as GROUPED
   const appendix2Forms = await formRepository.findAppendix2FormsById(form.id);
   if (appendix2Forms.length > 0) {
-    const promises = appendix2Forms.map(appendix => {
-      return transitionForm(user, appendix, {
-        type: EventType.MarkAsGrouped
-      });
-    });
-    await Promise.all(promises);
+    // mark appendix2Forms as GROUPED if all its grouping forms are sealed
+    // and quantityGrouped is equal to quantityReceived
+    await formRepository.updateAppendix2Forms(appendix2Forms);
   }
 
   // send welcome email to emitter if it is not registered in TD

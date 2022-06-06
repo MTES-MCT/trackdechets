@@ -16,7 +16,7 @@ export default function CountrySelector(props: CountrySelectorProps) {
   return (
     <Select
       {...props}
-      options={countries}
+      options={countries.filter(country => country.cca2 !== "FR")}
       onChange={option =>
         props.onChange(
           // option can be null, an option or an array of options

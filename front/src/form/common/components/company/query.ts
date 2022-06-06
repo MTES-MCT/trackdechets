@@ -10,6 +10,7 @@ export const FAVORITES = gql`
       contact
       phone
       mail
+      codePaysEtrangerEtablissement
       transporterReceipt {
         receiptNumber
         validityLimit
@@ -48,6 +49,7 @@ export const COMPANY_INFOS = gql`
       statutDiffusionEtablissement
       isRegistered
       companyTypes
+      codePaysEtrangerEtablissement
       installation {
         codeS3ic
         urlFiche
@@ -76,6 +78,8 @@ export const SEARCH_COMPANIES = gql`
       siret
       name
       address
+      etatAdministratif
+      codePaysEtrangerEtablissement
       installation {
         codeS3ic
         urlFiche

@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { CompanyType, Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { convertUrls } from "../../database";
 import prisma from "../../../prisma";
@@ -11,7 +11,7 @@ import geocode from "../../geocode";
 import * as COMPANY_TYPES from "../../../common/constants/COMPANY_TYPES";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../mailer/templates";
-import { deleteCachedUserSirets } from "../../../common/redis/users";
+import { deleteCachedUserCompanies } from "../../../common/redis/users";
 import { isVat } from "../../../common/constants/companySearchHelpers";
 import { whereSiretOrVatNumber } from "../CompanySearchResult";
 import { searchCompany } from "../../search";
@@ -57,6 +57,11 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   let vatNumber: string;
   if (isVat(orgId)) {
     vatNumber = orgId;
+    if (companyTypes.join("") !== CompanyType.TRANSPORTER) {
+      throw new UserInputError(
+        "Impossible de créer un établissement identifié par un numéro de TVA d'un autre type que TRANSPORTER"
+      );
+    }
   }
   const existingCompany = await prisma.company.findUnique({
     where: whereSiretOrVatNumber({ siret, vatNumber })
@@ -146,7 +151,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       role: "ADMIN"
     }
   });
-  await deleteCachedUserSirets(user.id);
+  await deleteCachedUserCompanies(user.id);
   const company = await companyAssociationPromise.company();
 
   // fill firstAssociationDate field if null (no need to update it if user was previously already associated)

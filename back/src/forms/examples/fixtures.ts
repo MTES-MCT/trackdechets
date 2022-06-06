@@ -103,6 +103,14 @@ function recipientIsTempStorageInput(siret: string) {
   };
 }
 
+function ttrInput(siret: string) {
+  return {
+    processingOperation: "D 13",
+    cap: "CAP",
+    company: ttrCompanyInput(siret)
+  };
+}
+
 const wasteDetailsInput = {
   code: "06 05 02*",
   onuCode: "Non Soumis",
@@ -146,6 +154,19 @@ const processedInfoInput = {
   processedAt: "2020-04-15T10:22:00"
 };
 
+function awaitingGroupInfoInput(nextDestinationSiret: string) {
+  return {
+    processingOperationDone: "D 13",
+    processingOperationDescription: "Regroupement",
+    processedBy: "Alfred Dujardin",
+    processedAt: "2020-04-15T10:22:00",
+    nextDestination: {
+      processingOperation: "R 1",
+      company: traiteurCompanyInput(nextDestinationSiret)
+    }
+  };
+}
+
 const tempStoredInfosInput = {
   wasteAcceptationStatus: "ACCEPTED",
   receivedBy: "John Arnold",
@@ -185,6 +206,7 @@ export default {
   recipientInput,
   ttrCompanyInput,
   recipientIsTempStorageInput,
+  ttrInput,
   wasteDetailsInput,
   workSiteInput,
   receiptInput,
@@ -192,6 +214,7 @@ export default {
   signTransportFormInput,
   receivedInfoInput,
   processedInfoInput,
+  awaitingGroupInfoInput,
   tempStoredInfosInput,
   resealedInfosInput,
   nextSegmentInfoInput,

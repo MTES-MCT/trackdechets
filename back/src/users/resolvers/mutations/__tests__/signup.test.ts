@@ -34,7 +34,7 @@ jest.mock("../../../../mailer/mailing", () => ({
 }));
 
 jest.mock("../../../../common/redis/users", () => ({
-  deleteCachedUserSirets: () => jest.fn(() => Promise.resolve())
+  deleteCachedUserCompanies: () => jest.fn(() => Promise.resolve())
 }));
 
 describe("signup", () => {

@@ -1,9 +1,11 @@
+import { UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Mutation } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
   formFactory,
   formWithTempStorageFactory,
+  toIntermediaryCompany,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -12,11 +14,25 @@ const DUPLICATE_FORM = `
   mutation DuplicateForm($id: ID!) {
     duplicateForm(id: $id) {
       id
+      intermediaries {
+        siret
+        name
+      }
     }
   }
 `;
 
+const validateIntermediariesInputMock = jest.fn();
+jest.mock("../../../validation", () => ({
+  validateIntermediariesInput: jest.fn((...args) =>
+    validateIntermediariesInputMock(...args)
+  )
+}));
+
 describe("Mutation.duplicateForm", () => {
+  beforeEach(() => {
+    validateIntermediariesInputMock.mockReset();
+  });
   afterEach(() => resetDatabase());
 
   it.each([
@@ -323,5 +339,39 @@ describe("Mutation.duplicateForm", () => {
 
     expect(statusLogs.length).toEqual(1);
     expect(statusLogs[0].loggedAt).toBeTruthy();
+  });
+
+  it("should duplicate the intermediary company", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+    const intermediary = await userWithCompanyFactory(UserRole.MEMBER);
+    validateIntermediariesInputMock.mockResolvedValueOnce([
+      toIntermediaryCompany(intermediary.company)
+    ]);
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        intermediaries: {
+          create: [toIntermediaryCompany(intermediary.company)]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+      DUPLICATE_FORM,
+      {
+        variables: {
+          id: form.id
+        }
+      }
+    );
+
+    expect(data.duplicateForm.intermediaries).toEqual([
+      expect.objectContaining({
+        name: intermediary.company.name,
+        siret: intermediary.company.siret
+      })
+    ]);
   });
 });

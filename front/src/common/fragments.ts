@@ -55,6 +55,17 @@ export const wasteDetailsFragment = gql`
     consistence
     pop
     isDangerous
+    parcelNumbers {
+      city
+      postalCode
+      prefix
+      section
+      number
+      x
+      y
+    }
+    analysisReferences
+    landIdentifiers
   }
 `;
 
@@ -250,32 +261,38 @@ const mutableFieldsFragment = gql`
     wasteDetails {
       ...WasteDetailsFragment
     }
-    appendix2Forms {
-      id
-      readableId
-      wasteDetails {
-        code
-        name
-        quantity
-        packagingInfos {
-          type
-          other
-          quantity
-        }
-      }
-      emitter {
-        company {
+    grouping {
+      quantity
+      form {
+        id
+        readableId
+        wasteDetails {
+          code
           name
+          quantity
+          packagingInfos {
+            type
+            other
+            quantity
+          }
         }
-      }
-      recipient {
-        company {
-          siret
+        emitter {
+          company {
+            name
+          }
         }
+        recipient {
+          company {
+            siret
+          }
+        }
+        signedAt
+        quantityReceived
+        quantityGrouped
+        processingOperationDone
       }
-      signedAt
-      processingOperationDone
     }
+    quantityGrouped
     ecoOrganisme {
       name
       siret
@@ -346,20 +363,27 @@ export const detailFormFragment = gql`
       name
     }
     groupedIn {
-      id
-      readableId
-    }
-    appendix2Forms {
-      readableId
-      wasteDetails {
-        code
-        name
-        quantity
+      quantity
+      form {
+        id
+        readableId
       }
-      quantityReceived
-      signedAt
-      emitterPostalCode
     }
+    grouping {
+      quantity
+      form {
+        readableId
+        wasteDetails {
+          code
+          name
+          quantity
+        }
+        quantityReceived
+        signedAt
+        emitterPostalCode
+      }
+    }
+    quantityGrouped
   }
   ${transporterFormFragment}
 `;

@@ -11,11 +11,43 @@ import { Query } from "../../../../generated/graphql/types";
 const FAVORITES = `query Favorites($siret: String!, $type: FavoriteType!) {
   favorites(siret: $siret, type: $type) {
     siret
+    vatNumber
+    codePaysEtrangerEtablissement
   }
 }`;
 
 describe("query favorites", () => {
   afterEach(resetDatabase);
+
+  it("should return the right country code for a foreign transporter", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      vatNumber: "IT09301420155",
+      companyTypes: {
+        set: ["TRANSPORTER"]
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        transporterCompanyVatNumber: "IT09301420155"
+      }
+    });
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "TRANSPORTER"
+      }
+    });
+
+    expect(data.favorites).toEqual([
+      expect.objectContaining({
+        vatNumber: "IT09301420155",
+        codePaysEtrangerEtablissement: "IT"
+      })
+    ]);
+  });
 
   it("should return the recent EMITTER", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
@@ -37,7 +69,8 @@ describe("query favorites", () => {
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: form.emitterCompanySiret
+        siret: form.emitterCompanySiret,
+        codePaysEtrangerEtablissement: "FR"
       })
     ]);
   });
@@ -84,7 +117,8 @@ describe("query favorites", () => {
     expect(errors).toBeUndefined();
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: company.siret
+        siret: company.siret,
+        codePaysEtrangerEtablissement: "FR"
       })
     ]);
   });
@@ -104,7 +138,7 @@ describe("query favorites", () => {
     const secondForm = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: "1".repeat(14)
+        emitterCompanySiret: "2".repeat(14)
       }
     });
 
@@ -118,13 +152,16 @@ describe("query favorites", () => {
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: secondForm.emitterCompanySiret
+        siret: secondForm.emitterCompanySiret,
+        codePaysEtrangerEtablissement: "FR"
       }),
       expect.objectContaining({
-        siret: firstForm.emitterCompanySiret
+        siret: firstForm.emitterCompanySiret,
+        codePaysEtrangerEtablissement: "FR"
       }),
       expect.objectContaining({
-        siret: company.siret
+        siret: company.siret,
+        codePaysEtrangerEtablissement: "FR"
       })
     ]);
   });
@@ -164,13 +201,16 @@ describe("query favorites", () => {
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: thirdForm.emitterCompanySiret
+        siret: thirdForm.emitterCompanySiret,
+        codePaysEtrangerEtablissement: "FR"
       }),
       expect.objectContaining({
-        siret: company.siret
+        siret: company.siret,
+        codePaysEtrangerEtablissement: "FR"
       }),
       expect.objectContaining({
-        siret: firstForm.emitterCompanySiret
+        siret: firstForm.emitterCompanySiret,
+        codePaysEtrangerEtablissement: "FR"
       })
     ]);
   });
@@ -206,7 +246,39 @@ describe("query favorites", () => {
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: firstForm.emitterCompanySiret
+        siret: firstForm.emitterCompanySiret,
+        codePaysEtrangerEtablissement: "FR"
+      })
+    ]);
+
+    // Test with VAT numbers
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        transporterCompanyName: "A Name",
+        transporterCompanyVatNumber: "IT09301420155"
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        transporterCompanyName: "Another Name",
+        transporterCompanyVatNumber: "IT09301420155"
+      }
+    });
+
+    const { data: data2 } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "TRANSPORTER"
+      }
+    });
+
+    expect(data2.favorites).toEqual([
+      expect.objectContaining({
+        vatNumber: "IT09301420155",
+        siret: "12345678974589",
+        codePaysEtrangerEtablissement: "IT"
       })
     ]);
   });

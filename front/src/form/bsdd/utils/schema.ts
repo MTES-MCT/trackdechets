@@ -88,6 +88,31 @@ const destinationSchema = companySchema.concat(
   })
 );
 
+export const transporterSchema = object().shape({
+  isExemptedOfReceipt: boolean().nullable(true),
+  receipt: string().when(
+    "isExemptedOfReceipt",
+    (isExemptedOfReceipt: boolean, schema: StringSchema) =>
+      isExemptedOfReceipt
+        ? schema.nullable(true)
+        : schema
+            .ensure()
+            .required(
+              "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+            )
+  ),
+  department: string().when(
+    "isExemptedOfReceipt",
+    (isExemptedOfReceipt: boolean, schema: StringSchema) =>
+      isExemptedOfReceipt
+        ? schema.nullable(true)
+        : schema.required("Le département du transporteur est obligatoire")
+  ),
+  validityLimit: date().nullable(true),
+  numberPlate: string().nullable(true),
+  company: companySchema,
+});
+
 const packagingInfo: SchemaOf<Omit<
   PackagingInfo,
   "__typename"
@@ -167,36 +192,28 @@ export const formSchema = object().shape({
       ),
     company: destinationSchema,
   }),
-  transporter: object().shape({
-    isExemptedOfReceipt: boolean().nullable(true),
-    receipt: string().when(
-      "isExemptedOfReceipt",
-      (isExemptedOfReceipt: boolean, schema: StringSchema) =>
-        isExemptedOfReceipt
-          ? schema.nullable(true)
-          : schema.required(
-              "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
-            )
-    ),
-    department: string().when(
-      "isExemptedOfReceipt",
-      (isExemptedOfReceipt: boolean, schema: StringSchema) =>
-        isExemptedOfReceipt
-          ? schema.nullable(true)
-          : schema.required("Le département du transporteur est obligatoire")
-    ),
-    validityLimit: date().nullable(true),
-    numberPlate: string().nullable(true),
-    company: companySchema,
-  }),
+  transporter: transporterSchema,
   trader: object()
     .notRequired()
     .nullable()
     .shape({
       company: companySchema,
-      validityLimit: date().nullable(true),
-      department: string().nullable(),
-      receipt: string().nullable(),
+      validityLimit: date().required(
+        "La date de limite de validité est obligatoire"
+      ),
+      department: string().required("Le département est obligatoire"),
+      receipt: string().required("Le numéro de récépissé est obligatoire"),
+    }),
+  broker: object()
+    .notRequired()
+    .nullable()
+    .shape({
+      company: companySchema,
+      validityLimit: date().required(
+        "La date de limite de validité est obligatoire"
+      ),
+      department: string().required("Le département est obligatoire"),
+      receipt: string().required("Le numéro de récépissé est obligatoire"),
     }),
   wasteDetails: object().shape({
     code: string().required("Code déchet manquant"),

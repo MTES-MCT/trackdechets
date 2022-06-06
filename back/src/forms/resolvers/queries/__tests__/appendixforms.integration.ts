@@ -8,6 +8,7 @@ import {
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { gql } from "apollo-server-core";
+import prisma from "../../../../prisma";
 
 const APPENDIX_FORMS = gql`
   query AppendixForm($siret: String!) {
@@ -25,61 +26,122 @@ describe("Test appendixForms", () => {
   afterEach(async () => {
     await resetDatabase();
   });
-  it("should return appendixForms data", async () => {
+  it("should return appendix 2 candidates", async () => {
     const { user: emitter, company: emitterCompany } =
       await userWithCompanyFactory("ADMIN");
-    const { user: recipient, company: recipientCompany } =
-      await userWithCompanyFactory("ADMIN");
+    const { user: ttr, company: ttrCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
 
     // This form is in AWAITING_GROUP and should be returned
-    const form = await formFactory({
+    const awaitingGroupForm = await formFactory({
       ownerId: emitter.id,
       opt: {
         emitterCompanyName: emitterCompany.name,
         emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret,
-        status: "AWAITING_GROUP"
-      }
-    });
-    // other forms should not be returned
-    await formFactory({
-      ownerId: emitter.id,
-      opt: {
-        emitterCompanyName: emitterCompany.name,
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret,
-        status: "PROCESSED"
-      }
-    });
-    await formFactory({
-      ownerId: emitter.id,
-      opt: {
-        emitterCompanyName: emitterCompany.name,
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret,
-        status: "RECEIVED"
-      }
-    });
-    await formFactory({
-      ownerId: emitter.id,
-      opt: {
-        emitterCompanyName: emitterCompany.name,
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret,
+        recipientCompanySiret: ttrCompany.siret,
         status: "AWAITING_GROUP",
-        appendix2RootForm: { connect: { id: form.id } } // Dummy link between forms
+        quantityReceived: 1
+      }
+    });
+    // processed form, should not be returned
+    await formFactory({
+      ownerId: emitter.id,
+      opt: {
+        emitterCompanyName: emitterCompany.name,
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: ttrCompany.siret,
+        status: "PROCESSED",
+        quantityReceived: 1
+      }
+    });
+    // received form, should not be returned
+    await formFactory({
+      ownerId: emitter.id,
+      opt: {
+        emitterCompanyName: emitterCompany.name,
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: ttrCompany.siret,
+        status: "RECEIVED",
+        quantityReceived: 1
       }
     });
 
-    const { query } = makeClient(recipient);
+    // totally grouped, should not be returned
+    const initialForm1 = await formFactory({
+      ownerId: emitter.id,
+      opt: {
+        emitterCompanyName: emitterCompany.name,
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: ttrCompany.siret,
+        status: "AWAITING_GROUP",
+        quantityReceived: 1,
+        quantityGrouped: 1
+      }
+    });
+
+    const groupingForm1 = await formFactory({
+      ownerId: ttr.id,
+      opt: {
+        emitterCompanyName: ttrCompany.name,
+        emitterCompanySiret: ttrCompany.siret,
+        recipientCompanySiret: destinationCompany.siret,
+        status: "SEALED"
+      }
+    });
+
+    await prisma.formGroupement.create({
+      data: {
+        nextFormId: groupingForm1.id,
+        initialFormId: initialForm1.id,
+        quantity: 1 // totally grouped
+      }
+    });
+
+    // partially grouped, should be returned
+    const initialForm2 = await formFactory({
+      ownerId: emitter.id,
+      opt: {
+        emitterCompanyName: emitterCompany.name,
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: ttrCompany.siret,
+        status: "AWAITING_GROUP",
+        quantityReceived: 1,
+        quantityGrouped: 0.5
+      }
+    });
+
+    const groupingForm2 = await formFactory({
+      ownerId: ttr.id,
+      opt: {
+        emitterCompanyName: ttrCompany.name,
+        emitterCompanySiret: ttrCompany.siret,
+        recipientCompanySiret: destinationCompany.siret,
+        status: "SEALED"
+      }
+    });
+
+    await prisma.formGroupement.create({
+      data: {
+        nextFormId: groupingForm2.id,
+        initialFormId: initialForm2.id,
+        quantity: 0.5 // partially grouped,
+      }
+    });
+
+    const { query } = makeClient(ttr);
     const {
       data: { appendixForms }
     } = await query<{ appendixForms: { id: string }[] }>(APPENDIX_FORMS, {
-      variables: { siret: recipientCompany.siret }
+      variables: { siret: ttrCompany.siret }
     });
 
-    expect(appendixForms.length).toBe(1);
-    expect(appendixForms[0].id).toBe(form.id);
+    expect(appendixForms.length).toBe(2);
+    expect(appendixForms[0].id).toBe(awaitingGroupForm.id);
+    expect(appendixForms[1].id).toBe(initialForm2.id);
   });
 
   it("should not return appendixForms data", async () => {
@@ -125,7 +187,8 @@ describe("Test appendixForms", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: ttrCompany.siret,
         recipientIsTempStorage: true,
-        status: "AWAITING_GROUP"
+        status: "AWAITING_GROUP",
+        quantityReceived: 1
       },
       tempStorageOpts: { destinationCompanySiret: destinationCompany.siret }
     });

@@ -17,11 +17,13 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import {
   userWithCompanyFactory,
-  formFactory
+  formFactory,
+  toIntermediaryCompany
 } from "../../../../__tests__/factories";
 
 import { indexForm } from "../../../../forms/elastic";
 import { getFullForm } from "../../../../forms/database";
+
 const GET_BSDS = `
   query GetBsds($where: BsdWhere) {
     bsds(where: $where) {
@@ -29,6 +31,23 @@ const GET_BSDS = `
         node {
           ... on Form {
             id
+          }
+        }
+      }
+    }
+  }
+`;
+const GET_BSDS_INTERMEDIARIES = `
+  query GetBsds($where: BsdWhere) {
+    bsds(where: $where) {
+      edges {
+        node {
+          ... on Form {
+            id
+            intermediaries {
+              name
+              siret
+            }
           }
         }
       }
@@ -47,12 +66,18 @@ describe("Query.bsds workflow", () => {
   let emitter: { user: User; company: Company };
   let transporter: { user: User; company: Company };
   let recipient: { user: User; company: Company };
+  let intermediary: { user: User; company: Company };
   let formId: string;
 
   beforeAll(async () => {
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
         set: ["PRODUCER"]
+      }
+    });
+    intermediary = await userWithCompanyFactory(UserRole.MEMBER, {
+      companyTypes: {
+        set: ["TRANSPORTER"]
       }
     });
     transporter = await userWithCompanyFactory(UserRole.ADMIN, {
@@ -128,7 +153,8 @@ describe("Query.bsds workflow", () => {
                 ],
                 quantityType: "ESTIMATED",
                 quantity: 1
-              }
+              },
+              intermediaries: [toIntermediaryCompany(intermediary.company)]
             }
           }
         }
@@ -154,10 +180,39 @@ describe("Query.bsds workflow", () => {
         expect.objectContaining({ node: { id: formId } })
       ]);
     });
+
+    it("should list the intermediaries", async () => {
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS_INTERMEDIARIES,
+        {
+          variables: {
+            where: {
+              isDraftFor: [emitter.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({
+          node: {
+            id: formId,
+            intermediaries: [
+              {
+                name: intermediary.company.name,
+                siret: intermediary.company.siret
+              }
+            ]
+          }
+        })
+      ]);
+    });
   });
 
   describe("when the bsd is sealed", () => {
     beforeAll(async () => {
+      expect(formId).toBeDefined();
       const { mutate } = makeClient(transporter.user);
       const MARK_AS_SEALED = `
         mutation MarkAsSealed($id: ID!) {
@@ -216,6 +271,7 @@ describe("Query.bsds workflow", () => {
 
   describe("when the bsd is signed by the transporter and the producer", () => {
     beforeAll(async () => {
+      expect(formId).toBeDefined();
       const { mutate } = makeClient(transporter.user);
       const SIGNED_BY_TRANSPORTER = `
         mutation SignedByTransporter($id: ID!, $signingInfo: TransporterSignatureFormInput!) {
@@ -282,6 +338,7 @@ describe("Query.bsds workflow", () => {
 
   describe("when the bsd is received by the recipient", () => {
     beforeAll(async () => {
+      expect(formId).toBeDefined();
       const { mutate } = makeClient(recipient.user);
       const MARK_AS_RECEIVED = `
         mutation MarkAsReceived($id: ID!, $receivedInfo: ReceivedFormInput!) {
@@ -331,6 +388,7 @@ describe("Query.bsds workflow", () => {
 
   describe("when the bsd is treated by the recipient", () => {
     beforeAll(async () => {
+      expect(formId).toBeDefined();
       const { mutate } = makeClient(recipient.user);
       const MARK_AS_PROCESSED = `
         mutation MarkAsProcessed($id: ID!, $processedInfo: ProcessedFormInput!) {

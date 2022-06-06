@@ -55,7 +55,7 @@ describe("mutation verifyCompanyByAdmin", () => {
     const { errors } = await mutate(VERIFY_COMPANY_BY_ADMIN, {
       variables: {
         input: {
-          siret: "11111111111111"
+          siret: "21111111111111"
         }
       }
     });
