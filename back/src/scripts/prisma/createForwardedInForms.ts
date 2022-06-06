@@ -50,7 +50,7 @@ export default async function createForwardedInForms() {
         signedBy: temporaryStorageDetail.tempStorerSignedBy,
         forwardedIn: {
           create: {
-            readableId: `${form.id}-suite`,
+            readableId: `${form.readableId}-suite`,
             status: getForwardedInStatus(form),
             emitterType: "PRODUCER",
             emitterCompanySiret: form.recipientCompanySiret,
