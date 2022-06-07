@@ -148,7 +148,7 @@ describe("expandFormFromDb", () => {
     const expanded = await expandFormFromDb(form);
     expect(expanded.temporaryStorageDetail).toEqual({
       temporaryStorer: {
-        quantityType: "REAL",
+        quantityType: null,
         quantityReceived: null,
         wasteAcceptationStatus: null,
         wasteRefusalReason: null,
