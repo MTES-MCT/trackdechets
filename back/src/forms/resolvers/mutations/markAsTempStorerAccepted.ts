@@ -24,7 +24,16 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
 
     const formUpdateInput: Prisma.FormUpdateInput = {
       ...tmpStorerAcceptedInfo,
-      signedAt: new Date(tempStorerAcceptedInfo.signedAt)
+      signedAt: new Date(tempStorerAcceptedInfo.signedAt),
+      forwardedIn: {
+        // pre-complete waste details repackaging info on BSD suite
+        update: {
+          wasteDetailsQuantity: tmpStorerAcceptedInfo.quantityReceived,
+          wasteDetailsQuantityType: quantityType,
+          wasteDetailsOnuCode: form.wasteDetailsOnuCode,
+          wasteDetailsPackagingInfos: form.wasteDetailsPackagingInfos
+        }
+      }
     };
 
     const tempStoredForm = await transitionForm(user, form, {

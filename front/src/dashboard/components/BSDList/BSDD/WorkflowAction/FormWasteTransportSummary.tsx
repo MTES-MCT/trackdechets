@@ -2,6 +2,7 @@ import * as React from "react";
 import { Field, useFormikContext } from "formik";
 import {
   Form,
+  FormStatus,
   QuantityType,
   SignTransportFormInput,
 } from "generated/graphql/types";
@@ -60,7 +61,8 @@ export function FormWasteTransportSummary({
         </DataListItem>
         <DataListItem>
           <DataListTerm>Poids en tonnes</DataListTerm>
-          {temporaryStorageDetail?.wasteDetails?.quantity ? (
+
+          {form.status === FormStatus.SignedByTempStorer ? (
             <DataListDescription>
               {temporaryStorageDetail?.wasteDetails?.quantity}{" "}
               {temporaryStorageDetail?.wasteDetails?.quantityType ===
@@ -79,9 +81,9 @@ export function FormWasteTransportSummary({
         </DataListItem>
         <DataListItem>
           <DataListTerm>Contenant(s)</DataListTerm>
-          {temporaryStorageDetail ? (
+          {form.status === FormStatus.SignedByTempStorer ? (
             <DataListDescription>
-              {temporaryStorageDetail.wasteDetails?.packagingInfos
+              {temporaryStorageDetail?.wasteDetails?.packagingInfos
                 ?.map(packaging => `${packaging.quantity} ${packaging.type}`)
                 .join(", ")}
             </DataListDescription>
@@ -95,9 +97,9 @@ export function FormWasteTransportSummary({
         </DataListItem>
         <DataListItem>
           <DataListTerm>Code ADR (ONU)</DataListTerm>
-          {temporaryStorageDetail ? (
+          {form.status === FormStatus.SignedByTempStorer ? (
             <DataListDescription>
-              {temporaryStorageDetail.wasteDetails?.onuCode ?? "Non soumis"}
+              {temporaryStorageDetail?.wasteDetails?.onuCode ?? "Non soumis"}
             </DataListDescription>
           ) : (
             <DataListDescription>

@@ -35,7 +35,22 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
     ...tmpStoredInfos,
     // quantity type can be estimated in case of temporary storage
     quantityReceivedType: quantityType,
-    currentTransporterSiret: ""
+    currentTransporterSiret: "",
+    ...(["ACCEPTED", "PARTIALLY_REFUSED"].includes(
+      tmpStoredInfos.wasteAcceptationStatus
+    )
+      ? {
+          forwardedIn: {
+            // pre-complete waste details repackaging info on BSD suite
+            update: {
+              wasteDetailsQuantity: tmpStoredInfos.quantityReceived,
+              wasteDetailsQuantityType: quantityType,
+              wasteDetailsOnuCode: form.wasteDetailsOnuCode,
+              wasteDetailsPackagingInfos: form.wasteDetailsPackagingInfos
+            }
+          }
+        }
+      : {})
   };
 
   const tempStoredForm = await transitionForm(user, form, {
