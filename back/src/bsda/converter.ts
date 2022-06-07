@@ -597,8 +597,8 @@ export function expandBsdaRevisionRequestContent(
       }),
       reception: nullIfNoValues<BsdaRevisionRequestReception>({
         weight: bsdaRevisionRequest.destinationReceptionWeight
-        ? bsdaRevisionRequest.destinationReceptionWeight / 1000
-        : bsdaRevisionRequest.destinationReceptionWeight
+          ? bsdaRevisionRequest.destinationReceptionWeight / 1000
+          : bsdaRevisionRequest.destinationReceptionWeight
       })
     })
   };
