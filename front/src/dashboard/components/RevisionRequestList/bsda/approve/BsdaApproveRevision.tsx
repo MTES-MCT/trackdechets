@@ -1,11 +1,11 @@
 import React from "react";
 import * as yup from "yup";
 import {
-  Broker,
+  BsdaBroker,
   BsdaRevisionRequest,
   Mutation,
   MutationSubmitBsdaRevisionRequestApprovalArgs,
-  Trader,
+  PickupSite,
 } from "generated/graphql/types";
 import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton, RedErrorMessage } from "common/components";
@@ -118,6 +118,7 @@ export function DisplayRevision({ review }: Props) {
         label="Adresse de collecte"
         bsddValue={review.bsda.emitter?.pickupSite}
         reviewValue={review.content.emitter?.pickupSite}
+        formatter={pickupSiteFormatter}
       />
 
       <RevisionField
@@ -185,7 +186,7 @@ export function DisplayRevision({ review }: Props) {
   );
 }
 
-function brokerFormatter(entity: Broker | undefined): React.ReactNode {
+function brokerFormatter(entity: BsdaBroker | undefined): React.ReactNode {
   if (!entity?.company?.name) return null;
 
   return (
@@ -195,10 +196,25 @@ function brokerFormatter(entity: Broker | undefined): React.ReactNode {
         {entity.company?.address}
       </div>
       <div>
-        Récepissé: {entity.receipt} - Département: {entity.department} - Date
-        limite de validité:{" "}
-        {entity.validityLimit ? formatDate(entity.validityLimit) : ""}
+        Récepissé: {entity.recepisse?.number} - Département:{" "}
+        {entity.recepisse?.department} - Date limite de validité:{" "}
+        {entity.recepisse?.validityLimit
+          ? formatDate(entity.recepisse?.validityLimit)
+          : ""}
       </div>
+    </>
+  );
+}
+
+function pickupSiteFormatter(entity: PickupSite | undefined): React.ReactNode {
+  if (!entity?.name) return null;
+
+  return (
+    <>
+      <div>
+        {entity.name} - {entity.address}, {entity.postalCode} {entity.city}
+      </div>
+      <div>{entity.infos}</div>
     </>
   );
 }

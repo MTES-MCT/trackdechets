@@ -66,6 +66,7 @@ const routes = {
       create: "/dashboard/:siret/bsdas/create",
       edit: "/dashboard/:siret/bsdas/edit/:id",
       view: "/dashboard/:siret/bsdas/view/:id",
+      review: "/dashboard/:siret/bsdas/review/:id",
     },
     transport: {
       index: "/dashboard/:siret/transport",

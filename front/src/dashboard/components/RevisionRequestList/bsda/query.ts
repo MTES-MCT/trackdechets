@@ -5,8 +5,46 @@ const reviewFragment = gql`
   fragment BsdaRevisionRequestFragment on BsdaRevisionRequest {
     id
     bsda {
+      id
+      emitter {
+        pickupSite {
+          name
+          address
+          city
+          postalCode
+          infos
+        }
+      }
       waste {
         code
+        materialName
+        pop
+        sealNumbers
+      }
+      packagings {
+        other
+        quantity
+        type
+      }
+      broker {
+        company {
+          ...CompanyFragment
+        }
+        recepisse {
+          number
+          department
+          validityLimit
+        }
+      }
+      destination {
+        cap
+        reception {
+          weight
+        }
+        operation {
+          code
+          description
+        }
       }
     }
     authoringCompany {
@@ -18,8 +56,45 @@ const reviewFragment = gql`
       status
     }
     content {
+      emitter {
+        pickupSite {
+          name
+          address
+          city
+          postalCode
+          infos
+        }
+      }
       waste {
         code
+        materialName
+        pop
+        sealNumbers
+      }
+      packagings {
+        other
+        quantity
+        type
+      }
+      broker {
+        company {
+          ...CompanyFragment
+        }
+        recepisse {
+          number
+          department
+          validityLimit
+        }
+      }
+      destination {
+        cap
+        reception {
+          weight
+        }
+        operation {
+          code
+          description
+        }
       }
     }
     status
@@ -30,7 +105,7 @@ const reviewFragment = gql`
 
 export const GET_BSDA_REVISION_REQUESTS = gql`
   query BsdaRevisionRequests($siret: String!) {
-    BsdaRevisionRequests(siret: $siret) {
+    bsdaRevisionRequests(siret: $siret) {
       edges {
         node {
           ...BsdaRevisionRequestFragment

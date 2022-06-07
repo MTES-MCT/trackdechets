@@ -30,7 +30,7 @@ CREATE TABLE "default$default"."BsdaRevisionRequest" (
     "emitterPickupSiteAddress" TEXT,
     "emitterPickupSiteCity" TEXT,
     "emitterPickupSitePostalCode" TEXT,
-    "emitterPickupSiteInfos" TEXT
+    "emitterPickupSiteInfos" TEXT,
 
     PRIMARY KEY ("id")
 );

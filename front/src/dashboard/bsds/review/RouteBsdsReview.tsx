@@ -11,8 +11,13 @@ export function RouteBsdsReview() {
         <BreadcrumbItem>Révisions</BreadcrumbItem>
       </Breadcrumb>
 
-      <BsddRevisionRequestList />
-      <BsdaRevisionRequestList />
+      <div className="tw-p-4">
+        <h4 className="h4">BSDD</h4>
+        <BsddRevisionRequestList />
+
+        <h4 className="h4 tw-pt-4">BSDA</h4>
+        <BsdaRevisionRequestList />
+      </div>
     </>
   );
 }
