@@ -692,7 +692,7 @@ export async function expandFormFromDb(form: PrismaForm): Promise<GraphQLForm> {
               phone: forwardedIn.recipientCompanyPhone,
               mail: forwardedIn.recipientCompanyMail
             }),
-            isFilledByEmitter: false // TODO: handle this field
+            isFilledByEmitter: false // DEPRECATED, always returns false
           }),
           wasteDetails: nullIfNoValues<WasteDetails>({
             code: forwardedIn.wasteDetailsCode,
