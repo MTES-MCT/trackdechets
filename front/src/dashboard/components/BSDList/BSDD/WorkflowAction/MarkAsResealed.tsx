@@ -134,18 +134,6 @@ export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
                   Installation de destination prévue
                 </h5>
 
-                <div className="form__row form__row--inline">
-                  <Field
-                    name="destination.isFilledByEmitter"
-                    type="checkbox"
-                    id="isFilledByEmitter"
-                    className="td-checkbox"
-                  />
-                  <label htmlFor="isFilledByEmitter">
-                    Je suis l'émetteur du bordereau
-                  </label>
-                </div>
-
                 <CompanySelector name="destination.company" />
 
                 <div className="form__row">
@@ -279,7 +267,7 @@ const emptyState = {
     },
     cap: "",
     processingOperation: "",
-    isFilledByEmitter: true,
+    isFilledByEmitter: false,
   },
   transporter: {
     isExemptedOfReceipt: false,
