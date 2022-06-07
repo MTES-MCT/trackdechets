@@ -260,7 +260,7 @@ export async function indexAllForms(
   return indexAllForms(idx, { skip: skip + take });
 }
 
-export async function indexForm(form: FullForm, ctx?: GraphQLContext) {
+export function indexForm(form: FullForm, ctx?: GraphQLContext) {
   // prevent unwanted cascaded reindexation
   if (form.isDeleted) {
     return null;
