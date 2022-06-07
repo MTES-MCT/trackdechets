@@ -33,6 +33,7 @@ import {
 import { getFullForm } from "../database";
 import prisma from "../../prisma";
 import { buildAddress } from "../../companies/sirene/utils";
+import { packagingsEqual } from "../../common/constants/formHelpers";
 
 type ReceiptFieldsProps = Partial<
   Pick<GraphQLForm["transporter"], "department" | "receipt" | "validityLimit">
@@ -274,6 +275,13 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
       }))
     )
   };
+  const isRepackging =
+    form.recipient?.isTempStorage &&
+    !!form.temporaryStorageDetail?.wasteDetails?.packagingInfos &&
+    !packagingsEqual(
+      form.temporaryStorageDetail?.wasteDetails?.packagingInfos,
+      form.wasteDetails?.packagingInfos
+    );
   const qrCode = await QRCode.toString(form.readableId, { type: "svg" });
   const html = ReactDOMServer.renderToStaticMarkup(
     <Document title={form.readableId}>
@@ -747,7 +755,9 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             </p>
             <PackagingInfosTable
               packagingInfos={
-                form.temporaryStorageDetail?.wasteDetails?.packagingInfos ?? []
+                isRepackging
+                  ? form.temporaryStorageDetail?.wasteDetails?.packagingInfos
+                  : []
               }
             />
           </div>
@@ -757,7 +767,11 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 16. Quantité (à remplir en cas de reconditionnement uniquement)
               </strong>
             </p>
-            <QuantityFields {...form.temporaryStorageDetail?.wasteDetails} />
+            <QuantityFields
+              {...(isRepackging
+                ? form.temporaryStorageDetail?.wasteDetails
+                : { quantity: null, quantityType: null })}
+            />
           </div>
         </div>
 
@@ -770,7 +784,9 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 :
               </strong>
             </p>
-            <p>{form.temporaryStorageDetail?.wasteDetails?.onuCode}</p>
+            {isRepackging ? (
+              <p>{form.temporaryStorageDetail?.wasteDetails?.onuCode}</p>
+            ) : null}
           </div>
         </div>
 

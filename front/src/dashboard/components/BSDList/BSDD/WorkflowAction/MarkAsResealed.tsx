@@ -11,8 +11,8 @@ import {
   Mutation,
   QuantityType,
   ResealedFormInput,
-  WasteDetails,
 } from "generated/graphql/types";
+import { packagingsEqual } from "generated/constants/formHelpers";
 import ProcessingOperationSelect from "common/components/ProcessingOperationSelect";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "common/components/Modal";
@@ -34,52 +34,23 @@ const MARK_RESEALED = gql`
   ${statusChangeFragment}
 `;
 
-export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
+export default function MarkAsResealed({ form }: WorkflowActionProps) {
   const initialValues = mergeDefaults(
     emptyState,
     form.temporaryStorageDetail || {}
   );
+
   const [isRefurbished, setIsRefurbished] = useState(
-    !!form.temporaryStorageDetail?.wasteDetails?.quantity
+    !!form.temporaryStorageDetail?.wasteDetails?.packagingInfos &&
+      !packagingsEqual(
+        form.temporaryStorageDetail?.wasteDetails?.packagingInfos,
+        form.wasteDetails?.packagingInfos
+      )
   );
 
-  function onChangeRefurbished(values, setFieldValue: (field, value) => void) {
+  function onChangeRefurbished() {
     const willBeRefurbished = !isRefurbished;
     setIsRefurbished(willBeRefurbished);
-
-    if (willBeRefurbished) {
-      const { wasteDetails } = form;
-
-      if (wasteDetails == null) {
-        return;
-      }
-
-      const keys: Array<keyof WasteDetails> = [
-        "onuCode",
-        "packagingInfos",
-        "quantity",
-        "quantityType",
-      ];
-      keys.forEach(key => {
-        switch (key) {
-          case "packagingInfos": {
-            if (
-              wasteDetails[key]?.length &&
-              values.wasteDetails[key].length === 0
-            ) {
-              setFieldValue(`wasteDetails.${key}`, wasteDetails[key]);
-            }
-            break;
-          }
-          default: {
-            if (wasteDetails[key] && !values.wasteDetails[key]) {
-              setFieldValue(`wasteDetails.${key}`, wasteDetails[key]);
-            }
-            break;
-          }
-        }
-      });
-    }
   }
 
   const [markAsResealed, { error, loading }] = useMutation<
@@ -160,7 +131,7 @@ export default function MarkAsResealed({ form, siret }: WorkflowActionProps) {
                     checked={isRefurbished}
                     id="id_isRefurbished"
                     className="td-checkbox"
-                    onChange={() => onChangeRefurbished(values, setFieldValue)}
+                    onChange={onChangeRefurbished}
                   />
                   <label htmlFor="id_isRefurbished">
                     Les déchets ont subi un reconditionnement, je dois saisir

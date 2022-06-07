@@ -496,7 +496,7 @@ export default function BSDDetailContent({
 
             <div className={styles.detailGrid}>
               <dt>Code onu</dt>
-              <dd>{form?.wasteDetails?.onuCode}</dd>
+              <dd>{form?.stateSummary?.onuCode}</dd>
               <dt>POP</dt> <dd>{form.wasteDetails?.pop ? "Oui" : "Non"}</dd>
             </div>
 

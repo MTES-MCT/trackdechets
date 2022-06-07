@@ -674,7 +674,7 @@ export async function expandFormFromDb(form: PrismaForm): Promise<GraphQLForm> {
     temporaryStorageDetail: forwardedIn
       ? {
           temporaryStorer: {
-            quantityType: "REAL",
+            quantityType: form.quantityReceivedType,
             quantityReceived: form.quantityReceived,
             wasteAcceptationStatus: form.wasteAcceptationStatus,
             wasteRefusalReason: form.wasteRefusalReason,
