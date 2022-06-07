@@ -236,6 +236,7 @@ export async function indexAllForms(
       isDeleted: false
     },
     include: {
+      forwarding: true,
       forwardedIn: true,
       transportSegments: true,
       intermediaries: true
