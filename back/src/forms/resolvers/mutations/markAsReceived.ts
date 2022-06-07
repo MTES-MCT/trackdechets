@@ -47,6 +47,9 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
               WasteAcceptationStatus.PARTIALLY_REFUSED
             ].includes(receivedInfo.wasteAcceptationStatus as any)
               ? Status.ACCEPTED
+              : receivedInfo.wasteAcceptationStatus ==
+                WasteAcceptationStatus.REFUSED
+              ? Status.REFUSED
               : Status.RECEIVED,
             ...receivedInfo
           }

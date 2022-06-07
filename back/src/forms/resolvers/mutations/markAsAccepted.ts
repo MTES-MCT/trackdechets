@@ -28,7 +28,10 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
       ? {
           forwardedIn: {
             update: {
-              status: Status.ACCEPTED,
+              status:
+                acceptedInfo.wasteAcceptationStatus === Status.REFUSED
+                  ? Status.REFUSED
+                  : Status.ACCEPTED,
               ...acceptedInfo,
               signedAt: new Date(acceptedInfo.signedAt)
             }
