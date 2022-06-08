@@ -9,6 +9,7 @@ import { InvalidWasteCode, MissingTempStorageFlag } from "../../errors";
 import {
   checkCanUpdate,
   checkIsFormContributor,
+  checkMandatoryRegistrations,
   formToCompanies
 } from "../../permissions";
 import { GraphQLContext } from "../../../types";
@@ -139,6 +140,8 @@ const updateFormResolver = async (
     nextFormCompanies,
     "Vous ne pouvez pas enlever votre établissement du bordereau"
   );
+
+  await checkMandatoryRegistrations(nextFormCompanies);
 
   // Delete temporaryStorageDetail
   if (

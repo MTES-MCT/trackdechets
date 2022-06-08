@@ -13,7 +13,7 @@ import {
   flattenFormInput,
   flattenTemporaryStorageDetailInput
 } from "../../form-converter";
-import { checkIsFormContributor } from "../../permissions";
+import { checkIsFormContributor, checkMandatoryRegistrations } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
 import { FormCompanies } from "../../types";
@@ -85,6 +85,7 @@ const createFormResolver = async (
     formCompanies,
     "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
   );
+  await checkMandatoryRegistrations(formCompanies);
 
   const form = flattenFormInput(formContent);
 

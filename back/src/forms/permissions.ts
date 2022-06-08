@@ -9,7 +9,11 @@ import {
 } from "../common/redis/users";
 
 import { getFullForm } from "./database";
-import { InvaliSecurityCode, NotFormContributor } from "./errors";
+import {
+  InvaliSecurityCode,
+  NotFormContributor,
+  NotRegisteredCompany
+} from "./errors";
 import { getFormRepository } from "./repository";
 
 export async function formToCompanies(form: Form): Promise<FormCompanies> {
@@ -496,4 +500,28 @@ export async function checkCanRequestRevision(
   }
 
   return true;
+}
+
+export async function checkMandatoryRegistrations(
+  formCompanies: FormCompanies
+) {
+  const mustBeRegisteredSirets = [
+    formCompanies.transporterCompanySiret,
+    formCompanies.recipientCompanySiret,
+    formCompanies.temporaryStorageDetail?.transporterCompanySiret,
+    formCompanies.temporaryStorageDetail?.destinationCompanySiret
+  ].filter(Boolean);
+
+  const registeredCompanies = await prisma.company.findMany({
+    where: { siret: { in: mustBeRegisteredSirets } },
+    select: { siret: true }
+  });
+
+  if (registeredCompanies.length !== mustBeRegisteredSirets.length) {
+    const registeredSirets = registeredCompanies.map(c => c.siret);
+    const missingSirets = mustBeRegisteredSirets.filter(
+      siret => !registeredSirets.includes(siret)
+    );
+    throw new NotRegisteredCompany(missingSirets);
+  }
 }
