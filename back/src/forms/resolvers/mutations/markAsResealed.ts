@@ -7,7 +7,13 @@ import { checkCanMarkAsResealed } from "../../permissions";
 import { checkCompaniesType, sealedFormSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
-import { EmitterType, Form, Prisma, Status } from "@prisma/client";
+import {
+  EmitterType,
+  Form,
+  Prisma,
+  QuantityType,
+  Status
+} from "@prisma/client";
 import { getFormRepository } from "../../repository";
 
 const markAsResealed: MutationResolvers["markAsResealed"] = async (
@@ -24,18 +30,12 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
 
   const { forwardedIn } = await formRepository.findFullFormById(form.id);
 
-  if (forwardedIn === null) {
-    throw new UserInputError(
-      "Ce bordereau ne correspond pas à un entreposage provisoire ou un reconditionnemnt"
-    );
-  }
-
   await checkCanMarkAsResealed(user, form);
 
   const { destination, transporter, wasteDetails } = resealedInfos;
 
   // copy basic info from initial BSD and overwrite it with resealedInfos
-  const updateInput: Prisma.FormUpdateInput = {
+  const updateInput = {
     emitterType: EmitterType.PRODUCER,
     emittedByEcoOrganisme: false,
     emitterCompanySiret: form.recipientCompanySiret,
@@ -50,7 +50,7 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     wasteDetailsName: form.wasteDetailsName,
     wasteDetailsOnuCode: form.wasteDetailsOnuCode,
     wasteDetailsPop: form.wasteDetailsPop,
-    wasteDetailsQuantityType: "REAL",
+    wasteDetailsQuantityType: QuantityType.REAL,
     wasteDetailsQuantity: form.quantityReceived,
     wasteDetailsPackagingInfos: form.wasteDetailsPackagingInfos,
     wasteDetailsAnalysisReferences: [],
@@ -66,11 +66,26 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
 
   await checkCompaniesType(form);
 
-  const formUpdateInput: Prisma.FormUpdateInput = {
-    forwardedIn: {
-      update: { ...updateInput, status: Status.SEALED }
-    }
-  };
+  const formUpdateInput: Prisma.FormUpdateInput =
+    forwardedIn === null
+      ? // The recipient decides to forward the BSD even if it has not been
+        // flagged as temporary storage before
+        {
+          recipientIsTempStorage: true,
+          forwardedIn: {
+            create: {
+              owner: { connect: { id: user.id } },
+              readableId: `${form.readableId}-suite`,
+              ...updateInput,
+              status: Status.SEALED
+            }
+          }
+        }
+      : {
+          forwardedIn: {
+            update: { ...updateInput, status: Status.SEALED }
+          }
+        };
 
   let resealedForm: Form | null = null;
 

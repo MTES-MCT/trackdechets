@@ -27,7 +27,7 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 
   await checkCanMarkAsProcessed(user, form);
 
-  const formUpdateInput: Prisma.FormUpdateInput =
+  let formUpdateInput: Prisma.FormUpdateInput =
     flattenProcessedFormInput(processedInfo);
   processedInfoSchema.validateSync(formUpdateInput, { abortEarly: false });
 
@@ -48,21 +48,32 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
     formUpdateInput.nextDestinationCompanyCountry = "FR";
   }
 
+  if (form.status === Status.TEMP_STORER_ACCEPTED) {
+    // The form was flagged as temporary storage but the recipient decides to
+    // fo a final treatement or a groupement
+    formUpdateInput = {
+      ...formUpdateInput,
+      recipientIsTempStorage: false,
+      forwardedIn: { delete: true }
+    };
+  } else if (!!form.forwardedInId) {
+    // Processed info is applied on BSD suite
+    formUpdateInput = {
+      forwardedIn: {
+        update: {
+          status: machine.transition(Status.ACCEPTED, {
+            type: EventType.MarkAsProcessed,
+            formUpdateInput
+          }).value as Status,
+          ...formUpdateInput
+        }
+      }
+    };
+  }
+
   const processedForm = await transitionForm(user, form, {
     type: EventType.MarkAsProcessed,
-    formUpdateInput: form.forwardedInId
-      ? {
-          forwardedIn: {
-            update: {
-              status: machine.transition(Status.ACCEPTED, {
-                type: EventType.MarkAsProcessed,
-                formUpdateInput
-              }).value as Status,
-              ...formUpdateInput
-            }
-          }
-        }
-      : formUpdateInput
+    formUpdateInput
   });
 
   const { findAppendix2FormsById, updateAppendix2Forms } =
