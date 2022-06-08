@@ -89,7 +89,7 @@ export default function AccountFormCompanyTransporterReceipt({
   ] = useMutation(DELETE_TRADER_RECEIPT, {
     update(cache) {
       cache.writeFragment({
-        id: company.id,
+        id: `CompanyPrivate:${company.id}`,
         fragment: gql`
           fragment TraderReceiptCompanyFragment on CompanyPrivate {
             id
@@ -98,7 +98,7 @@ export default function AccountFormCompanyTransporterReceipt({
             }
           }
         `,
-        data: { traderReceipt: null, __typename: "CompanyPrivate" },
+        data: { traderReceipt: null },
       });
     },
   });

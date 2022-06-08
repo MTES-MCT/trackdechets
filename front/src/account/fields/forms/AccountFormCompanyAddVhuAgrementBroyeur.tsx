@@ -84,7 +84,7 @@ export default function AccountFormCompanyAddVhuAgrementBroyeur({
   ] = useMutation(DELETE_VHU_AGREMENT, {
     update(cache) {
       cache.writeFragment({
-        id: company.id,
+        id: `CompanyPrivate:${company.id}`,
         fragment: gql`
           fragment VhuAgrementBroyeurCompanyFragment on CompanyPrivate {
             id
@@ -93,7 +93,7 @@ export default function AccountFormCompanyAddVhuAgrementBroyeur({
             }
           }
         `,
-        data: { vhuAgrementBroyeur: null, __typename: "CompanyPrivate" },
+        data: { vhuAgrementBroyeur: null },
       });
     },
   });
