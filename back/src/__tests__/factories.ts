@@ -282,6 +282,32 @@ export const transportSegmentFactory = async ({ formId, segmentPayload }) => {
   });
 };
 
+const upsertBaseSiret = async siret => {
+  const exists = await prisma.company.findUnique({ where: { siret } });
+  if (!exists) {
+    // Using prisma.upsert gives us "Unique constraint failed on the fields: (`siret`)"
+    // Instead we create if it didn't exist upon entry, and ignore errors.
+    try {
+      await prisma.company.create({
+        data: {
+          siret,
+          companyTypes: {
+            set: ["PRODUCER" as CompanyType]
+          },
+          name: `company_${siret}`,
+          securityCode: 1234,
+          verificationCode: "34567",
+          address: "Champ de Mars, 5 Av. Anatole France, 75007 Paris",
+          contactEmail: `contact_${siret}@gmail.com`,
+          contactPhone: `+${siret}`
+        }
+      });
+    } catch (err) {
+      // Must have been already created (race condition). Just ignore
+    }
+  }
+};
+
 export const formFactory = async ({
   ownerId,
   opt = {}
@@ -289,13 +315,12 @@ export const formFactory = async ({
   ownerId: string;
   opt?: Partial<Prisma.FormCreateInput>;
 }) => {
-  const transporter = await companyFactory();
-  const recipient = await companyFactory();
+  // Those sirets are required for the form to be updatable
+  await upsertBaseSiret(formdata.transporterCompanySiret);
+  await upsertBaseSiret(formdata.recipientCompanySiret);
 
   const formParams = {
     ...formdata,
-    transporterCompanySiret: transporter.siret,
-    recipientCompanySiret: recipient.siret,
     ...opt
   };
   return prisma.form.create({
