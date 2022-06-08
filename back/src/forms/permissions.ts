@@ -506,19 +506,24 @@ export async function checkMandatoryRegistrations(
   formCompanies: FormCompanies
 ) {
   const mustBeRegisteredSirets = [
-    formCompanies.transporterCompanySiret,
-    formCompanies.recipientCompanySiret,
-    formCompanies.temporaryStorageDetail?.transporterCompanySiret,
-    formCompanies.temporaryStorageDetail?.destinationCompanySiret
-  ].filter(Boolean);
+    ...new Set(
+      [
+        formCompanies.transporterCompanySiret,
+        formCompanies.recipientCompanySiret,
+        formCompanies.temporaryStorageDetail?.transporterCompanySiret,
+        formCompanies.temporaryStorageDetail?.destinationCompanySiret
+      ].filter(Boolean)
+    )
+  ];
 
   const registeredCompanies = await prisma.company.findMany({
     where: { siret: { in: mustBeRegisteredSirets } },
     select: { siret: true }
   });
+  const registeredSirets = registeredCompanies.map(c => c.siret);
 
-  if (registeredCompanies.length !== mustBeRegisteredSirets.length) {
-    const registeredSirets = registeredCompanies.map(c => c.siret);
+  // We need to remove duplicates
+  if (registeredSirets.length !== mustBeRegisteredSirets.length) {
     const missingSirets = mustBeRegisteredSirets.filter(
       siret => !registeredSirets.includes(siret)
     );

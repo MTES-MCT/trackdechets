@@ -13,7 +13,10 @@ import {
   flattenFormInput,
   flattenTemporaryStorageDetailInput
 } from "../../form-converter";
-import { checkIsFormContributor, checkMandatoryRegistrations } from "../../permissions";
+import {
+  checkIsFormContributor,
+  checkMandatoryRegistrations
+} from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
 import { FormCompanies } from "../../types";
