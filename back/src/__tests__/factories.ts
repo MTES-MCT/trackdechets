@@ -46,7 +46,7 @@ function siretify(index) {
   if (siret.length > siretLength) {
     throw Error("Generated siret is too long");
   }
-  return siret.padStart(14, "1");
+  return siret.padStart(14, "9");
 }
 
 /**
