@@ -16,7 +16,7 @@ import { BSDCards } from "./BSDCards";
 import styles from "./BSDList.module.scss";
 import { BSDTable } from "./BSDTable";
 import { Column, COLUMNS } from "./columns";
-import { NewBSDDropdown } from "./NewBSDDropdown";
+import { BSDDropdown } from "./BSDDropdown";
 
 const DEFAULT_COLUMNS = [
   COLUMNS.type,
@@ -120,7 +120,7 @@ export function BSDList({
   return (
     <>
       <div className={styles.BSDListActions}>
-        <NewBSDDropdown siret={siret} />
+        <BSDDropdown siret={siret} />
         <button
           className="btn btn--primary"
           onClick={() => refetch()}

@@ -10,8 +10,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout de la révision BSDA, qui rend possible la modification de certains champs du bordereau même après la fin de son cycle de vie [PR 1443](https://github.com/MTES-MCT/trackdechets/pull/1443)
-
-
+- Permettre au forces de l'ordre d'accèder au pdf des bordereaux sur présenttaion d'un QR-code à durée de vie limitée[PR 1433](https://github.com/MTES-MCT/trackdechets/pull/1433)
+ 
 #### :bug: Corrections de bugs
 
 - Correction du code déchet erroné pour les DASRI d'origine animale (18 01 02* => 18 02 02*) [PR 1460](https://github.com/MTES-MCT/trackdechets/pull/1460)

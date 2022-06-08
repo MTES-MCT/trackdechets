@@ -42,3 +42,9 @@ input CompanyWhere {
 input SignatureWhere {
   date: DateFilter
 }
+
+
+input CreatePdfAccessTokenInput {
+  bsdType: BsdType!
+  bsdId: ID!
+}

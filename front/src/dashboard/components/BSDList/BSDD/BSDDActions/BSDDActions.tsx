@@ -25,6 +25,7 @@ import { useDuplicate } from "./useDuplicate";
 import { useDownloadPdf } from "./useDownloadPdf";
 import styles from "../../BSDActions.module.scss";
 import { Loader } from "common/components";
+import { TableRoadControlButton } from "../../RoadControlButton";
 
 interface BSDDActionsProps {
   form: Form;
@@ -84,6 +85,8 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
+              <TableRoadControlButton siret={siret} form={form} />
+
               {form.status !== FormStatus.Draft && (
                 <MenuItem onSelect={() => downloadPdf()}>
                   <IconPdf size="24px" color="blueLight" />

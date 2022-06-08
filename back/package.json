@@ -33,7 +33,9 @@
     "reindex-bsd": "node dist/src/scripts/bin/reindexBsd.js $bsdId",
     "reindex-bsd:dev": "ts-node -r dotenv/config ./src/scripts/bin/reindexBsd.ts $bsdId",
     "watch:queue": "nodemon -r dotenv/config --watch src --exec \"ts-eager\" --inspect=0.0.0.0:9230 src/queue/consumer.ts -e ts,tsx",
-    "queue": "node dist/src/queue/consumer.js"
+    "queue": "node dist/src/queue/consumer.js",
+    "purge-pdf-token": "node dist/src/scripts/bin/purgePdfAccessToken.js",
+    "purge-pdf-token:dev": "ts-node -r dotenv/config ./src/scripts/bin/purgePdfAccessToken.ts"
   },
   "engines": {
     "node": "^14"

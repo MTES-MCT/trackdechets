@@ -21,6 +21,7 @@ const routes = {
     index: "/dashboard/:siret",
     exports: "/dashboard/:siret/exports",
     stats: "/dashboard/:siret/stats",
+    roadControl: "/dashboard/:siret/:bsdType/road-control/:id",
     bsds: {
       index: "/dashboard/:siret/bsds",
       drafts: "/dashboard/:siret/bsds/drafts",
@@ -37,6 +38,7 @@ const routes = {
     },
     bsdasris: {
       view: "/dashboard/:siret/bsdasris/view/:id",
+
       create: "/dashboard/:siret/bsdasris/create",
 
       edit: "/dashboard/:siret/bsdasris/edit/:id",

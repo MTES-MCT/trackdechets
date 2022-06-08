@@ -33,11 +33,13 @@ import { createCompanyDataLoaders } from "./companies/dataloaders";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
+import { roadControlPdfHandler } from "./routers/roadControlPdfRouter";
 import { oauth2Router } from "./routers/oauth2-router";
 import { resolvers, typeDefs } from "./schema";
 import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
+import { ROAD_CONTROL_SLUG } from "./common/constants";
 import forwarded from "forwarded";
 
 const {
@@ -260,6 +262,8 @@ app.get("/exports", (_, res) =>
     .status(410)
     .send("Route dépréciée, utilisez la query GraphQL `formsRegister`")
 );
+
+app.get(`/${ROAD_CONTROL_SLUG}/:token`, roadControlPdfHandler);
 
 app.use(
   "/graphiql",

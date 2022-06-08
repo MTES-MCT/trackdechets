@@ -1,6 +1,6 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
-import { vhuFormFactory } from "../../../__tests__/factories.vhu";
+import { bsvhuFactory } from "../../../__tests__/factories.vhu";
 import {
   userFactory,
   userWithCompanyFactory
@@ -69,7 +69,7 @@ describe("Mutation.Vhu.update", () => {
 
   it("should disallow a user to update a form they are not part of", async () => {
     const { company } = await userWithCompanyFactory("MEMBER");
-    const form = await vhuFormFactory({
+    const form = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret
       }
@@ -102,7 +102,7 @@ describe("Mutation.Vhu.update", () => {
 
   it("should be possible to update a non signed form", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const form = await vhuFormFactory({
+    const form = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret
       }
@@ -126,7 +126,7 @@ describe("Mutation.Vhu.update", () => {
 
   it("should allow emitter fields update before emitter signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const form = await vhuFormFactory({
+    const form = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret
       }
@@ -150,7 +150,7 @@ describe("Mutation.Vhu.update", () => {
 
   it("should disallow emitter fields update after emitter signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const form = await vhuFormFactory({
+    const form = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureAuthor: "The Signatory",
@@ -184,7 +184,7 @@ describe("Mutation.Vhu.update", () => {
 
   it("should allow transporter fields update after emitter signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const form = await vhuFormFactory({
+    const form = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureAuthor: "The Signatory",

@@ -3,14 +3,14 @@ import {
   BsvhuMetadataResolvers,
   BsvhuStatus
 } from "../../generated/graphql/types";
-import { getFormOrFormNotFound } from "../database";
+import { getBsvhuOrNotFound } from "../database";
 import { validateBsvhu } from "../validation";
 
 const bsvhuMetadataResolvers: BsvhuMetadataResolvers = {
   errors: async (
     metadata: BsvhuMetadata & { id: string; status: BsvhuStatus }
   ) => {
-    const prismaForm = await getFormOrFormNotFound(metadata.id);
+    const prismaForm = await getBsvhuOrNotFound(metadata.id);
 
     const validationMatrix = [
       {

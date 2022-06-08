@@ -16,7 +16,6 @@ export async function getFileDownload({
   params
 }: FileDownloadPayload): Promise<FileDownload> {
   const token = getUid(10);
-
   const options: SetOptions = {};
 
   if (process.env.NODE_ENV === "production") {

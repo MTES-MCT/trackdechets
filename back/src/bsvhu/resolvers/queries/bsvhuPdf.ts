@@ -4,8 +4,8 @@ import {
 } from "../../../generated/graphql/types";
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getFormOrFormNotFound } from "../../database";
-import { checkIsFormContributor } from "../../permissions";
+import { getBsvhuOrNotFound } from "../../database";
+import { checkIsBsvhuContributor } from "../../permissions";
 import { createPDFResponse } from "../../../common/pdf";
 import { buildPdf } from "../../pdf/generator";
 import prisma from "../../../prisma";
@@ -26,9 +26,9 @@ const formPdfResolver: QueryResolvers["formPdf"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
-  const form = await getFormOrFormNotFound(id);
+  const form = await getBsvhuOrNotFound(id);
 
-  await checkIsFormContributor(
+  await checkIsBsvhuContributor(
     user,
     form,
     "Vous n'êtes pas autorisé à accéder à ce bordereau"

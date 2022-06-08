@@ -23,6 +23,7 @@ import { Bsda, BsdaStatus } from "generated/graphql/types";
 import { DeleteBsdaModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";
 import { useDuplicate } from "./useDuplicate";
+import { TableRoadControlButton } from "../../RoadControlButton";
 
 import styles from "../../BSDActions.module.scss";
 import { Loader } from "common/components";
@@ -72,6 +73,23 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
               >
                 <IconView color="blueLight" size="24px" />
                 Aperçu
+              </MenuLink>
+
+              <TableRoadControlButton siret={siret} form={form} />
+
+              <MenuLink
+                as={Link}
+                to={{
+                  pathname: generatePath(routes.dashboard.roadControl, {
+                    siret,
+                    bsdType: "bsda",
+                    id: form.id,
+                  }),
+                  state: { background: location },
+                }}
+              >
+                <IconView color="blueLight" size="24px" />
+                Contrôle routier
               </MenuLink>
               {!form.isDraft && (
                 <MenuItem onSelect={() => downloadPdf()}>
