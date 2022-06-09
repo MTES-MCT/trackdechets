@@ -22,7 +22,6 @@ export const BSDA_REVISION_REQUESTER_FIELDS: Record<
   emitter: "emitterCompanySiret",
   destination: "destinationCompanySiret",
   worker: "workerCompanySiret",
-  broker: "brokerCompanySiret"
 };
 
 export const BSDA_CONTRIBUTORS_FIELDS: Record<string, keyof BsdaContributors> =
