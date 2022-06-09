@@ -187,9 +187,30 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 defaultValue={initialReview.destination?.operation?.code}
               >
                 <Field
-                  component={ProcessingOperation}
+                  as="select"
                   name="content.destination.operation.code"
-                />
+                  className="td-select"
+                >
+                  <option value="...">Sélectionnez une valeur...</option>
+                  <option value="R 5">
+                    R 5 - Recyclage ou récupération d'autres matières
+                    inorganiques.
+                  </option>
+                  <option value="D 5">
+                    D 5 - Mise en décharge aménagée et autorisée en ISDD ou
+                    ISDND
+                  </option>
+                  <option value="D 9">
+                    D 9 - Vitrification, traitement chimique ou prétraitement
+                  </option>
+                  <option value="R 13">
+                    R 13 - Opérations de transit incluant le groupement sans
+                    transvasement préalable à R 5
+                  </option>
+                  <option value="D 15">
+                    D 15 - Transit incluant le groupement sans transvasement
+                  </option>
+                </Field>
               </ReviewableField>
 
               <ReviewableField
