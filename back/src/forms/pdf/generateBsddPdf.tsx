@@ -353,7 +353,27 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             <p>
               <strong>1.1 Producteur ou détenteur du déchet</strong>
             </p>
-            <FormCompanyFields company={form.emitter?.company} />
+            <p>
+              <input
+                type="checkbox"
+                checked={form.emitter?.isPrivateIndividual}
+                readOnly
+              />{" "}
+              L'émetteur est un particulier
+            </p>
+            <p>
+              <input
+                type="checkbox"
+                checked={form.emitter?.isForeignShip}
+                readOnly
+              />{" "}
+              L'émetteur est un navire étranger
+            </p>
+            <FormCompanyFields
+              company={form.emitter?.company}
+              isPrivateIndividual={form.emitter?.isPrivateIndividual}
+              isForeignShip={form.emitter?.isForeignShip}
+            />
 
             <p>
               <strong>1.2 Point de collecte/chantier</strong> (si adresse

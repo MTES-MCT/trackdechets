@@ -31,8 +31,16 @@ export const COLUMNS: Record<
   emitter: {
     accessor: form => (
       <>
-        <div>{form.emitter?.company?.name ?? ""}</div>
+        <div>
+          {form.emitter?.company?.name ?? ""}
+          {form.emitter?.isPrivateIndividual ? " (particulier)" : ""}
+        </div>
         <div>{form.emitter?.company?.siret ?? ""}</div>
+        <div>
+          {form.emitter?.company?.omiNumber
+            ? `${form.emitter?.company?.omiNumber}`
+            : ""}
+        </div>
       </>
     ),
   },

@@ -34,7 +34,10 @@ const signatures: Partial<
         user,
         args.securityCode
       );
-    } else {
+    } else if (
+      !existingForm.emitterIsForeignShip &&
+      !existingForm.emitterIsPrivateIndividual
+    ) {
       await checkCanSignFor(
         existingForm.emitterCompanySiret,
         user,
@@ -55,7 +58,10 @@ const signatures: Partial<
 
       emittedAt: args.input.emittedAt,
       emittedBy: args.input.emittedBy,
-      emittedByEcoOrganisme: args.input.emittedByEcoOrganisme ?? false
+      emittedByEcoOrganisme: args.input.emittedByEcoOrganisme ?? false,
+      // required for machine to authorize signature
+      emitterIsForeignShip: existingForm.emitterIsForeignShip,
+      emitterIsPrivateIndividual: existingForm.emitterIsPrivateIndividual
     };
     const futureForm: Prisma.FormUpdateInput = {
       ...existingForm,

@@ -31,8 +31,11 @@ describe("expandFormFromDb", () => {
           address: form.emitterCompanyAddress,
           contact: form.emitterCompanyContact,
           phone: form.emitterCompanyPhone,
-          mail: form.emitterCompanyMail
-        }
+          mail: form.emitterCompanyMail,
+          omiNumber: null
+        },
+        isForeignShip: false,
+        isPrivateIndividual: false
       },
       recipient: {
         cap: form.recipientCap,

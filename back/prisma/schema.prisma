@@ -267,12 +267,15 @@ model Form {
   updatedAt                          DateTime                @updatedAt @db.Timestamptz(6)
   emitterType                        EmitterType?
   emitterPickupSite                  String?
+  emitterIsPrivateIndividual         Boolean?                 @default(false)
+  emitterIsForeignShip               Boolean?                 @default(false)
   emitterCompanyName                 String?
   emitterCompanySiret                String?
   emitterCompanyAddress              String?
   emitterCompanyContact              String?
   emitterCompanyPhone                String?
   emitterCompanyMail                 String?
+  emitterCompanyOmiNumber            String?
   recipientCap                       String?
   recipientProcessingOperation       String?
   recipientCompanyName               String?

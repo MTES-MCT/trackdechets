@@ -86,8 +86,11 @@ describe("flattenFormInput", () => {
           address: "1 rue de paradis, 75010 PARIS",
           contact: "Jean Dupont de la Boue",
           mail: "jean.dupont@boues.fr",
-          phone: "01 00 00 00 00"
-        }
+          phone: "01 00 00 00 00",
+          omiNumber: "OMI1234567"
+        },
+        isForeignShip: true,
+        isPrivateIndividual: false
       },
       recipient: {
         processingOperation: "D 10",
@@ -125,6 +128,9 @@ describe("flattenFormInput", () => {
       emitterCompanyContact: input.emitter.company.contact,
       emitterCompanyPhone: input.emitter.company.phone,
       emitterCompanyMail: input.emitter.company.mail,
+      emitterIsPrivateIndividual: input.emitter.isPrivateIndividual,
+      emitterIsForeignShip: input.emitter.isForeignShip,
+      emitterCompanyOmiNumber: input.emitter.company.omiNumber,
       recipientProcessingOperation: input.recipient.processingOperation,
       recipientCompanyName: input.recipient.company.name,
       recipientCompanySiret: input.recipient.company.siret,

@@ -206,6 +206,11 @@ function flattenEmitterInput(input: { emitter?: EmitterInput }) {
     emitterWorkSiteInfos: chain(input.emitter, e =>
       chain(e.workSite, w => w.infos)
     ),
+    emitterIsPrivateIndividual: chain(
+      input.emitter,
+      e => e.isPrivateIndividual
+    ),
+    emitterIsForeignShip: chain(input.emitter, e => e.isForeignShip),
     emitterCompanyName: chain(input.emitter, e =>
       chain(e.company, c => c.name)
     ),
@@ -221,7 +226,12 @@ function flattenEmitterInput(input: { emitter?: EmitterInput }) {
     emitterCompanyPhone: chain(input.emitter, e =>
       chain(e.company, c => c.phone)
     ),
-    emitterCompanyMail: chain(input.emitter, e => chain(e.company, c => c.mail))
+    emitterCompanyMail: chain(input.emitter, e =>
+      chain(e.company, c => c.mail)
+    ),
+    emitterCompanyOmiNumber: chain(input.emitter, e =>
+      chain(e.company, c => c.omiNumber)
+    )
   };
 }
 
@@ -518,13 +528,16 @@ export async function expandFormFromDb(form: PrismaForm): Promise<GraphQLForm> {
         infos: form.emitterWorkSiteInfos
       }),
       pickupSite: form.emitterPickupSite,
+      isPrivateIndividual: form.emitterIsPrivateIndividual,
+      isForeignShip: form.emitterIsForeignShip,
       company: nullIfNoValues<FormCompany>({
         name: form.emitterCompanyName,
         siret: form.emitterCompanySiret,
         address: form.emitterCompanyAddress,
         contact: form.emitterCompanyContact,
         phone: form.emitterCompanyPhone,
-        mail: form.emitterCompanyMail
+        mail: form.emitterCompanyMail,
+        omiNumber: form.emitterCompanyOmiNumber
       })
     }),
     recipient: nullIfNoValues<Recipient>({
