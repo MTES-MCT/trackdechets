@@ -123,7 +123,8 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse.id,
         approvals: { create: { approverSiret: company.siret } },
-        comment: ""
+        comment: "",
+        wasteCode: "10 13 09*"
       }
     });
 
