@@ -102,7 +102,9 @@ function getUpdateFromRevisionRequest(revisionRequest: BsdaRevisionRequest) {
 
   function removeEmpty(obj) {
     const cleanedObject = Object.fromEntries(
-      Object.entries(obj).filter(([_, v]) => v != null)
+      Object.entries(obj).filter(
+        ([_, v]) => v != null && (Array.isArray(v) ? v.length > 0 : true)
+      )
     );
 
     return Object.keys(cleanedObject).length === 0 ? null : cleanedObject;

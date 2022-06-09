@@ -4,7 +4,7 @@ import { registerUpdater, Updater } from "./helper/helper";
 @registerUpdater(
   "Create FormGroupement and fill quantityGrouped",
   "Create FormGroupement and fill quantityGrouped",
-  true
+  false
 )
 export class CreateFormGroupement implements Updater {
   async run() {

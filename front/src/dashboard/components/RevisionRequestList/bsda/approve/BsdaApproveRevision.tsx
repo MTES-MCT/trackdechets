@@ -144,6 +144,7 @@ export function DisplayRevision({ review }: Props) {
         label="Numéros de scellés"
         bsddValue={review.bsda.waste?.sealNumbers}
         reviewValue={review.content.waste?.sealNumbers}
+        formatter={sealNumbersFormatter}
       />
 
       <RevisionField
@@ -223,4 +224,10 @@ function booleanFormatter(entity: boolean | undefined): React.ReactNode {
   if (entity == null) return null;
 
   return entity ? "Oui" : "Non";
+}
+
+function sealNumbersFormatter(entity: string[] | undefined): React.ReactNode {
+  if (!entity) return null;
+
+  return entity.join(", ");
 }

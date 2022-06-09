@@ -178,7 +178,7 @@ const revisionRequestContentSchema = yup.object({
     .nullable(),
   wastePop: yup.boolean().nullable(),
   packagings: yup.array().nullable(),
-  wasteSealNumbers: yup.array().ensure().of(yup.string()).nullable(),
+  wasteSealNumbers: yup.array().of(yup.string()).nullable(),
   wasteMaterialName: yup.string().nullable(),
   destinationCap: yup.string().nullable(),
   destinationReceptionWeight: yup.number().nullable(),

@@ -114,7 +114,7 @@ export function removeEmptyKeys<T>(obj: Object): Partial<T> | undefined {
     .reduce((cleanedObj, [key]) => {
       const value =
         typeof obj[key] === "object"
-          ? Array.isArray(obj)
+          ? Array.isArray(obj[key])
             ? obj[key]
             : removeEmptyKeys(obj[key])
           : obj[key];

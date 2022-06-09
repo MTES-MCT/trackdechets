@@ -1,6 +1,7 @@
 import { useMutation } from "@apollo/client";
 import classNames from "classnames";
 import { FieldSwitch, RedErrorMessage } from "common/components";
+import TagsInput from "common/components/tags-input/TagsInput";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
@@ -38,7 +39,7 @@ const initialReview = {
   waste: {
     code: "",
     pop: "",
-    sealNumbers: {},
+    sealNumbers: [],
     materialName: "",
   },
   packagings: [],
@@ -128,6 +129,15 @@ export function BsdaRequestRevision({ bsda }: Props) {
                   name="content.waste.materialName"
                   className="td-input td-input--medium"
                 />
+              </ReviewableField>
+
+              <ReviewableField
+                title="Numéros de scellés"
+                value={bsda.waste?.sealNumbers?.join(", ")}
+                name="content.waste.sealNumbers"
+                defaultValue={initialReview.waste.sealNumbers}
+              >
+                <TagsInput name="content.waste.sealNumbers" />
               </ReviewableField>
 
               <ReviewableField
