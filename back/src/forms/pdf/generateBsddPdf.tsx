@@ -368,6 +368,35 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             </p>
 
             <p>
+              <strong>1.3 Terres et sédiments</strong>
+            </p>
+            <p>
+              Parcelle(s) :{" "}
+              {form.wasteDetails?.parcelNumbers
+                ?.map(
+                  pn =>
+                    `${pn.city} - ${pn.postalCode} - ${[
+                      pn.prefix,
+                      pn.section,
+                      pn.number,
+                      pn.x,
+                      pn.y
+                    ]
+                      .filter(Boolean)
+                      .join("/")}`
+                )
+                .join(", ")}
+              <br />
+              Coordonnée(s) GPS :
+              <br />
+              Référence(s) laboratoire(s) :{" "}
+              {form.wasteDetails?.analysisReferences?.join(", ")}
+              <br />
+              Identifiant(s) terrain (le cas échéant) :{" "}
+              {form.wasteDetails?.landIdentifiers?.join(", ")}
+            </p>
+
+            <p>
               <input
                 type="checkbox"
                 checked={Boolean(form.ecoOrganisme)}
