@@ -1,12 +1,11 @@
 import { ForbiddenError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationPublishBsdaArgs } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound, getPreviousBsdas } from "../../database";
-import { indexBsda } from "../../elastic";
 import { checkIsBsdaContributor } from "../../permissions";
+import { getBsdaRepository } from "../../repository";
 import { validateBsda } from "../../validation";
 
 export default async function create(
@@ -32,12 +31,10 @@ export default async function create(
   const previousBsdas = await getPreviousBsdas(existingBsda);
   await validateBsda(existingBsda, previousBsdas, { emissionSignature: true });
 
-  const updatedBsda = await prisma.bsda.update({
-    where: { id },
-    data: { isDraft: false }
-  });
-
-  await indexBsda(updatedBsda, context);
+  const updatedBsda = await getBsdaRepository(user).update(
+    { id },
+    { isDraft: false }
+  );
 
   return expandBsdaFromDb(updatedBsda);
 }

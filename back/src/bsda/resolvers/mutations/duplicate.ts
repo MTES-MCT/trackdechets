@@ -2,11 +2,10 @@ import { Bsda, BsdaStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { MutationDuplicateBsdaArgs } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
-import { indexBsda } from "../../elastic";
 import { checkIsBsdaContributor } from "../../permissions";
+import { getBsdaRepository } from "../../repository";
 
 export default async function duplicate(
   _,
@@ -23,8 +22,8 @@ export default async function duplicate(
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  const newBsda = await duplicateForm(prismaForm);
-  await indexBsda(newBsda, context);
+  const data = duplicateForm(prismaForm);
+  const newBsda = await getBsdaRepository(user).create(data);
 
   return expandBsdaFromDb(newBsda);
 }
@@ -58,12 +57,10 @@ function duplicateForm({
   groupedInId,
   ...rest
 }: Bsda) {
-  return prisma.bsda.create({
-    data: {
-      ...rest,
-      id: getReadableId(ReadableIdPrefix.BSDA),
-      status: BsdaStatus.INITIAL,
-      isDraft: true
-    }
-  });
+  return {
+    ...rest,
+    id: getReadableId(ReadableIdPrefix.BSDA),
+    status: BsdaStatus.INITIAL,
+    isDraft: true
+  };
 }

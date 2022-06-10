@@ -1,13 +1,12 @@
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationUpdateBsdaArgs } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb, flattenBsdaInput } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
 import { checkKeysEditability } from "../../edition-rules";
-import { indexBsda } from "../../elastic";
 import { checkIsBsdaContributor } from "../../permissions";
+import { getBsdaRepository } from "../../repository";
 import { validateBsda } from "../../validation";
 
 export default async function edit(
@@ -33,19 +32,19 @@ export default async function edit(
     "Vous ne pouvez pas enlever votre établissement du bordereau"
   );
 
+  const bsdaRepository = getBsdaRepository(user);
+
   const forwardedBsda = input.forwarding
     ? await getBsdaOrNotFound(input.forwarding)
     : existingBsda.forwardingId
-    ? await prisma.bsda.findUnique({ where: { id: existingBsda.forwardingId } })
+    ? await bsdaRepository.findUnique({ id: existingBsda.forwardingId })
     : null;
 
   const groupedBsdas =
     input.grouping?.length > 0
-      ? await prisma.bsda.findMany({
-          where: { id: { in: input.grouping } }
-        })
-      : await prisma.bsda
-          .findUnique({ where: { id: existingBsda.id } })
+      ? await bsdaRepository.findMany({ id: { in: input.grouping } })
+      : await bsdaRepository
+          .findRelatedEntity({ id: existingBsda.id })
           .grouping();
 
   const isForwarding = Boolean(forwardedBsda);
@@ -68,9 +67,9 @@ export default async function edit(
     transportSignature: existingBsda.transporterTransportSignatureAuthor != null
   });
 
-  const updatedBsda = await prisma.bsda.update({
-    where: { id },
-    data: {
+  const updatedBsda = await bsdaRepository.update(
+    { id },
+    {
       ...data,
       ...(input.grouping?.length > 0 && {
         grouping: { set: input.grouping.map(id => ({ id })) }
@@ -79,9 +78,7 @@ export default async function edit(
         forwarding: { connect: { id: input.forwarding } }
       })
     }
-  });
-
-  await indexBsda(updatedBsda, context);
+  );
 
   return expandBsdaFromDb(updatedBsda);
 }

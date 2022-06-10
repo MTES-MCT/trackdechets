@@ -42,6 +42,7 @@ export const FullBsdaFragment = gql`
       }
       operation {
         code
+        description
         date
         signature {
           author

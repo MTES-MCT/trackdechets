@@ -11,13 +11,12 @@ import {
   BsdaSignatureType,
   MutationSignBsdaArgs
 } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaHistory, getBsdaOrNotFound } from "../../database";
-import { indexBsda } from "../../elastic";
 import { machine } from "../../machine";
+import { getBsdaRepository, runInTransaction } from "../../repository";
 import { validateBsda } from "../../validation";
 
 type SignatureTypeInfos = {
@@ -75,35 +74,33 @@ export default async function sign(
     throw new InvalidSignatureError();
   }
 
-  const signedBsda = await prisma.bsda.update({
-    where: { id },
-    data: {
-      [signatureTypeInfos.dbAuthorKey]: input.author,
-      [signatureTypeInfos.dbDateKey]: new Date(input.date ?? Date.now()),
-      isDraft: false,
-      status: newStatus as BsdaStatus
-    }
-  });
+  return runInTransaction(async transaction => {
+    const bsdaRepository = getBsdaRepository(user, transaction);
 
-  if (newStatus === BsdaStatus.PROCESSED) {
-    const previousBsdas = await getBsdaHistory(signedBsda);
-    await prisma.bsda.updateMany({
-      data: {
-        status: BsdaStatus.PROCESSED
-      },
-      where: {
-        id: { in: previousBsdas.map(bsff => bsff.id) }
+    const signedBsda = await bsdaRepository.update(
+      { id },
+      {
+        [signatureTypeInfos.dbAuthorKey]: input.author,
+        [signatureTypeInfos.dbDateKey]: new Date(input.date ?? Date.now()),
+        isDraft: false,
+        status: newStatus as BsdaStatus
       }
-    });
-    const updatedBsdas = await prisma.bsda.findMany({
-      where: { id: { in: previousBsdas.map(bsff => bsff.id) } }
-    });
-    await Promise.all(updatedBsdas.map(bsda => indexBsda(bsda)));
-  }
+    );
 
-  await indexBsda(signedBsda, context);
+    if (newStatus === BsdaStatus.PROCESSED) {
+      const previousBsdas = await getBsdaHistory(signedBsda);
+      await bsdaRepository.updateMany(
+        {
+          id: { in: previousBsdas.map(bsff => bsff.id) }
+        },
+        {
+          status: BsdaStatus.PROCESSED
+        }
+      );
+    }
 
-  return expandBsdaFromDb(signedBsda);
+    return expandBsdaFromDb(signedBsda);
+  });
 }
 
 const signatureTypeMapping: Record<BsdaSignatureType, SignatureTypeInfos> = {

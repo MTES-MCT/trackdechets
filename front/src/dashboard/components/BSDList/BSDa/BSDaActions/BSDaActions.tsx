@@ -101,11 +101,25 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
                 <IconDuplicateFile size="24px" color="blueLight" />
                 Dupliquer
               </MenuItem>
-              {form["bsdaStatus"] === BsdaStatus.Initial && (
+              {form["bsdaStatus"] === BsdaStatus.Initial ? (
                 <MenuItem onSelect={() => setIsDeleting(true)}>
                   <IconTrash color="blueLight" size="24px" />
                   Supprimer
                 </MenuItem>
+              ) : (
+                <MenuLink
+                  as={Link}
+                  to={{
+                    pathname: generatePath(routes.dashboard.bsdas.review, {
+                      siret,
+                      id: form.id,
+                    }),
+                    state: { background: location },
+                  }}
+                >
+                  <IconPaperWrite size="24px" color="blueLight" />
+                  Révision
+                </MenuLink>
               )}
             </MenuList>
           </>
