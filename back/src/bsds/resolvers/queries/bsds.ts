@@ -58,21 +58,42 @@ async function buildQuery(
       });
     });
 
-  Object.entries({
-    emitterCompanyName: where.emitter,
-    destinationCompanyName: where.recipient
-  })
-    .filter(([_, value]) => value != null)
-    .forEach(([key, value]) => {
-      query.bool.must.push({
-        match: {
-          [key]: {
-            query: value,
-            fuzziness: "AUTO"
-          }
-        }
-      });
+  if (where.emitter) {
+    query.bool.must.push({
+      // behaves like an OR
+      bool: {
+        should: [
+          {
+            match: {
+              emitterCompanyName: {
+                query: where.emitter,
+                fuzziness: "AUTO"
+              }
+            }
+          },
+          { term: { emitterCompanySiret: where.emitter } }
+        ]
+      }
     });
+  }
+
+  if (where.recipient) {
+    query.bool.must.push({
+      bool: {
+        should: [
+          {
+            match: {
+              destinationCompanyName: {
+                query: where.recipient,
+                fuzziness: "AUTO"
+              }
+            }
+          },
+          { term: { destinationCompanySiret: where.recipient } }
+        ]
+      }
+    });
+  }
 
   if (where.transporterCustomInfo) {
     query.bool.must.push({
