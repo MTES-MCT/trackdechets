@@ -809,6 +809,9 @@ input FormRevisionRequestContentInput {
   "Traitement réalisé (code D/R)"
   processingOperationDone: String
 
+  "Description de l'opération d’élimination / valorisation (case 11)"
+  processingOperationDescription: String
+
   "Entreposage provisoire (édition partielle uniquement)"
   temporaryStorageDetail: FormRevisionRequestTemporaryStorageDetailInput
 }
@@ -817,8 +820,14 @@ input FormRevisionRequestWasteDetailsInput {
   "Code CED"
   code: String
 
+  "Description du déchet"
+  name: String
+
   "Contient des Polluants Organiques Persistants (POP) oui / non"
   pop: Boolean
+
+  "Conditionnements"
+  packagingInfos: [PackagingInfoInput!]
 }
 
 input FormRevisionRequestRecipientInput {

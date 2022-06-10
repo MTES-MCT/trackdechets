@@ -102,9 +102,13 @@ function getUpdateFromFormRevisionRequest(
   const bsddUpdate = {
     recipientCap: revisionRequest.recipientCap,
     wasteDetailsCode: revisionRequest.wasteDetailsCode,
+    wasteDetailsName: revisionRequest.wasteDetailsName,
     wasteDetailsPop: revisionRequest.wasteDetailsPop,
+    wasteDetailsPackagingInfos: revisionRequest.wasteDetailsPackagingInfos,
     quantityReceived: revisionRequest.quantityReceived,
     processingOperationDone: revisionRequest.processingOperationDone,
+    processingOperationDescription:
+      revisionRequest.processingOperationDescription,
     brokerCompanyName: revisionRequest.brokerCompanyName,
     brokerCompanySiret: revisionRequest.brokerCompanySiret,
     brokerCompanyAddress: revisionRequest.brokerCompanyAddress,
@@ -133,7 +137,9 @@ function getUpdateFromFormRevisionRequest(
 
   function removeEmpty(obj) {
     const cleanedObject = Object.fromEntries(
-      Object.entries(obj).filter(([_, v]) => v != null)
+      Object.entries(obj).filter(
+        ([_, v]) => v != null && (Array.isArray(v) ? v.length > 0 : true)
+      )
     );
 
     return Object.keys(cleanedObject).length === 0 ? null : cleanedObject;

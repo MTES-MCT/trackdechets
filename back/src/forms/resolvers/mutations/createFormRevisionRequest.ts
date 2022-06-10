@@ -28,14 +28,18 @@ import {
   INVALID_SIRET_LENGTH,
   INVALID_WASTE_CODE
 } from "../../errors";
+import { packagingInfoFn } from "../../validation";
 
 export type RevisionRequestContent = Pick<
   Prisma.BsddRevisionRequestCreateInput,
   | "recipientCap"
   | "wasteDetailsCode"
+  | "wasteDetailsName"
   | "wasteDetailsPop"
+  | "wasteDetailsPackagingInfos"
   | "quantityReceived"
   | "processingOperationDone"
+  | "processingOperationDescription"
   | "brokerCompanyName"
   | "brokerCompanySiret"
   | "brokerCompanyAddress"
@@ -236,12 +240,18 @@ const bsddRevisionRequestSchema = yup
     wasteDetailsCode: yup
       .string()
       .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE),
+    wasteDetailsName: yup.string().nullable(),
     wasteDetailsPop: yup.boolean().nullable(),
+    wasteDetailsPackagingInfos: yup
+      .array()
+      .of(packagingInfoFn(false))
+      .nullable(),
     quantityReceived: yup.number().min(0).nullable(),
     processingOperationDone: yup
       .string()
       .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
       .nullable(),
+    processingOperationDescription: yup.string().nullable(),
     brokerCompanyName: yup.string().nullable(),
     brokerCompanySiret: yup
       .string()

@@ -359,7 +359,7 @@ const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
       .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_EMAIL}`)
   });
 
-const packagingInfoFn = (isDraft: boolean) =>
+export const packagingInfoFn = (isDraft: boolean) =>
   yup.object().shape({
     type: yup
       .mixed<Packagings>()

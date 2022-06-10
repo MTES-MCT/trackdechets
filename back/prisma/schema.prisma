@@ -435,9 +435,12 @@ model BsddRevisionRequest {
 
   recipientCap                                   String?
   wasteDetailsCode                               String?
+  wasteDetailsName                               String?
   wasteDetailsPop                                Boolean?
+  wasteDetailsPackagingInfos                     Json?
   quantityReceived                               Float?
   processingOperationDone                        String?
+  processingOperationDescription                 String?
   brokerCompanyName                              String?
   brokerCompanySiret                             String?
   brokerCompanyAddress                           String?
