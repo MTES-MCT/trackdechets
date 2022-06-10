@@ -104,9 +104,17 @@ export function bsddReducer(
       return { ...currentState, isDeleted: true };
 
     case "BsddRevisionRequestApplied":
+      const { wasteDetailsPackagingInfos, ...bsdd } = event.data.content;
+
       return {
         ...currentState,
-        ...event.data.content,
+        ...bsdd,
+        ...(wasteDetailsPackagingInfos
+          ? {
+              wasteDetailsPackagingInfos:
+                wasteDetailsPackagingInfos as Prisma.JsonValue
+            }
+          : {}),
         ...dateConverter(currentState, event.data.content)
       };
 
