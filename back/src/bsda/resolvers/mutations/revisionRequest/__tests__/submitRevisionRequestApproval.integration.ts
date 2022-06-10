@@ -227,6 +227,11 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       ).status
     ).toBe("REFUSED");
     expect(data.submitBsdaRevisionRequestApproval.status).toBe("REFUSED");
+    expect(
+      data.submitBsdaRevisionRequestApproval.approvals.find(
+        val => val.approverSiret === thirdCompany.siret
+      ).status
+    ).toBe("CANCELED");
   });
 
   it("should work if only validator refuses the revisionRequest", async () => {

@@ -11,6 +11,10 @@ export function buildCancelRevisionRequest(
 ): CancelRevisionRequestFn {
   return async (where, logMetadata) => {
     const { prisma, user } = deps;
+
+    await prisma.bsddRevisionRequestApproval.deleteMany({
+      where: { revisionRequest: where }
+    });
     const deletedRevisionRequest = await prisma.bsdaRevisionRequest.delete({
       where
     });

@@ -12,17 +12,22 @@ import {
   CANCEL_BSDA_REVISION_REQUEST,
   GET_BSDA_REVISION_REQUESTS,
 } from "../query";
+import { useParams } from "react-router-dom";
 
 type Props = {
   review: BsdaRevisionRequest;
 };
 
 export function BsdaCancelRevision({ review }: Props) {
+  const { siret } = useParams<{ siret: string }>();
+
   const [cancelBsdaRevisionRequest, { loading }] = useMutation<
     Pick<Mutation, "cancelBsdaRevisionRequest">,
     MutationCancelBsdaRevisionRequestArgs
   >(CANCEL_BSDA_REVISION_REQUEST, {
-    refetchQueries: [GET_BSDA_REVISION_REQUESTS],
+    refetchQueries: [
+      { query: GET_BSDA_REVISION_REQUESTS, variables: { siret } },
+    ],
   });
 
   return (

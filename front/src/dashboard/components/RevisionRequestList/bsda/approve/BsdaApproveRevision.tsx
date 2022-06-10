@@ -11,11 +11,15 @@ import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton, RedErrorMessage } from "common/components";
 import { IconCogApproved } from "common/components/Icons";
 import { useMutation } from "@apollo/client";
-import { SUBMIT_BSDA_REVISION_REQUEST_APPROVAL } from "../query";
+import {
+  GET_BSDA_REVISION_REQUESTS,
+  SUBMIT_BSDA_REVISION_REQUEST_APPROVAL,
+} from "../query";
 import { Field, Form, Formik } from "formik";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { formatDate } from "common/datetime";
 import { RevisionField } from "../../bsdd/approve/RevisionField";
+import { useParams } from "react-router-dom";
 
 type Props = {
   review: BsdaRevisionRequest;
@@ -26,10 +30,16 @@ const validationSchema = yup.object({
 });
 
 export function BsdaApproveRevision({ review }: Props) {
+  const { siret } = useParams<{ siret: string }>();
+
   const [submitBsdaRevisionRequestApproval, { loading }] = useMutation<
     Pick<Mutation, "submitBsdaRevisionRequestApproval">,
     MutationSubmitBsdaRevisionRequestApprovalArgs
-  >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL);
+  >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+    refetchQueries: [
+      { query: GET_BSDA_REVISION_REQUESTS, variables: { siret } },
+    ],
+  });
 
   return (
     <TdModalTrigger

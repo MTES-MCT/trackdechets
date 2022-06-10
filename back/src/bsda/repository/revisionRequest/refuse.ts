@@ -33,7 +33,7 @@ export function buildRefuseRevisionRequestApproval(
     });
     await prisma.bsdaRevisionRequestApproval.updateMany({
       where: {
-        revisionRequestId: revisionRequestApproval.id,
+        revisionRequestId: revisionRequestApproval.revisionRequestId,
         status: RevisionRequestApprovalStatus.PENDING
       },
       data: { status: RevisionRequestApprovalStatus.CANCELED }
