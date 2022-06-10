@@ -1,4 +1,6 @@
-"Payload d'un établissement"
+"""
+Payload d'un établissement
+"""
 input CompanyInput {
   """
   SIRET de l'établissement composé de 14 caractères numériques
@@ -6,7 +8,8 @@ input CompanyInput {
   siret: String
 
   """
-  Numéro de TVA intra-communautaire de l'établissement
+  Numéro de TVA intra-communautaire de l'établissement. À renseigner pour
+  les transporteurs étrangers uniquement.
   """
   vatNumber: String
 
