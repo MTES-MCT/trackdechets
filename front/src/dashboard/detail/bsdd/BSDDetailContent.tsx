@@ -741,6 +741,7 @@ export default function BSDDetailContent({
               </Link>
             </>
           )}
+
           <WorkflowAction siret={siret} form={form} />
           {children}
         </div>
