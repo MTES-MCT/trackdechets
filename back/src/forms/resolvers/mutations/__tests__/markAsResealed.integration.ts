@@ -146,8 +146,12 @@ describe("Mutation markAsResealed", () => {
     expect(resealedForm.forwardedIn.recipientCompanySiret).toEqual(
       destination.siret
     );
-    expect(resealedForm.transporterCompanySiret).toEqual(transporter.siret);
-    expect(resealedForm.forwardedIn.id).toEqual(`${form.id}-suite`);
+    expect(resealedForm.forwardedIn.transporterCompanySiret).toEqual(
+      transporter.siret
+    );
+    expect(resealedForm.forwardedIn.readableId).toEqual(
+      `${form.readableId}-suite`
+    );
     expect(resealedForm.forwardedIn.status).toEqual("SEALED");
   });
 
