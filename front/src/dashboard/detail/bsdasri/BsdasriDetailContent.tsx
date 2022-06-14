@@ -35,7 +35,7 @@ import classNames from "classnames";
 const getVerboseWasteName = (code: string): string => {
   const desc = {
     "18 01 03*": "DASRI origine humaine ",
-    "18 01 02*": "DASRI origine animale",
+    "18 02 02*": "DASRI origine animale",
   }[code];
   return !!desc ? desc : "";
 };

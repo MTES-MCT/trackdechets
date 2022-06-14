@@ -699,4 +699,43 @@ describe("Mutation.createDasri validation scenarii", () => {
 
     expect(data.createBsdasri.emitter.company.siret).toEqual(company.siret);
   });
+
+  it("should convert 18 01 02* to 18 02 02*", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 02*" },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: company.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(data.createBsdasri.waste.code).toEqual("18 02 02*");
+  });
 });
