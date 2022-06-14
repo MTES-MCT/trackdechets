@@ -1,5 +1,5 @@
 import { ApolloError } from "@apollo/client";
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, ReactElement } from "react";
 import styles from "./Error.module.scss";
 
 type Props = {
@@ -68,7 +68,7 @@ export function SimpleNotificationError({
   message,
 }: {
   className?: string;
-  message: string;
+  message: string | ReactElement;
 }) {
   return (
     <div
