@@ -176,11 +176,3 @@ enum FormsRegisterExportFormat {
   """
   XLSX
 }
-
-"Dénomination de l'auteur de la signature"
-enum SignatureAuthor {
-  "L'auteur de la signature est l'émetteur du déchet"
-  EMITTER
-  "L'auteur de la signature est l'éco-organisme figurant sur le BSD"
-  ECO_ORGANISME
-}
