@@ -28,7 +28,7 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
           ]
         },
         { isDeleted: false },
-        { appendix2RootFormId: null }
+        { forwarding: null }
       ]
     }
   });

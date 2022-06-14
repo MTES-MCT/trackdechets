@@ -12,6 +12,7 @@ import { processedInfoSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
+import machine from "../../workflow/machine";
 
 const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   parent,
@@ -52,7 +53,13 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
     formUpdateInput: form.forwardedInId
       ? {
           forwardedIn: {
-            update: { status: Status.PROCESSED, ...formUpdateInput }
+            update: {
+              status: machine.transition(Status.ACCEPTED, {
+                type: EventType.MarkAsProcessed,
+                formUpdateInput
+              }).value as Status,
+              ...formUpdateInput
+            }
           }
         }
       : formUpdateInput

@@ -200,10 +200,15 @@ const machine = Machine<any, Event>(
   {
     guards: {
       isExemptOfTraceability: (_, event) =>
-        !!event?.formUpdateInput?.noTraceability,
+        !!event?.formUpdateInput?.noTraceability ||
+        !!event.formUpdateInput?.forwardedIn?.update?.noTraceability,
       awaitsGroup: (_, event) =>
         PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
           event.formUpdateInput?.processingOperationDone as string
+        ) ||
+        PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
+          event.formUpdateInput?.forwardedIn?.update
+            ?.processingOperationDone as string
         ),
       isFormRefused: (_, event) =>
         event.formUpdateInput?.wasteAcceptationStatus === "REFUSED" ||
