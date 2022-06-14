@@ -369,9 +369,6 @@ model Form {
   // quantité affectée à des bordereaux de regroupement
   quantityGrouped                    Float                   @default(0)
 
-  // TODO delete after release 2022.06.1
-  appendix2RootFormId String?
-
   ownerId              String
   owner                User                          @relation(fields: [ownerId], references: [id])
   StatusLog            StatusLog[]
