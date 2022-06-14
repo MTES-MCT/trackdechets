@@ -27,7 +27,8 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
             }
           ]
         },
-        { isDeleted: false }
+        { isDeleted: false },
+        { forwarding: null }
       ]
     }
   });
