@@ -17,6 +17,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Ajout de suggestions lors de l'ajout d'un établissement fermé. [PR 1463](https://github.com/MTES-MCT/trackdechets/pull/1463)
+
 #### :memo: Documentation
 
 #### :house: Interne
