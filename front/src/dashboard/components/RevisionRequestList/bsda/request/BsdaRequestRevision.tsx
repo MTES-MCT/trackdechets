@@ -6,7 +6,6 @@ import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import ProcessingOperation from "form/common/components/processing-operation/ProcessingOperation";
 import { Field, Form, Formik } from "formik";
 import {
   Bsda,
