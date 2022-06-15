@@ -21,21 +21,16 @@ import {
   BsvhuStatus
 } from "@prisma/client";
 import { addMinutes } from "date-fns";
+
 const CREATE_PDF_TOKEN = `
-mutation CreatePdfAccessToken(  $input: CreatePdfAccessTokenInput!) {
+mutation CreatePdfAccessToken($input: CreatePdfAccessTokenInput!) {
   createPdfAccessToken(  input: $input)  
 }`;
 
 describe("Mutation.creatPdfAccessToken", () => {
   afterEach(resetDatabase);
 
-  it.each([
-    BsdType.BSDD,
-    BsdType.BSDA,
-    BsdType.BSDASRI,
-    BsdType.BSFF,
-    BsdType.BSVHU
-  ])("should deny token creation for %p if id is wrong", async bsdType => {
+  it("should deny token creation if id does not exist", async () => {
     const { company } = await userWithCompanyFactory("MEMBER");
     const user = await userFactory();
     await formFactory({
@@ -50,7 +45,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       CREATE_PDF_TOKEN,
       {
         variables: {
-          input: { bsdId: "abcdef", bsdType }
+          input: { bsdId: "abcdef" }
         }
       }
     );
@@ -79,7 +74,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       CREATE_PDF_TOKEN,
       {
         variables: {
-          input: { bsdId: bsdd.id, bsdType: BsdType.BSDD }
+          input: { bsdId: bsdd.id }
         }
       }
     );
@@ -108,7 +103,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       CREATE_PDF_TOKEN,
       {
         variables: {
-          input: { bsdId: bsdd.id, bsdType: BsdType.BSDD }
+          input: { bsdId: bsdd.id }
         }
       }
     );
@@ -139,7 +134,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       CREATE_PDF_TOKEN,
       {
         variables: {
-          input: { bsdId: bsdd.id, bsdType: BsdType.BSDD }
+          input: { bsdId: bsdd.id }
         }
       }
     );
@@ -169,7 +164,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       CREATE_PDF_TOKEN,
       {
         variables: {
-          input: { bsdId: bsda.id, bsdType: BsdType.BSDA }
+          input: { bsdId: bsda.id }
         }
       }
     );
@@ -196,7 +191,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       CREATE_PDF_TOKEN,
       {
         variables: {
-          input: { bsdId: bsda.id, bsdType: BsdType.BSDA }
+          input: { bsdId: bsda.id }
         }
       }
     );
@@ -225,7 +220,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       CREATE_PDF_TOKEN,
       {
         variables: {
-          input: { bsdId: bsda.id, bsdType: BsdType.BSDA }
+          input: { bsdId: bsda.id }
         }
       }
     );
@@ -255,7 +250,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       CREATE_PDF_TOKEN,
       {
         variables: {
-          input: { bsdId: dasri.id, bsdType: BsdType.BSDASRI }
+          input: { bsdId: dasri.id }
         }
       }
     );
@@ -282,7 +277,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       CREATE_PDF_TOKEN,
       {
         variables: {
-          input: { bsdId: dasri.id, bsdType: BsdType.BSDASRI }
+          input: { bsdId: dasri.id }
         }
       }
     );
@@ -310,7 +305,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       CREATE_PDF_TOKEN,
       {
         variables: {
-          input: { bsdId: dasri.id, bsdType: BsdType.BSDASRI }
+          input: { bsdId: dasri.id }
         }
       }
     );
@@ -338,7 +333,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       CREATE_PDF_TOKEN,
       {
         variables: {
-          input: { bsdId: bsff.id, bsdType: BsdType.BSFF }
+          input: { bsdId: bsff.id }
         }
       }
     );
@@ -364,7 +359,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       CREATE_PDF_TOKEN,
       {
         variables: {
-          input: { bsdId: bsff.id, bsdType: BsdType.BSFF }
+          input: { bsdId: bsff.id }
         }
       }
     );
@@ -391,7 +386,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       CREATE_PDF_TOKEN,
       {
         variables: {
-          input: { bsdId: bsff.id, bsdType: BsdType.BSFF }
+          input: { bsdId: bsff.id }
         }
       }
     );
@@ -421,7 +416,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       CREATE_PDF_TOKEN,
       {
         variables: {
-          input: { bsdId: vhu.id, bsdType: BsdType.BSVHU }
+          input: { bsdId: vhu.id }
         }
       }
     );
@@ -448,7 +443,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       CREATE_PDF_TOKEN,
       {
         variables: {
-          input: { bsdId: vhu.id, bsdType: BsdType.BSVHU }
+          input: { bsdId: vhu.id }
         }
       }
     );
@@ -477,7 +472,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       CREATE_PDF_TOKEN,
       {
         variables: {
-          input: { bsdId: vhu.id, bsdType: BsdType.BSVHU }
+          input: { bsdId: vhu.id }
         }
       }
     );

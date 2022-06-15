@@ -21,7 +21,7 @@ const routes = {
     index: "/dashboard/:siret",
     exports: "/dashboard/:siret/exports",
     stats: "/dashboard/:siret/stats",
-    roadControl: "/dashboard/:siret/:bsdType/road-control/:id",
+    roadControl: "/dashboard/:siret/road-control/:id",
     bsds: {
       index: "/dashboard/:siret/bsds",
       drafts: "/dashboard/:siret/bsds/drafts",

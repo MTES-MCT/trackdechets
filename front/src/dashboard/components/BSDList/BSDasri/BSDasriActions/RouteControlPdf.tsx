@@ -3,7 +3,6 @@ import React from "react";
 import {
   Mutation,
   MutationCreatePdfAccessTokenArgs,
-  BsdType,
 } from "generated/graphql/types";
 import QRCodeIcon from "react-qr-code";
 import { useMutation, gql } from "@apollo/client";
@@ -21,10 +20,9 @@ const CREATE_PDF_ACCESS_TOKEN = gql`
 `;
 
 export function RouteControlPdf() {
-  const { id, bsdType } = useParams<{
+  const { id } = useParams<{
     id: string;
     siret: string;
-    bsdType: BsdType;
   }>();
   const history = useHistory();
 
@@ -53,7 +51,6 @@ export function RouteControlPdf() {
       {!!data && (
         <div className="tw-mt-4 tw-mb-4 tw-flex tw-flex-col tw-items-center">
           <QRCodeIcon value={data.createPdfAccessToken} size={128} />
-          {/* <span>{ data.createPdfAccessToken}</span> */}
           <span className="tw-mt-3">À scanner par les forces de l'ordre</span>
         </div>
       )}
@@ -68,7 +65,7 @@ export function RouteControlPdf() {
           onClick={() =>
             createPdfAccessToken({
               variables: {
-                input: { bsdId: id, bsdType: bsdType },
+                input: { bsdId: id },
               },
             })
           }

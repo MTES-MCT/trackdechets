@@ -12,16 +12,12 @@ const handlers = {
 };
 
 export const roadControlPdfHandler = async (req, res) => {
-  const existingToken = await prisma.pdfAccessToken.findUnique({
-    where: { token: req.params.token }
+  const existingToken = await prisma.pdfAccessToken.findFirst({
+    where: { token: req.params.token, expiresAt: { gt: new Date() } }
   });
 
   if (!existingToken) {
-    return res.send("L'autorisation d'accès à ce bordereau n'existe pas.");
-  }
-
-  if (existingToken.expiresAt.getTime() < new Date().getTime()) {
-    return res.send("L'autorisation d'accès pour ce bordereau a expiré.");
+    return res.send("Vous n'êtes pas autorisé à accéder à ce bordereau.");
   }
 
   if (!existingToken.visitedAt) {

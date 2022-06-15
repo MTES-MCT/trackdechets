@@ -77,20 +77,6 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
 
               <TableRoadControlButton siret={siret} form={form} />
 
-              <MenuLink
-                as={Link}
-                to={{
-                  pathname: generatePath(routes.dashboard.roadControl, {
-                    siret,
-                    bsdType: "bsda",
-                    id: form.id,
-                  }),
-                  state: { background: location },
-                }}
-              >
-                <IconView color="blueLight" size="24px" />
-                Contrôle routier
-              </MenuLink>
               {!form.isDraft && (
                 <MenuItem onSelect={() => downloadPdf()}>
                   <IconPdf size="24px" color="blueLight" />

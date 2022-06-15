@@ -15,9 +15,5 @@ CREATE TABLE "default$default"."PdfAccessToken" (
     PRIMARY KEY ("id")
 );
 
--- AddForeignKey
-ALTER TABLE "default$default"."Bsda" ADD FOREIGN KEY ("childBsdaId") REFERENCES "default$default"."Bsda"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
-
 -- CreateIndex
 CREATE UNIQUE INDEX "_PdfAccessTokenTokenIdx" ON "default$default"."PdfAccessToken"("token");

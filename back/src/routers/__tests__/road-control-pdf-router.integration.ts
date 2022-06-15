@@ -70,7 +70,7 @@ describe("Road control pdf Router", () => {
     const res = await request.get(url);
 
     expect(res.text).toEqual(
-      "L'autorisation d'accès pour ce bordereau a expiré."
+      "Vous n'êtes pas autorisé à accéder à ce bordereau."
     );
   });
 
@@ -80,7 +80,7 @@ describe("Road control pdf Router", () => {
     const res = await request.get(url);
 
     expect(res.text).toEqual(
-      "L'autorisation d'accès à ce bordereau n'existe pas."
+      "Vous n'êtes pas autorisé à accéder à ce bordereau."
     );
   });
 });

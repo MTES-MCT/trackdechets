@@ -2,6 +2,7 @@ import prisma from "../../../prisma";
 import { addMinutes } from "date-fns";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { ForbiddenError } from "apollo-server-core";
+import { ReadableIdPrefix } from "../../../forms/readableId";
 
 import { getUid, getAPIBaseURL } from "../../../utils";
 
@@ -53,6 +54,24 @@ const permissions = {
   [BsdType.BSVHU]: (user, bsvhu) =>
     checkIsBsvhuContributor(user, bsvhu, deniedAccessMessage)
 };
+
+const getBsdType = (id: string): BsdType => {
+  if (id.startsWith(ReadableIdPrefix.DASRI)) {
+    return BsdType.BSDASRI;
+  }
+  if (id.startsWith(ReadableIdPrefix.BSDA)) {
+    return BsdType.BSDA;
+  }
+  if (id.startsWith(ReadableIdPrefix.FF)) {
+    return BsdType.BSFF;
+  }
+  if (id.startsWith(ReadableIdPrefix.VHU)) {
+    return BsdType.BSVHU;
+  }
+
+  return BsdType.BSDD;
+};
+
 const createPdfAccessToken: MutationResolvers["createPdfAccessToken"] = async (
   _,
   { input },
@@ -60,20 +79,24 @@ const createPdfAccessToken: MutationResolvers["createPdfAccessToken"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
   // find bsd
-  const bsd = await accessors[input.bsdType](input.bsdId);
+
+  const bsdType = getBsdType(input.bsdId);
+
+  const bsd = await accessors[bsdType](input.bsdId);
+
   // check status
-  if (!checkStatus[input.bsdType](bsd)) {
+  if (!checkStatus[bsdType](bsd)) {
     throw new ForbiddenError(
       "Seuls les bordereaux pris en charge par un transporteur peuvent être consulté via un accès temporaire."
     );
   }
   // check perms
-  await permissions[input.bsdType](user, bsd);
+  await permissions[bsdType](user, bsd);
 
   const token = await prisma.pdfAccessToken.create({
     data: {
       token: getUid(50),
-      bsdType: input.bsdType,
+      bsdType: bsdType,
       bsdId: input.bsdId,
       userId: user.id,
       expiresAt: addMinutes(new Date(), 30)

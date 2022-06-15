@@ -45,6 +45,6 @@ input SignatureWhere {
 
 
 input CreatePdfAccessTokenInput {
-  bsdType: BsdType!
+
   bsdId: ID!
 }
