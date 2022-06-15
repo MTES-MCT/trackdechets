@@ -5,7 +5,7 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2022.06.27] ~27/06/2022
+# [2022.06.2] ~27/06/2022
 
 #### :rocket: Nouvelles fonctionnalités
 
@@ -16,13 +16,12 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Correction du code déchet erroné pour les DASRI d'origine animale (18 01 02* => 18 02 02*) [PR 1460](https://github.com/MTES-MCT/trackdechets/pull/1460)
 
 #### :boom: Breaking changes
-
 #### :nail_care: Améliorations
 
 - Ajout de suggestions lors de l'ajout d'un établissement fermé. [PR 1463](https://github.com/MTES-MCT/trackdechets/pull/1463)
+- Ajout de la possibilité de filtrer par numéro SIRET de l'émetteur ou du destinataire dans le tableau de bord [PR 1456](https://github.com/MTES-MCT/trackdechets/pull/1456)
 
 #### :memo: Documentation
-
 #### :house: Interne
 
 # [2022.06.1] ~06/06/2022

@@ -31,10 +31,20 @@ export const COLUMNS: Record<
     accessor: vhu => vhu.id,
   },
   emitter: {
-    accessor: vhu => vhu?.emitter?.company?.name ?? "",
+    accessor: vhu => (
+      <>
+        <div>{vhu?.emitter?.company?.name ?? ""}</div>
+        <div>{vhu?.emitter?.company?.siret ?? ""}</div>
+      </>
+    ),
   },
   recipient: {
-    accessor: vhu => vhu?.destination?.company?.name ?? "",
+    accessor: vhu => (
+      <>
+        <div>{vhu?.destination?.company?.name ?? ""}</div>
+        <div>{vhu?.destination?.company?.siret ?? ""}</div>
+      </>
+    ),
   },
   waste: {
     accessor: vhu => vhu?.wasteCode,
