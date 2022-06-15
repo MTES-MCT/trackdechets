@@ -66,6 +66,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :memo: Documentation
 
+- Retrait du schema de Form dans la documentation Dasri [PR 1457](https://github.com/MTES-MCT/trackdechets/pull/1457)
+
 #### :house: Interne
 
 # [2022.05.1] ~16/05/2022
