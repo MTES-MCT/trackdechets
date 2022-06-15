@@ -6,10 +6,26 @@ const SEND_MEMBERSHIP_REQUEST = gql`
   mutation SendMembershipRequest($siret: String!) {
     sendMembershipRequest(siret: $siret) {
       email
+      sentTo
     }
   }
 `;
-
+const displayUnredactedEmailAddresses = sentTo => {
+  const clearEmailAddresses = sentTo.filter(adr => !adr.includes("***"));
+  if (!clearEmailAddresses.length) {
+    return null;
+  }
+  const emailText =
+    clearEmailAddresses.length > 1
+      ? "une de ces adresses :"
+      : "cette adresse : ";
+  return (
+    <>
+      Si vous n'avez pas de retour au bout de quelques jours, vous pouvez
+      contacter {emailText} <strong>{clearEmailAddresses.join(", ")}</strong>
+    </>
+  );
+};
 /**
  * Allows users to send an invitation request to join a company
  * when there is already an admin for this company
@@ -29,7 +45,8 @@ export default function AccountCompanyAddInvitationRequest({ siret }) {
       <div className="notification notification--success">
         <p>
           Demande de rattachement envoyée. Vous recevrez un email de
-          confirmation lorsque votre demande sera validée
+          confirmation lorsque votre demande sera validée. <br />
+          {displayUnredactedEmailAddresses(data.sendMembershipRequest.sentTo)}
         </p>
       </div>
     );

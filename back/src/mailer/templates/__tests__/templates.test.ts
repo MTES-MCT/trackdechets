@@ -236,12 +236,14 @@ describe("templates", () => {
   test("membershipRequestConfirmation", () => {
     const companyName = "ACME";
     const companySiret = "11111111111111";
+    const adminEmailsInfo = "emails info";
     const rendered = renderMail(membershipRequestConfirmation, {
-      variables: { companyName, companySiret },
+      variables: { companyName, companySiret, adminEmailsInfo },
       to
     });
     expect(rendered.body).toContain(companyName);
     expect(rendered.body).toContain(companySiret);
+    expect(rendered.body).toContain(adminEmailsInfo);
   });
 
   test("membershipRequest", () => {

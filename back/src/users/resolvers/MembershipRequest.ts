@@ -1,8 +1,13 @@
 import { MembershipRequestResolvers } from "../../generated/graphql/types";
-import { partiallyHideEmail } from "../utils";
+import { redactOrShowEmail } from "../utils";
+import { checkIsAuthenticated } from "../../common/permissions";
 
 const membershipRequestResolvers: MembershipRequestResolvers = {
-  sentTo: parent => parent.sentTo.map(email => partiallyHideEmail(email))
+  sentTo: (parent, arg, context) => {
+    const user = checkIsAuthenticated(context);
+
+    return parent.sentTo.map(email => redactOrShowEmail(email, user.email));
+  }
 };
 
 export default membershipRequestResolvers;
