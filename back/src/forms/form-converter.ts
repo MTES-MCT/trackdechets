@@ -388,13 +388,23 @@ export function flattenBsddRevisionRequestInput(
     wasteDetailsCode: chain(reviewContent, c =>
       chain(c.wasteDetails, w => w.code)
     ),
+    wasteDetailsName: chain(reviewContent, c =>
+      chain(c.wasteDetails, w => w.name)
+    ),
     wasteDetailsPop: chain(reviewContent, c =>
       chain(c.wasteDetails, w => w.pop)
+    ),
+    wasteDetailsPackagingInfos: chain(reviewContent, c =>
+      chain(c.wasteDetails, w => w.packagingInfos)
     ),
     quantityReceived: chain(reviewContent, c => c.quantityReceived),
     processingOperationDone: chain(
       reviewContent,
       c => c.processingOperationDone
+    ),
+    processingOperationDescription: chain(
+      reviewContent,
+      c => c.processingOperationDescription
     ),
     ...flattenTraderInput(reviewContent),
     ...flattenBrokerInput(reviewContent),
@@ -843,7 +853,10 @@ export function expandBsddRevisionRequestContent(
   return {
     wasteDetails: nullIfNoValues<FormRevisionRequestWasteDetails>({
       code: bsddRevisionRequest.wasteDetailsCode,
-      pop: bsddRevisionRequest.wasteDetailsPop
+      name: bsddRevisionRequest.wasteDetailsName,
+      pop: bsddRevisionRequest.wasteDetailsPop,
+      packagingInfos:
+        bsddRevisionRequest.wasteDetailsPackagingInfos as PackagingInfo[]
     }),
     trader: nullIfNoValues<Trader>({
       company: nullIfNoValues<FormCompany>({
@@ -876,6 +889,8 @@ export function expandBsddRevisionRequestContent(
     }),
     quantityReceived: bsddRevisionRequest.quantityReceived,
     processingOperationDone: bsddRevisionRequest.processingOperationDone,
+    processingOperationDescription:
+      bsddRevisionRequest.processingOperationDescription,
     temporaryStorageDetail:
       nullIfNoValues<FormRevisionRequestTemporaryStorageDetail>({
         destination: nullIfNoValues<FormRevisionRequestDestination>({

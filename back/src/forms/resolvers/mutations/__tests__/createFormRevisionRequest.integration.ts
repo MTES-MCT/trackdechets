@@ -216,7 +216,9 @@ describe("Mutation.createFormRevisionRequest", () => {
         variables: {
           input: {
             bsddId: "",
-            content: { wasteDetails: { name: "I cannot change the name" } },
+            content: {
+              wasteDetails: { onuCode: "I cannot change the onuCode" }
+            },
             comment: "A comment"
           }
         }
@@ -224,7 +226,7 @@ describe("Mutation.createFormRevisionRequest", () => {
     } catch (err) {
       expect(err.message).toContain('{"code":"BAD_USER_INPUT"}');
       expect(err.message).toContain(
-        'Field \\"name\\" is not defined by type \\"FormRevisionRequestWasteDetailsInput\\".'
+        'Field \\"onuCode\\" is not defined by type \\"FormRevisionRequestWasteDetailsInput\\".'
       );
     }
   });
