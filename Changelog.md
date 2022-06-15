@@ -24,6 +24,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :memo: Documentation
 #### :house: Interne
 
+- Passage à React V18. [PR 1385](https://github.com/MTES-MCT/trackdechets/pull/1385)
+
 # [2022.06.1] ~06/06/2022
 
 #### :rocket: Nouvelles fonctionnalités
