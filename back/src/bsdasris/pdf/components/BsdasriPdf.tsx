@@ -146,7 +146,9 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               <p>
                 <strong>
                   Signature avec code secret{" "}
-                  {!!bsdasri?.ecoOrganisme?.emittedByEcoOrganisme ? "Éco-Organisme" : "PRED"}{" "}
+                  {!!bsdasri?.ecoOrganisme?.emittedByEcoOrganisme
+                    ? "Éco-Organisme"
+                    : "PRED"}{" "}
                   :
                 </strong>{" "}
                 Oui
@@ -177,10 +179,10 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               <br />
               <input
                 type="checkbox"
-                checked={bsdasri?.waste?.code === "18 01 02*"}
+                checked={bsdasri?.waste?.code === "18 02 02*"}
                 readOnly
               />{" "}
-              18 01 02* DASRI origine animale
+              18 02 02* DASRI origine animale
               <br />
               <strong>Mention ADR : </strong> {bsdasri?.waste?.adr}
             </p>
