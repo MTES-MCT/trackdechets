@@ -55,4 +55,9 @@
     background: $red-light;
     border-color: $red;
   }
+
+  a {
+    cursor: pointer;
+    text-decoration: underline;
+  }
 }
