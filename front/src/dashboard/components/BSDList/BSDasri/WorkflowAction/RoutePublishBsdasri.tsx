@@ -39,7 +39,7 @@ export function RoutePublishBsdasri() {
       id: formId,
     },
 
-    fetchPolicy: "network-only",
+    fetchPolicy: "no-cache",
   });
 
   const [

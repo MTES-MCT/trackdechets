@@ -121,7 +121,7 @@ export function RouteSignBsdasri({
     variables: {
       id: formId,
     },
-    fetchPolicy: "network-only",
+    fetchPolicy: "no-cache",
   });
   const [updateBsdasri, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsdasri">,

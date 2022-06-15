@@ -101,6 +101,7 @@ export const FullBsdaFragment = gql`
         ...CompanyFragment
         vatNumber
       }
+      customInfo
       recepisse {
         number
         department

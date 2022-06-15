@@ -17,7 +17,7 @@ export function RouteBSDasrisView() {
       id: formId,
     },
     skip: !formId,
-    fetchPolicy: "network-only",
+    fetchPolicy: "no-cache",
   });
 
   if (error) {
