@@ -9,7 +9,7 @@ import express from "express";
 import passport from "passport";
 import { BasicStrategy } from "passport-http";
 import { Strategy as BearerStrategy } from "passport-http-bearer";
-import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
+
 import { Strategy as LocalStrategy } from "passport-local";
 import {
   Strategy as ClientPasswordStrategy,
@@ -23,8 +23,6 @@ import {
   sanitizeEmail,
   hashToken
 } from "./utils";
-
-const { JWT_SECRET } = process.env;
 
 // Set specific type for req.user
 declare global {
@@ -110,43 +108,6 @@ passport.deserializeUser((id: string, done) => {
     .then(user => done(null, { ...user, auth: AuthType.Session }))
     .catch(err => done(err));
 });
-
-const jwtOpts = {
-  passReqToCallback: true,
-  secretOrKey: JWT_SECRET,
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken()
-};
-
-passport.use(
-  new JwtStrategy(
-    jwtOpts,
-    async (req: express.Request, jwtPayload: { userId: string }, done) => {
-      try {
-        const user = await prisma.user.findUnique({
-          where: { id: jwtPayload.userId }
-        });
-        if (user) {
-          const token = jwtOpts.jwtFromRequest(req);
-          // verify that the token has not been
-          // converted to OAuth and revoked
-          const accessToken = await prisma.accessToken.findUnique({
-            where: {
-              token: hashToken(token)
-            }
-          });
-          if (accessToken && accessToken.isRevoked) {
-            return done(null, false);
-          }
-          return done(null, { ...user, auth: AuthType.JWT }, { token });
-        } else {
-          return done(null, false);
-        }
-      } catch (err) {
-        return done(err, false);
-      }
-    }
-  )
-);
 
 /**
  * Update field lastUsed on AccessToken if it was never set
@@ -275,42 +236,6 @@ export const passportBearerMiddleware = (
     next,
     passport.authenticate("bearer", { session: false }, (err, user) => {
       passportCallback(err, req, next, user);
-    })
-  );
-};
-
-/**
- * Middleware used to authenticate request using JWT token
- * It is used for retro-compatibility with not expiring jwt
- * tokens that were emitted before using OAuth tokens saved in db.
- * Upon successful verification, this token is converted to a
- * normal OAuth token
- */
-export const passportJwtMiddleware = (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-) => {
-  iffNotAuthenticated(
-    req,
-    res,
-    next,
-    passport.authenticate("jwt", { session: false }, (err, user, opts) => {
-      opts = opts ? opts : {};
-      passportCallback(err, req, next, user, () => {
-        if (user && opts.token) {
-          const token: string = opts.token;
-          // save this token to the OAuth access token table
-          return prisma.accessToken.create({
-            data: {
-              token,
-              user: { connect: { id: user.id } },
-              lastUsed: new Date()
-            }
-          });
-        }
-        return Promise.resolve();
-      });
     })
   );
 };

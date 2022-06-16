@@ -130,6 +130,14 @@ enum ApplicationGoal {
   CLIENTS
 }
 
+enum BsdType {
+  BSDD
+  BSDA
+  BSDASRI
+  BSFF
+  BSVHU
+}
+
 model AccessToken {
   id            String       @id @default(cuid())
   createdAt     DateTime     @default(now()) @db.Timestamptz(6)
@@ -711,10 +719,11 @@ model User {
   UserActivationHash    UserActivationHash[]
   UserResetPasswordHash UserResetPasswordHash[]
 
-  bsdasriEmissionSignatures  Bsdasri[] @relation("BsdasriEmissionSignature")
-  bsdasriTransportSignatures Bsdasri[] @relation("BsdasriTransportSignature")
-  bsdasriReceptionSignatures Bsdasri[] @relation("BsdasriReceptionSignature")
-  bsdasriOperationignatures  Bsdasri[] @relation("BsdasriOperationSignature")
+  bsdasriEmissionSignatures  Bsdasri[]        @relation("BsdasriEmissionSignature")
+  bsdasriTransportSignatures Bsdasri[]        @relation("BsdasriTransportSignature")
+  bsdasriReceptionSignatures Bsdasri[]        @relation("BsdasriReceptionSignature")
+  bsdasriOperationignatures  Bsdasri[]        @relation("BsdasriOperationSignature")
+  PdfAccessToken             PdfAccessToken[]
 }
 
 model UserAccountHash {
@@ -1394,4 +1403,20 @@ model Event {
   metadata Json?
 
   actor String
+}
+
+// Short-lived token to access a bsd pdf
+model PdfAccessToken {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  expiresAt DateTime  @db.Timestamptz(6)
+  token     String    @unique
+  bsdType   BsdType
+  bsdId     String
+  lastUsed  DateTime? @db.Timestamptz(6)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  visitedAt DateTime? @db.Timestamptz(6)
+
+  @@index([token], map: "_PdfAccessTokenTokenIdx")
 }

@@ -7,7 +7,7 @@ import {
   Mutation,
   MutationDeleteBsvhuArgs
 } from "../../../../generated/graphql/types";
-import { vhuFormFactory } from "../../../__tests__/factories.vhu";
+import { bsvhuFactory } from "../../../__tests__/factories.vhu";
 import prisma from "../../../../prisma";
 const DELETE_VHU = `
 mutation DeleteVhu($id: ID!){
@@ -21,7 +21,7 @@ describe("Mutation.deleteBsdasri", () => {
 
   it("should disallow unauthenticated user", async () => {
     const { company } = await userWithCompanyFactory("MEMBER");
-    const vhu = await vhuFormFactory({
+    const vhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret
       }
@@ -49,7 +49,7 @@ describe("Mutation.deleteBsdasri", () => {
     const { user: nonFormuser } = await userWithCompanyFactory("MEMBER");
     const { company: otherCompany } = await userWithCompanyFactory("MEMBER");
 
-    const vhu = await vhuFormFactory({
+    const vhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: otherCompany.siret
       }
@@ -79,7 +79,7 @@ describe("Mutation.deleteBsdasri", () => {
   it("should forbid to delete a non INITIAL vhu", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
-    const vhu = await vhuFormFactory({
+    const vhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret,
         status: "SENT"
@@ -111,7 +111,7 @@ describe("Mutation.deleteBsdasri", () => {
   it("should mark a vhu as deleted", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
-    const vhu = await vhuFormFactory({
+    const vhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret
       }

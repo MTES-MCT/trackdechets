@@ -6,7 +6,7 @@ import {
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
 
-export const vhuFormFactory = async ({
+export const bsvhuFactory = async ({
   opt = {}
 }: {
   opt?: Partial<Prisma.BsvhuCreateInput>;

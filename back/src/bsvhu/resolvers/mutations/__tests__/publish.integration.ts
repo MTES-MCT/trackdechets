@@ -3,7 +3,7 @@ import { ErrorCode } from "../../../../common/errors";
 import { Mutation } from "../../../../generated/graphql/types";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { vhuFormFactory } from "../../../__tests__/factories.vhu";
+import { bsvhuFactory } from "../../../__tests__/factories.vhu";
 
 const PUBLISH_VHU_FORM = `
 mutation PublishBsvhu($id: ID!) {
@@ -40,7 +40,7 @@ describe("Mutation.Vhu.publish", () => {
 
   it("should fail if the form is not a draft", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const form = await vhuFormFactory({
+    const form = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret,
         isDraft: false
@@ -62,7 +62,7 @@ describe("Mutation.Vhu.publish", () => {
 
   it("should pass the form as non draft", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const form = await vhuFormFactory({
+    const form = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret,
         isDraft: true

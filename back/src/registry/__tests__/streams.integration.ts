@@ -7,7 +7,7 @@ import {
 } from "../../../integration-tests/helper";
 import { bsdaFactory } from "../../bsda/__tests__/factories";
 import { bsdasriFactory } from "../../bsdasris/__tests__/factories";
-import { vhuFormFactory } from "../../bsvhu/__tests__/factories.vhu";
+import { bsvhuFactory } from "../../bsvhu/__tests__/factories.vhu";
 import { createBsffAfterReception } from "../../bsffs/__tests__/factories";
 import { getFullForm } from "../../forms/database";
 import { indexForm } from "../../forms/elastic";
@@ -100,7 +100,7 @@ describe("wastesReader", () => {
       Array(5)
         .fill(1)
         .map(() =>
-          vhuFormFactory({
+          bsvhuFactory({
             opt: {
               destinationCompanySiret: destination.company.siret,
               destinationReceptionDate: new Date(),

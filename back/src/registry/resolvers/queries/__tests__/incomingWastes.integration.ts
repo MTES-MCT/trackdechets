@@ -23,7 +23,7 @@ import { bsdasriFactory } from "../../../../bsdasris/__tests__/factories";
 import { indexBsff } from "../../../../bsffs/elastic";
 import { createBsffAfterOperation } from "../../../../bsffs/__tests__/factories";
 import { indexBsvhu } from "../../../../bsvhu/elastic";
-import { vhuFormFactory } from "../../../../bsvhu/__tests__/factories.vhu";
+import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 import { getFullForm } from "../../../../forms/database";
 import { indexForm } from "../../../../forms/elastic";
 import { Query } from "../../../../generated/graphql/types";
@@ -126,7 +126,7 @@ describe("Incoming wastes registry", () => {
         destinationOperationCode: "R 13"
       }
     });
-    bsd4 = await vhuFormFactory({
+    bsd4 = await bsvhuFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
         transporterCompanySiret: transporter.company.siret,

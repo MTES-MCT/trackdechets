@@ -22,6 +22,7 @@ import { BsffStatus } from "generated/graphql/types";
 import { BsffFragment } from "../types";
 import { DeleteBsffModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";
+import { TableRoadControlButton } from "../../RoadControlButton";
 
 import styles from "../../BSDActions.module.scss";
 
@@ -68,6 +69,8 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
+              <TableRoadControlButton siret={siret} form={form} />
+
               <MenuItem onSelect={() => downloadPdf()}>
                 <IconPdf size="24px" color="blueLight" />
                 Pdf

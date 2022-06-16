@@ -2,7 +2,7 @@ import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 
-import { getFormOrFormNotFound } from "../../database";
+import { getBsvhuOrNotFound } from "../../database";
 import { expandVhuFormFromDb } from "../../converter";
 import { checkCanDeleteBsdvhu } from "../../permissions";
 import * as elastic from "../../../common/elastic";
@@ -17,7 +17,7 @@ const deleteBsvhuResolver: MutationResolvers["deleteBsvhu"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const bshvhu = await getFormOrFormNotFound(id);
+  const bshvhu = await getBsvhuOrNotFound(id);
   // user must belong to the vhu, and status must be INITIAL
 
   await checkCanDeleteBsdvhu(user, bshvhu);

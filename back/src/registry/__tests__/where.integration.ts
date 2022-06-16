@@ -10,7 +10,7 @@ import { bsdasriFactory } from "../../bsdasris/__tests__/factories";
 import { indexBsff } from "../../bsffs/elastic";
 import { createBsff } from "../../bsffs/__tests__/factories";
 import { indexBsvhu } from "../../bsvhu/elastic";
-import { vhuFormFactory } from "../../bsvhu/__tests__/factories.vhu";
+import { bsvhuFactory } from "../../bsvhu/__tests__/factories.vhu";
 import { BsdElastic, client, index } from "../../common/elastic";
 import { getFullForm } from "../../forms/database";
 import { indexForm } from "../../forms/elastic";
@@ -40,7 +40,7 @@ describe("toElasticFilter", () => {
         BSDD: await getFullForm(await formFactory({ ownerId: user.id })),
         BSDA: await bsdaFactory({}),
         BSDASRI: await bsdasriFactory({}),
-        BSVHU: await vhuFormFactory({}),
+        BSVHU: await bsvhuFactory({}),
         BSFF: await createBsff()
       };
 
@@ -69,7 +69,7 @@ describe("toElasticFilter", () => {
       BSDD: await getFullForm(await formFactory({ ownerId: user.id })),
       BSDA: await bsdaFactory({}),
       BSDASRI: await bsdasriFactory({}),
-      BSVHU: await vhuFormFactory({}),
+      BSVHU: await bsvhuFactory({}),
       BSFF: await createBsff()
     };
 
@@ -268,19 +268,19 @@ describe("toElasticFilter", () => {
       destinationOperationDate: "destinationOperationDate"
     };
 
-    const bsvhu1 = await vhuFormFactory({
+    const bsvhu1 = await bsvhuFactory({
       opt: { [toBsvhuKey[date]]: new Date("2021-01-01") }
     });
 
-    const bsvhu2 = await vhuFormFactory({
+    const bsvhu2 = await bsvhuFactory({
       opt: { [toBsvhuKey[date]]: new Date("2021-01-02") }
     });
 
-    const bsvhu3 = await vhuFormFactory({
+    const bsvhu3 = await bsvhuFactory({
       opt: { [toBsvhuKey[date]]: new Date("2021-01-03") }
     });
 
-    const bsvhu4 = await vhuFormFactory({
+    const bsvhu4 = await bsvhuFactory({
       opt: { [toBsvhuKey[date]]: new Date("2021-01-04") }
     });
 
@@ -543,19 +543,19 @@ describe("toElasticFilter", () => {
       destinationOperationDate: "destinationOperationDate"
     };
 
-    const bsvhu1 = await vhuFormFactory({
+    const bsvhu1 = await bsvhuFactory({
       opt: { [toBsvhuKey[date]]: new Date("2021-01-01") }
     });
 
-    const bsvhu2 = await vhuFormFactory({
+    const bsvhu2 = await bsvhuFactory({
       opt: { [toBsvhuKey[date]]: new Date("2021-01-02") }
     });
 
-    const bsvhu3 = await vhuFormFactory({
+    const bsvhu3 = await bsvhuFactory({
       opt: { [toBsvhuKey[date]]: new Date("2021-01-03") }
     });
 
-    const bsvhu4 = await vhuFormFactory({
+    const bsvhu4 = await bsvhuFactory({
       opt: { [toBsvhuKey[date]]: new Date("2021-01-04") }
     });
 
@@ -811,19 +811,19 @@ describe("toElasticFilter", () => {
       destinationOperationDate: "destinationOperationDate"
     };
 
-    const bsvhu1 = await vhuFormFactory({
+    const bsvhu1 = await bsvhuFactory({
       opt: { [toBsvhuKey[date]]: new Date("2021-01-01") }
     });
 
-    const bsvhu2 = await vhuFormFactory({
+    const bsvhu2 = await bsvhuFactory({
       opt: { [toBsvhuKey[date]]: new Date("2021-01-02") }
     });
 
-    const bsvhu3 = await vhuFormFactory({
+    const bsvhu3 = await bsvhuFactory({
       opt: { [toBsvhuKey[date]]: new Date("2021-01-03") }
     });
 
-    const bsvhu4 = await vhuFormFactory({
+    const bsvhu4 = await bsvhuFactory({
       opt: { [toBsvhuKey[date]]: new Date("2021-01-04") }
     });
 
@@ -1020,19 +1020,19 @@ describe("toElasticFilter", () => {
   });
 
   it("should filter BSVHUs between two reception weights (strict)", async () => {
-    const bsvhu1 = await vhuFormFactory({
+    const bsvhu1 = await bsvhuFactory({
       opt: { destinationReceptionWeight: 1 }
     });
 
-    const bsvhu2 = await vhuFormFactory({
+    const bsvhu2 = await bsvhuFactory({
       opt: { destinationReceptionWeight: 2 }
     });
 
-    const bsvhu3 = await vhuFormFactory({
+    const bsvhu3 = await bsvhuFactory({
       opt: { destinationReceptionWeight: 3 }
     });
 
-    const bsvhu4 = await vhuFormFactory({
+    const bsvhu4 = await bsvhuFactory({
       opt: { destinationReceptionWeight: 4 }
     });
 
@@ -1198,19 +1198,19 @@ describe("toElasticFilter", () => {
   });
 
   it("should filter BSVHUs between two reception weights (not strict)", async () => {
-    const bsvhu1 = await vhuFormFactory({
+    const bsvhu1 = await bsvhuFactory({
       opt: { destinationReceptionWeight: 1 }
     });
 
-    const bsvhu2 = await vhuFormFactory({
+    const bsvhu2 = await bsvhuFactory({
       opt: { destinationReceptionWeight: 2 }
     });
 
-    const bsvhu3 = await vhuFormFactory({
+    const bsvhu3 = await bsvhuFactory({
       opt: { destinationReceptionWeight: 3 }
     });
 
-    const bsvhu4 = await vhuFormFactory({
+    const bsvhu4 = await bsvhuFactory({
       opt: { destinationReceptionWeight: 4 }
     });
 
@@ -1373,19 +1373,19 @@ describe("toElasticFilter", () => {
   });
 
   it("should filter BSVHUs on reception weight (exact)", async () => {
-    const bsvhu1 = await vhuFormFactory({
+    const bsvhu1 = await bsvhuFactory({
       opt: { destinationReceptionWeight: 1 }
     });
 
-    const bsvhu2 = await vhuFormFactory({
+    const bsvhu2 = await bsvhuFactory({
       opt: { destinationReceptionWeight: 2 }
     });
 
-    const bsvhu3 = await vhuFormFactory({
+    const bsvhu3 = await bsvhuFactory({
       opt: { destinationReceptionWeight: 3 }
     });
 
-    const bsvhu4 = await vhuFormFactory({
+    const bsvhu4 = await bsvhuFactory({
       opt: { destinationReceptionWeight: 4 }
     });
 
@@ -1525,15 +1525,15 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id]);
   });
   it("should filter BSVHUs on emitterCompanySiret (exact)", async () => {
-    const bsvhu1 = await vhuFormFactory({
+    const bsvhu1 = await bsvhuFactory({
       opt: { emitterCompanySiret: "11111111111111" }
     });
 
-    const bsvhu2 = await vhuFormFactory({
+    const bsvhu2 = await bsvhuFactory({
       opt: { emitterCompanySiret: "22222222222222" }
     });
 
-    const bsvhu3 = await vhuFormFactory({
+    const bsvhu3 = await bsvhuFactory({
       opt: { emitterCompanySiret: "33333333333333" }
     });
 
@@ -1673,15 +1673,15 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id, bsdasri2.id]);
   });
   it("should filter BSVHUs on a list of emitterCompanySiret", async () => {
-    const bsvhu1 = await vhuFormFactory({
+    const bsvhu1 = await bsvhuFactory({
       opt: { emitterCompanySiret: "11111111111111" }
     });
 
-    const bsvhu2 = await vhuFormFactory({
+    const bsvhu2 = await bsvhuFactory({
       opt: { emitterCompanySiret: "22222222222222" }
     });
 
-    const bsvhu3 = await vhuFormFactory({
+    const bsvhu3 = await bsvhuFactory({
       opt: { emitterCompanySiret: "33333333333333" }
     });
 
@@ -1819,15 +1819,15 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id]);
   });
   it("should filter BSVHUs on a substring of emitterCompanySiret", async () => {
-    const bsvhu1 = await vhuFormFactory({
+    const bsvhu1 = await bsvhuFactory({
       opt: { emitterCompanySiret: "11111111111111" }
     });
 
-    const bsvhu2 = await vhuFormFactory({
+    const bsvhu2 = await bsvhuFactory({
       opt: { emitterCompanySiret: "22222222222222" }
     });
 
-    const bsvhu3 = await vhuFormFactory({
+    const bsvhu3 = await bsvhuFactory({
       opt: { emitterCompanySiret: "33333333333333" }
     });
 
@@ -1967,15 +1967,15 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id]);
   });
   it("should filter BSVHUs on transporterCompanySiret (exact)", async () => {
-    const bsvhu1 = await vhuFormFactory({
+    const bsvhu1 = await bsvhuFactory({
       opt: { transporterCompanySiret: "11111111111111" }
     });
 
-    const bsvhu2 = await vhuFormFactory({
+    const bsvhu2 = await bsvhuFactory({
       opt: { transporterCompanySiret: "22222222222222" }
     });
 
-    const bsvhu3 = await vhuFormFactory({
+    const bsvhu3 = await bsvhuFactory({
       opt: { transporterCompanySiret: "33333333333333" }
     });
 
@@ -2115,15 +2115,15 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id, bsdasri2.id]);
   });
   it("should filter BSVHUs on a list of transporterCompanySiret", async () => {
-    const bsvhu1 = await vhuFormFactory({
+    const bsvhu1 = await bsvhuFactory({
       opt: { transporterCompanySiret: "11111111111111" }
     });
 
-    const bsvhu2 = await vhuFormFactory({
+    const bsvhu2 = await bsvhuFactory({
       opt: { transporterCompanySiret: "22222222222222" }
     });
 
-    const bsvhu3 = await vhuFormFactory({
+    const bsvhu3 = await bsvhuFactory({
       opt: { transporterCompanySiret: "33333333333333" }
     });
 
@@ -2261,15 +2261,15 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id]);
   });
   it("should filter BSVHUs on a substring of transporterCompanySiret", async () => {
-    const bsvhu1 = await vhuFormFactory({
+    const bsvhu1 = await bsvhuFactory({
       opt: { transporterCompanySiret: "11111111111111" }
     });
 
-    const bsvhu2 = await vhuFormFactory({
+    const bsvhu2 = await bsvhuFactory({
       opt: { transporterCompanySiret: "22222222222222" }
     });
 
-    const bsvhu3 = await vhuFormFactory({
+    const bsvhu3 = await bsvhuFactory({
       opt: { transporterCompanySiret: "33333333333333" }
     });
 
@@ -2411,15 +2411,15 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id]);
   });
   it("should filter BSVHUs on transporterCompanySiret (exact)", async () => {
-    const bsvhu1 = await vhuFormFactory({
+    const bsvhu1 = await bsvhuFactory({
       opt: { destinationCompanySiret: "11111111111111" }
     });
 
-    const bsvhu2 = await vhuFormFactory({
+    const bsvhu2 = await bsvhuFactory({
       opt: { destinationCompanySiret: "22222222222222" }
     });
 
-    const bsvhu3 = await vhuFormFactory({
+    const bsvhu3 = await bsvhuFactory({
       opt: { destinationCompanySiret: "33333333333333" }
     });
 
@@ -2559,15 +2559,15 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id, bsdasri2.id]);
   });
   it("should filter BSVHUs on a list of destinationCompanySiret", async () => {
-    const bsvhu1 = await vhuFormFactory({
+    const bsvhu1 = await bsvhuFactory({
       opt: { destinationCompanySiret: "11111111111111" }
     });
 
-    const bsvhu2 = await vhuFormFactory({
+    const bsvhu2 = await bsvhuFactory({
       opt: { destinationCompanySiret: "22222222222222" }
     });
 
-    const bsvhu3 = await vhuFormFactory({
+    const bsvhu3 = await bsvhuFactory({
       opt: { destinationCompanySiret: "33333333333333" }
     });
 
@@ -2705,15 +2705,15 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id]);
   });
   it("should filter BSVHUs on a substring of destinationCompanySiret", async () => {
-    const bsvhu1 = await vhuFormFactory({
+    const bsvhu1 = await bsvhuFactory({
       opt: { destinationCompanySiret: "11111111111111" }
     });
 
-    const bsvhu2 = await vhuFormFactory({
+    const bsvhu2 = await bsvhuFactory({
       opt: { destinationCompanySiret: "22222222222222" }
     });
 
-    const bsvhu3 = await vhuFormFactory({
+    const bsvhu3 = await bsvhuFactory({
       opt: { destinationCompanySiret: "33333333333333" }
     });
 

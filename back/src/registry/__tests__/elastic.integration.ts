@@ -16,7 +16,7 @@ import {
   createBsffBeforeEmission
 } from "../../bsffs/__tests__/factories";
 import { indexBsvhu } from "../../bsvhu/elastic";
-import { vhuFormFactory } from "../../bsvhu/__tests__/factories.vhu";
+import { bsvhuFactory } from "../../bsvhu/__tests__/factories.vhu";
 import { client, index } from "../../common/elastic";
 import { getFullForm } from "../../forms/database";
 import { indexForm } from "../../forms/elastic";
@@ -257,7 +257,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     expect(bsds).toEqual([]);
   });
   it("should list a BSVHU in destination's incoming wastes once it has been received", async () => {
-    const bsvhu = await vhuFormFactory({
+    const bsvhu = await bsvhuFactory({
       opt: {
         destinationCompanySiret: destination.company.siret,
         destinationReceptionDate: new Date(),
@@ -270,7 +270,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
   });
   it("should not list a BSVHU in destination's incoming wastes before it has been received", async () => {
-    const bsvhu = await vhuFormFactory({
+    const bsvhu = await bsvhuFactory({
       opt: {
         destinationCompanySiret: destination.company.siret,
         destinationOperationSignatureDate: null
@@ -432,7 +432,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     expect(bsds).toEqual([]);
   });
   it("should list a BSVHU in emitter's outgoing wastes once it has been sent", async () => {
-    const bsvhu = await vhuFormFactory({
+    const bsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
         emitterEmissionSignatureDate: new Date(),
@@ -445,7 +445,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
   });
   it("should not list a BSVHU in emitter's outgoing wastes before it has been sent", async () => {
-    const bsvhu = await vhuFormFactory({
+    const bsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
         emitterEmissionSignatureDate: null,
@@ -582,7 +582,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     expect(bsds).toEqual([]);
   });
   it("should list a BSVHU in transporter's transported wastes once it has been taken over", async () => {
-    const bsvhu = await vhuFormFactory({
+    const bsvhu = await bsvhuFactory({
       opt: {
         transporterCompanySiret: transporter.company.siret,
         emitterEmissionSignatureDate: new Date(),
@@ -595,7 +595,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
   });
   it("should not list a BSVHU in transporter'transported wastes before it has been delivered", async () => {
-    const bsvhu = await vhuFormFactory({
+    const bsvhu = await bsvhuFactory({
       opt: {
         transporterCompanySiret: transporter.company.siret,
         emitterEmissionSignatureDate: null,
@@ -883,7 +883,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri.id]);
   });
   it("should list a BSVHU in emitter's all wastes", async () => {
-    const bsvhu = await vhuFormFactory({
+    const bsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret
       }
@@ -894,7 +894,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
   });
   it("should list a BSVHU in transporter's all wastes", async () => {
-    const bsvhu = await vhuFormFactory({
+    const bsvhu = await bsvhuFactory({
       opt: {
         transporterCompanySiret: transporter.company.siret
       }
@@ -905,7 +905,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
   });
   it("should list a BSVHU in destination's all wastes", async () => {
-    const bsvhu = await vhuFormFactory({
+    const bsvhu = await bsvhuFactory({
       opt: {
         destinationCompanySiret: destination.company.siret
       }
