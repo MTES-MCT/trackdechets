@@ -69,7 +69,13 @@ export default function CompanySelector({
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
   const [field] = useField<FormCompany>({ name });
-  const { setFieldValue, setFieldTouched, resetForm } = useFormikContext();
+  const {
+    setFieldError,
+    setFieldValue,
+    setFieldTouched,
+    resetForm,
+  } = useFormikContext();
+  const { values } = useFormikContext<FormCompany>();
   const [clue, setClue] = useState("");
   const [department, setDepartement] = useState<null | string>(null);
   const [
@@ -275,6 +281,36 @@ export default function CompanySelector({
     (!!field.value.vatNumber &&
       !field.value.vatNumber.toUpperCase().startsWith("FR"));
 
+  const onClickValidateForeignVat = () => {
+    const { siret } = values;
+
+    if (!siret) return;
+
+    const isValidSiret = isSiret(siret);
+    const isValidVat = isVat(siret);
+    if (isValidSiret) {
+      return setFieldError(
+        "siret",
+        "Vous devez entrer un numéro de TVA intra-communautaire hors-France"
+      );
+    } else if (isValidVat && isFRVat(siret)) {
+      return setFieldError(
+        "siret",
+        "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et non son numéro de TVA"
+      );
+    } else if (!isValidVat) {
+      return setFieldError(
+        "siret",
+        "Vous devez entrer un numéro TVA intra-communautaire valide"
+      );
+    }
+
+    setCompanyInfos(null);
+    searchCompany({
+      variables: { siret: siret },
+    });
+  };
+
   return (
     <>
       {error && (
@@ -377,70 +413,37 @@ export default function CompanySelector({
           {isForeignCompany && (
             <>
               {displayVatSearch && (
-                <Formik
-                  initialValues={{ siret: "" }}
-                  validate={values => {
-                    const isValidSiret = isSiret(values.siret);
-                    const isValidVat = isVat(values.siret);
-                    if (isValidSiret) {
-                      return {
-                        siret:
-                          "Vous devez entrer un numéro de TVA intra-communautaire hors-France",
-                      };
-                    } else if (isValidVat && isFRVat(values.siret)) {
-                      return {
-                        siret:
-                          "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et non son numéro de TVA",
-                      };
-                    } else if (!isValidVat) {
-                      return {
-                        siret:
-                          "Vous devez entrer un numéro TVA intra-communautaire valide",
-                      };
-                    }
-                  }}
-                  onSubmit={values => {
-                    // reset company infos
-                    setCompanyInfos(null);
-                    searchCompany({
-                      variables: { siret: values.siret },
-                    });
-                  }}
-                >
-                  {({ setFieldValue }) => (
-                    <Form className={styles.companyForeignSelectorForm}>
-                      <div className={styles.field}>
-                        <label className={`text-right ${styles.bold}`}>
-                          Numéro TVA pour un transporteur de l'UE hors-France
-                        </label>
-                        <div className={styles.field__value}>
-                          <Field
-                            name="siret"
-                            component={AutoFormattingCompanyInfosInput}
-                            onChange={e => {
-                              setFieldValue("siret", e.target.value);
-                            }}
-                            disabled={isDisabled}
-                          />
-                          {!isRegistered && (
-                            <p className="error-message">
-                              Cet établissement n'est pas inscrit sur
-                              Trackdéchets
-                            </p>
-                          )}
-                          <RedErrorMessage name="siret" />
-                          <button
-                            disabled={loading}
-                            className="btn btn--primary tw-mt-2 tw-ml-1"
-                            type="submit"
-                          >
-                            {loading ? "Chargement..." : "Chercher"}
-                          </button>
-                        </div>
-                      </div>
-                    </Form>
-                  )}
-                </Formik>
+                <div className={styles.companyForeignSelectorForm}>
+                  <div className={styles.field}>
+                    <label className={`text-right ${styles.bold}`}>
+                      Numéro TVA pour un transporteur de l'UE hors-France
+                    </label>
+                    <div className={styles.field__value}>
+                      <Field
+                        name="siret"
+                        component={AutoFormattingCompanyInfosInput}
+                        onChange={e => {
+                          setFieldValue("siret", e.target.value);
+                        }}
+                        disabled={isDisabled}
+                      />
+                      {!isRegistered && (
+                        <p className="error-message">
+                          Cet établissement n'est pas inscrit sur Trackdéchets
+                        </p>
+                      )}
+                      <RedErrorMessage name="siret" />
+                      <button
+                        disabled={loading}
+                        className="btn btn--primary tw-mt-2 tw-ml-1"
+                        type="button"
+                        onClick={onClickValidateForeignVat}
+                      >
+                        {loading ? "Chargement..." : "Chercher"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
               )}
               <label>
                 Nom de l'entreprise
