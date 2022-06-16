@@ -20,9 +20,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
  
 - Affiche les adresses emails des administrateurs d'un établissement lors d'une demande de rattachement si l'email du requérant appartient au même nom de domaine [PR 1429](https://github.com/MTES-MCT/trackdechets/pull/1429)
-
 - Ajout de suggestions lors de l'ajout d'un établissement fermé. [PR 1463](https://github.com/MTES-MCT/trackdechets/pull/1463)
 - Ajout de la possibilité de filtrer par numéro SIRET de l'émetteur ou du destinataire dans le tableau de bord [PR 1456](https://github.com/MTES-MCT/trackdechets/pull/1456)
+- Affichage d'un message d'erreur plus explicite à la création d'un BSDD de groupement  [PR 1461](https://github.com/MTES-MCT/trackdechets/pull/1461)
 
 #### :memo: Documentation
 #### :house: Interne

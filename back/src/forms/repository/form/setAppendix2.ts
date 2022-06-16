@@ -88,6 +88,20 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
       );
     }
 
+    // check each form appears in only one form fraction
+    const formIds = appendix2.map(({ form }) => form.id);
+    const duplicates = formIds.filter(
+      (id, index) => formIds.indexOf(id) !== index
+    );
+    if (duplicates.length > 0) {
+      throw new UserInputError(
+        `Impossible d'associer plusieurs fractions du même bordereau initial sur un même bordereau` +
+          ` de regroupement. Identifiant du ou des bordereaux initiaux concernés : ${duplicates.join(
+            ", "
+          )}`
+      );
+    }
+
     // check quantity grouped in each grouped form is not greater than quantity received
     for (const { form: initialForm, quantity } of appendix2) {
       if (quantity <= 0) {

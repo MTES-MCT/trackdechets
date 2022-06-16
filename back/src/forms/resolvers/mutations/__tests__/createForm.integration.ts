@@ -859,6 +859,47 @@ describe("Mutation.createForm", () => {
     expect(updatedInitialForm.quantityGrouped).toEqual(1);
   });
 
+  it("should fail when adding the same form twice to the same groupement form", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
+
+    const initialForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "AWAITING_GROUP",
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
+      }
+    });
+
+    const createFormInput = {
+      emitter: {
+        type: EmitterType.APPENDIX2,
+        company: {
+          siret: ttr.siret
+        }
+      },
+      grouping: [
+        { form: { id: initialForm.id }, quantity: 0.5 },
+        { form: { id: initialForm.id }, quantity: 0.5 }
+      ]
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          `Impossible d'associer plusieurs fractions du même bordereau initial sur un même bordereau` +
+          ` de regroupement. Identifiant du ou des bordereaux initiaux concernés : ${initialForm.id}`
+      })
+    ]);
+  });
+
   it(
     "should disallow creating a form with an appendix 2 if the appendix2" +
       " form is already part of another appendix (using CreateFormInput.appendix2Forms)",
