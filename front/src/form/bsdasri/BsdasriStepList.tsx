@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from "@apollo/client";
 import cogoToast from "cogo-toast";
-import routes from "common/routes";
 import GenericStepList, {
   getComputedState,
 } from "form/common/stepper/GenericStepList";
@@ -21,7 +20,7 @@ import {
 } from "generated/graphql/types";
 import omitDeep from "omit-deep-lodash";
 import React, { ReactElement, useMemo } from "react";
-import { generatePath, useHistory, useParams } from "react-router-dom";
+import { useHistory, useParams } from "react-router-dom";
 import getInitialState from "./utils/initial-state";
 import {
   CREATE_DRAFT_BSDASRI,
@@ -226,11 +225,7 @@ export default function BsdasriStepsList(props: Props) {
 
     saveForm(input, type)
       .then(_ => {
-        // TODO  redirect to the correct dashboard
-        const redirectTo = generatePath(routes.dashboard.bsds.drafts, {
-          siret,
-        });
-        history.push(redirectTo);
+        history.goBack();
       })
       .catch(err => formInputToastError(err));
   }
