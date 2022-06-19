@@ -1,9 +1,9 @@
 import { User, Bsvhu, BsvhuStatus } from "@prisma/client";
 import { NotFormContributor } from "../forms/errors";
 import { getCachedUserSirets } from "../common/redis/users";
-
 import { ForbiddenError } from "apollo-server-express";
-export async function checkIsFormContributor(
+
+export async function checkIsBsvhuContributor(
   user: User,
   form: Partial<
     Pick<
@@ -15,7 +15,7 @@ export async function checkIsFormContributor(
   >,
   errorMsg: string
 ) {
-  const isContributor = await isFormContributor(user, form);
+  const isContributor = await isBsvhuContributor(user, form);
 
   if (!isContributor) {
     throw new NotFormContributor(errorMsg);
@@ -24,7 +24,7 @@ export async function checkIsFormContributor(
   return true;
 }
 
-export async function isFormContributor(user: User, form: Partial<Bsvhu>) {
+export async function isBsvhuContributor(user: User, form: Partial<Bsvhu>) {
   const userSirets = await getCachedUserSirets(user.id);
 
   const formSirets = [
@@ -37,7 +37,7 @@ export async function isFormContributor(user: User, form: Partial<Bsvhu>) {
 }
 
 export async function checkCanDeleteBsdvhu(user: User, form: Bsvhu) {
-  await checkIsFormContributor(
+  await checkIsBsvhuContributor(
     user,
     form,
     "Vous n'êtes pas autorisé à supprimer ce bordereau."

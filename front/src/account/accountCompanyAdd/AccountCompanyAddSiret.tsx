@@ -37,7 +37,11 @@ const closedCompanyError = (
         </p>
         <p>
           Pour vérifier s'il existe encore, RDV sur{" "}
-          <a href="https://annuaire-entreprises.data.gouv.fr" target="_blank">
+          <a
+            href="https://annuaire-entreprises.data.gouv.fr"
+            target="_blank"
+            rel="noreferrer"
+          >
             https://annuaire-entreprises.data.gouv.fr
           </a>
         </p>
@@ -46,6 +50,7 @@ const closedCompanyError = (
           <a
             href="https://entreprendre.service-public.fr/vosdroits/F31479"
             target="_blank"
+            rel="noreferrer"
           >
             https://entreprendre.service-public.fr/vosdroits/F31479
           </a>

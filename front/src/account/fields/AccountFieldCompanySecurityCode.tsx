@@ -22,7 +22,7 @@ AccountFieldCompanySecurityCode.fragments = {
 };
 
 const tooltip =
-  "Ce code sécurisé de signature permet de valider un BSD au départ de vos déchets si le transporteur est équipé d'un outil permettant la dématérialisation du BSD. Ce numéro est unique et confidentiel";
+  "Ce code sécurisé de signature vous permet de signer un BSD au départ de vos déchets sur l'outil (smartphone/tablette) du transporteur. Ce numéro est unique et confidentiel.";
 
 const fieldName = "securityCode";
 const fieldLabel = "Code de signature";

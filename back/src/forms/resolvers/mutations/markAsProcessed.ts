@@ -73,7 +73,19 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 
   const processedForm = await transitionForm(user, form, {
     type: EventType.MarkAsProcessed,
-    formUpdateInput
+    formUpdateInput: form.forwardedInId
+      ? {
+          forwardedIn: {
+            update: {
+              status: machine.transition(Status.ACCEPTED, {
+                type: EventType.MarkAsProcessed,
+                formUpdateInput
+              }).value as Status,
+              ...formUpdateInput
+            }
+          }
+        }
+      : formUpdateInput
   });
 
   const { findAppendix2FormsById, updateAppendix2Forms } =

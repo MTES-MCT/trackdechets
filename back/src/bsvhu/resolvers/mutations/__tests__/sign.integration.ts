@@ -3,7 +3,7 @@ import { ErrorCode } from "../../../../common/errors";
 import { Mutation } from "../../../../generated/graphql/types";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { vhuFormFactory } from "../../../__tests__/factories.vhu";
+import { bsvhuFactory } from "../../../__tests__/factories.vhu";
 
 const SIGN_VHU_FORM = `
 mutation SignVhuForm($id: ID!, $input: BsvhuSignatureInput!) {
@@ -45,7 +45,7 @@ describe("Mutation.Vhu.sign", () => {
 
   it("should set a default signature date if none is given", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const bsvhu = await vhuFormFactory({
+    const bsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret
       }
@@ -65,7 +65,7 @@ describe("Mutation.Vhu.sign", () => {
 
   it("should use the provided date for the signature if  given", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const bsvhu = await vhuFormFactory({
+    const bsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret
       }

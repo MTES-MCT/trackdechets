@@ -1,0 +1,9 @@
+type Mutation {
+  """
+  Mutation permettant d'obtenir un lien de téléchargement valide 30 minutes.
+  A destination des forces de l'ordre qui ne disposent pas d'accès à Trackdéchets, le lien
+  est accessible sans authentification, et peut être transmis sous la form de QR-code.
+  La chaîn retournée est l'url de téléchargement.
+  """
+  createPdfAccessToken(input: CreatePdfAccessTokenInput!): String!
+}

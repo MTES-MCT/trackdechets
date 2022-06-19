@@ -24,7 +24,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
 import { indexBsvhu } from "../../../../bsvhu/elastic";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
-import { vhuFormFactory } from "../../../../bsvhu/__tests__/factories.vhu";
+import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 
 const GET_BSDS = `
   query GetBsds($where: BsdWhere) {
@@ -608,7 +608,7 @@ describe("Query.bsds.vhus mutations", () => {
       }
     });
 
-    const vhu = await vhuFormFactory({
+    const vhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret
       }
@@ -658,7 +658,7 @@ describe("Query.bsds.vhus mutations", () => {
       }
     });
 
-    const vhu = await vhuFormFactory({
+    const vhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret
       }

@@ -31,6 +31,7 @@ import {
 import { RouteBSDasrisSignEmissionSecretCode } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasriSecretCode";
 import { RoutePublishBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RoutePublishBsdasri";
 import { RouteSignBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
+import { RouteControlPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/RouteControlPdf";
 import {
   RouteBSDasrisView,
   RouteBsvhusView,
@@ -211,6 +212,15 @@ export default function Dashboard() {
                   wide={true}
                 >
                   <RouteBsddRequestRevision />
+                </Modal>
+              </Route>
+              <Route path={routes.dashboard.roadControl}>
+                <Modal
+                  onClose={() => history.goBack()}
+                  ariaLabel="Contrôle routier"
+                  isOpen
+                >
+                  <RouteControlPdf />
                 </Modal>
               </Route>
               <Route path={routes.dashboard.bsdasris.sign.publish}>

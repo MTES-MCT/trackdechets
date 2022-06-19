@@ -166,7 +166,7 @@ const updateFormResolver = async (
         formUpdateInput.forwardedIn = {
           create: {
             owner: { connect: { id: user.id } },
-            readableId: `${form.readableId}-suite`,
+            readableId: `${existingForm.readableId}-suite`,
             ...flattenTemporaryStorageDetailInput(temporaryStorageDetail)
           }
         };

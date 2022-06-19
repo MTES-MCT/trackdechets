@@ -50,7 +50,11 @@ export async function getFormOrFormNotFound({
   const form = await prisma.form.findUnique({
     where: id ? { id } : { readableId }
   });
-  if (form == null || form.isDeleted == true) {
+  if (
+    form == null ||
+    form.isDeleted == true ||
+    form.readableId.endsWith("-suite")
+  ) {
     throw new FormNotFound(id ? id.toString() : readableId);
   }
   return form;
