@@ -123,11 +123,10 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         transporterCompanySiret: transporter.company.siret,
         recipientCompanySiret: ttr.company.siret,
         status: Status.TEMP_STORER_ACCEPTED,
-        receivedAt: null
+        receivedAt: new Date()
       },
-      tempStorageOpts: {
-        destinationCompanySiret: destination.company.siret,
-        tempStorerReceivedAt: new Date()
+      forwardedInOpts: {
+        recipientCompanySiret: destination.company.siret
       }
     });
 
@@ -148,16 +147,16 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         status: Status.ACCEPTED,
         receivedAt: new Date()
       },
-      tempStorageOpts: {
-        destinationCompanySiret: destination.company.siret,
-        tempStorerReceivedAt: new Date()
+      forwardedInOpts: {
+        recipientCompanySiret: destination.company.siret,
+        receivedAt: new Date()
       }
     });
 
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
     const bsds = await searchBsds("INCOMING", [destination.company.siret]);
-    expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
+    expect(bsds.map(bsd => bsd.id)).toEqual([form.forwardedIn.id]);
   });
 
   it("it should not list a BSDD in destination's incoming wastes before it has been received", async () => {
@@ -332,7 +331,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     const bsds = await searchBsds("OUTGOING", [emitter.company.siret]);
     expect(bsds).toEqual([]);
   });
-  it("should list a BSDD in ttr's outgoing wastes once it has been sent after temporary storage ", async () => {
+  it("should list a BSDD in ttr's outgoing wastes once it has been sent after temporary storage", async () => {
     const form = await formWithTempStorageFactory({
       ownerId: emitter.user.id,
       opt: {
@@ -340,18 +339,21 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         transporterCompanySiret: transporter.company.siret,
         recipientCompanySiret: ttr.company.siret,
         status: Status.RESENT,
-        receivedAt: null
+        receivedAt: new Date(),
+        signedAt: new Date()
       },
-      tempStorageOpts: {
-        destinationCompanySiret: destination.company.siret,
-        tempStorerSignedAt: new Date()
+      forwardedInOpts: {
+        emitterCompanySiret: ttr.company.siret,
+        recipientCompanySiret: destination.company.siret,
+        sentAt: new Date(),
+        status: Status.SENT
       }
     });
 
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
     const bsds = await searchBsds("OUTGOING", [ttr.company.siret]);
-    expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
+    expect(bsds.map(bsd => bsd.id)).toEqual([form.forwardedIn.id]);
   });
   it("should list a BSDA in emitter's outgoing wastes once it has been sent", async () => {
     const bsda = await bsdaFactory({
@@ -517,17 +519,18 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         recipientCompanySiret: ttr.company.siret,
         status: Status.RESENT
       },
-      tempStorageOpts: {
-        destinationCompanySiret: destination.company.siret,
+      forwardedInOpts: {
+        recipientCompanySiret: destination.company.siret,
         transporterCompanySiret: transporter2.company.siret,
-        signedAt: new Date()
+        sentAt: new Date(),
+        status: Status.SENT
       }
     });
 
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
     const bsds = await searchBsds("TRANSPORTED", [transporter2.company.siret]);
-    expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
+    expect(bsds.map(bsd => bsd.id)).toEqual([form.forwardedIn.id]);
   });
   it("should list a BSDA in transporter's transported wastes once it has been taken over", async () => {
     const bsda = await bsdaFactory({
@@ -714,7 +717,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     const form = await formFactory({
       ownerId: emitter.user.id,
       opt: {
-        emitterCompanySiret: emitter.company.siret
+        emitterCompanySiret: emitter.company.siret,
+        sentAt: new Date()
       }
     });
     await indexForm(await getFullForm(form));
@@ -726,7 +730,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     const form = await formFactory({
       ownerId: transporter.user.id,
       opt: {
-        transporterCompanySiret: transporter.company.siret
+        transporterCompanySiret: transporter.company.siret,
+        sentAt: new Date()
       }
     });
     await indexForm(await getFullForm(form));
@@ -738,7 +743,9 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     const form = await formFactory({
       ownerId: destination.user.id,
       opt: {
-        recipientCompanySiret: destination.company.siret
+        recipientCompanySiret: destination.company.siret,
+        sentAt: new Date(),
+        receivedAt: new Date()
       }
     });
     await indexForm(await getFullForm(form));
@@ -750,7 +757,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     const form = await formFactory({
       ownerId: trader.user.id,
       opt: {
-        traderCompanySiret: trader.company.siret
+        traderCompanySiret: trader.company.siret,
+        sentAt: new Date()
       }
     });
     await indexForm(await getFullForm(form));
@@ -774,7 +782,9 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     const form = await formWithTempStorageFactory({
       ownerId: ttr.user.id,
       opt: {
-        recipientCompanySiret: ttr.company.siret
+        recipientCompanySiret: ttr.company.siret,
+        sentAt: new Date(),
+        receivedAt: new Date()
       }
     });
 
@@ -786,29 +796,41 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   it("should list a BSDD in transporter after temp storage 's all wastes", async () => {
     const form = await formWithTempStorageFactory({
       ownerId: emitter.user.id,
-      tempStorageOpts: { transporterCompanySiret: transporter.company.siret }
+      forwardedInOpts: {
+        transporterCompanySiret: transporter.company.siret,
+        sentAt: new Date()
+      }
     });
 
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
     const bsds = await searchBsds("ALL", [transporter.company.siret]);
-    expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
+    const ids = bsds.map(bsd => bsd.id);
+    expect(ids).toContain(form.id);
+    expect(ids).toContain(form.forwardedIn.id);
   });
   it("should list a BSDD in final destination's all wastes", async () => {
     const form = await formWithTempStorageFactory({
       ownerId: emitter.user.id,
-      tempStorageOpts: { destinationCompanySiret: destination.company.siret }
+      forwardedInOpts: {
+        recipientCompanySiret: destination.company.siret,
+        sentAt: new Date()
+      }
     });
 
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
     const bsds = await searchBsds("ALL", [destination.company.siret]);
-    expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
+    const ids = bsds.map(bsd => bsd.id);
+    expect(ids).toContain(form.id);
+    expect(ids).toContain(form.forwardedIn.id);
   });
   it("should list a BSDA in emitter's all wastes", async () => {
     const bsda = await bsdaFactory({
       opt: {
-        emitterCompanySiret: emitter.company.siret
+        emitterCompanySiret: emitter.company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
       }
     });
     await indexBsda(bsda);
@@ -819,7 +841,9 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   it("should list a BSDA in transporter's all wastes", async () => {
     const bsda = await bsdaFactory({
       opt: {
-        transporterCompanySiret: transporter.company.siret
+        transporterCompanySiret: transporter.company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
       }
     });
     await indexBsda(bsda);
@@ -830,7 +854,10 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   it("should list a BSDA in destination's all wastes", async () => {
     const bsda = await bsdaFactory({
       opt: {
-        destinationCompanySiret: destination.company.siret
+        destinationCompanySiret: destination.company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date(),
+        destinationOperationSignatureDate: new Date()
       }
     });
     await indexBsda(bsda);
@@ -841,7 +868,9 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   it("should list a BSDA in broker's all wastes", async () => {
     const bsda = await bsdaFactory({
       opt: {
-        brokerCompanySiret: broker.company.siret
+        brokerCompanySiret: broker.company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
       }
     });
     await indexBsda(bsda);
@@ -852,7 +881,9 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   it("should list a BSDASRI in emitter's all wastes", async () => {
     const bsdasri = await bsdasriFactory({
       opt: {
-        emitterCompanySiret: emitter.company.siret
+        emitterCompanySiret: emitter.company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
       }
     });
     await indexBsdasri(bsdasri);
@@ -863,7 +894,9 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   it("should list a BSDASRI in transporter's all wastes", async () => {
     const bsdasri = await bsdasriFactory({
       opt: {
-        transporterCompanySiret: transporter.company.siret
+        transporterCompanySiret: transporter.company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
       }
     });
     await indexBsdasri(bsdasri);
@@ -874,7 +907,10 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   it("should list a BSDASRI in destination's all wastes", async () => {
     const bsdasri = await bsdasriFactory({
       opt: {
-        destinationCompanySiret: destination.company.siret
+        destinationCompanySiret: destination.company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date(),
+        destinationReceptionSignatureDate: new Date()
       }
     });
     await indexBsdasri(bsdasri);
@@ -885,7 +921,9 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   it("should list a BSVHU in emitter's all wastes", async () => {
     const bsvhu = await bsvhuFactory({
       opt: {
-        emitterCompanySiret: emitter.company.siret
+        emitterCompanySiret: emitter.company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
       }
     });
     await indexBsvhu(bsvhu);
@@ -896,7 +934,9 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   it("should list a BSVHU in transporter's all wastes", async () => {
     const bsvhu = await bsvhuFactory({
       opt: {
-        transporterCompanySiret: transporter.company.siret
+        transporterCompanySiret: transporter.company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
       }
     });
     await indexBsvhu(bsvhu);
@@ -907,7 +947,10 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
   it("should list a BSVHU in destination's all wastes", async () => {
     const bsvhu = await bsvhuFactory({
       opt: {
-        destinationCompanySiret: destination.company.siret
+        destinationCompanySiret: destination.company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date(),
+        destinationOperationSignatureDate: new Date()
       }
     });
     await indexBsvhu(bsvhu);
@@ -916,33 +959,52 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
   });
   it("should list a BSFF in emitter's all wastes", async () => {
-    const bsff = await createBsff({
-      emitter,
-      transporter,
-      destination
-    });
+    const bsff = await createBsff(
+      {
+        emitter,
+        transporter,
+        destination
+      },
+      {
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      }
+    );
     await indexBsff(bsff);
     await refreshElasticSearch();
     const bsds = await searchBsds("ALL", [emitter.company.siret]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsff.id]);
   });
   it("should list a BSFF in transporter's all wastes", async () => {
-    const bsff = await createBsff({
-      emitter,
-      transporter,
-      destination
-    });
+    const bsff = await createBsff(
+      {
+        emitter,
+        transporter,
+        destination
+      },
+      {
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date()
+      }
+    );
     await indexBsff(bsff);
     await refreshElasticSearch();
     const bsds = await searchBsds("ALL", [transporter.company.siret]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsff.id]);
   });
   it("should list a BSFF in destination's all wastes", async () => {
-    const bsff = await createBsff({
-      emitter,
-      transporter,
-      destination
-    });
+    const bsff = await createBsff(
+      {
+        emitter,
+        transporter,
+        destination
+      },
+      {
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date(),
+        destinationReceptionSignatureDate: new Date()
+      }
+    );
     await indexBsff(bsff);
     await refreshElasticSearch();
     const bsds = await searchBsds("ALL", [destination.company.siret]);

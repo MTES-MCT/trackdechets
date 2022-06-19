@@ -57,9 +57,7 @@ describe("Workflow machine", () => {
     const nextState = machine.transition(Status.SENT, {
       type: EventType.MarkAsTempStored,
       formUpdateInput: {
-        temporaryStorageDetail: {
-          update: { tempStorerWasteAcceptationStatus: "ACCEPTED" }
-        }
+        wasteAcceptationStatus: "ACCEPTED"
       }
     });
     expect(nextState.value).toEqual(Status.TEMP_STORER_ACCEPTED);
@@ -68,9 +66,7 @@ describe("Workflow machine", () => {
     const nextState = machine.transition(Status.SENT, {
       type: EventType.MarkAsTempStored,
       formUpdateInput: {
-        temporaryStorageDetail: {
-          update: { tempStorerWasteAcceptationStatus: "REFUSED" }
-        }
+        wasteAcceptationStatus: "REFUSED"
       }
     });
     expect(nextState.value).toEqual(Status.REFUSED);
@@ -79,9 +75,7 @@ describe("Workflow machine", () => {
     const nextState = machine.transition(Status.TEMP_STORED, {
       type: EventType.MarkAsTempStorerAccepted,
       formUpdateInput: {
-        temporaryStorageDetail: {
-          update: { tempStorerWasteAcceptationStatus: "REFUSED" }
-        }
+        wasteAcceptationStatus: "REFUSED"
       }
     });
     expect(nextState.value).toEqual(Status.REFUSED);

@@ -4,10 +4,10 @@ import prisma from "../../../prisma";
 import {
   formFactory,
   formWithTempStorageFactory,
-  tempStorageData,
   userFactory
 } from "../../../__tests__/factories";
-import { expandTemporaryStorageFromDb } from "../../form-converter";
+import { expandFormFromDb } from "../../form-converter";
+import getReadableId from "../../readableId";
 import { formDiff } from "../diff";
 
 describe("formDiff", () => {
@@ -16,7 +16,7 @@ describe("formDiff", () => {
   it("should return an empty object if no change are recorded", async () => {
     const user = await userFactory();
     const form = await formFactory({ ownerId: user.id });
-    const diff = formDiff(form, form);
+    const diff = await formDiff(form, form);
     expect(diff).toEqual({});
   });
 
@@ -31,7 +31,7 @@ describe("formDiff", () => {
       where: { id: form.id },
       data: formUpdateInput
     });
-    const diff = formDiff(form, updatedForm);
+    const diff = await formDiff(form, updatedForm);
     expect(diff).toEqual({
       emitter: { company: { name: formUpdateInput.emitterCompanyName } },
       sentBy: formUpdateInput.sentBy
@@ -41,11 +41,11 @@ describe("formDiff", () => {
   it("should calculate diff on temporary storage detail", async () => {
     const user = await userFactory();
     const form = await formWithTempStorageFactory({ ownerId: user.id });
-    const temporaryStorageDetail = await prisma.form
+    const forwardedIn = await prisma.form
       .findUnique({ where: { id: form.id } })
-      .temporaryStorageDetail();
+      .forwardedIn();
     const formUpdateInput: Prisma.FormUpdateInput = {
-      temporaryStorageDetail: {
+      forwardedIn: {
         update: {
           transporterCompanyName: "New Transporter"
         }
@@ -55,20 +55,19 @@ describe("formDiff", () => {
       where: { id: form.id },
       data: formUpdateInput
     });
-    const updatedTemporaryStorageDetail = await prisma.form
+    const updatedForwardedIn = await prisma.form
       .findUnique({ where: { id: form.id } })
-      .temporaryStorageDetail();
+      .forwardedIn();
 
-    const diff = formDiff(
-      { ...form, temporaryStorageDetail },
-      { ...updatedForm, temporaryStorageDetail: updatedTemporaryStorageDetail }
+    const diff = await formDiff(
+      { ...form, forwardedIn },
+      { ...updatedForm, forwardedIn: updatedForwardedIn }
     );
     expect(diff).toEqual({
       temporaryStorageDetail: {
         transporter: {
           company: {
-            name: formUpdateInput.temporaryStorageDetail.update
-              .transporterCompanyName
+            name: formUpdateInput.forwardedIn.update.transporterCompanyName
           }
         }
       }
@@ -78,30 +77,24 @@ describe("formDiff", () => {
   it("should calculate diff on temporary storage detail if no initial temp storage", async () => {
     const user = await userFactory();
     const form = await formFactory({ ownerId: user.id });
-    const temporaryStorageDetail = await prisma.form
-      .findUnique({ where: { id: form.id } })
-      .temporaryStorageDetail();
     const formUpdateInput: Prisma.FormUpdateInput = {
-      temporaryStorageDetail: {
-        create: tempStorageData
+      forwardedIn: {
+        create: {
+          readableId: getReadableId(),
+          owner: { connect: { id: user.id } },
+          recipientCompanySiret: "11111111111111"
+        }
       }
     };
     const updatedForm = await prisma.form.update({
       where: { id: form.id },
-      data: formUpdateInput
+      data: formUpdateInput,
+      include: { forwardedIn: true }
     });
-    const updatedTemporaryStorageDetail = await prisma.form
-      .findUnique({ where: { id: form.id } })
-      .temporaryStorageDetail();
-    const diff = formDiff(
-      { ...form, temporaryStorageDetail },
-      { ...updatedForm, temporaryStorageDetail: updatedTemporaryStorageDetail }
-    );
+    const diff = await formDiff(form, updatedForm);
 
     const expected = {
-      temporaryStorageDetail: expandTemporaryStorageFromDb(
-        updatedTemporaryStorageDetail
-      )
+      temporaryStorageDetail: await expandFormFromDb(updatedForm.forwardedIn)
     };
     expect(diff).toEqual(expected);
   });

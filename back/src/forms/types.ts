@@ -1,6 +1,5 @@
 import {
   Form,
-  TemporaryStorageDetail,
   TransportSegment,
   Prisma,
   TransportMode,
@@ -13,7 +12,7 @@ import { FormStatus } from "../generated/graphql/types";
  * A Prisma Form with linked objects
  */
 export interface FullForm extends Form {
-  temporaryStorageDetail: TemporaryStorageDetail;
+  forwardedIn: Form;
   transportSegments: TransportSegment[];
   intermediaries: IntermediaryFormAssociation[];
 }
@@ -27,12 +26,7 @@ export type FormCompanies = Pick<
   | "brokerCompanySiret"
   | "ecoOrganismeSiret"
 > & {
-  temporaryStorageDetail?: Partial<
-    Pick<
-      TemporaryStorageDetail,
-      "transporterCompanySiret" | "destinationCompanySiret"
-    >
-  >;
+  forwardedIn?: Pick<Form, "transporterCompanySiret" | "recipientCompanySiret">;
 } & {
   transportSegments?: Pick<TransportSegment, "transporterCompanySiret">[];
 } & {

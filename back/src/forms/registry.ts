@@ -1,4 +1,4 @@
-import { Form, TemporaryStorageDetail, TransportSegment } from "@prisma/client";
+import { Form, TransportSegment } from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import {
@@ -11,10 +11,12 @@ import {
 import { GenericWaste } from "../registry/types";
 import { extractPostalCode } from "../utils";
 import { formToBsdd } from "./compat";
-import { Bsdd, FullForm } from "./types";
+import { Bsdd } from "./types";
 
 export function getRegistryFields(
-  form: FullForm
+  form: Form & {
+    transportSegments: TransportSegment[];
+  }
 ): Pick<
   BsdElastic,
   | "isIncomingWasteFor"
@@ -29,44 +31,19 @@ export function getRegistryFields(
     isManagedWasteFor: []
   };
 
-  if (form.temporaryStorageDetailId) {
-    const temporaryStorage = form.temporaryStorageDetail;
-    if (temporaryStorage.tempStorerReceivedAt) {
-      registryFields.isIncomingWasteFor.push(form.recipientCompanySiret);
-    }
-    if (temporaryStorage.signedAt) {
-      registryFields.isOutgoingWasteFor.push(form.recipientCompanySiret);
-      registryFields.isTransportedWasteFor.push(
-        temporaryStorage.transporterCompanySiret
-      );
+  if (form.receivedAt) {
+    registryFields.isIncomingWasteFor.push(form.recipientCompanySiret);
+    registryFields.isTransportedWasteFor.push(form.transporterCompanySiret);
 
-      if (form.transportSegments?.length) {
-        for (const transportSegment of form.transportSegments) {
-          registryFields.isTransportedWasteFor.push(
-            transportSegment.transporterCompanySiret
-          );
-        }
-      }
-    }
-    if (form.receivedAt) {
-      registryFields.isIncomingWasteFor.push(
-        temporaryStorage.destinationCompanySiret
-      );
-    }
-  } else {
-    if (form.receivedAt) {
-      registryFields.isIncomingWasteFor.push(form.recipientCompanySiret);
-      registryFields.isTransportedWasteFor.push(form.transporterCompanySiret);
-
-      if (form.transportSegments?.length) {
-        for (const transportSegment of form.transportSegments) {
-          registryFields.isTransportedWasteFor.push(
-            transportSegment.transporterCompanySiret
-          );
-        }
+    if (form.transportSegments?.length) {
+      for (const transportSegment of form.transportSegments) {
+        registryFields.isTransportedWasteFor.push(
+          transportSegment.transporterCompanySiret
+        );
       }
     }
   }
+
   if (form.sentAt) {
     registryFields.isOutgoingWasteFor.push(form.emitterCompanySiret);
     registryFields.isTransportedWasteFor.push(form.transporterCompanySiret);
@@ -174,39 +151,6 @@ export function toIncomingWaste(
   };
 }
 
-export function toIncomingWastes(
-  form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
-    grouping: { initialForm: Form }[];
-  } & { transportSegments: TransportSegment[] },
-  sirets: string[]
-): IncomingWaste[] {
-  const bsdd = formToBsdd(form);
-
-  if (bsdd.forwarding) {
-    // In case of temporary storage, a form can be flagged as incoming waste
-    // either for the TTR or for the final destination. Here we compute two "virtual"
-    // BSDDs, one from the emitter to the TTR and one from the TTR to the final destination
-    const incomingWastes: IncomingWaste[] = [];
-
-    if (sirets.includes(bsdd.forwarding.destinationCompanySiret)) {
-      // add a record only if TTR is present in the sirets
-      incomingWastes.push(
-        toIncomingWaste({ ...bsdd.forwarding, forwarding: null })
-      );
-    }
-    if (
-      bsdd.destinationReceptionSignatureDate &&
-      sirets.includes(bsdd.destinationCompanySiret)
-    ) {
-      // add a record only if final destination is present in the sirets
-      incomingWastes.push(toIncomingWaste(bsdd));
-    }
-    return incomingWastes;
-  }
-
-  return [toIncomingWaste(bsdd)];
-}
-
 export function toOutgoingWaste(
   bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
 ): OutgoingWaste {
@@ -279,39 +223,6 @@ export function toOutgoingWaste(
   };
 }
 
-export function toOutgoingWastes(
-  form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
-    grouping: { initialForm: Form }[];
-  } & { transportSegments: TransportSegment[] },
-  sirets: string[]
-): OutgoingWaste[] {
-  const bsdd = formToBsdd(form);
-
-  if (bsdd.forwarding) {
-    // In case of temporary storage, a form can be flagged as outgoing waste
-    // either for the emitter or for the TTR. Here we compute two "virtual"
-    // BSDDs, one from the emitter to the TTR and one from the TTR to the final destination
-    const outgoingWastes: OutgoingWaste[] = [];
-
-    if (sirets.includes(bsdd.forwarding.emitterCompanySiret)) {
-      // add a record only if initial emitter is present in the sirets
-      outgoingWastes.push(
-        toOutgoingWaste({ ...bsdd.forwarding, forwarding: null })
-      );
-    }
-    if (
-      bsdd.transporterTransportSignatureDate &&
-      sirets.includes(bsdd.emitterCompanySiret)
-    ) {
-      // add a record only if TTR is present in the sirets
-      outgoingWastes.push(toOutgoingWaste(bsdd));
-    }
-    return outgoingWastes;
-  }
-
-  return [toOutgoingWaste(bsdd)];
-}
-
 export function toTransportedWaste(
   bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
 ): TransportedWaste {
@@ -379,44 +290,6 @@ export function toTransportedWaste(
     emitterCompanyMail: bsdd.emitterCompanyMail,
     destinationCompanyMail: bsdd.destinationCompanyMail
   };
-}
-
-export function toTransportedWastes(
-  form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
-    grouping: { initialForm: Form }[];
-  } & { transportSegments: TransportSegment[] },
-  sirets: string[]
-): TransportedWaste[] {
-  const bsdd = formToBsdd(form);
-
-  if (bsdd.forwarding) {
-    // In case of temporary storage, a form can be flagged as transported waste
-    // either for the first transporter or for the transporter after temp storage.
-    // Here we compute two "virtual" BSDDs, one from the emitter to the TTR and
-    // one from the TTR to the final destination
-    const transportedWastes: TransportedWaste[] = [];
-
-    if (
-      sirets.includes(bsdd.forwarding.transporterCompanySiret) ||
-      sirets.includes(bsdd.forwarding.transporter2CompanySiret) ||
-      sirets.includes(bsdd.forwarding.transporter3CompanySiret)
-    ) {
-      // add a record only if one of the initial transporters is present in the sirets
-      transportedWastes.push(
-        toTransportedWaste({ ...bsdd.forwarding, forwarding: null })
-      );
-    }
-    if (
-      bsdd.transporterTransportSignatureDate &&
-      sirets.includes(bsdd.transporterCompanySiret)
-    ) {
-      // add a record only if second transporter is present in the sirets
-      transportedWastes.push(toTransportedWaste(bsdd));
-    }
-    return transportedWastes;
-  }
-
-  return [toTransportedWaste(bsdd)];
 }
 
 export function toManagedWaste(
@@ -488,7 +361,7 @@ export function toManagedWaste(
 }
 
 export function toManagedWastes(
-  form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
+  form: Form & { forwarding: Form } & {
     grouping: { initialForm: Form }[];
   } & { transportSegments: TransportSegment[] }
 ): ManagedWaste[] {
@@ -577,52 +450,4 @@ export function toAllWaste(
     transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber,
     transporter3CompanyMail: bsdd.transporter3CompanyMail
   };
-}
-
-export function toAllWastes(
-  form: Form & { temporaryStorageDetail: TemporaryStorageDetail } & {
-    grouping: { initialForm: Form }[];
-  } & { transportSegments: TransportSegment[] },
-  sirets: string[]
-): AllWaste[] {
-  const bsdd = formToBsdd(form);
-
-  if (bsdd.forwarding) {
-    // In case of temporary storage, a form can appear in all waste register
-    // either for initial form or for reexpedition. Here we compute two "virtual"
-    // BSDDs, one from the emitter to the TTR and one from the TTR to the final destination
-    const allWastes: AllWaste[] = [];
-
-    if (
-      sirets.some(siret =>
-        [
-          bsdd.emitterCompanySiret,
-          bsdd.transporterCompanySiret,
-          bsdd.traderCompanySiret,
-          bsdd.brokerCompanySiret,
-          bsdd.destinationCompanySiret
-        ].includes(siret)
-      )
-    ) {
-      // add a record only if siret is present in initial form
-      allWastes.push(toAllWaste(bsdd));
-    }
-    if (
-      sirets.some(siret =>
-        [
-          bsdd.forwarding.emitterCompanySiret,
-          bsdd.forwarding.transporterCompanySiret,
-          bsdd.forwarding.traderCompanySiret,
-          bsdd.forwarding.brokerCompanySiret,
-          bsdd.forwarding.destinationCompanySiret
-        ].includes(siret)
-      )
-    ) {
-      // add a record only if siret is present in reexpedition
-      allWastes.push(toAllWaste({ ...bsdd.forwarding, forwarding: null }));
-    }
-    return allWastes;
-  }
-
-  return [toAllWaste(bsdd)];
 }

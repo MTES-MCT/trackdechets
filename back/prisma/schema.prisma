@@ -315,6 +315,7 @@ model Form {
   isAccepted                         Boolean?                @default(false)
   receivedAt                         DateTime?               @db.Timestamptz(6)
   quantityReceived                   Float?
+  quantityReceivedType               QuantityType?
   processingOperationDone            String?
   wasteDetailsName                   String?
   isDeleted                          Boolean?                @default(false)
@@ -369,13 +370,16 @@ model Form {
   ecoOrganismeName                   String?
   ecoOrganismeSiret                  String?
   signedBy                           String?
-  temporaryStorageDetailId           String?                 @unique
-  temporaryStorageDetail             TemporaryStorageDetail? @relation(fields: [temporaryStorageDetailId], references: [id])
-  transportSegments                  TransportSegment[]
-  groupedIn                          FormGroupement[]        @relation("GroupedIn")
-  grouping                           FormGroupement[]        @relation("Grouping")
+
+  // TODO delete after release 2022.06.2
+  temporaryStorageDetailId String?                 @unique
+  temporaryStorageDetail   TemporaryStorageDetail? @relation(fields: [temporaryStorageDetailId], references: [id])
+
+  transportSegments TransportSegment[]
+  groupedIn         FormGroupement[]   @relation("GroupedIn")
+  grouping          FormGroupement[]   @relation("Grouping")
   // quantité affectée à des bordereaux de regroupement
-  quantityGrouped                    Float                   @default(0)
+  quantityGrouped   Float              @default(0)
 
   // TODO delete after release 2022.06.1
   appendix2RootFormId String?
@@ -385,6 +389,10 @@ model Form {
   StatusLog            StatusLog[]
   bsddRevisionRequests BsddRevisionRequest[]
   intermediaries       IntermediaryFormAssociation[]
+
+  forwarding    Form?   @relation("BsddForwarding")
+  forwardedInId String? @unique
+  forwardedIn   Form?   @relation("BsddForwarding", fields: [forwardedInId], references: [id])
 
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
@@ -584,6 +592,7 @@ model StatusLog {
   @@index([formId], map: "_StatusLogFormIdIdx")
 }
 
+// TODO delete after release 2022.06.2
 model TemporaryStorageDetail {
   id                               String                  @id @default(cuid())
   tempStorerQuantityType           QuantityType?

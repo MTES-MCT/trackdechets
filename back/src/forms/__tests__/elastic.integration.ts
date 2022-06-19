@@ -134,12 +134,8 @@ describe("getSiretsByTab", () => {
     const { isFollowFor, isCollectedFor, isForActionFor } =
       getSiretsByTab(fullForm);
     expect(isFollowFor).toContain(form.emitterCompanySiret);
-    expect(isFollowFor).toContain(
-      fullForm.temporaryStorageDetail.transporterCompanySiret
-    );
-    expect(isFollowFor).toContain(
-      fullForm.temporaryStorageDetail.destinationCompanySiret
-    );
+    expect(isFollowFor).toContain(fullForm.forwardedIn.transporterCompanySiret);
+    expect(isFollowFor).toContain(fullForm.forwardedIn.recipientCompanySiret);
 
     expect(isForActionFor).toContain(form.recipientCompanySiret);
     expect(isCollectedFor).toContain(form.transporterCompanySiret);
@@ -196,11 +192,9 @@ describe("getSiretsByTab", () => {
     expect(isFollowFor).toContain(form.emitterCompanySiret);
     expect(isFollowFor).toContain(form.transporterCompanySiret);
     expect(isForActionFor).toContain(form.recipientCompanySiret);
-    expect(isFollowFor).toContain(
-      fullForm.temporaryStorageDetail.destinationCompanySiret
-    );
+    expect(isFollowFor).toContain(fullForm.forwardedIn.recipientCompanySiret);
     expect(isToCollectFor).toContain(
-      fullForm.temporaryStorageDetail.transporterCompanySiret
+      fullForm.forwardedIn.transporterCompanySiret
     );
   });
 
@@ -217,10 +211,10 @@ describe("getSiretsByTab", () => {
     expect(isFollowFor).toContain(form.transporterCompanySiret);
     expect(isFollowFor).toContain(form.recipientCompanySiret);
     expect(isForActionFor).toContain(
-      fullForm.temporaryStorageDetail.destinationCompanySiret
+      fullForm.forwardedIn.recipientCompanySiret
     );
     expect(isCollectedFor).toContain(
-      fullForm.temporaryStorageDetail.transporterCompanySiret
+      fullForm.forwardedIn.transporterCompanySiret
     );
   });
 });

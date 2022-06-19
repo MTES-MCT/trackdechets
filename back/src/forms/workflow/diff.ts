@@ -1,9 +1,6 @@
 import { isDate, isEqual } from "date-fns";
-import { Form, TemporaryStorageDetail } from "@prisma/client";
-import {
-  expandFormFromDb,
-  expandTemporaryStorageFromDb
-} from "../form-converter";
+import { Form } from "@prisma/client";
+import { expandFormFromDb } from "../form-converter";
 
 export function isArray(obj) {
   return {}.toString.apply(obj) === "[object Array]";
@@ -66,26 +63,30 @@ export function objectDiff(o1, o2) {
   }, {});
 }
 
-export function tempStorageDiff(
-  t1: TemporaryStorageDetail,
-  t2: TemporaryStorageDetail
-) {
+export async function tempStorageDiff(t1: Form, t2: Form) {
   if (!t1 && !t2) {
     return {};
   }
 
   if (!t1 && t2) {
-    return { temporaryStorageDetail: expandTemporaryStorageFromDb(t2) };
+    return { temporaryStorageDetail: await expandFormFromDb(t2) };
   }
 
   if (t1 && !t2) {
     return { temporaryStorageDetail: null };
   }
+  const {
+    updatedAt: _u1,
+    status: _s1,
+    ...expandedt1
+  } = await expandFormFromDb(t1);
+  const {
+    updatedAt: _u2,
+    status: _s2,
+    ...expandedt2
+  } = await expandFormFromDb(t2);
 
-  const diff = objectDiff(
-    expandTemporaryStorageFromDb(t1),
-    expandTemporaryStorageFromDb(t2)
-  );
+  const diff = objectDiff(expandedt1, expandedt2);
 
   return isEmpty(diff) ? {} : { temporaryStorageDetail: diff };
 }
@@ -93,15 +94,23 @@ export function tempStorageDiff(
 /**
  * Calculates expanded diff between two forms
  */
-export function formDiff(
-  f1: Form & { temporaryStorageDetail?: TemporaryStorageDetail },
-  f2: Form & { temporaryStorageDetail?: TemporaryStorageDetail }
+export async function formDiff(
+  f1: Form & { forwardedIn?: Form },
+  f2: Form & { forwardedIn?: Form }
 ) {
-  const { updatedAt: _u1, status: _s1, ...expandedf1 } = expandFormFromDb(f1);
-  const { updatedAt: _u2, status: _s2, ...expandedf2 } = expandFormFromDb(f2);
+  const {
+    updatedAt: _u1,
+    status: _s1,
+    ...expandedf1
+  } = await expandFormFromDb(f1);
+  const {
+    updatedAt: _u2,
+    status: _s2,
+    ...expandedf2
+  } = await expandFormFromDb(f2);
 
   return {
     ...objectDiff(expandedf1, expandedf2),
-    ...tempStorageDiff(f1.temporaryStorageDetail, f2.temporaryStorageDetail)
+    ...(await tempStorageDiff(f1.forwardedIn, f2.forwardedIn))
   };
 }

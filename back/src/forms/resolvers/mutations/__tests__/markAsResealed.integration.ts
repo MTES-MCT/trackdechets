@@ -57,9 +57,10 @@ describe("Mutation markAsResealed", () => {
       ownerId: owner.id,
       opt: {
         status: "TEMP_STORER_ACCEPTED",
-        recipientCompanySiret: collector.siret
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
       },
-      tempStorageOpts: { destinationCompanySiret: destination.siret }
+      forwardedInOpts: { recipientCompanySiret: destination.siret }
     });
 
     await mutate(MARK_AS_RESEALED, {
@@ -88,7 +89,8 @@ describe("Mutation markAsResealed", () => {
       ownerId: owner.id,
       opt: {
         status: "TEMP_STORER_ACCEPTED",
-        recipientCompanySiret: collector.siret
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
       }
     });
 
@@ -96,7 +98,7 @@ describe("Mutation markAsResealed", () => {
     await prisma.form.update({
       where: { id: form.id },
       data: {
-        temporaryStorageDetail: { update: { destinationCompanySiret: "" } }
+        forwardedIn: { update: { recipientCompanySiret: "" } }
       }
     });
 
@@ -109,7 +111,7 @@ describe("Mutation markAsResealed", () => {
 
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual(
-      "Destination prévue: Le siret de l'entreprise est obligatoire"
+      "Destinataire: Le siret de l'entreprise est obligatoire"
     );
     expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
     const resealedForm = await prisma.form.findUnique({
@@ -131,11 +133,12 @@ describe("Mutation markAsResealed", () => {
       ownerId: owner.id,
       opt: {
         status: "TEMP_STORER_ACCEPTED",
-        recipientCompanySiret: collector.siret
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
       },
-      tempStorageOpts: {
+      forwardedInOpts: {
         // assume destination siret is missing
-        destinationCompanySiret: ""
+        recipientCompanySiret: ""
       }
     });
 
@@ -178,9 +181,10 @@ describe("Mutation markAsResealed", () => {
       ownerId: owner.id,
       opt: {
         status: Status.RESEALED,
-        recipientCompanySiret: collector.siret
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
       },
-      tempStorageOpts: { destinationCompanySiret: destination.siret }
+      forwardedInOpts: { recipientCompanySiret: destination.siret }
     });
 
     // change transporter
@@ -199,10 +203,10 @@ describe("Mutation markAsResealed", () => {
 
     const resealedForm = await prisma.form.findUnique({
       where: { id: form.id },
-      include: { temporaryStorageDetail: true }
+      include: { forwardedIn: true }
     });
     expect(resealedForm.status).toEqual("RESEALED");
-    expect(resealedForm.temporaryStorageDetail.transporterCompanySiret).toEqual(
+    expect(resealedForm.forwardedIn.transporterCompanySiret).toEqual(
       transporter.siret
     );
   });
@@ -224,10 +228,11 @@ describe("Mutation markAsResealed", () => {
       ownerId: owner.id,
       opt: {
         status: "TEMP_STORER_ACCEPTED",
-        recipientCompanySiret: collector.siret
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
       },
-      tempStorageOpts: {
-        destinationCompanySiret: destination.siret
+      forwardedInOpts: {
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -251,7 +256,7 @@ describe("Mutation markAsResealed", () => {
       .findUnique({
         where: { id: form.id }
       })
-      .temporaryStorageDetail();
+      .forwardedIn();
     expect(tempStorage.wasteDetailsPackagingInfos).toEqual(
       repackaging.packagingInfos
     );
@@ -279,9 +284,10 @@ describe("Mutation markAsResealed", () => {
       ownerId: owner.id,
       opt: {
         status: "TEMP_STORER_ACCEPTED",
-        recipientCompanySiret: collector.siret
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
       },
-      tempStorageOpts: { destinationCompanySiret: destination.siret }
+      forwardedInOpts: { recipientCompanySiret: destination.siret }
     });
 
     await mutate(MARK_AS_RESEALED, {
@@ -327,11 +333,12 @@ describe("Mutation markAsResealed", () => {
       ownerId: owner.id,
       opt: {
         status: "TEMP_STORER_ACCEPTED",
-        recipientCompanySiret: collector.siret
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
       },
-      tempStorageOpts: {
+      forwardedInOpts: {
         // this SIRET is not registered in TD
-        destinationCompanySiret: "3".repeat(14)
+        recipientCompanySiret: "3".repeat(14)
       }
     });
 
@@ -367,10 +374,11 @@ describe("Mutation markAsResealed", () => {
       ownerId: owner.id,
       opt: {
         status: Status.TEMP_STORER_ACCEPTED,
-        recipientCompanySiret: collector.siret
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
       },
-      tempStorageOpts: {
-        destinationCompanySiret: destination.siret
+      forwardedInOpts: {
+        recipientCompanySiret: destination.siret
       }
     });
 
@@ -419,18 +427,19 @@ describe("Mutation markAsResealed", () => {
       opt: {
         status: Status.TEMP_STORER_ACCEPTED,
         emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: collector.siret
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
       },
-      tempStorageOpts: {
-        destinationCompanySiret: destination.siret
+      forwardedInOpts: {
+        recipientCompanySiret: destination.siret
       }
     });
 
     await prisma.form.update({
       where: { id: form.id },
       data: {
-        temporaryStorageDetail: {
-          update: { destinationCompanySiret: destination.siret }
+        forwardedIn: {
+          update: { recipientCompanySiret: destination.siret }
         }
       }
     });
@@ -467,10 +476,11 @@ describe("Mutation markAsResealed", () => {
       ownerId: owner.id,
       opt: {
         status: Status.TEMP_STORER_ACCEPTED,
-        recipientCompanySiret: collector.siret
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
       },
-      tempStorageOpts: {
-        destinationCompanySiret: destination.siret
+      forwardedInOpts: {
+        recipientCompanySiret: destination.siret
       }
     });
 

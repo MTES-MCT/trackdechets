@@ -3,8 +3,7 @@ import {
   Prisma,
   RevisionRequestStatus,
   Status,
-  User,
-  TemporaryStorageDetail
+  User
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
@@ -73,15 +72,9 @@ export default async function createFormRevisionRequest(
   const existingBsdd = await getFormOrFormNotFound({ id: formId });
 
   const formRepository = getFormRepository(user);
-  const { temporaryStorageDetail } = await formRepository.findFullFormById(
-    formId
-  );
+  const forwardedIn = await formRepository.findForwardedInById(formId);
 
-  await checkIfUserCanRequestRevisionOnBsdd(
-    user,
-    existingBsdd,
-    temporaryStorageDetail
-  );
+  await checkIfUserCanRequestRevisionOnBsdd(user, existingBsdd, forwardedIn);
 
   const flatContent = await getFlatContent(content, existingBsdd);
 
@@ -115,15 +108,15 @@ async function getAuthoringCompany(
   bsdd: Form,
   authoringCompanySiret: string
 ) {
-  const { temporaryStorageDetail } = await getFormRepository(
-    user
-  ).findFullFormById(bsdd.id);
+  const forwardedIn = await getFormRepository(user).findForwardedInById(
+    bsdd.id
+  );
 
   if (
     ![
       bsdd.emitterCompanySiret,
       bsdd.recipientCompanySiret,
-      temporaryStorageDetail?.destinationCompanySiret
+      forwardedIn?.recipientCompanySiret
     ].includes(authoringCompanySiret)
   ) {
     throw new UserInputError(
@@ -148,9 +141,9 @@ async function getAuthoringCompany(
 async function checkIfUserCanRequestRevisionOnBsdd(
   user: User,
   bsdd: Form,
-  temporaryStorageDetail?: TemporaryStorageDetail
+  forwardedIn?: Form
 ): Promise<void> {
-  await checkCanRequestRevision(user, bsdd, temporaryStorageDetail);
+  await checkCanRequestRevision(user, bsdd, forwardedIn);
   if (Status.DRAFT === bsdd.status || Status.SEALED === bsdd.status) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau. Vous pouvez le modifier directement, aucune signature bloquante n'a encore été apposée."
@@ -188,10 +181,7 @@ async function getFlatContent(
     );
   }
 
-  if (
-    bsdd.temporaryStorageDetailId == null &&
-    hasTemporaryStorageUpdate(flatContent)
-  ) {
+  if (bsdd.forwardedInId == null && hasTemporaryStorageUpdate(flatContent)) {
     throw new UserInputError(
       "Impossible de réviser l'entreposage provisoire, ce bordereau n'est pas concerné."
     );
@@ -215,11 +205,11 @@ async function getApproversSirets(
   ];
 
   if (hasTemporaryStorageUpdate(content)) {
-    const { temporaryStorageDetail } = await getFormRepository(
-      user
-    ).findFullFormById(bsdd.id);
+    const forwardedIn = await getFormRepository(user).findForwardedInById(
+      bsdd.id
+    );
 
-    approvers.push(temporaryStorageDetail.destinationCompanySiret);
+    approvers.push(forwardedIn.recipientCompanySiret);
   }
 
   return approvers

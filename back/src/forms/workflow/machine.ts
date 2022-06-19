@@ -54,11 +54,11 @@ const machine = Machine<any, Event>(
           [EventType.MarkAsTempStored]: [
             {
               target: Status.REFUSED,
-              cond: "isFormRefusedByTempStorage"
+              cond: "isFormRefused"
             },
             {
               target: Status.TEMP_STORER_ACCEPTED,
-              cond: "isFormAcceptedByTempStorage"
+              cond: "isFormAccepted"
             },
             {
               target: Status.TEMP_STORED
@@ -125,7 +125,7 @@ const machine = Machine<any, Event>(
           [EventType.MarkAsTempStorerAccepted]: [
             {
               target: Status.REFUSED,
-              cond: "isFormRefusedByTempStorage"
+              cond: "isFormRefused"
             },
             {
               target: Status.TEMP_STORER_ACCEPTED
@@ -200,28 +200,31 @@ const machine = Machine<any, Event>(
   {
     guards: {
       isExemptOfTraceability: (_, event) =>
-        !!event?.formUpdateInput?.noTraceability,
+        !!event?.formUpdateInput?.noTraceability ||
+        !!event.formUpdateInput?.forwardedIn?.update?.noTraceability,
       awaitsGroup: (_, event) =>
         PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
           event.formUpdateInput?.processingOperationDone as string
+        ) ||
+        PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
+          event.formUpdateInput?.forwardedIn?.update
+            ?.processingOperationDone as string
         ),
       isFormRefused: (_, event) =>
-        event.formUpdateInput?.wasteAcceptationStatus === "REFUSED",
+        event.formUpdateInput?.wasteAcceptationStatus === "REFUSED" ||
+        event.formUpdateInput?.forwardedIn?.update?.wasteAcceptationStatus ===
+          "REFUSED",
       isFormAccepted: (_, event) =>
         [
           WasteAcceptationStatus.ACCEPTED,
           WasteAcceptationStatus.PARTIALLY_REFUSED
-        ].includes(event.formUpdateInput?.wasteAcceptationStatus as any),
-      isFormRefusedByTempStorage: (_, event) =>
-        event.formUpdateInput?.temporaryStorageDetail?.update
-          ?.tempStorerWasteAcceptationStatus === "REFUSED",
-      isFormAcceptedByTempStorage: (_, event) =>
+        ].includes(event.formUpdateInput?.wasteAcceptationStatus as any) ||
         [
           WasteAcceptationStatus.ACCEPTED,
           WasteAcceptationStatus.PARTIALLY_REFUSED
         ].includes(
-          event.formUpdateInput?.temporaryStorageDetail?.update
-            ?.tempStorerWasteAcceptationStatus as any
+          event.formUpdateInput?.forwardedIn?.update
+            ?.wasteAcceptationStatus as any
         )
     }
   }

@@ -184,52 +184,6 @@ type ProcessedInfo = Pick<
   | "nextDestinationCompanyMail"
 >;
 
-type TempStorageInfo = Pick<
-  Prisma.TemporaryStorageDetailCreateInput,
-  | "tempStorerQuantityType"
-  | "tempStorerQuantityReceived"
-  | "tempStorerWasteAcceptationStatus"
-  | "tempStorerWasteRefusalReason"
-  | "tempStorerReceivedAt"
-  | "tempStorerReceivedBy"
-  | "tempStorerSignedAt"
->;
-
-type DestinationAfterTempStorage = Pick<
-  Prisma.TemporaryStorageDetailCreateInput,
-  | "destinationCompanyName"
-  | "destinationCompanySiret"
-  | "destinationCompanyAddress"
-  | "destinationCompanyContact"
-  | "destinationCompanyPhone"
-  | "destinationCompanyMail"
-  | "destinationCap"
-  | "destinationProcessingOperation"
->;
-
-type TransporterAfterTempStorage = Pick<
-  Prisma.TemporaryStorageDetailCreateInput,
-  | "transporterCompanyName"
-  | "transporterCompanySiret"
-  | "transporterCompanyAddress"
-  | "transporterCompanyContact"
-  | "transporterCompanyPhone"
-  | "transporterCompanyMail"
-  | "transporterIsExemptedOfReceipt"
-  | "transporterReceipt"
-  | "transporterDepartment"
-  | "transporterValidityLimit"
-  | "transporterNumberPlate"
->;
-
-type WasteRepackaging = Pick<
-  Prisma.TemporaryStorageDetailCreateInput,
-  | "wasteDetailsOnuCode"
-  | "wasteDetailsPackagingInfos"
-  | "wasteDetailsQuantity"
-  | "wasteDetailsQuantityType"
->;
-
 // *************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 1
 // *************************************************************
@@ -1020,197 +974,6 @@ const processedInfoSchemaFn: (value: any) => yup.SchemaOf<ProcessedInfo> =
 
 export const processedInfoSchema = yup.lazy(processedInfoSchemaFn);
 
-// *********************************************************************
-// DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 2 (SUITE)
-// *********************************************************************
-
-// 13 - Réception dans l’installation d’entreposage ou de reconditionnement
-export const tempStoredInfoSchema: yup.SchemaOf<TempStorageInfo> = yup.object({
-  tempStorerReceivedBy: yup
-    .string()
-    .ensure()
-    .required("Vous devez saisir un responsable de la réception."),
-  tempStorerReceivedAt: yup.date().required(),
-  tempStorerSignedAt: yup.date().nullable(),
-  tempStorerQuantityType: yup.mixed<QuantityType>(),
-  tempStorerWasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
-  tempStorerQuantityReceived: yup
-    .number()
-    // if waste is refused, quantityReceived must be 0
-    .when(
-      "tempStorerWasteAcceptationStatus",
-      (wasteAcceptationStatus, schema) =>
-        ["REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.test(
-              "is-zero",
-              "Vous devez saisir une quantité reçue égale à 0.",
-              v => v === 0
-            )
-          : schema
-    )
-    // if waste is partially or totally accepted, we check it is a positive value
-    .when(
-      "tempStorerWasteAcceptationStatus",
-      (wasteAcceptationStatus, schema) =>
-        ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.test(
-              "is-strictly-positive",
-              "Vous devez saisir une quantité reçue supérieure à 0.",
-              v => v > 0
-            )
-          : schema
-    ),
-  tempStorerWasteRefusalReason: yup
-    .string()
-    .when(
-      "tempStorerWasteAcceptationStatus",
-      (wasteAcceptationStatus, schema) =>
-        ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.required("Vous devez renseigner la raison du refus")
-          : schema
-              .notRequired()
-              .nullable()
-              .test(
-                "is-empty",
-                "Le champ tempStorerWasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
-                v => !v
-              )
-    )
-});
-
-export const tempStorerAcceptedInfoSchema = yup.object().shape({
-  tempStorerReceivedAt: yup.date().nullable(),
-  tempStorerQuantityType: yup.mixed<QuantityType>().required(),
-  tempStorerWasteAcceptationStatus: yup
-    .mixed<WasteAcceptationStatus>()
-    .required(),
-  tempStorerSignedBy: yup
-    .string()
-    .ensure()
-    .required("Vous devez saisir un responsable de l'acceptation."),
-  tempStorerSignedAt: yup.date().nullable(),
-  tempStorerQuantityReceived: yup
-    .number()
-    .required()
-    // if waste is refused, quantityReceived must be 0
-    .when(
-      "tempStorerWasteAcceptationStatus",
-      (wasteAcceptationStatus, schema) =>
-        ["REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.test(
-              "is-zero",
-              "Vous devez saisir une quantité reçue égale à 0.",
-              v => v === 0
-            )
-          : schema
-    )
-    // if waste is partially or totally accepted, we check it is a positive value
-    .when(
-      "tempStorerWasteAcceptationStatus",
-      (wasteAcceptationStatus, schema) =>
-        ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.test(
-              "is-strictly-positive",
-              "Vous devez saisir une quantité reçue supérieure à 0.",
-              v => v > 0
-            )
-          : schema
-    ),
-  tempStorerWasteRefusalReason: yup
-    .string()
-    .when(
-      "tempStorerWasteAcceptationStatus",
-      (wasteAcceptationStatus, schema) =>
-        ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.required("Vous devez renseigner la raison du refus")
-          : schema
-              .notRequired()
-              .nullable()
-              .test(
-                "is-empty",
-                "Le champ tempStorerWasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
-                v => !v
-              )
-    )
-});
-
-// 14 - Installation de destination prévue
-export const destinationAfterTempStorageSchema: yup.SchemaOf<DestinationAfterTempStorage> =
-  yup.object({
-    destinationCap: yup.string().nullable(),
-    destinationCompanyName: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_NAME}`),
-    destinationCompanySiret: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_SIRET}`)
-      .length(14, `Destination ultérieure: ${INVALID_SIRET_LENGTH}`),
-    destinationCompanyAddress: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_ADDRESS}`),
-    destinationCompanyContact: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_CONTACT}`),
-    destinationCompanyPhone: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_PHONE}`),
-    destinationCompanyMail: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_EMAIL}`),
-    destinationProcessingOperation: yup
-      .string()
-      .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
-  });
-
-// 15 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
-// 16 - Conditionnement
-// 17 - Quantité
-export const wasteRepackagingSchema: yup.SchemaOf<WasteRepackaging> =
-  yup.object({
-    wasteDetailsOnuCode: yup.string().nullable(),
-    wasteDetailsPackagingInfos: yup
-      .array()
-      .nullable()
-      .of(packagingInfoFn(false))
-      .test(
-        "is-valid-repackaging-infos",
-        "${path} ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
-        (infos: PackagingInfo[]) => {
-          const hasCiterne = infos?.find(i => i.type === "CITERNE");
-          const hasBenne = infos?.find(i => i.type === "BENNE");
-
-          if (hasCiterne && hasBenne) {
-            return false;
-          }
-
-          const hasOtherPackaging = infos?.find(
-            i => !["CITERNE", "BENNE"].includes(i.type)
-          );
-          if ((hasCiterne || hasBenne) && hasOtherPackaging) {
-            return false;
-          }
-
-          return true;
-        }
-      ),
-    wasteDetailsQuantityType: yup.mixed<QuantityType>().nullable(),
-    wasteDetailsQuantity: yup
-      .number()
-      .nullable()
-      .notRequired()
-      .min(0, "La quantité doit être supérieure à 0")
-  });
-
-// 18 - Collecteur-transporteur reconditionnement
-export const transporterAfterTempStorageSchema: yup.SchemaOf<TransporterAfterTempStorage> =
-  transporterSchemaFn(false);
-
 // *******************************************************************
 // COMPOSE VALIDATION SCHEMAS TO VALIDATE A FORM FOR A SPECIFIC STATUS
 // *******************************************************************
@@ -1235,12 +998,6 @@ export const processedFormSchema = yup.lazy((value: any) =>
     .concat(receivedInfoSchema)
     .concat(processedInfoSchemaFn(value))
 );
-
-// validation schema for BSD suite before it can be (re)sealed
-export const resealedFormSchema = tempStoredInfoSchema
-  .concat(destinationAfterTempStorageSchema)
-  .concat(wasteRepackagingSchema)
-  .concat(transporterAfterTempStorageSchema);
 
 // *******************************************************************
 // HELPER FUNCTIONS THAT MAKE USES OF YUP SCHEMAS TO APPLY VALIDATION
@@ -1354,17 +1111,12 @@ async function checkDestinationAfterTempStorage(siret: string) {
 export async function checkCompaniesType(form: Form) {
   await checkDestination(form.recipientCompanySiret);
 
-  const temporaryStorageDetail = await prisma.form
+  const forwardedIn = await prisma.form
     .findUnique({ where: { id: form.id } })
-    .temporaryStorageDetail();
+    .forwardedIn();
 
-  if (
-    temporaryStorageDetail &&
-    temporaryStorageDetail.destinationCompanySiret
-  ) {
-    await checkDestinationAfterTempStorage(
-      temporaryStorageDetail.destinationCompanySiret
-    );
+  if (forwardedIn && forwardedIn.recipientCompanySiret) {
+    await checkDestinationAfterTempStorage(forwardedIn.recipientCompanySiret);
   }
 
   return true;

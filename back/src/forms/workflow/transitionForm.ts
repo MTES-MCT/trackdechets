@@ -40,9 +40,9 @@ export default async function transitionForm(
 
   // retrieves temp storage before update
   // for diff calculation
-  const temporaryStorageDetail = await prisma.form
+  const forwardedIn = await prisma.form
     .findUnique({ where: { id: form.id } })
-    .temporaryStorageDetail();
+    .forwardedIn();
 
   // update form
   const updatedForm = await prisma.form.update({
@@ -51,14 +51,14 @@ export default async function transitionForm(
   });
 
   // retrieves updated temp storage
-  const updatedTemporaryStorageDetail = await prisma.form
+  const updatedForwardedIn = await prisma.form
     .findUnique({ where: { id: updatedForm.id } })
-    .temporaryStorageDetail();
+    .forwardedIn();
 
   // calculates diff between initial form and updated form
-  const updatedFields = formDiff(
-    { ...form, temporaryStorageDetail },
-    { ...updatedForm, temporaryStorageDetail: updatedTemporaryStorageDetail }
+  const updatedFields = await formDiff(
+    { ...form, forwardedIn },
+    { ...updatedForm, forwardedIn: updatedForwardedIn }
   );
 
   eventEmitter.emit<Form>(TDEvent.TransitionForm, {

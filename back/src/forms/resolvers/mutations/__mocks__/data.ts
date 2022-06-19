@@ -195,8 +195,8 @@ const EMPTY_FORM = {
   },
   appendix2Forms: [],
   ecoOrganisme: {},
-  temporaryStorageDetail: {
-    destination: {
+  forwardedIn: {
+    recipient: {
       company: {
         siret: "",
         name: "",

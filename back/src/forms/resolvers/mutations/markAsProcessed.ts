@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, Status } from "@prisma/client";
 import { PROCESSING_OPERATIONS } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
@@ -12,6 +12,7 @@ import { processedInfoSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
+import machine from "../../workflow/machine";
 
 const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   parent,
@@ -49,7 +50,19 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 
   const processedForm = await transitionForm(user, form, {
     type: EventType.MarkAsProcessed,
-    formUpdateInput
+    formUpdateInput: form.forwardedInId
+      ? {
+          forwardedIn: {
+            update: {
+              status: machine.transition(Status.ACCEPTED, {
+                type: EventType.MarkAsProcessed,
+                formUpdateInput
+              }).value as Status,
+              ...formUpdateInput
+            }
+          }
+        }
+      : formUpdateInput
   });
 
   const { findAppendix2FormsById, updateAppendix2Forms } =

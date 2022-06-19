@@ -9,7 +9,12 @@ import { expandFormFromDb } from "../../form-converter";
 import { TemporaryStorageCannotReceive } from "../../errors";
 import prisma from "../../../prisma";
 import { getFormRepository } from "../../repository";
-import { WasteAcceptationStatus } from "@prisma/client";
+import {
+  Prisma,
+  QuantityType,
+  Status,
+  WasteAcceptationStatus
+} from "@prisma/client";
 
 const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   parent,
@@ -25,20 +30,38 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   if (form.recipientIsTempStorage === true) {
     // this form can be mark as received only if it has been
     // taken over by the transporter after temp storage
-    const { temporaryStorageDetail } = await formRepository.findFullFormById(
-      form.id
-    );
+    const { forwardedIn } = await formRepository.findFullFormById(form.id);
 
-    if (!temporaryStorageDetail?.signedAt) {
+    if (!forwardedIn?.emittedAt) {
       throw new TemporaryStorageCannotReceive();
     }
   }
 
   await receivedInfoSchema.validate(receivedInfo);
-  const formUpdateInput = {
-    ...receivedInfo,
-    currentTransporterSiret: ""
-  };
+  const formUpdateInput: Prisma.FormUpdateInput = form.forwardedInId
+    ? {
+        forwardedIn: {
+          update: {
+            status: [
+              WasteAcceptationStatus.ACCEPTED,
+              WasteAcceptationStatus.PARTIALLY_REFUSED
+            ].includes(receivedInfo.wasteAcceptationStatus as any)
+              ? Status.ACCEPTED
+              : receivedInfo.wasteAcceptationStatus ==
+                WasteAcceptationStatus.REFUSED
+              ? Status.REFUSED
+              : Status.RECEIVED,
+            ...receivedInfo
+          }
+        },
+        currentTransporterSiret: ""
+      }
+    : {
+        ...receivedInfo,
+        quantityReceivedType: QuantityType.REAL,
+        currentTransporterSiret: ""
+      };
+
   const receivedForm = await transitionForm(user, form, {
     type: EventType.MarkAsReceived,
     formUpdateInput

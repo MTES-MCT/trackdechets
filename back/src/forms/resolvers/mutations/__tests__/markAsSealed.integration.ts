@@ -119,7 +119,10 @@ describe("Mutation.markAsSealed", () => {
         }
       });
 
-      form = await prisma.form.findUnique({ where: { id: form.id } });
+      form = await prisma.form.findUnique({
+        where: { id: form.id },
+        include: { forwardedIn: true }
+      });
 
       expect(form.status).toEqual("SEALED");
 
@@ -170,7 +173,10 @@ describe("Mutation.markAsSealed", () => {
       }
     });
 
-    form = await prisma.form.findUnique({ where: { id: form.id } });
+    form = await prisma.form.findUnique({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
 
     expect(form.status).toEqual("SEALED");
   });
@@ -274,7 +280,10 @@ describe("Mutation.markAsSealed", () => {
       "Émetteur: Le contact dans l'entreprise est obligatoire";
     expect(errors[0].message).toBe(errMessage);
 
-    form = await prisma.form.findUnique({ where: { id: form.id } });
+    form = await prisma.form.findUnique({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
     expect(form.status).toEqual("DRAFT");
 
     // no statusLog is created
@@ -318,7 +327,10 @@ describe("Mutation.markAsSealed", () => {
           "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement."
         )
       );
-      form = await prisma.form.findUnique({ where: { id: form.id } });
+      form = await prisma.form.findUnique({
+        where: { id: form.id },
+        include: { forwardedIn: true }
+      });
 
       expect(form.status).toEqual("DRAFT");
 
@@ -597,8 +609,8 @@ describe("Mutation.markAsSealed", () => {
     await prisma.form.update({
       where: { id: form.id },
       data: {
-        temporaryStorageDetail: {
-          update: { destinationCompanySiret: "12345654327896" }
+        forwardedIn: {
+          update: { recipientCompanySiret: "12345654327896" }
         }
       }
     });
@@ -634,8 +646,8 @@ describe("Mutation.markAsSealed", () => {
     await prisma.form.update({
       where: { id: form.id },
       data: {
-        temporaryStorageDetail: {
-          update: { destinationCompanySiret: destination.siret }
+        forwardedIn: {
+          update: { recipientCompanySiret: destination.siret }
         }
       }
     });
@@ -717,8 +729,8 @@ describe("Mutation.markAsSealed", () => {
     await prisma.form.update({
       where: { id: form.id },
       data: {
-        temporaryStorageDetail: {
-          update: { destinationCompanySiret: destination.siret }
+        forwardedIn: {
+          update: { recipientCompanySiret: destination.siret }
         }
       }
     });
