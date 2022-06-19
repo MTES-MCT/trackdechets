@@ -5,6 +5,7 @@ import { PROCESSING_OPERATIONS } from "../../../../common/constants";
 import {
   companyFactory,
   formFactory,
+  formWithTempStorageFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -105,6 +106,40 @@ describe("mutation.markAsProcessed", () => {
     });
     expect(statusLogs.length).toEqual(1);
     expect(statusLogs[0].loggedAt).toBeTruthy();
+  });
+
+  it("should mark a form with temporary storage as processed and delete BSD suite", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: {
+        status: "TEMP_STORER_ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 1",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z"
+        }
+      }
+    });
+
+    const updatedForm = await prisma.form.findFirst({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
+
+    expect(updatedForm.recipientIsTempStorage).toEqual(false);
+    expect(updatedForm.forwardedInId).toBeNull();
+    expect(updatedForm.status).toEqual("PROCESSED");
   });
 
   it("should fill the description with the operation's", async () => {

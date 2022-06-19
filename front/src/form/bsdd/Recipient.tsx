@@ -77,6 +77,14 @@ export default function Recipient() {
           reconditionnement"
         />
       </div>
+      {isTempStorage && (
+        <div className="notification tw-mt-2">
+          Vous avez sélectionné "Entreposage provisoire ou reconditionnement".
+          En cas de doute, et pour éviter une erreur qui serait bloquante pour
+          le parcours du déchet, veuillez vérifier avec vos partenaires ce qu'il
+          convient de renseigner.
+        </div>
+      )}
       <h4 className="form__section-heading">
         Installation{" "}
         {isTempStorage

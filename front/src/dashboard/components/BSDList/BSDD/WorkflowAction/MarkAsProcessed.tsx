@@ -68,6 +68,13 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
 
   return (
     <Form>
+      {form.status === FormStatus.TempStorerAccepted && (
+        <div className="notification notification--warning">
+          Vous vous apprêtez à valider un traitement ou un regroupement sur un
+          BSDD sur lequel votre établissement est identifié en tant
+          qu'installation d'entreposage provisoire ou de reconditionnement.
+        </div>
+      )}
       <div className="form__row">
         <label>
           Nom du responsable
@@ -191,7 +198,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
   );
 }
 
-export default function MarkAsProcessed({ form, siret }: WorkflowActionProps) {
+export default function MarkAsProcessed({ form }: WorkflowActionProps) {
   const [markAsProcessed, { loading, error }] = useMutation<
     Pick<Mutation, "markAsProcessed">,
     MutationMarkAsProcessedArgs
@@ -219,7 +226,11 @@ export default function MarkAsProcessed({ form, siret }: WorkflowActionProps) {
     <TdModalTrigger
       ariaLabel={actionLabel}
       trigger={open => (
-        <ActionButton icon={<IconCogApproved size="24px" />} onClick={open}>
+        <ActionButton
+          icon={<IconCogApproved size="24px" />}
+          onClick={open}
+          secondary={form.status === FormStatus.TempStorerAccepted}
+        >
           {actionLabel}
         </ActionButton>
       )}

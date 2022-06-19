@@ -79,7 +79,11 @@ export default function MarkAsResealed({ form }: WorkflowActionProps) {
     <TdModalTrigger
       ariaLabel={actionLabel}
       trigger={open => (
-        <ActionButton icon={<IconPaperWrite size="24px" />} onClick={open}>
+        <ActionButton
+          icon={<IconPaperWrite size="24px" />}
+          onClick={open}
+          secondary={form.status !== FormStatus.TempStorerAccepted}
+        >
           {actionLabel}
         </ActionButton>
       )}
@@ -99,8 +103,15 @@ export default function MarkAsResealed({ form }: WorkflowActionProps) {
               })
             }
           >
-            {({ values, setFieldValue }) => (
+            {() => (
               <Form>
+                {form.status !== FormStatus.TempStorerAccepted && (
+                  <div className="notification notification--warning">
+                    Vous vous apprêtez à ajouter une étape d'entreposage
+                    provisoire ou de reconditionnement sur un BSDD pour lequel
+                    cette étape n'était pas prévue initialement.
+                  </div>
+                )}
                 <h5 className="form__section-heading">
                   Installation de destination prévue
                 </h5>

@@ -107,6 +107,11 @@ const machine = Machine<any, Event>(
             {
               target: Status.PROCESSED
             }
+          ],
+          [EventType.MarkAsResealed]: [
+            {
+              target: Status.RESEALED
+            }
           ]
         }
       },
@@ -143,6 +148,19 @@ const machine = Machine<any, Event>(
           [EventType.MarkAsResent]: [
             {
               target: Status.RESENT
+            }
+          ],
+          [EventType.MarkAsProcessed]: [
+            {
+              target: Status.NO_TRACEABILITY,
+              cond: "isExemptOfTraceability"
+            },
+            {
+              target: Status.AWAITING_GROUP,
+              cond: "awaitsGroup"
+            },
+            {
+              target: Status.PROCESSED
             }
           ]
         }

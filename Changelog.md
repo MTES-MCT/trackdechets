@@ -10,15 +10,24 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout de la révision BSDA, qui rend possible la modification de certains champs du bordereau même après la fin de son cycle de vie [PR 1443](https://github.com/MTES-MCT/trackdechets/pull/1443)
+- Ajout de la possibilité d'ajouter un supprimer une étape d'entreposage provisoire sur le BSDD [PR 1449](https://github.com/MTES-MCT/trackdechets/pull/1449)
+
+```mermaid
+graph TD
+ACCEPTED -->|markAsProcessed| PROCESSED(PROCESSED / AWAITING_GROUP / NO_TRACEABILITY)
+ACCEPTED -.->|markAsResealed| RESEALED(RESEALED)
+TEMP_STORER_ACCEPTED -->|markAsResealed| RESEALED(RESEALED)
+TEMP_STORER_ACCEPTED -.->|markAsProcessed| PROCESSED(PROCESSED / AWAITING_GROUP / NO_TRACEABILITY)
+```
 - Permettre aux forces de l'ordre d’accéder au pdf des bordereaux sur présentation d'un QR-code à durée de vie limitée [PR 1433](https://github.com/MTES-MCT/trackdechets/pull/1433)
- 
+
 #### :bug: Corrections de bugs
 
 - Correction du code déchet erroné pour les DASRI d'origine animale (18 01 02* => 18 02 02*) [PR 1460](https://github.com/MTES-MCT/trackdechets/pull/1460)
 
 #### :boom: Breaking changes
 #### :nail_care: Améliorations
- 
+
 - Affiche les adresses emails des administrateurs d'un établissement lors d'une demande de rattachement si l'email du requérant appartient au même nom de domaine [PR 1429](https://github.com/MTES-MCT/trackdechets/pull/1429)
 - Ajout de suggestions lors de l'ajout d'un établissement fermé. [PR 1463](https://github.com/MTES-MCT/trackdechets/pull/1463)
 - Ajout de la possibilité de filtrer par numéro SIRET de l'émetteur ou du destinataire dans le tableau de bord [PR 1456](https://github.com/MTES-MCT/trackdechets/pull/1456)
