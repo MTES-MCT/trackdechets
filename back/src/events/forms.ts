@@ -36,6 +36,9 @@ export async function mailWhenFormIsDeclined(payload: TDEventPayload<Form>) {
     return;
   }
   const form = await prisma.form.findUnique({ where: { id: payload.node.id } });
+  if (form.emitterIsPrivateIndividual || form.emitterIsForeignShip) {
+    return;
+  }
   // build pdf as a base64 string
   const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
