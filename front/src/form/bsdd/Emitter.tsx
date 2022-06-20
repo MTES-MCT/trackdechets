@@ -90,8 +90,8 @@ export default function Emitter({ disabled }) {
         <div className="form__row notification notification--warning">
           Lorsqu'un particulier ou un navire étranger est émetteur du déchet, le
           type d'émetteur est verrouillé à "Producteur". La signature de
-          l'émetteur ne sera pas requise et après validation, le bordereau
-          passera à l'attente de la signature par le transporteur.
+          l'émetteur ne sera pas requise et après validation du bordereau la
+          première signature attendue sera celle du transporteur.
         </div>
       )}
       <div className="form__row">

@@ -289,4 +289,66 @@ describe("Mutation.createFormRevisionRequest", () => {
       wasteDetails: { code: "01 03 08" }
     });
   });
+  it("should fail if emitter is a foreign ship", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: null,
+        emitterIsForeignShip: true,
+        emitterCompanyOmiNumber: "OMI1234567"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: {},
+          comment: "A comment",
+          authoringCompanySiret: company.siret
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      `Vous n'êtes pas autorisé à réviser ce bordereau`
+    );
+  });
+  it("should fail if emitter is a private individual", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: null,
+        emitterIsPrivateIndividual: true,
+        emitterCompanyName: "Madame Déchets Dangeureux"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: {},
+          comment: "A comment",
+          authoringCompanySiret: company.siret
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      `Vous n'êtes pas autorisé à réviser ce bordereau`
+    );
+  });
 });

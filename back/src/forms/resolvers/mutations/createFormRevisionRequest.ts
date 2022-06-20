@@ -144,6 +144,11 @@ async function checkIfUserCanRequestRevisionOnBsdd(
   forwardedIn?: Form
 ): Promise<void> {
   await checkCanRequestRevision(user, bsdd, forwardedIn);
+  if (bsdd.emitterIsPrivateIndividual || bsdd.emitterIsForeignShip) {
+    throw new ForbiddenError(
+      "Impossible de créer une révision sur ce bordereau car l'émetteur est un particulier ou un navire étranger."
+    );
+  }
   if (Status.DRAFT === bsdd.status || Status.SEALED === bsdd.status) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau. Vous pouvez le modifier directement, aucune signature bloquante n'a encore été apposée."
