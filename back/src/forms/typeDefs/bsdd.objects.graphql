@@ -340,6 +340,12 @@ type Emitter {
 
   "Établissement émetteur"
   company: FormCompany
+
+  "Indique si le détenteur est un particulier ou une entreprise"
+  isPrivateIndividual: Boolean
+
+  "Indique si le détenteur est un navire étranger"
+  isForeignShip: Boolean
 }
 
 """

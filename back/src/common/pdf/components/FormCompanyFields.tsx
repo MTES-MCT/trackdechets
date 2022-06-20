@@ -8,9 +8,15 @@ const FRENCH_COUNTRY = countries.find(country => country.cca2 === "FR");
 
 type FormCompanyFieldsProps = {
   company?: FormCompany;
+  isForeignShip?: boolean;
+  isPrivateIndividual?: boolean;
 };
 
-export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
+export function FormCompanyFields({
+  company,
+  isForeignShip,
+  isPrivateIndividual
+}: FormCompanyFieldsProps) {
   let companyCountry: Country = null;
 
   if (company) {
@@ -33,6 +39,7 @@ export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
         <input
           type="checkbox"
           checked={
+            !isForeignShip &&
             !company?.vatNumber &&
             company?.siret &&
             companyCountry &&
@@ -45,18 +52,38 @@ export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
         <input
           type="checkbox"
           checked={
-            company?.vatNumber && companyCountry && companyCountry.cca2 !== "FR"
+            isForeignShip ||
+            (company?.vatNumber &&
+              companyCountry &&
+              companyCountry.cca2 !== "FR")
           }
           readOnly
         />{" "}
         Entreprise étrangère
       </p>
       <p>
-        N° SIRET : {!company?.vatNumber ? company?.siret : ""}
-        <br />
-        N° TVA intracommunautaire (le cas échéant) : {company?.vatNumber}
-        <br />
-        RAISON SOCIALE : {company?.name}
+        {!isForeignShip && !isPrivateIndividual && !company?.vatNumber && (
+          <div>
+            N° SIRET : {company?.siret}
+            <br />
+          </div>
+        )}
+        {!isForeignShip && !isPrivateIndividual && (
+          <div>
+            N° TVA intracommunautaire (le cas échéant) : {company?.vatNumber}
+            <br />
+          </div>
+        )}
+        {company?.omiNumber && (
+          <div>
+            Numéro navire OMI : {company?.omiNumber}
+            <br />
+          </div>
+        )}
+        {!company?.siret && !company?.vatNumber
+          ? "Nom Prénom"
+          : "RAISON SOCIALE"}{" "}
+        : {company?.name}
         <br />
         Adresse complète : {company?.address}
         <br />
@@ -69,8 +96,12 @@ export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
         Tel : {company?.phone}
         <br />
         Mail (facultatif) : {company?.mail}
-        <br />
-        Personne à contacter : {company?.contact}
+        {!isPrivateIndividual && (
+          <div>
+            <br />
+            Personne à contacter : {company?.contact}
+          </div>
+        )}
       </p>
     </>
   );

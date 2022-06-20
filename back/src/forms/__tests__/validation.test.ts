@@ -130,9 +130,254 @@ describe("sealedFormSchema", () => {
         expect(isValid).toEqual(true);
       }
     );
+
+    test("when emitterIsForeignShip is true without emitter company siret", async () => {
+      const partialForm: Partial<Form> = {
+        id: "cjplbvecc000d0766j32r19am",
+        readableId: "BSD-20210101-AAAAAAAA",
+        status: "SEALED",
+        emitterType: "PRODUCER",
+        emitterIsForeignShip: true,
+        emitterWorkSiteName: "",
+        emitterWorkSiteAddress: "",
+        emitterWorkSiteCity: "",
+        emitterWorkSitePostalCode: "",
+        emitterWorkSiteInfos: "",
+        emitterCompanyName: "A company 2",
+        emitterCompanyAddress: "8 rue du Général de Gaulle",
+        emitterCompanyOmiNumber: "OMI1234567",
+        recipientCap: "1234",
+        recipientProcessingOperation: "D 6",
+        recipientCompanyName: "A company 3",
+        recipientCompanySiret: "00000000000003",
+        recipientCompanyAddress: "8 rue du Général de Gaulle",
+        recipientCompanyContact: "Destination",
+        recipientCompanyPhone: "02",
+        recipientCompanyMail: "d@d.fr",
+        transporterReceipt: "sdfg",
+        transporterDepartment: "82",
+        transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
+        transporterCompanyName: "A company 4",
+        transporterCompanySiret: "00000000000004",
+        transporterCompanyAddress: "8 rue du Général de Gaulle",
+        transporterCompanyContact: "Transporteur",
+        transporterCompanyPhone: "03",
+        transporterCompanyMail: "t@t.fr",
+        wasteDetailsCode: "01 03 04*",
+        wasteDetailsOnuCode: "AAA",
+        wasteDetailsPackagingInfos: [
+          { type: "FUT", other: null, quantity: 1 },
+          { type: "GRV", other: null, quantity: 1 }
+        ],
+        wasteDetailsQuantity: 1.5,
+        wasteDetailsQuantityType: "REAL",
+        wasteDetailsConsistence: "SOLID",
+        wasteDetailsPop: false
+      };
+      await sealedFormSchema.validate(partialForm);
+      const isValid = await sealedFormSchema.isValid(partialForm);
+      expect(isValid).toEqual(true);
+    });
+    test("when emitterIsPrivateIndividual is true without emitter company siret", async () => {
+      const partialForm: Partial<Form> = {
+        id: "cjplbvecc000d0766j32r19am",
+        readableId: "BSD-20210101-AAAAAAAA",
+        status: "SEALED",
+        emitterType: "PRODUCER",
+        emitterIsPrivateIndividual: true,
+        emitterWorkSiteName: "",
+        emitterWorkSiteAddress: "",
+        emitterWorkSiteCity: "",
+        emitterWorkSitePostalCode: "",
+        emitterWorkSiteInfos: "",
+        emitterCompanyName: "A company 2",
+        emitterCompanyAddress: "8 rue du Général de Gaulle",
+        recipientCap: "1234",
+        recipientProcessingOperation: "D 6",
+        recipientCompanyName: "A company 3",
+        recipientCompanySiret: "00000000000003",
+        recipientCompanyAddress: "8 rue du Général de Gaulle",
+        recipientCompanyContact: "Destination",
+        recipientCompanyPhone: "02",
+        recipientCompanyMail: "d@d.fr",
+        transporterReceipt: "sdfg",
+        transporterDepartment: "82",
+        transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
+        transporterCompanyName: "A company 4",
+        transporterCompanySiret: "00000000000004",
+        transporterCompanyAddress: "8 rue du Général de Gaulle",
+        transporterCompanyContact: "Transporteur",
+        transporterCompanyPhone: "03",
+        transporterCompanyMail: "t@t.fr",
+        wasteDetailsCode: "01 03 04*",
+        wasteDetailsOnuCode: "AAA",
+        wasteDetailsPackagingInfos: [
+          { type: "FUT", other: null, quantity: 1 },
+          { type: "GRV", other: null, quantity: 1 }
+        ],
+        wasteDetailsQuantity: 1.5,
+        wasteDetailsQuantityType: "REAL",
+        wasteDetailsConsistence: "SOLID",
+        wasteDetailsPop: false
+      };
+      await sealedFormSchema.validate(partialForm);
+      const isValid = await sealedFormSchema.isValid(partialForm);
+      expect(isValid).toEqual(true);
+    });
   });
 
   describe("form cannot be sealed", () => {
+    test("when emitterIsForeignShip is true without emitterCompanyOmiNumber", async () => {
+      const partialForm: Partial<Form> = {
+        id: "cjplbvecc000d0766j32r19am",
+        readableId: "BSD-20210101-AAAAAAAA",
+        status: "SEALED",
+        emitterType: "PRODUCER",
+        emitterIsForeignShip: true,
+        emitterWorkSiteName: "",
+        emitterWorkSiteAddress: "",
+        emitterWorkSiteCity: "",
+        emitterWorkSitePostalCode: "",
+        emitterWorkSiteInfos: "",
+        emitterCompanyName: "A company 2",
+        emitterCompanySiret: "00000000000002",
+        emitterCompanyContact: "Emetteur",
+        emitterCompanyPhone: "01",
+        emitterCompanyAddress: "8 rue du Général de Gaulle",
+        emitterCompanyMail: "e@e.fr",
+        recipientCap: "1234",
+        recipientProcessingOperation: "D 6",
+        recipientCompanyName: "A company 3",
+        recipientCompanySiret: "00000000000003",
+        recipientCompanyAddress: "8 rue du Général de Gaulle",
+        recipientCompanyContact: "Destination",
+        recipientCompanyPhone: "02",
+        recipientCompanyMail: "d@d.fr",
+        transporterReceipt: "sdfg",
+        transporterDepartment: "82",
+        transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
+        transporterCompanyName: "A company 4",
+        transporterCompanySiret: "00000000000004",
+        transporterCompanyAddress: "8 rue du Général de Gaulle",
+        transporterCompanyContact: "Transporteur",
+        transporterCompanyPhone: "03",
+        transporterCompanyMail: "t@t.fr",
+        wasteDetailsCode: "01 03 04*",
+        wasteDetailsOnuCode: "AAA",
+        wasteDetailsPackagingInfos: [
+          { type: "FUT", other: null, quantity: 1 },
+          { type: "GRV", other: null, quantity: 1 }
+        ],
+        wasteDetailsQuantity: 1.5,
+        wasteDetailsQuantityType: "REAL",
+        wasteDetailsConsistence: "SOLID",
+        wasteDetailsPop: false
+      };
+      const isValid = await sealedFormSchema.isValid(partialForm);
+      expect(isValid).toEqual(false);
+    });
+    test("when emitterIsForeignShip is true with invalid emitterCompanyOmiNumber", async () => {
+      const partialForm: Partial<Form> = {
+        id: "cjplbvecc000d0766j32r19am",
+        readableId: "BSD-20210101-AAAAAAAA",
+        status: "SEALED",
+        emitterType: "PRODUCER",
+        emitterIsForeignShip: true,
+        emitterWorkSiteName: "",
+        emitterWorkSiteAddress: "",
+        emitterWorkSiteCity: "",
+        emitterWorkSitePostalCode: "",
+        emitterWorkSiteInfos: "",
+        emitterCompanyName: "A company 2",
+        emitterCompanySiret: "00000000000002",
+        emitterCompanyContact: "Emetteur",
+        emitterCompanyPhone: "01",
+        emitterCompanyAddress: "8 rue du Général de Gaulle",
+        emitterCompanyMail: "e@e.fr",
+        emitterCompanyOmiNumber: "OMI123",
+        recipientCap: "1234",
+        recipientProcessingOperation: "D 6",
+        recipientCompanyName: "A company 3",
+        recipientCompanySiret: "00000000000003",
+        recipientCompanyAddress: "8 rue du Général de Gaulle",
+        recipientCompanyContact: "Destination",
+        recipientCompanyPhone: "02",
+        recipientCompanyMail: "d@d.fr",
+        transporterReceipt: "sdfg",
+        transporterDepartment: "82",
+        transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
+        transporterCompanyName: "A company 4",
+        transporterCompanySiret: "00000000000004",
+        transporterCompanyAddress: "8 rue du Général de Gaulle",
+        transporterCompanyContact: "Transporteur",
+        transporterCompanyPhone: "03",
+        transporterCompanyMail: "t@t.fr",
+        wasteDetailsCode: "01 03 04*",
+        wasteDetailsOnuCode: "AAA",
+        wasteDetailsPackagingInfos: [
+          { type: "FUT", other: null, quantity: 1 },
+          { type: "GRV", other: null, quantity: 1 }
+        ],
+        wasteDetailsQuantity: 1.5,
+        wasteDetailsQuantityType: "REAL",
+        wasteDetailsConsistence: "SOLID",
+        wasteDetailsPop: false
+      };
+      const isValid = await sealedFormSchema.isValid(partialForm);
+      expect(isValid).toEqual(false);
+    });
+
+    test("when emitterIsForeignShip and emitterIsPrivateIndividual both true", async () => {
+      const partialForm: Partial<Form> = {
+        id: "cjplbvecc000d0766j32r19am",
+        readableId: "BSD-20210101-AAAAAAAA",
+        status: "SEALED",
+        emitterType: "PRODUCER",
+        emitterIsForeignShip: true,
+        emitterIsPrivateIndividual: true,
+        emitterWorkSiteName: "",
+        emitterWorkSiteAddress: "",
+        emitterWorkSiteCity: "",
+        emitterWorkSitePostalCode: "",
+        emitterWorkSiteInfos: "",
+        emitterCompanyName: "A company 2",
+        emitterCompanySiret: "00000000000002",
+        emitterCompanyContact: "Emetteur",
+        emitterCompanyPhone: "01",
+        emitterCompanyAddress: "8 rue du Général de Gaulle",
+        emitterCompanyMail: "e@e.fr",
+        emitterCompanyOmiNumber: "OMI1234567",
+        recipientCap: "1234",
+        recipientProcessingOperation: "D 6",
+        recipientCompanyName: "A company 3",
+        recipientCompanySiret: "00000000000003",
+        recipientCompanyAddress: "8 rue du Général de Gaulle",
+        recipientCompanyContact: "Destination",
+        recipientCompanyPhone: "02",
+        recipientCompanyMail: "d@d.fr",
+        transporterReceipt: "sdfg",
+        transporterDepartment: "82",
+        transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
+        transporterCompanyName: "A company 4",
+        transporterCompanySiret: "00000000000004",
+        transporterCompanyAddress: "8 rue du Général de Gaulle",
+        transporterCompanyContact: "Transporteur",
+        transporterCompanyPhone: "03",
+        transporterCompanyMail: "t@t.fr",
+        wasteDetailsCode: "01 03 04*",
+        wasteDetailsOnuCode: "AAA",
+        wasteDetailsPackagingInfos: [
+          { type: "FUT", other: null, quantity: 1 },
+          { type: "GRV", other: null, quantity: 1 }
+        ],
+        wasteDetailsQuantity: 1.5,
+        wasteDetailsQuantityType: "REAL",
+        wasteDetailsConsistence: "SOLID",
+        wasteDetailsPop: false
+      };
+      const isValid = await sealedFormSchema.isValid(partialForm);
+      expect(isValid).toEqual(false);
+    });
     test("when there is no receipt exemption and no receipt", async () => {
       const testForm = {
         ...form,
@@ -578,6 +823,40 @@ describe("draftFormSchema", () => {
     await expect(validateFn()).rejects.toThrow(
       "Parcelle: la coordonnée Y est obligatoire"
     );
+  });
+
+  it("should be valid when emitterIsForeignShip with empty fields", async () => {
+    const partialForm: Partial<Form> = {
+      id: "cjplbvecc000d0766j32r19am",
+      readableId: "BSD-20210101-AAAAAAAA",
+      status: "DRAFT",
+      emitterType: "PRODUCER",
+      emitterIsForeignShip: true,
+      emitterWorkSiteName: "",
+      emitterWorkSiteAddress: "",
+      emitterWorkSiteCity: "",
+      emitterWorkSitePostalCode: "",
+      emitterWorkSiteInfos: "",
+      emitterCompanyName: "A company 2",
+      emitterCompanyContact: "Emetteur",
+      emitterCompanyPhone: "01",
+      emitterCompanyAddress: "8 rue du Général de Gaulle",
+      emitterCompanyMail: "e@e.fr",
+      emitterCompanyOmiNumber: "OMI1234567",
+      wasteDetailsCode: "01 03 04*",
+      wasteDetailsOnuCode: "AAA",
+      wasteDetailsPackagingInfos: [
+        { type: "FUT", other: null, quantity: 1 },
+        { type: "GRV", other: null, quantity: 1 }
+      ],
+      wasteDetailsQuantity: 1.5,
+      wasteDetailsQuantityType: "REAL",
+      wasteDetailsConsistence: "SOLID",
+      wasteDetailsPop: false
+    };
+    draftFormSchema.validateSync(partialForm);
+    const isValid = await draftFormSchema.isValid(partialForm);
+    expect(isValid).toEqual(true);
   });
 });
 

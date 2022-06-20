@@ -62,6 +62,9 @@ const Company = ({ company, label }: CompanyProps) => (
   <>
     <dt>{label}</dt> <dd>{company?.name}</dd>
     <dt>Siret</dt> <dd>{company?.siret}</dd>
+    <dt>Numéro de TVA</dt> <dd>{company?.vatNumber}</dd>
+    <dt>Numéro OMI (Organisation maritime internationale)</dt>{" "}
+    <dd>{company?.omiNumber}</dd>
     <dt>Adresse</dt> <dd>{company?.address}</dd>
     <dt>Tél</dt> <dd>{company?.phone}</dd>
     <dt>Mél</dt> <dd>{company?.mail}</dd>
@@ -583,7 +586,14 @@ export default function BSDDetailContent({
                         : ""
                     }
                   />
-                  <Company label="Émetteur" company={form.emitter?.company} />
+                  <Company
+                    label={
+                      form.emitter?.isPrivateIndividual !== true
+                        ? "Émetteur"
+                        : "Émetteur (Particulier)"
+                    }
+                    company={form.emitter?.company}
+                  />
                   <DetailRow
                     value={form.emitter?.workSite?.name}
                     label="Chantier"

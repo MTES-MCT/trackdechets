@@ -36,12 +36,16 @@ import {
   INVALID_PROCESSING_OPERATION,
   EXTRANEOUS_NEXT_DESTINATION,
   MISSING_COMPANY_SIRET_OR_VAT,
-  MISSING_PROCESSING_OPERATION
+  MISSING_PROCESSING_OPERATION,
+  MISSING_COMPANY_OMI_NUMBER,
+  INVALID_COMPANY_OMI_NUMBER,
+  INVALID_INDIVIDUAL_OR_FOREIGNSHIP
 } from "./errors";
 import {
   isVat,
   isSiret,
-  isFRVat
+  isFRVat,
+  isOmi
 } from "../common/constants/companySearchHelpers";
 import { searchCompany } from "../companies/search";
 // set yup default error messages
@@ -57,6 +61,8 @@ type Emitter = Pick<
   Prisma.FormCreateInput,
   | "emitterType"
   | "emitterPickupSite"
+  | "emitterIsPrivateIndividual"
+  | "emitterIsForeignShip"
   | "emitterWorkSiteName"
   | "emitterWorkSiteAddress"
   | "emitterWorkSiteCity"
@@ -68,6 +74,7 @@ type Emitter = Pick<
   | "emitterCompanyContact"
   | "emitterCompanyPhone"
   | "emitterCompanyMail"
+  | "emitterCompanyOmiNumber"
 >;
 
 type Recipient = Pick<
@@ -197,25 +204,83 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
     emitterWorkSiteInfos: yup.string().nullable(),
     emitterWorkSiteName: yup.string().nullable(),
     emitterWorkSitePostalCode: yup.string().nullable(),
-    emitterType: yup.mixed<EmitterType>().when("ecoOrganismeSiret", {
-      is: ecoOrganismeSiret => !ecoOrganismeSiret,
-      then: yup
-        .mixed()
-        .requiredIf(!isDraft, `Émetteur: Le type d'émetteur est obligatoire`),
-      otherwise: yup
-        .mixed()
-        .oneOf(
-          ["OTHER"],
-          `Émetteur: Le type d'émetteur doit être "OTHER" lorsqu'un éco-organisme est responsable du déchet`
-        )
-    }),
+    emitterType: yup
+      .mixed<EmitterType>()
+      .when("ecoOrganismeSiret", {
+        is: ecoOrganismeSiret => !ecoOrganismeSiret,
+        then: yup
+          .mixed()
+          .requiredIf(!isDraft, `Émetteur: Le type d'émetteur est obligatoire`),
+        otherwise: yup
+          .mixed()
+          .oneOf(
+            ["OTHER"],
+            `Émetteur: Le type d'émetteur doit être "OTHER" lorsqu'un éco-organisme est responsable du déchet`
+          )
+      })
+      .when("emitterIsPrivateIndividual", {
+        is: emitterIsPrivateIndividual => !emitterIsPrivateIndividual,
+        then: yup
+          .mixed()
+          .requiredIf(!isDraft, `Émetteur: Le type d'émetteur est obligatoire`),
+        otherwise: yup
+          .mixed()
+          .oneOf(
+            ["PRODUCER"],
+            `Émetteur: Le type d'émetteur doit être "PRODUCER" lorsque l'émetteur est un particulier`
+          )
+      })
+      .when("emitterIsForeignShip", {
+        is: emitterIsForeignShip => !emitterIsForeignShip,
+        then: yup
+          .mixed()
+          .requiredIf(!isDraft, `Émetteur: Le type d'émetteur est obligatoire`),
+        otherwise: yup
+          .mixed()
+          .oneOf(
+            ["PRODUCER"],
+            `Émetteur: Le type d'émetteur doit être "PRODUCER" lorsque l'émetteur est un navire étranger`
+          )
+      }),
     emitterCompanyName: yup
       .string()
       .ensure()
+      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+        emitterIsForeignShip === true ? schema.notRequired() : schema
+      )
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_NAME}`),
     emitterCompanySiret: yup
       .string()
-      .ensure()
+      .test(
+        "company-siret-with-foreign-ship",
+        "Émetteur: vous ne pouvez pas enregistrer un numéro de SIRET en cas d'émetteur navire étranger",
+        function (value) {
+          const { emitterIsForeignShip } = this.parent;
+          if (emitterIsForeignShip === true && value) {
+            return false;
+          }
+          return true;
+        }
+      )
+      .test(
+        "company-siret-with-private",
+        "Émetteur: vous ne pouvez pas enregistrer un numéro de SIRET en cas d'émetteur particulier",
+        function (value) {
+          const { emitterIsPrivateIndividual } = this.parent;
+          if (emitterIsPrivateIndividual === true && value) {
+            return false;
+          }
+          return true;
+        }
+      )
+      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+        emitterIsForeignShip === true ? schema.notRequired() : schema
+      )
+      .when(
+        "emitterIsPrivateIndividual",
+        (emitterIsPrivateIndividual, schema) =>
+          emitterIsPrivateIndividual === true ? schema.notRequired() : schema
+      )
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_SIRET}`)
       .matches(/^$|^\d{14}$/, {
         message: `Émetteur: ${INVALID_SIRET_LENGTH}`
@@ -223,20 +288,130 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
     emitterCompanyAddress: yup
       .string()
       .ensure()
+      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+        emitterIsForeignShip === true ? schema.notRequired() : schema
+      )
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_ADDRESS}`),
     emitterCompanyContact: yup
       .string()
       .ensure()
+      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+        emitterIsForeignShip === true ? schema.notRequired() : schema
+      )
+      .when(
+        "emitterIsPrivateIndividual",
+        (emitterIsPrivateIndividual, schema) =>
+          emitterIsPrivateIndividual === true ? schema.notRequired() : schema
+      )
+      .test(
+        "company-contact-with-private",
+        "Émetteur: vous ne pouvez pas enregistrer une personne contact en cas d'émetteur particulier",
+        function (value) {
+          const { emitterIsPrivateIndividual } = this.parent;
+          if (emitterIsPrivateIndividual === true && value) {
+            return false;
+          }
+          return true;
+        }
+      )
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_CONTACT}`),
     emitterCompanyPhone: yup
       .string()
       .ensure()
+      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+        emitterIsForeignShip === true ? schema.notRequired() : schema
+      )
+      .when(
+        "emitterIsPrivateIndividual",
+        (emitterIsPrivateIndividual, schema) =>
+          emitterIsPrivateIndividual === true ? schema.notRequired() : schema
+      )
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_PHONE}`),
     emitterCompanyMail: yup
       .string()
       .email()
       .ensure()
-      .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_EMAIL}`)
+      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+        emitterIsForeignShip === true ? schema.notRequired() : schema
+      )
+      .when(
+        "emitterIsPrivateIndividual",
+        (emitterIsPrivateIndividual, schema) =>
+          emitterIsPrivateIndividual === true ? schema.notRequired() : schema
+      )
+      .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_EMAIL}`),
+    emitterCompanyOmiNumber: yup
+      .string()
+      .nullable()
+      .notRequired()
+      .test(
+        "omi-but-private",
+        `Émetteur: Impossible de définir un  numéro OMI avec un émetteur particulier`,
+        function (value) {
+          const { emitterIsPrivateIndividual } = this.parent;
+          if (emitterIsPrivateIndividual === true && !!value) {
+            return false;
+          }
+          return true;
+        }
+      )
+      .test(
+        "omi-absent-with-foreign-ship",
+        `Émetteur: ${MISSING_COMPANY_OMI_NUMBER}`,
+        function (value) {
+          const { emitterIsForeignShip } = this.parent;
+          if (emitterIsForeignShip === true && !value) {
+            return false;
+          }
+          return true;
+        }
+      )
+      .test(
+        "omi-invalid-with-foreign-ship",
+        `Émetteur: ${INVALID_COMPANY_OMI_NUMBER}`,
+        function (value) {
+          const { emitterIsForeignShip } = this.parent;
+          if (emitterIsForeignShip === true && !isOmi(value)) {
+            return false;
+          }
+          return true;
+        }
+      )
+      .test(
+        "omi-defined-but-not-foreign-ship",
+        `Émetteur: Impossible de définir un  numéro OMI sans un émetteur navire étranger`,
+        function (value) {
+          const { emitterIsForeignShip } = this.parent;
+          if (!emitterIsForeignShip && !!value) {
+            return false;
+          }
+          return true;
+        }
+      ),
+    emitterIsPrivateIndividual: yup
+      .boolean()
+      .nullable()
+      .notRequired()
+      .test(
+        "is-private-exclusive",
+        `Émetteur: ${INVALID_INDIVIDUAL_OR_FOREIGNSHIP}`,
+        function (value) {
+          const { emitterIsForeignShip } = this.parent;
+          return !(value === true && emitterIsForeignShip === true);
+        }
+      ),
+    emitterIsForeignShip: yup
+      .boolean()
+      .nullable()
+      .notRequired()
+      .test(
+        "is-foreign-ship-exclusive",
+        `Émetteur: ${INVALID_INDIVIDUAL_OR_FOREIGNSHIP}`,
+        function (value) {
+          const { emitterIsPrivateIndividual } = this.parent;
+          return !(value === true && emitterIsPrivateIndividual === true);
+        }
+      )
   });
 
 // Optional validation schema for eco-organisme appearing in frame 1
@@ -1145,7 +1320,8 @@ const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
   name: yup.string().notRequired().nullable(),
   phone: yup.string().notRequired().nullable(),
   mail: yup.string().notRequired().nullable(),
-  country: yup.string().notRequired().nullable() // ignored in db schema
+  country: yup.string().notRequired().nullable(), // ignored in db schema
+  omiNumber: yup.string().notRequired().nullable() // ignored in db schema
 });
 
 /**

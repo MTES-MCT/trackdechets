@@ -417,6 +417,12 @@ input EmitterInput {
 
   "Établissement émetteur"
   company: CompanyInput
+
+  "Indique si le détenteur est un particulier ou une entreprise"
+  isPrivateIndividual: Boolean
+
+  "Indique si le détenteur est un navire étranger"
+  isForeignShip: Boolean
 }
 
 """

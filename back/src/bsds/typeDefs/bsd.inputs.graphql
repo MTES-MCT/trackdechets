@@ -30,6 +30,12 @@ input CompanyInput {
 
   "Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise"
   country: String
+
+  """
+  Numéro OMI ou IMO (International Maritime Organization) pour les navires étrangers (sans SIRET).
+  Il est composé des trois lettres IMO suivi d'un nombre de sept chiffres (ex: IMO 1234567).
+  """
+  omiNumber: String
 }
 
 "Filtre pour les établissement"

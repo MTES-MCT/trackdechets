@@ -17,6 +17,7 @@ export const companyFragment = gql`
     country
     phone
     mail
+    omiNumber
   }
 `;
 
@@ -94,6 +95,8 @@ const emitterFragment = gql`
     company {
       ...CompanyFragment
     }
+    isPrivateIndividual
+    isForeignShip
   }
   ${companyFragment}
   ${workSiteFragment}
