@@ -19,22 +19,26 @@ ACCEPTED -.->|markAsResealed| RESEALED(RESEALED)
 TEMP_STORER_ACCEPTED -->|markAsResealed| RESEALED(RESEALED)
 TEMP_STORER_ACCEPTED -.->|markAsProcessed| PROCESSED(PROCESSED / AWAITING_GROUP / NO_TRACEABILITY)
 ```
+
 - Permettre aux forces de l'ordre d’accéder au pdf des bordereaux sur présentation d'un QR-code à durée de vie limitée [PR 1433](https://github.com/MTES-MCT/trackdechets/pull/1433)
 - En tant que particulier ou navire étranger je peux être producteur d'un BSDD [PR 1452](https://github.com/MTES-MCT/trackdechets/pull/1452)
 
 #### :bug: Corrections de bugs
 
 - Correction du code déchet erroné pour les DASRI d'origine animale (18 01 02* => 18 02 02*) [PR 1460](https://github.com/MTES-MCT/trackdechets/pull/1460)
+- Chercher un transporteur étranger ne rafraichit plus la page et sélectionne bien l'entreprise [PR 1468](https://github.com/MTES-MCT/trackdechets/pull/1468)
 
 #### :boom: Breaking changes
+
 #### :nail_care: Améliorations
 
 - Affiche les adresses emails des administrateurs d'un établissement lors d'une demande de rattachement si l'email du requérant appartient au même nom de domaine [PR 1429](https://github.com/MTES-MCT/trackdechets/pull/1429)
 - Ajout de suggestions lors de l'ajout d'un établissement fermé. [PR 1463](https://github.com/MTES-MCT/trackdechets/pull/1463)
 - Ajout de la possibilité de filtrer par numéro SIRET de l'émetteur ou du destinataire dans le tableau de bord [PR 1456](https://github.com/MTES-MCT/trackdechets/pull/1456)
-- Affichage d'un message d'erreur plus explicite à la création d'un BSDD de groupement  [PR 1461](https://github.com/MTES-MCT/trackdechets/pull/1461)
+- Affichage d'un message d'erreur plus explicite à la création d'un BSDD de groupement [PR 1461](https://github.com/MTES-MCT/trackdechets/pull/1461)
 
 #### :memo: Documentation
+
 #### :house: Interne
 
 - Passage à React V18. [PR 1385](https://github.com/MTES-MCT/trackdechets/pull/1385)
