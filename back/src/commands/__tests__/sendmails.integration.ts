@@ -1,8 +1,8 @@
 import axios from "axios";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { CompanyType } from "@prisma/client";
-import { mailQueue } from "../../queue/producer";
-import sendMailJob from "../../queue/jobs/sendmail";
+import { mailQueue } from "../../queue/producers/mail";
+import { sendMailJob } from "../../queue/jobs/sendmail";
 import * as mailing from "../../mailer/mailing";
 import { backend } from "../../mailer";
 

@@ -10,7 +10,17 @@ const { REDIS_URL, QUEUE_NAME_SENDMAIL } = process.env;
 export const mailQueue = new Queue(`${QUEUE_NAME_SENDMAIL}`, `${REDIS_URL}`, {
   defaultJobOptions: {
     removeOnComplete: 10_000
-  }
+  },
+  // Bull docs: https://docs.bullmq.io/guide/rate-limiting
+  // Sendinblue rate limiting docs: https://developers.sendinblue.com/docs/api-limits#general-rate-limiting
+  ...(process.env.JEST_WORKER_ID === undefined && {
+    limiter: {
+      max: process.env.QUEUE_MAXRATE_SENDMAIL
+        ? parseInt(process.env.QUEUE_MAXRATE_SENDMAIL, 10)
+        : 16,
+      duration: 1000
+    }
+  })
 });
 
 /**
@@ -26,6 +36,7 @@ export const addToMailQueue = async (
   // default options can be overwritten by the calling function
   const jobOptions: JobOptions = {
     attempts: 3,
+    // Retry failing jobs: https://docs.bullmq.io/guide/retrying-failing-jobs
     backoff: { type: "exponential", delay: 100 },
     timeout: 10000,
     ...options
