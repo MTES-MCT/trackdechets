@@ -42,6 +42,7 @@ TEMP_STORER_ACCEPTED -.->|markAsProcessed| PROCESSED(PROCESSED / AWAITING_GROUP 
 #### :house: Interne
 
 - Passage à React V18. [PR 1385](https://github.com/MTES-MCT/trackdechets/pull/1385)
+- Passage à Express pour servir le front de production, en remplacement de `serve` [PR 1472](https://github.com/MTES-MCT/trackdechets/pull/1472)
 
 # [2022.06.1] ~06/06/2022
 
