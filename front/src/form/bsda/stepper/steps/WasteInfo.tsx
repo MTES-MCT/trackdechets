@@ -31,6 +31,11 @@ export const BSDA_WASTE_CODES = [
   },
 
   {
+    code: "12 01 16*",
+    description: "déchets de grenaillage contenant des substances dangereuses",
+  },
+
+  {
     code: "15 01 11*",
     description:
       "emballages métalliques contenant une matrice poreuse solide dangereuse (par exemple amiante), y compris des conteneurs à pression vides",
