@@ -85,7 +85,7 @@ Si la requête échoue à cause d'un paramètre invalide, une erreur est retourn
 
 * (D) L'application cliente demande un jeton d'accès au serveur d'autorisation en incluant le code d'autorisation reçu à l'étape précédente en faisant un `POST` sur l'URL `https://api.trackdechets.beta.gouv.fr/oauth2/token`. Cf [https://tools.ietf.org/html/rfc6749#section-4.1.3](https://tools.ietf.org/html/rfc6749#section-4.1.3). Les paramètres suivants doivent être passés en utilisant le format "application/x-www-form-urlencoded".
 
-  - `grant_type=code`
+  - `grant_type=authorization_code`
   - `code={code}` code reçu à l'étape précédente
   - `redirect_uri={redirect_uri}` URL de redirection spécifié à l'étape (A)
 
