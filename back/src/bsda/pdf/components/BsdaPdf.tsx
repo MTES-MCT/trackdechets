@@ -57,7 +57,7 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
                 checked={bsda.type === "OTHER_COLLECTIONS"}
                 readOnly
               />{" "}
-              la collecte amiante sur un chantier{" "}
+              la collecte d'amiante sur un chantier{" "}
               <input
                 type="checkbox"
                 checked={bsda.type === "COLLECTION_2710"}
