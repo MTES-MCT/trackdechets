@@ -4,7 +4,11 @@ import { ActionLink } from "common/components";
 import { generatePath, useLocation, useRouteMatch } from "react-router-dom";
 
 import "@reach/menu-button/styles.css";
-import { IconCheckCircle1, IconPaperWrite } from "common/components/Icons";
+import {
+  IconCheckCircle1,
+  IconShipmentSignSmartphone,
+  IconPaperWrite,
+} from "common/components/Icons";
 
 import routes from "common/routes";
 
@@ -98,7 +102,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
             {!isSynthesis && (
               <ActionLink
                 className="tw-mb-1"
-                icon={<IconCheckCircle1 size="24px" />}
+                icon={<IconShipmentSignSmartphone size="24px" />}
                 to={{
                   pathname: generatePath(
                     routes.dashboard.bsdasris.sign.emissionSecretCode,
@@ -110,7 +114,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
                   state: { background: location },
                 }}
               >
-                Signature émetteur (code secret)
+                Signature émetteur
               </ActionLink>
             )}
 
