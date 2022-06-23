@@ -69,12 +69,7 @@ export default function CompanySelector({
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
   const [field] = useField<FormCompany>({ name });
-  const {
-    setFieldError,
-    setFieldValue,
-    setFieldTouched,
-    resetForm,
-  } = useFormikContext();
+  const { setFieldError, setFieldValue, setFieldTouched } = useFormikContext();
   const { values } = useFormikContext<FormCompany>();
   const [clue, setClue] = useState("");
   const [department, setDepartement] = useState<null | string>(null);
@@ -109,7 +104,6 @@ export default function CompanySelector({
           cogoToast.error(
             "Cet établissement n'est pas enregistré sur Trackdéchets, nous ne pouvons l'ajouter dans ce formulaire"
           );
-          resetCompany();
           return;
         }
         if (companyInfos.name === "---") {
@@ -124,13 +118,6 @@ export default function CompanySelector({
     },
     fetchPolicy: "no-cache",
   });
-
-  const resetCompany = useCallback(() => {
-    resetForm();
-    if (onCompanySelected) {
-      onCompanySelected({});
-    }
-  }, [resetForm, onCompanySelected]);
 
   const selectCompany = useCallback(
     (company: CompanyFavorite) => {
