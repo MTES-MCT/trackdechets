@@ -107,7 +107,7 @@ export default function MarkAsResealed({ form }: WorkflowActionProps) {
               <Form>
                 {form.status !== FormStatus.TempStorerAccepted && (
                   <div className="notification notification--warning">
-                    Attention : vous vous apprêtez à ajouter une étape
+                    Attention, vous vous apprêtez à ajouter une étape
                     d'entreposage provisoire ou de reconditionnement sur un BSDD
                     pour lequel cette étape n'était pas prévue initialement.
                   </div>
