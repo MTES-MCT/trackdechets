@@ -1,4 +1,5 @@
 @import "src/scss/Constants.scss";
+@import "src/scss/Breakpoints.scss";
 
 .Table {
   width: 100%;
@@ -25,10 +26,15 @@
   font-size: 14px;
   padding: 8px 20px;
   border-bottom: 1px solid $grey-light;
-  
+  max-width: 220px;
+  word-wrap: break-word;
+
+  @include xl-desktop {
+    max-width: 400px;
+  }
 }
 
-.TableRowDigest .TableCell{
+.TableRowDigest .TableCell {
   border-top: 3px solid $grey-light;
 }
 
