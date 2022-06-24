@@ -1,15 +1,16 @@
+import React, { useCallback } from "react";
+import cogoToast from "cogo-toast";
 import classNames from "classnames";
+import Select from "react-select";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import TdSwitch from "common/components/Switch";
 import Tooltip from "common/components/Tooltip";
 import ProcessingOperation from "form/common/components/processing-operation/ProcessingOperation";
 import { Field, useFormikContext } from "formik";
 import { isDangerous } from "generated/constants";
-import { Form } from "generated/graphql/types";
-import React from "react";
+import { CompanySearchResult, Form } from "generated/graphql/types";
 import CompanySelector from "../common/components/company/CompanySelector";
 import DateInput from "../common/components/custom-inputs/DateInput";
-import { RadioButton } from "../common/components/custom-inputs/RadioButton";
 import TemporaryStorage from "./components/temporaryStorage/TemporaryStorage";
 import styles from "./Recipient.module.scss";
 import {
@@ -17,38 +18,83 @@ import {
   getInitialTemporaryStorageDetail,
   getInitialTrader,
 } from "./utils/initial-state";
+import { IconClose } from "common/components/Icons";
+
+type IntermediariesSelect = {
+  value: string;
+  label: string;
+};
 
 export default function Recipient() {
   const { values, setFieldValue } = useFormikContext<Form>();
-
   const hasTrader = !!values.trader;
   const hasBroker = !!values.broker;
   const isTempStorage = !!values.recipient?.isTempStorage;
   const isDangerousWaste = isDangerous(values.wasteDetails?.code ?? "");
+  // limite arbitraire du nombre d'intermédiaires qu'on peut ajouter
+  const isAddIntermediaryButtonEnabled = values.intermediaries.length <= 20;
 
-  function handleNoneToggle() {
-    setFieldValue("broker", null, false);
-    setFieldValue("trader", null, false);
-  }
+  const intermediariesOptions: IntermediariesSelect[] = [
+    ...(!hasTrader && !hasBroker
+      ? [
+          {
+            value: "TRADER",
+            label: "Je suis passé par un négociant",
+          },
+        ]
+      : []),
+    ...(!hasTrader && !hasBroker
+      ? [
+          {
+            value: "BROKER",
+            label: "Je suis passé par un courtier",
+          },
+        ]
+      : []),
+    ...(isAddIntermediaryButtonEnabled
+      ? [
+          {
+            value: "INTERMEDIARY",
+            label: "Ajouter un autre type d'intermédiaire",
+          },
+        ]
+      : []),
+  ];
 
   function handleTraderToggle() {
-    if (hasTrader) {
-      // the switch is toggled off, set trader to null
-      setFieldValue("trader", null, false);
-    } else {
-      // the switch is toggled on, set trader to initial value
-      setFieldValue("broker", null, false);
-      setFieldValue("trader", getInitialTrader(), false);
-    }
+    setFieldValue("trader", getInitialTrader(), false);
   }
 
   function handleBrokerToggle() {
-    if (hasBroker) {
-      setFieldValue("broker", null, false);
-    } else {
-      setFieldValue("trader", null, false);
-      setFieldValue("broker", getInitialBroker(), false);
-    }
+    setFieldValue("broker", getInitialBroker(), false);
+  }
+
+  function handleIntermediaryAdd() {
+    setFieldValue(
+      "intermediaries",
+      values.intermediaries.concat([
+        {
+          siret: "",
+          name: "",
+          address: "",
+          contact: "",
+          mail: "",
+          phone: "",
+          vatNumber: "",
+          country: "",
+        },
+      ])
+    );
+    const { hide } = cogoToast.success(
+      "Nouvel intermédiaire ajouté en bas de page: merci de chercher un SIRET ou un nom d'entreprise pour lancer une recherche.",
+      {
+        hideAfter: 3,
+        position: "bottom-right",
+        onClick: () => {
+          if (hide) hide();
+        },
+      }
+    );
   }
 
   function handleTempStorageToggle(checked) {
@@ -66,6 +112,44 @@ export default function Recipient() {
       setFieldValue("temporaryStorageDetail", null, false);
     }
   }
+
+  function removeIntermediary(index) {
+    setFieldValue(
+      "intermediaries",
+      values.intermediaries.filter((_, idx) => index !== idx)
+    );
+  }
+
+  /**
+   * Callback on company result click
+   */
+  const selectIntermediary = useCallback((company: CompanySearchResult) => {
+    if (!company) {
+      const { hide } = cogoToast.error(
+        `Intermédiaire: aucun établissement sélectionné`,
+        {
+          hideAfter: 3,
+          position: "bottom-right",
+          onClick: () => {
+            if (hide) hide();
+          },
+        }
+      );
+      return;
+    }
+    if (company.isRegistered === false) {
+      const { hide } = cogoToast.warn(
+        `Intermédiaire: l'établissement sélectionné n'est pas enregistré sur Trackdéchets, le suivi du bordereau ne sera pas possible sur la plateforme`,
+        {
+          hideAfter: 3,
+          position: "bottom-right",
+          onClick: () => {
+            if (hide) hide();
+          },
+        }
+      );
+    }
+  }, []);
 
   return (
     <>
@@ -134,31 +218,24 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
         </label>
       </div>
       <div className="form__row">
-        <div className="tw-flex">
-          <legend className="tw-font-semibold"> Intermédiaire :</legend>
-          <Field
-            name="intermediate"
-            id="NONE"
-            label="Aucun"
-            component={RadioButton}
-            onChange={handleNoneToggle}
-            checked={!hasTrader && !hasBroker}
-          />
-          <Field
-            name="intermediate"
-            id="TRADER"
-            component={RadioButton}
-            checked={hasTrader}
-            onChange={handleTraderToggle}
-            label="Je suis passé par un négociant"
-          />
-          <Field
-            name="intermediate"
-            id="BROKER"
-            label="Je suis passé par un courtier"
-            component={RadioButton}
-            checked={hasBroker}
-            onChange={handleBrokerToggle}
+        <div className="td-input">
+          <label> Ajout d'intermédiaires:</label>
+          <Select
+            placeholder="Ajouter un intermédiaire"
+            options={intermediariesOptions}
+            onChange={option => {
+              switch ((option as IntermediariesSelect).value) {
+                case "INTERMEDIARY":
+                  return handleIntermediaryAdd();
+                case "TRADER":
+                  return handleTraderToggle();
+                case "BROKER":
+                  return handleBrokerToggle();
+                default:
+                  return;
+              }
+            }}
+            classNamePrefix="react-select"
           />
         </div>
       </div>
@@ -225,6 +302,17 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
 
             <RedErrorMessage name="trader.validityLimit" />
           </div>
+          <div className="tw-mt-2">
+            <button
+              className="btn btn--danger tw-mr-1"
+              type="button"
+              onClick={async () => {
+                setFieldValue("trader", null, false);
+              }}
+            >
+              Supprimer le négociant
+            </button>
+          </div>
         </div>
       )}
       {hasBroker && (
@@ -290,8 +378,66 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
 
             <RedErrorMessage name="broker.validityLimit" />
           </div>
+          <div className="tw-mt-2">
+            <button
+              className="btn btn--danger tw-mr-1"
+              type="button"
+              onClick={async () => {
+                setFieldValue("broker", null, false);
+              }}
+            >
+              Supprimer le courtier
+            </button>
+          </div>
         </div>
       )}
+      <div className="form__row">
+        {values.intermediaries?.length ? (
+          <h4 className="form__section-heading">
+            Autre type d'intermédiaire
+            {values.intermediaries?.length > 1 ? "s" : ""}
+          </h4>
+        ) : (
+          ""
+        )}
+        {values.intermediaries?.length
+          ? values.intermediaries?.map((p, index) => (
+              <div
+                key={`inter-${index}`}
+                className="tw-border-2 tw-border-gray-400 tw-border-solid tw-rounded-md tw-px-4 tw-py-2 tw-mb-2"
+              >
+                <button
+                  type="button"
+                  className="btn btn--slim btn--small tw-pr-2 tw-pl-2 tw-float-right"
+                  onClick={() => removeIntermediary(index)}
+                >
+                  <IconClose />
+                </button>
+                <CompanySelector
+                  name={`intermediaries.${index}`}
+                  allowForeignCompanies={false}
+                  optionalMail={true}
+                  skipFavorite={true}
+                  optional={true}
+                  onCompanySelected={intermediary => {
+                    selectIntermediary(intermediary);
+                  }}
+                />
+                <div className="tw-mt-2">
+                  <button
+                    className="btn btn--danger tw-mr-1"
+                    type="button"
+                    onClick={() => {
+                      removeIntermediary(index);
+                    }}
+                  >
+                    Supprimer l'intermédiaire
+                  </button>
+                </div>
+              </div>
+            ))
+          : ""}
+      </div>
       {isTempStorage && values.temporaryStorageDetail && (
         <TemporaryStorage name="temporaryStorageDetail" />
       )}

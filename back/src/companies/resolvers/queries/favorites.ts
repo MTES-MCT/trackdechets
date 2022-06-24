@@ -72,6 +72,7 @@ function companyToFavorite(
     contact: company.contact,
     phone: company.contactPhone,
     mail: company.contactEmail,
+    isRegistered: !!company,
     codePaysEtrangerEtablissement: !company.vatNumber
       ? "FR"
       : checkVAT(company.vatNumber, countries)?.country?.isoCode.short,
@@ -85,10 +86,12 @@ function companySearchResultToFavorite(
   return {
     name: companySearchResult.name,
     siret: companySearchResult.siret,
+    vatNumber: companySearchResult.vatNumber,
     address: companySearchResult.address,
     contact: companySearchResult.contact,
     phone: companySearchResult.contactPhone ?? "",
-    mail: companySearchResult.contactEmail ?? ""
+    mail: companySearchResult.contactEmail ?? "",
+    isRegistered: companySearchResult.isRegistered
   };
 }
 

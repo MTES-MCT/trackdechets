@@ -218,6 +218,8 @@ type CompanySearchResult {
   contactEmail: String
   "Numéro de téléphone de contact"
   contactPhone: String
+  "Nom et prénom de contact"
+  contact: String
   "Site web"
   website: String
   """
@@ -467,4 +469,31 @@ type Installation {
 
   "Liste des déclarations GEREP"
   declarations: [Declaration!]
+}
+
+enum EtatAdministratif {
+  A
+  F
+}
+
+enum StatutDiffusionEtablissement {
+  O
+  N
+}
+
+"""
+Informations minimal sur une entreprise identifiée par son siret
+validées par requête à l'INSEE
+"""
+type CompanyValidationInfos {
+  siret: String!
+  vatNumber: String
+  address: String
+  name: String
+  "Enregistré sur Trackdéchets"
+  isRegistered: Boolean!
+  "Statuts de diffusion autorisée ou non selon l'INSEE"
+  statutDiffusionEtablissement: StatutDiffusionEtablissement
+  "Etat ouvert ou fermé selon l'INSEE"
+  etatAdministratif: EtatAdministratif
 }

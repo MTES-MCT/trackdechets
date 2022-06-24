@@ -253,7 +253,8 @@ describe("Mutation.createForm", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Seul les numéros de TVA en France sont valides",
+        message:
+          "Intermédiaires: seul les numéros de TVA en France sont valides",
         extensions: {
           code: "BAD_USER_INPUT"
         }
@@ -284,7 +285,7 @@ describe("Mutation.createForm", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Le N°SIRET est obligatoire pour une entreprise intermédiaire",
+        message: "Intermédiaires: le N° SIRET est obligatoire",
         extensions: {
           code: "BAD_USER_INPUT"
         }

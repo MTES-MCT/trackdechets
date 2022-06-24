@@ -99,6 +99,24 @@ export function getInitialEcoOrganisme(ecoOrganisme?: FormEcoOrganisme | null) {
 }
 
 /**
+ * Computes initial values for Form.intermediaries
+ */
+export function getInitialIntermediaries(intermediaries?: FormCompany[]) {
+  return intermediaries
+    ? intermediaries.map(company => ({
+        siret: company?.siret ?? "",
+        name: company?.name ?? "",
+        address: company?.address ?? "",
+        contact: company?.contact ?? "",
+        mail: company?.mail ?? "",
+        phone: company?.phone ?? "",
+        vatNumber: company?.vatNumber ?? "",
+        country: company?.country ?? "",
+      }))
+    : [];
+}
+
+/**
  * Computes initial values of Formik's form by merging
  * default values to the current draft form (if any)
  * @param f current BSD
@@ -173,5 +191,6 @@ export function getInitialState(f?: Form | null): FormInput {
     temporaryStorageDetail: f?.temporaryStorageDetail
       ? getInitialTemporaryStorageDetail(f?.temporaryStorageDetail)
       : null,
+    intermediaries: getInitialIntermediaries(f?.intermediaries),
   };
 }

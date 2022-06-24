@@ -38,7 +38,10 @@ export async function searchCompany(
   let companyInfo: SireneSearchResult | CompanyVatSearchResult;
   // search for test or anonymous companies first
   const anonymousCompany = await prisma.anonymousCompany.findUnique({
-    where: { siret: cleanClue }
+    where: {
+      ...(isSiret(cleanClue) && { siret: cleanClue }),
+      ...(!isSiret(cleanClue) && isVat(cleanClue) && { vatNumber: cleanClue })
+    }
   });
   if (anonymousCompany) {
     companyInfo = {
@@ -64,9 +67,7 @@ export async function searchCompany(
       companyInfo = await searchVatFrOnlyOrNotFound(cleanClue);
     }
   }
-
-  // append Company data
-  // data is null if the company is not registered in TD
+  // Concaténer données Company
   const where = {
     ...(isSiret(cleanClue) && { where: { siret: cleanClue } }),
     ...(isVat(cleanClue) && { where: { vatNumber: cleanClue } })
@@ -92,9 +93,10 @@ export async function searchCompany(
   return {
     // ensure compatibility with CompanyPublic
     ecoOrganismeAgreements: [],
-    isRegistered: trackdechetsCompanyInfo != null,
+    isRegistered: trackdechetsCompanyInfo !== null,
     companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
     ...convertUrls(trackdechetsCompanyInfo),
+    // override database infos with Sirene or VAT search
     ...companyInfo
   };
 }
@@ -104,8 +106,7 @@ export const makeSearchCompanies =
   ({ searchCompany }: SearchCompaniesDeps) =>
   (clue: string, department?: string) => {
     // clue can be formatted like a SIRET or a VAT number
-    // but we don't want to search  for VAT numbers
-    if (isSiret(clue)) {
+    if (isSiret(clue) || isVat(clue)) {
       return searchCompany(clue)
         .then(c =>
           // Exclude closed companies

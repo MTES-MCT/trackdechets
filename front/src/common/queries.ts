@@ -76,7 +76,7 @@ export const GET_BSDS = gql`
             ...FullForm
           }
           ... on Bsdasri {
-            ...DasriFragment
+            ...DashboardDasriFragment
           }
           ... on Bsvhu {
             ...VhuFragment
