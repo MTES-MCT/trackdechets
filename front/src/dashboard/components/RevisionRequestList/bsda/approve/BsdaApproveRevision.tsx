@@ -2,6 +2,7 @@ import React from "react";
 import * as yup from "yup";
 import {
   BsdaBroker,
+  BsdaPackaging,
   BsdaRevisionRequest,
   Mutation,
   MutationSubmitBsdaRevisionRequestApprovalArgs,
@@ -20,6 +21,7 @@ import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { formatDate } from "common/datetime";
 import { RevisionField } from "../../bsdd/approve/RevisionField";
 import { useParams } from "react-router-dom";
+import { PACKAGINGS_NAMES } from "form/bsda/components/packagings/Packagings";
 
 type Props = {
   review: BsdaRevisionRequest;
@@ -161,6 +163,7 @@ export function DisplayRevision({ review }: Props) {
         label="Conditionnement"
         bsddValue={review.bsda.packagings}
         reviewValue={review.content.packagings}
+        formatter={packagingsFormatter}
       />
 
       <RevisionField
@@ -240,4 +243,14 @@ function sealNumbersFormatter(entity: string[] | undefined): React.ReactNode {
   if (!entity) return null;
 
   return entity.join(", ");
+}
+
+function packagingsFormatter(
+  entity: BsdaPackaging[] | undefined
+): React.ReactNode {
+  if (!entity?.length) return null;
+
+  return entity
+    .map(p => `${p.quantity} ${PACKAGINGS_NAMES[p.type]}`)
+    .join(", ");
 }
