@@ -9,7 +9,13 @@ const reviewFragment = gql`
       readableId
       wasteDetails {
         code
+        name
         pop
+        packagingInfos {
+          type
+          other
+          quantity
+        }
       }
       trader {
         company {
@@ -32,6 +38,7 @@ const reviewFragment = gql`
       }
       quantityReceived
       processingOperationDone
+      processingOperationDescription
       temporaryStorageDetail {
         destination {
           cap
@@ -50,7 +57,13 @@ const reviewFragment = gql`
     content {
       wasteDetails {
         code
+        name
         pop
+        packagingInfos {
+          type
+          other
+          quantity
+        }
       }
       trader {
         company {
@@ -73,6 +86,7 @@ const reviewFragment = gql`
       }
       quantityReceived
       processingOperationDone
+      processingOperationDescription
       temporaryStorageDetail {
         destination {
           cap

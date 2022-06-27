@@ -27,19 +27,20 @@ import {
   toAllWaste as bsdasriToAllWaste
 } from "../bsdasris/registry";
 import {
-  toIncomingWastes as formToIncomingWastes,
-  toOutgoingWastes as formToOutgoingWastes,
-  toTransportedWastes as formToTransportedWastes,
-  toManagedWastes as formToManagedWastes,
-  toAllWastes as formToAllWastes
+  toIncomingWaste as formToIncomingWaste,
+  toOutgoingWaste as formToOutgoingWaste,
+  toTransportedWaste as formToTransportedWaste,
+  toManagedWaste as formToManagedWaste,
+  toAllWaste as formToAllWaste
 } from "../forms/registry";
 
 import { GenericWaste } from "./types";
 import { PrismaBsdMap } from "../common/elastic";
 import { WasteRegistryType } from "../generated/graphql/types";
+import { formToBsdd } from "../forms/compat";
 
 const bsdsToIncomingWastes = {
-  BSDD: formToIncomingWastes,
+  BSDD: formToIncomingWaste,
   BSDA: bsdaToIncomingWaste,
   BSDASRI: bsdasriToIncomingWaste,
   BSVHU: bsvhuToIncomingWaste,
@@ -47,7 +48,7 @@ const bsdsToIncomingWastes = {
 };
 
 const bsdsToOutgoingWastes = {
-  BSDD: formToOutgoingWastes,
+  BSDD: formToOutgoingWaste,
   BSDA: bsdaToOutgoingWaste,
   BSDASRI: bsdasriToOutgoingWaste,
   BSVHU: bsvhuToOutgoingWaste,
@@ -55,7 +56,7 @@ const bsdsToOutgoingWastes = {
 };
 
 const bsdsToTransportedWastes = {
-  BSDD: formToTransportedWastes,
+  BSDD: formToTransportedWaste,
   BSDA: bsdaToTransportedWaste,
   BSDASRI: bsdasriToTransportedWaste,
   BSVHU: bsvhuToTransportedWaste,
@@ -63,7 +64,7 @@ const bsdsToTransportedWastes = {
 };
 
 const bsdsToManagedWastes = {
-  BSDD: formToManagedWastes,
+  BSDD: formToManagedWaste,
   BSDA: bsdaToManagedWaste,
   BSDASRI: bsdasriToManagedWaste,
   BSVHU: bsvhuToManagedWaste,
@@ -71,7 +72,7 @@ const bsdsToManagedWastes = {
 };
 
 const bsdsToAllWastes = {
-  BSDD: formToAllWastes,
+  BSDD: formToAllWaste,
   BSDA: bsdaToAllWaste,
   BSDASRI: bsdasriToAllWaste,
   BSVHU: bsvhuToAllWaste,
@@ -96,14 +97,13 @@ type WasteMap<WasteType> = {
 
 export function toWastes<WasteType extends GenericWaste>(
   registryType: WasteRegistryType,
-  sirets: string[],
   bsds: PrismaBsdMap
 ): WasteMap<WasteType> {
   const converter = bsdsToWastes[registryType];
   const { bsdds, bsdas, bsdasris, bsvhus, bsffs } = bsds;
 
   return {
-    BSDD: bsdds.map(bsd => converter.BSDD(bsd, sirets)).flat(),
+    BSDD: bsdds.map(form => converter.BSDD(formToBsdd(form))),
     BSDASRI: bsdasris.map(converter.BSDASRI),
     BSVHU: bsvhus.map(converter.BSVHU),
     BSDA: bsdas.map(converter.BSDA),

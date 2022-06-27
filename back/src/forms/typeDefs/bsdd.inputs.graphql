@@ -356,7 +356,10 @@ input DestinationInput {
   "Opération d'élimination / valorisation prévue (code D/R)"
   processingOperation: String
 
-  "Indique si c'est l'émetteur initial ou l'installation d'entreposage ou de reconditionnement qui a saisi les informations"
+  """
+  DEPRECATED (ce champ peut être omis, il n'est plus pris en charge) - Indique si c'est l'émetteur initial ou l'installation d'entreposage
+  ou de reconditionnement qui a saisi les informations
+  """
   isFilledByEmitter: Boolean
 }
 
@@ -414,6 +417,12 @@ input EmitterInput {
 
   "Établissement émetteur"
   company: CompanyInput
+
+  "Indique si le détenteur est un particulier ou une entreprise"
+  isPrivateIndividual: Boolean
+
+  "Indique si le détenteur est un navire étranger"
+  isForeignShip: Boolean
 }
 
 """
@@ -809,6 +818,9 @@ input FormRevisionRequestContentInput {
   "Traitement réalisé (code D/R)"
   processingOperationDone: String
 
+  "Description de l'opération d’élimination / valorisation (case 11)"
+  processingOperationDescription: String
+
   "Entreposage provisoire (édition partielle uniquement)"
   temporaryStorageDetail: FormRevisionRequestTemporaryStorageDetailInput
 }
@@ -817,8 +829,14 @@ input FormRevisionRequestWasteDetailsInput {
   "Code CED"
   code: String
 
+  "Description du déchet"
+  name: String
+
   "Contient des Polluants Organiques Persistants (POP) oui / non"
   pop: Boolean
+
+  "Conditionnements"
+  packagingInfos: [PackagingInfoInput!]
 }
 
 input FormRevisionRequestRecipientInput {

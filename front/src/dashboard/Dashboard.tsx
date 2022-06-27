@@ -31,6 +31,7 @@ import {
 import { RouteBSDasrisSignEmissionSecretCode } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasriSecretCode";
 import { RoutePublishBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RoutePublishBsdasri";
 import { RouteSignBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
+import { RouteControlPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/RouteControlPdf";
 import {
   RouteBSDasrisView,
   RouteBsvhusView,
@@ -43,6 +44,7 @@ import { RouteBsdsReview } from "./bsds/review";
 import { RouteBsddRequestRevision } from "./components/RevisionRequestList/bsdd/request/RouteBsddRequestRevision";
 import { DashboardTabs } from "./DashboardTabs";
 import SideMenu from "common/components/SideMenu";
+import { RouteBsdaRequestRevision } from "./components/RevisionRequestList/bsda/request";
 
 export const GET_ME = gql`
   {
@@ -146,6 +148,9 @@ export default function Dashboard() {
             <Route path={routes.dashboard.bsdas.view}>
               <RouteBSDasView />
             </Route>
+            <Route path={routes.dashboard.bsdas.review}>
+              <RouteBsdaRequestRevision />
+            </Route>
             <Route path={routes.dashboard.bsffs.view}>
               <RouteBsffsView />
             </Route>
@@ -207,6 +212,15 @@ export default function Dashboard() {
                   wide={true}
                 >
                   <RouteBsddRequestRevision />
+                </Modal>
+              </Route>
+              <Route path={routes.dashboard.roadControl}>
+                <Modal
+                  onClose={() => history.goBack()}
+                  ariaLabel="Contrôle routier"
+                  isOpen
+                >
+                  <RouteControlPdf />
                 </Modal>
               </Route>
               <Route path={routes.dashboard.bsdasris.sign.publish}>
@@ -325,6 +339,17 @@ export default function Dashboard() {
                   wide={true}
                 >
                   <RouteBSDasView />
+                </Modal>
+              </Route>
+              <Route path={routes.dashboard.bsdas.review}>
+                <Modal
+                  onClose={() => history.goBack()}
+                  ariaLabel="Demande de révision"
+                  isOpen
+                  padding={false}
+                  wide={true}
+                >
+                  <RouteBsdaRequestRevision />
                 </Modal>
               </Route>
               <Route path={routes.dashboard.bsffs.view}>

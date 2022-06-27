@@ -107,7 +107,10 @@ export const MISSING_COMPANY_CONTACT =
 export const MISSING_COMPANY_PHONE =
   "Le téléphone de l'entreprise est obligatoire";
 export const MISSING_COMPANY_EMAIL = "L'email de l'entreprise est obligatoire";
-
+export const MISSING_COMPANY_OMI_NUMBER =
+  "Le numéro OMI (Organisation maritime international) de l'entreprise est obligatoire";
+export const INVALID_COMPANY_OMI_NUMBER =
+  "Le numéro OMI (Organisation maritime international) de l'entreprise doit se composer des trois lettres OMI suivives de 7 chiffres (ex. OMI1234567)";
 export const INVALID_SIRET_LENGTH =
   "Le SIRET doit faire 14 caractères numériques";
 
@@ -121,3 +124,6 @@ export const INVALID_WASTE_CODE =
   "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement.";
 
 export const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseignée ne permet pas de destination ultérieure`;
+
+export const INVALID_INDIVIDUAL_OR_FOREIGNSHIP =
+  "Ne peut pas être à la fois un particulier et un navire étranger";

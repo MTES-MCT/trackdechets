@@ -32,3 +32,33 @@ enum WasteAcceptationStatus {
   "Refus partiel"
   PARTIALLY_REFUSED
 }
+
+"Statut d'une demande de révision"
+enum RevisionRequestStatus {
+  "En attente de validation"
+  PENDING
+  "Acceptée"
+  ACCEPTED
+  "Refusée"
+  REFUSED
+}
+
+"Statut d'une demande d'approbation sur une révision"
+enum RevisionRequestApprovalStatus {
+  "En attente de validation"
+  PENDING
+  "Annulée - quand un des approbateurs refuse la révision, toutes les approbations en attente sont annulées et la révision est refusée"
+  CANCELED
+  "Acceptée"
+  ACCEPTED
+  "Refusée"
+  REFUSED
+}
+
+"Dénomination de l'auteur de la signature"
+enum SignatureAuthor {
+  "L'auteur de la signature est l'émetteur du déchet"
+  EMITTER
+  "L'auteur de la signature est l'éco-organisme figurant sur le BSD"
+  ECO_ORGANISME
+}

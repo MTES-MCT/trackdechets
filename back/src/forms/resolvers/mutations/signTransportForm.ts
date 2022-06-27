@@ -1,5 +1,5 @@
-import { Form, Status } from "@prisma/client";
-import { UserInputError } from "apollo-server-express";
+import { Form, Prisma, Status } from "@prisma/client";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import {
   MutationResolvers,
   Form as GraphQLForm,
@@ -12,6 +12,38 @@ import { EventType } from "../../workflow/types";
 import { checkCanSignFor } from "../../permissions";
 import { expandFormFromDb } from "../../form-converter";
 
+/**
+ * Common function for signing
+ */
+const signedByTransporterFn = async (user, args, existingForm) => {
+  await checkCanSignFor(
+    existingForm.transporterCompanySiret,
+    user,
+    args.securityCode
+  );
+  const formUpdateInput = {
+    takenOverAt: args.input.takenOverAt,
+    takenOverBy: args.input.takenOverBy,
+    transporterNumberPlate:
+      args.input.transporterNumberPlate ?? existingForm.transporterNumberPlate,
+
+    currentTransporterSiret: existingForm.transporterCompanySiret,
+
+    // The following fields are deprecated
+    // but we need to fill them until we remove them completely
+    signedByTransporter: true,
+    sentAt: args.input.takenOverAt,
+    sentBy: existingForm.emittedBy
+  };
+
+  const updatedForm = await transitionForm(user, existingForm, {
+    type: EventType.SignedByTransporter,
+    formUpdateInput
+  });
+
+  return expandFormFromDb(updatedForm);
+};
+
 const signatures: Partial<
   Record<
     Status,
@@ -22,59 +54,46 @@ const signatures: Partial<
     ) => Promise<GraphQLForm>
   >
 > = {
-  [Status.SIGNED_BY_PRODUCER]: async (user, args, existingForm) => {
-    await checkCanSignFor(
-      existingForm.transporterCompanySiret,
-      user,
-      args.securityCode
-    );
-
-    const formUpdateInput = {
-      takenOverAt: args.input.takenOverAt,
-      takenOverBy: args.input.takenOverBy,
-      transporterNumberPlate:
-        args.input.transporterNumberPlate ??
-        existingForm.transporterNumberPlate,
-
-      currentTransporterSiret: existingForm.transporterCompanySiret,
-
-      // The following fields are deprecated
-      // but we need to fill them until we remove them completely
-      signedByTransporter: true,
-      sentAt: args.input.takenOverAt,
-      sentBy: existingForm.emittedBy
-    };
-
-    const updatedForm = await transitionForm(user, existingForm, {
-      type: EventType.SignedByTransporter,
-      formUpdateInput
-    });
-
-    return expandFormFromDb(updatedForm);
+  [Status.SEALED]: async (user, args, existingForm) => {
+    // no signature needed
+    if (
+      existingForm.emitterIsPrivateIndividual === true ||
+      (existingForm.emitterIsForeignShip === true &&
+        existingForm.emitterCompanyOmiNumber)
+    ) {
+      return signedByTransporterFn(user, args, existingForm);
+    } else {
+      throw new ForbiddenError(
+        "Vous n'êtes pas autorisé à signer ce bordereau"
+      );
+    }
   },
+  [Status.SIGNED_BY_PRODUCER]: async (user, args, existingForm) =>
+    signedByTransporterFn(user, args, existingForm),
   [Status.SIGNED_BY_TEMP_STORER]: async (user, args, existingForm) => {
     const existingFullForm = await getFullForm(existingForm);
 
     await checkCanSignFor(
-      existingFullForm.temporaryStorageDetail.transporterCompanySiret,
+      existingFullForm.forwardedIn.transporterCompanySiret,
       user,
       args.securityCode
     );
 
-    const formUpdateInput = {
-      temporaryStorageDetail: {
+    const formUpdateInput: Prisma.FormUpdateInput = {
+      forwardedIn: {
         update: {
+          status: Status.SENT,
           takenOverAt: args.input.takenOverAt,
           takenOverBy: args.input.takenOverBy,
           transporterNumberPlate:
             args.input.transporterNumberPlate ??
-            existingFullForm.temporaryStorageDetail.transporterNumberPlate,
+            existingFullForm.forwardedIn.transporterNumberPlate,
 
           // The following fields are deprecated
           // but we need to fill them until we remove them completely
           signedByTransporter: true,
-          signedAt: args.input.takenOverAt,
-          signedBy: existingFullForm.temporaryStorageDetail.emittedBy
+          sentAt: args.input.takenOverAt,
+          sentBy: existingForm.emittedBy
         }
       }
     };

@@ -1,11 +1,9 @@
 import { Bsda } from "@prisma/client";
 import { FormNotFound } from "../forms/errors";
-import prisma from "../prisma";
+import { getReadonlyBsdaRepository } from "./repository";
 
 export async function getBsdaOrNotFound(id: string) {
-  const form = await prisma.bsda.findUnique({
-    where: { id }
-  });
+  const form = await getReadonlyBsdaRepository().findUnique({ id });
 
   if (form == null || form.isDeleted == true) {
     throw new FormNotFound(id.toString());
@@ -18,12 +16,13 @@ export async function getBsdaOrNotFound(id: string) {
  * Returns direct parents of a BSDA
  */
 export async function getPreviousBsdas(bsda: Bsda) {
+  const bsdaRepository = getReadonlyBsdaRepository();
   const forwardedBsda = bsda.forwardingId
-    ? await prisma.bsda.findUnique({ where: { id: bsda.forwardingId } })
+    ? await bsdaRepository.findUnique({ id: bsda.forwardingId })
     : null;
 
-  const groupedBsdas = await prisma.bsda
-    .findUnique({ where: { id: bsda.id } })
+  const groupedBsdas = await bsdaRepository
+    .findRelatedEntity({ id: bsda.id })
     .grouping();
 
   return [forwardedBsda, ...groupedBsdas].filter(Boolean);

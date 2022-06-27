@@ -23,6 +23,7 @@ import { Bsvhu, BsvhuStatus } from "generated/graphql/types";
 import { DeleteBsvhuModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";
 import { useDuplicate } from "./useDuplicate";
+import { TableRoadControlButton } from "../../RoadControlButton";
 
 import styles from "../../BSDActions.module.scss";
 import { Loader } from "common/components";
@@ -73,6 +74,8 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
+              <TableRoadControlButton siret={siret} form={form} />
+
               {!form.isDraft && (
                 <MenuItem onSelect={() => downloadPdf()}>
                   <IconPdf size="24px" color="blueLight" />

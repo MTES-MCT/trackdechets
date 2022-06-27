@@ -35,7 +35,7 @@ type Bsda {
   "Courtier"
   broker: BsdaBroker
 
-  "Dénomination du déchet"
+  "Description du déchet"
   waste: BsdaWaste
   "Conditionnement"
   packagings: [BsdaPackaging!]
@@ -189,7 +189,7 @@ type BsdaDestination {
 type BsdaReception {
   "Date de présentation sur site"
   date: DateTime
-  "Poids présentée"
+  "Poids présenté"
   weight: Float
   "Lot accepté, accepté partiellement ou refusé"
   acceptationStatus: WasteAcceptationStatus
@@ -283,4 +283,115 @@ type BsdaError {
   message: String!
   path: String!
   requiredFor: BsdaSignatureType!
+}
+
+"Demande de révision Bsda"
+type BsdaRevisionRequest {
+  "Identifiant de la demande de révison"
+  id: ID!
+
+  "Aperçu du bordereau concerné au moment de la création de la demande de révision. Il ne reflète pas le bordereau actuel."
+  bsda: Bsda!
+
+  "Date de création de la demande"
+  createdAt: DateTime
+
+  "Entreprise à l'origine de la demande de révision"
+  authoringCompany: FormCompany!
+
+  "Liste des approbations apposées sur la révision"
+  approvals: [BsdaRevisionRequestApproval!]!
+
+  "Contenu de la révision"
+  content: BsdaRevisionRequestContent!
+
+  "Commentaire explicatif, saisi par l'auteur de la demande de révision"
+  comment: String!
+
+  "Statut d'acceptation de la révision"
+  status: RevisionRequestStatus!
+}
+
+"Approbation d'une demande de révision"
+type BsdaRevisionRequestApproval {
+  "Siret de l'entreprise responsable de cette approbation"
+  approverSiret: String!
+
+  "Commentaire explicatif, saisi par l'approbateur"
+  comment: String
+
+  "Statut d'acceptation de l'approbation"
+  status: RevisionRequestApprovalStatus!
+}
+
+"Payload de révision d'un bordereau. Disponible sur une liste restreinte de champs."
+type BsdaRevisionRequestContent {
+  "Maitre d'ouvrage ou détenteur du déchet"
+  emitter: BsdaRevisionRequestEmitter
+
+  "Courtier"
+  broker: BsdaBroker
+
+  "Installation de destination"
+  destination: BsdaRevisionRequestDestination
+
+  "Description du déchet"
+  waste: BsdaRevisionRequestWaste
+
+  "Conditionnement"
+  packagings: [BsdaPackaging!]
+}
+
+type BsdaRevisionRequestEmitter {
+  "Informations chantier (si différente de l'adresse de l'entreprise)"
+  pickupSite: BsdaPickupSite
+}
+
+type BsdaRevisionRequestDestination {
+  "N° de CAP (le cas échéant)"
+  cap: String
+
+  "Expédition reçue à l'installation de destination"
+  reception: BsdaRevisionRequestReception
+
+  "Réalisation de l'opération (case 11)"
+  operation: BsdaRevisionRequestOperation
+}
+
+type BsdaRevisionRequestReception {
+  "Poids présenté"
+  weight: Float
+}
+
+type BsdaRevisionRequestOperation {
+  "Code D/R"
+  code: String
+
+  "Description de l'opération"
+  description: String
+}
+
+type BsdaRevisionRequestWaste {
+  "Rubrique Déchet"
+  code: String
+
+  "Nom du matériau"
+  materialName: String
+
+  "Numéros de scellés"
+  sealNumbers: [String!]
+
+  "Contient des Polluants Organiques Persistants (POP) oui / non"
+  pop: Boolean
+}
+
+type BsdaRevisionRequestConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [BsdaRevisionRequestEdge!]!
+}
+
+type BsdaRevisionRequestEdge {
+  cursor: String!
+  node: BsdaRevisionRequest!
 }

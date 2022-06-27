@@ -26,9 +26,20 @@ import {
   BsdaPickupSite,
   BsdaWeight,
   BsdaEcoOrganisme,
-  BsdaNextDestination
+  BsdaNextDestination,
+  BsdaRevisionRequestContentInput,
+  BsdaRevisionRequestContent,
+  BsdaRevisionRequestEmitter,
+  BsdaRevisionRequestWaste,
+  BsdaRevisionRequestDestination,
+  BsdaRevisionRequestOperation,
+  BsdaRevisionRequestReception
 } from "../generated/graphql/types";
-import { Prisma, Bsda as PrismaBsda } from "@prisma/client";
+import {
+  Prisma,
+  Bsda as PrismaBsda,
+  BsdaRevisionRequest
+} from "@prisma/client";
 
 export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
   return {
@@ -470,5 +481,125 @@ export function toInitialBsda(bsda: GraphqlBsda): GraphQLInitialBsda {
     weight: bsda.weight,
     destination: bsda.destination,
     packagings: bsda.packagings
+  };
+}
+
+export function flattenBsdaRevisionRequestInput(
+  reviewContent: BsdaRevisionRequestContentInput
+): Partial<Prisma.BsdaRevisionRequestCreateInput> {
+  return {
+    brokerCompanyAddress: chain(reviewContent, r =>
+      chain(r.broker, b => chain(b.company, c => c.address))
+    ),
+    brokerCompanyContact: chain(reviewContent, r =>
+      chain(r.broker, b => chain(b.company, c => c.contact))
+    ),
+    brokerCompanyMail: chain(reviewContent, r =>
+      chain(r.broker, b => chain(b.company, c => c.mail))
+    ),
+    brokerCompanyName: chain(reviewContent, r =>
+      chain(r.broker, b => chain(b.company, c => c.name))
+    ),
+    brokerCompanyPhone: chain(reviewContent, r =>
+      chain(r.broker, b => chain(b.company, c => c.phone))
+    ),
+    brokerCompanySiret: chain(reviewContent, r =>
+      chain(r.broker, b => chain(b.company, c => c.siret))
+    ),
+    brokerRecepisseNumber: chain(reviewContent, r =>
+      chain(r.broker, b => chain(b.recepisse, re => re.number))
+    ),
+    brokerRecepisseDepartment: chain(reviewContent, r =>
+      chain(r.broker, b => chain(b.recepisse, re => re.department))
+    ),
+    brokerRecepisseValidityLimit: chain(reviewContent, r =>
+      chain(r.broker, b => chain(b.recepisse, re => re.validityLimit))
+    ),
+    emitterPickupSiteName: chain(reviewContent, c =>
+      chain(c.emitter, e => chain(e.pickupSite, w => w.name))
+    ),
+    emitterPickupSiteAddress: chain(reviewContent, c =>
+      chain(c.emitter, e => chain(e.pickupSite, w => w.address))
+    ),
+    emitterPickupSiteCity: chain(reviewContent, c =>
+      chain(c.emitter, e => chain(e.pickupSite, w => w.city))
+    ),
+    emitterPickupSitePostalCode: chain(reviewContent, c =>
+      chain(c.emitter, e => chain(e.pickupSite, w => w.postalCode))
+    ),
+    emitterPickupSiteInfos: chain(reviewContent, c =>
+      chain(c.emitter, e => chain(e.pickupSite, w => w.infos))
+    ),
+    wasteCode: chain(reviewContent, r => chain(r.waste, w => w.code)),
+    wasteMaterialName: chain(reviewContent, r =>
+      chain(r.waste, w => w.materialName)
+    ),
+    wasteSealNumbers: chain(reviewContent, r =>
+      chain(r.waste, w => (w.sealNumbers === null ? undefined : w.sealNumbers))
+    ),
+    wastePop: chain(reviewContent, r => chain(r.waste, w => w.pop)),
+    packagings: chain(reviewContent, r => r.packagings),
+    destinationOperationCode: chain(reviewContent, r =>
+      chain(r.destination, d => chain(d.operation, o => o.code))
+    ),
+    destinationOperationDescription: chain(reviewContent, r =>
+      chain(r.destination, d => chain(d.operation, o => o.description))
+    ),
+    destinationCap: chain(reviewContent, r => chain(r.destination, d => d.cap)),
+    destinationReceptionWeight: chain(reviewContent, r =>
+      chain(r.destination, d =>
+        chain(d.reception, r => (r.weight ? r.weight * 1000 : r.weight))
+      )
+    )
+  };
+}
+
+export function expandBsdaRevisionRequestContent(
+  bsdaRevisionRequest: BsdaRevisionRequest
+): BsdaRevisionRequestContent {
+  return {
+    emitter: nullIfNoValues<BsdaRevisionRequestEmitter>({
+      pickupSite: nullIfNoValues<BsdaPickupSite>({
+        address: bsdaRevisionRequest.emitterPickupSiteAddress,
+        city: bsdaRevisionRequest.emitterPickupSiteCity,
+        infos: bsdaRevisionRequest.emitterPickupSiteInfos,
+        name: bsdaRevisionRequest.emitterPickupSiteName,
+        postalCode: bsdaRevisionRequest.emitterPickupSitePostalCode
+      })
+    }),
+    packagings: bsdaRevisionRequest.packagings as BsdaPackaging[],
+    waste: nullIfNoValues<BsdaRevisionRequestWaste>({
+      code: bsdaRevisionRequest.wasteCode,
+      materialName: bsdaRevisionRequest.wasteMaterialName,
+      pop: bsdaRevisionRequest.wastePop,
+      sealNumbers: bsdaRevisionRequest.wasteSealNumbers
+    }),
+    broker: nullIfNoValues<BsdaBroker>({
+      company: nullIfNoValues<FormCompany>({
+        name: bsdaRevisionRequest.brokerCompanyName,
+        siret: bsdaRevisionRequest.brokerCompanySiret,
+        address: bsdaRevisionRequest.brokerCompanyAddress,
+        contact: bsdaRevisionRequest.brokerCompanyContact,
+        phone: bsdaRevisionRequest.brokerCompanyPhone,
+        mail: bsdaRevisionRequest.brokerCompanyMail
+      }),
+      recepisse: nullIfNoValues<BsdaRecepisse>({
+        department: bsdaRevisionRequest.brokerRecepisseDepartment,
+        number: bsdaRevisionRequest.brokerRecepisseNumber,
+        validityLimit: bsdaRevisionRequest.brokerRecepisseValidityLimit
+      })
+    }),
+    destination: nullIfNoValues<BsdaRevisionRequestDestination>({
+      cap: bsdaRevisionRequest.destinationCap,
+      operation: nullIfNoValues<BsdaRevisionRequestOperation>({
+        code: bsdaRevisionRequest.destinationOperationCode,
+        description: bsdaRevisionRequest.destinationOperationDescription
+      }),
+      reception: nullIfNoValues<BsdaRevisionRequestReception>({
+        weight: bsdaRevisionRequest.destinationReceptionWeight
+          ? bsdaRevisionRequest.destinationReceptionWeight / 1000
+          : bsdaRevisionRequest.destinationReceptionWeight
+      })
+    })
   };
 }

@@ -1,4 +1,4 @@
-import { Form, User, TemporaryStorageDetail } from "@prisma/client";
+import { Form, User } from "@prisma/client";
 import { ForbiddenError } from "apollo-server-express";
 import prisma from "../prisma";
 import { FormCompanies } from "./types";
@@ -38,13 +38,12 @@ export async function formToCompanies(form: Form): Promise<FormCompanies> {
           }))
         }
       : {}),
-    ...(fullForm.temporaryStorageDetail
+    ...(fullForm.forwardedIn
       ? {
-          temporaryStorageDetail: {
-            destinationCompanySiret:
-              fullForm.temporaryStorageDetail.destinationCompanySiret,
+          forwardedIn: {
+            recipientCompanySiret: fullForm.forwardedIn.recipientCompanySiret,
             transporterCompanySiret:
-              fullForm.temporaryStorageDetail.transporterCompanySiret
+              fullForm.forwardedIn.transporterCompanySiret
           }
         }
       : {})
@@ -103,26 +102,22 @@ function isFormDestinationAfterTempStorage(
   userSirets: string[],
   form: FormCompanies
 ) {
-  if (!form.temporaryStorageDetail) {
+  if (!form.forwardedIn) {
     return false;
   }
 
-  return userSirets.includes(
-    form.temporaryStorageDetail.destinationCompanySiret
-  );
+  return userSirets.includes(form.forwardedIn.recipientCompanySiret);
 }
 
 function isFormTransporterAfterTempStorage(
   userSirets: string[],
   form: FormCompanies
 ) {
-  if (!form.temporaryStorageDetail) {
+  if (!form.forwardedIn) {
     return false;
   }
 
-  return userSirets.includes(
-    form.temporaryStorageDetail.transporterCompanySiret
-  );
+  return userSirets.includes(form.forwardedIn.transporterCompanySiret);
 }
 
 function isFormMultiModalTransporter(
@@ -483,7 +478,7 @@ export async function checkSecurityCode(siret: string, securityCode: number) {
 export async function checkCanRequestRevision(
   user: User,
   form: Form,
-  temporaryStorageDetail?: TemporaryStorageDetail
+  forwardedIn?: Form
 ) {
   const userSirets = await getCachedUserSirets(user.id);
 
@@ -491,9 +486,7 @@ export async function checkCanRequestRevision(
     isFormEmitter,
     isFormRecipient,
     isFormDestinationAfterTempStorage
-  ].some(isFormRole =>
-    isFormRole(userSirets, { ...form, temporaryStorageDetail })
-  );
+  ].some(isFormRole => isFormRole(userSirets, { ...form, forwardedIn }));
 
   if (!canRequestRevision) {
     throw new NotFormContributor(

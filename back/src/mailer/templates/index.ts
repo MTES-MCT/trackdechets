@@ -111,6 +111,7 @@ export const formPartiallyRefused: MailTemplate<{ form: Form }> = {
 export const membershipRequestConfirmation: MailTemplate<{
   companyName: string;
   companySiret: string;
+  adminEmailsInfo: string;
 }> = {
   subject: "Votre demande de rattachement a été transmise à l'administrateur",
   body: mustacheRenderer("confirmation-demande-de-rattachement.html"),

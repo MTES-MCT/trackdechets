@@ -65,8 +65,8 @@ export function SynthesisEmitter({
           />
           <Field
             name="waste.code"
-            id="18 01 02*"
-            label="18 01 02* DASRI d'origine animale"
+            id="18 02 02*"
+            label="18 02 02* DASRI d'origine animale"
             component={RadioButton}
             disabled={disabled}
           />
@@ -172,8 +172,8 @@ export function Emitter({ status, stepName, disabled = false }) {
           />
           <Field
             name="waste.code"
-            id="18 01 02*"
-            label="18 01 02* DASRI d'origine animale"
+            id="18 02 02*"
+            label="18 02 02* DASRI d'origine animale"
             component={RadioButton}
             disabled={editionDisabled}
           />

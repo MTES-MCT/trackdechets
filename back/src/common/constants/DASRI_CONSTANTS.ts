@@ -12,7 +12,7 @@ export const DASRI_WASTE_CODES = [
     description: "DASRI d'origine humaine"
   },
   {
-    code: "18 01 02*",
+    code: "18 02 02*",
     description: "DASRI d'origine animale"
   }
 ];

@@ -52,6 +52,7 @@ export function getInitialCompany(company?: FormCompany | null) {
     phone: company?.phone ?? "",
     vatNumber: company?.vatNumber ?? "",
     country: company?.country ?? "",
+    omiNumber: company?.omiNumber ?? "",
   };
 }
 
@@ -113,6 +114,8 @@ export function getInitialState(f?: Form | null): FormInput {
         ? getInitialEmitterWorkSite(f?.emitter?.workSite)
         : null,
       company: getInitialCompany(f?.emitter?.company),
+      isForeignShip: f?.emitter?.isForeignShip ?? false,
+      isPrivateIndividual: f?.emitter?.isPrivateIndividual ?? false,
     },
     recipient: {
       cap: f?.recipient?.cap ?? "",

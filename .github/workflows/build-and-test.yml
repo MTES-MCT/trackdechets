@@ -61,7 +61,6 @@ jobs:
       - name: Run tests
         run: npm test -- --forceExit
         env:
-          JWT_SECRET: "xxx"
           EMAIL_BACKEND: "console"
           SIB_BASE_URL: "http://mailservice"
           MAIN_TEMPLATE_ID: "9"

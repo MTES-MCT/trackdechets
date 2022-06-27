@@ -1,8 +1,8 @@
 import { Bsda, BsdaStatus } from "@prisma/client";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
-import prisma from "../prisma";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
+import { getReadonlyBsdaRepository } from "./repository";
 
 // | state              | emitter         | worker          | transporter | destination     | nextDestination |
 // | ------------------ | --------------- | --------------- | ----------- | --------------- | --------------- |
@@ -159,13 +159,15 @@ export async function indexAllBsdas(
   { skip = 0 }: { skip?: number } = {}
 ) {
   const take = 500;
-  const bsdas = await prisma.bsda.findMany({
-    skip,
-    take,
-    where: {
+  const bsdas = await getReadonlyBsdaRepository().findMany(
+    {
       isDeleted: false
+    },
+    {
+      skip,
+      take
     }
-  });
+  );
 
   if (bsdas.length === 0) {
     return;

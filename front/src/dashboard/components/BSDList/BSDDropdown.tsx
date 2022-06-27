@@ -17,7 +17,7 @@ const links = [
   { title: "Bordereau de suivi amiante", route: routes.dashboard.bsdas.create },
 ];
 
-export function NewBSDDropdown({ siret }: Props) {
+export function BSDDropdown({ siret }: Props) {
   return (
     <Menu>
       <MenuButton className="btn btn--primary">

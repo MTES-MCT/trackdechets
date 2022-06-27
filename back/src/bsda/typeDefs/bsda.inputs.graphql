@@ -303,3 +303,80 @@ input BsdaSignatureInput {
   "Code de sécurité de l'entreprise pour laquelle on signe. Permet de signer en tant que. Optionnel"
   securityCode: Int
 }
+
+"Payload de révision d'un bordereau."
+input CreateBsdaRevisionRequestInput {
+  "Identifiant du bordereau à réviser"
+  bsdaId: ID!
+  "Numéro SIRET du demandeur"
+  authoringCompanySiret: String!
+  "Contenu de la révision"
+  content: BsdaRevisionRequestContentInput!
+  "Commentaire pour expliquer la demande de révision"
+  comment: String!
+}
+
+"Payload de révision d'un bordereau. Disponible sur une liste restreinte de champs."
+input BsdaRevisionRequestContentInput {
+  "Maitre d'ouvrage ou détenteur du déchet"
+  emitter: BsdaRevisionRequestEmitterInput
+
+  "Courtier"
+  broker: BsdaBrokerInput
+
+  "Installation de destination"
+  destination: BsdaRevisionRequestDestinationInput
+
+  "Description du déchet"
+  waste: BsdaRevisionRequestWasteInput
+
+  "Conditionnement"
+  packagings: [BsdaPackagingInput!]
+}
+
+input BsdaRevisionRequestEmitterInput {
+  "Informations chantier (si différente de l'adresse de l'entreprise)"
+  pickupSite: BsdaPickupSiteInput
+}
+
+input BsdaRevisionRequestDestinationInput {
+  "N° de CAP (le cas échéant)"
+  cap: String
+
+  "Expédition reçue à l'installation de destination"
+  reception: BsdaRevisionRequestReceptionInput
+
+  "Réalisation de l'opération (case 11)"
+  operation: BsdaRevisionRequestOperationInput
+}
+
+input BsdaRevisionRequestReceptionInput {
+  "Poids présenté"
+  weight: Float
+}
+
+input BsdaRevisionRequestOperationInput {
+  "Code D/R"
+  code: String
+
+  "Description de l'opération"
+  description: String
+}
+
+input BsdaRevisionRequestWasteInput {
+  "Rubrique Déchet"
+  code: String
+
+  "Nom du matériau"
+  materialName: String
+
+  "Numéros de scellés"
+  sealNumbers: [String!]
+
+  "Contient des Polluants Organiques Persistants (POP) oui / non"
+  pop: Boolean
+}
+
+input BsdaRevisionRequestWhere {
+  status: RevisionRequestStatus
+}

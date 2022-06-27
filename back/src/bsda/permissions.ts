@@ -15,6 +15,15 @@ type BsdaContributors = Pick<
   | "destinationOperationNextDestinationCompanySiret"
 >;
 
+export const BSDA_REVISION_REQUESTER_FIELDS: Record<
+  string,
+  keyof BsdaContributors
+> = {
+  emitter: "emitterCompanySiret",
+  destination: "destinationCompanySiret",
+  worker: "workerCompanySiret"
+};
+
 export const BSDA_CONTRIBUTORS_FIELDS: Record<string, keyof BsdaContributors> =
   {
     emitter: "emitterCompanySiret",
@@ -39,24 +48,24 @@ export async function checkIsBsdaContributor(
   return true;
 }
 
-export async function isBsdaContributor(user: User, form: Partial<Bsda>) {
+export async function isBsdaContributor(user: User, bsda: Partial<Bsda>) {
   const userSirets = await getCachedUserSirets(user.id);
 
   const formSirets = Object.values(BSDA_CONTRIBUTORS_FIELDS).map(
-    field => form[field]
+    field => bsda[field]
   );
 
   return userSirets.some(siret => formSirets.includes(siret));
 }
 
-export async function checkCanDeleteBsda(user: User, form: Bsda) {
+export async function checkCanDeleteBsda(user: User, bsda: Bsda) {
   await checkIsBsdaContributor(
     user,
-    form,
+    bsda,
     "Vous n'êtes pas autorisé à supprimer ce bordereau."
   );
 
-  if (form.status !== BsdaStatus.INITIAL) {
+  if (bsda.status !== BsdaStatus.INITIAL) {
     throw new ForbiddenError(
       "Seuls les bordereaux en brouillon ou n'ayant pas encore été signés peuvent être supprimés"
     );
@@ -82,5 +91,17 @@ export async function checkCanAssociateBsdas(ids: string[]) {
     throw new UserInputError(
       `Les bordereaux ne peuvent pas être associés à un bordereau enfant.`
     );
+  }
+}
+
+export async function checkCanRequestRevision(user: User, bsda: Bsda) {
+  const userSirets = await getCachedUserSirets(user.id);
+
+  const formSirets = Object.values(BSDA_REVISION_REQUESTER_FIELDS).map(
+    field => bsda[field]
+  );
+
+  if (!userSirets.some(siret => formSirets.includes(siret))) {
+    throw new UserInputError(`Vous n'êtes pas autorisé à réviser ce bordereau`);
   }
 }

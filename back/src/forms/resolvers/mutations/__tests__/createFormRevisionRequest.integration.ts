@@ -8,6 +8,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import getReadableId from "../../../readableId";
 
 const CREATE_FORM_REVISION_REQUEST = `
   mutation CreateFormRevisionRequest($input: CreateFormRevisionRequestInput!) {
@@ -126,19 +127,19 @@ describe("Mutation.createFormRevisionRequest", () => {
       opt: {
         emitterCompanySiret: "1234",
         recipientCompanySiret: "5678",
-        temporaryStorageDetail: {
+        forwardedIn: {
           create: {
-            tempStorerQuantityType: "REAL",
-            tempStorerQuantityReceived: 2.4,
-            tempStorerWasteAcceptationStatus: "ACCEPTED",
-            tempStorerReceivedAt: "2022-03-20T00:00:00.000Z",
-            tempStorerReceivedBy: "John Doe",
-            tempStorerSignedAt: "2022-03-20T00:00:00.000Z",
-            destinationIsFilledByEmitter: false,
-            destinationCompanyName: company.name,
-            destinationCompanySiret: company.siret,
-            destinationCap: "",
-            destinationProcessingOperation: "R 6",
+            readableId: getReadableId(),
+            ownerId: user.id,
+            quantityReceived: 2.4,
+            wasteAcceptationStatus: "ACCEPTED",
+            receivedAt: "2022-03-20T00:00:00.000Z",
+            receivedBy: "John Doe",
+            signedAt: "2022-03-20T00:00:00.000Z",
+            recipientCompanyName: company.name,
+            recipientCompanySiret: company.siret,
+            recipientCap: "",
+            recipientProcessingOperation: "R 6",
             transporterCompanyName: "9876",
             transporterCompanySiret: "Transporter",
             transporterIsExemptedOfReceipt: false,
@@ -216,7 +217,9 @@ describe("Mutation.createFormRevisionRequest", () => {
         variables: {
           input: {
             bsddId: "",
-            content: { wasteDetails: { name: "I cannot change the name" } },
+            content: {
+              wasteDetails: { onuCode: "I cannot change the onuCode" }
+            },
             comment: "A comment"
           }
         }
@@ -224,7 +227,7 @@ describe("Mutation.createFormRevisionRequest", () => {
     } catch (err) {
       expect(err.message).toContain('{"code":"BAD_USER_INPUT"}');
       expect(err.message).toContain(
-        'Field \\"name\\" is not defined by type \\"FormRevisionRequestWasteDetailsInput\\".'
+        'Field \\"onuCode\\" is not defined by type \\"FormRevisionRequestWasteDetailsInput\\".'
       );
     }
   });
@@ -285,5 +288,67 @@ describe("Mutation.createFormRevisionRequest", () => {
     expect(data.createFormRevisionRequest.content).toEqual({
       wasteDetails: { code: "01 03 08" }
     });
+  });
+  it("should fail if emitter is a foreign ship", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: null,
+        emitterIsForeignShip: true,
+        emitterCompanyOmiNumber: "OMI1234567"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: {},
+          comment: "A comment",
+          authoringCompanySiret: company.siret
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      `Vous n'êtes pas autorisé à réviser ce bordereau`
+    );
+  });
+  it("should fail if emitter is a private individual", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: null,
+        emitterIsPrivateIndividual: true,
+        emitterCompanyName: "Madame Déchets Dangeureux"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: {},
+          comment: "A comment",
+          authoringCompanySiret: company.siret
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      `Vous n'êtes pas autorisé à réviser ce bordereau`
+    );
   });
 });

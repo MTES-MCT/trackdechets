@@ -29,10 +29,28 @@ export const COLUMNS: Record<
     },
   },
   emitter: {
-    accessor: form => form.emitter?.company?.name ?? "",
+    accessor: form => (
+      <>
+        <div>
+          {form.emitter?.company?.name ?? ""}
+          {form.emitter?.isPrivateIndividual ? " (particulier)" : ""}
+        </div>
+        <div>{form.emitter?.company?.siret ?? ""}</div>
+        <div>
+          {form.emitter?.company?.omiNumber
+            ? `${form.emitter?.company?.omiNumber}`
+            : ""}
+        </div>
+      </>
+    ),
   },
   recipient: {
-    accessor: form => form.stateSummary?.recipient?.name ?? "",
+    accessor: form => (
+      <>
+        <div>{form.stateSummary?.recipient?.name ?? ""}</div>
+        <div>{form.stateSummary?.recipient?.siret ?? ""}</div>
+      </>
+    ),
   },
   waste: {
     accessor: form =>

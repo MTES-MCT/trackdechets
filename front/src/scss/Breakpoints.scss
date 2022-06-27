@@ -25,3 +25,8 @@
     @content;
   }
 }
+@mixin xl-desktop {
+  @media only screen and (min-width: $breakpoint-xxl) {
+    @content;
+  }
+}

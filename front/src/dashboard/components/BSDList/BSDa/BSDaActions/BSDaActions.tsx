@@ -23,6 +23,7 @@ import { Bsda, BsdaStatus } from "generated/graphql/types";
 import { DeleteBsdaModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";
 import { useDuplicate } from "./useDuplicate";
+import { TableRoadControlButton } from "../../RoadControlButton";
 
 import styles from "../../BSDActions.module.scss";
 import { Loader } from "common/components";
@@ -73,6 +74,9 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
+
+              <TableRoadControlButton siret={siret} form={form} />
+
               {!form.isDraft && (
                 <MenuItem onSelect={() => downloadPdf()}>
                   <IconPdf size="24px" color="blueLight" />
@@ -101,11 +105,25 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
                 <IconDuplicateFile size="24px" color="blueLight" />
                 Dupliquer
               </MenuItem>
-              {form["bsdaStatus"] === BsdaStatus.Initial && (
+              {form["bsdaStatus"] === BsdaStatus.Initial ? (
                 <MenuItem onSelect={() => setIsDeleting(true)}>
                   <IconTrash color="blueLight" size="24px" />
                   Supprimer
                 </MenuItem>
+              ) : (
+                <MenuLink
+                  as={Link}
+                  to={{
+                    pathname: generatePath(routes.dashboard.bsdas.review, {
+                      siret,
+                      id: form.id,
+                    }),
+                    state: { background: location },
+                  }}
+                >
+                  <IconPaperWrite size="24px" color="blueLight" />
+                  Révision
+                </MenuLink>
               )}
             </MenuList>
           </>

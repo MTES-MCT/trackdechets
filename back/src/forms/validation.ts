@@ -36,12 +36,16 @@ import {
   INVALID_PROCESSING_OPERATION,
   EXTRANEOUS_NEXT_DESTINATION,
   MISSING_COMPANY_SIRET_OR_VAT,
-  MISSING_PROCESSING_OPERATION
+  MISSING_PROCESSING_OPERATION,
+  MISSING_COMPANY_OMI_NUMBER,
+  INVALID_COMPANY_OMI_NUMBER,
+  INVALID_INDIVIDUAL_OR_FOREIGNSHIP
 } from "./errors";
 import {
   isVat,
   isSiret,
-  isFRVat
+  isFRVat,
+  isOmi
 } from "../common/constants/companySearchHelpers";
 import { searchCompany } from "../companies/search";
 // set yup default error messages
@@ -57,6 +61,8 @@ type Emitter = Pick<
   Prisma.FormCreateInput,
   | "emitterType"
   | "emitterPickupSite"
+  | "emitterIsPrivateIndividual"
+  | "emitterIsForeignShip"
   | "emitterWorkSiteName"
   | "emitterWorkSiteAddress"
   | "emitterWorkSiteCity"
@@ -68,6 +74,7 @@ type Emitter = Pick<
   | "emitterCompanyContact"
   | "emitterCompanyPhone"
   | "emitterCompanyMail"
+  | "emitterCompanyOmiNumber"
 >;
 
 type Recipient = Pick<
@@ -184,52 +191,6 @@ type ProcessedInfo = Pick<
   | "nextDestinationCompanyMail"
 >;
 
-type TempStorageInfo = Pick<
-  Prisma.TemporaryStorageDetailCreateInput,
-  | "tempStorerQuantityType"
-  | "tempStorerQuantityReceived"
-  | "tempStorerWasteAcceptationStatus"
-  | "tempStorerWasteRefusalReason"
-  | "tempStorerReceivedAt"
-  | "tempStorerReceivedBy"
-  | "tempStorerSignedAt"
->;
-
-type DestinationAfterTempStorage = Pick<
-  Prisma.TemporaryStorageDetailCreateInput,
-  | "destinationCompanyName"
-  | "destinationCompanySiret"
-  | "destinationCompanyAddress"
-  | "destinationCompanyContact"
-  | "destinationCompanyPhone"
-  | "destinationCompanyMail"
-  | "destinationCap"
-  | "destinationProcessingOperation"
->;
-
-type TransporterAfterTempStorage = Pick<
-  Prisma.TemporaryStorageDetailCreateInput,
-  | "transporterCompanyName"
-  | "transporterCompanySiret"
-  | "transporterCompanyAddress"
-  | "transporterCompanyContact"
-  | "transporterCompanyPhone"
-  | "transporterCompanyMail"
-  | "transporterIsExemptedOfReceipt"
-  | "transporterReceipt"
-  | "transporterDepartment"
-  | "transporterValidityLimit"
-  | "transporterNumberPlate"
->;
-
-type WasteRepackaging = Pick<
-  Prisma.TemporaryStorageDetailCreateInput,
-  | "wasteDetailsOnuCode"
-  | "wasteDetailsPackagingInfos"
-  | "wasteDetailsQuantity"
-  | "wasteDetailsQuantityType"
->;
-
 // *************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 1
 // *************************************************************
@@ -243,25 +204,83 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
     emitterWorkSiteInfos: yup.string().nullable(),
     emitterWorkSiteName: yup.string().nullable(),
     emitterWorkSitePostalCode: yup.string().nullable(),
-    emitterType: yup.mixed<EmitterType>().when("ecoOrganismeSiret", {
-      is: ecoOrganismeSiret => !ecoOrganismeSiret,
-      then: yup
-        .mixed()
-        .requiredIf(!isDraft, `Émetteur: Le type d'émetteur est obligatoire`),
-      otherwise: yup
-        .mixed()
-        .oneOf(
-          ["OTHER"],
-          `Émetteur: Le type d'émetteur doit être "OTHER" lorsqu'un éco-organisme est responsable du déchet`
-        )
-    }),
+    emitterType: yup
+      .mixed<EmitterType>()
+      .when("ecoOrganismeSiret", {
+        is: ecoOrganismeSiret => !ecoOrganismeSiret,
+        then: yup
+          .mixed()
+          .requiredIf(!isDraft, `Émetteur: Le type d'émetteur est obligatoire`),
+        otherwise: yup
+          .mixed()
+          .oneOf(
+            ["OTHER"],
+            `Émetteur: Le type d'émetteur doit être "OTHER" lorsqu'un éco-organisme est responsable du déchet`
+          )
+      })
+      .when("emitterIsPrivateIndividual", {
+        is: emitterIsPrivateIndividual => !emitterIsPrivateIndividual,
+        then: yup
+          .mixed()
+          .requiredIf(!isDraft, `Émetteur: Le type d'émetteur est obligatoire`),
+        otherwise: yup
+          .mixed()
+          .oneOf(
+            ["PRODUCER"],
+            `Émetteur: Le type d'émetteur doit être "PRODUCER" lorsque l'émetteur est un particulier`
+          )
+      })
+      .when("emitterIsForeignShip", {
+        is: emitterIsForeignShip => !emitterIsForeignShip,
+        then: yup
+          .mixed()
+          .requiredIf(!isDraft, `Émetteur: Le type d'émetteur est obligatoire`),
+        otherwise: yup
+          .mixed()
+          .oneOf(
+            ["PRODUCER"],
+            `Émetteur: Le type d'émetteur doit être "PRODUCER" lorsque l'émetteur est un navire étranger`
+          )
+      }),
     emitterCompanyName: yup
       .string()
       .ensure()
+      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+        emitterIsForeignShip === true ? schema.notRequired() : schema
+      )
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_NAME}`),
     emitterCompanySiret: yup
       .string()
-      .ensure()
+      .test(
+        "company-siret-with-foreign-ship",
+        "Émetteur: vous ne pouvez pas enregistrer un numéro de SIRET en cas d'émetteur navire étranger",
+        function (value) {
+          const { emitterIsForeignShip } = this.parent;
+          if (emitterIsForeignShip === true && value) {
+            return false;
+          }
+          return true;
+        }
+      )
+      .test(
+        "company-siret-with-private",
+        "Émetteur: vous ne pouvez pas enregistrer un numéro de SIRET en cas d'émetteur particulier",
+        function (value) {
+          const { emitterIsPrivateIndividual } = this.parent;
+          if (emitterIsPrivateIndividual === true && value) {
+            return false;
+          }
+          return true;
+        }
+      )
+      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+        emitterIsForeignShip === true ? schema.notRequired() : schema
+      )
+      .when(
+        "emitterIsPrivateIndividual",
+        (emitterIsPrivateIndividual, schema) =>
+          emitterIsPrivateIndividual === true ? schema.notRequired() : schema
+      )
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_SIRET}`)
       .matches(/^$|^\d{14}$/, {
         message: `Émetteur: ${INVALID_SIRET_LENGTH}`
@@ -269,20 +288,130 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
     emitterCompanyAddress: yup
       .string()
       .ensure()
+      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+        emitterIsForeignShip === true ? schema.notRequired() : schema
+      )
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_ADDRESS}`),
     emitterCompanyContact: yup
       .string()
       .ensure()
+      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+        emitterIsForeignShip === true ? schema.notRequired() : schema
+      )
+      .when(
+        "emitterIsPrivateIndividual",
+        (emitterIsPrivateIndividual, schema) =>
+          emitterIsPrivateIndividual === true ? schema.notRequired() : schema
+      )
+      .test(
+        "company-contact-with-private",
+        "Émetteur: vous ne pouvez pas enregistrer une personne contact en cas d'émetteur particulier",
+        function (value) {
+          const { emitterIsPrivateIndividual } = this.parent;
+          if (emitterIsPrivateIndividual === true && value) {
+            return false;
+          }
+          return true;
+        }
+      )
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_CONTACT}`),
     emitterCompanyPhone: yup
       .string()
       .ensure()
+      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+        emitterIsForeignShip === true ? schema.notRequired() : schema
+      )
+      .when(
+        "emitterIsPrivateIndividual",
+        (emitterIsPrivateIndividual, schema) =>
+          emitterIsPrivateIndividual === true ? schema.notRequired() : schema
+      )
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_PHONE}`),
     emitterCompanyMail: yup
       .string()
       .email()
       .ensure()
-      .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_EMAIL}`)
+      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+        emitterIsForeignShip === true ? schema.notRequired() : schema
+      )
+      .when(
+        "emitterIsPrivateIndividual",
+        (emitterIsPrivateIndividual, schema) =>
+          emitterIsPrivateIndividual === true ? schema.notRequired() : schema
+      )
+      .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_EMAIL}`),
+    emitterCompanyOmiNumber: yup
+      .string()
+      .nullable()
+      .notRequired()
+      .test(
+        "omi-but-private",
+        `Émetteur: Impossible de définir un  numéro OMI avec un émetteur particulier`,
+        function (value) {
+          const { emitterIsPrivateIndividual } = this.parent;
+          if (emitterIsPrivateIndividual === true && !!value) {
+            return false;
+          }
+          return true;
+        }
+      )
+      .test(
+        "omi-absent-with-foreign-ship",
+        `Émetteur: ${MISSING_COMPANY_OMI_NUMBER}`,
+        function (value) {
+          const { emitterIsForeignShip } = this.parent;
+          if (emitterIsForeignShip === true && !value) {
+            return false;
+          }
+          return true;
+        }
+      )
+      .test(
+        "omi-invalid-with-foreign-ship",
+        `Émetteur: ${INVALID_COMPANY_OMI_NUMBER}`,
+        function (value) {
+          const { emitterIsForeignShip } = this.parent;
+          if (emitterIsForeignShip === true && !isOmi(value)) {
+            return false;
+          }
+          return true;
+        }
+      )
+      .test(
+        "omi-defined-but-not-foreign-ship",
+        `Émetteur: Impossible de définir un  numéro OMI sans un émetteur navire étranger`,
+        function (value) {
+          const { emitterIsForeignShip } = this.parent;
+          if (!emitterIsForeignShip && !!value) {
+            return false;
+          }
+          return true;
+        }
+      ),
+    emitterIsPrivateIndividual: yup
+      .boolean()
+      .nullable()
+      .notRequired()
+      .test(
+        "is-private-exclusive",
+        `Émetteur: ${INVALID_INDIVIDUAL_OR_FOREIGNSHIP}`,
+        function (value) {
+          const { emitterIsForeignShip } = this.parent;
+          return !(value === true && emitterIsForeignShip === true);
+        }
+      ),
+    emitterIsForeignShip: yup
+      .boolean()
+      .nullable()
+      .notRequired()
+      .test(
+        "is-foreign-ship-exclusive",
+        `Émetteur: ${INVALID_INDIVIDUAL_OR_FOREIGNSHIP}`,
+        function (value) {
+          const { emitterIsPrivateIndividual } = this.parent;
+          return !(value === true && emitterIsPrivateIndividual === true);
+        }
+      )
   });
 
 // Optional validation schema for eco-organisme appearing in frame 1
@@ -359,7 +488,7 @@ const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
       .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_EMAIL}`)
   });
 
-const packagingInfoFn = (isDraft: boolean) =>
+export const packagingInfoFn = (isDraft: boolean) =>
   yup.object().shape({
     type: yup
       .mixed<Packagings>()
@@ -1020,197 +1149,6 @@ const processedInfoSchemaFn: (value: any) => yup.SchemaOf<ProcessedInfo> =
 
 export const processedInfoSchema = yup.lazy(processedInfoSchemaFn);
 
-// *********************************************************************
-// DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 2 (SUITE)
-// *********************************************************************
-
-// 13 - Réception dans l’installation d’entreposage ou de reconditionnement
-export const tempStoredInfoSchema: yup.SchemaOf<TempStorageInfo> = yup.object({
-  tempStorerReceivedBy: yup
-    .string()
-    .ensure()
-    .required("Vous devez saisir un responsable de la réception."),
-  tempStorerReceivedAt: yup.date().required(),
-  tempStorerSignedAt: yup.date().nullable(),
-  tempStorerQuantityType: yup.mixed<QuantityType>(),
-  tempStorerWasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
-  tempStorerQuantityReceived: yup
-    .number()
-    // if waste is refused, quantityReceived must be 0
-    .when(
-      "tempStorerWasteAcceptationStatus",
-      (wasteAcceptationStatus, schema) =>
-        ["REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.test(
-              "is-zero",
-              "Vous devez saisir une quantité reçue égale à 0.",
-              v => v === 0
-            )
-          : schema
-    )
-    // if waste is partially or totally accepted, we check it is a positive value
-    .when(
-      "tempStorerWasteAcceptationStatus",
-      (wasteAcceptationStatus, schema) =>
-        ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.test(
-              "is-strictly-positive",
-              "Vous devez saisir une quantité reçue supérieure à 0.",
-              v => v > 0
-            )
-          : schema
-    ),
-  tempStorerWasteRefusalReason: yup
-    .string()
-    .when(
-      "tempStorerWasteAcceptationStatus",
-      (wasteAcceptationStatus, schema) =>
-        ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.required("Vous devez renseigner la raison du refus")
-          : schema
-              .notRequired()
-              .nullable()
-              .test(
-                "is-empty",
-                "Le champ tempStorerWasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
-                v => !v
-              )
-    )
-});
-
-export const tempStorerAcceptedInfoSchema = yup.object().shape({
-  tempStorerReceivedAt: yup.date().nullable(),
-  tempStorerQuantityType: yup.mixed<QuantityType>().required(),
-  tempStorerWasteAcceptationStatus: yup
-    .mixed<WasteAcceptationStatus>()
-    .required(),
-  tempStorerSignedBy: yup
-    .string()
-    .ensure()
-    .required("Vous devez saisir un responsable de l'acceptation."),
-  tempStorerSignedAt: yup.date().nullable(),
-  tempStorerQuantityReceived: yup
-    .number()
-    .required()
-    // if waste is refused, quantityReceived must be 0
-    .when(
-      "tempStorerWasteAcceptationStatus",
-      (wasteAcceptationStatus, schema) =>
-        ["REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.test(
-              "is-zero",
-              "Vous devez saisir une quantité reçue égale à 0.",
-              v => v === 0
-            )
-          : schema
-    )
-    // if waste is partially or totally accepted, we check it is a positive value
-    .when(
-      "tempStorerWasteAcceptationStatus",
-      (wasteAcceptationStatus, schema) =>
-        ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.test(
-              "is-strictly-positive",
-              "Vous devez saisir une quantité reçue supérieure à 0.",
-              v => v > 0
-            )
-          : schema
-    ),
-  tempStorerWasteRefusalReason: yup
-    .string()
-    .when(
-      "tempStorerWasteAcceptationStatus",
-      (wasteAcceptationStatus, schema) =>
-        ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-          ? schema.required("Vous devez renseigner la raison du refus")
-          : schema
-              .notRequired()
-              .nullable()
-              .test(
-                "is-empty",
-                "Le champ tempStorerWasteRefusalReason ne doit pas être rensigné si le déchet est accepté ",
-                v => !v
-              )
-    )
-});
-
-// 14 - Installation de destination prévue
-export const destinationAfterTempStorageSchema: yup.SchemaOf<DestinationAfterTempStorage> =
-  yup.object({
-    destinationCap: yup.string().nullable(),
-    destinationCompanyName: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_NAME}`),
-    destinationCompanySiret: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_SIRET}`)
-      .length(14, `Destination ultérieure: ${INVALID_SIRET_LENGTH}`),
-    destinationCompanyAddress: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_ADDRESS}`),
-    destinationCompanyContact: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_CONTACT}`),
-    destinationCompanyPhone: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_PHONE}`),
-    destinationCompanyMail: yup
-      .string()
-      .ensure()
-      .required(`Destination prévue: ${MISSING_COMPANY_EMAIL}`),
-    destinationProcessingOperation: yup
-      .string()
-      .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
-  });
-
-// 15 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
-// 16 - Conditionnement
-// 17 - Quantité
-export const wasteRepackagingSchema: yup.SchemaOf<WasteRepackaging> =
-  yup.object({
-    wasteDetailsOnuCode: yup.string().nullable(),
-    wasteDetailsPackagingInfos: yup
-      .array()
-      .nullable()
-      .of(packagingInfoFn(false))
-      .test(
-        "is-valid-repackaging-infos",
-        "${path} ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
-        (infos: PackagingInfo[]) => {
-          const hasCiterne = infos?.find(i => i.type === "CITERNE");
-          const hasBenne = infos?.find(i => i.type === "BENNE");
-
-          if (hasCiterne && hasBenne) {
-            return false;
-          }
-
-          const hasOtherPackaging = infos?.find(
-            i => !["CITERNE", "BENNE"].includes(i.type)
-          );
-          if ((hasCiterne || hasBenne) && hasOtherPackaging) {
-            return false;
-          }
-
-          return true;
-        }
-      ),
-    wasteDetailsQuantityType: yup.mixed<QuantityType>().nullable(),
-    wasteDetailsQuantity: yup
-      .number()
-      .nullable()
-      .notRequired()
-      .min(0, "La quantité doit être supérieure à 0")
-  });
-
-// 18 - Collecteur-transporteur reconditionnement
-export const transporterAfterTempStorageSchema: yup.SchemaOf<TransporterAfterTempStorage> =
-  transporterSchemaFn(false);
-
 // *******************************************************************
 // COMPOSE VALIDATION SCHEMAS TO VALIDATE A FORM FOR A SPECIFIC STATUS
 // *******************************************************************
@@ -1235,12 +1173,6 @@ export const processedFormSchema = yup.lazy((value: any) =>
     .concat(receivedInfoSchema)
     .concat(processedInfoSchemaFn(value))
 );
-
-// validation schema for BSD suite before it can be (re)sealed
-export const resealedFormSchema = tempStoredInfoSchema
-  .concat(destinationAfterTempStorageSchema)
-  .concat(wasteRepackagingSchema)
-  .concat(transporterAfterTempStorageSchema);
 
 // *******************************************************************
 // HELPER FUNCTIONS THAT MAKE USES OF YUP SCHEMAS TO APPLY VALIDATION
@@ -1354,17 +1286,12 @@ async function checkDestinationAfterTempStorage(siret: string) {
 export async function checkCompaniesType(form: Form) {
   await checkDestination(form.recipientCompanySiret);
 
-  const temporaryStorageDetail = await prisma.form
+  const forwardedIn = await prisma.form
     .findUnique({ where: { id: form.id } })
-    .temporaryStorageDetail();
+    .forwardedIn();
 
-  if (
-    temporaryStorageDetail &&
-    temporaryStorageDetail.destinationCompanySiret
-  ) {
-    await checkDestinationAfterTempStorage(
-      temporaryStorageDetail.destinationCompanySiret
-    );
+  if (forwardedIn && forwardedIn.recipientCompanySiret) {
+    await checkDestinationAfterTempStorage(forwardedIn.recipientCompanySiret);
   }
 
   return true;
@@ -1393,7 +1320,8 @@ const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
   name: yup.string().notRequired().nullable(),
   phone: yup.string().notRequired().nullable(),
   mail: yup.string().notRequired().nullable(),
-  country: yup.string().notRequired().nullable() // ignored in db schema
+  country: yup.string().notRequired().nullable(), // ignored in db schema
+  omiNumber: yup.string().notRequired().nullable() // ignored in db schema
 });
 
 /**

@@ -12,6 +12,16 @@ interface FormJourneySummaryProps {
 }
 
 export function FormJourneySummary({ form }: FormJourneySummaryProps) {
+  let emitterName = form.emitter?.company?.name;
+  let emitterDetails = form.emitter?.company?.siret;
+  if (form.emitter?.isPrivateIndividual) {
+    emitterDetails = "particulier";
+  }
+  if (form.emitter?.isForeignShip) {
+    emitterName = form.emitter?.company?.omiNumber;
+    emitterDetails = "navire étranger";
+  }
+
   const finalRecipient = form.temporaryStorageDetail
     ? {
         isComplete: Boolean(form.receivedAt),
@@ -29,7 +39,7 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
         <JourneyStopName>Émetteur</JourneyStopName>
         {form.emitter?.company && (
           <JourneyStopDescription>
-            {form.emitter.company.name} ({form.emitter.company.siret})<br />
+            {emitterName} ({emitterDetails})<br />
             {form.emitter.company.address}
           </JourneyStopDescription>
         )}

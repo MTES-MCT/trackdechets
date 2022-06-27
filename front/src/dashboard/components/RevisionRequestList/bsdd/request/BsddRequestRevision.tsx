@@ -1,6 +1,7 @@
 import { useMutation } from "@apollo/client";
 import classNames from "classnames";
 import { FieldSwitch, RedErrorMessage } from "common/components";
+import Packagings from "form/bsdd/components/packagings/Packagings";
 import {
   WasteCodeSelect,
   wasteCodeValidator,
@@ -9,6 +10,7 @@ import {
   getInitialBroker,
   getInitialTrader,
 } from "form/bsdd/utils/initial-state";
+import { getPackagingInfosSummary } from "form/bsdd/utils/packagings";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
@@ -35,7 +37,9 @@ type Props = {
 const initialReview = {
   wasteDetails: {
     code: "",
+    name: "",
     pop: "",
+    packagingInfos: [],
   },
   trader: getInitialTrader(),
   broker: getInitialBroker(),
@@ -44,6 +48,7 @@ const initialReview = {
   },
   quantityReceived: null,
   processingOperationDone: "",
+  processingOperationDescription: "",
   temporaryStorageDetail: {
     destination: {
       cap: "",
@@ -122,6 +127,15 @@ export function BsddRequestRevision({ bsdd }: Props) {
               </ReviewableField>
 
               <ReviewableField
+                title="Description du déchet"
+                value={bsdd.wasteDetails?.name}
+                name="content.wasteDetails.name"
+                defaultValue={initialReview.wasteDetails.name}
+              >
+                <Field name="content.wasteDetails.name" className="td-input" />
+              </ReviewableField>
+
+              <ReviewableField
                 title="Présence de polluants organiques persistants"
                 value={Boolean(bsdd.wasteDetails?.pop) ? "Oui" : "Non"}
                 name="content.wasteDetails.pop"
@@ -134,6 +148,22 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   label=""
                 />{" "}
                 {Boolean(values.content.wasteDetails.pop) ? "Oui" : "Non"}
+              </ReviewableField>
+
+              <ReviewableField
+                title="Conditionnement"
+                value={
+                  bsdd.wasteDetails?.packagingInfos
+                    ? getPackagingInfosSummary(bsdd.wasteDetails.packagingInfos)
+                    : ""
+                }
+                name="content.wasteDetails.packagingInfos"
+                defaultValue={initialReview.wasteDetails.packagingInfos}
+              >
+                <Field
+                  name="content.wasteDetails.packagingInfos"
+                  component={Packagings}
+                />
               </ReviewableField>
 
               <ReviewableField
@@ -158,6 +188,18 @@ export function BsddRequestRevision({ bsdd }: Props) {
                 <Field
                   component={ProcessingOperation}
                   name="content.processingOperationDone"
+                />
+              </ReviewableField>
+
+              <ReviewableField
+                title="Description de l'opération D/R"
+                value={bsdd.processingOperationDescription}
+                name="content.processingOperationDescription"
+                defaultValue={initialReview.processingOperationDescription}
+              >
+                <Field
+                  name="content.processingOperationDescription"
+                  className="td-input"
                 />
               </ReviewableField>
 

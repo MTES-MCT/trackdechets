@@ -28,12 +28,12 @@ import {
 import {
   expandAppendix2FormFromDb,
   expandFormFromDb,
-  expandTemporaryStorageFromDb,
   expandTransportSegmentFromDb
 } from "../form-converter";
 import { getFullForm } from "../database";
 import prisma from "../../prisma";
 import { buildAddress } from "../../companies/sirene/utils";
+import { packagingsEqual } from "../../common/constants/formHelpers";
 
 type ReceiptFieldsProps = Partial<
   Pick<GraphQLForm["transporter"], "department" | "receipt" | "validityLimit">
@@ -264,18 +264,24 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
   ).map(g => ({ form: g.initialForm, quantity: g.quantity }));
 
   const form: GraphQLForm = {
-    ...expandFormFromDb(fullPrismaForm),
-    temporaryStorageDetail: fullPrismaForm.temporaryStorageDetail
-      ? expandTemporaryStorageFromDb(fullPrismaForm.temporaryStorageDetail)
-      : null,
+    ...(await expandFormFromDb(fullPrismaForm)),
     transportSegments: fullPrismaForm.transportSegments.map(
       expandTransportSegmentFromDb
     ),
-    grouping: grouping.map(({ form, quantity }) => ({
-      form: expandAppendix2FormFromDb(form),
-      quantity
-    }))
+    grouping: await Promise.all(
+      grouping.map(async ({ form, quantity }) => ({
+        form: await expandAppendix2FormFromDb(form),
+        quantity
+      }))
+    )
   };
+  const isRepackging =
+    form.recipient?.isTempStorage &&
+    !!form.temporaryStorageDetail?.wasteDetails?.packagingInfos &&
+    !packagingsEqual(
+      form.temporaryStorageDetail?.wasteDetails?.packagingInfos,
+      form.wasteDetails?.packagingInfos
+    );
   const qrCode = await QRCode.toString(form.readableId, { type: "svg" });
   const html = ReactDOMServer.renderToStaticMarkup(
     <Document title={form.readableId}>
@@ -347,7 +353,27 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             <p>
               <strong>1.1 Producteur ou détenteur du déchet</strong>
             </p>
-            <FormCompanyFields company={form.emitter?.company} />
+            <p>
+              <input
+                type="checkbox"
+                checked={form.emitter?.isPrivateIndividual}
+                readOnly
+              />{" "}
+              L'émetteur est un particulier
+            </p>
+            <p>
+              <input
+                type="checkbox"
+                checked={form.emitter?.isForeignShip}
+                readOnly
+              />{" "}
+              L'émetteur est un navire étranger
+            </p>
+            <FormCompanyFields
+              company={form.emitter?.company}
+              isPrivateIndividual={form.emitter?.isPrivateIndividual}
+              isForeignShip={form.emitter?.isForeignShip}
+            />
 
             <p>
               <strong>1.2 Point de collecte/chantier</strong> (si adresse
@@ -365,6 +391,35 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 ])}
               <br />
               Info libre : {form.emitter?.workSite?.infos}
+            </p>
+
+            <p>
+              <strong>1.3 Terres et sédiments</strong>
+            </p>
+            <p>
+              Parcelle(s) :{" "}
+              {form.wasteDetails?.parcelNumbers
+                ?.map(
+                  pn =>
+                    `${pn.city} - ${pn.postalCode} - ${[
+                      pn.prefix,
+                      pn.section,
+                      pn.number,
+                      pn.x,
+                      pn.y
+                    ]
+                      .filter(Boolean)
+                      .join("/")}`
+                )
+                .join(", ")}
+              <br />
+              Coordonnée(s) GPS :
+              <br />
+              Référence(s) laboratoire(s) :{" "}
+              {form.wasteDetails?.analysisReferences?.join(", ")}
+              <br />
+              Identifiant(s) terrain (le cas échéant) :{" "}
+              {form.wasteDetails?.landIdentifiers?.join(", ")}
             </p>
 
             <p>
@@ -720,7 +775,9 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             </p>
             <PackagingInfosTable
               packagingInfos={
-                form.temporaryStorageDetail?.wasteDetails?.packagingInfos ?? []
+                isRepackging
+                  ? form.temporaryStorageDetail?.wasteDetails?.packagingInfos
+                  : []
               }
             />
           </div>
@@ -730,7 +787,11 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 16. Quantité (à remplir en cas de reconditionnement uniquement)
               </strong>
             </p>
-            <QuantityFields {...form.temporaryStorageDetail?.wasteDetails} />
+            <QuantityFields
+              {...(isRepackging
+                ? form.temporaryStorageDetail?.wasteDetails
+                : { quantity: null, quantityType: null })}
+            />
           </div>
         </div>
 
@@ -743,7 +804,9 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 :
               </strong>
             </p>
-            <p>{form.temporaryStorageDetail?.wasteDetails?.onuCode}</p>
+            {isRepackging ? (
+              <p>{form.temporaryStorageDetail?.wasteDetails?.onuCode}</p>
+            ) : null}
           </div>
         </div>
 

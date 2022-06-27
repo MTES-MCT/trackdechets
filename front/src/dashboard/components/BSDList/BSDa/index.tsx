@@ -40,13 +40,23 @@ export const COLUMNS: Record<
     accessor: bsda => bsda.id,
   },
   emitter: {
-    accessor: bsda =>
-      `${bsda.emitter?.company?.name ?? ""} ${
-        bsda.emitter?.isPrivateIndividual ? "(particulier)" : ""
-      }`,
+    accessor: bsda => (
+      <>
+        <div>
+          {bsda.emitter?.company?.name ?? ""}
+          {bsda.emitter?.isPrivateIndividual ? " (particulier)" : ""}
+        </div>
+        <div>{bsda.emitter?.company?.siret}</div>
+      </>
+    ),
   },
   recipient: {
-    accessor: bsda => bsda?.destination?.company?.name ?? "",
+    accessor: bsda => (
+      <>
+        <div>{bsda?.destination?.company?.name ?? ""}</div>
+        <div>{bsda?.destination?.company?.siret ?? ""}</div>
+      </>
+    ),
   },
   waste: {
     accessor: bsda =>

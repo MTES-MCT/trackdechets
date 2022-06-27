@@ -84,6 +84,16 @@ const mockedForm = {
   wasteAcceptationStatus: "REFUSED"
 };
 
+// Mock prisma DB with a special value
+const mockedShip = {
+  ...mockedForm,
+  ...{
+    emitterCompanySiret: null,
+    emitterCompanyOmiNumber: "OMI1234567",
+    emitterIsForeignShip: true
+  }
+};
+
 const mockedCompanyAdmins = {
   "12343606600011": [
     {
@@ -175,9 +185,10 @@ jest.mock("../../companies/database", () => ({
   getCompanyAdminUsers: jest.fn(siret => mockedCompanyAdmins[siret])
 }));
 
-// Mock prima DB
+// Mock prisma DB
+const formFindMock = jest.fn();
 jest.mock("../../prisma", () => ({
-  form: { findUnique: jest.fn(() => mockedForm) }
+  form: { findUnique: jest.fn((...args) => formFindMock(...args)) }
 }));
 
 // spies on searchCompany to capture calls to entreprise.data.gouv.fr
@@ -201,6 +212,7 @@ describe("mailWhenFormIsDeclined", () => {
   const OLD_ENV = process.env;
 
   beforeEach(() => {
+    formFindMock.mockReset();
     jest.resetModules(); //   clears the cache
     process.env = { ...OLD_ENV };
   });
@@ -214,6 +226,7 @@ describe("mailWhenFormIsDeclined", () => {
   });
 
   it("should send mails if waste is refused", async () => {
+    formFindMock.mockResolvedValue(mockedForm);
     process.env.NOTIFY_DREAL_WHEN_FORM_DECLINED = "true";
 
     searchCompanySpy
@@ -266,6 +279,7 @@ describe("mailWhenFormIsDeclined", () => {
   });
 
   it("should send mails if waste is partially refused", async () => {
+    formFindMock.mockResolvedValue(mockedForm);
     process.env.NOTIFY_DREAL_WHEN_FORM_DECLINED = "true";
 
     searchCompanySpy
@@ -320,5 +334,96 @@ describe("mailWhenFormIsDeclined", () => {
     expect(payload1.body).toContain("BSD-20210101-AAAAAAAA");
 
     expect(payload1.templateId).toEqual(templateIds.LAYOUT);
+  });
+
+  it("should not send mails with emitter being a foreign ship if waste is refused", async () => {
+    formFindMock.mockResolvedValue(mockedShip);
+    process.env.NOTIFY_DREAL_WHEN_FORM_DECLINED = "true";
+
+    await mailWhenFormIsDeclined({
+      ...formPayload("REFUSED"),
+      ...{
+        node: {
+          id: "xyz12345",
+          readableId: "BSD-20210101-AAAAAAAA",
+          isImportedFromPaper: false,
+          status: "REFUSED",
+          createdAt: new Date("2019-10-16T07:45:13.959Z"),
+          updatedAt: new Date("2019-10-16T07:45:13.959Z"),
+          wasteAcceptationStatus: "REFUSED",
+          wasteRefusalReason: "Non conforme",
+          quantityReceived: 21.3,
+          wasteDetailsPop: false,
+          emitterCompanyOmiNumber: "OMI1234567",
+          emitterIsForeignShip: true
+        } as Form
+      }
+    });
+
+    // get called twice for entreprise.data.gouv.fr
+    expect(searchCompanySpy).toHaveBeenCalledTimes(0);
+
+    // get called twice for geo.api.gouv.fr
+    expect(mockedAxiosGet as jest.Mock<any>).toHaveBeenCalledTimes(0);
+
+    // post called 1 time for mail sending
+    expect(mockedSendMail as jest.Mock<any>).toHaveBeenCalledTimes(0);
+  });
+
+  it("should not send mails with emitter being a private individual if waste is refused", async () => {
+    // Mock prisma DB
+    formFindMock.mockResolvedValue({
+      ...mockedShip,
+      ...{
+        emitterCompanyName: "Madame Emettrice de Déchets",
+        emitterIsPrivateIndividual: true,
+        emitterIsForeignShip: false,
+        emitterCompanyOmiNumber: null
+      }
+    });
+
+    jest.mock("../../prisma", () => ({
+      form: {
+        findUnique: jest.fn(() => ({
+          ...mockedForm,
+          ...{
+            emitterCompanyName: "Madame Emettrice de Déchets",
+            emitterIsPrivateIndividual: true
+          }
+        }))
+      }
+    }));
+    process.env.NOTIFY_DREAL_WHEN_FORM_DECLINED = "true";
+    (mockedSendMail as jest.Mock<any>).mockImplementation(() =>
+      Promise.resolve()
+    );
+    await mailWhenFormIsDeclined({
+      ...formPayload("REFUSED"),
+      ...{
+        node: {
+          id: "xyz12345",
+          readableId: "BSD-20210101-AAAAAAAA",
+          isImportedFromPaper: false,
+          status: "REFUSED",
+          createdAt: new Date("2019-10-16T07:45:13.959Z"),
+          updatedAt: new Date("2019-10-16T07:45:13.959Z"),
+          wasteAcceptationStatus: "REFUSED",
+          wasteRefusalReason: "Non conforme",
+          quantityReceived: 21.3,
+          wasteDetailsPop: false,
+          emitterIsPrivateIndividual: true,
+          emitterCompanyName: "Madame Emettrice de Déchets"
+        } as Form
+      }
+    });
+
+    // get called twice for entreprise.data.gouv.fr
+    expect(searchCompanySpy).toHaveBeenCalledTimes(0);
+
+    // get called twice for geo.api.gouv.fr
+    expect(mockedAxiosGet as jest.Mock<any>).toHaveBeenCalledTimes(0);
+
+    // post called 1 time for mail sending
+    expect(mockedSendMail as jest.Mock<any>).toHaveBeenCalledTimes(0);
   });
 });

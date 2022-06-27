@@ -9,7 +9,7 @@ import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { expandVhuFormFromDb } from "../../converter";
-import { getFormOrFormNotFound } from "../../database";
+import { getBsvhuOrNotFound } from "../../database";
 import { AlreadySignedError, InvalidSignatureError } from "../../errors";
 import { machine } from "../../machine";
 import { validateBsvhu } from "../../validation";
@@ -28,7 +28,7 @@ export default async function sign(
   const user = checkIsAuthenticated(context);
 
   const signatureTypeInfos = signatureTypeMapping[input.type];
-  const prismaForm = await getFormOrFormNotFound(id);
+  const prismaForm = await getBsvhuOrNotFound(id);
 
   // To sign a form for a company, you must either:
   // - be part of that company

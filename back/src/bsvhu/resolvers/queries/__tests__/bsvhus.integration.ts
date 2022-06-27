@@ -5,7 +5,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { vhuFormFactory } from "../../../__tests__/factories.vhu";
+import { bsvhuFactory } from "../../../__tests__/factories.vhu";
 
 const GET_BSVHUS = `
   query GetBsvhus($where: BsvhuWhere) {
@@ -63,10 +63,10 @@ describe("Query.Bsvhus", () => {
       emitterCompanySiret: company.siret
     };
     // Create 4 forms
-    await vhuFormFactory({ opt });
-    await vhuFormFactory({ opt });
-    await vhuFormFactory({ opt });
-    await vhuFormFactory({ opt });
+    await bsvhuFactory({ opt });
+    await bsvhuFactory({ opt });
+    await bsvhuFactory({ opt });
+    await bsvhuFactory({ opt });
 
     const { query } = makeClient(user);
 
@@ -81,10 +81,10 @@ describe("Query.Bsvhus", () => {
       emitterCompanySiret: company.siret
     };
     // Create 4 forms
-    const firstForm = await vhuFormFactory({ opt });
-    await vhuFormFactory({ opt });
-    await vhuFormFactory({ opt });
-    const lastForm = await vhuFormFactory({ opt });
+    const firstForm = await bsvhuFactory({ opt });
+    await bsvhuFactory({ opt });
+    await bsvhuFactory({ opt });
+    const lastForm = await bsvhuFactory({ opt });
 
     const { query } = makeClient(user);
 
@@ -102,13 +102,13 @@ describe("Query.Bsvhus", () => {
       emitterCompanySiret: company.siret
     };
     // Create 3 forms on emitter Company
-    await vhuFormFactory({ opt });
-    await vhuFormFactory({ opt });
-    await vhuFormFactory({ opt });
-    await vhuFormFactory({ opt });
+    await bsvhuFactory({ opt });
+    await bsvhuFactory({ opt });
+    await bsvhuFactory({ opt });
+    await bsvhuFactory({ opt });
 
     // And 1 on recipient company
-    await vhuFormFactory({ opt: { destinationCompanySiret: company.siret } });
+    await bsvhuFactory({ opt: { destinationCompanySiret: company.siret } });
 
     const { query } = makeClient(user);
     const { data } = await query<Pick<Query, "bsvhus">>(GET_BSVHUS, {
@@ -131,10 +131,10 @@ describe("Query.Bsvhus", () => {
     );
 
     // 2 forms belonging to the current user
-    await vhuFormFactory({ opt: { emitterCompanySiret: company.siret } });
-    await vhuFormFactory({ opt: { emitterCompanySiret: secondCompany.siret } });
+    await bsvhuFactory({ opt: { emitterCompanySiret: company.siret } });
+    await bsvhuFactory({ opt: { emitterCompanySiret: secondCompany.siret } });
     // 1 form belonging to someone else
-    await vhuFormFactory({
+    await bsvhuFactory({
       opt: { emitterCompanySiret: outOfScopeCompany.siret }
     });
 
@@ -150,7 +150,7 @@ describe("Query.Bsvhus", () => {
       "MEMBER"
     );
 
-    await vhuFormFactory({
+    await bsvhuFactory({
       opt: { emitterCompanySiret: outOfScopeCompany.siret }
     });
 

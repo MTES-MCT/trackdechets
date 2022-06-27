@@ -16,7 +16,7 @@ import helmet from "helmet";
 import passport from "passport";
 import path from "path";
 import RateLimitRedisStore from "rate-limit-redis";
-import { passportBearerMiddleware, passportJwtMiddleware } from "./auth";
+import { passportBearerMiddleware } from "./auth";
 import { ErrorCode } from "./common/errors";
 import errorHandler from "./common/middlewares/errorHandler";
 import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";
@@ -33,11 +33,13 @@ import { createCompanyDataLoaders } from "./companies/dataloaders";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
+import { roadControlPdfHandler } from "./routers/roadControlPdfRouter";
 import { oauth2Router } from "./routers/oauth2-router";
 import { resolvers, typeDefs } from "./schema";
 import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
+import { ROAD_CONTROL_SLUG } from "./common/constants";
 import forwarded from "forwarded";
 
 const {
@@ -261,6 +263,8 @@ app.get("/exports", (_, res) =>
     .send("Route dépréciée, utilisez la query GraphQL `formsRegister`")
 );
 
+app.get(`/${ROAD_CONTROL_SLUG}/:token`, roadControlPdfHandler);
+
 app.use(
   "/graphiql",
   serveStatic(path.join(__dirname, "common/plugins/graphiql/assets"))
@@ -279,7 +283,7 @@ function ensureLoggedInAndAdmin() {
 app.use(bullBoardPath, ensureLoggedInAndAdmin(), serverAdapter.getRouter());
 
 // Apply passport auth middlewares to the graphQL endpoint
-app.use(graphQLPath, passportBearerMiddleware, passportJwtMiddleware);
+app.use(graphQLPath, passportBearerMiddleware);
 
 // Returns 404 Not Found for every routes not handled by apollo
 app.use((req, res, next) => {

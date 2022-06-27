@@ -25,8 +25,19 @@ export default function Layout({
 }: AuthProps & { children: ReactNode }) {
   const { data } = useQuery<Pick<Query, "warningMessage">>(GET_WARNING_MESSAGE);
 
+  const isIE11 = !!navigator.userAgent.match(/Trident.*rv\:11\./);
+
   return (
     <>
+      {isIE11 && (
+        <div
+          className="notification notification--error tw-text-center"
+          style={{ borderRadius: 0, border: 0, margin: 0 }}
+        >
+          Votre navigateur (IE11) ne sera bientôt plus supporté par
+          Trackdéchets. Veuillez utiliser un navigateur plus récent.
+        </div>
+      )}
       {VITE_WARNING_MESSAGE && (
         <div
           className="notification notification--error tw-text-center"

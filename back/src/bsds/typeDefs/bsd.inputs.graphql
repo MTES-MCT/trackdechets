@@ -1,4 +1,6 @@
-"Payload d'un établissement"
+"""
+Payload d'un établissement
+"""
 input CompanyInput {
   """
   SIRET de l'établissement composé de 14 caractères numériques
@@ -6,7 +8,8 @@ input CompanyInput {
   siret: String
 
   """
-  Numéro de TVA intra-communautaire de l'établissement
+  Numéro de TVA intra-communautaire de l'établissement. À renseigner pour
+  les transporteurs étrangers uniquement.
   """
   vatNumber: String
 
@@ -27,6 +30,12 @@ input CompanyInput {
 
   "Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise"
   country: String
+
+  """
+  Numéro OMI ou IMO (International Maritime Organization) pour les navires étrangers (sans SIRET).
+  Il est composé des trois lettres IMO suivi d'un nombre de sept chiffres (ex: IMO 1234567).
+  """
+  omiNumber: String
 }
 
 "Filtre pour les établissement"
@@ -38,4 +47,10 @@ input CompanyWhere {
 "Filtre pour les signatures"
 input SignatureWhere {
   date: DateFilter
+}
+
+
+input CreatePdfAccessTokenInput {
+
+  bsdId: ID!
 }

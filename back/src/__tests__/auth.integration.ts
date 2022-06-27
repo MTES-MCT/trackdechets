@@ -1,4 +1,3 @@
-import { sign } from "jsonwebtoken";
 import queryString from "querystring";
 import supertest from "supertest";
 import { resetDatabase } from "../../integration-tests/helper";
@@ -6,9 +5,9 @@ import { getLoginError } from "../auth";
 import prisma from "../prisma";
 import { app, sess } from "../server";
 import { getUid, hashToken } from "../utils";
-import { userFactory } from "./factories";
+import { userFactory, userWithAccessTokenFactory } from "./factories";
 
-const { UI_HOST, JWT_SECRET } = process.env;
+const { UI_HOST } = process.env;
 
 const request = supertest(app);
 const loginError = getLoginError("Some User");
@@ -254,34 +253,22 @@ describe("Authentification with token", () => {
     expect(res.body.data).toBeNull();
   });
 
-  it("should authenticate using JWT token", async () => {
-    const user = await userFactory();
-
-    const token = sign({ userId: user.id }, JWT_SECRET);
+  it("should authenticate using hashed token", async () => {
+    const { user, accessToken } = await userWithAccessTokenFactory();
 
     const res = await request
       .post("/")
       .send({ query: "{ me { email } }" })
-      .set("Authorization", `Bearer ${token}`);
+      .set("Authorization", `Bearer ${accessToken}`);
 
     expect(res.body.data).toEqual({
       me: { email: user.email }
     });
 
-    // should create a new access token to make it revokable
-    // next time this token is used, it will use passport bearer strategy
-    const accessToken = await prisma.accessToken.findUnique({
-      where: { token }
+    const dbToken = await prisma.accessToken.findUnique({
+      where: { token: hashToken(accessToken) }
     });
-
-    expect(accessToken).toBeDefined();
-    expect(accessToken.token).toEqual(token);
-
-    expect(accessToken.lastUsed).not.toBeNull();
-    const accessTokenUser = await prisma.accessToken
-      .findUnique({ where: { token } })
-      .user();
-    expect(accessTokenUser.id).toEqual(user.id);
+    expect(dbToken.lastUsed).not.toBeNull();
   });
 
   it("should not authenticate against previously unHashed token", async () => {

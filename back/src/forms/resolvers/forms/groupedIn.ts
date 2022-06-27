@@ -8,10 +8,12 @@ const groupedInResolver: FormResolvers["groupedIn"] = async form => {
     include: { nextForm: true }
   });
 
-  return groupement.map(({ nextForm, quantity }) => ({
-    form: expandFormFromDb(nextForm),
-    quantity
-  }));
+  return Promise.all(
+    groupement.map(async ({ nextForm, quantity }) => ({
+      form: await expandFormFromDb(nextForm),
+      quantity
+    }))
+  );
 };
 
 export default groupedInResolver;

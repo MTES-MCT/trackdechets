@@ -2,7 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Query } from "../../../../generated/graphql/types";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { vhuFormFactory } from "../../../__tests__/factories.vhu";
+import { bsvhuFactory } from "../../../__tests__/factories.vhu";
 
 const GET_BSVHU = `
 query GetBsvhu($id: ID!) {
@@ -46,7 +46,7 @@ describe("Query.Bsvhu", () => {
 
   it("should get a bsvhu by id", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const form = await vhuFormFactory({
+    const form = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret
       }

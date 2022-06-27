@@ -5,13 +5,12 @@ import {
   BsdaInput,
   MutationCreateBsdaArgs
 } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { expandBsdaFromDb, flattenBsdaInput } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
-import { indexBsda } from "../../elastic";
 import { checkIsBsdaContributor } from "../../permissions";
+import { getBsdaRepository } from "../../repository";
 import { validateBsda } from "../../validation";
 
 type CreateBsda = {
@@ -60,13 +59,12 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     );
   }
 
+  const bsdaRepository = getBsdaRepository(user);
   const forwardedBsda = isForwarding
     ? await getBsdaOrNotFound(input.forwarding)
     : null;
   const groupedBsdas = isGrouping
-    ? await prisma.bsda.findMany({
-        where: { id: { in: input.grouping } }
-      })
+    ? await bsdaRepository.findMany({ id: { in: input.grouping } })
     : [];
 
   const previousBsdas = [
@@ -78,21 +76,17 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     emissionSignature: !isDraft
   });
 
-  const newBsda = await prisma.bsda.create({
-    data: {
-      ...bsda,
-      id: getReadableId(ReadableIdPrefix.BSDA),
-      isDraft,
-      ...(isForwarding && {
-        forwarding: { connect: { id: input.forwarding } }
-      }),
-      ...(isGrouping && {
-        grouping: { connect: groupedBsdas.map(({ id }) => ({ id })) }
-      })
-    }
+  const newBsda = await bsdaRepository.create({
+    ...bsda,
+    id: getReadableId(ReadableIdPrefix.BSDA),
+    isDraft,
+    ...(isForwarding && {
+      forwarding: { connect: { id: input.forwarding } }
+    }),
+    ...(isGrouping && {
+      grouping: { connect: groupedBsdas.map(({ id }) => ({ id })) }
+    })
   });
-
-  await indexBsda(newBsda, context);
 
   return expandBsdaFromDb(newBsda);
 }

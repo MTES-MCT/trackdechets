@@ -5,6 +5,7 @@ import {
   FormRevisionRequest,
   Mutation,
   MutationSubmitFormRevisionRequestApprovalArgs,
+  PackagingInfo,
   Trader,
 } from "generated/graphql/types";
 import { TdModalTrigger } from "common/components/Modal";
@@ -16,6 +17,7 @@ import { SUBMIT_FORM_REVISION_REQUEST_APPROVAL } from "../query";
 import { Field, Form, Formik } from "formik";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { formatDate } from "common/datetime";
+import { getPackagingInfosSummary } from "form/bsdd/utils/packagings";
 
 type Props = {
   review: FormRevisionRequest;
@@ -121,10 +123,23 @@ export function DisplayRevision({ review }: Props) {
       />
 
       <RevisionField
+        label="Description déchet"
+        bsddValue={review.form.wasteDetails?.name}
+        reviewValue={review.content.wasteDetails?.name}
+      />
+
+      <RevisionField
         label="Présence de polluants organiques persistants"
         bsddValue={review.form.wasteDetails?.pop}
         reviewValue={review.content.wasteDetails?.pop}
         formatter={booleanFormatter}
+      />
+
+      <RevisionField
+        label="Description déchet"
+        bsddValue={review.form.wasteDetails?.packagingInfos}
+        reviewValue={review.content.wasteDetails?.packagingInfos}
+        formatter={packagingInfosFormatter}
       />
 
       <RevisionField
@@ -143,6 +158,12 @@ export function DisplayRevision({ review }: Props) {
         label="Opération réalisée"
         bsddValue={review.form.processingOperationDone}
         reviewValue={review.content.processingOperationDone}
+      />
+
+      <RevisionField
+        label="Description de l'opération réalisée"
+        bsddValue={review.form.processingOperationDescription}
+        reviewValue={review.content.processingOperationDescription}
       />
 
       <RevisionField
@@ -186,4 +207,12 @@ function booleanFormatter(entity: boolean | undefined): React.ReactNode {
   if (entity == null) return null;
 
   return entity ? "Oui" : "Non";
+}
+
+function packagingInfosFormatter(
+  entity: PackagingInfo[] | undefined
+): React.ReactNode {
+  if (entity == null || entity.length === 0) return null;
+
+  return getPackagingInfosSummary(entity);
 }

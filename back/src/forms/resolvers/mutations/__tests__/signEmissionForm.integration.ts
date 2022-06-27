@@ -9,6 +9,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import getReadableId from "../../../readableId";
 
 const SIGN_EMISSION_FORM = `
   mutation SignEmissionForm($id: ID!, $input: SignEmissionFormInput!, $securityCode: Int) {
@@ -379,8 +380,11 @@ describe("signEmissionForm", () => {
         status: "RESEALED",
         recipientCompanySiret: temporaryStorage.company.siret,
         recipientCompanyName: temporaryStorage.company.name,
-        temporaryStorageDetail: {
-          create: {}
+        forwardedIn: {
+          create: {
+            readableId: getReadableId(),
+            ownerId: temporaryStorage.user.id
+          }
         }
       }
     });
@@ -407,7 +411,7 @@ describe("signEmissionForm", () => {
         status: "SIGNED_BY_TEMP_STORER",
         temporaryStorageDetail: expect.objectContaining({
           signedAt: null,
-          signedBy: null,
+          signedBy: temporaryStorage.user.name,
           emittedAt: emittedAt.toISOString(),
           emittedBy: temporaryStorage.user.name
         })
@@ -424,8 +428,10 @@ describe("signEmissionForm", () => {
         status: "RESEALED",
         recipientCompanySiret: temporaryStorage.company.siret,
         recipientCompanyName: temporaryStorage.company.name,
-        temporaryStorageDetail: {
+        forwardedIn: {
           create: {
+            readableId: getReadableId(),
+            ownerId: temporaryStorage.user.id,
             transporterCompanySiret: transporter.company.siret,
             transporterCompanyName: transporter.company.name
           }
@@ -456,7 +462,7 @@ describe("signEmissionForm", () => {
         status: "SIGNED_BY_TEMP_STORER",
         temporaryStorageDetail: expect.objectContaining({
           signedAt: null,
-          signedBy: null,
+          signedBy: temporaryStorage.user.name,
           emittedAt: emittedAt.toISOString(),
           emittedBy: temporaryStorage.user.name
         })
@@ -473,8 +479,10 @@ describe("signEmissionForm", () => {
         status: "RESEALED",
         recipientCompanySiret: temporaryStorage.company.siret,
         recipientCompanyName: temporaryStorage.company.name,
-        temporaryStorageDetail: {
+        forwardedIn: {
           create: {
+            readableId: getReadableId(),
+            ownerId: temporaryStorage.user.id,
             transporterCompanySiret: transporter.company.siret,
             transporterCompanyName: transporter.company.name
           }

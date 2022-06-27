@@ -7,10 +7,12 @@ const groupingResolver: FormResolvers["grouping"] = async form => {
     where: { nextFormId: form.id },
     include: { initialForm: true }
   });
-  return formGroupements.map(({ quantity, initialForm }) => ({
-    quantity,
-    form: expandAppendix2FormFromDb(initialForm)
-  }));
+  return Promise.all(
+    formGroupements.map(async ({ quantity, initialForm }) => ({
+      quantity,
+      form: await expandAppendix2FormFromDb(initialForm)
+    }))
+  );
 };
 
 export default groupingResolver;

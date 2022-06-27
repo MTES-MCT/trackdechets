@@ -48,10 +48,20 @@ export const COLUMNS: Record<
     accessor: dasri => dasri.id,
   },
   emitter: {
-    accessor: dasri => dasri.emitter?.company?.name ?? "",
+    accessor: dasri => (
+      <>
+        <div>{dasri.emitter?.company?.name ?? ""}</div>
+        <div>{dasri.emitter?.company?.siret ?? ""}</div>
+      </>
+    ),
   },
   recipient: {
-    accessor: dasri => dasri?.destination?.company?.name ?? "",
+    accessor: dasri => (
+      <>
+        <div>{dasri?.destination?.company?.name ?? ""}</div>
+        <div>{dasri?.destination?.company?.siret ?? ""}</div>
+      </>
+    ),
   },
   waste: {
     accessor: dasri => dasri["bsdasriWaste"]?.code ?? "",

@@ -309,7 +309,10 @@ function flattenWasteInput(input: { waste?: BsdasriWasteInput }) {
     return null;
   }
   return {
-    wasteCode: chain(input.waste, w => w.code),
+    wasteCode: chain(input.waste, w =>
+      // we used to accept wrong "18 01 02*" code. Still accept it but convert it to "18 02 02*"
+      w.code === "18 01 02*" ? "18 02 02*" : w.code
+    ),
     wasteAdr: chain(input.waste, w => w.adr)
   };
 }

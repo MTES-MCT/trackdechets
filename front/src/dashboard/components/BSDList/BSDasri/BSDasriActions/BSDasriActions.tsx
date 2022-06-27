@@ -12,6 +12,7 @@ import classNames from "classnames";
 import routes from "common/routes";
 import { useBsdasriDuplicate } from "./useDuplicate";
 import { DeleteBsdasriModal } from "./DeleteModal";
+
 import {
   IconTrash,
   IconChevronDown,
@@ -24,6 +25,7 @@ import {
 import { Bsdasri, BsdasriStatus, BsdasriType } from "generated/graphql/types";
 import { useDownloadPdf } from "./useDownloadPdf";
 import styles from "../../BSDActions.module.scss";
+import { TableRoadControlButton } from "../../RoadControlButton";
 
 interface BSDAsriActionsProps {
   form: Bsdasri;
@@ -70,6 +72,9 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
+
+              <TableRoadControlButton siret={siret} form={form} />
+
               {form["bsdasriStatus"] === BsdasriStatus.Initial && (
                 <MenuItem onSelect={() => setIsDeleting(true)}>
                   <IconTrash color="blueLight" size="24px" />

@@ -96,16 +96,91 @@ describe("mutation sendMembershipRequest", () => {
         }
       })
     );
-
+    // admin emails are not displayed because they do not belong to the same domain
     expect(sendMailSpy).toHaveBeenNthCalledWith(
       2,
       renderMail(membershipRequestConfirmation, {
         to: [{ email: requester.email, name: requester.name }],
-        variables: { companyName: company.name, companySiret: company.siret }
+        variables: {
+          companyName: company.name,
+          companySiret: company.siret,
+          adminEmailsInfo: ""
+        }
       })
     );
   });
 
+  it("should send a request to all admins of the company and create a MembershipRequest record bis", async () => {
+    const userIndex = (await prisma.user.count()) + 1;
+
+    const requester = await userFactory({
+      email: `requester${userIndex}@trackdechets.fr`
+    });
+    const admin = await userFactory({
+      email: `admin${userIndex}@trackdechets.fr`
+    });
+    const company = await companyFactory();
+    await associateUserToCompany(admin.id, company.siret, "ADMIN");
+    const { mutate } = makeClient(requester);
+    const { data } = await mutate<Pick<Mutation, "sendMembershipRequest">>(
+      SEND_MEMBERSHIP_REQUEST,
+      {
+        variables: { siret: company.siret }
+      }
+    );
+    const { id, status, sentTo, email, siret } = data.sendMembershipRequest;
+    expect(status).toEqual("PENDING");
+    // emails should be hidden
+    expect(sentTo).toEqual([`admin${userIndex}@trackdechets.fr`]);
+    expect(email).toEqual(requester.email);
+    expect(siret).toEqual(company.siret);
+    const membershipRequest = await prisma.membershipRequest.findUnique({
+      where: { id }
+    });
+
+    // check relation to user was created
+    const linkedUser = await prisma.membershipRequest
+      .findUnique({ where: { id } })
+      .user();
+    expect(linkedUser.id).toEqual(requester.id);
+
+    // check relation to company was created
+    const linkedCompany = await prisma.membershipRequest
+      .findUnique({ where: { id } })
+      .company();
+    expect(linkedCompany.id).toEqual(company.id);
+
+    expect(membershipRequest.sentTo).toEqual([
+      `admin${userIndex}@trackdechets.fr`
+    ]);
+    expect(membershipRequest.status).toEqual("PENDING");
+    expect(membershipRequest.statusUpdatedBy).toBeNull();
+
+    expect(sendMailSpy).toHaveBeenNthCalledWith(
+      1,
+      renderMail(membershipRequestMail, {
+        to: [{ email: admin.email, name: admin.name }],
+        variables: {
+          membershipRequestId: membershipRequest.id,
+          companyName: company.name,
+          companySiret: company.siret,
+          userEmail: requester.email
+        }
+      })
+    );
+    // admin emails   not displayed because they  belong to the same domain
+    expect(sendMailSpy).toHaveBeenNthCalledWith(
+      2,
+      renderMail(membershipRequestConfirmation, {
+        to: [{ email: requester.email, name: requester.name }],
+        variables: {
+          companyName: company.name,
+          companySiret: company.siret,
+          adminEmailsInfo: `Si vous n'avez pas de retour au bout de quelques jours, vous pourrez contacter: ${admin.email}`
+        }
+      })
+    );
+  });
   it("should return an error if company does not exist", async () => {
     const user = await userFactory();
     const { mutate } = makeClient(user);

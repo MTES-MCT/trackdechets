@@ -1,0 +1,16 @@
+import { BsdaRevisionRequest, Prisma } from "@prisma/client";
+import { ReadRepositoryFnDeps } from "../../../forms/repository/types";
+
+export type FindManyBsdaRevisionRequestFn = (
+  where: Prisma.BsdaRevisionRequestWhereInput,
+  options?: Omit<Prisma.BsdaRevisionRequestFindManyArgs, "where">
+) => Promise<BsdaRevisionRequest[]>;
+
+export function buildFindManyBsdaRevisionRequest({
+  prisma
+}: ReadRepositoryFnDeps): FindManyBsdaRevisionRequestFn {
+  return (where, options?) => {
+    const input = { where, ...options };
+    return prisma.bsdaRevisionRequest.findMany(input);
+  };
+}

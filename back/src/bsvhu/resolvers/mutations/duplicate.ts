@@ -4,8 +4,8 @@ import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { MutationDuplicateBsvhuArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { expandVhuFormFromDb } from "../../converter";
-import { getFormOrFormNotFound } from "../../database";
-import { checkIsFormContributor } from "../../permissions";
+import { getBsvhuOrNotFound } from "../../database";
+import { checkIsBsvhuContributor } from "../../permissions";
 import { indexBsvhu } from "../../elastic";
 export default async function duplicate(
   _,
@@ -14,9 +14,9 @@ export default async function duplicate(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const prismaForm = await getFormOrFormNotFound(id);
+  const prismaForm = await getBsvhuOrNotFound(id);
 
-  await checkIsFormContributor(
+  await checkIsBsvhuContributor(
     user,
     prismaForm,
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"

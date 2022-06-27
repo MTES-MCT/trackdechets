@@ -28,6 +28,12 @@ type FormCompany {
 
   "Numéro de TVA intracommunautaire"
   vatNumber: String
+
+  """
+  Numéro OMI ou IMO (International Maritime Organization) pour les navires étrangers (sans SIRET).
+  Il est composé des trois lettres IMO suivi d'un nombre de sept chiffres (ex: IMO 1234567).
+  """
+  omiNumber: String
 }
 
 "Informations sur une adresse chantier"

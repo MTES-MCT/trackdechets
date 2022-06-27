@@ -302,6 +302,7 @@ type TemporaryStorer {
   receivedBy: String
 }
 
+"Destination finale après entreposage provisoire ou reconditionement"
 type Destination {
   "N° de CAP (le cas échéant)"
   cap: String
@@ -312,7 +313,10 @@ type Destination {
   "Établissement de destination"
   company: FormCompany
 
-  "Indique si l'information a été saisie par l'émetteur du bordereau ou l'installation d'entreposage"
+  """
+  DEPRECATED (renvoie toujours `false`) - Indique si l'information a été saisie par
+  l'émetteur du bordereau ou l'installation d'entreposage
+  """
   isFilledByEmitter: Boolean
 }
 
@@ -336,6 +340,12 @@ type Emitter {
 
   "Établissement émetteur"
   company: FormCompany
+
+  "Indique si le détenteur est un particulier ou une entreprise"
+  isPrivateIndividual: Boolean
+
+  "Indique si le détenteur est un navire étranger"
+  isForeignShip: Boolean
 }
 
 """
@@ -689,6 +699,9 @@ type FormRevisionRequestContent {
   "Traitement réalisé (code D/R)"
   processingOperationDone: String
 
+  "Description de l'opération d’élimination / valorisation (case 11)"
+  processingOperationDescription: String
+
   "Entreposage provisoire (édition partielle uniquement)"
   temporaryStorageDetail: FormRevisionRequestTemporaryStorageDetail
 }
@@ -697,8 +710,14 @@ type FormRevisionRequestWasteDetails {
   "Code CED"
   code: String
 
+  "Description du déchet"
+  name: String
+
   "Contient des Polluants Organiques Persistants (POP) oui / non"
   pop: Boolean
+
+  "Conditionnements"
+  packagingInfos: [PackagingInfo!]
 }
 
 type FormRevisionRequestRecipient {

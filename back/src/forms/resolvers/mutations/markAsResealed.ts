@@ -1,16 +1,18 @@
-import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
-import {
-  expandFormFromDb,
-  flattenResealedFormInput
-} from "../../form-converter";
+import { expandFormFromDb, flattenFormInput } from "../../form-converter";
 import { checkCanMarkAsResealed } from "../../permissions";
-import { checkCompaniesType, resealedFormSchema } from "../../validation";
+import { checkCompaniesType, sealedFormSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
-import { Form, Status } from "@prisma/client";
+import {
+  EmitterType,
+  Form,
+  Prisma,
+  QuantityType,
+  Status
+} from "@prisma/client";
 import { getFormRepository } from "../../repository";
 
 const markAsResealed: MutationResolvers["markAsResealed"] = async (
@@ -25,43 +27,71 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
   const form = await getFormOrFormNotFound({ id });
   const formRepository = getFormRepository(user);
 
-  const { temporaryStorageDetail } = await formRepository.findFullFormById(
-    form.id
-  );
-
-  if (temporaryStorageDetail === null) {
-    throw new UserInputError(
-      "Ce bordereau ne correspond pas à un entreposage provisoire ou un reconditionnemnt"
-    );
-  }
+  const { forwardedIn } = await formRepository.findFullFormById(form.id);
 
   await checkCanMarkAsResealed(user, form);
 
-  const updateInput = flattenResealedFormInput(resealedInfos);
+  const { destination, transporter, wasteDetails } = resealedInfos;
+
+  // copy basic info from initial BSD and overwrite it with resealedInfos
+  const updateInput = {
+    emitterType: EmitterType.PRODUCER,
+    emittedByEcoOrganisme: false,
+    emitterCompanySiret: form.recipientCompanySiret,
+    emitterCompanyName: form.recipientCompanyName,
+    emitterCompanyAddress: form.recipientCompanyAddress,
+    emitterCompanyContact: form.recipientCompanyContact,
+    emitterCompanyMail: form.recipientCompanyMail,
+    emitterCompanyPhone: form.recipientCompanyPhone,
+    wasteDetailsCode: form.wasteDetailsCode,
+    wasteDetailsConsistence: form.wasteDetailsConsistence,
+    wasteDetailsIsDangerous: form.wasteDetailsIsDangerous,
+    wasteDetailsName: form.wasteDetailsName,
+    wasteDetailsOnuCode: form.wasteDetailsOnuCode,
+    wasteDetailsPop: form.wasteDetailsPop,
+    wasteDetailsQuantityType: QuantityType.REAL,
+    wasteDetailsQuantity: form.quantityReceived,
+    wasteDetailsPackagingInfos: form.wasteDetailsPackagingInfos,
+    wasteDetailsAnalysisReferences: [],
+    wasteDetailsLandIdentifiers: [],
+    ...flattenFormInput({ transporter, wasteDetails, recipient: destination })
+  };
 
   // validate input
-  await resealedFormSchema.validate({
-    ...temporaryStorageDetail,
+  await sealedFormSchema.validate({
+    ...forwardedIn,
     ...updateInput
   });
 
   await checkCompaniesType(form);
 
-  const formUpdateInput = {
-    temporaryStorageDetail: {
-      update: updateInput
-    }
-  };
+  const formUpdateInput: Prisma.FormUpdateInput =
+    forwardedIn === null
+      ? // The recipient decides to forward the BSD even if it has not been
+        // flagged as temporary storage before
+        {
+          recipientIsTempStorage: true,
+          forwardedIn: {
+            create: {
+              owner: { connect: { id: user.id } },
+              readableId: `${form.readableId}-suite`,
+              ...updateInput,
+              status: Status.SEALED
+            }
+          }
+        }
+      : {
+          forwardedIn: {
+            update: { ...updateInput, status: Status.SEALED }
+          }
+        };
 
   let resealedForm: Form | null = null;
 
   if (form.status === Status.RESEALED) {
     // by pass xstate transition because markAsResealed is
     // used to update an already resealed form
-    resealedForm = await formRepository.update(
-      { id },
-      { temporaryStorageDetail: { update: updateInput } }
-    );
+    resealedForm = await formRepository.update({ id }, formUpdateInput);
   } else {
     resealedForm = await transitionForm(user, form, {
       type: EventType.MarkAsResealed,

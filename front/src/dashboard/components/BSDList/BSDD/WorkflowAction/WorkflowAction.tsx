@@ -90,7 +90,12 @@ export function WorkflowAction(props: WorkflowActionProps) {
     }
     case FormStatus.TempStorerAccepted: {
       if (siret === form.recipient?.company?.siret) {
-        return <MarkAsResealed {...props} />;
+        return (
+          <div className="tw-flex tw-space-x-2">
+            <MarkAsProcessed {...props} />
+            <MarkAsResealed {...props} />
+          </div>
+        );
       }
       return null;
     }
@@ -128,10 +133,16 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.Accepted: {
-      if (
-        (isTempStorage &&
-          siret === form.temporaryStorageDetail?.destination?.company?.siret) ||
-        (!isTempStorage && siret === form.recipient?.company?.siret)
+      if (!isTempStorage && siret === form.recipient?.company?.siret) {
+        return (
+          <div className="tw-flex tw-space-x-2">
+            <MarkAsResealed {...props} />
+            <MarkAsProcessed {...props} />
+          </div>
+        );
+      } else if (
+        isTempStorage &&
+        siret === form.temporaryStorageDetail?.destination?.company?.siret
       ) {
         return <MarkAsProcessed {...props} />;
       }

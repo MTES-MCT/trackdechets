@@ -23,10 +23,20 @@ export const COLUMNS: Record<
     accessor: bsff => bsff.id,
   },
   emitter: {
-    accessor: bsff => bsff.bsffEmitter?.company?.name ?? "",
+    accessor: bsff => (
+      <>
+        <div>{bsff.bsffEmitter?.company?.name ?? ""}</div>
+        <div>{bsff.bsffEmitter?.company?.siret ?? ""}</div>
+      </>
+    ),
   },
   recipient: {
-    accessor: bsff => bsff.bsffDestination?.company?.name ?? "",
+    accessor: bsff => (
+      <>
+        <div>{bsff.bsffDestination?.company?.name ?? ""}</div>
+        <div>{bsff.bsffDestination?.company?.siret ?? ""}</div>
+      </>
+    ),
   },
   waste: {
     accessor: bsff =>

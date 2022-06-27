@@ -13,7 +13,7 @@ import { Column } from "../columns";
 import styles from "./BSDCards.module.scss";
 import { BsdTypename } from "dashboard/constants";
 import { BsffFragment } from "../BSFF";
-
+import { CardRoadControlButton } from "../RoadControlButton";
 interface BSDCardsProps {
   bsds: Bsd[];
   columns: Column[];
@@ -53,19 +53,23 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
           </ul>
           <div className={styles.BSDCardActions}>
             {!!form.__typename && (
-              <Link
-                to={{
-                  pathname: generatePath(getViewRoute(form.__typename), {
-                    siret,
-                    id: form.id,
-                  }),
-                  state: { background: location },
-                }}
-                className="btn btn--outline-primary"
-              >
-                <IconView size="24px" style={{ marginRight: "1rem" }} />
-                Aperçu
-              </Link>
+              <>
+                <Link
+                  to={{
+                    pathname: generatePath(getViewRoute(form.__typename), {
+                      siret,
+                      id: form.id,
+                    }),
+                    state: { background: location },
+                  }}
+                  className="btn btn--outline-primary"
+                >
+                  <IconView size="24px" style={{ marginRight: "1rem" }} />
+                  Aperçu
+                </Link>
+
+                <CardRoadControlButton siret={siret} form={form} />
+              </>
             )}
             {form.__typename === "Form" ? (
               <WorkflowAction siret={siret} form={form} />

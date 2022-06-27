@@ -1345,3 +1345,35 @@ export function IconBSDa(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function IconQrCode({
+  color = "currentColor",
+  size = "1em",
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      {...props}
+      className={classNames(props.className, {
+        [styles.blue]: color === "blue",
+        [styles.blueLight]: color === "blueLight",
+        [styles.white]: color === "white",
+      })}
+      viewBox="0 0 48 48"
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      stroke="currentColor"
+      strokeWidth={1.5}
+    >
+      <g fill="none" fillRule="evenodd">
+        <path
+          d="M.75 12.75v1.5h1.5M.75.75h6v6h-6v-6Zm16.5 0h6v6h-6v-6ZM.75 17.25h6v6h-6v-6ZM12 .75h2.25m-4.5 0v3H12m2.25 0v3h-4.5m-9 3h6v1.5m-1.5 3h1.5m16.5 9h-3v-3h3v-3h-3m-6 6h-4.5v-6m7.5 0v6m-4.5-6h1.5v3h-1.5m-3-7.5v1.5h1.5m3 0h3m-1.5 0v-3m-6-1.5h3v1.5m10.5-1.5v1.5m0 2.25v.75m-4.5-4.5v1.5h1.5v2.25"
+          transform="scale(2)"
+        />
+      </g>
+    </svg>
+  );
+}
+
+// style="fill:none;fill-rule:nonzero;stroke:#000;stroke-width:1.5px"

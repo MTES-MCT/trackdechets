@@ -3,8 +3,7 @@ import {
   Prisma,
   RevisionRequestStatus,
   Status,
-  User,
-  TemporaryStorageDetail
+  User
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
@@ -28,14 +27,18 @@ import {
   INVALID_SIRET_LENGTH,
   INVALID_WASTE_CODE
 } from "../../errors";
+import { packagingInfoFn } from "../../validation";
 
 export type RevisionRequestContent = Pick<
   Prisma.BsddRevisionRequestCreateInput,
   | "recipientCap"
   | "wasteDetailsCode"
+  | "wasteDetailsName"
   | "wasteDetailsPop"
+  | "wasteDetailsPackagingInfos"
   | "quantityReceived"
   | "processingOperationDone"
+  | "processingOperationDescription"
   | "brokerCompanyName"
   | "brokerCompanySiret"
   | "brokerCompanyAddress"
@@ -69,15 +72,9 @@ export default async function createFormRevisionRequest(
   const existingBsdd = await getFormOrFormNotFound({ id: formId });
 
   const formRepository = getFormRepository(user);
-  const { temporaryStorageDetail } = await formRepository.findFullFormById(
-    formId
-  );
+  const forwardedIn = await formRepository.findForwardedInById(formId);
 
-  await checkIfUserCanRequestRevisionOnBsdd(
-    user,
-    existingBsdd,
-    temporaryStorageDetail
-  );
+  await checkIfUserCanRequestRevisionOnBsdd(user, existingBsdd, forwardedIn);
 
   const flatContent = await getFlatContent(content, existingBsdd);
 
@@ -111,15 +108,15 @@ async function getAuthoringCompany(
   bsdd: Form,
   authoringCompanySiret: string
 ) {
-  const { temporaryStorageDetail } = await getFormRepository(
-    user
-  ).findFullFormById(bsdd.id);
+  const forwardedIn = await getFormRepository(user).findForwardedInById(
+    bsdd.id
+  );
 
   if (
     ![
       bsdd.emitterCompanySiret,
       bsdd.recipientCompanySiret,
-      temporaryStorageDetail?.destinationCompanySiret
+      forwardedIn?.recipientCompanySiret
     ].includes(authoringCompanySiret)
   ) {
     throw new UserInputError(
@@ -144,9 +141,14 @@ async function getAuthoringCompany(
 async function checkIfUserCanRequestRevisionOnBsdd(
   user: User,
   bsdd: Form,
-  temporaryStorageDetail?: TemporaryStorageDetail
+  forwardedIn?: Form
 ): Promise<void> {
-  await checkCanRequestRevision(user, bsdd, temporaryStorageDetail);
+  await checkCanRequestRevision(user, bsdd, forwardedIn);
+  if (bsdd.emitterIsPrivateIndividual || bsdd.emitterIsForeignShip) {
+    throw new ForbiddenError(
+      "Impossible de créer une révision sur ce bordereau car l'émetteur est un particulier ou un navire étranger."
+    );
+  }
   if (Status.DRAFT === bsdd.status || Status.SEALED === bsdd.status) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau. Vous pouvez le modifier directement, aucune signature bloquante n'a encore été apposée."
@@ -184,10 +186,7 @@ async function getFlatContent(
     );
   }
 
-  if (
-    bsdd.temporaryStorageDetailId == null &&
-    hasTemporaryStorageUpdate(flatContent)
-  ) {
+  if (bsdd.forwardedInId == null && hasTemporaryStorageUpdate(flatContent)) {
     throw new UserInputError(
       "Impossible de réviser l'entreposage provisoire, ce bordereau n'est pas concerné."
     );
@@ -211,11 +210,11 @@ async function getApproversSirets(
   ];
 
   if (hasTemporaryStorageUpdate(content)) {
-    const { temporaryStorageDetail } = await getFormRepository(
-      user
-    ).findFullFormById(bsdd.id);
+    const forwardedIn = await getFormRepository(user).findForwardedInById(
+      bsdd.id
+    );
 
-    approvers.push(temporaryStorageDetail.destinationCompanySiret);
+    approvers.push(forwardedIn.recipientCompanySiret);
   }
 
   return approvers
@@ -236,12 +235,18 @@ const bsddRevisionRequestSchema = yup
     wasteDetailsCode: yup
       .string()
       .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE),
+    wasteDetailsName: yup.string().nullable(),
     wasteDetailsPop: yup.boolean().nullable(),
+    wasteDetailsPackagingInfos: yup
+      .array()
+      .of(packagingInfoFn(false))
+      .nullable(),
     quantityReceived: yup.number().min(0).nullable(),
     processingOperationDone: yup
       .string()
       .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
       .nullable(),
+    processingOperationDescription: yup.string().nullable(),
     brokerCompanyName: yup.string().nullable(),
     brokerCompanySiret: yup
       .string()

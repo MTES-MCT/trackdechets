@@ -1,4 +1,4 @@
-import { Status } from "@prisma/client";
+import { Form, Status } from "@prisma/client";
 import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 import { FullForm } from "./types";
@@ -36,10 +36,9 @@ export function getSiretsByTab(
   const formSirets = {
     emitterCompanySiret: form.emitterCompanySiret,
     recipientCompanySiret: form.recipientCompanySiret,
-    temporaryStorageDetailDestinationCompanySiret:
-      form.temporaryStorageDetail?.destinationCompanySiret,
-    temporaryStorageDetailTransporterCompanySiret:
-      form.temporaryStorageDetail?.transporterCompanySiret,
+    forwardedInDestinationCompanySiret: form.forwardedIn?.recipientCompanySiret,
+    forwardedInTransporterCompanySiret:
+      form.forwardedIn?.transporterCompanySiret,
     traderCompanySiret: form.traderCompanySiret,
     brokerCompanySiret: form.brokerCompanySiret,
     ecoOrganismeSiret: form.ecoOrganismeSiret,
@@ -123,31 +122,22 @@ export function getSiretsByTab(
     }
     case Status.RESEALED: {
       setFieldTab("recipientCompanySiret", "isForActionFor");
-      setFieldTab(
-        "temporaryStorageDetailTransporterCompanySiret",
-        "isToCollectFor"
-      );
+      setFieldTab("forwardedInTransporterCompanySiret", "isToCollectFor");
 
       break;
     }
     case Status.SIGNED_BY_TEMP_STORER: {
-      setFieldTab(
-        "temporaryStorageDetailTransporterCompanySiret",
-        "isToCollectFor"
-      );
+      setFieldTab("forwardedInTransporterCompanySiret", "isToCollectFor");
 
       break;
     }
     case Status.RESENT:
-      setFieldTab(
-        "temporaryStorageDetailTransporterCompanySiret",
-        "isCollectedFor"
-      );
+      setFieldTab("forwardedInTransporterCompanySiret", "isCollectedFor");
     case Status.RECEIVED:
     case Status.ACCEPTED: {
       setFieldTab(
         form.recipientIsTempStorage
-          ? "temporaryStorageDetailDestinationCompanySiret"
+          ? "forwardedInDestinationCompanySiret"
           : "recipientCompanySiret",
         "isForActionFor"
       );
@@ -178,10 +168,10 @@ export function getSiretsByTab(
 }
 
 function getRecipient(form: FullForm) {
-  return form.temporaryStorageDetail?.signedByTransporter
+  return form.forwardedIn?.emittedAt
     ? {
-        name: form.temporaryStorageDetail.destinationCompanyName,
-        siret: form.temporaryStorageDetail.destinationCompanySiret
+        name: form.forwardedIn.recipientCompanyName,
+        siret: form.forwardedIn.recipientCompanySiret
       }
     : { name: form.recipientCompanyName, siret: form.recipientCompanySiret };
 }
@@ -189,9 +179,10 @@ function getRecipient(form: FullForm) {
 /**
  * Convert a BSD from the forms table to Elastic Search's BSD model.
  */
-function toBsdElastic(form: FullForm): BsdElastic {
+function toBsdElastic(form: FullForm & { forwarding?: Form }): BsdElastic {
   const siretsByTab = getSiretsByTab(form);
   const recipient = getRecipient(form);
+
   return {
     type: "BSDD",
     id: form.id,
@@ -205,12 +196,7 @@ function toBsdElastic(form: FullForm): BsdElastic {
     transporterTakenOverAt: form.sentAt?.getTime(),
     destinationCompanyName: recipient.name ?? "",
     destinationCompanySiret: recipient.siret ?? "",
-    destinationReceptionDate:
-      form.receivedAt?.getTime() ??
-      // a single v1 BSDD increment both TTR incoming wastes registry
-      // and final destination incoming wastes registry. Add this line
-      // to prevent sorting on null value when paginating TTR registry
-      form.temporaryStorageDetail?.tempStorerReceivedAt?.getTime(),
+    destinationReceptionDate: form.receivedAt?.getTime(),
     destinationReceptionWeight: form.quantityReceived,
     destinationOperationCode: form.processingOperationDone ?? "",
     destinationOperationDate: form.processedAt?.getTime(),
@@ -218,7 +204,17 @@ function toBsdElastic(form: FullForm): BsdElastic {
     wasteDescription: form.wasteDetailsName,
     transporterNumberPlate: [form.transporterNumberPlate],
     transporterCustomInfo: form.transporterCustomInfo,
-    ...siretsByTab,
+    ...(form.forwarding
+      ? {
+          // do not display BSD suite in dashboard
+          isDraftFor: [],
+          isForActionFor: [],
+          isFollowFor: [],
+          isArchivedFor: [],
+          isToCollectFor: [],
+          isCollectedFor: []
+        }
+      : siretsByTab),
     sirets: Object.values(siretsByTab).flat(),
     ...getRegistryFields(form),
     intermediaries: form.intermediaries
@@ -240,7 +236,8 @@ export async function indexAllForms(
       isDeleted: false
     },
     include: {
-      temporaryStorageDetail: true,
+      forwarding: true,
+      forwardedIn: true,
       transportSegments: true,
       intermediaries: true
     }
@@ -268,5 +265,18 @@ export function indexForm(form: FullForm, ctx?: GraphQLContext) {
   if (form.isDeleted) {
     return null;
   }
+  if (form.forwardedIn) {
+    // index next BSD asynchronously
+    indexBsd(
+      toBsdElastic({
+        ...form.forwardedIn,
+        transportSegments: [],
+        intermediaries: [],
+        forwardedIn: null,
+        forwarding: form
+      })
+    );
+  }
+
   return indexBsd(toBsdElastic(form), ctx);
 }

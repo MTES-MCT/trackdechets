@@ -130,6 +130,14 @@ enum ApplicationGoal {
   CLIENTS
 }
 
+enum BsdType {
+  BSDD
+  BSDA
+  BSDASRI
+  BSFF
+  BSVHU
+}
+
 model AccessToken {
   id            String       @id @default(cuid())
   createdAt     DateTime     @default(now()) @db.Timestamptz(6)
@@ -197,6 +205,7 @@ model Company {
   MembershipRequest                    MembershipRequest[]
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
   bsddRevisionRequests                 BsddRevisionRequest[]
+  BsdaRevisionRequest                  BsdaRevisionRequest[]
 }
 
 // Companies with restricted diffusion of SIRENE or VAT information (police, army, etc)
@@ -258,12 +267,15 @@ model Form {
   updatedAt                          DateTime                @updatedAt @db.Timestamptz(6)
   emitterType                        EmitterType?
   emitterPickupSite                  String?
+  emitterIsPrivateIndividual         Boolean?                 @default(false)
+  emitterIsForeignShip               Boolean?                 @default(false)
   emitterCompanyName                 String?
   emitterCompanySiret                String?
   emitterCompanyAddress              String?
   emitterCompanyContact              String?
   emitterCompanyPhone                String?
   emitterCompanyMail                 String?
+  emitterCompanyOmiNumber            String?
   recipientCap                       String?
   recipientProcessingOperation       String?
   recipientCompanyName               String?
@@ -306,6 +318,7 @@ model Form {
   isAccepted                         Boolean?                @default(false)
   receivedAt                         DateTime?               @db.Timestamptz(6)
   quantityReceived                   Float?
+  quantityReceivedType               QuantityType?
   processingOperationDone            String?
   wasteDetailsName                   String?
   isDeleted                          Boolean?                @default(false)
@@ -360,22 +373,26 @@ model Form {
   ecoOrganismeName                   String?
   ecoOrganismeSiret                  String?
   signedBy                           String?
-  temporaryStorageDetailId           String?                 @unique
-  temporaryStorageDetail             TemporaryStorageDetail? @relation(fields: [temporaryStorageDetailId], references: [id])
-  transportSegments                  TransportSegment[]
-  groupedIn                          FormGroupement[]        @relation("GroupedIn")
-  grouping                           FormGroupement[]        @relation("Grouping")
-  // quantité affectée à des bordereaux de regroupement
-  quantityGrouped                    Float                   @default(0)
 
-  // TODO delete after release 2022.06.1
-  appendix2RootFormId String?
+  // TODO delete after release 2022.06.2
+  temporaryStorageDetailId String?                 @unique
+  temporaryStorageDetail   TemporaryStorageDetail? @relation(fields: [temporaryStorageDetailId], references: [id])
+
+  transportSegments TransportSegment[]
+  groupedIn         FormGroupement[]   @relation("GroupedIn")
+  grouping          FormGroupement[]   @relation("Grouping")
+  // quantité affectée à des bordereaux de regroupement
+  quantityGrouped   Float              @default(0)
 
   ownerId              String
   owner                User                          @relation(fields: [ownerId], references: [id])
   StatusLog            StatusLog[]
   bsddRevisionRequests BsddRevisionRequest[]
   intermediaries       IntermediaryFormAssociation[]
+
+  forwarding    Form?   @relation("BsddForwarding")
+  forwardedInId String? @unique
+  forwardedIn   Form?   @relation("BsddForwarding", fields: [forwardedInId], references: [id])
 
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
@@ -435,9 +452,12 @@ model BsddRevisionRequest {
 
   recipientCap                                   String?
   wasteDetailsCode                               String?
+  wasteDetailsName                               String?
   wasteDetailsPop                                Boolean?
+  wasteDetailsPackagingInfos                     Json?
   quantityReceived                               Float?
   processingOperationDone                        String?
+  processingOperationDescription                 String?
   brokerCompanyName                              String?
   brokerCompanySiret                             String?
   brokerCompanyAddress                           String?
@@ -572,6 +592,7 @@ model StatusLog {
   @@index([formId], map: "_StatusLogFormIdIdx")
 }
 
+// TODO delete after release 2022.06.2
 model TemporaryStorageDetail {
   id                               String                  @id @default(cuid())
   tempStorerQuantityType           QuantityType?
@@ -707,10 +728,11 @@ model User {
   UserActivationHash    UserActivationHash[]
   UserResetPasswordHash UserResetPasswordHash[]
 
-  bsdasriEmissionSignatures  Bsdasri[] @relation("BsdasriEmissionSignature")
-  bsdasriTransportSignatures Bsdasri[] @relation("BsdasriTransportSignature")
-  bsdasriReceptionSignatures Bsdasri[] @relation("BsdasriReceptionSignature")
-  bsdasriOperationignatures  Bsdasri[] @relation("BsdasriOperationSignature")
+  bsdasriEmissionSignatures  Bsdasri[]        @relation("BsdasriEmissionSignature")
+  bsdasriTransportSignatures Bsdasri[]        @relation("BsdasriTransportSignature")
+  bsdasriReceptionSignatures Bsdasri[]        @relation("BsdasriReceptionSignature")
+  bsdasriOperationignatures  Bsdasri[]        @relation("BsdasriOperationSignature")
+  PdfAccessToken             PdfAccessToken[]
 }
 
 model UserAccountHash {
@@ -1307,12 +1329,77 @@ model Bsda {
   childBsda   Bsda?   @relation("BsdasToBsda", fields: [childBsdaId], references: [id])
   childBsdaId String?
 
+  BsdaRevisionRequest BsdaRevisionRequest[]
   @@index([emitterCompanySiret], map: "_BsdaEmitterCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_BsdaBrokerCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsdaDestinationCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsdaTransporterCompanySiretIdx")
   @@index([workerCompanySiret], map: "_BsdaWorkerCompanySiretIdx")
   @@index([status], map: "_BsdaStatusIdx")
+}
+
+model BsdaRevisionRequest {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  bsdaId             String
+  bsda               Bsda    @relation(fields: [bsdaId], references: [id])
+  authoringCompanyId String
+  authoringCompany   Company @relation(fields: [authoringCompanyId], references: [id])
+
+  approvals BsdaRevisionRequestApproval[]
+
+  wasteCode         String?
+  wastePop          Boolean?
+  packagings        Json?
+  wasteSealNumbers  String[]
+  wasteMaterialName String?
+
+  destinationCap                  String?
+  destinationReceptionWeight      Float?
+  destinationOperationCode        String?
+  destinationOperationDescription String?
+
+  brokerCompanyName            String?
+  brokerCompanySiret           String?
+  brokerCompanyAddress         String?
+  brokerCompanyContact         String?
+  brokerCompanyPhone           String?
+  brokerCompanyMail            String?
+  brokerRecepisseNumber        String?
+  brokerRecepisseDepartment    String?
+  brokerRecepisseValidityLimit DateTime? @db.Timestamptz(6)
+
+
+  emitterPickupSiteName       String?
+  emitterPickupSiteAddress    String?
+  emitterPickupSiteCity       String?
+  emitterPickupSitePostalCode String?
+  emitterPickupSiteInfos      String?
+
+  comment String
+
+  status RevisionRequestStatus @default(PENDING)
+
+  @@index([authoringCompanyId], map: "_BsdaRevisionRequestAuthoringCompanyIdIdx")
+  @@index([bsdaId], map: "_BsdaRevisionRequestBsdaIdIdx")
+}
+
+model BsdaRevisionRequestApproval {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  revisionRequestId String
+  revisionRequest   BsdaRevisionRequest @relation(fields: [revisionRequestId], references: [id])
+  approverSiret     String
+
+  status  RevisionRequestApprovalStatus @default(PENDING)
+  comment String?
+
+  @@index([revisionRequestId], map: "_BsdaRevisionRequestApprovalRevisionRequestIdIdx")
+  @@index([approverSiret], map: "_BsdaRevisionRequestApprovalApproverSiretIdx")
 }
 
 model Event {
@@ -1325,4 +1412,20 @@ model Event {
   metadata Json?
 
   actor String
+}
+
+// Short-lived token to access a bsd pdf
+model PdfAccessToken {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  expiresAt DateTime  @db.Timestamptz(6)
+  token     String    @unique
+  bsdType   BsdType
+  bsdId     String
+  lastUsed  DateTime? @db.Timestamptz(6)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  visitedAt DateTime? @db.Timestamptz(6)
+
+  @@index([token], map: "_PdfAccessTokenTokenIdx")
 }

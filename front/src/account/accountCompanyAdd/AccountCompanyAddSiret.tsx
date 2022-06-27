@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { gql, useLazyQuery, useMutation } from "@apollo/client";
 import { Field, Form, Formik } from "formik";
-import cogoToast from "cogo-toast";
 import { COMPANY_PRIVATE_INFOS } from "form/common/components/company/query";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import AutoFormattingCompanyInfosInput from "common/components/AutoFormattingCompanyInfosInput";
@@ -28,6 +27,39 @@ const CREATE_TEST_COMPANY = gql`
   }
 `;
 
+const closedCompanyError = (
+  <SimpleNotificationError
+    message={
+      <>
+        <p>
+          Cet établissement est fermé, il ne peut pas être inscrit. Il est
+          possible que votre SIRET ait changé.
+        </p>
+        <p>
+          Pour vérifier s'il existe encore, RDV sur{" "}
+          <a
+            href="https://annuaire-entreprises.data.gouv.fr"
+            target="_blank"
+            rel="noreferrer"
+          >
+            https://annuaire-entreprises.data.gouv.fr
+          </a>
+        </p>
+        <p>
+          Pour déclarer un changement, RDV sur{" "}
+          <a
+            href="https://entreprendre.service-public.fr/vosdroits/F31479"
+            target="_blank"
+            rel="noreferrer"
+          >
+            https://entreprendre.service-public.fr/vosdroits/F31479
+          </a>
+        </p>
+      </>
+    }
+  />
+);
+
 /**
  * SIRET Formik field for company creation
  * The siret is checked against query { companyInfos }
@@ -40,6 +72,7 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
   const [isRegistered, setIsRegistered] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isNonDiffusible, setIsNonDiffusible] = useState(false);
+  const [isClosed, setIsClosed] = useState(false);
 
   const [searchCompany, { loading, error }] = useLazyQuery<
     Pick<Query, "companyPrivateInfos">
@@ -48,9 +81,7 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
       if (data && data.companyPrivateInfos) {
         const companyInfos = data.companyPrivateInfos;
         if (companyInfos.etatAdministratif === "F") {
-          cogoToast.error(
-            "Cet établissement est fermé, impossible de le créer"
-          );
+          setIsClosed(true);
         } else {
           // Non-diffusible mais pas encore inscrit en AnonymousCompany
           if (
@@ -64,6 +95,7 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
           }
           setIsDisabled(!companyInfos?.isRegistered);
           setIsRegistered(companyInfos?.isRegistered ?? false);
+          setIsClosed(false);
         }
       }
     },
@@ -91,6 +123,7 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
           }
         />
       )}
+      {isClosed && closedCompanyError}
       <Formik
         initialValues={{ siret: "" }}
         validate={values => {
