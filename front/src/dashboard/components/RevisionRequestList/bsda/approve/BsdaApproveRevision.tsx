@@ -170,13 +170,13 @@ export function DisplayRevision({ review }: Props) {
       />
 
       <RevisionField
-        label="Opération réalisée"
+        label="Quantité traitée (en tonnes)"
         bsddValue={review.bsda.destination?.reception?.weight}
         reviewValue={review.content.destination?.reception?.weight}
       />
 
       <RevisionField
-        label="Code d'pération réalisée"
+        label="Code d'opération réalisée"
         bsddValue={review.bsda.destination?.operation?.code}
         reviewValue={review.content.destination?.operation?.code}
       />
@@ -218,12 +218,12 @@ function brokerFormatter(entity: BsdaBroker | undefined): React.ReactNode {
 }
 
 function pickupSiteFormatter(entity: PickupSite | undefined): React.ReactNode {
-  if (!entity?.name) return null;
+  if (!entity?.address) return null;
 
   return (
     <>
       <div>
-        {entity.name} - {entity.address}, {entity.postalCode} {entity.city}
+        {entity.address}, {entity.postalCode} {entity.city}
       </div>
       <div>{entity.infos}</div>
     </>
