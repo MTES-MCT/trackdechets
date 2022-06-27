@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE "Form" DROP COLUMN "appendix2RootFormId";
+ALTER TABLE "default$default"."Form" DROP COLUMN "appendix2RootFormId";
