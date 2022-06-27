@@ -2,10 +2,15 @@ import { useMutation } from "@apollo/client";
 import classNames from "classnames";
 import { FieldSwitch, RedErrorMessage } from "common/components";
 import TagsInput from "common/components/tags-input/TagsInput";
+import Packagings, {
+  PACKAGINGS_NAMES,
+} from "form/bsda/components/packagings/Packagings";
+import { BSDA_WASTE_CODES } from "form/bsda/stepper/steps/WasteInfo";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import WorkSiteAddress from "form/common/components/work-site/WorkSiteAddress";
 import { Field, Form, Formik } from "formik";
 import {
   Bsda,
@@ -113,9 +118,17 @@ export function BsdaRequestRevision({ bsda }: Props) {
                 defaultValue={initialReview.waste.code}
               >
                 <Field
+                  as="select"
                   name="content.waste.code"
-                  className="td-input td-input--medium"
-                />
+                  className="td-select"
+                >
+                  <option />
+                  {BSDA_WASTE_CODES.map(item => (
+                    <option value={item.code} key={item.code}>
+                      {item.code} - {item.description}
+                    </option>
+                  ))}
+                </Field>
               </ReviewableField>
 
               <ReviewableField
@@ -167,7 +180,18 @@ export function BsdaRequestRevision({ bsda }: Props) {
               </ReviewableField>
 
               <ReviewableField
-                title="Quantité traitée"
+                title="Conditionnement"
+                value={bsda.packagings
+                  ?.map(p => `${p.quantity} ${PACKAGINGS_NAMES[p.type]}`)
+                  .join(", ")}
+                name="content.packagings"
+                defaultValue={initialReview.packagings}
+              >
+                <Field name="content.packagings" component={Packagings} />
+              </ReviewableField>
+
+              <ReviewableField
+                title="Quantité traitée (en tonnes)"
                 value={bsda.destination?.reception?.weight}
                 name="content.destination.reception.weight"
                 defaultValue={initialReview.destination?.reception?.weight}
@@ -310,6 +334,55 @@ export function BsdaRequestRevision({ bsda }: Props) {
                     <RedErrorMessage name="content.broker.recepisse.validityLimit" />
                   </div>
                 </>
+              </ReviewableField>
+
+              <ReviewableField
+                title="Adresse de chantier ou de collecte"
+                value={[
+                  bsda.emitter?.pickupSite?.address,
+                  bsda.emitter?.pickupSite?.postalCode,
+                  bsda.emitter?.pickupSite?.city,
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                name="content.emitter.pickupSite"
+                defaultValue={initialReview.emitter?.pickupSite}
+              >
+                <div className="form__row">
+                  <WorkSiteAddress
+                    address={values.content?.emitter?.pickupSite?.address}
+                    city={values.content?.emitter?.pickupSite?.city}
+                    postalCode={values.content?.emitter?.pickupSite?.postalCode}
+                    onAddressSelection={details => {
+                      // `address` is passed as `name` because of adresse api return fields
+                      setFieldValue(
+                        `content.emitter.pickupSite.address`,
+                        details.name
+                      );
+                      setFieldValue(
+                        `content.emitter.pickupSite.city`,
+                        details.city
+                      );
+                      setFieldValue(
+                        `content.emitter.pickupSite.postalCode`,
+                        details.postcode
+                      );
+                    }}
+                    designation="du chantier ou lieu de collecte"
+                  />
+                </div>
+
+                <div className="form__row">
+                  <label>
+                    Informations complémentaires (optionnel)
+                    <Field
+                      component="textarea"
+                      className="textarea-pickup-site td-textarea"
+                      placeholder="Champ libre pour préciser..."
+                      name="content.emitter.pickupSite.infos"
+                    />
+                  </label>
+                </div>
               </ReviewableField>
 
               <div className="form__row">

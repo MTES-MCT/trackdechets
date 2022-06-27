@@ -7,6 +7,133 @@ import { Bsda, BsdaConsistence, BsdaType } from "generated/graphql/types";
 import TagsInput from "common/components/tags-input/TagsInput";
 import { FieldSwitch } from "common/components";
 
+export const BSDA_WASTE_CODES = [
+  {
+    code: "06 07 01*",
+    description: "Déchets contenant de l'amiante provenant de l'électrolyse",
+  },
+
+  {
+    code: "06 13 04*",
+    description: "Déchets provenant de la transformation de l'amiante",
+  },
+
+  {
+    code: "08 01 17*",
+    description:
+      "déchets provenant du décapage de peintures ou vernis contenant des solvants organiques ou autres substances dangereuses",
+  },
+
+  {
+    code: "10 13 09*",
+    description:
+      "déchets provenant de la fabrication d'amiante-ciment contenant de l'amiante",
+  },
+
+  {
+    code: "15 01 11*",
+    description:
+      "emballages métalliques contenant une matrice poreuse solide dangereuse (par exemple amiante), y compris des conteneurs à pression vides",
+  },
+
+  {
+    code: "15 02 02*",
+    description:
+      "absorbants, matériaux filtrants (y compris les filtres à huile non spécifiés ailleurs), chiffons d'essuyage et vêtements de protection contaminés par des substances dangereuses",
+  },
+
+  { code: "16 01 11*", description: "patins de freins contenant de l'amiante" },
+
+  {
+    code: "16 02 12*",
+    description: "équipements mis au rebut contenant de l'amiante libre",
+  },
+
+  {
+    code: "16 02 13*",
+    description:
+      "équipements mis au rebut contenant des composants dangereux (3) autres que ceux visés aux rubriques 16 02 09 à 16 02 12",
+  },
+
+  {
+    code: "16 03 03*",
+    description:
+      "déchets d'origine minérale contenant des substances dangereuses",
+  },
+
+  {
+    code: "17 01 06*",
+    description:
+      "mélanges ou fractions séparées de béton, briques, tuiles et céramiques contenant des substances dangereuses",
+  },
+
+  {
+    code: "17 02 04*",
+    description:
+      "bois, verre et matières plastiques contenant des substances dangereuses ou contaminés par de telles substances",
+  },
+
+  {
+    code: "17 03 01*",
+    description: "mélanges bitumineux contenant du goudron",
+  },
+
+  {
+    code: "17 04 09*",
+    description:
+      "Déchets métalliques contaminés par des substances dangereuses",
+  },
+
+  {
+    code: "17 04 10*",
+    description:
+      "Câbles contenant des hydrocarbures, du goudron ou d'autres substances dangereuses",
+  },
+
+  {
+    code: "17 05 03*",
+    description: "Terres et cailloux contenant des substances dangereuses",
+  },
+
+  {
+    code: "17 05 05*",
+    description: "boues de dragage contenant des substances dangereuses",
+  },
+
+  {
+    code: "17 05 07*",
+    description: "ballast de voie contenant des substances dangereuses",
+  },
+
+  {
+    code: "17 06 01*",
+    description: "matériaux d'isolation contenant de l'amiante",
+  },
+
+  {
+    code: "17 06 03*",
+    description:
+      "autres matériaux d'isolation à base de ou contenant des substances dangereuses",
+  },
+
+  {
+    code: "17 06 05*",
+    description: "matériaux de construction contenant de l'amiante",
+  },
+
+  {
+    code: "17 08 01*",
+    description:
+      "matériaux de construction à base de gypse contaminés par des substances dangereuses",
+  },
+
+  {
+    code: "17 09 03*",
+    description:
+      "autres déchets de construction et de démolition (y compris en mélange) contenant des substances dangereuses",
+  },
+];
+
 export function WasteInfo({ disabled }) {
   const { values } = useFormikContext<Bsda>();
   const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
@@ -34,92 +161,11 @@ export function WasteInfo({ disabled }) {
         <label>Code déchet</label>
         <Field as="select" name="waste.code" className="td-select">
           <option />
-          <option value="06 07 01*">
-            06 07 01* - Déchets contenant de l'amiante provenant de
-            l'électrolyse
-          </option>
-          <option value="06 13 04*">
-            06 13 04* - Déchets provenant de la transformation de l'amiante
-          </option>
-          <option value="08 01 17*">
-            08 01 17* - déchets provenant du décapage de peintures ou vernis
-            contenant des solvants organiques ou autres substances dangereuses
-          </option>
-          <option value="10 13 09*">
-            10 13 09* - déchets provenant de la fabrication d'amiante-ciment
-            contenant de l'amiante
-          </option>
-          <option value="15 01 11*">
-            15 01 11* - emballages métalliques contenant une matrice poreuse
-            solide dangereuse (par exemple amiante), y compris des conteneurs à
-            pression vides
-          </option>
-          <option value="15 02 02*">
-            15 02 02* - absorbants, matériaux filtrants (y compris les filtres à
-            huile non spécifiés ailleurs), chiffons d'essuyage et vêtements de
-            protection contaminés par des substances dangereuses
-          </option>
-          <option value="16 01 11*">
-            16 01 11* - patins de freins contenant de l'amiante
-          </option>
-          <option value="16 02 12*">
-            16 02 12* - équipements mis au rebut contenant de l'amiante libre
-          </option>
-          <option value="16 02 13*">
-            16 02 13* - équipements mis au rebut contenant des composants
-            dangereux (3) autres que ceux visés aux rubriques 16 02 09 à 16 02
-            12
-          </option>
-          <option value="16 03 03*">
-            16 03 03* - déchets d'origine minérale contenant des substances
-            dangereuses
-          </option>
-          <option value="17 01 06*">
-            17 01 06* - mélanges ou fractions séparées de béton, briques, tuiles
-            et céramiques contenant des substances dangereuses
-          </option>
-          <option value="17 02 04*">
-            17 02 04* - bois, verre et matières plastiques contenant des
-            substances dangereuses ou contaminés par de telles substances
-          </option>
-          <option value="17 03 01*">
-            17 03 01* - mélanges bitumineux contenant du goudron
-          </option>
-          <option value="17 04 09*">
-            17 04 09* - Déchets métalliques contaminés par des substances
-            dangereuses
-          </option>
-          <option value="17 04 10*">
-            17 04 10* - Câbles contenant des hydrocarbures, du goudron ou
-            d'autres substances dangereuses
-          </option>
-          <option value="17 05 03*">
-            17 05 03* - Terres et cailloux contenant des substances dangereuses
-          </option>
-          <option value="17 05 05*">
-            17 05 05* - boues de dragage contenant des substances dangereuses
-          </option>
-          <option value="17 05 07*">
-            17 05 07* - ballast de voie contenant des substances dangereuses
-          </option>
-          <option value="17 06 01*">
-            17 06 01* - matériaux d'isolation contenant de l'amiante
-          </option>
-          <option value="17 06 03*">
-            17 06 03* - autres matériaux d'isolation à base de ou contenant des
-            substances dangereuses
-          </option>
-          <option value="17 06 05*">
-            17 06 05* - matériaux de construction contenant de l'amiante
-          </option>
-          <option value="17 08 01*">
-            17 08 01* - matériaux de construction à base de gypse contaminés par
-            des substances dangereuses
-          </option>
-          <option value="17 09 03*">
-            17 09 03* - autres déchets de construction et de démolition (y
-            compris en mélange) contenant des substances dangereuses
-          </option>
+          {BSDA_WASTE_CODES.map(item => (
+            <option value={item.code} key={item.code}>
+              {item.code} - {item.description}
+            </option>
+          ))}
         </Field>
       </div>
 
