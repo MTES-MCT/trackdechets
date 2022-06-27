@@ -5,12 +5,16 @@ import prisma from "../../prisma";
 function getForwardedInStatus(form: Form) {
   if (form.status === Status.PROCESSED) {
     return Status.PROCESSED;
+  } else if (form.status === Status.NO_TRACEABILITY) {
+    return Status.NO_TRACEABILITY;
+  } else if (form.status === Status.AWAITING_GROUP) {
+    return Status.AWAITING_GROUP;
   } else if (form.status === Status.REFUSED) {
     return Status.REFUSED;
   } else if (form.status === Status.RESENT) {
     return Status.SENT;
   } else if (form.status === Status.RESEALED) {
-    return Status.RESEALED;
+    return Status.SEALED;
   } else if (form.status === Status.SIGNED_BY_TEMP_STORER) {
     return Status.SIGNED_BY_PRODUCER;
   } else {
