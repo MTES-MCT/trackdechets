@@ -70,9 +70,11 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
     <Form>
       {form.status === FormStatus.TempStorerAccepted && (
         <div className="notification notification--warning">
-          Vous vous apprêtez à valider un traitement ou un regroupement sur un
-          BSDD sur lequel votre établissement est identifié en tant
-          qu'installation d'entreposage provisoire ou de reconditionnement.
+          Attention, vous vous apprêtez à valider un traitement ou un
+          regroupement sur lequel votre établissement était identifié en tant
+          qu'installation d'entreposage provisoire et/ou de reconditionnement.
+          Votre entreprise sera désormais uniquement destinataire du bordereau
+          et l'étape d'entreposage provisoire va disparaitre.
         </div>
       )}
       <div className="form__row">
