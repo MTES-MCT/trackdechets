@@ -42,219 +42,224 @@ const updateFormResolver = async (
   args: MutationUpdateFormArgs,
   context: GraphQLContext
 ) => {
-  const updatedForm = await prisma.$transaction(async transaction => {
-    const user = checkIsAuthenticated(context);
+  const user = checkIsAuthenticated(context);
 
-    const { updateFormInput } = validateArgs(args);
+  const { updateFormInput } = validateArgs(args);
 
-    const {
-      id,
-      appendix2Forms,
-      grouping,
-      temporaryStorageDetail,
-      intermediaries,
-      ...formContent
-    } = updateFormInput;
+  const {
+    id,
+    appendix2Forms,
+    grouping,
+    temporaryStorageDetail,
+    intermediaries,
+    ...formContent
+  } = updateFormInput;
 
-    if (appendix2Forms && grouping) {
-      throw new UserInputError(
-        "Vous devez renseigner soit `appendix2Forms` soit `grouping` mais pas les deux"
-      );
-    }
-
-    if (
-      formContent.wasteDetails?.code &&
-      isDangerous(formContent.wasteDetails?.code) &&
-      formContent.wasteDetails.isDangerous === undefined
-    ) {
-      formContent.wasteDetails.isDangerous = true;
-    }
-
-    const existingForm = await getFormOrFormNotFound({ id });
-    const formRepository = getFormRepository(user, transaction);
-
-    await checkCanUpdate(user, existingForm);
-
-    const form = flattenFormInput(formContent);
-
-    // Construct form update payload
-    const formUpdateInput: Prisma.FormUpdateInput = form;
-
-    // Validate form input
-    if (existingForm.status === "DRAFT") {
-      await draftFormSchema.validate({ ...existingForm, ...formUpdateInput });
-    } else {
-      await sealedFormSchema.validate({ ...existingForm, ...formUpdateInput });
-    }
-
-    const isOrWillBeTempStorage =
-      (existingForm.recipientIsTempStorage &&
-        formContent.recipient?.isTempStorage !== false) ||
-      formContent.recipient?.isTempStorage === true;
-
-    const forwardedIn = await prisma.form
-      .findUnique({
-        where: { id: existingForm.id }
-      })
-      .forwardedIn();
-
-    const formCompanies = await formToCompanies(existingForm);
-    const nextFormCompanies: FormCompanies = {
-      emitterCompanySiret:
-        form.emitterCompanySiret ?? formCompanies.emitterCompanySiret,
-      recipientCompanySiret:
-        form.recipientCompanySiret ?? formCompanies.recipientCompanySiret,
-      transporterCompanySiret:
-        form.transporterCompanySiret ?? formCompanies.transporterCompanySiret,
-      traderCompanySiret:
-        form.traderCompanySiret ?? formCompanies.traderCompanySiret,
-      brokerCompanySiret:
-        form.brokerCompanySiret ?? formCompanies.brokerCompanySiret,
-      ecoOrganismeSiret:
-        form.ecoOrganismeSiret ?? formCompanies.ecoOrganismeSiret,
-      ...(intermediaries?.length
-        ? {
-            intermediariesVatNumbers: intermediaries?.map(
-              intermediary => intermediary.vatNumber ?? null
-            ),
-            intermediariesSirets: intermediaries?.map(
-              intermediary => intermediary.siret ?? null
-            )
-          }
-        : {
-            intermediariesVatNumbers: formCompanies.intermediariesVatNumbers,
-            intermediariesSirets: formCompanies.intermediariesSirets
-          })
-    };
-
-    if (temporaryStorageDetail || forwardedIn) {
-      nextFormCompanies.forwardedIn = {
-        recipientCompanySiret:
-          temporaryStorageDetail?.destination?.company?.siret ??
-          forwardedIn?.recipientCompanySiret,
-        transporterCompanySiret: forwardedIn?.transporterCompanySiret
-      };
-    }
-
-    await checkIsFormContributor(
-      user,
-      nextFormCompanies,
-      "Vous ne pouvez pas enlever votre établissement du bordereau"
+  if (appendix2Forms && grouping) {
+    throw new UserInputError(
+      "Vous devez renseigner soit `appendix2Forms` soit `grouping` mais pas les deux"
     );
+  }
 
-    // Delete temporaryStorageDetail
-    if (
-      forwardedIn &&
-      (!isOrWillBeTempStorage || temporaryStorageDetail === null)
-    ) {
-      formUpdateInput.forwardedIn = { delete: true };
+  if (
+    formContent.wasteDetails?.code &&
+    isDangerous(formContent.wasteDetails?.code) &&
+    formContent.wasteDetails.isDangerous === undefined
+  ) {
+    formContent.wasteDetails.isDangerous = true;
+  }
+
+  const existingForm = await getFormOrFormNotFound({ id });
+
+  await checkCanUpdate(user, existingForm);
+
+  const form = flattenFormInput(formContent);
+
+  // Construct form update payload
+  const formUpdateInput: Prisma.FormUpdateInput = form;
+
+  // Validate form input
+  if (existingForm.status === "DRAFT") {
+    await draftFormSchema.validate({ ...existingForm, ...formUpdateInput });
+  } else {
+    await sealedFormSchema.validate({ ...existingForm, ...formUpdateInput });
+  }
+
+  const isOrWillBeTempStorage =
+    (existingForm.recipientIsTempStorage &&
+      formContent.recipient?.isTempStorage !== false) ||
+    formContent.recipient?.isTempStorage === true;
+
+  const forwardedIn = await prisma.form
+    .findUnique({
+      where: { id: existingForm.id }
+    })
+    .forwardedIn();
+
+  const formCompanies = await formToCompanies(existingForm);
+  const nextFormCompanies: FormCompanies = {
+    emitterCompanySiret:
+      form.emitterCompanySiret ?? formCompanies.emitterCompanySiret,
+    recipientCompanySiret:
+      form.recipientCompanySiret ?? formCompanies.recipientCompanySiret,
+    transporterCompanySiret:
+      form.transporterCompanySiret ?? formCompanies.transporterCompanySiret,
+    traderCompanySiret:
+      form.traderCompanySiret ?? formCompanies.traderCompanySiret,
+    brokerCompanySiret:
+      form.brokerCompanySiret ?? formCompanies.brokerCompanySiret,
+    ecoOrganismeSiret:
+      form.ecoOrganismeSiret ?? formCompanies.ecoOrganismeSiret,
+    ...(intermediaries?.length
+      ? {
+          intermediariesVatNumbers: intermediaries?.map(
+            intermediary => intermediary.vatNumber ?? null
+          ),
+          intermediariesSirets: intermediaries?.map(
+            intermediary => intermediary.siret ?? null
+          )
+        }
+      : {
+          intermediariesVatNumbers: formCompanies.intermediariesVatNumbers,
+          intermediariesSirets: formCompanies.intermediariesSirets
+        })
+  };
+
+  if (temporaryStorageDetail || forwardedIn) {
+    nextFormCompanies.forwardedIn = {
+      recipientCompanySiret:
+        temporaryStorageDetail?.destination?.company?.siret ??
+        forwardedIn?.recipientCompanySiret,
+      transporterCompanySiret: forwardedIn?.transporterCompanySiret
+    };
+  }
+
+  await checkIsFormContributor(
+    user,
+    nextFormCompanies,
+    "Vous ne pouvez pas enlever votre établissement du bordereau"
+  );
+
+  // Delete temporaryStorageDetail
+  if (
+    forwardedIn &&
+    (!isOrWillBeTempStorage || temporaryStorageDetail === null)
+  ) {
+    formUpdateInput.forwardedIn = { delete: true };
+  }
+
+  if (temporaryStorageDetail) {
+    if (!isOrWillBeTempStorage) {
+      // The user is trying to add a temporary storage detail
+      // but recipient is not set as temp storage on existing form
+      // or input
+      throw new MissingTempStorageFlag();
     }
 
-    if (temporaryStorageDetail) {
-      if (!isOrWillBeTempStorage) {
-        // The user is trying to add a temporary storage detail
-        // but recipient is not set as temp storage on existing form
-        // or input
-        throw new MissingTempStorageFlag();
-      }
-
-      if (forwardedIn) {
-        formUpdateInput.forwardedIn = {
-          update: flattenTemporaryStorageDetailInput(temporaryStorageDetail)
-        };
-      } else {
-        formUpdateInput.forwardedIn = {
-          create: {
-            owner: { connect: { id: user.id } },
-            readableId: `${existingForm.readableId}-suite`,
-            ...flattenTemporaryStorageDetailInput(temporaryStorageDetail)
-          }
-        };
-      }
-    }
-
-    // Delete intermediaries
-    if (
-      (!!intermediaries && intermediaries?.length === 0) ||
-      intermediaries === null
-    ) {
-      formUpdateInput.intermediaries = {
-        deleteMany: {}
+    if (forwardedIn) {
+      formUpdateInput.forwardedIn = {
+        update: flattenTemporaryStorageDetailInput(temporaryStorageDetail)
       };
-    } else if (intermediaries?.length) {
-      // Update the intermediaties
-      const existingIntermediaries =
-        await prisma.intermediaryFormAssociation.findMany({
-          where: { formId: existingForm.id }
-        });
-      // combine existing info with update info
-      const intermediariesInput = intermediaries.map(companyInput => {
-        const match = existingIntermediaries.find(
-          ({ siret, vatNumber }) =>
-            siret === companyInput.siret || vatNumber === companyInput.vatNumber
-        );
-        return {
-          ...(match
-            ? {
-                ...match,
-                siret: companyInput.siret ?? "",
-                name: match.name ?? ""
-              }
-            : {}),
-          ...{
-            ...companyInput,
-            siret: companyInput.siret ?? "",
-            name: companyInput.name ?? ""
-          }
-        };
-      });
-
-      formUpdateInput.intermediaries = {
-        deleteMany: {},
-        createMany: {
-          data: await validateIntermediariesInput(intermediariesInput),
-          skipDuplicates: true
+    } else {
+      formUpdateInput.forwardedIn = {
+        create: {
+          owner: { connect: { id: user.id } },
+          readableId: `${existingForm.readableId}-suite`,
+          ...flattenTemporaryStorageDetailInput(temporaryStorageDetail)
         }
       };
     }
+  }
 
-    const updatedForm = await formRepository.update({ id }, formUpdateInput);
-
-    let appendix2: { quantity: number; form: Form }[] = null;
-
-    if (grouping) {
-      appendix2 = await Promise.all(
-        grouping.map(async ({ form, quantity }) => {
-          const foundForm = await getFormOrFormNotFound(form);
-          return {
-            form: foundForm,
-            quantity:
-              quantity ??
-              new Decimal(foundForm.quantityReceived)
-                .minus(foundForm.quantityGrouped)
-                .toNumber()
-          };
-        })
+  // Delete intermediaries
+  if (
+    (!!intermediaries && intermediaries?.length === 0) ||
+    intermediaries === null
+  ) {
+    formUpdateInput.intermediaries = {
+      deleteMany: {}
+    };
+  } else if (intermediaries?.length) {
+    // Update the intermediaties
+    const existingIntermediaries =
+      await prisma.intermediaryFormAssociation.findMany({
+        where: { formId: existingForm.id }
+      });
+    // combine existing info with update info
+    const intermediariesInput = intermediaries.map(companyInput => {
+      const match = existingIntermediaries.find(
+        ({ siret, vatNumber }) =>
+          siret === companyInput.siret || vatNumber === companyInput.vatNumber
       );
-    } else if (appendix2Forms) {
-      appendix2 = await Promise.all(
-        appendix2Forms.map(async ({ id }) => {
-          const initialForm = await getFormOrFormNotFound({ id });
-          return {
-            form: initialForm,
-            quantity: initialForm.quantityReceived
-          };
-        })
-      );
-    }
-
-    await formRepository.setAppendix2({
-      form: updatedForm,
-      appendix2
+      return {
+        ...(match
+          ? {
+              ...match,
+              siret: companyInput.siret ?? "",
+              name: match.name ?? ""
+            }
+          : {}),
+        ...{
+          ...companyInput,
+          siret: companyInput.siret ?? "",
+          name: companyInput.name ?? ""
+        }
+      };
     });
 
-    return updatedForm;
-  });
+    formUpdateInput.intermediaries = {
+      deleteMany: {},
+      createMany: {
+        data: await validateIntermediariesInput(intermediariesInput),
+        skipDuplicates: true
+      }
+    };
+  }
+
+  let appendix2: { quantity: number; form: Form }[] = null;
+
+  if (grouping) {
+    appendix2 = await Promise.all(
+      grouping.map(async ({ form, quantity }) => {
+        const foundForm = await getFormOrFormNotFound(form);
+        return {
+          form: foundForm,
+          quantity:
+            quantity ??
+            new Decimal(foundForm.quantityReceived)
+              .minus(foundForm.quantityGrouped)
+              .toNumber()
+        };
+      })
+    );
+  } else if (appendix2Forms) {
+    appendix2 = await Promise.all(
+      appendix2Forms.map(async ({ id }) => {
+        const initialForm = await getFormOrFormNotFound({ id });
+        return {
+          form: initialForm,
+          quantity: initialForm.quantityReceived
+        };
+      })
+    );
+  }
+
+  const updatedForm = await prisma.$transaction(
+    async transaction => {
+      const { update, setAppendix2 } = getFormRepository(user, transaction);
+      const updatedForm = await update({ id }, formUpdateInput);
+      await setAppendix2({
+        form: updatedForm,
+        appendix2
+      });
+      return updatedForm;
+    },
+    {
+      maxWait: 10000, // default 2000
+      timeout: 20000 // default 5000
+    }
+  );
+
   return expandFormFromDb(updatedForm);
 };
 
