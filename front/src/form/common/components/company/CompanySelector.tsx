@@ -21,6 +21,7 @@ import { FAVORITES, SEARCH_COMPANIES } from "./query";
 import {
   Query,
   QuerySearchCompaniesArgs,
+  Form,
   FormCompany,
   QueryFavoritesArgs,
   FavoriteType,
@@ -70,7 +71,7 @@ export default function CompanySelector({
   const [uniqId] = useState(() => uuidv4());
   const [field] = useField<FormCompany>({ name });
   const { setFieldError, setFieldValue, setFieldTouched } = useFormikContext();
-  const { values } = useFormikContext<FormCompany>();
+  const { values } = useFormikContext<Form>();
   const [clue, setClue] = useState("");
   const [department, setDepartement] = useState<null | string>(null);
   const [
@@ -269,32 +270,32 @@ export default function CompanySelector({
       !field.value.vatNumber.toUpperCase().startsWith("FR"));
 
   const onClickValidateForeignVat = () => {
-    const { siret } = values;
+    const vatNumber = values.transporter?.company?.vatNumber;
 
-    if (!siret) return;
+    if (!vatNumber) return;
 
-    const isValidSiret = isSiret(siret);
-    const isValidVat = isVat(siret);
+    const isValidSiret = isSiret(vatNumber);
+    const isValidVat = isVat(vatNumber);
     if (isValidSiret) {
       return setFieldError(
-        "siret",
+        `${field.name}.vatNumber`,
         "Vous devez entrer un numéro de TVA intra-communautaire hors-France"
       );
-    } else if (isValidVat && isFRVat(siret)) {
+    } else if (isValidVat && isFRVat(vatNumber)) {
       return setFieldError(
-        "siret",
+        `${field.name}.vatNumber`,
         "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et non son numéro de TVA"
       );
     } else if (!isValidVat) {
       return setFieldError(
-        "siret",
+        `${field.name}.vatNumber`,
         "Vous devez entrer un numéro TVA intra-communautaire valide"
       );
     }
 
     setCompanyInfos(null);
     searchCompany({
-      variables: { siret: siret },
+      variables: { siret: vatNumber },
     });
   };
 
@@ -407,10 +408,13 @@ export default function CompanySelector({
                     </label>
                     <div className={styles.field__value}>
                       <Field
-                        name="siret"
+                        name={`${field.name}.vatNumber`}
                         component={AutoFormattingCompanyInfosInput}
                         onChange={e => {
-                          setFieldValue("siret", e.target.value);
+                          setFieldValue(
+                            `${field.name}.vatNumber`,
+                            e.target.value
+                          );
                         }}
                         disabled={isDisabled}
                       />
@@ -419,7 +423,7 @@ export default function CompanySelector({
                           Cet établissement n'est pas inscrit sur Trackdéchets
                         </p>
                       )}
-                      <RedErrorMessage name="siret" />
+                      <RedErrorMessage name={`${field.name}.vatNumber`} />
                       <button
                         disabled={loading}
                         className="btn btn--primary tw-mt-2 tw-ml-1"
