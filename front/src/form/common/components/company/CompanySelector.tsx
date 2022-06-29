@@ -66,10 +66,7 @@ export default function CompanySelector({
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
   const [field] = useField<FormCompany>({ name });
-  const [isForeignCompany, setIsForeignCompany] = useState(
-    !!field.value.vatNumber &&
-      !field.value.vatNumber?.toUpperCase().startsWith("FR")
-  );
+  const [isForeignCompany, setIsForeignCompany] = useState(false);
   const { setFieldError, setFieldValue, setFieldTouched } = useFormikContext();
   const { values } = useFormikContext<Form>();
   const [clue, setClue] = useState("");
@@ -258,6 +255,16 @@ export default function CompanySelector({
       }
     }
   }, [searchResults, field.value.siret, selectCompany, optional]);
+
+  /**
+   * Force Selection of checkbox is foreign
+   */
+  useEffect(() => {
+    setIsForeignCompany(
+      !!field.value.vatNumber &&
+        !field.value.vatNumber?.toUpperCase().startsWith("FR")
+    );
+  }, [field.value.vatNumber]);
 
   /**
    * Trigger searchCompaniesQuery with a delay
