@@ -131,6 +131,12 @@ export default function CompanySelector({
     (company: CompanyFavorite) => {
       if (disabled) return;
 
+      // empty contact infos
+      setFieldValue(field.name, {
+        contact: null,
+        mail: null,
+        phone: null,
+      });
       // avoid setting same company multiple times
       if (company?.siret && company.siret !== field.value.siret) {
         const fields = {
@@ -160,6 +166,7 @@ export default function CompanySelector({
         setFieldValue(field.name, {
           siret: "",
           name: "",
+          vatNumber: "",
           address: "",
           contact: "",
           mail: "",
