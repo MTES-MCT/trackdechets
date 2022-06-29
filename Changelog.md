@@ -12,6 +12,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Corrections d'édition d'un BSDD avec un transporteur étranger [PR 1491](https://github.com/MTES-MCT/trackdechets/pull/1491) et [PR 1494](https://github.com/MTES-MCT/trackdechets/pull/1494)
+- Corrections de wording diverses [PR 1477](https://github.com/MTES-MCT/trackdechets/pull/1477) et [PR 1475](https://github.com/MTES-MCT/trackdechets/pull/1475)
 
 #### :boom: Breaking changes
 
