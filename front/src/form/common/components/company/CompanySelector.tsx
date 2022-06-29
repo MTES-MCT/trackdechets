@@ -51,8 +51,8 @@ interface CompanySelectorProps {
 export default function CompanySelector({
   name,
   onCompanySelected,
-  allowForeignCompanies,
-  displayVatSearch = true,
+  allowForeignCompanies = false,
+  displayVatSearch = true, // used in order to allow foreign companies input without VAT search
   registeredOnlyCompanies = false,
   heading,
   disabled,
@@ -63,13 +63,10 @@ export default function CompanySelector({
   // STATE
   const [isRegistered, setIsRegistered] = useState(true);
   const [isDisabled, setIsDisabled] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [companyInfos, setCompanyInfos] = useState<CompanySearchResult | null>(
-    null
-  );
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
   const [field] = useField<FormCompany>({ name });
+  const [isForeignCompany, setIsForeignCompany] = useState(false);
   const { setFieldError, setFieldValue, setFieldTouched } = useFormikContext();
   const { values } = useFormikContext<Form>();
   const [clue, setClue] = useState("");
@@ -128,41 +125,10 @@ export default function CompanySelector({
    * for both searchCompanies by SIRET or name and searchCompany by VAT number
    */
   const selectCompany = useCallback(
-    (company: CompanyFavorite) => {
+    (company: CompanyFavorite | null) => {
       if (disabled) return;
-
-      // empty contact infos
-      setFieldValue(field.name, {
-        contact: null,
-        mail: null,
-        phone: null,
-      });
-      // avoid setting same company multiple times
-      if (company?.siret && company.siret !== field.value.siret) {
-        const fields = {
-          siret: company.siret,
-          vatNumber: company.vatNumber,
-          name: company.name,
-          address: company.address,
-          contact: company.contact,
-          phone: company.phone,
-          mail: company.mail,
-          country: company.codePaysEtrangerEtablissement,
-        };
-
-        if (company.vatNumber) {
-          const vatCountryCode = checkVAT(company.vatNumber, vatCountries)
-            ?.country?.isoCode.short;
-          if (vatCountryCode) {
-            fields.country = vatCountryCode;
-          }
-        }
-
-        Object.keys(fields).forEach(key => {
-          setFieldValue(`${field.name}.${key}`, fields[key]);
-        });
-      } else if (optional) {
-        // allow unselecting the company
+      // allow unselecting the company
+      if (!company) {
         setFieldValue(field.name, {
           siret: "",
           name: "",
@@ -171,9 +137,42 @@ export default function CompanySelector({
           contact: "",
           mail: "",
           phone: "",
+          country: "",
         });
+        return;
+      }
+      // empty contact infos
+      setFieldValue(field.name, {
+        contact: "",
+        mail: "",
+        phone: "",
+      });
+      // avoid setting same company multiple times
+      const fields = {
+        siret: company.siret,
+        vatNumber: company.vatNumber,
+        name: company.name,
+        address: company.address,
+        contact: company.contact,
+        phone: company.phone,
+        mail: company.mail,
+        country: company.codePaysEtrangerEtablissement,
+      };
+
+      // automatically set the country field
+      if (company.vatNumber) {
+        const vatCountryCode = checkVAT(company.vatNumber, vatCountries)
+          ?.country?.isoCode.short;
+        if (vatCountryCode) {
+          fields.country = vatCountryCode;
+        }
       }
 
+      Object.keys(fields).forEach(key => {
+        setFieldValue(`${field.name}.${key}`, fields[key]);
+      });
+
+      // callback to the parent React component
       if (onCompanySelected) {
         onCompanySelected(company);
       }
@@ -188,6 +187,9 @@ export default function CompanySelector({
     ]
   );
 
+  /**
+   * Parse and merge data from searchCompanies and favoritesData
+   */
   const searchResults: CompanyFavorite[] = useMemo(
     () =>
       searchData?.searchCompanies
@@ -243,6 +245,9 @@ export default function CompanySelector({
     [searchData, favoritesData]
   );
 
+  /**
+   * Force Selection of the first item if searchResults
+   */
   useEffect(() => {
     if (!optional) {
       if (searchResults.length === 1 && field.value.siret === "") {
@@ -251,6 +256,19 @@ export default function CompanySelector({
     }
   }, [searchResults, field.value.siret, selectCompany, optional]);
 
+  /**
+   * Force Selection of checkbox is foreign
+   */
+  useEffect(() => {
+    setIsForeignCompany(
+      !!field.value.vatNumber &&
+        !field.value.vatNumber?.toUpperCase().startsWith("FR")
+    );
+  }, [field.value.vatNumber]);
+
+  /**
+   * Trigger searchCompaniesQuery with a delay
+   */
   useEffect(() => {
     const timeoutID = setTimeout(() => {
       if (clue.length < 3) {
@@ -278,11 +296,9 @@ export default function CompanySelector({
     return <InlineError apolloError={favoritesError} />;
   }
 
-  const isForeignCompany =
-    field.value.siret == null ||
-    (!!field.value.vatNumber &&
-      !field.value.vatNumber.toUpperCase().startsWith("FR"));
-
+  /**
+   * Handle VAT search button click
+   */
   const onClickValidateForeignVat = () => {
     const vatNumber = values.transporter?.company?.vatNumber;
 
@@ -307,7 +323,6 @@ export default function CompanySelector({
       );
     }
 
-    setCompanyInfos(null);
     searchCompany({
       variables: { siret: vatNumber },
     });
@@ -354,31 +369,28 @@ export default function CompanySelector({
             </div>
           </div>
 
-          {!isForeignCompany && (
-            <>
-              <div className={styles.companySelectorSearchGroup}>
-                <label htmlFor={`geo-${uniqId}`}>
-                  Département ou code postal
-                </label>
+          <div className={styles.companySelectorSearchGroup}>
+            <label htmlFor={`geo-${uniqId}`}>Département ou code postal</label>
 
-                <input
-                  id={`geo-${uniqId}`}
-                  type="text"
-                  className={`td-input ${styles.companySelectorSearchGeo}`}
-                  onChange={event => setDepartement(event.target.value)}
-                  disabled={disabled}
-                />
-              </div>
-            </>
-          )}
+            <input
+              id={`geo-${uniqId}`}
+              type="text"
+              className={`td-input ${styles.companySelectorSearchGeo}`}
+              onChange={event => setDepartement(event.target.value)}
+              disabled={disabled || isForeignCompany}
+            />
+          </div>
         </div>
 
         {isLoadingSearch && <span>Chargement...</span>}
 
         <CompanyResults
           onSelect={company => {
-            // clear the VAT number input
-            setFieldValue(`${field.name}.vatNumber`, null);
+            if (!company.vatNumber) {
+              // clear the VAT number input
+              setFieldValue(`${field.name}.vatNumber`, "");
+            }
+            setIsForeignCompany(!!company.vatNumber);
             selectCompany(company);
           }}
           results={searchResults}
@@ -403,10 +415,8 @@ export default function CompanySelector({
               type="checkbox"
               className="td-checkbox"
               onChange={event => {
-                setFieldValue(
-                  `${field.name}.siret`,
-                  event.target.checked ? null : ""
-                );
+                setIsForeignCompany(event.target.checked);
+                selectCompany(null);
               }}
               checked={isForeignCompany}
               disabled={disabled}
@@ -416,7 +426,7 @@ export default function CompanySelector({
         )}
 
         <div className="form__row">
-          {isForeignCompany && (
+          {allowForeignCompanies && isForeignCompany && (
             <>
               {displayVatSearch && (
                 <div className={styles.companyForeignSelectorForm}>
@@ -465,7 +475,7 @@ export default function CompanySelector({
                 />
               </label>
 
-              <RedErrorMessage name={`${field.name}.address`} />
+              <RedErrorMessage name={`${field.name}.name`} />
 
               <label>
                 Adresse de l'entreprise
