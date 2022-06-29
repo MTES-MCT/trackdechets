@@ -117,7 +117,7 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
       {isNonDiffusible && (
         <SimpleNotificationError
           message={
-            "Nous n'avons pas pu récupérer les informations de cet établissement car il n'est pas diffusable. " +
+            "Nous n'avons pas pu récupérer les informations de cet établissement car il n'est pas diffusible. " +
             "Veuillez nous contacter à l'adresse hello@trackdechets.beta.gouv.fr avec votre certificat d'inscription au répertoire des Entreprises et " +
             "des Établissements (SIRENE) pour pouvoir procéder à la création de l'établissement"
           }
