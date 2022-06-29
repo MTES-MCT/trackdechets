@@ -95,6 +95,9 @@ export default function CompanySelector({
     skip: !Object.values(FavoriteType).includes(favoriteType) || skipFavorite,
   });
 
+  /**
+   * searchCompany used currently only for VAT number exact match search
+   */
   const [searchCompany, { loading, error }] = useLazyQuery<
     Pick<Query, "companyInfos">
   >(COMPANY_INFOS, {
@@ -120,6 +123,10 @@ export default function CompanySelector({
     fetchPolicy: "no-cache",
   });
 
+  /**
+   * Callback on company result selection
+   * for both searchCompanies by SIRET or name and searchCompany by VAT number
+   */
   const selectCompany = useCallback(
     (company: CompanyFavorite) => {
       if (disabled) return;
@@ -362,7 +369,11 @@ export default function CompanySelector({
         {isLoadingSearch && <span>Chargement...</span>}
 
         <CompanyResults
-          onSelect={company => selectCompany(company)}
+          onSelect={company => {
+            // clear the VAT number input
+            setFieldValue(`${field.name}.vatNumber`, null);
+            selectCompany(company);
+          }}
           results={searchResults}
           selectedItem={{
             ...field.value,
