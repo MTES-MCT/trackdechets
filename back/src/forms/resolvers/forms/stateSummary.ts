@@ -64,12 +64,12 @@ export async function getStateSummary(form: Form) {
           form.temporaryStorageDetail?.transporter?.numberPlate,
         transporterCustomInfo:
           form.temporaryStorageDetail?.transporter?.customInfo,
-        transporter: form.temporaryStorageDetail?.transporter.company
+        transporter: form.temporaryStorageDetail?.transporter?.company
       }
     : {
         transporterNumberPlate: form.transporter?.numberPlate,
         transporterCustomInfo: form.transporter?.customInfo,
-        transporter: form.transporter.company
+        transporter: form.transporter?.company
       };
 
   const recipient = isResealed
