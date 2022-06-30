@@ -244,21 +244,15 @@ const updateFormResolver = async (
     );
   }
 
-  const updatedForm = await prisma.$transaction(
-    async transaction => {
-      const { update, setAppendix2 } = getFormRepository(user, transaction);
-      const updatedForm = await update({ id }, formUpdateInput);
-      await setAppendix2({
-        form: updatedForm,
-        appendix2
-      });
-      return updatedForm;
-    },
-    {
-      maxWait: 10000, // default 2000
-      timeout: 20000 // default 5000
-    }
-  );
+  const updatedForm = await prisma.$transaction(async transaction => {
+    const { update, setAppendix2 } = getFormRepository(user, transaction);
+    const updatedForm = await update({ id }, formUpdateInput);
+    await setAppendix2({
+      form: updatedForm,
+      appendix2
+    });
+    return updatedForm;
+  });
 
   return expandFormFromDb(updatedForm);
 };

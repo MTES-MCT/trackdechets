@@ -158,21 +158,15 @@ const createFormResolver = async (
     );
   }
 
-  const newForm = await prisma.$transaction(
-    async transaction => {
-      const { create, setAppendix2 } = getFormRepository(user, transaction);
-      const newForm = await create(formCreateInput);
-      await setAppendix2({
-        form: newForm,
-        appendix2
-      });
-      return newForm;
-    },
-    {
-      maxWait: 10000, // default 2000
-      timeout: 20000 // default 5000
-    }
-  );
+  const newForm = await prisma.$transaction(async transaction => {
+    const { create, setAppendix2 } = getFormRepository(user, transaction);
+    const newForm = await create(formCreateInput);
+    await setAppendix2({
+      form: newForm,
+      appendix2
+    });
+    return newForm;
+  });
 
   eventEmitter.emit(TDEvent.CreateForm, {
     previousNode: null,
