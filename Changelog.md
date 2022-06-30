@@ -12,6 +12,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout du code 12 01 16\* pour les BSDA [PR 1478](https://github.com/MTES-MCT/trackdechets/pull/1478)
 
 #### :bug: Corrections de bugs
+- Correction d'un bug ne permettant pas au destinataire finale de créer un BSDD avec entreposage provisoire [PR 1498](https://github.com/MTES-MCT/trackdechets/pull/1498)
 
 #### :boom: Breaking changes
 
