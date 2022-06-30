@@ -5,6 +5,24 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.06.3] ~29/06/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+- Corrections d'édition d'un BSDD avec un transporteur étranger [PR 1491](https://github.com/MTES-MCT/trackdechets/pull/1491), [PR 1494](https://github.com/MTES-MCT/trackdechets/pull/1494) et [PR 1497](https://github.com/MTES-MCT/trackdechets/pull/1497)
+- Corrections de textes divers [PR 1477](https://github.com/MTES-MCT/trackdechets/pull/1477) et [PR 1475](https://github.com/MTES-MCT/trackdechets/pull/1475)
+- Correction "Select all" BSDD avec appendice 2, quantités groupées corrigées [PR 1493](https://github.com/MTES-MCT/trackdechets/pull/1493)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2022.06.2] ~27/06/2022
 
 #### :rocket: Nouvelles fonctionnalités

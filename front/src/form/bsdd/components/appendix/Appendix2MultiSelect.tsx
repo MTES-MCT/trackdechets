@@ -159,7 +159,13 @@ export default function Appendix2MultiSelect() {
     if (appendix2Selected.length === appendix2Candidates.length) {
       setFieldValue("grouping", []);
     } else {
-      setFieldValue("grouping", appendix2Candidates);
+      setFieldValue(
+        "grouping",
+        appendix2Candidates.map(candidate => ({
+          form: candidate.form,
+          quantity: candidate.quantity.toNumber(),
+        }))
+      );
     }
   }
 

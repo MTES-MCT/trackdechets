@@ -29,7 +29,7 @@ const COMPANY_INFOS = gql`
 
 const COMMON_OPTIONS = [
   {
-    title: "la collecte amiante sur un chantier",
+    title: "la collecte d'amiante sur un chantier",
     value: BsdaType.OtherCollections,
   },
   {
