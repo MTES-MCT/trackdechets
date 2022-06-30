@@ -1,5 +1,8 @@
 import {
+  companyFactory,
   formFactory,
+  formWithTempStorageFactory,
+  userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -8,72 +11,76 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { Query } from "../../../../generated/graphql/types";
 import getReadableId from "../../../../forms/readableId";
+import * as search from "../../../search";
+import { CompanySearchResult } from "../../../types";
 
 const FAVORITES = `query Favorites($siret: String!, $type: FavoriteType!) {
   favorites(siret: $siret, type: $type) {
+    name
     siret
     vatNumber
+    address
+    contact
+    phone
+    mail
     codePaysEtrangerEtablissement
+    transporterReceipt {
+      receiptNumber
+    }
+    traderReceipt {
+      receiptNumber
+    }
+    brokerReceipt {
+      receiptNumber
+    }
   }
 }`;
+
+const searchCompanySpy = jest.spyOn(search, "searchCompany");
 
 describe("query favorites", () => {
   afterEach(resetDatabase);
 
-  it("should return the right country code for a foreign transporter", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER", {
-      vatNumber: "IT09301420155",
-      companyTypes: {
-        set: ["TRANSPORTER"]
-      }
-    });
+  it("should not be possible to access favorites of other companies", async () => {
+    const user = await userFactory();
+    const { user: user2, company: company2 } = await userWithCompanyFactory(
+      "MEMBER"
+    );
     await formFactory({
-      ownerId: user.id,
-      opt: {
-        transporterCompanyVatNumber: "IT09301420155"
-      }
+      ownerId: user2.id,
+      opt: { recipientCompanySiret: company2.siret }
     });
-
     const { query } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+    const { errors } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
-        siret: company.siret,
-        type: "TRANSPORTER"
+        siret: company2.siret,
+        type: "RECIPIENT"
       }
     });
-
-    expect(data.favorites).toEqual([
+    expect(errors).toEqual([
       expect.objectContaining({
-        vatNumber: "IT09301420155",
-        codePaysEtrangerEtablissement: "IT"
+        message: `Vous n'êtes pas membre de l'entreprise portant le siret "${company2.siret}".`
       })
     ]);
   });
 
-  it("should return the recent EMITTER", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER", {
-      companyTypes: {
-        set: ["COLLECTOR"]
-      }
+  it("should not return favorites of other users", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { user: user2, company: company2 } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    await formFactory({
+      ownerId: user2.id,
+      opt: { recipientCompanySiret: company2.siret }
     });
-    const form = await formFactory({
-      ownerId: user.id
-    });
-
     const { query } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
       variables: {
         siret: company.siret,
-        type: "EMITTER"
+        type: "RECIPIENT"
       }
     });
-
-    expect(data.favorites).toEqual([
-      expect.objectContaining({
-        siret: form.emitterCompanySiret,
-        codePaysEtrangerEtablissement: "FR"
-      })
-    ]);
+    expect(data.favorites).toEqual([]);
   });
 
   it("should ignore drafts", async () => {
@@ -98,6 +105,589 @@ describe("query favorites", () => {
     });
 
     expect(data.favorites).toEqual([]);
+  });
+
+  it("should ignore deleted forms", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["COLLECTOR"]
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        isDeleted: true
+      }
+    });
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "EMITTER"
+      }
+    });
+
+    expect(data.favorites).toEqual([]);
+  });
+
+  it("should return recent emitters", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["COLLECTOR"]
+      }
+    });
+    const emitter = await companyFactory();
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: emitter.siret,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "EMITTER"
+      }
+    });
+
+    expect(data.favorites).toEqual([
+      expect.objectContaining({
+        siret: emitter.siret,
+        name: emitter.name,
+        address: emitter.address,
+        vatNumber: null,
+        mail: emitter.contactEmail,
+        phone: emitter.contactPhone,
+        contact: "",
+        codePaysEtrangerEtablissement: "FR"
+      })
+    ]);
+  });
+
+  it("should ignore emitters not registered in TD", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["COLLECTOR"]
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: "0".repeat(14),
+        recipientCompanySiret: company.siret
+      }
+    });
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "EMITTER"
+      }
+    });
+
+    expect(data.favorites).toEqual([]);
+  });
+
+  it("should return recent recipients", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+    const recipient = await companyFactory();
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipient.siret
+      }
+    });
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "RECIPIENT"
+      }
+    });
+
+    expect(data.favorites).toEqual([
+      expect.objectContaining({
+        siret: recipient.siret,
+        name: recipient.name,
+        address: recipient.address,
+        vatNumber: null,
+        mail: recipient.contactEmail,
+        phone: recipient.contactPhone,
+        codePaysEtrangerEtablissement: "FR",
+        contact: ""
+      })
+    ]);
+  });
+
+  it("should ignore recipients not registered in TD", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: "0".repeat(14)
+      }
+    });
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "RECIPIENT"
+      }
+    });
+
+    expect(data.favorites).toEqual([]);
+  });
+
+  it("should return recent french transporters", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+    const transporter = await companyFactory({
+      transporterReceipt: {
+        create: {
+          receiptNumber: "receipt",
+          validityLimit: new Date(),
+          department: "07"
+        }
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        transporterCompanySiret: transporter.siret
+      }
+    });
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "TRANSPORTER"
+      }
+    });
+
+    expect(data.favorites).toEqual([
+      expect.objectContaining({
+        siret: transporter.siret,
+        name: transporter.name,
+        address: transporter.address,
+        vatNumber: null,
+        mail: transporter.contactEmail,
+        phone: transporter.contactPhone,
+        codePaysEtrangerEtablissement: "FR",
+        contact: "",
+        transporterReceipt: expect.objectContaining({
+          receiptNumber: "receipt"
+        })
+      })
+    ]);
+  });
+
+  it("should return recent UE transporters", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+    const transporter = await companyFactory({
+      vatNumber: "IT09301420155",
+      siret: ""
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        transporterCompanyVatNumber: transporter.vatNumber
+      }
+    });
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "TRANSPORTER"
+      }
+    });
+
+    expect(data.favorites).toEqual([
+      expect.objectContaining({
+        siret: transporter.siret,
+        name: transporter.name,
+        address: transporter.address,
+        vatNumber: transporter.vatNumber,
+        mail: transporter.contactEmail,
+        phone: transporter.contactPhone,
+        codePaysEtrangerEtablissement: "IT",
+        contact: ""
+      })
+    ]);
+  });
+
+  it("should ignore transporters not registered in TD", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        transporterCompanySiret: "0".repeat(14)
+      }
+    });
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "TRANSPORTER"
+      }
+    });
+
+    expect(data.favorites).toEqual([]);
+  });
+
+  it("should return recent temporary storage", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+    const tempStorer = await companyFactory();
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: tempStorer.siret,
+        recipientIsTempStorage: true
+      }
+    });
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "TEMPORARY_STORAGE_DETAIL"
+      }
+    });
+
+    expect(data.favorites).toEqual([
+      expect.objectContaining({
+        siret: tempStorer.siret,
+        name: tempStorer.name,
+        address: tempStorer.address,
+        vatNumber: null,
+        mail: tempStorer.contactEmail,
+        phone: tempStorer.contactPhone,
+        contact: "",
+        codePaysEtrangerEtablissement: "FR"
+      })
+    ]);
+  });
+
+  it("should ignore temporary storage not registered in TD", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: "0".repeat(14),
+        recipientIsTempStorage: true
+      }
+    });
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "TEMPORARY_STORAGE_DETAIL"
+      }
+    });
+
+    expect(data.favorites).toEqual([]);
+  });
+
+  it("should return recent destination after temporary storage", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+    const destination = await companyFactory();
+
+    await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: company.siret },
+      forwardedInOpts: { recipientCompanySiret: destination.siret }
+    });
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "DESTINATION"
+      }
+    });
+
+    expect(data.favorites).toEqual([
+      expect.objectContaining({
+        siret: destination.siret,
+        name: destination.name,
+        address: destination.address,
+        vatNumber: null,
+        mail: destination.contactEmail,
+        phone: destination.contactPhone,
+        contact: "",
+        codePaysEtrangerEtablissement: "FR"
+      })
+    ]);
+  });
+
+  it("should ignore destinations after temp storage not registered in TD", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+
+    await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: company.siret },
+      forwardedInOpts: { recipientCompanySiret: "0".repeat(14) }
+    });
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "DESTINATION"
+      }
+    });
+
+    expect(data.favorites).toEqual([]);
+  });
+
+  it("should return recent next destinations", async () => {
+    const destination: CompanySearchResult = {
+      siret: "0".repeat(14),
+      address: "rue des 4 chemins",
+      name: "Destination ultérieure",
+      isRegistered: true,
+      companyTypes: ["WASTEPROCESSOR"],
+      statutDiffusionEtablissement: "O",
+      email: "contact@traiteur.co",
+      phone: "00 00 00 00 00"
+    };
+    searchCompanySpy.mockResolvedValueOnce(destination);
+
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        nextDestinationCompanySiret: destination.siret
+      }
+    });
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "NEXT_DESTINATION"
+      }
+    });
+
+    expect(data.favorites).toEqual([
+      expect.objectContaining({
+        siret: destination.siret,
+        name: destination.name,
+        address: destination.address,
+        vatNumber: null,
+        mail: destination.email,
+        phone: destination.phone,
+        contact: "",
+        codePaysEtrangerEtablissement: "FR"
+      })
+    ]);
+  });
+
+  it("should not return next destinations not present in SIRENE database", async () => {
+    searchCompanySpy.mockRejectedValueOnce("Entreprise inconnue");
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        nextDestinationCompanySiret: "0".repeat(14)
+      }
+    });
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "NEXT_DESTINATION"
+      }
+    });
+
+    expect(data.favorites).toEqual([]);
+  });
+
+  it("should return recent traders", async () => {
+    const trader = await companyFactory({
+      companyTypes: ["TRADER"],
+      traderReceipt: {
+        create: {
+          receiptNumber: "receipt",
+          department: "07",
+          validityLimit: new Date()
+        }
+      }
+    });
+
+    const traderSirene: CompanySearchResult = {
+      siret: trader.siret,
+      address: "rue des 4 chemins",
+      name: "Négociant",
+      isRegistered: true,
+      companyTypes: ["TRADER"],
+      statutDiffusionEtablissement: "O",
+      email: "contact@trader.co",
+      phone: "00 00 00 00 00"
+    };
+    searchCompanySpy.mockResolvedValueOnce(traderSirene);
+
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        traderCompanySiret: trader.siret
+      }
+    });
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "TRADER"
+      }
+    });
+
+    expect(data.favorites).toEqual([
+      expect.objectContaining({
+        siret: traderSirene.siret,
+        name: traderSirene.name,
+        address: traderSirene.address,
+        vatNumber: null,
+        mail: traderSirene.email,
+        phone: traderSirene.phone,
+        contact: "",
+        codePaysEtrangerEtablissement: "FR",
+        traderReceipt: {
+          receiptNumber: "receipt"
+        }
+      })
+    ]);
+  });
+
+  it("should return recent brokers", async () => {
+    const broker = await companyFactory({
+      companyTypes: ["BROKER"],
+      brokerReceipt: {
+        create: {
+          receiptNumber: "receipt",
+          department: "07",
+          validityLimit: new Date()
+        }
+      }
+    });
+
+    const brokerSirene: CompanySearchResult = {
+      siret: broker.siret,
+      address: "rue des 4 chemins",
+      name: "Courtier",
+      isRegistered: true,
+      companyTypes: ["BROKER"],
+      statutDiffusionEtablissement: "O",
+      email: "contact@broker.co",
+      phone: "00 00 00 00 00"
+    };
+    searchCompanySpy.mockResolvedValueOnce(brokerSirene);
+
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        brokerCompanySiret: broker.siret
+      }
+    });
+
+    const { query } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
+      variables: {
+        siret: company.siret,
+        type: "BROKER"
+      }
+    });
+
+    expect(data.favorites).toEqual([
+      expect.objectContaining({
+        siret: brokerSirene.siret,
+        name: brokerSirene.name,
+        address: brokerSirene.address,
+        vatNumber: null,
+        mail: brokerSirene.email,
+        phone: brokerSirene.phone,
+        contact: "",
+        codePaysEtrangerEtablissement: "FR",
+        brokerReceipt: {
+          receiptNumber: "receipt"
+        }
+      })
+    ]);
   });
 
   it("should return the user's company if it matches the favorite type", async () => {
@@ -130,16 +720,19 @@ describe("query favorites", () => {
         set: ["PRODUCER"]
       }
     });
+
+    const emitter1 = await companyFactory();
+    const emitter2 = await companyFactory();
     const firstForm = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: "0".repeat(14)
+        emitterCompanySiret: emitter1.siret
       }
     });
     const secondForm = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: "2".repeat(14)
+        emitterCompanySiret: emitter2.siret
       }
     });
 
@@ -153,11 +746,11 @@ describe("query favorites", () => {
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: secondForm.emitterCompanySiret,
+        siret: firstForm.emitterCompanySiret,
         codePaysEtrangerEtablissement: "FR"
       }),
       expect.objectContaining({
-        siret: firstForm.emitterCompanySiret,
+        siret: secondForm.emitterCompanySiret,
         codePaysEtrangerEtablissement: "FR"
       }),
       expect.objectContaining({
@@ -173,22 +766,25 @@ describe("query favorites", () => {
         set: ["PRODUCER"]
       }
     });
+    const emitter1 = await companyFactory();
+    const emitter2 = await companyFactory();
+
     const firstForm = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: "0".repeat(14)
+        emitterCompanySiret: emitter1.siret
+      }
+    });
+    const secondForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: emitter2.siret
       }
     });
     await formFactory({
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret
-      }
-    });
-    const thirdForm = await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: "2".repeat(14)
       }
     });
 
@@ -202,15 +798,15 @@ describe("query favorites", () => {
 
     expect(data.favorites).toEqual([
       expect.objectContaining({
-        siret: thirdForm.emitterCompanySiret,
-        codePaysEtrangerEtablissement: "FR"
-      }),
-      expect.objectContaining({
         siret: company.siret,
         codePaysEtrangerEtablissement: "FR"
       }),
       expect.objectContaining({
         siret: firstForm.emitterCompanySiret,
+        codePaysEtrangerEtablissement: "FR"
+      }),
+      expect.objectContaining({
+        siret: secondForm.emitterCompanySiret,
         codePaysEtrangerEtablissement: "FR"
       })
     ]);
@@ -222,11 +818,12 @@ describe("query favorites", () => {
         set: ["COLLECTOR"]
       }
     });
+    const emitter = await companyFactory();
     const firstForm = await formFactory({
       ownerId: user.id,
       opt: {
         emitterCompanyName: "A Name",
-        emitterCompanySiret: "0".repeat(14)
+        emitterCompanySiret: emitter.siret
       }
     });
     await formFactory({
@@ -253,18 +850,23 @@ describe("query favorites", () => {
     ]);
 
     // Test with VAT numbers
+
+    const transporter = await companyFactory({
+      vatNumber: "IT09301420155"
+    });
+
     await formFactory({
       ownerId: user.id,
       opt: {
         transporterCompanyName: "A Name",
-        transporterCompanyVatNumber: "IT09301420155"
+        transporterCompanyVatNumber: transporter.vatNumber
       }
     });
     await formFactory({
       ownerId: user.id,
       opt: {
         transporterCompanyName: "Another Name",
-        transporterCompanyVatNumber: "IT09301420155"
+        transporterCompanyVatNumber: transporter.vatNumber
       }
     });
 
@@ -278,37 +880,7 @@ describe("query favorites", () => {
     expect(data2.favorites).toEqual([
       expect.objectContaining({
         vatNumber: "IT09301420155",
-        siret: "12345678974589",
         codePaysEtrangerEtablissement: "IT"
-      })
-    ]);
-  });
-
-  it("should suggest a temporary storer", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER", {
-      companyTypes: {
-        set: ["PRODUCER"]
-      }
-    });
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        recipientCompanySiret: "0".repeat(14),
-        recipientIsTempStorage: true
-      }
-    });
-
-    const { query } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
-      variables: {
-        siret: company.siret,
-        type: "TEMPORARY_STORAGE_DETAIL"
-      }
-    });
-
-    expect(data.favorites).toEqual([
-      expect.objectContaining({
-        siret: form.recipientCompanySiret
       })
     ]);
   });
@@ -319,6 +891,7 @@ describe("query favorites", () => {
         set: ["PRODUCER"]
       }
     });
+    const destination = await companyFactory();
     const form = await formFactory({
       ownerId: user.id,
       opt: {
@@ -328,7 +901,7 @@ describe("query favorites", () => {
           create: {
             readableId: getReadableId(),
             ownerId: user.id,
-            recipientCompanySiret: "1".repeat(14)
+            recipientCompanySiret: destination.siret
           }
         }
       }
@@ -348,34 +921,6 @@ describe("query favorites", () => {
     expect(data.favorites).toEqual([
       expect.objectContaining({
         siret: forwardedIn.recipientCompanySiret
-      })
-    ]);
-  });
-
-  it("should suggest a next destination", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER", {
-      companyTypes: {
-        set: ["PRODUCER"]
-      }
-    });
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        nextDestinationCompanySiret: "0".repeat(14)
-      }
-    });
-
-    const { query } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await query<Pick<Query, "favorites">>(FAVORITES, {
-      variables: {
-        siret: company.siret,
-        type: "NEXT_DESTINATION"
-      }
-    });
-
-    expect(data.favorites).toEqual([
-      expect.objectContaining({
-        siret: form.nextDestinationCompanySiret
       })
     ]);
   });
