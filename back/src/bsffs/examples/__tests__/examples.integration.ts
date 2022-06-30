@@ -10,6 +10,6 @@ describe("Exemples de circuit du bordereau de suivi BSFF", () => {
     async () => {
       await testWorkflow(collectePetitesQuantitesWorkflow);
     },
-    10000
+    60000
   );
 });

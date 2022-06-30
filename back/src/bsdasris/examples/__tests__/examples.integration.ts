@@ -15,7 +15,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
     async () => {
       await testWorkflow(signatureCodeSecretEcoOrganisme);
     },
-    10000
+    60000
   );
 
   test(
@@ -23,7 +23,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
     async () => {
       await testWorkflow(signatureCodeSecret);
     },
-    10000
+    60000
   );
 
   test(
@@ -31,7 +31,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
     async () => {
       await testWorkflow(acheminementDirectEcoOrganisme);
     },
-    10000
+    60000
   );
 
   test(
@@ -39,7 +39,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
     async () => {
       await testWorkflow(acheminementDirect);
     },
-    10000
+    60000
   );
 
   test(
@@ -47,7 +47,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
     async () => {
       await testWorkflow(emportDirect);
     },
-    10000
+    60000
   );
 
   test(

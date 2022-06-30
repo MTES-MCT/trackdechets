@@ -12,7 +12,7 @@ describe("Exemples de circuit du bordereau de suivi amiante", () => {
     async () => {
       await testWorkflow(collecteChantierWorkflow);
     },
-    10000
+    60000
   );
 
   test(
@@ -20,7 +20,7 @@ describe("Exemples de circuit du bordereau de suivi amiante", () => {
     async () => {
       await testWorkflow(collecteChantierParticulierWorkflow);
     },
-    10000
+    60000
   );
 
   test(
@@ -28,6 +28,6 @@ describe("Exemples de circuit du bordereau de suivi amiante", () => {
     async () => {
       await testWorkflow(groupementWorkflow);
     },
-    20000
+    60000
   );
 });

@@ -55,7 +55,7 @@ describe("query { myCompanies }", () => {
     expect(data.myCompanies.edges.map(({ node }) => node.id)).toEqual([
       company1.id
     ]);
-  });
+  }, 20000);
 
   it("should paginate forward with first and after", async () => {
     const user = await userFactory();
@@ -97,7 +97,7 @@ describe("query { myCompanies }", () => {
     expect(page2.myCompanies.edges.map(({ node }) => node.id)).toEqual([
       company4.id
     ]);
-  });
+  }, 20000);
 
   it("should paginate backward with last and before", async () => {
     const user = await userFactory();
@@ -142,5 +142,5 @@ describe("query { myCompanies }", () => {
     expect(page2.myCompanies.edges.map(({ node }) => node.id)).toEqual([
       company1.id
     ]);
-  });
+  }, 20000);
 });
