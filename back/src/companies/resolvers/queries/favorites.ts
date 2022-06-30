@@ -116,15 +116,13 @@ async function getRecentEmitters(
 }
 
 async function getRecentRecipients(
-  defaultWhere: Prisma.FormWhereInput,
-  recipientIsTempStorage: boolean
+  defaultWhere: Prisma.FormWhereInput
 ): Promise<CompanyFavorite[]> {
   const forms = await prisma.form.findMany({
     ...defaultArgs,
     where: {
       ...defaultWhere,
-      NOT: [{ recipientCompanySiret: null }, { recipientCompanySiret: "" }],
-      recipientIsTempStorage
+      NOT: [{ recipientCompanySiret: null }, { recipientCompanySiret: "" }]
     },
     select: { recipientCompanySiret: true }
   });
@@ -334,9 +332,11 @@ async function getRecentPartners(
     case "EMITTER":
       return getRecentEmitters(defaultWhere);
     case "RECIPIENT":
-      return getRecentRecipients(defaultWhere, false);
+      return getRecentRecipients(defaultWhere);
     case "TEMPORARY_STORAGE_DETAIL":
-      return getRecentRecipients(defaultWhere, true);
+      // do not differenciate between recipient and temp storage
+      // because the front never set type = TEMPORARY_STORAGE_DETAIL
+      return getRecentRecipients(defaultWhere);
     case "TRANSPORTER":
       return getRecentTransporters(defaultWhere);
     case "DESTINATION":
