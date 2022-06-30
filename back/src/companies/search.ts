@@ -93,6 +93,8 @@ export async function searchCompany(
     ecoOrganismeAgreements: [],
     isRegistered: trackdechetsCompanyInfo != null,
     companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
+    phone: trackdechetsCompanyInfo?.contactPhone,
+    email: trackdechetsCompanyInfo?.contactEmail,
     ...convertUrls(trackdechetsCompanyInfo),
     ...companyInfo
   };

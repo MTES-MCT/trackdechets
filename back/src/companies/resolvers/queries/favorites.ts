@@ -12,6 +12,7 @@ import { getCompanyOrCompanyNotFound } from "../../database";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { countries } from "../../../common/constants/companySearchHelpers";
 import { checkVAT } from "jsvat";
+import { searchCompany } from "../../search";
 
 const MAX_FAVORITES = 10;
 
@@ -68,7 +69,7 @@ async function getRecentPartners(
 ): Promise<CompanyFavorite[]> {
   const defaultArgs = {
     orderBy: { updatedAt: "desc" as Prisma.SortOrder },
-    take: 50
+    take: 30
   };
   const defaultWhere: Prisma.FormWhereInput = {
     OR: [
@@ -97,84 +98,83 @@ async function getRecentPartners(
     isDeleted: false
   };
 
-  switch (type) {
-    case "TEMPORARY_STORAGE_DETAIL": {
-      const forms = await prisma.form.findMany({
-        ...defaultArgs,
-        where: {
-          ...defaultWhere,
-          recipientIsTempStorage: true,
-          recipientCompanySiret: { not: "" }
-        }
-      });
-      return forms.map(form => ({
-        name: form.recipientCompanyName,
-        siret: form.recipientCompanySiret,
-        address: form.recipientCompanyAddress,
-        contact: form.recipientCompanyAddress,
-        phone: form.recipientCompanyPhone,
-        mail: form.recipientCompanyMail
-      }));
-    }
-    case "DESTINATION": {
-      const forms = await prisma.form.findMany({
-        ...defaultArgs,
-        where: {
-          ...defaultWhere,
-          forwardedIn: {
+  const recentSirets: string[] = await (async () => {
+    switch (type) {
+      case "TEMPORARY_STORAGE_DETAIL": {
+        const forms = await prisma.form.findMany({
+          ...defaultArgs,
+          where: {
+            ...defaultWhere,
+            recipientIsTempStorage: true,
             recipientCompanySiret: { not: "" }
-          }
-        },
-        select: {
-          forwardedIn: {
-            select: {
-              recipientCompanyName: true,
-              recipientCompanySiret: true,
-              recipientCompanyAddress: true,
-              recipientCompanyContact: true,
-              recipientCompanyPhone: true,
-              recipientCompanyMail: true
+          },
+          select: { recipientCompanySiret: true }
+        });
+        return forms.map(form => form.recipientCompanySiret);
+      }
+      case "DESTINATION": {
+        const forms = await prisma.form.findMany({
+          ...defaultArgs,
+          where: {
+            ...defaultWhere,
+            forwardedIn: {
+              recipientCompanySiret: { not: "" }
+            }
+          },
+          select: {
+            forwardedIn: {
+              select: {
+                recipientCompanySiret: true
+              }
             }
           }
-        }
-      });
-      return forms.map(form => ({
-        name: form.forwardedIn?.recipientCompanyName,
-        siret: form.forwardedIn?.recipientCompanySiret,
-        address: form.forwardedIn?.recipientCompanyAddress,
-        contact: form.forwardedIn?.recipientCompanyContact,
-        phone: form.forwardedIn?.recipientCompanyPhone,
-        mail: form.forwardedIn?.recipientCompanyMail
-      }));
+        });
+        return forms.map(form => form.forwardedIn?.recipientCompanySiret);
+      }
+      case "EMITTER":
+      case "TRANSPORTER":
+      case "RECIPIENT":
+      case "TRADER":
+      case "BROKER":
+      case "NEXT_DESTINATION": {
+        const lowerType = camelCase(type);
+        const forms = await prisma.form.findMany({
+          ...defaultArgs,
+          where: {
+            ...defaultWhere,
+            [`${lowerType}CompanySiret`]: { not: "" }
+          },
+          select: { [`${lowerType}CompanySiret`]: true }
+        });
+        return forms.map(form => form[`${lowerType}CompanySiret`]);
+      }
+      default:
+        return [];
     }
-    case "EMITTER":
-    case "TRANSPORTER":
-    case "RECIPIENT":
-    case "TRADER":
-    case "BROKER":
-    case "NEXT_DESTINATION": {
-      const lowerType = camelCase(type);
-      const forms = await prisma.form.findMany({
-        ...defaultArgs,
-        where: {
-          ...defaultWhere,
-          [`${lowerType}CompanySiret`]: { not: "" }
-        }
-      });
+  })();
 
-      return forms.map(form => ({
-        name: form[`${lowerType}CompanyName`],
-        siret: form[`${lowerType}CompanySiret`],
-        vatNumber: form[`${lowerType}CompanyVatNumber`],
-        address: form[`${lowerType}CompanyAddress`],
-        contact: form[`${lowerType}CompanyContact`],
-        phone: form[`${lowerType}CompanyPhone`],
-        mail: form[`${lowerType}CompanyMail`]
-      }));
-    }
-    default:
-      return [];
-  }
+  const companies = (
+    await Promise.all(
+      recentSirets.map(async siret => {
+        try {
+          const company = await searchCompany(siret);
+          return company;
+        } catch {
+          // catch company not found
+          return null;
+        }
+      })
+    )
+  ).filter(c => c !== null); // filter company not found in SIRENE database
+
+  return companies.map(company => ({
+    name: company.name,
+    siret: company.siret,
+    address: company.address,
+    contact: "",
+    phone: company.phone ?? "",
+    mail: company.email ?? ""
+  }));
 }
 
 const favoritesResolver: QueryResolvers["favorites"] = async (
