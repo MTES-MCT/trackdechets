@@ -22,26 +22,34 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
 
   await acceptedInfoSchema.validate(acceptedInfo);
 
-  const acceptedForm = await transitionForm(user, form, {
-    type: EventType.MarkAsAccepted,
-    formUpdateInput: form.forwardedInId
-      ? {
-          forwardedIn: {
-            update: {
-              status:
-                acceptedInfo.wasteAcceptationStatus === Status.REFUSED
-                  ? Status.REFUSED
-                  : Status.ACCEPTED,
-              ...acceptedInfo,
-              signedAt: new Date(acceptedInfo.signedAt)
-            }
+  const formUpdateInput = form.forwardedInId
+    ? {
+        forwardedIn: {
+          update: {
+            status:
+              acceptedInfo.wasteAcceptationStatus === Status.REFUSED
+                ? Status.REFUSED
+                : Status.ACCEPTED,
+            ...acceptedInfo,
+            signedAt: new Date(acceptedInfo.signedAt)
           }
         }
-      : {
-          ...acceptedInfo,
-          signedAt: new Date(acceptedInfo.signedAt)
-        }
-  });
+      }
+    : {
+        ...acceptedInfo,
+        signedAt: new Date(acceptedInfo.signedAt)
+      };
+
+  const acceptedForm = await formRepository.update(
+    { id: form.id },
+    {
+      status: transitionForm(form, {
+        type: EventType.MarkAsAccepted,
+        formUpdateInput
+      }),
+      ...formUpdateInput
+    }
+  );
 
   if (acceptedInfo.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED) {
     await formRepository.removeAppendix2(id);

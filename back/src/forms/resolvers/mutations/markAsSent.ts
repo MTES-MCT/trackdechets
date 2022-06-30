@@ -36,13 +36,19 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
     currentTransporterSiret: form.transporterCompanySiret,
     signedByTransporter: false
   };
-  const resentForm = await transitionForm(user, form, {
-    type: EventType.MarkAsSent,
-    formUpdateInput
-  });
-
-  const { findAppendix2FormsById, updateAppendix2Forms } =
+  const { findAppendix2FormsById, updateAppendix2Forms, update } =
     getFormRepository(user);
+
+  const resentForm = await update(
+    { id: form.id },
+    {
+      status: transitionForm(form, {
+        type: EventType.MarkAsSent,
+        formUpdateInput
+      }),
+      ...formUpdateInput
+    }
+  );
 
   const appendix2Forms = await findAppendix2FormsById(form.id);
 

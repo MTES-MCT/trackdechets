@@ -11,6 +11,7 @@ import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { checkCanSignFor } from "../../permissions";
 import { expandFormFromDb } from "../../form-converter";
+import { getFormRepository } from "../../repository";
 
 /**
  * Common function for signing
@@ -36,10 +37,16 @@ const signedByTransporterFn = async (user, args, existingForm) => {
     sentBy: existingForm.emittedBy
   };
 
-  const updatedForm = await transitionForm(user, existingForm, {
-    type: EventType.SignedByTransporter,
-    formUpdateInput
-  });
+  const updatedForm = await getFormRepository(user).update(
+    { id: existingForm.id },
+    {
+      status: transitionForm(existingForm, {
+        type: EventType.SignedByTransporter,
+        formUpdateInput
+      }),
+      ...formUpdateInput
+    }
+  );
 
   return expandFormFromDb(updatedForm);
 };
@@ -98,10 +105,16 @@ const signatures: Partial<
       }
     };
 
-    const updatedForm = await transitionForm(user, existingFullForm, {
-      type: EventType.MarkAsResent,
-      formUpdateInput
-    });
+    const updatedForm = await getFormRepository(user).update(
+      { id: existingFullForm.id },
+      {
+        status: transitionForm(existingFullForm, {
+          type: EventType.MarkAsResent,
+          formUpdateInput
+        }),
+        ...formUpdateInput
+      }
+    );
 
     return expandFormFromDb(updatedForm);
   }

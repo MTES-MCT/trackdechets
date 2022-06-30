@@ -54,11 +54,15 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
     await beforeSignedByTransporterSchema.validate(futureForm);
   }
 
-  const sealedForm = await transitionForm(user, form, {
-    type: EventType.MarkAsSealed
-  });
-
   const formRepository = getFormRepository(user);
+  const sealedForm = await formRepository.update(
+    { id: form.id },
+    {
+      status: transitionForm(form, {
+        type: EventType.MarkAsSealed
+      })
+    }
+  );
 
   const appendix2Forms = await formRepository.findAppendix2FormsById(form.id);
   if (appendix2Forms.length > 0) {
@@ -84,10 +88,16 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
     (sealedForm.emitterIsForeignShip === true ||
       sealedForm.emitterIsPrivateIndividual === true)
   ) {
-    const updatedForm = await transitionForm(user, sealedForm, {
-      type: EventType.SignedByProducer,
-      formUpdateInput
-    });
+    const updatedForm = await formRepository.update(
+      { id: sealedForm.id },
+      {
+        status: transitionForm(sealedForm, {
+          type: EventType.SignedByProducer,
+          formUpdateInput
+        }),
+        ...formUpdateInput
+      }
+    );
     return expandFormFromDb(updatedForm);
   }
 

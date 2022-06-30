@@ -53,10 +53,16 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
       : {})
   };
 
-  const tempStoredForm = await transitionForm(user, form, {
-    type: EventType.MarkAsTempStored,
-    formUpdateInput
-  });
+  const tempStoredForm = await formRepository.update(
+    { id: form.id },
+    {
+      status: transitionForm(form, {
+        type: EventType.MarkAsTempStored,
+        formUpdateInput
+      }),
+      ...formUpdateInput
+    }
+  );
 
   // check for stale transport segments and delete them
   // quick fix https://trackdechets.zammad.com/#ticket/zoom/1696

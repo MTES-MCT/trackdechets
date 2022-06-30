@@ -36,10 +36,16 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
       }
     };
 
-    const tempStoredForm = await transitionForm(user, form, {
-      type: EventType.MarkAsTempStorerAccepted,
-      formUpdateInput
-    });
+    const tempStoredForm = await formRepository.update(
+      { id: form.id },
+      {
+        status: transitionForm(form, {
+          type: EventType.MarkAsTempStorerAccepted,
+          formUpdateInput
+        }),
+        ...formUpdateInput
+      }
+    );
 
     if (
       tempStorerAcceptedInfo.wasteAcceptationStatus ===

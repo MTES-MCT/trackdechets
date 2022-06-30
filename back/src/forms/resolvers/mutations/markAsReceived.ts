@@ -62,10 +62,16 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
         currentTransporterSiret: ""
       };
 
-  const receivedForm = await transitionForm(user, form, {
-    type: EventType.MarkAsReceived,
-    formUpdateInput
-  });
+  const receivedForm = await formRepository.update(
+    { id: form.id },
+    {
+      status: transitionForm(form, {
+        type: EventType.MarkAsReceived,
+        formUpdateInput
+      }),
+      ...formUpdateInput
+    }
+  );
 
   // check for stale transport segments and delete them
   // quick fix https://trackdechets.zammad.com/#ticket/zoom/1696

@@ -71,13 +71,19 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
     };
   }
 
-  const processedForm = await transitionForm(user, form, {
-    type: EventType.MarkAsProcessed,
-    formUpdateInput
-  });
-
-  const { findAppendix2FormsById, updateAppendix2Forms } =
+  const { findAppendix2FormsById, updateAppendix2Forms, update } =
     getFormRepository(user);
+
+  const processedForm = await update(
+    { id: form.id },
+    {
+      status: transitionForm(form, {
+        type: EventType.MarkAsProcessed,
+        formUpdateInput
+      }),
+      ...formUpdateInput
+    }
+  );
 
   // mark appendix2Forms as PROCESSED
   const appendix2Forms = await findAppendix2FormsById(form.id);

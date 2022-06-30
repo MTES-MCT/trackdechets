@@ -16,6 +16,7 @@ import {
   wasteDetailsSchema
 } from "../../validation";
 import { FullForm } from "../../types";
+import { getFormRepository } from "../../repository";
 
 const signatures: Partial<
   Record<
@@ -71,10 +72,16 @@ const signatures: Partial<
     await wasteDetailsSchema.validate(futureForm);
     await beforeSignedByTransporterSchema.validate(futureForm);
 
-    const updatedForm = await transitionForm(user, existingForm, {
-      type: EventType.SignedByProducer,
-      formUpdateInput
-    });
+    const updatedForm = await getFormRepository(user).update(
+      { id: existingForm.id },
+      {
+        status: transitionForm(existingForm, {
+          type: EventType.SignedByProducer,
+          formUpdateInput
+        }),
+        ...formUpdateInput
+      }
+    );
 
     return expandFormFromDb(updatedForm);
   },
@@ -122,10 +129,16 @@ const signatures: Partial<
     await wasteDetailsSchema.validate(futureFullForm);
     await beforeSignedByTransporterSchema.validate(futureFullForm);
 
-    const updatedForm = await transitionForm(user, existingForm, {
-      type: EventType.SignedByTempStorer,
-      formUpdateInput
-    });
+    const updatedForm = await getFormRepository(user).update(
+      { id: existingForm.id },
+      {
+        status: transitionForm(existingForm, {
+          type: EventType.SignedByTempStorer,
+          formUpdateInput
+        }),
+        ...formUpdateInput
+      }
+    );
 
     return expandFormFromDb(updatedForm);
   }
