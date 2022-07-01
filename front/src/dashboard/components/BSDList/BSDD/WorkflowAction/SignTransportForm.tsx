@@ -159,7 +159,7 @@ export default function SignTransportForm({
   form,
 }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = React.useState(false);
-  const title = "Signer en tant que transporteur";
+  const title = "Signature transporteur";
 
   return (
     <>
