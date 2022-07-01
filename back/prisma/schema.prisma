@@ -186,6 +186,7 @@ model Company {
   gerepId                              String?
   codeNaf                              String?
   givenName                            String?
+  contact                              String?
   contactEmail                         String?
   contactPhone                         String?
   website                              String?
