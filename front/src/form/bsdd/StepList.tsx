@@ -1,5 +1,4 @@
 import { useMutation, useQuery } from "@apollo/client";
-import cogoToast from "cogo-toast";
 import routes from "common/routes";
 import {
   FormInput,
@@ -18,6 +17,7 @@ import { CREATE_FORM, GET_FORM, UPDATE_FORM } from "./utils/queries";
 import { IStepContainerProps } from "../common/stepper/Step";
 import { GET_BSDS } from "common/queries";
 import { Loader } from "common/components";
+import { formInputToastError } from "form/common/stepper/toaster";
 
 interface Props {
   children: ReactElement<IStepContainerProps>[];
@@ -87,13 +87,7 @@ export default function StepsList(props: Props) {
 
     saveForm(formInput)
       .then(_ => history.push(redirectTo))
-      .catch(err => {
-        err.graphQLErrors.length &&
-          err.graphQLErrors.map(err =>
-            cogoToast.error(err.message, { hideAfter: 7 })
-          );
-        err.message && cogoToast.error(err.message, { hideAfter: 7 });
-      });
+      .catch(err => formInputToastError(err));
   }
 
   return (

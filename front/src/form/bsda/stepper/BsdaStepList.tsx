@@ -1,5 +1,4 @@
 import { useMutation, useQuery } from "@apollo/client";
-import cogoToast from "cogo-toast";
 import { Loader } from "common/components";
 import { GET_BSDS } from "common/queries";
 import routes from "common/routes";
@@ -21,6 +20,7 @@ import { generatePath, useHistory, useParams } from "react-router-dom";
 import initialState from "./initial-state";
 import { CREATE_BSDA, UPDATE_BSDA, GET_BSDA } from "./queries";
 import omitDeep from "omit-deep-lodash";
+import { formInputToastError } from "form/common/stepper/toaster";
 
 interface Props {
   children: (bsda: Bsda | undefined) => ReactElement;
@@ -107,15 +107,7 @@ export default function BsdaStepsList(props: Props) {
         });
         history.push(redirectTo);
       })
-      .catch(err => {
-        if (err.graphQLErrors?.length) {
-          err.graphQLErrors.map(err =>
-            cogoToast.error(err.message, { hideAfter: 7 })
-          );
-        } else if (err.message) {
-          cogoToast.error(err.message, { hideAfter: 7 });
-        }
-      });
+      .catch(err => formInputToastError(err));
   }
 
   // As it's a render function, the steps are nested into a `<></>` block
