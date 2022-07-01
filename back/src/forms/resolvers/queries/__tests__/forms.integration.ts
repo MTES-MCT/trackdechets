@@ -199,6 +199,33 @@ describe("Query.forms", () => {
     expect(data.forms[0].recipient.company.siret).toBe(otherCompany.siret);
   });
 
+  it("should return forms for which user is intermediary when filtering on siret", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    // Create form associated to the EO
+    await formFactory({
+      ownerId: user.id,
+      opt: {
+        intermediaries: {
+          create: {
+            siret: company.siret,
+            name: company.name,
+            contact: "John Doe"
+          }
+        }
+      }
+    });
+
+    const { query } = makeClient(user);
+    const { data } = await query<Pick<Query, "forms">>(FORMS, {
+      variables: {
+        siret: company.siret
+      }
+    });
+
+    expect(data.forms.length).toBe(1);
+  });
+
   it("should convert packagingInfos to an empty array if null", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 

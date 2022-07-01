@@ -68,6 +68,8 @@ enum FormRole {
   BROKER
   "Les BSD's dont je suis éco-organisme"
   ECO_ORGANISME
+  "Les BSD's dont je suis intermédiare"
+  INTERMEDIARY
 }
 
 "Types d'émetteur de déchet (choix multiple de la case 1)"
