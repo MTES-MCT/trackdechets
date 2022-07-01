@@ -40,7 +40,7 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
         signedAt: new Date(acceptedInfo.signedAt)
       };
 
-  return prisma.$transaction(async transaction => {
+  const acceptedForm = await prisma.$transaction(async transaction => {
     const { update, removeAppendix2 } = getFormRepository(user, transaction);
     const acceptedForm = await update(
       { id: form.id },
@@ -59,8 +59,10 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
       await removeAppendix2(id);
     }
 
-    return expandFormFromDb(acceptedForm);
+    return acceptedForm;
   });
+
+  return expandFormFromDb(acceptedForm);
 };
 
 export default markAsAcceptedResolver;

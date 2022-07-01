@@ -36,7 +36,7 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
       }
     };
 
-    return prisma.$transaction(async transaction => {
+    const tempStoredForm = await prisma.$transaction(async transaction => {
       const formRepository = getFormRepository(user, transaction);
       const tempStoredForm = await formRepository.update(
         { id: form.id },
@@ -56,8 +56,10 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
         await formRepository.removeAppendix2(id);
       }
 
-      return expandFormFromDb(tempStoredForm);
+      return tempStoredForm;
     });
+
+    return expandFormFromDb(tempStoredForm);
   };
 
 export default markAsTempStorerAcceptedResolver;

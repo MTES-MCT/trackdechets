@@ -26,44 +26,46 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   const form = await getFormOrFormNotFound({ id });
   await checkCanMarkAsReceived(user, form);
 
-  return prisma.$transaction(async transaction => {
-    const formRepository = getFormRepository(user, transaction);
+  if (form.recipientIsTempStorage === true) {
+    // this form can be mark as received only if it has been
+    // taken over by the transporter after temp storage
+    const { forwardedIn } = await getFormRepository(user).findFullFormById(
+      form.id
+    );
 
-    if (form.recipientIsTempStorage === true) {
-      // this form can be mark as received only if it has been
-      // taken over by the transporter after temp storage
-      const { forwardedIn } = await formRepository.findFullFormById(form.id);
-
-      if (!forwardedIn?.emittedAt) {
-        throw new TemporaryStorageCannotReceive();
-      }
+    if (!forwardedIn?.emittedAt) {
+      throw new TemporaryStorageCannotReceive();
     }
+  }
 
-    await receivedInfoSchema.validate(receivedInfo);
-    const formUpdateInput: Prisma.FormUpdateInput = form.forwardedInId
-      ? {
-          forwardedIn: {
-            update: {
-              status: [
-                WasteAcceptationStatus.ACCEPTED,
-                WasteAcceptationStatus.PARTIALLY_REFUSED
-              ].includes(receivedInfo.wasteAcceptationStatus as any)
-                ? Status.ACCEPTED
-                : receivedInfo.wasteAcceptationStatus ==
-                  WasteAcceptationStatus.REFUSED
-                ? Status.REFUSED
-                : Status.RECEIVED,
-              ...receivedInfo
-            }
-          },
-          currentTransporterSiret: ""
-        }
-      : {
-          ...receivedInfo,
-          quantityReceivedType: QuantityType.REAL,
-          currentTransporterSiret: ""
-        };
+  await receivedInfoSchema.validate(receivedInfo);
 
+  const formUpdateInput: Prisma.FormUpdateInput = form.forwardedInId
+    ? {
+        forwardedIn: {
+          update: {
+            status: [
+              WasteAcceptationStatus.ACCEPTED,
+              WasteAcceptationStatus.PARTIALLY_REFUSED
+            ].includes(receivedInfo.wasteAcceptationStatus as any)
+              ? Status.ACCEPTED
+              : receivedInfo.wasteAcceptationStatus ==
+                WasteAcceptationStatus.REFUSED
+              ? Status.REFUSED
+              : Status.RECEIVED,
+            ...receivedInfo
+          }
+        },
+        currentTransporterSiret: ""
+      }
+    : {
+        ...receivedInfo,
+        quantityReceivedType: QuantityType.REAL,
+        currentTransporterSiret: ""
+      };
+
+  const receivedForm = await prisma.$transaction(async transaction => {
+    const formRepository = getFormRepository(user, transaction);
     const receivedForm = await formRepository.update(
       { id: form.id },
       {
@@ -85,8 +87,10 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
       await formRepository.removeAppendix2(id);
     }
 
-    return expandFormFromDb(receivedForm);
+    return receivedForm;
   });
+
+  return expandFormFromDb(receivedForm);
 };
 
 export default markAsReceivedResolver;

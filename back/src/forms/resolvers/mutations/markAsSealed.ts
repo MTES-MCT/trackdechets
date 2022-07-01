@@ -54,7 +54,12 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
     await beforeSignedByTransporterSchema.validate(futureForm);
   }
 
-  return prisma.$transaction(async transaction => {
+  const emitterCompanyExists =
+    (await prisma.company.count({
+      where: { siret: form.emitterCompanySiret }
+    })) > 0;
+
+  const resultingForm = await prisma.$transaction(async transaction => {
     const formRepository = getFormRepository(user, transaction);
     const sealedForm = await formRepository.update(
       { id: form.id },
@@ -72,16 +77,9 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
       await formRepository.updateAppendix2Forms(appendix2Forms);
     }
 
-    if (form.emitterCompanySiret) {
-      // send welcome email to emitter if it is not registered in TD
-      const emitterCompanyExists =
-        (await transaction.company.count({
-          where: { siret: form.emitterCompanySiret }
-        })) > 0;
-
-      if (!emitterCompanyExists) {
-        await mailToNonExistentEmitter(sealedForm, formRepository);
-      }
+    // send welcome email to emitter if it is not registered in TD
+    if (form.emitterCompanySiret && !emitterCompanyExists) {
+      await mailToNonExistentEmitter(sealedForm, formRepository);
     }
 
     if (
@@ -89,7 +87,7 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
       (sealedForm.emitterIsForeignShip === true ||
         sealedForm.emitterIsPrivateIndividual === true)
     ) {
-      const updatedForm = await formRepository.update(
+      return formRepository.update(
         { id: sealedForm.id },
         {
           status: transitionForm(sealedForm, {
@@ -99,11 +97,12 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
           ...formUpdateInput
         }
       );
-      return expandFormFromDb(updatedForm);
     }
 
-    return expandFormFromDb(sealedForm);
+    return sealedForm;
   });
+
+  return expandFormFromDb(resultingForm);
 };
 
 async function mailToNonExistentEmitter(

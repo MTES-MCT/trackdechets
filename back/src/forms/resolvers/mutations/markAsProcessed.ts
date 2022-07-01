@@ -72,9 +72,15 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
     };
   }
 
+  const appendix2Forms = await getFormRepository(user).findAppendix2FormsById(
+    form.id
+  );
+
   const processedForm = await prisma.$transaction(async transaction => {
-    const { findAppendix2FormsById, updateAppendix2Forms, update } =
-      getFormRepository(user, transaction);
+    const { updateAppendix2Forms, update } = getFormRepository(
+      user,
+      transaction
+    );
 
     const processedForm = await update(
       { id: form.id },
@@ -88,8 +94,6 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
     );
 
     // mark appendix2Forms as PROCESSED
-    const appendix2Forms = await findAppendix2FormsById(form.id);
-
     if (appendix2Forms.length > 0) {
       await updateAppendix2Forms(appendix2Forms);
     }

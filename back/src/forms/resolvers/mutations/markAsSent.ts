@@ -38,9 +38,15 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
     signedByTransporter: false
   };
 
-  return prisma.$transaction(async transaction => {
-    const { findAppendix2FormsById, updateAppendix2Forms, update } =
-      getFormRepository(user, transaction);
+  const appendix2Forms = await getFormRepository(user).findAppendix2FormsById(
+    form.id
+  );
+
+  const resentForm = await prisma.$transaction(async transaction => {
+    const { updateAppendix2Forms, update } = getFormRepository(
+      user,
+      transaction
+    );
 
     const resentForm = await update(
       { id: form.id },
@@ -53,16 +59,16 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
       }
     );
 
-    const appendix2Forms = await findAppendix2FormsById(form.id);
-
     if (appendix2Forms.length > 0) {
       // mark appendix2Forms as GROUPED if all its grouping forms are sealed
       // and quantityGrouped is equal to quantityReceived
       await updateAppendix2Forms(appendix2Forms);
     }
 
-    return expandFormFromDb(resentForm);
+    return resentForm;
   });
+
+  return expandFormFromDb(resentForm);
 };
 
 export default markAsSentResolver;
