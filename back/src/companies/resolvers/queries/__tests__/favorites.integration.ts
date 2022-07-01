@@ -497,7 +497,8 @@ describe("query favorites", () => {
       companyTypes: ["WASTEPROCESSOR"],
       statutDiffusionEtablissement: "O",
       contactEmail: "contact@traiteur.co",
-      contactPhone: "00 00 00 00 00"
+      contactPhone: "00 00 00 00 00",
+      contact: "John Snow"
     };
     searchCompanySpy.mockResolvedValueOnce(destination);
 
@@ -584,7 +585,8 @@ describe("query favorites", () => {
       companyTypes: ["TRADER"],
       statutDiffusionEtablissement: "O",
       contactEmail: "contact@trader.co",
-      contactPhone: "00 00 00 00 00"
+      contactPhone: "00 00 00 00 00",
+      contact: "John Snow"
     };
     searchCompanySpy.mockResolvedValueOnce(traderSirene);
 
@@ -647,7 +649,8 @@ describe("query favorites", () => {
       companyTypes: ["BROKER"],
       statutDiffusionEtablissement: "O",
       contactEmail: "contact@broker.co",
-      contactPhone: "00 00 00 00 00"
+      contactPhone: "00 00 00 00 00",
+      contact: "John Snow"
     };
     searchCompanySpy.mockResolvedValueOnce(brokerSirene);
 

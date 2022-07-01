@@ -160,7 +160,8 @@ const insee1: CompanySearchResult = {
   companyTypes: [],
   statutDiffusionEtablissement: "O",
   contactEmail: "",
-  contactPhone: ""
+  contactPhone: "",
+  contact: ""
 };
 const insee2: CompanySearchResult = {
   siret: "12346085500055",
@@ -176,7 +177,8 @@ const insee2: CompanySearchResult = {
   companyTypes: [],
   statutDiffusionEtablissement: "O",
   contactEmail: "",
-  contactPhone: ""
+  contactPhone: "",
+  contact: ""
 };
 
 // Mock pdf generator
