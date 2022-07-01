@@ -98,7 +98,8 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
     ],
     ["TRADER"]: [{ traderCompanySiret: siret }],
     ["BROKER"]: [{ brokerCompanySiret: siret }],
-    ["ECO_ORGANISME"]: [{ ecoOrganismeSiret: siret }]
+    ["ECO_ORGANISME"]: [{ ecoOrganismeSiret: siret }],
+    ["INTERMEDIARY"]: [{ intermediaries: { some: { siret } } }]
   };
 
   return {
