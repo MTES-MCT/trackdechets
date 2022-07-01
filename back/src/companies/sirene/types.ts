@@ -2,7 +2,12 @@ import { CompanySearchResult } from "../types";
 
 export type SireneSearchResult = Omit<
   CompanySearchResult,
-  "id" | "isRegistered" | "companyTypes" | "contactEmail" | "contactPhone"
+  | "id"
+  | "isRegistered"
+  | "companyTypes"
+  | "contact"
+  | "contactEmail"
+  | "contactPhone"
 >;
 
 // Response from https://api.entreprise.data.gouv.fr/api/sirene/v3/etablissements/<VOTRE_SIRET>

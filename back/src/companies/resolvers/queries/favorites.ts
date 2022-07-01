@@ -69,7 +69,7 @@ function companyToFavorite(
     siret: company.siret,
     vatNumber: company.vatNumber,
     address: company.address,
-    contact: "",
+    contact: company.contact,
     phone: company.contactPhone,
     mail: company.contactEmail,
     codePaysEtrangerEtablissement: !company.vatNumber
@@ -86,7 +86,7 @@ function companySearchResultToFavorite(
     name: companySearchResult.name,
     siret: companySearchResult.siret,
     address: companySearchResult.address,
-    contact: "",
+    contact: companySearchResult.contact,
     phone: companySearchResult.contactPhone ?? "",
     mail: companySearchResult.contactEmail ?? ""
   };

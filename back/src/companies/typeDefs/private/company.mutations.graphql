@@ -14,6 +14,8 @@ type Mutation {
     siret: String!
     "Identifiant GEREP"
     gerepId: String
+    "Prénom et nom du contact dans l'entreprise"
+    contact: String
     "Email de contact"
     contactEmail: String
     "Numéro de téléphone de contact"

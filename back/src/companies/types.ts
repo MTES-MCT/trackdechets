@@ -16,6 +16,7 @@ export interface CompanySearchResult extends CompanyBaseIdentifiers {
   isRegistered: boolean;
   companyTypes: CompanyType[];
   ecoOrganismeAgreements?: URL[];
+  contact: string;
   contactEmail: string;
   contactPhone: string;
   // diffusible ou non-diffusible légalement (INSEE)

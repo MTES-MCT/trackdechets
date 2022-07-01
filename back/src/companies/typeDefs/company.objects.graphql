@@ -15,6 +15,9 @@ type CompanyPrivate {
   "État du processus de vérification de l'établissement"
   verificationStatus: CompanyVerificationStatus!
 
+  "Prénom et nom du contact"
+  contact: String
+
   "Email de contact (visible sur la fiche entreprise)"
   contactEmail: String
 
@@ -132,7 +135,8 @@ type CompanyPublic {
   associé à cet établissement
   """
   installation: Installation
-
+  "Prénom et nom du contact"
+  contact: String
   "Email de contact"
   contactEmail: String
   "Numéro de téléphone de contact"
