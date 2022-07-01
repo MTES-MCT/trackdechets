@@ -54,54 +54,56 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
     await beforeSignedByTransporterSchema.validate(futureForm);
   }
 
-  const formRepository = getFormRepository(user);
-  const sealedForm = await formRepository.update(
-    { id: form.id },
-    {
-      status: transitionForm(form, {
-        type: EventType.MarkAsSealed
-      })
-    }
-  );
-
-  const appendix2Forms = await formRepository.findAppendix2FormsById(form.id);
-  if (appendix2Forms.length > 0) {
-    // mark appendix2Forms as GROUPED if all its grouping forms are sealed
-    // and quantityGrouped is equal to quantityReceived
-    await formRepository.updateAppendix2Forms(appendix2Forms);
-  }
-
-  if (form.emitterCompanySiret) {
-    // send welcome email to emitter if it is not registered in TD
-    const emitterCompanyExists =
-      (await prisma.company.count({
-        where: { siret: form.emitterCompanySiret }
-      })) > 0;
-
-    if (!emitterCompanyExists) {
-      await mailToNonExistentEmitter(sealedForm, formRepository);
-    }
-  }
-
-  if (
-    formUpdateInput &&
-    (sealedForm.emitterIsForeignShip === true ||
-      sealedForm.emitterIsPrivateIndividual === true)
-  ) {
-    const updatedForm = await formRepository.update(
-      { id: sealedForm.id },
+  return prisma.$transaction(async transaction => {
+    const formRepository = getFormRepository(user, transaction);
+    const sealedForm = await formRepository.update(
+      { id: form.id },
       {
-        status: transitionForm(sealedForm, {
-          type: EventType.SignedByProducer,
-          formUpdateInput
-        }),
-        ...formUpdateInput
+        status: transitionForm(form, {
+          type: EventType.MarkAsSealed
+        })
       }
     );
-    return expandFormFromDb(updatedForm);
-  }
 
-  return expandFormFromDb(sealedForm);
+    const appendix2Forms = await formRepository.findAppendix2FormsById(form.id);
+    if (appendix2Forms.length > 0) {
+      // mark appendix2Forms as GROUPED if all its grouping forms are sealed
+      // and quantityGrouped is equal to quantityReceived
+      await formRepository.updateAppendix2Forms(appendix2Forms);
+    }
+
+    if (form.emitterCompanySiret) {
+      // send welcome email to emitter if it is not registered in TD
+      const emitterCompanyExists =
+        (await prisma.company.count({
+          where: { siret: form.emitterCompanySiret }
+        })) > 0;
+
+      if (!emitterCompanyExists) {
+        await mailToNonExistentEmitter(sealedForm, formRepository);
+      }
+    }
+
+    if (
+      formUpdateInput &&
+      (sealedForm.emitterIsForeignShip === true ||
+        sealedForm.emitterIsPrivateIndividual === true)
+    ) {
+      const updatedForm = await formRepository.update(
+        { id: sealedForm.id },
+        {
+          status: transitionForm(sealedForm, {
+            type: EventType.SignedByProducer,
+            formUpdateInput
+          }),
+          ...formUpdateInput
+        }
+      );
+      return expandFormFromDb(updatedForm);
+    }
+
+    return expandFormFromDb(sealedForm);
+  });
 };
 
 async function mailToNonExistentEmitter(

@@ -8,11 +8,11 @@ import { expandFormFromDb } from "../../form-converter";
 import { Prisma, WasteAcceptationStatus } from "@prisma/client";
 import { getFormRepository } from "../../repository";
 import { acceptedInfoSchema } from "../../validation";
+import prisma from "../../../prisma";
 
 const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccepted"] =
   async (_, args, context) => {
     const user = checkIsAuthenticated(context);
-    const formRepository = getFormRepository(user);
     const { id, tempStorerAcceptedInfo } = args;
     const form = await getFormOrFormNotFound({ id });
 
@@ -36,25 +36,28 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
       }
     };
 
-    const tempStoredForm = await formRepository.update(
-      { id: form.id },
-      {
-        status: transitionForm(form, {
-          type: EventType.MarkAsTempStorerAccepted,
-          formUpdateInput
-        }),
-        ...formUpdateInput
+    return prisma.$transaction(async transaction => {
+      const formRepository = getFormRepository(user, transaction);
+      const tempStoredForm = await formRepository.update(
+        { id: form.id },
+        {
+          status: transitionForm(form, {
+            type: EventType.MarkAsTempStorerAccepted,
+            formUpdateInput
+          }),
+          ...formUpdateInput
+        }
+      );
+
+      if (
+        tempStorerAcceptedInfo.wasteAcceptationStatus ===
+        WasteAcceptationStatus.REFUSED
+      ) {
+        await formRepository.removeAppendix2(id);
       }
-    );
 
-    if (
-      tempStorerAcceptedInfo.wasteAcceptationStatus ===
-      WasteAcceptationStatus.REFUSED
-    ) {
-      await formRepository.removeAppendix2(id);
-    }
-
-    return expandFormFromDb(tempStoredForm);
+      return expandFormFromDb(tempStoredForm);
+    });
   };
 
 export default markAsTempStorerAcceptedResolver;
