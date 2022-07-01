@@ -68,7 +68,7 @@ enum FormRole {
   BROKER
   "Les BSD's dont je suis éco-organisme"
   ECO_ORGANISME
-  "Les BSD'es dont je suis intermédiare"
+  "Les BSD's dont je suis intermédiare"
   INTERMEDIARY
 }
 
