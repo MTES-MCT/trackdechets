@@ -54,10 +54,11 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
     await beforeSignedByTransporterSchema.validate(futureForm);
   }
 
-  const emitterCompanyExists =
-    (await prisma.company.count({
-      where: { siret: form.emitterCompanySiret }
-    })) > 0;
+  const emitterCompanyExists = form.emitterCompanySiret
+    ? (await prisma.company.count({
+        where: { siret: form.emitterCompanySiret }
+      })) > 0
+    : false;
 
   const resultingForm = await prisma.$transaction(async transaction => {
     const formRepository = getFormRepository(user, transaction);
