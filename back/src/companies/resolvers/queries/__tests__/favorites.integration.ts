@@ -162,7 +162,7 @@ describe("query favorites", () => {
         vatNumber: null,
         mail: emitter.contactEmail,
         phone: emitter.contactPhone,
-        contact: "",
+        contact: emitter.contact,
         codePaysEtrangerEtablissement: "FR"
       })
     ]);
@@ -224,7 +224,7 @@ describe("query favorites", () => {
         mail: recipient.contactEmail,
         phone: recipient.contactPhone,
         codePaysEtrangerEtablissement: "FR",
-        contact: ""
+        contact: recipient.contact
       })
     ]);
   });
@@ -293,7 +293,7 @@ describe("query favorites", () => {
         mail: transporter.contactEmail,
         phone: transporter.contactPhone,
         codePaysEtrangerEtablissement: "FR",
-        contact: "",
+        contact: transporter.contact,
         transporterReceipt: expect.objectContaining({
           receiptNumber: "receipt"
         })
@@ -336,7 +336,7 @@ describe("query favorites", () => {
         mail: transporter.contactEmail,
         phone: transporter.contactPhone,
         codePaysEtrangerEtablissement: "IT",
-        contact: ""
+        contact: transporter.contact
       })
     ]);
   });
@@ -397,7 +397,7 @@ describe("query favorites", () => {
         vatNumber: null,
         mail: tempStorer.contactEmail,
         phone: tempStorer.contactPhone,
-        contact: "",
+        contact: tempStorer.contact,
         codePaysEtrangerEtablissement: "FR"
       })
     ]);
@@ -458,7 +458,7 @@ describe("query favorites", () => {
         vatNumber: null,
         mail: destination.contactEmail,
         phone: destination.contactPhone,
-        contact: "",
+        contact: destination.contact,
         codePaysEtrangerEtablissement: "FR"
       })
     ]);
@@ -532,7 +532,7 @@ describe("query favorites", () => {
         vatNumber: null,
         mail: destination.contactEmail,
         phone: destination.contactPhone,
-        contact: "",
+        contact: destination.contact,
         codePaysEtrangerEtablissement: "FR"
       })
     ]);
@@ -620,7 +620,7 @@ describe("query favorites", () => {
         vatNumber: null,
         mail: traderSirene.contactEmail,
         phone: traderSirene.contactPhone,
-        contact: "",
+        contact: traderSirene.contact,
         codePaysEtrangerEtablissement: "FR",
         traderReceipt: {
           receiptNumber: "receipt"
@@ -684,7 +684,7 @@ describe("query favorites", () => {
         vatNumber: null,
         mail: brokerSirene.contactEmail,
         phone: brokerSirene.contactPhone,
-        contact: "",
+        contact: brokerSirene.contact,
         codePaysEtrangerEtablissement: "FR",
         brokerReceipt: {
           receiptNumber: "receipt"
