@@ -19,11 +19,14 @@ export function arraysEqual(a, b) {
   if (a == null || b == null) return false;
   if (a.length !== b.length) return false;
 
-  for (let i = 0; i < a.length; ++i) {
-    if (isObject(a[i])) {
-      const diff = objectDiff(a[i], b[i]);
+  const sortedA = [...a].sort();
+  const sortedB = [...b].sort();
+
+  for (let i = 0; i < sortedA.length; ++i) {
+    if (isObject(sortedA[i])) {
+      const diff = objectDiff(sortedA[i], sortedB[i]);
       if (Object.keys(diff).length > 0) return false;
-    } else if (a[i] !== b[i]) return false;
+    } else if (sortedA[i] !== sortedB[i]) return false;
   }
   return true;
 }
