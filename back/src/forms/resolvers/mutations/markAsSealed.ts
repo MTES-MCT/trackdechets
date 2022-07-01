@@ -75,7 +75,7 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
     if (form.emitterCompanySiret) {
       // send welcome email to emitter if it is not registered in TD
       const emitterCompanyExists =
-        (await prisma.company.count({
+        (await transaction.company.count({
           where: { siret: form.emitterCompanySiret }
         })) > 0;
 
@@ -113,9 +113,10 @@ async function mailToNonExistentEmitter(
   // check contact email has not been mentionned already
   const contactAlreadyMentionned =
     (await formRepository.count({
+      id: { not: form.id },
       emitterCompanyMail: form.emitterCompanyMail,
       status: { not: Status.DRAFT }
-    })) > 1;
+    })) > 0;
   if (!contactAlreadyMentionned) {
     await sendMail(
       renderMail(contentAwaitsGuest, {
