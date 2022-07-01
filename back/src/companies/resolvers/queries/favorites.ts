@@ -87,8 +87,8 @@ function companySearchResultToFavorite(
     siret: companySearchResult.siret,
     address: companySearchResult.address,
     contact: "",
-    phone: companySearchResult.phone ?? "",
-    mail: companySearchResult.email ?? ""
+    phone: companySearchResult.contactPhone ?? "",
+    mail: companySearchResult.contactEmail ?? ""
   };
 }
 

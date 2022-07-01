@@ -496,8 +496,8 @@ describe("query favorites", () => {
       isRegistered: true,
       companyTypes: ["WASTEPROCESSOR"],
       statutDiffusionEtablissement: "O",
-      email: "contact@traiteur.co",
-      phone: "00 00 00 00 00"
+      contactEmail: "contact@traiteur.co",
+      contactPhone: "00 00 00 00 00"
     };
     searchCompanySpy.mockResolvedValueOnce(destination);
 
@@ -529,8 +529,8 @@ describe("query favorites", () => {
         name: destination.name,
         address: destination.address,
         vatNumber: null,
-        mail: destination.email,
-        phone: destination.phone,
+        mail: destination.contactEmail,
+        phone: destination.contactPhone,
         contact: "",
         codePaysEtrangerEtablissement: "FR"
       })
@@ -583,8 +583,8 @@ describe("query favorites", () => {
       isRegistered: true,
       companyTypes: ["TRADER"],
       statutDiffusionEtablissement: "O",
-      email: "contact@trader.co",
-      phone: "00 00 00 00 00"
+      contactEmail: "contact@trader.co",
+      contactPhone: "00 00 00 00 00"
     };
     searchCompanySpy.mockResolvedValueOnce(traderSirene);
 
@@ -616,8 +616,8 @@ describe("query favorites", () => {
         name: traderSirene.name,
         address: traderSirene.address,
         vatNumber: null,
-        mail: traderSirene.email,
-        phone: traderSirene.phone,
+        mail: traderSirene.contactEmail,
+        phone: traderSirene.contactPhone,
         contact: "",
         codePaysEtrangerEtablissement: "FR",
         traderReceipt: {
@@ -646,8 +646,8 @@ describe("query favorites", () => {
       isRegistered: true,
       companyTypes: ["BROKER"],
       statutDiffusionEtablissement: "O",
-      email: "contact@broker.co",
-      phone: "00 00 00 00 00"
+      contactEmail: "contact@broker.co",
+      contactPhone: "00 00 00 00 00"
     };
     searchCompanySpy.mockResolvedValueOnce(brokerSirene);
 
@@ -679,8 +679,8 @@ describe("query favorites", () => {
         name: brokerSirene.name,
         address: brokerSirene.address,
         vatNumber: null,
-        mail: brokerSirene.email,
-        phone: brokerSirene.phone,
+        mail: brokerSirene.contactEmail,
+        phone: brokerSirene.contactPhone,
         contact: "",
         codePaysEtrangerEtablissement: "FR",
         brokerReceipt: {
