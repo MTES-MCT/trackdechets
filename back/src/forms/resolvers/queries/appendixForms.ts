@@ -20,7 +20,7 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
         { status: "AWAITING_GROUP" },
         {
           OR: [
-            { recipientCompanySiret: siret },
+            { recipientCompanySiret: siret, forwardedIn: null },
             {
               recipientIsTempStorage: true,
               forwardedIn: { recipientCompanySiret: siret }
