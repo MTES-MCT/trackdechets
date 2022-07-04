@@ -5,13 +5,14 @@ import {
 import { Decimal } from "decimal.js-light";
 
 export const PACKAGINGS_NAMES = {
-  [BsdasriPackagingType.BoiteCarton]: "Caisse en carton avec sac en plastique",
+  [BsdasriPackagingType.BoiteCarton]:
+    "Caisse(s) en carton avec sac en plastique",
   [BsdasriPackagingType.Fut]: "Fût(s)",
   [BsdasriPackagingType.BoitePerforants]:
-    "Boîtes et Mini-collecteurs pour déchets perforants",
+    "Boîte(s) et Mini-collecteurs pour déchets perforants",
 
-  [BsdasriPackagingType.GrandEmballage]: "Grand emballage",
-  [BsdasriPackagingType.Grv]: "Grand récipient pour vrac",
+  [BsdasriPackagingType.GrandEmballage]: "Grand(s) emballage(s)",
+  [BsdasriPackagingType.Grv]: "Grand(s) récipient(s) pour vrac",
   [BsdasriPackagingType.Autre]: "Autre(s)",
 };
 
@@ -26,7 +27,7 @@ export function getDasriPackagingInfosSummary(packagings: BsdasriPackaging[]) {
       acc.plus((packaging.quantity ?? 0) * (packaging.volume ?? 0)),
     new Decimal(0)
   );
-  const packages = packagings
+  const packages2 = packagings
     .map(packaging => {
       const name =
         packaging.type === BsdasriPackagingType.Autre
@@ -39,6 +40,23 @@ export function getDasriPackagingInfosSummary(packagings: BsdasriPackaging[]) {
           : PACKAGINGS_NAMES[packaging.type];
       return `${packaging.quantity} ${name}`;
     })
+    .join(", ");
+
+  const quantityByType = packagings.reduce((acc, packaging) => {
+    if (acc[packaging.type] > 0) {
+      return {
+        ...acc,
+        [packaging.type]: packaging.quantity + acc[packaging.type],
+      };
+    }
+    return {
+      ...acc,
+      [packaging.type]: packaging.quantity,
+    };
+  }, {});
+
+  const packages = Object.keys(quantityByType)
+    .map(type => `${quantityByType[type]} ${PACKAGINGS_NAMES[type]}`)
     .join(", ");
 
   return `${total} colis : ${packages} -  Volume Total: ${totalVolume} l`;
