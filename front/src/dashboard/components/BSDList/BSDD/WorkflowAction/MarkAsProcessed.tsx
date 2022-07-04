@@ -178,7 +178,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
           <CompanySelector
             name="nextDestination.company"
             allowForeignCompanies={true}
-            displayVatSearch={false}
+            forceManualForeignCompanyForm={true}
             skipFavorite={noTraceability === true}
             optional={noTraceability === true}
           />

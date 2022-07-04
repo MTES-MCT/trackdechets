@@ -31,9 +31,11 @@ setLocale({
 
 const companySchema = object().shape({
   name: string().required(),
-  siret: string().when("country", {
-    is: country => country == null || country === "FR",
-    then: string().required("La sélection d'une entreprise est obligatoire"),
+  siret: string().when("vatNumber", {
+    is: vatNumber => vatNumber == null || vatNumber === "",
+    then: string().required(
+      "La sélection d'une entreprise par SIRET ou numéto de TVA intracommunautaire est obligatoire"
+    ),
     otherwise: string().nullable(),
   }),
   vatNumber: string().ensure(),
