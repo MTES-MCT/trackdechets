@@ -22,6 +22,7 @@ import {
 } from "./types";
 import buildSetAppendix2 from "./form/setAppendix2";
 import buildUpdateAppendix2Forms from "./form/updateAppendix2Forms";
+import buildDeleteFormStaleSegments from "./form/deleteStaleSegments";
 
 export type FormRepository = FormActions & FormRevisionRequestActions;
 
@@ -78,6 +79,12 @@ export function getFormRepository(
         ? buildUpdateAppendix2Forms({ prisma: transaction, user })(...args)
         : prisma.$transaction(prisma =>
             buildUpdateAppendix2Forms({ prisma, user })(...args)
+          ),
+    deleteStaleSegments: (...args) =>
+      transaction
+        ? buildDeleteFormStaleSegments({ prisma: transaction, user })(...args)
+        : prisma.$transaction(prisma =>
+            buildDeleteFormStaleSegments({ prisma, user })(...args)
           )
   };
 

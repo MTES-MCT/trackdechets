@@ -54,44 +54,56 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
     await beforeSignedByTransporterSchema.validate(futureForm);
   }
 
-  const sealedForm = await transitionForm(user, form, {
-    type: EventType.MarkAsSealed
-  });
-
-  const formRepository = getFormRepository(user);
-
-  const appendix2Forms = await formRepository.findAppendix2FormsById(form.id);
-  if (appendix2Forms.length > 0) {
-    // mark appendix2Forms as GROUPED if all its grouping forms are sealed
-    // and quantityGrouped is equal to quantityReceived
-    await formRepository.updateAppendix2Forms(appendix2Forms);
-  }
-
-  if (form.emitterCompanySiret) {
-    // send welcome email to emitter if it is not registered in TD
-    const emitterCompanyExists =
-      (await prisma.company.count({
+  const emitterCompanyExists = form.emitterCompanySiret
+    ? (await prisma.company.count({
         where: { siret: form.emitterCompanySiret }
-      })) > 0;
+      })) > 0
+    : false;
 
-    if (!emitterCompanyExists) {
+  const resultingForm = await prisma.$transaction(async transaction => {
+    const formRepository = getFormRepository(user, transaction);
+    const sealedForm = await formRepository.update(
+      { id: form.id },
+      {
+        status: transitionForm(form, {
+          type: EventType.MarkAsSealed
+        })
+      }
+    );
+
+    const appendix2Forms = await formRepository.findAppendix2FormsById(form.id);
+    if (appendix2Forms.length > 0) {
+      // mark appendix2Forms as GROUPED if all its grouping forms are sealed
+      // and quantityGrouped is equal to quantityReceived
+      await formRepository.updateAppendix2Forms(appendix2Forms);
+    }
+
+    // send welcome email to emitter if it is not registered in TD
+    if (form.emitterCompanySiret && !emitterCompanyExists) {
       await mailToNonExistentEmitter(sealedForm, formRepository);
     }
-  }
 
-  if (
-    formUpdateInput &&
-    (sealedForm.emitterIsForeignShip === true ||
-      sealedForm.emitterIsPrivateIndividual === true)
-  ) {
-    const updatedForm = await transitionForm(user, sealedForm, {
-      type: EventType.SignedByProducer,
-      formUpdateInput
-    });
-    return expandFormFromDb(updatedForm);
-  }
+    if (
+      formUpdateInput &&
+      (sealedForm.emitterIsForeignShip === true ||
+        sealedForm.emitterIsPrivateIndividual === true)
+    ) {
+      return formRepository.update(
+        { id: sealedForm.id },
+        {
+          status: transitionForm(sealedForm, {
+            type: EventType.SignedByProducer,
+            formUpdateInput
+          }),
+          ...formUpdateInput
+        }
+      );
+    }
 
-  return expandFormFromDb(sealedForm);
+    return sealedForm;
+  });
+
+  return expandFormFromDb(resultingForm);
 };
 
 async function mailToNonExistentEmitter(
@@ -101,9 +113,10 @@ async function mailToNonExistentEmitter(
   // check contact email has not been mentionned already
   const contactAlreadyMentionned =
     (await formRepository.count({
+      id: { not: form.id },
       emitterCompanyMail: form.emitterCompanyMail,
       status: { not: Status.DRAFT }
-    })) > 1;
+    })) > 0;
   if (!contactAlreadyMentionned) {
     await sendMail(
       renderMail(contentAwaitsGuest, {

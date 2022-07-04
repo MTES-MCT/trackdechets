@@ -17,6 +17,7 @@ import { CreateRevisionRequestFn } from "./formRevisionRequest/createRevisionReq
 import { GetRevisionRequestByIdFn } from "./formRevisionRequest/getRevisionRequestById";
 import { RefuseRevisionRequestFn } from "./formRevisionRequest/refuseRevisionRequestApproval";
 import { UpdateAppendix2Forms } from "./form/updateAppendix2Forms";
+import { DeleteFormStaleSegmentsFn } from "./form/deleteStaleSegments";
 
 export type PrismaTransaction = Omit<
   PrismaClient,
@@ -61,6 +62,7 @@ export type FormActions = {
   removeAppendix2: RemoveAppendix2Fn;
   setAppendix2: SetAppendix2Fn;
   updateAppendix2Forms: UpdateAppendix2Forms;
+  deleteStaleSegments: DeleteFormStaleSegmentsFn;
 };
 
 export type FormRevisionRequestActions = {

@@ -7,6 +7,7 @@ import { checkCanBeSealed, signingInfoSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
+import prisma from "../../../prisma";
 
 const markAsSentResolver: MutationResolvers["markAsSent"] = async (
   parent,
@@ -36,21 +37,36 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
     currentTransporterSiret: form.transporterCompanySiret,
     signedByTransporter: false
   };
-  const resentForm = await transitionForm(user, form, {
-    type: EventType.MarkAsSent,
-    formUpdateInput
+
+  const appendix2Forms = await getFormRepository(user).findAppendix2FormsById(
+    form.id
+  );
+
+  const resentForm = await prisma.$transaction(async transaction => {
+    const { updateAppendix2Forms, update } = getFormRepository(
+      user,
+      transaction
+    );
+
+    const resentForm = await update(
+      { id: form.id },
+      {
+        status: transitionForm(form, {
+          type: EventType.MarkAsSent,
+          formUpdateInput
+        }),
+        ...formUpdateInput
+      }
+    );
+
+    if (appendix2Forms.length > 0) {
+      // mark appendix2Forms as GROUPED if all its grouping forms are sealed
+      // and quantityGrouped is equal to quantityReceived
+      await updateAppendix2Forms(appendix2Forms);
+    }
+
+    return resentForm;
   });
-
-  const { findAppendix2FormsById, updateAppendix2Forms } =
-    getFormRepository(user);
-
-  const appendix2Forms = await findAppendix2FormsById(form.id);
-
-  if (appendix2Forms.length > 0) {
-    // mark appendix2Forms as GROUPED if all its grouping forms are sealed
-    // and quantityGrouped is equal to quantityReceived
-    await updateAppendix2Forms(appendix2Forms);
-  }
 
   return expandFormFromDb(resentForm);
 };

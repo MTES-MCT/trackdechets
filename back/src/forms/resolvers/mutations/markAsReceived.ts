@@ -25,12 +25,13 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   const { id, receivedInfo } = args;
   const form = await getFormOrFormNotFound({ id });
   await checkCanMarkAsReceived(user, form);
-  const formRepository = getFormRepository(user);
 
   if (form.recipientIsTempStorage === true) {
     // this form can be mark as received only if it has been
     // taken over by the transporter after temp storage
-    const { forwardedIn } = await formRepository.findFullFormById(form.id);
+    const { forwardedIn } = await getFormRepository(user).findFullFormById(
+      form.id
+    );
 
     if (!forwardedIn?.emittedAt) {
       throw new TemporaryStorageCannotReceive();
@@ -38,6 +39,7 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   }
 
   await receivedInfoSchema.validate(receivedInfo);
+
   const formUpdateInput: Prisma.FormUpdateInput = form.forwardedInId
     ? {
         forwardedIn: {
@@ -62,25 +64,31 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
         currentTransporterSiret: ""
       };
 
-  const receivedForm = await transitionForm(user, form, {
-    type: EventType.MarkAsReceived,
-    formUpdateInput
+  const receivedForm = await prisma.$transaction(async transaction => {
+    const formRepository = getFormRepository(user, transaction);
+    const receivedForm = await formRepository.update(
+      { id: form.id },
+      {
+        status: transitionForm(form, {
+          type: EventType.MarkAsReceived,
+          formUpdateInput
+        }),
+        ...formUpdateInput
+      }
+    );
+
+    // check for stale transport segments and delete them
+    // quick fix https://trackdechets.zammad.com/#ticket/zoom/1696
+    await formRepository.deleteStaleSegments({ id: form.id });
+
+    if (
+      receivedInfo.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED
+    ) {
+      await formRepository.removeAppendix2(id);
+    }
+
+    return receivedForm;
   });
-
-  // check for stale transport segments and delete them
-  // quick fix https://trackdechets.zammad.com/#ticket/zoom/1696
-  const staleSegments = await prisma.form
-    .findUnique({ where: { id: form.id } })
-    .transportSegments({ where: { takenOverAt: null } });
-  if (staleSegments.length > 0) {
-    await prisma.transportSegment.deleteMany({
-      where: { id: { in: staleSegments.map(s => s.id) } }
-    });
-  }
-
-  if (receivedInfo.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED) {
-    await formRepository.removeAppendix2(id);
-  }
 
   return expandFormFromDb(receivedForm);
 };

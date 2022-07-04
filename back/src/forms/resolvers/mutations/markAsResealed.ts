@@ -93,10 +93,16 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     // used to update an already resealed form
     resealedForm = await formRepository.update({ id }, formUpdateInput);
   } else {
-    resealedForm = await transitionForm(user, form, {
-      type: EventType.MarkAsResealed,
-      formUpdateInput
-    });
+    resealedForm = await formRepository.update(
+      { id: form.id },
+      {
+        status: transitionForm(form, {
+          type: EventType.MarkAsResealed,
+          formUpdateInput
+        }),
+        ...formUpdateInput
+      }
+    );
   }
 
   return expandFormFromDb(resealedForm);

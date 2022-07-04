@@ -83,10 +83,16 @@ async function updateForm(
     takenOverAt: flattenedFormInput.sentAt
   };
 
-  return transitionForm(user, form, {
-    type: EventType.ImportPaperForm,
-    formUpdateInput
-  });
+  return getFormRepository(user).update(
+    { id: form.id },
+    {
+      status: transitionForm(form, {
+        type: EventType.ImportPaperForm,
+        formUpdateInput
+      }),
+      ...formUpdateInput
+    }
+  );
 }
 
 /**
