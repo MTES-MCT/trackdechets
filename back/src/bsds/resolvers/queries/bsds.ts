@@ -121,7 +121,10 @@ async function buildQuery(
               }
             }
           },
-          { term: { customId: where.readableId } }
+          { term: { customId: where.readableId } },
+          {
+            match: { containers: { query: where.readableId, operator: "and" } }
+          }
         ]
       }
     });

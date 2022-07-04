@@ -107,6 +107,9 @@ export const GET_BSDS = gql`
               code
               description
             }
+            packagings {
+              numero
+            }
           }
           ... on Bsda {
             ...BsdaFragment

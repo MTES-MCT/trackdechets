@@ -26,4 +26,5 @@ export interface BsffFragment {
     code?: string;
     description?: string;
   };
+  packagings?: { numero: string }[];
 }

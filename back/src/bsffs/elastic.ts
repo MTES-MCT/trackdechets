@@ -3,6 +3,7 @@ import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
+import { BsffPackaging } from "../generated/graphql/types";
 
 function toBsdElastic(bsff: Bsff): BsdElastic {
   const bsd = {
@@ -26,7 +27,9 @@ function toBsdElastic(bsff: Bsff): BsdElastic {
     destinationOperationDate: bsff.destinationOperationSignatureDate?.getTime(),
     wasteCode: bsff.wasteCode ?? "",
     wasteDescription: bsff.wasteDescription ?? "",
-
+    containers: (bsff.packagings as BsffPackaging[]).map(
+      packaging => packaging.numero
+    ),
     isDraftFor: [],
     isForActionFor: [],
     isFollowFor: [],
