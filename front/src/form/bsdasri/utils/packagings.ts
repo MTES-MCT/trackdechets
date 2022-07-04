@@ -2,6 +2,7 @@ import {
   BsdasriPackaging,
   BsdasriPackagingType,
 } from "generated/graphql/types";
+import { Decimal } from "decimal.js-light";
 
 export const PACKAGINGS_NAMES = {
   [BsdasriPackagingType.BoiteCarton]: "Caisse en carton avec sac en plastique",
@@ -22,8 +23,8 @@ export function getDasriPackagingInfosSummary(packagings: BsdasriPackaging[]) {
 
   const totalVolume = packagings.reduce(
     (acc, packaging) =>
-      acc + (packaging.quantity ?? 0) * (packaging.volume ?? 0),
-    0
+      acc.plus((packaging.quantity ?? 0) * (packaging.volume ?? 0)),
+    new Decimal(0)
   );
   const packages = packagings
     .map(packaging => {
