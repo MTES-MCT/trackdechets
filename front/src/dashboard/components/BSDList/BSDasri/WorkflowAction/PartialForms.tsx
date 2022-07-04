@@ -301,7 +301,6 @@ export function OperationSignatureForm() {
             min="0"
             step="0.1"
           />
-          <span className="tw-ml-2">kg</span>
         </label>
 
         <RedErrorMessage name="destination.operation.weight.value" />
