@@ -14,7 +14,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     async () => {
       await testWorkflow(acheminementDirectWorkflow);
     },
-    10000
+    60000
   );
 
   test(
@@ -22,7 +22,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     async () => {
       await testWorkflow(entreposageProvisoireWorkflow);
     },
-    15000
+    60000
   );
 
   test(
@@ -30,7 +30,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     async () => {
       await testWorkflow(regroupement);
     },
-    15000
+    60000
   );
 
   test(
@@ -38,7 +38,7 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     async () => {
       await testWorkflow(multiModalWorkflow);
     },
-    10000
+    60000
   );
 
   test(
@@ -46,6 +46,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     async () => {
       await testWorkflow(importBsdPapier);
     },
-    10000
+    60000
   );
 });

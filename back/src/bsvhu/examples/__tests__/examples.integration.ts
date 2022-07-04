@@ -10,6 +10,6 @@ describe("Exemples de circuit du bordereau de suivi VHU", () => {
     async () => {
       await testWorkflow(vhuVersBroyeurWorkflow);
     },
-    10000
+    60000
   );
 });

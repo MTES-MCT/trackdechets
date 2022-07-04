@@ -66,17 +66,28 @@ const buildUpdateAppendix2Forms: (
         : Status.AWAITING_GROUP;
 
       if (form.status === Status.GROUPED && nextStatus === Status.PROCESSED) {
-        return transitionForm(user, form, {
-          type: EventType.MarkAsProcessed
-        });
+        return updateForm(
+          { id },
+          {
+            status: transitionForm(form, {
+              type: EventType.MarkAsProcessed
+            })
+          }
+        );
       } else if (
         form.status === Status.AWAITING_GROUP &&
         nextStatus === Status.GROUPED
       ) {
-        return transitionForm(user, form, {
-          type: EventType.MarkAsGrouped,
-          formUpdateInput: { quantityGrouped: quantityGrouped.toNumber() }
-        });
+        return updateForm(
+          { id },
+          {
+            status: transitionForm(form, {
+              type: EventType.MarkAsGrouped,
+              formUpdateInput: { quantityGrouped: quantityGrouped.toNumber() }
+            }),
+            quantityGrouped: quantityGrouped.toNumber()
+          }
+        );
       } else {
         return updateForm(
           { id },

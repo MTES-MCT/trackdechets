@@ -26,7 +26,6 @@ import {
   QueryFavoritesArgs,
   FavoriteType,
   CompanyFavorite,
-  CompanySearchResult,
 } from "generated/graphql/types";
 import CountrySelector from "./CountrySelector";
 import { v4 as uuidv4 } from "uuid";
@@ -177,14 +176,7 @@ export default function CompanySelector({
         onCompanySelected(company);
       }
     },
-    [
-      field.name,
-      field.value.siret,
-      setFieldValue,
-      onCompanySelected,
-      disabled,
-      optional,
-    ]
+    [field.name, setFieldValue, onCompanySelected, disabled]
   );
 
   /**

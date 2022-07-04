@@ -71,6 +71,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
     await wasteDetailsSchema.validate(futureForm);
     await beforeSignedByTransporterSchema.validate(futureForm);
 
+    const formRepository = getFormRepository(user);
     if (form.sentAt) {
       // BSD has already been sent, it must be a signature for frame 18
 
@@ -104,10 +105,17 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
           }
         }
       };
-      const resentForm = await transitionForm(user, form, {
-        type: EventType.SignedByTransporter,
-        formUpdateInput
-      });
+
+      const resentForm = await formRepository.update(
+        { id: form.id },
+        {
+          status: transitionForm(form, {
+            type: EventType.SignedByTransporter,
+            formUpdateInput
+          }),
+          ...formUpdateInput
+        }
+      );
 
       return expandFormFromDb(resentForm);
     }
@@ -147,10 +155,16 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       currentTransporterSiret: form.transporterCompanySiret
     };
 
-    const sentForm = await transitionForm(user, form, {
-      type: EventType.SignedByTransporter,
-      formUpdateInput
-    });
+    const sentForm = await formRepository.update(
+      { id: form.id },
+      {
+        status: transitionForm(form, {
+          type: EventType.SignedByTransporter,
+          formUpdateInput
+        }),
+        ...formUpdateInput
+      }
+    );
 
     return expandFormFromDb(sentForm);
   };

@@ -71,10 +71,13 @@ export const client = async (
       );
     }
 
+    const address = viesResult.address === "---" ? "" : viesResult.address;
+    const name = viesResult.name === "---" ? "" : viesResult.name;
+
     return {
       vatNumber: vatNumber,
-      address: viesResult.address,
-      name: viesResult.name,
+      address: address,
+      name: name,
       codePaysEtrangerEtablissement: country.isoCode.short,
       statutDiffusionEtablissement: "O"
     };

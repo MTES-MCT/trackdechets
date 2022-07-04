@@ -6,6 +6,7 @@ import GenericStepList, {
 } from "form/common/stepper/GenericStepList";
 
 import { IStepContainerProps } from "form/common/stepper/Step";
+import { formInputToastError } from "form/common/stepper/toaster";
 import {
   Mutation,
   MutationCreateBsdasriArgs,
@@ -231,13 +232,7 @@ export default function BsdasriStepsList(props: Props) {
         });
         history.push(redirectTo);
       })
-      .catch(err => {
-        err.graphQLErrors.length &&
-          err.graphQLErrors.map(err =>
-            cogoToast.error(err.message, { hideAfter: 7 })
-          );
-        err.message && cogoToast.error(err.message, { hideAfter: 7 });
-      });
+      .catch(err => formInputToastError(err));
   }
 
   // As it's a render function, the steps are nested into a `<></>` block

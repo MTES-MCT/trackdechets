@@ -13,6 +13,7 @@ import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
 import machine from "../../workflow/machine";
+import prisma from "../../../prisma";
 
 const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   parent,
@@ -71,20 +72,34 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
     };
   }
 
-  const processedForm = await transitionForm(user, form, {
-    type: EventType.MarkAsProcessed,
-    formUpdateInput
+  const appendix2Forms = await getFormRepository(user).findAppendix2FormsById(
+    form.id
+  );
+
+  const processedForm = await prisma.$transaction(async transaction => {
+    const { updateAppendix2Forms, update } = getFormRepository(
+      user,
+      transaction
+    );
+
+    const processedForm = await update(
+      { id: form.id },
+      {
+        status: transitionForm(form, {
+          type: EventType.MarkAsProcessed,
+          formUpdateInput
+        }),
+        ...formUpdateInput
+      }
+    );
+
+    // mark appendix2Forms as PROCESSED
+    if (appendix2Forms.length > 0) {
+      await updateAppendix2Forms(appendix2Forms);
+    }
+
+    return processedForm;
   });
-
-  const { findAppendix2FormsById, updateAppendix2Forms } =
-    getFormRepository(user);
-
-  // mark appendix2Forms as PROCESSED
-  const appendix2Forms = await findAppendix2FormsById(form.id);
-
-  if (appendix2Forms.length > 0) {
-    await updateAppendix2Forms(appendix2Forms);
-  }
 
   return expandFormFromDb(processedForm);
 };

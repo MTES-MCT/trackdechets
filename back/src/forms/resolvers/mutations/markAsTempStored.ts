@@ -17,7 +17,6 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
-  const formRepository = getFormRepository(user);
   const { id, tempStoredInfos } = args;
   const form = await getFormOrFormNotFound({ id });
 
@@ -53,27 +52,31 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
       : {})
   };
 
-  const tempStoredForm = await transitionForm(user, form, {
-    type: EventType.MarkAsTempStored,
-    formUpdateInput
+  const tempStoredForm = await prisma.$transaction(async transaction => {
+    const formRepository = getFormRepository(user, transaction);
+    const tempStoredForm = await formRepository.update(
+      { id: form.id },
+      {
+        status: transitionForm(form, {
+          type: EventType.MarkAsTempStored,
+          formUpdateInput
+        }),
+        ...formUpdateInput
+      }
+    );
+
+    // check for stale transport segments and delete them
+    // quick fix https://trackdechets.zammad.com/#ticket/zoom/1696
+    await formRepository.deleteStaleSegments({ id: form.id });
+
+    if (
+      tempStoredInfos.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED
+    ) {
+      await formRepository.removeAppendix2(id);
+    }
+
+    return tempStoredForm;
   });
-
-  // check for stale transport segments and delete them
-  // quick fix https://trackdechets.zammad.com/#ticket/zoom/1696
-  const staleSegments = await prisma.form
-    .findUnique({ where: { id: form.id } })
-    .transportSegments({ where: { takenOverAt: null } });
-  if (staleSegments.length > 0) {
-    await prisma.transportSegment.deleteMany({
-      where: { id: { in: staleSegments.map(s => s.id) } }
-    });
-  }
-
-  if (
-    tempStoredInfos.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED
-  ) {
-    await formRepository.removeAppendix2(id);
-  }
 
   return expandFormFromDb(tempStoredForm);
 };

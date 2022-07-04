@@ -1,7 +1,5 @@
-import { AuthType } from "../../../auth";
-import { Prisma } from "@prisma/client";
+import { Prisma, Status } from "@prisma/client";
 import { resetDatabase } from "../../../../integration-tests/helper";
-import prisma from "../../../prisma";
 import { formFactory, userFactory } from "../../../__tests__/factories";
 import transitionForm from "../transitionForm";
 import { EventType } from "../types";
@@ -9,9 +7,8 @@ import { EventType } from "../types";
 describe("transition form", () => {
   afterAll(resetDatabase);
 
-  it("should update a form with new status and log status change", async () => {
+  it("should get the new status", async () => {
     const owner = await userFactory();
-    const user = await userFactory();
     const form = await formFactory({
       ownerId: owner.id,
       opt: { status: "SENT" }
@@ -25,37 +22,15 @@ describe("transition form", () => {
     };
 
     const event = { type: EventType.MarkAsReceived, formUpdateInput };
-    await transitionForm({ ...user, auth: AuthType.Bearer }, form, event);
+    const newStatus = transitionForm(form, event);
 
-    const updatedForm = await prisma.form.findUnique({
-      where: { id: form.id }
-    });
+    const nextStatus = "ACCEPTED" as Status;
 
-    const nextStatus = "ACCEPTED";
-
-    expect(updatedForm.status).toEqual(nextStatus);
-
-    const statusLogs = await prisma.statusLog.findMany();
-    expect(statusLogs).toHaveLength(1);
-    const statusLog = statusLogs[0];
-    const statusLogUser = await prisma.statusLog
-      .findUnique({ where: { id: statusLog.id } })
-      .user();
-    const statusLogForm = await prisma.statusLog
-      .findUnique({ where: { id: statusLog.id } })
-      .form();
-
-    expect(statusLog.status).toEqual(nextStatus);
-    expect(statusLog.authType).toEqual("BEARER");
-    expect(statusLog.loggedAt).not.toBeNull();
-    expect(statusLog.updatedFields).toEqual(formUpdateInput);
-    expect(statusLogUser.id).toEqual(user.id);
-    expect(statusLogForm.id).toEqual(form.id);
+    expect(newStatus).toEqual(nextStatus);
   });
 
   it("should fail if transition is not possible", async () => {
     const owner = await userFactory();
-    const user = await userFactory();
     const form = await formFactory({
       ownerId: owner.id,
       opt: { status: "DRAFT" }
@@ -70,8 +45,7 @@ describe("transition form", () => {
 
     // trying to mark a draft form as  received
     const event = { type: EventType.MarkAsReceived, formUpdateInput };
-    const transitionFormFn = () => transitionForm(user, form, event);
-    await expect(transitionFormFn()).rejects.toThrow(
+    await expect(() => transitionForm(form, event)).toThrow(
       "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
     );
   });

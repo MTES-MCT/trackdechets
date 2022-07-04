@@ -1082,7 +1082,7 @@ describe("Mutation.markAsSealed", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<Pick<Mutation, "markAsSealed">>(
+    const { data } = await mutate<Pick<Mutation, "markAsSealed">>(
       MARK_AS_SEALED,
       {
         variables: {
@@ -1090,7 +1090,7 @@ describe("Mutation.markAsSealed", () => {
         }
       }
     );
-    console.log(errors);
+
     expect(data.markAsSealed.status).toBe("SIGNED_BY_PRODUCER");
   });
 });

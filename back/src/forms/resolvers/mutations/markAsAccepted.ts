@@ -1,6 +1,7 @@
 import { Status, WasteAcceptationStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
+import prisma from "../../../prisma";
 import { getFormOrFormNotFound } from "../../database";
 import { expandFormFromDb } from "../../form-converter";
 import { checkCanMarkAsAccepted } from "../../permissions";
@@ -15,37 +16,51 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
-  const formRepository = getFormRepository(user);
   const { id, acceptedInfo } = args;
   const form = await getFormOrFormNotFound({ id });
   await checkCanMarkAsAccepted(user, form);
 
   await acceptedInfoSchema.validate(acceptedInfo);
 
-  const acceptedForm = await transitionForm(user, form, {
-    type: EventType.MarkAsAccepted,
-    formUpdateInput: form.forwardedInId
-      ? {
-          forwardedIn: {
-            update: {
-              status:
-                acceptedInfo.wasteAcceptationStatus === Status.REFUSED
-                  ? Status.REFUSED
-                  : Status.ACCEPTED,
-              ...acceptedInfo,
-              signedAt: new Date(acceptedInfo.signedAt)
-            }
+  const formUpdateInput = form.forwardedInId
+    ? {
+        forwardedIn: {
+          update: {
+            status:
+              acceptedInfo.wasteAcceptationStatus === Status.REFUSED
+                ? Status.REFUSED
+                : Status.ACCEPTED,
+            ...acceptedInfo,
+            signedAt: new Date(acceptedInfo.signedAt)
           }
         }
-      : {
-          ...acceptedInfo,
-          signedAt: new Date(acceptedInfo.signedAt)
-        }
-  });
+      }
+    : {
+        ...acceptedInfo,
+        signedAt: new Date(acceptedInfo.signedAt)
+      };
 
-  if (acceptedInfo.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED) {
-    await formRepository.removeAppendix2(id);
-  }
+  const acceptedForm = await prisma.$transaction(async transaction => {
+    const { update, removeAppendix2 } = getFormRepository(user, transaction);
+    const acceptedForm = await update(
+      { id: form.id },
+      {
+        status: transitionForm(form, {
+          type: EventType.MarkAsAccepted,
+          formUpdateInput
+        }),
+        ...formUpdateInput
+      }
+    );
+
+    if (
+      acceptedInfo.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED
+    ) {
+      await removeAppendix2(id);
+    }
+
+    return acceptedForm;
+  });
 
   return expandFormFromDb(acceptedForm);
 };
