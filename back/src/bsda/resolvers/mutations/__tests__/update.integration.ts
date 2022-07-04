@@ -452,4 +452,72 @@ describe("Mutation.updateBsda", () => {
 
     expect(actualForwarded.id).toEqual(newForwarded.id);
   });
+
+  it("should ignore grouping if the bsdas ids order has changed", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const associatedBsda1 = await bsdaFactory({
+      opt: {
+        status: "AWAITING_CHILD",
+        emitterCompanySiret: emitter.company.siret,
+        destinationCompanySiret: destination.company.siret,
+        transporterCompanySiret: transporter.company.siret,
+        destinationOperationCode: "D 15"
+      }
+    });
+    const associatedBsda2 = await bsdaFactory({
+      opt: {
+        status: "AWAITING_CHILD",
+        emitterCompanySiret: emitter.company.siret,
+        destinationCompanySiret: destination.company.siret,
+        transporterCompanySiret: transporter.company.siret,
+        destinationOperationCode: "D 15"
+      }
+    });
+
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SENT",
+        emitterCompanySiret: destination.company.siret,
+        emitterEmissionSignatureDate: new Date().toISOString(),
+        grouping: {
+          connect: [{ id: associatedBsda1.id }, { id: associatedBsda2.id }]
+        }
+      }
+    });
+
+    // The bsda is SENT. The grouping field is not updatable anymore.
+    // But the value we pass should be ignored as it's the current bsda value.
+
+    // order 1
+    const { mutate } = makeClient(destination.user);
+    const { errors: errrors1 } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input: {
+          grouping: [associatedBsda1.id, associatedBsda2.id]
+        }
+      }
+    });
+    expect(errrors1).toBeUndefined();
+
+    // inverse order
+    const { errors: errrors2 } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input: {
+          grouping: [associatedBsda2.id, associatedBsda1.id]
+        }
+      }
+    });
+    expect(errrors2).toBeUndefined();
+  });
 });
