@@ -16,8 +16,7 @@ import {
 } from "dashboard/components/BSDList/BSDasri/types";
 import Loader from "common/components/Loaders";
 import { useQuery, useMutation } from "@apollo/client";
-import routes from "common/routes";
-import { useParams, useHistory, generatePath } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import { GET_DETAIL_DASRI_WITH_METADATA } from "common/queries";
 
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
@@ -144,12 +143,6 @@ export function RouteSignBsdasri({
 
   const config = settings[UIsignatureType];
 
-  const actionTab = {
-    pathname: generatePath(routes.dashboard.bsds.act, {
-      siret,
-    }),
-  };
-
   const formState = prefillWasteDetails(
     getComputedState(getInitialState(), bsdasri)
   );
@@ -182,7 +175,7 @@ export function RouteSignBsdasri({
               input: { ...signature, type: config.signatureType },
             },
           });
-          history.push(actionTab);
+          history.goBack();
         }}
       >
         {({ isSubmitting, handleReset, errors }) => {
@@ -212,7 +205,7 @@ export function RouteSignBsdasri({
                   className="btn btn--outline-primary"
                   onClick={() => {
                     handleReset();
-                    history.push(actionTab);
+                    history.goBack();
                   }}
                 >
                   Annuler

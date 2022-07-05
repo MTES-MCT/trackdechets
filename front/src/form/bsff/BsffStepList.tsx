@@ -1,5 +1,4 @@
 import { useMutation, useQuery } from "@apollo/client";
-import routes from "common/routes";
 import GenericStepList, {
   getComputedState,
 } from "form/common/stepper/GenericStepList";
@@ -16,7 +15,7 @@ import {
   BsffType,
 } from "generated/graphql/types";
 import React, { ReactElement, useMemo } from "react";
-import { generatePath, useHistory, useParams } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import initialState from "./utils/initial-state";
 import {
   CREATE_DRAFT_BSFF,
@@ -30,7 +29,6 @@ interface Props {
 }
 
 export default function BsffStepsList(props: Props) {
-  const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
 
   const formQuery = useQuery<Pick<Query, "bsff">, QueryBsffArgs>(
@@ -96,10 +94,7 @@ export default function BsffStepsList(props: Props) {
           : [],
     })
       .then(_ => {
-        const redirectTo = generatePath(routes.dashboard.bsds.drafts, {
-          siret,
-        });
-        history.push(redirectTo);
+        history.goBack();
       })
       .catch(err => formInputToastError(err));
   }
