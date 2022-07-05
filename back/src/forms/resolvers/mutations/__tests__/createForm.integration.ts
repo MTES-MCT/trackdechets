@@ -210,6 +210,26 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
+  it("should allow a destination after temp storage to create a form", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          recipient: { isTempStorage: true },
+          temporaryStorageDetail: {
+            destination: { company: { siret: company.siret } }
+          }
+        }
+      }
+    });
+    expect(data.createForm.id).toBeTruthy();
+  });
+
   it("should not allow to create a form with a foreign intermediary", async () => {
     const intermediary = await userWithCompanyFactory(UserRole.MEMBER, {
       companyTypes: {
