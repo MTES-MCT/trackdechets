@@ -1,8 +1,11 @@
 import { UserInputError } from "apollo-server-express";
 import omit from "object.omit";
-import { Prisma, Bsff } from "@prisma/client";
+import { Prisma, Bsff, BsffPackaging } from "@prisma/client";
 import prisma from "../../../prisma";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import {
+  BsffPackagingInput,
+  MutationResolvers
+} from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound } from "../../database";
 import { flattenBsffInput, unflattenBsff } from "../../converter";
@@ -18,6 +21,9 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   const user = checkIsAuthenticated(context);
 
   const existingBsff = await getBsffOrNotFound({ id });
+  const existingPackagings = await prisma.bsff
+    .findUnique({ where: { id: existingBsff.id } })
+    .packagings();
   await isBsffContributor(user, existingBsff);
 
   if (existingBsff.destinationOperationSignatureDate) {
@@ -62,7 +68,6 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       "transporterRecepisseNumber",
       "transporterRecepisseValidityLimit",
       "transporterTransportMode",
-      "packagings",
       "wasteAdr"
     ]);
   }
@@ -84,6 +89,8 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   }
 
   const futureBsff: Bsff = { ...existingBsff, ...flatInput };
+  const futurePackagings: BsffPackagingInput[] =
+    input.packagings ?? existingPackagings;
 
   await isBsffContributor(user, futureBsff);
 
@@ -126,7 +133,11 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
         : { bsffs: { some: { id: { in: [existingBsff.id] } } } }
   });
 
-  await validateBsff(futureBsff, previousBsffs, ficheInterventions);
+  await validateBsff(
+    { ...futureBsff, packagings: futurePackagings },
+    previousBsffs,
+    ficheInterventions
+  );
 
   const data: Prisma.BsffUpdateInput = flatInput;
 
@@ -158,6 +169,13 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   if (ficheInterventions.length > 0) {
     data.ficheInterventions = {
       set: ficheInterventions.map(({ id }) => ({ id }))
+    };
+  }
+
+  if (input.packagings) {
+    data.packagings = {
+      deleteMany: {},
+      createMany: { data: input.packagings }
     };
   }
 

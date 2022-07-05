@@ -16,6 +16,8 @@ input BsffWhere {
   transporter: BsffTransporterWhere
   "Filtre sur le champ destination."
   destination: BsffDestinationWhere
+  "Filtre sur le conditionnement"
+  packagings: BsffPackagingsWhere
   "ET logique"
   _and: [BsffWhere!]
   "OU logique"
@@ -74,6 +76,10 @@ input BsffReceptionWhere {
 input BsffOperationWhere {
   code: BsffOperationCodeFilter
   signature: SignatureWhere
+}
+
+input BsffPackagingsWhere {
+  numero: StringFilter
 }
 
 input SignatureInput {

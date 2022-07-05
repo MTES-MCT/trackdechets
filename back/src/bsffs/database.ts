@@ -113,7 +113,6 @@ export async function createBsff(
   const flatInput = {
     id: getReadableId(ReadableIdPrefix.FF),
     type: getBsffType(input),
-
     ...flattenBsffInput(input),
     ...additionalData
   };
@@ -158,9 +157,18 @@ export async function createBsff(
         })
       : [];
 
-  await validateBsff(flatInput, previousBsffs, ficheInterventions);
+  await validateBsff(
+    { ...flatInput, packagings: input.packagings },
+    previousBsffs,
+    ficheInterventions
+  );
 
-  const data: Prisma.BsffCreateInput = flatInput;
+  const data: Prisma.BsffCreateInput = {
+    ...flatInput,
+    ...(input.packagings
+      ? { packagings: { createMany: { data: input.packagings } } }
+      : {})
+  };
 
   if (isForwarding) {
     data.forwarding = { connect: { id: input.forwarding } };

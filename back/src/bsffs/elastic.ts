@@ -5,7 +5,9 @@ import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { BsffPackaging } from "../generated/graphql/types";
 
-function toBsdElastic(bsff: Bsff): BsdElastic {
+function toBsdElastic(
+  bsff: Bsff & { packagings: BsffPackaging[] }
+): BsdElastic {
   const bsd = {
     type: "BSFF" as const,
     id: bsff.id,
@@ -27,9 +29,7 @@ function toBsdElastic(bsff: Bsff): BsdElastic {
     destinationOperationDate: bsff.destinationOperationSignatureDate?.getTime(),
     wasteCode: bsff.wasteCode ?? "",
     wasteDescription: bsff.wasteDescription ?? "",
-    containers: (bsff.packagings as BsffPackaging[]).map(
-      packaging => packaging.numero
-    ),
+    containers: bsff.packagings.map(packaging => packaging.numero),
     isDraftFor: [],
     isForActionFor: [],
     isFollowFor: [],
@@ -117,7 +117,8 @@ export async function indexAllBsffs(
     take,
     where: {
       isDeleted: false
-    }
+    },
+    include: { packagings: true }
   });
 
   if (bsffs.length === 0) {
@@ -126,7 +127,7 @@ export async function indexAllBsffs(
 
   await indexBsds(
     idx,
-    bsffs.map(form => toBsdElastic(form))
+    bsffs.map(bsff => toBsdElastic(bsff))
   );
 
   if (bsffs.length < take) {
@@ -137,6 +138,9 @@ export async function indexAllBsffs(
   return indexAllBsffs(idx, { skip: skip + take });
 }
 
-export function indexBsff(form: Bsff, ctx?: GraphQLContext) {
-  return indexBsd(toBsdElastic(form), ctx);
+export async function indexBsff(bsff: Bsff, ctx?: GraphQLContext) {
+  const packagings = await prisma.bsff
+    .findUnique({ where: { id: bsff.id } })
+    .packagings();
+  return indexBsd(toBsdElastic({ ...bsff, packagings }), ctx);
 }

@@ -49,5 +49,16 @@ export const Bsff: BsffResolvers = {
       .findUnique({ where: { id } })
       .grouping();
     return groupedBsffs.map(bsff => toInitialBsff(unflattenBsff(bsff)));
+  },
+  packagings: async ({ id }) => {
+    const packagings = await prisma.bsff
+      .findUnique({ where: { id } })
+      .packagings();
+    return packagings.map(packaging => ({
+      name: packaging.name,
+      volume: packaging.volume,
+      weight: packaging.weight,
+      numero: packaging.numero
+    }));
   }
 };

@@ -268,8 +268,8 @@ model Form {
   updatedAt                          DateTime                @updatedAt @db.Timestamptz(6)
   emitterType                        EmitterType?
   emitterPickupSite                  String?
-  emitterIsPrivateIndividual         Boolean?                 @default(false)
-  emitterIsForeignShip               Boolean?                 @default(false)
+  emitterIsPrivateIndividual         Boolean?                @default(false)
+  emitterIsForeignShip               Boolean?                @default(false)
   emitterCompanyName                 String?
   emitterCompanySiret                String?
   emitterCompanyAddress              String?
@@ -1038,7 +1038,8 @@ model Bsff {
   emitterEmissionSignatureAuthor String?
   emitterEmissionSignatureDate   DateTime? @db.Timestamptz(6)
 
-  packagings Json @default("[]")
+  // DEPRECATED to be deleted after data migration
+  packagingsJson Json @default("[]")
 
   wasteCode        String?
   wasteDescription String?
@@ -1119,6 +1120,7 @@ model Bsff {
 
   ficheInterventions BsffFicheIntervention[]
 
+  packagings BsffPackaging[]
 
   @@index([emitterCompanySiret], map: "_BsffEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsffTransporterCompanySiretIdx")
@@ -1173,6 +1175,19 @@ model BsffFicheIntervention {
 
   @@index([detenteurCompanySiret], map: "_BsffFicheInterventionDetenteurCompanySiretIdx")
   @@index([operateurCompanySiret], map: "_BsffFicheInterventionOperateurCompanySiretIdx")
+}
+
+model BsffPackaging {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  name      String
+  volume    Float?
+  weight    Float
+  numero    String
+
+  bsff   Bsff @relation(fields: [bsffId], references: [id], onDelete: Cascade)
+  bsffId String
 }
 
 // ----------------
