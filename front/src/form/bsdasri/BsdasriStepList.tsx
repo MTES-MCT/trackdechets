@@ -110,7 +110,6 @@ const removeSections = (
   return omitDeep(input, mapping[status]);
 };
 export default function BsdasriStepsList(props: Props) {
-  const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
 
   const formQuery = useQuery<Pick<Query, "bsdasri">, QueryBsdasriArgs>(

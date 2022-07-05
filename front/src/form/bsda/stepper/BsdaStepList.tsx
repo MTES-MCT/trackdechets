@@ -34,7 +34,6 @@ const prefillTransportMode = state => {
   return state;
 };
 export default function BsdaStepsList(props: Props) {
-  const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
 
   const formQuery = useQuery<Pick<Query, "bsda">, QueryBsdaArgs>(GET_BSDA, {
