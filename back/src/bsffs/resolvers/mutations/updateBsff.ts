@@ -1,6 +1,6 @@
 import { UserInputError } from "apollo-server-express";
 import omit from "object.omit";
-import { Prisma, Bsff, BsffPackaging } from "@prisma/client";
+import { Prisma, Bsff } from "@prisma/client";
 import prisma from "../../../prisma";
 import {
   BsffPackagingInput,
