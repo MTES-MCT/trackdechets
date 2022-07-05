@@ -21,7 +21,7 @@ export const COLUMNS: Record<
   },
   readableId: {
     accessor: bsff => {
-      if (bsff.packagings?.length) {
+      if (bsff.packagings?.length && bsff.packagings.length < 15) {
         return (
           <>
             <div>{bsff.id}</div>
