@@ -45,6 +45,7 @@ function toPrismaBsdasriWhereInput(
   return safeInput<Prisma.BsdasriWhereInput>({
     ...toPrismaGenericWhereInput(where),
     status: toPrismaEnumFilter(where?.status),
+    type: toPrismaEnumFilter(where?.type),
     emitterCompanySiret: toPrismaStringFilter(where?.emitter?.company?.siret),
     emitterEmissionSignatureDate: toPrismaDateFilter(
       where?.emitter?.emission?.signature?.date

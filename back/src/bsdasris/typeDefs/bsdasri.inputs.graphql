@@ -35,6 +35,9 @@ input BsdasriOperationWhere {
 
 "Filtres possibles pour la récupération de bordereaux."
 input BsdasriWhere {
+  "(Optionnel) Filtre sur le type de BSDASRI"
+  type: BsdasriTypeFilter
+
   "(Optionnel) Permet de récupérer uniquement les bordereaux en brouillon"
   isDraft: Boolean
 
@@ -78,6 +81,12 @@ input BsdasriWhere {
 input BsdasriStatusFilter {
   _eq: BsdasriStatus
   _in: [BsdasriStatus!]
+}
+
+"Filtre sur le type de BSDASRI"
+input BsdasriTypeFilter {
+  _eq: BsdasriType
+  _in: [BsdasriType!]
 }
 
 """

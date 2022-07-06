@@ -10,10 +10,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout du code 12 01 16\* pour les BSDA [PR 1478](https://github.com/MTES-MCT/trackdechets/pull/1478)
-
+- Ajout d'un filtre sur sur le type de BSDASRI dans la query `bsdasris` [PR 1479](https://github.com/MTES-MCT/trackdechets/pull/1479)
 #### :bug: Corrections de bugs
 - Correction d'un bug ne permettant pas au destinataire finale de créer un BSDD avec entreposage provisoire [PR 1498](https://github.com/MTES-MCT/trackdechets/pull/1498)
-
 - Correction de la navigation entre les onglets du tableau de bord lors de certaines actions [PR 1469](https://github.com/MTES-MCT/trackdechets/pull/1469)
 
 #### :boom: Breaking changes
