@@ -158,7 +158,10 @@ const insee1: CompanySearchResult = {
   codeCommune: "66001",
   isRegistered: true,
   companyTypes: [],
-  statutDiffusionEtablissement: "O"
+  statutDiffusionEtablissement: "O",
+  contactEmail: "",
+  contactPhone: "",
+  contact: ""
 };
 const insee2: CompanySearchResult = {
   siret: "12346085500055",
@@ -172,7 +175,10 @@ const insee2: CompanySearchResult = {
   codeCommune: "77001",
   isRegistered: true,
   companyTypes: [],
-  statutDiffusionEtablissement: "O"
+  statutDiffusionEtablissement: "O",
+  contactEmail: "",
+  contactPhone: "",
+  contact: ""
 };
 
 // Mock pdf generator

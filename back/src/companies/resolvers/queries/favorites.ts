@@ -1,10 +1,16 @@
-import { camelCase } from "camel-case";
 import {
   CompanyFavorite,
   FavoriteType,
   QueryResolvers
 } from "../../../generated/graphql/types";
-import { Company, CompanyType, Prisma } from "@prisma/client";
+import {
+  BrokerReceipt,
+  Company,
+  CompanyType,
+  Prisma,
+  TraderReceipt,
+  TransporterReceipt
+} from "@prisma/client";
 import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -12,6 +18,8 @@ import { getCompanyOrCompanyNotFound } from "../../database";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { countries } from "../../../common/constants/companySearchHelpers";
 import { checkVAT } from "jsvat";
+import { searchCompany } from "../../search";
+import { CompanySearchResult } from "../../types";
 
 const MAX_FAVORITES = 10;
 
@@ -51,9 +59,236 @@ function matchesFavoriteType(
   );
 }
 
+function companyToFavorite(
+  company: Company & { transporterReceipt?: TransporterReceipt } & {
+    traderReceipt?: TraderReceipt;
+  } & { brokerReceipt?: BrokerReceipt }
+): CompanyFavorite {
+  return {
+    name: company.name,
+    siret: company.siret,
+    vatNumber: company.vatNumber,
+    address: company.address,
+    contact: company.contact,
+    phone: company.contactPhone,
+    mail: company.contactEmail,
+    codePaysEtrangerEtablissement: !company.vatNumber
+      ? "FR"
+      : checkVAT(company.vatNumber, countries)?.country?.isoCode.short,
+    transporterReceipt: company.transporterReceipt
+  };
+}
+
+function companySearchResultToFavorite(
+  companySearchResult: CompanySearchResult
+): CompanyFavorite {
+  return {
+    name: companySearchResult.name,
+    siret: companySearchResult.siret,
+    address: companySearchResult.address,
+    contact: companySearchResult.contact,
+    phone: companySearchResult.contactPhone ?? "",
+    mail: companySearchResult.contactEmail ?? ""
+  };
+}
+
+const defaultArgs = {
+  orderBy: { updatedAt: "desc" as Prisma.SortOrder },
+  take: 30
+};
+
+async function getRecentEmitters(
+  defaultWhere: Prisma.FormWhereInput
+): Promise<CompanyFavorite[]> {
+  const forms = await prisma.form.findMany({
+    ...defaultArgs,
+    where: {
+      ...defaultWhere,
+      NOT: [{ emitterCompanySiret: null }, { emitterCompanySiret: "" }]
+    },
+    select: { emitterCompanySiret: true }
+  });
+  const emitterSirets = forms.map(f => f.emitterCompanySiret);
+  const companies = await prisma.company.findMany({
+    where: { siret: { in: emitterSirets } }
+  });
+  return companies.map(c => companyToFavorite(c));
+}
+
+async function getRecentRecipients(
+  defaultWhere: Prisma.FormWhereInput
+): Promise<CompanyFavorite[]> {
+  const forms = await prisma.form.findMany({
+    ...defaultArgs,
+    where: {
+      ...defaultWhere,
+      NOT: [{ recipientCompanySiret: null }, { recipientCompanySiret: "" }]
+    },
+    select: { recipientCompanySiret: true }
+  });
+  const recipientSirets = forms.map(f => f.recipientCompanySiret);
+  const companies = await prisma.company.findMany({
+    where: { siret: { in: recipientSirets } }
+  });
+  return companies.map(c => companyToFavorite(c));
+}
+
+async function getRecentDestinationAfterTempStorage(
+  defaultWhere: Prisma.FormWhereInput
+): Promise<CompanyFavorite[]> {
+  const forms = await prisma.form.findMany({
+    ...defaultArgs,
+    where: {
+      ...defaultWhere,
+      forwardedIn: {
+        NOT: [{ recipientCompanySiret: null }, { recipientCompanySiret: "" }]
+      }
+    },
+    select: { forwardedIn: { select: { recipientCompanySiret: true } } }
+  });
+  const destinationSirets = forms.map(
+    f => f.forwardedIn?.recipientCompanySiret
+  );
+  const companies = await prisma.company.findMany({
+    where: { siret: { in: destinationSirets } }
+  });
+  return companies.map(c => companyToFavorite(c));
+}
+
+async function getRecentNextDestinations(
+  defaultWhere: Prisma.FormWhereInput
+): Promise<CompanyFavorite[]> {
+  const forms = await prisma.form.findMany({
+    ...defaultArgs,
+    where: {
+      ...defaultWhere,
+      NOT: [
+        { nextDestinationCompanySiret: null },
+        { nextDestinationCompanySiret: "" }
+      ]
+    },
+    select: { nextDestinationCompanySiret: true }
+  });
+  const nextDestinationSirets = forms.map(f => f.nextDestinationCompanySiret);
+  const companies = (
+    await Promise.all(
+      nextDestinationSirets.map(siret => searchCompany(siret).catch(_ => null))
+    )
+  ).filter(c => c !== null);
+  return companies.map(c => companySearchResultToFavorite(c));
+}
+
+async function getRecentTransporters(defaultWhere: Prisma.FormWhereInput) {
+  const forms = await prisma.form.findMany({
+    ...defaultArgs,
+    where: {
+      ...defaultWhere,
+      OR: [
+        {
+          NOT: [
+            { transporterCompanySiret: null },
+            { transporterCompanySiret: "" }
+          ]
+        },
+        {
+          NOT: [
+            { transporterCompanyVatNumber: null },
+            { transporterCompanyVatNumber: "" }
+          ]
+        }
+      ]
+    },
+    select: {
+      transporterCompanySiret: true,
+      transporterCompanyVatNumber: true,
+      transporterReceipt: true
+    }
+  });
+  const transporterSirets = forms
+    .map(f => f.transporterCompanySiret)
+    .filter(s => !["", null].includes(s));
+  const transporterVatNumbers = forms
+    .map(f => f.transporterCompanyVatNumber)
+    .filter(s => !["", null].includes(s));
+
+  const companies = await prisma.company.findMany({
+    where: {
+      OR: [
+        { siret: { in: transporterSirets } },
+        { vatNumber: { in: transporterVatNumbers } }
+      ]
+    }
+  });
+  return companies.map(c => companyToFavorite(c));
+}
+
+async function getRecentTraders(
+  defaultWhere: Prisma.FormWhereInput
+): Promise<CompanyFavorite[]> {
+  const forms = await prisma.form.findMany({
+    ...defaultArgs,
+    where: {
+      ...defaultWhere,
+      NOT: [{ traderCompanySiret: null }, { traderCompanySiret: "" }]
+    },
+    select: { traderCompanySiret: true }
+  });
+  const traderSirets = forms.map(f => f.traderCompanySiret);
+  const companies = (
+    await Promise.all(
+      traderSirets.map(siret => searchCompany(siret).catch(_ => null))
+    )
+  ).filter(c => c !== null);
+  return Promise.all(
+    companies.map(async c => {
+      const favorite = companySearchResultToFavorite(c);
+      const traderReceipt = await prisma.company
+        .findUnique({
+          where: { siret: favorite.siret }
+        })
+        .traderReceipt();
+      return { ...favorite, traderReceipt };
+    })
+  );
+}
+
+async function getRecentBrokers(
+  defaultWhere: Prisma.FormWhereInput
+): Promise<CompanyFavorite[]> {
+  const forms = await prisma.form.findMany({
+    ...defaultArgs,
+    where: {
+      ...defaultWhere,
+      NOT: [{ brokerCompanySiret: null }, { brokerCompanySiret: "" }]
+    },
+    select: { brokerCompanySiret: true }
+  });
+  const brokerSirets = forms.map(f => f.brokerCompanySiret);
+  const companies = (
+    await Promise.all(
+      brokerSirets.map(siret => searchCompany(siret).catch(_ => null))
+    )
+  ).filter(c => c !== null);
+
+  return Promise.all(
+    companies.map(async c => {
+      const favorite = companySearchResultToFavorite(c);
+      const brokerReceipt = await prisma.company
+        .findUnique({
+          where: { siret: favorite.siret }
+        })
+        .brokerReceipt();
+      return { ...favorite, brokerReceipt };
+    })
+  );
+}
+
 /**
  * Return a list of companies the user (and their company) have been working with recently.
  * The list is filtered according to a given "FavoriteType": a field of the form.
+ *
+ * For emitter, transporter, and destination after temporary storage, we only return companies registered in TD
+ * For brokers, traders, and next destinations we only returns companies present in SIRENE database
  *
  * @param {string} userID ID of the user for whom to retrieve the recent partners
  * @param {string} siret SIRET of the company for which to retrieve the recent partners
@@ -62,17 +297,13 @@ function matchesFavoriteType(
  * @returns {Promise} resolves to a list of recent partners matching the provided parameters
  */
 async function getRecentPartners(
-  userID: string,
+  userId: string,
   siret: string,
   type: FavoriteType
 ): Promise<CompanyFavorite[]> {
-  const defaultArgs = {
-    orderBy: { updatedAt: "desc" as Prisma.SortOrder },
-    take: 50
-  };
   const defaultWhere: Prisma.FormWhereInput = {
     OR: [
-      { owner: { id: userID } },
+      { owner: { id: userId } },
       { emitterCompanySiret: siret },
       { ecoOrganismeSiret: siret },
       { recipientCompanySiret: siret },
@@ -98,80 +329,24 @@ async function getRecentPartners(
   };
 
   switch (type) {
-    case "TEMPORARY_STORAGE_DETAIL": {
-      const forms = await prisma.form.findMany({
-        ...defaultArgs,
-        where: {
-          ...defaultWhere,
-          recipientIsTempStorage: true,
-          recipientCompanySiret: { not: "" }
-        }
-      });
-      return forms.map(form => ({
-        name: form.recipientCompanyName,
-        siret: form.recipientCompanySiret,
-        address: form.recipientCompanyAddress,
-        contact: form.recipientCompanyAddress,
-        phone: form.recipientCompanyPhone,
-        mail: form.recipientCompanyMail
-      }));
-    }
-    case "DESTINATION": {
-      const forms = await prisma.form.findMany({
-        ...defaultArgs,
-        where: {
-          ...defaultWhere,
-          forwardedIn: {
-            recipientCompanySiret: { not: "" }
-          }
-        },
-        select: {
-          forwardedIn: {
-            select: {
-              recipientCompanyName: true,
-              recipientCompanySiret: true,
-              recipientCompanyAddress: true,
-              recipientCompanyContact: true,
-              recipientCompanyPhone: true,
-              recipientCompanyMail: true
-            }
-          }
-        }
-      });
-      return forms.map(form => ({
-        name: form.forwardedIn?.recipientCompanyName,
-        siret: form.forwardedIn?.recipientCompanySiret,
-        address: form.forwardedIn?.recipientCompanyAddress,
-        contact: form.forwardedIn?.recipientCompanyContact,
-        phone: form.forwardedIn?.recipientCompanyPhone,
-        mail: form.forwardedIn?.recipientCompanyMail
-      }));
-    }
     case "EMITTER":
-    case "TRANSPORTER":
+      return getRecentEmitters(defaultWhere);
     case "RECIPIENT":
-    case "TRADER":
+      return getRecentRecipients(defaultWhere);
+    case "TEMPORARY_STORAGE_DETAIL":
+      // do not differenciate between recipient and temp storage
+      // because the front never set type = TEMPORARY_STORAGE_DETAIL
+      return getRecentRecipients(defaultWhere);
+    case "TRANSPORTER":
+      return getRecentTransporters(defaultWhere);
+    case "DESTINATION":
+      return getRecentDestinationAfterTempStorage(defaultWhere);
+    case "NEXT_DESTINATION":
+      return getRecentNextDestinations(defaultWhere);
     case "BROKER":
-    case "NEXT_DESTINATION": {
-      const lowerType = camelCase(type);
-      const forms = await prisma.form.findMany({
-        ...defaultArgs,
-        where: {
-          ...defaultWhere,
-          [`${lowerType}CompanySiret`]: { not: "" }
-        }
-      });
-
-      return forms.map(form => ({
-        name: form[`${lowerType}CompanyName`],
-        siret: form[`${lowerType}CompanySiret`],
-        vatNumber: form[`${lowerType}CompanyVatNumber`],
-        address: form[`${lowerType}CompanyAddress`],
-        contact: form[`${lowerType}CompanyContact`],
-        phone: form[`${lowerType}CompanyPhone`],
-        mail: form[`${lowerType}CompanyMail`]
-      }));
-    }
+      return getRecentBrokers(defaultWhere);
+    case "TRADER":
+      return getRecentTraders(defaultWhere);
     default:
       return [];
   }
@@ -225,18 +400,7 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
         favorite.vatNumber === company.vatNumber)
   );
   if (isMatchingType && !isAlreadyListed) {
-    favorites.push({
-      name: company.name,
-      siret: company.siret,
-      vatNumber: company.vatNumber,
-      address: company.address,
-      contact: user.name,
-      phone: user.phone,
-      mail: user.email,
-      codePaysEtrangerEtablissement: !company.vatNumber
-        ? "FR"
-        : checkVAT(company.vatNumber, countries)?.country?.isoCode.short
-    });
+    favorites.push(companyToFavorite(company));
   }
 
   // Return up to MAX_FAVORITES results

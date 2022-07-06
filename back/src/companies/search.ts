@@ -80,6 +80,7 @@ export async function searchCompany(
       address: true,
       vatNumber: true,
       companyTypes: true,
+      contact: true,
       contactEmail: true,
       contactPhone: true,
       website: true,
