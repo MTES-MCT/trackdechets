@@ -487,7 +487,7 @@ export function toInitialBsda(bsda: GraphqlBsda): GraphQLInitialBsda {
 export function flattenBsdaRevisionRequestInput(
   reviewContent: BsdaRevisionRequestContentInput
 ): Partial<Prisma.BsdaRevisionRequestCreateInput> {
-  return {
+  return safeInput({
     brokerCompanyAddress: chain(reviewContent, r =>
       chain(r.broker, b => chain(b.company, c => c.address))
     ),
@@ -551,7 +551,7 @@ export function flattenBsdaRevisionRequestInput(
         chain(d.reception, r => (r.weight ? r.weight * 1000 : r.weight))
       )
     )
-  };
+  });
 }
 
 export function expandBsdaRevisionRequestContent(
