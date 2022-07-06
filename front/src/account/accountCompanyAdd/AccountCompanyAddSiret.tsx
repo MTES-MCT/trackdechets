@@ -144,7 +144,7 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
           } else if (!isValidVat && !/^[0-9]{14}$/.test(values.siret)) {
             return {
               siret:
-                "Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter à l'adresse contact@trackdechets.beta.gouv.fr avec un justifictif légal du pays d'origine.",
+                "Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter à l'adresse contact@trackdechets.beta.gouv.fr avec un justificatif légal du pays d'origine.",
             };
           } else if (isValidVat && isFRVat(values.siret)) {
             return {
