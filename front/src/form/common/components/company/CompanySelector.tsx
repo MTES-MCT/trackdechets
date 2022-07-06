@@ -190,8 +190,8 @@ export default function CompanySelector({
    */
   useEffect(() => {
     if (clue.length === 0) {
-      // FIXME should empty the result when emptying the search input
-      setSearchResults(favoritesData?.favorites ?? []);
+      // the result when emptying the search input
+      return setSearchResults(favoritesData?.favorites ?? []);
     }
     setSearchResults(
       searchData?.searchCompanies
@@ -264,13 +264,18 @@ export default function CompanySelector({
    */
   useEffect(() => {
     const timeoutID = setTimeout(() => {
+      if (clue.length === 0) {
+        return refetchFavorites();
+      }
+      // no search for less than 4 characters
       if (clue.length < 3) {
         return;
       }
       const isValidSiret = isSiret(clue);
       const isValidVat = isVat(clue);
+      const isTextSearch = !isValidSiret && !isValidVat;
 
-      if (isValidSiret || (!isValidSiret && !isValidVat)) {
+      if (isValidSiret || isTextSearch) {
         setIsForeignCompany(false);
         setFieldValue(`${field.name}.vatNumber`, "");
         return searchCompaniesQuery({
@@ -280,7 +285,7 @@ export default function CompanySelector({
           },
         });
       } else if (!allowForeignCompanies) {
-        // foreign companies searh is not allowed
+        // foreign companies search is not allowed
         return setFieldError(
           `${field.name}.siret`,
           "Vous devez entrer un numéro SIRET valide (14 chiffres) ou le nom d'une entreprise française"
@@ -307,18 +312,7 @@ export default function CompanySelector({
     return () => {
       clearTimeout(timeoutID);
     };
-  }, [
-    allowForeignCompanies,
-    forceManualForeignCompanyForm,
-    field.name,
-    searchCompany,
-    clue,
-    department,
-    searchResults,
-    searchCompaniesQuery,
-    setFieldError,
-    setFieldValue,
-  ]);
+  }, [clue, department, searchResults]);
 
   if (isLoadingFavorites) {
     return <p>Chargement...</p>;
@@ -352,9 +346,9 @@ export default function CompanySelector({
         <div className="tw-flex tw-justify-between">
           <div className="tw-w-1/2 tw-flex tw-flex-col tw-justify-between">
             <label htmlFor={`siret-${uniqId}`}>
-              Nom ou numéro de SIRET
+              Nom, numéro de SIRET de l'établissement
               {allowForeignCompanies && !forceManualForeignCompanyForm
-                ? " ou numéro de TVA intracommunautaire pour les entreprises non françaises"
+                ? " ou numéro de TVA intracommunautaire pour les entreprises étrangères"
                 : ""}
             </label>
             <div className="tw-flex tw-items-center">
@@ -364,10 +358,6 @@ export default function CompanySelector({
                 className="td-input tw-w-2/3"
                 onChange={event => {
                   setClue(event.target.value);
-                  if (!event.target.value.length) {
-                    // FIXME does not update list displayed yet
-                    return refetchFavorites();
-                  }
                 }}
                 onBlur={() => {
                   setFieldTouched(`${field.name}.siret`, true);
