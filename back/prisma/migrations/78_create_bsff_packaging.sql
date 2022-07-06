@@ -1,0 +1,1 @@
+ALTER TABLE "default$default.Bsff" RENAME COLUMN packagings TO packagingsJson;
