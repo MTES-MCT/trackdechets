@@ -3,7 +3,7 @@ import cogoToast from "cogo-toast";
 import { Field, useField, useFormikContext } from "formik";
 import React, { useEffect, useCallback, useState } from "react";
 import { checkVAT } from "jsvat";
-import { IconSearch } from "common/components/Icons";
+import { IconSearch, IconLoading } from "common/components/Icons";
 import { constantCase } from "constant-case";
 import { InlineError, NotificationError } from "common/components/Error";
 import RedErrorMessage from "common/components/RedErrorMessage";
@@ -100,35 +100,34 @@ export default function CompanySelector({
   /**
    * searchCompany used currently only for VAT number exact match search
    */
-  const [searchCompany, { error }] = useLazyQuery<Pick<Query, "companyInfos">>(
-    COMPANY_INFOS,
-    {
-      onCompleted: data => {
-        if (data?.companyInfos) {
-          const companyInfos = data.companyInfos;
-          if (!companyInfos.isRegistered && registeredOnlyCompanies) {
-            cogoToast.error(
-              "Cet établissement n'est pas enregistré sur Trackdéchets, nous ne pouvons l'ajouter dans ce formulaire"
-            );
-            setFieldError(
-              `${field.name}.siret`,
-              "Cet établissement n'est pas enregistré sur Trackdéchets, nous ne pouvons l'ajouter dans ce formulaire"
-            );
-            return;
-          }
-          if (companyInfos.name === "---") {
-            cogoToast.error(
-              "Cet établissement existe mais nous ne pouvons remplir automatiquement le formulaire"
-            );
-          }
-          selectCompany(companyInfos as CompanyFavorite);
-        } else {
-          cogoToast.error("Aucun résultat pour votre recherche");
+  const [searchCompany, { loading: isLoadingCompany, error }] = useLazyQuery<
+    Pick<Query, "companyInfos">
+  >(COMPANY_INFOS, {
+    onCompleted: data => {
+      if (data?.companyInfos) {
+        const companyInfos = data.companyInfos;
+        if (!companyInfos.isRegistered && registeredOnlyCompanies) {
+          cogoToast.error(
+            "Cet établissement n'est pas enregistré sur Trackdéchets, nous ne pouvons l'ajouter dans ce formulaire"
+          );
+          setFieldError(
+            `${field.name}.siret`,
+            "Cet établissement n'est pas enregistré sur Trackdéchets, nous ne pouvons l'ajouter dans ce formulaire"
+          );
+          return;
         }
-      },
-      fetchPolicy: "no-cache",
-    }
-  );
+        if (companyInfos.name === "---") {
+          cogoToast.error(
+            "Cet établissement existe mais nous ne pouvons remplir automatiquement le formulaire"
+          );
+        }
+        selectCompany(companyInfos as CompanyFavorite);
+      } else {
+        cogoToast.error("Aucun résultat pour votre recherche");
+      }
+    },
+    fetchPolicy: "no-cache",
+  });
 
   /**
    * Callback on company result click
@@ -366,7 +365,11 @@ export default function CompanySelector({
                 disabled={disabled}
               />
               <i className={styles.searchIcon} aria-label="Recherche">
-                <IconSearch size="12px" />
+                {isLoadingSearch || isLoadingFavorites || isLoadingCompany ? (
+                  <IconLoading size="18px" />
+                ) : (
+                  <IconSearch size="16px" />
+                )}
               </i>
             </div>
           </div>
