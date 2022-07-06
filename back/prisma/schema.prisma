@@ -1038,7 +1038,7 @@ model Bsff {
   emitterEmissionSignatureAuthor String?
   emitterEmissionSignatureDate   DateTime? @db.Timestamptz(6)
 
-  // DEPRECATED to be deleted after data migration
+  // DEPRECATED to be deleted after release 2022.07.1
   packagingsJson Json @default("[]")
 
   wasteCode        String?

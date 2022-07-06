@@ -4,7 +4,7 @@ import prisma from "../../src/prisma";
 type BsffPackagingJson = {
   name: string;
   numero: string;
-  weight?: number; // this field may be absent in
+  weight?: number;
   kilos?: number; // legacy field
   volume?: number;
   litres?: number; // legacy field
