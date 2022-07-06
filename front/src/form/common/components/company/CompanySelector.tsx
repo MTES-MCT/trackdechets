@@ -345,10 +345,15 @@ export default function CompanySelector({
         <div className="tw-flex tw-justify-between">
           <div className="tw-w-1/2 tw-flex tw-flex-col tw-justify-between">
             <label htmlFor={`siret-${uniqId}`}>
-              Nom, numéro de SIRET de l'établissement
-              {allowForeignCompanies && !forceManualForeignCompanyForm
-                ? " ou numéro de TVA intracommunautaire pour les entreprises étrangères"
-                : ""}
+              Nom ou numéro de SIRET de l'établissement
+              {allowForeignCompanies && !forceManualForeignCompanyForm ? (
+                <small className="tw-block">
+                  ou numéro de TVA intracommunautaire pour les entreprises
+                  étrangères
+                </small>
+              ) : (
+                ""
+              )}
             </label>
             <div className="tw-flex tw-items-center">
               <input
@@ -376,7 +381,8 @@ export default function CompanySelector({
 
           <div className="tw-w-1/4 tw-flex tw-flex-col tw-justify-between">
             <label htmlFor={`geo-${uniqId}`}>
-              Département ou code postal (si français)
+              Département ou code postal
+              <small className="tw-block">si l'entreprise est française</small>
             </label>
 
             <input
