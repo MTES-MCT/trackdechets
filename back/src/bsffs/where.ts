@@ -34,7 +34,14 @@ function toPrismaBsffWhereInput(where: BsffWhere): Prisma.BsffWhereInput {
     ),
     destinationOperationSignatureDate: toPrismaDateFilter(
       where.destination?.operation?.signature?.date
-    )
+    ),
+    ...(where?.packagings?.numero
+      ? {
+          packagings: {
+            some: { numero: toPrismaStringFilter(where.packagings.numero) }
+          }
+        }
+      : {})
   });
 }
 export function toPrismaWhereInput(where: BsffWhere): Prisma.BsffWhereInput {

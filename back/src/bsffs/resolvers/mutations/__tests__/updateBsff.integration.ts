@@ -1,4 +1,5 @@
 import { UserRole, BsffType, BsffStatus } from "@prisma/client";
+import { gql } from "apollo-server-core";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -8,6 +9,7 @@ import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { OPERATION, WASTE_CODES } from "../../../constants";
+import { fullBsff } from "../../../fragments";
 import {
   createBsff,
   createBsffAfterEmission,
@@ -18,37 +20,13 @@ import {
   createFicheIntervention
 } from "../../../__tests__/factories";
 
-const UPDATE_BSFF = `
+const UPDATE_BSFF = gql`
   mutation UpdateBsff($id: ID!, $input: BsffInput!) {
     updateBsff(id: $id, input: $input) {
-      id
-      emitter {
-        company {
-          name
-        }
-      }
-      waste {
-        code
-        description
-        adr
-      }
-      weight {
-        value
-        isEstimate
-      }
-      transporter {
-        company {
-          siret
-          name
-        }
-      }
-      destination {
-        company {
-          name
-        }
-      }
+      ...FullBsff
     }
   }
+  ${fullBsff}
 `;
 
 describe("Mutation.updateBsff", () => {
@@ -77,6 +55,55 @@ describe("Mutation.updateBsff", () => {
 
     expect(errors).toBeUndefined();
     expect(data.updateBsff.id).toBeTruthy();
+  });
+
+  it("should allow user to update a bsff packagings", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsff(
+      { emitter },
+      {
+        packagings: {
+          create: { name: "BOUTEILLE", weight: 1, numero: "1" }
+        },
+        isDraft: true
+      }
+    );
+
+    let packagings = await prisma.bsff
+      .findUnique({ where: { id: bsff.id } })
+      .packagings();
+
+    expect(packagings.length).toEqual(1);
+
+    const { mutate } = makeClient(emitter.user);
+    const { data } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          packagings: [
+            { name: "BOUTEILLE", weight: 1, numero: "2" },
+            { name: "BOUTEILLE", weight: 1, numero: "3" }
+          ]
+        }
+      }
+    });
+
+    packagings = await prisma.bsff
+      .findUnique({ where: { id: bsff.id } })
+      .packagings();
+
+    console.log(packagings);
+
+    expect(packagings.length).toEqual(2); // previous packagings should be deleted
+    expect(packagings[0].numero).toEqual("2");
+    expect(packagings[1].numero).toEqual("3");
+    expect(data.updateBsff.packagings).toEqual([
+      expect.objectContaining({ name: "BOUTEILLE", weight: 1, numero: "2" }),
+      expect.objectContaining({ name: "BOUTEILLE", weight: 1, numero: "3" })
+    ]);
   });
 
   it("should disallow unauthenticated user from updating a bsff", async () => {
@@ -231,7 +258,9 @@ describe("Mutation.updateBsff", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data.updateBsff).toEqual(expect.objectContaining(input));
+    expect(data.updateBsff.emitter.company).toEqual(
+      expect.objectContaining({ name: input.emitter.company.name })
+    );
   });
 
   it("should not update emitter if they signed already", async () => {
@@ -264,13 +293,9 @@ describe("Mutation.updateBsff", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data.updateBsff).toEqual(
+    expect(data.updateBsff.emitter.company).toEqual(
       expect.objectContaining({
-        emitter: {
-          company: {
-            name: bsff.emitterCompanyName
-          }
-        }
+        name: bsff.emitterCompanyName
       })
     );
   });
@@ -463,7 +488,9 @@ describe("Mutation.updateBsff", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data.updateBsff).toEqual(expect.objectContaining(input));
+    expect(data.updateBsff.destination.company).toEqual(
+      expect.objectContaining({ name: input.destination.company.name })
+    );
   });
 
   it("should not update destination if they signed already", async () => {
@@ -496,13 +523,9 @@ describe("Mutation.updateBsff", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data.updateBsff).toEqual(
+    expect(data.updateBsff.destination.company).toEqual(
       expect.objectContaining({
-        destination: {
-          company: {
-            name: bsff.destinationCompanyName
-          }
-        }
+        name: bsff.destinationCompanyName
       })
     );
   });
@@ -731,7 +754,9 @@ describe("Mutation.updateBsff", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data.updateBsff).toEqual(expect.objectContaining(input));
+    expect(data.updateBsff.transporter.company).toEqual(
+      expect.objectContaining(input.transporter.company)
+    );
   });
 
   it("should update a bsff with previous bsffs", async () => {

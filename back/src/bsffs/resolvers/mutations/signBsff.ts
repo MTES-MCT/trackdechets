@@ -85,7 +85,10 @@ const signatures: Record<
       user,
       securityCode
     );
-    await validateBeforeTransport(existingBsff);
+    const packagings = await prisma.bsff
+      .findUnique({ where: { id: existingBsff.id } })
+      .packagings();
+    await validateBeforeTransport({ ...existingBsff, packagings });
 
     return prisma.bsff.update({
       data: {

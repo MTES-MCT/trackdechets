@@ -131,7 +131,7 @@ export async function validateBsff(
   bsff: SetOptional<
     Pick<Bsff, "id" | "type" | "emitterCompanySiret">,
     "emitterCompanySiret"
-  >,
+  > & { packagings?: BsffPackaging[] },
   previousBsffs: Bsff[],
   ficheInterventions: BsffFicheIntervention[]
 ) {
@@ -291,7 +291,6 @@ export function validateBeforeEmission(
 const beforeTransportSchema: yup.SchemaOf<
   Pick<
     Bsff,
-    | "packagings"
     | "transporterCompanyName"
     | "transporterCompanySiret"
     | "transporterCompanyVatNumber"
@@ -302,7 +301,9 @@ const beforeTransportSchema: yup.SchemaOf<
     | "emitterEmissionSignatureDate"
     | "transporterTransportSignatureDate"
     | "transporterTransportMode"
-  >
+  > & {
+    packagings?: Pick<BsffPackaging, "numero" | "volume" | "name" | "weight">[];
+  }
 > = yup.object({
   packagings: yup
     .array()

@@ -1,4 +1,5 @@
 import { UserRole } from "@prisma/client";
+import { gql } from "apollo-server-core";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -7,13 +8,15 @@ import {
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { WASTE_CODES } from "../../../constants";
+import { fullBsff } from "../../../fragments";
 
-const CREATE_BSFF = `
+const CREATE_BSFF = gql`
   mutation CreateBsff($input: BsffInput!) {
     createBsff(input: $input) {
-      id
+      ...FullBsff
     }
   }
+  ${fullBsff}
 `;
 
 describe("Mutation.createBsff", () => {
@@ -82,6 +85,13 @@ describe("Mutation.createBsff", () => {
 
     expect(errors).toBeUndefined();
     expect(data.createBsff.id).toBeTruthy();
+    expect(data.createBsff.packagings).toEqual([
+      expect.objectContaining({
+        name: "BOUTEILLE",
+        numero: "123",
+        weight: 1
+      })
+    ]);
   });
 
   it("should disallow unauthenticated user from creating a bsff", async () => {

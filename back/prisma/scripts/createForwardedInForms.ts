@@ -4,7 +4,7 @@ import { registerUpdater, Updater } from "./helper/helper";
 @registerUpdater(
   "Migrate from TemporaryStorageDetail to forwardedIn Form",
   "Migrate from TemporaryStorageDetail to forwardedIn Form",
-  true
+  false
 )
 export class CreateForwardedInForms implements Updater {
   async run() {

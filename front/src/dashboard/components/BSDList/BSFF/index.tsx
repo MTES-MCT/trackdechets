@@ -20,7 +20,22 @@ export const COLUMNS: Record<
     Cell: () => <IconBSFF style={{ fontSize: "24px" }} />,
   },
   readableId: {
-    accessor: bsff => bsff.id,
+    accessor: bsff => {
+      if (bsff.packagings?.length && bsff.packagings.length < 15) {
+        return (
+          <>
+            <div>{bsff.id}</div>
+            <div>
+              {bsff.packagings
+                .map(p => p.numero)
+                .filter(n => n?.length > 0)
+                .join(" | ")}
+            </div>
+          </>
+        );
+      }
+      return bsff.id;
+    },
   },
   emitter: {
     accessor: bsff => (
