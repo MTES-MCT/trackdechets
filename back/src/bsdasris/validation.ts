@@ -208,8 +208,9 @@ export const packagingInfo = _ =>
       .required(
         "Le volume en litres associé à chaque type de contenant doit être précisé."
       )
-      .integer()
-      .min(1, "Le volume de chaque type de contenant doit être supérieur à 0.")
+      .positive(
+        "Le volume de chaque type de contenant doit être supérieur à 0."
+      )
   });
 
 export const emissionSchema: FactorySchemaOf<

@@ -108,11 +108,11 @@ export default function DasriPackagings({
 
                       <div className="tw-w-1/3 tw-px-2">
                         <Field
-                          label="Volume"
+                          label="Volume unitaire (l)"
                           component={NumberInput}
                           className="td-input"
                           name={`${name}.${idx}.volume`}
-                          placeholder="Volume en litres"
+                          placeholder="Volume unitaire (l)"
                           min="1"
                           disabled={disabled}
                         />

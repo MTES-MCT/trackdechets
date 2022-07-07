@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import cogoToast from "cogo-toast";
+import { Loader } from "common/components";
 import GenericStepList, {
   getComputedState,
 } from "form/common/stepper/GenericStepList";
@@ -157,17 +158,17 @@ export default function BsdasriStepsList(props: Props) {
     ? formQuery?.data?.bsdasri?.["bsdasriStatus"]
     : "INITIAL";
 
-  const [createDraftBsdasri] = useMutation<
+  const [createDraftBsdasri, { loading: creatingDraft }] = useMutation<
     Pick<Mutation, "createDraftBsdasri">,
     MutationCreateDraftBsdasriArgs
   >(CREATE_DRAFT_BSDASRI);
 
-  const [createBsdasri] = useMutation<
+  const [createBsdasri, { loading: creating }] = useMutation<
     Pick<Mutation, "createBsdasri">,
     MutationCreateBsdasriArgs
   >(CREATE_BSDASRI);
 
-  const [updateBsdasri] = useMutation<
+  const [updateBsdasri, { loading: updating }] = useMutation<
     Pick<Mutation, "updateBsdasri">,
     MutationUpdateBsdasriArgs
   >(UPDATE_BSDASRI);
@@ -241,14 +242,17 @@ export default function BsdasriStepsList(props: Props) {
     return <p>Ce bordereau n'est plus modifiable</p>;
   }
   return (
-    <GenericStepList
-      children={steps}
-      formId={props.formId}
-      formQuery={formQuery}
-      onSubmit={onSubmit}
-      initialValues={formState}
-      validationSchema={null}
-      initialStep={props?.initialStep}
-    />
+    <>
+      <GenericStepList
+        children={steps}
+        formId={props.formId}
+        formQuery={formQuery}
+        onSubmit={onSubmit}
+        initialValues={formState}
+        validationSchema={null}
+        initialStep={props?.initialStep}
+      />
+      {(creating || updating || creatingDraft) && <Loader />}
+    </>
   );
 }

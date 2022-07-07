@@ -932,7 +932,7 @@ model Bsdasri {
   // emission
   emitterWasteWeightValue             Float? // kg
   emitterWasteWeightIsEstimate        Boolean?
-  emitterWasteVolume                  Int? // liters
+  emitterWasteVolume                  Float? // liters
   emitterWastePackagings              Json                    @default("[]")
   emissionSignatory                   User?                   @relation("BsdasriEmissionSignature", fields: [emissionSignatoryId], references: [id])
   emissionSignatoryId                 String?
@@ -965,7 +965,7 @@ model Bsdasri {
   transporterWastePackagings          Json                    @default("[]")
   transporterWasteWeightValue         Float? // kg
   transporterWasteWeightIsEstimate    Boolean?
-  transporterWasteVolume              Int? // liters
+  transporterWasteVolume              Float? // liters
   handedOverToRecipientAt             DateTime?               @db.Timestamptz(6)
   transportSignatory                  User?                   @relation("BsdasriTransportSignature", fields: [transportSignatoryId], references: [id])
   transportSignatoryId                String?
@@ -987,7 +987,7 @@ model Bsdasri {
   destinationReceptionWasteRefusalReason      String?
   destinationReceptionWasteRefusedWeightValue Float? // kg
   destinationReceptionWasteWeightValue        Float? // kg
-  destinationReceptionWasteVolume             Int? // liters
+  destinationReceptionWasteVolume             Float? // liters
   destinationReceptionDate                    DateTime? // accepted or refused date @db.Timestamptz(6)
   // processing
   destinationOperationCode                    String?
