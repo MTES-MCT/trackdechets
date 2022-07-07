@@ -9,10 +9,14 @@ const graphqlTypes = [
   "scalars",
 ];
 
+const excludes = [
+  path.join("reference", "api-reference", "registre", "mutations"),
+];
+
 function makeReference(apiId) {
-  return graphqlTypes.map((t) =>
-    path.join("reference", "api-reference", apiId, t)
-  );
+  return graphqlTypes
+    .map((t) => path.join("reference", "api-reference", apiId, t))
+    .filter((p) => !excludes.includes(p));
 }
 
 const referenceDefs = [
