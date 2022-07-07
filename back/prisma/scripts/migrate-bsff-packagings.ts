@@ -1,5 +1,7 @@
 import { Updater, registerUpdater } from "./helper/helper";
+import { client, index } from "../../src/common/elastic";
 import prisma from "../../src/prisma";
+import { indexAllBsffs } from "../../src/bsffs/elastic";
 
 type BsffPackagingJson = {
   name: string;
@@ -40,5 +42,43 @@ export class MigrateBsffPackagings implements Updater {
         }
       });
     }
+
+    const { container, container_search } = index.settings.analysis.analyzer;
+    const { container_ngram, container_char_group } =
+      index.settings.analysis.tokenizer;
+
+    // update settings
+    await client.indices.putSettings(
+      {
+        index: index.index,
+        body: {
+          settings: {
+            analysis: {
+              analyzer: { container, container_search },
+              tokenizer: { container_ngram, container_char_group }
+            }
+          }
+        }
+      },
+      {}
+    );
+
+    const { containers } = index.mappings.properties;
+    // update mapping
+    await client.indices.putMapping(
+      {
+        index: index.index,
+        body: { properties: { containers } }
+      },
+      {}
+    );
+
+    // reindex bsffs in place
+    await client.deleteByQuery({
+      index: index.index,
+      body: { query: { term: { type: "BSFF" } } }
+    });
+
+    await indexAllBsffs(index.index);
   }
 }
