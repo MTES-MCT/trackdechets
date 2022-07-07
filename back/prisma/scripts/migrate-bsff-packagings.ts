@@ -23,6 +23,9 @@ export class MigrateBsffPackagings implements Updater {
       where: { packagings: { none: {} }, packagingsJson: { not: [] } }, // make it idempotent in case we have to re-run the script
       select: { id: true, packagingsJson: true }
     });
+
+    console.log(`There are ${bsffs.length} packagings to migrate`);
+
     for (const bsff of bsffs) {
       await prisma.bsff.update({
         where: { id: bsff.id },
@@ -42,6 +45,13 @@ export class MigrateBsffPackagings implements Updater {
         }
       });
     }
+
+    console.log("Closing index before updating the settings");
+    // https://stackoverflow.com/questions/19758335/error-when-trying-to-update-the-settings
+
+    await client.indices.close({ index: index.index });
+
+    console.log("Updating index settings...");
 
     const { container, container_search } = index.settings.analysis.analyzer;
     const { container_ngram, container_char_group } =
@@ -63,21 +73,25 @@ export class MigrateBsffPackagings implements Updater {
       {}
     );
 
+    console.log("Updating index mapping....");
+
     const { containers } = index.mappings.properties;
+
     // update mapping
     await client.indices.putMapping(
       {
         index: index.index,
+        type: index.type,
         body: { properties: { containers } }
       },
       {}
     );
 
-    // reindex bsffs in place
-    await client.deleteByQuery({
-      index: index.index,
-      body: { query: { term: { type: "BSFF" } } }
-    });
+    console.log("Reopening the index...");
+
+    await client.indices.open({ index: index.index });
+
+    console.log("Reindexing all bsffs....");
 
     await indexAllBsffs(index.index);
   }
