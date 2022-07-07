@@ -27,20 +27,6 @@ export function getDasriPackagingInfosSummary(packagings: BsdasriPackaging[]) {
       acc.plus((packaging.quantity ?? 0) * (packaging.volume ?? 0)),
     new Decimal(0)
   );
-  const packages2 = packagings
-    .map(packaging => {
-      const name =
-        packaging.type === BsdasriPackagingType.Autre
-          ? [
-              PACKAGINGS_NAMES[BsdasriPackagingType.Autre],
-              packaging.other ? `(${packaging.other})` : null,
-            ]
-              .filter(Boolean)
-              .join(" ")
-          : PACKAGINGS_NAMES[packaging.type];
-      return `${packaging.quantity} ${name}`;
-    })
-    .join(", ");
 
   const quantityByType = packagings.reduce((acc, packaging) => {
     if (acc[packaging.type] > 0) {
