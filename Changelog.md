@@ -11,6 +11,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Ajout du code 12 01 16\* pour les BSDA [PR 1478](https://github.com/MTES-MCT/trackdechets/pull/1478)
 - Ajout d'un filtre sur sur le type de BSDASRI dans la query `bsdasris` [PR 1479](https://github.com/MTES-MCT/trackdechets/pull/1479)
+- Ajout de la possibilité de rechercher des BSFFs par leurs numéros de contenant (dans l'interface Trackdéchets et par API) [PR 1510](https://github.com/MTES-MCT/trackdechets/pull/1510)
+
 #### :bug: Corrections de bugs
 - Correction d'un bug ne permettant pas au destinataire finale de créer un BSDD avec entreposage provisoire [PR 1498](https://github.com/MTES-MCT/trackdechets/pull/1498)
 - Correction de la navigation entre les onglets du tableau de bord lors de certaines actions [PR 1469](https://github.com/MTES-MCT/trackdechets/pull/1469)
@@ -18,6 +20,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
+- Gestion des volumes représentés par des nombres décimaux sur les BSDASRIs [PR 1506](https://github.com/MTES-MCT/trackdechets/pull/1506)
 
 #### :memo: Documentation
 
