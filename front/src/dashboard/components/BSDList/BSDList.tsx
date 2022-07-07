@@ -17,6 +17,7 @@ import styles from "./BSDList.module.scss";
 import { BSDTable } from "./BSDTable";
 import { Column, COLUMNS } from "./columns";
 import { BSDDropdown } from "./BSDDropdown";
+import { useNotifier } from "./useNotifier";
 
 const DEFAULT_COLUMNS = [
   COLUMNS.type,
@@ -81,6 +82,8 @@ export function BSDList({
     fetchPolicy: "cache-and-network",
     notifyOnNetworkStatusChange: true,
   });
+
+  useNotifier(siret, refetch);
 
   // show the blankslate if the query returns no results without any filters
   // because if it returns no results with filters applied, it doesn't mean there are no results at all

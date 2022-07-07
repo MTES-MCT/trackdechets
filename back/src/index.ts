@@ -1,6 +1,6 @@
 import { initSubscriptions } from "./events";
 import { app, startApolloServer } from "./server";
-import { closeMailQueue } from "./queue/producer";
+import { closeMailQueue } from "./queue/producers/mail";
 
 const port = process.env.API_PORT || 80;
 

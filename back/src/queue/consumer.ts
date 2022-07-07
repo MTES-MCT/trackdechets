@@ -1,13 +1,16 @@
-import { mailQueue } from "./producer";
-import sendMailJob from "./jobs/sendmail";
+import { sendMailJob, indexBsdJob } from "./jobs";
+import { mailQueue } from "./producers/mail";
+import { indexQueue } from "./producers/elastic";
 
 const { REDIS_URL, QUEUE_NAME_SENDMAIL } = process.env;
 
-/**
- * Script for launching an independant process for jobs
- */
-mailQueue.process(sendMailJob);
+function startConsumers() {
+  console.info(
+    `Queue process worker started listening to queue: ${QUEUE_NAME_SENDMAIL} on ${REDIS_URL}`
+  );
 
-console.log(
-  `Worker started listening to queue: ${QUEUE_NAME_SENDMAIL} on ${REDIS_URL}`
-);
+  mailQueue.process(sendMailJob);
+  indexQueue.process(indexBsdJob);
+}
+
+startConsumers();

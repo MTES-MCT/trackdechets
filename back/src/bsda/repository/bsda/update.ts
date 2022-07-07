@@ -1,7 +1,7 @@
 import { Bsda, Prisma } from "@prisma/client";
 import { LogMetadata, RepositoryFnDeps } from "../../../forms/repository/types";
 import { GraphQLContext } from "../../../types";
-import { indexBsda } from "../../elastic";
+import { addBsdaToIndexQueue, indexBsda } from "../../elastic";
 
 export type UpdateBsdaFn = (
   where: Prisma.BsdaWhereUniqueInput,
@@ -38,7 +38,7 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
       });
     }
 
-    await indexBsda(bsda, { user } as GraphQLContext);
+    await addBsdaToIndexQueue(bsda);
 
     return bsda;
   };

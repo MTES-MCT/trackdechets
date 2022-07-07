@@ -5,7 +5,7 @@ import { Mail } from "../../mailer/types";
 
 const Sentry = initSentry();
 
-export default async function sendMailJob(job: Job<Mail>) {
+export async function sendMailJob(job: Job<Mail>) {
   try {
     return sendMailSync(job.data);
   } catch (err) {

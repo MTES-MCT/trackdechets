@@ -1,7 +1,7 @@
 import { createBullBoard } from "@bull-board/api";
 import { BullAdapter } from "@bull-board/api/bullAdapter";
 import { ExpressAdapter } from "@bull-board/express";
-import { mailQueue } from "./producer";
+import { mailQueue } from "./producers/mail";
 
 export const serverAdapter = new ExpressAdapter();
 export const bullBoardPath = `/queue/monitor/${process.env.QUEUE_MONITOR_TOKEN}`;
