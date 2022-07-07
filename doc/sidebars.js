@@ -4,9 +4,7 @@ const graphqlTypes = [
   "queries",
   "mutations",
   "objects",
-  "interfaces",
   "enums",
-  "unions",
   "inputObjects",
   "scalars",
 ];
