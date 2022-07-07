@@ -15,7 +15,7 @@ import {
   BsdaInput,
 } from "generated/graphql/types";
 import React, { ReactElement, useMemo } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import initialState from "./initial-state";
 import { CREATE_BSDA, UPDATE_BSDA, GET_BSDA } from "./queries";
 import omitDeep from "omit-deep-lodash";

@@ -311,7 +311,19 @@ export default function CompanySelector({
     return () => {
       clearTimeout(timeoutID);
     };
-  }, [clue, department, searchResults]);
+  }, [
+    clue,
+    department,
+    searchResults,
+    allowForeignCompanies,
+    field.name,
+    forceManualForeignCompanyForm,
+    refetchFavorites,
+    searchCompaniesQuery,
+    searchCompany,
+    setFieldError,
+    setFieldValue,
+  ]);
 
   if (isLoadingFavorites) {
     return <p>Chargement...</p>;

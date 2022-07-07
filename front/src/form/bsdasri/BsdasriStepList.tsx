@@ -21,7 +21,7 @@ import {
 } from "generated/graphql/types";
 import omitDeep from "omit-deep-lodash";
 import React, { ReactElement, useMemo } from "react";
-import { useHistory, useParams } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import getInitialState from "./utils/initial-state";
 import {
   CREATE_DRAFT_BSDASRI,
