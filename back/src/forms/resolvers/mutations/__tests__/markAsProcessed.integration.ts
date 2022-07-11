@@ -684,7 +684,7 @@ describe("mutation.markAsProcessed", () => {
     ]);
   });
 
-  it.only("should not allow a temp storer to call markAsProcessed", async () => {
+  it("should not allow a temp storer to call markAsProcessed", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const tempStorer = await userWithCompanyFactory("MEMBER");
     const destination = await userWithCompanyFactory("MEMBER");

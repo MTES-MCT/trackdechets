@@ -675,7 +675,7 @@ describe("Test Form reception", () => {
     expect(appendix2Forms).toEqual([]);
   });
 
-  it.only("should not allow a temp storer to call markAsReceived", async () => {
+  it("should not allow a temp storer to call markAsReceived", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const tempStorer = await userWithCompanyFactory("MEMBER");
     const destination = await userWithCompanyFactory("MEMBER");
@@ -685,7 +685,10 @@ describe("Test Form reception", () => {
         recipientCompanySiret: tempStorer.company.siret,
         status: "RESENT"
       },
-      forwardedInOpts: { recipientCompanySiret: destination.company.siret }
+      forwardedInOpts: {
+        recipientCompanySiret: destination.company.siret,
+        emittedAt: new Date()
+      }
     });
     const { mutate } = makeClient(tempStorer.user);
     const { errors } = await mutate<
@@ -698,7 +701,7 @@ describe("Test Form reception", () => {
           wasteAcceptationStatus: "ACCEPTED",
           receivedAt: new Date("2022-01-01").toISOString() as any,
           receivedBy: "John",
-          quantityReceived: 0
+          quantityReceived: 1
         }
       }
     });

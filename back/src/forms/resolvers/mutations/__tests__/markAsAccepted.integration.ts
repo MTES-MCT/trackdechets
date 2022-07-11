@@ -5,7 +5,6 @@ import {
   WasteAcceptationStatus
 } from "@prisma/client";
 import { format } from "date-fns";
-import { date } from "yup";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { allowedFormats } from "../../../../common/dates";
 import {
@@ -440,7 +439,7 @@ describe("Test Form reception", () => {
     expect(appendix2Forms).toEqual([]);
   });
 
-  it.only("should not allow a temp storer to call markAsAccepted", async () => {
+  it("should not allow a temp storer to call markAsAccepted", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const tempStorer = await userWithCompanyFactory("MEMBER");
     const destination = await userWithCompanyFactory("MEMBER");
