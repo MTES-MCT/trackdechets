@@ -10,9 +10,8 @@ export function useNotifier(siret: string, callback: () => Promise<any>) {
 
     const source = new EventSource(`${host}/updates/${siret}`);
 
-    source.addEventListener("message", e => {
-      callback();
-    });
+    source.addEventListener("open", callback);
+    source.addEventListener("message", callback);
 
     return () => {
       source.close();

@@ -1,10 +1,10 @@
 import axios from "axios";
-import sendMailJob from "../jobs/sendmail";
+import { sendMailJob } from "../jobs/sendmail";
 import templateIds from "../../mailer/templates/provider/templateIds";
 import * as mailing from "../../mailer/mailing";
 import { Mail } from "../../mailer/types";
-import * as producer from "../producer";
-import { mailQueue } from "../producer";
+import * as producer from "../producers/mail";
+import { mailQueue } from "../producers/mail";
 import { backend } from "../../mailer";
 
 // Intercept calls
