@@ -7,7 +7,8 @@ import {
   BsffFicheIntervention,
   BsffStatus,
   BsffType,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  Prisma
 } from "@prisma/client";
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { OPERATION, WASTE_CODES } from "./constants";
@@ -17,125 +18,356 @@ import {
   isSiret,
   isFRVat
 } from "../common/constants/companySearchHelpers";
+import { FactorySchemaOf } from "../common/yup/configureYup";
 
-const bsffSchema: yup.SchemaOf<
-  Pick<
-    Bsff,
-    | "isDraft"
-    | "emitterCompanyName"
-    | "emitterCompanySiret"
-    | "emitterCompanyAddress"
-    | "emitterCompanyContact"
-    | "emitterCompanyPhone"
-    | "emitterCompanyMail"
-    | "wasteCode"
-    | "wasteAdr"
-    | "weightValue"
-    | "destinationPlannedOperationCode"
-  >
-> = yup.object({
-  isDraft: yup.boolean().nullable(),
-  emitterCompanyName: yup
-    .string()
-    .nullable()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required("Le nom de l'entreprise émettrice est requis")
-    }),
-  emitterCompanySiret: yup
-    .string()
-    .nullable()
-    .length(
-      14,
-      "Le SIRET de l'entreprise émettrice n'est pas au bon format (${length} caractères)"
-    )
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required("Le SIRET de l'entreprise émettrice est requis")
-    }),
-  emitterCompanyAddress: yup
-    .string()
-    .nullable()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required("L'adresse de l'entreprise émettrice est requise")
-    }),
-  emitterCompanyContact: yup
-    .string()
-    .nullable()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required(
-          "Le nom du contact dans l'entreprise émettrice est requis"
-        )
-    }),
-  emitterCompanyPhone: yup
-    .string()
-    .nullable()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required(
-          "Le numéro de téléphone de l'entreprise émettrice est requis"
-        )
-    }),
-  emitterCompanyMail: yup
-    .string()
-    .nullable()
-    .email()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema =>
-        schema.required("L'adresse email de l'entreprise émettrice est requis")
-    }),
-  wasteCode: yup
-    .string()
+type Emitter = Pick<
+  Prisma.BsffCreateInput,
+  | "emitterCompanyName"
+  | "emitterCompanySiret"
+  | "emitterCompanyAddress"
+  | "emitterCompanyContact"
+  | "emitterCompanyPhone"
+  | "emitterCompanyMail"
+>;
+
+type Destination = Pick<
+  Prisma.BsffCreateInput,
+  | "destinationCompanyName"
+  | "destinationCompanySiret"
+  | "destinationCompanyAddress"
+  | "destinationCompanyContact"
+  | "destinationCompanyPhone"
+  | "destinationCompanyMail"
+  | "destinationPlannedOperationCode"
+  | "destinationCap"
+>;
+
+type Transporter = Pick<
+  Prisma.BsffCreateInput,
+  | "transporterCompanyName"
+  | "transporterCompanySiret"
+  | "transporterCompanyVatNumber"
+  | "transporterCompanyAddress"
+  | "transporterCompanyContact"
+  | "transporterCompanyPhone"
+  | "transporterCompanyMail"
+  | "transporterRecepisseNumber"
+  | "transporterRecepisseDepartment"
+  | "transporterRecepisseValidityLimit"
+>;
+
+type WasteDetails = Pick<
+  Prisma.BsffCreateInput,
+  | "wasteCode"
+  | "wasteDescription"
+  | "wasteAdr"
+  | "weightValue"
+  | "weightIsEstimate"
+> & { packagings?: Omit<BsffPackaging, "__typename">[] };
+
+type Transport = Pick<
+  Prisma.BsffCreateInput,
+  "transporterTransportMode" | "transporterTransportTakenOverAt"
+>;
+
+type Reception = Pick<
+  Prisma.BsffCreateInput,
+  | "destinationReceptionDate"
+  | "destinationReceptionWeight"
+  | "destinationReceptionAcceptationStatus"
+  | "destinationReceptionRefusalReason"
+>;
+
+type Operation = Pick<
+  Prisma.BsffCreateInput,
+  | "destinationOperationCode"
+  | "destinationOperationNextDestinationCompanyName"
+  | "destinationOperationNextDestinationCompanySiret"
+  | "destinationOperationNextDestinationCompanyVatNumber"
+  | "destinationOperationNextDestinationCompanyAddress"
+  | "destinationOperationNextDestinationCompanyContact"
+  | "destinationOperationNextDestinationCompanyPhone"
+  | "destinationOperationNextDestinationCompanyMail"
+>;
+
+const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
+  yup.object({
+    emitterCompanyName: yup
+      .string()
+      .requiredIf(!isDraft, "Le nom de l'entreprise émettrice est requis"),
+    emitterCompanySiret: yup
+      .string()
+      .length(
+        14,
+        "Le SIRET de l'entreprise émettrice n'est pas au bon format (${length} caractères)"
+      )
+      .requiredIf(!isDraft, "Le SIRET de l'entreprise émettrice est requis"),
+    emitterCompanyAddress: yup
+      .string()
+      .requiredIf(!isDraft, "L'adresse de l'entreprise émettrice est requise"),
+
+    emitterCompanyContact: yup
+      .string()
+      .requiredIf(
+        !isDraft,
+        "Le nom du contact dans l'entreprise émettrice est requis"
+      ),
+    emitterCompanyPhone: yup
+      .string()
+      .requiredIf(
+        !isDraft,
+        "Le numéro de téléphone de l'entreprise émettrice est requis"
+      ),
+    emitterCompanyMail: yup
+      .string()
+      .email()
+      .requiredIf(
+        !isDraft,
+        "L'adresse email de l'entreprise émettrice est requis"
+      )
+  });
+
+const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> = isDraft =>
+  yup.object({
+    transporterCompanyName: yup
+      .string()
+      .requiredIf(!isDraft, "Le nom du transporteur est requis"),
+    transporterCompanySiret: yup
+      .string()
+      .ensure()
+      .when("transporterCompanyVatNumber", (tva, schema) => {
+        if (!tva && !isDraft) {
+          return schema
+            .required(
+              `Transporteur : "Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"`
+            )
+            .test(
+              "is-siret",
+              "${path} n'est pas un numéro de SIRET valide",
+              value => isSiret(value)
+            );
+        }
+        if (!isDraft && tva && isFRVat(tva)) {
+          return schema.required(
+            "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
+          );
+        }
+        return schema.nullable().notRequired();
+      }),
+    transporterCompanyVatNumber: yup
+      .string()
+      .ensure()
+      .test(
+        "is-vat",
+        "${path} n'est pas un numéro de TVA intracommunautaire valide",
+        value => !value || isVat(value)
+      ),
+    transporterCompanyAddress: yup
+      .string()
+      .nullable()
+      .required("L'adresse du transporteur est requise"),
+    transporterCompanyContact: yup
+      .string()
+      .nullable()
+      .required("Le nom du contact dans l'entreprise émettrice est requis"),
+    transporterCompanyPhone: yup
+      .string()
+      .nullable()
+      .required("Le numéro de téléphone du transporteur est requis"),
+    transporterCompanyMail: yup
+      .string()
+      .nullable()
+      .email()
+      .required("L'adresse email du transporteur est requis"),
+    transporterRecepisseNumber: yup.string().requiredIf(!isDraft),
+    transporterRecepisseDepartment: yup.string().requiredIf(!isDraft),
+    transporterRecepisseValidityLimit: yup.date().requiredIf(!isDraft)
+  });
+
+const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
+  yup.object({
+    wasteCode: yup
+      .string()
+      .nullable()
+      .oneOf(
+        [null, ...WASTE_CODES],
+        "Le code déchet ne fait pas partie de la liste reconnue : ${values}"
+      )
+      .requiredIf(!isDraft, "Le code déchet est requis"),
+    wasteDescription: yup.string(),
+    wasteAdr: yup.string().requiredIf(!isDraft, "La mention ADR est requise"),
+    weightValue: yup
+      .number()
+      .requiredIf(!isDraft, "Le poids total du déchet est requis"),
+    weightIsEstimate: yup.boolean(),
+    packagings: yup
+      .array()
+      .nullable()
+      .of<yup.SchemaOf<Omit<BsffPackaging, "__typename">>>(
+        yup.object({
+          name: yup
+            .string()
+            .nullable()
+            .required("La dénomination du contenant est requise"),
+          volume: yup.number().nullable(),
+          numero: yup
+            .string()
+            .nullable()
+            .required("Le numéro identifiant du contenant est requis"),
+          weight: yup
+            .number()
+            .nullable()
+            .required("Le poids du contenant est requis")
+        })
+      )
+      .required("Le conditionnement est requis")
+  });
+
+const destinationSchemaFn: FactorySchemaOf<boolean, Destination> = isDraft =>
+  yup.object({
+    destinationCompanyName: yup
+      .string()
+      .nullable()
+      .requiredIf(
+        !isDraft,
+        "Le nom de l'installation de destination est requis"
+      ),
+    destinationCompanySiret: yup
+      .string()
+      .length(
+        14,
+        "Le SIRET de l'installation de destination n'est pas au bon format (${length} caractères)"
+      )
+      .requiredIf(
+        !isDraft,
+        "Le SIRET de l'installation de destination est requis"
+      ),
+    destinationCompanyAddress: yup
+      .string()
+      .requiredIf(
+        !isDraft,
+        "L'adresse de l'installation de destination est requise"
+      ),
+    destinationCompanyContact: yup
+      .string()
+      .requiredIf(
+        !isDraft,
+        "Le nom du contact dans l'entreprise émettrice est requis"
+      ),
+    destinationCompanyPhone: yup
+      .string()
+      .requiredIf(
+        !isDraft,
+        "Le numéro de téléphone de l'installation de destination est requis"
+      ),
+    destinationCompanyMail: yup
+      .string()
+      .email()
+      .requiredIf(
+        !isDraft,
+        "L'adresse email de l'installation de destination est requis"
+      ),
+    destinationPlannedOperationCode: yup
+      .string()
+      .nullable()
+      .oneOf(
+        [null, ...Object.keys(OPERATION)],
+        "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
+      )
+      .requiredIf(!isDraft),
+    destinationCap: yup.string().requiredIf(!isDraft)
+  });
+
+const transportSchema: yup.SchemaOf<Transport> = yup.object({
+  transporterTransportMode: yup
+    .mixed<TransportMode>()
     .nullable()
     .oneOf(
-      [null, ...WASTE_CODES],
-      "Le code déchet ne fait pas partie de la liste reconnue : ${values}"
+      [null, ...Object.values(TransportMode)],
+      "Le mode de transport ne fait pas partie de la liste reconnue : ${values}"
     )
-    .when("isDraft", {
-      is: true,
-      otherwise: schema => schema.required("Le code déchet est requis")
-    }),
-  wasteAdr: yup
-    .string()
+    .required("Le mode de transport utilisé par le transporteur est requis"),
+  transporterTransportTakenOverAt: yup.date().required()
+});
+
+const receptionSchema: yup.SchemaOf<Reception> = yup.object({
+  destinationReceptionDate: yup
+    .date()
     .nullable()
-    .when("isDraft", {
-      is: true,
-      otherwise: schema => schema.required("La mention ADR est requise")
-    }),
-  weightValue: yup
+    .required("La date de réception du déchet est requise") as any, // https://github.com/jquense/yup/issues/1302
+  destinationReceptionAcceptationStatus: yup
+    .mixed<WasteAcceptationStatus>()
+    .required()
+    .notOneOf(
+      [WasteAcceptationStatus.PARTIALLY_REFUSED],
+      "Le refus partiel n'est pas autorisé dans le cas d'un BSFF"
+    ),
+  destinationReceptionRefusalReason: yup
+    .string()
+    .when(
+      "destinationReceptionAcceptationStatus",
+      (acceptationStatus, schema) =>
+        acceptationStatus === WasteAcceptationStatus.REFUSED
+          ? schema.ensure().required("Vous devez saisir un motif de refus")
+          : schema
+              .ensure()
+              .max(
+                0,
+                "Le motif du refus ne doit pas être renseigné si le déchet est accepté"
+              )
+    ),
+  destinationReceptionWeight: yup
     .number()
     .nullable()
-    .when("isDraft", {
-      is: true,
+    .required("Le poids en kilos du déchet reçu est requis")
+    .when("destinationReceptionAcceptationStatus", {
+      is: value => value === WasteAcceptationStatus.REFUSED,
+      then: schema =>
+        schema.oneOf(
+          [0],
+          "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
+        ),
       otherwise: schema =>
-        schema.required("Le poids total du déchet est requis")
-    }),
-  destinationPlannedOperationCode: yup
-    .string()
-    .nullable()
-    .oneOf(
-      [null, ...Object.keys(OPERATION)],
-      "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
-    )
+        schema.positive("Vous devez saisir une quantité reçue supérieure à 0")
+    })
 });
+
+const operationSchema: yup.SchemaOf<Operation> = yup.object({
+  destinationOperationCode: yup
+    .string()
+    .oneOf(
+      Object.keys(OPERATION),
+      "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : ${values}"
+    ),
+  destinationOperationNextDestinationCompanyName: yup.string().nullable(),
+  destinationOperationNextDestinationCompanySiret: yup.string().nullable(),
+  destinationOperationNextDestinationCompanyVatNumber: yup.string().nullable(),
+  destinationOperationNextDestinationCompanyAddress: yup.string().nullable(),
+  destinationOperationNextDestinationCompanyContact: yup.string().nullable(),
+  destinationOperationNextDestinationCompanyPhone: yup.string().nullable(),
+  destinationOperationNextDestinationCompanyMail: yup.string().nullable()
+});
+
+// validation schema for BSFF before it can be published
+const baseBsffSchemaFn = (isDraft: boolean) =>
+  emitterSchemaFn(isDraft)
+    .concat(wasteDetailsSchemaFn(isDraft))
+    .concat(transporterSchemaFn(isDraft))
+    .concat(destinationSchemaFn(isDraft));
+
+export const bsffSchema = baseBsffSchemaFn(false);
+export const draftBsffSchema = baseBsffSchemaFn(true);
 
 export async function validateBsff(
   bsff: SetOptional<
-    Pick<Bsff, "id" | "type" | "emitterCompanySiret">,
+    Pick<Bsff, "id" | "isDraft" | "type" | "emitterCompanySiret">,
     "emitterCompanySiret"
   > & { packagings?: BsffPackaging[] },
   previousBsffs: Bsff[],
   ficheInterventions: BsffFicheIntervention[]
 ) {
-  await bsffSchema.validate(bsff, {
+  const validationSchema = bsff.isDraft ? draftBsffSchema : bsffSchema;
+  await validationSchema.validate(bsff, {
     abortEarly: false
   });
   await validatePreviousBsffs(bsff, previousBsffs);
@@ -261,24 +493,24 @@ async function validateFicheInterventions(
   }
 }
 
-const beforeEmissionSchema: yup.SchemaOf<
-  Pick<Bsff, "isDraft" | "emitterEmissionSignatureDate">
-> = yup.object({
-  isDraft: yup
-    .boolean()
-    .oneOf(
-      [false],
-      "Il n'est pas possible de signer un BSFF à l'état de brouillon"
-    ),
-  emitterEmissionSignatureDate: yup
-    .date()
-    .nullable()
-    .test(
-      "is-not-signed",
-      "L'entreprise émettrice a déjà signé ce bordereau",
-      value => value == null
-    ) as any // https://github.com/jquense/yup/issues/1302
-});
+const beforeEmissionSchema = bsffSchema.concat(
+  yup.object({
+    isDraft: yup
+      .boolean()
+      .oneOf(
+        [false],
+        "Il n'est pas possible de signer un BSFF à l'état de brouillon"
+      ),
+    emitterEmissionSignatureDate: yup
+      .date()
+      .nullable()
+      .test(
+        "is-not-signed",
+        "L'entreprise émettrice a déjà signé ce bordereau",
+        value => value == null
+      ) as any // https://github.com/jquense/yup/issues/1302
+  })
+);
 
 export function validateBeforeEmission(
   bsff: typeof beforeEmissionSchema["__outputType"]
@@ -288,109 +520,24 @@ export function validateBeforeEmission(
   });
 }
 
-const beforeTransportSchema: yup.SchemaOf<
-  Pick<
-    Bsff,
-    | "transporterCompanyName"
-    | "transporterCompanySiret"
-    | "transporterCompanyVatNumber"
-    | "transporterCompanyAddress"
-    | "transporterCompanyContact"
-    | "transporterCompanyPhone"
-    | "transporterCompanyMail"
-    | "emitterEmissionSignatureDate"
-    | "transporterTransportSignatureDate"
-    | "transporterTransportMode"
-  > & {
-    packagings?: Pick<BsffPackaging, "numero" | "volume" | "name" | "weight">[];
-  }
-> = yup.object({
-  packagings: yup
-    .array()
-    .nullable()
-    .of<yup.SchemaOf<Omit<BsffPackaging, "__typename">>>(
-      yup.object({
-        name: yup
-          .string()
-          .nullable()
-          .required("La dénomination du contenant est requise"),
-        volume: yup.number().nullable(),
-        numero: yup
-          .string()
-          .nullable()
-          .required("Le numéro identifiant du contenant est requis"),
-        weight: yup
-          .number()
-          .nullable()
-          .required("Le poids du contenant est requis")
-      })
-    )
-    .required("Le conditionnement est requis"),
-  transporterCompanyName: yup
-    .string()
-    .nullable()
-    .required("Le nom du transporteur est requis"),
-  transporterCompanySiret: yup
-    .string()
-    .ensure()
-    .when("transporterCompanyVatNumber", (tva, schema) => {
-      if (!tva) {
-        return schema.test(
-          "is-siret",
-          "${path} n'est pas un numéro de SIRET valide",
-          value => isSiret(value)
-        );
-      }
-      return schema.nullable().notRequired();
-    }),
-  transporterCompanyVatNumber: yup
-    .string()
-    .ensure()
-    .test(
-      "is-vat",
-      "${path} n'est pas un numéro de TVA intracommunautaire valide",
-      value => !value || (isVat(value) && !isFRVat(value))
-    ),
-  transporterCompanyAddress: yup
-    .string()
-    .nullable()
-    .required("L'adresse du transporteur est requise"),
-  transporterCompanyContact: yup
-    .string()
-    .nullable()
-    .required("Le nom du contact dans l'entreprise émettrice est requis"),
-  transporterCompanyPhone: yup
-    .string()
-    .nullable()
-    .required("Le numéro de téléphone du transporteur est requis"),
-  transporterCompanyMail: yup
-    .string()
-    .nullable()
-    .email()
-    .required("L'adresse email du transporteur est requis"),
-  emitterEmissionSignatureDate: yup
-    .date()
-    .nullable()
-    .required(
-      "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
-    ) as any, // https://github.com/jquense/yup/issues/1302
-  transporterTransportSignatureDate: yup
-    .date()
-    .nullable()
-    .test(
-      "is-not-signed",
-      "Le transporteur a déjà signé ce bordereau",
-      value => value == null
-    ) as any, // https://github.com/jquense/yup/issues/1302
-  transporterTransportMode: yup
-    .mixed<TransportMode>()
-    .nullable()
-    .oneOf(
-      [null, ...Object.values(TransportMode)],
-      "Le mode de transport ne fait pas partie de la liste reconnue : ${values}"
-    )
-    .required("Le mode de transport utilisé par le transporteur est requis")
-});
+const beforeTransportSchema = bsffSchema.concat(transportSchema).concat(
+  yup.object({
+    emitterEmissionSignatureDate: yup
+      .date()
+      .nullable()
+      .required(
+        "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
+      ) as any, // https://github.com/jquense/yup/issues/1302
+    transporterTransportSignatureDate: yup
+      .date()
+      .nullable()
+      .test(
+        "is-not-signed",
+        "Le transporteur a déjà signé ce bordereau",
+        value => value == null
+      ) as any // https://github.com/jquense/yup/issues/1302
+  })
+);
 
 export function validateBeforeTransport(
   bsff: typeof beforeTransportSchema["__outputType"]
@@ -400,106 +547,27 @@ export function validateBeforeTransport(
   });
 }
 
-export const beforeReceptionSchema: yup.SchemaOf<
-  Pick<
-    Bsff,
-    | "destinationCompanyName"
-    | "destinationCompanySiret"
-    | "destinationCompanyAddress"
-    | "destinationCompanyContact"
-    | "destinationCompanyPhone"
-    | "destinationCompanyMail"
-    | "transporterTransportSignatureDate"
-    | "destinationReceptionSignatureDate"
-    | "destinationReceptionDate"
-    | "destinationReceptionWeight"
-  >
-> = yup.object({
-  destinationCompanyName: yup
-    .string()
-    .nullable()
-    .required("Le nom de l'installation de destination est requis"),
-  destinationCompanySiret: yup
-    .string()
-    .nullable()
-    .length(
-      14,
-      "Le SIRET de l'installation de destination n'est pas au bon format (${length} caractères)"
-    )
-    .required("Le SIRET de l'installation de destination est requis"),
-  destinationCompanyAddress: yup
-    .string()
-    .nullable()
-    .required("L'adresse de l'installation de destination est requise"),
-  destinationCompanyContact: yup
-    .string()
-    .nullable()
-    .required("Le nom du contact dans l'entreprise émettrice est requis"),
-  destinationCompanyPhone: yup
-    .string()
-    .nullable()
-    .required(
-      "Le numéro de téléphone de l'installation de destination est requis"
-    ),
-  destinationCompanyMail: yup
-    .string()
-    .nullable()
-    .email()
-    .required("L'adresse email de l'installation de destination est requis"),
-  transporterTransportSignatureDate: yup
-    .date()
-    .nullable()
-    .required(
-      "L'installation de destination ne peut pas signer la réception avant que le transporteur ait signé le bordereau"
-    ) as any, // https://github.com/jquense/yup/issues/1302
-  destinationReceptionSignatureDate: yup
-    .date()
-    .nullable()
-    .test(
-      "is-not-signed",
-      "L'installation de destination a déjà signé la réception du déchet",
-      value => value == null
-    ) as any, // https://github.com/jquense/yup/issues/1302
-  destinationReceptionDate: yup
-    .date()
-    .nullable()
-    .required("La date de réception du déchet est requise") as any, // https://github.com/jquense/yup/issues/1302
-  destinationReceptionAcceptationStatus: yup
-    .mixed<WasteAcceptationStatus>()
-    .required()
-    .notOneOf(
-      [WasteAcceptationStatus.PARTIALLY_REFUSED],
-      "Le refus partiel n'est pas autorisé dans le cas d'un BSFF"
-    ),
-  destinationReceptionRefusalReason: yup
-    .string()
-    .when(
-      "destinationReceptionAcceptationStatus",
-      (acceptationStatus, schema) =>
-        acceptationStatus === WasteAcceptationStatus.REFUSED
-          ? schema.ensure().required("Vous devez saisir un motif de refus")
-          : schema
-              .ensure()
-              .max(
-                0,
-                "Le motif du refus ne doit pas être renseigné si le déchet est accepté"
-              )
-    ),
-  destinationReceptionWeight: yup
-    .number()
-    .nullable()
-    .required("Le poids en kilos du déchet reçu est requis")
-    .when("destinationReceptionAcceptationStatus", {
-      is: value => value === WasteAcceptationStatus.REFUSED,
-      then: schema =>
-        schema.oneOf(
-          [0],
-          "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
-        ),
-      otherwise: schema =>
-        schema.positive("Vous devez saisir une quantité reçue supérieure à 0")
+export const beforeReceptionSchema = bsffSchema
+  .concat(transportSchema)
+  .concat(receptionSchema)
+  .concat(
+    yup.object({
+      transporterTransportSignatureDate: yup
+        .date()
+        .nullable()
+        .required(
+          "L'installation de destination ne peut pas signer la réception avant que le transporteur ait signé le bordereau"
+        ) as any, // https://github.com/jquense/yup/issues/1302
+      destinationReceptionSignatureDate: yup
+        .date()
+        .nullable()
+        .test(
+          "is-not-signed",
+          "L'installation de destination a déjà signé la réception du déchet",
+          value => value == null
+        ) as any // https://github.com/jquense/yup/issues/1302
     })
-});
+  );
 
 export function validateBeforeReception(
   bsff: typeof beforeReceptionSchema["__outputType"]
@@ -509,35 +577,28 @@ export function validateBeforeReception(
   });
 }
 
-const beforeOperationSchema: yup.SchemaOf<
-  Pick<
-    Bsff,
-    | "destinationReceptionSignatureDate"
-    | "destinationOperationSignatureDate"
-    | "destinationOperationCode"
-  >
-> = yup.object({
-  destinationReceptionSignatureDate: yup
-    .date()
-    .nullable()
-    .required(
-      "L'installation de destination ne peut pas signer le traitement avant la réception du déchet"
-    ) as any, // https://github.com/jquense/yup/issues/1302
-  destinationOperationSignatureDate: yup
-    .date()
-    .nullable()
-    .test(
-      "is-not-signed",
-      "L'installation de destination a déjà signé le traitement du déchet",
-      value => value == null
-    ) as any, // https://github.com/jquense/yup/issues/1302
-  destinationOperationCode: yup
-    .string()
-    .oneOf(
-      Object.keys(OPERATION),
-      "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : ${values}"
-    )
-});
+const beforeOperationSchema = bsffSchema
+  .concat(transportSchema)
+  .concat(receptionSchema)
+  .concat(operationSchema)
+  .concat(
+    yup.object({
+      destinationReceptionSignatureDate: yup
+        .date()
+        .nullable()
+        .required(
+          "L'installation de destination ne peut pas signer le traitement avant la réception du déchet"
+        ) as any, // https://github.com/jquense/yup/issues/1302
+      destinationOperationSignatureDate: yup
+        .date()
+        .nullable()
+        .test(
+          "is-not-signed",
+          "L'installation de destination a déjà signé le traitement du déchet",
+          value => value == null
+        ) as any // https://github.com/jquense/yup/issues/1302
+    })
+  );
 
 export function validateBeforeOperation(
   bsff: typeof beforeOperationSchema["__outputType"]
