@@ -40,7 +40,7 @@ export function Emitter({ disabled }) {
                 setFieldValue("emitter.company.siret", null);
               }}
             />
-            Le MO ou le détenteur est un particulier
+            Le MOA ou le détenteur est un particulier
           </label>
         </div>
       )}
