@@ -71,7 +71,22 @@ describe("companyInfos with SIRET", () => {
       companyTypes: [],
       installation: {
         codeS3ic: "0055.14316"
-      }
+      },
+      address: undefined,
+      allowBsdasriTakeOverWithoutSignature: undefined,
+      brokerReceipt: undefined,
+      codeCommune: undefined,
+      codePaysEtrangerEtablissement: undefined,
+      contact: undefined,
+      etatAdministratif: undefined,
+      libelleNaf: undefined,
+      naf: undefined,
+      statutDiffusionEtablissement: undefined,
+      traderReceipt: undefined,
+      transporterReceipt: undefined,
+      vatNumber: undefined,
+      vhuAgrementBroyeur: undefined,
+      vhuAgrementDemolisseur: undefined
     });
   });
 
@@ -89,7 +104,25 @@ describe("companyInfos with SIRET", () => {
       isRegistered: false,
       companyTypes: [],
       ecoOrganismeAgreements: [],
-      installation: undefined
+      installation: undefined,
+      address: undefined,
+      allowBsdasriTakeOverWithoutSignature: undefined,
+      brokerReceipt: undefined,
+      codeCommune: undefined,
+      codePaysEtrangerEtablissement: undefined,
+      contact: undefined,
+      contactEmail: undefined,
+      contactPhone: undefined,
+      etatAdministratif: undefined,
+      libelleNaf: undefined,
+      naf: undefined,
+      statutDiffusionEtablissement: undefined,
+      traderReceipt: undefined,
+      transporterReceipt: undefined,
+      vatNumber: undefined,
+      vhuAgrementBroyeur: undefined,
+      vhuAgrementDemolisseur: undefined,
+      website: undefined
     });
   });
 });
@@ -129,6 +162,7 @@ describe("companyInfos search with a VAT number", () => {
     const company = await getCompanyInfos("IT09301420155");
 
     expect(company).toStrictEqual({
+      siret: undefined,
       vatNumber: "IT09301420155",
       name: "Code en stock",
       address: "une adresse",
@@ -140,7 +174,18 @@ describe("companyInfos search with a VAT number", () => {
       ecoOrganismeAgreements: [],
       companyTypes: [],
       installation: undefined,
-      statutDiffusionEtablissement: "O"
+      statutDiffusionEtablissement: "O",
+      allowBsdasriTakeOverWithoutSignature: undefined,
+      brokerReceipt: undefined,
+      codeCommune: undefined,
+      contact: undefined,
+      etatAdministratif: undefined,
+      libelleNaf: undefined,
+      naf: undefined,
+      traderReceipt: undefined,
+      transporterReceipt: undefined,
+      vhuAgrementBroyeur: undefined,
+      vhuAgrementDemolisseur: undefined
     });
   });
 
@@ -155,6 +200,7 @@ describe("companyInfos search with a VAT number", () => {
     const company = await getCompanyInfos("IT09301420155");
 
     expect(company).toStrictEqual({
+      siret: undefined,
       vatNumber: "IT09301420155",
       name: "Code en stock",
       address: "une adresse",
@@ -163,7 +209,21 @@ describe("companyInfos search with a VAT number", () => {
       companyTypes: [],
       ecoOrganismeAgreements: [],
       installation: undefined,
-      statutDiffusionEtablissement: "O"
+      statutDiffusionEtablissement: "O",
+      allowBsdasriTakeOverWithoutSignature: undefined,
+      brokerReceipt: undefined,
+      codeCommune: undefined,
+      contact: undefined,
+      contactPhone: undefined,
+      contactEmail: undefined,
+      etatAdministratif: undefined,
+      libelleNaf: undefined,
+      naf: undefined,
+      traderReceipt: undefined,
+      transporterReceipt: undefined,
+      vhuAgrementBroyeur: undefined,
+      vhuAgrementDemolisseur: undefined,
+      website: undefined
     });
   });
 });

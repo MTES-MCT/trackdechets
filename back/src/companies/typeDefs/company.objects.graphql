@@ -200,6 +200,12 @@ type CompanySearchResult {
   etatAdministratif: String
   "Adresse de l'établissement"
   address: String
+  "Nom de la voie de l'adresse de l'établissement"
+  addressVoie: String
+  "Code Postal de l'adresse de l'établissement"
+  addressPostalCode: String
+  "Ville de l'adresse de l'établissement"
+  addressCity: String
   "Code commune de l'établissement"
   codeCommune: String
   "Nom de l'établissement"
@@ -265,6 +271,10 @@ type CompanySearchResult {
   Agrément VHU broyeur (le cas échéant, pour les profils VHU)
   """
   vhuAgrementBroyeur: VhuAgrement
+  """
+  Statut de diffusion des informations de l'établisement selon l'INSEE
+  """
+  statutDiffusionEtablissement: StatutDiffusionEtablissement
 }
 
 """
