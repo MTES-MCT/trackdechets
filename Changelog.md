@@ -12,6 +12,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout du code 12 01 16\* pour les BSDAs [PR 1478](https://github.com/MTES-MCT/trackdechets/pull/1478)
 - Ajout d'un filtre sur le type de BSDASRI dans la query `bsdasris` [PR 1479](https://github.com/MTES-MCT/trackdechets/pull/1479)
 - Ajout de la possibilité de rechercher des BSFFs par leurs numéros de contenant (dans l'interface Trackdéchets et par API) [PR 1510](https://github.com/MTES-MCT/trackdechets/pull/1510)
+- Interface d'ajout des intermédiaires sur BSDD [PR 1481](https://github.com/MTES-MCT/trackdechets/pull/1481)
+- La requête `searchCompanies` qui interroge la base SIRENE (via [les données ouvertes de l'INSEE](https://files.data.gouv.fr/insee-sirene/)), reconnaît désormais si `clue` est un numéro de TVA et interroge la base VIES (via [le service la commission européenne](https://ec.europa.eu/taxation_customs/vies/)) pour vérifier son existence et indiquer si l'établissement est inscrit ou non sur Trackdéchets. [PR 1481](https://github.com/MTES-MCT/trackdechets/pull/1481)
+- Ajout de `FormInput.intermediaries: [CompanyInput!]` [PR 1481](https://github.com/MTES-MCT/trackdechets/pull/1481)
 
 #### :bug: Corrections de bugs
 - Correction d'un bug ne permettant pas au destinataire finale de créer un BSDD avec entreposage provisoire [PR 1498](https://github.com/MTES-MCT/trackdechets/pull/1498)

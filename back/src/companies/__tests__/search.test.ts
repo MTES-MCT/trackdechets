@@ -107,7 +107,7 @@ describe("searchCompanies", () => {
     expect(companies[0]).toStrictEqual(company);
   });
 
-  it("should not call searchCompany when the clue is formatted like a VAT number", async () => {
+  it("should call searchCompany when the clue is formatted like a VAT number", async () => {
     const company = {
       siret: "11111111111111",
       vatNumber: "IT09301420155",
@@ -123,7 +123,7 @@ describe("searchCompanies", () => {
     };
     searchCompanyMock.mockResolvedValue(company);
     await searchCompanies("IT09301420155");
-    expect(searchCompanyMock).toHaveBeenCalledTimes(0);
+    expect(searchCompanyMock).toHaveBeenCalledTimes(1);
   });
 
   it(`should not return closed companies when searching by SIRET`, async () => {

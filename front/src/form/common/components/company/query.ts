@@ -10,6 +10,7 @@ export const FAVORITES = gql`
       contact
       phone
       mail
+      isRegistered
       codePaysEtrangerEtablissement
       transporterReceipt {
         receiptNumber
@@ -80,6 +81,8 @@ export const SEARCH_COMPANIES = gql`
       address
       etatAdministratif
       codePaysEtrangerEtablissement
+      isRegistered
+      contact
       installation {
         codeS3ic
         urlFiche

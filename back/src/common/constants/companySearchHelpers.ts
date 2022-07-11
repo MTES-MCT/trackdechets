@@ -70,31 +70,34 @@ export const countries = [
 ];
 
 /**
- * SIRET number validator
+ * Validateur de numéro de SIRETs
  */
 export const isSiret = (clue: string): boolean =>
   !!clue && /^[0-9]{14}$/.test(clue.replace(/\s/g, ""));
 
 /**
- * VAT validator
- * both rules are required, checkVat allows digit-only VAT numbers, may be confusing with SIRET
+ * Validateur de numéro de TVA
  */
 export const isVat = (clue: string): boolean => {
   if (!clue) return false;
-  const isRegexValid = checkVAT(clue.trim(), countries);
+  const cleanClue = clue.replace(/\s/g, "");
+  if (!cleanClue) return false;
+  const isRegexValid = checkVAT(cleanClue, countries);
   return isRegexValid.isValid;
 };
 
 /**
- * French VAT
+ * TVA Français
  */
 export const isFRVat = (clue: string): boolean => {
   if (!clue) return false;
-  return clue.replace(/\s/g, "").slice(0, 2).toUpperCase().startsWith("FR");
+  const cleanClue = clue.replace(/\s/g, "");
+  if (!cleanClue) return false;
+  return cleanClue.slice(0, 2).toUpperCase().startsWith("FR");
 };
 
 /**
- * OMI number is "OMI1234567" (7 numbers)
+ * Le numéro OMI est "OMI1234567" (7 chiffres)
  */
 export const isOmi = (clue: string): boolean => {
   if (!clue) return false;

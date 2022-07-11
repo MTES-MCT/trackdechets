@@ -1,7 +1,7 @@
 import parseArgs from "minimist";
 import prisma from "../../prisma";
 import { loadCompanies, loadRoles } from "./loaders";
-import { validateCompany, validateRoleGenerator } from "./validations";
+import { companyValidationSchema, validateRoleGenerator } from "./validations";
 import { sirenify } from "./sirene";
 import { hashPassword, generatePassword } from "../utils";
 import { randomNumber, getUIBaseURL, sanitizeEmail } from "../../utils";
@@ -78,7 +78,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
   for (const company of companiesRows) {
     console.info(`Validate company ${company.siret}`);
     try {
-      const validCompany = await validateCompany(company);
+      const validCompany = await companyValidationSchema.validate(company);
       companies.push(validCompany);
     } catch (err) {
       isValid = false;

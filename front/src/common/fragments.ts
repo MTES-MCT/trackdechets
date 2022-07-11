@@ -309,6 +309,9 @@ const mutableFieldsFragment = gql`
     transportSegments {
       ...Segment
     }
+    intermediaries {
+      ...CompanyFragment
+    }
   }
   ${traderFragment}
   ${brokerFragment}
@@ -318,6 +321,7 @@ const mutableFieldsFragment = gql`
   ${emitterFragment}
   ${recipientFragment}
   ${segmentFragment}
+  ${companyFragment}
 `;
 
 export const fullFormFragment = gql`
@@ -461,7 +465,7 @@ const wasteAcceptationFragment = gql`
 `;
 
 export const dashboardDasriFragment = gql`
-  fragment DasriFragment on Bsdasri {
+  fragment DashboardDasriFragment on Bsdasri {
     id
     bsdasriStatus: status
     type

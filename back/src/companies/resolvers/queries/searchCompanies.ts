@@ -1,4 +1,5 @@
 import { QueryResolvers } from "../../../generated/graphql/types";
+import prisma from "../../../prisma";
 import { searchCompanies } from "../../search";
 
 const searchCompaniesResolver: QueryResolvers["searchCompanies"] = async (
@@ -6,12 +7,21 @@ const searchCompaniesResolver: QueryResolvers["searchCompanies"] = async (
   { clue, department },
   context
 ) => {
-  const companies = await searchCompanies(clue, department);
-  return companies.map(async company => {
-    return {
+  return searchCompanies(clue, department).then(async results => {
+    let existingCompanies = [];
+    if (results.length) {
+      existingCompanies = await prisma.company.findMany({
+        where: {
+          siret: { in: results.map(r => r.siret) }
+        }
+      });
+    }
+
+    return results.map(async company => ({
       ...company,
+      isRegistered: existingCompanies.includes(company.siret),
       installation: await context.dataloaders.installations.load(company.siret)
-    };
+    }));
   });
 };
 

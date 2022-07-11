@@ -64,13 +64,6 @@ export const companyValidationSchema = yup.object({
 });
 
 /**
- * Validate company row extracted from etablissements.csv
- */
-export function validateCompany(company): Promise<any> {
-  return companyValidationSchema.validate(company);
-}
-
-/**
  * Validation schema generator for user roles
  * Email adresses should match one entry from utilisateurs.csv
  * SIRET should match one entry from etablissements.csv

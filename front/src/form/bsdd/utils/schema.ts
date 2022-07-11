@@ -19,9 +19,15 @@ import {
   Consistence,
   WasteAcceptationStatus,
   CompanyType,
+  CompanyInput,
 } from "generated/graphql/types";
 import graphlClient from "graphql-client";
 import { COMPANY_INFOS } from "form/common/components/company/query";
+import {
+  isVat,
+  isFRVat,
+  isSiret,
+} from "generated/constants/companySearchHelpers";
 
 setLocale({
   mixed: {
@@ -158,6 +164,36 @@ const packagingInfo: SchemaOf<Omit<
     ),
 });
 
+const intermediariesShape: SchemaOf<Omit<
+  CompanyInput,
+  "__typename"
+>> = object().shape({
+  siret: string()
+    .required("Intermédiaires: le N° SIRET est obligatoire")
+    .test(
+      "is-siret",
+      "Intermédiaires: le SIRET n'est pas valide (14 chiffres obligatoires)",
+      siret => !siret || isSiret(siret)
+    ),
+  contact: string().required(
+    "Intermédiaires: les nom et prénom de contact sont obligatoires"
+  ),
+  vatNumber: string()
+    .notRequired()
+    .nullable()
+    .test(
+      "is-fr-vat",
+      "Intermédiaires: seul les numéros de TVA en France sont valides",
+      vat => !vat || (isVat(vat) && isFRVat(vat))
+    ),
+  address: string().notRequired().nullable(),
+  name: string().notRequired().nullable(),
+  phone: string().notRequired().nullable(),
+  mail: string().notRequired().nullable(),
+  country: string().notRequired().nullable(), // ignored only for compat with CompanyInput
+  omiNumber: string().notRequired().nullable(), // ignored only for compat with CompanyInput
+});
+
 export const formSchema = object().shape({
   id: string().required(),
   emitter: object().shape({
@@ -279,6 +315,7 @@ export const formSchema = object().shape({
         company: destinationSchema,
       }),
     }),
+  intermediaries: array().required().min(0).of(intermediariesShape),
 });
 
 export const receivedFormSchema = object().shape({
