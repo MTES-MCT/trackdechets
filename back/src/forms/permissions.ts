@@ -510,8 +510,8 @@ export async function checkMandatoryRegistrations(
       [
         formCompanies.transporterCompanySiret,
         formCompanies.recipientCompanySiret,
-        formCompanies.temporaryStorageDetail?.transporterCompanySiret,
-        formCompanies.temporaryStorageDetail?.destinationCompanySiret
+        formCompanies.forwardedIn?.transporterCompanySiret,
+        formCompanies.forwardedIn?.recipientCompanySiret
       ].filter(Boolean)
     )
   ];
