@@ -6,6 +6,7 @@ import * as mailsHelper from "../../../../mailer/mailing";
 import {
   companyFactory,
   formFactory,
+  formWithTempStorageFactory,
   transportSegmentFactory,
   userFactory,
   userWithCompanyFactory
@@ -672,5 +673,39 @@ describe("Test Form reception", () => {
     ).map(g => g.initialForm);
 
     expect(appendix2Forms).toEqual([]);
+  });
+
+  it.only("should not allow a temp storer to call markAsReceived", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const tempStorer = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const form = await formWithTempStorageFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        recipientCompanySiret: tempStorer.company.siret,
+        status: "RESENT"
+      },
+      forwardedInOpts: { recipientCompanySiret: destination.company.siret }
+    });
+    const { mutate } = makeClient(tempStorer.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "markAsReceived">,
+      MutationMarkAsReceivedArgs
+    >(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          wasteAcceptationStatus: "ACCEPTED",
+          receivedAt: new Date("2022-01-01").toISOString() as any,
+          receivedBy: "John",
+          quantityReceived: 0
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous n'êtes pas autorisé à réceptionner ce bordereau"
+      })
+    ]);
   });
 });
