@@ -23,7 +23,11 @@ import {
   PackagingInfo,
   Packagings
 } from "../generated/graphql/types";
-import { isCollector, isWasteProcessor } from "../companies/validation";
+import {
+  isCollector,
+  isWasteProcessor,
+  isTransporter
+} from "../companies/validation";
 import {
   MISSING_COMPANY_NAME,
   MISSING_COMPANY_SIRET,
@@ -1196,6 +1200,28 @@ export async function checkCanBeSealed(form: Form) {
   }
 }
 
+async function checkTransporter(siret: string) {
+  const company = await prisma.company.findUnique({
+    where: { siret }
+  });
+
+  if (!company) {
+    throw new UserInputError(
+      `Le transporter qui a été renseigné sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets`
+    );
+  }
+
+  if (!isTransporter(company)) {
+    throw new UserInputError(
+      `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.
+      Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur
+      de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+    );
+  }
+
+  return true;
+}
+
 /**
  * Check company in frame 2 is verified and registered with profile
  * COLLECTOR or WASTE_PROCESSOR or throw error
@@ -1285,6 +1311,7 @@ async function checkDestinationAfterTempStorage(siret: string) {
  */
 export async function checkCompaniesType(form: Form) {
   await checkDestination(form.recipientCompanySiret);
+  await checkTransporter(form.transporterCompanySiret);
 
   const forwardedIn = await prisma.form
     .findUnique({ where: { id: form.id } })
@@ -1292,6 +1319,9 @@ export async function checkCompaniesType(form: Form) {
 
   if (forwardedIn && forwardedIn.recipientCompanySiret) {
     await checkDestinationAfterTempStorage(forwardedIn.recipientCompanySiret);
+  }
+  if (forwardedIn && forwardedIn.transporterCompanySiret) {
+    await checkTransporter(forwardedIn.transporterCompanySiret);
   }
 
   return true;

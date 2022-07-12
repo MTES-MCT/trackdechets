@@ -13,14 +13,15 @@ import {
   flattenFormInput,
   flattenTemporaryStorageDetailInput
 } from "../../form-converter";
-import {
-  checkIsFormContributor,
-  checkMandatoryRegistrations
-} from "../../permissions";
+import { checkIsFormContributor } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
 import { FormCompanies } from "../../types";
-import { draftFormSchema, validateIntermediariesInput } from "../../validation";
+import {
+  checkCompaniesType,
+  draftFormSchema,
+  validateIntermediariesInput
+} from "../../validation";
 import { getFormOrFormNotFound } from "../../database";
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
@@ -88,9 +89,9 @@ const createFormResolver = async (
     formCompanies,
     "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
   );
-  await checkMandatoryRegistrations(formCompanies);
 
   const form = flattenFormInput(formContent);
+  await checkCompaniesType(form as Form);
 
   const readableId = getReadableId();
 

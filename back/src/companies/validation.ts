@@ -11,3 +11,7 @@ export function isCollector(company: Company) {
 export function isWasteProcessor(company: Company) {
   return company.companyTypes.includes(CompanyType.WASTEPROCESSOR);
 }
+
+export function isTransporter(company: Company) {
+  return company.companyTypes.includes(CompanyType.TRANSPORTER);
+}

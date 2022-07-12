@@ -501,32 +501,3 @@ export async function checkCanRequestRevision(
 
   return true;
 }
-
-export async function checkMandatoryRegistrations(
-  formCompanies: FormCompanies
-) {
-  const mustBeRegisteredSirets = [
-    ...new Set(
-      [
-        formCompanies.transporterCompanySiret,
-        formCompanies.recipientCompanySiret,
-        formCompanies.forwardedIn?.transporterCompanySiret,
-        formCompanies.forwardedIn?.recipientCompanySiret
-      ].filter(Boolean)
-    )
-  ];
-
-  const registeredCompanies = await prisma.company.findMany({
-    where: { siret: { in: mustBeRegisteredSirets } },
-    select: { siret: true }
-  });
-  const registeredSirets = registeredCompanies.map(c => c.siret);
-
-  // We need to remove duplicates
-  if (registeredSirets.length !== mustBeRegisteredSirets.length) {
-    const missingSirets = mustBeRegisteredSirets.filter(
-      siret => !registeredSirets.includes(siret)
-    );
-    throw new NotRegisteredCompany(missingSirets);
-  }
-}
