@@ -14,6 +14,7 @@ import {
 import prisma from "../../../../prisma";
 import {
   formFactory,
+  formWithTempStorageFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -436,5 +437,39 @@ describe("Test Form reception", () => {
     const appendix2Forms = groupement.map(g => g.initialForm);
 
     expect(appendix2Forms).toEqual([]);
+  });
+
+  it("should not allow a temp storer to call markAsAccepted", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const tempStorer = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const form = await formWithTempStorageFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        recipientCompanySiret: tempStorer.company.siret,
+        status: "RECEIVED"
+      },
+      forwardedInOpts: { recipientCompanySiret: destination.company.siret }
+    });
+    const { mutate } = makeClient(tempStorer.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "markAsAccepted">,
+      MutationMarkAsAcceptedArgs
+    >(MARK_AS_ACCEPTED, {
+      variables: {
+        id: form.id,
+        acceptedInfo: {
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: 1,
+          signedAt: new Date("2022-01-01").toISOString() as any,
+          signedBy: "John Snow"
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous n'êtes pas autorisé à marquer ce bordereau comme accepté"
+      })
+    ]);
   });
 });
