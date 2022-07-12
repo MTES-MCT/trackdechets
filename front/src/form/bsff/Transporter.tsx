@@ -28,25 +28,16 @@ export default function Transporter({ disabled }) {
         registeredOnlyCompanies={true}
         onCompanySelected={transporter => {
           if (transporter.transporterReceipt) {
-            setFieldValue(
-              "transporter.recepisse.number",
-              transporter.transporterReceipt.receiptNumber
-            );
-            setFieldValue(
-              "transporter.recepisse.validityLimit",
-              transporter.transporterReceipt.validityLimit
-            );
-            setFieldValue(
-              "transporter.recepisse.department",
-              transporter.transporterReceipt.department
-            );
+            setFieldValue("transporter.recepisse", {
+              receiptNumber: transporter.transporterReceipt.receiptNumber,
+              validityLimit: transporter.transporterReceipt.validityLimit,
+              departement: transporter.transporterReceipt.department,
+            });
           } else {
-            setFieldValue("transporter.recepisse.number", "");
             setFieldValue(
-              "transporter.recepisse.validityLimit",
-              initialState.transporter.recepisse.validityLimit
+              "transporter.recepisse",
+              initialState.transporter.recepisse
             );
-            setFieldValue("transporter.recepisse.department", "");
           }
         }}
       />

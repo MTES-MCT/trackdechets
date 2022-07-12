@@ -1,4 +1,3 @@
-import type { SetOptional } from "type-fest";
 import * as yup from "yup";
 import { UserInputError } from "apollo-server-express";
 import {
@@ -18,7 +17,9 @@ import {
   isSiret,
   isFRVat
 } from "../common/constants/companySearchHelpers";
-import { FactorySchemaOf } from "../common/yup/configureYup";
+import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
+
+configureYup();
 
 type Emitter = Pick<
   Prisma.BsffCreateInput,
@@ -39,7 +40,6 @@ type Destination = Pick<
   | "destinationCompanyPhone"
   | "destinationCompanyMail"
   | "destinationPlannedOperationCode"
-  | "destinationCap"
 >;
 
 type Transporter = Pick<
@@ -97,15 +97,14 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
       .requiredIf(!isDraft, "Le nom de l'entreprise émettrice est requis"),
     emitterCompanySiret: yup
       .string()
-      .length(
-        14,
-        "Le SIRET de l'entreprise émettrice n'est pas au bon format (${length} caractères)"
-      )
-      .requiredIf(!isDraft, "Le SIRET de l'entreprise émettrice est requis"),
+      .requiredIf(!isDraft, "Le SIRET de l'entreprise émettrice est requis")
+      .matches(/^$|^\d{14}$/, {
+        message:
+          "Le SIRET de l'entreprise émettrice n'est pas au bon format (${length} caractères)"
+      }),
     emitterCompanyAddress: yup
       .string()
       .requiredIf(!isDraft, "L'adresse de l'entreprise émettrice est requise"),
-
     emitterCompanyContact: yup
       .string()
       .requiredIf(
@@ -164,24 +163,26 @@ const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> = isDraft =>
       ),
     transporterCompanyAddress: yup
       .string()
-      .nullable()
-      .required("L'adresse du transporteur est requise"),
+      .requiredIf(!isDraft, "L'adresse du transporteur est requise"),
     transporterCompanyContact: yup
       .string()
-      .nullable()
-      .required("Le nom du contact dans l'entreprise émettrice est requis"),
+      .requiredIf(
+        !isDraft,
+        "Le nom du contact dans l'entreprise émettrice est requis"
+      ),
     transporterCompanyPhone: yup
       .string()
-      .nullable()
-      .required("Le numéro de téléphone du transporteur est requis"),
+      .requiredIf(
+        !isDraft,
+        "Le numéro de téléphone du transporteur est requis"
+      ),
     transporterCompanyMail: yup
       .string()
-      .nullable()
       .email()
-      .required("L'adresse email du transporteur est requis"),
-    transporterRecepisseNumber: yup.string().requiredIf(!isDraft),
-    transporterRecepisseDepartment: yup.string().requiredIf(!isDraft),
-    transporterRecepisseValidityLimit: yup.date().requiredIf(!isDraft)
+      .requiredIf(!isDraft, "L'adresse email du transporteur est requis"),
+    transporterRecepisseNumber: yup.string().nullable(),
+    transporterRecepisseDepartment: yup.string().nullable(),
+    transporterRecepisseValidityLimit: yup.date().nullable()
   });
 
 const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
@@ -194,7 +195,9 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
         "Le code déchet ne fait pas partie de la liste reconnue : ${values}"
       )
       .requiredIf(!isDraft, "Le code déchet est requis"),
-    wasteDescription: yup.string(),
+    wasteDescription: yup
+      .string()
+      .requiredIf(!isDraft, "La description du fluide est obligatoire"),
     wasteAdr: yup.string().requiredIf(!isDraft, "La mention ADR est requise"),
     weightValue: yup
       .number()
@@ -220,7 +223,7 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
             .required("Le poids du contenant est requis")
         })
       )
-      .required("Le conditionnement est requis")
+      .requiredIf(!isDraft, "Le conditionnement est requis")
   });
 
 const destinationSchemaFn: FactorySchemaOf<boolean, Destination> = isDraft =>
@@ -234,14 +237,14 @@ const destinationSchemaFn: FactorySchemaOf<boolean, Destination> = isDraft =>
       ),
     destinationCompanySiret: yup
       .string()
-      .length(
-        14,
-        "Le SIRET de l'installation de destination n'est pas au bon format (${length} caractères)"
-      )
       .requiredIf(
         !isDraft,
         "Le SIRET de l'installation de destination est requis"
-      ),
+      )
+      .matches(/^$|^\d{14}$/, {
+        message:
+          "Le SIRET de l'installation de destination n'est pas au bon format (${length} caractères)"
+      }),
     destinationCompanyAddress: yup
       .string()
       .requiredIf(
@@ -252,7 +255,7 @@ const destinationSchemaFn: FactorySchemaOf<boolean, Destination> = isDraft =>
       .string()
       .requiredIf(
         !isDraft,
-        "Le nom du contact dans l'entreprise émettrice est requis"
+        "Le nom du contact sur l'installation de destination est requis"
       ),
     destinationCompanyPhone: yup
       .string()
@@ -274,8 +277,7 @@ const destinationSchemaFn: FactorySchemaOf<boolean, Destination> = isDraft =>
         [null, ...Object.keys(OPERATION)],
         "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
       )
-      .requiredIf(!isDraft),
-    destinationCap: yup.string().requiredIf(!isDraft)
+      .requiredIf(!isDraft)
   });
 
 const transportSchema: yup.SchemaOf<Transport> = yup.object({
@@ -359,26 +361,35 @@ export const bsffSchema = baseBsffSchemaFn(false);
 export const draftBsffSchema = baseBsffSchemaFn(true);
 
 export async function validateBsff(
-  bsff: SetOptional<
-    Pick<Bsff, "id" | "isDraft" | "type" | "emitterCompanySiret">,
-    "emitterCompanySiret"
-  > & { packagings?: BsffPackaging[] },
+  bsff: Partial<Bsff | Prisma.BsffCreateInput> & {
+    packagings?: BsffPackaging[];
+  },
   previousBsffs: Bsff[],
   ficheInterventions: BsffFicheIntervention[]
 ) {
-  const validationSchema = bsff.isDraft ? draftBsffSchema : bsffSchema;
-  await validationSchema.validate(bsff, {
-    abortEarly: false
-  });
+  try {
+    const validationSchema = bsff.isDraft ? draftBsffSchema : bsffSchema;
+    const validBsff = await validationSchema.validate(bsff, {
+      abortEarly: false
+    });
+    return validBsff;
+  } catch (err) {
+    if (err.name === "ValidationError") {
+      const stringifiedErrors = err.errors?.join("\n");
+      throw new UserInputError(
+        `Erreur de validation des données. Des champs sont manquants ou mal formatés : \n ${stringifiedErrors}`
+      );
+    } else {
+      throw err;
+    }
+  }
+
   await validatePreviousBsffs(bsff, previousBsffs);
   await validateFicheInterventions(bsff, ficheInterventions);
 }
 
 async function validatePreviousBsffs(
-  bsff: SetOptional<
-    Pick<Bsff, "id" | "type" | "emitterCompanySiret">,
-    "emitterCompanySiret"
-  >,
+  bsff: Partial<Bsff | Prisma.BsffCreateInput>,
   previousBsffs: Bsff[]
 ) {
   if (previousBsffs.length === 0) {
@@ -469,7 +480,7 @@ async function validatePreviousBsffs(
 }
 
 async function validateFicheInterventions(
-  bsff: Pick<Bsff, "id" | "type">,
+  bsff: Partial<Bsff | Prisma.BsffCreateInput>,
   ficheInterventions: BsffFicheIntervention[]
 ) {
   if (ficheInterventions.length === 0) {
@@ -641,10 +652,10 @@ const ficheInterventionSchema: yup.SchemaOf<
   detenteurCompanySiret: yup
     .string()
     .required("Le SIRET de l'entreprise détentrice de l'équipement est requis")
-    .length(
-      14,
-      "Le SIRET de l'entreprise détentrice de l'équipement n'est pas au bon format (${length} caractères)"
-    ),
+    .matches(/^$|^\d{14}$/, {
+      message:
+        "Le SIRET de l'entreprise détentrice de l'équipement n'est pas au bon format (${length} caractères)"
+    }),
   detenteurCompanyAddress: yup
     .string()
     .required(
@@ -671,10 +682,10 @@ const ficheInterventionSchema: yup.SchemaOf<
   operateurCompanySiret: yup
     .string()
     .required("Le SIRET de l'entreprise de l'opérateur est requis")
-    .length(
-      14,
-      "Le SIRET de l'entreprise de l'opérateur n'est pas au bon format (${length} caractères)"
-    ),
+    .matches(/^$|^\d{14}$/, {
+      message:
+        "Le SIRET de l'entreprise de l'opérateur n'est pas au bon format (${length} caractères)"
+    }),
   operateurCompanyAddress: yup
     .string()
     .required("L'addresse de l'entreprise de l'opérateur est requis"),

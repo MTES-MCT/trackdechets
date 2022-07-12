@@ -15,6 +15,10 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
   const user = checkIsAuthenticated(context);
   const existingBsff = await getBsffOrNotFound({ id });
 
+  const packagings = await prisma.bsff
+    .findUnique({ where: { id: existingBsff.id } })
+    .packagings();
+
   await isBsffContributor(user, existingBsff);
 
   const previousBsffs = await getPreviousBsffs(existingBsff);
@@ -23,7 +27,11 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
     where: { bsffs: { some: { id: { in: [existingBsff.id] } } } }
   });
 
-  await validateBsff(existingBsff, previousBsffs, ficheInterventions);
+  await validateBsff(
+    { ...existingBsff, packagings, isDraft: false },
+    previousBsffs,
+    ficheInterventions
+  );
 
   const updatedBsff = await prisma.bsff.update({
     data: {

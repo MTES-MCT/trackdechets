@@ -61,7 +61,8 @@ describe("Mutation.createBsff", () => {
               contact: destination.user.name,
               mail: destination.user.email,
               phone: destination.company.contactPhone
-            }
+            },
+            plannedOperationCode: "R2"
           },
           waste: {
             code: WASTE_CODES[0],
