@@ -63,7 +63,7 @@ export const companyFactory = async (
     data: {
       siret: siretify(companyIndex),
       companyTypes: {
-        set: ["PRODUCER" as CompanyType]
+        set: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"]
       },
       name: `company_${companyIndex}`,
       securityCode: 1234,
@@ -71,6 +71,7 @@ export const companyFactory = async (
       address: "Champ de Mars, 5 Av. Anatole France, 75007 Paris",
       contactEmail: `contact_${companyIndex}@gmail.com`,
       contactPhone: `+${companyIndex} 606060606`,
+      verificationStatus: "VERIFIED",
       ...opts
     }
   });
