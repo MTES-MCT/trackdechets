@@ -26,7 +26,12 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
     if (isMember) {
       throw new UserInputError("Vous êtes déjà membre de cet établissement");
     }
-
+    const admins = await getCompanyAdminUsers(siret);
+    const adminEmails = admins.map(a => a.email);
+    const userEmailDomain = getEmailDomain(user?.email);
+    const displayableAdminEmails = adminEmails
+      .filter(email => canSeeEmail(email, userEmailDomain))
+      .join(", ");
     // check there is no existing membership request for this
     // user and company
     const alreadyRequested = await prisma.membershipRequest.findFirst({
@@ -36,12 +41,14 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
       }
     });
     if (alreadyRequested) {
+      const adminEmailsText = !!displayableAdminEmails
+        ? ` Vous pouvez contacter directement: ${displayableAdminEmails}`
+        : "";
       throw new UserInputError(
-        "Une demande de rattachement a déjà été faite pour cet établissement"
+        `Une demande de rattachement a déjà été faite pour cet établissement.${adminEmailsText}`
       );
     }
 
-    const admins = await getCompanyAdminUsers(siret);
     const emails = admins.map(a => a.email);
 
     const membershipRequest = await prisma.membershipRequest.create({
@@ -69,12 +76,7 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
 
     // send membership request confirmation to requester
     // Iot let him/her know about admin emails, we filter them (same domain name, no public email providers)
-    const adminEmails = admins.map(a => a.email);
-    const userEmailDomain = getEmailDomain(user?.email);
 
-    const displayableAdminEmails = adminEmails
-      .filter(email => canSeeEmail(email, userEmailDomain))
-      .join(", ");
     const adminEmailsInfo = !!displayableAdminEmails
       ? `Si vous n'avez pas de retour au bout de quelques jours, vous pourrez contacter: ${displayableAdminEmails}`
       : "";
