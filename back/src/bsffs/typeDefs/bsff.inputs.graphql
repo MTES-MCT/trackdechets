@@ -154,7 +154,7 @@ input BsffTransporterTransportInput {
 
 input BsffDestinationInput {
   company: CompanyInput
-  cap: String
+  cap: String @deprecated(reason: "Il n'y a pas de CAP sur le BSFF")
   reception: BsffDestinationReceptionInput
   plannedOperationCode: BsffOperationCode
   operation: BsffDestinationOperationInput

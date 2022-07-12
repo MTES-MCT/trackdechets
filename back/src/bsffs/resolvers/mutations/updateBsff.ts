@@ -80,7 +80,6 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       "destinationCompanyName",
       "destinationCompanyPhone",
       "destinationCompanySiret",
-      "destinationCap",
       "destinationReceptionDate",
       "destinationReceptionWeight",
       "destinationReceptionAcceptationStatus",

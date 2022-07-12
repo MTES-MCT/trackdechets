@@ -224,8 +224,8 @@ type BsffDestination {
   operation: BsffOperation
   "Opération de traitement prévu initialement."
   plannedOperationCode: BsffOperationCode
-  "Numéro CAP."
-  cap: String
+  "DEPRECATED - Numéro CAP."
+  cap: String @deprecated(reason: "Il n'y a pas de CAP sur le BSFF")
   "Champ libre"
   customInfo: String
 }
