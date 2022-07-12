@@ -34,16 +34,6 @@ export class NotFormContributor extends ForbiddenError {
   }
 }
 
-export class NotRegisteredCompany extends ForbiddenError {
-  constructor(sirets: string[]) {
-    super(
-      `Certains acteurs mentionnés sur le bordereau ne sont pas inscrits sur la plateforme, rendant impossible la création du bordereau. SIRET(s): ${sirets.join(
-        ", "
-      )}`
-    );
-  }
-}
-
 export class FormNotFound extends UserInputError {
   constructor(id: string) {
     super(`Le bordereau avec l'identifiant "${id}" n'existe pas.`);

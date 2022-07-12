@@ -9,11 +9,7 @@ import {
 } from "../common/redis/users";
 
 import { getFullForm } from "./database";
-import {
-  InvaliSecurityCode,
-  NotFormContributor,
-  NotRegisteredCompany
-} from "./errors";
+import { InvaliSecurityCode, NotFormContributor } from "./errors";
 import { getFormRepository } from "./repository";
 
 export async function formToCompanies(form: Form): Promise<FormCompanies> {
