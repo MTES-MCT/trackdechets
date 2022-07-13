@@ -8,21 +8,26 @@ import {
   throttle
 } from "./ratelimit";
 import { redundant } from "./redundancy";
+import { SireneSearchResult } from "./types";
 
-const searchCompaniesInseeThrottled = backoffIfTestEnvs(
+const searchCompaniesInseeThrottled = backoffIfTestEnvs<SireneSearchResult[]>(
   backoffIfTooManyRequests(searchCompaniesInsee, {
     service: "insee"
   })
 );
 
-const searchCompaniesDataGouvThrottled = backoffIfTestEnvs(
+const searchCompaniesDataGouvThrottled = backoffIfTestEnvs<
+  SireneSearchResult[]
+>(
   throttle(searchCompaniesDataGouv, {
     service: "data_gouv",
     requestsPerSeconds: 8
   })
 );
 
-const searchCompaniesSocialGouvThrottled = backoffIfTestEnvs(
+const searchCompaniesSocialGouvThrottled = backoffIfTestEnvs<
+  SireneSearchResult[]
+>(
   throttle(searchCompaniesSocialGouv, {
     service: "social_gouv",
     requestsPerSeconds: 50

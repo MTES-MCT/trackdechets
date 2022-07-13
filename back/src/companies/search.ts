@@ -182,13 +182,7 @@ async function searchVatFrOnlyOrNotFound(
     );
   }
   // throws UserInputError if not found
-  const result = await searchVat(vatNumber);
-  return {
-    ...result,
-    // to ensure compatibility with the common type
-    etatAdministratif: "A",
-    statutDiffusionEtablissement: "O"
-  };
+  return searchVat(vatNumber);
 }
 
 export const searchCompanies = makeSearchCompanies({ searchCompany });

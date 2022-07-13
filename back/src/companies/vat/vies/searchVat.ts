@@ -78,8 +78,10 @@ export const client = async (
       vatNumber: vatNumber,
       address: address,
       name: name,
+      // Compat mapping avec SireneSearchResult
       codePaysEtrangerEtablissement: country.isoCode.short,
-      statutDiffusionEtablissement: "O"
+      statutDiffusionEtablissement: "O",
+      etatAdministratif: "A"
     };
   } catch (err) {
     if (err instanceof UserInputError) {

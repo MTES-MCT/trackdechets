@@ -155,7 +155,6 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     const vatNumber = "85001946400013";
     searchSirene.mockResolvedValueOnce({
       siret: null,
-      vatNumber,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
       address: "4 Boulevard Longchamp 13001 Marseille",
