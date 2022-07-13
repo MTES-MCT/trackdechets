@@ -149,7 +149,9 @@ describe("companyInfos search with a VAT number", () => {
       vatNumber: "IT09301420155",
       name: "Code en stock",
       address: "une adresse",
-      codePaysEtrangerEtablissement: "IT"
+      codePaysEtrangerEtablissement: "IT",
+      statutDiffusionEtablissement: "O",
+      etatAdministratif: "A"
     });
     companyMock.mockResolvedValueOnce({
       contactEmail: "benoit.guigal@protonmail.com",
@@ -179,7 +181,7 @@ describe("companyInfos search with a VAT number", () => {
       brokerReceipt: undefined,
       codeCommune: undefined,
       contact: undefined,
-      etatAdministratif: undefined,
+      etatAdministratif: "A",
       libelleNaf: undefined,
       naf: undefined,
       traderReceipt: undefined,
@@ -194,7 +196,9 @@ describe("companyInfos search with a VAT number", () => {
       vatNumber: "IT09301420155",
       name: "Code en stock",
       address: "une adresse",
-      codePaysEtrangerEtablissement: "IT"
+      codePaysEtrangerEtablissement: "IT",
+      statutDiffusionEtablissement: "O",
+      etatAdministratif: "A"
     });
     companyMock.mockResolvedValueOnce(null);
     const company = await getCompanyInfos("IT09301420155");
@@ -216,7 +220,7 @@ describe("companyInfos search with a VAT number", () => {
       contact: undefined,
       contactPhone: undefined,
       contactEmail: undefined,
-      etatAdministratif: undefined,
+      etatAdministratif: "A",
       libelleNaf: undefined,
       naf: undefined,
       traderReceipt: undefined,

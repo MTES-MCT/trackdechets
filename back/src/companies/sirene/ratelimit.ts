@@ -18,7 +18,7 @@ export function backoffIfTooManyRequests<T>(
   fn: (...args) => Promise<T>,
   { service, expiry }: BackoffDecoratorOpts
 ) {
-  const rateLimited = async (...args) => {
+  const rateLimited = async (...args): Promise<T> => {
     const cacheKey = `${service}_backoff`;
     const isRateLimited = await redisClient.get(cacheKey);
     if (isRateLimited) {
@@ -47,10 +47,10 @@ type ThrottleDecoratorArgs = {
 };
 
 export function backoffIfTestEnvs<T>(fn: (...args) => Promise<T>) {
-  const backoff = async (...args) => {
+  const backoff = async (...args): Promise<T> => {
     if (process.env.NODE_ENV === "test") {
       // do not call the APIs when running tests
-      return Promise.resolve(null);
+      return;
     } else {
       return fn(...args);
     }
