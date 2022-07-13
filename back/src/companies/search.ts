@@ -160,6 +160,7 @@ async function searchSireneOrNotFound(
     } else if (err instanceof AnonymousCompanyError) {
       // And it's finally an anonymous that is not found in AnonymousCompany
       return {
+        etatAdministratif: "A",
         siret,
         statutDiffusionEtablissement: "N"
       } as SireneSearchResult;
@@ -185,6 +186,7 @@ async function searchVatFrOnlyOrNotFound(
   return {
     ...result,
     // to ensure compatibility with the common type
+    etatAdministratif: "A",
     statutDiffusionEtablissement: "O"
   };
 }
