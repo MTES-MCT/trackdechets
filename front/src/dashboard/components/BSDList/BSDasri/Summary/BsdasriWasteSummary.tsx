@@ -46,13 +46,16 @@ export function BsdasriWasteSummary({ bsdasri }: BsdasriWasteSummaryProps) {
       <DataListItem>
         <DataListTerm>Contenant(s)</DataListTerm>
         <DataListDescription>
-          {!!packagings?.length &&
-            packagings
-              .map(
-                packaging =>
-                  `${packaging.quantity}  ${packaging.other} ${packaging.type} (${packaging.volume} litre(s))`
-              )
-              .join(", ")}
+          {!!packagings?.length && (
+            <>
+              {packagings.map(packaging => (
+                <div>
+                  {packaging.quantity} {packaging.other} {packaging.type} (
+                  {packaging.volume} litre(s))
+                </div>
+              ))}
+            </>
+          )}
         </DataListDescription>
       </DataListItem>
     </DataList>
