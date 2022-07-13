@@ -93,7 +93,7 @@ export async function searchCompany(
   return {
     // ensure compatibility with CompanyPublic
     ecoOrganismeAgreements: [],
-    isRegistered: trackdechetsCompanyInfo !== null,
+    isRegistered: trackdechetsCompanyInfo != null,
     companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
     ...convertUrls(trackdechetsCompanyInfo),
     // override database infos with Sirene or VAT search
@@ -104,7 +104,7 @@ export async function searchCompany(
 // used for dependency injection in tests to easily mock `searchCompany`
 export const makeSearchCompanies =
   ({ searchCompany }: SearchCompaniesDeps) =>
-  (clue: string, department?: string) => {
+  (clue: string, department?: string): Promise<CompanySearchResult[]> => {
     // clue can be formatted like a SIRET or a VAT number
     if (isSiret(clue) || isVat(clue)) {
       return searchCompany(clue)
@@ -114,7 +114,27 @@ export const makeSearchCompanies =
         )
         .catch(_ => []);
     }
-    return decoratedSearchCompanies(clue, department);
+    return decoratedSearchCompanies(clue, department).then(async results => {
+      let existingCompanies = [];
+      if (results.length) {
+        existingCompanies = (
+          await prisma.company.findMany({
+            where: {
+              siret: { in: results.map(r => r.siret) }
+            },
+            select: {
+              siret: true,
+              vatNumber: true
+            }
+          })
+        ).map(company => company.siret);
+      }
+
+      return results.map(company => ({
+        ...company,
+        isRegistered: existingCompanies.includes(company.siret)
+      }));
+    });
   };
 
 async function searchSireneOrNotFound(

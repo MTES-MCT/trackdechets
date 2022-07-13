@@ -1,7 +1,6 @@
 import { UserInputError } from "apollo-server-express";
 import {
   CompanyPublic,
-  CompanySearchPrivate,
   QueryResolvers
 } from "../../../generated/graphql/types";
 import { getInstallation } from "../../database";
@@ -19,7 +18,7 @@ import { searchCompany } from "../../search";
  */
 export async function getCompanyInfos(
   siretOrVat: string
-): Promise<CompanyPublic | CompanySearchPrivate> {
+): Promise<CompanyPublic> {
   if (!siretOrVat) {
     throw new UserInputError(
       "Paramètre absent. Un numéro SIRET ou de TVA intracommunautaire valide est requis",
@@ -29,13 +28,39 @@ export async function getCompanyInfos(
     );
   }
   const searchResult = await searchCompany(siretOrVat);
+
   return {
-    ...searchResult,
+    siret: searchResult.siret,
+    vatNumber: searchResult.vatNumber,
+    codePaysEtrangerEtablissement: searchResult.codePaysEtrangerEtablissement,
+    etatAdministratif: searchResult.etatAdministratif,
+    statutDiffusionEtablissement: searchResult.statutDiffusionEtablissement,
+    address: searchResult.address,
+    codeCommune: searchResult.codeCommune,
+    name: searchResult.name,
+    naf: searchResult.naf,
+    libelleNaf: searchResult.libelleNaf,
+    installation: await getInstallation(siretOrVat),
+    contact: searchResult.contact,
+    contactEmail: searchResult.contactEmail,
+    contactPhone: searchResult.contactPhone,
+    website: searchResult.website,
+    isRegistered: searchResult.isRegistered,
+    companyTypes: searchResult.companyTypes,
     ecoOrganismeAgreements: searchResult.ecoOrganismeAgreements ?? [],
-    installation: await getInstallation(siretOrVat)
+    allowBsdasriTakeOverWithoutSignature:
+      searchResult.allowBsdasriTakeOverWithoutSignature,
+    transporterReceipt: searchResult.transporterReceipt,
+    traderReceipt: searchResult.traderReceipt,
+    brokerReceipt: searchResult.brokerReceipt,
+    vhuAgrementDemolisseur: searchResult.vhuAgrementDemolisseur,
+    vhuAgrementBroyeur: searchResult.vhuAgrementBroyeur
   };
 }
 
+/**
+ * Public Query
+ */
 const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
   _,
   args

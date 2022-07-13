@@ -17,6 +17,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout de `FormInput.intermediaries: [CompanyInput!]` [PR 1481](https://github.com/MTES-MCT/trackdechets/pull/1481)
 
 #### :bug: Corrections de bugs
+
 - Correction d'un bug ne permettant pas au destinataire finale de créer un BSDD avec entreposage provisoire [PR 1498](https://github.com/MTES-MCT/trackdechets/pull/1498)
 - Correction de la navigation entre les onglets du tableau de bord lors de certaines actions [PR 1469](https://github.com/MTES-MCT/trackdechets/pull/1469)
 - Correction d'un bug affichant une mauvaise adresse et raison sociale dans le module de recherche d'entreprise sur l'interface Trackdéchets [PR 1501](https://github.com/MTES-MCT/trackdechets/pull/1501)
@@ -24,7 +25,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
+
 - Gestion des volumes représentés par des nombres décimaux sur les BSDASRIs [PR 1506](https://github.com/MTES-MCT/trackdechets/pull/1506)
+- Interface de recherche d'établissements : améliorations de design général, et support des entreprises étrangères par recherche de TVA inclus directement dans le champs de recherche textuel des entreprises françaises. Suppression du sélecteur "Entreprise étrangère".
 
 #### :memo: Documentation
 
