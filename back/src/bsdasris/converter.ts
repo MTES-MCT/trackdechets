@@ -38,6 +38,7 @@ import {
   undefinedOrDefault
 } from "../forms/form-converter";
 import { Prisma, Bsdasri, BsdasriStatus } from "@prisma/client";
+import Decimal from "decimal.js-light";
 
 export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
   return {
@@ -244,11 +245,13 @@ const computeTotalVolume: computeTotalVolumeFn = packagings => {
   if (!packagings) {
     return undefined;
   }
-  return packagings.reduce(
-    (acc, packaging) =>
-      acc + (packaging.volume || 0) * (packaging.quantity || 0),
-    0
-  );
+  return packagings
+    .reduce(
+      (acc, packaging) =>
+        acc.plus((packaging.volume || 0) * (packaging.quantity || 0)),
+      new Decimal(0)
+    )
+    .toNumber();
 };
 
 function flattenEcoOrganismeInput(input: {
