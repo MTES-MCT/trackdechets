@@ -34,6 +34,21 @@ export interface CompanyInfo {
 }
 
 describe("bulk create users and companies from csv files", () => {
+  const search = require("../../../companies/search");
+  const searchCompanySpy = jest.spyOn(search, "searchCompany");
+  searchCompanySpy
+    .mockResolvedValue({
+      siret: "85001946400013",
+      name: "Code en stock",
+      statutDiffusionEtablissement: "O",
+      etatAdministratif: "A"
+    })
+    .mockResolvedValue({
+      siret: "81343950200028",
+      name: "Frontier SAS",
+      statutDiffusionEtablissement: "O",
+      etatAdministratif: "A"
+    });
   // CSV files are read from __tests__/csv folder
   //
   // In the test data we have

@@ -198,7 +198,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     expect(response.data.companyPrivateInfos.transporterReceipt).toEqual(
       receipt
     );
-    expect(response.data.companyPrivateInfos.vatNumber).toEqual(siret);
+    expect(response.data.companyPrivateInfos.siret).toEqual(siret);
     expect(response.data.companyPrivateInfos.isAnonymousCompany).toBeFalsy();
   });
 
