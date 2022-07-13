@@ -14,4 +14,5 @@ export interface CompanyVatSearchResult {
   codePaysEtrangerEtablissement: string;
   // required to ensure compatibility with the common CompanySearchResult interface
   statutDiffusionEtablissement: "O" | "N";
+  etatAdministratif: "A" | "F";
 }

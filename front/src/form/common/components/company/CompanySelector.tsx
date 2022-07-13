@@ -417,7 +417,10 @@ export default function CompanySelector({
             }
           />
         )}
-        {isLoadingSearch && <span>Chargement...</span>}
+
+        {searchData?.searchCompanies.length === 0 && !isLoadingSearch && (
+          <span>Aucun établissement ne correspond à cette recherche...</span>
+        )}
 
         <CompanyResults<CompanySearchResult>
           onSelect={company => selectCompany(company)}
