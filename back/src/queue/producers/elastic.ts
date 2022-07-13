@@ -36,6 +36,6 @@ export async function addToIndexQueue(
   await indexQueue.add(jobData, options);
 }
 
-export function closeIndexQueue() {
-  return indexQueue.close();
+export function closeIndexAndUpdatesQueue() {
+  return Promise.all([indexQueue.close(), updatesQueue.close()]);
 }

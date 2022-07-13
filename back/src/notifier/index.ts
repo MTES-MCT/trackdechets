@@ -1,8 +1,9 @@
 import cors from "cors";
 import express, { json } from "express";
+import helmet from "helmet";
 import { getUIBaseURL } from "../utils";
 import { startUpdatesConsumer } from "./consumer";
-import { sseHandler } from "./sseHandler";
+import { sseHandler } from "./handlers/sse";
 
 const UI_BASE_URL = getUIBaseURL();
 const port = process.env.NOTIFIER_PORT || 82;
@@ -16,6 +17,7 @@ sseApp.use(
     credentials: true
   })
 );
+sseApp.use(helmet());
 
 sseApp.get("/ping", (_, res) => res.send("Pong!"));
 sseApp.get("/updates/:siret", sseHandler);

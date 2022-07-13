@@ -5,7 +5,7 @@ type AwaitingCallInfos = { url: string; ids: string[] };
 const HOOKS_PROCESSOR_INTERVAL = 10 * 1000;
 const hooksToCall = new Map<string, AwaitingCallInfos>(); // Map to batch hook calls
 
-export async function pushHookUpdate(sirets: Set<string>, id: string) {
+export async function pushWebHookUpdate(sirets: Set<string>, id: string) {
   for (const siret of sirets) {
     if (!hooksToCall.has(siret)) {
       const url = await getSiretHookUrl(siret);
@@ -20,7 +20,7 @@ export async function pushHookUpdate(sirets: Set<string>, id: string) {
 }
 
 async function getSiretHookUrl(siret: string): Promise<string> {
-  // TODO retrieve URL associated to `siret`
+  // Implement once webhook are setup...
   console.log(`Find ${siret} hook`);
   return null;
 }
