@@ -22,7 +22,7 @@ export function CompanyContact({ company }: Props) {
     <p>
       Tel : {company?.phone}
       <br />
-      Mail (facultatif) : {company?.mail}
+      Mail : {company?.mail}
       <br />
       Personne à contacter : {company?.contact}
     </p>

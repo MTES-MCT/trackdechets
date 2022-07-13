@@ -10,12 +10,14 @@ type FormCompanyFieldsProps = {
   company?: FormCompany;
   isForeignShip?: boolean;
   isPrivateIndividual?: boolean;
+  isEmailMandatory?: boolean;
 };
 
 export function FormCompanyFields({
   company,
   isForeignShip,
-  isPrivateIndividual
+  isPrivateIndividual,
+  isEmailMandatory = true
 }: FormCompanyFieldsProps) {
   let companyCountry: Country = null;
 
@@ -95,7 +97,7 @@ export function FormCompanyFields({
       <p>
         Tel : {company?.phone}
         <br />
-        Mail (facultatif) : {company?.mail}
+        { `Mail ${isEmailMandatory ? "" : "(facultatif) " }: ` }{company?.mail}
         {!isPrivateIndividual && (
           <div>
             <br />
