@@ -144,3 +144,21 @@ export const COMPANY_PRIVATE_INFOS = gql`
     }
   }
 `;
+
+export const COMPANY_SELECTOR_PRIVATE_INFOS = gql`
+  query CompanyPrivateInfos($clue: String!) {
+    companyPrivateInfos(clue: $clue) {
+      siret
+      vatNumber
+      name
+      naf
+      libelleNaf
+      address
+      etatAdministratif
+      statutDiffusionEtablissement
+      isRegistered
+      isAnonymousCompany
+      companyTypes
+    }
+  }
+`;
