@@ -21,13 +21,15 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Correction d'un bug ne permettant pas au destinataire finale de créer un BSDD avec entreposage provisoire [PR 1498](https://github.com/MTES-MCT/trackdechets/pull/1498)
 - Correction de la navigation entre les onglets du tableau de bord lors de certaines actions [PR 1469](https://github.com/MTES-MCT/trackdechets/pull/1469)
 - Correction d'un bug affichant une mauvaise adresse et raison sociale dans le module de recherche d'entreprise sur l'interface Trackdéchets [PR 1501](https://github.com/MTES-MCT/trackdechets/pull/1501)
+- - On visualise mieux quand la recherche par TVA donne des informations manquantes pour un TVA qui existe et on doit pouvoir éditer manuellement les coordonnées d'un établissement étranger aux coordonnées inconnues donc ouverture automatique du formulaire à la selection du résultat inconnus [PR 1543](https://github.com/MTES-MCT/trackdechets/pull/1543)
 
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
 
 - Gestion des volumes représentés par des nombres décimaux sur les BSDASRIs [PR 1506](https://github.com/MTES-MCT/trackdechets/pull/1506)
-- Interface de recherche d'établissements : améliorations de design général, et support des entreprises étrangères par recherche de TVA inclus directement dans le champs de recherche textuel des entreprises françaises. Suppression du sélecteur "Entreprise étrangère".
+- Interface de recherche d'établissements : améliorations de design général, et support des entreprises étrangères par recherche de TVA inclus directement dans le champs de recherche textuel des entreprises françaises. Suppression du sélecteur "Entreprise étrangère". [PR 1481](https://github.com/MTES-MCT/trackdechets/pull/1481) et suivantes : [PR 1539](https://github.com/MTES-MCT/trackdechets/pull/1539), [PR 1538](https://github.com/MTES-MCT/trackdechets/pull/1538), [PR 1528](https://github.com/MTES-MCT/trackdechets/pull/1528)
+- Affichage des inscriptions sur Trackdéchets dans la liste des résultats de recherche [PR 1541](https://github.com/MTES-MCT/trackdechets/pull/1541)
 - Meilleure validation des numéros de téléphone étrangers dans le compte utilisateur [PR 1544](https://github.com/MTES-MCT/trackdechets/pull/1544)
 
 #### :memo: Documentation
