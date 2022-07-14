@@ -43,7 +43,9 @@ export default function CompanyResults<
           >
             <div className={styles.content}>
               <h6 className="tw-flex tw-items-center tw-align-middle">
-                <div className="tw-mt-1">{item.name}</div>
+                <div className="tw-mt-1">
+                  {item.name ? item.name : "[Nom inconnu]"}
+                </div>
                 {item.isRegistered === true && (
                   <div className="tw-ml-1">
                     <IconTrackDechetsCheck />
@@ -51,7 +53,8 @@ export default function CompanyResults<
                 )}
               </h6>
               <p>
-                {item.siret} - {item.address}
+                {item.siret} -{" "}
+                {item.address ? item.address : "[Adresse inconnue]"}
               </p>
               <p>
                 <a

@@ -80,6 +80,10 @@ export default function CompanySelector({
   const [department, setDepartement] = useState<null | string>(null);
   const [mustBeRegistered, setMustBeRegistered] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<CompanySearchResult[]>([]);
+  const [
+    toggleManualForeignCompanyForm,
+    setToggleManualForeignCompanyForm,
+  ] = useState<boolean>(false);
   const timeout = useRef<number | null>();
 
   /**
@@ -158,7 +162,7 @@ export default function CompanySelector({
         }),
         country: company.codePaysEtrangerEtablissement,
       };
-      if (company.name === "---") {
+      if (company.name === "---" || company.name === "") {
         cogoToast.error(
           "Cet établissement existe mais nous ne pouvons remplir automatiquement le formulaire"
         );
@@ -172,7 +176,10 @@ export default function CompanySelector({
           fields.country = vatCountryCode;
         }
       }
-
+      setToggleManualForeignCompanyForm(
+        company.codePaysEtrangerEtablissement !== "FR" &&
+          (company.name === "---" || company.name === "")
+      );
       setIsForeignCompany(company.codePaysEtrangerEtablissement !== "FR");
       Object.keys(fields).forEach(key => {
         setFieldValue(`${field.name}.${key}`, fields[key]);
@@ -187,6 +194,7 @@ export default function CompanySelector({
       field.name,
       setFieldValue,
       setIsForeignCompany,
+      setToggleManualForeignCompanyForm,
       onCompanySelected,
       disabled,
       registeredOnlyCompanies,
@@ -495,7 +503,9 @@ export default function CompanySelector({
 
         <div className="form__row">
           {allowForeignCompanies &&
-            (isForeignCompany || forceManualForeignCompanyForm) && (
+            (isForeignCompany ||
+              forceManualForeignCompanyForm ||
+              toggleManualForeignCompanyForm) && (
               <>
                 <label>
                   Nom de l'entreprise
