@@ -22,7 +22,7 @@ import {
   CompanyInput,
 } from "generated/graphql/types";
 import graphlClient from "graphql-client";
-import { COMPANY_INFOS } from "form/common/components/company/query";
+import { COMPANY_IS_REGISTERED } from "form/common/components/company/query";
 import {
   isVat,
   isFRVat,
@@ -80,8 +80,8 @@ const destinationSchema = companySchema.concat(
       async value => {
         if (value) {
           const { data } = await graphlClient.query({
-            query: COMPANY_INFOS,
-            variables: { siret: value },
+            query: COMPANY_IS_REGISTERED,
+            variables: { clue: value },
           });
           // it should be registered to TD
           if (data.companyInfos?.isRegistered === false) {

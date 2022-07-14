@@ -189,7 +189,10 @@ export default function Recipient() {
           </a>
         </p>
       </div>
-      <CompanySelector name="recipient.company" />
+      <CompanySelector
+        name="recipient.company"
+        registeredOnlyCompanies={true}
+      />
       <h4 className="form__section-heading">Informations complémentaires</h4>
       <div className="form__row">
         <Field

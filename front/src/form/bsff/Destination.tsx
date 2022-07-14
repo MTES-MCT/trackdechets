@@ -17,6 +17,7 @@ export default function Destination({ disabled }) {
         disabled={disabled}
         name="destination.company"
         heading="Installation de destination"
+        registeredOnlyCompanies={true}
       />
 
       <div className="form__row">

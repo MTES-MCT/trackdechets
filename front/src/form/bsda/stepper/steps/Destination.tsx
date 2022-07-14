@@ -80,6 +80,7 @@ export function Destination({ disabled }) {
           disabled={disabled}
           name="destination.company"
           heading="Entreprise de destination"
+          registeredOnlyCompanies={true}
         />
       )}
 

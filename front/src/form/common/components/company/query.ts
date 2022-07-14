@@ -162,3 +162,13 @@ export const COMPANY_SELECTOR_PRIVATE_INFOS = gql`
     }
   }
 `;
+
+
+export const COMPANY_IS_REGISTERED = gql`
+  query CompanyInfos($clue: String) {
+    companyInfos(clue: $clue) {
+      companyTypes
+      isRegistered
+    }
+  }
+`;
