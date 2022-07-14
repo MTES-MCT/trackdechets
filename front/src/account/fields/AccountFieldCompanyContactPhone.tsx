@@ -1,5 +1,6 @@
 import React from "react";
 import { gql } from "@apollo/client";
+import { isValidPhoneNumber, getCountries } from "libphonenumber-js";
 import AccountField from "./AccountField";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
@@ -35,13 +36,21 @@ const UPDATE_CONTACT_PHONE = gql`
   }
 `;
 
+const countries = getCountries().map(country => country);
+
 const yupSchema = object().shape({
   contactPhone: string()
     .trim()
-    .matches(/^(0[1-9])(?:[ _.-]?(\d{2})){4}$/, {
-      message: "Le numéro de téléphone est invalide",
-      excludeEmptyString: true,
-    }),
+    .test(
+      "is-valid-phone",
+      "Merci de renseigner un numéro de téléphone valide",
+      value =>
+        !!value &&
+        ((!value.startsWith("0") &&
+          countries.some(country => isValidPhoneNumber(value!, country))) ||
+          (value.startsWith("0") &&
+            /^(0[1-9])(?:[ _.-]?(\d{2})){4}$/.test(value)))
+    ),
 });
 
 export default function AccountFielCompanyContactPhone({ company }: Props) {
