@@ -392,7 +392,7 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
           </div>
 
           <div className={styles.detailGrid}>
-            <dt>Code onu</dt>
+            <dt>Mention ADR</dt>
             <dd>{form?.waste?.adr}</dd>
 
             <dt>Conditionnement</dt>
