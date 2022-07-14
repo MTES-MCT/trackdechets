@@ -1,6 +1,5 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { isValidPhoneNumber, getCountries } from "libphonenumber-js";
 import AccountField from "./AccountField";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
@@ -10,6 +9,7 @@ import {
   UserRole,
   MutationUpdateCompanyArgs,
 } from "generated/graphql/types";
+import { validatePhoneNumber } from "common/helper";
 
 type Props = {
   company: CompanyPrivate;
@@ -36,20 +36,13 @@ const UPDATE_CONTACT_PHONE = gql`
   }
 `;
 
-const countries = getCountries().map(country => country);
-
 const yupSchema = object().shape({
   contactPhone: string()
     .trim()
     .test(
       "is-valid-phone",
       "Merci de renseigner un numéro de téléphone valide",
-      value =>
-        !!value &&
-        ((!value.startsWith("0") &&
-          countries.some(country => isValidPhoneNumber(value!, country))) ||
-          (value.startsWith("0") &&
-            /^(0[1-9])(?:[ _.-]?(\d{2})){4}$/.test(value)))
+      validatePhoneNumber
     ),
 });
 

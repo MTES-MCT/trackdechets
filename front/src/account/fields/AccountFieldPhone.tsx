@@ -1,10 +1,10 @@
 import React from "react";
 import { gql } from "@apollo/client";
-import { getCountries, isValidPhoneNumber } from "libphonenumber-js";
 import AccountField from "./AccountField";
 import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
 import { object, string } from "yup";
 import { User, MutationEditProfileArgs } from "generated/graphql/types";
+import { validatePhoneNumber } from "common/helper";
 
 type Me = Pick<User, "phone">;
 
@@ -30,20 +30,13 @@ const UPDATE_PHONE = gql`
   }
 `;
 
-const countries = getCountries().map(country => country);
-
 const yupSchema = object().shape({
   phone: string()
     .trim()
     .test(
       "is-valid-phone",
       "Merci de renseigner un numéro de téléphone valide",
-      value =>
-        !!value &&
-        ((!value.startsWith("0") &&
-          countries.some(country => isValidPhoneNumber(value!, country))) ||
-          (value.startsWith("0") &&
-            /^(0[1-9])(?:[ _.-]?(\d{2})){4}$/.test(value)))
+      validatePhoneNumber
     ),
 });
 
