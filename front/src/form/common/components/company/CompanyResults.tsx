@@ -1,5 +1,12 @@
 import React from "react";
-import { IconCheckCircle1, IconSignBadgeCircle } from "common/components/Icons";
+import { Tooltip } from "@reach/tooltip";
+
+import {
+  IconCheckCircle1,
+  IconProfile,
+  IconQuestionCircle,
+  IconSignBadgeCircle,
+} from "common/components/Icons";
 import styles from "./CompanyResult.module.scss";
 import { CompanySearchResult } from "../../../../generated/graphql/types";
 import { generatePath } from "react-router-dom";
@@ -12,7 +19,10 @@ interface CompanyResultsProps<T> {
 }
 
 export default function CompanyResults<
-  T extends Pick<CompanySearchResult, "siret" | "name" | "address">
+  T extends Pick<
+    CompanySearchResult,
+    "siret" | "name" | "address" | "isRegistered"
+  >
 >({ results, onSelect, selectedItem }: CompanyResultsProps<T>) {
   return (
     <ul className={styles.results}>
@@ -33,7 +43,12 @@ export default function CompanyResults<
             onClick={() => onSelect(item)}
           >
             <div className={styles.content}>
-              <h6>{item.name}</h6>
+              <h6 className="tw-flex tw-items-center tw-align-middle">
+                <div className="tw-mt-1">{item.name}</div>
+                <div className="tw-text-xs tw-ml-1 tw-underline tw-font-sans tw-font-bold tw-font tw-text-blue-400">
+                  {item.isRegistered === true ? "Inscrit" : ""}
+                </div>
+              </h6>
               <p>
                 {item.siret} - {item.address}
               </p>

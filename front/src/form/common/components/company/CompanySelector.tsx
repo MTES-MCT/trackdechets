@@ -20,7 +20,11 @@ import {
 
 import CompanyResults from "./CompanyResults";
 import styles from "./CompanySelector.module.scss";
-import { FAVORITES, SEARCH_COMPANIES } from "./query";
+import {
+  FAVORITES,
+  SEARCH_COMPANIES,
+  COMPANY_SELECTOR_PRIVATE_INFOS,
+} from "./query";
 import {
   Query,
   QuerySearchCompaniesArgs,
@@ -28,6 +32,8 @@ import {
   QueryFavoritesArgs,
   FavoriteType,
   CompanySearchResult,
+  CompanyFavorite,
+  QueryCompanyPrivateInfosArgs,
 } from "generated/graphql/types";
 import CountrySelector from "./CountrySelector";
 import { v4 as uuidv4 } from "uuid";
@@ -103,6 +109,18 @@ export default function CompanySelector({
   });
 
   /**
+   * seleted companyInfos query
+   */
+  const { data: selectedData } = useQuery<
+    Pick<Query, "companyPrivateInfos">,
+    QueryCompanyPrivateInfosArgs
+  >(COMPANY_SELECTOR_PRIVATE_INFOS, {
+    variables: {
+      clue: field.value.siret!,
+    },
+    skip: !field.value.siret,
+  });
+  /**
    * Selection d'un établissement dans le formulaire
    */
   const selectCompany = useCallback(
@@ -176,60 +194,94 @@ export default function CompanySelector({
     ]
   );
 
+  const favoriteToCompanySearchResult = ({
+    siret,
+    vatNumber,
+    name,
+    address,
+    transporterReceipt,
+    traderReceipt,
+    brokerReceipt,
+    vhuAgrementDemolisseur,
+    vhuAgrementBroyeur,
+    codePaysEtrangerEtablissement,
+    isRegistered,
+    phone,
+    mail,
+    contact,
+  }: CompanyFavorite): CompanySearchResult => ({
+    siret,
+    vatNumber,
+    name,
+    address,
+    transporterReceipt,
+    traderReceipt,
+    brokerReceipt,
+    vhuAgrementDemolisseur,
+    vhuAgrementBroyeur,
+    codePaysEtrangerEtablissement: codePaysEtrangerEtablissement?.length
+      ? codePaysEtrangerEtablissement
+      : "FR",
+    contact,
+    contactPhone: phone,
+    contactEmail: mail,
+    isRegistered,
+    companyTypes: [],
+    etatAdministratif: "A",
+  });
+
   /**
    * Parse and merge data from searchCompanies and favoritesData
    */
   useEffect(() => {
-    if (disabled) return;
-    const mergedResults: CompanySearchResult[] =
-      searchData?.searchCompanies
-        .map(
-          ({
-            siret,
-            vatNumber,
-            name,
-            address,
-            transporterReceipt,
-            traderReceipt,
-            brokerReceipt,
-            vhuAgrementDemolisseur,
-            vhuAgrementBroyeur,
-            codePaysEtrangerEtablissement,
-            etatAdministratif,
-            isRegistered,
-            companyTypes,
-            contactPhone,
-            contactEmail,
-            contact,
-          }) =>
-            ({
-              // convert CompanySearchResult to form values
-              __typename: "CompanySearchResult",
-              siret,
-              vatNumber,
-              name,
-              address,
-              transporterReceipt,
-              traderReceipt,
-              brokerReceipt,
-              vhuAgrementDemolisseur,
-              vhuAgrementBroyeur,
-              codePaysEtrangerEtablissement: codePaysEtrangerEtablissement?.length
-                ? codePaysEtrangerEtablissement
-                : "FR",
-              contact,
-              phone: contactPhone,
-              mail: contactEmail,
-              isRegistered,
-              companyTypes,
-              etatAdministratif,
-            } as CompanySearchResult)
-        )
-        .filter(company => company.etatAdministratif === "A")
-        // Concatener les favoris
-        // Sauf doublons et sauf si l'input de recherche est un numéro de SIRET ou de TVA
-        .concat(
-          (favoritesData?.favorites?.filter(
+    if (disabled || !searchData) return;
+    let mergedResults: CompanySearchResult[] = searchData.searchCompanies
+      .map(
+        ({
+          siret,
+          vatNumber,
+          name,
+          address,
+          transporterReceipt,
+          traderReceipt,
+          brokerReceipt,
+          vhuAgrementDemolisseur,
+          vhuAgrementBroyeur,
+          codePaysEtrangerEtablissement,
+          etatAdministratif,
+          isRegistered,
+          companyTypes,
+          contactPhone,
+          contactEmail,
+          contact,
+        }) => ({
+          siret,
+          vatNumber,
+          name,
+          address,
+          transporterReceipt,
+          traderReceipt,
+          brokerReceipt,
+          vhuAgrementDemolisseur,
+          vhuAgrementBroyeur,
+          codePaysEtrangerEtablissement: codePaysEtrangerEtablissement?.length
+            ? codePaysEtrangerEtablissement
+            : "FR",
+          contact,
+          contactPhone,
+          contactEmail,
+          isRegistered,
+          companyTypes,
+          etatAdministratif,
+        })
+      )
+      .filter(company => company.etatAdministratif === "A");
+
+    if (mergedResults) {
+      // Concatener les favoris sauf doublons
+      mergedResults.concat(
+        favoritesData?.favorites
+          .filter(
             fav =>
               !skipFavorite &&
               !searchData?.searchCompanies
@@ -238,13 +290,16 @@ export default function CompanySelector({
               !searchData?.searchCompanies
                 .map(company => company.vatNumber)
                 .includes(fav.vatNumber)
-          ) as CompanySearchResult[]) ?? []
-        ) ??
-      (favoritesData?.favorites.filter(
-        fav => !skipFavorite
-      ) as CompanySearchResult[]) ??
-      [];
-
+          )
+          .map(favorite => favoriteToCompanySearchResult(favorite)) ?? []
+      );
+    } else if (favoritesData?.favorites) {
+      mergedResults = favoritesData?.favorites
+        .filter(fav => !skipFavorite)
+        .map(favorite => favoriteToCompanySearchResult(favorite));
+    } else {
+      mergedResults = [];
+    }
     setSearchResults(mergedResults);
   }, [
     disabled,
@@ -426,8 +481,10 @@ export default function CompanySelector({
           onSelect={company => selectCompany(company)}
           results={searchResults}
           selectedItem={{
-            ...(field.value as CompanySearchResult),
             __typename: "CompanySearchResult",
+            // complete FormCompany with companyPrivateInfos
+            ...(selectedData?.companyPrivateInfos as CompanySearchResult),
+            ...(field.value as CompanySearchResult),
             transporterReceipt: null,
             traderReceipt: null,
             brokerReceipt: null,

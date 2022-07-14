@@ -40,7 +40,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Corrections d'édition d'un BSDD avec un transporteur étranger [PR 1491](https://github.com/MTES-MCT/trackdechets/pull/1491), [PR 1494](https://github.com/MTES-MCT/trackdechets/pull/1494) et [PR 1497](https://github.com/MTES-MCT/trackdechets/pull/1497)
-- Corrections de textes divers [PR 1477](https://github.com/MTES-MCT/trackdechets/pull/1477) et [PR 1475](https://github.com/MTES-MCT/trackdechets/pull/1475)
+- Corrections de textes divers [PR 1477](https://github.co+m/MTES-MCT/trackdechets/pull/1477) et [PR 1475](https://github.com/MTES-MCT/trackdechets/pull/1475)
 - Correction "Select all" BSDD avec appendice 2, quantités groupées corrigées [PR 1493](https://github.com/MTES-MCT/trackdechets/pull/1493)
 
 #### :boom: Breaking changes
@@ -124,6 +124,7 @@ TEMP_STORER_ACCEPTED -.->|markAsProcessed| PROCESSED(PROCESSED / AWAITING_GROUP 
   - Dédoublonnage établissements dans la recherche
   - Exclusion des Établissements fermés dans les résultats de recherche
   - Empêcher de choisir manuellement FR quand un transporteur étranger est sélectionné
+  - Icône indicatrice d'inscription sur Trackdéchets
 
 #### :memo: Documentation
 
