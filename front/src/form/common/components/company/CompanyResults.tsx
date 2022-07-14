@@ -3,8 +3,7 @@ import { Tooltip } from "@reach/tooltip";
 
 import {
   IconCheckCircle1,
-  IconProfile,
-  IconQuestionCircle,
+  IconTrackDechetsCheck,
   IconSignBadgeCircle,
 } from "common/components/Icons";
 import styles from "./CompanyResult.module.scss";
@@ -45,9 +44,11 @@ export default function CompanyResults<
             <div className={styles.content}>
               <h6 className="tw-flex tw-items-center tw-align-middle">
                 <div className="tw-mt-1">{item.name}</div>
-                <div className="tw-text-xs tw-ml-1 tw-underline tw-font-sans tw-font-bold tw-font tw-text-blue-400">
-                  {item.isRegistered === true ? "Inscrit" : ""}
-                </div>
+                {item.isRegistered === true && (
+                  <div className="tw-ml-1">
+                    <IconTrackDechetsCheck />
+                  </div>
+                )}
               </h6>
               <p>
                 {item.siret} - {item.address}
