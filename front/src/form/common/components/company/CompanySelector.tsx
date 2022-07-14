@@ -279,7 +279,7 @@ export default function CompanySelector({
 
     if (mergedResults) {
       // Concatener les favoris sauf doublons
-      mergedResults.concat(
+      mergedResults = mergedResults.concat(
         favoritesData?.favorites
           .filter(
             fav =>
