@@ -1,0 +1,1 @@
+ALTER TABLE "default$default"."Bsff" DROP COLUMN "destinationCap";
