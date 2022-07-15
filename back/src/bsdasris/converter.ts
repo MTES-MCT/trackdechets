@@ -38,7 +38,7 @@ import {
   undefinedOrDefault
 } from "../forms/form-converter";
 import { Prisma, Bsdasri, BsdasriStatus } from "@prisma/client";
-import Decimal from "decimal.js-light";
+import { Decimal } from "decimal.js-light";
 
 export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
   return {
