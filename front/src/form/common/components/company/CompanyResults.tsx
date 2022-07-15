@@ -1,5 +1,4 @@
 import React from "react";
-import { Tooltip } from "@reach/tooltip";
 
 import {
   IconCheckCircle1,

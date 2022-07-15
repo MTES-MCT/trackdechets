@@ -309,13 +309,7 @@ export default function CompanySelector({
       mergedResults = [];
     }
     setSearchResults(mergedResults);
-  }, [
-    disabled,
-    searchData?.searchCompanies,
-    favoritesData,
-    setSearchResults,
-    skipFavorite,
-  ]);
+  }, [disabled, searchData, favoritesData, setSearchResults, skipFavorite]);
 
   /**
    * Démarre la requete avec un délai
