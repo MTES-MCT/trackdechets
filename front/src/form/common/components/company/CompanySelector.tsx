@@ -242,8 +242,10 @@ export default function CompanySelector({
    * Parse and merge data from searchCompanies and favoritesData
    */
   useEffect(() => {
-    if (disabled || !searchData) return;
-    let mergedResults: CompanySearchResult[] = searchData.searchCompanies
+    if (disabled) return;
+    let mergedResults:
+      | CompanySearchResult[]
+      | undefined = searchData?.searchCompanies
       .map(
         ({
           siret,
