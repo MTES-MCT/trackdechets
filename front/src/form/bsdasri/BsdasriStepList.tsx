@@ -124,19 +124,6 @@ export default function BsdasriStepsList(props: Props) {
     }
   );
 
-  // prefill packaging info with previous dasri actor data
-  const prefillWasteDetails = dasri => {
-    if (!dasri?.transporter?.transport?.packagings?.length) {
-      dasri.transporter.transport.packagings =
-        dasri?.emitter?.emission?.packagings;
-    }
-
-    if (!dasri?.destination?.reception?.packagings?.length) {
-      dasri.destination.reception.packagings =
-        dasri?.transporter?.transport?.packagings;
-    }
-    return dasri;
-  };
   const mapRegrouped = dasri => ({
     ...dasri,
     grouping: dasri?.grouping.map(d => d.id),
@@ -145,11 +132,9 @@ export default function BsdasriStepsList(props: Props) {
 
   const formState = useMemo(
     () =>
-      prefillWasteDetails(
-        getComputedState(
-          getInitialState(),
-          mapRegrouped(formQuery.data?.bsdasri)
-        )
+      getComputedState(
+        getInitialState(),
+        mapRegrouped(formQuery.data?.bsdasri)
       ),
     [formQuery.data]
   );
