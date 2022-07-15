@@ -1,5 +1,6 @@
 import { UserRole } from "@prisma/client";
 import { gql } from "apollo-server-core";
+import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import {
   Mutation,
@@ -18,6 +19,8 @@ const PUBLISH_BSFF = gql`
 `;
 
 describe("publishBsff", () => {
+  afterEach(resetDatabase);
+
   it("should throw error if data is missing", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff = await prisma.bsff.create({
@@ -36,35 +39,34 @@ describe("publishBsff", () => {
       MutationPublishBsffArgs
     >(PUBLISH_BSFF, { variables: { id: bsff.id } });
 
-    // TODO harmoniser les messages d'erreurs
     expect(errors).toEqual([
       expect.objectContaining({
         message:
           "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
-          " Le nom de l'installation de destination est requis\n" +
-          "Le SIRET de l'installation de destination est requis\n" +
-          "L'adresse de l'installation de destination est requise\n" +
-          "Le nom du contact sur l'installation de destination est requis\n" +
-          "Le numéro de téléphone de l'installation de destination est requis\n" +
-          "L'adresse email de l'installation de destination est requis\n" +
-          "destinationPlannedOperationCode est un champ requis et doit avoir une valeur\n" +
-          "Le nom du transporteur est requis\n" +
-          'Transporteur : "Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"\n' +
-          "transporterCompanySiret n'est pas un numéro de SIRET valide\n" +
-          "L'adresse du transporteur est requise\n" +
-          "Le nom du contact dans l'entreprise émettrice est requis\n" +
-          "Le numéro de téléphone du transporteur est requis\n" +
-          "L'adresse email du transporteur est requis\n" +
+          "Destination : le nom de l'établissement est requis\n" +
+          "Destination : le n°SIRET de l'établissement est requis\n" +
+          "Destination : l'adresse de l'établissement est requise\n" +
+          "Destination : le nom du contact est requis\n" +
+          "Destination : le numéro de téléphone est requis\n" +
+          "Destination : l'adresse email est requise\n" +
+          "Le code de l'opération de traitement prévu est requis\n" +
+          "Transporteur : le nom de l'établissement est requis\n" +
+          "Transporteur : le n° SIRET ou le numéro de TVA intracommunautaire est requis\n" +
+          "Transporteur : le n° SIRET n'est pas au bon format\n" +
+          "Transporteur : l'adresse de l'établissement est requise\n" +
+          "Transporteur : le nom du contact est requis\n" +
+          "Transporteur : le numéro de téléphone est requis\n" +
+          "Transporteur : l'adresse email est requise\n" +
           "Le code déchet est requis\n" +
           "La description du fluide est obligatoire\n" +
           "La mention ADR est requise\n" +
-          "Le poids total du déchet est requis\n" +
-          "weightIsEstimate ne peut pas être null\n" +
-          "Le nom de l'entreprise émettrice est requis\n" +
-          "L'adresse de l'entreprise émettrice est requise\n" +
-          "Le nom du contact dans l'entreprise émettrice est requis\n" +
-          "Le numéro de téléphone de l'entreprise émettrice est requis\n" +
-          "L'adresse email de l'entreprise émettrice est requis"
+          "Le poids total est requis\n" +
+          "Le type de poids (estimé ou non) est un requis\n" +
+          "Émetteur : le nom de l'établissement est requis\n" +
+          "Émetteur : l'adresse de l'établissement est requise\n" +
+          "Émetteur : le nom du contact est requis\n" +
+          "Émetteur : le numéro de téléphone est requis\n" +
+          "Émetteur : l'adresse email est requise"
       })
     ]);
   });

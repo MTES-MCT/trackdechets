@@ -101,6 +101,7 @@ export function createBsffBeforeTransport(
       create: { name: "BOUTEILLE 2L", numero: "01", weight: 1 }
     },
     transporterTransportMode: TransportMode.ROAD,
+    transporterTransportTakenOverAt: new Date(),
     ...initialData
   });
 }

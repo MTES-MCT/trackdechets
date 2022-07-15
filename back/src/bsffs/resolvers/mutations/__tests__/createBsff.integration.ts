@@ -144,4 +144,55 @@ describe("Mutation.createBsff", () => {
       })
     ]);
   });
+
+  it("should fail with incomplete data", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsff">,
+      MutationCreateBsffArgs
+    >(CREATE_BSFF, {
+      variables: {
+        input: {
+          emitter: {
+            company: {
+              siret: emitter.company.siret
+            }
+          }
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
+          "Destination : le nom de l'établissement est requis\n" +
+          "Destination : le n°SIRET de l'établissement est requis\n" +
+          "Destination : l'adresse de l'établissement est requise\n" +
+          "Destination : le nom du contact est requis\n" +
+          "Destination : le numéro de téléphone est requis\n" +
+          "Destination : l'adresse email est requise\n" +
+          "Le code de l'opération de traitement prévu est requis\n" +
+          "Transporteur : le nom de l'établissement est requis\n" +
+          "Transporteur : le n° SIRET ou le numéro de TVA intracommunautaire est requis\n" +
+          "Transporteur : le n° SIRET n'est pas au bon format\n" +
+          "Transporteur : l'adresse de l'établissement est requise\n" +
+          "Transporteur : le nom du contact est requis\n" +
+          "Transporteur : le numéro de téléphone est requis\n" +
+          "Transporteur : l'adresse email est requise\n" +
+          "Le code déchet est requis\n" +
+          "La description du fluide est obligatoire\n" +
+          "La mention ADR est requise\n" +
+          "Le poids total est requis\n" +
+          "Le type de poids (estimé ou non) est un requis\n" +
+          "Le conditionnement est requis\n" +
+          "Émetteur : le nom de l'établissement est requis\n" +
+          "Émetteur : l'adresse de l'établissement est requise\n" +
+          "Émetteur : le nom du contact est requis\n" +
+          "Émetteur : le numéro de téléphone est requis\n" +
+          "Émetteur : l'adresse email est requise"
+      })
+    ]);
+    console.log(errors);
+  });
 });

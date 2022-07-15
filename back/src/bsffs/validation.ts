@@ -94,36 +94,33 @@ export const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
   yup.object({
     emitterCompanyName: yup
       .string()
-      .requiredIf(!isDraft, "Le nom de l'entreprise émettrice est requis"),
+      .requiredIf(!isDraft, "Émetteur : le nom de l'établissement est requis"),
     emitterCompanySiret: yup
       .string()
-      .requiredIf(!isDraft, "Le SIRET de l'entreprise émettrice est requis")
+      .requiredIf(
+        !isDraft,
+        "Émetteur : le n°SIRET de l'établissement est requis"
+      )
       .matches(/^$|^\d{14}$/, {
         message:
-          "Le SIRET de l'entreprise émettrice n'est pas au bon format (${length} caractères)"
+          "Émetteur : le n°SIRET de l'établissement n'est pas au bon format"
       }),
     emitterCompanyAddress: yup
       .string()
-      .requiredIf(!isDraft, "L'adresse de l'entreprise émettrice est requise"),
+      .requiredIf(
+        !isDraft,
+        "Émetteur : l'adresse de l'établissement est requise"
+      ),
     emitterCompanyContact: yup
       .string()
-      .requiredIf(
-        !isDraft,
-        "Le nom du contact dans l'entreprise émettrice est requis"
-      ),
+      .requiredIf(!isDraft, "Émetteur : le nom du contact est requis"),
     emitterCompanyPhone: yup
       .string()
-      .requiredIf(
-        !isDraft,
-        "Le numéro de téléphone de l'entreprise émettrice est requis"
-      ),
+      .requiredIf(!isDraft, "Émetteur : le numéro de téléphone est requis"),
     emitterCompanyMail: yup
       .string()
-      .email()
-      .requiredIf(
-        !isDraft,
-        "L'adresse email de l'entreprise émettrice est requis"
-      )
+      .email("Émetteur : l'adresse email est invalide")
+      .requiredIf(!isDraft, "Émetteur : l'adresse email est requise")
   });
 
 export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
@@ -131,25 +128,28 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
     yup.object({
       transporterCompanyName: yup
         .string()
-        .requiredIf(!isDraft, "Le nom du transporteur est requis"),
+        .requiredIf(
+          !isDraft,
+          "Transporteur : le nom de l'établissement est requis"
+        ),
       transporterCompanySiret: yup
         .string()
         .ensure()
         .when("transporterCompanyVatNumber", (tva, schema) => {
           if (!tva && !isDraft) {
             return schema
-              .requiredIf(
-                `Transporteur : "Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"`
+              .required(
+                "Transporteur : le n° SIRET ou le numéro de TVA intracommunautaire est requis"
               )
               .test(
                 "is-siret",
-                "${path} n'est pas un numéro de SIRET valide",
+                "Transporteur : le n° SIRET n'est pas au bon format",
                 value => isSiret(value)
               );
           }
           if (!isDraft && tva && isFRVat(tva)) {
             return schema.required(
-              "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
+              "Transporteur : le n° SIRET est requis pour un établissement français"
             );
           }
           return schema.nullable().notRequired();
@@ -159,28 +159,28 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
         .ensure()
         .test(
           "is-vat",
-          "${path} n'est pas un numéro de TVA intracommunautaire valide",
+          "Transporteur : le numéro de TVA intracommunautaire n'est pas au bon format",
           value => !value || isVat(value)
         ),
       transporterCompanyAddress: yup
         .string()
-        .requiredIf(!isDraft, "L'adresse du transporteur est requise"),
-      transporterCompanyContact: yup
-        .string()
         .requiredIf(
           !isDraft,
-          "Le nom du contact dans l'entreprise émettrice est requis"
+          "Transporteur : l'adresse de l'établissement est requise"
         ),
+      transporterCompanyContact: yup
+        .string()
+        .requiredIf(!isDraft, "Transporteur : le nom du contact est requis"),
       transporterCompanyPhone: yup
         .string()
         .requiredIf(
           !isDraft,
-          "Le numéro de téléphone du transporteur est requis"
+          "Transporteur : le numéro de téléphone est requis"
         ),
       transporterCompanyMail: yup
         .string()
-        .email()
-        .requiredIf(!isDraft, "L'adresse email du transporteur est requis"),
+        .email("Transporteur : l'adresse email est invalide")
+        .requiredIf(!isDraft, "Transporteur : l'adresse email est requise"),
       transporterRecepisseNumber: yup.string().nullable(),
       transporterRecepisseDepartment: yup.string().nullable(),
       transporterRecepisseValidityLimit: yup.date().nullable()
@@ -203,26 +203,30 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
       wasteAdr: yup.string().requiredIf(!isDraft, "La mention ADR est requise"),
       weightValue: yup
         .number()
-        .requiredIf(!isDraft, "Le poids total du déchet est requis"),
-      weightIsEstimate: yup.boolean(),
+        .positive("Le poids doit être supérieur à 0")
+        .requiredIf(!isDraft, "Le poids total est requis"),
+      weightIsEstimate: yup
+        .boolean()
+        .requiredIf(!isDraft, "Le type de poids (estimé ou non) est un requis"),
       packagings: yup
         .array()
         .nullable()
+        .min(1, "Le nombre de contenants doit être supérieur ou égal à 1")
         .of<yup.SchemaOf<Omit<BsffPackaging, "__typename">>>(
           yup.object({
             name: yup
               .string()
               .nullable()
-              .required("La dénomination du contenant est requise"),
+              .required("Contenant : la dénomination du contenant est requise"),
             volume: yup.number().nullable(),
             numero: yup
               .string()
               .nullable()
-              .required("Le numéro identifiant du contenant est requis"),
+              .required("Contenant : le numéro d'identification est requis"),
             weight: yup
               .number()
               .nullable()
-              .required("Le poids du contenant est requis")
+              .required("Contenant : Le poids est requis")
           })
         )
         .requiredIf(!isDraft, "Le conditionnement est requis")
@@ -236,43 +240,36 @@ export const destinationSchemaFn: FactorySchemaOf<boolean, Destination> =
         .nullable()
         .requiredIf(
           !isDraft,
-          "Le nom de l'installation de destination est requis"
+          "Destination : le nom de l'établissement est requis"
         ),
       destinationCompanySiret: yup
         .string()
         .requiredIf(
           !isDraft,
-          "Le SIRET de l'installation de destination est requis"
+          "Destination : le n°SIRET de l'établissement est requis"
         )
         .matches(/^$|^\d{14}$/, {
-          message:
-            "Le SIRET de l'installation de destination n'est pas au bon format (${length} caractères)"
+          message: "Destination : le n°SIRET n'est pas au bon format"
         }),
       destinationCompanyAddress: yup
         .string()
         .requiredIf(
           !isDraft,
-          "L'adresse de l'installation de destination est requise"
+          "Destination : l'adresse de l'établissement est requise"
         ),
       destinationCompanyContact: yup
         .string()
-        .requiredIf(
-          !isDraft,
-          "Le nom du contact sur l'installation de destination est requis"
-        ),
+        .requiredIf(!isDraft, "Destination : le nom du contact est requis"),
       destinationCompanyPhone: yup
         .string()
         .requiredIf(
           !isDraft,
-          "Le numéro de téléphone de l'installation de destination est requis"
+          "Destination : le numéro de téléphone est requis"
         ),
       destinationCompanyMail: yup
         .string()
-        .email()
-        .requiredIf(
-          !isDraft,
-          "L'adresse email de l'installation de destination est requis"
-        ),
+        .email("Destination : l'adresse email est invalide")
+        .requiredIf(!isDraft, "Destination : l'adresse email est requise"),
       destinationPlannedOperationCode: yup
         .string()
         .nullable()
@@ -280,7 +277,10 @@ export const destinationSchemaFn: FactorySchemaOf<boolean, Destination> =
           [null, ...Object.keys(OPERATION)],
           "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
         )
-        .requiredIf(!isDraft)
+        .requiredIf(
+          !isDraft,
+          "Le code de l'opération de traitement prévu est requis"
+        )
     });
 
 export const transportSchema: yup.SchemaOf<Transport> = yup.object({
@@ -292,13 +292,14 @@ export const transportSchema: yup.SchemaOf<Transport> = yup.object({
       "Le mode de transport ne fait pas partie de la liste reconnue : ${values}"
     )
     .required("Le mode de transport utilisé par le transporteur est requis"),
-  transporterTransportTakenOverAt: yup.date().required()
+  transporterTransportTakenOverAt: yup
+    .date()
+    .required("La date de prise en charge par le transporteur est requise")
 });
 
 export const receptionSchema: yup.SchemaOf<Reception> = yup.object({
   destinationReceptionDate: yup
     .date()
-    .nullable()
     .required("La date de réception du déchet est requise") as any, // https://github.com/jquense/yup/issues/1302
   destinationReceptionAcceptationStatus: yup
     .mixed<WasteAcceptationStatus>()
@@ -379,7 +380,7 @@ export async function validateBsff(
     if (err.name === "ValidationError") {
       const stringifiedErrors = err.errors?.join("\n");
       throw new UserInputError(
-        `Erreur de validation des données. Des champs sont manquants ou mal formatés : \n ${stringifiedErrors}`
+        `Erreur de validation des données. Des champs sont manquants ou mal formatés : \n${stringifiedErrors}`
       );
     } else {
       throw err;
