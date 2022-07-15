@@ -51,6 +51,8 @@ export const COMPANY_INFOS = gql`
       isRegistered
       companyTypes
       codePaysEtrangerEtablissement
+      contactPhone
+      contactEmail
       installation {
         codeS3ic
         urlFiche
@@ -83,6 +85,8 @@ export const SEARCH_COMPANIES = gql`
       codePaysEtrangerEtablissement
       isRegistered
       contact
+      contactPhone
+      contactEmail
       installation {
         codeS3ic
         urlFiche
