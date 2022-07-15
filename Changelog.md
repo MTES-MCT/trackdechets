@@ -21,7 +21,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Correction d'un bug ne permettant pas au destinataire finale de créer un BSDD avec entreposage provisoire [PR 1498](https://github.com/MTES-MCT/trackdechets/pull/1498)
 - Correction de la navigation entre les onglets du tableau de bord lors de certaines actions [PR 1469](https://github.com/MTES-MCT/trackdechets/pull/1469)
 - Correction d'un bug affichant une mauvaise adresse et raison sociale dans le module de recherche d'entreprise sur l'interface Trackdéchets [PR 1501](https://github.com/MTES-MCT/trackdechets/pull/1501)
-- - On visualise mieux quand la recherche par TVA donne des informations manquantes pour un TVA qui existe et on doit pouvoir éditer manuellement les coordonnées d'un établissement étranger aux coordonnées inconnues donc ouverture automatique du formulaire à la selection du résultat inconnus [PR 1543](https://github.com/MTES-MCT/trackdechets/pull/1543)
+- On visualise mieux quand la recherche par TVA donne des informations manquantes pour un numéro de TVA qui existe et on doit pouvoir éditer manuellement les coordonnées d'un établissement étranger aux coordonnées inconnues donc ouverture automatique du formulaire à la sélection du résultat inconnu [PR 1543](https://github.com/MTES-MCT/trackdechets/pull/1543)
 
 #### :boom: Breaking changes
 
