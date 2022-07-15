@@ -683,4 +683,38 @@ describe("mutation.markAsProcessed", () => {
       })
     ]);
   });
+
+  it("should not allow a temp storer to call markAsProcessed", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const tempStorer = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const form = await formWithTempStorageFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        recipientCompanySiret: tempStorer.company.siret,
+        status: "ACCEPTED"
+      },
+      forwardedInOpts: { recipientCompanySiret: destination.company.siret }
+    });
+    const { mutate } = makeClient(tempStorer.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "markAsProcessed">,
+      MutationMarkAsProcessedArgs
+    >(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processedAt: new Date("2022-01-01").toISOString() as any,
+          processedBy: "John Snow",
+          processingOperationDone: "R 1",
+          processingOperationDescription: "Incinération"
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous n'êtes pas autorisé à marquer ce bordereau comme traité"
+      })
+    ]);
+  });
 });

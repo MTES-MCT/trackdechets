@@ -1,4 +1,4 @@
-import { Form, User } from "@prisma/client";
+import { Form, Status, User } from "@prisma/client";
 import { ForbiddenError } from "apollo-server-express";
 import prisma from "../prisma";
 import { FormCompanies } from "./types";
@@ -358,10 +358,9 @@ export async function checkCanSignedByTransporter(user: User, form: Form) {
 export async function checkCanMarkAsReceived(user: User, form: Form) {
   const userSirets = await getCachedUserSirets(user.id);
   const formCompanies = await formToCompanies(form);
-  const isAuthorized = [
-    isFormRecipient,
-    isFormDestinationAfterTempStorage
-  ].some(isFormRole => isFormRole(userSirets, formCompanies));
+  const isAuthorized = form.forwardedInId
+    ? isFormDestinationAfterTempStorage(userSirets, formCompanies)
+    : isFormRecipient(userSirets, formCompanies);
 
   if (!isAuthorized) {
     throw new ForbiddenError(
@@ -374,10 +373,9 @@ export async function checkCanMarkAsReceived(user: User, form: Form) {
 export async function checkCanMarkAsAccepted(user: User, form: Form) {
   const userSirets = await getCachedUserSirets(user.id);
   const formCompanies = await formToCompanies(form);
-  const isAuthorized = [
-    isFormRecipient,
-    isFormDestinationAfterTempStorage
-  ].some(isFormRole => isFormRole(userSirets, formCompanies));
+  const isAuthorized = form.forwardedInId
+    ? isFormDestinationAfterTempStorage(userSirets, formCompanies)
+    : isFormRecipient(userSirets, formCompanies);
   if (!isAuthorized) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à marquer ce bordereau comme accepté"
@@ -389,10 +387,13 @@ export async function checkCanMarkAsAccepted(user: User, form: Form) {
 export async function checkCanMarkAsProcessed(user: User, form: Form) {
   const userSirets = await getCachedUserSirets(user.id);
   const formCompanies = await formToCompanies(form);
-  const isAuthorized = [
-    isFormRecipient,
-    isFormDestinationAfterTempStorage
-  ].some(isFormRole => isFormRole(userSirets, formCompanies));
+  const isAuthorized = form.forwardedInId
+    ? isFormDestinationAfterTempStorage(userSirets, formCompanies) ||
+      // case when the temp storer decides to do an anticipated treatment
+      (form.status === Status.TEMP_STORER_ACCEPTED &&
+        isFormRecipient(userSirets, formCompanies))
+    : isFormRecipient(userSirets, formCompanies);
+
   if (!isAuthorized) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à marquer ce bordereau comme traité"

@@ -56,6 +56,39 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     );
   });
 
+  it("should fail if revision is empty", async () => {
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        status: "SENT"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: {},
+          comment: "A comment",
+          authoringCompanySiret: company.siret
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      "Impossible de créer une révision sans modifications."
+    );
+  });
+
   it("should fail if current user is neither emitter or recipient of the bsda", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
