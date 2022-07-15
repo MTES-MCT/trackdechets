@@ -24,6 +24,7 @@
     "graphql": "^16.0.2",
     "graphql-anywhere": "^4.2.7",
     "jsvat": "^2.5.3",
+    "libphonenumber-js": "^1.10.8",
     "local-storage": "^2.0.0",
     "mapbox-gl": "^1.11.1",
     "object.omit": "^3.0.0",

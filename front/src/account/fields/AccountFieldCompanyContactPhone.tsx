@@ -9,6 +9,7 @@ import {
   UserRole,
   MutationUpdateCompanyArgs,
 } from "generated/graphql/types";
+import { validatePhoneNumber } from "common/helper";
 
 type Props = {
   company: CompanyPrivate;
@@ -38,10 +39,11 @@ const UPDATE_CONTACT_PHONE = gql`
 const yupSchema = object().shape({
   contactPhone: string()
     .trim()
-    .matches(/^(0[1-9])(?:[ _.-]?(\d{2})){4}$/, {
-      message: "Le numéro de téléphone est invalide",
-      excludeEmptyString: true,
-    }),
+    .test(
+      "is-valid-phone",
+      "Merci de renseigner un numéro de téléphone valide",
+      validatePhoneNumber
+    ),
 });
 
 export default function AccountFielCompanyContactPhone({ company }: Props) {

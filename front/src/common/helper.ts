@@ -1,5 +1,6 @@
 import { DocumentNode } from "graphql";
 import { ApolloError, DataProxy } from "@apollo/client";
+import { getCountries, isValidPhoneNumber } from "libphonenumber-js";
 
 export const capitalize = (str: string) =>
   str.charAt(0).toUpperCase() + str.slice(1);
@@ -142,3 +143,12 @@ export const sortCompaniesByName = values => {
     return aName.localeCompare(bName);
   });
 };
+
+const countries = getCountries().map(country => country);
+
+export const validatePhoneNumber = value =>
+  !!value &&
+  ((!value.startsWith("0") &&
+    value.startsWith("+") &&
+    countries.some(country => isValidPhoneNumber(value!, country))) ||
+    (value.startsWith("0") && /^(0[1-9])(?:[ _.-]?(\d{2})){4}$/.test(value)));
