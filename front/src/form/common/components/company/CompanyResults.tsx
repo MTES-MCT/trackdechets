@@ -63,7 +63,7 @@ export default function CompanyResults<
             <p>
               <a
                 href={generatePath(routes.company, {
-                  siret: item.siret?.length ?? item.vatNumber!,
+                  siret: item.siret?.length ? item.siret : item.vatNumber!,
                 })}
                 target="_blank"
                 rel="noopener noreferrer"
