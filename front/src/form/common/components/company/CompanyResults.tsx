@@ -16,10 +16,14 @@ interface CompanyResultsProps<T> {
   selectedItem: T | null;
 }
 
+const isSelected = (item, selectedItem): boolean =>
+  item.siret === selectedItem.siret ||
+  (!!item.vatNumber && item.vatNumber === selectedItem.vatNumber);
+
 export default function CompanyResults<
   T extends Pick<
     CompanySearchResult,
-    "siret" | "name" | "address" | "isRegistered"
+    "siret" | "name" | "address" | "isRegistered" | "vatNumber"
   >
 >({ results, onSelect, selectedItem }: CompanyResultsProps<T>) {
   return (
@@ -28,15 +32,15 @@ export default function CompanyResults<
         .concat(
           // append selectedItem if it's set and it's not in the results
           !selectedItem?.siret ||
-            results.find(result => result.siret === selectedItem.siret)
+            results.find(result => isSelected(result, selectedItem))
             ? []
             : [selectedItem]
         )
         .map(item => (
           <li
-            key={item.siret!}
+            key={item.siret ?? item.vatNumber!}
             className={`${styles.resultsItem}  ${
-              selectedItem?.siret === item.siret ? styles.isSelected : ""
+              isSelected(item, selectedItem) ? styles.isSelected : ""
             }`}
             onClick={() => onSelect(item)}
           >
@@ -52,12 +56,14 @@ export default function CompanyResults<
                 )}
               </h6>
               <p>
-                {item.siret} -{" "}
+                {item.siret ?? item.vatNumber} -{" "}
                 {item.address ? item.address : "[Adresse inconnue]"}
               </p>
               <p>
                 <a
-                  href={generatePath(routes.company, { siret: item.siret! })}
+                  href={generatePath(routes.company, {
+                    siret: item.siret ?? item.vatNumber!,
+                  })}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="link"
@@ -67,7 +73,7 @@ export default function CompanyResults<
               </p>
             </div>
             <div className={styles.icon}>
-              {selectedItem?.siret === item.siret ? (
+              {isSelected(item, selectedItem) ? (
                 <IconCheckCircle1 />
               ) : (
                 <IconSignBadgeCircle />

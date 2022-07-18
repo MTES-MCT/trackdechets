@@ -9,7 +9,13 @@ const searchCompaniesResolver: QueryResolvers["searchCompanies"] = async (
   searchCompanies(clue, department).then(async results =>
     results.map(async company => ({
       ...company,
-      installation: await context.dataloaders.installations.load(company.siret)
+      ...(company.siret
+        ? {
+            installation: await context.dataloaders.installations.load(
+              company.siret!
+            )
+          }
+        : {})
     }))
   );
 

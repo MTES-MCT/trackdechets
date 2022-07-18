@@ -144,11 +144,7 @@ export default function CompanySelector({
         });
         return;
       }
-      if (!company.isRegistered && registeredOnlyCompanies) {
-        setMustBeRegistered(true);
-      } else {
-        setMustBeRegistered(false);
-      }
+      setMustBeRegistered(!company.isRegistered && registeredOnlyCompanies);
       // avoid setting same company multiple times
       const fields = {
         siret: company.siret,
@@ -164,7 +160,7 @@ export default function CompanySelector({
       };
       if (company.name === "---" || company.name === "") {
         cogoToast.error(
-          "Cet établissement existe mais nous ne pouvons remplir automatiquement le formulaire"
+          "Cet établissement existe mais nous ne pouvons pas remplir automatiquement le formulaire"
         );
       }
 
@@ -176,6 +172,7 @@ export default function CompanySelector({
           fields.country = vatCountryCode;
         }
       }
+
       setToggleManualForeignCompanyForm(
         company.codePaysEtrangerEtablissement !== "FR" &&
           (company.name === "---" || company.name === "")
@@ -383,11 +380,25 @@ export default function CompanySelector({
     field.name,
   ]);
 
+  /**
+   * Auto-selection Company si le form est vierge
+   */
   useEffect(() => {
-    if (!optional && searchResults.length >= 1 && !field.value.siret?.length) {
+    if (
+      !optional &&
+      searchResults.length >= 1 &&
+      !field.value.siret?.length &&
+      !field.value.vatNumber?.length
+    ) {
       selectCompany(searchResults[0]);
     }
-  }, [optional, field.value.siret?.length, searchResults, selectCompany]);
+  }, [
+    optional,
+    field.value.siret?.length,
+    field.value.vatNumber?.length,
+    searchResults,
+    selectCompany,
+  ]);
 
   if (favoritesError) {
     return <InlineError apolloError={favoritesError} />;

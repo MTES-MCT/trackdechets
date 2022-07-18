@@ -79,6 +79,7 @@ export const SEARCH_COMPANIES = gql`
   query SearchCompanies($clue: String!, $department: String) {
     searchCompanies(clue: $clue, department: $department) {
       siret
+      vatNumber
       name
       address
       etatAdministratif
