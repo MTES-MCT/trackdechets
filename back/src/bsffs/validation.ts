@@ -187,8 +187,38 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
     });
 
 export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
-  isDraft =>
-    yup.object({
+  isDraft => {
+    const packagings = isDraft
+      ? yup.array().nullable().notRequired()
+      : yup
+          .array()
+          .min(
+            1,
+            "Conditionnements : le nombre de contenants doit être supérieur ou égal à 1"
+          )
+          .of<yup.SchemaOf<Omit<BsffPackaging, "__typename">>>(
+            yup.object({
+              name: yup
+                .string()
+                .ensure()
+                .required(
+                  "Conditionnements : la dénomination du contenant est requise"
+                ),
+              volume: yup.number().nullable(),
+              numero: yup
+                .string()
+                .ensure()
+                .required(
+                  "Conditionnements : le numéro d'identification est requis"
+                ),
+              weight: yup
+                .number()
+                .required("Conditionnements : Le poids est requis")
+                .min(0)
+            })
+          );
+
+    return yup.object({
       wasteCode: yup
         .string()
         .nullable()
@@ -208,29 +238,9 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
       weightIsEstimate: yup
         .boolean()
         .requiredIf(!isDraft, "Le type de poids (estimé ou non) est un requis"),
-      packagings: yup
-        .array()
-        .nullable()
-        .min(1, "Le nombre de contenants doit être supérieur ou égal à 1")
-        .of<yup.SchemaOf<Omit<BsffPackaging, "__typename">>>(
-          yup.object({
-            name: yup
-              .string()
-              .nullable()
-              .required("Contenant : la dénomination du contenant est requise"),
-            volume: yup.number().nullable(),
-            numero: yup
-              .string()
-              .nullable()
-              .required("Contenant : le numéro d'identification est requis"),
-            weight: yup
-              .number()
-              .nullable()
-              .required("Contenant : Le poids est requis")
-          })
-        )
-        .requiredIf(!isDraft, "Le conditionnement est requis")
+      packagings: packagings as any
     });
+  };
 
 export const destinationSchemaFn: FactorySchemaOf<boolean, Destination> =
   isDraft =>

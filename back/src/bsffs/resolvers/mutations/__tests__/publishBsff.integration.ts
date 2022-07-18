@@ -62,6 +62,7 @@ describe("publishBsff", () => {
           "La mention ADR est requise\n" +
           "Le poids total est requis\n" +
           "Le type de poids (estimé ou non) est un requis\n" +
+          "Conditionnements : le nombre de contenants doit être supérieur ou égal à 1\n" +
           "Émetteur : le nom de l'établissement est requis\n" +
           "Émetteur : l'adresse de l'établissement est requise\n" +
           "Émetteur : le nom du contact est requis\n" +

@@ -191,7 +191,7 @@ describe("wasteDetailsSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Le nombre de contenants doit être supérieur ou égal à 1"
+      "Conditionnements : le nombre de contenants doit être supérieur ou égal à 1"
     );
   });
 });

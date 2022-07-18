@@ -185,7 +185,6 @@ describe("Mutation.createBsff", () => {
           "La mention ADR est requise\n" +
           "Le poids total est requis\n" +
           "Le type de poids (estimé ou non) est un requis\n" +
-          "Le conditionnement est requis\n" +
           "Émetteur : le nom de l'établissement est requis\n" +
           "Émetteur : l'adresse de l'établissement est requise\n" +
           "Émetteur : le nom du contact est requis\n" +
@@ -193,6 +192,5 @@ describe("Mutation.createBsff", () => {
           "Émetteur : l'adresse email est requise"
       })
     ]);
-    console.log(errors);
   });
 });
