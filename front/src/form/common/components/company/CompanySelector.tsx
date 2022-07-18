@@ -86,7 +86,7 @@ export default function CompanySelector({
   const timeout = useRef<number | null>();
 
   /**
-   * SearchCompanies allows to search by siret or text
+   * SearchCompanies permet de rechercher par nom, tva ou siret.
    */
   const [
     searchCompaniesQuery,
@@ -94,11 +94,9 @@ export default function CompanySelector({
   ] = useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
     SEARCH_COMPANIES
   );
-  // The favorite type is inferred from the name's prefix
+  // Le type de favori est déduit du préfixe nom du champ (transporter, emitter, etc)
   const favoriteType = constantCase(field.name.split(".")[0]) as FavoriteType;
-  /**
-   * favorites query
-   */
+
   const {
     loading: isLoadingFavorites,
     data: favoritesData,
@@ -111,11 +109,15 @@ export default function CompanySelector({
     skip: skipFavorite,
   });
 
-  const privateInfosClue = field.value.siret
-    ? field.value.siret
-    : field.value.vatNumber
-    ? field.value.vatNumber
-    : "";
+  const getFormCompanyIdentifier = (): string => {
+    if (field.value.siret) {
+      return field.value.siret;
+    } else if (field.value.vatNumber) {
+      return field.value.vatNumber;
+    }
+    return "";
+  };
+
   /**
    * CompanyPrivateInfos pour completer les informations
    * initialement enregistrées dans le BSD
@@ -125,9 +127,9 @@ export default function CompanySelector({
     QueryCompanyPrivateInfosArgs
   >(COMPANY_SELECTOR_PRIVATE_INFOS, {
     variables: {
-      clue: privateInfosClue,
+      clue: getFormCompanyIdentifier(),
     },
-    skip: !privateInfosClue,
+    skip: !getFormCompanyIdentifier().length,
   });
 
   /**
@@ -191,7 +193,7 @@ export default function CompanySelector({
         setFieldValue(`${field.name}.${key}`, fields[key]);
       });
 
-      // callback to the parent component
+      // Parent component
       if (onCompanySelected) {
         onCompanySelected(company);
       }
@@ -209,7 +211,10 @@ export default function CompanySelector({
   );
 
   useEffect(() => {
-    if (!field.value.siret && !field.value.vatNumber) {
+    if (!allowForeignCompanies) {
+      return setToggleManualForeignCompanyForm(false);
+    }
+    if (!field.value.siret?.length && !field.value.vatNumber?.length) {
       setToggleManualForeignCompanyForm(false);
     } else {
       setToggleManualForeignCompanyForm(
@@ -222,11 +227,12 @@ export default function CompanySelector({
     field.value.siret,
     field.value.vatNumber,
     isForeignCompany,
+    allowForeignCompanies,
     setToggleManualForeignCompanyForm,
   ]);
 
   useEffect(() => {
-    if (!field?.value.country) {
+    if (!field?.value.country || field.value.country === "") {
       setIsForeignCompany(false);
     } else {
       setIsForeignCompany(
@@ -506,7 +512,7 @@ export default function CompanySelector({
             />
           </div>
         </div>
-        {(field.value.name === "" || field.value.name === "---") && (
+        {toggleManualForeignCompanyForm === true && (
           <SimpleNotificationError
             message={
               <>

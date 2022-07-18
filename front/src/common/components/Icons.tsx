@@ -1451,5 +1451,3 @@ export function IconTrackDechetsCheck({
     </svg>
   );
 }
-
-// style="fill:none;fill-rule:nonzero;stroke:#000;strokeWidth:1.5px"
