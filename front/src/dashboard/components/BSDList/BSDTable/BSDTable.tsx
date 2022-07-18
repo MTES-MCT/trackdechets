@@ -120,7 +120,11 @@ export function BSDTable({ bsds, refetch, ...props }: BSDTableProps) {
                     }
                   />
                 </span>
-                {column.canFilter ? column.render("Filter") : null}
+                {column.canFilter
+                  ? column.render("Filter", {
+                      placeHolder: column["filterPlaceHolder"],
+                    })
+                  : null}
               </TableHeaderCell>
             ))}
           </TableRow>

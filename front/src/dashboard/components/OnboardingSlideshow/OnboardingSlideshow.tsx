@@ -220,8 +220,9 @@ export function OnboardingSlideshow() {
                     <IconCheckCircle1 className={styles.CheckmarkIcon} />
                   }
                 >
-                  Posez vos questions ou remontez des problèmes en direct sur le
-                  tchat de Trackdéchets. Le support est là pour vous répondre !
+                  Votre question n'est pas documentée dans la FAQ ? Vous pouvez
+                  nous contacter par email. L'équipe support est là pour vous
+                  répondre !
                 </ListItem>
               </List>
             </div>

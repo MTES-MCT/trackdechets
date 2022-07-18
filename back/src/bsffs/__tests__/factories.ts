@@ -97,7 +97,9 @@ export function createBsffBeforeTransport(
   initialData: Partial<Prisma.BsffCreateInput> = {}
 ) {
   return createBsffAfterEmission(args, {
-    packagings: [{ name: "BOUTEILLE 2L", numero: "01", weight: 1 }],
+    packagings: {
+      create: { name: "BOUTEILLE 2L", numero: "01", weight: 1 }
+    },
     transporterTransportMode: TransportMode.ROAD,
     ...initialData
   });

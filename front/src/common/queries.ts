@@ -76,7 +76,7 @@ export const GET_BSDS = gql`
             ...FullForm
           }
           ... on Bsdasri {
-            ...DasriFragment
+            ...DashboardDasriFragment
           }
           ... on Bsvhu {
             ...VhuFragment
@@ -106,6 +106,9 @@ export const GET_BSDS = gql`
             waste {
               code
               description
+            }
+            packagings {
+              numero
             }
           }
           ... on Bsda {

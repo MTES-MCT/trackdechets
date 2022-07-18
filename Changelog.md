@@ -9,13 +9,28 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
-- Ajout du code 12 01 16\* pour les BSDA [PR 1478](https://github.com/MTES-MCT/trackdechets/pull/1478)
+- Ajout du code 12 01 16\* pour les BSDAs [PR 1478](https://github.com/MTES-MCT/trackdechets/pull/1478)
+- Ajout d'un filtre sur le type de BSDASRI dans la query `bsdasris` [PR 1479](https://github.com/MTES-MCT/trackdechets/pull/1479)
+- Ajout de la possibilité de rechercher des BSFFs par leurs numéros de contenant (dans l'interface Trackdéchets et par API) [PR 1510](https://github.com/MTES-MCT/trackdechets/pull/1510)
+- Interface d'ajout des intermédiaires sur BSDD [PR 1481](https://github.com/MTES-MCT/trackdechets/pull/1481)
+- La requête `searchCompanies` qui interroge la base SIRENE (via [les données ouvertes de l'INSEE](https://files.data.gouv.fr/insee-sirene/)), reconnaît désormais si `clue` est un numéro de TVA et interroge la base VIES (via [le service la commission européenne](https://ec.europa.eu/taxation_customs/vies/)) pour vérifier son existence et indiquer si l'établissement est inscrit ou non sur Trackdéchets. [PR 1481](https://github.com/MTES-MCT/trackdechets/pull/1481)
+- Ajout de `FormInput.intermediaries: [CompanyInput!]` [PR 1481](https://github.com/MTES-MCT/trackdechets/pull/1481)
 
 #### :bug: Corrections de bugs
+
+- Correction d'un bug ne permettant pas au destinataire finale de créer un BSDD avec entreposage provisoire [PR 1498](https://github.com/MTES-MCT/trackdechets/pull/1498)
+- Correction de la navigation entre les onglets du tableau de bord lors de certaines actions [PR 1469](https://github.com/MTES-MCT/trackdechets/pull/1469)
+- Correction d'un bug affichant une mauvaise adresse et raison sociale dans le module de recherche d'entreprise sur l'interface Trackdéchets [PR 1501](https://github.com/MTES-MCT/trackdechets/pull/1501)
+- On visualise mieux quand la recherche par TVA donne des informations manquantes pour un numéro de TVA qui existe et on doit pouvoir éditer manuellement les coordonnées d'un établissement étranger aux coordonnées inconnues donc ouverture automatique du formulaire à la sélection du résultat inconnu [PR 1543](https://github.com/MTES-MCT/trackdechets/pull/1543)
 
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
+
+- Gestion des volumes représentés par des nombres décimaux sur les BSDASRIs [PR 1506](https://github.com/MTES-MCT/trackdechets/pull/1506)
+- Interface de recherche d'établissements : améliorations de design général, et support des entreprises étrangères par recherche de TVA inclus directement dans le champs de recherche textuel des entreprises françaises. Suppression du sélecteur "Entreprise étrangère". [PR 1481](https://github.com/MTES-MCT/trackdechets/pull/1481) et suivantes : [PR 1539](https://github.com/MTES-MCT/trackdechets/pull/1539), [PR 1538](https://github.com/MTES-MCT/trackdechets/pull/1538), [PR 1528](https://github.com/MTES-MCT/trackdechets/pull/1528)
+- Affichage des inscriptions sur Trackdéchets dans la liste des résultats de recherche [PR 1541](https://github.com/MTES-MCT/trackdechets/pull/1541)
+- Meilleure validation des numéros de téléphone étrangers dans le compte utilisateur [PR 1544](https://github.com/MTES-MCT/trackdechets/pull/1544)
 
 #### :memo: Documentation
 
@@ -28,7 +43,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Corrections d'édition d'un BSDD avec un transporteur étranger [PR 1491](https://github.com/MTES-MCT/trackdechets/pull/1491), [PR 1494](https://github.com/MTES-MCT/trackdechets/pull/1494) et [PR 1497](https://github.com/MTES-MCT/trackdechets/pull/1497)
-- Corrections de textes divers [PR 1477](https://github.com/MTES-MCT/trackdechets/pull/1477) et [PR 1475](https://github.com/MTES-MCT/trackdechets/pull/1475)
+- Corrections de textes divers [PR 1477](https://github.co+m/MTES-MCT/trackdechets/pull/1477) et [PR 1475](https://github.com/MTES-MCT/trackdechets/pull/1475)
 - Correction "Select all" BSDD avec appendice 2, quantités groupées corrigées [PR 1493](https://github.com/MTES-MCT/trackdechets/pull/1493)
 
 #### :boom: Breaking changes
@@ -112,6 +127,7 @@ TEMP_STORER_ACCEPTED -.->|markAsProcessed| PROCESSED(PROCESSED / AWAITING_GROUP 
   - Dédoublonnage établissements dans la recherche
   - Exclusion des Établissements fermés dans les résultats de recherche
   - Empêcher de choisir manuellement FR quand un transporteur étranger est sélectionné
+  - Icône indicatrice d'inscription sur Trackdéchets
 
 #### :memo: Documentation
 

@@ -1,7 +1,10 @@
 import * as React from "react";
 import countries, { Country } from "world-countries";
 import { checkVAT } from "jsvat";
-import { countries as vatCountries } from "../../../common/constants/companySearchHelpers";
+import {
+  countries as vatCountries,
+  isVat
+} from "../../../common/constants/companySearchHelpers";
 import { FormCompany } from "../../../generated/graphql/types";
 
 const FRENCH_COUNTRY = countries.find(country => country.cca2 === "FR");
@@ -10,22 +13,27 @@ type FormCompanyFieldsProps = {
   company?: FormCompany;
   isForeignShip?: boolean;
   isPrivateIndividual?: boolean;
+  isEmailMandatory?: boolean;
 };
 
 export function FormCompanyFields({
   company,
   isForeignShip,
-  isPrivateIndividual
+  isPrivateIndividual,
+  isEmailMandatory = true
 }: FormCompanyFieldsProps) {
-  let companyCountry: Country = null;
+  let companyCountry: Country = FRENCH_COUNTRY;
 
   if (company) {
-    companyCountry =
-      countries.find(country => country.cca2 === company?.country) ??
-      FRENCH_COUNTRY;
-    if (company.vatNumber) {
-      const vatCountryCode = checkVAT(company.vatNumber.trim(), vatCountries)
-        ?.country?.isoCode.short;
+    companyCountry = countries.find(
+      country => country.cca2 === company?.country
+    );
+    // trouver automatiquement le pays avec le vatNumber s'il n'est pas renseigné.
+    if (isVat(company.vatNumber)) {
+      const vatCountryCode = checkVAT(
+        company.vatNumber.replace(/\s/g, ""),
+        vatCountries
+      )?.country?.isoCode.short;
 
       companyCountry = countries.find(
         country => country.cca2 === vatCountryCode
@@ -40,10 +48,7 @@ export function FormCompanyFields({
           type="checkbox"
           checked={
             !isForeignShip &&
-            !company?.vatNumber &&
-            company?.siret &&
-            companyCountry &&
-            companyCountry.cca2 === "FR"
+            (!!company?.siret || companyCountry?.cca2 === "FR")
           }
           readOnly
         />{" "}
@@ -53,9 +58,7 @@ export function FormCompanyFields({
           type="checkbox"
           checked={
             isForeignShip ||
-            (company?.vatNumber &&
-              companyCountry &&
-              companyCountry.cca2 !== "FR")
+            (!!company?.vatNumber && companyCountry?.cca2 !== "FR")
           }
           readOnly
         />{" "}
@@ -95,7 +98,7 @@ export function FormCompanyFields({
       <p>
         Tel : {company?.phone}
         <br />
-        Mail (facultatif) : {company?.mail}
+        { `Mail ${isEmailMandatory ? "" : "(facultatif) " }: ` }{company?.mail}
         {!isPrivateIndividual && (
           <div>
             <br />

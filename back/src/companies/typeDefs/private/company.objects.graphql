@@ -29,6 +29,11 @@ type CompanyFavorite {
   codePaysEtrangerEtablissement: String
 
   """
+  Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
+  """
+  isRegistered: Boolean
+
+  """
   Récépissé transporteur associé à cet établissement (le cas échéant)
   """
   transporterReceipt: TransporterReceipt
@@ -199,4 +204,7 @@ type CompanySearchPrivate {
   Si oui on non cet établissement est inscrit sur TD comme AnonymousCompany
   """
   isAnonymousCompany: Boolean
+
+  "Nom du contact"
+  contact: String
 }

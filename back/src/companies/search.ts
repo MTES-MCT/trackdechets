@@ -38,7 +38,10 @@ export async function searchCompany(
   let companyInfo: SireneSearchResult | CompanyVatSearchResult;
   // search for test or anonymous companies first
   const anonymousCompany = await prisma.anonymousCompany.findUnique({
-    where: { siret: cleanClue }
+    where: {
+      ...(isSiret(cleanClue) && { siret: cleanClue }),
+      ...(!isSiret(cleanClue) && isVat(cleanClue) && { vatNumber: cleanClue })
+    }
   });
   if (anonymousCompany) {
     companyInfo = {
@@ -64,9 +67,7 @@ export async function searchCompany(
       companyInfo = await searchVatFrOnlyOrNotFound(cleanClue);
     }
   }
-
-  // append Company data
-  // data is null if the company is not registered in TD
+  // Concaténer données Company
   const where = {
     ...(isSiret(cleanClue) && { where: { siret: cleanClue } }),
     ...(isVat(cleanClue) && { where: { vatNumber: cleanClue } })
@@ -80,6 +81,7 @@ export async function searchCompany(
       address: true,
       vatNumber: true,
       companyTypes: true,
+      contact: true,
       contactEmail: true,
       contactPhone: true,
       website: true,
@@ -94,6 +96,7 @@ export async function searchCompany(
     isRegistered: trackdechetsCompanyInfo != null,
     companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
     ...convertUrls(trackdechetsCompanyInfo),
+    // override database infos with Sirene or VAT search
     ...companyInfo
   };
 }
@@ -101,10 +104,9 @@ export async function searchCompany(
 // used for dependency injection in tests to easily mock `searchCompany`
 export const makeSearchCompanies =
   ({ searchCompany }: SearchCompaniesDeps) =>
-  (clue: string, department?: string) => {
+  (clue: string, department?: string): Promise<CompanySearchResult[]> => {
     // clue can be formatted like a SIRET or a VAT number
-    // but we don't want to search  for VAT numbers
-    if (isSiret(clue)) {
+    if (isSiret(clue) || isVat(clue)) {
       return searchCompany(clue)
         .then(c =>
           // Exclude closed companies
@@ -112,7 +114,27 @@ export const makeSearchCompanies =
         )
         .catch(_ => []);
     }
-    return decoratedSearchCompanies(clue, department);
+    return decoratedSearchCompanies(clue, department).then(async results => {
+      let existingCompanies = [];
+      if (results.length) {
+        existingCompanies = (
+          await prisma.company.findMany({
+            where: {
+              siret: { in: results.map(r => r.siret) }
+            },
+            select: {
+              siret: true,
+              vatNumber: true
+            }
+          })
+        ).map(company => company.siret);
+      }
+
+      return results.map(company => ({
+        ...company,
+        isRegistered: existingCompanies.includes(company.siret)
+      }));
+    });
   };
 
 async function searchSireneOrNotFound(
@@ -138,6 +160,7 @@ async function searchSireneOrNotFound(
     } else if (err instanceof AnonymousCompanyError) {
       // And it's finally an anonymous that is not found in AnonymousCompany
       return {
+        etatAdministratif: "A",
         siret,
         statutDiffusionEtablissement: "N"
       } as SireneSearchResult;
@@ -159,12 +182,7 @@ async function searchVatFrOnlyOrNotFound(
     );
   }
   // throws UserInputError if not found
-  const result = await searchVat(vatNumber);
-  return {
-    ...result,
-    // to ensure compatibility with the common type
-    statutDiffusionEtablissement: "O"
-  };
+  return searchVat(vatNumber);
 }
 
 export const searchCompanies = makeSearchCompanies({ searchCompany });

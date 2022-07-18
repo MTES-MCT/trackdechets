@@ -38,6 +38,7 @@ export interface BsdElastic {
   transporterTakenOverAt: number;
   wasteCode: string;
   wasteDescription: string;
+  containers?: string[];
   transporterNumberPlate?: string[];
   transporterCustomInfo?: string;
   destinationCompanyName: string;
@@ -93,6 +94,14 @@ const settings = {
       numberPlate_search: {
         tokenizer: "numberPlate_char_group",
         filter: ["lowercase"]
+      },
+      container: {
+        tokenizer: "container_ngram",
+        filter: ["lowercase"]
+      },
+      container_search: {
+        tokenizer: "container_char_group",
+        filter: ["lowercase"]
       }
     },
     tokenizer: {
@@ -130,6 +139,16 @@ const settings = {
       numberPlate_char_group: {
         type: "char_group",
         tokenize_on_chars: ["whitespace", "-"]
+      },
+      container_ngram: {
+        type: "ngram",
+        min_gram: 1,
+        max_gram: 10,
+        token_chars: ["letter", "digit", "punctuation"]
+      },
+      container_char_group: {
+        type: "char_group",
+        tokenize_on_chars: ["whitespace"]
       }
     }
   }
@@ -225,6 +244,16 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
       }
     }
   },
+  containers: {
+    type: "text",
+    analyzer: "container",
+    search_analyzer: "container_search",
+    fields: {
+      keyword: {
+        type: "keyword"
+      }
+    }
+  },
   transporterNumberPlate: {
     type: "text",
     analyzer: "numberPlate",
@@ -301,7 +330,7 @@ export type BsdIndex = {
   index: string;
   alias: string;
   type: string;
-  settings: object;
+  settings: typeof settings;
   mappings: {
     properties: typeof properties;
   };

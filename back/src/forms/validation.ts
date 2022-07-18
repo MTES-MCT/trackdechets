@@ -47,7 +47,7 @@ import {
   isFRVat,
   isOmi
 } from "../common/constants/companySearchHelpers";
-import { searchCompany } from "../companies/search";
+import { validateCompany } from "../companies/validateCompany";
 // set yup default error messages
 configureYup();
 
@@ -1305,15 +1305,22 @@ export async function checkCompaniesType(form: Form) {
 const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
   siret: yup
     .string()
-    .required("Le N°SIRET est obligatoire pour une entreprise intermédiaire"),
-  contact: yup.string().required(),
+    .required("Intermédiaires: le N° SIRET est obligatoire")
+    .test(
+      "is-siret",
+      "Intermédiaires: le SIRET n'est pas valide (14 chiffres obligatoires)",
+      siret => !siret || isSiret(siret)
+    ),
+  contact: yup
+    .string()
+    .required("Intermédiaires: les nom et prénom de contact sont obligatoires"),
   vatNumber: yup
     .string()
     .notRequired()
     .nullable()
     .test(
       "is-fr-vat",
-      "Seul les numéros de TVA en France sont valides",
+      "Intermédiaires: seul les numéros de TVA en France sont valides",
       vat => !vat || (isVat(vat) && isFRVat(vat))
     ),
   address: yup.string().notRequired().nullable(),
@@ -1325,38 +1332,13 @@ const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
 });
 
 /**
- * Validate intermediary input and convert it to Prisma IntermediaryFormAssociationCreateInput :
+ * Validate Intermediary Input
  * - an intermediary company should be identified by a SIRET (french only) or VAT number
  * - address and name from SIRENE database takes precedence over user input data
  */
-async function validateIntermediaryInput(
-  company: CompanyInput
-): Promise<Prisma.IntermediaryFormAssociationCreateManyFormInput> {
-  const { siret, vatNumber, contact, phone, mail } =
-    await intermediarySchema.validate(company);
-  const companySearchResult = await searchCompany(siret || vatNumber);
-
-  return {
-    siret: siret!, // presence of SIRET is validated in intermediarySchema
-    vatNumber,
-    address: companySearchResult?.address ?? "",
-    name: companySearchResult?.name ?? "",
-    contact,
-    phone,
-    mail
-  };
-}
-
 export function validateIntermediariesInput(
   companies: CompanyInput[]
 ): Promise<Prisma.IntermediaryFormAssociationCreateManyFormInput[]> {
-  for (const companyInput of companies) {
-    if (!companyInput.siret && !companyInput.vatNumber) {
-      throw new UserInputError(
-        "intermediairies doit obligatoirement spécifier soit un siret soit un numéro de TVA intracommunautaire"
-      );
-    }
-  }
   // check we do not add the same SIRET twice
   const intermediarySirets = companies.map(c => c.siret || c.vatNumber);
   const hasDuplicate = intermediarySirets.reduce((acc, curr, idx) => {
@@ -1364,11 +1346,24 @@ export function validateIntermediariesInput(
   }, false);
   if (hasDuplicate) {
     throw new UserInputError(
-      "Vous ne pouvez pas ajouter le même établissement en intermédiaire plusieurs fois"
+      "Intermédiaires: impossible d'ajouter le même établissement en intermédiaire plusieurs fois"
     );
   }
 
   return Promise.all(
-    companies.map(company => validateIntermediaryInput(company))
+    companies.map(async company => {
+      const validated = await validateCompany(
+        await intermediarySchema.validate(company)
+      );
+      return {
+        siret: validated.siret,
+        vatNumber: validated.vatNumber ?? "",
+        name: validated.name ?? "",
+        address: validated.address ?? "",
+        contact: company.contact ?? "",
+        phone: company.phone ?? "",
+        mail: company.mail ?? ""
+      };
+    })
   );
 }

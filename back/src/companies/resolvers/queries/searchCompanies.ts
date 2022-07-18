@@ -5,14 +5,18 @@ const searchCompaniesResolver: QueryResolvers["searchCompanies"] = async (
   _,
   { clue, department },
   context
-) => {
-  const companies = await searchCompanies(clue, department);
-  return companies.map(async company => {
-    return {
+) =>
+  searchCompanies(clue, department).then(async results =>
+    results.map(async company => ({
       ...company,
-      installation: await context.dataloaders.installations.load(company.siret)
-    };
-  });
-};
+      ...(company.siret
+        ? {
+            installation: await context.dataloaders.installations.load(
+              company.siret!
+            )
+          }
+        : {})
+    }))
+  );
 
 export default searchCompaniesResolver;

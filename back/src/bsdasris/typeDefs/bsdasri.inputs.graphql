@@ -35,6 +35,9 @@ input BsdasriOperationWhere {
 
 "Filtres possibles pour la récupération de bordereaux."
 input BsdasriWhere {
+  "(Optionnel) Filtre sur le type de BSDASRI"
+  type: BsdasriTypeFilter
+
   "(Optionnel) Permet de récupérer uniquement les bordereaux en brouillon"
   isDraft: Boolean
 
@@ -80,6 +83,12 @@ input BsdasriStatusFilter {
   _in: [BsdasriStatus!]
 }
 
+"Filtre sur le type de BSDASRI"
+input BsdasriTypeFilter {
+  _eq: BsdasriType
+  _in: [BsdasriType!]
+}
+
 """
 Filtre sur les numéros de containers. Renvoie les Bsdasris dont au moins un des identifiants de containers `identificationNumbers`
 est présent dans la liste passée en paramètre
@@ -96,7 +105,7 @@ input BsdasriPackagingsInput {
   other: String
 
   "Volume de chaque colis associé à ce conditionnement"
-  volume: Int!
+  volume: Float!
 
   "Nombre de colis associés à ce conditionnement"
   quantity: Int!

@@ -6,7 +6,7 @@ import AccountCompanyMenu from "./AccountCompanyMenu";
 import AccountCompanyInfo from "./AccountCompanyInfo";
 import AccountCompanySecurity from "./AccountCompanySecurity";
 import AccountCompanyMemberList from "./AccountCompanyMemberList";
-import AccountCompanyPage from "./AccountCompanyPage";
+import AccountCompanyContact from "./AccountCompanyContact";
 import AccountCompanyAdvanced from "./AccountCompanyAdvanced";
 import styles from "./AccountCompany.module.scss";
 import { CompanyPrivate, UserRole } from "generated/graphql/types";
@@ -19,7 +19,7 @@ export enum Link {
   Info = "Information",
   Signature = "Signature",
   Members = "Membres",
-  CompanyPage = "Fiche Entreprise",
+  Contact = "Contact",
   Advanced = "Avancé",
 }
 
@@ -33,12 +33,12 @@ AccountCompany.fragments = {
       ...AccountCompanyInfoFragment
       ...AccountCompanySecurityFragment
       ...AccountCompanyMemberListFragment
-      ...AccountCompanyPageFragment
+      ...AccountCompanyContactFragment
     }
     ${AccountCompanyInfo.fragments.company}
     ${AccountCompanySecurity.fragments.company}
     ${AccountCompanyMemberList.fragments.company}
-    ${AccountCompanyPage.fragments.company}
+    ${AccountCompanyContact.fragments.company}
   `,
 };
 
@@ -65,9 +65,9 @@ export default function AccountCompany({ company }: Props) {
     />
   );
 
-  const page = (
-    <AccountCompanyPage
-      company={filter(AccountCompanyPage.fragments.company, company)}
+  const contact = (
+    <AccountCompanyContact
+      company={filter(AccountCompanyContact.fragments.company, company)}
     />
   );
 
@@ -89,8 +89,8 @@ export default function AccountCompany({ company }: Props) {
     case Link.Members:
       activeContent = members;
       break;
-    case Link.CompanyPage:
-      activeContent = page;
+    case Link.Contact:
+      activeContent = contact;
       break;
     case Link.Advanced:
       activeContent = advanced;
@@ -98,8 +98,8 @@ export default function AccountCompany({ company }: Props) {
   }
 
   const links = isAdmin
-    ? [Link.Info, Link.Signature, Link.Members, Link.CompanyPage, Link.Advanced]
-    : [Link.Info, Link.Signature, Link.CompanyPage];
+    ? [Link.Info, Link.Signature, Link.Members, Link.Contact, Link.Advanced]
+    : [Link.Info, Link.Signature, Link.Contact];
 
   return (
     <div className={["panel", styles.company].join(" ")}>

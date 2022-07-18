@@ -99,6 +99,11 @@ export function BsdaPicker({ name, bsdaId }: Props) {
       bsda?.waste?.materialName ?? initialState.waste.materialName
     );
     setFieldValue("waste.code", bsda?.waste?.code ?? initialState.waste.code);
+    setFieldValue("waste.adr", bsda?.waste?.adr ?? initialState.waste.adr);
+    setFieldValue(
+      "waste.familyCode",
+      bsda?.waste?.familyCode ?? initialState.waste.familyCode
+    );
     setFieldValue("packagings", bsda?.packagings ?? initialState.packagings);
 
     const { country, ...company } =

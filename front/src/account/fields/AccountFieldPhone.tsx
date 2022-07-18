@@ -4,6 +4,7 @@ import AccountField from "./AccountField";
 import AccountFormSimpleInput from "./forms/AccountFormSimpleInput";
 import { object, string } from "yup";
 import { User, MutationEditProfileArgs } from "generated/graphql/types";
+import { validatePhoneNumber } from "common/helper";
 
 type Me = Pick<User, "phone">;
 
@@ -32,10 +33,11 @@ const UPDATE_PHONE = gql`
 const yupSchema = object().shape({
   phone: string()
     .trim()
-    .matches(/^(0[1-9])(?:[ _.-]?(\d{2})){4}$/, {
-      message: "Le numéro de téléphone est invalide",
-      excludeEmptyString: true,
-    }),
+    .test(
+      "is-valid-phone",
+      "Merci de renseigner un numéro de téléphone valide",
+      validatePhoneNumber
+    ),
 });
 
 export default function AccountFieldPhone({ me }: Props) {

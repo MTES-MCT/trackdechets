@@ -55,7 +55,16 @@ export default function DasriPackagings({
                           placeholder="Nombre de colis"
                           min="1"
                           disabled={disabled}
+                          validate={value => {
+                            if (value === null) {
+                              return "Champ requis";
+                            }
+                            if (value < 1) {
+                              return "Le nombre de colis doit être supérieur ou égal à 1";
+                            }
+                          }}
                         />
+                        <RedErrorMessage name={`${name}.${idx}.quantity`} />
                       </div>
                       <div className="tw-w-1/3 tw-pr-2">
                         <label>
@@ -91,6 +100,7 @@ export default function DasriPackagings({
                             ))}
                           </select>
                         </label>
+                        <RedErrorMessage name={`${name}.${idx}.type`} />
                       </div>
                       <div className="tw-w-1/3 tw-px-2">
                         {p.type === "AUTRE" && (
@@ -101,21 +111,28 @@ export default function DasriPackagings({
                               name={`${name}.${idx}.other`}
                               placeholder="..."
                               disabled={disabled}
+                              validate={value => {
+                                if (value === null || value === "") {
+                                  return "Champ requis";
+                                }
+                              }}
                             />
+                            <RedErrorMessage name={`${name}.${idx}.other`} />
                           </label>
                         )}
                       </div>
 
                       <div className="tw-w-1/3 tw-px-2">
                         <Field
-                          label="Volume"
+                          label="Volume unitaire (l)"
                           component={NumberInput}
                           className="td-input"
                           name={`${name}.${idx}.volume`}
-                          placeholder="Volume en litres"
+                          placeholder="Volume unitaire (l)"
                           min="1"
                           disabled={disabled}
                         />
+                        <RedErrorMessage name={`${name}.${idx}.volume`} />
                       </div>
                     </div>
                     {!disabled && (
@@ -129,10 +146,6 @@ export default function DasriPackagings({
                       </div>
                     )}
                   </div>
-                  <RedErrorMessage name={`${name}.${idx}.type`} />
-                  <RedErrorMessage name={`${name}.${idx}.other`} />
-                  <RedErrorMessage name={`${name}.${idx}.quantity`} />
-                  <RedErrorMessage name={`${name}.${idx}.volume`} />
                 </div>
               );
             })}
@@ -146,7 +159,7 @@ export default function DasriPackagings({
                     type: BsdasriPackagingType.Autre,
                     other: "",
                     quantity: 1,
-                    volume: 0,
+                    volume: 1,
                   })
                 }
               >

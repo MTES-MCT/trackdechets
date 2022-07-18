@@ -34,8 +34,6 @@ export function flattenBsffInput(
     emitterCompanyMail: bsffInput.emitter?.company?.mail,
     emitterCustomInfo: bsffInput.emitter?.customInfo,
 
-    packagings: bsffInput.packagings,
-
     wasteCode: bsffInput.waste?.code,
     wasteDescription: bsffInput.waste?.description,
     wasteAdr: bsffInput.waste?.adr,
@@ -126,7 +124,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
         })
       })
     }),
-    packagings: prismaBsff.packagings as GraphQL.BsffPackaging[],
+    packagings: [], // will be resolved in Bsff resolver
     waste: nullIfNoValues<GraphQL.BsffWaste>({
       code: prismaBsff.wasteCode,
       description: prismaBsff.wasteDescription,

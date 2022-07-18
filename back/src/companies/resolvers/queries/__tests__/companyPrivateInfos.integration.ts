@@ -152,10 +152,9 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Transporter company with transporter receipt", async () => {
-    const vatNumber = "85001946400013";
+    const siret = "85001946400013";
     searchSirene.mockResolvedValueOnce({
-      siret: null,
-      vatNumber,
+      siret: "85001946400013",
       etatAdministratif: "A",
       name: "CODE EN STOCK",
       address: "4 Boulevard Longchamp 13001 Marseille",
@@ -174,7 +173,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     };
 
     await companyFactory({
-      vatNumber,
+      siret: "85001946400013",
       name: "Code en Stock",
       securityCode: 1234,
       contactEmail: "john.snow@trackdechets.fr",
@@ -186,7 +185,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     const gqlquery = `
       query {
         companyPrivateInfos(clue: "85001946400013") {
-          vatNumber
+          siret
           isAnonymousCompany
           transporterReceipt {
             receiptNumber
@@ -199,7 +198,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     expect(response.data.companyPrivateInfos.transporterReceipt).toEqual(
       receipt
     );
-    expect(response.data.companyPrivateInfos.vatNumber).toEqual(vatNumber);
+    expect(response.data.companyPrivateInfos.siret).toEqual(siret);
     expect(response.data.companyPrivateInfos.isAnonymousCompany).toBeFalsy();
   });
 
@@ -354,7 +353,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       address: null,
       contactEmail: null,
       contactPhone: null,
-      etatAdministratif: null,
+      etatAdministratif: "A",
       installation: null,
       isRegistered: false,
       statutDiffusionEtablissement: "N",
@@ -404,7 +403,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       contactPhone: company.contactPhone,
       website: company.website,
       companyTypes: [CompanyType.WASTEPROCESSOR],
-      etatAdministratif: null,
+      etatAdministratif: "A",
       isRegistered: true,
       statutDiffusionEtablissement: "N",
       isAnonymousCompany: false,

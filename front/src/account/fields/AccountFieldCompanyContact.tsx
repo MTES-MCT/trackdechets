@@ -9,46 +9,39 @@ import {
   UserRole,
   MutationUpdateCompanyArgs,
 } from "generated/graphql/types";
-import { validatePhoneNumber } from "common/helper";
 
 type Props = {
   company: CompanyPrivate;
 };
 
-AccountFielCompanyContactPhone.fragments = {
+AccountFielCompanyContact.fragments = {
   company: gql`
-    fragment AccountFieldCompanyContactPhoneFragment on CompanyPrivate {
+    fragment AccountFieldCompanyContactFragment on CompanyPrivate {
       id
       siret
-      contactPhone
+      contact
       userRole
     }
   `,
 };
 
-const UPDATE_CONTACT_PHONE = gql`
-  mutation UpdateCompany($siret: String!, $contactPhone: String) {
-    updateCompany(siret: $siret, contactPhone: $contactPhone) {
+const UPDATE_CONTACT = gql`
+  mutation UpdateCompany($siret: String!, $contact: String!) {
+    updateCompany(siret: $siret, contact: $contact) {
       id
       siret
-      contactPhone
+      contact
     }
   }
 `;
 
 const yupSchema = object().shape({
-  contactPhone: string()
-    .trim()
-    .test(
-      "is-valid-phone",
-      "Merci de renseigner un numéro de téléphone valide",
-      validatePhoneNumber
-    ),
+  contact: string().max(100),
 });
 
-export default function AccountFielCompanyContactPhone({ company }: Props) {
-  const fieldName = "contactPhone";
-  const fieldLabel = "Téléphone de contact";
+export default function AccountFielCompanyContact({ company }: Props) {
+  const fieldName = "contact";
+  const fieldLabel = "Prénom et nom du contact";
 
   return (
     <>
@@ -56,14 +49,14 @@ export default function AccountFielCompanyContactPhone({ company }: Props) {
         <AccountField
           name={fieldName}
           label={fieldLabel}
-          value={company.contactPhone}
+          value={company.contact}
           renderForm={toggleEdition => (
             <AccountFormSimpleInput<Partial<MutationUpdateCompanyArgs>>
-              name="contactPhone"
-              type="tel"
-              value={company.contactPhone}
+              name="contact"
+              type="text"
+              value={company.contact}
               placeHolder={fieldLabel}
-              mutation={UPDATE_CONTACT_PHONE}
+              mutation={UPDATE_CONTACT}
               mutationArgs={{ siret: company.siret }}
               yupSchema={yupSchema}
               toggleEdition={() => {
@@ -76,7 +69,7 @@ export default function AccountFielCompanyContactPhone({ company }: Props) {
         <AccountFieldNotEditable
           name={fieldName}
           label={fieldLabel}
-          value={company.contactPhone}
+          value={company.contact}
         />
       )}
     </>

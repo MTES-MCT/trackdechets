@@ -218,6 +218,98 @@ describe("Query.bsffs", () => {
     expect(data.bsffs.edges.length).toBe(1);
   });
 
+  it("should filter on packagings numero", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff1 = await createBsff(
+      { emitter },
+      {
+        packagings: {
+          create: { name: "Bouteille", numero: "AAAAA", weight: 1 }
+        }
+      }
+    );
+    const bsff2 = await createBsff(
+      { emitter },
+      {
+        packagings: {
+          create: { name: "Bouteille", numero: "BBBBB", weight: 1 }
+        }
+      }
+    );
+    const bsff3 = await createBsff(
+      { emitter },
+      {
+        packagings: {
+          create: { name: "Bouteille", numero: "CCCCC", weight: 1 }
+        }
+      }
+    );
+
+    const { query } = makeClient(emitter.user);
+    const { data: data1 } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+      GET_BSFFS,
+      {
+        variables: {
+          where: {
+            packagings: {
+              numero: {
+                _eq: "AAAAA"
+              }
+            }
+          }
+        }
+      }
+    );
+    expect(data1.bsffs.edges).toEqual([
+      expect.objectContaining({
+        node: expect.objectContaining({ id: bsff1.id })
+      })
+    ]);
+
+    const { data: data2 } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+      GET_BSFFS,
+      {
+        variables: {
+          where: {
+            packagings: {
+              numero: {
+                _contains: "AA"
+              }
+            }
+          }
+        }
+      }
+    );
+    expect(data2.bsffs.edges).toEqual([
+      expect.objectContaining({
+        node: expect.objectContaining({ id: bsff1.id })
+      })
+    ]);
+
+    const { data: data3 } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+      GET_BSFFS,
+      {
+        variables: {
+          where: {
+            packagings: {
+              numero: {
+                _in: ["BBBBB", "CCCCC"]
+              }
+            }
+          }
+        }
+      }
+    );
+    expect(data3.bsffs.edges).toEqual([
+      expect.objectContaining({
+        node: expect.objectContaining({ id: bsff3.id })
+      }),
+      expect.objectContaining({
+        node: expect.objectContaining({ id: bsff2.id })
+      })
+    ]);
+  });
+
   describe("when listing the BSFFs that are grouped into this one", () => {
     let emitter: UserWithCompany;
     let transporter: UserWithCompany;

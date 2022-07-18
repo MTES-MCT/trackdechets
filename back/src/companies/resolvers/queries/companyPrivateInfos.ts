@@ -1,4 +1,5 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
+import { isSiret, isVat } from "../../../common/constants/companySearchHelpers";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   CompanySearchPrivate,
@@ -8,22 +9,35 @@ import prisma from "../../../prisma";
 import { getCompanyInfos } from "./companyInfos";
 
 const companyInfosResolvers: QueryResolvers["companyPrivateInfos"] = async (
-  parent,
+  _,
   args,
   context
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   checkIsAuthenticated(context);
   const cleanClue = args.clue.replace(/\s/g, "").toUpperCase();
-  const [companyInfos, isAnonymousCompany] = await Promise.all([
+  const [companyInfos, isAnonymousCompany, company] = await Promise.all([
     getCompanyInfos(cleanClue),
     prisma.anonymousCompany.count({
       where: { siret: cleanClue }
+    }),
+    prisma.company.findUnique({
+      where: {
+        ...(isSiret(cleanClue) && { siret: cleanClue }),
+        ...(isVat(cleanClue) && { vatNumber: cleanClue })
+      },
+      select: {
+        gerepId: true,
+        securityCode: true,
+        verificationCode: true,
+        givenName: true
+      }
     })
   ]);
-
+  const companyInfosConvert: any = companyInfos;
   return {
-    ...companyInfos,
+    ...companyInfosConvert,
+    ...company,
     // We don't need this infos in this query
     isAnonymousCompany: isAnonymousCompany > 0
   } as CompanySearchPrivate;

@@ -1,0 +1,22 @@
+"""
+Basic Company Infos to validate and correct
+"""
+input CompanyValidationInput {
+  """
+  SIRET de l'établissement composé de 14 caractères numériques
+  """
+  siret: String
+
+  """
+  Numéro de TVA intra-communautaire de l'établissement. À renseigner pour
+  les transporteurs étrangers uniquement.
+  """
+  vatNumber: String
+
+  "Nom de l'établissement"
+  name: String
+
+  "Adresse de l'établissement"
+  address: String
+
+}

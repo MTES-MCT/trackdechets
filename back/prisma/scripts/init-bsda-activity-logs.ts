@@ -6,7 +6,7 @@ const CHUNK_SIZE = 100;
 @registerUpdater(
   "Init Bsda activity logs",
   "Create a `BsdaCreated` event for every existing Bsda. It acts as a starting point in time.",
-  true
+  false
 )
 export class InitBsdaActivityLogs implements Updater {
   async run() {

@@ -693,8 +693,27 @@ export default function AccountCompanyAdd() {
                     Je certifie disposer du pouvoir pour créer un compte au nom
                     de mon entreprise
                   </label>
-
                   <RedErrorMessage name="isAllowed" />
+                  <div className="notification tw-mt-2">
+                    <p className="tw-italic">
+                      En tant qu'administrateur de l'établissement, j'ai pris
+                      connaissance des{" "}
+                      <a
+                        href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        modalités de gestion des membres
+                      </a>
+                      .
+                    </p>
+                    <p className="tw-italic">
+                      Je m'engage notamment à traiter les éventuelles demandes
+                      de rattachement et à ce que, à tout moment, au moins un
+                      administrateur ait accès à cet établissement dans
+                      Trackdéchets.
+                    </p>
+                  </div>
                 </div>
               </div>
 

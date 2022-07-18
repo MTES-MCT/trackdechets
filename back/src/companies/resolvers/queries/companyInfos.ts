@@ -1,24 +1,25 @@
 import { UserInputError } from "apollo-server-express";
 import {
   CompanyPublic,
-  CompanySearchPrivate,
   QueryResolvers
 } from "../../../generated/graphql/types";
 import { getInstallation } from "../../database";
 import { searchCompany } from "../../search";
 
 /**
- * This function is used to return public company
- * information for a specific siret or VAT number. It merge info
- * from Sirene or VIES vat database, S3ic database and TD without
- * exposing private TD info like securityCode, users, etc
+ * Recherche et renvoie les données diffusables
+ * sur une entreprise pour un numéro de SIRET ou de TVA
+ * Fusionnant les infos des bases Tracdéchets et S3IC
+ * si elles existent
+ * Renvoie le type CompanyPublic pour la query companyInfos
+ * et le type CompanySearchPrivate pour la query companyPrivateInfos
  *
  * @param siretOrVat
  */
 export async function getCompanyInfos(
   siretOrVat: string
-): Promise<CompanyPublic | CompanySearchPrivate> {
-  if (siretOrVat === undefined || !siretOrVat.length) {
+): Promise<CompanyPublic> {
+  if (!siretOrVat) {
     throw new UserInputError(
       "Paramètre absent. Un numéro SIRET ou de TVA intracommunautaire valide est requis",
       {
@@ -27,18 +28,44 @@ export async function getCompanyInfos(
     );
   }
   const searchResult = await searchCompany(siretOrVat);
+
   return {
-    ...searchResult,
+    siret: searchResult.siret,
+    vatNumber: searchResult.vatNumber,
+    codePaysEtrangerEtablissement: searchResult.codePaysEtrangerEtablissement,
+    etatAdministratif: searchResult.etatAdministratif,
+    statutDiffusionEtablissement: searchResult.statutDiffusionEtablissement,
+    address: searchResult.address,
+    codeCommune: searchResult.codeCommune,
+    name: searchResult.name,
+    naf: searchResult.naf,
+    libelleNaf: searchResult.libelleNaf,
+    installation: await getInstallation(siretOrVat),
+    contact: searchResult.contact,
+    contactEmail: searchResult.contactEmail,
+    contactPhone: searchResult.contactPhone,
+    website: searchResult.website,
+    isRegistered: searchResult.isRegistered,
+    companyTypes: searchResult.companyTypes,
     ecoOrganismeAgreements: searchResult.ecoOrganismeAgreements ?? [],
-    installation: await getInstallation(siretOrVat)
+    allowBsdasriTakeOverWithoutSignature:
+      searchResult.allowBsdasriTakeOverWithoutSignature,
+    transporterReceipt: searchResult.transporterReceipt,
+    traderReceipt: searchResult.traderReceipt,
+    brokerReceipt: searchResult.brokerReceipt,
+    vhuAgrementDemolisseur: searchResult.vhuAgrementDemolisseur,
+    vhuAgrementBroyeur: searchResult.vhuAgrementBroyeur
   };
 }
 
+/**
+ * Public Query
+ */
 const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
-  parent,
+  _,
   args
 ) => {
-  if (args.siret === undefined && args.clue === undefined) {
+  if (!args.siret && !args.clue) {
     throw new UserInputError(
       "Paramètre siret et clue absents. Un numéro SIRET ou de TVA intracommunautaire valide est requis",
       {

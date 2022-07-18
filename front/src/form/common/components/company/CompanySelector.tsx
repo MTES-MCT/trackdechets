@@ -1,13 +1,15 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import { Field, useField, useFormikContext } from "formik";
-import React, { useEffect, useCallback, useMemo, useState } from "react";
+import React, { useRef, useEffect, useCallback, useState } from "react";
 import { checkVAT } from "jsvat";
-import { IconSearch } from "common/components/Icons";
+import { IconSearch, IconLoading } from "common/components/Icons";
 import { constantCase } from "constant-case";
-import { InlineError, NotificationError } from "common/components/Error";
+import {
+  NotificationError,
+  SimpleNotificationError,
+} from "common/components/Error";
 import RedErrorMessage from "common/components/RedErrorMessage";
-import { COMPANY_INFOS } from "form/common/components/company/query";
 import {
   isFRVat,
   isSiret,
@@ -15,29 +17,35 @@ import {
   countries as vatCountries,
 } from "generated/constants/companySearchHelpers";
 
-import CompanyResults from "./CompanyResults";
+import CompanyResults, { isSelected } from "./CompanyResults";
 import styles from "./CompanySelector.module.scss";
-import { FAVORITES, SEARCH_COMPANIES } from "./query";
+import {
+  FAVORITES,
+  SEARCH_COMPANIES,
+  COMPANY_SELECTOR_PRIVATE_INFOS,
+} from "./query";
 import {
   Query,
   QuerySearchCompaniesArgs,
-  Form,
   FormCompany,
   QueryFavoritesArgs,
   FavoriteType,
+  CompanySearchResult,
   CompanyFavorite,
+  QueryCompanyPrivateInfosArgs,
 } from "generated/graphql/types";
 import CountrySelector from "./CountrySelector";
 import { v4 as uuidv4 } from "uuid";
 import { useParams } from "react-router-dom";
-import AutoFormattingCompanyInfosInput from "common/components/AutoFormattingCompanyInfosInput";
+
+const DEBOUNCE_DELAY = 500;
 
 interface CompanySelectorProps {
   name: string;
-  onCompanySelected?: (company: CompanyFavorite) => void;
+  onCompanySelected?: (company: CompanySearchResult) => void;
   allowForeignCompanies?: boolean;
-  // whether to display a vat searchbar when allowForeignCompanies==true
-  displayVatSearch?: boolean;
+  // force l'affichage d'un formulaire pour entrer manuellement les coordonnées
+  forceManualForeignCompanyForm?: boolean;
   registeredOnlyCompanies?: boolean;
   heading?: string;
   disabled?: boolean;
@@ -51,7 +59,7 @@ export default function CompanySelector({
   name,
   onCompanySelected,
   allowForeignCompanies = false,
-  displayVatSearch = true, // used in order to allow foreign companies input without VAT search
+  forceManualForeignCompanyForm = false,
   registeredOnlyCompanies = false,
   heading,
   disabled,
@@ -59,25 +67,36 @@ export default function CompanySelector({
   skipFavorite = false,
   optional = false,
 }: CompanySelectorProps) {
-  // STATE
-  const [isRegistered, setIsRegistered] = useState(true);
-  const [isDisabled, setIsDisabled] = useState(false);
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
   const [field] = useField<FormCompany>({ name });
-  const [isForeignCompany, setIsForeignCompany] = useState(false);
-  const { setFieldError, setFieldValue, setFieldTouched } = useFormikContext();
-  const { values } = useFormikContext<Form>();
+  const { setFieldError, setFieldValue } = useFormikContext();
+  const [isForeignCompany, setIsForeignCompany] = useState(
+    `${field.name}.country` !== "FR"
+  );
+
   const [clue, setClue] = useState("");
   const [department, setDepartement] = useState<null | string>(null);
+  const [mustBeRegistered, setMustBeRegistered] = useState<boolean>(false);
+  const [searchResults, setSearchResults] = useState<CompanySearchResult[]>([]);
+  const [
+    toggleManualForeignCompanyForm,
+    setToggleManualForeignCompanyForm,
+  ] = useState<boolean>(false);
+  const timeout = useRef<number | null>();
+
+  /**
+   * SearchCompanies permet de rechercher par nom, tva ou siret.
+   */
   const [
     searchCompaniesQuery,
-    { loading: isLoadingSearch, data: searchData },
+    { loading: isLoadingSearch, data: searchData, error },
   ] = useLazyQuery<Pick<Query, "searchCompanies">, QuerySearchCompaniesArgs>(
     SEARCH_COMPANIES
   );
-  // The favorite type is inferred from the name's prefix
+  // Le type de favori est déduit du préfixe nom du champ (transporter, emitter, etc)
   const favoriteType = constantCase(field.name.split(".")[0]) as FavoriteType;
+
   const {
     loading: isLoadingFavorites,
     data: favoritesData,
@@ -87,46 +106,39 @@ export default function CompanySelector({
       siret,
       type: favoriteType,
     },
-    // Skip this query if the name's prefix is not a known favorite
-    skip: !Object.values(FavoriteType).includes(favoriteType) || skipFavorite,
+    skip: skipFavorite,
   });
 
+  const getFormCompanyIdentifier = (): string => {
+    if (field.value.siret) {
+      return field.value.siret;
+    } else if (field.value.vatNumber) {
+      return field.value.vatNumber;
+    }
+    return "";
+  };
+
   /**
-   * searchCompany used currently only for VAT number exact match search
+   * CompanyPrivateInfos pour completer les informations
+   * initialement enregistrées dans le BSD
    */
-  const [searchCompany, { loading, error }] = useLazyQuery<
-    Pick<Query, "companyInfos">
-  >(COMPANY_INFOS, {
-    onCompleted: data => {
-      if (data?.companyInfos) {
-        const companyInfos = data.companyInfos;
-        if (!companyInfos.isRegistered && registeredOnlyCompanies) {
-          cogoToast.error(
-            "Cet établissement n'est pas enregistré sur Trackdéchets, nous ne pouvons l'ajouter dans ce formulaire"
-          );
-          return;
-        }
-        if (companyInfos.name === "---") {
-          cogoToast.error(
-            "Cet établissement existe mais nous ne pouvons remplir automatiquement le formulaire"
-          );
-        }
-        setIsRegistered(companyInfos.isRegistered ?? false);
-        setIsDisabled(!companyInfos.isRegistered);
-        selectCompany(companyInfos as CompanyFavorite);
-      }
+  const { data: selectedData } = useQuery<
+    Pick<Query, "companyPrivateInfos">,
+    QueryCompanyPrivateInfosArgs
+  >(COMPANY_SELECTOR_PRIVATE_INFOS, {
+    variables: {
+      clue: getFormCompanyIdentifier(),
     },
-    fetchPolicy: "no-cache",
+    skip: !getFormCompanyIdentifier().length,
   });
 
   /**
-   * Callback on company result selection
-   * for both searchCompanies by SIRET or name and searchCompany by VAT number
+   * Selection d'un établissement dans le formulaire
    */
   const selectCompany = useCallback(
-    (company: CompanyFavorite | null) => {
+    (company: CompanySearchResult) => {
       if (disabled) return;
-      // allow unselecting the company
+      // empty the  selected company when null
       if (!company) {
         setFieldValue(field.name, {
           siret: "",
@@ -140,25 +152,35 @@ export default function CompanySelector({
         });
         return;
       }
-      // empty contact infos
-      setFieldValue(field.name, {
-        contact: "",
-        mail: "",
-        phone: "",
-      });
-      // avoid setting same company multiple times
-      const fields = {
+      // Effets de bord
+      setMustBeRegistered(!company.isRegistered && registeredOnlyCompanies);
+      // Doubler l'erreur affichée dans le dom par ce toaster asur le click
+      if (company.name === "---" || company.name === "") {
+        cogoToast.error(
+          "Cet établissement existe mais nous ne pouvons pas remplir automatiquement le formulaire"
+        );
+      }
+
+      // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
+      setToggleManualForeignCompanyForm(
+        company.codePaysEtrangerEtablissement !== "FR" &&
+          (company.name === "---" || company.name === "")
+      );
+
+      setIsForeignCompany(company.codePaysEtrangerEtablissement !== "FR");
+      // Prépare la mise à jour du Form
+      const fields: FormCompany = {
         siret: company.siret,
         vatNumber: company.vatNumber,
-        name: company.name,
-        address: company.address,
-        contact: company.contact,
-        phone: company.phone,
-        mail: company.mail,
+        name: company.name ?? "",
+        address: company.address ?? "",
+        contact: company.contact ?? "",
+        phone: company.contactPhone ?? "",
+        mail: company.contactEmail ?? "",
         country: company.codePaysEtrangerEtablissement,
       };
 
-      // automatically set the country field
+      // Automatiquement écraser le champ country
       if (company.vatNumber) {
         const vatCountryCode = checkVAT(company.vatNumber, vatCountries)
           ?.country?.isoCode.short;
@@ -171,157 +193,258 @@ export default function CompanySelector({
         setFieldValue(`${field.name}.${key}`, fields[key]);
       });
 
-      // callback to the parent React component
+      // Parent component
       if (onCompanySelected) {
         onCompanySelected(company);
       }
     },
-    [field.name, setFieldValue, onCompanySelected, disabled]
+    [
+      field.name,
+      setFieldValue,
+      setIsForeignCompany,
+      setToggleManualForeignCompanyForm,
+      onCompanySelected,
+      disabled,
+      registeredOnlyCompanies,
+      setMustBeRegistered,
+    ]
   );
 
+  useEffect(() => {
+    if (!allowForeignCompanies) {
+      return setToggleManualForeignCompanyForm(false);
+    }
+    if (!field.value.siret?.length && !field.value.vatNumber?.length) {
+      setToggleManualForeignCompanyForm(false);
+    } else {
+      setToggleManualForeignCompanyForm(
+        !!isForeignCompany &&
+          (field.value.name === "---" || field.value.name === "")
+      );
+    }
+  }, [
+    field.value.name,
+    field.value.siret,
+    field.value.vatNumber,
+    isForeignCompany,
+    allowForeignCompanies,
+    setToggleManualForeignCompanyForm,
+  ]);
+
+  useEffect(() => {
+    if (!field?.value.country || field.value.country === "") {
+      setIsForeignCompany(false);
+    } else {
+      setIsForeignCompany(
+        field?.value.country?.length > 0 && field.value.country !== "FR"
+      );
+    }
+  }, [field.value.country, setIsForeignCompany]);
+
+  const favoriteToCompanySearchResult = ({
+    siret,
+    vatNumber,
+    name,
+    address,
+    transporterReceipt,
+    traderReceipt,
+    brokerReceipt,
+    vhuAgrementDemolisseur,
+    vhuAgrementBroyeur,
+    codePaysEtrangerEtablissement,
+    isRegistered,
+    phone,
+    mail,
+    contact,
+  }: CompanyFavorite): CompanySearchResult => ({
+    siret,
+    vatNumber,
+    name,
+    address,
+    transporterReceipt,
+    traderReceipt,
+    brokerReceipt,
+    vhuAgrementDemolisseur,
+    vhuAgrementBroyeur,
+    codePaysEtrangerEtablissement: codePaysEtrangerEtablissement?.length
+      ? codePaysEtrangerEtablissement
+      : "FR",
+    contact,
+    contactPhone: phone,
+    contactEmail: mail,
+    isRegistered,
+    companyTypes: [],
+    etatAdministratif: "A",
+  });
+
   /**
-   * Parse and merge data from searchCompanies and favoritesData
+   * Fusionne les réponses de searchCompanies et favoritesData
    */
-  const searchResults: CompanyFavorite[] = useMemo(
-    () =>
-      searchData?.searchCompanies
-        .map(
-          ({
-            siret,
-            vatNumber,
-            name,
-            address,
-            transporterReceipt,
-            traderReceipt,
-            brokerReceipt,
-            vhuAgrementDemolisseur,
-            vhuAgrementBroyeur,
-            codePaysEtrangerEtablissement,
-            etatAdministratif,
-          }) => {
-            // exclude closed companies in SIRENE data
-            if (etatAdministratif !== "A") return {};
-            return {
-              // convert CompanySearchResult to CompanyFavorite
-              siret,
-              vatNumber,
-              name,
-              address,
-              transporterReceipt,
-              traderReceipt,
-              brokerReceipt,
-              vhuAgrementDemolisseur,
-              vhuAgrementBroyeur,
-              codePaysEtrangerEtablissement: codePaysEtrangerEtablissement?.length
-                ? codePaysEtrangerEtablissement
-                : "FR",
-              __typename: "CompanyFavorite",
-              contact: "",
-              phone: "",
-              mail: "",
-            } as CompanyFavorite;
-          }
-        )
-        .filter(company => Object.keys(company).length > 0)
-        // Concat user favorites companies, except the siret already in Search results
-        .concat(
-          favoritesData?.favorites?.filter(
+  useEffect(() => {
+    if (disabled) return;
+    let mergedResults:
+      | CompanySearchResult[]
+      | undefined = searchData?.searchCompanies
+      .map(
+        ({
+          siret,
+          vatNumber,
+          name,
+          address,
+          transporterReceipt,
+          traderReceipt,
+          brokerReceipt,
+          vhuAgrementDemolisseur,
+          vhuAgrementBroyeur,
+          codePaysEtrangerEtablissement,
+          etatAdministratif,
+          isRegistered,
+          companyTypes,
+          contactPhone,
+          contactEmail,
+          contact,
+        }) => ({
+          siret,
+          vatNumber,
+          name,
+          address,
+          transporterReceipt,
+          traderReceipt,
+          brokerReceipt,
+          vhuAgrementDemolisseur,
+          vhuAgrementBroyeur,
+          codePaysEtrangerEtablissement: codePaysEtrangerEtablissement?.length
+            ? codePaysEtrangerEtablissement
+            : "FR",
+          contact,
+          contactPhone,
+          contactEmail,
+          isRegistered,
+          companyTypes,
+          etatAdministratif,
+        })
+      )
+      .filter(company => company.etatAdministratif === "A");
+
+    if (mergedResults) {
+      // Concatener les favoris sauf doublons
+      mergedResults = mergedResults.concat(
+        favoritesData?.favorites
+          .filter(
             fav =>
+              !skipFavorite &&
               !searchData?.searchCompanies
                 .map(company => company.siret)
-                .includes(fav.siret)
-          ) ?? []
-        ) ??
-      favoritesData?.favorites ??
-      [],
-    [searchData, favoritesData]
-  );
-
-  /**
-   * Force Selection of the first item if searchResults
-   */
-  useEffect(() => {
-    if (!optional) {
-      if (searchResults.length === 1 && field.value.siret === "") {
-        selectCompany(searchResults[0]);
-      }
+                .includes(fav.siret) &&
+              !searchData?.searchCompanies
+                .map(company => company.vatNumber)
+                .includes(fav.vatNumber)
+          )
+          .map(favorite => favoriteToCompanySearchResult(favorite)) ?? []
+      );
+    } else if (favoritesData?.favorites) {
+      mergedResults = favoritesData?.favorites
+        .filter(fav => !skipFavorite)
+        .map(favorite => favoriteToCompanySearchResult(favorite));
+    } else {
+      mergedResults = [];
     }
-  }, [searchResults, field.value.siret, selectCompany, optional]);
+    setSearchResults(mergedResults);
+  }, [disabled, favoritesData, searchData, setSearchResults, skipFavorite]);
 
   /**
-   * Force Selection of checkbox is foreign
+   * Démarre la requete avec un délai
    */
   useEffect(() => {
-    setIsForeignCompany(
-      !!field.value.vatNumber &&
-        !field.value.vatNumber?.toUpperCase().startsWith("FR")
-    );
-  }, [field.value.vatNumber]);
-
-  /**
-   * Trigger searchCompaniesQuery with a delay
-   */
-  useEffect(() => {
-    const timeoutID = setTimeout(() => {
+    timeout.current = setTimeout(() => {
       if (clue.length < 3) {
         return;
       }
+      const isValidSiret = isSiret(clue);
+      const isValidVat = isVat(clue);
+      const isTextSearch = !isValidSiret && !isValidVat;
 
-      searchCompaniesQuery({
-        variables: {
-          clue,
-          department: department,
-        },
-      });
-    }, 300);
+      if (isValidSiret || isTextSearch) {
+        searchCompaniesQuery({
+          variables: {
+            clue,
+            department: department,
+          },
+        });
+      } else if (isValidVat) {
+        if (allowForeignCompanies) {
+          if (isFRVat(clue)) {
+            setFieldError(
+              `${field.name}.siret`,
+              "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et pas par son numéro de TVA"
+            );
+          } else {
+            searchCompaniesQuery({
+              variables: {
+                clue,
+              },
+            });
+          }
+        } else {
+          setFieldError(
+            `${field.name}.siret`,
+            "Vous ne pouvez pas chercher un établissement par son numéro de TVA, mais par nom ou numéro de SIRET"
+          );
+        }
+      } else {
+        setFieldError(
+          `${field.name}.siret`,
+          "Vous devez entrer un numéro SIRET valide (14 chiffres) ou le nom d'une entreprise française"
+        );
+      }
+      timeout.current = null;
+    }, DEBOUNCE_DELAY);
 
     return () => {
-      clearTimeout(timeoutID);
+      if (timeout.current) {
+        clearTimeout(timeout.current);
+        timeout.current = null;
+      }
     };
-  }, [clue, department, searchCompaniesQuery]);
-
-  if (isLoadingFavorites) {
-    return <p>Chargement...</p>;
-  }
-
-  if (favoritesError) {
-    return <InlineError apolloError={favoritesError} />;
-  }
+  }, [
+    clue,
+    department,
+    setIsForeignCompany,
+    setFieldValue,
+    searchCompaniesQuery,
+    setFieldError,
+    allowForeignCompanies,
+    field.name,
+  ]);
 
   /**
-   * Handle VAT search button click
+   * Selection Company si le form est vierge
    */
-  const onClickValidateForeignVat = () => {
-    const vatNumber = values.transporter?.company?.vatNumber;
-
-    if (!vatNumber) return;
-
-    const isValidSiret = isSiret(vatNumber);
-    const isValidVat = isVat(vatNumber);
-    if (isValidSiret) {
-      return setFieldError(
-        `${field.name}.vatNumber`,
-        "Vous devez entrer un numéro de TVA intra-communautaire hors-France"
-      );
-    } else if (isValidVat && isFRVat(vatNumber)) {
-      return setFieldError(
-        `${field.name}.vatNumber`,
-        "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et non son numéro de TVA"
-      );
-    } else if (!isValidVat) {
-      return setFieldError(
-        `${field.name}.vatNumber`,
-        "Vous devez entrer un numéro TVA intra-communautaire valide"
-      );
+  useEffect(() => {
+    if (
+      !optional &&
+      searchResults.length >= 1 &&
+      !field.value.siret?.length &&
+      !field.value.vatNumber?.length
+    ) {
+      selectCompany(searchResults[0]);
     }
-
-    searchCompany({
-      variables: { siret: vatNumber },
-    });
-  };
+  }, [
+    optional,
+    field.value.siret?.length,
+    field.value.vatNumber?.length,
+    searchResults,
+    selectCompany,
+  ]);
 
   return (
     <>
+      {favoritesError && (
+        <NotificationError
+          apolloError={favoritesError}
+          message={error => error.message}
+        />
+      )}
       {error && (
         <NotificationError
           apolloError={error}
@@ -331,8 +454,8 @@ export default function CompanySelector({
               error.graphQLErrors[0].extensions?.code === "FORBIDDEN"
             ) {
               return (
-                "Nous n'avons pas pu récupérer les informations de cet établissement. " +
-                "Veuillez nous contacter à l'adresse hello@trackdechets.beta.gouv.fr pour pouvoir procéder à la création de l'établissement"
+                "Nous n'avons pas pu récupérer les informations." +
+                "Veuillez nous contacter à l'adresse contact@trackdechets.beta.gouv.fr pour pouvoir procéder à la création de l'établissement"
               );
             }
             return error.message;
@@ -341,163 +464,155 @@ export default function CompanySelector({
       )}
       <div className="tw-my-6">
         {!!heading && <h4 className="form__section-heading">{heading}</h4>}
-        <div className={styles.companySelectorSearchFields}>
-          <div className={styles.companySelectorSearchGroup}>
+        <div className="tw-flex tw-justify-between">
+          <div className="tw-w-3/4 tw-flex tw-flex-col tw-justify-between">
             <label htmlFor={`siret-${uniqId}`}>
-              Nom ou numéro de SIRET de l'entreprise
+              Nom ou numéro de SIRET de l'établissement
+              {allowForeignCompanies ? (
+                <small className="tw-block">
+                  ou numéro de TVA intracommunautaire pour les entreprises
+                  étrangères
+                </small>
+              ) : (
+                ""
+              )}
             </label>
-            <div className={styles.companySelectorSearchField}>
+            <div className="tw-flex tw-items-center tw-mr-4">
               <input
                 id={`siret-${uniqId}`}
                 type="text"
-                className={`td-input ${styles.companySelectorSearchSiret}`}
-                onChange={event => setClue(event.target.value)}
-                onBlur={() => setFieldTouched(`${field.name}.siret`, true)}
+                className="td-input tw-w-2/3"
+                onChange={event => {
+                  setClue(event.target.value);
+                }}
                 disabled={disabled}
               />
               <i className={styles.searchIcon} aria-label="Recherche">
-                <IconSearch size="12px" />
+                {isLoadingSearch || isLoadingFavorites ? (
+                  <IconLoading size="18px" />
+                ) : (
+                  <IconSearch size="16px" />
+                )}
               </i>
             </div>
           </div>
 
-          <div className={styles.companySelectorSearchGroup}>
-            <label htmlFor={`geo-${uniqId}`}>Département ou code postal</label>
+          <div className="tw-w-1/4 tw-flex tw-flex-col tw-justify-between">
+            <label htmlFor={`geo-${uniqId}`}>
+              Département ou code postal
+              <small className="tw-block">si l'entreprise est française</small>
+            </label>
 
             <input
               id={`geo-${uniqId}`}
               type="text"
-              className={`td-input ${styles.companySelectorSearchGeo}`}
+              className="td-input"
               onChange={event => setDepartement(event.target.value)}
-              disabled={disabled || isForeignCompany}
+              disabled={disabled}
             />
           </div>
         </div>
-
-        {isLoadingSearch && <span>Chargement...</span>}
-
-        <CompanyResults
-          onSelect={company => {
-            if (!company.vatNumber) {
-              // clear the VAT number input
-              setFieldValue(`${field.name}.vatNumber`, "");
+        {toggleManualForeignCompanyForm === true && (
+          <SimpleNotificationError
+            message={
+              <>
+                <span>
+                  Cet établissement existe mais nous ne pouvons pas remplir
+                  automatiquement le formulaire
+                </span>
+              </>
             }
-            setIsForeignCompany(!!company.vatNumber);
-            selectCompany(company);
-          }}
-          results={searchResults}
-          selectedItem={{
-            ...field.value,
-
-            // Convert FormCompany to CompanyFavorite
-            __typename: "CompanyFavorite",
-            transporterReceipt: null,
-            traderReceipt: null,
-            brokerReceipt: null,
-            vhuAgrementBroyeur: null,
-            vhuAgrementDemolisseur: null,
-          }}
-        />
-
-        <RedErrorMessage name={`${field.name}.siret`} />
-
-        {allowForeignCompanies && (
-          <label>
-            <input
-              type="checkbox"
-              className="td-checkbox"
-              onChange={event => {
-                setIsForeignCompany(event.target.checked);
-                selectCompany(null);
-              }}
-              checked={isForeignCompany}
-              disabled={disabled}
-            />
-            L'entreprise est à l'étranger
-          </label>
+          />
+        )}
+        {!field.value.vatNumber && !field.value.siret && (
+          <SimpleNotificationError
+            message={
+              <>
+                <span>La sélection d'un établissement est obligatoire</span>
+              </>
+            }
+          />
+        )}
+        {mustBeRegistered && (
+          <SimpleNotificationError
+            message={
+              <>
+                <span>
+                  Cet établissement n'est pas inscrit sur Trackdéchets, nous ne
+                  pouvons pas l'ajouter dans ce formulaire
+                </span>
+              </>
+            }
+          />
         )}
 
+        {searchData?.searchCompanies.length === 0 && !isLoadingSearch && (
+          <span>Aucun établissement ne correspond à cette recherche...</span>
+        )}
+
+        <CompanyResults<CompanySearchResult>
+          onSelect={company => selectCompany(company)}
+          results={searchResults}
+          selectedItem={{
+            siret: field.value.siret,
+            vatNumber: field.value.vatNumber,
+            name: field.value.name,
+            address: field.value.address,
+            // complète avec isRegistered
+            ...(selectedData?.companyPrivateInfos &&
+            isSelected(selectedData?.companyPrivateInfos, field.value)
+              ? { isRegistered: selectedData?.companyPrivateInfos.isRegistered }
+              : {}),
+          }}
+        />
         <div className="form__row">
-          {allowForeignCompanies && isForeignCompany && (
-            <>
-              {displayVatSearch && (
-                <div className={styles.companyForeignSelectorForm}>
-                  <div className={styles.field}>
-                    <label className={`text-right ${styles.bold}`}>
-                      Numéro TVA pour un transporteur de l'UE hors-France
-                    </label>
-                    <div className={styles.field__value}>
-                      <Field
-                        name={`${field.name}.vatNumber`}
-                        component={AutoFormattingCompanyInfosInput}
-                        onChange={e => {
-                          setFieldValue(
-                            `${field.name}.vatNumber`,
-                            e.target.value
-                          );
-                        }}
-                        disabled={isDisabled}
+          {allowForeignCompanies &&
+            (isForeignCompany ||
+              forceManualForeignCompanyForm ||
+              toggleManualForeignCompanyForm) && (
+              <>
+                <label>
+                  Nom de l'entreprise
+                  <Field
+                    type="text"
+                    className="td-input"
+                    name={`${field.name}.name`}
+                    placeholder="Nom"
+                    disabled={disabled}
+                  />
+                </label>
+
+                <RedErrorMessage name={`${field.name}.name`} />
+
+                <label>
+                  Adresse de l'entreprise
+                  <Field
+                    type="text"
+                    className="td-input"
+                    name={`${field.name}.address`}
+                    placeholder="Adresse"
+                    disabled={disabled}
+                  />
+                </label>
+
+                <RedErrorMessage name={`${field.name}.address`} />
+                <label>
+                  Pays de l'entreprise
+                  <Field name={`${field.name}.country`} disabled={disabled}>
+                    {({ field, form }) => (
+                      <CountrySelector
+                        {...field}
+                        onChange={code => form.setFieldValue(field.name, code)}
+                        value={field.value}
+                        placeholder="Pays"
                       />
-                      {!isRegistered && (
-                        <p className="error-message">
-                          Cet établissement n'est pas inscrit sur Trackdéchets
-                        </p>
-                      )}
-                      <RedErrorMessage name={`${field.name}.vatNumber`} />
-                      <button
-                        disabled={loading}
-                        className="btn btn--primary tw-mt-2 tw-ml-1"
-                        type="button"
-                        onClick={onClickValidateForeignVat}
-                      >
-                        {loading ? "Chargement..." : "Chercher"}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-              <label>
-                Nom de l'entreprise
-                <Field
-                  type="text"
-                  className="td-input"
-                  name={`${field.name}.name`}
-                  placeholder="Nom"
-                  disabled={disabled}
-                />
-              </label>
+                    )}
+                  </Field>
+                </label>
 
-              <RedErrorMessage name={`${field.name}.name`} />
-
-              <label>
-                Adresse de l'entreprise
-                <Field
-                  type="text"
-                  className="td-input"
-                  name={`${field.name}.address`}
-                  placeholder="Adresse"
-                  disabled={disabled}
-                />
-              </label>
-
-              <RedErrorMessage name={`${field.name}.address`} />
-              <label>
-                Pays de l'entreprise
-                <Field name={`${field.name}.country`} disabled={disabled}>
-                  {({ field, form }) => (
-                    <CountrySelector
-                      {...field}
-                      onChange={code => form.setFieldValue(field.name, code)}
-                      value={field.value}
-                      placeholder="Pays"
-                    />
-                  )}
-                </Field>
-              </label>
-
-              <RedErrorMessage name={`${field.name}.country`} />
-            </>
-          )}
+                <RedErrorMessage name={`${field.name}.country`} />
+              </>
+            )}
           <label>
             Personne à contacter
             <Field
@@ -508,7 +623,6 @@ export default function CompanySelector({
               disabled={disabled}
             />
           </label>
-
           <RedErrorMessage name={`${field.name}.contact`} />
         </div>
         <div className="form__row">

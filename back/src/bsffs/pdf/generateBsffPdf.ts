@@ -5,7 +5,6 @@ import { format } from "date-fns";
 import { Bsff, BsffType, WasteAcceptationStatus } from "@prisma/client";
 import * as QRCode from "qrcode";
 import prisma from "../../prisma";
-import { BsffPackaging } from "../../generated/graphql/types";
 import { OPERATION } from "../constants";
 import { getBsffHistory } from "../database";
 import { generatePdf } from "../../common/pdf";
@@ -19,6 +18,9 @@ export async function generateBsffPdf(bsff: Bsff) {
   const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
     where: { bsffs: { some: { id: { in: [bsff.id] } } } }
   });
+  const packagings = await prisma.bsff
+    .findUnique({ where: { id: bsff.id } })
+    .packagings();
 
   const bsffType = {
     isTracerFluide: bsff.type === BsffType.TRACER_FLUIDE,
@@ -64,7 +66,7 @@ export async function generateBsffPdf(bsff: Bsff) {
     bsff,
     bsffType,
     bsffOperation,
-    packagings: ((bsff.packagings ?? []) as BsffPackaging[])
+    packagings: packagings
       .map(
         packaging =>
           `${[

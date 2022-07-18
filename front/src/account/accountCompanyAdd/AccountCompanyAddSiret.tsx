@@ -117,9 +117,23 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
       {isNonDiffusible && (
         <SimpleNotificationError
           message={
-            "Nous n'avons pas pu récupérer les informations de cet établissement car il n'est pas diffusible. " +
-            "Veuillez nous contacter à l'adresse hello@trackdechets.beta.gouv.fr avec votre certificat d'inscription au répertoire des Entreprises et " +
-            "des Établissements (SIRENE) pour pouvoir procéder à la création de l'établissement"
+            <>
+              <span>
+                Nous n'avons pas pu récupérer les informations de cet
+                établissement car il n'est pas diffusible. Veuillez nous
+                contacter à l'adresse hello@trackdechets.beta.gouv.fr avec votre
+                certificat d'inscription au répertoire des Entreprises et des
+                Établissements (SIRENE) pour pouvoir procéder à la création de
+                l'établissement. Pour télécharger votre certificat, RDV sur{" "}
+              </span>
+              <a
+                href="https://avis-situation-sirene.insee.fr/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                https://avis-situation-sirene.insee.fr/
+              </a>
+            </>
           }
         />
       )}
@@ -136,7 +150,7 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
           } else if (!isValidVat && !/^[0-9]{14}$/.test(values.siret)) {
             return {
               siret:
-                "Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter à l'adresse hello@trackdechets.beta.gouv.fr avec un justifictif légal du pays d'origine.",
+                "Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter à l'adresse contact@trackdechets.beta.gouv.fr avec un justificatif légal du pays d'origine.",
             };
           } else if (isValidVat && isFRVat(values.siret)) {
             return {

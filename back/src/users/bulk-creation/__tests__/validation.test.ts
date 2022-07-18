@@ -1,5 +1,5 @@
 import { ValidationError } from "yup";
-import { validateCompany, validateRoleGenerator } from "../validations";
+import { companyValidationSchema, validateRoleGenerator } from "../validations";
 import { CompanyType } from "@prisma/client";
 
 const mockCompanyExists = jest.fn();
@@ -31,19 +31,21 @@ describe("company validation", () => {
       siret: "12345678901234",
       companyTypes: ["PRODUCER"]
     };
-    await expect(validateCompany(company)).resolves.toEqual(company);
+    await expect(companyValidationSchema.validate(company)).resolves.toEqual(
+      company
+    );
   });
 
   test("missing siret", async () => {
     await expect(
-      validateCompany({
+      companyValidationSchema.validate({
         siret: null,
         companyTypes: ["PRODUCER"]
       })
     ).rejects.toThrow(ValidationError);
 
     await expect(
-      validateCompany({
+      companyValidationSchema.validate({
         companyTypes: ["PRODUCER"]
       })
     ).rejects.toThrow(ValidationError);
@@ -51,7 +53,7 @@ describe("company validation", () => {
 
   test("siret does not have lenght 14", async () => {
     await expect(
-      validateCompany({
+      companyValidationSchema.validate({
         siret: "123",
         companyTypes: ["PRODUCER"]
       })
@@ -63,7 +65,7 @@ describe("company validation", () => {
       Promise.reject("SIRET does not exist")
     );
     await expect(
-      validateCompany({
+      companyValidationSchema.validate({
         siret: "12345678901234",
         companyTypes: ["PRODUCER"]
       })
@@ -73,7 +75,7 @@ describe("company validation", () => {
   test("company already exists in TD", async () => {
     mockCompanyExists.mockResolvedValueOnce(true);
     console.warn = jest.fn();
-    await validateCompany({
+    await companyValidationSchema.validate({
       siret: "12345678901234",
       companyTypes: ["PRODUCER"]
     });
@@ -83,24 +85,24 @@ describe("company validation", () => {
 
   test("missing companyTypes", async () => {
     await expect(
-      validateCompany({
+      companyValidationSchema.validate({
         siret: "12345678901234"
       })
     ).rejects.toThrow(ValidationError);
     await expect(
-      validateCompany({
+      companyValidationSchema.validate({
         siret: "12345678901234",
         companyTypes: null
       })
     ).rejects.toThrow(ValidationError);
     await expect(
-      validateCompany({
+      companyValidationSchema.validate({
         siret: "12345678901234",
         companyTypes: []
       })
     ).rejects.toThrow(ValidationError);
     await expect(
-      validateCompany({
+      companyValidationSchema.validate({
         siret: "12345678901234",
         companyTypes: [""]
       })
@@ -109,7 +111,7 @@ describe("company validation", () => {
 
   test("companyTypes includes bad value", async () => {
     await expect(
-      validateCompany({
+      companyValidationSchema.validate({
         siret: "123",
         companyTypes: [
           "PRODUCE", // typo here
@@ -126,10 +128,12 @@ describe("company validation", () => {
       companyTypes: ["PRODUCER"],
       contactEmail: "john.snow@trackdechets.fr"
     };
-    await expect(validateCompany(company)).resolves.toEqual(company);
+    await expect(companyValidationSchema.validate(company)).resolves.toEqual(
+      company
+    );
     // invalid email
     await expect(
-      validateCompany({
+      companyValidationSchema.validate({
         siret: "12345678901234",
         companyTypes: ["PRODUCER"],
         contactEmail: "azerty"
@@ -144,10 +148,12 @@ describe("company validation", () => {
       companyTypes: ["PRODUCER"],
       website: "https://trackdechets.beta.gouv.fr"
     };
-    await expect(validateCompany(company)).resolves.toEqual(company);
+    await expect(companyValidationSchema.validate(company)).resolves.toEqual(
+      company
+    );
     // invalid URL
     await expect(
-      validateCompany({
+      companyValidationSchema.validate({
         siret: "12345678901234",
         companyTypes: ["PRODUCER"],
         website: "azerty"
@@ -162,23 +168,29 @@ describe("company validation", () => {
       companyTypes: ["PRODUCER"],
       contactPhone: "0100000000"
     };
-    await expect(validateCompany(company)).resolves.toEqual(company);
+    await expect(companyValidationSchema.validate(company)).resolves.toEqual(
+      company
+    );
     company = {
       siret: "12345678901234",
       companyTypes: ["PRODUCER"],
       contactPhone: "01 00 00 00 00"
     };
-    await expect(validateCompany(company)).resolves.toEqual(company);
+    await expect(companyValidationSchema.validate(company)).resolves.toEqual(
+      company
+    );
 
     company = {
       siret: "12345678901234",
       companyTypes: ["PRODUCER"],
       contactPhone: "01-00-00-00-00"
     };
-    await expect(validateCompany(company)).resolves.toEqual(company);
+    await expect(companyValidationSchema.validate(company)).resolves.toEqual(
+      company
+    );
     // invalid phone number
     await expect(
-      validateCompany({
+      companyValidationSchema.validate({
         siret: "12345678901234",
         companyTypes: ["PRODUCER"],
         contactPhone: "01-00-00-00" // missing two digits
@@ -191,7 +203,7 @@ describe("company validation", () => {
       Promise.resolve({ etatAdministratif: "F" })
     );
     await expect(
-      validateCompany({
+      companyValidationSchema.validate({
         siret: "12345678901234",
         companyTypes: ["PRODUCER"]
       })

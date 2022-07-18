@@ -78,7 +78,8 @@ describe("searchVat client", () => {
       address: "address",
       name: "name",
       codePaysEtrangerEtablissement: "IT",
-      statutDiffusionEtablissement: "O"
+      statutDiffusionEtablissement: "O",
+      etatAdministratif: "A"
     };
     checkVatAsyncMock.mockResolvedValueOnce([testValue]);
     const res = await client("IT09301420155", createClientTest);

@@ -186,6 +186,7 @@ model Company {
   gerepId                              String?
   codeNaf                              String?
   givenName                            String?
+  contact                              String?
   contactEmail                         String?
   contactPhone                         String?
   website                              String?
@@ -267,8 +268,8 @@ model Form {
   updatedAt                          DateTime                @updatedAt @db.Timestamptz(6)
   emitterType                        EmitterType?
   emitterPickupSite                  String?
-  emitterIsPrivateIndividual         Boolean?                 @default(false)
-  emitterIsForeignShip               Boolean?                 @default(false)
+  emitterIsPrivateIndividual         Boolean?                @default(false)
+  emitterIsForeignShip               Boolean?                @default(false)
   emitterCompanyName                 String?
   emitterCompanySiret                String?
   emitterCompanyAddress              String?
@@ -931,7 +932,7 @@ model Bsdasri {
   // emission
   emitterWasteWeightValue             Float? // kg
   emitterWasteWeightIsEstimate        Boolean?
-  emitterWasteVolume                  Int? // liters
+  emitterWasteVolume                  Float? // liters
   emitterWastePackagings              Json                    @default("[]")
   emissionSignatory                   User?                   @relation("BsdasriEmissionSignature", fields: [emissionSignatoryId], references: [id])
   emissionSignatoryId                 String?
@@ -964,7 +965,7 @@ model Bsdasri {
   transporterWastePackagings          Json                    @default("[]")
   transporterWasteWeightValue         Float? // kg
   transporterWasteWeightIsEstimate    Boolean?
-  transporterWasteVolume              Int? // liters
+  transporterWasteVolume              Float? // liters
   handedOverToRecipientAt             DateTime?               @db.Timestamptz(6)
   transportSignatory                  User?                   @relation("BsdasriTransportSignature", fields: [transportSignatoryId], references: [id])
   transportSignatoryId                String?
@@ -986,7 +987,7 @@ model Bsdasri {
   destinationReceptionWasteRefusalReason      String?
   destinationReceptionWasteRefusedWeightValue Float? // kg
   destinationReceptionWasteWeightValue        Float? // kg
-  destinationReceptionWasteVolume             Int? // liters
+  destinationReceptionWasteVolume             Float? // liters
   destinationReceptionDate                    DateTime? // accepted or refused date @db.Timestamptz(6)
   // processing
   destinationOperationCode                    String?
@@ -1037,7 +1038,8 @@ model Bsff {
   emitterEmissionSignatureAuthor String?
   emitterEmissionSignatureDate   DateTime? @db.Timestamptz(6)
 
-  packagings Json @default("[]")
+  // DEPRECATED to be deleted after release 2022.07.1
+  packagingsJson Json @default("[]")
 
   wasteCode        String?
   wasteDescription String?
@@ -1118,6 +1120,7 @@ model Bsff {
 
   ficheInterventions BsffFicheIntervention[]
 
+  packagings BsffPackaging[]
 
   @@index([emitterCompanySiret], map: "_BsffEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsffTransporterCompanySiretIdx")
@@ -1172,6 +1175,17 @@ model BsffFicheIntervention {
 
   @@index([detenteurCompanySiret], map: "_BsffFicheInterventionDetenteurCompanySiretIdx")
   @@index([operateurCompanySiret], map: "_BsffFicheInterventionOperateurCompanySiretIdx")
+}
+
+model BsffPackaging {
+  id        String   @id @default(cuid())
+  name      String
+  volume    Float?
+  weight    Float
+  numero    String
+
+  bsff   Bsff @relation(fields: [bsffId], references: [id], onDelete: Cascade)
+  bsffId String
 }
 
 // ----------------

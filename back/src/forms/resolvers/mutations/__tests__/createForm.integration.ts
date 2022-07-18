@@ -210,6 +210,26 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
+  it("should allow a destination after temp storage to create a form", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          recipient: { isTempStorage: true },
+          temporaryStorageDetail: {
+            destination: { company: { siret: company.siret } }
+          }
+        }
+      }
+    });
+    expect(data.createForm.id).toBeTruthy();
+  });
+
   it("should not allow to create a form with a foreign intermediary", async () => {
     const intermediary = await userWithCompanyFactory(UserRole.MEMBER, {
       companyTypes: {
@@ -233,7 +253,8 @@ describe("Mutation.createForm", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Seul les numéros de TVA en France sont valides",
+        message:
+          "Intermédiaires: seul les numéros de TVA en France sont valides",
         extensions: {
           code: "BAD_USER_INPUT"
         }
@@ -264,7 +285,7 @@ describe("Mutation.createForm", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Le N°SIRET est obligatoire pour une entreprise intermédiaire",
+        message: "Intermédiaires: le N° SIRET est obligatoire",
         extensions: {
           code: "BAD_USER_INPUT"
         }

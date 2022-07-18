@@ -71,7 +71,8 @@ type BsdasriPackaging {
   "Nombre de colis associés à ce conditionnement"
   quantity: Int!
 
-  volume: Int!
+  "Volume de chaque colis associé à ce conditionnement"
+  volume: Float!
 }
 
 "Informations sur un poids de déchet estimé ou pesé"
@@ -109,7 +110,7 @@ type BsdasriTransport {
   "Quantité transportée"
   weight: BsdasriWeight
   "Volume transporté"
-  volume: Int
+  volume: Float
   "Conditionnement"
   packagings: [BsdasriPackaging!]
   acceptation: BsdasriWasteAcceptation
@@ -126,7 +127,7 @@ type BsdasriEmission {
   "Quantité émise"
   weight: BsdasriWeight
   "Volume en litres"
-  volume: Int
+  volume: Float
   "Conditionnement"
   packagings: [BsdasriPackaging!]
   signature: BsdasriSignature
@@ -139,7 +140,7 @@ type BsdasriEmission {
 "Informations relatives à la réception du Bsdasri"
 type BsdasriReception {
   "Volume reçu"
-  volume: Int
+  volume: Float
   "Conditionnement"
   packagings: [BsdasriPackaging!]
   acceptation: BsdasriWasteAcceptation
@@ -165,7 +166,7 @@ type InitialBsdasri {
   "Nombre de contenants reçus"
   quantity: Int
   "Volume reçu dans le cas d'un groupement, émis dans le cas d'une synthèse"
-  volume: Int
+  volume: Float
   "Poids de déchets (en kg) traités dans le cas d'un groupement, émis (si renseigné) dans le cas d'une synthèse"
   weight: Float
   "Date de collecte initiale"
@@ -181,7 +182,7 @@ type Bsdasri {
   createdAt: DateTime
   updatedAt: DateTime
   isDraft: Boolean!
-  
+
   waste: BsdasriWaste
 
   emitter: BsdasriEmitter

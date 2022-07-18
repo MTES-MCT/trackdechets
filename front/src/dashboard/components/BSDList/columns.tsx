@@ -59,7 +59,12 @@ export type Column<T extends object = Bsd> = ColumnWithLooseAccessor<T> &
         Filter: Renderer<FilterProps<T>>;
         filter: string;
       }
-    | { id: string; disableFilters: true; disableSortBy: true }
+    | {
+        id: string;
+        disableFilters: true;
+        disableSortBy: true;
+        filterPlaceHolder?: string;
+      }
   );
 
 export function createColumn(column: Column): Column {
@@ -137,6 +142,7 @@ export const COLUMNS: Record<string, Column> = {
     Header: "Numéro",
     Filter: TextInputFilter,
     filter: "text",
+    filterPlaceHolder: "N° BSD ou contenant",
   }),
   emitter: createColumn({
     id: "emitter",

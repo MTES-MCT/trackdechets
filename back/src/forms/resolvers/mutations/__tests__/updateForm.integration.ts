@@ -5,6 +5,7 @@ import { ErrorCode } from "../../../../common/errors";
 import {
   companyFactory,
   formFactory,
+  formWithTempStorageFactory,
   toIntermediaryCompany,
   userFactory,
   userWithCompanyFactory
@@ -243,6 +244,30 @@ describe("Mutation.updateForm", () => {
       );
     }
   );
+
+  it("should allow a destination after temp storage to update a form", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const form = await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: { status: "DRAFT" },
+      forwardedInOpts: { recipientCompanySiret: company.siret }
+    });
+
+    const { mutate } = makeClient(user);
+    const updateFormInput = {
+      id: form.id,
+      wasteDetails: {
+        code: "01 01 01"
+      }
+    };
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    expect(data.updateForm.wasteDetails).toMatchObject(
+      updateFormInput.wasteDetails
+    );
+  });
 
   it("should not be possible to invalidate a sealed form", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");

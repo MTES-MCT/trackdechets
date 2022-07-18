@@ -10,7 +10,8 @@ const DEBOUNCE_DELAY = 500;
  */
 export function TextInputFilter({
   column: { filterValue = "", setFilter },
-}: FilterProps<Bsd>) {
+  placeHolder = "Filtrer...",
+}: FilterProps<Bsd> & { placeHolder?: string }) {
   const [value, setValue] = React.useState(filterValue);
   const timeout = React.useRef<number | null>();
   const ref = React.useRef<{ value: string; filterValue: string }>();
@@ -62,7 +63,7 @@ export function TextInputFilter({
       className="td-input"
       onChange={event => setValue(event.target.value)}
       value={value}
-      placeholder="Filtrer..."
+      placeholder={placeHolder}
       style={{ marginTop: "0.5rem" }}
     />
   );

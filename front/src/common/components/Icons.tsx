@@ -480,6 +480,44 @@ export const IconSearch = ({
   </svg>
 );
 
+export const IconLoading = ({
+  color = "currentColor",
+  size = "1em",
+  ...props
+}: IconProps) => (
+  <svg
+    {...props}
+    className={classNames(
+      props.className,
+      {
+        [styles.blue]: color === "blue",
+        [styles.blueLight]: color === "blueLight",
+        [styles.white]: color === "white",
+      },
+      "tw-animate-spin"
+    )}
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    width={size}
+    height={size}
+  >
+    <circle
+      className="tw-opacity-25"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="4"
+    ></circle>
+    <path
+      className="tw-opacity-75"
+      fill="currentColor"
+      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+    ></path>
+  </svg>
+);
+
 export const IconTriangleDown = ({
   color = "currentColor",
   size = "1em",
@@ -1376,4 +1414,40 @@ export function IconQrCode({
   );
 }
 
-// style="fill:none;fill-rule:nonzero;stroke:#000;stroke-width:1.5px"
+export function IconTrackDechetsCheck({
+  color = "currentColor",
+  size = "1.5em",
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      {...props}
+      viewBox="0 0 23 23"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+    >
+      <g fill="none" fillRule="evenodd">
+        <path
+          d="M17.031 2.59589C14.892 1.27217 12.3485 0.76139 9.86432 1.1567C7.38013 1.55201 5.12079 2.82707 3.49835 4.74935C1.8759 6.67163 0.99845 9.11304 1.02602 11.6283C1.05359 14.1436 1.98435 16.5652 3.64854 18.4515C5.31273 20.3377 7.59948 21.563 10.0917 21.9037C12.584 22.2445 15.1157 21.6781 17.2252 20.3078C19.3346 18.9375 20.8813 16.8546 21.583 14.4391C22.2848 12.0235 22.0949 9.43614 21.048 7.14889"
+          stroke="#18753C"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M13.0254 5.1917L15.0525 8.09732C15.1359 8.21695 15.245 8.31539 15.3714 8.38508C15.4978 8.45477 15.6382 8.49386 15.7816 8.49933C15.9251 8.50481 16.0679 8.47653 16.199 8.41667C16.3301 8.35681 16.4461 8.26697 16.538 8.15404L21.0254 2.5"
+          stroke="#18753C"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M6.30439 11.361H8.24839V16.5H9.52639V11.361H11.4704V10.2H6.30439V11.361ZM10.8829 16.5H13.3579C15.3559 16.5 16.7059 15.051 16.7059 13.35C16.7059 11.649 15.3559 10.2 13.3579 10.2H10.8829V16.5ZM13.3759 11.361C14.5459 11.361 15.3919 12.225 15.3919 13.35C15.3919 14.466 14.5459 15.339 13.3759 15.339H12.1609V11.361H13.3759Z"
+          fill="#18753C"
+        />
+      </g>
+    </svg>
+  );
+}

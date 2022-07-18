@@ -1,6 +1,7 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import { filter } from "graphql-anywhere";
+import AccountFieldCompanyContact from "./fields/AccountFieldCompanyContact";
 import AccountFieldCompanyContactEmail from "./fields/AccountFieldCompanyContactEmail";
 import AccountFieldCompanyContactPhone from "./fields/AccountFieldCompanyContactPhone";
 import AccountFieldCompanyWebsite from "./fields/AccountFieldCompanyWebsite";
@@ -13,16 +14,18 @@ type Props = {
   company: CompanyPrivate;
 };
 
-AccountCompanyPage.fragments = {
+AccountCompanyContact.fragments = {
   company: gql`
-    fragment AccountCompanyPageFragment on CompanyPrivate {
+    fragment AccountCompanyContactFragment on CompanyPrivate {
       siret
       companyTypes
+      ...AccountFieldCompanyContactFragment
       ...AccountFieldCompanyContactEmailFragment
       ...AccountFieldCompanyContactPhoneFragment
       ...AccountFieldCompanyWebsiteFragment
       ...AccountFieldCompanyAgreementsFragment
     }
+    ${AccountFieldCompanyContact.fragments.company}
     ${AccountFieldCompanyContactEmail.fragments.company}
     ${AccountFieldCompanyContactPhone.fragments.company}
     ${AccountFieldCompanyWebsite.fragments.company}
@@ -30,7 +33,7 @@ AccountCompanyPage.fragments = {
   `,
 };
 
-export default function AccountCompanyPage({ company }: Props) {
+export default function AccountCompanyContact({ company }: Props) {
   const companyPage =
     `${import.meta.env.VITE_URL_SCHEME}://` +
     `${import.meta.env.VITE_HOSTNAME}` +
@@ -43,8 +46,13 @@ export default function AccountCompanyPage({ company }: Props) {
         <a href={companyPage} target="_blank" rel="noopener noreferrer">
           fiche entreprise
         </a>{" "}
-        et sont consultables par n'importe qui.
+        et sont consultables par n'importe qui. Elles sont également utilisées
+        pour compléter automatiquement les informations de contact sur les
+        bordereaux lorsque votre n°SIRET est visé.
       </div>
+      <AccountFieldCompanyContact
+        company={filter(AccountFieldCompanyContact.fragments.company, company)}
+      />
       <AccountFieldCompanyContactEmail
         company={filter(
           AccountFieldCompanyContactEmail.fragments.company,

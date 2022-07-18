@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from "@apollo/client";
 import cogoToast from "cogo-toast";
-import routes from "common/routes";
+import { Loader } from "common/components";
 import GenericStepList, {
   getComputedState,
 } from "form/common/stepper/GenericStepList";
@@ -21,7 +21,7 @@ import {
 } from "generated/graphql/types";
 import omitDeep from "omit-deep-lodash";
 import React, { ReactElement, useMemo } from "react";
-import { generatePath, useHistory, useParams } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import getInitialState from "./utils/initial-state";
 import {
   CREATE_DRAFT_BSDASRI,
@@ -111,7 +111,6 @@ const removeSections = (
   return omitDeep(input, mapping[status]);
 };
 export default function BsdasriStepsList(props: Props) {
-  const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
 
   const formQuery = useQuery<Pick<Query, "bsdasri">, QueryBsdasriArgs>(
@@ -125,19 +124,6 @@ export default function BsdasriStepsList(props: Props) {
     }
   );
 
-  // prefill packaging info with previous dasri actor data
-  const prefillWasteDetails = dasri => {
-    if (!dasri?.transporter?.transport?.packagings?.length) {
-      dasri.transporter.transport.packagings =
-        dasri?.emitter?.emission?.packagings;
-    }
-
-    if (!dasri?.destination?.reception?.packagings?.length) {
-      dasri.destination.reception.packagings =
-        dasri?.transporter?.transport?.packagings;
-    }
-    return dasri;
-  };
   const mapRegrouped = dasri => ({
     ...dasri,
     grouping: dasri?.grouping.map(d => d.id),
@@ -146,11 +132,9 @@ export default function BsdasriStepsList(props: Props) {
 
   const formState = useMemo(
     () =>
-      prefillWasteDetails(
-        getComputedState(
-          getInitialState(),
-          mapRegrouped(formQuery.data?.bsdasri)
-        )
+      getComputedState(
+        getInitialState(),
+        mapRegrouped(formQuery.data?.bsdasri)
       ),
     [formQuery.data]
   );
@@ -159,17 +143,17 @@ export default function BsdasriStepsList(props: Props) {
     ? formQuery?.data?.bsdasri?.["bsdasriStatus"]
     : "INITIAL";
 
-  const [createDraftBsdasri] = useMutation<
+  const [createDraftBsdasri, { loading: creatingDraft }] = useMutation<
     Pick<Mutation, "createDraftBsdasri">,
     MutationCreateDraftBsdasriArgs
   >(CREATE_DRAFT_BSDASRI);
 
-  const [createBsdasri] = useMutation<
+  const [createBsdasri, { loading: creating }] = useMutation<
     Pick<Mutation, "createBsdasri">,
     MutationCreateBsdasriArgs
   >(CREATE_BSDASRI);
 
-  const [updateBsdasri] = useMutation<
+  const [updateBsdasri, { loading: updating }] = useMutation<
     Pick<Mutation, "updateBsdasri">,
     MutationUpdateBsdasriArgs
   >(UPDATE_BSDASRI);
@@ -226,11 +210,7 @@ export default function BsdasriStepsList(props: Props) {
 
     saveForm(input, type)
       .then(_ => {
-        // TODO  redirect to the correct dashboard
-        const redirectTo = generatePath(routes.dashboard.bsds.drafts, {
-          siret,
-        });
-        history.push(redirectTo);
+        history.goBack();
       })
       .catch(err => formInputToastError(err));
   }
@@ -247,14 +227,17 @@ export default function BsdasriStepsList(props: Props) {
     return <p>Ce bordereau n'est plus modifiable</p>;
   }
   return (
-    <GenericStepList
-      children={steps}
-      formId={props.formId}
-      formQuery={formQuery}
-      onSubmit={onSubmit}
-      initialValues={formState}
-      validationSchema={null}
-      initialStep={props?.initialStep}
-    />
+    <>
+      <GenericStepList
+        children={steps}
+        formId={props.formId}
+        formQuery={formQuery}
+        onSubmit={onSubmit}
+        initialValues={formState}
+        validationSchema={null}
+        initialStep={props?.initialStep}
+      />
+      {(creating || updating || creatingDraft) && <Loader />}
+    </>
   );
 }

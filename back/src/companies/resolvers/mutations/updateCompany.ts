@@ -14,6 +14,7 @@ export async function updateCompanyFn({
   siret,
   companyTypes,
   gerepId,
+  contact,
   contactEmail,
   contactPhone,
   website,
@@ -29,6 +30,7 @@ export async function updateCompanyFn({
   const data = {
     ...(companyTypes != null ? { companyTypes: { set: companyTypes } } : {}),
     ...(gerepId != null ? { gerepId } : {}),
+    ...(contact != null ? { contact } : {}),
     ...(contactEmail != null ? { contactEmail } : {}),
     ...(contactPhone != null ? { contactPhone } : {}),
     ...(website != null ? { website } : {}),

@@ -33,6 +33,19 @@ export function getSiretsByTab(
     {}
   );
 
+  const intermediarySiretsReducer = form.intermediaries.reduce(
+    (acc, intermediary) => {
+      if (!!intermediary.siret) {
+        return {
+          ...acc,
+          [`intermediarySiret${intermediary.siret}`]: intermediary.siret
+        };
+      }
+      return acc;
+    },
+    {}
+  );
+
   const formSirets = {
     emitterCompanySiret: form.emitterCompanySiret,
     recipientCompanySiret: form.recipientCompanySiret,
@@ -43,7 +56,8 @@ export function getSiretsByTab(
     brokerCompanySiret: form.brokerCompanySiret,
     ecoOrganismeSiret: form.ecoOrganismeSiret,
     transporterCompanySiret: form.transporterCompanySiret,
-    ...multimodalTransportersBySegmentId
+    ...multimodalTransportersBySegmentId,
+    ...intermediarySiretsReducer
   };
 
   const siretsByTab = {
@@ -72,7 +86,9 @@ export function getSiretsByTab(
   }
 
   // initialize intermediaries into isFollowFor
-  form.intermediaries.map(({ siret }) => fieldTabs.set(siret, "isFollowFor"));
+  form.intermediaries.forEach(({ siret }) =>
+    setFieldTab(`intermediarySiret${siret}`, "isFollowFor")
+  );
 
   switch (form.status) {
     case Status.DRAFT: {

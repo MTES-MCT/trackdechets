@@ -10,6 +10,7 @@ export const FAVORITES = gql`
       contact
       phone
       mail
+      isRegistered
       codePaysEtrangerEtablissement
       transporterReceipt {
         receiptNumber
@@ -50,6 +51,8 @@ export const COMPANY_INFOS = gql`
       isRegistered
       companyTypes
       codePaysEtrangerEtablissement
+      contactPhone
+      contactEmail
       installation {
         codeS3ic
         urlFiche
@@ -76,10 +79,15 @@ export const SEARCH_COMPANIES = gql`
   query SearchCompanies($clue: String!, $department: String) {
     searchCompanies(clue: $clue, department: $department) {
       siret
+      vatNumber
       name
       address
       etatAdministratif
       codePaysEtrangerEtablissement
+      isRegistered
+      contact
+      contactPhone
+      contactEmail
       installation {
         codeS3ic
         urlFiche
@@ -138,6 +146,20 @@ export const COMPANY_PRIVATE_INFOS = gql`
         validityLimit
         department
       }
+    }
+  }
+`;
+
+export const COMPANY_SELECTOR_PRIVATE_INFOS = gql`
+  query CompanyPrivateInfos($clue: String!) {
+    companyPrivateInfos(clue: $clue) {
+      siret
+      vatNumber
+      etatAdministratif
+      statutDiffusionEtablissement
+      isRegistered
+      isAnonymousCompany
+      companyTypes
     }
   }
 `;

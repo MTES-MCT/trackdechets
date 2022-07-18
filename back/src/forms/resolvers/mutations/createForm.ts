@@ -61,8 +61,11 @@ const createFormResolver = async (
     ecoOrganismeSiret: formContent.ecoOrganisme?.siret,
     ...(temporaryStorageDetail?.destination?.company?.siret
       ? {
-          destinationCompanySiret:
-            temporaryStorageDetail.destination.company.siret
+          forwardedIn: {
+            recipientCompanySiret:
+              temporaryStorageDetail.destination.company.siret,
+            transporterCompanySiret: null
+          }
         }
       : {}),
     ...(intermediaries?.length
