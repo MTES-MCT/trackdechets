@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "common/components";
 import { GET_BSDAS } from "form/bsda/stepper/queries";
+import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import { FieldArray, useFormikContext } from "formik";
 import {
   Bsda,
@@ -82,10 +83,15 @@ export function BsdaPicker({ name, bsdaId }: Props) {
       }, [] as BsdaPackaging[]) ?? initialState.packagings
     );
 
-    const { country, ...company } =
+    const { country, ...emitterCompany } =
       groupedBsdas?.[0]?.destination?.company ??
       initialState.destination.company;
-    setFieldValue("emitter.company", company);
+    setFieldValue("emitter.company", emitterCompany);
+
+    const { country: _, ...nextDestinationCompany } =
+      groupedBsdas?.[0]?.destination?.operation?.nextDestination?.company ??
+      getInitialCompany();
+    setFieldValue("destination.company", nextDestinationCompany);
   }
 
   function onForwardingChange(bsda: Bsda) {
@@ -106,9 +112,14 @@ export function BsdaPicker({ name, bsdaId }: Props) {
     );
     setFieldValue("packagings", bsda?.packagings ?? initialState.packagings);
 
-    const { country, ...company } =
+    const { country, ...emitterCcompany } =
       bsda?.destination?.company ?? initialState.destination.company;
-    setFieldValue("emitter.company", company);
+    setFieldValue("emitter.company", emitterCcompany);
+
+    const { country: _, ...nextDestinationCompany } =
+      bsda?.destination?.operation?.nextDestination?.company ??
+      getInitialCompany();
+    setFieldValue("destination.company", nextDestinationCompany);
   }
 
   if (data == null) {
@@ -129,6 +140,8 @@ export function BsdaPicker({ name, bsdaId }: Props) {
         }}
         isSelected={bsda => forwarding === bsda.id}
         bsdas={bsdas}
+        pickerType="forwarding"
+        selected={forwarding}
       />
     );
   }
@@ -157,13 +170,28 @@ export function BsdaPicker({ name, bsdaId }: Props) {
           }}
           isSelected={bsda => grouping!.findIndex(id => id === bsda.id) >= 0}
           bsdas={bsdas}
+          pickerType="grouping"
+          selected={grouping}
         />
       )}
     />
   );
 }
 
-function PickerTable({ bsdas, onClick, isSelected }) {
+type PickerTableProps = {
+  bsdas: Bsda[];
+  onClick: (bsda: Bsda) => void;
+  isSelected: (bsda: Bsda) => boolean;
+  pickerType: "grouping" | "forwarding";
+  selected: string | string[] | undefined | null;
+};
+function PickerTable({
+  bsdas,
+  onClick,
+  isSelected,
+  pickerType,
+  selected,
+}: PickerTableProps) {
   return (
     <Table isSelectable>
       <TableHead>
@@ -171,21 +199,33 @@ function PickerTable({ bsdas, onClick, isSelected }) {
           <TableHeaderCell />
           <TableHeaderCell>Numéro</TableHeaderCell>
           <TableHeaderCell>Déchet</TableHeaderCell>
-          <TableHeaderCell>Quantité (tonnes)</TableHeaderCell>
+          <TableHeaderCell>Poids reçu (tonnes)</TableHeaderCell>
           <TableHeaderCell>Émetteur</TableHeaderCell>
-          <TableHeaderCell>Transporteur</TableHeaderCell>
-          <TableHeaderCell>Destinataire</TableHeaderCell>
+          <TableHeaderCell>CAP final</TableHeaderCell>
+          <TableHeaderCell>Exutoire</TableHeaderCell>
         </TableRow>
       </TableHead>
       <TableBody>
         {bsdas.map(bsda => {
+          const getNextDestinationSiret = b =>
+            b?.destination?.operation?.nextDestination?.company?.siret;
+          const isDisabled =
+            Array.isArray(selected) &&
+            selected.length > 0 &&
+            getNextDestinationSiret(bsdas.find(b => b.id === selected[0])) !==
+              getNextDestinationSiret(bsda);
+
           return (
-            <TableRow key={bsda.id} onClick={() => onClick(bsda)}>
+            <TableRow
+              key={bsda.id}
+              onClick={() => !isDisabled && onClick(bsda)}
+            >
               <TableCell>
                 <input
-                  type="checkbox"
+                  type={pickerType === "grouping" ? "checkbox" : "radio"}
                   className="td-input"
                   checked={isSelected(bsda)}
+                  disabled={isDisabled}
                   readOnly
                 />
               </TableCell>
@@ -195,8 +235,17 @@ function PickerTable({ bsdas, onClick, isSelected }) {
               </TableCell>
               <TableCell>{bsda.destination?.reception?.weight}</TableCell>
               <TableCell>{bsda.emitter?.company?.name}</TableCell>
-              <TableCell>{bsda.transporter?.company?.name}</TableCell>
-              <TableCell>{bsda.destination?.company?.name}</TableCell>
+              <TableCell>
+                {bsda.destination?.operation?.nextDestination?.cap}
+              </TableCell>
+              <TableCell>
+                {[
+                  bsda.destination?.operation?.nextDestination?.company?.name,
+                  bsda.destination?.operation?.nextDestination?.company?.siret,
+                ]
+                  .filter(Boolean)
+                  .join(" - ")}
+              </TableCell>
             </TableRow>
           );
         })}

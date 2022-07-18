@@ -15,6 +15,7 @@ export function TraceabilityTable({ previousBsdas }: Props) {
           <th>CAP (exutoire)</th>
           <th>Quantité (en T)</th>
           <th>Date de collecte</th>
+          <th>Exutoire prévu</th>
         </tr>
       </thead>
       <tbody>
@@ -30,6 +31,14 @@ export function TraceabilityTable({ previousBsdas }: Props) {
             </td>
             <td>{bsda?.destination?.reception?.weight}</td>
             <td>{formatDate(bsda?.transporter?.transport?.takenOverAt)}</td>
+            <td>
+              {[
+                bsda?.destination?.operation?.nextDestination?.company?.name,
+                bsda?.destination?.operation?.nextDestination?.company?.siret
+              ]
+                .filter(Boolean)
+                .join(" - ")}
+            </td>
           </tr>
         ))}
       </tbody>

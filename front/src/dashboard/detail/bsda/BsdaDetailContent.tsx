@@ -18,6 +18,7 @@ import { PACKAGINGS_NAMES } from "form/bsda/components/packagings/Packagings";
 import {
   Bsda,
   BsdaNextDestination,
+  BsdaType,
   FormCompany,
 } from "generated/graphql/types";
 import React from "react";
@@ -383,7 +384,9 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             {form.id} {form.isDraft && " (Brouillon)"}
           </span>
           {!!form?.grouping?.length && <span> - Bordereau de groupement</span>}
-          {!!form?.forwardedIn?.id && <span> - Bordereau de réexpédition</span>}
+          {form?.type === BsdaType.Reshipment && (
+            <span> - Bordereau de réexpédition</span>
+          )}
         </h4>
 
         <div className={styles.detailContent}>

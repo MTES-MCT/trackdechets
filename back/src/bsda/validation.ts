@@ -161,6 +161,15 @@ async function validatePreviousBsdas(
     );
   }
 
+  const nextDestinations = previousBsdas.map(
+    bsda => bsda.destinationOperationNextDestinationCompanySiret
+  );
+  if (!nextDestinations.every(siret => siret === nextDestinations[0])) {
+    throw new UserInputError(
+      `Certains des bordereaux à associer ont des exutoires différents. Ils ne peuvent pas être groupés ensemble.`
+    );
+  }
+
   const firstPreviousBsdaWithDestination = previousBsdasWithDestination[0];
   if (
     previousBsdasWithDestination.some(
