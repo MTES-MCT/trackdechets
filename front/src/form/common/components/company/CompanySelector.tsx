@@ -6,7 +6,6 @@ import { checkVAT } from "jsvat";
 import { IconSearch, IconLoading } from "common/components/Icons";
 import { constantCase } from "constant-case";
 import {
-  InlineError,
   NotificationError,
   SimpleNotificationError,
 } from "common/components/Error";
@@ -18,7 +17,7 @@ import {
   countries as vatCountries,
 } from "generated/constants/companySearchHelpers";
 
-import CompanyResults from "./CompanyResults";
+import CompanyResults, { isSelected } from "./CompanyResults";
 import styles from "./CompanySelector.module.scss";
 import {
   FAVORITES,
@@ -112,18 +111,25 @@ export default function CompanySelector({
     skip: skipFavorite,
   });
 
+  const privateInfosClue = field.value.siret
+    ? field.value.siret
+    : field.value.vatNumber
+    ? field.value.vatNumber
+    : "";
   /**
-   * seleted companyInfos query
+   * CompanyPrivateInfos pour completer les informations
+   * initialement enregistrées dans le BSD
    */
   const { data: selectedData } = useQuery<
     Pick<Query, "companyPrivateInfos">,
     QueryCompanyPrivateInfosArgs
   >(COMPANY_SELECTOR_PRIVATE_INFOS, {
     variables: {
-      clue: field.value.siret!,
+      clue: privateInfosClue,
     },
-    skip: !field.value.siret,
+    skip: !privateInfosClue,
   });
+
   /**
    * Selection d'un établissement dans le formulaire
    */
@@ -144,27 +150,35 @@ export default function CompanySelector({
         });
         return;
       }
+      // Effets de bord
       setMustBeRegistered(!company.isRegistered && registeredOnlyCompanies);
-      // avoid setting same company multiple times
-      const fields = {
-        siret: company.siret,
-        vatNumber: company.vatNumber,
-        name: company.name,
-        ...(company.name !== "---" && {
-          address: company.address,
-          contact: company.contact ?? "",
-          phone: company.contactPhone ?? "",
-          mail: company.contactEmail ?? "",
-        }),
-        country: company.codePaysEtrangerEtablissement,
-      };
+      // Doubler l'erreur affichée dans le dom par ce toaster asur le click
       if (company.name === "---" || company.name === "") {
         cogoToast.error(
           "Cet établissement existe mais nous ne pouvons pas remplir automatiquement le formulaire"
         );
       }
 
-      // automatically set the country field
+      // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
+      setToggleManualForeignCompanyForm(
+        company.codePaysEtrangerEtablissement !== "FR" &&
+          (company.name === "---" || company.name === "")
+      );
+
+      setIsForeignCompany(company.codePaysEtrangerEtablissement !== "FR");
+      // Prépare la mise à jour du Form
+      const fields: FormCompany = {
+        siret: company.siret,
+        vatNumber: company.vatNumber,
+        name: company.name ?? "",
+        address: company.address ?? "",
+        contact: company.contact ?? "",
+        phone: company.contactPhone ?? "",
+        mail: company.contactEmail ?? "",
+        country: company.codePaysEtrangerEtablissement,
+      };
+
+      // Automatiquement écraser le champ country
       if (company.vatNumber) {
         const vatCountryCode = checkVAT(company.vatNumber, vatCountries)
           ?.country?.isoCode.short;
@@ -173,11 +187,6 @@ export default function CompanySelector({
         }
       }
 
-      setToggleManualForeignCompanyForm(
-        company.codePaysEtrangerEtablissement !== "FR" &&
-          (company.name === "---" || company.name === "")
-      );
-      setIsForeignCompany(company.codePaysEtrangerEtablissement !== "FR");
       Object.keys(fields).forEach(key => {
         setFieldValue(`${field.name}.${key}`, fields[key]);
       });
@@ -198,6 +207,17 @@ export default function CompanySelector({
       setMustBeRegistered,
     ]
   );
+
+  useEffect(() => {
+    setToggleManualForeignCompanyForm(
+      !!isForeignCompany &&
+        (field.value.name === "---" || field.value.name === "")
+    );
+  }, [field.value.name, isForeignCompany, setToggleManualForeignCompanyForm]);
+
+  useEffect(() => {
+    setIsForeignCompany(field.value.country !== "FR");
+  }, [field.value.country, setIsForeignCompany]);
 
   const favoriteToCompanySearchResult = ({
     siret,
@@ -236,7 +256,7 @@ export default function CompanySelector({
   });
 
   /**
-   * Parse and merge data from searchCompanies and favoritesData
+   * Fusionne les réponses de searchCompanies et favoritesData
    */
   useEffect(() => {
     if (disabled) return;
@@ -381,7 +401,7 @@ export default function CompanySelector({
   ]);
 
   /**
-   * Auto-selection Company si le form est vierge
+   * Selection Company si le form est vierge
    */
   useEffect(() => {
     if (
@@ -400,12 +420,14 @@ export default function CompanySelector({
     selectCompany,
   ]);
 
-  if (favoritesError) {
-    return <InlineError apolloError={favoritesError} />;
-  }
-
   return (
     <>
+      {favoritesError && (
+        <NotificationError
+          apolloError={favoritesError}
+          message={error => error.message}
+        />
+      )}
       {error && (
         <NotificationError
           apolloError={error}
@@ -438,6 +460,7 @@ export default function CompanySelector({
                 ""
               )}
             </label>
+            <div>{JSON.stringify(field.value)}</div>
             <div className="tw-flex tw-items-center tw-mr-4">
               <input
                 id={`siret-${uniqId}`}
@@ -473,8 +496,27 @@ export default function CompanySelector({
             />
           </div>
         </div>
-
-        <RedErrorMessage name={`${field.name}.siret`} />
+        {(field.value.name === "" || field.value.name === "---") && (
+          <SimpleNotificationError
+            message={
+              <>
+                <span>
+                  Cet établissement existe mais nous ne pouvons pas remplir
+                  automatiquement le formulaire
+                </span>
+              </>
+            }
+          />
+        )}
+        {!field.value.vatNumber && !field.value.siret && (
+          <SimpleNotificationError
+            message={
+              <>
+                <span>La sélection d'un établissement est obligatoire</span>
+              </>
+            }
+          />
+        )}
         {mustBeRegistered && (
           <SimpleNotificationError
             message={
@@ -496,18 +538,17 @@ export default function CompanySelector({
           onSelect={company => selectCompany(company)}
           results={searchResults}
           selectedItem={{
-            __typename: "CompanySearchResult",
-            // complete FormCompany with companyPrivateInfos
-            ...(selectedData?.companyPrivateInfos as CompanySearchResult),
-            ...(field.value as CompanySearchResult),
-            transporterReceipt: null,
-            traderReceipt: null,
-            brokerReceipt: null,
-            vhuAgrementBroyeur: null,
-            vhuAgrementDemolisseur: null,
+            siret: field.value.siret,
+            vatNumber: field.value.vatNumber,
+            name: field.value.name,
+            address: field.value.address,
+            // complète avec isRegistered
+            ...(selectedData?.companyPrivateInfos &&
+            isSelected(selectedData?.companyPrivateInfos, field.value)
+              ? { isRegistered: selectedData?.companyPrivateInfos.isRegistered }
+              : {}),
           }}
         />
-
         <div className="form__row">
           {allowForeignCompanies &&
             (isForeignCompany ||

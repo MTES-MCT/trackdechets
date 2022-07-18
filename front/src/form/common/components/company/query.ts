@@ -155,10 +155,6 @@ export const COMPANY_SELECTOR_PRIVATE_INFOS = gql`
     companyPrivateInfos(clue: $clue) {
       siret
       vatNumber
-      name
-      naf
-      libelleNaf
-      address
       etatAdministratif
       statutDiffusionEtablissement
       isRegistered
