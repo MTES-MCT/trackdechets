@@ -209,14 +209,30 @@ export default function CompanySelector({
   );
 
   useEffect(() => {
-    setToggleManualForeignCompanyForm(
-      !!isForeignCompany &&
-        (field.value.name === "---" || field.value.name === "")
-    );
-  }, [field.value.name, isForeignCompany, setToggleManualForeignCompanyForm]);
+    if (!field.value.siret && !field.value.vatNumber) {
+      setToggleManualForeignCompanyForm(false);
+    } else {
+      setToggleManualForeignCompanyForm(
+        !!isForeignCompany &&
+          (field.value.name === "---" || field.value.name === "")
+      );
+    }
+  }, [
+    field.value.name,
+    field.value.siret,
+    field.value.vatNumber,
+    isForeignCompany,
+    setToggleManualForeignCompanyForm,
+  ]);
 
   useEffect(() => {
-    setIsForeignCompany(field.value.country !== "FR");
+    if (!field?.value.country) {
+      setIsForeignCompany(false);
+    } else {
+      setIsForeignCompany(
+        field?.value.country?.length > 0 && field.value.country !== "FR"
+      );
+    }
   }, [field.value.country, setIsForeignCompany]);
 
   const favoriteToCompanySearchResult = ({
@@ -328,7 +344,7 @@ export default function CompanySelector({
       mergedResults = [];
     }
     setSearchResults(mergedResults);
-  }, [disabled, searchData, favoritesData, setSearchResults, skipFavorite]);
+  }, [disabled, favoritesData, searchData, setSearchResults, skipFavorite]);
 
   /**
    * Démarre la requete avec un délai
@@ -343,8 +359,6 @@ export default function CompanySelector({
       const isTextSearch = !isValidSiret && !isValidVat;
 
       if (isValidSiret || isTextSearch) {
-        setIsForeignCompany(false);
-        setFieldValue(`${field.name}.vatNumber`, "");
         searchCompaniesQuery({
           variables: {
             clue,
@@ -359,9 +373,6 @@ export default function CompanySelector({
               "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et pas par son numéro de TVA"
             );
           } else {
-            setIsForeignCompany(true);
-            setFieldValue(`${field.name}.vatNumber`, clue);
-            setFieldValue(`${field.name}.siret`, "");
             searchCompaniesQuery({
               variables: {
                 clue,
@@ -460,7 +471,6 @@ export default function CompanySelector({
                 ""
               )}
             </label>
-            <div>{JSON.stringify(field.value)}</div>
             <div className="tw-flex tw-items-center tw-mr-4">
               <input
                 id={`siret-${uniqId}`}

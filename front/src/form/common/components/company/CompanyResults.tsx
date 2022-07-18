@@ -29,6 +29,7 @@ export default function CompanyResults<
   // prepend selectedItem if it's not in the results
   if (
     selectedItem &&
+    (selectedItem.siret || selectedItem.vatNumber) &&
     !results.some(result => isSelected(result, selectedItem))
   ) {
     results.unshift(selectedItem);
