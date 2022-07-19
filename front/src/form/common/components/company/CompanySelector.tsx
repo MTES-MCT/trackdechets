@@ -204,12 +204,11 @@ export default function CompanySelector({
         .filter(
           fav =>
             !skipFavorite &&
-            !searchCompanies
-              .map(company => company.siret)
-              .includes(fav.siret) &&
-            !searchCompanies
-              .map(company => company.vatNumber)
-              .includes(fav.vatNumber)
+            !searchCompanies.some(
+              company =>
+                company.siret === fav.siret ||
+                company.vatNumber === fav.vatNumber
+            )
         )
         .map(favorite => favoriteToCompanySearchResult(favorite)) ?? [];
 
@@ -223,7 +222,7 @@ export default function CompanySelector({
             : "FR",
         })) ?? [];
 
-    const results = reshapedFavorites.concat(reshapedSearchResults);
+    const results = [...reshapedSearchResults, ...reshapedFavorites];
     setSearchResults(results);
 
     // If the form is empty and we have a single result, we auto-select it.
