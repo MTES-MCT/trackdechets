@@ -160,7 +160,16 @@ export default function CompanySelector({
 
     setIsForeignCompany(company.codePaysEtrangerEtablissement !== "FR");
     // Prépare la mise à jour du Form
-    const fields = getInitialCompany(company as FormCompany);
+    const fields: FormCompany = {
+      siret: company.siret,
+      vatNumber: company.vatNumber,
+      name: company.name ?? "",
+      address: company.address ?? "",
+      contact: company.contact ?? "",
+      phone: company.contactPhone ?? "",
+      mail: company.contactEmail ?? "",
+      country: company.codePaysEtrangerEtablissement,
+    };
 
     // Automatiquement écraser le champ country
     if (company.vatNumber) {
