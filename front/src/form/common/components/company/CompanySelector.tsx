@@ -144,9 +144,12 @@ export default function CompanySelector({
     // empty the  selected company when null
     if (!company) return setFieldValue(field.name, getInitialCompany());
 
-    // Effets de bord
-    setMustBeRegistered(!company.isRegistered && registeredOnlyCompanies);
-    // Doubler l'erreur affichée dans le dom par ce toaster asur le click
+    // Side effects
+    const notVoidCompany = Object.keys(company).length !== 0; // unselect returns emtpy object {}
+    setMustBeRegistered(
+      notVoidCompany && !company.isRegistered && registeredOnlyCompanies
+    );
+    // On click display form error in a toast message
     if (company.name === "---" || company.name === "") {
       cogoToast.error(
         "Cet établissement existe mais nous ne pouvons pas remplir automatiquement le formulaire"
@@ -370,15 +373,18 @@ export default function CompanySelector({
             }
           />
         )}
-        {!field.value.vatNumber && !field.value.siret && (
-          <SimpleNotificationError
-            message={
-              <>
-                <span>La sélection d'un établissement est obligatoire</span>
-              </>
-            }
-          />
-        )}
+        {!isLoadingFavorites &&
+          !field.value.vatNumber &&
+          !field.value.siret &&
+          !optional && (
+            <SimpleNotificationError
+              message={
+                <>
+                  <span>La sélection d'un établissement est obligatoire</span>
+                </>
+              }
+            />
+          )}
         {mustBeRegistered && (
           <SimpleNotificationError
             message={
@@ -391,22 +397,20 @@ export default function CompanySelector({
             }
           />
         )}
-
         {searchData?.searchCompanies.length === 0 && !isLoadingSearch && (
           <span>Aucun établissement ne correspond à cette recherche...</span>
         )}
-
         <RedErrorMessage name={`${field.name}.siret`} />
-
         <CompanyResults<CompanySearchResult>
           onSelect={company => selectCompany(company)}
+          onUnselect={() => selectCompany({})}
           results={searchResults}
           selectedItem={{
             siret: field.value.siret,
             vatNumber: field.value.vatNumber,
             name: field.value.name,
             address: field.value.address,
-            // complète avec isRegistered
+            // complete with isRegistered
             ...(selectedData?.companyPrivateInfos && {
               isRegistered: selectedData?.companyPrivateInfos.isRegistered,
             }),
