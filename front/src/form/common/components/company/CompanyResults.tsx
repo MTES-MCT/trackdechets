@@ -1,5 +1,4 @@
 import React from "react";
-
 import {
   IconCheckCircle1,
   IconTrackDechetsCheck,
@@ -13,6 +12,7 @@ import routes from "common/routes";
 interface CompanyResultsProps<T> {
   results: T[];
   onSelect: (item: T) => void;
+  onUnselect?: () => void;
   selectedItem: T | null;
 }
 
@@ -34,6 +34,7 @@ export function isSelected<T extends CompanyResultBase>(
 export default function CompanyResults<T extends CompanyResultBase>({
   results,
   onSelect,
+  onUnselect,
   selectedItem,
 }: CompanyResultsProps<T>) {
   // prepend selectedItem if it's not in the results
@@ -53,7 +54,9 @@ export default function CompanyResults<T extends CompanyResultBase>({
           className={`${styles.resultsItem}  ${
             isSelected(item, selectedItem) ? styles.isSelected : ""
           }`}
-          onClick={() => onSelect(item)}
+          onClick={() =>
+            isSelected(item, selectedItem) ? onUnselect?.() : onSelect(item)
+          }
         >
           <div className={styles.content}>
             <h6 className="tw-flex tw-items-center tw-align-middle">

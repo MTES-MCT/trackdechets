@@ -5,6 +5,8 @@
 
 .resultsItem {
   background-color: #ebeff3;
+  border: 1px solid #ebeff3;
+
   margin: 10px 0;
   padding: 10px;
   cursor: pointer;
@@ -31,7 +33,7 @@
   }
 
   &.isSelected {
-    border: 1px solid #03bd5b;
+    border-color: #03bd5b;
     background-color: #daf5e7;
   }
 }
