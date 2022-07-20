@@ -185,18 +185,23 @@ async function getRecentTransporters(defaultWhere: Prisma.FormWhereInput) {
   const forms = await prisma.form.findMany({
     ...defaultArgs,
     where: {
-      ...defaultWhere,
-      OR: [
+      // `defaultWhere` uses an `OR` already. We need a `AND` to avoid overwriting it.
+      AND: [
+        defaultWhere,
         {
-          NOT: [
-            { transporterCompanySiret: null },
-            { transporterCompanySiret: "" }
-          ]
-        },
-        {
-          NOT: [
-            { transporterCompanyVatNumber: null },
-            { transporterCompanyVatNumber: "" }
+          OR: [
+            {
+              NOT: [
+                { transporterCompanySiret: null },
+                { transporterCompanySiret: "" }
+              ]
+            },
+            {
+              NOT: [
+                { transporterCompanyVatNumber: null },
+                { transporterCompanyVatNumber: "" }
+              ]
+            }
           ]
         }
       ]
