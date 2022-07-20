@@ -78,11 +78,12 @@ export default function CompanyResults<T extends CompanyResultBase>({
                 href={generatePath(routes.company, {
                   siret: item.siret?.length ? item.siret : item.vatNumber!,
                 })}
+                onClick={e => e.stopPropagation()}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="link"
               >
-                Information sur l'entreprise
+                Informations sur l'entreprise
               </a>
             </p>
           </div>
