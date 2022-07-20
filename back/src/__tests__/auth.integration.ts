@@ -177,7 +177,7 @@ describe("POST /login", () => {
     });
 
     process.env = OLD_ENV;
-  });
+  }, 10000);
 
   it("should authenticate with invalid password if already connected user is admin", async () => {
     const admin = await userFactory({ isAdmin: true });
