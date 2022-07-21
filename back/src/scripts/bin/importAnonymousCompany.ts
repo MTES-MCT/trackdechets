@@ -1,10 +1,11 @@
 #!/usr/bin/env ts-node
-// Use like so: `ts-node importAnonymousCompany.ts /path/to/csv/file.csv`
+/* Use like so: `ts-node importAnonymousCompany.ts /path/to/csv/file.csv` */
+
 import fs from "fs";
-import csv from "csv-parser";
 import * as yup from "yup";
 import prisma from "../../prisma";
 import { nafCodes } from "../../common/constants/NAF";
+import { readCsv } from "../../users/bulk-creation/loaders";
 
 type AnonymousCompanyRow = {
   siret: string;
@@ -13,7 +14,6 @@ type AnonymousCompanyRow = {
   codeCommune: string;
   codeNaf: string;
 };
-const separator = ",";
 
 async function runImport() {
   const [path] = process.argv.slice(2);
@@ -60,23 +60,6 @@ async function runImport() {
   }
 
   console.info("Done, exiting.");
-}
-
-function readCsv<Row>(
-  csvpath: string,
-  transform?: (row: any) => Row
-): Promise<Row[]> {
-  const rows = [];
-  return new Promise((resolve, reject) => {
-    fs.createReadStream(csvpath)
-      .pipe(csv({ separator }))
-      .on("data", async data => {
-        const row = (transform ? transform(data) : data) as Row;
-        rows.push(row);
-      })
-      .on("end", () => resolve(rows))
-      .on("error", err => reject(err));
-  });
 }
 
 const anonymousCompanySchema = yup.object({
