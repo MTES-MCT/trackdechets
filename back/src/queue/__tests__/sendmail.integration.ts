@@ -1,5 +1,4 @@
 import axios from "axios";
-import { sendMailJob } from "../jobs/sendmail";
 import templateIds from "../../mailer/templates/provider/templateIds";
 import * as mailing from "../../mailer/mailing";
 import { Mail } from "../../mailer/types";
@@ -18,10 +17,6 @@ axiosSpy.mockResolvedValue(null);
 const { sendMail } = mailing;
 
 describe("Test the mail job queue", () => {
-  beforeAll(() => {
-    // test job worker attached to the queue singleton
-    mailQueue.process(sendMailJob);
-  });
   beforeEach(() => {
     axiosSpy.mockClear();
     mockedSendMailBackend.mockClear();
@@ -37,26 +32,24 @@ describe("Test the mail job queue", () => {
       body: "Bonjour, ceci est un email de test de Trackdéchets.",
       templateId: templateIds.LAYOUT
     };
+    const drainedPromise = new Promise<void>(resolve =>
+      mailQueue.once("global:drained", resolve)
+    );
     // add to the queue
     await sendMail(mail);
     // wait for the queue to finish
-    await new Promise(resolve => {
-      mailQueue.on("completed", () => resolve(null));
-    });
+    await drainedPromise;
     // test the job is completed
     const jobs = await mailQueue.getCompleted();
     expect(jobs.length).toEqual(1);
-    expect(axiosSpy).toHaveBeenCalledTimes(1);
-    expect(mockedSendMailBackend).toHaveBeenCalledTimes(1);
-    expect(mockedSendMailSync).toHaveBeenCalledTimes(1);
+    const { data } = jobs[0];
     // assert parameters values
-    const postArgs: any = mockedSendMailBackend.mock.calls[0];
     // to right person
-    expect(postArgs[0].to[0].email).toEqual("test@trackdechets.local");
+    expect(data.to[0].email).toEqual("test@trackdechets.local");
     // With right text
-    expect(postArgs[0].subject).toContain("Email de test");
+    expect(data.subject).toContain("Email de test");
     // with right body
-    expect(postArgs[0].body).toContain(
+    expect(data.body).toContain(
       "Bonjour, ceci est un email de test de Trackdéchets."
     );
   });

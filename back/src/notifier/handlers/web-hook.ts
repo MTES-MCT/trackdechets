@@ -21,8 +21,7 @@ export async function pushWebHookUpdate(sirets: Set<string>, id: string) {
 
 async function getSiretHookUrl(siret: string): Promise<string> {
   // Implement once webhook are setup...
-  console.log(`Find ${siret} hook`);
-  return null;
+  if (siret) return null;
 }
 
 function processAwaitingHookCalls(

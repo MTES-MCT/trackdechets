@@ -448,16 +448,6 @@ export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
   });
 }
 
-export function indexBsdAndWaitForRefresh(bsd: BsdElastic) {
-  return client.index({
-    index: index.index,
-    type: index.type,
-    id: bsd.id,
-    body: bsd,
-    refresh: "wait_for"
-  });
-}
-
 /**
  * Bulk create/update a list of documents in Elastic Search.
  */
