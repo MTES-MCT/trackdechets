@@ -9,7 +9,7 @@ const separator = ";";
  * @param csvpath path of the csv file
  * @param transform optional transform function to transform row
  */
-function readCsv<Row>(
+export function readCsv<Row>(
   csvpath: string,
   transform?: (row: any) => Row
 ): Promise<Row[]> {
