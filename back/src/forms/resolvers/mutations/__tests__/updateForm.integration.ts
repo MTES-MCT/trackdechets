@@ -1124,7 +1124,55 @@ describe("Mutation.updateForm", () => {
     });
     expect(data.updateForm.wasteDetails.code).toEqual("01 03 04*");
   });
+  it("should be impossible to update emitter siret on a form containing appendix 2", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+    const { company: otherEmitter } = await userWithCompanyFactory("MEMBER");
 
+    const appendixForm = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "GROUPED",
+        recipientCompanySiret: ttr.siret,
+        quantityReceived: 1
+      }
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: ttr.siret,
+        emitterType: EmitterType.APPENDIX2,
+        grouping: {
+          create: {
+            initialFormId: appendixForm.id,
+            quantity: appendixForm.quantityReceived
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          emitter: {
+            company: { siret: otherEmitter.siret }
+          }
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des bordereaux figurent dans l'annexe 2, le siret de l'émetteur ne peut pas être modifié.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
   it(
     "should disallow linking an appendix 2 form if the emitter of the regroupement" +
       " form is not the recipient of the initial form (using UpdateFormInput.appendix2Forms)",

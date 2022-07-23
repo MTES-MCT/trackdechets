@@ -218,6 +218,17 @@ const updateFormResolver = async (
 
   let appendix2: { quantity: number; form: Form }[] = null;
 
+  const { findAppendix2FormsById } = getFormRepository(user);
+  const existingAppendix2Forms = await findAppendix2FormsById(existingForm.id);
+
+  if (existingAppendix2Forms?.length) {
+    const updatedSiret = formUpdateInput?.emitterCompanySiret;
+    if (!!updatedSiret && updatedSiret !== existingForm?.emitterCompanySiret) {
+      throw new UserInputError(
+        "Des bordereaux figurent dans l'annexe 2, le siret de l'émetteur ne peut pas être modifié."
+      );
+    }
+  }
   if (grouping) {
     appendix2 = await Promise.all(
       grouping.map(async ({ form, quantity }) => {
