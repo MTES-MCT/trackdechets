@@ -1125,11 +1125,15 @@ describe("Mutation.updateForm", () => {
     expect(data.updateForm.wasteDetails.code).toEqual("01 03 04*");
   });
   it("should be impossible to update emitter siret on a form containing appendix 2", async () => {
-    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+    const { user: transporterUser, company: transporter } =
+      await userWithCompanyFactory("MEMBER");
+    const { user: ttrUser, company: ttr } = await userWithCompanyFactory(
+      "MEMBER"
+    );
     const { company: otherEmitter } = await userWithCompanyFactory("MEMBER");
 
     const appendixForm = await formFactory({
-      ownerId: user.id,
+      ownerId: ttrUser.id,
       opt: {
         status: "GROUPED",
         recipientCompanySiret: ttr.siret,
@@ -1138,11 +1142,12 @@ describe("Mutation.updateForm", () => {
     });
 
     const form = await formFactory({
-      ownerId: user.id,
+      ownerId: ttrUser.id,
       opt: {
         status: "SEALED",
         emitterCompanySiret: ttr.siret,
         emitterType: EmitterType.APPENDIX2,
+        transporterCompanySiret: transporter.siret,
         grouping: {
           create: {
             initialFormId: appendixForm.id,
@@ -1152,7 +1157,7 @@ describe("Mutation.updateForm", () => {
       }
     });
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(transporterUser);
     const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
       variables: {
         updateFormInput: {
