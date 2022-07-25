@@ -1,4 +1,3 @@
-import rateLimit from "express-rate-limit";
 import {
   MutationResolvers,
   QueryResolvers

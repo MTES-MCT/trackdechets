@@ -13,8 +13,7 @@ describe("graphqlRateLimiterMiddleware", () => {
     graphQLPath,
     graphqlRateLimiterMiddleware("resendInvitation", {
       maxRequestsPerWindow: 1,
-      windowMs: 10000,
-      store: undefined
+      windowMs: 10000
     })
   );
   app.post(graphQLPath, (req, res) => {

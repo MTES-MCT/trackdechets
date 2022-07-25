@@ -9,12 +9,15 @@ import { getUIBaseURL } from "../utils";
 
 const UI_BASE_URL = getUIBaseURL();
 
+const windowMs = 1000 * 60;
+const maxRequestsPerWindow = process.env.NODE_ENV === "test" ? 1000 : 10;
+
 export const authRouter = Router();
 authRouter.post(
   "/login",
   rateLimiterMiddleware({
-    windowMs: 1000 * 60,
-    maxRequestsPerWindow: 10,
+    windowMs,
+    maxRequestsPerWindow,
     keyGenerator: (ip: string) => `login_${ip}`
   }),
   (req, res, next) => {
