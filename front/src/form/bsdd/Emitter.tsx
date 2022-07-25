@@ -13,7 +13,12 @@ import { isOmi } from "generated/constants/companySearchHelpers";
 import { RedErrorMessage } from "common/components";
 
 export default function Emitter({ disabled }) {
-  const { values, handleChange, setFieldValue } = useFormikContext<Form>();
+  const ctx = useFormikContext<Form>();
+
+  const { values, handleChange, setFieldValue, initialValues } = ctx;
+
+  const hasInitialGrouping = !!initialValues?.grouping?.length; // siret is non editable once bsd contains grouped bsds
+  const siretNonEditable = hasInitialGrouping && !!values?.id;
 
   const [lockEmitterType, setLockEmitterType] = useState(
     values.ecoOrganisme?.siret != null
@@ -291,6 +296,7 @@ export default function Emitter({ disabled }) {
           <h4 className="form__section-heading">Entreprise émettrice</h4>
           <MyCompanySelector
             fieldName="emitter.company"
+            siretEditable={!siretNonEditable}
             onSelect={() => {
               if (values.grouping?.length) {
                 // make sure to empty appendix2 forms because new emitter may
