@@ -17,11 +17,7 @@ import { checkIsFormContributor } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
 import { FormCompanies } from "../../types";
-import {
-  checkCompaniesType,
-  draftFormSchema,
-  validateIntermediariesInput
-} from "../../validation";
+import { draftFormSchema, validateIntermediariesInput } from "../../validation";
 import { getFormOrFormNotFound } from "../../database";
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
@@ -91,7 +87,6 @@ const createFormResolver = async (
   );
 
   const form = flattenFormInput(formContent);
-  await checkCompaniesType(form as Form);
 
   const readableId = getReadableId();
 

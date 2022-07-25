@@ -21,7 +21,7 @@ import {
 import { getFormRepository } from "../../repository";
 import { FormCompanies } from "../../types";
 import {
-  checkCompaniesType,
+  validateForwardedInCompanies,
   draftFormSchema,
   sealedFormSchema,
   validateIntermediariesInput
@@ -141,7 +141,7 @@ const updateFormResolver = async (
     "Vous ne pouvez pas enlever votre établissement du bordereau"
   );
 
-  await checkCompaniesType(form as Form);
+  await validateForwardedInCompanies(form as Form);
 
   // Delete temporaryStorageDetail
   if (

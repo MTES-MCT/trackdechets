@@ -546,7 +546,7 @@ describe("Mutation.createForm", () => {
       },
       recipient: {
         company: {
-          siret: "an unregistered siret"
+          siret: "01478520369874" // an unregistered siret
         }
       }
     };
@@ -560,9 +560,9 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Certains acteurs mentionnés sur le bordereau ne sont pas inscrits sur la plateforme, rendant impossible la création du bordereau. SIRET(s): an unregistered siret",
+          "L'installation de destination avec le SIRET 01478520369874 n'est pas inscrite sur Trackdéchets",
         extensions: expect.objectContaining({
-          code: ErrorCode.FORBIDDEN
+          code: ErrorCode.BAD_USER_INPUT
         })
       })
     ]);
@@ -579,7 +579,7 @@ describe("Mutation.createForm", () => {
       },
       transporter: {
         company: {
-          siret: "an unregistered siret"
+          siret: "01478520369874"
         }
       }
     };
@@ -593,9 +593,9 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Certains acteurs mentionnés sur le bordereau ne sont pas inscrits sur la plateforme, rendant impossible la création du bordereau. SIRET(s): an unregistered siret",
+          "Le transporter qui a été renseigné sur le bordereau (SIRET: 01478520369874) n'est pas inscrit sur Trackdéchets",
         extensions: expect.objectContaining({
-          code: ErrorCode.FORBIDDEN
+          code: ErrorCode.BAD_USER_INPUT
         })
       })
     ]);

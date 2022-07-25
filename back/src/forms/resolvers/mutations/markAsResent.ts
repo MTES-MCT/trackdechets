@@ -5,7 +5,10 @@ import { expandFormFromDb, flattenFormInput } from "../../form-converter";
 import transitionForm from "../../workflow/transitionForm";
 import { checkCanMarkAsResent } from "../../permissions";
 import { UserInputError } from "apollo-server-express";
-import { checkCompaniesType, sealedFormSchema } from "../../validation";
+import {
+  validateForwardedInCompanies,
+  sealedFormSchema
+} from "../../validation";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
 import { EmitterType, Prisma, Status } from "@prisma/client";
@@ -59,7 +62,7 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
     ...updateInput
   });
 
-  await checkCompaniesType(form);
+  await validateForwardedInCompanies(form);
 
   const formUpdateInput: Prisma.FormUpdateInput = {
     forwardedIn: {
