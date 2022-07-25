@@ -221,7 +221,11 @@ input UpdateFormInput {
   """
   customId: String
 
-  "Établissement émetteur/producteur du déchet (case 1)"
+  """
+  Établissement émetteur/producteur du déchet (case 1)
+  
+  NB: le siret émetteur n'est pas modifiable si le bsd comporte des bsds groupés (Annexe 2)
+  """
   emitter: EmitterInput
 
   """
