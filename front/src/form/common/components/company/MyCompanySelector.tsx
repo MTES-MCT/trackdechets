@@ -11,6 +11,7 @@ import styles from "./CompanySelector.module.scss";
 import React, { useCallback, useMemo } from "react";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import { sortCompaniesByName } from "common/helper";
+import { CompanyResult } from "./CompanyResults";
 
 export const GET_ME = gql`
   {
@@ -29,7 +30,11 @@ export const GET_ME = gql`
   }
 `;
 
-export default function MyCompanySelector({ fieldName, onSelect }) {
+export default function MyCompanySelector({
+  fieldName,
+  onSelect,
+  siretEditable = true,
+}) {
   const { setFieldValue } = useFormikContext<CreateFormInput>();
   const [field] = useField({ name: fieldName });
 
@@ -54,8 +59,13 @@ export default function MyCompanySelector({ fieldName, onSelect }) {
 
   const { loading, error, data } = useQuery<Pick<Query, "me">>(GET_ME, {
     onCompleted: data => {
+      if (!siretEditable) {
+        return;
+      }
+
       // check user is member of selected company or reset emitter company
       const companies = data.me.companies;
+
       if (!companies.map(c => c.siret).includes(field.value.siret)) {
         if (companies.length === 1) {
           onCompanySelect(companies[0]);
@@ -81,34 +91,49 @@ export default function MyCompanySelector({ fieldName, onSelect }) {
   if (data) {
     return (
       <>
-        <select
-          className="td-select td-input--medium"
-          value={field.value?.siret}
-          onChange={e => {
-            const selectedCompany = companies.filter(
-              c => c.siret === e.target.value
-            )?.[0];
-            if (selectedCompany) {
-              onCompanySelect(selectedCompany);
-            } else {
-              setFieldValue(fieldName, getInitialCompany());
-            }
-          }}
-        >
-          <option value="" label="Sélectionner un de vos établissements" />
-          {companies.map(c => {
-            const name =
-              c.givenName && c.givenName !== "" ? c.givenName : c.name;
+        {siretEditable ? (
+          <select
+            className="td-select td-input--medium"
+            value={field.value?.siret}
+            onChange={e => {
+              const selectedCompany = companies.filter(
+                c => c.siret === e.target.value
+              )?.[0];
+              if (selectedCompany) {
+                onCompanySelect(selectedCompany);
+              } else {
+                setFieldValue(fieldName, getInitialCompany());
+              }
+            }}
+          >
+            <option value="" label="Sélectionner un de vos établissements" />
+            {companies.map(c => {
+              const name =
+                c.givenName && c.givenName !== "" ? c.givenName : c.name;
 
-            return (
-              <option
-                key={c.siret}
-                value={c.siret}
-                label={`${name} - ${c.siret}`}
-              ></option>
-            );
-          })}
-        </select>
+              return (
+                <option
+                  key={c.siret}
+                  value={c.siret}
+                  label={`${name} - ${c.siret}`}
+                ></option>
+              );
+            })}
+          </select>
+        ) : (
+          <>
+            <p>
+              Des bordereaux sont présents en annexe 2, l'entrepise n'est pas
+              modifiable
+            </p>
+            <CompanyResult
+              item={field.value}
+              selectedItem={field.value}
+              onSelect={() => null}
+              onUnselect={() => null}
+            />
+          </>
+        )}
         <div className="form__row">
           <label>
             Personne à contacter

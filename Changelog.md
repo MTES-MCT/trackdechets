@@ -5,6 +5,80 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.07.5] 25/07/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+ 
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :house: Interne
+
+-  Import de sociétés anonymes - script [PR 1533](https://github.com/MTES-MCT/trackdechets/pull/1533)
+
+# [2022.07.4] 21/07/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :house: Interne
+
+-  Import de sociétés anonymes - script [PR 1533](https://github.com/MTES-MCT/trackdechets/pull/1533)
+
+# [2022.07.3] 20/07/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+- Correction des liens du company selector [PR 1558](https://github.com/MTES-MCT/trackdechets/pull/1558)
+- Correction des favoris transporteur [PR 1559](https://github.com/MTES-MCT/trackdechets/pull/1559)
+ 
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :house: Interne
+
+# [2022.07.2] 19/07/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+- Refactor du company selector [PR 1553](https://github.com/MTES-MCT/trackdechets/pull/1553)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :house: Interne
+
 # [2022.07.1] ~18/07/2022
 
 #### :rocket: Nouvelles fonctionnalités
@@ -32,7 +106,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Affichage des inscriptions sur Trackdéchets dans la liste des résultats de recherche [PR 1541](https://github.com/MTES-MCT/trackdechets/pull/1541)
 - Meilleure validation des numéros de téléphone étrangers dans le compte utilisateur [PR 1544](https://github.com/MTES-MCT/trackdechets/pull/1544)
 
-#### :memo: Documentation
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
 
 #### :house: Interne
 

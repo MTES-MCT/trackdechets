@@ -8,6 +8,7 @@ import styles from "./CompanyResult.module.scss";
 import { CompanySearchResult } from "../../../../generated/graphql/types";
 import { generatePath } from "react-router-dom";
 import routes from "common/routes";
+import classNames from "classnames";
 
 interface CompanyResultsProps<T> {
   results: T[];
@@ -49,53 +50,75 @@ export default function CompanyResults<T extends CompanyResultBase>({
   return (
     <ul className={styles.results}>
       {results.map(item => (
-        <li
+        <CompanyResult
           key={item.siret ?? item.vatNumber!}
-          className={`${styles.resultsItem}  ${
-            isSelected(item, selectedItem) ? styles.isSelected : ""
-          }`}
-          onClick={() =>
-            isSelected(item, selectedItem) ? onUnselect?.() : onSelect(item)
-          }
-        >
-          <div className={styles.content}>
-            <h6 className="tw-flex tw-items-center tw-align-middle">
-              <div className="tw-mt-1">
-                {item.name ? item.name : "[Nom inconnu]"}
-              </div>
-              {item.isRegistered === true && (
-                <div className="tw-ml-1">
-                  <IconTrackDechetsCheck />
-                </div>
-              )}
-            </h6>
-            <p>
-              {item.siret?.length ? item.siret : item.vatNumber} -{" "}
-              {item.address ? item.address : "[Adresse inconnue]"}
-            </p>
-            <p>
-              <a
-                href={generatePath(routes.company, {
-                  siret: item.siret?.length ? item.siret : item.vatNumber!,
-                })}
-                onClick={e => e.stopPropagation()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="link"
-              >
-                Informations sur l'entreprise
-              </a>
-            </p>
-          </div>
-          <div className={styles.icon}>
-            {isSelected(item, selectedItem) ? (
-              <IconCheckCircle1 />
-            ) : (
-              <IconSignBadgeCircle />
-            )}
-          </div>
-        </li>
+          item={item}
+          selectedItem={selectedItem}
+          onSelect={onSelect}
+          onUnselect={onUnselect}
+        />
       ))}
     </ul>
+  );
+}
+interface CompanyResultProp<T> {
+  item: T;
+  onSelect: (item: T) => void;
+  onUnselect?: () => void;
+  selectedItem: T | null;
+}
+export function CompanyResult<T extends CompanyResultBase>({
+  item,
+  selectedItem,
+  onSelect,
+  onUnselect,
+}: CompanyResultProp<T>) {
+  return (
+    <li
+      key={item.siret ?? item.vatNumber!}
+      className={classNames(styles.resultsItem, {
+        [styles.isSelected]: isSelected(item, selectedItem),
+      })}
+      onClick={() =>
+        isSelected(item, selectedItem) ? onUnselect?.() : onSelect(item)
+      }
+    >
+      <div className={styles.content}>
+        <h6 className="tw-flex tw-items-center tw-align-middle">
+          <div className="tw-mt-1">
+            {item.name ? item.name : "[Nom inconnu]"}
+          </div>
+          {item.isRegistered === true && (
+            <div className="tw-ml-1">
+              <IconTrackDechetsCheck />
+            </div>
+          )}
+        </h6>
+        <p>
+          {item.siret?.length ? item.siret : item.vatNumber} -{" "}
+          {item.address ? item.address : "[Adresse inconnue]"}
+        </p>
+        <p>
+          <a
+            href={generatePath(routes.company, {
+              siret: item.siret?.length ? item.siret : item.vatNumber!,
+            })}
+            onClick={e => e.stopPropagation()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="link"
+          >
+            Informations sur l'entreprise
+          </a>
+        </p>
+      </div>
+      <div className={styles.icon}>
+        {isSelected(item, selectedItem) ? (
+          <IconCheckCircle1 />
+        ) : (
+          <IconSignBadgeCircle />
+        )}
+      </div>
+    </li>
   );
 }
