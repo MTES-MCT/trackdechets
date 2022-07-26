@@ -1,4 +1,5 @@
 import rateLimit from "express-rate-limit";
+import { Request } from "express";
 import forwarded from "forwarded";
 import RateLimitRedisStore from "rate-limit-redis";
 import { redisClient } from "../../common/redis";
@@ -6,7 +7,7 @@ import { redisClient } from "../../common/redis";
 type Options = {
   windowMs: number;
   maxRequestsPerWindow: number;
-  keyGenerator?: (ip: string) => string;
+  keyGenerator?: (ip: string, request: Request) => string;
 };
 
 const { USE_XFF_HEADER } = process.env;
@@ -25,14 +26,18 @@ export function rateLimiterMiddleware(options: Options) {
     windowMs: options.windowMs,
     max: options.maxRequestsPerWindow,
     store,
-    keyGenerator: request => {
-      // use xff data as client ip when behind a cdn
-      if (USE_XFF_HEADER !== "true") {
-        return request.ip;
-      }
-      const parsed = forwarded(request);
-      const clientIp = parsed.slice(-1).pop() ?? request.ip;
-      return options.keyGenerator(clientIp);
+    keyGenerator: (request: Request) => {
+      const clientIp = getClientIp(request);
+      return options.keyGenerator(clientIp, request);
     }
   });
+}
+
+function getClientIp(request: Request) {
+  if (USE_XFF_HEADER !== "true") {
+    return request.ip;
+  }
+
+  const parsed = forwarded(request);
+  return parsed.slice(-1).pop() ?? request.ip;
 }

@@ -36,7 +36,7 @@ describe("graphqlRateLimiterMiddleware", () => {
     expect(response2.status).toEqual(429);
   });
 
-  it("should not rate limite other queries", async () => {
+  it("should not rate limit other queries", async () => {
     const body = JSON.stringify({ query: "{otherQuery { id } }" });
     const response1 = await request
       .post(graphQLPath)

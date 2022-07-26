@@ -18,7 +18,8 @@ authRouter.post(
   rateLimiterMiddleware({
     windowMs,
     maxRequestsPerWindow,
-    keyGenerator: (ip: string) => `login_${ip}`
+    keyGenerator: (ip, request) =>
+      `login_${ip}_${request.body?.email ?? "void"}`
   }),
   (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
