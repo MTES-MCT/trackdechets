@@ -1,4 +1,4 @@
-import { Form } from "@prisma/client";
+import { CompanyType, CompanyVerificationStatus, Form } from "@prisma/client";
 import {
   draftFormSchema,
   sealedFormSchema,
@@ -8,6 +8,24 @@ import {
   transporterSchemaFn
 } from "../validation";
 import { ReceivedFormInput } from "../../generated/graphql/types";
+
+jest.mock("../../prisma", () => ({
+  company: {
+    findUnique: jest.fn(() =>
+      Promise.resolve({
+        companyTypes: [
+          CompanyType.COLLECTOR,
+          CompanyType.WASTEPROCESSOR,
+          CompanyType.TRANSPORTER
+        ],
+        verificationStatus: CompanyVerificationStatus.VERIFIED
+      })
+    )
+  },
+  ecoOrganisme: {
+    findFirst: jest.fn(() => Promise.resolve(null))
+  }
+}));
 
 const form: Partial<Form> = {
   id: "cjplbvecc000d0766j32r19am",
@@ -57,7 +75,6 @@ const form: Partial<Form> = {
 describe("sealedFormSchema", () => {
   describe("form can be sealed", () => {
     test("when fully filled", async () => {
-      sealedFormSchema.validateSync(form);
       const isValid = await sealedFormSchema.isValid(form);
       expect(isValid).toEqual(true);
     });
@@ -499,8 +516,8 @@ describe("receivedInfosSchema", () => {
       signedAt: new Date("2020-01-17T10:12:00+0100")
     };
 
-    it("should be valid when waste is accepted", () => {
-      const isValid = receivedInfoSchema.isValidSync(receivedInfo);
+    it("should be valid when waste is accepted", async () => {
+      const isValid = await receivedInfoSchema.isValid(receivedInfo);
       expect(isValid).toEqual(true);
     });
 
@@ -526,8 +543,8 @@ describe("receivedInfosSchema", () => {
       signedAt: new Date("2020-01-17T10:12:00+0100")
     };
 
-    it("should be valid when waste is refused", () => {
-      const isValid = receivedInfoSchema.isValidSync(receivedInfo);
+    it("should be valid when waste is refused", async () => {
+      const isValid = await receivedInfoSchema.isValid(receivedInfo);
       expect(isValid).toEqual(true);
     });
 
@@ -561,8 +578,8 @@ describe("receivedInfosSchema", () => {
       signedAt: new Date("2020-01-17T10:12:00+0100")
     };
 
-    it("should be valid when waste is partially refused", () => {
-      const isValid = receivedInfoSchema.isValidSync(receivedInfo);
+    it("should be valid when waste is partially refused", async () => {
+      const isValid = await receivedInfoSchema.isValid(receivedInfo);
       expect(isValid).toEqual(true);
     });
 
@@ -599,12 +616,12 @@ describe("draftFormSchema", () => {
     transporterValidityLimit: new Date()
   };
 
-  it("should be valid when passing empty strings", () => {
-    const isValid = draftFormSchema.isValidSync(form);
+  it("should be valid when passing empty strings", async () => {
+    const isValid = await draftFormSchema.isValid(form);
     expect(isValid).toBe(true);
   });
 
-  it("should be valid when passing null values", () => {
+  it("should be valid when passing null values", async () => {
     const form = {
       emitterCompanySiret: null,
       recipientCompanySiret: null,
@@ -615,13 +632,13 @@ describe("draftFormSchema", () => {
       transporterCompanyMail: null,
       transporterValidityLimit: null
     };
-    const isValid = draftFormSchema.isValidSync(form);
+    const isValid = await draftFormSchema.isValid(form);
 
     expect(isValid).toBe(true);
   });
 
-  it("should be valid when passing undefined values", () => {
-    const isValid = draftFormSchema.isValidSync({});
+  it("should be valid when passing undefined values", async () => {
+    const isValid = await draftFormSchema.isValid({});
 
     expect(isValid).toBe(true);
   });
@@ -854,14 +871,13 @@ describe("draftFormSchema", () => {
       wasteDetailsConsistence: "SOLID",
       wasteDetailsPop: false
     };
-    draftFormSchema.validateSync(partialForm);
     const isValid = await draftFormSchema.isValid(partialForm);
     expect(isValid).toEqual(true);
   });
 });
 
 describe("processedInfoSchema", () => {
-  test("noTraceability can be true when processing operation is groupement", () => {
+  test("noTraceability can be true when processing operation is groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -877,10 +893,10 @@ describe("processedInfoSchema", () => {
       nextDestinationCompanyPhone: "06 XX XX XX XX",
       nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
     };
-    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+    expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("noTraceability can be false when processing operation is groupement", () => {
+  test("noTraceability can be false when processing operation is groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -896,10 +912,10 @@ describe("processedInfoSchema", () => {
       nextDestinationCompanyPhone: "06 XX XX XX XX",
       nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
     };
-    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+    expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("noTraceability can be undefined when processing operation is groupement", () => {
+  test("noTraceability can be undefined when processing operation is groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -914,10 +930,10 @@ describe("processedInfoSchema", () => {
       nextDestinationCompanyPhone: "06 XX XX XX XX",
       nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
     };
-    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+    expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("noTraceability can be null when processing operation is groupement", () => {
+  test("noTraceability can be null when processing operation is groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -933,7 +949,7 @@ describe("processedInfoSchema", () => {
       nextDestinationCompanyPhone: "06 XX XX XX XX",
       nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
     };
-    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+    expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
   test("noTraceability cannot be true when processing operation is not groupement", async () => {
@@ -951,7 +967,7 @@ describe("processedInfoSchema", () => {
     );
   });
 
-  test("noTraceability can be false when processing operation is not groupement", () => {
+  test("noTraceability can be false when processing operation is not groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -959,20 +975,20 @@ describe("processedInfoSchema", () => {
       processingOperationDescription: "Traitement biologique",
       noTraceability: false
     };
-    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+    expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("noTraceability can be undefined when processing operation is not groupement", () => {
+  test("noTraceability can be undefined when processing operation is not groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
       processingOperationDone: "D 8",
       processingOperationDescription: "Traitement biologique"
     };
-    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+    expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("noTraceability can be null when processing operation is not groupement", () => {
+  test("noTraceability can be null when processing operation is not groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -980,10 +996,10 @@ describe("processedInfoSchema", () => {
       processingOperationDescription: "Traitement biologique",
       noTraceability: null
     };
-    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+    expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("transporter SIRET is optional when a valid foreign vatNumber is present", () => {
+  test("transporter SIRET is optional when a valid foreign vatNumber is present", async () => {
     const transporter = {
       transporterCompanyName: "Thalys",
       transporterCompanyVatNumber: "BE0541696005",
@@ -993,10 +1009,10 @@ describe("processedInfoSchema", () => {
       transporterCompanyMail: "contact@thalys.com",
       transporterIsExemptedOfReceipt: true
     };
-    expect(transporterSchemaFn(false).isValidSync(transporter)).toEqual(true);
+    expect(await transporterSchemaFn(false).isValid(transporter)).toEqual(true);
   });
 
-  test("transporter vatNumber is optional when a valid SIRET is present", () => {
+  test("transporter vatNumber is optional when a valid SIRET is present", async () => {
     const transporter = {
       transporterCompanyName: "Code en Stock",
       transporterCompanySiret: "85001946400021",
@@ -1006,7 +1022,7 @@ describe("processedInfoSchema", () => {
       transporterCompanyMail: "contact@codeenstock.fr",
       transporterIsExemptedOfReceipt: true
     };
-    expect(transporterSchemaFn(false).isValidSync(transporter)).toEqual(true);
+    expect(await transporterSchemaFn(false).isValid(transporter)).toEqual(true);
   });
 
   test("transporter SIRET is required with a french vatNumber", async () => {
@@ -1043,7 +1059,7 @@ describe("processedInfoSchema", () => {
       "transporterCompanyVatNumber n'est pas un numéro de TVA intracommunautaire valide"
     );
   });
-  test("nextDestination should be defined when processing operation is groupement and noTraceability is false", () => {
+  test("nextDestination should be defined when processing operation is groupement and noTraceability is false", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1055,7 +1071,7 @@ describe("processedInfoSchema", () => {
     expect.assertions(1);
 
     try {
-      processedInfoSchema.validateSync(processedInfo, { abortEarly: false });
+      await processedInfoSchema.validate(processedInfo, { abortEarly: false });
     } catch (err) {
       expect(err.errors).toEqual([
         "Destination ultérieure : L'opération de traitement est obligatoire",
@@ -1070,7 +1086,7 @@ describe("processedInfoSchema", () => {
     }
   });
 
-  test("nextDestination company info is optional when noTraceability is true", () => {
+  test("nextDestination company info is optional when noTraceability is true", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1079,10 +1095,10 @@ describe("processedInfoSchema", () => {
       nextDestinationProcessingOperation: "R 1",
       noTraceability: true
     };
-    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+    expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("nextDestination fields can be empty when noTraceability is true", () => {
+  test("nextDestination fields can be empty when noTraceability is true", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1097,7 +1113,7 @@ describe("processedInfoSchema", () => {
       nextDestinationCompanyPhone: "",
       nextDestinationCompanyMail: ""
     };
-    expect(processedInfoSchema.isValidSync(processedInfo)).toEqual(true);
+    expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
   test("nextDestination processingOperation is required when noTraceability is true", async () => {

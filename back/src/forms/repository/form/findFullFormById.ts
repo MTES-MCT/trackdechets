@@ -1,9 +1,9 @@
 import { FullForm } from "../../types";
-import { RepositoryFnDeps } from "../types";
+import { ReadRepositoryFnDeps } from "../types";
 
 export type FindFullFormByIdFn = (id: string) => Promise<FullForm>;
 
-const buildFindFullFormById: (deps: RepositoryFnDeps) => FindFullFormByIdFn =
+const buildFindFullFormById: (deps: ReadRepositoryFnDeps) => FindFullFormByIdFn =
   ({ prisma }) =>
   id =>
     prisma.form.findUnique({
