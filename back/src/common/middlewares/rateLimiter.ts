@@ -13,10 +13,13 @@ type Options = {
 const { USE_XFF_HEADER } = process.env;
 
 const RATE_LIMIT_WINDOW_SECONDS = 60;
-const store = new RateLimitRedisStore({
-  client: redisClient,
-  expiry: RATE_LIMIT_WINDOW_SECONDS
-});
+const store =
+  process.env.NODE_ENV === "test"
+    ? undefined // Default memory store is used for tests
+    : new RateLimitRedisStore({
+        client: redisClient,
+        expiry: RATE_LIMIT_WINDOW_SECONDS
+      });
 
 export function rateLimiterMiddleware(options: Options) {
   options.keyGenerator = options.keyGenerator ?? (ip => ip);
