@@ -593,7 +593,7 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Le transporter qui a été renseigné sur le bordereau (SIRET: 01478520369874) n'est pas inscrit sur Trackdéchets",
+          "Le transporteur qui a été renseigné sur le bordereau (SIRET: 01478520369874) n'est pas inscrit sur Trackdéchets",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

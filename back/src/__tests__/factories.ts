@@ -237,7 +237,7 @@ const formdata = {
   wasteDetailsPop: false,
   wasteDetailsQuantity: 22.5,
   wasteDetailsQuantityType: "ESTIMATED" as QuantityType,
-  wasteRefusalReason: ""
+  wasteRefusalReason: null
 };
 
 export const forwardedInData: Partial<Prisma.FormCreateInput> = {
@@ -293,7 +293,7 @@ const upsertBaseSiret = async siret => {
         data: {
           siret,
           companyTypes: {
-            set: ["PRODUCER" as CompanyType]
+            set: ["TRANSPORTER", "WASTEPROCESSOR"]
           },
           name: `company_${siret}`,
           securityCode: 1234,
@@ -343,6 +343,9 @@ export const formWithTempStorageFactory = async ({
   opt?: Partial<Prisma.FormCreateInput>;
   forwardedInOpts?: Partial<Prisma.FormCreateInput>;
 }) => {
+  await upsertBaseSiret(forwardedInData.transporterCompanySiret);
+  await upsertBaseSiret(forwardedInData.recipientCompanySiret);
+
   return formFactory({
     ownerId,
     opt: {
