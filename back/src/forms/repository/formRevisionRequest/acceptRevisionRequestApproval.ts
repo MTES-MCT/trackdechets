@@ -7,7 +7,7 @@ import {
 import { GraphQLContext } from "../../../types";
 import { indexForm } from "../../elastic";
 import buildFindFullFormById from "../form/findFullFormById";
-import { LogMetadata, RepositoryFnDeps } from "../types";
+import { LogMetadata, PrismaTransaction, RepositoryFnDeps } from "../types";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -30,37 +30,6 @@ const buildAcceptRevisionRequestApproval: (
       }
     });
 
-    // If it was the last approval:
-    // - mark the revision as approved
-    // - apply the revision to the BSDD
-    const revisionRequest = await prisma.bsddRevisionRequest.findUnique({
-      where: { id: updatedApproval.revisionRequestId }
-    });
-    const remainingApprovals = await prisma.bsddRevisionRequestApproval.count({
-      where: {
-        revisionRequestId: revisionRequest.id,
-        status: RevisionRequestApprovalStatus.PENDING
-      }
-    });
-    if (remainingApprovals !== 0) return;
-
-    await prisma.bsddRevisionRequest.update({
-      where: { id: revisionRequest.id },
-      data: { status: RevisionRequestStatus.ACCEPTED }
-    });
-    const [bsddUpdate, temporaryStorageUpdate] =
-      getUpdateFromFormRevisionRequest(revisionRequest);
-
-    await prisma.form.update({
-      where: { id: revisionRequest.bsddId },
-      data: {
-        ...bsddUpdate,
-        ...(temporaryStorageUpdate && {
-          forwardedIn: { update: { ...temporaryStorageUpdate } }
-        })
-      }
-    });
-
     await prisma.event.create({
       data: {
         streamId: updatedApproval.revisionRequestId,
@@ -75,18 +44,22 @@ const buildAcceptRevisionRequestApproval: (
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
-    await prisma.event.create({
-      data: {
-        streamId: revisionRequest.bsddId,
-        actor: user.id,
-        type: "BsddRevisionRequestApplied",
-        data: {
-          content: bsddUpdate,
-          revisionRequestId: revisionRequest.id
-        } as Prisma.InputJsonObject,
-        metadata: { ...logMetadata, authType: user.auth }
+
+    // If it was the last approval:
+    // - mark the revision as approved
+    // - apply the revision to the BSDD
+    const remainingApprovals = await prisma.bsddRevisionRequestApproval.count({
+      where: {
+        revisionRequestId: updatedApproval.revisionRequestId,
+        status: RevisionRequestApprovalStatus.PENDING
       }
     });
+    if (remainingApprovals !== 0) return;
+
+    const revisionRequest = await approveAndApplyRevisionRequest(
+      updatedApproval.revisionRequestId,
+      { prisma, user, logMetadata }
+    );
 
     const updatedFormId = revisionRequest.bsddId;
 
@@ -146,6 +119,52 @@ function getUpdateFromFormRevisionRequest(
   }
 
   return [removeEmpty(bsddUpdate), removeEmpty(temporaryStorageUpdate)];
+}
+
+export async function approveAndApplyRevisionRequest(
+  revisionRequestId: string,
+  context: {
+    prisma: PrismaTransaction;
+    user: Express.User;
+    logMetadata?: LogMetadata;
+  }
+): Promise<BsddRevisionRequest> {
+  const { prisma, user, logMetadata } = context;
+
+  const revisionRequest = await prisma.bsddRevisionRequest.findUnique({
+    where: { id: revisionRequestId }
+  });
+  const updatedRevisionRequest = await prisma.bsddRevisionRequest.update({
+    where: { id: revisionRequest.id },
+    data: { status: RevisionRequestStatus.ACCEPTED }
+  });
+  const [bsddUpdate, temporaryStorageUpdate] =
+    getUpdateFromFormRevisionRequest(revisionRequest);
+
+  await prisma.form.update({
+    where: { id: revisionRequest.bsddId },
+    data: {
+      ...bsddUpdate,
+      ...(temporaryStorageUpdate && {
+        forwardedIn: { update: { ...temporaryStorageUpdate } }
+      })
+    }
+  });
+
+  await prisma.event.create({
+    data: {
+      streamId: revisionRequest.bsddId,
+      actor: user.id,
+      type: "BsddRevisionRequestApplied",
+      data: {
+        content: bsddUpdate,
+        revisionRequestId: revisionRequest.id
+      } as Prisma.InputJsonObject,
+      metadata: { ...logMetadata, authType: user.auth }
+    }
+  });
+
+  return updatedRevisionRequest;
 }
 
 export default buildAcceptRevisionRequestApproval;

@@ -90,7 +90,7 @@ export default async function createFormRevisionRequest(
     context.user
   );
 
-  const bsddRevisionRequest = await formRepository.createRevisionRequest({
+  return formRepository.createRevisionRequest({
     bsdd: { connect: { id: existingBsdd.id } },
     ...flatContent,
     authoringCompany: { connect: { id: authoringCompany.id } },
@@ -99,8 +99,6 @@ export default async function createFormRevisionRequest(
     },
     comment
   });
-
-  return bsddRevisionRequest;
 }
 
 async function getAuthoringCompany(
@@ -217,9 +215,12 @@ async function getApproversSirets(
     approvers.push(forwardedIn.recipientCompanySiret);
   }
 
-  return approvers
-    .filter(Boolean)
-    .filter(siret => siret !== authoringCompanySiret);
+  const approversSirets = approvers.filter(
+    siret => Boolean(siret) && siret !== authoringCompanySiret
+  );
+
+  // Remove duplicates
+  return [...new Set(approversSirets)];
 }
 
 function hasTemporaryStorageUpdate(content: RevisionRequestContent): boolean {

@@ -4,7 +4,11 @@ import {
   RevisionRequestApprovalStatus,
   RevisionRequestStatus
 } from "@prisma/client";
-import { LogMetadata, RepositoryFnDeps } from "../../../forms/repository/types";
+import {
+  LogMetadata,
+  PrismaTransaction,
+  RepositoryFnDeps
+} from "../../../forms/repository/types";
 import { GraphQLContext } from "../../../types";
 import { indexBsda } from "../../elastic";
 
@@ -52,32 +56,14 @@ export function buildAcceptRevisionRequestApproval(
     });
     if (remainingApprovals > 0) return;
 
-    const revisionRequest = await prisma.bsdaRevisionRequest.findUnique({
-      where: { id: updatedApproval.revisionRequestId }
-    });
-    await prisma.bsdaRevisionRequest.update({
-      where: { id: revisionRequest.id },
-      data: { status: RevisionRequestStatus.ACCEPTED }
-    });
-
-    const updateData = getUpdateFromRevisionRequest(revisionRequest);
-    await prisma.bsda.update({
-      where: { id: revisionRequest.bsdaId },
-      data: updateData
-    });
-
-    await prisma.event.create({
-      data: {
-        streamId: revisionRequest.bsdaId,
-        actor: user.id,
-        type: "BsdaRevisionRequestApplied",
-        data: {
-          content: updateData,
-          revisionRequestId: revisionRequest.id
-        } as Prisma.InputJsonObject,
-        metadata: { ...logMetadata, authType: user.auth }
+    const revisionRequest = await approveAndApplyRevisionRequest(
+      updatedApproval.revisionRequestId,
+      {
+        prisma,
+        user,
+        logMetadata
       }
-    });
+    );
 
     const updatedBsda = await prisma.bsda.findUnique({
       where: {
@@ -111,4 +97,41 @@ function getUpdateFromRevisionRequest(revisionRequest: BsdaRevisionRequest) {
   }
 
   return removeEmpty(bsdaUpdate);
+}
+
+export async function approveAndApplyRevisionRequest(
+  revisionRequestId: string,
+  context: {
+    prisma: PrismaTransaction;
+    user: Express.User;
+    logMetadata?: LogMetadata;
+  }
+): Promise<BsdaRevisionRequest> {
+  const { prisma, user, logMetadata } = context;
+
+  const updatedRevisionRequest = await prisma.bsdaRevisionRequest.update({
+    where: { id: revisionRequestId },
+    data: { status: RevisionRequestStatus.ACCEPTED }
+  });
+
+  const updateData = getUpdateFromRevisionRequest(updatedRevisionRequest);
+  await prisma.bsda.update({
+    where: { id: updatedRevisionRequest.bsdaId },
+    data: updateData
+  });
+
+  await prisma.event.create({
+    data: {
+      streamId: updatedRevisionRequest.bsdaId,
+      actor: user.id,
+      type: "BsdaRevisionRequestApplied",
+      data: {
+        content: updateData,
+        revisionRequestId: updatedRevisionRequest.id
+      } as Prisma.InputJsonObject,
+      metadata: { ...logMetadata, authType: user.auth }
+    }
+  });
+
+  return updatedRevisionRequest;
 }
