@@ -46,7 +46,7 @@ describe("mutation sendMembershipRequest", () => {
     expect(errors[0].message).toEqual("Vous n'êtes pas connecté.");
   });
 
-  it("should send a request to all admins of the company and create a MembershipRequest record", async () => {
+  it("should send a request to all admins of the company and create a MembershipRequest record. Admins emails partially hidden.", async () => {
     const requester = await userFactory();
     const admin = await userFactory({ email: "john.snow@trackdechets.fr" });
     const company = await companyFactory();
@@ -110,7 +110,7 @@ describe("mutation sendMembershipRequest", () => {
     );
   });
 
-  it("should send a request to all admins of the company and create a MembershipRequest record bis", async () => {
+  it("should send a request to all admins of the company and create a MembershipRequest record. Admins emails shown.", async () => {
     const userIndex = (await prisma.user.count()) + 1;
 
     const requester = await userFactory({
@@ -205,7 +205,8 @@ describe("mutation sendMembershipRequest", () => {
     );
   });
 
-  it("should return an error if a pending request already exists", async () => {
+  it("should return an error if a pending request already exists. Admin emails displayed.", async () => {
+    // admin email tld != requester email tld, admin email not displayed
     const requester = await userFactory();
     const company = await companyFactory();
 
@@ -223,7 +224,39 @@ describe("mutation sendMembershipRequest", () => {
     });
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual(
-      "Une demande de rattachement a déjà été faite pour cet établissement"
+      "Une demande de rattachement a déjà été faite pour cet établissement."
+    );
+  });
+
+  it("should return an error if a pending request already exists. Admin emails shown.", async () => {
+    // admin email tld == requester email tld, admin email shown
+
+    const userIndex = (await prisma.user.count()) + 1;
+
+    const requester = await userFactory({
+      email: `requester${userIndex}@trackdechets.fr`
+    });
+    const admin = await userFactory({
+      email: `admin${userIndex}@trackdechets.fr`
+    });
+    const company = await companyFactory();
+    await associateUserToCompany(admin.id, company.siret, "ADMIN");
+
+    await prisma.membershipRequest.create({
+      data: {
+        user: { connect: { id: requester.id } },
+        company: { connect: { id: company.id } }
+      }
+    });
+
+    const { mutate } = makeClient(requester);
+
+    const { errors } = await mutate(SEND_MEMBERSHIP_REQUEST, {
+      variables: { siret: company.siret }
+    });
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toEqual(
+      `Une demande de rattachement a déjà été faite pour cet établissement. Vous pouvez contacter directement: ${admin.email}`
     );
   });
 });
