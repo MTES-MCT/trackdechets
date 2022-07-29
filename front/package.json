@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@apollo/client": "^3.6.8",
-    "@reach/dialog": "^0.11.2",
+    "@reach/dialog": "^0.17.0",
     "@reach/menu-button": "^0.11.2",
     "@reach/tooltip": "^0.11.2",
     "@sentry/browser": "^6.19.7",
