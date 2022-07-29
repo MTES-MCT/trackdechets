@@ -5,7 +5,7 @@
   "dependencies": {
     "@apollo/client": "^3.6.8",
     "@reach/dialog": "^0.11.2",
-    "@reach/menu-button": "^0.11.2",
+    "@reach/menu-button": "^0.17.0",
     "@reach/tooltip": "^0.11.2",
     "@sentry/browser": "^6.19.7",
     "@sentry/react": "^5.30.0",
