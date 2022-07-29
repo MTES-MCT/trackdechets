@@ -329,7 +329,7 @@ const NextBsda = ({ bsda }: { bsda: Bsda }) => {
   return (
     <div className={styles.detailColumns}>
       <div className={styles.detailGrid}>
-        <dt>Identifiant</dt>
+        <dt>N°</dt>
         <dd>{bsda.id}</dd>
 
         <dt>Code déchet</dt>
