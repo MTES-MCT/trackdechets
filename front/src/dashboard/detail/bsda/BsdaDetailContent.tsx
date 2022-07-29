@@ -324,6 +324,36 @@ const NextDestination = ({
   </div>
 );
 
+const NextBsda = ({ bsda }: { bsda: Bsda }) => {
+  const [downloadPdf] = useDownloadPdf({});
+  return (
+    <div className={styles.detailColumns}>
+      <div className={styles.detailGrid}>
+        <dt>Identifiant</dt>
+        <dd>{bsda.id}</dd>
+
+        <dt>Code déchet</dt>
+        <dd>{bsda.waste?.code}</dd>
+
+        <dt>CAP</dt>
+        <dd>{bsda.destination?.cap}</dd>
+
+        <dt>PDF</dt>
+        <dd>
+          <button
+            type="button"
+            className="btn btn--slim btn--small btn--outline-primary"
+            onClick={() => downloadPdf({ variables: { id: bsda.id } })}
+          >
+            <IconPdf size="18px" color="blueLight" />
+            <span>Pdf</span>
+          </button>
+        </dd>
+      </div>
+    </div>
+  );
+};
+
 export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
@@ -467,6 +497,15 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             </Tab>
           )}
 
+          {(form?.forwardedIn?.id || form?.groupedIn?.id) && (
+            <Tab className={styles.detailTab}>
+              <IconBSDa style={{ fontSize: "25px" }} />
+              <span className={styles.detailTabCaption}>
+                <span>BSDA suite</span>
+              </span>
+            </Tab>
+          )}
+
           {!!initialBsdas?.length && (
             <Tab className={styles.detailTab}>
               <IconBSDa style={{ fontSize: "25px" }} />
@@ -519,6 +558,12 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
                 forwardedIn={form.forwardedIn}
                 groupedIn={form.groupedIn}
               />
+            </TabPanel>
+          )}
+
+          {(form?.forwardedIn?.id || form?.groupedIn?.id) && (
+            <TabPanel className={styles.detailTabPanel}>
+              <NextBsda bsda={form.forwardedIn ?? form.groupedIn!} />
             </TabPanel>
           )}
 
