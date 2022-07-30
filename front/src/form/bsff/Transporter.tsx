@@ -29,9 +29,9 @@ export default function Transporter({ disabled }) {
         onCompanySelected={transporter => {
           if (transporter.transporterReceipt) {
             setFieldValue("transporter.recepisse", {
-              receiptNumber: transporter.transporterReceipt.receiptNumber,
+              number: transporter.transporterReceipt.receiptNumber,
               validityLimit: transporter.transporterReceipt.validityLimit,
-              departement: transporter.transporterReceipt.department,
+              department: transporter.transporterReceipt.department,
             });
           } else {
             setFieldValue(
