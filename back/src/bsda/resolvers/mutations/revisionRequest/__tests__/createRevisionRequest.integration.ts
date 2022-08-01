@@ -267,4 +267,66 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       waste: { code: "01 03 08" }
     });
   });
+
+  it("should create an auto-approved revisionRequest all roles have the same siret", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        destinationCompanySiret: company.siret,
+        workerCompanySiret: company.siret,
+        status: "SENT"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: { waste: { code: "01 03 08" } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret
+        }
+      }
+    });
+
+    expect(data.createBsdaRevisionRequest.bsda.id).toBe(bsda.id);
+    expect(data.createBsdaRevisionRequest.approvals.length).toBe(0);
+    expect(data.createBsdaRevisionRequest.status).toBe("ACCEPTED");
+  });
+
+  it("should only create one approval if two approving roles have the same siret", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        destinationCompanySiret: recipientCompany.siret,
+        workerCompanySiret: recipientCompany.siret,
+        status: "SENT"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: { waste: { code: "01 03 08" } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret
+        }
+      }
+    });
+
+    expect(data.createBsdaRevisionRequest.bsda.id).toBe(bsda.id);
+    expect(data.createBsdaRevisionRequest.approvals.length).toBe(1);
+  });
 });
