@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'un onglet "BSDA suite" sur l'aperçu pour les BSDAs initiaux groupés ou faisant partie d'un bordereau de transit [PR 1577](https://github.com/MTES-MCT/trackdechets/pull/1577)
+- Ajout de la possibilité pour l'émetteur d'un BSDA de supprimer le bordereau après qu'il ait signé, si aucun autre acteur n'a encore signé [PR 1571](https://github.com/MTES-MCT/trackdechets/pull/1571)
 
 #### :bug: Corrections de bugs
 
