@@ -1,4 +1,4 @@
-import { BsdaStatus, UserRole } from "@prisma/client";
+import { BsdaStatus, UserRole, WasteAcceptationStatus } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import {
@@ -768,6 +768,138 @@ describe("Mutation.Bsda.sign", () => {
           message: "Le conditionnement est obligatoire"
         })
       ]);
+    });
+
+    it("should release initial BSDAs when grouping BSDA is refused", async () => {
+      const { company: emitter } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { company: transporter } = await userWithCompanyFactory(
+        UserRole.ADMIN
+      );
+      const { user, company: destination } = await userWithCompanyFactory(
+        UserRole.ADMIN
+      );
+      const { company: ttr1 } = await userWithCompanyFactory(UserRole.ADMIN);
+
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: ttr1.siret,
+          transporterCompanySiret: transporter.siret,
+          destinationCompanySiret: destination.siret,
+          status: BsdaStatus.SENT,
+          destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
+          destinationReceptionRefusalReason: "Invalid bsda, cant accept",
+          destinationReceptionWeight: 0,
+          destinationOperationCode: null
+        }
+      });
+
+      const grouped1 = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: emitter.siret,
+          transporterCompanySiret: transporter.siret,
+          destinationCompanySiret: ttr1.siret,
+          destinationOperationCode: "R 13",
+          status: BsdaStatus.AWAITING_CHILD,
+          groupedIn: { connect: { id: bsda.id } }
+        }
+      });
+      const grouped2 = await bsdaFactory({
+        opt: {
+          status: BsdaStatus.AWAITING_CHILD,
+          emitterCompanySiret: emitter.siret,
+          transporterCompanySiret: transporter.siret,
+          destinationCompanySiret: ttr1.siret,
+          destinationOperationCode: "R 13",
+          groupedIn: { connect: { id: bsda.id } }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.signBsda.id).toBeTruthy();
+
+      const newGrouped1 = await prisma.bsda.findUnique({
+        where: { id: grouped1.id }
+      });
+      expect(newGrouped1.status).toEqual(BsdaStatus.AWAITING_CHILD);
+      expect(newGrouped1.groupedInId).toBe(null);
+
+      const newGrouped2 = await prisma.bsda.findUnique({
+        where: { id: grouped2.id }
+      });
+      expect(newGrouped2.status).toEqual(BsdaStatus.AWAITING_CHILD);
+      expect(newGrouped2.groupedInId).toBe(null);
+    });
+
+    it("should release forwarded BSDA when forwarding BSDA is refused", async () => {
+      const { company: emitter } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { company: transporter } = await userWithCompanyFactory(
+        UserRole.ADMIN
+      );
+      const { user, company: destination } = await userWithCompanyFactory(
+        UserRole.ADMIN
+      );
+      const { company: ttr1 } = await userWithCompanyFactory(UserRole.ADMIN);
+
+      const forwarded = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: emitter.siret,
+          transporterCompanySiret: transporter.siret,
+          destinationCompanySiret: ttr1.siret,
+          status: BsdaStatus.AWAITING_CHILD,
+          destinationOperationCode: "R 13"
+        }
+      });
+
+      const forwarding = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: emitter.siret,
+          transporterCompanySiret: transporter.siret,
+          destinationCompanySiret: destination.siret,
+          destinationReceptionWeight: 0,
+          destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
+          destinationReceptionRefusalReason: "Invalid bsda, cant accept",
+          destinationOperationCode: null,
+          status: BsdaStatus.SENT,
+          forwarding: { connect: { id: forwarded.id } }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: forwarding.id,
+          input: {
+            type: "OPERATION",
+            author: user.name
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+      expect(data.signBsda.id).toBeTruthy();
+
+      const newForwarding = await prisma.bsda.findUnique({
+        where: { id: forwarding.id }
+      });
+      expect(newForwarding.status).toEqual(BsdaStatus.REFUSED);
+      expect(newForwarding.forwardingId).toBe(null);
     });
   });
 });
