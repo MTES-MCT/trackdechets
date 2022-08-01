@@ -176,6 +176,12 @@ export const FullBsdaFragment = gql`
     }
     groupedIn {
       id
+      waste {
+        code
+      }
+      destination {
+        cap
+      }
     }
   }
   ${companyFragment}

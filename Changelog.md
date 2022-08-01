@@ -8,14 +8,19 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 # [2022.08.1] ~08/08/2022
 
 #### :rocket: Nouvelles fonctionnalités
+
+- Ajout d'un onglet "BSDA suite" sur l'aperçu pour les BSDAs initiaux groupés ou faisant partie d'un bordereau de transit [PR 1577](https://github.com/MTES-MCT/trackdechets/pull/1577)
+
 #### :bug: Corrections de bugs
 
 #### :boom: Breaking changes
+
 #### :nail_care: Améliorations
 
 - Correction du fonctionnement de la validation des champs requis sur le BSFF [PR 1531](https://github.com/MTES-MCT/trackdechets/pull/1531)
 
 #### :memo: Documentation
+
 #### :house: Interne
 
 # [2022.07.5] 25/07/2022
@@ -24,7 +29,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
- 
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
@@ -35,7 +39,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
--  Import de sociétés anonymes - script [PR 1533](https://github.com/MTES-MCT/trackdechets/pull/1533)
+- Import de sociétés anonymes - script [PR 1533](https://github.com/MTES-MCT/trackdechets/pull/1533)
 
 # [2022.07.4] 21/07/2022
 
@@ -53,7 +57,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
--  Import de sociétés anonymes - script [PR 1533](https://github.com/MTES-MCT/trackdechets/pull/1533)
+- Import de sociétés anonymes - script [PR 1533](https://github.com/MTES-MCT/trackdechets/pull/1533)
 
 # [2022.07.3] 20/07/2022
 
@@ -63,7 +67,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Correction des liens du company selector [PR 1558](https://github.com/MTES-MCT/trackdechets/pull/1558)
 - Correction des favoris transporteur [PR 1559](https://github.com/MTES-MCT/trackdechets/pull/1559)
- 
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations

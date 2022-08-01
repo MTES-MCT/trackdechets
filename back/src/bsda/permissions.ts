@@ -4,6 +4,7 @@ import { NotFormContributor } from "../forms/errors";
 import { getCachedUserSirets } from "../common/redis/users";
 
 import prisma from "../prisma";
+import { getPreviousBsdas } from "./database";
 
 type BsdaContributors = Pick<
   Bsda,
@@ -33,6 +34,20 @@ export const BSDA_CONTRIBUTORS_FIELDS: Record<string, keyof BsdaContributors> =
     broker: "brokerCompanySiret",
     nextDestination: "destinationOperationNextDestinationCompanySiret"
   };
+
+export async function checkCanAccessBsdaPdf(user: User, bsda: Bsda) {
+  const isContributor = await isBsdaContributor(user, bsda);
+  if (isContributor) return true;
+
+  const previousBsdas = await getPreviousBsdas(bsda);
+  for (const previousBsda of previousBsdas) {
+    if (await isBsdaContributor(user, previousBsda)) return true;
+  }
+
+  throw new NotFormContributor(
+    "Vous n'êtes pas autorisé à accéder au bordereau de ce BSDA."
+  );
+}
 
 export async function checkIsBsdaContributor(
   user: User,
