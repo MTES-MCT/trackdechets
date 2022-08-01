@@ -80,7 +80,15 @@ export async function checkCanDeleteBsda(user: User, bsda: Bsda) {
     "Vous n'êtes pas autorisé à supprimer ce bordereau."
   );
 
-  if (bsda.status !== BsdaStatus.INITIAL) {
+  const userSirets = await getCachedUserSirets(user.id);
+  const isBsdaEmitter = userSirets.some(
+    siret => bsda.emitterCompanySiret === siret
+  );
+
+  if (
+    bsda.status !== BsdaStatus.INITIAL &&
+    (!isBsdaEmitter || bsda.status !== BsdaStatus.SIGNED_BY_PRODUCER)
+  ) {
     throw new ForbiddenError(
       "Seuls les bordereaux en brouillon ou n'ayant pas encore été signés peuvent être supprimés"
     );

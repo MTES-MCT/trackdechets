@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { BsdaStatus, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -133,7 +133,7 @@ describe("Mutation.deleteBsda", () => {
     const bsda = await bsdaFactory({
       opt: {
         emitterCompanySiret: company.siret,
-        status: "SIGNED_BY_PRODUCER"
+        status: "SIGNED_BY_WORKER"
       }
     });
 
@@ -185,5 +185,56 @@ describe("Mutation.deleteBsda", () => {
       include: { forwarding: true }
     });
     expect(updatedForwarded.forwarding).toBe(null);
+  });
+
+  it("should allow the producer to remove a bsda signed by himself only", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { mutate } = makeClient(user);
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        status: BsdaStatus.SIGNED_BY_PRODUCER
+      }
+    });
+    await mutate<Pick<Mutation, "deleteBsda">, MutationDeleteBsdaArgs>(
+      DELETE_BSDA,
+      {
+        variables: {
+          id: bsda.id
+        }
+      }
+    );
+
+    const deletedBsda = await prisma.bsda.findUnique({
+      where: { id: bsda.id }
+    });
+    expect(deletedBsda.isDeleted).toBe(true);
+  });
+
+  it("should allow removing a bsda signed by the producer only if the current user is not the producer", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { mutate } = makeClient(user);
+
+    const bsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: company.siret,
+        status: BsdaStatus.SIGNED_BY_PRODUCER
+      }
+    });
+    const { errors } = await mutate<
+      Pick<Mutation, "deleteBsda">,
+      MutationDeleteBsdaArgs
+    >(DELETE_BSDA, {
+      variables: {
+        id: bsda.id
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Seuls les bordereaux en brouillon ou n'ayant pas encore été signés peuvent être supprimés`
+      })
+    ]);
   });
 });
