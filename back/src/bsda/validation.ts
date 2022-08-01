@@ -738,7 +738,10 @@ const packagingsSchema = yup.object({
   other: yup.string().optional(),
   quantity: yup
     .number()
-    .min(1, "La quantité d'un conditionnement doit être supérieure à 1")
+    .min(
+      1,
+      "La quantité d'un conditionnement doit être supérieure ou égale à 1"
+    )
     .required("La quantité associée à un conditionnement est obligatoire")
 });
 
