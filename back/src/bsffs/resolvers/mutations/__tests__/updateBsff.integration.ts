@@ -95,8 +95,6 @@ describe("Mutation.updateBsff", () => {
       .findUnique({ where: { id: bsff.id } })
       .packagings();
 
-    console.log(packagings);
-
     expect(packagings.length).toEqual(2); // previous packagings should be deleted
     expect(packagings[0].numero).toEqual("2");
     expect(packagings[1].numero).toEqual("3");
@@ -778,6 +776,7 @@ describe("Mutation.updateBsff", () => {
       { emitter },
       {
         type: BsffType.GROUPEMENT,
+        isDraft: true,
         grouping: { connect: groupingBsffs.map(({ id }) => ({ id })) }
       }
     );
@@ -820,6 +819,7 @@ describe("Mutation.updateBsff", () => {
       { emitter: ttr },
       {
         type: BsffType.REEXPEDITION,
+        isDraft: true,
         forwarding: { connect: { id: forwardedBsff.id } }
       }
     );
@@ -856,6 +856,7 @@ describe("Mutation.updateBsff", () => {
     const bsff = await createBsffBeforeEmission(
       { emitter },
       {
+        isDraft: true,
         ficheInterventions: {
           connect: ficheInterventions.map(({ id }) => ({ id }))
         }

@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "@apollo/client";
+import { Loader } from "common/components";
 import GenericStepList, {
   getComputedState,
 } from "form/common/stepper/GenericStepList";
@@ -56,12 +57,12 @@ export default function BsffStepsList(props: Props) {
     return getComputedState(initialState, bsff ? getCurrentState(bsff) : null);
   }, [formQuery.data]);
 
-  const [createDraftBsff] = useMutation<
+  const [createDraftBsff, { loading: creating }] = useMutation<
     Pick<Mutation, "createDraftBsff">,
     MutationCreateDraftBsffArgs
   >(CREATE_DRAFT_BSFF);
 
-  const [updateBsffForm] = useMutation<
+  const [updateBsffForm, { loading: updating }] = useMutation<
     Pick<Mutation, "updateBsff">,
     MutationUpdateBsffArgs
   >(UPDATE_BSFF_FORM);
@@ -107,13 +108,16 @@ export default function BsffStepsList(props: Props) {
   >[];
 
   return (
-    <GenericStepList
-      children={steps}
-      formId={props.formId}
-      formQuery={formQuery}
-      onSubmit={onSubmit}
-      initialValues={formState}
-      validationSchema={null}
-    />
+    <>
+      <GenericStepList
+        children={steps}
+        formId={props.formId}
+        formQuery={formQuery}
+        onSubmit={onSubmit}
+        initialValues={formState}
+        validationSchema={null}
+      />
+      {(creating || updating) && <Loader />}
+    </>
   );
 }

@@ -5,6 +5,19 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.08.1] ~08/08/2022
+
+#### :rocket: Nouvelles fonctionnalités
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+#### :nail_care: Améliorations
+
+- Correction du fonctionnement de la validation des champs requis sur le BSFF [PR 1531](https://github.com/MTES-MCT/trackdechets/pull/1531)
+
+#### :memo: Documentation
+#### :house: Interne
+
 # [2022.07.5] 25/07/2022
 
 #### :rocket: Nouvelles fonctionnalités

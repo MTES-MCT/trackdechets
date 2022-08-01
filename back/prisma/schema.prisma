@@ -1099,8 +1099,6 @@ model Bsff {
   destinationOperationSignatureAuthor String?
   destinationOperationSignatureDate   DateTime? @db.Timestamptz(6)
 
-  destinationCap String?
-
   grouping    Bsff[]  @relation("BsffGrouping")
   groupedIn   Bsff?   @relation("BsffGrouping", fields: [groupedInId], references: [id])
   groupedInId String?

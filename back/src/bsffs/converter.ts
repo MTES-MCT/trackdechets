@@ -93,9 +93,7 @@ export function flattenBsffInput(
     destinationOperationNextDestinationCompanyPhone:
       bsffInput.destination?.operation?.nextDestination?.company?.phone,
     destinationOperationNextDestinationCompanyMail:
-      bsffInput.destination?.operation?.nextDestination?.company?.mail,
-
-    destinationCap: bsffInput.destination?.cap
+      bsffInput.destination?.operation?.nextDestination?.company?.mail
   });
 }
 
@@ -204,7 +202,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
       }),
       plannedOperationCode:
         prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode,
-      cap: prismaBsff.destinationCap
+      cap: null // deprecated field
     }),
     // the following relations will be set in Bsff resolver
     ficheInterventions: [],

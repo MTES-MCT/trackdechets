@@ -52,7 +52,6 @@ function toGenericWaste(bsff: Bsff): GenericWaste {
     bsdType: "BSFF",
     status: bsff.status,
     customId: null,
-    destinationCap: bsff.destinationCap,
     destinationOperationNoTraceability: false,
     destinationReceptionAcceptationStatus:
       bsff.destinationReceptionAcceptationStatus,

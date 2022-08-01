@@ -5,6 +5,7 @@ import { ActionButton, Loader } from "common/components";
 import { TdModalTrigger } from "common/components/Modal";
 import { IconPaperWrite } from "common/components/Icons";
 import { GET_BSDS } from "common/queries";
+import { NotificationError } from "common/components/Error";
 
 const PUBLISH_BSFF = gql`
   mutation PublishBsff($id: ID!) {
@@ -20,7 +21,7 @@ interface PublishBsffProps {
 }
 
 export function PublishBsff({ bsffId }: PublishBsffProps) {
-  const [publishBsff, { loading }] = useMutation<
+  const [publishBsff, { loading, error }] = useMutation<
     Pick<Mutation, "publishBsff">,
     MutationPublishBsffArgs
   >(PUBLISH_BSFF, {
@@ -58,6 +59,7 @@ export function PublishBsff({ bsffId }: PublishBsffProps) {
             </button>
           </div>
           {loading && <Loader />}
+          {error && <NotificationError apolloError={error} />}
         </>
       )}
     />
