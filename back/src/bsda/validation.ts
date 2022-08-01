@@ -733,6 +733,18 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
         })
     });
 
+const packagingsSchema = yup.object({
+  type: yup.string().required("Le type de conditionnement est obligatoire"),
+  other: yup.string().optional(),
+  quantity: yup
+    .number()
+    .min(
+      1,
+      "La quantité d'un conditionnement doit être supérieure ou égale à 1"
+    )
+    .required("La quantité associée à un conditionnement est obligatoire")
+});
+
 const wasteDescriptionSchema: FactorySchemaOf<
   BsdaValidationContext,
   WasteDescription
@@ -755,7 +767,7 @@ const wasteDescriptionSchema: FactorySchemaOf<
     wasteSealNumbers: yup.array().ensure().of(yup.string()) as any,
     wasteAdr: yup.string().nullable(),
     wastePop: yup.boolean().nullable(),
-    packagings: yup.array(),
+    packagings: yup.array().of(packagingsSchema),
     weightIsEstimate: yup
       .boolean()
       .requiredIf(context.workSignature, `Le type de quantité est obligatoire`),

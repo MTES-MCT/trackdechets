@@ -20,6 +20,7 @@ import initialState from "./initial-state";
 import { CREATE_BSDA, UPDATE_BSDA, GET_BSDA } from "./queries";
 import omitDeep from "omit-deep-lodash";
 import { formInputToastError } from "form/common/stepper/toaster";
+import { bsdaValidationSchema } from "./schema";
 
 interface Props {
   children: (bsda: Bsda | undefined) => ReactElement;
@@ -120,7 +121,7 @@ export default function BsdaStepsList(props: Props) {
         formQuery={formQuery}
         onSubmit={onSubmit}
         initialValues={formState}
-        validationSchema={null}
+        validationSchema={bsdaValidationSchema}
         initialStep={props.initialStep}
       />
       {(creating || updating) && <Loader />}
