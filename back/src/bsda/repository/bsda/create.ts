@@ -23,7 +23,7 @@ export function buildCreateBsda(deps: RepositoryFnDeps): CreateBsdaFn {
       }
     });
 
-    await addBsdaToIndexQueue(bsda);
+    prisma.addAfterCommitCallback(() => addBsdaToIndexQueue(bsda));
 
     return bsda;
   };

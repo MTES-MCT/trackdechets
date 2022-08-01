@@ -37,7 +37,7 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
       });
     }
 
-    await addBsdaToIndexQueue(bsda);
+    prisma.addAfterCommitCallback(() => addBsdaToIndexQueue(bsda));
 
     return bsda;
   };

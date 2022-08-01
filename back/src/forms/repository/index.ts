@@ -2,12 +2,15 @@ import prisma from "../../prisma";
 import buildCountForms from "./form/count";
 import buildCreateForm from "./form/create";
 import buildDeleteForm from "./form/delete";
+import buildDeleteFormStaleSegments from "./form/deleteStaleSegments";
 import buildFindAppendix2FormsById from "./form/findAppendix2FormsById";
 import buildFindForwardedInById from "./form/findForwardedInById";
 import buildFindFullFormById from "./form/findFullFormById";
 import buildFindUniqueForm from "./form/findUnique";
 import buildRemoveAppendix2 from "./form/removeAppendix2";
+import buildSetAppendix2 from "./form/setAppendix2";
 import buildUpdateForm from "./form/update";
+import buildUpdateAppendix2Forms from "./form/updateAppendix2Forms";
 import buildUpdateManyForms from "./form/updateMany";
 import buildAcceptRevisionRequestApproval from "./formRevisionRequest/acceptRevisionRequestApproval";
 import buildCancelRevisionRequest from "./formRevisionRequest/cancelRevisionRequest";
@@ -20,9 +23,6 @@ import {
   FormRevisionRequestActions,
   PrismaTransaction
 } from "./types";
-import buildSetAppendix2 from "./form/setAppendix2";
-import buildUpdateAppendix2Forms from "./form/updateAppendix2Forms";
-import buildDeleteFormStaleSegments from "./form/deleteStaleSegments";
 
 export type FormRepository = FormActions & FormRevisionRequestActions;
 

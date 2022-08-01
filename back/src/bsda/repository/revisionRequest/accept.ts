@@ -69,7 +69,7 @@ export function buildAcceptRevisionRequestApproval(
         id: revisionRequest.bsdaId
       }
     });
-    await addBsdaToIndexQueue(updatedBsda);
+    prisma.addAfterCommitCallback(() => addBsdaToIndexQueue(updatedBsda));
   };
 }
 

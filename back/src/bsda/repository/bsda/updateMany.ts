@@ -40,11 +40,9 @@ export function buildUpdateManyBsdas(deps: RepositoryFnDeps): UpdateManyBsdaFn {
     }
 
     const bsdas = await buildFindManyBsda(deps)({ id: { in: ids } });
-    await Promise.all(
-      bsdas.map(async bsda => {
-        addBsdaToIndexQueue(bsda);
-      })
-    );
+    for (const bsda of bsdas) {
+      prisma.addAfterCommitCallback(() => addBsdaToIndexQueue(bsda));
+    }
 
     return update;
   };
