@@ -48,17 +48,17 @@
    127.0.0.1 trackdechets.local
    127.0.0.1 developers.trackdechets.local
    127.0.0.1 es.trackdechets.local
-   127.0.0.1 kibana.trackdechets.local
+   127.0.0.1 notifier.trackdechets.local
    ```
 
    > Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
 
-   > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `UI_HOST`, `DEVELOPERS_HOST`, `ELASTIC_SEARCH_HOST` et `KIBANA_HOST`
+   > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `NOTIFIER_HOST`, `UI_HOST`, `DEVELOPERS_HOST` et `ELASTIC_SEARCH_HOST`
 
 4. Démarrer les containers
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx elasticsearch kibana
+   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx elasticsearch
    ```
 
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
