@@ -77,6 +77,25 @@ resource "scalingo_app" "api" {
   force_https = true
 }
 
+
+resource "scalingo_app" "notifier" {
+  name = "trackdechets-${var.scalingo_app_name}-api"
+
+  environment = {
+    NOTIFER_PORT="$PORT"
+    NOTIFIER_HOST="notifier.${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
+    UI_HOST="${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
+    UI_URL_SCHEME="https"
+    REDIS_URL="${lookup(scalingo_app.api.all_environment, "SCALINGO_REDIS_URL", "n/c")}"
+    NODE_ENV="demo"
+    PROJECT_DIR="back/notifier"
+    NPM_CONFIG_PRODUCTION="false"
+    TZ="Europe/Paris"
+  }
+
+  force_https = true
+}
+
 resource "scalingo_addon" "api_psql" {
   provider_id = "scalingo-postgresql"
   plan        = "postgresql-sandbox"
@@ -110,4 +129,19 @@ resource "scalingo_github_link" "ui_link" {
   auto_deploy                     = true
   deploy_on_branch_change         = true
   review_apps                     = false
+}
+
+resource "scalingo_domain" "domain_front" {
+  common_name = "${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
+  app = "${scalingo_app.front.id}"
+}
+
+resource "scalingo_domain" "domain_api" {
+  common_name = "api.${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
+  app = "${scalingo_app.api.id}"
+}
+
+resource "scalingo_domain" "domain_notifier" {
+  common_name = "notifier.${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
+  app = "${scalingo_app.notifier.id}"
 }
