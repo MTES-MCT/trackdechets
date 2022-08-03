@@ -51,6 +51,17 @@
     border-color: $orange;
   }
 
+  &--platform {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fde39c;
+
+    img {
+      margin-right: 20px;
+    }
+  }
+
   &--error {
     background: $red-light;
     border-color: $red;
