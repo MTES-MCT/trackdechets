@@ -123,7 +123,7 @@ export default function MyCompanySelector({
         ) : (
           <>
             <p>
-              Des bordereaux sont présents en annexe 2, l'entrepise n'est pas
+              Des bordereaux sont présents en annexe 2, l'entreprise n'est pas
               modifiable
             </p>
             <CompanyResult
