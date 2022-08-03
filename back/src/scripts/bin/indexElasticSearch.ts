@@ -4,6 +4,11 @@ import { closeQueues } from "../../queue/producers";
 
 (async function () {
   const force = process.argv.includes("-f");
-  await indexElasticSearch({ force, index });
-  await closeQueues();
+  try {
+    await indexElasticSearch({ force, index });
+  } catch (error) {
+    console.error("ES indexation failed, error:", error);
+  } finally {
+    await closeQueues();
+  }
 })();
