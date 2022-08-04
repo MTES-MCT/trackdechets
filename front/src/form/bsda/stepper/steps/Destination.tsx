@@ -182,7 +182,7 @@ export function Destination({ disabled }) {
                 <Field
                   disabled={disabled}
                   type="text"
-                  name="destination..cap"
+                  name="destination.cap"
                   className="td-input td-input--medium"
                 />
               </label>
