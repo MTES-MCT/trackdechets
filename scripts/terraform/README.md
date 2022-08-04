@@ -27,6 +27,8 @@ $ terraform apply
 
 4. Restore a DB backup & index ES
 
+Either restore an existing backup, keeping compatibility with migrations :
+
 ```
 $ scalingo -a trackdechets-test_app-api run --file /path/to/db_backup.pgsql bash
 
@@ -40,6 +42,23 @@ $ scalingo -a trackdechets-test_app-api run --file /path/to/db_backup.pgsql bash
 > curl -X DELETE $ELASTIC_SEARCH_URL/bsds_0.X.X
 
 # Re-index documents
+> npm run index-elastic-search
+```
+
+Or push the schema with Prisma (migrations won't work) :
+
+```
+$ scalingo -a trackdechets-test_app-api run bash
+
+> prisma db push
+
+# Seed if necessary
+> cd dist/prisma/
+> cp seed.model.js seed.dev
+> node seed.js
+
+# Delete & reindex ES
+> curl -X DELETE $ELASTIC_SEARCH_URL/bsds_0.X.X
 > npm run index-elastic-search
 ```
 
