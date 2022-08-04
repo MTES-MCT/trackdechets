@@ -82,13 +82,14 @@ resource "scalingo_app" "notifier" {
   name = "trackdechets-${var.scalingo_app_name}-api"
 
   environment = {
+    STARTUP_FILE="dist/src/notifier/index.js"
     NOTIFER_PORT="$PORT"
     NOTIFIER_HOST="notifier.${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
     UI_HOST="${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
     UI_URL_SCHEME="https"
     REDIS_URL="${lookup(scalingo_app.api.all_environment, "SCALINGO_REDIS_URL", "n/c")}"
     NODE_ENV="demo"
-    PROJECT_DIR="back/notifier"
+    PROJECT_DIR="back"
     NPM_CONFIG_PRODUCTION="false"
     TZ="Europe/Paris"
   }
