@@ -15,6 +15,9 @@ CNAME	test_app           trackdechets-test_app-front.osc-fr1.scalingo.io
 3. Run tarraform to create the necessary resources in Scalingo
 
 ```
+# Install dependencies if it's the first run
+terraform init
+
 # Check plan
 $ terraform plan
 

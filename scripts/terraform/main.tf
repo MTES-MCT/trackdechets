@@ -58,7 +58,7 @@ resource "scalingo_app" "api" {
     NODE_ENV="demo"
     REDIS_URL="$SCALINGO_REDIS_URL"
     ELASTIC_SEARCH_URL="$SCALINGO_ELASTICSEARCH_URL"
-    DATABASE_URL="$SCALINGO_POSTGRESQL_URL&schema=default$default"
+    DATABASE_URL="$SCALINGO_POSTGRESQL_URL"
     PROJECT_DIR="back"
     NPM_CONFIG_PRODUCTION="false"
     TZ="Europe/Paris"
@@ -79,11 +79,11 @@ resource "scalingo_app" "api" {
 
 
 resource "scalingo_app" "notifier" {
-  name = "trackdechets-${var.scalingo_app_name}-api"
+  name = "trackdechets-${var.scalingo_app_name}-notifier"
 
   environment = {
     STARTUP_FILE="dist/src/notifier/index.js"
-    NOTIFER_PORT="$PORT"
+    NOTIFIER_PORT="$PORT"
     NOTIFIER_HOST="notifier.${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
     UI_HOST="${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
     UI_URL_SCHEME="https"
@@ -120,11 +120,21 @@ resource "scalingo_github_link" "api_link" {
   source                          = "https://github.com/MTES-MCT/trackdechets"
   branch                          = "${var.github_branch}"
   auto_deploy                     = true
+  deploy_on_branch_change         = true
   review_apps                     = false
 }
 
 resource "scalingo_github_link" "ui_link" {
   app                             = "${scalingo_app.front.id}"
+  source                          = "https://github.com/MTES-MCT/trackdechets"
+  branch                          = "${var.github_branch}"
+  auto_deploy                     = true
+  deploy_on_branch_change         = true
+  review_apps                     = false
+}
+
+resource "scalingo_github_link" "notifier_link" {
+  app                             = "${scalingo_app.notifier.id}"
   source                          = "https://github.com/MTES-MCT/trackdechets"
   branch                          = "${var.github_branch}"
   auto_deploy                     = true
