@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-named-as-default
 import Queue, { JobOptions } from "bull";
-import { Mail } from "../mailer/types";
+import { Mail } from "../../mailer/types";
 
 const { REDIS_URL, QUEUE_NAME_SENDMAIL } = process.env;
 

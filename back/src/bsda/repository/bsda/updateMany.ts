@@ -1,7 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { LogMetadata, RepositoryFnDeps } from "../../../forms/repository/types";
-import { GraphQLContext } from "../../../types";
-import { indexBsda } from "../../elastic";
+import { addBsdaToIndexQueue } from "../../elastic";
 import { buildFindManyBsda } from "./findMany";
 
 export type UpdateManyBsdaFn = (
@@ -41,11 +40,9 @@ export function buildUpdateManyBsdas(deps: RepositoryFnDeps): UpdateManyBsdaFn {
     }
 
     const bsdas = await buildFindManyBsda(deps)({ id: { in: ids } });
-    await Promise.all(
-      bsdas.map(async bsda => {
-        indexBsda(bsda, { user } as GraphQLContext);
-      })
-    );
+    for (const bsda of bsdas) {
+      prisma.addAfterCommitCallback(() => addBsdaToIndexQueue(bsda));
+    }
 
     return update;
   };

@@ -9,8 +9,7 @@ import {
   PrismaTransaction,
   RepositoryFnDeps
 } from "../../../forms/repository/types";
-import { GraphQLContext } from "../../../types";
-import { indexBsda } from "../../elastic";
+import { addBsdaToIndexQueue } from "../../elastic";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -70,7 +69,7 @@ export function buildAcceptRevisionRequestApproval(
         id: revisionRequest.bsdaId
       }
     });
-    await indexBsda(updatedBsda, { user } as GraphQLContext);
+    prisma.addAfterCommitCallback(() => addBsdaToIndexQueue(updatedBsda));
   };
 }
 

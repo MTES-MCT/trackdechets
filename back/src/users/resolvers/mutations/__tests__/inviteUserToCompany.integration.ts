@@ -1,4 +1,4 @@
-import * as queue from "../../../../queue/producer";
+import * as queue from "../../../../queue/producers/mail";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   userWithCompanyFactory,

@@ -6,7 +6,7 @@
   "scripts": {
     "predev": "npm run generate",
     "dev": "npm run watch:all",
-    "watch:all": "concurrently -k -p \"[{name}]\" -n \"Api,Queue\" -c \"yellow.bold,cyan.bold\" \"npm run watch:node\" \"npm run watch:queue\"",
+    "watch:all": "concurrently -k -p \"[{name}]\" -n \"Api,Queue,Notifier\" -c \"yellow.bold,cyan.bold,blue.bold\" \"npm run watch:node\" \"npm run watch:queue\" \"npm run watch:notifier\"",
     "watch:node": "nodemon -r dotenv/config --watch src --exec ts-eager --inspect=0.0.0.0:9229 src/index.ts -e ts,tsx",
     "start": "node dist/src/index.js",
     "update": "node dist/prisma/scripts/index.js",
@@ -23,7 +23,7 @@
     "generate:graphql": "graphql-codegen --config codegen.yml",
     "prebuild": "npm run generate",
     "build": "tsc && copyfiles -e **/*.ts src/**/*.{graphql,pdf,png,ttf,html,css,svg} src/**/assets/*.js prisma/**/*.{prisma,sql} dist/",
-    "scalingo-postbuild": "npm run build && npm prune --production && cd dist && npm run migrate && npm run index-elastic-search",
+    "scalingo-postbuild": "./src/scripts/build/scalingo.sh",
     "lint": "eslint -c .eslintrc.js --ext .ts ./src",
     "lint:fix": "eslint -c .eslintrc.js --fix --ext .ts ./src",
     "bulk-create-account": "node dist/src/users/bulk-creation/index.js",
@@ -32,7 +32,8 @@
     "index-elastic-search:dev": "ts-node -r dotenv/config ./src/scripts/bin/indexElasticSearch.ts",
     "reindex-bsd": "node dist/src/scripts/bin/reindexBsd.js $bsdId",
     "reindex-bsd:dev": "ts-node -r dotenv/config ./src/scripts/bin/reindexBsd.ts $bsdId",
-    "watch:queue": "nodemon -r dotenv/config --watch src --exec \"ts-eager\" --inspect=0.0.0.0:9230 src/queue/consumer.ts -e ts,tsx",
+    "watch:queue": "nodemon -r dotenv/config --watch src --exec \"ts-eager\" --inspect=0.0.0.0:9230 src/queue/consumer.ts -e ts",
+    "watch:notifier": "nodemon -r dotenv/config --watch src --exec \"ts-eager\" src/notifier/index.ts -e ts",
     "queue": "node dist/src/queue/consumer.js",
     "purge-pdf-token": "node dist/src/scripts/bin/purgePdfAccessToken.js",
     "purge-pdf-token:dev": "ts-node -r dotenv/config ./src/scripts/bin/purgePdfAccessToken.ts"

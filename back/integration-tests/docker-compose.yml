@@ -31,7 +31,6 @@ services:
     build:
       context: ../
       dockerfile: Dockerfile.dev
-    command: tail -f /dev/null
     volumes:
       - ../src:/usr/src/app/src
     env_file:
