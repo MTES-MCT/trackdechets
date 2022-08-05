@@ -736,5 +736,38 @@ describe("Mutation.Bsda.sign", () => {
         })
       ]);
     });
+
+    it("should throw an error when the worker tries to sign a bsda that has no packaging", async () => {
+      const worker = await userWithCompanyFactory(UserRole.ADMIN);
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SIGNED_BY_PRODUCER",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerCompanySiret: worker.company.siret,
+          packagings: []
+        }
+      });
+
+      const { mutate } = makeClient(worker.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "WORK",
+            author: worker.user.name
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: "Le conditionnement est obligatoire"
+        })
+      ]);
+    });
   });
 });

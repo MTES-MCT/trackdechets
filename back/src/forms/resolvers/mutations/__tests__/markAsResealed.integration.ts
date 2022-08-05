@@ -535,7 +535,7 @@ describe("Mutation markAsResealed", () => {
       n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 14 du bordereau.`
       })
     ]);
-  });
+  }, 10000);
 
   it("should work when a transporter vat number is present", async () => {
     const owner = await userFactory();

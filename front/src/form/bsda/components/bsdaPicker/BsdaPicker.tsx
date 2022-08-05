@@ -236,13 +236,22 @@ function PickerTable({
               <TableCell>{bsda.destination?.reception?.weight}</TableCell>
               <TableCell>{bsda.emitter?.company?.name}</TableCell>
               <TableCell>
-                {bsda.destination?.operation?.nextDestination?.cap}
+                {bsda.destination?.operation?.nextDestination?.cap ??
+                  bsda.destination?.cap}
               </TableCell>
               <TableCell>
-                {[
-                  bsda.destination?.operation?.nextDestination?.company?.name,
-                  bsda.destination?.operation?.nextDestination?.company?.siret,
-                ]
+                {(bsda.destination?.operation?.nextDestination?.company
+                  ? [
+                      bsda.destination?.operation?.nextDestination?.company
+                        ?.name,
+                      bsda.destination?.operation?.nextDestination?.company
+                        ?.siret,
+                    ]
+                  : [
+                      bsda.destination?.company?.name,
+                      bsda.destination?.company?.siret,
+                    ]
+                )
                   .filter(Boolean)
                   .join(" - ")}
               </TableCell>

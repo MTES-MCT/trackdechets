@@ -776,7 +776,14 @@ const wasteDescriptionSchema: FactorySchemaOf<
     wasteSealNumbers: yup.array().ensure().of(yup.string()) as any,
     wasteAdr: yup.string().nullable(),
     wastePop: yup.boolean().nullable(),
-    packagings: yup.array().of(packagingsSchema),
+    packagings: yup
+      .array()
+      .of(packagingsSchema)
+      .test(
+        "has-packaging",
+        "Le conditionnement est obligatoire",
+        value => !context.workSignature || value?.length > 0
+      ),
     weightIsEstimate: yup
       .boolean()
       .requiredIf(context.workSignature, `Le type de quantité est obligatoire`),
