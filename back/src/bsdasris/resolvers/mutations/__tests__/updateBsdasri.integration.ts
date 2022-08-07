@@ -1,7 +1,10 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { bsdasriFactory } from "../../../__tests__/factories";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  userWithCompanyFactory,
+  ecoOrganismeFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
 import prisma from "../../../../prisma";
@@ -186,7 +189,70 @@ describe("Mutation.updateBsdasri", () => {
       expect(data.updateBsdasri.type).toBe("SIMPLE");
     }
   );
+  it("should allow eco organisme fields update for INITIAL bsdasris", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const count = await prisma.company.count();
+    const ecoOrg = await ecoOrganismeFactory({ count, handleBsdasri: true });
+    const { company: ecoOrgCompany } = await userWithCompanyFactory("MEMBER", {
+      siret: ecoOrg.siret
+    });
+    const dasri = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.INITIAL,
+        emitterCompanySiret: company.siret,
+        emitterEmissionSignatureAuthor: user.name,
+        emissionSignatory: { connect: { id: user.id } },
+        emitterEmissionSignatureDate: new Date().toISOString()
+      }
+    });
 
+    const { mutate } = makeClient(user);
+    const input = {
+      ecoOrganisme: { siret: ecoOrg.siret, name: "eco-org" }
+    };
+
+    await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
+      variables: { id: dasri.id, input }
+    });
+    const updated = await prisma.bsdasri.findUnique({
+      where: { id: dasri.id }
+    });
+    expect(updated.ecoOrganismeSiret).toEqual(ecoOrgCompany.siret);
+    expect(updated.ecoOrganismeName).toEqual(ecoOrgCompany.name);
+  });
+  it("should allow eco organisme fields nulling for INITIAL bsdasris", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const count = await prisma.company.count();
+    const ecoOrg = await ecoOrganismeFactory({ count, handleBsdasri: true });
+    const { company: ecoOrgCompany } = await userWithCompanyFactory("MEMBER", {
+      siret: ecoOrg.siret
+    });
+    const dasri = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.INITIAL,
+        emitterCompanySiret: company.siret,
+        emitterEmissionSignatureAuthor: user.name,
+        emissionSignatory: { connect: { id: user.id } },
+        emitterEmissionSignatureDate: new Date().toISOString(),
+        ecoOrganismeName: ecoOrgCompany.siret,
+        ecoOrganismeSiret: ecoOrgCompany.name
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const input = {
+      ecoOrganisme: null
+    };
+
+    await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
+      variables: { id: dasri.id, input }
+    });
+    const updated = await prisma.bsdasri.findUnique({
+      where: { id: dasri.id }
+    });
+    expect(updated.ecoOrganismeSiret).toEqual(null);
+    expect(updated.ecoOrganismeName).toEqual(null);
+  });
   it("should disallow emitter fields update after emission signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
@@ -226,7 +292,46 @@ describe("Mutation.updateBsdasri", () => {
       "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés:"
     );
   });
+  it("should disallow eco organisme fields update after emission signature", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const count = await prisma.company.count();
+    const ecoOrg = await ecoOrganismeFactory({ count, handleBsdasri: true });
+    await userWithCompanyFactory("MEMBER", {
+      siret: ecoOrg.siret
+    });
+    const dasri = await bsdasriFactory({
+      opt: {
+        status: BsdasriStatus.SIGNED_BY_PRODUCER,
+        emitterCompanySiret: company.siret,
+        emitterEmissionSignatureAuthor: user.name,
+        emissionSignatory: { connect: { id: user.id } },
+        emitterEmissionSignatureDate: new Date().toISOString()
+      }
+    });
 
+    const { mutate } = makeClient(user);
+    const input = {
+      ecoOrganisme: { siret: ecoOrg.siret, name: "eco-org" }
+    };
+
+    const { errors } = await mutate<Pick<Mutation, "updateBsdasri">>(
+      UPDATE_DASRI,
+      {
+        variables: { id: dasri.id, input }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        extensions: expect.objectContaining({
+          code: ErrorCode.FORBIDDEN
+        })
+      })
+    ]);
+    expect(errors[0].message).toContain(
+      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés:"
+    );
+  });
   it("should allow transporter and destination fields update after emission signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     let dasri = await bsdasriFactory({

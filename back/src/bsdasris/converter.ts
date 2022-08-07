@@ -257,10 +257,6 @@ const computeTotalVolume: computeTotalVolumeFn = packagings => {
 function flattenEcoOrganismeInput(input: {
   ecoOrganisme?: BsdasriEcoOrganismeInput;
 }) {
-  if (!input?.ecoOrganisme) {
-    return null;
-  }
-
   return {
     ecoOrganismeName: chain(input.ecoOrganisme, e => e.name),
     ecoOrganismeSiret: chain(input.ecoOrganisme, e => e.siret)
