@@ -218,7 +218,7 @@ describe("Mutation.updateBsdasri", () => {
       where: { id: dasri.id }
     });
     expect(updated.ecoOrganismeSiret).toEqual(ecoOrgCompany.siret);
-    expect(updated.ecoOrganismeName).toEqual(ecoOrgCompany.name);
+    expect(updated.ecoOrganismeName).toEqual("eco-org");
   });
   it("should allow eco organisme fields nulling for INITIAL bsdasris", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
