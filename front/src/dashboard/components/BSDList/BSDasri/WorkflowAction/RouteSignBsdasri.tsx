@@ -91,7 +91,7 @@ const settings: {
   },
 
   [BsdasriSignatureType.Reception]: {
-    getLabel: () => "Signature reception",
+    getLabel: () => "Signature réception",
     signatureType: BsdasriSignatureType.Reception,
     validationText:
       "En signant, je confirme la réception des déchets pour la quantité indiquée dans ce bordereau. La signature est horodatée.",

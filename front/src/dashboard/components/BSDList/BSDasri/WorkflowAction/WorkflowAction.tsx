@@ -198,7 +198,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
               state: { background: location },
             }}
           >
-            Signature reception
+            Signature réception
           </ActionLink>
         );
       }
