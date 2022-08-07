@@ -219,7 +219,7 @@ const sign = async ({
     await cascadeOnSynthesized({ dasri: updatedDasri });
   }
   const expandedDasri = expandBsdasriFromDB(updatedDasri);
-  await indexBsdasri(updatedDasri);
+  await indexBsdasri(updatedDasri, context);
   return expandedDasri;
 };
 
