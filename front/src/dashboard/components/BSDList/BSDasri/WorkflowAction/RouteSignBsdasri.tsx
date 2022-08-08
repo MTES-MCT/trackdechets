@@ -16,7 +16,7 @@ import {
 } from "dashboard/components/BSDList/BSDasri/types";
 import Loader from "common/components/Loaders";
 import { useQuery, useMutation } from "@apollo/client";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useHistory, generatePath } from "react-router-dom";
 import { GET_DETAIL_DASRI_WITH_METADATA, GET_BSDS } from "common/queries";
 
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
@@ -34,6 +34,7 @@ import {
   OperationSignatureForm,
   removeSections,
 } from "./PartialForms";
+import routes from "common/routes";
 
 import { BdasriSummary } from "dashboard/components/BSDList/BSDasri/Summary/BsdasriSummary";
 
@@ -112,6 +113,18 @@ export function RouteSignBsdasri({
 }) {
   const { id: formId, siret } = useParams<{ id: string; siret: string }>();
   const history = useHistory();
+  const transporterTab = {
+    pathname: generatePath(routes.dashboard.transport.toCollect, {
+      siret,
+    }),
+  };
+
+  // in most cases, goBack works, but for combined signature (pred+transporter), it leads to an infinite loop
+  // so we explicitly redirect to transporter tab
+  const nextPage =
+    UIsignatureType === BsdasriSignatureType.Transport
+      ? () => history.push(transporterTab)
+      : () => history.goBack();
 
   const { error, data, loading } = useQuery<
     Pick<Query, "bsdasri">,
@@ -177,7 +190,7 @@ export function RouteSignBsdasri({
             refetchQueries: [GET_BSDS],
             awaitRefetchQueries: true,
           });
-          history.goBack();
+          nextPage();
         }}
       >
         {({ isSubmitting, handleReset, errors }) => {
@@ -207,7 +220,7 @@ export function RouteSignBsdasri({
                   className="btn btn--outline-primary"
                   onClick={() => {
                     handleReset();
-                    history.goBack();
+                    nextPage();
                   }}
                 >
                   Annuler
