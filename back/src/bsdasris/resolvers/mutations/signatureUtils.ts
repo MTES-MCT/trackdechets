@@ -91,7 +91,9 @@ export const checkEmissionSignedWithSecretCode: checkEmitterAllowsSignatureWithC
       });
 
       if (securityCode !== ecoorganismeCompany.securityCode) {
-        throw new UserInputError(errMessage);
+        throw new UserInputError(errMessage, {
+          errorCode: "SECRET_CODE_ERROR"
+        }); // include more spécific error code for UI
       }
     }
     if (emissionSignatureAuthor === "EMITTER") {
@@ -100,7 +102,9 @@ export const checkEmissionSignedWithSecretCode: checkEmitterAllowsSignatureWithC
       });
 
       if (securityCode !== emitterCompany.securityCode) {
-        throw new UserInputError(errMessage);
+        throw new UserInputError(errMessage, {
+          errorCode: "SECRET_CODE_ERROR"
+        }); // include more spécific error code for UI
       }
     }
     return true;

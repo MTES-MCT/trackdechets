@@ -206,25 +206,22 @@ export function RouteBSDasrisSignEmissionSecretCode() {
           );
         }}
       </Formik>
-      {(updateError || signError) && (
-        <>
+
+      {signError &&
+        !signError?.graphQLErrors
+          ?.map(err => err?.extensions?.errorCode)
+          ?.includes("SECRET_CODE_ERROR") && (
           <p className="tw-mt-2 tw-text-red-700">
             Vous devez mettre à jour le bordereau et renseigner les champs
             nécessaires avant de le signer.
           </p>
-          {updateError && (
-            <NotificationError
-              className="action-error"
-              apolloError={updateError}
-            />
-          )}
-          {signError && (
-            <NotificationError
-              className="action-error"
-              apolloError={signError}
-            />
-          )}
-        </>
+        )}
+      {updateError && (
+        <NotificationError className="action-error" apolloError={updateError} />
+      )}
+
+      {signError && (
+        <NotificationError className="action-error" apolloError={signError} />
       )}
     </div>
   );

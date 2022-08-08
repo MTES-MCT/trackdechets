@@ -44,7 +44,7 @@ const duplicateBsdasriResolver: MutationResolvers["duplicateBsdasri"] = async (
   );
 
   const newBsdasri = await duplicateBsdasri(user, bsdasri);
-  await indexBsdasri(newBsdasri);
+  await indexBsdasri(newBsdasri, context);
   return expandBsdasriFromDB(newBsdasri);
 };
 
