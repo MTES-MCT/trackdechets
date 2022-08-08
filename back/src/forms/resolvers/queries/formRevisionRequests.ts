@@ -4,6 +4,7 @@ import { QueryFormRevisionRequestsArgs } from "../../../generated/graphql/types"
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
+import { getConnection } from "../../../common/pagination";
 
 const MIN_SIZE = 0;
 const MAX_SIZE = 50;
@@ -33,34 +34,19 @@ export default async function formRevisionRequests(
     ...(status && { status })
   };
 
-  const revisionRequestsCount = await prisma.bsddRevisionRequest.count({
-    where
-  });
-  const revisionRequests = await prisma.bsddRevisionRequest.findMany({
-    take: pageSize + 1,
-    ...(after && { cursor: { id: after } }),
-    orderBy: { createdAt: "desc" },
+  const revisionRequestsTotalCount = await prisma.bsddRevisionRequest.count({
     where
   });
 
-  const edges = revisionRequests
-    .map(revision => ({
-      node: revision,
-      cursor: revision.id
-    }))
-    .slice(0, pageSize);
-
-  const pageInfo = {
-    startCursor: edges[0]?.cursor || null,
-    endCursor: edges[edges.length - 1]?.cursor || null,
-
-    hasNextPage: revisionRequests.length > pageSize,
-    hasPreviousPage: false
-  };
-
-  return {
-    edges,
-    pageInfo,
-    totalCount: revisionRequestsCount
-  };
+  return getConnection({
+    totalCount: revisionRequestsTotalCount,
+    findMany: prismaPaginationArgs =>
+      prisma.bsddRevisionRequest.findMany({
+        where,
+        ...prismaPaginationArgs,
+        orderBy: { createdAt: "desc" }
+      }),
+    formatNode: node => node,
+    ...{ after, first: pageSize }
+  });
 }

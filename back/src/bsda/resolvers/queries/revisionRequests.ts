@@ -4,6 +4,7 @@ import { QueryBsdaRevisionRequestsArgs } from "../../../generated/graphql/types"
 import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { getReadonlyBsdaRepository } from "../../repository";
+import { getConnection } from "../../../common/pagination";
 
 const MIN_SIZE = 0;
 const MAX_SIZE = 50;
@@ -34,36 +35,19 @@ export async function bsdaRevisionRequests(
   };
 
   const bsdaRepository = getReadonlyBsdaRepository();
-  const revisionRequestsCount = await bsdaRepository.countRevisionRequests(
+  const revisionRequestsTotalCount = await bsdaRepository.countRevisionRequests(
     where
   );
-  const revisionRequests = await bsdaRepository.findManyBsdaRevisionRequest(
-    where,
-    {
-      take: pageSize + 1,
-      ...(after && { cursor: { id: after } }),
-      orderBy: { createdAt: "desc" }
-    }
-  );
 
-  const edges = revisionRequests
-    .map(revision => ({
-      node: revision,
-      cursor: revision.id
-    }))
-    .slice(0, pageSize);
+  return getConnection({
+    totalCount: revisionRequestsTotalCount,
+    findMany: prismaPaginationArgs =>
+      bsdaRepository.findManyBsdaRevisionRequest(where, {
+        ...prismaPaginationArgs,
 
-  const pageInfo = {
-    startCursor: edges[0]?.cursor || null,
-    endCursor: edges[edges.length - 1]?.cursor || null,
-
-    hasNextPage: revisionRequests.length > pageSize,
-    hasPreviousPage: false
-  };
-
-  return {
-    edges,
-    pageInfo,
-    totalCount: revisionRequestsCount
-  };
+        orderBy: { createdAt: "desc" }
+      }),
+    formatNode: node => node,
+    ...{ after, first: pageSize }
+  });
 }
