@@ -531,7 +531,7 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
             schema
               .oneOf(
                 [null, ""],
-                "Le code d'opétation ne doit pas être renseigné lorsque le déchet est refusé"
+                "Le code d'opération ne doit pas être renseigné lorsque le déchet est refusé"
               )
               .nullable(),
           otherwise: schema =>
