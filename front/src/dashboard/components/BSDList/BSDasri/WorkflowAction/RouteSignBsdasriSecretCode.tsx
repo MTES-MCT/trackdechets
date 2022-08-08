@@ -213,7 +213,7 @@ export function RouteBSDasrisSignEmissionSecretCode() {
           ?.includes("SECRET_CODE_ERROR") && (
           <p className="tw-mt-2 tw-text-red-700">
             Vous devez mettre à jour le bordereau et renseigner les champs
-            nécessaires avant de le signer.vvv
+            nécessaires avant de le signer.
           </p>
         )}
       {updateError && (
