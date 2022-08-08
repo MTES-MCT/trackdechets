@@ -27,6 +27,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Correction du fonctionnement de la validation des champs requis sur le BSFF [PR 1531](https://github.com/MTES-MCT/trackdechets/pull/1531)
 - Ajout d'un "rate limit" sur le formulaire de connexion pour éviter les attaques par "brute force" [PR 1565](https://github.com/MTES-MCT/trackdechets/pull/1565)
 - Multiples améliorations BSDA: inversion de la destination finale & initiale sur le formulaire UI, correction d'un bug sur l'aperçu qui indiquait un bordereau comme de réexpédition par erreur, amélioration de la visibilité du destinataire final lors d'un groupement, ajout de détails sur les BSDAs associés dans les onglets de signature, PDF  et aperçu [PR 1551](https://github.com/MTES-MCT/trackdechets/pull/1551)
+- Ajout d'un bouton pour charger les révisions non affichées [PR 1587](https://github.com/MTES-MCT/trackdechets/pull/1587)
 
 #### :memo: Documentation
 

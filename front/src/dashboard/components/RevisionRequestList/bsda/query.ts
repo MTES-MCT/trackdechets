@@ -104,12 +104,16 @@ const reviewFragment = gql`
 `;
 
 export const GET_BSDA_REVISION_REQUESTS = gql`
-  query BsdaRevisionRequests($siret: String!) {
-    bsdaRevisionRequests(siret: $siret) {
+  query BsdaRevisionRequests($siret: String!, $after: String) {
+    bsdaRevisionRequests(siret: $siret, after: $after) {
       edges {
         node {
           ...BsdaRevisionRequestFragment
         }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
       }
     }
   }
