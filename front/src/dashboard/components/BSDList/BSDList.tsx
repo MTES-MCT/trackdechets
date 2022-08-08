@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import classNames from "classnames";
 import {
   IconLayout2,
@@ -71,7 +71,7 @@ export function BSDList({
   blankslate,
   defaultWhere,
 }: BSDListProps) {
-  const { data, loading, fetchMore, refetch } = useQuery<
+  const [fetchBsds, { data, loading, fetchMore }] = useLazyQuery<
     Pick<Query, "bsds">,
     QueryBsdsArgs
   >(GET_BSDS, {
@@ -83,7 +83,7 @@ export function BSDList({
     notifyOnNetworkStatusChange: true,
   });
 
-  useNotifier(siret, refetch);
+  useNotifier(siret, fetchBsds);
 
   // show the blankslate if the query returns no results without any filters
   // because if it returns no results with filters applied, it doesn't mean there are no results at all
@@ -103,8 +103,8 @@ export function BSDList({
 
   const refetchWithDefaultWhere = React.useCallback(
     ({ where, ...args }) =>
-      refetch({ ...args, where: { ...where, ...defaultWhere } }),
-    [refetch, defaultWhere]
+      fetchBsds({ ...args, where: { ...where, ...defaultWhere } }),
+    [fetchBsds, defaultWhere]
   );
 
   const [layoutType, setLayoutType] = usePersistedState<LayoutType>(
@@ -126,7 +126,7 @@ export function BSDList({
         <BSDDropdown siret={siret} />
         <button
           className="btn btn--primary"
-          onClick={() => refetch()}
+          onClick={() => fetchBsds()}
           disabled={loading}
         >
           Rafraîchir <IconRefresh style={{ marginLeft: "0.5rem" }} />
