@@ -83,7 +83,8 @@ export default async function sign(
         [signatureTypeInfos.dbAuthorKey]: input.author,
         [signatureTypeInfos.dbDateKey]: new Date(input.date ?? Date.now()),
         isDraft: false,
-        status: newStatus as BsdaStatus
+        status: newStatus as BsdaStatus,
+        ...(newStatus === BsdaStatus.REFUSED && { forwardingId: null })
       }
     );
 
@@ -96,6 +97,15 @@ export default async function sign(
         {
           status: BsdaStatus.PROCESSED
         }
+      );
+    }
+
+    if (newStatus === BsdaStatus.REFUSED) {
+      await bsdaRepository.updateMany(
+        {
+          groupedInId: signedBsda.id
+        },
+        { groupedInId: null }
       );
     }
 

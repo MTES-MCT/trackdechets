@@ -13,8 +13,7 @@ describe("graphqlRateLimiterMiddleware", () => {
     graphQLPath,
     graphqlRateLimiterMiddleware("resendInvitation", {
       maxRequestsPerWindow: 1,
-      windowMs: 10000,
-      store: undefined
+      windowMs: 10000
     })
   );
   app.post(graphQLPath, (req, res) => {
@@ -37,7 +36,7 @@ describe("graphqlRateLimiterMiddleware", () => {
     expect(response2.status).toEqual(429);
   });
 
-  it("should not rate limite other queries", async () => {
+  it("should not rate limit other queries", async () => {
     const body = JSON.stringify({ query: "{otherQuery { id } }" });
     const response1 = await request
       .post(graphQLPath)

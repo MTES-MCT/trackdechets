@@ -1,3 +1,3 @@
-web: node dist/src/index.js
+web: node ${STARTUP_FILE:-dist/src/index.js}
 clock: node dist/src/cron.js
 queue: node dist/src/queue/consumer.js

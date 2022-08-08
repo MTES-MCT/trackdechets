@@ -18,6 +18,14 @@ describe("Bsda edition rules", () => {
     ).toThrow(SealedFieldsError);
   });
 
+  it("should throw if trying to edit a field sealed not by the required signature type but by a child signature type", () => {
+    expect(() =>
+      checkKeysEditability({ type: BsdaType.GATHERING }, {
+        destinationOperationSignatureDate: new Date()
+      } as BsdaWithGrouping)
+    ).toThrow(SealedFieldsError);
+  });
+
   it("should throw with the flat field path when erroring", () => {
     expect.assertions(1);
     try {

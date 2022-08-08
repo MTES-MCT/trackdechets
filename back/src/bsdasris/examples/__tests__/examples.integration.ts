@@ -55,6 +55,6 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
     async () => {
       await testWorkflow(dasriDeSynthese);
     },
-    10000
+    60000
   );
 });

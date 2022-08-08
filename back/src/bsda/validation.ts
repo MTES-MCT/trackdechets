@@ -161,6 +161,15 @@ async function validatePreviousBsdas(
     );
   }
 
+  const nextDestinations = previousBsdas.map(
+    bsda => bsda.destinationOperationNextDestinationCompanySiret
+  );
+  if (!nextDestinations.every(siret => siret === nextDestinations[0])) {
+    throw new UserInputError(
+      `Certains des bordereaux à associer ont des exutoires différents. Ils ne peuvent pas être groupés ensemble.`
+    );
+  }
+
   const firstPreviousBsdaWithDestination = previousBsdasWithDestination[0];
   if (
     previousBsdasWithDestination.some(
@@ -522,7 +531,7 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
             schema
               .oneOf(
                 [null, ""],
-                "Le code d'opétation ne doit pas être renseigné lorsque le déchet est refusé"
+                "Le code d'opération ne doit pas être renseigné lorsque le déchet est refusé"
               )
               .nullable(),
           otherwise: schema =>
@@ -733,6 +742,18 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
         })
     });
 
+const packagingsSchema = yup.object({
+  type: yup.string().required("Le type de conditionnement est obligatoire"),
+  other: yup.string().optional(),
+  quantity: yup
+    .number()
+    .min(
+      1,
+      "La quantité d'un conditionnement doit être supérieure ou égale à 1"
+    )
+    .required("La quantité associée à un conditionnement est obligatoire")
+});
+
 const wasteDescriptionSchema: FactorySchemaOf<
   BsdaValidationContext,
   WasteDescription
@@ -755,7 +776,14 @@ const wasteDescriptionSchema: FactorySchemaOf<
     wasteSealNumbers: yup.array().ensure().of(yup.string()) as any,
     wasteAdr: yup.string().nullable(),
     wastePop: yup.boolean().nullable(),
-    packagings: yup.array(),
+    packagings: yup
+      .array()
+      .of(packagingsSchema)
+      .test(
+        "has-packaging",
+        "Le conditionnement est obligatoire",
+        value => !context.workSignature || value?.length > 0
+      ),
     weightIsEstimate: yup
       .boolean()
       .requiredIf(context.workSignature, `Le type de quantité est obligatoire`),

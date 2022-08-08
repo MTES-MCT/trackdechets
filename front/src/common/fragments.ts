@@ -718,6 +718,7 @@ export const bsdaFragment = gql`
     }
     waste {
       materialName
+      bsdaCode: code
     }
     forwardedIn {
       id

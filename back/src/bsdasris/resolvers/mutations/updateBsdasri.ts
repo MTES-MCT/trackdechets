@@ -68,7 +68,7 @@ const updateBsdasriResolver = async (
     });
   }
 
-  return updateBsdasri({ id, input, dbBsdasri, dbGrouping });
+  return updateBsdasri({ id, input, dbBsdasri, dbGrouping, context });
 };
 
 export default updateBsdasriResolver;

@@ -101,12 +101,16 @@ const reviewFragment = gql`
 `;
 
 export const GET_FORM_REVISION_REQUESTS = gql`
-  query FormRevisionRequests($siret: String!) {
-    formRevisionRequests(siret: $siret) {
+  query FormRevisionRequests($siret: String!, $after: String) {
+    formRevisionRequests(siret: $siret, after: $after) {
       edges {
         node {
           ...FormRevisionRequestFragment
         }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
       }
     }
   }

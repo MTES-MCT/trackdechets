@@ -9,14 +9,14 @@ import {
 import redisStore from "connect-redis";
 import cors from "cors";
 import express, { json, static as serveStatic, urlencoded } from "express";
-import rateLimit from "express-rate-limit";
 import session from "express-session";
+import forwarded from "forwarded";
 import depthLimit from "graphql-depth-limit";
 import helmet from "helmet";
 import passport from "passport";
 import path from "path";
-import RateLimitRedisStore from "rate-limit-redis";
 import { passportBearerMiddleware } from "./auth";
+import { ROAD_CONTROL_SLUG } from "./common/constants";
 import { ErrorCode } from "./common/errors";
 import errorHandler from "./common/middlewares/errorHandler";
 import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";
@@ -25,6 +25,7 @@ import { graphqlQueryParserMiddleware } from "./common/middlewares/graphqlQueryP
 import { graphqlRateLimiterMiddleware } from "./common/middlewares/graphqlRatelimiter";
 import { graphqlRegenerateSessionMiddleware } from "./common/middlewares/graphqlRegenerateSession";
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
+import { rateLimiterMiddleware } from "./common/middlewares/rateLimiter";
 import { graphiqlLandingPagePlugin } from "./common/plugins/graphiql";
 import sentryReporter from "./common/plugins/sentryReporter";
 import { redisClient } from "./common/redis";
@@ -33,14 +34,12 @@ import { createCompanyDataLoaders } from "./companies/dataloaders";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
-import { roadControlPdfHandler } from "./routers/roadControlPdfRouter";
 import { oauth2Router } from "./routers/oauth2-router";
+import { roadControlPdfHandler } from "./routers/roadControlPdfRouter";
 import { resolvers, typeDefs } from "./schema";
 import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
-import { ROAD_CONTROL_SLUG } from "./common/constants";
-import forwarded from "forwarded";
 
 const {
   SESSION_SECRET,
@@ -49,8 +48,7 @@ const {
   SESSION_NAME,
   UI_HOST,
   MAX_REQUESTS_PER_WINDOW = "1000",
-  NODE_ENV,
-  USE_XFF_HEADER
+  NODE_ENV
 } = process.env;
 
 const Sentry = initSentry();
@@ -116,27 +114,11 @@ if (Sentry) {
 }
 
 const RATE_LIMIT_WINDOW_SECONDS = 60;
-const maxrequestPerWindows = parseInt(MAX_REQUESTS_PER_WINDOW, 10);
-const store = new RateLimitRedisStore({
-  client: redisClient,
-  expiry: RATE_LIMIT_WINDOW_SECONDS
-});
 
 app.use(
-  rateLimit({
-    message: `Quota de ${maxrequestPerWindows} requêtes par minute excédé pour cette adresse IP, merci de réessayer plus tard.`,
+  rateLimiterMiddleware({
     windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
-    max: maxrequestPerWindows,
-    keyGenerator: request => {
-      // use xff data as client ip when behind a cdn
-      if (USE_XFF_HEADER !== "true") {
-        return request.ip;
-      }
-      const parsed = forwarded(request);
-      const clientIp = parsed.slice(-1).pop();
-      return !!clientIp ? clientIp : request.ip;
-    },
-    store
+    maxRequestsPerWindow: parseInt(MAX_REQUESTS_PER_WINDOW, 10)
   })
 );
 
@@ -183,16 +165,14 @@ app.use(
   graphQLPath,
   graphqlRateLimiterMiddleware("resendInvitation", {
     windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
-    maxRequestsPerWindow: 10, // 10 requests each 3 minutes
-    store
+    maxRequestsPerWindow: 10 // 10 requests each 3 minutes
   })
 );
 app.use(
   graphQLPath,
   graphqlRateLimiterMiddleware("createPasswordResetRequest", {
     windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
-    maxRequestsPerWindow: 1,
-    store
+    maxRequestsPerWindow: 1
   })
 );
 

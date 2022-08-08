@@ -5,13 +5,40 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.08.1] ~08/08/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout d'un onglet "BSDA suite" sur l'aperçu pour les BSDAs initiaux groupés ou faisant partie d'un bordereau de transit [PR 1577](https://github.com/MTES-MCT/trackdechets/pull/1577)
+- Ajout de la possibilité pour l'émetteur d'un BSDA de supprimer le bordereau après qu'il ait signé, si aucun autre acteur n'a encore signé [PR 1571](https://github.com/MTES-MCT/trackdechets/pull/1571)
+- Ajout du code 08 04 09\* pour les BSDA [PR 1570](https://github.com/MTES-MCT/trackdechets/pull/1570)
+
+#### :bug: Corrections de bugs
+
+- Correction d'un bug qui, dans le cas d'un BSDA avec un particulier, laissait trop longtemps possible la modification de certains champs [PR 1569](https://github.com/MTES-MCT/trackdechets/pull/1569)
+- Corrections de bugs sur la révision BSDD & BSDA, dans le cas ou un SIRET avait plusieurs rôles de validation de cette révision. Si le créateur de la révision a l'ensemble des rôles d'approbation, la révision est désormais auto-approuvée [PR 1567](https://github.com/MTES-MCT/trackdechets/pull/1567)
+- Correction d'un bug à l'enregistrement sur le formulaire BSDA si on saisissait un conditionnement sans saisir la quantité associée [PR 1557](https://github.com/MTES-MCT/trackdechets/pull/1557)
+- Correction d'un bug qui entraînait l'envoi d'un email de refus incomplet [PR 1579](https://github.com/MTES-MCT/trackdechets/pull/1579)
+- Correction dasri diverses [PR 1585](https://github.com/MTES-MCT/trackdechets/pull/1585)
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Correction du fonctionnement de la validation des champs requis sur le BSFF [PR 1531](https://github.com/MTES-MCT/trackdechets/pull/1531)
+- Ajout d'un "rate limit" sur le formulaire de connexion pour éviter les attaques par "brute force" [PR 1565](https://github.com/MTES-MCT/trackdechets/pull/1565)
+- Multiples améliorations BSDA: inversion de la destination finale & initiale sur le formulaire UI, correction d'un bug sur l'aperçu qui indiquait un bordereau comme de réexpédition par erreur, amélioration de la visibilité du destinataire final lors d'un groupement, ajout de détails sur les BSDAs associés dans les onglets de signature, PDF  et aperçu [PR 1551](https://github.com/MTES-MCT/trackdechets/pull/1551)
+- Ajout d'un bouton pour charger les révisions non affichées [PR 1587](https://github.com/MTES-MCT/trackdechets/pull/1587)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2022.07.5] 25/07/2022
 
 #### :rocket: Nouvelles fonctionnalités
 
 #### :bug: Corrections de bugs
 
- 
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
@@ -22,7 +49,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
--  Import de sociétés anonymes - script [PR 1533](https://github.com/MTES-MCT/trackdechets/pull/1533)
+- Import de sociétés anonymes - script [PR 1533](https://github.com/MTES-MCT/trackdechets/pull/1533)
 
 # [2022.07.4] 21/07/2022
 
@@ -40,7 +67,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
--  Import de sociétés anonymes - script [PR 1533](https://github.com/MTES-MCT/trackdechets/pull/1533)
+- Import de sociétés anonymes - script [PR 1533](https://github.com/MTES-MCT/trackdechets/pull/1533)
 
 # [2022.07.3] 20/07/2022
 
@@ -50,7 +77,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Correction des liens du company selector [PR 1558](https://github.com/MTES-MCT/trackdechets/pull/1558)
 - Correction des favoris transporteur [PR 1559](https://github.com/MTES-MCT/trackdechets/pull/1559)
- 
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations

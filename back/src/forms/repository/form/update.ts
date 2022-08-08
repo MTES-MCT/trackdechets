@@ -1,5 +1,4 @@
 import { Form, Prisma } from "@prisma/client";
-import { eventEmitter, TDEvent } from "../../../events/emitter";
 import { GraphQLContext } from "../../../types";
 import { indexForm } from "../../elastic";
 import { formDiff } from "../../workflow/diff";
@@ -51,12 +50,7 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
         forwardedIn: updatedForwardedIn
       });
 
-      eventEmitter.emit<Form>(TDEvent.TransitionForm, {
-        previousNode: oldForm,
-        node: updatedForm,
-        updatedFields,
-        mutation: "UPDATED"
-      });
+      // eventEmitter temporary taken out from te repository to fix incomplete refusal email bug
 
       // log status change
       await prisma.statusLog.create({

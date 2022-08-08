@@ -92,6 +92,16 @@ export default function Packagings({
                           name={`${name}.${idx}.quantity`}
                           placeholder="Nombre"
                           min="1"
+                          onBlur={() => {
+                            // Having an empty quantity is not valid in our gql schema
+                            // So we forbid it with this form
+                            if (
+                              p.quantity == null ||
+                              Number.isNaN(p.quantity)
+                            ) {
+                              setFieldValue(`${name}.${idx}.quantity`, 1);
+                            }
+                          }}
                         />
                       </div>
                     </div>

@@ -121,9 +121,12 @@ async function checkIfUserCanRequestRevisionOnBsda(
 
 async function getApproversSirets(bsda: Bsda, authoringCompanySiret: string) {
   // Requesters and approvers are the same persona
-  return Object.values(BSDA_REVISION_REQUESTER_FIELDS)
+  const approversSirets = Object.values(BSDA_REVISION_REQUESTER_FIELDS)
     .map(field => bsda[field])
     .filter(siret => Boolean(siret) && siret !== authoringCompanySiret);
+
+  // Remove duplicates
+  return [...new Set(approversSirets)];
 }
 
 async function getAuthoringCompany(

@@ -18,6 +18,7 @@ import { PACKAGINGS_NAMES } from "form/bsda/components/packagings/Packagings";
 import {
   Bsda,
   BsdaNextDestination,
+  BsdaType,
   FormCompany,
 } from "generated/graphql/types";
 import React from "react";
@@ -324,6 +325,36 @@ const NextDestination = ({
   </div>
 );
 
+const NextBsda = ({ bsda }: { bsda: Bsda }) => {
+  const [downloadPdf] = useDownloadPdf({});
+  return (
+    <div className={styles.detailColumns}>
+      <div className={styles.detailGrid}>
+        <dt>N°</dt>
+        <dd>{bsda.id}</dd>
+
+        <dt>Code déchet</dt>
+        <dd>{bsda.waste?.code}</dd>
+
+        <dt>CAP</dt>
+        <dd>{bsda.destination?.cap}</dd>
+
+        <dt>PDF</dt>
+        <dd>
+          <button
+            type="button"
+            className="btn btn--slim btn--small btn--outline-primary"
+            onClick={() => downloadPdf({ variables: { id: bsda.id } })}
+          >
+            <IconPdf size="18px" color="blueLight" />
+            <span>Pdf</span>
+          </button>
+        </dd>
+      </div>
+    </div>
+  );
+};
+
 export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
@@ -353,7 +384,9 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             {form.id} {form.isDraft && " (Brouillon)"}
           </span>
           {!!form?.grouping?.length && <span> - Bordereau de groupement</span>}
-          {!!form?.forwardedIn?.id && <span> - Bordereau de réexpédition</span>}
+          {form?.type === BsdaType.Reshipment && (
+            <span> - Bordereau de réexpédition</span>
+          )}
         </h4>
 
         <div className={styles.detailContent}>
@@ -467,6 +500,15 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             </Tab>
           )}
 
+          {(form?.forwardedIn?.id || form?.groupedIn?.id) && (
+            <Tab className={styles.detailTab}>
+              <IconBSDa style={{ fontSize: "25px" }} />
+              <span className={styles.detailTabCaption}>
+                <span>BSDA suite</span>
+              </span>
+            </Tab>
+          )}
+
           {!!initialBsdas?.length && (
             <Tab className={styles.detailTab}>
               <IconBSDa style={{ fontSize: "25px" }} />
@@ -519,6 +561,12 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
                 forwardedIn={form.forwardedIn}
                 groupedIn={form.groupedIn}
               />
+            </TabPanel>
+          )}
+
+          {(form?.forwardedIn?.id || form?.groupedIn?.id) && (
+            <TabPanel className={styles.detailTabPanel}>
+              <NextBsda bsda={form.forwardedIn ?? form.groupedIn!} />
             </TabPanel>
           )}
 

@@ -1,15 +1,15 @@
-import React from "react";
-import { useQuery } from "@apollo/client";
+import React, { useEffect } from "react";
+import { useLazyQuery } from "@apollo/client";
 import { Query, QueryBsdaRevisionRequestsArgs } from "generated/graphql/types";
 import { GET_BSDA_REVISION_REQUESTS } from "./query";
 import { useParams } from "react-router-dom";
 import { Loader } from "common/components";
 import { BsdaRevisionRequestTable } from "./BsdaRevisionRequestTable";
-
+import buildUpdateQueryFn from "../fetchMore";
 export function BsdaRevisionRequestList() {
   const { siret } = useParams<{ siret: string }>();
 
-  const { data, loading } = useQuery<
+  const [fetchRevisions, { data, loading, fetchMore }] = useLazyQuery<
     Pick<Query, "bsdaRevisionRequests">,
     QueryBsdaRevisionRequestsArgs
   >(GET_BSDA_REVISION_REQUESTS, {
@@ -18,6 +18,9 @@ export function BsdaRevisionRequestList() {
     },
     fetchPolicy: "cache-and-network",
   });
+  useEffect(() => {
+    fetchRevisions();
+  }, [fetchRevisions]);
 
   if (loading) return <Loader />;
 
@@ -26,8 +29,31 @@ export function BsdaRevisionRequestList() {
   }
 
   return (
-    <BsdaRevisionRequestTable
-      revisions={data.bsdaRevisionRequests.edges.map(edge => edge.node)}
-    />
+    <>
+      <BsdaRevisionRequestTable
+        revisions={data.bsdaRevisionRequests.edges.map(edge => edge.node)}
+      />
+      {data?.bsdaRevisionRequests?.pageInfo?.hasNextPage && (
+        <div className="tw-flex tw-justify-center tw-mt-2">
+          <button
+            className="center btn btn--primary small"
+            onClick={() =>
+              fetchMore({
+                variables: {
+                  after: data?.bsdaRevisionRequests.pageInfo.endCursor,
+                },
+
+                updateQuery: (prev, { fetchMoreResult }) =>
+                  buildUpdateQueryFn("bsdaRevisionRequests")(prev, {
+                    fetchMoreResult,
+                  }),
+              })
+            }
+          >
+            Charger plus de révisions
+          </button>
+        </div>
+      )}
+    </>
   );
 }

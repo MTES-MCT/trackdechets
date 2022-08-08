@@ -74,7 +74,7 @@ const Emitter = ({ form }: { form: Bsdasri }) => {
         ) : null}
         <Company label="Émetteur" company={emitter?.company} />
         <DetailRow value={emitter?.pickupSite?.name} label="Adresse collecte" />
-        <DetailRow value={emitter?.pickupSite?.name} label="Informations" />
+        <DetailRow value={emitter?.pickupSite?.infos} label="Informations" />
         {!!emitter?.pickupSite?.address && (
           <>
             <dt>Adresse</dt>

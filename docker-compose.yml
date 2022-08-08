@@ -35,6 +35,7 @@ services:
       NODE_ENV: dev
     ports:
       - "4000:$API_PORT"
+      - "4001:$NOTIFIER_PORT"
     depends_on:
       - redis
       - postgres
@@ -81,6 +82,7 @@ services:
     environment:
       API_HOST: $API_HOST
       API_PORT: $API_PORT
+      NOTIFIER_HOST: $NOTIFIER_HOST
       UI_HOST: $UI_HOST
       DEVELOPERS_HOST: $DEVELOPERS_HOST
       NGINX_PROXY_HOST: $NGINX_PROXY_HOST

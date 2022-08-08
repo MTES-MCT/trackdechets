@@ -4,6 +4,7 @@ import { NotFormContributor } from "../forms/errors";
 import { getCachedUserSirets } from "../common/redis/users";
 
 import prisma from "../prisma";
+import { getPreviousBsdas } from "./database";
 
 type BsdaContributors = Pick<
   Bsda,
@@ -33,6 +34,20 @@ export const BSDA_CONTRIBUTORS_FIELDS: Record<string, keyof BsdaContributors> =
     broker: "brokerCompanySiret",
     nextDestination: "destinationOperationNextDestinationCompanySiret"
   };
+
+export async function checkCanAccessBsdaPdf(user: User, bsda: Bsda) {
+  const isContributor = await isBsdaContributor(user, bsda);
+  if (isContributor) return true;
+
+  const previousBsdas = await getPreviousBsdas(bsda);
+  for (const previousBsda of previousBsdas) {
+    if (await isBsdaContributor(user, previousBsda)) return true;
+  }
+
+  throw new NotFormContributor(
+    "Vous n'êtes pas autorisé à accéder au bordereau de ce BSDA."
+  );
+}
 
 export async function checkIsBsdaContributor(
   user: User,
@@ -65,7 +80,15 @@ export async function checkCanDeleteBsda(user: User, bsda: Bsda) {
     "Vous n'êtes pas autorisé à supprimer ce bordereau."
   );
 
-  if (bsda.status !== BsdaStatus.INITIAL) {
+  const userSirets = await getCachedUserSirets(user.id);
+  const isBsdaEmitter = userSirets.some(
+    siret => bsda.emitterCompanySiret === siret
+  );
+
+  if (
+    bsda.status !== BsdaStatus.INITIAL &&
+    (!isBsdaEmitter || bsda.status !== BsdaStatus.SIGNED_BY_PRODUCER)
+  ) {
     throw new ForbiddenError(
       "Seuls les bordereaux en brouillon ou n'ayant pas encore été signés peuvent être supprimés"
     );

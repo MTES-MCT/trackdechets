@@ -48,8 +48,8 @@ export function BsdasriWasteSummary({ bsdasri }: BsdasriWasteSummaryProps) {
         <DataListDescription>
           {!!packagings?.length && (
             <>
-              {packagings.map(packaging => (
-                <div>
+              {packagings.map((packaging, idx) => (
+                <div key={idx}>
                   {packaging.quantity} {packaging.other} {packaging.type} (
                   {packaging.volume} litre(s))
                 </div>

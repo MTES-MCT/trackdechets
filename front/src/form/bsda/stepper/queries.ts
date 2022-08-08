@@ -127,12 +127,17 @@ export const FullBsdaFragment = gql`
       id
       waste {
         code
+        materialName
       }
       destination {
         cap
         operation {
           nextDestination {
             cap
+            company {
+              siret
+              name
+            }
           }
         }
         reception {
@@ -176,6 +181,12 @@ export const FullBsdaFragment = gql`
     }
     groupedIn {
       id
+      waste {
+        code
+      }
+      destination {
+        cap
+      }
     }
   }
   ${companyFragment}
