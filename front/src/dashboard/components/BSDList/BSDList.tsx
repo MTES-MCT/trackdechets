@@ -103,7 +103,9 @@ export function BSDList({
 
   const refetchWithDefaultWhere = React.useCallback(
     ({ where, ...args }) =>
-      fetchBsds({ ...args, where: { ...where, ...defaultWhere } }),
+      fetchBsds({
+        variables: { ...args, where: { ...where, ...defaultWhere } },
+      }),
     [fetchBsds, defaultWhere]
   );
 
