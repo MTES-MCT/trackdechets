@@ -642,4 +642,110 @@ describe("Mutation.Bsda.create", () => {
 
     expect(data.createBsda.id).toBeDefined();
   });
+
+  it("should disallow creating a bsda with packaging OTHER and no description", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: ["WASTE_CENTER"] }
+    });
+
+    const input: BsdaInput = {
+      type: "COLLECTION_2710",
+      emitter: {
+        isPrivateIndividual: true,
+        company: {
+          name: "Jean DUPONT",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      waste: {
+        code: "16 01 06",
+        adr: "ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "OTHER", other: null }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: company.siret,
+          name: company.name,
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      "Détail du conditionnement ne peut pas être null"
+    );
+  });
+
+  it("should allow creating a bsda with packaging field other null if packaging type is not OTHER", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: ["WASTE_CENTER"] }
+    });
+
+    const input: BsdaInput = {
+      type: "COLLECTION_2710",
+      emitter: {
+        isPrivateIndividual: true,
+        company: {
+          name: "Jean DUPONT",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      waste: {
+        code: "16 01 06",
+        adr: "ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME", other: null }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: company.siret,
+          name: company.name,
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(data.createBsda.id).toBeDefined();
+  });
 });
