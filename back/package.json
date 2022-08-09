@@ -36,7 +36,9 @@
     "watch:notifier": "nodemon -r dotenv/config --watch src --exec \"ts-eager\" src/notifier/index.ts -e ts",
     "queue": "node dist/src/queue/consumer.js",
     "purge-pdf-token": "node dist/src/scripts/bin/purgePdfAccessToken.js",
-    "purge-pdf-token:dev": "ts-node -r dotenv/config ./src/scripts/bin/purgePdfAccessToken.ts"
+    "purge-pdf-token:dev": "ts-node -r dotenv/config ./src/scripts/bin/purgePdfAccessToken.ts",
+    "populate:dev": "ts-node -r dotenv/config ./src/scripts/populate/main.ts",
+    "populate": "node dist/src/scripts/populate/main.js"
   },
   "engines": {
     "node": "^14"

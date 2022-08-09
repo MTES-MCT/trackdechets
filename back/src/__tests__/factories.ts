@@ -37,7 +37,7 @@ export const userFactory = async (
  * Left pad a given index with 0s
  * @param index numerical index
  */
-function siretify(index) {
+export function siretify(index) {
   const siretLength = 14;
   const siret = `${index}`;
   if (siret.length === siretLength) {
