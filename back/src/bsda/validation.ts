@@ -744,7 +744,15 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
 
 const packagingsSchema = yup.object({
   type: yup.string().required("Le type de conditionnement est obligatoire"),
-  other: yup.string().optional(),
+  other: yup
+    .string()
+    .label("Détail du conditionnement")
+    .when("type", {
+      is: "OTHER",
+      then: schema =>
+        schema.required("Vous devez saisir la description du conditionnement"),
+      otherwise: schema => schema.optional().nullable()
+    }),
   quantity: yup
     .number()
     .min(
