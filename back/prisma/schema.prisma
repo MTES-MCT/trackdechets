@@ -395,11 +395,14 @@ model Form {
   forwardedInId String? @unique
   forwardedIn   Form?   @relation("BsddForwarding", fields: [forwardedInId], references: [id])
 
+  // partial index _FormIsDeletedIdx see migration82_missing_indices.sql
+
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_FormTransporterCompanySiretIdx")
   @@index([traderCompanySiret], map: "_FormTraderCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_FormBrokerCompanySiretIdx")
+  @@index([ecoOrganismeSiret], map: "_FormEcoOrganismeSiretIdx")
   @@index([status], map: "_FormStatusIdx")
 }
 
@@ -700,7 +703,6 @@ model TransportSegment {
   formId                          String
   form                            Form           @relation(fields: [formId], references: [id])
 
-
   @@index([formId], map: "_TransportSegmentFormIdIdx")
   @@index([transporterCompanySiret], map: "_TransportSegmentTransporterCompanySiretIdx")
 }
@@ -874,6 +876,8 @@ model Bsvhu {
   destinationOperationSignatureAuthor                 String?
   destinationOperationSignatureDate                   DateTime? @db.Timestamptz(6)
 
+  // partial indices _BsvhuIsDeletedIdx,_BsvhuIsDraftIdx  see migration82_missing_indices.sql
+
   @@index([emitterCompanySiret], map: "_BvhuEmitterCompanySirettIdx")
   @@index([destinationCompanySiret], map: "_BsvhuDestinationCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsvhuTransporterCompanySiretIdx")
@@ -1008,10 +1012,17 @@ model Bsdasri {
   synthesizing                                Bsdasri[]               @relation("BsdasriSynthesizing")
   synthesizedIn                               Bsdasri?                @relation("BsdasriSynthesizing", fields: [synthesizedInId], references: [id])
   synthesizedInId                             String?
+
+  // partial indices _BsdasriTypeIdx, _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
+
   @@index([emitterCompanySiret], map: "_BsdasriEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsdasriTransporterCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsdasriDestinationCompanySiretIdx")
+  @@index([ecoOrganismeSiret], map: "_BsdasriEcoOrganismeSiretIdx")
+  @@index([synthesizedInId], map: "_BsdasriSynthesizedInIdIdx")
+  @@index([groupedInId], map: "_BsdasriGroupedInIdIdx")
   @@index([status], map: "_BsdasriStatusIdx")
+  @@index([type], map: "_BsdasriTypeIdx")
 }
 
 // ----------------
@@ -1120,6 +1131,8 @@ model Bsff {
 
   packagings BsffPackaging[]
 
+  // partial _BsffIsDeletedIdx, _BsffIsDraftIdx index see migration82_missing_indices.sql
+
   @@index([emitterCompanySiret], map: "_BsffEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsffTransporterCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsffDestinationCompanySiretIdx")
@@ -1176,13 +1189,13 @@ model BsffFicheIntervention {
 }
 
 model BsffPackaging {
-  id        String   @id @default(cuid())
-  name      String
-  volume    Float?
-  weight    Float
-  numero    String
+  id     String @id @default(cuid())
+  name   String
+  volume Float?
+  weight Float
+  numero String
 
-  bsff   Bsff @relation(fields: [bsffId], references: [id], onDelete: Cascade)
+  bsff   Bsff   @relation(fields: [bsffId], references: [id], onDelete: Cascade)
   bsffId String
 }
 
@@ -1342,12 +1355,16 @@ model Bsda {
   childBsdaId String?
 
   BsdaRevisionRequest BsdaRevisionRequest[]
+
+  // partial indices _BsdaIsDeletedIdx, _BsdaIsDraftIdx see migration82_missing_indices.sql
+
   @@index([emitterCompanySiret], map: "_BsdaEmitterCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_BsdaBrokerCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsdaDestinationCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsdaTransporterCompanySiretIdx")
   @@index([workerCompanySiret], map: "_BsdaWorkerCompanySiretIdx")
   @@index([status], map: "_BsdaStatusIdx")
+  @@index([groupedInId], map: "_BsdaGroupedInIdIdx")
 }
 
 model BsdaRevisionRequest {
@@ -1382,7 +1399,6 @@ model BsdaRevisionRequest {
   brokerRecepisseNumber        String?
   brokerRecepisseDepartment    String?
   brokerRecepisseValidityLimit DateTime? @db.Timestamptz(6)
-
 
   emitterPickupSiteName       String?
   emitterPickupSiteAddress    String?
