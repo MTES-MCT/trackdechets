@@ -70,7 +70,7 @@
 
    ```bash
    docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
-   npx prisma db push --preview-feature
+   npx prisma db push
    ```
 
 6. Initialiser l'index Elastic Search.
