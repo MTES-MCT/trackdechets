@@ -37,17 +37,26 @@ const bulkBsffFactory = async ({
       destinationPlannedOperationCode: "D10",
       transporterTransportMode: "ROAD",
 
-      packagings: [{ name: "BOUTEILLE 2L", numero: "01", weight: 1 }],
-
+    
       ...formParams,
       isDraft,
       status
     });
   }
-
-  return prisma.bsff.createMany({
+  const packagingData = data.map(bsff => ({
+    bsffId: bsff.id,
+    name: "BOUTEILLE",
+    weight: 1,
+    volume: 1,
+    numero: "1"
+  }));
+  const createdBsff = await prisma.bsff.createMany({
     data
   });
+  await prisma.bsffPackaging.createMany({
+    data : packagingData
+  });
+  return createdBsff;
 };
 
 export async function createBsffs(userCompany, quantity) {

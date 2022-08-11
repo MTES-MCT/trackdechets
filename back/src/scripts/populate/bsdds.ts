@@ -2,10 +2,10 @@ import { formdata } from "../../__tests__/factories";
 import { subSeconds } from "date-fns";
 
 import prisma from "../../prisma";
-
+import { populateSiretify } from "./utils";
 import { Prisma } from "@prisma/client";
 
-import { randomChoice, getReadableId } from "./utils";
+import { randomChoice, getReadableId, chunkArray } from "./utils";
 import { getRandomInt } from "../../forms/readableId";
 const formsStatuses = [
   "DRAFT",
@@ -31,26 +31,30 @@ export const createStatusLogs = async (skip = 0) => {
     return;
   }
   const baseDate = new Date();
-  const data = [];
-  for (let i = 0; i < forms.length; i++) {
-    const nb = getRandomInt(6);
-    for (let j = 0; j <= nb; j++) {
-      data.push({
-        formId: forms[i].id,
-        userId: forms[i].ownerId,
-        status: randomChoice(formsStatuses),
-        authType: randomChoice(["SESSION", "BEARER"]),
-        updatedFields: {},
-        loggedAt: subSeconds(baseDate, i * 10 + j)
-      });
+
+  const chunks = chunkArray(forms, 10000);
+
+  for (const chunk of chunks) {
+    const chunkData = [];
+    for (let i = 0; i < chunk.length; i++) {
+      const nb = Math.max(getRandomInt(6), 2);
+      for (let j = 0; j <= nb; j++) {
+        chunkData.push({
+          formId: chunk[i].id,
+          userId: chunk[i].ownerId,
+          status: randomChoice(formsStatuses),
+          authType: randomChoice(["SESSION", "BEARER"]),
+          updatedFields: {},
+          loggedAt: subSeconds(baseDate, i * 10 + j)
+        });
+      }
     }
+
+    await prisma.statusLog.createMany({
+      data: chunkData
+    });
   }
-
-  await prisma.statusLog.createMany({
-    data
-  });
-
-  return createStatusLogs(skip + take);
+  return createStatusLogs();
 };
 
 export const bulkFormsFactory = async ({
@@ -99,4 +103,29 @@ export async function createForms(userCompany, quantity) {
       wasteDetailsCode: "06 01 01*"
     }
   });
+}
+
+const segmentPayload = { transporterCompanySiret: "98765" };
+export async function createSegments() {
+  const segmentsCount = await prisma.transportSegment.count();
+  if (!!segmentsCount) {
+    return;
+  }
+  for (let i = 1; i <= 1000; i++) {
+    const siret = populateSiretify(i);
+    console.log(siret);
+    const form = await prisma.form.findFirst({
+      where: { emitterCompanySiret: siret }
+    });
+    if (!!form) {
+      for (let j = 0; j <= 2; j++) {
+        await prisma.transportSegment.create({
+          data: {
+            form: { connect: { id: form.id } },
+            ...segmentPayload
+          }
+        });
+      }
+    }
+  }
 }

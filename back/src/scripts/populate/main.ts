@@ -9,44 +9,61 @@ import {
   createCompaniesAndAssociate,
   associateExistingUsers
 } from "./users";
-import { createForms, createStatusLogs } from "./bsdds";
+import { createForms, createStatusLogs, createSegments } from "./bsdds";
 import { createBsdasris } from "./bsdasris";
 import { createBsdas } from "./bsdas";
 import { createBsvhus } from "./bsvhus";
 import { createBsffs } from "./bsffs";
+import { createEvents } from "./events";
 
-const USER_NUM = 10000;
+// const USER_NUM = 1000;
+// const COMPANIES_WITH_BSDS = 100;
+// const DASRI_PER_COMPANIES = 100;
+// const BSDA_PER_COMPANIES = 100;
+// const VHU_PER_COMPANIES = 100;
+// const BSDD_PER_COMPANIES = 100;
+// const BSFF_PER_COMPANIES = 100;
+// const BIG_CORPS = 30;
+// const COMPANY_PER_BIG_CORP_USER = 5;
+// const EVENTS_BATCHS = 10;
+// const EVENTS_PAGE_SIZE = 10_000;
+
+const USER_NUM = 205_000;
 const COMPANIES_WITH_BSDS = 100;
-const DASRI_PER_COMPANIES = 5000;
-const BSDA_PER_COMPANIES = 5000;
-const VHU_PER_COMPANIES = 5000;
-const BSDD_PER_COMPANIES = 5000;
-const BSFF_PER_COMPANIES = 5000;
+const DASRI_PER_COMPANIES = 1400;
+const BSDA_PER_COMPANIES = 500;
+const VHU_PER_COMPANIES = 500;
+const BSDD_PER_COMPANIES = 10_700;
+const BSFF_PER_COMPANIES = 500;
 const COMPANY_PER_USER = 3;
-const BIG_CORPS = 100;
-const COMPANY_PER_BIG_CORP_USER = 30;
+const BIG_CORPS = 30;
+const COMPANY_PER_BIG_CORP_USER = 200;
+const EVENTS = 25_000_000;
+const EVENTS_BATCHS = 2_500;
+const EVENTS_PAGE_SIZE = 10_000;
 
 (async function main() {
   console.time("script");
 
+  console.log("Users");
   const userIds = await createUsersWithAccessToken(USER_NUM);
 
+  console.log("Companies");
   // create companies to be queried
   const usersAndMatchingCompany = await createOneCompanyPerUser({
     role: UserRole.ADMIN
   });
 
+  console.log("Big corps");
   for (const userId of userIds.slice(0, BIG_CORPS)) {
-    await createCompaniesAndAssociate(
-      userId,
-
-      COMPANY_PER_BIG_CORP_USER
-    );
+    await createCompaniesAndAssociate(userId, COMPANY_PER_BIG_CORP_USER);
   }
 
-  for (const userId of userIds.slice(BIG_CORPS)) {
-    await createCompaniesAndAssociate(userId, COMPANY_PER_USER);
-  }
+  console.log("Other companies");
+
+  // for (const userId of userIds.slice(BIG_CORPS)) {
+  //   await createCompaniesAndAssociate(userId, 1);
+  // }
 
   console.log("Dasris");
   for (const userAndMatchingCompany of usersAndMatchingCompany.slice(
@@ -90,8 +107,16 @@ const COMPANY_PER_BIG_CORP_USER = 30;
 
   console.log("StatusLogs");
   await createStatusLogs();
+  
+  console.log("Segments");
+  await createSegments();
 
+  // console.log("Events");
+  // await createEvents(EVENTS_PAGE_SIZE, EVENTS_BATCHS);
+
+  console.log("associateExistingUsers");
   await associateExistingUsers();
+
   console.log(`All done, exiting.`);
 
   console.timeEnd("script");

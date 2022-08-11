@@ -1,15 +1,15 @@
-import { siretify } from "../../__tests__/factories";
+import { populateSiretify } from "./utils";
 
 import prisma from "../../prisma";
 import { hash } from "bcrypt";
 import { hashToken } from "../../utils";
 import { CompanyType } from "@prisma/client";
-import { randomChoice } from "./utils";
+import { randomChoice, chunkArray } from "./utils";
 
 export const createUsersWithAccessToken = async (quantity = 1, opt = {}) => {
   const userData = [];
-  const tokenData = [];
-  const emailAndToken = [];
+
+  let createdUsers = [];
 
   const defaultPassword = await hash("pass", 10);
   for (let i = 0; i < quantity; i++) {
@@ -23,40 +23,38 @@ export const createUsersWithAccessToken = async (quantity = 1, opt = {}) => {
       ...opt
     });
   }
+  let userEmails = [];
 
-  await prisma.user.createMany({ data: userData });
-  const userEmails = userData.map(u => u.email);
+  const chunks = chunkArray(userData, 10000);
 
-  const createdUsers = await prisma.user.findMany({
-    where: { email: { in: userEmails } },
-    select: { id: true, email: true },
-    orderBy: {
-      createdAt: "asc"
+  for (const chunk of chunks) {
+    let chunkTokenData = [];
+    await prisma.user.createMany({ data: chunk });
+    const chunkEmails = chunk.map(u => u.email);
+
+    userEmails = [...userEmails, ...chunkEmails];
+    const users = await prisma.user.findMany({
+      where: { email: { in: chunkEmails } },
+      select: { id: true, email: true }
+    });
+    createdUsers = createdUsers.concat(users);
+
+    for (const user of users) {
+      const idx = user.email.match(/\d+/)[0];
+
+      const clearToken = `token_${idx}`;
+
+      chunkTokenData.push({
+        token: hashToken(clearToken),
+        description: clearToken,
+        userId: user.id
+      });
     }
-  });
 
-  for (let i = 0; i < quantity; i++) {
-    const idx = i + 1;
-    const clearToken = `token_${idx}`;
-
-    const email = `user_${idx}@td.io`;
-    const user = await prisma.user.findUnique({
-      where: { email },
-      select: { id: true }
-    });
-    emailAndToken.push({
-      token: clearToken,
-      email
-    });
-    tokenData.push({
-      token: hashToken(clearToken),
-      userId: user.id
+    await prisma.accessToken.createMany({
+      data: chunkTokenData
     });
   }
-
-  await prisma.accessToken.createMany({
-    data: tokenData
-  });
 
   return createdUsers.map(u => u.id);
 };
@@ -75,7 +73,7 @@ export async function createOneCompanyPerUser({ role, start = 0 }) {
   const userCount = users.length;
 
   for (let i = start + 1; i <= userCount; i++) {
-    const siret = siretify(i);
+    const siret = populateSiretify(i);
     data.push({
       siret,
       companyTypes: {
@@ -137,7 +135,8 @@ export async function createCompaniesAndAssociate(
   const sirets = [];
   for (let i = 0; i < maxCompaniesPerUser; i++) {
     const companyIndex = initialCompanyCount + i;
-    const siret = siretify(companyIndex);
+    const siret = populateSiretify(companyIndex);
+
     sirets.push(siret);
     data.push({
       siret,
@@ -185,10 +184,10 @@ export async function createCompaniesAndAssociate(
 }
 
 /**
- *   Associate users from 1010 to 200 to company 1
+ *   Associate users from 1010 to 2000 to company 1
  */
 export async function associateExistingUsers() {
-  const siret = siretify(1);
+  const siret = populateSiretify(1);
   const company = await prisma.company.findUnique({
     where: { siret: siret },
     select: { id: true, siret: true }
@@ -199,15 +198,16 @@ export async function associateExistingUsers() {
       where: { email: email },
       select: { email: true, id: true }
     });
-
-    await prisma.companyAssociation.create({
-      data: {
-        user: { connect: { id: user.id } },
-        company: {
-          connect: { id: company.id }
-        },
-        role: "MEMBER"
-      }
-    });
+    if (!!user) {
+      await prisma.companyAssociation.create({
+        data: {
+          user: { connect: { id: user.id } },
+          company: {
+            connect: { id: company.id }
+          },
+          role: "MEMBER"
+        }
+      });
+    }
   }
 }

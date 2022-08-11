@@ -158,7 +158,7 @@ export const userWithAccessTokenFactory = async (opt = {}) => {
   return { user, accessToken: clearToken };
 };
 
-const formdata = {
+export const formdata = {
   wasteDetailsQuantity: 22.5,
   signedByTransporter: true,
   emitterCompanyName: "WASTE PRODUCER",

@@ -15,7 +15,7 @@ export const bsdaFactory = async ({
   });
 };
 
-const getBsdaObject = (): Prisma.BsdaCreateInput => ({
+export const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   id: getReadableId(ReadableIdPrefix.BSDA),
 
   type: BsdaType.OTHER_COLLECTIONS,

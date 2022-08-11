@@ -20,3 +20,20 @@ export function getReadableId(date, prefix) {
   const encoded = base32Encode(randomNumber).padStart(charsLength, "0");
   return `${prefix}-${todayStr}-${encoded}`;
 }
+
+export function populateSiretify(index) {
+  const siretLength = 14;
+  const siret = `${index}`;
+  if (siret.length === siretLength) {
+    return siret;
+  }
+  if (siret.length > siretLength) {
+    throw Error("Generated siret is too long");
+  }
+  return siret.padStart(14, "0"); // pad with 0 rather than 1 in siretify
+}
+
+export const chunkArray = (array, chunkSize) =>
+  Array.from({ length: Math.ceil(array.length / chunkSize) }, (_, index) =>
+    array.slice(index * chunkSize, (index + 1) * chunkSize)
+  );
