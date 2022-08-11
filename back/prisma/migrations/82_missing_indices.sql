@@ -9,15 +9,15 @@ CREATE INDEX IF NOT EXISTS "_BsdasriIsDeletedIdx" ON default$default."Bsdasri"("
 -- Bsda
 CREATE INDEX IF NOT EXISTS "_BsdaGroupedInIdIdx" ON "default$default"."Bsda"("groupedInId");
 CREATE INDEX IF NOT EXISTS "_BsdaIsDeletedIdx" ON default$default."Bsda"("isDeleted") WHERE "Bsda"."isDeleted"=true;
-CREATE INDEX IF NOT EXISTS "_BsdaIsDraftIdx" ON default$default."Bsda" ("isDraft") WHERE "Bsda"."isDeleted"=true;
+CREATE INDEX IF NOT EXISTS "_BsdaIsDraftIdx" ON default$default."Bsda"("isDraft") WHERE "Bsda"."isDraft"=true;
 
 -- Bsff
 CREATE INDEX IF NOT EXISTS "_BsffIsDeletedIdx" ON default$default."Bsff"("isDeleted") WHERE "Bsff"."isDeleted"=true;
-CREATE INDEX IF NOT EXISTS "_BsffIsDraftIdx" ON default$default."Bsff"("isDeleted") WHERE "Bsff"."isDeleted"=true;
+CREATE INDEX IF NOT EXISTS "_BsffIsDraftIdx" ON default$default."Bsff"("isDraft") WHERE "Bsff"."isDraft"=true;
 
 -- Bsvhu
 CREATE INDEX IF NOT EXISTS "_BsvhuIsDeletedIdx" ON default$default."Bsvhu" ("isDeleted") WHERE "Bsvhu"."isDeleted"=true;
-CREATE INDEX IF NOT EXISTS "_BsvhuIsDraftIdx" ON default$default."Bsvhu"("isDeleted") WHERE "Bsvhu"."isDeleted"=true;
+CREATE INDEX IF NOT EXISTS "_BsvhuIsDraftIdx" ON default$default."Bsvhu"("isDraft") WHERE "Bsvhu"."isDraft"=true;
 
 -- Form
 CREATE INDEX IF NOT EXISTS "_FormEcoOrganismeSiretIdx" ON "default$default"."Form"("ecoOrganismeSiret");
