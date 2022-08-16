@@ -40,7 +40,7 @@ export default function WeightWidget({
         />
       )}
 
-      {showWeight && (
+      {showWeight ? (
         <>
           <div className="form__row">
             <label>
@@ -70,6 +70,8 @@ export default function WeightWidget({
             />
           </div>
         </>
+      ) : (
+        <p>Pesée non précisée</p>
       )}
     </div>
   );
