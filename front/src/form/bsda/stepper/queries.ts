@@ -202,11 +202,12 @@ export const GET_BSDA = gql`
 `;
 
 export const GET_BSDAS = gql`
-  query Bsdas($where: BsdaWhere) {
-    bsdas(where: $where) {
+  query Bsdas($first: Int, $after: ID, $where: BsdaWhere) {
+    bsdas(first: $first, after: $after, where: $where) {
       totalCount
       pageInfo {
         hasNextPage
+        endCursor
       }
       edges {
         cursor
