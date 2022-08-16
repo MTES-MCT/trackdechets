@@ -71,19 +71,28 @@ export function BSDList({
   blankslate,
   defaultWhere,
 }: BSDListProps) {
-  const [fetchBsds, { data, loading, fetchMore }] = useLazyQuery<
+  // As variables are modified by the UI filters,
+  // we need to persist them so that subsequent call use the same variables
+  const [bsdsVariables, setBsdsVariables] = React.useState<QueryBsdsArgs>({
+    first: FIRST,
+    where: defaultWhere,
+  });
+
+  const [lazyFetchBsds, { data, loading, fetchMore }] = useLazyQuery<
     Pick<Query, "bsds">,
     QueryBsdsArgs
   >(GET_BSDS, {
-    variables: {
-      first: FIRST,
-      where: defaultWhere,
-    },
     fetchPolicy: "cache-and-network",
     notifyOnNetworkStatusChange: true,
   });
 
-  useNotifier(siret, fetchBsds);
+  const refetchBsds = React.useCallback(() => {
+    lazyFetchBsds({
+      variables: bsdsVariables,
+    });
+  }, [lazyFetchBsds, bsdsVariables]);
+
+  useNotifier(siret, refetchBsds);
 
   // show the blankslate if the query returns no results without any filters
   // because if it returns no results with filters applied, it doesn't mean there are no results at all
@@ -102,11 +111,14 @@ export function BSDList({
   const showBlankslate = cachedData?.bsds.totalCount === 0;
 
   const refetchWithDefaultWhere = React.useCallback(
-    ({ where, ...args }) =>
-      fetchBsds({
-        variables: { ...args, where: { ...where, ...defaultWhere } },
-      }),
-    [fetchBsds, defaultWhere]
+    ({ where, ...args }) => {
+      const newVariables = { ...args, where: { ...where, ...defaultWhere } };
+      setBsdsVariables(newVariables);
+      lazyFetchBsds({
+        variables: newVariables,
+      });
+    },
+    [lazyFetchBsds, defaultWhere]
   );
 
   const [layoutType, setLayoutType] = usePersistedState<LayoutType>(
@@ -128,7 +140,7 @@ export function BSDList({
         <BSDDropdown siret={siret} />
         <button
           className="btn btn--primary"
-          onClick={() => fetchBsds()}
+          onClick={() => refetchBsds()}
           disabled={loading}
         >
           Rafraîchir <IconRefresh style={{ marginLeft: "0.5rem" }} />
