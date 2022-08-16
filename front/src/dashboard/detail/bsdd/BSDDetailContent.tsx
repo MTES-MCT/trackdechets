@@ -277,7 +277,6 @@ const EcoOrganisme = ({ ecoOrganisme }) => (
 type BSDDetailContentProps = {
   form: Form;
   children?: React.ReactNode;
-  refetch?: () => void;
 };
 
 const GroupedIn = ({ form }: { form: Form }) => {
@@ -407,7 +406,6 @@ const Appendix2 = ({
 export default function BSDDetailContent({
   form,
   children = null,
-  refetch,
 }: BSDDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();

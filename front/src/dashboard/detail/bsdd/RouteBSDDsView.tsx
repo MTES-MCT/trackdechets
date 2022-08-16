@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { GET_DETAIL_FORM } from "common/queries";
 import { InlineError } from "common/components/Error";
 import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
+
 export function RouteBSDDsView() {
   const { id: formId } = useParams<{ id: string }>();
   const { error, data, loading } = useQuery<Pick<Query, "form">, QueryFormArgs>(
