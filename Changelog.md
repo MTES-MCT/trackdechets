@@ -5,6 +5,24 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.08.3] 16/08/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+- Correction d'un bug sur le dashboard qui faisait disparaitre les filtres saisis [PR 1592](https://github.com/MTES-MCT/trackdechets/pull/1598)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Ajout d'un bouton pour charger plus de bordereaux dans le composant de sélection des annexes BSDA [PR 1592](https://github.com/MTES-MCT/trackdechets/pull/1599)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2022.08.2] 14/08/2022
 
 #### :rocket: Nouvelles fonctionnalités
@@ -18,6 +36,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :memo: Documentation
 
 #### :house: Interne
+
 - Ajout d'index db supplémentaires [PR 1592](https://github.com/MTES-MCT/trackdechets/pull/1592)
 
 # [2022.08.1] ~08/08/2022
@@ -35,13 +54,14 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Correction d'un bug à l'enregistrement sur le formulaire BSDA si on saisissait un conditionnement sans saisir la quantité associée [PR 1557](https://github.com/MTES-MCT/trackdechets/pull/1557)
 - Correction d'un bug qui entraînait l'envoi d'un email de refus incomplet [PR 1579](https://github.com/MTES-MCT/trackdechets/pull/1579)
 - Correction dasri diverses [PR 1585](https://github.com/MTES-MCT/trackdechets/pull/1585)
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
 
 - Correction du fonctionnement de la validation des champs requis sur le BSFF [PR 1531](https://github.com/MTES-MCT/trackdechets/pull/1531)
 - Ajout d'un "rate limit" sur le formulaire de connexion pour éviter les attaques par "brute force" [PR 1565](https://github.com/MTES-MCT/trackdechets/pull/1565)
-- Multiples améliorations BSDA: inversion de la destination finale & initiale sur le formulaire UI, correction d'un bug sur l'aperçu qui indiquait un bordereau comme de réexpédition par erreur, amélioration de la visibilité du destinataire final lors d'un groupement, ajout de détails sur les BSDAs associés dans les onglets de signature, PDF  et aperçu [PR 1551](https://github.com/MTES-MCT/trackdechets/pull/1551)
+- Multiples améliorations BSDA: inversion de la destination finale & initiale sur le formulaire UI, correction d'un bug sur l'aperçu qui indiquait un bordereau comme de réexpédition par erreur, amélioration de la visibilité du destinataire final lors d'un groupement, ajout de détails sur les BSDAs associés dans les onglets de signature, PDF et aperçu [PR 1551](https://github.com/MTES-MCT/trackdechets/pull/1551)
 - Ajout d'un bouton pour charger les révisions non affichées [PR 1587](https://github.com/MTES-MCT/trackdechets/pull/1587)
 
 #### :memo: Documentation
