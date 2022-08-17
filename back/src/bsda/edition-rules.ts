@@ -67,6 +67,7 @@ const editableFields: EditableFields<BsdaInput> = {
   packagings: ifAwaitingSignature("WORK"),
   weight: ifAwaitingSignature("WORK"),
   worker: {
+    isDisabled: ifAwaitingSignature("EMISSION"),
     company: ifAwaitingSignature("EMISSION"),
     work: ifAwaitingSignature("WORK")
   },
@@ -86,7 +87,9 @@ const editableFields: EditableFields<BsdaInput> = {
  * @param signatureType
  * @returns boolean
  */
-function ifAwaitingSignature(signatureType: BsdaSignatureType | undefined) {
+function ifAwaitingSignature(
+  signatureType: BsdaSignatureType | undefined
+): (bsda?: Bsda) => boolean {
   if (!signatureType) {
     return () => true;
   }

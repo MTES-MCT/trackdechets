@@ -1330,6 +1330,8 @@ model Bsda {
   transporterTransportSignatureAuthor String?
   transporterTransportSignatureDate   DateTime?      @db.Timestamptz(6)
 
+  workerIsDisabled Boolean?
+
   workerCompanyName    String?
   workerCompanySiret   String?
   workerCompanyAddress String?
