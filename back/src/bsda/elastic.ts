@@ -82,7 +82,7 @@ function getWhere(
       break;
 
     case BsdaStatus.SIGNED_BY_PRODUCER:
-      if (bsda.type === "OTHER_COLLECTIONS") {
+      if (bsda.type === "OTHER_COLLECTIONS" && !bsda.workerIsDisabled) {
         setTab(siretsFilters, "workerCompanySiret", "isForActionFor");
       } else {
         // Bsda types GATHERING and RESHIPMENT do not expect worker signature,
