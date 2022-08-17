@@ -5,7 +5,7 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2022.08.4] ~29/08/2022
+# [2022.08.4] 29/08/2022
 
 #### :rocket: Nouvelles fonctionnalités
 
@@ -16,11 +16,12 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Utilisation des sirets en cache pour la query formsLifeCycle [PR 1609](https://github.com/MTES-MCT/trackdechets/pull/1609)
+- Prise en compte de la colonne Company.contact lors de l'import en masse [PR 1606](https://github.com/MTES-MCT/trackdechets/pull/1606) 
 
 #### :memo: Documentation
 
 #### :house: Interne
-
+ 
 # [2022.08.3] 16/08/2022
 
 #### :rocket: Nouvelles fonctionnalités
