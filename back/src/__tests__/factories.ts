@@ -283,7 +283,7 @@ export const transportSegmentFactory = async ({ formId, segmentPayload }) => {
   });
 };
 
-const upsertBaseSiret = async siret => {
+export const upsertBaseSiret = async siret => {
   const exists = await prisma.company.findUnique({ where: { siret } });
   if (!exists) {
     // Using prisma.upsert gives us "Unique constraint failed on the fields: (`siret`)"

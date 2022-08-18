@@ -78,6 +78,9 @@ describe("Mutation.Bsda.create", () => {
 
   it("should allow creating a valid form for the producer signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const input: BsdaInput = {
       emitter: {
@@ -116,7 +119,7 @@ describe("Mutation.Bsda.create", () => {
         cap: "A cap",
         plannedOperationCode: "D 9",
         company: {
-          siret: "3".repeat(14),
+          siret: destinationCompany.siret,
           name: "destination",
           address: "address",
           contact: "contactEmail",
@@ -143,6 +146,9 @@ describe("Mutation.Bsda.create", () => {
 
   it("should allow creating a valid form with null sealNumbers field", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const input: BsdaInput = {
       emitter: {
@@ -181,7 +187,7 @@ describe("Mutation.Bsda.create", () => {
         cap: "A cap",
         plannedOperationCode: "D 9",
         company: {
-          siret: "11111111111111",
+          siret: destinationCompany.siret,
           name: "destination",
           address: "address",
           contact: "contactEmail",
@@ -211,6 +217,9 @@ describe("Mutation.Bsda.create", () => {
 
   it("should allow creating a valid form without sealNumbers field", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const input: BsdaInput = {
       emitter: {
@@ -248,7 +257,7 @@ describe("Mutation.Bsda.create", () => {
         cap: "A cap",
         plannedOperationCode: "D 9",
         company: {
-          siret: "11111111111111",
+          siret: destinationCompany.siret,
           name: "destination",
           address: "address",
           contact: "contactEmail",
@@ -277,6 +286,12 @@ describe("Mutation.Bsda.create", () => {
   });
   it("should allow creating the form if up to 2 plates are submitted", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { company: transporterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const input: BsdaInput = {
       emitter: {
@@ -315,7 +330,7 @@ describe("Mutation.Bsda.create", () => {
         cap: "A cap",
         plannedOperationCode: "D 9",
         company: {
-          siret: "3".repeat(14),
+          siret: destinationCompany.siret,
           name: "destination",
           address: "address",
           contact: "contactEmail",
@@ -325,7 +340,7 @@ describe("Mutation.Bsda.create", () => {
       },
       transporter: {
         company: {
-          siret: "21111111111112",
+          siret: transporterCompany.siret,
           name: "The Transporter",
           address: "Rue du bsda",
           contact: "Un transporter",
@@ -348,6 +363,12 @@ describe("Mutation.Bsda.create", () => {
 
   it("should fail creating the form if more than 2 plates are submitted", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { company: transporterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const input: BsdaInput = {
       emitter: {
@@ -386,7 +407,7 @@ describe("Mutation.Bsda.create", () => {
         cap: "A cap",
         plannedOperationCode: "D 9",
         company: {
-          siret: "3".repeat(14),
+          siret: destinationCompany.siret,
           name: "destination",
           address: "address",
           contact: "contactEmail",
@@ -396,7 +417,7 @@ describe("Mutation.Bsda.create", () => {
       },
       transporter: {
         company: {
-          siret: "21111111111112",
+          siret: transporterCompany.siret,
           name: "The Transporter",
           address: "Rue du bsda",
           contact: "Un transporter",
@@ -426,6 +447,9 @@ describe("Mutation.Bsda.create", () => {
 
   it("should fail creating the form if a required field like the waste code is missing", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const input: BsdaInput = {
       emitter: {
@@ -464,7 +488,7 @@ describe("Mutation.Bsda.create", () => {
         cap: "A cap",
         plannedOperationCode: "D 9",
         company: {
-          siret: "3".repeat(14),
+          siret: destinationCompany.siret,
           name: "destination",
           address: "address",
           contact: "contactEmail",
