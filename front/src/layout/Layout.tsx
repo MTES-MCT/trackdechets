@@ -40,13 +40,15 @@ export default function Layout({
           Trackdéchets. Veuillez utiliser un navigateur plus récent.
         </div>
       )}
-      {VITE_WARNING_MESSAGE && typeof VITE_WARNING_MESSAGE === "string" && (
+      {VITE_WARNING_MESSAGE && (
         <div
           className="notification notification--platform tw-text-center"
           style={{ borderRadius: 0, border: 0, margin: 0 }}
         >
           <img src={sandboxIcon} alt="" />
-          <div dangerouslySetInnerHTML={{ __html: VITE_WARNING_MESSAGE }}></div>
+          <div
+            dangerouslySetInnerHTML={{ __html: VITE_WARNING_MESSAGE as string }}
+          ></div>
         </div>
       )}
       {data?.warningMessage && (
