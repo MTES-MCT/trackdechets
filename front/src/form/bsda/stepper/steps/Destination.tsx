@@ -43,7 +43,7 @@ export function Destination({ disabled }) {
         </div>
       )}
 
-      {isDechetterie ? (
+      {isDechetterie && !hasNextDestination ? (
         <div className="form__row">
           <div className="notification">
             Vous effectuez une collecte en déchetterie. Il n'y a pas de
