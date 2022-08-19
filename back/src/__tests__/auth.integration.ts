@@ -73,10 +73,7 @@ describe("POST /login", () => {
     const redirect = login.header.location;
     expect(redirect).toContain(`http://${UI_HOST}/login`);
     expect(redirect).toContain(
-      queryString.escape(loginError.UNKNOWN_USER.message)
-    );
-    expect(redirect).toContain(
-      queryString.escape(loginError.UNKNOWN_USER.errorField)
+      queryString.escape(loginError.IVALID_USER_OR_PASSWORD.code)
     );
   });
 
@@ -96,7 +93,7 @@ describe("POST /login", () => {
     const redirect = login.header.location;
     expect(redirect).toContain(`http://${UI_HOST}/login`);
     expect(redirect).toContain(
-      queryString.escape(loginError.NOT_ACTIVATED.message)
+      queryString.escape(loginError.NOT_ACTIVATED.code)
     );
   });
 
@@ -116,10 +113,7 @@ describe("POST /login", () => {
     const redirect = login.header.location;
     expect(redirect).toContain(`http://${UI_HOST}/login`);
     expect(redirect).toContain(
-      queryString.escape(loginError.INVALID_PASSWORD.message)
-    );
-    expect(redirect).toContain(
-      queryString.escape(loginError.INVALID_PASSWORD.errorField)
+      queryString.escape(loginError.IVALID_USER_OR_PASSWORD.code)
     );
   });
 
@@ -224,10 +218,7 @@ describe("POST /login", () => {
     const redirect = login.header.location;
     expect(redirect).toContain(`http://${UI_HOST}/login`);
     expect(redirect).toContain(
-      queryString.escape(loginError.INVALID_PASSWORD.message)
-    );
-    expect(redirect).toContain(
-      queryString.escape(loginError.INVALID_PASSWORD.errorField)
+      queryString.escape(loginError.IVALID_USER_OR_PASSWORD.code)
     );
   });
 });

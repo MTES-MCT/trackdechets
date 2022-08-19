@@ -40,22 +40,22 @@ export enum AuthType {
   Bearer = "BEARER"
 }
 
+enum LoginErrorCode {
+  INVALID_USER_OR_PASSWORD = "INVALID_USER_OR_PASSWORD",
+  NOT_ACTIVATED = "NOT_ACTIVATED"
+}
+
 // verbose error message and related errored field
 export const getLoginError = (username: string) => ({
-  UNKNOWN_USER: {
-    message: "Aucun utilisateur trouvé avec cet email",
-    errorField: "email",
+  IVALID_USER_OR_PASSWORD: {
+    code: LoginErrorCode.INVALID_USER_OR_PASSWORD,
+    message: "Email ou mot de passe incorrect",
     username: username
   },
   NOT_ACTIVATED: {
+    code: LoginErrorCode.NOT_ACTIVATED,
     message:
       "Ce compte n'a pas encore été activé. Vérifiez vos emails ou contactez le support",
-    errorField: "",
-    username: username
-  },
-  INVALID_PASSWORD: {
-    message: "Mot de passe incorrect",
-    errorField: "password",
     username: username
   }
 });
@@ -72,7 +72,7 @@ passport.use(
 
       if (!user) {
         return done(null, false, {
-          ...getLoginError(username).UNKNOWN_USER
+          ...getLoginError(username).IVALID_USER_OR_PASSWORD
         });
       }
 
@@ -92,7 +92,7 @@ passport.use(
       }
 
       return done(null, false, {
-        ...getLoginError(username).INVALID_PASSWORD
+        ...getLoginError(username).IVALID_USER_OR_PASSWORD
       });
     }
   )
