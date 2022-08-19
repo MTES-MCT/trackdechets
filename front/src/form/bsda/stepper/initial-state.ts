@@ -4,13 +4,14 @@ import {
   BsdaType,
   TransportMode,
 } from "generated/graphql/types";
+import { getInitialEmitterPickupSite } from "./steps/Emitter";
 
 const initialState = {
   type: BsdaType.OtherCollections,
   emitter: {
     company: getInitialCompany(),
     isPrivateIndividual: false,
-    pickupSite: null,
+    pickupSite: getInitialEmitterPickupSite(),
   },
   waste: {
     code: "",
