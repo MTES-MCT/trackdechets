@@ -123,10 +123,6 @@ function getWhere(
   return where;
 }
 
-function getWasteDescription(bsda: Bsda) {
-  return [bsda.wasteCode, bsda.wasteMaterialName].filter(Boolean).join(", ");
-}
-
 function toBsdElastic(bsda: Bsda): BsdElastic {
   const where = getWhere(bsda);
 
@@ -148,7 +144,7 @@ function toBsdElastic(bsda: Bsda): BsdElastic {
     destinationOperationCode: bsda.destinationOperationCode ?? "",
     destinationOperationDate: bsda.destinationOperationDate?.getTime(),
     wasteCode: bsda.wasteCode ?? "",
-    wasteDescription: getWasteDescription(bsda),
+    wasteDescription: bsda.wasteMaterialName,
     ...where,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsda)

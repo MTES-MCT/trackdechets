@@ -71,6 +71,13 @@ async function buildQuery(
               }
             }
           },
+          {
+            wildcard: {
+              emitterCompanyName: {
+                value: `${where.emitter}*`
+              }
+            }
+          },
           { term: { emitterCompanySiret: where.emitter } }
         ]
       }
@@ -86,6 +93,13 @@ async function buildQuery(
               destinationCompanyName: {
                 query: where.recipient,
                 fuzziness: "AUTO"
+              }
+            }
+          },
+          {
+            wildcard: {
+              destinationCompanyName: {
+                value: `${where.emitter}*`
               }
             }
           },
@@ -162,6 +176,13 @@ async function buildQuery(
                 // match on waste description
                 query: where.waste,
                 fuzziness: "AUTO"
+              }
+            }
+          },
+          {
+            wildcard: {
+              wasteDescription: {
+                value: `${where.waste}*`
               }
             }
           }
