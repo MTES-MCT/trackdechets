@@ -1,52 +1,39 @@
-import React from "react";
-import * as queryString from "query-string";
-import {
-  Link,
-  RouteComponentProps,
-  withRouter,
-  Redirect,
-} from "react-router-dom";
-
-import { localAuthService } from "./auth.service";
 import routes from "common/routes";
+import * as queryString from "query-string";
+import React from "react";
+import { Link, Redirect, useLocation } from "react-router-dom";
+import { localAuthService } from "./auth.service";
 
-const fieldErrorsProps = (fieldName, errorField) => {
-  if (errorField === fieldName) {
-    return {
-      autoFocus: true,
-      style: { border: "1px solid red" },
-    };
+function getErrorMessage(errorCode: string) {
+  if (errorCode === "NOT_ACTIVATED") {
+    return "Ce compte n'a pas encore été activé. Vérifiez vos emails ou contactez le support";
   }
-  return {};
-};
-export default withRouter(function Login(
-  routeProps: RouteComponentProps<
-    {},
-    {},
-    {
-      error?: string;
-      errorField?: string;
-      returnTo?: string;
-      username?: string;
-    }
-  >
-) {
+
+  return "Email ou mot de passe incorrect";
+}
+
+export default function Login() {
+  const location = useLocation<{
+    errorCode?: string;
+    returnTo?: string;
+    username?: string;
+  }>();
+
   const { VITE_API_ENDPOINT } = import.meta.env;
 
-  const queries = queryString.parse(routeProps.location.search);
+  const queries = queryString.parse(location.search);
 
-  if (queries.error || queries.returnTo) {
-    const { error, errorField, returnTo, username } = queries;
+  if (queries.errorCode || queries.returnTo) {
+    const { errorCode, returnTo, username } = queries;
     const state = {
-      ...(queries.error ? { error, errorField, username } : {}),
+      ...(queries.errorCode ? { errorCode, username } : {}),
       ...(!!returnTo ? { returnTo } : {}),
     };
 
     return <Redirect to={{ pathname: routes.login, state }} />;
   }
 
-  const { returnTo, error, errorField, username } =
-    routeProps.location.state || {};
+  const { returnTo, errorCode, username } = location.state || {};
 
   return (
     <section className="section section--white">
@@ -61,30 +48,20 @@ export default withRouter(function Login(
                 name="email"
                 defaultValue={username}
                 className="td-input"
-                {...fieldErrorsProps("email", errorField)}
               />
             </label>
-            {error && errorField === "email" && (
-              <div className="error-message">{error}</div>
-            )}
           </div>
 
           <div className="form__row">
             <label>
               Mot de passe
-              <input
-                type="password"
-                name="password"
-                className="td-input"
-                {...fieldErrorsProps("password", errorField)}
-              />
+              <input type="password" name="password" className="td-input" />
             </label>
-            {error && errorField === "password" && (
-              <div className="error-message">{error}</div>
-            )}
           </div>
           {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
-          {error && !errorField && <div className="error-message">{error}</div>}
+          {errorCode && (
+            <div className="error-message">{getErrorMessage(errorCode)}</div>
+          )}
           <div className="form__actions">
             <button
               className="btn btn--primary"
@@ -120,4 +97,4 @@ export default withRouter(function Login(
       </div>
     </section>
   );
-});
+}
