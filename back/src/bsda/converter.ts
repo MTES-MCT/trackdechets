@@ -182,7 +182,8 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
       recepisse: nullIfNoValues<BsdaRecepisse>({
         department: form.transporterRecepisseDepartment,
         number: form.transporterRecepisseNumber,
-        validityLimit: form.transporterRecepisseValidityLimit
+        validityLimit: form.transporterRecepisseValidityLimit,
+        isExempted: form.transporterRecepisseIsExempted
       }),
       transport: nullIfNoValues<BsdaTransport>({
         mode: form.transporterTransportMode,
