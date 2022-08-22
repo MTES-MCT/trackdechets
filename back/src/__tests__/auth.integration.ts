@@ -73,7 +73,7 @@ describe("POST /login", () => {
     const redirect = login.header.location;
     expect(redirect).toContain(`http://${UI_HOST}/login`);
     expect(redirect).toContain(
-      queryString.escape(loginError.IVALID_USER_OR_PASSWORD.code)
+      queryString.escape(loginError.INVALID_USER_OR_PASSWORD.code)
     );
   });
 
@@ -113,7 +113,7 @@ describe("POST /login", () => {
     const redirect = login.header.location;
     expect(redirect).toContain(`http://${UI_HOST}/login`);
     expect(redirect).toContain(
-      queryString.escape(loginError.IVALID_USER_OR_PASSWORD.code)
+      queryString.escape(loginError.INVALID_USER_OR_PASSWORD.code)
     );
   });
 
@@ -218,7 +218,7 @@ describe("POST /login", () => {
     const redirect = login.header.location;
     expect(redirect).toContain(`http://${UI_HOST}/login`);
     expect(redirect).toContain(
-      queryString.escape(loginError.IVALID_USER_OR_PASSWORD.code)
+      queryString.escape(loginError.INVALID_USER_OR_PASSWORD.code)
     );
   });
 });

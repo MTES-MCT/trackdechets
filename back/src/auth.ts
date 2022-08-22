@@ -47,7 +47,7 @@ enum LoginErrorCode {
 
 // verbose error message and related errored field
 export const getLoginError = (username: string) => ({
-  IVALID_USER_OR_PASSWORD: {
+  INVALID_USER_OR_PASSWORD: {
     code: LoginErrorCode.INVALID_USER_OR_PASSWORD,
     message: "Email ou mot de passe incorrect",
     username: username
@@ -72,7 +72,7 @@ passport.use(
 
       if (!user) {
         return done(null, false, {
-          ...getLoginError(username).IVALID_USER_OR_PASSWORD
+          ...getLoginError(username).INVALID_USER_OR_PASSWORD
         });
       }
 
@@ -92,7 +92,7 @@ passport.use(
       }
 
       return done(null, false, {
-        ...getLoginError(username).IVALID_USER_OR_PASSWORD
+        ...getLoginError(username).INVALID_USER_OR_PASSWORD
       });
     }
   )
