@@ -30,7 +30,7 @@ export type MailTemplate<
   V = any
 > = {
   subject: string | ((values: V) => string);
-  // template from the mail provider (Mailjet, Sendinblue), used standalone or as layout in conjunction with body
+  // template from the mail provider (Sendinblue), used standalone or as layout in conjunction with body
   templateId: number;
   // optional body or body template to be used in conjunction with the LAYOUT templateId
   body?: string | ((values: V) => string);
