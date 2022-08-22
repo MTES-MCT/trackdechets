@@ -36,7 +36,8 @@ export function WorkflowAction(props: WorkflowActionProps) {
     case BsdaStatus.SignedByProducer:
       if (
         form["bsdaType"] === "GATHERING" ||
-        form["bsdaType"] === "RESHIPMENT"
+        form["bsdaType"] === "RESHIPMENT" ||
+        form.worker?.isDisabled
       ) {
         return siret === form.transporter?.company?.siret ? (
           <SignTransport {...props} bsdaId={form.id} />

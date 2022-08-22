@@ -7,7 +7,7 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 
 export function Worker({ disabled }) {
-  const { setFieldValue, values } = useFormikContext<Bsda>();
+  const { setFieldValue, values, handleChange } = useFormikContext<Bsda>();
   const hasBroker = Boolean(values.broker);
 
   function onBrokerToggle() {
@@ -51,90 +51,111 @@ export function Worker({ disabled }) {
         </div>
       )}
 
-      <CompanySelector
-        disabled={disabled}
-        name="worker.company"
-        heading="Entreprise de travaux"
-      />
-
       <div className="form__row">
         <label>
-          <input
-            type="checkbox"
-            onChange={onBrokerToggle}
+          <Field
             disabled={disabled}
-            checked={hasBroker}
+            type="checkbox"
+            name="worker.isDisabled"
             className="td-checkbox"
+            onChange={e => {
+              handleChange(e);
+              setFieldValue("worker.company.name", null);
+              setFieldValue("worker.company.siret", null);
+            }}
           />
-          Je suis passé par un courtier
+          Il n'y a pas d'entreprise de travaux
         </label>
       </div>
 
-      {hasBroker && (
-        <div className="form__row">
-          <h4 className="form__section-heading">Courtier</h4>
+      {!Boolean(values?.worker?.isDisabled) && (
+        <>
           <CompanySelector
-            name="broker.company"
-            onCompanySelected={broker => {
-              if (broker.brokerReceipt) {
-                setFieldValue(
-                  "broker.recepisse.number",
-                  broker.brokerReceipt.receiptNumber
-                );
-                setFieldValue(
-                  "broker.recepisse.validityLimit",
-                  broker.brokerReceipt.validityLimit
-                );
-                setFieldValue(
-                  "broker.recepisse.department",
-                  broker.brokerReceipt.department
-                );
-              } else {
-                setFieldValue("broker.recepisse.number", "");
-                setFieldValue("broker.recepisse.validityLimit", null);
-                setFieldValue("broker.recepisse.department", "");
-              }
-            }}
+            disabled={disabled}
+            name="worker.company"
+            heading="Entreprise de travaux"
           />
 
           <div className="form__row">
             <label>
-              Numéro de récépissé
-              <Field
-                type="text"
-                name="broker.recepisse.number"
-                className="td-input td-input--medium"
+              <input
+                type="checkbox"
+                onChange={onBrokerToggle}
+                disabled={disabled}
+                checked={hasBroker}
+                className="td-checkbox"
               />
+              Je suis passé par un courtier
             </label>
-
-            <RedErrorMessage name="broker.recepisse.number" />
           </div>
-          <div className="form__row">
-            <label>
-              Département
-              <Field
-                type="text"
-                name="broker.recepisse.department"
-                placeholder="Ex: 83"
-                className="td-input td-input--small"
+
+          {hasBroker && (
+            <div className="form__row">
+              <h4 className="form__section-heading">Courtier</h4>
+              <CompanySelector
+                name="broker.company"
+                onCompanySelected={broker => {
+                  if (broker.brokerReceipt) {
+                    setFieldValue(
+                      "broker.recepisse.number",
+                      broker.brokerReceipt.receiptNumber
+                    );
+                    setFieldValue(
+                      "broker.recepisse.validityLimit",
+                      broker.brokerReceipt.validityLimit
+                    );
+                    setFieldValue(
+                      "broker.recepisse.department",
+                      broker.brokerReceipt.department
+                    );
+                  } else {
+                    setFieldValue("broker.recepisse.number", "");
+                    setFieldValue("broker.recepisse.validityLimit", null);
+                    setFieldValue("broker.recepisse.department", "");
+                  }
+                }}
               />
-            </label>
 
-            <RedErrorMessage name="broker.recepisse.department" />
-          </div>
-          <div className="form__row">
-            <label>
-              Limite de validité
-              <Field
-                component={DateInput}
-                name="broker.recepisse.validityLimit"
-                className="td-input td-input--small"
-              />
-            </label>
+              <div className="form__row">
+                <label>
+                  Numéro de récépissé
+                  <Field
+                    type="text"
+                    name="broker.recepisse.number"
+                    className="td-input td-input--medium"
+                  />
+                </label>
 
-            <RedErrorMessage name="broker.recepisse.validityLimit" />
-          </div>
-        </div>
+                <RedErrorMessage name="broker.recepisse.number" />
+              </div>
+              <div className="form__row">
+                <label>
+                  Département
+                  <Field
+                    type="text"
+                    name="broker.recepisse.department"
+                    placeholder="Ex: 83"
+                    className="td-input td-input--small"
+                  />
+                </label>
+
+                <RedErrorMessage name="broker.recepisse.department" />
+              </div>
+              <div className="form__row">
+                <label>
+                  Limite de validité
+                  <Field
+                    component={DateInput}
+                    name="broker.recepisse.validityLimit"
+                    className="td-input td-input--small"
+                  />
+                </label>
+
+                <RedErrorMessage name="broker.recepisse.validityLimit" />
+              </div>
+            </div>
+          )}
+        </>
       )}
     </>
   );

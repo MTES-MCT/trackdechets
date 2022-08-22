@@ -28,6 +28,7 @@ const initialState = {
     value: null,
   },
   worker: {
+    isDisabled: false,
     company: getInitialCompany(),
     work: {
       hasEmitterPaperSignature: false,

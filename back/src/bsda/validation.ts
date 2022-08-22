@@ -301,13 +301,14 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
 
 const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
   yup.object({
-    workerCompanyName: yup.string().when("type", {
-      is: value =>
+    workerIsDisabled: yup.boolean().nullable(),
+    workerCompanyName: yup.string().when(["type", "workerIsDisabled"], {
+      is: (type, isDisabled) =>
         [
           BsdaType.RESHIPMENT,
           BsdaType.GATHERING,
           BsdaType.COLLECTION_2710
-        ].includes(value),
+        ].includes(type) || isDisabled,
       then: schema =>
         schema
           .nullable()
@@ -321,13 +322,13 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           `Entreprise de travaux: ${MISSING_COMPANY_NAME}`
         )
     }),
-    workerCompanySiret: yup.string().when("type", {
-      is: value =>
+    workerCompanySiret: yup.string().when(["type", "workerIsDisabled"], {
+      is: (type, isDisabled) =>
         [
           BsdaType.RESHIPMENT,
           BsdaType.GATHERING,
           BsdaType.COLLECTION_2710
-        ].includes(value),
+        ].includes(type) || isDisabled,
       then: schema =>
         schema
           .nullable()
@@ -343,13 +344,13 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
             `Entreprise de travaux: ${MISSING_COMPANY_SIRET}`
           )
     }),
-    workerCompanyAddress: yup.string().when("type", {
-      is: value =>
+    workerCompanyAddress: yup.string().when(["type", "workerIsDisabled"], {
+      is: (type, isDisabled) =>
         [
           BsdaType.RESHIPMENT,
           BsdaType.GATHERING,
           BsdaType.COLLECTION_2710
-        ].includes(value),
+        ].includes(type) || isDisabled,
       then: schema => schema.nullable(),
       otherwise: schema =>
         schema.requiredIf(
@@ -357,13 +358,13 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           `Entreprise de travaux: ${MISSING_COMPANY_ADDRESS}`
         )
     }),
-    workerCompanyContact: yup.string().when("type", {
-      is: value =>
+    workerCompanyContact: yup.string().when(["type", "workerIsDisabled"], {
+      is: (type, isDisabled) =>
         [
           BsdaType.RESHIPMENT,
           BsdaType.GATHERING,
           BsdaType.COLLECTION_2710
-        ].includes(value),
+        ].includes(type) || isDisabled,
       then: schema => schema.nullable(),
       otherwise: schema =>
         schema.requiredIf(
@@ -371,13 +372,13 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           `Entreprise de travaux: ${MISSING_COMPANY_CONTACT}`
         )
     }),
-    workerCompanyPhone: yup.string().when("type", {
-      is: value =>
+    workerCompanyPhone: yup.string().when(["type", "workerIsDisabled"], {
+      is: (type, isDisabled) =>
         [
           BsdaType.RESHIPMENT,
           BsdaType.GATHERING,
           BsdaType.COLLECTION_2710
-        ].includes(value),
+        ].includes(type) || isDisabled,
       then: schema => schema.nullable(),
       otherwise: schema =>
         schema.requiredIf(
@@ -388,13 +389,13 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
     workerCompanyMail: yup
       .string()
       .email()
-      .when("type", {
-        is: value =>
+      .when(["type", "workerIsDisabled"], {
+        is: (type, isDisabled) =>
           [
             BsdaType.RESHIPMENT,
             BsdaType.GATHERING,
             BsdaType.COLLECTION_2710
-          ].includes(value),
+          ].includes(type) || isDisabled,
         then: schema => schema.nullable(),
         otherwise: schema =>
           schema.requiredIf(
