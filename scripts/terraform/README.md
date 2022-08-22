@@ -12,7 +12,7 @@ CNAME	test_app           trackdechets-test_app-front.osc-fr1.scalingo.io
 
 2. Copy `terraform.tfvars.model` into `terraform.tfvars` and configure missing environment variables
 
-3. Run tarraform to create the necessary resources in Scalingo
+3. Run terraform to create the necessary resources in Scalingo
 
 ```
 # Install dependencies if it's the first run
