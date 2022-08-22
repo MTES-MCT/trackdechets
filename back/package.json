@@ -39,7 +39,7 @@
     "purge-pdf-token:dev": "ts-node -r dotenv/config ./src/scripts/bin/purgePdfAccessToken.ts"
   },
   "engines": {
-    "node": "^14"
+    "node": "^16"
   },
   "keywords": [],
   "author": "",
@@ -57,7 +57,7 @@
     "@graphql-tools/load-files": "^6.5.1",
     "@graphql-tools/merge": "^8.2.0",
     "@graphql-tools/schema": "^8.3.0",
-    "@prisma/client": "^3.12.0",
+    "@prisma/client": "^4.2.0",
     "@sentry/integrations": "^6.19.7",
     "@sentry/node": "^6.19.6",
     "apollo-server-core": "^3.4.0",
@@ -78,7 +78,7 @@
     "date-fns": "^2.14.0",
     "dd-trace": "^1.5.0",
     "decimal.js-light": "^2.5.1",
-    "exceljs": "^4.1.0",
+    "exceljs": "^4.3.0",
     "express": "^4.17.1",
     "express-rate-limit": "^5.5.0",
     "express-session": "^1.17.2",
@@ -105,7 +105,7 @@
     "passport-oauth2-client-password": "^0.1.2",
     "pg": "^8.5.1",
     "postgres-migrations": "^5.1.0",
-    "prisma": "^3.12.0",
+    "prisma": "^4.2.0",
     "qrcode": "^1.4.4",
     "rate-limit-redis": "^2.1.0",
     "react": "^17.0.2",
@@ -135,7 +135,7 @@
     "@types/express-serve-static-core": "^4.17.24",
     "@types/express-session": "^1.17.4",
     "@types/ioredis": "^4.0.21",
-    "@types/jest": "^25.2.3",
+    "@types/jest": "^28.1.6",
     "@types/mustache": "^4.1.1",
     "@types/node": "^14.14.25",
     "@types/node-mailjet": "^3.3.4",
@@ -171,7 +171,7 @@
     "superagent-mock": "^4.0.0",
     "supertest": "^6.1.6",
     "ts-eager": "^2.0.2",
-    "ts-jest": "^28.0.1",
+    "ts-jest": "^28.0.7",
     "ts-node": "^10.4.0",
     "type-fest": "^2.5.1",
     "typescript": "^4.6.4",

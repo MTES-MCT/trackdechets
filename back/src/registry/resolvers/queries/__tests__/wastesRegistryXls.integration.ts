@@ -147,9 +147,7 @@ describe("query { wastesRegistryXls }", () => {
       req.pipe(writeStream);
 
       await new Promise<void>(resolve => {
-        req.on("end", async () => {
-          resolve();
-        });
+        req.on("end", resolve);
       });
 
       const workbook = new Excel.Workbook();

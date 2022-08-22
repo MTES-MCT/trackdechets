@@ -28,9 +28,9 @@ export const wastesRegistryXlsDownloadHandler: DownloadHandler<QueryWastesRegist
 
       const filename = getRegistryFileName(args.registryType, args.sirets);
       res.set("Content-Disposition", `attachment; filename=${filename}.xlsx`);
-      const contenType =
+      const contentType =
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-      res.set("Content-Type", contenType);
+      res.set("Content-Type", contentType);
       res.set("Transfer-Encoding", "chunked");
       const workbook = new Excel.stream.xlsx.WorkbookWriter({
         stream: res
