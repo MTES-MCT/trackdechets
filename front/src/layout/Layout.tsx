@@ -3,6 +3,8 @@ import { gql, useQuery } from "@apollo/client";
 import { Query } from "generated/graphql/types";
 import Header from "./Header";
 
+import sandboxIcon from "./assets/code-sandbox.svg";
+
 interface AuthProps {
   isAuthenticated: boolean;
   isAdmin: boolean;
@@ -40,10 +42,13 @@ export default function Layout({
       )}
       {VITE_WARNING_MESSAGE && (
         <div
-          className="notification notification--error tw-text-center"
+          className="notification notification--platform tw-text-center"
           style={{ borderRadius: 0, border: 0, margin: 0 }}
         >
-          {VITE_WARNING_MESSAGE}
+          <img src={sandboxIcon} alt="" />
+          <div
+            dangerouslySetInnerHTML={{ __html: VITE_WARNING_MESSAGE as string }}
+          ></div>
         </div>
       )}
       {data?.warningMessage && (

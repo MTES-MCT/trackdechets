@@ -2,6 +2,7 @@ module.exports = {
   moduleDirectories: ["node_modules", "src"],
   moduleNameMapper: {
     "^.+\\.(css|less|scss)$": "identity-obj-proxy",
+    "^.+.(svg)$": "jest-transform-stub",
   },
   testEnvironment: "jsdom",
   setupFilesAfterEnv: [
