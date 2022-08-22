@@ -1,0 +1,24 @@
+# This file is maintained automatically by "terraform init".
+# Manual edits may be lost in future updates.
+
+provider "registry.terraform.io/scalingo/scalingo" {
+  version     = "0.5.2"
+  constraints = "0.5.2"
+  hashes = [
+    "h1:sa7NbB7boEgQ0dd030FQM+4YodJvoqFlBEYx2Oim+RI=",
+    "zh:07110a32a795ec511cea71d3544b8cda598600b15e2e82ab7263e0d820931d62",
+    "zh:0bb0fe3fc1ec64eb3821cb67c28bbb630622e97f043591600d3e3b69315f938d",
+    "zh:3de8adef773fd73805a19ab2467a1661505fa80a4b1f38e2ceca3204be84660a",
+    "zh:3e4109c789abf78062fd3c660bf5d561b55ff9130a9aa577568f7f94c604d7da",
+    "zh:542d9f0c282be4730f2440683440712b420c71787a7d1bae642e32067dcbfed5",
+    "zh:5c3beb01e4b6f6d7da897caab201d5878ed4b46afb1e26bacb7838eca8872c90",
+    "zh:72606b851c4d5ff2841c42cd43d912426c3782a73027218c8a2df369d468a006",
+    "zh:774f6b5197184822335e655c8c16429d038cdd184a9f7a75b264f31a3b7e7647",
+    "zh:8202e45c4120a3d0dfb7ed2356e21e55c0104c2f0ee857e367102be65f46a3dd",
+    "zh:88493fb36af199cca47b1da19d318689ea4b94f803d08e3eb421995ae58b9203",
+    "zh:92d8623d11cfe42e6b9300d9659d7eb53d12b50298907485c1d0dd419f6b7068",
+    "zh:c9339324ee7e7863100ddf254716493b783ea1d82ace464c31933abb85d50d10",
+    "zh:e93d00187922e5d4d8cf6fd090505cbd41234c9702a686e431d9e495ef1e7dd3",
+    "zh:f034d8fafe0d76158292979055f0898c3a5ef00b6bc0bae8ff9a129b728f0215",
+  ]
+}
