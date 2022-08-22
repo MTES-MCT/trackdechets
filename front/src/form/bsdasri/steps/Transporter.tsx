@@ -108,8 +108,11 @@ export default function Transporter({
             "field-emphasis": transportEmphasis,
           })}
         >
+          <h4 className="form__section-heading">
+            Remise à l'installation destinataire
+          </h4>
           <label>
-            Date de remise à l'installation destinataire (optionnel)
+            Date de remise (optionnel)
             <div className="td-date-wrapper">
               <Field
                 name="transporter.transport.handedOverAt"
