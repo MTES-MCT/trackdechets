@@ -59,6 +59,7 @@ export default function PasswordReset() {
   if (queryError) {
     return <NotificationError apolloError={queryError} />;
   }
+
   if (!queryData?.passwordResetRequest) {
     return (
       <section className="section section-white">
@@ -76,6 +77,7 @@ export default function PasswordReset() {
       </section>
     );
   }
+
   if (mutationData) {
     return <PasswordChangedSuccess />;
   }

@@ -28,16 +28,13 @@ const BsvhuFormContainer = lazy(() => import("form/bsvhu/FormContainer"));
 const BsffFormContainer = lazy(() => import("form/bsff/FormContainer"));
 const BsdasriFormContainer = lazy(() => import("form/bsdasri/FormContainer"));
 const BsdaFormContainer = lazy(() => import("form/bsda/FormContainer"));
-const SignupInfo = lazy(() => import("login/SignupInfos"));
 const WasteSelector = lazy(() => import("login/WasteSelector"));
 
-const Invite = lazy(() => import("login/Invite.new"));
-const PasswordResetRequest = lazy(() =>
-  import("login/PasswordResetRequest.new")
-);
+const Invite = lazy(() => import("login/Invite"));
+const PasswordResetRequest = lazy(() => import("login/PasswordResetRequest"));
 const PasswordReset = lazy(() => import("login/PasswordReset"));
-const Login = lazy(() => import("login/Login.new"));
-const Signup = lazy(() => import("login/Signup.new"));
+const Login = lazy(() => import("login/Login"));
+const Signup = lazy(() => import("login/Signup"));
 const Dialog = lazy(() => import("oauth2/Dialog"));
 const Company = lazy(() => import("company/Company"));
 const WasteTree = lazy(() => import("search/WasteTree"));
@@ -121,10 +118,6 @@ export default withRouter(function LayoutContainer({ history }) {
 
               <Route exact path={routes.signup.details}>
                 <WasteSelector />
-              </Route>
-
-              <Route exact path={routes.signup.activation}>
-                <SignupInfo />
               </Route>
 
               <Route exact path={routes.passwordResetRequest}>
