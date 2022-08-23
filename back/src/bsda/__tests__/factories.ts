@@ -1,13 +1,19 @@
 import { BsdaConsistence, BsdaType, Prisma } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
+import { upsertBaseSiret } from "../../__tests__/factories";
 
 export const bsdaFactory = async ({
   opt = {}
 }: {
   opt?: Partial<Prisma.BsdaCreateInput>;
 }) => {
-  const formParams = { ...getBsdaObject(), ...opt };
+  const bsdaObject = getBsdaObject();
+
+  await upsertBaseSiret(bsdaObject.transporterCompanySiret);
+  await upsertBaseSiret(bsdaObject.destinationCompanySiret);
+
+  const formParams = { ...bsdaObject, ...opt };
   return prisma.bsda.create({
     data: {
       ...formParams

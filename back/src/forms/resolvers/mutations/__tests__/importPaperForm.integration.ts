@@ -36,7 +36,14 @@ describe("mutation / importPaperForm", () => {
   describe("import a BSD from scratch", () => {
     afterEach(resetDatabase);
 
-    function getImportPaperFormInput(): ImportPaperFormInput {
+    async function getImportPaperFormInput(): Promise<ImportPaperFormInput> {
+      const { company: transporterCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+
       const input = {
         customId: "customId",
         emitter: {
@@ -54,7 +61,7 @@ describe("mutation / importPaperForm", () => {
           processingOperation: "R 1",
           cap: "It's a cap",
           company: {
-            siret: "98017829178192",
+            siret: recipientCompany.siret,
             name: "Destination",
             address: "Somewhere",
             phone: "0000000000",
@@ -65,7 +72,7 @@ describe("mutation / importPaperForm", () => {
         transporter: {
           isExemptedOfReceipt: true,
           company: {
-            siret: "09167289178291",
+            siret: transporterCompany.siret,
             name: "Transporteur",
             address: "Somewhere",
             phone: "0000000000",
@@ -108,7 +115,7 @@ describe("mutation / importPaperForm", () => {
       const { errors } = await mutate<Pick<Mutation, "importPaperForm">>(
         IMPORT_PAPER_FORM,
         {
-          variables: { input: getImportPaperFormInput() }
+          variables: { input: await getImportPaperFormInput() }
         }
       );
       expect(errors).toHaveLength(1);
@@ -120,7 +127,7 @@ describe("mutation / importPaperForm", () => {
 
       const { mutate } = makeClient(user);
 
-      const input = getImportPaperFormInput();
+      const input = await getImportPaperFormInput();
       input.recipient.company.siret = company.siret;
 
       const { data } = await mutate<Pick<Mutation, "importPaperForm">>(
@@ -139,7 +146,7 @@ describe("mutation / importPaperForm", () => {
 
       const { mutate } = makeClient(user);
 
-      const input = getImportPaperFormInput();
+      const input = await getImportPaperFormInput();
 
       const { errors } = await mutate<Pick<Mutation, "importPaperForm">>(
         IMPORT_PAPER_FORM,
@@ -159,7 +166,7 @@ describe("mutation / importPaperForm", () => {
 
       const { mutate } = makeClient(user);
 
-      const input = getImportPaperFormInput();
+      const input = await getImportPaperFormInput();
       input.recipient.company.siret = company.siret;
       // invalidate input
       input.emitter.type = null;
@@ -189,7 +196,7 @@ describe("mutation / importPaperForm", () => {
 
       const { mutate } = makeClient(user);
 
-      const input = getImportPaperFormInput();
+      const input = await getImportPaperFormInput();
       input.emitter.type = "OTHER";
       input.recipient.company.siret = company.siret;
       input.ecoOrganisme = {
@@ -221,7 +228,7 @@ describe("mutation / importPaperForm", () => {
 
       const { mutate } = makeClient(user);
 
-      const input = getImportPaperFormInput();
+      const input = await getImportPaperFormInput();
       input.emitter.type = "OTHER";
       input.recipient.company.siret = company.siret;
       input.ecoOrganisme = {
@@ -255,7 +262,7 @@ describe("mutation / importPaperForm", () => {
         const signedAt = new Date("2021-01-03");
         const processedAt = new Date("2021-01-04");
 
-        const input = getImportPaperFormInput();
+        const input = await getImportPaperFormInput();
         input.recipient.company.siret = company.siret;
         input.signingInfo.sentAt = format(sentAt, f) as any;
         input.receivedInfo.receivedAt = format(receivedAt, f) as any;
@@ -288,7 +295,7 @@ describe("mutation / importPaperForm", () => {
 
       const { mutate } = makeClient(user);
 
-      const input = getImportPaperFormInput();
+      const input = await getImportPaperFormInput();
       input.recipient.company.siret = company.siret;
       input.processedInfo.processingOperationDone = "D 13";
       input.processedInfo.nextDestination = {
@@ -319,7 +326,7 @@ describe("mutation / importPaperForm", () => {
 
       const { mutate } = makeClient(user);
 
-      const input = getImportPaperFormInput();
+      const input = await getImportPaperFormInput();
       input.recipient.company.siret = company.siret;
       input.processedInfo.noTraceability = true;
       input.processedInfo.processingOperationDone = "R 13";
@@ -350,39 +357,48 @@ describe("mutation / importPaperForm", () => {
   describe("update an existing BSD with imported data", () => {
     afterEach(resetDatabase);
 
-    const baseData: Partial<Form> = {
-      status: "SEALED",
-      emitterType: "PRODUCER",
-      emitterCompanySiret: "98767567182671",
-      emitterCompanyName: "Émetteur",
-      emitterCompanyAddress: "Somewhere",
-      emitterCompanyPhone: "0000000000",
-      emitterCompanyContact: "Mr Émetteur",
-      emitterCompanyMail: "emtteur@trackdechets.fr",
-      recipientProcessingOperation: "R 1",
-      recipientCompanySiret: "52156984789632",
-      recipientCompanyName: "Destination",
-      recipientCompanyAddress: "Somewhere",
-      recipientCompanyPhone: "0000000000",
-      recipientCompanyContact: "Mr Destination",
-      recipientCompanyMail: "recipient@trackdechets.fr",
-      recipientCap: "it's a CAP",
-      transporterIsExemptedOfReceipt: true,
-      transporterCompanySiret: "09167289178291",
-      transporterCompanyName: "Transporteur",
-      transporterCompanyAddress: "Somewhere",
-      transporterCompanyPhone: "0000000000",
-      transporterCompanyContact: "Mr Transporteur",
-      transporterCompanyMail: "trasnporteur@trackdechets.fr",
-      wasteDetailsCode: "01 03 04*",
-      wasteDetailsQuantity: 1.0,
-      wasteDetailsQuantityType: "ESTIMATED",
-      wasteDetailsPackagingInfos: [{ type: "BENNE", quantity: 1 }],
-      wasteDetailsConsistence: "SOLID",
-      wasteDetailsPop: false,
-      wasteDetailsIsDangerous: true,
-      wasteDetailsOnuCode: "ONU"
-    };
+    async function getBaseData(): Promise<Partial<Form>> {
+      const { company: transporterCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+
+      return {
+        status: "SEALED",
+        emitterType: "PRODUCER",
+        emitterCompanySiret: "98767567182671",
+        emitterCompanyName: "Émetteur",
+        emitterCompanyAddress: "Somewhere",
+        emitterCompanyPhone: "0000000000",
+        emitterCompanyContact: "Mr Émetteur",
+        emitterCompanyMail: "emtteur@trackdechets.fr",
+        recipientProcessingOperation: "R 1",
+        recipientCompanySiret: recipientCompany.siret,
+        recipientCompanyName: "Destination",
+        recipientCompanyAddress: "Somewhere",
+        recipientCompanyPhone: "0000000000",
+        recipientCompanyContact: "Mr Destination",
+        recipientCompanyMail: "recipient@trackdechets.fr",
+        recipientCap: "it's a CAP",
+        transporterIsExemptedOfReceipt: true,
+        transporterCompanySiret: transporterCompany.siret,
+        transporterCompanyName: "Transporteur",
+        transporterCompanyAddress: "Somewhere",
+        transporterCompanyPhone: "0000000000",
+        transporterCompanyContact: "Mr Transporteur",
+        transporterCompanyMail: "trasnporteur@trackdechets.fr",
+        wasteDetailsCode: "01 03 04*",
+        wasteDetailsQuantity: 1.0,
+        wasteDetailsQuantityType: "ESTIMATED",
+        wasteDetailsPackagingInfos: [{ type: "BENNE", quantity: 1 }],
+        wasteDetailsConsistence: "SOLID",
+        wasteDetailsPop: false,
+        wasteDetailsIsDangerous: true,
+        wasteDetailsOnuCode: "ONU"
+      };
+    }
 
     const importedData: ImportPaperFormInput = {
       signingInfo: {
@@ -409,7 +425,7 @@ describe("mutation / importPaperForm", () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
       const formCreateInput: Prisma.FormCreateInput = {
-        ...baseData,
+        ...(await getBaseData()),
         readableId: getReadableId(),
         owner: {
           connect: { id: owner.id }
@@ -499,7 +515,7 @@ describe("mutation / importPaperForm", () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
       const formCreateInput: Prisma.FormCreateInput = {
-        ...baseData,
+        ...(await getBaseData()),
         readableId: getReadableId(),
         owner: {
           connect: { id: owner.id }
@@ -541,7 +557,7 @@ describe("mutation / importPaperForm", () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
       const formCreateInput: Prisma.FormCreateInput = {
-        ...baseData,
+        ...(await getBaseData()),
         readableId: getReadableId(),
         owner: {
           connect: { id: owner.id }
@@ -578,7 +594,7 @@ describe("mutation / importPaperForm", () => {
       const user = await userFactory();
 
       const formCreateInput: Prisma.FormCreateInput = {
-        ...baseData,
+        ...(await getBaseData()),
         readableId: getReadableId(),
         owner: {
           connect: { id: owner.id }
@@ -614,7 +630,7 @@ describe("mutation / importPaperForm", () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
       const formCreateInput: Prisma.FormCreateInput = {
-        ...baseData,
+        ...(await getBaseData()),
         readableId: getReadableId(),
         owner: {
           connect: { id: owner.id }
@@ -656,7 +672,7 @@ describe("mutation / importPaperForm", () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
       const formCreateInput: Prisma.FormCreateInput = {
-        ...baseData,
+        ...(await getBaseData()),
         readableId: getReadableId(),
         owner: {
           connect: { id: owner.id }
@@ -699,7 +715,7 @@ describe("mutation / importPaperForm", () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
       const formCreateInput: Prisma.FormCreateInput = {
-        ...baseData,
+        ...(await getBaseData()),
         readableId: getReadableId(),
         owner: {
           connect: { id: owner.id }
@@ -749,7 +765,7 @@ describe("mutation / importPaperForm", () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
       const formCreateInput: Prisma.FormCreateInput = {
-        ...baseData,
+        ...(await getBaseData()),
         readableId: getReadableId(),
         owner: {
           connect: { id: owner.id }

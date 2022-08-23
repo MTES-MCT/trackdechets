@@ -3,7 +3,10 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
 import { expandFormFromDb, flattenFormInput } from "../../form-converter";
 import { checkCanMarkAsResealed } from "../../permissions";
-import { checkCompaniesType, sealedFormSchema } from "../../validation";
+import {
+  validateForwardedInCompanies,
+  sealedFormSchema
+} from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import {
@@ -63,7 +66,7 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     ...updateInput
   });
 
-  await checkCompaniesType(form);
+  await validateForwardedInCompanies(form);
 
   const formUpdateInput: Prisma.FormUpdateInput =
     forwardedIn === null

@@ -40,8 +40,7 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
   ({ prisma, user }) =>
   async ({ form, appendix2 }) => {
     const findAppendix2FormsById = buildFindAppendix2FormsById({
-      prisma,
-      user
+      prisma
     });
 
     const currentAppendix2Forms = await findAppendix2FormsById(form.id);

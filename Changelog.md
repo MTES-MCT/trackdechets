@@ -33,6 +33,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :boom: Breaking changes
 
+- Ajout de restrictions sur le SIRET visé comme émetteur ou destinataire d'un BSDD. Si l'un de ces acteurs n'est pas inscrit sur Trackdéchets, la création du bordereau est désormais impossible [PR 1451](https://github.com/MTES-MCT/trackdechets/pull/1451)
+
 #### :nail_care: Améliorations
 
 - Ajout d'un bouton pour charger plus de bordereaux dans le composant de sélection des annexes BSDA [PR 1592](https://github.com/MTES-MCT/trackdechets/pull/1599)

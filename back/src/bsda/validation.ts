@@ -2,6 +2,7 @@ import {
   Bsda,
   BsdaStatus,
   BsdaType,
+  CompanyVerificationStatus,
   Prisma,
   TransportMode,
   WasteAcceptationStatus
@@ -16,6 +17,12 @@ import {
 } from "../common/constants/companySearchHelpers";
 import { FactorySchemaOf } from "../common/yup/configureYup";
 import {
+  isCollector,
+  isTransporter,
+  isWasteCenter,
+  isWasteProcessor
+} from "../companies/validation";
+import {
   INVALID_SIRET_LENGTH,
   INVALID_WASTE_CODE,
   MISSING_COMPANY_ADDRESS,
@@ -28,6 +35,7 @@ import {
 import { BsdaConsistence } from "../generated/graphql/types";
 import prisma from "../prisma";
 
+const { VERIFY_COMPANY } = process.env;
 export const PARTIAL_OPERATIONS = ["R 13", "D 15"];
 export const OPERATIONS = ["R 5", "D 5", "D 9", ...PARTIAL_OPERATIONS];
 type Emitter = Pick<
@@ -421,6 +429,42 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         .requiredIf(
           context.emissionSignature,
           `Entreprise de destination: ${MISSING_COMPANY_SIRET}`
+        )
+        .test(
+          "is-recipient-registered-with-right-profile",
+          ({ value }) =>
+            `L'installation de destination avec le SIRET ${value} n'est pas inscrite sur Trackdéchets`,
+          async (siret, ctx) => {
+            if (!siret) return true;
+
+            const company = await prisma.company.findUnique({
+              where: { siret }
+            });
+            if (!company) {
+              return false;
+            }
+
+            if (
+              !isCollector(company) &&
+              !isWasteProcessor(company) &&
+              !isWasteCenter(company)
+            ) {
+              throw ctx.createError({
+                message: `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${siret}" n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement, de tri transit regroupement ou déchetterie. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+              });
+            }
+
+            if (
+              VERIFY_COMPANY === "true" &&
+              company.verificationStatus !== CompanyVerificationStatus.VERIFIED
+            ) {
+              throw ctx.createError({
+                message: `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau bordereau.`
+              });
+            }
+
+            return true;
+          }
         ),
       destinationCompanyAddress: yup
         .string()
@@ -680,7 +724,30 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
                   `Transporteur: ${MISSING_COMPANY_SIRET}`
                 );
             })
-        }),
+        })
+        .test(
+          "is-transporter-registered-with-right-profile",
+          ({ value }) =>
+            `Le transporteur qui a été renseigné sur le bordereau (SIRET: ${value}) n'est pas inscrit sur Trackdéchets`,
+          async (siret, ctx) => {
+            if (!siret) return true;
+
+            const company = await prisma.company.findUnique({
+              where: { siret }
+            });
+            if (!company) {
+              return false;
+            }
+
+            if (!isTransporter(company)) {
+              throw ctx.createError({
+                message: `Le transporteur saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+              });
+            }
+
+            return true;
+          }
+        ),
       transporterCompanyVatNumber: yup
         .string()
         .ensure()
