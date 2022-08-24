@@ -1,9 +1,7 @@
 import axios from "axios";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { CompanyType } from "@prisma/client";
-import { mailQueue } from "../../queue/producers/mail";
-import { sendMailJob } from "../../queue/jobs/sendmail";
-import * as mailing from "../../mailer/mailing";
+import * as producer from "../../queue/producers/mail";
 import { backend } from "../../mailer";
 
 import {
@@ -16,20 +14,21 @@ import prisma from "../../prisma";
 
 // Intercept calls
 const mockedSendMailBackend = jest.spyOn(backend, "sendMail");
-const mockedSendMailSync = jest.spyOn(mailing, "sendMailSync");
+// Simulate queue error in order to test with sendMailSync
+const mockAddToMailQueue = jest.spyOn(producer, "addToMailQueue");
+mockAddToMailQueue.mockRejectedValue(
+  new Error("any queue error to bypass job queue and sendmail synchronously")
+);
 // Integration tests EMAIL_BACKEND is supposed to use axios.
 const mockedAxiosPost = jest.spyOn(axios, "post");
 mockedAxiosPost.mockResolvedValue(null);
-// test job worker attached to the queue singleton
-mailQueue.process(sendMailJob);
 
 describe("sendOnboardingFirstStepMails", () => {
   afterEach(resetDatabase);
   beforeEach(() => {
     mockedAxiosPost.mockClear();
     mockedSendMailBackend.mockClear();
-    mockedSendMailSync.mockClear();
-    return mailQueue.clean(1000);
+    mockAddToMailQueue.mockClear();
   });
 
   it("should send a request to mail service for onboarding first step", async () => {
@@ -48,9 +47,7 @@ describe("sendOnboardingFirstStepMails", () => {
     await userFactory({ firstAssociationDate: twoDaysAgo });
 
     await sendFirstOnboardingEmail();
-    // test the job is completed
-    const jobs = await mailQueue.getCompleted();
-    expect(jobs.length).toEqual(1);
+
     expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
     expect(mockedAxiosPost).toHaveBeenCalledWith(
       "http://mailservice/smtp/email",
@@ -73,11 +70,12 @@ describe("sendOnboardingFirstStepMails", () => {
 
         cc: undefined
       },
-
-      {
-        headers: { "Content-Type": "application/json", "api-key": undefined },
+      expect.objectContaining({
+        headers: {
+          "Content-Type": "application/json",
+        },
         timeout: 5000
-      }
+      })
     );
   });
 });
@@ -87,8 +85,7 @@ describe("sendOnboardingSecondStepMails", () => {
   beforeEach(() => {
     mockedAxiosPost.mockClear();
     mockedSendMailBackend.mockClear();
-    mockedSendMailSync.mockClear();
-    return mailQueue.clean(1000);
+    mockAddToMailQueue.mockClear();
   });
   it.each([1, 2, 4])(
     "should not send any mail request for onboarding second step (users created %p days ago)",
@@ -174,11 +171,12 @@ describe("sendOnboardingSecondStepMails", () => {
 
         cc: undefined
       },
-
-      {
-        headers: { "Content-Type": "application/json", "api-key": undefined },
+      expect.objectContaining({
+        headers: {
+          "Content-Type": "application/json"
+        },
         timeout: 5000
-      }
+      })
     );
   });
 
@@ -204,9 +202,7 @@ describe("sendOnboardingSecondStepMails", () => {
     );
 
     await sendSecondOnboardingEmail();
-    // test the job is completed
-    const jobs = await mailQueue.getCompleted();
-    expect(jobs.length).toEqual(1);
+
     expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
     expect(mockedAxiosPost).toHaveBeenCalledWith(
       "http://mailservice/smtp/email",
@@ -230,11 +226,12 @@ describe("sendOnboardingSecondStepMails", () => {
 
         cc: undefined
       },
-
-      {
-        headers: { "Content-Type": "application/json", "api-key": undefined },
+      expect.objectContaining({
+        headers: {
+          "Content-Type": "application/json",
+        },
         timeout: 5000
-      }
+      })
     );
   });
 });
