@@ -12,7 +12,7 @@ export const indexQueue = new Queue<BsdElastic>(
     defaultJobOptions: {
       attempts: 3,
       backoff: { type: "exponential", delay: 100 },
-      removeOnComplete: true,
+      removeOnComplete: 100,
       timeout: 10000
     }
   }
@@ -24,7 +24,8 @@ export const updatesQueue = new Queue<BsdUpdateQueueItem>(
   REDIS_URL,
   {
     defaultJobOptions: {
-      delay: INDEX_REFRESH_INTERVAL // We delay processing to make sure updates have been refreshed in ES
+      delay: INDEX_REFRESH_INTERVAL, // We delay processing to make sure updates have been refreshed in ES
+      removeOnComplete: 100
     }
   }
 );
@@ -33,6 +34,12 @@ indexQueue.on("completed", job => {
   const { sirets, id } = job.data;
 
   updatesQueue.add({ sirets, id });
+});
+
+indexQueue.on("failed", (job, err) => {
+  const { id } = job.data;
+
+  console.error(`Indexation job failed for bsd "${id}"`, { id, err });
 });
 
 export async function addToIndexQueue(
