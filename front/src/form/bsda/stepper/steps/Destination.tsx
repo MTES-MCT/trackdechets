@@ -195,7 +195,6 @@ export function Destination({ disabled }) {
               disabled={disabled}
               name="destination.company"
               heading="Installation de transit ou de groupement"
-              optional={true}
               registeredOnlyCompanies={true}
             />
 
