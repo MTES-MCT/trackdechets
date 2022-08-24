@@ -17,17 +17,37 @@ export function Destination({ disabled }) {
     // - when it's a "simple" bsda, `destination.company` is displayed at the top
     // - otherwise, `destination.operation.nextDestination` is displayed first
     if (hasNextDestination) {
-      const nextDestination =
-        values.destination?.operation?.nextDestination?.company;
-      setFieldValue("destination.operation.nextDestination", null);
-      setFieldValue("destination.company", nextDestination, false);
-    } else {
-      const destination = values.destination?.company;
-      setFieldValue("destination.company", getInitialCompany(), false);
+      const { company, cap, plannedOperationCode } =
+        values.destination?.operation?.nextDestination ?? {};
       setFieldValue(
-        "destination.operation.nextDestination",
+        "destination",
         {
-          company: destination,
+          company,
+          cap,
+          plannedOperationCode,
+          operation: {
+            ...values.destination?.operation,
+            nextDestination: null,
+          },
+        },
+        false
+      );
+    } else {
+      const { company, cap, plannedOperationCode } = values.destination ?? {};
+      setFieldValue(
+        "destination",
+        {
+          company: getInitialCompany(),
+          cap: "",
+          plannedOperationCode: "",
+          operation: {
+            ...values.destination?.operation,
+            nextDestination: {
+              company,
+              cap,
+              plannedOperationCode,
+            },
+          },
         },
         false
       );
@@ -174,6 +194,7 @@ export function Destination({ disabled }) {
               disabled={disabled}
               name="destination.company"
               heading="Installation de transit ou de groupement"
+              optional={true}
             />
 
             <div className="form__row">
