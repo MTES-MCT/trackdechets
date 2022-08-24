@@ -36,6 +36,12 @@ indexQueue.on("completed", job => {
   updatesQueue.add({ sirets, id });
 });
 
+indexQueue.on("failed", (job, err) => {
+  const { id } = job.data;
+
+  console.error(`Indexation job failed for bsd "${id}"`, { id, err });
+});
+
 export async function addToIndexQueue(
   jobData: BsdElastic,
   options?: JobOptions
