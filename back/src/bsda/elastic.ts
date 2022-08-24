@@ -123,7 +123,7 @@ function getWhere(
   return where;
 }
 
-function toBsdElastic(bsda: Bsda): BsdElastic {
+export function toBsdElastic(bsda: Bsda): BsdElastic {
   const where = getWhere(bsda);
 
   return {

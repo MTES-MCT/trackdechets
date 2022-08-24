@@ -5,7 +5,7 @@ import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { BsffPackaging } from "../generated/graphql/types";
 
-function toBsdElastic(
+export function toBsdElastic(
   bsff: Bsff & { packagings: BsffPackaging[] }
 ): BsdElastic {
   const bsd = {
