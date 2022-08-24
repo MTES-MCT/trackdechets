@@ -113,6 +113,7 @@ export function Destination({ disabled }) {
               : "destination.company"
           }
           heading="Installation de destination finale (exutoire)"
+          registeredOnlyCompanies={true}
         />
       )}
 
@@ -195,6 +196,7 @@ export function Destination({ disabled }) {
               name="destination.company"
               heading="Installation de transit ou de groupement"
               optional={true}
+              registeredOnlyCompanies={true}
             />
 
             <div className="form__row">
