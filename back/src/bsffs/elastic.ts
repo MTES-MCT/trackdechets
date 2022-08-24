@@ -21,6 +21,7 @@ function toBsdElastic(
     transporterTakenOverAt:
       bsff.transporterTransportTakenOverAt?.getTime() ??
       bsff.transporterTransportSignatureDate?.getTime(),
+    transporterCustomInfo: bsff.transporterCustomInfo ?? "",
     destinationCompanyName: bsff.destinationCompanyName ?? "",
     destinationCompanySiret: bsff.destinationCompanySiret ?? "",
     destinationReceptionDate: bsff.destinationReceptionDate?.getTime(),

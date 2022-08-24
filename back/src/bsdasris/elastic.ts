@@ -128,6 +128,7 @@ function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
     transporterCompanyName: bsdasri.transporterCompanyName ?? "",
     transporterCompanySiret: bsdasri.transporterCompanySiret ?? "",
     transporterTakenOverAt: bsdasri.transporterTakenOverAt?.getTime(),
+    transporterCustomInfo: bsdasri.transporterCustomInfo ?? "",
     destinationCompanyName: bsdasri.destinationCompanyName ?? "",
     destinationCompanySiret: bsdasri.destinationCompanySiret ?? "",
     destinationReceptionDate: bsdasri.destinationReceptionDate?.getTime(),
