@@ -15,6 +15,7 @@ export interface BsffFragment {
       siret?: string;
       name?: string;
     };
+    customInfo?: string;
   };
   bsffDestination?: {
     company?: {

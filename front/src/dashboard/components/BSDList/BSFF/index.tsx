@@ -7,6 +7,7 @@ import { ActionButtonContext } from "common/components/ActionButton";
 import { WorkflowAction } from "./WorkflowAction";
 import { useParams } from "react-router-dom";
 import { bsffVerboseStatuses } from "form/bsff/utils/constants";
+import { UpdateTransporterCustomInfo } from "./BsffActions/UpdateTransporterCustomInfo";
 
 export const COLUMNS: Record<
   string,
@@ -58,8 +59,13 @@ export const COLUMNS: Record<
       [bsff.waste?.code, bsff.waste?.description].filter(Boolean).join(" "),
   },
   transporterCustomInfo: {
-    accessor: () => null,
-    Cell: () => null,
+    accessor: bsff => bsff.bsffTransporter?.customInfo ?? "",
+    Cell: ({ value, row }) => (
+      <>
+        <span style={{ marginRight: "0.5rem" }}>{value}</span>
+        <UpdateTransporterCustomInfo bsff={row.original} />
+      </>
+    ),
   },
   transporterNumberPlate: {
     accessor: () => null,

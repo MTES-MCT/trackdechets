@@ -6,7 +6,7 @@ import { ActionButtonContext } from "common/components/ActionButton";
 import { BSDDActions } from "dashboard/components/BSDList/BSDD/BSDDActions/BSDDActions";
 import { IconBSDD } from "common/components/Icons";
 import { statusLabels } from "../../../constants";
-import TransporterInfoEdit from "../TransporterInfoEdit";
+import TransporterInfoEdit from "./TransporterInfoEdit";
 import { WorkflowAction } from "./WorkflowAction";
 
 export const COLUMNS: Record<
