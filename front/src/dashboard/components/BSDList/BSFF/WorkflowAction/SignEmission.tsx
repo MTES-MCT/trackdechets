@@ -89,9 +89,7 @@ function SignEmissionForm({ bsff, onCancel }: SignEmissionFormProps) {
               disabled={signBsffResult.loading}
             >
               <span>
-                {signBsffResult.loading
-                  ? "Signature en cours..."
-                  : "Signer l'enlèvement"}
+                {signBsffResult.loading ? "Signature en cours..." : "Signer"}
               </span>
             </button>
           </div>
@@ -107,7 +105,7 @@ interface SignEmissionProps {
 
 export function SignEmission({ bsffId }: SignEmissionProps) {
   return (
-    <SignBsff title="Signer l'enlèvement" bsffId={bsffId}>
+    <SignBsff title="Signature émetteur" bsffId={bsffId}>
       {({ bsff, onClose }) => (
         <SignEmissionForm bsff={bsff} onCancel={onClose} />
       )}
