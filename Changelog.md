@@ -11,6 +11,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Correction du filtre sur l'information libre transporteur pour les BSDASRI, BSDA et BSFF [PR 1623](https://github.com/MTES-MCT/trackdechets/pull/1623)
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations

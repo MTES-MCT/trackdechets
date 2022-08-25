@@ -115,7 +115,7 @@ function getWhere(
 /**
  * Convert a dasri from the bsdasri table to Elastic Search's BSD model.
  */
-function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
+export function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
   const where = getWhere(bsdasri);
 
   return {
@@ -128,6 +128,7 @@ function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
     transporterCompanyName: bsdasri.transporterCompanyName ?? "",
     transporterCompanySiret: bsdasri.transporterCompanySiret ?? "",
     transporterTakenOverAt: bsdasri.transporterTakenOverAt?.getTime(),
+    transporterCustomInfo: bsdasri.transporterCustomInfo ?? "",
     destinationCompanyName: bsdasri.destinationCompanyName ?? "",
     destinationCompanySiret: bsdasri.destinationCompanySiret ?? "",
     destinationReceptionDate: bsdasri.destinationReceptionDate?.getTime(),

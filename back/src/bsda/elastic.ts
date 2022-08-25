@@ -123,7 +123,7 @@ function getWhere(
   return where;
 }
 
-function toBsdElastic(bsda: Bsda): BsdElastic {
+export function toBsdElastic(bsda: Bsda): BsdElastic {
   const where = getWhere(bsda);
 
   return {
@@ -137,6 +137,8 @@ function toBsdElastic(bsda: Bsda): BsdElastic {
     transporterCompanyName: bsda.transporterCompanyName ?? "",
     transporterCompanySiret: bsda.transporterCompanySiret ?? "",
     transporterTakenOverAt: bsda.transporterTransportTakenOverAt?.getTime(),
+    transporterCustomInfo: bsda.transporterCustomInfo ?? "",
+    transporterNumberPlate: bsda.transporterTransportPlates,
     destinationCompanyName: bsda.destinationCompanyName ?? "",
     destinationCompanySiret: bsda.destinationCompanySiret ?? "",
     destinationReceptionDate: bsda.destinationReceptionDate?.getTime(),
