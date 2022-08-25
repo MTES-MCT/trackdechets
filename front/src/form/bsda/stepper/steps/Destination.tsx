@@ -105,34 +105,33 @@ export function Destination({ disabled }) {
           </div>
         </div>
       ) : (
-        <CompanySelector
-          disabled={disabled}
-          name={
-            hasNextDestination
-              ? "destination.operation.nextDestination.company"
-              : "destination.company"
-          }
-          heading="Installation de destination finale (exutoire)"
-          registeredOnlyCompanies={true}
-        />
-      )}
-
-      {!isDechetterie && (
-        <div className="form__row">
-          <label>
-            N° CAP:
-            <Field
-              disabled={disabled}
-              type="text"
-              name={
-                hasNextDestination
-                  ? "destination.operation.nextDestination.cap"
-                  : "destination.cap"
-              }
-              className="td-input td-input--medium"
-            />
-          </label>
-        </div>
+        <>
+          <CompanySelector
+            disabled={disabled}
+            name={
+              hasNextDestination
+                ? "destination.operation.nextDestination.company"
+                : "destination.company"
+            }
+            heading="Installation de destination finale (exutoire)"
+            registeredOnlyCompanies={true}
+          />
+          <div className="form__row">
+            <label>
+              N° CAP:
+              <Field
+                disabled={disabled}
+                type="text"
+                name={
+                  hasNextDestination
+                    ? "destination.operation.nextDestination.cap"
+                    : "destination.cap"
+                }
+                className="td-input td-input--medium"
+              />
+            </label>
+          </div>
+        </>
       )}
 
       <div className="form__row">
