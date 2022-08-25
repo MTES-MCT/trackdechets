@@ -71,6 +71,10 @@ function getWhere(
         setTab(siretsFilters, "destinationCompanySiret", "isForActionFor");
         break;
       }
+      if (bsda.emitterIsPrivateIndividual && bsda.workerIsDisabled) {
+        setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
+        break;
+      }
       if (
         bsda.workerWorkHasEmitterPaperSignature ||
         bsda.emitterIsPrivateIndividual

@@ -25,11 +25,14 @@ export default function FormContainer() {
       <div className="container">
         <StepList formId={id} initialStep={initialStep}>
           {bsda => {
-            const emitterSigned =
-              bsda?.emitter?.emission?.signature?.author != null;
-            const workerSigned = bsda?.worker?.work?.signature?.author != null;
             const transporterSigned =
               bsda?.transporter?.transport?.signature?.author != null;
+            const workerSigned =
+              bsda?.worker?.work?.signature?.author != null ||
+              transporterSigned;
+            const emitterSigned =
+              bsda?.emitter?.emission?.signature?.author != null ||
+              workerSigned;
 
             return (
               <>

@@ -118,13 +118,14 @@ export default function Operation() {
             >
               <option value="...">Sélectionnez une valeur...</option>
               <option value="R 5">
-                R 5 - Recyclage ou récupération d'autres matières inorganiques.
+                R 5 - Recyclage ou récupération d'autres matières inorganiques
+                (dont vitrification)
               </option>
               <option value="D 5">
                 D 5 - Mise en décharge aménagée et autorisée en ISDD ou ISDND
               </option>
               <option value="D 9">
-                D 9 - Vitrification, traitement chimique ou prétraitement
+                D 9 - Traitement chimique ou prétraitement (dont vitrification)
               </option>
               <option value="R 13">
                 R 13 - Opérations de transit incluant le groupement sans
