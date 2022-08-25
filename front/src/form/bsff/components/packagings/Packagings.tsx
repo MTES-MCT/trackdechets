@@ -46,7 +46,7 @@ export default function BsffPackagings({
 
                       <div className="tw-w-1/4 tw-px-2">
                         <label>
-                          Volume
+                          Volume (en litres)
                           <Field
                             component={NumberInput}
                             className="td-input"
