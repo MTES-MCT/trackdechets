@@ -147,7 +147,7 @@ export function Destination({ disabled }) {
           disabled={disabled}
         >
           <option />
-          {isDechetterie ? (
+          {isDechetterie && !hasNextDestination ? (
             <>
               <option value="R 13">
                 R 13 - Opérations de transit incluant le groupement sans
