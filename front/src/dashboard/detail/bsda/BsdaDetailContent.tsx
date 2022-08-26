@@ -293,7 +293,7 @@ const NextDestination = ({
 }) => (
   <div className={styles.detailColumns}>
     <div className={styles.detailGrid}>
-      <dt>Courtier</dt>
+      <dt>Exutoire final</dt>
       <dd>{nextDestination.company?.name}</dd>
 
       <dt>Siret</dt>
