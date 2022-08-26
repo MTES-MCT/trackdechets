@@ -529,6 +529,7 @@ describe("Mutation.Bsda.sign", () => {
         opt: {
           status: "INITIAL",
           emitterIsPrivateIndividual: true,
+          emitterCompanySiret: null,
           workerIsDisabled: true,
           workerCompanySiret: null,
           workerCompanyName: null,
