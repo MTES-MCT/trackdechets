@@ -96,6 +96,7 @@ export const GET_BSDS = gql`
                 siret
                 name
               }
+              customInfo
             }
             bsffDestination: destination {
               company {

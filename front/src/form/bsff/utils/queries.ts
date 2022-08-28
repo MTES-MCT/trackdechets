@@ -57,6 +57,7 @@ export const FullBsffFragment = gql`
           date
         }
       }
+      customInfo
     }
     destination {
       company {
