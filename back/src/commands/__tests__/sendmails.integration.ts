@@ -72,7 +72,7 @@ describe("sendOnboardingFirstStepMails", () => {
       },
       expect.objectContaining({
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
         timeout: 5000
       })
@@ -228,7 +228,7 @@ describe("sendOnboardingSecondStepMails", () => {
       },
       expect.objectContaining({
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
         timeout: 5000
       })
