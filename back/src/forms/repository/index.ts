@@ -26,17 +26,23 @@ import {
 
 export type FormRepository = FormActions & FormRevisionRequestActions;
 
+export function getReadOnlyFormRepository() {
+  return {
+    findUnique: buildFindUniqueForm({ prisma }),
+    findFullFormById: buildFindFullFormById({ prisma }),
+    findAppendix2FormsById: buildFindAppendix2FormsById({ prisma }),
+    findForwardedInById: buildFindForwardedInById({ prisma }),
+    count: buildCountForms({ prisma })
+  };
+}
+
 export function getFormRepository(
   user: Express.User,
   transaction?: PrismaTransaction
 ): FormRepository {
   const formActions: FormActions = {
     // READ operations
-    findUnique: buildFindUniqueForm({ prisma, user }),
-    findFullFormById: buildFindFullFormById({ prisma, user }),
-    findAppendix2FormsById: buildFindAppendix2FormsById({ prisma, user }),
-    findForwardedInById: buildFindForwardedInById({ prisma, user }),
-    count: buildCountForms({ prisma, user }),
+    ...getReadOnlyFormRepository(),
     // WRITE OPERATIONS - wrapped into a transaction
     create: (...args) =>
       transaction

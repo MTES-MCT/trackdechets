@@ -185,7 +185,7 @@ export default function Recipient() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            la liste des installation classées.
+            la liste des installations classées.
           </a>
         </p>
       </div>

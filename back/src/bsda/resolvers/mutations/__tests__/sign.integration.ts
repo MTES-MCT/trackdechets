@@ -487,6 +487,74 @@ describe("Mutation.Bsda.sign", () => {
         })
       ]);
     });
+
+    it("should allow transporter to sign bsda signed by emitter only if worker is disabled", async () => {
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "SIGNED_BY_PRODUCER",
+          emitterEmissionSignatureAuthor: "Emétteur",
+          emitterEmissionSignatureDate: new Date(),
+          workerIsDisabled: true,
+          workerCompanySiret: null,
+          workerCompanyName: null,
+          transporterCompanySiret: transporter.company.siret,
+          transporterTransportMode: "ROAD",
+          transporterTransportPlates: ["AA-00-XX"]
+        }
+      });
+
+      const { mutate } = makeClient(transporter.user);
+      const { data } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "TRANSPORT",
+            author: transporter.user.name
+          }
+        }
+      });
+
+      expect(data.signBsda.id).toBeTruthy();
+    });
+
+    it("should allow transporter to sign an initial bsda if the emitter is a private individual and the worker is disabled", async () => {
+      const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+
+      const bsda = await bsdaFactory({
+        opt: {
+          status: "INITIAL",
+          emitterIsPrivateIndividual: true,
+          emitterCompanySiret: null,
+          workerIsDisabled: true,
+          workerCompanySiret: null,
+          workerCompanyName: null,
+          transporterCompanySiret: transporter.company.siret,
+          transporterTransportMode: "ROAD",
+          transporterTransportPlates: ["AA-00-XX"]
+        }
+      });
+
+      const { mutate } = makeClient(transporter.user);
+      const { data } = await mutate<
+        Pick<Mutation, "signBsda">,
+        MutationSignBsdaArgs
+      >(SIGN_BSDA, {
+        variables: {
+          id: bsda.id,
+          input: {
+            type: "TRANSPORT",
+            author: transporter.user.name
+          }
+        }
+      });
+
+      expect(data.signBsda.id).toBeTruthy();
+    });
   });
 
   describe("OPERATION", () => {

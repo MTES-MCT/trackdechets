@@ -71,6 +71,10 @@ function getWhere(
         setTab(siretsFilters, "destinationCompanySiret", "isForActionFor");
         break;
       }
+      if (bsda.emitterIsPrivateIndividual && bsda.workerIsDisabled) {
+        setTab(siretsFilters, "transporterCompanySiret", "isToCollectFor");
+        break;
+      }
       if (
         bsda.workerWorkHasEmitterPaperSignature ||
         bsda.emitterIsPrivateIndividual
@@ -82,7 +86,7 @@ function getWhere(
       break;
 
     case BsdaStatus.SIGNED_BY_PRODUCER:
-      if (bsda.type === "OTHER_COLLECTIONS") {
+      if (bsda.type === "OTHER_COLLECTIONS" && !bsda.workerIsDisabled) {
         setTab(siretsFilters, "workerCompanySiret", "isForActionFor");
       } else {
         // Bsda types GATHERING and RESHIPMENT do not expect worker signature,
@@ -123,11 +127,7 @@ function getWhere(
   return where;
 }
 
-function getWasteDescription(bsda: Bsda) {
-  return [bsda.wasteCode, bsda.wasteMaterialName].filter(Boolean).join(", ");
-}
-
-function toBsdElastic(bsda: Bsda): BsdElastic {
+export function toBsdElastic(bsda: Bsda): BsdElastic {
   const where = getWhere(bsda);
 
   return {
@@ -141,6 +141,8 @@ function toBsdElastic(bsda: Bsda): BsdElastic {
     transporterCompanyName: bsda.transporterCompanyName ?? "",
     transporterCompanySiret: bsda.transporterCompanySiret ?? "",
     transporterTakenOverAt: bsda.transporterTransportTakenOverAt?.getTime(),
+    transporterCustomInfo: bsda.transporterCustomInfo ?? "",
+    transporterNumberPlate: bsda.transporterTransportPlates,
     destinationCompanyName: bsda.destinationCompanyName ?? "",
     destinationCompanySiret: bsda.destinationCompanySiret ?? "",
     destinationReceptionDate: bsda.destinationReceptionDate?.getTime(),
@@ -148,7 +150,7 @@ function toBsdElastic(bsda: Bsda): BsdElastic {
     destinationOperationCode: bsda.destinationOperationCode ?? "",
     destinationOperationDate: bsda.destinationOperationDate?.getTime(),
     wasteCode: bsda.wasteCode ?? "",
-    wasteDescription: getWasteDescription(bsda),
+    wasteDescription: bsda.wasteMaterialName,
     ...where,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsda)

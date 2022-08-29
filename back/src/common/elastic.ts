@@ -572,10 +572,25 @@ export async function toPrismaBsds(
   return { bsdds, bsdasris, bsvhus, bsdas, bsffs };
 }
 
-export async function indexAllBsds(index: string) {
-  await indexAllForms(index);
-  await indexAllBsdasris(index);
-  await indexAllBsvhus(index);
-  await indexAllBsdas(index);
-  await indexAllBsffs(index);
+export async function indexAllBsds(index: string, bsdType?: BsdType) {
+  if (!bsdType || bsdType === "BSDD") {
+    console.log("Indexing Bsdds");
+    await indexAllForms(index);
+  }
+  if (!bsdType || bsdType === "BSDASRI") {
+    console.log("Indexing Bsdasris");
+    await indexAllBsdasris(index);
+  }
+  if (!bsdType || bsdType === "BSVHU") {
+    console.log("Indexing Bsvhus");
+    await indexAllBsvhus(index);
+  }
+  if (!bsdType || bsdType === "BSDA") {
+    console.log("Indexing Bsdas");
+    await await indexAllBsdas(index);
+  }
+  if (!bsdType || bsdType === "BSFF") {
+    console.log("Indexing Bsffs");
+    await indexAllBsffs(index);
+  }
 }

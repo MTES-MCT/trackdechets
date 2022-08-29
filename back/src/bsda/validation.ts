@@ -2,6 +2,7 @@ import {
   Bsda,
   BsdaStatus,
   BsdaType,
+  CompanyVerificationStatus,
   Prisma,
   TransportMode,
   WasteAcceptationStatus
@@ -16,6 +17,12 @@ import {
 } from "../common/constants/companySearchHelpers";
 import { FactorySchemaOf } from "../common/yup/configureYup";
 import {
+  isCollector,
+  isTransporter,
+  isWasteCenter,
+  isWasteProcessor
+} from "../companies/validation";
+import {
   INVALID_SIRET_LENGTH,
   INVALID_WASTE_CODE,
   MISSING_COMPANY_ADDRESS,
@@ -28,6 +35,7 @@ import {
 import { BsdaConsistence } from "../generated/graphql/types";
 import prisma from "../prisma";
 
+const { VERIFY_COMPANY } = process.env;
 export const PARTIAL_OPERATIONS = ["R 13", "D 15"];
 export const OPERATIONS = ["R 5", "D 5", "D 9", ...PARTIAL_OPERATIONS];
 type Emitter = Pick<
@@ -86,6 +94,7 @@ type Transporter = Pick<
   | "transporterCompanyPhone"
   | "transporterCompanyMail"
   | "transporterCompanyVatNumber"
+  | "transporterRecepisseIsExempted"
   | "transporterRecepisseNumber"
   | "transporterRecepisseDepartment"
   | "transporterRecepisseValidityLimit"
@@ -300,13 +309,14 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
 
 const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
   yup.object({
-    workerCompanyName: yup.string().when("type", {
-      is: value =>
+    workerIsDisabled: yup.boolean().nullable(),
+    workerCompanyName: yup.string().when(["type", "workerIsDisabled"], {
+      is: (type, isDisabled) =>
         [
           BsdaType.RESHIPMENT,
           BsdaType.GATHERING,
           BsdaType.COLLECTION_2710
-        ].includes(value),
+        ].includes(type) || isDisabled,
       then: schema =>
         schema
           .nullable()
@@ -320,13 +330,13 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           `Entreprise de travaux: ${MISSING_COMPANY_NAME}`
         )
     }),
-    workerCompanySiret: yup.string().when("type", {
-      is: value =>
+    workerCompanySiret: yup.string().when(["type", "workerIsDisabled"], {
+      is: (type, isDisabled) =>
         [
           BsdaType.RESHIPMENT,
           BsdaType.GATHERING,
           BsdaType.COLLECTION_2710
-        ].includes(value),
+        ].includes(type) || isDisabled,
       then: schema =>
         schema
           .nullable()
@@ -342,13 +352,13 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
             `Entreprise de travaux: ${MISSING_COMPANY_SIRET}`
           )
     }),
-    workerCompanyAddress: yup.string().when("type", {
-      is: value =>
+    workerCompanyAddress: yup.string().when(["type", "workerIsDisabled"], {
+      is: (type, isDisabled) =>
         [
           BsdaType.RESHIPMENT,
           BsdaType.GATHERING,
           BsdaType.COLLECTION_2710
-        ].includes(value),
+        ].includes(type) || isDisabled,
       then: schema => schema.nullable(),
       otherwise: schema =>
         schema.requiredIf(
@@ -356,13 +366,13 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           `Entreprise de travaux: ${MISSING_COMPANY_ADDRESS}`
         )
     }),
-    workerCompanyContact: yup.string().when("type", {
-      is: value =>
+    workerCompanyContact: yup.string().when(["type", "workerIsDisabled"], {
+      is: (type, isDisabled) =>
         [
           BsdaType.RESHIPMENT,
           BsdaType.GATHERING,
           BsdaType.COLLECTION_2710
-        ].includes(value),
+        ].includes(type) || isDisabled,
       then: schema => schema.nullable(),
       otherwise: schema =>
         schema.requiredIf(
@@ -370,13 +380,13 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           `Entreprise de travaux: ${MISSING_COMPANY_CONTACT}`
         )
     }),
-    workerCompanyPhone: yup.string().when("type", {
-      is: value =>
+    workerCompanyPhone: yup.string().when(["type", "workerIsDisabled"], {
+      is: (type, isDisabled) =>
         [
           BsdaType.RESHIPMENT,
           BsdaType.GATHERING,
           BsdaType.COLLECTION_2710
-        ].includes(value),
+        ].includes(type) || isDisabled,
       then: schema => schema.nullable(),
       otherwise: schema =>
         schema.requiredIf(
@@ -387,13 +397,13 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
     workerCompanyMail: yup
       .string()
       .email()
-      .when("type", {
-        is: value =>
+      .when(["type", "workerIsDisabled"], {
+        is: (type, isDisabled) =>
           [
             BsdaType.RESHIPMENT,
             BsdaType.GATHERING,
             BsdaType.COLLECTION_2710
-          ].includes(value),
+          ].includes(type) || isDisabled,
         then: schema => schema.nullable(),
         otherwise: schema =>
           schema.requiredIf(
@@ -419,6 +429,42 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         .requiredIf(
           context.emissionSignature,
           `Entreprise de destination: ${MISSING_COMPANY_SIRET}`
+        )
+        .test(
+          "is-recipient-registered-with-right-profile",
+          ({ value }) =>
+            `L'installation de destination avec le SIRET ${value} n'est pas inscrite sur Trackdéchets`,
+          async (siret, ctx) => {
+            if (!siret) return true;
+
+            const company = await prisma.company.findUnique({
+              where: { siret }
+            });
+            if (!company) {
+              return false;
+            }
+
+            if (
+              !isCollector(company) &&
+              !isWasteProcessor(company) &&
+              !isWasteCenter(company)
+            ) {
+              throw ctx.createError({
+                message: `L'installation de destination ou d'entreposage ou de reconditionnement avec le SIRET ${siret} n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement, de tri transit regroupement ou déchetterie. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+              });
+            }
+
+            if (
+              VERIFY_COMPANY === "true" &&
+              company.verificationStatus !== CompanyVerificationStatus.VERIFIED
+            ) {
+              throw ctx.createError({
+                message: `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau bordereau.`
+              });
+            }
+
+            return true;
+          }
         ),
       destinationCompanyAddress: yup
         .string()
@@ -588,43 +634,53 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
 const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
   context =>
     yup.object({
-      transporterRecepisseDepartment: yup.string().when("type", {
-        is: BsdaType.COLLECTION_2710,
-        then: schema => schema.nullable(),
-        otherwise: schema =>
-          schema.when("transporterCompanyVatNumber", (tva, schema) => {
-            if (!tva) {
-              return schema.requiredIf(
-                context.transportSignature,
-                `Transporteur: le département associé au récépissé est obligatoire`
-              );
-            }
-            return schema.nullable().notRequired();
-          })
-      }),
-      transporterRecepisseNumber: yup.string().when("type", {
-        is: BsdaType.COLLECTION_2710,
-        then: schema => schema.nullable(),
-        otherwise: schema =>
-          schema.when("transporterCompanyVatNumber", (tva, schema) => {
-            if (!tva) {
-              return schema.requiredIf(
-                context.transportSignature,
-                `Transporteur: le numéro de récépissé est obligatoire`
-              );
-            }
-            return schema.nullable().notRequired();
-          })
-      }),
-      transporterRecepisseValidityLimit: yup.date().when("type", {
-        is: BsdaType.COLLECTION_2710,
-        then: schema => schema.nullable(),
-        otherwise: schema =>
-          schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: la date limite de validité du récépissé est obligatoire`
-          ) as any
-      }),
+      transporterRecepisseIsExempted: yup.boolean().nullable(),
+      transporterRecepisseDepartment: yup
+        .string()
+        .when(["type", "transporterRecepisseIsExempted"], {
+          is: (type, isExempted) =>
+            type === BsdaType.COLLECTION_2710 || isExempted,
+          then: schema => schema.nullable(),
+          otherwise: schema =>
+            schema.when("transporterCompanyVatNumber", (tva, schema) => {
+              if (!tva) {
+                return schema.requiredIf(
+                  context.transportSignature,
+                  `Transporteur: le département associé au récépissé est obligatoire`
+                );
+              }
+              return schema.nullable().notRequired();
+            })
+        }),
+      transporterRecepisseNumber: yup
+        .string()
+        .when(["type", "transporterRecepisseIsExempted"], {
+          is: (type, isExempted) =>
+            type === BsdaType.COLLECTION_2710 || isExempted,
+          then: schema => schema.nullable(),
+          otherwise: schema =>
+            schema.when("transporterCompanyVatNumber", (tva, schema) => {
+              if (!tva) {
+                return schema.requiredIf(
+                  context.transportSignature,
+                  `Transporteur: le numéro de récépissé est obligatoire`
+                );
+              }
+              return schema.nullable().notRequired();
+            })
+        }),
+      transporterRecepisseValidityLimit: yup
+        .date()
+        .when(["type", "transporterRecepisseIsExempted"], {
+          is: (type, isExempted) =>
+            type === BsdaType.COLLECTION_2710 || isExempted,
+          then: schema => schema.nullable(),
+          otherwise: schema =>
+            schema.requiredIf(
+              context.transportSignature,
+              `Transporteur: la date limite de validité du récépissé est obligatoire`
+            ) as any
+        }),
       transporterCompanyName: yup.string().when("type", {
         is: BsdaType.COLLECTION_2710,
         then: schema =>
@@ -668,7 +724,30 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
                   `Transporteur: ${MISSING_COMPANY_SIRET}`
                 );
             })
-        }),
+        })
+        .test(
+          "is-transporter-registered-with-right-profile",
+          ({ value }) =>
+            `Le transporteur avec le SIRET ${value} n'est pas inscrit sur Trackdéchets`,
+          async (siret, ctx) => {
+            if (!siret) return true;
+
+            const company = await prisma.company.findUnique({
+              where: { siret }
+            });
+            if (!company) {
+              return false;
+            }
+
+            if (!isTransporter(company)) {
+              throw ctx.createError({
+                message: `Le transporteur avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+              });
+            }
+
+            return true;
+          }
+        ),
       transporterCompanyVatNumber: yup
         .string()
         .ensure()

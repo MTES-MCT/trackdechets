@@ -12,6 +12,7 @@ describe("loaders", () => {
         givenName: "Code en Stock",
         contactEmail: "codeenstock@trackdechets.fr",
         contactPhone: "0600000000",
+        contact: "Marcel Machin",
         website: "https://codeenstock.trackdechets.fr"
       },
       {
@@ -21,6 +22,7 @@ describe("loaders", () => {
         givenName: "Frontier SAS",
         contactEmail: "frontier@trackdechets.fr",
         contactPhone: "0700000000",
+        contact: "",
         website: "https://frontier.trackdechets.fr"
       }
     ]);

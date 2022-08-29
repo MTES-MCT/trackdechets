@@ -28,6 +28,10 @@ export const machine = createMachine<Record<string, never>, Event>(
             target: BsdaStatus.SIGNED_BY_WORKER,
             cond: "canSkipEmissionSignature"
           },
+          TRANSPORT: {
+            target: BsdaStatus.SENT,
+            cond: "isPrivateIndividualWithNoWorkerBsda"
+          },
           OPERATION: [
             {
               target: BsdaStatus.AWAITING_CHILD,
@@ -47,7 +51,7 @@ export const machine = createMachine<Record<string, never>, Event>(
           },
           TRANSPORT: {
             target: BsdaStatus.SENT,
-            cond: "isGroupingOrForwardingBsda"
+            cond: "isGroupingOrForwardingOrWithNoWorkerBsda"
           }
         }
       },
@@ -95,9 +99,12 @@ export const machine = createMachine<Record<string, never>, Event>(
         PARTIAL_OPERATIONS.includes(event.bsda?.destinationOperationCode),
       isGroupingOrReshipmentOperation: (_, event) =>
         PARTIAL_OPERATIONS.includes(event.bsda?.destinationOperationCode),
-      isGroupingOrForwardingBsda: (_, event) =>
+      isGroupingOrForwardingOrWithNoWorkerBsda: (_, event) =>
         event.bsda?.type === BsdaType.GATHERING ||
-        event.bsda?.type === BsdaType.RESHIPMENT
+        event.bsda?.type === BsdaType.RESHIPMENT ||
+        event.bsda?.workerIsDisabled,
+      isPrivateIndividualWithNoWorkerBsda: (_, event) =>
+        event.bsda?.emitterIsPrivateIndividual && event.bsda?.workerIsDisabled
     }
   }
 );

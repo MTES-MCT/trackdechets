@@ -1,10 +1,10 @@
 import { Form } from "@prisma/client";
-import { RepositoryFnDeps } from "../types";
+import { ReadRepositoryFnDeps } from "../types";
 
 export type FindForwardedInByIdFn = (id: string) => Promise<Form>;
 
 const buildFindForwardedInById: (
-  deps: RepositoryFnDeps
+  deps: ReadRepositoryFnDeps
 ) => FindForwardedInByIdFn =
   ({ prisma }) =>
   id => {

@@ -10,8 +10,7 @@ const buildRemoveAppendix2: (deps: RepositoryFnDeps) => RemoveAppendix2Fn =
   ({ prisma, user }) =>
   async id => {
     const findAppendix2FormsById = buildFindAppendix2FormsById({
-      prisma,
-      user
+      prisma
     });
     const appendix2Forms = await findAppendix2FormsById(id);
 
@@ -25,7 +24,7 @@ const buildRemoveAppendix2: (deps: RepositoryFnDeps) => RemoveAppendix2Fn =
       await updateAppendix2Forms(appendix2Forms);
     }
 
-    const findUniqueForm = buildFindUniqueForm({ prisma, user });
+    const findUniqueForm = buildFindUniqueForm({ prisma });
     return findUniqueForm({ id });
   };
 

@@ -12,10 +12,10 @@ export function PickupSite({ pickupSite }: Props) {
         <strong>Informations chantier (si différente)</strong>
       </p>
       <p>
-        Code chantier : {pickupSite?.name}
+        Nom du chantier / collecte : {pickupSite?.name}
         <br />
-        Adresse chantier : {pickupSite?.address} {pickupSite?.postalCode}{" "}
-        {pickupSite?.city}
+        Adresse chantier / collecte : {pickupSite?.address}{" "}
+        {pickupSite?.postalCode} {pickupSite?.city}
       </p>
     </>
   );

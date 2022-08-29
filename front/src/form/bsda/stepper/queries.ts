@@ -76,6 +76,7 @@ export const FullBsdaFragment = gql`
       isEstimate
     }
     worker {
+      isDisabled
       company {
         ...CompanyFragment
       }

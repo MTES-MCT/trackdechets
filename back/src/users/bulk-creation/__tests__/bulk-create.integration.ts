@@ -17,7 +17,7 @@ sireneSpy.mockImplementation(company =>
   Promise.resolve({
     ...company,
     name: "NAME FROM SIRENE",
-    address: "40 boulevard Volatire 13001 Marseille",
+    address: "40 boulevard Voltaire 13001 Marseille",
     codeNaf: "62.01Z",
     latitude: 1,
     longitude: 1
@@ -124,6 +124,16 @@ describe("bulk create users and companies from csv files", () => {
     expect(codeEnStock.website).toEqual("https://codeenstock.trackdechets.fr");
     expect(codeEnStock.gerepId).toEqual("1234");
     expect(codeEnStock.contactPhone).toEqual("0600000000");
+    expect(codeEnStock.contact).toEqual("Marcel Machin");
+
+    // check fields are OK for second company
+    const frontier = await prisma.company.findUnique({
+      where: { siret: "81343950200028" }
+    });
+    expect(frontier.name).toEqual("NAME FROM SIRENE");
+    expect(frontier.givenName).toEqual("Frontier SAS");
+    // empty contact cell
+    expect(frontier.contact).toEqual("");
   }, 10000);
 
   test("already existing company", async () => {

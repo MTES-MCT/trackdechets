@@ -622,7 +622,10 @@ describe("Mutation.markAsSealed", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination ou d’entreposage ou de reconditionnement qui a été renseignée en case 2 (SIRET: 12345654327896) n'est pas inscrite sur Trackdéchets`
+        message: [
+          "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
+          `Erreur(s): L'installation de destination avec le SIRET 12345654327896 n'est pas inscrite sur Trackdéchets`
+        ].join("\n")
       })
     ]);
   });
@@ -649,10 +652,10 @@ describe("Mutation.markAsSealed", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination ou d’entreposage ou de reconditionnement qui a été renseignée en case 2 (SIRET: ${destination.siret})
-      n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement.
-      Cette installation ne peut donc pas être visée en case 2 du bordereau. Veuillez vous rapprocher de l'administrateur
-      de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+        message: [
+          "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
+          `Erreur(s): L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${destination.siret}" n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+        ].join("\n")
       })
     ]);
   });
@@ -686,7 +689,7 @@ describe("Mutation.markAsSealed", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination après entreposage provisoire ou reconditionnement qui a été renseignée en case 14 (SIRET 12345654327896) n'est pas inscrite sur Trackdéchets`
+        message: `L'installation de destination avec le SIRET 12345654327896 n'est pas inscrite sur Trackdéchets`
       })
     ]);
   });
@@ -723,10 +726,7 @@ describe("Mutation.markAsSealed", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination après entreposage provisoire ou reconditionnement qui a été renseignée en case 14 (SIRET ${destination.siret})
-      n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement.
-      Cette installation ne peut donc pas être visée en case 14 du bordereau. Veuillez vous rapprocher de l'administrateur
-      de cette installation pour qu'il modifie le profil de l'installation depuis l'interface Trackdéchets Mon Compte > Établissements`
+        message: `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${destination.siret}" n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
       })
     ]);
   });
@@ -760,8 +760,10 @@ describe("Mutation.markAsSealed", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${destination.siret}
-      n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 2 du bordereau.`
+        message: [
+          `Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.`,
+          `Erreur(s): Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue avec le SIRET ${destination.siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau bordereau.`
+        ].join("\n")
       })
     ]);
   });
@@ -806,8 +808,7 @@ describe("Mutation.markAsSealed", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue ${destination.siret}
-      n'a pas encore été vérifié. Cette installation ne peut pas être visée en case 14 du bordereau.`
+        message: `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue avec le SIRET ${destination.siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau bordereau.`
       })
     ]);
   });

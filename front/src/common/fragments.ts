@@ -701,6 +701,7 @@ export const bsdaFragment = gql`
       }
     }
     worker {
+      isDisabled
       company {
         name
         siret

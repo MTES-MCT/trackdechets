@@ -17,17 +17,37 @@ export function Destination({ disabled }) {
     // - when it's a "simple" bsda, `destination.company` is displayed at the top
     // - otherwise, `destination.operation.nextDestination` is displayed first
     if (hasNextDestination) {
-      const nextDestination =
-        values.destination?.operation?.nextDestination?.company;
-      setFieldValue("destination.operation.nextDestination", null);
-      setFieldValue("destination.company", nextDestination, false);
-    } else {
-      const destination = values.destination?.company;
-      setFieldValue("destination.company", getInitialCompany(), false);
+      const { company, cap, plannedOperationCode } =
+        values.destination?.operation?.nextDestination ?? {};
       setFieldValue(
-        "destination.operation.nextDestination",
+        "destination",
         {
-          company: destination,
+          company,
+          cap,
+          plannedOperationCode,
+          operation: {
+            ...values.destination?.operation,
+            nextDestination: null,
+          },
+        },
+        false
+      );
+    } else {
+      const { company, cap, plannedOperationCode } = values.destination ?? {};
+      setFieldValue(
+        "destination",
+        {
+          company: getInitialCompany(),
+          cap: "",
+          plannedOperationCode: "",
+          operation: {
+            ...values.destination?.operation,
+            nextDestination: {
+              company,
+              cap,
+              plannedOperationCode,
+            },
+          },
         },
         false
       );
@@ -43,7 +63,7 @@ export function Destination({ disabled }) {
         </div>
       )}
 
-      {isDechetterie ? (
+      {isDechetterie && !hasNextDestination ? (
         <div className="form__row">
           <div className="notification">
             Vous effectuez une collecte en déchetterie. Il n'y a pas de
@@ -85,33 +105,33 @@ export function Destination({ disabled }) {
           </div>
         </div>
       ) : (
-        <CompanySelector
-          disabled={disabled}
-          name={
-            hasNextDestination
-              ? "destination.operation.nextDestination.company"
-              : "destination.company"
-          }
-          heading="Installation de destination finale (exutoire)"
-        />
-      )}
-
-      {!isDechetterie && (
-        <div className="form__row">
-          <label>
-            N° CAP:
-            <Field
-              disabled={disabled}
-              type="text"
-              name={
-                hasNextDestination
-                  ? "destination.operation.nextDestination.cap"
-                  : "destination.cap"
-              }
-              className="td-input td-input--medium"
-            />
-          </label>
-        </div>
+        <>
+          <CompanySelector
+            disabled={disabled}
+            name={
+              hasNextDestination
+                ? "destination.operation.nextDestination.company"
+                : "destination.company"
+            }
+            heading="Installation de destination finale (exutoire)"
+            registeredOnlyCompanies={true}
+          />
+          <div className="form__row">
+            <label>
+              N° CAP:
+              <Field
+                disabled={disabled}
+                type="text"
+                name={
+                  hasNextDestination
+                    ? "destination.operation.nextDestination.cap"
+                    : "destination.cap"
+                }
+                className="td-input td-input--medium"
+              />
+            </label>
+          </div>
+        </>
       )}
 
       <div className="form__row">
@@ -127,7 +147,7 @@ export function Destination({ disabled }) {
           disabled={disabled}
         >
           <option />
-          {isDechetterie ? (
+          {isDechetterie && !hasNextDestination ? (
             <>
               <option value="R 13">
                 R 13 - Opérations de transit incluant le groupement sans
@@ -140,13 +160,14 @@ export function Destination({ disabled }) {
           ) : (
             <>
               <option value="R 5">
-                R 5 - Recyclage ou récupération d'autres matières inorganiques.
+                R 5 - Recyclage ou récupération d'autres matières inorganiques
+                (dont vitrification)
               </option>
               <option value="D 5">
                 D 5 - Mise en décharge aménagée et autorisée en ISDD ou ISDND
               </option>
               <option value="D 9">
-                D 9 - Vitrification, traitement chimique ou prétraitement
+                D 9 - Traitement chimique ou prétraitement (dont vitrification)
               </option>
             </>
           )}
@@ -174,6 +195,7 @@ export function Destination({ disabled }) {
               disabled={disabled}
               name="destination.company"
               heading="Installation de transit ou de groupement"
+              registeredOnlyCompanies={true}
             />
 
             <div className="form__row">

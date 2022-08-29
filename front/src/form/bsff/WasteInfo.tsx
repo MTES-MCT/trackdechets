@@ -1,10 +1,20 @@
 import { FieldSwitch, RedErrorMessage } from "common/components";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { Field } from "formik";
-import React from "react";
+import { Field, useFormikContext } from "formik";
+import { Bsff } from "generated/graphql/types";
+import React, { useEffect } from "react";
 import Packagings from "./components/packagings/Packagings";
 
 export default function WasteInfo({ disabled }) {
+  const { setFieldValue, values } = useFormikContext<Bsff>();
+
+  useEffect(() => {
+    const totalWeight = values.packagings.reduce((acc, p) => {
+      return acc + p.weight ?? 0;
+    }, 0);
+    setFieldValue("weight.value", totalWeight);
+  }, [values.packagings, setFieldValue]);
+
   return (
     <>
       {disabled && (

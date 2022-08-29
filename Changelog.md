@@ -5,6 +5,35 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.08.4] 29/08/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+- Correction du filtre sur l'information libre transporteur pour les BSDASRI, BSDA et BSFF [PR 1623](https://github.com/MTES-MCT/trackdechets/pull/1623)
+- Affichage du CAP sur le BSDA [PR 1625](https://github.com/MTES-MCT/trackdechets/pull/1625)
+- Affichage d'un bouton manquant sur le BSDA avec émetteur particulier [PR 1626](https://github.com/MTES-MCT/trackdechets/pull/1626)
+- Correction du ratelimit au login [PR 1613](https://github.com/MTES-MCT/trackdechets/pull/1613)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Utilisation des sirets en cache pour la query formsLifeCycle [PR 1609](https://github.com/MTES-MCT/trackdechets/pull/1609)
+- Prise en compte de la colonne Company.contact lors de l'import en masse [PR 1606](https://github.com/MTES-MCT/trackdechets/pull/1606)
+- Améliorations de l'UI Bsdasri [PR 1602](https://github.com/MTES-MCT/trackdechets/pull/1602)
+- Possibilité de passer outre l'entreprise de travaux sur le BSDA  [PR 1604](https://github.com/MTES-MCT/trackdechets/pull/1604)
+- Amélioration des filtres dashboard [PR 1595](https://github.com/MTES-MCT/trackdechets/pull/1595)
+- Permettre de spécifier exutoire final sur le BSDA sur le workflox déchetterie + entreposage [PR 1614](https://github.com/MTES-MCT/trackdechets/pull/1614)
+- Amélioration de la sécurité à la connexion [PR 1612](https://github.com/MTES-MCT/trackdechets/pull/1612)
+- Différenciation plus visible de la sandbox [PR 1617](https://github.com/MTES-MCT/trackdechets/pull/1617)
+
+
+#### :memo: Documentation
+
+#### :house: Interne
+ 
 # [2022.08.3] 16/08/2022
 
 #### :rocket: Nouvelles fonctionnalités
@@ -14,6 +43,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Correction d'un bug sur le dashboard qui faisait disparaitre les filtres saisis [PR 1592](https://github.com/MTES-MCT/trackdechets/pull/1598)
 
 #### :boom: Breaking changes
+
+- Ajout de restrictions sur le SIRET visé comme émetteur ou destinataire d'un BSDD. Si l'un de ces acteurs n'est pas inscrit sur Trackdéchets, la création du bordereau est désormais impossible [PR 1451](https://github.com/MTES-MCT/trackdechets/pull/1451)
 
 #### :nail_care: Améliorations
 

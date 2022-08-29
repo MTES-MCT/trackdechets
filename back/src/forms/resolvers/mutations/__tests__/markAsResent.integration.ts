@@ -181,7 +181,7 @@ describe("Mutation markAsResent", () => {
           signedBy: "John Snow",
           destination: {
             company: {
-              siret: "12658974589563"
+              siret: destination.siret
             }
           }
         }

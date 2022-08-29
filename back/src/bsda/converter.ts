@@ -137,6 +137,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
       })
     }),
     worker: nullIfNoValues<BsdaWorker>({
+      isDisabled: Boolean(form.workerIsDisabled),
       company: nullIfNoValues<FormCompany>({
         name: form.workerCompanyName,
         siret: form.workerCompanySiret,
@@ -182,7 +183,8 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
       recepisse: nullIfNoValues<BsdaRecepisse>({
         department: form.transporterRecepisseDepartment,
         number: form.transporterRecepisseNumber,
-        validityLimit: form.transporterRecepisseValidityLimit
+        validityLimit: form.transporterRecepisseValidityLimit,
+        isExempted: form.transporterRecepisseIsExempted
       }),
       transport: nullIfNoValues<BsdaTransport>({
         mode: form.transporterTransportMode,
@@ -410,6 +412,7 @@ function flattenBsdaTransporterInput({
 
 function flattenBsdaWorkerInput({ worker }: Pick<BsdaInput, "worker">) {
   return {
+    workerIsDisabled: chain(worker, w => w.isDisabled),
     workerCompanyName: chain(worker, w => chain(w.company, c => c.name)),
     workerCompanySiret: chain(worker, w => chain(w.company, c => c.siret)),
     workerCompanyAddress: chain(worker, w => chain(w.company, c => c.address)),

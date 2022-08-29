@@ -51,7 +51,9 @@ describe("Test Factories", () => {
     const companyAssociations = usr.companyAssociations;
     expect(companyAssociations.length).toBe(1);
     expect([...companyAssociations[0].company.companyTypes]).toMatchObject([
-      "PRODUCER"
+      "PRODUCER",
+      "TRANSPORTER",
+      "WASTEPROCESSOR"
     ]);
     expect(companyAssociations[0].company.siret).toBe(company.siret);
   });

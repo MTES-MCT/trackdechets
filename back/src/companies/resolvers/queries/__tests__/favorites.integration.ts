@@ -80,7 +80,10 @@ describe("query favorites", () => {
         type: "RECIPIENT"
       }
     });
-    expect(data.favorites).toEqual([]);
+
+    expect(data.favorites).toEqual([
+      expect.objectContaining({ siret: company.siret })
+    ]);
   });
 
   it("should ignore drafts", async () => {
@@ -327,18 +330,20 @@ describe("query favorites", () => {
       }
     });
 
-    expect(data.favorites).toEqual([
-      expect.objectContaining({
-        siret: transporter.siret,
-        name: transporter.name,
-        address: transporter.address,
-        vatNumber: transporter.vatNumber,
-        mail: transporter.contactEmail,
-        phone: transporter.contactPhone,
-        codePaysEtrangerEtablissement: "IT",
-        contact: transporter.contact
-      })
-    ]);
+    expect(data.favorites).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          siret: transporter.siret,
+          name: transporter.name,
+          address: transporter.address,
+          vatNumber: transporter.vatNumber,
+          mail: transporter.contactEmail,
+          phone: transporter.contactPhone,
+          codePaysEtrangerEtablissement: "IT",
+          contact: transporter.contact
+        })
+      ])
+    );
   });
 
   it("should ignore transporters not registered in TD", async () => {
@@ -880,12 +885,14 @@ describe("query favorites", () => {
       }
     });
 
-    expect(data2.favorites).toEqual([
-      expect.objectContaining({
-        vatNumber: "IT09301420155",
-        codePaysEtrangerEtablissement: "IT"
-      })
-    ]);
+    expect(data2.favorites).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          vatNumber: "IT09301420155",
+          codePaysEtrangerEtablissement: "IT"
+        })
+      ])
+    );
   });
 
   it("should suggest a temporary storage detail destination", async () => {

@@ -46,7 +46,7 @@ function siretify(index) {
   if (siret.length > siretLength) {
     throw Error("Generated siret is too long");
   }
-  return siret.padStart(14, "1");
+  return siret.padStart(14, "9");
 }
 
 /**
@@ -63,7 +63,7 @@ export const companyFactory = async (
     data: {
       siret: siretify(companyIndex),
       companyTypes: {
-        set: ["PRODUCER" as CompanyType]
+        set: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"]
       },
       name: `company_${companyIndex}`,
       securityCode: 1234,
@@ -71,6 +71,7 @@ export const companyFactory = async (
       address: "Champ de Mars, 5 Av. Anatole France, 75007 Paris",
       contactEmail: `contact_${companyIndex}@gmail.com`,
       contactPhone: `+${companyIndex} 606060606`,
+      verificationStatus: "VERIFIED",
       ...opts
     }
   });
@@ -159,84 +160,84 @@ export const userWithAccessTokenFactory = async (opt = {}) => {
 };
 
 const formdata = {
-  wasteDetailsQuantity: 22.5,
-  signedByTransporter: true,
-  emitterCompanyName: "WASTE PRODUCER",
-  transporterCompanyName: "WASTE TRANSPORTER",
-  traderCompanyAddress: "",
   brokerCompanyAddress: "",
-  transporterReceipt: "33AA",
-  quantityReceived: null,
-  processedAt: null,
-  wasteDetailsOnuCode: "2003",
-  emitterType: "PRODUCER" as EmitterType,
-  traderValidityLimit: null,
-  traderCompanyContact: "",
   brokerCompanyContact: "",
-  wasteDetailsCode: "05 01 04*",
-  wasteDetailsIsDangerous: true,
-  processedBy: null,
-  recipientCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
-  transporterDepartment: "86",
-  emitterWorkSiteName: "",
+  brokerCompanyMail: "",
+  brokerCompanyName: "",
+  brokerCompanyPhone: "",
+  brokerCompanySiret: "",
+  customId: null,
+  emitterCompanyAddress: "20 Avenue de la 1ère Dfl 13000 Marseille",
+  emitterCompanyContact: "Marc Martin",
+  emitterCompanyMail: "emitter@compnay.fr",
+  emitterCompanyName: "WASTE PRODUCER",
+  emitterCompanyPhone: "06 18 76 02 96",
+  emitterCompanySiret: "15397456982146",
+  emitterType: "PRODUCER" as EmitterType,
   emitterWorkSiteAddress: "",
   emitterWorkSiteCity: "",
-  emitterWorkSitePostalCode: "",
   emitterWorkSiteInfos: "",
-  recipientCap: "I am a CAP",
-  emitterCompanyPhone: "06 18 76 02 96",
+  emitterWorkSiteName: "",
+  emitterWorkSitePostalCode: "",
   isAccepted: null,
-  emitterCompanyMail: "emitter@compnay.fr",
-  receivedBy: null,
-  transporterCompanySiret: "12345678974589",
-  processingOperationDescription: null,
-  transporterCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
-  nextDestinationProcessingOperation: null,
-  nextDestinationCompanyAddress: null,
-  nextDestinationCompanyPhone: null,
-  nextDestinationCompanyMail: null,
-  nextDestinationCompanyContact: null,
-  nextDestinationCompanySiret: null,
-  recipientCompanyPhone: "06 18 76 02 99",
-  traderCompanyName: "",
-  brokerCompanyName: "",
-  wasteAcceptationStatus: null,
-  customId: null,
   isDeleted: false,
-  transporterCompanyContact: "transporter",
-  traderCompanyMail: "",
-  brokerCompanyMail: "",
-  emitterCompanyAddress: "20 Avenue de la 1ère Dfl 13000 Marseille",
-  sentBy: "signe",
-  status: "SENT" as Status,
-  wasteRefusalReason: null,
-  recipientCompanySiret: "56847895684123",
-  transporterCompanyMail: "transporter@td.io",
-  wasteDetailsName: "Divers",
-  traderDepartment: "",
-  recipientCompanyContact: "Jean Dupont",
-  receivedAt: null,
-  transporterIsExemptedOfReceipt: false,
-  sentAt: "2019-11-20T00:00:00.000Z",
-  traderCompanySiret: "",
-  brokerCompanySiret: "",
-  transporterNumberPlate: "aa22",
-  recipientProcessingOperation: "D 6",
-  wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }],
-  transporterValidityLimit: "2019-11-27T00:00:00.000Z",
-  emitterCompanyContact: "Marc Martin",
-  traderReceipt: "",
-  wasteDetailsQuantityType: "ESTIMATED" as QuantityType,
-  transporterCompanyPhone: "06 18 76 02 66",
-  recipientCompanyMail: "recipient@td.io",
-  wasteDetailsConsistence: "SOLID" as Consistence,
-  wasteDetailsPop: false,
-  traderCompanyPhone: "",
-  brokerCompanyPhone: "",
+  nextDestinationCompanyAddress: null,
+  nextDestinationCompanyContact: null,
+  nextDestinationCompanyMail: null,
+  nextDestinationCompanyPhone: null,
+  nextDestinationCompanySiret: null,
+  nextDestinationProcessingOperation: null,
   noTraceability: null,
-  emitterCompanySiret: "15397456982146",
+  processedAt: null,
+  processedBy: null,
+  processingOperationDescription: null,
   processingOperationDone: null,
-  recipientCompanyName: "WASTE COMPANY"
+  quantityReceived: null,
+  receivedAt: null,
+  receivedBy: null,
+  recipientCap: "I am a CAP",
+  recipientCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
+  recipientCompanyContact: "Jean Dupont",
+  recipientCompanyMail: "recipient@td.io",
+  recipientCompanyName: "WASTE COMPANY",
+  recipientCompanyPhone: "06 18 76 02 99",
+  recipientCompanySiret: "56847895684123",
+  recipientProcessingOperation: "D 6",
+  sentAt: "2019-11-20T00:00:00.000Z",
+  sentBy: "signe",
+  signedByTransporter: true,
+  status: "SENT" as Status,
+  traderCompanyAddress: "",
+  traderCompanyContact: "",
+  traderCompanyMail: "",
+  traderCompanyName: "",
+  traderCompanyPhone: "",
+  traderCompanySiret: "",
+  traderDepartment: "",
+  traderReceipt: "",
+  traderValidityLimit: null,
+  transporterCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
+  transporterCompanyContact: "transporter",
+  transporterCompanyMail: "transporter@td.io",
+  transporterCompanyName: "WASTE TRANSPORTER",
+  transporterCompanyPhone: "06 18 76 02 66",
+  transporterCompanySiret: "12345678974589",
+  transporterDepartment: "86",
+  transporterIsExemptedOfReceipt: false,
+  transporterNumberPlate: "aa22",
+  transporterReceipt: "33AA",
+  transporterValidityLimit: "2019-11-27T00:00:00.000Z",
+  wasteAcceptationStatus: null,
+  wasteDetailsCode: "05 01 04*",
+  wasteDetailsConsistence: "SOLID" as Consistence,
+  wasteDetailsIsDangerous: true,
+  wasteDetailsName: "Divers",
+  wasteDetailsOnuCode: "2003",
+  wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }],
+  wasteDetailsPop: false,
+  wasteDetailsQuantity: 22.5,
+  wasteDetailsQuantityType: "ESTIMATED" as QuantityType,
+  wasteRefusalReason: null
 };
 
 export const forwardedInData: Partial<Prisma.FormCreateInput> = {
@@ -282,6 +283,32 @@ export const transportSegmentFactory = async ({ formId, segmentPayload }) => {
   });
 };
 
+export const upsertBaseSiret = async siret => {
+  const exists = await prisma.company.findUnique({ where: { siret } });
+  if (!exists) {
+    // Using prisma.upsert gives us "Unique constraint failed on the fields: (`siret`)"
+    // Instead we create if it didn't exist upon entry, and ignore errors.
+    try {
+      await prisma.company.create({
+        data: {
+          siret,
+          companyTypes: {
+            set: ["TRANSPORTER", "WASTEPROCESSOR"]
+          },
+          name: `company_${siret}`,
+          securityCode: 1234,
+          verificationCode: "34567",
+          address: "Champ de Mars, 5 Av. Anatole France, 75007 Paris",
+          contactEmail: `contact_${siret}@gmail.com`,
+          contactPhone: `+${siret}`
+        }
+      });
+    } catch (err) {
+      // Must have been already created (race condition). Just ignore
+    }
+  }
+};
+
 export const formFactory = async ({
   ownerId,
   opt = {}
@@ -289,7 +316,14 @@ export const formFactory = async ({
   ownerId: string;
   opt?: Partial<Prisma.FormCreateInput>;
 }) => {
-  const formParams = { ...formdata, ...opt };
+  // Those sirets are required for the form to be updatable
+  await upsertBaseSiret(formdata.transporterCompanySiret);
+  await upsertBaseSiret(formdata.recipientCompanySiret);
+
+  const formParams = {
+    ...formdata,
+    ...opt
+  };
   return prisma.form.create({
     data: {
       readableId: getReadableId(),
@@ -309,6 +343,9 @@ export const formWithTempStorageFactory = async ({
   opt?: Partial<Prisma.FormCreateInput>;
   forwardedInOpts?: Partial<Prisma.FormCreateInput>;
 }) => {
+  await upsertBaseSiret(forwardedInData.transporterCompanySiret);
+  await upsertBaseSiret(forwardedInData.recipientCompanySiret);
+
   return formFactory({
     ownerId,
     opt: {

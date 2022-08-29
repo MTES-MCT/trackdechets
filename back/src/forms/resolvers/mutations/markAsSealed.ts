@@ -6,7 +6,7 @@ import { checkCanMarkAsSealed } from "../../permissions";
 import {
   beforeSignedByTransporterSchema,
   checkCanBeSealed,
-  checkCompaniesType,
+  validateForwardedInCompanies,
   wasteDetailsSchema
 } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
@@ -30,7 +30,7 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   // validate form data
   await checkCanBeSealed(form);
 
-  await checkCompaniesType(form);
+  await validateForwardedInCompanies(form);
   let formUpdateInput = null;
 
   if (

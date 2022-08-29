@@ -5,7 +5,7 @@ import { ADMIN_IS_PERSONIFYING } from "../auth";
 import nocache from "../common/middlewares/nocache";
 import { rateLimiterMiddleware } from "../common/middlewares/rateLimiter";
 import { sess } from "../server";
-import { getUIBaseURL } from "../utils";
+import { getUIBaseURL, sanitizeEmail } from "../utils";
 
 const UI_BASE_URL = getUIBaseURL();
 
@@ -18,8 +18,10 @@ authRouter.post(
   rateLimiterMiddleware({
     windowMs,
     maxRequestsPerWindow,
-    keyGenerator: (ip, request) =>
-      `login_${ip}_${request.body?.email ?? "void"}`
+    keyGenerator: (ip, request) => {
+      const { email } = request.body;
+      return `login_${ip}_${email ? sanitizeEmail(email) : "void"}`;
+    }
   }),
   (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
@@ -29,8 +31,7 @@ authRouter.post(
       if (!user) {
         const queries = {
           ...{
-            error: info.message,
-            errorField: info.errorField,
+            errorCode: info.code,
             username: info.username
           },
           ...(req.body.returnTo ? { returnTo: req.body.returnTo } : {})

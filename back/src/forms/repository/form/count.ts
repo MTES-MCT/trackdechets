@@ -1,9 +1,9 @@
 import { Prisma } from "@prisma/client";
-import { RepositoryFnDeps } from "../types";
+import { ReadRepositoryFnDeps } from "../types";
 
 export type CountFormsFn = (where: Prisma.FormWhereInput) => Promise<number>;
 
-const buildCountForms: (deps: RepositoryFnDeps) => CountFormsFn =
+const buildCountForms: (deps: ReadRepositoryFnDeps) => CountFormsFn =
   ({ prisma }) =>
   where => {
     return prisma.form.count({ where });

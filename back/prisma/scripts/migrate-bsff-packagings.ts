@@ -15,7 +15,7 @@ type BsffPackagingJson = {
 @registerUpdater(
   "Migrate bsff packagings to their own table",
   "Migrate bsff packagings to their own table",
-  true
+  false
 )
 export class MigrateBsffPackagings implements Updater {
   async run() {

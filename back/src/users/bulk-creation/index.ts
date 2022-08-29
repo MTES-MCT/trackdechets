@@ -167,6 +167,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
           givenName: company.givenName,
           contactEmail: company.contactEmail,
           contactPhone: company.contactPhone,
+          contact: company.contact,
           website: company.website,
           verificationCode: randomNumber(5).toString(),
           address: company.address,
