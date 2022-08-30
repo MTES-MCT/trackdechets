@@ -1499,6 +1499,34 @@ describe("Mutation.createForm", () => {
     expect(data?.createForm?.id).toBeDefined();
   });
 
+  it("should be possible to fill TVA number only for a foregin transporter", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+    const { company: transporterCompany } = await userWithCompanyFactory(UserRole.MEMBER, {
+      companyTypes: {
+        set: ["TRANSPORTER"]
+      },
+      vatNumber: "BE0541696005"
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitter.siret }
+          },
+          transporter: {
+            company: { vatNumber: transporterCompany.vatNumber }
+          }
+        }
+      }
+    });
+    expect(data?.createForm?.id).toBeDefined();
+  });
+
   it("should perform form creation in transaction", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
