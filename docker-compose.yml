@@ -42,7 +42,7 @@ services:
 
   td-ui:
     stdin_open: true
-    image: node:14.15.4
+    image: node:16
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     working_dir: /usr/src/front
     command: sh -c "npm install && npm run dev"
