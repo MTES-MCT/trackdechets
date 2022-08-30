@@ -310,3 +310,15 @@ Voilà la procédure pour ajouter une icône au fichier `Icons.tsx` :
 3. [Convertir le SVG en JSX](https://react-svgr.com/playground/?expandProps=start&icon=true&replaceAttrValues=%23000%3D%22currentColor%22&typescript=true) et l'ajouter au fichier (adapter le code selon les exemples existants : props, remplacer `width`/`height` et `"currentColor"`).
 
 Pour s'y retrouver plus facilement, suivre la convention de nommage en place et utiliser le nom donné par streamlineicons.
+
+### Reindexer un bordereau individuel
+
+```
+   npm run reindex-bsd BSD-XYZ123
+```
+
+### Réindexer un type de bordereau
+
+```
+   npm run index-elastic-search bsdasri -f
+```
