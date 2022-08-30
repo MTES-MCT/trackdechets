@@ -211,6 +211,8 @@ type BsffTransport {
   takenOverAt: DateTime
   "Mode de transport utilisé."
   mode: TransportMode!
+  "Plaque(s) d'immatriculation"
+  plates: [String!]
   "Signature du transporteur lors de l'enlèvement auprès de l'émetteur."
   signature: Signature
 }

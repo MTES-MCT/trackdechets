@@ -140,6 +140,8 @@ input BsffTransporterInput {
   transport: BsffTransporterTransportInput
   "Champ libre"
   customInfo: String
+  "Plaque(s) d'immatriculation - maximum 2"
+  plates: [String!]
 }
 input BsffTransporterRecepisseInput {
   number: String!
