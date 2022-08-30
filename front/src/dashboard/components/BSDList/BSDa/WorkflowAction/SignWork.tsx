@@ -38,7 +38,7 @@ export function SignWork({ siret, bsdaId }: Props) {
   >(SIGN_BSDA, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   return (
-    <SignBsda title="Signature entreprise de travaux" bsdaId={bsdaId}>
+    <SignBsda title="Signer en tant qu'entreprise de travaux" bsdaId={bsdaId}>
       {({ bsda, onClose }) =>
         bsda.metadata?.errors?.some(
           error => error.requiredFor === SignatureTypeInput.Emission

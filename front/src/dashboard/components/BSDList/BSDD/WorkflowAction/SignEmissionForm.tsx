@@ -233,7 +233,7 @@ export default function SignEmissionForm({ siret, form }: WorkflowActionProps) {
 
   const currentUserIsEmitter = emitterSirets.includes(siret);
   const title = currentUserIsEmitter
-    ? `Signer en tant que ${emitterLabel}`
+    ? `Signer en tant qu'${emitterLabel}`
     : `Faire signer l'${emitterLabel}`;
 
   return (
