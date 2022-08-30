@@ -1501,12 +1501,15 @@ describe("Mutation.createForm", () => {
 
   it("should be possible to fill TVA number only for a foregin transporter", async () => {
     const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
-    const { company: transporterCompany } = await userWithCompanyFactory(UserRole.MEMBER, {
-      companyTypes: {
-        set: ["TRANSPORTER"]
-      },
-      vatNumber: "BE0541696005"
-    });
+    const { company: transporterCompany } = await userWithCompanyFactory(
+      UserRole.MEMBER,
+      {
+        companyTypes: {
+          set: ["TRANSPORTER"]
+        },
+        vatNumber: "BE0541696005"
+      }
+    );
 
     const { mutate } = makeClient(user);
     const { data } = await mutate<
