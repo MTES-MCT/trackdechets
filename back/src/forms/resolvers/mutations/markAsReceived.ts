@@ -88,14 +88,15 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
     ) {
       await formRepository.removeAppendix2(id);
     }
-    // eventEmitter temporary taken out from te repository to fix incomplete refusal email bug
-    eventEmitter.emit<Form>(TDEvent.TransitionForm, {
-      previousNode: null,
-      node: receivedForm,
-      updatedFields: { wasteAcceptationStatus: WasteAcceptationStatus.REFUSED },
-      mutation: "UPDATED"
-    });
     return receivedForm;
+  });
+
+  // eventEmitter temporary taken out from te repository to fix incomplete refusal email bug
+  eventEmitter.emit<Form>(TDEvent.TransitionForm, {
+    previousNode: null,
+    node: receivedForm,
+    updatedFields: receivedInfo,
+    mutation: "UPDATED"
   });
 
   return expandFormFromDb(receivedForm);
