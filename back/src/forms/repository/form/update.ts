@@ -50,8 +50,6 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
         forwardedIn: updatedForwardedIn
       });
 
-      // eventEmitter temporary taken out from te repository to fix incomplete refusal email bug
-
       // log status change
       await prisma.statusLog.create({
         data: {

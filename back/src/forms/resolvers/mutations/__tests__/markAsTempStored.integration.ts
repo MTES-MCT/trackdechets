@@ -16,6 +16,18 @@ import {
   MutationMarkAsTempStoredArgs
 } from "../../../../generated/graphql/types";
 import getReadableId from "../../../readableId";
+import * as mailsHelper from "../../../../mailer/mailing";
+import * as generateBsddPdf from "../../../pdf/generateBsddPdf";
+
+// No mails
+const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
+sendMailSpy.mockImplementation(() => Promise.resolve());
+
+const generateBsddPdfToBase64Spy = jest.spyOn(
+  generateBsddPdf,
+  "generateBsddPdfToBase64"
+);
+generateBsddPdfToBase64Spy.mockResolvedValue("");
 
 const MARK_AS_TEMP_STORED = `
   mutation MarkAsTempStored($id: ID!, $tempStoredInfos: TempStoredFormInput!){
@@ -267,6 +279,11 @@ describe("{ mutation { markAsTempStored } }", () => {
       }
     });
     expect(statusLogs.length).toEqual(1);
+    expect(sendMailSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject: "Refus de prise en charge de votre déchet"
+      })
+    );
   });
 
   it("should not be possible to mark a BSD as temp stored if recipientIsTempStorage != true", async () => {

@@ -30,6 +30,8 @@ export default async function geocode(address: string): Promise<GeoInfo> {
         }
       }
     }
-  } catch (_) {}
+  } catch (_) {
+    console.log(`Error while trying to geocode address ${address}`);
+  }
   return { longitude: null, latitude: null };
 }

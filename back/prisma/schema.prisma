@@ -181,6 +181,7 @@ model Company {
   verifiedAt                           DateTime?                 @db.Timestamptz(6)
   name                                 String?
   address                              String?
+  codeDepartement                      String?
   longitude                            Float?
   latitude                             Float?
   gerepId                              String?

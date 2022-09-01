@@ -1,4 +1,4 @@
-import { Form, Status, WasteAcceptationStatus } from "@prisma/client";
+import { Status, WasteAcceptationStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
@@ -9,7 +9,8 @@ import { getFormRepository } from "../../repository";
 import { acceptedInfoSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
-import { eventEmitter, TDEvent } from "../../../events/emitter";
+import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
+import { sendMail } from "../../../mailer/mailing";
 
 const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
   _,
@@ -63,12 +64,14 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
     return acceptedForm;
   });
 
-  eventEmitter.emit<Form>(TDEvent.TransitionForm, {
-    previousNode: null,
-    node: acceptedForm,
-    updatedFields: acceptedInfo,
-    mutation: "UPDATED"
-  });
+  if (
+    acceptedForm.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED ||
+    acceptedForm.wasteAcceptationStatus ===
+      WasteAcceptationStatus.PARTIALLY_REFUSED
+  ) {
+    const refusedEmail = await renderFormRefusedEmail(acceptedForm);
+    sendMail(refusedEmail);
+  }
 
   return expandFormFromDb(acceptedForm);
 };

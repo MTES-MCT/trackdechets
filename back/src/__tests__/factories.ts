@@ -69,6 +69,7 @@ export const companyFactory = async (
       securityCode: 1234,
       verificationCode: "34567",
       address: "Champ de Mars, 5 Av. Anatole France, 75007 Paris",
+      codeDepartement: "75",
       contactEmail: `contact_${companyIndex}@gmail.com`,
       contactPhone: `+${companyIndex} 606060606`,
       verificationStatus: "VERIFIED",

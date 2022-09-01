@@ -18,10 +18,17 @@ import {
   Mutation,
   MutationMarkAsReceivedArgs
 } from "../../../../generated/graphql/types";
+import * as generateBsddPdf from "../../../pdf/generateBsddPdf";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
+
+const generateBsddPdfToBase64Spy = jest.spyOn(
+  generateBsddPdf,
+  "generateBsddPdfToBase64"
+);
+generateBsddPdfToBase64Spy.mockResolvedValue("");
 
 const MARK_AS_RECEIVED = `
   mutation MarkAsReceived($id: ID!, $receivedInfo: ReceivedFormInput!){
@@ -232,6 +239,11 @@ describe("Test Form reception", () => {
     });
     expect(logs.length).toBe(1);
     expect(logs[0].status).toBe("REFUSED");
+    expect(sendMailSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        subject: "Refus de prise en charge de votre déchet"
+      })
+    );
   });
 
   it("should not accept a non-zero quantity when waste is refused", async () => {
