@@ -41,7 +41,7 @@ export const COMPANY_TYPES = [
     value: CompanyType.Transporter,
     label: "Transporteur",
     helpText:
-      "Transporteur de déchets (dangereux) disposant d'un récépissé préfectoral",
+      "Transporteur de déchets professionnel disposant d'un récépissé de déclaration -ou- personne qui transporte ses propres déchets ou qui répond à l'exemption de récépissé",
   },
   {
     value: CompanyType.Trader,
