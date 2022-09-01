@@ -1,4 +1,4 @@
-import { Status, WasteAcceptationStatus } from "@prisma/client";
+import { Form, Status, WasteAcceptationStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
@@ -9,6 +9,7 @@ import { getFormRepository } from "../../repository";
 import { acceptedInfoSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
+import { eventEmitter, TDEvent } from "../../../events/emitter";
 
 const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
   _,
@@ -60,6 +61,13 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
     }
 
     return acceptedForm;
+  });
+
+  eventEmitter.emit<Form>(TDEvent.TransitionForm, {
+    previousNode: null,
+    node: acceptedForm,
+    updatedFields: acceptedInfo,
+    mutation: "UPDATED"
   });
 
   return expandFormFromDb(acceptedForm);

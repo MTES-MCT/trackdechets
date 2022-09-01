@@ -241,9 +241,6 @@ const recipientCompanySiretSchema = yup
 const transporterCompanySiretSchema = yup
   .string()
   .ensure()
-  .matches(/^$|^\d{14}$/, {
-    message: `Transporteur: ${INVALID_SIRET_LENGTH}`
-  })
   .test(
     "is-transporter-registered-with-right-profile",
     ({ value }) =>
