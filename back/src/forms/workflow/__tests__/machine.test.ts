@@ -92,6 +92,17 @@ describe("Workflow machine", () => {
     });
     expect(nextState.value).toEqual(Status.PROCESSED);
   });
+  test("ACCEPTED -> FOLLOWED_WITH_PNTTD", () => {
+    const nextState = machine.transition(Status.ACCEPTED, {
+      type: EventType.MarkAsProcessed,
+      formUpdateInput: {
+        processingOperationDone: "R 12",
+        nextDestinationCompanyCountry: "BE",
+        noTraceability: false
+      }
+    });
+    expect(nextState.value).toEqual(Status.FOLLOWED_WITH_PNTTD);
+  });
   test("ACCEPTED -> AWAITING_GROUP", () => {
     const nextState = machine.transition(Status.ACCEPTED, {
       type: EventType.MarkAsProcessed,

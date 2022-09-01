@@ -352,6 +352,49 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
+  it("should mark a form as NO_TRACEABILITY when user declares it and with foreign destination", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 13",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          noTraceability: true,
+          nextDestination: {
+            processingOperation: "D 1",
+            company: {
+              mail: "m@m.fr",
+              siret: null,
+              country: "DE",
+              name: "DE company",
+              phone: "0101010101",
+              contact: "The famous bot",
+              address: "A beautiful place..."
+            }
+          }
+        }
+      }
+    });
+
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
+    expect(resultingForm.status).toBe("NO_TRACEABILITY");
+  });
+
   it("should set country to FR by default", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
@@ -396,7 +439,7 @@ describe("mutation.markAsProcessed", () => {
     });
   });
 
-  it("should add a foreign next destination", async () => {
+  it("should mark a form FOLLOWED_WITH_PNTTD with foreign next destination", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -422,7 +465,7 @@ describe("mutation.markAsProcessed", () => {
               mail: "m@m.fr",
               siret: null,
               country: "DE",
-              name: "company",
+              name: "DE company",
               phone: "0101010101",
               contact: "The famous bot",
               address: "A beautiful place..."
@@ -435,7 +478,7 @@ describe("mutation.markAsProcessed", () => {
     const resultingForm = await prisma.form.findUnique({
       where: { id: form.id }
     });
-    expect(resultingForm.status).toBe("AWAITING_GROUP");
+    expect(resultingForm.status).toBe("FOLLOWED_WITH_PNTTD");
     expect(resultingForm.nextDestinationCompanyCountry).toBe("DE");
   });
 
