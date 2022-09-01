@@ -109,7 +109,7 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
                   button={
                     <Link
                       className="btn btn--primary"
-                      to={routes.account.companies.create}
+                      to={routes.account.companies.create.simple}
                     >
                       Créer un établissement
                     </Link>
@@ -119,7 +119,7 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
                 </AccountContentWrapper>
               )}
             />
-            <Route path={routes.account.companies.create}>
+            <Route path={routes.account.companies.create.simple}>
               <AccountContentWrapper title="Créer un établissement">
                 <AccountCompanyAdd />
               </AccountContentWrapper>
