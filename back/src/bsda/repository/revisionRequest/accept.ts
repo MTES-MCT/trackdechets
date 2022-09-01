@@ -9,7 +9,7 @@ import {
   PrismaTransaction,
   RepositoryFnDeps
 } from "../../../forms/repository/types";
-import { addBsdaToIndexQueue } from "../../elastic";
+import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -64,12 +64,9 @@ export function buildAcceptRevisionRequestApproval(
       }
     );
 
-    const updatedBsda = await prisma.bsda.findUnique({
-      where: {
-        id: revisionRequest.bsdaId
-      }
-    });
-    prisma.addAfterCommitCallback(() => addBsdaToIndexQueue(updatedBsda));
+    prisma.addAfterCommitCallback(() =>
+      enqueueBsdToIndex(revisionRequest.bsdaId)
+    );
   };
 }
 

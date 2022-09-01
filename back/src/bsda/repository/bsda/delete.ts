@@ -1,7 +1,6 @@
 import { Bsda, Prisma } from "@prisma/client";
-import { deleteBsd } from "../../../common/elastic";
 import { LogMetadata, RepositoryFnDeps } from "../../../forms/repository/types";
-import { GraphQLContext } from "../../../types";
+import { enqueueBsdToDelete } from "../../../queue/producers/elastic";
 
 export type DeleteBsdaFn = (
   where: Prisma.BsdaWhereUniqueInput,
@@ -33,7 +32,7 @@ export function buildDeleteBsda(deps: RepositoryFnDeps): DeleteBsdaFn {
       }
     });
 
-    await deleteBsd(deletedBsda, { user } as GraphQLContext);
+    prisma.addAfterCommitCallback(() => enqueueBsdToDelete(deletedBsda.id));
 
     return deletedBsda;
   };

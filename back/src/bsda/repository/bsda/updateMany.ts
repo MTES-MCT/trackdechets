@@ -1,7 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { LogMetadata, RepositoryFnDeps } from "../../../forms/repository/types";
-import { addBsdaToIndexQueue } from "../../elastic";
-import { buildFindManyBsda } from "./findMany";
+import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
 
 export type UpdateManyBsdaFn = (
   where: Prisma.BsdaWhereInput,
@@ -37,11 +36,8 @@ export function buildUpdateManyBsdas(deps: RepositoryFnDeps): UpdateManyBsdaFn {
           metadata: { ...logMetadata, authType: user.auth }
         }
       });
-    }
 
-    const bsdas = await buildFindManyBsda(deps)({ id: { in: ids } });
-    for (const bsda of bsdas) {
-      prisma.addAfterCommitCallback(() => addBsdaToIndexQueue(bsda));
+      prisma.addAfterCommitCallback(() => enqueueBsdToIndex(id));
     }
 
     return update;

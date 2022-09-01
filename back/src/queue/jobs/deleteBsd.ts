@@ -1,18 +1,17 @@
 import { Job } from "bull";
 import { toBsdElastic } from "../../bsda/elastic";
-import { BsdElastic, indexBsd } from "../../common/elastic";
+import { BsdElastic, deleteBsd } from "../../common/elastic";
 import prisma from "../../prisma";
 
-export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
+export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
   const bsdId = job.data;
+
+  await deleteBsd({ id: bsdId });
 
   if (bsdId.startsWith("BSDA-")) {
     const bsda = await prisma.bsda.findUnique({ where: { id: bsdId } });
 
-    const elasticBsda = toBsdElastic(bsda);
-    await indexBsd(elasticBsda);
-
-    return elasticBsda;
+    return toBsdElastic(bsda);
   }
 
   throw new Error("Indexing this type of BSD is not handled by this worker.");
