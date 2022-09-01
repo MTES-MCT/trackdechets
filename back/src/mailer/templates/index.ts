@@ -184,3 +184,14 @@ export const verificationDone: MailTemplate<{
     }
   })
 };
+
+export const finalDestinationModified: MailTemplate<{
+  id: string;
+  emitter: { name?: string; siret: string };
+  destination: { name?: string; siret: string };
+  plannedDestination: { name?: string; siret: string };
+}> = {
+  subject: ({ id }) => `Alerte sur le bordereau ${id}`,
+  body: mustacheRenderer("destination-finale-modifiee.html"),
+  templateId: templateIds.LAYOUT
+};

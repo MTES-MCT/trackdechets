@@ -11,6 +11,9 @@ import {
   BsdaSignatureType,
   MutationSignBsdaArgs
 } from "../../../generated/graphql/types";
+import { sendMail } from "../../../mailer/mailing";
+import { finalDestinationModified } from "../../../mailer/templates";
+import { renderMail } from "../../../mailer/templates/renderers";
 import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { expandBsdaFromDb } from "../../converter";
@@ -74,7 +77,7 @@ export default async function sign(
     throw new InvalidSignatureError();
   }
 
-  return runInTransaction(async transaction => {
+  const signedBsda = await runInTransaction(async transaction => {
     const bsdaRepository = getBsdaRepository(user, transaction);
 
     const signedBsda = await bsdaRepository.update(
@@ -109,8 +112,12 @@ export default async function sign(
       );
     }
 
-    return expandBsdaFromDb(signedBsda);
+    return signedBsda;
   });
+
+  sendAlertIfFollowingBsdaChangedPlannedDestination(signedBsda);
+
+  return expandBsdaFromDb(signedBsda);
 }
 
 const signatureTypeMapping: Record<BsdaSignatureType, SignatureTypeInfos> = {
@@ -165,5 +172,51 @@ function checkBsdaTypeSpecificRules(bsda: Bsda, input: BsdaSignatureInput) {
     throw new UserInputError(
       "Ce type de bordereau ne peut pas être signé par une entreprise de travaux."
     );
+  }
+}
+
+async function sendAlertIfFollowingBsdaChangedPlannedDestination(bsda: Bsda) {
+  // Alert can only be sent:
+  // - if the bsda is either a reshipment or a grouping
+  // - when the producer signs the bsda
+  if (
+    (bsda.type !== BsdaType.GATHERING && bsda.type !== BsdaType.RESHIPMENT) ||
+    bsda.status !== BsdaStatus.SIGNED_BY_PRODUCER
+  ) {
+    return;
+  }
+
+  const previousBsdas = await getBsdaHistory(bsda);
+  for (const previousBsda of previousBsdas) {
+    if (
+      previousBsda.destinationOperationNextDestinationCompanySiret &&
+      previousBsda.destinationOperationNextDestinationCompanySiret !==
+        bsda.destinationCompanySiret
+    ) {
+      const mail = renderMail(finalDestinationModified, {
+        to: [
+          {
+            email: previousBsda.emitterCompanyMail,
+            name: previousBsda.emitterCompanyName
+          }
+        ],
+        variables: {
+          id: previousBsda.id,
+          emitter: {
+            siret: bsda.emitterCompanySiret,
+            name: bsda.emitterCompanyName
+          },
+          destination: {
+            siret: bsda.destinationCompanySiret,
+            name: bsda.destinationCompanyName
+          },
+          plannedDestination: {
+            siret: previousBsda.destinationOperationNextDestinationCompanySiret,
+            name: previousBsda.destinationOperationNextDestinationCompanyName
+          }
+        }
+      });
+      sendMail(mail);
+    }
   }
 }
