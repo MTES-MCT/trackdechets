@@ -226,7 +226,8 @@ const machine = Machine<any, Event>(
         !!event?.formUpdateInput?.noTraceability ||
         !!event.formUpdateInput?.forwardedIn?.update?.noTraceability,
       awaitsGroup: (_, event) =>
-        event.formUpdateInput.nextDestinationCompanyCountry === "FR" &&
+        (!event.formUpdateInput?.nextDestinationCompanyCountry ||
+          event.formUpdateInput?.nextDestinationCompanyCountry === "FR") &&
         (PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
           event.formUpdateInput?.processingOperationDone as string
         ) ||
@@ -235,7 +236,8 @@ const machine = Machine<any, Event>(
               ?.processingOperationDone as string
           )),
       isFollowedWithPnttd: (_, event) =>
-        event.formUpdateInput.nextDestinationCompanyCountry !== "FR" &&
+        !!event.formUpdateInput?.nextDestinationCompanyCountry &&
+        event.formUpdateInput?.nextDestinationCompanyCountry !== "FR" &&
         !event?.formUpdateInput?.noTraceability &&
         !event.formUpdateInput?.forwardedIn?.update?.noTraceability &&
         (PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(

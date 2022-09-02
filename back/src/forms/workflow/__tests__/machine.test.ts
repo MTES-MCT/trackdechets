@@ -88,7 +88,10 @@ describe("Workflow machine", () => {
   });
   test("ACCEPTED -> PROCESSED", () => {
     const nextState = machine.transition(Status.ACCEPTED, {
-      type: EventType.MarkAsProcessed
+      type: EventType.MarkAsProcessed,
+      formUpdateInput: {
+        nextDestinationCompanyCountry: "FR"
+      }
     });
     expect(nextState.value).toEqual(Status.PROCESSED);
   });
