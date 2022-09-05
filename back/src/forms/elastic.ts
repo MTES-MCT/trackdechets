@@ -56,6 +56,7 @@ export function getSiretsByTab(
     brokerCompanySiret: form.brokerCompanySiret,
     ecoOrganismeSiret: form.ecoOrganismeSiret,
     transporterCompanySiret: form.transporterCompanySiret,
+    transporterCompanyVatNumber: form.transporterCompanyVatNumber,
     ...multimodalTransportersBySegmentId,
     ...intermediarySiretsReducer
   };
@@ -101,11 +102,13 @@ export function getSiretsByTab(
       setFieldTab("emitterCompanySiret", "isForActionFor");
       setFieldTab("ecoOrganismeSiret", "isForActionFor");
       setFieldTab("transporterCompanySiret", "isToCollectFor");
+      setFieldTab("transporterCompanyVatNumber", "isToCollectFor");
 
       break;
     }
     case Status.SIGNED_BY_PRODUCER: {
       setFieldTab("transporterCompanySiret", "isToCollectFor");
+      setFieldTab("transporterCompanyVatNumber", "isToCollectFor");
 
       break;
     }
@@ -127,6 +130,7 @@ export function getSiretsByTab(
 
       if (!hasBeenHandedOver) {
         setFieldTab("transporterCompanySiret", "isCollectedFor");
+        setFieldTab("transporterCompanyVatNumber", "isCollectedFor");
       }
 
       break;
@@ -210,6 +214,7 @@ function toBsdElastic(form: FullForm & { forwarding?: Form }): BsdElastic {
     emitterCompanySiret: form.emitterCompanySiret ?? "",
     transporterCompanyName: form.transporterCompanyName ?? "",
     transporterCompanySiret: form.transporterCompanySiret ?? "",
+    transporterCompanyVatNumber: form.transporterCompanyVatNumber ?? "",
     transporterTakenOverAt: form.sentAt?.getTime(),
     destinationCompanyName: recipient.name ?? "",
     destinationCompanySiret: recipient.siret ?? "",
