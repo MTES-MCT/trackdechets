@@ -1,3 +1,5 @@
+import "dd-trace/init";
+
 import express, { json } from "express";
 import { mongodbClient } from "./clients/mongodb";
 import { closePsqlClient } from "./clients/psql";

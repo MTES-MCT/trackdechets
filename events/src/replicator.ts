@@ -14,28 +14,24 @@ export async function startReplicator() {
 
 async function migrateEvents() {
   try {
-    await recursiveMigrateEvents();
+    while (true) {
+      const { events, count } = await getOldestEvents(BATCH_SIZE);
+
+      if (count === 0) return Promise.resolve();
+
+      for (const event of events) {
+        await appendEvent(event);
+      }
+
+      await deleteEvents(events.map(e => e.id));
+
+      if (count < BATCH_SIZE) {
+        return Promise.resolve();
+      }
+    }
   } catch (err) {
     console.error("An error occurred during replication", err);
   }
 
   setTimeout(migrateEvents, REPLICATION_INTERVAL);
-}
-
-async function recursiveMigrateEvents() {
-  const { events, count } = await getOldestEvents(BATCH_SIZE);
-
-  if (count === 0) return Promise.resolve();
-
-  for (const event of events) {
-    await appendEvent(event);
-  }
-
-  await deleteEvents(events.map(e => e.id));
-
-  if (count === BATCH_SIZE) {
-    return recursiveMigrateEvents();
-  }
-
-  return Promise.resolve();
 }
