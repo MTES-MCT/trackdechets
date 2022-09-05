@@ -24,8 +24,8 @@ AccountFielCompanyGivenName.fragments = {
 };
 
 const UPDATE_GIVEN_NAME = gql`
-  mutation UpdateCompany($siret: String!, $givenName: String) {
-    updateCompany(siret: $siret, givenName: $givenName) {
+  mutation UpdateCompany($id: String!, $givenName: String) {
+    updateCompany(id: $id, givenName: $givenName) {
       id
       siret
       givenName
@@ -52,7 +52,7 @@ export default function AccountFielCompanyGivenName({ company }: Props) {
               value={company.givenName || ""}
               placeHolder="Nom usuel"
               mutation={UPDATE_GIVEN_NAME}
-              mutationArgs={{ siret: company.siret }}
+              mutationArgs={{ id: company.id }}
               toggleEdition={() => {
                 toggleEdition();
               }}

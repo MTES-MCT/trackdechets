@@ -8,19 +8,16 @@ import styles from "./AccountForm.module.scss";
 interface AccountFormAgreementsProps {
   name: string;
   ecoOrganismeAgreements: string[];
-  siret: string;
+  id: string;
   toggleEdition: () => void;
 }
 
 const UPDATE_AGREEMENTS = gql`
   mutation UpdateCompanyAgreements(
-    $siret: String!
+    $id: String!
     $ecoOrganismeAgreements: [URL!]
   ) {
-    updateCompany(
-      siret: $siret
-      ecoOrganismeAgreements: $ecoOrganismeAgreements
-    ) {
+    updateCompany(id: $id, ecoOrganismeAgreements: $ecoOrganismeAgreements) {
       id
       siret
       ecoOrganismeAgreements
@@ -31,13 +28,13 @@ const UPDATE_AGREEMENTS = gql`
 export default function AccountFormAgreements({
   name,
   ecoOrganismeAgreements,
-  siret,
+  id,
   toggleEdition,
 }: AccountFormAgreementsProps) {
   const [updateAgreements, { loading, error }] = useMutation<
     {},
     {
-      siret: string;
+      id: string;
       ecoOrganismeAgreements: string[];
     }
   >(UPDATE_AGREEMENTS);
@@ -48,7 +45,7 @@ export default function AccountFormAgreements({
       onSubmit={async values => {
         await updateAgreements({
           variables: {
-            siret,
+            id,
             ecoOrganismeAgreements:
               // Filter out empty inputs
               values.ecoOrganismeAgreements.filter(Boolean),

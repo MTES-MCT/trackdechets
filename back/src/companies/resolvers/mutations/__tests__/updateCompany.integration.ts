@@ -46,7 +46,7 @@ describe("mutation updateCompany", () => {
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
     const variables = {
-      siret: company.siret,
+      id: company.id,
       gerepId: "newGerepId",
       contactEmail: "newContact@trackdechets.fr",
       contactPhone: "1111111111",
