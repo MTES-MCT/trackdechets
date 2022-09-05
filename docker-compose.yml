@@ -73,6 +73,37 @@ services:
         constraints:
           - "node.labels.elasticsearch == true"
 
+  mongodb:
+    image: mongo:6
+    ports:
+      - 27017:27017
+    volumes:
+      - ~/apps/mongo:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=trackdechets
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    profiles:
+      - events
+
+  td-events:
+    image: td-events
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    build:
+      context: ./events
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./events/src:/usr/src/app/src
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: dev
+    ports:
+      - "4002:$EVENTS_PORT"
+    depends_on:
+      - mongodb
+    profiles:
+      - events
+
   nginx:
     image: nginx:1.19.6
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"

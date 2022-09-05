@@ -1,0 +1,22 @@
+{
+  "name": "td-events",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.1",
+    "mongodb": "^4.9.1",
+    "pg": "^8.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.7.14",
+    "@types/pg": "^8.6.5",
+    "tsx": "^3.9.0"
+  }
+}
