@@ -4,7 +4,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { getFormsRightFilter } from "../../database";
 import { getConnection } from "../../../common/pagination";
-import { getCachedUserSirets } from "../../../common/redis/users";
+import { getCachedUserCompanies } from "../../../common/redis/users";
 
 const PAGINATE_BY = 100;
 
@@ -15,16 +15,16 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const userSirets = await getCachedUserSirets(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
 
   // User must be associated with a company
-  if (!userSirets.length) {
+  if (!userCompaniesSiretOrVat.length) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à consulter le cycle de vie des bordereaux."
     );
   }
   // If user is associated with several companies, siret is mandatory
-  if (userSirets.length > 1 && !siret) {
+  if (userCompaniesSiretOrVat.length > 1 && !siret) {
     throw new UserInputError(
       "Vous devez préciser pour quel siret vous souhaitez consulter",
       {
@@ -33,13 +33,13 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
     );
   }
   // If requested siret does not belong to user, raise an error
-  if (!!siret && !userSirets.includes(siret)) {
+  if (!!siret && !userCompaniesSiretOrVat.includes(siret)) {
     throw new ForbiddenError(
       "Vous n'avez pas le droit d'accéder au siret précisé"
     );
   }
   // Select user company siret matching siret or get the first
-  const selectedSiret = siret || userSirets.shift();
+  const selectedSiret = siret || userCompaniesSiretOrVat.shift();
 
   const formsFilter = getFormsRightFilter(selectedSiret);
 

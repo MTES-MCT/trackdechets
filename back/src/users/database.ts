@@ -10,15 +10,22 @@ import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail, hashToken } from "../utils";
-import { deleteCachedUserCompanies } from "../common/redis/users";
+import {
+  deleteCachedUserCompanies,
+  getCachedUserCompanies
+} from "../common/redis/users";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
-  // hint: See getCachedUserSirets function to leverage redis
-  const companyAssociations = await prisma.companyAssociation.findMany({
-    where: { userId },
-    include: { company: true }
+  const userCompaniesSiretOrVat = await getCachedUserCompanies(userId);
+  const companies = await prisma.company.findMany({
+    where: {
+      OR: [
+        { vatNumber: { in: userCompaniesSiretOrVat } },
+        { siret: { in: userCompaniesSiretOrVat } }
+      ]
+    }
   });
-  return companyAssociations.map(association => association.company);
+  return companies;
 }
 
 /**

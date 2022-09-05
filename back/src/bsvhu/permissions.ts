@@ -1,6 +1,6 @@
 import { User, Bsvhu, BsvhuStatus } from "@prisma/client";
 import { NotFormContributor } from "../forms/errors";
-import { getCachedUserSirets } from "../common/redis/users";
+import { getCachedUserCompanies } from "../common/redis/users";
 import { ForbiddenError } from "apollo-server-express";
 
 export async function checkIsBsvhuContributor(
@@ -25,7 +25,7 @@ export async function checkIsBsvhuContributor(
 }
 
 export async function isBsvhuContributor(user: User, form: Partial<Bsvhu>) {
-  const userSirets = await getCachedUserSirets(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
 
   const formSirets = [
     form.emitterCompanySiret,
@@ -33,7 +33,7 @@ export async function isBsvhuContributor(user: User, form: Partial<Bsvhu>) {
     form.transporterCompanySiret
   ];
 
-  return userSirets.some(siret => formSirets.includes(siret));
+  return userCompaniesSiretOrVat.some(siret => formSirets.includes(siret));
 }
 
 export async function checkCanDeleteBsdvhu(user: User, form: Bsvhu) {
