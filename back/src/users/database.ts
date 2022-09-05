@@ -10,22 +10,14 @@ import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail, hashToken } from "../utils";
-import {
-  deleteCachedUserCompanies,
-  getCachedUserCompanies
-} from "../common/redis/users";
+import { deleteCachedUserCompanies } from "../common/redis/users";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(userId);
-  const companies = await prisma.company.findMany({
-    where: {
-      OR: [
-        { vatNumber: { in: userCompaniesSiretOrVat } },
-        { siret: { in: userCompaniesSiretOrVat } }
-      ]
-    }
+  const companyAssociations = await prisma.companyAssociation.findMany({
+    where: { userId },
+    include: { company: true }
   });
-  return companies;
+  return companyAssociations.map(association => association.company);
 }
 
 /**
