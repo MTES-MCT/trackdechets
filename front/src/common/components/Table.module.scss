@@ -48,10 +48,10 @@
 }
 
 .TableSortIcon {
-  display: inline;
+  display: none;
   margin: 0 0.5rem;
   visibility: hidden;
 }
 .TableSortIconVisible {
-  visibility: visible;
+  display: inline;
 }

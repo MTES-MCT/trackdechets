@@ -46,7 +46,7 @@ export default function DasriPackagings({
                 >
                   <div className="tw-flex tw-mb-4 tw-items-end">
                     <div className="tw-w-11/12 tw-flex">
-                      <div className="tw-w-1/3 tw-px-2">
+                      <div className="tw-w-1/3 tw-px-2 tw-flex tw-items-end">
                         <Field
                           label="Nombre de colis"
                           component={NumberInput}
@@ -66,7 +66,7 @@ export default function DasriPackagings({
                         />
                         <RedErrorMessage name={`${name}.${idx}.quantity`} />
                       </div>
-                      <div className="tw-w-1/3 tw-pr-2">
+                      <div className="tw-w-1/3 tw-pr-2 tw-flex tw-items-end">
                         <label>
                           Type
                           <select
@@ -102,7 +102,7 @@ export default function DasriPackagings({
                         </label>
                         <RedErrorMessage name={`${name}.${idx}.type`} />
                       </div>
-                      <div className="tw-w-1/3 tw-px-2">
+                      <div className="tw-w-1/3 tw-px-2 tw-flex tw-items-end">
                         {p.type === "AUTRE" && (
                           <label>
                             Précisez
@@ -122,7 +122,7 @@ export default function DasriPackagings({
                         )}
                       </div>
 
-                      <div className="tw-w-1/3 tw-px-2">
+                      <div className="tw-w-1/3 tw-px-2 tw-flex tw-items-end">
                         <Field
                           label="Volume unitaire (l)"
                           component={NumberInput}
@@ -137,7 +137,7 @@ export default function DasriPackagings({
                     </div>
                     {!disabled && (
                       <div
-                        className="tw-px-2"
+                        className="tw-px-2 tw-mb-2"
                         onClick={() => arrayHelpers.remove(idx)}
                       >
                         <button type="button">
