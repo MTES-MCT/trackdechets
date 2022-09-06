@@ -38,24 +38,6 @@ export async function setCachedUserCompanyId(
 }
 
 /**
- * Store sirets in a redis SET
- * @param userId
- * @param sirets
- */
-export async function setCachedUserSirets(
-  userId: string,
-  sirets: string[]
-): Promise<void> {
-  const key = getUserCompanySiretCacheKey(userId);
-
-  await redisClient
-    .pipeline()
-    .sadd(key, sirets)
-    .expire(key, CACHED_COMPANY_EXPIRATION)
-    .exec();
-}
-
-/**
  * Retrieve cached Company siret and vatNumber
  * if found in redis, or query the db and cache them
  * @param userId

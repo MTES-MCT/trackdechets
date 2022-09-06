@@ -7,7 +7,7 @@ import { Mutation } from "../../../../generated/graphql/types";
 
 const UPDATE_COMPANY = `
   mutation UpdateCompany(
-    $siret: String!,
+    $id: String!,
     $gerepId: String,
     $contactEmail: String,
     $contactPhone: String,
@@ -20,7 +20,7 @@ const UPDATE_COMPANY = `
     $allowBsdasriTakeOverWithoutSignature: Boolean
     ){
       updateCompany(
-        siret: $siret,
+        id: $id,
         gerepId: $gerepId,
         contactEmail: $contactEmail,
         contactPhone: $contactPhone,
@@ -75,7 +75,7 @@ describe("mutation updateCompany", () => {
 
     const { errors } = await mutate(UPDATE_COMPANY, {
       variables: {
-        siret: company.siret,
+        id: company.id,
         ecoOrganismeAgreements: ["https://legifrance.com/1"]
       }
     });
@@ -102,7 +102,7 @@ describe("mutation updateCompany", () => {
 
     const { errors } = await mutate(UPDATE_COMPANY, {
       variables: {
-        siret: company.siret,
+        id: company.id,
         ecoOrganismeAgreements: []
       }
     });
@@ -128,7 +128,7 @@ describe("mutation updateCompany", () => {
 
     const { errors } = await mutate(UPDATE_COMPANY, {
       variables: {
-        siret: company.vatNumber,
+        id: company.id,
         companyTypes: ["ECO_ORGANISME", "TRANSPORTER"]
       }
     });
@@ -142,7 +142,7 @@ describe("mutation updateCompany", () => {
 
     const { errors: errors2 } = await mutate(UPDATE_COMPANY, {
       variables: {
-        siret: company.vatNumber,
+        id: company.id,
         companyTypes: ["TRANSPORTER"]
       }
     });
