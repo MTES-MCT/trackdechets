@@ -1,7 +1,7 @@
 import "dd-trace/init";
 
 import express, { json } from "express";
-import { mongodbClient } from "./clients/mongodb";
+import { closeMongoClient } from "./clients/mongodb";
 import { closePsqlClient } from "./clients/psql";
 import { getEventsHandler } from "./handlers";
 import { startReplicator } from "./replicator";
@@ -10,6 +10,7 @@ const port = process.env.EVENTS_PORT || 82;
 
 export const app = express();
 
+app.disable("x-powered-by");
 app.use(json());
 
 app.get("/ping", (_, res) => res.send("Pong!"));
@@ -22,7 +23,7 @@ app.listen(port, () =>
 startReplicator();
 
 function shutdown() {
-  return Promise.all([closePsqlClient(), mongodbClient.close()]).finally(
+  return Promise.all([closePsqlClient(), closeMongoClient()]).finally(
     process.exit()
   );
 }

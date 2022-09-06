@@ -11,7 +11,7 @@ export type TDEvent = {
 };
 
 export type EventCollection = {
-  _id: string; // This is the streamId
+  streamId: string;
   latestEvent: Date;
   events: TDEvent[];
 };
