@@ -6,6 +6,7 @@ import prisma from "../../../../prisma";
 import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { getCachedUserCompanies } from "../../../../common/redis/users";
 
 const REMOVE_USER_FROM_COMPANY = `mutation RemoveUserFromCompany($userId: ID!, $siret: String!){
   removeUserFromCompany(userId: $userId, siret: $siret){
@@ -45,5 +46,24 @@ describe("mutation removeUserFromCompany", () => {
     });
     isMember = await isMemberFn(user.id, company.siret);
     expect(isMember).toEqual(false);
+  });
+
+  it("should reset cache", async () => {
+    const { user: admin, company } = await userWithCompanyFactory("ADMIN");
+    const user = await userFactory();
+    await prisma.companyAssociation.create({
+      data: {
+        user: { connect: { id: user.id } },
+        company: { connect: { id: company.id } },
+        role: "MEMBER"
+      }
+    });
+
+    expect(await getCachedUserCompanies(user.id)).toEqual([company.siret]);
+    const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
+    await mutate(REMOVE_USER_FROM_COMPANY, {
+      variables: { userId: user.id, siret: company.siret }
+    });
+    expect(await getCachedUserCompanies(user.id)).toEqual([]);
   });
 });
