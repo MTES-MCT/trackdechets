@@ -17,6 +17,10 @@ export default function AccountContentWrapper({
 }: Props) {
   return (
     <div className={styles.content}>
+      <div className={styles.panelTitle}>
+        <h5 className="h5 tw-font-bold tw-mb-4">{title}</h5>
+        {button || null}
+      </div>
       <div>{children}</div>
     </div>
   );

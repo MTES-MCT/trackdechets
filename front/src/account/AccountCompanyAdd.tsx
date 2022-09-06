@@ -106,9 +106,8 @@ export default function AccountCompanyAdd() {
   const history = useHistory();
 
   // STATE
-  const [companyInfos, setCompanyInfos] = useState<CompanySearchResult | null>(
-    null
-  );
+  const [companyInfos, setCompanyInfos] =
+    useState<CompanySearchResult | null>(null);
 
   // QUERIES AND MUTATIONS
   const [createCompany, { error: savingError }] = useMutation<
@@ -125,24 +124,17 @@ export default function AccountCompanyAdd() {
     },
   });
 
-  const [
-    createTransporterReceipt,
-    { error: createTransporterReceiptError },
-  ] = useMutation(CREATE_TRANSPORTER_RECEIPT);
+  const [createTransporterReceipt, { error: createTransporterReceiptError }] =
+    useMutation(CREATE_TRANSPORTER_RECEIPT);
 
-  const [
-    createTraderReceipt,
-    { error: createTraderReceiptError },
-  ] = useMutation(CREATE_TRADER_RECEIPT);
+  const [createTraderReceipt, { error: createTraderReceiptError }] =
+    useMutation(CREATE_TRADER_RECEIPT);
 
-  const [
-    createBrokerReceipt,
-    { error: createBrokerReceiptError },
-  ] = useMutation(CREATE_BROKER_RECEIPT);
+  const [createBrokerReceipt, { error: createBrokerReceiptError }] =
+    useMutation(CREATE_BROKER_RECEIPT);
 
-  const [createVhuAgrement, { error: createVhuAgrementError }] = useMutation(
-    CREATE_VHU_AGREMENT
-  );
+  const [createVhuAgrement, { error: createVhuAgrementError }] =
+    useMutation(CREATE_VHU_AGREMENT);
 
   function isTransporter(companyTypes: _CompanyType[]) {
     return companyTypes.includes(_CompanyType.Transporter);

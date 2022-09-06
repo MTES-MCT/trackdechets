@@ -87,6 +87,7 @@ const routes = {
       },
       join: "/account/companies/join",
       list: "/account/companies",
+      orientation: "/account/companies/create",
     },
     authorizedApplications: "/account/applications",
     tokens: { list: "/account/tokens/list" },

@@ -17,11 +17,13 @@ import AccountAccessTokenList from "./accessTokens/AccountAccessTokenList";
 import AccountCompanyList from "./AccountCompanyList";
 import AccountContentWrapper from "./AccountContentWrapper";
 import AccountCompanyAdd from "./AccountCompanyAdd";
+import AccountCompanyAddProducer from "./AccountCompanyAddProducer";
 import AccountOauth2AppList from "./oauth2/AccountOauth2AppList";
 import AccountOAuth2AppCreateUpdate from "./oauth2/AccountOauth2AppCreateUpdate";
 import { Query } from "generated/graphql/types";
 import routes from "common/routes";
 import AccountAuthorizedAppList from "./apps/AccountAuthorizedAppList";
+import AccountCompanyOrientation from "./AccountCompanyOrientation";
 
 export const GET_ME = gql`
   {
@@ -100,6 +102,11 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
                 </AccountContentWrapper>
               )}
             />
+            <Route path={routes.account.companies.orientation}>
+              <AccountContentWrapper title="">
+                <AccountCompanyOrientation />
+              </AccountContentWrapper>
+            </Route>
             <Route
               exact
               path={routes.account.companies.list}
@@ -109,7 +116,7 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
                   button={
                     <Link
                       className="btn btn--primary"
-                      to={routes.account.companies.create.simple}
+                      to={routes.account.companies.orientation}
                     >
                       Créer un établissement
                     </Link>
@@ -120,6 +127,11 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
               )}
             />
             <Route path={routes.account.companies.create.simple}>
+              <AccountContentWrapper title="Créer un établissement">
+                <AccountCompanyAddProducer />
+              </AccountContentWrapper>
+            </Route>
+            <Route path={routes.account.companies.create.pro}>
               <AccountContentWrapper title="Créer un établissement">
                 <AccountCompanyAdd />
               </AccountContentWrapper>

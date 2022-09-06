@@ -66,19 +66,19 @@ export default function Invite() {
   const hash = decodeHash(qsHash);
 
   // INVITATION QUERY
-  const { loading, error: queryError, data: queryData } = useQuery<
-    Pick<Query, "invitation">
-  >(INVITATION, {
+  const {
+    loading,
+    error: queryError,
+    data: queryData,
+  } = useQuery<Pick<Query, "invitation">>(INVITATION, {
     variables: { hash },
   });
 
   // JOIN_WITH_INVITE MUTATION
-  const [
-    joinWithInvite,
-    { error: mutationError, data: mutationData },
-  ] = useMutation<Pick<Mutation, "joinWithInvite">, MutationJoinWithInviteArgs>(
-    JOIN_WITH_INVITE
-  );
+  const [joinWithInvite, { error: mutationError, data: mutationData }] =
+    useMutation<Pick<Mutation, "joinWithInvite">, MutationJoinWithInviteArgs>(
+      JOIN_WITH_INVITE
+    );
 
   if (loading) {
     return <Loader />;
@@ -240,7 +240,6 @@ export default function Invite() {
                   {({ field }) => {
                     return (
                       <TextInput
-                        // @ts-ign
                         {...field}
                         required
                         label="Nom et prénom"
@@ -253,13 +252,7 @@ export default function Invite() {
                 <Field name="email">
                   {({ field }) => {
                     return (
-                      <TextInput
-                        // @ts-ignore
-                        {...field}
-                        readOnly
-                        required
-                        label="Email"
-                      />
+                      <TextInput {...field} readOnly required label="Email" />
                     );
                   }}
                 </Field>
