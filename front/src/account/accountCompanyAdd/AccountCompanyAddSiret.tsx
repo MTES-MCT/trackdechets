@@ -121,10 +121,10 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
               <span>
                 Nous n'avons pas pu récupérer les informations de cet
                 établissement car il n'est pas diffusible. Veuillez nous
-                contacter à l'adresse hello@trackdechets.beta.gouv.fr avec votre
-                certificat d'inscription au répertoire des Entreprises et des
-                Établissements (SIRENE) pour pouvoir procéder à la création de
-                l'établissement. Pour télécharger votre certificat, RDV sur{" "}
+                contacter à l'adresse contact@trackdechets.beta.gouv.fr avec
+                votre certificat d'inscription au répertoire des Entreprises et
+                des Établissements (SIRENE) pour pouvoir procéder à la création
+                de l'établissement. Pour télécharger votre certificat, RDV sur{" "}
               </span>
               <a
                 href="https://avis-situation-sirene.insee.fr/"

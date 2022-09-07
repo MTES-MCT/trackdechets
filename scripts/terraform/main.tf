@@ -38,7 +38,7 @@ resource "scalingo_app" "front" {
     VITE_ALLOW_TEST_COMPANY="true"
     VITE_HOSTNAME="${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
     VITE_API_ENDPOINT="https://api.${var.scalingo_app_name}.trackdechets.beta.gouv.fr"
-    VITE_CONTACT_EMAIL="hello@trackdechets.beta.gouv.fr"
+    VITE_CONTACT_EMAIL="contact@trackdechets.beta.gouv.fr"
     VITE_DEVELOPERS_ENDPOINT="https://developers.trackdechets.fr"
     VITE_SIB_CHAT="0"
     VITE_URL_SCHEME="https"
