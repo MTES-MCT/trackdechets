@@ -184,7 +184,7 @@
             {{#bsff.transporterTransportTakenOverAt}}{{#formatDate}}{{bsff.transporterTransportTakenOverAt}}{{/formatDate}}{{/bsff.transporterTransportTakenOverAt}}
             {{^bsff.transporterTransportTakenOverAt}}{{#formatDate}}{{bsff.transporterTransportSignatureDate}}{{/formatDate}}{{/bsff.transporterTransportTakenOverAt}}
             <br />
-            Mode de transport : Route<br />
+            Mode de transport : {{ transportMode }}<br />
           </p>
           <p>Signature :</p>
           <div class="Signature">{{{ signatures.transport }}}</div>
