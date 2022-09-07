@@ -56,6 +56,7 @@ export const FullBsffFragment = gql`
           author
           date
         }
+        plates
       }
       customInfo
     }
