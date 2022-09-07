@@ -52,7 +52,7 @@ export default function SignupInfo() {
               👉
             </span>
             Pour recevoir nos emails sans encombres, vous pouvez ajouter
-            contact@trackdechets.beta.gouv.fr à votre liste de contacts
+            {CONTACT_EMAIL} à votre liste de contacts
           </li>
           <li>
             <span

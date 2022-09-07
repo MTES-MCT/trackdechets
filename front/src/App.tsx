@@ -7,6 +7,7 @@ import LayoutContainer from "./layout/LayoutContainer";
 import setYupLocale from "./common/setYupLocale";
 import BrowserDetect from "./BrowserDetect";
 import { SimpleNotificationError } from "common/components/Error";
+import { CONTACT_EMAIL } from "common/config";
 
 // Defines app-wide french error messages for yup
 // See https://github.com/jquense/yup#using-a-custom-locale-dictionary
@@ -19,8 +20,8 @@ export default function App() {
         fallback={
           <SimpleNotificationError
             message={
-              "Une erreur s'est produite, nous nous en excusons." +
-              "Si le problème persiste, merci de contacter le support contact@trackdechets.beta.gouv.fr"
+              `Une erreur s'est produite, nous nous en excusons.` +
+              `Si le problème persiste, merci de contacter le support ${CONTACT_EMAIL}`
             }
           />
         }
