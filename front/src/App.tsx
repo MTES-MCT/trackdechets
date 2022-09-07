@@ -20,7 +20,7 @@ export default function App() {
           <SimpleNotificationError
             message={
               "Une erreur s'est produite, nous nous en excusons." +
-              "Si le problème persiste, merci de contacter le support hello@trackdechets.beta.gouv.fr"
+              "Si le problème persiste, merci de contacter le support contact@trackdechets.beta.gouv.fr"
             }
           />
         }
