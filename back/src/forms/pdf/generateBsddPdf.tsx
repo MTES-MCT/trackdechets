@@ -273,7 +273,8 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
         form: await expandAppendix2FormFromDb(form),
         quantity
       }))
-    )
+    ),
+    intermediaries: fullPrismaForm.intermediaries ?? []
   };
   const isRepackging =
     form.recipient?.isTempStorage &&
@@ -590,13 +591,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             <div className="BoxCol">
               <p>
                 <strong>
-                  Non réglementaire.{" "}
-                  <input
-                    type="checkbox"
-                    checked={Boolean(form.intermediaries?.length)}
-                    readOnly
-                  />{" "}
-                  Intermédiaire{form?.intermediaries?.length > 1 ? "s" : ""}
+                  Autre{form?.intermediaries?.length > 1 ? "s" : ""} Intermédiaire{form?.intermediaries?.length > 1 ? "s" : ""}
                 </strong>
               </p>
               {form?.intermediaries?.map(intermediary => (

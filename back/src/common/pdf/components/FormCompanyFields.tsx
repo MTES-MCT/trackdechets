@@ -99,7 +99,8 @@ export function FormCompanyFields({
       <p>
         Tel : {company?.phone}
         <br />
-        { `Mail ${isEmailMandatory ? "" : "(facultatif) " }: ` }{company?.mail}
+        {`Mail ${isEmailMandatory ? "" : "(facultatif) "}: `}
+        {company?.mail}
         {!isPrivateIndividual && (
           <div>
             <br />
