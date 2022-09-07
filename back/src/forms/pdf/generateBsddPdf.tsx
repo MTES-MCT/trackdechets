@@ -585,7 +585,32 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             </div>
           </div>
         </div>
-
+        {form.intermediaries?.length ? (
+          <div className="BoxRow">
+            <div className="BoxCol">
+              <p>
+                <strong>
+                  Non réglementaire.{" "}
+                  <input
+                    type="checkbox"
+                    checked={Boolean(form.intermediaries?.length)}
+                    readOnly
+                  />{" "}
+                  Intermédiaire{form?.intermediaries?.length > 1 ? "s" : ""}
+                </strong>
+              </p>
+              {form?.intermediaries?.map(intermediary => (
+                <div className="Row">
+                  <div className="Col">
+                    <FormCompanyFields company={intermediary} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
         <div className="BoxRow">
           <div className="BoxCol">
             <p>
