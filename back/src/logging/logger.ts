@@ -19,7 +19,7 @@ setInterval(() => {
   const memoryUsage = process.memoryUsage();
   logger.info("Memory usage - TEMP", memoryUsage);
 
-  if (process.env.DD_ENV === "sandbox") {
+  if (["sandbox", "recette"].includes(process.env.DD_ENV)) {
     createHeapSnapshotAndUploadToS3();
   }
 }, 1000 * 60 * 3);
@@ -28,7 +28,7 @@ async function createHeapSnapshotAndUploadToS3() {
   const snapshotStream = v8.getHeapSnapshot();
   // It's important that the filename end with `.heapsnapshot`,
   // otherwise Chrome DevTools won't open it.
-  const fileName = `${Date.now()}.heapsnapshot`;
+  const fileName = `${process.env.DD_ENV}_${Date.now()}.heapsnapshot`;
   const fileStream = createWriteStream(fileName);
   snapshotStream.pipe(fileStream);
 
