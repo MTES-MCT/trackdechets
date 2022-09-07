@@ -210,7 +210,7 @@ type BsffTransport {
   "Date de prise en charge"
   takenOverAt: DateTime
   "Mode de transport utilisé."
-  mode: TransportMode!
+  mode: TransportMode
   "Plaque(s) d'immatriculation"
   plates: [String!]
   "Signature du transporteur lors de l'enlèvement auprès de l'émetteur."
