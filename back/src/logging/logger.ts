@@ -18,11 +18,13 @@ const logger = createLogger({
 setInterval(() => {
   const memoryUsage = process.memoryUsage();
   logger.info("Memory usage - TEMP", memoryUsage);
+}, 1000 * 60 * 3);
 
+setInterval(() => {
   if (["sandbox", "recette"].includes(process.env.DD_ENV)) {
     createHeapSnapshotAndUploadToS3();
   }
-}, 1000 * 60 * 3);
+}, 1000 * 60 * 60);
 
 async function createHeapSnapshotAndUploadToS3() {
   const snapshotStream = v8.getHeapSnapshot();
