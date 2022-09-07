@@ -7,7 +7,7 @@ import { getInitialCompany } from "form/bsdd/utils/initial-state";
 export function Destination({ disabled }) {
   const { values, setFieldValue } = useFormikContext<Bsda>();
   const hasNextDestination = Boolean(
-    values.destination?.operation?.nextDestination
+    values.destination?.operation?.nextDestination?.company
   );
   const isDechetterie = values?.type === BsdaType.Collection_2710;
 
