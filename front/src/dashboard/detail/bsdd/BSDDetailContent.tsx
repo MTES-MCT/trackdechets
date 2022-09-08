@@ -747,7 +747,7 @@ export default function BSDDetailContent({
             {/* Intermdiaries tab panel */}
             {form?.intermediaries?.length ? (
               <TabPanel className={styles.detailTabPanel}>
-                {form?.intermediaries?.map((intermediary) => (
+                {form?.intermediaries?.map(intermediary => (
                   <Intermediary intermediary={intermediary} />
                 ))}
               </TabPanel>
