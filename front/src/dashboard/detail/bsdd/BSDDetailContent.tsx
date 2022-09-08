@@ -269,8 +269,8 @@ const Intermediary = ({ intermediary }) => (
   <>
     <div className={styles.detailColumns}>
       <div className={styles.detailGrid}>
-        <dt>{intermediary?.name}</dt>
-        <dd></dd>
+        <dt>Établissement intermédiaire</dt>
+        <dd>{intermediary?.name}</dd>
 
         <dt>Siret</dt>
         <dd>{intermediary?.siret}</dd>
@@ -747,7 +747,7 @@ export default function BSDDetailContent({
             {/* Intermdiaries tab panel */}
             {form?.intermediaries?.length ? (
               <TabPanel className={styles.detailTabPanel}>
-                {form?.intermediaries?.map((intermediary, idx) => (
+                {form?.intermediaries?.map((intermediary) => (
                   <Intermediary intermediary={intermediary} />
                 ))}
               </TabPanel>
