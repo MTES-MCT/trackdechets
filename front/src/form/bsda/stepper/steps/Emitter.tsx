@@ -7,10 +7,17 @@ import WorkSite from "form/common/components/work-site/WorkSite";
 export function Emitter({ disabled }) {
   const { values, handleChange, setFieldValue } = useFormikContext<Bsda>();
 
-  const isValidBsdaSuite =
-    [BsdaType.Gathering, BsdaType.Reshipment].includes(
-      values?.type as BsdaType
-    ) && values.emitter?.company?.siret;
+  const isBsdaSuite = [BsdaType.Gathering, BsdaType.Reshipment].includes(
+    values?.type as BsdaType
+  );
+
+  if (isBsdaSuite && !values.emitter?.company?.siret) {
+    return (
+      <div className="notification notification--error">
+        Sélectionnez les bordereaux à associer avant de compléter l'émetteur.
+      </div>
+    );
+  }
 
   return (
     <>
@@ -21,7 +28,7 @@ export function Emitter({ disabled }) {
         </div>
       )}
 
-      {isValidBsdaSuite ? (
+      {isBsdaSuite ? (
         <div className="notification">
           Vous effectuez un groupement ou une réexpédition. L'entreprise
           émettrice est obligatoirement la vôtre:{" "}
@@ -45,7 +52,7 @@ export function Emitter({ disabled }) {
         </div>
       )}
 
-      {values.emitter?.isPrivateIndividual || isValidBsdaSuite ? (
+      {values.emitter?.isPrivateIndividual || isBsdaSuite ? (
         <>
           <div className="form__row">
             {values.emitter?.isPrivateIndividual ? (
@@ -113,7 +120,7 @@ export function Emitter({ disabled }) {
         />
       )}
 
-      {!isValidBsdaSuite && (
+      {!isBsdaSuite && (
         <WorkSite
           switchLabel="Je souhaite ajouter une adresse de chantier ou de collecte"
           headingTitle="Adresse chantier"
