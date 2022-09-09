@@ -8,6 +8,7 @@ export const statusLabels: { [key: string]: string } = {
   ACCEPTED: "Accepté, en attente de traitement",
   PROCESSED: "Traité",
   AWAITING_GROUP: "En attente de regroupement",
+  FOLLOWED_WITH_PNTTD: "Suivi via PNTTD",
   GROUPED: "Annexé à un bordereau de regroupement",
   NO_TRACEABILITY: "Regroupé, avec autorisation de rupture de traçabilité",
   REFUSED: "Refusé",

@@ -85,7 +85,7 @@ enum Status {
   GROUPED
   NO_TRACEABILITY
   REFUSED
-
+  FOLLOWED_WITH_PNTTD
   // Temporary storage status
   TEMP_STORED
   TEMP_STORER_ACCEPTED
