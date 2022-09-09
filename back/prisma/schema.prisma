@@ -434,6 +434,8 @@ model IntermediaryFormAssociation {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
 
   @@index([formId], map: "_IntermediaryFormAssociationFormIdIdx")
+  @@index([siret], map: "IntermediaryFormAssociationSiretIdx")
+  @@index([vatNumber], map: "IntermediaryFormAssociationVatNumberIdx")
 }
 
 enum RevisionRequestStatus {
@@ -1197,6 +1199,8 @@ model BsffPackaging {
 
   bsff   Bsff   @relation(fields: [bsffId], references: [id], onDelete: Cascade)
   bsffId String
+
+  @@index([bsffId], map: "_BsffPackagingBsffId")
 }
 
 // ----------------
