@@ -6,7 +6,7 @@ import {
 } from "../../__tests__/factories";
 
 import {
-  getCachedUserCompanies,
+  getCachedUserSiretOrVat,
   getUserCompaniesCacheKey,
   deleteCachedUserCompanies
 } from "../../common/redis/users";
@@ -34,7 +34,7 @@ describe("Test Caching", () => {
     let exists = await redisClient.exists(key);
     expect(exists).toBe(0);
 
-    const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+    const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
     expect(userCompaniesSiretOrVat.length).toEqual(2);
     expect(userCompaniesSiretOrVat.includes(company.siret)).toBe(true);

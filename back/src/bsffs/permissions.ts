@@ -2,7 +2,7 @@ import { User, Bsff, BsffFicheIntervention } from "@prisma/client";
 import { ForbiddenError } from "apollo-server-express";
 
 import { checkIsCompanyMember } from "../users/permissions";
-import { getCachedUserCompanies } from "../common/redis/users";
+import { getCachedUserSiretOrVat } from "../common/redis/users";
 
 export async function isBsffContributor(
   user: User,
@@ -15,7 +15,7 @@ export async function isBsffContributor(
     >
   >
 ) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   const bsffSirets = [
     bsff.emitterCompanySiret,

@@ -3,7 +3,7 @@ import { ForbiddenError } from "apollo-server-express";
 import prisma from "../prisma";
 import { FormCompanies } from "./types";
 
-import { getCachedUserCompanies } from "../common/redis/users";
+import { getCachedUserSiretOrVat } from "../common/redis/users";
 
 import { getFullForm } from "./database";
 import { InvaliSecurityCode, NotFormContributor } from "./errors";
@@ -160,9 +160,9 @@ function isFormIntermediary(userCompanies: string[], form: FormCompanies) {
 }
 
 export async function isFormContributor(user: User, form: FormCompanies) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   // fetch both vatNumber and siret
-  const userCompanies = await getCachedUserCompanies(user.id);
+  const userCompanies = await getCachedUserSiretOrVat(user.id);
   const isFormCompanyIdContributor = isFormIntermediary(userCompanies, form);
   const isFormSiretContributor = [
     isFormEmitter,
@@ -181,7 +181,7 @@ export async function isFormContributor(user: User, form: FormCompanies) {
 async function isFormInitialEmitter(user: User, form: Form) {
   const { findAppendix2FormsById } = getFormRepository(user);
   const appendix2Forms = await findAppendix2FormsById(form.id);
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   return appendix2Forms.reduce(
     (acc, f) => acc || isFormEmitter(userCompaniesSiretOrVat, f),
     false
@@ -240,7 +240,7 @@ export async function checkCanUpdate(user: User, form: Form) {
   );
 
   if (form.status === "SIGNED_BY_PRODUCER") {
-    const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+    const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
     if (
       form.emittedByEcoOrganisme &&
@@ -273,7 +273,7 @@ export async function checkCanDelete(user: User, form: Form) {
   );
 
   if (form.status === "SIGNED_BY_PRODUCER") {
-    const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+    const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
     if (
       form.emittedByEcoOrganisme &&
@@ -299,7 +299,7 @@ export async function checkCanDelete(user: User, form: Form) {
 }
 
 export async function checkCanUpdateTransporterFields(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   // check if Intermediary can update Transporter fields
   if (!isFormTransporter(userCompaniesSiretOrVat, form)) {
     throw new ForbiddenError("Vous n'êtes pas transporteur de ce bordereau.");
@@ -315,7 +315,7 @@ export async function checkCanMarkAsSealed(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsSent(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const formCompanies = await formToCompanies(form);
 
   const isAuthorized = [isFormRecipient, isFormEmitter].some(isFormRole =>
@@ -334,7 +334,7 @@ export async function checkCanSignFor(
   user: User,
   securityCode?: number
 ) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   if (userCompaniesSiretOrVat.includes(siret)) {
     return true;
@@ -350,7 +350,7 @@ export async function checkCanSignFor(
 }
 
 export async function checkCanSignedByTransporter(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const formCompanies = await formToCompanies(form);
   const isAuthorized = [
     isFormTransporter,
@@ -366,7 +366,7 @@ export async function checkCanSignedByTransporter(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsReceived(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const formCompanies = await formToCompanies(form);
   const isAuthorized = form.forwardedInId
     ? isFormDestinationAfterTempStorage(userCompaniesSiretOrVat, formCompanies)
@@ -381,7 +381,7 @@ export async function checkCanMarkAsReceived(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsAccepted(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const formCompanies = await formToCompanies(form);
   const isAuthorized = form.forwardedInId
     ? isFormDestinationAfterTempStorage(userCompaniesSiretOrVat, formCompanies)
@@ -395,7 +395,7 @@ export async function checkCanMarkAsAccepted(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsProcessed(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const formCompanies = await formToCompanies(form);
   const isAuthorized = form.forwardedInId
     ? isFormDestinationAfterTempStorage(
@@ -416,7 +416,7 @@ export async function checkCanMarkAsProcessed(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsTempStored(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const formCompanies = await formToCompanies(form);
 
   const isAuthorized = isFormRecipient(userCompaniesSiretOrVat, formCompanies);
@@ -429,7 +429,7 @@ export async function checkCanMarkAsTempStored(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsTempStorerAccepted(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const formCompanies = await formToCompanies(form);
 
   const isAuthorized = isFormRecipient(userCompaniesSiretOrVat, formCompanies);
@@ -442,7 +442,7 @@ export async function checkCanMarkAsTempStorerAccepted(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsResealed(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const formCompanies = await formToCompanies(form);
 
   const isAuthorized = isFormRecipient(userCompaniesSiretOrVat, formCompanies);
@@ -455,7 +455,7 @@ export async function checkCanMarkAsResealed(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsResent(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const formCompanies = await formToCompanies(form);
 
   const isAuthorized = isFormRecipient(userCompaniesSiretOrVat, formCompanies);
@@ -469,7 +469,7 @@ export async function checkCanMarkAsResent(user: User, form: Form) {
 
 // only recipient of the form can import data from paper
 export async function checkCanImportForm(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const isAuthorized = isFormRecipient(userCompaniesSiretOrVat, form);
   if (!isAuthorized) {
     throw new ForbiddenError(
@@ -494,7 +494,7 @@ export async function checkCanRequestRevision(
   form: Form,
   forwardedIn?: Form
 ) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   const canRequestRevision = [
     isFormEmitter,

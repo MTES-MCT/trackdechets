@@ -1,6 +1,6 @@
 import { User, Bsdasri, BsdasriStatus, BsdasriType } from "@prisma/client";
 import prisma from "../prisma";
-import { getCachedUserCompanies } from "../common/redis/users";
+import { getCachedUserSiretOrVat } from "../common/redis/users";
 
 import { BsdasriSirets } from "./types";
 
@@ -18,7 +18,7 @@ export async function isDasriContributorHelper(
   user: User,
   dasri: BsdasriSirets
 ) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const formSirets = [
     dasri.emitterCompanySiret,
     dasri.transporterCompanySiret,
@@ -31,7 +31,7 @@ export async function isDasriContributorHelper(
 
 // Don't call directly in resolver to handle permissions
 export async function isDasriInitialEmitterHelper(user: User, dasriId: string) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const bsdasris = await prisma.bsdasri.findMany({
     where: { synthesizedIn: { id: dasriId } },
     select: { emitterCompanySiret: true }

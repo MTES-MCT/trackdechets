@@ -12,7 +12,7 @@ import {
 } from "@prisma/client";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { checkCanEditBsdasri } from "../../permissions";
-import { getCachedUserCompanies } from "../../../common/redis/users";
+import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 
 import {
   dasriSignatureMapping,
@@ -108,7 +108,7 @@ const getSiretWhoSigns = async ({
     await checkIsCompanyMember({ id: userId }, { siret: siretWhoSigns });
   } else {
     // several allowed sirets ? take the first belonging to current user
-    const userCompaniesSiretOrVat = await getCachedUserCompanies(userId);
+    const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(userId);
     const userAuthorizedSirets = authorizedSirets.filter(siret =>
       userCompaniesSiretOrVat.includes(siret)
     );

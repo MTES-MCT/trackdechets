@@ -6,7 +6,7 @@ import prisma from "../../../../prisma";
 import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { getCachedUserCompanies } from "../../../../common/redis/users";
+import { getCachedUserSiretOrVat } from "../../../../common/redis/users";
 
 const REMOVE_USER_FROM_COMPANY = `mutation RemoveUserFromCompany($userId: ID!, $siret: String!){
   removeUserFromCompany(userId: $userId, siret: $siret){
@@ -59,11 +59,11 @@ describe("mutation removeUserFromCompany", () => {
       }
     });
 
-    expect(await getCachedUserCompanies(user.id)).toEqual([company.siret]);
+    expect(await getCachedUserSiretOrVat(user.id)).toEqual([company.siret]);
     const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
     await mutate(REMOVE_USER_FROM_COMPANY, {
       variables: { userId: user.id, siret: company.siret }
     });
-    expect(await getCachedUserCompanies(user.id)).toEqual([]);
+    expect(await getCachedUserSiretOrVat(user.id)).toEqual([]);
   });
 });

@@ -4,7 +4,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { getFormsRightFilter } from "../../database";
 import { getConnection } from "../../../common/pagination";
-import { getCachedUserCompanies } from "../../../common/redis/users";
+import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 
 const PAGINATE_BY = 100;
 
@@ -15,7 +15,7 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   // User must be associated with a company
   if (!userCompaniesSiretOrVat.length) {

@@ -1,7 +1,7 @@
 import { User, Bsda, BsdaStatus } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { NotFormContributor } from "../forms/errors";
-import { getCachedUserCompanies } from "../common/redis/users";
+import { getCachedUserSiretOrVat } from "../common/redis/users";
 
 import prisma from "../prisma";
 import { getPreviousBsdas } from "./database";
@@ -64,7 +64,7 @@ export async function checkIsBsdaContributor(
 }
 
 export async function isBsdaContributor(user: User, bsda: Partial<Bsda>) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   const formSirets = Object.values(BSDA_CONTRIBUTORS_FIELDS).map(
     field => bsda[field]
@@ -80,7 +80,7 @@ export async function checkCanDeleteBsda(user: User, bsda: Bsda) {
     "Vous n'êtes pas autorisé à supprimer ce bordereau."
   );
 
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const isBsdaEmitter = userCompaniesSiretOrVat.some(
     siret => bsda.emitterCompanySiret === siret
   );
@@ -118,7 +118,7 @@ export async function checkCanAssociateBsdas(ids: string[]) {
 }
 
 export async function checkCanRequestRevision(user: User, bsda: Bsda) {
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   const formSirets = Object.values(BSDA_REVISION_REQUESTER_FIELDS).map(
     field => bsda[field]

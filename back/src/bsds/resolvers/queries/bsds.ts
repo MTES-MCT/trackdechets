@@ -25,7 +25,7 @@ import { expandBsdasriFromDB } from "../../../bsdasris/converter";
 import { expandVhuFormFromDb } from "../../../bsvhu/converter";
 import { expandBsdaFromDb } from "../../../bsda/converter";
 
-import { getCachedUserCompanies } from "../../../common/redis/users";
+import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 
 import { unflattenBsff } from "../../../bsffs/converter";
 
@@ -207,7 +207,7 @@ async function buildQuery(
   }
 
   // Limit the scope of what the user can see to their companies
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   query.bool.filter.push({
     terms: {
       sirets: userCompaniesSiretOrVat

@@ -11,7 +11,7 @@ import { getEligibleDasrisForSynthesis, aggregatePackagings } from "./utils";
 import { indexBsdasri } from "../../elastic";
 import { UserInputError } from "apollo-server-express";
 import { BsdasriType } from "@prisma/client";
-import { getCachedUserCompanies } from "../../../common/redis/users";
+import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 
 /**
  * Bsdasri creation mutation :
@@ -27,7 +27,7 @@ const createSynthesisBsdasri = async (
   context: GraphQLContext
 ) => {
   const user = checkIsAuthenticated(context);
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   if (
     input?.emitter ||

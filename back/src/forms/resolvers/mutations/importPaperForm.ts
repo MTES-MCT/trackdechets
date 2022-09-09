@@ -1,7 +1,7 @@
 import { Form, Prisma, Status } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getCachedUserCompanies } from "../../../common/redis/users";
+import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import {
   ImportPaperFormInput,
   MutationResolvers
@@ -107,7 +107,7 @@ async function createForm(input: ImportPaperFormInput, user: Express.User) {
   });
 
   // check user belongs to destination company
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   if (
     !userCompaniesSiretOrVat.includes(flattenedFormInput.recipientCompanySiret)
   ) {

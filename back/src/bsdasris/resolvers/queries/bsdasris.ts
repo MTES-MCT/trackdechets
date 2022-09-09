@@ -4,7 +4,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { GraphQLContext } from "../../../types";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
-import { getCachedUserCompanies } from "../../../common/redis/users";
+import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { getConnection } from "../../../common/pagination";
 import { QueryResolvers } from "../../../generated/graphql/types";
 
@@ -17,7 +17,7 @@ const bsdasrisResolver: QueryResolvers["bsdasris"] = async (
 
   const { where: whereArgs, ...gqlPaginationArgs } = args;
 
-  const userCompaniesSiretOrVat = await getCachedUserCompanies(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   // ensure query returns only bsds belonging to current user
   const mask = {
     OR: [

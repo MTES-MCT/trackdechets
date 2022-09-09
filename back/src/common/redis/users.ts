@@ -43,7 +43,7 @@ export async function setCachedUserCompanyId(
  * @param userId
  * @returns array of sirets and vatNumber
  */
-export async function getCachedUserCompanies(
+export async function getCachedUserSiretOrVat(
   userId: string
 ): Promise<string[]> {
   const key = getUserCompaniesCacheKey(userId);
