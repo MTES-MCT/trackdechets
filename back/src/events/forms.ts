@@ -27,7 +27,7 @@ export async function formsEventCallback(payload: TDEventPayload<Form>) {
  */
 export async function mailWhenFormIsDeclined(payload: TDEventPayload<Form>) {
   if (
-    !payload.updatedFields?.hasOwnProperty("wasteAcceptationStatus") ||
+    !("wasteAcceptationStatus" in (payload.updatedFields ?? {})) ||
     !payload.node ||
     !["REFUSED", "PARTIALLY_REFUSED"].includes(
       payload.node.wasteAcceptationStatus
