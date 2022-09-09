@@ -51,11 +51,11 @@ import { extractPostalCode } from "../utils";
 import prisma from "../prisma";
 
 /**
- * Return null if all object values are null
+ * Return null if all object values are null or an empty string
  * obj otherwise
  */
 export function nullIfNoValues<T>(obj: T): T | null {
-  return Object.values(obj).some(v => v !== null) ? obj : null;
+  return Object.values(obj).some(v => v !== null && v !== "") ? obj : null;
 }
 
 /**

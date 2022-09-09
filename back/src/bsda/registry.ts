@@ -27,16 +27,17 @@ export function getRegistryFields(
     isManagedWasteFor: []
   };
 
-  if (
-    bsda.emitterEmissionSignatureDate &&
-    bsda.transporterTransportSignatureDate
-  ) {
-    registryFields.isOutgoingWasteFor.push(bsda.emitterCompanySiret);
+  if (bsda.transporterTransportSignatureDate) {
+    if (bsda.emitterCompanySiret) {
+      registryFields.isOutgoingWasteFor.push(bsda.emitterCompanySiret);
+    }
     if (bsda.workerCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsda.workerCompanySiret);
     }
     registryFields.isTransportedWasteFor.push(bsda.transporterCompanySiret);
-    registryFields.isManagedWasteFor.push(bsda.brokerCompanySiret);
+    if (bsda.brokerCompanySiret) {
+      registryFields.isManagedWasteFor.push(bsda.brokerCompanySiret);
+    }
   }
 
   // There is no signature at reception on the BSDA so we use the operation signature
