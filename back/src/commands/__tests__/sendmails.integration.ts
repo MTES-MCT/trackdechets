@@ -1,6 +1,8 @@
 import axios from "axios";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { CompanyType } from "@prisma/client";
+import * as producer from "../../queue/producers/mail";
+import { backend } from "../../mailer";
 
 import {
   sendFirstOnboardingEmail,
@@ -10,12 +12,23 @@ import {
 import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
 import prisma from "../../prisma";
 
-const mockedAxiosPost = jest.spyOn(axios, "post"); // spy on axios.post method
+// Intercept calls
+const mockedSendMailBackend = jest.spyOn(backend, "sendMail");
+// Simulate queue error in order to test with sendMailSync
+const mockAddToMailQueue = jest.spyOn(producer, "addToMailQueue");
+mockAddToMailQueue.mockRejectedValue(
+  new Error("any queue error to bypass job queue and sendmail synchronously")
+);
+// Integration tests EMAIL_BACKEND is supposed to use axios.
+const mockedAxiosPost = jest.spyOn(axios, "post");
+mockedAxiosPost.mockResolvedValue(null);
 
 describe("sendOnboardingFirstStepMails", () => {
   afterEach(resetDatabase);
   beforeEach(() => {
     mockedAxiosPost.mockClear();
+    mockedSendMailBackend.mockClear();
+    mockAddToMailQueue.mockClear();
   });
 
   it("should send a request to mail service for onboarding first step", async () => {
@@ -57,11 +70,12 @@ describe("sendOnboardingFirstStepMails", () => {
 
         cc: undefined
       },
-
-      {
-        headers: { "Content-Type": "application/json", "api-key": undefined },
+      expect.objectContaining({
+        headers: {
+          "Content-Type": "application/json"
+        },
         timeout: 5000
-      }
+      })
     );
   });
 });
@@ -70,6 +84,8 @@ describe("sendOnboardingSecondStepMails", () => {
   afterEach(resetDatabase);
   beforeEach(() => {
     mockedAxiosPost.mockClear();
+    mockedSendMailBackend.mockClear();
+    mockAddToMailQueue.mockClear();
   });
   it.each([1, 2, 4])(
     "should not send any mail request for onboarding second step (users created %p days ago)",
@@ -155,11 +171,12 @@ describe("sendOnboardingSecondStepMails", () => {
 
         cc: undefined
       },
-
-      {
-        headers: { "Content-Type": "application/json", "api-key": undefined },
+      expect.objectContaining({
+        headers: {
+          "Content-Type": "application/json"
+        },
         timeout: 5000
-      }
+      })
     );
   });
 
@@ -209,11 +226,12 @@ describe("sendOnboardingSecondStepMails", () => {
 
         cc: undefined
       },
-
-      {
-        headers: { "Content-Type": "application/json", "api-key": undefined },
+      expect.objectContaining({
+        headers: {
+          "Content-Type": "application/json"
+        },
         timeout: 5000
-      }
+      })
     );
   });
 });

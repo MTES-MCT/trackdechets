@@ -1,5 +1,5 @@
 import prisma from "../prisma";
-import { sendMailSync } from "../mailer/mailing";
+import { sendMail } from "../mailer/mailing";
 import { Company, CompanyAssociation, User } from "@prisma/client";
 import * as COMPANY_TYPES from "../common/constants/COMPANY_TYPES";
 import {
@@ -58,7 +58,7 @@ export const sendFirstOnboardingEmail = async () => {
       const payload = renderMail(onboardingFirstStep, {
         to: [{ name: recipient.name, email: recipient.email }]
       });
-      return sendMailSync(payload);
+      return sendMail(payload);
     })
   );
   await prisma.$disconnect();
@@ -107,7 +107,7 @@ export const sendSecondOnboardingEmail = async () => {
       const payload = renderMail(mailTemplate, {
         to: [{ email: recipient.email, name: recipient.name }]
       });
-      return sendMailSync(payload);
+      return sendMail(payload);
     })
   );
   await prisma.$disconnect();

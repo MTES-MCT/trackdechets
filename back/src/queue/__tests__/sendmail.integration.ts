@@ -5,7 +5,9 @@ import { Mail } from "../../mailer/types";
 import * as producer from "../producers/mail";
 import { mailQueue } from "../producers/mail";
 import { backend } from "../../mailer";
+import { sendMailJob } from "../jobs/sendmail";
 
+mailQueue.process(sendMailJob);
 // Intercept calls
 const mockedSendMailBackend = jest.spyOn(backend, "sendMail");
 const mockedSendMailSync = jest.spyOn(mailing, "sendMailSync");
