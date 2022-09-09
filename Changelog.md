@@ -15,6 +15,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Affichage des intermédiaires d'un BSDD dans l'aperçu et l'export PDF [PR 1668](https://github.com/MTES-MCT/trackdechets/pull/1668)
+
 #### :memo: Documentation
 
 #### :house: Interne

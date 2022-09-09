@@ -3,6 +3,8 @@ import countries, { Country } from "world-countries";
 import { checkVAT } from "jsvat";
 import {
   countries as vatCountries,
+  isFRVat,
+  isSiret,
   isVat
 } from "../../../common/constants/companySearchHelpers";
 import { FormCompany } from "../../../generated/graphql/types";
@@ -25,19 +27,24 @@ export function FormCompanyFields({
   let companyCountry: Country = FRENCH_COUNTRY;
 
   if (company) {
+    // reconnaitre le pays directement dans le champ country
     companyCountry = countries.find(
       country => country.cca2 === company?.country
     );
-    // trouver automatiquement le pays avec le vatNumber s'il n'est pas renseigné.
-    if (isVat(company.vatNumber)) {
-      const vatCountryCode = checkVAT(
-        company.vatNumber.replace(/\s/g, ""),
-        vatCountries
-      )?.country?.isoCode.short;
+    if (companyCountry === undefined) {
+      if (isSiret(company.siret)) {
+        companyCountry = countries.find(country => country.cca2 === "FR");
+      } else if (isVat(company.vatNumber)) {
+        // trouver automatiquement le pays
+        const vatCountryCode = checkVAT(
+          company.vatNumber.replace(/\s/g, ""),
+          vatCountries
+        )?.country?.isoCode.short;
 
-      companyCountry = countries.find(
-        country => country.cca2 === vatCountryCode
-      );
+        companyCountry = countries.find(
+          country => country.cca2 === vatCountryCode
+        );
+      }
     }
   }
 
@@ -46,20 +53,14 @@ export function FormCompanyFields({
       <p>
         <input
           type="checkbox"
-          checked={
-            !isForeignShip &&
-            (!!company?.siret || companyCountry?.cca2 === "FR")
-          }
+          checked={!isForeignShip && companyCountry?.cca2 === "FR"}
           readOnly
         />{" "}
         Entreprise française
         <br />
         <input
           type="checkbox"
-          checked={
-            isForeignShip ||
-            (!!company?.vatNumber && companyCountry?.cca2 !== "FR")
-          }
+          checked={isForeignShip || companyCountry?.cca2 !== "FR"}
           readOnly
         />{" "}
         Entreprise étrangère
@@ -98,7 +99,8 @@ export function FormCompanyFields({
       <p>
         Tel : {company?.phone}
         <br />
-        { `Mail ${isEmailMandatory ? "" : "(facultatif) " }: ` }{company?.mail}
+        {`Mail ${isEmailMandatory ? "" : "(facultatif) "}: `}
+        {company?.mail}
         {!isPrivateIndividual && (
           <div>
             <br />
