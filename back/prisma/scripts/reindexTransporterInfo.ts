@@ -8,7 +8,7 @@ import { toBsdElastic as bsffToBsdElastic } from "../../src/bsffs/elastic";
 @registerUpdater(
   "Reindex transporter custom info and plates on BSDA, BSDASRI and BSFF",
   "Reindex transporter custom info and plates on BSDA, BSDASRI and BSFF",
-  true
+  false
 )
 export class ReindexTransporterInfo implements Updater {
   async run() {
