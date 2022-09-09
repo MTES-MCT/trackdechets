@@ -1,5 +1,4 @@
 import { searchCompanies as searchCompaniesInsee } from "./insee/client";
-import { searchCompanies as searchCompaniesDataGouv } from "./entreprise.data.gouv.fr/client";
 import { searchCompanies as searchCompaniesSocialGouv } from "./social.gouv/client";
 import { searchCompanies as searchCompaniesTD } from "./trackdechets/client";
 import {
@@ -13,15 +12,6 @@ import { SireneSearchResult } from "./types";
 const searchCompaniesInseeThrottled = backoffIfTestEnvs<SireneSearchResult[]>(
   backoffIfTooManyRequests(searchCompaniesInsee, {
     service: "insee"
-  })
-);
-
-const searchCompaniesDataGouvThrottled = backoffIfTestEnvs<
-  SireneSearchResult[]
->(
-  throttle(searchCompaniesDataGouv, {
-    service: "data_gouv",
-    requestsPerSeconds: 8
   })
 );
 
@@ -39,14 +29,12 @@ const searchCompaniesSocialGouvThrottled = backoffIfTestEnvs<
 const searchCompaniesProviders = [
   searchCompaniesTD,
   searchCompaniesInseeThrottled,
-  searchCompaniesDataGouvThrottled,
   searchCompaniesSocialGouvThrottled
 ];
 
 /**
  * Apply throttle and redundant decorator to searchCompanies functions
- * We use entreprise.data.gouv.fr API in priority and fallback to INSEE
- * because fuzzy search is way better in entreprise.data.gouv.fr
+ * We use our own search engine in priority and fallback to INSEE
  */
 const decoratedSearchCompanies = redundant(...searchCompaniesProviders);
 
