@@ -28,7 +28,7 @@ AccountFielCompanyContactPhone.fragments = {
 
 const UPDATE_CONTACT_PHONE = gql`
   mutation UpdateCompany($siret: String!, $contactPhone: String) {
-    updateCompany(siret: $siret, contactPhone: $contactPhone) {
+    updateCompany(id: $id, contactPhone: $contactPhone) {
       id
       siret
       contactPhone
@@ -64,7 +64,7 @@ export default function AccountFielCompanyContactPhone({ company }: Props) {
               value={company.contactPhone}
               placeHolder={fieldLabel}
               mutation={UPDATE_CONTACT_PHONE}
-              mutationArgs={{ siret: company.siret }}
+              mutationArgs={{ id: company.id }}
               yupSchema={yupSchema}
               toggleEdition={() => {
                 toggleEdition();

@@ -1,7 +1,7 @@
 import { Form, Prisma, Status } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getCachedUserSirets } from "../../../common/redis/users";
+import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import {
   ImportPaperFormInput,
   MutationResolvers
@@ -107,8 +107,10 @@ async function createForm(input: ImportPaperFormInput, user: Express.User) {
   });
 
   // check user belongs to destination company
-  const userSirets = await getCachedUserSirets(user.id);
-  if (!userSirets.includes(flattenedFormInput.recipientCompanySiret)) {
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
+  if (
+    !userCompaniesSiretOrVat.includes(flattenedFormInput.recipientCompanySiret)
+  ) {
     throw new UserInputError(
       "Vous devez apparaitre en tant que destinataire du bordereau (case 2) pour pouvoir importer ce bordereau"
     );

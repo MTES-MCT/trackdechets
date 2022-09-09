@@ -38,50 +38,12 @@ export async function setCachedUserCompanyId(
 }
 
 /**
- * Store sirets in a redis SET
- * @param userId
- * @param sirets
- */
-export async function setCachedUserSirets(
-  userId: string,
-  sirets: string[]
-): Promise<void> {
-  const key = getUserCompanySiretCacheKey(userId);
-
-  await redisClient
-    .pipeline()
-    .sadd(key, sirets)
-    .expire(key, CACHED_COMPANY_EXPIRATION)
-    .exec();
-}
-
-/**
- * DEPRECATED in favor of getCachedUserCompanies
- * Retrieve cached sirets if found in redis, or query the db and cache them
- * @param userId
- * @returns array of sirets
- */
-export async function getCachedUserSirets(userId: string): Promise<string[]> {
-  const key = getUserCompanySiretCacheKey(userId);
-  const exists = await redisClient.exists(key);
-  if (!!exists) {
-    return redisClient.smembers(key);
-  }
-
-  const companies = await getUserCompanies(userId);
-  const sirets = companies.map(c => c.siret);
-
-  await setCachedUserSirets(userId, sirets);
-  return sirets;
-}
-
-/**
  * Retrieve cached Company siret and vatNumber
  * if found in redis, or query the db and cache them
  * @param userId
  * @returns array of sirets and vatNumber
  */
-export async function getCachedUserCompanies(
+export async function getCachedUserSiretOrVat(
   userId: string
 ): Promise<string[]> {
   const key = getUserCompaniesCacheKey(userId);

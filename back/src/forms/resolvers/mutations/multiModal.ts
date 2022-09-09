@@ -10,7 +10,7 @@ import {
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
-import { getCachedUserSirets } from "../../../common/redis/users";
+import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 
 import {
   expandTransportSegmentFromDb,
@@ -94,8 +94,8 @@ export async function prepareSegment(
 ): Promise<TransportSegment> {
   const user = checkIsAuthenticated(context);
 
-  const currentUserSirets = await getCachedUserSirets(user.id);
-  if (!currentUserSirets.includes(siret)) {
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
+  if (!userCompaniesSiretOrVat.includes(siret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
   const nextSegmentPayload = flattenTransportSegmentInput(nextSegmentInfo);
@@ -216,8 +216,8 @@ export async function markSegmentAsReadyToTakeOver(
   }
 
   const userCompanies = await getUserCompanies(user.id);
-  const userSirets = userCompanies.map(c => c.siret);
-  if (!userSirets.includes(form.currentTransporterSiret)) {
+  const userCompaniesSiretOrVat = userCompanies.map(c => c.siret);
+  if (!userCompaniesSiretOrVat.includes(form.currentTransporterSiret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
 
@@ -295,15 +295,15 @@ export async function takeOverSegment(
     throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
 
-  const userSirets = await getCachedUserSirets(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   //   user must be the nextTransporter
   const nexTransporterIsFilled = !!form.nextTransporterSiret;
   if (
     !nexTransporterIsFilled ||
     (nexTransporterIsFilled &&
-      !userSirets.includes(form.nextTransporterSiret)) ||
-    !userSirets.includes(currentSegment.transporterCompanySiret)
+      !userCompaniesSiretOrVat.includes(form.nextTransporterSiret)) ||
+    !userCompaniesSiretOrVat.includes(currentSegment.transporterCompanySiret)
   ) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
@@ -371,9 +371,9 @@ export async function editSegment(
 
   // check user owns siret
 
-  const userSirets = await getCachedUserSirets(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
-  if (!userSirets.includes(userSiret)) {
+  if (!userCompaniesSiretOrVat.includes(userSiret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
 

@@ -16,17 +16,28 @@ import { UserInputError } from "apollo-server-express";
 import { AppDataloaders } from "../types";
 
 /**
- * Retrieves a company by siret or or throw a CompanyNotFound error
+ * Retrieves a company by any unique identifier or throw a CompanyNotFound error
  */
 export async function getCompanyOrCompanyNotFound({
   id,
-  siret
+  siret,
+  vatNumber
 }: Prisma.CompanyWhereUniqueInput) {
   if (!id && !siret) {
-    throw new UserInputError("You should specify an id or a siret");
+    throw new UserInputError(
+      "You should specify an id or a siret or a VAT number"
+    );
+  }
+  let where: Prisma.CompanyWhereUniqueInput;
+  if (id) {
+    where = { id };
+  } else if (siret) {
+    where = { siret };
+  } else if (vatNumber) {
+    where = { vatNumber };
   }
   const company = await prisma.company.findUnique({
-    where: id ? { id } : { siret }
+    where
   });
   if (company == null) {
     throw new CompanyNotFound();

@@ -46,7 +46,7 @@ export default function AccountFieldCompanyTypes({ company }: Props) {
           renderForm={toggleEdition => (
             <AccountFormCompanyTypes
               name="companyTypes"
-              siret={company.siret}
+              id={company.id}
               companyTypes={companyTypes}
               toggleEdition={toggleEdition}
             />

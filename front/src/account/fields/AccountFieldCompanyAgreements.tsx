@@ -7,10 +7,7 @@ import { CompanyPrivate, UserRole } from "../../generated/graphql/types";
 import styles from "./AccountField.module.scss";
 
 interface Props {
-  company: Pick<
-    CompanyPrivate,
-    "siret" | "userRole" | "ecoOrganismeAgreements"
-  >;
+  company: Pick<CompanyPrivate, "id" | "userRole" | "ecoOrganismeAgreements">;
 }
 
 AccountFieldCompanyAgreements.fragments = {
@@ -49,7 +46,7 @@ export default function AccountFieldCompanyAgreements({ company }: Props) {
             <AccountFormAgreements
               name={fieldName}
               ecoOrganismeAgreements={company.ecoOrganismeAgreements}
-              siret={company.siret}
+              id={company.id}
               toggleEdition={toggleEdition}
             />
           )}

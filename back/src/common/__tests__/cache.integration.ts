@@ -6,8 +6,8 @@ import {
 } from "../../__tests__/factories";
 
 import {
-  getCachedUserSirets,
-  getUserCompanySiretCacheKey,
+  getCachedUserSiretOrVat,
+  getUserCompaniesCacheKey,
   deleteCachedUserCompanies
 } from "../../common/redis/users";
 import { redisClient } from "../redis";
@@ -17,7 +17,7 @@ describe("Test Caching", () => {
     await resetDatabase();
   });
 
-  test("siret caching lifecycle", async () => {
+  test("User's companies siret caching lifecycle", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const otherCompany = await companyFactory();
 
@@ -29,16 +29,16 @@ describe("Test Caching", () => {
       }
     });
 
-    const key = getUserCompanySiretCacheKey(user.id);
+    const key = getUserCompaniesCacheKey(user.id);
     // redis key does not exist yet
     let exists = await redisClient.exists(key);
     expect(exists).toBe(0);
 
-    const sirets = await getCachedUserSirets(user.id);
+    const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
-    expect(sirets.length).toEqual(2);
-    expect(sirets.includes(company.siret)).toBe(true);
-    expect(sirets.includes(otherCompany.siret)).toBe(true);
+    expect(userCompaniesSiretOrVat.length).toEqual(2);
+    expect(userCompaniesSiretOrVat.includes(company.siret)).toBe(true);
+    expect(userCompaniesSiretOrVat.includes(otherCompany.siret)).toBe(true);
 
     // redis key exists now
     exists = await redisClient.exists(key);
