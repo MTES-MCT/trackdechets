@@ -16,6 +16,9 @@ export interface BsffFragment {
       name?: string;
     };
     customInfo?: string;
+    transport?: {
+      plates?: string[];
+    };
   };
   bsffDestination?: {
     company?: {

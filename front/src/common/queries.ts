@@ -96,6 +96,9 @@ export const GET_BSDS = gql`
                 siret
                 name
               }
+              transport {
+                plates
+              }
               customInfo
             }
             bsffDestination: destination {

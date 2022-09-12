@@ -1076,6 +1076,7 @@ model Bsff {
   transporterRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
   transporterTransportMode            TransportMode?
+  transporterTransportPlates          String[]
   transporterTransportTakenOverAt     DateTime?      @db.Timestamptz(6)
   transporterTransportSignatureAuthor String?
   transporterTransportSignatureDate   DateTime?      @db.Timestamptz(6)

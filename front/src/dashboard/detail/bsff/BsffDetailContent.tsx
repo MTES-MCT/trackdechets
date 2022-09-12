@@ -21,6 +21,7 @@ import routes from "common/routes";
 import { WorkflowAction } from "dashboard/components/BSDList/BSFF/WorkflowAction";
 import { DeleteBsffModal } from "dashboard/components/BSDList/BSFF/BsffActions/DeleteModal";
 import { useDownloadPdf } from "dashboard/components/BSDList/BSFF/BsffActions/useDownloadPdf";
+import { transportModeLabels } from "dashboard/constants";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -261,6 +262,18 @@ function Transporter({ form }: { form: Bsff }) {
         <DateRow
           value={form.transporter?.recepisse?.validityLimit}
           label="Date de validité"
+        />
+        <DetailRow
+          value={
+            form.transporter?.transport?.mode
+              ? transportModeLabels[form.transporter.transport.mode]
+              : ""
+          }
+          label="Mode de transport"
+        />
+        <DetailRow
+          value={form.transporter?.transport?.plates?.join(", ")}
+          label="Plaques d'immatriculation"
         />
       </div>
       <div className={`${styles.detailGrid} `}>

@@ -2,12 +2,17 @@ import path from "path";
 import fs from "fs/promises";
 import mustache from "mustache";
 import { format } from "date-fns";
-import { Bsff, BsffType, WasteAcceptationStatus } from "@prisma/client";
+import {
+  Bsff,
+  BsffType,
+  TransportMode,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import * as QRCode from "qrcode";
 import prisma from "../../prisma";
 import { OPERATION } from "../constants";
 import { getBsffHistory } from "../database";
-import { generatePdf } from "../../common/pdf";
+import { generatePdf, TRANSPORT_MODE_LABELS } from "../../common/pdf";
 
 const assetsPath = path.join(__dirname, "assets");
 const templatePath = path.join(assetsPath, "index.html");
@@ -61,11 +66,15 @@ export async function generateBsffPdf(bsff: Bsff) {
     operation: bsff.destinationOperationSignatureDate ? signature : ""
   };
 
+  const transportMode =
+    TRANSPORT_MODE_LABELS[bsff.transporterTransportMode ?? TransportMode.ROAD];
+
   const html = mustache.render(await fs.readFile(templatePath, "utf-8"), {
     qrCode,
     bsff,
     bsffType,
     bsffOperation,
+    transportMode,
     packagings: packagings
       .map(
         packaging =>

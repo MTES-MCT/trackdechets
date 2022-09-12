@@ -19,6 +19,7 @@ const initialState = {
     },
     transport: {
       mode: TransportMode.Road,
+      plates: [],
     },
   },
   destination: {

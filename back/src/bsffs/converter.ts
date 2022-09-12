@@ -49,6 +49,7 @@ export function flattenBsffInput(
     transporterCompanyPhone: bsffInput.transporter?.company?.phone,
     transporterCompanyMail: bsffInput.transporter?.company?.mail,
     transporterCustomInfo: bsffInput.transporter?.customInfo,
+    transporterTransportPlates: bsffInput.transporter?.transport?.plates,
 
     transporterRecepisseNumber: bsffInput.transporter?.recepisse?.number,
     transporterRecepisseDepartment:
@@ -150,6 +151,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
       customInfo: prismaBsff.transporterCustomInfo,
       transport: nullIfNoValues<GraphQL.BsffTransport>({
         mode: prismaBsff.transporterTransportMode,
+        plates: prismaBsff.transporterTransportPlates,
         takenOverAt: prismaBsff.transporterTransportTakenOverAt,
         signature: nullIfNoValues<GraphQL.Signature>({
           author: prismaBsff.transporterTransportSignatureAuthor,

@@ -1,5 +1,7 @@
-import { Switch } from "common/components";
+import { FieldTransportModeSelect, Switch } from "common/components";
 import RedErrorMessage from "common/components/RedErrorMessage";
+import TagsInput from "common/components/tags-input/TagsInput";
+import TdTooltip from "common/components/Tooltip";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { Field, useFormikContext } from "formik";
@@ -55,7 +57,9 @@ export default function Transporter({ disabled }) {
         </label>
       ) : (
         <>
-          <h4 className="form__section-heading">Autorisations</h4>
+          <h4 className="form__section-heading">
+            Récépissé de déclaration de transport de déchets
+          </h4>
           <div className="form__row">
             <Switch
               checked={values.transporter?.recepisse == null}
@@ -112,6 +116,30 @@ export default function Transporter({ disabled }) {
               </div>
             </>
           )}
+          <h4 className="form__section-heading">Détails</h4>
+          <div className="form__row">
+            <label>
+              Mode de transport:
+              <Field
+                id="id_mode"
+                name="transporter.transport.mode"
+                component={FieldTransportModeSelect}
+                disabled={disabled}
+              ></Field>
+            </label>
+          </div>
+
+          <div className="form__row">
+            <label>
+              Immatriculations
+              <TdTooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
+              <TagsInput
+                name="transporter.transport.plates"
+                disabled={disabled}
+                limit={2}
+              />
+            </label>
+          </div>
         </>
       )}
     </>

@@ -9,6 +9,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Ajout des plaques d'immatriculation sur le BSFF [PR 1667](https://github.com/MTES-MCT/trackdechets/pull/1667)
+
 #### :bug: Corrections de bugs
 
 #### :boom: Breaking changes

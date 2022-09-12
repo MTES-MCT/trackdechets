@@ -4,22 +4,24 @@ import { useMutation } from "@apollo/client";
 import { Mutation, MutationUpdateBsffArgs } from "generated/graphql/types";
 import TdModal from "common/components/Modal";
 import { UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
-import { Field, Form, Formik } from "formik";
+import { Form, Formik } from "formik";
 import { BsffFragment } from "../types";
 import { NotificationError } from "common/components/Error";
+import TagsInput from "common/components/tags-input/TagsInput";
+import Tooltip from "common/components/Tooltip";
 
-export function UpdateTransporterCustomInfo({ bsff }: { bsff: BsffFragment }) {
+export function UpdateTransporterPlates({ bsff }: { bsff: BsffFragment }) {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <>
       <button
         className="link__ icon__ btn--no-style"
         onClick={() => setIsOpen(true)}
-        title={`Modifier le champ libre`}
+        title={"Modifier la ou les plaque(s) d'immatriculation"}
       >
         <IconPaperWrite color="blue" />
       </button>
-      <UpdateTransporterCustomInfoModal
+      <UpdateTransporterPlatesModal
         bsff={bsff}
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
@@ -28,7 +30,7 @@ export function UpdateTransporterCustomInfo({ bsff }: { bsff: BsffFragment }) {
   );
 }
 
-function UpdateTransporterCustomInfoModal({
+function UpdateTransporterPlatesModal({
   bsff,
   isOpen,
   onClose,
@@ -45,29 +47,30 @@ function UpdateTransporterCustomInfoModal({
   return (
     <TdModal
       isOpen={isOpen}
-      ariaLabel="Modifier le champ libre"
+      ariaLabel="Modifier la ou les plaque(s) d'immatriculation"
       onClose={onClose}
     >
       <h2 className="h2 tw-mb-4">Modifier</h2>
       <Formik
-        initialValues={{ customInfo: bsff.bsffTransporter?.customInfo }}
+        initialValues={{ plates: bsff.bsffTransporter?.transport?.plates }}
         onSubmit={values => {
           return updateBsff({
             variables: {
               id: bsff.id,
-              input: { transporter: { customInfo: values.customInfo } },
+              input: {
+                transporter: { transport: { plates: values.plates ?? [] } },
+              },
             },
           });
         }}
       >
         <Form>
-          <label htmlFor={"customInfo"}>Champ libre</label>
-          <Field
-            id="customInfo"
-            name="customInfo"
-            type="text"
-            className="td-input"
-          />
+          <label>
+            Immatriculations
+            <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
+            <TagsInput name="plates" limit={2} />
+          </label>
+
           {!!error && <NotificationError apolloError={error} />}
 
           <div className="form__actions">
