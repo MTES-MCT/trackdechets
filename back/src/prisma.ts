@@ -15,7 +15,7 @@ const prisma = new PrismaClient({
   datasources: {
     db: { url: getDbUrl() }
   },
-  log: process.env.NODE_ENV !== "test" ? ["query", "info", "warn", "error"] : []
+  log: process.env.NODE_ENV !== "test" ? ["info", "warn", "error"] : []
 });
 
 // Expose the active Datadog span context to OpenTelemetry
