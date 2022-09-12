@@ -1,5 +1,4 @@
 @import "../generated/css/tailwind.generated.css";
-
 @import "./Constants.scss";
 @import "./Breakpoints.scss";
 @import "./Typography.scss";
@@ -16,7 +15,7 @@
 @import "./Dashboard.scss";
 
 @font-face {
-  font-family: "marianne";
+  font-family: "marianne-td";
   src: url("/fonts/marianne/marianne-regular-webfont.woff2") format("woff2"),
     url("/fonts/marianne/marianne-regular-webfont.woff") format("woff");
   font-weight: normal;
@@ -24,7 +23,7 @@
 }
 
 @font-face {
-  font-family: "marianne";
+  font-family: "marianne-td";
   src: url("/fonts/marianne/marianne-bold-webfont.woff2") format("woff2"),
     url("/fonts/marianne/marianne-bold-webfont.woff") format("woff");
   font-weight: bold;
@@ -33,7 +32,7 @@
 html,
 body,
 * {
-  font-family: "marianne";
+  font-family: "marianne-td", Arial, Helvetica, sans-serif;
 }
 html {
   font-size: 16px;
@@ -46,23 +45,22 @@ address {
   font-style: normal;
 }
 
-button.link {
-  text-decoration: underline;
-  cursor: pointer;
-  background: none;
-  border: none;
-  padding: 0;
-  color: $blue;
-  font-family: Source Sans Pro, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.5em;
+.App {
+  button.link {
+    text-decoration: underline;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    color: $blue;
+    font-family: Source Sans Pro, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.5em;
+  }
 }
 
 @include xs-phone {
   .modal__backdrop .modal {
     max-height: 100%;
   }
-}
-a:hover {
-  background: none;
 }

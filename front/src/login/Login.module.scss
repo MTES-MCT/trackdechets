@@ -1,0 +1,13 @@
+.onboardingWrapper {
+  .centralContainer {
+    max-width: 451px;
+
+    &Large {
+      max-width: 688px;
+    }
+  }
+
+  .resetFlexCol {
+    flex: 0 1 auto;
+  }
+}

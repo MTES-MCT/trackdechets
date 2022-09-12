@@ -22,5 +22,5 @@ export const userActivationHandler = async (req, res) => {
   });
 
   const UI_BASE_URL = getUIBaseURL();
-  return res.redirect(UI_BASE_URL);
+  return res.redirect(`${UI_BASE_URL}/login?signup=complete`);
 };

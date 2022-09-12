@@ -59,7 +59,12 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
                 <IconChevronDown size="14px" color="blueLight" />
               )}
             </MenuButton>
-            <MenuList className={styles.BSDDActionsMenu}>
+            <MenuList
+              className={classNames(
+                "fr-raw-link fr-raw-list",
+                styles.BSDDActionsMenu
+              )}
+            >
               <MenuLink
                 as={Link}
                 to={{

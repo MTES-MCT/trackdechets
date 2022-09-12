@@ -27,14 +27,14 @@
       font-weight: bold;
     }
     &:hover {
-      background-color: $white;
+      background-color: $white !important;
       border-color: $blue-dark;
     }
   }
 
   &__link--active {
     font-weight: bold;
-    background-color: $white;
+    background-color: $white !important;
     border-color: $blue-dark;
   }
   li {
