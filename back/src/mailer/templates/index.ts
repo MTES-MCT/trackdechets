@@ -152,8 +152,10 @@ export const membershipRequestRefused: MailTemplate<{
 export const securityCodeRenewal: MailTemplate<{
   company: { name?: string; siret: string };
 }> = {
-  subject: "Renouvellement du code de signature sur Trackdéchets",
-  templateId: templateIds.SECURITY_CODE_RENEWAL
+  subject: ({ company }) =>
+    `Renouvellement du code de signature de votre établissement "${company.name}" (${company.siret})`,
+  body: mustacheRenderer("notification-renouvellement-code-signature.html"),
+  templateId: templateIds.LAYOUT
 };
 
 export const verificationProcessInfo: MailTemplate<{
