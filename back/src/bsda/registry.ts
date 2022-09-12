@@ -402,6 +402,7 @@ export function toAllWaste(
     transporterCompanyName: bsda.transporterCompanyName,
     transporterCompanySiret: bsda.transporterCompanySiret,
     transporterRecepisseNumber: bsda.transporterRecepisseNumber,
+    transporterNumberPlates: bsda.transporterTransportPlates,
     weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
     managedEndDate: null,
     managedStartDate: null,

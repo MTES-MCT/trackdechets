@@ -430,6 +430,7 @@ export function toAllWaste(
     transporterCompanyName: bsdd.transporterCompanyName,
     transporterCompanySiret: bsdd.transporterCompanySiret,
     transporterRecepisseNumber: bsdd.transporterRecepisseNumber,
+    transporterNumberPlates: bsdd.transporterNumberPlates,
     transporterCompanyMail: bsdd.transporterCompanyMail,
     weight: bsdd.weightValue,
     managedEndDate: null,
@@ -443,11 +444,13 @@ export function toAllWaste(
     transporter2CompanyName: bsdd.transporter2CompanyName,
     transporter2CompanySiret: bsdd.transporter2CompanySiret,
     transporter2RecepisseNumber: bsdd.transporter2RecepisseNumber,
+    transporter2NumberPlates: bsdd.transporter2NumberPlates,
     transporter2CompanyMail: bsdd.transporter2CompanyMail,
     transporter3CompanyAddress: bsdd.transporter3CompanyAddress,
     transporter3CompanyName: bsdd.transporter3CompanyName,
     transporter3CompanySiret: bsdd.transporter3CompanySiret,
     transporter3RecepisseNumber: bsdd.transporter3RecepisseNumber,
+    transporter3NumberPlates: bsdd.transporter3NumberPlates,
     transporter3CompanyMail: bsdd.transporter3CompanyMail
   };
 }
