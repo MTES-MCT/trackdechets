@@ -3,10 +3,7 @@ import { PROCESSING_OPERATIONS } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
-import {
-  expandFormFromDb,
-  flattenProcessedFormInput
-} from "../../form-converter";
+import { expandFormFromDb, flattenProcessedFormInput } from "../../converter";
 import { checkCanMarkAsProcessed } from "../../permissions";
 import { processedInfoSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";

@@ -3,7 +3,7 @@ import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import * as elastic from "../../../common/elastic";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { unflattenBsff } from "../../converter";
+import { expandBsffFromDB } from "../../converter";
 import { isBsffContributor } from "../../permissions";
 import { getBsffOrNotFound } from "../../database";
 
@@ -33,7 +33,7 @@ const deleteBsff: MutationResolvers["deleteBsff"] = async (
 
   await elastic.deleteBsd(updatedBsff, context);
 
-  return unflattenBsff(updatedBsff);
+  return expandBsffFromDB(updatedBsff);
 };
 
 export default deleteBsff;

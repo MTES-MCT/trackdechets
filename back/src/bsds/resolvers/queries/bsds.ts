@@ -1,3 +1,4 @@
+// OLD
 import { ApiResponse } from "@elastic/elasticsearch";
 import {
   QueryResolvers,
@@ -16,18 +17,16 @@ import {
   getFieldNameFromKeyword,
   GetResponse,
   SearchResponse,
-  toPrismaBsds
+  toRawBsds
 } from "../../../common/elastic";
 import { Bsdasri } from "@prisma/client";
 import prisma from "../../../prisma";
-import { expandFormFromDb } from "../../../forms/form-converter";
-import { expandBsdasriFromDB } from "../../../bsdasris/converter";
+import { expandFormFromElastic } from "../../../forms/converter";
+import { expandBsdasriFromElastic } from "../../../bsdasris/converter";
 import { expandVhuFormFromDb } from "../../../bsvhu/converter";
-import { expandBsdaFromDb } from "../../../bsda/converter";
-
 import { getCachedUserSiretOrVat } from "../../../common/redis/users";
-
-import { unflattenBsff } from "../../../bsffs/converter";
+import { expandBsdaFromElastic } from "../../../bsda/converter";
+import { expandBsffFromElastic } from "../../../bsffs/converter";
 
 async function buildQuery(
   { clue, where = {} }: QueryBsdsArgs,
@@ -291,7 +290,7 @@ async function buildDasris(dasris: Bsdasri[]) {
 
   // expand dasris and insert `allowDirectTakeOver`
   return dasris.map(bsd => ({
-    ...expandBsdasriFromDB(bsd),
+    ...expandBsdasriFromElastic(bsd),
     allowDirectTakeOver: allows.includes(bsd.emitterCompanySiret)
   }));
 }
@@ -299,7 +298,6 @@ async function buildDasris(dasris: Bsdasri[]) {
 const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-
   const MIN_SIZE = 0;
   const MAX_SIZE = 100;
   const { first = MAX_SIZE } = args;
@@ -326,18 +324,20 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   );
   const hits = body.hits.hits.slice(0, size);
 
-  const { bsdds, bsdasris, bsvhus, bsdas, bsffs } = await toPrismaBsds(
-    hits.map(hit => hit._source)
-  );
-
-  const expandedDasris = await buildDasris(bsdasris);
+  const {
+    bsdds: concreteBsdds,
+    bsdasris: concreteBsdasris,
+    bsvhus: concreteBsvhus,
+    bsdas: concreteBsdas,
+    bsffs: concreteBsffs
+  } = await toRawBsds(hits.map(hit => hit._source));
 
   const bsds: Record<BsdType, Bsd[]> = {
-    BSDD: await Promise.all(bsdds.map(expandFormFromDb)),
-    BSDASRI: expandedDasris,
-    BSVHU: bsvhus.map(expandVhuFormFromDb),
-    BSDA: bsdas.map(expandBsdaFromDb),
-    BSFF: bsffs.map(unflattenBsff)
+    BSDD: await Promise.all(concreteBsdds.map(expandFormFromElastic)),
+    BSDASRI: await buildDasris(concreteBsdasris),
+    BSVHU: concreteBsvhus.map(expandVhuFormFromDb),
+    BSDA: concreteBsdas.map(expandBsdaFromElastic),
+    BSFF: concreteBsffs.map(expandBsffFromElastic)
   };
   const edges = hits
     .reduce<Array<Bsd>>((acc, { _source: { type, id } }) => {

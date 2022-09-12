@@ -1,6 +1,7 @@
 import * as Prisma from "@prisma/client";
-import { nullIfNoValues, safeInput } from "../forms/form-converter";
+import { nullIfNoValues, safeInput, processDate } from "../common/converter";
 import * as GraphQL from "../generated/graphql/types";
+import { BsdElastic } from "../common/elastic";
 
 export function flattenBsffInput(
   bsffInput: GraphQL.BsffInput
@@ -98,11 +99,11 @@ export function flattenBsffInput(
   });
 }
 
-export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
+export function expandBsffFromDB(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
   return {
     id: prismaBsff.id,
-    createdAt: prismaBsff.createdAt,
-    updatedAt: prismaBsff.updatedAt,
+    createdAt: processDate(prismaBsff.createdAt),
+    updatedAt: processDate(prismaBsff.updatedAt),
     isDraft: prismaBsff.isDraft,
     type: prismaBsff.type,
     status: prismaBsff.status,
@@ -119,7 +120,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
       emission: nullIfNoValues<GraphQL.BsffEmission>({
         signature: nullIfNoValues<GraphQL.Signature>({
           author: prismaBsff.emitterEmissionSignatureAuthor,
-          date: prismaBsff.emitterEmissionSignatureDate
+          date: processDate(prismaBsff.emitterEmissionSignatureDate)
         })
       })
     }),
@@ -146,7 +147,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
       recepisse: nullIfNoValues<GraphQL.BsffTransporterRecepisse>({
         number: prismaBsff.transporterRecepisseNumber,
         department: prismaBsff.transporterRecepisseDepartment,
-        validityLimit: prismaBsff.transporterRecepisseValidityLimit
+        validityLimit: processDate(prismaBsff.transporterRecepisseValidityLimit)
       }),
       customInfo: prismaBsff.transporterCustomInfo,
       transport: nullIfNoValues<GraphQL.BsffTransport>({
@@ -155,7 +156,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
         takenOverAt: prismaBsff.transporterTransportTakenOverAt,
         signature: nullIfNoValues<GraphQL.Signature>({
           author: prismaBsff.transporterTransportSignatureAuthor,
-          date: prismaBsff.transporterTransportSignatureDate
+          date: processDate(prismaBsff.transporterTransportSignatureDate)
         })
       })
     }),
@@ -170,7 +171,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
       }),
       customInfo: prismaBsff.destinationCustomInfo,
       reception: nullIfNoValues<GraphQL.BsffReception>({
-        date: prismaBsff.destinationReceptionDate,
+        date: processDate(prismaBsff.destinationReceptionDate),
         weight: prismaBsff.destinationReceptionWeight,
         acceptation: nullIfNoValues<GraphQL.BsffAcceptation>({
           status: prismaBsff.destinationReceptionAcceptationStatus,
@@ -178,7 +179,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
         }),
         signature: nullIfNoValues<GraphQL.Signature>({
           author: prismaBsff.destinationReceptionSignatureAuthor,
-          date: prismaBsff.destinationReceptionSignatureDate
+          date: processDate(prismaBsff.destinationReceptionSignatureDate)
         })
       }),
       operation: nullIfNoValues<GraphQL.BsffOperation>({
@@ -199,7 +200,7 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
         }),
         signature: nullIfNoValues<GraphQL.Signature>({
           author: prismaBsff.destinationOperationSignatureAuthor,
-          date: prismaBsff.destinationOperationSignatureDate
+          date: processDate(prismaBsff.destinationOperationSignatureDate)
         })
       }),
       plannedOperationCode:
@@ -210,6 +211,21 @@ export function unflattenBsff(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
     ficheInterventions: [],
     grouping: [],
     repackaging: []
+  };
+}
+
+export function expandBsffFromElastic(
+  bsff: BsdElastic["rawBsd"]
+): GraphQL.Bsff {
+  const expanded = expandBsffFromDB(bsff);
+
+  if (!expanded) {
+    return null;
+  }
+
+  return {
+    ...expanded,
+    packagings: bsff.packagings
   };
 }
 
@@ -241,7 +257,7 @@ export function flattenFicheInterventionBsffInput(
   };
 }
 
-export function unflattenFicheInterventionBsff(
+export function expandFicheInterventionBsffFromDB(
   prismaFicheIntervention: Prisma.BsffFicheIntervention
 ): GraphQL.BsffFicheIntervention {
   return {

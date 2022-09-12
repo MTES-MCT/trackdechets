@@ -3,7 +3,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import {
   flattenFicheInterventionBsffInput,
-  unflattenFicheInterventionBsff
+  expandFicheInterventionBsffFromDB
 } from "../../converter";
 import { validateFicheIntervention } from "../../validation";
 import { getFicheInterventionBsffOrNotFound } from "../../database";
@@ -32,7 +32,7 @@ const updateFicheInterventionBsff: MutationResolvers["updateFicheInterventionBsf
       where: { id: existingFicheIntervention.id }
     });
 
-    return unflattenFicheInterventionBsff(updatedFicheIntervention);
+    return expandFicheInterventionBsffFromDB(updatedFicheIntervention);
   };
 
 export default updateFicheInterventionBsff;

@@ -152,7 +152,8 @@ export function toBsdElastic(bsda: Bsda): BsdElastic {
     wasteDescription: bsda.wasteMaterialName,
     ...where,
     sirets: Object.values(where).flat(),
-    ...getRegistryFields(bsda)
+    ...getRegistryFields(bsda),
+    rawBsd: bsda
   };
 }
 
@@ -160,14 +161,19 @@ export async function indexAllBsdas(
   idx: string,
   { skip = 0 }: { skip?: number } = {}
 ) {
-  const take = 500;
+  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
   const bsdas = await getReadonlyBsdaRepository().findMany(
     {
       isDeleted: false
     },
+
     {
       skip,
-      take
+      take,
+      include: {
+        forwardedIn: { select: { id: true } },
+        groupedIn: { select: { id: true } }
+      }
     }
   );
 

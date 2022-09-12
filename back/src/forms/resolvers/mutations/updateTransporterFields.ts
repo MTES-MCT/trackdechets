@@ -4,7 +4,7 @@ import { isBsddTransporterFieldEditable } from "../../../common/constants/formHe
 import { getFormOrFormNotFound } from "../../database";
 import { ForbiddenError } from "apollo-server-express";
 import { checkCanUpdateTransporterFields } from "../../permissions";
-import { expandFormFromDb } from "../../form-converter";
+import { expandFormFromDb } from "../../converter";
 import { getFormRepository } from "../../repository";
 
 const updateTransporterFieldsResolver: MutationResolvers["updateTransporterFields"] =

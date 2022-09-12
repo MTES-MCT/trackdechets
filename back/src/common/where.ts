@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
-import { safeInput } from "../forms/form-converter";
+import { safeInput } from "../common/converter";
+
 import {
   DateFilter,
   StringFilter,

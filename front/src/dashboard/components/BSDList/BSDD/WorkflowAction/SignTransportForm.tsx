@@ -1,20 +1,27 @@
 import * as React from "react";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { Field, Form as FormikForm, Formik } from "formik";
 import * as yup from "yup";
 import {
-  Form,
   Mutation,
   MutationSignTransportFormArgs,
+  Query,
+  QueryFormArgs,
 } from "generated/graphql/types";
 import { fullFormFragment } from "common/fragments";
 import { ActionButton, Modal, RedErrorMessage } from "common/components";
-import { NotificationError } from "common/components/Error";
+import {
+  NotificationError,
+  SimpleNotificationError,
+  InlineError,
+} from "common/components/Error";
 import { IconShipmentSignSmartphone } from "common/components/Icons";
 import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { FormJourneySummary } from "./FormJourneySummary";
 import { FormWasteTransportSummary } from "./FormWasteTransportSummary";
+import { GET_FORM } from "form/bsdd/utils/queries";
+import Loader from "common/components/Loaders";
 
 const SIGN_TRANSPORT_FORM = gql`
   mutation SignTransportForm(
@@ -29,13 +36,6 @@ const SIGN_TRANSPORT_FORM = gql`
   ${fullFormFragment}
 `;
 
-interface SignTransportFormModalProps {
-  title: string;
-  siret: string;
-  form: Form;
-  onClose: () => void;
-}
-
 const validationSchema = yup.object({
   takenOverBy: yup
     .string()
@@ -46,17 +46,41 @@ const validationSchema = yup.object({
     .nullable()
     .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
 });
-
+interface SignTransportFormModalProps {
+  title: string;
+  siret: string;
+  formId: string;
+  onClose: () => void;
+}
 function SignTransportFormModal({
   title,
   siret,
-  form,
+  formId,
   onClose,
 }: SignTransportFormModalProps) {
+  const { loading: formLoading, error: formError, data } = useQuery<
+    Pick<Query, "form">,
+    QueryFormArgs
+  >(GET_FORM, {
+    variables: {
+      id: formId,
+      readableId: null,
+    },
+    fetchPolicy: "no-cache",
+  });
   const [signTransportForm, { loading, error }] = useMutation<
     Pick<Mutation, "signTransportForm">,
     MutationSignTransportFormArgs
   >(SIGN_TRANSPORT_FORM);
+
+  if (formLoading) return <Loader />;
+  if (formError) return <InlineError apolloError={formError} />;
+  if (!data?.form) {
+    return (
+      <SimpleNotificationError message="Impossible de charger le bordereau" />
+    );
+  }
+  const form = data?.form;
   return (
     <Modal onClose={onClose} ariaLabel={title} isOpen>
       <h2 className="td-modal-title">{title}</h2>
@@ -154,6 +178,11 @@ function SignTransportFormModal({
   );
 }
 
+interface SignTransportFormModalProps {
+  siret: string;
+  formId: string;
+}
+
 export default function SignTransportForm({
   siret,
   form,
@@ -173,7 +202,7 @@ export default function SignTransportForm({
         <SignTransportFormModal
           title={title}
           siret={siret}
-          form={form}
+          formId={form.id}
           onClose={() => setIsOpen(false)}
         />
       )}

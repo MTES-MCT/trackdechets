@@ -1,6 +1,6 @@
 import { FormResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
-import { expandAppendix2FormFromDb } from "../../form-converter";
+import { expandAppendix2FormFromDb } from "../../converter";
 
 const groupingResolver: FormResolvers["grouping"] = async form => {
   const formGroupements = await prisma.formGroupement.findMany({

@@ -1,7 +1,9 @@
 import prisma from "../../prisma";
 import { BsffResolvers } from "../../generated/graphql/types";
-import { toInitialBsff, unflattenBsff } from "../converter";
+import { toInitialBsff, expandBsffFromDB } from "../converter";
 import { getFicheInterventions } from "../database";
+import { dashboardOperationName } from "../../common/queries";
+import { isSessionUser } from "../../auth";
 
 export const Bsff: BsffResolvers = {
   ficheInterventions: async ({ id }, _, context) => {
@@ -16,7 +18,7 @@ export const Bsff: BsffResolvers = {
         where: { id }
       })
       .forwardedIn();
-    return forwardingBsff ? unflattenBsff(forwardingBsff) : null;
+    return forwardingBsff ? expandBsffFromDB(forwardingBsff) : null;
   },
   forwarding: async ({ id }) => {
     const forwardedBsff = await prisma.bsff
@@ -24,36 +26,48 @@ export const Bsff: BsffResolvers = {
         where: { id }
       })
       .forwarding();
-    return forwardedBsff ? toInitialBsff(unflattenBsff(forwardedBsff)) : null;
+    return forwardedBsff
+      ? toInitialBsff(expandBsffFromDB(forwardedBsff))
+      : null;
   },
   repackagedIn: async ({ id }) => {
     const repackagingBsff = await prisma.bsff
       .findUnique({ where: { id } })
       .repackagedIn();
-    return repackagingBsff ? unflattenBsff(repackagingBsff) : null;
+    return repackagingBsff ? expandBsffFromDB(repackagingBsff) : null;
   },
   repackaging: async ({ id }) => {
     const repackagedBsffs = await prisma.bsff
       .findUnique({ where: { id } })
       .repackaging();
-    return repackagedBsffs.map(bsff => toInitialBsff(unflattenBsff(bsff)));
+    return repackagedBsffs.map(bsff => toInitialBsff(expandBsffFromDB(bsff)));
   },
   groupedIn: async ({ id }) => {
     const groupingBsff = await prisma.bsff
       .findUnique({ where: { id } })
       .groupedIn();
-    return groupingBsff ? unflattenBsff(groupingBsff) : null;
+    return groupingBsff ? expandBsffFromDB(groupingBsff) : null;
   },
   grouping: async ({ id }) => {
     const groupedBsffs = await prisma.bsff
       .findUnique({ where: { id } })
       .grouping();
-    return groupedBsffs.map(bsff => toInitialBsff(unflattenBsff(bsff)));
+    return groupedBsffs.map(bsff => toInitialBsff(expandBsffFromDB(bsff)));
   },
-  packagings: async ({ id }) => {
-    const packagings = await prisma.bsff
-      .findUnique({ where: { id } })
-      .packagings();
+  packagings: async (bsff, _, ctx) => {
+    let packagings = [];
+    // use ES indexed field when requested from dashboard
+    if (
+      ctx?.req?.body?.operationName === dashboardOperationName &&
+      isSessionUser(ctx)
+    ) {
+      packagings = bsff?.packagings ?? [];
+    } else {
+      packagings = await prisma.bsff
+        .findUnique({ where: { id: bsff.id } })
+        .packagings();
+    }
+
     return packagings.map(packaging => ({
       name: packaging.name,
       volume: packaging.volume,

@@ -7,7 +7,7 @@ import prisma from "../../prisma";
 import {
   expandBsddRevisionRequestContent,
   expandFormFromDb
-} from "../form-converter";
+} from "../converter";
 
 const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
   approvals: async parent => {

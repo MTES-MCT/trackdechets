@@ -1,6 +1,5 @@
 import { Prisma, BsdasriType } from "@prisma/client";
-
-import { safeInput } from "../forms/form-converter";
+import { safeInput } from "../common/converter";
 import { BsdasriWhere } from "../generated/graphql/types";
 import {
   toPrismaDateFilter,

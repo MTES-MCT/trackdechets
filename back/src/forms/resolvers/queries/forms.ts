@@ -7,7 +7,7 @@ import prisma from "../../../prisma";
 import { getUserCompanies } from "../../../users/database";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { getFormsRightFilter } from "../../database";
-import { expandFormFromDb } from "../../form-converter";
+import { expandFormFromDb } from "../../converter";
 import { getPrismaPaginationArgs } from "../../../common/pagination";
 
 const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {

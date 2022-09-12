@@ -14,7 +14,7 @@ import { NotificationError } from "common/components/Error";
 import { IconBusTransfer } from "common/components/Icons";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
-import { WorkflowActionProps } from "./WorkflowAction";
+import { WorkflowActionProps } from "../WorkflowAction";
 import TdSwitch from "common/components/Switch";
 import { GET_BSDS, GET_DETAIL_FORM } from "common/queries";
 import {
@@ -40,7 +40,7 @@ const PREPARE_SEGMENT = gql`
 
 const validationSchema = yup.object({ transporter: transporterSchema });
 
-export default function PrepareSegment({ form, siret }: WorkflowActionProps) {
+export function PrepareSegment({ form, siret }: WorkflowActionProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [prepareSegment, { loading, error }] = useMutation<
     Pick<Mutation, "prepareSegment">,

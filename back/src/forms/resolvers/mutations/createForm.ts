@@ -11,7 +11,7 @@ import {
   expandFormFromDb,
   flattenFormInput,
   flattenTemporaryStorageDetailInput
-} from "../../form-converter";
+} from "../../converter";
 import { checkIsFormContributor } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";

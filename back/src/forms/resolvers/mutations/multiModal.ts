@@ -15,7 +15,7 @@ import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import {
   expandTransportSegmentFromDb,
   flattenTransportSegmentInput
-} from "../../form-converter";
+} from "../../converter";
 import { Prisma } from "@prisma/client";
 import { getFormRepository } from "../../repository";
 import prisma from "../../../prisma";

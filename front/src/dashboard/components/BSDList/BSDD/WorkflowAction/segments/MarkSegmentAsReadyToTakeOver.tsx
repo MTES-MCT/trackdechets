@@ -11,7 +11,7 @@ import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
 import { IconPaperWrite } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
-import { WorkflowActionProps } from "./WorkflowAction";
+import { WorkflowActionProps } from "../WorkflowAction";
 import { GET_BSDS } from "common/queries";
 import { Loader } from "common/components";
 
@@ -24,7 +24,7 @@ const MARK_SEGMENT_AS_READY_TO_TAKE_OVER = gql`
   ${segmentFragment}
 `;
 
-export default function MarkSegmentAsReadyToTakeOver({
+export function MarkSegmentAsReadyToTakeOver({
   form,
   siret,
 }: WorkflowActionProps) {

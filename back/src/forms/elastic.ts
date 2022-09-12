@@ -204,6 +204,9 @@ function toBsdElastic(form: FullForm & { forwarding?: Form }): BsdElastic {
   const siretsByTab = getSiretsByTab(form);
   const recipient = getRecipient(form);
 
+  // const forwardedIn: Form = form.forwardedIn
+  // ? await prisma.form.findUnique({ where: { id: form.id } }).forwardedIn()
+  // : null;
   return {
     type: "BSDD",
     id: form.id,
@@ -239,7 +242,8 @@ function toBsdElastic(form: FullForm & { forwarding?: Form }): BsdElastic {
       : siretsByTab),
     sirets: Object.values(siretsByTab).flat(),
     ...getRegistryFields(form),
-    intermediaries: form.intermediaries
+    intermediaries: form.intermediaries,
+    rawBsd: form
   };
 }
 
@@ -250,7 +254,7 @@ export async function indexAllForms(
   idx: string,
   { skip = 0 }: { skip?: number } = {}
 ) {
-  const take = 500;
+  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
   const forms = await prisma.form.findMany({
     skip,
     take,

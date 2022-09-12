@@ -111,11 +111,16 @@ const updateBsdasri = async ({
     data: {
       ...flattenedInput,
       ...getGroupedBsdasriArgs(inputGrouping)
+    },
+    include: {
+      grouping: { select: { id: true } },
+      synthesizing: { select: { id: true } }
     }
   });
 
   const expandedDasri = expandBsdasriFromDB(updatedDasri);
   await indexBsdasri(updatedDasri, context);
+
   return expandedDasri;
 };
 

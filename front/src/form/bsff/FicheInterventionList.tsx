@@ -16,7 +16,7 @@ import {
 import * as React from "react";
 import countries from "world-countries";
 import * as yup from "yup";
-import { FicheInterventionFragment } from "./utils/queries";
+import { FicheInterventionFragment } from "common/fragments";
 
 const CREATE_BSFF_FICHE_INTERVENTION = gql`
   mutation CreateBsffFicheIntervention($input: BsffFicheInterventionInput!) {

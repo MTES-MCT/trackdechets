@@ -1,7 +1,7 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
-import { expandFormFromDb, flattenFormInput } from "../../form-converter";
+import { expandFormFromDb, flattenFormInput } from "../../converter";
 import { checkCanMarkAsResealed } from "../../permissions";
 import {
   validateForwardedInCompanies,

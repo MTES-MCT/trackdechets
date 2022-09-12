@@ -81,6 +81,10 @@ const createBsdasri = async (
       grouping: { connect: groupedBsdasris },
 
       isDraft
+    },
+    include: {
+      grouping: { select: { id: true } },
+      synthesizing: { select: { id: true } }
     }
   });
 

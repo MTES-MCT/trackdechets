@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { safeInput } from "../../forms/form-converter";
+import { safeInput } from "../../common/converter";
 import { BsffWhere } from "../../generated/graphql/types";
 import {
   NestingWhereError,

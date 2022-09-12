@@ -19,7 +19,7 @@ import {
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
 import { getFormOrFormNotFound } from "../../database";
-import { flattenBsddRevisionRequestInput } from "../../form-converter";
+import { flattenBsddRevisionRequestInput } from "../../converter";
 import { checkCanRequestRevision } from "../../permissions";
 import { getFormRepository } from "../../repository";
 import {

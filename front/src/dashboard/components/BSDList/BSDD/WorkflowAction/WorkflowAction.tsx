@@ -9,9 +9,12 @@ import MarkAsResealed from "./MarkAsResealed";
 import MarkAsTempStorerAccepted from "./MarkAsTempStorerAccepted";
 import SignEmissionForm from "./SignEmissionForm";
 import SignTransportForm from "./SignTransportForm";
-import PrepareSegment from "./PrepareSegment";
-import MarkSegmentAsReadyToTakeOver from "./MarkSegmentAsReadyToTakeOver";
-import TakeOverSegment from "./TakeOverSegment";
+
+import {
+  PrepareSegment,
+  MarkSegmentAsReadyToTakeOver,
+  TakeOverSegment,
+} from "./segments";
 
 export interface WorkflowActionProps {
   form: Form;
@@ -65,7 +68,6 @@ export function WorkflowAction(props: WorkflowActionProps) {
         ) {
           return <PrepareSegment {...props} />;
         }
-
         if (
           // the last segment is still a draft
           !lastSegment.readyToTakeOver &&

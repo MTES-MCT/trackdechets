@@ -32,11 +32,13 @@ import {
   BsdasriIdentificationInput
 } from "../generated/graphql/types";
 import {
-  chain,
   nullIfNoValues,
   safeInput,
+  processDate,
+  chain,
   undefinedOrDefault
-} from "../forms/form-converter";
+} from "../common/converter";
+import { BsdElastic } from "../common/elastic";
 import { Prisma, Bsdasri, BsdasriStatus } from "@prisma/client";
 import { Decimal } from "decimal.js-light";
 
@@ -110,7 +112,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
       recepisse: nullIfNoValues({
         department: bsdasri.transporterRecepisseDepartment,
         number: bsdasri.transporterRecepisseNumber,
-        validityLimit: bsdasri.transporterRecepisseValidityLimit
+        validityLimit: processDate(bsdasri.transporterRecepisseValidityLimit)
       }),
       transport: nullIfNoValues<BsdasriTransport>({
         mode: bsdasri.transporterTransportMode,
@@ -132,7 +134,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
           refusalReason: bsdasri.transporterWasteRefusalReason,
           refusedWeight: bsdasri.transporterWasteRefusedWeightValue
         }),
-        takenOverAt: bsdasri.transporterTakenOverAt,
+        takenOverAt: processDate(bsdasri.transporterTakenOverAt),
         handedOverAt: bsdasri.handedOverToRecipientAt,
         signature: nullIfNoValues<BsdasriSignature>({
           author: bsdasri.transporterTransportSignatureAuthor,
@@ -160,7 +162,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
           refusalReason: bsdasri.destinationReceptionWasteRefusalReason,
           refusedWeight: bsdasri.destinationReceptionWasteRefusedWeightValue
         }),
-        date: bsdasri.destinationReceptionDate,
+        date: processDate(bsdasri.destinationReceptionDate),
         signature: nullIfNoValues<BsdasriSignature>({
           author: bsdasri.destinationReceptionSignatureAuthor,
           date: bsdasri.destinationReceptionSignatureDate
@@ -171,21 +173,39 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
           value: bsdasri.destinationReceptionWasteWeightValue
         }),
         code: bsdasri.destinationOperationCode,
-        date: bsdasri.destinationOperationDate,
+        date: processDate(bsdasri.destinationOperationDate),
         signature: nullIfNoValues<BsdasriSignature>({
           author: bsdasri.destinationOperationSignatureAuthor,
-          date: bsdasri.destinationOperationSignatureDate
+          date: processDate(bsdasri.destinationOperationSignatureDate)
         })
       })
     }),
     identification: nullIfNoValues<BsdasriIdentification>({
       numbers: bsdasri.identificationNumbers
     }),
-    createdAt: bsdasri.createdAt,
-    updatedAt: bsdasri.updatedAt,
+    createdAt: processDate(bsdasri.createdAt),
+    updatedAt: processDate(bsdasri.updatedAt),
     status: bsdasri.status as BsdasriStatus,
     metadata: null,
     allowDirectTakeOver: null
+  };
+}
+
+export function expandBsdasriFromElastic(
+  bsdasri: BsdElastic["rawBsd"]
+): GqlBsdasri {
+  const expanded = expandBsdasriFromDB(bsdasri);
+
+  if (!expanded) {
+    return null;
+  }
+
+  return {
+    ...expanded,
+    grouping: bsdasri.grouping,
+    synthesizing: bsdasri.synthesizing,
+    groupedIn: bsdasri.groupedIn,
+    synthesizedIn: bsdasri.synthesizedInId
   };
 }
 
@@ -214,7 +234,7 @@ export const expandGroupingDasri = (dasri: Bsdasri): InitialBsdasri => ({
 
   weight: dasri.destinationReceptionWasteWeightValue,
 
-  takenOverAt: dasri.transporterTakenOverAt,
+  takenOverAt: processDate(dasri.transporterTakenOverAt),
 
   postalCode:
     dasri?.emitterPickupSitePostalCode ??
