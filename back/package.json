@@ -10,7 +10,7 @@
     "watch:node": "nodemon -r dotenv/config --watch src --exec ts-eager --inspect=0.0.0.0:9229 src/index.ts -e ts,tsx",
     "start": "node dist/src/index.js",
     "update": "node dist/prisma/scripts/index.js",
-    "update:dev": "ts-node prisma/scripts/index.ts",
+    "update:dev": "ts-node -r dotenv/config prisma/scripts/index.ts",
     "migrate": "node dist/prisma/migrate.js",
     "migrate:dev": "ts-node -r dotenv/config prisma/migrate.ts",
     "check:migrations": "pg-validate-migrations ./prisma/migrations",

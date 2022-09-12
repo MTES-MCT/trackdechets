@@ -1,10 +1,11 @@
 <p>
-  Nous vous informons que la société {{form.recipientCompanyName}} a refusé partiellement le {{form.receivedAt}}, le
+  Nous vous informons que la société {{form.recipientCompanyName}} ({{form.recipientCompanySiret}}) a refusé
+  partiellement le {{form.receivedAt}}, le
   déchet de la société suivante :
 </p>
 <br />
 <ul>
-  <li>{{form.emitterCompanyName}} - {{form.emitterCompanyAddress}}</li>
+  <li>{{form.emitterCompanyName}} ({{form.emitterCompanySiret}}) - {{form.emitterCompanyAddress}}</li>
   <li>Informations relatives aux déchets refusés :</li>
   <ul>
     <li>Numéro du BSD : {{form.readableId}}</li>
@@ -12,8 +13,8 @@
     <li>Code déchet : {{form.wasteDetailsCode}}</li>
     <li>Quantité acceptée: {{form.quantityReceived}} tonnes</li>
     <li>Motif de refus :
-      {{#form.wasteRefusalReason}} <span> {{form.wasteRefusalReason}}</span>{{/form.wasteRefusalReason}}
-      {{^form.wasteRefusalReason}} <span> Non précisé</span> {{/form.wasteRefusalReason}}
+      {{#form.wasteRefusalReason}}<span>{{form.wasteRefusalReason}}</span>{{/form.wasteRefusalReason}}
+      {{^form.wasteRefusalReason}}<span>Non précisé</span>{{/form.wasteRefusalReason}}
     </li>
   </ul>
   <li>Transporteur :

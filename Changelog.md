@@ -27,6 +27,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Amélioration de l'indexation des BSDAs pour éviter des problèmes de désynchronisation du statut [PR 1641](https://github.com/MTES-MCT/trackdechets/pull/1641)
 - Ajout d'index manquant [PR 1648](https://github.com/MTES-MCT/trackdechets/pull/1648)
 - Refacto pour permettre d'identifier les `Company` par `siret` ou `vatNumber` dans le cache par utilisateur (et les permissions) afin de ne pas causer de problèmes pour les entreprises identifiées uniquement pas VAT, usage de `Company.id` pour `updateCompany` et `getCompanyOrCompanyNotFound` [PR 1647](https://github.com/MTES-MCT/trackdechets/pull/1647)
+- Amélioration de l'envoi des emails de refus [PR 1642](https://github.com/MTES-MCT/trackdechets/pull/1642)
 
 # [2022.08.4] 29/08/2022
 

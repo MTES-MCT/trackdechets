@@ -1,7 +1,6 @@
 import { Form, Prisma } from "@prisma/client";
 import { isDangerous } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { eventEmitter, TDEvent } from "../../../events/emitter";
 import {
   MutationCreateFormArgs,
   ResolversParentTypes
@@ -169,13 +168,6 @@ const createFormResolver = async (
       appendix2
     });
     return newForm;
-  });
-
-  eventEmitter.emit(TDEvent.CreateForm, {
-    previousNode: null,
-    node: newForm,
-    updatedFields: {},
-    mutation: "CREATED"
   });
 
   return expandFormFromDb(newForm);

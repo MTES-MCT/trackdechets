@@ -10,6 +10,8 @@ import { DestinationCannotTempStore } from "../../errors";
 import { Prisma, WasteAcceptationStatus } from "@prisma/client";
 import { getFormRepository } from "../../repository";
 import prisma from "../../../prisma";
+import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
+import { sendMail } from "../../../mailer/mailing";
 
 const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
   parent,
@@ -77,6 +79,15 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
 
     return tempStoredForm;
   });
+
+  if (
+    tempStoredForm.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED ||
+    tempStoredForm.wasteAcceptationStatus ===
+      WasteAcceptationStatus.PARTIALLY_REFUSED
+  ) {
+    const refusedEmail = await renderFormRefusedEmail(tempStoredForm);
+    sendMail(refusedEmail);
+  }
 
   return expandFormFromDb(tempStoredForm);
 };

@@ -9,6 +9,8 @@ import { Prisma, WasteAcceptationStatus } from "@prisma/client";
 import { getFormRepository } from "../../repository";
 import { acceptedInfoSchema } from "../../validation";
 import prisma from "../../../prisma";
+import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
+import { sendMail } from "../../../mailer/mailing";
 
 const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccepted"] =
   async (_, args, context) => {
@@ -58,6 +60,16 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
 
       return tempStoredForm;
     });
+
+    if (
+      tempStoredForm.wasteAcceptationStatus ===
+        WasteAcceptationStatus.REFUSED ||
+      tempStoredForm.wasteAcceptationStatus ===
+        WasteAcceptationStatus.PARTIALLY_REFUSED
+    ) {
+      const refusedEmail = await renderFormRefusedEmail(tempStoredForm);
+      sendMail(refusedEmail);
+    }
 
     return expandFormFromDb(tempStoredForm);
   };

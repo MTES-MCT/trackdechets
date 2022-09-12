@@ -12,12 +12,13 @@ import prisma from "../../../prisma";
 import { getFormRepository } from "../../repository";
 import {
   Prisma,
-  Form,
   QuantityType,
   Status,
   WasteAcceptationStatus
 } from "@prisma/client";
-import { eventEmitter, TDEvent } from "../../../events/emitter";
+import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
+import { sendMail } from "../../../mailer/mailing";
+
 const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   parent,
   args,
@@ -91,13 +92,14 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
     return receivedForm;
   });
 
-  // eventEmitter temporary taken out from te repository to fix incomplete refusal email bug
-  eventEmitter.emit<Form>(TDEvent.TransitionForm, {
-    previousNode: null,
-    node: receivedForm,
-    updatedFields: receivedInfo,
-    mutation: "UPDATED"
-  });
+  if (
+    receivedForm.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED ||
+    receivedForm.wasteAcceptationStatus ===
+      WasteAcceptationStatus.PARTIALLY_REFUSED
+  ) {
+    const refusedEmail = await renderFormRefusedEmail(receivedForm);
+    sendMail(refusedEmail);
+  }
 
   return expandFormFromDb(receivedForm);
 };
