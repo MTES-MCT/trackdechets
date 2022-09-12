@@ -21,7 +21,7 @@ setInterval(() => {
 }, 1000 * 60 * 3);
 
 setInterval(() => {
-  if (["sandbox", "recette"].includes(process.env.DD_ENV)) {
+  if (process.env.DEBUG_HEAPDUMP === "active") {
     createHeapSnapshotAndUploadToS3();
   }
 }, 1000 * 60 * 60);
