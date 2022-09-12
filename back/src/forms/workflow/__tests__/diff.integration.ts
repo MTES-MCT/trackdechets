@@ -6,7 +6,7 @@ import {
   formWithTempStorageFactory,
   userFactory
 } from "../../../__tests__/factories";
-import { expandFormFromDb } from "../../form-converter";
+import { expandFormFromDb } from "../../converter";
 import getReadableId from "../../readableId";
 import { formDiff } from "../diff";
 

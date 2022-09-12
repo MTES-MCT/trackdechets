@@ -1,21 +1,28 @@
 import * as React from "react";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { Field, Form as FormikForm, Formik } from "formik";
 import * as yup from "yup";
 import {
-  Form,
   FormStatus,
   Mutation,
   MutationSignEmissionFormArgs,
+  Query,
+  QueryFormArgs,
 } from "generated/graphql/types";
+import Loader from "common/components/Loaders";
 import { fullFormFragment } from "common/fragments";
 import { ActionButton, Modal, RedErrorMessage } from "common/components";
-import { NotificationError } from "common/components/Error";
+import {
+  NotificationError,
+  InlineError,
+  SimpleNotificationError,
+} from "common/components/Error";
 import { IconShipmentSignSmartphone } from "common/components/Icons";
 import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { FormJourneySummary } from "./FormJourneySummary";
 import { FormWasteEmissionSummary } from "./FormWasteEmissionSummary";
+import { GET_FORM } from "form/bsdd/utils/queries";
 
 const SIGN_EMISSION_FORM = gql`
   mutation SignEmissionForm(
@@ -33,7 +40,7 @@ const SIGN_EMISSION_FORM = gql`
 interface SignEmissionFormModalProps {
   title: string;
   siret: string;
-  form: Form;
+  formId: string;
   onClose: () => void;
 }
 
@@ -56,14 +63,33 @@ enum EmitterType {
 function SignEmissionFormModal({
   title,
   siret,
-  form,
+  formId,
   onClose,
 }: SignEmissionFormModalProps) {
+  const { loading: formLoading, error: formError, data } = useQuery<
+    Pick<Query, "form">,
+    QueryFormArgs
+  >(GET_FORM, {
+    variables: {
+      id: formId,
+      readableId: null,
+    },
+    fetchPolicy: "no-cache",
+  });
+
   const [signEmissionForm, { loading, error }] = useMutation<
     Pick<Mutation, "signEmissionForm">,
     MutationSignEmissionFormArgs
   >(SIGN_EMISSION_FORM);
 
+  if (formLoading) return <Loader />;
+  if (formError) return <InlineError apolloError={formError} />;
+  if (!data?.form) {
+    return (
+      <SimpleNotificationError message="Impossible de charger le bordereau" />
+    );
+  }
+  const form = data?.form;
   const initialValues = {
     emittedBy: "",
     emittedByType: EmitterType.Emitter,
@@ -248,7 +274,7 @@ export default function SignEmissionForm({ siret, form }: WorkflowActionProps) {
         <SignEmissionFormModal
           title={title}
           siret={siret}
-          form={form}
+          formId={form.id}
           onClose={() => setIsOpen(false)}
         />
       )}

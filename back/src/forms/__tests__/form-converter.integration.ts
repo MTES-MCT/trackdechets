@@ -3,7 +3,7 @@ import {
   formWithTempStorageFactory,
   userFactory
 } from "../../__tests__/factories";
-import { expandFormFromDb } from "../form-converter";
+import { expandFormFromDb } from "../converter";
 
 describe("expandFormFromDb", () => {
   it("should expand normal form from db", async () => {

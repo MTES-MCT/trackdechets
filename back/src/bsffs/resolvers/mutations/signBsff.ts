@@ -18,7 +18,7 @@ import {
   validateBeforeReception,
   validateBeforeTransport
 } from "../../validation";
-import { unflattenBsff } from "../../converter";
+import { expandBsffFromDB } from "../../converter";
 import { getBsffHistory, getBsffOrNotFound } from "../../database";
 import { indexBsff } from "../../elastic";
 import { OPERATION } from "../../constants";
@@ -185,7 +185,7 @@ const signBsff: MutationResolvers["signBsff"] = async (_, args, context) => {
 
   await indexBsff(updatedBsff, context);
 
-  return unflattenBsff(updatedBsff);
+  return expandBsffFromDB(updatedBsff);
 };
 
 export default signBsff;

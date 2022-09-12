@@ -26,6 +26,7 @@ import { indexBsdasri } from "../../elastic";
 const reindexAssociatedDasris = async dasriId => {
   const updatedDasris = await prisma.bsdasri.findMany({
     where: { synthesizedInId: dasriId }
+    // no need to query grouping and synthesizing dasris for ES here
   });
   for (const updatedDasri of updatedDasris) {
     await indexBsdasri(updatedDasri);

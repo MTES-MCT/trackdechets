@@ -47,54 +47,17 @@ import {
   ParcelNumber,
   Destination
 } from "../generated/graphql/types";
+import { BsdElastic } from "../common/elastic";
+
 import { extractPostalCode } from "../utils";
 import prisma from "../prisma";
-
-/**
- * Return null if all object values are null or an empty string
- * obj otherwise
- */
-export function nullIfNoValues<T>(obj: T): T | null {
-  return Object.values(obj).some(v => v !== null && v !== "") ? obj : null;
-}
-
-/**
- * Discard undefined fields in a flatten input
- * It is used to prevent overriding existing data when
- * updating records
- */
-export function safeInput<K>(obj: K): Partial<K> {
-  return Object.keys(obj).reduce((acc, curr) => {
-    return {
-      ...acc,
-      ...(obj[curr] !== undefined ? { [curr]: obj[curr] } : {})
-    };
-  }, {});
-}
-
-/**
- * Equivalent to a typescript optional chaining operator foo?.bar
- * except that it returns "null" instead of "undefined" if "null" is encountered in the chain
- * It allows to differentiate between voluntary null update and field omission that should
- * not update any data
- */
-export function chain<T, K>(o: T, getter: (o: T) => K): K | null | undefined {
-  if (o === null) {
-    return null;
-  }
-  if (o === undefined) {
-    return undefined;
-  }
-  return getter(o);
-}
-
-export function undefinedOrDefault<I>(value: I, defaultValue: I): I {
-  if (value === null) {
-    return defaultValue;
-  }
-
-  return value;
-}
+import {
+  nullIfNoValues,
+  safeInput,
+  processDate,
+  chain,
+  undefinedOrDefault
+} from "../common/converter";
 
 function flattenDestinationInput(input: {
   destination?: DestinationInput;
@@ -507,11 +470,23 @@ export function flattenTransportSegmentInput(
 
 /**
  * Expand form data from db
+ * Overlaoded function to handle prisma and elastic bsds
  */
-export async function expandFormFromDb(form: PrismaForm): Promise<GraphQLForm> {
-  const forwardedIn: Form = form.forwardedInId
-    ? await prisma.form.findUnique({ where: { id: form.id } }).forwardedIn()
-    : null;
+export async function expandFormFromDb(
+  form: BsdElastic["rawBsd"]
+): Promise<GraphQLForm>;
+export async function expandFormFromDb(form: PrismaForm): Promise<GraphQLForm>;
+export async function expandFormFromDb(form: any): Promise<GraphQLForm> {
+  let forwardedIn: Form;
+  // if form is rawBsd, forwardedIn is already computed
+  if (form?.forwardedIn) {
+    forwardedIn = form.forwardedIn;
+  } else {
+    // id form is Form, get forwardedIn from db
+    forwardedIn = form.forwardedInId
+      ? await prisma.form.findUnique({ where: { id: form.id } }).forwardedIn()
+      : null;
+  }
 
   return {
     id: form.id,
@@ -566,7 +541,7 @@ export async function expandFormFromDb(form: PrismaForm): Promise<GraphQLForm> {
       isExemptedOfReceipt: form.transporterIsExemptedOfReceipt,
       receipt: form.transporterReceipt,
       department: form.transporterDepartment,
-      validityLimit: form.transporterValidityLimit,
+      validityLimit: processDate(form.transporterValidityLimit),
       numberPlate: form.transporterNumberPlate,
       customInfo: form.transporterCustomInfo,
       // transportMode has default value in DB but we do not want to return anything
@@ -602,7 +577,7 @@ export async function expandFormFromDb(form: PrismaForm): Promise<GraphQLForm> {
       }),
       receipt: form.traderReceipt,
       department: form.traderDepartment,
-      validityLimit: form.traderValidityLimit
+      validityLimit: processDate(form.traderValidityLimit)
     }),
     broker: nullIfNoValues<Broker>({
       company: nullIfNoValues<FormCompany>({
@@ -615,22 +590,22 @@ export async function expandFormFromDb(form: PrismaForm): Promise<GraphQLForm> {
       }),
       receipt: form.brokerReceipt,
       department: form.brokerDepartment,
-      validityLimit: form.brokerValidityLimit
+      validityLimit: processDate(form.brokerValidityLimit)
     }),
     ecoOrganisme: nullIfNoValues<FormEcoOrganisme>({
       name: form.ecoOrganismeName,
       siret: form.ecoOrganismeSiret
     }),
-    createdAt: form.createdAt,
-    updatedAt: form.updatedAt,
+    createdAt: processDate(form.createdAt),
+    updatedAt: processDate(form.updatedAt),
     status: form.status as FormStatus,
-    emittedAt: form.emittedAt,
+    emittedAt: processDate(form.emittedAt),
     emittedBy: form.emittedBy,
     emittedByEcoOrganisme: form.emittedByEcoOrganisme,
-    takenOverAt: form.takenOverAt,
+    takenOverAt: processDate(form.takenOverAt),
     takenOverBy: form.takenOverBy,
     signedByTransporter: form.signedByTransporter,
-    sentAt: form.sentAt,
+    sentAt: processDate(form.sentAt),
     sentBy: form.sentBy,
     wasteAcceptationStatus: forwardedIn
       ? forwardedIn.wasteAcceptationStatus
@@ -639,8 +614,10 @@ export async function expandFormFromDb(form: PrismaForm): Promise<GraphQLForm> {
       ? forwardedIn.wasteRefusalReason
       : form.wasteRefusalReason,
     receivedBy: forwardedIn ? forwardedIn.receivedBy : form.receivedBy,
-    receivedAt: forwardedIn ? forwardedIn.receivedAt : form.receivedAt,
-    signedAt: forwardedIn ? forwardedIn.signedAt : form.signedAt,
+    receivedAt: processDate(
+      forwardedIn ? forwardedIn.receivedAt : form.receivedAt
+    ),
+    signedAt: processDate(forwardedIn ? forwardedIn.signedAt : form.signedAt),
     quantityReceived: forwardedIn
       ? forwardedIn.quantityReceived
       : form.quantityReceived,
@@ -652,7 +629,9 @@ export async function expandFormFromDb(form: PrismaForm): Promise<GraphQLForm> {
       ? forwardedIn.processingOperationDescription
       : form.processingOperationDescription,
     processedBy: forwardedIn ? forwardedIn.processedBy : form.processedBy,
-    processedAt: forwardedIn ? forwardedIn.processedAt : form.processedAt,
+    processedAt: processDate(
+      forwardedIn ? forwardedIn.processedAt : form.processedAt
+    ),
     noTraceability: forwardedIn
       ? forwardedIn.noTraceability
       : form.noTraceability,
@@ -691,7 +670,7 @@ export async function expandFormFromDb(form: PrismaForm): Promise<GraphQLForm> {
             quantityReceived: form.quantityReceived,
             wasteAcceptationStatus: form.wasteAcceptationStatus,
             wasteRefusalReason: form.wasteRefusalReason,
-            receivedAt: form.receivedAt,
+            receivedAt: processDate(form.receivedAt),
             receivedBy: form.receivedBy
           },
           destination: nullIfNoValues<Destination>({
@@ -736,7 +715,7 @@ export async function expandFormFromDb(form: PrismaForm): Promise<GraphQLForm> {
             isExemptedOfReceipt: forwardedIn.transporterIsExemptedOfReceipt,
             receipt: forwardedIn.transporterReceipt,
             department: forwardedIn.transporterDepartment,
-            validityLimit: forwardedIn.transporterValidityLimit,
+            validityLimit: processDate(forwardedIn.transporterValidityLimit),
             numberPlate: forwardedIn.transporterNumberPlate,
             customInfo: forwardedIn.transporterCustomInfo,
             // transportMode has default value in DB but we do not want to return anything
@@ -745,17 +724,28 @@ export async function expandFormFromDb(form: PrismaForm): Promise<GraphQLForm> {
               ? forwardedIn.transporterTransportMode
               : null
           }),
-          emittedAt: forwardedIn.emittedAt,
+          emittedAt: processDate(forwardedIn.emittedAt),
           emittedBy: forwardedIn.emittedBy,
-          takenOverAt: forwardedIn.takenOverAt,
+          takenOverAt: processDate(forwardedIn.takenOverAt),
           takenOverBy: forwardedIn.takenOverBy,
           // Deprecated: Remplacé par takenOverAt
-          signedAt: forwardedIn.takenOverAt,
+          signedAt: processDate(forwardedIn.takenOverAt),
           // Deprecated: Remplacé par emittedBy
           signedBy: forwardedIn.emittedBy
         }
       : null
   };
+}
+
+export async function expandFormFromElastic(
+  form: BsdElastic["rawBsd"]
+): Promise<GraphQLForm> {
+  const expanded = await expandFormFromDb(form);
+
+  if (!expanded) {
+    return null;
+  }
+  return { ...expanded, transportSegments: form.transportSegments };
 }
 
 export async function expandAppendix2FormFromDb(
@@ -783,7 +773,7 @@ export async function expandAppendix2FormFromDb(
     emitterPostalCode: hasPickupSite
       ? emitter?.workSite?.postalCode
       : extractPostalCode(emitter?.company?.address),
-    signedAt,
+    signedAt: processDate(signedAt),
     recipient,
     quantityReceived,
     quantityGrouped,
@@ -809,12 +799,12 @@ export function expandTransportSegmentFromDb(
       isExemptedOfReceipt: segment.transporterIsExemptedOfReceipt,
       receipt: segment.transporterReceipt,
       department: segment.transporterDepartment,
-      validityLimit: segment.transporterValidityLimit,
+      validityLimit: processDate(segment.transporterValidityLimit),
       numberPlate: segment.transporterNumberPlate,
       customInfo: null
     }),
     mode: segment.mode,
-    takenOverAt: segment.takenOverAt,
+    takenOverAt: processDate(segment.takenOverAt),
     takenOverBy: segment.takenOverBy,
     readyToTakeOver: segment.readyToTakeOver,
     segmentNumber: segment.segmentNumber

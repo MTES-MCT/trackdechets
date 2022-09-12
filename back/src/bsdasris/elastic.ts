@@ -141,7 +141,8 @@ export function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
     createdAt: bsdasri.createdAt.getTime(),
     ...where,
     sirets: Object.values(where).flat(),
-    ...getRegistryFields(bsdasri)
+    ...getRegistryFields(bsdasri),
+    rawBsd: bsdasri
   };
 }
 
@@ -152,12 +153,16 @@ export async function indexAllBsdasris(
   idx: string,
   { skip = 0 }: { skip?: number } = {}
 ) {
-  const take = 500;
+  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
   const bsdasris = await prisma.bsdasri.findMany({
     skip,
     take,
     where: {
       isDeleted: false
+    },
+    include: {
+      grouping: { select: { id: true } },
+      synthesizing: { select: { id: true } }
     }
   });
 

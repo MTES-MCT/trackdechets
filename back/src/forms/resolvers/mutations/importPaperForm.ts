@@ -7,10 +7,7 @@ import {
   MutationResolvers
 } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
-import {
-  expandFormFromDb,
-  flattenImportPaperFormInput
-} from "../../form-converter";
+import { expandFormFromDb, flattenImportPaperFormInput } from "../../converter";
 import { checkCanImportForm } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";

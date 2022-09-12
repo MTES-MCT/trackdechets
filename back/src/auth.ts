@@ -256,3 +256,11 @@ export function applyAuthStrategies(
   }
   return context;
 }
+
+/**
+ * Check if request is made by a logged-in Trackdechets UI user
+ *
+ */
+export function isSessionUser(context: GraphQLContext): boolean {
+  return context.user && context.user.auth === AuthType.Session;
+}

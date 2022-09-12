@@ -3,7 +3,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { getFormOrFormNotFound } from "../../database";
-import { expandFormFromDb } from "../../form-converter";
+import { expandFormFromDb } from "../../converter";
 import { checkCanMarkAsAccepted } from "../../permissions";
 import { getFormRepository } from "../../repository";
 import { acceptedInfoSchema } from "../../validation";

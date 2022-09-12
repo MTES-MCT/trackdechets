@@ -1,5 +1,5 @@
 import { FormResolvers } from "../../../generated/graphql/types";
-import { expandAppendix2FormFromDb } from "../../form-converter";
+import { expandAppendix2FormFromDb } from "../../converter";
 import { getFormRepository } from "../../repository";
 
 const appendix2FormsResolver: FormResolvers["appendix2Forms"] = async (

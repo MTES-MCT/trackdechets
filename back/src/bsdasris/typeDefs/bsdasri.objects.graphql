@@ -213,7 +213,7 @@ type Bsdasri {
 
   metadata: BsdasriMetadata!
 
-  "DEPRECATED - renvoie null"
+  "DEPRECATED - renvoie null - usage interne pour les requêtes dashboard"
   allowDirectTakeOver: Boolean
     @deprecated(
       reason: "utiliser le champ `allowBsdasriTakeOverWithoutSignature` dans la réponse de la query `companyInfos` en passant le SIRET de l'émetteur en paramètre"

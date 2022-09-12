@@ -102,6 +102,10 @@ const createSynthesisBsdasri = async (
       type: BsdasriType.SYNTHESIS,
 
       synthesizing: { connect: synthesizedBsdasrisId }
+    },
+    include: {
+      grouping: { select: { id: true } },
+      synthesizing: { select: { id: true } }
     }
   });
   const expandeBsdasri = expandBsdasriFromDB(newDasri);

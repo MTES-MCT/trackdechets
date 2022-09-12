@@ -62,6 +62,8 @@ export interface BsdElastic {
   isOutgoingWasteFor: string[];
   isTransportedWasteFor: string[];
   isManagedWasteFor: string[];
+
+  rawBsd: any;
 }
 
 // Custom analyzers for readableId and waste fields
@@ -327,7 +329,8 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
       mail: { type: "text" },
       vatNumber: { type: "keyword" }
     }
-  }
+  },
+  rawBsd: { type: "nested", enabled: false } // store, do not index
 };
 
 export type BsdIndex = {
@@ -346,7 +349,8 @@ export const index: BsdIndex = {
   // Changing the value of index is a way to "bump" the model
   // Doing so will cause all BSDs to be reindexed in Elastic Search
   // when running the appropriate script
-  index: "bsds_0.2.4",
+
+  index: "bsds_0.2.5",
 
   // The next major version of Elastic Search doesn't use "type" anymore
   // so while it's required for the current version, we are not using it too much
@@ -447,6 +451,7 @@ export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
     index: index.index,
     type: index.type,
     id: bsd.id,
+
     body: bsd,
     ...refresh(ctx)
   });
@@ -519,13 +524,43 @@ type PrismaBsdsInclude = {
 };
 
 /**
- * Convert a list of BsdElastic to a mapping of prisma Bsds
+ * Convert a list of BsdElastic to a mapping of prisma-like Bsds by retrieving rawBsd elastic field
+ */
+export async function toRawBsds(
+  bsdsElastic: BsdElastic[]
+): Promise<PrismaBsdMap> {
+  const { BSDD, BSDASRI, BSVHU, BSDA, BSFF } = bsdsElastic.reduce<{
+    BSDD: Form[];
+    BSDASRI: Bsdasri[];
+    BSVHU: Bsvhu[];
+    BSDA: Bsda[];
+    BSFF: Bsff[];
+  }>(
+    (acc, bsdElastic) => ({
+      ...acc,
+      [bsdElastic.type]: [...acc[bsdElastic.type], bsdElastic?.rawBsd]
+    }),
+    { BSDD: [], BSDASRI: [], BSVHU: [], BSDA: [], BSFF: [] }
+  );
+
+  return {
+    bsdds: BSDD,
+    bsdasris: BSDASRI,
+    bsvhus: BSVHU,
+    bsdas: BSDA,
+    bsffs: BSFF
+  };
+}
+
+/**
+ * Convert a list of BsdElastic to a mapping of prisma Bsds - Used for registry
  */
 export async function toPrismaBsds(
   bsdsElastic: BsdElastic[],
   include: PrismaBsdsInclude = {}
 ): Promise<PrismaBsdMap> {
   const { BSDD, BSDASRI, BSVHU, BSDA, BSFF } = groupByBsdType(bsdsElastic);
+
   const prismaBsdsPromises: [
     Promise<Form[]>,
     Promise<Bsdasri[]>,

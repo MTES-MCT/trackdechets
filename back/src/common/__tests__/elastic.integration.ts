@@ -37,7 +37,8 @@ const defaultOpts: BsdElastic = {
   isIncomingWasteFor: [],
   isOutgoingWasteFor: [],
   isTransportedWasteFor: [],
-  isManagedWasteFor: []
+  isManagedWasteFor: [],
+  rawBsd: {}
 };
 
 describe("readableId analyzer", () => {

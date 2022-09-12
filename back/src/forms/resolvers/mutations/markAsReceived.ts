@@ -5,7 +5,7 @@ import transitionForm from "../../workflow/transitionForm";
 import { checkCanMarkAsReceived } from "../../permissions";
 import { receivedInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
-import { expandFormFromDb } from "../../form-converter";
+import { expandFormFromDb } from "../../converter";
 import { TemporaryStorageCannotReceive } from "../../errors";
 import prisma from "../../../prisma";
 

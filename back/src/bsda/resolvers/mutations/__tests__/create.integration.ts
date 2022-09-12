@@ -264,15 +264,11 @@ describe("Mutation.Bsda.create", () => {
     };
 
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<Pick<Mutation, "createBsda">>(
-      CREATE_BSDA,
-      {
-        variables: {
-          input
-        }
+    const { data } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
       }
-    );
-    console.log(errors);
+    });
     expect(data.createBsda.id).toMatch(
       new RegExp(`^BSDA-[0-9]{8}-[A-Z0-9]{9}$`)
     );

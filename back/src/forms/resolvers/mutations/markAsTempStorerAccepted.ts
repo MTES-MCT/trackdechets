@@ -4,7 +4,7 @@ import transitionForm from "../../workflow/transitionForm";
 import { getFormOrFormNotFound } from "../../database";
 import { checkCanMarkAsTempStorerAccepted } from "../../permissions";
 import { EventType } from "../../workflow/types";
-import { expandFormFromDb } from "../../form-converter";
+import { expandFormFromDb } from "../../converter";
 import { Prisma, WasteAcceptationStatus } from "@prisma/client";
 import { getFormRepository } from "../../repository";
 import { acceptedInfoSchema } from "../../validation";
