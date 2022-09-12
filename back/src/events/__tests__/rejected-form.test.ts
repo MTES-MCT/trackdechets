@@ -197,7 +197,7 @@ jest.mock("../../prisma", () => ({
   form: { findUnique: jest.fn((...args) => formFindMock(...args)) }
 }));
 
-// spies on searchCompany to capture calls to entreprise.data.gouv.fr
+// spies on searchCompany
 const searchCompanySpy = jest.spyOn(search, "searchCompany");
 // spies on axios get to capture calls to geo.api.gouv.fr
 const mockedAxiosGet = jest.spyOn(axios, "get");
