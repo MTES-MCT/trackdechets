@@ -45,6 +45,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     companyTypes,
     transporterReceiptId,
     traderReceiptId,
+    brokerReceiptId,
     vhuAgrementDemolisseurId,
     vhuAgrementBroyeurId,
     allowBsdasriTakeOverWithoutSignature
@@ -126,6 +127,12 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   if (!!traderReceiptId) {
     companyCreateInput.traderReceipt = {
       connect: { id: traderReceiptId }
+    };
+  }
+
+  if (!!brokerReceiptId) {
+    companyCreateInput.brokerReceipt = {
+      connect: { id: brokerReceiptId }
     };
   }
 
