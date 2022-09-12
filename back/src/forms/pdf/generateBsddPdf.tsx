@@ -730,144 +730,154 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
           </div>
         </div>
 
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p>
-              <strong>
-                A REMPLIR EN CAS D’ENTREPOSAGE PROVISOIRE OU DE
-                RECONDITIONNEMENT (cadres 14 à 19)
-              </strong>
-            </p>
-          </div>
-        </div>
+        {form.recipient?.isTempStorage && (
+          <>
+            <div className="BoxRow">
+              <div className="BoxCol">
+                <p>
+                  <strong>
+                    A REMPLIR EN CAS D’ENTREPOSAGE PROVISOIRE OU DE
+                    RECONDITIONNEMENT (cadres 14 à 19)
+                  </strong>
+                </p>
+              </div>
+            </div>
 
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p>
-              <strong>
-                13. Réception par l’installation d’entreposage prévue au cadre 2
-              </strong>
-            </p>
-            <p>Quantité présentée :</p>
-            <QuantityFields
-              quantity={
-                form.temporaryStorageDetail?.temporaryStorer?.quantityReceived
-              }
-              quantityType={
-                form.temporaryStorageDetail?.temporaryStorer?.quantityType
-              }
-            />
-            <p>
-              Date de présentation :{" "}
-              {formatDate(
-                form.temporaryStorageDetail?.temporaryStorer?.receivedAt
-              )}
-            </p>
-            <AcceptationFields
-              {...form.temporaryStorageDetail?.temporaryStorer}
-            />
-            <p>
-              Nom : {form.temporaryStorageDetail?.temporaryStorer?.receivedBy}
-              <br />
-              Signature :
-            </p>
-            {form.temporaryStorageDetail?.temporaryStorer?.receivedAt && (
-              <SignatureStamp />
-            )}
-          </div>
-          <div className="BoxCol">
-            <p>
-              <strong>14. Installation de destination prévue</strong>
-            </p>
-            <RecipientFormCompanyFields
-              {...form.temporaryStorageDetail?.destination}
-            />
-          </div>
-        </div>
+            <div className="BoxRow">
+              <div className="BoxCol">
+                <p>
+                  <strong>
+                    13. Réception par l’installation d’entreposage prévue au
+                    cadre 2
+                  </strong>
+                </p>
+                <p>Quantité présentée :</p>
+                <QuantityFields
+                  quantity={
+                    form.temporaryStorageDetail?.temporaryStorer
+                      ?.quantityReceived
+                  }
+                  quantityType={
+                    form.temporaryStorageDetail?.temporaryStorer?.quantityType
+                  }
+                />
+                <p>
+                  Date de présentation :{" "}
+                  {formatDate(
+                    form.temporaryStorageDetail?.temporaryStorer?.receivedAt
+                  )}
+                </p>
+                <AcceptationFields
+                  {...form.temporaryStorageDetail?.temporaryStorer}
+                />
+                <p>
+                  Nom :{" "}
+                  {form.temporaryStorageDetail?.temporaryStorer?.receivedBy}
+                  <br />
+                  Signature :
+                </p>
+                {form.temporaryStorageDetail?.temporaryStorer?.receivedAt && (
+                  <SignatureStamp />
+                )}
+              </div>
+              <div className="BoxCol">
+                <p>
+                  <strong>14. Installation de destination prévue</strong>
+                </p>
+                <RecipientFormCompanyFields
+                  {...form.temporaryStorageDetail?.destination}
+                />
+              </div>
+            </div>
 
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p>
-              <strong>
-                15. Conditionnement (à remplir en cas de reconditionnement
-                uniquement)
-              </strong>
-            </p>
-            <PackagingInfosTable
-              packagingInfos={
-                isRepackging
-                  ? form.temporaryStorageDetail?.wasteDetails?.packagingInfos
-                  : []
-              }
-            />
-          </div>
-          <div className="BoxCol">
-            <p>
-              <strong>
-                16. Quantité (à remplir en cas de reconditionnement uniquement)
-              </strong>
-            </p>
-            <QuantityFields
-              {...(isRepackging
-                ? form.temporaryStorageDetail?.wasteDetails
-                : { quantity: null, quantityType: null })}
-            />
-          </div>
-        </div>
+            <div className="BoxRow">
+              <div className="BoxCol">
+                <p>
+                  <strong>
+                    15. Conditionnement (à remplir en cas de reconditionnement
+                    uniquement)
+                  </strong>
+                </p>
+                <PackagingInfosTable
+                  packagingInfos={
+                    isRepackging
+                      ? form.temporaryStorageDetail?.wasteDetails
+                          ?.packagingInfos
+                      : []
+                  }
+                />
+              </div>
+              <div className="BoxCol">
+                <p>
+                  <strong>
+                    16. Quantité (à remplir en cas de reconditionnement
+                    uniquement)
+                  </strong>
+                </p>
+                <QuantityFields
+                  {...(isRepackging
+                    ? form.temporaryStorageDetail?.wasteDetails
+                    : { quantity: null, quantityType: null })}
+                />
+              </div>
+            </div>
 
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p>
-              <strong>
-                17. Mentions au titre des règlements ADR, RID, ADNR, IMDG (à
-                remplir en cas de reconditionnement uniquement) (le cas échéant)
-                :
-              </strong>
-            </p>
-            {isRepackging ? (
-              <p>{form.temporaryStorageDetail?.wasteDetails?.onuCode}</p>
-            ) : null}
-          </div>
-        </div>
+            <div className="BoxRow">
+              <div className="BoxCol">
+                <p>
+                  <strong>
+                    17. Mentions au titre des règlements ADR, RID, ADNR, IMDG (à
+                    remplir en cas de reconditionnement uniquement) (le cas
+                    échéant) :
+                  </strong>
+                </p>
+                {isRepackging ? (
+                  <p>{form.temporaryStorageDetail?.wasteDetails?.onuCode}</p>
+                ) : null}
+              </div>
+            </div>
 
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p>
-              <strong>18. Collecteur-Transporteur</strong>
-            </p>
-            <TransporterFormCompanyFields
-              transporter={form.temporaryStorageDetail?.transporter}
-              takenOverAt={form.temporaryStorageDetail?.takenOverAt}
-              takenOverBy={form.temporaryStorageDetail?.takenOverBy}
-            />
-          </div>
-        </div>
+            <div className="BoxRow">
+              <div className="BoxCol">
+                <p>
+                  <strong>18. Collecteur-Transporteur</strong>
+                </p>
+                <TransporterFormCompanyFields
+                  transporter={form.temporaryStorageDetail?.transporter}
+                  takenOverAt={form.temporaryStorageDetail?.takenOverAt}
+                  takenOverBy={form.temporaryStorageDetail?.takenOverBy}
+                />
+              </div>
+            </div>
 
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p>
-              <strong>
-                19. Déclaration générale de la personne mentionnée au cadre 2
-              </strong>
-            </p>
-            <p>
-              Je soussigné, certifie que les renseignements portés dans les
-              cades ci-dessus sont exacts et de bonne foi.
-            </p>
-            <p>
-              <span className="Row">
-                <span className="Col">
-                  Nom : {form.temporaryStorageDetail?.signedBy}
-                </span>
-                <span className="Col">
-                  Date : {formatDate(form.temporaryStorageDetail?.signedAt)}
-                </span>
-                <span className="Col">Signature :</span>
-              </span>
-            </p>
-            {form.temporaryStorageDetail?.signedAt && <SignatureStamp />}
-          </div>
-        </div>
+            <div className="BoxRow">
+              <div className="BoxCol">
+                <p>
+                  <strong>
+                    19. Déclaration générale de la personne mentionnée au cadre
+                    2
+                  </strong>
+                </p>
+                <p>
+                  Je soussigné, certifie que les renseignements portés dans les
+                  cades ci-dessus sont exacts et de bonne foi.
+                </p>
+                <p>
+                  <span className="Row">
+                    <span className="Col">
+                      Nom : {form.temporaryStorageDetail?.signedBy}
+                    </span>
+                    <span className="Col">
+                      Date : {formatDate(form.temporaryStorageDetail?.signedAt)}
+                    </span>
+                    <span className="Col">Signature :</span>
+                  </span>
+                </p>
+                {form.temporaryStorageDetail?.signedAt && <SignatureStamp />}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {form.transportSegments.length > 0 && (
