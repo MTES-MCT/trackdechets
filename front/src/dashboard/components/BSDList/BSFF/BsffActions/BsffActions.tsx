@@ -17,14 +17,17 @@ import {
   IconPaperWrite,
   IconPdf,
   IconTrash,
+  IconDuplicateFile,
 } from "common/components/Icons";
 import { BsffStatus } from "generated/graphql/types";
 import { BsffFragment } from "../types";
 import { DeleteBsffModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";
 import { TableRoadControlButton } from "../../RoadControlButton";
+import { useDuplicate } from "./useDuplicate";
 
 import styles from "../../BSDActions.module.scss";
+import { Loader } from "common/components";
 
 interface BsffActionsProps {
   form: BsffFragment;
@@ -34,6 +37,9 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
   const { siret } = useParams<{ siret: string }>();
   const location = useLocation();
 
+  const [duplicateBsff, { loading: isDuplicating }] = useDuplicate({
+    variables: { id: form.id },
+  });
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
 
@@ -91,6 +97,10 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
                   </MenuLink>
                 </>
               )}
+              <MenuItem onSelect={() => duplicateBsff()}>
+                <IconDuplicateFile size="24px" color="blueLight" />
+                Dupliquer
+              </MenuItem>
               {form.bsffStatus === BsffStatus.Initial && (
                 <MenuItem onSelect={() => setIsDeleting(true)}>
                   <IconTrash color="blueLight" size="24px" />
@@ -108,6 +118,7 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
           formId={form.id}
         />
       )}
+      {isDuplicating && <Loader />}
     </>
   );
 };
