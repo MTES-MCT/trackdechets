@@ -1,18 +1,17 @@
 import { useMutation } from "@apollo/client";
+import { Field, Form, Formik } from "formik";
+import React, { useState, lazy } from "react";
 import { NotificationError } from "common/components/Error";
 import { IconPaperWrite } from "common/components/Icons";
 import TdModal from "common/components/Modal";
-import TagsInput from "common/components/tags-input/TagsInput";
 import Tooltip from "common/components/Tooltip";
 import { UPDATE_BSDA } from "form/bsda/stepper/queries";
-import { Field, Form, Formik } from "formik";
 import {
   Bsda,
   Mutation,
   MutationUpdateBsdaArgs,
 } from "generated/graphql/types";
-import React, { useState } from "react";
-
+const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 type Props = {
   bsda: Bsda;
 };

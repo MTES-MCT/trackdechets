@@ -1,10 +1,10 @@
-import React from "react";
+import React, { lazy } from "react";
 import { Field, useFormikContext } from "formik";
 import { Bsda } from "generated/graphql/types";
 import { RedErrorMessage, FieldTransportModeSelect } from "common/components";
 import Tooltip from "common/components/Tooltip";
-import TagsInput from "common/components/tags-input/TagsInput";
 import DateInput from "form/common/components/custom-inputs/DateInput";
+const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 type Props = { disabled: boolean };
 export function Transport({ disabled }: Props) {

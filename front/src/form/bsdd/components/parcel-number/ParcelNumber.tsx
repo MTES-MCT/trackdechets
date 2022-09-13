@@ -5,12 +5,12 @@ import {
   FieldProps,
   useFormikContext,
 } from "formik";
-import React, { useMemo } from "react";
+import React, { useMemo, lazy } from "react";
 import TdSwitch from "common/components/Switch";
 import { Form, ParcelNumber } from "generated/graphql/types";
-import TagsInput from "common/components/tags-input/TagsInput";
 import Tooltip from "common/components/Tooltip";
 import { IconDelete1 } from "common/components/Icons";
+const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 const newParcelNumber = {
   city: "",

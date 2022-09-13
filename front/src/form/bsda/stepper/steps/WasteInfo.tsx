@@ -1,11 +1,11 @@
-import React from "react";
+import React, { lazy } from "react";
 import { Field, useFormikContext } from "formik";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import Packagings from "form/bsda/components/packagings/Packagings";
 import Tooltip from "common/components/Tooltip";
 import { Bsda, BsdaConsistence, BsdaType } from "generated/graphql/types";
-import TagsInput from "common/components/tags-input/TagsInput";
 import { FieldSwitch } from "common/components";
+const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export const BSDA_WASTE_CODES = [
   {
