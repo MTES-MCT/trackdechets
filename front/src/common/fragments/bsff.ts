@@ -96,8 +96,8 @@ export const FullBsffFragment = gql`
           author
           date
         }
+        plates
       }
-      plates
       customInfo
     }
     destination {
