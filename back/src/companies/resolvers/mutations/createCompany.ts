@@ -11,7 +11,7 @@ import * as COMPANY_TYPES from "../../../common/constants/COMPANY_TYPES";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../mailer/templates";
 import { deleteCachedUserCompanies } from "../../../common/redis/users";
-import { isVat } from "../../../common/constants/companySearchHelpers";
+import { isFRVat, isSiret, isVat } from "../../../common/constants/companySearchHelpers";
 import { whereSiretOrVatNumber } from "../CompanySearchResult";
 import { searchCompany } from "../../search";
 import {
@@ -55,10 +55,15 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     companyInput.ecoOrganismeAgreements?.map(a => a.href) || [];
 
   // clean orgId
-  const orgId = companyInput.orgId.replace(/\s+/g, "");
+  const orgId = companyInput.orgId.replace(/\s+|\.+/g, "");
   // copy VAT number to the SIRET field in order to ensure backward compatibility
   const siret = orgId;
   let vatNumber: string;
+  if (isFRVat(orgId)) {
+    throw new UserInputError(
+      "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indique un SIRET"
+    );
+  }
   if (isVat(orgId)) {
     vatNumber = orgId;
     if (companyTypes.join("") !== CompanyType.TRANSPORTER) {
@@ -66,6 +71,10 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
         "Impossible de créer un établissement identifié par un numéro de TVA d'un autre type que TRANSPORTER"
       );
     }
+  } else if (!isSiret(orgId)) {
+    throw new UserInputError(
+      "Impossible de créer un établissement sans un SIRET valide ni un numéro de TVA étranger valide"
+    );
   }
   const existingCompany = await prisma.company.findUnique({
     where: whereSiretOrVatNumber({ siret, vatNumber })

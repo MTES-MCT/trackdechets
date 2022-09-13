@@ -230,13 +230,13 @@ input PrivateCompanyInput {
   codeNaf: String
 
   "Nom de l'établissement"
-  companyName: String
+  companyName: String!
 
   "Nom d'usage de l'établissement"
   givenName: String
 
   "Adresse de l'établissement"
-  address: String
+  address: String!
 
   """
   Récipissé transporteur (le cas échéant, pour les profils transporteur)
