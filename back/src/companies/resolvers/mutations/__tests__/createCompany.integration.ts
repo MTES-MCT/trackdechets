@@ -30,6 +30,7 @@ const CREATE_COMPANY = `
       vatNumber
       gerepId
       name
+      address
       companyTypes
       ecoOrganismeAgreements
       transporterReceipt {
@@ -62,6 +63,7 @@ describe("Mutation.createCompany", () => {
       orgId: "12345678912345",
       gerepId: "1234",
       companyName: "Acme",
+      address: "3 rue des granges",
       companyTypes: ["PRODUCER"]
     };
 
@@ -117,6 +119,7 @@ describe("Mutation.createCompany", () => {
       orgId: "12345678912345",
       gerepId: "1234",
       companyName: "Acme",
+      address: "3 rue des granges",
       companyTypes: ["PRODUCER"],
       allowBsdasriTakeOverWithoutSignature: true
     };
@@ -179,6 +182,7 @@ describe("Mutation.createCompany", () => {
     const companyInput = {
       orgId: "12345678912345",
       companyName: "Acme",
+      address: "3 rue des granges",
       companyTypes: ["TRANSPORTER"],
       transporterReceiptId: transporterReceipt.id
     };
@@ -222,6 +226,7 @@ describe("Mutation.createCompany", () => {
     const companyInput = {
       orgId: "12345678912345",
       companyName: "Acme",
+      address: "3 rue des granges",
       companyTypes: ["TRADER"],
       traderReceiptId: traderReceipt.id
     };
@@ -262,6 +267,7 @@ describe("Mutation.createCompany", () => {
       orgId: company.siret,
       gerepId: company.gerepId,
       companyName: company.name,
+      address: "3 rue des granges",
       companyTypes: company.companyTypes
     };
 
@@ -293,6 +299,8 @@ describe("Mutation.createCompany", () => {
       variables: {
         companyInput: {
           orgId: "1".repeat(14),
+          companyName: "UN BEL ECO ORGANISME",
+          address: "3 rue des granges",
           companyTypes: ["ECO_ORGANISME"]
         }
       }
@@ -311,6 +319,8 @@ describe("Mutation.createCompany", () => {
 
     const companyInput = {
       orgId: "1".repeat(14),
+      companyName: "UN BEL ECO ORGANISME",
+      address: "3 rue des granges",
       companyTypes: ["ECO_ORGANISME"]
     };
     searchSirene.mockResolvedValueOnce({
@@ -345,6 +355,8 @@ describe("Mutation.createCompany", () => {
 
     const companyInput = {
       orgId: "1".repeat(14),
+      companyName: "UN BEL ECO ORGANISME",
+      address: "3 rue des granges",
       companyTypes: ["ECO_ORGANISME"],
       ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
     };
@@ -381,6 +393,8 @@ describe("Mutation.createCompany", () => {
 
     const companyInput = {
       orgId: "1".repeat(14),
+      companyName: "UN BEL ECO ORGANISME",
+      address: "3 rue des granges",
       companyTypes: ["PRODUCER"],
       ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
     };
@@ -436,6 +450,7 @@ describe("Mutation.createCompany", () => {
       orgId: "12345678912345",
       gerepId: "1234",
       companyName: "Acme",
+      address: "3 rue des granges",
       companyTypes: [CompanyType.WASTEPROCESSOR]
     };
 
@@ -461,10 +476,12 @@ describe("Mutation.createCompany", () => {
     process.env = OLD_ENV;
   }, 30000);
 
-  it("should allow to create a TRANSPORTER company with VAT number only", async () => {
+  it("should allow to create a TRANSPORTER company with VAT number", async () => {
     const user = await userFactory();
     const companyInput = {
       orgId: "RO17579668",
+      companyName: "Acme in EU",
+      address: "Transporter street",
       companyTypes: ["TRANSPORTER"]
     };
 
@@ -481,8 +498,9 @@ describe("Mutation.createCompany", () => {
         companyTypes: ["TRANSPORTER"],
         ecoOrganismeAgreements: [],
         gerepId: null,
-        name: null,
+        name: "Acme in EU",
         siret: "RO17579668",
+        address: "Transporter street",
         traderReceipt: null,
         transporterReceipt: null,
         vatNumber: "RO17579668"
@@ -499,6 +517,8 @@ describe("Mutation.createCompany", () => {
       }
       const companyInput = {
         orgId: "RO17579668",
+        companyName: "Acme in EU",
+        address: "Transporter street",
         companyTypes: [type]
       };
 
