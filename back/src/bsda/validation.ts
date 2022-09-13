@@ -450,7 +450,7 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
               !isWasteCenter(company)
             ) {
               throw ctx.createError({
-                message: `L'installation de destination ou d'entreposage ou de reconditionnement avec le SIRET ${siret} n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement, de tri transit regroupement ou déchetterie. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+                message: `L'installation de destination ou d'entreposage ou de reconditionnement avec le SIRET ${siret} n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement, de tri transit regroupement ou déchetterie. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements.`
               });
             }
 
@@ -741,7 +741,7 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
 
             if (!isTransporter(company)) {
               throw ctx.createError({
-                message: `Le transporteur avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+                message: `Le transporteur avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport. Cet établissement ne peut donc pas être visé sur le bordereau. Veuillez vous rapprocher de l'administrateur de cet établissement pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements.`
               });
             }
 
