@@ -376,10 +376,6 @@ model Form {
   ecoOrganismeSiret                  String?
   signedBy                           String?
 
-  // TODO delete after release 2022.06.2
-  temporaryStorageDetailId String?                 @unique
-  temporaryStorageDetail   TemporaryStorageDetail? @relation(fields: [temporaryStorageDetailId], references: [id])
-
   transportSegments TransportSegment[]
   groupedIn         FormGroupement[]   @relation("GroupedIn")
   grouping          FormGroupement[]   @relation("Grouping")
@@ -597,57 +593,6 @@ model StatusLog {
 
   @@index([userId], map: "_StatusLogUserIdIdx")
   @@index([formId], map: "_StatusLogFormIdIdx")
-}
-
-// TODO delete after release 2022.06.2
-model TemporaryStorageDetail {
-  id                               String                  @id @default(cuid())
-  tempStorerQuantityType           QuantityType?
-  tempStorerQuantityReceived       Float?
-  tempStorerWasteAcceptationStatus WasteAcceptationStatus?
-  tempStorerWasteRefusalReason     String?
-  tempStorerReceivedAt             DateTime?               @db.Timestamptz(6)
-  tempStorerReceivedBy             String?
-  tempStorerSignedAt               DateTime?               @db.Timestamptz(6)
-  tempStorerSignedBy               String?
-  destinationIsFilledByEmitter     Boolean?                @default(true)
-  destinationCompanyName           String?
-  destinationCompanySiret          String?
-  destinationCompanyAddress        String?
-  destinationCompanyContact        String?
-  destinationCompanyPhone          String?
-  destinationCompanyMail           String?
-  destinationCap                   String?
-  destinationProcessingOperation   String?
-  wasteDetailsOnuCode              String?
-  wasteDetailsPackagingInfos       Json                    @default("[]")
-  wasteDetailsQuantity             Float?
-  wasteDetailsQuantityType         QuantityType?
-  transporterCompanyName           String?
-  transporterCompanySiret          String?
-  transporterCompanyVatNumber      String?
-  transporterCompanyAddress        String?
-  transporterCompanyContact        String?
-  transporterCompanyPhone          String?
-  transporterCompanyMail           String?
-  transporterIsExemptedOfReceipt   Boolean?
-  transporterReceipt               String?
-  transporterDepartment            String?
-  transporterValidityLimit         DateTime?               @db.Timestamptz(6)
-  transporterNumberPlate           String?
-  transporterCustomInfo            String?
-  transporterTransportMode         TransportMode?          @default(ROAD)
-  emittedBy                        String?
-  emittedAt                        DateTime?               @db.Timestamptz(6)
-  takenOverBy                      String?
-  takenOverAt                      DateTime?               @db.Timestamptz(6)
-  signedByTransporter              Boolean?
-  signedBy                         String?
-  signedAt                         DateTime?               @db.Timestamptz(6)
-  Form                             Form[]
-
-  @@index([destinationCompanySiret], map: "_TemporaryStorageDetailDestinationCompanyIdx")
-  @@index([transporterCompanySiret], map: "_TemporaryStorageDetailTransporterCompanySiretIdx")
 }
 
 model TraderReceipt {
@@ -1052,9 +997,6 @@ model Bsff {
   emitterEmissionSignatureAuthor String?
   emitterEmissionSignatureDate   DateTime? @db.Timestamptz(6)
 
-  // DEPRECATED to be deleted after release 2022.07.1
-  packagingsJson Json @default("[]")
-
   wasteCode        String?
   wasteDescription String?
   wasteAdr         String?
@@ -1125,11 +1067,6 @@ model Bsff {
   forwarding   Bsff?   @relation("BsffForwarding", fields: [forwardingId], references: [id])
   forwardingId String? @unique
   forwardedIn  Bsff?   @relation("BsffForwarding")
-
-  // DEPRECATED relations, to be deleted after data migration
-  previousBsffs Bsff[]  @relation("BsffToBsff")
-  nextBsff      Bsff?   @relation("BsffToBsff", fields: [nextBsffId], references: [id])
-  nextBsffId    String?
 
   ficheInterventions BsffFicheIntervention[]
 
@@ -1269,8 +1206,6 @@ model Bsda {
   wastePop          Boolean          @default(value: false)
 
   packagings       Json          @default("[]")
-  // DEPRECATED - remove after migration
-  quantityType     QuantityType?
   weightIsEstimate Boolean?
   weightValue      Float?
 
@@ -1356,11 +1291,6 @@ model Bsda {
   forwarding   Bsda?   @relation("BsdaForwarding", fields: [forwardingId], references: [id])
   forwardingId String? @unique
   forwardedIn  Bsda?   @relation("BsdaForwarding")
-
-  // DEPRECATED - remove after migration
-  bsdas       Bsda[]  @relation("BsdasToBsda")
-  childBsda   Bsda?   @relation("BsdasToBsda", fields: [childBsdaId], references: [id])
-  childBsdaId String?
 
   BsdaRevisionRequest BsdaRevisionRequest[]
 
