@@ -19,10 +19,7 @@ ALTER TABLE
 
 -- DropForeignKey
 ALTER TABLE
-  "default$default"."Form" DROP CONSTRAINT "Form_temporaryStorageDetailId_fkey";
-
--- DropIndex
-DROP INDEX "Form_temporaryStorageDetailId_key";
+  "default$default"."Form" DROP CONSTRAINT "Form_temporaryStorageDetail_fkey";
 
 -- AlterTable
 ALTER TABLE
