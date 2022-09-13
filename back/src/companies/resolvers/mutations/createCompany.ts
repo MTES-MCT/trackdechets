@@ -11,7 +11,11 @@ import * as COMPANY_TYPES from "../../../common/constants/COMPANY_TYPES";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../mailer/templates";
 import { deleteCachedUserCompanies } from "../../../common/redis/users";
-import { isFRVat, isSiret, isVat } from "../../../common/constants/companySearchHelpers";
+import {
+  isFRVat,
+  isSiret,
+  isVat
+} from "../../../common/constants/companySearchHelpers";
 import { whereSiretOrVatNumber } from "../CompanySearchResult";
 import { searchCompany } from "../../search";
 import {
