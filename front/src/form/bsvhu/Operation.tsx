@@ -1,12 +1,12 @@
+import { Field, useFormikContext } from "formik";
+import React, { lazy } from "react";
 import { RedErrorMessage } from "common/components";
 import Tooltip from "common/components/Tooltip";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
-import { Field, useFormikContext } from "formik";
 import { Bsvhu, BsvhuDestinationType } from "generated/graphql/types";
-import React from "react";
-import TagsInput from "common/components/tags-input/TagsInput";
+const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export default function Operation() {
   const { values } = useFormikContext<Bsvhu>();

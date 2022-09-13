@@ -4,7 +4,7 @@ import { GET_BSDS } from "common/queries";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import Operation from "form/bsvhu/Operation";
 import { UPDATE_VHU_FORM } from "form/bsvhu/utils/queries";
-import { getComputedState } from "form/common/stepper/GenericStepList";
+import { getComputedState } from "form/common/getComputedState";
 import { Field, Form, Formik } from "formik";
 import {
   Mutation,

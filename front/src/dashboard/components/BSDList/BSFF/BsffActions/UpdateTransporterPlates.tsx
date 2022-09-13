@@ -1,14 +1,14 @@
-import React, { useState } from "react";
+import { Form, Formik } from "formik";
+import React, { useState, lazy } from "react";
 import { IconPaperWrite } from "common/components/Icons";
 import { useMutation } from "@apollo/client";
 import { Mutation, MutationUpdateBsffArgs } from "generated/graphql/types";
 import TdModal from "common/components/Modal";
 import { UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
-import { Form, Formik } from "formik";
 import { BsffFragment } from "../types";
 import { NotificationError } from "common/components/Error";
-import TagsInput from "common/components/tags-input/TagsInput";
 import Tooltip from "common/components/Tooltip";
+const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export function UpdateTransporterPlates({ bsff }: { bsff: BsffFragment }) {
   const [isOpen, setIsOpen] = useState(false);

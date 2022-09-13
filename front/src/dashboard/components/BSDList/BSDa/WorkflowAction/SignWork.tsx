@@ -4,7 +4,7 @@ import { GET_BSDS } from "common/queries";
 import routes from "common/routes";
 import { UPDATE_BSDA } from "form/bsda/stepper/queries";
 import { WasteInfoWorker } from "form/bsda/stepper/steps/WasteInfo";
-import { getComputedState } from "form/common/stepper/GenericStepList";
+import { getComputedState } from "form/common/getComputedState";
 import { Field, Form, Formik } from "formik";
 import {
   BsdaConsistence,

@@ -24,6 +24,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Améliorations performances du front : réduction de taille du build, réduction taille bundle CSS, utilisateur de `React.lazy()` pour `GenericStepList` [PR 1681](https://github.com/MTES-MCT/trackdechets/pull/1681)
 
 #### :memo: Documentation
 

@@ -23,7 +23,7 @@ import EmptyDetail from "dashboard/detail/common/EmptyDetailView";
 import { Formik, Field, Form } from "formik";
 import { SIGN_BSDASRI, UPDATE_BSDASRI } from "form/bsdasri/utils/queries";
 
-import { getComputedState } from "form/common/stepper/GenericStepList";
+import { getComputedState } from "form/common/getComputedState";
 import getInitialState from "form/bsdasri/utils/initial-state";
 import { signatureValidationSchema, prefillWasteDetails } from "./utils";
 import {
