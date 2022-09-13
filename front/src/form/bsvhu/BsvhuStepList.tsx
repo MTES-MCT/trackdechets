@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from "@apollo/client";
+import React, { ReactElement, useMemo, lazy } from "react";
+import { generatePath, useHistory, useParams } from "react-router-dom";
 import routes from "common/routes";
-import GenericStepList, {
-  getComputedState,
-} from "form/common/stepper/GenericStepList";
+import { getComputedState } from "form/common/getComputedState";
 import { IStepContainerProps } from "form/common/stepper/Step";
 import { formInputToastError } from "form/common/stepper/toaster";
 import {
@@ -14,15 +14,15 @@ import {
   Bsvhu,
   BsvhuInput,
 } from "generated/graphql/types";
-import React, { ReactElement, useMemo } from "react";
-import { generatePath, useHistory, useParams } from "react-router-dom";
 import initialState from "./utils/initial-state";
 import {
   CREATE_VHU_FORM,
   UPDATE_VHU_FORM,
   GET_VHU_FORM,
 } from "./utils/queries";
-
+const GenericStepList = lazy(() =>
+  import("form/common/stepper/GenericStepList")
+);
 interface Props {
   children: (vhuForm: Bsvhu | undefined) => ReactElement;
   formId?: string;

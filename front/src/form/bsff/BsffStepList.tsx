@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from "@apollo/client";
+import React, { ReactElement, useMemo, lazy } from "react";
+import { useHistory } from "react-router-dom";
 import { Loader } from "common/components";
-import GenericStepList, {
-  getComputedState,
-} from "form/common/stepper/GenericStepList";
+import { getComputedState } from "form/common/getComputedState";
 import { IStepContainerProps } from "form/common/stepper/Step";
 import { formInputToastError } from "form/common/stepper/toaster";
 import {
@@ -15,15 +15,15 @@ import {
   BsffInput,
   BsffType,
 } from "generated/graphql/types";
-import React, { ReactElement, useMemo } from "react";
-import { useHistory } from "react-router-dom";
 import initialState from "./utils/initial-state";
 import {
   CREATE_DRAFT_BSFF,
   UPDATE_BSFF_FORM,
   GET_BSFF_FORM,
 } from "./utils/queries";
-
+const GenericStepList = lazy(() =>
+  import("form/common/stepper/GenericStepList")
+);
 interface Props {
   children: (bsff: Bsff | undefined) => ReactElement;
   formId?: string;
