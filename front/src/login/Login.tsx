@@ -135,13 +135,13 @@ export default function Login() {
                 Vous n'avez pas reçu d'email d'activation suite à votre
                 inscription ?{" "}
                 <Link href={routes.resendActivationEmail} isSimple>
-                  Renvoyez l'email d'activation
+                  Renvoyer l'email d'activation
                 </Link>
               </Text>
               <Text as="p">
                 Vous avez perdu votre mot de passe ?{" "}
                 <Link href={routes.passwordResetRequest} isSimple>
-                  Réinitialisez le
+                  Réinitialisez-le
                 </Link>
               </Text>
             </Col>

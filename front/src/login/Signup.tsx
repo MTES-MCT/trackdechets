@@ -40,7 +40,11 @@ export default function Signup() {
   const passwordRef = createRef<HTMLInputElement>();
   const cguRef = createRef<HTMLInputElement>();
 
-  const onSubmit = () => {
+  const handleSubmit = event => {
+    event?.preventDefault();
+
+    if (!submittable || submitting) return;
+
     const userInfos = {
       email: emailRef.current?.value || "",
       name: nameRef.current?.value || "",
@@ -86,88 +90,90 @@ export default function Signup() {
     ) : null;
 
   const formContent = (
-    <Container className={styles.centralContainer} spacing="pt-10w">
-      {alert}
-      <Row justifyContent="center" spacing="mb-2w">
-        <Col spacing="m-auto">
-          <Title as="h1" look="h3" spacing="mb-1w">
-            Créer mon compte Trackdéchets
-          </Title>
-          <Text as="p" spacing="mb-1w">
-            Vous vous apprêtez à créer votre compte utilisateur. Cette étape est
-            préalable à l'enregistrement ou au rattachement d'une entreprise
-            dans Trackdéchets.
-          </Text>
-          <Text as="p" className="fr-text--bold">
-            Vos informations :
-          </Text>
-          <TextInput
-            // @ts-ignore Ref isn't part of the interface
-            ref={nameRef}
-            required
-            label="Nom et prénom"
-            onBlur={onChange}
-          />
-          <TextInput
-            // @ts-ignore ref
-            ref={emailRef}
-            required
-            label="Email"
-            onBlur={onChange}
-          />
-          <TextInput
-            type={showPassword ? "text" : "password"}
-            required
-            label="Mot de passe"
-            // @ts-ignore
-            ref={passwordRef}
-            onBlur={onChange}
-          />
-          <Button
-            tertiary
-            hasBorder={false}
-            icon={showPassword ? "ri-eye-off-line" : "ri-eye-line"}
-            iconPosition="left"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? "Masquer" : "Afficher"} le mot de passe
-          </Button>
-        </Col>
-      </Row>
-      <Row spacing="mb-2w">
-        <Col className={styles.resetFlexCol}>
-          <Checkbox
-            // @ts-ignore no change event in interface / passes as remaining props
-            onChange={onChange}
-            label="Je certifie avoir lu les conditions générales"
-            ref={cguRef}
-          />
-          <Link
-            href="https://trackdechets.beta.gouv.fr/cgu"
-            target="_blank"
-            isSimple
-            // @ts-ignore
-            rel="noopener noreferrer"
-          >
-            Voir les conditions générales.
-          </Link>
-        </Col>
-      </Row>
-      <Row justifyContent="right">
-        <Col className={styles.resetFlexCol}>
-          <Button
-            icon="ri-arrow-right-line"
-            iconPosition="right"
-            size="md"
-            title={submitting ? "Création en cours..." : "Créer mon compte"}
-            disabled={!submittable || submitting}
-            onClick={onSubmit}
-          >
-            Créer mon compte
-          </Button>
-        </Col>
-      </Row>
-    </Container>
+    <form onSubmit={handleSubmit}>
+      <Container className={styles.centralContainer} spacing="pt-10w">
+        {alert}
+        <Row justifyContent="center" spacing="mb-2w">
+          <Col spacing="m-auto">
+            <Title as="h1" look="h3" spacing="mb-1w">
+              Créer mon compte Trackdéchets
+            </Title>
+            <Text as="p" spacing="mb-1w">
+              Vous vous apprêtez à créer votre compte utilisateur. Cette étape
+              est préalable à l'enregistrement ou au rattachement d'une
+              entreprise dans Trackdéchets.
+            </Text>
+            <Text as="p" className="fr-text--bold">
+              Vos informations :
+            </Text>
+            <TextInput
+              // @ts-ignore Ref isn't part of the interface
+              ref={nameRef}
+              required
+              label="Nom et prénom"
+              onBlur={onChange}
+            />
+            <TextInput
+              // @ts-ignore ref
+              ref={emailRef}
+              required
+              label="Email"
+              onBlur={onChange}
+            />
+            <TextInput
+              type={showPassword ? "text" : "password"}
+              required
+              label="Mot de passe"
+              // @ts-ignore
+              ref={passwordRef}
+              onBlur={onChange}
+            />
+            <Button
+              tertiary
+              hasBorder={false}
+              icon={showPassword ? "ri-eye-off-line" : "ri-eye-line"}
+              iconPosition="left"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? "Masquer" : "Afficher"} le mot de passe
+            </Button>
+          </Col>
+        </Row>
+        <Row spacing="mb-2w">
+          <Col className={styles.resetFlexCol}>
+            <Checkbox
+              // @ts-ignore no change event in interface / passes as remaining props
+              onChange={onChange}
+              label="Je certifie avoir lu les conditions générales"
+              ref={cguRef}
+            />
+            <Link
+              href="https://trackdechets.beta.gouv.fr/cgu"
+              target="_blank"
+              isSimple
+              // @ts-ignore
+              rel="noopener noreferrer"
+            >
+              Voir les conditions générales.
+            </Link>
+          </Col>
+        </Row>
+        <Row justifyContent="right">
+          <Col className={styles.resetFlexCol}>
+            <Button
+              icon="ri-arrow-right-line"
+              iconPosition="right"
+              size="md"
+              title={submitting ? "Création en cours..." : "Créer mon compte"}
+              disabled={!submittable || submitting}
+              onClick={handleSubmit}
+            >
+              Créer mon compte
+            </Button>
+          </Col>
+        </Row>
+      </Container>
+    </form>
   );
 
   const successContent = (

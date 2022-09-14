@@ -26,17 +26,18 @@ const RESET_PASSWORD = gql`
 export default function PasswordResetRequest() {
   const [submittable, setSubmittable] = useState(false);
 
-  const [createPasswordResetReques, { data, error }] = useMutation<
+  const [createPasswordResetRequest, { data, error }] = useMutation<
     Pick<Mutation, "createPasswordResetRequest">,
     MutationCreatePasswordResetRequestArgs
   >(RESET_PASSWORD);
 
   const emailRef = createRef<HTMLInputElement>();
 
-  const onClickSubmit = () => {
-    const email = emailRef.current?.value || "";
+  const handleSubmit = event => {
+    event.preventDefault();
 
-    createPasswordResetReques({ variables: { email } });
+    const email = emailRef.current?.value || "";
+    createPasswordResetRequest({ variables: { email } });
   };
 
   const onChange = () => {
@@ -45,9 +46,13 @@ export default function PasswordResetRequest() {
     setSubmittable(formFilled);
   };
 
+  const errorMessage = error?.networkError
+    ? "Vous avez dépassé votre quota. Veuillez réessayer dans une minute."
+    : error?.message;
+
   const errorAlert = error?.message ? (
     <Row spacing="mb-2w">
-      <Alert title="Erreur" description={error.message} type="error" />
+      <Alert title="Erreur" description={errorMessage} type="error" />
     </Row>
   ) : null;
 
@@ -55,7 +60,7 @@ export default function PasswordResetRequest() {
     <Row spacing="mb-2w">
       <Alert
         title="Succès"
-        description="Un email d'activation vous a été renvoyé."
+        description="Un email vient de vous être envoyé (veuillez également vérifier dans votre dossier de courrier indésirable)."
         type="success"
       />
     </Row>
@@ -63,38 +68,40 @@ export default function PasswordResetRequest() {
 
   return (
     <div className={styles.onboardingWrapper}>
-      <Container
-        className={`pt-5w ${styles.centralContainerLarge}`}
-        spacing="pt-10w"
-      >
-        {successAlert}
-        {errorAlert}
-        <Row justifyContent="center" spacing="mb-2w">
-          <Col spacing="m-auto">
-            <Title as="h1" look="h3" spacing="mb-3w">
-              Réinitialisation de votre mot de passe
-            </Title>
-            <Text as="p">
-              Afin de réinitialiser votre mot de passe, merci de saisir votre
-              email. Un lien vous sera transmis à cette adresse email.
-            </Text>
-            <TextInput
-              // @ts-ignore
-              ref={emailRef}
-              name="email"
-              onChange={onChange}
-              required
-            />
-          </Col>
-        </Row>
-        <Row justifyContent="right">
-          <Col className={styles.resetFlexCol}>
-            <Button disabled={!submittable} size="md" onClick={onClickSubmit}>
-              Réinitialiser
-            </Button>
-          </Col>
-        </Row>
-      </Container>
+      <form onSubmit={handleSubmit}>
+        <Container
+          className={`pt-5w ${styles.centralContainerLarge}`}
+          spacing="pt-10w"
+        >
+          {successAlert}
+          {errorAlert}
+          <Row justifyContent="center" spacing="mb-2w">
+            <Col spacing="m-auto">
+              <Title as="h1" look="h3" spacing="mb-3w">
+                Réinitialisation de votre mot de passe
+              </Title>
+              <Text as="p">
+                Afin de réinitialiser votre mot de passe, merci de saisir votre
+                email. Un lien vous sera transmis à cette adresse email.
+              </Text>
+              <TextInput
+                // @ts-ignore
+                ref={emailRef}
+                name="email"
+                onChange={onChange}
+                required
+              />
+            </Col>
+          </Row>
+          <Row justifyContent="right">
+            <Col className={styles.resetFlexCol}>
+              <Button disabled={!submittable} size="md" onClick={handleSubmit}>
+                Réinitialiser
+              </Button>
+            </Col>
+          </Row>
+        </Container>
+      </form>
     </div>
   );
 }
