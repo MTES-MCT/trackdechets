@@ -14,17 +14,17 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Correction d'un bug ne prenant pas en compte le récépissé courtier renseigné lors du rattachement d'un établissement [PR 1673](https://github.com/MTES-MCT/trackdechets/pull/1673)
+- Correction du contenu de l'email de refus en cas d'entreposage provisoire [PR 1638](https://github.com/MTES-MCT/trackdechets/pull/1638)
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
 
 - Affichage des intermédiaires d'un BSDD dans l'aperçu et l'export PDF [PR 1668](https://github.com/MTES-MCT/trackdechets/pull/1668)
-
-#### :memo: Documentation
-
-#### :house: Interne
-
-- Améliorations performances du front : réduction de taille du build, réduction taille bundle CSS, utilisateur de `React.lazy()` pour `GenericStepList` [PR 1681](https://github.com/MTES-MCT/trackdechets/pull/1681)
+- L'email de renouvellement du code de signature mentionne désormais le numéro SIRET de l'établissement concerné [PR 1680](https://github.com/MTES-MCT/trackdechets/pull/1680)
+- Remplacement des adresses emails hello@trackdechets.beta.gouv.fr par contact@trackdechets.beta.gouv.fr [PR 1666](https://github.com/MTES-MCT/trackdechets/pull/1666)
+- Cache les cadres 13 à 19 sur le PDF BSDD lorsqu'il n'y a pas d'entreposage provisoire [PR 1665](https://github.com/MTES-MCT/trackdechets/pull/1665)
 
 #### :memo: Documentation
 
@@ -35,6 +35,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout d'index manquant [PR 1648](https://github.com/MTES-MCT/trackdechets/pull/1648)
 - Refacto pour permettre d'identifier les `Company` par `siret` ou `vatNumber` dans le cache par utilisateur (et les permissions) afin de ne pas causer de problèmes pour les entreprises identifiées uniquement pas VAT, usage de `Company.id` pour `updateCompany` et `getCompanyOrCompanyNotFound` [PR 1647](https://github.com/MTES-MCT/trackdechets/pull/1647)
 - Amélioration de l'envoi des emails de refus [PR 1642](https://github.com/MTES-MCT/trackdechets/pull/1642)
+- Améliorations performances du front : réduction de taille du build, réduction taille bundle CSS, utilisateur de `React.lazy()` pour `GenericStepList` [PR 1681](https://github.com/MTES-MCT/trackdechets/pull/1681)
+
 
 # [2022.08.4] 29/08/2022
 
