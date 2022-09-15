@@ -10,7 +10,7 @@ import {
 } from "generated/graphql/types";
 import WasteTreeModal from "search/WasteTreeModal";
 import { wasteCodeValidator } from "form/bsdd/components/waste-code/waste-code.validator";
-import { WASTES } from "generated/constants";
+import { BSDD_WASTES } from "generated/constants";
 import { useLazyQuery, gql } from "@apollo/client";
 import { NotificationError } from "common/components/Error";
 import RedErrorMessage from "common/components/RedErrorMessage";
@@ -221,7 +221,7 @@ export default function ExportsForm({ companies }: IProps) {
       validate={validate}
     >
       {({ values, setFieldValue }) => {
-        const wasteCodeDetail = WASTES.find(
+        const wasteCodeDetail = BSDD_WASTES.find(
           waste => waste.code === values.wasteCode
         );
 

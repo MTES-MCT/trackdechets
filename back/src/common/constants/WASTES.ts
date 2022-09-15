@@ -3672,12 +3672,11 @@ export const WASTES_TREE: WasteNode[] = [
         description:
           "déchets de solvants, d'agents réfrigérants et d'agents propulseurs d'aérosols/de mousses organiques",
         children: [
-          // Ce type de déchet doit faire l'objet d'un BSFF
-          // {
-          //   code: "14 06 01*",
-          //   description: "chlorofluorocarbones, HCFC, HFC",
-          //   children: []
-          // },
+          {
+            code: "14 06 01*",
+            description: "chlorofluorocarbones, HCFC, HFC",
+            children: []
+          },
           {
             code: "14 06 02*",
             description: "autres solvants et mélanges de solvants halogénés",
@@ -5537,12 +5536,29 @@ function flatten(wastes: WasteNode[]): WasteNode[] {
   );
 }
 
-export const WASTES = flatten(WASTES_TREE).filter(
+export const ALL_WASTES = flatten(WASTES_TREE).filter(
   // only keep actual wastes and filter out categories
   waste => waste.code.length >= 8
 );
 
-export const WASTES_CODES = WASTES.map(waste => waste.code);
+export const BSDD_WASTES = ALL_WASTES.filter(
+  // BSFF only
+  waste => waste.code !== "14 06 01*"
+);
+
+export const BSDD_WASTES_CODES = BSDD_WASTES.map(waste => waste.code);
+
+export const BSFF_WASTE_CODES = [
+  "14 06 01*",
+  "14 06 02*",
+  "14 06 03*",
+  "16 05 04*",
+  "13 03 10*"
+];
+
+export const BSFF_WASTES = ALL_WASTES.filter(waste =>
+  BSFF_WASTE_CODES.includes(waste.code)
+);
 
 export function isDangerous(wasteCode: string): boolean {
   return wasteCode.endsWith("*");

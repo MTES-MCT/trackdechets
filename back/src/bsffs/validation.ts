@@ -10,7 +10,7 @@ import {
   Prisma
 } from "@prisma/client";
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
-import { OPERATION, WASTE_CODES } from "./constants";
+import { OPERATION } from "./constants";
 import prisma from "../prisma";
 import {
   isVat,
@@ -18,6 +18,7 @@ import {
   isFRVat
 } from "../common/constants/companySearchHelpers";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
+import { BSFF_WASTE_CODES } from "../common/constants";
 
 configureYup();
 
@@ -223,7 +224,7 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
         .string()
         .nullable()
         .oneOf(
-          [null, ...WASTE_CODES],
+          [null, ...BSFF_WASTE_CODES],
           "Le code déchet ne fait pas partie de la liste reconnue : ${values}"
         )
         .requiredIf(!isDraft, "Le code déchet est requis"),
