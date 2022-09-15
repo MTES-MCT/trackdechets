@@ -6,7 +6,7 @@ export interface WasteNode {
   children: WasteNode[];
 }
 
-export const WASTES_TREE: WasteNode[] = [
+export const ALL_WASTES_TREE: WasteNode[] = [
   {
     code: "01",
     description:
@@ -5528,15 +5528,11 @@ export const WASTES_TREE: WasteNode[] = [
   }
 ];
 
-function flatten(wastes: WasteNode[]): WasteNode[] {
-  return wastes.reduce(
-    (acc: WasteNode[], waste) =>
-      acc.concat([waste, ...flatten(waste.children)]),
-    []
-  );
-}
+export const BSDD_WASTES_TREE = toWasteTree(ALL_WASTES_TREE, {
+  exclude: ["14 06 01*"]
+});
 
-export const ALL_WASTES = flatten(WASTES_TREE).filter(
+export const ALL_WASTES = flatten(ALL_WASTES_TREE).filter(
   // only keep actual wastes and filter out categories
   waste => waste.code.length >= 8
 );
@@ -5559,6 +5555,34 @@ export const BSFF_WASTE_CODES = [
 export const BSFF_WASTES = ALL_WASTES.filter(waste =>
   BSFF_WASTE_CODES.includes(waste.code)
 );
+
+function flatten(wastes: WasteNode[]): WasteNode[] {
+  return wastes.reduce(
+    (acc: WasteNode[], waste) =>
+      acc.concat([waste, ...flatten(waste.children)]),
+    []
+  );
+}
+
+export function toWasteTree(
+  wasteNodes: WasteNode[],
+  opts?: { exclude?: string[] }
+): WasteNode[] {
+  return wasteNodes
+    .filter(({ code }) => {
+      if (opts?.exclude?.length) {
+        return !opts.exclude.includes(code);
+      }
+      return true;
+    })
+    .map(({ code, description, children }) => {
+      return {
+        code,
+        description,
+        children: toWasteTree(children, opts)
+      };
+    });
+}
 
 export function isDangerous(wasteCode: string): boolean {
   return wasteCode.endsWith("*");
