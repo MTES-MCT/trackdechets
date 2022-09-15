@@ -27,16 +27,18 @@ import { OPERATION } from "./utils/constants";
 
 const options = [
   {
-    value: BsffType.TracerFluide,
-    label: "Tracer un fluide",
+    value: BsffType.CollectePetitesQuantites,
+    label:
+      "un opérateur qui collecte des déchets dangereux de fluides frigorigènes (ou autres déchets dangereux de fluides) lors d'opérations sur les équipements en contenant de ses clients",
   },
   {
-    value: BsffType.CollectePetitesQuantites,
-    label: "Collecte de petites quantités",
+    value: BsffType.TracerFluide,
+    label: "un autre détenteur de déchets",
   },
   {
     value: BsffType.Groupement,
-    label: "Groupement de plusieurs BSFFs",
+    label:
+      "Une plateforme de transit ou un site de traitement dans le cadre d'un regroupement",
     Component: () => (
       <div style={{ padding: "1rem 0" }}>
         <p style={{ marginBottom: "0.25rem" }}>
@@ -55,7 +57,7 @@ const options = [
   },
   {
     value: BsffType.Reconditionnement,
-    label: "Reconditionnement de plusieurs BSFFs",
+    label: "Une plateforme de transit dans le cadre d'un reconditionnement",
     Component: () => (
       <div style={{ padding: "1rem 0" }}>
         <p style={{ marginBottom: "0.25rem" }}>
@@ -74,7 +76,7 @@ const options = [
   },
   {
     value: BsffType.Reexpedition,
-    label: "Réexpédition d'un BSFF",
+    label: "Une plateforme de transit dans le cadre d'une réexpédition",
     Component: () => (
       <div style={{ padding: "1rem 0" }}>
         <p style={{ marginBottom: "0.25rem" }}>
@@ -289,7 +291,7 @@ export function BsffTypeSelector() {
       <h4 className="form__section-heading">Type de BSFF</h4>
 
       <div className="form__row">
-        <p>J'édite un BSFF pour :</p>
+        <p>L'émetteur du BSFF est :</p>
       </div>
 
       <div className="form__row">

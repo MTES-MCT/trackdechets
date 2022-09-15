@@ -1,14 +1,17 @@
 "Représente les différents types de BSFF possibles."
 enum BsffType {
-  "BSFF qui trace un fluide provenant d'une seule origine."
-  TRACER_FLUIDE
-  "BSFF qui trace des fluides provenant de différentes origines."
+  """
+  Cas d'un BSFF émis par un opérateur qui collecte des déchets dangereux de fluide frigorigènes lors d'opérations
+  sur les équipements en contenant de ses clients. Peut-être associé à des fiches d'interventions.
+  """
   COLLECTE_PETITES_QUANTITES
-  "BSFF qui groupe plusieurs autres BSFFs."
+  "Cas d'un BSFF émis par un autre détenteur de déchets"
+  TRACER_FLUIDE
+  "Cas d'un BSFF émis par une plateforme de transit ou installation de traitement dans le cadre d'un regroupement"
   GROUPEMENT
-  "BSFF qui reconditionne un ou plusieurs autres BSFFs."
+  "Cas d'un BSFF émis par une plateforme de transit dans le cadre d'un reconditionnement"
   RECONDITIONNEMENT
-  "BSFF qui réexpédie un autre BSFF."
+  "Cas d'un BSFF émis par une plateforme de transit dans le cadre d'une réexpédition"
   REEXPEDITION
 }
 
