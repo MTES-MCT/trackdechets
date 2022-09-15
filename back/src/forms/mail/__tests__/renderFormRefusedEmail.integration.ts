@@ -86,7 +86,7 @@ describe("renderFormRefusedEmail", () => {
     expect(email.cc).toEqual([
       { email: destination.user.email, name: destination.user.name },
       {
-        email: "ud75.driee-if@developpement-durable.gouv.fr",
+        email: "sric.ud92.drieat-if@developpement-durable.gouv.fr",
         name: "UD75 (Unité Départementale de Paris)"
       }
     ]);

@@ -490,7 +490,7 @@ const Dreals = [
     DrealRegion: "DREAL Pays Loire",
     name: "UD75 (Unité Départementale de Paris)",
     Dept: "75",
-    email: "ud75.driee-if@developpement-durable.gouv.fr"
+    email: "sric.ud92.drieat-if@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DREAL Normandie",
@@ -508,7 +508,7 @@ const Dreals = [
     DrealRegion: "DREAL Pays Loire",
     name: "UD77 (Unité Départementale de Seine-et-Marne)",
     Dept: "77",
-    email: "ud77.driee-if@developpement-durable.gouv.fr"
+    email: "ud77.drieat-if@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DREAL Pays Loire",
@@ -598,31 +598,31 @@ const Dreals = [
     DrealRegion: "DREAL Pays Loire",
     name: "UD91 (Unité Départementale de l'Essonne)",
     Dept: "91",
-    email: "ud91.driee-if@developpement-durable.gouv.fr"
+    email: "ud91.drieat-if@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DREAL Pays Loire",
     name: "UD92 (Unité Départementale des Hauts-de-Seine)",
     Dept: "92",
-    email: "ud92.driee-if@developpement-durable.gouv.fr"
+    email: "sric.ud92.drieat-if@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DREAL Pays Loire",
     name: "UD93 (Unité Départementale de Seine-Saint-Denis)",
     Dept: "93",
-    email: "ud93.driee-if@developpement-durable.gouv.fr"
+    email: "ud93-driee.ud93.drieat-if@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DREAL Pays Loire",
     name: "UD94 (Unité Départementale du Val-de-Marne)",
     Dept: "94",
-    email: "ud94.driee-if@developpement-durable.gouv.fr"
+    email: "sric.ud94.drieat-if@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DREAL Pays Loire",
     name: "UD95 (Unité Départementale du Val-d'Oise)",
     Dept: "95",
-    email: "ud95.driee-if@developpement-durable.gouv.fr"
+    email: "ud95.drieat-if@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DEAL Guadeloupe",
