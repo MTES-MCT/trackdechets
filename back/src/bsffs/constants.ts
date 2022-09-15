@@ -57,4 +57,10 @@ export const OPERATION: Record<
   }
 };
 
-export const WASTE_CODES = ["14 06 01*"];
+export const WASTE_CODES = [
+  "14 06 01*",
+  "14 06 02*",
+  "14 06 03*",
+  "16 05 04*",
+  "13 03 10*"
+];

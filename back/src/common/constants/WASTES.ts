@@ -3672,11 +3672,12 @@ export const WASTES_TREE: WasteNode[] = [
         description:
           "déchets de solvants, d'agents réfrigérants et d'agents propulseurs d'aérosols/de mousses organiques",
         children: [
-          {
-            code: "14 06 01*",
-            description: "chlorofluorocarbones, HCFC, HFC",
-            children: []
-          },
+          // Ce type de déchet doit faire l'objet d'un BSFF
+          // {
+          //   code: "14 06 01*",
+          //   description: "chlorofluorocarbones, HCFC, HFC",
+          //   children: []
+          // },
           {
             code: "14 06 02*",
             description: "autres solvants et mélanges de solvants halogénés",
