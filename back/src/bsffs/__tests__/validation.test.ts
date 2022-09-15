@@ -163,7 +163,7 @@ describe("wasteDetailsSchema", () => {
     const validateFn = () =>
       wasteDetailsSchema.validate({
         ...wasteDetails,
-        wasteCode: "14 06 02*"
+        wasteCode: "18 01 03*"
       });
 
     await expect(validateFn()).rejects.toThrow(
