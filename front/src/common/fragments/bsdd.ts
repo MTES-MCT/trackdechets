@@ -418,6 +418,7 @@ export const dashboardFormFragment = gql`
         siret
         name
       }
+      isTempStorage
     }
     transporter {
       company {
