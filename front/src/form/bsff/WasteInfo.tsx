@@ -1,12 +1,32 @@
 import { FieldSwitch, RedErrorMessage } from "common/components";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { Field, useFormikContext } from "formik";
-import { Bsff } from "generated/graphql/types";
+import { Field, useField, useFormikContext } from "formik";
+import {
+  Bsff,
+  BsffPackagingInput,
+  BsffType,
+  BsffWeightInput,
+} from "generated/graphql/types";
 import React, { useEffect } from "react";
 import Packagings from "./components/packagings/Packagings";
+import { PreviousBsffsPicker } from "./components/PreviousBsffsPicker";
 
 export default function WasteInfo({ disabled }) {
-  const { setFieldValue, values } = useFormikContext<Bsff>();
+  const { setFieldValue, values } = useFormikContext<
+    Bsff & { previousBsffs: Bsff[] }
+  >();
+
+  useEffect(() => {
+    if ([BsffType.Reexpedition, BsffType.Groupement].includes(values.type)) {
+      setFieldValue(
+        "packagings",
+        values.previousBsffs.reduce<BsffPackagingInput[]>(
+          (acc, previousBsff) => acc.concat(previousBsff.packagings),
+          []
+        )
+      );
+    }
+  }, [values.previousBsffs, values.type, setFieldValue]);
 
   useEffect(() => {
     const totalWeight = values.packagings.reduce((acc, p) => {
@@ -22,6 +42,17 @@ export default function WasteInfo({ disabled }) {
           Les champs ci-dessous ont été scellés via signature et ne sont plus
           modifiables.
         </div>
+      )}
+
+      {[
+        BsffType.Reconditionnement,
+        BsffType.Groupement,
+        BsffType.Reexpedition,
+      ].includes(values.type) && (
+        <>
+          <h4 className="form__section-heading">BSFF initiaux</h4>
+          <PreviousBsffsPicker bsffType={values.type} />
+        </>
       )}
 
       <h4 className="form__section-heading">Déchet</h4>

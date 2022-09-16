@@ -27,13 +27,13 @@ export default function FormContainer() {
                   title="Type de bordereau"
                 />
                 <StepContainer
-                  component={WasteInfo}
-                  title="Détail du déchet"
+                  component={Emitter}
+                  title="Émetteur du déchet"
                   disabled={emitterSigned}
                 />
                 <StepContainer
-                  component={Emitter}
-                  title="Émetteur du déchet"
+                  component={WasteInfo}
+                  title="Détail du déchet"
                   disabled={emitterSigned}
                 />
                 <StepContainer

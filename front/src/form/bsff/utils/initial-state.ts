@@ -3,7 +3,7 @@ import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import { BsffType, TransportMode } from "generated/graphql/types";
 
 const initialState = {
-  type: BsffType.TracerFluide,
+  type: BsffType.CollectePetitesQuantites,
   emitter: {
     company: getInitialCompany(),
   },

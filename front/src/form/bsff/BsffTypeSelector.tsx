@@ -23,191 +23,36 @@ import {
   TableCell,
 } from "common/components";
 import { GET_BSFF_FORMS } from "./utils/queries";
-import { OPERATION } from "./utils/constants";
 
 const options = [
   {
     value: BsffType.CollectePetitesQuantites,
     label:
-      "un opérateur qui collecte des déchets dangereux de fluides frigorigènes (ou autres déchets dangereux de fluides) lors d'opérations sur les équipements en contenant de ses clients",
+      "Un opérateur qui collecte des déchets dangereux de fluides frigorigènes (ou autres déchets dangereux de fluides) lors d'opérations sur les équipements en contenant de ses clients",
   },
   {
     value: BsffType.TracerFluide,
-    label: "un autre détenteur de déchets",
+    label: "Un autre détenteur de déchets",
   },
   {
     value: BsffType.Groupement,
-    label:
-      "Une plateforme de transit ou un site de traitement dans le cadre d'un regroupement",
-    Component: () => (
-      <div style={{ padding: "1rem 0" }}>
-        <p style={{ marginBottom: "0.25rem" }}>
-          Retrouvez ci-dessous la liste des BSFFs qui sont en attente d'un
-          groupement.
-        </p>
-        <PreviousBsffsPicker
-          code_in={Object.values(OPERATION)
-            .filter(operation =>
-              operation.successors.includes(BsffType.Groupement)
-            )
-            .map(operation => operation.code)}
-        />
-      </div>
-    ),
+    label: "Une installation dans le cadre d'un regroupement",
   },
   {
     value: BsffType.Reconditionnement,
-    label: "Une plateforme de transit dans le cadre d'un reconditionnement",
-    Component: () => (
-      <div style={{ padding: "1rem 0" }}>
-        <p style={{ marginBottom: "0.25rem" }}>
-          Retrouvez ci-dessous la liste des BSFFs qui sont en attente d'un
-          reconditionnement.
-        </p>
-        <PreviousBsffsPicker
-          code_in={Object.values(OPERATION)
-            .filter(operation =>
-              operation.successors.includes(BsffType.Reconditionnement)
-            )
-            .map(operation => operation.code)}
-        />
-      </div>
-    ),
+    label: "Une installation le cadre d'un reconditionnement",
   },
   {
     value: BsffType.Reexpedition,
-    label: "Une plateforme de transit dans le cadre d'une réexpédition",
-    Component: () => (
-      <div style={{ padding: "1rem 0" }}>
-        <p style={{ marginBottom: "0.25rem" }}>
-          Retrouvez ci-dessous la liste des BSFFs qui sont en attente d'une
-          réexpédition.
-        </p>
-        <PreviousBsffsPicker
-          code_in={Object.values(OPERATION)
-            .filter(operation =>
-              operation.successors.includes(BsffType.Reexpedition)
-            )
-            .map(operation => operation.code)}
-          max={1}
-        />
-      </div>
-    ),
+    label: "Une installation dans le cadre d'une réexpédition",
   },
 ];
-
-interface PreviousBsffsPickerProps {
-  code_in: BsffOperationCode[];
-  max?: number;
-}
-
-function PreviousBsffsPicker({
-  code_in,
-  max = Infinity,
-}: PreviousBsffsPickerProps) {
-  const { data } = useQuery<Pick<Query, "bsffs">, QueryBsffsArgs>(
-    GET_BSFF_FORMS,
-    {
-      variables: {
-        where: {
-          status: { _eq: BsffStatus.IntermediatelyProcessed },
-          destination: {
-            operation: {
-              code: { _in: code_in },
-            },
-          },
-        },
-      },
-      // make sure we have fresh data here
-      fetchPolicy: "cache-and-network",
-    }
-  );
-  const [{ value: previousBsffs }] = useField<Bsff[]>("previousBsffs");
-
-  if (data == null) {
-    return <Loader />;
-  }
-
-  // remove bsffs that have already been grouped, forwarded or repackaged
-  const pickableBsffs = data.bsffs.edges
-    .map(({ node: bsff }) => bsff)
-    .filter(bsff => {
-      return !bsff.groupedIn && !bsff.repackagedIn && !bsff.forwardedIn;
-    });
-
-  return (
-    <FieldArray
-      name="previousBsffs"
-      render={({ push, remove }) => (
-        <Table isSelectable>
-          <TableHead>
-            <TableRow>
-              <TableHeaderCell />
-              <TableHeaderCell>Numéro</TableHeaderCell>
-              <TableHeaderCell>Déchet</TableHeaderCell>
-              <TableHeaderCell>Émetteur</TableHeaderCell>
-              <TableHeaderCell>Transporteur</TableHeaderCell>
-              <TableHeaderCell>Destinataire</TableHeaderCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {pickableBsffs.map(bsff => {
-              const previousBsffIndex = previousBsffs.findIndex(
-                previousBsff => previousBsff.id === bsff.id
-              );
-              const isSelected = previousBsffIndex >= 0;
-
-              return (
-                <TableRow
-                  key={bsff.id}
-                  onClick={() => {
-                    if (isSelected) {
-                      remove(previousBsffIndex);
-                    } else {
-                      if (previousBsffs.length >= max) {
-                        window.alert(
-                          `Vous ne pouvez pas sélectionner plus de ${max} BSFFs avec ce type de BSFF.`
-                        );
-                        return;
-                      }
-                      push(bsff);
-                    }
-                  }}
-                >
-                  <TableCell>
-                    <input
-                      type="checkbox"
-                      className="td-input"
-                      checked={isSelected}
-                      readOnly
-                    />
-                  </TableCell>
-                  <TableCell>{bsff.id}</TableCell>
-                  <TableCell>
-                    {bsff.waste?.code} - Nature :{" "}
-                    {bsff.waste?.description ?? "inconnue"}
-                  </TableCell>
-                  <TableCell>{bsff.emitter?.company?.name}</TableCell>
-                  <TableCell>{bsff.transporter?.company?.name}</TableCell>
-                  <TableCell>{bsff.destination?.company?.name}</TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      )}
-    />
-  );
-}
 
 export function BsffTypeSelector() {
   const [{ value: type }, , { setValue: setType }] = useField<BsffType>("type");
   const [{ value: packagings }, , { setValue: setPackagings }] = useField<
     BsffPackagingInput[]
   >("packagings");
-  const [, , { setValue: setEmitterCompany }] = useField<CompanyInput>(
-    "emitter.company"
-  );
   const [, , { setValue: setWeight }] = useField<BsffWeightInput>("weight");
   const [
     { value: ficheInterventions },
@@ -217,74 +62,6 @@ export function BsffTypeSelector() {
   const [{ value: previousBsffs }, , { setValue: setPreviousBsffs }] = useField<
     Bsff[]
   >("previousBsffs");
-
-  // formik's value and callback are hardly memoizable
-  // so for now they are triggering useEffects too often
-  // that's why we are using a ref here
-  // it should be fixed in formik v3: https://github.com/formium/formik/issues/2268
-  const setters = React.useRef({
-    setEmitterCompany,
-    setWeight,
-    setPackagings,
-  });
-  setters.current.setEmitterCompany = setEmitterCompany;
-  setters.current.setWeight = setWeight;
-  setters.current.setPackagings = setPackagings;
-
-  // When selecting the previous bsffs, prefill the fields with what we already know
-  React.useEffect(() => {
-    if (
-      [BsffType.TracerFluide, BsffType.CollectePetitesQuantites].includes(type)
-    ) {
-      return;
-    }
-
-    const firstPreviousBsffWithDestination = previousBsffs.find(
-      previousBsff => previousBsff.destination?.company?.siret
-    );
-    if (firstPreviousBsffWithDestination) {
-      const {
-        country,
-        ...company
-      } = firstPreviousBsffWithDestination.destination!.company!;
-      setters.current.setEmitterCompany(company);
-    }
-
-    if ([BsffType.Reexpedition, BsffType.Groupement].includes(type)) {
-      setters.current.setWeight(
-        previousBsffs.reduce<BsffWeightInput>(
-          (acc, previousBsff) => {
-            if (previousBsff.destination?.reception?.weight) {
-              return {
-                ...acc,
-                value: acc.value + previousBsff.destination.reception.weight,
-              };
-            }
-
-            if (previousBsff.weight) {
-              return {
-                ...acc,
-                ...previousBsff.weight,
-              };
-            }
-
-            return acc;
-          },
-          {
-            value: 0,
-            isEstimate: false,
-          }
-        )
-      );
-
-      setters.current.setPackagings(
-        previousBsffs.reduce<BsffPackagingInput[]>(
-          (acc, previousBsff) => acc.concat(previousBsff.packagings),
-          []
-        )
-      );
-    }
-  }, [type, previousBsffs]);
 
   return (
     <>
@@ -329,6 +106,9 @@ export function BsffTypeSelector() {
                     }
 
                     setPreviousBsffs([]);
+                    setPackagings([]);
+                    setWeight({ value: 0, isEstimate: false });
+                    setFicheInterventions([]);
                     setType(option.value);
                     return;
                   }
@@ -365,6 +145,7 @@ export function BsffTypeSelector() {
 
                     setPreviousBsffs([]);
                     setPackagings([]);
+                    setWeight({ value: 0, isEstimate: false });
                     setFicheInterventions([]);
                     setType(option.value);
                     return;
@@ -395,6 +176,8 @@ export function BsffTypeSelector() {
                     }
 
                     setPreviousBsffs([]);
+                    setPackagings([]);
+                    setWeight({ value: 0, isEstimate: false });
                     setFicheInterventions([]);
                     setType(option.value);
                     return;
@@ -432,6 +215,7 @@ export function BsffTypeSelector() {
 
                     setPreviousBsffs([]);
                     setPackagings([]);
+                    setWeight({ value: 0, isEstimate: false });
                     setFicheInterventions([]);
                     setType(option.value);
                     return;
@@ -444,7 +228,6 @@ export function BsffTypeSelector() {
               />{" "}
               {option.label}
             </label>
-            {type === option.value && option.Component && <option.Component />}
           </React.Fragment>
         ))}
       </div>

@@ -7,6 +7,7 @@ import {
 } from "generated/graphql/types";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { FicheInterventionList } from "./FicheInterventionList";
+import MyCompanySelector from "form/common/components/company/MyCompanySelector";
 
 export default function Emitter({ disabled }) {
   const [{ value: emitterCompany }] = useField<CompanyInput>("emitter.company");
@@ -14,6 +15,15 @@ export default function Emitter({ disabled }) {
     "ficheInterventions"
   );
   const [{ value: type }] = useField<BsffType>("type");
+
+  const heading =
+    type === BsffType.TracerFluide
+      ? "Détenteur"
+      : type === BsffType.CollectePetitesQuantites
+      ? "Opérateur"
+      : type === BsffType.Groupement
+      ? "Installation de tri, transit, regroupement ou traitement"
+      : "Installation de tri, transit, regroupement";
 
   return (
     <>
@@ -24,15 +34,28 @@ export default function Emitter({ disabled }) {
         </div>
       )}
 
-      <CompanySelector
-        disabled={disabled}
-        name="emitter.company"
-        heading="Entreprise émettrice"
-      />
+      {type === BsffType.TracerFluide ||
+      type === BsffType.CollectePetitesQuantites ? (
+        <CompanySelector
+          disabled={disabled}
+          name="emitter.company"
+          heading={heading}
+        />
+      ) : (
+        <>
+          <h4 className="form__section-heading">{heading}</h4>
+          <MyCompanySelector
+            fieldName="emitter.company"
+            siretEditable={true}
+            onSelect={() => {
+              // TODO make sure to empty grouping, repackaging or forwarding
+              // because new emitter may not be destination of
+            }}
+          />
+        </>
+      )}
 
-      {[BsffType.TracerFluide, BsffType.CollectePetitesQuantites].includes(
-        type
-      ) && (
+      {[BsffType.CollectePetitesQuantites].includes(type) && (
         <FieldArray
           name="ficheInterventions"
           render={({ push, remove }) => (
