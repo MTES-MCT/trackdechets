@@ -10,7 +10,7 @@ import { renderMail } from "../../mailer/templates/renderers";
 const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
 export async function renderFormRefusedEmail(
-  form: Form & { forwarding?: Form },
+  form: Form,
   notifyDreal = NOTIFY_DREAL_WHEN_FORM_DECLINED === "true"
 ): Promise<Mail> {
   if (form.emitterIsPrivateIndividual || form.emitterIsForeignShip) {
@@ -32,7 +32,7 @@ export async function renderFormRefusedEmail(
     : form.wasteAcceptationStatus;
 
   const attachmentData = {
-    file: await generateBsddPdfToBase64(form.forwarding ?? form),
+    file: await generateBsddPdfToBase64(form),
     name: `${form.readableId}.pdf`
   };
 
@@ -98,6 +98,8 @@ export async function renderFormRefusedEmail(
               transporterIsExemptedOfReceipt:
                 forwardedIn.transporterIsExemptedOfReceipt,
               transporterCompanyName: forwardedIn.transporterCompanyName,
+              transporterCompanySiret: forwardedIn.transporterCompanySiret,
+              transporterReceipt: forwardedIn.transporterReceipt,
               sentBy: forwardedIn.sentBy,
               quantityReceived: forwardedIn.quantityReceived
             }
@@ -109,6 +111,8 @@ export async function renderFormRefusedEmail(
               transporterIsExemptedOfReceipt:
                 form.transporterIsExemptedOfReceipt,
               transporterCompanyName: form.transporterCompanyName,
+              transporterCompanySiret: form.transporterCompanySiret,
+              transporterReceipt: form.transporterReceipt,
               sentBy: form.sentBy,
               quantityReceived: form.quantityReceived
             })

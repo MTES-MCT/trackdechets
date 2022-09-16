@@ -16,11 +16,10 @@
       {{^form.wasteRefusalReason}}<span>Non précisé</span>{{/form.wasteRefusalReason}}
     </li>
   </ul>
-  <li>Transporteur :
-    {{#form.transporterIsExemptedOfReceipt}}
-    <b>Exemption relevant de l'article R.541-50 du code de l'Environnement</b>{{/form.transporterIsExemptedOfReceipt}}
+  <li>Transporteur : {{form.transporterCompanyName}} ({{form.transporterCompanySiret}}). {{#form.transporterIsExemptedOfReceipt}}
+    <span> Récépissé transport : Exemption relevant de l'article R.541-50 du code de l'Environnement</span>{{/form.transporterIsExemptedOfReceipt}}
     {{^form.transporterIsExemptedOfReceipt}}
-    <b>{{form.transporterCompanyName}}</b>
+    <span> Récépissé transport : {{form.transporterReceipt}}</span>
     {{/form.transporterIsExemptedOfReceipt}}
   </li>
   <li>Responsable du site : {{form.sentBy}}</li>

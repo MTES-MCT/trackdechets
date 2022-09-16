@@ -401,6 +401,11 @@ export const dashboardFormFragment = gql`
     wasteDetails {
       code
       name
+      packagingInfos {
+        type
+        other
+        quantity
+      }
     }
     emitter {
       type
@@ -451,7 +456,23 @@ export const dashboardFormFragment = gql`
       destination {
         company {
           siret
+          address
+          name
+          contact
+          phone
+          mail
         }
+        cap
+        processingOperation
+      }
+      wasteDetails {
+        packagingInfos {
+          type
+          other
+          quantity
+        }
+        quantity
+        quantityType
       }
     }
     transportSegments {
