@@ -53,7 +53,11 @@ export function FormCompanyFields({
       <p>
         <input
           type="checkbox"
-          checked={!isForeignShip && companyCountry?.cca2 === "FR"}
+          checked={
+            !!company?.siret?.length &&
+            !isForeignShip &&
+            companyCountry?.cca2 === "FR"
+          }
           readOnly
         />{" "}
         Entreprise française
