@@ -75,46 +75,44 @@ export default function Transporter({ disabled }) {
             />
           </div>
           {values.transporter?.recepisse != null && (
-            <>
-              <div className="form__row">
-                <label>
-                  Numéro de récépissé
-                  <Field
-                    type="text"
-                    name="transporter.recepisse.number"
-                    className="td-input"
-                    disabled={disabled}
-                  />
-                </label>
+            <div className="form__row">
+              <label>
+                Numéro de récépissé
+                <Field
+                  type="text"
+                  name="transporter.recepisse.number"
+                  className="td-input"
+                  disabled={disabled}
+                />
+              </label>
 
-                <RedErrorMessage name="transporter.recepisse.number" />
+              <RedErrorMessage name="transporter.recepisse.number" />
 
-                <label>
-                  Département
-                  <Field
-                    type="text"
-                    name="transporter.recepisse.department"
-                    placeholder="Ex: 83"
-                    className={`td-input ${styles.transporterDepartment}`}
-                    disabled={disabled}
-                  />
-                </label>
+              <label>
+                Département
+                <Field
+                  type="text"
+                  name="transporter.recepisse.department"
+                  placeholder="Ex: 83"
+                  className={`td-input ${styles.transporterDepartment}`}
+                  disabled={disabled}
+                />
+              </label>
 
-                <RedErrorMessage name="transporter.recepisse.department" />
+              <RedErrorMessage name="transporter.recepisse.department" />
 
-                <label>
-                  Limite de validité
-                  <Field
-                    component={DateInput}
-                    name="transporter.recepisse.validityLimit"
-                    className={`td-input ${styles.transporterValidityLimit}`}
-                    disabled={disabled}
-                  />
-                </label>
+              <label>
+                Limite de validité
+                <Field
+                  component={DateInput}
+                  name="transporter.recepisse.validityLimit"
+                  className={`td-input ${styles.transporterValidityLimit}`}
+                  disabled={disabled}
+                />
+              </label>
 
-                <RedErrorMessage name="transporter.recepisse.validityLimit" />
-              </div>
-            </>
+              <RedErrorMessage name="transporter.recepisse.validityLimit" />
+            </div>
           )}
           <h4 className="form__section-heading">Détails</h4>
           <div className="form__row">
