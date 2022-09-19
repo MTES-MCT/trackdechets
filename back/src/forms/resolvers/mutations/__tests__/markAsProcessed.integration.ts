@@ -378,6 +378,7 @@ describe("mutation.markAsProcessed", () => {
             company: {
               mail: "m@m.fr",
               siret: null,
+              vatNumber: "DE12345678",
               country: "DE",
               name: "DE company",
               phone: "0101010101",
@@ -464,6 +465,7 @@ describe("mutation.markAsProcessed", () => {
             company: {
               mail: "m@m.fr",
               siret: null,
+              vatNumber: "DE12345678",
               country: "DE",
               name: "DE company",
               phone: "0101010101",
