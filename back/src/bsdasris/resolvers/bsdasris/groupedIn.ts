@@ -1,6 +1,5 @@
 import { BsdasriResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
-
 import { expandBsdasriFromDB } from "../../converter";
 
 const groupedIn: BsdasriResolvers["groupedIn"] = async bsdasri => {

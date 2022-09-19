@@ -40,8 +40,8 @@ const CREATE_TRANSPORTER_RECEIPT = gql`
 `;
 
 export const UPDATE_COMPANY_TRANSPORTER_RECEIPT = gql`
-  mutation UpdateCompany($siret: String!, $transporterReceiptId: String!) {
-    updateCompany(siret: $siret, transporterReceiptId: $transporterReceiptId) {
+  mutation UpdateCompany($id: String!, $transporterReceiptId: String!) {
+    updateCompany(id: $id, transporterReceiptId: $transporterReceiptId) {
       id
       transporterReceipt {
         id
@@ -139,7 +139,7 @@ export default function AccountFormCompanyTransporterReceipt({
           if (data.createTransporterReceipt) {
             await updateCompany({
               variables: {
-                siret: company.siret,
+                id: company.id,
                 transporterReceiptId: data.createTransporterReceipt.id,
               },
             });

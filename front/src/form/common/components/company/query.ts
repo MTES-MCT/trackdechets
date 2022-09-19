@@ -71,6 +71,11 @@ export const COMPANY_INFOS = gql`
         validityLimit
         department
       }
+      brokerReceipt {
+        receiptNumber
+        validityLimit
+        department
+      }
     }
   }
 `;
@@ -98,6 +103,11 @@ export const SEARCH_COMPANIES = gql`
         department
       }
       traderReceipt {
+        receiptNumber
+        validityLimit
+        department
+      }
+      brokerReceipt {
         receiptNumber
         validityLimit
         department
@@ -142,6 +152,11 @@ export const COMPANY_PRIVATE_INFOS = gql`
         department
       }
       traderReceipt {
+        receiptNumber
+        validityLimit
+        department
+      }
+      brokerReceipt {
         receiptNumber
         validityLimit
         department

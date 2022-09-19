@@ -16,6 +16,7 @@ import {
   isSiret,
   isVat,
 } from "generated/constants/companySearchHelpers";
+import { CONTACT_EMAIL } from "common/config";
 
 type IProps = {
   onCompanyInfos: (companyInfos) => void;
@@ -121,8 +122,8 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
               <span>
                 Nous n'avons pas pu récupérer les informations de cet
                 établissement car il n'est pas diffusible. Veuillez nous
-                contacter à l'adresse hello@trackdechets.beta.gouv.fr avec votre
-                certificat d'inscription au répertoire des Entreprises et des
+                contacter à l'adresse {CONTACT_EMAIL} avec votre certificat
+                d'inscription au répertoire des Entreprises et des
                 Établissements (SIRENE) pour pouvoir procéder à la création de
                 l'établissement. Pour télécharger votre certificat, RDV sur{" "}
               </span>
@@ -149,8 +150,7 @@ export default function AccountCompanyAddSiret({ onCompanyInfos }: IProps) {
             };
           } else if (!isValidVat && !/^[0-9]{14}$/.test(values.siret)) {
             return {
-              siret:
-                "Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter à l'adresse contact@trackdechets.beta.gouv.fr avec un justificatif légal du pays d'origine.",
+              siret: `Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter à l'adresse ${CONTACT_EMAIL} avec un justificatif légal du pays d'origine.`,
             };
           } else if (isValidVat && isFRVat(values.siret)) {
             return {

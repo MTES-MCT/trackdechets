@@ -11,7 +11,7 @@ import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
 import { checkIsCompanyAdmin } from "../../../users/permissions";
 
 export async function updateCompanyFn({
-  siret,
+  id,
   companyTypes,
   gerepId,
   contact,
@@ -65,7 +65,7 @@ export async function updateCompanyFn({
   };
 
   const company = await prisma.company.update({
-    where: { siret },
+    where: { id },
     data
   });
 
@@ -79,7 +79,7 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-  const company = await getCompanyOrCompanyNotFound({ siret: args.siret });
+  const company = await getCompanyOrCompanyNotFound({ id: args.id });
   await checkIsCompanyAdmin(user, company);
 
   const companyTypes = args.companyTypes || company.companyTypes;

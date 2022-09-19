@@ -4,7 +4,7 @@ export const MEDIA_QUERIES = {
 
 export const CONTACT_EMAIL =
   (import.meta.env.VITE_CONTACT_EMAIL as string) ||
-  "hello@trackdechets.beta.gouv.fr";
+  "contact@trackdechets.beta.gouv.fr";
 
 export const DEVELOPERS_DOCUMENTATION_URL =
   (import.meta.env.VITE_DEVELOPERS_DOCUMENTATION_URL as string) ||

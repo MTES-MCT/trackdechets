@@ -6,6 +6,8 @@ import { indexBsvhu } from "../../bsvhu/elastic";
 import { indexForm } from "../../forms/elastic";
 import { getFullForm } from "../../forms/database";
 import { deleteBsd, client, index } from "../../common/elastic";
+import { closeQueues } from "../../queue/producers";
+import { getReadonlyBsdaRepository } from "../../bsda/repository";
 
 async function findBsd(id) {
   return client.search({
@@ -22,6 +24,11 @@ async function findBsd(id) {
     }
   });
 }
+async function exitScript(msg?: string) {
+  await prisma.$disconnect();
+  console.log(msg || "Done, exiting");
+  await closeQueues();
+}
 
 (async function () {
   const bsdId: string = process.argv[2];
@@ -37,20 +44,31 @@ async function findBsd(id) {
     return;
   }
   if (bsdId.startsWith("BSDA-")) {
-    const bsda = await prisma.bsda.findFirst({
-      where: { id: bsdId, isDeleted: false }
-    });
-    if (!!bsda) {
+    const bsda = await getReadonlyBsdaRepository().findUnique(
+      { id: bsdId },
+      {
+        include: {
+          forwardedIn: { select: { id: true } },
+          groupedIn: { select: { id: true } }
+        }
+      }
+    );
+    if (!!bsda && !bsda.isDeleted) {
       await indexBsda(bsda);
     } else {
       await deleteBsd({ id: bsdId });
     }
+    await exitScript();
     return;
   }
 
   if (bsdId.startsWith("DASRI-")) {
     const bsdasri = await prisma.bsdasri.findFirst({
-      where: { id: bsdId, isDeleted: false }
+      where: { id: bsdId, isDeleted: false },
+      include: {
+        grouping: { select: { id: true } },
+        synthesizing: { select: { id: true } }
+      }
     });
 
     if (!!bsdasri) {
@@ -58,6 +76,7 @@ async function findBsd(id) {
     } else {
       await deleteBsd({ id: bsdId });
     }
+    await exitScript();
     return;
   }
 
@@ -71,6 +90,7 @@ async function findBsd(id) {
     } else {
       await deleteBsd({ id: bsdId });
     }
+    await exitScript();
     return;
   }
 
@@ -84,6 +104,7 @@ async function findBsd(id) {
     } else {
       await deleteBsd({ id: bsdId });
     }
+    await exitScript();
     return;
   }
 
@@ -102,7 +123,8 @@ async function findBsd(id) {
         await deleteBsd({ id: indexedId });
       }
     }
+    await exitScript();
     return;
   }
-  console.log("L'argument ne correspond pas à un ID ou readableId de bsd");
+  await exitScript("L'argument ne correspond pas à un ID ou readableId de bsd");
 })();

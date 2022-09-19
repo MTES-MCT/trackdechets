@@ -1,5 +1,7 @@
 import { Prisma } from "@prisma/client";
-import { safeInput } from "../forms/form-converter";
+
+import { safeInput } from "../common/converter";
+
 import { BsdaWhere } from "../generated/graphql/types";
 import {
   toPrismaDateFilter,

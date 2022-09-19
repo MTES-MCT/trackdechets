@@ -2,7 +2,7 @@ import { checkIsCompanyMember } from "../../../users/permissions";
 import prisma from "../../../prisma";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
-import { expandFormFromDb } from "../../form-converter";
+import { expandFormFromDb } from "../../converter";
 import { Decimal } from "decimal.js-light";
 
 const appendixFormsResolver: QueryResolvers["appendixForms"] = async (

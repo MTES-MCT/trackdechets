@@ -1,0 +1,1 @@
+ALTER TABLE "default$default"."Company" RENAME COLUMN "codedepartement" TO "codeDepartement";

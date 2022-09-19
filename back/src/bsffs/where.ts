@@ -1,6 +1,6 @@
 import { BsffWhere, BsffOperationCode } from "../generated/graphql/types";
 import { Prisma } from "@prisma/client";
-import { safeInput } from "../forms/form-converter";
+import { safeInput } from "../common/converter";
 import {
   toPrismaDateFilter,
   toPrismaEnumFilter,

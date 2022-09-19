@@ -1,7 +1,7 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
-import { expandFormFromDb } from "../../form-converter";
+import { expandFormFromDb } from "../../converter";
 import { checkCanMarkAsSent } from "../../permissions";
 import { checkCanBeSealed, signingInfoSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";

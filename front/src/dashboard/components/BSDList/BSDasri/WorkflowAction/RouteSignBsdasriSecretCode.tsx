@@ -15,7 +15,7 @@ import {
   MutationUpdateBsdasriArgs,
   BsdasriSignatureType,
 } from "generated/graphql/types";
-import { getComputedState } from "form/common/stepper/GenericStepList";
+import { getComputedState } from "form/common/getComputedState";
 import getInitialState, {
   getInitialWeightFn,
 } from "form/bsdasri/utils/initial-state";

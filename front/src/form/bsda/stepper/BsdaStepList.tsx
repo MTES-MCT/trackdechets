@@ -1,9 +1,10 @@
 import { useMutation, useQuery } from "@apollo/client";
+import React, { lazy, ReactElement, useMemo } from "react";
+import { useHistory } from "react-router-dom";
 import { Loader } from "common/components";
 import { GET_BSDS } from "common/queries";
-import GenericStepList, {
-  getComputedState,
-} from "form/common/stepper/GenericStepList";
+import { getComputedState } from "form/common/getComputedState";
+
 import { IStepContainerProps } from "form/common/stepper/Step";
 import {
   Mutation,
@@ -14,13 +15,15 @@ import {
   Bsda,
   BsdaInput,
 } from "generated/graphql/types";
-import React, { ReactElement, useMemo } from "react";
-import { useHistory } from "react-router-dom";
 import initialState from "./initial-state";
 import { CREATE_BSDA, UPDATE_BSDA, GET_BSDA } from "./queries";
 import omitDeep from "omit-deep-lodash";
 import { formInputToastError } from "form/common/stepper/toaster";
 import { bsdaValidationSchema } from "./schema";
+
+const GenericStepList = lazy(() =>
+  import("form/common/stepper/GenericStepList")
+);
 
 interface Props {
   children: (bsda: Bsda | undefined) => ReactElement;

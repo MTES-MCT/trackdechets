@@ -1,4 +1,9 @@
-import { chain, nullIfNoValues, safeInput } from "../forms/form-converter";
+import {
+  nullIfNoValues,
+  safeInput,
+  processDate,
+  chain
+} from "../common/converter";
 import {
   FormCompany,
   Signature,
@@ -25,8 +30,8 @@ import {
 export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
   return {
     id: form.id,
-    createdAt: form.createdAt,
-    updatedAt: form.updatedAt,
+    createdAt: processDate(form.createdAt),
+    updatedAt: processDate(form.updatedAt),
     isDraft: form.isDraft,
     status: form.status,
     emitter: nullIfNoValues<BsvhuEmitter>({
@@ -42,7 +47,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
       emission: nullIfNoValues<BsvhuEmission>({
         signature: nullIfNoValues<Signature>({
           author: form.emitterEmissionSignatureAuthor,
-          date: form.emitterEmissionSignatureDate
+          date: processDate(form.emitterEmissionSignatureDate)
         })
       })
     }),
@@ -71,7 +76,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
       plannedOperationCode: form.destinationPlannedOperationCode,
       reception: nullIfNoValues<BsvhuReception>({
         acceptationStatus: form.destinationReceptionAcceptationStatus,
-        date: form.destinationReceptionDate,
+        date: processDate(form.destinationReceptionDate),
         identification: nullIfNoValues<BsvhuIdentification>({
           numbers: form.destinationReceptionIdentificationNumbers,
           type: form.destinationReceptionIdentificationType
@@ -83,7 +88,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
       }),
       operation: nullIfNoValues<BsvhuOperation>({
         code: form.destinationOperationCode,
-        date: form.destinationOperationDate,
+        date: processDate(form.destinationOperationDate),
         nextDestination: nullIfNoValues<BsvhuNextDestination>({
           company: nullIfNoValues<FormCompany>({
             name: form.destinationOperationNextDestinationCompanyName,
@@ -97,7 +102,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
 
         signature: nullIfNoValues<Signature>({
           author: form.destinationOperationSignatureAuthor,
-          date: form.destinationOperationSignatureDate
+          date: processDate(form.destinationOperationSignatureDate)
         })
       })
     }),
@@ -114,14 +119,14 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
       recepisse: nullIfNoValues<BsvhuRecepisse>({
         number: form.transporterRecepisseNumber,
         department: form.transporterRecepisseDepartment,
-        validityLimit: form.transporterRecepisseValidityLimit
+        validityLimit: processDate(form.transporterRecepisseValidityLimit)
       }),
       transport: nullIfNoValues<BsvhuTransport>({
         signature: nullIfNoValues<Signature>({
           author: form.transporterTransportSignatureAuthor,
-          date: form.transporterTransportSignatureDate
+          date: processDate(form.transporterTransportSignatureDate)
         }),
-        takenOverAt: form.transporterTransportTakenOverAt
+        takenOverAt: processDate(form.transporterTransportTakenOverAt)
       })
     }),
     metadata: null

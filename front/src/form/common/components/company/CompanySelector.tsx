@@ -38,6 +38,7 @@ import {
   FAVORITES,
   SEARCH_COMPANIES,
 } from "./query";
+import { CONTACT_EMAIL } from "common/config";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -295,8 +296,8 @@ export default function CompanySelector({
               error.graphQLErrors[0].extensions?.code === "FORBIDDEN"
             ) {
               return (
-                "Nous n'avons pas pu récupérer les informations." +
-                "Veuillez nous contacter à l'adresse contact@trackdechets.beta.gouv.fr pour pouvoir procéder à la création de l'établissement"
+                `Nous n'avons pas pu récupérer les informations.` +
+                `Veuillez nous contacter à l'adresse ${CONTACT_EMAIL} pour pouvoir procéder à la création de l'établissement`
               );
             }
             return error.message;

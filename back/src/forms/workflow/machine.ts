@@ -105,6 +105,10 @@ const machine = Machine<any, Event>(
               cond: "awaitsGroup"
             },
             {
+              target: Status.FOLLOWED_WITH_PNTTD,
+              cond: "isFollowedWithPnttd"
+            },
+            {
               target: Status.PROCESSED
             }
           ],
@@ -116,6 +120,7 @@ const machine = Machine<any, Event>(
         }
       },
       [Status.PROCESSED]: { type: "final" },
+      [Status.FOLLOWED_WITH_PNTTD]: { type: "final" },
       [Status.NO_TRACEABILITY]: { type: "final" },
       [Status.AWAITING_GROUP]: {
         on: {
@@ -221,13 +226,27 @@ const machine = Machine<any, Event>(
         !!event?.formUpdateInput?.noTraceability ||
         !!event.formUpdateInput?.forwardedIn?.update?.noTraceability,
       awaitsGroup: (_, event) =>
-        PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
+        (!event.formUpdateInput?.nextDestinationCompanyCountry ||
+          event.formUpdateInput?.nextDestinationCompanyCountry === "FR") &&
+        (PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
           event.formUpdateInput?.processingOperationDone as string
         ) ||
-        PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-          event.formUpdateInput?.forwardedIn?.update
-            ?.processingOperationDone as string
-        ),
+          PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
+            event.formUpdateInput?.forwardedIn?.update
+              ?.processingOperationDone as string
+          )),
+      isFollowedWithPnttd: (_, event) =>
+        !!event.formUpdateInput?.nextDestinationCompanyCountry &&
+        event.formUpdateInput?.nextDestinationCompanyCountry !== "FR" &&
+        !event?.formUpdateInput?.noTraceability &&
+        !event.formUpdateInput?.forwardedIn?.update?.noTraceability &&
+        (PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
+          event.formUpdateInput?.processingOperationDone as string
+        ) ||
+          PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
+            event.formUpdateInput?.forwardedIn?.update
+              ?.processingOperationDone as string
+          )),
       isFormRefused: (_, event) =>
         event.formUpdateInput?.wasteAcceptationStatus === "REFUSED" ||
         event.formUpdateInput?.forwardedIn?.update?.wasteAcceptationStatus ===

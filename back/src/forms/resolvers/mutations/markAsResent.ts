@@ -1,7 +1,7 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound } from "../../database";
-import { expandFormFromDb, flattenFormInput } from "../../form-converter";
+import { expandFormFromDb, flattenFormInput } from "../../converter";
 import transitionForm from "../../workflow/transitionForm";
 import { checkCanMarkAsResent } from "../../permissions";
 import { UserInputError } from "apollo-server-express";

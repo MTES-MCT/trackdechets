@@ -4,7 +4,7 @@ import { GET_BSDS } from "common/queries";
 import routes from "common/routes";
 import { UPDATE_BSDA } from "form/bsda/stepper/queries";
 import { WasteInfoWorker } from "form/bsda/stepper/steps/WasteInfo";
-import { getComputedState } from "form/common/stepper/GenericStepList";
+import { getComputedState } from "form/common/getComputedState";
 import { Field, Form, Formik } from "formik";
 import {
   BsdaConsistence,
@@ -38,7 +38,7 @@ export function SignWork({ siret, bsdaId }: Props) {
   >(SIGN_BSDA, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   return (
-    <SignBsda title="Signature entreprise de travaux" bsdaId={bsdaId}>
+    <SignBsda title="Signer en tant qu'entreprise de travaux" bsdaId={bsdaId}>
       {({ bsda, onClose }) =>
         bsda.metadata?.errors?.some(
           error => error.requiredFor === SignatureTypeInput.Emission

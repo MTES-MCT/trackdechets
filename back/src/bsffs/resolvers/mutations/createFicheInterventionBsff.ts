@@ -3,7 +3,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import {
   flattenFicheInterventionBsffInput,
-  unflattenFicheInterventionBsff
+  expandFicheInterventionBsffFromDB
 } from "../../converter";
 import { isFicheInterventionOperateur } from "../../permissions";
 import { validateFicheIntervention } from "../../validation";
@@ -21,7 +21,7 @@ const createFicheInterventionBsff: MutationResolvers["createFicheInterventionBsf
       data: flatInput
     });
 
-    return unflattenFicheInterventionBsff(ficheIntervention);
+    return expandFicheInterventionBsffFromDB(ficheIntervention);
   };
 
 export default createFicheInterventionBsff;

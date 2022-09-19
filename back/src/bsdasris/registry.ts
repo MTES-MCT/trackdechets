@@ -360,6 +360,7 @@ export function toAllWaste(
     transporterCompanyName: bsdasri.transporterCompanyName,
     transporterCompanySiret: bsdasri.transporterCompanySiret,
     transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
+    transporterNumberPlates: bsdasri.transporterTransportPlates,
     weight: bsdasri.emitterWasteWeightValue
       ? bsdasri.emitterWasteWeightValue / 1000
       : bsdasri.emitterWasteWeightValue,

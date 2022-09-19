@@ -26,11 +26,11 @@ AccountFieldCompanyDasriDirectTakeOver.fragments = {
 };
 const UPDATE_DASRI_DIRECT_TAKEOVER = gql`
   mutation UpdateCompany(
-    $siret: String!
+    $id: String!
     $allowBsdasriTakeOverWithoutSignature: Boolean!
   ) {
     updateCompany(
-      siret: $siret
+      id: $id
       allowBsdasriTakeOverWithoutSignature: $allowBsdasriTakeOverWithoutSignature
     ) {
       id
@@ -64,7 +64,7 @@ export default function AccountFieldCompanyDasriDirectTakeOver({
               label={`${fieldLabel} - ${explanation}`}
               value={company.allowBsdasriTakeOverWithoutSignature}
               mutation={UPDATE_DASRI_DIRECT_TAKEOVER}
-              mutationArgs={{ siret: company.siret }}
+              mutationArgs={{ id: company.id }}
               isEditing={isEditing}
               toggleEdition={() => {
                 toggleEdition();

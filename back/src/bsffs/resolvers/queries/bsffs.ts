@@ -1,11 +1,11 @@
 import prisma from "../../../prisma";
 import { QueryResolvers } from "../../../generated/graphql/types";
-import { unflattenBsff } from "../../converter";
+import { expandBsffFromDB } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { getConnection } from "../../../common/pagination";
-import { getCachedUserSirets } from "../../../common/redis/users";
+import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 
 const bsffs: QueryResolvers["bsffs"] = async (
   _,
@@ -14,13 +14,13 @@ const bsffs: QueryResolvers["bsffs"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const sirets = await getCachedUserSirets(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   const mask = {
     OR: [
-      { emitterCompanySiret: { in: sirets } },
-      { transporterCompanySiret: { in: sirets } },
-      { destinationCompanySiret: { in: sirets } }
+      { emitterCompanySiret: { in: userCompaniesSiretOrVat } },
+      { transporterCompanySiret: { in: userCompaniesSiretOrVat } },
+      { destinationCompanySiret: { in: userCompaniesSiretOrVat } }
     ]
   };
 
@@ -41,7 +41,7 @@ const bsffs: QueryResolvers["bsffs"] = async (
         ...prismaPaginationArgs,
         orderBy: { createdAt: "desc" }
       }),
-    formatNode: unflattenBsff,
+    formatNode: expandBsffFromDB,
     ...gqlPaginationArgs
   });
 };

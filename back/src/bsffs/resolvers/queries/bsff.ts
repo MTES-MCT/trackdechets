@@ -1,22 +1,22 @@
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { unflattenBsff } from "../../converter";
-import { getCachedUserSirets } from "../../../common/redis/users";
+import { expandBsffFromDB } from "../../converter";
+import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { getBsffOrNotFound } from "../../database";
 
 const bsff: QueryResolvers["bsff"] = async (_, { id }, context) => {
   const user = checkIsAuthenticated(context);
-  const sirets = await getCachedUserSirets(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const bsff = await getBsffOrNotFound({
     id,
     OR: [
-      { emitterCompanySiret: { in: sirets } },
-      { transporterCompanySiret: { in: sirets } },
-      { destinationCompanySiret: { in: sirets } }
+      { emitterCompanySiret: { in: userCompaniesSiretOrVat } },
+      { transporterCompanySiret: { in: userCompaniesSiretOrVat } },
+      { destinationCompanySiret: { in: userCompaniesSiretOrVat } }
     ]
   });
 
-  return unflattenBsff(bsff);
+  return expandBsffFromDB(bsff);
 };
 
 export default bsff;

@@ -5,7 +5,7 @@ import { ErrorCode } from "../../../../common/errors";
 import * as mailsHelper from "../../../../mailer/mailing";
 import { companyFactory, userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import * as geocode from "../../../geocode";
+import * as geocode from "../../../geo/geocode";
 import { CompanyType } from "@prisma/client";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../../mailer/templates";
@@ -301,7 +301,7 @@ describe("Mutation.createCompany", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Cette entreprise ne fait pas partie de la liste des éco-organismes reconnus par Trackdéchets. Contactez-nous si vous pensez qu'il s'agit d'une erreur : hello@trackdechets.beta.gouv.fr"
+          "Cette entreprise ne fait pas partie de la liste des éco-organismes reconnus par Trackdéchets. Contactez-nous si vous pensez qu'il s'agit d'une erreur : contact@trackdechets.beta.gouv.fr"
       })
     ]);
   });
@@ -415,7 +415,7 @@ describe("Mutation.createCompany", () => {
     await server.start();
     const makeClient = require("../../../../__tests__/testClient").default;
     const mailsHelper = require("../../../../mailer/mailing");
-    const geocode = require("../../../geocode");
+    const geocode = require("../../../geo/geocode");
     const searchCompanyReload = require("../../../sirene/searchCompany");
     const searchSireneMock = jest.spyOn(searchCompanyReload, "default");
     searchSireneMock.mockResolvedValueOnce({

@@ -60,35 +60,33 @@ function UpdateTransporterCustomInfoModal({
           });
         }}
       >
-        {({ isSubmitting }) => (
-          <Form>
-            <label htmlFor={"customInfo"}>Champ libre</label>
-            <Field
-              id="customInfo"
-              name="customInfo"
-              type="text"
-              className="td-input"
-            />
-            {!!error && <NotificationError apolloError={error} />}
+        <Form>
+          <label htmlFor={"customInfo"}>Champ libre</label>
+          <Field
+            id="customInfo"
+            name="customInfo"
+            type="text"
+            className="td-input"
+          />
+          {!!error && <NotificationError apolloError={error} />}
 
-            <div className="form__actions">
-              <button
-                className="btn btn--outline-primary"
-                type="button"
-                onClick={onClose}
-              >
-                Annuler
-              </button>
-              <button
-                className="btn btn--primary"
-                type="submit"
-                disabled={loading}
-              >
-                {loading ? "Envoi en cours" : "Modifier"}
-              </button>
-            </div>
-          </Form>
-        )}
+          <div className="form__actions">
+            <button
+              className="btn btn--outline-primary"
+              type="button"
+              onClick={onClose}
+            >
+              Annuler
+            </button>
+            <button
+              className="btn btn--primary"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "Envoi en cours" : "Modifier"}
+            </button>
+          </div>
+        </Form>
       </Formik>
     </TdModal>
   );

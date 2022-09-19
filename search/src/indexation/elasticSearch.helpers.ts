@@ -223,7 +223,7 @@ export const getWritableParserAndIndexer = (
   indexName: string
 ) =>
   new Writable({
-    // seems a reasonanle data size to go with CHUNK_SIZE = 10000
+    // seems a reasonable data size to go with CHUNK_SIZE = 10000
     highWaterMark: 100_000,
     objectMode: true,
     writev: (csvLines, next) => {

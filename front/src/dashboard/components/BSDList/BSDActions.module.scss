@@ -36,3 +36,11 @@
     }
   }
 }
+
+.BSDDropdown {
+  &[data-selected] {
+    background: hsl(211, 81%, 36%) !important;
+    color: white;
+    outline: none;
+  }
+}

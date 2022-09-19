@@ -149,20 +149,22 @@ export default function EditSegment({ siret, segment }: Props) {
                 )}
 
                 <h4 className="form__section-heading">Autorisations</h4>
-                <label htmlFor="isExemptedOfReceipt" className="tw-mb-2">
-                  <Field
-                    type="checkbox"
-                    name="transporter.isExemptedOfReceipt"
-                    id="isExemptedOfReceipt"
-                    checked={values?.transporter?.isExemptedOfReceipt}
-                    className="td-input"
-                  />
-                  Le transporteur déclare être exempté de récépissé conformément
-                  aux dispositions de l'article R.541-50 du code de
-                  l'environnement.
-                </label>
+                <div className="form__row">
+                  <label htmlFor="isExemptedOfReceipt" className="tw-mb-2">
+                    <Field
+                      type="checkbox"
+                      name="transporter.isExemptedOfReceipt"
+                      id="isExemptedOfReceipt"
+                      checked={values?.transporter?.isExemptedOfReceipt}
+                      className="td-input"
+                    />
+                    Le transporteur déclare être exempté de récépissé
+                    conformément aux dispositions de l'article R.541-50 du code
+                    de l'environnement.
+                  </label>
+                </div>
                 {!values?.transporter?.isExemptedOfReceipt && (
-                  <>
+                  <div className="form__row">
                     <label htmlFor="id_receipt">Numéro de récépissé</label>
                     <Field
                       type="text"
@@ -191,7 +193,7 @@ export default function EditSegment({ siret, segment }: Props) {
                       id="id_numberPlate"
                       className="td-input"
                     />
-                  </>
+                  </div>
                 )}
                 {error && <NotificationError apolloError={error} />}
 

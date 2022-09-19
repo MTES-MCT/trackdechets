@@ -2,7 +2,7 @@ import {
   QueryResolvers,
   QueryFormArgs
 } from "../../../generated/graphql/types";
-import { expandFormFromDb } from "../../form-converter";
+import { expandFormFromDb } from "../../converter";
 import { UserInputError } from "apollo-server-express";
 import { MissingIdOrReadableId } from "../../errors";
 import { checkIsAuthenticated } from "../../../common/permissions";

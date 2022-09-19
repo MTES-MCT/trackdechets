@@ -264,6 +264,36 @@ const Broker = ({ broker }) => (
     </div>
   </>
 );
+
+const Intermediary = ({ intermediary }) => (
+  <>
+    <div className={styles.detailColumns}>
+      <div className={styles.detailGrid}>
+        <dt>Établissement intermédiaire</dt>
+        <dd>{intermediary?.name}</dd>
+
+        <dt>Siret</dt>
+        <dd>{intermediary?.siret}</dd>
+
+        <dt>Numéro de TVA</dt>
+        <dd>{intermediary?.vatNumber}</dd>
+
+        <dt>Adresse</dt>
+        <dd>{intermediary?.address}</dd>
+
+        <dt>Tél</dt>
+        <dd>{intermediary?.phone}</dd>
+
+        <dt>Mél</dt>
+        <dd>{intermediary?.mail}</dd>
+
+        <dt>Contact</dt>
+        <dd>{intermediary?.contact}</dd>
+      </div>
+    </div>
+  </>
+);
+
 const EcoOrganisme = ({ ecoOrganisme }) => (
   <div className={styles.detailGrid}>
     <dt>EcoOrganisme</dt>
@@ -563,6 +593,17 @@ export default function BSDDetailContent({
               <IconRenewableEnergyEarth size="25px" />
               <span className={styles.detailTabCaption}>Destinataire</span>
             </Tab>
+            {form?.intermediaries?.length ? (
+              <Tab className={styles.detailTab}>
+                <IconWarehousePackage size="25px" />
+                <span className={styles.detailTabCaption}>
+                  Intermédiaire
+                  {form?.intermediaries?.length > 1 ? "s" : ""}
+                </span>
+              </Tab>
+            ) : (
+              ""
+            )}
           </TabList>
           {/* Tabs content */}
           <div className={styles.detailTabPanels}>
@@ -703,6 +744,16 @@ export default function BSDDetailContent({
                 <Recipient form={form} hasTempStorage={hasTempStorage} />
               </div>
             </TabPanel>
+            {/* Intermdiaries tab panel */}
+            {form?.intermediaries?.length ? (
+              <TabPanel className={styles.detailTabPanel}>
+                {form?.intermediaries?.map(intermediary => (
+                  <Intermediary intermediary={intermediary} />
+                ))}
+              </TabPanel>
+            ) : (
+              ""
+            )}
           </div>
         </Tabs>
         <div className={styles.detailActions}>

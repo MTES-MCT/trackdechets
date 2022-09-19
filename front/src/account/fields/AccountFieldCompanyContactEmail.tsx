@@ -14,7 +14,7 @@ type Props = {
   company: CompanyPrivate;
 };
 
-AccountFielCompanyContactEmail.fragments = {
+AccountFieldCompanyContactEmail.fragments = {
   company: gql`
     fragment AccountFieldCompanyContactEmailFragment on CompanyPrivate {
       id
@@ -27,7 +27,7 @@ AccountFielCompanyContactEmail.fragments = {
 
 const UPDATE_CONTACT_EMAIL = gql`
   mutation UpdateCompany($siret: String!, $contactEmail: String) {
-    updateCompany(siret: $siret, contactEmail: $contactEmail) {
+    updateCompany(id: $id, contactEmail: $contactEmail) {
       id
       siret
       contactEmail
@@ -39,7 +39,7 @@ const yupSchema = object().shape({
   contactEmail: string().email(),
 });
 
-export default function AccountFielCompanyContactEmail({ company }: Props) {
+export default function AccountFieldCompanyContactEmail({ company }: Props) {
   const fieldName = "contactEmail";
   const fieldLabel = "Email de contact";
 
@@ -57,7 +57,7 @@ export default function AccountFielCompanyContactEmail({ company }: Props) {
               value={company.contactEmail}
               placeHolder={fieldLabel}
               mutation={UPDATE_CONTACT_EMAIL}
-              mutationArgs={{ siret: company.siret }}
+              mutationArgs={{ id: company.id }}
               yupSchema={yupSchema}
               toggleEdition={() => {
                 toggleEdition();

@@ -3,7 +3,7 @@ import {
   formWithTempStorageFactory,
   userFactory
 } from "../../__tests__/factories";
-import { expandFormFromDb } from "../form-converter";
+import { expandFormFromDb } from "../converter";
 
 describe("expandFormFromDb", () => {
   it("should expand normal form from db", async () => {
@@ -17,13 +17,7 @@ describe("expandFormFromDb", () => {
       isImportedFromPaper: false,
       emitter: {
         type: form.emitterType,
-        workSite: {
-          name: "",
-          address: "",
-          city: "",
-          postalCode: "",
-          infos: ""
-        },
+        workSite: null,
         pickupSite: null,
         company: {
           name: form.emitterCompanyName,
@@ -85,32 +79,8 @@ describe("expandFormFromDb", () => {
         landIdentifiers: [],
         parcelNumbers: []
       },
-      trader: {
-        company: {
-          name: "",
-          siret: "",
-          address: "",
-          contact: "",
-          phone: "",
-          mail: ""
-        },
-        receipt: "",
-        department: "",
-        validityLimit: null
-      },
-      broker: {
-        company: {
-          name: "",
-          siret: "",
-          address: "",
-          contact: "",
-          phone: "",
-          mail: ""
-        },
-        receipt: null,
-        department: null,
-        validityLimit: null
-      },
+      trader: null,
+      broker: null,
       intermediaries: [],
       ecoOrganisme: null,
       createdAt: form.createdAt,

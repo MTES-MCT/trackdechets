@@ -394,7 +394,8 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
       <div className="form__row">
         {values.intermediaries?.length ? (
           <h4 className="form__section-heading">
-            Autre type d'intermédiaire
+            Autre{values.intermediaries?.length > 1 ? "s" : ""} type
+            {values.intermediaries?.length > 1 ? "s" : ""} d'intermédiaire
             {values.intermediaries?.length > 1 ? "s" : ""}
           </h4>
         ) : (

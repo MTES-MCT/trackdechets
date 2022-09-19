@@ -1,6 +1,6 @@
 import { Bsda, Prisma } from "@prisma/client";
 import { LogMetadata, RepositoryFnDeps } from "../../../forms/repository/types";
-import { addBsdaToIndexQueue } from "../../elastic";
+import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
 
 export type UpdateBsdaFn = (
   where: Prisma.BsdaWhereUniqueInput,
@@ -37,7 +37,7 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
       });
     }
 
-    prisma.addAfterCommitCallback(() => addBsdaToIndexQueue(bsda));
+    prisma.addAfterCommitCallback(() => enqueueBsdToIndex(bsda.id));
 
     return bsda;
   };

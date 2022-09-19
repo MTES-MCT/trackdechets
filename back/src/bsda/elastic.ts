@@ -1,6 +1,5 @@
 import { Bsda, BsdaStatus } from "@prisma/client";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
-import { addToIndexQueue } from "../queue/producers/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { getReadonlyBsdaRepository } from "./repository";
@@ -153,7 +152,8 @@ export function toBsdElastic(bsda: Bsda): BsdElastic {
     wasteDescription: bsda.wasteMaterialName,
     ...where,
     sirets: Object.values(where).flat(),
-    ...getRegistryFields(bsda)
+    ...getRegistryFields(bsda),
+    rawBsd: bsda
   };
 }
 
@@ -161,14 +161,19 @@ export async function indexAllBsdas(
   idx: string,
   { skip = 0 }: { skip?: number } = {}
 ) {
-  const take = 500;
+  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
   const bsdas = await getReadonlyBsdaRepository().findMany(
     {
       isDeleted: false
     },
+
     {
       skip,
-      take
+      take,
+      include: {
+        forwardedIn: { select: { id: true } },
+        groupedIn: { select: { id: true } }
+      }
     }
   );
 
@@ -186,10 +191,6 @@ export async function indexAllBsdas(
   }
 
   return indexAllBsdas(idx, { skip: skip + take });
-}
-
-export function addBsdaToIndexQueue(bsda: Bsda) {
-  return addToIndexQueue(toBsdElastic(bsda));
 }
 
 export function indexBsda(bsda: Bsda, ctx?: GraphQLContext) {

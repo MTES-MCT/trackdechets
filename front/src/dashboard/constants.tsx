@@ -8,6 +8,7 @@ export const statusLabels: { [key: string]: string } = {
   ACCEPTED: "Accepté, en attente de traitement",
   PROCESSED: "Traité",
   AWAITING_GROUP: "En attente de regroupement",
+  FOLLOWED_WITH_PNTTD: "Suivi via PNTTD",
   GROUPED: "Annexé à un bordereau de regroupement",
   NO_TRACEABILITY: "Regroupé, avec autorisation de rupture de traçabilité",
   REFUSED: "Refusé",
@@ -20,6 +21,8 @@ export const statusLabels: { [key: string]: string } = {
   SIGNED_BY_PRODUCER: "Signé par l'émetteur",
   SIGNED_BY_EMITTER: "Signé par l'émetteur",
   SIGNED_BY_TEMP_STORER: "Signé par l'installation d'entreposage provisoire",
+  SIGNED_BY_WORKER: "Signé par l'entreprise de travaux",
+  AWAITING_CHILD: "En attente ou associé à un BSD suite",
 };
 
 export const ITEMS_PER_PAGE = 50;

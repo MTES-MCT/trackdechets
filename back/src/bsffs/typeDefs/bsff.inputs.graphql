@@ -149,7 +149,9 @@ input BsffTransporterRecepisseInput {
 input BsffTransporterTransportInput {
   "Date de prise en charge"
   takenOverAt: DateTime
-  mode: TransportMode!
+  mode: TransportMode
+  "Plaque(s) d'immatriculation - maximum 2"
+  plates: [String!]
 }
 
 input BsffDestinationInput {

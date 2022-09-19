@@ -130,7 +130,11 @@ const updateSynthesisBsdasri = async ({
 
   const updatedDasri = await prisma.bsdasri.update({
     where: { id },
-    data: { ...flattenedArgs, ...synthesizingArgs }
+    data: { ...flattenedArgs, ...synthesizingArgs },
+    include: {
+      grouping: { select: { id: true } },
+      synthesizing: { select: { id: true } }
+    }
   });
 
   const expandedDasri = expandBsdasriFromDB(updatedDasri);

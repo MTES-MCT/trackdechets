@@ -114,7 +114,7 @@
   flex-direction: column;
   justify-content: flex-end;
   padding-bottom: 100px;
-  margin-top: auto;
+  margin: auto 0 0;
 
   @include desktop {
     height: 100px;
@@ -136,6 +136,7 @@
   margin-left: 0.25rem;
   align-items: center;
   border-bottom: 1px solid $grey-light;
+  padding-bottom: 0;
   &NoBorder {
     border-bottom: none;
   }
@@ -160,6 +161,10 @@
   align-items: center;
   span {
     margin-left: 1rem;
+  }
+
+  &:after {
+    display: none !important;
   }
 
   @include desktop {

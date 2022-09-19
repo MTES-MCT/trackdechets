@@ -53,9 +53,11 @@ const buildUpdateAppendix2Forms: (
         groupementForms.reduce(
           (acc, form) =>
             acc &&
-            [Status.PROCESSED, Status.NO_TRACEABILITY].includes(
-              form.status as any
-            ),
+            [
+              Status.PROCESSED,
+              Status.NO_TRACEABILITY,
+              Status.FOLLOWED_WITH_PNTTD
+            ].includes(form.status as any),
           true
         );
 

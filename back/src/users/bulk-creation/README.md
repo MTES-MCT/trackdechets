@@ -28,7 +28,6 @@ La démarche est la suivante :
    node ./dist/src/users/bulk-creation/index.js --validateOnly --csvDir=/tmp/
    ```
    Note : le flag `--validateOnly` permet de faire une simple vérification sans créer les comptes.
-   Note : en cas de problème avec un service de recherche d'établissement par SIRET, `--sireneProvider=social.gouv` permet d'utiliser un autre server que le service par défaut `entreprise.data.gouv.fr`
    Relancez la commande sans ce flag pour créer les comptes.
 
 Pour plus de détails sur l'exécution de tâches dans une application Scalingo, voir :

@@ -13,9 +13,10 @@ type Props = {
   company: CompanyPrivate;
 };
 
-AccountFielCompanyGerepId.fragments = {
+AccountFieldCompanyGerepId.fragments = {
   company: gql`
     fragment AccountFieldCompanyGerepIdFragment on CompanyPrivate {
+      id
       siret
       gerepId
       userRole
@@ -24,8 +25,8 @@ AccountFielCompanyGerepId.fragments = {
 };
 
 const UPDATE_GEREP_ID = gql`
-  mutation UpdateCompany($siret: String!, $gerepId: String) {
-    updateCompany(siret: $siret, gerepId: $gerepId) {
+  mutation UpdateCompany($id: String!, $gerepId: String) {
+    updateCompany(id: $id, gerepId: $gerepId) {
       id
       siret
       gerepId
@@ -33,7 +34,7 @@ const UPDATE_GEREP_ID = gql`
   }
 `;
 
-export default function AccountFielCompanyGerepId({ company }: Props) {
+export default function AccountFieldCompanyGerepId({ company }: Props) {
   return (
     <>
       {company.userRole === UserRole.Admin ? (
@@ -48,7 +49,7 @@ export default function AccountFielCompanyGerepId({ company }: Props) {
               value={company.gerepId}
               placeHolder="Identifiant GEREP"
               mutation={UPDATE_GEREP_ID}
-              mutationArgs={{ siret: company.siret }}
+              mutationArgs={{ id: company.id }}
               toggleEdition={() => {
                 toggleEdition();
               }}

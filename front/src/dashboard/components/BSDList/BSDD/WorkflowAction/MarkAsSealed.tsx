@@ -24,7 +24,7 @@ const MARK_AS_SEALED = gql`
   ${statusChangeFragment}
 `;
 
-export default function MarkAsSealed({ form, siret }: WorkflowActionProps) {
+export default function MarkAsSealed({ form }: WorkflowActionProps) {
   const [markAsSealed, { loading, error }] = useMutation<
     Pick<Mutation, "markAsSealed">,
     MutationMarkAsSealedArgs

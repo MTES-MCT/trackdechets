@@ -22,6 +22,7 @@ export function toBsdElastic(
       bsff.transporterTransportTakenOverAt?.getTime() ??
       bsff.transporterTransportSignatureDate?.getTime(),
     transporterCustomInfo: bsff.transporterCustomInfo ?? "",
+    transporterNumberPlate: bsff.transporterTransportPlates ?? [],
     destinationCompanyName: bsff.destinationCompanyName ?? "",
     destinationCompanySiret: bsff.destinationCompanySiret ?? "",
     destinationReceptionDate: bsff.destinationReceptionDate?.getTime(),
@@ -42,7 +43,13 @@ export function toBsdElastic(
       bsff.transporterCompanySiret,
       bsff.destinationCompanySiret
     ],
-    ...getRegistryFields(bsff)
+    ...getRegistryFields(bsff),
+    rawBsd: {
+      ...bsff,
+      packagings: bsff.packagings.map(packaging => ({
+        numero: packaging.numero
+      }))
+    }
   };
 
   if (bsff.isDraft) {
@@ -112,7 +119,7 @@ export async function indexAllBsffs(
   idx: string,
   { skip = 0 }: { skip?: number } = {}
 ) {
-  const take = 500;
+  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
   const bsffs = await prisma.bsff.findMany({
     skip,
     take,

@@ -288,6 +288,7 @@ export function toAllWaste(bsvhu: Bsvhu): AllWaste {
     transporterCompanyName: bsvhu.transporterCompanyName,
     transporterCompanySiret: bsvhu.transporterCompanySiret,
     transporterRecepisseNumber: bsvhu.transporterRecepisseNumber,
+    transporterNumberPlates: bsvhu.transporterTransportPlates,
     weight: bsvhu.weightValue ? bsvhu.weightValue / 1000 : bsvhu.weightValue,
     managedEndDate: null,
     managedStartDate: null,

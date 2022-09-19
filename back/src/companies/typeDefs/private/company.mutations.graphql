@@ -10,8 +10,8 @@ type Mutation {
   Édite les informations d'un établissement
   """
   updateCompany(
-    "SIRET de l'établissement"
-    siret: String!
+    "ID de l'établissement"
+    id: String!
     "Identifiant GEREP"
     gerepId: String
     "Prénom et nom du contact dans l'entreprise"
