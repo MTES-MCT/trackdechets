@@ -13,9 +13,10 @@ type Props = {
   company: CompanyPrivate;
 };
 
-AccountFielCompanyGerepId.fragments = {
+AccountFieldCompanyGerepId.fragments = {
   company: gql`
     fragment AccountFieldCompanyGerepIdFragment on CompanyPrivate {
+      id
       siret
       gerepId
       userRole
@@ -33,7 +34,7 @@ const UPDATE_GEREP_ID = gql`
   }
 `;
 
-export default function AccountFielCompanyGerepId({ company }: Props) {
+export default function AccountFieldCompanyGerepId({ company }: Props) {
   return (
     <>
       {company.userRole === UserRole.Admin ? (

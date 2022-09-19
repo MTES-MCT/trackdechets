@@ -13,9 +13,10 @@ type Props = {
   company: CompanyPrivate;
 };
 
-AccountFielCompanyGivenName.fragments = {
+AccountFieldCompanyGivenName.fragments = {
   company: gql`
     fragment AccountFieldCompanyGivenNameFragment on CompanyPrivate {
+      id
       siret
       givenName
       userRole
@@ -36,7 +37,7 @@ const UPDATE_GIVEN_NAME = gql`
 export const tooltip =
   "Nom usuel de l'établissement qui permet de différencier plusieurs établissements ayant le même nom dans le sélecteur de Mon espace";
 
-export default function AccountFielCompanyGivenName({ company }: Props) {
+export default function AccountFieldCompanyGivenName({ company }: Props) {
   return (
     <>
       {company.userRole === UserRole.Admin ? (
