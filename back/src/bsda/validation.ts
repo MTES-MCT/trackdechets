@@ -15,7 +15,7 @@ import {
   isSiret,
   isFRVat
 } from "../common/constants/companySearchHelpers";
-import { FactorySchemaOf } from "../common/yup/configureYup";
+import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
   isCollector,
   isTransporter,
@@ -34,6 +34,8 @@ import {
 } from "../forms/errors";
 import { BsdaConsistence } from "../generated/graphql/types";
 import prisma from "../prisma";
+
+configureYup();
 
 const { VERIFY_COMPANY } = process.env;
 export const PARTIAL_OPERATIONS = ["R 13", "D 15"];

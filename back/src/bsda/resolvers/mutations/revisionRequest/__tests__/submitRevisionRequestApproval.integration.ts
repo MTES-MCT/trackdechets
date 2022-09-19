@@ -343,4 +343,130 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
 
     expect(updatedBsda.wasteCode).not.toBe("01 03 08");
   });
+
+  it("should change the bsda status if the bsda is PROCESSED and the new operation code implies a next bsda", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        status: "PROCESSED",
+        destinationOperationCode: "R 5"
+      }
+    });
+
+    const revisionRequest = await prisma.bsdaRevisionRequest.create({
+      data: {
+        bsdaId: bsda.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret } },
+        destinationOperationCode: "R 13",
+        comment: "Operation code error"
+      }
+    });
+
+    await mutate<
+      Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+      MutationSubmitBsdaRevisionRequestApprovalArgs
+    >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    const updatedBsda = await prisma.bsda.findUnique({
+      where: { id: bsda.id }
+    });
+
+    expect(updatedBsda.status).toBe("AWAITING_CHILD");
+  });
+
+  it("should change the bsda status if the bsda is AWAITING_CHILD and the new operation code does not imply a next bsda", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        status: "AWAITING_CHILD",
+        destinationOperationCode: "R 13"
+      }
+    });
+
+    const revisionRequest = await prisma.bsdaRevisionRequest.create({
+      data: {
+        bsdaId: bsda.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret } },
+        destinationOperationCode: "R 5",
+        comment: "Operation code error"
+      }
+    });
+
+    await mutate<
+      Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+      MutationSubmitBsdaRevisionRequestApprovalArgs
+    >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    const updatedBsda = await prisma.bsda.findUnique({
+      where: { id: bsda.id }
+    });
+
+    expect(updatedBsda.status).toBe("PROCESSED");
+  });
+
+  it("should change not the bsda status if the new operation code implies a next bsda but the bsda is not PROCESSED", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        status: "SENT",
+        destinationOperationCode: "R 5"
+      }
+    });
+
+    const revisionRequest = await prisma.bsdaRevisionRequest.create({
+      data: {
+        bsdaId: bsda.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret } },
+        destinationOperationCode: "R 13",
+        comment: "Operation code error"
+      }
+    });
+
+    await mutate<
+      Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+      MutationSubmitBsdaRevisionRequestApprovalArgs
+    >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    const updatedBsda = await prisma.bsda.findUnique({
+      where: { id: bsda.id }
+    });
+
+    expect(updatedBsda.status).toBe("SENT");
+  });
 });

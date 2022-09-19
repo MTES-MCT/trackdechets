@@ -1,6 +1,6 @@
 import {
   BsdaRevisionRequest,
-  Prisma,
+  BsdaStatus,
   RevisionRequestApprovalStatus,
   RevisionRequestStatus
 } from "@prisma/client";
@@ -10,6 +10,7 @@ import {
   RepositoryFnDeps
 } from "../../../forms/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { PARTIAL_OPERATIONS } from "../../validation";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -70,7 +71,10 @@ export function buildAcceptRevisionRequestApproval(
   };
 }
 
-function getUpdateFromRevisionRequest(revisionRequest: BsdaRevisionRequest) {
+async function getUpdateFromRevisionRequest(
+  revisionRequest: BsdaRevisionRequest,
+  prisma: PrismaTransaction
+) {
   const {
     bsdaId,
     comment,
@@ -82,17 +86,54 @@ function getUpdateFromRevisionRequest(revisionRequest: BsdaRevisionRequest) {
     ...bsdaUpdate
   } = revisionRequest;
 
-  function removeEmpty(obj) {
-    const cleanedObject = Object.fromEntries(
-      Object.entries(obj).filter(
-        ([_, v]) => v != null && (Array.isArray(v) ? v.length > 0 : true)
-      )
-    );
+  const { status: currentStatus } = await prisma.bsda.findUnique({
+    where: { id: bsdaId },
+    select: { status: true }
+  });
+  const newStatus = getNewStatus(
+    currentStatus,
+    bsdaUpdate.destinationOperationCode
+  );
 
-    return Object.keys(cleanedObject).length === 0 ? null : cleanedObject;
+  return removeEmpty({
+    ...bsdaUpdate,
+    status: newStatus,
+    brokerRecepisseValidityLimit:
+      bsdaUpdate.brokerRecepisseValidityLimit?.toISOString()
+  });
+}
+
+function getNewStatus(
+  status: BsdaStatus,
+  newOperationCode: string | null
+): BsdaStatus {
+  if (
+    status === BsdaStatus.PROCESSED &&
+    PARTIAL_OPERATIONS.includes(newOperationCode)
+  ) {
+    return BsdaStatus.AWAITING_CHILD;
   }
 
-  return removeEmpty(bsdaUpdate);
+  if (
+    status === BsdaStatus.AWAITING_CHILD &&
+    !PARTIAL_OPERATIONS.includes(newOperationCode)
+  ) {
+    return BsdaStatus.PROCESSED;
+  }
+
+  return status;
+}
+
+function removeEmpty<T>(obj: T): Partial<T> {
+  const cleanedObject = Object.fromEntries(
+    Object.entries(obj).filter(
+      ([_, v]) => v != null && (Array.isArray(v) ? v.length > 0 : true)
+    )
+  );
+
+  return Object.keys(cleanedObject).length === 0
+    ? null
+    : (cleanedObject as Partial<T>);
 }
 
 export async function approveAndApplyRevisionRequest(
@@ -110,7 +151,11 @@ export async function approveAndApplyRevisionRequest(
     data: { status: RevisionRequestStatus.ACCEPTED }
   });
 
-  const updateData = getUpdateFromRevisionRequest(updatedRevisionRequest);
+  const updateData = await getUpdateFromRevisionRequest(
+    updatedRevisionRequest,
+    prisma
+  );
+
   await prisma.bsda.update({
     where: { id: updatedRevisionRequest.bsdaId },
     data: updateData
@@ -124,7 +169,7 @@ export async function approveAndApplyRevisionRequest(
       data: {
         content: updateData,
         revisionRequestId: updatedRevisionRequest.id
-      } as Prisma.InputJsonObject,
+      },
       metadata: { ...logMetadata, authType: user.auth }
     }
   });
