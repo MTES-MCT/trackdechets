@@ -14,7 +14,8 @@ export function Emitter({ disabled }) {
   if (isBsdaSuite && !values.emitter?.company?.siret) {
     return (
       <div className="notification notification--error">
-        Sélectionnez les bordereaux à associer avant de compléter l'émetteur.
+        Veuillez sélectionner les bordereaux à associer avant de compléter
+        l'émetteur.
       </div>
     );
   }
