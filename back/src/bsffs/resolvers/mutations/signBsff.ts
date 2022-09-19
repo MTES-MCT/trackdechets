@@ -1,9 +1,4 @@
-import {
-  BsffStatus,
-  Bsff,
-  WasteAcceptationStatus,
-  BsffPackaging
-} from "@prisma/client";
+import { BsffStatus, Bsff, BsffPackaging } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -13,15 +8,19 @@ import {
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import {
+  validateAfterReception,
+  validateBeforeAcceptation,
   validateBeforeEmission,
   validateBeforeOperation,
   validateBeforeReception,
   validateBeforeTransport
 } from "../../validation";
 import { expandBsffFromDB } from "../../converter";
-import { getBsffHistory, getBsffOrNotFound } from "../../database";
+import { getBsffOrNotFound, getPreviousPackagings } from "../../database";
 import { indexBsff } from "../../elastic";
-import { OPERATION } from "../../constants";
+import { isFinalOperation } from "../../constants";
+import { getStatus } from "../../compat";
+import { runInTransaction } from "../../../common/repository/helper";
 
 async function checkIsAllowed(
   siret: string | null,
@@ -69,119 +68,235 @@ const signatures: Record<
     existingBsff: Bsff & { packagings: BsffPackaging[] }
   ) => Promise<Bsff>
 > = {
-  EMISSION: async ({ id, signature, securityCode }, user, existingBsff) => {
+  EMISSION: async (
+    { id, input: { date, author, securityCode } },
+    user,
+    existingBsff
+  ) => {
     await checkIsAllowed(existingBsff.emitterCompanySiret, user, securityCode);
-    await validateBeforeEmission(existingBsff);
+    await validateBeforeEmission(existingBsff as any);
 
     return prisma.bsff.update({
       data: {
         status: BsffStatus.SIGNED_BY_EMITTER,
-        emitterEmissionSignatureDate: signature.date,
-        emitterEmissionSignatureAuthor: signature.author
+        emitterEmissionSignatureDate: date,
+        emitterEmissionSignatureAuthor: author
       },
       where: {
         id
       }
     });
   },
-  TRANSPORT: async ({ id, signature, securityCode }, user, existingBsff) => {
+  TRANSPORT: async (
+    { id, input: { date, author, securityCode } },
+    user,
+    existingBsff
+  ) => {
     await checkIsAllowed(
       existingBsff.transporterCompanySiret,
       user,
       securityCode
     );
-    const packagings = await prisma.bsff
-      .findUnique({ where: { id: existingBsff.id } })
-      .packagings();
-    await validateBeforeTransport({ ...existingBsff, packagings });
+
+    await validateBeforeTransport(existingBsff as any);
 
     return prisma.bsff.update({
       data: {
         status: BsffStatus.SENT,
-        transporterTransportSignatureDate: signature.date,
-        transporterTransportSignatureAuthor: signature.author
+        transporterTransportSignatureDate: date,
+        transporterTransportSignatureAuthor: author
       },
       where: {
         id
       }
     });
   },
-  RECEPTION: async ({ id, signature, securityCode }, user, existingBsff) => {
+  RECEPTION: async (
+    { id, input: { date, author, securityCode } },
+    user,
+    existingBsff
+  ) => {
     await checkIsAllowed(
       existingBsff.destinationCompanySiret,
       user,
       securityCode
     );
-    await validateBeforeReception(existingBsff);
+    await validateBeforeReception(existingBsff as any);
 
     return prisma.bsff.update({
       data: {
-        status:
-          existingBsff.destinationReceptionAcceptationStatus ===
-          WasteAcceptationStatus.ACCEPTED
-            ? BsffStatus.RECEIVED
-            : BsffStatus.REFUSED,
-        destinationReceptionSignatureDate: signature.date,
-        destinationReceptionSignatureAuthor: signature.author
+        status: BsffStatus.RECEIVED,
+        destinationReceptionSignatureDate: date,
+        destinationReceptionSignatureAuthor: author
       },
       where: {
         id
       }
     });
   },
-  OPERATION: async ({ id, signature, securityCode }, user, existingBsff) => {
+  ACCEPTATION: async (
+    { id, input: { date, author, securityCode, packagingId } },
+    user,
+    existingBsff
+  ) => {
     await checkIsAllowed(
       existingBsff.destinationCompanySiret,
       user,
       securityCode
     );
-    await validateBeforeOperation(existingBsff);
 
-    const status =
-      OPERATION[existingBsff.destinationOperationCode].successors.length > 0
-        ? BsffStatus.INTERMEDIATELY_PROCESSED
-        : BsffStatus.PROCESSED;
+    await validateAfterReception(existingBsff as any);
 
-    const previousBsffsIds = (await getBsffHistory(existingBsff)).map(
-      bsff => bsff.id
+    return runInTransaction(async transaction => {
+      if (packagingId) {
+        const packaging = existingBsff.packagings.find(
+          p => p.id === packagingId
+        );
+        if (!packaging) {
+          throw new UserInputError(
+            `Le contenant ${packagingId} n'apparait pas sur le BSFF n°${id}`
+          );
+        }
+
+        await validateBeforeAcceptation(packaging);
+
+        await transaction.bsffPackaging.update({
+          where: { id: packagingId },
+          data: {
+            acceptationSignatureDate: date,
+            acceptationSignatureAuthor: author
+          }
+        });
+      } else {
+        await Promise.all(
+          existingBsff.packagings.map(p => validateBeforeAcceptation(p))
+        );
+
+        // sign for all packagings
+        await transaction.bsffPackaging.updateMany({
+          where: { bsffId: id },
+          data: {
+            acceptationSignatureDate: date,
+            acceptationSignatureAuthor: author
+          }
+        });
+      }
+
+      const packagings = await transaction.bsff
+        .findUnique({
+          where: { id }
+        })
+        .packagings();
+
+      const status = await getStatus({ ...existingBsff, packagings });
+
+      return transaction.bsff.update({
+        where: { id },
+        data: { status }
+      });
+    });
+  },
+  OPERATION: async (
+    { id, input: { date, author, securityCode, packagingId } },
+    user,
+    existingBsff
+  ) => {
+    await checkIsAllowed(
+      existingBsff.destinationCompanySiret,
+      user,
+      securityCode
     );
+    await validateAfterReception(existingBsff as any);
 
-    if (status === BsffStatus.PROCESSED && previousBsffsIds.length > 0) {
-      await prisma.bsff.updateMany({
-        data: {
-          status: BsffStatus.PROCESSED
-        },
-        where: {
-          id: { in: previousBsffsIds }
+    const updatedBsff = await runInTransaction(async transaction => {
+      if (packagingId) {
+        const packaging = existingBsff.packagings.find(
+          p => p.id === packagingId
+        );
+        if (!packaging) {
+          throw new UserInputError(
+            `Le contenant ${packagingId} n'apparait pas sur le BSFF n°${id}`
+          );
+        }
+
+        await validateBeforeOperation(packaging);
+
+        await transaction.bsffPackaging.update({
+          where: { id: packagingId },
+          data: {
+            operationSignatureDate: date,
+            operationSignatureAuthor: author
+          }
+        });
+      } else {
+        await Promise.all(
+          existingBsff.packagings.map(p => validateBeforeOperation(p))
+        );
+        // sign for all packagings
+        await transaction.bsffPackaging.updateMany({
+          where: { bsffId: id },
+          data: {
+            operationSignatureDate: date,
+            operationSignatureAuthor: author
+          }
+        });
+      }
+
+      const packagings = await transaction.bsff
+        .findUnique({
+          where: { id }
+        })
+        .packagings({ include: { previousPackagings: true } });
+
+      const status = await getStatus({ ...existingBsff, packagings });
+
+      return transaction.bsff.update({
+        where: { id },
+        data: { status },
+        include: {
+          packagings: { include: { previousPackagings: true } }
         }
       });
-      const updatedBsffs = await prisma.bsff.findMany({
-        where: { id: { in: previousBsffsIds } }
-      });
-      await Promise.all(updatedBsffs.map(bsff => indexBsff(bsff)));
-    }
-
-    return prisma.bsff.update({
-      data: {
-        status,
-        destinationOperationSignatureDate: signature.date,
-        destinationOperationSignatureAuthor: signature.author
-      },
-      where: {
-        id
-      }
     });
+
+    // update status of previous bsffs
+    // TODO this should be done in the same transaction
+
+    const finalOperationPackagings = updatedBsff.packagings.filter(p =>
+      isFinalOperation(p.operationCode, p.operationNoTraceability)
+    );
+
+    const previousPackagings = await getPreviousPackagings(
+      finalOperationPackagings.map(p => p.id)
+    );
+
+    const bsffs = await prisma.bsff.findMany({
+      where: { id: { in: previousPackagings.map(p => p.bsffId) } },
+      include: { packagings: true }
+    });
+
+    await Promise.all(
+      bsffs.map(async bsff => {
+        const newStatus = await getStatus(bsff);
+        if (newStatus !== bsff.status) {
+          return prisma.bsff.update({
+            where: { id: bsff.id },
+            data: { status: newStatus }
+          });
+        }
+        return bsff;
+      })
+    );
+
+    return updatedBsff;
   }
 };
 
 const signBsff: MutationResolvers["signBsff"] = async (_, args, context) => {
   const user = checkIsAuthenticated(context);
   const existingBsff = await getBsffOrNotFound({ id: args.id });
-  const packagings = await prisma.bsff
-    .findUnique({ where: { id: existingBsff.id } })
-    .packagings();
-  const sign = signatures[args.type];
-  const updatedBsff = await sign(args, user, { ...existingBsff, packagings });
+  const sign = signatures[args.input.type];
+  const updatedBsff = await sign(args, user, existingBsff);
 
   await indexBsff(updatedBsff, context);
 

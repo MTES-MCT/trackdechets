@@ -64,6 +64,36 @@ export const fullBsff = gql`
       volume
       numero
       weight
+      acceptation {
+        weight
+        status
+        refusalReason
+        wasteCode
+        wasteDescription
+        signature {
+          date
+          author
+        }
+      }
+      operation {
+        code
+        noTraceability
+        nextDestination {
+          company {
+            siret
+            name
+            address
+            country
+            contact
+            phone
+            mail
+          }
+        }
+        signature {
+          date
+          author
+        }
+      }
     }
     waste {
       code
@@ -113,58 +143,14 @@ export const fullBsff = gql`
       plannedOperationCode
       reception {
         date
-        weight
-        acceptation {
-          status
-          refusalReason
-        }
         signature {
           date
           author
-        }
-      }
-      operation {
-        code
-        nextDestination {
-          company {
-            siret
-            name
-            address
-            country
-            contact
-            phone
-            mail
-          }
-        }
-        signature {
-          author
-          date
         }
       }
     }
     ficheInterventions {
       ...FullFicheIntervention
-    }
-    forwarding {
-      id
-    }
-    forwardedIn {
-      id
-    }
-    repackaging {
-      id
-    }
-    repackagedIn {
-      id
-    }
-    grouping {
-      id
-      ficheInterventions {
-        ...FullFicheIntervention
-      }
-    }
-    groupedIn {
-      id
     }
   }
   ${fullFicheIntervention}

@@ -18,4 +18,27 @@ type Query {
     "Filtre les résultats d'après certains critères."
     where: BsffWhere
   ): BsffConnection!
+
+  """
+  Retourne tous les contenants qui apparaissent sur un BSFF visant un des établissements
+  de l'utilisateur connecté, en respectant les différents filtres
+  """
+  bsffPackagings(
+    "Retourne les bordereaux après celui qui correspond à l'identifiant donné."
+    after: ID
+    "Retourne les bordereaux avant celui qui correspond à l'identifiant donné."
+    before: ID
+    "Retourne les x premiers bordereaux."
+    first: Int
+    "Retourne les x derniers bordereaux."
+    last: Int
+    "Filtre les résultats d'après certains critères."
+    where: BsffPackagingWhere
+  ): BsffPackagingConnection!
+
+  """
+  Renvoie les informations sur un contenant ainsi que sur la traçabilité
+  du contenu (BSFFs antérieurs et BSFFs ultérieurs dans la chaîne de traçabilité)
+  """
+  bsffPackaging(id: ID!): BsffPackaging!
 }

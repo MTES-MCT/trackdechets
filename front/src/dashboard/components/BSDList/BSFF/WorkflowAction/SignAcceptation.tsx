@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useMutation, useQuery } from "@apollo/client";
-import { Formik, Form, Field, useFormikContext } from "formik";
+import { Formik, Form, Field } from "formik";
 import * as yup from "yup";
 import {
   BsffSignatureType,
@@ -8,20 +8,17 @@ import {
   MutationSignBsffArgs,
   BsffPackaging,
   MutationUpdateBsffPackagingArgs,
+  WasteAcceptationStatus,
   Bsff,
   Query,
   QueryBsffArgs,
-  BsffOperationCode,
-  WasteAcceptationStatus,
-  BsffType,
-  BsffPackagingOperationInput,
-  SignatureInput,
 } from "generated/graphql/types";
 import {
   ActionButton,
   Loader,
   Modal,
   RedErrorMessage,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -37,56 +34,77 @@ import {
   UPDATE_BSFF_PACKAGING,
 } from "form/bsff/utils/queries";
 import { GET_BSDS } from "common/queries";
+import NumberInput from "form/common/components/custom-inputs/NumberInput";
+import { BSFF_WASTES } from "generated/constants";
 import { Column, useFilters, useTable } from "react-table";
 import { IconCheckCircle1 } from "common/components/Icons";
 import { BsffWasteSummary } from "./BsffWasteSummary";
 import { BsffSummary } from "./BsffSummary";
+import TdTooltip from "common/components/Tooltip";
 import { formatDate } from "common/datetime";
 import { BsffPackagingSummary } from "./BsffPackagingSummary";
-import { OPERATION } from "form/bsff/utils/constants";
-import CompanySelector from "form/common/components/company/CompanySelector";
 
 const validationSchema = yup.object({
-  code: yup
+  analysisWasteCode: yup.string().required(),
+  analysisWasteDescription: yup.string().required(),
+  acceptationDate: yup.date().required(),
+  acceptationStatus: yup
     .string()
-    .oneOf(
-      Object.keys(OPERATION),
-      "Le code de traitement doit faire partie de la liste reconnue"
-    )
-    .required(),
-  description: yup.string().ensure().required(),
-  date: yup.date().required(),
-  author: yup
+    .oneOf([
+      "",
+      null,
+      WasteAcceptationStatus.Accepted,
+      WasteAcceptationStatus.Refused,
+    ]),
+  acceptationWeight: yup
+    .number()
+    .required()
+    .when("acceptationStatus", {
+      is: value => value === WasteAcceptationStatus.Refused,
+      then: schema =>
+        schema.max(0, "La quantité reçue doit être égale à 0 en cas de refus"),
+      otherwise: schema =>
+        schema.moreThan(0, "Vous devez saisir une quantité supérieure à 0"),
+    }),
+  acceptationRefusalReason: yup.string().when("acceptationStatus", {
+    is: value => value === WasteAcceptationStatus.Refused,
+    then: schema =>
+      schema
+        .ensure()
+        .min(1, "Le motif du refus doit être complété en cas de refus"),
+    otherwise: schema => schema.nullable(),
+  }),
+  signatureAuthor: yup
     .string()
     .ensure()
     .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
 });
 
-interface SignBsffOperationProps {
+interface SignBsffAcceptationProps {
   bsffId: string;
   packagingsCount: number;
 }
 
-export function SignBsffOperation({
+export function SignBsffAcceptation({
   bsffId,
   packagingsCount,
-}: SignBsffOperationProps) {
+}: SignBsffAcceptationProps) {
   if (packagingsCount === 1) {
-    return SignBsffOperationOnePackaging({ bsffId });
+    return SignBsffAcceptationOnePackaging({ bsffId });
   }
   if (packagingsCount > 1) {
-    return SignBsffOperationMultiplePackagings({ bsffId });
+    return SignBsffAcceptationMultiplePackagings({ bsffId });
   }
   return null;
 }
 
 /**
- * Bouton d'action permettant de signer l'opération d'un BSFF
+ * Bouton d'action permettant de signer l'acceptation d'un BSFF
  * avec un seul contenant
  */
-function SignBsffOperationOnePackaging({
+function SignBsffAcceptationOnePackaging({
   bsffId,
-}: Pick<SignBsffOperationProps, "bsffId">) {
+}: Pick<SignBsffAcceptationProps, "bsffId">) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
@@ -95,10 +113,10 @@ function SignBsffOperationOnePackaging({
         icon={<IconCheckCircle1 size="24px" />}
         onClick={() => setIsOpen(true)}
       >
-        Signer l'opération
+        Signer l'acceptation
       </ActionButton>
       {isOpen && (
-        <SignBsffOperationOnePackagingModal
+        <SignBsffAcceptationOnePackagingModal
           bsffId={bsffId}
           onClose={() => setIsOpen(false)}
         />
@@ -108,12 +126,12 @@ function SignBsffOperationOnePackaging({
 }
 
 /**
- * Bouton d'action permettant de signer l'opération
+ * Bouton d'action permettant de signer l'acceptation
  * d'un BSFF avec plusieurs contenants
  */
-export function SignBsffOperationMultiplePackagings({
+export function SignBsffAcceptationMultiplePackagings({
   bsffId,
-}: Pick<SignBsffOperationProps, "bsffId">) {
+}: Pick<SignBsffAcceptationProps, "bsffId">) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
@@ -122,10 +140,10 @@ export function SignBsffOperationMultiplePackagings({
         icon={<IconCheckCircle1 size="24px" />}
         onClick={() => setIsOpen(true)}
       >
-        Signer l'opération des contenants
+        Signer l'acceptation des contenants
       </ActionButton>
       {isOpen && (
-        <SignBsffOperationMultiplePackagingsModal
+        <SignBsffAcceptationMultiplePackagingsModal
           bsffId={bsffId}
           onClose={() => setIsOpen(false)}
         />
@@ -134,10 +152,10 @@ export function SignBsffOperationMultiplePackagings({
   );
 }
 
-function SignBsffOperationOnePackagingModal({
+function SignBsffAcceptationOnePackagingModal({
   bsffId,
   onClose,
-}: SignBsffOperationMultiplePackagingsModalProps) {
+}: SignBsffAcceptationMultiplePackagingsModalProps) {
   const { data } = useQuery<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF_FORM, {
     variables: {
       id: bsffId,
@@ -151,10 +169,10 @@ function SignBsffOperationOnePackagingModal({
   const { bsff } = data;
 
   return (
-    <Modal onClose={onClose} ariaLabel="Signer l'opération" isOpen>
-      <h2 className="td-modal-title">Signer l'opération</h2>
+    <Modal onClose={onClose} ariaLabel="Signer l'acceptation" isOpen>
+      <h2 className="td-modal-title">Signer l'acceptation</h2>
       <BsffSummary bsff={bsff} />
-      <SignBsffOperationOnePackagingModalContent
+      <SignBsffAcceptationOnePackagingModalContent
         bsff={bsff}
         packaging={bsff.packagings[0]}
         onCancel={onClose}
@@ -163,106 +181,20 @@ function SignBsffOperationOnePackagingModal({
   );
 }
 
-interface SignBsffOperationOnePackagingModalContentProps {
+interface SignBsffAcceptationOnePackagingModalContentProps {
   bsff: Bsff;
   packaging: BsffPackaging;
   onCancel: () => void;
 }
 
-function NoTraceabilityField(props) {
-  const {
-    values: { code },
-    touched,
-    setFieldValue,
-  } = useFormikContext<BsffPackagingOperationInput>();
-
-  const isGroupement = OPERATION[code]?.successors.includes(
-    BsffType.Groupement
-  );
-
-  React.useEffect(() => {
-    if (!isGroupement) {
-      setFieldValue(props.name, false);
-    }
-  }, [isGroupement, touched.code, setFieldValue, props.name]);
-
-  return isGroupement ? (
-    <div className="form__row form__row--inline">
-      <Field
-        type="checkbox"
-        name={props.name}
-        id="id_noTraceability"
-        className="td-checkbox"
-      />
-
-      <label htmlFor="id_noTraceability">
-        {" "}
-        Rupture de traçabilité autorisée par arrêté préfectoral pour ce déchet -
-        la responsabilité du producteur du déchet est transférée
-      </label>
-    </div>
-  ) : null;
-}
-
-function NextDestinationField(props) {
-  const {
-    values: { code, noTraceability, nextDestination },
-    setFieldValue,
-  } = useFormikContext<BsffPackagingOperationInput>();
-
-  const hasNextDestination =
-    OPERATION[code]?.successors?.length > 0 && !noTraceability;
-
-  React.useEffect(() => {
-    if (!hasNextDestination) {
-      setFieldValue(props.name, null);
-    } else {
-      setFieldValue(props.name, {
-        plannedOperationCode: "",
-        company: {},
-      });
-    }
-  }, [hasNextDestination, props.name, setFieldValue]);
-
-  return hasNextDestination && nextDestination ? (
-    <div className="form__row">
-      <h4 className="h4">Destination ultérieure prévue</h4>
-      <div className="form__row">
-        <label>
-          Code de l'opération d'élimination ou valorisation prévue
-          <Field
-            as="select"
-            name="nextDestination.plannedOperationCode"
-            className="td-select"
-          >
-            <option />
-            {Object.values(OPERATION).map(operation => (
-              <option key={operation.code} value={operation.code}>
-                {operation.code} - {operation.description}
-              </option>
-            ))}
-          </Field>
-        </label>
-        <RedErrorMessage name="code" />
-      </div>
-      <CompanySelector
-        name="nextDestination.company"
-        allowForeignCompanies={true}
-        forceManualForeignCompanyForm={true}
-        skipFavorite={true}
-      />
-    </div>
-  ) : null;
-}
-
 /**
- * Contenu de la modale permettant de signer l'opération d'un contenant
+ * Contenu de la modale permettant de signer l'acceptation d'un contenant
  */
-function SignBsffOperationOnePackagingModalContent({
+function SignBsffAcceptationOnePackagingModalContent({
   bsff,
   packaging,
   onCancel,
-}: SignBsffOperationOnePackagingModalContentProps) {
+}: SignBsffAcceptationOnePackagingModalContentProps) {
   const [updateBsffPackaging, updateBsffPackagingResult] = useMutation<
     Pick<Mutation, "updateBsffPackaging">,
     MutationUpdateBsffPackagingArgs
@@ -277,19 +209,21 @@ function SignBsffOperationOnePackagingModalContent({
 
   return (
     <>
-      {bsff.packagings?.length > 1 && (
-        <BsffPackagingSummary bsff={bsff} packaging={packaging} />
-      )}
-      <Formik<BsffPackagingOperationInput & SignatureInput>
+      <BsffPackagingSummary bsff={bsff} packaging={packaging} />
+      <Formik
         initialValues={{
-          code:
-            bsff?.destination?.plannedOperationCode ??
-            ("" as BsffOperationCode),
-          description: "",
-          date: new Date().toISOString(),
-          noTraceability: false,
-          nextDestination: null,
-          author: "",
+          analysisWasteCode:
+            packaging?.acceptation?.wasteCode ?? bsff.waste?.code ?? "",
+          analysisWasteDescription:
+            packaging?.acceptation?.wasteDescription ??
+            bsff.waste?.description ??
+            "",
+          acceptationStatus: WasteAcceptationStatus.Accepted,
+          acceptationDate:
+            packaging.acceptation?.date ?? new Date().toISOString(),
+          acceptationWeight: 0,
+          acceptationRefusalReason: "",
+          signatureAuthor: "",
         }}
         validationSchema={validationSchema}
         onSubmit={async values => {
@@ -297,12 +231,13 @@ function SignBsffOperationOnePackagingModalContent({
             variables: {
               id: packaging.id,
               input: {
-                operation: {
-                  code: values.code,
-                  description: values.description,
-                  date: values.date,
-                  noTraceability: values.noTraceability,
-                  nextDestination: values.nextDestination,
+                acceptation: {
+                  wasteCode: values.analysisWasteCode,
+                  wasteDescription: values.analysisWasteDescription,
+                  date: values.acceptationDate,
+                  status: values.acceptationStatus,
+                  weight: values.acceptationWeight,
+                  refusalReason: values.acceptationRefusalReason,
                 },
               },
             },
@@ -311,8 +246,8 @@ function SignBsffOperationOnePackagingModalContent({
             variables: {
               id: bsff.id,
               input: {
-                type: BsffSignatureType.Operation,
-                author: values.author,
+                type: BsffSignatureType.Acceptation,
+                author: values.signatureAuthor,
                 date: new Date().toISOString(),
                 packagingId: packaging.id,
               },
@@ -325,51 +260,114 @@ function SignBsffOperationOnePackagingModalContent({
           <Form>
             <div className="form__row">
               <label>
-                Date du traitement
-                <Field className="td-input" name="date" component={DateInput} />
-              </label>
-              <RedErrorMessage name="date" />
-            </div>
-
-            <div className="form__row">
-              <label>
-                Code de traitement
-                <Field as="select" name="code" className="td-select">
+                Code déchet{" "}
+                <TdTooltip msg="Permet de spécifier le code déchet après une éventuelle analyse" />
+                <Field
+                  as="select"
+                  name="analysisWasteCode"
+                  className="td-select"
+                >
                   <option />
-                  {Object.values(OPERATION).map(operation => (
-                    <option key={operation.code} value={operation.code}>
-                      {operation.code} - {operation.description}
+                  {BSFF_WASTES.map(item => (
+                    <option value={item.code} key={item.code}>
+                      {item.code} - {item.description}
                     </option>
                   ))}
                 </Field>
               </label>
-              <RedErrorMessage name="code" />
+              <RedErrorMessage name="analysisWasteCode" />
             </div>
             <div className="form__row">
               <label>
-                Description de l'opération réalisée
-                <Field className="td-input" name="description" />
+                Description du fluide{" "}
+                <TdTooltip msg="Permet de spécifier la description du fluide après une éventuelle analyse" />
+                <Field className="td-input" name="analysisWasteDescription" />
               </label>
-              <RedErrorMessage name="description" />
+              <RedErrorMessage name="analysisWasteDescription" />
             </div>
-            <NoTraceabilityField name="noTraceability" />
-            <NextDestinationField name="nextDestination" />
+            <div className="form__row">
+              <label>
+                <Switch
+                  label="Le contenant a été refusé"
+                  onChange={checked =>
+                    setValues({
+                      ...values,
+                      acceptationStatus: checked
+                        ? WasteAcceptationStatus.Refused
+                        : WasteAcceptationStatus.Accepted,
+                      acceptationWeight: 0,
+                    })
+                  }
+                  checked={
+                    values.acceptationStatus === WasteAcceptationStatus.Refused
+                  }
+                />
+              </label>
+            </div>
+            <div className="form__row">
+              <label>
+                Date{" "}
+                {values.acceptationStatus === WasteAcceptationStatus.Accepted
+                  ? "de l'acceptation"
+                  : "du refus"}
+                <Field
+                  className="td-input"
+                  name="acceptationDate"
+                  component={DateInput}
+                />
+              </label>
+              <RedErrorMessage name="acceptationDate" />
+            </div>
+            <div className="form__row">
+              <label>
+                Quantité de déchet présenté (pour les installations
+                d'entreposage ou de reconditionnement, la quantité peut être
+                estimée)
+                <Field
+                  className="td-input"
+                  name="acceptationWeight"
+                  component={NumberInput}
+                  disabled={
+                    values.acceptationStatus === WasteAcceptationStatus.Refused
+                  }
+                />
+              </label>
+              <RedErrorMessage name="acceptationWeight" />
+            </div>
+
+            {values.acceptationStatus === WasteAcceptationStatus.Refused && (
+              <div className="form__row">
+                <label>
+                  <Field
+                    as="textarea"
+                    className="td-input"
+                    name="acceptationRefusalReason"
+                    placeholder="Motif du refus"
+                  />
+                </label>
+                <RedErrorMessage name="acceptationRefusalReason" />{" "}
+              </div>
+            )}
             <div className="form__row">
               <label>
                 NOM et prénom du signataire
                 <Field
                   className="td-input"
-                  name="author"
+                  name="signatureAuthor"
                   placeholder="NOM Prénom"
                 />
               </label>
-              <RedErrorMessage name="author" />
+              <RedErrorMessage name="signatureAuthor" />
             </div>
 
             <p className="tw-mt-6">
               En qualité de <strong>destinataire du déchet</strong>, j'atteste
               que les informations ci-dessus sont correctes. En signant ce
-              document, je déclare avoir traité le déchet.
+              document, je déclare{" "}
+              {values.acceptationStatus === WasteAcceptationStatus.Accepted
+                ? "accepter "
+                : "refuser "}
+              le contenant.
             </p>
 
             {error && <NotificationError apolloError={error} />}
@@ -397,15 +395,15 @@ function SignBsffOperationOnePackagingModalContent({
   );
 }
 
-interface SignBsffOperationMultiplePackagingsModalProps {
+interface SignBsffAcceptationMultiplePackagingsModalProps {
   bsffId: string;
   onClose: () => void;
 }
 
-function SignBsffOperationMultiplePackagingsModal({
+function SignBsffAcceptationMultiplePackagingsModal({
   bsffId,
   onClose,
-}: SignBsffOperationMultiplePackagingsModalProps) {
+}: SignBsffAcceptationMultiplePackagingsModalProps) {
   const { data } = useQuery<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF_FORM, {
     variables: {
       id: bsffId,
@@ -421,10 +419,10 @@ function SignBsffOperationMultiplePackagingsModal({
   return (
     <Modal
       onClose={onClose}
-      ariaLabel="Signer l'opération des contentants"
+      ariaLabel="Signer l'acceptation des contentants"
       isOpen
     >
-      <h2 className="td-modal-title">Signer l'opération des contentants</h2>
+      <h2 className="td-modal-title">Signer l'acceptation des contentants</h2>
       <BsffWasteSummary bsff={bsff} />
       <BsffPackagingTable bsff={bsff} />
     </Modal>
@@ -535,16 +533,19 @@ function BsffPackagingTable({ bsff }: BsffPackagingTableProps) {
                 );
               })}
               <TableCell>
-                {row.original.operation?.signature?.date ? (
-                  <div>
-                    Traité le {formatDate(row.original.operation?.date ?? "")} -
-                    Code {row.original.operation?.code}
-                  </div>
-                ) : row.original.acceptation?.status ===
-                  WasteAcceptationStatus.Refused ? (
-                  <div>
-                    Refusé le {formatDate(row.original.acceptation?.date ?? "")}
-                  </div>
+                {row.original.acceptation?.signature?.date ? (
+                  row.original.acceptation?.status ===
+                  WasteAcceptationStatus.Accepted ? (
+                    <div>
+                      Accepté le{" "}
+                      {formatDate(row.original.acceptation?.date ?? "")}
+                    </div>
+                  ) : (
+                    <div>
+                      Refusé le{" "}
+                      {formatDate(row.original.acceptation?.date ?? "")}
+                    </div>
+                  )
                 ) : (
                   <SignBsffPackaging bsff={bsff} packaging={row.original} />
                 )}
@@ -571,19 +572,19 @@ function SignBsffPackaging({ bsff, packaging }: SignBsffPackagingProps) {
         icon={<IconCheckCircle1 size="24px" />}
         onClick={() => setIsOpen(true)}
       >
-        Signer l'opération
+        Signer l'acceptation
       </ActionButton>
 
       {isOpen && (
         <Modal
           onClose={() => setIsOpen(false)}
-          ariaLabel="Signer l'opération"
+          ariaLabel="Signer l'acceptation"
           isOpen
         >
           <h2 className="td-modal-title">
-            Signer l'opération du contenant {packaging.numero}
+            Signer l'acceptation du contenant {packaging.numero}
           </h2>
-          <SignBsffOperationOnePackagingModalContent
+          <SignBsffAcceptationOnePackagingModalContent
             bsff={bsff}
             packaging={packaging}
             onCancel={() => setIsOpen(false)}

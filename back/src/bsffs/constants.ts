@@ -56,3 +56,10 @@ export const OPERATION: Record<
     successors: [Prisma.BsffType.REEXPEDITION]
   }
 };
+
+export function isFinalOperation(
+  operationCode: string,
+  noTraceability = false
+) {
+  return OPERATION[operationCode]?.successors?.length === 0 || noTraceability;
+}

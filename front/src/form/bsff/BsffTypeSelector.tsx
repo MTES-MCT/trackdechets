@@ -38,13 +38,20 @@ const options = [
 export function BsffTypeSelector() {
   const [{ value: id }] = useField<BsffType>("id");
   const [{ value: type }, , { setValue: setType }] = useField<BsffType>("type");
-  const [{ value: packagings }, , { setValue: setPackagings }] =
-    useField<BsffPackagingInput[]>("packagings");
+  const [{ value: packagings }, , { setValue: setPackagings }] = useField<
+    BsffPackagingInput[]
+  >("packagings");
   const [, , { setValue: setWeight }] = useField<BsffWeightInput>("weight");
-  const [{ value: ficheInterventions }, , { setValue: setFicheInterventions }] =
-    useField<BsffFicheIntervention[]>("ficheInterventions");
-  const [{ value: previousBsffs }, , { setValue: setPreviousBsffs }] =
-    useField<Bsff[]>("previousBsffs");
+  const [
+    { value: ficheInterventions },
+    ,
+    { setValue: setFicheInterventions },
+  ] = useField<BsffFicheIntervention[]>("ficheInterventions");
+  const [
+    { value: previousPackagings },
+    ,
+    { setValue: setPreviousBsffs },
+  ] = useField<Bsff[]>("previousPackagings");
 
   return (
     <>
@@ -73,9 +80,9 @@ export function BsffTypeSelector() {
                     ].includes(option.value)
                   ) {
                     const errors = [
-                      ...(previousBsffs.length > 0
+                      ...(previousPackagings.length > 0
                         ? [
-                            `Ce BSFF fait actuellement référence à ${previousBsffs.length} précédents BSFFs. Hors le nouveau type de BSFF que vous avez choisit ne permet pas de grouper ou de reconditionner d'autres BSFFs.`,
+                            `Ce BSFF fait actuellement référence à ${previousPackagings.length} précédent(s) contenant(s). Hors le nouveau type de BSFF que vous avez choisit ne permet pas de reéxpédier, grouper ou reconditionner d'autres contenants.`,
                             `Pour continuer, ces BSFFs vont être dissociés.`,
                           ]
                         : []),
@@ -99,9 +106,9 @@ export function BsffTypeSelector() {
 
                   if (option.value === BsffType.Groupement) {
                     const errors = [
-                      ...(previousBsffs.length > 0
+                      ...(previousPackagings.length > 0
                         ? [
-                            `Ce BSFF fait actuellement référénce à ${previousBsffs.length} précédents BSFFs. Hors certains d'entre eux peuvent avoir déclaré un traitement incompatible avec le groupement.`,
+                            `Ce BSFF fait actuellement référénce à ${previousPackagings.length} précédents contenants. Hors certains d'entre eux peuvent avoir déclaré un traitement incompatible avec le groupement.`,
                             `Pour continuer, ces BSFFs vont être dissociés.`,
                           ]
                         : []),
@@ -137,9 +144,9 @@ export function BsffTypeSelector() {
 
                   if (option.value === BsffType.Reconditionnement) {
                     const errors = [
-                      ...(previousBsffs.length > 0
+                      ...(previousPackagings.length > 0
                         ? [
-                            `Ce BSFF fait actuellement référénce à ${previousBsffs.length} précédents BSFFs. Hors certains d'entre eux peuvent avoir déclaré un traitement incompatible avec le groupement.`,
+                            `Ce BSFF fait actuellement référénce à ${previousPackagings.length} précédents contenants. Hors certains d'entre eux peuvent avoir déclaré un traitement incompatible avec le groupement.`,
                             `Pour continuer, ces BSFFs vont être dissociés.`,
                           ]
                         : []),
@@ -169,9 +176,9 @@ export function BsffTypeSelector() {
 
                   if (option.value === BsffType.Reexpedition) {
                     const errors = [
-                      ...(previousBsffs.length > 0
+                      ...(previousPackagings.length > 0
                         ? [
-                            `Ce BSFF fait actuellement référénce à ${previousBsffs.length} précédents BSFFs. Hors certains d'entre eux peuvent avoir déclaré un traitement incompatible avec une réexpédition.`,
+                            `Ce BSFF fait actuellement référénce à ${previousPackagings.length} précédents contenants. Hors certains d'entre eux peuvent avoir déclaré un traitement incompatible avec une réexpédition.`,
                             `Pour continuer, ces BSFFs vont être dissociés.`,
                           ]
                         : []),

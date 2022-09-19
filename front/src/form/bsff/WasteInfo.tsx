@@ -1,36 +1,33 @@
 import { FieldSwitch, RedErrorMessage } from "common/components";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { Field, useFormikContext } from "formik";
-import { Bsff, BsffPackagingInput, BsffType } from "generated/graphql/types";
+import { Bsff, BsffType } from "generated/graphql/types";
 import { BSFF_WASTES } from "generated/constants";
 import React, { useEffect } from "react";
 import Packagings from "./components/packagings/Packagings";
-import { PreviousBsffsPicker } from "./components/PreviousBsffsPicker";
+import { PreviousPackagingsPicker } from "./components/PreviousPackagingsPicker";
 
 export default function WasteInfo({ disabled }) {
-  const { setFieldValue, values } =
-    useFormikContext<Bsff & { previousBsffs: Bsff[] }>();
+  const { setFieldValue, values } = useFormikContext<
+    Bsff & { previousPackagings: Bsff[] }
+  >();
 
-  const [hasPreviousBsffsChanged, setHasPreviousBsffsChanged] =
-    React.useState(false);
+  const [
+    hasPreviousPackagingsChanged,
+    setHasPreviousPackagingsChanged,
+  ] = React.useState(false);
 
   useEffect(() => {
     if ([BsffType.Reexpedition, BsffType.Groupement].includes(values.type)) {
-      if (!values.id || hasPreviousBsffsChanged) {
-        setFieldValue(
-          "packagings",
-          values.previousBsffs.reduce<BsffPackagingInput[]>(
-            (acc, previousBsff) => acc.concat(previousBsff.packagings),
-            []
-          )
-        );
+      if (!values.id || hasPreviousPackagingsChanged) {
+        setFieldValue("packagings", values.previousPackagings);
       }
     }
   }, [
-    values.previousBsffs,
+    values.previousPackagings,
     values.type,
     values.id,
-    hasPreviousBsffsChanged,
+    hasPreviousPackagingsChanged,
     setFieldValue,
   ]);
 
@@ -56,10 +53,17 @@ export default function WasteInfo({ disabled }) {
         BsffType.Reexpedition,
       ].includes(values.type) && (
         <>
-          <h4 className="form__section-heading">BSFF initiaux</h4>
-          <PreviousBsffsPicker
+          <h4 className="form__section-heading">
+            Contenants à{" "}
+            {values.type === BsffType.Groupement
+              ? "grouper"
+              : values.type === BsffType.Reexpedition
+              ? "reéxpédier"
+              : "reconditionner"}
+          </h4>
+          <PreviousPackagingsPicker
             bsff={values}
-            onAddOrRemove={() => setHasPreviousBsffsChanged(true)}
+            onAddOrRemove={() => setHasPreviousPackagingsChanged(true)}
           />
         </>
       )}

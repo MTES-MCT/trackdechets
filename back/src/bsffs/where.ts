@@ -1,4 +1,4 @@
-import { BsffWhere, BsffOperationCode } from "../generated/graphql/types";
+import { BsffWhere, BsffPackagingWhere } from "../generated/graphql/types";
 import { Prisma } from "@prisma/client";
 import { safeInput } from "../common/converter";
 import {
@@ -9,7 +9,7 @@ import {
   toPrismaGenericWhereInput
 } from "../common/where";
 
-function toPrismaBsffWhereInput(where: BsffWhere): Prisma.BsffWhereInput {
+function toPrismaBsffSimpleWhereInput(where: BsffWhere): Prisma.BsffWhereInput {
   return safeInput<Prisma.BsffWhereInput>({
     ...toPrismaGenericWhereInput(where),
     status: toPrismaEnumFilter(where.status),
@@ -26,15 +26,6 @@ function toPrismaBsffWhereInput(where: BsffWhere): Prisma.BsffWhereInput {
     destinationCompanySiret: toPrismaStringFilter(
       where.destination?.company?.siret
     ),
-    destinationReceptionSignatureDate: toPrismaDateFilter(
-      where.destination?.reception?.signature.date
-    ),
-    destinationOperationCode: toPrismaEnumFilter<BsffOperationCode>(
-      where.destination?.operation?.code
-    ),
-    destinationOperationSignatureDate: toPrismaDateFilter(
-      where.destination?.operation?.signature?.date
-    ),
     ...(where?.packagings?.numero
       ? {
           packagings: {
@@ -44,6 +35,31 @@ function toPrismaBsffWhereInput(where: BsffWhere): Prisma.BsffWhereInput {
       : {})
   });
 }
-export function toPrismaWhereInput(where: BsffWhere): Prisma.BsffWhereInput {
-  return toPrismaNestedWhereInput(where, toPrismaBsffWhereInput);
+export function toPrismaBsffWhereInput(
+  where: BsffWhere
+): Prisma.BsffWhereInput {
+  return toPrismaNestedWhereInput(where, toPrismaBsffSimpleWhereInput);
+}
+
+export function toPrismaBsffPackagingSimpleWhereInput(
+  where: BsffPackagingWhere
+): Prisma.BsffPackagingWhereInput {
+  return safeInput<Prisma.BsffPackagingWhereInput>({
+    numero: toPrismaStringFilter(where.numero),
+    acceptationSignatureDate: toPrismaDateFilter(
+      where.acceptation?.signature?.date
+    ),
+    acceptationWasteCode: toPrismaStringFilter(where.acceptation?.wasteCode),
+    operationCode: toPrismaEnumFilter(where.operation?.code),
+    operationSignatureDate: toPrismaDateFilter(
+      where.operation?.signature?.date
+    ),
+    bsff: toPrismaBsffWhereInput(where.bsff)
+  });
+}
+
+export function toPrismaBsffPackagingWhereInput(
+  where: BsffPackagingWhere
+): Prisma.BsffPackagingWhereInput {
+  return toPrismaNestedWhereInput(where, toPrismaBsffPackagingSimpleWhereInput);
 }

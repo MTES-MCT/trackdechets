@@ -1,4 +1,5 @@
-import { UserRole, BsffStatus } from "@prisma/client";
+import { BsffStatus, BsffType, UserRole } from "@prisma/client";
+import { gql } from "apollo-server-core";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -16,15 +17,15 @@ import {
   createBsffAfterEmission,
   createBsffBeforeTransport,
   createBsffBeforeReception,
+  createBsffBeforeRefusal,
   createBsffAfterTransport,
   createBsffBeforeOperation,
-  createBsffBeforeRefusal,
   createBsffAfterOperation
 } from "../../../__tests__/factories";
 
-const SIGN = `
-  mutation Sign($id: ID!, $type: BsffSignatureType!, $signature: SignatureInput!, $securityCode: Int) {
-    signBsff(id: $id, type: $type, signature: $signature, securityCode: $securityCode) {
+const SIGN = gql`
+  mutation Sign($id: ID!, $input: BsffSignatureInput!) {
+    signBsff(id: $id, input: $input) {
       id
     }
   }
@@ -63,8 +64,8 @@ describe("Mutation.signBsff", () => {
     >(SIGN, {
       variables: {
         id: "123",
-        type: "EMISSION",
-        signature: {
+        input: {
+          type: "EMISSION",
           date: new Date().toISOString() as any,
           author: "Jeanne Dupont"
         }
@@ -88,8 +89,8 @@ describe("Mutation.signBsff", () => {
     >(SIGN, {
       variables: {
         id: "123",
-        type: "EMISSION",
-        signature: {
+        input: {
+          type: "EMISSION",
           date: new Date().toISOString() as any,
           author: emitter.user.name
         }
@@ -118,8 +119,8 @@ describe("Mutation.signBsff", () => {
       >(SIGN, {
         variables: {
           id: bsff.id,
-          type: "EMISSION",
-          signature: {
+          input: {
+            type: "EMISSION",
             date: new Date().toISOString() as any,
             author: emitter.user.name
           }
@@ -144,12 +145,12 @@ describe("Mutation.signBsff", () => {
       >(SIGN, {
         variables: {
           id: bsff.id,
-          type: "EMISSION",
-          signature: {
+          input: {
+            type: "EMISSION",
             date: new Date().toISOString() as any,
-            author: emitter.user.name
-          },
-          securityCode: emitter.company.securityCode
+            author: emitter.user.name,
+            securityCode: emitter.company.securityCode
+          }
         }
       });
 
@@ -171,8 +172,8 @@ describe("Mutation.signBsff", () => {
       >(SIGN, {
         variables: {
           id: bsff.id,
-          type: "EMISSION",
-          signature: {
+          input: {
+            type: "EMISSION",
             date: new Date().toISOString() as any,
             author: emitter.user.name
           }
@@ -200,12 +201,12 @@ describe("Mutation.signBsff", () => {
       >(SIGN, {
         variables: {
           id: bsff.id,
-          type: "EMISSION",
-          signature: {
+          input: {
+            type: "EMISSION",
             date: new Date().toISOString() as any,
-            author: emitter.user.name
-          },
-          securityCode: 1
+            author: emitter.user.name,
+            securityCode: 1
+          }
         }
       });
 
@@ -230,8 +231,8 @@ describe("Mutation.signBsff", () => {
       >(SIGN, {
         variables: {
           id: bsff.id,
-          type: "EMISSION",
-          signature: {
+          input: {
+            type: "EMISSION",
             date: new Date().toISOString() as any,
             author: emitter.user.name
           }
@@ -261,8 +262,8 @@ describe("Mutation.signBsff", () => {
       >(SIGN, {
         variables: {
           id: bsff.id,
-          type: "TRANSPORT",
-          signature: {
+          input: {
+            type: "TRANSPORT",
             date: new Date().toISOString() as any,
             author: transporter.user.name
           }
@@ -293,8 +294,8 @@ describe("Mutation.signBsff", () => {
       >(SIGN, {
         variables: {
           id: bsff.id,
-          type: "TRANSPORT",
-          signature: {
+          input: {
+            type: "TRANSPORT",
             date: new Date().toISOString() as any,
             author: transporter.user.name
           }
@@ -319,8 +320,8 @@ describe("Mutation.signBsff", () => {
       >(SIGN, {
         variables: {
           id: bsff.id,
-          type: "TRANSPORT",
-          signature: {
+          input: {
+            type: "TRANSPORT",
             date: new Date().toISOString() as any,
             author: transporter.user.name
           }
@@ -352,8 +353,8 @@ describe("Mutation.signBsff", () => {
       >(SIGN, {
         variables: {
           id: bsff.id,
-          type: "RECEPTION",
-          signature: {
+          input: {
+            type: "RECEPTION",
             date: new Date().toISOString() as any,
             author: destination.user.name
           }
@@ -363,7 +364,9 @@ describe("Mutation.signBsff", () => {
       expect(errors).toBeUndefined();
       expect(data.signBsff.id).toBeTruthy();
     });
+  });
 
+  describe("ACCEPTATION", () => {
     it("should allow destination to sign refusal", async () => {
       const bsff = await createBsffBeforeRefusal({
         emitter,
@@ -378,8 +381,8 @@ describe("Mutation.signBsff", () => {
       >(SIGN, {
         variables: {
           id: bsff.id,
-          type: "RECEPTION",
-          signature: {
+          input: {
+            type: "ACCEPTATION",
             date: new Date().toISOString() as any,
             author: destination.user.name
           }
@@ -390,7 +393,7 @@ describe("Mutation.signBsff", () => {
       expect(data.signBsff.id).toBeTruthy();
     });
 
-    it("should disallow destination to sign reception when required data is missing", async () => {
+    it("should disallow destination to sign acceptation when required data is missing", async () => {
       const bsff = await createBsffAfterTransport({
         emitter,
         transporter,
@@ -404,8 +407,8 @@ describe("Mutation.signBsff", () => {
       >(SIGN, {
         variables: {
           id: bsff.id,
-          type: "RECEPTION",
-          signature: {
+          input: {
+            type: "ACCEPTATION",
             date: new Date().toISOString() as any,
             author: destination.user.name
           }
@@ -437,8 +440,8 @@ describe("Mutation.signBsff", () => {
       >(SIGN, {
         variables: {
           id: bsff.id,
-          type: "OPERATION",
-          signature: {
+          input: {
+            type: "OPERATION",
             date: new Date().toISOString() as any,
             author: destination.user.name
           }
@@ -456,8 +459,18 @@ describe("Mutation.signBsff", () => {
           transporter,
           destination
         },
+        {},
         {
-          destinationOperationCode: OPERATION.R13.code
+          operationCode: OPERATION.R13.code,
+          operationNextDestinationCompanyName: "ACME INC",
+          operationNextDestinationPlannedOperationCode: "R2",
+          operationNextDestinationCap: "cap",
+          operationNextDestinationCompanySiret: null,
+          operationNextDestinationCompanyVatNumber: "IE9513674T",
+          operationNextDestinationCompanyAddress: "Quelque part",
+          operationNextDestinationCompanyContact: "Mr Déchet",
+          operationNextDestinationCompanyPhone: "01 00 00 00 00",
+          operationNextDestinationCompanyMail: "contact@trackdechets.fr"
         }
       );
 
@@ -468,8 +481,8 @@ describe("Mutation.signBsff", () => {
       >(SIGN, {
         variables: {
           id: bsff.id,
-          type: "OPERATION",
-          signature: {
+          input: {
+            type: "OPERATION",
             date: new Date().toISOString() as any,
             author: destination.user.name
           }
@@ -487,31 +500,36 @@ describe("Mutation.signBsff", () => {
       const bsff1 = await createBsffAfterOperation(
         { emitter, transporter, destination: ttr1 },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED,
-          destinationOperationCode: OPERATION.R13.code
-        }
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        { operationCode: OPERATION.R13.code }
       );
 
       // bsff1 => bsff2
       const bsff2 = await createBsffAfterOperation(
-        { emitter: ttr1, transporter, destination: ttr2 },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED,
-          destinationOperationCode: OPERATION.R13.code,
-          forwarding: { connect: { id: bsff1.id } }
-        }
+          emitter: ttr1,
+          transporter,
+          destination: ttr2,
+          previousPackagings: bsff1.packagings
+        },
+        {
+          type: BsffType.REEXPEDITION,
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        { operationCode: OPERATION.R13.code }
       );
+
       // bsff1 => bsff2 => bsff3
       const bsff3 = await createBsffBeforeOperation(
         {
           emitter: ttr2,
           transporter,
-          destination
+          destination,
+          previousPackagings: bsff2.packagings
         },
-        {
-          destinationOperationCode: OPERATION.D10.code,
-          forwarding: { connect: { id: bsff2.id } }
-        }
+        { type: BsffType.REEXPEDITION },
+        { operationCode: OPERATION.R2.code }
       );
 
       const { mutate } = makeClient(destination.user);
@@ -521,8 +539,8 @@ describe("Mutation.signBsff", () => {
       >(SIGN, {
         variables: {
           id: bsff3.id,
-          type: "OPERATION",
-          signature: {
+          input: {
+            type: "OPERATION",
             date: new Date().toISOString() as any,
             author: destination.user.name
           }
@@ -536,6 +554,7 @@ describe("Mutation.signBsff", () => {
         where: { id: bsff1.id }
       });
       expect(newBsff1.status).toEqual(BsffStatus.PROCESSED);
+
       const newBsff2 = await prisma.bsff.findUnique({
         where: { id: bsff2.id }
       });

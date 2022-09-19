@@ -46,12 +46,8 @@ export default function BsffStepsList(props: Props) {
   const formState = useMemo(() => {
     function getCurrentState(bsff: Bsff) {
       const { forwarding, repackaging, grouping } = bsff;
-      const previousBsffs = [
-        ...(forwarding ? [forwarding] : []),
-        ...repackaging,
-        ...grouping,
-      ];
-      return { ...formQuery.data?.bsff, previousBsffs };
+      const previousPackagings = [...forwarding, ...repackaging, ...grouping];
+      return { ...formQuery.data?.bsff, previousPackagings };
     }
     const bsff = formQuery.data?.bsff;
     return getComputedState(initialState, bsff ? getCurrentState(bsff) : null);
@@ -76,23 +72,33 @@ export default function BsffStepsList(props: Props) {
   }
 
   function onSubmit(values) {
-    const { id, ficheInterventions, previousBsffs, ...input } = values;
+    const {
+      id,
+      ficheInterventions,
+      previousPackagings,
+      packagings,
+      type,
+      ...input
+    } = values;
 
     saveForm({
+      type,
       ...input,
+      // packagings is computed by the backend in case of groupement or reexpedition
+      ...([BsffType.Groupement, BsffType.Reexpedition].includes(type)
+        ? {}
+        : { packagings }),
       ficheInterventions: ficheInterventions.map(
         ficheIntervention => ficheIntervention.id
       ),
       forwarding:
-        input.type === BsffType.Reexpedition ? previousBsffs[0]?.id : null,
+        type === BsffType.Reexpedition ? previousPackagings.map(p => p.id) : [],
       repackaging:
-        input.type === BsffType.Reconditionnement
-          ? previousBsffs.map(previousBsff => previousBsff.id)
+        type === BsffType.Reconditionnement
+          ? previousPackagings.map(p => p.id)
           : [],
       grouping:
-        input.type === BsffType.Groupement
-          ? previousBsffs.map(previousBsff => previousBsff.id)
-          : [],
+        type === BsffType.Groupement ? previousPackagings.map(p => p.id) : [],
     })
       .then(_ => {
         history.goBack();
