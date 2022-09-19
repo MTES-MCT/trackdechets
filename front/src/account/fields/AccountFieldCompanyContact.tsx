@@ -14,7 +14,7 @@ type Props = {
   company: CompanyPrivate;
 };
 
-AccountFielCompanyContact.fragments = {
+AccountFieldCompanyContact.fragments = {
   company: gql`
     fragment AccountFieldCompanyContactFragment on CompanyPrivate {
       id
@@ -39,7 +39,7 @@ const yupSchema = object().shape({
   contact: string().max(100),
 });
 
-export default function AccountFielCompanyContact({ company }: Props) {
+export default function AccountFieldCompanyContact({ company }: Props) {
   const fieldName = "contact";
   const fieldLabel = "Prénom et nom du contact";
 

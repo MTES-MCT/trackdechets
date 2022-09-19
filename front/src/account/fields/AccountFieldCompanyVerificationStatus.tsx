@@ -15,6 +15,7 @@ type Props = {
 AccountFieldCompanyVerificationStatus.fragments = {
   company: gql`
     fragment AccountFieldCompanyVerificationStatusFragment on CompanyPrivate {
+      id
       siret
       verificationStatus
     }

@@ -13,6 +13,7 @@ type Props = {
 AccountFieldCompanyTypes.fragments = {
   company: gql`
     fragment AccountFieldCompanyTypesFragment on CompanyPrivate {
+      id
       siret
       companyTypes
       userRole
