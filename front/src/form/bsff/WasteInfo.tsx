@@ -1,12 +1,7 @@
 import { FieldSwitch, RedErrorMessage } from "common/components";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { Field, useField, useFormikContext } from "formik";
-import {
-  Bsff,
-  BsffPackagingInput,
-  BsffType,
-  BsffWeightInput,
-} from "generated/graphql/types";
+import { Field, useFormikContext } from "formik";
+import { Bsff, BsffPackagingInput, BsffType } from "generated/graphql/types";
 import React, { useEffect } from "react";
 import Packagings from "./components/packagings/Packagings";
 import { PreviousBsffsPicker } from "./components/PreviousBsffsPicker";

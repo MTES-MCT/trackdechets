@@ -19,6 +19,7 @@ import {
   TableRow,
 } from "common/components";
 import { OPERATION } from "../utils/constants";
+import { useTable, Column, useFilters } from "react-table";
 
 interface PreviousBsffsPickerProps {
   bsffType: BsffType;
@@ -33,9 +34,52 @@ export function PreviousBsffsPicker({
     .filter(operation => operation.successors.includes(bsffType))
     .map(operation => operation.code);
 
+  const columns: Column<Bsff>[] = React.useMemo(
+    () => [
+      {
+        id: "id",
+        Header: "Numéro BSFF",
+        accessor: bsff => bsff.id,
+        canFilter: true,
+        filter: "text",
+      },
+      {
+        id: "packagingsNumero",
+        Header: "Numéro(s) de contenant(s)",
+        accessor: bsff =>
+          bsff.packagings
+            ?.map(p => p.numero)
+            .filter(n => n?.length > 0)
+            .splice(0, 10)
+            ?.join(" | "),
+        canFilter: true,
+        filter: "text",
+      },
+      {
+        id: "wasteCode",
+        Header: "Déchet",
+        accessor: bsff =>
+          `${bsff.waste?.code} - Nature : ${
+            bsff.waste?.description ?? "inconnue"
+          }`,
+        canFilter: true,
+        filter: "text",
+      },
+      {
+        id: "emitter",
+        Header: "Émetteur initial",
+        accessor: bsff =>
+          `${bsff.emitter?.company?.name} (${bsff.emitter?.company?.siret})`,
+        canFilter: true,
+        filter: "text",
+      },
+    ],
+    []
+  );
+
   const instruction =
     bsffType === BsffType.Groupement
-      ? "Retrouvez ci-dessous la liste des BSFFs qui sont en attente d'ungroupement."
+      ? "Retrouvez ci-dessous la liste des BSFFs qui sont en attente d'un groupement."
       : bsffType === BsffType.Reconditionnement
       ? "Retrouvez ci-dessous la liste des BSFFs qui sont en attente d'un reconditionnement."
       : bsffType === BsffType.Reexpedition
@@ -54,6 +98,8 @@ export function PreviousBsffsPicker({
             },
           },
         },
+        // pagination does not play well with bsff picking
+        first: 5000,
       },
       // make sure we have fresh data here
       fetchPolicy: "cache-and-network",
@@ -95,64 +141,150 @@ export function PreviousBsffsPicker({
       <FieldArray
         name="previousBsffs"
         render={({ push, remove }) => (
-          <Table isSelectable>
-            <TableHead>
-              <TableRow>
-                <TableHeaderCell />
-                <TableHeaderCell>Numéro</TableHeaderCell>
-                <TableHeaderCell>Déchet</TableHeaderCell>
-                <TableHeaderCell>Émetteur</TableHeaderCell>
-                <TableHeaderCell>Transporteur</TableHeaderCell>
-                <TableHeaderCell>Destinataire</TableHeaderCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {pickableBsffs.map(bsff => {
-                const previousBsffIndex = previousBsffs.findIndex(
-                  previousBsff => previousBsff.id === bsff.id
-                );
-                const isSelected = previousBsffIndex >= 0;
-
-                return (
-                  <TableRow
-                    key={bsff.id}
-                    onClick={() => {
-                      if (isSelected) {
-                        remove(previousBsffIndex);
-                      } else {
-                        if (previousBsffs.length >= max) {
-                          window.alert(
-                            `Vous ne pouvez pas sélectionner plus de ${max} BSFFs avec ce type de BSFF.`
-                          );
-                          return;
-                        }
-                        push(bsff);
-                      }
-                    }}
-                  >
-                    <TableCell>
-                      <input
-                        type="checkbox"
-                        className="td-input"
-                        checked={isSelected}
-                        readOnly
-                      />
-                    </TableCell>
-                    <TableCell>{bsff.id}</TableCell>
-                    <TableCell>
-                      {bsff.waste?.code} - Nature :{" "}
-                      {bsff.waste?.description ?? "inconnue"}
-                    </TableCell>
-                    <TableCell>{bsff.emitter?.company?.name}</TableCell>
-                    <TableCell>{bsff.transporter?.company?.name}</TableCell>
-                    <TableCell>{bsff.destination?.company?.name}</TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
+          <BsffTable
+            columns={columns}
+            data={pickableBsffs}
+            selected={previousBsffs}
+            push={push}
+            remove={remove}
+            max={max}
+          />
         )}
       />
     </div>
+  );
+}
+
+// Define a default UI for filtering
+function DefaultColumnFilter({ column: { filterValue, setFilter } }) {
+  return (
+    <input
+      className="td-input td-input--small"
+      value={filterValue || ""}
+      onChange={e => {
+        setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
+      }}
+      placeholder={`Filtrer...`}
+    />
+  );
+}
+
+type BsffTableProps = {
+  columns: Column<Bsff>[];
+  data: Bsff[];
+  selected: Bsff[];
+  push: (bsff: Bsff) => void;
+  remove: (idx: number) => void;
+  max: number;
+};
+
+function BsffTable({
+  columns,
+  data,
+  selected,
+  push,
+  remove,
+  max,
+}: BsffTableProps) {
+  const filterTypes = React.useMemo(
+    () => ({
+      text: (rows, id, filterValue) => {
+        return rows.filter(row => {
+          const rowValue = row.values[id];
+          return rowValue !== undefined
+            ? String(rowValue)
+                .toLowerCase()
+                .includes(String(filterValue).toLowerCase())
+            : true;
+        });
+      },
+    }),
+    []
+  );
+
+  const defaultColumn = React.useMemo(
+    () => ({
+      // Let's set up our default Filter UI
+      Filter: DefaultColumnFilter,
+    }),
+    []
+  );
+
+  const {
+    getTableProps,
+    headerGroups,
+    getTableBodyProps,
+    rows,
+    prepareRow,
+  } = useTable(
+    {
+      columns,
+      data,
+      filterTypes,
+      defaultColumn,
+    },
+    useFilters
+  );
+
+  return (
+    <Table {...getTableProps()}>
+      <TableHead>
+        {headerGroups.map(headerGroup => (
+          <TableRow {...headerGroup.getHeaderGroupProps()}>
+            <TableHeaderCell />
+            {headerGroup.headers.map(column => (
+              <TableHeaderCell {...column.getHeaderProps()}>
+                {column.render("Header")}
+                <div>{column.canFilter ? column.render("Filter") : null}</div>
+              </TableHeaderCell>
+            ))}
+          </TableRow>
+        ))}
+      </TableHead>
+      <TableBody {...getTableBodyProps()}>
+        {rows.map(row => {
+          prepareRow(row);
+          const previousBsffIndex = selected.findIndex(
+            previousBsff => previousBsff.id === row.values["id"]
+          );
+          const isSelected = previousBsffIndex >= 0;
+          return (
+            <TableRow
+              {...row.getRowProps()}
+              onClick={() => {
+                if (isSelected) {
+                  remove(previousBsffIndex);
+                } else {
+                  if (selected.length >= max) {
+                    window.alert(
+                      `Vous ne pouvez pas sélectionner plus de ${max} BSFFs avec ce type de BSFF.`
+                    );
+                    return;
+                  }
+                  const bsff = data.find(bsff => bsff.id === row.values["id"])!;
+                  push(bsff);
+                }
+              }}
+            >
+              <TableCell>
+                <input
+                  type="checkbox"
+                  className="td-input"
+                  checked={isSelected}
+                  readOnly
+                />
+              </TableCell>
+              {row.cells.map(cell => {
+                return (
+                  <TableCell {...cell.getCellProps()}>
+                    {cell.render("Cell")}
+                  </TableCell>
+                );
+              })}
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
   );
 }
