@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { FullBsffFragment } from "common/fragments";
+import { FullBsffFragment, PreviousBsffFragment } from "common/fragments";
 
 export const GET_BSFF_FORM = gql`
   query Bsff($id: ID!) {
@@ -26,6 +26,24 @@ export const GET_BSFF_FORMS = gql`
     }
   }
   ${FullBsffFragment}
+`;
+
+export const GET_PREVIOUS_BSFFS = gql`
+  query Bsffs($where: BsffWhere) {
+    bsffs(where: $where) {
+      totalCount
+      pageInfo {
+        hasNextPage
+      }
+      edges {
+        cursor
+        node {
+          ...PreviousBsff
+        }
+      }
+    }
+  }
+  ${PreviousBsffFragment}
 `;
 
 export const CREATE_DRAFT_BSFF = gql`

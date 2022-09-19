@@ -8,7 +8,7 @@ import {
   Query,
   QueryBsffsArgs,
 } from "generated/graphql/types";
-import { GET_BSFF_FORMS } from "../utils/queries";
+import { GET_BSFF_FORMS, GET_PREVIOUS_BSFFS } from "../utils/queries";
 import {
   Loader,
   Table,
@@ -87,7 +87,7 @@ export function PreviousBsffsPicker({
       : "";
 
   const { data } = useQuery<Pick<Query, "bsffs">, QueryBsffsArgs>(
-    GET_BSFF_FORMS,
+    GET_PREVIOUS_BSFFS,
     {
       variables: {
         where: {

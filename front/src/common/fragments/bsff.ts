@@ -156,3 +156,41 @@ export const FullBsffFragment = gql`
   ${companyFragment}
   ${FicheInterventionFragment}
 `;
+
+export const PreviousBsffFragment = gql`
+  fragment PreviousBsff on Bsff {
+    id
+    type
+    status
+    emitter {
+      company {
+        siret
+        name
+      }
+    }
+    packagings {
+      name
+      numero
+      volume
+      weight
+    }
+    waste {
+      code
+      description
+      adr
+    }
+    weight {
+      value
+      isEstimate
+    }
+    repackagedIn {
+      id
+    }
+    forwarding {
+      id
+    }
+    forwardedIn {
+      id
+    }
+  }
+`;
