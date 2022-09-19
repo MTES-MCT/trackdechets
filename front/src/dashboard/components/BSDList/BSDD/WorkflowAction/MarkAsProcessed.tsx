@@ -13,6 +13,7 @@ import {
   MutationMarkAsProcessedArgs,
   Query,
   QueryFormArgs,
+  ProcessedFormInput,
 } from "generated/graphql/types";
 import { gql, useMutation, useLazyQuery } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
@@ -213,6 +214,7 @@ export default function MarkAsProcessed({ form }: WorkflowActionProps) {
       fetchPolicy: "network-only",
     }
   );
+
   const [markAsProcessed, { loading, error }] = useMutation<
     Pick<Mutation, "markAsProcessed">,
     MutationMarkAsProcessedArgs
@@ -259,7 +261,7 @@ export default function MarkAsProcessed({ form }: WorkflowActionProps) {
         if (!!data?.form) {
           return (
             <div>
-              <Formik
+              <Formik<ProcessedFormInput>
                 initialValues={{
                   processingOperationDone: "",
                   processingOperationDescription: "",
@@ -268,9 +270,20 @@ export default function MarkAsProcessed({ form }: WorkflowActionProps) {
                   nextDestination: null,
                   noTraceability: null,
                 }}
-                onSubmit={values => {
-                  markAsProcessed({
-                    variables: { id: data.form.id, processedInfo: values },
+                onSubmit={({ nextDestination, ...values }) => {
+                  const cleanedNextDestination = nextDestination;
+                  if (cleanedNextDestination?.company) {
+                    // clean vatNumber that may have been added by CompanySelector
+                    delete cleanedNextDestination.company["vatNumber"];
+                  }
+                  return markAsProcessed({
+                    variables: {
+                      id: data?.form.id,
+                      processedInfo: {
+                        ...values,
+                        nextDestination: cleanedNextDestination,
+                      },
+                    },
                   });
                 }}
               >
