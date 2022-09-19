@@ -1,17 +1,17 @@
 "Représente les différents types de BSFF possibles."
 enum BsffType {
   """
-  Cas d'un BSFF émis par un opérateur qui collecte des déchets dangereux de fluide frigorigènes lors d'opérations
-  sur les équipements en contenant de ses clients. Peut-être associé à des fiches d'interventions.
+  À utiliser dans le cas d'un opérateur qui collecte des déchets dangereux de fluides frigorigènes (ou autres déchets dangereux de fluides)
+   lors d'opérations sur les équipements en contenant de ses clients.
   """
   COLLECTE_PETITES_QUANTITES
-  "Cas d'un BSFF émis par un autre détenteur de déchets"
+  "À utiliser lors de l'émission d'un BSFF par un autre détenteur de déchet."
   TRACER_FLUIDE
-  "Cas d'un BSFF émis par une plateforme de transit ou installation de traitement dans le cadre d'un regroupement"
+  "À utiliser dans le cas d'un groupement de plusieurs contenants sur une installation de tri transit regroupement."
   GROUPEMENT
-  "Cas d'un BSFF émis par une plateforme de transit dans le cadre d'un reconditionnement"
+  "À utiliser dans le cas d'un reconditionnement de plusieurs contenants dans un plus grand contenant sur une installation de tri transit regroupement."
   RECONDITIONNEMENT
-  "Cas d'un BSFF émis par une plateforme de transit dans le cadre d'une réexpédition"
+  "À utiliser dans le cas d'une réexpédition d'un ou plusieurs contenants après transit sur une installation de tri, transit, regroupement."
   REEXPEDITION
 }
 
@@ -19,32 +19,48 @@ enum BsffType {
 enum BsffStatus {
   "Le bordereau ne comporte aucune signature."
   INITIAL
-  "Le bordereau a été signé par l'emitter."
+  "Le bordereau a été signé par l'émetteur."
   SIGNED_BY_EMITTER
   "Le bordereau a été signé par le transporteur."
   SENT
-  "Le bordereau a été reçu par l'installation de destination."
-  RECEIVED
   """
-  Le déchet a subit un groupement, reconditionnement ou un entreposage provisoire.
-  Il est en attente de la création d'un nouveau BSFF pour finaliser le traitement.
+  Le BSFF a été reçu par l'installation de destination. Les contenants sont en attente d'acceptation
+  ou de refus.
+  """
+  RECEIVED
+  "Tous les contenants du BSFF ont été acceptés et sont en attente de traitement."
+  ACCEPTED
+  "Tous les contenants du BSFF ont été refusés."
+  REFUSED
+  "Une partie des contenants a été refusée, l'autre partie acceptée. Les contenants acceptées n'ont pas encore été traités."
+  PARTIALLY_REFUSED
+  """
+  Une partie des contenants acceptés présents sur le BSFF ont subi un groupement, reconditionnement ou un entreposage provisoire
+  et sont attente d'un traitement final (régénération, recyclage ou destruction). Les autres contenants
+  ont été régénérés, recyclés ou détruits.
   """
   INTERMEDIATELY_PROCESSED
-  "Le déchet a été traité par l'installation de destination."
+  "Tous les fluides des contenants acceptés présents sur le BSFF ont été régénérés, recyclés ou détruits"
   PROCESSED
-  "Le déchet a été refusé par l'installation de traitement."
-  REFUSED
 }
 
 "Liste des codes de traitement possible."
 enum BsffOperationCode {
+  "Récupération ou régénération des solvants"
   R2
+  "Recyclage ou récupération des substances organiques qui ne sont pas utilisées comme solvants (y compris les opérations de compostage et autres transformations biologiques)"
   R3
+  "Échange de déchets en vue de les soumettre à l'une des opérations numérotées R1 à R11"
   R12
+  "Stockage de déchets préalablement à l’une des opérations R1 à R12 (à l’exclusion du stockage temporaire, avant collecte, sur le site de production)."
   R13
+  "Incinération à terre"
   D10
+  "Regroupement préalablement à l'une des opérations numérotées D1 à D12"
   D13
+  "Reconditionnement préalablement à l’une des opérations numérotées D1 à D13"
   D14
+  "Stockage préalablement à l’une des opérations D1 à D14 (à l’exclusion du stockage temporaire, avant collecte, sur le site de production)."
   D15
 }
 
@@ -56,6 +72,8 @@ enum BsffSignatureType {
   TRANSPORT
   "Signature de la destination, lors de la réception."
   RECEPTION
+  "Signature de la destination, lors de l'acceptation"
+  ACCEPTATION
   "Signature de la destination, lors du traitement."
   OPERATION
 }

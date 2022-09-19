@@ -26,6 +26,26 @@ input BsffWhere {
   _not: BsffWhere
 }
 
+"Filtres possibles sur la récupération de contenants"
+input BsffPackagingWhere {
+  "Filtre sur l'ID"
+  id: IdFilter
+  "Filtre sur le numéro de contenant"
+  numero: StringFilter
+  "Filtre possible sur les bsffs"
+  bsff: BsffWhere
+  "Filtre possible sur l'acceptation des contenants"
+  acceptation: BsffPackagingAcceptationWhere
+  "Filtre possible sur l'opération effectuée"
+  operation: BsffPackagingOperationWhere
+  "ET logique"
+  _and: [BsffPackagingWhere!]
+  "OU logique"
+  _or: [BsffPackagingWhere!]
+  "NON logique"
+  _not: BsffPackagingWhere
+}
+
 "Filtre sur le statut"
 input BsffStatusFilter {
   _eq: BsffStatus
@@ -63,23 +83,23 @@ input BsffTransportWhere {
 "Champs possible pour le filtre sur la destination."
 input BsffDestinationWhere {
   company: CompanyWhere
-  reception: BsffReceptionWhere
-  operation: BsffOperationWhere
 }
 
-"Champs possibles pour le filtre sur la réception"
-input BsffReceptionWhere {
+"Champs possibles pour le filtre sur la réception d'un contenant"
+input BsffPackagingAcceptationWhere {
+  wasteCode: StringFilter
   signature: SignatureWhere
 }
 
-"Champs possible pour le filtre sur l'opération."
-input BsffOperationWhere {
+"Champs possible pour le filtre sur l'opération sur un contenant"
+input BsffPackagingOperationWhere {
   code: BsffOperationCodeFilter
   signature: SignatureWhere
 }
 
 input BsffPackagingsWhere {
   numero: StringFilter
+  bsff: BsffWhere
 }
 
 input SignatureInput {
@@ -87,21 +107,63 @@ input SignatureInput {
   author: String!
 }
 
+input BsffSignatureInput {
+  "Type de signature apposée"
+  type: BsffSignatureType!
+
+  """
+  Identifiant du packaging en cas de signature pour une acceptation ou un traitement
+  Si omis, permet de signer l'acceptation ou le traitement pour l'ensemble des contenants.
+  """
+  packagingId: ID
+
+  "Date de la signature"
+  date: DateTime
+  "Nom et prénom du signataire"
+  author: String!
+  """
+  Code de signature de l'auteur de la signature.
+
+  Ce paramètre est optionnel, il n'est utile que dans le cas où vous souhaitez signer pour un tiers sans moyen de vous authentifier à sa place.
+  Ce tiers peut alors saisir son code de signature dans votre outil.
+  """
+  securityCode: Int
+}
+
 input BsffInput {
+  """
+  Type de BSFF, voir l'enum pour plus de détails. -
+  """
   type: BsffType
+  """
+  Émetteur du déchet. En fonction de la valeur du champ `type` il peut s'agir :
+  - d'un opérateur qui collecte des déchets dangereux de fluides frigorigènes (ou autres déchets dangereux de fluides) lors d'opérations sur
+  les équipements en contenant de ses clients
+  - d'un autre détenteur de déchet.
+  - d'une installation de tri, transit, regroupement lors d'une réexpédition, reconditionnement ou groupement.
+  """
   emitter: BsffEmitterInput
+  """
+  Liste des contenants utilisés pour le transport des déchets de fluides.
+  Ne pas renseigner ce champ en cas de groupement ou de réexpédition car les
+  informations de contenants du nouveau BSFF sont déduites automatiquement à
+  partir des informations des BSFFs initiaux
+  """
   packagings: [BsffPackagingInput!]
+  """
+  Détails du déchet
+  """
   waste: BsffWasteInput
   "Quantité en kilogrammes"
   weight: BsffWeightInput
   transporter: BsffTransporterInput
   destination: BsffDestinationInput
   ficheInterventions: [ID!]
-  "Bordereau que celui-ci reéxpédie"
-  forwarding: ID
-  "Liste des bordereaux que celui-ci reconditionne"
+  "Identifiant des contenant réexpédié dans ce BSFF. La liste de contenants doit faire partie du même BSFF"
+  forwarding: [ID!]
+  "Identifiant des contenant reconditionné dans ce BSFF"
   repackaging: [ID!]
-  "Liste des bordereaux que celui-ci groupe"
+  "Identifiant des contenants regroupés dans ce BSFF"
   grouping: [ID!]
 }
 
@@ -111,15 +173,51 @@ input BsffEmitterInput {
   customInfo: String
 }
 
+"Permet de renseigner les informations d'un contenant par l'émetteur du BSFF"
 input BsffPackagingInput {
   "Dénomination du contenant."
   name: String!
   "Volume du contenant."
-  volume: Float
+  volume: Float!
   "Numéro du contenant."
   numero: String!
   "Poids en kilogrammes"
   weight: Float!
+}
+
+input UpdateBsffPackagingInput {
+  "Informations sur l'acceptation du contenant sur l'installation de destination"
+  acceptation: BsffPackagingAcceptationInput
+  "Informations sur le traitement effectué par contenant"
+  operation: BsffPackagingOperationInput
+}
+
+input BsffPackagingAcceptationInput {
+  "Date de la réception"
+  date: String!
+  "Poids du contenant. Doit être à 0 dans le cas d'un refus"
+  weight: Float!
+  "Accepté ou refusé"
+  status: WasteAcceptationStatus!
+  "En cas de refus, la raison"
+  refusalReason: String
+  "Code déchet après analyse"
+  wasteCode: String
+  "Dénomination usuelle du déchet après analyse"
+  wasteDescription: String
+}
+
+input BsffPackagingOperationInput {
+  "Date de l'opération"
+  date: String!
+  "Code de l'opération de traitement."
+  code: BsffOperationCode!
+  "Description de l'opération réaliséee"
+  description: String!
+  "Rupture de traçabilité autorisée par arrêté préfectoral"
+  noTraceability: Boolean
+  "Destination ultérieure prévue, dans le cas d'un envoi vers l'étranger."
+  nextDestination: BsffPackagingNextDestinationInput
 }
 
 input BsffWasteInput {
@@ -159,7 +257,6 @@ input BsffDestinationInput {
   cap: String @deprecated(reason: "Il n'y a pas de CAP sur le BSFF")
   reception: BsffDestinationReceptionInput
   plannedOperationCode: BsffOperationCode
-  operation: BsffDestinationOperationInput
   "Champ libre"
   customInfo: String
 }
@@ -173,18 +270,12 @@ input BsffAcceptationInput {
 
 input BsffDestinationReceptionInput {
   date: DateTime!
-  "Poids en kilogrammes"
-  weight: Float!
-  acceptation: BsffAcceptationInput!
 }
 
-input BsffOperationNextDestinationInput {
-  company: CompanyInput!
-}
-
-input BsffDestinationOperationInput {
-  code: BsffOperationCode!
-  nextDestination: BsffOperationNextDestinationInput
+input BsffPackagingNextDestinationInput {
+  plannedOperationCode: BsffOperationCode
+  cap: String
+  company: CompanyInput
 }
 
 input BsffFicheInterventionInput {
@@ -200,4 +291,19 @@ input BsffDetenteurInput {
 }
 input BsffOperateurInput {
   company: CompanyInput!
+}
+
+input BsffPackagingAcceptation {
+  "Poids du contenant. Doit être à 0 dans le cas d'un refus"
+  weight: Float!
+  "Accepté ou refusé"
+  status: WasteAcceptationStatus!
+  "En cas de refus, la raison"
+  refusalReason: String
+  "Code déchet après analyse"
+  wasteCode: String
+  "Dénomination usuelle du déchet après analyse"
+  wasteDescription: String
+  "Signature de la destination lors de l'acceptation ou du refus du déchet."
+  signature: Signature
 }

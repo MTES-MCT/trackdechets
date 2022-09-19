@@ -38,7 +38,7 @@ const initialState = {
     isEstimate: false,
   },
   ficheInterventions: [],
-  previousBsffs: [],
+  previousPackagings: [],
 };
 
 export default initialState;

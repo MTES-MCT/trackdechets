@@ -1,16 +1,21 @@
 import { UserInputError } from "apollo-server-express";
 import omit from "object.omit";
-import { Prisma, Bsff, BsffType } from "@prisma/client";
+import { Prisma, BsffType } from "@prisma/client";
 import prisma from "../../../prisma";
-import {
-  BsffPackagingInput,
-  MutationResolvers
-} from "../../../generated/graphql/types";
+import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getBsffOrNotFound } from "../../database";
+import {
+  getBsffOrNotFound,
+  getPackagingCreateInput,
+  getPreviousPackagings
+} from "../../database";
 import { flattenBsffInput, expandBsffFromDB } from "../../converter";
 import { isBsffContributor } from "../../permissions";
-import { validateBsff } from "../../validation";
+import {
+  validateBsff,
+  validateFicheInterventions,
+  validatePreviousPackagings
+} from "../../validation";
 import { indexBsff } from "../../elastic";
 
 const updateBsff: MutationResolvers["updateBsff"] = async (
@@ -21,14 +26,11 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   const user = checkIsAuthenticated(context);
 
   const existingBsff = await getBsffOrNotFound({ id });
-  const existingPackagings = await prisma.bsff
-    .findUnique({ where: { id: existingBsff.id } })
-    .packagings();
   await isBsffContributor(user, existingBsff);
 
-  if (existingBsff.destinationOperationSignatureDate) {
+  if (existingBsff.destinationReceptionSignatureDate) {
     throw new UserInputError(
-      `Il n'est pas possible d'éditer un bordereau dont le traitement final a été signé`
+      `Il n'est pas possible d'éditer un BSFF qui a été récéptionné`
     );
   }
 
@@ -52,7 +54,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     );
   }
 
-  let flatInput = flattenBsffInput(input);
+  let flatInput = { ...flattenBsffInput(input) };
 
   if (existingBsff.emitterEmissionSignatureDate) {
     flatInput = omit(flatInput, [
@@ -100,50 +102,28 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       "destinationCompanyName",
       "destinationCompanyPhone",
       "destinationCompanySiret",
-      "destinationReceptionDate",
-      "destinationReceptionWeight",
-      "destinationReceptionAcceptationStatus",
-      "destinationReceptionRefusalReason"
+      "destinationReceptionDate"
     ]);
   }
 
-  const futureBsff: Bsff = { ...existingBsff, ...flatInput };
-  const futurePackagings: BsffPackagingInput[] =
-    input.packagings ?? existingPackagings;
+  const futureBsff = {
+    ...existingBsff,
+    ...flatInput,
+    packagings: input.packagings ?? existingBsff.packagings
+  };
 
   await isBsffContributor(user, futureBsff);
 
-  const forwardedBsff = input.forwarding
-    ? await getBsffOrNotFound({ id: input.forwarding })
-    : existingBsff.forwardingId
-    ? await prisma.bsff.findUnique({ where: { id: existingBsff.forwardingId } })
-    : null;
+  const packagingHasChanged =
+    !!input.forwarding ||
+    !!input.grouping ||
+    !!input.repackaging ||
+    !!input.packagings;
 
-  const repackagedBsffs =
-    input.repackaging?.length > 0
-      ? await prisma.bsff.findMany({ where: { id: { in: input.repackaging } } })
-      : await prisma.bsff.findFirst({ where: { id } }).repackaging();
-
-  const groupedBsffs =
-    input.grouping?.length > 0
-      ? await prisma.bsff.findMany({ where: { id: { in: input.grouping } } })
-      : await prisma.bsff.findFirst({ where: { id } }).grouping();
-
-  const isForwarding = !!forwardedBsff;
-  const isRepackaging = repackagedBsffs.length > 0;
-  const isGrouping = groupedBsffs.length > 0;
-
-  if ([isForwarding, isRepackaging, isGrouping].filter(b => b).length > 1) {
-    throw new UserInputError(
-      "Les opérations d'entreposage provisoire, reconditionnement et groupement ne sont pas compatibles entre elles"
-    );
-  }
-
-  const previousBsffs = [
-    ...(isForwarding ? [forwardedBsff] : []),
-    ...groupedBsffs,
-    ...repackagedBsffs
-  ];
+  const existingPreviousPackagings = await getPreviousPackagings(
+    existingBsff.packagings.map(p => p.id),
+    1
+  );
 
   const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
     where:
@@ -152,52 +132,55 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
         : { bsffs: { some: { id: { in: [existingBsff.id] } } } }
   });
 
-  await validateBsff(
-    { ...futureBsff, packagings: futurePackagings },
-    previousBsffs,
-    ficheInterventions
+  await validateBsff(futureBsff);
+
+  await validateFicheInterventions(futureBsff, ficheInterventions);
+
+  const futurePreviousPackagingsIds = {
+    ...(futureBsff.type === BsffType.REEXPEDITION
+      ? {
+          forwarding:
+            input.forwarding ?? existingPreviousPackagings.map(p => p.id)
+        }
+      : {}),
+    ...(futureBsff.type === BsffType.GROUPEMENT
+      ? {
+          grouping: input.grouping ?? existingPreviousPackagings.map(p => p.id)
+        }
+      : {}),
+    ...(futureBsff.type === BsffType.RECONDITIONNEMENT
+      ? {
+          repackaging:
+            input.repackaging ?? existingPreviousPackagings.map(p => p.id)
+        }
+      : {})
+  };
+
+  const futurePreviousPackagings = await validatePreviousPackagings(
+    futureBsff,
+    futurePreviousPackagingsIds
   );
 
-  const data: Prisma.BsffUpdateInput = flatInput;
-
-  if (input.grouping?.length > 0) {
-    data.grouping = {
-      set: input.grouping.map(id => ({
-        id
-      }))
-    };
-  }
-
-  if (input.repackaging?.length > 0) {
-    data.repackaging = {
-      set: input.repackaging.map(id => ({
-        id
-      }))
-    };
-  }
-
-  if (input.forwarding) {
-    // disconnect current relation
-    await prisma.bsff.update({
-      where: { id },
-      data: { forwarding: { disconnect: true } }
-    });
-    data.forwarding = { connect: { id: input.forwarding } };
-  }
+  const data: Prisma.BsffUpdateInput = {
+    ...flatInput,
+    ...(packagingHasChanged
+      ? {
+          packagings: {
+            deleteMany: {},
+            create: getPackagingCreateInput(
+              futureBsff,
+              futurePreviousPackagings
+            )
+          }
+        }
+      : {})
+  };
 
   if (ficheInterventions.length > 0) {
     data.ficheInterventions = {
       set: ficheInterventions.map(({ id }) => ({ id }))
     };
   }
-
-  if (input.packagings) {
-    data.packagings = {
-      deleteMany: {},
-      createMany: { data: input.packagings }
-    };
-  }
-
   const updatedBsff = await prisma.bsff.update({
     data,
     where: { id }

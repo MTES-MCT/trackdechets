@@ -5,6 +5,7 @@ type Mutation {
   Ces champs sont requis :
 
   ```
+  type
   emitter {
     company {
       name
@@ -30,7 +31,7 @@ type Mutation {
 
   """
   Mutation permettant de créer un nouveau bordereau de suivi de fluides frigorigènes, à l'état de brouillon.
-  Un brouillon n'a pas de champs requis, la validation se fait au moment de le publier.
+  Les seuls champs requis sont le type du BSFF et le n°SIRET de l'émetteur, du transporteur ou du destinataire.
   """
   createDraftBsff(input: BsffInput!): Bsff!
 
@@ -38,6 +39,12 @@ type Mutation {
   Mutation permettant de modifier un bordereau existant de suivi de fluides frigorigènes.
   """
   updateBsff(id: ID!, input: BsffInput!): Bsff!
+
+  """
+  Mutation permettant de modifier les informations de réception
+  et traitement par contenant
+  """
+  updateBsffPackaging(id: ID!, input: UpdateBsffPackagingInput!): BsffPackaging!
 
   """
   Mutation permettant de publier un brouillon.
@@ -139,17 +146,8 @@ type Mutation {
   signBsff(
     "Identifiant du BSFF à signer."
     id: ID!
-    "Type de signature à apposer, voir l'enum pour plus de détails."
-    type: BsffSignatureType!
-    "Informations à propos de la personne signant le BSFF."
-    signature: SignatureInput!
-    """
-    Code de signature de l'auteur de la signature.
 
-    Ce paramètre est optionnel, il n'est utile que dans le cas où vous souhaitez signer pour un tiers sans moyen de vous authentifier à sa place.
-    Ce tiers peut alors saisir son code de signature dans votre outil.
-    """
-    securityCode: Int
+    input: BsffSignatureInput!
   ): Bsff!
 
   """

@@ -312,13 +312,13 @@ function Destination({ form }: { form: Bsff }) {
           value={form.destination?.reception?.signature?.author}
           label="Réception signée par"
         />
-        <DetailRow
+        {/* <DetailRow
           value={form.destination?.reception?.weight}
           label="Quantité reçue"
           units="kg"
-        />
+        /> */}
       </div>
-      <div className={styles.detailGrid}>
+      {/* <div className={styles.detailGrid}>
         <DetailRow
           value={form.destination?.operation?.code}
           label="Opération de traitement"
@@ -332,7 +332,7 @@ function Destination({ form }: { form: Bsff }) {
           value={form.destination?.operation?.signature?.date}
           label="Traitement signé le"
         />
-      </div>
+      </div> */}
     </>
   );
 }

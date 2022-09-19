@@ -54,7 +54,15 @@ async function getWasteConnection<WasteType extends GenericWaste>(
       },
       BSDA: { grouping: true, forwarding: true },
       BSDASRI: { grouping: true },
-      BSFF: { grouping: true, forwarding: true, repackaging: true }
+      BSFF: {
+        packagings: {
+          include: {
+            previousPackagings: {
+              include: { bsff: true }
+            }
+          }
+        }
+      }
     }
   );
 

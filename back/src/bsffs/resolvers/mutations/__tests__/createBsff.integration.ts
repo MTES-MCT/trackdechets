@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { BsffType, UserRole } from "@prisma/client";
 import { gql } from "apollo-server-core";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { BSFF_WASTE_CODES } from "../../../../common/constants";
@@ -33,6 +33,7 @@ describe("Mutation.createBsff", () => {
     >(CREATE_BSFF, {
       variables: {
         input: {
+          type: BsffType.COLLECTE_PETITES_QUANTITES,
           emitter: {
             company: {
               name: emitter.company.name,
@@ -77,7 +78,8 @@ describe("Mutation.createBsff", () => {
             {
               name: "BOUTEILLE",
               numero: "123",
-              weight: 1
+              weight: 1,
+              volume: 1
             }
           ]
         }
@@ -124,6 +126,7 @@ describe("Mutation.createBsff", () => {
     >(CREATE_BSFF, {
       variables: {
         input: {
+          type: BsffType.COLLECTE_PETITES_QUANTITES,
           emitter: {
             company: {
               name: "Clim' Clean",
@@ -154,6 +157,7 @@ describe("Mutation.createBsff", () => {
     >(CREATE_BSFF, {
       variables: {
         input: {
+          type: BsffType.COLLECTE_PETITES_QUANTITES,
           emitter: {
             company: {
               siret: emitter.company.siret

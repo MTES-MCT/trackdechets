@@ -31,14 +31,8 @@ export function BsffWasteSummary({ bsff }: BsffWasteSummaryProps) {
       <DataListItem>
         <DataListTerm>Quantité de fluides</DataListTerm>
         <DataListDescription>
-          {bsff.destination?.reception?.weight == null ? (
-            <>
-              {bsff.weight?.value} kilo(s){" "}
-              {bsff.weight?.isEstimate && <>(estimé(s))</>}
-            </>
-          ) : (
-            <>{bsff.destination.reception.weight} kilo(s)</>
-          )}
+          {bsff.weight?.value} kilo(s){" "}
+          {bsff.weight?.isEstimate && <>(estimé(s))</>}
         </DataListDescription>
       </DataListItem>
       <DataListItem>

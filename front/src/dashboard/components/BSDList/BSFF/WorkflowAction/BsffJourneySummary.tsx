@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Bsff } from "generated/graphql/types";
+import { Bsff, BsffStatus } from "generated/graphql/types";
 import {
   Journey,
   JourneyStop,
@@ -41,7 +41,11 @@ export function BsffJourneySummary({ bsff }: BsffJourneySummaryProps) {
       </JourneyStop>
       <JourneyStop
         variant={
-          bsff.destination?.operation?.signature
+          [
+            BsffStatus.Processed,
+            BsffStatus.IntermediatelyProcessed,
+            BsffStatus.Refused,
+          ].includes(bsff.status)
             ? "complete"
             : bsff.transporter?.transport?.signature
             ? "active"

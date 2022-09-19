@@ -42,8 +42,8 @@ function SignEmissionForm({ bsff, onCancel }: SignEmissionFormProps) {
         await signBsff({
           variables: {
             id: bsff.id,
-            type: BsffSignatureType.Emission,
-            signature: {
+            input: {
+              type: BsffSignatureType.Emission,
               author: values.signatureAuthor,
               date: new Date().toISOString(),
             },

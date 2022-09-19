@@ -12,6 +12,8 @@ export const bsffVerboseStatuses: Record<BsffStatus, string> = {
   INTERMEDIATELY_PROCESSED: "Traité, en attente de suivi",
   PROCESSED: "Traité",
   REFUSED: "Refusé par le destinataire",
+  ACCEPTED: "En attente de traitement",
+  PARTIALLY_REFUSED: "Refusé partiellement, en attente de traitement",
 };
 
 export const OPERATION: Record<
