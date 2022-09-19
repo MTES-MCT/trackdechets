@@ -16,6 +16,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Correction d'un bug ne prenant pas en compte le récépissé courtier renseigné lors du rattachement d'un établissement [PR 1673](https://github.com/MTES-MCT/trackdechets/pull/1673)
 - Correction du contenu de l'email de refus en cas d'entreposage provisoire [PR 1638](https://github.com/MTES-MCT/trackdechets/pull/1638)
+- Correction des règles d'affichage du bouton de contrôle routier [PR 1697](https://github.com/MTES-MCT/trackdechets/pull/1697)
 
 #### :boom: Breaking changes
 
