@@ -19,7 +19,16 @@ export function WorkflowAction(props: WorkflowActionProps) {
   }
   switch (form["bsdaStatus"]) {
     case BsdaStatus.Initial:
-      if (form.emitter?.isPrivateIndividual && form.worker?.isDisabled) {
+      if (form["bsdaType"] === "COLLECTION_2710") {
+        return siret === form.destination?.company?.siret ? (
+          <SignOperation {...props} bsdaId={form.id} />
+        ) : null;
+      }
+      if (
+        form.emitter?.isPrivateIndividual &&
+        form.worker?.isDisabled &&
+        siret === form.transporter?.company?.siret
+      ) {
         return <SignTransport {...props} bsdaId={form.id} />;
       }
       if (
@@ -27,11 +36,6 @@ export function WorkflowAction(props: WorkflowActionProps) {
         siret === form.worker?.company?.siret
       ) {
         return <SignWork {...props} bsdaId={form.id} />;
-      }
-      if (form["bsdaType"] === "COLLECTION_2710") {
-        return siret === form.destination?.company?.siret ? (
-          <SignOperation {...props} bsdaId={form.id} />
-        ) : null;
       }
       if (siret !== form.emitter?.company?.siret) return null;
       return <SignEmission {...props} bsdaId={form.id} />;
