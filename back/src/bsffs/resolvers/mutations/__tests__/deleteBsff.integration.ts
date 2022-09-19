@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { BsffStatus, BsffType, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -8,8 +8,11 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import {
   createBsff,
-  createBsffAfterEmission
+  createBsffAfterEmission,
+  createBsffAfterOperation
 } from "../../../__tests__/factories";
+import prisma from "../../../../prisma";
+import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 
 const DELETE_BSFF = `
   mutation DeleteBsff($id: ID!) {
@@ -147,5 +150,145 @@ describe("Mutation.deleteBsff", () => {
         message: `Il n'est pas possible de supprimer un bordereau qui a été signé par un des acteurs`
       })
     ]);
+  });
+
+  it("should unlink grouped bsffs", async () => {
+    const initialEmitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+
+    let initialBsff = await createBsffAfterOperation({
+      emitter: initialEmitter,
+      transporter,
+      destination: ttr
+    });
+
+    const groupingBsff = await prisma.bsff.create({
+      data: {
+        id: getReadableId(ReadableIdPrefix.FF),
+        isDraft: true,
+        type: BsffType.GROUPEMENT,
+        status: BsffStatus.INITIAL,
+        emitterCompanySiret: ttr.company.siret,
+        grouping: { connect: [{ id: initialBsff.id }] }
+      }
+    });
+
+    initialBsff = await prisma.bsff.findUnique({
+      where: { id: initialBsff.id }
+    });
+
+    expect(initialBsff.groupedInId).toEqual(groupingBsff.id);
+
+    const { mutate } = makeClient(ttr.user);
+
+    await mutate<Pick<Mutation, "deleteBsff">, MutationDeleteBsffArgs>(
+      DELETE_BSFF,
+      {
+        variables: {
+          id: groupingBsff.id
+        }
+      }
+    );
+
+    initialBsff = await prisma.bsff.findUnique({
+      where: { id: initialBsff.id }
+    });
+
+    expect(initialBsff.groupedInId).toEqual(null);
+  });
+
+  it("should unlink repackaged bsffs", async () => {
+    const initialEmitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+
+    let initialBsff = await createBsffAfterOperation({
+      emitter: initialEmitter,
+      transporter,
+      destination: ttr
+    });
+
+    const repackagingBsff = await prisma.bsff.create({
+      data: {
+        id: getReadableId(ReadableIdPrefix.FF),
+        isDraft: true,
+        type: BsffType.RECONDITIONNEMENT,
+        status: BsffStatus.INITIAL,
+        emitterCompanySiret: ttr.company.siret,
+        repackaging: { connect: [{ id: initialBsff.id }] }
+      }
+    });
+
+    initialBsff = await prisma.bsff.findUnique({
+      where: { id: initialBsff.id }
+    });
+
+    expect(initialBsff.repackagedInId).toEqual(repackagingBsff.id);
+
+    const { mutate } = makeClient(ttr.user);
+
+    await mutate<Pick<Mutation, "deleteBsff">, MutationDeleteBsffArgs>(
+      DELETE_BSFF,
+      {
+        variables: {
+          id: repackagingBsff.id
+        }
+      }
+    );
+
+    initialBsff = await prisma.bsff.findUnique({
+      where: { id: initialBsff.id }
+    });
+
+    expect(initialBsff.repackagedInId).toEqual(null);
+  });
+
+  it("should unlink forwarded bsff", async () => {
+    const initialEmitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const initialBsff = await createBsffAfterOperation({
+      emitter: initialEmitter,
+      transporter,
+      destination: ttr
+    });
+
+    const forwardingBsff = await prisma.bsff.create({
+      data: {
+        id: getReadableId(ReadableIdPrefix.FF),
+        isDraft: true,
+        type: BsffType.REEXPEDITION,
+        status: BsffStatus.INITIAL,
+        emitterCompanySiret: ttr.company.siret,
+        forwarding: { connect: { id: initialBsff.id } }
+      }
+    });
+
+    let updatedInitialBsff = await prisma.bsff.findUnique({
+      where: { id: initialBsff.id },
+      include: { forwardedIn: true }
+    });
+
+    expect(updatedInitialBsff.forwardedIn.id).toEqual(forwardingBsff.id);
+
+    const { mutate } = makeClient(ttr.user);
+
+    await mutate<Pick<Mutation, "deleteBsff">, MutationDeleteBsffArgs>(
+      DELETE_BSFF,
+      {
+        variables: {
+          id: forwardingBsff.id
+        }
+      }
+    );
+
+    updatedInitialBsff = await prisma.bsff.findUnique({
+      where: { id: initialBsff.id },
+      include: { forwardedIn: true }
+    });
+
+    expect(updatedInitialBsff.forwardedIn).toEqual(null);
   });
 });

@@ -24,7 +24,10 @@ const deleteBsff: MutationResolvers["deleteBsff"] = async (
 
   const updatedBsff = await prisma.bsff.update({
     data: {
-      isDeleted: true
+      isDeleted: true,
+      repackaging: { set: [] },
+      grouping: { set: [] },
+      forwarding: { disconnect: true }
     },
     where: {
       id
