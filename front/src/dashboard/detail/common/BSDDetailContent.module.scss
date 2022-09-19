@@ -35,7 +35,6 @@
     @include desktop {
       flex-direction: row;
     }
-   
   }
   &Grid {
     display: inline-grid;
@@ -130,6 +129,7 @@
   &TabCaption {
     color: $blue;
     font-size: 0.75rem;
+    line-height: initial;
   }
   &TabPanels {
     border-top: 2px solid $blue;
