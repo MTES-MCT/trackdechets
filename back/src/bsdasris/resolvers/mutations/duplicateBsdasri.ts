@@ -5,11 +5,12 @@ import {
   MutationDuplicateBsdasriArgs,
   MutationResolvers
 } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+
 import { expandBsdasriFromDB } from "../../converter";
 import { getBsdasriOrNotFound } from "../../database";
 import { checkIsBsdasriContributor } from "../../permissions";
 import { ForbiddenError } from "apollo-server-express";
+import { getBsdasriRepository } from "../../repository";
 
 import { indexBsdasri } from "../../elastic";
 /**
@@ -99,13 +100,13 @@ function duplicateBsdasri(
     ...fieldsToCopy
   }: Bsdasri
 ) {
-  return prisma.bsdasri.create({
-    data: {
-      ...fieldsToCopy,
-      id: getReadableId(ReadableIdPrefix.DASRI),
-      status: BsdasriStatus.INITIAL,
-      isDraft: true
-    }
+  const bsdasriRepository = getBsdasriRepository(user);
+
+  return bsdasriRepository.create({
+    ...fieldsToCopy,
+    id: getReadableId(ReadableIdPrefix.DASRI),
+    status: BsdasriStatus.INITIAL,
+    isDraft: true
   });
 }
 

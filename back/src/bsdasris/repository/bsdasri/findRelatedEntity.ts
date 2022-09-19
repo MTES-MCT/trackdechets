@@ -1,0 +1,19 @@
+import { Bsdasri, Prisma } from "@prisma/client";
+import { ReadRepositoryFnDeps } from "../../../forms/repository/types";
+
+type ChainableBsdasri = Pick<
+  Prisma.Prisma__BsdasriClient<Bsdasri>,
+  "synthesizedIn" | "synthesizing" | "groupedIn" | "grouping"
+>;
+
+export type FindRelatedEntityFn = (
+  where: Prisma.BsdasriWhereUniqueInput
+) => ChainableBsdasri;
+
+export function buildFindRelatedBsdasriEntity({
+  prisma
+}: ReadRepositoryFnDeps): FindRelatedEntityFn {
+  return where => {
+    return prisma.bsdasri.findUnique({ where });
+  };
+}

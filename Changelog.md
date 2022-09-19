@@ -25,6 +25,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :memo: Documentation
 #### :house: Interne
 
+- Utilisation du pattern repository et indexation asynchrone sur le bsdasri [PR 1718](https://github.com/MTES-MCT/trackdechets/pull/1718)
 
 # [2022.09.1] 20/09/2022
 

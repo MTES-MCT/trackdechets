@@ -1,9 +1,10 @@
 import { BsdasriResolvers } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+
 import { BsdasriType } from "@prisma/client";
 import { expandSynthesizingDasri } from "../../converter";
 import { dashboardOperationName } from "../../../common/queries";
 import { isSessionUser } from "../../../auth";
+import { getReadonlyBsdasriRepository } from "../../repository";
 
 const synthesizing: BsdasriResolvers["synthesizing"] = async (
   bsdasri,
@@ -22,8 +23,8 @@ const synthesizing: BsdasriResolvers["synthesizing"] = async (
   ) {
     synthesizing = bsdasri?.synthesizing ?? [];
   } else {
-    synthesizing = await prisma.bsdasri
-      .findUnique({ where: { id: bsdasri.id } })
+    synthesizing = await getReadonlyBsdasriRepository()
+      .findRelatedEntity({ id: bsdasri.id })
       .synthesizing();
   }
 

@@ -1,5 +1,4 @@
 import { Bsdasri, Prisma, BsdasriStatus } from "@prisma/client";
-import prisma from "../../prisma";
 import { BsdasriEvent } from "./types";
 import machine from "./machine";
 import { InvalidTransition } from "../../forms/errors";
@@ -34,13 +33,9 @@ export default async function dasriTransition(
     ...extraFields
   };
 
-  // update dasri
-  return prisma.bsdasri.update({
+  //  dasri update payload
+  return {
     where: { id: bsdasri.id },
-    data: dasriUpdateInput,
-    include: {
-      grouping: { select: { id: true } },
-      synthesizing: { select: { id: true } }
-    }
-  });
+    updateData: dasriUpdateInput
+  };
 }
