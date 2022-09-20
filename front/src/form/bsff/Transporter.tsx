@@ -1,12 +1,14 @@
-import { Switch } from "common/components";
+import React, { lazy } from "react";
+import { FieldTransportModeSelect, Switch } from "common/components";
 import RedErrorMessage from "common/components/RedErrorMessage";
+import TdTooltip from "common/components/Tooltip";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { Field, useFormikContext } from "formik";
 import { Bsff } from "generated/graphql/types";
-import React from "react";
 import styles from "./Transporter.module.scss";
 import initialState from "./utils/initial-state";
+const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export default function Transporter({ disabled }) {
   const { setFieldValue, values } = useFormikContext<Bsff>();
@@ -28,25 +30,16 @@ export default function Transporter({ disabled }) {
         registeredOnlyCompanies={true}
         onCompanySelected={transporter => {
           if (transporter.transporterReceipt) {
-            setFieldValue(
-              "transporter.recepisse.number",
-              transporter.transporterReceipt.receiptNumber
-            );
-            setFieldValue(
-              "transporter.recepisse.validityLimit",
-              transporter.transporterReceipt.validityLimit
-            );
-            setFieldValue(
-              "transporter.recepisse.department",
-              transporter.transporterReceipt.department
-            );
+            setFieldValue("transporter.recepisse", {
+              number: transporter.transporterReceipt.receiptNumber,
+              validityLimit: transporter.transporterReceipt.validityLimit,
+              department: transporter.transporterReceipt.department,
+            });
           } else {
-            setFieldValue("transporter.recepisse.number", "");
             setFieldValue(
-              "transporter.recepisse.validityLimit",
-              initialState.transporter.recepisse.validityLimit
+              "transporter.recepisse",
+              initialState.transporter.recepisse
             );
-            setFieldValue("transporter.recepisse.department", "");
           }
         }}
       />
@@ -64,7 +57,9 @@ export default function Transporter({ disabled }) {
         </label>
       ) : (
         <>
-          <h4 className="form__section-heading">Autorisations</h4>
+          <h4 className="form__section-heading">
+            Récépissé de déclaration de transport de déchets
+          </h4>
           <div className="form__row">
             <Switch
               checked={values.transporter?.recepisse == null}
@@ -80,47 +75,69 @@ export default function Transporter({ disabled }) {
             />
           </div>
           {values.transporter?.recepisse != null && (
-            <>
-              <div className="form__row">
-                <label>
-                  Numéro de récépissé
-                  <Field
-                    type="text"
-                    name="transporter.recepisse.number"
-                    className="td-input"
-                    disabled={disabled}
-                  />
-                </label>
+            <div className="form__row">
+              <label>
+                Numéro de récépissé
+                <Field
+                  type="text"
+                  name="transporter.recepisse.number"
+                  className="td-input"
+                  disabled={disabled}
+                />
+              </label>
 
-                <RedErrorMessage name="transporter.recepisse.number" />
+              <RedErrorMessage name="transporter.recepisse.number" />
 
-                <label>
-                  Département
-                  <Field
-                    type="text"
-                    name="transporter.recepisse.department"
-                    placeholder="Ex: 83"
-                    className={`td-input ${styles.transporterDepartment}`}
-                    disabled={disabled}
-                  />
-                </label>
+              <label>
+                Département
+                <Field
+                  type="text"
+                  name="transporter.recepisse.department"
+                  placeholder="Ex: 83"
+                  className={`td-input ${styles.transporterDepartment}`}
+                  disabled={disabled}
+                />
+              </label>
 
-                <RedErrorMessage name="transporter.recepisse.department" />
+              <RedErrorMessage name="transporter.recepisse.department" />
 
-                <label>
-                  Limite de validité
-                  <Field
-                    component={DateInput}
-                    name="transporter.recepisse.validityLimit"
-                    className={`td-input ${styles.transporterValidityLimit}`}
-                    disabled={disabled}
-                  />
-                </label>
+              <label>
+                Limite de validité
+                <Field
+                  component={DateInput}
+                  name="transporter.recepisse.validityLimit"
+                  className={`td-input ${styles.transporterValidityLimit}`}
+                  disabled={disabled}
+                />
+              </label>
 
-                <RedErrorMessage name="transporter.recepisse.validityLimit" />
-              </div>
-            </>
+              <RedErrorMessage name="transporter.recepisse.validityLimit" />
+            </div>
           )}
+          <h4 className="form__section-heading">Détails</h4>
+          <div className="form__row">
+            <label>
+              Mode de transport:
+              <Field
+                id="id_mode"
+                name="transporter.transport.mode"
+                component={FieldTransportModeSelect}
+                disabled={disabled}
+              ></Field>
+            </label>
+          </div>
+
+          <div className="form__row">
+            <label>
+              Immatriculations
+              <TdTooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
+              <TagsInput
+                name="transporter.transport.plates"
+                disabled={disabled}
+                limit={2}
+              />
+            </label>
+          </div>
         </>
       )}
     </>

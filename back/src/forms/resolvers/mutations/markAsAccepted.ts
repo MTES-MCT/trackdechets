@@ -3,12 +3,14 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { getFormOrFormNotFound } from "../../database";
-import { expandFormFromDb } from "../../form-converter";
+import { expandFormFromDb } from "../../converter";
 import { checkCanMarkAsAccepted } from "../../permissions";
 import { getFormRepository } from "../../repository";
 import { acceptedInfoSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
+import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
+import { sendMail } from "../../../mailer/mailing";
 
 const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
   _,
@@ -61,6 +63,15 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
 
     return acceptedForm;
   });
+
+  if (
+    acceptedForm.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED ||
+    acceptedForm.wasteAcceptationStatus ===
+      WasteAcceptationStatus.PARTIALLY_REFUSED
+  ) {
+    const refusedEmail = await renderFormRefusedEmail(acceptedForm);
+    sendMail(refusedEmail);
+  }
 
   return expandFormFromDb(acceptedForm);
 };

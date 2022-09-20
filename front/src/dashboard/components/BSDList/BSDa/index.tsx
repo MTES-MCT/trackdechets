@@ -60,7 +60,7 @@ export const COLUMNS: Record<
   },
   waste: {
     accessor: bsda =>
-      [bsda?.waste?.code, bsda?.waste?.materialName]
+      [bsda?.waste?.["bsdaCode"], bsda?.waste?.materialName]
         .filter(Boolean)
         .join(" - "),
   },

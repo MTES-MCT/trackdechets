@@ -1,45 +1,25 @@
+import { RepositoryTransaction } from "../../forms/repository/types";
 import prisma from "../../prisma";
-import { BsdaActions } from "./types";
-import { PrismaTransaction } from "../../forms/repository/types";
-import { buildFindUniqueBsda } from "./bsda/findUnique";
 import { buildCountBsdas } from "./bsda/count";
 import { buildCreateBsda } from "./bsda/create";
 import { buildDeleteBsda } from "./bsda/delete";
-import { buildUpdateBsda } from "./bsda/update";
-import { buildUpdateManyBsdas } from "./bsda/updateMany";
 import { buildFindManyBsda } from "./bsda/findMany";
 import { buildFindRelatedBsdaEntity } from "./bsda/findRelatedEntity";
-import { buildCreateRevisionRequest } from "./revisionRequest/create";
-import { buildCountRevisionRequests } from "./revisionRequest/count";
-import { buildFindUniqueRevisionRequest } from "./revisionRequest/findUnique";
-import { buildCancelRevisionRequest } from "./revisionRequest/cancel";
+import { buildFindUniqueBsda } from "./bsda/findUnique";
+import { buildUpdateBsda } from "./bsda/update";
+import { buildUpdateManyBsdas } from "./bsda/updateMany";
+import { transactionWrapper } from "./helper";
 import { buildAcceptRevisionRequestApproval } from "./revisionRequest/accept";
-import { buildRefuseRevisionRequestApproval } from "./revisionRequest/refuse";
+import { buildCancelRevisionRequest } from "./revisionRequest/cancel";
+import { buildCountRevisionRequests } from "./revisionRequest/count";
+import { buildCreateRevisionRequest } from "./revisionRequest/create";
 import { buildFindManyBsdaRevisionRequest } from "./revisionRequest/findMany";
+import { buildFindUniqueRevisionRequest } from "./revisionRequest/findUnique";
+import { buildRefuseRevisionRequestApproval } from "./revisionRequest/refuse";
+import { BsdaActions } from "./types";
 
 export type BsdaRepository = BsdaActions;
-
-function transactionWrapper<Builder extends (args) => any>(
-  user: Express.User,
-  transaction: PrismaTransaction | undefined,
-  builder: Builder
-) {
-  return (...args) => {
-    if (transaction) {
-      return builder({ user, prisma: transaction })(...args);
-    }
-
-    return prisma.$transaction(newTransaction =>
-      builder({ user, prisma: newTransaction })(...args)
-    );
-  };
-}
-
-export function runInTransaction<F>(
-  func: (transaction: PrismaTransaction) => Promise<F>
-) {
-  return prisma.$transaction(async transaction => func(transaction));
-}
+export { runInTransaction } from "./helper";
 
 export function getReadonlyBsdaRepository() {
   return {
@@ -55,7 +35,7 @@ export function getReadonlyBsdaRepository() {
 
 export function getBsdaRepository(
   user: Express.User,
-  transaction?: PrismaTransaction
+  transaction?: RepositoryTransaction
 ): BsdaRepository {
   const useTransaction = builder =>
     transactionWrapper(user, transaction, builder);

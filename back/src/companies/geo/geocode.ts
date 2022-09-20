@@ -1,0 +1,37 @@
+import axios from "axios";
+
+const API_ADRESSE_URL = "https://api-adresse.data.gouv.fr/search/";
+
+interface GeoInfo {
+  latitude: number | null;
+  longitude: number | null;
+}
+
+type Feature = {
+  geometry?: { type: string; coordinates: number[] };
+  properties?: { score: number };
+};
+
+export default async function geocode(address: string): Promise<GeoInfo> {
+  try {
+    const response = await axios.get<{ features: Feature[] }>(API_ADRESSE_URL, {
+      params: { q: address }
+    });
+    if (response.status === 200) {
+      const features = response.data.features;
+      if (features && features.length > 0) {
+        const feature = features[0];
+        if (
+          feature.geometry?.type === "Point" &&
+          feature.properties?.score > 0.6
+        ) {
+          const coordinates = feature.geometry.coordinates;
+          return { longitude: coordinates[0], latitude: coordinates[1] };
+        }
+      }
+    }
+  } catch (_) {
+    console.log(`Error while trying to geocode address ${address}`);
+  }
+  return { longitude: null, latitude: null };
+}

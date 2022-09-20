@@ -117,7 +117,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
                 Signature émetteur
               </ActionLink>
             )}
-
+            {/* marked as deprecated for api user, this field is used to dynamically insert user settings data */}
             {form?.allowDirectTakeOver &&
             isSimple && ( // grouping dasri can't be directly taken over
                 <ActionLink
@@ -136,7 +136,6 @@ export function WorkflowAction(props: WorkflowActionProps) {
                   Emport direct transporteur
                 </ActionLink>
               )}
-
             {isSynthesis && (
               <ActionLink
                 icon={<IconCheckCircle1 size="24px" />}
@@ -198,7 +197,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
               state: { background: location },
             }}
           >
-            Signature reception
+            Signature réception
           </ActionLink>
         );
       }

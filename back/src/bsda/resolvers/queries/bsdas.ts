@@ -6,7 +6,7 @@ import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { BSDA_CONTRIBUTORS_FIELDS } from "../../permissions";
 import { getConnection } from "../../../common/pagination";
-import { getCachedUserSirets } from "../../../common/redis/users";
+import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { getBsdaRepository } from "../../repository";
 
 export default async function bsdas(
@@ -16,11 +16,11 @@ export default async function bsdas(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const userSirets = await getCachedUserSirets(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   const mask = {
     OR: Object.values(BSDA_CONTRIBUTORS_FIELDS).map(field => ({
-      [field]: { in: userSirets }
+      [field]: { in: userCompaniesSiretOrVat }
     }))
   };
 

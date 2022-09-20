@@ -1,14 +1,16 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { CountFormsFn } from "./form/count";
 import { CreateFormFn } from "./form/create";
-import { SetAppendix2Fn } from "./form/setAppendix2";
 import { DeleteFormFn } from "./form/delete";
+import { DeleteFormStaleSegmentsFn } from "./form/deleteStaleSegments";
 import { FindAppendix2FormsByIdFn } from "./form/findAppendix2FormsById";
 import { FindForwardedInByIdFn } from "./form/findForwardedInById";
 import { FindFullFormByIdFn } from "./form/findFullFormById";
 import { FindUniqueFormFn } from "./form/findUnique";
 import { RemoveAppendix2Fn } from "./form/removeAppendix2";
+import { SetAppendix2Fn } from "./form/setAppendix2";
 import { UpdateFormFn } from "./form/update";
+import { UpdateAppendix2Forms } from "./form/updateAppendix2Forms";
 import { UpdateManyFormFn } from "./form/updateMany";
 import { AcceptRevisionRequestApprovalFn } from "./formRevisionRequest/acceptRevisionRequestApproval";
 import { CancelRevisionRequestFn } from "./formRevisionRequest/cancelRevisionRequest";
@@ -16,15 +18,16 @@ import { CountRevisionRequestsFn } from "./formRevisionRequest/countRevisionRequ
 import { CreateRevisionRequestFn } from "./formRevisionRequest/createRevisionRequest";
 import { GetRevisionRequestByIdFn } from "./formRevisionRequest/getRevisionRequestById";
 import { RefuseRevisionRequestFn } from "./formRevisionRequest/refuseRevisionRequestApproval";
-import { UpdateAppendix2Forms } from "./form/updateAppendix2Forms";
-import { DeleteFormStaleSegmentsFn } from "./form/deleteStaleSegments";
 
 export type PrismaTransaction = Omit<
   PrismaClient,
   "$connect" | "$disconnect" | "$on" | "$transaction" | "$use"
 >;
+export type RepositoryTransaction = PrismaTransaction & {
+  addAfterCommitCallback?: (callback: () => void | Promise<void>) => void;
+};
 
-export type ReadRepositoryFnDeps = { prisma: PrismaTransaction };
+export type ReadRepositoryFnDeps = { prisma: RepositoryTransaction };
 export type WriteRepositoryFnDeps = ReadRepositoryFnDeps & {
   user: Express.User;
 };

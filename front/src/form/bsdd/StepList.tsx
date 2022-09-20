@@ -8,17 +8,18 @@ import {
   Query,
   QueryFormArgs,
 } from "generated/graphql/types";
-import React, { ReactElement, useMemo } from "react";
+import React, { ReactElement, useMemo, lazy } from "react";
 import { generatePath, useHistory, useParams } from "react-router-dom";
 import { getInitialState } from "./utils/initial-state";
 import { formSchema } from "./utils/schema";
-import GenericStepList from "../common/stepper/GenericStepList";
 import { CREATE_FORM, GET_FORM, UPDATE_FORM } from "./utils/queries";
 import { IStepContainerProps } from "../common/stepper/Step";
 import { GET_BSDS } from "common/queries";
 import { Loader } from "common/components";
 import { formInputToastError } from "form/common/stepper/toaster";
-
+const GenericStepList = lazy(() =>
+  import("form/common/stepper/GenericStepList")
+);
 interface Props {
   children: ReactElement<IStepContainerProps>[];
   formId?: string;

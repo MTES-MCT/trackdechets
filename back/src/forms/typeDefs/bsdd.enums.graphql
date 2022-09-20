@@ -27,6 +27,9 @@ enum FormStatus {
   "BSD dont les déchets ont été traités"
   PROCESSED
 
+  "BSD dont les déchets ont été traités en dehors de France sans rupture de traçabilité"
+  FOLLOWED_WITH_PNTTD
+
   "BSD en attente de regroupement"
   AWAITING_GROUP
 

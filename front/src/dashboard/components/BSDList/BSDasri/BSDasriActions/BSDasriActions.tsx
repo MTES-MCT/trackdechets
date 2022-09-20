@@ -26,6 +26,7 @@ import { Bsdasri, BsdasriStatus, BsdasriType } from "generated/graphql/types";
 import { useDownloadPdf } from "./useDownloadPdf";
 import styles from "../../BSDActions.module.scss";
 import { TableRoadControlButton } from "../../RoadControlButton";
+import { Loader } from "common/components";
 
 interface BSDAsriActionsProps {
   form: Bsdasri;
@@ -34,7 +35,7 @@ interface BSDAsriActionsProps {
 export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
   const { siret } = useParams<{ siret: string }>();
   const location = useLocation();
-  const [duplicateBsdasri] = useBsdasriDuplicate({
+  const [duplicateBsdasri, { loading }] = useBsdasriDuplicate({
     variables: { id: form.id },
   });
   const [isDeleting, setIsDeleting] = React.useState(false);
@@ -58,7 +59,12 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
                 <IconChevronDown size="14px" color="blueLight" />
               )}
             </MenuButton>
-            <MenuList className={styles.BSDDActionsMenu}>
+            <MenuList
+              className={classNames(
+                "fr-raw-link fr-raw-list",
+                styles.BSDDActionsMenu
+              )}
+            >
               <MenuLink
                 as={Link}
                 to={{
@@ -113,6 +119,7 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
           </>
         )}
       </Menu>
+      {loading && <Loader />}
       {isDeleting && (
         <DeleteBsdasriModal
           isOpen

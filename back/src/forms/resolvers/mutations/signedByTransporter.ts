@@ -5,7 +5,7 @@ import { getFormOrFormNotFound } from "../../database";
 import {
   expandFormFromDb,
   flattenSignedByTransporterInput
-} from "../../form-converter";
+} from "../../converter";
 import {
   checkCanSignedByTransporter,
   checkSecurityCode

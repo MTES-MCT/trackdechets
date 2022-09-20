@@ -20,7 +20,10 @@ import { BsdasriStatus, Bsdasri, BsdasriType } from "generated/graphql/types";
 import BsdasriGroupingSelector from "form/bsdasri/components/grouping/BsdasriGroupingSelector";
 import BsdasriSynthesisSelector from "form/bsdasri/components/grouping/BsdasriSynthesisSelector";
 import { useParams } from "react-router-dom";
+import Tooltip from "common/components/Tooltip";
 
+export const customInfoToolTip =
+  "Informations propres à l'entreprise. N'apparaît pas sur le bordereau.";
 export default function GenericEmitter({ status, stepName, disabled = false }) {
   const { values } = useFormikContext<Bsdasri>();
 
@@ -214,7 +217,7 @@ export function Emitter({ status, stepName, disabled = false }) {
         })}
       >
         <label>
-          Code ADR
+          Mention ADR
           <Field
             disabled={editionDisabled}
             type="text"
@@ -228,7 +231,7 @@ export function Emitter({ status, stepName, disabled = false }) {
 
       <div className="form__row">
         <label>
-          Champ libre (optionnel)
+          Champ libre (optionnel) <Tooltip msg={customInfoToolTip} />
           <Field
             disabled={editionDisabled}
             component="textarea"

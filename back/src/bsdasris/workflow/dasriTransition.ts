@@ -35,10 +35,12 @@ export default async function dasriTransition(
   };
 
   // update dasri
-  const updatedForm = await prisma.bsdasri.update({
+  return prisma.bsdasri.update({
     where: { id: bsdasri.id },
-    data: dasriUpdateInput
+    data: dasriUpdateInput,
+    include: {
+      grouping: { select: { id: true } },
+      synthesizing: { select: { id: true } }
+    }
   });
-
-  return updatedForm;
 }

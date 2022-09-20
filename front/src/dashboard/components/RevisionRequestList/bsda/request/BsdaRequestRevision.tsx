@@ -1,7 +1,11 @@
 import { useMutation } from "@apollo/client";
+import { Field, Form, Formik } from "formik";
+import React, { lazy } from "react";
+import { useHistory } from "react-router";
+import { useParams } from "react-router-dom";
+import * as yup from "yup";
 import classNames from "classnames";
 import { FieldSwitch, RedErrorMessage } from "common/components";
-import TagsInput from "common/components/tags-input/TagsInput";
 import Packagings, {
   PACKAGINGS_NAMES,
 } from "form/bsda/components/packagings/Packagings";
@@ -11,20 +15,16 @@ import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import WorkSiteAddress from "form/common/components/work-site/WorkSiteAddress";
-import { Field, Form, Formik } from "formik";
 import {
   Bsda,
   Mutation,
   MutationCreateBsdaRevisionRequestArgs,
 } from "generated/graphql/types";
-import React from "react";
-import { useHistory } from "react-router";
-import { useParams } from "react-router-dom";
-import * as yup from "yup";
 import { removeEmptyKeys } from "../../../../../common/helper";
 import { ReviewableField } from "../../bsdd/request/ReviewableField";
 import { CREATE_BSDA_REVISION_REQUEST } from "../query";
 import styles from "./BsdaRequestRevision.module.scss";
+const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 type Props = {
   bsda: Bsda;
@@ -217,14 +217,15 @@ export function BsdaRequestRevision({ bsda }: Props) {
                   <option value="...">Sélectionnez une valeur...</option>
                   <option value="R 5">
                     R 5 - Recyclage ou récupération d'autres matières
-                    inorganiques.
+                    inorganiques (dont vitrification)
                   </option>
                   <option value="D 5">
                     D 5 - Mise en décharge aménagée et autorisée en ISDD ou
                     ISDND
                   </option>
                   <option value="D 9">
-                    D 9 - Vitrification, traitement chimique ou prétraitement
+                    D 9 - Traitement chimique ou prétraitement (dont
+                    vitrification)
                   </option>
                   <option value="R 13">
                     R 13 - Opérations de transit incluant le groupement sans

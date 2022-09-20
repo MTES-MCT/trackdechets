@@ -129,6 +129,7 @@ async function getRecentRecipients(
     },
     select: { recipientCompanySiret: true }
   });
+
   const recipientSirets = forms.map(f => f.recipientCompanySiret);
   const companies = await prisma.company.findMany({
     where: { siret: { in: recipientSirets } }

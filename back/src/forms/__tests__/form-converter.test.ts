@@ -1,9 +1,5 @@
-import {
-  flattenFormInput,
-  nullIfNoValues,
-  safeInput,
-  chain
-} from "../form-converter";
+import { flattenFormInput } from "../converter";
+import { nullIfNoValues, safeInput, chain } from "../../common/converter";
 import { FormInput, WasteDetailsInput } from "../../generated/graphql/types";
 
 test("nullIfNoValues", () => {

@@ -1,7 +1,6 @@
 import { Bsda, Prisma } from "@prisma/client";
 import { LogMetadata, RepositoryFnDeps } from "../../../forms/repository/types";
-import { GraphQLContext } from "../../../types";
-import { indexBsda } from "../../elastic";
+import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
 
 export type CreateBsdaFn = (
   data: Prisma.BsdaCreateInput,
@@ -24,7 +23,7 @@ export function buildCreateBsda(deps: RepositoryFnDeps): CreateBsdaFn {
       }
     });
 
-    await indexBsda(bsda, { user } as GraphQLContext);
+    prisma.addAfterCommitCallback(() => enqueueBsdToIndex(bsda.id));
 
     return bsda;
   };

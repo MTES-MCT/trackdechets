@@ -1,5 +1,4 @@
 import { Form, Prisma } from "@prisma/client";
-import { eventEmitter, TDEvent } from "../../../events/emitter";
 import { GraphQLContext } from "../../../types";
 import { indexForm } from "../../elastic";
 import { formDiff } from "../../workflow/diff";
@@ -49,13 +48,6 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
       const updatedFields = await formDiff(oldForm, {
         ...updatedForm,
         forwardedIn: updatedForwardedIn
-      });
-
-      eventEmitter.emit<Form>(TDEvent.TransitionForm, {
-        previousNode: oldForm,
-        node: updatedForm,
-        updatedFields,
-        mutation: "UPDATED"
       });
 
       // log status change

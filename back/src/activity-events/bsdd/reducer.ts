@@ -115,7 +115,10 @@ export function bsddReducer(
                 wasteDetailsPackagingInfos as Prisma.JsonValue
             }
           : {}),
-        ...dateConverter(currentState, event.data.content)
+        ...dateConverter(
+          currentState,
+          event.data.content as Partial<Prisma.FormCreateInput>
+        )
       };
 
     default:

@@ -12,7 +12,7 @@ import {
 } from "@prisma/client";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { checkCanEditBsdasri } from "../../permissions";
-import { getCachedUserSirets } from "../../../common/redis/users";
+import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 
 import {
   dasriSignatureMapping,
@@ -26,6 +26,7 @@ import { indexBsdasri } from "../../elastic";
 const reindexAssociatedDasris = async dasriId => {
   const updatedDasris = await prisma.bsdasri.findMany({
     where: { synthesizedInId: dasriId }
+    // no need to query grouping and synthesizing dasris for ES here
   });
   for (const updatedDasri of updatedDasris) {
     await indexBsdasri(updatedDasri);
@@ -108,9 +109,9 @@ const getSiretWhoSigns = async ({
     await checkIsCompanyMember({ id: userId }, { siret: siretWhoSigns });
   } else {
     // several allowed sirets ? take the first belonging to current user
-    const userSirets = await getCachedUserSirets(userId);
+    const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(userId);
     const userAuthorizedSirets = authorizedSirets.filter(siret =>
-      userSirets.includes(siret)
+      userCompaniesSiretOrVat.includes(siret)
     );
     if (!userAuthorizedSirets.length) {
       throw new ForbiddenError(
@@ -219,7 +220,7 @@ const sign = async ({
     await cascadeOnSynthesized({ dasri: updatedDasri });
   }
   const expandedDasri = expandBsdasriFromDB(updatedDasri);
-  await indexBsdasri(updatedDasri);
+  await indexBsdasri(updatedDasri, context);
   return expandedDasri;
 };
 

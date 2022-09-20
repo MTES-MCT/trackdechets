@@ -14,7 +14,7 @@ type Props = {
   company: CompanyPrivate;
 };
 
-AccountFielCompanyContactWebsite.fragments = {
+AccountFieldCompanyContactWebsite.fragments = {
   company: gql`
     fragment AccountFieldCompanyWebsiteFragment on CompanyPrivate {
       id
@@ -26,8 +26,8 @@ AccountFielCompanyContactWebsite.fragments = {
 };
 
 const UPDATE_WEBSITE = gql`
-  mutation UpdateCompany($siret: String!, $website: String) {
-    updateCompany(siret: $siret, website: $website) {
+  mutation UpdateCompany($id: String!, $website: String) {
+    updateCompany(id: $id, website: $website) {
       id
       siret
       website
@@ -39,7 +39,7 @@ const yupSchema = object().shape({
   website: string().url(),
 });
 
-export default function AccountFielCompanyContactWebsite({ company }: Props) {
+export default function AccountFieldCompanyContactWebsite({ company }: Props) {
   const fieldName = "website";
   const fieldLabel = "Site web";
 
@@ -57,7 +57,7 @@ export default function AccountFielCompanyContactWebsite({ company }: Props) {
               value={company.website}
               placeHolder={fieldLabel}
               mutation={UPDATE_WEBSITE}
-              mutationArgs={{ siret: company.siret }}
+              mutationArgs={{ id: company.id }}
               yupSchema={yupSchema}
               toggleEdition={() => {
                 toggleEdition();

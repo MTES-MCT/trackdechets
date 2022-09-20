@@ -16,6 +16,7 @@ Au cours de son cycle de vie, un BSDD numérique peut passer par différents ét
 - `PROCESSED` (traité): BSD dont l'opération de traitement a été effectué
 - `NO_TRACEABILITY` (rupture de traçabilité): Rupture de traçabilité autorisée par arrêté préfectoral avec transfert de responsabilité.
 - `AWAITING_GROUP`: BSD en attente de regroupement (code de traitement D 13, D 14, D 15, R 12, R 13)
+- `FOLLOWED_WITH_PNTTD` (traité): BSD sans rupture de traçabilité avec destination ultérieure à l'étranger
 - `GROUPED`: BSD qui a été ajouté à une annexe 2
 - `TEMP_STORED`: (reçu): BSD reçu sur l'installation d'entreposage provisoire ou de reconditionnement
 - `TEMP_STORED_ACCEPTED`: (accepté): BSD accepté sur l'installation d'entreposage provisoire ou de reconditionnement
@@ -34,7 +35,7 @@ Chaque changement d'état s'effectue grâce à une mutation.
 | `signTransportForm`        | <div><ul><li>`SIGNED_BY_PRODUCER -> SENT`</li><li>`SIGNED_BY_TEMP_STORER -> RESENT`</li></ul></div>                             | [SignTransportFormInput](../api-reference/bsdd/inputObjects#signtransportforminput)           | <div><ul><li>transporteur (authentifié ou via son code de signature)</li></ul></div>                                                                                       |
 | `markAsReceived`           | <div><ul><li>`SENT -> ACCEPTED`</li><li>`SENT -> RECEIVED`</li><li>`SENT -> REFUSED`</li></ul></div>                            | [ReceivedFormInput](../api-reference/bsdd/inputObjects#receivedforminput)                     | Uniquement le destinataire du BSD                                                                                                                                          |
 | `markAsAccepted`           | `RECEIVED -> ACCEPTED`                                                                                                          | [AcceptedFormInput](../api-reference/bsdd/inputObjects#acceptedforminput)                     | Uniquement le destinataire du BSD                                                                                                                                          |
-| `markAsProcessed`          | <div><ul><li>`RECEIVED -> PROCESSED`</li><li>`RECEIVED -> NO_TRACEABILITY`</li><li>`RECEIVED -> AWAITING_GROUP`</li></ul></div> | [ProcessedFormInput](../api-reference/bsdd/inputObjects#processedforminput)                   | Uniquement le destinataire du BSD                                                                                                                                          |
+| `markAsProcessed`          | <div><ul><li>`RECEIVED -> PROCESSED`</li><li>`RECEIVED -> NO_TRACEABILITY`</li><li>`RECEIVED -> AWAITING_GROUP`</li><li>`RECEIVED -> FOLLOWED_WITH_PNTTD`</li></ul></div> | [ProcessedFormInput](../api-reference/bsdd/inputObjects#processedforminput)                   | Uniquement le destinataire du BSD                                                                                                                                          |
 | `markAsTempStored`         | <div><ul><li>`SENT -> TEMP_STORER_ACCEPTED`</li><li>`SENT -> TEMP_STORED`</li><li>`SENT -> REFUSED`</li></ul></div>             | [TempStoredFormInput](../api-reference/bsdd/inputObjects#tempstoredforminput)                 | Uniquement le site d'entreposage temporaire ou de reconditionnement                                                                                                        |
 | `markAsTempStorerAccepted` | `TEMP_STORED -> TEMP_STORER_ACCEPTED`                                                                                           | [TempStorerAcceptedFormInput](../api-reference/bsdd/inputObjects#tempstoreracceptedforminput) | Uniquement le site d'entreposage temporaire ou de reconditionnement                                                                                                        |
 | `markAsResealed`           | <div><ul><li>`TEMP_STORED -> RESEALED`</li><li>`RESEALED -> RESEALED`</li></ul></div>                                           | [ResealedFormInput](../api-reference/bsdd/inputObjects#resealedtoredforminput)                | Uniquement le site d'entreposage temporaire ou de reconditionnement                                                                                                        |
@@ -61,6 +62,7 @@ RECEIVED -->|markAsReceived - avec refus| REFUSED
 ACCEPTED -->|markAsProcessed| PROCESSED(PROCESSED)
 ACCEPTED -->|markAsProcessed - avec rupture de traçabalité |NO_TRACEABILITY(NO_TRACEABILITY)
 ACCEPTED -->|markAsProcessed - avec opération de regroupement | AWAITING_GROUP(AWAITING_GROUP)
+ACCEPTED -->|markAsProcessed - avec une destination ultérieure à l'étranger | FOLLOWED_WITH_PNTTD(FOLLOWED_WITH_PNTTD)
 SENT -->|markAsReceived - avec refus| REFUSED(REFUSED)
 SENT -->|markAsTempStored - avec refus| REFUSED
 AWAITING_GROUP.->|createForm - appendix2Forms |DRAFT

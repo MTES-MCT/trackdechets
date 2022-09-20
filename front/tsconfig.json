@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "allowJs": true,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
@@ -16,14 +16,9 @@
     "noImplicitAny": false,
     "strictNullChecks": true,
     "jsx": "react",
-    "lib": [
-      "dom",
-      "esnext"
-    ],
+    "lib": ["dom", "esnext"],
     "baseUrl": "./src",
-    "types": ["jest", "vite/client", "vite-plugin-svgr/client"],
+    "types": ["jest", "vite/client", "vite-plugin-svgr/client"]
   },
-  "include": [
-    "src/**/*"
-  ]
+  "include": ["src/**/*"]
 }

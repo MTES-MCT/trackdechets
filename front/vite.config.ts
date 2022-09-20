@@ -5,6 +5,8 @@ import svgrPlugin from "vite-plugin-svgr";
 import path from "path";
 import { readdirSync } from "fs";
 
+const { NODE_ENV } = process.env;
+
 const srcPath = path.resolve("./src");
 const srcRootContent = readdirSync(srcPath, {
   withFileTypes: true,
@@ -22,7 +24,7 @@ const absolutePathAliases: Record<string, string> = srcRootContent.reduce(
 export default defineConfig({
   build: {
     outDir: "build",
-    sourcemap: true,
+    sourcemap: NODE_ENV !== "production",
   },
   plugins: [
     reactRefresh(),

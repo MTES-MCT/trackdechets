@@ -5,9 +5,10 @@ import transitionForm from "../../workflow/transitionForm";
 import { checkCanMarkAsReceived } from "../../permissions";
 import { receivedInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
-import { expandFormFromDb } from "../../form-converter";
+import { expandFormFromDb } from "../../converter";
 import { TemporaryStorageCannotReceive } from "../../errors";
 import prisma from "../../../prisma";
+
 import { getFormRepository } from "../../repository";
 import {
   Prisma,
@@ -15,6 +16,8 @@ import {
   Status,
   WasteAcceptationStatus
 } from "@prisma/client";
+import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
+import { sendMail } from "../../../mailer/mailing";
 
 const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   parent,
@@ -86,9 +89,17 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
     ) {
       await formRepository.removeAppendix2(id);
     }
-
     return receivedForm;
   });
+
+  if (
+    receivedForm.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED ||
+    receivedForm.wasteAcceptationStatus ===
+      WasteAcceptationStatus.PARTIALLY_REFUSED
+  ) {
+    const refusedEmail = await renderFormRefusedEmail(receivedForm);
+    sendMail(refusedEmail);
+  }
 
   return expandFormFromDb(receivedForm);
 };

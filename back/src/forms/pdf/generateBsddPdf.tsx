@@ -29,7 +29,7 @@ import {
   expandAppendix2FormFromDb,
   expandFormFromDb,
   expandTransportSegmentFromDb
-} from "../form-converter";
+} from "../converter";
 import { getFullForm } from "../database";
 import prisma from "../../prisma";
 import { buildAddress } from "../../companies/sirene/utils";
@@ -273,7 +273,8 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
         form: await expandAppendix2FormFromDb(form),
         quantity
       }))
-    )
+    ),
+    intermediaries: fullPrismaForm.intermediaries ?? []
   };
   const isRepackging =
     form.recipient?.isTempStorage &&
@@ -585,7 +586,26 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             </div>
           </div>
         </div>
-
+        {form.intermediaries?.length ? (
+          <div className="BoxRow">
+            <div className="BoxCol">
+              <p>
+                <strong>
+                  Autre{form?.intermediaries?.length > 1 ? "s" : ""} Intermédiaire{form?.intermediaries?.length > 1 ? "s" : ""}
+                </strong>
+              </p>
+              {form?.intermediaries?.map(intermediary => (
+                <div className="Row">
+                  <div className="Col">
+                    <FormCompanyFields company={intermediary} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          ""
+        )}
         <div className="BoxRow">
           <div className="BoxCol">
             <p>
@@ -710,144 +730,154 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
           </div>
         </div>
 
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p>
-              <strong>
-                A REMPLIR EN CAS D’ENTREPOSAGE PROVISOIRE OU DE
-                RECONDITIONNEMENT (cadres 14 à 19)
-              </strong>
-            </p>
-          </div>
-        </div>
+        {form.recipient?.isTempStorage && (
+          <>
+            <div className="BoxRow">
+              <div className="BoxCol">
+                <p>
+                  <strong>
+                    A REMPLIR EN CAS D’ENTREPOSAGE PROVISOIRE OU DE
+                    RECONDITIONNEMENT (cadres 14 à 19)
+                  </strong>
+                </p>
+              </div>
+            </div>
 
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p>
-              <strong>
-                13. Réception par l’installation d’entreposage prévue au cadre 2
-              </strong>
-            </p>
-            <p>Quantité présentée :</p>
-            <QuantityFields
-              quantity={
-                form.temporaryStorageDetail?.temporaryStorer?.quantityReceived
-              }
-              quantityType={
-                form.temporaryStorageDetail?.temporaryStorer?.quantityType
-              }
-            />
-            <p>
-              Date de présentation :{" "}
-              {formatDate(
-                form.temporaryStorageDetail?.temporaryStorer?.receivedAt
-              )}
-            </p>
-            <AcceptationFields
-              {...form.temporaryStorageDetail?.temporaryStorer}
-            />
-            <p>
-              Nom : {form.temporaryStorageDetail?.temporaryStorer?.receivedBy}
-              <br />
-              Signature :
-            </p>
-            {form.temporaryStorageDetail?.temporaryStorer?.receivedAt && (
-              <SignatureStamp />
-            )}
-          </div>
-          <div className="BoxCol">
-            <p>
-              <strong>14. Installation de destination prévue</strong>
-            </p>
-            <RecipientFormCompanyFields
-              {...form.temporaryStorageDetail?.destination}
-            />
-          </div>
-        </div>
+            <div className="BoxRow">
+              <div className="BoxCol">
+                <p>
+                  <strong>
+                    13. Réception par l’installation d’entreposage prévue au
+                    cadre 2
+                  </strong>
+                </p>
+                <p>Quantité présentée :</p>
+                <QuantityFields
+                  quantity={
+                    form.temporaryStorageDetail?.temporaryStorer
+                      ?.quantityReceived
+                  }
+                  quantityType={
+                    form.temporaryStorageDetail?.temporaryStorer?.quantityType
+                  }
+                />
+                <p>
+                  Date de présentation :{" "}
+                  {formatDate(
+                    form.temporaryStorageDetail?.temporaryStorer?.receivedAt
+                  )}
+                </p>
+                <AcceptationFields
+                  {...form.temporaryStorageDetail?.temporaryStorer}
+                />
+                <p>
+                  Nom :{" "}
+                  {form.temporaryStorageDetail?.temporaryStorer?.receivedBy}
+                  <br />
+                  Signature :
+                </p>
+                {form.temporaryStorageDetail?.temporaryStorer?.receivedAt && (
+                  <SignatureStamp />
+                )}
+              </div>
+              <div className="BoxCol">
+                <p>
+                  <strong>14. Installation de destination prévue</strong>
+                </p>
+                <RecipientFormCompanyFields
+                  {...form.temporaryStorageDetail?.destination}
+                />
+              </div>
+            </div>
 
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p>
-              <strong>
-                15. Conditionnement (à remplir en cas de reconditionnement
-                uniquement)
-              </strong>
-            </p>
-            <PackagingInfosTable
-              packagingInfos={
-                isRepackging
-                  ? form.temporaryStorageDetail?.wasteDetails?.packagingInfos
-                  : []
-              }
-            />
-          </div>
-          <div className="BoxCol">
-            <p>
-              <strong>
-                16. Quantité (à remplir en cas de reconditionnement uniquement)
-              </strong>
-            </p>
-            <QuantityFields
-              {...(isRepackging
-                ? form.temporaryStorageDetail?.wasteDetails
-                : { quantity: null, quantityType: null })}
-            />
-          </div>
-        </div>
+            <div className="BoxRow">
+              <div className="BoxCol">
+                <p>
+                  <strong>
+                    15. Conditionnement (à remplir en cas de reconditionnement
+                    uniquement)
+                  </strong>
+                </p>
+                <PackagingInfosTable
+                  packagingInfos={
+                    isRepackging
+                      ? form.temporaryStorageDetail?.wasteDetails
+                          ?.packagingInfos
+                      : []
+                  }
+                />
+              </div>
+              <div className="BoxCol">
+                <p>
+                  <strong>
+                    16. Quantité (à remplir en cas de reconditionnement
+                    uniquement)
+                  </strong>
+                </p>
+                <QuantityFields
+                  {...(isRepackging
+                    ? form.temporaryStorageDetail?.wasteDetails
+                    : { quantity: null, quantityType: null })}
+                />
+              </div>
+            </div>
 
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p>
-              <strong>
-                17. Mentions au titre des règlements ADR, RID, ADNR, IMDG (à
-                remplir en cas de reconditionnement uniquement) (le cas échéant)
-                :
-              </strong>
-            </p>
-            {isRepackging ? (
-              <p>{form.temporaryStorageDetail?.wasteDetails?.onuCode}</p>
-            ) : null}
-          </div>
-        </div>
+            <div className="BoxRow">
+              <div className="BoxCol">
+                <p>
+                  <strong>
+                    17. Mentions au titre des règlements ADR, RID, ADNR, IMDG (à
+                    remplir en cas de reconditionnement uniquement) (le cas
+                    échéant) :
+                  </strong>
+                </p>
+                {isRepackging ? (
+                  <p>{form.temporaryStorageDetail?.wasteDetails?.onuCode}</p>
+                ) : null}
+              </div>
+            </div>
 
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p>
-              <strong>18. Collecteur-Transporteur</strong>
-            </p>
-            <TransporterFormCompanyFields
-              transporter={form.temporaryStorageDetail?.transporter}
-              takenOverAt={form.temporaryStorageDetail?.takenOverAt}
-              takenOverBy={form.temporaryStorageDetail?.takenOverBy}
-            />
-          </div>
-        </div>
+            <div className="BoxRow">
+              <div className="BoxCol">
+                <p>
+                  <strong>18. Collecteur-Transporteur</strong>
+                </p>
+                <TransporterFormCompanyFields
+                  transporter={form.temporaryStorageDetail?.transporter}
+                  takenOverAt={form.temporaryStorageDetail?.takenOverAt}
+                  takenOverBy={form.temporaryStorageDetail?.takenOverBy}
+                />
+              </div>
+            </div>
 
-        <div className="BoxRow">
-          <div className="BoxCol">
-            <p>
-              <strong>
-                19. Déclaration générale de la personne mentionnée au cadre 2
-              </strong>
-            </p>
-            <p>
-              Je soussigné, certifie que les renseignements portés dans les
-              cades ci-dessus sont exacts et de bonne foi.
-            </p>
-            <p>
-              <span className="Row">
-                <span className="Col">
-                  Nom : {form.temporaryStorageDetail?.signedBy}
-                </span>
-                <span className="Col">
-                  Date : {formatDate(form.temporaryStorageDetail?.signedAt)}
-                </span>
-                <span className="Col">Signature :</span>
-              </span>
-            </p>
-            {form.temporaryStorageDetail?.signedAt && <SignatureStamp />}
-          </div>
-        </div>
+            <div className="BoxRow">
+              <div className="BoxCol">
+                <p>
+                  <strong>
+                    19. Déclaration générale de la personne mentionnée au cadre
+                    2
+                  </strong>
+                </p>
+                <p>
+                  Je soussigné, certifie que les renseignements portés dans les
+                  cades ci-dessus sont exacts et de bonne foi.
+                </p>
+                <p>
+                  <span className="Row">
+                    <span className="Col">
+                      Nom : {form.temporaryStorageDetail?.signedBy}
+                    </span>
+                    <span className="Col">
+                      Date : {formatDate(form.temporaryStorageDetail?.signedAt)}
+                    </span>
+                    <span className="Col">Signature :</span>
+                  </span>
+                </p>
+                {form.temporaryStorageDetail?.signedAt && <SignatureStamp />}
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {form.transportSegments.length > 0 && (
@@ -860,30 +890,30 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             </div>
           </div>
 
-          {(
-            [
-              ...form.transportSegments,
-              ...Array.from({
-                length: 2 - form.transportSegments.length
-              }).fill(undefined)
-            ] as Array<TransportSegment | undefined>
-          ).map((transportSegment, index) => (
-            <div className="BoxRow" key={index}>
-              <div className="BoxCol">
-                <p>
-                  <strong>18. Collecteur-Transporteur</strong>
-                </p>
-                <TransporterFormCompanyFields
-                  transporter={{
-                    ...transportSegment?.transporter,
-                    mode: transportSegment?.mode
-                  }}
-                  takenOverAt={transportSegment?.takenOverAt}
-                  takenOverBy={transportSegment?.takenOverBy}
-                />
+          {([
+            ...form.transportSegments,
+            ...Array.from({
+              length: 2 - form.transportSegments.length
+            }).fill(undefined)
+          ] as Array<TransportSegment | undefined>).map(
+            (transportSegment, index) => (
+              <div className="BoxRow" key={index}>
+                <div className="BoxCol">
+                  <p>
+                    <strong>18. Collecteur-Transporteur</strong>
+                  </p>
+                  <TransporterFormCompanyFields
+                    transporter={{
+                      ...transportSegment?.transporter,
+                      mode: transportSegment?.mode
+                    }}
+                    takenOverAt={transportSegment?.takenOverAt}
+                    takenOverBy={transportSegment?.takenOverBy}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
         </div>
       )}
 
@@ -930,32 +960,33 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                   </tr>
                 </thead>
                 <tbody>
-                  {(
-                    [
-                      ...form.grouping,
-                      ...Array.from({
-                        length: 10 - form.grouping.length
-                      }).fill({ form: null, quantity: null })
-                    ] as Array<InitialFormFraction>
-                  ).map(({ form, quantity }, index) => (
-                    <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td>{form?.readableId}</td>
-                      <td>{form?.wasteDetails?.code}</td>
-                      <td>{form?.wasteDetails?.name}</td>
-                      <td>
-                        {form?.quantityReceived ?? form?.wasteDetails?.quantity}
-                      </td>
-                      <td>
-                        {form?.quantityReceived
-                          ? "R"
-                          : form?.wasteDetails?.quantityType?.charAt(0)}
-                      </td>
-                      <td>{quantity}</td>
-                      <td>{formatDate(form?.signedAt)}</td>
-                      <td>{form?.emitterPostalCode}</td>
-                    </tr>
-                  ))}
+                  {([
+                    ...form.grouping,
+                    ...Array.from({
+                      length: 10 - form.grouping.length
+                    }).fill({ form: null, quantity: null })
+                  ] as Array<InitialFormFraction>).map(
+                    ({ form, quantity }, index) => (
+                      <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>{form?.readableId}</td>
+                        <td>{form?.wasteDetails?.code}</td>
+                        <td>{form?.wasteDetails?.name}</td>
+                        <td>
+                          {form?.quantityReceived ??
+                            form?.wasteDetails?.quantity}
+                        </td>
+                        <td>
+                          {form?.quantityReceived
+                            ? "R"
+                            : form?.wasteDetails?.quantityType?.charAt(0)}
+                        </td>
+                        <td>{quantity}</td>
+                        <td>{formatDate(form?.signedAt)}</td>
+                        <td>{form?.emitterPostalCode}</td>
+                      </tr>
+                    )
+                  )}
                 </tbody>
               </table>
             </div>

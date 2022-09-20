@@ -60,7 +60,12 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
                 <IconChevronDown size="14px" color="blueLight" />
               )}
             </MenuButton>
-            <MenuList className={styles.BSDDActionsMenu}>
+            <MenuList
+              className={classNames(
+                "fr-raw-link fr-raw-list",
+                styles.BSDDActionsMenu
+              )}
+            >
               <MenuLink
                 as={Link}
                 to={{
@@ -105,7 +110,9 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
                 <IconDuplicateFile size="24px" color="blueLight" />
                 Dupliquer
               </MenuItem>
-              {form["bsdaStatus"] === BsdaStatus.Initial ? (
+              {form["bsdaStatus"] === BsdaStatus.Initial ||
+              (form["bsdaStatus"] === BsdaStatus.SignedByProducer &&
+                form.emitter?.company?.siret === siret) ? (
                 <MenuItem onSelect={() => setIsDeleting(true)}>
                   <IconTrash color="blueLight" size="24px" />
                   Supprimer

@@ -1,9 +1,10 @@
 import { useMutation, useQuery } from "@apollo/client";
 import cogoToast from "cogo-toast";
+import omitDeep from "omit-deep-lodash";
+import React, { lazy, ReactElement, useMemo } from "react";
+import { useHistory } from "react-router-dom";
 import { Loader } from "common/components";
-import GenericStepList, {
-  getComputedState,
-} from "form/common/stepper/GenericStepList";
+import { getComputedState } from "form/common/getComputedState";
 
 import { IStepContainerProps } from "form/common/stepper/Step";
 import { formInputToastError } from "form/common/stepper/toaster";
@@ -19,9 +20,6 @@ import {
   BsdasriStatus,
   BsdasriType,
 } from "generated/graphql/types";
-import omitDeep from "omit-deep-lodash";
-import React, { ReactElement, useMemo } from "react";
-import { useHistory } from "react-router-dom";
 import getInitialState from "./utils/initial-state";
 import {
   CREATE_DRAFT_BSDASRI,
@@ -29,7 +27,9 @@ import {
   GET_BSDASRI,
   UPDATE_BSDASRI,
 } from "./utils/queries";
-
+const GenericStepList = lazy(() =>
+  import("form/common/stepper/GenericStepList")
+);
 interface Props {
   children: (dasriForm: Bsdasri | undefined) => ReactElement;
   formId?: string;
@@ -39,6 +39,8 @@ interface Props {
 
 const wasteKey = "waste";
 const ecoOrganismeKey = "ecoOrganisme";
+const emittedByEcoOrganismeKey = "ecoOrganisme.emittedByEcoOrganisme";
+
 const emitterKey = "emitter";
 const transporterKey = "transporter";
 const destinationKey = "destination";
@@ -58,13 +60,14 @@ const getCommonKeys = (bsdasriType: BsdasriType): string[] => {
       transporterCompanyVatNumberKey,
       transporterTransportPackagingsKey,
       transporterTransportVolumeKey,
+      emittedByEcoOrganismeKey,
     ];
   }
   if (bsdasriType === BsdasriType.Grouping) {
-    return [synthesizingKey];
+    return [synthesizingKey, emittedByEcoOrganismeKey];
   }
   if (bsdasriType === BsdasriType.Simple) {
-    return [synthesizingKey, groupingKey];
+    return [synthesizingKey, groupingKey, emittedByEcoOrganismeKey];
   }
   return [];
 };

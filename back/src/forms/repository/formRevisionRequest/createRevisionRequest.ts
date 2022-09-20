@@ -1,5 +1,6 @@
 import { BsddRevisionRequest, Prisma } from "@prisma/client";
 import { LogMetadata, RepositoryFnDeps } from "../types";
+import { approveAndApplyRevisionRequest } from "./acceptRevisionRequestApproval";
 
 export type CreateRevisionRequestFn = (
   data: Prisma.BsddRevisionRequestCreateInput,
@@ -12,7 +13,8 @@ const buildCreateRevisionRequest: (
   ({ prisma, user }) =>
   async (data, logMetadata) => {
     const createdRevisionRequest = await prisma.bsddRevisionRequest.create({
-      data
+      data,
+      include: { approvals: true }
     });
 
     await prisma.event.create({
@@ -24,7 +26,17 @@ const buildCreateRevisionRequest: (
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
-    return createdRevisionRequest;
+
+    if (createdRevisionRequest.approvals.length > 0) {
+      return createdRevisionRequest;
+    }
+
+    // 0 approvals, auto-approve
+    return approveAndApplyRevisionRequest(createdRevisionRequest.id, {
+      prisma,
+      user,
+      logMetadata
+    });
   };
 
 export default buildCreateRevisionRequest;

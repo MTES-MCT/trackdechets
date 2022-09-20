@@ -60,6 +60,7 @@ export const companyValidationSchema = yup.object({
       message: "Le numéro de téléphone de contact est invalide",
       excludeEmptyString: true
     }),
+  contact: yup.string().notRequired(),
   website: yup.string().notRequired().url()
 });
 

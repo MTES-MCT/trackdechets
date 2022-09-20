@@ -1,10 +1,10 @@
 import { Form } from "@prisma/client";
-import { RepositoryFnDeps } from "../types";
+import { ReadRepositoryFnDeps } from "../types";
 
 export type FindAppendix2FormsByIdFn = (id: string) => Promise<Form[]>;
 
 const buildFindAppendix2FormsById: (
-  deps: RepositoryFnDeps
+  deps: ReadRepositoryFnDeps
 ) => FindAppendix2FormsByIdFn =
   ({ prisma }) =>
   async id => {

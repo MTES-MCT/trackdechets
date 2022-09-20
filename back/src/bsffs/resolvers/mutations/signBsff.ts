@@ -1,4 +1,9 @@
-import { BsffStatus, Bsff, WasteAcceptationStatus } from "@prisma/client";
+import {
+  BsffStatus,
+  Bsff,
+  WasteAcceptationStatus,
+  BsffPackaging
+} from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -13,7 +18,7 @@ import {
   validateBeforeReception,
   validateBeforeTransport
 } from "../../validation";
-import { unflattenBsff } from "../../converter";
+import { expandBsffFromDB } from "../../converter";
 import { getBsffHistory, getBsffOrNotFound } from "../../database";
 import { indexBsff } from "../../elastic";
 import { OPERATION } from "../../constants";
@@ -61,7 +66,7 @@ const signatures: Record<
   (
     args: MutationSignBsffArgs,
     user: Express.User,
-    existingBsff: Bsff
+    existingBsff: Bsff & { packagings: BsffPackaging[] }
   ) => Promise<Bsff>
 > = {
   EMISSION: async ({ id, signature, securityCode }, user, existingBsff) => {
@@ -172,12 +177,15 @@ const signatures: Record<
 const signBsff: MutationResolvers["signBsff"] = async (_, args, context) => {
   const user = checkIsAuthenticated(context);
   const existingBsff = await getBsffOrNotFound({ id: args.id });
+  const packagings = await prisma.bsff
+    .findUnique({ where: { id: existingBsff.id } })
+    .packagings();
   const sign = signatures[args.type];
-  const updatedBsff = await sign(args, user, existingBsff);
+  const updatedBsff = await sign(args, user, { ...existingBsff, packagings });
 
   await indexBsff(updatedBsff, context);
 
-  return unflattenBsff(updatedBsff);
+  return expandBsffFromDB(updatedBsff);
 };
 
 export default signBsff;

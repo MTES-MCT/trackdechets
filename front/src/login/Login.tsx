@@ -1,123 +1,153 @@
-import React from "react";
+import React, { useState, createRef } from "react";
 import * as queryString from "query-string";
-import {
-  Link,
-  RouteComponentProps,
-  withRouter,
-  Redirect,
-} from "react-router-dom";
-
-import { localAuthService } from "./auth.service";
+import { useLocation, Redirect } from "react-router-dom";
 import routes from "common/routes";
 
-const fieldErrorsProps = (fieldName, errorField) => {
-  if (errorField === fieldName) {
-    return {
-      autoFocus: true,
-      style: { border: "1px solid red" },
-    };
+import {
+  Container,
+  Row,
+  Col,
+  Title,
+  Text,
+  TextInput,
+  Button,
+  Link,
+  Alert,
+} from "@dataesr/react-dsfr";
+import styles from "./Login.module.scss";
+
+function getErrorMessage(errorCode: string) {
+  if (errorCode === "NOT_ACTIVATED") {
+    return "Ce compte n'a pas encore été activé. Vérifiez vos emails ou contactez le support";
   }
-  return {};
-};
-export default withRouter(function Login(
-  routeProps: RouteComponentProps<
-    {},
-    {},
-    {
-      error?: string;
-      errorField?: string;
-      returnTo?: string;
-      username?: string;
-    }
-  >
-) {
+
+  return "Email ou mot de passe incorrect";
+}
+
+export default function Login() {
+  const location = useLocation<{
+    errorCode?: string;
+    returnTo?: string;
+    username?: string;
+  }>();
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const formRef = createRef<HTMLFormElement>();
   const { VITE_API_ENDPOINT } = import.meta.env;
 
-  const queries = queryString.parse(routeProps.location.search);
+  const queries = queryString.parse(location.search);
 
-  if (queries.error || queries.returnTo) {
-    const { error, errorField, returnTo, username } = queries;
+  const createdWithSuccess = queries.signup === "complete";
+
+  if (queries.errorCode || queries.returnTo) {
+    const { errorCode, returnTo, username } = queries;
     const state = {
-      ...(queries.error ? { error, errorField, username } : {}),
+      ...(queries.errorCode ? { errorCode, username } : {}),
       ...(!!returnTo ? { returnTo } : {}),
     };
 
     return <Redirect to={{ pathname: routes.login, state }} />;
   }
 
-  const { returnTo, error, errorField, username } =
-    routeProps.location.state || {};
+  const { returnTo, errorCode, username } = location.state || {};
+
+  const alert = errorCode ? (
+    <Row spacing="mb-2w">
+      <Alert
+        title="Erreur"
+        description={getErrorMessage(errorCode)}
+        type="error"
+      />
+    </Row>
+  ) : null;
+
+  const createdAlert = createdWithSuccess ? (
+    <Row spacing="mb-2w">
+      <Alert
+        title="Votre compte est créé !"
+        description="Vous pouvez maintenant vous connecter puis créer ou rejoindre un établissement."
+        type="success"
+      />
+    </Row>
+  ) : null;
 
   return (
-    <section className="section section--white">
-      <div className="container-narrow">
-        <form action={`${VITE_API_ENDPOINT}/login`} method="post" name="login">
-          <h1 className="h1 tw-mb-6">Connexion</h1>
-          <div className="form__row">
-            <label>
-              Email
-              <input
-                type="email"
-                name="email"
+    <div className={styles.onboardingWrapper}>
+      <form
+        ref={formRef}
+        action={`${VITE_API_ENDPOINT}/login`}
+        method="post"
+        name="login"
+      >
+        <Container className={styles.centralContainer} spacing="pt-10w">
+          {createdAlert}
+          {alert}
+          <Row justifyContent="center" spacing="mb-2w">
+            <Col spacing="m-auto">
+              <Title as="h1" look="h3" spacing="mb-3w">
+                Se connecter
+              </Title>
+              <TextInput
+                // @ts-ignore
                 defaultValue={username}
-                className="td-input"
-                {...fieldErrorsProps("email", errorField)}
+                name="email"
+                required
+                label="Email"
               />
-            </label>
-            {error && errorField === "email" && (
-              <div className="error-message">{error}</div>
-            )}
-          </div>
-
-          <div className="form__row">
-            <label>
-              Mot de passe
-              <input
-                type="password"
+              <TextInput
+                type={showPassword ? "text" : "password"}
+                // @ts-ignore
                 name="password"
-                className="td-input"
-                {...fieldErrorsProps("password", errorField)}
+                required
+                label="Mot de passe"
               />
-            </label>
-            {error && errorField === "password" && (
-              <div className="error-message">{error}</div>
-            )}
-          </div>
-          {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
-          {error && !errorField && <div className="error-message">{error}</div>}
-          <div className="form__actions">
-            <button
-              className="btn btn--primary"
-              type="submit"
-              onClick={() => {
-                localAuthService.locallySignOut();
-                document.forms["login"].submit();
-              }}
-            >
-              Se connecter
-            </button>
-          </div>
-          <p className="tw-my-5">
-            Vous n'avez pas encore de compte ?{" "}
-            <Link to={routes.signup.index} className="link">
-              Inscrivez vous maintenant
-            </Link>
-          </p>
-          <p className="tw-my-5">
-            Vous n'avez pas reçu d'email d'activation suite à votre inscription
-            ?{" "}
-            <Link to={routes.resendActivationEmail} className="link">
-              Renvoyez l'email d'activation
-            </Link>
-          </p>
-          <p className="tw-my-5">
-            Vous avez perdu votre mot de passe ?{" "}
-            <Link to={routes.passwordResetRequest} className="link">
-              Réinitialisez le
-            </Link>
-          </p>
-        </form>
-      </div>
-    </section>
+              {returnTo && (
+                <input type="hidden" name="returnTo" value={returnTo} />
+              )}
+              <Button
+                tertiary
+                hasBorder={false}
+                icon={showPassword ? "ri-eye-off-line" : "ri-eye-line"}
+                iconPosition="left"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? "Masquer" : "Afficher"} le mot de passe
+              </Button>
+            </Col>
+          </Row>
+          <Row justifyContent="right">
+            <Col className={styles.resetFlexCol}>
+              <Button size="md" submit={true}>
+                Se connecter
+              </Button>
+            </Col>
+          </Row>
+          <Row spacing="pt-3w">
+            <Col>
+              <Text as="p">
+                Vous n'avez pas encore de compte ?{" "}
+                <Link href={routes.signup.index} isSimple>
+                  Inscrivez-vous
+                </Link>
+              </Text>
+              <Text as="p">
+                Vous n'avez pas reçu d'email d'activation suite à votre
+                inscription ?{" "}
+                <Link href={routes.resendActivationEmail} isSimple>
+                  Renvoyer l'email d'activation
+                </Link>
+              </Text>
+              <Text as="p">
+                Vous avez perdu votre mot de passe ?{" "}
+                <Link href={routes.passwordResetRequest} isSimple>
+                  Réinitialisez-le
+                </Link>
+              </Text>
+            </Col>
+          </Row>
+        </Container>
+      </form>
+    </div>
   );
-});
+}

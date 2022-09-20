@@ -1,6 +1,6 @@
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions"]
+  previewFeatures = ["interactiveTransactions", "tracing"]
 }
 
 datasource db {
@@ -85,7 +85,7 @@ enum Status {
   GROUPED
   NO_TRACEABILITY
   REFUSED
-
+  FOLLOWED_WITH_PNTTD
   // Temporary storage status
   TEMP_STORED
   TEMP_STORER_ACCEPTED
@@ -181,6 +181,7 @@ model Company {
   verifiedAt                           DateTime?                 @db.Timestamptz(6)
   name                                 String?
   address                              String?
+  codeDepartement                      String?
   longitude                            Float?
   latitude                             Float?
   gerepId                              String?
@@ -375,10 +376,6 @@ model Form {
   ecoOrganismeSiret                  String?
   signedBy                           String?
 
-  // TODO delete after release 2022.06.2
-  temporaryStorageDetailId String?                 @unique
-  temporaryStorageDetail   TemporaryStorageDetail? @relation(fields: [temporaryStorageDetailId], references: [id])
-
   transportSegments TransportSegment[]
   groupedIn         FormGroupement[]   @relation("GroupedIn")
   grouping          FormGroupement[]   @relation("Grouping")
@@ -395,11 +392,14 @@ model Form {
   forwardedInId String? @unique
   forwardedIn   Form?   @relation("BsddForwarding", fields: [forwardedInId], references: [id])
 
+  // partial index _FormIsDeletedIdx see migration82_missing_indices.sql
+
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_FormTransporterCompanySiretIdx")
   @@index([traderCompanySiret], map: "_FormTraderCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_FormBrokerCompanySiretIdx")
+  @@index([ecoOrganismeSiret], map: "_FormEcoOrganismeSiretIdx")
   @@index([status], map: "_FormStatusIdx")
 }
 
@@ -431,6 +431,8 @@ model IntermediaryFormAssociation {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
 
   @@index([formId], map: "_IntermediaryFormAssociationFormIdIdx")
+  @@index([siret], map: "IntermediaryFormAssociationSiretIdx")
+  @@index([vatNumber], map: "IntermediaryFormAssociationVatNumberIdx")
 }
 
 enum RevisionRequestStatus {
@@ -593,57 +595,6 @@ model StatusLog {
   @@index([formId], map: "_StatusLogFormIdIdx")
 }
 
-// TODO delete after release 2022.06.2
-model TemporaryStorageDetail {
-  id                               String                  @id @default(cuid())
-  tempStorerQuantityType           QuantityType?
-  tempStorerQuantityReceived       Float?
-  tempStorerWasteAcceptationStatus WasteAcceptationStatus?
-  tempStorerWasteRefusalReason     String?
-  tempStorerReceivedAt             DateTime?               @db.Timestamptz(6)
-  tempStorerReceivedBy             String?
-  tempStorerSignedAt               DateTime?               @db.Timestamptz(6)
-  tempStorerSignedBy               String?
-  destinationIsFilledByEmitter     Boolean?                @default(true)
-  destinationCompanyName           String?
-  destinationCompanySiret          String?
-  destinationCompanyAddress        String?
-  destinationCompanyContact        String?
-  destinationCompanyPhone          String?
-  destinationCompanyMail           String?
-  destinationCap                   String?
-  destinationProcessingOperation   String?
-  wasteDetailsOnuCode              String?
-  wasteDetailsPackagingInfos       Json                    @default("[]")
-  wasteDetailsQuantity             Float?
-  wasteDetailsQuantityType         QuantityType?
-  transporterCompanyName           String?
-  transporterCompanySiret          String?
-  transporterCompanyVatNumber      String?
-  transporterCompanyAddress        String?
-  transporterCompanyContact        String?
-  transporterCompanyPhone          String?
-  transporterCompanyMail           String?
-  transporterIsExemptedOfReceipt   Boolean?
-  transporterReceipt               String?
-  transporterDepartment            String?
-  transporterValidityLimit         DateTime?               @db.Timestamptz(6)
-  transporterNumberPlate           String?
-  transporterCustomInfo            String?
-  transporterTransportMode         TransportMode?          @default(ROAD)
-  emittedBy                        String?
-  emittedAt                        DateTime?               @db.Timestamptz(6)
-  takenOverBy                      String?
-  takenOverAt                      DateTime?               @db.Timestamptz(6)
-  signedByTransporter              Boolean?
-  signedBy                         String?
-  signedAt                         DateTime?               @db.Timestamptz(6)
-  Form                             Form[]
-
-  @@index([destinationCompanySiret], map: "_TemporaryStorageDetailDestinationCompanyIdx")
-  @@index([transporterCompanySiret], map: "_TemporaryStorageDetailTransporterCompanySiretIdx")
-}
-
 model TraderReceipt {
   id            String    @id @default(cuid())
   receiptNumber String
@@ -699,7 +650,6 @@ model TransportSegment {
   updatedAt                       DateTime       @updatedAt @db.Timestamptz(6)
   formId                          String
   form                            Form           @relation(fields: [formId], references: [id])
-
 
   @@index([formId], map: "_TransportSegmentFormIdIdx")
   @@index([transporterCompanySiret], map: "_TransportSegmentTransporterCompanySiretIdx")
@@ -874,6 +824,8 @@ model Bsvhu {
   destinationOperationSignatureAuthor                 String?
   destinationOperationSignatureDate                   DateTime? @db.Timestamptz(6)
 
+  // partial indices _BsvhuIsDeletedIdx,_BsvhuIsDraftIdx  see migration82_missing_indices.sql
+
   @@index([emitterCompanySiret], map: "_BvhuEmitterCompanySirettIdx")
   @@index([destinationCompanySiret], map: "_BsvhuDestinationCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsvhuTransporterCompanySiretIdx")
@@ -1008,10 +960,17 @@ model Bsdasri {
   synthesizing                                Bsdasri[]               @relation("BsdasriSynthesizing")
   synthesizedIn                               Bsdasri?                @relation("BsdasriSynthesizing", fields: [synthesizedInId], references: [id])
   synthesizedInId                             String?
+
+  // partial indices _BsdasriTypeIdx, _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
+
   @@index([emitterCompanySiret], map: "_BsdasriEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsdasriTransporterCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsdasriDestinationCompanySiretIdx")
+  @@index([ecoOrganismeSiret], map: "_BsdasriEcoOrganismeSiretIdx")
+  @@index([synthesizedInId], map: "_BsdasriSynthesizedInIdIdx")
+  @@index([groupedInId], map: "_BsdasriGroupedInIdIdx")
   @@index([status], map: "_BsdasriStatusIdx")
+  @@index([type], map: "_BsdasriTypeIdx")
 }
 
 // ----------------
@@ -1038,9 +997,6 @@ model Bsff {
   emitterEmissionSignatureAuthor String?
   emitterEmissionSignatureDate   DateTime? @db.Timestamptz(6)
 
-  // DEPRECATED to be deleted after release 2022.07.1
-  packagingsJson Json @default("[]")
-
   wasteCode        String?
   wasteDescription String?
   wasteAdr         String?
@@ -1063,6 +1019,7 @@ model Bsff {
   transporterRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
   transporterTransportMode            TransportMode?
+  transporterTransportPlates          String[]
   transporterTransportTakenOverAt     DateTime?      @db.Timestamptz(6)
   transporterTransportSignatureAuthor String?
   transporterTransportSignatureDate   DateTime?      @db.Timestamptz(6)
@@ -1099,8 +1056,6 @@ model Bsff {
   destinationOperationSignatureAuthor String?
   destinationOperationSignatureDate   DateTime? @db.Timestamptz(6)
 
-  destinationCap String?
-
   grouping    Bsff[]  @relation("BsffGrouping")
   groupedIn   Bsff?   @relation("BsffGrouping", fields: [groupedInId], references: [id])
   groupedInId String?
@@ -1113,14 +1068,11 @@ model Bsff {
   forwardingId String? @unique
   forwardedIn  Bsff?   @relation("BsffForwarding")
 
-  // DEPRECATED relations, to be deleted after data migration
-  previousBsffs Bsff[]  @relation("BsffToBsff")
-  nextBsff      Bsff?   @relation("BsffToBsff", fields: [nextBsffId], references: [id])
-  nextBsffId    String?
-
   ficheInterventions BsffFicheIntervention[]
 
   packagings BsffPackaging[]
+
+  // partial _BsffIsDeletedIdx, _BsffIsDraftIdx index see migration82_missing_indices.sql
 
   @@index([emitterCompanySiret], map: "_BsffEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsffTransporterCompanySiretIdx")
@@ -1178,14 +1130,16 @@ model BsffFicheIntervention {
 }
 
 model BsffPackaging {
-  id        String   @id @default(cuid())
-  name      String
-  volume    Float?
-  weight    Float
-  numero    String
+  id     String @id @default(cuid())
+  name   String
+  volume Float?
+  weight Float
+  numero String
 
-  bsff   Bsff @relation(fields: [bsffId], references: [id], onDelete: Cascade)
+  bsff   Bsff   @relation(fields: [bsffId], references: [id], onDelete: Cascade)
   bsffId String
+
+  @@index([bsffId], map: "_BsffPackagingBsffId")
 }
 
 // ----------------
@@ -1252,8 +1206,6 @@ model Bsda {
   wastePop          Boolean          @default(value: false)
 
   packagings       Json          @default("[]")
-  // DEPRECATED - remove after migration
-  quantityType     QuantityType?
   weightIsEstimate Boolean?
   weightValue      Float?
 
@@ -1319,6 +1271,8 @@ model Bsda {
   transporterTransportSignatureAuthor String?
   transporterTransportSignatureDate   DateTime?      @db.Timestamptz(6)
 
+  workerIsDisabled Boolean?
+
   workerCompanyName    String?
   workerCompanySiret   String?
   workerCompanyAddress String?
@@ -1338,18 +1292,17 @@ model Bsda {
   forwardingId String? @unique
   forwardedIn  Bsda?   @relation("BsdaForwarding")
 
-  // DEPRECATED - remove after migration
-  bsdas       Bsda[]  @relation("BsdasToBsda")
-  childBsda   Bsda?   @relation("BsdasToBsda", fields: [childBsdaId], references: [id])
-  childBsdaId String?
-
   BsdaRevisionRequest BsdaRevisionRequest[]
+
+  // partial indices _BsdaIsDeletedIdx, _BsdaIsDraftIdx see migration82_missing_indices.sql
+
   @@index([emitterCompanySiret], map: "_BsdaEmitterCompanySiretIdx")
   @@index([brokerCompanySiret], map: "_BsdaBrokerCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsdaDestinationCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsdaTransporterCompanySiretIdx")
   @@index([workerCompanySiret], map: "_BsdaWorkerCompanySiretIdx")
   @@index([status], map: "_BsdaStatusIdx")
+  @@index([groupedInId], map: "_BsdaGroupedInIdIdx")
 }
 
 model BsdaRevisionRequest {
@@ -1384,7 +1337,6 @@ model BsdaRevisionRequest {
   brokerRecepisseNumber        String?
   brokerRecepisseDepartment    String?
   brokerRecepisseValidityLimit DateTime? @db.Timestamptz(6)
-
 
   emitterPickupSiteName       String?
   emitterPickupSiteAddress    String?

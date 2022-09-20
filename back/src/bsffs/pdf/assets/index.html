@@ -84,8 +84,6 @@
             <br />
             Nom de la personne à contacter : {{ bsff.destinationCompanyContact
             }}<br />
-            N° CAP (le cas échéant) : {{ bsff.destinationCap }}<br />
-            Code D/R prévu : {{ bsff.destinationPlannedOperationCode }}
           </p>
         </div>
       </div>
@@ -186,7 +184,7 @@
             {{#bsff.transporterTransportTakenOverAt}}{{#formatDate}}{{bsff.transporterTransportTakenOverAt}}{{/formatDate}}{{/bsff.transporterTransportTakenOverAt}}
             {{^bsff.transporterTransportTakenOverAt}}{{#formatDate}}{{bsff.transporterTransportSignatureDate}}{{/formatDate}}{{/bsff.transporterTransportTakenOverAt}}
             <br />
-            Mode de transport : Route<br />
+            Mode de transport : {{ transportMode }}<br />
           </p>
           <p>Signature :</p>
           <div class="Signature">{{{ signatures.transport }}}</div>

@@ -12,11 +12,16 @@ type EditableFields<Type> = {
     | ReturnType<typeof ifAwaitingSignature>;
 };
 
-const signatureToFieldMapping: { [key in BsdaSignatureType]: keyof Bsda } = {
-  EMISSION: "emitterEmissionSignatureDate",
-  WORK: "workerWorkSignatureDate",
-  TRANSPORT: "transporterTransportSignatureDate",
-  OPERATION: "destinationOperationSignatureDate"
+const SIGNATURES_HIERARCHY: {
+  [key in BsdaSignatureType]: { field: keyof Bsda; next?: BsdaSignatureType };
+} = {
+  EMISSION: { field: "emitterEmissionSignatureDate", next: "WORK" },
+  WORK: { field: "workerWorkSignatureDate", next: "TRANSPORT" },
+  TRANSPORT: {
+    field: "transporterTransportSignatureDate",
+    next: "OPERATION"
+  },
+  OPERATION: { field: "destinationOperationSignatureDate" }
 };
 
 const bsdaWithGrouping = Prisma.validator<Prisma.BsdaArgs>()({
@@ -62,6 +67,7 @@ const editableFields: EditableFields<BsdaInput> = {
   packagings: ifAwaitingSignature("WORK"),
   weight: ifAwaitingSignature("WORK"),
   worker: {
+    isDisabled: ifAwaitingSignature("EMISSION"),
     company: ifAwaitingSignature("EMISSION"),
     work: ifAwaitingSignature("WORK")
   },
@@ -72,9 +78,25 @@ const editableFields: EditableFields<BsdaInput> = {
   forwarding: ifAwaitingSignature("EMISSION")
 };
 
-function ifAwaitingSignature(signature: BsdaSignatureType) {
-  const field = signatureToFieldMapping[signature];
-  return (bsda: Bsda) => bsda[field] == null;
+/**
+ * Checks if we still await a signature of the inputed type.
+ * As in some cases a signature nevers gets filled (ex private individual emitter),
+ * we recursively check that any signature coming after the inputed one hasn't
+ * been filled already.
+ *
+ * @param signatureType
+ * @returns boolean
+ */
+function ifAwaitingSignature(
+  signatureType: BsdaSignatureType | undefined
+): (bsda?: Bsda) => boolean {
+  if (!signatureType) {
+    return () => true;
+  }
+
+  const signature = SIGNATURES_HIERARCHY[signatureType];
+  return (bsda: Bsda) =>
+    bsda[signature.field] == null && ifAwaitingSignature(signature.next)(bsda);
 }
 
 function getDiffInput(updates: BsdaInput, currentForm: BsdaWithGrouping) {

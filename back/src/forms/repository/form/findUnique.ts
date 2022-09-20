@@ -1,12 +1,12 @@
 import { Form, Prisma } from "@prisma/client";
-import { RepositoryFnDeps } from "../types";
+import { ReadRepositoryFnDeps } from "../types";
 
 export type FindUniqueFormFn = (
   where: Prisma.FormWhereUniqueInput,
   options?: Omit<Prisma.FormFindUniqueArgs, "where">
 ) => Promise<Form>;
 
-const buildFindUniqueForm: (deps: RepositoryFnDeps) => FindUniqueFormFn =
+const buildFindUniqueForm: (deps: ReadRepositoryFnDeps) => FindUniqueFormFn =
   ({ prisma }) =>
   (where, options?) => {
     const input = { where, ...options };

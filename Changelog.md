@@ -5,13 +5,140 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.09.1] 20/09/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout des plaques d'immatriculation sur le BSFF [PR 1667](https://github.com/MTES-MCT/trackdechets/pull/1667)
+- Ajout de la possibilité de dupliquer un BSFF [PR 1630](https://github.com/MTES-MCT/trackdechets/pull/1630)
+
+#### :bug: Corrections de bugs
+
+- Correction d'un bug ne prenant pas en compte le récépissé courtier renseigné lors du rattachement d'un établissement [PR 1673](https://github.com/MTES-MCT/trackdechets/pull/1673)
+- Correction du contenu de l'email de refus en cas d'entreposage provisoire [PR 1638](https://github.com/MTES-MCT/trackdechets/pull/1638)
+- Correction des règles d'affichage du bouton de contrôle routier [PR 1697](https://github.com/MTES-MCT/trackdechets/pull/1697)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Affichage des intermédiaires d'un BSDD dans l'aperçu et l'export PDF [PR 1668](https://github.com/MTES-MCT/trackdechets/pull/1668)
+- L'email de renouvellement du code de signature mentionne désormais le numéro SIRET de l'établissement concerné [PR 1680](https://github.com/MTES-MCT/trackdechets/pull/1680)
+- Remplacement des adresses emails hello@trackdechets.beta.gouv.fr par contact@trackdechets.beta.gouv.fr [PR 1666](https://github.com/MTES-MCT/trackdechets/pull/1666)
+- Cache les cadres 13 à 19 sur le PDF BSDD lorsqu'il n'y a pas d'entreposage provisoire [PR 1665](https://github.com/MTES-MCT/trackdechets/pull/1665)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Utilisation directe des résultats Elasticsearch pour les réponse aux requêtes dashboard [PR 1637](https://github.com/MTES-MCT/trackdechets/pull/1637)
+- Amélioration de l'indexation des BSDAs pour éviter des problèmes de désynchronisation du statut [PR 1641](https://github.com/MTES-MCT/trackdechets/pull/1641)
+- Ajout d'index manquant [PR 1648](https://github.com/MTES-MCT/trackdechets/pull/1648)
+- Refacto pour permettre d'identifier les `Company` par `siret` ou `vatNumber` dans le cache par utilisateur (et les permissions) afin de ne pas causer de problèmes pour les entreprises identifiées uniquement pas VAT, usage de `Company.id` pour `updateCompany` et `getCompanyOrCompanyNotFound` [PR 1647](https://github.com/MTES-MCT/trackdechets/pull/1647)
+- Amélioration de l'envoi des emails de refus [PR 1642](https://github.com/MTES-MCT/trackdechets/pull/1642)
+- Améliorations performances du front : réduction de taille du build, réduction taille bundle CSS, utilisateur de `React.lazy()` pour `GenericStepList` [PR 1681](https://github.com/MTES-MCT/trackdechets/pull/1681)
+
+
+# [2022.08.4] 29/08/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+- Correction du filtre sur l'information libre transporteur pour les BSDASRI, BSDA et BSFF [PR 1623](https://github.com/MTES-MCT/trackdechets/pull/1623)
+- Affichage du CAP sur le BSDA [PR 1625](https://github.com/MTES-MCT/trackdechets/pull/1625)
+- Affichage d'un bouton manquant sur le BSDA avec émetteur particulier [PR 1626](https://github.com/MTES-MCT/trackdechets/pull/1626)
+- Correction du ratelimit au login [PR 1613](https://github.com/MTES-MCT/trackdechets/pull/1613)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Utilisation des sirets en cache pour la query formsLifeCycle [PR 1609](https://github.com/MTES-MCT/trackdechets/pull/1609)
+- Prise en compte de la colonne Company.contact lors de l'import en masse [PR 1606](https://github.com/MTES-MCT/trackdechets/pull/1606)
+- Améliorations de l'UI Bsdasri [PR 1602](https://github.com/MTES-MCT/trackdechets/pull/1602)
+- Possibilité de passer outre l'entreprise de travaux sur le BSDA  [PR 1604](https://github.com/MTES-MCT/trackdechets/pull/1604)
+- Amélioration des filtres dashboard [PR 1595](https://github.com/MTES-MCT/trackdechets/pull/1595)
+- Permettre de spécifier exutoire final sur le BSDA sur le workflox déchetterie + entreposage [PR 1614](https://github.com/MTES-MCT/trackdechets/pull/1614)
+- Amélioration de la sécurité à la connexion [PR 1612](https://github.com/MTES-MCT/trackdechets/pull/1612)
+- Différenciation plus visible de la sandbox [PR 1617](https://github.com/MTES-MCT/trackdechets/pull/1617)
+
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+# [2022.08.3] 16/08/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+- Correction d'un bug sur le dashboard qui faisait disparaitre les filtres saisis [PR 1592](https://github.com/MTES-MCT/trackdechets/pull/1598)
+
+#### :boom: Breaking changes
+
+- Ajout de restrictions sur le SIRET visé comme émetteur ou destinataire d'un BSDD. Si l'un de ces acteurs n'est pas inscrit sur Trackdéchets, la création du bordereau est désormais impossible [PR 1451](https://github.com/MTES-MCT/trackdechets/pull/1451)
+
+#### :nail_care: Améliorations
+
+- Ajout d'un bouton pour charger plus de bordereaux dans le composant de sélection des annexes BSDA [PR 1592](https://github.com/MTES-MCT/trackdechets/pull/1599)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+# [2022.08.2] 14/08/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Ajout d'index db supplémentaires [PR 1592](https://github.com/MTES-MCT/trackdechets/pull/1592)
+
+# [2022.08.1] ~08/08/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout d'un onglet "BSDA suite" sur l'aperçu pour les BSDAs initiaux groupés ou faisant partie d'un bordereau de transit [PR 1577](https://github.com/MTES-MCT/trackdechets/pull/1577)
+- Ajout de la possibilité pour l'émetteur d'un BSDA de supprimer le bordereau après qu'il ait signé, si aucun autre acteur n'a encore signé [PR 1571](https://github.com/MTES-MCT/trackdechets/pull/1571)
+- Ajout du code 08 04 09\* pour les BSDA [PR 1570](https://github.com/MTES-MCT/trackdechets/pull/1570)
+
+#### :bug: Corrections de bugs
+
+- Correction d'un bug qui, dans le cas d'un BSDA avec un particulier, laissait trop longtemps possible la modification de certains champs [PR 1569](https://github.com/MTES-MCT/trackdechets/pull/1569)
+- Corrections de bugs sur la révision BSDD & BSDA, dans le cas ou un SIRET avait plusieurs rôles de validation de cette révision. Si le créateur de la révision a l'ensemble des rôles d'approbation, la révision est désormais auto-approuvée [PR 1567](https://github.com/MTES-MCT/trackdechets/pull/1567)
+- Correction d'un bug à l'enregistrement sur le formulaire BSDA si on saisissait un conditionnement sans saisir la quantité associée [PR 1557](https://github.com/MTES-MCT/trackdechets/pull/1557)
+- Correction d'un bug qui entraînait l'envoi d'un email de refus incomplet [PR 1579](https://github.com/MTES-MCT/trackdechets/pull/1579)
+- Correction dasri diverses [PR 1585](https://github.com/MTES-MCT/trackdechets/pull/1585)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Correction du fonctionnement de la validation des champs requis sur le BSFF [PR 1531](https://github.com/MTES-MCT/trackdechets/pull/1531)
+- Ajout d'un "rate limit" sur le formulaire de connexion pour éviter les attaques par "brute force" [PR 1565](https://github.com/MTES-MCT/trackdechets/pull/1565)
+- Multiples améliorations BSDA: inversion de la destination finale & initiale sur le formulaire UI, correction d'un bug sur l'aperçu qui indiquait un bordereau comme de réexpédition par erreur, amélioration de la visibilité du destinataire final lors d'un groupement, ajout de détails sur les BSDAs associés dans les onglets de signature, PDF et aperçu [PR 1551](https://github.com/MTES-MCT/trackdechets/pull/1551)
+- Ajout d'un bouton pour charger les révisions non affichées [PR 1587](https://github.com/MTES-MCT/trackdechets/pull/1587)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2022.07.5] 25/07/2022
 
 #### :rocket: Nouvelles fonctionnalités
 
 #### :bug: Corrections de bugs
 
- 
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
@@ -22,7 +149,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
--  Import de sociétés anonymes - script [PR 1533](https://github.com/MTES-MCT/trackdechets/pull/1533)
+- Import de sociétés anonymes - script [PR 1533](https://github.com/MTES-MCT/trackdechets/pull/1533)
 
 # [2022.07.4] 21/07/2022
 
@@ -40,7 +167,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
--  Import de sociétés anonymes - script [PR 1533](https://github.com/MTES-MCT/trackdechets/pull/1533)
+- Import de sociétés anonymes - script [PR 1533](https://github.com/MTES-MCT/trackdechets/pull/1533)
 
 # [2022.07.3] 20/07/2022
 
@@ -50,7 +177,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Correction des liens du company selector [PR 1558](https://github.com/MTES-MCT/trackdechets/pull/1558)
 - Correction des favoris transporteur [PR 1559](https://github.com/MTES-MCT/trackdechets/pull/1559)
- 
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations

@@ -11,9 +11,11 @@ import {
   FormStatus,
   Mutation,
   MutationMarkAsProcessedArgs,
+  Query,
+  QueryFormArgs,
   ProcessedFormInput,
 } from "generated/graphql/types";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useLazyQuery } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "common/components/Modal";
@@ -22,6 +24,7 @@ import { IconCogApproved } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 import cogoToast from "cogo-toast";
 import { GET_BSDS } from "common/queries";
+import { GET_FORM } from "form/bsdd/utils/queries";
 
 const MARK_AS_PROCESSED = gql`
   mutation MarkAsProcessed($id: ID!, $processedInfo: ProcessedFormInput!) {
@@ -201,6 +204,17 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
 }
 
 export default function MarkAsProcessed({ form }: WorkflowActionProps) {
+  const [getBsdd, { data }] = useLazyQuery<Pick<Query, "form">, QueryFormArgs>(
+    GET_FORM,
+    {
+      variables: {
+        id: form.id,
+        readableId: null,
+      },
+      fetchPolicy: "network-only",
+    }
+  );
+
   const [markAsProcessed, { loading, error }] = useMutation<
     Pick<Mutation, "markAsProcessed">,
     MutationMarkAsProcessedArgs
@@ -230,48 +244,62 @@ export default function MarkAsProcessed({ form }: WorkflowActionProps) {
       trigger={open => (
         <ActionButton
           icon={<IconCogApproved size="24px" />}
-          onClick={open}
+          onClick={() => {
+            getBsdd();
+            open();
+          }}
           secondary={form.status === FormStatus.TempStorerAccepted}
         >
           {actionLabel}
         </ActionButton>
       )}
-      modalContent={close => (
-        <div>
-          <Formik<ProcessedFormInput>
-            initialValues={{
-              processingOperationDone: "",
-              processingOperationDescription: "",
-              processedBy: "",
-              processedAt: new Date().toISOString(),
-              nextDestination: null,
-              noTraceability: null,
-            }}
-            onSubmit={({ nextDestination, ...values }) => {
-              const cleanedNextDestination = nextDestination;
-              if (cleanedNextDestination?.company) {
-                // clean vatNumber that may have been added by CompanySelector
-                delete cleanedNextDestination.company["vatNumber"];
-              }
-              return markAsProcessed({
-                variables: {
-                  id: form.id,
-                  processedInfo: {
-                    ...values,
-                    nextDestination: cleanedNextDestination,
-                  },
-                },
-              });
-            }}
-          >
-            <ProcessedInfo form={form} close={close} />
-          </Formik>
-          {error && (
-            <NotificationError className="action-error" apolloError={error} />
-          )}
-          {loading && <Loader />}
-        </div>
-      )}
+      modalContent={close => {
+        if (data == null) {
+          return <Loader />;
+        }
+
+        if (!!data?.form) {
+          return (
+            <div>
+              <Formik<ProcessedFormInput>
+                initialValues={{
+                  processingOperationDone: "",
+                  processingOperationDescription: "",
+                  processedBy: "",
+                  processedAt: new Date().toISOString(),
+                  nextDestination: null,
+                  noTraceability: null,
+                }}
+                onSubmit={({ nextDestination, ...values }) => {
+                  const cleanedNextDestination = nextDestination;
+                  if (cleanedNextDestination?.company) {
+                    // clean vatNumber that may have been added by CompanySelector
+                    delete cleanedNextDestination.company["vatNumber"];
+                  }
+                  return markAsProcessed({
+                    variables: {
+                      id: data?.form.id,
+                      processedInfo: {
+                        ...values,
+                        nextDestination: cleanedNextDestination,
+                      },
+                    },
+                  });
+                }}
+              >
+                <ProcessedInfo form={data.form} close={close} />
+              </Formik>
+              {error && (
+                <NotificationError
+                  className="action-error"
+                  apolloError={error}
+                />
+              )}
+              {loading && <Loader />}
+            </div>
+          );
+        }
+      }}
     />
   );
 }

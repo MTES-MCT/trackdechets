@@ -25,6 +25,9 @@ export function createBsff(
     id: getReadableId(ReadableIdPrefix.FF),
     type: BsffType.TRACER_FLUIDE,
     status: BsffStatus.INITIAL,
+    packagings: {
+      create: { name: "BOUTEILLE", numero: "1234", weight: 1, volume: 1 }
+    },
     ...initialData
   };
 
@@ -101,6 +104,7 @@ export function createBsffBeforeTransport(
       create: { name: "BOUTEILLE 2L", numero: "01", weight: 1 }
     },
     transporterTransportMode: TransportMode.ROAD,
+    transporterTransportTakenOverAt: new Date(),
     ...initialData
   });
 }

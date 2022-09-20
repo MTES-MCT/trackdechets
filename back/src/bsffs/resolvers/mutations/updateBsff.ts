@@ -8,7 +8,7 @@ import {
 } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound } from "../../database";
-import { flattenBsffInput, unflattenBsff } from "../../converter";
+import { flattenBsffInput, expandBsffFromDB } from "../../converter";
 import { isBsffContributor } from "../../permissions";
 import { validateBsff } from "../../validation";
 import { indexBsff } from "../../elastic";
@@ -80,7 +80,6 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       "destinationCompanyName",
       "destinationCompanyPhone",
       "destinationCompanySiret",
-      "destinationCap",
       "destinationReceptionDate",
       "destinationReceptionWeight",
       "destinationReceptionAcceptationStatus",
@@ -186,7 +185,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   await indexBsff(updatedBsff, context);
 
-  return unflattenBsff(updatedBsff);
+  return expandBsffFromDB(updatedBsff);
 };
 
 export default updateBsff;

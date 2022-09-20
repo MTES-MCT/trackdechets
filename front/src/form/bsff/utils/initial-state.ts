@@ -1,7 +1,6 @@
 import { addYears, startOfYear } from "date-fns";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import { BsffType, TransportMode } from "generated/graphql/types";
-import { OPERATION } from "./constants";
 
 const initialState = {
   type: BsffType.TracerFluide,
@@ -20,12 +19,13 @@ const initialState = {
     },
     transport: {
       mode: TransportMode.Road,
+      plates: [],
     },
   },
   destination: {
     company: getInitialCompany(),
     cap: "",
-    plannedOperationCode: OPERATION.R2.code,
+    plannedOperationCode: "",
   },
   packagings: [],
   waste: {

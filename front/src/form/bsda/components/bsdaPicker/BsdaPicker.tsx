@@ -9,12 +9,14 @@ import {
   TableRow,
 } from "common/components";
 import { GET_BSDAS } from "form/bsda/stepper/queries";
+import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import { FieldArray, useFormikContext } from "formik";
 import {
   Bsda,
   BsdaInput,
   BsdaPackaging,
   BsdaStatus,
+  PageInfo,
   Query,
   QueryBsdasArgs,
 } from "generated/graphql/types";
@@ -29,20 +31,23 @@ export function BsdaPicker({ name, bsdaId }: Props) {
 
   const codeFilter =
     name === "grouping" ? { _in: ["D 15", "R 13"] } : { _eq: "D 15" };
-  const { data } = useQuery<Pick<Query, "bsdas">, QueryBsdasArgs>(GET_BSDAS, {
-    variables: {
-      where: {
-        status: { _eq: BsdaStatus.AwaitingChild },
-        _or: [{ groupedIn: { _eq: null } }, { groupedIn: { _eq: bsdaId } }],
-        forwardedIn: { _eq: null },
-        destination: {
-          operation: { code: codeFilter },
-          company: { siret: { _eq: siret } },
+  const { data, fetchMore } = useQuery<Pick<Query, "bsdas">, QueryBsdasArgs>(
+    GET_BSDAS,
+    {
+      variables: {
+        where: {
+          status: { _eq: BsdaStatus.AwaitingChild },
+          _or: [{ groupedIn: { _eq: null } }, { groupedIn: { _eq: bsdaId } }],
+          forwardedIn: { _eq: null },
+          destination: {
+            operation: { code: codeFilter },
+            company: { siret: { _eq: siret } },
+          },
         },
       },
-    },
-    fetchPolicy: "network-only",
-  });
+      fetchPolicy: "network-only",
+    }
+  );
   const {
     values: { forwarding, grouping },
     setFieldValue,
@@ -82,10 +87,15 @@ export function BsdaPicker({ name, bsdaId }: Props) {
       }, [] as BsdaPackaging[]) ?? initialState.packagings
     );
 
-    const { country, ...company } =
+    const { country, ...emitterCompany } =
       groupedBsdas?.[0]?.destination?.company ??
       initialState.destination.company;
-    setFieldValue("emitter.company", company);
+    setFieldValue("emitter.company", emitterCompany);
+
+    const { country: _, ...nextDestinationCompany } =
+      groupedBsdas?.[0]?.destination?.operation?.nextDestination?.company ??
+      getInitialCompany();
+    setFieldValue("destination.company", nextDestinationCompany);
   }
 
   function onForwardingChange(bsda: Bsda) {
@@ -106,9 +116,14 @@ export function BsdaPicker({ name, bsdaId }: Props) {
     );
     setFieldValue("packagings", bsda?.packagings ?? initialState.packagings);
 
-    const { country, ...company } =
+    const { country, ...emitterCcompany } =
       bsda?.destination?.company ?? initialState.destination.company;
-    setFieldValue("emitter.company", company);
+    setFieldValue("emitter.company", emitterCcompany);
+
+    const { country: _, ...nextDestinationCompany } =
+      bsda?.destination?.operation?.nextDestination?.company ??
+      getInitialCompany();
+    setFieldValue("destination.company", nextDestinationCompany);
   }
 
   if (data == null) {
@@ -129,6 +144,10 @@ export function BsdaPicker({ name, bsdaId }: Props) {
         }}
         isSelected={bsda => forwarding === bsda.id}
         bsdas={bsdas}
+        pickerType="forwarding"
+        selected={forwarding}
+        fetchMore={fetchMore}
+        pageInfo={data.bsdas.pageInfo}
       />
     );
   }
@@ -157,50 +176,140 @@ export function BsdaPicker({ name, bsdaId }: Props) {
           }}
           isSelected={bsda => grouping!.findIndex(id => id === bsda.id) >= 0}
           bsdas={bsdas}
+          pickerType="grouping"
+          selected={grouping}
+          fetchMore={fetchMore}
+          pageInfo={data.bsdas.pageInfo}
         />
       )}
     />
   );
 }
 
-function PickerTable({ bsdas, onClick, isSelected }) {
+type PickerTableProps = {
+  bsdas: Bsda[];
+  onClick: (bsda: Bsda) => void;
+  isSelected: (bsda: Bsda) => boolean;
+  pickerType: "grouping" | "forwarding";
+  selected: string | string[] | undefined | null;
+  fetchMore: (params: any) => Promise<any>;
+  pageInfo: PageInfo;
+};
+function PickerTable({
+  bsdas,
+  onClick,
+  isSelected,
+  pickerType,
+  selected,
+  fetchMore,
+  pageInfo,
+}: PickerTableProps) {
   return (
-    <Table isSelectable>
-      <TableHead>
-        <TableRow>
-          <TableHeaderCell />
-          <TableHeaderCell>Numéro</TableHeaderCell>
-          <TableHeaderCell>Déchet</TableHeaderCell>
-          <TableHeaderCell>Quantité (tonnes)</TableHeaderCell>
-          <TableHeaderCell>Émetteur</TableHeaderCell>
-          <TableHeaderCell>Transporteur</TableHeaderCell>
-          <TableHeaderCell>Destinataire</TableHeaderCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {bsdas.map(bsda => {
-          return (
-            <TableRow key={bsda.id} onClick={() => onClick(bsda)}>
-              <TableCell>
-                <input
-                  type="checkbox"
-                  className="td-input"
-                  checked={isSelected(bsda)}
-                  readOnly
-                />
-              </TableCell>
-              <TableCell>{bsda.id}</TableCell>
-              <TableCell>
-                {bsda.waste?.code} - {bsda.waste?.materialName ?? "inconnue"}
-              </TableCell>
-              <TableCell>{bsda.destination?.reception?.weight}</TableCell>
-              <TableCell>{bsda.emitter?.company?.name}</TableCell>
-              <TableCell>{bsda.transporter?.company?.name}</TableCell>
-              <TableCell>{bsda.destination?.company?.name}</TableCell>
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
+    <div>
+      <Table isSelectable>
+        <TableHead>
+          <TableRow>
+            <TableHeaderCell />
+            <TableHeaderCell>Numéro</TableHeaderCell>
+            <TableHeaderCell>Déchet</TableHeaderCell>
+            <TableHeaderCell>Poids reçu (tonnes)</TableHeaderCell>
+            <TableHeaderCell>Émetteur</TableHeaderCell>
+            <TableHeaderCell>CAP final</TableHeaderCell>
+            <TableHeaderCell>Exutoire</TableHeaderCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {bsdas.map(bsda => {
+            const getNextDestinationSiret = b =>
+              b?.destination?.operation?.nextDestination?.company?.siret;
+            const isDisabled =
+              Array.isArray(selected) &&
+              selected.length > 0 &&
+              getNextDestinationSiret(bsdas.find(b => b.id === selected[0])) !==
+                getNextDestinationSiret(bsda);
+
+            return (
+              <TableRow
+                key={bsda.id}
+                onClick={() => !isDisabled && onClick(bsda)}
+              >
+                <TableCell>
+                  <input
+                    type={pickerType === "grouping" ? "checkbox" : "radio"}
+                    className="td-input"
+                    checked={isSelected(bsda)}
+                    disabled={isDisabled}
+                    readOnly
+                  />
+                </TableCell>
+                <TableCell>{bsda.id}</TableCell>
+                <TableCell>
+                  {bsda.waste?.code} - {bsda.waste?.materialName ?? "inconnue"}
+                </TableCell>
+                <TableCell>{bsda.destination?.reception?.weight}</TableCell>
+                <TableCell>{bsda.emitter?.company?.name}</TableCell>
+                <TableCell>
+                  {bsda.destination?.operation?.nextDestination?.cap ??
+                    bsda.destination?.cap}
+                </TableCell>
+                <TableCell>
+                  {(bsda.destination?.operation?.nextDestination?.company
+                    ? [
+                        bsda.destination?.operation?.nextDestination?.company
+                          ?.name,
+                        bsda.destination?.operation?.nextDestination?.company
+                          ?.siret,
+                      ]
+                    : [
+                        bsda.destination?.company?.name,
+                        bsda.destination?.company?.siret,
+                      ]
+                  )
+                    .filter(Boolean)
+                    .join(" - ")}
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+      <LoadMoreButton fetchMore={fetchMore} pageInfo={pageInfo} />
+    </div>
+  );
+}
+
+function LoadMoreButton({ pageInfo, fetchMore }) {
+  if (!pageInfo?.hasNextPage) return null;
+
+  return (
+    <div style={{ textAlign: "center" }}>
+      <button
+        type="button"
+        className="center btn btn--primary small"
+        onClick={() =>
+          fetchMore({
+            variables: {
+              after: pageInfo.endCursor,
+            },
+            updateQuery: (prev, { fetchMoreResult }) => {
+              if (fetchMoreResult == null) {
+                return prev;
+              }
+
+              return {
+                ...prev,
+                bsdas: {
+                  ...prev.bsdas,
+                  ...fetchMoreResult.bsdas,
+                  edges: prev.bsdas.edges.concat(fetchMoreResult.bsdas.edges),
+                },
+              };
+            },
+          })
+        }
+      >
+        Charger plus de bordereaux
+      </button>
+    </div>
   );
 }

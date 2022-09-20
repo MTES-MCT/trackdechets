@@ -102,6 +102,9 @@ describe("Mutation.Bsda.createDraft", () => {
 
   it("create a form with an emitter and a destination", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const input = {
       emitter: {
@@ -111,7 +114,7 @@ describe("Mutation.Bsda.createDraft", () => {
       },
       destination: {
         company: {
-          siret: "3".repeat(14)
+          siret: destinationCompany.siret
         }
       }
     };

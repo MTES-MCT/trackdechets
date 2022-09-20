@@ -1,10 +1,8 @@
 import consoleBackend from "./backends/consoleBackend";
-import mailjetBackend from "./backends/mailjetBackend";
 import sendInBlueBackend from "./backends/sendInBlueBackend";
 
 const backends = {
   console: consoleBackend,
-  mailjet: mailjetBackend,
   sendinblue: sendInBlueBackend
 };
 

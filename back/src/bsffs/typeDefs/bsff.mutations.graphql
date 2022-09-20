@@ -51,6 +51,12 @@ type Mutation {
   deleteBsff(id: ID!): Bsff!
 
   """
+  Mutation permettant de dupliquer les informations de base d'un BSFF.
+  Renvoie un nouveau BSFF à l'état brouillon.
+  """
+  duplicateBsff(id: ID!): Bsff!
+
+  """
   Mutation permettant d'apposer une signature sur le bordereau.
 
   **Champs requis pour `EMISSION` :**

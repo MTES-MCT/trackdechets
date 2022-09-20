@@ -4,6 +4,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { getFormsRightFilter } from "../../database";
 import { getConnection } from "../../../common/pagination";
+import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 
 const PAGINATE_BY = 100;
 
@@ -14,23 +15,16 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const userCompanies = await prisma.companyAssociation
-    .findMany({
-      where: { user: { id: user.id } },
-      include: {
-        company: { select: { id: true, siret: true } }
-      }
-    })
-    .then(associations => associations.map(a => a.company));
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   // User must be associated with a company
-  if (!userCompanies.length) {
+  if (!userCompaniesSiretOrVat.length) {
     throw new ForbiddenError(
       "Vous n'êtes pas autorisé à consulter le cycle de vie des bordereaux."
     );
   }
   // If user is associated with several companies, siret is mandatory
-  if (userCompanies.length > 1 && !siret) {
+  if (userCompaniesSiretOrVat.length > 1 && !siret) {
     throw new UserInputError(
       "Vous devez préciser pour quel siret vous souhaitez consulter",
       {
@@ -39,16 +33,15 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
     );
   }
   // If requested siret does not belong to user, raise an error
-  if (!!siret && !userCompanies.map(c => c.siret).includes(siret)) {
+  if (!!siret && !userCompaniesSiretOrVat.includes(siret)) {
     throw new ForbiddenError(
       "Vous n'avez pas le droit d'accéder au siret précisé"
     );
   }
-  // Select user company matching siret or get the first
-  const selectedCompany =
-    userCompanies.find(uc => uc.siret === siret) || userCompanies.shift();
+  // Select user company siret matching siret or get the first
+  const selectedSiret = siret || userCompaniesSiretOrVat.shift();
 
-  const formsFilter = getFormsRightFilter(selectedCompany.siret);
+  const formsFilter = getFormsRightFilter(selectedSiret);
 
   const gqlPaginationArgs = {
     after: cursorAfter,

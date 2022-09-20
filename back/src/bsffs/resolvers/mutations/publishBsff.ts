@@ -3,7 +3,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound, getPreviousBsffs } from "../../database";
 import { isBsffContributor } from "../../permissions";
 import prisma from "../../../prisma";
-import { unflattenBsff } from "../../converter";
+import { expandBsffFromDB } from "../../converter";
 import { indexBsff } from "../../elastic";
 import { validateBsff } from "../../validation";
 
@@ -15,6 +15,10 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
   const user = checkIsAuthenticated(context);
   const existingBsff = await getBsffOrNotFound({ id });
 
+  const packagings = await prisma.bsff
+    .findUnique({ where: { id: existingBsff.id } })
+    .packagings();
+
   await isBsffContributor(user, existingBsff);
 
   const previousBsffs = await getPreviousBsffs(existingBsff);
@@ -23,7 +27,11 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
     where: { bsffs: { some: { id: { in: [existingBsff.id] } } } }
   });
 
-  await validateBsff(existingBsff, previousBsffs, ficheInterventions);
+  await validateBsff(
+    { ...existingBsff, packagings, isDraft: false },
+    previousBsffs,
+    ficheInterventions
+  );
 
   const updatedBsff = await prisma.bsff.update({
     data: {
@@ -36,7 +44,7 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
 
   await indexBsff(updatedBsff, context);
 
-  return unflattenBsff(updatedBsff);
+  return expandBsffFromDB(updatedBsff);
 };
 
 export default publishBsffResolver;

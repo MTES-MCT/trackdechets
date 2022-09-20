@@ -11,6 +11,8 @@ import { FillFieldsInfo, DisabledFieldsInfo } from "../utils/commons";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import classNames from "classnames";
+import Tooltip from "common/components/Tooltip";
+import { customInfoToolTip } from "./Emitter";
 
 export default function Destination({ status, stepName, disabled = false }) {
   const receptionDisabled = disabled || BsdasriStatus.Received === status;
@@ -37,7 +39,7 @@ export default function Destination({ status, stepName, disabled = false }) {
       </div>
       <div className="form__row">
         <label>
-          Champ libre (optionnel)
+          Champ libre (optionnel) <Tooltip msg={customInfoToolTip} />
           <Field
             component="textarea"
             name="destination.customInfo"

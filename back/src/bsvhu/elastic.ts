@@ -124,7 +124,8 @@ function toBsdElastic(bsvhu: Bsvhu): BsdElastic {
     wasteDescription: "",
     ...where,
     sirets: Object.values(where).flat(),
-    ...getRegistryFields(bsvhu)
+    ...getRegistryFields(bsvhu),
+    rawBsd: bsvhu
   };
 }
 
@@ -135,7 +136,7 @@ export async function indexAllBsvhus(
   idx: string,
   { skip = 0 }: { skip?: number } = {}
 ) {
-  const take = 500;
+  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
   const bsvhus = await prisma.bsvhu.findMany({
     skip,
     take,

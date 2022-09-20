@@ -1,12 +1,18 @@
 import * as React from "react";
-import { Link, generatePath, useLocation } from "react-router-dom";
+import {
+  Link,
+  generatePath,
+  useLocation,
+  useRouteMatch,
+} from "react-router-dom";
 import { IconQrCode } from "common/components/Icons";
 import routes from "common/routes";
 import { MenuLink } from "@reach/menu-button";
 
 export const CardRoadControlButton = ({ siret, form }) => {
   const location = useLocation();
-  if (!displayRoadControlButton(form)) {
+
+  if (!useDisplayRoadControlButton(form)) {
     return null;
   }
   return (
@@ -30,9 +36,10 @@ export const CardRoadControlButton = ({ siret, form }) => {
 export const TableRoadControlButton = ({ siret, form }) => {
   const location = useLocation();
 
-  if (!displayRoadControlButton(form)) {
+  if (!useDisplayRoadControlButton(form)) {
     return null;
   }
+
   return (
     <MenuLink
       as={Link}
@@ -53,7 +60,7 @@ export const TableRoadControlButton = ({ siret, form }) => {
   );
 };
 
-const displayRoadControlButton = bsd => {
+const useDisplayRoadControlButton = bsd => {
   const statusKey = {
     Form: "status",
     Bsdasri: "bsdasriStatus",
@@ -61,6 +68,6 @@ const displayRoadControlButton = bsd => {
     Bsvhu: "bsvhuStatus",
     Bsda: "bsdaStatus",
   }[bsd.__typename];
-
-  return ["SENT", "RESENT"].includes(bsd[statusKey]);
+  const isCollectedTab = !!useRouteMatch(routes.dashboard.transport.collected);
+  return ["SENT", "RESENT"].includes(bsd[statusKey]) && isCollectedTab;
 };

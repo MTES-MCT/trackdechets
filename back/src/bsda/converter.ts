@@ -1,9 +1,11 @@
 import {
-  chain,
   nullIfNoValues,
   safeInput,
+  processDate,
+  chain,
   undefinedOrDefault
-} from "../forms/form-converter";
+} from "../common/converter";
+
 import {
   FormCompany,
   Signature,
@@ -40,12 +42,12 @@ import {
   Bsda as PrismaBsda,
   BsdaRevisionRequest
 } from "@prisma/client";
-
+import { BsdElastic } from "../common/elastic";
 export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
   return {
     id: form.id,
-    createdAt: form.createdAt,
-    updatedAt: form.updatedAt,
+    createdAt: processDate(form.createdAt),
+    updatedAt: processDate(form.updatedAt),
     isDraft: form.isDraft,
     status: form.status,
     type: form.type,
@@ -63,7 +65,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
       emission: nullIfNoValues<BsdaEmission>({
         signature: nullIfNoValues<Signature>({
           author: form.emitterEmissionSignatureAuthor,
-          date: form.emitterEmissionSignatureDate
+          date: processDate(form.emitterEmissionSignatureDate)
         })
       }),
       pickupSite: nullIfNoValues<BsdaPickupSite>({
@@ -108,7 +110,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
       reception: nullIfNoValues<BsdaReception>({
         acceptationStatus: form.destinationReceptionAcceptationStatus,
         refusalReason: form.destinationReceptionRefusalReason,
-        date: form.destinationReceptionDate,
+        date: processDate(form.destinationReceptionDate),
         weight: form.destinationReceptionWeight
           ? form.destinationReceptionWeight / 1000
           : form.destinationReceptionWeight
@@ -119,7 +121,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         date: form.destinationOperationDate,
         signature: nullIfNoValues<Signature>({
           author: form.destinationOperationSignatureAuthor,
-          date: form.destinationOperationSignatureDate
+          date: processDate(form.destinationOperationSignatureDate)
         }),
         nextDestination: nullIfNoValues<BsdaNextDestination>({
           company: nullIfNoValues<FormCompany>({
@@ -137,6 +139,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
       })
     }),
     worker: nullIfNoValues<BsdaWorker>({
+      isDisabled: Boolean(form.workerIsDisabled),
       company: nullIfNoValues<FormCompany>({
         name: form.workerCompanyName,
         siret: form.workerCompanySiret,
@@ -149,7 +152,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         hasEmitterPaperSignature: form.workerWorkHasEmitterPaperSignature,
         signature: nullIfNoValues<Signature>({
           author: form.workerWorkSignatureAuthor,
-          date: form.workerWorkSignatureDate
+          date: processDate(form.workerWorkSignatureDate)
         })
       })
     }),
@@ -165,7 +168,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
       recepisse: nullIfNoValues<BsdaRecepisse>({
         department: form.brokerRecepisseDepartment,
         number: form.brokerRecepisseNumber,
-        validityLimit: form.brokerRecepisseValidityLimit
+        validityLimit: processDate(form.brokerRecepisseValidityLimit)
       })
     }),
     transporter: nullIfNoValues<BsdaTransporter>({
@@ -182,15 +185,16 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
       recepisse: nullIfNoValues<BsdaRecepisse>({
         department: form.transporterRecepisseDepartment,
         number: form.transporterRecepisseNumber,
-        validityLimit: form.transporterRecepisseValidityLimit
+        validityLimit: processDate(form.transporterRecepisseValidityLimit),
+        isExempted: form.transporterRecepisseIsExempted
       }),
       transport: nullIfNoValues<BsdaTransport>({
         mode: form.transporterTransportMode,
         plates: form.transporterTransportPlates,
-        takenOverAt: form.transporterTransportTakenOverAt,
+        takenOverAt: processDate(form.transporterTransportTakenOverAt),
         signature: nullIfNoValues<Signature>({
           author: form.transporterTransportSignatureAuthor,
-          date: form.transporterTransportSignatureDate
+          date: processDate(form.transporterTransportSignatureDate)
         })
       })
     }),
@@ -198,7 +202,21 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
     metadata: null
   };
 }
+export function expandBsdaFromElastic(
+  bsda: BsdElastic["rawBsd"]
+): GraphqlBsda & { groupedIn?: string; forwardedIn?: string } {
+  const expanded = expandBsdaFromDb(bsda);
 
+  if (!expanded) {
+    return null;
+  }
+  // pass down related field to sub-resolvers
+  return {
+    ...expanded,
+    groupedIn: bsda?.groupedIn,
+    forwardedIn: bsda?.forwardedIn
+  };
+}
 export function flattenBsdaInput(
   formInput: BsdaInput
 ): Partial<Prisma.BsdaCreateInput> {
@@ -410,6 +428,7 @@ function flattenBsdaTransporterInput({
 
 function flattenBsdaWorkerInput({ worker }: Pick<BsdaInput, "worker">) {
   return {
+    workerIsDisabled: chain(worker, w => w.isDisabled),
     workerCompanyName: chain(worker, w => chain(w.company, c => c.name)),
     workerCompanySiret: chain(worker, w => chain(w.company, c => c.siret)),
     workerCompanyAddress: chain(worker, w => chain(w.company, c => c.address)),

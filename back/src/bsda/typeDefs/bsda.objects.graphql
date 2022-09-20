@@ -221,6 +221,9 @@ type BsdaNextDestination {
 }
 
 type BsdaWorker {
+  "Indique si une entreprise de travaux est présente sur le BSDA (pour le cas d'un émetteur qui démonte lui même son amiante par ex)"
+  isDisabled: Boolean!
+  
   "Entreprise de travaux"
   company: FormCompany
   "Déclaration générale"

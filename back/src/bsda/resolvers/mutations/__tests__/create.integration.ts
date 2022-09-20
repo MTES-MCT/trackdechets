@@ -78,6 +78,9 @@ describe("Mutation.Bsda.create", () => {
 
   it("should allow creating a valid form for the producer signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const input: BsdaInput = {
       emitter: {
@@ -116,7 +119,7 @@ describe("Mutation.Bsda.create", () => {
         cap: "A cap",
         plannedOperationCode: "D 9",
         company: {
-          siret: "3".repeat(14),
+          siret: destinationCompany.siret,
           name: "destination",
           address: "address",
           contact: "contactEmail",
@@ -143,6 +146,9 @@ describe("Mutation.Bsda.create", () => {
 
   it("should allow creating a valid form with null sealNumbers field", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const input: BsdaInput = {
       emitter: {
@@ -181,7 +187,7 @@ describe("Mutation.Bsda.create", () => {
         cap: "A cap",
         plannedOperationCode: "D 9",
         company: {
-          siret: "11111111111111",
+          siret: destinationCompany.siret,
           name: "destination",
           address: "address",
           contact: "contactEmail",
@@ -192,15 +198,11 @@ describe("Mutation.Bsda.create", () => {
     };
 
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<Pick<Mutation, "createBsda">>(
-      CREATE_BSDA,
-      {
-        variables: {
-          input
-        }
+    const { data } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
       }
-    );
-    console.log(errors);
+    });
     expect(data.createBsda.id).toMatch(
       new RegExp(`^BSDA-[0-9]{8}-[A-Z0-9]{9}$`)
     );
@@ -211,6 +213,9 @@ describe("Mutation.Bsda.create", () => {
 
   it("should allow creating a valid form without sealNumbers field", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const input: BsdaInput = {
       emitter: {
@@ -248,7 +253,7 @@ describe("Mutation.Bsda.create", () => {
         cap: "A cap",
         plannedOperationCode: "D 9",
         company: {
-          siret: "11111111111111",
+          siret: destinationCompany.siret,
           name: "destination",
           address: "address",
           contact: "contactEmail",
@@ -259,15 +264,11 @@ describe("Mutation.Bsda.create", () => {
     };
 
     const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<Pick<Mutation, "createBsda">>(
-      CREATE_BSDA,
-      {
-        variables: {
-          input
-        }
+    const { data } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
       }
-    );
-    console.log(errors);
+    });
     expect(data.createBsda.id).toMatch(
       new RegExp(`^BSDA-[0-9]{8}-[A-Z0-9]{9}$`)
     );
@@ -277,6 +278,12 @@ describe("Mutation.Bsda.create", () => {
   });
   it("should allow creating the form if up to 2 plates are submitted", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { company: transporterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const input: BsdaInput = {
       emitter: {
@@ -315,7 +322,7 @@ describe("Mutation.Bsda.create", () => {
         cap: "A cap",
         plannedOperationCode: "D 9",
         company: {
-          siret: "3".repeat(14),
+          siret: destinationCompany.siret,
           name: "destination",
           address: "address",
           contact: "contactEmail",
@@ -325,7 +332,7 @@ describe("Mutation.Bsda.create", () => {
       },
       transporter: {
         company: {
-          siret: "21111111111112",
+          siret: transporterCompany.siret,
           name: "The Transporter",
           address: "Rue du bsda",
           contact: "Un transporter",
@@ -348,6 +355,12 @@ describe("Mutation.Bsda.create", () => {
 
   it("should fail creating the form if more than 2 plates are submitted", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { company: transporterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const input: BsdaInput = {
       emitter: {
@@ -386,7 +399,7 @@ describe("Mutation.Bsda.create", () => {
         cap: "A cap",
         plannedOperationCode: "D 9",
         company: {
-          siret: "3".repeat(14),
+          siret: destinationCompany.siret,
           name: "destination",
           address: "address",
           contact: "contactEmail",
@@ -396,7 +409,7 @@ describe("Mutation.Bsda.create", () => {
       },
       transporter: {
         company: {
-          siret: "21111111111112",
+          siret: transporterCompany.siret,
           name: "The Transporter",
           address: "Rue du bsda",
           contact: "Un transporter",
@@ -426,6 +439,9 @@ describe("Mutation.Bsda.create", () => {
 
   it("should fail creating the form if a required field like the waste code is missing", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const input: BsdaInput = {
       emitter: {
@@ -464,7 +480,7 @@ describe("Mutation.Bsda.create", () => {
         cap: "A cap",
         plannedOperationCode: "D 9",
         company: {
-          siret: "3".repeat(14),
+          siret: destinationCompany.siret,
           name: "destination",
           address: "address",
           contact: "contactEmail",
@@ -618,6 +634,112 @@ describe("Mutation.Bsda.create", () => {
         sealNumbers: ["1", "2"]
       },
       packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: company.siret,
+          name: company.name,
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(data.createBsda.id).toBeDefined();
+  });
+
+  it("should disallow creating a bsda with packaging OTHER and no description", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: ["WASTE_CENTER"] }
+    });
+
+    const input: BsdaInput = {
+      type: "COLLECTION_2710",
+      emitter: {
+        isPrivateIndividual: true,
+        company: {
+          name: "Jean DUPONT",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      waste: {
+        code: "16 01 06",
+        adr: "ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "OTHER", other: null }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: company.siret,
+          name: company.name,
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      "Détail du conditionnement ne peut pas être null"
+    );
+  });
+
+  it("should allow creating a bsda with packaging field other null if packaging type is not OTHER", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: ["WASTE_CENTER"] }
+    });
+
+    const input: BsdaInput = {
+      type: "COLLECTION_2710",
+      emitter: {
+        isPrivateIndividual: true,
+        company: {
+          name: "Jean DUPONT",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      waste: {
+        code: "16 01 06",
+        adr: "ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME", other: null }],
       weight: { isEstimate: true, value: 1.2 },
       destination: {
         cap: "A cap",

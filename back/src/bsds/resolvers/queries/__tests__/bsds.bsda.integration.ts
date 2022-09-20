@@ -1018,7 +1018,6 @@ describe("Query.bsds.bsdas mutations", () => {
       }
     });
 
-    await indexBsda(bsda);
     await refreshElasticSearch();
 
     const { query } = makeClient(emitter.user);

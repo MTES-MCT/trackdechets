@@ -13,7 +13,7 @@ import {
 
 type Props = {
   name: string;
-  siret: string;
+  id: string;
   companyTypes: CompanyType[];
   toggleEdition: () => void;
 };
@@ -23,8 +23,8 @@ type V = {
 };
 
 export const UPDATE_COMPANY_TYPES = gql`
-  mutation UpdateCompany($siret: String!, $companyTypes: [CompanyType]) {
-    updateCompany(siret: $siret, companyTypes: $companyTypes) {
+  mutation UpdateCompany($id: String!, $companyTypes: [CompanyType]) {
+    updateCompany(id: $id, companyTypes: $companyTypes) {
       id
       siret
       companyTypes
@@ -34,13 +34,13 @@ export const UPDATE_COMPANY_TYPES = gql`
 
 export default function AccountFormCompanyTypes({
   name,
-  siret,
+  id,
   companyTypes,
   toggleEdition,
 }: Props) {
   const [update, { loading, error }] = useMutation<
     Pick<Mutation, "updateCompany">,
-    Pick<MutationUpdateCompanyArgs, "siret" | "companyTypes">
+    Pick<MutationUpdateCompanyArgs, "id" | "companyTypes">
   >(UPDATE_COMPANY_TYPES, {
     onCompleted: () => {
       toggleEdition();
@@ -54,7 +54,7 @@ export default function AccountFormCompanyTypes({
     <Formik
       initialValues={initialValues}
       onSubmit={(values, { setFieldError, setSubmitting }) => {
-        update({ variables: { siret, ...values } }).catch(() => {
+        update({ variables: { id, ...values } }).catch(() => {
           setFieldError(name, "Erreur serveur");
           setSubmitting(false);
         });

@@ -210,7 +210,9 @@ type BsffTransport {
   "Date de prise en charge"
   takenOverAt: DateTime
   "Mode de transport utilisé."
-  mode: TransportMode!
+  mode: TransportMode
+  "Plaque(s) d'immatriculation"
+  plates: [String!]
   "Signature du transporteur lors de l'enlèvement auprès de l'émetteur."
   signature: Signature
 }
@@ -224,8 +226,8 @@ type BsffDestination {
   operation: BsffOperation
   "Opération de traitement prévu initialement."
   plannedOperationCode: BsffOperationCode
-  "Numéro CAP."
-  cap: String
+  "DEPRECATED - Numéro CAP."
+  cap: String @deprecated(reason: "Il n'y a pas de CAP sur le BSFF")
   "Champ libre"
   customInfo: String
 }

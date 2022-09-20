@@ -223,7 +223,7 @@ input UpdateFormInput {
 
   """
   Établissement émetteur/producteur du déchet (case 1)
-  
+
   NB: le siret émetteur n'est pas modifiable si le bsd comporte des bsds groupés (Annexe 2)
   """
   emitter: EmitterInput
@@ -382,6 +382,11 @@ ou à l'étranger
 input InternationalCompanyInput {
   "SIRET de l'établissement, optionnel dans le cas d'un établissement à l'étranger"
   siret: String
+
+  """
+  Numéro de TVA intra-communautaire de l'établissement.
+  """
+  vatNumber: String
 
   "Nom de l'établissement"
   name: String

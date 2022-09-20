@@ -36,9 +36,9 @@ const CREATE_VHU_AGREMENT = gql`
 `;
 
 const UPDATE_COMPANY_VHU_AGREMENT = gql`
-  mutation UpdateCompany($siret: String!, $vhuAgrementDemolisseurId: String!) {
+  mutation UpdateCompany($id: String!, $vhuAgrementDemolisseurId: String!) {
     updateCompany(
-      siret: $siret
+      id: $id
       vhuAgrementDemolisseurId: $vhuAgrementDemolisseurId
     ) {
       id
@@ -137,7 +137,7 @@ export default function AccountFormCompanyAddVhuAgrementDemolisseur({
           if (data.createVhuAgrement) {
             await updateCompany({
               variables: {
-                siret: company.siret,
+                id: company.id,
                 vhuAgrementDemolisseurId: data.createVhuAgrement.id,
               },
             });

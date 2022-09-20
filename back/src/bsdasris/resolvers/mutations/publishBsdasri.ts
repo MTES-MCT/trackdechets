@@ -40,11 +40,16 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
   // publish  dasri
   const publishedBsdasri = await prisma.bsdasri.update({
     where: { id: bsdasri.id },
-    data: { isDraft: false }
+    data: { isDraft: false },
+    include: {
+      grouping: { select: { id: true } },
+      synthesizing: { select: { id: true } }
+    }
   });
 
   const expandedDasri = expandBsdasriFromDB(publishedBsdasri);
-  await indexBsdasri(publishedBsdasri);
+
+  await indexBsdasri(publishedBsdasri, context);
   return expandedDasri;
 };
 

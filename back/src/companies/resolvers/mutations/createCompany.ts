@@ -7,7 +7,6 @@ import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { randomNumber } from "../../../utils";
-import geocode from "../../geocode";
 import * as COMPANY_TYPES from "../../../common/constants/COMPANY_TYPES";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../mailer/templates";
@@ -15,6 +14,10 @@ import { deleteCachedUserCompanies } from "../../../common/redis/users";
 import { isVat } from "../../../common/constants/companySearchHelpers";
 import { whereSiretOrVatNumber } from "../CompanySearchResult";
 import { searchCompany } from "../../search";
+import {
+  addToGeocodeCompanyQueue,
+  addToSetCompanyDepartementQueue
+} from "../../../queue/producers/company";
 
 /**
  * Create a new company and associate it to a user
@@ -42,6 +45,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     companyTypes,
     transporterReceiptId,
     traderReceiptId,
+    brokerReceiptId,
     vhuAgrementDemolisseurId,
     vhuAgrementBroyeurId,
     allowBsdasriTakeOverWithoutSignature
@@ -74,7 +78,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   }
 
   // check if orgId exists in public databases or in AnonymousCompany
-  await searchCompany(orgId);
+  const companyInfo = await searchCompany(orgId);
 
   if (companyTypes.includes("ECO_ORGANISME") && siret) {
     const ecoOrganismeExists = await prisma.ecoOrganisme.findUnique({
@@ -82,7 +86,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     });
     if (!ecoOrganismeExists) {
       throw new UserInputError(
-        "Cette entreprise ne fait pas partie de la liste des éco-organismes reconnus par Trackdéchets. Contactez-nous si vous pensez qu'il s'agit d'une erreur : hello@trackdechets.beta.gouv.fr"
+        "Cette entreprise ne fait pas partie de la liste des éco-organismes reconnus par Trackdéchets. Contactez-nous si vous pensez qu'il s'agit d'une erreur : contact@trackdechets.beta.gouv.fr"
       );
     }
 
@@ -97,8 +101,6 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     );
   }
 
-  const { latitude, longitude } = await geocode(address);
-
   const companyCreateInput: Prisma.CompanyCreateInput = {
     siret,
     vatNumber,
@@ -107,8 +109,6 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     name,
     givenName,
     address,
-    latitude,
-    longitude,
     companyTypes: { set: companyTypes },
     securityCode: randomNumber(4),
     verificationCode: randomNumber(5).toString(),
@@ -130,6 +130,12 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     };
   }
 
+  if (!!brokerReceiptId) {
+    companyCreateInput.brokerReceipt = {
+      connect: { id: brokerReceiptId }
+    };
+  }
+
   if (!!vhuAgrementDemolisseurId) {
     companyCreateInput.vhuAgrementDemolisseur = {
       connect: { id: vhuAgrementDemolisseurId }
@@ -142,17 +148,18 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     };
   }
 
-  const companyAssociationPromise = prisma.companyAssociation.create({
+  const companyAssociation = await prisma.companyAssociation.create({
     data: {
       user: { connect: { id: user.id } },
       company: {
         create: companyCreateInput
       },
       role: "ADMIN"
-    }
+    },
+    include: { company: true }
   });
   await deleteCachedUserCompanies(user.id);
-  const company = await companyAssociationPromise.company();
+  const company = companyAssociation.company;
 
   // fill firstAssociationDate field if null (no need to update it if user was previously already associated)
   await prisma.user.updateMany({
@@ -173,6 +180,13 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       );
     }
   }
+
+  // Fill latitude, longitude and departement asynchronously
+  addToGeocodeCompanyQueue({ siret: company.siret, address: company.address });
+  addToSetCompanyDepartementQueue({
+    siret: company.siret,
+    codeCommune: companyInfo.codeCommune
+  });
 
   return convertUrls(company);
 };

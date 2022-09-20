@@ -10,7 +10,7 @@ import { getFormOrFormNotFound, getFullForm } from "../../database";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { checkCanSignFor } from "../../permissions";
-import { expandFormFromDb } from "../../form-converter";
+import { expandFormFromDb } from "../../converter";
 import {
   beforeSignedByTransporterSchema,
   wasteDetailsSchema

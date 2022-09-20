@@ -115,7 +115,7 @@ function getWhere(
 /**
  * Convert a dasri from the bsdasri table to Elastic Search's BSD model.
  */
-function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
+export function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
   const where = getWhere(bsdasri);
 
   return {
@@ -128,6 +128,7 @@ function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
     transporterCompanyName: bsdasri.transporterCompanyName ?? "",
     transporterCompanySiret: bsdasri.transporterCompanySiret ?? "",
     transporterTakenOverAt: bsdasri.transporterTakenOverAt?.getTime(),
+    transporterCustomInfo: bsdasri.transporterCustomInfo ?? "",
     destinationCompanyName: bsdasri.destinationCompanyName ?? "",
     destinationCompanySiret: bsdasri.destinationCompanySiret ?? "",
     destinationReceptionDate: bsdasri.destinationReceptionDate?.getTime(),
@@ -140,7 +141,8 @@ function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
     createdAt: bsdasri.createdAt.getTime(),
     ...where,
     sirets: Object.values(where).flat(),
-    ...getRegistryFields(bsdasri)
+    ...getRegistryFields(bsdasri),
+    rawBsd: bsdasri
   };
 }
 
@@ -151,12 +153,16 @@ export async function indexAllBsdasris(
   idx: string,
   { skip = 0 }: { skip?: number } = {}
 ) {
-  const take = 500;
+  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
   const bsdasris = await prisma.bsdasri.findMany({
     skip,
     take,
     where: {
       isDeleted: false
+    },
+    include: {
+      grouping: { select: { id: true } },
+      synthesizing: { select: { id: true } }
     }
   });
 

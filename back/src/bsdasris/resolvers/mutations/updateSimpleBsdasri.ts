@@ -2,7 +2,7 @@ import { expandBsdasriFromDB, flattenBsdasriInput } from "../../converter";
 import { BsdasriStatus, BsdasriType, Bsdasri } from "@prisma/client";
 import prisma from "../../../prisma";
 import { BsdasriInput } from "../../../generated/graphql/types";
-
+import { GraphQLContext } from "../../../types";
 import { validateBsdasri } from "../../validation";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { indexBsdasri } from "../../elastic";
@@ -34,12 +34,14 @@ const updateBsdasri = async ({
   id,
   input,
   dbBsdasri,
-  dbGrouping
+  dbGrouping,
+  context
 }: {
   id: string;
   dbBsdasri: Bsdasri;
   input: BsdasriInput;
   dbGrouping: any;
+  context: GraphQLContext;
 }) => {
   const { grouping: inputGrouping, synthesizing: inputSynthesizing } = input;
   const isGroupingType = dbBsdasri.type === BsdasriType.GROUPING;
@@ -109,11 +111,16 @@ const updateBsdasri = async ({
     data: {
       ...flattenedInput,
       ...getGroupedBsdasriArgs(inputGrouping)
+    },
+    include: {
+      grouping: { select: { id: true } },
+      synthesizing: { select: { id: true } }
     }
   });
 
   const expandedDasri = expandBsdasriFromDB(updatedDasri);
-  await indexBsdasri(updatedDasri);
+  await indexBsdasri(updatedDasri, context);
+
   return expandedDasri;
 };
 

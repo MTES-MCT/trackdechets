@@ -1,12 +1,12 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
-import { expandFormFromDb } from "../../form-converter";
+import { expandFormFromDb } from "../../converter";
 import { checkCanMarkAsSealed } from "../../permissions";
 import {
   beforeSignedByTransporterSchema,
   checkCanBeSealed,
-  checkCompaniesType,
+  validateForwardedInCompanies,
   wasteDetailsSchema
 } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
@@ -30,7 +30,7 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   // validate form data
   await checkCanBeSealed(form);
 
-  await checkCompaniesType(form);
+  await validateForwardedInCompanies(form);
   let formUpdateInput = null;
 
   if (

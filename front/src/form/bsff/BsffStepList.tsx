@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from "@apollo/client";
-import GenericStepList, {
-  getComputedState,
-} from "form/common/stepper/GenericStepList";
+import React, { ReactElement, useMemo, lazy } from "react";
+import { useHistory } from "react-router-dom";
+import { Loader } from "common/components";
+import { getComputedState } from "form/common/getComputedState";
 import { IStepContainerProps } from "form/common/stepper/Step";
 import { formInputToastError } from "form/common/stepper/toaster";
 import {
@@ -14,15 +15,15 @@ import {
   BsffInput,
   BsffType,
 } from "generated/graphql/types";
-import React, { ReactElement, useMemo } from "react";
-import { useHistory } from "react-router-dom";
 import initialState from "./utils/initial-state";
 import {
   CREATE_DRAFT_BSFF,
   UPDATE_BSFF_FORM,
   GET_BSFF_FORM,
 } from "./utils/queries";
-
+const GenericStepList = lazy(() =>
+  import("form/common/stepper/GenericStepList")
+);
 interface Props {
   children: (bsff: Bsff | undefined) => ReactElement;
   formId?: string;
@@ -56,12 +57,12 @@ export default function BsffStepsList(props: Props) {
     return getComputedState(initialState, bsff ? getCurrentState(bsff) : null);
   }, [formQuery.data]);
 
-  const [createDraftBsff] = useMutation<
+  const [createDraftBsff, { loading: creating }] = useMutation<
     Pick<Mutation, "createDraftBsff">,
     MutationCreateDraftBsffArgs
   >(CREATE_DRAFT_BSFF);
 
-  const [updateBsffForm] = useMutation<
+  const [updateBsffForm, { loading: updating }] = useMutation<
     Pick<Mutation, "updateBsff">,
     MutationUpdateBsffArgs
   >(UPDATE_BSFF_FORM);
@@ -107,13 +108,16 @@ export default function BsffStepsList(props: Props) {
   >[];
 
   return (
-    <GenericStepList
-      children={steps}
-      formId={props.formId}
-      formQuery={formQuery}
-      onSubmit={onSubmit}
-      initialValues={formState}
-      validationSchema={null}
-    />
+    <>
+      <GenericStepList
+        children={steps}
+        formId={props.formId}
+        formQuery={formQuery}
+        onSubmit={onSubmit}
+        initialValues={formState}
+        validationSchema={null}
+      />
+      {(creating || updating) && <Loader />}
+    </>
   );
 }

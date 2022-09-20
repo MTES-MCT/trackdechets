@@ -152,8 +152,10 @@ export const membershipRequestRefused: MailTemplate<{
 export const securityCodeRenewal: MailTemplate<{
   company: { name?: string; siret: string };
 }> = {
-  subject: "Renouvellement du code de signature sur Trackdéchets",
-  templateId: templateIds.SECURITY_CODE_RENEWAL
+  subject: ({ company }) =>
+    `Renouvellement du code de signature de votre établissement "${company.name}" (${company.siret})`,
+  body: mustacheRenderer("notification-renouvellement-code-signature.html"),
+  templateId: templateIds.LAYOUT
 };
 
 export const verificationProcessInfo: MailTemplate<{
@@ -183,4 +185,15 @@ export const verificationDone: MailTemplate<{
         company.verificationMode === CompanyVerificationMode.LETTER
     }
   })
+};
+
+export const finalDestinationModified: MailTemplate<{
+  id: string;
+  emitter: { name?: string; siret: string };
+  destination: { name?: string; siret: string };
+  plannedDestination: { name?: string; siret: string };
+}> = {
+  subject: ({ id }) => `Alerte sur le bordereau ${id}`,
+  body: mustacheRenderer("destination-finale-modifiee.html"),
+  templateId: templateIds.LAYOUT
 };

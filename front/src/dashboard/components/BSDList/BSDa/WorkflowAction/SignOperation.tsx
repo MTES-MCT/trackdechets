@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { UPDATE_BSDA } from "form/bsda/stepper/queries";
 import Operation from "form/bsda/stepper/steps/Operation";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import { getComputedState } from "form/common/stepper/GenericStepList";
+import { getComputedState } from "form/common/getComputedState";
 import { Field, Form, Formik } from "formik";
 import {
   BsdaSignatureType,

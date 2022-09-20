@@ -4,6 +4,7 @@ import { redisClient } from "../src/common/redis";
 import prisma from "../src/prisma";
 import { app } from "../src/server";
 import { client as elasticSearch, index } from "../src/common/elastic";
+import { indexQueue } from "../src/queue/producers/elastic";
 
 let httpServerInstance: HttpServer | HttpsServer = null;
 
@@ -69,7 +70,21 @@ export async function resetDatabase() {
   await truncateDatabase();
 }
 
-export function refreshElasticSearch() {
+export async function refreshElasticSearch() {
+  const drainedPromise = new Promise<void>(resolve =>
+    indexQueue.once("global:drained", resolve)
+  );
+
+  // Wait for the processing queue to index all bsds
+  const jobsCount = await indexQueue.getJobCounts();
+  if (jobsCount.active || jobsCount.waiting || jobsCount.delayed) {
+    await Promise.race([
+      drainedPromise,
+      new Promise(resolve => setTimeout(resolve, 1000))
+    ]);
+  }
+  indexQueue.removeAllListeners("global:drained");
+
   return elasticSearch.indices.refresh({
     index: index.alias
   });

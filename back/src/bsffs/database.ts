@@ -11,8 +11,8 @@ import { BsffFicheIntervention, BsffInput } from "../generated/graphql/types";
 import getReadableId, { ReadableIdPrefix } from "../forms/readableId";
 import {
   flattenBsffInput,
-  unflattenBsff,
-  unflattenFicheInterventionBsff
+  expandBsffFromDB,
+  expandFicheInterventionBsffFromDB
 } from "./converter";
 import { isBsffContributor } from "./permissions";
 import { validateBsff } from "./validation";
@@ -66,7 +66,7 @@ export async function getFicheInterventions({
     .ficheInterventions();
 
   const unflattenedFicheInterventions = ficheInterventions.map(
-    unflattenFicheInterventionBsff
+    expandFicheInterventionBsffFromDB
   );
 
   // the user trying to read ficheInterventions might not be a contributor of the bsff
@@ -110,7 +110,7 @@ export async function createBsff(
   input: BsffInput,
   additionalData: Partial<Bsff> = {}
 ) {
-  const flatInput = {
+  const flatInput: Prisma.BsffCreateInput = {
     id: getReadableId(ReadableIdPrefix.FF),
     type: getBsffType(input),
     ...flattenBsffInput(input),
@@ -196,11 +196,13 @@ export async function createBsff(
     };
   }
 
-  const bsff = await prisma.bsff.create({ data });
+  const bsff = await prisma.bsff.create({
+    data
+  });
 
   await indexBsff(bsff, { user } as GraphQLContext);
 
-  return unflattenBsff(bsff);
+  return expandBsffFromDB(bsff);
 }
 
 /**

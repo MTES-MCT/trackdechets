@@ -1,15 +1,16 @@
-import React from "react";
-import { useQuery } from "@apollo/client";
+import React, { useEffect } from "react";
+import { useLazyQuery } from "@apollo/client";
 import { Query, QueryFormRevisionRequestsArgs } from "generated/graphql/types";
 import { GET_FORM_REVISION_REQUESTS } from "./query";
 import { useParams } from "react-router-dom";
 import { Loader } from "common/components";
 import { BsddRevisionRequestTable } from "./BsddRevisionRequestTable";
+import buildUpdateQueryFn from "../fetchMore";
 
 export function BsddRevisionRequestList() {
   const { siret } = useParams<{ siret: string }>();
 
-  const { data, loading } = useQuery<
+  const [fetchRevisions, { data, loading, fetchMore }] = useLazyQuery<
     Pick<Query, "formRevisionRequests">,
     QueryFormRevisionRequestsArgs
   >(GET_FORM_REVISION_REQUESTS, {
@@ -19,6 +20,10 @@ export function BsddRevisionRequestList() {
     fetchPolicy: "cache-and-network",
   });
 
+  useEffect(() => {
+    fetchRevisions();
+  }, [fetchRevisions]);
+
   if (loading) return <Loader />;
 
   if (!data?.formRevisionRequests?.edges?.length) {
@@ -26,8 +31,31 @@ export function BsddRevisionRequestList() {
   }
 
   return (
-    <BsddRevisionRequestTable
-      revisions={data.formRevisionRequests.edges.map(edge => edge.node)}
-    />
+    <>
+      <BsddRevisionRequestTable
+        revisions={data.formRevisionRequests.edges.map(edge => edge.node)}
+      />
+      {data?.formRevisionRequests?.pageInfo?.hasNextPage && (
+        <div className="tw-flex tw-justify-center tw-mt-2">
+          <button
+            className="center btn btn--primary small"
+            onClick={() =>
+              fetchMore({
+                variables: {
+                  after: data?.formRevisionRequests.pageInfo.endCursor,
+                },
+
+                updateQuery: (prev, { fetchMoreResult }) =>
+                  buildUpdateQueryFn("formRevisionRequests")(prev, {
+                    fetchMoreResult,
+                  }),
+              })
+            }
+          >
+            Charger plus de révisions
+          </button>
+        </div>
+      )}
+    </>
   );
 }

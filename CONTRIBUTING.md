@@ -48,17 +48,17 @@
    127.0.0.1 trackdechets.local
    127.0.0.1 developers.trackdechets.local
    127.0.0.1 es.trackdechets.local
-   127.0.0.1 kibana.trackdechets.local
+   127.0.0.1 notifier.trackdechets.local
    ```
 
    > Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
 
-   > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `UI_HOST`, `DEVELOPERS_HOST`, `ELASTIC_SEARCH_HOST` et `KIBANA_HOST`
+   > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `NOTIFIER_HOST`, `UI_HOST`, `DEVELOPERS_HOST` et `ELASTIC_SEARCH_HOST`
 
 4. Démarrer les containers
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx elasticsearch kibana
+   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx elasticsearch
    ```
 
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
@@ -70,7 +70,7 @@
 
    ```bash
    docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
-   npx prisma db push --preview-feature
+   npx prisma db push
    ```
 
 6. Initialiser l'index Elastic Search.
@@ -310,3 +310,15 @@ Voilà la procédure pour ajouter une icône au fichier `Icons.tsx` :
 3. [Convertir le SVG en JSX](https://react-svgr.com/playground/?expandProps=start&icon=true&replaceAttrValues=%23000%3D%22currentColor%22&typescript=true) et l'ajouter au fichier (adapter le code selon les exemples existants : props, remplacer `width`/`height` et `"currentColor"`).
 
 Pour s'y retrouver plus facilement, suivre la convention de nommage en place et utiliser le nom donné par streamlineicons.
+
+### Reindexer un bordereau individuel
+
+```
+   npm run reindex-bsd BSD-XYZ123
+```
+
+### Réindexer un type de bordereau
+
+```
+   npm run index-elastic-search bsdasri -f
+```

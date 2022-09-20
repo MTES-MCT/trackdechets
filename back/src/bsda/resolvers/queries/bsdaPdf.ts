@@ -3,7 +3,7 @@ import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { createPDFResponse } from "../../../common/pdf";
 import { getBsdaOrNotFound } from "../../database";
-import { checkIsBsdaContributor } from "../../permissions";
+import { checkCanAccessBsdaPdf } from "../../permissions";
 import { buildPdf } from "../../pdf/generator";
 import { DownloadHandler } from "../../../routers/downloadRouter";
 import { getBsdaRepository } from "../../repository";
@@ -19,13 +19,9 @@ export const bsdaPdfDownloadHandler: DownloadHandler<QueryBsdaPdfArgs> = {
 
 export default async function bsdaPdf(_, { id }: QueryBsdaPdfArgs, context) {
   const user = checkIsAuthenticated(context);
-  const form = await getBsdaOrNotFound(id);
+  const bsda = await getBsdaOrNotFound(id);
 
-  await checkIsBsdaContributor(
-    user,
-    form,
-    "Vous n'êtes pas autorisé à accéder à ce bordereau"
-  );
+  await checkCanAccessBsdaPdf(user, bsda);
 
   return getFileDownload({
     handler: bsdaPdfDownloadHandler.name,

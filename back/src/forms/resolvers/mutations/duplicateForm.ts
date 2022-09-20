@@ -1,9 +1,8 @@
 import { Form, Prisma, Status, User } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { eventEmitter, TDEvent } from "../../../events/emitter";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
-import { expandFormFromDb } from "../../form-converter";
+import { expandFormFromDb } from "../../converter";
 import { checkCanDuplicate } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
@@ -51,7 +50,6 @@ function getDuplicateFormInput(
     transporterCustomInfo,
     currentTransporterSiret,
     forwardedInId,
-    temporaryStorageDetailId,
     ownerId,
     ...rest
   }: Form
@@ -113,13 +111,6 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
 
   const newForm = await formRepository.create(newFormInput, {
     duplicate: { id: existingForm.id }
-  });
-
-  eventEmitter.emit(TDEvent.CreateForm, {
-    previousNode: null,
-    node: newForm,
-    updatedFields: {},
-    mutation: "CREATED"
   });
 
   return expandFormFromDb(newForm);

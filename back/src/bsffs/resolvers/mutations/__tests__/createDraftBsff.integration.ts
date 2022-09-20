@@ -33,31 +33,30 @@ const CREATE_DRAFT_BSFF = `
 describe("Mutation.createDraftBsff", () => {
   afterEach(resetDatabase);
 
-  it("should allow user to create a bsff", async () => {
-    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
-    const { mutate } = makeClient(user);
-    const { data, errors } = await mutate<
-      Pick<Mutation, "createDraftBsff">,
-      MutationCreateDraftBsffArgs
-    >(CREATE_DRAFT_BSFF, {
-      variables: {
-        input: {
-          emitter: {
-            company: {
-              name: company.name,
-              siret: company.siret,
-              address: company.address,
-              contact: user.name,
-              mail: user.email
+  it.each(["emitter", "transporter", "destination"])(
+    "should allow %p to create a bsff",
+    async role => {
+      const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createDraftBsff">,
+        MutationCreateDraftBsffArgs
+      >(CREATE_DRAFT_BSFF, {
+        variables: {
+          input: {
+            [role]: {
+              company: {
+                siret: company.siret
+              }
             }
           }
         }
-      }
-    });
+      });
 
-    expect(errors).toBeUndefined();
-    expect(data.createDraftBsff.id).toBeTruthy();
-  });
+      expect(errors).toBeUndefined();
+      expect(data.createDraftBsff.id).toBeTruthy();
+    }
+  );
 
   it("should disallow unauthenticated user from creating a bsff", async () => {
     const { mutate } = makeClient();

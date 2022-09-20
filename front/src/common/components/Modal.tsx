@@ -26,7 +26,7 @@ export default function TdModal({
     <DialogOverlay
       isOpen={isOpen}
       onDismiss={onClose}
-      className={styles.tdModalOverlay}
+      className={classNames("fr-raw-link fr-raw-list", styles.tdModalOverlay)}
     >
       <DialogContent
         aria-label={ariaLabel}

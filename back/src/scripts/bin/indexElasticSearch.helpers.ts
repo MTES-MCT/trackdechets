@@ -1,17 +1,31 @@
 import { client, indexAllBsds, BsdIndex } from "../../common/elastic";
 import prisma from "../../prisma";
+import { BsdType } from "../../generated/graphql/types";
 
 /**
- * Reindex all documents "in place" in the current index. Useful when
+ * Reindex all or given bsd type documents "in place" in the current index. Useful when
  * you want to force a reindex without bumping index version.
  * WARNING : it will cause a read downtime during the time of the reindex.
  */
-async function reindexInPlace(index: BsdIndex) {
+async function reindexInPlace(index: BsdIndex, bsdType?: BsdType) {
+  let query = {};
+  if (bsdType) {
+    console.log(`Deleting ${bsdType} entries`);
+    query = {
+      match: {
+        type: bsdType
+      }
+    };
+  } else {
+    console.log(`Deleting all entries`);
+    query = { match_all: {} };
+  }
+
   await client.deleteByQuery({
     index: index.index,
-    body: { query: { match_all: {} } }
+    body: { query: query }
   });
-  await indexAllBsds(index.index);
+  await indexAllBsds(index.index, bsdType);
 }
 
 /**
@@ -100,11 +114,13 @@ async function initializeIndex(index: BsdIndex) {
 type IndexElasticSearchOpts = {
   force?: boolean;
   index: BsdIndex;
+  bsdTypeToIndex?: BsdType;
 };
 
 export async function indexElasticSearch({
   index,
-  force = false
+  force = false,
+  bsdTypeToIndex = undefined
 }: IndexElasticSearchOpts) {
   const newIndex = index.index;
 
@@ -122,9 +138,9 @@ export async function indexElasticSearch({
     if (oldIndex === newIndex) {
       if (force) {
         console.log(
-          `The -f flag was passed, all documents are being reindexed in place.`
+          `The -f flag was passed, documents are being reindexed in place.`
         );
-        await reindexInPlace(index);
+        await reindexInPlace(index, bsdTypeToIndex);
       } else {
         console.log(
           `The alias "${index.alias}" is already pointing to the current index "${newIndex}", which means there are no changes to apply.`,

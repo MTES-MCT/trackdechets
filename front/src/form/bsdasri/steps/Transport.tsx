@@ -1,16 +1,17 @@
-import React from "react";
-import RedErrorMessage from "common/components/RedErrorMessage";
 import { Field, useFormikContext } from "formik";
+import React, { lazy } from "react";
+import classNames from "classnames";
+import RedErrorMessage from "common/components/RedErrorMessage";
 import Tooltip from "common/components/Tooltip";
-import TagsInput from "common/components/tags-input/TagsInput";
 import WeightWidget from "../components/Weight";
 import { FieldTransportModeSelect } from "common/components";
 import Packagings from "../components/packagings/Packagings";
 import { getInitialWeightFn } from "../utils/initial-state";
-import classNames from "classnames";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { BsdasriStatus, Bsdasri, BsdasriType } from "generated/graphql/types";
 import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
+import { customInfoToolTip } from "./Emitter";
+const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export default function Transport({ status, editionDisabled = false }) {
   function handleTransportMode(e) {
@@ -22,8 +23,12 @@ export default function Transport({ status, editionDisabled = false }) {
   const { values, setFieldValue } = useFormikContext<Bsdasri>();
 
   const showTransportFields =
-    status === BsdasriStatus.SignedByProducer ||
-    values.type === BsdasriType.Synthesis;
+    [
+      BsdasriStatus.SignedByProducer,
+      BsdasriStatus.Sent,
+      BsdasriStatus.Processed,
+      BsdasriStatus.Refused,
+    ].includes(status) || values.type === BsdasriType.Synthesis;
 
   const showTransportePlates = values?.transporter?.transport?.mode === "ROAD";
 
@@ -36,7 +41,8 @@ export default function Transport({ status, editionDisabled = false }) {
     <>
       <div className="form__row">
         <label>
-          Champ libre (optionnel)
+          Champ libre (optionnel){" "}
+          <Tooltip msg="Informations internes. N'apparaît pas sur le bordereau." />
           <Field
             component="textarea"
             name="transporter.customInfo"
@@ -115,7 +121,7 @@ export default function Transport({ status, editionDisabled = false }) {
         <div className="form__row">
           <label>
             Immatriculations
-            <Tooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
+            <Tooltip msg={customInfoToolTip} />
             <TagsInput
               name="transporter.transport.plates"
               disabled={disabled}

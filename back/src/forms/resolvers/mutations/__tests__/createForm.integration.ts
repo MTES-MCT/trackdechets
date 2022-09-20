@@ -507,6 +507,9 @@ describe("Mutation.createForm", () => {
 
   it("create a form with a recipient", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: recipientCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const createFormInput = {
       emitter: {
@@ -516,7 +519,7 @@ describe("Mutation.createForm", () => {
       },
       recipient: {
         company: {
-          siret: "3".repeat(14)
+          siret: recipientCompany.siret
         }
       }
     };
@@ -530,6 +533,72 @@ describe("Mutation.createForm", () => {
     expect(data.createForm.recipient.company).toMatchObject(
       createFormInput.recipient.company
     );
+  });
+
+  it("should fail creating a form with a recipient if the recipient is not registered", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      recipient: {
+        company: {
+          siret: "01478520369874" // an unregistered siret
+        }
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: {
+        createFormInput
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "L'installation de destination avec le SIRET 01478520369874 n'est pas inscrite sur Trackdéchets",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
+  it("should fail creating a form with a transporter if the transporter is not registered", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      transporter: {
+        company: {
+          siret: "01478520369874"
+        }
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: {
+        createFormInput
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le transporteur qui a été renseigné sur le bordereau (SIRET: 01478520369874) n'est pas inscrit sur Trackdéchets",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
   });
 
   it.each([
@@ -576,6 +645,9 @@ describe("Mutation.createForm", () => {
 
   it("should create a form with a transporter", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: transporterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const createFormInput = {
       emitter: {
@@ -585,7 +657,7 @@ describe("Mutation.createForm", () => {
       },
       transporter: {
         company: {
-          siret: "12345678901234",
+          siret: transporterCompany.siret,
           name: "Transporter",
           address: "123 whatever street, Somewhere",
           contact: "Jane Doe",
@@ -620,6 +692,9 @@ describe("Mutation.createForm", () => {
     "%p should be a valid format for transporter and trader receipt validity limit",
     async f => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { company: transporterCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
 
       const validityLimit = new Date("2040-01-01");
       const createFormInput = {
@@ -630,7 +705,7 @@ describe("Mutation.createForm", () => {
         },
         transporter: {
           company: {
-            siret: "12345678901234",
+            siret: transporterCompany.siret,
             name: "Transporter",
             address: "123 whatever street, Somewhere",
             contact: "Jane Doe",
@@ -1417,6 +1492,37 @@ describe("Mutation.createForm", () => {
           },
           transporter: {
             company: { siret: transporter.siret, vatNumber: "FR87850019464" }
+          }
+        }
+      }
+    });
+    expect(data?.createForm?.id).toBeDefined();
+  });
+
+  it("should be possible to fill TVA number only for a foregin transporter", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+    const { company: transporterCompany } = await userWithCompanyFactory(
+      UserRole.MEMBER,
+      {
+        companyTypes: {
+          set: ["TRANSPORTER"]
+        },
+        vatNumber: "BE0541696005"
+      }
+    );
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: emitter.siret }
+          },
+          transporter: {
+            company: { vatNumber: transporterCompany.vatNumber }
           }
         }
       }

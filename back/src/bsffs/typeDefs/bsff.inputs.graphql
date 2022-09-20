@@ -149,12 +149,14 @@ input BsffTransporterRecepisseInput {
 input BsffTransporterTransportInput {
   "Date de prise en charge"
   takenOverAt: DateTime
-  mode: TransportMode!
+  mode: TransportMode
+  "Plaque(s) d'immatriculation - maximum 2"
+  plates: [String!]
 }
 
 input BsffDestinationInput {
   company: CompanyInput
-  cap: String
+  cap: String @deprecated(reason: "Il n'y a pas de CAP sur le BSFF")
   reception: BsffDestinationReceptionInput
   plannedOperationCode: BsffOperationCode
   operation: BsffDestinationOperationInput

@@ -4,7 +4,7 @@ import { applyMask } from "../../../common/where";
 import { QueryBsvhusArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
-import { getCachedUserSirets } from "../../../common/redis/users";
+import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { expandVhuFormFromDb } from "../../converter";
 
 import { toPrismaWhereInput } from "../../where";
@@ -16,13 +16,13 @@ export default async function bsvhus(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const userSirets = await getCachedUserSirets(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   const mask = {
     OR: [
-      { emitterCompanySiret: { in: userSirets } },
-      { transporterCompanySiret: { in: userSirets } },
-      { destinationCompanySiret: { in: userSirets } }
+      { emitterCompanySiret: { in: userCompaniesSiretOrVat } },
+      { transporterCompanySiret: { in: userCompaniesSiretOrVat } },
+      { destinationCompanySiret: { in: userCompaniesSiretOrVat } }
     ]
   };
 

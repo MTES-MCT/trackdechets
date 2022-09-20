@@ -11,7 +11,7 @@ import { getEligibleDasrisForSynthesis, aggregatePackagings } from "./utils";
 import { indexBsdasri } from "../../elastic";
 import { UserInputError } from "apollo-server-express";
 import { BsdasriType } from "@prisma/client";
-import { getCachedUserSirets } from "../../../common/redis/users";
+import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 
 /**
  * Bsdasri creation mutation :
@@ -27,7 +27,7 @@ const createSynthesisBsdasri = async (
   context: GraphQLContext
 ) => {
   const user = checkIsAuthenticated(context);
-  const userSirets = await getCachedUserSirets(user.id);
+  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   if (
     input?.emitter ||
@@ -39,7 +39,7 @@ const createSynthesisBsdasri = async (
     );
   }
 
-  if (!userSirets.includes(input.transporter.company.siret)) {
+  if (!userCompaniesSiretOrVat.includes(input.transporter.company.siret)) {
     throw new UserInputError(
       `Le siret du transporteur doit être un des vôtres`
     );
@@ -102,6 +102,10 @@ const createSynthesisBsdasri = async (
       type: BsdasriType.SYNTHESIS,
 
       synthesizing: { connect: synthesizedBsdasrisId }
+    },
+    include: {
+      grouping: { select: { id: true } },
+      synthesizing: { select: { id: true } }
     }
   });
   const expandeBsdasri = expandBsdasriFromDB(newDasri);
