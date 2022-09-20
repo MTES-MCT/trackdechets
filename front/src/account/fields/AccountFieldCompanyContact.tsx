@@ -18,7 +18,6 @@ AccountFieldCompanyContact.fragments = {
   company: gql`
     fragment AccountFieldCompanyContactFragment on CompanyPrivate {
       id
-      siret
       contact
       userRole
     }
@@ -29,8 +28,8 @@ const UPDATE_CONTACT = gql`
   mutation UpdateCompany($id: String!, $contact: String!) {
     updateCompany(id: $id, contact: $contact) {
       id
-      siret
       contact
+      userRole
     }
   }
 `;
