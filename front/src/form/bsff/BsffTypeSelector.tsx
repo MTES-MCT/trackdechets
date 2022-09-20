@@ -1,28 +1,12 @@
 import * as React from "react";
-import { useQuery } from "@apollo/client";
-import { FieldArray, useField } from "formik";
+import { useField } from "formik";
 import {
   Bsff,
   BsffFicheIntervention,
-  BsffOperationCode,
   BsffPackagingInput,
   BsffWeightInput,
-  BsffStatus,
   BsffType,
-  CompanyInput,
-  Query,
-  QueryBsffsArgs,
 } from "generated/graphql/types";
-import {
-  Loader,
-  Table,
-  TableHead,
-  TableHeaderCell,
-  TableBody,
-  TableRow,
-  TableCell,
-} from "common/components";
-import { GET_BSFF_FORMS } from "./utils/queries";
 
 const options = [
   {

@@ -11,17 +11,29 @@ export default function WasteInfo({ disabled }) {
     Bsff & { previousBsffs: Bsff[] }
   >();
 
+  const [hasPreviousBsffsChanged, setHasPreviousBsffsChanged] = React.useState(
+    false
+  );
+
   useEffect(() => {
     if ([BsffType.Reexpedition, BsffType.Groupement].includes(values.type)) {
-      setFieldValue(
-        "packagings",
-        values.previousBsffs.reduce<BsffPackagingInput[]>(
-          (acc, previousBsff) => acc.concat(previousBsff.packagings),
-          []
-        )
-      );
+      if (!values.id || hasPreviousBsffsChanged) {
+        setFieldValue(
+          "packagings",
+          values.previousBsffs.reduce<BsffPackagingInput[]>(
+            (acc, previousBsff) => acc.concat(previousBsff.packagings),
+            []
+          )
+        );
+      }
     }
-  }, [values.previousBsffs, values.type, setFieldValue]);
+  }, [
+    values.previousBsffs,
+    values.type,
+    values.id,
+    hasPreviousBsffsChanged,
+    setFieldValue,
+  ]);
 
   useEffect(() => {
     const totalWeight = values.packagings.reduce((acc, p) => {
@@ -46,7 +58,10 @@ export default function WasteInfo({ disabled }) {
       ].includes(values.type) && (
         <>
           <h4 className="form__section-heading">BSFF initiaux</h4>
-          <PreviousBsffsPicker bsffType={values.type} />
+          <PreviousBsffsPicker
+            bsff={values}
+            onAddOrRemove={() => setHasPreviousBsffsChanged(true)}
+          />
         </>
       )}
 

@@ -8,7 +8,7 @@ import {
   Query,
   QueryBsffsArgs,
 } from "generated/graphql/types";
-import { GET_BSFF_FORMS, GET_PREVIOUS_BSFFS } from "../utils/queries";
+import { GET_PREVIOUS_BSFFS } from "../utils/queries";
 import {
   Loader,
   Table,
@@ -22,16 +22,16 @@ import { OPERATION } from "../utils/constants";
 import { useTable, Column, useFilters } from "react-table";
 
 interface PreviousBsffsPickerProps {
-  bsffType: BsffType;
-  max?: number;
+  bsff: Bsff;
+  onAddOrRemove: () => void;
 }
 
 export function PreviousBsffsPicker({
-  bsffType,
-  max = Infinity,
+  bsff,
+  onAddOrRemove,
 }: PreviousBsffsPickerProps) {
   const code_in = Object.values(OPERATION)
-    .filter(operation => operation.successors.includes(bsffType))
+    .filter(operation => operation.successors.includes(bsff.type))
     .map(operation => operation.code);
 
   const columns: Column<Bsff>[] = React.useMemo(
@@ -78,11 +78,11 @@ export function PreviousBsffsPicker({
   );
 
   const instruction =
-    bsffType === BsffType.Groupement
+    bsff.type === BsffType.Groupement
       ? "Retrouvez ci-dessous la liste des BSFFs qui sont en attente d'un groupement."
-      : bsffType === BsffType.Reconditionnement
+      : bsff.type === BsffType.Reconditionnement
       ? "Retrouvez ci-dessous la liste des BSFFs qui sont en attente d'un reconditionnement."
-      : bsffType === BsffType.Reexpedition
+      : bsff.type === BsffType.Reexpedition
       ? "Retrouvez ci-dessous la liste des BSFFs qui sont en attente d'une réexpédition."
       : "";
 
@@ -114,19 +114,28 @@ export function PreviousBsffsPicker({
   // remove bsffs that have already been grouped, forwarded or repackaged
   const pickableBsffs = data.bsffs.edges
     .map(({ node: bsff }) => bsff)
-    .filter(bsff => {
-      return !bsff.groupedIn && !bsff.repackagedIn && !bsff.forwardedIn;
+    .filter(initialBsff => {
+      if (initialBsff.groupedIn && initialBsff.groupedIn.id !== bsff.id) {
+        return false;
+      }
+      if (initialBsff.repackagedIn && initialBsff.repackagedIn.id !== bsff.id) {
+        return false;
+      }
+      if (initialBsff.forwardedIn && initialBsff.forwardedIn.id !== bsff.id) {
+        return false;
+      }
+      return true;
     });
 
   if (!pickableBsffs?.length) {
     return (
       <div>
         {`Aucune BSFF éligible pour ${
-          bsffType === BsffType.Groupement
+          bsff.type === BsffType.Groupement
             ? "un regroupement"
-            : bsffType === BsffType.Reconditionnement
+            : bsff.type === BsffType.Reconditionnement
             ? "un reconditionnement"
-            : bsffType === BsffType.Reexpedition
+            : bsff.type === BsffType.Reexpedition
             ? "une réexpédition"
             : ""
         }
@@ -145,9 +154,15 @@ export function PreviousBsffsPicker({
             columns={columns}
             data={pickableBsffs}
             selected={previousBsffs}
-            push={push}
-            remove={remove}
-            max={max}
+            push={bsff => {
+              push(bsff);
+              onAddOrRemove();
+            }}
+            remove={idx => {
+              remove(idx);
+              onAddOrRemove();
+            }}
+            bsffType={bsff.type}
           />
         )}
       />
@@ -175,7 +190,7 @@ type BsffTableProps = {
   selected: Bsff[];
   push: (bsff: Bsff) => void;
   remove: (idx: number) => void;
-  max: number;
+  bsffType: BsffType;
 };
 
 function BsffTable({
@@ -184,7 +199,7 @@ function BsffTable({
   selected,
   push,
   remove,
-  max,
+  bsffType,
 }: BsffTableProps) {
   const filterTypes = React.useMemo(
     () => ({
@@ -255,9 +270,12 @@ function BsffTable({
                 if (isSelected) {
                   remove(previousBsffIndex);
                 } else {
-                  if (selected.length >= max) {
+                  if (
+                    bsffType === BsffType.Reexpedition &&
+                    selected.length >= 1
+                  ) {
                     window.alert(
-                      `Vous ne pouvez pas sélectionner plus de ${max} BSFFs avec ce type de BSFF.`
+                      `Vous ne pouvez sélectionner qu'un seul BSFF intitial dans le cadre d'une réexpédition`
                     );
                     return;
                   }

@@ -136,18 +136,36 @@ export const FullBsffFragment = gql`
     }
     grouping {
       id
+      packagings {
+        name
+        numero
+        volume
+        weight
+      }
     }
     groupedIn {
       id
     }
     repackaging {
       id
+      packagings {
+        name
+        numero
+        volume
+        weight
+      }
     }
     repackagedIn {
       id
     }
     forwarding {
       id
+      packagings {
+        name
+        numero
+        volume
+        weight
+      }
     }
     forwardedIn {
       id
@@ -185,12 +203,30 @@ export const PreviousBsffFragment = gql`
     }
     repackagedIn {
       id
-    }
-    forwarding {
-      id
+      packagings {
+        name
+        numero
+        volume
+        weight
+      }
     }
     forwardedIn {
       id
+      packagings {
+        name
+        numero
+        volume
+        weight
+      }
+    }
+    groupedIn {
+      id
+      packagings {
+        name
+        numero
+        volume
+        weight
+      }
     }
   }
 `;
