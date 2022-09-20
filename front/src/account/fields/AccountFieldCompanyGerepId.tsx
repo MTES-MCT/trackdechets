@@ -17,7 +17,6 @@ AccountFieldCompanyGerepId.fragments = {
   company: gql`
     fragment AccountFieldCompanyGerepIdFragment on CompanyPrivate {
       id
-      siret
       gerepId
       userRole
     }
@@ -28,8 +27,8 @@ const UPDATE_GEREP_ID = gql`
   mutation UpdateCompany($id: String!, $gerepId: String) {
     updateCompany(id: $id, gerepId: $gerepId) {
       id
-      siret
       gerepId
+      userRole
     }
   }
 `;
