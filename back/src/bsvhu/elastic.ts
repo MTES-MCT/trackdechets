@@ -3,6 +3,7 @@ import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
+import logger from "../logging/logger";
 
 // | state              | emitter | transporter | destination |
 // |--------------------|---------|-------------|-------------|
@@ -135,18 +136,33 @@ function toBsdElastic(bsvhu: Bsvhu): BsdElastic {
  */
 export async function indexAllBsvhus(
   idx: string,
-  { skip = 0 }: { skip?: number } = {}
+  { skip = 0 }: { skip?: number } = {},
+  total = -1,
+  since?: Date
 ) {
+  let count = 0;
+  if (total < 0) {
+    count = await prisma.bsvhu.count({
+      where: {
+        isDeleted: false,
+        ...(since ? { updatedAt: { gte: since } } : {})
+      }
+    });
+  } else {
+    count = total;
+  }
   const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
   const bsvhus = await prisma.bsvhu.findMany({
     skip,
     take,
     where: {
-      isDeleted: false
+      isDeleted: false,
+      ...(since ? { updatedAt: { gte: since } } : {})
     }
   });
 
   if (bsvhus.length === 0) {
+    logger.info(`No BSVHU to index, exit`, since);
     return;
   }
 
@@ -154,9 +170,10 @@ export async function indexAllBsvhus(
     idx,
     bsvhus.map(bsvhu => toBsdElastic(bsvhu))
   );
+  logger.info(`Indexed BSVHU batch ${skip}/${count}`);
 
   if (bsvhus.length < take) {
-    // all forms have been indexed
+    logger.info(`Indexed BSVHU batch ${count}/${count}`);
     return;
   }
 

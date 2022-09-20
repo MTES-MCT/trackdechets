@@ -8,11 +8,14 @@ import {
 } from "./producers/company";
 import { geocodeJob } from "./jobs/geocode";
 import { setDepartementJob } from "./jobs/setDepartement";
+import { indexAllBsdJob } from "./jobs/indexAllBsds";
 
 function startConsumers() {
   console.info(`Queues processors started`);
 
   mailQueue.process(sendMailJob);
+  // this job needs more memory than the others depending on the batch size in env BULK_INDEX_BATCH_SIZE
+  indexQueue.process("indexAll", indexAllBsdJob);
   indexQueue.process("index", indexBsdJob);
   indexQueue.process("delete", deleteBsdJob);
   geocodeCompanyQueue.process(geocodeJob);

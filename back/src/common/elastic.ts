@@ -332,14 +332,23 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
       contact: { type: "text" },
       phone: { type: "text" },
       mail: { type: "text" },
-      vatNumber: { type: "keyword" }
+      vatNumber: { type: "keyword" },
+      createdAt: {
+        type: "date"
+      },
+      formId: { type: "keyword" },
+      id: { type: "keyword" }
     }
   },
-  rawBsd: { type: "nested", enabled: false } // store, do not index
+  rawBsd: {
+    // enabled false only compatible with object type on ES 6.8
+    type: "object",
+    // store, do not index
+    enabled: false
+  }
 };
 
 export type BsdIndex = {
-  index: string;
   alias: string;
   type: string;
   settings: typeof settings;
@@ -350,13 +359,6 @@ export type BsdIndex = {
 
 export const index: BsdIndex = {
   alias: "bsds",
-
-  // Changing the value of index is a way to "bump" the model
-  // Doing so will cause all BSDs to be reindexed in Elastic Search
-  // when running the appropriate script
-
-  index: "bsds_0.2.5",
-
   // The next major version of Elastic Search doesn't use "type" anymore
   // so while it's required for the current version, we are not using it too much
   type: "_doc",
@@ -454,7 +456,7 @@ function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
 export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
   logger.info(`Indexing BSD ${bsd.id}`);
   return client.index({
-    index: index.index,
+    index: index.alias,
     type: index.type,
     id: bsd.id,
     body: bsd,
@@ -619,24 +621,41 @@ export async function toPrismaBsds(
 }
 
 export async function indexAllBsds(index: string, bsdType?: BsdType) {
+  let since: Date;
   if (!bsdType || bsdType === "BSDD") {
     logger.info("Indexing Bsdds");
+    since = new Date();
     await indexAllForms(index);
+    logger.info(`Catch-up updated Bsdds since ${since.toISOString()}`);
+    await indexAllForms(index, {}, -1, since);
   }
   if (!bsdType || bsdType === "BSDASRI") {
     logger.info("Indexing Bsdasris");
+    since = new Date();
     await indexAllBsdasris(index);
+    logger.info(`Catch-up updated Bsdasris since ${since.toISOString()}`);
+    await indexAllBsdasris(index, {}, -1, since);
   }
   if (!bsdType || bsdType === "BSVHU") {
     logger.info("Indexing Bsvhus");
+    since = new Date();
     await indexAllBsvhus(index);
+    logger.info(`Catch-up updated Bsvhus since ${since.toISOString()}`);
+    await indexAllBsvhus(index, {}, -1, since);
   }
   if (!bsdType || bsdType === "BSDA") {
     logger.info("Indexing Bsdas");
+    since = new Date();
     await indexAllBsdas(index);
+    logger.info(`Catch-up updated Bsdas since ${since.toISOString()}`);
+    await indexAllBsdas(index, {}, -1, since);
   }
   if (!bsdType || bsdType === "BSFF") {
     logger.info("Indexing Bsffs");
+    since = new Date();
     await indexAllBsffs(index);
+    logger.info(`Catch-up updated Bsffs since ${since.toISOString()}`);
+    await indexAllBsdas(index, {}, -1, since);
   }
+  logger.info("All types of BSD have been indexed");
 }

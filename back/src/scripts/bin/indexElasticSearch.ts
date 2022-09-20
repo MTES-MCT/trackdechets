@@ -1,15 +1,26 @@
+import logger from "../../logging/logger";
+import prisma from "../../prisma";
 import { indexElasticSearch } from "./indexElasticSearch.helpers";
 import { index } from "../../common/elastic";
-import { closeQueues } from "../../queue/producers";
 import { BsdType } from "../../generated/graphql/types";
-import logger from "../../logging/logger";
+import { closeQueues } from "../../queue/producers";
+
 const bsdTypes: BsdType[] = ["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"];
+
+function doubleLog(msg: string, err?: any) {
+  console.log(msg);
+  logger.info(msg, err);
+}
+
+async function exitScript(exitCode: number) {
+  doubleLog("Finished indexElasticSearch script, exiting");
+  await prisma.$disconnect();
+  process.exit(exitCode);
+}
 
 (async function () {
   const args = process.argv.slice(2);
-
   const force = args.includes("-f");
-
   const bsdTypesToIndex = bsdTypes.filter(t =>
     args.map(a => a.toUpperCase()).includes(t)
   );
@@ -19,17 +30,13 @@ const bsdTypes: BsdType[] = ["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"];
       logger.error("You can only specify one bsd type to index");
       return;
     }
-    if (!!bsdTypesToIndex.length && !force) {
-      logger.error(
-        "When you specify a bsd type, you must pass the -f argument to reindex in place"
-      );
-      return;
-    }
-    const bsdTypeToIndex = bsdTypesToIndex[0];
 
+    const bsdTypeToIndex = bsdTypesToIndex[0];
     await indexElasticSearch({ force, index, bsdTypeToIndex });
+    await exitScript(1);
   } catch (error) {
-    logger.error("ES indexation failed, error:", error);
+    doubleLog("ES indexation failed, error:", error);
+    await exitScript(0);
   } finally {
     await closeQueues();
   }

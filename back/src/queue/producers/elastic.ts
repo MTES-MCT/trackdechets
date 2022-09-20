@@ -1,6 +1,7 @@
 // eslint-disable-next-line import/no-named-as-default
 import Queue, { JobOptions } from "bull";
 import logger from "../../logging/logger";
+import { indexAllBsdJob } from "../jobs/indexAllBsds";
 
 export type BsdUpdateQueueItem = { sirets: string[]; id: string };
 const { REDIS_URL, NODE_ENV } = process.env;
@@ -60,4 +61,17 @@ export async function enqueueBsdToDelete(
 
 export function closeIndexAndUpdatesQueue() {
   return Promise.all([indexQueue.close(), updatesQueue.close()]);
+}
+
+export async function enqueueAllBsdToIndex(
+  options?: JobOptions
+): Promise<void> {
+  try {
+    await indexQueue.add("indexAll", options);
+  } catch (e) {
+    logger.error(
+      `Indexation indexAll job failed, retrying without job queue: ${e}`
+    );
+    await indexAllBsdJob();
+  }
 }
