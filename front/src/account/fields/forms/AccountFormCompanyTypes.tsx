@@ -26,7 +26,6 @@ export const UPDATE_COMPANY_TYPES = gql`
   mutation UpdateCompany($id: String!, $companyTypes: [CompanyType]) {
     updateCompany(id: $id, companyTypes: $companyTypes) {
       id
-      siret
       companyTypes
     }
   }
