@@ -9,7 +9,7 @@ import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import {
   PROCESSING_OPERATIONS_CODES,
-  BSDD_WASTES_CODES
+  BSDD_WASTE_CODES
 } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -235,7 +235,7 @@ const bsddRevisionRequestSchema = yup
     recipientCap: yup.string().nullable(),
     wasteDetailsCode: yup
       .string()
-      .oneOf([...BSDD_WASTES_CODES, "", null], INVALID_WASTE_CODE),
+      .oneOf([...BSDD_WASTE_CODES, "", null], INVALID_WASTE_CODE),
     wasteDetailsName: yup.string().nullable(),
     wasteDetailsPop: yup.boolean().nullable(),
     wasteDetailsPackagingInfos: yup

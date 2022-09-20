@@ -9,7 +9,6 @@ import { FieldSwitch, RedErrorMessage } from "common/components";
 import Packagings, {
   PACKAGINGS_NAMES,
 } from "form/bsda/components/packagings/Packagings";
-import { BSDA_WASTE_CODES } from "form/bsda/stepper/steps/WasteInfo";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
@@ -24,6 +23,7 @@ import { removeEmptyKeys } from "../../../../../common/helper";
 import { ReviewableField } from "../../bsdd/request/ReviewableField";
 import { CREATE_BSDA_REVISION_REQUEST } from "../query";
 import styles from "./BsdaRequestRevision.module.scss";
+import { BSDA_WASTES } from "generated/constants";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 type Props = {
@@ -123,7 +123,7 @@ export function BsdaRequestRevision({ bsda }: Props) {
                   className="td-select"
                 >
                   <option />
-                  {BSDA_WASTE_CODES.map(item => (
+                  {BSDA_WASTES.map(item => (
                     <option value={item.code} key={item.code}>
                       {item.code} - {item.description}
                     </option>

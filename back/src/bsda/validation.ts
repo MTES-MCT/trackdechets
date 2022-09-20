@@ -9,7 +9,7 @@ import {
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import * as yup from "yup";
-import { BSDD_WASTES_CODES } from "../common/constants";
+import { BSDA_WASTE_CODES, BSDD_WASTE_CODES } from "../common/constants";
 import {
   isVat,
   isSiret,
@@ -851,7 +851,7 @@ const wasteDescriptionSchema: FactorySchemaOf<
     wasteCode: yup
       .string()
       .requiredIf(context.emissionSignature, "Le code déchet est obligatoire")
-      .oneOf([...BSDD_WASTES_CODES, "", null], INVALID_WASTE_CODE),
+      .oneOf([...BSDA_WASTE_CODES, "", null], INVALID_WASTE_CODE),
     wasteFamilyCode: yup.string().nullable(),
     wasteMaterialName: yup
       .string()
