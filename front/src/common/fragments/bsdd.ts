@@ -465,6 +465,11 @@ export const dashboardFormFragment = gql`
         cap
         processingOperation
       }
+      transporter {
+        company {
+          siret
+        }
+      }
       wasteDetails {
         packagingInfos {
           type
