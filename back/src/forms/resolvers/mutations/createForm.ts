@@ -1,4 +1,4 @@
-import { Form, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { isDangerous } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -17,10 +17,9 @@ import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
 import { FormCompanies } from "../../types";
 import { draftFormSchema, validateIntermediariesInput } from "../../validation";
-import { getFormOrFormNotFound } from "../../database";
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
-import { Decimal } from "decimal.js-light";
+import { preCheckAppendix2 } from "../../repository/form/setAppendix2";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -132,40 +131,19 @@ const createFormResolver = async (
     };
   }
 
-  let appendix2: { quantity: number; form: Form }[] = null;
-
-  if (grouping) {
-    appendix2 = await Promise.all(
-      grouping.map(async ({ form, quantity }) => {
-        const foundForm = await getFormOrFormNotFound(form);
-        return {
-          form: foundForm,
-          quantity:
-            quantity ??
-            new Decimal(foundForm.quantityReceived)
-              .minus(foundForm.quantityGrouped)
-              .toNumber()
-        };
-      })
-    );
-  } else if (appendix2Forms) {
-    appendix2 = await Promise.all(
-      appendix2Forms.map(async ({ id }) => {
-        const initialForm = await getFormOrFormNotFound({ id });
-        return {
-          form: initialForm,
-          quantity: initialForm.quantityReceived
-        };
-      })
-    );
-  }
+  const { appendix2 } = await preCheckAppendix2(form, grouping, appendix2Forms);
 
   const newForm = await prisma.$transaction(async transaction => {
-    const { create, setAppendix2 } = getFormRepository(user, transaction);
+    const { create, setAppendix2, updateAppendix2Forms } = getFormRepository(
+      user,
+      transaction
+    );
     const newForm = await create(formCreateInput);
     await setAppendix2({
       form: newForm,
-      appendix2
+      appendix2,
+      currentAppendix2Forms: [],
+      updateAppendix2Forms
     });
     return newForm;
   });
