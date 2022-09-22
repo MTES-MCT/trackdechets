@@ -53,6 +53,7 @@ interface CompanySelectorProps {
   disabled?: boolean;
   optionalMail?: boolean;
   skipFavorite?: boolean;
+  isBsdaTransporter?: boolean;
   // whether the company is optional
   optional?: boolean;
 }
@@ -67,6 +68,7 @@ export default function CompanySelector({
   disabled,
   optionalMail = false,
   skipFavorite = false,
+  isBsdaTransporter = false,
   optional = false,
 }: CompanySelectorProps) {
   const { siret } = useParams<{ siret: string }>();
@@ -380,7 +382,11 @@ export default function CompanySelector({
             <SimpleNotificationError
               message={
                 <>
-                  <span>La sélection d'un établissement est obligatoire</span>
+                  <span>
+                    {isBsdaTransporter
+                      ? "La sélection d'un transporteur sera obligatoire avant la signature de l'entreprise de travaux"
+                      : "La sélection d'un établissement est obligatoire"}
+                  </span>
                 </>
               }
             />

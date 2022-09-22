@@ -33,6 +33,7 @@ export function Transporter({ disabled }) {
         name="transporter.company"
         heading="Entreprise de transport"
         allowForeignCompanies={true}
+        isBsdaTransporter={true}
         registeredOnlyCompanies={true}
         onCompanySelected={transporter => {
           if (transporter.transporterReceipt) {
