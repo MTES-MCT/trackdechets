@@ -9,7 +9,7 @@ import {
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import * as yup from "yup";
-import { BSDA_WASTE_CODES, BSDD_WASTE_CODES } from "../common/constants";
+import { BSDA_WASTE_CODES } from "../common/constants";
 import {
   isVat,
   isSiret,

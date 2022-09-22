@@ -105,7 +105,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -173,7 +173,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -240,7 +240,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -308,7 +308,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -385,7 +385,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -466,7 +466,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        // code: "16 01 06",
+        // code: "06 07 01*",
         adr: "ADR",
         consistence: "SOLIDE",
         familyCode: "Code famille",
@@ -517,7 +517,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -565,7 +565,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -625,7 +625,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -677,7 +677,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -731,7 +731,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",

@@ -122,7 +122,7 @@ describe("ActivityEvent.Bsda", () => {
             }
           },
           waste: {
-            code: "01 03 04*",
+            code: "06 07 01*",
             consistence: "SOLIDE",
             materialName: "Amiante"
           }
@@ -152,7 +152,7 @@ describe("ActivityEvent.Bsda", () => {
           id: bsdaId,
           input: {
             waste: {
-              code: "01 01 01"
+              code: "06 13 04*"
             }
           }
         }
@@ -299,7 +299,7 @@ describe("ActivityEvent.Bsda", () => {
             }
           },
           waste: {
-            code: "01 03 04*",
+            code: "06 07 01*",
             consistence: "SOLIDE",
             materialName: "Amiante"
           }
@@ -317,7 +317,7 @@ describe("ActivityEvent.Bsda", () => {
         id: bsdaId,
         input: {
           waste: {
-            code: "01 01 01"
+            code: "06 13 04*"
           }
         }
       }

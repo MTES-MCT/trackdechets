@@ -33,7 +33,7 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   emitterCompanyMail: "recipient@td.io",
   emitterIsPrivateIndividual: false,
 
-  wasteCode: "16 01 06",
+  wasteCode: "06 07 01*",
   wasteFamilyCode: "6",
   wasteMaterialName:
     "Amiante lié : Amiante ciment, lié à des matériaux inertes",

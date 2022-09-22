@@ -144,7 +144,7 @@ describe("Query.bsds.bsda base workflow", () => {
               }
             },
             waste: {
-              code: "16 01 06",
+              code: "06 07 01*",
               adr: "ADR",
               consistence: "SOLIDE",
               familyCode: "Code famille",
