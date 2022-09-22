@@ -1,65 +1,53 @@
 import { URL } from "url";
 import { unescape } from "querystring";
 import { PrismaClient } from "@prisma/client";
-import * as api from "@opentelemetry/api";
-import { AsyncLocalStorageContextManager } from "@opentelemetry/context-async-hooks";
 import { tracer } from "./tracer";
-import {
-  BasicTracerProvider,
-  BatchSpanProcessor
-} from "@opentelemetry/sdk-trace-base";
-import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
-import { PrismaInstrumentation } from "@prisma/instrumentation";
 
 const prisma = new PrismaClient({
   datasources: {
     db: { url: getDbUrl() }
   },
-  log: process.env.NODE_ENV !== "test" ? ["info", "warn", "error"] : []
+  log:
+    process.env.NODE_ENV !== "test"
+      ? [
+          {
+            emit: "event",
+            level: "query"
+          },
+          {
+            emit: "stdout",
+            level: "error"
+          },
+          {
+            emit: "stdout",
+            level: "info"
+          },
+          {
+            emit: "stdout",
+            level: "warn"
+          }
+        ]
+      : []
 });
 
-// Expose the active Datadog span context to OpenTelemetry
-// From https://github.com/DataDog/dd-trace-js/issues/1244
-class DatadogContextManager extends AsyncLocalStorageContextManager {
-  active(): api.Context {
-    const context = super.active();
-    const datadogActiveSpan = tracer.scope().active();
+prisma.$use(async (params, next) => {
+  const tags = {
+    "span.kind": "client",
+    "span.type": "sql",
+    "prisma.model": params.model,
+    "prisma.action": params.action
+  };
 
-    // Only use the Datadog context if an OpenTelemetry span is not active and there is an active Datadog span.
-    const shouldUseDatadogContext =
-      !api.trace.getSpanContext(context) && datadogActiveSpan;
-
-    if (!shouldUseDatadogContext) {
-      return context;
-    }
-
-    // Extract and convert Datadog trace/span IDs to OpenTelemetry format.
-    // See: https://docs.datadoghq.com/tracing/other_telemetry/connect_logs_and_traces/opentelemetry/
-    const datadogSpanContext = datadogActiveSpan.context();
-    const traceId = BigInt(datadogSpanContext.toTraceId())
-      .toString(16)
-      .padStart(32, "0");
-    const spanId = BigInt(datadogSpanContext.toSpanId())
-      .toString(16)
-      .padStart(16, "0");
-
-    return api.trace.setSpanContext(context, {
-      traceId,
-      spanId,
-
-      // Datadog APM uses tail sampling, so we set this flag to always record data.
-      traceFlags: api.TraceFlags.SAMPLED
-    });
-  }
-}
-
-const provider = new BasicTracerProvider();
-provider.addSpanProcessor(new BatchSpanProcessor(new OTLPTraceExporter()));
-provider.register({
-  contextManager: new DatadogContextManager()
+  return tracer.trace("prisma.query", { tags }, () => next(params));
 });
 
-new PrismaInstrumentation().enable();
+prisma.$on("query", e => {
+  const span = tracer.scope().active();
+
+  span?.setTag("prisma.query", e.query);
+  span?.setTag("prisma.params", e.params);
+  span?.setTag("prisma.duration", e.duration);
+});
 
 function getDbUrl() {
   try {
