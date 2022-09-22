@@ -1,4 +1,4 @@
-import { EmitterType, Form, Status } from "@prisma/client";
+import { EmitterType, Form, Prisma, Status } from "@prisma/client";
 import { UserInputError } from "apollo-server-core";
 import { RepositoryFnDeps } from "../types";
 import buildFindAppendix2FormsById from "./findAppendix2FormsById";
@@ -63,19 +63,22 @@ export async function buildAppendix2FormsInput(
 }
 
 export async function preCheckAppendix2(
-  form,
-  grouping,
-  appendix2Forms
+  form: Partial<Omit<Prisma.FormCreateInput, "temporaryStorageDetail">>,
+  grouping: InitialFormFractionInput[],
+  appendix2Forms: AppendixFormInput[]
 ): Promise<{
   appendix2: FormFraction[] | null;
   currentAppendix2Forms: Form[];
 }> {
   const appendix2 = await buildAppendix2FormsInput(grouping, appendix2Forms);
-  const findAppendix2FormsById = buildFindAppendix2FormsById({
-    prisma
-  });
+  let currentAppendix2Forms = [];
 
-  const currentAppendix2Forms = await findAppendix2FormsById(form.id);
+  if (form.id) {
+    const findAppendix2FormsById = buildFindAppendix2FormsById({
+      prisma
+    });
+    currentAppendix2Forms = await findAppendix2FormsById(form.id);
+  }
 
   // check groupement form type is APPENDIX2 if appendix2 is not empty
   if (

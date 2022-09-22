@@ -131,7 +131,12 @@ const createFormResolver = async (
     };
   }
 
-  const { appendix2 } = await preCheckAppendix2(form, grouping, appendix2Forms);
+  // currentAppendix2Forms will be empty
+  const { appendix2, currentAppendix2Forms } = await preCheckAppendix2(
+    form,
+    grouping,
+    appendix2Forms
+  );
 
   const newForm = await prisma.$transaction(async transaction => {
     const { create, setAppendix2, updateAppendix2Forms } = getFormRepository(
@@ -142,7 +147,7 @@ const createFormResolver = async (
     await setAppendix2({
       form: newForm,
       appendix2,
-      currentAppendix2Forms: [],
+      currentAppendix2Forms,
       updateAppendix2Forms
     });
     return newForm;
