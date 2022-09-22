@@ -24,6 +24,7 @@ export async function updateCompanyFn({
   brokerReceiptId,
   vhuAgrementDemolisseurId,
   vhuAgrementBroyeurId,
+  workerCertificationId,
   ecoOrganismeAgreements,
   allowBsdasriTakeOverWithoutSignature
 }: MutationUpdateCompanyArgs): Promise<CompanyPrivate> {
@@ -54,6 +55,9 @@ export async function updateCompanyFn({
       : {}),
     ...(vhuAgrementBroyeurId
       ? { vhuAgrementBroyeur: { connect: { id: vhuAgrementBroyeurId } } }
+      : {}),
+    ...(workerCertificationId
+      ? { workerCertification: { connect: { id: workerCertificationId } } }
       : {}),
     ...(ecoOrganismeAgreements != null
       ? {

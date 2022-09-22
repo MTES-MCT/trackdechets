@@ -76,6 +76,13 @@ export const COMPANY_INFOS = gql`
         validityLimit
         department
       }
+      workerCertification {
+        hasSubSectionFour
+        hasSubSectionThree
+        certificationNumber
+        validityLimit
+        organisation
+      }
     }
   }
 `;
@@ -119,6 +126,13 @@ export const SEARCH_COMPANIES = gql`
       vhuAgrementBroyeur {
         agrementNumber
         department
+      }
+      workerCertification {
+        hasSubSectionFour
+        hasSubSectionThree
+        certificationNumber
+        validityLimit
+        organisation
       }
     }
   }

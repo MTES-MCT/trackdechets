@@ -89,6 +89,11 @@ type CompanyPrivate {
   vhuAgrementBroyeur: VhuAgrement
 
   """
+  Informations de certifications pour les entreprise de travaux
+  """
+  workerCertification: WorkerCertification
+
+  """
   Liste des agréments de l'éco-organisme
   """
   ecoOrganismeAgreements: [URL!]!
@@ -275,6 +280,11 @@ type CompanySearchResult {
   Statut de diffusion des informations de l'établisement selon l'INSEE
   """
   statutDiffusionEtablissement: StatutDiffusionEtablissement
+  
+  """
+  Certification entreprise de travaux
+  """
+  workerCertification: WorkerCertification
 }
 
 """
@@ -380,6 +390,38 @@ type VhuAgrement {
   Département ayant enregistré la déclaration
   """
   department: String!
+}
+
+"""
+Certifications pour les entreprise de travaux
+"""
+type WorkerCertification {
+  id: ID!
+
+  """
+  Indique si l'entreprise réalise des travaux relevant de la sous-section 4
+  """
+  hasSubSectionFour: Boolean!
+
+  """
+  Indique si l'entreprise réalise des travaux relevant de la sous-section 3
+  """
+  hasSubSectionThree: Boolean!
+
+  """
+  Numéro de certification (sous-section 3 uniquement)
+  """
+  certificationNumber: String
+
+  """
+  Limite de validité de la certification (sous-section 3 uniquement)
+  """
+  validityLimit: DateTime
+
+  """
+  Organisation qui a décerné la certification (sous-section 3 uniquement)
+  """
+  organisation: String
 }
 
 "Information sur utilisateur au sein d'un établissement"

@@ -47,6 +47,11 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
       .findUnique({ where: { id: parent.id } })
       .vhuAgrementDemolisseur();
   },
+  workerCertification: parent => {
+    return prisma.company
+      .findUnique({ where: { id: parent.id } })
+      .workerCertification();
+  },
   installation: (parent, _, context) => {
     return context.dataloaders.installations.load(parent.siret);
   }

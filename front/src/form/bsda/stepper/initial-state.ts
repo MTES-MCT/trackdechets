@@ -30,6 +30,13 @@ const initialState = {
   worker: {
     isDisabled: false,
     company: getInitialCompany(),
+    certification: {
+      hasSubSectionFour: false,
+      hasSubSectionThree: false,
+      certificationNumber: "",
+      validityLimit: null,
+      organisation: "",
+    },
     work: {
       hasEmitterPaperSignature: false,
     },

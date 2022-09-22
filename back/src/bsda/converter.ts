@@ -35,7 +35,8 @@ import {
   BsdaRevisionRequestWaste,
   BsdaRevisionRequestDestination,
   BsdaRevisionRequestOperation,
-  BsdaRevisionRequestReception
+  BsdaRevisionRequestReception,
+  BsdaWorkerCertification
 } from "../generated/graphql/types";
 import {
   Prisma,
@@ -147,6 +148,13 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         contact: form.workerCompanyContact,
         phone: form.workerCompanyPhone,
         mail: form.workerCompanyMail
+      }),
+      certification: nullIfNoValues<BsdaWorkerCertification>({
+        hasSubSectionFour: form.workerCertificationHasSubSectionFour,
+        hasSubSectionThree: form.workerCertificationHasSubSectionThree,
+        certificationNumber: form.workerCertificationCertificationNumber,
+        validityLimit: form.workerCertificationValidityLimit,
+        organisation: form.workerCertificationOrganisation
       }),
       work: nullIfNoValues<BsdaWork>({
         hasEmitterPaperSignature: form.workerWorkHasEmitterPaperSignature,
@@ -437,6 +445,21 @@ function flattenBsdaWorkerInput({ worker }: Pick<BsdaInput, "worker">) {
     workerCompanyMail: chain(worker, w => chain(w.company, c => c.mail)),
     workerWorkHasEmitterPaperSignature: chain(worker, w =>
       chain(w.work, wo => wo.hasEmitterPaperSignature)
+    ),
+    workerCertificationHasSubSectionFour: chain(worker, w =>
+      chain(w.certification, c => c.hasSubSectionFour)
+    ),
+    workerCertificationHasSubSectionThree: chain(worker, w =>
+      chain(w.certification, c => c.hasSubSectionThree)
+    ),
+    workerCertificationCertificationNumber: chain(worker, w =>
+      chain(w.certification, c => c.certificationNumber)
+    ),
+    workerCertificationValidityLimit: chain(worker, w =>
+      chain(w.certification, c => c.validityLimit)
+    ),
+    workerCertificationOrganisation: chain(worker, w =>
+      chain(w.certification, c => c.organisation)
     )
   };
 }

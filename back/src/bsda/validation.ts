@@ -65,6 +65,11 @@ type Worker = Pick<
   | "workerCompanyPhone"
   | "workerCompanyMail"
   | "workerWorkHasEmitterPaperSignature"
+  | "workerCertificationHasSubSectionFour"
+  | "workerCertificationHasSubSectionThree"
+  | "workerCertificationCertificationNumber"
+  | "workerCertificationValidityLimit"
+  | "workerCertificationOrganisation"
 >;
 
 type Destination = Pick<
@@ -413,7 +418,29 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
             `Entreprise de travaux: ${MISSING_COMPANY_EMAIL}`
           )
       }),
-    workerWorkHasEmitterPaperSignature: yup.boolean().nullable()
+    workerWorkHasEmitterPaperSignature: yup.boolean().nullable(),
+    workerCertificationHasSubSectionFour: yup.boolean().nullable(),
+    workerCertificationHasSubSectionThree: yup.boolean().nullable(),
+    workerCertificationCertificationNumber: yup
+      .string()
+      .when("hasSubSectionThree", {
+        is: true,
+        then: schema => schema.required(),
+        otherwise: schema => schema.nullable()
+      }),
+    workerCertificationValidityLimit: yup.date().when("hasSubSectionThree", {
+      is: true,
+      then: schema => schema.required(),
+      otherwise: schema => schema.nullable()
+    }),
+    workerCertificationOrganisation: yup
+      .string()
+      .oneOf(["AFNOR Certification", "GLOBAL CERTIFICATION", "QUALIBAT"])
+      .when("hasSubSectionThree", {
+        is: true,
+        then: schema => schema.required(),
+        otherwise: schema => schema.nullable()
+      })
   });
 
 const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
