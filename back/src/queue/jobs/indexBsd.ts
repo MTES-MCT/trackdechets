@@ -1,10 +1,11 @@
 import { Job } from "bull";
 import { toBsdElastic as toBsdaElastic } from "../../bsda/elastic";
 import { toBsdElastic as toBsdasriElastic } from "../../bsdasris/elastic";
-import { BsdElastic, indexBsd } from "../../common/elastic";
+import { indexBsd } from "../../common/elastic";
+import { indexForm } from "../../forms/elastic";
 import prisma from "../../prisma";
 
-export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
+export async function indexBsdJob(job: Job<string>): Promise<void> {
   const bsdId = job.data;
 
   if (bsdId.startsWith("BSDA-")) {
@@ -20,7 +21,19 @@ export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
     const elasticBsda = toBsdaElastic(bsda);
     await indexBsd(elasticBsda);
 
-    return elasticBsda;
+    return;
+  }
+  if (bsdId.startsWith("BSD-")) {
+    const fullForm = await prisma.form.findUnique({
+      where: { readableId: bsdId },
+      include: {
+        forwardedIn: true,
+        transportSegments: true,
+        intermediaries: true
+      }
+    });
+    await indexForm(fullForm);
+    return;
   }
 
   if (bsdId.startsWith("DASRI-")) {

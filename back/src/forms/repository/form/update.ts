@@ -1,9 +1,7 @@
 import { Form, Prisma } from "@prisma/client";
-import { GraphQLContext } from "../../../types";
-import { indexForm } from "../../elastic";
+import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
 import { formDiff } from "../../workflow/diff";
 import { LogMetadata, RepositoryFnDeps } from "../types";
-import buildFindFullFormById from "./findFullFormById";
 
 export type UpdateFormFn = (
   where: Prisma.FormWhereUniqueInput,
@@ -73,8 +71,9 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
       });
     }
 
-    const fullForm = await buildFindFullFormById(deps)(updatedForm.id);
-    await indexForm(fullForm, { user } as GraphQLContext);
+    prisma.addAfterCommitCallback(() =>
+      enqueueBsdToIndex(updatedForm.readableId)
+    );
 
     return updatedForm;
   };
