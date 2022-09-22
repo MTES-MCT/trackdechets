@@ -138,7 +138,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       variables: {
         input: {
           bsdaId: bsda.id,
-          content: { waste: { code: "01 03 08" } },
+          content: { waste: { code: "16 01 11*" } },
           comment: "A comment",
           authoringCompanySiret: company.siret
         }
@@ -170,7 +170,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       variables: {
         input: {
           bsdaId: bsda.id,
-          content: { waste: { code: "01 03 08" } },
+          content: { waste: { code: "16 01 11*" } },
           comment: "A comment",
           authoringCompanySiret: company.siret
         }
@@ -256,7 +256,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       variables: {
         input: {
           bsdaId: bsda.id,
-          content: { waste: { code: "01 03 08" } },
+          content: { waste: { code: "16 01 11*" } },
           comment: "A comment",
           authoringCompanySiret: company.siret
         }
@@ -264,7 +264,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     });
 
     expect(data.createBsdaRevisionRequest.content).toEqual({
-      waste: { code: "01 03 08" }
+      waste: { code: "16 01 11*" }
     });
   });
 
@@ -287,7 +287,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       variables: {
         input: {
           bsdaId: bsda.id,
-          content: { waste: { code: "01 03 08" } },
+          content: { waste: { code: "16 01 11*" } },
           comment: "A comment",
           authoringCompanySiret: company.siret
         }
@@ -319,7 +319,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       variables: {
         input: {
           bsdaId: bsda.id,
-          content: { waste: { code: "01 03 08" } },
+          content: { waste: { code: "16 01 11*" } },
           comment: "A comment",
           authoringCompanySiret: company.siret
         }
