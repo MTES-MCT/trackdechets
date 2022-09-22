@@ -116,6 +116,7 @@ function getNewStatus(
 
   if (
     status === BsdaStatus.AWAITING_CHILD &&
+    newOperationCode &&
     !PARTIAL_OPERATIONS.includes(newOperationCode)
   ) {
     return BsdaStatus.PROCESSED;
