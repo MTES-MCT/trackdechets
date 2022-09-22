@@ -145,8 +145,6 @@ function AddFicheInterventionModal({
             name="detenteur.company"
           />
 
-          <CompanySelector heading="Opérateur" name="operateur.company" />
-
           {error && <NotificationError apolloError={error} />}
 
           <div className="td-modal-actions">

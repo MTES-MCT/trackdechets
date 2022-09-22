@@ -1,12 +1,39 @@
 import { FieldSwitch, RedErrorMessage } from "common/components";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { Field, useFormikContext } from "formik";
-import { Bsff } from "generated/graphql/types";
+import { Bsff, BsffPackagingInput, BsffType } from "generated/graphql/types";
 import React, { useEffect } from "react";
 import Packagings from "./components/packagings/Packagings";
+import { PreviousBsffsPicker } from "./components/PreviousBsffsPicker";
 
 export default function WasteInfo({ disabled }) {
-  const { setFieldValue, values } = useFormikContext<Bsff>();
+  const { setFieldValue, values } = useFormikContext<
+    Bsff & { previousBsffs: Bsff[] }
+  >();
+
+  const [hasPreviousBsffsChanged, setHasPreviousBsffsChanged] = React.useState(
+    false
+  );
+
+  useEffect(() => {
+    if ([BsffType.Reexpedition, BsffType.Groupement].includes(values.type)) {
+      if (!values.id || hasPreviousBsffsChanged) {
+        setFieldValue(
+          "packagings",
+          values.previousBsffs.reduce<BsffPackagingInput[]>(
+            (acc, previousBsff) => acc.concat(previousBsff.packagings),
+            []
+          )
+        );
+      }
+    }
+  }, [
+    values.previousBsffs,
+    values.type,
+    values.id,
+    hasPreviousBsffsChanged,
+    setFieldValue,
+  ]);
 
   useEffect(() => {
     const totalWeight = values.packagings.reduce((acc, p) => {
@@ -22,6 +49,20 @@ export default function WasteInfo({ disabled }) {
           Les champs ci-dessous ont été scellés via signature et ne sont plus
           modifiables.
         </div>
+      )}
+
+      {[
+        BsffType.Reconditionnement,
+        BsffType.Groupement,
+        BsffType.Reexpedition,
+      ].includes(values.type) && (
+        <>
+          <h4 className="form__section-heading">BSFF initiaux</h4>
+          <PreviousBsffsPicker
+            bsff={values}
+            onAddOrRemove={() => setHasPreviousBsffsChanged(true)}
+          />
+        </>
       )}
 
       <h4 className="form__section-heading">Déchet</h4>
