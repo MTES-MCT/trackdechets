@@ -3,7 +3,7 @@ import { UserInputError } from "apollo-server-core";
 import { RepositoryFnDeps } from "../types";
 import buildFindAppendix2FormsById from "./findAppendix2FormsById";
 import {
-  getFinalDestinationSiret,
+  getFinalDestinationSirets,
   getFormOrFormNotFound
 } from "../../database";
 import { Decimal } from "decimal.js-light";
@@ -96,17 +96,19 @@ export async function preCheckAppendix2(
   }
 
   // check emitter of groupement form matches destination of initial form
-  for (const { form: initialForm } of appendix2) {
-    const appendix2DestinationSiret = await getFinalDestinationSiret(
-      initialForm
-    );
+  const finalDestinationSirets = await getFinalDestinationSirets(
+    appendix2.map(({ form }) => form)
+  );
 
+  appendix2.map(({ form: initialForm }, index) => {
+    const appendix2DestinationSiret = finalDestinationSirets[index];
     if (form.emitterCompanySiret !== appendix2DestinationSiret) {
       throw new UserInputError(
         `Le bordereau ${initialForm.id} n'est pas en possession du nouvel émetteur`
       );
     }
-  }
+  });
+
   // check grouped forms have status AWAITING_GROUP or GROUPED
   const unawaitingGroupForm = await prisma.form.findFirst({
     where: {
@@ -136,43 +138,45 @@ export async function preCheckAppendix2(
   }
 
   // check quantity grouped in each grouped form is not greater than quantity received
-  for (const { form: initialForm, quantity } of appendix2) {
-    if (quantity <= 0) {
-      throw new UserInputError(
-        "La quantité regroupée doit être strictement supérieure à 0"
-      );
-    }
-    const quantityGroupedInOtherForms =
-      (
-        await prisma.formGroupement.aggregate({
-          _sum: { quantity: true },
-          where: {
-            initialFormId: initialForm.id,
-            nextFormId: { not: form.id }
-          }
-        })
-      )._sum.quantity ?? 0;
+  await Promise.all(
+    appendix2.map(async ({ form: initialForm, quantity }) => {
+      if (quantity <= 0) {
+        throw new UserInputError(
+          "La quantité regroupée doit être strictement supérieure à 0"
+        );
+      }
+      const quantityGroupedInOtherForms =
+        (
+          await prisma.formGroupement.aggregate({
+            _sum: { quantity: true },
+            where: {
+              initialFormId: initialForm.id,
+              nextFormId: { not: form.id }
+            }
+          })
+        )._sum.quantity ?? 0;
 
-    const quantityLeftToGroup = new Decimal(initialForm.quantityReceived)
-      .minus(quantityGroupedInOtherForms)
-      .toDecimalPlaces(6); // set precision to gramme
+      const quantityLeftToGroup = new Decimal(initialForm.quantityReceived)
+        .minus(quantityGroupedInOtherForms)
+        .toDecimalPlaces(6); // set precision to gramme
 
-    if (quantityLeftToGroup.equals(0)) {
-      throw new UserInputError(
-        `Le bordereau ${initialForm.readableId} a déjà été regroupé en totalité`
-      );
-    }
+      if (quantityLeftToGroup.equals(0)) {
+        throw new UserInputError(
+          `Le bordereau ${initialForm.readableId} a déjà été regroupé en totalité`
+        );
+      }
 
-    if (new Decimal(quantity).greaterThan(quantityLeftToGroup)) {
-      throw new UserInputError(
-        `La quantité restante à regrouper sur le BSDD ${
-          initialForm.readableId
-        } est de ${quantityLeftToGroup.toFixed(
-          3
-        )} T. Vous tentez de regrouper ${quantity} T.`
-      );
-    }
-  }
+      if (new Decimal(quantity).greaterThan(quantityLeftToGroup)) {
+        throw new UserInputError(
+          `La quantité restante à regrouper sur le BSDD ${
+            initialForm.readableId
+          } est de ${quantityLeftToGroup.toFixed(
+            3
+          )} T. Vous tentez de regrouper ${quantity} T.`
+        );
+      }
+    })
+  );
 
   return {
     appendix2,

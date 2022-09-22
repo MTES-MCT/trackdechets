@@ -112,9 +112,27 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
   };
 }
 
-export async function getFinalDestinationSiret(form: Form) {
-  return form.forwardedInId
-    ? (await prisma.form.findUnique({ where: { id: form.id } }).forwardedIn())
-        ?.recipientCompanySiret
-    : form.recipientCompanySiret;
+export async function getFinalDestinationSirets(forms: Form[]) {
+  const formsWithForwardedIn = forms.filter(form => form.forwardedInId);
+
+  let allForwardedInDestinations = [];
+  if (formsWithForwardedIn.length) {
+    // we'll be looking for dest.forwardedIn.recipientCompanySiret
+    allForwardedInDestinations = await prisma.form.findMany({
+      where: { id: { in: forms.map(form => form.id) } },
+      include: {
+        forwardedIn: true
+      }
+    });
+  }
+
+  return forms.map(form => {
+    if (form.forwardedInId) {
+      return allForwardedInDestinations.find(
+        forwardedInForm => form.id === forwardedInForm.id
+      ).forwardedIn.recipientCompanySiret;
+    } else {
+      return form.recipientCompanySiret;
+    }
+  });
 }
