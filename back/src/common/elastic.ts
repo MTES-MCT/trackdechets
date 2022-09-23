@@ -626,7 +626,7 @@ export async function indexAllBsds(index: string, bsdType?: BsdType) {
   }
   if (!bsdType || bsdType === "BSDA") {
     console.log("Indexing Bsdas");
-    await await indexAllBsdas(index);
+    await indexAllBsdas(index);
   }
   if (!bsdType || bsdType === "BSFF") {
     console.log("Indexing Bsffs");

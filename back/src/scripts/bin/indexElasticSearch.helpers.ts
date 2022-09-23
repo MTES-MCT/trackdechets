@@ -136,10 +136,15 @@ export async function indexElasticSearch({
   } else {
     const { index: oldIndex } = catAliasesResponse.body[0];
     if (oldIndex === newIndex) {
-      if (force) {
+      if (force && !bsdTypeToIndex) {
         console.log(
           `The -f flag was passed, documents are being reindexed in place.`
         );
+        await bumpIndex(index.index, {
+          ...index,
+          index: `${index.index}_force_${Date.now()}`
+        });
+      } else if (force && bsdTypeToIndex) {
         await reindexInPlace(index, bsdTypeToIndex);
       } else {
         console.log(
