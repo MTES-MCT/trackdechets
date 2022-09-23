@@ -350,7 +350,7 @@ export const index: BsdIndex = {
   // Doing so will cause all BSDs to be reindexed in Elastic Search
   // when running the appropriate script
 
-  index: "bsds_0.2.6",
+  index: "bsds_0.2.5",
 
   // The next major version of Elastic Search doesn't use "type" anymore
   // so while it's required for the current version, we are not using it too much
@@ -626,7 +626,7 @@ export async function indexAllBsds(index: string, bsdType?: BsdType) {
   }
   if (!bsdType || bsdType === "BSDA") {
     console.log("Indexing Bsdas");
-    await await indexAllBsdas(index);
+    await indexAllBsdas(index);
   }
   if (!bsdType || bsdType === "BSFF") {
     console.log("Indexing Bsffs");
