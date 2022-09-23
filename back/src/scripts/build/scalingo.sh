@@ -10,5 +10,4 @@ npm prune --production
 if [ -z "${STARTUP_FILE}" ] || [ "$STARTUP_FILE" = "dist/src/index.js" ]; then
     cd dist
     npm run migrate
-    npm run index-elastic-search
 fi
