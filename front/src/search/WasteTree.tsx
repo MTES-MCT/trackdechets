@@ -16,11 +16,15 @@ const loop = (data: WasteNode[]) => {
   });
 };
 
-type Props = { checkable?: boolean; onSelect?: (selectedKeys: any) => void };
+type Props = {
+  wasteTree?: WasteNode[];
+  checkable?: boolean;
+  onSelect?: (selectedKeys: any) => void;
+};
 export default function WasteTree(props: Props) {
   return (
     <Tree className="myCls" showLine {...props}>
-      {loop(BSDD_WASTES_TREE)}
+      {loop(props.wasteTree ?? BSDD_WASTES_TREE)}
     </Tree>
   );
 }
