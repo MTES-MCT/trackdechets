@@ -1,5 +1,5 @@
 import { Form, Prisma } from "@prisma/client";
-import { isDangerous, WASTES_CODES } from "../../../common/constants";
+import { isDangerous, BSDD_WASTE_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   MutationUpdateFormArgs,
@@ -31,7 +31,7 @@ import { Decimal } from "decimal.js-light";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
-  if (wasteDetailsCode && !WASTES_CODES.includes(wasteDetailsCode)) {
+  if (wasteDetailsCode && !BSDD_WASTE_CODES.includes(wasteDetailsCode)) {
     throw new InvalidWasteCode(wasteDetailsCode);
   }
   return args;

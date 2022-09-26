@@ -5,121 +5,8 @@ import Packagings from "form/bsda/components/packagings/Packagings";
 import Tooltip from "common/components/Tooltip";
 import { Bsda, BsdaConsistence, BsdaType } from "generated/graphql/types";
 import { FieldSwitch } from "common/components";
+import { BSDA_WASTES } from "generated/constants";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
-
-export const BSDA_WASTE_CODES = [
-  {
-    code: "06 07 01*",
-    description: "Déchets contenant de l'amiante provenant de l'électrolyse",
-  },
-  {
-    code: "06 13 04*",
-    description: "Déchets provenant de la transformation de l'amiante",
-  },
-  {
-    code: "08 01 17*",
-    description:
-      "déchets provenant du décapage de peintures ou vernis contenant des solvants organiques ou autres substances dangereuses",
-  },
-  {
-    code: "08 04 09*",
-    description:
-      "déchets de colles et mastics contenant des solvants organiques ou d'autres substances dangereuses",
-  },
-  {
-    code: "10 13 09*",
-    description:
-      "déchets provenant de la fabrication d'amiante-ciment contenant de l'amiante",
-  },
-  {
-    code: "12 01 16*",
-    description: "déchets de grenaillage contenant des substances dangereuses",
-  },
-  {
-    code: "15 01 11*",
-    description:
-      "emballages métalliques contenant une matrice poreuse solide dangereuse (par exemple amiante), y compris des conteneurs à pression vides",
-  },
-  {
-    code: "15 02 02*",
-    description:
-      "absorbants, matériaux filtrants (y compris les filtres à huile non spécifiés ailleurs), chiffons d'essuyage et vêtements de protection contaminés par des substances dangereuses",
-  },
-  { code: "16 01 11*", description: "patins de freins contenant de l'amiante" },
-  {
-    code: "16 02 12*",
-    description: "équipements mis au rebut contenant de l'amiante libre",
-  },
-  {
-    code: "16 02 13*",
-    description:
-      "équipements mis au rebut contenant des composants dangereux (3) autres que ceux visés aux rubriques 16 02 09 à 16 02 12",
-  },
-  {
-    code: "16 03 03*",
-    description:
-      "déchets d'origine minérale contenant des substances dangereuses",
-  },
-  {
-    code: "17 01 06*",
-    description:
-      "mélanges ou fractions séparées de béton, briques, tuiles et céramiques contenant des substances dangereuses",
-  },
-  {
-    code: "17 02 04*",
-    description:
-      "bois, verre et matières plastiques contenant des substances dangereuses ou contaminés par de telles substances",
-  },
-  {
-    code: "17 03 01*",
-    description: "mélanges bitumineux contenant du goudron",
-  },
-  {
-    code: "17 04 09*",
-    description:
-      "Déchets métalliques contaminés par des substances dangereuses",
-  },
-  {
-    code: "17 04 10*",
-    description:
-      "Câbles contenant des hydrocarbures, du goudron ou d'autres substances dangereuses",
-  },
-  {
-    code: "17 05 03*",
-    description: "Terres et cailloux contenant des substances dangereuses",
-  },
-  {
-    code: "17 05 05*",
-    description: "boues de dragage contenant des substances dangereuses",
-  },
-  {
-    code: "17 05 07*",
-    description: "ballast de voie contenant des substances dangereuses",
-  },
-  {
-    code: "17 06 01*",
-    description: "matériaux d'isolation contenant de l'amiante",
-  },
-  {
-    code: "17 06 03*",
-    description:
-      "autres matériaux d'isolation à base de ou contenant des substances dangereuses",
-  },
-  {
-    code: "17 06 05*",
-    description: "matériaux de construction contenant de l'amiante",
-  },
-  {
-    code: "17 08 01*",
-    description:
-      "matériaux de construction à base de gypse contaminés par des substances dangereuses",
-  },
-  {
-    code: "17 09 03*",
-    description:
-      "autres déchets de construction et de démolition (y compris en mélange) contenant des substances dangereuses",
-  },
-];
 
 export function WasteInfo({ disabled }) {
   const { values } = useFormikContext<Bsda>();
@@ -148,7 +35,7 @@ export function WasteInfo({ disabled }) {
         <label>Code déchet</label>
         <Field as="select" name="waste.code" className="td-select">
           <option />
-          {BSDA_WASTE_CODES.map(item => (
+          {BSDA_WASTES.map(item => (
             <option value={item.code} key={item.code}>
               {item.code} - {item.description}
             </option>

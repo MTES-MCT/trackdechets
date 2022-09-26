@@ -9,7 +9,8 @@ import {
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
 import { UserWithCompany } from "../../__tests__/factories";
-import { OPERATION, WASTE_CODES } from "../constants";
+import { OPERATION } from "../constants";
+import { BSFF_WASTE_CODES } from "../../common/constants";
 
 interface CreateBsffArgs {
   emitter?: UserWithCompany;
@@ -73,7 +74,7 @@ export function createBsffBeforeEmission(
 ) {
   return createBsff(args, {
     isDraft: false,
-    wasteCode: WASTE_CODES[0],
+    wasteCode: BSFF_WASTE_CODES[0],
     wasteAdr: "Mention ADR",
     wasteDescription: "Fluides",
     weightValue: 1,

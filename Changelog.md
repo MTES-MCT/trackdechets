@@ -5,6 +5,27 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.10.1] 10/10/2022
+
+#### :rocket: Nouvelles fonctionnalités
+#### :bug: Corrections de bugs
+
+- Correction dans l'UI Trackdéchets d'un crash lorsqu'on essayait de modifier un BSFF avec des BSFFs initiaux (en cas de regroupement, reconditionnement ou réexpédition) [PR 1707](https://github.com/MTES-MCT/trackdechets/pull/1707).
+
+#### :boom: Breaking changes
+#### :nail_care: Améliorations
+
+- Amélioration du parcours de création d'un BSFF dans l'UI Trackdéchets [PR 1707](https://github.com/MTES-MCT/trackdechets/pull/1707).
+- Ajout des codes 14 06 02*, 14 06 03*, 16 05 04* et 13 03 10* comme code déchet sur le BSFF [PR 1707](https://github.com/MTES-MCT/trackdechets/pull/1707).
+- Restriction sur les codes déchets disponibles sur le BSDD et le BSDA [PR 1707](https://github.com/MTES-MCT/trackdechets/pull/1707) :
+  - Seuls les codes suivants sont désormais disponibles sur le BSDA (UI & API):   "06 07 01*", "06 13 04*", "10 13 09*", "16 01 11*", "16 02 12*", "17 06 01*", "17 06 05*", "08 01 17*", "08 04 09*", "12 01 16*", "15 01 11*", "15 02 02*", "16 02 13*", "16 03 03*", "17 01 06*", "17 02 04*", "17 03 01*", "17 04 09*", "17 04 10*", "17 05 03*", "17 05 05*", "17 05 07*", "17 06 03*", "17 08 01*", "17 09 03*".
+  - Les codes suivants ne sont plus disponibles sur le BSDD (UI & API): "14 06 01*",   "06 07 01*", "06 13 04*", "10 13 09*", "16 01 11*", "16 02 12*", "17 06 01*", "17 06 05*", "18 01 03*", "18 02 02*"
+
+
+#### :memo: Documentation
+#### :house: Interne
+
+
 # [2022.09.1] 20/09/2022
 
 #### :rocket: Nouvelles fonctionnalités

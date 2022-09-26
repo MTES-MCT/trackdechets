@@ -1,13 +1,13 @@
 import { UserRole } from "@prisma/client";
 import { gql } from "apollo-server-core";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { BSFF_WASTE_CODES } from "../../../../common/constants";
 import {
   Mutation,
   MutationCreateBsffArgs
 } from "../../../../generated/graphql/types";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { WASTE_CODES } from "../../../constants";
 import { fullBsff } from "../../../fragments";
 
 const CREATE_BSFF = gql`
@@ -65,7 +65,7 @@ describe("Mutation.createBsff", () => {
             plannedOperationCode: "R2"
           },
           waste: {
-            code: WASTE_CODES[0],
+            code: BSFF_WASTE_CODES[0],
             adr: "Mention ADR",
             description: "R410"
           },

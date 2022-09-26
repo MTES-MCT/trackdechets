@@ -1,4 +1,4 @@
-import { WASTES } from "generated/constants";
+import { BSDD_WASTES } from "generated/constants";
 
 export function wasteCodeValidator(wasteCode: string) {
   const wasteCodeWithoutSpaces = wasteCode.replace(/\s+/g, "");
@@ -9,7 +9,7 @@ export function wasteCodeValidator(wasteCode: string) {
     return "Le code déchet saisi n'existe pas. Il doit être composé de moins de 7 caractères.";
   }
 
-  if (WASTES.find(waste => waste.code === wasteCode)) {
+  if (BSDD_WASTES.find(waste => waste.code === wasteCode)) {
     return undefined;
   }
 

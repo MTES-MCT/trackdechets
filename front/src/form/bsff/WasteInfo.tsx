@@ -2,6 +2,7 @@ import { FieldSwitch, RedErrorMessage } from "common/components";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { Field, useFormikContext } from "formik";
 import { Bsff, BsffPackagingInput, BsffType } from "generated/graphql/types";
+import { BSFF_WASTES } from "generated/constants";
 import React, { useEffect } from "react";
 import Packagings from "./components/packagings/Packagings";
 import { PreviousBsffsPicker } from "./components/PreviousBsffsPicker";
@@ -70,7 +71,14 @@ export default function WasteInfo({ disabled }) {
       <div className="form__row">
         <label>
           Code déchet
-          <Field type="text" name="waste.code" disabled className="td-input" />
+          <Field as="select" name="waste.code" className="td-select">
+            <option />
+            {BSFF_WASTES.map(item => (
+              <option value={item.code} key={item.code}>
+                {item.code} - {item.description}
+              </option>
+            ))}
+          </Field>
         </label>
         <RedErrorMessage name="waste.code" />
       </div>

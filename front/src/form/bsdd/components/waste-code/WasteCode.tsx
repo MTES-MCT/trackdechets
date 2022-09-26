@@ -1,6 +1,6 @@
 import { FieldProps } from "formik";
 import React, { useState } from "react";
-import { WASTES } from "generated/constants";
+import { BSDD_WASTES } from "generated/constants";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import WasteTreeModal from "search/WasteTreeModal";
 import styles from "./WasteCode.module.scss";
@@ -26,7 +26,7 @@ function formatWasteCode(wasteCode: string) {
 export function WasteCodeSelect({ field, form }: FieldProps) {
   const [openModal, setOpenModal] = useState(false);
 
-  const waste = WASTES.find(waste => waste.code === field.value);
+  const waste = BSDD_WASTES.find(waste => waste.code === field.value);
 
   return (
     <div>

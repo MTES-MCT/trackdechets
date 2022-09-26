@@ -1,6 +1,7 @@
 import { UserRole, BsffType, BsffStatus } from "@prisma/client";
 import { gql } from "apollo-server-core";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { BSFF_WASTE_CODES } from "../../../../common/constants";
 import {
   Mutation,
   MutationUpdateBsffArgs
@@ -8,7 +9,7 @@ import {
 import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { OPERATION, WASTE_CODES } from "../../../constants";
+import { OPERATION } from "../../../constants";
 import { fullBsff } from "../../../fragments";
 import {
   createBsff,
@@ -312,7 +313,7 @@ describe("Mutation.updateBsff", () => {
 
     const input = {
       waste: {
-        code: WASTE_CODES[0],
+        code: BSFF_WASTE_CODES[0],
         description: "R10",
         adr: "Mention ADR"
       },
@@ -349,7 +350,7 @@ describe("Mutation.updateBsff", () => {
 
     const input = {
       waste: {
-        code: WASTE_CODES[0],
+        code: BSFF_WASTE_CODES[0],
         description: "R10",
         adr: "Mention ADR"
       },

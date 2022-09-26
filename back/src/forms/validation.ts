@@ -15,7 +15,7 @@ import {
   isDangerous,
   PROCESSING_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
-  WASTES_CODES
+  BSDD_WASTE_CODES
 } from "../common/constants";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
@@ -651,7 +651,7 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
     wasteDetailsCode: yup
       .string()
       .requiredIf(!isDraft, "Le code déchet est obligatoire")
-      .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE),
+      .oneOf([...BSDD_WASTE_CODES, "", null], INVALID_WASTE_CODE),
     wasteDetailsOnuCode: yup.string().when("wasteDetailsIsDangerous", {
       is: (wasteDetailsIsDangerous: boolean) =>
         wasteDetailsIsDangerous === true,

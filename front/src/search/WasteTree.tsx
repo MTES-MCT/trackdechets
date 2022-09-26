@@ -1,6 +1,6 @@
 import React from "react";
 import Tree, { TreeNode } from "rc-tree";
-import { WASTES_TREE, WasteNode } from "generated/constants/WASTES";
+import { BSDD_WASTES_TREE, WasteNode } from "generated/constants/WASTES";
 import "rc-tree/assets/index.css";
 
 const loop = (data: WasteNode[]) => {
@@ -20,7 +20,7 @@ type Props = { checkable?: boolean; onSelect?: (selectedKeys: any) => void };
 export default function WasteTree(props: Props) {
   return (
     <Tree className="myCls" showLine {...props}>
-      {loop(WASTES_TREE)}
+      {loop(BSDD_WASTES_TREE)}
     </Tree>
   );
 }
