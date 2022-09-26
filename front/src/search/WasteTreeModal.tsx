@@ -4,7 +4,7 @@ import styles from "./WasteTreeModal.module.scss";
 import TdModal from "common/components/Modal";
 import { BSDD_WASTES_TREE, WasteNode } from "generated/constants";
 type Props = {
-  wasteTree: WasteNode[];
+  wasteTree?: WasteNode[];
   open: boolean;
   onClose?: () => void;
   onSelect?: (value: any) => void;
