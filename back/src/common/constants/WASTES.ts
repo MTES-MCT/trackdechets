@@ -5578,6 +5578,8 @@ export const BSDD_WASTES_TREE = toWasteTree(ALL_WASTES_TREE, {
   ]
 });
 
+export const ALL_WASTES = flatten(ALL_WASTES_TREE);
+
 export const BSDD_WASTES = flatten(BSDD_WASTES_TREE);
 
 export const BSDA_WASTES = BSDD_WASTES.filter(w =>
