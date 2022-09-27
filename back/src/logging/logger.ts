@@ -30,7 +30,9 @@ async function createHeapSnapshotAndUploadToS3() {
   const snapshotStream = v8.getHeapSnapshot();
   // It's important that the filename end with `.heapsnapshot`,
   // otherwise Chrome DevTools won't open it.
-  const fileName = `${process.env.DD_ENV}_${Date.now()}.heapsnapshot`;
+  const fileName = `${process.env.DD_ENV}_${
+    process.env.CONTAINER
+  }_${Date.now()}.heapsnapshot`;
   const fileStream = createWriteStream(fileName);
   snapshotStream.pipe(fileStream);
 
