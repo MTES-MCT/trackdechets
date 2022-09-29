@@ -455,8 +455,9 @@ export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
     index: index.index,
     type: index.type,
     id: bsd.id,
-
     body: bsd,
+    version_type: "external",
+    version: bsd.updatedAt,
     ...refresh(ctx)
   });
 }
