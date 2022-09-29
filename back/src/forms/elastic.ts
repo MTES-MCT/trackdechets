@@ -213,6 +213,7 @@ function toBsdElastic(form: FullForm & { forwarding?: Form }): BsdElastic {
     readableId: form.readableId,
     customId: form.customId,
     createdAt: form.createdAt.getTime(),
+    updatedAt: form.updatedAt.getTime(),
     emitterCompanyName: form.emitterCompanyName ?? "",
     emitterCompanySiret: form.emitterCompanySiret ?? "",
     transporterCompanyName: form.transporterCompanyName ?? "",

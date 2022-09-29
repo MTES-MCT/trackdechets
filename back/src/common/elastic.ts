@@ -29,6 +29,7 @@ export interface BsdElastic {
   type: BsdType;
   id: string;
   createdAt: number;
+  updatedAt: number;
   readableId: string;
   customId: string;
   emitterCompanyName: string;
@@ -279,6 +280,9 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
     }
   },
   createdAt: {
+    type: "date"
+  },
+  updatedAt: {
     type: "date"
   },
   isDraftFor: {

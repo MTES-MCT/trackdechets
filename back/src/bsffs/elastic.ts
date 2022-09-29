@@ -14,6 +14,7 @@ export function toBsdElastic(
     readableId: bsff.id,
     customId: "",
     createdAt: bsff.createdAt.getTime(),
+    updatedAt: bsff.updatedAt.getTime(),
     emitterCompanyName: bsff.emitterCompanyName ?? "",
     emitterCompanySiret: bsff.emitterCompanySiret ?? "",
     transporterCompanyName: bsff.transporterCompanyName ?? "",
