@@ -11,6 +11,7 @@ import { indexAllBsdasris } from "../bsdasris/elastic";
 import { indexAllBsvhus } from "../bsvhu/elastic";
 import { indexAllBsdas } from "../bsda/elastic";
 import { indexAllBsffs } from "../bsffs/elastic";
+import logger from "../logging/logger";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -447,6 +448,7 @@ function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
  * Create/update a document in Elastic Search.
  */
 export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
+  logger.info(`Indexing BSD ${bsd.id}`);
   return client.index({
     index: index.index,
     type: index.type,
@@ -613,23 +615,23 @@ export async function toPrismaBsds(
 
 export async function indexAllBsds(index: string, bsdType?: BsdType) {
   if (!bsdType || bsdType === "BSDD") {
-    console.log("Indexing Bsdds");
+    logger.info("Indexing Bsdds");
     await indexAllForms(index);
   }
   if (!bsdType || bsdType === "BSDASRI") {
-    console.log("Indexing Bsdasris");
+    logger.info("Indexing Bsdasris");
     await indexAllBsdasris(index);
   }
   if (!bsdType || bsdType === "BSVHU") {
-    console.log("Indexing Bsvhus");
+    logger.info("Indexing Bsvhus");
     await indexAllBsvhus(index);
   }
   if (!bsdType || bsdType === "BSDA") {
-    console.log("Indexing Bsdas");
+    logger.info("Indexing Bsdas");
     await indexAllBsdas(index);
   }
   if (!bsdType || bsdType === "BSFF") {
-    console.log("Indexing Bsffs");
+    logger.info("Indexing Bsffs");
     await indexAllBsffs(index);
   }
 }

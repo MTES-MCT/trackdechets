@@ -1,13 +1,14 @@
 import { Mail, Contact } from "./types";
 import { backend } from ".";
 import { addToMailQueue } from "../queue/producers/mail";
+import logger from "../logging/logger";
 
 // push job to the job queue for the api server not to execute the sendMail itself
 export async function sendMail(mail: Mail): Promise<void> {
   try {
     await addToMailQueue(mail);
   } catch (err) {
-    console.error(`Error adding sendmail Job to the queue`, err);
+    logger.error(`Error adding sendmail Job to the queue`, err);
     await sendMailSync(mail);
   }
 }
