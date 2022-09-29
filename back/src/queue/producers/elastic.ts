@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-named-as-default
 import Queue, { JobOptions } from "bull";
+import logger from "../../logging/logger";
 
 export type BsdUpdateQueueItem = { sirets: string[]; id: string };
 const { REDIS_URL, NODE_ENV } = process.env;
@@ -39,13 +40,14 @@ indexQueue.on("completed", job => {
 indexQueue.on("failed", (job, err) => {
   const id = job.data;
 
-  console.error(`Indexation job failed for bsd "${id}"`, { id, err });
+  logger.error(`Indexation job failed for bsd "${id}"`, { id, err });
 });
 
 export async function enqueueBsdToIndex(
   bsdId: string,
   options?: JobOptions
 ): Promise<void> {
+  logger.info(`Enquing BSD ${bsdId} for indexation`);
   await indexQueue.add("index", bsdId, options);
 }
 
