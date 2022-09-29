@@ -64,11 +64,12 @@ const updateBsdasriResolver = async (
       id,
       input,
       dbBsdasri,
-      dbSynthesizing
+      dbSynthesizing,
+      user
     });
   }
 
-  return updateBsdasri({ id, input, dbBsdasri, dbGrouping, context });
+  return updateBsdasri({ id, input, dbBsdasri, dbGrouping, user });
 };
 
 export default updateBsdasriResolver;

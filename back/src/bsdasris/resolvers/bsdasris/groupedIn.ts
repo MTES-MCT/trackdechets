@@ -1,11 +1,13 @@
 import { BsdasriResolvers } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+
 import { expandBsdasriFromDB } from "../../converter";
+import { getReadonlyBsdasriRepository } from "../../repository";
 
 const groupedIn: BsdasriResolvers["groupedIn"] = async bsdasri => {
-  const groupedIn = await prisma.bsdasri
-    .findUnique({ where: { id: bsdasri.id } })
+  const groupedIn = await getReadonlyBsdasriRepository()
+    .findRelatedEntity({ id: bsdasri.id })
     .groupedIn();
+
   if (!groupedIn) {
     return null;
   }

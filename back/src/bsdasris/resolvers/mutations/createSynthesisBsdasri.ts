@@ -1,6 +1,5 @@
 import { BsdasriInput } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
-import prisma from "../../../prisma";
 
 import { expandBsdasriFromDB, flattenBsdasriInput } from "../../converter";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
@@ -12,6 +11,7 @@ import { indexBsdasri } from "../../elastic";
 import { UserInputError } from "apollo-server-express";
 import { BsdasriType } from "@prisma/client";
 import { getCachedUserSiretOrVat } from "../../../common/redis/users";
+import { getBsdasriRepository } from "../../repository";
 
 /**
  * Bsdasri creation mutation :
@@ -94,19 +94,14 @@ const createSynthesisBsdasri = async (
     emissionSignature: true,
     isSynthesis: true
   });
+  const bsdasriRepository = getBsdasriRepository(user);
 
-  const newDasri = await prisma.bsdasri.create({
-    data: {
-      ...flattenedInput,
-      id: getReadableId(ReadableIdPrefix.DASRI),
-      type: BsdasriType.SYNTHESIS,
+  const newDasri = await bsdasriRepository.create({
+    ...flattenedInput,
+    id: getReadableId(ReadableIdPrefix.DASRI),
+    type: BsdasriType.SYNTHESIS,
 
-      synthesizing: { connect: synthesizedBsdasrisId }
-    },
-    include: {
-      grouping: { select: { id: true } },
-      synthesizing: { select: { id: true } }
-    }
+    synthesizing: { connect: synthesizedBsdasrisId }
   });
   const expandeBsdasri = expandBsdasriFromDB(newDasri);
   await indexBsdasri(newDasri, context);

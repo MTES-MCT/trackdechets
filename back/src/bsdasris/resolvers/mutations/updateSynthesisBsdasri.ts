@@ -1,13 +1,15 @@
 import { expandBsdasriFromDB, flattenBsdasriInput } from "../../converter";
 import { Bsdasri, BsdasriStatus, BsdasriType } from "@prisma/client";
-import prisma from "../../../prisma";
 import { BsdasriInput } from "../../../generated/graphql/types";
 
 import { validateBsdasri } from "../../validation";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import { indexBsdasri } from "../../elastic";
 
 import { getEligibleDasrisForSynthesis, aggregatePackagings } from "./utils";
+import {
+  getBsdasriRepository,
+  getReadonlyBsdasriRepository
+} from "../../repository";
 
 import { getFieldsAllorwedForUpdate } from "./fieldsUpdateRules";
 
@@ -43,12 +45,14 @@ const updateSynthesisBsdasri = async ({
   id,
   input,
   dbBsdasri,
-  dbSynthesizing
+  dbSynthesizing,
+  user
 }: {
   id: string;
   input: BsdasriInput;
   dbBsdasri: Bsdasri;
   dbSynthesizing: any;
+  user: Express.User;
 }) => {
   const {
     grouping: inputGrouping,
@@ -88,11 +92,11 @@ const updateSynthesisBsdasri = async ({
       dbBsdasri.transporterCompanySiret
     );
   }
+
+  const bsdasriReadonlyRepository = getReadonlyBsdasriRepository();
   const dasrisToAssociate = !!inputSynthesizing?.length
-    ? await prisma.bsdasri.findMany({
-        where: {
-          id: { in: inputSynthesizing }
-        }
+    ? await bsdasriReadonlyRepository.findMany({
+        id: { in: inputSynthesizing }
       })
     : [];
   const synthesizedBsdasriArgs = await buildSynthesizedBsdasriArgs(
@@ -127,20 +131,13 @@ const updateSynthesisBsdasri = async ({
         }
       }
     : {};
+  const bsdasriRepository = getBsdasriRepository(user);
 
-  const updatedDasri = await prisma.bsdasri.update({
-    where: { id },
-    data: { ...flattenedArgs, ...synthesizingArgs },
-    include: {
-      grouping: { select: { id: true } },
-      synthesizing: { select: { id: true } }
-    }
-  });
-
-  const expandedDasri = expandBsdasriFromDB(updatedDasri);
-
-  await indexBsdasri(updatedDasri);
-  return expandedDasri;
+  const updatedDasri = await bsdasriRepository.update(
+    { id },
+    { ...flattenedArgs, ...synthesizingArgs }
+  );
+  return expandBsdasriFromDB(updatedDasri);
 };
 
 export default updateSynthesisBsdasri;

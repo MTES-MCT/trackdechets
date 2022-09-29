@@ -111,6 +111,12 @@ export async function checkCanDeleteBsdasri(user: User, bsdasri: Bsdasri) {
       "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés"
     );
   }
+  // INITIAL dasris should not be synthesized or grouped, but let's keep a safeguard here
+  if (!!bsdasri.synthesizedInId || !!bsdasri.groupedInId) {
+    throw new ForbiddenError(
+      "Ce bordereau est associé à un autre, il n'est pas supprimable"
+    );
+  }
 
   return true;
 }

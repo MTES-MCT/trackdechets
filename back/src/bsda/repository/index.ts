@@ -8,7 +8,7 @@ import { buildFindRelatedBsdaEntity } from "./bsda/findRelatedEntity";
 import { buildFindUniqueBsda } from "./bsda/findUnique";
 import { buildUpdateBsda } from "./bsda/update";
 import { buildUpdateManyBsdas } from "./bsda/updateMany";
-import { transactionWrapper } from "./helper";
+import { transactionWrapper } from "../../common/repository/helper";
 import { buildAcceptRevisionRequestApproval } from "./revisionRequest/accept";
 import { buildCancelRevisionRequest } from "./revisionRequest/cancel";
 import { buildCountRevisionRequests } from "./revisionRequest/count";
@@ -19,7 +19,6 @@ import { buildRefuseRevisionRequestApproval } from "./revisionRequest/refuse";
 import { BsdaActions } from "./types";
 
 export type BsdaRepository = BsdaActions;
-export { runInTransaction } from "./helper";
 
 export function getReadonlyBsdaRepository() {
   return {
