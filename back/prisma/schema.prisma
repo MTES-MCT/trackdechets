@@ -858,6 +858,7 @@ enum BsdasriStatus {
   RECEIVED
   PROCESSED
   REFUSED
+  AWAITING_GROUP
 }
 
 enum BsdasriEmitterType {

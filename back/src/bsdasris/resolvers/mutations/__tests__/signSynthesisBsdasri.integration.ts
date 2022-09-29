@@ -182,7 +182,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
     }
   );
 
-  it("should put reception signature on a SENT synthesis dasri and cascade on groupes bsds", async () => {
+  it("should put reception signature on a SENT synthesis dasri and cascade on grouped bsds", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
@@ -313,7 +313,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
     }
   );
 
-  it("should put operation signature on a RECEIVED synthesis dasri and cascade on groupes bsds", async () => {
+  it("should put operation signature on a RECEIVED synthesis dasri and cascade on grouped bsds", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"

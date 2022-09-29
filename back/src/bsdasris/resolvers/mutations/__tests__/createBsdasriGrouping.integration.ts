@@ -157,7 +157,7 @@ describe("Mutation.createDasri", () => {
 
     const toRegroup1 = await bsdasriFactory({
       opt: {
-        status: BsdasriStatus.PROCESSED,
+        status: BsdasriStatus.AWAITING_GROUP,
         emitterCompanySiret: "1234",
         destinationCompanySiret: company.siret,
         destinationOperationCode: "D12"
@@ -166,7 +166,7 @@ describe("Mutation.createDasri", () => {
 
     const toRegroup2 = await bsdasriFactory({
       opt: {
-        status: BsdasriStatus.PROCESSED,
+        status: BsdasriStatus.AWAITING_GROUP,
         emitterCompanySiret: "1234",
         destinationCompanySiret: company.siret,
         destinationOperationCode: "R12"

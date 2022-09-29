@@ -73,7 +73,7 @@ export const checkDasrisAreGroupable = async (
     {
       id: { in: groupingIds },
       destinationOperationCode: { in: DASRI_GROUPING_OPERATIONS_CODES },
-      status: BsdasriStatus.PROCESSED,
+      status: BsdasriStatus.AWAITING_GROUP,
       type: BsdasriType.SIMPLE,
       groupedIn: null,
       grouping: { none: {} },

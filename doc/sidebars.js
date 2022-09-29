@@ -67,6 +67,7 @@ module.exports = {
                 "tutoriels/examples/bsdasri/signature-code-secret",
                 "tutoriels/examples/bsdasri/signature-code-secret-ecoorganisme",
                 "tutoriels/examples/bsdasri/synthese",
+                "tutoriels/examples/bsdasri/groupement",
               ],
               BSVHU: ["tutoriels/examples/bsvhu/vhu-vers-broyeur"],
               BSFF: ["tutoriels/examples/bsff/collecte-petites-quantites"],

@@ -77,7 +77,7 @@ export default function BsdasriTableGrouping({
           },
         },
 
-        status: { _eq: BsdasriStatus.Processed },
+        status: { _eq: BsdasriStatus.AwaitingGroup },
       },
     },
   });

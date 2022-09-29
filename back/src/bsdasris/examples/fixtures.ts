@@ -1,7 +1,6 @@
 const wasteInput = {
   waste: {
     code: "18 01 03*",
-
     adr: "non soumis"
   }
 };
@@ -116,6 +115,14 @@ const operationInput = {
   date: "2020-04-28"
 };
 
+const operationForGroupingInput = {
+  weight: {
+    value: 1
+  },
+  code: "D12",
+  date: "2020-04-28"
+};
+
 export default {
   wasteInput,
   emitterCompanyInput,
@@ -129,5 +136,6 @@ export default {
   destinationCompanyInput,
   destinationInput,
   receptionInput,
-  operationInput
+  operationInput,
+  operationForGroupingInput
 };
