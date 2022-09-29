@@ -9,8 +9,6 @@ type Options = {
   keyGenerator?: (ip: string, request: Request) => string;
 };
 
-const { USE_XFF_HEADER } = process.env;
-
 const RATE_LIMIT_WINDOW_SECONDS = 60;
 const store =
   process.env.NODE_ENV === "test"
