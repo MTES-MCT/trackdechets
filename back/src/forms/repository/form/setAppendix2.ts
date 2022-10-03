@@ -102,7 +102,7 @@ export async function preCheckAppendix2(
     appendix2.map(({ form }) => form)
   );
 
-  appendix2.map(({ form: initialForm }, index) => {
+  appendix2.forEach(({ form: initialForm }, index) => {
     const appendix2DestinationSiret = finalDestinationSirets[index];
     if (form.emitterCompanySiret !== appendix2DestinationSiret) {
       throw new UserInputError(
