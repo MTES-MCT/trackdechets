@@ -12,7 +12,7 @@ import {
   InitialFormFractionInput
 } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
-import { UpdateAppendix2Forms } from "./updateAppendix2Forms";
+import buildUpdateAppendix2Forms from "./updateAppendix2Forms";
 
 class FormFraction {
   form: Form;
@@ -23,7 +23,6 @@ class SetAppendix2Args {
   form: Form;
   appendix2: FormFraction[] | null;
   currentAppendix2Forms?: Form[];
-  updateAppendix2Forms: UpdateAppendix2Forms;
 }
 
 export type SetAppendix2Fn = (args: SetAppendix2Args) => Promise<void>;
@@ -206,8 +205,8 @@ export async function preCheckAppendix2(
  * than that has been received at the TTR site.
  */
 const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
-  ({ prisma }) =>
-  async ({ form, appendix2, currentAppendix2Forms, updateAppendix2Forms }) => {
+  ({ prisma, user }) =>
+  async ({ form, appendix2, currentAppendix2Forms }) => {
     // delete existing appendix2 not present in input
     await prisma.formGroupement.deleteMany({
       where: {
@@ -252,6 +251,7 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
       where: { id: { in: dirtyFormIds } }
     });
 
+    const updateAppendix2Forms = buildUpdateAppendix2Forms({ prisma, user });
     await updateAppendix2Forms(dirtyForms);
   };
 
