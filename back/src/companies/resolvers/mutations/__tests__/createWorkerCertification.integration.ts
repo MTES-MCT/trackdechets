@@ -61,9 +61,7 @@ describe("{ mutation { createWorkerCertification } }", () => {
         }`;
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
 
-    const { data } = await mutate<Pick<Mutation, "createWorkerCertification">>(
-      mutation
-    );
+    await mutate<Pick<Mutation, "createWorkerCertification">>(mutation);
 
     expect(await prisma.workerCertification.count()).toEqual(1);
   });

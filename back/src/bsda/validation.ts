@@ -435,7 +435,13 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
     }),
     workerCertificationOrganisation: yup
       .string()
-      .oneOf(["AFNOR Certification", "GLOBAL CERTIFICATION", "QUALIBAT"])
+      .oneOf([
+        "AFNOR Certification",
+        "GLOBAL CERTIFICATION",
+        "QUALIBAT",
+        "",
+        null
+      ])
       .when("hasSubSectionThree", {
         is: true,
         then: schema => schema.required(),
