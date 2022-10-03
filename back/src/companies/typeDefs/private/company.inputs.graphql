@@ -235,12 +235,12 @@ input UpdateWorkerCertificationInput {
   """
   Indique si l'entreprise réalise des travaux relevant de la sous-section 4
   """
-  hasSubSectionFour: Boolean!
+  hasSubSectionFour: Boolean
 
   """
   Indique si l'entreprise réalise des travaux relevant de la sous-section 3
   """
-  hasSubSectionThree: Boolean!
+  hasSubSectionThree: Boolean
 
   """
   Numéro de certification (sous-section 3 uniquement)
