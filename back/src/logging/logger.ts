@@ -14,19 +14,12 @@ const logger = createLogger({
   transports: [new transports.File({ filename: LOG_PATH })]
 });
 
-// TODO - remove
-setInterval(() => {
-  const memoryUsage = process.memoryUsage();
-  logger.info("Memory usage - TEMP", memoryUsage);
-}, 1000 * 60 * 3);
-
-setInterval(() => {
-  if (process.env.DEBUG_HEAPDUMP === "active") {
-    createHeapSnapshotAndUploadToS3();
-  }
-}, 1000 * 60 * 60);
+createHeapSnapshotAndUploadToS3();
 
 async function createHeapSnapshotAndUploadToS3() {
+  if (process.env.DEBUG_HEAPDUMP !== "active") {
+    return;
+  }
   const snapshotStream = v8.getHeapSnapshot();
   // It's important that the filename end with `.heapsnapshot`,
   // otherwise Chrome DevTools won't open it.
@@ -60,6 +53,7 @@ async function createHeapSnapshotAndUploadToS3() {
   } catch (e) {
     logger.error("Error while uploading heapdump", e);
   }
+  setTimeout(() => createHeapSnapshotAndUploadToS3(), 1000 * 60 * 60);
 }
 
 export default logger;
