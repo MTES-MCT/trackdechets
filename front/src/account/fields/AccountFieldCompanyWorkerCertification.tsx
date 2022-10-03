@@ -4,6 +4,7 @@ import AccountField from "./AccountField";
 import { CompanyPrivate, UserRole } from "generated/graphql/types";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 import AccountFormCompanyAddWorkerCertification from "./forms/AccountFormCompanyWorkerCertification";
+import { formatDate } from "common/datetime";
 
 type Props = {
   company: Pick<
@@ -54,7 +55,7 @@ export default function AccountFieldCompanyWorkerCertification({
             </tr>
             <tr>
               <td>Date de validité</td>
-              <td>{company.workerCertification.validityLimit}</td>
+              <td>{formatDate(company.workerCertification.validityLimit!)}</td>
             </tr>
             <tr>
               <td>Organisme</td>
