@@ -28,16 +28,14 @@ const MARK_AS_TEMP_STORED = gql`
 `;
 
 export default function MarkAsTempStored({ form }: WorkflowActionProps) {
-  const [
-    getBsdd,
-    { error: bsddGetError, data, loading: bsddGetLoading },
-  ] = useLazyQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
-    variables: {
-      id: form.id,
-      readableId: null,
-    },
-    fetchPolicy: "network-only",
-  });
+  const [getBsdd, { error: bsddGetError, data, loading: bsddGetLoading }] =
+    useLazyQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
+      variables: {
+        id: form.id,
+        readableId: null,
+      },
+      fetchPolicy: "network-only",
+    });
   const [markAsTempStored, { loading, error }] = useMutation<
     Pick<Mutation, "markAsTempStored">,
     MutationMarkAsTempStoredArgs

@@ -28,9 +28,8 @@ export default function EcoOrganismes(props: EcoOrganismesProps) {
   const [field] = useField<Form["ecoOrganisme"]>(props);
   const { setFieldValue } = useFormikContext<Form>();
   const [clue, setClue] = useState("");
-  const { loading, error, data } = useQuery<Pick<Query, "ecoOrganismes">>(
-    GET_ECO_ORGANISMES
-  );
+  const { loading, error, data } =
+    useQuery<Pick<Query, "ecoOrganismes">>(GET_ECO_ORGANISMES);
 
   const hasEcoOrganisme = !!field.value;
 

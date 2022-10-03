@@ -14,10 +14,10 @@ export default function AccountOauth2AppDelete({
   application,
   onClose,
 }: AccountOauth2AppDeleteProps) {
-  const [
-    deleteApplication,
-    { loading, error },
-  ] = useMutation(DELETE_APPLICATION, { refetchQueries: [MY_APPLICATIONS] });
+  const [deleteApplication, { loading, error }] = useMutation(
+    DELETE_APPLICATION,
+    { refetchQueries: [MY_APPLICATIONS] }
+  );
 
   return (
     <Modal ariaLabel="Supprimer une application" onClose={onClose} isOpen>

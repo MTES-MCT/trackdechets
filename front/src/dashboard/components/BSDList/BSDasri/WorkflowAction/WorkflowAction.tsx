@@ -119,7 +119,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
             )}
             {/* marked as deprecated for api user, this field is used to dynamically insert user settings data */}
             {form?.allowDirectTakeOver &&
-            isSimple && ( // grouping dasri can't be directly taken over
+              isSimple && ( // grouping dasri can't be directly taken over
                 <ActionLink
                   icon={<IconCheckCircle1 size="24px" />}
                   to={{

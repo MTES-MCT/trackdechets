@@ -43,9 +43,8 @@ export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
   const [field] = useField<Bsdasri["ecoOrganisme"]>(props);
   const { setFieldValue } = useFormikContext<Bsdasri>();
 
-  const { loading, error, data } = useQuery<Pick<Query, "ecoOrganismes">>(
-    GET_ECO_ORGANISMES
-  );
+  const { loading, error, data } =
+    useQuery<Pick<Query, "ecoOrganismes">>(GET_ECO_ORGANISMES);
 
   const hasEcoOrganisme = !!field.value;
   function handleEcoOrganismeToggle() {

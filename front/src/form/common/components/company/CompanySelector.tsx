@@ -83,10 +83,8 @@ export default function CompanySelector({
   const clueInputRef = useRef<HTMLInputElement>(null);
   const [mustBeRegistered, setMustBeRegistered] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<CompanySearchResult[]>([]);
-  const [
-    toggleManualForeignCompanyForm,
-    setToggleManualForeignCompanyForm,
-  ] = useState<boolean>(false);
+  const [toggleManualForeignCompanyForm, setToggleManualForeignCompanyForm] =
+    useState<boolean>(false);
 
   // Favortite type is deduced from the field prefix (transporter, emitter, etc)
   const favoriteType = constantCase(field.name.split(".")[0]) as FavoriteType;

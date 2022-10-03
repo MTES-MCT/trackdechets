@@ -184,10 +184,10 @@ export default withRouter(function Header({
   const [menuHidden, toggleMenu] = useState(true);
 
   const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
-  const closeMobileMenu = useCallback(() => isMobile && toggleMenu(true), [
-    isMobile,
-    toggleMenu,
-  ]);
+  const closeMobileMenu = useCallback(
+    () => isMobile && toggleMenu(true),
+    [isMobile, toggleMenu]
+  );
 
   useEffect(() => {
     return history.listen(() => {

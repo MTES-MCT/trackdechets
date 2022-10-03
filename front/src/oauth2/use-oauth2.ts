@@ -19,10 +19,8 @@ export interface AuthorizePayload {
 export function useOAuth2() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [
-    authorizePayload,
-    setAuthorizePayload,
-  ] = useState<AuthorizePayload | null>(null);
+  const [authorizePayload, setAuthorizePayload] =
+    useState<AuthorizePayload | null>(null);
 
   const { VITE_API_ENDPOINT } = import.meta.env;
 
