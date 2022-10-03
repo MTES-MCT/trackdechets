@@ -3,6 +3,7 @@ import routes from "common/routes";
 import React from "react";
 import { NavLink, Switch, Route, Redirect } from "react-router-dom";
 import { CreateAnonymousCompany } from "./anonymousCompany";
+import Reindex from "./reindex/Reindex";
 import CompaniesVerification from "./verification/CompaniesVerification";
 
 /**
@@ -33,6 +34,15 @@ export default function Admin() {
                 Entreprise anonyme
               </NavLink>
             </li>
+            <li className="tw-mb-1">
+              <NavLink
+                to={routes.admin.reindex}
+                className="sidebar__link"
+                activeClassName="sidebar__link--active"
+              >
+                Réindexation
+              </NavLink>
+            </li>
           </ul>
         </>
       </SideMenu>
@@ -43,6 +53,9 @@ export default function Admin() {
           </Route>
           <Route exact path={routes.admin.anonymousCompany}>
             <CreateAnonymousCompany />
+          </Route>
+          <Route exact path={routes.admin.reindex}>
+            <Reindex />
           </Route>
           <Redirect to={routes.admin.verification} />
         </Switch>
