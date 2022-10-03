@@ -128,7 +128,7 @@ describe("{ mutation { createWorkerCertification } }", () => {
       Pick<Mutation, "createWorkerCertification">
     >(mutation);
 
-    expect(errors[0].message).toBe(
+    expect(errors[0].message).toContain(
       "organisation must be one of the following values: AFNOR Certification, GLOBAL CERTIFICATION, QUALIBAT"
     );
   });

@@ -797,12 +797,12 @@ describe("Mutation.Bsda.create", () => {
           hasSubSectionFour: true,
           hasSubSectionThree: true,
           certificationNumber: "AAA",
-          validityLimit: new Date(),
+          validityLimit: new Date().toISOString() as any,
           organisation: "AFNOR Certification"
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
