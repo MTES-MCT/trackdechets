@@ -235,16 +235,12 @@ const updateFormResolver = async (
   );
 
   const updatedForm = await prisma.$transaction(async transaction => {
-    const { update, setAppendix2, updateAppendix2Forms } = getFormRepository(
-      user,
-      transaction
-    );
+    const { update, setAppendix2 } = getFormRepository(user, transaction);
     const updatedForm = await update({ id }, formUpdateInput);
     await setAppendix2({
       form: updatedForm,
       appendix2,
-      currentAppendix2Forms,
-      updateAppendix2Forms
+      currentAppendix2Forms
     });
     return updatedForm;
   });
