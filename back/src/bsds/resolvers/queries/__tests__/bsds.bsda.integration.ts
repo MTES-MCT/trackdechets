@@ -5,6 +5,7 @@ import {
 } from "../../../../../integration-tests/helper";
 import { indexBsda } from "../../../../bsda/elastic";
 import { bsdaFactory } from "../../../../bsda/__tests__/factories";
+import { deleteBsd } from "../../../../common/elastic";
 import { ErrorCode } from "../../../../common/errors";
 import {
   Mutation,
@@ -178,6 +179,8 @@ describe("Query.bsds.bsda base workflow", () => {
         }
       });
       bsdaId = data.createDraftBsda.id;
+      const bsda = await prisma.bsda.findUnique({ where: { id: bsdaId } });
+      await indexBsda(bsda);
       await refreshElasticSearch();
     });
 
@@ -287,6 +290,9 @@ describe("Query.bsds.bsda base workflow", () => {
         }
       );
 
+      const bsda = await prisma.bsda.findUnique({ where: { id: bsdaId } });
+      await indexBsda(bsda);
+
       await refreshElasticSearch();
     });
 
@@ -377,6 +383,8 @@ describe("Query.bsds.bsda base workflow", () => {
         }
       );
 
+      const bsda = await prisma.bsda.findUnique({ where: { id: bsdaId } });
+      await indexBsda(bsda);
       await refreshElasticSearch();
     });
 
@@ -466,7 +474,8 @@ describe("Query.bsds.bsda base workflow", () => {
           }
         }
       );
-
+      const bsda = await prisma.bsda.findUnique({ where: { id: bsdaId } });
+      await indexBsda(bsda);
       await refreshElasticSearch();
     });
 
@@ -556,6 +565,8 @@ describe("Query.bsds.bsda base workflow", () => {
           }
         }
       );
+      const bsda = await prisma.bsda.findUnique({ where: { id: bsdaId } });
+      await indexBsda(bsda);
 
       await refreshElasticSearch();
     });
@@ -646,6 +657,9 @@ describe("Query.bsds.bsda base workflow", () => {
           }
         }
       );
+
+      const bsda = await prisma.bsda.findUnique({ where: { id: bsdaId } });
+      await indexBsda(bsda);
 
       await refreshElasticSearch();
     });
@@ -747,6 +761,8 @@ describe("Query.bsds.bsda base workflow", () => {
         }
       );
 
+      const bsda = await prisma.bsda.findUnique({ where: { id: bsdaId } });
+      await indexBsda(bsda);
       await refreshElasticSearch();
     });
 
@@ -849,6 +865,8 @@ describe("Query.bsds.bsda base workflow", () => {
           }
         }
       );
+      const bsda = await prisma.bsda.findUnique({ where: { id: bsdaId } });
+      await indexBsda(bsda);
 
       await refreshElasticSearch();
     });
@@ -973,6 +991,7 @@ describe("Query.bsds.bsdas mutations", () => {
       }
     );
 
+    await deleteBsd({ id: bsda.id });
     await refreshElasticSearch();
 
     res = await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {});
@@ -1017,6 +1036,11 @@ describe("Query.bsds.bsdas mutations", () => {
         id: bsda.id
       }
     });
+
+    const duplicated = await prisma.bsda.findUnique({
+      where: { id: duplicateBsda.id }
+    });
+    await indexBsda(duplicated);
 
     await refreshElasticSearch();
 

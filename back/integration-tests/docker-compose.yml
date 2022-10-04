@@ -34,6 +34,7 @@ services:
     build:
       context: ../
       dockerfile: Dockerfile.dev
+    command: ["npm", "run", "watch:node"]
     volumes:
       - ../src:/usr/src/app/src
     env_file:

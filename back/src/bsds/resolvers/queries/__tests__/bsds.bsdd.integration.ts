@@ -20,6 +20,7 @@ import {
   formFactory,
   toIntermediaryCompany
 } from "../../../../__tests__/factories";
+import prisma from "../../../../prisma";
 
 import { indexForm } from "../../../../forms/elastic";
 import { getFullForm } from "../../../../forms/database";
@@ -160,6 +161,15 @@ describe("Query.bsds workflow", () => {
         }
       );
       formId = id;
+      const form = await prisma.form.findUnique({
+        where: { id: formId },
+        include: {
+          transportSegments: true,
+          intermediaries: true,
+          forwardedIn: true
+        }
+      });
+      await indexForm(form);
       await refreshElasticSearch();
     });
 
@@ -229,6 +239,16 @@ describe("Query.bsds workflow", () => {
           }
         }
       );
+      const form = await prisma.form.findUnique({
+        where: { id: formId },
+        include: {
+          transportSegments: true,
+          intermediaries: true,
+          forwardedIn: true
+        }
+      });
+
+      await indexForm(form);
       await refreshElasticSearch();
     });
 
@@ -296,6 +316,15 @@ describe("Query.bsds workflow", () => {
           }
         }
       });
+      const form = await prisma.form.findUnique({
+        where: { id: formId },
+        include: {
+          transportSegments: true,
+          intermediaries: true,
+          forwardedIn: true
+        }
+      });
+      await indexForm(form);
       await refreshElasticSearch();
     });
 
@@ -362,6 +391,15 @@ describe("Query.bsds workflow", () => {
           }
         }
       });
+      const form = await prisma.form.findUnique({
+        where: { id: formId },
+        include: {
+          transportSegments: true,
+          intermediaries: true,
+          forwardedIn: true
+        }
+      });
+      await indexForm(form);
       await refreshElasticSearch();
 
       expect(errors).toBeUndefined();
@@ -410,6 +448,15 @@ describe("Query.bsds workflow", () => {
           }
         }
       });
+      const form = await prisma.form.findUnique({
+        where: { id: formId },
+        include: {
+          transportSegments: true,
+          intermediaries: true,
+          forwardedIn: true
+        }
+      });
+      await indexForm(form);
       await refreshElasticSearch();
 
       expect(errors).toBeUndefined();
