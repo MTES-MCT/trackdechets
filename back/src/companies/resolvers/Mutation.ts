@@ -15,6 +15,9 @@ import verifyCompany from "./mutations/verifyCompany";
 import createVhuAgrement from "./mutations/createVhuAgrement";
 import updateVhuAgrement from "./mutations/updateVhuAgrement";
 import deleteVhuAgrement from "./mutations/deleteVhuAgrement";
+import { createWorkerCertification } from "./mutations/createWorkerCertification";
+import { updateWorkerCertification } from "./mutations/updateWorkerCertification";
+import { deleteWorkerCertification } from "./mutations/deleteWorkerCertification";
 import verifyCompanyByAdmin from "./mutations/verifyCompanyByAdmin";
 import sendVerificationCodeLetter from "./mutations/sendVerificationCodeLetter";
 import createTestCompany from "./mutations/createTestCompany";
@@ -38,6 +41,9 @@ const Mutation: MutationResolvers = {
   createVhuAgrement,
   updateVhuAgrement,
   deleteVhuAgrement,
+  createWorkerCertification,
+  updateWorkerCertification,
+  deleteWorkerCertification,
   verifyCompanyByAdmin,
   sendVerificationCodeLetter,
   createTestCompany,

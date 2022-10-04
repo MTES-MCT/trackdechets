@@ -8,21 +8,25 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 # [2022.10.1] 10/10/2022
 
 #### :rocket: Nouvelles fonctionnalités
+
+- Ajout d'un profil "Entreprise de travaux". Intégration des champs de certifications associés dans le BSDA [PR 1740](https://github.com/MTES-MCT/trackdechets/pull/1740).
+
 #### :bug: Corrections de bugs
 
 - Correction dans l'UI Trackdéchets d'un crash lorsqu'on essayait de modifier un BSFF avec des BSFFs initiaux (en cas de regroupement, reconditionnement ou réexpédition) [PR 1707](https://github.com/MTES-MCT/trackdechets/pull/1707).
 
 #### :boom: Breaking changes
+
 #### :nail_care: Améliorations
 
 - Amélioration du parcours de création d'un BSFF dans l'UI Trackdéchets [PR 1707](https://github.com/MTES-MCT/trackdechets/pull/1707).
 - Ajout des codes 14 06 02*, 14 06 03*, 16 05 04* et 13 03 10* comme code déchet sur le BSFF [PR 1707](https://github.com/MTES-MCT/trackdechets/pull/1707).
 - Restriction sur les codes déchets disponibles sur le BSDD et le BSDA [PR 1707](https://github.com/MTES-MCT/trackdechets/pull/1707) :
-  - Seuls les codes suivants sont désormais disponibles sur le BSDA (UI & API):   "06 07 01*", "06 13 04*", "10 13 09*", "16 01 11*", "16 02 12*", "17 06 01*", "17 06 05*", "08 01 17*", "08 04 09*", "12 01 16*", "15 01 11*", "15 02 02*", "16 02 13*", "16 03 03*", "17 01 06*", "17 02 04*", "17 03 01*", "17 04 09*", "17 04 10*", "17 05 03*", "17 05 05*", "17 05 07*", "17 06 03*", "17 08 01*", "17 09 03*".
-  - Les codes suivants ne sont plus disponibles sur le BSDD (UI & API): "14 06 01*",   "06 07 01*", "06 13 04*", "10 13 09*", "16 01 11*", "16 02 12*", "17 06 01*", "17 06 05*", "18 01 03*", "18 02 02*"
-
+  - Seuls les codes suivants sont désormais disponibles sur le BSDA (UI & API): "06 07 01*", "06 13 04*", "10 13 09*", "16 01 11*", "16 02 12*", "17 06 01*", "17 06 05*", "08 01 17*", "08 04 09*", "12 01 16*", "15 01 11*", "15 02 02*", "16 02 13*", "16 03 03*", "17 01 06*", "17 02 04*", "17 03 01*", "17 04 09*", "17 04 10*", "17 05 03*", "17 05 05*", "17 05 07*", "17 06 03*", "17 08 01*", "17 09 03\*".
+  - Les codes suivants ne sont plus disponibles sur le BSDD (UI & API): "14 06 01*", "06 07 01*", "06 13 04*", "10 13 09*", "16 01 11*", "16 02 12*", "17 06 01*", "17 06 05*", "18 01 03*", "18 02 02*"
 
 #### :memo: Documentation
+
 #### :house: Interne
 
 - Utilisation du pattern repository et indexation asynchrone sur le bsdasri [PR 1718](https://github.com/MTES-MCT/trackdechets/pull/1718)
@@ -60,7 +64,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Amélioration de l'envoi des emails de refus [PR 1642](https://github.com/MTES-MCT/trackdechets/pull/1642)
 - Améliorations performances du front : réduction de taille du build, réduction taille bundle CSS, utilisateur de `React.lazy()` pour `GenericStepList` [PR 1681](https://github.com/MTES-MCT/trackdechets/pull/1681)
 
-
 # [2022.08.4] 29/08/2022
 
 #### :rocket: Nouvelles fonctionnalités
@@ -79,12 +82,11 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Utilisation des sirets en cache pour la query formsLifeCycle [PR 1609](https://github.com/MTES-MCT/trackdechets/pull/1609)
 - Prise en compte de la colonne Company.contact lors de l'import en masse [PR 1606](https://github.com/MTES-MCT/trackdechets/pull/1606)
 - Améliorations de l'UI Bsdasri [PR 1602](https://github.com/MTES-MCT/trackdechets/pull/1602)
-- Possibilité de passer outre l'entreprise de travaux sur le BSDA  [PR 1604](https://github.com/MTES-MCT/trackdechets/pull/1604)
+- Possibilité de passer outre l'entreprise de travaux sur le BSDA [PR 1604](https://github.com/MTES-MCT/trackdechets/pull/1604)
 - Amélioration des filtres dashboard [PR 1595](https://github.com/MTES-MCT/trackdechets/pull/1595)
 - Permettre de spécifier exutoire final sur le BSDA sur le workflox déchetterie + entreposage [PR 1614](https://github.com/MTES-MCT/trackdechets/pull/1614)
 - Amélioration de la sécurité à la connexion [PR 1612](https://github.com/MTES-MCT/trackdechets/pull/1612)
 - Différenciation plus visible de la sandbox [PR 1617](https://github.com/MTES-MCT/trackdechets/pull/1617)
-
 
 #### :memo: Documentation
 

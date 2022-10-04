@@ -18,6 +18,7 @@ enum CompanyType {
   TRADER
   BROKER
   ECO_ORGANISME
+  WORKER
 }
 
 enum CompanyVerificationMode {
@@ -203,6 +204,8 @@ model Company {
   vhuAgrementDemolisseur               VhuAgrement?              @relation(name: "VhuAgrementDemolisseur_Company", fields: [vhuAgrementDemolisseurId], references: [id])
   vhuAgrementBroyeurId                 String?
   vhuAgrementBroyeur                   VhuAgrement?              @relation(name: "VhuAgrementBroyeur_Company", fields: [vhuAgrementBroyeurId], references: [id])
+  workerCertificationId                String?
+  workerCertification                  WorkerCertification?      @relation(fields: [workerCertificationId], references: [id])
   companyAssociations                  CompanyAssociation[]
   MembershipRequest                    MembershipRequest[]
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
@@ -625,6 +628,16 @@ model VhuAgrement {
   department           String
   demolisseurCompanies Company[] @relation("VhuAgrementDemolisseur_Company")
   broyeurCompanies     Company[] @relation("VhuAgrementBroyeur_Company")
+}
+
+model WorkerCertification {
+  id                  String    @id @default(cuid())
+  hasSubSectionFour   Boolean
+  hasSubSectionThree  Boolean
+  certificationNumber String?
+  validityLimit       DateTime? @db.Timestamptz(6)
+  organisation        String?
+  Company             Company[]
 }
 
 model TransportSegment {
@@ -1208,7 +1221,7 @@ model Bsda {
   wasteAdr          String?
   wastePop          Boolean          @default(value: false)
 
-  packagings       Json          @default("[]")
+  packagings       Json     @default("[]")
   weightIsEstimate Boolean?
   weightValue      Float?
 
@@ -1276,12 +1289,17 @@ model Bsda {
 
   workerIsDisabled Boolean?
 
-  workerCompanyName    String?
-  workerCompanySiret   String?
-  workerCompanyAddress String?
-  workerCompanyContact String?
-  workerCompanyPhone   String?
-  workerCompanyMail    String?
+  workerCompanyName                      String?
+  workerCompanySiret                     String?
+  workerCompanyAddress                   String?
+  workerCompanyContact                   String?
+  workerCompanyPhone                     String?
+  workerCompanyMail                      String?
+  workerCertificationHasSubSectionFour   Boolean?
+  workerCertificationHasSubSectionThree  Boolean?
+  workerCertificationCertificationNumber String?
+  workerCertificationValidityLimit       DateTime? @db.Timestamptz(6)
+  workerCertificationOrganisation        String?
 
   workerWorkHasEmitterPaperSignature Boolean?
   workerWorkSignatureAuthor          String?

@@ -14,6 +14,7 @@ import AccountFieldCompanyBrokerReceipt from "./fields/AccountFieldCompanyBroker
 import AccountFieldCompanyVerificationStatus from "./fields/AccountFieldCompanyVerificationStatus";
 import AccountFieldCompanyVhuAgrementBroyeur from "./fields/AccountFieldCompanyVhuAgrementBroyeur";
 import AccountFieldCompanyVhuAgrementDemolisseur from "./fields/AccountFieldCompanyVhuAgrementDemolisseur";
+import AccountFieldCompanyWorkerCertification from "./fields/AccountFieldCompanyWorkerCertification";
 import * as COMPANY_TYPES from "generated/constants/COMPANY_TYPES";
 import { isSiret, isVat } from "generated/constants/companySearchHelpers";
 
@@ -39,6 +40,7 @@ AccountCompanyInfo.fragments = {
       ...AccountFieldCompanyVerificationStatusFragment
       ...AccountFieldCompanyVhuAgrementBroyeurFragment
       ...AccountFieldCompanyVhuAgrementDemolisseurFragment
+      ...AccountFieldCompanyWorkerCertificationFragment
       installation {
         urlFiche
       }
@@ -52,6 +54,7 @@ AccountCompanyInfo.fragments = {
     ${AccountFieldCompanyVerificationStatus.fragments.company}
     ${AccountFieldCompanyVhuAgrementBroyeur.fragments.company}
     ${AccountFieldCompanyVhuAgrementDemolisseur.fragments.company}
+    ${AccountFieldCompanyWorkerCertification.fragments.company}
   `,
 };
 
@@ -154,6 +157,16 @@ export default function AccountCompanyInfo({ company }: Props) {
           <AccountFieldCompanyVhuAgrementDemolisseur
             company={filter(
               AccountFieldCompanyVhuAgrementDemolisseur.fragments.company,
+              company
+            )}
+          />
+        </>
+      )}
+      {company.companyTypes.includes(CompanyType.Worker) && (
+        <>
+          <AccountFieldCompanyWorkerCertification
+            company={filter(
+              AccountFieldCompanyWorkerCertification.fragments.company,
               company
             )}
           />

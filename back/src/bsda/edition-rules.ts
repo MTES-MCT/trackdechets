@@ -69,6 +69,7 @@ const editableFields: EditableFields<BsdaInput> = {
   worker: {
     isDisabled: ifAwaitingSignature("EMISSION"),
     company: ifAwaitingSignature("EMISSION"),
+    certification: ifAwaitingSignature("WORK"),
     work: ifAwaitingSignature("WORK")
   },
   broker: ifAwaitingSignature("EMISSION"),
