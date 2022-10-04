@@ -1373,7 +1373,7 @@ export async function validateGroupement(
   form: Partial<Form | Prisma.FormCreateInput>,
   grouping: InitialFormFractionInput[]
 ) {
-  if (!grouping || grouping.length === 0) {
+  if (!grouping || grouping?.length === 0) {
     return [];
   }
 
@@ -1389,25 +1389,8 @@ export async function validateGroupement(
     );
   }
 
-  const initialForms = await prisma.form.findMany({
-    where: { id: { in: grouping.map(({ form }) => form.id) } },
-    include: {
-      forwardedIn: { select: { recipientCompanySiret: true } },
-      groupedIn: true
-    }
-  });
-
-  if (grouping.length > 0 && initialForms.length < grouping.length) {
-    const notFoundIds = grouping
-      .map(({ form }) => form.id)
-      .filter(id => !initialForms.map(p => p.id).includes(id));
-    throw new UserInputError(
-      `Les BSDD initiaux ${notFoundIds.join(", ")} n'existent pas`
-    );
-  }
-
   // check each form appears in only one form fraction
-  const formIds = initialForms.map(form => form.id);
+  const formIds = grouping.map(({ form }) => form.id);
   const duplicates = formIds.filter(
     (id, index) => formIds.indexOf(id) !== index
   );
@@ -1420,22 +1403,56 @@ export async function validateGroupement(
     );
   }
 
-  const formFractions = initialForms.map(form => {
+  const initialForms = await prisma.form.findMany({
+    where: {
+      id: { in: grouping.map(({ form }) => form.id) },
+      status: { in: [Status.AWAITING_GROUP, Status.GROUPED] }
+    },
+    include: {
+      forwardedIn: { select: { recipientCompanySiret: true } },
+      groupedIn: true
+    }
+  });
+
+  if (grouping.length > 0 && initialForms.length < grouping.length) {
+    const notFoundIds = grouping
+      .map(({ form }) => form.id)
+      .filter(id => !initialForms.map(p => p.id).includes(id));
+    throw new UserInputError(
+      `Les BSDD initiaux ${notFoundIds.join(
+        ", "
+      )} n'existent pas ou ne sont pas en attente de regroupement`
+    );
+  }
+
+  const formFractions = initialForms.map(f => {
     const quantity = grouping.find(
-      ({ form: initialForm }) => initialForm.id === form.id
+      formFraction => formFraction.form.id === f.id
     ).quantity;
+
+    const quantityGroupedInOtherForms = f.groupedIn.reduce(
+      (counter, formGroupement) => {
+        if (formGroupement.nextFormId !== form.id) {
+          return counter.plus(formGroupement.quantity);
+        }
+        return counter;
+      },
+      new Decimal(0)
+    );
+
     return {
-      form,
+      form: f,
       quantity:
         quantity ??
-        new Decimal(form.quantityReceived)
-          .minus(form.quantityGrouped)
-          .toNumber()
+        new Decimal(f.quantityReceived)
+          .minus(quantityGroupedInOtherForms)
+          .toNumber(),
+      quantityGroupedInOtherForms
     };
   });
 
-  const errors = formFractions.reduce(
-    (acc, { form: initialForm, quantity }) => {
+  const errors = formFractions.reduce<string[]>(
+    (acc, { form: initialForm, quantity, quantityGroupedInOtherForms }) => {
       const destinationSiret = initialForm.forwardedIn
         ? initialForm.forwardedIn.recipientCompanySiret
         : initialForm.recipientCompanySiret;
@@ -1447,31 +1464,13 @@ export async function validateGroupement(
         ];
       }
 
-      if (
-        ![Status.AWAITING_GROUP, Status.GROUPED].includes(
-          initialForm.status as any
-        )
-      ) {
-        return [
-          ...acc,
-          `Le bordereau ${initialForm.readableId} n'est pas en attente de regroupement`
-        ];
-      }
-
       if (quantity <= 0) {
         return [
           ...acc,
           `La quantité regroupée sur le BSDD ${initialForm.readableId} doit être supérieure à 0`
         ];
       }
-      const quantityGroupedInOtherForms = initialForm.groupedIn.reduce(
-        (acc, formGroupement) => {
-          if (formGroupement.initialFormId !== form.id) {
-            return acc.plus(formGroupement.quantity);
-          }
-        },
-        new Decimal(0)
-      );
+
       const quantityLeftToGroup = new Decimal(initialForm.quantityReceived)
         .minus(quantityGroupedInOtherForms)
         .toDecimalPlaces(6); // set precision to gramme
@@ -1493,6 +1492,8 @@ export async function validateGroupement(
           )} T. Vous tentez de regrouper ${quantity} T.`
         ];
       }
+
+      return acc;
     },
     []
   );

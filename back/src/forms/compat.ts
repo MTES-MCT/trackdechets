@@ -194,7 +194,7 @@ export function tov1ReadableId(readableId: string) {
 }
 
 export function appendix2toFormFractions(
-  appendix2Forms?: AppendixFormInput[]
+  appendix2Forms: AppendixFormInput[]
 ): InitialFormFractionInput[] {
   return appendix2Forms.map(({ id }) => {
     return {

@@ -135,16 +135,14 @@ const createFormResolver = async (
     };
   }
 
-  const isGroupement = !!grouping || !!appendix2Forms;
+  const isGroupement = grouping?.length > 0 || appendix2Forms?.length > 0;
 
   const appendix2 = isGroupement
     ? await validateGroupement(
         formCreateInput,
-        grouping
+        grouping?.length > 0
           ? grouping
-          : appendix2Forms
-          ? appendix2toFormFractions(appendix2Forms)
-          : []
+          : appendix2toFormFractions(appendix2Forms)
       )
     : null;
 

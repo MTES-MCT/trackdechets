@@ -1209,7 +1209,7 @@ describe("Mutation.updateForm", () => {
 
       const wannaBeAppendix2 = await formFactory({
         ownerId: (await userFactory()).id,
-        opt: { status: Status.AWAITING_GROUP }
+        opt: { status: Status.AWAITING_GROUP, quantityReceived: 1 }
       });
 
       const updateFormInput = {
@@ -1331,7 +1331,7 @@ describe("Mutation.updateForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+          "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
       })
     ]);
   });
@@ -1376,7 +1376,7 @@ describe("Mutation.updateForm", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+            "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
         })
       ]);
     }
@@ -1428,7 +1428,7 @@ describe("Mutation.updateForm", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+            "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
         })
       ]);
     }
@@ -1555,6 +1555,7 @@ describe("Mutation.updateForm", () => {
         }
       }
     });
+
     expect(data.updateForm.appendix2Forms).toHaveLength(1);
 
     const { data: data2 } = await mutate<
@@ -1571,7 +1572,7 @@ describe("Mutation.updateForm", () => {
     expect(data2.updateForm.appendix2Forms).toHaveLength(1);
   });
 
-  it("should be possible to re-associate same appendix2 (using UpdateFormInput.grouping)", async () => {
+  it.only("should be possible to re-associate same appendix2 (using UpdateFormInput.grouping)", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
 
     const appendixForm = await formFactory({
@@ -1636,6 +1637,7 @@ describe("Mutation.updateForm", () => {
         }
       }
     });
+
     expect(data2.updateForm.grouping).toHaveLength(1);
 
     const { data: data3 } = await mutate<
@@ -1806,7 +1808,7 @@ describe("Mutation.updateForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le bordereau avec l'identifiant "does-not-exist" n'existe pas.`
+        message: `Les BSDD initiaux does-not-exist n'existent pas ou ne sont pas en attente de regroupement`
       })
     ]);
 

@@ -21,6 +21,7 @@ const buildUpdateAppendix2Forms: (
         return form;
       }
       const { id, quantityReceived } = form;
+
       const quantityGrouped = new Decimal(
         (
           await prisma.formGroupement.aggregate({
@@ -29,6 +30,7 @@ const buildUpdateAppendix2Forms: (
           })
         )._sum.quantity ?? 0
       ).toDecimalPlaces(6); // set precision to gramme
+
       const groupementForms = (
         await prisma.formGroupement.findMany({
           where: { initialFormId: id },

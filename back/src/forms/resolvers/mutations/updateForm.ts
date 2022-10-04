@@ -75,15 +75,16 @@ const updateFormResolver = async (
   await checkCanUpdate(user, existingForm);
 
   const form = flattenFormInput(formContent);
+  const futureForm = { ...existingForm, ...form };
 
   // Construct form update payload
   const formUpdateInput: Prisma.FormUpdateInput = form;
 
   // Validate form input
   if (existingForm.status === "DRAFT") {
-    await draftFormSchema.validate({ ...existingForm, ...formUpdateInput });
+    await draftFormSchema.validate(futureForm);
   } else {
-    await sealedFormSchema.validate({ ...existingForm, ...formUpdateInput });
+    await sealedFormSchema.validate(futureForm);
   }
 
   const isOrWillBeTempStorage =
@@ -219,10 +220,11 @@ const updateFormResolver = async (
 
   const existingFormFractions = await prisma.formGroupement.findMany({
     where: { nextFormId: form.id },
-    include: { nextForm: true }
+    include: { initialForm: true }
   });
+
   const existingAppendix2Forms = existingFormFractions.map(
-    ({ nextForm }) => nextForm
+    ({ initialForm }) => initialForm
   );
 
   if (existingAppendix2Forms?.length) {
@@ -234,26 +236,35 @@ const updateFormResolver = async (
     }
   }
 
-  const appendix2 = await validateGroupement(
-    { ...existingForm },
-    grouping
-      ? grouping
-      : appendix2Forms
-      ? appendix2toFormFractions(appendix2Forms)
-      : existingFormFractions.map(({ quantity, nextFormId }) => ({
-          form: { id: nextFormId },
-          quantity
-        }))
-  );
+  const isGroupementUpdated =
+    !!grouping ||
+    !!appendix2Forms ||
+    futureForm.emitterType !== existingForm.emitterType;
+
+  const appendix2 = isGroupementUpdated
+    ? await validateGroupement(
+        futureForm,
+        grouping
+          ? grouping
+          : appendix2Forms
+          ? appendix2toFormFractions(appendix2Forms)
+          : existingFormFractions.map(({ quantity, initialFormId }) => ({
+              form: { id: initialFormId },
+              quantity
+            }))
+      )
+    : null;
 
   const updatedForm = await prisma.$transaction(async transaction => {
     const { update, setAppendix2 } = getFormRepository(user, transaction);
     const updatedForm = await update({ id }, formUpdateInput);
-    await setAppendix2({
-      form: updatedForm,
-      appendix2,
-      currentAppendix2Forms: existingAppendix2Forms
-    });
+    if (isGroupementUpdated) {
+      await setAppendix2({
+        form: updatedForm,
+        appendix2,
+        currentAppendix2Forms: existingAppendix2Forms
+      });
+    }
     return updatedForm;
   });
 
