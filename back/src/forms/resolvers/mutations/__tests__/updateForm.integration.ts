@@ -1572,7 +1572,7 @@ describe("Mutation.updateForm", () => {
     expect(data2.updateForm.appendix2Forms).toHaveLength(1);
   });
 
-  it.only("should be possible to re-associate same appendix2 (using UpdateFormInput.grouping)", async () => {
+  it("should be possible to re-associate same appendix2 (using UpdateFormInput.grouping)", async () => {
     const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
 
     const appendixForm = await formFactory({

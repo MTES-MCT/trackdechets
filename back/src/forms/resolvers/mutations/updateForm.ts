@@ -218,10 +218,9 @@ const updateFormResolver = async (
     };
   }
 
-  const existingFormFractions = await prisma.formGroupement.findMany({
-    where: { nextFormId: form.id },
-    include: { initialForm: true }
-  });
+  const existingFormFractions = await prisma.form
+    .findUnique({ where: { id: existingForm.id } })
+    .grouping({ include: { initialForm: true } });
 
   const existingAppendix2Forms = existingFormFractions.map(
     ({ initialForm }) => initialForm
