@@ -21,7 +21,6 @@ import { OnboardingSlideshow } from "./components/OnboardingSlideshow";
 import { ExtraSignatureType } from "dashboard/components/BSDList/BSDasri/types";
 
 import { Query, BsdasriSignatureType } from "generated/graphql/types";
-import Stats from "./stats/Stats";
 import {
   RouteBsdsAct,
   RouteBsdsDrafts,
@@ -179,9 +178,6 @@ export default function Dashboard() {
               <Exports
                 companies={filter(Exports.fragments.company, companies)}
               />
-            </Route>
-            <Route path={routes.dashboard.stats}>
-              <Stats />
             </Route>
             <Redirect
               to={generatePath(routes.dashboard.bsds.drafts, {

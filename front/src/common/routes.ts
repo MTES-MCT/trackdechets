@@ -20,7 +20,6 @@ const routes = {
   dashboard: {
     index: "/dashboard/:siret",
     exports: "/dashboard/:siret/exports",
-    stats: "/dashboard/:siret/stats",
     roadControl: "/dashboard/:siret/road-control/:id",
     bsds: {
       index: "/dashboard/:siret/bsds",

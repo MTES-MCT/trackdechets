@@ -146,8 +146,11 @@ type Query {
     customId: String
   ): [Form!]!
 
-  "Renvoie des statistiques sur le volume de déchets entrant et sortant"
+  "DEPRECATED - Renvoie des statistiques sur le volume de déchets entrant et sortant"
   stats: [CompanyStat!]!
+    @deprecated(
+      reason: "Ne fonctionne pas avec des comptes utilisateurs ayant de nombreux établissements"
+    )
 
   "Renvoie des BSD candidats à un regroupement dans une annexe 2"
   appendixForms(

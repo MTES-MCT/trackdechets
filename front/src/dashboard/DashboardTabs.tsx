@@ -140,18 +140,6 @@ export function DashboardTabs({
               Registre
             </NavLink>
           </li>
-
-          <li>
-            <NavLink
-              to={generatePath(routes.dashboard.stats, {
-                siret: currentCompany.siret,
-              })}
-              className="sidebar__link sidebar__link--chapter"
-              activeClassName="sidebar__link--active"
-            >
-              Statistiques
-            </NavLink>
-          </li>
         </ul>
       </>
     </>
