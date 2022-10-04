@@ -3,6 +3,7 @@ import {
   MutationResolvers,
   QueryResolvers
 } from "../../generated/graphql/types";
+import logger from "../../logging/logger";
 
 type GqlQueryKey = keyof QueryResolvers | keyof MutationResolvers;
 
@@ -12,7 +13,7 @@ export function graphqlSpecificQueryHandlerMiddleware(
 ) {
   return function (req: Request, res: Response, next: NextFunction) {
     if (!req.gqlInfos) {
-      console.warn(
+      logger.warn(
         `The "gqlInfos" is not set on the request object. The "graphqlQueryParser" middleware must be called before this one, otherwise queries won't be rate limited.`
       );
       return next();

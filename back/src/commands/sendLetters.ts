@@ -1,9 +1,10 @@
 import { sendVerificationCodeLetters } from "../companies/verif";
+import logger from "../logging/logger";
 
 sendVerificationCodeLetters()
   .then(() => {
-    console.log("Successfully sent verification code letters");
+    logger.info("Successfully sent verification code letters");
   })
   .catch(() => {
-    console.error("Error while trying to send verification code letters");
+    logger.error("Error while trying to send verification code letters");
   });

@@ -12,6 +12,12 @@ const statsResolver: QueryResolvers["stats"] = async (
 
   const userCompanies = await getUserCompanies(user.id);
 
+  // safe guard to prevent timeout because this query
+  // is not optimized at all
+  if (userCompanies.length > 5) {
+    return [];
+  }
+
   return userCompanies.map(async userCompany => {
     const queriedForms = await prisma.form.findMany({
       where: {
