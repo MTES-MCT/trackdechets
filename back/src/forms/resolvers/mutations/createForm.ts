@@ -16,10 +16,14 @@ import { checkIsFormContributor } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
 import { FormCompanies } from "../../types";
-import { draftFormSchema, validateIntermediariesInput } from "../../validation";
+import {
+  draftFormSchema,
+  validateGroupement,
+  validateIntermediariesInput
+} from "../../validation";
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
-import { preCheckAppendix2 } from "../../repository/form/setAppendix2";
+import { appendix2toFormFractions } from "../../compat";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -131,11 +135,13 @@ const createFormResolver = async (
     };
   }
 
-  // currentAppendix2Forms will be empty
-  const { appendix2, currentAppendix2Forms } = await preCheckAppendix2(
-    form,
-    grouping,
-    appendix2Forms
+  const appendix2 = await validateGroupement(
+    formCreateInput,
+    grouping
+      ? grouping
+      : appendix2Forms
+      ? appendix2toFormFractions(appendix2Forms)
+      : null
   );
 
   const newForm = await prisma.$transaction(async transaction => {
@@ -144,7 +150,7 @@ const createFormResolver = async (
     await setAppendix2({
       form: newForm,
       appendix2,
-      currentAppendix2Forms
+      currentAppendix2Forms: []
     });
     return newForm;
   });

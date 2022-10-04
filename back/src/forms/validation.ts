@@ -5,7 +5,8 @@ import {
   QuantityType,
   WasteAcceptationStatus,
   Prisma,
-  CompanyVerificationStatus
+  CompanyVerificationStatus,
+  Status
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
@@ -20,6 +21,7 @@ import {
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
   CompanyInput,
+  InitialFormFractionInput,
   PackagingInfo,
   Packagings
 } from "../generated/graphql/types";
@@ -52,6 +54,7 @@ import {
   isOmi
 } from "../common/constants/companySearchHelpers";
 import { validateCompany } from "../companies/validateCompany";
+import Decimal from "decimal.js-light";
 // set yup default error messages
 configureYup();
 
@@ -1355,4 +1358,144 @@ export function validateIntermediariesInput(
       };
     })
   );
+}
+
+/**
+ * Les vérifications suivantes sont effectuées :
+ * - Vérifie que le type d'émetteur est compatible avec le groupement
+ * - Vérifie que le SIRET de l'établissement émetteur est renseigné et qu'il correspond
+ * au SIRET de destination des BSDD initiaux
+ * - Vérifie que les identifiants des BSDD initiaux existent
+ * - Vérifie que les BSDD initiaux sont bien en attente de regroupement
+ * - Vérifie que les quantités à regrouper son cohérentes
+ */
+export async function validateGroupement(
+  form: Partial<Form | Prisma.FormCreateInput>,
+  grouping: InitialFormFractionInput[]
+) {
+  if (grouping?.length > 0 && form.emitterType !== EmitterType.APPENDIX2) {
+    throw new UserInputError(
+      "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
+    );
+  }
+
+  if (grouping?.length > 0 && !form.emitterCompanySiret) {
+    throw new UserInputError(
+      "Vous devez renseigner le numéro SIRET de l'établissement de tri, transit, regroupement émettrice du BSDD de regroupement"
+    );
+  }
+
+  const initialForms = await prisma.form.findMany({
+    where: { id: { in: grouping.map(({ form }) => form.id) } },
+    include: {
+      forwardedIn: { select: { recipientCompanySiret: true } },
+      groupedIn: true
+    }
+  });
+
+  if (grouping.length > 0 && initialForms.length < grouping.length) {
+    const notFoundIds = grouping
+      .map(({ form }) => form.id)
+      .filter(id => !initialForms.map(p => p.id).includes(id));
+    throw new UserInputError(
+      `Les BSDD initiaux ${notFoundIds.join(", ")} n'existent pas`
+    );
+  }
+
+  // check each form appears in only one form fraction
+  const formIds = initialForms.map(form => form.id);
+  const duplicates = formIds.filter(
+    (id, index) => formIds.indexOf(id) !== index
+  );
+  if (duplicates.length > 0) {
+    throw new UserInputError(
+      `Impossible d'associer plusieurs fractions du même bordereau initial sur un même bordereau` +
+        ` de regroupement. Identifiant du ou des bordereaux initiaux concernés : ${duplicates.join(
+          ", "
+        )}`
+    );
+  }
+
+  const formFractions = initialForms.map(form => {
+    const quantity = grouping.find(
+      ({ form: initialForm }) => initialForm.id === form.id
+    ).quantity;
+    return {
+      form,
+      quantity:
+        quantity ??
+        new Decimal(form.quantityReceived)
+          .minus(form.quantityGrouped)
+          .toNumber()
+    };
+  });
+
+  const errors = formFractions.reduce(
+    (acc, { form: initialForm, quantity }) => {
+      const destinationSiret = initialForm.forwardedIn
+        ? initialForm.forwardedIn.recipientCompanySiret
+        : initialForm.recipientCompanySiret;
+
+      if (destinationSiret !== form.emitterCompanySiret) {
+        return [
+          ...acc,
+          `Le bordereau ${initialForm.id} n'est pas en possession du nouvel émetteur`
+        ];
+      }
+
+      if (
+        ![Status.AWAITING_GROUP, Status.GROUPED].includes(
+          initialForm.status as any
+        )
+      ) {
+        return [
+          ...acc,
+          `Le bordereau ${initialForm.readableId} n'est pas en attente de regroupement`
+        ];
+      }
+
+      if (quantity <= 0) {
+        return [
+          ...acc,
+          `La quantité regroupée sur le BSDD ${initialForm.readableId} doit être supérieure à 0`
+        ];
+      }
+      const quantityGroupedInOtherForms = initialForm.groupedIn.reduce(
+        (acc, formGroupement) => {
+          if (formGroupement.initialFormId !== form.id) {
+            return acc.plus(formGroupement.quantity);
+          }
+        },
+        new Decimal(0)
+      );
+      const quantityLeftToGroup = new Decimal(initialForm.quantityReceived)
+        .minus(quantityGroupedInOtherForms)
+        .toDecimalPlaces(6); // set precision to gramme
+
+      if (quantityLeftToGroup.equals(0)) {
+        return [
+          ...acc,
+          `Le bordereau ${initialForm.readableId} a déjà été regroupé en totalité`
+        ];
+      }
+
+      if (new Decimal(quantity).greaterThan(quantityLeftToGroup)) {
+        return [
+          ...acc,
+          `La quantité restante à regrouper sur le BSDD ${
+            initialForm.readableId
+          } est de ${quantityLeftToGroup.toFixed(
+            3
+          )} T. Vous tentez de regrouper ${quantity} T.`
+        ];
+      }
+    },
+    []
+  );
+
+  if (errors.length > 0) {
+    throw new UserInputError(errors.join("\n"));
+  }
+
+  return formFractions;
 }

@@ -23,11 +23,12 @@ import { FormCompanies } from "../../types";
 import {
   draftFormSchema,
   sealedFormSchema,
+  validateGroupement,
   validateIntermediariesInput
 } from "../../validation";
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
-import { preCheckAppendix2 } from "../../repository/form/setAppendix2";
+import { appendix2toFormFractions } from "../../compat";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -216,8 +217,13 @@ const updateFormResolver = async (
     };
   }
 
-  const { findAppendix2FormsById } = getFormRepository(user);
-  const existingAppendix2Forms = await findAppendix2FormsById(existingForm.id);
+  const existingFormFractions = await prisma.formGroupement.findMany({
+    where: { nextFormId: form.id },
+    include: { nextForm: true }
+  });
+  const existingAppendix2Forms = existingFormFractions.map(
+    ({ nextForm }) => nextForm
+  );
 
   if (existingAppendix2Forms?.length) {
     const updatedSiret = formUpdateInput?.emitterCompanySiret;
@@ -228,10 +234,16 @@ const updateFormResolver = async (
     }
   }
 
-  const { appendix2, currentAppendix2Forms } = await preCheckAppendix2(
-    form,
-    grouping,
-    appendix2Forms
+  const appendix2 = await validateGroupement(
+    { ...existingForm },
+    grouping
+      ? grouping
+      : appendix2Forms
+      ? appendix2toFormFractions(appendix2Forms)
+      : existingFormFractions.map(({ quantity, nextFormId }) => ({
+          form: { id: nextFormId },
+          quantity
+        }))
   );
 
   const updatedForm = await prisma.$transaction(async transaction => {
@@ -240,7 +252,7 @@ const updateFormResolver = async (
     await setAppendix2({
       form: updatedForm,
       appendix2,
-      currentAppendix2Forms
+      currentAppendix2Forms: existingAppendix2Forms
     });
     return updatedForm;
   });
