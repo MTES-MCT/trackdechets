@@ -109,6 +109,7 @@ function toBsdElastic(bsvhu: Bsvhu): BsdElastic {
     readableId: bsvhu.id,
     customId: "",
     createdAt: bsvhu.createdAt.getTime(),
+    updatedAt: bsvhu.updatedAt.getTime(),
     emitterCompanyName: bsvhu.emitterCompanyName ?? "",
     emitterCompanySiret: bsvhu.emitterCompanySiret ?? "",
     transporterCompanyName: bsvhu.transporterCompanyName ?? "",

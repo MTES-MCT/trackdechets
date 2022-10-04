@@ -139,6 +139,7 @@ export function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
     wasteDescription: DASRI_WASTE_CODES_MAPPING[bsdasri.wasteCode],
     transporterNumberPlate: bsdasri.transporterTransportPlates,
     createdAt: bsdasri.createdAt.getTime(),
+    updatedAt: bsdasri.updatedAt.getTime(),
     ...where,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsdasri),

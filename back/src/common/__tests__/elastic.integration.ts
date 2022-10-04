@@ -27,6 +27,7 @@ const defaultOpts: BsdElastic = {
   destinationOperationCode: "D10",
   destinationOperationDate: null,
   createdAt: new Date().getMilliseconds(),
+  updatedAt: new Date().getMilliseconds(),
   isDraftFor: [],
   isForActionFor: [],
   isFollowFor: [],
