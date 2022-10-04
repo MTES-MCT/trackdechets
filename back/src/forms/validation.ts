@@ -1464,13 +1464,6 @@ export async function validateGroupement(
         ];
       }
 
-      if (quantity <= 0) {
-        return [
-          ...acc,
-          `La quantité regroupée sur le BSDD ${initialForm.readableId} doit être supérieure à 0`
-        ];
-      }
-
       const quantityLeftToGroup = new Decimal(initialForm.quantityReceived)
         .minus(quantityGroupedInOtherForms)
         .toDecimalPlaces(6); // set precision to gramme
@@ -1479,6 +1472,13 @@ export async function validateGroupement(
         return [
           ...acc,
           `Le bordereau ${initialForm.readableId} a déjà été regroupé en totalité`
+        ];
+      }
+
+      if (quantity <= 0) {
+        return [
+          ...acc,
+          `La quantité regroupée sur le BSDD ${initialForm.readableId} doit être supérieure à 0`
         ];
       }
 
