@@ -1,6 +1,5 @@
 import prisma from "../../prisma";
 import { transactionWrapper } from "../../common/repository/helper";
-import { RepositoryTransaction } from "../../forms/repository/types";
 import { BsdasriActions } from "./types";
 import { buildFindUniqueBsdasri } from "./bsdasri/findUnique";
 import { buildFindManyBsdasri } from "./bsdasri/findMany";
@@ -10,6 +9,10 @@ import { buildCreateBsdasri } from "./bsdasri/create";
 import { buildDeleteBsdasri } from "./bsdasri/delete";
 import { buildUpdateBsdasri } from "./bsdasri/update";
 import { buildUpdateManyBsdasris } from "./bsdasri/updateMany";
+import {
+  RepositoryFnBuilder,
+  RepositoryTransaction
+} from "../../common/repository/types";
 
 export type BsdasriRepository = BsdasriActions;
 export function getReadonlyBsdasriRepository() {
@@ -25,8 +28,10 @@ export function getBsdasriRepository(
   user: Express.User,
   transaction?: RepositoryTransaction
 ): BsdasriRepository {
-  const useTransaction = builder =>
-    transactionWrapper(user, transaction, builder);
+  function useTransaction<FnResult>(builder: RepositoryFnBuilder<FnResult>) {
+    return transactionWrapper(builder, { user, transaction });
+  }
+
   return {
     ...getReadonlyBsdasriRepository(),
     create: useTransaction(buildCreateBsdasri),

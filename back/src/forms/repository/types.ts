@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { CountFormsFn } from "./form/count";
 import { CreateFormFn } from "./form/create";
 import { DeleteFormFn } from "./form/delete";
@@ -19,27 +19,6 @@ import { CreateRevisionRequestFn } from "./formRevisionRequest/createRevisionReq
 import { GetRevisionRequestByIdFn } from "./formRevisionRequest/getRevisionRequestById";
 import { RefuseRevisionRequestFn } from "./formRevisionRequest/refuseRevisionRequestApproval";
 
-export type PrismaTransaction = Omit<
-  PrismaClient,
-  "$connect" | "$disconnect" | "$on" | "$transaction" | "$use"
->;
-export type RepositoryTransaction = PrismaTransaction & {
-  addAfterCommitCallback?: (callback: () => void | Promise<void>) => void;
-};
-
-export type ReadRepositoryFnDeps = { prisma: RepositoryTransaction };
-export type WriteRepositoryFnDeps = ReadRepositoryFnDeps & {
-  user: Express.User;
-};
-export type RepositoryFnDeps = WriteRepositoryFnDeps;
-
-export interface RepositoryDeps {
-  prisma: PrismaClient;
-  user: Express.User;
-}
-
-export type RepositoryFnBuilder<Fn> = (deps: RepositoryFnDeps) => Fn;
-
 const formWithLinkedObjects = Prisma.validator<Prisma.FormArgs>()({
   include: {
     forwardedIn: true,
@@ -49,8 +28,6 @@ const formWithLinkedObjects = Prisma.validator<Prisma.FormArgs>()({
 });
 
 export type FullForm = Prisma.FormGetPayload<typeof formWithLinkedObjects>;
-
-export type LogMetadata = Record<string, unknown>;
 
 export type FormActions = {
   findUnique: FindUniqueFormFn;

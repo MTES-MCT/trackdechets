@@ -1,8 +1,8 @@
 import { Form, Status } from "@prisma/client";
 import { Decimal } from "decimal.js-light";
+import { RepositoryFnDeps } from "../../../common/repository/types";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
-import { RepositoryFnDeps } from "../types";
 import buildUpdateForm from "./update";
 
 export type UpdateAppendix2Forms = (forms: Form[]) => Promise<Form[]>;

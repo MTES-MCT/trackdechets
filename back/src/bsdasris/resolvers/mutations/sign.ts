@@ -14,7 +14,6 @@ import { checkIsCompanyMember } from "../../../users/permissions";
 import { checkCanEditBsdasri } from "../../permissions";
 import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { getBsdasriRepository } from "../../repository";
-import { runInTransaction } from "../../../common/repository/helper";
 
 import {
   dasriSignatureMapping,
@@ -24,6 +23,7 @@ import {
   getFieldsUpdate
 } from "./signatureUtils";
 import { indexBsdasri } from "../../elastic";
+import { runInTransaction } from "../../../common/repository/helper";
 
 const reindexAssociatedDasris = async dasriId => {
   const updatedDasris = await prisma.bsdasri.findMany({
@@ -217,6 +217,7 @@ const sign = async ({
         : {})
     }
   );
+
   const signedDasri = await runInTransaction(async transaction => {
     const bsdasriRepository = getBsdasriRepository(user, transaction);
 
@@ -226,6 +227,7 @@ const sign = async ({
     }
     return signedDasri;
   });
+
   return expandBsdasriFromDB(signedDasri);
 };
 

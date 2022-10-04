@@ -4,10 +4,14 @@ import {
   RevisionRequestApprovalStatus,
   RevisionRequestStatus
 } from "@prisma/client";
+import {
+  LogMetadata,
+  PrismaTransaction,
+  RepositoryFnDeps
+} from "../../../common/repository/types";
 import { GraphQLContext } from "../../../types";
 import { indexForm } from "../../elastic";
 import buildFindFullFormById from "../form/findFullFormById";
-import { LogMetadata, PrismaTransaction, RepositoryFnDeps } from "../types";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,

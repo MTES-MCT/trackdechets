@@ -1,7 +1,10 @@
 import { Form, Prisma } from "@prisma/client";
 import { deleteBsd } from "../../../common/elastic";
+import {
+  LogMetadata,
+  RepositoryFnDeps
+} from "../../../common/repository/types";
 import { GraphQLContext } from "../../../types";
-import { LogMetadata, RepositoryFnDeps } from "../types";
 import buildRemoveAppendix2 from "./removeAppendix2";
 
 export type DeleteFormFn = (

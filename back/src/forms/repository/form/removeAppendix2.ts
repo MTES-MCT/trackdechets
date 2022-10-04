@@ -1,5 +1,5 @@
 import { Form } from "@prisma/client";
-import { RepositoryFnDeps } from "../types";
+import { RepositoryFnDeps } from "../../../common/repository/types";
 import buildFindAppendix2FormsById from "./findAppendix2FormsById";
 import buildFindUniqueForm from "./findUnique";
 import buildUpdateAppendix2Forms from "./updateAppendix2Forms";

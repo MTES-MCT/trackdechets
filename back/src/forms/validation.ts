@@ -1373,13 +1373,17 @@ export async function validateGroupement(
   form: Partial<Form | Prisma.FormCreateInput>,
   grouping: InitialFormFractionInput[]
 ) {
-  if (grouping?.length > 0 && form.emitterType !== EmitterType.APPENDIX2) {
+  if (!grouping || grouping.length === 0) {
+    return [];
+  }
+
+  if (form.emitterType !== EmitterType.APPENDIX2) {
     throw new UserInputError(
       "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
     );
   }
 
-  if (grouping?.length > 0 && !form.emitterCompanySiret) {
+  if (!form.emitterCompanySiret) {
     throw new UserInputError(
       "Vous devez renseigner le numéro SIRET de l'établissement de tri, transit, regroupement émettrice du BSDD de regroupement"
     );

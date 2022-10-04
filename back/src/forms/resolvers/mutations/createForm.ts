@@ -135,23 +135,29 @@ const createFormResolver = async (
     };
   }
 
-  const appendix2 = await validateGroupement(
-    formCreateInput,
-    grouping
-      ? grouping
-      : appendix2Forms
-      ? appendix2toFormFractions(appendix2Forms)
-      : null
-  );
+  const isGroupement = !!grouping || !!appendix2Forms;
+
+  const appendix2 = isGroupement
+    ? await validateGroupement(
+        formCreateInput,
+        grouping
+          ? grouping
+          : appendix2Forms
+          ? appendix2toFormFractions(appendix2Forms)
+          : []
+      )
+    : null;
 
   const newForm = await prisma.$transaction(async transaction => {
     const { create, setAppendix2 } = getFormRepository(user, transaction);
     const newForm = await create(formCreateInput);
-    await setAppendix2({
-      form: newForm,
-      appendix2,
-      currentAppendix2Forms: []
-    });
+    if (isGroupement) {
+      await setAppendix2({
+        form: newForm,
+        appendix2,
+        currentAppendix2Forms: []
+      });
+    }
     return newForm;
   });
 

@@ -1,5 +1,5 @@
 import { Form, Prisma } from "@prisma/client";
-import { ReadRepositoryFnDeps } from "../types";
+import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 export type FindUniqueFormFn = (
   where: Prisma.FormWhereUniqueInput,

@@ -1,5 +1,5 @@
 import { Bsdasri, Prisma } from "@prisma/client";
-import { ReadRepositoryFnDeps } from "../../../forms/repository/types";
+import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 type ChainableBsdasri = Pick<
   Prisma.Prisma__BsdasriClient<Bsdasri>,

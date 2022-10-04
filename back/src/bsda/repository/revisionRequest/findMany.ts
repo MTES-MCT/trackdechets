@@ -1,5 +1,5 @@
 import { BsdaRevisionRequest, Prisma } from "@prisma/client";
-import { ReadRepositoryFnDeps } from "../../../forms/repository/types";
+import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 export type FindManyBsdaRevisionRequestFn = (
   where: Prisma.BsdaRevisionRequestWhereInput,

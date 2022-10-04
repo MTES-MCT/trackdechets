@@ -1,5 +1,5 @@
+import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 import { FullForm } from "../../types";
-import { ReadRepositoryFnDeps } from "../types";
 
 export type FindFullFormByIdFn = (id: string) => Promise<FullForm>;
 

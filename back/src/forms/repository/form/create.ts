@@ -1,14 +1,17 @@
 import { Form, Prisma } from "@prisma/client";
+import {
+  LogMetadata,
+  RepositoryFnDeps
+} from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
-import { LogMetadata, RepositoryFnDeps } from "../types";
 
 export type CreateFormFn = (
   data: Prisma.FormCreateInput,
   logMetadata?: LogMetadata
 ) => Promise<Form>;
 
-const buildCreateForm: (deps: RepositoryFnDeps) => CreateFormFn =
-  deps => async (data, logMetadata?) => {
+export default function buildCreateForm(deps: RepositoryFnDeps): CreateFormFn {
+  return async (data, logMetadata?) => {
     const { prisma, user } = deps;
 
     const form = await prisma.form.create({ data });
@@ -37,5 +40,4 @@ const buildCreateForm: (deps: RepositoryFnDeps) => CreateFormFn =
     prisma.addAfterCommitCallback(() => enqueueBsdToIndex(form.readableId));
     return form;
   };
-
-export default buildCreateForm;
+}
