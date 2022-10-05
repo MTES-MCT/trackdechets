@@ -50,7 +50,8 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
       initialFormId: string;
       quantity: number;
     }[] = [];
-    appendix2.map(({ form: initialForm, quantity }) => {
+
+    for (const { form: initialForm, quantity } of appendix2) {
       if (currentAppendix2Forms.map(f => f.id).includes(initialForm.id)) {
         formGroupementToUpdate.push({
           initialFormId: initialForm.id,
@@ -63,7 +64,7 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
           quantity: quantity
         });
       }
-    });
+    }
 
     if (formGroupementToCreate.length > 0) {
       await prisma.formGroupement.createMany({
@@ -89,7 +90,7 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
           prisma.formGroupement.updateMany({
             where: {
               nextFormId: form.id,
-              initialFormId: initialFormId
+              initialFormId
             },
             data: { quantity }
           })
