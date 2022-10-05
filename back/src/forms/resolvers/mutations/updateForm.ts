@@ -29,6 +29,7 @@ import {
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
 import { appendix2toFormFractions } from "../../compat";
+import { runInTransaction } from "../../../common/repository/helper";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -254,7 +255,7 @@ const updateFormResolver = async (
       )
     : null;
 
-  const updatedForm = await prisma.$transaction(async transaction => {
+  const updatedForm = await runInTransaction(async transaction => {
     const { update, setAppendix2 } = getFormRepository(user, transaction);
     const updatedForm = await update({ id }, formUpdateInput);
     if (isGroupementUpdated) {

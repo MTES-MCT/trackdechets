@@ -24,6 +24,7 @@ import {
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
 import { appendix2toFormFractions } from "../../compat";
+import { runInTransaction } from "../../../common/repository/helper";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -146,7 +147,7 @@ const createFormResolver = async (
       )
     : null;
 
-  const newForm = await prisma.$transaction(async transaction => {
+  const newForm = await runInTransaction(async transaction => {
     const { create, setAppendix2 } = getFormRepository(user, transaction);
     const newForm = await create(formCreateInput);
     if (isGroupement) {

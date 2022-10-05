@@ -1,3 +1,4 @@
+import logger from "../../logging/logger";
 import prisma from "../../prisma";
 import { RepositoryFnBuilder, RepositoryTransaction } from "./types";
 
@@ -9,54 +10,48 @@ type RepositoryContext = {
 };
 
 /**
- * Provide a transaction if not provided
- * and add commit callback to prisma transaction
- * @param builder
- * @param context
+ * Wrapper to provide a transaction if not provided from context
  */
 export function transactionWrapper<FnResult>(
   builder: RepositoryFnBuilder<FnResult>,
-  context: RepositoryContext
+  { user, transaction }: RepositoryContext
 ) {
-  return async (...args) => {
-    const callbacks: Callback[] = [];
-
-    const result = context.transaction
-      ? await builder({
-          user: context.user,
-          prisma: {
-            ...context.transaction,
-            addAfterCommitCallback: callback => {
-              callbacks.push(callback);
-            }
-          }
-        })(...args)
-      : await runInTransaction(async transaction =>
-          builder({
-            user: context.user,
-            prisma: {
-              ...transaction,
-              addAfterCommitCallback: callback => {
-                callbacks.push(callback);
-              }
-            }
-          })(...args)
-        );
-
-    for (const callback of callbacks) {
-      try {
-        await callback();
-      } catch (err) {
-        console.error("Transaction callback error", err);
-      }
+  return (...args) => {
+    if (transaction) {
+      return builder({ user, prisma: transaction })(...args);
     }
 
-    return result;
+    return runInTransaction(newTransaction =>
+      builder({ user, prisma: newTransaction })(...args)
+    );
   };
 }
 
+/**
+ * Wrapper to run a function in transaction and add an `addAfterCommitCallback`
+ * to the transaction object
+ */
 export async function runInTransaction<F>(
   func: (transaction: RepositoryTransaction) => Promise<F>
 ) {
-  return prisma.$transaction(async transaction => func(transaction));
+  const callbacks: Callback[] = [];
+
+  const result = await prisma.$transaction(async transaction =>
+    func({
+      ...transaction,
+      addAfterCommitCallback: callback => {
+        callbacks.push(callback);
+      }
+    })
+  );
+
+  for (const callback of callbacks) {
+    try {
+      await callback();
+    } catch (err) {
+      logger.error("Transaction callback error", err);
+    }
+  }
+
+  return result;
 }

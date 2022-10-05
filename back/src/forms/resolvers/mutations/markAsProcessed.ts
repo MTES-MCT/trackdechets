@@ -11,6 +11,7 @@ import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
 import machine from "../../workflow/machine";
 import prisma from "../../../prisma";
+import { runInTransaction } from "../../../common/repository/helper";
 
 const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   parent,
@@ -73,7 +74,7 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
     form.id
   );
 
-  const processedForm = await prisma.$transaction(async transaction => {
+  const processedForm = await runInTransaction(async transaction => {
     const { updateAppendix2Forms, update } = getFormRepository(
       user,
       transaction

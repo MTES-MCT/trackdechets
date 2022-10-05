@@ -1,74 +1,57 @@
-import { Company } from "@prisma/client";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import prisma from "../../../prisma";
-import { userFactory } from "../../../__tests__/factories";
-import { transactionWrapper } from "../helper";
-import { RepositoryFnBuilder } from "../types";
+import { runInTransaction } from "../helper";
 
 describe("Repository.helper", () => {
   afterEach(resetDatabase);
 
   it("should run addAfterCommitCallbacks after transaction is comitted", async () => {
     expect.assertions(1);
+
     const siret = "1".padStart(14);
-
-    const user = await userFactory();
-
-    const buildCreateCompany: RepositoryFnBuilder<Company> =
-      deps => async () => {
-        deps.prisma.addAfterCommitCallback(async () => {
-          const companyCreatedInTransaction = await prisma.company.findUnique({
-            where: { siret }
-          });
-
-          expect(companyCreatedInTransaction.siret).toBe(siret);
+    await runInTransaction(transaction => {
+      transaction.addAfterCommitCallback(async () => {
+        const companyCreatedInTransaction = await prisma.company.findUnique({
+          where: { siret }
         });
 
-        return deps.prisma.company.create({
-          data: {
-            siret,
-            securityCode: 1,
-            verificationCode: "1111"
-          }
-        });
-      };
+        expect(companyCreatedInTransaction.siret).toBe(siret);
+      });
 
-    await transactionWrapper(buildCreateCompany, {
-      user
-    })();
+      return transaction.company.create({
+        data: {
+          siret,
+          securityCode: 1,
+          verificationCode: "1111"
+        }
+      });
+    });
   });
 
   it("should run all addAfterCommitCallbacks even if one fails", async () => {
     expect.assertions(1);
-    const user = await userFactory();
 
     const siret = "1".padStart(14);
+    await runInTransaction(transaction => {
+      transaction.addAfterCommitCallback(() => {
+        throw new Error("Callback throwing");
+      });
 
-    const buildCreateCompany: RepositoryFnBuilder<Company> =
-      deps => async () => {
-        deps.prisma.addAfterCommitCallback(() => {
-          throw new Error("Callback throwing");
+      transaction.addAfterCommitCallback(async () => {
+        const companyCreatedInTransaction = await prisma.company.findUnique({
+          where: { siret }
         });
 
-        deps.prisma.addAfterCommitCallback(async () => {
-          const companyCreatedInTransaction = await prisma.company.findUnique({
-            where: { siret }
-          });
+        expect(companyCreatedInTransaction.siret).toBe(siret);
+      });
 
-          expect(companyCreatedInTransaction.siret).toBe(siret);
-        });
-
-        return deps.prisma.company.create({
-          data: {
-            siret,
-            securityCode: 1,
-            verificationCode: "1111"
-          }
-        });
-      };
-
-    await transactionWrapper(buildCreateCompany, {
-      user
-    })();
+      return transaction.company.create({
+        data: {
+          siret,
+          securityCode: 1,
+          verificationCode: "1111"
+        }
+      });
+    });
   });
 });
