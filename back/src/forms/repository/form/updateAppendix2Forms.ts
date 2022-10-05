@@ -73,7 +73,10 @@ const buildUpdateAppendix2Forms: (
         type: EventType.MarkAsProcessed
       });
 
-      formUpdatesByStatus.set(status, [...formUpdatesByStatus.get(status), id]);
+      formUpdatesByStatus.set(status, [
+        ...(formUpdatesByStatus.get(status) ?? []),
+        id
+      ]);
     } else if (
       form.status === Status.AWAITING_GROUP &&
       nextStatus === Status.GROUPED
@@ -81,10 +84,13 @@ const buildUpdateAppendix2Forms: (
       const status = transitionForm(form, {
         type: EventType.MarkAsGrouped
       });
-      formUpdatesByStatus.set(status, [...formUpdatesByStatus.get(status), id]);
+      formUpdatesByStatus.set(status, [
+        ...(formUpdatesByStatus.get(status) ?? []),
+        id
+      ]);
     } else {
       formUpdatesByStatus.set(nextStatus, [
-        ...formUpdatesByStatus.get(nextStatus),
+        ...(formUpdatesByStatus.get(nextStatus) ?? []),
         id
       ]);
     }
