@@ -57,7 +57,7 @@ interface Values extends FormikValues {
  * This component allows to create a producer-lony company and make
  * the logged in user admin of it
  */
-export default function AccountCompanyAdd() {
+export default function AccountCompanyAddProducer() {
   const history = useHistory();
 
   // STATE
@@ -130,8 +130,6 @@ export default function AccountCompanyAdd() {
                 willManageDasris: false,
               }}
               validate={values => {
-                console.log(values);
-
                 return {
                   ...(!values.isAllowed && {
                     isAllowed:

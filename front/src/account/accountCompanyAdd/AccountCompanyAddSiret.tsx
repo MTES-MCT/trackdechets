@@ -221,8 +221,9 @@ export default function AccountCompanyAddSiret({
                         messageType={errors.siret ? "error" : ""}
                         message={errors.siret || ""}
                         onChange={e => {
+                          const siret = e.target.value.split(" ").join("");
                           setIsRegistered(false);
-                          setFieldValue("siret", e.target.value);
+                          setFieldValue("siret", siret);
                         }}
                         disabled={isDisabled}
                       />
