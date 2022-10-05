@@ -3,15 +3,17 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
-import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { GraphQLContext } from "../../../types";
+import { indexForm } from "../../elastic";
+import buildFindFullFormById from "./findFullFormById";
 
 export type CreateFormFn = (
   data: Prisma.FormCreateInput,
   logMetadata?: LogMetadata
 ) => Promise<Form>;
 
-export default function buildCreateForm(deps: RepositoryFnDeps): CreateFormFn {
-  return async (data, logMetadata?) => {
+const buildCreateForm: (deps: RepositoryFnDeps) => CreateFormFn =
+  deps => async (data, logMetadata?) => {
     const { prisma, user } = deps;
 
     const form = await prisma.form.create({ data });
@@ -37,7 +39,10 @@ export default function buildCreateForm(deps: RepositoryFnDeps): CreateFormFn {
       }
     });
 
-    prisma.addAfterCommitCallback(() => enqueueBsdToIndex(form.readableId));
+    const fullForm = await buildFindFullFormById(deps)(form.id);
+    await indexForm(fullForm, { user } as GraphQLContext);
+
     return form;
   };
-}
+
+export default buildCreateForm;
