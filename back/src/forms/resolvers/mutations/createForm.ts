@@ -21,7 +21,6 @@ import {
   validateGroupement,
   validateIntermediariesInput
 } from "../../validation";
-import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
 import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";

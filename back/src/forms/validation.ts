@@ -54,7 +54,7 @@ import {
   isOmi
 } from "../common/constants/companySearchHelpers";
 import { validateCompany } from "../companies/validateCompany";
-import Decimal from "decimal.js-light";
+import { Decimal } from "decimal.js-light";
 // set yup default error messages
 configureYup();
 

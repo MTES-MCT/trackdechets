@@ -7,7 +7,6 @@ import { receivedInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
 import { expandFormFromDb } from "../../converter";
 import { TemporaryStorageCannotReceive } from "../../errors";
-import prisma from "../../../prisma";
 
 import { getFormRepository } from "../../repository";
 import {

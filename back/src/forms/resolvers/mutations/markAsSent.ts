@@ -7,7 +7,6 @@ import { checkCanBeSealed, signingInfoSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
-import prisma from "../../../prisma";
 import { runInTransaction } from "../../../common/repository/helper";
 
 const markAsSentResolver: MutationResolvers["markAsSent"] = async (

@@ -1,7 +1,6 @@
 import { Status, WasteAcceptationStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { getFormOrFormNotFound } from "../../database";
 import { expandFormFromDb } from "../../converter";
 import { checkCanMarkAsAccepted } from "../../permissions";

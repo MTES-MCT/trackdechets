@@ -8,7 +8,6 @@ import { expandFormFromDb } from "../../converter";
 import { Prisma, WasteAcceptationStatus } from "@prisma/client";
 import { getFormRepository } from "../../repository";
 import { acceptedInfoSchema } from "../../validation";
-import prisma from "../../../prisma";
 import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
 import { sendMail } from "../../../mailer/mailing";
 import { runInTransaction } from "../../../common/repository/helper";
