@@ -1,4 +1,5 @@
 import { RepositoryTransaction } from "../../forms/repository/types";
+import logger from "../../logging/logger";
 import prisma from "../../prisma";
 
 export function transactionWrapper<Builder extends (args) => any>(
@@ -37,7 +38,7 @@ export async function runInTransaction<F>(
     try {
       await callback();
     } catch (err) {
-      console.error("Transaction callback error", err);
+      logger.error("Transaction callback error", err);
     }
   }
 

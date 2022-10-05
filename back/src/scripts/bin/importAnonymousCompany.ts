@@ -6,6 +6,7 @@ import * as yup from "yup";
 import prisma from "../../prisma";
 import { nafCodes } from "../../common/constants/NAF";
 import { readCsv } from "../../users/bulk-creation/loaders";
+import logger from "../../logging/logger";
 
 type AnonymousCompanyRow = {
   siret: string;
@@ -28,7 +29,7 @@ async function runImport() {
   try {
     await anonymousCompaniesSchema.validate(companies, { abortEarly: false });
   } catch (err) {
-    console.error(err.errors);
+    logger.error(err.errors);
     throw new Error(err.message);
   }
 
@@ -41,7 +42,7 @@ async function runImport() {
     c => !existingSirets.includes(c.siret)
   );
 
-  console.info(
+  logger.info(
     `Importing anonymous companies. Starting creation of the ${companiesToCreate.length} out of ${companies.length} missing companies.`
   );
 
@@ -53,13 +54,13 @@ async function runImport() {
           libelleNaf: nafCodes[company.codeNaf]
         }
       });
-      console.info(`Created ${company.siret}`);
+      logger.info(`Created ${company.siret}`);
     } catch (err) {
-      console.error(`Could not create company ${company.siret}`, err);
+      logger.error(`Could not create company ${company.siret}`, err);
     }
   }
 
-  console.info("Done, exiting.");
+  logger.info("Done, exiting.");
 }
 
 const anonymousCompanySchema = yup.object({

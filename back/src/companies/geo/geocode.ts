@@ -1,4 +1,5 @@
 import axios from "axios";
+import logger from "../../logging/logger";
 
 const API_ADRESSE_URL = "https://api-adresse.data.gouv.fr/search/";
 
@@ -31,7 +32,7 @@ export default async function geocode(address: string): Promise<GeoInfo> {
       }
     }
   } catch (_) {
-    console.log(`Error while trying to geocode address ${address}`);
+    logger.error(`Error while trying to geocode address ${address}`);
   }
   return { longitude: null, latitude: null };
 }

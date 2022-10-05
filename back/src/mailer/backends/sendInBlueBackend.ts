@@ -1,6 +1,7 @@
 import { Mail, Contact } from "../types";
 import axios from "axios";
 import * as Sentry from "@sentry/node";
+import logger from "../../logging/logger";
 
 const {
   SIB_APIKEY,
@@ -51,7 +52,7 @@ const sendInBlueBackend = {
       .then(() => {
         const allRecipients = [...mail.to, ...(!!mail.cc ? mail.cc : [])];
         for (const recipient of allRecipients) {
-          console.log(
+          logger.info(
             `Mail sent via SIB to ${recipient.email} - Subject: ${mail.subject}`
           );
         }
@@ -65,7 +66,7 @@ const sendInBlueBackend = {
             }
           });
         } else {
-          console.log(err);
+          logger.error(err);
         }
       });
   },
@@ -82,10 +83,10 @@ const sendInBlueBackend = {
     );
     req
       .then(() => {
-        console.log(`Contact created on SIB: ${contact.email}`);
+        logger.info(`Contact created on SIB: ${contact.email}`);
       })
       .catch(err => {
-        console.log(err);
+        logger.error(err);
       });
   }
 };

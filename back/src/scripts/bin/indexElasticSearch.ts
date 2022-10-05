@@ -2,6 +2,7 @@ import { indexElasticSearch } from "./indexElasticSearch.helpers";
 import { index } from "../../common/elastic";
 import { closeQueues } from "../../queue/producers";
 import { BsdType } from "../../generated/graphql/types";
+import logger from "../../logging/logger";
 const bsdTypes: BsdType[] = ["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"];
 
 (async function () {
@@ -15,11 +16,11 @@ const bsdTypes: BsdType[] = ["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"];
 
   try {
     if (bsdTypesToIndex.length > 1) {
-      console.error("You can only specify one bsd type to index");
+      logger.error("You can only specify one bsd type to index");
       return;
     }
     if (!!bsdTypesToIndex.length && !force) {
-      console.error(
+      logger.error(
         "When you specify a bsd type, you must pass the -f argument to reindex in place"
       );
       return;
@@ -28,7 +29,7 @@ const bsdTypes: BsdType[] = ["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"];
 
     await indexElasticSearch({ force, index, bsdTypeToIndex });
   } catch (error) {
-    console.error("ES indexation failed, error:", error);
+    logger.error("ES indexation failed, error:", error);
   } finally {
     await closeQueues();
   }

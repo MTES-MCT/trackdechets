@@ -1,4 +1,5 @@
 import axios from "axios";
+import logger from "../../logging/logger";
 
 const GEO_API_BASE_URL = "https://geo.api.gouv.fr";
 
@@ -12,7 +13,7 @@ export async function getDepartement(codeCommune: string) {
     );
     return res.data.codeDepartement;
   } catch (_) {
-    console.error(
+    logger.error(
       `Error while trying to retrieve departement for commune: "${codeCommune}"`
     );
   }
