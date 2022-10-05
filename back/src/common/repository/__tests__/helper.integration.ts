@@ -1,6 +1,6 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
 import prisma from "../../../prisma";
-import { runInTransaction } from "../../../common/repository/helper";
+import { runInTransaction } from "../helper";
 
 describe("Repository.helper", () => {
   afterEach(resetDatabase);

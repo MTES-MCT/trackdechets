@@ -1,5 +1,8 @@
 import { BsddRevisionRequest, Prisma } from "@prisma/client";
-import { LogMetadata, RepositoryFnDeps } from "../types";
+import {
+  LogMetadata,
+  RepositoryFnDeps
+} from "../../../common/repository/types";
 
 export type CancelRevisionRequestFn = (
   where: Prisma.BsddRevisionRequestWhereUniqueInput,

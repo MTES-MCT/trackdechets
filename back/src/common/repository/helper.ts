@@ -1,11 +1,20 @@
-import { RepositoryTransaction } from "../../forms/repository/types";
 import logger from "../../logging/logger";
 import prisma from "../../prisma";
+import { RepositoryFnBuilder, RepositoryTransaction } from "./types";
 
-export function transactionWrapper<Builder extends (args) => any>(
-  user: Express.User,
-  transaction: RepositoryTransaction | undefined,
-  builder: Builder
+type Callback = Parameters<RepositoryTransaction["addAfterCommitCallback"]>[0];
+
+type RepositoryContext = {
+  user: Express.User;
+  transaction?: RepositoryTransaction;
+};
+
+/**
+ * Wrapper to provide a transaction if not provided from context
+ */
+export function transactionWrapper<FnResult>(
+  builder: RepositoryFnBuilder<FnResult>,
+  { user, transaction }: RepositoryContext
 ) {
   return (...args) => {
     if (transaction) {
@@ -18,8 +27,10 @@ export function transactionWrapper<Builder extends (args) => any>(
   };
 }
 
-type Callback = Parameters<RepositoryTransaction["addAfterCommitCallback"]>[0];
-
+/**
+ * Wrapper to run a function in transaction and add an `addAfterCommitCallback`
+ * to the transaction object
+ */
 export async function runInTransaction<F>(
   func: (transaction: RepositoryTransaction) => Promise<F>
 ) {

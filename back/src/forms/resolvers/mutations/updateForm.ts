@@ -1,4 +1,4 @@
-import { Form, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { isDangerous, BSDD_WASTE_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -23,11 +23,13 @@ import { FormCompanies } from "../../types";
 import {
   draftFormSchema,
   sealedFormSchema,
+  validateGroupement,
   validateIntermediariesInput
 } from "../../validation";
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
-import { Decimal } from "decimal.js-light";
+import { appendix2toFormFractions } from "../../compat";
+import { runInTransaction } from "../../../common/repository/helper";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -74,15 +76,16 @@ const updateFormResolver = async (
   await checkCanUpdate(user, existingForm);
 
   const form = flattenFormInput(formContent);
+  const futureForm = { ...existingForm, ...form };
 
   // Construct form update payload
   const formUpdateInput: Prisma.FormUpdateInput = form;
 
   // Validate form input
   if (existingForm.status === "DRAFT") {
-    await draftFormSchema.validate({ ...existingForm, ...formUpdateInput });
+    await draftFormSchema.validate(futureForm);
   } else {
-    await sealedFormSchema.validate({ ...existingForm, ...formUpdateInput });
+    await sealedFormSchema.validate(futureForm);
   }
 
   const isOrWillBeTempStorage =
@@ -216,10 +219,13 @@ const updateFormResolver = async (
     };
   }
 
-  let appendix2: { quantity: number; form: Form }[] = null;
+  const existingFormFractions = await prisma.form
+    .findUnique({ where: { id: existingForm.id } })
+    .grouping({ include: { initialForm: true } });
 
-  const { findAppendix2FormsById } = getFormRepository(user);
-  const existingAppendix2Forms = await findAppendix2FormsById(existingForm.id);
+  const existingAppendix2Forms = existingFormFractions.map(
+    ({ initialForm }) => initialForm
+  );
 
   if (existingAppendix2Forms?.length) {
     const updatedSiret = formUpdateInput?.emitterCompanySiret;
@@ -229,39 +235,36 @@ const updateFormResolver = async (
       );
     }
   }
-  if (grouping) {
-    appendix2 = await Promise.all(
-      grouping.map(async ({ form, quantity }) => {
-        const foundForm = await getFormOrFormNotFound(form);
-        return {
-          form: foundForm,
-          quantity:
-            quantity ??
-            new Decimal(foundForm.quantityReceived)
-              .minus(foundForm.quantityGrouped)
-              .toNumber()
-        };
-      })
-    );
-  } else if (appendix2Forms) {
-    appendix2 = await Promise.all(
-      appendix2Forms.map(async ({ id }) => {
-        const initialForm = await getFormOrFormNotFound({ id });
-        return {
-          form: initialForm,
-          quantity: initialForm.quantityReceived
-        };
-      })
-    );
-  }
 
-  const updatedForm = await prisma.$transaction(async transaction => {
+  const isGroupementUpdated =
+    !!grouping ||
+    !!appendix2Forms ||
+    futureForm.emitterType !== existingForm.emitterType;
+
+  const appendix2 = isGroupementUpdated
+    ? await validateGroupement(
+        futureForm,
+        grouping
+          ? grouping
+          : appendix2Forms
+          ? appendix2toFormFractions(appendix2Forms)
+          : existingFormFractions.map(({ quantity, initialFormId }) => ({
+              form: { id: initialFormId },
+              quantity
+            }))
+      )
+    : null;
+
+  const updatedForm = await runInTransaction(async transaction => {
     const { update, setAppendix2 } = getFormRepository(user, transaction);
     const updatedForm = await update({ id }, formUpdateInput);
-    await setAppendix2({
-      form: updatedForm,
-      appendix2
-    });
+    if (isGroupementUpdated) {
+      await setAppendix2({
+        form: updatedForm,
+        appendix2,
+        currentAppendix2Forms: existingAppendix2Forms
+      });
+    }
     return updatedForm;
   });
 

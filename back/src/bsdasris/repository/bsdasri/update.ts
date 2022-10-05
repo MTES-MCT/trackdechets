@@ -1,5 +1,8 @@
 import { Bsdasri, Prisma } from "@prisma/client";
-import { LogMetadata, RepositoryFnDeps } from "../../../forms/repository/types";
+import {
+  LogMetadata,
+  RepositoryFnDeps
+} from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
 
 export type UpdateBsdasriFn = (

@@ -1116,11 +1116,15 @@ describe("Mutation.createForm", () => {
     "should disallow linking an appendix 2 form if the emitter of the regroupement" +
       " form is not the recipient of the initial form (using CreateFormInput.appendix2Forms)",
     async () => {
+      const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
       const appendix2 = await formFactory({
         ownerId: (await userFactory()).id,
-        opt: { status: Status.AWAITING_GROUP }
+        opt: {
+          status: Status.AWAITING_GROUP,
+          quantityReceived: 1
+        }
       });
-      const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
 
       const createFormInput = {
         emitter: {
@@ -1204,7 +1208,7 @@ describe("Mutation.createForm", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le bordereau ${appendix2.id} n'est pas en attente de regroupement`
+        message: `Les BSDD initiaux ${appendix2.id} n'existent pas ou ne sont pas en attente de regroupement`
       })
     ]);
   });
@@ -1237,7 +1241,7 @@ describe("Mutation.createForm", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le bordereau ${appendix2.id} n'est pas en attente de regroupement`
+        message: `Les BSDD initiaux ${appendix2.id} n'existent pas ou ne sont pas en attente de regroupement`
       })
     ]);
   });
@@ -1265,7 +1269,7 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+          "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
       })
     ]);
   });
@@ -1299,7 +1303,7 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+          "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
       })
     ]);
   });
@@ -1544,6 +1548,7 @@ describe("Mutation.createForm", () => {
       variables: {
         createFormInput: {
           emitter: {
+            type: "APPENDIX2",
             company: { siret: company.siret }
           },
           // let's throw an error in appendix2 association that happens
@@ -1555,7 +1560,8 @@ describe("Mutation.createForm", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le bordereau avec l'identifiant "does-not-exist" n'existe pas.`
+        message:
+          "Les BSDD initiaux does-not-exist n'existent pas ou ne sont pas en attente de regroupement"
       })
     ]);
 

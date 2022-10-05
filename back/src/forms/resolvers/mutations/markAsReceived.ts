@@ -7,7 +7,6 @@ import { receivedInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
 import { expandFormFromDb } from "../../converter";
 import { TemporaryStorageCannotReceive } from "../../errors";
-import prisma from "../../../prisma";
 
 import { getFormRepository } from "../../repository";
 import {
@@ -18,6 +17,7 @@ import {
 } from "@prisma/client";
 import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
 import { sendMail } from "../../../mailer/mailing";
+import { runInTransaction } from "../../../common/repository/helper";
 
 const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   parent,
@@ -67,7 +67,7 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
         currentTransporterSiret: ""
       };
 
-  const receivedForm = await prisma.$transaction(async transaction => {
+  const receivedForm = await runInTransaction(async transaction => {
     const formRepository = getFormRepository(user, transaction);
     const receivedForm = await formRepository.update(
       { id: form.id },
