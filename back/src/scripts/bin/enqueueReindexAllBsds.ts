@@ -1,5 +1,6 @@
 import logger from "../../logging/logger";
 import prisma from "../../prisma";
+import { closeQueues } from "../../queue/producers";
 import { enqueueAllBsdToIndex } from "../../queue/producers/elastic";
 
 const { STARTUP_FILE } = process.env;
@@ -9,10 +10,10 @@ function doubleLog(msg) {
   logger.info(msg);
 }
 
-async function exitScript(exitCode: number) {
+async function exitScript() {
   doubleLog("Done enqueueReindexAllBsd script, exiting");
   await prisma.$disconnect();
-  process.exit(exitCode);
+  await closeQueues();
 }
 
 (async function () {
@@ -20,18 +21,16 @@ async function exitScript(exitCode: number) {
     doubleLog(
       "Abort index all BSDs because not in the api deployment, exiting"
     );
-    await exitScript(0);
     return;
   }
   // launch reindex all job in the queue
   await enqueueAllBsdToIndex({
     // insert as first in the queue
     lifo: true,
-    // 4h
+    // 4h is arbitrary
     timeout: 1000 * 60 * 60 * 4,
     // more debug info
     stackTraceLimit: 100
   });
-  await exitScript(1);
-  return;
+  await exitScript();
 })();

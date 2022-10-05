@@ -12,10 +12,10 @@ function doubleLog(msg: string, err?: any) {
   logger.info(msg, err);
 }
 
-async function exitScript(exitCode: number) {
+async function exitScript() {
   doubleLog("Finished indexElasticSearch script, exiting");
   await prisma.$disconnect();
-  process.exit(exitCode);
+  await closeQueues();
 }
 
 (async function () {
@@ -33,11 +33,9 @@ async function exitScript(exitCode: number) {
 
     const bsdTypeToIndex = bsdTypesToIndex[0];
     await indexElasticSearch({ force, index, bsdTypeToIndex });
-    await exitScript(1);
   } catch (error) {
     doubleLog("ES indexation failed, error:", error);
-    await exitScript(0);
   } finally {
-    await closeQueues();
+    await exitScript();
   }
 })();
