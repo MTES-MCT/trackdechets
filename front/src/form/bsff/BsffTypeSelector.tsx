@@ -24,7 +24,7 @@ const options = [
   },
   {
     value: BsffType.Reconditionnement,
-    label: "Une installation le cadre d'un reconditionnement",
+    label: "Une installation dans le cadre d'un reconditionnement",
   },
   {
     value: BsffType.Reexpedition,

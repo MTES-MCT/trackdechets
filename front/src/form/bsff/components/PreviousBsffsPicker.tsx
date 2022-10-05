@@ -86,13 +86,16 @@ export function PreviousBsffsPicker({
       ? "Retrouvez ci-dessous la liste des BSFFs qui sont en attente d'une réexpédition."
       : "";
 
-  const { data } = useQuery<Pick<Query, "bsffs">, QueryBsffsArgs>(
+  const { data, loading } = useQuery<Pick<Query, "bsffs">, QueryBsffsArgs>(
     GET_PREVIOUS_BSFFS,
     {
       variables: {
         where: {
           status: { _eq: BsffStatus.IntermediatelyProcessed },
           destination: {
+            company: {
+              siret: { _eq: bsff.emitter?.company?.siret },
+            },
             operation: {
               code: { _in: code_in },
             },
@@ -103,71 +106,79 @@ export function PreviousBsffsPicker({
       },
       // make sure we have fresh data here
       fetchPolicy: "cache-and-network",
+      skip: !bsff.emitter?.company?.siret?.length,
     }
   );
   const [{ value: previousBsffs }] = useField<Bsff[]>("previousBsffs");
 
-  if (data == null) {
+  if (loading) {
     return <Loader />;
   }
 
-  // remove bsffs that have already been grouped, forwarded or repackaged
-  const pickableBsffs = data.bsffs.edges
-    .map(({ node: bsff }) => bsff)
-    .filter(initialBsff => {
-      if (initialBsff.groupedIn && initialBsff.groupedIn.id !== bsff.id) {
-        return false;
-      }
-      if (initialBsff.repackagedIn && initialBsff.repackagedIn.id !== bsff.id) {
-        return false;
-      }
-      if (initialBsff.forwardedIn && initialBsff.forwardedIn.id !== bsff.id) {
-        return false;
-      }
-      return true;
-    });
-
-  if (!pickableBsffs?.length) {
-    return (
-      <div>
-        {`Aucune BSFF éligible pour ${
-          bsff.type === BsffType.Groupement
-            ? "un regroupement"
-            : bsff.type === BsffType.Reconditionnement
-            ? "un reconditionnement"
-            : bsff.type === BsffType.Reexpedition
-            ? "une réexpédition"
-            : ""
+  if (data) {
+    // remove bsffs that have already been grouped, forwarded or repackaged
+    const pickableBsffs = data.bsffs.edges
+      .map(({ node: bsff }) => bsff)
+      .filter(initialBsff => {
+        if (initialBsff.groupedIn && initialBsff.groupedIn.id !== bsff.id) {
+          return false;
         }
-        `}
+        if (
+          initialBsff.repackagedIn &&
+          initialBsff.repackagedIn.id !== bsff.id
+        ) {
+          return false;
+        }
+        if (initialBsff.forwardedIn && initialBsff.forwardedIn.id !== bsff.id) {
+          return false;
+        }
+        return true;
+      });
+
+    if (!pickableBsffs?.length) {
+      return (
+        <div>
+          {`Aucune BSFF éligible pour ${
+            bsff.type === BsffType.Groupement
+              ? "un regroupement"
+              : bsff.type === BsffType.Reconditionnement
+              ? "un reconditionnement"
+              : bsff.type === BsffType.Reexpedition
+              ? "une réexpédition"
+              : ""
+          }
+          `}
+        </div>
+      );
+    }
+
+    return (
+      <div style={{ padding: "1rem 0" }}>
+        <p style={{ marginBottom: "0.25rem" }}>{instruction}</p>
+        <FieldArray
+          name="previousBsffs"
+          render={({ push, remove }) => (
+            <BsffTable
+              columns={columns}
+              data={pickableBsffs}
+              selected={previousBsffs}
+              push={bsff => {
+                push(bsff);
+                onAddOrRemove();
+              }}
+              remove={idx => {
+                remove(idx);
+                onAddOrRemove();
+              }}
+              bsffType={bsff.type}
+            />
+          )}
+        />
       </div>
     );
   }
 
-  return (
-    <div style={{ padding: "1rem 0" }}>
-      <p style={{ marginBottom: "0.25rem" }}>{instruction}</p>
-      <FieldArray
-        name="previousBsffs"
-        render={({ push, remove }) => (
-          <BsffTable
-            columns={columns}
-            data={pickableBsffs}
-            selected={previousBsffs}
-            push={bsff => {
-              push(bsff);
-              onAddOrRemove();
-            }}
-            remove={idx => {
-              remove(idx);
-              onAddOrRemove();
-            }}
-            bsffType={bsff.type}
-          />
-        )}
-      />
-    </div>
-  );
+  return <div>Aucun établissement émetteur sélectionné</div>;
 }
 
 // Define a default UI for filtering
@@ -275,7 +286,7 @@ function BsffTable({
                     selected.length >= 1
                   ) {
                     window.alert(
-                      `Vous ne pouvez sélectionner qu'un seul BSFF intitial dans le cadre d'une réexpédition`
+                      `Vous ne pouvez sélectionner qu'un seul BSFF initial dans le cadre d'une réexpédition`
                     );
                     return;
                   }
