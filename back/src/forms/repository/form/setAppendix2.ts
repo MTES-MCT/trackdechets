@@ -45,7 +45,11 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
     });
 
     // update or create new appendix2
-    const formGroupementToCreate = [];
+    const formGroupementToCreate: {
+      nextFormId: string;
+      initialFormId: string;
+      quantity: number;
+    }[] = [];
     const formGroupementToUpdate: {
       initialFormId: string;
       quantity: number;
