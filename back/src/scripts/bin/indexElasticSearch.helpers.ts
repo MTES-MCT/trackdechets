@@ -1,5 +1,4 @@
 import type { ApiResponse } from "@elastic/elasticsearch";
-import isequal from "lodash.isequal";
 import logger from "../../logging/logger";
 import { client, indexAllBsds, BsdIndex } from "../../common/elastic";
 import { BsdType } from "../../generated/graphql/types";
@@ -30,9 +29,10 @@ const getIndexDateString = (dateStr?: string) => {
 };
 
 /**
- * Convert index date version name to Date object
+ * Convert index name to the Date object of its creation time
  */
 const getIndexDateFromName = (indexName: string): Date => {
+  // Datetime is the last fragment in the index name
   const indexDateString = indexName.split(INDEX_ALIAS_NAME_SEPARATOR).pop();
   return new Date(
     indexDateString
@@ -40,11 +40,20 @@ const getIndexDateFromName = (indexName: string): Date => {
       .replace(new RegExp(INDEX_DATETIME_SEPARATOR, "g"), ":")
   );
 };
+
+/**
+ * Convert index name to the mappings version name
+ */
+const getIndexMappingsVersionFromName = (indexName: string): string =>
+  indexName.split(INDEX_ALIAS_NAME_SEPARATOR)[1];
+
 /**
  * Build a codified index name
  */
 const getIndexName = (index: BsdIndex, dateStr?: string): string =>
   `${index.alias}${INDEX_ALIAS_NAME_SEPARATOR}${
+    index.mappings_version
+  }${INDEX_ALIAS_NAME_SEPARATOR}${
     process.env.NODE_ENV ? process.env.NODE_ENV : "dev"
   }${INDEX_ALIAS_NAME_SEPARATOR}${getIndexDateString(dateStr)}`;
 
@@ -129,12 +138,9 @@ export const attachNewIndexAndcleanOldIndexes = async (
 };
 
 /**
- * Detect mappings changes using _.isEqual()
+ * Detect mappings changes the declared version
  */
 async function isIndexMappingsChanged(index: BsdIndex): Promise<boolean> {
-  const { body } = await client.indices.getMapping({
-    index: index.alias
-  });
   const aliases: ApiResponse<Array<{ index: string }>> =
     await client.cat.aliases({
       name: index.alias,
@@ -146,28 +152,40 @@ async function isIndexMappingsChanged(index: BsdIndex): Promise<boolean> {
     return true;
   }
 
-  const mostRecentIndex: Date = aliases?.body
+  const mostRecentIndexDateAndVersion: {
+    date: Date;
+    mappings_version: string;
+  } = aliases?.body
     .map(info => info.index)
-    .map((name: string) => getIndexDateFromName(name))
-    .sort()
+    .map((name: string) => ({
+      date: getIndexDateFromName(name),
+      mappings_version: getIndexMappingsVersionFromName(name)
+    }))
+    .sort((a, b) => {
+      if (a.date === b.date) {
+        return 0;
+      }
+      if (a.date < b.date) {
+        return -1;
+      } else {
+        return 1;
+      }
+    })
     .reverse()[0];
 
-  const mostRecentIndexName = getIndexName(index, mostRecentIndex.toJSON());
-  const mostRecentMappings =
-    body[mostRecentIndexName].mappings?._doc?.properties;
-  if (isequal(mostRecentMappings, index.mappings.properties)) {
+  if (
+    mostRecentIndexDateAndVersion?.mappings_version &&
+    getIndexMappingsVersionFromName(
+      mostRecentIndexDateAndVersion.mappings_version
+    ) === index.mappings_version
+  ) {
     logger.info(
-      `No changes detected in index "${index.alias}" mappings.`,
-      index.mappings.properties
+      `No mappings version change was detected for index "${index.alias}".`
     );
     return false;
   } else {
     logger.info(
-      `Changes detected in index "${index.alias}" mapping has changed.`,
-      {
-        newIndexMappings: index.mappings.properties,
-        [mostRecentIndexName]: mostRecentMappings
-      }
+      `Mappings version change has been detected for index "${index.alias}".`
     );
     return true;
   }

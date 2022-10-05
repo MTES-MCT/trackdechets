@@ -117,7 +117,9 @@ function getWhere(
 /**
  * Convert a dasri from the bsdasri table to Elastic Search's BSD model.
  */
-export function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
+export function toBsdElastic(
+  bsdasri: Bsdasri
+): Omit<BsdElastic, "es_mappings_version"> {
   const where = getWhere(bsdasri);
 
   return {

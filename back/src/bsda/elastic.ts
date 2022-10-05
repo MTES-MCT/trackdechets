@@ -127,7 +127,9 @@ function getWhere(
   return where;
 }
 
-export function toBsdElastic(bsda: Bsda): BsdElastic {
+export function toBsdElastic(
+  bsda: Bsda
+): Omit<BsdElastic, "es_mappings_version"> {
   const where = getWhere(bsda);
 
   return {

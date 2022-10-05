@@ -201,7 +201,9 @@ function getRecipient(form: FullForm) {
 /**
  * Convert a BSD from the forms table to Elastic Search's BSD model.
  */
-function toBsdElastic(form: FullForm & { forwarding?: Form }): BsdElastic {
+function toBsdElastic(
+  form: FullForm & { forwarding?: Form }
+): Omit<BsdElastic, "es_mappings_version"> {
   const siretsByTab = getSiretsByTab(form);
   const recipient = getRecipient(form);
 

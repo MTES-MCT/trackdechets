@@ -96,7 +96,6 @@
     "helmet": "^4.6.0",
     "ioredis": "^4.28.0",
     "jsvat": "^2.5.3",
-    "lodash.isequal": "^4.5.0",
     "minimist": "^1.2.5",
     "mustache": "^4.2.0",
     "oauth2orize": "^1.11.0",

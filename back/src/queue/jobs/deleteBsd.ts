@@ -4,7 +4,9 @@ import { toBsdElastic as toBsdasriElastic } from "../../bsdasris/elastic";
 import { BsdElastic, deleteBsd } from "../../common/elastic";
 import prisma from "../../prisma";
 
-export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
+export async function deleteBsdJob(
+  job: Job<string>
+): Promise<Omit<BsdElastic, "es_mappings_version">> {
   const bsdId = job.data;
 
   await deleteBsd({ id: bsdId });

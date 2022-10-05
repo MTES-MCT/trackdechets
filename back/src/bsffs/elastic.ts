@@ -8,7 +8,7 @@ import logger from "../logging/logger";
 
 export function toBsdElastic(
   bsff: Bsff & { packagings: BsffPackaging[] }
-): BsdElastic {
+): Omit<BsdElastic, "es_mappings_version"> {
   const bsd = {
     type: "BSFF" as const,
     id: bsff.id,

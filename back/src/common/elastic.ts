@@ -66,6 +66,7 @@ export interface BsdElastic {
   isManagedWasteFor: string[];
 
   rawBsd: any;
+  es_mappings_version: string;
 }
 
 // Custom analyzers for readableId and waste fields
@@ -345,13 +346,16 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
     type: "object",
     // store, do not index
     enabled: false
-  }
+  },
+  // internal ES mappings version number
+  es_mappings_version: { type: "keyword" }
 };
 
 export type BsdIndex = {
   alias: string;
   type: string;
   settings: typeof settings;
+  mappings_version: string;
   mappings: {
     properties: typeof properties;
   };
@@ -363,6 +367,9 @@ export const index: BsdIndex = {
   // so while it's required for the current version, we are not using it too much
   type: "_doc",
   settings,
+  // increment when mapping has changed to rpovoque reindexation on release
+  // only use v[0-9]+, no special characters not supported by ES index names
+  mappings_version: "v1",
   mappings: {
     properties
   }
@@ -453,13 +460,20 @@ function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
 /**
  * Create/update a document in Elastic Search.
  */
-export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
+export function indexBsd(
+  bsd: Omit<BsdElastic, "es_mappings_version">,
+  ctx?: GraphQLContext
+) {
   logger.info(`Indexing BSD ${bsd.id}`);
   return client.index({
     index: index.alias,
     type: index.type,
     id: bsd.id,
-    body: bsd,
+    body: {
+      ...bsd,
+      // inject ES mappings version number
+      es_mappings_version: index.mappings_version
+    },
     version_type: "external_gte",
     version: bsd.updatedAt,
     ...refresh(ctx)
@@ -469,7 +483,10 @@ export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
 /**
  * Bulk create/update a list of documents in Elastic Search.
  */
-export function indexBsds(idx: string, bsds: BsdElastic[]) {
+export function indexBsds(
+  idx: string,
+  bsds: Array<Omit<BsdElastic, "es_mappings_version">>
+) {
   return client.bulk({
     body: bsds.flatMap(bsd => [
       {
@@ -479,7 +496,11 @@ export function indexBsds(idx: string, bsds: BsdElastic[]) {
           _id: bsd.id
         }
       },
-      bsd
+      {
+        ...bsd,
+        // inject ES mappings version number
+        es_mappings_version: index.mappings_version
+      }
     ])
   });
 }

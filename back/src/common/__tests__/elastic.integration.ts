@@ -6,7 +6,7 @@ import getReadableId from "../../forms/readableId";
 import { BsdType } from "../../generated/graphql/types";
 import { BsdElastic, client, index, indexBsds } from "../elastic";
 
-const defaultOpts: BsdElastic = {
+const defaultOpts: Omit<BsdElastic, "es_mappings_version"> = {
   id: "id",
   readableId: "readableId",
   customId: null,
@@ -44,7 +44,7 @@ const defaultOpts: BsdElastic = {
 
 describe("readableId analyzer", () => {
   beforeAll(async () => {
-    const bsds: BsdElastic[] = [
+    const bsds: Array<Omit<BsdElastic, "es_mappings_version">> = [
       {
         id: "BSD-20211004-KU76G98FR",
         type: "BSDD" as BsdType
@@ -176,7 +176,11 @@ describe("waste.ngram analyzer", () => {
   const waste3 = "10 01 05*";
 
   beforeAll(async () => {
-    const bsds: BsdElastic[] = [waste1, waste2, waste3].map(wasteCode => {
+    const bsds: Array<Omit<BsdElastic, "es_mappings_version">> = [
+      waste1,
+      waste2,
+      waste3
+    ].map(wasteCode => {
       const id = getReadableId();
       return {
         ...defaultOpts,
@@ -263,7 +267,11 @@ describe("waste text analyzer", () => {
   const waste3 = "désulfuration gaz";
 
   beforeAll(async () => {
-    const bsds: BsdElastic[] = [waste1, waste2, waste3].map(waste => {
+    const bsds: Array<Omit<BsdElastic, "es_mappings_version">> = [
+      waste1,
+      waste2,
+      waste3
+    ].map(waste => {
       const id = getReadableId();
       return {
         ...defaultOpts,
@@ -322,14 +330,16 @@ describe("transporterNumberPlate analyzer", () => {
   const plates = ["GT-086-HY", "GT-022-VC", "AD-022-DA"];
 
   beforeAll(async () => {
-    const bsds: BsdElastic[] = plates.map(plate => {
-      const id = getReadableId();
-      return {
-        ...defaultOpts,
-        id,
-        transporterNumberPlate: [plate]
-      };
-    });
+    const bsds: Array<Omit<BsdElastic, "es_mappings_version">> = plates.map(
+      plate => {
+        const id = getReadableId();
+        return {
+          ...defaultOpts,
+          id,
+          transporterNumberPlate: [plate]
+        };
+      }
+    );
 
     await indexBsds(index.alias, bsds);
     await refreshElasticSearch();
