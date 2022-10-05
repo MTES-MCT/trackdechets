@@ -1360,6 +1360,8 @@ export function validateIntermediariesInput(
   );
 }
 
+const BSDD_MAX_APPENDIX2 = parseInt(process.env.BSDD_MAX_APPENDIX2, 10) || 250;
+
 /**
  * Les vérifications suivantes sont effectuées :
  * - Vérifie que le type d'émetteur est compatible avec le groupement
@@ -1375,6 +1377,12 @@ export async function validateGroupement(
 ) {
   if (!grouping || grouping?.length === 0) {
     return [];
+  }
+
+  if (grouping.length > BSDD_MAX_APPENDIX2) {
+    throw new UserInputError(
+      `Vous ne pouvez pas regrouper plus de ${BSDD_MAX_APPENDIX2} BSDDs initiaux`
+    );
   }
 
   if (form.emitterType !== EmitterType.APPENDIX2) {

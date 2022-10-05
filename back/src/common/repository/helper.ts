@@ -9,6 +9,10 @@ type RepositoryContext = {
   transaction?: RepositoryTransaction;
 };
 
+// See https://www.prisma.io/docs/concepts/components/prisma-client/transactions#interactive-transactions-in-preview
+const PRISMA_TRANSACTION_TIMEOUT =
+  parseInt(process.env.PRISMA_TRANSACTION_TIMEOUT, 10) || 5000;
+
 /**
  * Wrapper to provide a transaction if not provided from context
  */
@@ -36,13 +40,15 @@ export async function runInTransaction<F>(
 ) {
   const callbacks: Callback[] = [];
 
-  const result = await prisma.$transaction(async transaction =>
-    func({
-      ...transaction,
-      addAfterCommitCallback: callback => {
-        callbacks.push(callback);
-      }
-    })
+  const result = await prisma.$transaction(
+    async transaction =>
+      func({
+        ...transaction,
+        addAfterCommitCallback: callback => {
+          callbacks.push(callback);
+        }
+      }),
+    { timeout: PRISMA_TRANSACTION_TIMEOUT }
   );
 
   for (const callback of callbacks) {
