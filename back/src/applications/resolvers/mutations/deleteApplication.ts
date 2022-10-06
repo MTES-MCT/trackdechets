@@ -4,6 +4,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { getApplicationOrApplicationNotFound } from "../../database";
+import { updateManyAccessToken } from "../../../users/database";
 
 const deleteApplicationResolver: MutationResolvers["deleteApplication"] =
   async (_, { id }, context) => {
@@ -20,7 +21,7 @@ const deleteApplicationResolver: MutationResolvers["deleteApplication"] =
       );
     }
 
-    await prisma.accessToken.updateMany({
+    await updateManyAccessToken({
       where: { applicationId: existingApplication.id },
       data: { isRevoked: true }
     });

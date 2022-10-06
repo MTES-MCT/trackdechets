@@ -23,6 +23,8 @@ import {
   sanitizeEmail,
   hashToken
 } from "./utils";
+import { redisClient, generateKey } from "./common/redis";
+import { updateAccessToken } from "./users/database";
 
 // Set specific type for req.user
 declare global {
@@ -122,7 +124,7 @@ export function updateAccessTokenLastUsed(accessToken: AccessToken) {
     !accessToken.lastUsed ||
     daysBetween(now, new Date(accessToken.lastUsed)) > 0
   ) {
-    return prisma.accessToken.update({
+    return updateAccessToken({
       data: { lastUsed: sameDayMidnight(now) },
       where: { token: accessToken.token }
     });
@@ -130,20 +132,45 @@ export function updateAccessTokenLastUsed(accessToken: AccessToken) {
     return Promise.resolve();
   }
 }
-
 passport.use(
   new BearerStrategy(async (token, done) => {
+    const dateFormat = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/;
+
+    function reviver(key, value) {
+      if (typeof value === "string" && dateFormat.test(value)) {
+        return new Date(value);
+      }
+
+      return value;
+    }
+    const hashedToken = hashToken(token);
     try {
-      const accessToken = await prisma.accessToken.findFirst({
-        where: {
-          token: hashToken(token)
-        },
-        include: { user: true }
-      });
-      if (accessToken && !accessToken.isRevoked) {
-        const user = accessToken.user;
+      const key = generateKey("token", hashedToken);
+
+      const exists = await redisClient.exists(key);
+
+      let accessToken;
+      if (!!exists) {
+        const cached = await redisClient.get(key);
+        accessToken = JSON.parse(cached, reviver);
+      } else {
+        accessToken = await prisma.accessToken.findFirst({
+          where: {
+            token: hashedToken
+          },
+          include: { user: true }
+        });
+        const serialized = JSON.stringify(accessToken);
+        await redisClient
+          .pipeline()
+          .set(key, serialized)
+          .expire(key, 600)
+          .exec();
+      }
+
+      if (accessToken && !accessToken?.isRevoked) {
         await updateAccessTokenLastUsed(accessToken);
-        return done(null, { ...user, auth: AuthType.Bearer });
+        return done(null, { ...accessToken.user, auth: AuthType.Bearer });
       } else {
         return done(null, false);
       }

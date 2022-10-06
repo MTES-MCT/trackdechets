@@ -3,6 +3,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import prisma from "../../../prisma";
 import { ForbiddenError, UserInputError } from "apollo-server-core";
+import { updateAccessToken } from "../../database";
 
 const revokeAccessTokenResolver: MutationResolvers["revokeAccessToken"] =
   async (_parent, { id }, context) => {
@@ -17,7 +18,7 @@ const revokeAccessTokenResolver: MutationResolvers["revokeAccessToken"] =
         "Vous n'avez pas le droit de supprimer ce jeton d'accès"
       );
     }
-    return prisma.accessToken.update({
+    return updateAccessToken({
       where: { id },
       data: { isRevoked: true }
     });

@@ -10,7 +10,11 @@ import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail, hashToken } from "../utils";
-import { deleteCachedUserCompanies } from "../common/redis/users";
+import {
+  deleteCachedUserCompanies,
+  redisClient,
+  generateKey
+} from "../common/redis";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma.companyAssociation.findMany({
@@ -158,6 +162,68 @@ export async function createAccessToken({
     }
   });
   return { ...accessToken, token: clearToken };
+}
+
+const clearCachedAccessToken = async hashedToken => {
+  const key = generateKey("token", hashedToken);
+  console.log(key);
+  return redisClient.unlink(key);
+};
+
+export async function updateAccessToken({
+  where,
+  data
+}: {
+  where: Prisma.AccessTokenWhereUniqueInput;
+  data: Prisma.AccessTokenUpdateInput;
+}) {
+  const accessToken = await prisma.accessToken.update({
+    where,
+    data
+  });
+  await clearCachedAccessToken(accessToken.token);
+  return accessToken;
+}
+
+export async function updateManyAccessToken({
+  where,
+  data
+}: {
+  where: Prisma.AccessTokenWhereInput;
+  data: Prisma.AccessTokenUpdateManyMutationInput;
+}) {
+  const update = await prisma.accessToken.updateMany({
+    where,
+    data
+  });
+  const updatedTokens = await prisma.accessToken.findMany({
+    where,
+    select: { token: true }
+  });
+
+  const tokens = updatedTokens.map(({ token }) => token);
+
+  await Promise.all(tokens.map(token => clearCachedAccessToken(token)));
+  return update;
+}
+
+export async function deleteManyAccessToken({
+  where
+}: {
+  where: Prisma.AccessTokenWhereInput;
+}) {
+  const deletedTokens = await prisma.accessToken.findMany({
+    where,
+    select: { token: true }
+  });
+  const update = await prisma.accessToken.deleteMany({
+    where
+  });
+
+  const tokens = deletedTokens.map(({ token }) => token);
+
+  await Promise.all(tokens.map(token => clearCachedAccessToken(token)));
+  return update;
 }
 
 export async function userExists(unsafeEmail: string) {

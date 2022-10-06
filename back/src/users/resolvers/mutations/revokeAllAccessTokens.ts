@@ -2,6 +2,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import prisma from "../../../prisma";
+import { updateManyAccessToken } from "../../database";
 
 const revokeAllAccessTokensResolver: MutationResolvers["revokeAllAccessTokens"] =
   async (_parent, _, context) => {
@@ -10,7 +11,7 @@ const revokeAllAccessTokensResolver: MutationResolvers["revokeAllAccessTokens"] 
     const accessTokens = await prisma.accessToken.findMany({
       where: { userId: user.id, applicationId: null, isRevoked: false }
     });
-    await prisma.accessToken.updateMany({
+    await updateManyAccessToken({
       where: { id: { in: accessTokens.map(t => t.id) } },
       data: { isRevoked: true }
     });

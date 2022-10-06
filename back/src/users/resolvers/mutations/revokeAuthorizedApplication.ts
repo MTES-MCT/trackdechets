@@ -4,6 +4,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import prisma from "../../../prisma";
 import { getApplicationOrApplicationNotFound } from "../../../applications/database";
 import { UserInputError } from "apollo-server-core";
+import { updateManyAccessToken } from "../../database";
 
 const revokeAuthorizedApplicationResolver: MutationResolvers["revokeAuthorizedApplication"] =
   async (_parent, { id }, context) => {
@@ -24,7 +25,7 @@ const revokeAuthorizedApplicationResolver: MutationResolvers["revokeAuthorizedAp
       );
     }
 
-    await prisma.accessToken.updateMany({
+    await updateManyAccessToken({
       where: { userId: user.id, applicationId: id },
       data: { isRevoked: true }
     });

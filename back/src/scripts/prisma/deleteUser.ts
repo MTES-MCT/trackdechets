@@ -1,5 +1,6 @@
 import { User } from "@prisma/client";
 import prisma from "../../prisma";
+import { deleteManyAccessToken } from "../../users/database";
 
 export default async function deleteUser(user: User) {
   const errors = [
@@ -135,7 +136,7 @@ async function deleteUserActivationHashes(user: User) {
 }
 
 async function deleteUserAccessTokens(user: User) {
-  await prisma.accessToken.deleteMany({
+  await deleteManyAccessToken({
     where: {
       user: {
         id: user.id
