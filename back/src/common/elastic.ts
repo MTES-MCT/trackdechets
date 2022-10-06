@@ -363,7 +363,7 @@ export type BsdIndex = {
 };
 
 export const index: BsdIndex = {
-  alias: "bsds",
+  alias: process.env.ELASTICSEARCH_BSDS_ALIAS_NAME || "bsds",
   // The next major version of Elastic Search doesn't use "type" anymore
   // so while it's required for the current version, we are not using it too much
   type: "_doc",

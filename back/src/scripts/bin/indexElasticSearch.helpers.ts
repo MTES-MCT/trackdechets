@@ -60,7 +60,7 @@ const getIndexName = (index: BsdIndex, dateStr?: string): string =>
 /**
  * Create index on ES
  */
-async function declareNewIndex(index: BsdIndex) {
+export async function declareNewIndex(index: BsdIndex) {
   const newIndex = getIndexName(index);
   await client.indices.create({
     index: newIndex,
@@ -268,17 +268,17 @@ async function reindexRollover(
  */
 async function initializeIndex(index: BsdIndex, useQueue = false) {
   const newIndex = await declareNewIndex(index);
-  logger.info(`All BSDs are being indexed in the new index "${newIndex}".`);
-
-  await indexAllBsds(newIndex, undefined, useQueue);
-  logger.info(
-    `Created the alias "${index.alias}" pointing to the new index "${newIndex}"`
-  );
-
   await client.indices.putAlias({
     name: index.alias,
     index: newIndex
   });
+  logger.info(
+    `All BSDs are being indexed in the new index "${newIndex}" with alias "${index.alias}".`
+  );
+  await indexAllBsds(newIndex, undefined, useQueue);
+  logger.info(
+    `Created the alias "${index.alias}" pointing to the new index "${newIndex}"`
+  );
 }
 
 type IndexElasticSearchOpts = {
