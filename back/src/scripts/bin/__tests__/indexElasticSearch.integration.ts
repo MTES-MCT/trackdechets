@@ -20,11 +20,12 @@ describe("indexElasticSearch script", () => {
 
   const testIndexV0: BsdIndex = {
     ...globalIndex,
+    mappings_version: "v0",
     alias: testAlias
   };
 
   async function deleteTestIndexes() {
-    await client.indices.delete({ index: "*" }, { ignore: [404] });
+    await client.indices.delete({ index: "testAlias_*" }, { ignore: [404] });
   }
 
   afterEach(async () => {
