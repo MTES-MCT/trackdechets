@@ -1,10 +1,12 @@
 import { ExpressContext } from "apollo-server-express/dist/ApolloServer";
 import { GqlInfo } from "./common/middlewares/graphqlQueryParser";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
+import { createFormDataLoaders } from "./forms/dataloader";
 import { createUserDataLoaders } from "./users/dataloaders";
 
 export type AppDataloaders = ReturnType<typeof createUserDataLoaders> &
-  ReturnType<typeof createCompanyDataLoaders>;
+  ReturnType<typeof createCompanyDataLoaders> &
+  ReturnType<typeof createFormDataLoaders>;
 
 export type GraphQLContext = ExpressContext & {
   user: Express.User | null;
