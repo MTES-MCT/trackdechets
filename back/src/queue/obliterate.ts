@@ -34,5 +34,6 @@ const QUEUES = {
     return;
   }
 
-  await QUEUES[queueName].obliterate({ force: true });
+  QUEUES[queueName].obliterate({ force: true });
+  process.exit();
 })();

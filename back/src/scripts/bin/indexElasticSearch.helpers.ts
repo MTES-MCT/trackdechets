@@ -232,7 +232,7 @@ async function reindexInPlace(
       body: { query: query }
     });
   }
-  await indexAllBsds(index.alias, bsdType, useQueue);
+  await indexAllBsds(index.alias, useQueue, bsdType);
 }
 
 /**
@@ -254,7 +254,7 @@ async function reindexRollover(
       `BSD are being indexed in the new index "${newIndex}" while the alias "${index.alias}" still points to the current index.`
     );
 
-    await indexAllBsds(newIndex, undefined, useQueue);
+    await indexAllBsds(newIndex, useQueue);
     await attachNewIndexAndcleanOldIndexes(index, newIndex);
   } else {
     logger.info(
@@ -275,7 +275,7 @@ async function initializeIndex(index: BsdIndex, useQueue = false) {
   logger.info(
     `All BSDs are being indexed in the new index "${newIndex}" with alias "${index.alias}".`
   );
-  await indexAllBsds(newIndex, undefined, useQueue);
+  await indexAllBsds(newIndex, useQueue);
   logger.info(
     `Created the alias "${index.alias}" pointing to the new index "${newIndex}"`
   );
@@ -295,9 +295,9 @@ type IndexElasticSearchOpts = {
  */
 export async function indexElasticSearch({
   index,
-  force = false,
   bsdTypeToIndex,
-  useQueue = false
+  useQueue,
+  force = false
 }: IndexElasticSearchOpts) {
   const catAliasesResponse = await client.cat.aliases({
     name: index.alias,

@@ -8,19 +8,14 @@ import {
 } from "./producers/company";
 import { geocodeJob } from "./jobs/geocode";
 import { setDepartementJob } from "./jobs/setDepartement";
-import { indexAllBsdJob, indexChunkBsdJob } from "./jobs/indexAllBsds";
+import { indexChunkBsdJob } from "./jobs/indexAllBsds";
 
 function startConsumers() {
   console.info(`Queues processors started`);
 
   mailQueue.process(sendMailJob);
-  // this job needs more memory than the others depending on the batch size in env BULK_INDEX_BATCH_SIZE
-  indexQueue.process("indexAll", indexAllBsdJob);
-  indexQueue.process(
-    "indexChunk",
-    parseInt(process.env.INDEX_CHUNK_QUEUE_CONCURRENCEY, 10) || 5,
-    indexChunkBsdJob
-  );
+  // this job needs more memory than the others (cf. BULK_INDEX_BATCH_SIZE)
+  indexQueue.process("indexChunk", indexChunkBsdJob);
   indexQueue.process("index", indexBsdJob);
   indexQueue.process("delete", deleteBsdJob);
   geocodeCompanyQueue.process(geocodeJob);

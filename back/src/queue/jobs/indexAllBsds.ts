@@ -1,26 +1,12 @@
 import { Job } from "bull";
 import {
   findManyAndIndexBsds,
-  FindManyAndIndexBsdsFnSignature,
-  index
+  FindManyAndIndexBsdsFnSignature
 } from "../../common/elastic";
-import { indexElasticSearch } from "../../scripts/bin/indexElasticSearch.helpers";
-
-export async function indexAllBsdJob() {
-  try {
-    // will index all BSD without downtime, only if need because of a mapping change
-    await indexElasticSearch({
-      index,
-      force: false,
-      useQueue: true
-    });
-  } catch (error) {
-    throw new Error(`Error in indexAllBsdJob : ${error}`);
-  }
-}
+import logger from "../../logging/logger";
 
 /**
- *  will index a chunk of BSD
+ * Index one chunk of one type of BSD
  */
 export async function indexChunkBsdJob(job: Job<string>) {
   try {
@@ -28,7 +14,7 @@ export async function indexChunkBsdJob(job: Job<string>) {
       bsdName,
       index,
       skip,
-      total: count,
+      count,
       take,
       since
     }: FindManyAndIndexBsdsFnSignature = JSON.parse(job.data);
@@ -37,11 +23,12 @@ export async function indexChunkBsdJob(job: Job<string>) {
       bsdName,
       index,
       skip,
-      total: count,
+      count,
       take,
       since
     });
   } catch (error) {
-    throw new Error(`Error in indexChunkBsdJob : ${error}`);
+    logger.error(`Error in indexChunkBsdJob : ${error}`, error);
+    throw error;
   }
 }

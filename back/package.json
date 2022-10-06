@@ -31,6 +31,7 @@
     "index-elastic-search": "node dist/src/scripts/bin/indexElasticSearch.js",
     "index-elastic-search:dev": "ts-node -r dotenv/config ./src/scripts/bin/indexElasticSearch.ts",
     "enqueue-reindex-all-bsds": "node dist/src/scripts/bin/enqueueReindexAllBsds.js",
+    "enqueue-reindex-all-bsds:dev": "ts-node  -r dotenv/config ./src/scripts/bin/enqueueReindexAllBsds.ts",
     "reindex-bsd": "node dist/src/scripts/bin/reindexBsd.js $bsdId",
     "reindex-bsd:dev": "ts-node -r dotenv/config ./src/scripts/bin/reindexBsd.ts $bsdId",
     "watch:queue": "nodemon -r dotenv/config --watch src --exec \"ts-eager\" --inspect=0.0.0.0:9230 src/queue/consumer.ts -e ts",

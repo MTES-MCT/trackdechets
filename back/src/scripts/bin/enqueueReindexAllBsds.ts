@@ -1,8 +1,8 @@
 import logger from "../../logging/logger";
 import prisma from "../../prisma";
 import { closeQueues } from "../../queue/producers";
-import { enqueueAllBsdToIndex } from "../../queue/producers/elastic";
-
+import { index } from "../../common/elastic";
+import { indexElasticSearch } from "../../scripts/bin/indexElasticSearch.helpers";
 const { STARTUP_FILE } = process.env;
 
 function doubleLog(msg) {
@@ -11,7 +11,7 @@ function doubleLog(msg) {
 }
 
 async function exitScript() {
-  doubleLog("Done enqueueReindexAllBsd script, exiting");
+  doubleLog("Done enqueueReindexAllBsds script, exiting");
   await prisma.$disconnect();
   await closeQueues();
 }
@@ -23,12 +23,16 @@ async function exitScript() {
     );
     return;
   }
-  // launch reindex all job in the queue
-  await enqueueAllBsdToIndex({
-    // insert as first in the queue
-    lifo: true,
-    // more debug info
-    stackTraceLimit: 100
-  });
+  // launch reindex all job by chunks in the queue
+  try {
+    // will index all BSD without downtime, only if need because of a mapping change
+    await indexElasticSearch({
+      index,
+      force: false,
+      useQueue: true
+    });
+  } catch (error) {
+    throw new Error(`Error in enqueueReindexAllBsds script : ${error}`);
+  }
   await exitScript();
 })();
