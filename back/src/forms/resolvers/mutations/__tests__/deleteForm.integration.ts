@@ -200,7 +200,6 @@ describe("Mutation.deleteForm", () => {
     });
     expect(disconnectedAppendix2.groupedIn).toEqual([]);
     expect(disconnectedAppendix2.status).toEqual("AWAITING_GROUP");
-    expect(disconnectedAppendix2.quantityGrouped).toEqual(0);
   });
 
   it("should delete bsd suite", async () => {

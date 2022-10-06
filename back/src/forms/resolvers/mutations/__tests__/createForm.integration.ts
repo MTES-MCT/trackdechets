@@ -947,12 +947,6 @@ describe("Mutation.createForm", () => {
     expect(groupementForm2.grouping).toEqual([
       { form: { id: initialForm.id }, quantity: 0.5 }
     ]);
-
-    const updatedInitialForm = await prisma.form.findUnique({
-      where: { id: initialForm.id }
-    });
-
-    expect(updatedInitialForm.quantityGrouped).toEqual(1);
   });
 
   it("should fail when adding the same form twice to the same groupement form", async () => {
@@ -1350,8 +1344,7 @@ describe("Mutation.createForm", () => {
       opt: {
         status: Status.AWAITING_GROUP,
         recipientCompanySiret: ttr.siret,
-        quantityReceived: 1,
-        quantityGrouped: 0.2
+        quantityReceived: 1
       }
     });
 
@@ -1390,14 +1383,6 @@ describe("Mutation.createForm", () => {
         form: expect.objectContaining({ id: appendix2.id })
       })
     ]);
-
-    const updatedAppendix2 = await prisma.form.findUnique({
-      where: { id: appendix2.id }
-    });
-
-    expect(updatedAppendix2.quantityGrouped).toEqual(
-      updatedAppendix2.quantityReceived
-    );
   });
 
   it("should set isDangerous to `true` when specifying a waste code ending with *", async () => {
