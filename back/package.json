@@ -36,6 +36,7 @@
     "watch:queue": "nodemon -r dotenv/config --watch src --exec \"ts-eager\" --inspect=0.0.0.0:9230 src/queue/consumer.ts -e ts",
     "watch:notifier": "nodemon -r dotenv/config --watch src --exec \"ts-eager\" src/notifier/index.ts -e ts",
     "queue": "node dist/src/queue/consumer.js",
+    "queue:obliterate": "node dist/src/queue/obliterate.js",
     "purge-pdf-token": "node dist/src/scripts/bin/purgePdfAccessToken.js",
     "purge-pdf-token:dev": "ts-node -r dotenv/config ./src/scripts/bin/purgePdfAccessToken.ts"
   },
@@ -51,8 +52,8 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.163.0",
     "@aws-sdk/lib-storage": "^3.165.0",
-    "@bull-board/api": "^3.11.0",
-    "@bull-board/express": "^3.11.0",
+    "@bull-board/api": "^4.4.0",
+    "@bull-board/express": "^4.4.0",
     "@elastic/elasticsearch": "^7.17.0",
     "@fast-csv/format": "^4.3.0",
     "@graphql-toolkit/file-loading": "^0.10.7",
@@ -69,7 +70,7 @@
     "app-root-path": "^3.0.0",
     "axios": "^0.23.0",
     "bcrypt": "^5.0.0",
-    "bull": "^4.1.4",
+    "bull": "^4.10.0",
     "camel-case": "^4.1.1",
     "concat-stream": "^2.0.0",
     "connect-redis": "^6.0.0",

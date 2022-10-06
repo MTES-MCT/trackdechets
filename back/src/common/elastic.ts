@@ -13,6 +13,7 @@ import { toBsdElastic as bsdasriToBsdElastic } from "../../src/bsdasris/elastic"
 import { toBsdElastic as bsffToBsdElastic } from "../../src/bsffs/elastic";
 import { toBsdElastic as formToBsdElastic } from "../../src/forms/elastic";
 import { toBsdElastic as bsvhuToBsdElastic } from "../../src/bsvhu/elastic";
+import { indexQueue } from "../queue/producers/elastic";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -725,6 +726,13 @@ export async function indexAllBsds(
   logger.info("All types of BSD have been indexed");
 }
 
+type AnyPrismaBsdDelegate =
+  | typeof prisma.bsda
+  | typeof prisma.form
+  | typeof prisma.bsff
+  | typeof prisma.bsvhu
+  | typeof prisma.bsdasri;
+
 type IndexAllFnSignature = {
   bsdName: string;
   index: string;
@@ -733,6 +741,53 @@ type IndexAllFnSignature = {
   since: Date;
   useQueue: boolean;
 };
+
+export type FindManyAndIndexBsdsFnSignature = {
+  bsdName: string;
+  index: string;
+  skip: number;
+  total: number;
+  since: Date;
+  take: number;
+};
+
+export async function findManyAndIndexBsds({
+  bsdName,
+  index,
+  skip,
+  take,
+  total,
+  since
+}: FindManyAndIndexBsdsFnSignature): Promise<boolean> {
+  const prismaModelDelegate: AnyPrismaBsdDelegate = prismaModels[bsdName];
+  const toBsdElasticFn = bsdaToBsdElasticFns[bsdName];
+  const bsds = await (prismaModelDelegate as any).findMany({
+    skip,
+    take,
+    where: {
+      isDeleted: false,
+      ...(since ? { updatedAt: { gte: since } } : {})
+    },
+    ...prismaFindManyOptions[bsdName]
+  });
+
+  if (bsds.length === 0) {
+    logger.info(`No ${bsdName} to index, exit`, since);
+    return;
+  }
+
+  await indexBsds(
+    index,
+    bsds.map(form => toBsdElasticFn(form))
+  );
+
+  logger.info(`Indexed ${bsdName} batch ${skip}/${total}`);
+  if (bsds.length < take) {
+    logger.info(`Indexed ${bsdName} batch ${total}/${total}`);
+    return false;
+  }
+  return true;
+}
 
 /**
  * Index all BSDs from the forms table.
@@ -745,15 +800,10 @@ async function indexAllBsdType({
   since,
   useQueue
 }: IndexAllFnSignature): Promise<IndexAllFnSignature | void> {
-  const prismaModelDelegate:
-    | typeof prisma.bsda
-    | typeof prisma.form
-    | typeof prisma.bsff
-    | typeof prisma.bsvhu
-    | typeof prisma.bsdasri = prismaModels[bsdName];
-  const toBsdElasticFn = bsdaToBsdElasticFns[bsdName];
+  // initialize the total counter
   let count = 0;
   if (total < 0) {
+    const prismaModelDelegate: AnyPrismaBsdDelegate = prismaModels[bsdName];
     count = await (prismaModelDelegate as any).count({
       where: {
         isDeleted: false,
@@ -765,38 +815,56 @@ async function indexAllBsdType({
   }
 
   const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
-  const forms = await (prismaModelDelegate as any).findMany({
-    skip,
-    take,
-    where: {
-      isDeleted: false,
-      ...(since ? { updatedAt: { gte: since } } : {})
-    },
-    ...prismaFindManyOptions[bsdName]
-  });
+  if (!useQueue) {
+    const continueChunks = await findManyAndIndexBsds({
+      bsdName,
+      index,
+      skip,
+      total: count,
+      take,
+      since
+    });
 
-  if (forms.length === 0) {
-    logger.info(`No ${bsdName} to index, exit`, since);
+    if (!continueChunks) {
+      return;
+    }
+
+    return indexAllBsdType({
+      bsdName,
+      index,
+      skip: skip + take,
+      total: count,
+      since,
+      useQueue
+    });
+  } else {
+    const data = [];
+    for (
+      let incrementalSkip = skip;
+      incrementalSkip + take > count;
+      incrementalSkip += take
+    ) {
+      data.push({
+        name: "indexChunk",
+        data: JSON.stringify({
+          bsdName,
+          index,
+          skip: incrementalSkip,
+          total: count,
+          take,
+          since
+        }),
+        opts: {
+          lifo: true,
+          stackTraceLimit: 100
+        }
+      });
+    }
+    // all jobs added or all jobs will fail
+    await indexQueue.addBulk(data);
+    logger.info(
+      `Added ${data.length} bulk jobs to index a chunk of ${take} "${bsdName}" to index "${index}"`
+    );
     return;
   }
-
-  await indexBsds(
-    index,
-    forms.map(form => toBsdElasticFn(form))
-  );
-
-  logger.info(`Indexed ${bsdName} batch ${skip}/${count}`);
-  if (forms.length < take) {
-    logger.info(`Indexed ${bsdName} batch ${count}/${count}`);
-    return;
-  }
-
-  return indexAllBsdType({
-    bsdName,
-    index,
-    skip: skip + take,
-    total: count,
-    since,
-    useQueue
-  });
 }

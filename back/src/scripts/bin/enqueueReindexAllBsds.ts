@@ -27,8 +27,6 @@ async function exitScript() {
   await enqueueAllBsdToIndex({
     // insert as first in the queue
     lifo: true,
-    // 4h is arbitrary
-    timeout: 1000 * 60 * 60 * 4,
     // more debug info
     stackTraceLimit: 100
   });
