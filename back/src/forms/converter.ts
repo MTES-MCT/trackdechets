@@ -1,63 +1,63 @@
 import {
-  Form as PrismaForm,
-  TransportSegment as PrismaTransportSegment,
-  Prisma,
   BsddRevisionRequest,
-  Form
+  Form,
+  Form as PrismaForm,
+  Prisma,
+  TransportSegment as PrismaTransportSegment
 } from "@prisma/client";
+import DataLoader from "dataloader";
 import {
-  Form as GraphQLForm,
-  Appendix2Form as GraphQLAppendix2Form,
-  TransportSegment as GraphQLTransportSegment,
-  Emitter,
-  Recipient,
-  Transporter,
-  Trader,
-  Broker,
-  WasteDetails,
-  FormStatus,
-  WorkSite,
-  FormCompany,
-  FormEcoOrganisme,
-  NextDestination,
-  FormInput,
-  TemporaryStorageDetailInput,
-  EmitterInput,
-  ProcessedFormInput,
-  DestinationInput,
-  WasteDetailsInput,
-  TransporterInput,
-  RecipientInput,
-  TraderInput,
-  BrokerInput,
-  NextDestinationInput,
-  ImportPaperFormInput,
-  EcoOrganismeInput,
-  PackagingInfo,
-  TransporterSignatureFormInput,
-  SignatureFormInput,
-  ReceivedFormInput,
-  NextSegmentInfoInput,
-  FormRevisionRequestContentInput,
-  FormRevisionRequestContent,
-  FormRevisionRequestWasteDetails,
-  FormRevisionRequestTemporaryStorageDetail,
-  FormRevisionRequestDestination,
-  FormRevisionRequestRecipient,
-  ParcelNumber,
-  Destination
-} from "../generated/graphql/types";
-import { BsdElastic } from "../common/elastic";
-
-import { extractPostalCode } from "../utils";
-import prisma from "../prisma";
-import {
-  nullIfNoValues,
-  safeInput,
-  processDate,
   chain,
+  nullIfNoValues,
+  processDate,
+  safeInput,
   undefinedOrDefault
 } from "../common/converter";
+import { BsdElastic } from "../common/elastic";
+import {
+  Appendix2Form as GraphQLAppendix2Form,
+  Broker,
+  BrokerInput,
+  Destination,
+  DestinationInput,
+  EcoOrganismeInput,
+  Emitter,
+  EmitterInput,
+  Form as GraphQLForm,
+  FormCompany,
+  FormEcoOrganisme,
+  FormInput,
+  FormRevisionRequestContent,
+  FormRevisionRequestContentInput,
+  FormRevisionRequestDestination,
+  FormRevisionRequestRecipient,
+  FormRevisionRequestTemporaryStorageDetail,
+  FormRevisionRequestWasteDetails,
+  FormStatus,
+  ImportPaperFormInput,
+  NextDestination,
+  NextDestinationInput,
+  NextSegmentInfoInput,
+  PackagingInfo,
+  ParcelNumber,
+  ProcessedFormInput,
+  ReceivedFormInput,
+  Recipient,
+  RecipientInput,
+  SignatureFormInput,
+  TemporaryStorageDetailInput,
+  Trader,
+  TraderInput,
+  Transporter,
+  TransporterInput,
+  TransporterSignatureFormInput,
+  TransportSegment as GraphQLTransportSegment,
+  WasteDetails,
+  WasteDetailsInput,
+  WorkSite
+} from "../generated/graphql/types";
+import prisma from "../prisma";
+import { extractPostalCode } from "../utils";
 
 function flattenDestinationInput(input: {
   destination?: DestinationInput;
@@ -478,8 +478,14 @@ export function flattenTransportSegmentInput(
 export async function expandFormFromDb(
   form: BsdElastic["rawBsd"]
 ): Promise<GraphQLForm>;
-export async function expandFormFromDb(form: PrismaForm): Promise<GraphQLForm>;
-export async function expandFormFromDb(form: any): Promise<GraphQLForm> {
+export async function expandFormFromDb(
+  form: PrismaForm,
+  dataloader?: DataLoader<string, Form, string>
+): Promise<GraphQLForm>;
+export async function expandFormFromDb(
+  form: any,
+  dataloader?: DataLoader<string, Form, string>
+): Promise<GraphQLForm> {
   let forwardedIn: Form;
   // if form is rawBsd, forwardedIn is already computed
   if (form?.forwardedIn) {
@@ -487,7 +493,9 @@ export async function expandFormFromDb(form: any): Promise<GraphQLForm> {
   } else {
     // id form is Form, get forwardedIn from db
     forwardedIn = form.forwardedInId
-      ? await prisma.form.findUnique({ where: { id: form.id } }).forwardedIn()
+      ? dataloader
+        ? await dataloader.load(form.id)
+        : await prisma.form.findUnique({ where: { id: form.id } }).forwardedIn()
       : null;
   }
 
@@ -754,7 +762,8 @@ export async function expandFormFromElastic(
 }
 
 export async function expandAppendix2FormFromDb(
-  prismaForm: PrismaForm
+  prismaForm: PrismaForm,
+  dataloader?: DataLoader<string, Form, string>
 ): Promise<GraphQLAppendix2Form> {
   const {
     id,
@@ -766,7 +775,7 @@ export async function expandAppendix2FormFromDb(
     quantityReceived,
     processingOperationDone,
     quantityGrouped
-  } = await expandFormFromDb(prismaForm);
+  } = await expandFormFromDb(prismaForm, dataloader);
 
   const hasPickupSite = emitter?.workSite?.postalCode?.length > 0;
 

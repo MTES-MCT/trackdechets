@@ -1,12 +1,13 @@
 import { FormResolvers } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 
-const quantityGrouped: FormResolvers["quantityGrouped"] = async form => {
-  const formGroupements = await prisma.form
-    .findUnique({
-      where: { id: form.id }
-    })
-    .groupedIn();
+const quantityGrouped: FormResolvers["quantityGrouped"] = async (
+  form,
+  _,
+  context
+) => {
+  const formGroupements = await context.dataloaders.formGoupements.load(
+    form.id
+  );
 
   if (formGroupements) {
     return formGroupements

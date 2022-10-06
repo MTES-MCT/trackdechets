@@ -30,6 +30,7 @@ import sentryReporter from "./common/plugins/sentryReporter";
 import { redisClient } from "./common/redis";
 import { initSentry } from "./common/sentry";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
+import { createFormDataLoaders } from "./forms/dataloader";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
@@ -72,7 +73,11 @@ export const server = new ApolloServer({
       ...ctx,
       // req.user is made available by passport
       user: ctx.req?.user ?? null,
-      dataloaders: { ...createUserDataLoaders(), ...createCompanyDataLoaders() }
+      dataloaders: {
+        ...createUserDataLoaders(),
+        ...createCompanyDataLoaders(),
+        ...createFormDataLoaders()
+      }
     };
   },
   formatError: err => {
