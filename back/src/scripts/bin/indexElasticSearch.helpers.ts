@@ -132,9 +132,12 @@ export const attachNewIndexAndcleanOldIndexes = async (
     await Promise.all(
       oldIndicesNames.map(async index => {
         try {
-          await client.indices.delete({
-            index
-          });
+          await client.indices.delete(
+            {
+              index
+            },
+            { ignore: [404] }
+          );
         } catch (e) {
           logger.error(e);
         }
