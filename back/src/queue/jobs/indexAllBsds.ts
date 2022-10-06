@@ -5,9 +5,11 @@ export async function indexAllBsdJob() {
   try {
     // will index all BSD without downtime, only if need because of a mapping change
     await indexElasticSearch({
-      index
+      index,
+      force: false,
+      useQueue: true
     });
   } catch (error) {
-    throw new Error(`Error in job re-indexing off all BSDs : ${error}`);
+    throw new Error(`Error in indexAllBsdJob : ${error}`);
   }
 }

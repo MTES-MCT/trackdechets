@@ -117,30 +117,38 @@ export const attachNewIndexAndcleanOldIndexes = async (
     .sort();
 
   // keep the last index in order to rollback if rescue needed
-  const keptIndex = oldIndices.pop();
+  const keptIndex = getIndexName(index, oldIndices.pop().toJSON());
   logger.info(
     `Keeping previous index "${keptIndex}" if a rescue rollback is needed use: curl -X PUT http://elasticsearch.url/${keptIndex}/alias/${index.alias}`
   );
   if (oldIndices.length) {
-    logger.info(
-      `Removing ${oldIndices.length} old index(es) : (${oldIndices.join(", ")})`
+    const oldIndicesNames = oldIndices.map(oldIndex =>
+      getIndexName(index, oldIndex.toJSON())
     );
-    try {
-      await client.indices.delete({
-        index: oldIndices
-          .map(oldIndex => getIndexName(index, oldIndex.toJSON()))
-          .join(",")
-      });
-    } catch (e) {
-      logger.error(e);
-    }
+    logger.info(
+      `Removing ${oldIndices.length} old index : ${oldIndicesNames.join(",")}`
+    );
+
+    await Promise.all(
+      oldIndicesNames.map(async index => {
+        try {
+          await client.indices.delete({
+            index
+          });
+        } catch (e) {
+          logger.error(e);
+        }
+      })
+    );
   }
 };
 
 /**
  * Detect mappings changes the declared version
  */
-async function isIndexMappingsChanged(index: BsdIndex): Promise<boolean> {
+async function isIndexMappingsVersionChanged(
+  index: BsdIndex
+): Promise<boolean> {
   const aliases: ApiResponse<Array<{ index: string }>> =
     await client.cat.aliases({
       name: index.alias,
@@ -199,7 +207,8 @@ async function isIndexMappingsChanged(index: BsdIndex): Promise<boolean> {
 async function reindexInPlace(
   index: BsdIndex,
   bsdType: BsdType,
-  force = false
+  force = false,
+  useQueue = false
 ) {
   if (force) {
     let query = {};
@@ -220,7 +229,7 @@ async function reindexInPlace(
       body: { query: query }
     });
   }
-  await indexAllBsds(index.alias, bsdType);
+  await indexAllBsds(index.alias, bsdType, useQueue);
 }
 
 /**
@@ -228,8 +237,12 @@ async function reindexInPlace(
  * to avoid read downtimes. At the end of the indexation, the alias is reconfigured to
  * point to the new index.
  */
-async function reindexRollover(index: BsdIndex, force: boolean) {
-  const mappingChanged = await isIndexMappingsChanged(index);
+async function reindexRollover(
+  index: BsdIndex,
+  force: boolean,
+  useQueue = false
+) {
+  const mappingChanged = await isIndexMappingsVersionChanged(index);
   if (mappingChanged || force) {
     // index a new version and roll-over on the same alias without downtime
     const newIndex = await declareNewIndex(index);
@@ -238,7 +251,7 @@ async function reindexRollover(index: BsdIndex, force: boolean) {
       `BSD are being indexed in the new index "${newIndex}" while the alias "${index.alias}" still points to the current index.`
     );
 
-    await indexAllBsds(newIndex);
+    await indexAllBsds(newIndex, undefined, useQueue);
     await attachNewIndexAndcleanOldIndexes(index, newIndex);
   } else {
     logger.info(
@@ -250,11 +263,11 @@ async function reindexRollover(index: BsdIndex, force: boolean) {
 /**
  * Creates a brand new index and alias from scratch
  */
-async function initializeIndex(index: BsdIndex) {
+async function initializeIndex(index: BsdIndex, useQueue = false) {
   const newIndex = await declareNewIndex(index);
   logger.info(`All BSDs are being indexed in the new index "${newIndex}".`);
 
-  await indexAllBsds(newIndex);
+  await indexAllBsds(newIndex, undefined, useQueue);
   logger.info(
     `Created the alias "${index.alias}" pointing to the new index "${newIndex}"`
   );
@@ -269,6 +282,7 @@ type IndexElasticSearchOpts = {
   index: BsdIndex;
   bsdTypeToIndex?: BsdType;
   force?: boolean;
+  useQueue?: boolean;
 };
 
 /**
@@ -279,7 +293,8 @@ type IndexElasticSearchOpts = {
 export async function indexElasticSearch({
   index,
   force = false,
-  bsdTypeToIndex
+  bsdTypeToIndex,
+  useQueue = false
 }: IndexElasticSearchOpts) {
   const catAliasesResponse = await client.cat.aliases({
     name: index.alias,
@@ -289,7 +304,7 @@ export async function indexElasticSearch({
   const aliasExists = catAliasesResponse.body.length > 0;
   if (!aliasExists) {
     // first time indexation for a new alias name
-    await initializeIndex(index);
+    await initializeIndex(index, useQueue);
   } else {
     if (!!bsdTypeToIndex) {
       if (!force) {
@@ -298,9 +313,9 @@ export async function indexElasticSearch({
         );
         return;
       }
-      await reindexInPlace(index, bsdTypeToIndex, force);
+      await reindexInPlace(index, bsdTypeToIndex, force, useQueue);
     } else {
-      await reindexRollover(index, force);
+      await reindexRollover(index, force, useQueue);
     }
   }
 
