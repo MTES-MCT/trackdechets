@@ -6,7 +6,6 @@ API_TOKEN_SECRET=any_secret
 API_HOST=api.trackdechets.local
 UI_HOST=trackdechets.local
 ELASTIC_SEARCH_URL=http://elasticsearch:9200
-ELASTIC_SEARCH_BSDS_ALIAS_NAME=test_bsds
 DD_TRACE_ENABLED=false
 QUEUE_NAME_SENDMAIL=td-integration-tests-queue
 TD_COMPANY_ELASTICSEARCH_INDEX=stocketablissement-production
