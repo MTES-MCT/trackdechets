@@ -55,6 +55,7 @@ export const FullBsffFragment = gql`
     id
     type
     status
+    isDraft
     emitter {
       company {
         ...CompanyFragment
