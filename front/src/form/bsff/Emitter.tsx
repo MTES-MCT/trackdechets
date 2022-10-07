@@ -1,7 +1,9 @@
 import React from "react";
 import { FieldArray, useField } from "formik";
 import {
+  Bsff,
   BsffFicheIntervention,
+  BsffPackagingInput,
   BsffType,
   CompanyInput,
 } from "generated/graphql/types";
@@ -10,11 +12,19 @@ import { FicheInterventionList } from "./FicheInterventionList";
 import MyCompanySelector from "form/common/components/company/MyCompanySelector";
 
 export default function Emitter({ disabled }) {
+  const [{ value: id }] = useField<CompanyInput>("id");
   const [{ value: emitterCompany }] = useField<CompanyInput>("emitter.company");
   const [{ value: ficheInterventions }] = useField<BsffFicheIntervention[]>(
     "ficheInterventions"
   );
   const [{ value: type }] = useField<BsffType>("type");
+
+  const [{ value: previousBsffs }, , { setValue: setPreviousBsffs }] = useField<
+    Bsff[]
+  >("previousBsffs");
+  const [, , { setValue: setPackagings }] = useField<BsffPackagingInput[]>(
+    "packagings"
+  );
 
   const heading =
     type === BsffType.TracerFluide
@@ -46,10 +56,18 @@ export default function Emitter({ disabled }) {
           <h4 className="form__section-heading">{heading}</h4>
           <MyCompanySelector
             fieldName="emitter.company"
-            siretEditable={true}
-            onSelect={() => {
-              // TODO make sure to empty grouping, repackaging or forwarding
-              // because new emitter may not be destination of
+            siretEditable={!id}
+            onSelect={companySiret => {
+              if (
+                companySiret?.length &&
+                previousBsffs?.length &&
+                window.confirm(
+                  "L'établissement sélectionné n'est pas compatible avec les bordereaux initiaux sélectionnés. Nous allons donc les dissocier."
+                )
+              ) {
+                setPreviousBsffs([]);
+                setPackagings([]);
+              }
             }}
           />
         </>

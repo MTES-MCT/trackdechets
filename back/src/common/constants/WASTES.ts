@@ -5582,11 +5582,11 @@ export const ALL_WASTES = flatten(ALL_WASTES_TREE);
 
 export const BSDD_WASTES = flatten(BSDD_WASTES_TREE);
 
-export const BSDA_WASTES = BSDD_WASTES.filter(w =>
+export const BSDA_WASTES = ALL_WASTES.filter(w =>
   BSDA_WASTE_CODES.includes(w.code)
 );
 
-export const BSFF_WASTES = BSDD_WASTES.filter(w =>
+export const BSFF_WASTES = ALL_WASTES.filter(w =>
   BSFF_WASTE_CODES.includes(w.code)
 );
 export const BSDD_WASTE_CODES = BSDD_WASTES.map(waste => waste.code);
