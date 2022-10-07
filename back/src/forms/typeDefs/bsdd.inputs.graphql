@@ -194,7 +194,10 @@ input CreateFormInput {
   appendix2Forms: [AppendixFormInput!]
     @deprecated(reason: "Utiliser `grouping`")
 
-  "Bordereaux que celui-ci regroupe (Annexe 2) - Permet une utilisation partielle du bordereau initial"
+  """
+  Bordereaux que celui-ci regroupe (Annexe 2) - Permet une utilisation partielle du bordereau initial.
+  Limité à 250 BSDDs initiaux.
+  """
   grouping: [InitialFormFractionInput!]
 
   ecoOrganisme: EcoOrganismeInput

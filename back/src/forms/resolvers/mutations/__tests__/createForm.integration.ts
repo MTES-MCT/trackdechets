@@ -1385,6 +1385,30 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
+  it("should not be possible to add more than 250 BSDDs on appendix2", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+    const createFormInput: CreateFormInput = {
+      emitter: {
+        type: "APPENDIX2",
+        company: {
+          siret: ttr.siret
+        }
+      },
+      grouping: Array.from(Array(300).keys()).map(n => ({
+        form: { id: `id_${n}` }
+      }))
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Vous ne pouvez pas regrouper plus de 250 BSDDs initiaux`
+      })
+    ]);
+  });
+
   it("should set isDangerous to `true` when specifying a waste code ending with *", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
