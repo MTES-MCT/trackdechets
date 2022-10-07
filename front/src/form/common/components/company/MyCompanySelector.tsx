@@ -123,8 +123,8 @@ export default function MyCompanySelector({
         ) : (
           <>
             <p>
-              Des bordereaux sont présents en annexe 2, l'entreprise n'est pas
-              modifiable
+              L'établissement émetteur n'est plus modifiable après création du
+              bordereau en cas de réexpédition, regroupement ou recondtionnement
             </p>
             <CompanyResult
               item={field.value}

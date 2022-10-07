@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { FieldArray, useField } from "formik";
 import {
   Bsff,
@@ -12,6 +12,7 @@ import { FicheInterventionList } from "./FicheInterventionList";
 import MyCompanySelector from "form/common/components/company/MyCompanySelector";
 
 export default function Emitter({ disabled }) {
+  const [{ value: id }] = useField<CompanyInput>("id");
   const [{ value: emitterCompany }] = useField<CompanyInput>("emitter.company");
   const [{ value: ficheInterventions }] = useField<BsffFicheIntervention[]>(
     "ficheInterventions"
@@ -21,9 +22,9 @@ export default function Emitter({ disabled }) {
   const [{ value: previousBsffs }, , { setValue: setPreviousBsffs }] = useField<
     Bsff[]
   >("previousBsffs");
-  const [{ value: packagings }, , { setValue: setPackagings }] = useField<
-    BsffPackagingInput[]
-  >("packagings");
+  const [, , { setValue: setPackagings }] = useField<BsffPackagingInput[]>(
+    "packagings"
+  );
 
   const heading =
     type === BsffType.TracerFluide
@@ -55,7 +56,7 @@ export default function Emitter({ disabled }) {
           <h4 className="form__section-heading">{heading}</h4>
           <MyCompanySelector
             fieldName="emitter.company"
-            siretEditable={true}
+            siretEditable={!id}
             onSelect={companySiret => {
               if (
                 companySiret?.length &&

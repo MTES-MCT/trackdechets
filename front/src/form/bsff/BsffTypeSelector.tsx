@@ -33,6 +33,7 @@ const options = [
 ];
 
 export function BsffTypeSelector() {
+  const [{ value: id }] = useField<BsffType>("id");
   const [{ value: type }, , { setValue: setType }] = useField<BsffType>("type");
   const [{ value: packagings }, , { setValue: setPackagings }] = useField<
     BsffPackagingInput[]
@@ -61,6 +62,7 @@ export function BsffTypeSelector() {
             <label>
               <input
                 type="radio"
+                disabled={!!id}
                 className="td-radio"
                 name="type"
                 value={option.value}
