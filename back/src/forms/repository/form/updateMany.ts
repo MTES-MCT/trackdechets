@@ -22,15 +22,17 @@ const buildUpdateManyForms: (deps: RepositoryFnDeps) => UpdateManyFormFn =
       data
     });
 
-    await prisma.event.createMany({
-      data: ids.map(id => ({
-        streamId: id,
-        actor: user.id,
-        type: "BsddUpdated",
-        data: { content: data } as Prisma.InputJsonObject,
-        metadata: { ...logMetadata, authType: user.auth }
-      }))
-    });
+    for (const id of ids) {
+      await prisma.event.create({
+        data: {
+          streamId: id,
+          actor: user.id,
+          type: "BsddUpdated",
+          data: { content: data } as Prisma.InputJsonObject,
+          metadata: { ...logMetadata, authType: user.auth }
+        }
+      });
+    }
 
     await Promise.all(
       ids.map(async id => {
