@@ -69,7 +69,7 @@ export interface BsdElastic {
   isManagedWasteFor: string[];
 
   rawBsd: any;
-  es_mappings_version: string;
+  es_mappings_version: string; // made to check the mapping version for a doc in ES
 }
 
 // Custom analyzers for readableId and waste fields
@@ -727,7 +727,7 @@ export async function indexAllBsds(
           since
         });
       } else {
-        const take = 10_000;
+        const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 1000;
         const data = [];
         for (
           let incrementalSkip = 0;
@@ -746,7 +746,8 @@ export async function indexAllBsds(
             }),
             opts: {
               lifo: true,
-              stackTraceLimit: 100
+              stackTraceLimit: 100,
+              attempts: 1
             }
           });
         }

@@ -28,7 +28,7 @@ export async function indexChunkBsdJob(job: Job<string>) {
       since
     });
   } catch (error) {
-    logger.error(`Error in indexChunkBsdJob : ${error}`, error);
+    logger.error(`Error in indexChunkBsdJob.`, error);
     throw error;
   }
 }

@@ -21,6 +21,7 @@ async function exitScript() {
 (async function () {
   const args = process.argv.slice(2);
   const force = args.includes("-f");
+  const useQueue = args.includes("--useQueue");
   const bsdTypesToIndex = bsdTypes.filter(t =>
     args.map(a => a.toUpperCase()).includes(t)
   );
@@ -32,7 +33,12 @@ async function exitScript() {
     }
 
     const bsdTypeToIndex = bsdTypesToIndex[0];
-    await indexElasticSearch({ force, index, bsdTypeToIndex });
+    await indexElasticSearch({
+      force,
+      index,
+      bsdTypeToIndex,
+      useQueue
+    });
   } catch (error) {
     doubleLog("ES indexation failed, error:", error);
   } finally {

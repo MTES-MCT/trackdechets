@@ -11,7 +11,7 @@ export const indexQueue = new Queue<string>(
   {
     defaultJobOptions: {
       attempts: 3,
-      backoff: { type: "exponential", delay: 100 },
+      backoff: { type: "fixed", delay: 100 },
       removeOnComplete: 10_000,
       timeout: 10000
     }

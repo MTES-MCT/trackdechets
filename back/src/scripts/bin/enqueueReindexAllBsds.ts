@@ -17,19 +17,21 @@ async function exitScript() {
 }
 
 (async function () {
+  // script meant to be used for production deployment
   if (!STARTUP_FILE || STARTUP_FILE === "dist/src/index.js") {
     doubleLog(
       "Abort index all BSDs because not in the api deployment, exiting"
     );
     return;
   }
-  // launch reindex all job by chunks in the queue
   try {
+    // launch reindex all job by chunks in the queue only if argument is specified
+    const useQueue = process.argv.includes("--useQueue");
     // will index all BSD without downtime, only if need because of a mapping change
     await indexElasticSearch({
       index,
       force: false,
-      useQueue: true
+      useQueue
     });
   } catch (error) {
     throw new Error(`Error in enqueueReindexAllBsds script : ${error}`);
