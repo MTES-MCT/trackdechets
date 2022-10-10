@@ -480,7 +480,9 @@ describe("mutation.markAsProcessed", () => {
     const resultingForm = await prisma.form.findUnique({
       where: { id: form.id }
     });
+
     expect(resultingForm.status).toBe("FOLLOWED_WITH_PNTTD");
+    expect(resultingForm.nextDestinationCompanyVatNumber).toEqual("DE12345678");
     expect(resultingForm.nextDestinationCompanyCountry).toBe("DE");
   });
 

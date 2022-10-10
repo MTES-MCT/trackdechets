@@ -271,17 +271,12 @@ export default function MarkAsProcessed({ form }: WorkflowActionProps) {
                   noTraceability: null,
                 }}
                 onSubmit={({ nextDestination, ...values }) => {
-                  const cleanedNextDestination = nextDestination;
-                  if (cleanedNextDestination?.company) {
-                    // clean vatNumber that may have been added by CompanySelector
-                    delete cleanedNextDestination.company["vatNumber"];
-                  }
                   return markAsProcessed({
                     variables: {
                       id: data?.form.id,
                       processedInfo: {
                         ...values,
-                        nextDestination: cleanedNextDestination,
+                        nextDestination,
                       },
                     },
                   });
