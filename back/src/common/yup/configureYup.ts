@@ -18,7 +18,9 @@ export default function configureYup() {
     mixed: {
       default: "${path} est invalide",
       required: "${path} est un champ requis et doit avoir une valeur",
-      notType: "${path} ne peut pas être null"
+      notType: "${path} ne peut pas être null",
+      oneOf: "${path} doit prendre l'une des valeurs suivantes: ${values}",
+      defined: "${path} doit avoir une valeur"
     }
   });
 
