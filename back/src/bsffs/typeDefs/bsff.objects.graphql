@@ -200,11 +200,11 @@ type BsffTransporter {
 }
 type BsffTransporterRecepisse {
   "Numéro du récépissé."
-  number: String!
+  number: String
   "Département auquel est lié le récépissé."
-  department: String!
+  department: String
   "Date limite de validité du récépissé."
-  validityLimit: DateTime!
+  validityLimit: DateTime
 }
 type BsffTransport {
   "Date de prise en charge"

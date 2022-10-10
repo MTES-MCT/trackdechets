@@ -182,9 +182,24 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
         .string()
         .email("Transporteur : l'adresse email est invalide")
         .requiredIf(!isDraft, "Transporteur : l'adresse email est requise"),
-      transporterRecepisseNumber: yup.string().nullable(),
-      transporterRecepisseDepartment: yup.string().nullable(),
-      transporterRecepisseValidityLimit: yup.date().nullable()
+      transporterRecepisseNumber: yup
+        .string()
+        .requiredIf(
+          !isDraft,
+          "Transporteur : le numéro de récépissé est requis"
+        ),
+      transporterRecepisseDepartment: yup
+        .string()
+        .requiredIf(
+          !isDraft,
+          "Transporteur : le département du récépissé est requis"
+        ),
+      transporterRecepisseValidityLimit: yup
+        .date()
+        .requiredIf(
+          !isDraft,
+          "Transporteur : la date de validité du récépissé est requise"
+        )
     });
 
 export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
