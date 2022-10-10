@@ -138,7 +138,7 @@ export function PreviousBsffsPicker({
     if (!pickableBsffs?.length) {
       return (
         <div>
-          {`Aucune BSFF éligible pour ${
+          {`Aucun BSFF éligible pour ${
             bsff.type === BsffType.Groupement
               ? "un regroupement"
               : bsff.type === BsffType.Reconditionnement
