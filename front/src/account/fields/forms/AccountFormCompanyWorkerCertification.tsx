@@ -164,7 +164,7 @@ export default function AccountFormCompanyAddWorkerCertification({
             <table>
               <tbody>
                 <tr>
-                  <td>Travaux relevants de la sous-section 4</td>
+                  <td>Travaux relevant de la sous-section 4</td>
                   <td>
                     <Field
                       type="checkbox"
@@ -175,7 +175,7 @@ export default function AccountFormCompanyAddWorkerCertification({
                 </tr>
                 <tr>
                   <td>
-                    Travaux relevants de la sous-section 3{" "}
+                    Travaux relevant de la sous-section 3{" "}
                     <Tooltip msg="Ce profil correspond à une entreprise disposant d'une certification Amiante (NFX 46-010)" />
                   </td>
                   <td>

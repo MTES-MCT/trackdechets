@@ -253,7 +253,7 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
                     </p>
                     <p>
                       Limite de validité :{" "}
-                      {bsda.worker.certification.validityLimit}
+                      {formatDate(bsda.worker.certification.validityLimit)}
                     </p>
                     <p>Organisme : {bsda.worker.certification.organisation}</p>
                   </>

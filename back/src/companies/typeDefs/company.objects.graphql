@@ -191,6 +191,10 @@ type CompanyPublic {
   Agrément VHU broyeur (le cas échéant, pour les profils VHU)
   """
   vhuAgrementBroyeur: VhuAgrement
+  """
+  Certification entreprise de travaux
+  """
+  workerCertification: WorkerCertification
 }
 
 "Information sur un établissement accessible publiquement en recherche floue"

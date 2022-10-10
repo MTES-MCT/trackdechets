@@ -31,6 +31,7 @@ export const workerCertificationSchema = yup.object({
   }),
   organisation: yup
     .string()
+    .label("L'organisme")
     .oneOf([
       "AFNOR Certification",
       "GLOBAL CERTIFICATION",
