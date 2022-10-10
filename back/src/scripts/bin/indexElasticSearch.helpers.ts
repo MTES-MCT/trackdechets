@@ -67,7 +67,8 @@ export async function declareNewIndex(index: BsdIndex) {
     body: {
       mappings: { [index.type]: index.mappings },
       settings: index.settings
-    }
+    },
+    include_type_name: true // compatibility with ES 7+
   });
   return newIndex;
 }
@@ -249,12 +250,19 @@ async function reindexRollover(
   if (mappingChanged || force) {
     // index a new version and roll-over on the same alias without downtime
     const newIndex = await declareNewIndex(index);
-
     logger.info(
       `BSD are being indexed in the new index "${newIndex}" while the alias "${index.alias}" still points to the current index.`
     );
 
-    await indexAllBsds(newIndex, useQueue);
+    const jobs = await indexAllBsds(newIndex, useQueue);
+    if (useQueue && jobs.length) {
+      logger.info(`Waiting for ${jobs.length} to finish`);
+      await Promise.all(
+        jobs.map(async job => {
+          await job.finished();
+        })
+      );
+    }
     await attachNewIndexAndcleanOldIndexes(index, newIndex);
   } else {
     logger.info(

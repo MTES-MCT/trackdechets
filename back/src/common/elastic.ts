@@ -14,6 +14,7 @@ import { toBsdElastic as bsffToBsdElastic } from "../../src/bsffs/elastic";
 import { toBsdElastic as formToBsdElastic } from "../../src/forms/elastic";
 import { toBsdElastic as bsvhuToBsdElastic } from "../../src/bsvhu/elastic";
 import { indexQueue } from "../queue/producers/elastic";
+import { Job } from "bull";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -159,6 +160,9 @@ const settings = {
         tokenize_on_chars: ["whitespace"]
       }
     }
+  },
+  index: {
+    max_ngram_diff: 20 // compatibility with ES 7+, max_ngram_diff > any of max_gram above
   }
 };
 
@@ -694,39 +698,75 @@ export async function indexAllBsds(
   index: string,
   useQueue = false,
   bsdType?: BsdType
-): Promise<void> {
+): Promise<Job<string>[]> {
   let since: Date;
+  const jobs: Job<string>[] = [];
   for (const loopType of bsdTypes) {
     if (!bsdType || bsdType === loopType) {
       const bsdName = loopType.toLowerCase();
       logger.info(`Indexing ${bsdName}`);
-      since = new Date();
-      await indexAllBsdType({
-        bsdName,
-        index,
-        skip: 0,
-        total: -1, // use to initialize once the prisma count()
-        since: undefined,
-        useQueue
-      });
-
+      // initialize the total counter
+      const count = await getIndexTypeCount(bsdName, since);
       if (!useQueue) {
+        since = new Date();
+        await indexAllBsdTypeSync({
+          bsdName,
+          index,
+          skip: 0,
+          total: count, // use to initialize once the prisma count()
+          since: undefined
+        });
         logger.info(
           `Catching-up indexation of ${bsdName} updated in database since ${since.toISOString()}`
         );
-
-        await indexAllBsdType({
+        await indexAllBsdTypeSync({
           bsdName,
           index,
           skip: 0,
           total: -1, // use to initialize once the prisma count()
-          since,
-          useQueue
+          since
         });
+      } else {
+        const take = 10_000;
+        const data = [];
+        for (
+          let incrementalSkip = 0;
+          incrementalSkip + take <= count;
+          incrementalSkip += take
+        ) {
+          data.push({
+            name: "indexChunk",
+            data: JSON.stringify({
+              bsdName,
+              index,
+              skip: incrementalSkip,
+              count,
+              take,
+              since
+            }),
+            opts: {
+              lifo: true,
+              stackTraceLimit: 100
+            }
+          });
+        }
+        // control concurrency of addBulk
+        const chunkSize = parseInt(process.env.BULK_INDEX_BATCH_ADD, 10) || 5;
+        for (let i = 0; i < data.length; i += chunkSize) {
+          const chunk = data.slice(i, i + chunkSize);
+          // all jobs are succesfully added in bulk or all jobs will fail
+          const bulkJobs = await indexQueue.addBulk(chunk);
+          jobs.push(...bulkJobs);
+        }
+
+        logger.info(
+          `Added ${data.length} bulk jobs to index a chunk of ${take} "${bsdName}" to index "${index}"`
+        );
       }
     }
   }
   logger.info("All types of BSD have been indexed");
+  return jobs;
 }
 
 type AnyPrismaBsdDelegate =
@@ -742,7 +782,6 @@ type IndexAllFnSignature = {
   skip: number;
   total: number;
   since: Date;
-  useQueue: boolean;
 };
 
 export type FindManyAndIndexBsdsFnSignature = {
@@ -799,88 +838,45 @@ export async function findManyAndIndexBsds({
 }
 
 /**
- * Index all BSDs from the forms table.
+ * Index in chunks all BSDs of a given type in a synchronous manner
  */
-async function indexAllBsdType({
+async function indexAllBsdTypeSync({
   bsdName,
   index,
   skip,
   total,
-  since,
-  useQueue
+  since
 }: IndexAllFnSignature): Promise<IndexAllFnSignature | void> {
-  // initialize the total counter
-  let count = 0;
-  if (total < 0) {
-    const prismaModelDelegate: AnyPrismaBsdDelegate = prismaModels[bsdName];
-    count = await (prismaModelDelegate as any).count({
-      where: {
-        isDeleted: false,
-        ...(since ? { updatedAt: { gte: since } } : {})
-      }
-    });
-  } else {
-    count = total;
-  }
-
   const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
-  if (!useQueue) {
-    const continueChunks = await findManyAndIndexBsds({
-      bsdName,
-      index,
-      skip,
-      count,
-      take,
-      since
-    });
 
-    if (!continueChunks) {
-      return;
-    }
-    // synchronous indexation takes place in the database order
-    return indexAllBsdType({
-      bsdName,
-      index,
-      skip: skip + take,
-      // eslint-disable-next-line prettier/prettier
-      "total": count,
-      since,
-      useQueue
-    });
-  } else {
-    const data = [];
-    for (
-      let incrementalSkip = skip;
-      incrementalSkip + take <= count;
-      incrementalSkip += take
-    ) {
-      data.push({
-        name: "indexChunk",
-        data: JSON.stringify({
-          bsdName,
-          index,
-          skip: incrementalSkip,
-          count,
-          take,
-          since
-        }),
-        opts: {
-          lifo: true,
-          stackTraceLimit: 100
-        }
-      });
-    }
-    // control concurrency of addBulk
-    const chunkSize = parseInt(process.env.BULK_INDEX_BATCH_ADD, 10) || 5;
-    for (let i = 0; i < data.length; i += chunkSize) {
-      const chunk = data.slice(i, i + chunkSize);
-      // all jobs are succesfully added in bulk or all jobs will fail
-      indexQueue.addBulk(chunk);
-    }
+  const continueChunks = await findManyAndIndexBsds({
+    bsdName,
+    index,
+    skip,
+    count: total,
+    take,
+    since
+  });
 
-    logger.info(
-      `Added ${data.length} bulk jobs to index a chunk of ${take} "${bsdName}" to index "${index}"`
-    );
+  if (!continueChunks) {
     return;
   }
+  // synchronous indexation takes place in the database order
+  return indexAllBsdTypeSync({
+    bsdName,
+    index,
+    skip: skip + take,
+    total,
+    since
+  });
+}
+
+async function getIndexTypeCount(bsdName: string, since: Date) {
+  const prismaModelDelegate: AnyPrismaBsdDelegate = prismaModels[bsdName];
+  return (prismaModelDelegate as any).count({
+    where: {
+      isDeleted: false,
+      ...(since ? { updatedAt: { gte: since } } : {})
+    }
+  });
 }

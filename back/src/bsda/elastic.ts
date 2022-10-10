@@ -1,9 +1,7 @@
 import { Bsda, BsdaStatus } from "@prisma/client";
-import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
-import logger from "../logging/logger";
+import { BsdElastic, indexBsd } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
-import { getReadonlyBsdaRepository } from "./repository";
 
 // | state              | emitter         | worker          | transporter | destination     | nextDestination |
 // | ------------------ | --------------- | --------------- | ----------- | --------------- | --------------- |
@@ -159,57 +157,6 @@ export function toBsdElastic(
     ...getRegistryFields(bsda),
     rawBsd: bsda
   };
-}
-
-export async function indexAllBsdas(
-  idx: string,
-  { skip = 0 }: { skip?: number } = {},
-  total = -1,
-  since?: Date
-) {
-  let count = 0;
-  if (total < 0) {
-    count = await getReadonlyBsdaRepository().count({
-      isDeleted: false,
-      ...(since ? { updatedAt: { gte: since } } : {})
-    });
-  } else {
-    count = total;
-  }
-  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
-  const bsdas = await getReadonlyBsdaRepository().findMany(
-    {
-      isDeleted: false,
-      ...(since ? { updatedAt: { gte: since } } : {})
-    },
-
-    {
-      skip,
-      take,
-      include: {
-        forwardedIn: { select: { id: true } },
-        groupedIn: { select: { id: true } }
-      }
-    }
-  );
-
-  if (bsdas.length === 0) {
-    logger.info(`No BSDA to index, exit`, since);
-    return;
-  }
-
-  await indexBsds(
-    idx,
-    bsdas.map(bsda => toBsdElastic(bsda))
-  );
-  logger.info(`Indexed BSDA batch ${skip}/${count}`);
-
-  if (bsdas.length < take) {
-    logger.info(`Indexed BSDA batch ${count}/${count}`);
-    return;
-  }
-
-  return indexAllBsdas(idx, { skip: skip + take });
 }
 
 export function indexBsda(bsda: Bsda, ctx?: GraphQLContext) {

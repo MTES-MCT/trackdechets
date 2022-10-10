@@ -1,10 +1,9 @@
 import { Bsff, BsffStatus } from "@prisma/client";
 import prisma from "../prisma";
-import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
+import { BsdElastic, indexBsd } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { BsffPackaging } from "../generated/graphql/types";
-import logger from "../logging/logger";
 
 export function toBsdElastic(
   bsff: Bsff & { packagings: BsffPackaging[] }
@@ -115,53 +114,6 @@ export function toBsdElastic(
   }
 
   return bsd;
-}
-
-export async function indexAllBsffs(
-  idx: string,
-  { skip = 0 }: { skip?: number } = {},
-  total = -1,
-  since?: Date
-) {
-  let count = 0;
-  if (total < 0) {
-    count = await prisma.bsff.count({
-      where: {
-        isDeleted: false,
-        ...(since ? { updatedAt: { gte: since } } : {})
-      }
-    });
-  } else {
-    count = total;
-  }
-  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
-  const bsffs = await prisma.bsff.findMany({
-    skip,
-    take,
-    where: {
-      isDeleted: false,
-      ...(since ? { updatedAt: { gte: since } } : {})
-    },
-    include: { packagings: true }
-  });
-
-  if (bsffs.length === 0) {
-    logger.info(`No BSFF to index, exit`, since);
-    return;
-  }
-
-  await indexBsds(
-    idx,
-    bsffs.map(bsff => toBsdElastic(bsff))
-  );
-  logger.info(`Indexed BSFF batch ${skip}/${count}`);
-
-  if (bsffs.length < take) {
-    logger.info(`Indexed BSFF batch ${count}/${count}`);
-    return;
-  }
-
-  return indexAllBsffs(idx, { skip: skip + take });
 }
 
 export async function indexBsff(bsff: Bsff, ctx?: GraphQLContext) {

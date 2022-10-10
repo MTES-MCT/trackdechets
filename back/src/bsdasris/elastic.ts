@@ -1,12 +1,9 @@
 import { BsdasriStatus, Bsdasri, BsdasriType } from "@prisma/client";
-import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
-import { getReadonlyBsdasriRepository } from "./repository";
+import { BsdElastic, indexBsd } from "../common/elastic";
 
 import { DASRI_WASTE_CODES_MAPPING } from "../common/constants/DASRI_CONSTANTS";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
-import logger from "../logging/logger";
-import prisma from "../prisma";
 
 // | state              | emitter | transporter | recipient |
 // |--------------------|---------|-------------|-----------|
@@ -149,62 +146,6 @@ export function toBsdElastic(
     ...getRegistryFields(bsdasri),
     rawBsd: bsdasri
   };
-}
-
-/**
- * Index all BSDs from the forms table.
- */
-export async function indexAllBsdasris(
-  idx: string,
-  { skip = 0 }: { skip?: number } = {},
-  total = -1,
-  since?: Date
-) {
-  let count = 0;
-  if (total < 0) {
-    count = await prisma.bsdasri.count({
-      where: {
-        isDeleted: false,
-        ...(since ? { updatedAt: { gte: since } } : {})
-      }
-    });
-  } else {
-    count = total;
-  }
-  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
-  const bsdasris = await getReadonlyBsdasriRepository().findMany(
-    {
-      isDeleted: false,
-      ...(since ? { updatedAt: { gte: since } } : {})
-    },
-    {
-      skip,
-      take,
-
-      include: {
-        grouping: { select: { id: true } },
-        synthesizing: { select: { id: true } }
-      }
-    }
-  );
-
-  if (bsdasris.length === 0) {
-    logger.info(`No BSDASRI to index, exit`, since);
-    return;
-  }
-
-  await indexBsds(
-    idx,
-    bsdasris.map(bsdasri => toBsdElastic(bsdasri))
-  );
-  logger.info(`Indexed BSDASRI batch ${skip}/${count}`);
-
-  if (bsdasris.length < take) {
-    logger.info(`Indexed BSDASRI batch ${count}/${count}`);
-    return;
-  }
-
-  return indexAllBsdasris(idx, { skip: skip + take });
 }
 
 export function indexBsdasri(bsdasri: Bsdasri, ctx?: GraphQLContext) {

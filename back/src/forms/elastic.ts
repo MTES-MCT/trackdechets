@@ -1,10 +1,8 @@
 import { Form, Status } from "@prisma/client";
-import prisma from "../prisma";
-import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
+import { BsdElastic, indexBsd } from "../common/elastic";
 import { FullForm } from "./types";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
-import logger from "../logging/logger";
 
 /**
  * Computes which SIRET should appear on which tab in the frontend
@@ -251,63 +249,10 @@ export function toBsdElastic(
   };
 }
 
-/**
- * Index all BSDs from the forms table.
- */
-export async function indexAllForms(
-  idx: string,
-  { skip = 0 }: { skip?: number } = {},
-  total = -1,
-  since?: Date
-) {
-  let count = 0;
-  if (total < 0) {
-    // calculate the total once
-    count = await prisma.form.count({
-      where: {
-        isDeleted: false,
-        ...(since ? { updatedAt: { gte: since } } : {})
-      }
-    });
-  } else {
-    count = total;
-  }
-  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
-  const forms = await prisma.form.findMany({
-    skip,
-    take,
-    where: {
-      isDeleted: false,
-      ...(since ? { updatedAt: { gte: since } } : {})
-    },
-    include: {
-      forwarding: true,
-      forwardedIn: true,
-      transportSegments: true,
-      intermediaries: true
-    }
-  });
-
-  if (forms.length === 0) {
-    logger.info(`No Forms to index, exit`, since);
-    return;
-  }
-
-  await indexBsds(
-    idx,
-    forms.map(form => toBsdElastic(form))
-  );
-  logger.info(`Indexed BSDD batch ${skip}/${count}`);
-
-  if (forms.length < take) {
-    logger.info(`Indexed BSDD batch ${count}/${count}`);
-    return;
-  }
-
-  return indexAllForms(idx, { skip: skip + take }, count);
-}
-
-export async function indexForm(form: FullForm, ctx?: GraphQLContext) {
+export async function indexForm(
+  form: FullForm,
+  ctx?: GraphQLContext
+): Promise<Omit<BsdElastic, "es_mappings_version">> {
   // prevent unwanted cascaded reindexation
   if (form.isDeleted) {
     return null;
