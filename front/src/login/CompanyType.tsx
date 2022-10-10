@@ -61,6 +61,12 @@ export const COMPANY_TYPES = [
     helpText:
       "Société prenant en charge la gestion des déchets, dans le cadre de la REP (Responsabilité élargie du producteur)",
   },
+  {
+    value: CompanyType.Worker,
+    label: "Entreprise de travaux amiante",
+    helpText:
+      "Entreprise qui réalise des travaux amiante relevant de la sous-section 3 ou 4, conformément aux dispositions des articles R.4412-94 à 146 du code du travail",
+  },
 ];
 
 export default function CompanyTypeField({

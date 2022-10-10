@@ -139,6 +139,13 @@ export const FullBsdaFragment = gql`
       company {
         ...CompanyFragment
       }
+      certification {
+        hasSubSectionFour
+        hasSubSectionThree
+        certificationNumber
+        validityLimit
+        organisation
+      }
       work {
         signature {
           author

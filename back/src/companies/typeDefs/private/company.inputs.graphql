@@ -198,6 +198,74 @@ input DeleteBrokerReceiptInput {
   id: ID!
 }
 
+input CreateWorkerCertificationInput {
+  """
+  Indique si l'entreprise réalise des travaux relevant de la sous-section 4
+  """
+  hasSubSectionFour: Boolean!
+
+  """
+  Indique si l'entreprise réalise des travaux relevant de la sous-section 3
+  """
+  hasSubSectionThree: Boolean!
+
+  """
+  Numéro de certification (sous-section 3 uniquement)
+  """
+  certificationNumber: String
+
+  """
+  Limite de validité de la certification (sous-section 3 uniquement)
+  """
+  validityLimit: DateTime
+
+  """
+  Organisation qui a décerné la certification (sous-section 3 uniquement)
+  Peut prendre uniquement les valeurs suivantes: AFNOR Certification, GLOBAL CERTIFICATION, QUALIBAT
+  """
+  organisation: String
+}
+
+input UpdateWorkerCertificationInput {
+  """
+  The id of the worker certification to update
+  """
+  id: ID!
+
+  """
+  Indique si l'entreprise réalise des travaux relevant de la sous-section 4
+  """
+  hasSubSectionFour: Boolean
+
+  """
+  Indique si l'entreprise réalise des travaux relevant de la sous-section 3
+  """
+  hasSubSectionThree: Boolean
+
+  """
+  Numéro de certification (sous-section 3 uniquement)
+  """
+  certificationNumber: String
+
+  """
+  Limite de validité de la certification (sous-section 3 uniquement)
+  """
+  validityLimit: DateTime
+
+  """
+  Organisation qui a décerné la certification (sous-section 3 uniquement)
+  Peut prendre uniquement les valeurs suivantes: AFNOR Certification, GLOBAL CERTIFICATION, QUALIBAT
+  """
+  organisation: String
+}
+
+input DeleteWorkerCertificationInput {
+  """
+  The id of the worker certification to delete
+  """
+  id: ID!
+}
+
 input VerifyCompanyInput {
   "Le SIRET de l'établissement à vérifier"
   siret: String!
@@ -230,13 +298,13 @@ input PrivateCompanyInput {
   codeNaf: String
 
   "Nom de l'établissement"
-  companyName: String
+  companyName: String!
 
   "Nom d'usage de l'établissement"
   givenName: String
 
   "Adresse de l'établissement"
-  address: String
+  address: String!
 
   """
   Récipissé transporteur (le cas échéant, pour les profils transporteur)

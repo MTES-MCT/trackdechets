@@ -170,7 +170,7 @@ export default function Appendix2MultiSelect() {
   }
 
   if (loading) {
-    return <div>Chargement</div>;
+    return <div>Chargement...</div>;
   }
 
   return (

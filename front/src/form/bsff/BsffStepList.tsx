@@ -84,7 +84,7 @@ export default function BsffStepsList(props: Props) {
         ficheIntervention => ficheIntervention.id
       ),
       forwarding:
-        input.type === BsffType.Reexpedition ? previousBsffs[0].id : null,
+        input.type === BsffType.Reexpedition ? previousBsffs[0]?.id : null,
       repackaging:
         input.type === BsffType.Reconditionnement
           ? previousBsffs.map(previousBsff => previousBsff.id)

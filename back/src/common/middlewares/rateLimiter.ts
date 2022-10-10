@@ -1,6 +1,5 @@
 import rateLimit from "express-rate-limit";
 import { Request } from "express";
-import forwarded from "forwarded";
 import RateLimitRedisStore from "rate-limit-redis";
 import { redisClient } from "../../common/redis";
 
@@ -9,8 +8,6 @@ type Options = {
   maxRequestsPerWindow: number;
   keyGenerator?: (ip: string, request: Request) => string;
 };
-
-const { USE_XFF_HEADER } = process.env;
 
 const RATE_LIMIT_WINDOW_SECONDS = 60;
 const store =
@@ -30,17 +27,7 @@ export function rateLimiterMiddleware(options: Options) {
     max: options.maxRequestsPerWindow,
     store,
     keyGenerator: (request: Request) => {
-      const clientIp = getClientIp(request);
-      return options.keyGenerator(clientIp, request);
+      return options.keyGenerator(request.ip, request);
     }
   });
-}
-
-function getClientIp(request: Request) {
-  if (USE_XFF_HEADER !== "true") {
-    return request.ip;
-  }
-
-  const parsed = forwarded(request);
-  return parsed.slice(-1).pop() ?? request.ip;
 }

@@ -273,6 +273,7 @@ describe("Mutation.duplicateForm", () => {
 
     expect(duplicatedForm.recipientIsTempStorage).toBe(true);
     expect(duplicatedTemporaryStorageDetail).toMatchObject({
+      readableId: `${duplicatedForm.readableId}-suite`,
       quantityReceived: null,
       wasteAcceptationStatus: null,
       wasteRefusalReason: null,

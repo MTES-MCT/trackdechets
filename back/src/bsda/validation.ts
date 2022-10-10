@@ -9,7 +9,7 @@ import {
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import * as yup from "yup";
-import { WASTES_CODES } from "../common/constants";
+import { BSDA_WASTE_CODES } from "../common/constants";
 import {
   isVat,
   isSiret,
@@ -65,6 +65,11 @@ type Worker = Pick<
   | "workerCompanyPhone"
   | "workerCompanyMail"
   | "workerWorkHasEmitterPaperSignature"
+  | "workerCertificationHasSubSectionFour"
+  | "workerCertificationHasSubSectionThree"
+  | "workerCertificationCertificationNumber"
+  | "workerCertificationValidityLimit"
+  | "workerCertificationOrganisation"
 >;
 
 type Destination = Pick<
@@ -413,7 +418,35 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
             `Entreprise de travaux: ${MISSING_COMPANY_EMAIL}`
           )
       }),
-    workerWorkHasEmitterPaperSignature: yup.boolean().nullable()
+    workerWorkHasEmitterPaperSignature: yup.boolean().nullable(),
+    workerCertificationHasSubSectionFour: yup.boolean().nullable(),
+    workerCertificationHasSubSectionThree: yup.boolean().nullable(),
+    workerCertificationCertificationNumber: yup
+      .string()
+      .when("hasSubSectionThree", {
+        is: true,
+        then: schema => schema.required(),
+        otherwise: schema => schema.nullable()
+      }),
+    workerCertificationValidityLimit: yup.date().when("hasSubSectionThree", {
+      is: true,
+      then: schema => schema.required(),
+      otherwise: schema => schema.nullable()
+    }),
+    workerCertificationOrganisation: yup
+      .string()
+      .oneOf([
+        "AFNOR Certification",
+        "GLOBAL CERTIFICATION",
+        "QUALIBAT",
+        "",
+        null
+      ])
+      .when("hasSubSectionThree", {
+        is: true,
+        then: schema => schema.required(),
+        otherwise: schema => schema.nullable()
+      })
   });
 
 const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
@@ -851,7 +884,7 @@ const wasteDescriptionSchema: FactorySchemaOf<
     wasteCode: yup
       .string()
       .requiredIf(context.emissionSignature, "Le code déchet est obligatoire")
-      .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE),
+      .oneOf([...BSDA_WASTE_CODES, "", null], INVALID_WASTE_CODE),
     wasteFamilyCode: yup.string().nullable(),
     wasteMaterialName: yup
       .string()

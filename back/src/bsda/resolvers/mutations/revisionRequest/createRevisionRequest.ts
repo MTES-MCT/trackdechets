@@ -7,7 +7,7 @@ import {
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
-import { WASTES_CODES } from "../../../../common/constants/WASTES";
+import { BSDA_WASTE_CODES } from "../../../../common/constants/WASTES";
 import { checkIsAuthenticated } from "../../../../common/permissions";
 import { INVALID_WASTE_CODE } from "../../../../forms/errors";
 import {
@@ -177,7 +177,7 @@ async function getFlatContent(
 const revisionRequestContentSchema = yup.object({
   wasteCode: yup
     .string()
-    .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE)
+    .oneOf([...BSDA_WASTE_CODES, "", null], INVALID_WASTE_CODE)
     .nullable(),
   wastePop: yup.boolean().nullable(),
   packagings: yup.array().nullable(),

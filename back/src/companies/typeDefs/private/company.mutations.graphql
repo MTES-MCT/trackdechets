@@ -36,6 +36,8 @@ type Mutation {
     vhuAgrementDemolisseurId: String
     "Identifiant d'un agrément VHU broyeur"
     vhuAgrementBroyeurId: String
+    "Identifiant des informations de certification de l'entreprise de travaux"
+    workerCertificationId: String
     "Agréments de l'éco-organisme"
     ecoOrganismeAgreements: [URL!]
     "L'entreprise autorise l'enlèvement d'un Dasri sans sa signature"
@@ -127,6 +129,30 @@ type Mutation {
   Supprime un agrément VHU
   """
   deleteVhuAgrement(input: DeleteVhuAgrementInput!): VhuAgrement
+
+  """
+  USAGE INTERNE
+  Crée une certification d'entreprise de travaux
+  """
+  createWorkerCertification(
+    input: CreateWorkerCertificationInput!
+  ): WorkerCertification
+
+  """
+  USAGE INTERNE
+  Édite une certification d'entreprise de travaux
+  """
+  updateWorkerCertification(
+    input: UpdateWorkerCertificationInput!
+  ): WorkerCertification
+
+  """
+  USAGE INTERNE
+  Supprime une certification d'entreprise de travaux
+  """
+  deleteWorkerCertification(
+    input: DeleteWorkerCertificationInput!
+  ): WorkerCertification
 
   """
   USAGE INTERNE

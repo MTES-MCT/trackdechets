@@ -135,6 +135,7 @@ export function toBsdElastic(bsda: Bsda): BsdElastic {
     customId: "",
     readableId: bsda.id,
     createdAt: bsda.createdAt.getTime(),
+    updatedAt: bsda.updatedAt.getTime(),
     emitterCompanyName: bsda.emitterCompanyName ?? "",
     emitterCompanySiret: bsda.emitterCompanySiret ?? "",
     transporterCompanyName: bsda.transporterCompanyName ?? "",

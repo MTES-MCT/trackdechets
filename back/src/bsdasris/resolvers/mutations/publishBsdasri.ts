@@ -8,8 +8,8 @@ import {
   checkIsBsdasriPublishable,
   checkCanEditBsdasri
 } from "../../permissions";
-import prisma from "../../../prisma";
-import { indexBsdasri } from "../../elastic";
+
+import { getBsdasriRepository } from "../../repository";
 
 const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
   _,
@@ -37,19 +37,16 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
 
   await validateBsdasri(bsdasri, { emissionSignature: true });
 
+  const bsdasriRepository = getBsdasriRepository(user);
+
   // publish  dasri
-  const publishedBsdasri = await prisma.bsdasri.update({
-    where: { id: bsdasri.id },
-    data: { isDraft: false },
-    include: {
-      grouping: { select: { id: true } },
-      synthesizing: { select: { id: true } }
-    }
-  });
+  const publishedBsdasri = await bsdasriRepository.update(
+    { id: bsdasri.id },
+    { isDraft: false }
+  );
 
   const expandedDasri = expandBsdasriFromDB(publishedBsdasri);
 
-  await indexBsdasri(publishedBsdasri, context);
   return expandedDasri;
 };
 

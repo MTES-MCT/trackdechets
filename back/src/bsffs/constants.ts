@@ -56,5 +56,3 @@ export const OPERATION: Record<
     successors: [Prisma.BsffType.REEXPEDITION]
   }
 };
-
-export const WASTE_CODES = ["14 06 01*"];

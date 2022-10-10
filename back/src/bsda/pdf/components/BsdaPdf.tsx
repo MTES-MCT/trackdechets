@@ -226,6 +226,40 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
             <CompanyContact company={bsda?.worker?.company} />
           </div>
           <div className="BoxCol">
+            {bsda.worker?.certification && (
+              <>
+                <strong>Certifications</strong>
+                <p>
+                  <input
+                    type="checkbox"
+                    checked={bsda?.worker?.certification?.hasSubSectionFour}
+                    readOnly
+                  />{" "}
+                  Travaux relevant de la sous-section 4
+                </p>
+                <p>
+                  <input
+                    type="checkbox"
+                    checked={bsda?.worker?.certification?.hasSubSectionThree}
+                    readOnly
+                  />{" "}
+                  Travaux relevant de la sous-section 3
+                </p>
+                {bsda?.worker?.certification?.hasSubSectionThree && (
+                  <>
+                    <p>
+                      Numéro de certification :{" "}
+                      {bsda.worker.certification.certificationNumber}
+                    </p>
+                    <p>
+                      Limite de validité :{" "}
+                      {formatDate(bsda.worker.certification.validityLimit)}
+                    </p>
+                    <p>Organisme : {bsda.worker.certification.organisation}</p>
+                  </>
+                )}
+              </>
+            )}
             <p>
               <strong>5.1 Version papier</strong>
               <p>

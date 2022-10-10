@@ -82,6 +82,7 @@ module.exports = {
     },
     {
       Guides: [
+        "guides/good-practices",
         "guides/playground",
         "guides/language",
         "guides/pdf",

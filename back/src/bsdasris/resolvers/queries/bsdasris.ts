@@ -1,5 +1,5 @@
 import { expandBsdasriFromDB } from "../../converter";
-import prisma from "../../../prisma";
+
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { GraphQLContext } from "../../../types";
 import { toPrismaWhereInput } from "../../where";
@@ -7,6 +7,7 @@ import { applyMask } from "../../../common/where";
 import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { getConnection } from "../../../common/pagination";
 import { QueryResolvers } from "../../../generated/graphql/types";
+import { getBsdasriRepository } from "../../repository";
 
 const bsdasrisResolver: QueryResolvers["bsdasris"] = async (
   _,
@@ -35,13 +36,14 @@ const bsdasrisResolver: QueryResolvers["bsdasris"] = async (
 
   const where = applyMask(prismaWhere, mask);
 
-  const totalCount = await prisma.bsdasri.count({ where });
+  const bsdasriRepository = getBsdasriRepository(user);
+
+  const totalCount = await bsdasriRepository.count(where);
 
   return getConnection({
     totalCount,
     findMany: prismaPaginationArgs =>
-      prisma.bsdasri.findMany({
-        where,
+      bsdasriRepository.findMany(where, {
         ...prismaPaginationArgs,
         orderBy: { createdAt: "desc" }
       }),

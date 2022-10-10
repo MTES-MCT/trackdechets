@@ -1,4 +1,8 @@
 import { Form, QuantityType, Status, TransportSegment } from "@prisma/client";
+import {
+  AppendixFormInput,
+  InitialFormFractionInput
+} from "../generated/graphql/types";
 import { Bsdd } from "./types";
 
 /**
@@ -187,4 +191,14 @@ export function formToBsdd(
  */
 export function tov1ReadableId(readableId: string) {
   return readableId.replace("-suite", "");
+}
+
+export function appendix2toFormFractions(
+  appendix2Forms: AppendixFormInput[]
+): InitialFormFractionInput[] {
+  return appendix2Forms.map(({ id }) => {
+    return {
+      form: { id }
+    };
+  });
 }

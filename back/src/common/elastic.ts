@@ -30,6 +30,7 @@ export interface BsdElastic {
   type: BsdType;
   id: string;
   createdAt: number;
+  updatedAt: number;
   readableId: string;
   customId: string;
   emitterCompanyName: string;
@@ -282,6 +283,9 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
   createdAt: {
     type: "date"
   },
+  updatedAt: {
+    type: "date"
+  },
   isDraftFor: {
     type: "keyword"
   },
@@ -453,8 +457,9 @@ export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
     index: index.index,
     type: index.type,
     id: bsd.id,
-
     body: bsd,
+    version_type: "external_gte",
+    version: bsd.updatedAt,
     ...refresh(ctx)
   });
 }

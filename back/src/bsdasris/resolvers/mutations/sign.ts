@@ -13,6 +13,7 @@ import {
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { checkCanEditBsdasri } from "../../permissions";
 import { getCachedUserSiretOrVat } from "../../../common/redis/users";
+import { getBsdasriRepository } from "../../repository";
 
 import {
   dasriSignatureMapping,
@@ -22,6 +23,7 @@ import {
   getFieldsUpdate
 } from "./signatureUtils";
 import { indexBsdasri } from "../../elastic";
+import { runInTransaction } from "../../../common/repository/helper";
 
 const reindexAssociatedDasris = async dasriId => {
   const updatedDasris = await prisma.bsdasri.findMany({
@@ -36,7 +38,7 @@ const reindexAssociatedDasris = async dasriId => {
  * When synthesized dasri is received or processed, associated dasris are updated
  *
  */
-const cascadeOnSynthesized = async ({ dasri }) => {
+const cascadeOnSynthesized = async ({ dasri, bsdasriRepository }) => {
   if (dasri.status === BsdasriStatus.RECEIVED) {
     const {
       destinationCompanyName,
@@ -50,9 +52,9 @@ const cascadeOnSynthesized = async ({ dasri }) => {
       destinationReceptionSignatureAuthor,
       destinationReceptionSignatureDate
     } = dasri;
-    await prisma.bsdasri.updateMany({
-      where: { synthesizedInId: dasri.id },
-      data: {
+    await bsdasriRepository.updateMany(
+      { synthesizedInId: dasri.id },
+      {
         status: BsdasriStatus.RECEIVED,
         destinationCompanyName,
         destinationCompanySiret,
@@ -66,7 +68,7 @@ const cascadeOnSynthesized = async ({ dasri }) => {
         destinationReceptionSignatureDate,
         destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED
       }
-    });
+    );
     await reindexAssociatedDasris(dasri.id);
   }
 
@@ -79,9 +81,9 @@ const cascadeOnSynthesized = async ({ dasri }) => {
       destinationOperationSignatureAuthor
     } = dasri;
 
-    await prisma.bsdasri.updateMany({
-      where: { synthesizedInId: dasri.id },
-      data: {
+    await bsdasriRepository.updateMany(
+      { synthesizedInId: dasri.id },
+      {
         status: BsdasriStatus.PROCESSED,
         destinationOperationCode,
         destinationOperationDate,
@@ -89,7 +91,7 @@ const cascadeOnSynthesized = async ({ dasri }) => {
         destinationOperationSignatureDate,
         destinationOperationSignatureAuthor
       }
-    });
+    );
     await reindexAssociatedDasris(dasri.id);
   }
 };
@@ -191,7 +193,7 @@ const sign = async ({
     ...getFieldsUpdate({ bsdasri, input: { author, type } })
   };
 
-  const updatedDasri = await dasriTransition(
+  const { where, updateData } = await dasriTransition(
     {
       ...bsdasri
     },
@@ -216,12 +218,17 @@ const sign = async ({
     }
   );
 
-  if (updatedDasri.type === BsdasriType.SYNTHESIS) {
-    await cascadeOnSynthesized({ dasri: updatedDasri });
-  }
-  const expandedDasri = expandBsdasriFromDB(updatedDasri);
-  await indexBsdasri(updatedDasri, context);
-  return expandedDasri;
+  const signedDasri = await runInTransaction(async transaction => {
+    const bsdasriRepository = getBsdasriRepository(user, transaction);
+
+    const signedDasri = await bsdasriRepository.update(where, updateData);
+    if (signedDasri.type === BsdasriType.SYNTHESIS) {
+      await cascadeOnSynthesized({ dasri: signedDasri, bsdasriRepository });
+    }
+    return signedDasri;
+  });
+
+  return expandBsdasriFromDB(signedDasri);
 };
 
 export default sign;

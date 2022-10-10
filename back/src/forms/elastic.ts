@@ -213,6 +213,7 @@ function toBsdElastic(form: FullForm & { forwarding?: Form }): BsdElastic {
     readableId: form.readableId,
     customId: form.customId,
     createdAt: form.createdAt.getTime(),
+    updatedAt: form.updatedAt.getTime(),
     emitterCompanyName: form.emitterCompanyName ?? "",
     emitterCompanySiret: form.emitterCompanySiret ?? "",
     transporterCompanyName: form.transporterCompanyName ?? "",
@@ -286,7 +287,7 @@ export async function indexAllForms(
   return indexAllForms(idx, { skip: skip + take });
 }
 
-export function indexForm(form: FullForm, ctx?: GraphQLContext) {
+export async function indexForm(form: FullForm, ctx?: GraphQLContext) {
   // prevent unwanted cascaded reindexation
   if (form.isDeleted) {
     return null;
@@ -303,6 +304,7 @@ export function indexForm(form: FullForm, ctx?: GraphQLContext) {
       })
     );
   }
-
-  return indexBsd(toBsdElastic(form), ctx);
+  const bsdElastic = toBsdElastic(form);
+  await indexBsd(bsdElastic, ctx);
+  return bsdElastic;
 }

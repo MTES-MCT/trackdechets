@@ -105,7 +105,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -173,7 +173,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -240,7 +240,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -276,6 +276,7 @@ describe("Mutation.Bsda.create", () => {
       input.destination.company.siret
     );
   });
+
   it("should allow creating the form if up to 2 plates are submitted", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { company: destinationCompany } = await userWithCompanyFactory(
@@ -308,7 +309,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -385,7 +386,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -466,7 +467,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        // code: "16 01 06",
+        // code: "06 07 01*",
         adr: "ADR",
         consistence: "SOLIDE",
         familyCode: "Code famille",
@@ -517,7 +518,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -565,7 +566,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -625,7 +626,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -677,7 +678,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -731,7 +732,7 @@ describe("Mutation.Bsda.create", () => {
         }
       },
       waste: {
-        code: "16 01 06",
+        code: "06 07 01*",
         adr: "ADR",
         pop: true,
         consistence: "SOLIDE",
@@ -747,6 +748,76 @@ describe("Mutation.Bsda.create", () => {
         company: {
           siret: company.siret,
           name: company.name,
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(data.createBsda.id).toBeDefined();
+  });
+
+  it("should allow creating the bsda with the worker certification infos", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const input: BsdaInput = {
+      emitter: {
+        isPrivateIndividual: false,
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      worker: {
+        company: {
+          siret: "22222222222222",
+          name: "worker",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        },
+        certification: {
+          hasSubSectionFour: true,
+          hasSubSectionThree: true,
+          certificationNumber: "AAA",
+          validityLimit: new Date().toISOString() as any,
+          organisation: "AFNOR Certification"
+        }
+      },
+      waste: {
+        code: "06 07 01*",
+        adr: "ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
           address: "address",
           contact: "contactEmail",
           phone: "contactPhone",

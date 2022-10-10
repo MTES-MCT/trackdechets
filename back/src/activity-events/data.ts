@@ -11,7 +11,10 @@ export async function getStream(
     ...(until && { createdAt: { lte: until } })
   };
 
-  const events = await prisma.event.findMany({ where });
+  const events = await prisma.event.findMany({
+    where,
+    orderBy: { createdAt: "asc" }
+  });
 
   return events?.map(event => ({
     type: event.type,

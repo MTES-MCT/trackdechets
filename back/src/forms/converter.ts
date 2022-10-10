@@ -308,6 +308,9 @@ function flattenNextDestinationInput(input: {
     ),
     nextDestinationCompanyPhone: chain(input.nextDestination, nd =>
       chain(nd.company, c => c.phone)
+    ),
+    nextDestinationCompanyVatNumber: chain(input.nextDestination, nd =>
+      chain(nd.company, c => c.vatNumber)
     )
   };
 }
@@ -641,6 +644,7 @@ export async function expandFormFromDb(form: any): Promise<GraphQLForm> {
           company: nullIfNoValues<FormCompany>({
             name: forwardedIn.nextDestinationCompanyName,
             siret: forwardedIn.nextDestinationCompanySiret,
+            vatNumber: forwardedIn.nextDestinationCompanyVatNumber,
             address: forwardedIn.nextDestinationCompanyAddress,
             country: forwardedIn.nextDestinationCompanyCountry,
             contact: forwardedIn.nextDestinationCompanyContact,
@@ -653,6 +657,7 @@ export async function expandFormFromDb(form: any): Promise<GraphQLForm> {
           company: nullIfNoValues<FormCompany>({
             name: form.nextDestinationCompanyName,
             siret: form.nextDestinationCompanySiret,
+            vatNumber: form.nextDestinationCompanyVatNumber,
             address: form.nextDestinationCompanyAddress,
             country: form.nextDestinationCompanyCountry,
             contact: form.nextDestinationCompanyContact,

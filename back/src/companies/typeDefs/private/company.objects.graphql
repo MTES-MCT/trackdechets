@@ -57,6 +57,11 @@ type CompanyFavorite {
   Agrément VHU broyeur (le cas échéant, pour les profils VHU)
   """
   vhuAgrementBroyeur: VhuAgrement
+
+  """
+  Certification entreprise de travaux
+  """
+  workerCertification: WorkerCertification
 }
 
 type CompanyForVerification {

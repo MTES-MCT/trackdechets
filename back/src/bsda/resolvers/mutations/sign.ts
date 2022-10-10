@@ -19,7 +19,8 @@ import { checkIsCompanyMember } from "../../../users/permissions";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaHistory, getBsdaOrNotFound } from "../../database";
 import { machine } from "../../machine";
-import { getBsdaRepository, runInTransaction } from "../../repository";
+import { getBsdaRepository } from "../../repository";
+import { runInTransaction } from "../../../common/repository/helper";
 import { validateBsda } from "../../validation";
 
 type SignatureTypeInfos = {

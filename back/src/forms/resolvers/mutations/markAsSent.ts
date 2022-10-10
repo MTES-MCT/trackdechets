@@ -7,7 +7,7 @@ import { checkCanBeSealed, signingInfoSchema } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
-import prisma from "../../../prisma";
+import { runInTransaction } from "../../../common/repository/helper";
 
 const markAsSentResolver: MutationResolvers["markAsSent"] = async (
   parent,
@@ -42,7 +42,7 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
     form.id
   );
 
-  const resentForm = await prisma.$transaction(async transaction => {
+  const resentForm = await runInTransaction(async transaction => {
     const { updateAppendix2Forms, update } = getFormRepository(
       user,
       transaction

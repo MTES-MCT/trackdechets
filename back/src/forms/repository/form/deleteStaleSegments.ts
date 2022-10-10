@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { RepositoryFnDeps } from "../types";
+import { RepositoryFnDeps } from "../../../common/repository/types";
 
 export type DeleteFormStaleSegmentsFn = (
   where: Prisma.FormWhereUniqueInput

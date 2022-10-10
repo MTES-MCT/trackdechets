@@ -3,6 +3,7 @@ const routes = {
     index: "/admin",
     verification: "/admin/verification",
     anonymousCompany: "/admin/anonymous-company",
+    reindex: "/admin/reindex",
   },
   login: "/login",
   invite: "/invite",

@@ -247,8 +247,38 @@ input BsdaWorkerInput {
   isDisabled: Boolean
   "Entreprise de travaux"
   company: CompanyInput
+  "Informations de certification"
+  certification: BsdaWorkerCertificationInput
   "Déclaration générale"
   work: BsdaWorkInput
+}
+
+input BsdaWorkerCertificationInput {
+  """
+  Indique si l'entreprise réalise des travaux relevant de la sous-section 4
+  """
+  hasSubSectionFour: Boolean!
+
+  """
+  Indique si l'entreprise réalise des travaux relevant de la sous-section 3
+  """
+  hasSubSectionThree: Boolean!
+
+  """
+  Numéro de certification (sous-section 3 uniquement)
+  """
+  certificationNumber: String
+
+  """
+  Limite de validité de la certification (sous-section 3 uniquement)
+  """
+  validityLimit: DateTime
+
+  """
+  Organisation qui a décerné la certification (sous-section 3 uniquement)
+  Peut prendre uniquement les valeurs suivantes: AFNOR Certification, GLOBAL CERTIFICATION, QUALIBAT
+  """
+  organisation: String
 }
 
 input BsdaWorkInput {

@@ -55,6 +55,7 @@ export const FullBsffFragment = gql`
     id
     type
     status
+    isDraft
     emitter {
       company {
         ...CompanyFragment
@@ -136,18 +137,36 @@ export const FullBsffFragment = gql`
     }
     grouping {
       id
+      packagings {
+        name
+        numero
+        volume
+        weight
+      }
     }
     groupedIn {
       id
     }
     repackaging {
       id
+      packagings {
+        name
+        numero
+        volume
+        weight
+      }
     }
     repackagedIn {
       id
     }
     forwarding {
       id
+      packagings {
+        name
+        numero
+        volume
+        weight
+      }
     }
     forwardedIn {
       id
@@ -155,4 +174,60 @@ export const FullBsffFragment = gql`
   }
   ${companyFragment}
   ${FicheInterventionFragment}
+`;
+
+export const PreviousBsffFragment = gql`
+  fragment PreviousBsff on Bsff {
+    id
+    type
+    status
+    emitter {
+      company {
+        siret
+        name
+      }
+    }
+    packagings {
+      name
+      numero
+      volume
+      weight
+    }
+    waste {
+      code
+      description
+      adr
+    }
+    weight {
+      value
+      isEstimate
+    }
+    repackagedIn {
+      id
+      packagings {
+        name
+        numero
+        volume
+        weight
+      }
+    }
+    forwardedIn {
+      id
+      packagings {
+        name
+        numero
+        volume
+        weight
+      }
+    }
+    groupedIn {
+      id
+      packagings {
+        name
+        numero
+        volume
+        weight
+      }
+    }
+  }
 `;

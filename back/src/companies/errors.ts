@@ -29,3 +29,9 @@ export class VhuAgrementNotFound extends UserInputError {
     super(`Cet agrément VHU n'existe pas`);
   }
 }
+
+export class WorkerCertificationNotFound extends UserInputError {
+  constructor() {
+    super(`Cette certification d'entreprise de travaux n'existe pas`);
+  }
+}

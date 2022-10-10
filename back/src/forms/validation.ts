@@ -5,7 +5,8 @@ import {
   QuantityType,
   WasteAcceptationStatus,
   Prisma,
-  CompanyVerificationStatus
+  CompanyVerificationStatus,
+  Status
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
@@ -15,11 +16,12 @@ import {
   isDangerous,
   PROCESSING_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
-  WASTES_CODES
+  BSDD_WASTE_CODES
 } from "../common/constants";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
   CompanyInput,
+  InitialFormFractionInput,
   PackagingInfo,
   Packagings
 } from "../generated/graphql/types";
@@ -52,6 +54,7 @@ import {
   isOmi
 } from "../common/constants/companySearchHelpers";
 import { validateCompany } from "../companies/validateCompany";
+import { Decimal } from "decimal.js-light";
 // set yup default error messages
 configureYup();
 
@@ -193,6 +196,7 @@ type ProcessedInfo = Pick<
   | "nextDestinationCompanyContact"
   | "nextDestinationCompanyPhone"
   | "nextDestinationCompanyMail"
+  | "nextDestinationCompanyVatNumber"
 >;
 
 // *************************************************************
@@ -651,7 +655,7 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
     wasteDetailsCode: yup
       .string()
       .requiredIf(!isDraft, "Le code déchet est obligatoire")
-      .oneOf([...WASTES_CODES, "", null], INVALID_WASTE_CODE),
+      .oneOf([...BSDD_WASTE_CODES, "", null], INVALID_WASTE_CODE),
     wasteDetailsOnuCode: yup.string().when("wasteDetailsIsDangerous", {
       is: (wasteDetailsIsDangerous: boolean) =>
         wasteDetailsIsDangerous === true,
@@ -1098,6 +1102,14 @@ const withNextDestination = (required: boolean) =>
               )
           : schema.notRequired().nullable();
       }),
+    nextDestinationCompanyVatNumber: yup
+      .string()
+      .ensure()
+      .test(
+        "is-vat",
+        "${path} n'est pas un numéro de TVA intracommunautaire valide",
+        value => !value || isVat(value)
+      ),
     nextDestinationCompanyAddress: yup
       .string()
       .ensure()
@@ -1140,6 +1152,10 @@ const withoutNextDestination = yup.object().shape({
     .ensure()
     .max(0, EXTRANEOUS_NEXT_DESTINATION),
   nextDestinationCompanySiret: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  nextDestinationCompanyVatNumber: yup
     .string()
     .ensure()
     .max(0, EXTRANEOUS_NEXT_DESTINATION),
@@ -1355,4 +1371,157 @@ export function validateIntermediariesInput(
       };
     })
   );
+}
+
+const BSDD_MAX_APPENDIX2 = parseInt(process.env.BSDD_MAX_APPENDIX2, 10) || 250;
+
+/**
+ * Les vérifications suivantes sont effectuées :
+ * - Vérifie que le type d'émetteur est compatible avec le groupement
+ * - Vérifie que le SIRET de l'établissement émetteur est renseigné et qu'il correspond
+ * au SIRET de destination des BSDD initiaux
+ * - Vérifie que les identifiants des BSDD initiaux existent
+ * - Vérifie que les BSDD initiaux sont bien en attente de regroupement
+ * - Vérifie que les quantités à regrouper son cohérentes
+ */
+export async function validateGroupement(
+  form: Partial<Form | Prisma.FormCreateInput>,
+  grouping: InitialFormFractionInput[]
+) {
+  if (!grouping || grouping?.length === 0) {
+    return [];
+  }
+
+  if (grouping.length > BSDD_MAX_APPENDIX2) {
+    throw new UserInputError(
+      `Vous ne pouvez pas regrouper plus de ${BSDD_MAX_APPENDIX2} BSDDs initiaux`
+    );
+  }
+
+  if (form.emitterType !== EmitterType.APPENDIX2) {
+    throw new UserInputError(
+      "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
+    );
+  }
+
+  if (!form.emitterCompanySiret) {
+    throw new UserInputError(
+      "Vous devez renseigner le numéro SIRET de l'établissement de tri, transit, regroupement émettrice du BSDD de regroupement"
+    );
+  }
+
+  // check each form appears in only one form fraction
+  const formIds = grouping.map(({ form }) => form.id);
+  const duplicates = formIds.filter(
+    (id, index) => formIds.indexOf(id) !== index
+  );
+  if (duplicates.length > 0) {
+    throw new UserInputError(
+      `Impossible d'associer plusieurs fractions du même bordereau initial sur un même bordereau` +
+        ` de regroupement. Identifiant du ou des bordereaux initiaux concernés : ${duplicates.join(
+          ", "
+        )}`
+    );
+  }
+
+  const initialForms = await prisma.form.findMany({
+    where: {
+      id: { in: grouping.map(({ form }) => form.id) },
+      status: { in: [Status.AWAITING_GROUP, Status.GROUPED] }
+    },
+    include: {
+      forwardedIn: { select: { recipientCompanySiret: true } },
+      groupedIn: true
+    }
+  });
+
+  if (grouping.length > 0 && initialForms.length < grouping.length) {
+    const notFoundIds = grouping
+      .map(({ form }) => form.id)
+      .filter(id => !initialForms.map(p => p.id).includes(id));
+    throw new UserInputError(
+      `Les BSDD initiaux ${notFoundIds.join(
+        ", "
+      )} n'existent pas ou ne sont pas en attente de regroupement`
+    );
+  }
+
+  const formFractions = initialForms.map(f => {
+    const quantity = grouping.find(
+      formFraction => formFraction.form.id === f.id
+    ).quantity;
+
+    const quantityGroupedInOtherForms = f.groupedIn.reduce(
+      (counter, formGroupement) => {
+        if (formGroupement.nextFormId !== form.id) {
+          return counter.plus(formGroupement.quantity);
+        }
+        return counter;
+      },
+      new Decimal(0)
+    );
+
+    return {
+      form: f,
+      quantity:
+        quantity ??
+        new Decimal(f.quantityReceived)
+          .minus(quantityGroupedInOtherForms)
+          .toNumber(),
+      quantityGroupedInOtherForms
+    };
+  });
+
+  const errors = formFractions.reduce<string[]>(
+    (acc, { form: initialForm, quantity, quantityGroupedInOtherForms }) => {
+      const destinationSiret = initialForm.forwardedIn
+        ? initialForm.forwardedIn.recipientCompanySiret
+        : initialForm.recipientCompanySiret;
+
+      if (destinationSiret !== form.emitterCompanySiret) {
+        return [
+          ...acc,
+          `Le bordereau ${initialForm.id} n'est pas en possession du nouvel émetteur`
+        ];
+      }
+
+      const quantityLeftToGroup = new Decimal(initialForm.quantityReceived)
+        .minus(quantityGroupedInOtherForms)
+        .toDecimalPlaces(6); // set precision to gramme
+
+      if (quantityLeftToGroup.equals(0)) {
+        return [
+          ...acc,
+          `Le bordereau ${initialForm.readableId} a déjà été regroupé en totalité`
+        ];
+      }
+
+      if (quantity <= 0) {
+        return [
+          ...acc,
+          `La quantité regroupée sur le BSDD ${initialForm.readableId} doit être supérieure à 0`
+        ];
+      }
+
+      if (new Decimal(quantity).greaterThan(quantityLeftToGroup)) {
+        return [
+          ...acc,
+          `La quantité restante à regrouper sur le BSDD ${
+            initialForm.readableId
+          } est de ${quantityLeftToGroup.toFixed(
+            3
+          )} T. Vous tentez de regrouper ${quantity} T.`
+        ];
+      }
+
+      return acc;
+    },
+    []
+  );
+
+  if (errors.length > 0) {
+    throw new UserInputError(errors.join("\n"));
+  }
+
+  return formFractions;
 }

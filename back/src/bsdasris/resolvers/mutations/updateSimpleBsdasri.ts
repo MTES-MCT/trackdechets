@@ -1,13 +1,13 @@
 import { expandBsdasriFromDB, flattenBsdasriInput } from "../../converter";
 import { BsdasriStatus, BsdasriType, Bsdasri } from "@prisma/client";
-import prisma from "../../../prisma";
+
 import { BsdasriInput } from "../../../generated/graphql/types";
-import { GraphQLContext } from "../../../types";
 import { validateBsdasri } from "../../validation";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import { indexBsdasri } from "../../elastic";
+
 import { getFieldsAllorwedForUpdate } from "./fieldsUpdateRules";
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
+import { getBsdasriRepository } from "../../repository";
 
 const getGroupedBsdasriArgs = (
   inputRegroupedBsdasris: string[] | null | undefined
@@ -35,13 +35,15 @@ const updateBsdasri = async ({
   input,
   dbBsdasri,
   dbGrouping,
-  context
+
+  user
 }: {
   id: string;
   dbBsdasri: Bsdasri;
   input: BsdasriInput;
   dbGrouping: any;
-  context: GraphQLContext;
+
+  user: Express.User;
 }) => {
   const { grouping: inputGrouping, synthesizing: inputSynthesizing } = input;
   const isGroupingType = dbBsdasri.type === BsdasriType.GROUPING;
@@ -106,22 +108,17 @@ const updateBsdasri = async ({
     }
   }
 
-  const updatedDasri = await prisma.bsdasri.update({
-    where: { id },
-    data: {
+  const bsdasriRepository = getBsdasriRepository(user);
+
+  const updatedDasri = await bsdasriRepository.update(
+    { id },
+    {
       ...flattenedInput,
       ...getGroupedBsdasriArgs(inputGrouping)
-    },
-    include: {
-      grouping: { select: { id: true } },
-      synthesizing: { select: { id: true } }
     }
-  });
+  );
 
-  const expandedDasri = expandBsdasriFromDB(updatedDasri);
-  await indexBsdasri(updatedDasri, context);
-
-  return expandedDasri;
+  return expandBsdasriFromDB(updatedDasri);
 };
 
 export default updateBsdasri;

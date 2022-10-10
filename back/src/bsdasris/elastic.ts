@@ -1,6 +1,6 @@
 import { BsdasriStatus, Bsdasri, BsdasriType } from "@prisma/client";
-import prisma from "../prisma";
 import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
+import { getReadonlyBsdasriRepository } from "./repository";
 
 import { DASRI_WASTE_CODES_MAPPING } from "../common/constants/DASRI_CONSTANTS";
 import { GraphQLContext } from "../types";
@@ -139,6 +139,7 @@ export function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
     wasteDescription: DASRI_WASTE_CODES_MAPPING[bsdasri.wasteCode],
     transporterNumberPlate: bsdasri.transporterTransportPlates,
     createdAt: bsdasri.createdAt.getTime(),
+    updatedAt: bsdasri.updatedAt.getTime(),
     ...where,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsdasri),
@@ -154,17 +155,20 @@ export async function indexAllBsdasris(
   { skip = 0 }: { skip?: number } = {}
 ) {
   const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
-  const bsdasris = await prisma.bsdasri.findMany({
-    skip,
-    take,
-    where: {
+  const bsdasris = await getReadonlyBsdasriRepository().findMany(
+    {
       isDeleted: false
     },
-    include: {
-      grouping: { select: { id: true } },
-      synthesizing: { select: { id: true } }
+    {
+      skip,
+      take,
+
+      include: {
+        grouping: { select: { id: true } },
+        synthesizing: { select: { id: true } }
+      }
     }
-  });
+  );
 
   if (bsdasris.length === 0) {
     return;

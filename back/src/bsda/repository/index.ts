@@ -1,4 +1,3 @@
-import { RepositoryTransaction } from "../../forms/repository/types";
 import prisma from "../../prisma";
 import { buildCountBsdas } from "./bsda/count";
 import { buildCreateBsda } from "./bsda/create";
@@ -8,7 +7,7 @@ import { buildFindRelatedBsdaEntity } from "./bsda/findRelatedEntity";
 import { buildFindUniqueBsda } from "./bsda/findUnique";
 import { buildUpdateBsda } from "./bsda/update";
 import { buildUpdateManyBsdas } from "./bsda/updateMany";
-import { transactionWrapper } from "./helper";
+import { transactionWrapper } from "../../common/repository/helper";
 import { buildAcceptRevisionRequestApproval } from "./revisionRequest/accept";
 import { buildCancelRevisionRequest } from "./revisionRequest/cancel";
 import { buildCountRevisionRequests } from "./revisionRequest/count";
@@ -17,9 +16,12 @@ import { buildFindManyBsdaRevisionRequest } from "./revisionRequest/findMany";
 import { buildFindUniqueRevisionRequest } from "./revisionRequest/findUnique";
 import { buildRefuseRevisionRequestApproval } from "./revisionRequest/refuse";
 import { BsdaActions } from "./types";
+import {
+  RepositoryFnBuilder,
+  RepositoryTransaction
+} from "../../common/repository/types";
 
 export type BsdaRepository = BsdaActions;
-export { runInTransaction } from "./helper";
 
 export function getReadonlyBsdaRepository() {
   return {
@@ -37,8 +39,9 @@ export function getBsdaRepository(
   user: Express.User,
   transaction?: RepositoryTransaction
 ): BsdaRepository {
-  const useTransaction = builder =>
-    transactionWrapper(user, transaction, builder);
+  function useTransaction<FnResult>(builder: RepositoryFnBuilder<FnResult>) {
+    return transactionWrapper(builder, { user, transaction });
+  }
 
   return {
     ...getReadonlyBsdaRepository(),
