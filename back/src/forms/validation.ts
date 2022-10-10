@@ -196,6 +196,7 @@ type ProcessedInfo = Pick<
   | "nextDestinationCompanyContact"
   | "nextDestinationCompanyPhone"
   | "nextDestinationCompanyMail"
+  | "nextDestinationCompanyVatNumber"
 >;
 
 // *************************************************************
@@ -1101,6 +1102,14 @@ const withNextDestination = (required: boolean) =>
               )
           : schema.notRequired().nullable();
       }),
+    nextDestinationCompanyVatNumber: yup
+      .string()
+      .ensure()
+      .test(
+        "is-vat",
+        "${path} n'est pas un numéro de TVA intracommunautaire valide",
+        value => !value || isVat(value)
+      ),
     nextDestinationCompanyAddress: yup
       .string()
       .ensure()
@@ -1143,6 +1152,10 @@ const withoutNextDestination = yup.object().shape({
     .ensure()
     .max(0, EXTRANEOUS_NEXT_DESTINATION),
   nextDestinationCompanySiret: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  nextDestinationCompanyVatNumber: yup
     .string()
     .ensure()
     .max(0, EXTRANEOUS_NEXT_DESTINATION),

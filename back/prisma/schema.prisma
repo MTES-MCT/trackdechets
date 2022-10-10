@@ -363,6 +363,8 @@ model Form {
   nextDestinationCompanyContact      String?
   nextDestinationCompanyPhone        String?
   nextDestinationCompanyMail         String?
+  nextDestinationCompanyCountry      String?
+  nextDestinationCompanyVatNumber    String?
   emitterWorkSiteName                String?
   emitterWorkSiteAddress             String?
   emitterWorkSiteCity                String?
@@ -373,8 +375,6 @@ model Form {
   signedAt                           DateTime?               @db.Timestamptz(6)
   currentTransporterSiret            String?
   nextTransporterSiret               String?
-  nextDestinationCompanyCountry      String?
-  nextDestinationCompanyVatNumber    String?
   isImportedFromPaper                Boolean                 @default(false)
   ecoOrganismeName                   String?
   ecoOrganismeSiret                  String?
