@@ -13,7 +13,7 @@ export async function getStream(
 
   const events = await prisma.event.findMany({
     where,
-    orderBy: { createdAt: "desc" }
+    orderBy: { createdAt: "asc" }
   });
 
   return events?.map(event => ({

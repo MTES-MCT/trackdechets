@@ -129,7 +129,7 @@ describe("{ mutation { createWorkerCertification } }", () => {
     >(mutation);
 
     expect(errors[0].message).toContain(
-      "organisation must be one of the following values: AFNOR Certification, GLOBAL CERTIFICATION, QUALIBAT"
+      "L'organisme doit prendre l'une des valeurs suivantes: AFNOR Certification, GLOBAL CERTIFICATION, QUALIBAT"
     );
   });
 });
