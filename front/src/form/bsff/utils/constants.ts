@@ -5,7 +5,7 @@ import {
 } from "generated/graphql/types";
 
 export const bsffVerboseStatuses: Record<BsffStatus, string> = {
-  INITIAL: "En attente d'enlèvement",
+  INITIAL: "En attente de signature par l'émetteur",
   SIGNED_BY_EMITTER: "Signé par l'émetteur",
   SENT: "Signé par le transporteur",
   RECEIVED: "Reçu par le destinataire",

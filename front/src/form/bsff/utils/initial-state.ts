@@ -25,7 +25,7 @@ const initialState = {
   destination: {
     company: getInitialCompany(),
     cap: "",
-    plannedOperationCode: "",
+    plannedOperationCode: null,
   },
   packagings: [],
   waste: {

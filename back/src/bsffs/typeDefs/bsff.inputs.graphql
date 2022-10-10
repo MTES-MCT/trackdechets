@@ -142,9 +142,9 @@ input BsffTransporterInput {
   customInfo: String
 }
 input BsffTransporterRecepisseInput {
-  number: String!
-  department: String!
-  validityLimit: DateTime!
+  number: String
+  department: String
+  validityLimit: DateTime
 }
 input BsffTransporterTransportInput {
   "Date de prise en charge"

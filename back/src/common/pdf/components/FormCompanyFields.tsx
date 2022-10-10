@@ -3,7 +3,6 @@ import countries, { Country } from "world-countries";
 import { checkVAT } from "jsvat";
 import {
   countries as vatCountries,
-  isFRVat,
   isSiret,
   isVat
 } from "../../../common/constants/companySearchHelpers";
@@ -64,7 +63,9 @@ export function FormCompanyFields({
         <br />
         <input
           type="checkbox"
-          checked={isForeignShip || companyCountry?.cca2 !== "FR"}
+          checked={
+            company?.vatNumber?.length > 0 && companyCountry?.cca2 !== "FR"
+          }
           readOnly
         />{" "}
         Entreprise étrangère
