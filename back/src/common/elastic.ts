@@ -747,7 +747,8 @@ export async function indexAllBsds(
             opts: {
               lifo: true,
               stackTraceLimit: 100,
-              attempts: 1
+              attempts: 1,
+              timeout: 100_000
             }
           });
         }
