@@ -1,22 +1,16 @@
-import { sendMailJob, indexBsdJob } from "./jobs";
+import { sendMailJob } from "./jobs";
 import { mailQueue } from "./producers/mail";
-import { indexQueue } from "./producers/elastic";
-import { deleteBsdJob } from "./jobs/deleteBsd";
 import {
   geocodeCompanyQueue,
   setCompanyDepartementQueue
 } from "./producers/company";
 import { geocodeJob } from "./jobs/geocode";
 import { setDepartementJob } from "./jobs/setDepartement";
-import { indexChunkBsdJob } from "./jobs/indexAllBsds";
 
 function startConsumers() {
-  console.info(`Queues processors started`);
+  console.info(`General queues consumers started`);
 
   mailQueue.process(sendMailJob);
-  indexQueue.process("indexChunk", indexChunkBsdJob);
-  indexQueue.process("index", indexBsdJob);
-  indexQueue.process("delete", deleteBsdJob);
   geocodeCompanyQueue.process(geocodeJob);
   setCompanyDepartementQueue.process(setDepartementJob);
 }
