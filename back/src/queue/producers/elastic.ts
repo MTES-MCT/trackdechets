@@ -77,5 +77,9 @@ export async function enqueueBsdToDelete(
 }
 
 export function closeIndexAndUpdatesQueue() {
-  return Promise.all([indexQueue.close(), updatesQueue.close()]);
+  return Promise.all([
+    indexQueue.close(),
+    updatesQueue.close(),
+    syncEventsQueue.close()
+  ]);
 }

@@ -3,6 +3,7 @@ import { Event } from "@prisma/client";
 import { EventCollection } from "./types";
 
 const { MONGODB_URL } = process.env;
+
 const DB_NAME = "td_events";
 const EVENTS_COLLECTION = "events";
 
@@ -19,8 +20,6 @@ export async function closeMongoClient() {
 }
 
 export async function getStreamEvents(streamId: string, lte?: Date) {
-  // For some reason, we get a `Type instantiation is excessively deep and possibly infinite.` error
-  // @ts-ignore
   const { events } = await eventsCollection.findOne({ _id: streamId });
 
   return events
