@@ -67,6 +67,7 @@ export const server = new ApolloServer({
   schema,
   introspection: true, // used to enable the playground in production
   validationRules: [depthLimit(10)],
+  csrfPrevention: true, // To prevent "simple requests". See https://www.apollographql.com/docs/apollo-server/security/cors/#preventing-cross-site-request-forgery-csrf
   context: async ctx => {
     return {
       ...ctx,
@@ -286,14 +287,11 @@ export async function startApolloServer() {
 
   /**
    * Wire up ApolloServer to /
-   * UI_BASE_URL is explicitly set in the origin list
-   * to avoid "Credentials is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’"
-   * See https://developer.mozilla.org/fr/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials
    */
   server.applyMiddleware({
     app,
     cors: {
-      origin: [UI_BASE_URL, "*"],
+      origin: [UI_BASE_URL],
       methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
       preflightContinue: false,
       optionsSuccessStatus: 204,
