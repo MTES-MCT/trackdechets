@@ -647,7 +647,7 @@ export async function toPrismaBsds(
   return { bsdds, bsdasris, bsvhus, bsdas, bsffs };
 }
 
-const bsdTypes: BsdType[] = ["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"];
+const allBsdTypes: BsdType[] = ["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"];
 const bsdaToBsdElasticFns = {
   bsff: bsffToBsdElastic,
   bsvhu: bsvhuToBsdElastic,
@@ -697,33 +697,35 @@ const prismaFindManyOptions = {
 export async function indexAllBsds(
   index: string,
   useQueue = false,
-  bsdType?: BsdType
-): Promise<Job<string>[]> {
+  bsdType?: BsdType,
+  updatedSince?: Date
+): Promise<void> {
   let since: Date;
   const jobs: Job<string>[] = [];
-  for (const loopType of bsdTypes) {
+  for (const loopType of allBsdTypes) {
     if (!bsdType || bsdType === loopType) {
       const bsdName = loopType.toLowerCase();
       logger.info(`Indexing ${bsdName}`);
       // initialize the total counter
-      const count = await getIndexTypeCount(bsdName, since);
+      const total = await getIndexTypeCount(bsdName, since);
       if (!useQueue) {
         since = new Date();
         await indexAllBsdTypeSync({
           bsdName,
           index,
           skip: 0,
-          total: count, // use to initialize once the prisma count()
-          since: undefined
+          total,
+          since: updatedSince ?? undefined
         });
         logger.info(
           `Catching-up indexation of ${bsdName} updated in database since ${since.toISOString()}`
         );
+        const totalSince = await getIndexTypeCount(bsdName, since);
         await indexAllBsdTypeSync({
           bsdName,
           index,
           skip: 0,
-          total: -1, // use to initialize once the prisma count()
+          total: totalSince,
           since
         });
       } else {
@@ -731,7 +733,7 @@ export async function indexAllBsds(
         const data = [];
         for (
           let incrementalSkip = 0;
-          incrementalSkip + take <= count;
+          incrementalSkip + take <= total;
           incrementalSkip += take
         ) {
           data.push({
@@ -740,7 +742,7 @@ export async function indexAllBsds(
               bsdName,
               index,
               skip: incrementalSkip,
-              count,
+              total,
               take,
               since
             }),
@@ -767,8 +769,15 @@ export async function indexAllBsds(
       }
     }
   }
+  if (useQueue && jobs.length) {
+    logger.info(`Waiting for all ${jobs.length} jobs in queue to finish`);
+    await Promise.all(
+      jobs.map(async job => {
+        await job.finished();
+      })
+    );
+  }
   logger.info("All types of BSD have been indexed");
-  return jobs;
 }
 
 type AnyPrismaBsdDelegate =
@@ -790,7 +799,7 @@ export type FindManyAndIndexBsdsFnSignature = {
   bsdName: string;
   index: string;
   skip: number;
-  count: number;
+  total: number;
   since: Date;
   take: number;
 };
@@ -803,7 +812,7 @@ export async function findManyAndIndexBsds({
   index,
   skip,
   take,
-  count,
+  total,
   since
 }: FindManyAndIndexBsdsFnSignature): Promise<boolean> {
   const prismaModelDelegate: AnyPrismaBsdDelegate = prismaModels[bsdName];
@@ -813,10 +822,13 @@ export async function findManyAndIndexBsds({
     take,
     // orderBy gives consistency in SELECT with OFFSET and LIMIT.
     // Job queue is LIFO so the last inserted should be the first job processed
+    // All BSD have an SQL INDEX on updatedAt
     orderBy: { updatedAt: "desc" },
     where: {
       isDeleted: false,
-      ...(since ? { updatedAt: { gte: since } } : {})
+      ...(since
+        ? { OR: [{ updatedAt: { gte: since } }, { createdAt: { gte: since } }] }
+        : {})
     },
     ...prismaFindManyOptions[bsdName]
   });
@@ -831,9 +843,13 @@ export async function findManyAndIndexBsds({
     bsds.map(form => toBsdElasticFn(form))
   );
 
-  logger.info(`Indexed ${bsdName} batch ${skip}/${count}`);
+  logger.info(
+    `Indexed ${bsdName} batch ${skip} to ${skip + take} on total of ${total}`
+  );
   if (bsds.length < take) {
-    logger.info(`Indexed ${bsdName} batch ${count}/${count}`);
+    logger.info(
+      `Indexed ${bsdName} batch ${skip} to ${total} on total of ${total}`
+    );
     return false;
   }
   return true;
@@ -855,7 +871,7 @@ async function indexAllBsdTypeSync({
     bsdName,
     index,
     skip,
-    count: total,
+    total,
     take,
     since
   });

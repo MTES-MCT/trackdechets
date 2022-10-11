@@ -14,7 +14,7 @@ export async function indexChunkBsdJob(job: Job<string>) {
       bsdName,
       index,
       skip,
-      count,
+      total,
       take,
       since
     }: FindManyAndIndexBsdsFnSignature = JSON.parse(job.data);
@@ -23,7 +23,7 @@ export async function indexChunkBsdJob(job: Job<string>) {
       bsdName,
       index,
       skip,
-      count,
+      total,
       take,
       since
     });

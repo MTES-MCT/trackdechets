@@ -3,6 +3,12 @@ import logger from "../../logging/logger";
 import { client, indexAllBsds, BsdIndex } from "../../common/elastic";
 import { BsdType } from "../../generated/graphql/types";
 
+type IndexElasticSearchOpts = {
+  index: BsdIndex;
+  force?: boolean;
+  useQueue?: boolean;
+};
+
 /**
  * Separators constants
  * If changed, breaks the script roll-over system
@@ -12,7 +18,7 @@ export const INDEX_ALIAS_NAME_SEPARATOR = "_";
 export const INDEX_DATETIME_SEPARATOR = "===";
 
 /**
- * Convert Date to readable index version name suffixe
+ * Convert Date to readable index version name suffix
  */
 const getIndexDateString = (dateStr?: string) => {
   let dateObj;
@@ -58,15 +64,23 @@ const getIndexName = (index: BsdIndex, dateStr?: string): string =>
   }${INDEX_ALIAS_NAME_SEPARATOR}${getIndexDateString(dateStr)}`;
 
 /**
- * Create index on ES
+ * Create index on ES optimized for bulk indexing
  */
-export async function declareNewIndex(index: BsdIndex) {
+async function declareNewIndex(index: BsdIndex) {
   const newIndex = getIndexName(index);
   await client.indices.create({
     index: newIndex,
     body: {
       mappings: { [index.type]: index.mappings },
-      settings: index.settings
+      settings: {
+        ...index.settings,
+        index: {
+          ...index.settings.index,
+          // optimize for speed https://www.elastic.co/guide/en/elasticsearch/reference/6.8/tune-for-indexing-speed.html
+          refresh_interval: -1,
+          number_of_replicas: 0
+        }
+      }
     },
     include_type_name: true // compatibility with ES 7+
   });
@@ -74,9 +88,22 @@ export async function declareNewIndex(index: BsdIndex) {
 }
 
 /**
+ * Update ES dynamic index settings
+ * Dynamis settings docs :https://www.elastic.co/guide/en/elasticsearch/reference/6.8/index-modules.html#dynamic-index-settings
+ * Example settings for speed https://www.elastic.co/guide/en/elasticsearch/reference/6.8/tune-for-indexing-speed.html
+ */
+async function updateIndexSettings(index: BsdIndex, settings: any) {
+  return client.indices.putSettings({
+    index: index.alias,
+    preserve_existing: true,
+    body: settings
+  });
+}
+
+/**
  * Clean older indexes and attach the newest one to the alias
  */
-export const attachNewIndexAndcleanOldIndexes = async (
+const attachNewIndexAndcleanOldIndexes = async (
   index: BsdIndex,
   newIndex: string
 ) => {
@@ -208,32 +235,29 @@ async function isIndexMappingsVersionChanged(
  * you want to force a reindex without bumping index version.
  * WARNING : it will cause a read downtime during the time of the reindex.
  */
-async function reindexInPlace(
+export async function reindexInPlace(
   index: BsdIndex,
   bsdType: BsdType,
+  since?: Date,
   force = false,
   useQueue = false
 ) {
-  if (force) {
-    let query = {};
-    if (bsdType) {
-      logger.info(`Deleting ${bsdType} entries`);
-      query = {
-        match: {
-          type: bsdType
-        }
-      };
-    } else {
-      logger.info(`Deleting all entries`);
-      query = { match_all: {} };
-    }
-
+  // avoid unwantd deletion
+  if (bsdType && force && !since) {
+    logger.info(`Deleting ${bsdType} entries`);
     await client.deleteByQuery({
       index: index.alias,
-      body: { query: query }
+      body: {
+        query: {
+          match: {
+            type: bsdType
+          }
+        }
+      }
     });
   }
-  await indexAllBsds(index.alias, useQueue, bsdType);
+  logger.info(`Reindex in place ${bsdType} ${since ? "since" : ""}${since}`);
+  await indexAllBsds(index.alias, useQueue, bsdType, since);
 }
 
 /**
@@ -254,19 +278,18 @@ async function reindexRollover(
       `BSD are being indexed in the new index "${newIndex}" while the alias "${index.alias}" still points to the current index.`
     );
 
-    const jobs = await indexAllBsds(newIndex, useQueue);
-    if (useQueue && jobs.length) {
-      logger.info(`Waiting for ${jobs.length} to finish`);
-      await Promise.all(
-        jobs.map(async job => {
-          await job.finished();
-        })
-      );
-    }
+    await indexAllBsds(newIndex, useQueue);
     await attachNewIndexAndcleanOldIndexes(index, newIndex);
+    // restore index settings to defaults
+    await updateIndexSettings(index, {
+      index: {
+        refresh_interval: "1s",
+        number_of_replicas: 1
+      }
+    });
   } else {
     logger.info(
-      `indexElasticSearch script has nothing to do, no mappings changes detected nor --force argument passed`
+      `reindexAll script has nothing to do, no mappings changes detected nor --force argument passed`
     );
   }
 }
@@ -284,27 +307,26 @@ async function initializeIndex(index: BsdIndex, useQueue = false) {
     `All BSDs are being indexed in the new index "${newIndex}" with alias "${index.alias}".`
   );
   await indexAllBsds(newIndex, useQueue);
+  // restore index settings to defaults
+  await updateIndexSettings(index, {
+    index: {
+      refresh_interval: "1s",
+      number_of_replicas: 1
+    }
+  });
   logger.info(
     `Created the alias "${index.alias}" pointing to the new index "${newIndex}"`
   );
 }
-
-type IndexElasticSearchOpts = {
-  index: BsdIndex;
-  bsdTypeToIndex?: BsdType;
-  force?: boolean;
-  useQueue?: boolean;
-};
 
 /**
  * Main function
  * Initialize the first index or re-index without downtime if mapping changed
  * Re-index in place (deleting & indexing again) for a single type of BSds
  */
-export async function indexElasticSearch({
+export async function reindexAllBsdsInBulk({
   index,
-  bsdTypeToIndex,
-  useQueue,
+  useQueue = false,
   force = false
 }: IndexElasticSearchOpts) {
   const catAliasesResponse = await client.cat.aliases({
@@ -317,18 +339,8 @@ export async function indexElasticSearch({
     // first time indexation for a new alias name
     await initializeIndex(index, useQueue);
   } else {
-    if (!!bsdTypeToIndex) {
-      if (!force) {
-        logger.error(
-          "When you specify a bsd type to reindex, you must pass the --force argument to confirm deleting older BSDs before indexing."
-        );
-        return;
-      }
-      await reindexInPlace(index, bsdTypeToIndex, force, useQueue);
-    } else {
-      await reindexRollover(index, force, useQueue);
-    }
+    await reindexRollover(index, force, useQueue);
   }
 
-  logger.info(`indexElasticSearch() done, exiting.`);
+  logger.info(`reindexAllBsdsInBulk() done, exiting.`);
 }

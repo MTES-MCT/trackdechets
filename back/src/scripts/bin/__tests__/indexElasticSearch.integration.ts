@@ -1,16 +1,16 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { formFactory, userFactory } from "../../../__tests__/factories";
 import {
-  indexElasticSearch,
+  reindexAllBsdsInBulk,
   INDEX_ALIAS_NAME_SEPARATOR
-} from "../indexElasticSearch.helpers";
+} from "../../../bsds/indexation/bulkIndexBsds";
 import {
   BsdIndex,
   client,
   index as globalIndex
 } from "../../../common/elastic";
 
-describe("indexElasticSearch script", () => {
+describe("reindexAllBsdsInBulk script", () => {
   const testAlias = "test_bsds";
 
   const testIndex: BsdIndex = {
@@ -34,7 +34,7 @@ describe("indexElasticSearch script", () => {
   });
 
   it("should initialize an index and alias from scratch", async () => {
-    await indexElasticSearch({ index: testIndex });
+    await reindexAllBsdsInBulk({ index: testIndex });
     const catAliasResponses = await client.cat.aliases({
       name: testIndex.alias,
       format: "json"
@@ -50,7 +50,7 @@ describe("indexElasticSearch script", () => {
     await formFactory({ ownerId: user.id });
 
     // initialize index and alias
-    await indexElasticSearch({ index: testIndex });
+    await reindexAllBsdsInBulk({ index: testIndex });
 
     await client.indices.refresh({
       index: testIndex.alias
@@ -62,7 +62,7 @@ describe("indexElasticSearch script", () => {
 
     // create a new form an index again
     await formFactory({ ownerId: user.id });
-    await indexElasticSearch({ index: testIndex });
+    await reindexAllBsdsInBulk({ index: testIndex });
 
     await client.indices.refresh({
       index: testIndex.alias
@@ -78,7 +78,7 @@ describe("indexElasticSearch script", () => {
     await formFactory({ ownerId: user.id });
 
     // initialize index and alias
-    await indexElasticSearch({ index: testIndex });
+    await reindexAllBsdsInBulk({ index: testIndex });
 
     await client.indices.refresh({
       index: testIndex.alias
@@ -90,7 +90,7 @@ describe("indexElasticSearch script", () => {
 
     // create a new form an index again with force=true
     await formFactory({ ownerId: user.id });
-    await indexElasticSearch({ index: testIndex, force: true });
+    await reindexAllBsdsInBulk({ index: testIndex, force: true });
 
     await client.indices.refresh({
       index: testIndex.alias
@@ -106,7 +106,7 @@ describe("indexElasticSearch script", () => {
     const user = await userFactory();
     await formFactory({ ownerId: user.id });
 
-    await indexElasticSearch({
+    await reindexAllBsdsInBulk({
       index: testIndexV0
     });
     await client.indices.refresh({
@@ -116,8 +116,8 @@ describe("indexElasticSearch script", () => {
     // check the first form is indexed
     expect(countResponse1.body.count).toEqual(1);
     await formFactory({ ownerId: user.id });
-    // bump version and reindex
-    await indexElasticSearch({
+    // create a new index version
+    await reindexAllBsdsInBulk({
       index: testIndex
     });
     await client.indices.refresh({

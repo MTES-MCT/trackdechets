@@ -81,7 +81,7 @@
 
    ```bash
    docker exec -it $(docker ps -aqf "name=trackdechets_td-api") bash
-   npm run index-elastic-search:dev
+   npm run reindex-all-in-bulk:dev
    ```
 
 7. Accéder aux différents services.
@@ -320,5 +320,5 @@ Pour s'y retrouver plus facilement, suivre la convention de nommage en place et 
 ### Réindexer un type de bordereau
 
 ```
-   npm run index-elastic-search bsdasri -f
+   npm run reindex-in-place bsdasri -f
 ```

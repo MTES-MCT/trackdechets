@@ -1,6 +1,6 @@
 import prisma from "../../prisma";
 import { closeQueues } from "../../queue/producers";
-import { reindex } from "../../bsds/resolvers/mutations/reindexBsdHelpers";
+import { reindex } from "../../bsds/indexation/reindexBsdHelpers";
 
 async function exitScript(success?: boolean) {
   await prisma.$disconnect();

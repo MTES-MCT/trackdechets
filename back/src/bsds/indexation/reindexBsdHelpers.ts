@@ -1,12 +1,12 @@
-import prisma from "../../../prisma";
-import { indexBsda } from "../../../bsda/elastic";
-import { indexBsdasri } from "../../../bsdasris/elastic";
-import { indexBsff } from "../../../bsffs/elastic";
-import { indexBsvhu } from "../../../bsvhu/elastic";
-import { indexForm } from "../../../forms/elastic";
-import { getFullForm } from "../../../forms/database";
-import { deleteBsd } from "../../../common/elastic";
-import { getReadonlyBsdaRepository } from "../../../bsda/repository";
+import prisma from "../../prisma";
+import { indexBsda } from "../../bsda/elastic";
+import { indexBsdasri } from "../../bsdasris/elastic";
+import { indexBsff } from "../../bsffs/elastic";
+import { indexBsvhu } from "../../bsvhu/elastic";
+import { indexForm } from "../../forms/elastic";
+import { getFullForm } from "../../forms/database";
+import { deleteBsd } from "../../common/elastic";
+import { getReadonlyBsdaRepository } from "../../bsda/repository";
 
 export async function reindex(bsdId, exitFn) {
   if (bsdId.startsWith("BSDA-")) {
