@@ -17,8 +17,9 @@ async function exitScript() {
 }
 
 (async function () {
-  // script meant to be used for production deployment
-  if (!STARTUP_FILE || STARTUP_FILE === "dist/src/index.js") {
+  const force = process.argv.includes("--force");
+  // only meant to be used for api production deployment
+  if (!force && (!STARTUP_FILE || STARTUP_FILE === "dist/src/index.js")) {
     doubleLog(
       "Abort index all BSDs because not in a TD api deployment, exiting"
     );
@@ -27,7 +28,6 @@ async function exitScript() {
   try {
     // launch job by chunks in the queue only if argument is specified
     const useQueue = process.argv.includes("--useQueue");
-    const force = process.argv.includes("--force");
     // will index all BSD without downtime, only if need because of a mapping change
     await reindexAllBsdsInBulk({
       index,
