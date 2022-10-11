@@ -702,12 +702,13 @@ export async function indexAllBsds(
 ): Promise<void> {
   let since: Date;
   const jobs: Job<string>[] = [];
+
   for (const loopType of allBsdTypes) {
     if (!bsdType || bsdType === loopType) {
       const bsdName = loopType.toLowerCase();
-      logger.info(`Indexing ${bsdName}`);
+      logger.info(`Starting indexation of ${bsdName}`);
       // initialize the total counter
-      const total = await getIndexTypeCount(bsdName, since);
+      const total = await getIndexTypeCount(bsdName, updatedSince);
       if (!useQueue) {
         since = new Date();
         await indexAllBsdTypeSync({

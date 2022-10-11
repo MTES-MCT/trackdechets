@@ -232,14 +232,14 @@ async function isIndexMappingsVersionChanged(
  * you want to force a reindex without bumping index version.
  * WARNING : it will cause a read downtime during the time of the reindex.
  */
-export async function reindexInPlace(
+export async function reindexPartialInPlace(
   index: BsdIndex,
   bsdType: BsdType,
-  since?: Date,
   force = false,
-  useQueue = false
+  useQueue = false,
+  since?: Date
 ) {
-  // avoid unwantd deletion
+  // avoid unwanted deletion
   if (bsdType && force && !since) {
     logger.info(`Deleting ${bsdType} entries`);
     await client.deleteByQuery({
@@ -253,7 +253,11 @@ export async function reindexInPlace(
       }
     });
   }
-  logger.info(`Reindex in place ${bsdType} ${since ? "since" : ""}${since}`);
+  logger.info(
+    `Reindex in place ${bsdType ? bsdType + " " : " "}${
+      since ? "since" : ""
+    } ${since}`
+  );
   await indexAllBsds(index.alias, useQueue, bsdType, since);
 }
 
@@ -262,7 +266,7 @@ export async function reindexInPlace(
  * to avoid read downtimes. At the end of the indexation, the alias is reconfigured to
  * point to the new index.
  */
-async function reindexRollover(
+async function reindexAllBsdsNoDowntime(
   index: BsdIndex,
   force: boolean,
   useQueue = false
@@ -336,7 +340,7 @@ export async function reindexAllBsdsInBulk({
     // first time indexation for a new alias name
     await initializeIndex(index, useQueue);
   } else {
-    await reindexRollover(index, force, useQueue);
+    await reindexAllBsdsNoDowntime(index, force, useQueue);
   }
 
   logger.info(`reindexAllBsdsInBulk() done, exiting.`);
