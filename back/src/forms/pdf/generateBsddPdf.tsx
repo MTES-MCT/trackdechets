@@ -634,7 +634,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             </p>
             <p>
               Je soussigné, certifie que les renseignements portés dans les
-              cades ci-dessus sont exacts et de bonne foi.
+              cadres ci-dessus sont exacts et de bonne foi.
             </p>
             <p>
               <span className="Row">
@@ -860,7 +860,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 </p>
                 <p>
                   Je soussigné, certifie que les renseignements portés dans les
-                  cades ci-dessus sont exacts et de bonne foi.
+                  cadres ci-dessus sont exacts et de bonne foi.
                 </p>
                 <p>
                   <span className="Row">
