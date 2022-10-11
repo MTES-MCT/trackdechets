@@ -8,6 +8,7 @@ const { REDIS_URL, NODE_ENV } = process.env;
 export const INDEX_JOB_NAME = "index";
 export const DELETE_JOB_NAME = "delete";
 
+// Indexation queue. BSD ids are pushed into it when an indexation is needed
 export const indexQueue = new Queue<string>(
   `queue_index_elastic_${NODE_ENV}`,
   REDIS_URL,
@@ -22,6 +23,7 @@ export const indexQueue = new Queue<string>(
 );
 
 const INDEX_REFRESH_INTERVAL = 1000;
+// Updates queue, used by the notifier. Items are enqueued once indexation is done
 export const updatesQueue = new Queue<BsdUpdateQueueItem>(
   `queue_updates_elastic_${NODE_ENV}`,
   REDIS_URL,
@@ -33,12 +35,24 @@ export const updatesQueue = new Queue<BsdUpdateQueueItem>(
   }
 );
 
+// Events sync queue. Items are enqueued once indexation is done
+export const syncEventsQueue = new Queue<void>(
+  `queue_sync_events_${NODE_ENV}`,
+  REDIS_URL,
+  {
+    defaultJobOptions: {
+      removeOnComplete: 100
+    }
+  }
+);
+
 indexQueue.on("completed", job => {
   const id = job.data;
   const { sirets } = job.returnvalue;
   if ([DELETE_JOB_NAME, INDEX_JOB_NAME].includes(job.name)) {
     updatesQueue.add({ sirets, id });
   }
+  syncEventsQueue.add();
 });
 
 indexQueue.on("failed", (job, err) => {

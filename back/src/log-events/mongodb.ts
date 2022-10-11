@@ -18,24 +18,25 @@ export async function closeMongoClient() {
   return mongodbClient.close();
 }
 
-export async function getStreamEvents(streamId: string) {
-  return eventsCollection.findOne({ streamId });
+export async function getStreamEvents(streamId: string, lte?: Date) {
+  // For some reason, we get a `Type instantiation is excessively deep and possibly infinite.` error
+  // @ts-ignore
+  const { events } = await eventsCollection.findOne({ _id: streamId });
+
+  return events
+    .filter(evt => !lte || evt.createdAt <= lte)
+    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 }
 
-export async function appendEvent(tdEvent: Event) {
+export async function appendStreamEvents(streamId: string, tdEvents: Event[]) {
+  const latestEvent = tdEvents
+    .map(event => event.createdAt)
+    .sort()
+    .pop();
+
   return eventsCollection.updateOne(
-    { streamId: tdEvent.streamId },
-    { $push: { events: tdEvent }, $set: { latestEvent: tdEvent.createdAt } },
+    { _id: streamId },
+    { $push: { events: { $each: tdEvents } }, $set: { latestEvent } },
     { upsert: true }
   );
 }
-
-async function createIndexes() {
-  try {
-    await eventsCollection.createIndex({ streamId: 1 });
-  } catch (err) {
-    console.error("Error while creating indexes", err);
-  }
-}
-
-createIndexes();

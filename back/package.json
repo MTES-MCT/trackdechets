@@ -101,6 +101,7 @@
     "ioredis": "^4.28.0",
     "jsvat": "^2.5.3",
     "minimist": "^1.2.5",
+    "mongodb": "^4.10.0",
     "mustache": "^4.2.0",
     "oauth2orize": "^1.11.0",
     "object.omit": "^3.0.0",

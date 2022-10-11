@@ -1,20 +1,13 @@
 import { ActivityEvent } from ".";
 import prisma from "../prisma";
 import { Event, Prisma } from "@prisma/client";
+import { getStreamEvents } from "../log-events/mongodb";
 
 export async function getStream(
   streamId: string,
   { until }: { until?: Date } = {}
 ): Promise<ActivityEvent[]> {
-  const where = {
-    streamId,
-    ...(until && { createdAt: { lte: until } })
-  };
-
-  const events = await prisma.event.findMany({
-    where,
-    orderBy: { createdAt: "asc" }
-  });
+  const events = await getStreamEvents(streamId, until);
 
   return events?.map(event => ({
     type: event.type,
