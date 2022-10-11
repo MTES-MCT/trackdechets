@@ -213,10 +213,7 @@ async function isIndexMappingsVersionChanged(
     .reverse()[0];
 
   if (
-    mostRecentIndexDateAndVersion?.mappings_version &&
-    getIndexMappingsVersionFromName(
-      mostRecentIndexDateAndVersion.mappings_version
-    ) === index.mappings_version
+    mostRecentIndexDateAndVersion.mappings_version! === index.mappings_version
   ) {
     logger.info(
       `No mappings version change was detected for index "${index.alias}".`

@@ -17,7 +17,7 @@ async function exitScript() {
 }
 
 (async function () {
-  const force = process.argv.includes("--force");
+  const force = process.argv.includes("--force") || process.argv.includes("-f");
   // only meant to be used for api production deployment
   if (!force && (!STARTUP_FILE || STARTUP_FILE === "dist/src/index.js")) {
     doubleLog(
