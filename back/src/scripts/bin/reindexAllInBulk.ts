@@ -34,8 +34,9 @@ async function exitScript() {
       logger.info(`Enqueuing indexation of all bsds in bulk without downtime`);
       // default options can be overwritten by the calling function
       const jobOptions: JobOptions = {
+        lifo: true,
         attempts: 1,
-        timeout: -1
+        timeout: 36_000_000 // 10h
       };
       await indexQueue.add(
         "indexAllInBulk",

@@ -757,7 +757,7 @@ export async function indexAllBsds(
               lifo: true,
               stackTraceLimit: 100,
               attempts: 1,
-              timeout: 100_000
+              timeout: 600_000 // 10 min
             }
           });
         }
