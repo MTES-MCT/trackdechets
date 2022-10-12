@@ -28,13 +28,18 @@ services:
         constraints:
           - "node.labels.elasticsearch == true"
 
+  mongodb:
+    image: mongo:6
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=test
+      - MONGO_INITDB_ROOT_PASSWORD=no_pass
+
   td-api:
     image: td-api
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     build:
       context: ../
       dockerfile: Dockerfile.dev
-    command: ["npm", "run", "watch:queue"]
     volumes:
       - ../src:/usr/src/app/src
     env_file:

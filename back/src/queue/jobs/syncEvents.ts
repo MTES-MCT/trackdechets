@@ -2,12 +2,12 @@ import { Event } from "@prisma/client";
 import { appendStreamEvents } from "../../log-events/mongodb";
 import prisma from "../../prisma";
 
-const MAX_NB_OF_SYNC_EVENTS = 500;
+const MAX_NB_OF_EVENTS_SYNC = 500;
 
 export async function syncEventsJob(): Promise<void> {
   return prisma.$transaction(async transaction => {
     const events = await transaction.event.findMany({
-      take: MAX_NB_OF_SYNC_EVENTS
+      take: MAX_NB_OF_EVENTS_SYNC
     });
 
     if (events.length === 0) return Promise.resolve();
@@ -23,8 +23,8 @@ export async function syncEventsJob(): Promise<void> {
   });
 }
 
-function groupByStreamId(array: Event[]): { [streamId: string]: Event[] } {
-  return array.reduce((groups, event) => {
+function groupByStreamId(array: Event[]) {
+  return array.reduce<Record<string, Event[]>>((groups, event) => {
     const { streamId } = event;
     if (!groups[streamId]) {
       groups[streamId] = [];
