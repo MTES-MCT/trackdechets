@@ -92,9 +92,9 @@ async function declareNewIndex(index: BsdIndex) {
  * Dynamis settings docs :https://www.elastic.co/guide/en/elasticsearch/reference/6.8/index-modules.html#dynamic-index-settings
  * Example settings for speed https://www.elastic.co/guide/en/elasticsearch/reference/6.8/tune-for-indexing-speed.html
  */
-async function updateIndexSettings(index: BsdIndex, settings: any) {
+async function updateIndexSettings(index: string, settings: any) {
   return client.indices.putSettings({
-    index: index.alias,
+    index,
     preserve_existing: true,
     body: settings
   });
@@ -282,7 +282,7 @@ async function reindexAllBsdsNoDowntime(
     await indexAllBsds(newIndex, useQueue);
     await attachNewIndexAndcleanOldIndexes(index, newIndex);
     // restore index settings to defaults
-    await updateIndexSettings(index, {
+    await updateIndexSettings(newIndex, {
       index: {
         refresh_interval: "1s",
         number_of_replicas: 1
@@ -309,7 +309,7 @@ async function initializeIndex(index: BsdIndex, useQueue = false) {
   );
   await indexAllBsds(newIndex, useQueue);
   // restore index settings to defaults
-  await updateIndexSettings(index, {
+  await updateIndexSettings(newIndex, {
     index: {
       refresh_interval: "1s",
       number_of_replicas: 1
