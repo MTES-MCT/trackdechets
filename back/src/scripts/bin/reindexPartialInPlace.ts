@@ -1,4 +1,4 @@
-import { DateTime } from "luxon";
+import { isValid, parseISO } from "date-fns";
 import prompts from "prompts";
 import logger from "../../logging/logger";
 import prisma from "../../prisma";
@@ -34,9 +34,13 @@ async function exitScript() {
 
   let since;
   if (matchIsoDate) {
-    since = DateTime.fromISO(matchIsoDate);
-    if (!since.isValid) since = undefined;
-    else since = since.toJSDate();
+    since = parseISO(matchIsoDate);
+    if (!isValid(since)) {
+      doubleLog(
+        "You must pass a Date in the following format '--since YYYY-MM-DD'"
+      );
+      return;
+    }
   }
 
   try {
@@ -49,7 +53,7 @@ async function exitScript() {
 
     if (!bsdTypeToIndex && !since) {
       doubleLog(
-        "You can only target one bsd type OR a date since bsd were updated or created to target to index in place"
+        "You can target whether one bsd type OR a date '--since YYYY-MM-DD' to target the re-indexation in place"
       );
       return;
     }

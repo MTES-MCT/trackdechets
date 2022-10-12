@@ -84,21 +84,6 @@ async function declareNewIndex(index: BsdIndex) {
 }
 
 /**
- * Update ES dynamic index settings
- * Dynamis settings docs :https://www.elastic.co/guide/en/elasticsearch/reference/6.8/index-modules.html#dynamic-index-settings
- * Example settings for speed https://www.elastic.co/guide/en/elasticsearch/reference/6.8/tune-for-indexing-speed.html
- */
-async function updateIndexSettings(
-  index: string,
-  settings: { settings: { index: any } }
-) {
-  return client.indices.putSettings({
-    index,
-    body: settings
-  });
-}
-
-/**
  * Clean older indexes and attach the newest one to the alias
  */
 const attachNewIndexAndcleanOldIndexes = async (
@@ -134,29 +119,35 @@ const attachNewIndexAndcleanOldIndexes = async (
     index: `${index.alias}${INDEX_ALIAS_NAME_SEPARATOR}*`,
     format: "json"
   });
-  // Indices sorted by Date of creation
-  const oldIndices: Date[] = indices.body
-    .map((info: { index: string }) => info.index)
-    // Exclude the current newIndex
-    .filter((index: string) => index !== newIndex)
-    .map((name: string) => getIndexDateFromName(name))
-    .sort();
 
-  // keep the last index in order to rollback if rescue needed
-  const keptIndex = getIndexName(index, oldIndices.pop().toJSON());
+  // Indices sorted by Date of creation
+  const oldIndicesToDelete = indices.body
+    .map((info: { index: string }) => info.index)
+    .filter((index: string) => index !== newIndex)
+    .sort((a, b) => {
+      if (getIndexDateFromName(a) === getIndexDateFromName(b)) {
+        return 0;
+      }
+      if (getIndexDateFromName(a) < getIndexDateFromName(b)) {
+        return -1;
+      } else {
+        return 1;
+      }
+    });
+
+  const oldIndiceToKeep = oldIndicesToDelete.pop();
   logger.info(
-    `Keeping previous index "${keptIndex}" if a rescue rollback is needed use: curl -X PUT http://elasticsearch.url/${keptIndex}/alias/${index.alias}`
+    `Keeping previous index "${oldIndiceToKeep}" if a rescue rollback is needed use: curl -X PUT http://elasticsearch.url/${oldIndiceToKeep}/alias/${index.alias}`
   );
-  if (oldIndices.length) {
-    const oldIndicesNames = oldIndices.map(oldIndex =>
-      getIndexName(index, oldIndex.toJSON())
-    );
+  if (oldIndicesToDelete.length) {
     logger.info(
-      `Removing ${oldIndices.length} old index : ${oldIndicesNames.join(",")}`
+      `Removing ${
+        oldIndicesToDelete.length
+      } old index : ${oldIndicesToDelete.join(",")}`
     );
 
     await Promise.all(
-      oldIndicesNames.map(async index => {
+      oldIndicesToDelete.map(async index => {
         try {
           await client.indices.delete(
             {
@@ -280,11 +271,14 @@ async function reindexAllBsdsNoDowntime(
     await indexAllBsds(newIndex, useQueue);
     await attachNewIndexAndcleanOldIndexes(index, newIndex);
     // restore index settings to defaults
-    await updateIndexSettings(newIndex, {
-      settings: {
-        index: {
-          refresh_interval: "1s",
-          number_of_replicas: 1
+    await client.indices.putSettings({
+      index: newIndex,
+      body: {
+        settings: {
+          index: {
+            refresh_interval: "1s",
+            number_of_replicas: 1
+          }
         }
       }
     });
@@ -313,11 +307,14 @@ async function initializeIndex(
   );
   await indexAllBsds(newIndex, useQueue);
   // restore index settings to defaults
-  await updateIndexSettings(newIndex, {
-    settings: {
-      index: {
-        refresh_interval: "1s",
-        number_of_replicas: 1
+  await client.indices.putSettings({
+    index: newIndex,
+    body: {
+      settings: {
+        index: {
+          refresh_interval: "1s",
+          number_of_replicas: 1
+        }
       }
     }
   });
