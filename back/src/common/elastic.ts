@@ -647,7 +647,6 @@ export async function toPrismaBsds(
   return { bsdds, bsdasris, bsvhus, bsdas, bsffs };
 }
 
-const allBsdTypes: BsdType[] = ["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"];
 const bsdaToBsdElasticFns = {
   bsff: bsffToBsdElastic,
   bsvhu: bsvhuToBsdElastic,
@@ -702,6 +701,7 @@ export async function indexAllBsds(
 ): Promise<void> {
   let since: Date;
   const jobs: Job<string>[] = [];
+  const allBsdTypes: BsdType[] = ["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"];
 
   for (const loopType of allBsdTypes) {
     if (!bsdType || bsdType === loopType) {
