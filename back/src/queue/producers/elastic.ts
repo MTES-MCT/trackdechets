@@ -47,7 +47,7 @@ export async function enqueueBsdToIndex(
   bsdId: string,
   options?: JobOptions
 ): Promise<void> {
-  logger.info(`Enquing BSD ${bsdId} for indexation`);
+  logger.info(`Enqueuing BSD ${bsdId} for indexation`);
   await indexQueue.add("index", bsdId, options);
 }
 

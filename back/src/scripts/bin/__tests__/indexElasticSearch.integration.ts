@@ -11,7 +11,8 @@ import {
 } from "../../../common/elastic";
 
 describe("reindexAllBsdsInBulk script", () => {
-  const testAlias = "test_bsds";
+  // do not use INDEX_ALIAS_NAME_SEPARATOR
+  const testAlias = "testbsds";
 
   const testIndex: BsdIndex = {
     ...globalIndex,
@@ -25,7 +26,7 @@ describe("reindexAllBsdsInBulk script", () => {
   };
 
   async function deleteTestIndexes() {
-    await client.indices.delete({ index: "testAlias_*" }, { ignore: [404] });
+    await client.indices.delete({ index: "testbsds*" }, { ignore: [404] });
   }
 
   afterEach(async () => {
@@ -34,7 +35,7 @@ describe("reindexAllBsdsInBulk script", () => {
   });
 
   it("should initialize an index and alias from scratch", async () => {
-    await reindexAllBsdsInBulk({ index: testIndex });
+    const newIndex = await reindexAllBsdsInBulk({ index: testIndex });
     const catAliasResponses = await client.cat.aliases({
       name: testIndex.alias,
       format: "json"
@@ -42,7 +43,7 @@ describe("reindexAllBsdsInBulk script", () => {
     expect(catAliasResponses.body).toHaveLength(1);
     const { alias, index: aliasedIndex } = catAliasResponses.body[0];
     expect(alias).toEqual(testIndex.alias);
-    expect(aliasedIndex).toEqual(testIndex.alias);
+    expect(aliasedIndex).toEqual(newIndex);
   });
 
   it("should not do anything when index and alias already exist and mapping is not changed", async () => {
@@ -68,9 +69,9 @@ describe("reindexAllBsdsInBulk script", () => {
       index: testIndex.alias
     });
     const countResponse2 = await client.count({ index: testIndex.alias });
-
     // check the second form has not been indexed
     expect(countResponse2.body.count).toEqual(1);
+    expect(countResponse2.body).toEqual(countResponse1.body);
   });
 
   it("should force reindex in place when force=true", async () => {
@@ -106,18 +107,23 @@ describe("reindexAllBsdsInBulk script", () => {
     const user = await userFactory();
     await formFactory({ ownerId: user.id });
 
-    await reindexAllBsdsInBulk({
+    const newIndex = await reindexAllBsdsInBulk({
       index: testIndexV0
     });
     await client.indices.refresh({
       index: testIndexV0.alias
     });
+    const initialIndices = await client.indices.get({
+      index: `${testIndex.alias}${INDEX_ALIAS_NAME_SEPARATOR}*`
+    });
+    expect(Object.keys(initialIndices.body)).toEqual([newIndex]);
+
     const countResponse1 = await client.count({ index: testIndexV0.alias });
     // check the first form is indexed
     expect(countResponse1.body.count).toEqual(1);
     await formFactory({ ownerId: user.id });
     // create a new index version
-    await reindexAllBsdsInBulk({
+    const secondIndex = await reindexAllBsdsInBulk({
       index: testIndex
     });
     await client.indices.refresh({
@@ -137,10 +143,12 @@ describe("reindexAllBsdsInBulk script", () => {
     const countResponse2 = await client.count({ index: testIndex.alias });
     expect(countResponse2.body.count).toEqual(2);
 
-    // check there is 2 indices left
+    // check there is always 2 indices left by desgin
     const leftIndices = await client.indices.get({
       index: `${testIndex.alias}${INDEX_ALIAS_NAME_SEPARATOR}*`
     });
-    expect(leftIndices.body).toEqual(2);
+    expect(Object.keys(leftIndices.body).length).toEqual(2);
+    expect(Object.keys(leftIndices.body)).toContainEqual(newIndex);
+    expect(Object.keys(leftIndices.body)).toContainEqual(secondIndex);
   });
 });

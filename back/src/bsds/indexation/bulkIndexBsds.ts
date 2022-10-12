@@ -272,7 +272,7 @@ async function reindexAllBsdsNoDowntime(
   index: BsdIndex,
   force: boolean,
   useQueue = false
-) {
+): Promise<string> {
   const mappingChanged = await isIndexMappingsVersionChanged(index);
   if (mappingChanged || force) {
     // index a new version and roll-over on the same alias without downtime
@@ -292,6 +292,7 @@ async function reindexAllBsdsNoDowntime(
         }
       }
     });
+    return newIndex;
   } else {
     logger.info(
       `reindexAll script has nothing to do, no mappings changes detected nor --force argument passed`
@@ -302,7 +303,10 @@ async function reindexAllBsdsNoDowntime(
 /**
  * Creates a brand new index and alias from scratch
  */
-async function initializeIndex(index: BsdIndex, useQueue = false) {
+async function initializeIndex(
+  index: BsdIndex,
+  useQueue = false
+): Promise<string> {
   const newIndex = await declareNewIndex(index);
   await client.indices.putAlias({
     name: index.alias,
@@ -324,6 +328,7 @@ async function initializeIndex(index: BsdIndex, useQueue = false) {
   logger.info(
     `Created the alias "${index.alias}" pointing to the new index "${newIndex}"`
   );
+  return newIndex;
 }
 
 /**
@@ -335,7 +340,7 @@ export async function reindexAllBsdsInBulk({
   index,
   useQueue = false,
   force = false
-}: IndexElasticSearchOpts) {
+}: IndexElasticSearchOpts): Promise<string> {
   const catAliasesResponse = await client.cat.aliases({
     name: index.alias,
     format: "json"
@@ -344,10 +349,16 @@ export async function reindexAllBsdsInBulk({
   const aliasExists = catAliasesResponse.body.length > 0;
   if (!aliasExists) {
     // first time indexation for a new alias name
-    await initializeIndex(index, useQueue);
+    const newIndex = await initializeIndex(index, useQueue);
+    logger.info(
+      `reindexAllBsdsInBulk() done initializing a new index, exiting.`
+    );
+    return newIndex;
   } else {
-    await reindexAllBsdsNoDowntime(index, force, useQueue);
+    const newIndex = await reindexAllBsdsNoDowntime(index, force, useQueue);
+    logger.info(
+      `reindexAllBsdsInBulk() done rolling out a new index without downtime, exiting.`
+    );
+    return newIndex;
   }
-
-  logger.info(`reindexAllBsdsInBulk() done, exiting.`);
 }
