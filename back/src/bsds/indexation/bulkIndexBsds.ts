@@ -98,7 +98,6 @@ async function updateIndexSettings(
 ) {
   return client.indices.putSettings({
     index,
-    preserve_existing: true,
     body: settings
   });
 }
