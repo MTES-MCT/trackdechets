@@ -1,6 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationUpdateBsvhuArgs } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb, flattenVhuInput } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
@@ -8,7 +7,8 @@ import { getNotEditableKeys } from "../../edition-rules";
 import { SealedFieldsError } from "../../errors";
 import { checkIsBsvhuContributor } from "../../permissions";
 import { validateBsvhu } from "../../validation";
-import { indexBsvhu } from "../../elastic";
+import { getBsvhuRepository } from "../../repository";
+
 export default async function edit(
   _,
   { id, input }: MutationUpdateBsvhuArgs,
@@ -42,12 +42,9 @@ export default async function edit(
     operationSignature: prismaForm.destinationOperationSignatureAuthor != null,
     transportSignature: prismaForm.transporterTransportSignatureAuthor != null
   });
+  const bsvhuRepository = getBsvhuRepository(user);
 
-  const updatedForm = await prisma.bsvhu.update({
-    where: { id },
-    data: formUpdate
-  });
+  const updatedBsvhu = await bsvhuRepository.update({ id }, formUpdate);
 
-  await indexBsvhu(updatedForm, context);
-  return expandVhuFormFromDb(updatedForm);
+  return expandVhuFormFromDb(updatedBsvhu);
 }

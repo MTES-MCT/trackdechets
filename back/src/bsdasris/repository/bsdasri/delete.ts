@@ -4,6 +4,7 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { enqueueBsdToDelete } from "../../../queue/producers/elastic";
+import { bsdasriEventTypes } from "./eventTypes";
 
 export type DeleteBsdasriFn = (
   where: Prisma.BsdaWhereUniqueInput,
@@ -26,7 +27,7 @@ export function buildDeleteBsdasri(deps: RepositoryFnDeps): DeleteBsdasriFn {
       data: {
         streamId: deletedBsdasri.id,
         actor: user.id,
-        type: "BsdasriDeleted",
+        type: bsdasriEventTypes.deleted,
         data: {},
         metadata: { ...logMetadata, authType: user.auth }
       }

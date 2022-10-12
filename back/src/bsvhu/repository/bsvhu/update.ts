@@ -1,28 +1,28 @@
-import { Bsda, Prisma } from "@prisma/client";
+import { Bsvhu, Prisma } from "@prisma/client";
 import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
-import { bsdaEventTypes } from "./eventTypes";
+import { bsvhuEventTypes } from "./eventTypes";
 
-export type UpdateBsdaFn = (
-  where: Prisma.BsdaWhereUniqueInput,
-  data: Prisma.XOR<Prisma.BsdaUpdateInput, Prisma.BsdaUncheckedUpdateInput>,
+export type UpdateBsvhuFn = (
+  where: Prisma.BsvhuWhereUniqueInput,
+  data: Prisma.XOR<Prisma.BsvhuUpdateInput, Prisma.BsvhuUncheckedUpdateInput>,
   logMetadata?: LogMetadata
-) => Promise<Bsda>;
+) => Promise<Bsvhu>;
 
-export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
+export function buildUpdateBsvhu(deps: RepositoryFnDeps): UpdateBsvhuFn {
   return async (where, data, logMetadata?) => {
     const { prisma, user } = deps;
 
-    const bsda = await prisma.bsda.update({ where, data });
+    const bsvhu = await prisma.bsvhu.update({ where, data });
 
     await prisma.event.create({
       data: {
-        streamId: bsda.id,
+        streamId: bsvhu.id,
         actor: user.id,
-        type: bsdaEventTypes.updated,
+        type: bsvhuEventTypes.updated,
         data: data as Prisma.InputJsonObject,
         metadata: { ...logMetadata, authType: user.auth }
       }
@@ -32,17 +32,17 @@ export function buildUpdateBsda(deps: RepositoryFnDeps): UpdateBsdaFn {
     if (data.status) {
       await prisma.event.create({
         data: {
-          streamId: bsda.id,
+          streamId: bsvhu.id,
           actor: user.id,
-          type: bsdaEventTypes.signed,
+          type: bsvhuEventTypes.signed,
           data: { status: data.status },
           metadata: { ...logMetadata, authType: user.auth }
         }
       });
     }
 
-    prisma.addAfterCommitCallback(() => enqueueBsdToIndex(bsda.id));
+    prisma.addAfterCommitCallback(() => enqueueBsdToIndex(bsvhu.id));
 
-    return bsda;
+    return bsvhu;
   };
 }

@@ -1,12 +1,12 @@
-import { Bsvhu, BsvhuStatus } from "@prisma/client";
+import { Prisma, BsvhuStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { MutationDuplicateBsvhuArgs } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
 import { checkIsBsvhuContributor } from "../../permissions";
-import { indexBsvhu } from "../../elastic";
+import { getBsvhuRepository } from "../../repository";
+
 export default async function duplicate(
   _,
   { id }: MutationDuplicateBsvhuArgs,
@@ -14,21 +14,21 @@ export default async function duplicate(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const prismaForm = await getBsvhuOrNotFound(id);
+  const prismaBsvhu = await getBsvhuOrNotFound(id);
 
   await checkIsBsvhuContributor(
     user,
-    prismaForm,
+    prismaBsvhu,
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  const newForm = await duplicateForm(prismaForm);
+  const bsvhuRepository = getBsvhuRepository(user);
+  const newBsvhu = await bsvhuRepository.create(getDuplicateData(prismaBsvhu));
 
-  await indexBsvhu(newForm, context);
-  return expandVhuFormFromDb(newForm);
+  return expandVhuFormFromDb(newBsvhu);
 }
 
-function duplicateForm({
+function getDuplicateData({
   id,
   createdAt,
   updatedAt,
@@ -48,13 +48,11 @@ function duplicateForm({
   destinationOperationSignatureAuthor,
   destinationOperationSignatureDate,
   ...rest
-}: Bsvhu) {
-  return prisma.bsvhu.create({
-    data: {
-      ...rest,
-      id: getReadableId(ReadableIdPrefix.VHU),
-      status: BsvhuStatus.INITIAL,
-      isDraft: true
-    }
-  });
+}): Prisma.BsvhuCreateInput {
+  return {
+    ...rest,
+    id: getReadableId(ReadableIdPrefix.VHU),
+    status: BsvhuStatus.INITIAL,
+    isDraft: true
+  };
 }

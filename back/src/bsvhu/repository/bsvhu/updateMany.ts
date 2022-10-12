@@ -4,39 +4,39 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
-import { bsdasriEventTypes } from "./eventTypes";
+import { bsvhuEventTypes } from "./eventTypes";
 
-export type UpdateManyBsdasriFn = (
-  where: Prisma.BsdasriWhereInput,
+export type UpdateManyBsvhuFn = (
+  where: Prisma.BsvhuWhereInput,
   data: Prisma.XOR<
-    Prisma.BsdasriUpdateManyMutationInput,
-    Prisma.BsdasriUncheckedUpdateManyInput
+    Prisma.BsvhuUpdateManyMutationInput,
+    Prisma.BsvhuUncheckedUpdateManyInput
   >,
   logMetadata?: LogMetadata
 ) => Promise<Prisma.BatchPayload>;
 
-export function buildUpdateManyBsdasris(
+export function buildUpdateManyBsvhus(
   deps: RepositoryFnDeps
-): UpdateManyBsdasriFn {
+): UpdateManyBsvhuFn {
   return async (where, data, logMetadata) => {
     const { prisma, user } = deps;
 
-    const update = await prisma.bsdasri.updateMany({
+    const update = await prisma.bsvhu.updateMany({
       where,
       data
     });
 
-    const updatedBsdasris = await prisma.bsdasri.findMany({
+    const updatedBsvhus = await prisma.bsvhu.findMany({
       where,
       select: { id: true }
     });
 
-    const ids = updatedBsdasris.map(({ id }) => id);
+    const ids = updatedBsvhus.map(({ id }) => id);
 
     const eventsData = ids.map(id => ({
       streamId: id,
       actor: user.id,
-      type: bsdasriEventTypes.updated,
+      type: bsvhuEventTypes.updated,
       data: data as Prisma.InputJsonObject,
       metadata: { ...logMetadata, authType: user.auth }
     }));
