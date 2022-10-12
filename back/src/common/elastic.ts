@@ -471,19 +471,25 @@ export function indexBsd(
   ctx?: GraphQLContext
 ) {
   logger.info(`Indexing BSD ${bsd.id}`);
-  return client.index({
-    index: index.alias,
-    type: index.type,
-    id: bsd.id,
-    body: {
-      ...bsd,
-      // inject ES mappings version number
-      es_mappings_version: index.mappings_version
+  return client.index(
+    {
+      index: index.alias,
+      type: index.type,
+      id: bsd.id,
+      body: {
+        ...bsd,
+        // inject ES mappings version number
+        es_mappings_version: index.mappings_version
+      },
+      version_type: "external_gte",
+      version: bsd.updatedAt,
+      ...refresh(ctx)
     },
-    version_type: "external_gte",
-    version: bsd.updatedAt,
-    ...refresh(ctx)
-  });
+    {
+      // do not throw version conflict errors
+      ignore: [409]
+    }
+  );
 }
 
 /**
