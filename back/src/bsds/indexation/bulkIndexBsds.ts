@@ -57,7 +57,12 @@ const getIndexMappingsVersionFromName = (indexName: string): string =>
  * Build a codified index name
  */
 const getIndexName = (index: BsdIndex, dateStr?: string): string =>
-  [index.alias, index.mappings_version, process.env.NODE_ENV ?? "dev", getIndexDateString(dateStr)].join(INDEX_ALIAS_NAME_SEPARATOR)
+  [
+    index.alias,
+    index.mappings_version,
+    process.env.NODE_ENV ?? "dev",
+    getIndexDateString(dateStr)
+  ].join(INDEX_ALIAS_NAME_SEPARATOR);
 
 /**
  * Create index on ES optimized for bulk indexing

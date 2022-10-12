@@ -3,6 +3,8 @@ import prisma from "../../prisma";
 import { closeQueues } from "../../queue/producers";
 import { index } from "../../common/elastic";
 import { reindexAllBsdsInBulk } from "../../bsds/indexation/bulkIndexBsds";
+import { indexQueue } from "../../queue/producers/elastic";
+import { JobOptions } from "bull";
 const { STARTUP_FILE } = process.env;
 
 function doubleLog(msg) {
@@ -28,11 +30,28 @@ async function exitScript() {
   try {
     // launch job by chunks in the queue only if argument is specified
     const useQueue = process.argv.includes("--useQueue");
+    if (useQueue) {
+      logger.info(`Enqueuing indexation of all bsds in bulk without downtime`);
+      // default options can be overwritten by the calling function
+      const jobOptions: JobOptions = {
+        attempts: 1,
+        timeout: -1
+      };
+      await indexQueue.add(
+        "indexAllInBulk",
+        JSON.stringify({
+          index,
+          force
+        }),
+        jobOptions
+      );
+      return;
+    }
     // will index all BSD without downtime, only if need because of a mapping change
     await reindexAllBsdsInBulk({
       index,
       force,
-      useQueue
+      useQueue: false
     });
   } catch (error) {
     throw new Error(`Error in reindexAllInBulk script : ${error}`);
