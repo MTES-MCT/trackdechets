@@ -9,7 +9,7 @@ interface AuthProps {
   isAuthenticated: boolean;
   isAdmin: boolean;
 }
-const { VITE_WARNING_MESSAGE } = import.meta.env;
+const { VITE_WARNING_MESSAGE, DOWNTIME_BANNER_MESSAGE } = import.meta.env;
 
 const GET_WARNING_MESSAGE = gql`
   query GetWarningMessage {
@@ -41,6 +41,17 @@ export default function Layout({
         </div>
       )}
       {VITE_WARNING_MESSAGE && (
+        <div
+          className="notification notification--platform tw-text-center"
+          style={{ borderRadius: 0, border: 0, margin: 0 }}
+        >
+          <img src={sandboxIcon} alt="" />
+          <div
+            dangerouslySetInnerHTML={{ __html: VITE_WARNING_MESSAGE as string }}
+          ></div>
+        </div>
+      )}
+      {DOWNTIME_BANNER_MESSAGE && (
         <div
           className="notification notification--platform tw-text-center"
           style={{ borderRadius: 0, border: 0, margin: 0 }}
