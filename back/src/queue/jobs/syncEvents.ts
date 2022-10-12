@@ -1,4 +1,4 @@
-import { insertStreamEvents } from "../../log-events/mongodb";
+import { insertStreamEvents } from "../../common/events/mongodb";
 import prisma from "../../prisma";
 
 const MAX_NB_OF_EVENTS_SYNC = 500;
