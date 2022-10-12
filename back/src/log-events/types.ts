@@ -8,7 +8,6 @@ type EventLike = Omit<Event, "metadata" | "data"> & {
 };
 
 export type EventCollection = {
-  _id: string; // Holds the psql streamId
-  latestEvent: Date;
-  events: EventLike[];
+  streamId: string;
+  event: EventLike;
 };

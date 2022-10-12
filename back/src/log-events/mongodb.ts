@@ -20,22 +20,28 @@ export async function closeMongoClient() {
 }
 
 export async function getStreamEvents(streamId: string, lte?: Date) {
-  const { events } = await eventsCollection.findOne({ _id: streamId });
+  const events = await eventsCollection
+    .find({ streamId })
+    .project<Event>({ event: 1 })
+    .toArray();
 
   return events
     .filter(evt => !lte || evt.createdAt <= lte)
     .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 }
 
-export async function appendStreamEvents(streamId: string, tdEvents: Event[]) {
-  const latestEvent = tdEvents
-    .map(event => event.createdAt)
-    .sort()
-    .pop();
-
-  return eventsCollection.updateOne(
-    { _id: streamId },
-    { $push: { events: { $each: tdEvents } }, $set: { latestEvent } },
-    { upsert: true }
+export async function insertStreamEvents(tdEvents: Event[]) {
+  return eventsCollection.insertMany(
+    tdEvents.map(evt => ({ streamId: evt.streamId, event: evt }))
   );
 }
+
+async function createIndexes() {
+  try {
+    await eventsCollection.createIndex({ streamId: 1 });
+  } catch (err) {
+    console.error("Error while creating indexes", err);
+  }
+}
+
+createIndexes();
