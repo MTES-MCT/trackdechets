@@ -212,7 +212,7 @@ export const sess: session.SessionOptions = {
 // - Scalingo proxy for live envs
 // - with Baleen, there is a second reverse proxy layer. Hence, the user's ip is 1 hop further
 // For more details, see https://expressjs.com/en/guide/behind-proxies.html.
-app.set("trust proxy", TRUST_PROXY_HOPS ?? 1);
+app.set("trust proxy", TRUST_PROXY_HOPS ? parseInt(TRUST_PROXY_HOPS, 10) : 1);
 
 if (SESSION_COOKIE_SECURE === "true") {
   sess.cookie.secure = true; // serve secure cookies
