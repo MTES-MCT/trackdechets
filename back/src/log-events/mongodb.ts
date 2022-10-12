@@ -20,14 +20,11 @@ export async function closeMongoClient() {
 }
 
 export async function getStreamEvents(streamId: string, lte?: Date) {
-  const events = await eventsCollection
-    .find({ streamId })
-    .project<Event>({ event: 1 })
+  const documents = await eventsCollection
+    .find({ streamId, ...(lte && { "event.createdAt": { $lte: lte } }) })
     .toArray();
 
-  return events
-    .filter(evt => !lte || evt.createdAt <= lte)
-    .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+  return documents.map(document => document.event);
 }
 
 export async function insertStreamEvents(tdEvents: Event[]) {

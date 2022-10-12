@@ -7,7 +7,20 @@ export async function getStream(
   streamId: string,
   { until }: { until?: Date } = {}
 ): Promise<ActivityEvent[]> {
-  const events = await getStreamEvents(streamId, until);
+  // Events might be dispatched between Psql & Mongo so we fetch from both
+  const [mongoEvents, psqlEvents] = await Promise.all([
+    getStreamEvents(streamId, until),
+    prisma.event.findMany({
+      where: {
+        streamId,
+        ...(until && { createdAt: { lte: until } })
+      }
+    })
+  ]);
+
+  const events = [...mongoEvents, ...psqlEvents].sort(
+    (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
+  );
 
   return events?.map(event => ({
     type: event.type,
