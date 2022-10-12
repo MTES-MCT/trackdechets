@@ -787,13 +787,6 @@ export async function indexAllBsds(
   logger.info("All types of BSD have been indexed");
 }
 
-type AnyPrismaBsdDelegate =
-  | typeof prisma.bsda
-  | typeof prisma.form
-  | typeof prisma.bsff
-  | typeof prisma.bsvhu
-  | typeof prisma.bsdasri;
-
 type IndexAllFnSignature = {
   bsdName: string;
   index: string;
@@ -822,9 +815,9 @@ export async function findManyAndIndexBsds({
   total,
   since
 }: FindManyAndIndexBsdsFnSignature): Promise<boolean> {
-  const prismaModelDelegate: AnyPrismaBsdDelegate = prismaModels[bsdName];
+  const prismaModelDelegate = prismaModels[bsdName];
   const toBsdElasticFn = bsdaToBsdElasticFns[bsdName];
-  const bsds = await (prismaModelDelegate as any).findMany({
+  const bsds = await prismaModelDelegate.findMany({
     skip,
     take,
     // orderBy gives consistency in SELECT with OFFSET and LIMIT.
@@ -897,8 +890,8 @@ async function indexAllBsdTypeSync({
 }
 
 async function getIndexTypeCount(bsdName: string, since: Date) {
-  const prismaModelDelegate: AnyPrismaBsdDelegate = prismaModels[bsdName];
-  return (prismaModelDelegate as any).count({
+  const prismaModelDelegate = prismaModels[bsdName];
+  return prismaModelDelegate.count({
     where: {
       isDeleted: false,
       ...(since ? { updatedAt: { gte: since } } : {})

@@ -29,7 +29,7 @@ const getIndexDateString = (dateStr?: string) => {
   }
 
   return dateObj
-    .toJSON()
+    .toISOString()
     .replace(/\:/g, INDEX_DATETIME_SEPARATOR)
     .toLowerCase();
 };
