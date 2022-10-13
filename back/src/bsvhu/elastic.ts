@@ -99,9 +99,7 @@ function getWhere(
 /**
  * Convert a dasri from the bsvhu table to Elastic Search's BSD model.
  */
-export function toBsdElastic(
-  bsvhu: Bsvhu
-): Omit<BsdElastic, "es_mappings_version"> {
+export function toBsdElastic(bsvhu: Bsvhu): BsdElastic {
   const where = getWhere(bsvhu);
 
   return {
