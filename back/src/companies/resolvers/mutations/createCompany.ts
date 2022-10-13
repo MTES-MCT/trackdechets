@@ -52,7 +52,10 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     brokerReceiptId,
     vhuAgrementDemolisseurId,
     vhuAgrementBroyeurId,
-    allowBsdasriTakeOverWithoutSignature
+    allowBsdasriTakeOverWithoutSignature,
+    contact,
+    contactEmail,
+    contactPhone
   } = companyInput;
 
   const ecoOrganismeAgreements =
@@ -128,7 +131,10 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     ecoOrganismeAgreements: {
       set: ecoOrganismeAgreements
     },
-    allowBsdasriTakeOverWithoutSignature
+    allowBsdasriTakeOverWithoutSignature,
+    contact,
+    contactEmail,
+    contactPhone
   };
 
   if (!!transporterReceiptId) {
