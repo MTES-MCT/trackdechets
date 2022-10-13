@@ -1,6 +1,5 @@
 import { Form, Status } from "@prisma/client";
-import prisma from "../prisma";
-import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
+import { BsdElastic, indexBsd } from "../common/elastic";
 import { FullForm } from "./types";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
@@ -200,7 +199,9 @@ function getRecipient(form: FullForm) {
 /**
  * Convert a BSD from the forms table to Elastic Search's BSD model.
  */
-function toBsdElastic(form: FullForm & { forwarding?: Form }): BsdElastic {
+export function toBsdElastic(
+  form: FullForm & { forwarding?: Form }
+): BsdElastic {
   const siretsByTab = getSiretsByTab(form);
   const recipient = getRecipient(form);
 
@@ -248,46 +249,10 @@ function toBsdElastic(form: FullForm & { forwarding?: Form }): BsdElastic {
   };
 }
 
-/**
- * Index all BSDs from the forms table.
- */
-export async function indexAllForms(
-  idx: string,
-  { skip = 0 }: { skip?: number } = {}
-) {
-  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
-  const forms = await prisma.form.findMany({
-    skip,
-    take,
-    where: {
-      isDeleted: false
-    },
-    include: {
-      forwarding: true,
-      forwardedIn: true,
-      transportSegments: true,
-      intermediaries: true
-    }
-  });
-
-  if (forms.length === 0) {
-    return;
-  }
-
-  await indexBsds(
-    idx,
-    forms.map(form => toBsdElastic(form))
-  );
-
-  if (forms.length < take) {
-    // all forms have been indexed
-    return;
-  }
-
-  return indexAllForms(idx, { skip: skip + take });
-}
-
-export async function indexForm(form: FullForm, ctx?: GraphQLContext) {
+export async function indexForm(
+  form: FullForm,
+  ctx?: GraphQLContext
+): Promise<BsdElastic> {
   // prevent unwanted cascaded reindexation
   if (form.isDeleted) {
     return null;

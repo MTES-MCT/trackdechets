@@ -6,12 +6,22 @@ import { S3Client } from "@aws-sdk/client-s3";
 import { Upload } from "@aws-sdk/lib-storage";
 
 const LOG_PATH = `${appRoot}/logs/app.log`;
+// Avoid using undefined console.log() in jest context
+const LOG_TO_CONSOLE =
+  process.env.FORCE_LOGGER_CONSOLE && process.env.JEST_WORKER_ID === undefined;
 
 const logger = createLogger({
   level: "info",
   exitOnError: false,
   format: format.combine(format.errors({ stack: true }), format.json()),
-  transports: [new transports.File({ filename: LOG_PATH })]
+  transports: [
+    !LOG_TO_CONSOLE
+      ? new transports.File({ filename: LOG_PATH })
+      : new transports.Console({
+          // Simple `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
+          format: format.simple()
+        })
+  ]
 });
 
 createHeapSnapshotAndUploadToS3();

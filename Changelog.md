@@ -34,6 +34,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Meilleure gestion des ré-indexations de BSD [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706)
 - Utilisation du pattern repository et indexation asynchrone sur le bsdasri [PR 1718](https://github.com/MTES-MCT/trackdechets/pull/1718)
 - Amélioration des performances liées aux BSDD de regroupement avec de nombreux BSDDs initiaux en annexe 2 [PR 1715](https://github.com/MTES-MCT/trackdechets/pull/1715)
 

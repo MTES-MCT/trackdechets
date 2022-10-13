@@ -6,12 +6,15 @@ import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
 import prisma from "../prisma";
 import { Bsda, Bsdasri, Bsff, Bsvhu, Form, Prisma } from "@prisma/client";
-import { indexAllForms } from "../forms/elastic";
-import { indexAllBsdasris } from "../bsdasris/elastic";
-import { indexAllBsvhus } from "../bsvhu/elastic";
-import { indexAllBsdas } from "../bsda/elastic";
-import { indexAllBsffs } from "../bsffs/elastic";
 import logger from "../logging/logger";
+
+import { toBsdElastic as bsdaToBsdElastic } from "../../src/bsda/elastic";
+import { toBsdElastic as bsdasriToBsdElastic } from "../../src/bsdasris/elastic";
+import { toBsdElastic as bsffToBsdElastic } from "../../src/bsffs/elastic";
+import { toBsdElastic as formToBsdElastic } from "../../src/forms/elastic";
+import { toBsdElastic as bsvhuToBsdElastic } from "../../src/bsvhu/elastic";
+import { indexQueue } from "../queue/producers/elastic";
+import { Job } from "bull";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -156,6 +159,9 @@ const settings = {
         tokenize_on_chars: ["whitespace"]
       }
     }
+  },
+  index: {
+    max_ngram_diff: 20 // compatibility with ES 7+, max_ngram_diff > any of max_gram above
   }
 };
 
@@ -332,35 +338,41 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
       contact: { type: "text" },
       phone: { type: "text" },
       mail: { type: "text" },
-      vatNumber: { type: "keyword" }
+      vatNumber: { type: "keyword" },
+      createdAt: {
+        type: "date"
+      },
+      formId: { type: "keyword" },
+      id: { type: "keyword" }
     }
   },
-  rawBsd: { type: "nested", enabled: false } // store, do not index
+  rawBsd: {
+    // enabled false only compatible with object type on ES 6.8
+    type: "object",
+    // store, do not index
+    enabled: false
+  }
 };
 
 export type BsdIndex = {
-  index: string;
   alias: string;
   type: string;
   settings: typeof settings;
+  mappings_version: string;
   mappings: {
     properties: typeof properties;
   };
 };
 
 export const index: BsdIndex = {
-  alias: "bsds",
-
-  // Changing the value of index is a way to "bump" the model
-  // Doing so will cause all BSDs to be reindexed in Elastic Search
-  // when running the appropriate script
-
-  index: "bsds_0.2.5",
-
+  alias: process.env.ELASTICSEARCH_BSDS_ALIAS_NAME || "bsds",
   // The next major version of Elastic Search doesn't use "type" anymore
   // so while it's required for the current version, we are not using it too much
   type: "_doc",
   settings,
+  // increment when mapping has changed to rpovoque reindexation on release
+  // only use Regexp.match("v\d\.\d\.\d"), no special characters that are not supported by index names
+  mappings_version: "v0.2.6",
   mappings: {
     properties
   }
@@ -453,26 +465,32 @@ function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
  */
 export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
   logger.info(`Indexing BSD ${bsd.id}`);
-  return client.index({
-    index: index.index,
-    type: index.type,
-    id: bsd.id,
-    body: bsd,
-    version_type: "external_gte",
-    version: bsd.updatedAt,
-    ...refresh(ctx)
-  });
+  return client.index(
+    {
+      index: index.alias,
+      type: index.type,
+      id: bsd.id,
+      body: bsd,
+      version_type: "external_gte",
+      version: bsd.updatedAt,
+      ...refresh(ctx)
+    },
+    {
+      // do not throw version conflict errors
+      ignore: [409]
+    }
+  );
 }
 
 /**
  * Bulk create/update a list of documents in Elastic Search.
  */
-export function indexBsds(idx: string, bsds: BsdElastic[]) {
+export function indexBsds(indexName: string, bsds: BsdElastic[]) {
   return client.bulk({
     body: bsds.flatMap(bsd => [
       {
         index: {
-          _index: idx,
+          _index: indexName,
           _type: index.type,
           _id: bsd.id
         }
@@ -618,25 +636,248 @@ export async function toPrismaBsds(
   return { bsdds, bsdasris, bsvhus, bsdas, bsffs };
 }
 
-export async function indexAllBsds(index: string, bsdType?: BsdType) {
-  if (!bsdType || bsdType === "BSDD") {
-    logger.info("Indexing Bsdds");
-    await indexAllForms(index);
+const bsdaToBsdElasticFns = {
+  bsff: bsffToBsdElastic,
+  bsvhu: bsvhuToBsdElastic,
+  bsda: bsdaToBsdElastic,
+  bsdasri: bsdasriToBsdElastic,
+  bsdd: formToBsdElastic
+};
+
+const prismaModels = {
+  bsff: prisma.bsff,
+  bsvhu: prisma.bsvhu,
+  bsda: prisma.bsda,
+  bsdasri: prisma.bsdasri,
+  bsdd: prisma.form
+};
+
+const prismaFindManyOptions = {
+  bsff: {
+    include: { packagings: true }
+  },
+  bsvhu: {},
+  bsda: {
+    include: {
+      forwardedIn: { select: { id: true } },
+      groupedIn: { select: { id: true } }
+    }
+  },
+  bsdasri: {
+    include: {
+      grouping: { select: { id: true } },
+      synthesizing: { select: { id: true } }
+    }
+  },
+  bsdd: {
+    include: {
+      forwarding: true,
+      forwardedIn: true,
+      transportSegments: true,
+      intermediaries: true
+    }
   }
-  if (!bsdType || bsdType === "BSDASRI") {
-    logger.info("Indexing Bsdasris");
-    await indexAllBsdasris(index);
+};
+
+/**
+ * Generic indexation function for all bsd or all bsd of a given type
+ */
+export async function indexAllBsds(
+  index: string,
+  useQueue = false,
+  bsdType?: BsdType,
+  updatedSince?: Date
+): Promise<void> {
+  let since: Date;
+  const jobs: Job<string>[] = [];
+  const allBsdTypes: BsdType[] = ["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"];
+
+  for (const loopType of allBsdTypes) {
+    if (!bsdType || bsdType === loopType) {
+      const bsdName = loopType.toLowerCase();
+      logger.info(`Starting indexation of ${bsdName}`);
+      // initialize the total counter
+      const total = await getIndexTypeCount(bsdName, updatedSince);
+      if (!useQueue) {
+        since = new Date();
+        await indexAllBsdTypeSync({
+          bsdName,
+          index,
+          skip: 0,
+          total,
+          since: updatedSince ?? undefined
+        });
+        logger.info(
+          `Catching-up indexation of ${bsdName} updated in database since ${since.toISOString()}`
+        );
+        const totalSince = await getIndexTypeCount(bsdName, since);
+        await indexAllBsdTypeSync({
+          bsdName,
+          index,
+          skip: 0,
+          total: totalSince,
+          since
+        });
+      } else {
+        const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 1000;
+        const data = [];
+        for (
+          let incrementalSkip = 0;
+          incrementalSkip + take <= total;
+          incrementalSkip += take
+        ) {
+          data.push({
+            name: "indexChunk",
+            data: JSON.stringify({
+              bsdName,
+              index,
+              skip: incrementalSkip,
+              total,
+              take,
+              since
+            }),
+            opts: {
+              lifo: true,
+              stackTraceLimit: 100,
+              attempts: 1,
+              timeout: 600_000 // 10 min
+            }
+          });
+        }
+        // control concurrency of addBulk
+        const chunkSize = parseInt(process.env.BULK_INDEX_BATCH_ADD, 10) || 5;
+        for (let i = 0; i < data.length; i += chunkSize) {
+          const chunk = data.slice(i, i + chunkSize);
+          // all jobs are succesfully added in bulk or all jobs will fail
+          const bulkJobs = await indexQueue.addBulk(chunk);
+          jobs.push(...bulkJobs);
+        }
+
+        logger.info(
+          `Added ${data.length} bulk jobs to index a chunk of ${take} "${bsdName}" to index "${index}"`
+        );
+      }
+    }
   }
-  if (!bsdType || bsdType === "BSVHU") {
-    logger.info("Indexing Bsvhus");
-    await indexAllBsvhus(index);
+  if (useQueue && jobs.length) {
+    logger.info(`Waiting for all ${jobs.length} jobs in queue to finish`);
+    await Promise.all(
+      jobs.map(async job => {
+        await job.finished();
+      })
+    );
   }
-  if (!bsdType || bsdType === "BSDA") {
-    logger.info("Indexing Bsdas");
-    await indexAllBsdas(index);
+  logger.info("All types of BSD have been indexed");
+}
+
+type IndexAllFnSignature = {
+  bsdName: string;
+  index: string;
+  skip: number;
+  total: number;
+  since: Date;
+};
+
+export type FindManyAndIndexBsdsFnSignature = {
+  bsdName: string;
+  index: string;
+  skip: number;
+  total: number;
+  since: Date;
+  take: number;
+};
+
+/**
+ * Find a slice of Bsds in the database and Bulk index them
+ */
+export async function findManyAndIndexBsds({
+  bsdName,
+  index,
+  skip,
+  take,
+  total,
+  since
+}: FindManyAndIndexBsdsFnSignature): Promise<boolean> {
+  const prismaModelDelegate = prismaModels[bsdName];
+  const toBsdElasticFn = bsdaToBsdElasticFns[bsdName];
+  const bsds = await prismaModelDelegate.findMany({
+    skip,
+    take,
+    // orderBy gives consistency in SELECT with OFFSET and LIMIT.
+    // Job queue is LIFO so the last inserted should be the first job processed
+    // All BSD have an SQL INDEX on updatedAt
+    orderBy: { updatedAt: "desc" },
+    where: {
+      isDeleted: false,
+      ...(since
+        ? { OR: [{ updatedAt: { gte: since } }, { createdAt: { gte: since } }] }
+        : {})
+    },
+    ...prismaFindManyOptions[bsdName]
+  });
+
+  if (bsds.length === 0) {
+    logger.info(`No ${bsdName} to index, exit`, since);
+    return false;
   }
-  if (!bsdType || bsdType === "BSFF") {
-    logger.info("Indexing Bsffs");
-    await indexAllBsffs(index);
+
+  await indexBsds(
+    index,
+    bsds.map(form => toBsdElasticFn(form))
+  );
+
+  logger.info(
+    `Indexed ${bsdName} batch ${skip} to ${skip + take} on total of ${total}`
+  );
+  if (bsds.length < take) {
+    logger.info(
+      `Indexed ${bsdName} batch ${skip} to ${total} on total of ${total}`
+    );
+    return false;
   }
+  return true;
+}
+
+/**
+ * Index in chunks all BSDs of a given type in a synchronous manner
+ */
+async function indexAllBsdTypeSync({
+  bsdName,
+  index,
+  skip,
+  total,
+  since
+}: IndexAllFnSignature): Promise<IndexAllFnSignature | void> {
+  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
+
+  const continueChunks = await findManyAndIndexBsds({
+    bsdName,
+    index,
+    skip,
+    total,
+    take,
+    since
+  });
+
+  if (!continueChunks) {
+    return;
+  }
+  // synchronous indexation takes place in the database order
+  return indexAllBsdTypeSync({
+    bsdName,
+    index,
+    skip: skip + take,
+    total,
+    since
+  });
+}
+
+async function getIndexTypeCount(bsdName: string, since: Date) {
+  const prismaModelDelegate = prismaModels[bsdName];
+  return prismaModelDelegate.count({
+    where: {
+      isDeleted: false,
+      ...(since ? { updatedAt: { gte: since } } : {})
+    }
+  });
 }
