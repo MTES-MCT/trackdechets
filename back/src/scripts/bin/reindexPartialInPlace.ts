@@ -34,6 +34,7 @@ async function exitScript() {
       logger.info(
         "You must pass a Date in the following format '--since YYYY-MM-DD'"
       );
+      await exitScript();
       return;
     }
   }
@@ -41,6 +42,7 @@ async function exitScript() {
   try {
     if (bsdTypesToIndex.length > 1) {
       logger.info("You can only specify one bsd type to index");
+      await exitScript();
       return;
     }
 
@@ -50,6 +52,7 @@ async function exitScript() {
       logger.info(
         "You can target whether one bsd type OR a date '--since YYYY-MM-DD' to target the re-indexation in place"
       );
+      await exitScript();
       return;
     }
     if (force) {
@@ -57,6 +60,7 @@ async function exitScript() {
         logger.info(
           "You can only force delete existing bsd when passing a BSD type as a command argument"
         );
+        await exitScript();
         return;
       }
       await prompts({
