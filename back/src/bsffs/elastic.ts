@@ -7,7 +7,7 @@ import { BsffPackaging } from "../generated/graphql/types";
 
 export function toBsdElastic(
   bsff: Bsff & { packagings: BsffPackaging[] }
-): Omit<BsdElastic, "es_mappings_version"> {
+): BsdElastic {
   const bsd = {
     type: "BSFF" as const,
     id: bsff.id,
