@@ -185,30 +185,14 @@ async function isIndexMappingsVersionChanged(
     return true;
   }
 
-  const mostRecentIndexDateAndVersion: {
-    date: Date;
-    mappings_version: string;
-  } = aliases?.body
+  const everyMappingUnchanged = aliases?.body
     .map(info => info.index)
-    .map((name: string) => ({
-      date: getIndexDateFromName(name),
-      mappings_version: getIndexMappingsVersionFromName(name)
-    }))
-    .sort((a, b) => {
-      if (a.date === b.date) {
-        return 0;
-      }
-      if (a.date < b.date) {
-        return -1;
-      } else {
-        return 1;
-      }
-    })
-    .reverse()[0];
+    .every(
+      (name: string) =>
+        getIndexMappingsVersionFromName(name) === index.mappings_version
+    );
 
-  if (
-    mostRecentIndexDateAndVersion.mappings_version! === index.mappings_version
-  ) {
+  if (everyMappingUnchanged) {
     logger.info(
       `No mappings version change was detected for index "${index.alias}".`
     );
@@ -236,16 +220,23 @@ export async function reindexPartialInPlace(
   // avoid unwanted deletion
   if (bsdType && force && !since) {
     logger.info(`Deleting ${bsdType} entries`);
-    await client.deleteByQuery({
-      index: index.alias,
-      body: {
-        query: {
-          match: {
-            type: bsdType
+    await client.deleteByQuery(
+      {
+        index: index.alias,
+        body: {
+          query: {
+            match: {
+              type: bsdType
+            }
           }
-        }
+        },
+        refresh: true
+      },
+      {
+        // do not throw an error if a document has been updated during delete operation
+        ignore: [409]
       }
-    });
+    );
   }
   logger.info(
     `Reindex in place ${bsdType ? bsdType + " " : " "}${
