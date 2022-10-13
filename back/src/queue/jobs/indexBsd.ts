@@ -5,9 +5,7 @@ import { BsdElastic, indexBsd } from "../../common/elastic";
 import { indexForm } from "../../forms/elastic";
 import prisma from "../../prisma";
 
-export async function indexBsdJob(
-  job: Job<string>
-): Promise<Omit<BsdElastic, "es_mappings_version">> {
+export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
   const bsdId = job.data;
 
   if (bsdId.startsWith("BSDA-")) {

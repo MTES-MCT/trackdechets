@@ -201,7 +201,7 @@ function getRecipient(form: FullForm) {
  */
 export function toBsdElastic(
   form: FullForm & { forwarding?: Form }
-): Omit<BsdElastic, "es_mappings_version"> {
+): BsdElastic {
   const siretsByTab = getSiretsByTab(form);
   const recipient = getRecipient(form);
 
@@ -252,7 +252,7 @@ export function toBsdElastic(
 export async function indexForm(
   form: FullForm,
   ctx?: GraphQLContext
-): Promise<Omit<BsdElastic, "es_mappings_version">> {
+): Promise<BsdElastic> {
   // prevent unwanted cascaded reindexation
   if (form.isDeleted) {
     return null;

@@ -69,7 +69,6 @@ export interface BsdElastic {
   isManagedWasteFor: string[];
 
   rawBsd: any;
-  es_mappings_version: string; // made to check the mapping version for a doc in ES
 }
 
 // Custom analyzers for readableId and waste fields
@@ -352,9 +351,7 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
     type: "object",
     // store, do not index
     enabled: false
-  },
-  // internal ES mappings version number
-  es_mappings_version: { type: "keyword" }
+  }
 };
 
 export type BsdIndex = {
@@ -466,21 +463,14 @@ function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
 /**
  * Create/update a document in Elastic Search.
  */
-export function indexBsd(
-  bsd: Omit<BsdElastic, "es_mappings_version">,
-  ctx?: GraphQLContext
-) {
+export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
   logger.info(`Indexing BSD ${bsd.id}`);
   return client.index(
     {
       index: index.alias,
       type: index.type,
       id: bsd.id,
-      body: {
-        ...bsd,
-        // inject ES mappings version number
-        es_mappings_version: index.mappings_version
-      },
+      body: bsd,
       version_type: "external_gte",
       version: bsd.updatedAt,
       ...refresh(ctx)
@@ -495,10 +485,7 @@ export function indexBsd(
 /**
  * Bulk create/update a list of documents in Elastic Search.
  */
-export function indexBsds(
-  indexName: string,
-  bsds: Array<Omit<BsdElastic, "es_mappings_version">>
-) {
+export function indexBsds(indexName: string, bsds: BsdElastic[]) {
   return client.bulk({
     body: bsds.flatMap(bsd => [
       {
@@ -508,11 +495,7 @@ export function indexBsds(
           _id: bsd.id
         }
       },
-      {
-        ...bsd,
-        // inject ES mappings version number
-        es_mappings_version: index.mappings_version
-      }
+      bsd
     ])
   });
 }
