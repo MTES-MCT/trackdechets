@@ -9,13 +9,8 @@ import { closeQueues } from "../../queue/producers";
 
 const bsdTypes: BsdType[] = ["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"];
 
-function doubleLog(msg: string, err?: any) {
-  console.log(msg);
-  logger.info(msg, err);
-}
-
 async function exitScript() {
-  doubleLog("Finished reindex-in-place script, exiting");
+  logger.info("Finished reindex-in-place script, exiting");
   await prisma.$disconnect();
   await closeQueues();
 }
@@ -36,7 +31,7 @@ async function exitScript() {
   if (matchIsoDate) {
     since = parseISO(matchIsoDate);
     if (!isValid(since)) {
-      doubleLog(
+      logger.info(
         "You must pass a Date in the following format '--since YYYY-MM-DD'"
       );
       return;
@@ -45,21 +40,21 @@ async function exitScript() {
 
   try {
     if (bsdTypesToIndex.length > 1) {
-      doubleLog("You can only specify one bsd type to index");
+      logger.info("You can only specify one bsd type to index");
       return;
     }
 
     const bsdTypeToIndex = bsdTypesToIndex[0];
 
     if (!bsdTypeToIndex && !since) {
-      doubleLog(
+      logger.info(
         "You can target whether one bsd type OR a date '--since YYYY-MM-DD' to target the re-indexation in place"
       );
       return;
     }
     if (force) {
       if (!bsdTypeToIndex) {
-        doubleLog(
+        logger.info(
           "You can only force delete existing bsd when passing a BSD type as a command argument"
         );
         return;
@@ -80,7 +75,7 @@ async function exitScript() {
       since ?? undefined
     );
   } catch (error) {
-    doubleLog("reindex-in-place failed, error:", error);
+    logger.info("reindex-in-place failed, error:", error);
   } finally {
     await exitScript();
   }

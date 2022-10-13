@@ -7,13 +7,8 @@ import { indexQueue } from "../../queue/producers/elastic";
 import { JobOptions } from "bull";
 const { STARTUP_FILE } = process.env;
 
-function doubleLog(msg) {
-  console.log(msg);
-  logger.info(msg);
-}
-
 async function exitScript() {
-  doubleLog("Done reindexAllInBulk script, exiting");
+  logger.info("Done reindexAllInBulk script, exiting");
   await prisma.$disconnect();
   await closeQueues();
 }
@@ -22,7 +17,7 @@ async function exitScript() {
   const force = process.argv.includes("--force") || process.argv.includes("-f");
   // only meant to be used for api production deployment
   if (!force && (!STARTUP_FILE || STARTUP_FILE === "dist/src/index.js")) {
-    doubleLog(
+    logger.info(
       "Abort reindexAllInBulk: not in a TD api deployment ($STARTUP_FILE is absent or not correct), exiting"
     );
     return;
