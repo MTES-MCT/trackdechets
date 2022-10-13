@@ -1,9 +1,11 @@
-// eslint-disable-next-line import/no-named-as-default
 import Queue, { JobOptions } from "bull";
 import logger from "../../logging/logger";
 
 export type BsdUpdateQueueItem = { sirets: string[]; id: string };
 const { REDIS_URL, NODE_ENV } = process.env;
+
+export const INDEX_JOB_NAME = "index";
+export const DELETE_JOB_NAME = "delete";
 
 export const indexQueue = new Queue<string>(
   `queue_index_elastic_${NODE_ENV}`,
@@ -33,8 +35,9 @@ export const updatesQueue = new Queue<BsdUpdateQueueItem>(
 indexQueue.on("completed", job => {
   const id = job.data;
   const { sirets } = job.returnvalue;
-
-  updatesQueue.add({ sirets, id });
+  if ([DELETE_JOB_NAME, INDEX_JOB_NAME].includes(job.name)) {
+    updatesQueue.add({ sirets, id });
+  }
 });
 
 indexQueue.on("failed", (job, err) => {

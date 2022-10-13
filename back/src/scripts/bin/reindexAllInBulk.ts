@@ -23,7 +23,7 @@ async function exitScript() {
   // only meant to be used for api production deployment
   if (!force && (!STARTUP_FILE || STARTUP_FILE === "dist/src/index.js")) {
     doubleLog(
-      "Abort index all BSDs because not in a TD api deployment, exiting"
+      "Abort reindexAllInBulk: not in a TD api deployment ($STARTUP_FILE is absent or not correct), exiting"
     );
     return;
   }
