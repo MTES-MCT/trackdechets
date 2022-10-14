@@ -120,7 +120,9 @@ export function Worker({ disabled }) {
             }}
           />
 
-          <h4 className="form__section-heading">Certifications</h4>
+          <h4 className="form__section-heading">
+            Catégorie entreprise de travaux amiante
+          </h4>
 
           <div className="form__row">
             <label>
