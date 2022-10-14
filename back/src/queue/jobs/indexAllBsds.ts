@@ -1,10 +1,10 @@
 import { Job } from "bull";
 import { reindexAllBsdsInBulk } from "../../bsds/indexation/bulkIndexBsds";
+import { BsdIndex } from "../../common/elastic";
 import {
-  BsdIndex,
   findManyAndIndexBsds,
   FindManyAndIndexBsdsFnSignature
-} from "../../common/elastic";
+} from "../../bsds/indexation/bulkIndexBsds";
 import logger from "../../logging/logger";
 
 /**
