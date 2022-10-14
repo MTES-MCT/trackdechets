@@ -16,19 +16,6 @@ import { toBsdElastic as bsvhuToBsdElastic } from "../../src/bsvhu/elastic";
 import { indexQueue } from "../queue/producers/elastic";
 import { Job } from "bull";
 
-// complete Typescript example:
-// https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
-export interface SearchResponse<T> {
-  hits: {
-    total: number;
-    hits: Array<{
-      _source: T;
-    }>;
-  };
-}
-export interface GetResponse<T> {
-  _source: T;
-}
 export interface BsdElastic {
   type: BsdType;
   id: string;
@@ -372,74 +359,11 @@ export const index: BsdIndex = {
   settings,
   // increment when mapping has changed to rpovoque reindexation on release
   // only use Regexp.match("v\d\.\d\.\d"), no special characters that are not supported by index names
-  mappings_version: "v0.2.9",
+  mappings_version: "v0.2.10",
   mappings: {
     properties
   }
 };
-
-/**
- * Returns the keyword field matching the given fieldName.
- *
- * e.g passing "readableId" returns "readableId.keyword",
- *     because "redableId" is a "text" with a sub field "readableId.keyword" which is a keyword.
- *
- * e.g passing "id" returns "id", because it's already a keyword.
- *
- * This is useful for context where we are given a property but need to use its keyword counterpart.
- * For example when sorting, where it's not possible to sort on text fields.
- */
-export function getKeywordFieldNameFromName(
-  fieldName: keyof BsdElastic
-): string {
-  const property = index.mappings.properties[fieldName];
-
-  if (property.type === "keyword") {
-    // this property is of type "keyword" itself, it can be used as such
-    return fieldName;
-  }
-
-  // look for a sub field with the type "keyword"
-  const [subFieldName] =
-    Object.entries(property.fields || {}).find(
-      ([_, property]) => property.type === "keyword"
-    ) ?? [];
-
-  if (subFieldName == null) {
-    throw new Error(
-      `The field "${fieldName}" is not of type "keyword" and has no sub fields of that type.`
-    );
-  }
-
-  return `${fieldName}.${subFieldName}`;
-}
-
-/**
- * Returns the root field name matching keywordFieldName.
- * It's the opposite of getKeywordFieldNameFromName.
- *
- * e.g passing "readableId.keyword" returns "readableId",
- *     because "readableId.keyword" is a sub field, the actual field is "readableId".
- *
- * e.g passing "id" returns "id", because "id" is the root field.
- *
- * This is useful for context where a key has been turned into its keyword counterpart
- * but we need to access the value of a document based on it.
- * For example when constructing the "search_after" array from the "sort" array.
- */
-export function getFieldNameFromKeyword(
-  keywordFieldName: string
-): keyof BsdElastic {
-  const [fieldName] = keywordFieldName.split(".");
-
-  if (index.mappings.properties[fieldName] == null) {
-    throw new Error(
-      `The field "${keywordFieldName}" doesn't match a property declared in the mappings.`
-    );
-  }
-
-  return fieldName as keyof BsdElastic;
-}
 
 const certPath = path.join(__dirname, "es.cert");
 export const client = new Client({
@@ -548,34 +472,65 @@ type PrismaBsdsInclude = {
   BSFF?: Prisma.BsffInclude;
 };
 
-/**
- * Convert a list of BsdElastic to a mapping of prisma-like Bsds by retrieving rawBsd elastic field
- */
-export async function toRawBsds(
-  bsdsElastic: BsdElastic[]
-): Promise<PrismaBsdMap> {
-  const { BSDD, BSDASRI, BSVHU, BSDA, BSFF } = bsdsElastic.reduce<{
-    BSDD: Form[];
-    BSDASRI: Bsdasri[];
-    BSVHU: Bsvhu[];
-    BSDA: Bsda[];
-    BSFF: Bsff[];
-  }>(
-    (acc, bsdElastic) => ({
-      ...acc,
-      [bsdElastic.type]: [...acc[bsdElastic.type], bsdElastic?.rawBsd]
-    }),
-    { BSDD: [], BSDASRI: [], BSVHU: [], BSDA: [], BSFF: [] }
-  );
+type IndexAllFnSignature = {
+  bsdName: string;
+  index: string;
+  skip: number;
+  total: number;
+  since: Date;
+};
 
-  return {
-    bsdds: BSDD,
-    bsdasris: BSDASRI,
-    bsvhus: BSVHU,
-    bsdas: BSDA,
-    bsffs: BSFF
-  };
-}
+export type FindManyAndIndexBsdsFnSignature = {
+  bsdName: string;
+  index: string;
+  skip: number;
+  total: number;
+  since: Date;
+  take: number;
+};
+
+const bsdNameToBsdElasticFns = {
+  bsff: bsffToBsdElastic,
+  bsvhu: bsvhuToBsdElastic,
+  bsda: bsdaToBsdElastic,
+  bsdasri: bsdasriToBsdElastic,
+  bsdd: formToBsdElastic
+};
+
+const prismaModels = {
+  bsff: prisma.bsff,
+  bsvhu: prisma.bsvhu,
+  bsda: prisma.bsda,
+  bsdasri: prisma.bsdasri,
+  bsdd: prisma.form
+};
+
+const prismaFindManyOptions = {
+  bsff: {
+    include: { packagings: true }
+  },
+  bsvhu: {},
+  bsda: {
+    include: {
+      forwardedIn: { select: { id: true } },
+      groupedIn: { select: { id: true } }
+    }
+  },
+  bsdasri: {
+    include: {
+      grouping: { select: { id: true } },
+      synthesizing: { select: { id: true } }
+    }
+  },
+  bsdd: {
+    include: {
+      forwarding: true,
+      forwardedIn: true,
+      transportSegments: true,
+      intermediaries: true
+    }
+  }
+};
 
 /**
  * Convert a list of BsdElastic to a mapping of prisma Bsds - Used for registry
@@ -635,49 +590,6 @@ export async function toPrismaBsds(
   );
   return { bsdds, bsdasris, bsvhus, bsdas, bsffs };
 }
-
-const bsdaToBsdElasticFns = {
-  bsff: bsffToBsdElastic,
-  bsvhu: bsvhuToBsdElastic,
-  bsda: bsdaToBsdElastic,
-  bsdasri: bsdasriToBsdElastic,
-  bsdd: formToBsdElastic
-};
-
-const prismaModels = {
-  bsff: prisma.bsff,
-  bsvhu: prisma.bsvhu,
-  bsda: prisma.bsda,
-  bsdasri: prisma.bsdasri,
-  bsdd: prisma.form
-};
-
-const prismaFindManyOptions = {
-  bsff: {
-    include: { packagings: true }
-  },
-  bsvhu: {},
-  bsda: {
-    include: {
-      forwardedIn: { select: { id: true } },
-      groupedIn: { select: { id: true } }
-    }
-  },
-  bsdasri: {
-    include: {
-      grouping: { select: { id: true } },
-      synthesizing: { select: { id: true } }
-    }
-  },
-  bsdd: {
-    include: {
-      forwarding: true,
-      forwardedIn: true,
-      transportSegments: true,
-      intermediaries: true
-    }
-  }
-};
 
 /**
  * Generic indexation function for all bsd or all bsd of a given type
@@ -770,23 +682,6 @@ export async function indexAllBsds(
   logger.info("All types of BSD have been indexed");
 }
 
-type IndexAllFnSignature = {
-  bsdName: string;
-  index: string;
-  skip: number;
-  total: number;
-  since: Date;
-};
-
-export type FindManyAndIndexBsdsFnSignature = {
-  bsdName: string;
-  index: string;
-  skip: number;
-  total: number;
-  since: Date;
-  take: number;
-};
-
 /**
  * Find a slice of Bsds in the database and Bulk index them
  */
@@ -799,7 +694,12 @@ export async function findManyAndIndexBsds({
   since
 }: FindManyAndIndexBsdsFnSignature): Promise<boolean> {
   const prismaModelDelegate = prismaModels[bsdName];
-  const toBsdElasticFn = bsdaToBsdElasticFns[bsdName];
+  const toBsdElasticFn = bsdNameToBsdElasticFns[bsdName];
+  if (!toBsdElasticFn || !prismaModelDelegate) {
+    const msg = `Wrong parameters for findManyAndIndexBsds : ${bsdName} not found`;
+    logger.error(msg);
+    throw new Error(msg);
+  }
   const bsds = await prismaModelDelegate.findMany({
     skip,
     take,

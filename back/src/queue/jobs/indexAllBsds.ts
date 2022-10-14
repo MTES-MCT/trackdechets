@@ -20,6 +20,9 @@ export async function indexChunkBsdJob(job: Job<string>) {
       take,
       since
     }: FindManyAndIndexBsdsFnSignature = JSON.parse(job.data);
+    logger.info(
+      `Started job indexChunk for the following bsd and index names : "${bsdName}", "${index}"`
+    );
     // will index a chunk of BSD
     await findManyAndIndexBsds({
       bsdName,
