@@ -372,7 +372,7 @@ export const index: BsdIndex = {
   settings,
   // increment when mapping has changed to rpovoque reindexation on release
   // only use Regexp.match("v\d\.\d\.\d"), no special characters that are not supported by index names
-  mappings_version: "v0.2.6",
+  mappings_version: "v0.2.7",
   mappings: {
     properties
   }
