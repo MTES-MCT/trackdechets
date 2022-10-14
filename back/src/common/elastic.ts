@@ -372,7 +372,7 @@ export const index: BsdIndex = {
   settings,
   // increment when mapping has changed to rpovoque reindexation on release
   // only use Regexp.match("v\d\.\d\.\d"), no special characters that are not supported by index names
-  mappings_version: "v0.2.8",
+  mappings_version: "v0.2.9",
   mappings: {
     properties
   }
@@ -695,9 +695,9 @@ export async function indexAllBsds(
   for (const loopType of allBsdTypes) {
     if (!bsdType || bsdType === loopType) {
       const bsdName = loopType.toLowerCase();
-      logger.info(`Starting indexation of ${bsdName}`);
       // initialize the total counter
       const total = await getIndexTypeCount(bsdName, updatedSince);
+      logger.info(`Starting indexation of ${total} ${loopType}`);
       if (!useQueue) {
         since = new Date();
         await indexAllBsdTypeSync({
@@ -754,7 +754,7 @@ export async function indexAllBsds(
         }
 
         logger.info(
-          `Added ${jobs.length} bulk jobs to index chunks of ${take} bsds "${bsdName}" to index "${index}"`
+          `Added ${data.length} bulk jobs to index chunks of "${loopType}" to index "${index}"`
         );
       }
     }
@@ -826,14 +826,17 @@ export async function findManyAndIndexBsds({
     bsds.map(form => toBsdElasticFn(form))
   );
 
-  logger.info(
-    `Indexed ${bsdName} batch ${skip} to ${skip + take} on total of ${total}`
-  );
   if (bsds.length < take) {
     logger.info(
-      `Indexed ${bsdName} batch ${skip} to ${total} on total of ${total}`
+      `Indexed ${bsdName} the last/unique batch from cursor ${skip} to ${total} on total of ${total}`
     );
     return false;
+  } else {
+    logger.info(
+      `Indexed ${bsdName} batch from cursor ${skip} to ${
+        skip + take
+      } on total of ${total}`
+    );
   }
   return true;
 }
