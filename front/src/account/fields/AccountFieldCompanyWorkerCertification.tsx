@@ -74,7 +74,7 @@ export default function AccountFieldCompanyWorkerCertification({
       {company.userRole === UserRole.Admin ? (
         <AccountField
           name="workerCertification"
-          label="Certification entreprise de travaux amiante"
+          label="Catégorie entreprise de travaux amiante"
           value={workerCertification}
           renderForm={toggleEdition => (
             <AccountFormCompanyAddWorkerCertification
@@ -86,7 +86,7 @@ export default function AccountFieldCompanyWorkerCertification({
       ) : (
         <AccountFieldNotEditable
           name="workerCertification"
-          label="Certification entreprise de travaux amiante"
+          label="Catégorie entreprise de travaux amiante"
           value={workerCertification}
         />
       )}
