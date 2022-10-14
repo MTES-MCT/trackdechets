@@ -17,12 +17,18 @@ async function exitScript() {
   const force = process.argv.includes("--force") || process.argv.includes("-f");
   const dev = process.argv.includes("--dev") || process.argv.includes("-d");
   // only meant to be used for api production deployment, exxcept if --dev is passed
-  if (!dev && (!STARTUP_FILE || STARTUP_FILE === "dist/src/index.js")) {
-    logger.info(
-      "Abort reindexAllInBulk: not in a TD api deployment ($STARTUP_FILE is absent or not correct), exiting"
-    );
-    await exitScript();
-    return;
+  if (!STARTUP_FILE || STARTUP_FILE !== "dist/src/index.js") {
+    if (!!dev) {
+      logger.info(
+        "Starting reindexAllInBulk with --dev bypassing api deployment protection"
+      );
+    } else {
+      logger.info(
+        "Abort reindexAllInBulk: not in a TD api deployment ($STARTUP_FILE defined and not targeting the api), exiting"
+      );
+      await exitScript();
+      return;
+    }
   }
   try {
     // launch job by chunks in the queue only if argument is specified
