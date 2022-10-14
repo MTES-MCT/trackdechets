@@ -372,7 +372,7 @@ export const index: BsdIndex = {
   settings,
   // increment when mapping has changed to rpovoque reindexation on release
   // only use Regexp.match("v\d\.\d\.\d"), no special characters that are not supported by index names
-  mappings_version: "v0.2.7",
+  mappings_version: "v0.2.8",
   mappings: {
     properties
   }
@@ -723,7 +723,7 @@ export async function indexAllBsds(
         const data = [];
         for (
           let incrementalSkip = 0;
-          incrementalSkip + take <= total;
+          incrementalSkip < total;
           incrementalSkip += take
         ) {
           data.push({
@@ -754,7 +754,7 @@ export async function indexAllBsds(
         }
 
         logger.info(
-          `Added ${data.length} bulk jobs to index a chunk of ${take} "${bsdName}" to index "${index}"`
+          `Added ${jobs.length} bulk jobs to index chunks of ${take} bsds "${bsdName}" to index "${index}"`
         );
       }
     }
