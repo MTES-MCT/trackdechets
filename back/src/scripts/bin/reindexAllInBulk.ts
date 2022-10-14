@@ -24,7 +24,7 @@ async function exitScript() {
       );
     } else {
       logger.info(
-        "Abort reindexAllInBulk: not in a TD api deployment ($STARTUP_FILE defined and not targeting the api), exiting"
+        "Abort reindexAllInBulk: not in a TD api deployment ($STARTUP_FILE not defined or not targeting the api index.js)"
       );
       await exitScript();
       return;
