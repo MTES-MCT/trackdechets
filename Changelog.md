@@ -19,7 +19,13 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
-- Meilleure gestion des ré-indexations de BSD et parallélisation avec la job queue [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706)
+- Meilleure gestion des ré-indexations de BSD sans interruption du service avec `npm run reindex-all-bsds-bulk` et parallélisation avec la job queue avec l'option `--useQueue` [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).
+- Création de nouveau jobs `indexAllInBulk` et `indexChunk` pour la queue d'indexation, , création d'un groupe de workers de job spécifiques pour l'indexation `indexQueue` [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).
+- Refonte d'un script de reindexation partielle avec interruption du service `npm run reindex-partial-in-place` avec une demande de confirmation dans la console [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).
+- Création d'un nouveau script pour vider de force une queue par son nom `npm run queue:obliterate` [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).
+- Suppression du script `bin/indexElasticSearch.ts` au profit des scripts `reindex*.ts` [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).
+- Ajout d'option pour le logger avec les variables `LOG_TO_CONSOLE` et `LOG_TO_HTTP` [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706).
+- Corrections au mappings de l'index bsds, notamment `rawBsd` et `intermediaries`
 
 # [2022.10.1] 10/10/2022
 
@@ -30,7 +36,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Correction dans l'UI Trackdéchets d'un crash lorsqu'on essayait de modifier un BSFF avec des BSFFs initiaux (en cas de regroupement, reconditionnement ou réexpédition) [PR 1707](https://github.com/MTES-MCT/trackdechets/pull/1707).
-- Correction d'un bug permettant à un transporteur étranger de s'inscrire sans renseigner de raison sociale ni d'adresse [PR 1686](https://github.com/MTES-MCT/trackdechets/pull/1686)
+- Correction d'un bug permettant à u*n transporteur étranger de s'inscrire sans renseigner de raison sociale ni d'adresse [PR 1686](https://github.com/MTES-MCT/trackdechets/pull/1686)
 - Correction d'un bug qui ne changeait pas le statut d'un BSDA lors d'une révision d'un code de traitement vers un code de groupement ou de transit [PR 1719](https://github.com/MTES-MCT/trackdechets/pull/1719).
 
 #### :boom: Breaking changes

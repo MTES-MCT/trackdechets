@@ -1,9 +1,9 @@
 import { Job } from "bull";
-import { reindexAllBsdsInBulk } from "../../bsds/indexation/bulkIndexBsds";
 import { BsdIndex } from "../../common/elastic";
 import {
   findManyAndIndexBsds,
-  FindManyAndIndexBsdsFnSignature
+  FindManyAndIndexBsdsFnSignature,
+  reindexAllBsdsInBulk
 } from "../../bsds/indexation/bulkIndexBsds";
 import logger from "../../logging/logger";
 
