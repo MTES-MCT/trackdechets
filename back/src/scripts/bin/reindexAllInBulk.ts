@@ -13,7 +13,7 @@ if (STARTUP_FILE && STARTUP_FILE !== "dist/src/index.js") {
     logger.info(
       "Abort reindexAllInBulk: not in a TD api deployment ($STARTUP_FILE is not targeting the api server index.js)"
     );
-    process.exit(1);
+    process.exit(0);
   }
 }
 
