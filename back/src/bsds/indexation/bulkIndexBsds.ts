@@ -1,8 +1,13 @@
-import { Job } from "bull";
+import { Job, JobOptions } from "bull";
 import type { ApiResponse } from "@elastic/elasticsearch";
 import logger from "../../logging/logger";
 import prisma from "../../prisma";
-import { client, BsdIndex, indexBsds } from "../../common/elastic";
+import {
+  client,
+  BsdIndex,
+  indexBsds,
+  index as defaultIndexConfig
+} from "../../common/elastic";
 import { BsdType } from "../../generated/graphql/types";
 import { toBsdElastic as bsdaToBsdElastic } from "../../bsda/elastic";
 import { toBsdElastic as bsdasriToBsdElastic } from "../../bsdasris/elastic";
@@ -11,7 +16,7 @@ import { toBsdElastic as formToBsdElastic } from "../../forms/elastic";
 import { toBsdElastic as bsvhuToBsdElastic } from "../../bsvhu/elastic";
 import { indexQueue } from "../../queue/producers/elastic";
 type IndexElasticSearchOpts = {
-  index: BsdIndex;
+  index?: BsdIndex;
   force?: boolean;
   useQueue?: boolean;
 };
@@ -393,7 +398,7 @@ async function initializeIndex(
  * Re-index in place (deleting & indexing again) for a single type of BSds
  */
 export async function reindexAllBsdsInBulk({
-  index,
+  index = defaultIndexConfig,
   useQueue = false,
   force = false
 }: IndexElasticSearchOpts): Promise<string> {
@@ -406,17 +411,38 @@ export async function reindexAllBsdsInBulk({
   if (!aliasExists) {
     // first time indexation for a new alias name
     const newIndex = await initializeIndex(index, useQueue);
-    logger.info(
-      `reindexAllBsdsInBulk() done initializing a new index, exiting.`
-    );
+    logger.info(`reindexAllBsdsInBulk done initializing a new index, exiting.`);
     return newIndex;
   } else {
     const newIndex = await reindexAllBsdsNoDowntime(index, force, useQueue);
     logger.info(
-      `reindexAllBsdsInBulk() done rolling out a new index without downtime, exiting.`
+      `reindexAllBsdsInBulk done rolling out a new index without downtime, exiting.`
     );
     return newIndex;
   }
+}
+
+/**
+ * Main queuing function
+ */
+export async function addReindexAllInBulkJob(
+  force: boolean
+): Promise<Job<string>> {
+  logger.info(`Enqueuing indexation of all bsds in bulk without downtime`);
+  // default options can be overwritten by the calling function
+  const jobOptions: JobOptions = {
+    lifo: true,
+    attempts: 1,
+    timeout: 36_000_000 // 10h
+  };
+  return indexQueue.add(
+    "indexAllInBulk",
+    JSON.stringify({
+      index: defaultIndexConfig,
+      force
+    }),
+    jobOptions
+  );
 }
 
 /**

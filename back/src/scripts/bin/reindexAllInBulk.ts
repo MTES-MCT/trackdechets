@@ -1,10 +1,11 @@
 import logger from "../../logging/logger";
 import prisma from "../../prisma";
 import { closeQueues } from "../../queue/producers";
-import { index } from "../../common/elastic";
-import { reindexAllBsdsInBulk } from "../../bsds/indexation/bulkIndexBsds";
-import { indexQueue } from "../../queue/producers/elastic";
-import { JobOptions } from "bull";
+import {
+  reindexAllBsdsInBulk,
+  addReindexAllInBulkJob
+} from "../../bsds/indexation/bulkIndexBsds";
+
 const { STARTUP_FILE } = process.env;
 
 async function exitScript() {
@@ -34,27 +35,12 @@ async function exitScript() {
     // launch job by chunks in the queue only if argument is specified
     const useQueue = process.argv.includes("--useQueue");
     if (useQueue) {
-      logger.info(`Enqueuing indexation of all bsds in bulk without downtime`);
-      // default options can be overwritten by the calling function
-      const jobOptions: JobOptions = {
-        lifo: true,
-        attempts: 1,
-        timeout: 36_000_000 // 10h
-      };
-      await indexQueue.add(
-        "indexAllInBulk",
-        JSON.stringify({
-          index,
-          force
-        }),
-        jobOptions
-      );
+      await addReindexAllInBulkJob(force);
       await exitScript();
       return;
     }
     // will index all BSD without downtime, only if need because of a mapping change
     await reindexAllBsdsInBulk({
-      index,
       force,
       useQueue: false
     });
