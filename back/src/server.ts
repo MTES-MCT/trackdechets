@@ -82,9 +82,20 @@ export const server = new ApolloServer({
     };
   },
   formatError: err => {
+    // Do not leak error for internal server error in production
+    const sentryId = (err?.originalError as any)?.sentryId;
     // Catch Yup `ValidationError` and throw a `UserInputError` instead of an `InternalServerError`
     if (err.extensions.exception?.name === "ValidationError") {
       return new UserInputError(err.extensions.exception.errors.join("\n"));
+    }
+    // Catch Yup `VAT_SEARCH_TOO_MANY_REQUESTS` and throw a `UserInputError`
+    if (err.extensions.code === ErrorCode.VAT_SEARCH_TOO_MANY_REQUESTS) {
+      return new ApolloError(
+        sentryId
+          ? `Erreur serveur externe de recherche par numéro de TVA de la commission européenne (VIES), veuillez réessayer dans quelques minutes ou si l'erreur persiste, envoyez un mail à contact@trackdechets.beta.gouv.fr avec le numéro suivant : rapport d'erreur ${sentryId}`
+          : "Erreur serveur externe de recherche par numéro de TVA de la commission européenne (VIES), veuillez réessayer dans quelques minutes ou si l'erreur persiste, envoyez un mail à contact@trackdechets.beta.gouv.fr avec le contexte de votre erreur",
+        ErrorCode.VAT_SEARCH_TOO_MANY_REQUESTS
+      );
     }
     if (
       err.extensions.code === ErrorCode.INTERNAL_SERVER_ERROR &&
@@ -97,12 +108,10 @@ export const server = new ApolloServer({
         err.extensions.code = "GRAPHQL_VALIDATION_FAILED";
         return err;
       }
-      // Do not leak error for internal server error in production
-      const sentryId = (err?.originalError as any)?.sentryId;
       return new ApolloError(
         sentryId
-          ? `Erreur serveur : rapport d'erreur ${sentryId}`
-          : "Erreur serveur",
+          ? `Erreur interne serveur, veuillez réessayer dans quelques minutes ou si l'erreur persiste, envoyez un mail à contact@trackdechets.beta.gouv.fr avec le numéro suivant : rapport d'erreur ${sentryId}`
+          : "Erreur interne serveur, veuillez réessayer dans quelques minutes ou si l'erreur persiste, envoyez un mail à contact@trackdechets.beta.gouv.fr avec le contexte de votre erreur",
         ErrorCode.INTERNAL_SERVER_ERROR
       );
     }

@@ -4,6 +4,7 @@ import { checkVAT } from "jsvat";
 import { CompanyVatSearchResult, ViesResult } from "./types";
 import { countries } from "../../../common/constants/companySearchHelpers";
 import logger from "../../../logging/logger";
+import { ErrorCode } from "../../../common/errors";
 
 const viesUrl =
   "http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl";
@@ -44,7 +45,7 @@ export const client = async (
       }
     );
   }
-  if (!isValid) {
+  if (!isValid || !vatNumber) {
     throw new UserInputError(
       "Le numéro de TVA intracommunautaire n'est pas valide",
       {
@@ -84,13 +85,32 @@ export const client = async (
       etatAdministratif: "A"
     };
   } catch (err) {
-    if (err instanceof UserInputError) {
-      throw err;
-    }
     logger.error(
-      `Error requesting VIES Server ${getReadableErrorMsg(err.message)}`,
+      `Erreur de requete au serveur de recherche de TVA VIES EC ${getReadableErrorMsg(
+        err.root?.Enveloppe?.Body?.Fault?.faultstring
+      )}`,
       err
     );
+    if (
+      err instanceof UserInputError ||
+      err.root?.Enveloppe?.Body?.Fault?.faultstring === "INVALID_INPUT"
+    ) {
+      throw new UserInputError(
+        `Echec de la recherche du numéro de TVA, le service externe de la commission européenne renvoit une erreur INVALID_INPUT ${vatNumber}`
+      );
+    }
+    if (
+      [
+        "SERVICE_UNAVAILABLE",
+        "MS_UNAVAILABLE",
+        "TIMEOUT",
+        "SERVER_BUSY",
+        "MS_MAX_CONCURRENT_REQ",
+        "ENOTFOUND"
+      ].includes(err.root?.Enveloppe?.Body?.Fault?.faultstring)
+    ) {
+      throw Error(ErrorCode.VAT_SEARCH_TOO_MANY_REQUESTS);
+    }
     throw Error(err.message);
   }
 };
