@@ -350,9 +350,10 @@ export const index: BsdIndex = {
   // so while it's required for the current version, we are not using it too much
   type: "_doc",
   settings,
-  // increment when mapping has changed to rpovoque reindexation on release
-  // only use Regexp.match("v\d\.\d\.\d"), no special characters that are not supported by index names
-  mappings_version: "v0.2.10",
+  // increment when mapping has changed to trigger re-indexation on release
+  // only use vX.Y.Z that matches regexp "v\d\.\d\.\d"
+  // no special characters that are not supported by ES index names (like ":")
+  mappings_version: "v0.2.11",
   mappings: {
     properties
   }

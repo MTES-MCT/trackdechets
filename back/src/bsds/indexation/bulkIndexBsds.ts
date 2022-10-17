@@ -193,7 +193,7 @@ const attachNewIndexAndcleanOldIndexes = async (
   }
   // Delete all old indices to save disk space, except the last
   const indices = await client.cat.indices({
-    index: `${index.alias}${INDEX_ALIAS_NAME_SEPARATOR}*`,
+    index: `${index.alias}${INDEX_ALIAS_NAME_SEPARATOR}v*`,
     format: "json"
   });
 
