@@ -256,6 +256,7 @@ function TransporterFormCompanyFields({
 
 export async function generateBsddPdf(prismaForm: PrismaForm) {
   const fullPrismaForm = await getFullForm(prismaForm);
+
   const grouping = (
     await prisma.formGroupement.findMany({
       where: { nextFormId: fullPrismaForm.id },
@@ -263,6 +264,14 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
     })
   ).map(g => ({ form: g.initialForm, quantity: g.quantity }));
 
+  const groupedIn = (
+    await prisma.formGroupement.findMany({
+      where: { initialFormId: fullPrismaForm.id },
+      include: { nextForm: true }
+    })
+  ).map(g => ({ form: g.nextForm.readableId }));
+
+ 
   const form: GraphQLForm = {
     ...(await expandFormFromDb(fullPrismaForm)),
     transportSegments: fullPrismaForm.transportSegments.map(
@@ -274,6 +283,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
         quantity
       }))
     ),
+ 
     intermediaries: fullPrismaForm.intermediaries ?? []
   };
   const isRepackging =
@@ -345,6 +355,8 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             <p>
               <strong>N° Bordereau :</strong> {form.readableId}{" "}
               {form.customId && <>({form.customId})</>}
+              {groupedIn?.length && <><strong>Annexé au bordereau n° :</strong> { form.groupedIn.map(fraction => fraction.form.readableId)}</>}
+              {}
             </p>
           </div>
         </div>
@@ -591,7 +603,8 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             <div className="BoxCol">
               <p>
                 <strong>
-                  Autre{form?.intermediaries?.length > 1 ? "s" : ""} Intermédiaire{form?.intermediaries?.length > 1 ? "s" : ""}
+                  Autre{form?.intermediaries?.length > 1 ? "s" : ""}{" "}
+                  Intermédiaire{form?.intermediaries?.length > 1 ? "s" : ""}
                 </strong>
               </p>
               {form?.intermediaries?.map(intermediary => (
