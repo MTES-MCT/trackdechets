@@ -269,9 +269,8 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
       where: { initialFormId: fullPrismaForm.id },
       include: { nextForm: true }
     })
-  ).map(g => ({ form: g.nextForm.readableId }));
+  ).map(g => ({ readableId: g.nextForm.readableId }));
 
- 
   const form: GraphQLForm = {
     ...(await expandFormFromDb(fullPrismaForm)),
     transportSegments: fullPrismaForm.transportSegments.map(
@@ -283,7 +282,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
         quantity
       }))
     ),
- 
+
     intermediaries: fullPrismaForm.intermediaries ?? []
   };
   const isRepackging =
@@ -355,7 +354,12 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             <p>
               <strong>N° Bordereau :</strong> {form.readableId}{" "}
               {form.customId && <>({form.customId})</>}
-              {groupedIn?.length && <><strong>Annexé au bordereau n° :</strong> { form.groupedIn.map(fraction => fraction.form.readableId)}</>}
+              {groupedIn?.length && (
+                <>
+                  <strong>Annexé au bordereau n° :</strong>{" "}
+                  {groupedIn.map(bsd => bsd.readableId)}
+                </>
+              )}
               {}
             </p>
           </div>
