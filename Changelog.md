@@ -5,6 +5,22 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.10.3] 31/10/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Assouplissement des prérogatives des éco-organismes [PR 1786](https://github.com/MTES-MCT/trackdechets/pull/1786)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2022.10.2] 17/10/2022
 
 #### :rocket: Nouvelles fonctionnalités
