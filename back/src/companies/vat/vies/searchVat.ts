@@ -124,7 +124,7 @@ export const client = async (
       );
     }
 
-     // any VIES Server error
+    // any VIES Server error
     throw new GraphQLError(err.message, {
       extensions: {
         code: ErrorCode.EXTERNAL_SERVICE_ERROR

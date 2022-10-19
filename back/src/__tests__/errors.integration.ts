@@ -92,7 +92,9 @@ describe("Error handling", () => {
 
     const error = errors[0];
     expect(error.extensions.code).toEqual("INTERNAL_SERVER_ERROR");
-    expect(error.message).toEqual("Erreur interne serveur, veuillez réessayer dans quelques minutes ou si l'erreur persiste, envoyez un mail à contact@trackdechets.beta.gouv.fr avec le contexte de votre erreur");
+    expect(error.message).toEqual(
+      "Erreur interne serveur, veuillez réessayer dans quelques minutes ou si l'erreur persiste, envoyez un mail à contact@trackdechets.beta.gouv.fr avec le contexte de votre erreur"
+    );
   });
 
   test("Sentry id should be displayed when available", async () => {
@@ -109,7 +111,7 @@ describe("Error handling", () => {
     const error = errors[0];
     expect(error.extensions.code).toEqual("INTERNAL_SERVER_ERROR");
     expect(error.message).toEqual(
-      "Erreur serveur : rapport d'erreur sentry_id"
+      "Erreur interne serveur, veuillez réessayer dans quelques minutes ou si l'erreur persiste, envoyez un mail à contact@trackdechets.beta.gouv.fr avec le numéro suivant : rapport d'erreur sentry_id"
     );
   });
 
@@ -124,7 +126,9 @@ describe("Error handling", () => {
 
     const error = errors[0];
     expect(error.extensions.code).toEqual("INTERNAL_SERVER_ERROR");
-    expect(error.message).toEqual("Erreur interne serveur, veuillez réessayer dans quelques minutes ou si l'erreur persiste, envoyez un mail à contact@trackdechets.beta.gouv.fr avec le contexte de votre erreur");
+    expect(error.message).toEqual(
+      "Erreur interne serveur, veuillez réessayer dans quelques minutes ou si l'erreur persiste, envoyez un mail à contact@trackdechets.beta.gouv.fr avec le contexte de votre erreur"
+    );
   });
 
   test("the message of unhandled error returned should be masked", async () => {
@@ -138,7 +142,9 @@ describe("Error handling", () => {
 
     const error = errors[0];
     expect(error.extensions.code).toEqual("INTERNAL_SERVER_ERROR");
-    expect(error.message).toEqual("Erreur interne serveur, veuillez réessayer dans quelques minutes ou si l'erreur persiste, envoyez un mail à contact@trackdechets.beta.gouv.fr avec le contexte de votre erreur");
+    expect(error.message).toEqual(
+      "Erreur interne serveur, veuillez réessayer dans quelques minutes ou si l'erreur persiste, envoyez un mail à contact@trackdechets.beta.gouv.fr avec le contexte de votre erreur"
+    );
   });
 
   test("unhandled errors message should be displayed in dev", async () => {
