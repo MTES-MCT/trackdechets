@@ -18,9 +18,12 @@ export async function getStream(
     })
   ]);
 
-  const events = [...mongoEvents, ...psqlEvents].sort(
-    (a, b) => a.createdAt.getTime() - b.createdAt.getTime()
-  );
+  const mongoEventsIds = mongoEvents.map(e => e.id);
+  const events = [
+    ...mongoEvents,
+    // Some events might be already in Mongo but still in Psql (especially during tests), so we remove duplicates
+    ...psqlEvents.filter(evt => !mongoEventsIds.includes(evt.id))
+  ].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
   return events?.map(event => ({
     type: event.type,

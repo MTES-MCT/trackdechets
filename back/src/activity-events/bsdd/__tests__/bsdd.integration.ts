@@ -10,6 +10,7 @@ import {
   userWithCompanyFactory
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
+import { getStream } from "../../data";
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
@@ -138,10 +139,8 @@ describe("ActivityEvent.Bsdd", () => {
     expect(formAfterCreate).toMatchObject(formFromEventsAfterCreate);
     expect(formFromEventsAfterCreate.emitterCompanyName).toBe(company.name);
 
-    const nbEventsAfterCreate = await prisma.event.count({
-      where: { streamId: formId }
-    });
-    expect(nbEventsAfterCreate).toBe(1);
+    const eventsAfterCreate = await getStream(formId);
+    expect(eventsAfterCreate.length).toBe(1);
 
     // Update form
     await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
@@ -162,10 +161,8 @@ describe("ActivityEvent.Bsdd", () => {
     expect(formAfterUpdate).toMatchObject(formFromEventsAfterUpdate);
     expect(formFromEventsAfterUpdate.wasteDetailsCode).toBe("01 01 01");
 
-    const nbEventsAfterUpdate = await prisma.event.count({
-      where: { streamId: formId }
-    });
-    expect(nbEventsAfterUpdate).toBe(2);
+    const eventsAfterUpdate = await getStream(formId);
+    expect(eventsAfterUpdate.length).toBe(2);
 
     // Mark as sealed
     await mutate<Pick<Mutation, "markAsSealed">>(MARK_AS_SEALED, {
@@ -181,10 +178,8 @@ describe("ActivityEvent.Bsdd", () => {
     expect(formAfterSealed).toMatchObject(formFromEventsAfterSealed);
     expect(formFromEventsAfterSealed.status).toBe("SEALED");
 
-    const nbEventsAfterSealed = await prisma.event.count({
-      where: { streamId: formId }
-    });
-    expect(nbEventsAfterSealed).toBe(4); // +2, update + signature
+    const eventsAfterSealed = await getStream(formId);
+    expect(eventsAfterSealed.length).toBe(4); // +2, update + signature
 
     // Mark as sent
     await mutate(MARK_AS_SENT, {
@@ -201,10 +196,8 @@ describe("ActivityEvent.Bsdd", () => {
     expect(formAfterSent).toMatchObject(formFromEventsAfterSent);
     expect(formFromEventsAfterSent.status).toBe("SENT");
 
-    const nbEventsAfterSent = await prisma.event.count({
-      where: { streamId: formId }
-    });
-    expect(nbEventsAfterSent).toBe(6); // +2, update + signature
+    const eventsAfterSent = await getStream(formId);
+    expect(eventsAfterSent.length).toBe(6); // +2, update + signature
   }, 10000);
 
   it("should create a bsdd event when a revision request is applied", async () => {
