@@ -7,19 +7,12 @@ import { expandVhuFormFromDb } from "../converter";
 import prisma from "../../prisma";
 import { BsvhuPdf } from "./components/BsvhuPdf";
 
- 
 export async function buildPdf(bsvhu: Bsvhu) {
   const qrCode = await QRCode.toString(bsvhu.id, { type: "svg" });
   const expandedBsvhu = expandVhuFormFromDb(bsvhu);
 
-  
-
   const html = ReactDOMServer.renderToStaticMarkup(
-    <BsvhuPdf
-    bsvhu={expandedBsvhu}
-      qrCode={qrCode}
-    
-    />
+    <BsvhuPdf bsvhu={expandedBsvhu} qrCode={qrCode} />
   );
   return generatePdf(html);
 }

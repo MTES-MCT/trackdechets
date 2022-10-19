@@ -13,6 +13,7 @@ const removeSpaces = (val: string | null | undefined): string => {
   }
   return val.replace(/\s/g, "");
 };
+
 type Props = {
   bsvhu: Bsvhu;
   qrCode: string;
@@ -142,7 +143,7 @@ export function BsvhuPdf({ bsvhu, qrCode }: Props) {
         {/* End Emitter/recipient */}
         {/* Waste */}
         <div className="BoxRow">
-          <div className="BoxCol2">
+          <div className="BoxColOneThird">
             <p className="mb-3">
               <strong>3. Le VHU sont conditionnés</strong>
             </p>
@@ -203,7 +204,7 @@ export function BsvhuPdf({ bsvhu, qrCode }: Props) {
         {/* End Waste */}
         {/* Waste identification */}
         <div className="BoxRow">
-          <div className="BoxCol3">
+          <div className="BoxColTwoThird">
             <p className="mb-3">
               <strong>5. Identification du ou des VHU</strong>
             </p>

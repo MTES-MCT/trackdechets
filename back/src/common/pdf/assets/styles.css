@@ -64,13 +64,13 @@ td {
 .BoxCol {
   flex: 1;
 }
-.BoxCol2{
+.BoxColOneThird {
   width: 33%;
   position: relative;
   border-right: 1px solid var(--color-black);
   padding: var(--spacing-gutter);
 }
-.BoxCol3{
+.BoxColTwoThird {
   width: 66%;
   position: relative;
   border-right: 1px solid var(--color-black);
