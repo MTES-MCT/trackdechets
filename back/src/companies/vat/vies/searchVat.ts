@@ -1,6 +1,7 @@
 import { UserInputError } from "apollo-server-express";
-import { createClientAsync, Client, IOptions } from "soap";
+import { ASTNode, GraphQLError } from "graphql";
 import { checkVAT } from "jsvat";
+import { createClientAsync, Client, IOptions } from "soap";
 import { CompanyVatSearchResult, ViesResult } from "./types";
 import { countries } from "../../../common/constants/companySearchHelpers";
 import logger from "../../../logging/logger";
@@ -41,7 +42,7 @@ export const client = async (
     throw new UserInputError(
       "Le code pays du numéro de TVA intracommunautaire n'est pas valide, veuillez utiliser un code pays ISO à 2 lettres",
       {
-        invalidArgs: ["vat"]
+        invalidArgs: ["clue"]
       }
     );
   }
@@ -49,7 +50,7 @@ export const client = async (
     throw new UserInputError(
       "Le numéro de TVA intracommunautaire n'est pas valide",
       {
-        invalidArgs: ["vat"]
+        invalidArgs: ["clue"]
       }
     );
   }
@@ -91,6 +92,8 @@ export const client = async (
       )}`,
       err
     );
+
+    // request is invalid
     if (
       err instanceof UserInputError ||
       err.root?.Enveloppe?.Body?.Fault?.faultstring === "INVALID_INPUT"
@@ -99,6 +102,8 @@ export const client = async (
         `Echec de la recherche du numéro de TVA, le service externe de la commission européenne renvoit une erreur INVALID_INPUT ${vatNumber}`
       );
     }
+
+    // VIES Server unavailable
     if (
       [
         "SERVICE_UNAVAILABLE",
@@ -109,9 +114,22 @@ export const client = async (
         "ENOTFOUND"
       ].includes(err.root?.Enveloppe?.Body?.Fault?.faultstring)
     ) {
-      throw Error(ErrorCode.VAT_SEARCH_TOO_MANY_REQUESTS);
+      throw new GraphQLError(
+        "Erreur serveur externe de recherche par numéro de TVA de la commission européenne (VIES), veuillez réessayer dans quelques minutes ou si l'erreur persiste, envoyez un mail à contact@trackdechets.beta.gouv.fr avec le contexte de votre erreur",
+        {
+          extensions: {
+            code: ErrorCode.EXTERNAL_SERVICE_ERROR
+          }
+        } as unknown as ASTNode
+      );
     }
-    throw Error(err.message);
+
+     // any VIES Server error
+    throw new GraphQLError(err.message, {
+      extensions: {
+        code: ErrorCode.EXTERNAL_SERVICE_ERROR
+      }
+    } as unknown as ASTNode);
   }
 };
 
