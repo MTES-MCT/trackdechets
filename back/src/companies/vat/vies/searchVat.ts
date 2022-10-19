@@ -93,14 +93,12 @@ export const client = async (
       err
     );
 
-    // request is invalid
+    // forward the original exception
     if (
       err instanceof UserInputError ||
       err.root?.Enveloppe?.Body?.Fault?.faultstring === "INVALID_INPUT"
     ) {
-      throw new UserInputError(
-        `Echec de la recherche du numéro de TVA, le service externe de la commission européenne renvoit une erreur INVALID_INPUT ${vatNumber}`
-      );
+      throw err;
     }
 
     // VIES Server unavailable
