@@ -36,7 +36,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Correction dans l'UI Trackdéchets d'un crash lorsqu'on essayait de modifier un BSFF avec des BSFFs initiaux (en cas de regroupement, reconditionnement ou réexpédition) [PR 1707](https://github.com/MTES-MCT/trackdechets/pull/1707).
-- Correction d'un bug permettant à u*n transporteur étranger de s'inscrire sans renseigner de raison sociale ni d'adresse [PR 1686](https://github.com/MTES-MCT/trackdechets/pull/1686)
+- Correction d'un bug permettant à un transporteur étranger de s'inscrire sans renseigner de raison sociale ni d'adresse [PR 1686](https://github.com/MTES-MCT/trackdechets/pull/1686)
 - Correction d'un bug qui ne changeait pas le statut d'un BSDA lors d'une révision d'un code de traitement vers un code de groupement ou de transit [PR 1719](https://github.com/MTES-MCT/trackdechets/pull/1719).
 
 #### :boom: Breaking changes
@@ -56,7 +56,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
-- Meilleure gestion des ré-indexations de BSD [PR1706](https://github.com/MTES-MCT/trackdechets/pull/1706)
 - Utilisation du pattern repository et indexation asynchrone sur le bsdasri [PR 1718](https://github.com/MTES-MCT/trackdechets/pull/1718)
 - Amélioration des performances liées aux BSDD de regroupement avec de nombreux BSDDs initiaux en annexe 2 [PR 1715](https://github.com/MTES-MCT/trackdechets/pull/1715)
 
