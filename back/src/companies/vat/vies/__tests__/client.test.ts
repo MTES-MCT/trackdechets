@@ -1,7 +1,7 @@
-import { client, makeSoapClient } from "../vies/searchVat";
-import { ErrorCode } from "../../../common/errors";
+import { client, makeSoapClient } from "../client";
+import { ErrorCode } from "../../../../common/errors";
 
-describe("searchVat client", () => {
+describe("Vat search VIES client", () => {
   const checkVatAsyncMock = jest.fn();
   const makeSoapClientTest = jest.fn();
   makeSoapClientTest.mockResolvedValue({
@@ -9,7 +9,7 @@ describe("searchVat client", () => {
   });
   const createClientTest = makeSoapClient(makeSoapClientTest);
 
-  jest.mock("../vies/searchVat", () => ({
+  jest.mock("../client", () => ({
     makeSoapClient: makeSoapClientTest
   }));
 

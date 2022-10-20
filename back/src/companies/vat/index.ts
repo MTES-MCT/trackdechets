@@ -1,10 +1,10 @@
-import { client } from "./vies/searchVat";
+import { client } from "./vies/client";
 import { cache } from "../sirene/cache";
 import { backoffIfTestEnvs, throttle } from "../sirene/ratelimit";
 import { CompanyVatSearchResult } from "./vies/types";
 
 /**
- * Apply throttling & cacheing, bu non-redundant on searchVat
+ * Apply throttling & caching, bu non-redundant on searchVat
  * Also avoid requesting VIES api in test env
  */
 const throttledSearchVat = backoffIfTestEnvs<CompanyVatSearchResult>(
