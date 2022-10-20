@@ -22,20 +22,20 @@ describe("Vat search VIES client", () => {
     expect.assertions(4);
     // uppercase
     try {
-      await client("TT1234", createClientTest);
+      await client("TT12345678910", createClientTest);
     } catch (e) {
       expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
       expect(e.message).toBe(
-        "Le code pays du numéro de TVA intracommunautaire n'est pas valide, veuillez utiliser un code pays ISO à 2 lettres"
+        "Le code pays du numéro de TVA n'est pas valide, veuillez utiliser un code pays intra-communautaire ISO à 2 lettres"
       );
     }
     // lower case
     try {
-      await client("zx1234", createClientTest);
+      await client("tt12345678910", createClientTest);
     } catch (e) {
       expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
       expect(e.message).toBe(
-        "Le code pays du numéro de TVA intracommunautaire n'est pas valide, veuillez utiliser un code pays ISO à 2 lettres"
+        "Le code pays du numéro de TVA n'est pas valide, veuillez utiliser un code pays intra-communautaire ISO à 2 lettres"
       );
     }
   });
@@ -84,5 +84,31 @@ describe("Vat search VIES client", () => {
     checkVatAsyncMock.mockResolvedValueOnce([testValue]);
     const res = await client("IT09301420155", createClientTest);
     expect(res).toStrictEqual(testValue);
+  });
+
+  it(`should throw BAD_USER_INPUT if
+  the VIES Server returns an unavailibility error`, async () => {
+    expect.assertions(2);
+    checkVatAsyncMock.mockRejectedValueOnce({
+      body: {
+        err: {
+          root: {
+            Enveloppe: {
+              Body: {
+                faultstring: "INVALID_INPUT"
+              }
+            }
+          }
+        }
+      }
+    });
+    try {
+      await client("IT09301420155", createClientTest);
+    } catch (e) {
+      expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+      expect(e.message).toBe(
+        "Aucun établissement trouvé avec ce numéro TVA intracommunautaire"
+      );
+    }
   });
 });

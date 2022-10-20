@@ -1,6 +1,7 @@
 import { UserInputError } from "apollo-server-express";
 import { ASTNode, GraphQLError } from "graphql";
 import { checkVAT } from "jsvat";
+import path from "path";
 import { createClientAsync, Client, IOptions } from "soap";
 import { CompanyVatSearchResult, ViesResult } from "./types";
 import {
@@ -10,8 +11,7 @@ import {
 import logger from "../../../logging/logger";
 import { ErrorCode } from "../../../common/errors";
 
-const viesUrl =
-  "http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl";
+const viesUrl = path.join(__dirname, "checkVatService.wsdl");
 
 /**
  * Dependency injection
@@ -42,15 +42,18 @@ export const client = async (
     countries
   );
 
-  if (!isValid || !isVat(vatNumber)) {
-    throw new UserInputError("Le numéro de TVA n'est pas valide", {
-      invalidArgs: ["clue"]
-    });
-  }
-
   if (!isSupportedCountry) {
     throw new UserInputError(
       "Le code pays du numéro de TVA n'est pas valide, veuillez utiliser un code pays intra-communautaire ISO à 2 lettres",
+      {
+        invalidArgs: ["clue"]
+      }
+    );
+  }
+
+  if (!isValid || !isVat(vatNumber)) {
+    throw new UserInputError(
+      "Le numéro de TVA intracommunautaire n'est pas valide",
       {
         invalidArgs: ["clue"]
       }
@@ -68,7 +71,7 @@ export const client = async (
     if (viesResult.valid === false) {
       // 404 "no results found"
       throw new UserInputError(
-        "Aucun établissement trouvé avec ce numéro TVA",
+        "Aucun établissement trouvé avec ce numéro TVA intracommunautaire",
         {
           invalidArgs: ["clue"]
         }
@@ -101,9 +104,9 @@ export const client = async (
     if (err instanceof UserInputError) {
       throw err;
     }
-
+    const faultstring = err.root?.Enveloppe?.Body?.Fault?.faultstring;
     // throws UserInputError when VIES client returns the error "INVALID_INPUT"
-    if (err.root?.Enveloppe?.Body?.Fault?.faultstring === "INVALID_INPUT") {
+    if (faultstring === "INVALID_INPUT") {
       throw new UserInputError(
         "Le numéro de TVA recherché n'est pas reconnu par le service de recherche par TVA de la commission européenne (VIES)",
         {
@@ -120,16 +123,13 @@ export const client = async (
         "SERVER_BUSY",
         "MS_MAX_CONCURRENT_REQ",
         "ENOTFOUND"
-      ].includes(err.root?.Enveloppe?.Body?.Fault?.faultstring)
+      ].includes(faultstring)
     ) {
-      throw new GraphQLError(
-        getReadableErrorMsg(err.root?.Enveloppe?.Body?.Fault?.faultstring),
-        {
-          extensions: {
-            code: ErrorCode.EXTERNAL_SERVICE_ERROR
-          }
-        } as unknown as ASTNode
-      );
+      throw new GraphQLError(getReadableErrorMsg(faultstring), {
+        extensions: {
+          code: ErrorCode.EXTERNAL_SERVICE_ERROR
+        }
+      } as unknown as ASTNode);
     }
 
     // Throws a generic VIES Server error
