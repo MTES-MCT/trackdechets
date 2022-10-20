@@ -1,5 +1,4 @@
-import { UserInputError } from "apollo-server-express";
-import { ASTNode, GraphQLError } from "graphql";
+import { ApolloError, UserInputError } from "apollo-server-express";
 import { checkVAT } from "jsvat";
 import path from "path";
 import { createClientAsync, Client, IOptions } from "soap";
@@ -12,6 +11,8 @@ import logger from "../../../logging/logger";
 import { ErrorCode } from "../../../common/errors";
 
 const viesUrl = path.join(__dirname, "checkVatService.wsdl");
+
+export class ViesClientError extends ApolloError {}
 
 /**
  * Dependency injection
@@ -92,11 +93,10 @@ export const client = async (
       etatAdministratif: "A"
     };
   } catch (err) {
+    const fault = err.root.Envelope.Body.Fault;
     // log the error to follow VIES service unavailibility
     logger.error(
-      `Erreur with VAT search VIES client: ${getReadableErrorMsg(
-        err.root?.Enveloppe?.Body?.Fault?.faultstring
-      )}`,
+      `Erreur with VAT search VIES client: ${getReadableErrorMsg(fault)}`,
       err
     );
 
@@ -104,9 +104,8 @@ export const client = async (
     if (err instanceof UserInputError) {
       throw err;
     }
-    const faultstring = err.root?.Enveloppe?.Body?.Fault?.faultstring;
     // throws UserInputError when VIES client returns the error "INVALID_INPUT"
-    if (faultstring === "INVALID_INPUT") {
+    if (fault.faultstring === "INVALID_INPUT") {
       throw new UserInputError(
         "Le numéro de TVA recherché n'est pas reconnu par le service de recherche par TVA de la commission européenne (VIES)",
         {
@@ -115,36 +114,23 @@ export const client = async (
       );
     }
     // Throws VIES Server unavailability message
-    if (
-      [
-        "SERVICE_UNAVAILABLE",
-        "MS_UNAVAILABLE",
-        "TIMEOUT",
-        "SERVER_BUSY",
-        "MS_MAX_CONCURRENT_REQ",
-        "ENOTFOUND"
-      ].includes(faultstring)
-    ) {
-      throw new GraphQLError(getReadableErrorMsg(faultstring), {
-        extensions: {
-          code: ErrorCode.EXTERNAL_SERVICE_ERROR
-        }
-      } as unknown as ASTNode);
-    }
-
-    // Throws a generic VIES Server error
-    throw new GraphQLError(err.message, {
-      extensions: {
-        code: ErrorCode.EXTERNAL_SERVICE_ERROR
-      }
-    } as unknown as ASTNode);
+    throw new ViesClientError(
+      getReadableErrorMsg(fault),
+      ErrorCode.EXTERNAL_SERVICE_ERROR
+    );
   }
 };
 
 /**
  * VIES server error code to readable string
  */
-export const getReadableErrorMsg = (faultstring: string): string => {
+export const getReadableErrorMsg = ({
+  faultstring,
+  faultcode
+}: {
+  faultstring: string;
+  faultcode: string;
+}): string => {
   switch (faultstring) {
     case "INVALID_INPUT":
       return "Le code pays ou le numéro de TVA est invalide";
@@ -161,6 +147,6 @@ export const getReadableErrorMsg = (faultstring: string): string => {
     case "INVALID_REQUESTER_INFO":
       return "Le service de recherche par TVA de la commission européenne (VIES) est indisponible, veuillez réessayer dans quelques minutes";
     default:
-      return "Le service de recherche par TVA de la commission européenne (VIES) est indisponible, veuillez réessayer dans quelques minutes";
+      return `Le service de recherche par TVA de la commission européenne (VIES) est indisponible, veuillez réessayer dans quelques minutes (${faultcode})`;
   }
 };

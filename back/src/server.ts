@@ -89,8 +89,8 @@ export const server = new ApolloServer({
     if (err.extensions.exception?.name === "ValidationError") {
       return new UserInputError(err.extensions.exception.errors.join("\n"));
     }
-    // Catch Yup `EXTERNAL_SERVICE_ERROR` and throw a `UserInputError`
-    if (err.extensions.code === ErrorCode.EXTERNAL_SERVICE_ERROR) {
+    // Catch Yup `ViesClientError` and throw an `ViesClientError`
+    if (err.extensions.exception?.name === "ViesClientError") {
       return new ApolloError(
         sentryId
           ? `${err.message} : rapport d'erreur ${sentryId}`

@@ -90,12 +90,12 @@ describe("Vat search VIES client", () => {
   the VIES Server returns an unavailibility error`, async () => {
     expect.assertions(2);
     checkVatAsyncMock.mockRejectedValueOnce({
-      body: {
-        err: {
-          root: {
-            Enveloppe: {
-              Body: {
-                faultstring: "INVALID_INPUT"
+      err: {
+        root: {
+          Enveloppe: {
+            Body: {
+              Fault: {
+                faultstring: "SERVICE_UNAVAILABLE"
               }
             }
           }
@@ -105,9 +105,9 @@ describe("Vat search VIES client", () => {
     try {
       await client("IT09301420155", createClientTest);
     } catch (e) {
-      expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+      expect(e.extensions.code).toEqual(ErrorCode.EXTERNAL_SERVICE_ERROR);
       expect(e.message).toBe(
-        "Aucun établissement trouvé avec ce numéro TVA intracommunautaire"
+        "Le numéro de TVA recherché n'est pas reconnu par le service de recherche par TVA de la commission européenne (VIES)"
       );
     }
   });
