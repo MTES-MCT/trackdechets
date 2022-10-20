@@ -28,7 +28,7 @@ const QUEUES = {
         `- queueName : nom de la queue (cf. back/src/queue/producers/)`,
         ``,
         `Exemple :`,
-        `npm run queue:drain -- indexQueue`
+        `npm run queue:obliterate -- indexQueue`
       ].join("\n")
     );
     return;
