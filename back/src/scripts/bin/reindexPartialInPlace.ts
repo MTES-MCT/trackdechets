@@ -10,7 +10,7 @@ import { closeQueues } from "../../queue/producers";
 const bsdTypes: BsdType[] = ["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"];
 
 async function exitScript() {
-  logger.info("Finished reindex-in-place script, exiting");
+  logger.info("Finished reindex-partial-in-place script, exiting");
   await prisma.$disconnect();
   await closeQueues();
 }
@@ -79,7 +79,7 @@ async function exitScript() {
       since ?? undefined
     );
   } catch (error) {
-    logger.info("reindex-in-place failed, error:", error);
+    logger.info("reindex-partial-in-place failed, error:", error);
   } finally {
     await exitScript();
   }
