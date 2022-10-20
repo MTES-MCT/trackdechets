@@ -6,26 +6,8 @@ import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
 import prisma from "../prisma";
 import { Bsda, Bsdasri, Bsff, Bsvhu, Form, Prisma } from "@prisma/client";
-import { indexAllForms } from "../forms/elastic";
-import { indexAllBsdasris } from "../bsdasris/elastic";
-import { indexAllBsvhus } from "../bsvhu/elastic";
-import { indexAllBsdas } from "../bsda/elastic";
-import { indexAllBsffs } from "../bsffs/elastic";
 import logger from "../logging/logger";
 
-// complete Typescript example:
-// https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
-export interface SearchResponse<T> {
-  hits: {
-    total: number;
-    hits: Array<{
-      _source: T;
-    }>;
-  };
-}
-export interface GetResponse<T> {
-  _source: T;
-}
 export interface BsdElastic {
   type: BsdType;
   id: string;
@@ -156,6 +138,9 @@ const settings = {
         tokenize_on_chars: ["whitespace"]
       }
     }
+  },
+  index: {
+    max_ngram_diff: 20 // compatibility with ES 7+, max_ngram_diff > any of max_gram above
   }
 };
 
@@ -332,102 +317,47 @@ const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
       contact: { type: "text" },
       phone: { type: "text" },
       mail: { type: "text" },
-      vatNumber: { type: "keyword" }
+      vatNumber: { type: "keyword" },
+      createdAt: {
+        type: "date"
+      },
+      formId: { type: "keyword" },
+      id: { type: "keyword" }
     }
   },
-  rawBsd: { type: "nested", enabled: false } // store, do not index
+  rawBsd: {
+    // enabled false only compatible with object type on ES 6.8
+    type: "object",
+    // store, do not index
+    enabled: false
+  }
 };
 
 export type BsdIndex = {
-  index: string;
   alias: string;
   type: string;
   settings: typeof settings;
+  mappings_version: string;
   mappings: {
     properties: typeof properties;
   };
 };
 
 export const index: BsdIndex = {
-  alias: "bsds",
-
-  // Changing the value of index is a way to "bump" the model
-  // Doing so will cause all BSDs to be reindexed in Elastic Search
-  // when running the appropriate script
-
-  index: "bsds_0.2.5",
-
+  // Do not change this alias name unless you know you will break the production when releasing the next version
+  alias: process.env.ELASTICSEARCH_BSDS_ALIAS_NAME || "bsds",
   // The next major version of Elastic Search doesn't use "type" anymore
   // so while it's required for the current version, we are not using it too much
   type: "_doc",
   settings,
+  // increment when mapping has changed to trigger re-indexation on release
+  // only use vX.Y.Z that matches regexp "v\d\.\d\.\d"
+  // no special characters that are not supported by ES index names (like ":")
+  mappings_version: "v0.2.11",
   mappings: {
     properties
   }
 };
-
-/**
- * Returns the keyword field matching the given fieldName.
- *
- * e.g passing "readableId" returns "readableId.keyword",
- *     because "redableId" is a "text" with a sub field "readableId.keyword" which is a keyword.
- *
- * e.g passing "id" returns "id", because it's already a keyword.
- *
- * This is useful for context where we are given a property but need to use its keyword counterpart.
- * For example when sorting, where it's not possible to sort on text fields.
- */
-export function getKeywordFieldNameFromName(
-  fieldName: keyof BsdElastic
-): string {
-  const property = index.mappings.properties[fieldName];
-
-  if (property.type === "keyword") {
-    // this property is of type "keyword" itself, it can be used as such
-    return fieldName;
-  }
-
-  // look for a sub field with the type "keyword"
-  const [subFieldName] =
-    Object.entries(property.fields || {}).find(
-      ([_, property]) => property.type === "keyword"
-    ) ?? [];
-
-  if (subFieldName == null) {
-    throw new Error(
-      `The field "${fieldName}" is not of type "keyword" and has no sub fields of that type.`
-    );
-  }
-
-  return `${fieldName}.${subFieldName}`;
-}
-
-/**
- * Returns the root field name matching keywordFieldName.
- * It's the opposite of getKeywordFieldNameFromName.
- *
- * e.g passing "readableId.keyword" returns "readableId",
- *     because "readableId.keyword" is a sub field, the actual field is "readableId".
- *
- * e.g passing "id" returns "id", because "id" is the root field.
- *
- * This is useful for context where a key has been turned into its keyword counterpart
- * but we need to access the value of a document based on it.
- * For example when constructing the "search_after" array from the "sort" array.
- */
-export function getFieldNameFromKeyword(
-  keywordFieldName: string
-): keyof BsdElastic {
-  const [fieldName] = keywordFieldName.split(".");
-
-  if (index.mappings.properties[fieldName] == null) {
-    throw new Error(
-      `The field "${keywordFieldName}" doesn't match a property declared in the mappings.`
-    );
-  }
-
-  return fieldName as keyof BsdElastic;
-}
 
 const certPath = path.join(__dirname, "es.cert");
 export const client = new Client({
@@ -453,26 +383,32 @@ function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
  */
 export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
   logger.info(`Indexing BSD ${bsd.id}`);
-  return client.index({
-    index: index.index,
-    type: index.type,
-    id: bsd.id,
-    body: bsd,
-    version_type: "external_gte",
-    version: bsd.updatedAt,
-    ...refresh(ctx)
-  });
+  return client.index(
+    {
+      index: index.alias,
+      type: index.type,
+      id: bsd.id,
+      body: bsd,
+      version_type: "external_gte",
+      version: bsd.updatedAt,
+      ...refresh(ctx)
+    },
+    {
+      // do not throw version conflict errors
+      ignore: [409]
+    }
+  );
 }
 
 /**
  * Bulk create/update a list of documents in Elastic Search.
  */
-export function indexBsds(idx: string, bsds: BsdElastic[]) {
+export function indexBsds(indexName: string, bsds: BsdElastic[]) {
   return client.bulk({
     body: bsds.flatMap(bsd => [
       {
         index: {
-          _index: idx,
+          _index: indexName,
           _type: index.type,
           _id: bsd.id
         }
@@ -531,35 +467,6 @@ type PrismaBsdsInclude = {
 };
 
 /**
- * Convert a list of BsdElastic to a mapping of prisma-like Bsds by retrieving rawBsd elastic field
- */
-export async function toRawBsds(
-  bsdsElastic: BsdElastic[]
-): Promise<PrismaBsdMap> {
-  const { BSDD, BSDASRI, BSVHU, BSDA, BSFF } = bsdsElastic.reduce<{
-    BSDD: Form[];
-    BSDASRI: Bsdasri[];
-    BSVHU: Bsvhu[];
-    BSDA: Bsda[];
-    BSFF: Bsff[];
-  }>(
-    (acc, bsdElastic) => ({
-      ...acc,
-      [bsdElastic.type]: [...acc[bsdElastic.type], bsdElastic?.rawBsd]
-    }),
-    { BSDD: [], BSDASRI: [], BSVHU: [], BSDA: [], BSFF: [] }
-  );
-
-  return {
-    bsdds: BSDD,
-    bsdasris: BSDASRI,
-    bsvhus: BSVHU,
-    bsdas: BSDA,
-    bsffs: BSFF
-  };
-}
-
-/**
  * Convert a list of BsdElastic to a mapping of prisma Bsds - Used for registry
  */
 export async function toPrismaBsds(
@@ -616,27 +523,4 @@ export async function toPrismaBsds(
     prismaBsdsPromises
   );
   return { bsdds, bsdasris, bsvhus, bsdas, bsffs };
-}
-
-export async function indexAllBsds(index: string, bsdType?: BsdType) {
-  if (!bsdType || bsdType === "BSDD") {
-    logger.info("Indexing Bsdds");
-    await indexAllForms(index);
-  }
-  if (!bsdType || bsdType === "BSDASRI") {
-    logger.info("Indexing Bsdasris");
-    await indexAllBsdasris(index);
-  }
-  if (!bsdType || bsdType === "BSVHU") {
-    logger.info("Indexing Bsvhus");
-    await indexAllBsvhus(index);
-  }
-  if (!bsdType || bsdType === "BSDA") {
-    logger.info("Indexing Bsdas");
-    await indexAllBsdas(index);
-  }
-  if (!bsdType || bsdType === "BSFF") {
-    logger.info("Indexing Bsffs");
-    await indexAllBsffs(index);
-  }
 }

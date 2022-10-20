@@ -11,6 +11,7 @@ services:
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-pass}
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms${JVM_RAM:-512m} -Xmx${JVM_RAM:-512m}"
+      - network.host=0.0.0.0
     volumes:
       - esdata01:/usr/share/elasticsearch/data
     ports:
