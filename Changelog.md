@@ -5,11 +5,25 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2022.10.3] 31/10/2022
+# [2022.11.1] 21/11/2022
 
 #### :rocket: Nouvelles fonctionnalités
 
-- Ajout d'un nouveau formulaire de création d'établissement pour les producteurs de déchets [PR 1732](https://github.com/MTES-MCT/trackdechets/pull/1732)
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Utilisation du pattern repository pour le bsvhu, indexation asynchrone et écriture d'events [PR 1767](https://github.com/MTES-MCT/trackdechets/pull/1767).
+
+# [2022.10.3] 31/10/2022
+
+#### :rocket: Nouvelles fonctionnalités
 
 #### :bug: Corrections de bugs
 
