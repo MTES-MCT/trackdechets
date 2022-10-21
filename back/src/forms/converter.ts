@@ -624,7 +624,7 @@ export async function expandFormFromDb(form: any): Promise<GraphQLForm> {
     quantityReceived: forwardedIn
       ? forwardedIn.quantityReceived
       : form.quantityReceived,
-    quantityGrouped: form.quantityGrouped,
+    quantityGrouped: null,
     processingOperationDone: forwardedIn
       ? forwardedIn.processingOperationDone
       : form.processingOperationDone,

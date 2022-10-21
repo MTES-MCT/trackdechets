@@ -45,29 +45,62 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
     });
 
     // update or create new appendix2
-    await Promise.all(
-      appendix2.map(({ form: initialForm, quantity }) => {
-        if (currentAppendix2Forms.map(f => f.id).includes(initialForm.id)) {
-          // update existing appendix2
-          return prisma.formGroupement.updateMany({
+    const formGroupementToCreate: {
+      nextFormId: string;
+      initialFormId: string;
+      quantity: number;
+    }[] = [];
+    const formGroupementToUpdate: {
+      initialFormId: string;
+      quantity: number;
+    }[] = [];
+
+    for (const { form: initialForm, quantity } of appendix2) {
+      if (currentAppendix2Forms.map(f => f.id).includes(initialForm.id)) {
+        formGroupementToUpdate.push({
+          initialFormId: initialForm.id,
+          quantity
+        });
+      } else {
+        formGroupementToCreate.push({
+          nextFormId: form.id,
+          initialFormId: initialForm.id,
+          quantity: quantity
+        });
+      }
+    }
+
+    if (formGroupementToCreate.length > 0) {
+      await prisma.formGroupement.createMany({
+        data: formGroupementToCreate
+      });
+    }
+    if (formGroupementToUpdate.length > 0) {
+      // We compare existing groupements with the updates. If the quantity hasn't changed, we skip the update
+      const existingGroupements = await prisma.formGroupement.findMany({
+        where: {
+          nextFormId: form.id
+        }
+      });
+      const validUpdates = formGroupementToUpdate.filter(update => {
+        const existingGroupement = existingGroupements.find(
+          grp => grp.initialFormId === update.initialFormId
+        );
+        return existingGroupement?.quantity !== update.quantity;
+      });
+
+      await Promise.all(
+        validUpdates.map(({ initialFormId, quantity }) =>
+          prisma.formGroupement.updateMany({
             where: {
               nextFormId: form.id,
-              initialFormId: initialForm.id
+              initialFormId
             },
-            data: { quantity: quantity }
-          });
-        } else {
-          // create appendix2
-          return prisma.formGroupement.create({
-            data: {
-              nextFormId: form.id,
-              initialFormId: initialForm.id,
-              quantity: quantity
-            }
-          });
-        }
-      })
-    );
+            data: { quantity }
+          })
+        )
+      );
+    }
 
     const dirtyFormIds = [
       ...new Set([
