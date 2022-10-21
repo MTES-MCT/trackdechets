@@ -737,7 +737,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 <p>
                   <strong>
                     A REMPLIR EN CAS D’ENTREPOSAGE PROVISOIRE OU DE
-                    RECONDITIONNEMENT (cadres 14 à 19)
+                    RECONDITIONNEMENT (cadres 13 à 19)
                   </strong>
                 </p>
               </div>
