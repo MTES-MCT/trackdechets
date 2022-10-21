@@ -148,7 +148,7 @@
     "@types/node-mailjet": "^3.3.4",
     "@types/oauth2orize": "^1.8.8",
     "@types/object.omit": "^3.0.0",
-    "@types/passport": "^1.0.4",
+    "@types/passport": "^1.0.11",
     "@types/passport-http": "^0.3.8",
     "@types/passport-http-bearer": "^1.0.35",
     "@types/passport-local": "^1.0.33",
