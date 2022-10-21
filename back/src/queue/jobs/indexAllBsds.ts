@@ -51,7 +51,7 @@ export async function indexAllInBulk(job: Job<string>) {
     const {
       SCALINGO_API_URL,
       SCALINGO_APP_NAME,
-      SCALINGO_API_TOKEN,
+      SCALINGO_TOKEN,
       BULK_INDEX_SCALINGO_ACTIVE_AUTOSCALING,
       BULK_INDEX_SCALINGO_CONTAINER_NAME,
       BULK_INDEX_SCALINGO_CONTAINER_SIZE_UP,
@@ -77,7 +77,7 @@ export async function indexAllInBulk(job: Job<string>) {
             ]
           },
           headers: {
-            Authorization: `Bearer ${SCALINGO_API_TOKEN}`
+            Authorization: `Bearer ${SCALINGO_TOKEN}`
           }
         });
         logger.info(
@@ -115,7 +115,7 @@ export async function indexAllInBulk(job: Job<string>) {
             ]
           },
           headers: {
-            Authorization: `Bearer ${SCALINGO_API_TOKEN}`
+            Authorization: `Bearer ${SCALINGO_TOKEN}`
           }
         });
         logger.info(
