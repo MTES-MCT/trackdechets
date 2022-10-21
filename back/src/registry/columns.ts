@@ -39,6 +39,11 @@ const columns: Column[] = [
     format: formatDate
   },
   {
+    field: "updatedAt",
+    label: "Date de dernière modification du bordereau",
+    format: formatDate
+  },
+  {
     field: "transporterTakenOverAt",
     label: "Date d'expédition",
     format: formatDate

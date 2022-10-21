@@ -54,6 +54,8 @@ function toGenericWaste(bsda: Bsda): GenericWaste {
     wasteCode: bsda.wasteCode,
     pop: false,
     id: bsda.id,
+    createdAt: bsda.createdAt,
+    updatedAt: bsda.updatedAt,
     ecoOrganismeName: bsda.ecoOrganismeName,
     ecoOrganismeSiren: bsda.ecoOrganismeSiret?.slice(0, 9),
     bsdType: "BSDA",

@@ -32,6 +32,45 @@ describe("toElasticFilter", () => {
     return body.hits.hits.map(hit => hit._source);
   }
 
+  it("should filter bsds by id (equality)", async () => {
+    const user = await userFactory();
+    const BSDS = {
+      BSDD: await getFullForm(await formFactory({ ownerId: user.id })),
+      BSDA: await bsdaFactory({}),
+      BSDASRI: await bsdasriFactory({}),
+      BSVHU: await bsvhuFactory({}),
+      BSFF: await createBsff()
+    };
+    await Promise.all([
+      indexForm(BSDS["BSDD"]),
+      indexBsda(BSDS["BSDA"]),
+      indexBsdasri(BSDS["BSDASRI"]),
+      indexBsvhu(BSDS["BSVHU"]),
+      indexBsff(BSDS["BSFF"])
+    ]);
+    await refreshElasticSearch();
+
+    let bsds = await searchBsds({ id: { _eq: BSDS.BSDD.readableId } });
+    expect(bsds).toHaveLength(1);
+    expect(bsds[0].readableId).toEqual(BSDS.BSDD.readableId);
+
+    bsds = await searchBsds({ id: { _eq: BSDS.BSDA.id } });
+    expect(bsds).toHaveLength(1);
+    expect(bsds[0].id).toEqual(BSDS.BSDA.id);
+
+    bsds = await searchBsds({ id: { _eq: BSDS.BSDASRI.id } });
+    expect(bsds).toHaveLength(1);
+    expect(bsds[0].id).toEqual(BSDS.BSDASRI.id);
+
+    bsds = await searchBsds({ id: { _eq: BSDS.BSFF.id } });
+    expect(bsds).toHaveLength(1);
+    expect(bsds[0].id).toEqual(BSDS.BSFF.id);
+
+    bsds = await searchBsds({ id: { _eq: BSDS.BSVHU.id } });
+    expect(bsds).toHaveLength(1);
+    expect(bsds[0].id).toEqual(BSDS.BSVHU.id);
+  });
+
   it.each(["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"] as BsdType[])(
     "should filter on %p type (equality)",
     async bsdType => {
