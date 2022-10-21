@@ -8,14 +8,16 @@ const queueNameCompany = QUEUE_NAME_COMPANY || "queue_company";
 export type GeocodeJobData = { siret: string; address?: string };
 export type SetDepartementJobData = { siret: string; codeCommune?: string };
 
+const geocodeCompanyQueueName = `${queueNameCompany}_geocode`;
 /**
  * This queue is used to off load retrieving latitude and longitude info for a company
  */
 export const geocodeCompanyQueue = new Queue(
-  `${queueNameCompany}_geocode`,
+  geocodeCompanyQueueName,
   `${REDIS_URL}`,
 
   {
+    prefix: `{${geocodeCompanyQueueName}}`,
     // prevent hitting api-adresse.data.gouv.fr limit
     limiter: {
       max: 15,
@@ -30,10 +32,13 @@ export const geocodeCompanyQueue = new Queue(
 /**
  * This queue is used to off load retrieving departement info for a company
  */
+
+const setCompanyDepartementQueueName = `${queueNameCompany}_set_departement`;
 export const setCompanyDepartementQueue = new Queue(
-  `${queueNameCompany}_set_departement`,
+  setCompanyDepartementQueueName,
   `${REDIS_URL}`,
   {
+    prefix: `{${setCompanyDepartementQueueName}}`,
     // prevent hitting geo.api.gouv.fr limit
     limiter: {
       max: 2,
