@@ -1,10 +1,11 @@
-import { FormResolvers } from "../../../generated/graphql/types";
+import { Decimal } from "decimal.js-light";
+import { GraphQLContext } from "../../../types";
 
-const quantityGrouped: FormResolvers["quantityGrouped"] = async (
-  form,
+export default async function quantityGrouped(
+  form: { id: string },
   _,
-  context
-) => {
+  context: GraphQLContext
+) {
   const formGroupements = await context.dataloaders.formGoupements.load(
     form.id
   );
@@ -12,9 +13,9 @@ const quantityGrouped: FormResolvers["quantityGrouped"] = async (
   if (formGroupements) {
     return formGroupements
       .map(grp => grp.quantity)
-      .reduce((prev, cur) => prev + cur, 0);
+      .reduce((prev, cur) => prev.add(cur), new Decimal(0))
+      .toNumber();
   }
-  return null;
-};
 
-export default quantityGrouped;
+  return null;
+}

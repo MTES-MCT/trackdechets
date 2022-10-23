@@ -78,8 +78,7 @@ describe("Test appendixForms", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: ttrCompany.siret,
         status: "AWAITING_GROUP",
-        quantityReceived: 1,
-        quantityGrouped: 1
+        quantityReceived: 1
       }
     });
 
@@ -109,8 +108,7 @@ describe("Test appendixForms", () => {
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: ttrCompany.siret,
         status: "AWAITING_GROUP",
-        quantityReceived: 1,
-        quantityGrouped: 0.5
+        quantityReceived: 1
       }
     });
 

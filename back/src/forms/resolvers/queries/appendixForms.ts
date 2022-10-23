@@ -30,16 +30,25 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
         { isDeleted: false },
         { forwarding: null }
       ]
+    },
+    include: {
+      groupedIn: true
     }
   });
 
   return Promise.all(
     queriedForms
-      .filter(
-        f =>
+      .filter(f => {
+        const quantityGrouped = f.groupedIn.reduce(
+          (sum, grp) => sum.add(grp.quantity),
+          new Decimal(0)
+        );
+
+        return (
           f.quantityReceived > 0 &&
-          new Decimal(f.quantityReceived).greaterThan(f.quantityGrouped)
-      )
+          new Decimal(f.quantityReceived).greaterThan(quantityGrouped)
+        );
+      })
       .map(f => expandFormFromDb(f))
   );
 };

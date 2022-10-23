@@ -14,7 +14,10 @@ const groupingResolver: FormResolvers["grouping"] = async (
   return Promise.all(
     formGroupements.map(async ({ quantity, initialForm }) => ({
       quantity,
-      form: await expandAppendix2FormFromDb(initialForm, context.dataloaders.forwardedIns)
+      form: await expandAppendix2FormFromDb(
+        initialForm,
+        context.dataloaders.forwardedIns
+      )
     }))
   );
 };

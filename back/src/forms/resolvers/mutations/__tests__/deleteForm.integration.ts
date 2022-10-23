@@ -177,7 +177,7 @@ describe("Mutation.deleteForm", () => {
 
     await prisma.form.update({
       where: { id: appendix2.id },
-      data: { status: "GROUPED", quantityGrouped: appendix2.quantityReceived }
+      data: { status: "GROUPED" }
     });
 
     const { mutate } = makeClient(ttrUser);

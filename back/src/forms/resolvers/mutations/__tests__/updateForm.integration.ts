@@ -1667,8 +1667,7 @@ describe("Mutation.updateForm", () => {
       opt: {
         status: "AWAITING_GROUP",
         recipientCompanySiret: ttr.siret,
-        quantityReceived: 1,
-        quantityGrouped: 0.2
+        quantityReceived: 1
       }
     });
 
