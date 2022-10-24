@@ -1,15 +1,5 @@
 import { Prisma } from "@prisma/client";
 
-// Xstate possible states
-export enum BsdasriState {
-  Initial = "INITIAL",
-  SignedByProducer = "SIGNED_BY_PRODUCER",
-  Sent = "SENT",
-  Received = "RECEIVED",
-  Processed = "PROCESSED",
-  Refused = "REFUSED"
-}
-
 // Xstate event type
 export enum BsdasriEventType {
   SignEmission = "SIGN_EMISSION",

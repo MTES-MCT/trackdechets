@@ -5,6 +5,22 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.10.3] 31/10/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Ajout d'un statut AWAITING_GROUP sur le BSDASRI [PR 1733](https://github.com/MTES-MCT/trackdechets/pull/1733).
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2022.10.2] 17/10/2022
 
 #### :rocket: Nouvelles fonctionnalités
@@ -40,8 +56,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Correction d'un bug qui ne changeait pas le statut d'un BSDA lors d'une révision d'un code de traitement vers un code de groupement ou de transit [PR 1719](https://github.com/MTES-MCT/trackdechets/pull/1719).
 
 #### :boom: Breaking changes
-
-
 
 #### :nail_care: Améliorations
 

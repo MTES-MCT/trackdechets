@@ -1,5 +1,6 @@
 import acheminementDirect from "./acheminementDirect";
 import emportDirect from "./emportDirect";
+import dasriDeGroupement from "./dasriDeGroupement";
 import dasriDeSynthese from "./dasriDeSynthese";
 import ecoOrganisme from "./ecoOrganisme";
 import signatureCodeSecret from "./signatureCodeSecret";
@@ -11,5 +12,6 @@ export default {
   signatureCodeSecret,
   signatureCodeSecretEcoOrganisme,
   emportDirect,
+  dasriDeGroupement,
   dasriDeSynthese
 };
