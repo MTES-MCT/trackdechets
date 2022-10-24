@@ -6,45 +6,76 @@
   - Ré-expédition
 """
 enum BsdaType {
+  "Collecte en déchèterie relevant de la rubrique 2710-1"
   COLLECTION_2710
+  "Collecte d'amiante sur un chantier"
   OTHER_COLLECTIONS
+  "Groupement de déchets entreposés sur un site relevant de la rubrique 2718 (ou 2710-1)"
   GATHERING
+  "Réexpédition après entreposage provisoire"
   RESHIPMENT
 }
 
+"Statut du bordereau"
 enum BsdaStatus {
+  "Bordereau dans son état initial"
   INITIAL
+  "Signé par le producteur"
   SIGNED_BY_PRODUCER
+  "Signé par l'entreprise de travaux"
   SIGNED_BY_WORKER
+  "Pris en charge par le transporteur"
   SENT
+  "Traité"
   PROCESSED
+  "Refusé"
   REFUSED
+  "En attente d'un bordereau suite"
   AWAITING_CHILD
 }
 
+"Type de packaging du déchet"
 enum BsdaPackagingType {
+  "Palette filmée"
   PALETTE_FILME
+  "Bug Bag"
   BIG_BAG
+  "Dépôt Bag"
   DEPOT_BAG
+  "Sac renforcé"
   SAC_RENFORCE
+  "Conteneur Bag"
   CONTENEUR_BAG
+  "Autre"
   OTHER
 }
 
+"Type de quantité"
 enum BsdaQuantityType {
+  "Réelle"
   REAL
+  "Estimée"
   ESTIMATED
 }
 
+"Consistance du déchet"
 enum BsdaConsistence {
+  "Solide"
   SOLIDE
+  "Pulvérulent"
   PULVERULENT
+  "Autre"
   OTHER
 }
 
+"Type de signature apposée"
 enum BsdaSignatureType {
+  "Signature émetteur"
   EMISSION
+  "Signature entreprise de travaux"
   WORK
+  "Signature transporteur"
   TRANSPORT
+  "Signature destination"
   OPERATION
 }
