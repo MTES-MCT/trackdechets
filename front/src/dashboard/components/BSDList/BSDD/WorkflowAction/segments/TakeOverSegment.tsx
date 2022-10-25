@@ -36,10 +36,11 @@ interface TakeOverSegmentModalProps {
 }
 
 function TakeOverSegmentModal({ formId, onClose }: TakeOverSegmentModalProps) {
-  const { loading: formLoading, error: formError, data } = useQuery<
-    Pick<Query, "form">,
-    QueryFormArgs
-  >(GET_FORM, {
+  const {
+    loading: formLoading,
+    error: formError,
+    data,
+  } = useQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
     variables: {
       id: formId,
       readableId: null,

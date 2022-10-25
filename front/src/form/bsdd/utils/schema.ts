@@ -127,72 +127,68 @@ export const transporterSchema = object().shape({
   company: companySchema,
 });
 
-const packagingInfo: SchemaOf<Omit<
-  PackagingInfo,
-  "__typename"
->> = object().shape({
-  type: mixed<Packagings>().required(
-    "Le type de conditionnement doit être précisé."
-  ),
-  other: string()
-    .ensure()
-    .when("type", (type, schema) =>
-      type === "AUTRE"
-        ? schema.required(
-            "La description doit être précisée pour le conditionnement 'AUTRE'."
-          )
-        : schema
-            .nullable()
-            .max(
-              0,
-              "Le description du conditionnement ne peut être renseignée que lorsque le type de conditionnement est 'AUTRE'."
+const packagingInfo: SchemaOf<Omit<PackagingInfo, "__typename">> =
+  object().shape({
+    type: mixed<Packagings>().required(
+      "Le type de conditionnement doit être précisé."
+    ),
+    other: string()
+      .ensure()
+      .when("type", (type, schema) =>
+        type === "AUTRE"
+          ? schema.required(
+              "La description doit être précisée pour le conditionnement 'AUTRE'."
             )
-    ),
-  quantity: number()
-    .required(
-      "Le nombre de colis associés au conditionnement doit être précisé."
-    )
-    .integer()
-    .min(1, "Le nombre de colis doit être supérieur à 0.")
-    .when("type", (type, schema) =>
-      ["CITERNE", "BENNE"].includes(type)
-        ? schema.max(
-            2,
-            "Le nombre de benne(s) ou de citerne(s) ne peut être supérieur à 2."
-          )
-        : schema
-    ),
-});
+          : schema
+              .nullable()
+              .max(
+                0,
+                "Le description du conditionnement ne peut être renseignée que lorsque le type de conditionnement est 'AUTRE'."
+              )
+      ),
+    quantity: number()
+      .required(
+        "Le nombre de colis associés au conditionnement doit être précisé."
+      )
+      .integer()
+      .min(1, "Le nombre de colis doit être supérieur à 0.")
+      .when("type", (type, schema) =>
+        ["CITERNE", "BENNE"].includes(type)
+          ? schema.max(
+              2,
+              "Le nombre de benne(s) ou de citerne(s) ne peut être supérieur à 2."
+            )
+          : schema
+      ),
+  });
 
-const intermediariesShape: SchemaOf<Omit<
-  CompanyInput,
-  "__typename"
->> = object().shape({
-  siret: string()
-    .required("Intermédiaires: le N° SIRET est obligatoire")
-    .test(
-      "is-siret",
-      "Intermédiaires: le SIRET n'est pas valide (14 chiffres obligatoires)",
-      siret => !siret || isSiret(siret)
+const intermediariesShape: SchemaOf<Omit<CompanyInput, "__typename">> =
+  object().shape({
+    siret: string()
+      .required("Intermédiaires: le N° SIRET est obligatoire")
+      .test(
+        "is-siret",
+        "Intermédiaires: le SIRET n'est pas valide (14 chiffres obligatoires)",
+        siret => !siret || isSiret(siret)
+      ),
+    contact: string().required(
+      "Intermédiaires: les nom et prénom de contact sont obligatoires"
     ),
-  contact: string().required(
-    "Intermédiaires: les nom et prénom de contact sont obligatoires"
-  ),
-  vatNumber: string()
-    .notRequired()
-    .nullable()
-    .test(
-      "is-fr-vat",
-      "Intermédiaires: seul les numéros de TVA en France sont valides",
-      vat => !vat || (isVat(vat) && isFRVat(vat))
-    ),
-  address: string().notRequired().nullable(),
-  name: string().notRequired().nullable(),
-  phone: string().notRequired().nullable(),
-  mail: string().notRequired().nullable(),
-  country: string().notRequired().nullable(), // ignored only for compat with CompanyInput
-  omiNumber: string().notRequired().nullable(), // ignored only for compat with CompanyInput
-});
+    vatNumber: string()
+      .notRequired()
+      .nullable()
+      .test(
+        "is-fr-vat",
+        "Intermédiaires: seul les numéros de TVA en France sont valides",
+        vat => !vat || (isVat(vat) && isFRVat(vat))
+      ),
+    address: string().notRequired().nullable(),
+    name: string().notRequired().nullable(),
+    phone: string().notRequired().nullable(),
+    mail: string().notRequired().nullable(),
+    country: string().notRequired().nullable(), // ignored only for compat with CompanyInput
+    omiNumber: string().notRequired().nullable(), // ignored only for compat with CompanyInput
+  });
 
 export const formSchema = object().shape({
   id: string().required(),

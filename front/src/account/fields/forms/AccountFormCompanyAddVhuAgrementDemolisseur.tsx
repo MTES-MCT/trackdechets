@@ -81,25 +81,23 @@ export default function AccountFormCompanyAddVhuAgrementDemolisseur({
     { loading: updateCompanyLoading, error: updateCompanyError },
   ] = useMutation(UPDATE_COMPANY_VHU_AGREMENT);
 
-  const [
-    deleteVhuAgrement,
-    { loading: deleteLoading, error: deleteError },
-  ] = useMutation(DELETE_VHU_AGREMENT, {
-    update(cache) {
-      cache.writeFragment({
-        id: `CompanyPrivate:${company.id}`,
-        fragment: gql`
-          fragment VhuAgrementDemolisseurCompanyFragment on CompanyPrivate {
-            id
-            vhuAgrementDemolisseur {
+  const [deleteVhuAgrement, { loading: deleteLoading, error: deleteError }] =
+    useMutation(DELETE_VHU_AGREMENT, {
+      update(cache) {
+        cache.writeFragment({
+          id: `CompanyPrivate:${company.id}`,
+          fragment: gql`
+            fragment VhuAgrementDemolisseurCompanyFragment on CompanyPrivate {
               id
+              vhuAgrementDemolisseur {
+                id
+              }
             }
-          }
-        `,
-        data: { vhuAgrementDemolisseur: null },
-      });
-    },
-  });
+          `,
+          data: { vhuAgrementDemolisseur: null },
+        });
+      },
+    });
 
   const initialValues: V = vhuAgrementDemolisseur
     ? {

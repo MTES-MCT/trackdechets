@@ -25,11 +25,12 @@ function getErrorMessage(errorCode: string) {
 }
 
 export default function Login() {
-  const location = useLocation<{
-    errorCode?: string;
-    returnTo?: string;
-    username?: string;
-  }>();
+  const location =
+    useLocation<{
+      errorCode?: string;
+      returnTo?: string;
+      username?: string;
+    }>();
 
   const [showPassword, setShowPassword] = useState(false);
 

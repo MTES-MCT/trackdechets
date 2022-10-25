@@ -8,13 +8,11 @@ import Packagings from "./components/packagings/Packagings";
 import { PreviousBsffsPicker } from "./components/PreviousBsffsPicker";
 
 export default function WasteInfo({ disabled }) {
-  const { setFieldValue, values } = useFormikContext<
-    Bsff & { previousBsffs: Bsff[] }
-  >();
+  const { setFieldValue, values } =
+    useFormikContext<Bsff & { previousBsffs: Bsff[] }>();
 
-  const [hasPreviousBsffsChanged, setHasPreviousBsffsChanged] = React.useState(
-    false
-  );
+  const [hasPreviousBsffsChanged, setHasPreviousBsffsChanged] =
+    React.useState(false);
 
   useEffect(() => {
     if ([BsffType.Reexpedition, BsffType.Groupement].includes(values.type)) {

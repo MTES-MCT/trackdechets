@@ -236,21 +236,16 @@ function BsffTable({
     []
   );
 
-  const {
-    getTableProps,
-    headerGroups,
-    getTableBodyProps,
-    rows,
-    prepareRow,
-  } = useTable(
-    {
-      columns,
-      data,
-      filterTypes,
-      defaultColumn,
-    },
-    useFilters
-  );
+  const { getTableProps, headerGroups, getTableBodyProps, rows, prepareRow } =
+    useTable(
+      {
+        columns,
+        data,
+        filterTypes,
+        defaultColumn,
+      },
+      useFilters
+    );
 
   return (
     <Table {...getTableProps()}>

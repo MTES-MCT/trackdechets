@@ -19,12 +19,8 @@ export default function Dialog() {
     return <div>{error}</div>;
   }
 
-  const {
-    transactionID,
-    redirectURI,
-    client,
-    user,
-  } = authorizePayload as AuthorizePayload;
+  const { transactionID, redirectURI, client, user } =
+    authorizePayload as AuthorizePayload;
 
   return (
     <div className={styles["dialog-container"]}>

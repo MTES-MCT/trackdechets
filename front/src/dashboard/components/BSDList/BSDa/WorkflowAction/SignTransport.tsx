@@ -28,10 +28,10 @@ const validationSchema = yup.object({
 
 type Props = { siret: string; bsdaId: string };
 export function SignTransport({ siret, bsdaId }: Props) {
-  const [updateBsda, { error: updateError }] = useMutation<
-    Pick<Mutation, "updateBsda">,
-    MutationUpdateBsdaArgs
-  >(UPDATE_BSDA);
+  const [updateBsda, { error: updateError }] =
+    useMutation<Pick<Mutation, "updateBsda">, MutationUpdateBsdaArgs>(
+      UPDATE_BSDA
+    );
   const [signBsda, { loading, error: signatureError }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs

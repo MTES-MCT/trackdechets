@@ -41,22 +41,17 @@ const COLUMNS = [
 export function BsddRevisionRequestTable({ revisions }: Props) {
   const columns: any = useMemo(() => COLUMNS, []);
 
-  const {
-    getTableProps,
-    headerGroups,
-    getTableBodyProps,
-    rows,
-    prepareRow,
-  } = useTable(
-    {
-      columns,
-      data: revisions,
-      manualFilters: true,
-      manualSortBy: true,
-    },
-    useFilters,
-    useSortBy
-  );
+  const { getTableProps, headerGroups, getTableBodyProps, rows, prepareRow } =
+    useTable(
+      {
+        columns,
+        data: revisions,
+        manualFilters: true,
+        manualSortBy: true,
+      },
+      useFilters,
+      useSortBy
+    );
 
   return (
     <Table {...getTableProps()}>

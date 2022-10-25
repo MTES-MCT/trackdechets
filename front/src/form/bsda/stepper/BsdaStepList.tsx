@@ -21,8 +21,8 @@ import omitDeep from "omit-deep-lodash";
 import { formInputToastError } from "form/common/stepper/toaster";
 import { bsdaValidationSchema } from "./schema";
 
-const GenericStepList = lazy(() =>
-  import("form/common/stepper/GenericStepList")
+const GenericStepList = lazy(
+  () => import("form/common/stepper/GenericStepList")
 );
 
 interface Props {
@@ -112,9 +112,8 @@ export default function BsdaStepsList(props: Props) {
   // As it's a render function, the steps are nested into a `<></>` block
   // So we render then unwrap to get the steps
   const parentOfSteps = props.children(formQuery.data?.bsda);
-  const steps = parentOfSteps.props.children as ReactElement<
-    IStepContainerProps
-  >[];
+  const steps = parentOfSteps.props
+    .children as ReactElement<IStepContainerProps>[];
 
   return (
     <>

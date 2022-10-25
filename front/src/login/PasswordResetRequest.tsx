@@ -26,10 +26,11 @@ const RESET_PASSWORD = gql`
 export default function PasswordResetRequest() {
   const [submittable, setSubmittable] = useState(false);
 
-  const [createPasswordResetRequest, { data, error }] = useMutation<
-    Pick<Mutation, "createPasswordResetRequest">,
-    MutationCreatePasswordResetRequestArgs
-  >(RESET_PASSWORD);
+  const [createPasswordResetRequest, { data, error }] =
+    useMutation<
+      Pick<Mutation, "createPasswordResetRequest">,
+      MutationCreatePasswordResetRequestArgs
+    >(RESET_PASSWORD);
 
   const emailRef = createRef<HTMLInputElement>();
 

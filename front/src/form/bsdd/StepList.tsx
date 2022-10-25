@@ -17,8 +17,8 @@ import { IStepContainerProps } from "../common/stepper/Step";
 import { GET_BSDS } from "common/queries";
 import { Loader } from "common/components";
 import { formInputToastError } from "form/common/stepper/toaster";
-const GenericStepList = lazy(() =>
-  import("form/common/stepper/GenericStepList")
+const GenericStepList = lazy(
+  () => import("form/common/stepper/GenericStepList")
 );
 interface Props {
   children: ReactElement<IStepContainerProps>[];
@@ -37,9 +37,10 @@ export default function StepsList(props: Props) {
     fetchPolicy: "network-only",
   });
 
-  const formState = useMemo(() => getInitialState(formQuery.data?.form), [
-    formQuery.data,
-  ]);
+  const formState = useMemo(
+    () => getInitialState(formQuery.data?.form),
+    [formQuery.data]
+  );
 
   const [createForm, { loading: creating }] = useMutation<
     Pick<Mutation, "createForm">,

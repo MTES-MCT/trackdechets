@@ -56,7 +56,7 @@ function isObject(value: any): boolean {
  * @returns {Object} Object with the exact shape as defaults, with values from options where provided.
  */
 export function mergeDefaults<T>(defaults: T, options: Record<string, any>): T {
-  return Object.keys(defaults).reduce((acc, key) => {
+  return Object.keys(defaults as any).reduce((acc, key) => {
     if (options[key] == null) {
       return {
         ...acc,
