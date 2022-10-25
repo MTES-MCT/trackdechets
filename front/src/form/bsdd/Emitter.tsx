@@ -20,10 +20,8 @@ export default function Emitter({ disabled }) {
   const hasInitialGrouping = !!initialValues?.grouping?.length; // siret is non editable once bsd contains grouped bsds
   const siretNonEditable = hasInitialGrouping && !!values?.id;
 
-  const [
-    emitterTypeProducerDisabled,
-    setEmitterTypeProducerDisabled,
-  ] = useState(values.ecoOrganisme?.siret != null);
+  const [emitterTypeProducerDisabled, setEmitterTypeProducerDisabled] =
+    useState(values.ecoOrganisme?.siret != null);
 
   const [lockEmitterProducer, setLockEmitterProducer] = useState(
     values.emitter?.isForeignShip || values.emitter?.isPrivateIndividual
