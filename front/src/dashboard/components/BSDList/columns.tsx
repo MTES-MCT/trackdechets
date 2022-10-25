@@ -82,7 +82,7 @@ export function createColumn(column: Column): Column {
       }
       if (bsd.__typename === "Bsff") {
         return bsff.COLUMNS[column.id]?.accessor?.(
-          (bsd as unknown) as bsff.BsffFragment
+          bsd as unknown as bsff.BsffFragment
         );
       }
       if (bsd.__typename === "Bsda") {
@@ -115,7 +115,7 @@ export function createColumn(column: Column): Column {
         const Cell = bsff.COLUMNS[column.id]?.Cell;
         if (Cell) {
           return (
-            <Cell {...((props as unknown) as CellProps<bsff.BsffFragment>)} />
+            <Cell {...(props as unknown as CellProps<bsff.BsffFragment>)} />
           );
         }
       }

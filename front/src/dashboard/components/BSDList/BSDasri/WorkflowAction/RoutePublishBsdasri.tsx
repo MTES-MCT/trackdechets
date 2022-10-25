@@ -42,25 +42,23 @@ export function RoutePublishBsdasri() {
     fetchPolicy: "no-cache",
   });
 
-  const [
-    publishBsdasri,
-    { loading: mutationLoading, error: publishError },
-  ] = useMutation<Pick<Mutation, "publishBsdasri">, MutationPublishBsdasriArgs>(
-    PUBLISH_BSDASRI,
-    {
-      variables: { id: formId },
-      refetchQueries: [GET_BSDS],
-      awaitRefetchQueries: true,
-      onCompleted: () => {
-        cogoToast.success(`Bordereau ${formId} publié`, { hideAfter: 5 });
-        history.goBack();
-      },
-      onError: () =>
-        cogoToast.error(`Le bordereau ${formId} n'a pas pu être publié`, {
-          hideAfter: 5,
-        }),
-    }
-  );
+  const [publishBsdasri, { loading: mutationLoading, error: publishError }] =
+    useMutation<Pick<Mutation, "publishBsdasri">, MutationPublishBsdasriArgs>(
+      PUBLISH_BSDASRI,
+      {
+        variables: { id: formId },
+        refetchQueries: [GET_BSDS],
+        awaitRefetchQueries: true,
+        onCompleted: () => {
+          cogoToast.success(`Bordereau ${formId} publié`, { hideAfter: 5 });
+          history.goBack();
+        },
+        onError: () =>
+          cogoToast.error(`Le bordereau ${formId} n'a pas pu être publié`, {
+            hideAfter: 5,
+          }),
+      }
+    );
   if (error) {
     return <InlineError apolloError={error} />;
   }

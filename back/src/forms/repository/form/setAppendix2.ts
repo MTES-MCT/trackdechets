@@ -1,10 +1,6 @@
-import { EmitterType, Form, Status } from "@prisma/client";
-import { UserInputError } from "apollo-server-core";
-import { RepositoryFnDeps } from "../types";
-import buildFindAppendix2FormsById from "./findAppendix2FormsById";
-import { getFinalDestinationSiret } from "../../database";
+import { Form } from "@prisma/client";
+import { RepositoryFnDeps } from "../../../common/repository/types";
 import buildUpdateAppendix2Forms from "./updateAppendix2Forms";
-import { Decimal } from "decimal.js-light";
 
 class FormFraction {
   form: Form;
@@ -14,9 +10,10 @@ class FormFraction {
 class SetAppendix2Args {
   form: Form;
   appendix2: FormFraction[] | null;
+  currentAppendix2Forms?: Form[];
 }
 
-export type SetAppendix2Fn = (args: SetAppendix2Args) => Promise<Form[]>;
+export type SetAppendix2Fn = (args: SetAppendix2Args) => Promise<void>;
 
 /**
  * Set appendix2 on a groupement form by creating associations between
@@ -38,108 +35,7 @@ export type SetAppendix2Fn = (args: SetAppendix2Args) => Promise<Form[]>;
  */
 const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
   ({ prisma, user }) =>
-  async ({ form, appendix2 }) => {
-    const findAppendix2FormsById = buildFindAppendix2FormsById({
-      prisma
-    });
-
-    const currentAppendix2Forms = await findAppendix2FormsById(form.id);
-
-    // check groupement form type is APPENDIX2 if appendix2 is not empty
-    if (
-      (appendix2?.length ||
-        (currentAppendix2Forms.length && appendix2?.length !== 0)) &&
-      form.emitterType !== EmitterType.APPENDIX2
-    ) {
-      throw new UserInputError(
-        "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
-      );
-    }
-
-    if (appendix2 === null) {
-      return currentAppendix2Forms;
-    }
-
-    // check emitter of groupement form matches destination of initial form
-    for (const { form: initialForm } of appendix2) {
-      const appendix2DestinationSiret = await getFinalDestinationSiret(
-        initialForm
-      );
-
-      if (form.emitterCompanySiret !== appendix2DestinationSiret) {
-        throw new UserInputError(
-          `Le bordereau ${initialForm.id} n'est pas en possession du nouvel émetteur`
-        );
-      }
-    }
-
-    // check grouped forms have status AWAITING_GROUP or GROUPED
-    const unawaitingGroupForm = await prisma.form.findFirst({
-      where: {
-        id: { in: appendix2.map(({ form }) => form.id) },
-        status: { not: { in: [Status.AWAITING_GROUP, Status.GROUPED] } }
-      }
-    });
-
-    if (unawaitingGroupForm) {
-      throw new UserInputError(
-        `Le bordereau ${unawaitingGroupForm.id} n'est pas en attente de regroupement`
-      );
-    }
-
-    // check each form appears in only one form fraction
-    const formIds = appendix2.map(({ form }) => form.id);
-    const duplicates = formIds.filter(
-      (id, index) => formIds.indexOf(id) !== index
-    );
-    if (duplicates.length > 0) {
-      throw new UserInputError(
-        `Impossible d'associer plusieurs fractions du même bordereau initial sur un même bordereau` +
-          ` de regroupement. Identifiant du ou des bordereaux initiaux concernés : ${duplicates.join(
-            ", "
-          )}`
-      );
-    }
-
-    // check quantity grouped in each grouped form is not greater than quantity received
-    for (const { form: initialForm, quantity } of appendix2) {
-      if (quantity <= 0) {
-        throw new UserInputError(
-          "La quantité regroupée doit être strictement supérieure à 0"
-        );
-      }
-      const quantityGroupedInOtherForms =
-        (
-          await prisma.formGroupement.aggregate({
-            _sum: { quantity: true },
-            where: {
-              initialFormId: initialForm.id,
-              nextFormId: { not: form.id }
-            }
-          })
-        )._sum.quantity ?? 0;
-
-      const quantityLeftToGroup = new Decimal(initialForm.quantityReceived)
-        .minus(quantityGroupedInOtherForms)
-        .toDecimalPlaces(6); // set precision to gramme
-
-      if (quantityLeftToGroup.equals(0)) {
-        throw new UserInputError(
-          `Le bordereau ${initialForm.readableId} a déjà été regroupé en totalité`
-        );
-      }
-
-      if (new Decimal(quantity).greaterThan(quantityLeftToGroup)) {
-        throw new UserInputError(
-          `La quantité restante à regrouper sur le BSDD ${
-            initialForm.readableId
-          } est de ${quantityLeftToGroup.toFixed(
-            3
-          )} T. Vous tentez de regrouper ${quantity} T.`
-        );
-      }
-    }
-
+  async ({ form, appendix2, currentAppendix2Forms }) => {
     // delete existing appendix2 not present in input
     await prisma.formGroupement.deleteMany({
       where: {
@@ -149,26 +45,61 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
     });
 
     // update or create new appendix2
+    const formGroupementToCreate: {
+      nextFormId: string;
+      initialFormId: string;
+      quantity: number;
+    }[] = [];
+    const formGroupementToUpdate: {
+      initialFormId: string;
+      quantity: number;
+    }[] = [];
+
     for (const { form: initialForm, quantity } of appendix2) {
       if (currentAppendix2Forms.map(f => f.id).includes(initialForm.id)) {
-        // update existing appendix2
-        await prisma.formGroupement.updateMany({
-          where: {
-            nextFormId: form.id,
-            initialFormId: initialForm.id
-          },
-          data: { quantity: quantity }
+        formGroupementToUpdate.push({
+          initialFormId: initialForm.id,
+          quantity
         });
       } else {
-        // create appendix2
-        await prisma.formGroupement.create({
-          data: {
-            nextFormId: form.id,
-            initialFormId: initialForm.id,
-            quantity: quantity
-          }
+        formGroupementToCreate.push({
+          nextFormId: form.id,
+          initialFormId: initialForm.id,
+          quantity: quantity
         });
       }
+    }
+
+    if (formGroupementToCreate.length > 0) {
+      await prisma.formGroupement.createMany({
+        data: formGroupementToCreate
+      });
+    }
+    if (formGroupementToUpdate.length > 0) {
+      // We compare existing groupements with the updates. If the quantity hasn't changed, we skip the update
+      const existingGroupements = await prisma.formGroupement.findMany({
+        where: {
+          nextFormId: form.id
+        }
+      });
+      const validUpdates = formGroupementToUpdate.filter(update => {
+        const existingGroupement = existingGroupements.find(
+          grp => grp.initialFormId === update.initialFormId
+        );
+        return existingGroupement?.quantity !== update.quantity;
+      });
+
+      await Promise.all(
+        validUpdates.map(({ initialFormId, quantity }) =>
+          prisma.formGroupement.updateMany({
+            where: {
+              nextFormId: form.id,
+              initialFormId
+            },
+            data: { quantity }
+          })
+        )
+      );
     }
 
     const dirtyFormIds = [
@@ -184,8 +115,6 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
 
     const updateAppendix2Forms = buildUpdateAppendix2Forms({ prisma, user });
     await updateAppendix2Forms(dirtyForms);
-
-    return findAppendix2FormsById(form.id);
   };
 
 export default buildSetAppendix2;

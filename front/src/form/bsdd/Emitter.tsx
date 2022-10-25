@@ -20,9 +20,8 @@ export default function Emitter({ disabled }) {
   const hasInitialGrouping = !!initialValues?.grouping?.length; // siret is non editable once bsd contains grouped bsds
   const siretNonEditable = hasInitialGrouping && !!values?.id;
 
-  const [lockEmitterType, setLockEmitterType] = useState(
-    values.ecoOrganisme?.siret != null
-  );
+  const [emitterTypeProducerDisabled, setEmitterTypeProducerDisabled] =
+    useState(values.ecoOrganisme?.siret != null);
 
   const [lockEmitterProducer, setLockEmitterProducer] = useState(
     values.emitter?.isForeignShip || values.emitter?.isPrivateIndividual
@@ -30,17 +29,17 @@ export default function Emitter({ disabled }) {
 
   useEffect(() => {
     if (values.ecoOrganisme?.siret) {
-      setLockEmitterType(true);
+      setEmitterTypeProducerDisabled(true);
       setFieldValue("emitter.type", "OTHER");
       return;
     }
-    setLockEmitterType(false);
+    setEmitterTypeProducerDisabled(false);
   }, [values.ecoOrganisme, setFieldValue]);
 
   useEffect(() => {
     if (values.emitter?.isForeignShip || values.emitter?.isPrivateIndividual) {
       setLockEmitterProducer(true);
-      setLockEmitterType(false);
+      setEmitterTypeProducerDisabled(false);
       setFieldValue("emitter.type", "PRODUCER");
       return;
     }
@@ -84,10 +83,10 @@ export default function Emitter({ disabled }) {
 
       <EcoOrganismes name="ecoOrganisme" />
 
-      {lockEmitterType && (
+      {emitterTypeProducerDisabled && (
         <div className="form__row notification info">
           Lorsqu'un éco-organisme est indiqué comme responsable du déchet, le
-          type d'émetteur est verrouillé à "Autre détenteur".
+          type d'émetteur ne peut être "Producteur".
         </div>
       )}
 
@@ -108,7 +107,7 @@ export default function Emitter({ disabled }) {
             label={emitterTypeLabels["PRODUCER"]}
             component={RadioButton}
             onChange={onChangeEmitterType}
-            disabled={lockEmitterType || lockEmitterProducer}
+            disabled={emitterTypeProducerDisabled || lockEmitterProducer}
           />
           <Field
             name="emitter.type"
@@ -116,7 +115,7 @@ export default function Emitter({ disabled }) {
             label={emitterTypeLabels["OTHER"]}
             component={RadioButton}
             onChange={onChangeEmitterType}
-            disabled={lockEmitterType || lockEmitterProducer}
+            disabled={lockEmitterProducer}
           />
           <Field
             name="emitter.type"
@@ -124,7 +123,7 @@ export default function Emitter({ disabled }) {
             label={emitterTypeLabels["APPENDIX2"]}
             component={RadioButton}
             onChange={onChangeEmitterType}
-            disabled={lockEmitterType || lockEmitterProducer}
+            disabled={lockEmitterProducer}
           />
 
           <Field
@@ -133,7 +132,7 @@ export default function Emitter({ disabled }) {
             label={emitterTypeLabels["APPENDIX1"]}
             component={RadioButton}
             onChange={onChangeEmitterType}
-            disabled={lockEmitterType || lockEmitterProducer}
+            disabled={lockEmitterProducer}
           />
         </fieldset>
       </div>

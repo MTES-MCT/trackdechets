@@ -1,5 +1,5 @@
 import { Form } from "@prisma/client";
-import { ReadRepositoryFnDeps } from "../types";
+import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 export type FindAppendix2FormsByIdFn = (id: string) => Promise<Form[]>;
 

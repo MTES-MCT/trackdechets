@@ -1,8 +1,7 @@
 import { Bsda, BsdaStatus } from "@prisma/client";
-import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
+import { BsdElastic, indexBsd } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
-import { getReadonlyBsdaRepository } from "./repository";
 
 // | state              | emitter         | worker          | transporter | destination     | nextDestination |
 // | ------------------ | --------------- | --------------- | ----------- | --------------- | --------------- |
@@ -135,6 +134,7 @@ export function toBsdElastic(bsda: Bsda): BsdElastic {
     customId: "",
     readableId: bsda.id,
     createdAt: bsda.createdAt.getTime(),
+    updatedAt: bsda.updatedAt.getTime(),
     emitterCompanyName: bsda.emitterCompanyName ?? "",
     emitterCompanySiret: bsda.emitterCompanySiret ?? "",
     transporterCompanyName: bsda.transporterCompanyName ?? "",
@@ -155,42 +155,6 @@ export function toBsdElastic(bsda: Bsda): BsdElastic {
     ...getRegistryFields(bsda),
     rawBsd: bsda
   };
-}
-
-export async function indexAllBsdas(
-  idx: string,
-  { skip = 0 }: { skip?: number } = {}
-) {
-  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
-  const bsdas = await getReadonlyBsdaRepository().findMany(
-    {
-      isDeleted: false
-    },
-
-    {
-      skip,
-      take,
-      include: {
-        forwardedIn: { select: { id: true } },
-        groupedIn: { select: { id: true } }
-      }
-    }
-  );
-
-  if (bsdas.length === 0) {
-    return;
-  }
-
-  await indexBsds(
-    idx,
-    bsdas.map(bsda => toBsdElastic(bsda))
-  );
-
-  if (bsdas.length < take) {
-    return;
-  }
-
-  return indexAllBsdas(idx, { skip: skip + take });
 }
 
 export function indexBsda(bsda: Bsda, ctx?: GraphQLContext) {

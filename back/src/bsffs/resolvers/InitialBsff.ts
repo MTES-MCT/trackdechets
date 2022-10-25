@@ -1,10 +1,12 @@
 import prisma from "../../prisma";
 import { BsffResolvers } from "../../generated/graphql/types";
-import { getFicheInterventions } from "../database";
 import { isBsffContributor } from "../permissions";
 import { ForbiddenError } from "apollo-server-express";
+import { Bsff } from "./Bsff";
 
 export const InitialBsff: BsffResolvers = {
+  packagings: Bsff.packagings,
+  ficheInterventions: Bsff.ficheInterventions,
   emitter: async ({ id, emitter }, _, { user }) => {
     const bsff = await prisma.bsff.findUnique({ where: { id } });
     try {
@@ -15,11 +17,5 @@ export const InitialBsff: BsffResolvers = {
       );
     }
     return emitter;
-  },
-  ficheInterventions: async ({ id }, _, context) => {
-    const prismaBsff = await prisma.bsff.findUnique({
-      where: { id }
-    });
-    return getFicheInterventions({ bsff: prismaBsff, context });
   }
 };

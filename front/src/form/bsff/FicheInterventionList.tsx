@@ -41,25 +41,22 @@ const companySchema: yup.SchemaOf<CompanyInput> = yup.object({
     .nullable(),
   omiNumber: yup.string().nullable(),
 });
-const detenteurSchema: yup.SchemaOf<
-  BsffFicheInterventionInput["detenteur"]
-> = yup.object({
-  company: companySchema,
-});
-const operateurSchema: yup.SchemaOf<
-  BsffFicheInterventionInput["operateur"]
-> = yup.object({
-  company: companySchema,
-});
-const ficheInterventionSchema: yup.SchemaOf<BsffFicheInterventionInput> = yup.object(
-  {
+const detenteurSchema: yup.SchemaOf<BsffFicheInterventionInput["detenteur"]> =
+  yup.object({
+    company: companySchema,
+  });
+const operateurSchema: yup.SchemaOf<BsffFicheInterventionInput["operateur"]> =
+  yup.object({
+    company: companySchema,
+  });
+const ficheInterventionSchema: yup.SchemaOf<BsffFicheInterventionInput> =
+  yup.object({
     numero: yup.string().required(),
     weight: yup.number().required(),
     postalCode: yup.string().required(),
     detenteur: detenteurSchema,
     operateur: operateurSchema,
-  }
-);
+  });
 
 interface AddFicheInterventionModalProps {
   initialOperateurCompany: BsffFicheInterventionInput["operateur"]["company"];
@@ -144,8 +141,6 @@ function AddFicheInterventionModal({
             heading="Détenteur de l'équipement"
             name="detenteur.company"
           />
-
-          <CompanySelector heading="Opérateur" name="operateur.company" />
 
           {error && <NotificationError apolloError={error} />}
 

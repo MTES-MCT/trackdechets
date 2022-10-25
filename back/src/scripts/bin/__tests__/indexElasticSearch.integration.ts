@@ -1,31 +1,32 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { formFactory, userFactory } from "../../../__tests__/factories";
-import { indexElasticSearch } from "../indexElasticSearch.helpers";
+import {
+  reindexAllBsdsInBulk,
+  INDEX_ALIAS_NAME_SEPARATOR
+} from "../../../bsds/indexation/bulkIndexBsds";
 import {
   BsdIndex,
   client,
   index as globalIndex
 } from "../../../common/elastic";
 
-describe("indexElasticSearch script", () => {
-  const testAlias = "test_bsds";
+describe("reindexAllBsdsInBulk script", () => {
+  // do not use INDEX_ALIAS_NAME_SEPARATOR
+  const testAlias = "testbsds";
 
   const testIndex: BsdIndex = {
     ...globalIndex,
-    alias: testAlias,
-    index: "test_bsds_v1"
+    alias: testAlias
   };
 
   const testIndexV0: BsdIndex = {
     ...globalIndex,
-    alias: testAlias,
-    index: "test_bsds_v0.1"
+    mappings_version: "v0",
+    alias: testAlias
   };
 
   async function deleteTestIndexes() {
-    for (const idx of [testIndex.index, testIndexV0.index]) {
-      await client.indices.delete({ index: [idx] }, { ignore: [404] });
-    }
+    await client.indices.delete({ index: "testbsds*" }, { ignore: [404] });
   }
 
   afterEach(async () => {
@@ -33,8 +34,8 @@ describe("indexElasticSearch script", () => {
     await deleteTestIndexes();
   });
 
-  it("should create index and alias from scratch", async () => {
-    await indexElasticSearch({ index: testIndex });
+  it("should initialize an index and alias from scratch", async () => {
+    const newIndex = await reindexAllBsdsInBulk({ index: testIndex });
     const catAliasResponses = await client.cat.aliases({
       name: testIndex.alias,
       format: "json"
@@ -42,35 +43,35 @@ describe("indexElasticSearch script", () => {
     expect(catAliasResponses.body).toHaveLength(1);
     const { alias, index: aliasedIndex } = catAliasResponses.body[0];
     expect(alias).toEqual(testIndex.alias);
-    expect(aliasedIndex).toEqual(testIndex.index);
+    expect(aliasedIndex).toEqual(newIndex);
   });
 
-  it("should not do anything when index and alias already exist and index version is not bumped", async () => {
+  it("should not do anything when index and alias already exist and mapping is not changed", async () => {
     const user = await userFactory();
     await formFactory({ ownerId: user.id });
 
     // initialize index and alias
-    await indexElasticSearch({ index: testIndex });
+    await reindexAllBsdsInBulk({ index: testIndex });
 
     await client.indices.refresh({
       index: testIndex.alias
     });
-    const countResponse1 = await client.count({ index: testIndex.index });
+    const countResponse1 = await client.count({ index: testIndex.alias });
 
     // check the first form has been indexed
     expect(countResponse1.body.count).toEqual(1);
 
     // create a new form an index again
     await formFactory({ ownerId: user.id });
-    await indexElasticSearch({ index: testIndex });
+    await reindexAllBsdsInBulk({ index: testIndex });
 
     await client.indices.refresh({
       index: testIndex.alias
     });
-    const countResponse2 = await client.count({ index: testIndex.index });
-
+    const countResponse2 = await client.count({ index: testIndex.alias });
     // check the second form has not been indexed
     expect(countResponse2.body.count).toEqual(1);
+    expect(countResponse2.body).toEqual(countResponse1.body);
   });
 
   it("should force reindex in place when force=true", async () => {
@@ -78,7 +79,7 @@ describe("indexElasticSearch script", () => {
     await formFactory({ ownerId: user.id });
 
     // initialize index and alias
-    await indexElasticSearch({ index: testIndex });
+    await reindexAllBsdsInBulk({ index: testIndex });
 
     await client.indices.refresh({
       index: testIndex.alias
@@ -90,7 +91,7 @@ describe("indexElasticSearch script", () => {
 
     // create a new form an index again with force=true
     await formFactory({ ownerId: user.id });
-    await indexElasticSearch({ index: testIndex, force: true });
+    await reindexAllBsdsInBulk({ index: testIndex, force: true });
 
     await client.indices.refresh({
       index: testIndex.alias
@@ -101,23 +102,28 @@ describe("indexElasticSearch script", () => {
     expect(countResponse2.body.count).toEqual(2);
   });
 
-  it("should reindex documents when the index version is bumped", async () => {
+  it("should reindex documents when the index mapping is changed", async () => {
     // initialize index and alias with an old version
     const user = await userFactory();
     await formFactory({ ownerId: user.id });
 
-    await indexElasticSearch({
+    const newIndex = await reindexAllBsdsInBulk({
       index: testIndexV0
     });
     await client.indices.refresh({
       index: testIndexV0.alias
     });
+    const initialIndices = await client.indices.get({
+      index: `${testIndex.alias}${INDEX_ALIAS_NAME_SEPARATOR}*`
+    });
+    expect(Object.keys(initialIndices.body)).toEqual([newIndex]);
+
     const countResponse1 = await client.count({ index: testIndexV0.alias });
     // check the first form is indexed
     expect(countResponse1.body.count).toEqual(1);
     await formFactory({ ownerId: user.id });
-    // bump version and reindex
-    await indexElasticSearch({
+    // create a new index version
+    const secondIndex = await reindexAllBsdsInBulk({
       index: testIndex
     });
     await client.indices.refresh({
@@ -130,19 +136,19 @@ describe("indexElasticSearch script", () => {
     });
 
     expect(catAliasResponses.body).toHaveLength(1);
-    const { alias, index: aliasedIndex } = catAliasResponses.body[0];
+    const { alias } = catAliasResponses.body[0];
     expect(alias).toEqual(testIndex.alias);
-    // check alias point to new index
-    expect(aliasedIndex).toEqual(testIndex.index);
 
     // check all documents have been reindexed
     const countResponse2 = await client.count({ index: testIndex.alias });
     expect(countResponse2.body.count).toEqual(2);
 
-    // check old index does not exist anymore
-    const shouldThrow = () => client.indices.get({ index: testIndexV0.index });
-    await expect(shouldThrow()).rejects.toThrowError(
-      "index_not_found_exception: [index_not_found_exception] Reason: no such index"
-    );
+    // check there is always 2 indices left by desgin
+    const leftIndices = await client.indices.get({
+      index: `${testIndex.alias}${INDEX_ALIAS_NAME_SEPARATOR}*`
+    });
+    expect(Object.keys(leftIndices.body).length).toEqual(2);
+    expect(Object.keys(leftIndices.body)).toContainEqual(newIndex);
+    expect(Object.keys(leftIndices.body)).toContainEqual(secondIndex);
   });
 });

@@ -223,11 +223,42 @@ type BsdaNextDestination {
 type BsdaWorker {
   "Indique si une entreprise de travaux est présente sur le BSDA (pour le cas d'un émetteur qui démonte lui même son amiante par ex)"
   isDisabled: Boolean!
-  
+
   "Entreprise de travaux"
   company: FormCompany
+
+  "Informations de certification"
+  certification: BsdaWorkerCertification
+
   "Déclaration générale"
   work: BsdaWork
+}
+
+type BsdaWorkerCertification {
+  """
+  Indique si l'entreprise réalise des travaux relevant de la sous-section 4
+  """
+  hasSubSectionFour: Boolean!
+
+  """
+  Indique si l'entreprise réalise des travaux relevant de la sous-section 3
+  """
+  hasSubSectionThree: Boolean!
+
+  """
+  Numéro de certification (sous-section 3 uniquement)
+  """
+  certificationNumber: String
+
+  """
+  Limite de validité de la certification (sous-section 3 uniquement)
+  """
+  validityLimit: DateTime
+
+  """
+  Organisation qui a décerné la certification (sous-section 3 uniquement)
+  """
+  organisation: String
 }
 
 type BsdaWork {

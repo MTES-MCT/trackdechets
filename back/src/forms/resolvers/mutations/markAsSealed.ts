@@ -17,6 +17,7 @@ import { contentAwaitsGuest } from "../../../mailer/templates";
 import { Form, Status } from "@prisma/client";
 import { FormRepository, getFormRepository } from "../../repository";
 import prisma from "../../../prisma";
+import { runInTransaction } from "../../../common/repository/helper";
 
 const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   parent,
@@ -60,7 +61,7 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
       })) > 0
     : false;
 
-  const resultingForm = await prisma.$transaction(async transaction => {
+  const resultingForm = await runInTransaction(async transaction => {
     const formRepository = getFormRepository(user, transaction);
     const sealedForm = await formRepository.update(
       { id: form.id },

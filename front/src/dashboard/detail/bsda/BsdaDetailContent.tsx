@@ -12,7 +12,11 @@ import { useDownloadPdf } from "dashboard/components/BSDList/BSDa/BSDaActions/us
 import { useDuplicate } from "dashboard/components/BSDList/BSDa/BSDaActions/useDuplicate";
 import { statusLabels, transportModeLabels } from "dashboard/constants";
 import styles from "dashboard/detail/common/BSDDetailContent.module.scss";
-import { DateRow, DetailRow } from "dashboard/detail/common/Components";
+import {
+  DateRow,
+  DetailRow,
+  YesNoRow,
+} from "dashboard/detail/common/Components";
 import { getVerboseAcceptationStatus } from "dashboard/detail/common/utils";
 import { PACKAGINGS_NAMES } from "form/bsda/components/packagings/Packagings";
 import {
@@ -112,6 +116,34 @@ const Worker = ({ form }: { form: Bsda }) => {
       <div className={styles.detailGrid}>
         <Company label="Entreprise de travaux" company={worker?.company} />
       </div>
+      {worker?.certification && (
+        <div className={styles.detailGrid}>
+          <YesNoRow
+            value={worker.certification?.hasSubSectionFour}
+            label="Travaux relevcant de la sous-section 4"
+          />
+          <YesNoRow
+            value={worker.certification?.hasSubSectionThree}
+            label="Travaux relevcant de la sous-section 3"
+          />
+          {worker.certification?.hasSubSectionThree && (
+            <>
+              <DetailRow
+                value={worker?.certification?.certificationNumber}
+                label="Numéro de certification"
+              />
+              <DetailRow
+                value={worker?.certification?.organisation}
+                label="Organisme de certification"
+              />
+              <DateRow
+                value={worker?.certification?.validityLimit}
+                label="Date de validité"
+              />
+            </>
+          )}
+        </div>
+      )}
       <div className={styles.detailGrid}>
         <DateRow value={worker?.work?.signature?.date} label="Signé le" />
         <DetailRow value={worker?.work?.signature?.author} label="Signé par" />

@@ -65,7 +65,7 @@ describe("Mutation.signBsdasri operation", () => {
     expect(receivedDasri.operationSignatoryId).toBeNull();
   });
 
-  it("should put operation signature on a dasri", async () => {
+  it("should put operation signature on a dasri and set status to PROCESSED", async () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { company: transporterCompany } = await userWithCompanyFactory(
       "MEMBER"
@@ -95,6 +95,48 @@ describe("Mutation.signBsdasri operation", () => {
       where: { id: dasri.id }
     });
     expect(receivedDasri.status).toEqual("PROCESSED");
+    expect(receivedDasri.destinationOperationSignatureAuthor).toEqual(
+      "Martine"
+    );
+    expect(receivedDasri.operationSignatoryId).toEqual(recipient.id);
+    expect(receivedDasri.destinationOperationSignatureDate).toBeTruthy();
+  });
+
+  it("should put operation signature on a dasri and set status to AWAITING_GROUP", async () => {
+    const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
+    const { company: transporterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { user: recipient, company: destinationCompany } =
+      await userWithCompanyFactory("MEMBER", {
+        companyTypes: {
+          set: [CompanyType.COLLECTOR]
+        }
+      });
+
+    const dasri = await bsdasriFactory({
+      opt: {
+        ...initialData(emitterCompany),
+        ...readyToTakeOverData(transporterCompany),
+        ...readyToReceiveData(destinationCompany),
+        ...readyToProcessData,
+        destinationOperationCode: "D12",
+        status: BsdasriStatus.RECEIVED
+      }
+    });
+    const { mutate } = makeClient(recipient); // recipient
+
+    await mutate<Pick<Mutation, "signBsdasri">>(SIGN_DASRI, {
+      variables: {
+        id: dasri.id,
+        input: { type: "OPERATION", author: "Martine" }
+      }
+    });
+
+    const receivedDasri = await prisma.bsdasri.findUnique({
+      where: { id: dasri.id }
+    });
+    expect(receivedDasri.status).toEqual("AWAITING_GROUP");
     expect(receivedDasri.destinationOperationSignatureAuthor).toEqual(
       "Martine"
     );
@@ -182,7 +224,7 @@ describe("Mutation.signBsdasri operation", () => {
     const receivedDasri = await prisma.bsdasri.findUnique({
       where: { id: dasri.id }
     });
-    expect(receivedDasri.status).toEqual("PROCESSED");
+    expect(receivedDasri.status).toEqual("AWAITING_GROUP");
     expect(receivedDasri.destinationOperationSignatureAuthor).toEqual(
       "Martine"
     );

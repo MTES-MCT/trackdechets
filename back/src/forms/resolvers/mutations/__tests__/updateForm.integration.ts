@@ -1209,7 +1209,7 @@ describe("Mutation.updateForm", () => {
 
       const wannaBeAppendix2 = await formFactory({
         ownerId: (await userFactory()).id,
-        opt: { status: Status.AWAITING_GROUP }
+        opt: { status: Status.AWAITING_GROUP, quantityReceived: 1 }
       });
 
       const updateFormInput = {
@@ -1331,7 +1331,7 @@ describe("Mutation.updateForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+          "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
       })
     ]);
   });
@@ -1376,7 +1376,7 @@ describe("Mutation.updateForm", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+            "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
         })
       ]);
     }
@@ -1428,7 +1428,7 @@ describe("Mutation.updateForm", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+            "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
         })
       ]);
     }
@@ -1555,6 +1555,7 @@ describe("Mutation.updateForm", () => {
         }
       }
     });
+
     expect(data.updateForm.appendix2Forms).toHaveLength(1);
 
     const { data: data2 } = await mutate<
@@ -1636,6 +1637,7 @@ describe("Mutation.updateForm", () => {
         }
       }
     });
+
     expect(data2.updateForm.grouping).toHaveLength(1);
 
     const { data: data3 } = await mutate<
@@ -1665,8 +1667,7 @@ describe("Mutation.updateForm", () => {
       opt: {
         status: "AWAITING_GROUP",
         recipientCompanySiret: ttr.siret,
-        quantityReceived: 1,
-        quantityGrouped: 0.2
+        quantityReceived: 1
       }
     });
 
@@ -1706,14 +1707,6 @@ describe("Mutation.updateForm", () => {
     expect(data.updateForm.grouping).toEqual([
       expect.objectContaining({ form: { id: appendix2Form.id }, quantity: 0.8 })
     ]);
-
-    const updatedAppendix2Form = await prisma.form.findFirst({
-      where: { id: appendix2Form.id }
-    });
-
-    expect(updatedAppendix2Form.quantityGrouped).toEqual(
-      updatedAppendix2Form.quantityReceived
-    );
   });
 
   it("should not be possible to set isDangerous=false with a waste code containing an *", async () => {
@@ -1806,7 +1799,7 @@ describe("Mutation.updateForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le bordereau avec l'identifiant "does-not-exist" n'existe pas.`
+        message: `Les BSDD initiaux does-not-exist n'existent pas ou ne sont pas en attente de regroupement`
       })
     ]);
 

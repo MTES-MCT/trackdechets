@@ -26,7 +26,11 @@ import AccountCompanyAddVhuAgrement from "./accountCompanyAdd/AccountCompanyAddV
 import { InlineRadioButton } from "form/common/components/custom-inputs/RadioButton";
 import classNames from "classnames";
 import { MY_COMPANIES } from "./AccountCompanyList";
-import { isSiret, isVat } from "generated/constants/companySearchHelpers";
+import {
+  isFRVat,
+  isSiret,
+  isVat,
+} from "generated/constants/companySearchHelpers";
 const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
     createCompany(companyInput: $companyInput) {
@@ -102,9 +106,8 @@ export default function AccountCompanyAdd() {
   const history = useHistory();
 
   // STATE
-  const [companyInfos, setCompanyInfos] = useState<CompanySearchResult | null>(
-    null
-  );
+  const [companyInfos, setCompanyInfos] =
+    useState<CompanySearchResult | null>(null);
 
   // QUERIES AND MUTATIONS
   const [createCompany, { error: savingError }] = useMutation<
@@ -121,24 +124,17 @@ export default function AccountCompanyAdd() {
     },
   });
 
-  const [
-    createTransporterReceipt,
-    { error: createTransporterReceiptError },
-  ] = useMutation(CREATE_TRANSPORTER_RECEIPT);
+  const [createTransporterReceipt, { error: createTransporterReceiptError }] =
+    useMutation(CREATE_TRANSPORTER_RECEIPT);
 
-  const [
-    createTraderReceipt,
-    { error: createTraderReceiptError },
-  ] = useMutation(CREATE_TRADER_RECEIPT);
+  const [createTraderReceipt, { error: createTraderReceiptError }] =
+    useMutation(CREATE_TRADER_RECEIPT);
 
-  const [
-    createBrokerReceipt,
-    { error: createBrokerReceiptError },
-  ] = useMutation(CREATE_BROKER_RECEIPT);
+  const [createBrokerReceipt, { error: createBrokerReceiptError }] =
+    useMutation(CREATE_BROKER_RECEIPT);
 
-  const [createVhuAgrement, { error: createVhuAgrementError }] = useMutation(
-    CREATE_VHU_AGREMENT
-  );
+  const [createVhuAgrement, { error: createVhuAgrementError }] =
+    useMutation(CREATE_VHU_AGREMENT);
 
   function isTransporter(companyTypes: _CompanyType[]) {
     return companyTypes.includes(_CompanyType.Transporter);
@@ -406,6 +402,12 @@ export default function AccountCompanyAdd() {
             const isBroker_ = isBroker(values.companyTypes);
 
             return {
+              ...(!values.companyName && {
+                companyName: "Champ obligatoire",
+              }),
+              ...(!values.address && {
+                address: "Champ obligatoire",
+              }),
               ...(values.willManageDasris &&
                 values.allowBsdasriTakeOverWithoutSignature === null && {
                   allowBsdasriTakeOverWithoutSignature:
@@ -418,11 +420,11 @@ export default function AccountCompanyAdd() {
                 isAllowed:
                   "Vous devez certifier être autorisé à créer ce compte pour votre entreprise",
               }),
-              ...(!isSiret(values.siret) &&
-                !isVat(values.vatNumber) && {
-                  siret:
-                    "Le SIRET ou le numéro de TVA intracommunautaire doit être valides.",
-                }),
+              ...((isFRVat(values.vatNumber) ||
+                (!isSiret(values.siret) && !isVat(values.vatNumber))) && {
+                siret:
+                  "Le SIRET ou le numéro de TVA intracommunautaire doit être valides.",
+              }),
               ...(anyTransporterReceipField &&
                 isTransporter_ &&
                 !values.transporterReceiptNumber && {
@@ -490,11 +492,15 @@ export default function AccountCompanyAdd() {
 
                 <div className={styles.field__value}>
                   {companyInfos?.name || (
-                    <Field
-                      type="text"
-                      name="companyName"
-                      className={`td-input ${styles.textField}`}
-                    />
+                    <>
+                      <Field
+                        type="text"
+                        name="companyName"
+                        className={`td-input ${styles.textField}`}
+                        disabled={!!companyInfos?.name}
+                      />
+                      <RedErrorMessage name="companyName" />
+                    </>
                   )}
                 </div>
               </div>
@@ -534,12 +540,15 @@ export default function AccountCompanyAdd() {
                 <label className={`text-right ${styles.bold}`}>Adresse</label>
                 <div className={styles.field__value}>
                   {companyInfos?.address || (
-                    <Field
-                      type="text"
-                      name="address"
-                      className={`td-input ${styles.textField}`}
-                      disabled={!!companyInfos?.address}
-                    />
+                    <>
+                      <Field
+                        type="text"
+                        name="address"
+                        className={`td-input ${styles.textField}`}
+                        disabled={!!companyInfos?.address}
+                      />
+                      <RedErrorMessage name="address" />
+                    </>
                   )}
                 </div>
               </div>

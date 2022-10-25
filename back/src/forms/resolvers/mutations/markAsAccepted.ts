@@ -1,7 +1,6 @@
 import { Status, WasteAcceptationStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { getFormOrFormNotFound } from "../../database";
 import { expandFormFromDb } from "../../converter";
 import { checkCanMarkAsAccepted } from "../../permissions";
@@ -11,6 +10,7 @@ import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
 import { sendMail } from "../../../mailer/mailing";
+import { runInTransaction } from "../../../common/repository/helper";
 
 const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
   _,
@@ -42,7 +42,7 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
         signedAt: new Date(acceptedInfo.signedAt)
       };
 
-  const acceptedForm = await prisma.$transaction(async transaction => {
+  const acceptedForm = await runInTransaction(async transaction => {
     const { update, removeAppendix2 } = getFormRepository(user, transaction);
     const acceptedForm = await update(
       { id: form.id },

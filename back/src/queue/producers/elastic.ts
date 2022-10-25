@@ -5,14 +5,17 @@ import logger from "../../logging/logger";
 export type BsdUpdateQueueItem = { sirets: string[]; id: string };
 const { REDIS_URL, NODE_ENV } = process.env;
 
+export const INDEX_JOB_NAME = "index";
+export const DELETE_JOB_NAME = "delete";
+
 export const indexQueue = new Queue<string>(
   `queue_index_elastic_${NODE_ENV}`,
   REDIS_URL,
   {
     defaultJobOptions: {
       attempts: 3,
-      backoff: { type: "exponential", delay: 100 },
-      removeOnComplete: 100,
+      backoff: { type: "fixed", delay: 100 },
+      removeOnComplete: 10_000,
       timeout: 10000
     }
   }
@@ -33,8 +36,9 @@ export const updatesQueue = new Queue<BsdUpdateQueueItem>(
 indexQueue.on("completed", job => {
   const id = job.data;
   const { sirets } = job.returnvalue;
-
-  updatesQueue.add({ sirets, id });
+  if ([DELETE_JOB_NAME, INDEX_JOB_NAME].includes(job.name)) {
+    updatesQueue.add({ sirets, id });
+  }
 });
 
 indexQueue.on("failed", (job, err) => {
@@ -47,7 +51,7 @@ export async function enqueueBsdToIndex(
   bsdId: string,
   options?: JobOptions
 ): Promise<void> {
-  logger.info(`Enquing BSD ${bsdId} for indexation`);
+  logger.info(`Enqueuing BSD ${bsdId} for indexation`);
   await indexQueue.add("index", bsdId, options);
 }
 

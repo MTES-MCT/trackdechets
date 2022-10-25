@@ -312,6 +312,11 @@ function Destination({ form }: { form: Bsff }) {
           value={form.destination?.reception?.signature?.author}
           label="Réception signée par"
         />
+        <DetailRow
+          value={form.destination?.reception?.weight}
+          label="Quantité reçue"
+          units="kg"
+        />
       </div>
       <div className={styles.detailGrid}>
         <DetailRow

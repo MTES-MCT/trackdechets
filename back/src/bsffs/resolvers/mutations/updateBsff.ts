@@ -1,6 +1,6 @@
 import { UserInputError } from "apollo-server-express";
 import omit from "object.omit";
-import { Prisma, Bsff } from "@prisma/client";
+import { Prisma, Bsff, BsffType } from "@prisma/client";
 import prisma from "../../../prisma";
 import {
   BsffPackagingInput,
@@ -29,6 +29,26 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   if (existingBsff.destinationOperationSignatureDate) {
     throw new UserInputError(
       `Il n'est pas possible d'éditer un bordereau dont le traitement final a été signé`
+    );
+  }
+
+  if (input.type && input.type !== existingBsff.type) {
+    throw new UserInputError(
+      "Vous ne pouvez pas modifier le type de BSFF après création"
+    );
+  }
+
+  if (
+    input.emitter?.company?.siret?.length &&
+    [
+      BsffType.GROUPEMENT,
+      BsffType.RECONDITIONNEMENT,
+      BsffType.REEXPEDITION
+    ].includes(existingBsff.type as any) &&
+    input.emitter?.company?.siret !== existingBsff.emitterCompanySiret
+  ) {
+    throw new UserInputError(
+      "Vous ne pouvez pas modifier l'établissement émetteur après création du BSFF en cas de réexpédition, groupement ou reconditionnement"
     );
   }
 

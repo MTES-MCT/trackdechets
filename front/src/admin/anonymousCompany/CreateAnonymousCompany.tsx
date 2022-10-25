@@ -26,8 +26,8 @@ const CREATE_ANONYMOUS_COMPANY = gql`
   }
 `;
 
-const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> = yup.object(
-  {
+const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
+  yup.object({
     address: yup.string().required(),
     codeCommune: yup.string().required(),
     codeNaf: yup
@@ -43,8 +43,7 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> = yup.obj
       .ensure()
       .required("n°SIRET requis")
       .test("is-siret", "n°SIRET invalide", value => isSiret(value)),
-  }
-);
+  });
 
 export function CreateAnonymousCompany() {
   const [createAnonymousCompany, { loading, error }] = useMutation<

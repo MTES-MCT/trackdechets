@@ -58,15 +58,21 @@ export async function resetDatabase() {
   jest.setTimeout(10000);
 
   await refreshElasticSearch();
-  await elasticSearch.deleteByQuery({
-    index: index.alias,
-    body: {
-      query: {
-        match_all: {}
-      }
+  await elasticSearch.deleteByQuery(
+    {
+      index: index.alias,
+      body: {
+        query: {
+          match_all: {}
+        }
+      },
+      refresh: true
     },
-    refresh: true
-  });
+    {
+      // do not throw an error if a document has been updated during delete operation
+      ignore: [409]
+    }
+  );
   await truncateDatabase();
 }
 
@@ -85,9 +91,15 @@ export async function refreshElasticSearch() {
   }
   indexQueue.removeAllListeners("global:drained");
 
-  return elasticSearch.indices.refresh({
-    index: index.alias
-  });
+  return elasticSearch.indices.refresh(
+    {
+      index: index.alias
+    },
+    {
+      // do not throw an error on version conflicts
+      ignore: [409]
+    }
+  );
 }
 
 /**

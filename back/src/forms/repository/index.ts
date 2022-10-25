@@ -1,3 +1,8 @@
+import { transactionWrapper } from "../../common/repository/helper";
+import {
+  RepositoryFnBuilder,
+  RepositoryTransaction
+} from "../../common/repository/types";
 import prisma from "../../prisma";
 import buildCountForms from "./form/count";
 import buildCreateForm from "./form/create";
@@ -18,11 +23,7 @@ import buildCountRevisionRequests from "./formRevisionRequest/countRevisionReque
 import buildCreateRevisionRequest from "./formRevisionRequest/createRevisionRequest";
 import buildGetRevisionRequestById from "./formRevisionRequest/getRevisionRequestById";
 import buildRefuseRevisionRequestApproval from "./formRevisionRequest/refuseRevisionRequestApproval";
-import {
-  FormActions,
-  FormRevisionRequestActions,
-  PrismaTransaction
-} from "./types";
+import { FormActions, FormRevisionRequestActions } from "./types";
 
 export type FormRepository = FormActions & FormRevisionRequestActions;
 
@@ -38,60 +39,24 @@ export function getReadOnlyFormRepository() {
 
 export function getFormRepository(
   user: Express.User,
-  transaction?: PrismaTransaction
+  transaction?: RepositoryTransaction
 ): FormRepository {
+  function useTransaction<FnResult>(builder: RepositoryFnBuilder<FnResult>) {
+    return transactionWrapper(builder, { user, transaction });
+  }
+
   const formActions: FormActions = {
     // READ operations
     ...getReadOnlyFormRepository(),
     // WRITE OPERATIONS - wrapped into a transaction
-    create: (...args) =>
-      transaction
-        ? buildCreateForm({ prisma: transaction, user })(...args)
-        : prisma.$transaction(prisma =>
-            buildCreateForm({ prisma, user })(...args)
-          ),
-    update: (...args) =>
-      transaction
-        ? buildUpdateForm({ prisma: transaction, user })(...args)
-        : prisma.$transaction(prisma =>
-            buildUpdateForm({ prisma, user })(...args)
-          ),
-    updateMany: (...args) =>
-      transaction
-        ? buildUpdateManyForms({ prisma: transaction, user })(...args)
-        : prisma.$transaction(prisma =>
-            buildUpdateManyForms({ prisma, user })(...args)
-          ),
-    delete: (...args) =>
-      transaction
-        ? buildDeleteForm({ prisma: transaction, user })(...args)
-        : prisma.$transaction(prisma =>
-            buildDeleteForm({ prisma, user })(...args)
-          ),
-    removeAppendix2: (...args) =>
-      transaction
-        ? buildRemoveAppendix2({ prisma: transaction, user })(...args)
-        : prisma.$transaction(prisma =>
-            buildRemoveAppendix2({ prisma, user })(...args)
-          ),
-    setAppendix2: (...args) =>
-      transaction
-        ? buildSetAppendix2({ prisma: transaction, user })(...args)
-        : prisma.$transaction(prisma =>
-            buildSetAppendix2({ prisma, user })(...args)
-          ),
-    updateAppendix2Forms: (...args) =>
-      transaction
-        ? buildUpdateAppendix2Forms({ prisma: transaction, user })(...args)
-        : prisma.$transaction(prisma =>
-            buildUpdateAppendix2Forms({ prisma, user })(...args)
-          ),
-    deleteStaleSegments: (...args) =>
-      transaction
-        ? buildDeleteFormStaleSegments({ prisma: transaction, user })(...args)
-        : prisma.$transaction(prisma =>
-            buildDeleteFormStaleSegments({ prisma, user })(...args)
-          )
+    create: useTransaction(buildCreateForm),
+    update: useTransaction(buildUpdateForm),
+    updateMany: useTransaction(buildUpdateManyForms),
+    delete: useTransaction(buildDeleteForm),
+    removeAppendix2: useTransaction(buildRemoveAppendix2),
+    setAppendix2: useTransaction(buildSetAppendix2),
+    updateAppendix2Forms: useTransaction(buildUpdateAppendix2Forms),
+    deleteStaleSegments: useTransaction(buildDeleteFormStaleSegments)
   };
 
   const formRevisionRequestActions: FormRevisionRequestActions = {
@@ -99,34 +64,14 @@ export function getFormRepository(
     getRevisionRequestById: buildGetRevisionRequestById({ prisma, user }),
     countRevisionRequests: buildCountRevisionRequests({ prisma, user }),
     // WRITE operations - wrapped into a transaction
-    cancelRevisionRequest: (...args) =>
-      transaction
-        ? buildCancelRevisionRequest({ prisma: transaction, user })(...args)
-        : prisma.$transaction(prisma =>
-            buildCancelRevisionRequest({ prisma, user })(...args)
-          ),
-    createRevisionRequest: (...args) =>
-      transaction
-        ? buildCreateRevisionRequest({ prisma: transaction, user })(...args)
-        : prisma.$transaction(prisma =>
-            buildCreateRevisionRequest({ prisma, user })(...args)
-          ),
-    acceptRevisionRequestApproval: (...args) =>
-      transaction
-        ? buildAcceptRevisionRequestApproval({ prisma: transaction, user })(
-            ...args
-          )
-        : prisma.$transaction(prisma =>
-            buildAcceptRevisionRequestApproval({ prisma, user })(...args)
-          ),
-    refuseRevisionRequestApproval: (...args) =>
-      transaction
-        ? buildRefuseRevisionRequestApproval({ prisma: transaction, user })(
-            ...args
-          )
-        : prisma.$transaction(prisma =>
-            buildRefuseRevisionRequestApproval({ prisma, user })(...args)
-          )
+    cancelRevisionRequest: useTransaction(buildCancelRevisionRequest),
+    createRevisionRequest: useTransaction(buildCreateRevisionRequest),
+    acceptRevisionRequestApproval: useTransaction(
+      buildAcceptRevisionRequestApproval
+    ),
+    refuseRevisionRequestApproval: useTransaction(
+      buildRefuseRevisionRequestApproval
+    )
   };
 
   return {

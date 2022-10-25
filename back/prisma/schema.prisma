@@ -18,6 +18,7 @@ enum CompanyType {
   TRADER
   BROKER
   ECO_ORGANISME
+  WORKER
 }
 
 enum CompanyVerificationMode {
@@ -203,6 +204,8 @@ model Company {
   vhuAgrementDemolisseur               VhuAgrement?              @relation(name: "VhuAgrementDemolisseur_Company", fields: [vhuAgrementDemolisseurId], references: [id])
   vhuAgrementBroyeurId                 String?
   vhuAgrementBroyeur                   VhuAgrement?              @relation(name: "VhuAgrementBroyeur_Company", fields: [vhuAgrementBroyeurId], references: [id])
+  workerCertificationId                String?
+  workerCertification                  WorkerCertification?      @relation(fields: [workerCertificationId], references: [id])
   companyAssociations                  CompanyAssociation[]
   MembershipRequest                    MembershipRequest[]
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
@@ -360,6 +363,8 @@ model Form {
   nextDestinationCompanyContact      String?
   nextDestinationCompanyPhone        String?
   nextDestinationCompanyMail         String?
+  nextDestinationCompanyCountry      String?
+  nextDestinationCompanyVatNumber    String?
   emitterWorkSiteName                String?
   emitterWorkSiteAddress             String?
   emitterWorkSiteCity                String?
@@ -370,7 +375,6 @@ model Form {
   signedAt                           DateTime?               @db.Timestamptz(6)
   currentTransporterSiret            String?
   nextTransporterSiret               String?
-  nextDestinationCompanyCountry      String?
   isImportedFromPaper                Boolean                 @default(false)
   ecoOrganismeName                   String?
   ecoOrganismeSiret                  String?
@@ -379,8 +383,6 @@ model Form {
   transportSegments TransportSegment[]
   groupedIn         FormGroupement[]   @relation("GroupedIn")
   grouping          FormGroupement[]   @relation("Grouping")
-  // quantité affectée à des bordereaux de regroupement
-  quantityGrouped   Float              @default(0)
 
   ownerId              String
   owner                User                          @relation(fields: [ownerId], references: [id])
@@ -627,6 +629,16 @@ model VhuAgrement {
   broyeurCompanies     Company[] @relation("VhuAgrementBroyeur_Company")
 }
 
+model WorkerCertification {
+  id                  String    @id @default(cuid())
+  hasSubSectionFour   Boolean
+  hasSubSectionThree  Boolean
+  certificationNumber String?
+  validityLimit       DateTime? @db.Timestamptz(6)
+  organisation        String?
+  Company             Company[]
+}
+
 model TransportSegment {
   id                              String         @id @default(cuid())
   segmentNumber                   Int?
@@ -830,6 +842,7 @@ model Bsvhu {
   @@index([destinationCompanySiret], map: "_BsvhuDestinationCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsvhuTransporterCompanySiretIdx")
   @@index([status], map: "_BsvhuStatusIdx")
+  @@index([updatedAt], map: "_BsvhuUpdatedAtIdx")
 }
 
 // ----------------
@@ -843,6 +856,7 @@ enum BsdasriStatus {
   RECEIVED
   PROCESSED
   REFUSED
+  AWAITING_GROUP
 }
 
 enum BsdasriEmitterType {
@@ -971,6 +985,7 @@ model Bsdasri {
   @@index([groupedInId], map: "_BsdasriGroupedInIdIdx")
   @@index([status], map: "_BsdasriStatusIdx")
   @@index([type], map: "_BsdasriTypeIdx")
+  @@index([updatedAt], map: "_BsdasriUpdatedAtIdx")
 }
 
 // ----------------
@@ -1078,6 +1093,7 @@ model Bsff {
   @@index([transporterCompanySiret], map: "_BsffTransporterCompanySiretIdx")
   @@index([destinationCompanySiret], map: "_BsffDestinationCompanySiretIdx")
   @@index([status], map: "_BsffStatusIdx")
+  @@index([updatedAt], map: "_BsffUpdatedAtIdx")
 }
 
 enum BsffType {
@@ -1205,7 +1221,7 @@ model Bsda {
   wasteAdr          String?
   wastePop          Boolean          @default(value: false)
 
-  packagings       Json          @default("[]")
+  packagings       Json     @default("[]")
   weightIsEstimate Boolean?
   weightValue      Float?
 
@@ -1273,12 +1289,17 @@ model Bsda {
 
   workerIsDisabled Boolean?
 
-  workerCompanyName    String?
-  workerCompanySiret   String?
-  workerCompanyAddress String?
-  workerCompanyContact String?
-  workerCompanyPhone   String?
-  workerCompanyMail    String?
+  workerCompanyName                      String?
+  workerCompanySiret                     String?
+  workerCompanyAddress                   String?
+  workerCompanyContact                   String?
+  workerCompanyPhone                     String?
+  workerCompanyMail                      String?
+  workerCertificationHasSubSectionFour   Boolean?
+  workerCertificationHasSubSectionThree  Boolean?
+  workerCertificationCertificationNumber String?
+  workerCertificationValidityLimit       DateTime? @db.Timestamptz(6)
+  workerCertificationOrganisation        String?
 
   workerWorkHasEmitterPaperSignature Boolean?
   workerWorkSignatureAuthor          String?
@@ -1303,6 +1324,7 @@ model Bsda {
   @@index([workerCompanySiret], map: "_BsdaWorkerCompanySiretIdx")
   @@index([status], map: "_BsdaStatusIdx")
   @@index([groupedInId], map: "_BsdaGroupedInIdIdx")
+  @@index([updatedAt], map: "_BsdaUpdatedAtIdx")
 }
 
 model BsdaRevisionRequest {

@@ -26,6 +26,9 @@ enum CompanyType {
 
   "Éco-organisme"
   ECO_ORGANISME
+
+  "Entreprise de travaux"
+  WORKER
 }
 
 "État du processus de vérification de l'établissement"

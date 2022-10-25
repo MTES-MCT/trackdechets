@@ -1,6 +1,5 @@
 import { BsvhuStatus, Bsvhu } from "@prisma/client";
-import prisma from "../prisma";
-import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
+import { BsdElastic, indexBsd } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 
@@ -100,7 +99,7 @@ function getWhere(
 /**
  * Convert a dasri from the bsvhu table to Elastic Search's BSD model.
  */
-function toBsdElastic(bsvhu: Bsvhu): BsdElastic {
+export function toBsdElastic(bsvhu: Bsvhu): BsdElastic {
   const where = getWhere(bsvhu);
 
   return {
@@ -109,6 +108,7 @@ function toBsdElastic(bsvhu: Bsvhu): BsdElastic {
     readableId: bsvhu.id,
     customId: "",
     createdAt: bsvhu.createdAt.getTime(),
+    updatedAt: bsvhu.updatedAt.getTime(),
     emitterCompanyName: bsvhu.emitterCompanyName ?? "",
     emitterCompanySiret: bsvhu.emitterCompanySiret ?? "",
     transporterCompanyName: bsvhu.transporterCompanyName ?? "",
@@ -127,39 +127,6 @@ function toBsdElastic(bsvhu: Bsvhu): BsdElastic {
     ...getRegistryFields(bsvhu),
     rawBsd: bsvhu
   };
-}
-
-/**
- * Index all Forms from the vhu table.
- */
-export async function indexAllBsvhus(
-  idx: string,
-  { skip = 0 }: { skip?: number } = {}
-) {
-  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
-  const bsvhus = await prisma.bsvhu.findMany({
-    skip,
-    take,
-    where: {
-      isDeleted: false
-    }
-  });
-
-  if (bsvhus.length === 0) {
-    return;
-  }
-
-  await indexBsds(
-    idx,
-    bsvhus.map(bsvhu => toBsdElastic(bsvhu))
-  );
-
-  if (bsvhus.length < take) {
-    // all forms have been indexed
-    return;
-  }
-
-  return indexAllBsvhus(idx, { skip: skip + take });
 }
 
 export function indexBsvhu(bsvhu: Bsvhu, ctx?: GraphQLContext) {

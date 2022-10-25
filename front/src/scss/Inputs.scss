@@ -6,7 +6,7 @@ textarea:focus,
 select:focus {
   border-color: #006be6;
   border-color: $blue-light;
-
+  outline: none;
   transition: border-color 0.2s ease-out;
 }
 
@@ -63,6 +63,12 @@ input[type="radio"]:checked::before {
   transform: scale(1);
 
   transition: transform 0.2s ease-out;
+}
+
+.fr-checkbox-group {
+  input[type="checkbox"]:checked {
+    opacity: 0;
+  }
 }
 
 input[type="checkbox"] {

@@ -17,7 +17,10 @@ export const toPDF = pipe(
     marginTop: 0.2,
     marginBottom: 0.2,
     marginLeft: 0.2,
-    marginRight: 0.2
+    marginRight: 0.2,
+    // A4 - default is Letter
+    paperWidth: 8.27,
+    paperHeight: 11.7
   }),
   adjust({ headers: { "X-Auth-Token": process.env.GOTENBERG_TOKEN ?? "" } }),
   please

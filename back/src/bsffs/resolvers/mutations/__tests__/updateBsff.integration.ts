@@ -1,14 +1,19 @@
 import { UserRole, BsffType, BsffStatus } from "@prisma/client";
 import { gql } from "apollo-server-core";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { BSFF_WASTE_CODES } from "../../../../common/constants";
 import {
   Mutation,
   MutationUpdateBsffArgs
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import { associateUserToCompany } from "../../../../users/database";
+import {
+  companyFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { OPERATION, WASTE_CODES } from "../../../constants";
+import { OPERATION } from "../../../constants";
 import { fullBsff } from "../../../fragments";
 import {
   createBsff,
@@ -312,7 +317,7 @@ describe("Mutation.updateBsff", () => {
 
     const input = {
       waste: {
-        code: WASTE_CODES[0],
+        code: BSFF_WASTE_CODES[0],
         description: "R10",
         adr: "Mention ADR"
       },
@@ -349,7 +354,7 @@ describe("Mutation.updateBsff", () => {
 
     const input = {
       waste: {
-        code: WASTE_CODES[0],
+        code: BSFF_WASTE_CODES[0],
         description: "R10",
         adr: "Mention ADR"
       },
@@ -882,5 +887,68 @@ describe("Mutation.updateBsff", () => {
 
     expect(errors).toBeUndefined();
     expect(data.updateBsff.id).toBeTruthy();
+  });
+
+  it("should not be possible to update BSFF type", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsffBeforeEmission(
+      { emitter },
+      {
+        type: BsffType.GROUPEMENT,
+        isDraft: true
+      }
+    );
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          type: BsffType.COLLECTE_PETITES_QUANTITES
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous ne pouvez pas modifier le type de BSFF après création"
+      })
+    ]);
+  });
+
+  it("should not be possible to update emitter when grouping, repackaging or forwarding", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const otherCompany = await companyFactory();
+    await associateUserToCompany(
+      emitter.user.id,
+      otherCompany.siret,
+      UserRole.ADMIN
+    );
+    const bsff = await createBsffBeforeEmission(
+      { emitter },
+      {
+        type: BsffType.GROUPEMENT,
+        isDraft: true
+      }
+    );
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          emitter: { company: { siret: otherCompany.siret } }
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous ne pouvez pas modifier l'établissement émetteur après création du BSFF en cas de réexpédition, groupement ou reconditionnement"
+      })
+    ]);
   });
 });

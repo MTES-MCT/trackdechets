@@ -12,14 +12,14 @@ export function RevisionField({
   reviewValue,
   formatter = value => value,
 }: Props) {
-  const formattedBsddValue = useMemo(() => formatter(bsddValue), [
-    formatter,
-    bsddValue,
-  ]);
-  const formattedReviewValue = useMemo(() => formatter(reviewValue), [
-    formatter,
-    reviewValue,
-  ]);
+  const formattedBsddValue = useMemo(
+    () => formatter(bsddValue),
+    [formatter, bsddValue]
+  );
+  const formattedReviewValue = useMemo(
+    () => formatter(reviewValue),
+    [formatter, reviewValue]
+  );
 
   if (!formattedReviewValue) return null;
 

@@ -1,11 +1,11 @@
 import { BsdasriResolvers } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+import { getReadonlyBsdasriRepository } from "../../repository";
 
 import { expandBsdasriFromDB } from "../../converter";
 
 const synthesizedIn: BsdasriResolvers["synthesizedIn"] = async bsdasri => {
-  const synthesizedIn = await prisma.bsdasri
-    .findUnique({ where: { id: bsdasri.id } })
+  const synthesizedIn = await getReadonlyBsdasriRepository()
+    .findRelatedEntity({ id: bsdasri.id })
     .synthesizedIn();
   if (!synthesizedIn) {
     return null;

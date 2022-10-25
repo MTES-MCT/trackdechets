@@ -5,7 +5,7 @@ import { addToSetCompanyDepartementQueue } from "../../src/queue/producers/compa
 @registerUpdater(
   "Set companies departements",
   "Set companies departements",
-  true
+  false
 )
 export class SetCompaniesDepartement implements Updater {
   async run() {

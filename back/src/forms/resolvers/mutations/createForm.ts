@@ -1,4 +1,4 @@
-import { Form, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { isDangerous } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -16,11 +16,14 @@ import { checkIsFormContributor } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
 import { FormCompanies } from "../../types";
-import { draftFormSchema, validateIntermediariesInput } from "../../validation";
-import { getFormOrFormNotFound } from "../../database";
-import prisma from "../../../prisma";
+import {
+  draftFormSchema,
+  validateGroupement,
+  validateIntermediariesInput
+} from "../../validation";
 import { UserInputError } from "apollo-server-core";
-import { Decimal } from "decimal.js-light";
+import { appendix2toFormFractions } from "../../compat";
+import { runInTransaction } from "../../../common/repository/helper";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -132,41 +135,27 @@ const createFormResolver = async (
     };
   }
 
-  let appendix2: { quantity: number; form: Form }[] = null;
+  const isGroupement = grouping?.length > 0 || appendix2Forms?.length > 0;
 
-  if (grouping) {
-    appendix2 = await Promise.all(
-      grouping.map(async ({ form, quantity }) => {
-        const foundForm = await getFormOrFormNotFound(form);
-        return {
-          form: foundForm,
-          quantity:
-            quantity ??
-            new Decimal(foundForm.quantityReceived)
-              .minus(foundForm.quantityGrouped)
-              .toNumber()
-        };
-      })
-    );
-  } else if (appendix2Forms) {
-    appendix2 = await Promise.all(
-      appendix2Forms.map(async ({ id }) => {
-        const initialForm = await getFormOrFormNotFound({ id });
-        return {
-          form: initialForm,
-          quantity: initialForm.quantityReceived
-        };
-      })
-    );
-  }
+  const appendix2 = isGroupement
+    ? await validateGroupement(
+        formCreateInput,
+        grouping?.length > 0
+          ? grouping
+          : appendix2toFormFractions(appendix2Forms)
+      )
+    : null;
 
-  const newForm = await prisma.$transaction(async transaction => {
+  const newForm = await runInTransaction(async transaction => {
     const { create, setAppendix2 } = getFormRepository(user, transaction);
     const newForm = await create(formCreateInput);
-    await setAppendix2({
-      form: newForm,
-      appendix2
-    });
+    if (isGroupement) {
+      await setAppendix2({
+        form: newForm,
+        appendix2,
+        currentAppendix2Forms: []
+      });
+    }
     return newForm;
   });
 

@@ -256,12 +256,20 @@ function TransporterFormCompanyFields({
 
 export async function generateBsddPdf(prismaForm: PrismaForm) {
   const fullPrismaForm = await getFullForm(prismaForm);
+
   const grouping = (
     await prisma.formGroupement.findMany({
       where: { nextFormId: fullPrismaForm.id },
       include: { initialForm: true }
     })
   ).map(g => ({ form: g.initialForm, quantity: g.quantity }));
+
+  const groupedIn = (
+    await prisma.formGroupement.findMany({
+      where: { initialFormId: fullPrismaForm.id },
+      include: { nextForm: true }
+    })
+  ).map(g => ({ readableId: g.nextForm.readableId }));
 
   const form: GraphQLForm = {
     ...(await expandFormFromDb(fullPrismaForm)),
@@ -274,6 +282,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
         quantity
       }))
     ),
+
     intermediaries: fullPrismaForm.intermediaries ?? []
   };
   const isRepackging =
@@ -345,6 +354,13 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             <p>
               <strong>N° Bordereau :</strong> {form.readableId}{" "}
               {form.customId && <>({form.customId})</>}
+              {groupedIn?.length && (
+                <>
+                  <strong>Annexé au bordereau n° :</strong>{" "}
+                  {groupedIn.map(bsd => bsd.readableId)}
+                </>
+              )}
+              {}
             </p>
           </div>
         </div>
@@ -591,7 +607,8 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             <div className="BoxCol">
               <p>
                 <strong>
-                  Autre{form?.intermediaries?.length > 1 ? "s" : ""} Intermédiaire{form?.intermediaries?.length > 1 ? "s" : ""}
+                  Autre{form?.intermediaries?.length > 1 ? "s" : ""}{" "}
+                  Intermédiaire{form?.intermediaries?.length > 1 ? "s" : ""}
                 </strong>
               </p>
               {form?.intermediaries?.map(intermediary => (
@@ -634,7 +651,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             </p>
             <p>
               Je soussigné, certifie que les renseignements portés dans les
-              cades ci-dessus sont exacts et de bonne foi.
+              cadres ci-dessus sont exacts et de bonne foi.
             </p>
             <p>
               <span className="Row">
@@ -737,7 +754,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 <p>
                   <strong>
                     A REMPLIR EN CAS D’ENTREPOSAGE PROVISOIRE OU DE
-                    RECONDITIONNEMENT (cadres 14 à 19)
+                    RECONDITIONNEMENT (cadres 13 à 19)
                   </strong>
                 </p>
               </div>
@@ -860,7 +877,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 </p>
                 <p>
                   Je soussigné, certifie que les renseignements portés dans les
-                  cades ci-dessus sont exacts et de bonne foi.
+                  cadres ci-dessus sont exacts et de bonne foi.
                 </p>
                 <p>
                   <span className="Row">

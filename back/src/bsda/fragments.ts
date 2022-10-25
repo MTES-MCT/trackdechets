@@ -145,6 +145,13 @@ export const fullBsda = gql`
         phone
         mail
       }
+      certification {
+        hasSubSectionFour
+        hasSubSectionThree
+        certificationNumber
+        validityLimit
+        organisation
+      }
       work {
         hasEmitterPaperSignature
         signature {

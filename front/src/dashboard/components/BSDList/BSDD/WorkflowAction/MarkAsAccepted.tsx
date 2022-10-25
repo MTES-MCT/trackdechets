@@ -26,16 +26,14 @@ const MARK_AS_ACCEPTED = gql`
 `;
 
 export default function MarkAsAccepted({ form }: WorkflowActionProps) {
-  const [
-    getBsdd,
-    { error: bsddGetError, data, loading: bsddGetLoading },
-  ] = useLazyQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
-    variables: {
-      id: form.id,
-      readableId: null,
-    },
-    fetchPolicy: "network-only",
-  });
+  const [getBsdd, { error: bsddGetError, data, loading: bsddGetLoading }] =
+    useLazyQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
+      variables: {
+        id: form.id,
+        readableId: null,
+      },
+      fetchPolicy: "network-only",
+    });
   const [markAsAccepted, { loading, error }] = useMutation<
     Pick<Mutation, "markAsAccepted">,
     MutationMarkAsAcceptedArgs

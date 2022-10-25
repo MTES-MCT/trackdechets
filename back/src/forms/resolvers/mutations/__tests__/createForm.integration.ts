@@ -947,12 +947,6 @@ describe("Mutation.createForm", () => {
     expect(groupementForm2.grouping).toEqual([
       { form: { id: initialForm.id }, quantity: 0.5 }
     ]);
-
-    const updatedInitialForm = await prisma.form.findUnique({
-      where: { id: initialForm.id }
-    });
-
-    expect(updatedInitialForm.quantityGrouped).toEqual(1);
   });
 
   it("should fail when adding the same form twice to the same groupement form", async () => {
@@ -1116,11 +1110,15 @@ describe("Mutation.createForm", () => {
     "should disallow linking an appendix 2 form if the emitter of the regroupement" +
       " form is not the recipient of the initial form (using CreateFormInput.appendix2Forms)",
     async () => {
+      const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+
       const appendix2 = await formFactory({
         ownerId: (await userFactory()).id,
-        opt: { status: Status.AWAITING_GROUP }
+        opt: {
+          status: Status.AWAITING_GROUP,
+          quantityReceived: 1
+        }
       });
-      const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
 
       const createFormInput = {
         emitter: {
@@ -1204,7 +1202,7 @@ describe("Mutation.createForm", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le bordereau ${appendix2.id} n'est pas en attente de regroupement`
+        message: `Les BSDD initiaux ${appendix2.id} n'existent pas ou ne sont pas en attente de regroupement`
       })
     ]);
   });
@@ -1237,7 +1235,7 @@ describe("Mutation.createForm", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le bordereau ${appendix2.id} n'est pas en attente de regroupement`
+        message: `Les BSDD initiaux ${appendix2.id} n'existent pas ou ne sont pas en attente de regroupement`
       })
     ]);
   });
@@ -1265,7 +1263,7 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+          "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
       })
     ]);
   });
@@ -1299,7 +1297,7 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "emitter.type doit être égal à APPENDIX2 lorsque appendix2Forms n'est pas vide"
+          "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
       })
     ]);
   });
@@ -1346,8 +1344,7 @@ describe("Mutation.createForm", () => {
       opt: {
         status: Status.AWAITING_GROUP,
         recipientCompanySiret: ttr.siret,
-        quantityReceived: 1,
-        quantityGrouped: 0.2
+        quantityReceived: 1
       }
     });
 
@@ -1386,14 +1383,30 @@ describe("Mutation.createForm", () => {
         form: expect.objectContaining({ id: appendix2.id })
       })
     ]);
+  });
 
-    const updatedAppendix2 = await prisma.form.findUnique({
-      where: { id: appendix2.id }
+  it("should not be possible to add more than 250 BSDDs on appendix2", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+    const createFormInput: CreateFormInput = {
+      emitter: {
+        type: "APPENDIX2",
+        company: {
+          siret: ttr.siret
+        }
+      },
+      grouping: Array.from(Array(300).keys()).map(n => ({
+        form: { id: `id_${n}` }
+      }))
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
     });
-
-    expect(updatedAppendix2.quantityGrouped).toEqual(
-      updatedAppendix2.quantityReceived
-    );
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Vous ne pouvez pas regrouper plus de 250 BSDDs initiaux`
+      })
+    ]);
   });
 
   it("should set isDangerous to `true` when specifying a waste code ending with *", async () => {
@@ -1544,6 +1557,7 @@ describe("Mutation.createForm", () => {
       variables: {
         createFormInput: {
           emitter: {
+            type: "APPENDIX2",
             company: { siret: company.siret }
           },
           // let's throw an error in appendix2 association that happens
@@ -1555,7 +1569,8 @@ describe("Mutation.createForm", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le bordereau avec l'identifiant "does-not-exist" n'existe pas.`
+        message:
+          "Les BSDD initiaux does-not-exist n'existent pas ou ne sont pas en attente de regroupement"
       })
     ]);
 

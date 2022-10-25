@@ -1,4 +1,3 @@
-import prisma from "../../../prisma";
 import { BsdasriInput } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { expandBsdasriFromDB, flattenBsdasriInput } from "../../converter";
@@ -7,8 +6,8 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { validateBsdasri, BsdasriValidationContext } from "../../validation";
 import { checkIsBsdasriContributor } from "../../permissions";
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
-import { indexBsdasri } from "../../elastic";
 import { BsdasriType } from "@prisma/client";
+import { getBsdasriRepository } from "../../repository";
 
 const getValidationContext = ({
   isDraft,
@@ -68,27 +67,20 @@ const createBsdasri = async (
     flattenedInput,
     getValidationContext({ isDraft, isGrouping })
   );
+  const bsdasriRepository = getBsdasriRepository(user);
 
   const bsdasriType: BsdasriType = isGrouping
     ? BsdasriType.GROUPING
     : BsdasriType.SIMPLE;
 
-  const newDasri = await prisma.bsdasri.create({
-    data: {
-      ...flattenedInput,
-      id: getReadableId(ReadableIdPrefix.DASRI),
-      type: bsdasriType,
-      grouping: { connect: groupedBsdasris },
+  const newDasri = await bsdasriRepository.create({
+    ...flattenedInput,
+    id: getReadableId(ReadableIdPrefix.DASRI),
+    type: bsdasriType,
+    grouping: { connect: groupedBsdasris },
 
-      isDraft
-    },
-    include: {
-      grouping: { select: { id: true } },
-      synthesizing: { select: { id: true } }
-    }
+    isDraft
   });
-
-  await indexBsdasri(newDasri, context);
 
   return expandBsdasriFromDB(newDasri);
 };

@@ -2,6 +2,7 @@ import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-express";
 import { BsdasriStatus, BsdasriType, Bsdasri } from "@prisma/client";
 import { DASRI_GROUPING_OPERATIONS_CODES } from "../../../common/constants";
+import { getReadonlyBsdasriRepository } from "../../repository";
 
 export const getEligibleDasrisForSynthesis = async (
   synthesizingIds: string[],
@@ -13,23 +14,23 @@ export const getEligibleDasrisForSynthesis = async (
   if (!synthesizingIds.length) {
     return;
   }
+
+  const bsdasriReadonlyRepository = getReadonlyBsdasriRepository();
   // retrieve dasris:
   // whose id is in synthesizingIds array
   // which are in SENT status
   // wich are of SIMPLE type
   // which are not already grouped, grouping, synthesized or synthesizing
   // whose recipient in current transporter
-  const found = await prisma.bsdasri.findMany({
-    where: {
-      id: { in: synthesizingIds },
-      status: BsdasriStatus.SENT,
-      type: BsdasriType.SIMPLE,
-      groupedIn: null,
-      grouping: { none: {} },
-      synthesizedIn: null,
-      synthesizing: { none: {} },
-      transporterCompanySiret: emitterSiret
-    }
+  const found = await bsdasriReadonlyRepository.findMany({
+    id: { in: synthesizingIds },
+    status: BsdasriStatus.SENT,
+    type: BsdasriType.SIMPLE,
+    groupedIn: null,
+    grouping: { none: {} },
+    synthesizedIn: null,
+    synthesizing: { none: {} },
+    transporterCompanySiret: emitterSiret
   });
 
   const foundIds = found.map(el => el.id);
@@ -59,6 +60,7 @@ export const checkDasrisAreGroupable = async (
   if (!groupingIds.length) {
     return;
   }
+  const bsdasriReadonlyRepository = getReadonlyBsdasriRepository();
 
   // retrieve dasris:
   // whose id is in regroupedBsdasrisIds array
@@ -67,11 +69,11 @@ export const checkDasrisAreGroupable = async (
   // wich are of SIMPLE type
   // which are not already grouped, grouping, synthesized or synthesizing
   // whose recipient in current emitter
-  const found = await prisma.bsdasri.findMany({
-    where: {
+  const found = await bsdasriReadonlyRepository.findMany(
+    {
       id: { in: groupingIds },
       destinationOperationCode: { in: DASRI_GROUPING_OPERATIONS_CODES },
-      status: BsdasriStatus.PROCESSED,
+      status: BsdasriStatus.AWAITING_GROUP,
       type: BsdasriType.SIMPLE,
       groupedIn: null,
       grouping: { none: {} },
@@ -79,8 +81,8 @@ export const checkDasrisAreGroupable = async (
       synthesizing: { none: {} },
       destinationCompanySiret: emitterSiret
     },
-    select: { id: true }
-  });
+    { select: { id: true } }
+  );
   const foundIds = found.map(el => el.id);
   const diff = groupingIds.filter(el => !foundIds.includes(el));
 

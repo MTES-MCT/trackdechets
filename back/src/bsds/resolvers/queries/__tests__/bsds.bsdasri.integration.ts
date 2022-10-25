@@ -1,52 +1,46 @@
-import { addYears } from "date-fns";
+import { Company, User, UserRole } from "@prisma/client";
 import {
-  Company,
-  User,
-  UserRole,
-  WasteAcceptationStatus
-} from "@prisma/client";
-import prisma from "../../../../prisma";
-import {
-  Query,
-  QueryBsdsArgs,
-  Mutation,
-  MutationCreateDraftBsdasriArgs,
-  MutationPublishBsdasriArgs,
-  MutationSignBsdasriArgs,
-  MutationDeleteBsdasriArgs,
-  MutationDuplicateBsdasriArgs
-} from "../../../../generated/graphql/types";
-import {
-  resetDatabase,
-  refreshElasticSearch
+  refreshElasticSearch,
+  resetDatabase
 } from "../../../../../integration-tests/helper";
-import makeClient from "../../../../__tests__/testClient";
+import { indexBsda } from "../../../../bsda/elastic";
+import { bsdaFactory } from "../../../../bsda/__tests__/factories";
 import { ErrorCode } from "../../../../common/errors";
-import { indexBsdasri } from "../../../../bsdasris/elastic";
+import {
+  Mutation,
+  MutationCreateDraftBsdaArgs,
+  MutationDeleteBsdaArgs,
+  MutationDuplicateBsdaArgs,
+  MutationPublishBsdaArgs,
+  MutationSignBsdaArgs,
+  Query,
+  QueryBsdsArgs
+} from "../../../../generated/graphql/types";
+import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
-import { bsdasriFactory } from "../../../../bsdasris/__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
 
-const CREATE_DRAFT_DASRI = `
-mutation CreateDraftDasri($input: BsdasriInput!) {
-  createDraftBsdasri(input: $input)  {
+const CREATE_DRAFT_BSDA = `
+mutation CreateDraftBsda($input: BsdaInput!) {
+  createDraftBsda(input: $input)  {
     id
   }
 }
 `;
 
-const PUBLISH_DASRI = `
-mutation PublishDasri($id:  ID!){
-  publishBsdasri(id: $id)  {
+const PUBLISH_BSDA = `
+mutation PublishBsda($id: ID!){
+  publishBsda(id: $id)  {
     id
     status
     isDraft
   }
 }
 `;
-export const SIGN_DASRI = `
-mutation SignDasri($id: ID!, $input: BsdasriSignatureInput
+export const SIGN_BSDA = `
+mutation SignBsda($id: ID!, $input: BsdaSignatureInput
 !) {
-  signBsdasri(id: $id, input: $input	) {
+  signBsda(id: $id, input: $input	) {
     id
   }
 }
@@ -56,7 +50,7 @@ const GET_BSDS = `
     bsds(where: $where) {
       edges {
         node {
-          ... on Bsdasri {
+          ... on Bsda {
             id
           }
         }
@@ -65,14 +59,20 @@ const GET_BSDS = `
   }
 `;
 
-describe("Query.bsds.dasris base workflow", () => {
+describe("Query.bsds.bsda base workflow", () => {
   let emitter: { user: User; company: Company };
+  let worker: { user: User; company: Company };
   let transporter: { user: User; company: Company };
   let destination: { user: User; company: Company };
-  let dasriId: string;
+  let bsdaId: string;
 
   beforeAll(async () => {
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: {
+        set: ["PRODUCER"]
+      }
+    });
+    worker = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
         set: ["PRODUCER"]
       }
@@ -90,93 +90,94 @@ describe("Query.bsds.dasris base workflow", () => {
   });
   afterAll(resetDatabase);
 
-  describe("when a draft bsdasri is freshly created", () => {
+  describe("when a draft bsda is freshly created", () => {
     beforeAll(async () => {
       const { mutate } = makeClient(emitter.user);
 
-      const {
-        data: {
-          createDraftBsdasri: { id }
-        }
-      } = await mutate<
-        Pick<Mutation, "createDraftBsdasri">,
-        MutationCreateDraftBsdasriArgs
-      >(CREATE_DRAFT_DASRI, {
+      const { data } = await mutate<
+        Pick<Mutation, "createDraftBsda">,
+        MutationCreateDraftBsdaArgs
+      >(CREATE_DRAFT_BSDA, {
         variables: {
           input: {
-            waste: {
-              code: "18 01 03*",
-              adr: "xyz 33"
-            },
             emitter: {
+              isPrivateIndividual: false,
               company: {
-                name: "hopital blanc",
                 siret: emitter.company.siret,
-                contact: "jean durand",
-                phone: "06 18 76 02 00",
-                mail: "emitter@test.fr",
-                address: "avenue de la mer"
-              },
-              emission: {
-                weight: { value: 23, isEstimate: false },
-                packagings: [
-                  {
-                    type: "BOITE_CARTON",
-                    volume: 22,
-                    quantity: 3
-                  }
-                ]
+                name: "The crusher",
+                address: "Rue de la carcasse",
+                contact: "Un centre VHU",
+                phone: "0101010101",
+                mail: "emitter@mail.com"
               }
             },
-
+            worker: {
+              company: {
+                siret: worker.company.siret,
+                name: "worker",
+                address: "address",
+                contact: "contactEmail",
+                phone: "contactPhone",
+                mail: "contactEmail@mail.com"
+              },
+              work: {
+                hasEmitterPaperSignature: false
+              }
+            },
             transporter: {
               company: {
                 siret: transporter.company.siret,
-                name: "JM TRANSPORT",
-                address: "2 rue des pâquerettes",
-                contact: "Jean-Michel",
-                mail: "jean.michel@gmaiL.com",
-                phone: "06"
+                name: "transporter",
+                address: "address",
+                contact: "contactEmail",
+                phone: "contactPhone",
+                mail: "contactEmail@mail.com"
               },
               recepisse: {
-                number: "123456789",
-                department: "69",
-                validityLimit: addYears(new Date(), 1).toISOString() as any
+                department: "83",
+                number: "1234",
+                validityLimit: new Date().toISOString() as any
               },
               transport: {
-                takenOverAt: new Date().toISOString() as any,
-
-                weight: { value: 99, isEstimate: false },
-
-                packagings: [{ type: "FUT", quantity: 44, volume: 123 }],
-
-                acceptation: { status: WasteAcceptationStatus.ACCEPTED }
+                mode: "ROAD",
+                plates: ["AA-00-XX"]
               }
             },
+            waste: {
+              code: "06 07 01*",
+              adr: "ADR",
+              consistence: "SOLIDE",
+              familyCode: "Code famille",
+              materialName: "A material",
+              sealNumbers: ["1", "2"]
+            },
+            packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+            weight: { isEstimate: true, value: 1.2 },
             destination: {
+              cap: "A cap",
+              plannedOperationCode: "D 5",
               company: {
                 siret: destination.company.siret,
-                name: "JEANNE COLLECTEUR",
-                address: "38 bis allée des anges",
-                contact: "Jeanne",
-                mail: "jeanne@gmail.com",
-                phone: "06"
+                name: "destination",
+                address: "address",
+                contact: "contactEmail",
+                phone: "contactPhone",
+                mail: "contactEmail@mail.com"
               },
               reception: {
-                packagings: [{ type: "FUT", quantity: 44, volume: 123 }],
-                acceptation: { status: WasteAcceptationStatus.ACCEPTED },
-                date: new Date().toISOString() as any
+                acceptationStatus: "ACCEPTED",
+                date: new Date().toISOString() as any,
+                weight: 1
               },
               operation: {
-                weight: { value: 99 },
-                code: "D10",
+                code: "D 9",
                 date: new Date().toISOString() as any
               }
             }
           }
         }
       });
-      dasriId = id;
+      bsdaId = data.createDraftBsda.id;
       await refreshElasticSearch();
     });
 
@@ -203,7 +204,7 @@ describe("Query.bsds.dasris base workflow", () => {
       ]);
     });
 
-    it("draft dasri should be isDraftFor emitter", async () => {
+    it("draft bsda should be isDraftFor emitter", async () => {
       const { query } = makeClient(emitter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -217,10 +218,27 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        expect.objectContaining({ node: { id: bsdaId } })
       ]);
     });
-    it("draft dasri should be isDraftFor transporter", async () => {
+    it("draft bsda should be isDraftFor worker", async () => {
+      const { query } = makeClient(worker.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isDraftFor: [worker.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+    it("draft bsda should be isDraftFor transporter", async () => {
       const { query } = makeClient(transporter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -234,10 +252,10 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        expect.objectContaining({ node: { id: bsdaId } })
       ]);
     });
-    it("draft dasri should be isDraftFor destination", async () => {
+    it("draft bsda should be isDraftFor destination", async () => {
       const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -251,28 +269,28 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        expect.objectContaining({ node: { id: bsdaId } })
       ]);
     });
   });
 
-  describe("when the dasri is published", () => {
+  describe("when the bsda is published", () => {
     beforeAll(async () => {
       const { mutate } = makeClient(emitter.user);
 
-      await mutate<
-        Pick<Mutation, "publishBsdasri">,
-        MutationPublishBsdasriArgs
-      >(PUBLISH_DASRI, {
-        variables: {
-          id: dasriId
+      await mutate<Pick<Mutation, "publishBsda">, MutationPublishBsdaArgs>(
+        PUBLISH_BSDA,
+        {
+          variables: {
+            id: bsdaId
+          }
         }
-      });
+      );
 
       await refreshElasticSearch();
     });
 
-    it("published dasri should be isForActionFor emitter", async () => {
+    it("published bsda should be isForActionFor emitter", async () => {
       const { query } = makeClient(emitter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -286,227 +304,29 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        expect.objectContaining({ node: { id: bsdaId } })
       ]);
     });
 
-    it("published dasri should be isToCollectFor transporter", async () => {
-      const { query } = makeClient(transporter.user);
+    it("published bsda should be isFollowFor worker", async () => {
+      const { query } = makeClient(worker.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
         {
           variables: {
             where: {
-              isToCollectFor: [transporter.company.siret]
+              isFollowFor: [worker.company.siret]
             }
           }
         }
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        expect.objectContaining({ node: { id: bsdaId } })
       ]);
     });
 
-    it("published dasri should be isFollowFor destination", async () => {
-      const { query } = makeClient(destination.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isFollowFor: [destination.company.siret]
-            }
-          }
-        }
-      );
-
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
-      ]);
-    });
-  });
-
-  describe("when the bsd is signed by the producer", () => {
-    beforeAll(async () => {
-      const { mutate } = makeClient(emitter.user);
-
-      await mutate<Pick<Mutation, "signBsdasri">, MutationSignBsdasriArgs>(
-        SIGN_DASRI,
-        {
-          variables: {
-            id: dasriId,
-            input: { type: "EMISSION", author: "Marcel" }
-          }
-        }
-      );
-
-      await refreshElasticSearch();
-    });
-
-    it("signed by emitter dasri should be isFollowFor emitter", async () => {
-      const { query } = makeClient(emitter.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isFollowFor: [emitter.company.siret]
-            }
-          }
-        }
-      );
-
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
-      ]);
-    });
-
-    it("signed by emitter dasri should be isToCollectFor transporter", async () => {
-      const { query } = makeClient(transporter.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isToCollectFor: [transporter.company.siret]
-            }
-          }
-        }
-      );
-
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
-      ]);
-    });
-
-    it("signed by emitter dasri should be isFollowFor destination", async () => {
-      const { query } = makeClient(destination.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isFollowFor: [destination.company.siret]
-            }
-          }
-        }
-      );
-
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
-      ]);
-    });
-  });
-
-  describe("when the bsd is signed by the transporteur (sent)", () => {
-    beforeAll(async () => {
-      const { mutate } = makeClient(transporter.user);
-
-      await mutate<Pick<Mutation, "signBsdasri">, MutationSignBsdasriArgs>(
-        SIGN_DASRI,
-        {
-          variables: {
-            id: dasriId,
-            input: { type: "TRANSPORT", author: "Bill" }
-          }
-        }
-      );
-
-      await refreshElasticSearch();
-    });
-
-    it("sent dasri should be isFollowFor emitter", async () => {
-      const { query } = makeClient(emitter.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isFollowFor: [emitter.company.siret]
-            }
-          }
-        }
-      );
-
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
-      ]);
-    });
-
-    it("sent by emitter dasri should be isCollectedFor transporter", async () => {
-      const { query } = makeClient(transporter.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isCollectedFor: [transporter.company.siret]
-            }
-          }
-        }
-      );
-
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
-      ]);
-    });
-
-    it("sent by emitter dasri should be isForActionFor destination", async () => {
-      const { query } = makeClient(destination.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isForActionFor: [destination.company.siret]
-            }
-          }
-        }
-      );
-
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
-      ]);
-    });
-  });
-
-  describe("when the dasri reception is signed by the destination", () => {
-    beforeAll(async () => {
-      const { mutate } = makeClient(destination.user);
-
-      await mutate<Pick<Mutation, "signBsdasri">, MutationSignBsdasriArgs>(
-        SIGN_DASRI,
-        {
-          variables: {
-            id: dasriId,
-            input: { type: "RECEPTION", author: "Bill" }
-          }
-        }
-      );
-
-      await refreshElasticSearch();
-    });
-
-    it("received dasri should be isFollowFor emitter", async () => {
-      const { query } = makeClient(emitter.user);
-      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
-        GET_BSDS,
-        {
-          variables: {
-            where: {
-              isFollowFor: [emitter.company.siret]
-            }
-          }
-        }
-      );
-
-      expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
-      ]);
-    });
-
-    it("received by emitter dasri should be isFollowFor transporter", async () => {
+    it("published bsda should be isFollowFor transporter", async () => {
       const { query } = makeClient(transporter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -520,11 +340,281 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        expect.objectContaining({ node: { id: bsdaId } })
       ]);
     });
 
-    it("received by emitter dasri should be isForActionFor destination", async () => {
+    it("published bsda should be isFollowFor destination", async () => {
+      const { query } = makeClient(destination.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [transporter.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+  });
+
+  describe("when the bsd is signed by the producer (SIGNED_BY_PRODUCER)", () => {
+    beforeAll(async () => {
+      const { mutate } = makeClient(emitter.user);
+
+      await mutate<Pick<Mutation, "signBsda">, MutationSignBsdaArgs>(
+        SIGN_BSDA,
+        {
+          variables: {
+            id: bsdaId,
+            input: { type: "EMISSION", author: "Patrick L'Emetteur" }
+          }
+        }
+      );
+
+      await refreshElasticSearch();
+    });
+
+    it("signed by emitter bsda should be isFollowFor emitter", async () => {
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [emitter.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("signed by emitter bsda should be isForActionFor worker", async () => {
+      const { query } = makeClient(worker.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isForActionFor: [worker.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("signed by emitter bsda should be isFollowFor transporter", async () => {
+      const { query } = makeClient(transporter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [transporter.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("signed by emitter bsda should be isFollowFor destination", async () => {
+      const { query } = makeClient(destination.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [destination.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+  });
+
+  describe("when the bsd is signed by the worker (SIGNED_BY_WORKER)", () => {
+    beforeAll(async () => {
+      const { mutate } = makeClient(worker.user);
+
+      await mutate<Pick<Mutation, "signBsda">, MutationSignBsdaArgs>(
+        SIGN_BSDA,
+        {
+          variables: {
+            id: bsdaId,
+            input: { type: "WORK", author: "Henri Du Travailleur" }
+          }
+        }
+      );
+
+      await refreshElasticSearch();
+    });
+
+    it("signed by worker bsda should be isFollowFor emitter", async () => {
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [emitter.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("signed by worker bsda should be isFollowFor worker", async () => {
+      const { query } = makeClient(worker.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [worker.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("signed by worker bsda should be isToCollectFor transporter", async () => {
+      const { query } = makeClient(transporter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isToCollectFor: [transporter.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("signed by worker bsda should be isFollowFor destination", async () => {
+      const { query } = makeClient(destination.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [destination.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+  });
+
+  describe("when the bsd is signed by the transporter (SENT)", () => {
+    beforeAll(async () => {
+      const { mutate } = makeClient(transporter.user);
+
+      await mutate<Pick<Mutation, "signBsda">, MutationSignBsdaArgs>(
+        SIGN_BSDA,
+        {
+          variables: {
+            id: bsdaId,
+            input: { type: "TRANSPORT", author: "Franck Le Camion" }
+          }
+        }
+      );
+
+      await refreshElasticSearch();
+    });
+
+    it("sent bsda should be isFollowFor emitter", async () => {
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [emitter.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("sent bsda should be isFollowFor worker", async () => {
+      const { query } = makeClient(worker.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [worker.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("sent bsda should be isCollectedFor transporter", async () => {
+      const { query } = makeClient(transporter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isCollectedFor: [transporter.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("sent bsda should be isForActionFor destination", async () => {
       const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -538,21 +628,21 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        expect.objectContaining({ node: { id: bsdaId } })
       ]);
     });
   });
 
-  describe("when the dasri operation is signed by the destination", () => {
+  describe("when the bsda operation is signed by the destination (PROCESSED)", () => {
     beforeAll(async () => {
       const { mutate } = makeClient(destination.user);
 
-      await mutate<Pick<Mutation, "signBsdasri">, MutationSignBsdasriArgs>(
-        SIGN_DASRI,
+      await mutate<Pick<Mutation, "signBsda">, MutationSignBsdaArgs>(
+        SIGN_BSDA,
         {
           variables: {
-            id: dasriId,
-            input: { type: "OPERATION", author: "Bill" }
+            id: bsdaId,
+            input: { type: "OPERATION", author: "Pierre Je Traite" }
           }
         }
       );
@@ -560,7 +650,7 @@ describe("Query.bsds.dasris base workflow", () => {
       await refreshElasticSearch();
     });
 
-    it("processed dasri should be isArchivedFor emitter", async () => {
+    it("processed bsda should be isArchivedFor emitter", async () => {
       const { query } = makeClient(emitter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -574,11 +664,29 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        expect.objectContaining({ node: { id: bsdaId } })
       ]);
     });
 
-    it("processed dasri should be isArchivedFor transporter", async () => {
+    it("processed bsda should be isArchivedFor worker", async () => {
+      const { query } = makeClient(worker.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isArchivedFor: [worker.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("processed bsda should be isArchivedFor transporter", async () => {
       const { query } = makeClient(transporter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -592,11 +700,11 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        expect.objectContaining({ node: { id: bsdaId } })
       ]);
     });
 
-    it("processed  dasri should be isArchivedFor destination", async () => {
+    it("processed bsda should be isArchivedFor destination", async () => {
       const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -610,22 +718,142 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        expect.objectContaining({ node: { id: bsdaId } })
       ]);
     });
   });
 
-  describe("when the dasri is refused", () => {
+  describe("when the bsda operation is signed by the destination (AWAITING_CHILD)", () => {
     beforeAll(async () => {
-      const refusedDasri = await prisma.bsdasri.update({
-        where: { id: dasriId },
-        data: { status: "REFUSED" }
+      const { mutate } = makeClient(destination.user);
+
+      await prisma.bsda.update({
+        where: { id: bsdaId },
+        data: {
+          destinationOperationCode: "D 15",
+          status: "SENT",
+          destinationOperationSignatureDate: null,
+          destinationOperationSignatureAuthor: null
+        }
       });
-      await indexBsdasri(refusedDasri);
+
+      await mutate<Pick<Mutation, "signBsda">, MutationSignBsdaArgs>(
+        SIGN_BSDA,
+        {
+          variables: {
+            id: bsdaId,
+            input: { type: "OPERATION", author: "Pierre Je Traite" }
+          }
+        }
+      );
+
       await refreshElasticSearch();
     });
 
-    it("refused dasri should be isArchivedFor emitter", async () => {
+    it("processed bsda should be isFollowFor emitter", async () => {
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [emitter.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("processed bsda should be isFollowFor worker", async () => {
+      const { query } = makeClient(worker.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [worker.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("processed bsda should be isFollowFor transporter", async () => {
+      const { query } = makeClient(transporter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [transporter.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("processed bsda should be isFollowFor destination", async () => {
+      const { query } = makeClient(destination.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isFollowFor: [destination.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+  });
+
+  describe("when the bsda is refused", () => {
+    beforeAll(async () => {
+      const { mutate } = makeClient(destination.user);
+
+      await prisma.bsda.update({
+        where: { id: bsdaId },
+        data: {
+          status: "SENT",
+          destinationReceptionWeight: 0,
+          destinationReceptionAcceptationStatus: "REFUSED",
+          destinationReceptionRefusalReason: "Ugly waste...",
+          destinationOperationCode: "",
+          destinationOperationSignatureDate: null,
+          destinationOperationSignatureAuthor: null
+        }
+      });
+
+      await mutate<Pick<Mutation, "signBsda">, MutationSignBsdaArgs>(
+        SIGN_BSDA,
+        {
+          variables: {
+            id: bsdaId,
+            input: { type: "OPERATION", author: "Pierre Je Traite" }
+          }
+        }
+      );
+
+      await refreshElasticSearch();
+    });
+
+    it("refused bsda should be isArchivedFor emitter", async () => {
       const { query } = makeClient(emitter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -639,11 +867,29 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        expect.objectContaining({ node: { id: bsdaId } })
       ]);
     });
 
-    it("refused dasri should be isArchivedFor transporter", async () => {
+    it("refused bsda should be isArchivedFor worker", async () => {
+      const { query } = makeClient(worker.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isArchivedFor: [worker.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toEqual([
+        expect.objectContaining({ node: { id: bsdaId } })
+      ]);
+    });
+
+    it("refused bsda should be isArchivedFor transporter", async () => {
       const { query } = makeClient(transporter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -657,11 +903,11 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        expect.objectContaining({ node: { id: bsdaId } })
       ]);
     });
 
-    it("refused  dasri should be isArchivedFor destination", async () => {
+    it("refused bsda should be isArchivedFor destination", async () => {
       const { query } = makeClient(destination.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
         GET_BSDS,
@@ -675,54 +921,54 @@ describe("Query.bsds.dasris base workflow", () => {
       );
 
       expect(data.bsds.edges).toEqual([
-        expect.objectContaining({ node: { id: dasriId } })
+        expect.objectContaining({ node: { id: bsdaId } })
       ]);
     });
   });
 });
 
-describe("Query.bsds.dasris mutations", () => {
+describe("Query.bsds.bsdas mutations", () => {
   afterAll(resetDatabase);
 
-  it("deleted dasri should be removed from es index", async () => {
+  it("deleted bsda should be removed from ES index", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
         set: ["PRODUCER"]
       }
     });
 
-    const dasri = await bsdasriFactory({
+    const bsda = await bsdaFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret
       }
     });
 
-    await indexBsdasri(dasri);
+    await indexBsda(bsda);
     await refreshElasticSearch();
 
     const { query } = makeClient(emitter.user);
     let res = await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {});
 
-    // created dasri is indexed
+    // created bsda is indexed
     expect(res.data.bsds.edges).toEqual([
-      expect.objectContaining({ node: { id: dasri.id } })
+      expect.objectContaining({ node: { id: bsda.id } })
     ]);
 
-    // let's delete this dasri
+    // then we delete it
     const { mutate } = makeClient(emitter.user);
-    const DELETE_DASRI = `
-      mutation DeleteDasri($id: ID!){
-        deleteBsdasri(id: $id)  {
+    const DELETE_BSDA = `
+      mutation DeleteBsda($id: ID!){
+        deleteBsda(id: $id)  {
           id
         }
       }
     `;
 
-    await mutate<Pick<Mutation, "deleteBsdasri">, MutationDeleteBsdasriArgs>(
-      DELETE_DASRI,
+    await mutate<Pick<Mutation, "deleteBsda">, MutationDeleteBsdaArgs>(
+      DELETE_BSDA,
       {
         variables: {
-          id: dasri.id
+          id: bsda.id
         }
       }
     );
@@ -730,30 +976,30 @@ describe("Query.bsds.dasris mutations", () => {
     await refreshElasticSearch();
 
     res = await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {});
-    // dasri si not indexed anymore
+    // bsda si not indexed anymore
     expect(res.data.bsds.edges).toEqual([]);
   });
 
-  it("duplicated dasri should be indexed", async () => {
+  it("duplicated bsda should be indexed", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
       companyTypes: {
         set: ["PRODUCER"]
       }
     });
 
-    const dasri = await bsdasriFactory({
+    const bsda = await bsdaFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret
       }
     });
-    await indexBsdasri(dasri);
+    await indexBsda(bsda);
 
-    //duplicate dasri
+    // duplicate bsda
     const { mutate } = makeClient(emitter.user);
 
-    const DUPLICATE_DASRI = `
-    mutation DuplicateDasri($id: ID!){
-      duplicateBsdasri(id: $id)  {
+    const DUPLICATE_BSDA = `
+    mutation DuplicateBsda($id: ID!){
+      duplicateBsda(id: $id)  {
         id
         status
         isDraft
@@ -762,17 +1008,16 @@ describe("Query.bsds.dasris mutations", () => {
     `;
 
     const {
-      data: { duplicateBsdasri }
+      data: { duplicateBsda }
     } = await mutate<
-      Pick<Mutation, "duplicateBsdasri">,
-      MutationDuplicateBsdasriArgs
-    >(DUPLICATE_DASRI, {
+      Pick<Mutation, "duplicateBsda">,
+      MutationDuplicateBsdaArgs
+    >(DUPLICATE_BSDA, {
       variables: {
-        id: dasri.id
+        id: bsda.id
       }
     });
 
-    await indexBsdasri(dasri);
     await refreshElasticSearch();
 
     const { query } = makeClient(emitter.user);
@@ -781,12 +1026,12 @@ describe("Query.bsds.dasris mutations", () => {
       {}
     );
 
-    // duplicated dasri is indexed
-    expect(data.bsds.edges.length).toEqual(2); // initial + duplicated dasri
+    // duplicated bsda is indexed
+    expect(data.bsds.edges.length).toEqual(2); // initial + duplicated bsda
     expect(data.bsds.edges).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ node: { id: dasri.id } }),
-        expect.objectContaining({ node: { id: duplicateBsdasri.id } })
+        expect.objectContaining({ node: { id: bsda.id } }),
+        expect.objectContaining({ node: { id: duplicateBsda.id } })
       ])
     );
   });

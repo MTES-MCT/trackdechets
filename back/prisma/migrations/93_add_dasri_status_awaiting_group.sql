@@ -1,0 +1,1 @@
+ALTER TYPE "default$default"."BsdasriStatus" ADD VALUE 'AWAITING_GROUP';

@@ -122,7 +122,7 @@ describe("ActivityEvent.Bsda", () => {
             }
           },
           waste: {
-            code: "01 03 04*",
+            code: "06 07 01*",
             consistence: "SOLIDE",
             materialName: "Amiante"
           }
@@ -152,7 +152,7 @@ describe("ActivityEvent.Bsda", () => {
           id: bsdaId,
           input: {
             waste: {
-              code: "01 01 01"
+              code: "06 13 04*"
             }
           }
         }
@@ -164,7 +164,7 @@ describe("ActivityEvent.Bsda", () => {
     });
     const bsdaFromEventsAfterUpdate = await getBsdaFromActivityEvents(bsdaId);
     expect(bsdaAfterUpdate).toMatchObject(bsdaFromEventsAfterUpdate);
-    expect(bsdaFromEventsAfterUpdate.wasteCode).toBe("01 01 01");
+    expect(bsdaFromEventsAfterUpdate.wasteCode).toBe("06 13 04*");
 
     const nbEventsAfterUpdate = await prisma.event.count({
       where: { streamId: bsdaId }
@@ -299,7 +299,7 @@ describe("ActivityEvent.Bsda", () => {
             }
           },
           waste: {
-            code: "01 03 04*",
+            code: "06 07 01*",
             consistence: "SOLIDE",
             materialName: "Amiante"
           }
@@ -317,7 +317,7 @@ describe("ActivityEvent.Bsda", () => {
         id: bsdaId,
         input: {
           waste: {
-            code: "01 01 01"
+            code: "06 13 04*"
           }
         }
       }
@@ -331,7 +331,7 @@ describe("ActivityEvent.Bsda", () => {
       bsdaId,
       now
     );
-    expect(bsdaFromEventsAfterCreate.wasteCode).toBe("01 03 04*");
-    expect(bsdaAfterUpdate.wasteCode).toBe("01 01 01");
+    expect(bsdaFromEventsAfterCreate.wasteCode).toBe("06 07 01*");
+    expect(bsdaAfterUpdate.wasteCode).toBe("06 13 04*");
   });
 });

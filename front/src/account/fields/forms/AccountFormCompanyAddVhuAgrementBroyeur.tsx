@@ -78,25 +78,23 @@ export default function AccountFormCompanyAddVhuAgrementBroyeur({
     { loading: updateCompanyLoading, error: updateCompanyError },
   ] = useMutation(UPDATE_COMPANY_VHU_AGREMENT);
 
-  const [
-    deleteVhuAgrement,
-    { loading: deleteLoading, error: deleteError },
-  ] = useMutation(DELETE_VHU_AGREMENT, {
-    update(cache) {
-      cache.writeFragment({
-        id: `CompanyPrivate:${company.id}`,
-        fragment: gql`
-          fragment VhuAgrementBroyeurCompanyFragment on CompanyPrivate {
-            id
-            vhuAgrementBroyeur {
+  const [deleteVhuAgrement, { loading: deleteLoading, error: deleteError }] =
+    useMutation(DELETE_VHU_AGREMENT, {
+      update(cache) {
+        cache.writeFragment({
+          id: `CompanyPrivate:${company.id}`,
+          fragment: gql`
+            fragment VhuAgrementBroyeurCompanyFragment on CompanyPrivate {
               id
+              vhuAgrementBroyeur {
+                id
+              }
             }
-          }
-        `,
-        data: { vhuAgrementBroyeur: null },
-      });
-    },
-  });
+          `,
+          data: { vhuAgrementBroyeur: null },
+        });
+      },
+    });
 
   const initialValues: V = vhuAgrementBroyeur
     ? {

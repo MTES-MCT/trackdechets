@@ -3,7 +3,6 @@ import { getBsdasriOrNotFound } from "../../database";
 import { expandBsdasriFromDB } from "../../converter";
 import { UserInputError, ForbiddenError } from "apollo-server-express";
 import { InvalidTransition } from "../../../forms/errors";
-import prisma from "../../../../src/prisma";
 import dasriTransition from "../../workflow/dasriTransition";
 import {
   BsdasriType,
@@ -13,6 +12,7 @@ import {
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { checkCanEditBsdasri } from "../../permissions";
 import { getCachedUserSiretOrVat } from "../../../common/redis/users";
+import { getBsdasriRepository } from "../../repository";
 
 import {
   dasriSignatureMapping,
@@ -21,22 +21,13 @@ import {
   checkIsSignedByEcoOrganisme,
   getFieldsUpdate
 } from "./signatureUtils";
-import { indexBsdasri } from "../../elastic";
+import { runInTransaction } from "../../../common/repository/helper";
 
-const reindexAssociatedDasris = async dasriId => {
-  const updatedDasris = await prisma.bsdasri.findMany({
-    where: { synthesizedInId: dasriId }
-    // no need to query grouping and synthesizing dasris for ES here
-  });
-  for (const updatedDasri of updatedDasris) {
-    await indexBsdasri(updatedDasri);
-  }
-};
 /**
  * When synthesized dasri is received or processed, associated dasris are updated
  *
  */
-const cascadeOnSynthesized = async ({ dasri }) => {
+const cascadeOnSynthesized = async ({ dasri, bsdasriRepository }) => {
   if (dasri.status === BsdasriStatus.RECEIVED) {
     const {
       destinationCompanyName,
@@ -50,9 +41,9 @@ const cascadeOnSynthesized = async ({ dasri }) => {
       destinationReceptionSignatureAuthor,
       destinationReceptionSignatureDate
     } = dasri;
-    await prisma.bsdasri.updateMany({
-      where: { synthesizedInId: dasri.id },
-      data: {
+    await bsdasriRepository.updateMany(
+      { synthesizedInId: dasri.id },
+      {
         status: BsdasriStatus.RECEIVED,
         destinationCompanyName,
         destinationCompanySiret,
@@ -66,8 +57,7 @@ const cascadeOnSynthesized = async ({ dasri }) => {
         destinationReceptionSignatureDate,
         destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED
       }
-    });
-    await reindexAssociatedDasris(dasri.id);
+    );
   }
 
   if (dasri.status === BsdasriStatus.PROCESSED) {
@@ -79,9 +69,9 @@ const cascadeOnSynthesized = async ({ dasri }) => {
       destinationOperationSignatureAuthor
     } = dasri;
 
-    await prisma.bsdasri.updateMany({
-      where: { synthesizedInId: dasri.id },
-      data: {
+    await bsdasriRepository.updateMany(
+      { synthesizedInId: dasri.id },
+      {
         status: BsdasriStatus.PROCESSED,
         destinationOperationCode,
         destinationOperationDate,
@@ -89,8 +79,7 @@ const cascadeOnSynthesized = async ({ dasri }) => {
         destinationOperationSignatureDate,
         destinationOperationSignatureAuthor
       }
-    });
-    await reindexAssociatedDasris(dasri.id);
+    );
   }
 };
 
@@ -191,7 +180,7 @@ const sign = async ({
     ...getFieldsUpdate({ bsdasri, input: { author, type } })
   };
 
-  const updatedDasri = await dasriTransition(
+  const { where, updateData } = await dasriTransition(
     {
       ...bsdasri
     },
@@ -216,12 +205,32 @@ const sign = async ({
     }
   );
 
-  if (updatedDasri.type === BsdasriType.SYNTHESIS) {
-    await cascadeOnSynthesized({ dasri: updatedDasri });
-  }
-  const expandedDasri = expandBsdasriFromDB(updatedDasri);
-  await indexBsdasri(updatedDasri, context);
-  return expandedDasri;
+  const signedDasri = await runInTransaction(async transaction => {
+    const bsdasriRepository = getBsdasriRepository(user, transaction);
+
+    const signedDasri = await bsdasriRepository.update(where, updateData);
+    if (signedDasri.type === BsdasriType.SYNTHESIS) {
+      await cascadeOnSynthesized({ dasri: signedDasri, bsdasriRepository });
+    }
+    if (signedDasri.type === BsdasriType.GROUPING) {
+      if (signedDasri.status === BsdasriStatus.PROCESSED) {
+        await bsdasriRepository.updateMany(
+          { groupedInId: signedDasri.id },
+          { status: BsdasriStatus.PROCESSED }
+        );
+      }
+      if (signedDasri.status === BsdasriStatus.REFUSED) {
+        await bsdasriRepository.updateMany(
+          { groupedInId: signedDasri.id },
+          { groupedInId: null }
+        );
+      }
+    }
+
+    return signedDasri;
+  });
+
+  return expandBsdasriFromDB(signedDasri);
 };
 
 export default sign;

@@ -1,5 +1,8 @@
 import { BsdaRevisionRequest, Prisma } from "@prisma/client";
-import { LogMetadata, RepositoryFnDeps } from "../../../forms/repository/types";
+import {
+  LogMetadata,
+  RepositoryFnDeps
+} from "../../../common/repository/types";
 import { approveAndApplyRevisionRequest } from "./accept";
 
 export type CreateRevisionRequestFn = (

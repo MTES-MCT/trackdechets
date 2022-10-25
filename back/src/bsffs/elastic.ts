@@ -1,6 +1,6 @@
 import { Bsff, BsffStatus } from "@prisma/client";
 import prisma from "../prisma";
-import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
+import { BsdElastic, indexBsd } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { BsffPackaging } from "../generated/graphql/types";
@@ -14,6 +14,7 @@ export function toBsdElastic(
     readableId: bsff.id,
     customId: "",
     createdAt: bsff.createdAt.getTime(),
+    updatedAt: bsff.updatedAt.getTime(),
     emitterCompanyName: bsff.emitterCompanyName ?? "",
     emitterCompanySiret: bsff.emitterCompanySiret ?? "",
     transporterCompanyName: bsff.transporterCompanyName ?? "",
@@ -113,37 +114,6 @@ export function toBsdElastic(
   }
 
   return bsd;
-}
-
-export async function indexAllBsffs(
-  idx: string,
-  { skip = 0 }: { skip?: number } = {}
-) {
-  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
-  const bsffs = await prisma.bsff.findMany({
-    skip,
-    take,
-    where: {
-      isDeleted: false
-    },
-    include: { packagings: true }
-  });
-
-  if (bsffs.length === 0) {
-    return;
-  }
-
-  await indexBsds(
-    idx,
-    bsffs.map(bsff => toBsdElastic(bsff))
-  );
-
-  if (bsffs.length < take) {
-    // all forms have been indexed
-    return;
-  }
-
-  return indexAllBsffs(idx, { skip: skip + take });
 }
 
 export async function indexBsff(bsff: Bsff, ctx?: GraphQLContext) {

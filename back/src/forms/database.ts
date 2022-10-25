@@ -111,10 +111,3 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
       .flat()
   };
 }
-
-export async function getFinalDestinationSiret(form: Form) {
-  return form.forwardedInId
-    ? (await prisma.form.findUnique({ where: { id: form.id } }).forwardedIn())
-        ?.recipientCompanySiret
-    : form.recipientCompanySiret;
-}

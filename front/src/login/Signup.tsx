@@ -29,9 +29,8 @@ export default function Signup() {
   const [errorMessage, setErrorMessage] = useState("");
   const [userEmail, setUserEmail] = useState("");
 
-  const [signup] = useMutation<Pick<Mutation, "signup">, MutationSignupArgs>(
-    SIGNUP
-  );
+  const [signup] =
+    useMutation<Pick<Mutation, "signup">, MutationSignupArgs>(SIGNUP);
 
   const history = useHistory();
 

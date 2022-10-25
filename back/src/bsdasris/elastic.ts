@@ -1,6 +1,5 @@
 import { BsdasriStatus, Bsdasri, BsdasriType } from "@prisma/client";
-import prisma from "../prisma";
-import { BsdElastic, indexBsd, indexBsds } from "../common/elastic";
+import { BsdElastic, indexBsd } from "../common/elastic";
 
 import { DASRI_WASTE_CODES_MAPPING } from "../common/constants/DASRI_CONSTANTS";
 import { GraphQLContext } from "../types";
@@ -16,6 +15,7 @@ import { getRegistryFields } from "./registry";
 // | received           | follow  | follow      | action    |
 // | processed          | archive | archive     | archive   |
 // | refused            | archive | archive     | archive   |
+// | awaiting_group     | follow  | follow      | follow    |
 
 function getWhere(
   bsdasri: Bsdasri
@@ -139,48 +139,12 @@ export function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
     wasteDescription: DASRI_WASTE_CODES_MAPPING[bsdasri.wasteCode],
     transporterNumberPlate: bsdasri.transporterTransportPlates,
     createdAt: bsdasri.createdAt.getTime(),
+    updatedAt: bsdasri.updatedAt.getTime(),
     ...where,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsdasri),
     rawBsd: bsdasri
   };
-}
-
-/**
- * Index all BSDs from the forms table.
- */
-export async function indexAllBsdasris(
-  idx: string,
-  { skip = 0 }: { skip?: number } = {}
-) {
-  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
-  const bsdasris = await prisma.bsdasri.findMany({
-    skip,
-    take,
-    where: {
-      isDeleted: false
-    },
-    include: {
-      grouping: { select: { id: true } },
-      synthesizing: { select: { id: true } }
-    }
-  });
-
-  if (bsdasris.length === 0) {
-    return;
-  }
-
-  await indexBsds(
-    idx,
-    bsdasris.map(bsdasri => toBsdElastic(bsdasri))
-  );
-
-  if (bsdasris.length < take) {
-    // all forms have been indexed
-    return;
-  }
-
-  return indexAllBsdasris(idx, { skip: skip + take });
 }
 
 export function indexBsdasri(bsdasri: Bsdasri, ctx?: GraphQLContext) {

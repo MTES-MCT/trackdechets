@@ -8,7 +8,7 @@ import {
   LogMetadata,
   PrismaTransaction,
   RepositoryFnDeps
-} from "../../../forms/repository/types";
+} from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
 import { PARTIAL_OPERATIONS } from "../../validation";
 

@@ -83,24 +83,22 @@ export default function AccountFormCompanyTransporterReceipt({
     { loading: updateCompanyLoading, error: updateCompanyError },
   ] = useMutation(UPDATE_COMPANY_BROKER_RECEIPT);
 
-  const [
-    deleteBrokerReceipt,
-    { loading: deleteLoading, error: deleteError },
-  ] = useMutation(DELETE_BROKER_RECEIPT, {
-    update(cache) {
-      cache.writeFragment({
-        id: `CompanyPrivate:${company.id}`,
-        fragment: gql`
-          fragment BrokerReceiptCompanyFragment on CompanyPrivate {
-            brokerReceipt {
-              id
+  const [deleteBrokerReceipt, { loading: deleteLoading, error: deleteError }] =
+    useMutation(DELETE_BROKER_RECEIPT, {
+      update(cache) {
+        cache.writeFragment({
+          id: `CompanyPrivate:${company.id}`,
+          fragment: gql`
+            fragment BrokerReceiptCompanyFragment on CompanyPrivate {
+              brokerReceipt {
+                id
+              }
             }
-          }
-        `,
-        data: { brokerReceipt: null },
-      });
-    },
-  });
+          `,
+          data: { brokerReceipt: null },
+        });
+      },
+    });
 
   const initialValues: V = brokerReceipt
     ? {

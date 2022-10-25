@@ -9,9 +9,9 @@ import { expandFormFromDb } from "../../converter";
 import { DestinationCannotTempStore } from "../../errors";
 import { Prisma, WasteAcceptationStatus } from "@prisma/client";
 import { getFormRepository } from "../../repository";
-import prisma from "../../../prisma";
 import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
 import { sendMail } from "../../../mailer/mailing";
+import { runInTransaction } from "../../../common/repository/helper";
 
 const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
   parent,
@@ -54,7 +54,7 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
       : {})
   };
 
-  const tempStoredForm = await prisma.$transaction(async transaction => {
+  const tempStoredForm = await runInTransaction(async transaction => {
     const formRepository = getFormRepository(user, transaction);
     const tempStoredForm = await formRepository.update(
       { id: form.id },

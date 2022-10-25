@@ -20,8 +20,8 @@ import ResendActivationEmail from "login/ResendActivationEmail";
 const Admin = lazy(() => import("admin/Admin"));
 const Dashboard = lazy(() => import("dashboard/Dashboard"));
 const Account = lazy(() => import("account/Account"));
-const AccountMembershipRequest = lazy(() =>
-  import("account/AccountMembershipRequest")
+const AccountMembershipRequest = lazy(
+  () => import("account/AccountMembershipRequest")
 );
 const FormContainer = lazy(() => import("form/bsdd/FormContainer"));
 const BsvhuFormContainer = lazy(() => import("form/bsvhu/FormContainer"));

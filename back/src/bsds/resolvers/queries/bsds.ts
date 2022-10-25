@@ -13,13 +13,9 @@ import {
   client,
   BsdElastic,
   index,
-  getKeywordFieldNameFromName,
-  getFieldNameFromKeyword,
-  GetResponse,
-  SearchResponse,
-  toRawBsds
+  PrismaBsdMap
 } from "../../../common/elastic";
-import { Bsdasri } from "@prisma/client";
+import { Bsda, Bsdasri, Bsff, Bsvhu, Form } from "@prisma/client";
 import prisma from "../../../prisma";
 import { expandFormFromElastic } from "../../../forms/converter";
 import { expandBsdasriFromElastic } from "../../../bsdasris/converter";
@@ -27,6 +23,48 @@ import { expandVhuFormFromDb } from "../../../bsvhu/converter";
 import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { expandBsdaFromElastic } from "../../../bsda/converter";
 import { expandBsffFromElastic } from "../../../bsffs/converter";
+
+// complete Typescript example:
+// https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
+export interface SearchResponse<T> {
+  hits: {
+    total: number;
+    hits: Array<{
+      _source: T;
+    }>;
+  };
+}
+
+export interface GetResponse<T> {
+  _source: T;
+}
+
+/**
+ * Convert a list of BsdElastic to a mapping of prisma-like Bsds by retrieving rawBsd elastic field
+ */
+async function toRawBsds(bsdsElastic: BsdElastic[]): Promise<PrismaBsdMap> {
+  const { BSDD, BSDASRI, BSVHU, BSDA, BSFF } = bsdsElastic.reduce<{
+    BSDD: Form[];
+    BSDASRI: Bsdasri[];
+    BSVHU: Bsvhu[];
+    BSDA: Bsda[];
+    BSFF: Bsff[];
+  }>(
+    (acc, bsdElastic) => ({
+      ...acc,
+      [bsdElastic.type]: [...acc[bsdElastic.type], bsdElastic?.rawBsd]
+    }),
+    { BSDD: [], BSDASRI: [], BSVHU: [], BSDA: [], BSFF: [] }
+  );
+
+  return {
+    bsdds: BSDD,
+    bsdasris: BSDASRI,
+    bsvhus: BSVHU,
+    bsdas: BSDA,
+    bsffs: BSFF
+  };
+}
 
 async function buildQuery(
   { clue, where = {} }: QueryBsdsArgs,
@@ -214,6 +252,65 @@ async function buildQuery(
   });
 
   return query;
+}
+
+/**
+ * Returns the keyword field matching the given fieldName.
+ *
+ * e.g passing "readableId" returns "readableId.keyword",
+ *     because "redableId" is a "text" with a sub field "readableId.keyword" which is a keyword.
+ *
+ * e.g passing "id" returns "id", because it's already a keyword.
+ *
+ * This is useful for context where we are given a property but need to use its keyword counterpart.
+ * For example when sorting, where it's not possible to sort on text fields.
+ */
+function getKeywordFieldNameFromName(fieldName: keyof BsdElastic): string {
+  const property = index.mappings.properties[fieldName];
+
+  if (property.type === "keyword") {
+    // this property is of type "keyword" itself, it can be used as such
+    return fieldName;
+  }
+
+  // look for a sub field with the type "keyword"
+  const [subFieldName] =
+    Object.entries(property.fields || {}).find(
+      ([_, property]) => property.type === "keyword"
+    ) ?? [];
+
+  if (subFieldName == null) {
+    throw new Error(
+      `The field "${fieldName}" is not of type "keyword" and has no sub fields of that type.`
+    );
+  }
+
+  return `${fieldName}.${subFieldName}`;
+}
+
+/**
+ * Returns the root field name matching keywordFieldName.
+ * It's the opposite of getKeywordFieldNameFromName.
+ *
+ * e.g passing "readableId.keyword" returns "readableId",
+ *     because "readableId.keyword" is a sub field, the actual field is "readableId".
+ *
+ * e.g passing "id" returns "id", because "id" is the root field.
+ *
+ * This is useful for context where a key has been turned into its keyword counterpart
+ * but we need to access the value of a document based on it.
+ * For example when constructing the "search_after" array from the "sort" array.
+ */
+function getFieldNameFromKeyword(keywordFieldName: string): keyof BsdElastic {
+  const [fieldName] = keywordFieldName.split(".");
+
+  if (index.mappings.properties[fieldName] == null) {
+    throw new Error(
+      `The field "${keywordFieldName}" doesn't match a property declared in the mappings.`
+    );
+  }
+
+  return fieldName as keyof BsdElastic;
 }
 
 function buildSort({ orderBy = {} }: QueryBsdsArgs) {

@@ -378,9 +378,9 @@ describe("mutation.markAsProcessed", () => {
             company: {
               mail: "m@m.fr",
               siret: null,
-              vatNumber: "DE12345678",
-              country: "DE",
-              name: "DE company",
+              vatNumber: "IE9513674T",
+              country: "IE",
+              name: "IE company",
               phone: "0101010101",
               contact: "The famous bot",
               address: "A beautiful place..."
@@ -465,9 +465,9 @@ describe("mutation.markAsProcessed", () => {
             company: {
               mail: "m@m.fr",
               siret: null,
-              vatNumber: "DE12345678",
-              country: "DE",
-              name: "DE company",
+              vatNumber: "IE9513674T",
+              country: "IE",
+              name: "IE company",
               phone: "0101010101",
               contact: "The famous bot",
               address: "A beautiful place..."
@@ -480,8 +480,10 @@ describe("mutation.markAsProcessed", () => {
     const resultingForm = await prisma.form.findUnique({
       where: { id: form.id }
     });
+
     expect(resultingForm.status).toBe("FOLLOWED_WITH_PNTTD");
-    expect(resultingForm.nextDestinationCompanyCountry).toBe("DE");
+    expect(resultingForm.nextDestinationCompanyVatNumber).toEqual("IE9513674T");
+    expect(resultingForm.nextDestinationCompanyCountry).toBe("IE");
   });
 
   it("should disallow a missing siret for a french next destination", async () => {

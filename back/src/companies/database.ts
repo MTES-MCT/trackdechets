@@ -9,7 +9,8 @@ import {
   TraderReceiptNotFound,
   BrokerReceiptNotFound,
   TransporterReceiptNotFound,
-  VhuAgrementNotFound
+  VhuAgrementNotFound,
+  WorkerCertificationNotFound
 } from "./errors";
 import { CompanyMember } from "../generated/graphql/types";
 import { UserInputError } from "apollo-server-express";
@@ -230,6 +231,18 @@ export async function getVhuAgrementOrNotFound({
   const agrement = await prisma.vhuAgrement.findUnique({ where: { id } });
   if (agrement == null) {
     throw new VhuAgrementNotFound();
+  }
+  return agrement;
+}
+
+export async function getWorkerCertificationOrNotFound({
+  id
+}: Prisma.WorkerCertificationWhereUniqueInput) {
+  const agrement = await prisma.workerCertification.findUnique({
+    where: { id }
+  });
+  if (agrement == null) {
+    throw new WorkerCertificationNotFound();
   }
   return agrement;
 }

@@ -87,9 +87,11 @@ export default function DasriPackagings({
                               });
                             }}
                           >
-                            {(Object.entries(PACKAGINGS_NAMES) as Array<
-                              [keyof typeof PACKAGINGS_NAMES, string]
-                            >).map(([optionValue, optionLabel]) => (
+                            {(
+                              Object.entries(PACKAGINGS_NAMES) as Array<
+                                [keyof typeof PACKAGINGS_NAMES, string]
+                              >
+                            ).map(([optionValue, optionLabel]) => (
                               <option
                                 key={optionValue}
                                 value={optionValue}

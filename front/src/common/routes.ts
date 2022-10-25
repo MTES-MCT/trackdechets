@@ -3,6 +3,7 @@ const routes = {
     index: "/admin",
     verification: "/admin/verification",
     anonymousCompany: "/admin/anonymous-company",
+    reindex: "/admin/reindex",
   },
   login: "/login",
   invite: "/invite",
@@ -20,7 +21,6 @@ const routes = {
   dashboard: {
     index: "/dashboard/:siret",
     exports: "/dashboard/:siret/exports",
-    stats: "/dashboard/:siret/stats",
     roadControl: "/dashboard/:siret/road-control/:id",
     bsds: {
       index: "/dashboard/:siret/bsds",
@@ -80,8 +80,14 @@ const routes = {
     index: "/account",
     info: "/account/info",
     companies: {
-      create: "/account/companies/new",
+      create: {
+        simple: "/account/companies/new",
+        pro: "/account/companies/professional",
+        foreign: "/account/companies/foreign",
+      },
+      join: "/account/companies/join",
       list: "/account/companies",
+      orientation: "/account/companies/create",
     },
     authorizedApplications: "/account/applications",
     tokens: { list: "/account/tokens/list" },

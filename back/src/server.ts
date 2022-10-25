@@ -10,7 +10,6 @@ import redisStore from "connect-redis";
 import cors from "cors";
 import express, { json, static as serveStatic, urlencoded } from "express";
 import session from "express-session";
-import forwarded from "forwarded";
 import depthLimit from "graphql-depth-limit";
 import helmet from "helmet";
 import passport from "passport";
@@ -31,6 +30,7 @@ import sentryReporter from "./common/plugins/sentryReporter";
 import { redisClient } from "./common/redis";
 import { initSentry } from "./common/sentry";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
+import { createFormDataLoaders } from "./forms/dataloader";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
@@ -48,7 +48,8 @@ const {
   SESSION_NAME,
   UI_HOST,
   MAX_REQUESTS_PER_WINDOW = "1000",
-  NODE_ENV
+  NODE_ENV,
+  TRUST_PROXY_HOPS
 } = process.env;
 
 const Sentry = initSentry();
@@ -72,7 +73,11 @@ export const server = new ApolloServer({
       ...ctx,
       // req.user is made available by passport
       user: ctx.req?.user ?? null,
-      dataloaders: { ...createUserDataLoaders(), ...createCompanyDataLoaders() }
+      dataloaders: {
+        ...createUserDataLoaders(),
+        ...createCompanyDataLoaders(),
+        ...createFormDataLoaders()
+      }
     };
   },
   formatError: err => {
@@ -207,8 +212,14 @@ export const sess: session.SessionOptions = {
   }
 };
 
+// The app is always served under one or more reverse proxy:
+// - nginx during local development
+// - Scalingo proxy for live envs
+// - with Baleen, there is a second reverse proxy layer. Hence, the user's ip is 1 hop further
+// For more details, see https://expressjs.com/en/guide/behind-proxies.html.
+app.set("trust proxy", TRUST_PROXY_HOPS ? parseInt(TRUST_PROXY_HOPS, 10) : 1);
+
 if (SESSION_COOKIE_SECURE === "true") {
-  app.set("trust proxy", 1); // trust first proxy
   sess.cookie.secure = true; // serve secure cookies
 }
 
@@ -225,13 +236,7 @@ app.use(oauth2Router);
 app.get("/ping", (_, res) => res.send("Pong!"));
 
 app.get("/ip", (req, res) => {
-  const parsed = forwarded(req);
-
-  return res.send(
-    `IP: ${req.ip} | XFF: ${req.get("X-Forwarded-For")} | parsed: ${parsed
-      .slice(-1)
-      .pop()}`
-  );
+  return res.send(`IP: ${req.ip} | XFF: ${req.get("X-Forwarded-For")}`);
 });
 
 app.get("/userActivation", userActivationHandler);

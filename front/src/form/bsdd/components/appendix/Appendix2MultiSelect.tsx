@@ -90,9 +90,10 @@ export default function Appendix2MultiSelect() {
     });
   }, [data, meta.initialValue, wasteCodeFilter, values.emitter]);
 
-  const appendix2Selected = useMemo(() => values.grouping ?? [], [
-    values.grouping,
-  ]);
+  const appendix2Selected = useMemo(
+    () => values.grouping ?? [],
+    [values.grouping]
+  );
 
   useEffect(() => {
     const quantites = appendix2Selected.reduce((qs, { form, quantity }) => {
@@ -170,7 +171,7 @@ export default function Appendix2MultiSelect() {
   }
 
   if (loading) {
-    return <div>Chargement</div>;
+    return <div>Chargement...</div>;
   }
 
   return (

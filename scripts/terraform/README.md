@@ -38,11 +38,8 @@ $ scalingo -a trackdechets-test_app-api run --file /path/to/db_backup.pgsql bash
 # Run migrations
 > npm run migrate
 
-# Delete ES index
-> curl -X DELETE $ELASTIC_SEARCH_URL/bsds_0.X.X
-
-# Re-index documents
-> npm run index-elastic-search
+# Re-index all bsds in ES
+> npm run reindex-all-bsds-bulk
 ```
 
 Or push the schema with Prisma (migrations won't work) :
@@ -57,9 +54,8 @@ $ scalingo -a trackdechets-test_app-api run bash
 > cp seed.model.js seed.dev
 > node seed.js
 
-# Delete & reindex ES
-> curl -X DELETE $ELASTIC_SEARCH_URL/bsds_0.X.X
-> npm run index-elastic-search
+# Re-index bsds in ES
+> npm run reindex-all-bsds-bulk
 ```
 
 You should be good to go !
