@@ -288,8 +288,8 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
         otherwise: yup
           .mixed()
           .oneOf(
-            ["OTHER"],
-            `Émetteur: Le type d'émetteur doit être "OTHER" lorsqu'un éco-organisme est responsable du déchet`
+            ["OTHER", "APPENDIX1", "APPENDIX2"],
+            `Émetteur: Le type d'émetteur doit être "OTHER", "APPENDIX1" ou "APPENDIX2" lorsqu'un éco-organisme est responsable du déchet`
           )
       })
       .when("emitterIsPrivateIndividual", {

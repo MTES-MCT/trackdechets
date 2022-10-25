@@ -426,7 +426,7 @@ input WorkSiteInput {
 
 "Payload lié à un l'émetteur du BSD (case 1)"
 input EmitterInput {
-  "Type d'émetteur. Le type d'émetteur doit être `OTHER` lorsqu'un éco-organisme est responsable du déchet"
+  "Type d'émetteur. Le type d'émetteur doit être `OTHER`, `APPENDIX1` ou `APPENDIX2` lorsqu'un éco-organisme est responsable du déchet"
   type: EmitterType
 
   "Adresse du chantier"
