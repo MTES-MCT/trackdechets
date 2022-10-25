@@ -126,6 +126,12 @@ type IncomingWaste {
   # Champs additionnels non mentionnés dans l'arrêté registre
   ###########################################################
 
+  "Extra - Date de création du bordereeau"
+  createdAt: DateTime
+
+  "Extra - Date de dernière modification du bordereau"
+  updatedAt: DateTime
+
   "Extra - Type de bordereau"
   bsdType: BsdType
 
@@ -330,6 +336,12 @@ type OutgoingWaste {
   ###########################################################
   # Champs additionnels non mentionnés dans l'arrêté registre
   ###########################################################
+
+  "Extra - Date de création du bordereeau"
+  createdAt: DateTime
+
+  "Extra - Date de dernière modification du bordereau"
+  updatedAt: DateTime
 
   "Extra - Type de bordereau"
   bsdType: BsdType
@@ -538,6 +550,12 @@ type TransportedWaste {
   # Champs additionnels non mentionnés dans l'arrêté registre
   ###########################################################
 
+  "Extra - Date de création du bordereeau"
+  createdAt: DateTime
+
+  "Extra - Date de dernière modification du bordereau"
+  updatedAt: DateTime
+
   "Extra - Type de bordereau"
   bsdType: BsdType
 
@@ -719,6 +737,12 @@ type ManagedWaste {
   # Champs additionnels non mentionnés dans l'arrêté registre
   ###########################################################
 
+  "Extra - Date de création du bordereeau"
+  createdAt: DateTime
+
+  "Extra - Date de dernière modification du bordereau"
+  updatedAt: DateTime
+
   "Extra - Type de bordereau"
   bsdType: BsdType
 
@@ -801,9 +825,6 @@ type AllWaste {
   https://www.legifrance.gouv.fr/affichCode.do?cidTexte=LEGITEXT000006072665&dateTexte=&categorieLien=cid
   """
   id: ID
-
-  "Date de création du bordereau"
-  createdAt: DateTime
 
   ################################################
   # Concernant les dates de transit du déchet :
@@ -953,6 +974,12 @@ type AllWaste {
   ###########################################################
   # Champs additionnels non mentionnés dans l'arrêté registre
   ###########################################################
+
+  "Extra - Date de création du bordereeau"
+  createdAt: DateTime
+
+  "Extra - Date de dernière modification du bordereau"
+  updatedAt: DateTime
 
   "Extra - Type de bordereau"
   bsdType: BsdType

@@ -47,6 +47,8 @@ function toGenericWaste(bsvhu: Bsvhu): GenericWaste {
     wasteCode: bsvhu.wasteCode,
     pop: false,
     id: bsvhu.id,
+    createdAt: bsvhu.createdAt,
+    updatedAt: bsvhu.createdAt,
     ecoOrganismeName: null,
     ecoOrganismeSiren: null,
     bsdType: "BSVHU",

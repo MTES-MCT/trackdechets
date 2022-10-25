@@ -49,6 +49,8 @@ function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
     wasteCode: bsdasri.wasteCode,
     pop: false,
     id: bsdasri.id,
+    createdAt: bsdasri.createdAt,
+    updatedAt: bsdasri.updatedAt,
     ecoOrganismeName: bsdasri.ecoOrganismeName,
     ecoOrganismeSiren: bsdasri.ecoOrganismeSiret?.slice(0, 9),
     bsdType: "BSDASRI",

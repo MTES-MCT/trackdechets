@@ -1,4 +1,6 @@
 input WasteRegistryWhere {
+  "Filtre sur l'identifiant du bordereau"
+  id: IdFilter
   "Filtre sur la date de création du bordereau associé"
   createdAt: DateFilter
   "Filtre sur le type de bordereaux"
