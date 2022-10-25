@@ -25,6 +25,9 @@ enum BsdasriStatus {
 
   "Déchet refusé"
   REFUSED
+
+  "En attente de groupement"
+  AWAITING_GROUP
 }
 
 "Type de packaging du déchet"

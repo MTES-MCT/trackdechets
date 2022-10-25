@@ -3,7 +3,6 @@ import { getBsdasriOrNotFound } from "../../database";
 import { expandBsdasriFromDB } from "../../converter";
 import { UserInputError, ForbiddenError } from "apollo-server-express";
 import { InvalidTransition } from "../../../forms/errors";
-import prisma from "../../../../src/prisma";
 import dasriTransition from "../../workflow/dasriTransition";
 import {
   BsdasriType,
@@ -22,18 +21,8 @@ import {
   checkIsSignedByEcoOrganisme,
   getFieldsUpdate
 } from "./signatureUtils";
-import { indexBsdasri } from "../../elastic";
 import { runInTransaction } from "../../../common/repository/helper";
 
-const reindexAssociatedDasris = async dasriId => {
-  const updatedDasris = await prisma.bsdasri.findMany({
-    where: { synthesizedInId: dasriId }
-    // no need to query grouping and synthesizing dasris for ES here
-  });
-  for (const updatedDasri of updatedDasris) {
-    await indexBsdasri(updatedDasri);
-  }
-};
 /**
  * When synthesized dasri is received or processed, associated dasris are updated
  *
@@ -69,7 +58,6 @@ const cascadeOnSynthesized = async ({ dasri, bsdasriRepository }) => {
         destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED
       }
     );
-    await reindexAssociatedDasris(dasri.id);
   }
 
   if (dasri.status === BsdasriStatus.PROCESSED) {
@@ -92,7 +80,6 @@ const cascadeOnSynthesized = async ({ dasri, bsdasriRepository }) => {
         destinationOperationSignatureAuthor
       }
     );
-    await reindexAssociatedDasris(dasri.id);
   }
 };
 
@@ -225,6 +212,21 @@ const sign = async ({
     if (signedDasri.type === BsdasriType.SYNTHESIS) {
       await cascadeOnSynthesized({ dasri: signedDasri, bsdasriRepository });
     }
+    if (signedDasri.type === BsdasriType.GROUPING) {
+      if (signedDasri.status === BsdasriStatus.PROCESSED) {
+        await bsdasriRepository.updateMany(
+          { groupedInId: signedDasri.id },
+          { status: BsdasriStatus.PROCESSED }
+        );
+      }
+      if (signedDasri.status === BsdasriStatus.REFUSED) {
+        await bsdasriRepository.updateMany(
+          { groupedInId: signedDasri.id },
+          { groupedInId: null }
+        );
+      }
+    }
+
     return signedDasri;
   });
 

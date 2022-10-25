@@ -651,7 +651,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             </p>
             <p>
               Je soussigné, certifie que les renseignements portés dans les
-              cades ci-dessus sont exacts et de bonne foi.
+              cadres ci-dessus sont exacts et de bonne foi.
             </p>
             <p>
               <span className="Row">
@@ -754,7 +754,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 <p>
                   <strong>
                     A REMPLIR EN CAS D’ENTREPOSAGE PROVISOIRE OU DE
-                    RECONDITIONNEMENT (cadres 14 à 19)
+                    RECONDITIONNEMENT (cadres 13 à 19)
                   </strong>
                 </p>
               </div>
@@ -877,7 +877,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 </p>
                 <p>
                   Je soussigné, certifie que les renseignements portés dans les
-                  cades ci-dessus sont exacts et de bonne foi.
+                  cadres ci-dessus sont exacts et de bonne foi.
                 </p>
                 <p>
                   <span className="Row">

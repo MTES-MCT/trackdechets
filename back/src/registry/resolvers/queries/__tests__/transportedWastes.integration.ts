@@ -9,7 +9,8 @@ import {
   Company,
   Status,
   User,
-  UserRole
+  UserRole,
+  BsdasriStatus
 } from "@prisma/client";
 import {
   refreshElasticSearch,
@@ -18,7 +19,7 @@ import {
 import { indexBsda } from "../../../../bsda/elastic";
 import { bsdaFactory } from "../../../../bsda/__tests__/factories";
 import { indexBsdasri } from "../../../../bsdasris/elastic";
-import { BsdasriState } from "../../../../bsdasris/workflow/types";
+
 import { bsdasriFactory } from "../../../../bsdasris/__tests__/factories";
 import { indexBsff } from "../../../../bsffs/elastic";
 import { createBsffAfterOperation } from "../../../../bsffs/__tests__/factories";
@@ -107,7 +108,7 @@ describe("Transported wastes registry", () => {
         transporterCompanySiret: transporter.company.siret,
         destinationCompanySiret: destination.company.siret,
         wasteCode: "18 01 03*",
-        status: BsdasriState.Processed,
+        status: BsdasriStatus.PROCESSED,
         createdAt: new Date("2021-06-01"),
         destinationReceptionWasteWeightValue: 10,
         emitterEmissionSignatureDate: new Date("2021-06-01"),
