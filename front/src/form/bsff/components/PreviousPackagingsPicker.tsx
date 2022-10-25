@@ -96,7 +96,8 @@ export function PreviousPackagingsPicker({
           code: { _in: code_in },
         },
         bsff: {
-          ...(previousPackagings?.length > 0
+          ...(bsff.type === BsffType.Reexpedition &&
+          previousPackagings?.length > 0
             ? { id: { _eq: previousPackagings[0].bsffId } }
             : {}),
           destination: {
@@ -232,16 +233,21 @@ function BsffPackagingTable({
     []
   );
 
-  const { getTableProps, headerGroups, getTableBodyProps, rows, prepareRow } =
-    useTable(
-      {
-        columns,
-        data,
-        filterTypes,
-        defaultColumn,
-      },
-      useFilters
-    );
+  const {
+    getTableProps,
+    headerGroups,
+    getTableBodyProps,
+    rows,
+    prepareRow,
+  } = useTable(
+    {
+      columns,
+      data,
+      filterTypes,
+      defaultColumn,
+    },
+    useFilters
+  );
 
   return (
     <Table {...getTableProps()}>
