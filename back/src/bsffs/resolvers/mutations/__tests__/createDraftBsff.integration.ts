@@ -258,7 +258,7 @@ describe("Mutation.createDraftBsff", () => {
       expect(previousPackagings[0].id).toEqual(forwarded.packagings[0].id);
     });
 
-    it.skip("should ne be possible to add packagings from several BSFFs in case of réexpédition", async () => {
+    it("should ne be possible to add packagings from several BSFFs in case of réexpédition", async () => {
       const bsff1 = await createBsffAfterOperation(
         { emitter, transporter, destination },
         {
