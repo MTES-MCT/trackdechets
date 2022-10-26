@@ -7,6 +7,7 @@ import {
   BsffWeightInput,
   BsffType,
 } from "generated/graphql/types";
+import Tooltip from "common/components/Tooltip";
 
 const options = [
   {
@@ -17,6 +18,8 @@ const options = [
   {
     value: BsffType.TracerFluide,
     label: "Un autre détenteur de déchets",
+    tooltip:
+      "Exemple : Centre VHU (fluides retirés des VHU), installation qui trace un contenant après rupture de traçabilité",
   },
   {
     value: BsffType.Groupement,
@@ -208,6 +211,7 @@ export function BsffTypeSelector() {
                 }}
               />{" "}
               {option.label}
+              {option.tooltip && <Tooltip msg={option.tooltip} />}
             </label>
           </React.Fragment>
         ))}
