@@ -247,47 +247,6 @@ describe("Mutation.markAsSealed", () => {
     expect(form.status).toEqual("SEALED");
   });
 
-  it("should fail if bsd has an eco-organisme and the wrong emitterType", async () => {
-    const emitterCompany = await companyFactory();
-    const recipientCompany = await destinationFactory();
-    const { user, company: eo } = await userWithCompanyFactory("MEMBER");
-    await prisma.ecoOrganisme.create({
-      data: {
-        name: eo.name,
-        siret: eo.siret,
-        address: "An address"
-      }
-    });
-
-    const form = await formFactory({
-      ownerId: user.id,
-      opt: {
-        status: "DRAFT",
-        emitterType: "PRODUCER",
-        emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: recipientCompany.siret,
-        ecoOrganismeSiret: eo.siret,
-        ecoOrganismeName: eo.name
-      }
-    });
-
-    const { mutate } = makeClient(user);
-    const { errors } = await mutate(MARK_AS_SEALED, {
-      variables: {
-        id: form.id
-      }
-    });
-
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: [
-          "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
-          `Erreur(s): Émetteur: Le type d'émetteur doit être "OTHER", "APPENDIX1" ou "APPENDIX2" lorsqu'un éco-organisme est responsable du déchet`
-        ].join("\n")
-      })
-    ]);
-  });
-
   it("should fail if user is not authorized", async () => {
     const owner = await userFactory();
     const { user } = await userWithCompanyFactory("MEMBER");

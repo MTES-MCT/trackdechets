@@ -20,26 +20,13 @@ export default function Emitter({ disabled }) {
   const hasInitialGrouping = !!initialValues?.grouping?.length; // siret is non editable once bsd contains grouped bsds
   const siretNonEditable = hasInitialGrouping && !!values?.id;
 
-  const [emitterTypeProducerDisabled, setEmitterTypeProducerDisabled] =
-    useState(values.ecoOrganisme?.siret != null);
-
   const [lockEmitterProducer, setLockEmitterProducer] = useState(
     values.emitter?.isForeignShip || values.emitter?.isPrivateIndividual
   );
 
   useEffect(() => {
-    if (values.ecoOrganisme?.siret) {
-      setEmitterTypeProducerDisabled(true);
-      setFieldValue("emitter.type", "OTHER");
-      return;
-    }
-    setEmitterTypeProducerDisabled(false);
-  }, [values.ecoOrganisme, setFieldValue]);
-
-  useEffect(() => {
     if (values.emitter?.isForeignShip || values.emitter?.isPrivateIndividual) {
       setLockEmitterProducer(true);
-      setEmitterTypeProducerDisabled(false);
       setFieldValue("emitter.type", "PRODUCER");
       return;
     }
@@ -83,13 +70,6 @@ export default function Emitter({ disabled }) {
 
       <EcoOrganismes name="ecoOrganisme" />
 
-      {emitterTypeProducerDisabled && (
-        <div className="form__row notification info">
-          Lorsqu'un éco-organisme est indiqué comme responsable du déchet, le
-          type d'émetteur ne peut être "Producteur".
-        </div>
-      )}
-
       {lockEmitterProducer && (
         <div className="form__row notification notification--warning">
           Lorsqu'un particulier ou un navire étranger est émetteur du déchet, le
@@ -107,7 +87,7 @@ export default function Emitter({ disabled }) {
             label={emitterTypeLabels["PRODUCER"]}
             component={RadioButton}
             onChange={onChangeEmitterType}
-            disabled={emitterTypeProducerDisabled || lockEmitterProducer}
+            disabled={lockEmitterProducer}
           />
           <Field
             name="emitter.type"
