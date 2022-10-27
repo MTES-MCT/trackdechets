@@ -66,7 +66,7 @@ export default function AccountFieldCompanyWorkerCertification({
       </tbody>
     </table>
   ) : (
-    "Aucune certification"
+    "Non renseignée"
   );
 
   return (
