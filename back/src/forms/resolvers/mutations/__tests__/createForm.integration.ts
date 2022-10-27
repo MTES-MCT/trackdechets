@@ -1064,21 +1064,8 @@ describe("Mutation.createForm", () => {
             create: {
               readableId: getReadableId(),
               ownerId: user.id,
-              quantityReceived: 2
-            }
-          }
-        }
-      });
-      await formFactory({
-        ownerId: user.id,
-        opt: {
-          status: "DRAFT",
-          recipientCompanyName: ttr.name,
-          recipientCompanySiret: ttr.siret,
-          grouping: {
-            create: {
-              initialFormId: appendix2.id,
-              quantity: 2
+              quantityReceived: 2,
+              recipientCompanySiret: ttr.siret
             }
           }
         }
@@ -1091,14 +1078,17 @@ describe("Mutation.createForm", () => {
             siret: ttr.siret
           }
         },
-        appendix2Forms: [{ id: appendix2.id }]
+        grouping: [{ form: { id: appendix2.id }, quantity: 2 }]
       };
       const { mutate } = makeClient(user);
-      const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
-        variables: { createFormInput }
-      });
+      const { data } = await mutate<Pick<Mutation, "createForm">>(
+        CREATE_FORM,
+        {
+          variables: { createFormInput }
+        }
+      );
 
-      expect(data.createForm.readableId).toBeDefined();
+      expect(data.createForm.id).toBeTruthy();
     }
   );
 
