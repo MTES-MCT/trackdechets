@@ -64,7 +64,7 @@
     "@graphql-tools/load-files": "^6.5.1",
     "@graphql-tools/merge": "^8.2.0",
     "@graphql-tools/schema": "^8.3.0",
-    "@prisma/client": "^4.2.0",
+    "@prisma/client": "^4.4.0",
     "@sentry/integrations": "^6.19.7",
     "@sentry/node": "^6.19.6",
     "apollo-server-core": "^3.10.1",
