@@ -63,7 +63,7 @@ export default function Emitter({ disabled }) {
 
   function omiNumberValidator(omi: string) {
     if (!isOmi(omi)) {
-      return "Le numéro OMI (Organisation maritime international) de l'entreprise doit se composer des trois lettres OMI suivives de 7 chiffres (ex. OMI1234567)";
+      return "Le numéro OMI (Organisation maritime international) de l'entreprise doit se composer des trois lettres OMI suivies de 7 chiffres (ex. OMI1234567)";
     }
     return undefined;
   }
