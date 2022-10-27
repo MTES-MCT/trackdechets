@@ -18,6 +18,7 @@ import {
   ParcelNumber
 } from "../../../../generated/graphql/types";
 import { EmitterType, Status, UserRole } from "@prisma/client";
+import getReadableId from "../../../readableId";
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
@@ -1044,6 +1045,60 @@ describe("Mutation.createForm", () => {
           })
         })
       ]);
+    }
+  );
+
+  it(
+    "should allow creating a form with an appendix 2 when the appendix2 quantity" +
+      "is equal to the forwarded received quantity and higher thant the initial form received quantity",
+    async () => {
+      const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
+
+      const appendix2 = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "AWAITING_GROUP",
+          recipientCompanySiret: ttr.siret,
+          quantityReceived: 1,
+          forwardedIn: {
+            create: {
+              readableId: getReadableId(),
+              ownerId: user.id,
+              quantityReceived: 2
+            }
+          }
+        }
+      });
+      await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "DRAFT",
+          recipientCompanyName: ttr.name,
+          recipientCompanySiret: ttr.siret,
+          grouping: {
+            create: {
+              initialFormId: appendix2.id,
+              quantity: 2
+            }
+          }
+        }
+      });
+
+      const createFormInput = {
+        emitter: {
+          type: EmitterType.APPENDIX2,
+          company: {
+            siret: ttr.siret
+          }
+        },
+        appendix2Forms: [{ id: appendix2.id }]
+      };
+      const { mutate } = makeClient(user);
+      const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+        variables: { createFormInput }
+      });
+
+      expect(data.createForm.readableId).toBeDefined();
     }
   );
 
