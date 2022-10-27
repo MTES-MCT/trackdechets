@@ -110,7 +110,7 @@ export const MISSING_COMPANY_EMAIL = "L'email de l'entreprise est obligatoire";
 export const MISSING_COMPANY_OMI_NUMBER =
   "Le numéro OMI (Organisation maritime international) de l'entreprise est obligatoire";
 export const INVALID_COMPANY_OMI_NUMBER =
-  "Le numéro OMI (Organisation maritime international) de l'entreprise doit se composer des trois lettres OMI suivives de 7 chiffres (ex. OMI1234567)";
+  "Le numéro OMI (Organisation maritime international) de l'entreprise doit se composer des trois lettres OMI suivies de 7 chiffres (ex. OMI1234567)";
 export const INVALID_SIRET_LENGTH =
   "Le SIRET doit faire 14 caractères numériques";
 
