@@ -1081,12 +1081,9 @@ describe("Mutation.createForm", () => {
         grouping: [{ form: { id: appendix2.id }, quantity: 2 }]
       };
       const { mutate } = makeClient(user);
-      const { data } = await mutate<Pick<Mutation, "createForm">>(
-        CREATE_FORM,
-        {
-          variables: { createFormInput }
-        }
-      );
+      const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+        variables: { createFormInput }
+      });
 
       expect(data.createForm.id).toBeTruthy();
     }
