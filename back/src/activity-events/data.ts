@@ -1,7 +1,7 @@
 import { ActivityEvent } from ".";
 import prisma from "../prisma";
 import { Event, Prisma } from "@prisma/client";
-import { getStreamEvents } from "../common/events/mongodb";
+import { getStreamEvents } from "../events/mongodb";
 
 export async function getStream(
   streamId: string,
