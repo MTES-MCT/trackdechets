@@ -3,9 +3,7 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
-import { GraphQLContext } from "../../../types";
-import { indexForm } from "../../elastic";
-import buildFindFullFormById from "./findFullFormById";
+import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
 
 export type UpdateManyFormFn = (
   ids: string[],
@@ -32,12 +30,14 @@ const buildUpdateManyForms: (deps: RepositoryFnDeps) => UpdateManyFormFn =
       }))
     });
 
-    await Promise.all(
-      ids.map(async id => {
-        const form = await buildFindFullFormById(deps)(id);
-        indexForm(form, { user } as GraphQLContext);
-      })
-    );
+    const forms = await prisma.form.findMany({
+      where: { id: { in: ids } },
+      select: { readableId: true }
+    });
+
+    for (const { readableId } of forms) {
+      prisma.addAfterCommitCallback(() => enqueueBsdToIndex(readableId));
+    }
 
     return update;
   };

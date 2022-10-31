@@ -9,9 +9,7 @@ import {
   PrismaTransaction,
   RepositoryFnDeps
 } from "../../../common/repository/types";
-import { GraphQLContext } from "../../../types";
-import { indexForm } from "../../elastic";
-import buildFindFullFormById from "../form/findFullFormById";
+import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -68,8 +66,11 @@ const buildAcceptRevisionRequestApproval: (
     const updatedFormId = revisionRequest.bsddId;
 
     if (updatedFormId) {
-      const fullForm = await buildFindFullFormById(deps)(updatedFormId);
-      await indexForm(fullForm, { user } as GraphQLContext);
+      const { readableId } = await prisma.form.findUnique({
+        where: { id: updatedFormId },
+        select: { readableId: true }
+      });
+      prisma.addAfterCommitCallback(() => enqueueBsdToIndex(readableId));
     }
   };
 
