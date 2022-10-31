@@ -39,6 +39,7 @@ export function RouteTransportToCollect() {
       </Breadcrumb>
 
       <BSDList
+        key={siret}
         siret={siret}
         defaultWhere={defaultWhere}
         columns={TO_COLLECT_COLUMNS}
