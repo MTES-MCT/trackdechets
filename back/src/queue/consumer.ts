@@ -1,6 +1,6 @@
 import { sendMailJob } from "./jobs";
 import { mailQueue } from "./producers/mail";
-import { syncEventsQueue } from "./producers/elastic";
+import { syncEventsQueue } from "./producers/events";
 import {
   geocodeCompanyQueue,
   setCompanyDepartementQueue

@@ -35,24 +35,12 @@ export const updatesQueue = new Queue<BsdUpdateQueueItem>(
   }
 );
 
-// Events sync queue. Items are enqueued once indexation is done
-export const syncEventsQueue = new Queue<void>(
-  `queue_sync_events_${NODE_ENV}`,
-  REDIS_URL,
-  {
-    defaultJobOptions: {
-      removeOnComplete: 100
-    }
-  }
-);
-
 indexQueue.on("completed", job => {
   const id = job.data;
   const { sirets } = job.returnvalue;
   if ([DELETE_JOB_NAME, INDEX_JOB_NAME].includes(job.name)) {
     updatesQueue.add({ sirets, id });
   }
-  syncEventsQueue.add();
 });
 
 indexQueue.on("failed", (job, err) => {
@@ -80,6 +68,5 @@ export function closeIndexAndUpdatesQueue() {
   return Promise.all([
     indexQueue.close(),
     updatesQueue.close(),
-    syncEventsQueue.close()
   ]);
 }
