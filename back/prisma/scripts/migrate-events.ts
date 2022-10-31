@@ -1,5 +1,5 @@
 import { Event } from "@prisma/client";
-import { insertStreamEvents } from "../../src/common/events/mongodb";
+import { insertStreamEvents } from "../../src/events/mongodb";
 import prisma from "../../src/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
 
