@@ -28,6 +28,7 @@ export function RouteBsdsFollow() {
       </Breadcrumb>
 
       <BSDList
+        key={siret}
         siret={siret}
         defaultWhere={defaultWhere}
         blankslate={
