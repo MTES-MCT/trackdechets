@@ -35,26 +35,21 @@ describe("<AccountField />", () => {
   });
 
   it("should render form when the modifier is clicked", () => {
-    const {
-      container,
-      getByText,
-      getByRole,
-      queryByText,
-      queryByRole,
-    } = render(
-      <AccountField
-        name="username"
-        label="Nom utilisateur"
-        value="John Snow"
-        renderForm={toggleEdition => (
-          <form name="a form" onSubmit={() => toggleEdition()}>
-            <button type="submit" data-test-id="submit-button" />
-          </form>
-        )}
-        tooltip="Le nom de l'utilisateur"
-        modifier="Modifier"
-      />
-    );
+    const { container, getByText, getByRole, queryByText, queryByRole } =
+      render(
+        <AccountField
+          name="username"
+          label="Nom utilisateur"
+          value="John Snow"
+          renderForm={toggleEdition => (
+            <form name="a form" onSubmit={() => toggleEdition()}>
+              <button type="submit" data-test-id="submit-button" />
+            </form>
+          )}
+          tooltip="Le nom de l'utilisateur"
+          modifier="Modifier"
+        />
+      );
 
     const modifier = getByText("Modifier");
 

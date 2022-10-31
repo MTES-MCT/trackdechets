@@ -38,19 +38,19 @@ export default function PasswordReset() {
   const hash = decodeHash(qsHash);
 
   // CHECK RESET LINK QUERY
-  const { loading, error: queryError, data: queryData } = useQuery<
-    Pick<Query, "passwordResetRequest">
-  >(PASSWORD_RESET_REQUEST, {
+  const {
+    loading,
+    error: queryError,
+    data: queryData,
+  } = useQuery<Pick<Query, "passwordResetRequest">>(PASSWORD_RESET_REQUEST, {
     variables: { hash },
   });
 
   // UPDATE PASSWORD MUTATION
-  const [
-    resetPassword,
-    { error: mutationError, data: mutationData },
-  ] = useMutation<Pick<Mutation, "resetPassword">, MutationResetPasswordArgs>(
-    RESET_PASSWORD
-  );
+  const [resetPassword, { error: mutationError, data: mutationData }] =
+    useMutation<Pick<Mutation, "resetPassword">, MutationResetPasswordArgs>(
+      RESET_PASSWORD
+    );
 
   if (loading) {
     return <Loader />;

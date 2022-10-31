@@ -18,6 +18,7 @@ import {
   ParcelNumber
 } from "../../../../generated/graphql/types";
 import { EmitterType, Status, UserRole } from "@prisma/client";
+import getReadableId from "../../../readableId";
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
@@ -947,12 +948,6 @@ describe("Mutation.createForm", () => {
     expect(groupementForm2.grouping).toEqual([
       { form: { id: initialForm.id }, quantity: 0.5 }
     ]);
-
-    const updatedInitialForm = await prisma.form.findUnique({
-      where: { id: initialForm.id }
-    });
-
-    expect(updatedInitialForm.quantityGrouped).toEqual(1);
   });
 
   it("should fail when adding the same form twice to the same groupement form", async () => {
@@ -1050,6 +1045,47 @@ describe("Mutation.createForm", () => {
           })
         })
       ]);
+    }
+  );
+
+  it(
+    "should allow creating a form with an appendix 2 when the appendix2 quantity" +
+      "is equal to the forwarded received quantity and higher thant the initial form received quantity",
+    async () => {
+      const { user, company: ttr } = await userWithCompanyFactory("ADMIN");
+
+      const appendix2 = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "AWAITING_GROUP",
+          recipientCompanySiret: ttr.siret,
+          quantityReceived: 1,
+          forwardedIn: {
+            create: {
+              readableId: getReadableId(),
+              ownerId: user.id,
+              quantityReceived: 2,
+              recipientCompanySiret: ttr.siret
+            }
+          }
+        }
+      });
+
+      const createFormInput = {
+        emitter: {
+          type: EmitterType.APPENDIX2,
+          company: {
+            siret: ttr.siret
+          }
+        },
+        grouping: [{ form: { id: appendix2.id }, quantity: 2 }]
+      };
+      const { mutate } = makeClient(user);
+      const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+        variables: { createFormInput }
+      });
+
+      expect(data.createForm.id).toBeTruthy();
     }
   );
 
@@ -1350,8 +1386,7 @@ describe("Mutation.createForm", () => {
       opt: {
         status: Status.AWAITING_GROUP,
         recipientCompanySiret: ttr.siret,
-        quantityReceived: 1,
-        quantityGrouped: 0.2
+        quantityReceived: 1
       }
     });
 
@@ -1390,14 +1425,30 @@ describe("Mutation.createForm", () => {
         form: expect.objectContaining({ id: appendix2.id })
       })
     ]);
+  });
 
-    const updatedAppendix2 = await prisma.form.findUnique({
-      where: { id: appendix2.id }
+  it("should not be possible to add more than 250 BSDDs on appendix2", async () => {
+    const { user, company: ttr } = await userWithCompanyFactory("MEMBER");
+    const createFormInput: CreateFormInput = {
+      emitter: {
+        type: "APPENDIX2",
+        company: {
+          siret: ttr.siret
+        }
+      },
+      grouping: Array.from(Array(300).keys()).map(n => ({
+        form: { id: `id_${n}` }
+      }))
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
     });
-
-    expect(updatedAppendix2.quantityGrouped).toEqual(
-      updatedAppendix2.quantityReceived
-    );
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Vous ne pouvez pas regrouper plus de 250 BSDDs initiaux`
+      })
+    ]);
   });
 
   it("should set isDangerous to `true` when specifying a waste code ending with *", async () => {

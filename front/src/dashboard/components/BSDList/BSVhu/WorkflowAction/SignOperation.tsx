@@ -25,10 +25,10 @@ const validationSchema = yup.object({
 
 type Props = { siret: string; bsvhuId: string };
 export function SignOperation({ siret, bsvhuId }: Props) {
-  const [updateBsvhu] = useMutation<
-    Pick<Mutation, "updateBsvhu">,
-    MutationUpdateBsvhuArgs
-  >(UPDATE_VHU_FORM);
+  const [updateBsvhu] =
+    useMutation<Pick<Mutation, "updateBsvhu">, MutationUpdateBsvhuArgs>(
+      UPDATE_VHU_FORM
+    );
   const [signBsvhu, { loading, error }] = useMutation<
     Pick<Mutation, "signBsvhu">,
     MutationSignBsvhuArgs

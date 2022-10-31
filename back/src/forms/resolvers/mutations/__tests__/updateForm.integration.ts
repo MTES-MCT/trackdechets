@@ -1667,8 +1667,7 @@ describe("Mutation.updateForm", () => {
       opt: {
         status: "AWAITING_GROUP",
         recipientCompanySiret: ttr.siret,
-        quantityReceived: 1,
-        quantityGrouped: 0.2
+        quantityReceived: 1
       }
     });
 
@@ -1708,14 +1707,6 @@ describe("Mutation.updateForm", () => {
     expect(data.updateForm.grouping).toEqual([
       expect.objectContaining({ form: { id: appendix2Form.id }, quantity: 0.8 })
     ]);
-
-    const updatedAppendix2Form = await prisma.form.findFirst({
-      where: { id: appendix2Form.id }
-    });
-
-    expect(updatedAppendix2Form.quantityGrouped).toEqual(
-      updatedAppendix2Form.quantityReceived
-    );
   });
 
   it("should not be possible to set isDangerous=false with a waste code containing an *", async () => {

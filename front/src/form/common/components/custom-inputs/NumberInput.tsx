@@ -1,9 +1,9 @@
 import React, { InputHTMLAttributes } from "react";
 import { FieldProps, useField } from "formik";
 
-type NumberInputProps = FieldProps & { label: string } & InputHTMLAttributes<
-    HTMLInputElement
-  >;
+type NumberInputProps = FieldProps & {
+  label: string;
+} & InputHTMLAttributes<HTMLInputElement>;
 
 export default function NumberInput({ label, ...props }: NumberInputProps) {
   const [field, , { setValue }] = useField(props.field);

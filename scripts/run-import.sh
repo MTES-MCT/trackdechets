@@ -24,7 +24,7 @@ echo -e "\e[1m→ Spawning XSLX2CSV CLI...\e[m"
 echo -e "\e[1m→ Please use the 'Export csv' action\e[m"
 echo -e "\e[94m-------------------------------------------------------\e[m"
 cd "$TD_XSLX2CSV_PATH" || exit
-poetry run python xlsx2csv.py "$xlsPath"
+pipenv run python xlsx2csv.py "$xlsPath"
 echo -e "\e[94m-------------------------------------------------------\e[m"
 
 cd "$CURRENT_DIR" || exit

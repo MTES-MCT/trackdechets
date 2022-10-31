@@ -20,8 +20,8 @@ import {
   UPDATE_VHU_FORM,
   GET_VHU_FORM,
 } from "./utils/queries";
-const GenericStepList = lazy(() =>
-  import("form/common/stepper/GenericStepList")
+const GenericStepList = lazy(
+  () => import("form/common/stepper/GenericStepList")
 );
 interface Props {
   children: (vhuForm: Bsvhu | undefined) => ReactElement;
@@ -48,15 +48,15 @@ export default function BsvhuStepsList(props: Props) {
     [formQuery.data]
   );
 
-  const [createVhuForm] = useMutation<
-    Pick<Mutation, "createBsvhu">,
-    MutationCreateBsvhuArgs
-  >(CREATE_VHU_FORM);
+  const [createVhuForm] =
+    useMutation<Pick<Mutation, "createBsvhu">, MutationCreateBsvhuArgs>(
+      CREATE_VHU_FORM
+    );
 
-  const [updateVhuForm] = useMutation<
-    Pick<Mutation, "updateBsvhu">,
-    MutationUpdateBsvhuArgs
-  >(UPDATE_VHU_FORM);
+  const [updateVhuForm] =
+    useMutation<Pick<Mutation, "updateBsvhu">, MutationUpdateBsvhuArgs>(
+      UPDATE_VHU_FORM
+    );
 
   function saveForm(input: BsvhuInput): Promise<any> {
     return formState.id
@@ -82,9 +82,8 @@ export default function BsvhuStepsList(props: Props) {
   // As it's a render function, the steps are nested into a `<></>` block
   // So we render then unwrap to get the steps
   const parentOfSteps = props.children(formQuery.data?.bsvhu);
-  const steps = parentOfSteps.props.children as ReactElement<
-    IStepContainerProps
-  >[];
+  const steps = parentOfSteps.props
+    .children as ReactElement<IStepContainerProps>[];
 
   return (
     <GenericStepList

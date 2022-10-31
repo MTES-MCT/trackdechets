@@ -87,10 +87,11 @@ export default function AccountOauth2AppCreateUpdate({
   const [
     updateApplication,
     { loading: updateApplicationLoading, error: updateApplicationError },
-  ] = useMutation<
-    Pick<Mutation, "updateApplication">,
-    MutationUpdateApplicationArgs
-  >(UPDATE_APPLICATION);
+  ] =
+    useMutation<
+      Pick<Mutation, "updateApplication">,
+      MutationUpdateApplicationArgs
+    >(UPDATE_APPLICATION);
 
   const history = useHistory();
 

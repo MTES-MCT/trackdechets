@@ -1,5 +1,5 @@
 import React from "react";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form, Field, FormikValues } from "formik";
 import { useMutation } from "@apollo/client";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import styles from "./AccountForm.module.scss";
@@ -15,7 +15,9 @@ type Props = {
   toggleEdition: () => void;
 };
 
-export default function AccountFormCheckboxInput<Variables>({
+export default function AccountFormCheckboxInput<
+  Variables extends FormikValues
+>({
   name,
   label,
   value,
@@ -31,8 +33,9 @@ export default function AccountFormCheckboxInput<Variables>({
     },
   });
 
-  const initialValues = {} as Variables;
-  initialValues[name] = value;
+  const initialValues = {
+    [name]: value,
+  } as Variables;
 
   return (
     <Formik<Variables>
@@ -47,7 +50,7 @@ export default function AccountFormCheckboxInput<Variables>({
       validateOnChange={false}
       validationSchema={yupSchema}
     >
-      {props => (
+      {({ isSubmitting }) => (
         <Form>
           <div className={styles.checkbox__row}>
             <Field
@@ -60,13 +63,13 @@ export default function AccountFormCheckboxInput<Variables>({
           </div>
           {loading && <div>Envoi en cours...</div>}
 
-          <RedErrorMessage name={name}>{props.errors[name]}</RedErrorMessage>
+          <RedErrorMessage name={name} />
 
           {isEditing && (
             <button
               className="btn btn--primary tw-mt-4"
               type="submit"
-              disabled={props.isSubmitting}
+              disabled={isSubmitting}
             >
               Valider
             </button>

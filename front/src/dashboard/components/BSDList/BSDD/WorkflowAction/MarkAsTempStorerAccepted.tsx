@@ -36,16 +36,14 @@ const MARK_TEMP_STORER_ACCEPTED = gql`
 export default function MarkAsTempStorerAccepted({
   form,
 }: WorkflowActionProps) {
-  const [
-    getBsdd,
-    { error: bsddGetError, data, loading: bsddGetLoading },
-  ] = useLazyQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
-    variables: {
-      id: form.id,
-      readableId: null,
-    },
-    fetchPolicy: "network-only",
-  });
+  const [getBsdd, { error: bsddGetError, data, loading: bsddGetLoading }] =
+    useLazyQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
+      variables: {
+        id: form.id,
+        readableId: null,
+      },
+      fetchPolicy: "network-only",
+    });
   const [markAsTempStorerAccepted, { loading, error }] = useMutation<
     Pick<Mutation, "markAsTempStorerAccepted">,
     MutationMarkAsTempStorerAcceptedArgs

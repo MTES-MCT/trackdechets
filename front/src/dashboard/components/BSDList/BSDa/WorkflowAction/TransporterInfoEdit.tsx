@@ -18,10 +18,10 @@ type Props = {
 
 export function TransporterInfoEdit({ bsda }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const [updateBsda, { error }] = useMutation<
-    Pick<Mutation, "updateBsda">,
-    MutationUpdateBsdaArgs
-  >(UPDATE_BSDA);
+  const [updateBsda, { error }] =
+    useMutation<Pick<Mutation, "updateBsda">, MutationUpdateBsdaArgs>(
+      UPDATE_BSDA
+    );
 
   if (
     !["SIGNED_BY_PRODUCER", "SIGNED_BY_WORKER", "INITIAL"].includes(

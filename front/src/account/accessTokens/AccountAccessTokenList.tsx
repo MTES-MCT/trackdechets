@@ -14,9 +14,8 @@ import AccountAccessTokenRevokeAll from "./AccountAccessTokenRevokeAll";
 export default function AccountAccessTokenList() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRevokingAll, setIsRevokingAll] = useState(false);
-  const [newAccessToken, setNewAccessToken] = useState<NewAccessToken | null>(
-    null
-  );
+  const [newAccessToken, setNewAccessToken] =
+    useState<NewAccessToken | null>(null);
 
   return (
     <AccountContentWrapper
@@ -74,9 +73,8 @@ function AccountAccessTokenListContent({
   newAccessToken,
   onNewAccessTokenDelete,
 }: AccountAccessTokenListContentProps) {
-  const { loading, error, data } = useQuery<Pick<Query, "accessTokens">>(
-    ACCESS_TOKENS
-  );
+  const { loading, error, data } =
+    useQuery<Pick<Query, "accessTokens">>(ACCESS_TOKENS);
 
   if (loading) {
     return <Loader />;

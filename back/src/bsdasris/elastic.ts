@@ -15,6 +15,7 @@ import { getRegistryFields } from "./registry";
 // | received           | follow  | follow      | action    |
 // | processed          | archive | archive     | archive   |
 // | refused            | archive | archive     | archive   |
+// | awaiting_group     | follow  | follow      | follow    |
 
 function getWhere(
   bsdasri: Bsdasri

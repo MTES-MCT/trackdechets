@@ -307,12 +307,6 @@ const Dreals = [
     email: "uid-30-48.dreal-occitanie@developpement-durable.gouv.fr"
   },
   {
-    DrealRegion: "DREAL Auvergne Rhone Alpes",
-    name: "Unité interDépartementale Loire-Haute-Loire",
-    Dept: "49",
-    email: "ud-lhl.dreal-auvergne-rhone-alpes@developpement-durable.gouv.fr"
-  },
-  {
     DrealRegion: "DREAL Pays Loire",
     name: "UD49 (Unité Départementale Angers)",
     Dept: "49",

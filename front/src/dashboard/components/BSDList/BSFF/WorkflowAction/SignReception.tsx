@@ -41,10 +41,10 @@ interface SignReceptionModalProps {
 }
 
 function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
-  const [updateBsff, updateBsffResult] = useMutation<
-    Pick<Mutation, "updateBsff">,
-    MutationUpdateBsffArgs
-  >(UPDATE_BSFF_FORM);
+  const [updateBsff, updateBsffResult] =
+    useMutation<Pick<Mutation, "updateBsff">, MutationUpdateBsffArgs>(
+      UPDATE_BSFF_FORM
+    );
   const [signBsff, signBsffResult] = useMutation<
     Pick<Mutation, "signBsff">,
     MutationSignBsffArgs

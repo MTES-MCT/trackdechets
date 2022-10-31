@@ -30,6 +30,7 @@ import sentryReporter from "./common/plugins/sentryReporter";
 import { redisClient } from "./common/redis";
 import { initSentry } from "./common/sentry";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
+import { createFormDataLoaders } from "./forms/dataloader";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
@@ -67,12 +68,17 @@ export const server = new ApolloServer({
   schema,
   introspection: true, // used to enable the playground in production
   validationRules: [depthLimit(10)],
+  csrfPrevention: true, // To prevent "simple requests". See https://www.apollographql.com/docs/apollo-server/security/cors/#preventing-cross-site-request-forgery-csrf
   context: async ctx => {
     return {
       ...ctx,
       // req.user is made available by passport
       user: ctx.req?.user ?? null,
-      dataloaders: { ...createUserDataLoaders(), ...createCompanyDataLoaders() }
+      dataloaders: {
+        ...createUserDataLoaders(),
+        ...createCompanyDataLoaders(),
+        ...createFormDataLoaders()
+      }
     };
   },
   formatError: err => {
@@ -286,14 +292,11 @@ export async function startApolloServer() {
 
   /**
    * Wire up ApolloServer to /
-   * UI_BASE_URL is explicitly set in the origin list
-   * to avoid "Credentials is not supported if the CORS header ‘Access-Control-Allow-Origin’ is ‘*’"
-   * See https://developer.mozilla.org/fr/docs/Web/HTTP/CORS/Errors/CORSNotSupportingCredentials
    */
   server.applyMiddleware({
     app,
     cors: {
-      origin: [UI_BASE_URL, "*"],
+      origin: [UI_BASE_URL],
       methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
       preflightContinue: false,
       optionsSuccessStatus: 204,

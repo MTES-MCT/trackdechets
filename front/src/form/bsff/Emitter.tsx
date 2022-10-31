@@ -14,17 +14,14 @@ import MyCompanySelector from "form/common/components/company/MyCompanySelector"
 export default function Emitter({ disabled }) {
   const [{ value: id }] = useField<CompanyInput>("id");
   const [{ value: emitterCompany }] = useField<CompanyInput>("emitter.company");
-  const [{ value: ficheInterventions }] = useField<BsffFicheIntervention[]>(
-    "ficheInterventions"
-  );
+  const [{ value: ficheInterventions }] =
+    useField<BsffFicheIntervention[]>("ficheInterventions");
   const [{ value: type }] = useField<BsffType>("type");
 
-  const [{ value: previousBsffs }, , { setValue: setPreviousBsffs }] = useField<
-    Bsff[]
-  >("previousBsffs");
-  const [, , { setValue: setPackagings }] = useField<BsffPackagingInput[]>(
-    "packagings"
-  );
+  const [{ value: previousBsffs }, , { setValue: setPreviousBsffs }] =
+    useField<Bsff[]>("previousBsffs");
+  const [, , { setValue: setPackagings }] =
+    useField<BsffPackagingInput[]>("packagings");
 
   const heading =
     type === BsffType.TracerFluide

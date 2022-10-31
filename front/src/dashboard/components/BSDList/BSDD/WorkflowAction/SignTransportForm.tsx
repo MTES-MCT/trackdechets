@@ -58,20 +58,22 @@ function SignTransportFormModal({
   formId,
   onClose,
 }: SignTransportFormModalProps) {
-  const { loading: formLoading, error: formError, data } = useQuery<
-    Pick<Query, "form">,
-    QueryFormArgs
-  >(GET_FORM, {
+  const {
+    loading: formLoading,
+    error: formError,
+    data,
+  } = useQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
     variables: {
       id: formId,
       readableId: null,
     },
     fetchPolicy: "no-cache",
   });
-  const [signTransportForm, { loading, error }] = useMutation<
-    Pick<Mutation, "signTransportForm">,
-    MutationSignTransportFormArgs
-  >(SIGN_TRANSPORT_FORM);
+  const [signTransportForm, { loading, error }] =
+    useMutation<
+      Pick<Mutation, "signTransportForm">,
+      MutationSignTransportFormArgs
+    >(SIGN_TRANSPORT_FORM);
 
   if (formLoading) return <Loader />;
   if (formError) return <InlineError apolloError={formError} />;

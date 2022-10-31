@@ -6,9 +6,8 @@ import AccountOauth2App from "./AccountOauth2App";
 import { MY_APPLICATIONS } from "./queries";
 
 export default function AccountOAuth2AppList() {
-  const { data, loading } = useQuery<Pick<Query, "myApplications">>(
-    MY_APPLICATIONS
-  );
+  const { data, loading } =
+    useQuery<Pick<Query, "myApplications">>(MY_APPLICATIONS);
 
   if (loading) {
     return <Loader />;

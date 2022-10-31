@@ -383,8 +383,6 @@ model Form {
   transportSegments TransportSegment[]
   groupedIn         FormGroupement[]   @relation("GroupedIn")
   grouping          FormGroupement[]   @relation("Grouping")
-  // quantité affectée à des bordereaux de regroupement
-  quantityGrouped   Float              @default(0)
 
   ownerId              String
   owner                User                          @relation(fields: [ownerId], references: [id])
@@ -858,6 +856,7 @@ enum BsdasriStatus {
   RECEIVED
   PROCESSED
   REFUSED
+  AWAITING_GROUP
 }
 
 enum BsdasriEmitterType {

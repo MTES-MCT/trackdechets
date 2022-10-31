@@ -4,12 +4,13 @@ import { Query } from "generated/graphql/types";
 import Header from "./Header";
 
 import sandboxIcon from "./assets/code-sandbox.svg";
+import downtimeIcon from "./assets/code-downtime.svg";
 
 interface AuthProps {
   isAuthenticated: boolean;
   isAdmin: boolean;
 }
-const { VITE_WARNING_MESSAGE } = import.meta.env;
+const { VITE_WARNING_MESSAGE, VITE_DOWNTIME_MESSAGE } = import.meta.env;
 
 const GET_WARNING_MESSAGE = gql`
   query GetWarningMessage {
@@ -48,6 +49,19 @@ export default function Layout({
           <img src={sandboxIcon} alt="" />
           <div
             dangerouslySetInnerHTML={{ __html: VITE_WARNING_MESSAGE as string }}
+          ></div>
+        </div>
+      )}
+      {VITE_DOWNTIME_MESSAGE && (
+        <div
+          className="notification notification--downtime tw-text-center"
+          style={{ borderRadius: 0, border: 0, margin: 0 }}
+        >
+          <img src={downtimeIcon} alt="" />
+          <div
+            dangerouslySetInnerHTML={{
+              __html: VITE_DOWNTIME_MESSAGE as string,
+            }}
           ></div>
         </div>
       )}

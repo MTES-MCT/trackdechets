@@ -47,6 +47,8 @@ function toGenericWaste(bsff: Bsff): GenericWaste {
     wasteCode: bsff.wasteCode,
     pop: false,
     id: bsff.id,
+    createdAt: bsff.createdAt,
+    updatedAt: bsff.updatedAt,
     ecoOrganismeName: null,
     ecoOrganismeSiren: null,
     bsdType: "BSFF",

@@ -4,6 +4,7 @@ import { BsdElastic } from "../common/elastic";
 import {
   BsdTypeFilter,
   DateFilter,
+  IdFilter,
   NumericFilter,
   StringFilter,
   WasteRegistryWhere
@@ -16,6 +17,19 @@ export function toElasticFilter(
   where: WasteRegistryWhere
 ): QueryDslQueryContainer[] {
   let filter: QueryDslQueryContainer[] = [];
+  if (where.id) {
+    filter = [
+      ...filter,
+      {
+        bool: {
+          should: [
+            idFilterToElasticFilter("id", where.id),
+            idFilterToElasticFilter("readableId.keyword" as any, where.id)
+          ]
+        }
+      }
+    ];
+  }
   if (where.createdAt) {
     filter = [
       ...filter,
@@ -178,6 +192,19 @@ function stringFilterToElasticFilter(
     return {
       wildcard: { [fieldName]: { value: `*${stringFilter._contains}*` } }
     };
+  }
+  return {};
+}
+
+function idFilterToElasticFilter(
+  fieldName: keyof BsdElastic,
+  idFilter: IdFilter
+) {
+  if (idFilter._eq) {
+    return { term: { [fieldName]: idFilter._eq } };
+  }
+  if (idFilter._in) {
+    return { terms: { [fieldName]: idFilter._in } };
   }
   return {};
 }

@@ -288,8 +288,8 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
         otherwise: yup
           .mixed()
           .oneOf(
-            ["OTHER"],
-            `Émetteur: Le type d'émetteur doit être "OTHER" lorsqu'un éco-organisme est responsable du déchet`
+            ["OTHER", "APPENDIX1", "APPENDIX2"],
+            `Émetteur: Le type d'émetteur doit être "OTHER", "APPENDIX1" ou "APPENDIX2" lorsqu'un éco-organisme est responsable du déchet`
           )
       })
       .when("emitterIsPrivateIndividual", {
@@ -1430,7 +1430,9 @@ export async function validateGroupement(
       status: { in: [Status.AWAITING_GROUP, Status.GROUPED] }
     },
     include: {
-      forwardedIn: { select: { recipientCompanySiret: true } },
+      forwardedIn: {
+        select: { recipientCompanySiret: true, quantityReceived: true }
+      },
       groupedIn: true
     }
   });
@@ -1485,7 +1487,11 @@ export async function validateGroupement(
         ];
       }
 
-      const quantityLeftToGroup = new Decimal(initialForm.quantityReceived)
+      const quantityLeftToGroup = new Decimal(
+        initialForm.forwardedIn
+          ? initialForm.forwardedIn.quantityReceived
+          : initialForm.quantityReceived
+      )
         .minus(quantityGroupedInOtherForms)
         .toDecimalPlaces(6); // set precision to gramme
 
