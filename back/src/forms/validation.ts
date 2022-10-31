@@ -1430,7 +1430,9 @@ export async function validateGroupement(
       status: { in: [Status.AWAITING_GROUP, Status.GROUPED] }
     },
     include: {
-      forwardedIn: { select: { recipientCompanySiret: true } },
+      forwardedIn: {
+        select: { recipientCompanySiret: true, quantityReceived: true }
+      },
       groupedIn: true
     }
   });
@@ -1485,7 +1487,11 @@ export async function validateGroupement(
         ];
       }
 
-      const quantityLeftToGroup = new Decimal(initialForm.quantityReceived)
+      const quantityLeftToGroup = new Decimal(
+        initialForm.forwardedIn
+          ? initialForm.forwardedIn.quantityReceived
+          : initialForm.quantityReceived
+      )
         .minus(quantityGroupedInOtherForms)
         .toDecimalPlaces(6); // set precision to gramme
 
