@@ -13,6 +13,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Correction d'un problème d'affichage sur le dashboard quand on sélectionne une autre entreprise  [PR 1820](https://github.com/MTES-MCT/trackdechets/pull/1820).
+- Correction d'un bug qui pouvait créer des bordereaux "fantômes" sur le tableau de bord  [PR 1798](https://github.com/MTES-MCT/trackdechets/pull/1798).
+- Correction d'un bug sur les quantités lorsqu'on groupe des bordereaux ayant eu un entreposage provisoire [PR 1810](https://github.com/MTES-MCT/trackdechets/pull/1810).
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
@@ -20,6 +24,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Assouplissement des prérogatives des éco-organismes [PR 1786](https://github.com/MTES-MCT/trackdechets/pull/1786)
 - Ajout d'un statut AWAITING_GROUP sur le BSDASRI [PR 1733](https://github.com/MTES-MCT/trackdechets/pull/1733).
 - Ajout d'une bannière pour mieux prendre en communiquer sur les coupures de service Trackdéchets [PR 1778](https://github.com/MTES-MCT/trackdechets/pull/1778).
+- Amélioration des performances sur tout ce qui touche aux annexes 2  [PR 1796](https://github.com/MTES-MCT/trackdechets/pull/1796).
 
 #### :memo: Documentation
 
