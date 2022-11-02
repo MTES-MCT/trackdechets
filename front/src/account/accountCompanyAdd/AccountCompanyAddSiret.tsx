@@ -175,11 +175,7 @@ export default function AccountCompanyAddSiret({
       <Row>
         <Col n="12">
           {error && (
-            <Alert
-              type="error"
-              title="Erreur"
-              description={error => error.message}
-            />
+            <Alert type="error" title="Erreur" description={error.message} />
           )}
           <Formik
             initialValues={{ siret: "" }}
@@ -221,7 +217,10 @@ export default function AccountCompanyAddSiret({
                         messageType={errors.siret ? "error" : ""}
                         message={errors.siret || ""}
                         onChange={e => {
-                          const siret = e.target.value.split(" ").join("");
+                          const siret = e.target.value
+                            .split(" ")
+                            .join("")
+                            .toUpperCase();
                           setIsRegistered(false);
                           setFieldValue("siret", siret);
                         }}
