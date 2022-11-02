@@ -28,6 +28,7 @@ async function exitScript() {
   logger.info("Done reindexAllInBulk script, exiting");
   await prisma.$disconnect();
   await closeQueues();
+  process.exit(0);
 }
 
 (async function () {
