@@ -18,9 +18,7 @@ const logger = createLogger({
   exitOnError: false,
   format: format.combine(format.errors({ stack: true }), format.json()),
   transports: [
-    !LOG_TO_CONSOLE && !LOG_TO_HTTP
-      ? new transports.File({ filename: LOG_PATH })
-      : LOG_TO_CONSOLE
+    LOG_TO_CONSOLE
       ? new transports.Console({
           // Simple `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
           format: format.simple()
