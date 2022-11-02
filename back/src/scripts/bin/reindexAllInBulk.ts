@@ -28,6 +28,7 @@ async function exitScript() {
   logger.info("Done reindexAllInBulk script, exiting");
   await prisma.$disconnect();
   await closeQueues();
+  process.exit(0);
 }
 
 (async function () {
@@ -37,14 +38,13 @@ async function exitScript() {
     const useQueue = process.argv.includes("--useQueue");
     if (useQueue) {
       await addReindexAllInBulkJob(force);
-      await exitScript();
-      return;
+    } else {
+      // will index all BSD without downtime, only if need because of a mapping change
+      await reindexAllBsdsInBulk({
+        force,
+        useQueue: false
+      });
     }
-    // will index all BSD without downtime, only if need because of a mapping change
-    await reindexAllBsdsInBulk({
-      force,
-      useQueue: false
-    });
   } catch (error) {
     throw new Error(`Error in reindexAllInBulk script : ${error}`);
   } finally {
