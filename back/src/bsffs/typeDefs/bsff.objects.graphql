@@ -149,7 +149,7 @@ type BsffPackaging {
   """
   Identifiant unique correspondant à un contenant sur BSFF en particulier.
   Un même contenant physique (identifié par un numéro) aura des identifiants différents
-  sur chaque BSFF sur lequel il apparait (en cas de tansit ou groupement).
+  sur chaque BSFF sur lequel il apparait (en cas de transit ou groupement).
   """
   id: ID!
   "Identifiant du BSFF auquel est rattaché ce contenant"
@@ -168,11 +168,11 @@ type BsffPackaging {
   operation: BsffPackagingOperation
   "BSFF qui trace ce contenant"
   bsff: Bsff!
-  "BSFF suivant"
+  "BSFF faisant immédiatement suite au BSFF traçant ce contenant."
   nextBsff: Bsff
-  "BSFFs suivants"
+  "Liste de tous les BSFFs suivants"
   nextBsffs: [Bsff!]!
-  "BSFF précédents"
+  "Liste de tous les BSFF précédents"
   previousBsffs: [InitialBsff!]!
 }
 

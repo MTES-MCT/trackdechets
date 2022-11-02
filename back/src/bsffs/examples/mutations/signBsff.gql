@@ -1,0 +1,6 @@
+mutation SignBsff($id: ID!, $input: BsffSignatureInput!) {
+  signBsff(id: $id, input: $input) {
+    id
+    status
+  }
+}

@@ -1,5 +1,5 @@
-import collectePetitesQuantites from "./collectePetitesQuantites";
+import collecteOperateur from "./collecteOperateur";
 
 export default {
-  collectePetitesQuantites
+  collecteOperateur
 };

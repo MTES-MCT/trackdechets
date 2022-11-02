@@ -7,7 +7,11 @@ import {
 } from "../../../../generated/graphql/types";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { createBsff } from "../../../__tests__/factories";
+import {
+  createBsff,
+  createFicheIntervention
+} from "../../../__tests__/factories";
+import prisma from "../../../../prisma";
 
 const DUPLICATE_BSFF = gql`
   mutation DuplicateBsff($id: ID!) {
@@ -119,5 +123,44 @@ describe("Mutation.duplicateBsff", () => {
         message: `Le bordereau de fluides frigorigènes n°${bsff.id} n'existe pas.`
       })
     ]);
+  });
+
+  it("should not copy fiches d'interventions into duplicated BSFF", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const ficheIntervention = await createFicheIntervention({
+      operateur: emitter,
+      detenteur
+    });
+
+    const bsff = await createBsff(
+      { emitter },
+      {
+        ficheInterventions: {
+          connect: {
+            id: ficheIntervention.id
+          }
+        }
+      }
+    );
+
+    const { mutate } = makeClient(emitter.user);
+
+    const { data } = await mutate<
+      Pick<Mutation, "duplicateBsff">,
+      MutationDuplicateBsffArgs
+    >(DUPLICATE_BSFF, {
+      variables: {
+        id: bsff.id
+      }
+    });
+
+    const duplicata = await prisma.bsff.findUnique({
+      where: { id: data.duplicateBsff.id },
+      include: { ficheInterventions: true }
+    });
+
+    expect(duplicata.ficheInterventions).toHaveLength(0);
   });
 });

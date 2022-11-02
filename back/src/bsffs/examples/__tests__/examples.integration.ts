@@ -1,6 +1,6 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
 import testWorkflow from "../../../__tests__/testWorkflow";
-import collectePetitesQuantitesWorkflow from "../workflows/collectePetitesQuantites";
+import collectePetitesQuantitesWorkflow from "../workflows/collecteOperateur";
 
 describe("Exemples de circuit du bordereau de suivi BSFF", () => {
   afterEach(resetDatabase);

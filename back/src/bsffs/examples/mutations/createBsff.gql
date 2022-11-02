@@ -2,5 +2,8 @@ mutation CreateBsff($input: BsffInput!) {
   createBsff(input: $input) {
     id
     status
+    packagings {
+      id
+    }
   }
 }
