@@ -62,11 +62,11 @@ function ttrInput(siret: string) {
 function traiteurCompanyInput(siret: string) {
   return {
     siret,
-    name: "Régénérateur & Co",
-    address: "1 avenue de le la régénération 67100 Strasbourg",
+    name: "Traiteur & Co",
+    address: "1 avenue des roses 67100 Strasbourg",
     contact: "Thomas Largeron",
     phone: "03 00 00 00 00",
-    mail: "thomas.largeron@regeneration.fr"
+    mail: "thomas.largeron@traiteur.fr"
   };
 }
 

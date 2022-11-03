@@ -9,7 +9,7 @@ export function signOperation(company: string): WorkflowStep {
       id: bsff.id,
       input: {
         type: "OPERATION",
-        author: "Jean Transit"
+        author: "Jean Opération"
       }
     }),
     expected: { status: "INTERMEDIATELY_PROCESSED" },
