@@ -27,13 +27,16 @@ export function createBsff(
     destination,
     previousPackagings
   }: CreateBsffArgs = {},
-  initialData: Partial<Prisma.BsffCreateInput> = {}
+  initialData: Partial<Prisma.BsffCreateInput> = {},
+  initialPackagingData: Partial<Prisma.BsffPackagingCreateInput> = {}
 ) {
   const data: Prisma.BsffCreateInput = {
     id: getReadableId(ReadableIdPrefix.FF),
     type: BsffType.TRACER_FLUIDE,
     status: BsffStatus.INITIAL,
-    packagings: { create: createBsffPackaging({}, previousPackagings) },
+    packagings: {
+      create: createBsffPackaging(initialPackagingData, previousPackagings)
+    },
     ...initialData
   };
 

@@ -68,7 +68,7 @@ function toGenericWaste(
     destinationOperationNoTraceability: false,
     destinationReceptionAcceptationStatus:
       bsffDestination.receptionAcceptationStatus,
-    destinationOperationDate: bsffDestination.operationSignatureDate,
+    destinationOperationDate: bsffDestination.operationDate,
     destinationReceptionWeight: bsffDestination.receptionWeight
       ? bsffDestination.receptionWeight / 1000
       : bsffDestination.receptionWeight,

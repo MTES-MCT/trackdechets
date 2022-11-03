@@ -12,7 +12,7 @@ type BsffDestination = {
   receptionAcceptationStatus: WasteAcceptationStatus;
   receptionRefusalReason: string;
   operationCode: string;
-  operationSignatureDate: Date;
+  operationDate: Date;
 };
 
 /**
@@ -81,10 +81,10 @@ export function toBsffDestination(
     : null;
 
   // returns last date
-  const operationSignatureDate = hasAnyOperation
+  const operationDate = hasAnyOperation
     ? packagings
-        .filter(p => !!p.acceptationSignatureDate)
-        .map(p => p.acceptationSignatureDate)
+        .filter(p => !!p.operationDate)
+        .map(p => p.operationDate)
         .sort((d1, d2) => d1.getMilliseconds() - d2.getMilliseconds())[0]
     : null;
 
@@ -93,7 +93,7 @@ export function toBsffDestination(
     receptionAcceptationStatus,
     receptionRefusalReason,
     operationCode,
-    operationSignatureDate
+    operationDate
   };
 }
 

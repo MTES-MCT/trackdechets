@@ -14,7 +14,7 @@ describe("Exemples de circuit du bordereau de suivi BSFF", () => {
     60000
   );
 
-  test.only(
+  test(
     groupementWorkflow.title,
     async () => {
       await testWorkflow(groupementWorkflow);

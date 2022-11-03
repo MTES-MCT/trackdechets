@@ -31,7 +31,7 @@ export function toBsdElastic(
     destinationReceptionDate: bsff.destinationReceptionDate?.getTime(),
     destinationReceptionWeight: bsffDestination.receptionWeight,
     destinationOperationCode: bsffDestination.operationCode ?? "",
-    destinationOperationDate: bsffDestination.operationSignatureDate?.getTime(),
+    destinationOperationDate: bsffDestination.operationDate?.getTime(),
     wasteCode: bsff.wasteCode ?? "",
     wasteDescription: bsff.wasteDescription ?? "",
     containers: bsff.packagings.map(packaging => packaging.numero),
