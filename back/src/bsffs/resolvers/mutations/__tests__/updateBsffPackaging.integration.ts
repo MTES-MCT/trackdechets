@@ -42,7 +42,7 @@ describe("Mutation.updateBsffPackaging", () => {
         id: packagingId,
         input: {
           acceptation: {
-            date: new Date().toISOString(),
+            date: new Date(),
             status: WasteAcceptationStatus.ACCEPTED,
             weight: 1
           }
@@ -79,7 +79,7 @@ describe("Mutation.updateBsffPackaging", () => {
         id: packagingId,
         input: {
           acceptation: {
-            date: new Date().toISOString(),
+            date: new Date(),
             status: WasteAcceptationStatus.ACCEPTED,
             weight: 1
           }
