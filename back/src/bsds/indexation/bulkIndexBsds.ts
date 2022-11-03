@@ -428,14 +428,16 @@ export async function reindexAllBsdsInBulk({
 export async function addReindexAllInBulkJob(
   force: boolean
 ): Promise<Job<string>> {
-  logger.info(`Enqueuing indexation of all bsds in bulk without downtime`);
+  logger.info(
+    `Enqueuing job indexAllInBulk for the indexation of all bsds in bulk without downtime`
+  );
   // default options can be overwritten by the calling function
   const jobOptions: JobOptions = {
     lifo: true,
     attempts: 1,
     timeout: 36_000_000 // 10h
   };
-  return indexQueue.add(
+  const job = await indexQueue.add(
     "indexAllInBulk",
     JSON.stringify({
       index: defaultIndexConfig,
@@ -443,6 +445,11 @@ export async function addReindexAllInBulkJob(
     }),
     jobOptions
   );
+  const isActive = await job.isActive();
+  logger.info(
+    `Done enqueuing job indexAllInBulk: Job ${job.id}, is currently active ? ${isActive}`
+  );
+  return job;
 }
 
 /**

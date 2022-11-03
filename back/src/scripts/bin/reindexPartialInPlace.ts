@@ -13,6 +13,7 @@ async function exitScript() {
   logger.info("Finished reindex-partial-in-place script, exiting");
   await prisma.$disconnect();
   await closeQueues();
+  process.exit(0);
 }
 
 (async function () {
@@ -42,7 +43,6 @@ async function exitScript() {
   try {
     if (bsdTypesToIndex.length > 1) {
       logger.info("You can only specify one bsd type to index");
-      await exitScript();
       return;
     }
 
@@ -52,7 +52,6 @@ async function exitScript() {
       logger.info(
         "You can target whether one bsd type OR a date '--since YYYY-MM-DD' to target the re-indexation in place"
       );
-      await exitScript();
       return;
     }
     if (force) {
@@ -60,7 +59,6 @@ async function exitScript() {
         logger.info(
           "You can only force delete existing bsd when passing a BSD type as a command argument"
         );
-        await exitScript();
         return;
       }
       await prompts({
@@ -81,6 +79,7 @@ async function exitScript() {
   } catch (error) {
     logger.info("reindex-partial-in-place failed, error:", error);
   } finally {
+    logger.info("Finished reindex-partial-in-place script, exiting");
     await exitScript();
   }
 })();
