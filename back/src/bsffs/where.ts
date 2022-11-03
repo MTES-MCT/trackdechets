@@ -10,6 +10,9 @@ import {
 } from "../common/where";
 
 function toPrismaBsffSimpleWhereInput(where: BsffWhere): Prisma.BsffWhereInput {
+  if (!where) {
+    return undefined;
+  }
   return safeInput<Prisma.BsffWhereInput>({
     ...toPrismaGenericWhereInput(where),
     status: toPrismaEnumFilter(where.status),
@@ -38,6 +41,9 @@ function toPrismaBsffSimpleWhereInput(where: BsffWhere): Prisma.BsffWhereInput {
 export function toPrismaBsffWhereInput(
   where: BsffWhere
 ): Prisma.BsffWhereInput {
+  if (!where) {
+    return undefined;
+  }
   return toPrismaNestedWhereInput(where, toPrismaBsffSimpleWhereInput);
 }
 
