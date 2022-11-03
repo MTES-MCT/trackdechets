@@ -23,8 +23,7 @@ const workflow: Workflow = {
     " Un bordereau doit servir de traçabilité pour un même fluide (pas de mélange)." +
     " Le bordereau est signé par l’opérateur, le transporteur et l’entreprise de destination finale qui" +
     " indique l’opération réalisée. Le BSFF est mis à disposition sur (ou via) Trackdéchets, à" +
-    " toutes les entreprises visées sur le bordereau, y compris les détenteurs d’équipements si" +
-    " leur siret a été renseigné (lors de la saisie des infos des fiches d’intervention associées). \n",
+    " toutes les entreprises visées sur le bordereau. \n",
   companies: [
     { name: "detenteur1", companyTypes: ["PRODUCER"] },
     { name: "detenteur2", companyTypes: ["PRODUCER"] },
