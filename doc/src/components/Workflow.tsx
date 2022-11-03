@@ -7,8 +7,8 @@ import { resolve } from "../utils";
 /**
  * Render line jumps
  */
-const lineBreaksToBr = text =>
-  text.split("\n").map(item => (
+const lineBreaksToBr = (text) =>
+  text.split("\n").map((item) => (
     <>
       {item}
       <br />

@@ -38,4 +38,6 @@ export type WorkflowStep = {
   data: (response: any) => any;
   // Optional callback to update the runtime context that is passed from one step to the other
   setContext?: (ctx: Context, data: any) => Context;
+  // Optional parameter to hide this step in the documentation
+  hideInDoc?: boolean;
 };

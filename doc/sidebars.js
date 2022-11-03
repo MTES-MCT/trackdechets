@@ -70,7 +70,10 @@ module.exports = {
                 "tutoriels/examples/bsdasri/groupement",
               ],
               BSVHU: ["tutoriels/examples/bsvhu/vhu-vers-broyeur"],
-              BSFF: ["tutoriels/examples/bsff/collecte-fluides-par-operateur"],
+              BSFF: [
+                "tutoriels/examples/bsff/collecte-fluides-par-operateur",
+                "tutoriels/examples/bsff/groupement",
+              ],
               BSDA: [
                 "tutoriels/examples/bsda/collecte-chantier",
                 "tutoriels/examples/bsda/collecte-chantier-particulier",

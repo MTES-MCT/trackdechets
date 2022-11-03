@@ -15,6 +15,10 @@ export function signOperation(company: string): WorkflowStep {
     expected: { status: "INTERMEDIATELY_PROCESSED" },
     data: response => response.signBsff,
     company,
-    setContext: (ctx, data) => ({ ...ctx, bsff: data })
+    setContext: (ctx, data) => ({
+      ...ctx,
+      bsff: data,
+      initialBsffs: [...(ctx.initialBsffs ?? []), data]
+    })
   };
 }

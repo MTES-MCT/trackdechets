@@ -78,10 +78,19 @@ function nextDestinationInput(siret: string) {
   };
 }
 
+function traiteurInput(siret: string) {
+  return {
+    cap: "CAP",
+    plannedOperationCode: "R2",
+    company: traiteurCompanyInput(siret)
+  };
+}
+
 export default {
   detenteurInput,
   operateurInput,
   transporterInput,
   ttrInput,
+  traiteurInput,
   nextDestinationInput
 };

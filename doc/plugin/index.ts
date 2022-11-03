@@ -12,11 +12,13 @@ function parseWorkflow(workflow: Workflow) {
     title: workflow.title,
     description: workflow.description,
     chart: workflow.chart,
-    steps: workflow.steps.map((step) => ({
-      description: step.description,
-      mutation: step.mutation,
-      variables: JSON.stringify(step.variables(workflow.docContext), null, 2),
-    })),
+    steps: workflow.steps
+      .filter((s) => !s.hideInDoc)
+      .map((step) => ({
+        description: step.description,
+        mutation: step.mutation,
+        variables: JSON.stringify(step.variables(workflow.docContext), null, 2),
+      })),
   };
 }
 
@@ -56,6 +58,7 @@ export default function plugin(): Plugin<any> {
           collecteFluidesParOperateur: parseWorkflow(
             bsffWorkflows.collecteFluidesParOperateur
           ),
+          groupement: parseWorkflow(bsffWorkflows.groupement),
         },
         bsda: {
           collecteChantier: parseWorkflow(bsdaWorkflows.collecteChantier),

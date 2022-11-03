@@ -8,7 +8,7 @@ import { updateReception } from "../steps/updateReception";
 import { signReception } from "../steps/signReception";
 import { updateAcceptation } from "../steps/updateAcceptation";
 import { signAcceptation } from "../steps/signAcceptation";
-import { updateOperation } from "../steps/updateOperation";
+import { updateOperationD13 } from "../steps/updateOperation";
 import { signOperation } from "../steps/signOperation";
 
 const workflow: Workflow = {
@@ -61,7 +61,7 @@ const workflow: Workflow = {
     signReception("ttr"),
     updateAcceptation("ttr", { packagingIdx: 0 }),
     signAcceptation("ttr"),
-    updateOperation("ttr", { packagingIdx: 0 }),
+    updateOperationD13("ttr", { packagingIdx: 0 }),
     signOperation("ttr")
   ],
   docContext: {
