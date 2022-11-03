@@ -1,7 +1,6 @@
 import fixtures from "../fixtures";
 import { WorkflowStep } from "../../../common/workflow";
 import mutations from "../mutations";
-import bsff from "../../resolvers/queries/bsff";
 
 export function createBsff(company: string): WorkflowStep {
   return {
