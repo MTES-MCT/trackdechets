@@ -19,7 +19,6 @@ import {
   createFicheIntervention
 } from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
-import bsff from "../../queries/bsff";
 
 const CREATE_DRAFT_BSFF = `
   mutation CreateDraftBsff($input: BsffInput!) {

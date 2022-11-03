@@ -4,7 +4,6 @@ import {
   TransportMode,
   BsffStatus,
   BsffType,
-  // WasteAcceptationStatus,
   BsffPackaging,
   WasteAcceptationStatus
 } from "@prisma/client";
@@ -13,7 +12,6 @@ import prisma from "../../prisma";
 import { UserWithCompany } from "../../__tests__/factories";
 import { OPERATION } from "../constants";
 import { BSFF_WASTE_CODES } from "../../common/constants";
-import { BsffOperationCode } from "../../generated/graphql/types";
 
 interface CreateBsffArgs {
   emitter?: UserWithCompany;
