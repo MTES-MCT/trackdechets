@@ -154,7 +154,7 @@ input BsffInput {
   Détails du déchet
   """
   waste: BsffWasteInput
-  "Quantité en kilogrammes"
+  "Quantité"
   weight: BsffWeightInput
   transporter: BsffTransporterInput
   destination: BsffDestinationInput
@@ -194,7 +194,7 @@ input UpdateBsffPackagingInput {
 
 input BsffPackagingAcceptationInput {
   "Date de la réception"
-  date: String!
+  date: DateTime!
   "Poids du contenant. Doit être à 0 dans le cas d'un refus"
   weight: Float!
   "Accepté ou refusé"
@@ -209,7 +209,7 @@ input BsffPackagingAcceptationInput {
 
 input BsffPackagingOperationInput {
   "Date de l'opération"
-  date: String!
+  date: DateTime!
   "Code de l'opération de traitement."
   code: BsffOperationCode!
   "Description de l'opération réaliséee"
@@ -221,27 +221,38 @@ input BsffPackagingOperationInput {
 }
 
 input BsffWasteInput {
+  """
+  Le code du déchet au regard l'[article R. 541-7 du code de l'environnement](https://www.legifrance.gouv.fr/affichCodeArticle.do?cidTexte=LEGITEXT000006074220&idArticle=LEGIARTI000006839070&dateTexte=&categorieLien=cid) à choisir parmi la liste suivante :
+  14 06 01*, 14 06 02*, 14 06 03*, 16 05 04*, 13 03 10*.
+  """
   code: String!
+  "La dénomination usuelle du déchet"
   description: String
-  adr: String!
+  "Les informations relatives au transport de marchandises dangereuses par voies terrestres"
+  adr: String
 }
 
 input BsffWeightInput {
-  "Poids en kilogrammes"
+  "Quantité totale exprimée en kilogramme"
   value: Float!
+  "Si cette quantité est estimée ou réelle"
   isEstimate: Boolean!
 }
 
 input BsffTransporterInput {
   company: CompanyInput
+  "Informations sur le récepissé transporteur."
   recepisse: BsffTransporterRecepisseInput
   transport: BsffTransporterTransportInput
   "Champ libre"
   customInfo: String
 }
 input BsffTransporterRecepisseInput {
+  "Le cas échéant, numéro de récépissé mentionné à l'article R. 541-51 du code de l'environnement."
   number: String
+  "Le cas échéant, département de la déclaration mentionnée à l'article R. 541-50 du code de l'environnement."
   department: String
+  "Le cas échéant, limite de validité du récépissé."
   validityLimit: DateTime
 }
 input BsffTransporterTransportInput {
@@ -254,8 +265,11 @@ input BsffTransporterTransportInput {
 
 input BsffDestinationInput {
   company: CompanyInput
-  cap: String @deprecated(reason: "Il n'y a pas de CAP sur le BSFF")
+  "Le cas échéant, numéro de certificat d'acceptation préalable des déchets."
+  cap: String
+  "Informations concernant la réception du déchet"
   reception: BsffDestinationReceptionInput
+  "Code de l'opération d'élimination ou valorisation prévue selon les annexes I et II de la directive 2008/98/CE relative aux déchets susvisée."
   plannedOperationCode: BsffOperationCode
   "Champ libre"
   customInfo: String

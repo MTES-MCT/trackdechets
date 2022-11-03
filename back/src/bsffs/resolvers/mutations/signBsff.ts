@@ -292,11 +292,19 @@ const signatures: Record<
   }
 };
 
-const signBsff: MutationResolvers["signBsff"] = async (_, args, context) => {
+const signBsff: MutationResolvers["signBsff"] = async (
+  _,
+  { id, input },
+  context
+) => {
   const user = checkIsAuthenticated(context);
-  const existingBsff = await getBsffOrNotFound({ id: args.id });
-  const sign = signatures[args.input.type];
-  const updatedBsff = await sign(args, user, existingBsff);
+  const existingBsff = await getBsffOrNotFound({ id });
+  const sign = signatures[input.type];
+  const updatedBsff = await sign(
+    { id, input: { ...input, date: new Date(input.date ?? Date.now()) } },
+    user,
+    existingBsff
+  );
 
   await indexBsff(updatedBsff, context);
 
