@@ -21,8 +21,8 @@ import {
   UPDATE_BSFF_FORM,
   GET_BSFF_FORM,
 } from "./utils/queries";
-const GenericStepList = lazy(() =>
-  import("form/common/stepper/GenericStepList")
+const GenericStepList = lazy(
+  () => import("form/common/stepper/GenericStepList")
 );
 interface Props {
   children: (bsff: Bsff | undefined) => ReactElement;
@@ -53,15 +53,15 @@ export default function BsffStepsList(props: Props) {
     return getComputedState(initialState, bsff ? getCurrentState(bsff) : null);
   }, [formQuery.data]);
 
-  const [createDraftBsff, { loading: creating }] = useMutation<
-    Pick<Mutation, "createDraftBsff">,
-    MutationCreateDraftBsffArgs
-  >(CREATE_DRAFT_BSFF);
+  const [createDraftBsff, { loading: creating }] =
+    useMutation<Pick<Mutation, "createDraftBsff">, MutationCreateDraftBsffArgs>(
+      CREATE_DRAFT_BSFF
+    );
 
-  const [updateBsffForm, { loading: updating }] = useMutation<
-    Pick<Mutation, "updateBsff">,
-    MutationUpdateBsffArgs
-  >(UPDATE_BSFF_FORM);
+  const [updateBsffForm, { loading: updating }] =
+    useMutation<Pick<Mutation, "updateBsff">, MutationUpdateBsffArgs>(
+      UPDATE_BSFF_FORM
+    );
 
   function saveForm(input: BsffInput): Promise<any> {
     return formState.id
@@ -116,9 +116,8 @@ export default function BsffStepsList(props: Props) {
   // As it's a render function, the steps are nested into a `<></>` block
   // So we render then unwrap to get the steps
   const parentOfSteps = props.children(formQuery.data?.bsff);
-  const steps = parentOfSteps.props.children as ReactElement<
-    IStepContainerProps
-  >[];
+  const steps = parentOfSteps.props
+    .children as ReactElement<IStepContainerProps>[];
 
   return (
     <>

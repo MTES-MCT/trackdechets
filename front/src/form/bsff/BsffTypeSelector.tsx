@@ -38,20 +38,13 @@ const options = [
 export function BsffTypeSelector() {
   const [{ value: id }] = useField<BsffType>("id");
   const [{ value: type }, , { setValue: setType }] = useField<BsffType>("type");
-  const [{ value: packagings }, , { setValue: setPackagings }] = useField<
-    BsffPackagingInput[]
-  >("packagings");
+  const [{ value: packagings }, , { setValue: setPackagings }] =
+    useField<BsffPackagingInput[]>("packagings");
   const [, , { setValue: setWeight }] = useField<BsffWeightInput>("weight");
-  const [
-    { value: ficheInterventions },
-    ,
-    { setValue: setFicheInterventions },
-  ] = useField<BsffFicheIntervention[]>("ficheInterventions");
-  const [
-    { value: previousPackagings },
-    ,
-    { setValue: setPreviousBsffs },
-  ] = useField<Bsff[]>("previousPackagings");
+  const [{ value: ficheInterventions }, , { setValue: setFicheInterventions }] =
+    useField<BsffFicheIntervention[]>("ficheInterventions");
+  const [{ value: previousPackagings }, , { setValue: setPreviousBsffs }] =
+    useField<Bsff[]>("previousPackagings");
 
   return (
     <>

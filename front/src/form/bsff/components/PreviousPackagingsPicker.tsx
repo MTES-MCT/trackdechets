@@ -80,9 +80,8 @@ export function PreviousPackagingsPicker({
       ? "Retrouvez ci-dessous la liste des contenants qui sont en attente d'une réexpédition."
       : "";
 
-  const [{ value: previousPackagings }] = useField<BsffPackaging[]>(
-    "previousPackagings"
-  );
+  const [{ value: previousPackagings }] =
+    useField<BsffPackaging[]>("previousPackagings");
 
   const { data, loading } = useQuery<
     Pick<Query, "bsffPackagings">,
@@ -233,21 +232,16 @@ function BsffPackagingTable({
     []
   );
 
-  const {
-    getTableProps,
-    headerGroups,
-    getTableBodyProps,
-    rows,
-    prepareRow,
-  } = useTable(
-    {
-      columns,
-      data,
-      filterTypes,
-      defaultColumn,
-    },
-    useFilters
-  );
+  const { getTableProps, headerGroups, getTableBodyProps, rows, prepareRow } =
+    useTable(
+      {
+        columns,
+        data,
+        filterTypes,
+        defaultColumn,
+      },
+      useFilters
+    );
 
   return (
     <Table {...getTableProps()}>

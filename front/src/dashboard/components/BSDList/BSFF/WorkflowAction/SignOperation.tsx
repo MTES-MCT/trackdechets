@@ -493,21 +493,16 @@ function BsffPackagingTable({ bsff }: BsffPackagingTableProps) {
     }),
     []
   );
-  const {
-    getTableProps,
-    getTableBodyProps,
-    headers,
-    rows,
-    prepareRow,
-  } = useTable(
-    {
-      columns,
-      data,
-      filterTypes,
-      defaultColumn,
-    },
-    useFilters
-  );
+  const { getTableProps, getTableBodyProps, headers, rows, prepareRow } =
+    useTable(
+      {
+        columns,
+        data,
+        filterTypes,
+        defaultColumn,
+      },
+      useFilters
+    );
 
   return (
     <Table {...getTableProps()}>
