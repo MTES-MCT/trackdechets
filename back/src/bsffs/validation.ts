@@ -655,7 +655,7 @@ export async function validatePreviousPackagings(
 
   if (isRepackaging && bsff.packagings?.length > 1) {
     throw new UserInputError(
-      "Vous ne pouvez saisir qu'un seul contenant de destination lors d'une opération de recondtionnement"
+      "Vous ne pouvez saisir qu'un seul contenant lors d'une opération de reconditionnement"
     );
   }
 

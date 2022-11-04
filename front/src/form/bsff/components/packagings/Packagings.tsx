@@ -17,6 +17,8 @@ export default function BsffPackagings({
   const canEdit =
     !disabled && ![BsffType.Reexpedition, BsffType.Groupement].includes(type);
 
+  const maxPackagings = type === BsffType.Reconditionnement ? 1 : Infinity;
+
   return (
     <div className="tw-mt-2">
       <FieldArray
@@ -96,7 +98,7 @@ export default function BsffPackagings({
                 </div>
               );
             })}
-            {canEdit && (
+            {canEdit && value.length < maxPackagings && (
               <button
                 type="button"
                 className="btn btn--outline-primary"
@@ -110,6 +112,12 @@ export default function BsffPackagings({
               >
                 Ajouter un contenant
               </button>
+            )}
+            {value.length >= maxPackagings && (
+              <div className="notification">
+                Un seul contenant est autorisé dans le cadre d'un
+                reconditionnement
+              </div>
             )}
           </div>
         )}
