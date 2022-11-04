@@ -38,6 +38,8 @@ input BsffPackagingWhere {
   acceptation: BsffPackagingAcceptationWhere
   "Filtre possible sur l'opération effectuée"
   operation: BsffPackagingOperationWhere
+  "Filtre possible sur le BSFF suivant (le cas échéant)"
+  nextBsff: BsffWhere
   "ET logique"
   _and: [BsffPackagingWhere!]
   "OU logique"

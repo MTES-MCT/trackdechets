@@ -4,6 +4,7 @@ import { FieldArray, useField } from "formik";
 import {
   Bsff,
   BsffPackaging,
+  BsffPackagingWhere,
   BsffType,
   Query,
   QueryBsffPackagingsArgs,
@@ -83,6 +84,31 @@ export function PreviousPackagingsPicker({
   const [{ value: previousPackagings }] =
     useField<BsffPackaging[]>("previousPackagings");
 
+  let where: BsffPackagingWhere = {
+    operation: { code: { _in: code_in } },
+    bsff: {
+      destination: {
+        company: {
+          siret: { _eq: bsff.emitter?.company?.siret },
+        },
+      },
+    },
+    nextBsff: null,
+  };
+
+  // On autorise uniquement les réexpéditions de contenants présents sur le même BSFF
+  if (bsff.type === BsffType.Reexpedition && previousPackagings?.length > 0) {
+    where = {
+      ...where,
+      bsff: { ...where.bsff, id: { _eq: previousPackagings[0].bsffId } },
+    };
+  }
+
+  if (bsff.id) {
+    // En cas d'update, on autorise les contenants qui ont déjà été ajouté à ce BSFF
+    where = { _or: [where, { ...where, nextBsff: { id: { _eq: bsff.id } } }] };
+  }
+
   const { data, loading } = useQuery<
     Pick<Query, "bsffPackagings">,
     QueryBsffPackagingsArgs
@@ -90,22 +116,7 @@ export function PreviousPackagingsPicker({
     variables: {
       // pagination does not play well with bsff picking
       first: 5000,
-      where: {
-        operation: {
-          code: { _in: code_in },
-        },
-        bsff: {
-          ...(bsff.type === BsffType.Reexpedition &&
-          previousPackagings?.length > 0
-            ? { id: { _eq: previousPackagings[0].bsffId } }
-            : {}),
-          destination: {
-            company: {
-              siret: { _eq: bsff.emitter?.company?.siret },
-            },
-          },
-        },
-      },
+      where,
     },
     // make sure we have fresh data here
     fetchPolicy: "cache-and-network",
@@ -117,22 +128,9 @@ export function PreviousPackagingsPicker({
   }
 
   if (data) {
-    const pickablePackagings = data.bsffPackagings.edges
-      .map(({ node: packaging }) => packaging)
-      .filter(packaging => {
-        // remove packagings that are grouped, forwarded or repackaged in another BSFF
-        if (packaging.nextBsff?.id !== bsff.id) {
-          return false;
-        }
-        // in case of réexpédition, remove packaging that are not on the same BSFF
-        if (
-          bsff.type === BsffType.Reexpedition &&
-          previousPackagings?.length > 0
-        ) {
-          return packaging.bsffId === previousPackagings[0].bsffId;
-        }
-        return true;
-      });
+    const pickablePackagings = data.bsffPackagings.edges.map(
+      ({ node: packaging }) => packaging
+    );
 
     if (!pickablePackagings?.length) {
       return (

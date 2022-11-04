@@ -60,12 +60,21 @@ export function toPrismaBsffPackagingSimpleWhereInput(
     operationSignatureDate: toPrismaDateFilter(
       where.operation?.signature?.date
     ),
-    bsff: toPrismaBsffWhereInput(where.bsff)
+    bsff: toPrismaBsffWhereInput(where.bsff),
+    nextPackaging:
+      where.nextBsff === null
+        ? { is: null }
+        : where.nextBsff
+        ? { bsff: toPrismaBsffWhereInput(where.nextBsff) }
+        : undefined
   });
 }
 
 export function toPrismaBsffPackagingWhereInput(
   where: BsffPackagingWhere
 ): Prisma.BsffPackagingWhereInput {
+  if (!where) {
+    return undefined;
+  }
   return toPrismaNestedWhereInput(where, toPrismaBsffPackagingSimpleWhereInput);
 }

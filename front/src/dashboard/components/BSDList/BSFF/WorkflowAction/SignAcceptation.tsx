@@ -209,7 +209,9 @@ function SignBsffAcceptationOnePackagingModalContent({
 
   return (
     <>
-      <BsffPackagingSummary bsff={bsff} packaging={packaging} />
+      {bsff.packagings?.length > 1 && (
+        <BsffPackagingSummary bsff={bsff} packaging={packaging} />
+      )}
       <Formik
         initialValues={{
           analysisWasteCode:
@@ -221,7 +223,7 @@ function SignBsffAcceptationOnePackagingModalContent({
           acceptationStatus: WasteAcceptationStatus.Accepted,
           acceptationDate:
             packaging.acceptation?.date ?? new Date().toISOString(),
-          acceptationWeight: 0,
+          acceptationWeight: packaging.weight,
           acceptationRefusalReason: "",
           signatureAuthor: "",
         }}
