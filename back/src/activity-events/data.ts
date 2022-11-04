@@ -18,7 +18,7 @@ export async function getStream(
     })
   ]);
 
-  const mongoEventsIds = mongoEvents.map(e => e.id);
+  const mongoEventsIds = mongoEvents.map(e => e._id);
   const events = [
     ...mongoEvents,
     // Some events might be already in Mongo but still in Psql (especially during tests), so we remove duplicates

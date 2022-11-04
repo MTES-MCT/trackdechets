@@ -23,19 +23,22 @@ export async function closeMongoClient() {
 
 export async function getStreamEvents(streamId: string, lte?: Date) {
   const documents = await eventsCollection
-    .find({ streamId, ...(lte && { "event.createdAt": { $lte: lte } }) })
+    .find({ streamId, ...(lte && { createdAt: { $lte: lte } }) })
     .toArray();
 
-  return documents.map(document => document.event);
+  return documents;
 }
 
 export async function insertStreamEvents(tdEvents: Event[]) {
   const writeResult = await eventsCollection.bulkWrite(
-    tdEvents.map(evt => ({
-      insertOne: {
-        document: { _id: evt.id, streamId: evt.streamId, event: evt }
-      }
-    })),
+    tdEvents.map(fullEvent => {
+      const { id, ...evt } = fullEvent;
+      return {
+        insertOne: {
+          document: { _id: id, ...evt }
+        }
+      };
+    }),
     // During an ordered bulk write, if an error occurs during the processing of an operation,
     // MongoDB returns without processing the remaining operations in the list.
     // In contrast, when ordered is false, MongoDB continues to process remaining write operations in the list.

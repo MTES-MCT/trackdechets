@@ -7,8 +7,4 @@ type EventLike = Omit<Event, "metadata" | "data"> & {
   metadata: any;
 };
 
-export type EventCollection = {
-  _id: string;
-  streamId: string;
-  event: EventLike;
-};
+export type EventCollection = { _id: string } & Omit<EventLike, "id">;
