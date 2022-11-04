@@ -40,8 +40,9 @@ async function testWorkflow(workflow: Workflow) {
 
     expect(errors).toBeUndefined();
     const data = step.data(response);
-    expect(data).toEqual(expect.objectContaining(step.expected));
-
+    if (step.expected) {
+      expect(data).toEqual(expect.objectContaining(step.expected));
+    }
     if (step.setContext) {
       context = step.setContext(context, data);
     }

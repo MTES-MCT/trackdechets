@@ -31,7 +31,9 @@ export default function Workflow({ path }) {
             {lineBreaksToBr(step.description)}
           </div>
           <div className="margin-bottom--lg">
-            <CodeBlock className="graphql">{step.mutation}</CodeBlock>
+            <CodeBlock className="graphql">
+              {step.mutation ?? step.query}
+            </CodeBlock>
             <CodeBlock className="json">{step.variables}</CodeBlock>
           </div>
         </div>

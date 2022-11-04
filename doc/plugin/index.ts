@@ -17,6 +17,7 @@ function parseWorkflow(workflow: Workflow) {
       .map((step) => ({
         description: step.description,
         mutation: step.mutation,
+        query: step.query,
         variables: JSON.stringify(step.variables(workflow.docContext), null, 2),
       })),
   };

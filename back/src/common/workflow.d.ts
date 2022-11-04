@@ -33,7 +33,7 @@ export type WorkflowStep = {
   // GraphQL variables";
   variables: (ctx: any) => any;
   // Expected result of the mutation
-  expected: any;
+  expected?: any;
   // Name of the company performing the mutation as defined in the parent workflow companies field
   company: string;
   // How to parse GraphQL response to get data

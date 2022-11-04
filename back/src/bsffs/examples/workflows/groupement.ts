@@ -13,6 +13,7 @@ import {
 import { signOperation } from "../steps/signOperation";
 import collecteFluidesParOperateur from "./collecteFluidesParOperateur";
 import { createGroupementBsff } from "../steps/createGroupementBsff";
+import { bsffPackagings } from "../steps/bsffPackagings";
 
 const workflow: Workflow = {
   title:
@@ -38,6 +39,7 @@ const workflow: Workflow = {
   steps: [
     ...collecteFluidesParOperateur.steps.map(s => ({ ...s, hideInDoc: true })),
     ...collecteFluidesParOperateur.steps.map(s => ({ ...s, hideInDoc: true })),
+    bsffPackagings("ttr"),
     createGroupementBsff("ttr"),
     signEmission("ttr"),
     updateTransport("transporteur"),
