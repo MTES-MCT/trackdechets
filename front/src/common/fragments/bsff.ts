@@ -82,6 +82,7 @@ export const FullBsffFragment = gql`
       }
       operation {
         code
+        noTraceability
         date
         signature {
           date

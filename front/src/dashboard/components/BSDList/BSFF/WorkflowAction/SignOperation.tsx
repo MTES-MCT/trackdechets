@@ -12,7 +12,6 @@ import {
   Query,
   QueryBsffArgs,
   BsffOperationCode,
-  WasteAcceptationStatus,
   BsffType,
   BsffPackagingOperationInput,
   SignatureInput,
@@ -22,12 +21,6 @@ import {
   Loader,
   Modal,
   RedErrorMessage,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeaderCell,
-  TableRow,
 } from "common/components";
 import { NotificationError } from "common/components/Error";
 import DateInput from "form/common/components/custom-inputs/DateInput";
@@ -37,11 +30,8 @@ import {
   UPDATE_BSFF_PACKAGING,
 } from "form/bsff/utils/queries";
 import { GET_BSDS } from "common/queries";
-import { Column, useFilters, useTable } from "react-table";
 import { IconCheckCircle1 } from "common/components/Icons";
-import { BsffWasteSummary } from "./BsffWasteSummary";
 import { BsffSummary } from "./BsffSummary";
-import { formatDate } from "common/datetime";
 import { BsffPackagingSummary } from "./BsffPackagingSummary";
 import { OPERATION } from "form/bsff/utils/constants";
 import CompanySelector from "form/common/components/company/CompanySelector";
@@ -64,27 +54,13 @@ const validationSchema = yup.object({
 
 interface SignBsffOperationProps {
   bsffId: string;
-  packagingsCount: number;
-}
-
-export function SignBsffOperation({
-  bsffId,
-  packagingsCount,
-}: SignBsffOperationProps) {
-  if (packagingsCount === 1) {
-    return SignBsffOperationOnePackaging({ bsffId });
-  }
-  if (packagingsCount > 1) {
-    return SignBsffOperationMultiplePackagings({ bsffId });
-  }
-  return null;
 }
 
 /**
  * Bouton d'action permettant de signer l'opération d'un BSFF
  * avec un seul contenant
  */
-function SignBsffOperationOnePackaging({
+export function SignBsffOperationOnePackaging({
   bsffId,
 }: Pick<SignBsffOperationProps, "bsffId">) {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -107,37 +83,15 @@ function SignBsffOperationOnePackaging({
   );
 }
 
-/**
- * Bouton d'action permettant de signer l'opération
- * d'un BSFF avec plusieurs contenants
- */
-export function SignBsffOperationMultiplePackagings({
-  bsffId,
-}: Pick<SignBsffOperationProps, "bsffId">) {
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  return (
-    <>
-      <ActionButton
-        icon={<IconCheckCircle1 size="24px" />}
-        onClick={() => setIsOpen(true)}
-      >
-        Signer l'opération des contenants
-      </ActionButton>
-      {isOpen && (
-        <SignBsffOperationMultiplePackagingsModal
-          bsffId={bsffId}
-          onClose={() => setIsOpen(false)}
-        />
-      )}
-    </>
-  );
+interface SignBsffOperationOnePackagingModalProps {
+  bsffId: string;
+  onClose: () => void;
 }
 
 function SignBsffOperationOnePackagingModal({
   bsffId,
   onClose,
-}: SignBsffOperationMultiplePackagingsModalProps) {
+}: SignBsffOperationOnePackagingModalProps) {
   const { data } = useQuery<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF_FORM, {
     variables: {
       id: bsffId,
@@ -258,7 +212,7 @@ function NextDestinationField(props) {
 /**
  * Contenu de la modale permettant de signer l'opération d'un contenant
  */
-function SignBsffOperationOnePackagingModalContent({
+export function SignBsffOperationOnePackagingModalContent({
   bsff,
   packaging,
   onCancel,
@@ -393,198 +347,6 @@ function SignBsffOperationOnePackagingModalContent({
           </Form>
         )}
       </Formik>
-    </>
-  );
-}
-
-interface SignBsffOperationMultiplePackagingsModalProps {
-  bsffId: string;
-  onClose: () => void;
-}
-
-function SignBsffOperationMultiplePackagingsModal({
-  bsffId,
-  onClose,
-}: SignBsffOperationMultiplePackagingsModalProps) {
-  const { data } = useQuery<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF_FORM, {
-    variables: {
-      id: bsffId,
-    },
-  });
-
-  if (data == null) {
-    return <Loader />;
-  }
-
-  const { bsff } = data;
-
-  return (
-    <Modal
-      onClose={onClose}
-      ariaLabel="Signer l'opération des contentants"
-      isOpen
-    >
-      <h2 className="td-modal-title">Signer l'opération des contentants</h2>
-      <BsffWasteSummary bsff={bsff} />
-      <BsffPackagingTable bsff={bsff} />
-    </Modal>
-  );
-}
-
-interface BsffPackagingTableProps {
-  bsff: Bsff;
-}
-
-function BsffPackagingTable({ bsff }: BsffPackagingTableProps) {
-  const columns: Column<BsffPackaging>[] = React.useMemo(
-    () => [
-      {
-        id: "numero",
-        Header: "Numéro de contenant",
-        accessor: bsffPackaging => bsffPackaging.numero,
-        filter: "text",
-      },
-      {
-        id: "name",
-        Header: "Dénomination",
-        accessor: bsffPackaging => bsffPackaging.name,
-        filter: "text",
-      },
-    ],
-    []
-  );
-
-  const data = React.useMemo(() => bsff.packagings, [bsff.packagings]);
-
-  const filterTypes = React.useMemo(
-    () => ({
-      text: (rows, id, filterValue) => {
-        return rows.filter(row => {
-          const rowValue = row.values[id];
-          return rowValue !== undefined
-            ? String(rowValue)
-                .toLowerCase()
-                .includes(String(filterValue).toLowerCase())
-            : true;
-        });
-      },
-    }),
-    []
-  );
-
-  // Define a default UI for filtering
-  function DefaultColumnFilter({ column: { filterValue, setFilter } }) {
-    return (
-      <input
-        className="td-input td-input--small"
-        value={filterValue || ""}
-        onChange={e => {
-          setFilter(e.target.value || undefined); // Set undefined to remove the filter entirely
-        }}
-        placeholder={`Filtrer...`}
-      />
-    );
-  }
-
-  const defaultColumn = React.useMemo(
-    () => ({
-      // Let's set up our default Filter UI
-      Filter: DefaultColumnFilter,
-    }),
-    []
-  );
-  const { getTableProps, getTableBodyProps, headers, rows, prepareRow } =
-    useTable(
-      {
-        columns,
-        data,
-        filterTypes,
-        defaultColumn,
-      },
-      useFilters
-    );
-
-  return (
-    <Table {...getTableProps()}>
-      <TableHead>
-        <TableRow>
-          {headers.map(column => (
-            <TableHeaderCell {...column.getHeaderProps()}>
-              {column.render("Header")}
-              <div>{column.canFilter ? column.render("Filter") : null}</div>
-            </TableHeaderCell>
-          ))}
-          <TableHeaderCell></TableHeaderCell>
-        </TableRow>
-      </TableHead>
-      <TableBody {...getTableBodyProps()}>
-        {rows.map(row => {
-          prepareRow(row);
-          return (
-            <TableRow {...row.getRowProps()}>
-              {row.cells.map(cell => {
-                return (
-                  <TableCell {...cell.getCellProps()}>
-                    {cell.render("Cell")}
-                  </TableCell>
-                );
-              })}
-              <TableCell>
-                {row.original.operation?.signature?.date ? (
-                  <div>
-                    Traité le {formatDate(row.original.operation?.date ?? "")} -
-                    Code {row.original.operation?.code}
-                  </div>
-                ) : row.original.acceptation?.status ===
-                  WasteAcceptationStatus.Refused ? (
-                  <div>
-                    Refusé le {formatDate(row.original.acceptation?.date ?? "")}
-                  </div>
-                ) : (
-                  <SignBsffPackaging bsff={bsff} packaging={row.original} />
-                )}
-              </TableCell>
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
-  );
-}
-
-interface SignBsffPackagingProps {
-  bsff: Bsff;
-  packaging: BsffPackaging;
-}
-
-function SignBsffPackaging({ bsff, packaging }: SignBsffPackagingProps) {
-  const [isOpen, setIsOpen] = React.useState(false);
-
-  return (
-    <>
-      <ActionButton
-        icon={<IconCheckCircle1 size="24px" />}
-        onClick={() => setIsOpen(true)}
-      >
-        Signer l'opération
-      </ActionButton>
-
-      {isOpen && (
-        <Modal
-          onClose={() => setIsOpen(false)}
-          ariaLabel="Signer l'opération"
-          isOpen
-        >
-          <h2 className="td-modal-title">
-            Signer l'opération du contenant {packaging.numero}
-          </h2>
-          <SignBsffOperationOnePackagingModalContent
-            bsff={bsff}
-            packaging={packaging}
-            onCancel={() => setIsOpen(false)}
-          />
-        </Modal>
-      )}
     </>
   );
 }

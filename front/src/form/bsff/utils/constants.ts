@@ -67,3 +67,7 @@ export const OPERATION: Record<
     successors: [BsffType.Reexpedition],
   },
 };
+
+export function isFinalOperation(operationCode: string) {
+  return OPERATION[operationCode]?.successors?.length === 0;
+}

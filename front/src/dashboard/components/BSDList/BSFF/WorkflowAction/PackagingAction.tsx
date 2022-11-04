@@ -1,0 +1,117 @@
+import { ActionButton, Modal } from "common/components";
+import { IconCheckCircle1 } from "common/components/Icons";
+import { formatDate } from "common/datetime";
+import {
+  Bsff,
+  BsffPackaging,
+  WasteAcceptationStatus,
+} from "generated/graphql/types";
+import React from "react";
+import { SignBsffAcceptationOnePackagingModalContent } from "./SignAcceptation";
+import { SignBsffOperationOnePackagingModalContent } from "./SignOperation";
+
+interface WorkflowPackagingActionProps {
+  bsff: Bsff;
+  packaging: BsffPackaging;
+}
+
+export function PackagingAction({
+  bsff,
+  packaging,
+}: WorkflowPackagingActionProps) {
+  if (packaging.operation?.signature?.date) {
+    if (packaging.operation?.code) {
+      return (
+        <div>
+          Traité le {formatDate(packaging.operation?.date ?? "")} - Code{" "}
+          {packaging.operation?.code}
+          {packaging.operation?.noTraceability && " (rupture de traçabilité)"}
+        </div>
+      );
+    }
+  }
+  if (packaging.acceptation?.signature?.date) {
+    if (packaging.acceptation?.status === WasteAcceptationStatus.Refused) {
+      return (
+        <div>Refusé le {formatDate(packaging.acceptation?.date ?? "")}</div>
+      );
+    }
+    return <SignBsffPackagingOperation packaging={packaging} bsff={bsff} />;
+  }
+  return <SignBsffPackagingAcceptation packaging={packaging} bsff={bsff} />;
+}
+
+interface SignBsffPackagingProps {
+  bsff: Bsff;
+  packaging: BsffPackaging;
+}
+
+export function SignBsffPackagingAcceptation({
+  bsff,
+  packaging,
+}: SignBsffPackagingProps) {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  return (
+    <>
+      <ActionButton
+        icon={<IconCheckCircle1 size="24px" />}
+        onClick={() => setIsOpen(true)}
+      >
+        Signer l'acceptation
+      </ActionButton>
+
+      {isOpen && (
+        <Modal
+          onClose={() => setIsOpen(false)}
+          ariaLabel="Signer l'acceptation"
+          isOpen
+        >
+          <h2 className="td-modal-title">
+            Signer l'acceptation du contenant {packaging.numero}
+          </h2>
+          <SignBsffAcceptationOnePackagingModalContent
+            bsff={bsff}
+            packaging={packaging}
+            onCancel={() => setIsOpen(false)}
+          />
+        </Modal>
+      )}
+    </>
+  );
+}
+
+export function SignBsffPackagingOperation({
+  bsff,
+  packaging,
+}: SignBsffPackagingProps) {
+  const [isOpen, setIsOpen] = React.useState(false);
+
+  return (
+    <>
+      <ActionButton
+        icon={<IconCheckCircle1 size="24px" />}
+        onClick={() => setIsOpen(true)}
+      >
+        Signer l'opération
+      </ActionButton>
+
+      {isOpen && (
+        <Modal
+          onClose={() => setIsOpen(false)}
+          ariaLabel="Signer l'opération"
+          isOpen
+        >
+          <h2 className="td-modal-title">
+            Signer l'opération du contenant {packaging.numero}
+          </h2>
+          <SignBsffOperationOnePackagingModalContent
+            bsff={bsff}
+            packaging={packaging}
+            onCancel={() => setIsOpen(false)}
+          />
+        </Modal>
+      )}
+    </>
+  );
+}
