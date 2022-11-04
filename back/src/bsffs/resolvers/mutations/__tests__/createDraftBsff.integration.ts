@@ -500,5 +500,38 @@ describe("Mutation.createDraftBsff", () => {
         })
       ]);
     });
+
+    it(
+      "should throw an error when creating a BSFF with type" +
+        " REEXPEDITION, GROUPEMENT or RECONDITIONNEMENT and no previous packagings attached",
+      async () => {
+        const { mutate } = makeClient(emitter.user);
+        const { errors } = await mutate<
+          Pick<Mutation, "createDraftBsff">,
+          MutationCreateDraftBsffArgs
+        >(CREATE_DRAFT_BSFF, {
+          variables: {
+            input: {
+              type: BsffType.GROUPEMENT,
+              emitter: {
+                company: {
+                  name: emitter.company.name,
+                  siret: emitter.company.siret,
+                  address: emitter.company.address,
+                  contact: emitter.user.name,
+                  mail: emitter.user.email
+                }
+              }
+            }
+          }
+        });
+        expect(errors).toEqual([
+          expect.objectContaining({
+            message:
+              "Vous devez saisir des contenants en transit en cas de groupement, reconditionnement ou réexpédition"
+          })
+        ]);
+      }
+    );
   });
 });
