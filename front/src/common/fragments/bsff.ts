@@ -206,6 +206,10 @@ export const PreviousBsffPackagingFragment = gql`
     volume
     name
     bsffId
+    acceptation {
+      wasteCode
+      wasteDescription
+    }
     bsff {
       id
       emitter {
@@ -216,6 +220,7 @@ export const PreviousBsffPackagingFragment = gql`
       }
       waste {
         code
+        description
       }
     }
     nextBsff {

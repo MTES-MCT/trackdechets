@@ -55,8 +55,13 @@ export function PreviousPackagingsPicker({
         id: "wasteCode",
         Header: "Déchet",
         accessor: bsffPackaging =>
-          bsffPackaging?.acceptation?.wasteCode ??
-          bsffPackaging.bsff?.waste?.code,
+          `${
+            bsffPackaging?.acceptation?.wasteCode ??
+            bsffPackaging.bsff?.waste?.code
+          } - ${
+            bsffPackaging?.acceptation?.wasteDescription ??
+            bsffPackaging.bsff?.waste?.description
+          }`,
         canFilter: true,
         filter: "text",
       },
