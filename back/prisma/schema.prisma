@@ -1045,6 +1045,7 @@ model Bsff {
   destinationCompanyContact String?
   destinationCompanyPhone   String?
   destinationCompanyMail    String?
+  destinationCap            String?
 
   destinationCustomInfo String?
 

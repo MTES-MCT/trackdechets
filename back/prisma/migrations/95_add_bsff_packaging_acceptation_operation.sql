@@ -50,6 +50,7 @@ ADD
 ADD
   COLUMN "operationNextPackagingId" TEXT;
 
+
 -- CreateIndex
 CREATE INDEX "_BsffPackagingNextPackagingIdx" ON "default$default"."BsffPackaging"("nextPackagingId");
 
@@ -61,6 +62,16 @@ ADD
 SET
   NULL ON UPDATE CASCADE;
 
+ALTER TYPE "default$default"."BsffStatus"
+ADD
+  VALUE 'ACCEPTED';
 
-ALTER TYPE "default$default"."BsffStatus" ADD VALUE 'ACCEPTED';
-ALTER TYPE "default$default"."BsffStatus" ADD VALUE 'PARTIALLY_REFUSED';
+ALTER TYPE "default$default"."BsffStatus"
+ADD
+  VALUE 'PARTIALLY_REFUSED';
+
+-- AlterTable
+ALTER TABLE
+  "default$default"."Bsff"
+ADD
+  COLUMN "destinationCap" TEXT;

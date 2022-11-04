@@ -69,6 +69,7 @@ export function flattenBsffInput(
     destinationCompanyContact: bsffInput.destination?.company?.contact,
     destinationCompanyPhone: bsffInput.destination?.company?.phone,
     destinationCompanyMail: bsffInput.destination?.company?.mail,
+    destinationCap: bsffInput.destination?.cap,
     destinationCustomInfo: bsffInput.destination?.customInfo,
 
     destinationReceptionDate: bsffInput.destination?.reception?.date,
@@ -139,6 +140,7 @@ export function expandBsffFromDB(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
       })
     }),
     destination: nullIfNoValues<GraphQL.BsffDestination>({
+      cap: prismaBsff.destinationCap,
       company: nullIfNoValues<GraphQL.FormCompany>({
         name: prismaBsff.destinationCompanyName,
         siret: prismaBsff.destinationCompanySiret,
@@ -156,8 +158,7 @@ export function expandBsffFromDB(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
         })
       }),
       plannedOperationCode:
-        prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode,
-      cap: null // deprecated field
+        prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode
     }),
     // the following relations will be set in Bsff resolver
     ficheInterventions: [],

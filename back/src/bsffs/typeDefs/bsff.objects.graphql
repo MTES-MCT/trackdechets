@@ -228,8 +228,8 @@ type BsffDestination {
   plannedOperationCode: BsffOperationCode
   "Déclaration de réception du déchet."
   reception: BsffReception
-  "DEPRECATED - Numéro CAP."
-  cap: String @deprecated(reason: "Il n'y a pas de CAP sur le BSFF")
+  "Numéro de CAP."
+  cap: String
   "Champ libre"
   customInfo: String
 }

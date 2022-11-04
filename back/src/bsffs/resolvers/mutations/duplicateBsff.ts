@@ -49,6 +49,8 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
       transporterRecepisseValidityLimit:
         existingBsff.transporterRecepisseValidityLimit,
       transporterTransportMode: existingBsff.transporterTransportMode,
+      transporterTransportPlates: existingBsff.transporterTransportPlates,
+      destinationCap: existingBsff.destinationCap,
       destinationCompanyName: existingBsff.destinationCompanyName,
       destinationCompanySiret: existingBsff.destinationCompanySiret,
       destinationCompanyAddress: existingBsff.destinationCompanyAddress,
