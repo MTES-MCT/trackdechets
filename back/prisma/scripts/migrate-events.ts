@@ -1,4 +1,3 @@
-import { Event } from "@prisma/client";
 import { insertStreamEvents } from "../../src/events/mongodb";
 import prisma from "../../src/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
@@ -17,46 +16,28 @@ export class SetContactsUpdater implements Updater {
       console.info(`ℹ️ Batch size is ${BATCH_SIZE}\n`);
 
       while (true) {
-        const nbOfEventsProcessed = await prisma.$transaction(
-          async transaction => {
-            const events = await transaction.event.findMany({
-              take: BATCH_SIZE
-            });
+        const events = await prisma.event.findMany({
+          take: BATCH_SIZE
+        });
 
-            if (events.length === 0) return 0;
+        if (events.length === 0) return 0;
 
-            await insertStreamEvents(events);
+        await insertStreamEvents(events);
 
-            await transaction.event.deleteMany({
-              where: { id: { in: events.map(e => e.id) } }
-            });
-
-            return events.length;
-          }
-        );
+        await prisma.event.deleteMany({
+          where: { id: { in: events.map(e => e.id) } }
+        });
 
         counter++;
         printProgress(counter, totalNumberOfEvents);
 
-        if (nbOfEventsProcessed < BATCH_SIZE) break;
+        if (events.length < BATCH_SIZE) break;
       }
     } catch (err) {
       console.error("☠ Something went wrong during the update", err);
       throw new Error();
     }
   }
-}
-
-function groupByStreamId(array: Event[]) {
-  return array.reduce<Record<string, Event[]>>((groups, event) => {
-    const { streamId } = event;
-    if (!groups[streamId]) {
-      groups[streamId] = [];
-    }
-
-    groups[streamId].push(event);
-    return groups;
-  }, {});
 }
 
 function printProgress(batchNb: number, totalNumberOfEvents: number) {

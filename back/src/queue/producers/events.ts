@@ -11,13 +11,21 @@ export const syncEventsQueue = new Queue<void>(
   REDIS_URL,
   {
     defaultJobOptions: {
-      removeOnComplete: 100
+      removeOnComplete: 1000
     }
   }
 );
 
-indexQueue.on("completed", () => {
-  syncEventsQueue.add();
+indexQueue.on("completed", async () => {
+  // Every time events are created in Psql an index event is queued.
+  // So we use the indexQueue as a trigger to launch a sync.
+  // We dont sync id by id but in batch, hence there is no need to request a sync too often.
+  // One awaiting request at a time should be sufficient.
+  // And if a sync misses on a few events, the next one will catch up.
+  const waitingCount = await syncEventsQueue.getWaitingCount();
+  if (waitingCount === 0) {
+    syncEventsQueue.add();
+  }
 });
 
 export function closeSyncEventsQueue() {
