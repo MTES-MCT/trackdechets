@@ -16,11 +16,6 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
   const existingBsff = await getBsffOrNotFound({ id });
-  const packagings = await prisma.bsff
-    .findUnique({ where: { id: existingBsff.id } })
-    .packagings({
-      select: { name: true, numero: true, weight: true, volume: true }
-    });
 
   await isBsffContributor(user, existingBsff);
 
@@ -61,8 +56,7 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
       destinationCompanyPhone: existingBsff.destinationCompanyPhone,
       destinationCompanyMail: existingBsff.destinationCompanyMail,
       destinationPlannedOperationCode:
-        existingBsff.destinationPlannedOperationCode,
-      packagings: { createMany: { data: packagings } }
+        existingBsff.destinationPlannedOperationCode
     }
   });
 
