@@ -67,7 +67,7 @@
     "@prisma/client": "^4.2.0",
     "@sentry/integrations": "^6.19.7",
     "@sentry/node": "^6.19.6",
-    "apollo-server-core": "^3.10.1",
+    "apollo-server-core": "^3.11.0",
     "apollo-server-express": "^3.10.1",
     "apollo-server-plugin-base": "^3.6.2",
     "app-root-path": "^3.0.0",
