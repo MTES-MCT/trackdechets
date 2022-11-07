@@ -14,7 +14,11 @@ app.use(
     crossOriginEmbedderPolicy: false,
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ["'self'", "*.trackdechets.beta.gouv.fr"],
+        defaultSrc: [
+          "'self'",
+          "*.trackdechets.beta.gouv.fr",
+          "*.trackdechets.fr",
+        ],
         baseUri: "'self'",
         fontSrc: ["'self'", "https:", "data:"],
         frameAncestors: "'none'",
