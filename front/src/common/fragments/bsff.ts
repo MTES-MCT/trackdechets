@@ -76,8 +76,13 @@ export const FullBsffFragment = gql`
       acceptation {
         date
         status
+        refusalReason
+        wasteCode
+        wasteDescription
+        weight
         signature {
           date
+          author
         }
       }
       operation {
@@ -86,6 +91,13 @@ export const FullBsffFragment = gql`
         date
         signature {
           date
+          author
+        }
+        nextDestination {
+          plannedOperationCode
+          company {
+            ...CompanyFragment
+          }
         }
       }
     }

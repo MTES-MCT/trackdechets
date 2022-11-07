@@ -7,7 +7,12 @@ import {
   IconWarehouseDelivery,
   IconWaterDam,
 } from "common/components/Icons";
-import { Bsff, BsffStatus, FormCompany } from "generated/graphql/types";
+import {
+  Bsff,
+  BsffStatus,
+  FormCompany,
+  WasteAcceptationStatus,
+} from "generated/graphql/types";
 import React, { useState } from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -217,16 +222,14 @@ function Emitter({ form }: { form: Bsff }) {
       <div className={styles.detailGrid}>
         <Company label="Émetteur" company={form.emitter?.company} />
       </div>
+
       <div className={styles.detailGrid}>
-        <DetailRow
-          value={(form.packagings ?? [])
-            .map(
-              packaging =>
-                `${packaging.name} ${packaging.numero} (${packaging.weight}kg)`
-            )
-            .join(", ")}
-          label="Conditionnement"
-        />
+        {form.packagings?.length === 1 && (
+          <DetailRow
+            value={`${form.packagings[0].name} ${form.packagings[0].numero} (${form.packagings[0].weight}kg)`}
+            label="Conditionnement"
+          />
+        )}
 
         <DetailRow value={form.weight?.value} label="Poids total" units="kg" />
       </div>
@@ -297,6 +300,7 @@ function Destination({ form }: { form: Bsff }) {
         <Company label="Destinataire" company={form.destination?.company} />
       </div>
       <div className={styles.detailGrid}>
+        <DetailRow value={form.destination?.cap} label="CAP" />
         <DetailRow
           value={form.destination?.plannedOperationCode}
           label="Opération prévue"
@@ -308,31 +312,93 @@ function Destination({ form }: { form: Bsff }) {
           value={form.destination?.reception?.signature?.date}
           label="Réception signée le"
         />
-        <DateRow
+        <DetailRow
           value={form.destination?.reception?.signature?.author}
           label="Réception signée par"
         />
-        {/* <DetailRow
-          value={form.destination?.reception?.weight}
-          label="Quantité reçue"
-          units="kg"
-        /> */}
+        {form.packagings?.length === 1 &&
+          !!form.packagings[0].acceptation?.status &&
+          !!form.packagings[0].acceptation?.signature?.date && (
+            <>
+              {form.packagings[0].acceptation?.status ===
+              WasteAcceptationStatus.Accepted ? (
+                <>
+                  <DateRow
+                    value={form.packagings[0].acceptation?.date}
+                    label="Accepté le"
+                  />
+                  <DetailRow
+                    value={form.packagings[0].acceptation?.signature?.author}
+                    label="Accepté par"
+                  />
+                  <DetailRow
+                    value={form.packagings[0].acceptation?.weight}
+                    label="Quantité acceptée"
+                    units="kg"
+                  />
+                </>
+              ) : (
+                <>
+                  <DateRow
+                    value={form.packagings[0].acceptation?.date}
+                    label="Refusé le"
+                  />
+                  <DetailRow
+                    value={form.packagings[0].acceptation?.signature?.author}
+                    label="Refusé par"
+                  />
+                  <DetailRow
+                    value={form.packagings[0].acceptation?.refusalReason}
+                    label="Raison du refus"
+                  />
+                </>
+              )}
+              <DetailRow
+                value={form.packagings[0].acceptation?.wasteCode}
+                label="Code déchet"
+              />
+              <DetailRow
+                value={form.packagings[0].acceptation?.wasteDescription}
+                label="Description du déchet"
+              />
+            </>
+          )}
       </div>
-      {/* <div className={styles.detailGrid}>
-        <DetailRow
-          value={form.destination?.operation?.code}
-          label="Opération de traitement"
-        />
-
-        <DetailRow
-          value={form.destination?.operation?.signature?.author}
-          label="Traitement signé par"
-        />
-        <DateRow
-          value={form.destination?.operation?.signature?.date}
-          label="Traitement signé le"
-        />
-      </div> */}
+      {form.packagings?.length === 1 && (
+        <div className={styles.detailGrid}>
+          <DetailRow
+            value={`${form.packagings[0].operation?.code}${
+              form.packagings[0].operation?.noTraceability
+                ? " (rupture de traçabilité)"
+                : ""
+            }`}
+            label="Opération de traitement"
+          />
+          <DateRow
+            value={form.packagings[0].operation?.signature?.date}
+            label="Traitement signé le"
+          />
+          <DetailRow
+            value={form.packagings[0].operation?.signature?.author}
+            label="Traitement signé par"
+          />
+          {!!form.packagings[0].operation?.nextDestination && (
+            <>
+              <DetailRow
+                value={
+                  form.packagings[0].operation?.nextDestination
+                    ?.plannedOperationCode
+                }
+                label="Opération ultérieure prévue"
+              />
+              <Company
+                label="Destination ultérieure prévue"
+                company={form.packagings[0].operation?.nextDestination?.company}
+              />
+            </>
+          )}
+        </div>
+      )}
     </>
   );
 }
