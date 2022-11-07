@@ -35,17 +35,21 @@ export function BsffWasteSummary({ bsff }: BsffWasteSummaryProps) {
           {bsff.weight?.isEstimate && <>(estimé(s))</>}
         </DataListDescription>
       </DataListItem>
-      <DataListItem>
-        <DataListTerm>Contenant(s)</DataListTerm>
-        <DataListDescription>
-          {bsff.packagings
-            .map(
-              packaging =>
-                `${packaging.name} n°${packaging.numero} (${packaging.weight} kilo(s))`
-            )
-            .join(", ")}
-        </DataListDescription>
-      </DataListItem>
+      {bsff.packagings?.length === 1 && (
+        <DataListItem>
+          <DataListTerm>Contenant</DataListTerm>
+          <DataListDescription>
+            {bsff.packagings[0].name} n°{bsff.packagings[0].numero} (
+            {bsff.packagings[0].weight} kilo(s))
+          </DataListDescription>
+        </DataListItem>
+      )}
+      {bsff.packagings?.length > 1 && (
+        <DataListItem>
+          <DataListTerm>Nombre de contenants</DataListTerm>
+          <DataListDescription>{bsff.packagings.length}</DataListDescription>
+        </DataListItem>
+      )}
     </DataList>
   );
 }
