@@ -1,8 +1,41 @@
 const express = require("express");
+const helmet = require("helmet");
+
 const path = require("path");
 const fs = require("fs");
 
 const app = express();
+
+app.use(
+  helmet({
+    frameguard: {
+      action: "deny",
+    },
+    crossOriginEmbedderPolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: [
+          "'self'",
+          "*.trackdechets.beta.gouv.fr",
+          "*.trackdechets.fr",
+        ],
+        baseUri: "'self'",
+        formAction: [
+          "'self'",
+          "*.trackdechets.beta.gouv.fr",
+          "*.trackdechets.fr",
+        ],
+        fontSrc: ["'self'", "https:", "data:"],
+        frameAncestors: "'none'",
+        frameSrc: ["'self'"],
+        imgSrc: ["'self'", "data:", "http:"], // allow oauth applications logos
+        scriptSrc: ["'self'", "https:", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "https:", "'unsafe-inline'"],
+      },
+    },
+  })
+);
+
 const directory = "/" + (process.env.STATIC_DIR || "build");
 app.use(express.static(__dirname + directory));
 
@@ -17,11 +50,11 @@ const indexContent =
       )
     : raw;
 
-app.get("/*", function (req, res) {
+app.get("/*", function(req, res) {
   res.send(indexContent);
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, function () {
+app.listen(port, function() {
   console.log("Trackdechets front listening on", port);
 });
