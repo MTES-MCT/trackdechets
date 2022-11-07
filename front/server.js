@@ -1,8 +1,32 @@
 const express = require("express");
+const helmet = require("helmet");
+
 const path = require("path");
 const fs = require("fs");
 
 const app = express();
+
+app.use(
+  helmet({
+    frameguard: {
+      action: "deny",
+    },
+    crossOriginEmbedderPolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        baseUri: "'self'",
+        fontSrc: ["'self'", "https:", "data:"],
+        frameAncestors: "'none'",
+        frameSrc: ["'self'"],
+        imgSrc: ["'self'", "data:"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        styleSrc: ["'self'", "https:", "'unsafe-inline'"],
+      },
+    },
+  })
+);
+
 const directory = "/" + (process.env.STATIC_DIR || "build");
 app.use(express.static(__dirname + directory));
 
@@ -17,11 +41,11 @@ const indexContent =
       )
     : raw;
 
-app.get("/*", function (req, res) {
+app.get("/*", function(req, res) {
   res.send(indexContent);
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, function () {
+app.listen(port, function() {
   console.log("Trackdechets front listening on", port);
 });
