@@ -1,20 +1,29 @@
 import { ActivityEvent } from ".";
 import prisma from "../prisma";
 import { Event, Prisma } from "@prisma/client";
+import { getStreamEvents } from "../events/mongodb";
 
 export async function getStream(
   streamId: string,
   { until }: { until?: Date } = {}
 ): Promise<ActivityEvent[]> {
-  const where = {
-    streamId,
-    ...(until && { createdAt: { lte: until } })
-  };
+  // Events might be dispatched between Psql & Mongo so we fetch from both
+  const [mongoEvents, psqlEvents] = await Promise.all([
+    getStreamEvents(streamId, until),
+    prisma.event.findMany({
+      where: {
+        streamId,
+        ...(until && { createdAt: { lte: until } })
+      }
+    })
+  ]);
 
-  const events = await prisma.event.findMany({
-    where,
-    orderBy: { createdAt: "asc" }
-  });
+  const mongoEventsIds = mongoEvents.map(e => e._id);
+  const events = [
+    ...mongoEvents,
+    // Some events might be already in Mongo but still in Psql (especially during tests), so we remove duplicates
+    ...psqlEvents.filter(evt => !mongoEventsIds.includes(evt.id))
+  ].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
 
   return events?.map(event => ({
     type: event.type,

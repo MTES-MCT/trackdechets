@@ -73,6 +73,16 @@ services:
         constraints:
           - "node.labels.elasticsearch == true"
 
+  mongodb:
+    image: mongo:6
+    ports:
+      - 27017:27017
+    volumes:
+      - ~/apps/mongo:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=trackdechets
+      - MONGO_INITDB_ROOT_PASSWORD=password
+
   nginx:
     image: nginx:1.19.6
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"

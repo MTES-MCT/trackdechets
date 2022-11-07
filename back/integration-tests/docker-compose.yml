@@ -28,6 +28,12 @@ services:
         constraints:
           - "node.labels.elasticsearch == true"
 
+  mongodb:
+    image: mongo:6
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=test
+      - MONGO_INITDB_ROOT_PASSWORD=no_pass
+
   td-api:
     image: td-api
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
