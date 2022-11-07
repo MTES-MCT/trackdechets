@@ -87,6 +87,7 @@ export const FullBsffFragment = gql`
       }
       operation {
         code
+        description
         noTraceability
         date
         signature {
@@ -97,6 +98,15 @@ export const FullBsffFragment = gql`
           plannedOperationCode
           company {
             ...CompanyFragment
+          }
+        }
+      }
+      nextBsffs {
+        id
+        destination {
+          company {
+            name
+            siret
           }
         }
       }

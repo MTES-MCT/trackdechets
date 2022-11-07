@@ -10,6 +10,7 @@ import {
 import {
   Bsff,
   BsffStatus,
+  BsffType,
   FormCompany,
   WasteAcceptationStatus,
 } from "generated/graphql/types";
@@ -27,6 +28,15 @@ import { WorkflowAction } from "dashboard/components/BSDList/BSFF/WorkflowAction
 import { DeleteBsffModal } from "dashboard/components/BSDList/BSFF/BsffActions/DeleteModal";
 import { useDownloadPdf } from "dashboard/components/BSDList/BSFF/BsffActions/useDownloadPdf";
 import { transportModeLabels } from "dashboard/constants";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "common/components";
+import { formatDate } from "common/datetime";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -60,10 +70,24 @@ export function BsffDetailContent({ form }: Props) {
               </div>
             </div>
             <div className={styles.detailGrid}>
-              {/* <DateRow
-              value={form.updatedAt}
-              label="Dernière action sur le BSD"
-            /> */}
+              {[
+                BsffType.Groupement,
+                BsffType.Reconditionnement,
+                BsffType.Reexpedition,
+              ].includes(form.type) && (
+                <DetailRow
+                  value={
+                    form.type === BsffType.Groupement
+                      ? "Groupement"
+                      : form.type === BsffType.Reconditionnement
+                      ? "Reconditionnement"
+                      : form.type === BsffType.Reexpedition
+                      ? "Réexpédition"
+                      : ""
+                  }
+                  label="Type"
+                />
+              )}
               <DetailRow
                 value={form.weight?.value}
                 label="Poids total"
@@ -96,11 +120,16 @@ export function BsffDetailContent({ form }: Props) {
               <IconRenewableEnergyEarth size="25px" />
               <span className={styles.detailTabCaption}>Destinataire</span>
             </Tab>
-
             <Tab className={styles.detailTab}>
-              <IconRenewableEnergyEarth size="25px" />
-              <span className={styles.detailTabCaption}>FIs</span>
+              <IconBSFF />
+              <span className={styles.detailTabCaption}>Contenants</span>
             </Tab>
+            {form.ficheInterventions?.length > 0 && (
+              <Tab className={styles.detailTab}>
+                <IconRenewableEnergyEarth size="25px" />
+                <span className={styles.detailTabCaption}>FIs</span>
+              </Tab>
+            )}
           </TabList>
           {/* Tabs content */}
           <div className={styles.detailTabPanels}>
@@ -121,12 +150,21 @@ export function BsffDetailContent({ form }: Props) {
               </div>
             </TabPanel>
 
-            {/* Fiche d'interventions */}
+            {/* Packagings tab panel */}
             <TabPanel className={styles.detailTabPanel}>
               <div className={styles.detailColumns}>
-                <FicheInterventions form={form} />
+                <Packagings form={form} />
               </div>
             </TabPanel>
+
+            {/* Fiche d'interventions */}
+            {form.ficheInterventions?.length > 0 && (
+              <TabPanel className={styles.detailTabPanel}>
+                <div className={styles.detailColumns}>
+                  <FicheInterventions form={form} />
+                </div>
+              </TabPanel>
+            )}
           </div>
         </Tabs>
         <div className={styles.detailActions}>
@@ -317,7 +355,6 @@ function Destination({ form }: { form: Bsff }) {
           label="Réception signée par"
         />
         {form.packagings?.length === 1 &&
-          !!form.packagings[0].acceptation?.status &&
           !!form.packagings[0].acceptation?.signature?.date && (
             <>
               {form.packagings[0].acceptation?.status ===
@@ -364,41 +401,44 @@ function Destination({ form }: { form: Bsff }) {
             </>
           )}
       </div>
-      {form.packagings?.length === 1 && (
-        <div className={styles.detailGrid}>
-          <DetailRow
-            value={`${form.packagings[0].operation?.code}${
-              form.packagings[0].operation?.noTraceability
-                ? " (rupture de traçabilité)"
-                : ""
-            }`}
-            label="Opération de traitement"
-          />
-          <DateRow
-            value={form.packagings[0].operation?.signature?.date}
-            label="Traitement signé le"
-          />
-          <DetailRow
-            value={form.packagings[0].operation?.signature?.author}
-            label="Traitement signé par"
-          />
-          {!!form.packagings[0].operation?.nextDestination && (
-            <>
-              <DetailRow
-                value={
-                  form.packagings[0].operation?.nextDestination
-                    ?.plannedOperationCode
-                }
-                label="Opération ultérieure prévue"
-              />
-              <Company
-                label="Destination ultérieure prévue"
-                company={form.packagings[0].operation?.nextDestination?.company}
-              />
-            </>
-          )}
-        </div>
-      )}
+      {form.packagings?.length === 1 &&
+        !!form.packagings[0].operation?.signature?.date && (
+          <div className={styles.detailGrid}>
+            <DetailRow
+              value={`${form.packagings[0].operation?.code}${
+                form.packagings[0].operation?.noTraceability
+                  ? " (rupture de traçabilité)"
+                  : ""
+              }`}
+              label="Opération de traitement"
+            />
+            <DateRow
+              value={form.packagings[0].operation?.signature?.date}
+              label="Traitement signé le"
+            />
+            <DetailRow
+              value={form.packagings[0].operation?.signature?.author}
+              label="Traitement signé par"
+            />
+            {!!form.packagings[0].operation?.nextDestination && (
+              <>
+                <DetailRow
+                  value={
+                    form.packagings[0].operation?.nextDestination
+                      ?.plannedOperationCode
+                  }
+                  label="Opération ultérieure prévue"
+                />
+                <Company
+                  label="Destination ultérieure prévue"
+                  company={
+                    form.packagings[0].operation?.nextDestination?.company
+                  }
+                />
+              </>
+            )}
+          </div>
+        )}
     </>
   );
 }
@@ -427,5 +467,94 @@ function FicheInterventions({ form }: { form: Bsff }) {
         </div>
       ))}
     </div>
+  );
+}
+
+function Packagings({ form }: { form: Bsff }) {
+  return (
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell>Nom</TableHeaderCell>
+          <TableHeaderCell>Numéro</TableHeaderCell>
+          <TableHeaderCell>Quantité (kg)</TableHeaderCell>
+          <TableHeaderCell>Volume (litres)</TableHeaderCell>
+          <TableHeaderCell>Acceptation</TableHeaderCell>
+          <TableHeaderCell>Opération</TableHeaderCell>
+          <TableHeaderCell>Destination ultérieure</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {form.packagings.map(p => {
+          return (
+            <TableRow>
+              <TableCell>{p.name}</TableCell>
+              <TableCell>{p.numero}</TableCell>
+              <TableCell>{p.weight}</TableCell>
+              <TableCell>{p.volume}</TableCell>
+              {!!p.acceptation?.signature?.date ? (
+                <TableCell>
+                  {p.acceptation?.status === WasteAcceptationStatus.Accepted ? (
+                    <>
+                      <div>
+                        Accepté le {formatDate(p.acceptation?.date ?? "")} par{" "}
+                        {p.acceptation?.signature?.author}
+                      </div>
+                      <div>{`${p.acceptation?.weight} kg - ${p.acceptation?.wasteCode} (${p.acceptation?.wasteDescription})`}</div>
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        Refusé le {formatDate(p.acceptation?.date ?? "")} par{" "}
+                        {p.acceptation?.signature?.author}
+                      </div>
+                      <div>{p.acceptation?.refusalReason}</div>
+                    </>
+                  )}
+                </TableCell>
+              ) : (
+                <TableCell> </TableCell>
+              )}
+              {!!p.operation?.signature?.date ? (
+                <TableCell>
+                  <div>
+                    Traité le {formatDate(p.operation?.date ?? "")} par{" "}
+                    {p.operation?.signature?.author}
+                  </div>
+                  <div>
+                    {p.operation?.code} ({p?.operation?.description})
+                  </div>
+                  {p.operation?.noTraceability && (
+                    <div>Rupture de traçabilité</div>
+                  )}
+                  {p.operation?.nextDestination?.company?.siret && (
+                    <div>
+                      Destination ultérieure prévue:{" "}
+                      {p.operation?.nextDestination?.company?.name} (
+                      {p.operation?.nextDestination?.company?.siret}) -{" "}
+                      {p.operation?.nextDestination?.plannedOperationCode}
+                    </div>
+                  )}
+                </TableCell>
+              ) : (
+                <TableCell> </TableCell>
+              )}
+              <TableCell>
+                {p.nextBsffs.map(bsff => {
+                  return (
+                    <div>
+                      <div>
+                        {bsff.destination?.company?.name} - (
+                        {bsff.destination?.company?.siret})
+                      </div>
+                    </div>
+                  );
+                })}
+              </TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
   );
 }
