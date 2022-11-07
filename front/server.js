@@ -20,6 +20,11 @@ app.use(
           "*.trackdechets.fr",
         ],
         baseUri: "'self'",
+        formAction: [
+          "'self'",
+          "*.trackdechets.beta.gouv.fr",
+          "*.trackdechets.fr",
+        ],
         fontSrc: ["'self'", "https:", "data:"],
         frameAncestors: "'none'",
         frameSrc: ["'self'"],
