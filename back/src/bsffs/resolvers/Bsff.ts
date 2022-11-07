@@ -24,7 +24,7 @@ export const Bsff: BsffResolvers = {
     } else {
       packagings = await prisma.bsff
         .findUnique({ where: { id: bsff.id } })
-        .packagings();
+        .packagings({ orderBy: { numero: "asc" } });
     }
     return packagings.map(packaging => expandBsffPackagingFromDB(packaging));
   },
