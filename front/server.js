@@ -20,7 +20,7 @@ app.use(
         frameAncestors: "'none'",
         frameSrc: ["'self'"],
         imgSrc: ["'self'", "data:"],
-        scriptSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "https:", "'unsafe-inline'"],
       },
     },
