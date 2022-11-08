@@ -53,20 +53,21 @@ export async function generateBsffPdf(
     isReexpedition: bsff.type === BsffType.REEXPEDITION
   };
   const bsffOperation = {
-    isRecuperationR2: packaging.operationCode === OPERATION.R2.code,
-    isRecyclageR3: packaging.operationCode === OPERATION.R3.code,
-    isIncinerationD10: packaging.operationCode === OPERATION.D10.code,
+    isRecuperationR2: packaging?.operationCode === OPERATION.R2.code,
+    isRecyclageR3: packaging?.operationCode === OPERATION.R3.code,
+    isIncinerationD10: packaging?.operationCode === OPERATION.D10.code,
     isGroupementR12:
-      packaging.operationCode === OPERATION.R12.code && bsffType.isGroupement,
-    isGroupementD13: packaging.operationCode === OPERATION.D13.code,
+      packaging?.operationCode === OPERATION.R12.code && bsffType.isGroupement,
+    isGroupementD13: packaging?.operationCode === OPERATION.D13.code,
     isReconditionnementR12:
-      packaging.operationCode === OPERATION.R12.code &&
+      packaging?.operationCode === OPERATION.R12.code &&
       bsffType.isReconditionnement,
-    isReconditionnementD14: packaging.operationCode === OPERATION.D14.code,
+    isReconditionnementD14: packaging?.operationCode === OPERATION.D14.code,
     isReexpeditionR13:
-      bsffType.isReexpedition && packaging.operationCode === OPERATION.R13.code,
+      bsffType.isReexpedition &&
+      packaging?.operationCode === OPERATION.R13.code,
     isReexpeditionD15:
-      bsffType.isReexpedition && packaging.operationCode === OPERATION.D15.code
+      bsffType.isReexpedition && packaging?.operationCode === OPERATION.D15.code
   };
 
   const qrCode = await QRCode.toString(bsff.id, { type: "svg" });
@@ -76,7 +77,7 @@ export async function generateBsffPdf(
     emission: bsff.emitterEmissionSignatureDate ? signature : "",
     transport: bsff.transporterTransportSignatureDate ? signature : "",
     reception: bsff.destinationReceptionDate ? signature : "",
-    operation: packaging.operationSignatureDate ? signature : ""
+    operation: packaging?.operationSignatureDate ? signature : ""
   };
 
   const transportMode =

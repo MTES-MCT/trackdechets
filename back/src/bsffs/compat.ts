@@ -73,12 +73,13 @@ export function toBsffDestination(
     p => !!p.operationSignatureDate && !!p.operationCode
   );
 
-  const operationCode = hasAnyOperation
+  const operationCodes = hasAnyOperation
     ? packagings
         .filter(p => !!p.operationSignatureDate && !!p.operationCode)
         .map(p => p.operationCode)
-        .join(" ")
-    : null;
+    : [];
+
+  const operationCode = [...new Set(operationCodes)].join(" ");
 
   // returns last date
   const operationDate = hasAnyOperation
@@ -134,7 +135,7 @@ export async function getStatus(bsff: Bsff & { packagings: BsffPackaging[] }) {
           ) ||
             isFinalOperation(
               packaging.lastPackaging?.operationCode,
-              packaging.operationNoTraceability
+              packaging.lastPackaging?.operationNoTraceability
             )));
       const intermediatelyProcessed =
         refused ||
