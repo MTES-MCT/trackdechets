@@ -1,4 +1,9 @@
-import { Bsda, BsdaStatus } from "@prisma/client";
+import {
+  Bsda,
+  BsdaStatus,
+  IntermediaryBsdaAssociation,
+  Prisma
+} from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { MutationDuplicateBsdaArgs } from "../../../generated/graphql/types";
@@ -57,12 +62,30 @@ function duplicateBsda({
   wasteSealNumbers,
   forwardingId,
   groupedInId,
+  intermediaries,
   ...rest
-}: Bsda) {
+}: Bsda & {
+  intermediaries: IntermediaryBsdaAssociation[];
+}): Prisma.BsdaCreateInput {
   return {
     ...rest,
     id: getReadableId(ReadableIdPrefix.BSDA),
     status: BsdaStatus.INITIAL,
-    isDraft: true
+    isDraft: true,
+    ...(intermediaries && {
+      intermediaries: {
+        createMany: {
+          data: intermediaries.map(intermediary => ({
+            siret: intermediary.siret,
+            address: intermediary.address,
+            vatNumber: intermediary.vatNumber,
+            name: intermediary.name,
+            contact: intermediary.contact,
+            phone: intermediary.phone,
+            mail: intermediary.mail
+          }))
+        }
+      }
+    })
   };
 }

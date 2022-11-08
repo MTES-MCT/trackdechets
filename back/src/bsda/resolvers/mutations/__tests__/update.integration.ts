@@ -524,7 +524,7 @@ describe("Mutation.updateBsda", () => {
     expect(errrors2).toBeUndefined();
   });
 
-  it.only("should allow updating intermediaries", async () => {
+  it("should allow updating intermediaries", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const { company: otherCompany } = await userWithCompanyFactory(
       UserRole.ADMIN
