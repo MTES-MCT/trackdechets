@@ -98,7 +98,8 @@ export default async function edit(
       }),
       ...(input.intermediaries?.length > 0 && {
         intermediaries: {
-          set: companyToIntermediaryInput(input.intermediaries)
+          deleteMany: {},
+          createMany: { data: companyToIntermediaryInput(input.intermediaries) }
         }
       })
     }

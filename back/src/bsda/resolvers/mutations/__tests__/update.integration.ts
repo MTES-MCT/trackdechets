@@ -34,6 +34,9 @@ const UPDATE_BSDA = `
           name
         }
       }
+      intermediaries {
+        siret
+      }
     }
   }
 `;
@@ -519,5 +522,51 @@ describe("Mutation.updateBsda", () => {
       }
     });
     expect(errrors2).toBeUndefined();
+  });
+
+  it.only("should allow updating intermediaries", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { company: otherCompany } = await userWithCompanyFactory(
+      UserRole.ADMIN
+    );
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        intermediaries: {
+          create: {
+            siret: company.siret,
+            name: company.name,
+            address: company.address,
+            contact: "John Doe"
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const input = {
+      intermediaries: [
+        {
+          siret: otherCompany.siret,
+          name: otherCompany.name,
+          address: otherCompany.address,
+          contact: "John Doe"
+        }
+      ]
+    };
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+    console.log(errors);
+
+    expect(data.updateBsda.intermediaries.length).toBe(1);
+    expect(data.updateBsda.intermediaries[0].siret).toBe(otherCompany.siret);
   });
 });

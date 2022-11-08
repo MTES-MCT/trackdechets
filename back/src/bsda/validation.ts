@@ -165,9 +165,8 @@ async function validateIntermediaries(intermediaries: CompanyInput[]) {
     );
   }
 
-  const intermediaryIdentifiers = intermediaries?.map(
-    c => c.siret || c.vatNumber
-  );
+  const intermediaryIdentifiers =
+    intermediaries?.map(c => c.siret || c.vatNumber) ?? [];
   const hasDuplicate =
     new Set(intermediaryIdentifiers).size !== intermediaryIdentifiers.length;
   if (hasDuplicate) {

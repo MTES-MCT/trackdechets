@@ -26,6 +26,9 @@ mutation CreateBsda($input: BsdaInput!) {
         plates
       }
     }
+    intermediaries {
+      siret
+    }
   }
 }
 `;
@@ -908,6 +911,7 @@ describe("Mutation.Bsda.create", () => {
     });
 
     expect(data.createBsda.id).toBeDefined();
+    expect(data.createBsda.intermediaries.length).toBe(1);
   });
 
   it("should fail if creating a bsda with the same intermediary several times", async () => {
@@ -981,14 +985,11 @@ describe("Mutation.Bsda.create", () => {
     };
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "createBsda">>(
-      CREATE_BSDA,
-      {
-        variables: {
-          input
-        }
+    const { errors } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
       }
-    );
+    });
 
     expect(errors[0].message).toBe(
       "Intermédiaires: impossible d'ajouter le même établissement en intermédiaire plusieurs fois"
@@ -1087,14 +1088,11 @@ describe("Mutation.Bsda.create", () => {
     };
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate<Pick<Mutation, "createBsda">>(
-      CREATE_BSDA,
-      {
-        variables: {
-          input
-        }
+    const { errors } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
       }
-    );
+    });
 
     expect(errors[0].message).toBe(
       "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires sur un BSDA"
