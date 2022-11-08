@@ -87,7 +87,7 @@ export function toBsffDestination(
   const operationDate = hasAnyOperation
     ? [
         ...packagings.filter(p => !!p.operationDate).map(p => p.operationDate)
-      ].sort((d1, d2) => d1.getTime() - d2.getTime())[0]
+      ].sort((d1, d2) => d2.getTime() - d1.getTime())[0]
     : null;
 
   return {
