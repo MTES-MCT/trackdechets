@@ -65,8 +65,8 @@ export function toBsffDestination(
         .filter(
           p => !!p.acceptationSignatureDate && !!p.acceptationRefusalReason
         )
-        .map(p => p.acceptationRefusalReason)
-        .join("; ")
+        .map(p => `${p.numero} : ${p.acceptationRefusalReason}`)
+        .join("\n")
     : null;
 
   const hasAnyOperation = packagings.some(
@@ -79,14 +79,15 @@ export function toBsffDestination(
         .map(p => p.operationCode)
     : [];
 
-  const operationCode = [...new Set(operationCodes)].join(" ");
+  const operationCode = hasAnyOperation
+    ? [...new Set(operationCodes)].join(" ")
+    : null;
 
   // returns last date
   const operationDate = hasAnyOperation
-    ? packagings
-        .filter(p => !!p.operationDate)
-        .map(p => p.operationDate)
-        .sort((d1, d2) => d1.getMilliseconds() - d2.getMilliseconds())[0]
+    ? [
+        ...packagings.filter(p => !!p.operationDate).map(p => p.operationDate)
+      ].sort((d1, d2) => d1.getTime() - d2.getTime())[0]
     : null;
 
   return {
