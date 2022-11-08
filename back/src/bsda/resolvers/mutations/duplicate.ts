@@ -14,21 +14,23 @@ export default async function duplicate(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const prismaForm = await getBsdaOrNotFound(id);
+  const prismaBsda = await getBsdaOrNotFound(id, {
+    include: { intermediaries: true }
+  });
 
   await checkIsBsdaContributor(
     user,
-    prismaForm,
+    prismaBsda,
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  const data = duplicateForm(prismaForm);
+  const data = duplicateBsda(prismaBsda);
   const newBsda = await getBsdaRepository(user).create(data);
 
   return expandBsdaFromDb(newBsda);
 }
 
-function duplicateForm({
+function duplicateBsda({
   id,
   createdAt,
   updatedAt,

@@ -13,7 +13,9 @@ export default async function deleteBsda(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const bsda = await getBsdaOrNotFound(id);
+  const bsda = await getBsdaOrNotFound(id, {
+    include: { intermediaries: true }
+  });
   await checkCanDeleteBsda(user, bsda);
 
   const bsdaRepository = getBsdaRepository(user);

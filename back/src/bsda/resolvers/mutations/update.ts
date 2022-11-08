@@ -2,7 +2,11 @@ import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationUpdateBsdaArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
-import { expandBsdaFromDb, flattenBsdaInput } from "../../converter";
+import {
+  companyToIntermediaryInput,
+  expandBsdaFromDb,
+  flattenBsdaInput
+} from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
 import { checkKeysEditability } from "../../edition-rules";
 import { checkIsBsdaContributor } from "../../permissions";
@@ -16,7 +20,9 @@ export default async function edit(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const existingBsda = await getBsdaOrNotFound(id);
+  const existingBsda = await getBsdaOrNotFound(id, {
+    include: { intermediaries: true }
+  });
   await checkIsBsdaContributor(
     user,
     existingBsda,
@@ -25,10 +31,18 @@ export default async function edit(
 
   const data = flattenBsdaInput(input);
 
-  const resultingForm = { ...existingBsda, ...data };
+  const resultingBsda = {
+    ...existingBsda,
+    ...data
+  };
+  const intermediaries = input.intermediaries ?? existingBsda.intermediaries;
+
   await checkIsBsdaContributor(
     user,
-    resultingForm,
+    {
+      ...resultingBsda,
+      intermediaries
+    },
     "Vous ne pouvez pas enlever votre établissement du bordereau"
   );
 
@@ -59,13 +73,18 @@ export default async function edit(
   checkKeysEditability(input, { ...existingBsda, grouping: groupedBsdas });
 
   const previousBsdas = [forwardedBsda, ...groupedBsdas].filter(Boolean);
-  await validateBsda(resultingForm, previousBsdas, {
-    emissionSignature: existingBsda.emitterEmissionSignatureAuthor != null,
-    workSignature: existingBsda.workerWorkSignatureAuthor != null,
-    operationSignature:
-      existingBsda.destinationOperationSignatureAuthor != null,
-    transportSignature: existingBsda.transporterTransportSignatureAuthor != null
-  });
+  await validateBsda(
+    existingBsda,
+    { previousBsdas, intermediaries },
+    {
+      emissionSignature: existingBsda.emitterEmissionSignatureAuthor != null,
+      workSignature: existingBsda.workerWorkSignatureAuthor != null,
+      operationSignature:
+        existingBsda.destinationOperationSignatureAuthor != null,
+      transportSignature:
+        existingBsda.transporterTransportSignatureAuthor != null
+    }
+  );
 
   const updatedBsda = await bsdaRepository.update(
     { id },
@@ -76,6 +95,11 @@ export default async function edit(
       }),
       ...(input.forwarding && {
         forwarding: { connect: { id: input.forwarding } }
+      }),
+      ...(input.intermediaries?.length > 0 && {
+        intermediaries: {
+          set: companyToIntermediaryInput(input.intermediaries)
+        }
       })
     }
   );

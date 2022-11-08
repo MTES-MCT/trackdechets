@@ -1312,7 +1312,7 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
  * - SIRET is mandatory
  * - only french companies are allowed
  */
-const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
+export const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
   siret: yup
     .string()
     .required("Intermédiaires: le N° SIRET est obligatoire")

@@ -15,7 +15,9 @@ export default async function create(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const existingBsda = await getBsdaOrNotFound(id);
+  const existingBsda = await getBsdaOrNotFound(id, {
+    include: { intermediaries: true }
+  });
   await checkIsBsdaContributor(
     user,
     existingBsda,
@@ -29,7 +31,12 @@ export default async function create(
   }
 
   const previousBsdas = await getPreviousBsdas(existingBsda);
-  await validateBsda(existingBsda, previousBsdas, { emissionSignature: true });
+  const { intermediaries, ...bsda } = existingBsda;
+  await validateBsda(
+    bsda,
+    { previousBsdas, intermediaries },
+    { emissionSignature: true }
+  );
 
   const updatedBsda = await getBsdaRepository(user).update(
     { id },

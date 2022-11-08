@@ -76,7 +76,8 @@ const editableFields: EditableFields<BsdaInput> = {
   transporter: ifAwaitingSignature("TRANSPORT"),
   ecoOrganisme: ifAwaitingSignature("TRANSPORT"),
   grouping: ifAwaitingSignature("EMISSION"),
-  forwarding: ifAwaitingSignature("EMISSION")
+  forwarding: ifAwaitingSignature("EMISSION"),
+  intermediaries: ifAwaitingSignature("TRANSPORT")
 };
 
 /**
