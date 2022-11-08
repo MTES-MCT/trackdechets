@@ -255,6 +255,9 @@ export const FullBsdaFragment = gql`
         cap
       }
     }
+    intermediaries {
+      ...CompanyFragment
+    }
   }
   ${companyFragment}
 `;

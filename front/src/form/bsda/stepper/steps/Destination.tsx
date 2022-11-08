@@ -3,6 +3,10 @@ import { Field, useFormikContext } from "formik";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { Bsda, BsdaType } from "generated/graphql/types";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
+import RedErrorMessage from "common/components/RedErrorMessage";
+import DateInput from "form/common/components/custom-inputs/DateInput";
+import Select from "react-select";
+import { IntermediariesSelector } from "form/bsda/components/intermediaries/IntermediariesSelector";
 
 export function Destination({ disabled }) {
   const { values, setFieldValue } = useFormikContext<Bsda>();
@@ -10,6 +14,44 @@ export function Destination({ disabled }) {
     values.destination?.operation?.nextDestination?.company
   );
   const isDechetterie = values?.type === BsdaType.Collection_2710;
+
+  const hasBroker = Boolean(values.broker);
+  function onBrokerToggle() {
+    if (hasBroker) {
+      setFieldValue("broker", null);
+    } else {
+      setFieldValue(
+        "broker",
+        {
+          company: getInitialCompany(),
+          recepisse: {
+            number: "",
+            department: "",
+            validityLimit: null,
+          },
+        },
+        false
+      );
+    }
+  }
+
+  function onAddIntermediary() {
+    setFieldValue(
+      "intermediaries",
+      (values.intermediaries ?? []).concat([
+        {
+          siret: "",
+          name: "",
+          address: "",
+          contact: "",
+          mail: "",
+          phone: "",
+          vatNumber: "",
+          country: "",
+        },
+      ])
+    );
+  }
 
   function onNextDestinationToggle() {
     // When we toggle the next destination switch, we swap destination <-> nextDestination
@@ -233,6 +275,125 @@ export function Destination({ disabled }) {
           </>
         )}
       </div>
+
+      <h4 className="form__section-heading">Informations complémentaires</h4>
+
+      <div className="form__row tw-mb-6">
+        <div className="td-input">
+          <label> Ajout d'intermédiaires:</label>
+          <Select
+            placeholder="Ajouter un intermédiaire"
+            options={[
+              ...(!hasBroker
+                ? [
+                    {
+                      value: "BROKER",
+                      label: "Je suis passé par un courtier",
+                    },
+                  ]
+                : []),
+              {
+                value: "INTERMEDIARY",
+                label: "Ajouter un autre type d'intermédiaire",
+              },
+            ]}
+            onChange={option => {
+              switch ((option as { value: string })?.value) {
+                case "INTERMEDIARY":
+                  return onAddIntermediary();
+                case "BROKER":
+                  return onBrokerToggle();
+                default:
+                  return;
+              }
+            }}
+            classNamePrefix="react-select"
+          />
+        </div>
+      </div>
+      {hasBroker && (
+        <div className="form__row td-input tw-mb-6">
+          <h4 className="form__section-heading">Courtier</h4>
+          <CompanySelector
+            name="broker.company"
+            onCompanySelected={broker => {
+              if (broker.brokerReceipt) {
+                setFieldValue(
+                  "broker.recepisse.number",
+                  broker.brokerReceipt.receiptNumber
+                );
+                setFieldValue(
+                  "broker.recepisse.validityLimit",
+                  broker.brokerReceipt.validityLimit
+                );
+                setFieldValue(
+                  "broker.recepisse.department",
+                  broker.brokerReceipt.department
+                );
+              } else {
+                setFieldValue("broker.recepisse.number", "");
+                setFieldValue("broker.recepisse.validityLimit", null);
+                setFieldValue("broker.recepisse.department", "");
+              }
+            }}
+          />
+
+          <div className="form__row">
+            <label>
+              Numéro de récépissé
+              <Field
+                type="text"
+                name="broker.recepisse.number"
+                className="td-input td-input--medium"
+              />
+            </label>
+
+            <RedErrorMessage name="broker.recepisse.number" />
+          </div>
+          <div className="form__row">
+            <label>
+              Département
+              <Field
+                type="text"
+                name="broker.recepisse.department"
+                placeholder="Ex: 83"
+                className="td-input td-input--small"
+              />
+            </label>
+
+            <RedErrorMessage name="broker.recepisse.department" />
+          </div>
+          <div className="form__row">
+            <label>
+              Limite de validité
+              <Field
+                component={DateInput}
+                name="broker.recepisse.validityLimit"
+                className="td-input td-input--small"
+              />
+            </label>
+
+            <RedErrorMessage name="broker.recepisse.validityLimit" />
+          </div>
+          <div className="tw-mt-2">
+            <button
+              className="btn btn--danger tw-mr-1"
+              type="button"
+              onClick={onBrokerToggle}
+            >
+              Supprimer le courtier
+            </button>
+          </div>
+        </div>
+      )}
+
+      {Boolean(values.intermediaries?.length) && (
+        <Field
+          name="intermediaries"
+          component={IntermediariesSelector}
+          disabled={disabled}
+        />
+      )}
     </>
   );
 }
