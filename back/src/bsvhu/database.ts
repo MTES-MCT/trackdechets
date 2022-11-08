@@ -1,14 +1,11 @@
 import { FormNotFound } from "../forms/errors";
-import prisma from "../prisma";
+import { getReadonlyBsvhuRepository } from "./repository";
 
 export async function getBsvhuOrNotFound(id: string) {
-  const form = await prisma.bsvhu.findUnique({
-    where: { id }
-  });
-
-  if (form == null || form.isDeleted == true) {
+  const bsvhu = await getReadonlyBsvhuRepository().findUnique({ id });
+  if (bsvhu == null || !!bsvhu.isDeleted) {
     throw new FormNotFound(id.toString());
   }
 
-  return form;
+  return bsvhu;
 }

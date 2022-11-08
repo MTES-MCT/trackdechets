@@ -4,12 +4,13 @@ import {
   BsvhuInput,
   MutationCreateBsvhuArgs
 } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
+
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb, flattenVhuInput } from "../../converter";
 import { checkIsBsvhuContributor } from "../../permissions";
 import { validateBsvhu } from "../../validation";
-import { indexBsvhu } from "../../elastic";
+import { getBsvhuRepository } from "../../repository";
+
 type CreateBsvhu = {
   isDraft: boolean;
   input: BsvhuInput;
@@ -35,13 +36,13 @@ export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
   );
 
   await validateBsvhu(form, { emissionSignature: !isDraft });
+  const bsvhuRepository = getBsvhuRepository(user);
 
-  const newForm = await prisma.bsvhu.create({
-    data: { ...form, id: getReadableId(ReadableIdPrefix.VHU), isDraft }
+  const newForm = await bsvhuRepository.create({
+    ...form,
+    id: getReadableId(ReadableIdPrefix.VHU),
+    isDraft
   });
 
-  // TODO Status log ?
-  // TODO emit event ?
-  await indexBsvhu(newForm, context);
   return expandVhuFormFromDb(newForm);
 }

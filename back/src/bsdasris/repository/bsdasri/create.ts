@@ -4,6 +4,7 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { bsdasriEventTypes } from "./eventTypes";
 
 export type CreateBsdasriFn = (
   data: Prisma.BsdasriCreateInput,
@@ -20,7 +21,7 @@ export function buildCreateBsdasri(deps: RepositoryFnDeps): CreateBsdasriFn {
       data: {
         streamId: bsdasri.id,
         actor: user.id,
-        type: "BsdasriCreated",
+        type: bsdasriEventTypes.created,
         data: data as Prisma.InputJsonObject,
         metadata: { ...logMetadata, authType: user.auth }
       }

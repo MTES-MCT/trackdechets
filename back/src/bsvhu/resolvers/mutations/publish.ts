@@ -1,14 +1,14 @@
 import { ForbiddenError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationPublishBsvhuArgs } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
 import { checkIsBsvhuContributor } from "../../permissions";
 import { validateBsvhu } from "../../validation";
-import { indexBsvhu } from "../../elastic";
-export default async function create(
+import { getBsvhuRepository } from "../../repository";
+
+export default async function publish(
   _,
   { id }: MutationPublishBsvhuArgs,
   context: GraphQLContext
@@ -29,11 +29,9 @@ export default async function create(
   }
 
   await validateBsvhu(prismaForm, { emissionSignature: true });
+  const bsvhuRepository = getBsvhuRepository(user);
 
-  const updatedForm = await prisma.bsvhu.update({
-    where: { id },
-    data: { isDraft: false }
-  });
-  await indexBsvhu(updatedForm, context);
-  return expandVhuFormFromDb(updatedForm);
+  const updatedBsvhu = await bsvhuRepository.update({ id }, { isDraft: false });
+
+  return expandVhuFormFromDb(updatedBsvhu);
 }
