@@ -159,7 +159,13 @@ export async function validateBsda(
 }
 
 async function validateIntermediaries(intermediaries: CompanyInput[]) {
-  const intermediaryIdentifiers = intermediaries.map(
+  if (intermediaries?.length > 3) {
+    throw new UserInputError(
+      "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires sur un BSDA"
+    );
+  }
+
+  const intermediaryIdentifiers = intermediaries?.map(
     c => c.siret || c.vatNumber
   );
   const hasDuplicate =

@@ -10,7 +10,7 @@ export async function getBsdaOrNotFound<Include extends Prisma.BsdaInclude>(
     include?: Include;
   }>({ id }, { include });
 
-  if (bsda == null || bsda.isDeleted == true) {
+  if (bsda == null || bsda.isDeleted) {
     throw new FormNotFound(id.toString());
   }
 
