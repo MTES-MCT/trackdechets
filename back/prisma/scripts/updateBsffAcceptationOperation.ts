@@ -4,7 +4,7 @@ import { registerUpdater, Updater } from "./helper/helper";
 @registerUpdater(
   "Update BSFF acceptation, operation, grouping, forwarding and repackaging",
   "Update BSFF acceptation, operation, grouping, forwarding and repackaging",
-  false
+  true
 )
 
 /**

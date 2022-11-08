@@ -48,7 +48,7 @@ ADD
 ADD
   COLUMN "operationNextDestinationCompanyVatNumber" TEXT,
 ADD
-  COLUMN "operationNextPackagingId" TEXT;
+  COLUMN "nextPackagingId" TEXT;
 
 
 -- CreateIndex
