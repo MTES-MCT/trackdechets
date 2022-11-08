@@ -158,15 +158,22 @@ export async function validateBsda(
   await validateIntermediaries(intermediaries);
 }
 
-async function validateIntermediaries(intermediaries: CompanyInput[]) {
-  if (intermediaries?.length > 3) {
+async function validateIntermediaries(
+  intermediaries: CompanyInput[] | undefined
+) {
+  if (!intermediaries || intermediaries.length === 0) {
+    return;
+  }
+
+  if (intermediaries.length > 3) {
     throw new UserInputError(
       "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires sur un BSDA"
     );
   }
 
-  const intermediaryIdentifiers =
-    intermediaries?.map(c => c.siret || c.vatNumber) ?? [];
+  const intermediaryIdentifiers = intermediaries.map(
+    c => c.siret || c.vatNumber
+  );
   const hasDuplicate =
     new Set(intermediaryIdentifiers).size !== intermediaryIdentifiers.length;
   if (hasDuplicate) {
