@@ -19,6 +19,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Utilisation de react pour la génération du pdf des bsvhus [PR1788](https://github.com/MTES-MCT/trackdechets/pull/1788).
 - Utilisation du pattern repository pour le bsvhu, indexation asynchrone et écriture d'events [PR 1767](https://github.com/MTES-MCT/trackdechets/pull/1767).
 
 # [2022.10.3] 31/10/2022
