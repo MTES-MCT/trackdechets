@@ -8,7 +8,8 @@ import {
   MutationMarkAsSealedArgs,
   MutationSignedByTransporterArgs,
   MutationMarkAsReceivedArgs,
-  MutationMarkAsProcessedArgs
+  MutationMarkAsProcessedArgs,
+  CreateFormInput
 } from "../../../../generated/graphql/types";
 import {
   resetDatabase,
@@ -23,6 +24,11 @@ import {
 
 import { indexForm } from "../../../../forms/elastic";
 import { getFullForm } from "../../../../forms/database";
+
+const searchCompanyMock = jest.spyOn(
+  require("../../../../companies/search"),
+  "searchCompany"
+);
 
 const GET_BSDS = `
   query GetBsds($where: BsdWhere) {
@@ -90,6 +96,14 @@ describe("Query.bsds workflow", () => {
         set: ["WASTEPROCESSOR"]
       }
     });
+    searchCompanyMock.mockResolvedValue({
+      siret: intermediary.company.siret,
+      name: intermediary.company.name,
+      statutDiffusionEtablissement: "O",
+      isRegistered: true,
+      address: intermediary.company.address,
+      etatAdministratif: "A"
+    });
   });
   afterAll(resetDatabase);
 
@@ -97,69 +111,68 @@ describe("Query.bsds workflow", () => {
     beforeAll(async () => {
       const { mutate } = makeClient(emitter.user);
 
-      const {
-        data: {
-          createForm: { id }
-        }
-      } = await mutate<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
-        CREATE_FORM,
-        {
-          variables: {
-            createFormInput: {
-              emitter: {
-                company: {
-                  siret: emitter.company.siret,
-                  name: "MARIE PRODUCTEUR",
-                  address: "12 chemin des caravanes",
-                  contact: "Marie",
-                  mail: "marie@gmail.com",
-                  phone: "06"
-                },
-                type: "PRODUCER"
-              },
-              transporter: {
-                company: {
-                  siret: transporter.company.siret,
-                  name: "JM TRANSPORT",
-                  address: "2 rue des pâquerettes",
-                  contact: "Jean-Michel",
-                  mail: "jean.michel@gmaiL.com",
-                  phone: "06"
-                },
-                receipt: "123456789",
-                department: "69",
-                validityLimit: addYears(new Date(), 1).toISOString() as any
-              },
-              recipient: {
-                company: {
-                  siret: recipient.company.siret,
-                  name: "JEANNE COLLECTEUR",
-                  address: "38 bis allée des anges",
-                  contact: "Jeanne",
-                  mail: "jeanne@gmail.com",
-                  phone: "06"
-                },
-                processingOperation: "R 1"
-              },
-              wasteDetails: {
-                code: "01 01 01",
-                name: "Stylos bille",
-                consistence: "SOLID",
-                packagingInfos: [
-                  {
-                    type: "BENNE",
-                    quantity: 1
-                  }
-                ],
-                quantityType: "ESTIMATED",
-                quantity: 1
-              },
-              intermediaries: [toIntermediaryCompany(intermediary.company)]
+      const input: CreateFormInput = {
+        emitter: {
+          company: {
+            siret: emitter.company.siret,
+            name: "MARIE PRODUCTEUR",
+            address: "12 chemin des caravanes",
+            contact: "Marie",
+            mail: "marie@gmail.com",
+            phone: "06"
+          },
+          type: "PRODUCER"
+        },
+        transporter: {
+          company: {
+            siret: transporter.company.siret,
+            name: "JM TRANSPORT",
+            address: "2 rue des pâquerettes",
+            contact: "Jean-Michel",
+            mail: "jean.michel@gmaiL.com",
+            phone: "06"
+          },
+          receipt: "123456789",
+          department: "69",
+          validityLimit: addYears(new Date(), 1).toISOString() as any
+        },
+        recipient: {
+          company: {
+            siret: recipient.company.siret,
+            name: "JEANNE COLLECTEUR",
+            address: "38 bis allée des anges",
+            contact: "Jeanne",
+            mail: "jeanne@gmail.com",
+            phone: "06"
+          },
+          processingOperation: "R 1"
+        },
+        wasteDetails: {
+          code: "01 01 01",
+          name: "Stylos bille",
+          consistence: "SOLID",
+          packagingInfos: [
+            {
+              type: "BENNE",
+              quantity: 1
             }
-          }
+          ],
+          quantityType: "ESTIMATED",
+          quantity: 1
+        },
+        intermediaries: [toIntermediaryCompany(intermediary.company)]
+      };
+
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: input
         }
-      );
-      formId = id;
+      });
+      expect(errors).toBeUndefined();
+      formId = data.createForm.id;
       await refreshElasticSearch();
     });
 

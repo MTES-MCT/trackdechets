@@ -51,6 +51,8 @@ export async function validateCompany(
           invalidArgs: ["siret", "vatNumber"]
         }
       );
+    } else {
+      throw exc;
     }
   }
 }
