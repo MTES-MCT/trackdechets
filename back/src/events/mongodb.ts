@@ -4,14 +4,13 @@ import { EventCollection } from "./types";
 import { WriteErrors } from "./writeErrors";
 import logger from "../logging/logger";
 
-const { MONGODB_URL } = process.env;
+const { MONGO_URL } = process.env;
 
-const DB_NAME = "td_events";
 const EVENTS_COLLECTION = "events";
 
-export const mongodbClient = new MongoClient(MONGODB_URL);
+export const mongodbClient = new MongoClient(MONGO_URL);
 
-const database = mongodbClient.db(DB_NAME);
+const database = mongodbClient.db();
 const eventsCollection =
   database.collection<EventCollection>(EVENTS_COLLECTION);
 
