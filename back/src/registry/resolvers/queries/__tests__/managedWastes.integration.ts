@@ -11,7 +11,7 @@ import {
   refreshElasticSearch,
   resetDatabase
 } from "../../../../../integration-tests/helper";
-import { indexBsda } from "../../../../bsda/elastic";
+import { BsdaToElastic, indexBsda } from "../../../../bsda/elastic";
 import { bsdaFactory } from "../../../../bsda/__tests__/factories";
 import { getFullForm } from "../../../../forms/database";
 import { indexForm } from "../../../../forms/elastic";
@@ -100,7 +100,10 @@ describe("Managed wastes registry", () => {
       }
     });
 
-    await Promise.all([indexForm(await getFullForm(bsd1)), indexBsda(bsd2)]);
+    await Promise.all([
+      indexForm(await getFullForm(bsd1)),
+      indexBsda(bsd2 as BsdaToElastic)
+    ]);
     await refreshElasticSearch();
   });
   afterAll(resetDatabase);

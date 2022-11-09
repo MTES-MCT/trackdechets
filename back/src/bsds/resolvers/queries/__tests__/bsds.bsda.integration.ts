@@ -3,7 +3,7 @@ import {
   refreshElasticSearch,
   resetDatabase
 } from "../../../../../integration-tests/helper";
-import { indexBsda } from "../../../../bsda/elastic";
+import { BsdaToElastic, indexBsda } from "../../../../bsda/elastic";
 import { bsdaFactory } from "../../../../bsda/__tests__/factories";
 import { ErrorCode } from "../../../../common/errors";
 import {
@@ -943,7 +943,7 @@ describe("Query.bsds.bsdas mutations", () => {
       }
     });
 
-    await indexBsda(bsda);
+    await indexBsda(bsda as BsdaToElastic);
     await refreshElasticSearch();
 
     const { query } = makeClient(emitter.user);
@@ -992,7 +992,7 @@ describe("Query.bsds.bsdas mutations", () => {
         emitterCompanySiret: emitter.company.siret
       }
     });
-    await indexBsda(bsda);
+    await indexBsda(bsda as BsdaToElastic);
 
     // duplicate bsda
     const { mutate } = makeClient(emitter.user);

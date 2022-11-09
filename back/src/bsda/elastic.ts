@@ -1,20 +1,24 @@
-import { Bsda, BsdaStatus } from "@prisma/client";
+import { Bsda, BsdaStatus, IntermediaryBsdaAssociation } from "@prisma/client";
 import { BsdElastic, indexBsd } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 
-// | state              | emitter         | worker          | transporter | destination     | nextDestination |
-// | ------------------ | --------------- | --------------- | ----------- | --------------- | --------------- |
-// | INITIAL (draft)    | draft           | draft           | draft       | draft           | follow          |
-// | INITIAL            | action / follow | follow / action | follow      | follow / action | follow          |
-// | SIGNED_BY_PRODUCER | follow          | action          | follow      | follow          | follow          |
-// | SIGNED_BY_WORKER   | follow          | follow          | to collect  | follow          | follow          |
-// | SENT               | follow          | follow          | collected   | action          | follow          |
-// | PROCESSED          | archive         | archive         | archive     | archive         | follow          |
-// | REFUSED            | archive         | archive         | archive     | archive         | follow          |
-// | AWAITING_CHILD     | follow          | follow          | follow      | follow          | follow          |
+export type BsdaToElastic = Bsda & {
+  intermediaries: IntermediaryBsdaAssociation[];
+};
+
+// | state              | emitter         | worker          | transporter | destination     | nextDestination | intermediary |
+// | ------------------ | --------------- | --------------- | ----------- | --------------- | --------------- | ------------ |
+// | INITIAL (draft)    | draft           | draft           | draft       | draft           | follow          | follow       |
+// | INITIAL            | action / follow | follow / action | follow      | follow / action | follow          | follow       |
+// | SIGNED_BY_PRODUCER | follow          | action          | follow      | follow          | follow          | follow       |
+// | SIGNED_BY_WORKER   | follow          | follow          | to collect  | follow          | follow          | follow       |
+// | SENT               | follow          | follow          | collected   | action          | follow          | follow       |
+// | PROCESSED          | archive         | archive         | archive     | archive         | follow          | archive      |
+// | REFUSED            | archive         | archive         | archive     | archive         | follow          | archive      |
+// | AWAITING_CHILD     | follow          | follow          | follow      | follow          | follow          | follow       |
 function getWhere(
-  bsda: Bsda
+  bsda: BsdaToElastic
 ): Pick<
   BsdElastic,
   | "isDraftFor"
@@ -33,6 +37,20 @@ function getWhere(
     isCollectedFor: []
   };
 
+  const intermediarySirets = bsda.intermediaries.reduce(
+    (sirets, intermediary) => {
+      if (intermediary.siret) {
+        const nbOfKeys = Object.keys(sirets).length;
+        return {
+          ...sirets,
+          [`intermediarySiret${nbOfKeys + 1}`]: intermediary.siret
+        };
+      }
+      return sirets;
+    },
+    {}
+  );
+
   const formSirets: Partial<Record<keyof Bsda, string | null | undefined>> = {
     emitterCompanySiret: bsda.emitterCompanySiret,
     workerCompanySiret: bsda.workerCompanySiret,
@@ -40,7 +58,8 @@ function getWhere(
     transporterCompanySiret: bsda.transporterCompanySiret,
     brokerCompanySiret: bsda.brokerCompanySiret,
     destinationOperationNextDestinationCompanySiret:
-      bsda.destinationOperationNextDestinationCompanySiret
+      bsda.destinationOperationNextDestinationCompanySiret,
+    ...intermediarySirets
   };
 
   const siretsFilters = new Map<string, keyof typeof where>(
@@ -125,7 +144,7 @@ function getWhere(
   return where;
 }
 
-export function toBsdElastic(bsda: Bsda): BsdElastic {
+export function toBsdElastic(bsda: BsdaToElastic): BsdElastic {
   const where = getWhere(bsda);
 
   return {
@@ -153,10 +172,11 @@ export function toBsdElastic(bsda: Bsda): BsdElastic {
     ...where,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsda),
+    intermediaries: bsda.intermediaries,
     rawBsd: bsda
   };
 }
 
-export function indexBsda(bsda: Bsda, ctx?: GraphQLContext) {
+export function indexBsda(bsda: BsdaToElastic, ctx?: GraphQLContext) {
   return indexBsd(toBsdElastic(bsda), ctx);
 }

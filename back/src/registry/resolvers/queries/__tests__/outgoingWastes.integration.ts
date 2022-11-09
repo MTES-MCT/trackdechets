@@ -16,7 +16,7 @@ import {
   refreshElasticSearch,
   resetDatabase
 } from "../../../../../integration-tests/helper";
-import { indexBsda } from "../../../../bsda/elastic";
+import { BsdaToElastic, indexBsda } from "../../../../bsda/elastic";
 import { bsdaFactory } from "../../../../bsda/__tests__/factories";
 import { indexBsdasri } from "../../../../bsdasris/elastic";
 import { bsdasriFactory } from "../../../../bsdasris/__tests__/factories";
@@ -157,7 +157,7 @@ describe("Outgoing wastes registry", () => {
 
     await Promise.all([
       indexForm(await getFullForm(bsd1)),
-      indexBsda(bsd2),
+      indexBsda(bsd2 as BsdaToElastic),
       indexBsdasri(bsd3),
       indexBsvhu(bsd4),
       indexBsff(bsd5)

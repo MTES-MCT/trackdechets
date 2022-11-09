@@ -15,7 +15,8 @@ export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
       include: {
         // required for dashboard queries
         forwardedIn: { select: { id: true } },
-        groupedIn: { select: { id: true } }
+        groupedIn: { select: { id: true } },
+        intermediaries: true
       }
     });
 
