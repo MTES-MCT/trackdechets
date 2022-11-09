@@ -681,6 +681,7 @@ model User {
   id                    String                  @id @default(cuid())
   email                 String                  @unique
   password              String
+  passwordVersion       Int
   name                  String?
   phone                 String?
   createdAt             DateTime                @default(now()) @db.Timestamptz(6)

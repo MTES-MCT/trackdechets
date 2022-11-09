@@ -4,7 +4,7 @@ import querystring from "querystring";
 import { ADMIN_IS_PERSONIFYING } from "../auth";
 import nocache from "../common/middlewares/nocache";
 import { rateLimiterMiddleware } from "../common/middlewares/rateLimiter";
-import { storeUserSessionId } from "../common/redis/users";
+import { storeUserSessionsId } from "../common/redis/users";
 import { getUIBaseURL, sanitizeEmail } from "../utils";
 
 const UI_BASE_URL = getUIBaseURL();
@@ -48,7 +48,7 @@ authRouter.post(
           req.session.cookie.maxAge = oneHourInMs;
           req.session.warningMessage = `Attention, vous êtes actuellement connecté avec le compte utilisateur ${user.email} pour une durée de 1 heure.`;
         }
-        storeUserSessionId(user.id, req.session.id);
+        storeUserSessionsId(user.id, req.session.id);
         const returnTo = req.body.returnTo || "/";
         return res.redirect(`${UI_BASE_URL}${returnTo}`);
       });

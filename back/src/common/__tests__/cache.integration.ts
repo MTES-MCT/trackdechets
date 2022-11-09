@@ -7,7 +7,7 @@ import {
 
 import {
   getCachedUserSiretOrVat,
-  getUserCompaniesCacheKey,
+  genUserCompaniesCacheKey,
   deleteCachedUserCompanies
 } from "../../common/redis/users";
 import { redisClient } from "../redis";
@@ -29,7 +29,7 @@ describe("Test Caching", () => {
       }
     });
 
-    const key = getUserCompaniesCacheKey(user.id);
+    const key = genUserCompaniesCacheKey(user.id);
     // redis key does not exist yet
     let exists = await redisClient.exists(key);
     expect(exists).toBe(0);

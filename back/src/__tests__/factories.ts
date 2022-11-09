@@ -13,6 +13,7 @@ import {
 } from "@prisma/client";
 import prisma from "../prisma";
 import { hashToken } from "../utils";
+import { createUser } from "../users/database";
 /**
  * Create a user with name and email
  * @param opt: extra parameters
@@ -30,7 +31,7 @@ export const userFactory = async (
     ...opt
   };
 
-  return prisma.user.create({ data });
+  return createUser({ data });
 };
 
 /**

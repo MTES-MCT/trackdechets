@@ -7,14 +7,20 @@ import {
   MutationChangePasswordArgs,
   MutationResolvers
 } from "../../../generated/graphql/types";
-import { hashPassword, isPasswordLongEnough } from "../../utils";
+import { checkPasswordCriteria } from "../../utils";
+import { updateUserPassword } from "../../database";
+import {
+  clearUserSessions,
+  storeUserSessionsId
+} from "../../../common/redis/users";
 
 /**
  * Change user password
  */
 export async function changePasswordFn(
   userId: string,
-  { oldPassword, newPassword }: MutationChangePasswordArgs
+  { oldPassword, newPassword }: MutationChangePasswordArgs,
+  currentSessionId: string
 ) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   const passwordValid = await compare(oldPassword, user.password);
@@ -25,16 +31,20 @@ export async function changePasswordFn(
   }
 
   const trimmedPassword = newPassword.trim();
-  if (!isPasswordLongEnough(trimmedPassword)) {
-    throw new UserInputError("Le nouveau mot de passe est trop court.", {
-      invalidArgs: ["newPassword"]
-    });
-  }
-  const hashedPassword = await hashPassword(trimmedPassword);
-  const updatedUser = await prisma.user.update({
-    where: { id: userId },
-    data: { password: hashedPassword }
+
+  checkPasswordCriteria(trimmedPassword);
+
+  const updatedUser = await updateUserPassword({
+    userId: user.id,
+    trimmedPassword
   });
+
+  // bust opened sessions to disconnect user from all devices and browsers
+  // current user session is regenerated thanks to graphqlRegenerateSessionMiddleware,
+  // but not yet referenced is userSessionsIds, so user is not disconnected
+  await clearUserSessions(user.id);
+  // store session reference
+  await storeUserSessionsId(user.id, currentSessionId);
 
   return {
     ...updatedUser,
@@ -52,7 +62,7 @@ const changePasswordResolver: MutationResolvers["changePassword"] = (
 
   const user = checkIsAuthenticated(context);
 
-  return changePasswordFn(user.id, args);
+  return changePasswordFn(user.id, args, context.req.sessionID);
 };
 
 export default changePasswordResolver;

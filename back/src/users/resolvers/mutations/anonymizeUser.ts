@@ -6,12 +6,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { UserInputError } from "apollo-server-core";
 import { PrismaTransaction } from "../../../common/repository/types";
 import { hashPassword } from "../../utils";
-import {
-  getUserSessions,
-  USER_SESSIONS_CACHE_KEY
-} from "../../../common/redis/users";
-import { redisClient } from "../../../common/redis";
-import { sess } from "../../../server";
+import { clearUserSessions } from "../../../common/redis/users";
 import { getUid } from "../../../utils";
 
 export async function checkCompanyAssociations(user: User): Promise<string[]> {
@@ -135,12 +130,6 @@ export async function deleteUserGrants(user: User, prisma: PrismaTransaction) {
   });
 }
 
-export async function deleteAllUserSessions(userId: string) {
-  const sessions = await getUserSessions(userId);
-  sessions.forEach(sessionId => sess.store.destroy(sessionId));
-  await redisClient.del(`${USER_SESSIONS_CACHE_KEY}-${userId}`);
-}
-
 /**
  * Soft-delete by anonymizing a User
  * @param userId
@@ -185,7 +174,7 @@ async function anonymizeUserFn(userId: string): Promise<string> {
           password: await hashPassword(getUid(16))
         }
       });
-      await deleteAllUserSessions(user.id);
+      await clearUserSessions(user.id);
     });
 
     return anonEmail;
