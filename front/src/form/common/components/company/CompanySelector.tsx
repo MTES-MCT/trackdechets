@@ -76,16 +76,15 @@ export default function CompanySelector({
   const [field] = useField<FormCompany>({ name });
   const { setFieldError, setFieldValue, setFieldTouched } = useFormikContext();
   const [isForeignCompany, setIsForeignCompany] = useState(
-    `${field.name}.country` !== "FR"
+    field.value.country && field.value.country !== "FR"
   );
-
+  console.log(`${field.name}.country`);
   const departmentInputRef = useRef<HTMLInputElement>(null);
   const clueInputRef = useRef<HTMLInputElement>(null);
   const [mustBeRegistered, setMustBeRegistered] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<CompanySearchResult[]>([]);
   const [toggleManualForeignCompanyForm, setToggleManualForeignCompanyForm] =
     useState<boolean>(false);
-
   // Favortite type is deduced from the field prefix (transporter, emitter, etc)
   const favoriteType = constantCase(field.name.split(".")[0]) as FavoriteType;
   const {
@@ -218,9 +217,8 @@ export default function CompanySelector({
         .filter(company => company.etatAdministratif === "A")
         .map(company => ({
           ...company,
-          codePaysEtrangerEtablissement: company.codePaysEtrangerEtablissement
-            ? company.codePaysEtrangerEtablissement
-            : "FR",
+          codePaysEtrangerEtablissement:
+            company.codePaysEtrangerEtablissement || "FR",
         })) ?? [];
 
     const results = [...reshapedSearchResults, ...reshapedFavorites];
@@ -414,9 +412,11 @@ export default function CompanySelector({
             vatNumber: field.value.vatNumber,
             name: field.value.name,
             address: field.value.address,
-            // complete with isRegistered
+            // complete with companyPrivateInfos data
             ...(selectedData?.companyPrivateInfos && {
               isRegistered: selectedData?.companyPrivateInfos.isRegistered,
+              codePaysEtrangerEtablissement:
+                selectedData?.companyPrivateInfos.codePaysEtrangerEtablissement,
             }),
           }}
         />
@@ -525,9 +525,8 @@ function favoriteToCompanySearchResult(
     brokerReceipt: company.brokerReceipt,
     vhuAgrementDemolisseur: company.vhuAgrementDemolisseur,
     vhuAgrementBroyeur: company.vhuAgrementBroyeur,
-    codePaysEtrangerEtablissement: company.codePaysEtrangerEtablissement
-      ? company.codePaysEtrangerEtablissement
-      : "FR",
+    codePaysEtrangerEtablissement:
+      company.codePaysEtrangerEtablissement || "FR",
     contact: company.contact,
     contactPhone: company.phone,
     contactEmail: company.mail,

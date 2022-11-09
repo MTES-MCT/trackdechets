@@ -97,6 +97,18 @@ export const isFRVat = (clue: string): boolean => {
 };
 
 /**
+ * TVA Non-Français
+ */
+export const isForeignVat = (clue: string): boolean => {
+  if (!clue) return false;
+  const cleanClue = clue.replace(/\s/g, "");
+  if (!cleanClue) return false;
+  return (
+    isVat(cleanClue) && !cleanClue.slice(0, 2).toUpperCase().startsWith("FR")
+  );
+};
+
+/**
  * Le numéro OMI est "OMI1234567" (7 chiffres)
  */
 export const isOmi = (clue: string): boolean => {
