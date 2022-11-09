@@ -56,7 +56,7 @@ export default function ResendActivationEmail() {
     <Row spacing="mb-2w">
       <Alert
         title="Succès"
-        description="Un email d'activation vous a été renvoyé."
+        description="Si votre compte est effectivement en attente sur notre plateforme, un email d'activation vous a été renvoyé."
         type="success"
       />
     </Row>
