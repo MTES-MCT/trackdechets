@@ -58,7 +58,7 @@ describe("publishBsff", () => {
           "Transporteur : le numéro de téléphone est requis\n" +
           "Transporteur : l'adresse email est requise\n" +
           "Le code déchet est requis\n" +
-          "La description du fluide est obligatoire\n" +
+          "La dénomination usuelle du déchet est obligatoire\n" +
           "La mention ADR est requise\n" +
           "Le poids total est requis\n" +
           "Le type de poids (estimé ou non) est un requis\n" +

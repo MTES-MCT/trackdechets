@@ -43,22 +43,24 @@ export const validationSchema = yup.object({
     code: yup.string().required(),
     description: yup.string().required(),
   }),
-  packagings: yup.array(
-    yup.object({
-      name: yup.string().required("La type de contenant est un champ requis"),
-      numero: yup
-        .string()
-        .required("Le numéro du contenant est un champ requis"),
-      volume: yup
-        .number()
-        .required("Le volume du contenant est un champ requis")
-        .positive("Le volume du contenant doit être supérieur 0"),
-      weight: yup
-        .number()
-        .required("Le poids du contenu est un champ requis")
-        .positive("La masse du contenu doit être supérieur 0"),
-    })
-  ),
+  packagings: yup
+    .array(
+      yup.object({
+        name: yup.string().required("La type de contenant est un champ requis"),
+        numero: yup
+          .string()
+          .required("Le numéro du contenant est un champ requis"),
+        volume: yup
+          .number()
+          .required("Le volume du contenant est un champ requis")
+          .positive("Le volume du contenant doit être supérieur 0"),
+        weight: yup
+          .number()
+          .required("Le poids du contenu est un champ requis")
+          .positive("La masse du contenu doit être supérieur 0"),
+      })
+    )
+    .min(1, "Le nombre de contenants doit être supérieur ou égal à 1"),
   weight: yup.object().shape({
     value: yup
       .number()
