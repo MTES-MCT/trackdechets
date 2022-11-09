@@ -20,11 +20,7 @@ app.use(
           "*.trackdechets.fr",
         ],
         baseUri: "'self'",
-        formAction: [
-          "'self'",
-          "*.trackdechets.beta.gouv.fr",
-          "*.trackdechets.fr",
-        ],
+        formAction: ["http:"], // allow external redirects for oauth workflow
         fontSrc: ["'self'", "https:", "data:"],
         frameAncestors: "'none'",
         frameSrc: ["'self'"],
