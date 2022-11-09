@@ -63,6 +63,10 @@ export function Worker({ disabled }) {
               handleChange(e);
               setFieldValue("worker.company.name", null);
               setFieldValue("worker.company.siret", null);
+              setFieldValue("worker.company.contact", null);
+              setFieldValue("worker.company.address", null);
+              setFieldValue("worker.company.mail", null);
+              setFieldValue("worker.company.phone", null);
             }}
           />
           Il n'y a pas d'entreprise de travaux
