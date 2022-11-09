@@ -4,15 +4,21 @@ import { Bsda } from "generated/graphql/types";
 import { RedErrorMessage, FieldTransportModeSelect } from "common/components";
 import Tooltip from "common/components/Tooltip";
 import DateInput from "form/common/components/custom-inputs/DateInput";
+import {
+  isForeignVat,
+  isSiret,
+} from "generated/constants/companySearchHelpers";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 type Props = { disabled: boolean };
 export function Transport({ disabled }: Props) {
   const { values } = useFormikContext<Bsda>();
+  const recipisseDisabled =
+    disabled || isForeignVat(values.transporter?.company?.vatNumber!!);
 
   return (
     <>
-      {values.transporter?.company?.siret === null ? (
+      {!isSiret(values.transporter?.company?.siret!!) ? (
         <label>
           Numéro de TVA intracommunautaire
           <Field
@@ -35,7 +41,7 @@ export function Transport({ disabled }: Props) {
                 type="text"
                 name="transporter.recepisse.number"
                 className="td-input td-input--medium"
-                disabled={disabled}
+                disabled={recipisseDisabled}
               />
             </label>
 
@@ -48,7 +54,7 @@ export function Transport({ disabled }: Props) {
                 name="transporter.recepisse.department"
                 placeholder="Ex: 83"
                 className={`td-input td-input--small`}
-                disabled={disabled}
+                disabled={recipisseDisabled}
               />
             </label>
 
@@ -60,7 +66,7 @@ export function Transport({ disabled }: Props) {
                 component={DateInput}
                 name="transporter.recepisse.validityLimit"
                 className={`td-input td-input--small`}
-                disabled={disabled}
+                disabled={recipisseDisabled}
               />
             </label>
 

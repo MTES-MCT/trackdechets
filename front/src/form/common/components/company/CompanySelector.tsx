@@ -414,6 +414,7 @@ export default function CompanySelector({
             vatNumber: field.value.vatNumber,
             name: field.value.name,
             address: field.value.address,
+            codePaysEtrangerEtablissement: field.value.country,
             // complete with isRegistered
             ...(selectedData?.companyPrivateInfos && {
               isRegistered: selectedData?.companyPrivateInfos.isRegistered,

@@ -14,6 +14,9 @@ type Values = {
 
 export default function Transporter() {
   const { setFieldValue, values } = useFormikContext<Values>();
+  const showCompanyReceipt =
+    !values.transporter.isExemptedOfReceipt &&
+    values.transporter.company?.country === "FR";
 
   return (
     <>
@@ -50,21 +53,26 @@ export default function Transporter() {
         <Field name="transporter.mode" component={FieldTransportModeSelect} />
       </label>
 
-      <h4 className="form__section-heading">Autorisations</h4>
-      <div className="form__row">
-        <TdSwitch
-          checked={!!values.transporter.isExemptedOfReceipt}
-          onChange={() =>
-            setFieldValue(
-              "transporter.isExemptedOfReceipt",
-              !values.transporter.isExemptedOfReceipt
-            )
-          }
-          label="Le transporteur déclare être exempté de récépissé conformément aux
-          dispositions de l'article R.541-50 du code de l'environnement."
-        />
-      </div>
-      {!values.transporter.isExemptedOfReceipt && (
+      {values.transporter.company?.country === "FR" && (
+        <>
+          <h4 className="form__section-heading">Autorisations</h4>
+          <div className="form__row">
+            <TdSwitch
+              checked={!!values.transporter.isExemptedOfReceipt}
+              onChange={() =>
+                setFieldValue(
+                  "transporter.isExemptedOfReceipt",
+                  !values.transporter.isExemptedOfReceipt
+                )
+              }
+              disabled={values.transporter.company?.country !== "FR"}
+              label="Le transporteur déclare être exempté de récépissé conformément aux
+            dispositions de l'article R.541-50 du code de l'environnement."
+            />
+          </div>
+        </>
+      )}
+      {showCompanyReceipt && (
         <div className="form__row">
           <label>
             Numéro de récépissé

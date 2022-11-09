@@ -229,14 +229,17 @@ function TransporterFormCompanyFields({
         <FormCompanyFields company={transporter?.company} />
       </div>
       <div className="Col">
-        {transporter?.isExemptedOfReceipt ? (
+        {transporter?.isExemptedOfReceipt &&
+        transporter.company?.country === "FR" ? (
           <p>
             <input type="checkbox" checked readOnly /> Je déclare être exempté
             de récépissé au titre de l'article R.541-50 du code de
             l'environnement
           </p>
-        ) : (
+        ) : transporter.company?.country === "FR" ? (
           <ReceiptFields {...(transporter ?? {})} />
+        ) : (
+          ""
         )}
         <p>
           Mode de transport :{" "}
@@ -907,30 +910,30 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             </div>
           </div>
 
-          {([
-            ...form.transportSegments,
-            ...Array.from({
-              length: 2 - form.transportSegments.length
-            }).fill(undefined)
-          ] as Array<TransportSegment | undefined>).map(
-            (transportSegment, index) => (
-              <div className="BoxRow" key={index}>
-                <div className="BoxCol">
-                  <p>
-                    <strong>18. Collecteur-Transporteur</strong>
-                  </p>
-                  <TransporterFormCompanyFields
-                    transporter={{
-                      ...transportSegment?.transporter,
-                      mode: transportSegment?.mode
-                    }}
-                    takenOverAt={transportSegment?.takenOverAt}
-                    takenOverBy={transportSegment?.takenOverBy}
-                  />
-                </div>
+          {(
+            [
+              ...form.transportSegments,
+              ...Array.from({
+                length: 2 - form.transportSegments.length
+              }).fill(undefined)
+            ] as Array<TransportSegment | undefined>
+          ).map((transportSegment, index) => (
+            <div className="BoxRow" key={index}>
+              <div className="BoxCol">
+                <p>
+                  <strong>18. Collecteur-Transporteur</strong>
+                </p>
+                <TransporterFormCompanyFields
+                  transporter={{
+                    ...transportSegment?.transporter,
+                    mode: transportSegment?.mode
+                  }}
+                  takenOverAt={transportSegment?.takenOverAt}
+                  takenOverBy={transportSegment?.takenOverBy}
+                />
               </div>
-            )
-          )}
+            </div>
+          ))}
         </div>
       )}
 
@@ -977,33 +980,32 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                   </tr>
                 </thead>
                 <tbody>
-                  {([
-                    ...form.grouping,
-                    ...Array.from({
-                      length: 10 - form.grouping.length
-                    }).fill({ form: null, quantity: null })
-                  ] as Array<InitialFormFraction>).map(
-                    ({ form, quantity }, index) => (
-                      <tr key={index}>
-                        <td>{index + 1}</td>
-                        <td>{form?.readableId}</td>
-                        <td>{form?.wasteDetails?.code}</td>
-                        <td>{form?.wasteDetails?.name}</td>
-                        <td>
-                          {form?.quantityReceived ??
-                            form?.wasteDetails?.quantity}
-                        </td>
-                        <td>
-                          {form?.quantityReceived
-                            ? "R"
-                            : form?.wasteDetails?.quantityType?.charAt(0)}
-                        </td>
-                        <td>{quantity}</td>
-                        <td>{formatDate(form?.signedAt)}</td>
-                        <td>{form?.emitterPostalCode}</td>
-                      </tr>
-                    )
-                  )}
+                  {(
+                    [
+                      ...form.grouping,
+                      ...Array.from({
+                        length: 10 - form.grouping.length
+                      }).fill({ form: null, quantity: null })
+                    ] as Array<InitialFormFraction>
+                  ).map(({ form, quantity }, index) => (
+                    <tr key={index}>
+                      <td>{index + 1}</td>
+                      <td>{form?.readableId}</td>
+                      <td>{form?.wasteDetails?.code}</td>
+                      <td>{form?.wasteDetails?.name}</td>
+                      <td>
+                        {form?.quantityReceived ?? form?.wasteDetails?.quantity}
+                      </td>
+                      <td>
+                        {form?.quantityReceived
+                          ? "R"
+                          : form?.wasteDetails?.quantityType?.charAt(0)}
+                      </td>
+                      <td>{quantity}</td>
+                      <td>{formatDate(form?.signedAt)}</td>
+                      <td>{form?.emitterPostalCode}</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

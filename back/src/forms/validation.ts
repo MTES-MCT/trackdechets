@@ -51,7 +51,8 @@ import {
   isVat,
   isSiret,
   isFRVat,
-  isOmi
+  isOmi,
+  isForeignVat
 } from "../common/constants/companySearchHelpers";
 import { validateCompany } from "../companies/validateCompany";
 import { Decimal } from "decimal.js-light";
@@ -793,6 +794,18 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
       transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
       transporterReceipt: yup
         .string()
+        .when(
+          "transporterCompanyVatNumber",
+          (transporterCompanyVatNumber, schema) =>
+            isForeignVat(transporterCompanyVatNumber)
+              ? schema.notRequired().nullable()
+              : schema
+                  .ensure()
+                  .requiredIf(
+                    !isDraft,
+                    "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+                  )
+        )
         .when("transporterIsExemptedOfReceipt", (isExemptedOfReceipt, schema) =>
           isExemptedOfReceipt
             ? schema.notRequired().nullable()
@@ -805,6 +818,18 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
         ),
       transporterDepartment: yup
         .string()
+        .when(
+          "transporterCompanyVatNumber",
+          (transporterCompanyVatNumber, schema) =>
+            isForeignVat(transporterCompanyVatNumber)
+              ? schema.notRequired().nullable()
+              : schema
+                  .ensure()
+                  .requiredIf(
+                    !isDraft,
+                    "Le département du transporteur est obligatoire"
+                  )
+        )
         .when("transporterIsExemptedOfReceipt", (isExemptedOfReceipt, schema) =>
           isExemptedOfReceipt
             ? schema.notRequired().nullable()
