@@ -13,24 +13,6 @@ export const GET_BSFF_FORM = gql`
   ${FullBsffFragment}
 `;
 
-export const GET_BSFF_FORMS = gql`
-  query Bsffs($where: BsffWhere) {
-    bsffs(where: $where) {
-      totalCount
-      pageInfo {
-        hasNextPage
-      }
-      edges {
-        cursor
-        node {
-          ...FullBsff
-        }
-      }
-    }
-  }
-  ${FullBsffFragment}
-`;
-
 export const GET_PREVIOUS_PACKAGINGS = gql`
   query BsffPackagings($where: BsffPackagingWhere) {
     bsffPackagings(where: $where) {
