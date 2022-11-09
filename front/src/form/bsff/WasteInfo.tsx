@@ -84,7 +84,7 @@ export default function WasteInfo({ disabled }) {
 
       <div className="form__row">
         <label>
-          Nature du fluide
+          Dénomination usuelle du déchet
           <Field
             type="text"
             name="waste.description"
@@ -116,7 +116,7 @@ export default function WasteInfo({ disabled }) {
 
       <div className="form__row">
         <label>
-          Poids total en kilos
+          Quantité totale (en kg)
           <Field
             component={NumberInput}
             name="weight.value"

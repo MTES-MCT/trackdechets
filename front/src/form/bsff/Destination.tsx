@@ -2,6 +2,7 @@ import React from "react";
 import { Field } from "formik";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { OPERATION } from "./utils/constants";
+import { RedErrorMessage } from "common/components";
 
 export default function Destination({ disabled }) {
   return (
@@ -34,6 +35,7 @@ export default function Destination({ disabled }) {
             </option>
           ))}
         </Field>
+        <RedErrorMessage name="destination.plannedOperationCode" />
       </div>
       <div className="form__row">
         <label>

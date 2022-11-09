@@ -1,4 +1,3 @@
-import { addYears, startOfYear } from "date-fns";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import { BsffType, TransportMode } from "generated/graphql/types";
 
@@ -15,7 +14,7 @@ const initialState = {
     recepisse: {
       number: "",
       department: "",
-      validityLimit: startOfYear(addYears(new Date(), 1)).toISOString(),
+      validityLimit: "",
     },
     transport: {
       mode: TransportMode.Road,
@@ -25,12 +24,12 @@ const initialState = {
   destination: {
     company: getInitialCompany(),
     cap: "",
-    plannedOperationCode: null,
+    plannedOperationCode: "",
   },
   packagings: [],
   waste: {
     code: "14 06 01*",
-    description: null,
+    description: "",
     adr: "UN 1078, Gaz frigorifique NSA (Gaz réfrigérant, NSA), 2.2 (C/E)",
   },
   weight: {

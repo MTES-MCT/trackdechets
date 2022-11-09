@@ -21,6 +21,8 @@ import {
   UPDATE_BSFF_FORM,
   GET_BSFF_FORM,
 } from "./utils/queries";
+import { validationSchema } from "./utils/schema";
+
 const GenericStepList = lazy(
   () => import("form/common/stepper/GenericStepList")
 );
@@ -78,12 +80,18 @@ export default function BsffStepsList(props: Props) {
       previousPackagings,
       packagings,
       type,
+      destination: { plannedOperationCode, ...destination },
       ...input
     } = values;
 
     saveForm({
       type,
       ...input,
+      destination: {
+        ...destination,
+        plannedOperationCode:
+          plannedOperationCode?.length > 0 ? plannedOperationCode : null,
+      },
       // packagings is computed by the backend in case of groupement or reexpedition
       ...([BsffType.Groupement, BsffType.Reexpedition].includes(type)
         ? {}
@@ -127,7 +135,7 @@ export default function BsffStepsList(props: Props) {
         formQuery={formQuery}
         onSubmit={onSubmit}
         initialValues={formState}
-        validationSchema={null}
+        validationSchema={validationSchema}
       />
       {(creating || updating) && <Loader />}
     </>

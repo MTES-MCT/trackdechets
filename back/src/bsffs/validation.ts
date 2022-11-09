@@ -237,7 +237,10 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
         .requiredIf(!isDraft, "Le code déchet est requis"),
       wasteDescription: yup
         .string()
-        .requiredIf(!isDraft, "La description du fluide est obligatoire"),
+        .requiredIf(
+          !isDraft,
+          "La dénomination usuelle du déchet est obligatoire"
+        ),
       wasteAdr: yup.string().requiredIf(!isDraft, "La mention ADR est requise"),
       weightValue: yup
         .number()
