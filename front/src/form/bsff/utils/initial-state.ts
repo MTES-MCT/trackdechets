@@ -34,7 +34,7 @@ const initialState = {
   },
   weight: {
     value: 0,
-    isEstimate: false,
+    isEstimate: true,
   },
   ficheInterventions: [],
   previousPackagings: [],
