@@ -673,56 +673,44 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
       transporterRecepisseIsExempted: yup.boolean().nullable(),
       transporterRecepisseDepartment: yup
         .string()
-        .when(
-          [
-            "type",
-            "transporterRecepisseIsExempted",
-            "transporterCompanyVatNumber"
-          ],
-          {
-            is: (type, isExempted, transporterCompanyVatNumber) =>
-              type === BsdaType.COLLECTION_2710 ||
-              isExempted ||
-              isForeignVat(transporterCompanyVatNumber),
-            then: schema => schema.nullable(),
-            otherwise: schema =>
-              schema.when("transporterCompanyVatNumber", (tva, schema) => {
-                if (!tva) {
+        .when(["type", "transporterRecepisseIsExempted"], {
+          is: (type, isExempted) =>
+            type === BsdaType.COLLECTION_2710 || isExempted,
+          then: schema => schema.nullable(),
+          otherwise: schema =>
+            schema.when(
+              "transporterCompanyVatNumber",
+              (transporterCompanyVatNumber, schema) => {
+                if (!isForeignVat(transporterCompanyVatNumber)) {
                   return schema.requiredIf(
                     context.transportSignature,
                     `Transporteur: le département associé au récépissé est obligatoire`
                   );
                 }
                 return schema.nullable().notRequired();
-              })
-          }
-        ),
+              }
+            )
+        }),
       transporterRecepisseNumber: yup
         .string()
-        .when(
-          [
-            "type",
-            "transporterRecepisseIsExempted",
-            "transporterCompanyVatNumber"
-          ],
-          {
-            is: (type, isExempted, transporterCompanyVatNumber) =>
-              type === BsdaType.COLLECTION_2710 ||
-              isExempted ||
-              isForeignVat(transporterCompanyVatNumber),
-            then: schema => schema.nullable(),
-            otherwise: schema =>
-              schema.when("transporterCompanyVatNumber", (tva, schema) => {
-                if (!tva) {
+        .when(["type", "transporterRecepisseIsExempted"], {
+          is: (type, isExempted) =>
+            type === BsdaType.COLLECTION_2710 || isExempted,
+          then: schema => schema.nullable(),
+          otherwise: schema =>
+            schema.when(
+              "transporterCompanyVatNumber",
+              (transporterCompanyVatNumber, schema) => {
+                if (!isForeignVat(transporterCompanyVatNumber)) {
                   return schema.requiredIf(
                     context.transportSignature,
                     `Transporteur: le numéro de récépissé est obligatoire`
                   );
                 }
                 return schema.nullable().notRequired();
-              })
-          }
-        ),
+              }
+            )
+        }),
       transporterRecepisseValidityLimit: yup
         .date()
         .when(["type", "transporterRecepisseIsExempted"], {
