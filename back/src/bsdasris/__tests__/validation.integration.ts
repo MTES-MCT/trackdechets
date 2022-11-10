@@ -29,4 +29,15 @@ describe("Mutation.signBsdasri emission", () => {
       transportSignature: true
     });
   });
+
+  it("should not require recipisse when it's a foreign transport", async () => {
+    const dasri = readyToTakeOverData({
+      vatNumber: "DE53075596600047",
+      name: "transporteur DE"
+    });
+    delete dasri.transporterRecepisseNumber;
+    delete dasri.transporterRecepisseDepartment;
+    delete dasri.transporterRecepisseValidityLimit;
+    await validateBsdasri(dasri, { transportSignature: true });
+  });
 });

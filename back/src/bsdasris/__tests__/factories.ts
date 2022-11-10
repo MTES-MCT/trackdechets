@@ -39,6 +39,7 @@ export const initialData = company => ({
 export const readyToTakeOverData = company => ({
   transporterCompanyName: company.name,
   transporterCompanySiret: company.siret,
+  transporterCompanyVatNumber: company.vatNumber,
   transporterCompanyAddress: "Boulevard machin",
   transporterCompanyPhone: "987654534",
   transporterCompanyContact: "Contact",
