@@ -1049,7 +1049,7 @@ model Bsff {
 
   destinationCustomInfo String?
 
-  destinationReceptionDate DateTime? @db.Timestamptz(6)
+  destinationReceptionDate              DateTime?               @db.Timestamptz(6)
   // DEPRECATED - TODO delete after data migration
   destinationReceptionWeight            Float?
   destinationReceptionAcceptationStatus WasteAcceptationStatus?
@@ -1162,13 +1162,12 @@ model BsffPackaging {
   weight Float
   numero String
 
-  acceptationDate          DateTime?               @db.Timestamptz(6)
-  acceptationWeight        Float?
-  acceptationStatus        WasteAcceptationStatus?
-  acceptationRefusalReason String?
+  acceptationDate             DateTime?               @db.Timestamptz(6)
+  acceptationWeight           Float?
+  acceptationStatus           WasteAcceptationStatus?
+  acceptationRefusalReason    String?
   acceptationWasteCode        String?
   acceptationWasteDescription String?
-
 
   acceptationSignatureAuthor String?
   acceptationSignatureDate   DateTime? @db.Timestamptz(6)
