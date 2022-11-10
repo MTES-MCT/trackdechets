@@ -21,6 +21,7 @@ import { indexBsff } from "../../elastic";
 import { isFinalOperation } from "../../constants";
 import { getStatus } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
+import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
 
 async function checkIsAllowed(
   siret: string | null,
@@ -279,10 +280,12 @@ const signatures: Record<
       bsffs.map(async bsff => {
         const newStatus = await getStatus(bsff);
         if (newStatus !== bsff.status) {
-          return prisma.bsff.update({
+          const updatedBsff = await prisma.bsff.update({
             where: { id: bsff.id },
             data: { status: newStatus }
           });
+          enqueueBsdToIndex(updatedBsff.id);
+          return updatedBsff;
         }
         return bsff;
       })
