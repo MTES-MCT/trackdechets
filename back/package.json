@@ -83,7 +83,7 @@
     "csv-parser": "^2.3.3",
     "dataloader": "^2.0.0",
     "date-fns": "^2.14.0",
-    "dd-trace": "^1.7.1",
+    "dd-trace": "^3.7.1",
     "decimal.js-light": "^2.5.1",
     "exceljs": "^4.3.0",
     "express": "^4.17.1",
