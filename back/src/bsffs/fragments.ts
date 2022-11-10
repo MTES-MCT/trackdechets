@@ -152,6 +152,15 @@ export const fullBsff = gql`
     ficheInterventions {
       ...FullFicheIntervention
     }
+    grouping {
+      id
+    }
+    repackaging {
+      id
+    }
+    forwarding {
+      id
+    }
   }
   ${fullFicheIntervention}
 `;

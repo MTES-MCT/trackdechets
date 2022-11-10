@@ -140,12 +140,15 @@ describe("All wastes registry", () => {
       },
       {
         wasteCode: "14 06 01*",
-        //destinationReceptionWeight: 200,
         createdAt: new Date("2021-08-01"),
-        transporterTransportTakenOverAt: new Date("2021-08-02")
-        //destinationReceptionDate: new Date("2021-08-03"),
-        //destinationOperationSignatureDate: new Date("2021-08-04"),
-        //destinationOperationCode: "R 2"
+        transporterTransportTakenOverAt: new Date("2021-08-02"),
+        destinationReceptionDate: new Date("2021-08-03")
+      },
+      {
+        acceptationWeight: 200,
+        acceptationDate: new Date("2021-08-03"),
+        operationSignatureDate: new Date("2021-08-04"),
+        operationCode: "R2"
       }
     );
     await Promise.all([

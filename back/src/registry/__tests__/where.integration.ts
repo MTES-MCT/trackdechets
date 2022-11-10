@@ -1264,33 +1264,49 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu2.id, bsvhu3.id]);
   });
 
-  // it("should filter BSFFs between two reception weights (strict)", async () => {
-  //   const bsff1 = await createBsff({}, { destinationReceptionWeight: 1 });
+  it("should filter BSFFs between two reception weights (strict)", async () => {
+    const bsff1 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 1, acceptationSignatureDate: new Date() }
+    );
 
-  //   const bsff2 = await createBsff({}, { destinationReceptionWeight: 2 });
+    const bsff2 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 2, acceptationSignatureDate: new Date() }
+    );
 
-  //   const bsff3 = await createBsff({}, { destinationReceptionWeight: 3 });
+    const bsff3 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 3, acceptationSignatureDate: new Date() }
+    );
 
-  //   const bsff4 = await createBsff({}, { destinationReceptionWeight: 4 });
+    const bsff4 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 4, acceptationSignatureDate: new Date() }
+    );
 
-  //   await Promise.all(
-  //     [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
-  //       return indexBsff(bsff);
-  //     })
-  //   );
-  //   await refreshElasticSearch();
+    await Promise.all(
+      [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
+        return indexBsff(bsff);
+      })
+    );
+    await refreshElasticSearch();
 
-  //   const where: WasteRegistryWhere = {
-  //     destinationReceptionWeight: {
-  //       _gt: 1,
-  //       _lt: 4
-  //     }
-  //   };
+    const where: WasteRegistryWhere = {
+      destinationReceptionWeight: {
+        _gt: 1,
+        _lt: 4
+      }
+    };
 
-  //   const bsds = await searchBsds(where);
+    const bsds = await searchBsds(where);
 
-  //   expect(bsds.map(bsd => bsd.id)).toEqual([bsff2.id, bsff3.id]);
-  // });
+    expect(bsds.map(bsd => bsd.id)).toEqual([bsff2.id, bsff3.id]);
+  });
 
   it("should filter BSDs between two reception weights (not strict)", async () => {
     const user = await userFactory();
@@ -1442,33 +1458,49 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu2.id, bsvhu3.id]);
   });
 
-  // it("should filter BSFFs between two reception weights (not strict)", async () => {
-  //   const bsff1 = await createBsff({}, { destinationReceptionWeight: 1 });
+  it("should filter BSFFs between two reception weights (not strict)", async () => {
+    const bsff1 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 1, acceptationSignatureDate: new Date() }
+    );
 
-  //   const bsff2 = await createBsff({}, { destinationReceptionWeight: 2 });
+    const bsff2 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 2, acceptationSignatureDate: new Date() }
+    );
 
-  //   const bsff3 = await createBsff({}, { destinationReceptionWeight: 3 });
+    const bsff3 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 3, acceptationSignatureDate: new Date() }
+    );
 
-  //   const bsff4 = await createBsff({}, { destinationReceptionWeight: 4 });
+    const bsff4 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 4, acceptationSignatureDate: new Date() }
+    );
 
-  //   await Promise.all(
-  //     [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
-  //       return indexBsff(bsff);
-  //     })
-  //   );
-  //   await refreshElasticSearch();
+    await Promise.all(
+      [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
+        return indexBsff(bsff);
+      })
+    );
+    await refreshElasticSearch();
 
-  //   const where: WasteRegistryWhere = {
-  //     destinationReceptionWeight: {
-  //       _gte: 2,
-  //       _lte: 3
-  //     }
-  //   };
+    const where: WasteRegistryWhere = {
+      destinationReceptionWeight: {
+        _gte: 2,
+        _lte: 3
+      }
+    };
 
-  //   const bsds = await searchBsds(where);
+    const bsds = await searchBsds(where);
 
-  //   expect(bsds.map(bsd => bsd.id)).toEqual([bsff2.id, bsff3.id]);
-  // });
+    expect(bsds.map(bsd => bsd.id)).toEqual([bsff2.id, bsff3.id]);
+  });
 
   it("should filter BSDs between on reception weight (exact)", async () => {
     const user = await userFactory();
@@ -1616,32 +1648,48 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu2.id]);
   });
 
-  // it("should filter BSFFs on reception weight (exact)", async () => {
-  //   const bsff1 = await createBsff({}, { destinationReceptionWeight: 1 });
+  it("should filter BSFFs on reception weight (exact)", async () => {
+    const bsff1 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 1, acceptationSignatureDate: new Date() }
+    );
 
-  //   const bsff2 = await createBsff({}, { destinationReceptionWeight: 2 });
+    const bsff2 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 2, acceptationSignatureDate: new Date() }
+    );
 
-  //   const bsff3 = await createBsff({}, { destinationReceptionWeight: 3 });
+    const bsff3 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 3, acceptationSignatureDate: new Date() }
+    );
 
-  //   const bsff4 = await createBsff({}, { destinationReceptionWeight: 4 });
+    const bsff4 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 4, acceptationSignatureDate: new Date() }
+    );
 
-  //   await Promise.all(
-  //     [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
-  //       return indexBsff(bsff);
-  //     })
-  //   );
-  //   await refreshElasticSearch();
+    await Promise.all(
+      [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
+        return indexBsff(bsff);
+      })
+    );
+    await refreshElasticSearch();
 
-  //   const where: WasteRegistryWhere = {
-  //     destinationReceptionWeight: {
-  //       _eq: 2
-  //     }
-  //   };
+    const where: WasteRegistryWhere = {
+      destinationReceptionWeight: {
+        _eq: 2
+      }
+    };
 
-  //   const bsds = await searchBsds(where);
+    const bsds = await searchBsds(where);
 
-  //   expect(bsds.map(bsd => bsd.id)).toEqual([bsff2.id]);
-  // });
+    expect(bsds.map(bsd => bsd.id)).toEqual([bsff2.id]);
+  });
 
   it("should filter BSDDs on emitterCompanySiret (exact)", async () => {
     const user = await userFactory();
