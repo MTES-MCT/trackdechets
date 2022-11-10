@@ -124,8 +124,11 @@ export async function getStatus(bsff: Bsff & { packagings: BsffPackaging[] }) {
         !!packaging.acceptationSignatureDate &&
         packaging.acceptationStatus === WasteAcceptationStatus.ACCEPTED;
       const refused =
-        !!packaging.acceptationSignatureDate &&
-        packaging.acceptationStatus === WasteAcceptationStatus.REFUSED;
+        (!!packaging.lastPackaging?.acceptationSignatureDate &&
+          packaging.lastPackaging?.acceptationStatus ===
+            WasteAcceptationStatus.REFUSED) ||
+        (!!packaging.acceptationSignatureDate &&
+          packaging.acceptationStatus === WasteAcceptationStatus.REFUSED);
       const acceptedOrRefused = accepted || refused;
       const processed =
         refused ||

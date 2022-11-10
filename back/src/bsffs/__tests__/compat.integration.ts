@@ -639,4 +639,59 @@ describe("getStatus", () => {
     const status = await getStatus(bsff);
     expect(status).toEqual(BsffStatus.PROCESSED);
   });
+
+  it("should return REFUSED when all next packagings are refused", async () => {
+    const bsff = await prisma.bsff.create({
+      data: {
+        id: getReadableId(ReadableIdPrefix.FF),
+        type: BsffType.TRACER_FLUIDE,
+        packagings: {
+          create: [
+            {
+              name: "Bouteille",
+              numero: "cont1",
+              weight: 1,
+              volume: 1,
+              acceptationSignatureDate: new Date(),
+              acceptationStatus: WasteAcceptationStatus.ACCEPTED,
+              acceptationWeight: 1,
+              acceptationDate: new Date(),
+              operationCode: "R12",
+              operationDate: new Date(),
+              operationSignatureDate: new Date()
+            }
+          ]
+        }
+      },
+      include: { packagings: true }
+    });
+
+    await prisma.bsff.create({
+      data: {
+        id: getReadableId(ReadableIdPrefix.FF),
+        type: BsffType.GROUPEMENT,
+        packagings: {
+          create: [
+            {
+              name: "Bouteille",
+              numero: "cont2",
+              weight: 2,
+              volume: 2,
+              acceptationSignatureDate: new Date(),
+              acceptationStatus: WasteAcceptationStatus.REFUSED,
+              acceptationWeight: 0,
+              acceptationRefusalReason: "parce que",
+              previousPackagings: {
+                connect: bsff.packagings.map(p => ({ id: p.id }))
+              }
+            }
+          ]
+        }
+      },
+      include: { packagings: true }
+    });
+
+    const status = await getStatus(bsff);
+    expect(status).toEqual(BsffStatus.REFUSED);
+  });
 });

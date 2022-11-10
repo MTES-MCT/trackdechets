@@ -1,4 +1,9 @@
-import { BsffStatus, Bsff, BsffPackaging } from "@prisma/client";
+import {
+  BsffStatus,
+  Bsff,
+  BsffPackaging,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -148,7 +153,7 @@ const signatures: Record<
 
     await validateAfterReception(existingBsff as any);
 
-    return runInTransaction(async transaction => {
+    const updatedBsff = await runInTransaction(async transaction => {
       if (packagingId) {
         const packaging = existingBsff.packagings.find(
           p => p.id === packagingId
@@ -193,9 +198,42 @@ const signatures: Record<
 
       return transaction.bsff.update({
         where: { id },
-        data: { status }
+        data: { status },
+        include: { packagings: true }
       });
     });
+
+    // TODO updating previous BSFFs status should be done in transaction
+
+    const refusedPackagings = updatedBsff.packagings.filter(
+      p => p.acceptationStatus === WasteAcceptationStatus.REFUSED
+    );
+
+    const previousPackagings = await getPreviousPackagings(
+      refusedPackagings.map(p => p.id)
+    );
+
+    const bsffs = await prisma.bsff.findMany({
+      where: { id: { in: previousPackagings.map(p => p.bsffId) } },
+      include: { packagings: true }
+    });
+
+    await Promise.all(
+      bsffs.map(async bsff => {
+        const newStatus = await getStatus(bsff);
+        if (newStatus !== bsff.status) {
+          const updatedBsff = await prisma.bsff.update({
+            where: { id: bsff.id },
+            data: { status: newStatus }
+          });
+          enqueueBsdToIndex(updatedBsff.id);
+          return updatedBsff;
+        }
+        return bsff;
+      })
+    );
+
+    return updatedBsff;
   },
   OPERATION: async (
     { id, input: { date, author, securityCode, packagingId } },
@@ -260,8 +298,7 @@ const signatures: Record<
       });
     });
 
-    // update status of previous bsffs
-    // TODO this should be done in the same transaction
+    // TODO updating previous BSFFs status should be done in transaction
 
     const finalOperationPackagings = updatedBsff.packagings.filter(p =>
       isFinalOperation(p.operationCode, p.operationNoTraceability)

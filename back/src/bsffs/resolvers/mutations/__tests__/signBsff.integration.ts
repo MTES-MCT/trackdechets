@@ -423,6 +423,42 @@ describe("Mutation.signBsff", () => {
         })
       ]);
     });
+
+    it("should update status of previous BSFFs when refused", async () => {
+      const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+
+      const bsff = await createBsffAfterOperation(
+        { emitter, transporter, destination: ttr },
+        {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        { operationCode: OPERATION.R13.code }
+      );
+
+      const nextBsff = await createBsffBeforeRefusal({
+        emitter: ttr,
+        transporter,
+        destination,
+        previousPackagings: bsff.packagings
+      });
+
+      const { mutate } = makeClient(destination.user);
+      await mutate<Pick<Mutation, "signBsff">, MutationSignBsffArgs>(SIGN, {
+        variables: {
+          id: nextBsff.id,
+          input: {
+            type: "ACCEPTATION",
+            date: new Date().toISOString() as any,
+            author: destination.user.name
+          }
+        }
+      });
+
+      const updatedBsff = await prisma.bsff.findUnique({
+        where: { id: bsff.id }
+      });
+      expect(updatedBsff.status).toEqual(BsffStatus.REFUSED);
+    });
   });
 
   describe("OPERATION", () => {
