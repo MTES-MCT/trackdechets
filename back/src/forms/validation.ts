@@ -1089,19 +1089,35 @@ const withNextDestination = (required: boolean) =>
       .requiredIf(required, `Destination ultérieure : ${MISSING_COMPANY_NAME}`),
     nextDestinationCompanySiret: yup
       .string()
-      .when("nextDestinationCompanyCountry", (country, schema) => {
-        return (country == null || country === "FR") && required
-          ? schema
+      .when(
+        ["nextDestinationCompanyCountry", "nextDestinationCompanyVatNumber"],
+        ([country, tva], schema) => {
+          if (!tva) {
+            return schema
               .ensure()
               .required(
-                `Destination ultérieure prévue : ${MISSING_COMPANY_SIRET}`
+                `Destination ultérieure prévue : ${MISSING_COMPANY_SIRET_OR_VAT}`
               )
-              .length(
-                14,
-                `Destination ultérieure prévue : ${INVALID_SIRET_LENGTH}`
-              )
-          : schema.notRequired().nullable();
-      }),
+              .test(
+                "is-siret",
+                "Destination ultérieure prévue : ${path} n'est pas un numéro de SIRET valide",
+                value => isSiret(value)
+              );
+          }
+          return (country == null || country === "FR") && required
+            ? schema
+                .ensure()
+                .required(
+                  `Destination ultérieure prévue : ${MISSING_COMPANY_SIRET}`
+                )
+                .test(
+                  "is-siret",
+                  "Destination ultérieure prévue : ${path} n'est pas un numéro de SIRET valide",
+                  value => isSiret(value)
+                )
+            : schema.notRequired().nullable();
+        }
+      ),
     nextDestinationCompanyVatNumber: yup
       .string()
       .ensure()
