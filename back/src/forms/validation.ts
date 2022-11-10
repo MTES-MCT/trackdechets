@@ -1091,31 +1091,21 @@ const withNextDestination = (required: boolean) =>
       .string()
       .when(
         ["nextDestinationCompanyCountry", "nextDestinationCompanyVatNumber"],
-        ([country, tva], schema) => {
-          if (!tva) {
-            return schema
+        {
+          is: (country, tva) =>
+            !tva || ((country == null || country === "FR") && required),
+          then: schema =>
+            schema
               .ensure()
               .required(
-                `Destination ultérieure prévue : ${MISSING_COMPANY_SIRET_OR_VAT}`
+                `Destination ultérieure prévue : ${MISSING_COMPANY_SIRET}`
               )
               .test(
                 "is-siret",
                 "Destination ultérieure prévue : ${path} n'est pas un numéro de SIRET valide",
                 value => isSiret(value)
-              );
-          }
-          return (country == null || country === "FR") && required
-            ? schema
-                .ensure()
-                .required(
-                  `Destination ultérieure prévue : ${MISSING_COMPANY_SIRET}`
-                )
-                .test(
-                  "is-siret",
-                  "Destination ultérieure prévue : ${path} n'est pas un numéro de SIRET valide",
-                  value => isSiret(value)
-                )
-            : schema.notRequired().nullable();
+              ),
+          otherwise: schema => schema.notRequired().nullable()
         }
       ),
     nextDestinationCompanyVatNumber: yup
