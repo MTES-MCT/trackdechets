@@ -27,6 +27,7 @@ import {
   isVat,
   isFRVat,
   isSiret,
+  isForeignVat,
 } from "generated/constants/companySearchHelpers";
 
 setLocale({
@@ -104,24 +105,46 @@ const destinationSchema = companySchema.concat(
 
 export const transporterSchema = object().shape({
   isExemptedOfReceipt: boolean().nullable(true),
-  receipt: string().when(
-    "isExemptedOfReceipt",
-    (isExemptedOfReceipt: boolean, schema: StringSchema) =>
-      isExemptedOfReceipt
-        ? schema.nullable(true)
-        : schema
-            .ensure()
-            .required(
-              "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
-            )
-  ),
-  department: string().when(
-    "isExemptedOfReceipt",
-    (isExemptedOfReceipt: boolean, schema: StringSchema) =>
-      isExemptedOfReceipt
-        ? schema.nullable(true)
-        : schema.required("Le département du transporteur est obligatoire")
-  ),
+  receipt: string()
+    .when(
+      "isExemptedOfReceipt",
+      (isExemptedOfReceipt: boolean, schema: StringSchema) =>
+        isExemptedOfReceipt
+          ? schema.nullable(true)
+          : schema
+              .ensure()
+              .required(
+                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+              )
+    )
+    .when(
+      "transporter.company.vatNumber",
+      (transporterCompanyVatNumber, schema) =>
+        isForeignVat(transporterCompanyVatNumber)
+          ? schema.nullable(true)
+          : schema
+              .ensure()
+              .required(
+                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+              )
+    ),
+  department: string()
+    .when(
+      "isExemptedOfReceipt",
+      (isExemptedOfReceipt: boolean, schema: StringSchema) =>
+        isExemptedOfReceipt
+          ? schema.nullable(true)
+          : schema.required("Le département du transporteur est obligatoire")
+    )
+    .when(
+      "transporter.company.vatNumber",
+      (transporterCompanyVatNumber, schema) =>
+        isForeignVat(transporterCompanyVatNumber)
+          ? schema.nullable(true)
+          : schema
+              .ensure()
+              .required("Le département du transporteur est obligatoire")
+    ),
   validityLimit: date().nullable(true),
   numberPlate: string().nullable(true),
   company: companySchema,

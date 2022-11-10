@@ -13,8 +13,7 @@ import { BSDA_WASTE_CODES } from "../common/constants";
 import {
   isVat,
   isSiret,
-  isFRVat,
-  isForeignVat
+  isFRVat
 } from "../common/constants/companySearchHelpers";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
@@ -678,18 +677,15 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
             type === BsdaType.COLLECTION_2710 || isExempted,
           then: schema => schema.nullable(),
           otherwise: schema =>
-            schema.when(
-              "transporterCompanyVatNumber",
-              (transporterCompanyVatNumber, schema) => {
-                if (!isForeignVat(transporterCompanyVatNumber)) {
-                  return schema.requiredIf(
-                    context.transportSignature,
-                    `Transporteur: le département associé au récépissé est obligatoire`
-                  );
-                }
-                return schema.nullable().notRequired();
+            schema.when("transporterCompanyVatNumber", (tva, schema) => {
+              if (!tva) {
+                return schema.requiredIf(
+                  context.transportSignature,
+                  `Transporteur: le département associé au récépissé est obligatoire`
+                );
               }
-            )
+              return schema.nullable().notRequired();
+            })
         }),
       transporterRecepisseNumber: yup
         .string()
@@ -698,18 +694,15 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
             type === BsdaType.COLLECTION_2710 || isExempted,
           then: schema => schema.nullable(),
           otherwise: schema =>
-            schema.when(
-              "transporterCompanyVatNumber",
-              (transporterCompanyVatNumber, schema) => {
-                if (!isForeignVat(transporterCompanyVatNumber)) {
-                  return schema.requiredIf(
-                    context.transportSignature,
-                    `Transporteur: le numéro de récépissé est obligatoire`
-                  );
-                }
-                return schema.nullable().notRequired();
+            schema.when("transporterCompanyVatNumber", (tva, schema) => {
+              if (!tva) {
+                return schema.requiredIf(
+                  context.transportSignature,
+                  `Transporteur: le numéro de récépissé est obligatoire`
+                );
               }
-            )
+              return schema.nullable().notRequired();
+            })
         }),
       transporterRecepisseValidityLimit: yup
         .date()
