@@ -22,6 +22,7 @@ export const GET_ME = gql`
         name
         givenName
         siret
+        contact
         contactEmail
         contactPhone
         address
@@ -42,11 +43,17 @@ export default function MyCompanySelector({
     (
       company: Pick<
         CompanyPrivate,
-        "siret" | "name" | "contactEmail" | "contactPhone" | "address"
+        | "siret"
+        | "name"
+        | "contact"
+        | "contactEmail"
+        | "contactPhone"
+        | "address"
       >
     ) => {
       setFieldValue(`${fieldName}.siret`, company.siret ?? "");
       setFieldValue(`${fieldName}.name`, company.name ?? "");
+      setFieldValue(`${fieldName}.contact`, company.contact ?? "");
       setFieldValue(`${fieldName}.mail`, company.contactEmail ?? "");
       setFieldValue(`${fieldName}.phone`, company.contactPhone ?? "");
       setFieldValue(`${fieldName}.address`, company.address ?? "");
