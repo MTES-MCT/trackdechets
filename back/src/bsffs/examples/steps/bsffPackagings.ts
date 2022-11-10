@@ -10,7 +10,8 @@ export function bsffPackagings(company: string): WorkflowStep {
     variables: ({ ttr }) => ({
       where: {
         operation: {
-          code: { _in: ["R12", "D13"] }
+          code: { _in: ["R12", "D13"] },
+          noTraceability: false
         },
         bsff: {
           destination: { company: { siret: { _eq: ttr.siret } } }

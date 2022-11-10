@@ -96,6 +96,7 @@ input BsffPackagingAcceptationWhere {
 "Champs possible pour le filtre sur l'opération sur un contenant"
 input BsffPackagingOperationWhere {
   code: BsffOperationCodeFilter
+  noTraceability: Boolean
   signature: SignatureWhere
 }
 

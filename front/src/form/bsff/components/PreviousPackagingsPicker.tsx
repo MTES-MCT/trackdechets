@@ -90,7 +90,7 @@ export function PreviousPackagingsPicker({
     useField<BsffPackaging[]>("previousPackagings");
 
   let where: BsffPackagingWhere = {
-    operation: { code: { _in: code_in } },
+    operation: { code: { _in: code_in }, noTraceability: false },
     bsff: {
       destination: {
         company: {

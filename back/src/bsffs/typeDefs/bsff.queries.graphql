@@ -24,7 +24,6 @@ type Query {
   de l'utilisateur connecté, en respectant les différents filtres. Cette query permet
   notamment à un centre de tri, transit, regroupement de récupérer les contenants présent sur
   son site éligibles au regroupement, réexpédition, ou reconditionnement.
-  ```
   """
   bsffPackagings(
     "Retourne les bordereaux après celui qui correspond à l'identifiant donné."

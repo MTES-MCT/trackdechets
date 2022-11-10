@@ -50,6 +50,8 @@ export function toPrismaBsffWhereInput(
 export function toPrismaBsffPackagingSimpleWhereInput(
   where: BsffPackagingWhere
 ): Prisma.BsffPackagingWhereInput {
+  const noTraceability = where.operation?.noTraceability;
+
   return safeInput<Prisma.BsffPackagingWhereInput>({
     numero: toPrismaStringFilter(where.numero),
     acceptationSignatureDate: toPrismaDateFilter(
@@ -57,6 +59,9 @@ export function toPrismaBsffPackagingSimpleWhereInput(
     ),
     acceptationWasteCode: toPrismaStringFilter(where.acceptation?.wasteCode),
     operationCode: toPrismaEnumFilter(where.operation?.code),
+    ...(noTraceability === true || noTraceability === false
+      ? { operationNoTraceability: noTraceability }
+      : {}),
     operationSignatureDate: toPrismaDateFilter(
       where.operation?.signature?.date
     ),
