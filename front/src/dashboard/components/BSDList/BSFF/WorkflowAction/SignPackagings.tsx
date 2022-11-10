@@ -17,6 +17,7 @@ import {
   BsffPackaging,
   Query,
   QueryBsffArgs,
+  WasteAcceptationStatus,
 } from "generated/graphql/types";
 import React from "react";
 import { Column, useFilters, useTable } from "react-table";
@@ -71,6 +72,7 @@ function SignPackagingsModal({ bsffId, onClose }: SignPackagingsModalProps) {
     <Modal
       onClose={onClose}
       ariaLabel="Signer l'opération des contentants"
+      wide={true}
       isOpen
     >
       <h2 className="td-modal-title">
@@ -90,19 +92,60 @@ function BsffPackagingTable({ bsff }: BsffPackagingTableProps) {
   const columns: Column<BsffPackaging>[] = React.useMemo(
     () => [
       {
+        id: "name",
+        Header: "Type de contenant",
+        accessor: bsffPackaging => bsffPackaging.name,
+        filter: "text",
+      },
+      {
         id: "numero",
-        Header: "Numéro de contenant",
+        Header: "Numéro",
         accessor: bsffPackaging => bsffPackaging.numero,
         filter: "text",
       },
       {
-        id: "name",
-        Header: "Dénomination",
-        accessor: bsffPackaging => bsffPackaging.name,
-        filter: "text",
+        id: "weight",
+        Header: "Masse du contenu (kg)",
+        accessor: bsffPackaging => bsffPackaging.volume,
+      },
+      {
+        id: "wasteCode",
+        Header: "Code déchet",
+        accessor: bsffPackaging =>
+          bsffPackaging.acceptation?.wasteCode ?? bsff.waste?.code,
+      },
+      {
+        id: "wasteDescription",
+        Header: "Dénomination usuelle",
+        accessor: bsffPackaging =>
+          bsffPackaging.acceptation?.wasteDescription ??
+          bsff.waste?.description,
+      },
+      {
+        id: "acceptation",
+        Header: "Quantité acceptée (kg)",
+        accessor: bsffPackaging =>
+          bsffPackaging?.acceptation?.signature?.date
+            ? bsffPackaging?.acceptation?.status ===
+              WasteAcceptationStatus.Accepted
+              ? bsffPackaging?.acceptation?.weight
+              : `Refusé (${bsffPackaging?.acceptation?.refusalReason})`
+            : "",
+      },
+      {
+        id: "operation",
+        Header: "Opération",
+        accessor: bsffPackaging =>
+          bsffPackaging?.operation?.signature?.date
+            ? `${bsffPackaging?.operation.code} ${
+                bsffPackaging?.operation?.noTraceability
+                  ? " (rupture de traçabilité)"
+                  : ""
+              }`
+            : "",
       },
     ],
-    []
+    [bsff.waste]
   );
 
   const data = React.useMemo(() => bsff.packagings, [bsff.packagings]);

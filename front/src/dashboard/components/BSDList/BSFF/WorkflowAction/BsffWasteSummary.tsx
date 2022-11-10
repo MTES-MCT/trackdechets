@@ -18,29 +18,41 @@ export function BsffWasteSummary({ bsff }: BsffWasteSummaryProps) {
         <DataListTerm>BSFF n°</DataListTerm>
         <DataListDescription>{bsff.id}</DataListDescription>
       </DataListItem>
-      <DataListItem>
-        <DataListTerm>Code déchet</DataListTerm>
-        <DataListDescription>{bsff.waste?.code}</DataListDescription>
-      </DataListItem>
-      <DataListItem>
-        <DataListTerm>Nature du fluide</DataListTerm>
-        <DataListDescription>
-          {bsff.waste?.description || "inconnue"}
-        </DataListDescription>
-      </DataListItem>
-      <DataListItem>
-        <DataListTerm>Quantité de fluides</DataListTerm>
-        <DataListDescription>
-          {bsff.weight?.value} kilo(s){" "}
-          {bsff.weight?.isEstimate && <>(estimé(s))</>}
-        </DataListDescription>
-      </DataListItem>
+      {bsff.packagings?.length === 1 && (
+        <>
+          <DataListItem>
+            <DataListTerm>Code déchet</DataListTerm>
+            <DataListDescription>
+              {bsff.packagings[0].acceptation?.wasteCode ?? bsff.waste?.code}
+            </DataListDescription>
+          </DataListItem>
+          <DataListItem>
+            <DataListTerm>Dénomination usuelle</DataListTerm>
+            <DataListDescription>
+              {bsff.packagings[0].acceptation?.wasteDescription ??
+                (bsff.waste?.description || "inconnue")}
+            </DataListDescription>
+          </DataListItem>
+        </>
+      )}
+
+      {bsff.packagings?.length === 1 && (
+        <DataListItem>
+          <DataListTerm>Quantité de fluides</DataListTerm>
+          <DataListDescription>
+            {bsff.packagings[0].acceptation?.weight ?? bsff.weight?.value} kg
+          </DataListDescription>
+        </DataListItem>
+      )}
+
       {bsff.packagings?.length === 1 && (
         <DataListItem>
           <DataListTerm>Contenant</DataListTerm>
           <DataListDescription>
             {bsff.packagings[0].name} n°{bsff.packagings[0].numero} (
-            {bsff.packagings[0].weight} kilo(s))
+            {bsff.packagings[0].acceptation?.weight ??
+              bsff.packagings[0].weight}{" "}
+            kg)
           </DataListDescription>
         </DataListItem>
       )}

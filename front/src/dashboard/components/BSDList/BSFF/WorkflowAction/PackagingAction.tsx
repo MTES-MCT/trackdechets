@@ -20,21 +20,11 @@ export function PackagingAction({
   packaging,
 }: WorkflowPackagingActionProps) {
   if (packaging.operation?.signature?.date) {
-    if (packaging.operation?.code) {
-      return (
-        <div>
-          Traité le {formatDate(packaging.operation?.date ?? "")} - Code{" "}
-          {packaging.operation?.code}
-          {packaging.operation?.noTraceability && " (rupture de traçabilité)"}
-        </div>
-      );
-    }
+    return null;
   }
   if (packaging.acceptation?.signature?.date) {
     if (packaging.acceptation?.status === WasteAcceptationStatus.Refused) {
-      return (
-        <div>Refusé le {formatDate(packaging.acceptation?.date ?? "")}</div>
-      );
+      return null;
     }
     return <SignBsffPackagingOperation packaging={packaging} bsff={bsff} />;
   }
