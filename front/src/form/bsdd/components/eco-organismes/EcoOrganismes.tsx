@@ -47,7 +47,7 @@ export default function EcoOrganismes(props: EcoOrganismesProps) {
         <TdSwitch
           checked={hasEcoOrganisme}
           onChange={handleEcoOrganismeToggle}
-          label="Un éco-organisme est le responsable / producteur des déchets de ce bordereau"
+          label="Un éco-organisme est responsable de la prise en charge des déchets"
         />
       </div>
 
