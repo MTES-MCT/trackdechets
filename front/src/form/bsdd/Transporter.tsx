@@ -12,11 +12,8 @@ type Values = {
   transporter: TransporterType;
 };
 
-export default function Transporter() {
+export default function Transporter({ disabled }) {
   const { setFieldValue, values } = useFormikContext<Values>();
-  const showCompanyReceipt =
-    !values.transporter.isExemptedOfReceipt &&
-    values.transporter.company?.country === "FR";
 
   return (
     <>
@@ -53,7 +50,18 @@ export default function Transporter() {
         <Field name="transporter.mode" component={FieldTransportModeSelect} />
       </label>
 
-      {values.transporter.company?.country === "FR" && (
+      {values.transporter.company?.siret === null ? (
+        <label>
+          Numéro de TVA intracommunautaire
+          <Field
+            type="text"
+            name="transporter.company.vatNumber"
+            placeholder="Ex: DE 123456789"
+            className="td-input"
+            disabled={disabled}
+          />
+        </label>
+      ) : (
         <>
           <h4 className="form__section-heading">Autorisations</h4>
           <div className="form__row">
@@ -65,62 +73,63 @@ export default function Transporter() {
                   !values.transporter.isExemptedOfReceipt
                 )
               }
-              disabled={values.transporter.company?.country !== "FR"}
+              disabled={values.transporter.company?.siret === null}
               label="Le transporteur déclare être exempté de récépissé conformément aux
             dispositions de l'article R.541-50 du code de l'environnement."
             />
           </div>
         </>
       )}
-      {showCompanyReceipt && (
-        <div className="form__row">
-          <label>
-            Numéro de récépissé
-            <Field
-              type="text"
-              name="transporter.receipt"
-              className="td-input"
-            />
-          </label>
+      {!values.transporter.isExemptedOfReceipt &&
+        values.transporter.company?.siret !== null && (
+          <div className="form__row">
+            <label>
+              Numéro de récépissé
+              <Field
+                type="text"
+                name="transporter.receipt"
+                className="td-input"
+              />
+            </label>
 
-          <RedErrorMessage name="transporter.receipt" />
+            <RedErrorMessage name="transporter.receipt" />
 
-          <label>
-            Département
-            <Field
-              type="text"
-              name="transporter.department"
-              placeholder="Ex: 83"
-              className={`td-input ${styles.transporterDepartment}`}
-            />
-          </label>
+            <label>
+              Département
+              <Field
+                type="text"
+                name="transporter.department"
+                placeholder="Ex: 83"
+                className={`td-input ${styles.transporterDepartment}`}
+              />
+            </label>
 
-          <RedErrorMessage name="transporter.department" />
+            <RedErrorMessage name="transporter.department" />
 
-          <label>
-            Limite de validité (optionnel)
-            <Field
-              component={DateInput}
-              name="transporter.validityLimit"
-              className={`td-input ${styles.transporterValidityLimit}`}
-            />
-          </label>
+            <label>
+              Limite de validité (optionnel)
+              <Field
+                component={DateInput}
+                name="transporter.validityLimit"
+                className={`td-input ${styles.transporterValidityLimit}`}
+              />
+            </label>
 
-          <RedErrorMessage name="transporter.validityLimit" />
+            <RedErrorMessage name="transporter.validityLimit" />
 
-          <label>
-            Immatriculation (optionnel)
-            <Field
-              type="text"
-              className={`td-input ${styles.transporterNumberPlate}`}
-              name="transporter.numberPlate"
-              placeholder="Plaque d'immatriculation du véhicule"
-            />
-          </label>
+            <label>
+              Immatriculation (optionnel)
+              <Field
+                type="text"
+                className={`td-input ${styles.transporterNumberPlate}`}
+                name="transporter.numberPlate"
+                placeholder="Plaque d'immatriculation du véhicule"
+              />
+            </label>
 
-          <RedErrorMessage name="transporter.numberPlate" />
-        </div>
-      )}
+            <RedErrorMessage name="transporter.numberPlate" />
+          </div>
+        )}
     </>
   );
 }
