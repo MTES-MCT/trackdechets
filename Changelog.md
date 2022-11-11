@@ -12,6 +12,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Cacher l'édition des champs d'adresse d'un transporteur FR, et corriger l'initialisation du pays d'un transporteur dans CompanySelector, et l'affiche dans l'item sélectionné dans la liste [PR 1846](https://github.com/MTES-MCT/trackdechets/pull/1846)
+- Fix erreur avec Bsdasri quand `transporterTransportMode` input à None [PR 1854](https://github.com/MTES-MCT/trackdechets/pull/1854)
 
 #### :boom: Breaking changes
 
