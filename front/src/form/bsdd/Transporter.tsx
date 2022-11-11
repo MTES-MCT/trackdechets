@@ -13,7 +13,7 @@ type Values = {
   transporter: TransporterType;
 };
 
-export default function Transporter({ disabled }) {
+export default function Transporter() {
   const { setFieldValue, values } = useFormikContext<Values>();
 
   return (

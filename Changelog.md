@@ -15,6 +15,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Transporteurs étrnagers : ne pas demander de remplir un récépissé transporteur dans les formulaires [PR 1844](https://github.com/MTES-MCT/trackdechets/pull/1844)
+
 #### :memo: Documentation
 
 #### :house: Interne
