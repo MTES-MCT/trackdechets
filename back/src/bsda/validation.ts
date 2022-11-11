@@ -13,7 +13,8 @@ import { BSDA_WASTE_CODES } from "../common/constants";
 import {
   isVat,
   isSiret,
-  isFRVat
+  isFRVat,
+  isForeignVat
 } from "../common/constants/companySearchHelpers";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
@@ -672,50 +673,67 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
       transporterRecepisseIsExempted: yup.boolean().nullable(),
       transporterRecepisseDepartment: yup
         .string()
-        .when(["type", "transporterRecepisseIsExempted"], {
-          is: (type, isExempted) =>
-            type === BsdaType.COLLECTION_2710 || isExempted,
-          then: schema => schema.nullable(),
-          otherwise: schema =>
-            schema.when("transporterCompanyVatNumber", (tva, schema) => {
-              if (!tva) {
-                return schema.requiredIf(
-                  context.transportSignature,
-                  `Transporteur: le département associé au récépissé est obligatoire`
-                );
-              }
-              return schema.nullable().notRequired();
-            })
-        }),
+        .when(
+          [
+            "type",
+            "transporterRecepisseIsExempted",
+            "transporterCompanyVatNumber"
+          ],
+          {
+            is: (type, isExempted, vat) =>
+              type === BsdaType.COLLECTION_2710 ||
+              isExempted ||
+              isForeignVat(vat),
+            then: schema => schema.nullable().notRequired(),
+            otherwise: schema =>
+              schema.requiredIf(
+                context.transportSignature,
+                `Transporteur: le département associé au récépissé est obligatoire`
+              )
+          }
+        ),
       transporterRecepisseNumber: yup
         .string()
-        .when(["type", "transporterRecepisseIsExempted"], {
-          is: (type, isExempted) =>
-            type === BsdaType.COLLECTION_2710 || isExempted,
-          then: schema => schema.nullable(),
-          otherwise: schema =>
-            schema.when("transporterCompanyVatNumber", (tva, schema) => {
-              if (!tva) {
-                return schema.requiredIf(
-                  context.transportSignature,
-                  `Transporteur: le numéro de récépissé est obligatoire`
-                );
-              }
-              return schema.nullable().notRequired();
-            })
-        }),
+        .when(
+          [
+            "type",
+            "transporterRecepisseIsExempted",
+            "transporterCompanyVatNumber"
+          ],
+          {
+            is: (type, isExempted, vat) =>
+              type === BsdaType.COLLECTION_2710 ||
+              isExempted ||
+              isForeignVat(vat),
+            then: schema => schema.nullable().notRequired(),
+            otherwise: schema =>
+              schema.requiredIf(
+                context.transportSignature,
+                `Transporteur: le numéro de récépissé est obligatoire`
+              )
+          }
+        ),
       transporterRecepisseValidityLimit: yup
         .date()
-        .when(["type", "transporterRecepisseIsExempted"], {
-          is: (type, isExempted) =>
-            type === BsdaType.COLLECTION_2710 || isExempted,
-          then: schema => schema.nullable(),
-          otherwise: schema =>
-            schema.requiredIf(
-              context.transportSignature,
-              `Transporteur: la date limite de validité du récépissé est obligatoire`
-            ) as any
-        }),
+        .when(
+          [
+            "type",
+            "transporterRecepisseIsExempted",
+            "transporterCompanyVatNumber"
+          ],
+          {
+            is: (type, isExempted, vat) =>
+              type === BsdaType.COLLECTION_2710 ||
+              isExempted ||
+              isForeignVat(vat),
+            then: schema => schema.nullable().notRequired(),
+            otherwise: schema =>
+              schema.requiredIf(
+                context.transportSignature,
+                `Transporteur: la date limite de validité du récépissé est obligatoire`
+              )
+          }
+        ),
       transporterCompanyName: yup.string().when("type", {
         is: BsdaType.COLLECTION_2710,
         then: schema =>
