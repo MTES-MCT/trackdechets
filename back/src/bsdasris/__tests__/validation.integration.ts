@@ -30,9 +30,9 @@ describe("Mutation.signBsdasri emission", () => {
     });
   });
 
-  it("should not require recipisse when it's a foreign transport", async () => {
+  it("should validate without recipisse when it's a foreign transport", async () => {
     const dasri = readyToTakeOverData({
-      vatNumber: "DE53075596600047",
+      vatNumber: "BE0541696005",
       name: "transporteur DE"
     });
     delete dasri.transporterRecepisseNumber;
@@ -40,4 +40,5 @@ describe("Mutation.signBsdasri emission", () => {
     delete dasri.transporterRecepisseValidityLimit;
     await validateBsdasri(dasri, { transportSignature: true });
   });
+
 });
