@@ -19,6 +19,7 @@ describe("BSDA validation", () => {
       transportSignature: true
     });
   });
+
   it("should not validate without recipisse when it's a foreign transport", async () => {
     const bsda = await bsdaFactory({
       opt: {

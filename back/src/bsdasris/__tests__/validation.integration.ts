@@ -1,3 +1,4 @@
+import { ValidationError } from "yup";
 import { validateBsdasri } from "../validation";
 
 import { initialData, readyToTakeOverData } from "./factories";
@@ -41,4 +42,19 @@ describe("Mutation.signBsdasri emission", () => {
     await validateBsdasri(dasri, { transportSignature: true });
   });
 
+  it("should not validate without recipisse when it's a foreign transport", async () => {
+    const dasri = await readyToTakeOverData({
+      opt: {
+        transporterCompanySiret: "12345678901234",
+        transporterCompanyName: "transporteur FR"
+      }
+    });
+    delete dasri.transporterRecepisseDepartment;
+    delete dasri.transporterRecepisseNumber;
+    await expect(() =>
+      validateBsdasri(dasri, {
+        transportSignature: true
+      })
+    ).rejects.toThrow(ValidationError);
+  });
 });
