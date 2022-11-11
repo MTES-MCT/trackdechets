@@ -12,6 +12,7 @@ import {
   countries as vatCountries,
   isFRVat,
   isVat,
+  isForeignVat,
 } from "generated/constants/companySearchHelpers";
 import { checkVAT } from "jsvat";
 import React, { useMemo, useRef, useState } from "react";
@@ -76,15 +77,17 @@ export default function CompanySelector({
   const [field] = useField<FormCompany>({ name });
   const { setFieldError, setFieldValue, setFieldTouched } = useFormikContext();
   const [isForeignCompany, setIsForeignCompany] = useState(
-    field.value.country && field.value.country !== "FR"
+    (field.value.country && field.value.country !== "FR") ||
+      isForeignVat(field.value.vatNumber!!)
   );
-  console.log(`${field.name}.country`);
+
   const departmentInputRef = useRef<HTMLInputElement>(null);
   const clueInputRef = useRef<HTMLInputElement>(null);
   const [mustBeRegistered, setMustBeRegistered] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<CompanySearchResult[]>([]);
   const [toggleManualForeignCompanyForm, setToggleManualForeignCompanyForm] =
     useState<boolean>(false);
+
   // Favortite type is deduced from the field prefix (transporter, emitter, etc)
   const favoriteType = constantCase(field.name.split(".")[0]) as FavoriteType;
   const {
@@ -157,11 +160,11 @@ export default function CompanySelector({
     }
     // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
     setToggleManualForeignCompanyForm(
-      company.codePaysEtrangerEtablissement !== "FR" &&
+      isForeignVat(company.vatNumber!!) &&
         (company.name === "---" || company.name === "")
     );
 
-    setIsForeignCompany(company.codePaysEtrangerEtablissement !== "FR");
+    setIsForeignCompany(isForeignVat(company.vatNumber!!));
     // Prépare la mise à jour du Form
     const fields: FormCompany = {
       siret: company.siret,
@@ -412,6 +415,7 @@ export default function CompanySelector({
             vatNumber: field.value.vatNumber,
             name: field.value.name,
             address: field.value.address,
+            codePaysEtrangerEtablissement: field.value.country,
             // complete with companyPrivateInfos data
             ...(selectedData?.companyPrivateInfos && {
               isRegistered: selectedData?.companyPrivateInfos.isRegistered,
