@@ -1077,7 +1077,7 @@ describe("processedInfoSchema", () => {
         "Destination ultérieure : L'opération de traitement est obligatoire",
         "Destination ultérieure : Le nom de l'entreprise est obligatoire",
         "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire",
-        "Destination ultérieure prévue : Le SIRET doit faire 14 caractères numériques",
+        "Destination ultérieure prévue : Le SIRET n'est pas valide, il doit faire 14 caractères numériques (nextDestinationCompanySiret)",
         "Destination ultérieure : L'adresse de l'entreprise est obligatoire",
         "Destination ultérieure : Le contact dans l'entreprise est obligatoire",
         "Destination ultérieure : Le téléphone de l'entreprise est obligatoire",

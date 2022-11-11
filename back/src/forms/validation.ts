@@ -1102,7 +1102,7 @@ const withNextDestination = (required: boolean) =>
               )
               .test(
                 "is-siret",
-                "Destination ultérieure prévue : ${path} n'est pas un numéro de SIRET valide",
+                "Destination ultérieure prévue : Le SIRET n'est pas valide, il doit faire 14 caractères numériques (${path})",
                 value => isSiret(value)
               ),
           otherwise: schema => schema.notRequired().nullable()
