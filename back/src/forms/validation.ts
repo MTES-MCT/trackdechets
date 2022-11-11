@@ -795,50 +795,30 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
       transporterReceipt: yup
         .string()
         .when(
-          "transporterCompanyVatNumber",
-          (transporterCompanyVatNumber, schema) =>
-            isForeignVat(transporterCompanyVatNumber)
-              ? schema.notRequired().nullable()
-              : schema
-                  .ensure()
-                  .requiredIf(
-                    !isDraft,
-                    "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
-                  )
-        )
-        .when("transporterIsExemptedOfReceipt", (isExemptedOfReceipt, schema) =>
-          isExemptedOfReceipt
-            ? schema.notRequired().nullable()
-            : schema
-                .ensure()
-                .requiredIf(
-                  !isDraft,
-                  "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
-                )
+          ["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"],
+          {
+            is: (isExempted, vat) => isForeignVat(vat) || isExempted,
+            then: schema => schema.notRequired().nullable(),
+            otherwise: schema =>
+              schema.requiredIf(
+                !isDraft,
+                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+              )
+          }
         ),
       transporterDepartment: yup
         .string()
         .when(
-          "transporterCompanyVatNumber",
-          (transporterCompanyVatNumber, schema) =>
-            isForeignVat(transporterCompanyVatNumber)
-              ? schema.notRequired().nullable()
-              : schema
-                  .ensure()
-                  .requiredIf(
-                    !isDraft,
-                    "Le département du transporteur est obligatoire"
-                  )
-        )
-        .when("transporterIsExemptedOfReceipt", (isExemptedOfReceipt, schema) =>
-          isExemptedOfReceipt
-            ? schema.notRequired().nullable()
-            : schema
-                .ensure()
-                .requiredIf(
-                  !isDraft,
-                  "Le département du transporteur est obligatoire"
-                )
+          ["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"],
+          {
+            is: (isExempted, vat) => isForeignVat(vat) || isExempted,
+            then: schema => schema.notRequired().nullable(),
+            otherwise: schema =>
+              schema.requiredIf(
+                !isDraft,
+                "Le département du transporteur est obligatoire"
+              )
+          }
         ),
       transporterValidityLimit: yup.date().nullable()
     });
