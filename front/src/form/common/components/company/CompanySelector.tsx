@@ -12,6 +12,7 @@ import {
   countries as vatCountries,
   isFRVat,
   isVat,
+  isForeignVat,
 } from "generated/constants/companySearchHelpers";
 import { checkVAT } from "jsvat";
 import React, { useMemo, useRef, useState } from "react";
@@ -76,7 +77,8 @@ export default function CompanySelector({
   const [field] = useField<FormCompany>({ name });
   const { setFieldError, setFieldValue, setFieldTouched } = useFormikContext();
   const [isForeignCompany, setIsForeignCompany] = useState(
-    `${field.name}.country` !== "FR"
+    (field.value.country && field.value.country !== "FR") ||
+      isForeignVat(field.value.vatNumber!!)
   );
 
   const departmentInputRef = useRef<HTMLInputElement>(null);
@@ -158,11 +160,11 @@ export default function CompanySelector({
     }
     // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
     setToggleManualForeignCompanyForm(
-      company.codePaysEtrangerEtablissement !== "FR" &&
+      isForeignVat(company.vatNumber!!) &&
         (company.name === "---" || company.name === "")
     );
 
-    setIsForeignCompany(company.codePaysEtrangerEtablissement !== "FR");
+    setIsForeignCompany(isForeignVat(company.vatNumber!!));
     // Prépare la mise à jour du Form
     const fields: FormCompany = {
       siret: company.siret,
@@ -218,9 +220,8 @@ export default function CompanySelector({
         .filter(company => company.etatAdministratif === "A")
         .map(company => ({
           ...company,
-          codePaysEtrangerEtablissement: company.codePaysEtrangerEtablissement
-            ? company.codePaysEtrangerEtablissement
-            : "FR",
+          codePaysEtrangerEtablissement:
+            company.codePaysEtrangerEtablissement || "FR",
         })) ?? [];
 
     const results = [...reshapedSearchResults, ...reshapedFavorites];
@@ -414,9 +415,12 @@ export default function CompanySelector({
             vatNumber: field.value.vatNumber,
             name: field.value.name,
             address: field.value.address,
-            // complete with isRegistered
+            codePaysEtrangerEtablissement: field.value.country,
+            // complete with companyPrivateInfos data
             ...(selectedData?.companyPrivateInfos && {
               isRegistered: selectedData?.companyPrivateInfos.isRegistered,
+              codePaysEtrangerEtablissement:
+                selectedData?.companyPrivateInfos.codePaysEtrangerEtablissement,
             }),
           }}
         />
@@ -525,9 +529,8 @@ function favoriteToCompanySearchResult(
     brokerReceipt: company.brokerReceipt,
     vhuAgrementDemolisseur: company.vhuAgrementDemolisseur,
     vhuAgrementBroyeur: company.vhuAgrementBroyeur,
-    codePaysEtrangerEtablissement: company.codePaysEtrangerEtablissement
-      ? company.codePaysEtrangerEtablissement
-      : "FR",
+    codePaysEtrangerEtablissement:
+      company.codePaysEtrangerEtablissement || "FR",
     contact: company.contact,
     contactPhone: company.phone,
     contactEmail: company.mail,
