@@ -2,6 +2,7 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { Field, useFormikContext } from "formik";
+import { isForeignVat } from "generated/constants/companySearchHelpers";
 import { Bsvhu } from "generated/graphql/types";
 import React from "react";
 import styles from "./Transporter.module.scss";
@@ -48,18 +49,7 @@ export default function Transporter({ disabled }) {
         }}
       />
 
-      {values.transporter?.company?.siret === null ? (
-        <label>
-          Numéro de TVA intracommunautaire
-          <Field
-            type="text"
-            name="transporter.company.vatNumber"
-            placeholder="Ex: DE 123456789"
-            className="td-input"
-            disabled={disabled}
-          />
-        </label>
-      ) : (
+      {!isForeignVat(values?.transporter?.company?.vatNumber!!) && (
         <>
           <h4 className="form__section-heading">Autorisations</h4>
           <div className="form__row">

@@ -11,6 +11,7 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 import { BsdasriStatus, Bsdasri, BsdasriType } from "generated/graphql/types";
 import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 import { customInfoToolTip } from "./Emitter";
+import { isForeignVat } from "generated/constants/companySearchHelpers";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export default function Transport({ status, editionDisabled = false }) {
@@ -51,61 +52,65 @@ export default function Transport({ status, editionDisabled = false }) {
           />
         </label>
       </div>
-      <h4 className="form__section-heading">Autorisations</h4>
-      <div
-        className={classNames("form__row", {
-          "field-emphasis": transportEmphasis,
-        })}
-      >
-        <label>
-          Numéro de récépissé
-          <Field
-            type="text"
-            name="transporter.recepisse.number"
-            className="td-input"
-            disabled={disabled}
-          />
-        </label>
+      {!isForeignVat(values?.transporter?.company?.vatNumber!!) && (
+        <>
+          <h4 className="form__section-heading">Autorisations</h4>
+          <div
+            className={classNames("form__row", {
+              "field-emphasis": transportEmphasis,
+            })}
+          >
+            <label>
+              Numéro de récépissé
+              <Field
+                type="text"
+                name="transporter.recepisse.number"
+                className="td-input"
+                disabled={disabled}
+              />
+            </label>
 
-        <RedErrorMessage name="transporter.recepisse.number" />
-      </div>
-      <div
-        className={classNames("form__row", {
-          "field-emphasis": transportEmphasis,
-        })}
-      >
-        <label>
-          Département
-          <Field
-            type="text"
-            name="transporter.recepisse.department"
-            placeholder="Ex: 83"
-            className="td-input td-department"
-            disabled={disabled}
-          />
-        </label>
-
-        <RedErrorMessage name="transporter.recepisse.department" />
-      </div>
-      <div
-        className={classNames("form__row", {
-          "field-emphasis": transportEmphasis,
-        })}
-      >
-        <label>
-          Limite de validité
-          <div className="td-date-wrapper">
-            <Field
-              component={DateInput}
-              name="transporter.recepisse.validityLimit"
-              className="td-input td-date"
-              disabled={disabled}
-            />
+            <RedErrorMessage name="transporter.recepisse.number" />
           </div>
-        </label>
+          <div
+            className={classNames("form__row", {
+              "field-emphasis": transportEmphasis,
+            })}
+          >
+            <label>
+              Département
+              <Field
+                type="text"
+                name="transporter.recepisse.department"
+                placeholder="Ex: 83"
+                className="td-input td-department"
+                disabled={disabled}
+              />
+            </label>
 
-        <RedErrorMessage name="transporter.recepisse.validityLimit" />
-      </div>
+            <RedErrorMessage name="transporter.recepisse.department" />
+          </div>
+          <div
+            className={classNames("form__row", {
+              "field-emphasis": transportEmphasis,
+            })}
+          >
+            <label>
+              Limite de validité
+              <div className="td-date-wrapper">
+                <Field
+                  component={DateInput}
+                  name="transporter.recepisse.validityLimit"
+                  className="td-input td-date"
+                  disabled={disabled}
+                />
+              </div>
+            </label>
+
+            <RedErrorMessage name="transporter.recepisse.validityLimit" />
+          </div>
+        </>
+      )}
       <h4 className="form__section-heading">Transport du déchet</h4>
       <div className="form__row">
         <label>Mode de transport</label>

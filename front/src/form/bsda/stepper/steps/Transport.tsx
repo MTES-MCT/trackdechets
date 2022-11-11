@@ -4,32 +4,17 @@ import { Bsda } from "generated/graphql/types";
 import { RedErrorMessage, FieldTransportModeSelect } from "common/components";
 import Tooltip from "common/components/Tooltip";
 import DateInput from "form/common/components/custom-inputs/DateInput";
-import {
-  isForeignVat,
-  isSiret,
-} from "generated/constants/companySearchHelpers";
+import { isForeignVat } from "generated/constants/companySearchHelpers";
+
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 type Props = { disabled: boolean };
 export function Transport({ disabled }: Props) {
   const { values } = useFormikContext<Bsda>();
-  const recipisseDisabled =
-    disabled || isForeignVat(values.transporter?.company?.vatNumber!!);
 
   return (
     <>
-      {!isSiret(values.transporter?.company?.siret!!) ? (
-        <label>
-          Numéro de TVA intracommunautaire
-          <Field
-            type="text"
-            name="transporter.company.vatNumber"
-            placeholder="Ex: DE 123456789"
-            className="td-input"
-            disabled={disabled}
-          />
-        </label>
-      ) : (
+      {!isForeignVat(values.transporter?.company?.vatNumber!!) && (
         <>
           <h4 className="form__section-heading">
             Récépissé de déclaration de transport de déchets
@@ -41,7 +26,7 @@ export function Transport({ disabled }: Props) {
                 type="text"
                 name="transporter.recepisse.number"
                 className="td-input td-input--medium"
-                disabled={recipisseDisabled}
+                disabled={disabled}
               />
             </label>
 
@@ -54,7 +39,7 @@ export function Transport({ disabled }: Props) {
                 name="transporter.recepisse.department"
                 placeholder="Ex: 83"
                 className={`td-input td-input--small`}
-                disabled={recipisseDisabled}
+                disabled={disabled}
               />
             </label>
 
@@ -66,7 +51,7 @@ export function Transport({ disabled }: Props) {
                 component={DateInput}
                 name="transporter.recepisse.validityLimit"
                 className={`td-input td-input--small`}
-                disabled={recipisseDisabled}
+                disabled={disabled}
               />
             </label>
 

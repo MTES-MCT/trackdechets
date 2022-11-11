@@ -7,6 +7,7 @@ import { Field, useFormikContext } from "formik";
 import { Transporter as TransporterType } from "generated/graphql/types";
 import React from "react";
 import styles from "./Transporter.module.scss";
+import { isForeignVat } from "generated/constants/companySearchHelpers";
 
 type Values = {
   transporter: TransporterType;
@@ -50,18 +51,7 @@ export default function Transporter({ disabled }) {
         <Field name="transporter.mode" component={FieldTransportModeSelect} />
       </label>
 
-      {values.transporter.company?.siret === null ? (
-        <label>
-          Numéro de TVA intracommunautaire
-          <Field
-            type="text"
-            name="transporter.company.vatNumber"
-            placeholder="Ex: DE 123456789"
-            className="td-input"
-            disabled={disabled}
-          />
-        </label>
-      ) : (
+      {!isForeignVat(values.transporter?.company?.vatNumber!!) && (
         <>
           <h4 className="form__section-heading">Autorisations</h4>
           <div className="form__row">
@@ -81,7 +71,7 @@ export default function Transporter({ disabled }) {
         </>
       )}
       {!values.transporter.isExemptedOfReceipt &&
-        values.transporter.company?.siret !== null && (
+        !isForeignVat(values.transporter?.company?.vatNumber!!) && (
           <div className="form__row">
             <label>
               Numéro de récépissé
