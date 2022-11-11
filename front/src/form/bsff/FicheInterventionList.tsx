@@ -241,14 +241,24 @@ export function FicheInterventionList({
         type="button"
         className="btn btn--outline-primary"
         onClick={() => {
-          if (ficheInterventions.length >= max) {
-            window.alert(
-              `Vous ne pouvez pas ajouter plus de ${max} fiche(s) d'intervention avec ce type de BSFF.`
-            );
-            return;
-          }
+          companySchema
+            .validate(initialOperateurCompany)
+            .then(() => {
+              if (ficheInterventions.length >= max) {
+                window.alert(
+                  `Vous ne pouvez pas ajouter plus de ${max} fiche(s) d'intervention avec ce type de BSFF.`
+                );
+                return;
+              }
 
-          setIsModalOpen(true);
+              setIsModalOpen(true);
+            })
+            .catch(() => {
+              window.alert(
+                `Veuillez compléter les champs de l'opérateur avant l'ajout d'une fiche d'intervention.`
+              );
+              return;
+            });
         }}
       >
         Ajouter une fiche d'intervention
