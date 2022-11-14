@@ -97,7 +97,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(true);
     });
 
-    test("with R.541-50 ticked and no transportation infos", async () => {
+    test("with transporter receipt exemption R.541-50 ticked and no transportation infos", async () => {
       const testForm = {
         ...form,
         transporterIsExemptedOfReceipt: true,
@@ -107,6 +107,23 @@ describe("sealedFormSchema", () => {
 
       const isValid = await sealedFormSchema.isValid(testForm);
       expect(isValid).toEqual(true);
+    });
+
+    test("with foreign transporter receipt no need for exemption R.541-50", async () => {
+      const testForm = {
+        ...form,
+        transporterCompanyVatNumber: "BE0541696005",
+        transporterIsExemptedOfReceipt: null,
+        transporterReceipt: null,
+        transporterDepartment: null
+      };
+      delete testForm.transporterCompanySiret;
+      const isValid = await sealedFormSchema.isValid(testForm);
+      expect(isValid).toEqual(true);
+      testForm.transporterIsExemptedOfReceipt = false;
+      delete testForm.transporterCompanySiret;
+      const isValid2 = await sealedFormSchema.isValid(testForm);
+      expect(isValid2).toEqual(true);
     });
 
     test("when there is an eco-organisme and emitter type is OTHER", async () => {
@@ -1028,7 +1045,7 @@ describe("processedInfoSchema", () => {
       transporterCompanyContact: "Contact",
       transporterCompanyPhone: "00 00 00 00 00",
       transporterCompanyMail: "contact@thalys.com",
-      transporterIsExemptedOfReceipt: true
+      transporterIsExemptedOfReceipt: null
     };
     expect(await transporterSchemaFn(false).isValid(transporter)).toEqual(true);
   });

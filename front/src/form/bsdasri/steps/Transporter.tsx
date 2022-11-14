@@ -137,6 +137,7 @@ const COMPANY_INFOS = gql`
   query CompanyInfos($siret: String!) {
     companyInfos(siret: $siret) {
       siret
+      vatNumber
       name
       address
       companyTypes
@@ -221,7 +222,8 @@ function CurrentCompanyWidget({ disabled = false }) {
           <div className={companyStyles.content}>
             <h6>{data?.companyInfos?.name}</h6>
             <p>
-              {data?.companyInfos?.siret} - {data?.companyInfos?.address}
+              {data?.companyInfos?.siret || data?.companyInfos?.vatNumber} -{" "}
+              {data?.companyInfos?.address}
             </p>
           </div>
         </div>
