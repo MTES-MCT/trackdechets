@@ -86,6 +86,9 @@ export default async function edit(
     }
   );
 
+  const shouldUpdateIntermediaries =
+    input.intermediaries?.length > 0 || existingBsda.intermediaries?.length > 0;
+
   const updatedBsda = await bsdaRepository.update(
     { id },
     {
@@ -96,7 +99,7 @@ export default async function edit(
       ...(input.forwarding && {
         forwarding: { connect: { id: input.forwarding } }
       }),
-      ...(input.intermediaries?.length > 0 && {
+      ...(shouldUpdateIntermediaries && {
         intermediaries: {
           deleteMany: {},
           createMany: { data: companyToIntermediaryInput(input.intermediaries) }

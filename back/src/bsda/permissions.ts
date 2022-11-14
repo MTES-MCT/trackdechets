@@ -22,9 +22,9 @@ const bsdaSiretFields = Prisma.validator<Prisma.BsdaArgs>()({
     destinationOperationNextDestinationCompanySiret: true
   }
 });
-type BsdaFlatSiretsFileds = Prisma.BsdaGetPayload<typeof bsdaSiretFields>;
+type BsdaFlatSiretsFields = Prisma.BsdaGetPayload<typeof bsdaSiretFields>;
 
-type BsdaContributors = Partial<BsdaFlatSiretsFileds> & {
+type BsdaContributors = Partial<BsdaFlatSiretsFields> & {
   intermediaries: Partial<
     Pick<IntermediaryBsdaAssociation, "siret" | "vatNumber">
   >[];
