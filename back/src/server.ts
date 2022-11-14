@@ -40,6 +40,7 @@ import { resolvers, typeDefs } from "./schema";
 import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
+import { heapSnapshotToS3Router } from "./logging/heapSnapshot";
 
 const {
   SESSION_SECRET,
@@ -267,6 +268,8 @@ function ensureLoggedInAndAdmin() {
   };
 }
 app.use(bullBoardPath, ensureLoggedInAndAdmin(), serverAdapter.getRouter());
+// TEMP until memory leaks are fixed
+app.get("/heap", ensureLoggedInAndAdmin(), heapSnapshotToS3Router);
 
 // Apply passport auth middlewares to the graphQL endpoint
 app.use(graphQLPath, passportBearerMiddleware);
