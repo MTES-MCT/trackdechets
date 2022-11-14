@@ -13,6 +13,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Cacher l'édition des champs d'adresse d'un transporteur FR, et corriger l'initialisation du pays d'un transporteur dans CompanySelector, et l'affiche dans l'item sélectionné dans la liste [PR 1846](https://github.com/MTES-MCT/trackdechets/pull/1846)
 - Destination ultérieure prévue : il n'est pas possible de ne choisir ni SIRET ni nº de TVA intracom [PR 1853](https://github.com/MTES-MCT/trackdechets/pull/1846)
+- Corrige le comportement des boutons radio relatifs au type d'émetteur lorsqu'un écoorganisme est présent  [PR 1856](https://github.com/MTES-MCT/trackdechets/pull/1856)
 
 #### :boom: Breaking changes
 
