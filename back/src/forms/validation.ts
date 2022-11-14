@@ -1089,8 +1089,8 @@ const withNextDestination = (required: boolean) =>
       .requiredIf(required, `Destination ultérieure : ${MISSING_COMPANY_NAME}`),
     nextDestinationCompanySiret: yup
       .string()
-      .when("nextDestinationCompanyCountry", (country, schema) => {
-        return (country == null || country === "FR") && required
+      .when("nextDestinationCompanyVatNumber", (vat, schema) => {
+        return !isVat(vat) && required
           ? schema
               .ensure()
               .required(
