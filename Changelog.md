@@ -12,11 +12,14 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Cacher l'édition des champs d'adresse d'un transporteur FR, et corriger l'initialisation du pays d'un transporteur dans CompanySelector, et l'affiche dans l'item sélectionné dans la liste [PR 1846](https://github.com/MTES-MCT/trackdechets/pull/1846)
-- Fix erreur avec Bsdasri quand `transporterTransportMode` input à None [PR 1854](https://github.com/MTES-MCT/trackdechets/pull/1854)
+- Résolution de l'erreur avec Bsdasri quand `transporterTransportMode` envoyé `None` [PR 1854](https://github.com/MTES-MCT/trackdechets/pull/1854)
+- Destination ultérieure prévue : il n'est pas possible de ne choisir ni SIRET ni nº de TVA intracom [PR 1853](https://github.com/MTES-MCT/trackdechets/pull/1846)
 
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
+
+- Transporteurs étrangers : ne pas demander de remplir un récépissé transporteur dans les formulaires [PR 1844](https://github.com/MTES-MCT/trackdechets/pull/1844)
 
 #### :memo: Documentation
 

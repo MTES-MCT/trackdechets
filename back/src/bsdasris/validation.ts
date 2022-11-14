@@ -358,25 +358,40 @@ export const transporterSchema: FactorySchemaOf<
     transporterRecepisseNumber: yup
       .string()
       .ensure()
-      .requiredIf(
-        context.transportSignature,
-        "Le numéro de récépissé est obligatoire"
-      ),
+      .when("transporterCompanyVatNumber", (tva, schema) => {
+        if (!tva) {
+          return schema.requiredIf(
+            context.transportSignature,
+            `Transporteur: le numéro de récépissé est obligatoire`
+          );
+        }
+        return schema.notRequired();
+      }),
 
     transporterRecepisseDepartment: yup
       .string()
       .ensure()
-      .requiredIf(
-        context.transportSignature || requiredForSynthesis,
-        "Le département du transporteur est obligatoire"
-      ),
+      .when("transporterCompanyVatNumber", (tva, schema) => {
+        if (!tva) {
+          return schema.requiredIf(
+            context.transportSignature,
+            `Transporteur: le département associé au récépissé est obligatoire`
+          );
+        }
+        return schema.notRequired();
+      }),
 
     transporterRecepisseValidityLimit: yup
       .date()
-      .requiredIf(
-        context.transportSignature || requiredForSynthesis,
-        "La date de validité du récépissé est obligatoire"
-      )
+      .when("transporterCompanyVatNumber", (tva, schema) => {
+        if (!tva) {
+          return schema.requiredIf(
+            context.transportSignature || requiredForSynthesis,
+            "La date de validité du récépissé est obligatoire"
+          );
+        }
+        return schema.notRequired();
+      })
   });
 };
 

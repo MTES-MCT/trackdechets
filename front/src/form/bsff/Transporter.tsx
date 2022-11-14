@@ -8,6 +8,7 @@ import { Field, useFormikContext } from "formik";
 import { Bsff } from "generated/graphql/types";
 import styles from "./Transporter.module.scss";
 import initialState from "./utils/initial-state";
+import { isForeignVat } from "generated/constants/companySearchHelpers";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export default function Transporter({ disabled }) {
@@ -44,18 +45,7 @@ export default function Transporter({ disabled }) {
         }}
       />
 
-      {values.transporter?.company?.siret === null ? (
-        <label>
-          Numéro de TVA intracommunautaire
-          <Field
-            type="text"
-            name="transporter.tvaIntracommunautaire"
-            placeholder="Ex: DE 123456789"
-            className="td-input"
-            disabled={disabled}
-          />
-        </label>
-      ) : (
+      {!isForeignVat(values?.transporter?.company?.vatNumber!!) && (
         <>
           <h4 className="form__section-heading">
             Récépissé de déclaration de transport de déchets
