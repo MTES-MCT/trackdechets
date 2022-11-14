@@ -15,9 +15,13 @@ describe("BSDA validation", () => {
     delete bsda.transporterRecepisseNumber;
     delete bsda.transporterRecepisseIsExempted;
 
-    await validateBsda(bsda, [], {
-      transportSignature: true
-    });
+    await validateBsda(
+      bsda,
+      { previousBsdas: [], intermediaries: [] },
+      {
+        transportSignature: true
+      }
+    );
   });
 
   it("should not validate without recipisse when it's a french transport", async () => {
@@ -30,9 +34,13 @@ describe("BSDA validation", () => {
     delete bsda.transporterRecepisseDepartment;
     delete bsda.transporterRecepisseNumber;
     await expect(() =>
-      validateBsda(bsda, [], {
-        transportSignature: true
-      })
+      validateBsda(
+        bsda,
+        { previousBsdas: [], intermediaries: [] },
+        {
+          transportSignature: true
+        }
+      )
     ).rejects.toThrow(ValidationError);
   });
 });
