@@ -392,6 +392,7 @@ export function Destination({ disabled }) {
           name="intermediaries"
           component={IntermediariesSelector}
           disabled={disabled}
+          maxNbOfIntermediaries={3}
         />
       )}
     </>

@@ -1,14 +1,28 @@
+import cogoToast from "cogo-toast";
 import { IconClose } from "common/components/Icons";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { FieldArray, FieldProps } from "formik";
-import { CompanyInput } from "generated/graphql/types";
-import React from "react";
-
-const MAX_NB_OF_INTERMEDIARIES = 3;
+import { CompanyInput, CompanySearchResult } from "generated/graphql/types";
+import React, { useCallback } from "react";
 
 export function IntermediariesSelector({
   field: { name, value },
-}: FieldProps<CompanyInput[]>) {
+  maxNbOfIntermediaries,
+}: FieldProps<CompanyInput[]> & { maxNbOfIntermediaries?: number }) {
+  const onIntermediarySelectedCallback = useCallback(
+    (company: CompanySearchResult) => {
+      if (!company.isRegistered) {
+        cogoToast.warn(
+          `Intermédiaire: l'établissement sélectionné n'est pas enregistré sur Trackdéchets, le suivi du bordereau ne sera pas possible sur la plateforme`,
+          {
+            position: "bottom-right",
+          }
+        );
+      }
+    },
+    []
+  );
+
   return (
     <div>
       <FieldArray
@@ -33,6 +47,7 @@ export function IntermediariesSelector({
                   optionalMail={true}
                   skipFavorite={true}
                   optional={true}
+                  onCompanySelected={onIntermediarySelectedCallback}
                 />
                 <div className="tw-mt-2">
                   <button
@@ -51,7 +66,10 @@ export function IntermediariesSelector({
               <button
                 type="button"
                 className="btn btn--outline-primary"
-                disabled={value.length === MAX_NB_OF_INTERMEDIARIES}
+                disabled={
+                  Boolean(maxNbOfIntermediaries) &&
+                  value.length === maxNbOfIntermediaries
+                }
                 onClick={() => {
                   arrayHelpers.insert(value.length, {
                     siret: "",
