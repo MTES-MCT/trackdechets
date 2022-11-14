@@ -60,7 +60,7 @@ export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
         <TdSwitch
           checked={hasEcoOrganisme}
           onChange={handleEcoOrganismeToggle}
-          label="Agit pour le compte de l'éco organisme agréé"
+          label="Un éco-organisme est responsable de la prise en charge des déchets"
         />
       </div>
 
