@@ -14,14 +14,15 @@ import { RedErrorMessage } from "common/components";
 
 export default function Emitter({ disabled }) {
   const ctx = useFormikContext<Form>();
-
   const { values, handleChange, setFieldValue, initialValues } = ctx;
 
   const hasInitialGrouping = !!initialValues?.grouping?.length; // siret is non editable once bsd contains grouped bsds
   const siretNonEditable = hasInitialGrouping && !!values?.id;
 
-  const [emitterTypeProducerDisabled, setEmitterTypeProducerDisabled] =
-    useState(values.ecoOrganisme?.siret != null);
+  const [
+    emitterTypeProducerDisabled,
+    setEmitterTypeProducerDisabled,
+  ] = useState(values.ecoOrganisme?.siret != null);
 
   const [lockEmitterProducer, setLockEmitterProducer] = useState(
     values.emitter?.isForeignShip || values.emitter?.isPrivateIndividual
@@ -29,8 +30,12 @@ export default function Emitter({ disabled }) {
 
   useEffect(() => {
     if (values.ecoOrganisme?.siret) {
+      // disable PRODUCER radio button
       setEmitterTypeProducerDisabled(true);
-      setFieldValue("emitter.type", "OTHER");
+      if (values?.emitter?.type === "PRODUCER") {
+        // set emitter type to OTHER if value was PRODUCER, else keep value
+        setFieldValue("emitter.type", "OTHER");
+      }
       return;
     }
     setEmitterTypeProducerDisabled(false);
