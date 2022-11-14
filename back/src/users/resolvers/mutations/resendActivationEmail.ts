@@ -3,17 +3,26 @@ import { sendMail } from "../../../mailer/mailing";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { onSignup } from "../../../mailer/templates";
-import { UserInputError } from "apollo-server-express";
+import { object, string } from "yup";
 
 const resendActivationEmail: MutationResolvers["resendActivationEmail"] =
   async (parent, { email }) => {
+    const schema = object({
+      email: string()
+        .email("Cet email n'est pas correctement formatté")
+        .required()
+    });
+    await schema.validate({ email });
+
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      throw new UserInputError(`Cet email n'existe pas sur notre plateforme.`);
+      // for security reason, do not leak  any clue
+      return true;
     }
 
     if (user.isActive) {
-      throw new UserInputError("Ce compte a déjà été activé");
+      // for security reason, do not leak  any clue
+      return true;
     }
 
     const activationHashes = await prisma.userActivationHash.findMany({
@@ -21,9 +30,9 @@ const resendActivationEmail: MutationResolvers["resendActivationEmail"] =
     });
 
     if (activationHashes?.length === 0) {
-      throw new Error(
-        `L'utlisateur ${user.email} non actif ne possède pas de hash d'activation`
-      );
+      // for security reason, do not leak  any clue
+
+      return true;
     }
 
     const { hash } = activationHashes[0];

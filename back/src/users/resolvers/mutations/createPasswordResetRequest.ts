@@ -5,7 +5,6 @@ import { sendMail } from "../../../mailer/mailing";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { createPasswordResetRequest } from "../../../mailer/templates";
-import { UserInputError } from "apollo-server-express";
 import { sanitizeEmail } from "../../../utils";
 import { addHours } from "date-fns";
 
@@ -15,7 +14,8 @@ const createPasswordResetRequestResolver: MutationResolvers["createPasswordReset
       where: { email: sanitizeEmail(email) }
     });
     if (!user) {
-      throw new UserInputError(`Cet email n'existe pas sur notre plateforme.`);
+      // for security reason, do not leak  any clue
+      return true;
     }
     const resetHash = (await promisify(crypto.randomBytes)(20)).toString("hex");
 

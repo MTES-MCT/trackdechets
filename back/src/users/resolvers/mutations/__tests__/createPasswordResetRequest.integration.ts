@@ -51,4 +51,23 @@ describe("mutation createPasswordResetRequest", () => {
       })
     );
   });
+  it("should silence not found email", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient();
+
+    const { data } = await mutate<Pick<Mutation, "createPasswordResetRequest">>(
+      CREATE_PASSWORD_RESET_REQUEST,
+      {
+        variables: { email: "donotexist@notfound.com" }
+      }
+    );
+    expect(data.createPasswordResetRequest).toEqual(true);
+
+    const resetHash = await prisma.userResetPasswordHash.findFirst({
+      where: { userId: user.id }
+    });
+    expect(resetHash).toBe(null);
+
+    expect(sendMailSpy).not.toHaveBeenCalled();
+  });
 });

@@ -61,7 +61,7 @@ export default function PasswordResetRequest() {
     <Row spacing="mb-2w">
       <Alert
         title="Succès"
-        description="Un email vient de vous être envoyé (veuillez également vérifier dans votre dossier de courrier indésirable)."
+        description="Si l'addresse email existe dans notre système, vous allez recevoir un email (veuillez également vérifier dans votre dossier de courrier indésirable)."
         type="success"
       />
     </Row>
