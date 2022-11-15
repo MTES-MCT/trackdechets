@@ -247,7 +247,7 @@ describe("Mutation.markAsSealed", () => {
     expect(form.status).toEqual("SEALED");
   });
 
-  it("should fail if bsd has an eco-organisme and the wrong emitterType", async () => {
+  it("the eco-organisme of the BSD can seal it with the producer emitterType", async () => {
     const emitterCompany = await companyFactory();
     const recipientCompany = await destinationFactory();
     const { user, company: eo } = await userWithCompanyFactory("MEMBER");
@@ -259,7 +259,7 @@ describe("Mutation.markAsSealed", () => {
       }
     });
 
-    const form = await formFactory({
+    let form = await formFactory({
       ownerId: user.id,
       opt: {
         status: "DRAFT",
@@ -272,20 +272,96 @@ describe("Mutation.markAsSealed", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { errors } = await mutate(MARK_AS_SEALED, {
+    await mutate(MARK_AS_SEALED, {
       variables: {
         id: form.id
       }
     });
 
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: [
-          "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
-          `Erreur(s): Émetteur: Le type d'émetteur doit être "OTHER", "APPENDIX1" ou "APPENDIX2" lorsqu'un éco-organisme est responsable du déchet`
-        ].join("\n")
-      })
-    ]);
+    form = await prisma.form.findUnique({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
+
+    expect(form.status).toEqual("SEALED");
+  });
+
+  it("the eco-organisme of the BSD can seal it with the APPENDIX1 emitterType", async () => {
+    const emitterCompany = await companyFactory();
+    const recipientCompany = await destinationFactory();
+    const { user, company: eo } = await userWithCompanyFactory("MEMBER");
+    await prisma.ecoOrganisme.create({
+      data: {
+        name: eo.name,
+        siret: eo.siret,
+        address: "An address"
+      }
+    });
+
+    let form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterType: "APPENDIX1",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        ecoOrganismeSiret: eo.siret,
+        ecoOrganismeName: eo.name
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    form = await prisma.form.findUnique({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
+
+    expect(form.status).toEqual("SEALED");
+  });
+
+  it("the eco-organisme of the BSD can seal it with the APPENDIX2 emitterType", async () => {
+    const emitterCompany = await companyFactory();
+    const recipientCompany = await destinationFactory();
+    const { user, company: eo } = await userWithCompanyFactory("MEMBER");
+    await prisma.ecoOrganisme.create({
+      data: {
+        name: eo.name,
+        siret: eo.siret,
+        address: "An address"
+      }
+    });
+
+    let form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterType: "APPENDIX2",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        ecoOrganismeSiret: eo.siret,
+        ecoOrganismeName: eo.name
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    form = await prisma.form.findUnique({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
+
+    expect(form.status).toEqual("SEALED");
   });
 
   it("should fail if user is not authorized", async () => {
