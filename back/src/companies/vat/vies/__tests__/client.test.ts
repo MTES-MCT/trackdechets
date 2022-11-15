@@ -86,17 +86,16 @@ describe("Vat search VIES client", () => {
     expect(res).toStrictEqual(testValue);
   });
 
-  it(`should throw BAD_USER_INPUT if
+  it(`should throw EXTERNAL_SERVICE_ERROR if
   the VIES Server returns an unavailibility error`, async () => {
     expect.assertions(2);
     checkVatAsyncMock.mockRejectedValueOnce({
-      err: {
-        root: {
-          Enveloppe: {
-            Body: {
-              Fault: {
-                faultstring: "SERVICE_UNAVAILABLE"
-              }
+      root: {
+        Envelope: {
+          Body: {
+            Fault: {
+              faultstring: "SERVICE_UNAVAILABLE",
+              faultcode: 500
             }
           }
         }
@@ -107,7 +106,7 @@ describe("Vat search VIES client", () => {
     } catch (e) {
       expect(e.extensions.code).toEqual(ErrorCode.EXTERNAL_SERVICE_ERROR);
       expect(e.message).toBe(
-        "Le numéro de TVA recherché n'est pas reconnu par le service de recherche par TVA de la commission européenne (VIES)"
+        "Le service de recherche par TVA de la commission européenne (VIES) est indisponible, veuillez réessayer dans quelques minutes (code erreur VIES: 500 SERVICE_UNAVAILABLE)"
       );
     }
   });

@@ -128,12 +128,12 @@ export const getReadableErrorMsg = ({
   switch (faultstring) {
     case "INVALID_INPUT":
       return "Le service de recherche par TVA de la commission européenne (VIES) ne reconnait pas le numéro de TVA ou celui-ci est invalide";
-    case "SERVICE_UNAVAILABLE":
-      return "Le service de recherche par TVA de la commission européenne (VIES) est indisponible, veuillez réessayer dans quelques minutes";
     case "MS_UNAVAILABLE":
       return "Le service de recherche par TVA du pays d'origine est indisponible, veuillez réessayer dans quelques minutes";
     case "MS_MAX_CONCURRENT_REQ":
       return "Le service de recherche par TVA du pays d'origine reçoit un trop grand nombre de requêtes, veuillez réessayer dans quelques minutes";
+    case "SERVICE_UNAVAILABLE":
+      return defaultMsg;
     case "TIMEOUT":
       return defaultMsg;
     case "SERVER_BUSY":
