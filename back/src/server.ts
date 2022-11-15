@@ -10,7 +10,6 @@ import redisStore from "connect-redis";
 import cors from "cors";
 import express, { json, static as serveStatic, urlencoded } from "express";
 import session from "express-session";
-import { GraphQLError } from "graphql";
 import depthLimit from "graphql-depth-limit";
 import helmet from "helmet";
 import passport from "passport";
@@ -82,21 +81,10 @@ export const server = new ApolloServer({
       }
     };
   },
-  formatError: (err: GraphQLError) => {
-    // Do not leak error for internal server error in production
-    const sentryId = (err?.originalError as any)?.sentryId;
+  formatError: err => {
     // Catch Yup `ValidationError` and throw a `UserInputError` instead of an `InternalServerError`
     if (err.extensions.exception?.name === "ValidationError") {
       return new UserInputError(err.extensions.exception.errors.join("\n"));
-    }
-    // Catch Yup `ViesClientError` and throw an `ViesClientError`
-    if (err.extensions.exception?.name === "ViesClientError") {
-      return new ApolloError(
-        sentryId
-          ? `${err.message} : rapport d'erreur ${sentryId}`
-          : err.message,
-        ErrorCode.EXTERNAL_SERVICE_ERROR
-      );
     }
     if (
       err.extensions.code === ErrorCode.INTERNAL_SERVER_ERROR &&
@@ -109,10 +97,12 @@ export const server = new ApolloServer({
         err.extensions.code = "GRAPHQL_VALIDATION_FAILED";
         return err;
       }
+      // Do not leak error for internal server error in production
+      const sentryId = (err?.originalError as any)?.sentryId;
       return new ApolloError(
         sentryId
-          ? `Erreur interne serveur, veuillez réessayer dans quelques minutes ou si l'erreur persiste, envoyez un mail à contact@trackdechets.beta.gouv.fr avec le numéro suivant : rapport d'erreur ${sentryId}`
-          : "Erreur interne serveur, veuillez réessayer dans quelques minutes ou si l'erreur persiste, envoyez un mail à contact@trackdechets.beta.gouv.fr avec le contexte de votre erreur",
+          ? `Erreur serveur : rapport d'erreur ${sentryId}`
+          : "Erreur serveur",
         ErrorCode.INTERNAL_SERVER_ERROR
       );
     }

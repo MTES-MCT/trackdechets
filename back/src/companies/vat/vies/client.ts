@@ -93,31 +93,24 @@ export const client = async (
       etatAdministratif: "A"
     };
   } catch (err) {
-    const fault = err.root.Envelope.Body.Fault;
-    // log the error to follow VIES service unavailibility
-    logger.error(
-      `Erreur with VAT search VIES client: ${getReadableErrorMsg(fault)}`,
-      err
-    );
-
-    // forward the original exception
+    // forward the original UserInputError
     if (err instanceof UserInputError) {
       throw err;
     }
+
+    const fault = err.root?.Envelope?.Body?.Fault;
+    const faultMessage = getReadableErrorMsg(fault);
+    // log the error to follow VIES service unavailibility
+    logger.error(`VIES client error: ${faultMessage}`, err);
+
     // throws UserInputError when VIES client returns the error "INVALID_INPUT"
     if (fault.faultstring === "INVALID_INPUT") {
-      throw new UserInputError(
-        "Le numéro de TVA recherché n'est pas reconnu par le service de recherche par TVA de la commission européenne (VIES)",
-        {
-          invalidArgs: ["clue"]
-        }
-      );
+      throw new UserInputError(faultMessage, {
+        invalidArgs: ["clue"]
+      });
     }
     // Throws VIES Server unavailability message
-    throw new ViesClientError(
-      getReadableErrorMsg(fault),
-      ErrorCode.EXTERNAL_SERVICE_ERROR
-    );
+    throw new ViesClientError(faultMessage, ErrorCode.EXTERNAL_SERVICE_ERROR);
   }
 };
 
@@ -131,9 +124,10 @@ export const getReadableErrorMsg = ({
   faultstring: string;
   faultcode: string;
 }): string => {
+  const defaultMsg = `Le service de recherche par TVA de la commission européenne (VIES) est indisponible, veuillez réessayer dans quelques minutes (code erreur VIES: ${faultcode} ${faultstring})`;
   switch (faultstring) {
     case "INVALID_INPUT":
-      return "Le code pays ou le numéro de TVA est invalide";
+      return "Le service de recherche par TVA de la commission européenne (VIES) ne reconnait pas le numéro de TVA ou celui-ci est invalide";
     case "SERVICE_UNAVAILABLE":
       return "Le service de recherche par TVA de la commission européenne (VIES) est indisponible, veuillez réessayer dans quelques minutes";
     case "MS_UNAVAILABLE":
@@ -141,12 +135,12 @@ export const getReadableErrorMsg = ({
     case "MS_MAX_CONCURRENT_REQ":
       return "Le service de recherche par TVA du pays d'origine reçoit un trop grand nombre de requêtes, veuillez réessayer dans quelques minutes";
     case "TIMEOUT":
-      return "Le service de recherche par TVA de la commission européenne (VIES) est indisponible, veuillez réessayer dans quelques minutes";
+      return defaultMsg;
     case "SERVER_BUSY":
-      return "Le service de recherche par TVA de la commission européenne (VIES) est indisponible, veuillez réessayer dans quelques minutes";
+      return defaultMsg;
     case "INVALID_REQUESTER_INFO":
-      return "Le service de recherche par TVA de la commission européenne (VIES) est indisponible, veuillez réessayer dans quelques minutes";
+      return defaultMsg;
     default:
-      return `Le service de recherche par TVA de la commission européenne (VIES) est indisponible, veuillez réessayer dans quelques minutes (${faultcode})`;
+      return defaultMsg;
   }
 };
