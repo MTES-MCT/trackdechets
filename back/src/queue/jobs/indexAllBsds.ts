@@ -82,7 +82,7 @@ export async function indexAllInBulk(job: Job<string>) {
         });
         logger.info(
           `Scaled-up ${SCALINGO_APP_NAME} ${BULK_INDEX_SCALINGO_CONTAINER_NAME} workers to ${BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_UP} ${BULK_INDEX_SCALINGO_CONTAINER_SIZE_UP}`,
-          resp.data
+          resp
         );
       } catch (e) {
         logger.error(
@@ -100,6 +100,8 @@ export async function indexAllInBulk(job: Job<string>) {
     });
     if (BULK_INDEX_SCALINGO_ACTIVE_AUTOSCALING === "true") {
       // scale-down indexqueue workers
+      // After scaling-up, the status of the application will be changed to ‘scaling’ for the scaling duration.
+      // No other operation is doable until the app status has switched to “running” again.
       try {
         const resp = await axios({
           method: "post",
@@ -120,7 +122,7 @@ export async function indexAllInBulk(job: Job<string>) {
         });
         logger.info(
           `Scaled-down ${SCALINGO_APP_NAME} ${BULK_INDEX_SCALINGO_CONTAINER_NAME} workers to ${BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_DOWN} ${BULK_INDEX_SCALINGO_CONTAINER_SIZE_DOWN}`,
-          resp.data
+          resp
         );
       } catch (e) {
         logger.error(
