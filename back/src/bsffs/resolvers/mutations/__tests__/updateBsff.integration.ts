@@ -14,12 +14,12 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { OPERATION } from "../../../constants";
+import { getPreviousPackagings } from "../../../database";
 import { fullBsff } from "../../../fragments";
 import {
   createBsff,
   createBsffAfterEmission,
   createBsffAfterOperation,
-  createBsffAfterReception,
   createBsffAfterTransport,
   createBsffBeforeEmission,
   createFicheIntervention
@@ -89,8 +89,8 @@ describe("Mutation.updateBsff", () => {
         id: bsff.id,
         input: {
           packagings: [
-            { name: "BOUTEILLE", weight: 1, numero: "2" },
-            { name: "BOUTEILLE", weight: 1, numero: "3" }
+            { name: "BOUTEILLE", weight: 1, numero: "2", volume: 1 },
+            { name: "BOUTEILLE", weight: 1, numero: "3", volume: 1 }
           ]
         }
       }
@@ -496,11 +496,11 @@ describe("Mutation.updateBsff", () => {
     );
   });
 
-  it("should not update destination if they signed already", async () => {
+  it("should not update a transporter if signed already", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsffAfterReception({
+    const bsff = await createBsffAfterTransport({
       emitter,
       transporter,
       destination
@@ -509,7 +509,7 @@ describe("Mutation.updateBsff", () => {
     const { mutate } = makeClient(emitter.user);
 
     const input = {
-      destination: {
+      transporter: {
         company: {
           name: "Another name"
         }
@@ -526,9 +526,9 @@ describe("Mutation.updateBsff", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data.updateBsff.destination.company).toEqual(
+    expect(data.updateBsff.transporter.company).toEqual(
       expect.objectContaining({
-        name: bsff.destinationCompanyName
+        name: bsff.transporterCompanyName
       })
     );
   });
@@ -544,9 +544,9 @@ describe("Mutation.updateBsff", () => {
           destination: emitter
         },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED,
-          destinationOperationCode: OPERATION.R12.code
-        }
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        { operationCode: OPERATION.R12.code }
       )
     ]);
     const newGroupingBsffs = await Promise.all([
@@ -557,9 +557,9 @@ describe("Mutation.updateBsff", () => {
           destination: emitter
         },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED,
-          destinationOperationCode: OPERATION.R12.code
-        }
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        { operationCode: OPERATION.R12.code }
       )
     ]);
 
@@ -567,41 +567,46 @@ describe("Mutation.updateBsff", () => {
       {
         emitter,
         transporter: await userWithCompanyFactory(UserRole.ADMIN),
-        destination: await userWithCompanyFactory(UserRole.ADMIN)
+        destination: await userWithCompanyFactory(UserRole.ADMIN),
+        previousPackagings: oldGroupingBsffs.flatMap(bsff => bsff.packagings)
       },
       {
-        type: BsffType.GROUPEMENT,
-        grouping: {
-          connect: oldGroupingBsffs.map(bsff => ({
-            id: bsff.id
-          }))
-        }
+        type: BsffType.GROUPEMENT
       }
     );
 
     const { mutate } = makeClient(emitter.user);
-    const { data, errors } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
       variables: {
         id: bsff.id,
         input: {
-          grouping: newGroupingBsffs.map(({ id }) => id)
+          grouping: newGroupingBsffs.flatMap(({ packagings }) =>
+            packagings.map(p => p.id)
+          )
         }
       }
     });
 
     expect(errors).toBeUndefined();
 
-    const actualGroupingBsffs = await prisma.bsff
-      .findUnique({
-        where: { id: data.updateBsff.id }
-      })
-      .grouping();
-    expect(actualGroupingBsffs).toEqual(
-      newGroupingBsffs.map(({ id }) => expect.objectContaining({ id }))
+    const updatedBsff = await prisma.bsff.findUnique({
+      where: { id: bsff.id },
+      include: { packagings: true }
+    });
+
+    const previousPackagings = await getPreviousPackagings(
+      updatedBsff.packagings.map(p => p.id),
+      1
     );
+
+    for (const packaging of previousPackagings) {
+      expect(
+        newGroupingBsffs.flatMap(bsff => bsff.packagings.map(p => p.id))
+      ).toContain(packaging.id);
+    }
   });
 
   it("should update the forwarded BSFF", async () => {
@@ -613,20 +618,20 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED,
-        destinationOperationCode: OPERATION.R13.code
-      }
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.R13.code }
     );
 
     const bsff = await createBsffBeforeEmission(
       {
         emitter: ttr,
         transporter: await userWithCompanyFactory(UserRole.ADMIN),
-        destination: await userWithCompanyFactory(UserRole.ADMIN)
+        destination: await userWithCompanyFactory(UserRole.ADMIN),
+        previousPackagings: oldForwarded.packagings
       },
       {
-        type: BsffType.REEXPEDITION,
-        forwarding: { connect: { id: oldForwarded.id } }
+        type: BsffType.REEXPEDITION
       }
     );
 
@@ -637,9 +642,9 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED,
-        destinationOperationCode: OPERATION.R13.code
-      }
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.R13.code }
     );
 
     const { mutate } = makeClient(ttr.user);
@@ -650,18 +655,25 @@ describe("Mutation.updateBsff", () => {
       variables: {
         id: bsff.id,
         input: {
-          forwarding: newForwarded.id
+          forwarding: newForwarded.packagings.map(p => p.id)
         }
       }
     });
 
     expect(errors).toBeUndefined();
 
-    const actualForwarded = await prisma.bsff
-      .findUnique({ where: { id: bsff.id } })
-      .forwarding();
+    const updatedBsff = await prisma.bsff.findUnique({
+      where: { id: bsff.id },
+      include: { packagings: true }
+    });
 
-    expect(actualForwarded.id).toEqual(newForwarded.id);
+    const previousPackagings = await getPreviousPackagings(
+      updatedBsff.packagings.map(p => p.id),
+      1
+    );
+    expect(previousPackagings).toHaveLength(1);
+
+    expect(previousPackagings[0].id).toEqual(newForwarded.packagings[0].id);
   });
 
   it("should update the list of repackaged BSFF", async () => {
@@ -673,20 +685,31 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED,
-        destinationOperationCode: OPERATION.D14.code
-      }
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.D14.code }
     );
 
     const bsff = await createBsffBeforeEmission(
       {
         emitter: ttr,
         transporter: await userWithCompanyFactory(UserRole.ADMIN),
-        destination: await userWithCompanyFactory(UserRole.ADMIN)
+        destination: await userWithCompanyFactory(UserRole.ADMIN),
+        previousPackagings: oldRepackaged.packagings
       },
       {
         type: BsffType.RECONDITIONNEMENT,
-        repackaging: { connect: [{ id: oldRepackaged.id }] }
+        packagings: {
+          create: {
+            name: "Citerne",
+            numero: "numero",
+            volume: 1,
+            weight: 1,
+            previousPackagings: {
+              connect: oldRepackaged.packagings.map(p => ({ id: p.id }))
+            }
+          }
+        }
       }
     );
 
@@ -697,9 +720,9 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED,
-        destinationOperationCode: OPERATION.D14.code
-      }
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.D14.code }
     );
 
     const { mutate } = makeClient(ttr.user);
@@ -710,19 +733,23 @@ describe("Mutation.updateBsff", () => {
       variables: {
         id: bsff.id,
         input: {
-          repackaging: [newRepackaged.id]
+          repackaging: [newRepackaged.packagings[0].id]
         }
       }
     });
 
     expect(errors).toBeUndefined();
 
-    const actualRepackaged = await prisma.bsff
-      .findUnique({ where: { id: bsff.id } })
-      .repackaging();
+    const previousPackagings = await getPreviousPackagings(
+      bsff.packagings.map(p => p.id),
+      1
+    );
 
-    expect(actualRepackaged).toHaveLength(1);
-    expect(actualRepackaged[0].id).toEqual(newRepackaged.id);
+    for (const previousPackaging of previousPackagings) {
+      expect(newRepackaged.packagings.map(p => p.id)).toContain(
+        previousPackaging.id
+      );
+    }
   });
 
   it("should change the initial transporter", async () => {
@@ -772,17 +799,19 @@ describe("Mutation.updateBsff", () => {
           destination: emitter
         },
         {
-          status: BsffStatus.INTERMEDIATELY_PROCESSED,
-          destinationOperationCode: OPERATION.R12.code
-        }
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        { operationCode: OPERATION.R12.code }
       )
     ]);
     const bsff = await createBsffBeforeEmission(
-      { emitter },
+      {
+        emitter,
+        previousPackagings: groupingBsffs.flatMap(bsff => bsff.packagings)
+      },
       {
         type: BsffType.GROUPEMENT,
-        isDraft: true,
-        grouping: { connect: groupingBsffs.map(({ id }) => ({ id })) }
+        isDraft: true
       }
     );
 
@@ -816,16 +845,15 @@ describe("Mutation.updateBsff", () => {
         destination: ttr
       },
       {
-        status: BsffStatus.INTERMEDIATELY_PROCESSED,
-        destinationOperationCode: OPERATION.R13.code
-      }
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.R13.code }
     );
     const bsff = await createBsffBeforeEmission(
-      { emitter: ttr },
+      { emitter: ttr, previousPackagings: forwardedBsff.packagings },
       {
         type: BsffType.REEXPEDITION,
-        isDraft: true,
-        forwarding: { connect: { id: forwardedBsff.id } }
+        isDraft: true
       }
     );
 

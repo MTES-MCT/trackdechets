@@ -2,6 +2,7 @@ import * as Prisma from "@prisma/client";
 import { nullIfNoValues, safeInput, processDate } from "../common/converter";
 import * as GraphQL from "../generated/graphql/types";
 import { BsdElastic } from "../common/elastic";
+import { BsffPackaging } from "@prisma/client";
 
 export function flattenBsffInput(
   bsffInput: GraphQL.BsffInput
@@ -68,34 +69,12 @@ export function flattenBsffInput(
     destinationCompanyContact: bsffInput.destination?.company?.contact,
     destinationCompanyPhone: bsffInput.destination?.company?.phone,
     destinationCompanyMail: bsffInput.destination?.company?.mail,
+    destinationCap: bsffInput.destination?.cap,
     destinationCustomInfo: bsffInput.destination?.customInfo,
 
     destinationReceptionDate: bsffInput.destination?.reception?.date,
-    destinationReceptionWeight: bsffInput.destination?.reception?.weight,
-    destinationReceptionAcceptationStatus:
-      bsffInput.destination?.reception?.acceptation?.status,
-    destinationReceptionRefusalReason:
-      bsffInput.destination?.reception?.acceptation?.refusalReason,
 
-    destinationPlannedOperationCode:
-      bsffInput.destination?.plannedOperationCode,
-
-    destinationOperationCode: bsffInput.destination?.operation?.code,
-
-    destinationOperationNextDestinationCompanyName:
-      bsffInput.destination?.operation?.nextDestination?.company?.name,
-    destinationOperationNextDestinationCompanySiret:
-      bsffInput.destination?.operation?.nextDestination?.company?.siret,
-    destinationOperationNextDestinationCompanyVatNumber:
-      bsffInput.destination?.operation?.nextDestination?.company?.vatNumber,
-    destinationOperationNextDestinationCompanyAddress:
-      bsffInput.destination?.operation?.nextDestination?.company?.address,
-    destinationOperationNextDestinationCompanyContact:
-      bsffInput.destination?.operation?.nextDestination?.company?.contact,
-    destinationOperationNextDestinationCompanyPhone:
-      bsffInput.destination?.operation?.nextDestination?.company?.phone,
-    destinationOperationNextDestinationCompanyMail:
-      bsffInput.destination?.operation?.nextDestination?.company?.mail
+    destinationPlannedOperationCode: bsffInput.destination?.plannedOperationCode
   });
 }
 
@@ -161,6 +140,7 @@ export function expandBsffFromDB(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
       })
     }),
     destination: nullIfNoValues<GraphQL.BsffDestination>({
+      cap: prismaBsff.destinationCap,
       company: nullIfNoValues<GraphQL.FormCompany>({
         name: prismaBsff.destinationCompanyName,
         siret: prismaBsff.destinationCompanySiret,
@@ -172,45 +152,107 @@ export function expandBsffFromDB(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
       customInfo: prismaBsff.destinationCustomInfo,
       reception: nullIfNoValues<GraphQL.BsffReception>({
         date: processDate(prismaBsff.destinationReceptionDate),
-        weight: prismaBsff.destinationReceptionWeight,
-        acceptation: nullIfNoValues<GraphQL.BsffAcceptation>({
-          status: prismaBsff.destinationReceptionAcceptationStatus,
-          refusalReason: prismaBsff.destinationReceptionRefusalReason
-        }),
         signature: nullIfNoValues<GraphQL.Signature>({
           author: prismaBsff.destinationReceptionSignatureAuthor,
           date: processDate(prismaBsff.destinationReceptionSignatureDate)
         })
       }),
-      operation: nullIfNoValues<GraphQL.BsffOperation>({
-        code: prismaBsff.destinationOperationCode as GraphQL.BsffOperationCode,
-        nextDestination: nullIfNoValues<GraphQL.BsffNextDestination>({
-          company: nullIfNoValues<GraphQL.FormCompany>({
-            name: prismaBsff.destinationOperationNextDestinationCompanyName,
-            siret: prismaBsff.destinationOperationNextDestinationCompanySiret,
-            vatNumber:
-              prismaBsff.destinationOperationNextDestinationCompanyVatNumber,
-            address:
-              prismaBsff.destinationOperationNextDestinationCompanyAddress,
-            contact:
-              prismaBsff.destinationOperationNextDestinationCompanyContact,
-            phone: prismaBsff.destinationOperationNextDestinationCompanyPhone,
-            mail: prismaBsff.destinationOperationNextDestinationCompanyMail
-          })
-        }),
-        signature: nullIfNoValues<GraphQL.Signature>({
-          author: prismaBsff.destinationOperationSignatureAuthor,
-          date: processDate(prismaBsff.destinationOperationSignatureDate)
-        })
-      }),
       plannedOperationCode:
-        prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode,
-      cap: null // deprecated field
+        prismaBsff.destinationPlannedOperationCode as GraphQL.BsffOperationCode
     }),
     // the following relations will be set in Bsff resolver
     ficheInterventions: [],
-    grouping: [],
-    repackaging: []
+    forwarding: [],
+    repackaging: [],
+    grouping: []
+  };
+}
+
+export function flattenBsffPackagingInput(
+  input: GraphQL.UpdateBsffPackagingInput
+) {
+  return {
+    acceptationDate: input.acceptation?.date,
+    acceptationWeight: input.acceptation?.weight,
+    acceptationStatus: input.acceptation?.status,
+    acceptationRefusalReason: input.acceptation?.refusalReason,
+    acceptationWasteCode: input.acceptation?.wasteCode,
+    acceptationWasteDescription: input.acceptation?.wasteDescription,
+    operationDate: input.operation?.date,
+    operationNoTraceability: input.operation?.noTraceability,
+    operationCode: input.operation?.code,
+    operationDescription: input.operation?.description,
+    operationNextDestinationPlannedOperationCode:
+      input.operation?.nextDestination?.plannedOperationCode,
+    operationNextDestinationCap: input.operation?.nextDestination?.cap,
+    operationNextDestinationCompanyName:
+      input.operation?.nextDestination?.company?.name,
+    operationNextDestinationCompanySiret:
+      input.operation?.nextDestination?.company?.siret,
+    operationNextDestinationCompanyVatNumber:
+      input.operation?.nextDestination?.company?.vatNumber,
+    operationNextDestinationCompanyAddress:
+      input.operation?.nextDestination?.company?.address,
+    operationNextDestinationCompanyContact:
+      input.operation?.nextDestination?.company?.contact,
+    operationNextDestinationCompanyPhone:
+      input.operation?.nextDestination?.company?.phone,
+    operationNextDestinationCompanyMail:
+      input.operation?.nextDestination?.company?.mail
+  };
+}
+
+export function expandBsffPackagingFromDB(
+  prismaBsffPackaging: BsffPackaging
+): GraphQL.BsffPackaging {
+  return {
+    id: prismaBsffPackaging.id,
+    bsffId: prismaBsffPackaging.bsffId,
+    numero: prismaBsffPackaging.numero,
+    name: prismaBsffPackaging.name,
+    volume: prismaBsffPackaging.volume,
+    weight: prismaBsffPackaging.weight,
+    acceptation: nullIfNoValues<GraphQL.BsffPackagingAcceptation>({
+      date: prismaBsffPackaging.acceptationDate,
+      weight: prismaBsffPackaging.acceptationWeight,
+      status: prismaBsffPackaging.acceptationStatus,
+      refusalReason: prismaBsffPackaging.acceptationRefusalReason,
+      wasteCode: prismaBsffPackaging.acceptationWasteCode,
+      wasteDescription: prismaBsffPackaging.acceptationWasteDescription,
+      signature: nullIfNoValues<GraphQL.Signature>({
+        date: processDate(prismaBsffPackaging.acceptationSignatureDate),
+        author: prismaBsffPackaging.acceptationSignatureAuthor
+      })
+    }),
+    operation: nullIfNoValues<GraphQL.BsffPackagingOperation>({
+      code: prismaBsffPackaging.operationCode as GraphQL.BsffOperationCode,
+      date: prismaBsffPackaging.operationDate,
+      description: prismaBsffPackaging.operationDescription,
+      noTraceability: prismaBsffPackaging.operationNoTraceability,
+      nextDestination: nullIfNoValues<GraphQL.BsffPackagingNextDestination>({
+        plannedOperationCode:
+          prismaBsffPackaging.operationNextDestinationPlannedOperationCode as GraphQL.BsffOperationCode,
+        cap: prismaBsffPackaging.operationNextDestinationCap,
+        company: nullIfNoValues<GraphQL.FormCompany>({
+          name: prismaBsffPackaging.operationNextDestinationCompanyName,
+          siret: prismaBsffPackaging.operationNextDestinationCompanySiret,
+          vatNumber:
+            prismaBsffPackaging.operationNextDestinationCompanyVatNumber,
+          address: prismaBsffPackaging.operationNextDestinationCompanyAddress,
+          contact: prismaBsffPackaging.operationNextDestinationCompanyContact,
+          phone: prismaBsffPackaging.operationNextDestinationCompanyPhone,
+          mail: prismaBsffPackaging.operationNextDestinationCompanyMail
+        })
+      }),
+      signature: nullIfNoValues<GraphQL.Signature>({
+        date: processDate(prismaBsffPackaging.operationSignatureDate),
+        author: prismaBsffPackaging.operationSignatureAuthor
+      })
+    }),
+    // the following fields will be resolved in BsddPackaging resolver
+    nextBsffs: [],
+    previousBsffs: [],
+    bsff: null
   };
 }
 
@@ -295,6 +337,7 @@ export function expandFicheInterventionBsffFromDB(
 export function toInitialBsff(bsff: GraphQL.Bsff): GraphQL.InitialBsff {
   return {
     id: bsff.id,
+    type: bsff.type,
     // emitter can only be read by someone who is contributor of the initial BSFF, this
     // logic is implemented in the InitialBsff resolver
     emitter: bsff.emitter,

@@ -1,21 +1,15 @@
-import { Bsff, BsffFicheIntervention, UserRole } from "@prisma/client";
+import { UserRole } from "@prisma/client";
 import { gql } from "apollo-server-express";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import { Query, QueryBsffsArgs } from "../../../../generated/graphql/types";
-import prisma from "../../../../prisma";
 import {
   userWithCompanyFactory,
-  companyAssociatedToExistingUserFactory,
-  UserWithCompany
+  companyAssociatedToExistingUserFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { OPERATION } from "../../../constants";
 import { fullBsff } from "../../../fragments";
-import {
-  createBsff,
-  createBsffAfterOperation
-} from "../../../__tests__/factories";
+import { createBsff } from "../../../__tests__/factories";
 
 const GET_BSFFS = gql`
   query GetBsffs(
@@ -184,40 +178,6 @@ describe("Query.bsffs", () => {
     );
   });
 
-  it("should filter bsffs with a given operation code", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    await createBsff(
-      { emitter },
-      {
-        destinationOperationCode: OPERATION.D10.code
-      }
-    );
-    await createBsff(
-      { emitter },
-      {
-        destinationOperationCode: OPERATION.R12.code
-      }
-    );
-
-    const { query } = makeClient(emitter.user);
-    const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
-      GET_BSFFS,
-      {
-        variables: {
-          where: {
-            destination: {
-              operation: {
-                code: { _eq: "D10" }
-              }
-            }
-          }
-        }
-      }
-    );
-
-    expect(data.bsffs.edges.length).toBe(1);
-  });
-
   it("should filter on packagings numero", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsff1 = await createBsff(
@@ -310,197 +270,46 @@ describe("Query.bsffs", () => {
     ]);
   });
 
-  describe("when listing the BSFFs that are grouped into this one", () => {
-    let emitter: UserWithCompany;
-    let transporter: UserWithCompany;
-    let destination: UserWithCompany;
-    let previousBsff: Bsff;
-    let previousBsffFicheIntervention: BsffFicheIntervention;
+  it("should work with a nested _or filter", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff1 = await createBsff(
+      { emitter },
+      {
+        destinationCompanySiret: "00000000000000"
+      }
+    );
+    const bsff2 = await createBsff(
+      { emitter },
+      {
+        destinationCompanySiret: "11111111111111"
+      }
+    );
+    await createBsff(
+      { emitter },
+      {
+        destinationCompanySiret: "22222222222222"
+      }
+    );
 
-    beforeEach(async () => {
-      emitter = await userWithCompanyFactory(UserRole.ADMIN);
-      transporter = await userWithCompanyFactory(UserRole.ADMIN);
-      destination = await userWithCompanyFactory(UserRole.ADMIN);
-
-      const bsffId = getReadableId(ReadableIdPrefix.FF);
-      const ficheInterventionNumero = "00001";
-      previousBsff = await createBsffAfterOperation(
-        {
-          emitter,
-          transporter,
-          destination
-        },
-        {
-          id: bsffId,
-          destinationOperationCode: OPERATION.R12.code,
-          ficheInterventions: {
-            create: [
+    const { query } = makeClient(emitter.user);
+    const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
+      GET_BSFFS,
+      {
+        variables: {
+          where: {
+            _or: [
               {
-                numero: ficheInterventionNumero,
-                weight: 2,
-                postalCode: "69000",
-                detenteurCompanyName: "Acme",
-                detenteurCompanySiret: "3".repeat(14),
-                detenteurCompanyAddress: "12 rue Albert Lyon 69000",
-                detenteurCompanyContact: "Carla Brownie",
-                detenteurCompanyMail: "carla.brownie@gmail.com",
-                detenteurCompanyPhone: "06",
-                operateurCompanyName: "Clim'op",
-                operateurCompanySiret: "2".repeat(14),
-                operateurCompanyAddress: "12 rue Albert Lyon 69000",
-                operateurCompanyContact: "Dupont Jean",
-                operateurCompanyMail: "contact@climop.com",
-                operateurCompanyPhone: "06"
+                destination: { company: { siret: { _eq: "00000000000000" } } }
+              },
+              {
+                destination: { company: { siret: { _eq: "11111111111111" } } }
               }
             ]
           }
         }
-      );
-      previousBsffFicheIntervention =
-        await prisma.bsffFicheIntervention.findFirst({
-          where: { bsffs: { some: { id: { in: [previousBsff.id] } } } }
-        });
-    });
-
-    it("should list the grouping bsffs", async () => {
-      const bsff = await createBsff(
-        { emitter, transporter, destination },
-        { grouping: { connect: [{ id: previousBsff.id }] } }
-      );
-
-      const { query } = makeClient(emitter.user);
-      const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
-        GET_BSFFS
-      );
-
-      expect(data.bsffs.edges).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            node: expect.objectContaining({
-              id: bsff.id,
-              grouping: [
-                expect.objectContaining({
-                  id: previousBsff.id
-                })
-              ]
-            })
-          })
-        ])
-      );
-    });
-
-    it("should show the detenteur from the fiche d'interventions to companies on the bsff", async () => {
-      const bsff = await createBsff(
-        { emitter, transporter, destination },
-        { grouping: { connect: [{ id: previousBsff.id }] } }
-      );
-
-      const { query } = makeClient(destination.user);
-      const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
-        GET_BSFFS
-      );
-
-      expect(data.bsffs.edges).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            node: expect.objectContaining({
-              id: bsff.id,
-              grouping: [
-                expect.objectContaining({
-                  id: previousBsff.id,
-                  ficheInterventions: [
-                    expect.objectContaining({
-                      detenteur: expect.objectContaining({
-                        company: expect.objectContaining({
-                          siret:
-                            previousBsffFicheIntervention.detenteurCompanySiret
-                        })
-                      })
-                    })
-                  ]
-                })
-              ]
-            })
-          })
-        ])
-      );
-    });
-
-    it("should not show the detenteur from the fiche d'interventions to companies not on the bsff", async () => {
-      const newDestination = await userWithCompanyFactory(UserRole.ADMIN);
-
-      const bsff = await createBsff(
-        { emitter: destination, transporter, destination: newDestination },
-        { grouping: { connect: [{ id: previousBsff.id }] } }
-      );
-
-      const { query } = makeClient(newDestination.user);
-      const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
-        GET_BSFFS
-      );
-
-      expect(data.bsffs.edges).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({
-            node: expect.objectContaining({
-              id: bsff.id,
-              grouping: [
-                expect.objectContaining({
-                  id: previousBsff.id,
-                  ficheInterventions: [
-                    expect.objectContaining({
-                      detenteur: null
-                    })
-                  ]
-                })
-              ]
-            })
-          })
-        ])
-      );
-    });
-
-    it("should work with a nested _or filter", async () => {
-      const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-      const bsff1 = await createBsff(
-        { emitter },
-        {
-          destinationCompanySiret: "00000000000000"
-        }
-      );
-      const bsff2 = await createBsff(
-        { emitter },
-        {
-          destinationCompanySiret: "11111111111111"
-        }
-      );
-      await createBsff(
-        { emitter },
-        {
-          destinationCompanySiret: "22222222222222"
-        }
-      );
-
-      const { query } = makeClient(emitter.user);
-      const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
-        GET_BSFFS,
-        {
-          variables: {
-            where: {
-              _or: [
-                {
-                  destination: { company: { siret: { _eq: "00000000000000" } } }
-                },
-                {
-                  destination: { company: { siret: { _eq: "11111111111111" } } }
-                }
-              ]
-            }
-          }
-        }
-      );
-      const bsffIds = data.bsffs.edges.map(({ node }) => node.id);
-      expect(bsffIds).toEqual([bsff2.id, bsff1.id]);
-    });
+      }
+    );
+    const bsffIds = data.bsffs.edges.map(({ node }) => node.id);
+    expect(bsffIds).toEqual([bsff2.id, bsff1.id]);
   });
 });

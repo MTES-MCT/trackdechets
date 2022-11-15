@@ -2,7 +2,7 @@ import prisma from "../../../prisma";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { expandBsffFromDB } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { toPrismaWhereInput } from "../../where";
+import { toPrismaBsffWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { getConnection } from "../../../common/pagination";
 import { getCachedUserSiretOrVat } from "../../../common/redis/users";
@@ -25,7 +25,7 @@ const bsffs: QueryResolvers["bsffs"] = async (
   };
 
   const prismaWhere = {
-    ...(whereArgs ? toPrismaWhereInput(whereArgs) : {}),
+    ...(whereArgs ? toPrismaBsffWhereInput(whereArgs) : {}),
     isDeleted: false
   };
 

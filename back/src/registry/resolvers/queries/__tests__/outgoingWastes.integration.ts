@@ -144,14 +144,17 @@ describe("Outgoing wastes registry", () => {
       },
       {
         wasteCode: "14 06 01*",
-        destinationReceptionWeight: 200,
+
         createdAt: new Date("2021-08-01"),
         emitterEmissionSignatureDate: new Date("2021-08-01"),
         transporterTransportSignatureDate: new Date("2021-08-01"),
         transporterTransportTakenOverAt: new Date("2021-08-01"),
-        destinationReceptionDate: new Date("2021-08-01"),
-        destinationOperationSignatureDate: new Date("2021-08-01"),
-        destinationOperationCode: "R 2"
+        destinationReceptionDate: new Date("2021-08-01")
+      },
+      {
+        acceptationWeight: 200,
+        operationCode: "R2",
+        operationSignatureDate: new Date("2021-08-01")
       }
     );
 

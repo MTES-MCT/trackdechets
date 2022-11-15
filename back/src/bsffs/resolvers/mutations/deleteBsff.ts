@@ -1,11 +1,11 @@
 import { UserInputError } from "apollo-server-express";
-import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import * as elastic from "../../../common/elastic";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { expandBsffFromDB } from "../../converter";
 import { isBsffContributor } from "../../permissions";
 import { getBsffOrNotFound } from "../../database";
+import { runInTransaction } from "../../../common/repository/helper";
 
 const deleteBsff: MutationResolvers["deleteBsff"] = async (
   _,
@@ -22,16 +22,23 @@ const deleteBsff: MutationResolvers["deleteBsff"] = async (
     );
   }
 
-  const updatedBsff = await prisma.bsff.update({
-    data: {
-      isDeleted: true,
-      repackaging: { set: [] },
-      grouping: { set: [] },
-      forwarding: { disconnect: true }
-    },
-    where: {
-      id
-    }
+  const updatedBsff = await runInTransaction(async transaction => {
+    // disconnect previous packagings
+    await transaction.bsffPackaging.updateMany({
+      where: {
+        nextPackagingId: { in: existingBsff.packagings.map(p => p.id) }
+      },
+      data: { nextPackagingId: null }
+    });
+
+    return transaction.bsff.update({
+      where: {
+        id
+      },
+      data: {
+        isDeleted: true
+      }
+    });
   });
 
   await elastic.deleteBsd(updatedBsff, context);

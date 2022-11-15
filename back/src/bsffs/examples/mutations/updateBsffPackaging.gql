@@ -1,0 +1,11 @@
+mutation UpdateBsffPackaging($id: ID!, $input: UpdateBsffPackagingInput!) {
+  updateBsffPackaging(id: $id, input: $input) {
+    id
+    acceptation {
+      date
+    }
+    operation {
+      date
+    }
+  }
+}

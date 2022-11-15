@@ -2,6 +2,7 @@ import { Job } from "bull";
 import { toBsdElastic as toBsdaElastic } from "../../bsda/elastic";
 import { toBsdElastic as toBsdasriElastic } from "../../bsdasris/elastic";
 import { toBsdElastic as toBsvhuElastic } from "../../bsvhu/elastic";
+import { toBsdElastic as toBsffElastic } from "../../bsffs/elastic";
 import { BsdElastic, indexBsd } from "../../common/elastic";
 import { indexForm } from "../../forms/elastic";
 import prisma from "../../prisma";
@@ -64,5 +65,18 @@ export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
 
     return elasticBsvhu;
   }
+
+  if (bsdId.startsWith("FF-")) {
+    const bsff = await prisma.bsff.findUnique({
+      where: { id: bsdId },
+      include: { packagings: true }
+    });
+
+    const elasticBsff = toBsffElastic(bsff);
+    await indexBsd(elasticBsff);
+
+    return elasticBsff;
+  }
+
   throw new Error("Indexing this type of BSD is not handled by this worker.");
 }

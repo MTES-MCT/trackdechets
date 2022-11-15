@@ -62,8 +62,8 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
         await signBsff({
           variables: {
             id: bsff.id,
-            type: BsffSignatureType.Transport,
-            signature: {
+            input: {
+              type: BsffSignatureType.Transport,
               author: values.signatureAuthor,
               date: new Date().toISOString(),
             },

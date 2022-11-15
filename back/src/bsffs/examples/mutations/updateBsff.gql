@@ -1,0 +1,6 @@
+mutation UpdateBsff($id: ID!, $input: BsffInput!) {
+  updateBsff(id: $id, input: $input) {
+    id
+    status
+  }
+}

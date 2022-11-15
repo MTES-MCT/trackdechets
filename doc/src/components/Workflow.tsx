@@ -7,8 +7,8 @@ import { resolve } from "../utils";
 /**
  * Render line jumps
  */
-const lineBreaksToBr = text =>
-  text.split("\n").map(item => (
+const lineBreaksToBr = (text) =>
+  text.split("\n").map((item) => (
     <>
       {item}
       <br />
@@ -31,7 +31,9 @@ export default function Workflow({ path }) {
             {lineBreaksToBr(step.description)}
           </div>
           <div className="margin-bottom--lg">
-            <CodeBlock className="graphql">{step.mutation}</CodeBlock>
+            <CodeBlock className="graphql">
+              {step.mutation ?? step.query}
+            </CodeBlock>
             <CodeBlock className="json">{step.variables}</CodeBlock>
           </div>
         </div>

@@ -70,7 +70,10 @@ module.exports = {
                 "tutoriels/examples/bsdasri/groupement",
               ],
               BSVHU: ["tutoriels/examples/bsvhu/vhu-vers-broyeur"],
-              BSFF: ["tutoriels/examples/bsff/collecte-petites-quantites"],
+              BSFF: [
+                "tutoriels/examples/bsff/collecte-fluides-par-operateur",
+                "tutoriels/examples/bsff/groupement",
+              ],
               BSDA: [
                 "tutoriels/examples/bsda/collecte-chantier",
                 "tutoriels/examples/bsda/collecte-chantier-particulier",
@@ -105,7 +108,11 @@ module.exports = {
           ],
         },
         {
-          Statuts: ["reference/statuts/bsdd", "reference/statuts/bsdasri"],
+          Statuts: [
+            "reference/statuts/bsdd",
+            "reference/statuts/bsdasri",
+            "reference/statuts/bsff",
+          ],
         },
         "reference/multi-bsd",
         "reference/environments/environments",

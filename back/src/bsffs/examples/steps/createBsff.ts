@@ -2,31 +2,40 @@ import fixtures from "../fixtures";
 import { WorkflowStep } from "../../../common/workflow";
 import mutations from "../mutations";
 
-export function createBsff(
-  company: string,
-  { detenteur: detenteurId, numero }
-): WorkflowStep {
+export function createBsff(company: string): WorkflowStep {
   return {
-    description: `L'opérateur crée un BSFF en liant les fiches d'intervention`,
+    description: `L'opérateur crée un BSFF`,
     mutation: mutations.createBsff,
-    variables: ({ operateur, ...vars }) => {
-      const detenteur = vars[detenteurId];
+    variables: ({ operateur, transporteur, ttr, ficheInterventions }) => {
       return {
         input: {
-          weight: 1,
-          operateur: fixtures.operateurInput(operateur.siret),
-          detenteur: fixtures.detenteurInput(detenteur.siret),
-          numero,
-          postalCode: "13001"
+          type: "COLLECTE_PETITES_QUANTITES",
+          emitter: fixtures.operateurInput(operateur.siret),
+          packagings: [
+            { name: "Bouteille", volume: 1, numero: "1", weight: 1 }
+          ],
+          waste: {
+            code: "14 06 01*",
+            description: "R404A",
+            adr: "UN 1078, Gaz frigorifique NSA (Gaz réfrigérant, NSA), 2.2 (C/E)"
+          },
+          weight: {
+            value: 1,
+            isEstimate: true
+          },
+          transporter: fixtures.transporterInput(transporteur.siret),
+          destination: fixtures.ttrInput(ttr.siret),
+          ficheInterventions: ficheInterventions.map(fi => fi.id)
         }
       };
     },
-    expected: { numero },
-    data: response => response.createFicheInterventionBsff,
+    expected: { status: "INITIAL" },
+    data: response => response.createBsff,
     company,
     setContext: (ctx, data) => ({
       ...ctx,
-      ficheInterventions: [...(ctx.ficheInterventions ?? []), data]
+      bsff: data,
+      packagings: data.packagings
     })
   };
 }

@@ -9,13 +9,30 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- BSFF - ETQ installation de destination, je peux gérer l'acceptation et le traitement par contenant [PR 1739](https://github.com/MTES-MCT/trackdechets/pull/1739)
+- BSFF - ETQ installation de destination, je peux réceptionner et accepter en deux temps [PR 1739](https://github.com/MTES-MCT/trackdechets/pull/1739)
+- BSFF - ETQ installation de destination, je peux préciser le code déchet et la description du déchet après analyse [PR 1739](https://github.com/MTES-MCT/trackdechets/pull/1739)
+- BSFF - ETQ installation de destination,, je peux indiquer une rupture de traçabilité [PR 1739](https://github.com/MTES-MCT/trackdechets/pull/1739)
+- BSFF - ETQ qu'installation de destination, je peux effectuer un refus partiel par contenant [PR 1739](https://github.com/MTES-MCT/trackdechets/pull/1739)
+- BSFF - ETQ installation de TTR je peux indiquer une destination ultérieure prévue [PR 1739](https://github.com/MTES-MCT/trackdechets/pull/1739)
+- BSFF - ajout du CAP [PR 1739](https://github.com/MTES-MCT/trackdechets/pull/1739)
+
 #### :bug: Corrections de bugs
 
 - Cacher l'édition des champs d'adresse d'un transporteur FR, et corriger l'initialisation du pays d'un transporteur dans CompanySelector, et l'affiche dans l'item sélectionné dans la liste [PR 1846](https://github.com/MTES-MCT/trackdechets/pull/1846)
 - Résolution de l'erreur avec Bsdasri quand `transporterTransportMode` envoyé `None` [PR 1854](https://github.com/MTES-MCT/trackdechets/pull/1854)
 - Destination ultérieure prévue : il n'est pas possible de ne choisir ni SIRET ni nº de TVA intracom [PR 1853](https://github.com/MTES-MCT/trackdechets/pull/1846)
+- BSFF - Les BSFFs groupés / reconditionnés / réexpédiés ne passent pas en "traité" lorsqu'il y a eu plusieurs intermédiaires [PR 1739](https://github.com/MTES-MCT/trackdechets/pull/1739)
 
 #### :boom: Breaking changes
+
+- Breaking changes `BSFF` :
+  - Modification des paramètres de la mutation `signBsff`.
+  - Modification de l'input `BsffInput`
+    - Suppression des champs `acceptation` et `operation` de l'input `BsffDestinationInput`
+    - Les champs `forwarding`, `repackaging` et `grouping` font désormais référence à des identifiants de contenant.
+  - Ajout d'une mutation `updateBsffPackaging` permettant de renseigner les informations d'acceptation et d'opération sur un contenant en particulier.
+  - Ajout d'une query `bsffPackagings` permettant de lister les contenants présents sur les BSFFs de l'utilisateur connecté.
 
 #### :nail_care: Améliorations
 
@@ -35,8 +52,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
-- Correction d'un problème d'affichage sur le dashboard quand on sélectionne une autre entreprise  [PR 1820](https://github.com/MTES-MCT/trackdechets/pull/1820).
-- Correction d'un bug qui pouvait créer des bordereaux "fantômes" sur le tableau de bord  [PR 1798](https://github.com/MTES-MCT/trackdechets/pull/1798).
+- Correction d'un problème d'affichage sur le dashboard quand on sélectionne une autre entreprise [PR 1820](https://github.com/MTES-MCT/trackdechets/pull/1820).
+- Correction d'un bug qui pouvait créer des bordereaux "fantômes" sur le tableau de bord [PR 1798](https://github.com/MTES-MCT/trackdechets/pull/1798).
 - Correction d'un bug sur les quantités lorsqu'on groupe des bordereaux ayant eu un entreposage provisoire [PR 1810](https://github.com/MTES-MCT/trackdechets/pull/1810).
 
 #### :boom: Breaking changes
@@ -46,7 +63,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Assouplissement des prérogatives des éco-organismes [PR 1786](https://github.com/MTES-MCT/trackdechets/pull/1786)
 - Ajout d'un statut AWAITING_GROUP sur le BSDASRI [PR 1733](https://github.com/MTES-MCT/trackdechets/pull/1733).
 - Ajout d'une bannière pour mieux prendre en communiquer sur les coupures de service Trackdéchets [PR 1778](https://github.com/MTES-MCT/trackdechets/pull/1778).
-- Amélioration des performances sur tout ce qui touche aux annexes 2  [PR 1796](https://github.com/MTES-MCT/trackdechets/pull/1796).
+- Amélioration des performances sur tout ce qui touche aux annexes 2 [PR 1796](https://github.com/MTES-MCT/trackdechets/pull/1796).
 
 #### :memo: Documentation
 
