@@ -157,7 +157,7 @@ describe("Transported wastes registry", () => {
 
     await Promise.all([
       indexForm(await getFullForm(bsd1)),
-      indexBsda(bsd2),
+      indexBsda({ ...bsd2, intermediaries: [] }),
       indexBsdasri(bsd3),
       indexBsvhu(bsd4),
       indexBsff(bsd5)

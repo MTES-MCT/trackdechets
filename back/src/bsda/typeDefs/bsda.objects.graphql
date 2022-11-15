@@ -67,6 +67,13 @@ type Bsda {
 
   "Metadata associées au bordereau"
   metadata: BsdaMetadata!
+
+  """
+  Liste d'entreprises intermédiaires. Un intermédiaire est une entreprise qui prend part à la gestion du déchet,
+  mais pas à la responsabilité de la traçabilité (entreprise de travaux, bureau d'étude, maitre d'oeuvre,
+  collectivité, etc.) Il pourra lire ce bordereau, sans étape de signature.
+  """
+  intermediaries: [FormCompany!]
 }
 
 type InitialBsda {

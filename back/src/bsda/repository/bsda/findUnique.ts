@@ -1,16 +1,19 @@
-import { Bsda, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
-export type FindUniqueBsdaFn = (
+export type FindUniqueBsdaFn = <
+  Include extends Omit<Prisma.BsdaFindUniqueArgs, "where">
+>(
   where: Prisma.BsdaWhereUniqueInput,
-  options?: Omit<Prisma.BsdaFindUniqueArgs, "where">
-) => Promise<Bsda>;
+  options?: Include
+) => Promise<Prisma.BsdaGetPayload<Include>>;
 
 export function buildFindUniqueBsda({
   prisma
 }: ReadRepositoryFnDeps): FindUniqueBsdaFn {
-  return (where, options?) => {
+  return async <Include>(where, options?) => {
     const input = { where, ...options };
-    return prisma.bsda.findUnique(input);
+    const bsda = await prisma.bsda.findUnique(input);
+    return bsda as Prisma.BsdaGetPayload<Include>;
   };
 }

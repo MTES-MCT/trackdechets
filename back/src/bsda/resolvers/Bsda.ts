@@ -46,6 +46,13 @@ export const Bsda: BsdaResolvers = {
       .groupedIn();
     return groupedIn ? expandBsdaFromDb(groupedIn) : null;
   },
+  intermediaries: async bsda => {
+    const intermediaries = await getReadonlyBsdaRepository()
+      .findRelatedEntity({ id: bsda.id })
+      .intermediaries();
+
+    return intermediaries ?? null;
+  },
   metadata: bsda => {
     return {
       id: bsda.id,

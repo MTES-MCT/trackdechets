@@ -1314,6 +1314,7 @@ model Bsda {
   forwardedIn  Bsda?   @relation("BsdaForwarding")
 
   BsdaRevisionRequest BsdaRevisionRequest[]
+  intermediaries      IntermediaryBsdaAssociation[]
 
   // partial indices _BsdaIsDeletedIdx, _BsdaIsDraftIdx see migration82_missing_indices.sql
 
@@ -1388,6 +1389,24 @@ model BsdaRevisionRequestApproval {
 
   @@index([revisionRequestId], map: "_BsdaRevisionRequestApprovalRevisionRequestIdIdx")
   @@index([approverSiret], map: "_BsdaRevisionRequestApprovalApproverSiretIdx")
+}
+
+model IntermediaryBsdaAssociation {
+  id        String   @id @default(cuid())
+  bsdaId    String
+  name      String
+  siret     String
+  contact   String
+  vatNumber String?
+  address   String?
+  phone     String?
+  mail      String?
+  bsda      Bsda     @relation(fields: [bsdaId], references: [id])
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([bsdaId], map: "_IntermediaryBsdaAssociationBsdaIdIdx")
+  @@index([siret], map: "IntermediaryBsdaAssociationSiretIdx")
+  @@index([vatNumber], map: "IntermediaryBsdaAssociationVatNumberIdx")
 }
 
 model Event {

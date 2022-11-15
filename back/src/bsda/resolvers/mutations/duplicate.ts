@@ -1,4 +1,9 @@
-import { Bsda, BsdaStatus } from "@prisma/client";
+import {
+  Bsda,
+  BsdaStatus,
+  IntermediaryBsdaAssociation,
+  Prisma
+} from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { MutationDuplicateBsdaArgs } from "../../../generated/graphql/types";
@@ -14,21 +19,23 @@ export default async function duplicate(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const prismaForm = await getBsdaOrNotFound(id);
+  const prismaBsda = await getBsdaOrNotFound(id, {
+    include: { intermediaries: true }
+  });
 
   await checkIsBsdaContributor(
     user,
-    prismaForm,
+    prismaBsda,
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  const data = duplicateForm(prismaForm);
+  const data = duplicateBsda(prismaBsda);
   const newBsda = await getBsdaRepository(user).create(data);
 
   return expandBsdaFromDb(newBsda);
 }
 
-function duplicateForm({
+function duplicateBsda({
   id,
   createdAt,
   updatedAt,
@@ -55,12 +62,30 @@ function duplicateForm({
   wasteSealNumbers,
   forwardingId,
   groupedInId,
+  intermediaries,
   ...rest
-}: Bsda) {
+}: Bsda & {
+  intermediaries: IntermediaryBsdaAssociation[];
+}): Prisma.BsdaCreateInput {
   return {
     ...rest,
     id: getReadableId(ReadableIdPrefix.BSDA),
     status: BsdaStatus.INITIAL,
-    isDraft: true
+    isDraft: true,
+    ...(intermediaries && {
+      intermediaries: {
+        createMany: {
+          data: intermediaries.map(intermediary => ({
+            siret: intermediary.siret,
+            address: intermediary.address,
+            vatNumber: intermediary.vatNumber,
+            name: intermediary.name,
+            contact: intermediary.contact,
+            phone: intermediary.phone,
+            mail: intermediary.mail
+          }))
+        }
+      }
+    })
   };
 }

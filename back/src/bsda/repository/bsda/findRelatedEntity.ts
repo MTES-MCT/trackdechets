@@ -3,7 +3,7 @@ import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 type ChainableBsda = Pick<
   Prisma.Prisma__BsdaClient<Bsda>,
-  "forwardedIn" | "forwarding" | "groupedIn" | "grouping"
+  "forwardedIn" | "forwarding" | "groupedIn" | "grouping" | "intermediaries"
 >;
 
 export type FindRelatedEntityFn = (

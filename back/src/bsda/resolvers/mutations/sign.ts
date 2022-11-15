@@ -55,19 +55,23 @@ export default async function sign(
   checkBsdaTypeSpecificRules(bsda, input);
 
   // Check that all necessary fields are filled
-  await validateBsda(bsda, [], {
-    skipPreviousBsdas: true,
-    emissionSignature:
-      bsda.emitterEmissionSignatureDate != null || input.type === "EMISSION",
-    workSignature:
-      bsda.workerWorkSignatureDate != null || input.type === "WORK",
-    transportSignature:
-      bsda.transporterTransportSignatureDate != null ||
-      input.type === "TRANSPORT",
-    operationSignature:
-      bsda.destinationOperationSignatureDate != null ||
-      input.type === "OPERATION"
-  });
+  await validateBsda(
+    bsda,
+    { previousBsdas: [], intermediaries: [] },
+    {
+      skipPreviousBsdas: true,
+      emissionSignature:
+        bsda.emitterEmissionSignatureDate != null || input.type === "EMISSION",
+      workSignature:
+        bsda.workerWorkSignatureDate != null || input.type === "WORK",
+      transportSignature:
+        bsda.transporterTransportSignatureDate != null ||
+        input.type === "TRANSPORT",
+      operationSignature:
+        bsda.destinationOperationSignatureDate != null ||
+        input.type === "OPERATION"
+    }
+  );
 
   const { value: newStatus } = machine.transition(bsda.status, {
     type: input.type,

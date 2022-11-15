@@ -100,7 +100,10 @@ describe("Managed wastes registry", () => {
       }
     });
 
-    await Promise.all([indexForm(await getFullForm(bsd1)), indexBsda(bsd2)]);
+    await Promise.all([
+      indexForm(await getFullForm(bsd1)),
+      indexBsda({ ...bsd2, intermediaries: [] })
+    ]);
     await refreshElasticSearch();
   });
   afterAll(resetDatabase);

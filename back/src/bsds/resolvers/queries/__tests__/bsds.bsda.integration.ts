@@ -943,7 +943,7 @@ describe("Query.bsds.bsdas mutations", () => {
       }
     });
 
-    await indexBsda(bsda);
+    await indexBsda({ ...bsda, intermediaries: [] });
     await refreshElasticSearch();
 
     const { query } = makeClient(emitter.user);
@@ -992,7 +992,7 @@ describe("Query.bsds.bsdas mutations", () => {
         emitterCompanySiret: emitter.company.siret
       }
     });
-    await indexBsda(bsda);
+    await indexBsda({ ...bsda, intermediaries: [] });
 
     // duplicate bsda
     const { mutate } = makeClient(emitter.user);
