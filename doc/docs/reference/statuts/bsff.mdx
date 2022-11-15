@@ -1,0 +1,48 @@
+---
+title: BSFF
+---
+
+import Mermaid from "../../../src/components/Mermaid";
+
+Au cours de son cycle de vie, le BSFF passe par différents statuts décrits [ici](../api-reference/bsff/enums#bsffstatus).
+
+Le diagramme ci dessous retrace le cycle de vie d'un BSFF dans Trackdéchets:
+
+<Mermaid
+  chart={`
+graph TD
+AO(NO STATE) -->|createDraftBsff| A
+AO(NO STATE) -->|createBsff| B
+A -->|"updateBsff (tous les champs)"| A
+B -->|"updateBsff (tous les champs)"| B
+C-->|"updateBsff (sauf champs signés)"| C
+D-->|"updateBsff (sauf champs signés)"| D
+E-->|"updateBsffPackaging"| E
+F-->|"updateBsffPackaging"| F
+L-->|"updateBsffPackaging"| L
+A["INITIAL (isDraft=true)"] -->|publishBsff| B("INITIAL (isDraft=false)")
+B -->|"signBsff (EMISSION / EMISSION_WITH_SECRET_CODE)"| C(SIGNED_BY_PRODUCER)
+C -->|"signBsff (TRANSPORT)"| D(SENT)
+D -->|"signBsff (RECEPTION)"| E(RECEIVED)
+E -->|"signBsff (ACCEPTATION)"| F(ACCEPTED)
+E -->|"signBsff (ACCEPTATION)"| J(REFUSED)
+E -->|"signBsff (ACCEPTATION)"| L(PARTIALLY_REFUSED)
+F -->|"signBsff (OPERATION)"| G(PROCESSED)
+F -->|"signBsff (OPERATION)"| K(INTERMEDIATELY_PROCESSED)
+L -->|"signBsff (OPERATION)"| G(PROCESSED)
+L -->|"signBsff (OPERATION)"| K(INTERMEDIATELY_PROCESSED)
+`}
+/>
+
+### En cas de regroupement, reconditionnement ou réexpedition
+
+Un BSFF reste au statut `INTERMEDIATELY_PROCESSED` tant que le contenu de l'ensemble de ses contenants n'ont pas
+subi un traitement final ou un refus ultérieur.
+
+<Mermaid
+  chart={`
+graph TD
+K(INTERMEDIATELY_PROCESSED) -->|"signBsff (OPERATION) sur un BSFF ultérieur"| G(PROCESSED)
+K -->|"signBsff (ACCEPTATION) sur un BSFF ultérieur"| J(REFUSED)
+`}
+/>

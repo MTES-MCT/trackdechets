@@ -108,7 +108,11 @@ module.exports = {
           ],
         },
         {
-          Statuts: ["reference/statuts/bsdd", "reference/statuts/bsdasri"],
+          Statuts: [
+            "reference/statuts/bsdd",
+            "reference/statuts/bsdasri",
+            "reference/statuts/bsff",
+          ],
         },
         "reference/multi-bsd",
         "reference/environments/environments",

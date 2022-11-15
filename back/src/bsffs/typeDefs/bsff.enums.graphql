@@ -17,14 +17,14 @@ enum BsffType {
 
 "Statut qui résume là où en est le BSFF dans son parcours."
 enum BsffStatus {
-  "Le bordereau ne comporte aucune signature."
+  "Statut initial à la création d'un BSFF. Le BSFF ne comporte aucune signature."
   INITIAL
-  "Le bordereau a été signé par l'émetteur."
+  "Le BSFF a été signé par l'émetteur."
   SIGNED_BY_EMITTER
-  "Le bordereau a été signé par le transporteur."
+  "Le BSFF a été signé par le transporteur."
   SENT
   """
-  Le BSFF a été reçu par l'installation de destination. Les contenants sont en attente d'acceptation
+  Le BSFF a été réceptionné par l'installation de destination. Les contenants sont en attente d'acceptation
   ou de refus.
   """
   RECEIVED
@@ -32,15 +32,15 @@ enum BsffStatus {
   ACCEPTED
   "Tous les contenants du BSFF ont été refusés."
   REFUSED
-  "Une partie des contenants a été refusée, l'autre partie acceptée. Les contenants acceptées n'ont pas encore été traités."
+  "Une partie des contenants a été refusée, l'autre partie acceptée. Les contenants acceptés n'ont pas encore été traités."
   PARTIALLY_REFUSED
   """
   Une partie des contenants acceptés présents sur le BSFF ont subi un groupement, reconditionnement ou un entreposage provisoire
-  et sont attente d'un traitement final (régénération, recyclage ou destruction). Les autres contenants
-  ont été régénérés, recyclés ou détruits.
+  et sont attente d'un traitement final (régénération ou destruction). Les autres contenants acceptés
+  ont subi un traitement final.
   """
   INTERMEDIATELY_PROCESSED
-  "Tous les fluides des contenants acceptés présents sur le BSFF ont été régénérés, recyclés ou détruits"
+  "Tous les fluides des contenants acceptés présents sur le BSFF ont subi un traitement final (régénération ou destruction)"
   PROCESSED
 }
 

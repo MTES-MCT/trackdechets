@@ -119,6 +119,7 @@ export async function createBsff(
 ) {
   const flatInput: Prisma.BsffCreateInput = {
     id: getReadableId(ReadableIdPrefix.FF),
+    isDraft: false,
     ...flattenBsffInput(input),
     ...additionalData
   };
