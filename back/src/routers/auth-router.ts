@@ -4,6 +4,7 @@ import querystring from "querystring";
 import { ADMIN_IS_PERSONIFYING } from "../auth";
 import nocache from "../common/middlewares/nocache";
 import { rateLimiterMiddleware } from "../common/middlewares/rateLimiter";
+import { sess } from "../server";
 import { getUIBaseURL, sanitizeEmail } from "../utils";
 
 const UI_BASE_URL = getUIBaseURL();
@@ -64,6 +65,8 @@ authRouter.post("/logout", (req, res, next) => {
     if (err) {
       return next(err);
     }
-    res.redirect(`${UI_BASE_URL}`);
+    res
+      .clearCookie(sess.name, { domain: sess.cookie.domain, path: "/" })
+      .redirect(`${UI_BASE_URL}`);
   });
 });
