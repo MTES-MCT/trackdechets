@@ -10,7 +10,7 @@ if (STARTUP_FILE && STARTUP_FILE !== "dist/src/index.js") {
       "Starting reindexAllInBulk with --dev bypassing api deployment protection"
     );
   } else {
-    logger.info(
+    logger.error(
       "Abort reindexAllInBulk: not in a TD api deployment ($STARTUP_FILE is not targeting the api server index.js)"
     );
     process.exit(0);
@@ -46,6 +46,7 @@ async function exitScript() {
       });
     }
   } catch (error) {
+    logger.error("Error in reindexAllInBulk script, exiting", error);
     throw new Error(`Error in reindexAllInBulk script : ${error}`);
   } finally {
     await exitScript();
