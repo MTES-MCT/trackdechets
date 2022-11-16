@@ -23,6 +23,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Résolution de l'erreur avec Bsdasri quand `transporterTransportMode` envoyé `None` [PR 1854](https://github.com/MTES-MCT/trackdechets/pull/1854)
 - Destination ultérieure prévue : il n'est pas possible de ne choisir ni SIRET ni nº de TVA intracom [PR 1853](https://github.com/MTES-MCT/trackdechets/pull/1846)
 - BSFF - Les BSFFs groupés / reconditionnés / réexpédiés ne passent pas en "traité" lorsqu'il y a eu plusieurs intermédiaires [PR 1739](https://github.com/MTES-MCT/trackdechets/pull/1739)
+- BSDD - Correction de l'affichage de la modale de réception après un refus [PR 1865](https://github.com/MTES-MCT/trackdechets/pull/1865)
 
 #### :boom: Breaking changes
 
