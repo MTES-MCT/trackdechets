@@ -4,7 +4,6 @@ import querystring from "querystring";
 import { ADMIN_IS_PERSONIFYING } from "../auth";
 import nocache from "../common/middlewares/nocache";
 import { rateLimiterMiddleware } from "../common/middlewares/rateLimiter";
-import { sess } from "../server";
 import { getUIBaseURL, sanitizeEmail } from "../utils";
 
 const UI_BASE_URL = getUIBaseURL();
@@ -60,14 +59,12 @@ authRouter.get("/isAuthenticated", nocache, (req, res) => {
   return res.json({ isAuthenticated: req.isAuthenticated() });
 });
 
-authRouter.post("/logout", (req, res) => {
-  req.logout();
-  req.session.destroy(() => {
-    res
-      .clearCookie(sess.name, {
-        domain: sess.cookie.domain,
-        path: "/"
-      })
-      .redirect(`${UI_BASE_URL}`);
+authRouter.post("/logout", (req, res, next) => {
+  req.logout(err => {
+    if (err) {
+      return next(err);
+    }
+
+    res.redirect(UI_BASE_URL);
   });
 });
