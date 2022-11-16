@@ -7,12 +7,23 @@ import { renderMail } from "../../../mailer/templates/renderers";
 import { createPasswordResetRequest } from "../../../mailer/templates";
 import { sanitizeEmail } from "../../../utils";
 import { addHours } from "date-fns";
+import { checkCaptcha } from "../../../captchaGen";
 
+import { UserInputError } from "apollo-server-core";
 const createPasswordResetRequestResolver: MutationResolvers["createPasswordResetRequest"] =
-  async (parent, { email }) => {
+  async (parent, { email, captchaInput }) => {
     const user = await prisma.user.findUnique({
       where: { email: sanitizeEmail(email) }
     });
+
+    const captchaIsValid = await checkCaptcha(
+      captchaInput.value,
+      captchaInput.token
+    );
+
+    if (!captchaIsValid) {
+      throw new UserInputError("Le test anti robots est incorrect");
+    }
     if (!user) {
       // for security reason, do not leak  any clue
       return true;

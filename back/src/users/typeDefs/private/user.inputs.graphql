@@ -16,3 +16,8 @@ input CreateAccessTokenInput {
   "Note personnelle pour se souvenir à quoi ce token va servir"
   description: String!
 }
+
+input CaptchaInput {
+  value: String!
+  token: String!
+}

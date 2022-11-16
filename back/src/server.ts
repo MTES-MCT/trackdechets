@@ -42,6 +42,7 @@ import { resolvers, typeDefs } from "./schema";
 import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
+import { captchaGen } from "./captchaGen";
 
 const {
   SESSION_SECRET,
@@ -175,7 +176,7 @@ app.use(
   graphQLPath,
   graphqlRateLimiterMiddleware("createPasswordResetRequest", {
     windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
-    maxRequestsPerWindow: 1
+    maxRequestsPerWindow: 3 // 3 requests each minute (captcha)
   })
 );
 
@@ -286,6 +287,8 @@ app.get("/ping", (_, res) => res.send("Pong!"));
 app.get("/ip", (req, res) => {
   return res.send(`IP: ${req.ip} | XFF: ${req.get("X-Forwarded-For")}`);
 });
+
+app.get("/captcha", (_, res) => captchaGen(res));
 
 app.get("/userActivation", userActivationHandler);
 app.get("/download", downloadRouter);

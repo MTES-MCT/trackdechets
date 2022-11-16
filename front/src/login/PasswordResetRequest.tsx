@@ -1,10 +1,10 @@
 import { useMutation, gql } from "@apollo/client";
-import React, { useState, createRef } from "react";
+import React, { useState } from "react";
 import {
   Mutation,
   MutationCreatePasswordResetRequestArgs,
 } from "generated/graphql/types";
-
+import Loader from "common/components/Loaders";
 import {
   Container,
   Row,
@@ -15,40 +15,53 @@ import {
   Button,
   Alert,
 } from "@dataesr/react-dsfr";
+import { Captcha, useCaptcha } from "common/components/captcha";
+
 import styles from "./Login.module.scss";
 
 const RESET_PASSWORD = gql`
-  mutation CreatePasswordResetRequest($email: String!) {
-    createPasswordResetRequest(email: $email)
+  mutation CreatePasswordResetRequest(
+    $email: String!
+    $captchaInput: CaptchaInput!
+  ) {
+    createPasswordResetRequest(email: $email, captchaInput: $captchaInput)
   }
 `;
 
 export default function PasswordResetRequest() {
-  const [submittable, setSubmittable] = useState(false);
-
+  const [email, setEmail] = useState("");
+  const [captchaInput, setCaptchaInput] = useState("");
   const [createPasswordResetRequest, { data, error }] =
     useMutation<
       Pick<Mutation, "createPasswordResetRequest">,
       MutationCreatePasswordResetRequestArgs
     >(RESET_PASSWORD);
-
-  const emailRef = createRef<HTMLInputElement>();
+  const { captchaLoading, captchaError, captchaData, refetchCaptcha } =
+    useCaptcha(true);
 
   const handleSubmit = event => {
     event.preventDefault();
 
-    const email = emailRef.current?.value || "";
-    createPasswordResetRequest({ variables: { email } });
-  };
+    createPasswordResetRequest({
+      variables: {
+        email,
+        captchaInput: { token: captchaData?.token ?? "", value: captchaInput },
+      },
 
-  const onChange = () => {
-    const formFilled = !!emailRef.current?.value;
-
-    setSubmittable(formFilled);
+      onError: () => {
+        setCaptchaInput("");
+        refetchCaptcha();
+      },
+      onCompleted: () => {
+        setCaptchaInput("");
+        refetchCaptcha();
+        setEmail("");
+      },
+    });
   };
 
   const errorMessage = error?.networkError
-    ? "Vous avez dépassé votre quota. Veuillez réessayer dans une minute."
+    ? "Vous avez dépassé votre quota. Veuillez réessayer dans quelques minutes."
     : error?.message;
 
   const errorAlert = error?.message ? (
@@ -67,6 +80,21 @@ export default function PasswordResetRequest() {
     </Row>
   ) : null;
 
+  if (captchaLoading) {
+    return <Loader />;
+  }
+  if (captchaError) {
+    return (
+      <Row spacing="mb-2w">
+        <Alert
+          title="Erreur"
+          description="Une erreur est survenue, veuillez rafraîchir la page"
+          type="error"
+        />
+      </Row>
+    );
+  }
+
   return (
     <div className={styles.onboardingWrapper}>
       <form onSubmit={handleSubmit}>
@@ -76,6 +104,7 @@ export default function PasswordResetRequest() {
         >
           {successAlert}
           {errorAlert}
+
           <Row justifyContent="center" spacing="mb-2w">
             <Col spacing="m-auto">
               <Title as="h1" look="h3" spacing="mb-3w">
@@ -87,16 +116,25 @@ export default function PasswordResetRequest() {
               </Text>
               <TextInput
                 // @ts-ignore
-                ref={emailRef}
                 name="email"
-                onChange={onChange}
+                value={email}
+                onChange={e => setEmail(e.target.value)}
                 required
               />
             </Col>
           </Row>
+          <Captcha
+            setCaptchaInput={setCaptchaInput}
+            captchaImg={captchaData?.img}
+            captchaInput={captchaInput}
+          />
           <Row justifyContent="right">
             <Col className={styles.resetFlexCol}>
-              <Button disabled={!submittable} size="md" onClick={handleSubmit}>
+              <Button
+                disabled={!email || !captchaInput}
+                size="md"
+                onClick={handleSubmit}
+              >
                 Réinitialiser
               </Button>
             </Col>

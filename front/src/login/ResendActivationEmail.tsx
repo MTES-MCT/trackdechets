@@ -1,9 +1,11 @@
 import { useMutation, gql } from "@apollo/client";
-import React, { useState, createRef } from "react";
+import React, { useState } from "react";
 import {
   Mutation,
   MutationResendActivationEmailArgs,
 } from "generated/graphql/types";
+import Loader from "common/components/Loaders";
+import { Captcha, useCaptcha } from "common/components/captcha";
 
 import {
   Container,
@@ -18,32 +20,43 @@ import {
 import styles from "./Login.module.scss";
 
 const RESEND_ACTIVATION_EMAIL = gql`
-  mutation ResendActivationEmail($email: String!) {
-    resendActivationEmail(email: $email)
+  mutation ResendActivationEmail(
+    $email: String!
+    $captchaInput: CaptchaInput!
+  ) {
+    resendActivationEmail(email: $email, captchaInput: $captchaInput)
   }
 `;
 
 export default function ResendActivationEmail() {
-  const [submittable, setSubmittable] = useState(false);
+  const [email, setEmail] = useState("");
+  const [captchaInput, setCaptchaInput] = useState("");
 
   const [resendActivationEmail, { data, error }] = useMutation<
     Pick<Mutation, "resendActivationEmail">,
     MutationResendActivationEmailArgs
   >(RESEND_ACTIVATION_EMAIL);
-
-  const emailRef = createRef<HTMLInputElement>();
+  const { captchaLoading, captchaError, captchaData, refetchCaptcha } =
+    useCaptcha(true);
 
   const handleSubmit = event => {
     event.preventDefault();
 
-    const email = emailRef.current?.value || "";
-    resendActivationEmail({ variables: { email } });
-  };
-
-  const onChange = () => {
-    const formFilled = !!emailRef.current?.value;
-
-    setSubmittable(formFilled);
+    resendActivationEmail({
+      variables: {
+        email,
+        captchaInput: { token: captchaData?.token ?? "", value: captchaInput },
+      },
+      onError: () => {
+        setCaptchaInput("");
+        refetchCaptcha();
+      },
+      onCompleted: () => {
+        setCaptchaInput("");
+        refetchCaptcha();
+        setEmail("");
+      },
+    });
   };
 
   const errorAlert = error?.message ? (
@@ -61,6 +74,21 @@ export default function ResendActivationEmail() {
       />
     </Row>
   ) : null;
+
+  if (captchaLoading) {
+    return <Loader />;
+  }
+  if (captchaError) {
+    return (
+      <Row spacing="mb-2w">
+        <Alert
+          title="Erreur"
+          description="Une erreur est survenue, veuillez rafraîchir la page"
+          type="error"
+        />
+      </Row>
+    );
+  }
 
   return (
     <div className={styles.onboardingWrapper}>
@@ -83,16 +111,27 @@ export default function ResendActivationEmail() {
               </Text>
               <TextInput
                 // @ts-ignore
-                ref={emailRef}
                 name="email"
-                onChange={onChange}
                 required
+                value={email}
+                onChange={e => setEmail(e.target.value)}
               />
             </Col>
           </Row>
+
+          <Captcha
+            setCaptchaInput={setCaptchaInput}
+            captchaImg={captchaData?.img}
+            captchaInput={captchaInput}
+          />
+
           <Row justifyContent="right">
             <Col className={styles.resetFlexCol}>
-              <Button disabled={!submittable} size="md" onClick={handleSubmit}>
+              <Button
+                disabled={!email || !captchaInput}
+                size="md"
+                onClick={handleSubmit}
+              >
                 Renvoyer l'email
               </Button>
             </Col>
