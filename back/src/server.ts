@@ -70,6 +70,7 @@ export const server = new ApolloServer({
   introspection: true, // used to enable the playground in production
   validationRules: [depthLimit(10)],
   csrfPrevention: true, // To prevent "simple requests". See https://www.apollographql.com/docs/apollo-server/security/cors/#preventing-cross-site-request-forgery-csrf
+  cache: "bounded", // Apollo Server's default caching features use an unbounded cache, which is not safe for production use
   context: async ctx => {
     return {
       ...ctx,
