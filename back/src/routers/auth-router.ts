@@ -65,8 +65,7 @@ authRouter.post("/logout", (req, res, next) => {
     if (err) {
       return next(err);
     }
-    res
-      .clearCookie(sess.name, { domain: sess.cookie.domain, path: "/" })
-      .redirect(`${UI_BASE_URL}`);
+
+    res.redirect(UI_BASE_URL);
   });
 });
