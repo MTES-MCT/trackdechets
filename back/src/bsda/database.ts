@@ -7,7 +7,7 @@ export async function getBsdaOrNotFound<Include extends Prisma.BsdaInclude>(
   { include }: { include?: Include } = {}
 ) {
   const bsda = await getReadonlyBsdaRepository().findUnique<{
-    include?: Include;
+    include: Include;
   }>({ id }, { include });
 
   if (bsda == null || bsda.isDeleted) {
