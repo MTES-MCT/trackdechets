@@ -1,7 +1,7 @@
-import { client, makeSoapClient } from "../vies/searchVat";
-import { ErrorCode } from "../../../common/errors";
+import { client, makeSoapClient } from "../client";
+import { ErrorCode } from "../../../../common/errors";
 
-describe("searchVat client", () => {
+describe("Vat search VIES client", () => {
   const checkVatAsyncMock = jest.fn();
   const makeSoapClientTest = jest.fn();
   makeSoapClientTest.mockResolvedValue({
@@ -9,7 +9,7 @@ describe("searchVat client", () => {
   });
   const createClientTest = makeSoapClient(makeSoapClientTest);
 
-  jest.mock("../vies/searchVat", () => ({
+  jest.mock("../client", () => ({
     makeSoapClient: makeSoapClientTest
   }));
 
@@ -22,20 +22,20 @@ describe("searchVat client", () => {
     expect.assertions(4);
     // uppercase
     try {
-      await client("TT1234", createClientTest);
+      await client("TT12345678910", createClientTest);
     } catch (e) {
       expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
       expect(e.message).toBe(
-        "Le code pays du numéro de TVA intracommunautaire n'est pas valide, veuillez utiliser un code pays ISO à 2 lettres"
+        "Le code pays du numéro de TVA n'est pas valide, veuillez utiliser un code pays intra-communautaire ISO à 2 lettres"
       );
     }
     // lower case
     try {
-      await client("zx1234", createClientTest);
+      await client("tt12345678910", createClientTest);
     } catch (e) {
       expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
       expect(e.message).toBe(
-        "Le code pays du numéro de TVA intracommunautaire n'est pas valide, veuillez utiliser un code pays ISO à 2 lettres"
+        "Le code pays du numéro de TVA n'est pas valide, veuillez utiliser un code pays intra-communautaire ISO à 2 lettres"
       );
     }
   });
@@ -84,5 +84,30 @@ describe("searchVat client", () => {
     checkVatAsyncMock.mockResolvedValueOnce([testValue]);
     const res = await client("IT09301420155", createClientTest);
     expect(res).toStrictEqual(testValue);
+  });
+
+  it(`should throw EXTERNAL_SERVICE_ERROR if
+  the VIES Server returns an unavailibility error`, async () => {
+    expect.assertions(2);
+    checkVatAsyncMock.mockRejectedValueOnce({
+      root: {
+        Envelope: {
+          Body: {
+            Fault: {
+              faultstring: "SERVICE_UNAVAILABLE",
+              faultcode: 500
+            }
+          }
+        }
+      }
+    });
+    try {
+      await client("IT09301420155", createClientTest);
+    } catch (e) {
+      expect(e.extensions.code).toEqual(ErrorCode.EXTERNAL_SERVICE_ERROR);
+      expect(e.message).toBe(
+        "Le service de recherche par TVA de la commission européenne (VIES) est indisponible, veuillez réessayer dans quelques minutes (code erreur VIES: 500 SERVICE_UNAVAILABLE)"
+      );
+    }
   });
 });

@@ -127,7 +127,7 @@ export default function CompanySelector({
 
   /**
    * CompanyPrivateInfos pour completer les informations
-   * initialement enregistrées dans le BSD
+   * de la Company courante enregistrée dans le BSD à son ouverture
    */
   const { data: selectedData } = useQuery<
     Pick<Query, "companyPrivateInfos">,
