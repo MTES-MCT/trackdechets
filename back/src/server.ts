@@ -25,12 +25,14 @@ import { graphqlRateLimiterMiddleware } from "./common/middlewares/graphqlRateli
 import { graphqlRegenerateSessionMiddleware } from "./common/middlewares/graphqlRegenerateSession";
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
 import { rateLimiterMiddleware } from "./common/middlewares/rateLimiter";
+import { timeoutMiddleware } from "./common/middlewares/timeout";
 import { graphiqlLandingPagePlugin } from "./common/plugins/graphiql";
 import sentryReporter from "./common/plugins/sentryReporter";
 import { redisClient } from "./common/redis";
 import { initSentry } from "./common/sentry";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
 import { createFormDataLoaders } from "./forms/dataloader";
+import { heapSnapshotToS3Router } from "./logging/heapSnapshot";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
@@ -40,7 +42,6 @@ import { resolvers, typeDefs } from "./schema";
 import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
-import { heapSnapshotToS3Router } from "./logging/heapSnapshot";
 
 const {
   SESSION_SECRET,
@@ -185,6 +186,8 @@ app.use(
 
 // logging middleware
 app.use(loggingMiddleware(graphQLPath));
+
+app.use(graphQLPath, timeoutMiddleware());
 
 /**
  * Set the following headers for cross-domain cookie
