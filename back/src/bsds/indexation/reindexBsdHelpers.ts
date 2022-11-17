@@ -17,7 +17,8 @@ export async function reindex(bsdId, exitFn) {
       {
         include: {
           forwardedIn: { select: { id: true } },
-          groupedIn: { select: { id: true } }
+          groupedIn: { select: { id: true } },
+          intermediaries: true
         }
       }
     );

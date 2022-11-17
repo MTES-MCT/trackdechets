@@ -26,6 +26,9 @@ mutation CreateBsda($input: BsdaInput!) {
         plates
       }
     }
+    intermediaries {
+      siret
+    }
   }
 }
 `;
@@ -834,5 +837,265 @@ describe("Mutation.Bsda.create", () => {
     });
 
     expect(data.createBsda.id).toBeDefined();
+  });
+
+  it("should allow creating the bsda with intermediaries", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: intermediaryCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const input: BsdaInput = {
+      emitter: {
+        isPrivateIndividual: false,
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      worker: {
+        company: {
+          siret: "22222222222222",
+          name: "worker",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      waste: {
+        code: "06 07 01*",
+        adr: "ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      intermediaries: [
+        {
+          siret: intermediaryCompany.siret,
+          name: intermediaryCompany.name,
+          address: intermediaryCompany.address,
+          contact: "John Doe"
+        }
+      ]
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(data.createBsda.id).toBeDefined();
+    expect(data.createBsda.intermediaries.length).toBe(1);
+  });
+
+  it("should fail if creating a bsda with the same intermediary several times", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: intermediaryCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const input: BsdaInput = {
+      emitter: {
+        isPrivateIndividual: false,
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      worker: {
+        company: {
+          siret: "22222222222222",
+          name: "worker",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      waste: {
+        code: "06 07 01*",
+        adr: "ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      intermediaries: [
+        {
+          siret: intermediaryCompany.siret,
+          name: intermediaryCompany.name,
+          address: intermediaryCompany.address,
+          contact: "John Doe"
+        },
+        {
+          siret: intermediaryCompany.siret,
+          name: intermediaryCompany.name,
+          address: intermediaryCompany.address,
+          contact: "John Doe"
+        }
+      ]
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      "Intermédiaires: impossible d'ajouter le même établissement en intermédiaire plusieurs fois"
+    );
+  });
+
+  it("should fail if creating a bsda with more than 3 intermediaries", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: intermediaryCompany1 } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { company: intermediaryCompany2 } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { company: intermediaryCompany3 } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { company: intermediaryCompany4 } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const input: BsdaInput = {
+      emitter: {
+        isPrivateIndividual: false,
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      worker: {
+        company: {
+          siret: "22222222222222",
+          name: "worker",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      waste: {
+        code: "06 07 01*",
+        adr: "ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      intermediaries: [
+        {
+          siret: intermediaryCompany1.siret,
+          name: intermediaryCompany1.name,
+          address: intermediaryCompany1.address,
+          contact: "John Doe"
+        },
+        {
+          siret: intermediaryCompany2.siret,
+          name: intermediaryCompany2.name,
+          address: intermediaryCompany2.address,
+          contact: "John Doe"
+        },
+        {
+          siret: intermediaryCompany3.siret,
+          name: intermediaryCompany3.name,
+          address: intermediaryCompany3.address,
+          contact: "John Doe"
+        },
+        {
+          siret: intermediaryCompany4.siret,
+          name: intermediaryCompany4.name,
+          address: intermediaryCompany4.address,
+          contact: "John Doe"
+        }
+      ]
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires sur un BSDA"
+    );
   });
 });

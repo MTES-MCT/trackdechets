@@ -31,14 +31,17 @@ type Bsff {
   status: BsffStatus!
 
   """
-  Émetteur du déchet, qui n'est pas nécessairement le producteur.
-  Il s'agit par exemple de l'opérateur ayant collecté des fluides lors d'interventions,
-  ou alors d'une installation de collecte qui procède à la réexpédition pour traitement final.
+  Émetteur du déchet. En fonction de la valeur du champ `type` il peut s'agir :
+  - d'un opérateur qui collecte des déchets dangereux de fluides frigorigènes (ou autres déchets dangereux de fluides) lors d'opérations sur
+  les équipements en contenant de ses clients
+  - d'un autre détenteur de déchet.
+  - d'une installation de tri, transit, regroupement lors d'une réexpédition, reconditionnement ou groupement.
   """
   emitter: BsffEmitter
 
   """
-  Liste des contenants utilisés pour le transport du déchet.
+  Liste des contenants utilisés pour le transport des déchets de fluides et
+  informations à propos de l'acceptation et du traitement.
   """
   packagings: [BsffPackaging!]!
 
@@ -74,35 +77,11 @@ type Bsff {
   """
   ficheInterventions: [BsffFicheIntervention!]!
 
-  """
-  Bordereau que celui-ci réexpédie
-  """
-  forwarding: InitialBsff
+  forwarding: [BsffPackaging!]!
 
-  """
-  Bordereau dans lequel celui-ci est réexpédié
-  """
-  forwardedIn: Bsff
+  grouping: [BsffPackaging!]!
 
-  """
-  Bordereaux que celui-ci reconditionne
-  """
-  repackaging: [InitialBsff!]!
-
-  """
-  Bordereau dans lequel celui-ci est reconditionné
-  """
-  repackagedIn: Bsff
-
-  """
-  Bordereaux que celui-ci groupe
-  """
-  grouping: [InitialBsff!]!
-
-  """
-  Bordereau dans lequel celui-ci est groupé.
-  """
-  groupedIn: Bsff
+  repackaging: [BsffPackaging!]!
 }
 
 """
@@ -114,6 +93,11 @@ type InitialBsff {
   Il est à utiliser pour les échanges avec l'API.
   """
   id: ID!
+
+  """
+  Type de BSFF, voir l'enum pour plus de détails.
+  """
+  type: BsffType!
 
   """
   Émetteur du déchet, qui n'est pas nécessairement le producteur.
@@ -162,14 +146,34 @@ type BsffEmission {
 }
 
 type BsffPackaging {
+  """
+  Identifiant unique correspondant à un contenant sur BSFF en particulier.
+  Un même contenant physique (identifié par un numéro) aura des identifiants différents
+  sur chaque BSFF sur lequel il apparait (en cas de transit ou groupement).
+  """
+  id: ID!
+  "Identifiant du BSFF auquel est rattaché ce contenant"
+  bsffId: ID!
+  "Numéro du contenant."
+  numero: String!
   "Dénomination du contenant."
   name: String!
   "Volume du contenant."
   volume: Float
-  "Numéro du contenant."
-  numero: String!
   "Poids en kilogrammes."
   weight: Float!
+  "Informations sur l'acceptation ou le refus du contenant"
+  acceptation: BsffPackagingAcceptation
+  "Informations sur le traitement effectué par contenant"
+  operation: BsffPackagingOperation
+  "BSFF qui trace ce contenant"
+  bsff: Bsff!
+  "BSFF faisant immédiatement suite au BSFF traçant ce contenant."
+  nextBsff: Bsff
+  "Liste de tous les BSFFs suivants"
+  nextBsffs: [Bsff!]!
+  "Liste de tous les BSFF précédents"
+  previousBsffs: [InitialBsff!]!
 }
 
 type BsffWaste {
@@ -220,48 +224,62 @@ type BsffTransport {
 type BsffDestination {
   "Entreprise réceptionant le déchet."
   company: FormCompany
-  "Déclaration de réception du déchet."
-  reception: BsffReception
-  "Déclaration de traitement du déchet."
-  operation: BsffOperation
   "Opération de traitement prévu initialement."
   plannedOperationCode: BsffOperationCode
-  "DEPRECATED - Numéro CAP."
-  cap: String @deprecated(reason: "Il n'y a pas de CAP sur le BSFF")
+  "Déclaration de réception du déchet."
+  reception: BsffReception
+  "Numéro de CAP."
+  cap: String
   "Champ libre"
   customInfo: String
 }
 
-type BsffAcceptation {
+type BsffPackagingAcceptation {
+  "Date de l'acceptation ou du refus"
+  date: DateTime
+  "Poids du contenant. Doit être à 0 dans le cas d'un refus"
+  weight: Float
   "Accepté ou refusé"
-  status: WasteAcceptationStatus!
+  status: WasteAcceptationStatus
   "En cas de refus, la raison"
   refusalReason: String
-}
-
-type BsffReception {
-  "Date de réception du déchet."
-  date: DateTime!
-  "Quantité totale du déchet en kilogrammes, qu'elle soit réelle ou estimée. Doit être à 0 dans le cas d'un refus"
-  weight: Float!
-  "Statut d'acceptation du déchet"
-  acceptation: BsffAcceptation
+  "Code déchet après analyse"
+  wasteCode: String
+  "Dénomination usuelle du déchet après analyse"
+  wasteDescription: String
   "Signature de la destination lors de l'acceptation ou du refus du déchet."
   signature: Signature
 }
 
-type BsffNextDestination {
-  "Entreprise qui va réceptionner le déchet par la suite."
-  company: FormCompany!
-}
-
-type BsffOperation {
+type BsffPackagingOperation {
   "Code de l'opération de traitement."
   code: BsffOperationCode
+  "Description de l'opération réalisée"
+  description: String
+  "Date de l'opération"
+  date: DateTime
+  "Rupture de traçabilité autorisée par arrêté préfectoral"
+  noTraceability: Boolean
   "Destination ultérieure prévue, dans le cas d'un envoi vers l'étranger."
-  nextDestination: BsffNextDestination
+  nextDestination: BsffPackagingNextDestination
   "Signature de la destination lors du traitement."
   signature: Signature
+}
+
+type BsffReception {
+  "Date de réception du déchet."
+  date: DateTime
+  "Signature de la destination lors de l'acceptation ou du refus du déchet."
+  signature: Signature
+}
+
+type BsffPackagingNextDestination {
+  "Code de l'opération d'élimination ou valorisation prévue "
+  plannedOperationCode: BsffOperationCode
+  "Numéro de certificat d'acceptation préalable des déchets ;"
+  cap: String
+  "Entreprise qui va réceptionner le déchet par la suite."
+  company: FormCompany
 }
 
 type BsffFicheIntervention {
@@ -296,4 +314,15 @@ type BsffConnection {
 type BsffEdge {
   cursor: String!
   node: Bsff!
+}
+
+type BsffPackagingConnection {
+  totalCount: Int!
+  pageInfo: PageInfo!
+  edges: [BsffPackagingEdge!]!
+}
+
+type BsffPackagingEdge {
+  cursor: String!
+  node: BsffPackaging!
 }

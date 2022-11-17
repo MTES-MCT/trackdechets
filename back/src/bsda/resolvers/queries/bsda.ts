@@ -12,7 +12,9 @@ export default async function bsda(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const form = await getBsdaOrNotFound(id);
+  const form = await getBsdaOrNotFound(id, {
+    include: { intermediaries: true }
+  });
   await checkIsBsdaContributor(
     user,
     form,

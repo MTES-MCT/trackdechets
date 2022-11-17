@@ -163,6 +163,76 @@ describe("Mutation.createDasri", () => {
 
     expect(data.createBsdasri.emitter.company.siret).toEqual(company.siret);
   });
+
+  it("create a dasri with a default transport mode", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const input = {
+      waste: { adr: "xyz 33", code: "18 01 03*" },
+      transporter: {
+        company: {
+          address: "5, route du dasri",
+          contact: "-",
+          mail: "_@email.indisponible",
+          name: "Transporteur de dasris",
+          phone: "-",
+          siret: company.siret
+        },
+        customInfo: null,
+        recepisse: {
+          department: "26",
+          number: "N°99999",
+          validityLimit: "2022-06-06T22:00:00"
+        },
+        transport: {
+          acceptation: null,
+          handedOverAt: null,
+          mode: null,
+          packagings: [],
+          plates: [],
+          takenOverAt: null,
+          weight: {}
+        }
+      },
+      emitter: {
+        company: {
+          name: "hopital blanc",
+          siret: company.siret,
+          contact: "jean durand",
+          phone: "06 18 76 02 00",
+          // email not required
+          address: "avenue de la mer"
+        },
+        emission: {
+          weight: { value: 23.2, isEstimate: false },
+
+          packagings: [
+            {
+              type: "BOITE_CARTON",
+              volume: 22,
+              quantity: 3
+            }
+          ]
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createBsdasri">>(
+      CREATE_DASRI,
+      {
+        variables: {
+          input
+        }
+      }
+    );
+
+    expect(data.createBsdasri.isDraft).toEqual(false);
+    expect(data.createBsdasri.status).toEqual("INITIAL");
+    expect(data.createBsdasri.type).toEqual("SIMPLE");
+
+    expect(data.createBsdasri.emitter.company.siret).toEqual(company.siret);
+  });
 });
 
 describe("Mutation.createDasri validation scenarii", () => {

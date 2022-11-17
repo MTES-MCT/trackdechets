@@ -68,10 +68,48 @@ export const FullBsffFragment = gql`
       }
     }
     packagings {
+      id
       name
       numero
       volume
       weight
+      acceptation {
+        date
+        status
+        refusalReason
+        wasteCode
+        wasteDescription
+        weight
+        signature {
+          date
+          author
+        }
+      }
+      operation {
+        code
+        description
+        noTraceability
+        date
+        signature {
+          date
+          author
+        }
+        nextDestination {
+          plannedOperationCode
+          company {
+            ...CompanyFragment
+          }
+        }
+      }
+      nextBsffs {
+        id
+        destination {
+          company {
+            name
+            siret
+          }
+        }
+      }
     }
     waste {
       code
@@ -107,23 +145,6 @@ export const FullBsffFragment = gql`
       }
       reception {
         date
-        weight
-        acceptation {
-          status
-          refusalReason
-        }
-        signature {
-          author
-          date
-        }
-      }
-      operation {
-        code
-        nextDestination {
-          company {
-            ...CompanyFragment
-          }
-        }
         signature {
           author
           date
@@ -135,99 +156,98 @@ export const FullBsffFragment = gql`
     ficheInterventions {
       ...FicheInterventionFragment
     }
-    grouping {
+    forwarding {
       id
-      packagings {
-        name
-        numero
-        volume
-        weight
+      numero
+      weight
+      volume
+      name
+      bsffId
+      bsff {
+        id
+        emitter {
+          company {
+            name
+            siret
+          }
+        }
+        waste {
+          code
+        }
       }
-    }
-    groupedIn {
-      id
     }
     repackaging {
       id
-      packagings {
-        name
-        numero
-        volume
-        weight
+      numero
+      weight
+      volume
+      name
+      bsffId
+      bsff {
+        id
+        emitter {
+          company {
+            name
+            siret
+          }
+        }
+        waste {
+          code
+        }
       }
     }
-    repackagedIn {
+    grouping {
       id
-    }
-    forwarding {
-      id
-      packagings {
-        name
-        numero
-        volume
-        weight
+      numero
+      weight
+      volume
+      name
+      bsffId
+      bsff {
+        id
+        emitter {
+          company {
+            name
+            siret
+          }
+        }
+        waste {
+          code
+        }
       }
-    }
-    forwardedIn {
-      id
     }
   }
   ${companyFragment}
   ${FicheInterventionFragment}
 `;
 
-export const PreviousBsffFragment = gql`
-  fragment PreviousBsff on Bsff {
+export const PreviousBsffPackagingFragment = gql`
+  fragment PreviousBsffPackaging on BsffPackaging {
     id
-    type
-    status
-    emitter {
-      company {
-        siret
-        name
-      }
+    numero
+    weight
+    volume
+    name
+    bsffId
+    acceptation {
+      wasteCode
+      wasteDescription
     }
-    packagings {
-      name
-      numero
-      volume
-      weight
-    }
-    waste {
-      code
-      description
-      adr
-    }
-    weight {
-      value
-      isEstimate
-    }
-    repackagedIn {
+    bsff {
       id
-      packagings {
-        name
-        numero
-        volume
-        weight
+      emitter {
+        company {
+          name
+          siret
+        }
+      }
+      waste {
+        code
+        description
       }
     }
-    forwardedIn {
+    nextBsff {
       id
-      packagings {
-        name
-        numero
-        volume
-        weight
-      }
-    }
-    groupedIn {
-      id
-      packagings {
-        name
-        numero
-        volume
-        weight
-      }
     }
   }
 `;

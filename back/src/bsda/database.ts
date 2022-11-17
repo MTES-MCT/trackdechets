@@ -1,29 +1,39 @@
-import { Bsda } from "@prisma/client";
+import { Bsda, Prisma } from "@prisma/client";
 import { FormNotFound } from "../forms/errors";
 import { getReadonlyBsdaRepository } from "./repository";
 
-export async function getBsdaOrNotFound(id: string) {
-  const form = await getReadonlyBsdaRepository().findUnique({ id });
+export async function getBsdaOrNotFound<Include extends Prisma.BsdaInclude>(
+  id: string,
+  { include }: { include?: Include } = {}
+) {
+  const bsda = await getReadonlyBsdaRepository().findUnique<{
+    include?: Include;
+  }>({ id }, { include });
 
-  if (form == null || form.isDeleted == true) {
+  if (bsda == null || bsda.isDeleted) {
     throw new FormNotFound(id.toString());
   }
 
-  return form;
+  return bsda;
 }
 
 /**
  * Returns direct parents of a BSDA
  */
-export async function getPreviousBsdas(bsda: Bsda) {
+export async function getPreviousBsdas(
+  bsda: Pick<Bsda, "id" | "forwardingId">
+) {
   const bsdaRepository = getReadonlyBsdaRepository();
   const forwardedBsda = bsda.forwardingId
-    ? await bsdaRepository.findUnique({ id: bsda.forwardingId })
+    ? await bsdaRepository.findUnique(
+        { id: bsda.forwardingId },
+        { include: { intermediaries: true } }
+      )
     : null;
 
   const groupedBsdas = await bsdaRepository
     .findRelatedEntity({ id: bsda.id })
-    .grouping();
+    .grouping({ include: { intermediaries: true } });
 
   return [forwardedBsda, ...groupedBsdas].filter(Boolean);
 }

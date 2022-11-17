@@ -2,15 +2,15 @@ import * as yup from "yup";
 import { UserInputError } from "apollo-server-express";
 import {
   Bsff,
+  BsffPackaging as PrismaBsffPackaging,
   TransportMode,
   BsffFicheIntervention,
-  BsffStatus,
   BsffType,
-  WasteAcceptationStatus,
-  Prisma
+  Prisma,
+  WasteAcceptationStatus
 } from "@prisma/client";
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
-import { OPERATION } from "./constants";
+import { isFinalOperation, OPERATION } from "./constants";
 import prisma from "../prisma";
 import {
   isVat,
@@ -71,24 +71,27 @@ type Transport = Pick<
   "transporterTransportMode" | "transporterTransportTakenOverAt"
 >;
 
-type Reception = Pick<
-  Prisma.BsffCreateInput,
-  | "destinationReceptionDate"
-  | "destinationReceptionWeight"
-  | "destinationReceptionAcceptationStatus"
-  | "destinationReceptionRefusalReason"
+type Reception = Pick<Prisma.BsffCreateInput, "destinationReceptionDate">;
+
+type Acceptation = Pick<
+  Prisma.BsffPackagingCreateInput,
+  "acceptationWeight" | "acceptationStatus" | "acceptationRefusalReason"
 >;
 
 type Operation = Pick<
-  Prisma.BsffCreateInput,
-  | "destinationOperationCode"
-  | "destinationOperationNextDestinationCompanyName"
-  | "destinationOperationNextDestinationCompanySiret"
-  | "destinationOperationNextDestinationCompanyVatNumber"
-  | "destinationOperationNextDestinationCompanyAddress"
-  | "destinationOperationNextDestinationCompanyContact"
-  | "destinationOperationNextDestinationCompanyPhone"
-  | "destinationOperationNextDestinationCompanyMail"
+  Prisma.BsffPackagingCreateInput,
+  | "operationDate"
+  | "operationCode"
+  | "operationNoTraceability"
+  | "operationNextDestinationPlannedOperationCode"
+  | "operationNextDestinationCap"
+  | "operationNextDestinationCompanyName"
+  | "operationNextDestinationCompanySiret"
+  | "operationNextDestinationCompanyVatNumber"
+  | "operationNextDestinationCompanyAddress"
+  | "operationNextDestinationCompanyContact"
+  | "operationNextDestinationCompanyPhone"
+  | "operationNextDestinationCompanyMail"
 >;
 
 export const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
@@ -197,7 +200,11 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
             1,
             "Conditionnements : le nombre de contenants doit être supérieur ou égal à 1"
           )
-          .of<yup.SchemaOf<Omit<BsffPackaging, "__typename">>>(
+          .of<
+            yup.SchemaOf<
+              Pick<PrismaBsffPackaging, "name" | "numero" | "volume" | "weight">
+            >
+          >(
             yup.object({
               name: yup
                 .string()
@@ -230,7 +237,10 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
         .requiredIf(!isDraft, "Le code déchet est requis"),
       wasteDescription: yup
         .string()
-        .requiredIf(!isDraft, "La description du fluide est obligatoire"),
+        .requiredIf(
+          !isDraft,
+          "La dénomination usuelle du déchet est obligatoire"
+        ),
       wasteAdr: yup.string().requiredIf(!isDraft, "La mention ADR est requise"),
       weightValue: yup
         .number()
@@ -311,33 +321,35 @@ export const transportSchema: yup.SchemaOf<Transport> = yup.object({
 export const receptionSchema: yup.SchemaOf<Reception> = yup.object({
   destinationReceptionDate: yup
     .date()
-    .required("La date de réception du déchet est requise") as any, // https://github.com/jquense/yup/issues/1302
-  destinationReceptionAcceptationStatus: yup
+    .nullable()
+    .required("La date de réception du déchet est requise") as any // https://github.com/jquense/yup/issues/1302
+});
+
+export const acceptationSchema: yup.SchemaOf<Acceptation> = yup.object({
+  acceptationStatus: yup
     .mixed<WasteAcceptationStatus>()
     .required()
     .notOneOf(
       [WasteAcceptationStatus.PARTIALLY_REFUSED],
       "Le refus partiel n'est pas autorisé dans le cas d'un BSFF"
     ),
-  destinationReceptionRefusalReason: yup
+  acceptationRefusalReason: yup
     .string()
-    .when(
-      "destinationReceptionAcceptationStatus",
-      (acceptationStatus, schema) =>
-        acceptationStatus === WasteAcceptationStatus.REFUSED
-          ? schema.ensure().required("Vous devez saisir un motif de refus")
-          : schema
-              .ensure()
-              .max(
-                0,
-                "Le motif du refus ne doit pas être renseigné si le déchet est accepté"
-              )
+    .when("acceptationStatus", (acceptationStatus, schema) =>
+      acceptationStatus === WasteAcceptationStatus.REFUSED
+        ? schema.ensure().required("Vous devez saisir un motif de refus")
+        : schema
+            .ensure()
+            .max(
+              0,
+              "Le motif du refus ne doit pas être renseigné si le déchet est accepté"
+            )
     ),
-  destinationReceptionWeight: yup
+  acceptationWeight: yup
     .number()
     .nullable()
     .required("Le poids en kilos du déchet reçu est requis")
-    .when("destinationReceptionAcceptationStatus", {
+    .when("acceptationStatus", {
       is: value => value === WasteAcceptationStatus.REFUSED,
       then: schema =>
         schema.oneOf(
@@ -346,24 +358,188 @@ export const receptionSchema: yup.SchemaOf<Reception> = yup.object({
         ),
       otherwise: schema =>
         schema.positive("Vous devez saisir une quantité reçue supérieure à 0")
-    })
+    }),
+  acceptationWasteCode: yup
+    .string()
+    .nullable()
+    .required("Le code déchet après analyse est requis")
+    .oneOf(
+      BSFF_WASTE_CODES,
+      "Le code déchet ne fait pas partie de la liste reconnue : ${values}"
+    ),
+  acceptationWasteDescription: yup
+    .string()
+    .ensure()
+    .required("La description du déchet après analyse est requise")
 });
 
-export const operationSchema: yup.SchemaOf<Operation> = yup.object({
-  destinationOperationCode: yup
+const withNextDestination = (required: boolean) =>
+  yup.object().shape({
+    operationNextDestinationPlannedOperationCode: yup
+      .string()
+      .ensure()
+      .requiredIf(
+        required,
+        "Destination ultérieure : le code de l'opération de traitement est requis"
+      )
+      .oneOf(
+        ["", ...Object.keys(OPERATION)],
+        "Destination ultérieure : Le code de l'opération de traitement ne fait pas partie de la liste reconnue : ${values}"
+      ),
+    operationNextDestinationCap: yup.string().nullable().notRequired(),
+    operationNextDestinationCompanyName: yup
+      .string()
+      .ensure()
+      .requiredIf(
+        required,
+        "Destination ultérieure : le nom de l'établissement est requis"
+      ),
+    operationNextDestinationCompanySiret: yup
+      .string()
+      .when("operationNextDestinationCompanyVatNumber", (vatNumber, schema) => {
+        return !!vatNumber
+          ? schema.notRequired().nullable()
+          : schema
+              .ensure()
+              .requiredIf(
+                required,
+                "Destination ultérieure : Le n° SIRET ou le n°TVA intracommunautaire est obligatoire"
+              )
+              .test(
+                "is-14-charachters",
+                `Destination ultérieure prévue : le n°SIRET doit faire 14 caractères`,
+                value => !value || value?.length === 14
+              );
+      }),
+    operationNextDestinationCompanyVatNumber: yup
+      .string()
+      .notRequired()
+      .nullable()
+      .test(
+        "is-vat",
+        "${path} n'est pas un numéro de TVA intracommunautaire valide",
+        value => !value || isVat(value)
+      ),
+
+    operationNextDestinationCompanyAddress: yup
+      .string()
+      .ensure()
+      .requiredIf(
+        required,
+        `Destination ultérieure : l'adresse de l'établissement est requis`
+      ),
+    operationNextDestinationCompanyContact: yup
+      .string()
+      .ensure()
+      .requiredIf(
+        required,
+        `Destination ultérieure : le nom du contact est requis`
+      ),
+    operationNextDestinationCompanyPhone: yup
+      .string()
+      .ensure()
+      .requiredIf(
+        required,
+        `Destination ultérieure : le numéro de téléphone est requis`
+      ),
+    operationNextDestinationCompanyMail: yup
+      .string()
+      .email()
+      .ensure()
+      .requiredIf(
+        required,
+        `Destination ultérieure : l'adresse email est requise`
+      )
+  });
+
+const EXTRANEOUS_NEXT_DESTINATION = `L'opération de traitement renseignée ne permet pas de destination ultérieure`;
+
+const withoutNextDestination = yup.object().shape({
+  operationNextDestinationPlannedOperationCode: yup
     .string()
-    .oneOf(
-      Object.keys(OPERATION),
-      "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : ${values}"
-    ),
-  destinationOperationNextDestinationCompanyName: yup.string().nullable(),
-  destinationOperationNextDestinationCompanySiret: yup.string().nullable(),
-  destinationOperationNextDestinationCompanyVatNumber: yup.string().nullable(),
-  destinationOperationNextDestinationCompanyAddress: yup.string().nullable(),
-  destinationOperationNextDestinationCompanyContact: yup.string().nullable(),
-  destinationOperationNextDestinationCompanyPhone: yup.string().nullable(),
-  destinationOperationNextDestinationCompanyMail: yup.string().nullable()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  operationNextDestinationCap: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  operationNextDestinationCompanyName: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  operationNextDestinationCompanySiret: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  operationNextDestinationCompanyVatNumber: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  operationNextDestinationCompanyAddress: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  operationNextDestinationCompanyContact: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  operationNextDestinationCompanyPhone: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  operationNextDestinationCompanyMail: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION)
 });
+
+const traceabilityBreakAllowed = yup.object({
+  operationNoTraceability: yup.boolean().nullable()
+});
+
+const traceabilityBreakForbidden = yup.object({
+  operationNoTraceability: yup
+    .boolean()
+    .nullable()
+    .notOneOf(
+      [true],
+      "Vous ne pouvez pas indiquer une rupture de traçabilité avec un code de traitement final"
+    )
+});
+
+const operationSchemaFn: (value: any) => yup.SchemaOf<Operation> = value => {
+  const base = yup.object({
+    operationDate: yup
+      .date()
+      .nullable()
+      .required("La date de l'opération est requise"),
+    operationCode: yup
+      .string()
+      .ensure()
+      .required("Le code de l'opération de traitement est requis")
+      .oneOf(
+        Object.keys(OPERATION),
+        "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : ${values}"
+      )
+  });
+
+  if (!isFinalOperation(value.operationCode)) {
+    if (value?.operationNoTraceability === true) {
+      return base
+        .concat(withNextDestination(false))
+        .concat(traceabilityBreakAllowed);
+    }
+    return base
+      .concat(withNextDestination(true))
+      .concat(traceabilityBreakAllowed);
+  } else {
+    return base
+      .concat(withoutNextDestination)
+      .concat(traceabilityBreakForbidden);
+  }
+};
+
+export const operationSchema = yup.lazy(operationSchemaFn);
 
 // validation schema for BSFF before it can be published
 const baseBsffSchemaFn = (isDraft: boolean) =>
@@ -377,10 +553,8 @@ export const draftBsffSchema = baseBsffSchemaFn(true);
 
 export async function validateBsff(
   bsff: Partial<Bsff | Prisma.BsffCreateInput> & {
-    packagings?: BsffPackaging[];
-  },
-  previousBsffs: Bsff[],
-  ficheInterventions: BsffFicheIntervention[]
+    packagings?: Pick<BsffPackaging, "name" | "numero" | "volume" | "weight">[];
+  }
 ) {
   try {
     const validationSchema = bsff.isDraft ? draftBsffSchema : bsffSchema;
@@ -397,104 +571,12 @@ export async function validateBsff(
       throw err;
     }
   }
-
-  await validatePreviousBsffs(bsff, previousBsffs);
-  await validateFicheInterventions(bsff, ficheInterventions);
 }
 
-async function validatePreviousBsffs(
-  bsff: Partial<Bsff | Prisma.BsffCreateInput>,
-  previousBsffs: Bsff[]
-) {
-  if (previousBsffs.length === 0) {
-    return;
-  }
-
-  const previousBsffsWithDestination = previousBsffs.filter(
-    previousBsff => previousBsff.destinationCompanySiret
-  );
-
-  if (
-    bsff.emitterCompanySiret &&
-    previousBsffsWithDestination.some(
-      previousBsff =>
-        previousBsff.destinationCompanySiret !== bsff.emitterCompanySiret
-    )
-  ) {
-    throw new UserInputError(
-      `Certains des bordereaux à associer ne sont pas en la possession du nouvel émetteur.`
-    );
-  }
-
-  const firstPreviousBsffWithDestination = previousBsffsWithDestination[0];
-  if (
-    previousBsffsWithDestination.some(
-      previousBsff =>
-        previousBsff.destinationCompanySiret !==
-        firstPreviousBsffWithDestination.destinationCompanySiret
-    )
-  ) {
-    throw new UserInputError(
-      `Certains des bordereaux à associer ne sont pas en possession du même établissement.`
-    );
-  }
-
-  const fullPreviousBsffs = await prisma.bsff.findMany({
-    where: { id: { in: previousBsffs.map(bsff => bsff.id) } },
-    include: {
-      forwardedIn: true,
-      repackagedIn: true,
-      groupedIn: true
-    }
-  });
-
-  const errors = fullPreviousBsffs.reduce<string[]>((acc, previousBsff) => {
-    if (previousBsff.status === BsffStatus.PROCESSED) {
-      return acc.concat([
-        `Le bordereau n°${previousBsff.id} a déjà reçu son traitement final.`
-      ]);
-    }
-
-    if (previousBsff.status !== BsffStatus.INTERMEDIATELY_PROCESSED) {
-      return acc.concat([
-        `Le bordereau n°${previousBsff.id} n'a pas toutes les signatures requises.`
-      ]);
-    }
-
-    const { forwardedIn, repackagedIn, groupedIn } = previousBsff;
-    // nextBsffs of previous
-    const nextBsffs = [
-      ...(forwardedIn ? [forwardedIn] : []),
-      ...(repackagedIn ? [repackagedIn] : []),
-      ...(groupedIn ? [groupedIn] : [])
-    ];
-    if (
-      nextBsffs.length > 0 &&
-      !nextBsffs.map(bsff => bsff.id).includes(bsff.id)
-    ) {
-      return acc.concat([
-        `Le bordereau n°${previousBsff.id} a déjà été réexpédié, reconditionné ou groupé.`
-      ]);
-    }
-
-    const operation =
-      OPERATION[previousBsff.destinationOperationCode as BsffOperationCode];
-    if (!operation.successors.includes(bsff.type)) {
-      return acc.concat([
-        `Le bordereau n°${previousBsff.id} a déclaré un traitement qui ne permet pas de lui donner la suite voulue.`
-      ]);
-    }
-
-    return acc;
-  }, []);
-
-  if (errors.length > 0) {
-    throw new UserInputError(errors.join("\n"));
-  }
-}
-
-async function validateFicheInterventions(
-  bsff: Partial<Bsff | Prisma.BsffCreateInput>,
+export async function validateFicheInterventions(
+  bsff: Partial<Bsff | Prisma.BsffCreateInput> & {
+    packagings?: Partial<BsffPackaging>[];
+  },
   ficheInterventions: BsffFicheIntervention[]
 ) {
   if (ficheInterventions.length === 0) {
@@ -516,6 +598,199 @@ async function validateFicheInterventions(
       `Le type de bordereau choisi ne permet pas d'associer plusieurs fiches d'intervention.`
     );
   }
+}
+
+/**
+ * Les vérifications suivantes sont effectuées :
+ * - Vérifie que le type du BSFF est compatible avec la valeur de `forwarding`, `grouping` et `repackaging`.
+ * - Vérifie que le SIRET de l'installation émettrice est renseigné
+ * - Vérifie que l'utilisateur n'essaye pas de rensigner des informations sur les contenants en cas de groupement
+ * ou reéxpédition (c'est calculé automatiquement à partir des infos des contenants initiaux).
+ * - Vérifie qu'un seul contenant est spécifié en cas de reconditionnement
+ * - Vérifie que les identifiants de contenants existent
+ * - Vérifie pour chaque contenant initial que :
+ *   - il a bien été traité avec un code de traitement compatible
+ *   - il a bien pour destination le SIRET de l'installation émettrice du BSFF de groupement / reconditionnement / reéxpédition
+ *   - il n'a pas été inclus dans un autre BSFF de groupement / reconditionnement / reéxpédition
+ */
+export async function validatePreviousPackagings(
+  bsff: Partial<Bsff | Prisma.BsffCreateInput> & {
+    packagings?: Partial<BsffPackaging>[];
+  },
+  previousPackagingsIds: {
+    forwarding?: string[];
+    grouping?: string[];
+    repackaging?: string[];
+  }
+): Promise<PrismaBsffPackaging[]> {
+  const { forwarding, grouping, repackaging } = previousPackagingsIds;
+
+  const isForwarding = forwarding?.length > 0;
+  const isRepackaging = repackaging?.length > 0;
+  const isGrouping = grouping?.length > 0;
+
+  if (isForwarding && bsff.type !== BsffType.REEXPEDITION) {
+    throw new UserInputError(
+      "Vous devez sélectionner le type de BSFF `REEXPEDITION` avec le paramètre `forwarding`"
+    );
+  }
+
+  if (isRepackaging && bsff.type !== BsffType.RECONDITIONNEMENT) {
+    throw new UserInputError(
+      "Vous devez sélectionner le type de BSFF `RECONDITIONNEMENT` avec le paramètre `repackaging`"
+    );
+  }
+
+  if (isGrouping && bsff.type !== BsffType.GROUPEMENT) {
+    throw new UserInputError(
+      "Vous devez sélectionner le type de BSFF `GROUPEMENT` avec le paramètre `repackaging`"
+    );
+  }
+
+  if (
+    (isForwarding || isRepackaging || isGrouping) &&
+    !bsff.emitterCompanySiret
+  ) {
+    throw new UserInputError(
+      "Vous devez renseigner le siret de l'installation émettrice du nouveau BSFF en cas de groupement, réexpédition ou reéxpédition"
+    );
+  }
+
+  if (isRepackaging && bsff.packagings?.length > 1) {
+    throw new UserInputError(
+      "Vous ne pouvez saisir qu'un seul contenant lors d'une opération de reconditionnement"
+    );
+  }
+
+  // contenants qui sont réexpédiés dans ce BSFF
+  const forwardedPackagings = isForwarding
+    ? await prisma.bsffPackaging.findMany({
+        where: { id: { in: forwarding } },
+        include: { bsff: true }
+      })
+    : [];
+
+  if (isForwarding && forwardedPackagings.length < forwarding.length) {
+    const notFoundIds = forwarding.filter(
+      id => !forwardedPackagings.map(p => p.id).includes(id)
+    );
+    throw new UserInputError(
+      `Les identifiants de contenants de fluide à réexpédiés ${notFoundIds.join(
+        ", "
+      )} n'existent pas`
+    );
+  }
+
+  // contenants qui sont reconditionnés dans ce BSFF
+  const repackagedPackagings = isRepackaging
+    ? await prisma.bsffPackaging.findMany({
+        where: { id: { in: repackaging } },
+        include: { bsff: true }
+      })
+    : [];
+
+  if (isRepackaging && repackagedPackagings.length < repackaging.length) {
+    const notFoundIds = repackaging.filter(
+      id => !repackagedPackagings.map(p => p.id).includes(id)
+    );
+    throw new UserInputError(
+      `Les identifiants de contenants de fluide à reconditionner ${notFoundIds.join(
+        ", "
+      )} n'existent pas`
+    );
+  }
+
+  // contenants qui sont groupés dans ce BSFF
+  const groupedPackagings = isGrouping
+    ? await prisma.bsffPackaging.findMany({
+        where: { id: { in: grouping } },
+        include: { bsff: true }
+      })
+    : [];
+
+  if (isGrouping && groupedPackagings.length < grouping.length) {
+    const notFoundIds = grouping.filter(
+      id => !groupedPackagings.map(p => p.id).includes(id)
+    );
+    throw new UserInputError(
+      `Les identifiants de contenants de fluide à grouper ${notFoundIds.join(
+        ", "
+      )} n'existent pas`
+    );
+  }
+
+  const previousPackagings = [
+    ...(isForwarding ? forwardedPackagings : []),
+    ...(isGrouping ? groupedPackagings : []),
+    ...(isRepackaging ? repackagedPackagings : [])
+  ];
+
+  if (
+    previousPackagings.length === 0 &&
+    [
+      BsffType.GROUPEMENT,
+      BsffType.REEXPEDITION,
+      BsffType.RECONDITIONNEMENT
+    ].includes(bsff.type as any)
+  ) {
+    throw new UserInputError(
+      "Vous devez saisir des contenants en transit en cas de groupement, reconditionnement ou réexpédition"
+    );
+  }
+
+  if (isForwarding) {
+    const bsffIds = forwardedPackagings.map(p => p.bsffId);
+    const areOnSameBsff = bsffIds.every(id => id === bsffIds[0]);
+    if (!areOnSameBsff) {
+      throw new UserInputError(
+        "Tous les contenants réexpédiés doivent apparaitre sur le même BSFF initial"
+      );
+    }
+  }
+
+  const errors = previousPackagings.reduce((acc, packaging) => {
+    if (packaging.bsff.destinationCompanySiret !== bsff.emitterCompanySiret) {
+      return [
+        ...acc,
+        `Le BSFF ${packaging.bsffId} sur lequel apparait le contenant ${packaging.id} (${packaging.numero}) ` +
+          `n'a pas été traité sur l'installation émettrice du nouveau BSFF ${bsff.emitterCompanySiret}`
+      ];
+    }
+
+    if (!packaging.operationSignatureDate) {
+      return [
+        ...acc,
+        `La signature de l'opération n'a pas encore été faite sur le contenant ${packaging.id} - ${packaging.numero}`
+      ];
+    }
+
+    const operation = OPERATION[packaging.operationCode as BsffOperationCode];
+    if (!operation.successors.includes(bsff.type)) {
+      return [
+        ...acc,
+        `Une opération de traitement finale a été déclarée sur le contenant n°${packaging.id} (${packaging.numero}). ` +
+          `Vous ne pouvez pas l'ajouter sur un BSFF de groupement, reconditionnement ou réexpédition`
+      ];
+    }
+
+    if (
+      !!packaging.nextPackagingId &&
+      !bsff.packagings?.map(p => p.id).includes(packaging.nextPackagingId)
+    ) {
+      return [
+        ...acc,
+        `Le contenant n°${packaging.id} (${packaging.numero}) a déjà été réexpédié, reconditionné ou groupé dans un autre BSFF.`
+      ];
+    }
+
+    return acc;
+  }, []);
+
+  if (errors.length > 0) {
+    throw new UserInputError(errors.join("\n"));
+  }
+
+  return previousPackagings;
 }
 
 const beforeEmissionSchema = bsffSchema.concat(
@@ -602,33 +877,53 @@ export function validateBeforeReception(
   });
 }
 
-const beforeOperationSchema = bsffSchema
+export const afterReceptionSchema = bsffSchema
   .concat(transportSchema)
   .concat(receptionSchema)
-  .concat(operationSchema)
   .concat(
     yup.object({
       destinationReceptionSignatureDate: yup
         .date()
         .nullable()
         .required(
-          "L'installation de destination ne peut pas signer le traitement avant la réception du déchet"
-        ) as any, // https://github.com/jquense/yup/issues/1302
-      destinationOperationSignatureDate: yup
-        .date()
-        .nullable()
-        .test(
-          "is-not-signed",
-          "L'installation de destination a déjà signé le traitement du déchet",
-          value => value == null
-        ) as any // https://github.com/jquense/yup/issues/1302
+          "L'installation de destination n'a pas encore signé la réception"
+        )
     })
   );
 
-export function validateBeforeOperation(
-  bsff: typeof beforeOperationSchema["__outputType"]
+export function validateAfterReception(
+  bsff: typeof beforeReceptionSchema["__outputType"]
 ) {
-  return beforeOperationSchema.validate(bsff, {
+  return afterReceptionSchema.validate(bsff, {
+    abortEarly: false
+  });
+}
+
+export function validateBeforeAcceptation(
+  bsffPackaging: typeof acceptationSchema["__outputType"]
+) {
+  return acceptationSchema.validate(bsffPackaging, {
+    abortEarly: false
+  });
+}
+
+const beforeOperationSchema = yup.lazy(value =>
+  acceptationSchema.concat(operationSchemaFn(value)).concat(
+    yup.object({
+      acceptationSignatureDate: yup
+        .date()
+        .nullable()
+        .required(
+          "L'installation de destination ne peut pas signer le traitement avant d'avoir signé la réception du déchet"
+        ) as any // https://github.com/jquense/yup/issues/1302
+    })
+  )
+);
+
+export function validateBeforeOperation(
+  bsffPackaging: typeof beforeOperationSchema["__outputType"]
+) {
+  return beforeOperationSchema.validate(bsffPackaging, {
     abortEarly: false
   });
 }

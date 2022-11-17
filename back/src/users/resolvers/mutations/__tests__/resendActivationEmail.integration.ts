@@ -3,7 +3,6 @@ import prisma from "../../../../prisma";
 import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import * as mailing from "../../../../mailer/mailing";
-import { ErrorCode } from "../../../../common/errors";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { onSignup } from "../../../../mailer/templates";
@@ -20,6 +19,7 @@ sendMailSpy.mockImplementation(() => Promise.resolve());
 
 describe("mutation resendActivationEmail", () => {
   afterAll(resetDatabase);
+  afterEach(sendMailSpy.mockClear);
 
   it("should resend activation email to user", async () => {
     const user = await userFactory({ isActive: false });
@@ -37,33 +37,29 @@ describe("mutation resendActivationEmail", () => {
     );
   });
 
-  it("should return UserInputError if user does not exist", async () => {
+  it("should return true if user does not exist", async () => {
     const { mutate } = makeClient();
-    const { errors } = await mutate(RESEND_ACTIVATION_EMAIL, {
+    const { data, errors } = await mutate(RESEND_ACTIVATION_EMAIL, {
       variables: { email: "john.snow@trackdechets.fr" }
     });
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: "Cet email n'existe pas sur notre plateforme.",
-        extensions: { code: ErrorCode.BAD_USER_INPUT }
-      })
-    ]);
+    expect(data.resendActivationEmail).toEqual(true);
+    expect(errors).toEqual(undefined);
+    // no mail sent
+    expect(sendMailSpy).not.toHaveBeenCalled();
   });
 
-  it("should return UserInputError if user is already active", async () => {
+  it("should return true if user is already active", async () => {
     const user = await userFactory({ isActive: true });
     await prisma.userActivationHash.create({
       data: { userId: user.id, hash: "hash_2" }
     });
     const { mutate } = makeClient();
-    const { errors } = await mutate(RESEND_ACTIVATION_EMAIL, {
+    const { data, errors } = await mutate(RESEND_ACTIVATION_EMAIL, {
       variables: { email: user.email }
     });
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message: "Ce compte a déjà été activé",
-        extensions: { code: ErrorCode.BAD_USER_INPUT }
-      })
-    ]);
+    expect(data.resendActivationEmail).toEqual(true);
+    expect(errors).toEqual(undefined);
+    // no mail sent
+    expect(sendMailSpy).not.toHaveBeenCalled();
   });
 });

@@ -1,4 +1,10 @@
-import { User, Bsda, BsdaStatus } from "@prisma/client";
+import {
+  User,
+  Bsda,
+  BsdaStatus,
+  IntermediaryBsdaAssociation,
+  Prisma
+} from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { NotFormContributor } from "../forms/errors";
 import { getCachedUserSiretOrVat } from "../common/redis/users";
@@ -6,15 +12,23 @@ import { getCachedUserSiretOrVat } from "../common/redis/users";
 import prisma from "../prisma";
 import { getPreviousBsdas } from "./database";
 
-type BsdaContributors = Pick<
-  Bsda,
-  | "emitterCompanySiret"
-  | "destinationCompanySiret"
-  | "transporterCompanySiret"
-  | "workerCompanySiret"
-  | "brokerCompanySiret"
-  | "destinationOperationNextDestinationCompanySiret"
->;
+const bsdaSiretFields = Prisma.validator<Prisma.BsdaArgs>()({
+  select: {
+    emitterCompanySiret: true,
+    destinationCompanySiret: true,
+    transporterCompanySiret: true,
+    workerCompanySiret: true,
+    brokerCompanySiret: true,
+    destinationOperationNextDestinationCompanySiret: true
+  }
+});
+type BsdaFlatSiretsFields = Prisma.BsdaGetPayload<typeof bsdaSiretFields>;
+
+type BsdaContributors = Partial<BsdaFlatSiretsFields> & {
+  intermediaries: Partial<
+    Pick<IntermediaryBsdaAssociation, "siret" | "vatNumber">
+  >[];
+};
 
 export const BSDA_REVISION_REQUESTER_FIELDS: Record<
   string,
@@ -35,7 +49,10 @@ export const BSDA_CONTRIBUTORS_FIELDS: Record<string, keyof BsdaContributors> =
     nextDestination: "destinationOperationNextDestinationCompanySiret"
   };
 
-export async function checkCanAccessBsdaPdf(user: User, bsda: Bsda) {
+export async function checkCanAccessBsdaPdf(
+  user: User,
+  bsda: BsdaContributors & Pick<Bsda, "id" | "forwardingId">
+) {
   const isContributor = await isBsdaContributor(user, bsda);
   if (isContributor) return true;
 
@@ -51,10 +68,10 @@ export async function checkCanAccessBsdaPdf(user: User, bsda: Bsda) {
 
 export async function checkIsBsdaContributor(
   user: User,
-  form: Partial<BsdaContributors>,
+  bsda: BsdaContributors,
   errorMsg: string
 ) {
-  const isContributor = await isBsdaContributor(user, form);
+  const isContributor = await isBsdaContributor(user, bsda);
 
   if (!isContributor) {
     throw new NotFormContributor(errorMsg);
@@ -63,17 +80,27 @@ export async function checkIsBsdaContributor(
   return true;
 }
 
-export async function isBsdaContributor(user: User, bsda: Partial<Bsda>) {
+export async function isBsdaContributor(user: User, bsda: BsdaContributors) {
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   const formSirets = Object.values(BSDA_CONTRIBUTORS_FIELDS).map(
     field => bsda[field]
   );
 
-  return userCompaniesSiretOrVat.some(siret => formSirets.includes(siret));
+  const intermerdiariesSirets = bsda.intermediaries?.flatMap(i => [
+    i.siret,
+    i.vatNumber
+  ]);
+
+  return userCompaniesSiretOrVat.some(
+    siret => formSirets.includes(siret) || intermerdiariesSirets.includes(siret)
+  );
 }
 
-export async function checkCanDeleteBsda(user: User, bsda: Bsda) {
+export async function checkCanDeleteBsda(
+  user: User,
+  bsda: BsdaContributors & Pick<Bsda, "status">
+) {
   await checkIsBsdaContributor(
     user,
     bsda,

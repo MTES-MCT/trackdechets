@@ -224,13 +224,16 @@ describe("POST /login", () => {
 });
 
 describe("POST /logout", () => {
-  it("should expire session cookie", async () => {
-    const logout = await request.post("/logout");
-    expect(logout.header["set-cookie"]).toHaveLength(1);
-    const cookieHeader = logout.header["set-cookie"][0];
-    expect(cookieHeader).toEqual(
-      `${sess.name}=; Domain=${UI_HOST}; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT`
-    );
+  it("should change sessionID", async () => {
+    const logout1 = await request.post("/logout");
+    expect(logout1.header["set-cookie"]).toHaveLength(1);
+    const cookieHeader1 = logout1.header["set-cookie"][0];
+
+    const logout2 = await request.post("/logout");
+    expect(logout2.header["set-cookie"]).toHaveLength(1);
+    const cookieHeader2 = logout2.header["set-cookie"][0];
+
+    expect(cookieHeader1).not.toEqual(cookieHeader2);
   });
 });
 

@@ -1,0 +1,9 @@
+query BsffPackagings($where: BsffPackagingWhere) {
+  bsffPackagings(where: $where) {
+    edges {
+      node {
+        id
+      }
+    }
+  }
+}

@@ -12,7 +12,10 @@ export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
   await deleteBsd({ id: bsdId });
 
   if (bsdId.startsWith("BSDA-")) {
-    const bsda = await prisma.bsda.findUnique({ where: { id: bsdId } });
+    const bsda = await prisma.bsda.findUnique({
+      where: { id: bsdId },
+      include: { intermediaries: true }
+    });
 
     return toBsdaElastic(bsda);
   }

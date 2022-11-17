@@ -5,7 +5,7 @@ import { enqueueBsdToIndex } from "../../src/queue/producers/elastic";
 @registerUpdater(
   "Update groupable dasris to AWAITING_GROUP",
   "Update groupable dasris to AWAITING_GROUP",
-  true
+  false
 )
 export class UpdateBsdasriStatusEligibleFirGrouping implements Updater {
   // PROCESSED dasri eligible for grouping should be in AWAITING_GROUP status. Also applies to grouped dasris whose grouping bsd is not already processed

@@ -1033,7 +1033,7 @@ model Bsff {
   transporterRecepisseDepartment    String?
   transporterRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
-  transporterTransportMode            TransportMode?
+  transporterTransportMode            TransportMode?   @default(ROAD)
   transporterTransportPlates          String[]
   transporterTransportTakenOverAt     DateTime?      @db.Timestamptz(6)
   transporterTransportSignatureAuthor String?
@@ -1045,10 +1045,12 @@ model Bsff {
   destinationCompanyContact String?
   destinationCompanyPhone   String?
   destinationCompanyMail    String?
+  destinationCap            String?
 
   destinationCustomInfo String?
 
   destinationReceptionDate              DateTime?               @db.Timestamptz(6)
+  // DEPRECATED - TODO delete after data migration
   destinationReceptionWeight            Float?
   destinationReceptionAcceptationStatus WasteAcceptationStatus?
   destinationReceptionRefusalReason     String?
@@ -1058,8 +1060,10 @@ model Bsff {
 
   destinationPlannedOperationCode String?
 
+  // DEPRECATED - TODO delete after data migration
   destinationOperationCode String?
 
+  // DEPRECATED - TODO delete after data migration
   destinationOperationNextDestinationCompanyName      String?
   destinationOperationNextDestinationCompanySiret     String?
   destinationOperationNextDestinationCompanyVatNumber String?
@@ -1068,17 +1072,21 @@ model Bsff {
   destinationOperationNextDestinationCompanyPhone     String?
   destinationOperationNextDestinationCompanyMail      String?
 
+  // DEPRECATED - TODO delete after data migration
   destinationOperationSignatureAuthor String?
   destinationOperationSignatureDate   DateTime? @db.Timestamptz(6)
 
+  // DEPRECATED - TODO delete after data migration
   grouping    Bsff[]  @relation("BsffGrouping")
   groupedIn   Bsff?   @relation("BsffGrouping", fields: [groupedInId], references: [id])
   groupedInId String?
 
+  // DEPRECATED - TODO delete after data migration
   repackaging    Bsff[]  @relation("BsffRepackaging")
   repackagedIn   Bsff?   @relation("BsffRepackaging", fields: [repackagedInId], references: [id])
   repackagedInId String?
 
+  // DEPRECATED - TODO delete after data migration
   forwarding   Bsff?   @relation("BsffForwarding", fields: [forwardingId], references: [id])
   forwardingId String? @unique
   forwardedIn  Bsff?   @relation("BsffForwarding")
@@ -1109,9 +1117,11 @@ enum BsffStatus {
   SIGNED_BY_EMITTER
   SENT
   RECEIVED
-  INTERMEDIATELY_PROCESSED
-  PROCESSED
+  ACCEPTED
+  PARTIALLY_REFUSED
   REFUSED
+  PROCESSED
+  INTERMEDIATELY_PROCESSED
 }
 
 model BsffFicheIntervention {
@@ -1152,10 +1162,42 @@ model BsffPackaging {
   weight Float
   numero String
 
+  acceptationDate             DateTime?               @db.Timestamptz(6)
+  acceptationWeight           Float?
+  acceptationStatus           WasteAcceptationStatus?
+  acceptationRefusalReason    String?
+  acceptationWasteCode        String?
+  acceptationWasteDescription String?
+
+  acceptationSignatureAuthor String?
+  acceptationSignatureDate   DateTime? @db.Timestamptz(6)
+
+  operationDate            DateTime? @db.Timestamptz(6)
+  operationNoTraceability  Boolean   @default(false)
+  operationCode            String?
+  operationDescription     String?
+  operationSignatureAuthor String?
+  operationSignatureDate   DateTime? @db.Timestamptz(6)
+
+  operationNextDestinationPlannedOperationCode String?
+  operationNextDestinationCap                  String?
+  operationNextDestinationCompanyName          String?
+  operationNextDestinationCompanySiret         String?
+  operationNextDestinationCompanyVatNumber     String?
+  operationNextDestinationCompanyAddress       String?
+  operationNextDestinationCompanyContact       String?
+  operationNextDestinationCompanyPhone         String?
+  operationNextDestinationCompanyMail          String?
+
   bsff   Bsff   @relation(fields: [bsffId], references: [id], onDelete: Cascade)
   bsffId String
 
+  nextPackaging      BsffPackaging?  @relation("NextPackaging", fields: [nextPackagingId], references: [id])
+  nextPackagingId    String?
+  previousPackagings BsffPackaging[] @relation("NextPackaging")
+
   @@index([bsffId], map: "_BsffPackagingBsffId")
+  @@index([nextPackagingId], map: "_BsffPackagingNextPackagingIdx")
 }
 
 // ----------------
@@ -1314,6 +1356,7 @@ model Bsda {
   forwardedIn  Bsda?   @relation("BsdaForwarding")
 
   BsdaRevisionRequest BsdaRevisionRequest[]
+  intermediaries      IntermediaryBsdaAssociation[]
 
   // partial indices _BsdaIsDeletedIdx, _BsdaIsDraftIdx see migration82_missing_indices.sql
 
@@ -1388,6 +1431,24 @@ model BsdaRevisionRequestApproval {
 
   @@index([revisionRequestId], map: "_BsdaRevisionRequestApprovalRevisionRequestIdIdx")
   @@index([approverSiret], map: "_BsdaRevisionRequestApprovalApproverSiretIdx")
+}
+
+model IntermediaryBsdaAssociation {
+  id        String   @id @default(cuid())
+  bsdaId    String
+  name      String
+  siret     String
+  contact   String
+  vatNumber String?
+  address   String?
+  phone     String?
+  mail      String?
+  bsda      Bsda     @relation(fields: [bsdaId], references: [id])
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([bsdaId], map: "_IntermediaryBsdaAssociationBsdaIdIdx")
+  @@index([siret], map: "IntermediaryBsdaAssociationSiretIdx")
+  @@index([vatNumber], map: "IntermediaryBsdaAssociationVatNumberIdx")
 }
 
 model Event {

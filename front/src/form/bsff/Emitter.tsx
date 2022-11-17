@@ -18,8 +18,8 @@ export default function Emitter({ disabled }) {
     useField<BsffFicheIntervention[]>("ficheInterventions");
   const [{ value: type }] = useField<BsffType>("type");
 
-  const [{ value: previousBsffs }, , { setValue: setPreviousBsffs }] =
-    useField<Bsff[]>("previousBsffs");
+  const [{ value: previousPackagings }, , { setValue: setPreviousPackagings }] =
+    useField<Bsff[]>("previousPackagings");
   const [, , { setValue: setPackagings }] =
     useField<BsffPackagingInput[]>("packagings");
 
@@ -57,12 +57,12 @@ export default function Emitter({ disabled }) {
             onSelect={companySiret => {
               if (
                 companySiret?.length &&
-                previousBsffs?.length &&
+                previousPackagings?.length &&
                 window.confirm(
                   "L'établissement sélectionné n'est pas compatible avec les bordereaux initiaux sélectionnés. Nous allons donc les dissocier."
                 )
               ) {
-                setPreviousBsffs([]);
+                setPreviousPackagings([]);
                 setPackagings([]);
               }
             }}

@@ -285,13 +285,7 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
         is: ecoOrganismeSiret => !ecoOrganismeSiret,
         then: yup
           .mixed()
-          .requiredIf(!isDraft, `Émetteur: Le type d'émetteur est obligatoire`),
-        otherwise: yup
-          .mixed()
-          .oneOf(
-            ["OTHER", "APPENDIX1", "APPENDIX2"],
-            `Émetteur: Le type d'émetteur doit être "OTHER", "APPENDIX1" ou "APPENDIX2" lorsqu'un éco-organisme est responsable du déchet`
-          )
+          .requiredIf(!isDraft, `Émetteur: Le type d'émetteur est obligatoire`)
       })
       .when("emitterIsPrivateIndividual", {
         is: emitterIsPrivateIndividual => !emitterIsPrivateIndividual,
@@ -1312,7 +1306,7 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
  * - SIRET is mandatory
  * - only french companies are allowed
  */
-const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
+export const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
   siret: yup
     .string()
     .required("Intermédiaires: le N° SIRET est obligatoire")

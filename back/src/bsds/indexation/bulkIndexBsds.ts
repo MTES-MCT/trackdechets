@@ -70,7 +70,8 @@ const prismaFindManyOptions = {
   bsda: {
     include: {
       forwardedIn: { select: { id: true } },
-      groupedIn: { select: { id: true } }
+      groupedIn: { select: { id: true } },
+      intermediaries: true
     }
   },
   bsdasri: {

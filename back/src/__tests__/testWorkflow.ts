@@ -1,8 +1,9 @@
+import { Workflow } from "../common/workflow";
 import prisma from "../prisma";
 import { userWithCompanyFactory, ecoOrganismeFactory } from "./factories";
 import makeClient from "./testClient";
 
-async function testWorkflow(workflow) {
+async function testWorkflow(workflow: Workflow) {
   // init a context that can be passed from one step to the other
   let context = {};
 
@@ -23,16 +24,25 @@ async function testWorkflow(workflow) {
 
   // run the steps one by one
   for (const step of workflow.steps) {
-    const { mutate } = makeClient(context[step.company].user);
+    const client = makeClient(context[step.company].user);
 
-    const { errors, data: response } = await mutate(step.mutation, {
-      variables: step.variables(context)
-    });
+    const { errors, data: response } = await (() => {
+      if (step.mutation) {
+        return client.mutate(step.mutation, {
+          variables: step.variables(context)
+        });
+      } else if (step.query) {
+        return client.query(step.query, {
+          variables: step.variables(context)
+        });
+      }
+    })();
+
     expect(errors).toBeUndefined();
-
     const data = step.data(response);
-    expect(data).toEqual(expect.objectContaining(step.expected));
-
+    if (step.expected) {
+      expect(data).toEqual(expect.objectContaining(step.expected));
+    }
     if (step.setContext) {
       context = step.setContext(context, data);
     }

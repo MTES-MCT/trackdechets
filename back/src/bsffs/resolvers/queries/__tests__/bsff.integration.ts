@@ -158,23 +158,26 @@ describe("Query.bsff", () => {
     );
   });
 
-  it("should list the BSFFs regrouped in this one", async () => {
+  it("should list the packagings regrouped in this BSFF", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
 
-    const previousBsff = await createBsffAfterOperation({
-      emitter,
-      transporter,
-      destination
-    });
+    const previousBsff = await createBsffAfterOperation(
+      {
+        emitter,
+        transporter,
+        destination
+      },
+      {},
+      { operationCode: "R13" }
+    );
     const bsff = await createBsff(
       {
-        emitter: destination
+        emitter: destination,
+        previousPackagings: previousBsff.packagings
       },
-      {
-        grouping: { connect: [{ id: previousBsff.id }] }
-      }
+      { type: "GROUPEMENT" }
     );
 
     const { query } = makeClient(destination.user);
@@ -184,45 +187,12 @@ describe("Query.bsff", () => {
       }
     });
 
-    expect(data.bsff).toEqual(
-      expect.objectContaining({
-        grouping: [expect.objectContaining({ id: previousBsff.id })]
-      })
-    );
+    expect(data.bsff.grouping).toEqual([
+      expect.objectContaining({ id: previousBsff.packagings[0].id })
+    ]);
   });
 
-  it("should return the BSFF this one has been grouped into", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-    const destination = await userWithCompanyFactory(UserRole.ADMIN);
-
-    const bsff = await createBsffAfterOperation({
-      emitter,
-      transporter,
-      destination
-    });
-    const nextBsff = await createBsff(
-      {
-        emitter: destination
-      },
-      { grouping: { connect: [{ id: bsff.id }] } }
-    );
-
-    const { query } = makeClient(destination.user);
-    const { data } = await query<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF, {
-      variables: {
-        id: bsff.id
-      }
-    });
-
-    expect(data.bsff).toEqual(
-      expect.objectContaining({
-        groupedIn: expect.objectContaining({ id: nextBsff.id })
-      })
-    );
-  });
-
-  it("should return the BSFF forwarded by this one", async () => {
+  it("should return the packagings forwarded by this BSFF", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
@@ -234,15 +204,10 @@ describe("Query.bsff", () => {
     });
     const bsff = await createBsff(
       {
-        emitter: destination
+        emitter: destination,
+        previousPackagings: forwardedBsff.packagings
       },
-      {
-        forwarding: {
-          connect: {
-            id: forwardedBsff.id
-          }
-        }
-      }
+      { type: "REEXPEDITION" }
     );
     const { query } = makeClient(destination.user);
     const { data } = await query<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF, {
@@ -250,45 +215,8 @@ describe("Query.bsff", () => {
         id: bsff.id
       }
     });
-    expect(data.bsff).toEqual(
-      expect.objectContaining({
-        forwarding: { id: forwardedBsff.id }
-      })
-    );
-  });
-
-  it("should return the BSFF this one has been forwarded in", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-    const destination = await userWithCompanyFactory(UserRole.ADMIN);
-
-    const bsff = await createBsffAfterOperation({
-      emitter,
-      transporter,
-      destination
-    });
-    const nextBsff = await createBsff(
-      {
-        emitter: destination
-      },
-      {
-        forwarding: {
-          connect: {
-            id: bsff.id
-          }
-        }
-      }
-    );
-    const { query } = makeClient(destination.user);
-    const { data } = await query<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF, {
-      variables: {
-        id: bsff.id
-      }
-    });
-    expect(data.bsff).toEqual(
-      expect.objectContaining({
-        forwardedIn: { id: nextBsff.id }
-      })
-    );
+    expect(data.bsff.forwarding).toEqual([
+      expect.objectContaining({ id: forwardedBsff.packagings[0].id })
+    ]);
   });
 });

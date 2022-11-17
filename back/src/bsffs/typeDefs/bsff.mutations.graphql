@@ -1,10 +1,11 @@
 type Mutation {
   """
-  Mutation permettant de créer un nouveau bordereau de suivi de fluides frigorigènes.
+  Mutation permettant de créer un nouveau BSFF.
 
   Ces champs sont requis :
 
   ```
+  type
   emitter {
     company {
       name
@@ -15,12 +16,41 @@ type Mutation {
       mail
     }
   }
+  transporter {
+    company {
+      name
+      siret
+      address
+      contact
+      phone
+      mail
+    }
+  }
+  destination {
+    company {
+      name
+      siret
+      address
+      contact
+      phone
+      mail
+    }
+    plannedOperationCode
+  }
   waste {
     code
     adr
+    description
   }
   weight {
     value
+    isEstimate
+  }
+  packagings {
+    name
+    numero
+    volume
+    weight
   }
   ```
 
@@ -29,8 +59,8 @@ type Mutation {
   createBsff(input: BsffInput!): Bsff!
 
   """
-  Mutation permettant de créer un nouveau bordereau de suivi de fluides frigorigènes, à l'état de brouillon.
-  Un brouillon n'a pas de champs requis, la validation se fait au moment de le publier.
+  Mutation permettant de créer un nouveau BSFF à l'état de brouillon.
+  Les seuls champs requis sont le type du BSFF et le n°SIRET de l'émetteur, du transporteur ou du destinataire.
   """
   createDraftBsff(input: BsffInput!): Bsff!
 
@@ -38,6 +68,12 @@ type Mutation {
   Mutation permettant de modifier un bordereau existant de suivi de fluides frigorigènes.
   """
   updateBsff(id: ID!, input: BsffInput!): Bsff!
+
+  """
+  Mutation permettant de modifier les informations de réception
+  et traitement par contenant
+  """
+  updateBsffPackaging(id: ID!, input: UpdateBsffPackagingInput!): BsffPackaging!
 
   """
   Mutation permettant de publier un brouillon.
@@ -57,11 +93,14 @@ type Mutation {
   duplicateBsff(id: ID!): Bsff!
 
   """
-  Mutation permettant d'apposer une signature sur le bordereau.
+  Mutation permettant de signer un `BSFF` lors des différentes étapes : émission, transport, réception,
+  acceptation, opération. Chaque mutation verrouille les informations et fait passer le BSFF d'un statut
+  à un autre.
 
   **Champs requis pour `EMISSION` :**
 
   ```
+  type
   emitter {
     company {
       name
@@ -72,18 +111,6 @@ type Mutation {
       mail
     }
   }
-  waste {
-    code
-    adr
-  }
-  weight {
-    value
-  }
-  ```
-
-  **Champs requis pour `TRANSPORT` :**
-
-  ```
   transporter {
     company {
       name
@@ -93,20 +120,7 @@ type Mutation {
       phone
       mail
     }
-    transport {
-      mode
-    }
   }
-  packagings {
-    name
-    numero
-    weight
-  }
-  ```
-
-  **Champs requis pour `RECEPTION` :**
-
-  ```
   destination {
     company {
       name
@@ -116,22 +130,72 @@ type Mutation {
       phone
       mail
     }
-    reception {
-      date
-      weight
-      acceptation {
-        status
-      }
+    plannedOperationCode
+  }
+  waste {
+    code
+    adr
+    description
+  }
+  weight {
+    value
+    isEstimate
+  }
+  packagings {
+    name
+    numero
+    volume
+    weight
+  }
+  ```
+
+  **Champs additionnels requis pour `TRANSPORT` :**
+
+  ```
+  transporter {
+    transport {
+      mode
+      takenOverAt
     }
   }
   ```
 
-  **Champs requis pour `OPERATION` :**
+  **Champs additionnels requis pour `RECEPTION` :**
 
   ```
   destination {
+    reception {
+      date
+    }
+  }
+  ```
+
+  **Champs additionnels requis pour `ACCEPTATION` :**
+
+  À mettre à jour via la mutation `updateBsffPackaging`. L'acceptation de chaque contenant peut-être signée séparement
+  en précisant un identifiant de contenant.
+
+  ```
+  packagings {
+    acceptation {
+      date
+      status
+      weight
+    }
+  }
+  ```
+
+  **Champs additionnels requis pour `OPERATION` :**
+
+  À mettre à jour via la mutation `updateBsffPackaging`. L'opération de chaque contenant peut-être signée séparement
+  en précisant un identifiant de contenant.
+
+  ```
+  packagings {
     operation {
+      date
       code
+      description
     }
   }
   ```
@@ -139,17 +203,8 @@ type Mutation {
   signBsff(
     "Identifiant du BSFF à signer."
     id: ID!
-    "Type de signature à apposer, voir l'enum pour plus de détails."
-    type: BsffSignatureType!
-    "Informations à propos de la personne signant le BSFF."
-    signature: SignatureInput!
-    """
-    Code de signature de l'auteur de la signature.
 
-    Ce paramètre est optionnel, il n'est utile que dans le cas où vous souhaitez signer pour un tiers sans moyen de vous authentifier à sa place.
-    Ce tiers peut alors saisir son code de signature dans votre outil.
-    """
-    securityCode: Int
+    input: BsffSignatureInput!
   ): Bsff!
 
   """

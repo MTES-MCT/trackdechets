@@ -1,13 +1,15 @@
-import { Bsff, BsffStatus } from "@prisma/client";
+import { Bsff, BsffStatus, BsffPackaging } from "@prisma/client";
 import prisma from "../prisma";
 import { BsdElastic, indexBsd } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
-import { BsffPackaging } from "../generated/graphql/types";
+import { toBsffDestination } from "./compat";
 
 export function toBsdElastic(
   bsff: Bsff & { packagings: BsffPackaging[] }
 ): BsdElastic {
+  const bsffDestination = toBsffDestination(bsff.packagings);
+
   const bsd = {
     type: "BSFF" as const,
     id: bsff.id,
@@ -27,9 +29,9 @@ export function toBsdElastic(
     destinationCompanyName: bsff.destinationCompanyName ?? "",
     destinationCompanySiret: bsff.destinationCompanySiret ?? "",
     destinationReceptionDate: bsff.destinationReceptionDate?.getTime(),
-    destinationReceptionWeight: bsff.destinationReceptionWeight,
-    destinationOperationCode: bsff.destinationOperationCode ?? "",
-    destinationOperationDate: bsff.destinationOperationSignatureDate?.getTime(),
+    destinationReceptionWeight: bsffDestination.receptionWeight,
+    destinationOperationCode: bsffDestination.operationCode ?? "",
+    destinationOperationDate: bsffDestination.operationDate?.getTime(),
     wasteCode: bsff.wasteCode ?? "",
     wasteDescription: bsff.wasteDescription ?? "",
     containers: bsff.packagings.map(packaging => packaging.numero),
@@ -83,7 +85,9 @@ export function toBsdElastic(
         bsd.isForActionFor.push(bsff.destinationCompanySiret);
         break;
       }
-      case BsffStatus.RECEIVED: {
+      case BsffStatus.RECEIVED:
+      case BsffStatus.PARTIALLY_REFUSED:
+      case BsffStatus.ACCEPTED: {
         bsd.isFollowFor.push(
           bsff.emitterCompanySiret,
           bsff.transporterCompanySiret

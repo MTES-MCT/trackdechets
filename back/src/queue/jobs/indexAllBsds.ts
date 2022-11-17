@@ -1,3 +1,4 @@
+import axios from "axios";
 import { Job } from "bull";
 import { BsdIndex } from "../../common/elastic";
 import {
@@ -6,6 +7,18 @@ import {
   reindexAllBsdsInBulk
 } from "../../bsds/indexation/bulkIndexBsds";
 import logger from "../../logging/logger";
+
+const {
+  SCALINGO_API_URL,
+  SCALINGO_APP_NAME,
+  SCALINGO_TOKEN,
+  BULK_INDEX_SCALINGO_ACTIVE_AUTOSCALING,
+  BULK_INDEX_SCALINGO_CONTAINER_NAME,
+  BULK_INDEX_SCALINGO_CONTAINER_SIZE_UP,
+  BULK_INDEX_SCALINGO_CONTAINER_SIZE_DOWN,
+  BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_UP,
+  BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_DOWN
+} = process.env;
 
 /**
  * Index one chunk of one given type of BSD
@@ -40,6 +53,47 @@ export async function indexChunkBsdJob(job: Job<string>) {
 }
 
 /**
+ *
+ */
+const sleepUntil = async (
+  operationsUrl: string,
+  timeoutMs: number
+): Promise<void> => {
+  const scalingoOperationStatus = async operationsUrl => {
+    if (!operationsUrl) return true;
+    const { data } = await axios.get<{
+      operation: {
+        status: string;
+      };
+    }>(operationsUrl, {
+      headers: {
+        Authorization: `Bearer ${SCALINGO_TOKEN}`
+      }
+    });
+    if (["done", "error"].includes(data?.operation?.status)) {
+      return true;
+    }
+    return false;
+  };
+
+  return new Promise((resolve, reject) => {
+    const timeWas = new Date();
+    const wait = setInterval(async function () {
+      const now = new Date();
+      const result = await scalingoOperationStatus(operationsUrl);
+      if (result === true) {
+        clearInterval(wait);
+        resolve();
+      } else if (now.getTime() - timeWas.getTime() > timeoutMs) {
+        // Timeout
+        clearInterval(wait);
+        reject();
+      }
+    }, 2000); // check scalingoOperationStatus every 2 secs
+  });
+};
+
+/**
  * Index all of BSD in other jobs
  */
 export async function indexAllInBulk(job: Job<string>) {
@@ -47,15 +101,98 @@ export async function indexAllInBulk(job: Job<string>) {
     const { index, force }: { index: BsdIndex; force: boolean } = JSON.parse(
       job.data
     );
+
+    let operationsUrl;
+    if (BULK_INDEX_SCALINGO_ACTIVE_AUTOSCALING === "true") {
+      // scale-up indexqueue workers
+      axios({
+        method: "post",
+        url: `https://${SCALINGO_API_URL}/v1/apps/${SCALINGO_APP_NAME}/scale`,
+        data: {
+          containers: [
+            {
+              name: BULK_INDEX_SCALINGO_CONTAINER_NAME,
+              amount:
+                parseInt(BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_UP, 10) || 4,
+              size: BULK_INDEX_SCALINGO_CONTAINER_SIZE_UP || "2XL"
+            }
+          ]
+        },
+        headers: {
+          Authorization: `Bearer ${SCALINGO_TOKEN}`
+        }
+      })
+        .then(resp => {
+          if (resp) {
+            operationsUrl = resp.headers.location;
+          }
+          logger.info(
+            `Scaled-up ${SCALINGO_APP_NAME} ${BULK_INDEX_SCALINGO_CONTAINER_NAME} workers to ${BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_UP} ${BULK_INDEX_SCALINGO_CONTAINER_SIZE_UP}, operation url is ${operationsUrl}`,
+            resp.data
+          );
+        })
+        .catch(error => {
+          logger.error(
+            `Failed to scale-up ${SCALINGO_APP_NAME} ${BULK_INDEX_SCALINGO_CONTAINER_NAME} workers to ${BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_UP} ${BULK_INDEX_SCALINGO_CONTAINER_SIZE_UP}, please take a manual action instead\n`,
+            error
+          );
+        });
+    }
+
     // will index all BSD without downtime, only if need because of a mapping change
     await reindexAllBsdsInBulk({
       index,
       force,
       useQueue: true
     });
+    if (BULK_INDEX_SCALINGO_ACTIVE_AUTOSCALING === "true") {
+      // scale-down indexqueue workers
+      // After scaling-up, the status of the application will be changed to ‘scaling’ for the scaling duration.
+      // No other operation is doable until the app status has switched to “running” again.
+      try {
+        // Wait or timeout after 60sec
+        await sleepUntil(operationsUrl, 60000);
+        // ready
+        await scaleDownScalingo();
+      } catch {
+        // timeout
+        await scaleDownScalingo();
+      }
+    }
     return null;
-  } catch (error) {
-    logger.error(`Error in indexAllInBulk.`, error);
-    throw error;
+  } catch (jobError) {
+    logger.error(`Error in indexAllInBulk job.`, { job, jobError });
+    throw jobError;
   }
+}
+
+function scaleDownScalingo() {
+  axios({
+    method: "post",
+    url: `https://${SCALINGO_API_URL}/v1/apps/${SCALINGO_APP_NAME}/scale`,
+    data: {
+      containers: [
+        {
+          name: BULK_INDEX_SCALINGO_CONTAINER_NAME,
+          amount: parseInt(BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_DOWN, 10) || 1,
+          size: BULK_INDEX_SCALINGO_CONTAINER_SIZE_DOWN || "M"
+        }
+      ]
+    },
+    headers: {
+      Authorization: `Bearer ${SCALINGO_TOKEN}`
+    }
+  })
+    .then(resp => {
+      logger.info(
+        `Scaled-down ${SCALINGO_APP_NAME} ${BULK_INDEX_SCALINGO_CONTAINER_NAME} workers to ${BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_DOWN} ${BULK_INDEX_SCALINGO_CONTAINER_SIZE_DOWN}`,
+        resp.data
+      );
+    })
+    .catch(function (error) {
+      logger.error(
+        `Failed to scale-down ${BULK_INDEX_SCALINGO_CONTAINER_NAME} workers to ${BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_DOWN} ${BULK_INDEX_SCALINGO_CONTAINER_SIZE_DOWN}, please take a manual action instead\n`,
+        error
+      );
+    });
 }

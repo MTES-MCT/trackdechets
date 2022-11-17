@@ -4,7 +4,9 @@ import {
   emitterSchemaFn,
   transporterSchemaFn,
   destinationSchemaFn,
-  wasteDetailsSchemaFn
+  wasteDetailsSchemaFn,
+  acceptationSchema,
+  operationSchema
 } from "../validation";
 
 describe("emitterSchema", () => {
@@ -199,72 +201,251 @@ describe("wasteDetailsSchema", () => {
 describe("receptionSchema", () => {
   const reception = {
     destinationReceptionSignatureDate: null,
-    destinationReceptionDate: new Date("2021-09-02"),
-    destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
-    destinationReceptionWeight: 1,
-    destinationReceptionRefusalReason: null
+    destinationReceptionDate: new Date("2021-09-02")
   };
 
-  it("should be valid when reception is accepted", async () => {
+  it("should be valid when reception date is set", async () => {
     const data = reception;
     expect(receptionSchema.isValidSync(data)).toEqual(true);
   });
 
-  it("should be invalid when reception is accepted but weight = 0", async () => {
-    const data = {
-      ...reception,
-      destinationReceptionWeight: 0
-    };
+  it("should be invalid when reception date is not set", async () => {
+    const data = { ...reception, destinationReceptionDate: null };
     const validateFn = () => receptionSchema.validate(data);
+    await expect(validateFn()).rejects.toThrow(
+      "La date de réception du déchet est requise"
+    );
+  });
+});
+
+describe("acceptationSchema", () => {
+  const acceptation = {
+    acceptationDate: new Date("2021-09-02"),
+    acceptationWeight: 1,
+    acceptationStatus: WasteAcceptationStatus.ACCEPTED,
+    acceptationRefusalReason: null,
+    acceptationWasteCode: "14 06 01*",
+    acceptationWasteDescription: "fluide"
+  };
+
+  it("should be valid when packaging is accepted", async () => {
+    const data = acceptation;
+    expect(acceptationSchema.isValidSync(data)).toEqual(true);
+  });
+
+  it("should be invalid when waste code after analysis is not set", async () => {
+    const data = { ...acceptation, acceptationWasteCode: null };
+    const validateFn = () => acceptationSchema.validate(data);
+    await expect(validateFn()).rejects.toThrow(
+      "Le code déchet après analyse est requis"
+    );
+  });
+
+  it("should be invalid when waste code after analysis is not compatible with BSFF", async () => {
+    const data = { ...acceptation, acceptationWasteCode: "06 07 01*" };
+    const validateFn = () => acceptationSchema.validate(data);
+    await expect(validateFn()).rejects.toThrow(
+      "Le code déchet ne fait pas partie de la liste reconnue : 14 06 01*, 14 06 02*, 14 06 03*, 16 05 04*, 13 03 10*"
+    );
+  });
+
+  it("should be invalid when waste description after analysis is not set", async () => {
+    const data = { ...acceptation, acceptationWasteDescription: null };
+    const validateFn = () => acceptationSchema.validate(data);
+    await expect(validateFn()).rejects.toThrow(
+      "La description du déchet après analyse est requise"
+    );
+  });
+
+  it("should be invalid when packaging is accepted but weight = 0", async () => {
+    const data = {
+      ...acceptation,
+      acceptationWeight: 0
+    };
+    const validateFn = () => acceptationSchema.validate(data);
     await expect(validateFn()).rejects.toThrow(
       "Vous devez saisir une quantité reçue supérieure à 0"
     );
   });
 
-  it("should be invalid when reception is accepted and refusal reason is set", async () => {
+  it("should be invalid when packaging is accepted and refusal reason is set", async () => {
     const data = {
-      ...reception,
-      destinationReceptionRefusalReason: "parce que"
+      ...acceptation,
+      acceptationRefusalReason: "parce que"
     };
-    const validateFn = () => receptionSchema.validate(data);
+    const validateFn = () => acceptationSchema.validate(data);
     await expect(validateFn()).rejects.toThrow(
       "Le motif du refus ne doit pas être renseigné si le déchet est accepté"
     );
   });
 
-  it("should be valid when reception is refused", () => {
+  it("should be valid when packaging is refused", () => {
     const data = {
-      ...reception,
-      destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
-      destinationReceptionWeight: 0,
-      destinationReceptionRefusalReason: "parce que"
+      ...acceptation,
+      acceptationStatus: WasteAcceptationStatus.REFUSED,
+      acceptationWeight: 0,
+      acceptationRefusalReason: "parce que"
     };
-    expect(receptionSchema.isValidSync(data)).toEqual(true);
+    expect(acceptationSchema.isValidSync(data)).toEqual(true);
   });
 
-  it("should be invalid when reception is refused and weight > 0", async () => {
+  it("should be invalid when packaging is refused and weight > 0", async () => {
     const data = {
-      ...reception,
-      destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
-      destinationReceptionWeight: 1,
-      destinationReceptionRefusalReason: "parce que"
+      ...acceptation,
+      acceptationStatus: WasteAcceptationStatus.REFUSED,
+      acceptationWeight: 1,
+      acceptationRefusalReason: "parce que"
     };
-    const validateFn = () => receptionSchema.validate(data);
+    const validateFn = () => acceptationSchema.validate(data);
     await expect(validateFn()).rejects.toThrow(
       "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
     );
   });
 
-  it("should be invalid when reception is refused and refusal reason is not set", async () => {
+  it("should be invalid when packaging is refused and refusal reason is not set", async () => {
     const data = {
-      ...reception,
-      destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
-      destinationReceptionWeight: 0,
-      destinationReceptionRefusalReason: null
+      ...acceptation,
+      acceptationStatus: WasteAcceptationStatus.REFUSED,
+      acceptationWeight: 0,
+      acceptationRefusalReason: null
     };
-    const validateFn = () => receptionSchema.validate(data);
+    const validateFn = () => acceptationSchema.validate(data);
     await expect(validateFn()).rejects.toThrow(
       "Vous devez saisir un motif de refus"
+    );
+  });
+});
+
+describe("operationSchema", () => {
+  const operation = {
+    operationDate: new Date("2021-09-02"),
+    operationNoTraceability: false,
+    operationCode: "R2",
+    operationNextDestinationCompanyName: null,
+    operationNextDestinationPlannedOperationCode: null,
+    operationNextDestinationCap: null,
+    operationNextDestinationCompanySiret: null,
+    operationNextDestinationCompanyVatNumber: null,
+    operationNextDestinationCompanyAddress: null,
+    operationNextDestinationCompanyContact: null,
+    operationNextDestinationCompanyPhone: null,
+    operationNextDestinationCompanyMail: null
+  };
+
+  it("should be valid when operation date and operation code are set", () => {
+    const data = operation;
+    expect(operationSchema.isValidSync(data)).toEqual(true);
+  });
+
+  it("should be valid when operation code is groupement and noTraceability is true", () => {
+    const data = {
+      ...operation,
+      operationNoTraceability: true,
+      operationCode: "D13"
+    };
+    expect(operationSchema.isValidSync(data)).toEqual(true);
+  });
+
+  it("should be valid when operation code is groupement and next destination is set and has a valid SIRET", () => {
+    const data = {
+      ...operation,
+      operationCode: "D13",
+      operationNextDestinationCompanyName: "ACME INC",
+      operationNextDestinationPlannedOperationCode: "R2",
+      operationNextDestinationCap: "cap",
+      operationNextDestinationCompanySiret: "11111111111111",
+      operationNextDestinationCompanyVatNumber: null,
+      operationNextDestinationCompanyAddress: "Quelque part",
+      operationNextDestinationCompanyContact: "Mr Déchet",
+      operationNextDestinationCompanyPhone: "01 00 00 00 00",
+      operationNextDestinationCompanyMail: "contact@trackdechets.fr"
+    };
+    expect(operationSchema.isValidSync(data)).toEqual(true);
+  });
+
+  it("should be valid when operation code is groupement and next destination is set and has a valid VAT", () => {
+    const data = {
+      ...operation,
+      operationCode: "D13",
+      operationNextDestinationCompanyName: "ACME INC",
+      operationNextDestinationPlannedOperationCode: "R2",
+      operationNextDestinationCap: "cap",
+      operationNextDestinationCompanySiret: null,
+      operationNextDestinationCompanyVatNumber: "IE9513674T",
+      operationNextDestinationCompanyAddress: "Quelque part",
+      operationNextDestinationCompanyContact: "Mr Déchet",
+      operationNextDestinationCompanyPhone: "01 00 00 00 00",
+      operationNextDestinationCompanyMail: "contact@trackdechets.fr"
+    };
+    expect(operationSchema.isValidSync(data)).toEqual(true);
+  });
+
+  it("should be invalid when no SIRET or VAT is provided in next destination", async () => {
+    const data = {
+      ...operation,
+      operationCode: "D13",
+      operationNextDestinationCompanyName: "ACME INC",
+      operationNextDestinationPlannedOperationCode: "R2",
+      operationNextDestinationCap: "cap",
+      operationNextDestinationCompanySiret: null,
+      operationNextDestinationCompanyVatNumber: null,
+      operationNextDestinationCompanyAddress: "Quelque part",
+      operationNextDestinationCompanyContact: "Mr Déchet",
+      operationNextDestinationCompanyPhone: "01 00 00 00 00",
+      operationNextDestinationCompanyMail: "contact@trackdechets.fr"
+    };
+    const validateFn = () => operationSchema.validate(data);
+    await expect(validateFn()).rejects.toThrow("");
+  });
+
+  it("should be valid when operation code is groupement, noTraceability is true and nextDestination is set", () => {
+    const data = {
+      ...operation,
+      operationNoTraceability: true,
+      operationCode: "D13",
+      operationNextDestinationCompanyName: "ACME INC",
+      operationNextDestinationPlannedOperationCode: "R2",
+      operationNextDestinationCap: "cap",
+      operationNextDestinationCompanySiret: "11111111111111",
+      operationNextDestinationCompanyVatNumber: null,
+      operationNextDestinationCompanyAddress: "Quelque part",
+      operationNextDestinationCompanyContact: "Mr Déchet",
+      operationNextDestinationCompanyPhone: "01 00 00 00 00",
+      operationNextDestinationCompanyMail: "contact@trackdechets.fr"
+    };
+    expect(operationSchema.isValidSync(data)).toEqual(true);
+  });
+
+  it("should be invalid when the processing operation is not set", async () => {
+    const data = {
+      ...operation,
+      operationCode: null
+    };
+    const validateFn = () => operationSchema.validate(data);
+    await expect(validateFn()).rejects.toThrow(
+      "Le code de l'opération de traitement est requis"
+    );
+  });
+
+  it("should be invalid when the operation date is not set", async () => {
+    const data = {
+      ...operation,
+      operationDate: null
+    };
+    const validateFn = () => operationSchema.validate(data);
+    await expect(validateFn()).rejects.toThrow(
+      "La date de l'opération est requise"
+    );
+  });
+
+  it("should be invalid when processing operation is not in the list", async () => {
+    const data = {
+      ...operation,
+      operationCode: "R8"
+    };
+    const validateFn = () => operationSchema.validate(data);
+    await expect(validateFn()).rejects.toThrow(
+      "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : R2, R3, R12, R13, D10, D13, D14, D15"
     );
   });
 });
