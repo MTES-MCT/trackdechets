@@ -19,6 +19,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Transporteurs étrangers : ne pas demander de remplir un récépissé transporteur dans les formulaires [PR 1844](https://github.com/MTES-MCT/trackdechets/pull/1844)
+- Amélioration des messages d'erreurs du service de recherche d'entreprise européenne par numéro de TVA. Ajout dans l'api du code d'erreur `EXTERNAL_SERVICE_ERROR`: La requête GraphQL est valide mais un service tiers externe à Trackdéchets a renvoyé une erreur. [PR 1783](https://github.com/MTES-MCT/trackdechets/pull/1783/)
 
 #### :memo: Documentation
 
