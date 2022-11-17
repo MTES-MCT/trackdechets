@@ -74,12 +74,13 @@ export default function MarkAsReceived({ form }: WorkflowActionProps) {
               <ReceivedInfo
                 form={data.form}
                 onSubmit={values => {
-                  return markAsReceived({
+                  markAsReceived({
                     variables: {
                       id: data.form.id,
                       receivedInfo: values,
                     },
                   });
+                  close();
                 }}
                 close={close}
               />
