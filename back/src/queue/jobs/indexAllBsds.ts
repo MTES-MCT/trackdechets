@@ -52,12 +52,36 @@ export async function indexChunkBsdJob(job: Job<string>) {
   }
 }
 
-const sleepUntil = async (testFunction, timeoutMs): Promise<void> => {
+/**
+ *
+ */
+const sleepUntil = async (
+  operationsUrl: string,
+  timeoutMs: number
+): Promise<void> => {
+  const scalingoOperationStatus = async operationsUrl => {
+    if (!operationsUrl) return true;
+    const { data } = await axios.get<{
+      operation: {
+        status: string;
+      };
+    }>(operationsUrl, {
+      headers: {
+        Authorization: `Bearer ${SCALINGO_TOKEN}`
+      }
+    });
+    if (["done", "error"].includes(data?.operation?.status)) {
+      return true;
+    }
+    return false;
+  };
+
   return new Promise((resolve, reject) => {
     const timeWas = new Date();
     const wait = setInterval(async function () {
       const now = new Date();
-      if (await testFunction()) {
+      const result = await scalingoOperationStatus(operationsUrl);
+      if (result === true) {
         clearInterval(wait);
         resolve();
       } else if (now.getTime() - timeWas.getTime() > timeoutMs) {
@@ -65,7 +89,7 @@ const sleepUntil = async (testFunction, timeoutMs): Promise<void> => {
         clearInterval(wait);
         reject();
       }
-    }, 20);
+    }, 2000); // check scalingoOperationStatus every 2 secs
   });
 };
 
@@ -100,11 +124,11 @@ export async function indexAllInBulk(job: Job<string>) {
       })
         .then(resp => {
           if (resp) {
-            operationsUrl = resp.headers.Location;
+            operationsUrl = resp.headers.location;
           }
           logger.info(
             `Scaled-up ${SCALINGO_APP_NAME} ${BULK_INDEX_SCALINGO_CONTAINER_NAME} workers to ${BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_UP} ${BULK_INDEX_SCALINGO_CONTAINER_SIZE_UP}, operation url is ${operationsUrl}`,
-            resp
+            resp.data
           );
         })
         .catch(error => {
@@ -125,20 +149,9 @@ export async function indexAllInBulk(job: Job<string>) {
       // scale-down indexqueue workers
       // After scaling-up, the status of the application will be changed to ‘scaling’ for the scaling duration.
       // No other operation is doable until the app status has switched to “running” again.
-      // TODO add while loop to wait for the operation to be done cf. https://developers.scalingo.com/operations.html
       try {
-        await sleepUntil(async () => {
-          if (!operationsUrl) return true;
-          const { data } = await axios.get<{
-            operation: {
-              status: string;
-            };
-          }>(operationsUrl);
-          if (["done", "error"].includes(data?.operation?.status)) {
-            return true;
-          }
-          return false;
-        }, 5000);
+        // Wait or timeout after 60sec
+        await sleepUntil(operationsUrl, 60000);
         // ready
         await scaleDownScalingo();
       } catch {
@@ -173,7 +186,7 @@ function scaleDownScalingo() {
     .then(resp => {
       logger.info(
         `Scaled-down ${SCALINGO_APP_NAME} ${BULK_INDEX_SCALINGO_CONTAINER_NAME} workers to ${BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_DOWN} ${BULK_INDEX_SCALINGO_CONTAINER_SIZE_DOWN}`,
-        resp
+        resp.data
       );
     })
     .catch(function (error) {
