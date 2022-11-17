@@ -50,8 +50,11 @@ export const InitialDasris = ({ initialBsdasris }) => {
           </TableCell>
 
           <TableCell>
-            {initialBsdasris.reduce((prev, curr) => prev + curr.weight, 0) ||
-              "N/A"}
+            {Number.parseFloat(
+              initialBsdasris
+                .reduce((prev, curr) => prev + curr.weight, 0)
+                .toFixed(3)
+            ) || "N/A"}
           </TableCell>
           <TableCell>{null}</TableCell>
           <TableCell>{null}</TableCell>
