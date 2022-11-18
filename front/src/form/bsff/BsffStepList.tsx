@@ -80,6 +80,7 @@ export default function BsffStepsList(props: Props) {
       previousPackagings,
       packagings,
       type,
+      transporter: { recepisse, ...transporter },
       destination: { plannedOperationCode, ...destination },
       ...input
     } = values;
@@ -87,6 +88,14 @@ export default function BsffStepsList(props: Props) {
     saveForm({
       type,
       ...input,
+      transporter: {
+        recepisse: {
+          ...recepisse,
+          validityLimit:
+            recepisse.validityLimit === "" ? null : recepisse.validityLimit,
+        },
+        ...transporter,
+      },
       destination: {
         ...destination,
         plannedOperationCode:
