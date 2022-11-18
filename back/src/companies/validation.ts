@@ -58,7 +58,11 @@ export const destinationCompanySiretSchema = (isDraft: boolean) =>
 
         if (!(isCollector(company) || isWasteProcessor(company))) {
           throw ctx.createError({
-            message: `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${siret}" n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+            message:
+              `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${siret}" n'est pas inscrite` +
+              ` sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut` +
+              ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
+              ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
           });
         }
 
@@ -67,7 +71,9 @@ export const destinationCompanySiretSchema = (isDraft: boolean) =>
           company.verificationStatus !== CompanyVerificationStatus.VERIFIED
         ) {
           throw ctx.createError({
-            message: `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau bordereau.`
+            message:
+              `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue` +
+              ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau bordereau.`
           });
         }
 
@@ -95,7 +101,11 @@ export const transporterCompanySiretSchema = (isDraft: boolean) =>
 
         if (!isTransporter(company)) {
           throw ctx.createError({
-            message: `Le transporteur saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+            message:
+              `Le transporteur saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets` +
+              ` en tant qu'entreprise de transport. Cette installation ne peut donc pas être visée sur le bordereau.` +
+              ` Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil` +
+              ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
           });
         }
 

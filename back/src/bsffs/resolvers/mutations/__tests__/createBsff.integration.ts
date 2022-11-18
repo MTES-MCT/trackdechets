@@ -4,7 +4,8 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { BSFF_WASTE_CODES } from "../../../../common/constants";
 import {
   Mutation,
-  MutationCreateBsffArgs
+  MutationCreateBsffArgs,
+  BsffOperationCode
 } from "../../../../generated/graphql/types";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -19,6 +20,58 @@ const CREATE_BSFF = gql`
   ${fullBsff}
 `;
 
+const createInput = (emitter, transporter, destination) => ({
+  type: BsffType.COLLECTE_PETITES_QUANTITES,
+  emitter: {
+    company: {
+      name: emitter.company.name,
+      siret: emitter.company.siret,
+      address: emitter.company.address,
+      contact: emitter.user.name,
+      mail: emitter.user.email,
+      phone: emitter.company.contactPhone
+    }
+  },
+  transporter: {
+    company: {
+      name: transporter.company.name,
+      siret: transporter.company.siret,
+      address: transporter.company.address,
+      contact: transporter.user.name,
+      mail: transporter.user.email,
+      phone: transporter.company.contactPhone
+    }
+  },
+  destination: {
+    company: {
+      name: destination.company.name,
+      siret: destination.company.siret,
+      address: destination.company.address,
+      contact: destination.user.name,
+      mail: destination.user.email,
+      phone: destination.company.contactPhone
+    },
+    plannedOperationCode: "R12" as BsffOperationCode
+  },
+  waste: {
+    code: BSFF_WASTE_CODES[0],
+    adr: "Mention ADR",
+    description: "R410"
+  },
+  weight: {
+    value: 1,
+    isEstimate: true
+  },
+  packagings: [
+    {
+      type: BsffPackagingType.BOUTEILLE,
+      numero: "123",
+      weight: 1,
+      volume: 1
+    }
+  ]
+});
+
 describe("Mutation.createBsff", () => {
   afterEach(resetDatabase);
 
@@ -32,57 +85,7 @@ describe("Mutation.createBsff", () => {
       MutationCreateBsffArgs
     >(CREATE_BSFF, {
       variables: {
-        input: {
-          type: BsffType.COLLECTE_PETITES_QUANTITES,
-          emitter: {
-            company: {
-              name: emitter.company.name,
-              siret: emitter.company.siret,
-              address: emitter.company.address,
-              contact: emitter.user.name,
-              mail: emitter.user.email,
-              phone: emitter.company.contactPhone
-            }
-          },
-          transporter: {
-            company: {
-              name: transporter.company.name,
-              siret: transporter.company.siret,
-              address: transporter.company.address,
-              contact: transporter.user.name,
-              mail: transporter.user.email,
-              phone: transporter.company.contactPhone
-            }
-          },
-          destination: {
-            company: {
-              name: destination.company.name,
-              siret: destination.company.siret,
-              address: destination.company.address,
-              contact: destination.user.name,
-              mail: destination.user.email,
-              phone: destination.company.contactPhone
-            },
-            plannedOperationCode: "R2"
-          },
-          waste: {
-            code: BSFF_WASTE_CODES[0],
-            adr: "Mention ADR",
-            description: "R410"
-          },
-          weight: {
-            value: 1,
-            isEstimate: true
-          },
-          packagings: [
-            {
-              type: BsffPackagingType.BOUTEILLE,
-              numero: "123",
-              weight: 1,
-              volume: 1
-            }
-          ]
-        }
+        input: createInput(emitter, transporter, destination)
       }
     });
 
@@ -200,6 +203,7 @@ describe("Mutation.createBsff", () => {
 
   it("should not be possible to set a transporter not registered in TD", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
     const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
@@ -208,55 +212,19 @@ describe("Mutation.createBsff", () => {
     >(CREATE_BSFF, {
       variables: {
         input: {
-          type: BsffType.COLLECTE_PETITES_QUANTITES,
-          emitter: {
-            company: {
-              name: emitter.company.name,
-              siret: emitter.company.siret,
-              address: emitter.company.address,
-              contact: emitter.user.name,
-              mail: emitter.user.email,
-              phone: emitter.company.contactPhone
+          ...createInput(emitter, transporter, destination),
+          ...{
+            transporter: {
+              company: {
+                name: "Transporter",
+                siret: "11111111111111",
+                address: "Quelque part",
+                contact: "John Snow",
+                mail: "john.snow@trackdechets.fr",
+                phone: "00 00 00 00 00"
+              }
             }
-          },
-          transporter: {
-            company: {
-              name: "Transporter",
-              siret: "11111111111111",
-              address: "Quelque part",
-              contact: "John Snow",
-              mail: "john.snow@trackdechets.fr",
-              phone: "00 00 00 00 00"
-            }
-          },
-          destination: {
-            company: {
-              name: destination.company.name,
-              siret: destination.company.siret,
-              address: destination.company.address,
-              contact: destination.user.name,
-              mail: destination.user.email,
-              phone: destination.company.contactPhone
-            },
-            plannedOperationCode: "R2"
-          },
-          waste: {
-            code: BSFF_WASTE_CODES[0],
-            adr: "Mention ADR",
-            description: "R410"
-          },
-          weight: {
-            value: 1,
-            isEstimate: true
-          },
-          packagings: [
-            {
-              name: "BOUTEILLE",
-              numero: "123",
-              weight: 1,
-              volume: 1
-            }
-          ]
+          }
         }
       }
     });
@@ -270,9 +238,10 @@ describe("Mutation.createBsff", () => {
     ]);
   });
 
-  it("should not be possible to set a transporter not registered in TD", async () => {
+  it("should not be possible to set a destination not registered in TD", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
     const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
       Pick<Mutation, "createBsff">,
@@ -280,27 +249,7 @@ describe("Mutation.createBsff", () => {
     >(CREATE_BSFF, {
       variables: {
         input: {
-          type: BsffType.COLLECTE_PETITES_QUANTITES,
-          emitter: {
-            company: {
-              name: emitter.company.name,
-              siret: emitter.company.siret,
-              address: emitter.company.address,
-              contact: emitter.user.name,
-              mail: emitter.user.email,
-              phone: emitter.company.contactPhone
-            }
-          },
-          transporter: {
-            company: {
-              name: transporter.company.name,
-              siret: transporter.company.siret,
-              address: transporter.company.address,
-              contact: transporter.user.name,
-              mail: transporter.user.email,
-              phone: transporter.company.contactPhone
-            }
-          },
+          ...createInput(emitter, transporter, destination),
           destination: {
             company: {
               name: "Destination",
@@ -310,25 +259,8 @@ describe("Mutation.createBsff", () => {
               mail: "john.snow@trackdechets.fr",
               phone: "00 00 00 00 00"
             },
-            plannedOperationCode: "R2"
-          },
-          waste: {
-            code: BSFF_WASTE_CODES[0],
-            adr: "Mention ADR",
-            description: "R410"
-          },
-          weight: {
-            value: 1,
-            isEstimate: true
-          },
-          packagings: [
-            {
-              name: "BOUTEILLE",
-              numero: "123",
-              weight: 1,
-              volume: 1
-            }
-          ]
+            plannedOperationCode: "R12"
+          }
         }
       }
     });
@@ -338,6 +270,63 @@ describe("Mutation.createBsff", () => {
         message:
           "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
           "L'installation de destination avec le SIRET 11111111111111 n'est pas inscrite sur Trackdéchets"
+      })
+    ]);
+  });
+
+  it("should not be possible to set a transporter which has not the `TRANSPORTER` profile", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: ["PRODUCER"]
+    });
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsff">,
+      MutationCreateBsffArgs
+    >(CREATE_BSFF, {
+      variables: {
+        input: createInput(emitter, transporter, destination)
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
+          `Le transporteur saisi sur le bordereau (SIRET: ${transporter.company.siret}) n'est pas inscrit sur` +
+          " Trackdéchets en tant qu'entreprise de transport. Cette installation ne peut donc pas" +
+          " être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette" +
+          " installation pour qu'il modifie le profil de l'établissement depuis l'interface" +
+          " Trackdéchets Mon Compte > Établissements"
+      })
+    ]);
+  });
+
+  it("should not be possible to set a destination which has not the `WASTEPROCESSOR` or `TTR` profile", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN, {
+      companyTypes: ["PRODUCER"]
+    });
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsff">,
+      MutationCreateBsffArgs
+    >(CREATE_BSFF, {
+      variables: {
+        input: createInput(emitter, transporter, destination)
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
+          `L\'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${destination.company.siret}"` +
+          " n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement." +
+          " Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur" +
+          " de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
       })
     ]);
   });
