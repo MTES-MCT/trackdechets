@@ -212,7 +212,12 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
                 .required(
                   "Conditionnements : la dénomination du contenant est requise"
                 ),
-              volume: yup.number().nullable(),
+              volume: yup
+                .number()
+                .required("Conditionnements : le volume est requis")
+                .positive(
+                  "Conditionnements : le volume doit être supérieur à 0"
+                ),
               numero: yup
                 .string()
                 .ensure()
@@ -222,7 +227,7 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
               weight: yup
                 .number()
                 .required("Conditionnements : Le poids est requis")
-                .min(0)
+                .positive("Conditionnements : le poids doit être supérieur à 0")
             })
           );
 

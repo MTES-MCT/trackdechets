@@ -150,7 +150,8 @@ describe("wasteDetailsSchema", () => {
       {
         name: "BOUTEILLE",
         numero: "123",
-        weight: 1
+        weight: 1,
+        volume: 1
       }
     ]
   };
@@ -194,6 +195,34 @@ describe("wasteDetailsSchema", () => {
 
     await expect(validateFn()).rejects.toThrow(
       "Conditionnements : le nombre de contenants doit être supérieur ou égal à 1"
+    );
+  });
+
+  test("packaging weight is 0", async () => {
+    const validateFn = () =>
+      wasteDetailsSchema.validate({
+        ...wasteDetails,
+        packagings: [
+          { name: "bouteille", numero: "numero", weight: 0, volume: 1 }
+        ]
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Conditionnements : le poids doit être supérieur à 0"
+    );
+  });
+
+  test("packaging volume is 0", async () => {
+    const validateFn = () =>
+      wasteDetailsSchema.validate({
+        ...wasteDetails,
+        packagings: [
+          { name: "bouteille", numero: "numero", weight: 1, volume: 0 }
+        ]
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Conditionnements : le volume doit être supérieur à 0"
     );
   });
 });
