@@ -106,17 +106,19 @@ describe("publishBsff", () => {
         weightValue: 1,
         weightIsEstimate: false,
         packagings: {
-          create: { name: "BOUTEILLE", numero: "123", weight: 1 }
+          create: { name: "BOUTEILLE", numero: "123", weight: 1, volume: 1 }
         }
       }
     });
 
     const { mutate } = makeClient(emitter.user);
 
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "publishBsff">,
       MutationPublishBsffArgs
     >(PUBLISH_BSFF, { variables: { id: bsff.id } });
+
+    expect(errors).toBeUndefined();
 
     expect(data.publishBsff.isDraft).toEqual(false);
   });
