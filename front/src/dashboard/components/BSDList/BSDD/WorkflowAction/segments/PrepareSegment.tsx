@@ -139,6 +139,7 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
                   name="transporter.company"
                   allowForeignCompanies={true}
                   registeredOnlyCompanies={true}
+                  initialAutoSelectFirstCompany={false}
                   onCompanySelected={transporter => {
                     if (transporter.transporterReceipt) {
                       setFieldValue(
