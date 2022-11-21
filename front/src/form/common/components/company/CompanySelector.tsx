@@ -47,8 +47,6 @@ interface CompanySelectorProps {
   name: string;
   onCompanySelected?: (company: CompanySearchResult) => void;
   allowForeignCompanies?: boolean;
-  // force l'affichage d'un formulaire pour entrer manuellement les coordonnées
-  forceManualForeignCompanyForm?: boolean;
   registeredOnlyCompanies?: boolean;
   heading?: string;
   disabled?: boolean;
@@ -63,7 +61,6 @@ export default function CompanySelector({
   name,
   onCompanySelected,
   allowForeignCompanies = false,
-  forceManualForeignCompanyForm = false,
   registeredOnlyCompanies = false,
   heading,
   disabled,
@@ -85,8 +82,10 @@ export default function CompanySelector({
   const clueInputRef = useRef<HTMLInputElement>(null);
   const [mustBeRegistered, setMustBeRegistered] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<CompanySearchResult[]>([]);
-  const [toggleManualForeignCompanyForm, setToggleManualForeignCompanyForm] =
-    useState<boolean>(false);
+  const [
+    toggleForeignCompanyWithUnknownInfos,
+    setToggleForeignCompanyWithUnknownInfos,
+  ] = useState<boolean>(false);
 
   // Favortite type is deduced from the field prefix (transporter, emitter, etc)
   const favoriteType = constantCase(field.name.split(".")[0]) as FavoriteType;
@@ -159,7 +158,7 @@ export default function CompanySelector({
       );
     }
     // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
-    setToggleManualForeignCompanyForm(
+    setToggleForeignCompanyWithUnknownInfos(
       isForeignVat(company.vatNumber!!) &&
         (company.name === "---" || company.name === "")
     );
@@ -362,7 +361,7 @@ export default function CompanySelector({
             />
           </div>
         </div>
-        {toggleManualForeignCompanyForm === true && (
+        {toggleForeignCompanyWithUnknownInfos === true && (
           <SimpleNotificationError
             message={
               <>
@@ -426,9 +425,7 @@ export default function CompanySelector({
         />
         <div className="form__row">
           {allowForeignCompanies &&
-            (isForeignCompany ||
-              forceManualForeignCompanyForm ||
-              toggleManualForeignCompanyForm) && (
+            (isForeignCompany || toggleForeignCompanyWithUnknownInfos) && (
               <>
                 <label>
                   Nom de l'entreprise
