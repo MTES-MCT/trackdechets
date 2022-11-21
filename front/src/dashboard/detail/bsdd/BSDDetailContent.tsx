@@ -318,7 +318,7 @@ const GroupedIn = ({ form }: { form: Form }) => {
       value={
         <span>
           {form.readableId} (
-          <button className="link" onClick={() => downloadPdf()}>
+          <button className={styles.downloadLink} onClick={() => downloadPdf()}>
             Télécharger le PDF
           </button>
           )

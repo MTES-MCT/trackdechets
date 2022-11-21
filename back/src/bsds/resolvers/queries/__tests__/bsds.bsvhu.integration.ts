@@ -647,7 +647,7 @@ describe("Query.bsds.vhus mutations", () => {
     await refreshElasticSearch();
 
     res = await query<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {});
-    // vhu si not indexed anymore
+    // vhu is not indexed anymore
     expect(res.data.bsds.edges).toEqual([]);
   });
 

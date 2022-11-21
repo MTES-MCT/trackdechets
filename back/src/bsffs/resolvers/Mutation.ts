@@ -8,6 +8,7 @@ import createFicheInterventionBsff from "./mutations/createFicheInterventionBsff
 import updateFicheInterventionBsff from "./mutations/updateFicheInterventionBsff";
 import signBsff from "./mutations/signBsff";
 import duplicateBsff from "./mutations/duplicateBsff";
+import updateBsffPackaging from "./mutations/updateBsffPackaging";
 
 export const Mutation: MutationResolvers = {
   createBsff: createBsffResolver,
@@ -18,5 +19,6 @@ export const Mutation: MutationResolvers = {
   duplicateBsff,
   createFicheInterventionBsff,
   updateFicheInterventionBsff,
-  signBsff
+  signBsff,
+  updateBsffPackaging
 };

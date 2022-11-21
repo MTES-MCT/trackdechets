@@ -7,21 +7,18 @@ const { REDIS_URL, NODE_ENV } = process.env;
 
 export const INDEX_JOB_NAME = "index";
 export const DELETE_JOB_NAME = "delete";
-
-export const indexQueue = new Queue<string>(
-  `queue_index_elastic_${NODE_ENV}`,
-  REDIS_URL,
-  {
-    defaultJobOptions: {
-      attempts: 3,
-      backoff: { type: "fixed", delay: 100 },
-      removeOnComplete: 10_000,
-      timeout: 10000
-    }
+export const INDEX_QUEUE_NAME = `queue_index_elastic_${NODE_ENV}`;
+export const indexQueue = new Queue<string>(INDEX_QUEUE_NAME, REDIS_URL, {
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: { type: "fixed", delay: 100 },
+    removeOnComplete: 10_000,
+    timeout: 10000
   }
-);
+});
 
 const INDEX_REFRESH_INTERVAL = 1000;
+// Updates queue, used by the notifier. Items are enqueued once indexation is done
 export const updatesQueue = new Queue<BsdUpdateQueueItem>(
   `queue_updates_elastic_${NODE_ENV}`,
   REDIS_URL,

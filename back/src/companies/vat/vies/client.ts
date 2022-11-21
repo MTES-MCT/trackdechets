@@ -1,12 +1,18 @@
-import { UserInputError } from "apollo-server-express";
-import { createClientAsync, Client, IOptions } from "soap";
+import { ApolloError, UserInputError } from "apollo-server-express";
 import { checkVAT } from "jsvat";
+import path from "path";
+import { createClientAsync, Client, IOptions } from "soap";
 import { CompanyVatSearchResult, ViesResult } from "./types";
-import { countries } from "../../../common/constants/companySearchHelpers";
+import {
+  countries,
+  isVat
+} from "../../../common/constants/companySearchHelpers";
 import logger from "../../../logging/logger";
+import { ErrorCode } from "../../../common/errors";
 
-const viesUrl =
-  "http://ec.europa.eu/taxation_customs/vies/checkVatService.wsdl";
+const viesUrl = path.join(__dirname, "checkVatService.wsdl");
+
+export class ViesClientError extends ApolloError {}
 
 /**
  * Dependency injection
@@ -36,19 +42,21 @@ export const client = async (
     vatNumber,
     countries
   );
+
   if (!isSupportedCountry) {
     throw new UserInputError(
-      "Le code pays du numéro de TVA intracommunautaire n'est pas valide, veuillez utiliser un code pays ISO à 2 lettres",
+      "Le code pays du numéro de TVA n'est pas valide, veuillez utiliser un code pays intra-communautaire ISO à 2 lettres",
       {
-        invalidArgs: ["vat"]
+        invalidArgs: ["clue"]
       }
     );
   }
-  if (!isValid) {
+
+  if (!isValid || !isVat(vatNumber)) {
     throw new UserInputError(
       "Le numéro de TVA intracommunautaire n'est pas valide",
       {
-        invalidArgs: ["vat"]
+        invalidArgs: ["clue"]
       }
     );
   }
@@ -71,6 +79,7 @@ export const client = async (
       );
     }
 
+    // auto-correct VIES "unknown data"
     const address = viesResult.address === "---" ? "" : viesResult.address;
     const name = viesResult.name === "---" ? "" : viesResult.name;
 
@@ -84,37 +93,54 @@ export const client = async (
       etatAdministratif: "A"
     };
   } catch (err) {
+    // forward the original UserInputError
     if (err instanceof UserInputError) {
       throw err;
     }
-    logger.error(
-      `Error requesting VIES Server ${getReadableErrorMsg(err.message)}`,
-      err
-    );
-    throw Error(err.message);
+
+    const fault = err.root?.Envelope?.Body?.Fault;
+    const faultMessage = getReadableErrorMsg(fault);
+    // log the error to follow VIES service unavailibility
+    logger.error(`VIES client error: ${faultMessage}`, err);
+
+    // throws UserInputError when VIES client returns the error "INVALID_INPUT"
+    if (fault.faultstring === "INVALID_INPUT") {
+      throw new UserInputError(faultMessage, {
+        invalidArgs: ["clue"]
+      });
+    }
+    // Throws VIES Server unavailability message
+    throw new ViesClientError(faultMessage, ErrorCode.EXTERNAL_SERVICE_ERROR);
   }
 };
 
 /**
  * VIES server error code to readable string
  */
-export const getReadableErrorMsg = (faultstring: string): string => {
+export const getReadableErrorMsg = ({
+  faultstring,
+  faultcode
+}: {
+  faultstring: string;
+  faultcode: string;
+}): string => {
+  const defaultMsg = `Le service de recherche par TVA de la commission européenne (VIES) est indisponible, veuillez réessayer dans quelques minutes (code erreur VIES: ${faultcode} ${faultstring})`;
   switch (faultstring) {
     case "INVALID_INPUT":
-      return "The provided CountryCode is invalid or the VAT number is empty";
-    case "SERVICE_UNAVAILABLE":
-      return "The VIES VAT service is unavailable, please try again later";
+      return "Le service de recherche par TVA de la commission européenne (VIES) ne reconnait pas le numéro de TVA ou celui-ci est invalide";
     case "MS_UNAVAILABLE":
-      return "The VAT database of the requested member country is unavailable, please try again later";
+      return "Le service de recherche par TVA du pays d'origine est indisponible, veuillez réessayer dans quelques minutes";
     case "MS_MAX_CONCURRENT_REQ":
-      return "The VAT database of the requested member country has had too many requests, please try again later";
+      return "Le service de recherche par TVA du pays d'origine reçoit un trop grand nombre de requêtes, veuillez réessayer dans quelques minutes";
+    case "SERVICE_UNAVAILABLE":
+      return defaultMsg;
     case "TIMEOUT":
-      return "The request to VAT database of the requested member country has timed out, please try again later";
+      return defaultMsg;
     case "SERVER_BUSY":
-      return "The service cannot process your request, please try again later";
+      return defaultMsg;
     case "INVALID_REQUESTER_INFO":
-      return "The requester info is invalid";
+      return defaultMsg;
     default:
-      return "Unknown error";
+      return defaultMsg;
   }
 };

@@ -4,6 +4,8 @@ import { Bsda } from "generated/graphql/types";
 import { RedErrorMessage, FieldTransportModeSelect } from "common/components";
 import Tooltip from "common/components/Tooltip";
 import DateInput from "form/common/components/custom-inputs/DateInput";
+import { isForeignVat } from "generated/constants/companySearchHelpers";
+
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 type Props = { disabled: boolean };
@@ -12,18 +14,7 @@ export function Transport({ disabled }: Props) {
 
   return (
     <>
-      {values.transporter?.company?.siret === null ? (
-        <label>
-          Numéro de TVA intracommunautaire
-          <Field
-            type="text"
-            name="transporter.company.vatNumber"
-            placeholder="Ex: DE 123456789"
-            className="td-input"
-            disabled={disabled}
-          />
-        </label>
-      ) : (
+      {!isForeignVat(values.transporter?.company?.vatNumber!!) && (
         <>
           <h4 className="form__section-heading">
             Récépissé de déclaration de transport de déchets

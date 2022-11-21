@@ -13,9 +13,11 @@ import { BSDA_WASTE_CODES } from "../common/constants";
 import {
   isVat,
   isSiret,
-  isFRVat
+  isFRVat,
+  isForeignVat
 } from "../common/constants/companySearchHelpers";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
+import { validateCompany } from "../companies/validateCompany";
 import {
   isCollector,
   isTransporter,
@@ -32,7 +34,8 @@ import {
   MISSING_COMPANY_PHONE,
   MISSING_COMPANY_SIRET
 } from "../forms/errors";
-import { BsdaConsistence } from "../generated/graphql/types";
+import { intermediarySchema } from "../forms/validation";
+import { BsdaConsistence, CompanyInput } from "../generated/graphql/types";
 import prisma from "../prisma";
 
 configureYup();
@@ -132,8 +135,14 @@ interface BsdaValidationContext {
 }
 
 export async function validateBsda(
-  bsda: Partial<Prisma.BsdaCreateInput>,
-  previousBsdas: Bsda[],
+  bsda: Omit<Partial<Prisma.BsdaCreateInput>, "intermediaries">,
+  {
+    previousBsdas,
+    intermediaries
+  }: {
+    previousBsdas: Bsda[];
+    intermediaries: CompanyInput[];
+  },
   context: BsdaValidationContext
 ) {
   await emitterSchema(context)
@@ -145,6 +154,37 @@ export async function validateBsda(
 
   if (!context.skipPreviousBsdas) {
     await validatePreviousBsdas(bsda, previousBsdas);
+  }
+  await validateIntermediaries(intermediaries);
+}
+
+async function validateIntermediaries(
+  intermediaries: CompanyInput[] | undefined
+) {
+  if (!intermediaries || intermediaries.length === 0) {
+    return;
+  }
+
+  if (intermediaries.length > 3) {
+    throw new UserInputError(
+      "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires sur un BSDA"
+    );
+  }
+
+  const intermediaryIdentifiers = intermediaries.map(
+    c => c.siret || c.vatNumber
+  );
+  const hasDuplicate =
+    new Set(intermediaryIdentifiers).size !== intermediaryIdentifiers.length;
+  if (hasDuplicate) {
+    throw new UserInputError(
+      "Intermédiaires: impossible d'ajouter le même établissement en intermédiaire plusieurs fois"
+    );
+  }
+
+  for (const intermediary of intermediaries) {
+    await intermediarySchema.validate(intermediary);
+    await validateCompany(intermediary);
   }
 }
 
@@ -672,50 +712,67 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
       transporterRecepisseIsExempted: yup.boolean().nullable(),
       transporterRecepisseDepartment: yup
         .string()
-        .when(["type", "transporterRecepisseIsExempted"], {
-          is: (type, isExempted) =>
-            type === BsdaType.COLLECTION_2710 || isExempted,
-          then: schema => schema.nullable(),
-          otherwise: schema =>
-            schema.when("transporterCompanyVatNumber", (tva, schema) => {
-              if (!tva) {
-                return schema.requiredIf(
-                  context.transportSignature,
-                  `Transporteur: le département associé au récépissé est obligatoire`
-                );
-              }
-              return schema.nullable().notRequired();
-            })
-        }),
+        .when(
+          [
+            "type",
+            "transporterRecepisseIsExempted",
+            "transporterCompanyVatNumber"
+          ],
+          {
+            is: (type, isExempted, vat) =>
+              type === BsdaType.COLLECTION_2710 ||
+              isExempted ||
+              isForeignVat(vat),
+            then: schema => schema.nullable().notRequired(),
+            otherwise: schema =>
+              schema.requiredIf(
+                context.transportSignature,
+                `Transporteur: le département associé au récépissé est obligatoire`
+              )
+          }
+        ),
       transporterRecepisseNumber: yup
         .string()
-        .when(["type", "transporterRecepisseIsExempted"], {
-          is: (type, isExempted) =>
-            type === BsdaType.COLLECTION_2710 || isExempted,
-          then: schema => schema.nullable(),
-          otherwise: schema =>
-            schema.when("transporterCompanyVatNumber", (tva, schema) => {
-              if (!tva) {
-                return schema.requiredIf(
-                  context.transportSignature,
-                  `Transporteur: le numéro de récépissé est obligatoire`
-                );
-              }
-              return schema.nullable().notRequired();
-            })
-        }),
+        .when(
+          [
+            "type",
+            "transporterRecepisseIsExempted",
+            "transporterCompanyVatNumber"
+          ],
+          {
+            is: (type, isExempted, vat) =>
+              type === BsdaType.COLLECTION_2710 ||
+              isExempted ||
+              isForeignVat(vat),
+            then: schema => schema.nullable().notRequired(),
+            otherwise: schema =>
+              schema.requiredIf(
+                context.transportSignature,
+                `Transporteur: le numéro de récépissé est obligatoire`
+              )
+          }
+        ),
       transporterRecepisseValidityLimit: yup
         .date()
-        .when(["type", "transporterRecepisseIsExempted"], {
-          is: (type, isExempted) =>
-            type === BsdaType.COLLECTION_2710 || isExempted,
-          then: schema => schema.nullable(),
-          otherwise: schema =>
-            schema.requiredIf(
-              context.transportSignature,
-              `Transporteur: la date limite de validité du récépissé est obligatoire`
-            ) as any
-        }),
+        .when(
+          [
+            "type",
+            "transporterRecepisseIsExempted",
+            "transporterCompanyVatNumber"
+          ],
+          {
+            is: (type, isExempted, vat) =>
+              type === BsdaType.COLLECTION_2710 ||
+              isExempted ||
+              isForeignVat(vat),
+            then: schema => schema.nullable().notRequired(),
+            otherwise: schema =>
+              schema.requiredIf(
+                context.transportSignature,
+                `Transporteur: la date limite de validité du récépissé est obligatoire`
+              )
+          }
+        ),
       transporterCompanyName: yup.string().when("type", {
         is: BsdaType.COLLECTION_2710,
         then: schema =>

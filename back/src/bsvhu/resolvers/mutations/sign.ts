@@ -5,7 +5,6 @@ import {
   MutationSignBsvhuArgs,
   SignatureTypeInput
 } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { checkIsCompanyMember } from "../../../users/permissions";
 import { expandVhuFormFromDb } from "../../converter";
@@ -13,7 +12,8 @@ import { getBsvhuOrNotFound } from "../../database";
 import { AlreadySignedError, InvalidSignatureError } from "../../errors";
 import { machine } from "../../machine";
 import { validateBsvhu } from "../../validation";
-import { indexBsvhu } from "../../elastic";
+import { getBsvhuRepository } from "../../repository";
+
 type SignatureTypeInfos = {
   dbDateKey: keyof Bsvhu;
   dbAuthorKey: keyof Bsvhu;
@@ -64,18 +64,18 @@ export default async function sign(
   if (newStatus === prismaForm.status) {
     throw new InvalidSignatureError();
   }
-
-  const signedForm = await prisma.bsvhu.update({
-    where: { id },
-    data: {
+  const bsvhuRepository = getBsvhuRepository(user);
+  const signedBsvhu = await bsvhuRepository.update(
+    { id },
+    {
       [signatureTypeInfos.dbAuthorKey]: input.author,
       [signatureTypeInfos.dbDateKey]: new Date(input.date ?? Date.now()),
       isDraft: false, // If it was one, signing always "un-drafts" it,
       status: newStatus as BsvhuStatus
     }
-  });
-  await indexBsvhu(signedForm, context);
-  return expandVhuFormFromDb(signedForm);
+  );
+
+  return expandVhuFormFromDb(signedBsvhu);
 }
 
 const signatureTypeMapping: Record<SignatureTypeInput, SignatureTypeInfos> = {

@@ -1,11 +1,16 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getBsffOrNotFound, getPreviousBsffs } from "../../database";
+import { getBsffOrNotFound, getPreviousPackagings } from "../../database";
 import { isBsffContributor } from "../../permissions";
 import prisma from "../../../prisma";
 import { expandBsffFromDB } from "../../converter";
 import { indexBsff } from "../../elastic";
-import { validateBsff } from "../../validation";
+import {
+  validateBsff,
+  validateFicheInterventions,
+  validatePreviousPackagings
+} from "../../validation";
+import { BsffType } from "@prisma/client";
 
 const publishBsffResolver: MutationResolvers["publishBsff"] = async (
   _,
@@ -21,17 +26,31 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
 
   await isBsffContributor(user, existingBsff);
 
-  const previousBsffs = await getPreviousBsffs(existingBsff);
+  const previousPackagings = await getPreviousPackagings(
+    existingBsff.packagings.map(p => p.id),
+    1
+  );
+  const previousPackagingsIds = {
+    ...(existingBsff.type === BsffType.REEXPEDITION
+      ? { forwarding: previousPackagings.map(p => p.id) }
+      : {}),
+    ...(existingBsff.type === BsffType.GROUPEMENT
+      ? { grouping: previousPackagings.map(p => p.id) }
+      : {}),
+    ...(existingBsff.type === BsffType.RECONDITIONNEMENT
+      ? { repackaging: previousPackagings.map(p => p.id) }
+      : {})
+  };
 
   const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
     where: { bsffs: { some: { id: { in: [existingBsff.id] } } } }
   });
 
-  await validateBsff(
-    { ...existingBsff, packagings, isDraft: false },
-    previousBsffs,
-    ficheInterventions
-  );
+  const fullBsff = { ...existingBsff, packagings, isDraft: false };
+
+  await validateBsff(fullBsff);
+  await validateFicheInterventions(fullBsff, ficheInterventions);
+  await validatePreviousPackagings(fullBsff, previousPackagingsIds);
 
   const updatedBsff = await prisma.bsff.update({
     data: {

@@ -387,6 +387,37 @@ const NextBsda = ({ bsda }: { bsda: Bsda }) => {
   );
 };
 
+const Intermediaries = ({ intermediaries }) => (
+  <>
+    {intermediaries.map(intermediary => (
+      <div className={styles.detailColumns}>
+        <div className={styles.detailGrid}>
+          <dt>Établissement intermédiaire</dt>
+          <dd>{intermediary?.name}</dd>
+
+          <dt>Siret</dt>
+          <dd>{intermediary?.siret}</dd>
+
+          <dt>Numéro de TVA</dt>
+          <dd>{intermediary?.vatNumber}</dd>
+
+          <dt>Adresse</dt>
+          <dd>{intermediary?.address}</dd>
+
+          <dt>Tél</dt>
+          <dd>{intermediary?.phone}</dd>
+
+          <dt>Mél</dt>
+          <dd>{intermediary?.mail}</dd>
+
+          <dt>Contact</dt>
+          <dd>{intermediary?.contact}</dd>
+        </div>
+      </div>
+    ))}
+  </>
+);
+
 export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
@@ -549,6 +580,13 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
               </span>
             </Tab>
           )}
+
+          {Boolean(form?.intermediaries?.length) && (
+            <Tab className={styles.detailTab}>
+              <IconWarehousePackage size="25px" />
+              <span className={styles.detailTabCaption}>Intermédiaires</span>
+            </Tab>
+          )}
         </TabList>
         {/* Tabs content */}
         <div className={styles.detailTabPanels}>
@@ -605,6 +643,13 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
           {!!initialBsdas?.length && (
             <TabPanel className={styles.detailTabPanel}>
               <InitialBsdas bsdas={initialBsdas} />
+            </TabPanel>
+          )}
+
+          {/* Intermdiaries tab panel */}
+          {Boolean(form?.intermediaries?.length) && (
+            <TabPanel className={styles.detailTabPanel}>
+              <Intermediaries intermediaries={form?.intermediaries} />
             </TabPanel>
           )}
         </div>

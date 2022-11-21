@@ -2,10 +2,10 @@ import { getConnection } from "../../../common/pagination";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { applyMask } from "../../../common/where";
 import { QueryBsvhusArgs } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
 import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { expandVhuFormFromDb } from "../../converter";
+import { getReadonlyBsvhuRepository } from "../../repository";
 
 import { toPrismaWhereInput } from "../../where";
 
@@ -32,14 +32,13 @@ export default async function bsvhus(
   };
 
   const where = applyMask(prismaWhere, mask);
-
-  const totalCount = await prisma.bsvhu.count({ where });
+  const bsvhuRepository = getReadonlyBsvhuRepository();
+  const totalCount = await bsvhuRepository.count(where);
 
   return getConnection({
     totalCount,
     findMany: prismaPaginationArgs =>
-      prisma.bsvhu.findMany({
-        where,
+      bsvhuRepository.findMany(where, {
         ...prismaPaginationArgs,
         orderBy: { createdAt: "desc" }
       }),

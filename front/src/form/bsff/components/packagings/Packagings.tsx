@@ -1,5 +1,6 @@
 import { IconClose } from "common/components/Icons";
 import RedErrorMessage from "common/components/RedErrorMessage";
+import TdTooltip from "common/components/Tooltip";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { Field, FieldArray, FieldProps, useField } from "formik";
 import { BsffPackagingInput, BsffType } from "generated/graphql/types";
@@ -16,6 +17,8 @@ export default function BsffPackagings({
   const [{ value: type }] = useField<BsffType>("type");
   const canEdit =
     !disabled && ![BsffType.Reexpedition, BsffType.Groupement].includes(type);
+
+  const maxPackagings = type === BsffType.Reconditionnement ? 1 : Infinity;
 
   return (
     <div className="tw-mt-2">
@@ -35,22 +38,11 @@ export default function BsffPackagings({
                     <div className="tw-w-11/12 tw-flex">
                       <div className="tw-w-1/4 tw-px-2">
                         <label>
-                          Dénomination
+                          Type de contenant{" "}
+                          <TdTooltip msg="Bouteille, ou autre à préciser" />
                           <Field
                             className="td-input"
                             name={`${fieldName}.name`}
-                            disabled={!canEdit}
-                          />
-                        </label>
-                      </div>
-
-                      <div className="tw-w-1/4 tw-px-2">
-                        <label>
-                          Volume (en litres)
-                          <Field
-                            component={NumberInput}
-                            className="td-input"
-                            name={`${fieldName}.volume`}
                             disabled={!canEdit}
                           />
                         </label>
@@ -69,7 +61,19 @@ export default function BsffPackagings({
 
                       <div className="tw-w-1/4 tw-px-2">
                         <label>
-                          Poids en kilos
+                          Volume (en L)
+                          <Field
+                            component={NumberInput}
+                            className="td-input"
+                            name={`${fieldName}.volume`}
+                            disabled={!canEdit}
+                          />
+                        </label>
+                      </div>
+
+                      <div className="tw-w-1/4 tw-px-2">
+                        <label>
+                          Masse du contenu (en kg)
                           <Field
                             component={NumberInput}
                             className="td-input"
@@ -92,24 +96,32 @@ export default function BsffPackagings({
                   </div>
                   <RedErrorMessage name={`${fieldName}.name`} />
                   <RedErrorMessage name={`${fieldName}.numero`} />
+                  <RedErrorMessage name={`${fieldName}.volume`} />
                   <RedErrorMessage name={`${fieldName}.weight`} />
                 </div>
               );
             })}
-            {canEdit && (
+            {canEdit && value.length < maxPackagings && (
               <button
                 type="button"
                 className="btn btn--outline-primary"
                 onClick={() =>
                   arrayHelpers.push({
-                    name: "",
+                    name: "Bouteille",
                     numero: "",
                     weight: 0,
+                    volume: 0,
                   })
                 }
               >
                 Ajouter un contenant
               </button>
+            )}
+            {value.length >= maxPackagings && (
+              <div className="notification">
+                Un seul contenant est autorisé dans le cadre d'un
+                reconditionnement
+              </div>
             )}
           </div>
         )}

@@ -7,7 +7,11 @@ import {
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { getUserCompanies } from "../../../users/database";
-import { expandBsdaFromDb, flattenBsdaInput } from "../../converter";
+import {
+  companyToIntermediaryInput,
+  expandBsdaFromDb,
+  flattenBsdaInput
+} from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
 import { checkIsBsdaContributor } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
@@ -33,7 +37,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
   const bsda = flattenBsdaInput(input);
   await checkIsBsdaContributor(
     user,
-    bsda,
+    { ...bsda, intermediaries: input.intermediaries },
     "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
@@ -71,10 +75,15 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     ...(isForwarding ? [forwardedBsda] : []),
     ...(isGrouping ? groupedBsdas : [])
   ];
+  const hasIntermediaries = input.intermediaries?.length > 0;
 
-  await validateBsda(bsda, previousBsdas, {
-    emissionSignature: !isDraft
-  });
+  await validateBsda(
+    bsda,
+    { previousBsdas, intermediaries: input.intermediaries },
+    {
+      emissionSignature: !isDraft
+    }
+  );
 
   const newBsda = await bsdaRepository.create({
     ...bsda,
@@ -85,6 +94,13 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     }),
     ...(isGrouping && {
       grouping: { connect: groupedBsdas.map(({ id }) => ({ id })) }
+    }),
+    ...(hasIntermediaries && {
+      intermediaries: {
+        createMany: {
+          data: companyToIntermediaryInput(input.intermediaries)
+        }
+      }
     })
   });
 

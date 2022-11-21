@@ -19,9 +19,12 @@ export default async function bsdas(
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   const mask = {
-    OR: Object.values(BSDA_CONTRIBUTORS_FIELDS).map(field => ({
-      [field]: { in: userCompaniesSiretOrVat }
-    }))
+    OR: [
+      ...Object.values(BSDA_CONTRIBUTORS_FIELDS).map(field => ({
+        [field]: { in: userCompaniesSiretOrVat }
+      })),
+      { intermediaries: { some: { siret: { in: userCompaniesSiretOrVat } } } }
+    ]
   };
 
   const prismaWhere = {

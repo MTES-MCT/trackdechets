@@ -152,6 +152,7 @@ export const COMPANY_PRIVATE_INFOS = gql`
       isRegistered
       isAnonymousCompany
       companyTypes
+      codePaysEtrangerEtablissement
       installation {
         codeS3ic
         urlFiche
@@ -189,6 +190,7 @@ export const COMPANY_SELECTOR_PRIVATE_INFOS = gql`
       isRegistered
       isAnonymousCompany
       companyTypes
+      codePaysEtrangerEtablissement
     }
   }
 `;

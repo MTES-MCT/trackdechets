@@ -97,7 +97,7 @@ function getWhere(
 }
 
 /**
- * Convert a dasri from the bsvhu table to Elastic Search's BSD model.
+ * Convert a bsvhu from the bsvhu table to Elastic Search's BSD model.
  */
 export function toBsdElastic(bsvhu: Bsvhu): BsdElastic {
   const where = getWhere(bsvhu);

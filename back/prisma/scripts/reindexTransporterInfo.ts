@@ -18,7 +18,8 @@ export class ReindexTransporterInfo implements Updater {
           { transporterCustomInfo: { not: null } },
           { transporterTransportPlates: { isEmpty: false } }
         ]
-      }
+      },
+      include: { intermediaries: true }
     });
 
     const bsdasris = await prisma.bsdasri.findMany({

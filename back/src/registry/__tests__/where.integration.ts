@@ -43,7 +43,7 @@ describe("toElasticFilter", () => {
     };
     await Promise.all([
       indexForm(BSDS["BSDD"]),
-      indexBsda(BSDS["BSDA"]),
+      indexBsda({ ...BSDS["BSDA"], intermediaries: [] }),
       indexBsdasri(BSDS["BSDASRI"]),
       indexBsvhu(BSDS["BSVHU"]),
       indexBsff(BSDS["BSFF"])
@@ -89,7 +89,7 @@ describe("toElasticFilter", () => {
 
       await Promise.all([
         indexForm(BSDS["BSDD"]),
-        indexBsda(BSDS["BSDA"]),
+        indexBsda({ ...BSDS["BSDA"], intermediaries: [] }),
         indexBsdasri(BSDS["BSDASRI"]),
         indexBsvhu(BSDS["BSVHU"]),
         indexBsff(BSDS["BSFF"])
@@ -118,7 +118,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all([
       indexForm(BSDS["BSDD"]),
-      indexBsda(BSDS["BSDA"]),
+      indexBsda({ ...BSDS["BSDA"], intermediaries: [] }),
       indexBsdasri(BSDS["BSDASRI"]),
       indexBsvhu(BSDS["BSVHU"]),
       indexBsff(BSDS["BSFF"])
@@ -223,7 +223,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3, bsda4].map(async bsda => {
-        return indexBsda(bsda);
+        return indexBsda({ ...bsda, intermediaries: [] });
       })
     );
     await refreshElasticSearch();
@@ -342,45 +342,102 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu2.id, bsvhu3.id]);
   });
 
-  it.each([
-    "createdAt",
-    "transporterTakenOverAt",
-    "destinationReceptionDate",
-    "destinationOperationDate"
-  ])("should filter BSFFs between two %p dates (strict)", async date => {
-    // convert elastic key to bsff key
-    const toBsffKey: {
-      [P in keyof BsdElastic]?: keyof Bsff;
-    } = {
-      createdAt: "createdAt",
-      transporterTakenOverAt: "transporterTransportTakenOverAt",
-      destinationReceptionDate: "destinationReceptionDate",
-      destinationOperationDate: "destinationOperationSignatureDate"
-    };
+  it.each(["createdAt", "transporterTakenOverAt", "destinationReceptionDate"])(
+    "should filter BSFFs between two %p dates (strict)",
+    async date => {
+      // convert elastic key to bsff key
+      const toBsffKey: {
+        [P in keyof BsdElastic]?: keyof Bsff;
+      } = {
+        createdAt: "createdAt",
+        transporterTakenOverAt: "transporterTransportTakenOverAt",
+        destinationReceptionDate: "destinationReceptionDate"
+      };
 
+      const bsff1 = await createBsff(
+        {},
+        { [toBsffKey[date]]: new Date("2021-01-01") }
+      );
+
+      const bsff2 = await createBsff(
+        {},
+        {
+          [toBsffKey[date]]: new Date("2021-01-02")
+        }
+      );
+
+      const bsff3 = await createBsff(
+        {},
+        {
+          [toBsffKey[date]]: new Date("2021-01-03")
+        }
+      );
+
+      const bsff4 = await createBsff(
+        {},
+        {
+          [toBsffKey[date]]: new Date("2021-01-04")
+        }
+      );
+
+      await Promise.all(
+        [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
+          return indexBsff(bsff);
+        })
+      );
+      await refreshElasticSearch();
+
+      const where: WasteRegistryWhere = {
+        [date]: {
+          _gt: new Date("2021-01-01"),
+          _lt: new Date("2021-01-04")
+        }
+      };
+
+      const bsds = await searchBsds(where);
+
+      expect(bsds.map(bsd => bsd.id)).toEqual([bsff2.id, bsff3.id]);
+    }
+  );
+
+  it("should filter BSFF between two operation dates (strict)", async () => {
     const bsff1 = await createBsff(
       {},
-      { [toBsffKey[date]]: new Date("2021-01-01") }
+      {},
+      {
+        operationDate: new Date("2021-01-01"),
+        operationSignatureDate: new Date("2021-01-01"),
+        operationCode: "R2"
+      }
     );
 
     const bsff2 = await createBsff(
       {},
+      {},
       {
-        [toBsffKey[date]]: new Date("2021-01-02")
+        operationDate: new Date("2021-01-02"),
+        operationSignatureDate: new Date("2021-01-02"),
+        operationCode: "R2"
       }
     );
 
     const bsff3 = await createBsff(
       {},
+      {},
       {
-        [toBsffKey[date]]: new Date("2021-01-03")
+        operationDate: new Date("2021-01-03"),
+        operationSignatureDate: new Date("2021-01-03"),
+        operationCode: "R2"
       }
     );
 
     const bsff4 = await createBsff(
       {},
+      {},
       {
-        [toBsffKey[date]]: new Date("2021-01-04")
+        operationDate: new Date("2021-01-04"),
+        operationSignatureDate: new Date("2021-01-04"),
+        operationCode: "R2"
       }
     );
 
@@ -392,7 +449,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
 
     const where: WasteRegistryWhere = {
-      [date]: {
+      destinationOperationDate: {
         _gt: new Date("2021-01-01"),
         _lt: new Date("2021-01-04")
       }
@@ -494,7 +551,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3, bsda4].map(async bsda => {
-        return indexBsda(bsda);
+        return indexBsda({ ...bsda, intermediaries: [] });
       })
     );
     await refreshElasticSearch();
@@ -617,45 +674,102 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu2.id, bsvhu3.id, bsvhu4.id]);
   });
 
-  it.each([
-    "createdAt",
-    "transporterTakenOverAt",
-    "destinationReceptionDate",
-    "destinationOperationDate"
-  ])("should filter BSFFs between two %p dates (not strict)", async date => {
-    // convert elastic key to bsff key
-    const toBsffKey: {
-      [P in keyof BsdElastic]?: keyof Bsff;
-    } = {
-      createdAt: "createdAt",
-      transporterTakenOverAt: "transporterTransportTakenOverAt",
-      destinationReceptionDate: "destinationReceptionDate",
-      destinationOperationDate: "destinationOperationSignatureDate"
-    };
+  it.each(["createdAt", "transporterTakenOverAt", "destinationReceptionDate"])(
+    "should filter BSFFs between two %p dates (not strict)",
+    async date => {
+      // convert elastic key to bsff key
+      const toBsffKey: {
+        [P in keyof BsdElastic]?: keyof Bsff;
+      } = {
+        createdAt: "createdAt",
+        transporterTakenOverAt: "transporterTransportTakenOverAt",
+        destinationReceptionDate: "destinationReceptionDate"
+      };
 
+      const bsff1 = await createBsff(
+        {},
+        { [toBsffKey[date]]: new Date("2021-01-01") }
+      );
+
+      const bsff2 = await createBsff(
+        {},
+        {
+          [toBsffKey[date]]: new Date("2021-01-02")
+        }
+      );
+
+      const bsff3 = await createBsff(
+        {},
+        {
+          [toBsffKey[date]]: new Date("2021-01-03")
+        }
+      );
+
+      const bsff4 = await createBsff(
+        {},
+        {
+          [toBsffKey[date]]: new Date("2021-01-04")
+        }
+      );
+
+      await Promise.all(
+        [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
+          return indexBsff(bsff);
+        })
+      );
+      await refreshElasticSearch();
+
+      const where: WasteRegistryWhere = {
+        [date]: {
+          _gte: new Date("2021-01-02"),
+          _lte: new Date("2021-01-04")
+        }
+      };
+
+      const bsds = await searchBsds(where);
+
+      expect(bsds.map(bsd => bsd.id)).toEqual([bsff2.id, bsff3.id, bsff4.id]);
+    }
+  );
+
+  it("should filter BSFF between two operation dates (not strict)", async () => {
     const bsff1 = await createBsff(
       {},
-      { [toBsffKey[date]]: new Date("2021-01-01") }
+      {},
+      {
+        operationDate: new Date("2021-01-01"),
+        operationSignatureDate: new Date("2021-01-01"),
+        operationCode: "R2"
+      }
     );
 
     const bsff2 = await createBsff(
       {},
+      {},
       {
-        [toBsffKey[date]]: new Date("2021-01-02")
+        operationDate: new Date("2021-01-02"),
+        operationSignatureDate: new Date("2021-01-02"),
+        operationCode: "R2"
       }
     );
 
     const bsff3 = await createBsff(
       {},
+      {},
       {
-        [toBsffKey[date]]: new Date("2021-01-03")
+        operationDate: new Date("2021-01-03"),
+        operationSignatureDate: new Date("2021-01-03"),
+        operationCode: "R2"
       }
     );
 
     const bsff4 = await createBsff(
       {},
+      {},
       {
-        [toBsffKey[date]]: new Date("2021-01-04")
+        operationDate: new Date("2021-01-04"),
+        operationSignatureDate: new Date("2021-01-04"),
+        operationCode: "R2"
       }
     );
 
@@ -667,7 +781,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
 
     const where: WasteRegistryWhere = {
-      [date]: {
+      destinationOperationDate: {
         _gte: new Date("2021-01-02"),
         _lte: new Date("2021-01-04")
       }
@@ -768,7 +882,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3, bsda4].map(async bsda => {
-        return indexBsda(bsda);
+        return indexBsda({ ...bsda, intermediaries: [] });
       })
     );
     await refreshElasticSearch();
@@ -884,45 +998,101 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu2.id]);
   });
 
-  it.each([
-    "createdAt",
-    "transporterTakenOverAt",
-    "destinationReceptionDate",
-    "destinationOperationDate"
-  ])("should filter BSFFs on %p (exact date)", async date => {
-    // convert elastic key to bsff key
-    const toBsffKey: {
-      [P in keyof BsdElastic]?: keyof Bsff;
-    } = {
-      createdAt: "createdAt",
-      transporterTakenOverAt: "transporterTransportTakenOverAt",
-      destinationReceptionDate: "destinationReceptionDate",
-      destinationOperationDate: "destinationOperationSignatureDate"
-    };
+  it.each(["createdAt", "transporterTakenOverAt", "destinationReceptionDate"])(
+    "should filter BSFFs on %p (exact date)",
+    async date => {
+      // convert elastic key to bsff key
+      const toBsffKey: {
+        [P in keyof BsdElastic]?: keyof Bsff;
+      } = {
+        createdAt: "createdAt",
+        transporterTakenOverAt: "transporterTransportTakenOverAt",
+        destinationReceptionDate: "destinationReceptionDate"
+      };
 
+      const bsff1 = await createBsff(
+        {},
+        { [toBsffKey[date]]: new Date("2021-01-01") }
+      );
+
+      const bsff2 = await createBsff(
+        {},
+        {
+          [toBsffKey[date]]: new Date("2021-01-02")
+        }
+      );
+
+      const bsff3 = await createBsff(
+        {},
+        {
+          [toBsffKey[date]]: new Date("2021-01-03")
+        }
+      );
+
+      const bsff4 = await createBsff(
+        {},
+        {
+          [toBsffKey[date]]: new Date("2021-01-04")
+        }
+      );
+
+      await Promise.all(
+        [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
+          return indexBsff(bsff);
+        })
+      );
+      await refreshElasticSearch();
+
+      const where: WasteRegistryWhere = {
+        [date]: {
+          _eq: new Date("2021-01-02")
+        }
+      };
+
+      const bsds = await searchBsds(where);
+
+      expect(bsds.map(bsd => bsd.id)).toEqual([bsff2.id]);
+    }
+  );
+
+  it("should filter BSFF between two operation dates (exact date)", async () => {
     const bsff1 = await createBsff(
       {},
-      { [toBsffKey[date]]: new Date("2021-01-01") }
+      {},
+      {
+        operationDate: new Date("2021-01-01"),
+        operationSignatureDate: new Date("2021-01-01"),
+        operationCode: "R2"
+      }
     );
 
     const bsff2 = await createBsff(
       {},
+      {},
       {
-        [toBsffKey[date]]: new Date("2021-01-02")
+        operationDate: new Date("2021-01-02"),
+        operationSignatureDate: new Date("2021-01-02"),
+        operationCode: "R2"
       }
     );
 
     const bsff3 = await createBsff(
       {},
+      {},
       {
-        [toBsffKey[date]]: new Date("2021-01-03")
+        operationDate: new Date("2021-01-03"),
+        operationSignatureDate: new Date("2021-01-03"),
+        operationCode: "R2"
       }
     );
 
     const bsff4 = await createBsff(
       {},
+      {},
       {
-        [toBsffKey[date]]: new Date("2021-01-04")
+        operationDate: new Date("2021-01-04"),
+        operationSignatureDate: new Date("2021-01-04"),
+        operationCode: "R2"
       }
     );
 
@@ -934,7 +1104,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
 
     const where: WasteRegistryWhere = {
-      [date]: {
+      destinationOperationDate: {
         _eq: new Date("2021-01-02")
       }
     };
@@ -1005,7 +1175,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3, bsda4].map(async bsda => {
-        return indexBsda(bsda);
+        return indexBsda({ ...bsda, intermediaries: [] });
       })
     );
     await refreshElasticSearch();
@@ -1095,13 +1265,29 @@ describe("toElasticFilter", () => {
   });
 
   it("should filter BSFFs between two reception weights (strict)", async () => {
-    const bsff1 = await createBsff({}, { destinationReceptionWeight: 1 });
+    const bsff1 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 1, acceptationSignatureDate: new Date() }
+    );
 
-    const bsff2 = await createBsff({}, { destinationReceptionWeight: 2 });
+    const bsff2 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 2, acceptationSignatureDate: new Date() }
+    );
 
-    const bsff3 = await createBsff({}, { destinationReceptionWeight: 3 });
+    const bsff3 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 3, acceptationSignatureDate: new Date() }
+    );
 
-    const bsff4 = await createBsff({}, { destinationReceptionWeight: 4 });
+    const bsff4 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 4, acceptationSignatureDate: new Date() }
+    );
 
     await Promise.all(
       [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
@@ -1183,7 +1369,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3, bsda4].map(async bsda => {
-        return indexBsda(bsda);
+        return indexBsda({ ...bsda, intermediaries: [] });
       })
     );
     await refreshElasticSearch();
@@ -1273,13 +1459,29 @@ describe("toElasticFilter", () => {
   });
 
   it("should filter BSFFs between two reception weights (not strict)", async () => {
-    const bsff1 = await createBsff({}, { destinationReceptionWeight: 1 });
+    const bsff1 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 1, acceptationSignatureDate: new Date() }
+    );
 
-    const bsff2 = await createBsff({}, { destinationReceptionWeight: 2 });
+    const bsff2 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 2, acceptationSignatureDate: new Date() }
+    );
 
-    const bsff3 = await createBsff({}, { destinationReceptionWeight: 3 });
+    const bsff3 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 3, acceptationSignatureDate: new Date() }
+    );
 
-    const bsff4 = await createBsff({}, { destinationReceptionWeight: 4 });
+    const bsff4 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 4, acceptationSignatureDate: new Date() }
+    );
 
     await Promise.all(
       [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
@@ -1360,7 +1562,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3, bsda4].map(async bsda => {
-        return indexBsda(bsda);
+        return indexBsda({ ...bsda, intermediaries: [] });
       })
     );
     await refreshElasticSearch();
@@ -1447,13 +1649,29 @@ describe("toElasticFilter", () => {
   });
 
   it("should filter BSFFs on reception weight (exact)", async () => {
-    const bsff1 = await createBsff({}, { destinationReceptionWeight: 1 });
+    const bsff1 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 1, acceptationSignatureDate: new Date() }
+    );
 
-    const bsff2 = await createBsff({}, { destinationReceptionWeight: 2 });
+    const bsff2 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 2, acceptationSignatureDate: new Date() }
+    );
 
-    const bsff3 = await createBsff({}, { destinationReceptionWeight: 3 });
+    const bsff3 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 3, acceptationSignatureDate: new Date() }
+    );
 
-    const bsff4 = await createBsff({}, { destinationReceptionWeight: 4 });
+    const bsff4 = await createBsff(
+      {},
+      {},
+      { acceptationWeight: 4, acceptationSignatureDate: new Date() }
+    );
 
     await Promise.all(
       [bsff1, bsff2, bsff3, bsff4].map(async bsff => {
@@ -1522,7 +1740,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda(bsda);
+        return indexBsda({ ...bsda, intermediaries: [] });
       })
     );
     await refreshElasticSearch();
@@ -1670,7 +1888,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda(bsda);
+        return indexBsda({ ...bsda, intermediaries: [] });
       })
     );
     await refreshElasticSearch();
@@ -1818,7 +2036,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda(bsda);
+        return indexBsda({ ...bsda, intermediaries: [] });
       })
     );
     await refreshElasticSearch();
@@ -1964,7 +2182,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda(bsda);
+        return indexBsda({ ...bsda, intermediaries: [] });
       })
     );
     await refreshElasticSearch();
@@ -2112,7 +2330,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda(bsda);
+        return indexBsda({ ...bsda, intermediaries: [] });
       })
     );
     await refreshElasticSearch();
@@ -2260,7 +2478,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda(bsda);
+        return indexBsda({ ...bsda, intermediaries: [] });
       })
     );
     await refreshElasticSearch();
@@ -2408,7 +2626,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda(bsda);
+        return indexBsda({ ...bsda, intermediaries: [] });
       })
     );
     await refreshElasticSearch();
@@ -2556,7 +2774,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda(bsda);
+        return indexBsda({ ...bsda, intermediaries: [] });
       })
     );
     await refreshElasticSearch();
@@ -2704,7 +2922,7 @@ describe("toElasticFilter", () => {
 
     await Promise.all(
       [bsda1, bsda2, bsda3].map(async bsda => {
-        return indexBsda(bsda);
+        return indexBsda({ ...bsda, intermediaries: [] });
       })
     );
     await refreshElasticSearch();

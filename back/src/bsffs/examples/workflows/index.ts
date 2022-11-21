@@ -1,5 +1,7 @@
-import collectePetitesQuantites from "./collectePetitesQuantites";
+import collecteFluidesParOperateur from "./collecteFluidesParOperateur";
+import groupement from "./groupement";
 
 export default {
-  collectePetitesQuantites
+  collecteFluidesParOperateur,
+  groupement
 };

@@ -7,6 +7,8 @@ import { indexForm } from "../../forms/elastic";
 import { getFullForm } from "../../forms/database";
 import { deleteBsd } from "../../common/elastic";
 import { getReadonlyBsdaRepository } from "../../bsda/repository";
+import { getReadonlyBsvhuRepository } from "../../bsvhu/repository";
+import { getReadonlyBsdasriRepository } from "../../bsdasris/repository";
 
 export async function reindex(bsdId, exitFn) {
   if (bsdId.startsWith("BSDA-")) {
@@ -15,7 +17,8 @@ export async function reindex(bsdId, exitFn) {
       {
         include: {
           forwardedIn: { select: { id: true } },
-          groupedIn: { select: { id: true } }
+          groupedIn: { select: { id: true } },
+          intermediaries: true
         }
       }
     );
@@ -28,15 +31,17 @@ export async function reindex(bsdId, exitFn) {
   }
 
   if (bsdId.startsWith("DASRI-")) {
-    const bsdasri = await prisma.bsdasri.findFirst({
-      where: { id: bsdId, isDeleted: false },
-      include: {
-        grouping: { select: { id: true } },
-        synthesizing: { select: { id: true } }
+    const bsdasri = await getReadonlyBsdasriRepository().findUnique(
+      { id: bsdId },
+      {
+        include: {
+          grouping: { select: { id: true } },
+          synthesizing: { select: { id: true } }
+        }
       }
-    });
+    );
 
-    if (!!bsdasri) {
+    if (!!bsdasri && !bsdasri.isDeleted) {
       await indexBsdasri(bsdasri);
     } else {
       await deleteBsd({ id: bsdId });
@@ -58,11 +63,11 @@ export async function reindex(bsdId, exitFn) {
   }
 
   if (bsdId.startsWith("VHU-")) {
-    const bsvhu = await prisma.bsvhu.findFirst({
-      where: { id: bsdId, isDeleted: false }
+    const bsvhu = await getReadonlyBsvhuRepository().findUnique({
+      id: bsdId
     });
 
-    if (!!bsvhu) {
+    if (!!bsvhu && !bsvhu.isDeleted) {
       await indexBsvhu(bsvhu);
     } else {
       await deleteBsd({ id: bsdId });

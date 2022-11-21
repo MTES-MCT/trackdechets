@@ -97,7 +97,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(true);
     });
 
-    test("with R.541-50 ticked and no transportation infos", async () => {
+    test("with transporter receipt exemption R.541-50 ticked and no transportation infos", async () => {
       const testForm = {
         ...form,
         transporterIsExemptedOfReceipt: true,
@@ -107,6 +107,23 @@ describe("sealedFormSchema", () => {
 
       const isValid = await sealedFormSchema.isValid(testForm);
       expect(isValid).toEqual(true);
+    });
+
+    test("with foreign transporter receipt no need for exemption R.541-50", async () => {
+      const testForm = {
+        ...form,
+        transporterCompanyVatNumber: "BE0541696005",
+        transporterIsExemptedOfReceipt: null,
+        transporterReceipt: null,
+        transporterDepartment: null
+      };
+      delete testForm.transporterCompanySiret;
+      const isValid = await sealedFormSchema.isValid(testForm);
+      expect(isValid).toEqual(true);
+      testForm.transporterIsExemptedOfReceipt = false;
+      delete testForm.transporterCompanySiret;
+      const isValid2 = await sealedFormSchema.isValid(testForm);
+      expect(isValid2).toEqual(true);
     });
 
     test("when there is an eco-organisme and emitter type is OTHER", async () => {
@@ -952,6 +969,27 @@ describe("processedInfoSchema", () => {
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
+  test("nextDestinationCompany SIRET or VAT number is required", async () => {
+    const processedInfo = {
+      processedBy: "John Snow",
+      processedAt: new Date(),
+      processingOperationDone: "D 13",
+      processingOperationDescription: "Regroupement",
+      nextDestinationProcessingOperation: "D 8",
+      nextDestinationCompanyName: "Exutoire",
+      nextDestinationCompanyAddress: "4 rue du déchet",
+      nextDestinationCompanyCountry: "FR",
+      nextDestinationCompanyContact: "Arya Stark",
+      nextDestinationCompanyPhone: "06 XX XX XX XX",
+      nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
+    };
+    const validateFn = () => processedInfoSchema.validate(processedInfo);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire"
+    );
+  });
+
   test("noTraceability cannot be true when processing operation is not groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
@@ -1007,7 +1045,7 @@ describe("processedInfoSchema", () => {
       transporterCompanyContact: "Contact",
       transporterCompanyPhone: "00 00 00 00 00",
       transporterCompanyMail: "contact@thalys.com",
-      transporterIsExemptedOfReceipt: true
+      transporterIsExemptedOfReceipt: null
     };
     expect(await transporterSchemaFn(false).isValid(transporter)).toEqual(true);
   });
@@ -1059,6 +1097,23 @@ describe("processedInfoSchema", () => {
       "transporterCompanyVatNumber n'est pas un numéro de TVA intracommunautaire valide"
     );
   });
+
+  test("transporter SIRET or VAT number is required", async () => {
+    const transporter = {
+      transporterCompanyName: "Thalys",
+      transporterCompanyAddress: "Bruxelles",
+      transporterCompanyContact: "Contact",
+      transporterCompanyPhone: "00 00 00 00 00",
+      transporterCompanyMail: "contact@thalys.com",
+      transporterIsExemptedOfReceipt: true
+    };
+    const validateFn = () => transporterSchemaFn(false).validate(transporter);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
+    );
+  });
+
   test("nextDestination should be defined when processing operation is groupement and noTraceability is false", async () => {
     const processedInfo = {
       processedBy: "John Snow",

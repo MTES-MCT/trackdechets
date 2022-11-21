@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React from "react";
 import cogoToast from "cogo-toast";
 import classNames from "classnames";
 import Select from "react-select";
@@ -8,7 +8,7 @@ import Tooltip from "common/components/Tooltip";
 import ProcessingOperation from "form/common/components/processing-operation/ProcessingOperation";
 import { Field, useFormikContext } from "formik";
 import { isDangerous } from "generated/constants";
-import { CompanySearchResult, Form } from "generated/graphql/types";
+import { Form } from "generated/graphql/types";
 import CompanySelector from "../common/components/company/CompanySelector";
 import DateInput from "../common/components/custom-inputs/DateInput";
 import TemporaryStorage from "./components/temporaryStorage/TemporaryStorage";
@@ -18,7 +18,7 @@ import {
   getInitialTemporaryStorageDetail,
   getInitialTrader,
 } from "./utils/initial-state";
-import { IconClose } from "common/components/Icons";
+import { IntermediariesSelector } from "form/bsda/components/intermediaries/IntermediariesSelector";
 
 type IntermediariesSelect = {
   value: string;
@@ -112,44 +112,6 @@ export default function Recipient() {
       setFieldValue("temporaryStorageDetail", null, false);
     }
   }
-
-  function removeIntermediary(index) {
-    setFieldValue(
-      "intermediaries",
-      values.intermediaries.filter((_, idx) => index !== idx)
-    );
-  }
-
-  /**
-   * Callback on company result click
-   */
-  const selectIntermediary = useCallback((company: CompanySearchResult) => {
-    if (!company) {
-      const { hide } = cogoToast.error(
-        `Intermédiaire: aucun établissement sélectionné`,
-        {
-          hideAfter: 3,
-          position: "bottom-right",
-          onClick: () => {
-            if (hide) hide();
-          },
-        }
-      );
-      return;
-    }
-    if (company.isRegistered === false) {
-      const { hide } = cogoToast.warn(
-        `Intermédiaire: l'établissement sélectionné n'est pas enregistré sur Trackdéchets, le suivi du bordereau ne sera pas possible sur la plateforme`,
-        {
-          hideAfter: 3,
-          position: "bottom-right",
-          onClick: () => {
-            if (hide) hide();
-          },
-        }
-      );
-    }
-  }, []);
 
   return (
     <>
@@ -392,52 +354,20 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
         </div>
       )}
       <div className="form__row">
-        {values.intermediaries?.length ? (
+        {Boolean(values.intermediaries?.length) && (
           <h4 className="form__section-heading">
             Autre{values.intermediaries?.length > 1 ? "s" : ""} type
             {values.intermediaries?.length > 1 ? "s" : ""} d'intermédiaire
             {values.intermediaries?.length > 1 ? "s" : ""}
           </h4>
-        ) : (
-          ""
         )}
-        {values.intermediaries?.length
-          ? values.intermediaries?.map((p, index) => (
-              <div
-                key={`inter-${index}`}
-                className="tw-border-2 tw-border-gray-400 tw-border-solid tw-rounded-md tw-px-4 tw-py-2 tw-mb-2"
-              >
-                <button
-                  type="button"
-                  className="btn btn--slim btn--small tw-pr-2 tw-pl-2 tw-float-right"
-                  onClick={() => removeIntermediary(index)}
-                >
-                  <IconClose />
-                </button>
-                <CompanySelector
-                  name={`intermediaries.${index}`}
-                  allowForeignCompanies={false}
-                  optionalMail={true}
-                  skipFavorite={true}
-                  optional={true}
-                  onCompanySelected={intermediary => {
-                    selectIntermediary(intermediary);
-                  }}
-                />
-                <div className="tw-mt-2">
-                  <button
-                    className="btn btn--danger tw-mr-1"
-                    type="button"
-                    onClick={() => {
-                      removeIntermediary(index);
-                    }}
-                  >
-                    Supprimer l'intermédiaire
-                  </button>
-                </div>
-              </div>
-            ))
-          : ""}
+        {Boolean(values.intermediaries?.length) && (
+          <Field
+            name="intermediaries"
+            component={IntermediariesSelector}
+            maxNbOfIntermediaries={3}
+          />
+        )}
       </div>
       {isTempStorage && values.temporaryStorageDetail && (
         <TemporaryStorage name="temporaryStorageDetail" />

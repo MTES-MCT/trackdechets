@@ -51,7 +51,8 @@ import {
   isVat,
   isSiret,
   isFRVat,
-  isOmi
+  isOmi,
+  isForeignVat
 } from "../common/constants/companySearchHelpers";
 import { validateCompany } from "../companies/validateCompany";
 import { Decimal } from "decimal.js-light";
@@ -284,13 +285,7 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
         is: ecoOrganismeSiret => !ecoOrganismeSiret,
         then: yup
           .mixed()
-          .requiredIf(!isDraft, `Émetteur: Le type d'émetteur est obligatoire`),
-        otherwise: yup
-          .mixed()
-          .oneOf(
-            ["OTHER", "APPENDIX1", "APPENDIX2"],
-            `Émetteur: Le type d'émetteur doit être "OTHER", "APPENDIX1" ou "APPENDIX2" lorsqu'un éco-organisme est responsable du déchet`
-          )
+          .requiredIf(!isDraft, `Émetteur: Le type d'émetteur est obligatoire`)
       })
       .when("emitterIsPrivateIndividual", {
         is: emitterIsPrivateIndividual => !emitterIsPrivateIndividual,
@@ -793,27 +788,31 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
       transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
       transporterReceipt: yup
         .string()
-        .when("transporterIsExemptedOfReceipt", (isExemptedOfReceipt, schema) =>
-          isExemptedOfReceipt
-            ? schema.notRequired().nullable()
-            : schema
-                .ensure()
-                .requiredIf(
-                  !isDraft,
-                  "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
-                )
+        .when(
+          ["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"],
+          {
+            is: (isExempted, vat) => isForeignVat(vat) || isExempted,
+            then: schema => schema.notRequired().nullable(),
+            otherwise: schema =>
+              schema.requiredIf(
+                !isDraft,
+                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+              )
+          }
         ),
       transporterDepartment: yup
         .string()
-        .when("transporterIsExemptedOfReceipt", (isExemptedOfReceipt, schema) =>
-          isExemptedOfReceipt
-            ? schema.notRequired().nullable()
-            : schema
-                .ensure()
-                .requiredIf(
-                  !isDraft,
-                  "Le département du transporteur est obligatoire"
-                )
+        .when(
+          ["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"],
+          {
+            is: (isExempted, vat) => isForeignVat(vat) || isExempted,
+            then: schema => schema.notRequired().nullable(),
+            otherwise: schema =>
+              schema.requiredIf(
+                !isDraft,
+                "Le département du transporteur est obligatoire"
+              )
+          }
         ),
       transporterValidityLimit: yup.date().nullable()
     });
@@ -1089,8 +1088,8 @@ const withNextDestination = (required: boolean) =>
       .requiredIf(required, `Destination ultérieure : ${MISSING_COMPANY_NAME}`),
     nextDestinationCompanySiret: yup
       .string()
-      .when("nextDestinationCompanyCountry", (country, schema) => {
-        return (country == null || country === "FR") && required
+      .when("nextDestinationCompanyVatNumber", (vat, schema) => {
+        return !isVat(vat) && required
           ? schema
               .ensure()
               .required(
@@ -1307,7 +1306,7 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
  * - SIRET is mandatory
  * - only french companies are allowed
  */
-const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
+export const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
   siret: yup
     .string()
     .required("Intermédiaires: le N° SIRET est obligatoire")

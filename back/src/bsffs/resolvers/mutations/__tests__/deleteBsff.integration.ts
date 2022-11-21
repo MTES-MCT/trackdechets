@@ -152,7 +152,7 @@ describe("Mutation.deleteBsff", () => {
     ]);
   });
 
-  it("should unlink grouped bsffs", async () => {
+  it("should unlink grouped packagings", async () => {
     const initialEmitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const ttr = await userWithCompanyFactory(UserRole.ADMIN);
@@ -170,15 +170,33 @@ describe("Mutation.deleteBsff", () => {
         type: BsffType.GROUPEMENT,
         status: BsffStatus.INITIAL,
         emitterCompanySiret: ttr.company.siret,
-        grouping: { connect: [{ id: initialBsff.id }] }
-      }
+        packagings: {
+          create: initialBsff.packagings.map(p => ({
+            name: p.name,
+            numero: p.numero,
+            volume: p.volume,
+            weight: p.acceptationWeight,
+            previousPackagings: { connect: { id: p.id } }
+          }))
+        }
+      },
+      include: { packagings: true }
     });
 
     initialBsff = await prisma.bsff.findUnique({
-      where: { id: initialBsff.id }
+      where: { id: initialBsff.id },
+      include: { packagings: true }
     });
 
-    expect(initialBsff.groupedInId).toEqual(groupingBsff.id);
+    for (const packaging of initialBsff.packagings) {
+      expect(groupingBsff.packagings.map(p => p.id)).toContain(
+        packaging.nextPackagingId
+      );
+    }
+
+    expect(initialBsff.packagings.map(p => p.nextPackagingId)).toEqual(
+      groupingBsff.packagings.map(p => p.id)
+    );
 
     const { mutate } = makeClient(ttr.user);
 
@@ -192,10 +210,13 @@ describe("Mutation.deleteBsff", () => {
     );
 
     initialBsff = await prisma.bsff.findUnique({
-      where: { id: initialBsff.id }
+      where: { id: initialBsff.id },
+      include: { packagings: true }
     });
 
-    expect(initialBsff.groupedInId).toEqual(null);
+    for (const packaging of initialBsff.packagings) {
+      expect(packaging.nextPackagingId).toBeNull();
+    }
   });
 
   it("should unlink repackaged bsffs", async () => {
@@ -216,15 +237,35 @@ describe("Mutation.deleteBsff", () => {
         type: BsffType.RECONDITIONNEMENT,
         status: BsffStatus.INITIAL,
         emitterCompanySiret: ttr.company.siret,
-        repackaging: { connect: [{ id: initialBsff.id }] }
-      }
+        packagings: {
+          create: {
+            name: "bouteille",
+            numero: "cont1",
+            weight: 1,
+            volume: 1,
+            previousPackagings: {
+              connect: initialBsff.packagings.map(p => ({ id: p.id }))
+            }
+          }
+        }
+      },
+      include: { packagings: true }
     });
 
     initialBsff = await prisma.bsff.findUnique({
-      where: { id: initialBsff.id }
+      where: { id: initialBsff.id },
+      include: { packagings: true }
     });
 
-    expect(initialBsff.repackagedInId).toEqual(repackagingBsff.id);
+    for (const packaging of initialBsff.packagings) {
+      expect(repackagingBsff.packagings.map(p => p.id)).toContain(
+        packaging.nextPackagingId
+      );
+    }
+
+    expect(initialBsff.packagings.map(p => p.nextPackagingId)).toEqual(
+      repackagingBsff.packagings.map(p => p.id)
+    );
 
     const { mutate } = makeClient(ttr.user);
 
@@ -238,10 +279,13 @@ describe("Mutation.deleteBsff", () => {
     );
 
     initialBsff = await prisma.bsff.findUnique({
-      where: { id: initialBsff.id }
+      where: { id: initialBsff.id },
+      include: { packagings: true }
     });
 
-    expect(initialBsff.repackagedInId).toEqual(null);
+    for (const packaging of initialBsff.packagings) {
+      expect(packaging.nextPackagingId).toBeNull();
+    }
   });
 
   it("should unlink forwarded bsff", async () => {
@@ -249,7 +293,7 @@ describe("Mutation.deleteBsff", () => {
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const ttr = await userWithCompanyFactory(UserRole.ADMIN);
 
-    const initialBsff = await createBsffAfterOperation({
+    let initialBsff = await createBsffAfterOperation({
       emitter: initialEmitter,
       transporter,
       destination: ttr
@@ -262,16 +306,35 @@ describe("Mutation.deleteBsff", () => {
         type: BsffType.REEXPEDITION,
         status: BsffStatus.INITIAL,
         emitterCompanySiret: ttr.company.siret,
-        forwarding: { connect: { id: initialBsff.id } }
-      }
+        packagings: {
+          create: {
+            name: initialBsff.packagings[0].name,
+            numero: initialBsff.packagings[0].name,
+            weight: initialBsff.packagings[0].acceptationWeight,
+            volume: initialBsff.packagings[0].volume,
+            previousPackagings: {
+              connect: { id: initialBsff.packagings[0].id }
+            }
+          }
+        }
+      },
+      include: { packagings: true }
     });
 
-    let updatedInitialBsff = await prisma.bsff.findUnique({
+    initialBsff = await prisma.bsff.findUnique({
       where: { id: initialBsff.id },
-      include: { forwardedIn: true }
+      include: { packagings: true }
     });
 
-    expect(updatedInitialBsff.forwardedIn.id).toEqual(forwardingBsff.id);
+    for (const packaging of initialBsff.packagings) {
+      expect(forwardingBsff.packagings.map(p => p.id)).toContain(
+        packaging.nextPackagingId
+      );
+    }
+
+    expect(initialBsff.packagings.map(p => p.nextPackagingId)).toEqual(
+      forwardingBsff.packagings.map(p => p.id)
+    );
 
     const { mutate } = makeClient(ttr.user);
 
@@ -284,11 +347,13 @@ describe("Mutation.deleteBsff", () => {
       }
     );
 
-    updatedInitialBsff = await prisma.bsff.findUnique({
+    initialBsff = await prisma.bsff.findUnique({
       where: { id: initialBsff.id },
-      include: { forwardedIn: true }
+      include: { packagings: true }
     });
 
-    expect(updatedInitialBsff.forwardedIn).toEqual(null);
+    for (const packaging of initialBsff.packagings) {
+      expect(packaging.nextPackagingId).toBeNull();
+    }
   });
 });

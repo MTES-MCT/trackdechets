@@ -5,7 +5,9 @@ import { PublishBsff } from "./PublishBsff";
 import { SignEmission } from "./SignEmission";
 import { SignTransport } from "./SignTransport";
 import { SignReception } from "./SignReception";
-import { SignOperation } from "./SignOperation";
+import { SignBsffOperationOnePackaging } from "./SignOperation";
+import { SignBsffAcceptationOnePackaging } from "./SignAcceptation";
+import { SignPackagings } from "./SignPackagings";
 
 export interface WorkflowActionProps {
   form: BsffFragment;
@@ -34,7 +36,21 @@ export function WorkflowAction(props: WorkflowActionProps) {
 
     case BsffStatus.Received:
       if (siret !== form.bsffDestination?.company?.siret) return null;
-      return <SignOperation bsffId={form.id} />;
+      if (form.packagings?.length === 1) {
+        return <SignBsffAcceptationOnePackaging bsffId={form.id} />;
+      }
+      return <SignPackagings bsffId={form.id} />;
+
+    case BsffStatus.Accepted:
+      if (siret !== form.bsffDestination?.company?.siret) return null;
+      if (form.packagings?.length === 1) {
+        return <SignBsffOperationOnePackaging bsffId={form.id} />;
+      }
+      return <SignPackagings bsffId={form.id} />;
+
+    case BsffStatus.PartiallyRefused:
+      if (siret !== form.bsffDestination?.company?.siret) return null;
+      return <SignPackagings bsffId={form.id} />;
 
     default:
       return null;

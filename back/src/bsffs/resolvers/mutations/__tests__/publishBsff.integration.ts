@@ -58,7 +58,7 @@ describe("publishBsff", () => {
           "Transporteur : le numéro de téléphone est requis\n" +
           "Transporteur : l'adresse email est requise\n" +
           "Le code déchet est requis\n" +
-          "La description du fluide est obligatoire\n" +
+          "La dénomination usuelle du déchet est obligatoire\n" +
           "La mention ADR est requise\n" +
           "Le poids total est requis\n" +
           "Le type de poids (estimé ou non) est un requis\n" +
@@ -106,17 +106,19 @@ describe("publishBsff", () => {
         weightValue: 1,
         weightIsEstimate: false,
         packagings: {
-          create: { name: "BOUTEILLE", numero: "123", weight: 1 }
+          create: { name: "BOUTEILLE", numero: "123", weight: 1, volume: 1 }
         }
       }
     });
 
     const { mutate } = makeClient(emitter.user);
 
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "publishBsff">,
       MutationPublishBsffArgs
     >(PUBLISH_BSFF, { variables: { id: bsff.id } });
+
+    expect(errors).toBeUndefined();
 
     expect(data.publishBsff.isDraft).toEqual(false);
   });

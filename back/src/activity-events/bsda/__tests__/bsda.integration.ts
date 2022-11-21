@@ -11,6 +11,7 @@ import {
 import prisma from "../../../prisma";
 import { userWithCompanyFactory } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
+import { getStream } from "../../data";
 
 const CREATE_BSDA = `
   mutation CreateBsda($input: BsdaInput!) {
@@ -139,10 +140,8 @@ describe("ActivityEvent.Bsda", () => {
     expect(bsdaAfterCreate).toMatchObject(bsdaFromEventsAfterCreate);
     expect(bsdaFromEventsAfterCreate.emitterCompanyName).toBe(company.name);
 
-    const nbEventsAfterCreate = await prisma.event.count({
-      where: { streamId: bsdaId }
-    });
-    expect(nbEventsAfterCreate).toBe(1);
+    const eventsAfterCreate = await getStream(bsdaId);
+    expect(eventsAfterCreate.length).toBe(1);
 
     // Update Bsda
     await mutate<Pick<Mutation, "updateBsda">, MutationUpdateBsdaArgs>(
@@ -166,10 +165,8 @@ describe("ActivityEvent.Bsda", () => {
     expect(bsdaAfterUpdate).toMatchObject(bsdaFromEventsAfterUpdate);
     expect(bsdaFromEventsAfterUpdate.wasteCode).toBe("06 13 04*");
 
-    const nbEventsAfterUpdate = await prisma.event.count({
-      where: { streamId: bsdaId }
-    });
-    expect(nbEventsAfterUpdate).toBe(2);
+    const eventsAfterUpdate = await getStream(bsdaId);
+    expect(eventsAfterUpdate.length).toBe(2);
 
     // Mark as sealed
     await mutate<Pick<Mutation, "signBsda">, MutationSignBsdaArgs>(SIGN_BSDA, {
@@ -186,10 +183,8 @@ describe("ActivityEvent.Bsda", () => {
     expect(bsdaAfterSealed).toMatchObject(bsdaFromEventsAfterSealed);
     expect(bsdaFromEventsAfterSealed.status).toBe("SIGNED_BY_PRODUCER");
 
-    const nbEventsAfterSealed = await prisma.event.count({
-      where: { streamId: bsdaId }
-    });
-    expect(nbEventsAfterSealed).toBe(4); // +2, update + signature
+    const eventsAfterSealed = await getStream(bsdaId);
+    expect(eventsAfterSealed.length).toBe(4); // +2, update + signature
   }, 10000);
 
   it("should create a bsda event when a revision request is applied", async () => {

@@ -30,5 +30,5 @@ export interface BsffFragment {
     code?: string;
     description?: string;
   };
-  packagings?: { numero: string }[];
+  packagings?: { id: string; numero: string }[];
 }

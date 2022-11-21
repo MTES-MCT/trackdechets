@@ -7,5 +7,8 @@ function loadMutation(name: string) {
 
 export default {
   createFicheIntervention: loadMutation("createFicheIntervention"),
-  createBsff: loadMutation("createBsff")
+  createBsff: loadMutation("createBsff"),
+  signBsff: loadMutation("signBsff"),
+  updateBsff: loadMutation("updateBsff"),
+  updateBsffPackaging: loadMutation("updateBsffPackaging")
 };

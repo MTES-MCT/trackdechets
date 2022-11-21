@@ -64,6 +64,18 @@ td {
 .BoxCol {
   flex: 1;
 }
+.BoxColOneThird {
+  width: 33%;
+  position: relative;
+  border-right: 1px solid var(--color-black);
+  padding: var(--spacing-gutter);
+}
+.BoxColTwoThird {
+  width: 66%;
+  position: relative;
+  border-right: 1px solid var(--color-black);
+  padding: var(--spacing-gutter);
+}
 
 .Page {
   break-after: page;
@@ -96,4 +108,13 @@ td {
 .Signature svg {
   width: 80px;
   height: auto;
+}
+.Flex {
+  display: flex;
+}
+.mb-3 {
+  margin-bottom: 3px;
+}
+.ml-12 {
+  margin-left: 12px;
 }

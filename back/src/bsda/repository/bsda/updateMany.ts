@@ -4,6 +4,7 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { bsdaEventTypes } from "./eventTypes";
 
 export type UpdateManyBsdaFn = (
   where: Prisma.BsdaWhereInput,
@@ -34,7 +35,7 @@ export function buildUpdateManyBsdas(deps: RepositoryFnDeps): UpdateManyBsdaFn {
         data: {
           streamId: id,
           actor: user.id,
-          type: "BsdaUpdated",
+          type: bsdaEventTypes.updated,
           data: data as Prisma.InputJsonObject,
           metadata: { ...logMetadata, authType: user.auth }
         }

@@ -54,6 +54,8 @@ query {
 
 * `BAD_USER_INPUT`: La requête GraphQL est valide mais la valeur des arguments fournis ne l'est pas. Exemple: vous essayez de passer un SIRET qui ne fait pas 14 caractères.
 
+* `EXTERNAL_SERVICE_ERROR`: La requête GraphQL est valide mais un service tiers externe à Trackdéchets a renvoyé une erreur.
+
 ```graphql
 query {
   companyInfos(siret: "123"){

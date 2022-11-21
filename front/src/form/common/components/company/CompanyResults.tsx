@@ -19,7 +19,12 @@ interface CompanyResultsProps<T> {
 
 type CompanyResultBase = Pick<
   CompanySearchResult,
-  "siret" | "name" | "address" | "isRegistered" | "vatNumber"
+  | "siret"
+  | "name"
+  | "address"
+  | "isRegistered"
+  | "vatNumber"
+  | "codePaysEtrangerEtablissement"
 >;
 
 export function isSelected<T extends CompanyResultBase>(
@@ -97,6 +102,9 @@ export function CompanyResult<T extends CompanyResultBase>({
         <p>
           {item.siret?.length ? item.siret : item.vatNumber} -{" "}
           {item.address ? item.address : "[Adresse inconnue]"}
+          {item.codePaysEtrangerEtablissement
+            ? ` - ${item.codePaysEtrangerEtablissement}`
+            : ""}
         </p>
         <p>
           <a

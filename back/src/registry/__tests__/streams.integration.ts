@@ -76,7 +76,9 @@ describe("wastesReader", () => {
         )
     );
 
-    await Promise.all(bsdas.map(bsda => indexBsda(bsda)));
+    await Promise.all(
+      bsdas.map(bsda => indexBsda({ ...bsda, intermediaries: [] }))
+    );
 
     // create 5 incoming BSDASRIs
     const bsdasris = await Promise.all(

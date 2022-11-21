@@ -69,6 +69,7 @@ const initialState = {
   },
   grouping: [],
   forwarding: null,
+  intermediaries: [],
 };
 
 export default initialState;

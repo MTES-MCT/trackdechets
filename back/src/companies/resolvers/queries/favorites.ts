@@ -16,7 +16,10 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../database";
 import { checkIsCompanyMember } from "../../../users/permissions";
-import { countries } from "../../../common/constants/companySearchHelpers";
+import {
+  countries,
+  isForeignVat
+} from "../../../common/constants/companySearchHelpers";
 import { checkVAT } from "jsvat";
 import { searchCompany } from "../../search";
 import { CompanySearchResult } from "../../types";
@@ -73,7 +76,7 @@ function companyToFavorite(
     phone: company.contactPhone,
     mail: company.contactEmail,
     isRegistered: !!company,
-    codePaysEtrangerEtablissement: !company.vatNumber
+    codePaysEtrangerEtablissement: !isForeignVat(company.vatNumber)
       ? "FR"
       : checkVAT(company.vatNumber, countries)?.country?.isoCode.short,
     transporterReceipt: company.transporterReceipt
@@ -384,7 +387,7 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
         ) == null
       ) {
         // compute codePaysEtrangerEtablissement
-        cur.codePaysEtrangerEtablissement = !cur.vatNumber
+        cur.codePaysEtrangerEtablissement = !isForeignVat(cur.vatNumber)
           ? "FR"
           : checkVAT(cur.vatNumber, countries)?.country?.isoCode.short;
         return prev.concat([cur]);

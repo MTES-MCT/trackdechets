@@ -8,13 +8,13 @@ import { getBsvhuOrNotFound } from "../../database";
 import { checkIsBsvhuContributor } from "../../permissions";
 import { createPDFResponse } from "../../../common/pdf";
 import { buildPdf } from "../../pdf/generator";
-import prisma from "../../../prisma";
+
 import { DownloadHandler } from "../../../routers/downloadRouter";
 
 export const bsvhuPdfDownloadHandler: DownloadHandler<QueryBsvhuPdfArgs> = {
   name: "bsvhuPdf",
   handler: async (_, res, { id }) => {
-    const bsvhu = await prisma.bsvhu.findUnique({ where: { id } });
+    const bsvhu = await getBsvhuOrNotFound(id);
     const readableStream = await buildPdf(bsvhu);
     readableStream.pipe(createPDFResponse(res, bsvhu.id));
   }

@@ -3,12 +3,13 @@ import { useQuery } from "@apollo/client";
 import { FieldArray, useField } from "formik";
 import {
   Bsff,
-  BsffStatus,
+  BsffPackaging,
+  BsffPackagingWhere,
   BsffType,
   Query,
-  QueryBsffsArgs,
+  QueryBsffPackagingsArgs,
 } from "generated/graphql/types";
-import { GET_PREVIOUS_BSFFS } from "../utils/queries";
+import { GET_PREVIOUS_PACKAGINGS } from "../utils/queries";
 import {
   Loader,
   Table,
@@ -26,7 +27,7 @@ interface PreviousBsffsPickerProps {
   onAddOrRemove: () => void;
 }
 
-export function PreviousBsffsPicker({
+export function PreviousPackagingsPicker({
   bsff,
   onAddOrRemove,
 }: PreviousBsffsPickerProps) {
@@ -34,33 +35,32 @@ export function PreviousBsffsPicker({
     .filter(operation => operation.successors.includes(bsff.type))
     .map(operation => operation.code);
 
-  const columns: Column<Bsff>[] = React.useMemo(
+  const columns: Column<BsffPackaging>[] = React.useMemo(
     () => [
       {
         id: "id",
         Header: "Numéro BSFF",
-        accessor: bsff => bsff.id,
+        accessor: bsffPackaging => bsffPackaging.bsff?.id, // TODO
         canFilter: true,
         filter: "text",
       },
       {
         id: "packagingsNumero",
         Header: "Numéro(s) de contenant(s)",
-        accessor: bsff =>
-          bsff.packagings
-            ?.map(p => p.numero)
-            .filter(n => n?.length > 0)
-            .splice(0, 10)
-            ?.join(" | "),
+        accessor: bsffPackaging => bsffPackaging.numero,
         canFilter: true,
         filter: "text",
       },
       {
         id: "wasteCode",
         Header: "Déchet",
-        accessor: bsff =>
-          `${bsff.waste?.code} - Nature : ${
-            bsff.waste?.description ?? "inconnue"
+        accessor: bsffPackaging =>
+          `${
+            bsffPackaging?.acceptation?.wasteCode ??
+            bsffPackaging.bsff?.waste?.code
+          } - ${
+            bsffPackaging?.acceptation?.wasteDescription ??
+            bsffPackaging.bsff?.waste?.description
           }`,
         canFilter: true,
         filter: "text",
@@ -68,8 +68,8 @@ export function PreviousBsffsPicker({
       {
         id: "emitter",
         Header: "Émetteur initial",
-        accessor: bsff =>
-          `${bsff.emitter?.company?.name} (${bsff.emitter?.company?.siret})`,
+        accessor: bsffPackaging =>
+          `${bsffPackaging.bsff?.emitter?.company?.name} (${bsffPackaging.bsff?.emitter?.company?.siret})`,
         canFilter: true,
         filter: "text",
       },
@@ -79,66 +79,68 @@ export function PreviousBsffsPicker({
 
   const instruction =
     bsff.type === BsffType.Groupement
-      ? "Retrouvez ci-dessous la liste des BSFFs qui sont en attente d'un groupement."
+      ? "Retrouvez ci-dessous la liste des contenants qui sont en attente d'un groupement."
       : bsff.type === BsffType.Reconditionnement
-      ? "Retrouvez ci-dessous la liste des BSFFs qui sont en attente d'un reconditionnement."
+      ? "Retrouvez ci-dessous la liste des contenants qui sont en attente d'un reconditionnement."
       : bsff.type === BsffType.Reexpedition
-      ? "Retrouvez ci-dessous la liste des BSFFs qui sont en attente d'une réexpédition."
+      ? "Retrouvez ci-dessous la liste des contenants qui sont en attente d'une réexpédition."
       : "";
 
-  const { data, loading } = useQuery<Pick<Query, "bsffs">, QueryBsffsArgs>(
-    GET_PREVIOUS_BSFFS,
-    {
-      variables: {
-        where: {
-          status: { _eq: BsffStatus.IntermediatelyProcessed },
-          destination: {
-            company: {
-              siret: { _eq: bsff.emitter?.company?.siret },
-            },
-            operation: {
-              code: { _in: code_in },
-            },
-          },
+  const [{ value: previousPackagings }] =
+    useField<BsffPackaging[]>("previousPackagings");
+
+  let where: BsffPackagingWhere = {
+    operation: { code: { _in: code_in }, noTraceability: false },
+    bsff: {
+      destination: {
+        company: {
+          siret: { _eq: bsff.emitter?.company?.siret },
         },
-        // pagination does not play well with bsff picking
-        first: 5000,
       },
-      // make sure we have fresh data here
-      fetchPolicy: "cache-and-network",
-      skip: !bsff.emitter?.company?.siret?.length,
-    }
-  );
-  const [{ value: previousBsffs }] = useField<Bsff[]>("previousBsffs");
+    },
+    nextBsff: null,
+  };
+
+  // On autorise uniquement les réexpéditions de contenants présents sur le même BSFF
+  if (bsff.type === BsffType.Reexpedition && previousPackagings?.length > 0) {
+    where = {
+      ...where,
+      bsff: { ...where.bsff, id: { _eq: previousPackagings[0].bsffId } },
+    };
+  }
+
+  if (bsff.id) {
+    // En cas d'update, on autorise les contenants qui ont déjà été ajouté à ce BSFF
+    where = { _or: [where, { ...where, nextBsff: { id: { _eq: bsff.id } } }] };
+  }
+
+  const { data, loading } = useQuery<
+    Pick<Query, "bsffPackagings">,
+    QueryBsffPackagingsArgs
+  >(GET_PREVIOUS_PACKAGINGS, {
+    variables: {
+      // pagination does not play well with bsff picking
+      first: 5000,
+      where,
+    },
+    // make sure we have fresh data here
+    fetchPolicy: "cache-and-network",
+    skip: !bsff.emitter?.company?.siret?.length,
+  });
 
   if (loading) {
     return <Loader />;
   }
 
   if (data) {
-    // remove bsffs that have already been grouped, forwarded or repackaged
-    const pickableBsffs = data.bsffs.edges
-      .map(({ node: bsff }) => bsff)
-      .filter(initialBsff => {
-        if (initialBsff.groupedIn && initialBsff.groupedIn.id !== bsff.id) {
-          return false;
-        }
-        if (
-          initialBsff.repackagedIn &&
-          initialBsff.repackagedIn.id !== bsff.id
-        ) {
-          return false;
-        }
-        if (initialBsff.forwardedIn && initialBsff.forwardedIn.id !== bsff.id) {
-          return false;
-        }
-        return true;
-      });
+    const pickablePackagings = data.bsffPackagings.edges.map(
+      ({ node: packaging }) => packaging
+    );
 
-    if (!pickableBsffs?.length) {
+    if (!pickablePackagings?.length) {
       return (
         <div>
-          {`Aucun BSFF éligible pour ${
+          {`Aucun contenant éligible pour ${
             bsff.type === BsffType.Groupement
               ? "un regroupement"
               : bsff.type === BsffType.Reconditionnement
@@ -156,21 +158,20 @@ export function PreviousBsffsPicker({
       <div style={{ padding: "1rem 0" }}>
         <p style={{ marginBottom: "0.25rem" }}>{instruction}</p>
         <FieldArray
-          name="previousBsffs"
+          name="previousPackagings"
           render={({ push, remove }) => (
-            <BsffTable
+            <BsffPackagingTable
               columns={columns}
-              data={pickableBsffs}
-              selected={previousBsffs}
-              push={bsff => {
-                push(bsff);
+              data={pickablePackagings}
+              selected={previousPackagings}
+              push={bsffPackaging => {
+                push(bsffPackaging);
                 onAddOrRemove();
               }}
               remove={idx => {
                 remove(idx);
                 onAddOrRemove();
               }}
-              bsffType={bsff.type}
             />
           )}
         />
@@ -195,23 +196,21 @@ function DefaultColumnFilter({ column: { filterValue, setFilter } }) {
   );
 }
 
-type BsffTableProps = {
-  columns: Column<Bsff>[];
-  data: Bsff[];
-  selected: Bsff[];
-  push: (bsff: Bsff) => void;
+type BsffPackagingTableProps = {
+  columns: Column<BsffPackaging>[];
+  data: BsffPackaging[];
+  selected: BsffPackaging[];
+  push: (bsffPackaging: BsffPackaging) => void;
   remove: (idx: number) => void;
-  bsffType: BsffType;
 };
 
-function BsffTable({
+function BsffPackagingTable({
   columns,
   data,
   selected,
   push,
   remove,
-  bsffType,
-}: BsffTableProps) {
+}: BsffPackagingTableProps) {
   const filterTypes = React.useMemo(
     () => ({
       text: (rows, id, filterValue) => {
@@ -265,28 +264,21 @@ function BsffTable({
       <TableBody {...getTableBodyProps()}>
         {rows.map(row => {
           prepareRow(row);
-          const previousBsffIndex = selected.findIndex(
-            previousBsff => previousBsff.id === row.values["id"]
+          const previousPackagingIndex = selected.findIndex(
+            previousPackaging => previousPackaging.id === row.original.id
           );
-          const isSelected = previousBsffIndex >= 0;
+          const isSelected = previousPackagingIndex >= 0;
           return (
             <TableRow
               {...row.getRowProps()}
               onClick={() => {
                 if (isSelected) {
-                  remove(previousBsffIndex);
+                  remove(previousPackagingIndex);
                 } else {
-                  if (
-                    bsffType === BsffType.Reexpedition &&
-                    selected.length >= 1
-                  ) {
-                    window.alert(
-                      `Vous ne pouvez sélectionner qu'un seul BSFF initial dans le cadre d'une réexpédition`
-                    );
-                    return;
-                  }
-                  const bsff = data.find(bsff => bsff.id === row.values["id"])!;
-                  push(bsff);
+                  const bsffPackaging = data.find(
+                    bsffPackaging => bsffPackaging.id === row.original.id
+                  )!;
+                  push(bsffPackaging);
                 }
               }}
             >

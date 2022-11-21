@@ -140,17 +140,20 @@ describe("All wastes registry", () => {
       },
       {
         wasteCode: "14 06 01*",
-        destinationReceptionWeight: 200,
         createdAt: new Date("2021-08-01"),
         transporterTransportTakenOverAt: new Date("2021-08-02"),
-        destinationReceptionDate: new Date("2021-08-03"),
-        destinationOperationSignatureDate: new Date("2021-08-04"),
-        destinationOperationCode: "R 2"
+        destinationReceptionDate: new Date("2021-08-03")
+      },
+      {
+        acceptationWeight: 200,
+        acceptationDate: new Date("2021-08-03"),
+        operationSignatureDate: new Date("2021-08-04"),
+        operationCode: "R2"
       }
     );
     await Promise.all([
       indexForm(await getFullForm(bsd1)),
-      indexBsda(bsd2),
+      indexBsda({ ...bsd2, intermediaries: [] }),
       indexBsdasri(bsd3),
       indexBsvhu(bsd4),
       indexBsff(bsd5)

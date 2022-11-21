@@ -36,7 +36,8 @@ import {
   BsdaRevisionRequestDestination,
   BsdaRevisionRequestOperation,
   BsdaRevisionRequestReception,
-  BsdaWorkerCertification
+  BsdaWorkerCertification,
+  CompanyInput
 } from "../generated/graphql/types";
 import {
   Prisma,
@@ -644,4 +645,20 @@ export function expandBsdaRevisionRequestContent(
       })
     })
   };
+}
+
+export function companyToIntermediaryInput(
+  companies: CompanyInput[]
+): Prisma.IntermediaryBsdaAssociationCreateManyBsdaInput[] {
+  return companies?.map(company => {
+    return {
+      name: company.name,
+      siret: company.siret,
+      vatNumber: company.vatNumber,
+      address: company.address,
+      contact: company.contact,
+      phone: company.phone,
+      mail: company.mail
+    };
+  });
 }
