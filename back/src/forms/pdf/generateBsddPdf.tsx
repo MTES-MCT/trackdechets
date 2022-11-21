@@ -353,14 +353,14 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
           <div className="BoxCol">
             <p>
               <strong>N° Bordereau :</strong> {form.readableId}{" "}
-              {form.customId && <>({form.customId})</>}
-              {groupedIn?.length && (
+              {!!form.customId && <>({form.customId})</>}
+              {!!groupedIn?.length && (
                 <>
                   <strong>Annexé au bordereau n° :</strong>{" "}
                   {groupedIn.map(bsd => bsd.readableId)}
                 </>
               )}
-              {}
+           
             </p>
           </div>
         </div>
