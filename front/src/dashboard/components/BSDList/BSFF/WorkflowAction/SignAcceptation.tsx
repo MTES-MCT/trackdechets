@@ -277,7 +277,7 @@ export function SignBsffAcceptationOnePackagingModalContent({
             </div>
             <div className="form__row">
               <label>
-                Quantité de déchet présenté (pour les installations
+                Quantité de déchet présentée (pour les installations
                 d'entreposage ou de reconditionnement, la quantité peut être
                 estimée)
                 <Field

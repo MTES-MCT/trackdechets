@@ -35,21 +35,42 @@ import { BsffSummary } from "./BsffSummary";
 import { BsffPackagingSummary } from "./BsffPackagingSummary";
 import { OPERATION } from "form/bsff/utils/constants";
 import CompanySelector from "form/common/components/company/CompanySelector";
+import { companySchema } from "common/validation/schema";
+
+const operationCode = yup
+  .string()
+  .required("Le code de l'opération de traitement est requis")
+  .oneOf(
+    Object.keys(OPERATION),
+    "Le code de l'opération de traitement ne fait pas partie de la liste reconnue"
+  );
 
 const validationSchema = yup.object({
-  code: yup
+  code: operationCode,
+  description: yup
     .string()
-    .oneOf(
-      Object.keys(OPERATION),
-      "Le code de traitement doit faire partie de la liste reconnue"
-    )
-    .required(),
-  description: yup.string().ensure().required(),
-  date: yup.date().required(),
+    .ensure()
+    .required("La description de l'opération réalisée est obligatoire"),
+  date: yup.date().required("La date de l'opération est requise"),
   author: yup
     .string()
     .ensure()
     .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+  nextDestination: yup.object().when("code", {
+    is: (code: string) => OPERATION[code]?.successors?.length > 0,
+    then: schema =>
+      schema.when("noTraceability", {
+        is: true,
+        then: schema => schema.nullable(),
+        otherwise: schema =>
+          schema.shape({
+            plannedOperationCode: operationCode,
+            company: companySchema,
+            cap: yup.string().nullable().notRequired(),
+          }),
+      }),
+    otherwise: schema => schema.nullable(),
+  }),
 });
 
 interface SignBsffOperationProps {
@@ -174,6 +195,7 @@ function NextDestinationField(props) {
       setFieldValue(props.name, {
         plannedOperationCode: "",
         company: {},
+        cap: "",
       });
     }
   }, [hasNextDestination, props.name, setFieldValue]);
@@ -197,13 +219,15 @@ function NextDestinationField(props) {
             ))}
           </Field>
         </label>
-        <RedErrorMessage name="code" />
+        <RedErrorMessage name="nextDestination.plannedOperationCode" />
       </div>
-      <CompanySelector
-        name="nextDestination.company"
-        allowForeignCompanies={true}
-        skipFavorite={true}
-      />
+      <CompanySelector name="nextDestination.company" skipFavorite={true} />
+      <div className="form__row">
+        <label>
+          Numéro de CAP (optionnel)
+          <Field type="text" name="nextDestination.cap" className="td-input" />
+        </label>
+      </div>
     </div>
   ) : null;
 }
