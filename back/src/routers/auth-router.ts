@@ -4,6 +4,7 @@ import querystring from "querystring";
 import { ADMIN_IS_PERSONIFYING } from "../auth";
 import nocache from "../common/middlewares/nocache";
 import { rateLimiterMiddleware } from "../common/middlewares/rateLimiter";
+import { storeUserSessionId } from "../common/redis/users";
 import { getUIBaseURL, sanitizeEmail } from "../utils";
 
 const UI_BASE_URL = getUIBaseURL();
@@ -40,14 +41,14 @@ authRouter.post(
           `${UI_BASE_URL}/login?${querystring.stringify(queries)}`
         );
       }
-      req.login(user, () => {
+      req.logIn(user, () => {
         if (info?.message === ADMIN_IS_PERSONIFYING) {
           // when personifying a user account we reduce the session duration to 1 hour and display a message
           const oneHourInMs = 3600000;
           req.session.cookie.maxAge = oneHourInMs;
           req.session.warningMessage = `Attention, vous êtes actuellement connecté avec le compte utilisateur ${user.email} pour une durée de 1 heure.`;
         }
-
+        storeUserSessionId(user.id, req);
         const returnTo = req.body.returnTo || "/";
         return res.redirect(`${UI_BASE_URL}${returnTo}`);
       });

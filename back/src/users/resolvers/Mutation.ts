@@ -18,6 +18,7 @@ import revokeAccessToken from "./mutations/revokeAccessToken";
 import createAccessToken from "./mutations/createAccessToken";
 import revokeAllAccessTokens from "./mutations/revokeAllAccessTokens";
 import resetPassword from "./mutations/resetPassword";
+import anonymizeUser from "./mutations/anonymizeUser";
 
 const Mutation: MutationResolvers = {
   signup,
@@ -26,6 +27,7 @@ const Mutation: MutationResolvers = {
   createPasswordResetRequest,
   resetPassword,
   editProfile,
+  anonymizeUser,
   inviteUserToCompany,
   deleteInvitation,
   resendInvitation,

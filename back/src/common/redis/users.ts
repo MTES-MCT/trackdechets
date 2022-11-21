@@ -1,5 +1,6 @@
 import { redisClient, generateKey } from "./redis";
 import { getUserCompanies } from "../../users/database";
+import { sess } from "../../server";
 
 const CACHED_COMPANY_EXPIRATION = 10 * 60; // 10 minutes
 
@@ -60,4 +61,27 @@ export async function getCachedUserSiretOrVat(
   const cleanIds = ids.filter(id => !!id);
   await setCachedUserCompanyId(userId, cleanIds);
   return cleanIds;
+}
+
+const userSessionsCache = "users-sessions-id";
+
+export async function storeUserSessionId(
+  userId: string,
+  req: Express.Request
+): Promise<void> {
+  if (!userId) {
+    return;
+  }
+
+  await redisClient.sadd(`${userSessionsCache}-${userId}`, req.session.id);
+}
+
+export async function disconnectAllUserSessions(userId: string): Promise<void> {
+  if (!userId) {
+    return;
+  }
+
+  const sessions = await redisClient.sinter(`${userSessionsCache}-${userId}`);
+  sessions.map(sessionId => sess.store.destroy(sessionId));
+  await redisClient.srem(`${userSessionsCache}-${userId}`);
 }

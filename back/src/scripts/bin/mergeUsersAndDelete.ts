@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 import prisma from "../../prisma";
 import mergeUsers from "../prisma/mergeUsers";
-import deleteUser from "../prisma/deleteUser";
+import deleteUser from "../prisma/hardDeleteUser";
 
 (async () => {
   const [userID, heirUserID] = process.argv.slice(2);
