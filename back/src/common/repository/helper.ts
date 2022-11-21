@@ -10,7 +10,7 @@ type RepositoryContext = {
 };
 
 // See https://www.prisma.io/docs/concepts/components/prisma-client/transactions#interactive-transactions-in-preview
-const PRISMA_TRANSACTION_TIMEOUT =
+export const PRISMA_TRANSACTION_TIMEOUT =
   parseInt(process.env.PRISMA_TRANSACTION_TIMEOUT, 10) || 5000;
 
 /**

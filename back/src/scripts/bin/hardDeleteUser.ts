@@ -1,6 +1,7 @@
 #!/usr/bin/env ts-node
+import prompts from "prompts";
 import prisma from "../../prisma";
-import deleteUser from "../prisma/deleteUser";
+import deleteUser from "../prisma/hardDeleteUser";
 
 (async () => {
   const [userID] = process.argv.slice(2);
@@ -15,7 +16,7 @@ import deleteUser from "../prisma/deleteUser";
         `Il est par exemple impossible de supprimer un utilisateur qui est seul administrateur d'une entreprise.`,
         ``,
         `Exemple :`,
-        `node ./src/scripts/bin/mergeUsersAndDelete.js 1234`
+        `node ./src/scripts/bin/hardDeleteUser.js 1234`
       ].join("\n")
     );
     return;
@@ -29,6 +30,11 @@ import deleteUser from "../prisma/deleteUser";
     );
     return;
   }
-
+  await prompts({
+    type: "confirm",
+    name: "force",
+    message: `Can you confirm to hard delete this user id=${user.id} email=${user.email}?`,
+    initial: false
+  });
   await deleteUser(user);
 })();

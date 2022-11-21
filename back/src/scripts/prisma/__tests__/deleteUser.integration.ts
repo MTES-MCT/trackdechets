@@ -7,7 +7,7 @@ import {
   userWithAccessTokenFactory,
   userWithCompanyFactory
 } from "../../../__tests__/factories";
-import deleteUser from "../deleteUser";
+import deleteUser from "../hardDeleteUser";
 
 describe("deleteUser", () => {
   afterEach(() => resetDatabase());
