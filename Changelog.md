@@ -16,6 +16,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - BSFF - ETQ qu'installation de destination, je peux effectuer un refus partiel par contenant [PR 1739](https://github.com/MTES-MCT/trackdechets/pull/1739)
 - BSFF - ETQ installation de TTR je peux indiquer une destination ultérieure prévue [PR 1739](https://github.com/MTES-MCT/trackdechets/pull/1739)
 - BSFF - ajout du CAP [PR 1739](https://github.com/MTES-MCT/trackdechets/pull/1739)
+- BSDA - support des intermédiaires [PR 1834](https://github.com/MTES-MCT/trackdechets/pull/1834)
 
 #### :bug: Corrections de bugs
 
@@ -47,6 +48,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Utilisation de react pour la génération du pdf des bsvhus [PR1788](https://github.com/MTES-MCT/trackdechets/pull/1788).
 - Utilisation du pattern repository pour le bsvhu, indexation asynchrone et écriture d'events [PR 1767](https://github.com/MTES-MCT/trackdechets/pull/1767).
+- Migration du stockage des évènements vers une base de données externe [PR 1646](https://github.com/MTES-MCT/trackdechets/pull/1646).
 
 # [2022.10.3] 31/10/2022
 
