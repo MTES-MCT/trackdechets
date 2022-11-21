@@ -47,8 +47,6 @@ interface CompanySelectorProps {
   name: string;
   onCompanySelected?: (company: CompanySearchResult) => void;
   allowForeignCompanies?: boolean;
-  // force l'affichage d'un formulaire pour entrer manuellement les coordonnées
-  forceManualForeignCompanyForm?: boolean;
   registeredOnlyCompanies?: boolean;
   heading?: string;
   disabled?: boolean;
@@ -63,7 +61,6 @@ export default function CompanySelector({
   name,
   onCompanySelected,
   allowForeignCompanies = false,
-  forceManualForeignCompanyForm = false,
   registeredOnlyCompanies = false,
   heading,
   disabled,
@@ -85,8 +82,10 @@ export default function CompanySelector({
   const clueInputRef = useRef<HTMLInputElement>(null);
   const [mustBeRegistered, setMustBeRegistered] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<CompanySearchResult[]>([]);
-  const [toggleManualForeignCompanyForm, setToggleManualForeignCompanyForm] =
-    useState<boolean>(false);
+  const [
+    displayForeignCompanyWithUnknownInfos,
+    setDisplayForeignCompanyWithUnknownInfos,
+  ] = useState<boolean>(false);
 
   // Favortite type is deduced from the field prefix (transporter, emitter, etc)
   const favoriteType = constantCase(field.name.split(".")[0]) as FavoriteType;
@@ -159,7 +158,7 @@ export default function CompanySelector({
       );
     }
     // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
-    setToggleManualForeignCompanyForm(
+    setDisplayForeignCompanyWithUnknownInfos(
       isForeignVat(company.vatNumber!!) &&
         (company.name === "---" || company.name === "")
     );
@@ -169,7 +168,7 @@ export default function CompanySelector({
     const fields: FormCompany = {
       siret: company.siret,
       vatNumber: company.vatNumber,
-      name: company.name ?? "",
+      name: company.name && company.name !== "---" ? company.name : "",
       address: company.address ?? "",
       contact: company.contact ?? "",
       phone: company.contactPhone ?? "",
@@ -362,7 +361,7 @@ export default function CompanySelector({
             />
           </div>
         </div>
-        {toggleManualForeignCompanyForm === true && (
+        {displayForeignCompanyWithUnknownInfos && (
           <SimpleNotificationError
             message={
               <>
@@ -425,53 +424,50 @@ export default function CompanySelector({
           }}
         />
         <div className="form__row">
-          {allowForeignCompanies &&
-            (isForeignCompany ||
-              forceManualForeignCompanyForm ||
-              toggleManualForeignCompanyForm) && (
-              <>
-                <label>
-                  Nom de l'entreprise
-                  <Field
-                    type="text"
-                    className="td-input"
-                    name={`${field.name}.name`}
-                    placeholder="Nom"
-                    disabled={disabled}
-                  />
-                </label>
+          {allowForeignCompanies && isForeignCompany && (
+            <>
+              <label>
+                Nom de l'entreprise
+                <Field
+                  type="text"
+                  className="td-input"
+                  name={`${field.name}.name`}
+                  placeholder="Nom"
+                  disabled={disabled}
+                />
+              </label>
 
-                <RedErrorMessage name={`${field.name}.name`} />
+              <RedErrorMessage name={`${field.name}.name`} />
 
-                <label>
-                  Adresse de l'entreprise
-                  <Field
-                    type="text"
-                    className="td-input"
-                    name={`${field.name}.address`}
-                    placeholder="Adresse"
-                    disabled={disabled}
-                  />
-                </label>
+              <label>
+                Adresse de l'entreprise
+                <Field
+                  type="text"
+                  className="td-input"
+                  name={`${field.name}.address`}
+                  placeholder="Adresse"
+                  disabled={disabled}
+                />
+              </label>
 
-                <RedErrorMessage name={`${field.name}.address`} />
-                <label>
-                  Pays de l'entreprise
-                  <Field name={`${field.name}.country`} disabled={disabled}>
-                    {({ field, form }) => (
-                      <CountrySelector
-                        {...field}
-                        onChange={code => form.setFieldValue(field.name, code)}
-                        value={field.value}
-                        placeholder="Pays"
-                      />
-                    )}
-                  </Field>
-                </label>
+              <RedErrorMessage name={`${field.name}.address`} />
+              <label>
+                Pays de l'entreprise
+                <Field name={`${field.name}.country`} disabled={disabled}>
+                  {({ field, form }) => (
+                    <CountrySelector
+                      {...field}
+                      onChange={code => form.setFieldValue(field.name, code)}
+                      value={field.value}
+                      placeholder="Pays"
+                    />
+                  )}
+                </Field>
+              </label>
 
-                <RedErrorMessage name={`${field.name}.country`} />
-              </>
-            )}
+              <RedErrorMessage name={`${field.name}.country`} />
+            </>
+          )}
           <label>
             Personne à contacter
             <Field

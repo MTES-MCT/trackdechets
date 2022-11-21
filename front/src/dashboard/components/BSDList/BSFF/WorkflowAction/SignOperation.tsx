@@ -202,7 +202,6 @@ function NextDestinationField(props) {
       <CompanySelector
         name="nextDestination.company"
         allowForeignCompanies={true}
-        forceManualForeignCompanyForm={true}
         skipFavorite={true}
       />
     </div>
