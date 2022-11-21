@@ -1,4 +1,9 @@
-import { UserRole, BsffType, BsffStatus } from "@prisma/client";
+import {
+  UserRole,
+  BsffType,
+  BsffStatus,
+  BsffPackagingType
+} from "@prisma/client";
 import { gql } from "apollo-server-core";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { BSFF_WASTE_CODES } from "../../../../common/constants";
@@ -68,7 +73,7 @@ describe("Mutation.updateBsff", () => {
       { emitter },
       {
         packagings: {
-          create: { name: "BOUTEILLE", weight: 1, numero: "1" }
+          create: { type: BsffPackagingType.BOUTEILLE, weight: 1, numero: "1" }
         },
         isDraft: true
       }
@@ -89,8 +94,18 @@ describe("Mutation.updateBsff", () => {
         id: bsff.id,
         input: {
           packagings: [
-            { name: "BOUTEILLE", weight: 1, numero: "2", volume: 1 },
-            { name: "BOUTEILLE", weight: 1, numero: "3", volume: 1 }
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              weight: 1,
+              numero: "2",
+              volume: 1
+            },
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              weight: 1,
+              numero: "3",
+              volume: 1
+            }
           ]
         }
       }
@@ -701,7 +716,7 @@ describe("Mutation.updateBsff", () => {
         type: BsffType.RECONDITIONNEMENT,
         packagings: {
           create: {
-            name: "Citerne",
+            type: BsffPackagingType.BOUTEILLE,
             numero: "numero",
             volume: 1,
             weight: 1,

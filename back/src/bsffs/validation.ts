@@ -202,16 +202,17 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
           )
           .of<
             yup.SchemaOf<
-              Pick<PrismaBsffPackaging, "name" | "numero" | "volume" | "weight">
+              Pick<
+                PrismaBsffPackaging,
+                "type" | "other" | "numero" | "volume" | "weight"
+              >
             >
           >(
             yup.object({
-              name: yup
-                .string()
-                .ensure()
-                .required(
-                  "Conditionnements : la dénomination du contenant est requise"
-                ),
+              type: yup
+                .mixed()
+                .required("Conditionnements : le type de contenant est requis"),
+              other: yup.string().notRequired().nullable(),
               volume: yup
                 .number()
                 .required("Conditionnements : le volume est requis")
@@ -558,7 +559,10 @@ export const draftBsffSchema = baseBsffSchemaFn(true);
 
 export async function validateBsff(
   bsff: Partial<Bsff | Prisma.BsffCreateInput> & {
-    packagings?: Pick<BsffPackaging, "name" | "numero" | "volume" | "weight">[];
+    packagings?: Pick<
+      BsffPackaging,
+      "type" | "other" | "numero" | "volume" | "weight"
+    >[];
   }
 ) {
   try {

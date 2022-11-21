@@ -5,7 +5,8 @@ import {
   BsffStatus,
   BsffType,
   BsffPackaging,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  BsffPackagingType
 } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
@@ -81,7 +82,7 @@ export function createBsffPackaging(
   previousPackagings?: BsffPackaging[]
 ) {
   return {
-    name: "BOUTEILLE",
+    type: BsffPackagingType.BOUTEILLE,
     numero: "1234",
     weight: 1,
     volume: 1,
@@ -144,7 +145,8 @@ export function createBsffPackagingBeforeTransport(
 ) {
   return createBsffPackaging(
     {
-      name: "BOUTEILLE 2L",
+      type: "OTHER",
+      operationSignatureAuthor: "BOUTEILLE 2L",
       numero: "01",
       weight: 1,
       ...args

@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { BsffPackagingType, UserRole } from "@prisma/client";
 import { gql } from "apollo-server-core";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
@@ -9,6 +9,7 @@ import {
 import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { BsffPackaging } from "../../BsffPackaging";
 
 const PUBLISH_BSFF = gql`
   mutation PublishBsff($id: ID!) {
@@ -106,7 +107,12 @@ describe("publishBsff", () => {
         weightValue: 1,
         weightIsEstimate: false,
         packagings: {
-          create: { name: "BOUTEILLE", numero: "123", weight: 1, volume: 1 }
+          create: {
+            type: BsffPackagingType.BOUTEILLE,
+            numero: "123",
+            weight: 1,
+            volume: 1
+          }
         }
       }
     });

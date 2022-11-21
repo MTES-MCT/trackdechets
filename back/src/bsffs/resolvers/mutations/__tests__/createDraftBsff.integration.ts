@@ -1,4 +1,9 @@
-import { UserRole, BsffStatus, BsffType } from "@prisma/client";
+import {
+  UserRole,
+  BsffStatus,
+  BsffType,
+  BsffPackagingType
+} from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -334,7 +339,12 @@ describe("Mutation.createDraftBsff", () => {
               }
             },
             packagings: [
-              { name: "Bouteille", volume: 1, weight: 1, numero: "cont1" }
+              {
+                type: BsffPackagingType.BOUTEILLE,
+                volume: 1,
+                weight: 1,
+                numero: "cont1"
+              }
             ],
             repackaging: previousBsffs.flatMap(previousBsff =>
               previousBsff.packagings.map(p => p.id)
