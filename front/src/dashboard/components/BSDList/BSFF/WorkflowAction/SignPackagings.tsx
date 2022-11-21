@@ -79,7 +79,9 @@ function SignPackagingsModal({ bsffId, onClose }: SignPackagingsModalProps) {
         Signature acceptation et traitement par contenant
       </h2>
       <BsffWasteSummary bsff={bsff} />
-      <BsffPackagingTable bsff={bsff} />
+      <div className="tw-overflow-x-scroll">
+        <BsffPackagingTable bsff={bsff} />
+      </div>
     </Modal>
   );
 }
