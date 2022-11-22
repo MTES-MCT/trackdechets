@@ -11,7 +11,7 @@ fi
 
 # Disable psql integration for every nodes but the first
 # There seems to be no env to disable the psql integration, so we simply remove the config file
-FIRST_NODE="${APP}-web-1"
-if [[ "${CONTAINER}" == "$FIRST_NODE" ]]; then
+FIRST_NODE="web-1"
+if [[ "${CONTAINER}" != "$FIRST_NODE" ]]; then
   rm ./conf.d/postgres.yaml
 fi
