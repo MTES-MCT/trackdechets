@@ -5,7 +5,7 @@
 # ex:
 # CONTAINER=one-off-7652
 # SCALINGO_USER_ID=us-1234-567-891-234-5678
-if [[ -n "${SCALINGO_USER_ID}" ]] || [[ "${SCALINGO_USER_ID}" == "one-off"* ]]; then
+if [[ -n "${SCALINGO_USER_ID}" ]] || [[ "${CONTAINER}" == "one-off"* ]]; then
   DISABLE_DATADOG_AGENT="true"
 fi
 
