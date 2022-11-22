@@ -239,6 +239,19 @@ app.use(graphQLPath, graphqlRegenerateSessionMiddleware("changePassword"));
 app.use(authRouter);
 app.use(oauth2Router);
 
+const USERS_BLACKLIST_ENV = process.env.USERS_BLACKLIST;
+let blacklist = [];
+if (USERS_BLACKLIST_ENV?.length > 0) {
+  blacklist = USERS_BLACKLIST_ENV.split(",");
+}
+
+app.use((req, res, next) => {
+  if (req.user && blacklist.includes(req.user.email)) {
+    return res.send("Too Many Requests").status(429);
+  }
+  next();
+});
+
 app.get("/ping", (_, res) => res.send("Pong!"));
 
 app.get("/ip", (req, res) => {
