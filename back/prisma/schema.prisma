@@ -395,6 +395,7 @@ model Form {
   forwardedIn   Form?   @relation("BsddForwarding", fields: [forwardedInId], references: [id])
 
   // partial index _FormIsDeletedIdx see migration82_missing_indices.sql
+  // partial index _FormRecipientIsTempStorageIdx see 99_add_form_indices.sql
 
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
@@ -403,6 +404,10 @@ model Form {
   @@index([brokerCompanySiret], map: "_FormBrokerCompanySiretIdx")
   @@index([ecoOrganismeSiret], map: "_FormEcoOrganismeSiretIdx")
   @@index([status], map: "_FormStatusIdx")
+  @@index([sentAt], map: "_FormSentAtIdx")
+  @@index([createdAt], map: "_FormCreatedAtIdx")
+  @@index([wasteDetailsCode], map: "_FormWasteDetailsCodeIdx")
+  @@index([customId], map: "_FormCustomIdIdx")
 }
 
 model FormGroupement {
@@ -1033,7 +1038,7 @@ model Bsff {
   transporterRecepisseDepartment    String?
   transporterRecepisseValidityLimit DateTime? @db.Timestamptz(6)
 
-  transporterTransportMode            TransportMode?   @default(ROAD)
+  transporterTransportMode            TransportMode? @default(ROAD)
   transporterTransportPlates          String[]
   transporterTransportTakenOverAt     DateTime?      @db.Timestamptz(6)
   transporterTransportSignatureAuthor String?
