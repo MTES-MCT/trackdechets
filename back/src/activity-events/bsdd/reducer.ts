@@ -16,6 +16,9 @@ export function bsddReducer(
         wasteDetailsParcelNumbers,
         wasteDetailsAnalysisReferences,
         wasteDetailsLandIdentifiers,
+        recipientsSirets,
+        transportersSirets,
+        intermediariesSirets,
         ...bsdd
       } = event.data.content;
       return {
@@ -60,6 +63,9 @@ export function bsddReducer(
         wasteDetailsParcelNumbers,
         wasteDetailsAnalysisReferences,
         wasteDetailsLandIdentifiers,
+        recipientsSirets,
+        transportersSirets,
+        intermediariesSirets,
         ...bsdd
       } = event.data.content as Prisma.FormCreateInput; // TODO Check if we can we somehow keep Prisma.FormUpdateInput
 
