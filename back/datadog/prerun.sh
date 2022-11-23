@@ -21,7 +21,6 @@ if [[ -n "${DATABASE_URL}" ]] && [[ "${CONTAINER}" == "${FIRST_NODE}" ]]; then
     sed -i "s/<DD_DATABASE_PORT>/${BASH_REMATCH[4]}/g" "${POSTGRES_CONF_FILE}"
     sed -i "s/<DD_DATABASE_DB>/${BASH_REMATCH[5]}/g" "${POSTGRES_CONF_FILE}"
   fi
-  cat "${POSTGRES_CONF_FILE}"
 else 
   # Disable psql integration for every nodes but the first
   # There seems to be no env to disable the psql integration, so we simply remove the config file
