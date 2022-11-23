@@ -4,6 +4,8 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { getFormSiretsByRole } from "../../database";
+import { hasPossibleSiretChange } from "./update";
 
 export type UpdateManyFormFn = (
   ids: string[],
@@ -14,11 +16,32 @@ export type UpdateManyFormFn = (
 const buildUpdateManyForms: (deps: RepositoryFnDeps) => UpdateManyFormFn =
   deps => async (ids, data, logMetadata) => {
     const { prisma, user } = deps;
+    const where = { id: { in: ids } };
 
     const update = await prisma.form.updateMany({
-      where: { id: { in: ids } },
+      where,
       data
     });
+
+    // WARNING : This is costly !
+    if (hasPossibleSiretChange(data)) {
+      const forms = await prisma.form.findMany({
+        where,
+        include: {
+          transportSegments: true,
+          intermediaries: true,
+          forwardedIn: true
+        }
+      });
+      await Promise.all(
+        forms.map(form => {
+          return prisma.form.update({
+            where: { id: form.id },
+            data: getFormSiretsByRole(form)
+          });
+        })
+      );
+    }
 
     await prisma.event.createMany({
       data: ids.map(id => ({

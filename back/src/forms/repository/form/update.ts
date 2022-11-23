@@ -4,6 +4,7 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { getFormSiretsByRole } from "../../database";
 import { formDiff } from "../../workflow/diff";
 
 export type UpdateFormFn = (
@@ -20,13 +21,27 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
     // for diff calculation
     const oldForm = await prisma.form.findUnique({
       where,
-      include: { forwardedIn: true }
+      include: {
+        forwardedIn: true
+      }
     });
 
     const updatedForm = await prisma.form.update({
       where,
-      data
+      data,
+      include: {
+        transportSegments: true,
+        intermediaries: true,
+        forwardedIn: true
+      }
     });
+
+    // Calculating the sirets from Prisma.FormUpdateInput and the previously existing ones is hard
+    // If a siret change might have occurred, we process it in a second update
+    if (hasPossibleSiretChange(data)) {
+      const denormalizedSirets = getFormSiretsByRole(updatedForm);
+      await prisma.form.update({ where, data: denormalizedSirets });
+    }
 
     // retrieves updated temp storage
     const updatedForwardedIn = await prisma.form
@@ -80,5 +95,15 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
 
     return updatedForm;
   };
+
+export function hasPossibleSiretChange(data: Prisma.FormUpdateInput) {
+  return (
+    data.recipientCompanySiret ||
+    data.transporterCompanySiret ||
+    data.intermediaries ||
+    data.transportSegments ||
+    data.forwardedIn
+  );
+}
 
 export default buildUpdateForm;

@@ -394,6 +394,11 @@ model Form {
   forwardedInId String? @unique
   forwardedIn   Form?   @relation("BsddForwarding", fields: [forwardedInId], references: [id])
 
+  // Denormalized fields, storing sirets. This is
+  recipientsSirets     String[] @default([])
+  transportersSirets   String[] @default([])
+  intermediariesSirets String[] @default([])
+
   // partial index _FormIsDeletedIdx see migration82_missing_indices.sql
   // partial index _FormRecipientIsTempStorageIdx see 99_add_form_indices.sql
 

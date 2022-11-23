@@ -72,34 +72,13 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
   const filtersByRole: {
     [key in FormRole]: Partial<Prisma.FormWhereInput>[];
   } = {
-    ["RECIPIENT"]: [
-      { recipientCompanySiret: siret },
-      {
-        forwardedIn: {
-          recipientCompanySiret: siret
-        }
-      }
-    ],
+    ["RECIPIENT"]: [{ recipientsSirets: { has: siret } }],
     ["EMITTER"]: [{ emitterCompanySiret: siret }],
-    ["TRANSPORTER"]: [
-      { transporterCompanySiret: siret },
-      {
-        transportSegments: {
-          some: {
-            transporterCompanySiret: siret
-          }
-        }
-      },
-      {
-        forwardedIn: {
-          transporterCompanySiret: siret
-        }
-      }
-    ],
+    ["TRANSPORTER"]: [{ transportersSirets: { has: siret } }],
     ["TRADER"]: [{ traderCompanySiret: siret }],
     ["BROKER"]: [{ brokerCompanySiret: siret }],
     ["ECO_ORGANISME"]: [{ ecoOrganismeSiret: siret }],
-    ["INTERMEDIARY"]: [{ intermediaries: { some: { siret } } }]
+    ["INTERMEDIARY"]: [{ intermediariesSirets: { has: siret } }]
   };
 
   return {
@@ -109,5 +88,31 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
       )
       .map(role => filtersByRole[role])
       .flat()
+  };
+}
+
+export function getFormSiretsByRole(
+  form: Prisma.FormGetPayload<{
+    include: {
+      transportSegments: true;
+      intermediaries: true;
+      forwardedIn: true;
+    };
+  }>
+) {
+  return {
+    recipientsSirets: [
+      form.recipientCompanySiret,
+      form.forwardedIn?.recipientCompanySiret
+    ].filter(Boolean),
+    transportersSirets: [
+      form.transporterCompanySiret,
+      ...form.transportSegments?.map(
+        segment => segment.transporterCompanySiret
+      ),
+      form.forwardedIn?.transporterCompanySiret
+    ].filter(Boolean),
+    intermediariesSirets:
+      form.intermediaries?.map(intermediary => intermediary.siret) ?? []
   };
 }
