@@ -1825,6 +1825,9 @@ describe("Mutation.updateForm", () => {
       }
     });
 
+    validateIntermediariesInputMock.mockResolvedValueOnce([
+      toIntermediaryCompany(company)
+    ]);
     const { data } = await mutate<
       Pick<Mutation, "updateForm">,
       MutationUpdateFormArgs
