@@ -16,8 +16,6 @@ if [[ -n "${DATABASE_URL}" ]] && [[ "${CONTAINER}" == "${FIRST_NODE}" ]]; then
   POSTGREGEX='^postgres://([^:]+):([^@]+)@([^:]+):([^/]+)/(.*)\?(.*)$'
   if [[ $DATABASE_URL =~ $POSTGREGEX ]]; then
     sed -i "s/<DD_DATABASE_HOST>/${BASH_REMATCH[3]}/g" "${POSTGRES_CONF_FILE}"
-    sed -i "s/<DD_DATABASE_USER>/${BASH_REMATCH[1]}/g" "${POSTGRES_CONF_FILE}"
-    sed -i "s/<DD_DATABASE_PWD>/${BASH_REMATCH[2]}/g" "${POSTGRES_CONF_FILE}"
     sed -i "s/<DD_DATABASE_PORT>/${BASH_REMATCH[4]}/g" "${POSTGRES_CONF_FILE}"
     sed -i "s/<DD_DATABASE_DB>/${BASH_REMATCH[5]}/g" "${POSTGRES_CONF_FILE}"
   fi
