@@ -22,7 +22,6 @@ if [[ -n "$DATABASE_URL" ]] && [[ "${CONTAINER}" == "$FIRST_NODE" ]]; then
     sed -i "s/<DD_DATABASE_PORT>/${BASH_REMATCH[4]}/g" ./datadog/conf.d/postgres.yaml
     sed -i "s/<DD_DATABASE_DB>/${BASH_REMATCH[5]}/g" ./datadog/conf.d/postgres.yaml
   fi
-fi
 else 
   rm ./datadog/conf.d/postgres.yaml
 fi
