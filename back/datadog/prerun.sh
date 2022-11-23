@@ -13,7 +13,6 @@ FIRST_NODE="web-1"
 POSTGRES_CONF_FILE="${DD_CONF_DIR}/conf.d/postgres.d/conf.yaml"
 
 if [[ -n "${DATABASE_URL}" ]] && [[ "${CONTAINER}" == "${FIRST_NODE}" ]]; then
-  echo 'Container N°1 detected : activating datadog agent postgres monitoring'
   POSTGREGEX='^postgres://([^:]+):([^@]+)@([^:]+):([^/]+)/(.*)\?(.*)$'
   if [[ $DATABASE_URL =~ $POSTGREGEX ]]; then
     sed -i "s/<DD_DATABASE_HOST>/${BASH_REMATCH[3]}/g" "${POSTGRES_CONF_FILE}"
@@ -26,6 +25,5 @@ if [[ -n "${DATABASE_URL}" ]] && [[ "${CONTAINER}" == "${FIRST_NODE}" ]]; then
 else 
   # Disable psql integration for every nodes but the first
   # There seems to be no env to disable the psql integration, so we simply remove the config file
-  echo 'Container N° > 1 detected : de-activating datadog agent postgres monitoring'
   rm "${POSTGRES_CONF_FILE}"
 fi
