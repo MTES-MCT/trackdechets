@@ -190,7 +190,7 @@ describe("Query.forms", () => {
       {
         recipientCompanyName: otherCompany.name,
         recipientCompanySiret: otherCompany.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [otherCompany.siret]
       }
     ]);
 
@@ -248,6 +248,7 @@ describe("Query.forms", () => {
       ownerId: user.id,
       opt: {
         recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret],
         wasteDetailsPackagingInfos: []
       }
     });
@@ -255,6 +256,7 @@ describe("Query.forms", () => {
       ownerId: user.id,
       opt: {
         recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret],
         wasteDetailsPackagingInfos: []
       }
     });
@@ -860,7 +862,7 @@ describe("Integration / Forms query for transporters", () => {
       ownerId: owner.id,
       opt: {
         transporterCompanySiret: "6543",
-        transportersSirets: ["6543"],
+        transportersSirets: ["6543", transporter.siret], // pre populate with the transport segment siret
         status: "SEALED"
       }
     });
