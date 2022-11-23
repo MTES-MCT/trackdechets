@@ -112,19 +112,23 @@ describe("Query.forms", () => {
     await createForms(user.id, [
       {
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
+        recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret]
       },
       {
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
+        recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret]
       },
       {
         emitterCompanyName: company.name,
-        emitterCompanySiret: company.siret
+        emitterCompanySiret: company.siret,
+        recipientsSirets: [company.siret]
       },
       {
         recipientCompanyName: "a name",
-        recipientCompanySiret: "a siret"
+        recipientCompanySiret: "a siret",
+        recipientsSirets: ["a siret"]
       }
     ]);
 
@@ -180,11 +184,13 @@ describe("Query.forms", () => {
     await createForms(user.id, [
       {
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
+        recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret]
       },
       {
         recipientCompanyName: otherCompany.name,
-        recipientCompanySiret: otherCompany.siret
+        recipientCompanySiret: otherCompany.siret,
+        recipientsSirets: [company.siret]
       }
     ]);
 
@@ -212,7 +218,8 @@ describe("Query.forms", () => {
             name: company.name,
             contact: "John Doe"
           }
-        }
+        },
+        intermediariesSirets: [company.siret]
       }
     });
 
@@ -233,6 +240,7 @@ describe("Query.forms", () => {
       ownerId: user.id,
       opt: {
         recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret],
         wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }]
       }
     });
@@ -279,6 +287,7 @@ describe("Query.forms", () => {
     await createForms(user.id, [
       {
         recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret],
         wasteDetailsPackagingInfos: [
           { type: "FUT", quantity: 2 },
           { type: "AUTRE", other: "Contenant", quantity: 3 }
@@ -355,11 +364,13 @@ describe("Query.forms", () => {
       {
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret],
         status: "SENT"
       },
       {
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret],
         status: "DRAFT"
       },
       {
@@ -415,7 +426,8 @@ describe("Query.forms", () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const opts = {
       recipientCompanyName: company.name,
-      recipientCompanySiret: company.siret
+      recipientCompanySiret: company.siret,
+      recipientsSirets: [company.siret]
     };
     const forms = await createNSortedForms(user.id, opts, 5);
     const f4 = forms[3];
@@ -431,7 +443,8 @@ describe("Query.forms", () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const opts = {
       recipientCompanyName: company.name,
-      recipientCompanySiret: company.siret
+      recipientCompanySiret: company.siret,
+      recipientsSirets: [company.siret]
     };
     const forms = await createNSortedForms(user.id, opts, 5);
     const f1 = forms[0];
@@ -473,7 +486,8 @@ describe("Query.forms", () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const opts = {
       recipientCompanyName: company.name,
-      recipientCompanySiret: company.siret
+      recipientCompanySiret: company.siret,
+      recipientsSirets: [company.siret]
     };
     const forms = await createNSortedForms(user.id, opts, 5);
     const f2 = forms[1];
@@ -489,7 +503,8 @@ describe("Query.forms", () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const opts = {
       recipientCompanyName: company.name,
-      recipientCompanySiret: company.siret
+      recipientCompanySiret: company.siret,
+      recipientsSirets: [company.siret]
     };
     const forms = await createNSortedForms(user.id, opts, 5);
     const f1 = forms[0];
@@ -607,11 +622,13 @@ describe("Query.forms", () => {
     await createForms(user.id, [
       {
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
+        recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret]
       },
       {
         recipientCompanyName: otherCompany.name,
-        recipientCompanySiret: otherCompany.siret
+        recipientCompanySiret: otherCompany.siret,
+        recipientsSirets: [otherCompany.siret]
       }
     ]);
 
@@ -637,11 +654,13 @@ describe("Query.forms", () => {
     await createForms(user.id, [
       {
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
+        recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret]
       },
       {
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
+        recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret]
       }
     ]);
 
@@ -684,12 +703,14 @@ describe("Query.forms", () => {
       {
         wasteDetailsCode: "01 03 04*",
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
+        recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret]
       },
       {
         wasteDetailsCode: "01 03 05*",
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
+        recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret]
       }
     ]);
 
@@ -717,17 +738,20 @@ describe("Query.forms", () => {
       {
         customId: "custom1",
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
+        recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret]
       },
       {
         customId: "custom2",
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
+        recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret]
       },
       {
         customId: null,
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
+        recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret]
       }
     ]);
 
@@ -753,11 +777,13 @@ describe("Query.forms", () => {
     await createForms(user.id, [
       {
         recipientCompanyName: company.name,
-        recipientCompanySiret: company.siret
+        recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret]
       },
       {
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret],
         emitterCompanyName: otherCompany.name,
         emitterCompanySiret: otherCompany.siret
       }
@@ -800,6 +826,7 @@ describe("Integration / Forms query for transporters", () => {
       ownerId: owner.id,
       opt: {
         transporterCompanySiret: transporter.siret,
+        transportersSirets: [transporter.siret],
         status: "SEALED"
       }
     });
@@ -833,6 +860,7 @@ describe("Integration / Forms query for transporters", () => {
       ownerId: owner.id,
       opt: {
         transporterCompanySiret: "6543",
+        transportersSirets: ["6543"],
         status: "SEALED"
       }
     });
