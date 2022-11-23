@@ -9,7 +9,6 @@ import {
 import prisma from "../../../../prisma";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { BsffPackaging } from "../../BsffPackaging";
 
 const PUBLISH_BSFF = gql`
   mutation PublishBsff($id: ID!) {
