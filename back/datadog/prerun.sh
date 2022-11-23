@@ -12,6 +12,17 @@ fi
 # Disable psql integration for every nodes but the first
 # There seems to be no env to disable the psql integration, so we simply remove the config file
 FIRST_NODE="web-1"
-if [[ "${CONTAINER}" != *"$FIRST_NODE" ]]; then
-  rm ./conf.d/postgres.yaml
+
+if [[ -n "$DATABASE_URL" ] || [ "${CONTAINER}" == "$FIRST_NODE" ]]; then
+  POSTGREGEX='^postgres://([^:]+):([^@]+)@([^:]+):([^/]+)/(.*)\?(.*)$'
+  if [[ $DATABASE_URL =~ $POSTGREGEX ]]; then
+    sed -i "s/<DD_DATABASE_HOST>/${BASH_REMATCH[3]}/g" ./datadog/conf.d/postgres.yaml
+    sed -i "s/<DD_DATABASE_USER>/${BASH_REMATCH[1]}/g" ./datadog/conf.d/postgres.yaml
+    sed -i "s/<DD_DATABASE_PWD>/${BASH_REMATCH[2]}/g" ./datadog/conf.d/postgres.yaml
+    sed -i "s/<DD_DATABASE_PORT>/${BASH_REMATCH[4]}/g" ./datadog/conf.d/postgres.yaml
+    sed -i "s/<DD_DATABASE_DB>/${BASH_REMATCH[5]}/g" ./datadog/conf.d/postgres.yaml
+  fi
+else 
+  rm ./datadog/conf.d/postgres.yaml
 fi
+
