@@ -11,22 +11,24 @@ fi
 
 
 FIRST_NODE="web-1"
-DD_CONF_FOLDER="/app/datadog/conf.d"
+
+echo "Print DD_CONF_DIR"
+echo $DD_CONF_DIR
 
 if [[ -n "${DATABASE_URL}" ]] && [[ "${CONTAINER}" == "${FIRST_NODE}" ]]; then
   echo 'Container N°1 detected : activating datadog agent postgres monitoring'
   POSTGREGEX='^postgres://([^:]+):([^@]+)@([^:]+):([^/]+)/(.*)\?(.*)$'
   if [[ $DATABASE_URL =~ $POSTGREGEX ]]; then
-    sed -i "s/<DD_DATABASE_HOST>/${BASH_REMATCH[3]}/g" "${DD_CONF_FOLDER}/postgres.yaml"
-    sed -i "s/<DD_DATABASE_USER>/${BASH_REMATCH[1]}/g" "${DD_CONF_FOLDER}/postgres.yaml"
-    sed -i "s/<DD_DATABASE_PWD>/${BASH_REMATCH[2]}/g" "${DD_CONF_FOLDER}/postgres.yaml"
-    sed -i "s/<DD_DATABASE_PORT>/${BASH_REMATCH[4]}/g" "${DD_CONF_FOLDER}/postgres.yaml"
-    sed -i "s/<DD_DATABASE_DB>/${BASH_REMATCH[5]}/g" "${DD_CONF_FOLDER}/postgres.yaml"
+    sed -i "s/<DD_DATABASE_HOST>/${BASH_REMATCH[3]}/g" "${DD_CONF_DIR}/conf.d/postgres.yaml"
+    sed -i "s/<DD_DATABASE_USER>/${BASH_REMATCH[1]}/g" "${DD_CONF_DIR}/conf.d/postgres.yaml"
+    sed -i "s/<DD_DATABASE_PWD>/${BASH_REMATCH[2]}/g" "${DD_CONF_DIR}/conf.d/postgres.yaml"
+    sed -i "s/<DD_DATABASE_PORT>/${BASH_REMATCH[4]}/g" "${DD_CONF_DIR}/conf.d/postgres.yaml"
+    sed -i "s/<DD_DATABASE_DB>/${BASH_REMATCH[5]}/g" "${DD_CONF_DIR}/conf.d/postgres.yaml"
   fi
-  cat "${DD_CONF_FOLDER}/postgres.yaml"
+  cat "${DD_CONF_DIR}/conf.d/postgres.yaml"
 else 
   # Disable psql integration for every nodes but the first
   # There seems to be no env to disable the psql integration, so we simply remove the config file
   echo 'Container N° > 1 detected : de-activating datadog agent postgres monitoring'
-  rm "${DD_CONF_FOLDER}/postgres.yaml"
+  rm "${DD_CONF_DIR}/conf.d/postgres.yaml"
 fi
