@@ -258,7 +258,7 @@ export default function CompanySelector({
           setFieldTouched(`${field.name}.siret`);
           return setFieldError(
             `${field.name}.siret`,
-            "Vous ne pouvez pas chercher un établissement par son numéro de TVA, mais par nom ou numéro de SIRET"
+            "Vous ne pouvez pas chercher un établissement par son numéro de TVA, mais seulement par nom ou numéro de SIRET"
           );
         }
       }
