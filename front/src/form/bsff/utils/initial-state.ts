@@ -11,6 +11,7 @@ const initialState = {
       ...getInitialCompany(),
       vatNumber: "",
     },
+    isExemptedOfRecepisse: false,
     recepisse: {
       number: "",
       department: "",
