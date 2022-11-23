@@ -394,7 +394,7 @@ model Form {
   forwardedInId String? @unique
   forwardedIn   Form?   @relation("BsddForwarding", fields: [forwardedInId], references: [id])
 
-  // Denormalized fields, storing sirets. This is
+  // Denormalized fields, storing sirets to speed up `forms` queries and avoid expensive joins
   recipientsSirets     String[] @default([])
   transportersSirets   String[] @default([])
   intermediariesSirets String[] @default([])
