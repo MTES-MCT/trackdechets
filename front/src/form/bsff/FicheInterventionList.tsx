@@ -203,7 +203,7 @@ export function FicheInterventionList({
               </div>
               <div className="tw-w-1/3 tw-px-2">
                 <label>
-                  Quantité fluides en kilo(s)
+                  Quantité fluides en kg
                   <input
                     type="text"
                     className="td-input"

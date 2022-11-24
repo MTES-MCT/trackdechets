@@ -98,7 +98,7 @@ export async function generateBsffPdf(
             `n°${packaging.numero}`
           ]
             .filter(Boolean)
-            .join(" ")} : ${packaging.weight} kilo(s)`
+            .join(" ")} : ${packaging.weight} kg`
       )
       .join(", "),
     receptionAccepted:

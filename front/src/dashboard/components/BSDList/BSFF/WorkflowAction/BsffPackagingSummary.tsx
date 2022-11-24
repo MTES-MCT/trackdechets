@@ -43,9 +43,9 @@ export function BsffPackagingSummary({
         <DataListTerm>Quantité de fluides</DataListTerm>
         <DataListDescription>
           {packaging.acceptation?.weight == null ? (
-            <>{packaging.weight} kilo(s) </>
+            <>{packaging.weight} kg </>
           ) : (
-            <>{packaging.acceptation?.weight} kilo(s)</>
+            <>{packaging.acceptation?.weight} kg</>
           )}
         </DataListDescription>
       </DataListItem>

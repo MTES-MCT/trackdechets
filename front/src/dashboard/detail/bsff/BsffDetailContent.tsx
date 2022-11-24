@@ -458,7 +458,7 @@ function FicheInterventions({ form }: { form: Bsff }) {
             value={ficheIntervention.numero}
           />
           <DetailRow
-            label="Quantité fluides en kilo(s)"
+            label="Quantité fluides en kg"
             value={ficheIntervention.weight}
           />
           <DetailRow
