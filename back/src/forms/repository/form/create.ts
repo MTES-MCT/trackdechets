@@ -4,7 +4,7 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
-import { getFormSiretsByRole } from "../../database";
+import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 
 export type CreateFormFn = (
   data: Prisma.FormCreateInput,
@@ -17,11 +17,7 @@ const buildCreateForm: (deps: RepositoryFnDeps) => CreateFormFn =
 
     const form = await prisma.form.create({
       data,
-      include: {
-        transportSegments: true,
-        intermediaries: true,
-        forwardedIn: true
-      }
+      ...SIRETS_BY_ROLE_INCLUDE
     });
 
     // Deducting every sirets from a Prisma.FormCreateInput object is far from trivial

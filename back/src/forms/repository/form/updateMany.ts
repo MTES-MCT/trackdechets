@@ -4,8 +4,8 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
-import { getFormSiretsByRole } from "../../database";
-import { hasPossibleSiretChange } from "./update";
+import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
+import { checkIfHasPossibleSiretChange } from "./update";
 
 export type UpdateManyFormFn = (
   ids: string[],
@@ -24,14 +24,10 @@ const buildUpdateManyForms: (deps: RepositoryFnDeps) => UpdateManyFormFn =
     });
 
     // WARNING : This is costly !
-    if (hasPossibleSiretChange(data)) {
+    if (checkIfHasPossibleSiretChange(data)) {
       const forms = await prisma.form.findMany({
         where,
-        include: {
-          transportSegments: true,
-          intermediaries: true,
-          forwardedIn: true
-        }
+        ...SIRETS_BY_ROLE_INCLUDE
       });
       await Promise.all(
         forms.map(form => {
