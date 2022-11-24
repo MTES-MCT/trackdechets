@@ -650,7 +650,9 @@ export function expandBsdaRevisionRequestContent(
 export function companyToIntermediaryInput(
   companies: CompanyInput[]
 ): Prisma.IntermediaryBsdaAssociationCreateManyBsdaInput[] {
-  return companies?.map(company => {
+  if (!companies) return [];
+
+  return companies.map(company => {
     return {
       name: company.name,
       siret: company.siret,
