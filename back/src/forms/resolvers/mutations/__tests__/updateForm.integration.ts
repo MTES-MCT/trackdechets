@@ -1810,4 +1810,44 @@ describe("Mutation.updateForm", () => {
     // check form has not been updated
     expect(updatedForm.wasteDetailsCode).toEqual("01 03 04*");
   });
+
+  it("should update denormalized fields", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: company.siret,
+        emitterType: EmitterType.APPENDIX2,
+        wasteDetailsCode: "01 03 04*"
+      }
+    });
+
+    validateIntermediariesInputMock.mockResolvedValueOnce([
+      toIntermediaryCompany(company)
+    ]);
+    const { data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          transporter: { company: { siret: company.siret } },
+          recipient: { company: { siret: company.siret } },
+          intermediaries: [toIntermediaryCompany(company)]
+        }
+      }
+    });
+
+    const updatedForm = await prisma.form.findUnique({
+      where: { id: data.updateForm.id }
+    });
+
+    expect(updatedForm.recipientsSirets).toContain(company.siret);
+    expect(updatedForm.transportersSirets).toContain(company.siret);
+    expect(updatedForm.intermediariesSirets).toContain(company.siret);
+  });
 });
