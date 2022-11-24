@@ -4,6 +4,7 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 
 export type CreateFormFn = (
   data: Prisma.FormCreateInput,
@@ -14,7 +15,18 @@ const buildCreateForm: (deps: RepositoryFnDeps) => CreateFormFn =
   deps => async (data, logMetadata?) => {
     const { prisma, user } = deps;
 
-    const form = await prisma.form.create({ data });
+    const form = await prisma.form.create({
+      data,
+      include: { ...SIRETS_BY_ROLE_INCLUDE, forwardedIn: true }
+    });
+
+    // Deducting every sirets from a Prisma.FormCreateInput object is far from trivial
+    // It's safer to fill the denormalized sirets after the creation
+    const denormalizedSirets = getFormSiretsByRole(form);
+    await prisma.form.update({
+      where: { id: form.id },
+      data: denormalizedSirets
+    });
 
     await prisma.statusLog.create({
       data: {

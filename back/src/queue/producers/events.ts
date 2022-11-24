@@ -16,7 +16,7 @@ export const syncEventsQueue = new Queue<void>(
   }
 );
 
-indexQueue.on("completed", async () => {
+indexQueue.on("global:completed", async () => {
   // Every time events are created in Psql an index event is queued.
   // So we use the indexQueue as a trigger to launch a sync.
   // We dont sync id by id but in batch, hence there is no need to request a sync too often.

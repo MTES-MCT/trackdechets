@@ -4,6 +4,7 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 import { formDiff } from "../../workflow/diff";
 
 export type UpdateFormFn = (
@@ -20,18 +21,26 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
     // for diff calculation
     const oldForm = await prisma.form.findUnique({
       where,
-      include: { forwardedIn: true }
+      include: {
+        forwardedIn: true
+      }
     });
 
+    const hasPossibleSiretChange = checkIfHasPossibleSiretChange(data);
     const updatedForm = await prisma.form.update({
       where,
-      data
+      data,
+      include: hasPossibleSiretChange
+        ? { ...SIRETS_BY_ROLE_INCLUDE, forwardedIn: true }
+        : { forwardedIn: true }
     });
 
-    // retrieves updated temp storage
-    const updatedForwardedIn = await prisma.form
-      .findUnique({ where })
-      .forwardedIn();
+    // Calculating the sirets from Prisma.FormUpdateInput and the previously existing ones is hard
+    // If a siret change might have occurred, we process it in a second update
+    if (hasPossibleSiretChange) {
+      const denormalizedSirets = getFormSiretsByRole(updatedForm as any); // Ts doesn't infer correctly because of the boolean
+      await prisma.form.update({ where, data: denormalizedSirets });
+    }
 
     await prisma.event.create({
       data: {
@@ -48,7 +57,7 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
       // calculates diff between initial form and updated form
       const updatedFields = await formDiff(oldForm, {
         ...updatedForm,
-        forwardedIn: updatedForwardedIn
+        forwardedIn: updatedForm.forwardedIn
       });
 
       // log status change
@@ -80,5 +89,15 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
 
     return updatedForm;
   };
+
+export function checkIfHasPossibleSiretChange(data: Prisma.FormUpdateInput) {
+  return Boolean(
+    data.recipientCompanySiret ||
+      data.transporterCompanySiret ||
+      data.intermediaries ||
+      data.transportSegments ||
+      data.forwardedIn
+  );
+}
 
 export default buildUpdateForm;
