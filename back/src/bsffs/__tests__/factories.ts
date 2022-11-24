@@ -146,9 +146,11 @@ export function createBsffPackagingBeforeTransport(
   return createBsffPackaging(
     {
       type: "AUTRE",
-      operationSignatureAuthor: "BOUTEILLE 2L",
+      other: "BOUTEILLE de récup",
+      operationSignatureAuthor: "John Snow",
       numero: "01",
       weight: 1,
+      volume: 1,
       ...args
     },
     previousPackagings

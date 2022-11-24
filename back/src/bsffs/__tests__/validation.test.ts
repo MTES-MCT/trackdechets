@@ -148,7 +148,7 @@ describe("wasteDetailsSchema", () => {
     weightIsEstimate: true,
     packagings: [
       {
-        name: "BOUTEILLE",
+        type: "BOUTEILLE",
         numero: "123",
         weight: 1,
         volume: 1
