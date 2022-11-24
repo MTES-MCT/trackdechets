@@ -37,6 +37,7 @@ import {
   TableRow,
 } from "common/components";
 import { formatDate } from "common/datetime";
+import { PACKAGINGS_NAMES } from "form/bsff/components/packagings/Packagings";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -487,8 +488,10 @@ function Packagings({ form }: { form: Bsff }) {
       <TableBody>
         {form.packagings.map(p => {
           return (
-            <TableRow>
-              <TableCell>{p.name}</TableCell>
+            <TableRow key={p.id}>
+              <TableCell>
+                {p.type === "OTHER" ? p.other : PACKAGINGS_NAMES[p.type]}
+              </TableCell>
               <TableCell>{p.numero}</TableCell>
               <TableCell>{p.weight}</TableCell>
               <TableCell>{p.volume}</TableCell>

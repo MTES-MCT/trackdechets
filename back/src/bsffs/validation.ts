@@ -7,7 +7,8 @@ import {
   BsffFicheIntervention,
   BsffType,
   Prisma,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  BsffPackagingType
 } from "@prisma/client";
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { isFinalOperation, OPERATION } from "./constants";
@@ -210,9 +211,23 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
           >(
             yup.object({
               type: yup
-                .mixed()
+                .mixed<BsffPackagingType>()
                 .required("Conditionnements : le type de contenant est requis"),
-              other: yup.string().notRequired().nullable(),
+              other: yup
+                .string()
+                .when("type", (type, schema) =>
+                  type === "OTHER"
+                    ? schema.requiredIf(
+                        !isDraft,
+                        "La description doit être précisée pour le conditionnement 'AUTRE'."
+                      )
+                    : schema
+                        .nullable()
+                        .max(
+                          0,
+                          "La description ne peut être renseigné que lorsque le type de conditionnement est 'AUTRE'."
+                        )
+                ),
               volume: yup
                 .number()
                 .required("Conditionnements : le volume est requis")

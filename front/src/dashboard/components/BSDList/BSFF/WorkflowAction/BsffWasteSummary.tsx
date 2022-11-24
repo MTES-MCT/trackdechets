@@ -6,6 +6,7 @@ import {
   DataListTerm,
   DataListDescription,
 } from "common/components";
+import { PACKAGINGS_NAMES } from "form/bsff/components/packagings/Packagings";
 
 interface BsffWasteSummaryProps {
   bsff: Bsff;
@@ -49,7 +50,11 @@ export function BsffWasteSummary({ bsff }: BsffWasteSummaryProps) {
         <DataListItem>
           <DataListTerm>Contenant</DataListTerm>
           <DataListDescription>
-            {bsff.packagings[0].name} n°{bsff.packagings[0].numero} (
+            {bsff.packagings[0].type === "OTHER"
+              ? bsff.packagings[0].other
+              : PACKAGINGS_NAMES[bsff.packagings[0].type]}{" "}
+            n°
+            {bsff.packagings[0].numero} (
             {bsff.packagings[0].acceptation?.weight ??
               bsff.packagings[0].weight}{" "}
             kg)

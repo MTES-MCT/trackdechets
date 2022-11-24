@@ -117,7 +117,8 @@ export default function BsffStepsList(props: Props) {
         ? {}
         : {
             packagings: packagings.map(p => ({
-              name: p.name,
+              type: p.type,
+              other: p.other,
               numero: p.numero,
               volume: p.volume,
               weight: p.weight,

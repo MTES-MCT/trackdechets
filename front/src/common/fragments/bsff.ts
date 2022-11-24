@@ -69,7 +69,8 @@ export const FullBsffFragment = gql`
     }
     packagings {
       id
-      name
+      type
+      other
       numero
       volume
       weight

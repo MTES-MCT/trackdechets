@@ -2,10 +2,27 @@ import { IconClose } from "common/components/Icons";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import TdTooltip from "common/components/Tooltip";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { Field, FieldArray, FieldProps, useField } from "formik";
-import { BsffPackagingInput, BsffType } from "generated/graphql/types";
-import React, { InputHTMLAttributes } from "react";
+import {
+  Field,
+  FieldArray,
+  FieldProps,
+  useField,
+  useFormikContext,
+} from "formik";
+import {
+  BsffPackagingInput,
+  BsffPackagingType,
+  BsffType,
+} from "generated/graphql/types";
+import React, { InputHTMLAttributes, ChangeEvent } from "react";
 import "./Packagings.scss";
+
+export const PACKAGINGS_NAMES = {
+  [BsffPackagingType.Bouteille]: "Bouteille",
+  [BsffPackagingType.Citerne]: "Citerne",
+  [BsffPackagingType.Conteneur]: "Conteneur",
+  [BsffPackagingType.Other]: "Autre",
+};
 
 export default function BsffPackagings({
   field: { name, value },
@@ -15,6 +32,7 @@ export default function BsffPackagings({
   ...props
 }: FieldProps<BsffPackagingInput[]> & InputHTMLAttributes<HTMLInputElement>) {
   const [{ value: type }] = useField<BsffType>("type");
+  const { setFieldValue } = useFormikContext();
   const canEdit =
     !disabled && ![BsffType.Reexpedition, BsffType.Groupement].includes(type);
 
@@ -35,20 +53,44 @@ export default function BsffPackagings({
                   className="tw-border-2 tw-border-gray-400 tw-border-solid tw-rounded-md tw-px-4 tw-py-2 tw-mb-2"
                 >
                   <div className="tw-flex tw-mb-4 tw-items-end">
-                    <div className="tw-w-11/12 tw-flex">
-                      <div className="tw-w-1/4 tw-px-2">
+                    <div className="tw-flex tw-items-end">
+                      <div className="tw-flex-grow tw-px-2">
                         <label>
                           Type de contenant{" "}
-                          <TdTooltip msg="Bouteille, ou autre à préciser" />
+                          <Field
+                            as="select"
+                            className="td-select"
+                            name={`${fieldName}.type`}
+                            disabled={!canEdit}
+                            onChange={(v: ChangeEvent<HTMLInputElement>) => {
+                              setFieldValue(
+                                `${fieldName}.type`,
+                                v.target.value
+                              );
+                              setFieldValue(`${fieldName}.other`, "");
+                            }}
+                          >
+                            {Object.keys(PACKAGINGS_NAMES).map(p => (
+                              <option key={p} value={p}>
+                                {PACKAGINGS_NAMES[p]}
+                              </option>
+                            ))}
+                          </Field>
+                        </label>
+                      </div>
+
+                      <div className="tw-px-2">
+                        <label>
+                          Autre type, à préciser
                           <Field
                             className="td-input"
-                            name={`${fieldName}.name`}
-                            disabled={!canEdit}
+                            name={`${fieldName}.other`}
+                            disabled={!canEdit || p.type !== "OTHER"}
                           />
                         </label>
                       </div>
 
-                      <div className="tw-w-1/4 tw-px-2">
+                      <div className="tw-px-2">
                         <label>
                           Numéro
                           <Field
@@ -59,24 +101,24 @@ export default function BsffPackagings({
                         </label>
                       </div>
 
-                      <div className="tw-w-1/4 tw-px-2">
+                      <div className="tw-px-2 tw-flex-shrink">
                         <label>
                           Volume (en L)
                           <Field
                             component={NumberInput}
-                            className="td-input"
+                            className="td-input td-input--small"
                             name={`${fieldName}.volume`}
                             disabled={!canEdit}
                           />
                         </label>
                       </div>
 
-                      <div className="tw-w-1/4 tw-px-2">
+                      <div className="tw-px-2 tw-flex-shrink">
                         <label>
                           Masse du contenu (en kg)
                           <Field
                             component={NumberInput}
-                            className="td-input"
+                            className="td-input td-input--small"
                             name={`${fieldName}.weight`}
                             disabled={!canEdit}
                           />
@@ -94,7 +136,8 @@ export default function BsffPackagings({
                       </div>
                     )}
                   </div>
-                  <RedErrorMessage name={`${fieldName}.name`} />
+                  <RedErrorMessage name={`${fieldName}.type`} />
+                  <RedErrorMessage name={`${fieldName}.other`} />
                   <RedErrorMessage name={`${fieldName}.numero`} />
                   <RedErrorMessage name={`${fieldName}.volume`} />
                   <RedErrorMessage name={`${fieldName}.weight`} />
@@ -107,8 +150,9 @@ export default function BsffPackagings({
                 className="btn btn--outline-primary"
                 onClick={() =>
                   arrayHelpers.push({
-                    name: "Bouteille",
+                    type: "BOUTEILLE",
                     numero: "",
+                    other: "",
                     weight: 0,
                     volume: 0,
                   })
