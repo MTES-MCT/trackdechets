@@ -7,16 +7,32 @@ export const companySchema = object().shape({
     .when("vatNumber", {
       is: vatNumber => !vatNumber,
       then: string().required(
-        "La sélection d'une entreprise par SIRET ou numéro de TVA (si l'entreprise n'est pas française) est obligatoire"
+        "La sélection d'une entreprise par son SIRET ou son numéro de TVA (si l'entreprise n'est pas française) est obligatoire"
       ),
       otherwise: string().nullable(),
     })
     .when("country", {
       is: country => country == null || country === "FR",
-      then: string().required("La sélection d'une entreprise est obligatoire"),
+      then: string().required(
+        "La sélection d'une entreprise par son SIRET est obligatoire"
+      ),
       otherwise: string().nullable(),
     }),
-  vatNumber: string().ensure(),
+  vatNumber: string()
+    .when("siret", {
+      is: siret => !siret,
+      then: string().required(
+        "La sélection d'une entreprise par numéro de TVA (si l'entreprise n'est pas française) est obligatoire"
+      ),
+      otherwise: string().ensure(),
+    })
+    .when("country", {
+      is: country => country && country !== "FR",
+      then: string().required(
+        "La sélection d'une entreprise par numéro de TVA (si l'entreprise n'est pas française) est obligatoire"
+      ),
+      otherwise: string().ensure(),
+    }),
   address: string().required(),
   country: string()
     .oneOf([
