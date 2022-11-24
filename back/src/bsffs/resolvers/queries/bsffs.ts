@@ -6,6 +6,7 @@ import { toPrismaBsffWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { getConnection } from "../../../common/pagination";
 import { getCachedUserSiretOrVat } from "../../../common/redis/users";
+import { Prisma } from "@prisma/client";
 
 const bsffs: QueryResolvers["bsffs"] = async (
   _,
@@ -16,15 +17,16 @@ const bsffs: QueryResolvers["bsffs"] = async (
 
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
-  const mask = {
+  const mask: Prisma.Enumerable<Prisma.BsffWhereInput> = {
     OR: [
       { emitterCompanySiret: { in: userCompaniesSiretOrVat } },
       { transporterCompanySiret: { in: userCompaniesSiretOrVat } },
-      { destinationCompanySiret: { in: userCompaniesSiretOrVat } }
+      { destinationCompanySiret: { in: userCompaniesSiretOrVat } },
+      { detenteurCompanySirets: { hasSome: userCompaniesSiretOrVat } }
     ]
   };
 
-  const prismaWhere = {
+  const prismaWhere: Prisma.BsffWhereInput = {
     ...(whereArgs ? toPrismaBsffWhereInput(whereArgs) : {}),
     isDeleted: false
   };

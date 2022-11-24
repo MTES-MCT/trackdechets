@@ -11,7 +11,11 @@ export const Bsff: BsffResolvers = {
     const prismaBsff = await prisma.bsff.findUnique({
       where: { id }
     });
-    return getFicheInterventions({ bsff: prismaBsff, context });
+    const ficheInterventions = await getFicheInterventions({
+      bsff: prismaBsff,
+      context
+    });
+    return ficheInterventions;
   },
   packagings: async (bsff, _, ctx) => {
     let packagings = [];

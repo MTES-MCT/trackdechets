@@ -47,6 +47,13 @@ export const FicheInterventionFragment = gql`
     numero
     weight
     postalCode
+    detenteur {
+      isPrivateIndividual
+      company {
+        name
+        siret
+      }
+    }
   }
 `;
 

@@ -5,7 +5,7 @@ import {
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound } from "../../database";
-import { isBsffContributor } from "../../permissions";
+import { checkCanReadBsff } from "../../permissions";
 import { createPDFResponse } from "../../../common/pdf";
 import { generateBsffPdf } from "../../pdf";
 import { DownloadHandler } from "../../../routers/downloadRouter";
@@ -22,7 +22,7 @@ export const bsffPdfDownloadHandler: DownloadHandler<QueryBsffPdfArgs> = {
 const bsffPdf: QueryResolvers["bsffPdf"] = async (_, { id }, context) => {
   const user = checkIsAuthenticated(context);
   const bsff = await getBsffOrNotFound({ id });
-  await isBsffContributor(user, bsff);
+  await checkCanReadBsff(user, bsff);
 
   return getFileDownload({
     handler: bsffPdfDownloadHandler.name,

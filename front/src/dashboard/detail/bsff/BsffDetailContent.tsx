@@ -46,10 +46,25 @@ type CompanyProps = {
 
 type Props = { form: Bsff };
 
-export function BsffDetailContent({ form }: Props) {
+export function BsffDetailContent({ form: bsff }: Props) {
   const { siret } = useParams<{ siret: string }>();
   const [isDeleting, setIsDeleting] = useState(false);
-  const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
+  const [downloadPdf] = useDownloadPdf({ variables: { id: bsff.id } });
+
+  const emitterLabel =
+    bsff.type === BsffType.CollectePetitesQuantites
+      ? "Opérateur"
+      : bsff.type === BsffType.TracerFluide
+      ? "Autre détenteur"
+      : "Installation de tri, transit, regroupement";
+
+  const isBsffContributor = [
+    bsff.emitter?.company?.siret,
+    bsff.transporter?.company?.siret,
+    bsff?.destination?.company?.siret,
+  ]
+    .filter(Boolean)
+    .includes(siret);
 
   return (
     <>
@@ -58,15 +73,15 @@ export function BsffDetailContent({ form }: Props) {
           <h4 className={styles.detailTitle}>
             <IconBSFF className="tw-mr-2" />
             <span className={styles.detailStatus}>
-              [{form.isDraft ? "Brouillon" : bsffVerboseStatuses[form.status]}]
+              [{bsff.isDraft ? "Brouillon" : bsffVerboseStatuses[bsff.status]}]
             </span>
-            <span>{form.id}</span>
+            <span>{bsff.id}</span>
           </h4>
 
           <div className={styles.detailContent}>
             <div className={`${styles.detailQRCodeIcon}`}>
               <div className={styles.detailQRCode}>
-                <QRCodeIcon value={form.id} size={96} />
+                <QRCodeIcon value={bsff.id} size={96} />
                 <span>Ce QR code contient le numéro du bordereau </span>
               </div>
             </div>
@@ -75,14 +90,14 @@ export function BsffDetailContent({ form }: Props) {
                 BsffType.Groupement,
                 BsffType.Reconditionnement,
                 BsffType.Reexpedition,
-              ].includes(form.type) && (
+              ].includes(bsff.type) && (
                 <DetailRow
                   value={
-                    form.type === BsffType.Groupement
+                    bsff.type === BsffType.Groupement
                       ? "Groupement"
-                      : form.type === BsffType.Reconditionnement
+                      : bsff.type === BsffType.Reconditionnement
                       ? "Reconditionnement"
-                      : form.type === BsffType.Reexpedition
+                      : bsff.type === BsffType.Reexpedition
                       ? "Réexpédition"
                       : ""
                   }
@@ -90,13 +105,13 @@ export function BsffDetailContent({ form }: Props) {
                 />
               )}
               <DetailRow
-                value={form.weight?.value}
+                value={bsff.weight?.value}
                 label="Poids total"
                 units="kg"
               />
               <dt>Déchet</dt>
               <dd>
-                {form.waste?.code} {form.waste?.description}
+                {bsff.waste?.code} {bsff.waste?.description}
               </dd>
             </div>
           </div>
@@ -105,9 +120,15 @@ export function BsffDetailContent({ form }: Props) {
         <Tabs selectedTabClassName={styles.detailTabSelected}>
           {/* Tabs menu */}
           <TabList className={styles.detailTabs}>
+            {bsff.ficheInterventions?.length > 0 && (
+              <Tab className={styles.detailTab}>
+                <IconRenewableEnergyEarth size="25px" />
+                <span className={styles.detailTabCaption}>Détenteur(s)</span>
+              </Tab>
+            )}
             <Tab className={styles.detailTab}>
               <IconWaterDam size="25px" />
-              <span className={styles.detailTabCaption}>Émetteur</span>
+              <span className={styles.detailTabCaption}>{emitterLabel}</span>
             </Tab>
 
             <Tab className={styles.detailTab}>
@@ -125,47 +146,40 @@ export function BsffDetailContent({ form }: Props) {
               <IconBSFF />
               <span className={styles.detailTabCaption}>Contenants</span>
             </Tab>
-            {form.ficheInterventions?.length > 0 && (
-              <Tab className={styles.detailTab}>
-                <IconRenewableEnergyEarth size="25px" />
-                <span className={styles.detailTabCaption}>FIs</span>
-              </Tab>
-            )}
           </TabList>
           {/* Tabs content */}
           <div className={styles.detailTabPanels}>
+            {/* Fiche d'interventions */}
+            {bsff.ficheInterventions?.length > 0 && (
+              <TabPanel className={styles.detailTabPanel}>
+                <div className={styles.detailColumns}>
+                  <FicheInterventions form={bsff} />
+                </div>
+              </TabPanel>
+            )}
             {/* Emitter tab panel */}
             <TabPanel className={styles.detailTabPanel}>
-              <Emitter form={form} />
+              <Emitter form={bsff} />
             </TabPanel>
 
             {/* Transporter tab panel */}
             <TabPanel className={styles.detailTabPanel}>
-              <Transporter form={form} />
+              <Transporter form={bsff} />
             </TabPanel>
 
             {/* Recipient  tab panel */}
             <TabPanel className={styles.detailTabPanel}>
               <div className={styles.detailColumns}>
-                <Destination form={form} />
+                <Destination form={bsff} />
               </div>
             </TabPanel>
 
             {/* Packagings tab panel */}
             <TabPanel className={styles.detailTabPanel}>
               <div className={styles.detailColumns}>
-                <Packagings form={form} />
+                <Packagings form={bsff} />
               </div>
             </TabPanel>
-
-            {/* Fiche d'interventions */}
-            {form.ficheInterventions?.length > 0 && (
-              <TabPanel className={styles.detailTabPanel}>
-                <div className={styles.detailColumns}>
-                  <FicheInterventions form={form} />
-                </div>
-              </TabPanel>
-            )}
           </div>
         </Tabs>
         <div className={styles.detailActions}>
@@ -177,7 +191,7 @@ export function BsffDetailContent({ form }: Props) {
             <IconPdf size="24px" color="blueLight" />
             <span>Pdf</span>
           </button>
-          {[BsffStatus.Initial].includes(form.status) && (
+          {[BsffStatus.Initial].includes(bsff.status) && isBsffContributor && (
             <>
               <button
                 className="btn btn--outline-primary"
@@ -190,7 +204,7 @@ export function BsffDetailContent({ form }: Props) {
               <Link
                 to={generatePath(routes.dashboard.bsffs.edit, {
                   siret,
-                  id: form.id,
+                  id: bsff.id,
                 })}
                 className="btn btn--outline-primary"
               >
@@ -200,32 +214,31 @@ export function BsffDetailContent({ form }: Props) {
             </>
           )}
           <WorkflowAction
-            siret={siret}
             form={{
-              ...form,
-              id: form.id,
-              bsffStatus: form.status,
+              ...bsff,
+              id: bsff.id,
+              bsffStatus: bsff.status,
               bsffDestination: {
                 company: {
-                  siret: form.destination?.company?.siret ?? undefined,
-                  name: form.destination?.company?.name ?? undefined,
+                  siret: bsff.destination?.company?.siret ?? undefined,
+                  name: bsff.destination?.company?.name ?? undefined,
                 },
               },
               bsffEmitter: {
                 company: {
-                  siret: form.emitter?.company?.siret ?? undefined,
-                  name: form.emitter?.company?.name ?? undefined,
+                  siret: bsff.emitter?.company?.siret ?? undefined,
+                  name: bsff.emitter?.company?.name ?? undefined,
                 },
               },
               bsffTransporter: {
                 company: {
-                  siret: form.transporter?.company?.siret ?? undefined,
-                  name: form.transporter?.company?.name ?? undefined,
+                  siret: bsff.transporter?.company?.siret ?? undefined,
+                  name: bsff.transporter?.company?.name ?? undefined,
                 },
               },
               waste: {
-                code: form.waste?.code,
-                description: form.waste?.description ?? undefined,
+                code: bsff.waste?.code,
+                description: bsff.waste?.description ?? undefined,
               },
             }}
           />
@@ -233,7 +246,7 @@ export function BsffDetailContent({ form }: Props) {
       </div>
       {isDeleting && (
         <DeleteBsffModal
-          formId={form.id}
+          formId={bsff.id}
           isOpen
           onClose={() => setIsDeleting(false)}
         />
@@ -259,7 +272,7 @@ function Emitter({ form }: { form: Bsff }) {
   return (
     <div className={styles.detailColumns}>
       <div className={styles.detailGrid}>
-        <Company label="Émetteur" company={form.emitter?.company} />
+        <Company label="Raison sociale" company={form.emitter?.company} />
       </div>
 
       <div className={styles.detailGrid}>
@@ -290,7 +303,7 @@ function Transporter({ form }: { form: Bsff }) {
   return (
     <>
       <div className={styles.detailGrid}>
-        <Company label="Transporteur" company={form.transporter?.company} />
+        <Company label="Raison sociale" company={form.transporter?.company} />
       </div>
       <div className={styles.detailGrid}>
         <DetailRow
@@ -336,7 +349,7 @@ function Destination({ form }: { form: Bsff }) {
   return (
     <>
       <div className={styles.detailGrid}>
-        <Company label="Destinataire" company={form.destination?.company} />
+        <Company label="Raison sociale" company={form.destination?.company} />
       </div>
       <div className={styles.detailGrid}>
         <DetailRow value={form.destination?.cap} label="CAP" />
@@ -453,6 +466,18 @@ function FicheInterventions({ form }: { form: Bsff }) {
           className={styles.detailGrid}
           style={{ flex: "0 0 50%", padding: "0 0 2rem 0", margin: "0" }}
         >
+          <DetailRow
+            label={
+              ficheIntervention.detenteur?.isPrivateIndividual
+                ? "Nom (particulier)"
+                : "Raison sociale"
+            }
+            value={ficheIntervention.detenteur?.company?.name}
+          />
+          <DetailRow
+            label="N°SIRET"
+            value={ficheIntervention.detenteur?.company?.siret}
+          />
           <DetailRow
             label="Numéro fiche d'intervention"
             value={ficheIntervention.numero}

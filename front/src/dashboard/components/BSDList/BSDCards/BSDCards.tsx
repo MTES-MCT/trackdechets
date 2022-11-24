@@ -78,10 +78,7 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
               <BsdasriWorkflowAction siret={siret} form={form} />
             ) : null}
             {form.__typename === "Bsff" ? (
-              <BsffWorkflowAction
-                siret={siret}
-                form={form as unknown as BsffFragment}
-              />
+              <BsffWorkflowAction form={form as unknown as BsffFragment} />
             ) : null}
             {form.__typename === "Bsvhu" ? (
               <BsvhuWorkflowAction siret={siret} form={form} />

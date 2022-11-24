@@ -13,7 +13,8 @@ import {
   createBsffAfterEmission,
   createBsffAfterReception,
   createBsffAfterTransport,
-  createBsffBeforeEmission
+  createBsffBeforeEmission,
+  createFicheIntervention
 } from "../../bsffs/__tests__/factories";
 import { indexBsvhu } from "../../bsvhu/elastic";
 import { bsvhuFactory } from "../../bsvhu/__tests__/factories.vhu";
@@ -470,6 +471,31 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     const bsds = await searchBsds("OUTGOING", [emitter.company.siret]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsff.id]);
   });
+
+  it("should list a BSFF in detenteur's outgoing wastes once it has been sent", async () => {
+    const detenteur = await userWithCompanyFactory("MEMBER");
+    const ficheIntervention = await createFicheIntervention({
+      detenteur,
+      operateur: emitter
+    });
+    const bsff = await createBsffAfterTransport(
+      {
+        emitter,
+        transporter,
+        destination
+      },
+      {
+        detenteurCompanySirets: [detenteur.company.id],
+        ficheInterventions: { connect: { id: ficheIntervention.id } }
+      }
+    );
+
+    await indexBsff(bsff);
+    await refreshElasticSearch();
+    const bsds = await searchBsds("OUTGOING", [detenteur.company.siret]);
+    expect(bsds.map(bsd => bsd.id)).toEqual([bsff.id]);
+  });
+
   it("should not list a BSFF in emitter's outgoing wastes before it has been sent", async () => {
     const bsff = await createBsffBeforeEmission({
       emitter,

@@ -9,7 +9,7 @@ import { getUid, getAPIBaseURL } from "../../../utils";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { checkCanReadBsdasri } from "../../../bsdasris/permissions";
 import { checkIsBsdaContributor } from "../../../bsda/permissions";
-import { isBsffContributor } from "../../../bsffs/permissions";
+import { checkCanReadBsff } from "../../../bsffs/permissions";
 import { checkIsBsvhuContributor } from "../../../bsvhu/permissions";
 import { checkIsFormContributor } from "../../../forms/permissions";
 import { getFormOrFormNotFound } from "../../../forms/database";
@@ -50,7 +50,7 @@ const permissions = {
   [BsdType.BSDA]: (user, bsda) =>
     checkIsBsdaContributor(user, bsda, deniedAccessMessage),
   [BsdType.BSDASRI]: (user, bsdasri) => checkCanReadBsdasri(user, bsdasri),
-  [BsdType.BSFF]: (user, bsff) => isBsffContributor(user, bsff),
+  [BsdType.BSFF]: (user, bsff) => checkCanReadBsff(user, bsff),
   [BsdType.BSVHU]: (user, bsvhu) =>
     checkIsBsvhuContributor(user, bsvhu, deniedAccessMessage)
 };

@@ -3,7 +3,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import * as elastic from "../../../common/elastic";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { expandBsffFromDB } from "../../converter";
-import { isBsffContributor } from "../../permissions";
+import { checkCanWriteBsff } from "../../permissions";
 import { getBsffOrNotFound } from "../../database";
 import { runInTransaction } from "../../../common/repository/helper";
 
@@ -14,7 +14,7 @@ const deleteBsff: MutationResolvers["deleteBsff"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
   const existingBsff = await getBsffOrNotFound({ id });
-  await isBsffContributor(user, existingBsff);
+  await checkCanWriteBsff(user, existingBsff);
 
   if (existingBsff.emitterEmissionSignatureDate) {
     throw new UserInputError(

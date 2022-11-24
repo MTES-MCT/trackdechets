@@ -10,7 +10,7 @@ import {
   getPreviousPackagings
 } from "../../database";
 import { flattenBsffInput, expandBsffFromDB } from "../../converter";
-import { isBsffContributor } from "../../permissions";
+import { checkCanWriteBsff } from "../../permissions";
 import {
   validateBsff,
   validateFicheInterventions,
@@ -27,7 +27,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   const user = checkIsAuthenticated(context);
 
   const existingBsff = await getBsffOrNotFound({ id });
-  await isBsffContributor(user, existingBsff);
+  await checkCanWriteBsff(user, existingBsff);
 
   if (existingBsff.destinationReceptionSignatureDate) {
     throw new UserInputError(
@@ -114,7 +114,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       input.packagings?.map(toBsffPackagingWithType) ?? existingBsff.packagings
   };
 
-  await isBsffContributor(user, futureBsff);
+  await checkCanWriteBsff(user, futureBsff);
 
   const packagingHasChanged =
     !!input.forwarding ||
@@ -182,6 +182,9 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     data.ficheInterventions = {
       set: ficheInterventions.map(({ id }) => ({ id }))
     };
+    data.detenteurCompanySirets = ficheInterventions
+      .map(fi => fi.detenteurCompanySiret)
+      .filter(Boolean);
   }
   const updatedBsff = await prisma.bsff.update({
     data,
