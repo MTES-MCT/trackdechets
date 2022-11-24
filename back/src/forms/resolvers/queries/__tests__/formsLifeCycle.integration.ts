@@ -10,11 +10,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import {
-  prepareDB,
-  prepareRedis,
-  storeRedisCompanyInfo
-} from "../../../__tests__/helpers";
+import { prepareDB, storeRedisCompanyInfo } from "../../../__tests__/helpers";
 import { Query } from "../../../../generated/graphql/types";
 
 // No mails
@@ -54,11 +50,6 @@ describe("Test formsLifeCycle query", () => {
     const { emitter, emitterCompany, recipient, recipientCompany, form } =
       await prepareDB();
 
-    await prepareRedis({
-      emitterCompany,
-      recipientCompany
-    });
-
     await statusLogFactory({
       status: "SENT",
       formId: form.id,
@@ -81,11 +72,6 @@ describe("Test formsLifeCycle query", () => {
     const { emitter, emitterCompany, recipient, recipientCompany, form } =
       await prepareDB();
 
-    await prepareRedis({
-      emitterCompany,
-      recipientCompany
-    });
-
     // create a statusLog without loggedAt field (as it was before formsLifeCycle feature)
     await statusLogFactory({
       status: "SENT",
@@ -106,10 +92,6 @@ describe("Test formsLifeCycle query", () => {
     const { emitter, emitterCompany, recipient, recipientCompany, form } =
       await prepareDB();
 
-    await prepareRedis({
-      emitterCompany,
-      recipientCompany
-    });
     const today = new Date();
     const yesterday = (d => new Date(d.setDate(d.getDate() - 1)))(new Date());
     const todayStr = today.toISOString().substring(0, 10);
@@ -145,10 +127,6 @@ describe("Test formsLifeCycle query", () => {
     const { emitter, emitterCompany, recipient, recipientCompany, form } =
       await prepareDB();
 
-    await prepareRedis({
-      emitterCompany,
-      recipientCompany
-    });
     const today = new Date();
     const yesterday = (d => new Date(d.setDate(d.getDate() - 1)))(new Date());
     const todayStr = today.toISOString().substring(0, 10);
@@ -193,11 +171,6 @@ describe("Test formsLifeCycle query", () => {
       }
     });
 
-    await prepareRedis({
-      emitterCompany,
-      recipientCompany
-    });
-
     await statusLogFactory({
       status: "RECEIVED",
       formId: form.id,
@@ -226,10 +199,6 @@ describe("Test formsLifeCycle query", () => {
   it("should return statusLog data filtered by siret", async () => {
     const { emitter, emitterCompany, recipient, recipientCompany, form } =
       await prepareDB();
-    await prepareRedis({
-      emitterCompany,
-      recipientCompany
-    });
 
     // let's create another company, associate it to recipient user, then create a form and its status log
     const otherCompany = await companyFactory();
@@ -282,11 +251,6 @@ describe("Test formsLifeCycle query", () => {
   it("should not return statusLog data for deleted forms", async () => {
     const { emitter, emitterCompany, recipient, recipientCompany, form } =
       await prepareDB();
-
-    await prepareRedis({
-      emitterCompany,
-      recipientCompany
-    });
 
     await statusLogFactory({
       status: "SENT",
