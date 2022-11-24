@@ -420,11 +420,11 @@ export default function AccountCompanyAdd() {
                 isAllowed:
                   "Vous devez certifier être autorisé à créer ce compte pour votre entreprise",
               }),
-              ...((isFRVat(values.vatNumber) ||
-                (!isSiret(values.siret) && !isVat(values.vatNumber))) && {
-                siret:
-                  "Le SIRET ou le numéro de TVA intracommunautaire doit être valides. (seuls les caractères alphanumériques sont acceptés, pas d'espaces ni de signes de ponctuation)",
-              }),
+              ...(!isSiret(values.siret) &&
+                !isVat(values.vatNumber) && {
+                  siret:
+                    "Le SIRET ou le numéro de TVA intracommunautaire doit être valides (seuls les caractères alphanumériques sont acceptés, pas d'espaces ni de signes de ponctuation).",
+                }),
               ...(anyTransporterReceipField &&
                 isTransporter_ &&
                 !values.transporterReceiptNumber && {
