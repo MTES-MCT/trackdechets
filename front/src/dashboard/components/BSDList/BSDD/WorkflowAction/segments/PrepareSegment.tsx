@@ -1,7 +1,10 @@
-import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
-import { Field, Form as FormikForm, Formik } from "formik";
 import cogoToast from "cogo-toast";
+import { Field, Form as FormikForm, Formik } from "formik";
+import React, { useState } from "react";
+import * as yup from "yup";
+import { boolean, date, object, string, StringSchema } from "yup";
+import { companySchema } from "common/validation/schema";
 import {
   Mutation,
   MutationPrepareSegmentArgs,
@@ -22,8 +25,6 @@ import {
   FieldTransportModeSelect,
   RedErrorMessage,
 } from "common/components";
-import * as yup from "yup";
-import { transporterSchema } from "form/bsdd/utils/schema";
 
 const PREPARE_SEGMENT = gql`
   mutation prepareSegment(
@@ -37,6 +38,35 @@ const PREPARE_SEGMENT = gql`
   }
   ${segmentFragment}
 `;
+
+/**
+ * TEMP Transporter schema, to be merged with "form/bsdd/utils/schema"
+ * when TransportSegment supports foreign companies
+ */
+export const transporterSchema = object().shape({
+  isExemptedOfReceipt: boolean().nullable(true),
+  receipt: string().when(
+    "isExemptedOfReceipt",
+    (isExemptedOfReceipt: boolean, schema: StringSchema) =>
+      isExemptedOfReceipt
+        ? schema.nullable(true)
+        : schema
+            .ensure()
+            .required(
+              "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+            )
+  ),
+  department: string().when(
+    "isExemptedOfReceipt",
+    (isExemptedOfReceipt: boolean, schema: StringSchema) =>
+      isExemptedOfReceipt
+        ? schema.nullable(true)
+        : schema.required("Le département du transporteur est obligatoire")
+  ),
+  validityLimit: date().nullable(true),
+  numberPlate: string().nullable(true),
+  company: companySchema,
+});
 
 const validationSchema = yup.object({ transporter: transporterSchema });
 
