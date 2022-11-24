@@ -7,6 +7,7 @@ import {
   geocodeCompanyQueue,
   setCompanyDepartementQueue
 } from "./producers/company";
+import { syncEventsQueue } from "./producers/events";
 
 export const serverAdapter = new ExpressAdapter();
 export const bullBoardPath = `/queue/monitor/${process.env.QUEUE_MONITOR_TOKEN}`;
@@ -17,7 +18,8 @@ createBullBoard({
     new BullAdapter(indexQueue),
     new BullAdapter(updatesQueue),
     new BullAdapter(geocodeCompanyQueue),
-    new BullAdapter(setCompanyDepartementQueue)
+    new BullAdapter(setCompanyDepartementQueue),
+    new BullAdapter(syncEventsQueue)
   ],
   serverAdapter: serverAdapter
 });
