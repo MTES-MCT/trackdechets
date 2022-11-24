@@ -47,8 +47,7 @@ describe("Test formsLifeCycle query", () => {
     await resetDatabase();
   });
   it("should return statusLog data", async () => {
-    const { emitter, emitterCompany, recipient, recipientCompany, form } =
-      await prepareDB();
+    const { emitter, recipient, form } = await prepareDB();
 
     await statusLogFactory({
       status: "SENT",
@@ -69,8 +68,7 @@ describe("Test formsLifeCycle query", () => {
   });
 
   it("should return not statusLog objects without null loggedAt", async () => {
-    const { emitter, emitterCompany, recipient, recipientCompany, form } =
-      await prepareDB();
+    const { emitter, recipient, form } = await prepareDB();
 
     // create a statusLog without loggedAt field (as it was before formsLifeCycle feature)
     await statusLogFactory({
@@ -89,8 +87,7 @@ describe("Test formsLifeCycle query", () => {
   });
 
   it("should return statusLog data after a given date", async () => {
-    const { emitter, emitterCompany, recipient, recipientCompany, form } =
-      await prepareDB();
+    const { emitter, recipient, form } = await prepareDB();
 
     const today = new Date();
     const yesterday = (d => new Date(d.setDate(d.getDate() - 1)))(new Date());
@@ -124,8 +121,7 @@ describe("Test formsLifeCycle query", () => {
   });
 
   it("should return statusLog data before a given date", async () => {
-    const { emitter, emitterCompany, recipient, recipientCompany, form } =
-      await prepareDB();
+    const { emitter, recipient, form } = await prepareDB();
 
     const today = new Date();
     const yesterday = (d => new Date(d.setDate(d.getDate() - 1)))(new Date());
@@ -249,8 +245,7 @@ describe("Test formsLifeCycle query", () => {
   });
 
   it("should not return statusLog data for deleted forms", async () => {
-    const { emitter, emitterCompany, recipient, recipientCompany, form } =
-      await prepareDB();
+    const { emitter, recipient, form } = await prepareDB();
 
     await statusLogFactory({
       status: "SENT",
