@@ -93,7 +93,8 @@ export async function isBsdaContributor(user: User, bsda: BsdaContributors) {
   ]);
 
   return userCompaniesSiretOrVat.some(
-    siret => formSirets.includes(siret) || intermerdiariesSirets.includes(siret)
+    siret =>
+      formSirets.includes(siret) || intermerdiariesSirets?.includes(siret)
   );
 }
 

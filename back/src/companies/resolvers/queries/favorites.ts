@@ -309,29 +309,30 @@ async function getRecentBrokers(
  * @returns {Promise} resolves to a list of recent partners matching the provided parameters
  */
 async function getRecentPartners(
-  userId: string,
+  //userId: string,
   siret: string,
   type: FavoriteType
 ): Promise<CompanyFavorite[]> {
   const defaultWhere: Prisma.FormWhereInput = {
     OR: [
-      { owner: { id: userId } },
       { emitterCompanySiret: siret },
       { ecoOrganismeSiret: siret },
       { recipientCompanySiret: siret },
       { traderCompanySiret: siret },
       { brokerCompanySiret: siret },
-      {
-        forwardedIn: { recipientCompanySiret: siret }
-      },
-      { transporterCompanySiret: siret },
-      {
-        transportSegments: {
-          some: {
-            transporterCompanySiret: siret
-          }
-        }
-      }
+      // hotfix problem perf
+      // {
+      //   forwardedIn: { recipientCompanySiret: siret }
+      // },
+      { transporterCompanySiret: siret }
+      // hotfix problem perf
+      // {
+      //   transportSegments: {
+      //     some: {
+      //       transporterCompanySiret: siret
+      //     }
+      //   }
+      // }
     ],
 
     // ignore drafts as they are likely to be incomplete
@@ -375,7 +376,7 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
   await checkIsCompanyMember({ id: user.id }, { siret: company.siret });
 
   const favorites: CompanyFavorite[] = (
-    await getRecentPartners(user.id, company.siret, type)
+    await getRecentPartners(company.siret, type)
   )
     // Remove duplicates (by company siret or VAT)
     .reduce<CompanyFavorite[]>((prev, cur) => {

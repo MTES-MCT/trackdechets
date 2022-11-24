@@ -40,7 +40,8 @@ export const prepareDB = async () => {
     opt: {
       emitterCompanyName: emitterCompany.name,
       emitterCompanySiret: emitterCompany.siret,
-      recipientCompanySiret: recipientCompany.siret
+      recipientCompanySiret: recipientCompany.siret,
+      recipientsSirets: [recipientCompany.siret]
     }
   });
 

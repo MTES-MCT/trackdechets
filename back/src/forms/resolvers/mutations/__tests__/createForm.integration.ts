@@ -1620,4 +1620,36 @@ describe("Mutation.createForm", () => {
     const formCountAfterCreationAttempt = await prisma.form.count();
     expect(formCountAfterCreationAttempt).toEqual(0);
   });
+
+  it("should fill denormalized fields upon creation", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+
+    const intermediaryCreation = toIntermediaryCompany(company);
+
+    const { data } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            type: "APPENDIX2",
+            company: { siret: company.siret }
+          },
+          transporter: { company: { siret: company.siret } },
+          recipient: { company: { siret: company.siret } },
+          intermediaries: [intermediaryCreation]
+        }
+      }
+    });
+
+    const form = await prisma.form.findUnique({
+      where: { id: data.createForm.id }
+    });
+
+    expect(form.recipientsSirets).toContain(company.siret);
+    expect(form.transportersSirets).toContain(company.siret);
+    expect(form.intermediariesSirets).toContain(company.siret);
+  });
 });
