@@ -17,7 +17,7 @@ const buildCreateForm: (deps: RepositoryFnDeps) => CreateFormFn =
 
     const form = await prisma.form.create({
       data,
-      ...SIRETS_BY_ROLE_INCLUDE
+      include: SIRETS_BY_ROLE_INCLUDE
     });
 
     // Deducting every sirets from a Prisma.FormCreateInput object is far from trivial

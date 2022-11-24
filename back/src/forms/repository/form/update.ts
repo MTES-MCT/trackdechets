@@ -30,20 +30,17 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
     const updatedForm = await prisma.form.update({
       where,
       data,
-      ...(hasPossibleSiretChange && SIRETS_BY_ROLE_INCLUDE)
+      include: hasPossibleSiretChange
+        ? { ...SIRETS_BY_ROLE_INCLUDE, forwardedIn: true }
+        : { forwardedIn: true }
     });
 
     // Calculating the sirets from Prisma.FormUpdateInput and the previously existing ones is hard
     // If a siret change might have occurred, we process it in a second update
     if (hasPossibleSiretChange) {
-      const denormalizedSirets = getFormSiretsByRole(updatedForm);
+      const denormalizedSirets = getFormSiretsByRole(updatedForm as any); // Ts doesn't infer correctly because of the boolean
       await prisma.form.update({ where, data: denormalizedSirets });
     }
-
-    // retrieves updated temp storage
-    const updatedForwardedIn = await prisma.form
-      .findUnique({ where })
-      .forwardedIn();
 
     await prisma.event.create({
       data: {
@@ -60,7 +57,7 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
       // calculates diff between initial form and updated form
       const updatedFields = await formDiff(oldForm, {
         ...updatedForm,
-        forwardedIn: updatedForwardedIn
+        forwardedIn: updatedForm.forwardedIn
       });
 
       // log status change

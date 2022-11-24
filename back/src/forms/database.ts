@@ -92,16 +92,17 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
 }
 
 export const SIRETS_BY_ROLE_INCLUDE = {
-  include: {
-    transportSegments: { select: { transporterCompanySiret: true } },
-    intermediaries: { select: { siret: true } },
-    forwardedIn: {
-      select: { recipientCompanySiret: true, transporterCompanySiret: true }
-    }
+  transportSegments: { select: { transporterCompanySiret: true } },
+  intermediaries: { select: { siret: true } },
+  forwardedIn: {
+    select: { recipientCompanySiret: true, transporterCompanySiret: true }
   }
 };
+
+const fullInclude = { include: SIRETS_BY_ROLE_INCLUDE };
+
 export function getFormSiretsByRole(
-  form: Prisma.FormGetPayload<typeof SIRETS_BY_ROLE_INCLUDE>
+  form: Prisma.FormGetPayload<typeof fullInclude>
 ) {
   return {
     recipientsSirets: [

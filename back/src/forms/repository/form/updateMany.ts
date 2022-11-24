@@ -27,7 +27,7 @@ const buildUpdateManyForms: (deps: RepositoryFnDeps) => UpdateManyFormFn =
     if (checkIfHasPossibleSiretChange(data)) {
       const forms = await prisma.form.findMany({
         where,
-        ...SIRETS_BY_ROLE_INCLUDE
+        include: SIRETS_BY_ROLE_INCLUDE
       });
       await Promise.all(
         forms.map(form => {
