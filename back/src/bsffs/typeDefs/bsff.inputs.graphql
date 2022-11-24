@@ -180,7 +180,7 @@ input BsffEmitterInput {
 input BsffPackagingInput {
   "Type de contenant : bouteille, ou autre à préciser ;"
   type: BsffPackagingType
-  "Précision sur le type de contenant lorsque type=OTHER"
+  "Précision sur le type de contenant lorsque type=AUTRE"
   other: String
   "DEPRECATED - Dénomination du contenant."
   name: String @deprecated(reason: "Utiliser `type`")

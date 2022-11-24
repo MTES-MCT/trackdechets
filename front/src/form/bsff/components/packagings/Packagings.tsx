@@ -21,7 +21,7 @@ export const PACKAGINGS_NAMES = {
   [BsffPackagingType.Bouteille]: "Bouteille",
   [BsffPackagingType.Citerne]: "Citerne",
   [BsffPackagingType.Conteneur]: "Conteneur",
-  [BsffPackagingType.Other]: "Autre",
+  [BsffPackagingType.Autre]: "Autre",
 };
 
 export default function BsffPackagings({
@@ -85,7 +85,7 @@ export default function BsffPackagings({
                           <Field
                             className="td-input"
                             name={`${fieldName}.other`}
-                            disabled={!canEdit || p.type !== "OTHER"}
+                            disabled={!canEdit || p.type !== "AUTRE"}
                           />
                         </label>
                       </div>

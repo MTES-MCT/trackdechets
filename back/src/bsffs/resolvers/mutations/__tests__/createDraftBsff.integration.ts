@@ -611,7 +611,7 @@ describe("Mutation.createDraftBsff", () => {
         }
       });
       expect(errors).toBeUndefined();
-      expect(data.createDraftBsff.packagings[0].type).toEqual("OTHER");
+      expect(data.createDraftBsff.packagings[0].type).toEqual("AUTRE");
       expect(data.createDraftBsff.packagings[0].name).toEqual(
         "Bouteille de récup"
       );

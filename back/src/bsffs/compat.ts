@@ -224,8 +224,8 @@ export function toBsffPackagingWithType({
     type =
       name?.toLowerCase() === "bouteille"
         ? BsffPackagingType.BOUTEILLE
-        : BsffPackagingType.OTHER;
-    if (type === BsffPackagingType.OTHER) {
+        : BsffPackagingType.AUTRE;
+    if (type === BsffPackagingType.AUTRE) {
       other = name;
     }
   }

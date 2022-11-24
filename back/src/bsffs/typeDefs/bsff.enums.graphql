@@ -24,7 +24,7 @@ enum BsffPackagingType {
   "Citerne"
   CITERNE
   "Autre, à préciser via le paramètre `other`"
-  OTHER
+  AUTRE
 }
 
 "Statut qui résume là où en est le BSFF dans son parcours."

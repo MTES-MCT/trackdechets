@@ -1215,7 +1215,7 @@ enum BsffPackagingType {
   BOUTEILLE
   CONTENEUR
   CITERNE
-  OTHER
+  AUTRE
 }
 
 // ----------------

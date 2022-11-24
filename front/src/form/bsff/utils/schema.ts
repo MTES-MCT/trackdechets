@@ -53,7 +53,7 @@ export const validationSchema = yup.object({
         other: yup
           .string()
           .when("type", (type, schema) =>
-            type === "OTHER"
+            type === "AUTRE"
               ? schema.required(
                   "La description doit être précisée pour le conditionnement 'Autre'."
                 )

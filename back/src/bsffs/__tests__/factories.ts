@@ -145,7 +145,7 @@ export function createBsffPackagingBeforeTransport(
 ) {
   return createBsffPackaging(
     {
-      type: "OTHER",
+      type: "AUTRE",
       operationSignatureAuthor: "BOUTEILLE 2L",
       numero: "01",
       weight: 1,

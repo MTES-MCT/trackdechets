@@ -216,7 +216,7 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
               other: yup
                 .string()
                 .when("type", (type, schema) =>
-                  type === "OTHER"
+                  type === "AUTRE"
                     ? schema.requiredIf(
                         !isDraft,
                         "La description doit être précisée pour le conditionnement 'AUTRE'."

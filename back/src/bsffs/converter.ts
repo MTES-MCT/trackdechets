@@ -292,7 +292,7 @@ export function expandBsffPackagingFromDB(
     type: prismaBsffPackaging.type,
     other: prismaBsffPackaging.other,
     name:
-      prismaBsffPackaging.type === BsffPackagingType.OTHER
+      prismaBsffPackaging.type === BsffPackagingType.AUTRE
         ? prismaBsffPackaging.other
         : prismaBsffPackaging.type,
     volume: prismaBsffPackaging.volume,

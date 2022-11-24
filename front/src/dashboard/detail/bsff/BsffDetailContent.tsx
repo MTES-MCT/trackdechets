@@ -490,7 +490,7 @@ function Packagings({ form }: { form: Bsff }) {
           return (
             <TableRow key={p.id}>
               <TableCell>
-                {p.type === "OTHER" ? p.other : PACKAGINGS_NAMES[p.type]}
+                {p.type === "AUTRE" ? p.other : PACKAGINGS_NAMES[p.type]}
               </TableCell>
               <TableCell>{p.numero}</TableCell>
               <TableCell>{p.weight}</TableCell>

@@ -93,7 +93,7 @@ export async function generateBsffPdf(
       .map(
         packaging =>
           `${[
-            packaging.type === "OTHER" ? packaging.other : packaging.type,
+            packaging.type === "AUTRE" ? packaging.other : packaging.type,
             packaging.volume ? `${packaging.volume}L` : null,
             `n°${packaging.numero}`
           ]

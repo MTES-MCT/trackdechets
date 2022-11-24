@@ -50,7 +50,7 @@ export function BsffWasteSummary({ bsff }: BsffWasteSummaryProps) {
         <DataListItem>
           <DataListTerm>Contenant</DataListTerm>
           <DataListDescription>
-            {bsff.packagings[0].type === "OTHER"
+            {bsff.packagings[0].type === "AUTRE"
               ? bsff.packagings[0].other
               : PACKAGINGS_NAMES[bsff.packagings[0].type]}{" "}
             n°
