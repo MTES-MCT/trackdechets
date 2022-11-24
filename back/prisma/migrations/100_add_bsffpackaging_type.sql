@@ -19,7 +19,7 @@ WHERE
 UPDATE
     "default$default"."BsffPackaging"
 SET
-    "type" = 'OTHER' :: "default$default"."BsffPackagingType",
+    "type" = 'AUTRE' :: "default$default"."BsffPackagingType",
     "other" = "name"
 WHERE
     LOWER("name") != 'bouteille';
