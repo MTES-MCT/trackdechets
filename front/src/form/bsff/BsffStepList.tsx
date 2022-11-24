@@ -47,9 +47,18 @@ export default function BsffStepsList(props: Props) {
 
   const formState = useMemo(() => {
     function getCurrentState(bsff: Bsff) {
-      const { forwarding, repackaging, grouping } = bsff;
+      const { forwarding, repackaging, grouping, transporter } = bsff;
       const previousPackagings = [...forwarding, ...repackaging, ...grouping];
-      return { ...formQuery.data?.bsff, previousPackagings };
+      return {
+        ...formQuery.data?.bsff,
+        previousPackagings,
+        transporter: {
+          ...transporter,
+          isExemptedOfRecepisse:
+            !!bsff?.transporter?.company?.siret &&
+            bsff?.transporter?.recepisse === null,
+        },
+      };
     }
     const bsff = formQuery.data?.bsff;
     return getComputedState(initialState, bsff ? getCurrentState(bsff) : null);
@@ -80,7 +89,7 @@ export default function BsffStepsList(props: Props) {
       previousPackagings,
       packagings,
       type,
-      transporter: { recepisse, ...transporter },
+      transporter: { recepisse, isExemptedOfRecepisse, ...transporter },
       destination: { plannedOperationCode, ...destination },
       ...input
     } = values;
@@ -89,11 +98,13 @@ export default function BsffStepsList(props: Props) {
       type,
       ...input,
       transporter: {
-        recepisse: {
-          ...recepisse,
-          validityLimit:
-            recepisse.validityLimit === "" ? null : recepisse.validityLimit,
-        },
+        recepisse: isExemptedOfRecepisse
+          ? null
+          : {
+              ...recepisse,
+              validityLimit:
+                recepisse.validityLimit === "" ? null : recepisse.validityLimit,
+            },
         ...transporter,
       },
       destination: {

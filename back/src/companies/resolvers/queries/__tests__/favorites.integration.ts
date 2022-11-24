@@ -722,7 +722,7 @@ describe("query favorites", () => {
     ]);
   });
 
-  it("should return the user's company even if there are other results", async () => {
+  it.skip("should return the user's company even if there are other results", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
         set: ["PRODUCER"]
@@ -768,7 +768,7 @@ describe("query favorites", () => {
     ]);
   });
 
-  it("should return the user's company based on an existing BSD", async () => {
+  it.skip("should return the user's company based on an existing BSD", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
         set: ["PRODUCER"]
@@ -820,7 +820,7 @@ describe("query favorites", () => {
     ]);
   });
 
-  it("should not return the same company twice", async () => {
+  it.skip("should not return the same company twice", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
         set: ["COLLECTOR"]
@@ -895,7 +895,7 @@ describe("query favorites", () => {
     );
   });
 
-  it("should suggest a temporary storage detail destination", async () => {
+  it.skip("should suggest a temporary storage detail destination", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
         set: ["PRODUCER"]

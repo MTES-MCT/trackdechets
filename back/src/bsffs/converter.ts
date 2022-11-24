@@ -1,8 +1,132 @@
 import * as Prisma from "@prisma/client";
-import { nullIfNoValues, safeInput, processDate } from "../common/converter";
+import {
+  nullIfNoValues,
+  safeInput,
+  processDate,
+  chain
+} from "../common/converter";
 import * as GraphQL from "../generated/graphql/types";
 import { BsdElastic } from "../common/elastic";
 import { BsffPackaging } from "@prisma/client";
+
+function flattenEmitterInput(input: { emitter?: GraphQL.BsffEmitter }) {
+  return {
+    emitterCompanyName: chain(input.emitter, e =>
+      chain(e.company, c => c.name)
+    ),
+    emitterCompanySiret: chain(input.emitter, e =>
+      chain(e.company, c => c.siret)
+    ),
+    emitterCompanyAddress: chain(input.emitter, e =>
+      chain(e.company, c => c.address)
+    ),
+    emitterCompanyContact: chain(input.emitter, e =>
+      chain(e.company, c => c.contact)
+    ),
+    emitterCompanyPhone: chain(input.emitter, e =>
+      chain(e.company, c => c.phone)
+    ),
+    emitterCompanyMail: chain(input.emitter, e =>
+      chain(e.company, c => c.mail)
+    ),
+    emitterCustomInfo: chain(input.emitter, e => e.customInfo)
+  };
+}
+
+function flattenTransporterInput(input: {
+  transporter?: GraphQL.BsffTransporter;
+}) {
+  return {
+    transporterCompanyName: chain(input.transporter, t =>
+      chain(t.company, c => c.name)
+    ),
+    transporterCompanySiret: chain(input.transporter, t =>
+      chain(t.company, c => c.siret)
+    ),
+    transporterCompanyVatNumber: chain(input.transporter, t =>
+      chain(t.company, c => c.vatNumber)
+    ),
+    transporterCompanyAddress: chain(input.transporter, t =>
+      chain(t.company, c => c.address)
+    ),
+    transporterCompanyContact: chain(input.transporter, t =>
+      chain(t.company, c => c.contact)
+    ),
+    transporterCompanyPhone: chain(input.transporter, t =>
+      chain(t.company, c => c.phone)
+    ),
+    transporterCompanyMail: chain(input.transporter, t =>
+      chain(t.company, c => c.mail)
+    ),
+    transporterCustomInfo: chain(input.transporter, t => t.customInfo),
+    transporterTransportPlates: chain(input.transporter, t =>
+      chain(t.transport, tr => tr.plates)
+    ),
+    transporterRecepisseNumber: chain(input.transporter, t =>
+      chain(t.recepisse, r => r.number)
+    ),
+    transporterRecepisseDepartment: chain(input.transporter, t =>
+      chain(t.recepisse, r => r.department)
+    ),
+    transporterRecepisseValidityLimit: chain(input.transporter, t =>
+      chain(t.recepisse, r => r.validityLimit)
+    ),
+    transporterTransportMode: chain(input.transporter, t =>
+      chain(t.transport, tr => tr.mode)
+    ),
+    transporterTransportTakenOverAt: chain(input.transporter, t =>
+      chain(t.transport, tr => tr.takenOverAt)
+    )
+  };
+}
+
+function flattenDestinationInput(input: {
+  destination?: GraphQL.BsffDestinationInput;
+}) {
+  return {
+    destinationCompanyName: chain(input.destination, d =>
+      chain(d.company, c => c.name)
+    ),
+    destinationCompanySiret: chain(input.destination, d =>
+      chain(d.company, c => c.siret)
+    ),
+    destinationCompanyAddress: chain(input.destination, d =>
+      chain(d.company, c => c.address)
+    ),
+    destinationCompanyContact: chain(input.destination, d =>
+      chain(d.company, c => c.contact)
+    ),
+    destinationCompanyPhone: chain(input.destination, d =>
+      chain(d.company, c => c.phone)
+    ),
+    destinationCompanyMail: chain(input.destination, d =>
+      chain(d.company, c => c.mail)
+    ),
+    destinationCap: chain(input.destination, d => d.cap),
+    destinationCustomInfo: chain(input.destination, d => d.customInfo),
+
+    destinationReceptionDate: chain(input.destination, d =>
+      chain(d.reception, r => r.date)
+    ),
+    destinationPlannedOperationCode: chain(
+      input.destination,
+      d => d.plannedOperationCode
+    )
+  };
+}
+
+function flattenWasteDetailsInput(input: {
+  waste?: GraphQL.BsffWasteInput;
+  weight?: GraphQL.BsffWeightInput;
+}) {
+  return {
+    wasteCode: chain(input.waste, w => w.code),
+    wasteDescription: chain(input.waste, w => w.description),
+    wasteAdr: chain(input.waste, w => w.adr),
+    weightValue: chain(input.weight, w => w.value),
+    weightIsEstimate: chain(input.weight, w => w.isEstimate)
+  };
+}
 
 export function flattenBsffInput(
   bsffInput: GraphQL.BsffInput
@@ -27,54 +151,10 @@ export function flattenBsffInput(
 > {
   return safeInput({
     type: bsffInput.type,
-
-    emitterCompanyName: bsffInput.emitter?.company?.name,
-    emitterCompanySiret: bsffInput.emitter?.company?.siret,
-    emitterCompanyAddress: bsffInput.emitter?.company?.address,
-    emitterCompanyContact: bsffInput.emitter?.company?.contact,
-    emitterCompanyPhone: bsffInput.emitter?.company?.phone,
-    emitterCompanyMail: bsffInput.emitter?.company?.mail,
-    emitterCustomInfo: bsffInput.emitter?.customInfo,
-
-    wasteCode: bsffInput.waste?.code,
-    wasteDescription: bsffInput.waste?.description,
-    wasteAdr: bsffInput.waste?.adr,
-
-    weightValue: bsffInput.weight?.value,
-    weightIsEstimate: bsffInput.weight?.isEstimate,
-
-    transporterCompanyName: bsffInput.transporter?.company?.name,
-    transporterCompanySiret: bsffInput.transporter?.company?.siret,
-    transporterCompanyVatNumber: bsffInput.transporter?.company?.vatNumber,
-    transporterCompanyAddress: bsffInput.transporter?.company?.address,
-    transporterCompanyContact: bsffInput.transporter?.company?.contact,
-    transporterCompanyPhone: bsffInput.transporter?.company?.phone,
-    transporterCompanyMail: bsffInput.transporter?.company?.mail,
-    transporterCustomInfo: bsffInput.transporter?.customInfo,
-    transporterTransportPlates: bsffInput.transporter?.transport?.plates,
-
-    transporterRecepisseNumber: bsffInput.transporter?.recepisse?.number,
-    transporterRecepisseDepartment:
-      bsffInput.transporter?.recepisse?.department,
-    transporterRecepisseValidityLimit:
-      bsffInput.transporter?.recepisse?.validityLimit,
-
-    transporterTransportMode: bsffInput.transporter?.transport?.mode,
-    transporterTransportTakenOverAt:
-      bsffInput.transporter?.transport?.takenOverAt,
-
-    destinationCompanyName: bsffInput.destination?.company?.name,
-    destinationCompanySiret: bsffInput.destination?.company?.siret,
-    destinationCompanyAddress: bsffInput.destination?.company?.address,
-    destinationCompanyContact: bsffInput.destination?.company?.contact,
-    destinationCompanyPhone: bsffInput.destination?.company?.phone,
-    destinationCompanyMail: bsffInput.destination?.company?.mail,
-    destinationCap: bsffInput.destination?.cap,
-    destinationCustomInfo: bsffInput.destination?.customInfo,
-
-    destinationReceptionDate: bsffInput.destination?.reception?.date,
-
-    destinationPlannedOperationCode: bsffInput.destination?.plannedOperationCode
+    ...flattenEmitterInput(bsffInput),
+    ...flattenTransporterInput(bsffInput),
+    ...flattenDestinationInput(bsffInput),
+    ...flattenWasteDetailsInput(bsffInput)
   });
 }
 

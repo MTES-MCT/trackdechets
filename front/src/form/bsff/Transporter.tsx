@@ -4,7 +4,7 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import TdTooltip from "common/components/Tooltip";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import DateInput from "form/common/components/custom-inputs/DateInput";
-import { Field, useFormikContext } from "formik";
+import { Field, useField, useFormikContext } from "formik";
 import { Bsff } from "generated/graphql/types";
 import styles from "./Transporter.module.scss";
 import initialState from "./utils/initial-state";
@@ -13,6 +13,10 @@ const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export default function Transporter({ disabled }) {
   const { setFieldValue, values } = useFormikContext<Bsff>();
+
+  const [{ value: isExemptedOfRecepisse }, ,] = useField<boolean>(
+    "transporter.isExemptedOfRecepisse"
+  );
 
   return (
     <>
@@ -52,19 +56,18 @@ export default function Transporter({ disabled }) {
           </h4>
           <div className="form__row">
             <Switch
-              checked={values.transporter?.recepisse == null}
-              onChange={() =>
+              checked={isExemptedOfRecepisse}
+              onChange={checked => {
+                setFieldValue("transporter.isExemptedOfRecepisse", checked);
                 setFieldValue(
                   "transporter.recepisse",
-                  values.transporter?.recepisse == null
-                    ? initialState.transporter.recepisse
-                    : null
-                )
-              }
+                  initialState.transporter.recepisse
+                );
+              }}
               label="Le transporteur déclare être exempté de récépissé conformément aux dispositions de l'article R.541-50 du code de l'environnement."
             />
           </div>
-          {values.transporter?.recepisse != null && (
+          {!isExemptedOfRecepisse && (
             <div className="form__row">
               <label>
                 Numéro de récépissé

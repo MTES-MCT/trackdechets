@@ -74,7 +74,7 @@ export default async function edit(
 
   const previousBsdas = [forwardedBsda, ...groupedBsdas].filter(Boolean);
   await validateBsda(
-    existingBsda,
+    resultingBsda,
     { previousBsdas, intermediaries },
     {
       emissionSignature: existingBsda.emitterEmissionSignatureAuthor != null,
