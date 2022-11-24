@@ -27,7 +27,7 @@ const FORM_MUST_BE_SENT = "Le bordereau doit être envoyé";
 const FORM_MUST_BE_DRAFT = "Le bordereau doit être en brouillon";
 const SEGMENT_ALREADY_SEALED = "Ce segment de transport est déjà scellé";
 const SEGMENTS_ALREADY_PREPARED =
-  "Il y a d'autres segments après le votre, vous ne pouvez pas ajouter de segment";
+  "Il y a d'autres segments après le vôtre, vous ne pouvez pas ajouter de segment";
 
 const segmentSchema = Yup.object<any>().shape({
   // id: Yup.string().label("Identifiant (id)").required(),
