@@ -1,6 +1,6 @@
-ALTER TABLE "default$default"."Form" ADD COLUMN "recipientsSirets" text[] DEFAULT '{}';
-ALTER TABLE "default$default"."Form" ADD COLUMN "transportersSirets" text[] DEFAULT '{}';
-ALTER TABLE "default$default"."Form" ADD COLUMN "intermediariesSirets" text[] DEFAULT '{}';
+ALTER TABLE "default$default"."Form" ADD COLUMN IF NOT EXISTS "recipientsSirets" text[] DEFAULT '{}';
+ALTER TABLE "default$default"."Form" ADD COLUMN IF NOT EXISTS "transportersSirets" text[] DEFAULT '{}';
+ALTER TABLE "default$default"."Form" ADD COLUMN IF NOT EXISTS "intermediariesSirets" text[] DEFAULT '{}';
 
 -- GIN indexes for arrays
 -- > GIN indexes are “inverted indexes” which are appropriate for data values that contain multiple component values, such as arrays.

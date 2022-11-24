@@ -20,14 +20,11 @@ export class DenormalizeFormSiretsUpdater implements Updater {
         await prisma.$executeRawUnsafe(`
           UPDATE default$default."Form" AS f1
           SET "recipientsSirets" =
-          array_remove(
             array(SELECT f2."recipientCompanySiret"
               FROM default$default."Form" AS f2
-              WHERE f2.id = f1."forwardedInId"
-              UNION SELECT f1."recipientCompanySiret"
-            ),
-            NULL
-          )
+              WHERE f2.id = f1."forwardedInId" AND f2."recipientCompanySiret" IS NOT NULL
+              UNION SELECT f1."recipientCompanySiret" WHERE f1."recipientCompanySiret" IS NOT NULL
+            )
           WHERE "status" = '${status}';`);
       }
 
@@ -37,17 +34,14 @@ export class DenormalizeFormSiretsUpdater implements Updater {
         await prisma.$executeRawUnsafe(`
           UPDATE default$default."Form" AS f1
           SET "transportersSirets" =
-            array_remove(
-              array(
-                SELECT ts."transporterCompanySiret"
-                  FROM default$default."TransportSegment" AS ts
-                  WHERE ts."formId" = f1."id"
-                UNION SELECT f2."transporterCompanySiret"
-                  FROM default$default."Form" AS f2
-                  WHERE f2.id = f1."forwardedInId"
-                UNION SELECT f1."transporterCompanySiret"
-              ),
-              NULL
+            array(
+              SELECT ts."transporterCompanySiret"
+                FROM default$default."TransportSegment" AS ts
+                WHERE ts."formId" = f1."id" AND ts."transporterCompanySiret" IS NOT NULL 
+              UNION SELECT f2."transporterCompanySiret"
+                FROM default$default."Form" AS f2
+                WHERE f2.id = f1."forwardedInId" AND f2."transporterCompanySiret" IS NOT NULL
+              UNION SELECT f1."transporterCompanySiret" WHERE f1."transporterCompanySiret" IS NOT NULL
             )
           WHERE "status" = '${status}';`);
       }
@@ -58,13 +52,10 @@ export class DenormalizeFormSiretsUpdater implements Updater {
         await prisma.$executeRawUnsafe(`
           UPDATE default$default."Form" AS f1
           SET "intermediariesSirets" =
-            array_remove(
-              array(
-                SELECT i."siret"
-                FROM default$default."IntermediaryFormAssociation" AS i
-                WHERE i."formId" = f1."id"
-              ),
-              NULL
+            array(
+              SELECT i."siret"
+              FROM default$default."IntermediaryFormAssociation" AS i
+              WHERE i."formId" = f1."id" AND i."siret" IS NOT NULL
             )
           WHERE "status" = '${status}';`);
       }
