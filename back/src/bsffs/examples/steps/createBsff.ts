@@ -12,7 +12,7 @@ export function createBsff(company: string): WorkflowStep {
           type: "COLLECTE_PETITES_QUANTITES",
           emitter: fixtures.operateurInput(operateur.siret),
           packagings: [
-            { name: "Bouteille", volume: 1, numero: "1", weight: 1 }
+            { type: "BOUTEILLE", volume: 1, numero: "1", weight: 1 }
           ],
           waste: {
             code: "14 06 01*",
