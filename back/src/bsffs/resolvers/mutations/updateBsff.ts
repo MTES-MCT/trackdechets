@@ -17,6 +17,7 @@ import {
   validatePreviousPackagings
 } from "../../validation";
 import { indexBsff } from "../../elastic";
+import { toBsffPackagingWithType } from "../../compat";
 
 const updateBsff: MutationResolvers["updateBsff"] = async (
   _,
@@ -109,7 +110,8 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
   const futureBsff = {
     ...existingBsff,
     ...flatInput,
-    packagings: input.packagings ?? existingBsff.packagings
+    packagings:
+      input.packagings?.map(toBsffPackagingWithType) ?? existingBsff.packagings
   };
 
   await isBsffContributor(user, futureBsff);

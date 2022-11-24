@@ -1,9 +1,12 @@
 import {
   Bsff,
   BsffPackaging,
+  BsffPackagingType,
   BsffStatus,
   WasteAcceptationStatus
 } from "@prisma/client";
+import { UserInputError } from "apollo-server-core";
+import { BsffPackagingInput } from "../generated/graphql/types";
 import { isFinalOperation } from "./constants";
 import { getNextPackagings } from "./database";
 
@@ -200,4 +203,36 @@ export async function getStatus(bsff: Bsff & { packagings: BsffPackaging[] }) {
   }
 
   return bsff.status;
+}
+
+/**
+ * Make packaging with `name` retro compatible with packaging with `type`
+ */
+export function toBsffPackagingWithType({
+  name,
+  ...packaging
+}: BsffPackagingInput): BsffPackagingInput & { type: BsffPackagingType } {
+  if (!packaging.type && !name) {
+    throw new UserInputError(
+      "Vous devez préciser le type de contenant : ex: BOUTEILLE"
+    );
+  }
+
+  let type = packaging.type;
+  let other = packaging.other;
+  if (!packaging.type) {
+    type =
+      name?.toLowerCase() === "bouteille"
+        ? BsffPackagingType.BOUTEILLE
+        : BsffPackagingType.OTHER;
+    if (type === BsffPackagingType.OTHER) {
+      other = name;
+    }
+  }
+
+  return {
+    ...packaging,
+    type,
+    other
+  };
 }

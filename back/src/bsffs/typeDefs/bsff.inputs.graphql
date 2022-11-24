@@ -179,7 +179,7 @@ input BsffEmitterInput {
 "Permet de renseigner les informations d'un contenant par l'émetteur du BSFF"
 input BsffPackagingInput {
   "Type de contenant : bouteille, ou autre à préciser ;"
-  type: BsffPackagingType!
+  type: BsffPackagingType
   "Précision sur le type de contenant lorsque type=OTHER"
   other: String
   "DEPRECATED - Dénomination du contenant."

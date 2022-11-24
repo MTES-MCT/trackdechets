@@ -34,6 +34,9 @@ const CREATE_DRAFT_BSFF = `
       }
       packagings {
         id
+        name
+        type
+        other
       }
     }
   }
@@ -543,5 +546,78 @@ describe("Mutation.createDraftBsff", () => {
         ]);
       }
     );
+
+    it("should allow to create a BSFF packaging with deprecated field `name=bouteille`", async () => {
+      const emitter = await userWithCompanyFactory("ADMIN");
+
+      const { mutate } = makeClient(emitter.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createDraftBsff">,
+        MutationCreateDraftBsffArgs
+      >(CREATE_DRAFT_BSFF, {
+        variables: {
+          input: {
+            type: BsffType.COLLECTE_PETITES_QUANTITES,
+            emitter: {
+              company: {
+                name: emitter.company.name,
+                siret: emitter.company.siret,
+                address: emitter.company.address,
+                contact: emitter.user.name,
+                mail: emitter.user.email
+              }
+            },
+            packagings: [
+              { name: "Bouteille", numero: "cont1", volume: 1, weight: 1 }
+            ]
+          }
+        }
+      });
+      expect(errors).toBeUndefined();
+      expect(data.createDraftBsff.packagings[0].name).toEqual("BOUTEILLE");
+      expect(data.createDraftBsff.packagings[0].type).toEqual("BOUTEILLE");
+      expect(data.createDraftBsff.packagings[0].other).toBeNull();
+    });
+
+    it("should allow to create a BSFF packaging with deprecated field `name=anything`", async () => {
+      const emitter = await userWithCompanyFactory("ADMIN");
+
+      const { mutate } = makeClient(emitter.user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createDraftBsff">,
+        MutationCreateDraftBsffArgs
+      >(CREATE_DRAFT_BSFF, {
+        variables: {
+          input: {
+            type: BsffType.COLLECTE_PETITES_QUANTITES,
+            emitter: {
+              company: {
+                name: emitter.company.name,
+                siret: emitter.company.siret,
+                address: emitter.company.address,
+                contact: emitter.user.name,
+                mail: emitter.user.email
+              }
+            },
+            packagings: [
+              {
+                name: "Bouteille de récup",
+                numero: "cont1",
+                volume: 1,
+                weight: 1
+              }
+            ]
+          }
+        }
+      });
+      expect(errors).toBeUndefined();
+      expect(data.createDraftBsff.packagings[0].type).toEqual("OTHER");
+      expect(data.createDraftBsff.packagings[0].name).toEqual(
+        "Bouteille de récup"
+      );
+      expect(data.createDraftBsff.packagings[0].other).toEqual(
+        "Bouteille de récup"
+      );
+    });
   });
 });

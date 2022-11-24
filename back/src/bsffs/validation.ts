@@ -561,7 +561,7 @@ export async function validateBsff(
   bsff: Partial<Bsff | Prisma.BsffCreateInput> & {
     packagings?: Pick<
       BsffPackaging,
-      "type" | "other" | "numero" | "volume" | "weight"
+      "type" | "name" | "other" | "numero" | "volume" | "weight"
     >[];
   }
 ) {

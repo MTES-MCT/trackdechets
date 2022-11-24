@@ -3,6 +3,7 @@ import {
   Bsff,
   BsffFicheIntervention as PrismaBsffFicheIntervention,
   BsffPackaging,
+  BsffPackagingType,
   BsffType,
   Prisma
 } from "@prisma/client";
@@ -27,6 +28,7 @@ import {
 } from "./validation";
 import { indexBsff } from "./elastic";
 import { GraphQLContext } from "../types";
+import { toBsffPackagingWithType } from "./compat";
 
 export async function getBsffOrNotFound(
   where: SetRequired<Prisma.BsffWhereInput, "id">
@@ -137,9 +139,11 @@ export async function createBsff(
         })
       : [];
 
+  const packagingsInput = input.packagings?.map(toBsffPackagingWithType);
+
   const futureBsff = {
     ...flatInput,
-    packagings: input.packagings
+    packagings: packagingsInput
   };
 
   await validateBsff(futureBsff);
@@ -176,7 +180,7 @@ export async function createBsff(
 
 export function getPackagingCreateInput(
   bsff: Partial<Bsff | Prisma.BsffCreateInput> & {
-    packagings?: BsffPackagingInput[];
+    packagings?: (BsffPackagingInput & { type: BsffPackagingType })[];
   },
   previousPackagings: BsffPackaging[]
 ): Prisma.BsffPackagingCreateWithoutBsffInput[] {
