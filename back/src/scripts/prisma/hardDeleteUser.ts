@@ -1,6 +1,8 @@
 import { User } from "@prisma/client";
-import { disconnectAllUserSessions } from "../../common/redis/users";
+import { redisClient } from "../../common/redis";
+import { getUserSessions, USER_SESSIONS_CACHE_KEY } from "../../common/redis/users";
 import prisma from "../../prisma";
+import { sess } from "../../server";
 import {
   checkCompanyAssociations,
   checkApplications,
@@ -35,7 +37,9 @@ export default async function deleteUser(user: User) {
   await prisma.user.delete({
     where: { id: user.id }
   });
-  await disconnectAllUserSessions(user.id);
+  const sessions = await getUserSessions(user.id);
+  sessions.map(sessionId => sess.store.destroy(sessionId));
+  await redisClient.del(`${USER_SESSIONS_CACHE_KEY}-${user.id}`);
 }
 
 async function checkForms(user: User): Promise<string[]> {

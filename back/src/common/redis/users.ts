@@ -1,6 +1,5 @@
 import { redisClient, generateKey } from "./redis";
 import { getUserCompanies } from "../../users/database";
-import { sess } from "../../server";
 
 const CACHED_COMPANY_EXPIRATION = 10 * 60; // 10 minutes
 
@@ -79,14 +78,10 @@ export async function storeUserSessionId(
   );
 }
 
-export async function disconnectAllUserSessions(userId: string): Promise<void> {
+export async function getUserSessions(userId: string): Promise<string[]> {
   if (!userId) {
     return;
   }
 
-  const sessions = await redisClient.smembers(
-    `${USER_SESSIONS_CACHE_KEY}-${userId}`
-  );
-  sessions.map(sessionId => sess.store.destroy(sessionId));
-  await redisClient.del(`${USER_SESSIONS_CACHE_KEY}-${userId}`);
+  return redisClient.smembers(`${USER_SESSIONS_CACHE_KEY}-${userId}`);
 }

@@ -8,7 +8,9 @@ import { UserInputError } from "apollo-server-core";
 import { PRISMA_TRANSACTION_TIMEOUT } from "../../../common/repository/helper";
 import { PrismaTransaction } from "../../../common/repository/types";
 import { hashPassword } from "../../utils";
-import { disconnectAllUserSessions } from "../../../common/redis/users";
+import { getUserSessions, USER_SESSIONS_CACHE_KEY } from "../../../common/redis/users";
+import { redisClient } from "../../../common/redis";
+import { sess } from "../../../server";
 
 export async function checkCompanyAssociations(user: User): Promise<string[]> {
   const errors = [];
@@ -166,7 +168,9 @@ async function anonymizeUserFn(userId: string): Promise<string> {
             password: await hashPassword(nanoid())
           }
         });
-        await disconnectAllUserSessions(user.id);
+        const sessions = await getUserSessions(user.id);
+        sessions.map(sessionId => sess.store.destroy(sessionId));
+        await redisClient.del(`${USER_SESSIONS_CACHE_KEY}-${user.id}`);
       },
       { timeout: PRISMA_TRANSACTION_TIMEOUT }
     );
