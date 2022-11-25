@@ -8,7 +8,10 @@ import { UserInputError } from "apollo-server-core";
 import { PRISMA_TRANSACTION_TIMEOUT } from "../../../common/repository/helper";
 import { PrismaTransaction } from "../../../common/repository/types";
 import { hashPassword } from "../../utils";
-import { getUserSessions, USER_SESSIONS_CACHE_KEY } from "../../../common/redis/users";
+import {
+  getUserSessions,
+  USER_SESSIONS_CACHE_KEY
+} from "../../../common/redis/users";
 import { redisClient } from "../../../common/redis";
 import { sess } from "../../../server";
 
