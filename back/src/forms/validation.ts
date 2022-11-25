@@ -10,7 +10,6 @@ import {
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
-import countries from "world-countries";
 import * as yup from "yup";
 import {
   isDangerous,
