@@ -115,6 +115,9 @@ export async function prepareSegment(
   const transportSegments = await prisma.transportSegment.findMany({
     where: {
       form: { id: id }
+    },
+    orderBy: {
+      segmentNumber: "asc"
     }
   });
 
