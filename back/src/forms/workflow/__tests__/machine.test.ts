@@ -90,7 +90,7 @@ describe("Workflow machine", () => {
     const nextState = machine.transition(Status.ACCEPTED, {
       type: EventType.MarkAsProcessed,
       formUpdateInput: {
-        nextDestinationCompanyCountry: "FR"
+        nextDestinationCompanySiret: "12345678912345"
       }
     });
     expect(nextState.value).toEqual(Status.PROCESSED);
@@ -100,7 +100,7 @@ describe("Workflow machine", () => {
       type: EventType.MarkAsProcessed,
       formUpdateInput: {
         processingOperationDone: "R 12",
-        nextDestinationCompanyCountry: "BE",
+        nextDestinationCompanyVatNumber: "BE1234567890",
         noTraceability: false
       }
     });

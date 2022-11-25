@@ -905,7 +905,6 @@ describe("processedInfoSchema", () => {
       nextDestinationCompanyName: "Exutoire",
       nextDestinationCompanySiret: "11111111111111",
       nextDestinationCompanyAddress: "4 rue du déchet",
-      nextDestinationCompanyCountry: "FR",
       nextDestinationCompanyContact: "Arya Stark",
       nextDestinationCompanyPhone: "06 XX XX XX XX",
       nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
@@ -924,7 +923,6 @@ describe("processedInfoSchema", () => {
       nextDestinationCompanyName: "Exutoire",
       nextDestinationCompanySiret: "11111111111111",
       nextDestinationCompanyAddress: "4 rue du déchet",
-      nextDestinationCompanyCountry: "FR",
       nextDestinationCompanyContact: "Arya Stark",
       nextDestinationCompanyPhone: "06 XX XX XX XX",
       nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
@@ -942,7 +940,6 @@ describe("processedInfoSchema", () => {
       nextDestinationCompanyName: "Exutoire",
       nextDestinationCompanySiret: "11111111111111",
       nextDestinationCompanyAddress: "4 rue du déchet",
-      nextDestinationCompanyCountry: "FR",
       nextDestinationCompanyContact: "Arya Stark",
       nextDestinationCompanyPhone: "06 XX XX XX XX",
       nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
@@ -961,7 +958,6 @@ describe("processedInfoSchema", () => {
       nextDestinationCompanyName: "Exutoire",
       nextDestinationCompanySiret: "11111111111111",
       nextDestinationCompanyAddress: "4 rue du déchet",
-      nextDestinationCompanyCountry: "FR",
       nextDestinationCompanyContact: "Arya Stark",
       nextDestinationCompanyPhone: "06 XX XX XX XX",
       nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
@@ -978,7 +974,6 @@ describe("processedInfoSchema", () => {
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
       nextDestinationCompanyAddress: "4 rue du déchet",
-      nextDestinationCompanyCountry: "FR",
       nextDestinationCompanyContact: "Arya Stark",
       nextDestinationCompanyPhone: "06 XX XX XX XX",
       nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
