@@ -117,7 +117,7 @@ describe("{ mutation { prepareSegment } }", () => {
     expect(segment.readyToTakeOver).toBe(false);
   });
 
-  it("should return the created segment id", async () => {
+  it("should create multiple segments and return the created segment id", async () => {
     // after a regression where the returned segment was not the created one, this test ensures the fixed code works
     const owner = await userFactory();
     const { user: firstTransporter, company } = await userWithCompanyFactory(
@@ -126,6 +126,14 @@ describe("{ mutation { prepareSegment } }", () => {
         companyTypes: { set: ["TRANSPORTER"] }
       }
     );
+    const { user: secondTransporter, company: company2 } =
+      await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["TRANSPORTER"] }
+      });
+    const { user: thirdTransporter, company: company3 } =
+      await userWithCompanyFactory("ADMIN", {
+        companyTypes: { set: ["TRANSPORTER"] }
+      });
 
     // create dictinct form/segment
     const otherForm = await formFactory({
@@ -155,23 +163,134 @@ describe("{ mutation { prepareSegment } }", () => {
          nextSegmentInfo: {
             transporter: {
               company: {
-                siret: "976345"
+                siret: "${company2.siret}"
                 name: "Nightwatch fight club"
                 address: "The north wall"
                 contact: "John Snow"
+                phone: "0475848484"
+                mail: "toto@mail.com"
               }
+              isExemptedOfReceipt: true
             }
             mode: ROAD
           }) {
               id
+              transporter {
+                company {
+                  siret
+                }
+              }
           }
       }`
     );
 
+    expect(data.prepareSegment.transporter.company.siret).toBe(company2.siret);
     const segment = await prisma.transportSegment.findFirst({
       where: { form: { id: form.id } }
     });
 
     expect(segment.id).toBe(data.prepareSegment.id);
+    const { errors: markReadyErrors } = await mutate(
+      `mutation  {
+          markSegmentAsReadyToTakeOver(id:"${segment.id}") {
+            id
+          }
+      }`
+    );
+
+    expect(markReadyErrors).toBeUndefined();
+    const { mutate: mutate2 } = makeClient(secondTransporter);
+    const { errors: takeOverErrors } = await mutate2(
+      `mutation  {
+        takeOverSegment(id:"${segment.id}",
+          takeOverInfo: { takenOverAt: "2020-04-28", takenOverBy: "transporter suivant" }
+          ) {
+            id
+          }
+      }`
+    );
+
+    expect(takeOverErrors).toBeUndefined();
+    const { data: data2 } = await mutate2<Pick<Mutation, "prepareSegment">>(
+      `mutation  {
+        prepareSegment(id:"${form.id}",
+         siret:"${company2.siret}",
+         nextSegmentInfo: {
+            transporter: {
+              company: {
+                siret: "${company3.siret}"
+                name: "Nightwatch fight club"
+                address: "The north wall"
+                contact: "John Snow"
+                phone: "0475848484"
+                mail: "toto@mail.com"
+              }
+              isExemptedOfReceipt: true
+            }
+            mode: ROAD
+          }) {
+              id
+              transporter {
+                company {
+                  siret
+                }
+              }
+          }
+      }`
+    );
+
+    expect(data2.prepareSegment.transporter.company.siret).toBe(company3.siret);
+    const { errors: markReadyErrors2 } = await mutate2(
+      `mutation  {
+        markSegmentAsReadyToTakeOver(id:"${data2.prepareSegment.id}") {
+          id
+        }
+      }`
+    );
+
+    expect(markReadyErrors2).toBeUndefined();
+    const { mutate: mutate3 } = makeClient(thirdTransporter);
+    const { errors: takeOverErrors2 } = await mutate3(
+      `mutation  {
+        takeOverSegment(id:"${data2.prepareSegment.id}",
+          takeOverInfo: { takenOverAt: "2020-04-28", takenOverBy: "transporter suivant" }
+          ) {
+            id
+          }
+      }`
+    );
+
+    expect(takeOverErrors2).toBeUndefined();
+    const { data: data3, errors } = await mutate3<
+      Pick<Mutation, "prepareSegment">
+    >(
+      `mutation  {
+        prepareSegment(id:"${form.id}",
+         siret:"${company3.siret}",
+         nextSegmentInfo: {
+            transporter: {
+              company: {
+                siret: "976345"
+                name: "Nightwatch fight club"
+                address: "The north wall"
+                contact: "John Snow"
+                phone: "0475848484"
+                mail: "toto@mail.com"
+              }
+              isExemptedOfReceipt: true
+            }
+            mode: ROAD
+          }) {
+              id
+              transporter {
+                company {
+                  siret
+                }
+              }
+          }
+      }`
+    );
+    expect(errors).toBeUndefined();
+    expect(data3.prepareSegment.transporter.company.siret).toBe("976345");
   });
 });
