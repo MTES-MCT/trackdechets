@@ -1,0 +1,16 @@
+import { Form, Prisma } from "@prisma/client";
+import { ReadRepositoryFnDeps } from "../../../common/repository/types";
+
+export type FindFirstFormFn = (
+  where: Prisma.FormWhereInput,
+  options?: Omit<Prisma.FormFindFirstArgs, "where">
+) => Promise<Form>;
+
+const buildFindFirstForm: (deps: ReadRepositoryFnDeps) => FindFirstFormFn =
+  ({ prisma }) =>
+  (where, options?) => {
+    const input = { where, ...options };
+    return prisma.form.findFirst(input);
+  };
+
+export default buildFindFirstForm;

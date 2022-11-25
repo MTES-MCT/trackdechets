@@ -112,12 +112,14 @@ async function mailToNonExistentEmitter(
   formRepository: FormRepository
 ) {
   // check contact email has not been mentionned already
-  const contactAlreadyMentionned =
-    (await formRepository.count({
+  const contactAlreadyMentionned = await formRepository.findFirst(
+    {
       id: { not: form.id },
       emitterCompanyMail: form.emitterCompanyMail,
       status: { not: Status.DRAFT }
-    })) > 0;
+    },
+    { select: { id: true } }
+  );
   if (!contactAlreadyMentionned) {
     await sendMail(
       renderMail(contentAwaitsGuest, {

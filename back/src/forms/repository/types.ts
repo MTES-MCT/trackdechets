@@ -4,6 +4,7 @@ import { CreateFormFn } from "./form/create";
 import { DeleteFormFn } from "./form/delete";
 import { DeleteFormStaleSegmentsFn } from "./form/deleteStaleSegments";
 import { FindAppendix2FormsByIdFn } from "./form/findAppendix2FormsById";
+import { FindFirstFormFn } from "./form/findFirst";
 import { FindForwardedInByIdFn } from "./form/findForwardedInById";
 import { FindFullFormByIdFn } from "./form/findFullFormById";
 import { FindUniqueFormFn } from "./form/findUnique";
@@ -31,6 +32,7 @@ export type FullForm = Prisma.FormGetPayload<typeof formWithLinkedObjects>;
 
 export type FormActions = {
   findUnique: FindUniqueFormFn;
+  findFirst: FindFirstFormFn;
   findFullFormById: FindFullFormByIdFn;
   findAppendix2FormsById: FindAppendix2FormsByIdFn;
   findForwardedInById: FindForwardedInByIdFn;
