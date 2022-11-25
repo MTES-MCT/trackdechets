@@ -63,7 +63,7 @@ export async function getCachedUserSiretOrVat(
   return cleanIds;
 }
 
-const userSessionsCache = "users-sessions-id";
+export const USER_SESSIONS_CACHE_KEY = "users-sessions-id";
 
 export async function storeUserSessionId(
   userId: string,
@@ -73,7 +73,10 @@ export async function storeUserSessionId(
     return;
   }
 
-  await redisClient.sadd(`${userSessionsCache}-${userId}`, req.session.id);
+  await redisClient.sadd(
+    `${USER_SESSIONS_CACHE_KEY}-${userId}`,
+    req.session.id
+  );
 }
 
 export async function disconnectAllUserSessions(userId: string): Promise<void> {
@@ -81,7 +84,9 @@ export async function disconnectAllUserSessions(userId: string): Promise<void> {
     return;
   }
 
-  const sessions = await redisClient.sinter(`${userSessionsCache}-${userId}`);
+  const sessions = await redisClient.smembers(
+    `${USER_SESSIONS_CACHE_KEY}-${userId}`
+  );
   sessions.map(sessionId => sess.store.destroy(sessionId));
-  await redisClient.srem(`${userSessionsCache}-${userId}`);
+  await redisClient.del(`${USER_SESSIONS_CACHE_KEY}-${userId}`);
 }
