@@ -38,7 +38,7 @@ export default async function deleteUser(user: User) {
     where: { id: user.id }
   });
   const sessions = await getUserSessions(user.id);
-  sessions.map(sessionId => sess.store.destroy(sessionId));
+  sessions.forEach(sessionId => sess.store.destroy(sessionId));
   await redisClient.del(`${USER_SESSIONS_CACHE_KEY}-${user.id}`);
 }
 

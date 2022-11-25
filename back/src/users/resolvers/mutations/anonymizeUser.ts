@@ -172,7 +172,7 @@ async function anonymizeUserFn(userId: string): Promise<string> {
           }
         });
         const sessions = await getUserSessions(user.id);
-        sessions.map(sessionId => sess.store.destroy(sessionId));
+        sessions.forEach(sessionId => sess.store.destroy(sessionId));
         await redisClient.del(`${USER_SESSIONS_CACHE_KEY}-${user.id}`);
       },
       { timeout: PRISMA_TRANSACTION_TIMEOUT }
