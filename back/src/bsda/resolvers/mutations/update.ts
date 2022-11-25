@@ -86,8 +86,7 @@ export default async function edit(
     }
   );
 
-  const shouldUpdateIntermediaries =
-    input.intermediaries?.length > 0 || existingBsda.intermediaries?.length > 0;
+  const shouldUpdateIntermediaries = Array.isArray(input.intermediaries);
 
   const updatedBsda = await bsdaRepository.update(
     { id },
