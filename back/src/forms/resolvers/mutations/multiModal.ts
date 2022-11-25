@@ -152,7 +152,8 @@ export async function prepareSegment(
     : null;
   if (
     !!lastSegment &&
-    (!lastSegment.takenOverAt || lastSegment.transporterCompanySiret !== siret)
+    !lastSegment.takenOverAt &&
+    lastSegment.transporterCompanySiret !== siret
   ) {
     throw new ForbiddenError(SEGMENTS_ALREADY_PREPARED);
   }
