@@ -250,6 +250,41 @@ describe("{ mutation { prepareSegment } }", () => {
 
     expect(markReadyErrors2).toBeUndefined();
     const { mutate: mutate3 } = makeClient(thirdTransporter);
+    // should not allow to prepare befor takeOver segment
+    const { errors: errorToPrepare } = await mutate3<
+      Pick<Mutation, "prepareSegment">
+    >(
+      `mutation  {
+      prepareSegment(id:"${form.id}",
+       siret:"${company3.siret}",
+       nextSegmentInfo: {
+          transporter: {
+            company: {
+              siret: "976345"
+              name: "Nightwatch fight club"
+              address: "The north wall"
+              contact: "John Snow"
+              phone: "0475848484"
+              mail: "toto@mail.com"
+            }
+            isExemptedOfReceipt: true
+          }
+          mode: ROAD
+        }) {
+            id
+            transporter {
+              company {
+                siret
+              }
+            }
+        }
+    }`
+    );
+    expect(errorToPrepare.length).toBe(1);
+    expect(errorToPrepare[0].extensions.code).toBe("FORBIDDEN");
+    expect(errorToPrepare[0].message).toBe(
+      "Vous ne disposez pas des permissions nécessaires"
+    );
     const { errors: takeOverErrors2 } = await mutate3(
       `mutation  {
         takeOverSegment(id:"${data2.prepareSegment.id}",
