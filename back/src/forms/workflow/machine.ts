@@ -1,6 +1,7 @@
 import { Status, WasteAcceptationStatus } from "@prisma/client";
 import { Machine } from "xstate";
 import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "../../common/constants";
+import { isFRVat } from "../../common/constants/companySearchHelpers";
 import { Event, EventType } from "./types";
 
 /**
@@ -226,8 +227,7 @@ const machine = Machine<any, Event>(
         !!event?.formUpdateInput?.noTraceability ||
         !!event.formUpdateInput?.forwardedIn?.update?.noTraceability,
       awaitsGroup: (_, event) =>
-        (!event.formUpdateInput?.nextDestinationCompanyCountry ||
-          event.formUpdateInput?.nextDestinationCompanyCountry === "FR") &&
+        event.formUpdateInput?.nextDestinationCompanySiret &&
         (PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
           event.formUpdateInput?.processingOperationDone as string
         ) ||
@@ -236,8 +236,10 @@ const machine = Machine<any, Event>(
               ?.processingOperationDone as string
           )),
       isFollowedWithPnttd: (_, event) =>
-        !!event.formUpdateInput?.nextDestinationCompanyCountry &&
-        event.formUpdateInput?.nextDestinationCompanyCountry !== "FR" &&
+        event.formUpdateInput?.nextDestinationCompanyVatNumber &&
+        !isFRVat(
+          event.formUpdateInput.nextDestinationCompanyVatNumber as string
+        ) &&
         !event?.formUpdateInput?.noTraceability &&
         !event.formUpdateInput?.forwardedIn?.update?.noTraceability &&
         (PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(

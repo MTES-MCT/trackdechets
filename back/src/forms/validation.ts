@@ -193,7 +193,6 @@ type ProcessedInfo = Pick<
   | "nextDestinationCompanyName"
   | "nextDestinationCompanySiret"
   | "nextDestinationCompanyAddress"
-  | "nextDestinationCompanyCountry"
   | "nextDestinationCompanyContact"
   | "nextDestinationCompanyPhone"
   | "nextDestinationCompanyMail"
@@ -1116,10 +1115,6 @@ const withNextDestination = (required: boolean) =>
         required,
         `Destination ultérieure : ${MISSING_COMPANY_ADDRESS}`
       ),
-    nextDestinationCompanyCountry: yup.string().oneOf(
-      countries.map(country => country.cca2),
-      "Destination ultérieure : le code ISO 3166-1 alpha-2 du pays de l'entreprise n'est pas reconnu"
-    ),
     nextDestinationCompanyContact: yup
       .string()
       .ensure()
@@ -1159,10 +1154,6 @@ const withoutNextDestination = yup.object().shape({
     .ensure()
     .max(0, EXTRANEOUS_NEXT_DESTINATION),
   nextDestinationCompanyAddress: yup
-    .string()
-    .ensure()
-    .max(0, EXTRANEOUS_NEXT_DESTINATION),
-  nextDestinationCompanyCountry: yup
     .string()
     .ensure()
     .max(0, EXTRANEOUS_NEXT_DESTINATION),

@@ -483,7 +483,6 @@ describe("mutation.markAsProcessed", () => {
 
     expect(resultingForm.status).toBe("FOLLOWED_WITH_PNTTD");
     expect(resultingForm.nextDestinationCompanyVatNumber).toEqual("IE9513674T");
-    expect(resultingForm.nextDestinationCompanyCountry).toBe("IE");
   });
 
   it("should disallow a missing siret for a french next destination", async () => {

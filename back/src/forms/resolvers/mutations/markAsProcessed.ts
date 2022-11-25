@@ -37,15 +37,6 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   formUpdateInput.processingOperationDescription =
     processedInfo.processingOperationDescription || operation?.description;
 
-  if (
-    formUpdateInput.nextDestinationCompanySiret &&
-    !formUpdateInput.nextDestinationCompanyCountry
-  ) {
-    // only default to "FR" if there's an actual nextDestination
-    // otherwise keep it empty to avoid filling a field for an object that doesn't exist
-    formUpdateInput.nextDestinationCompanyCountry = "FR";
-  }
-
   if (form.status === Status.TEMP_STORER_ACCEPTED) {
     // The form was flagged as temporary storage but the recipient decides to
     // fo a final treatement or a groupement

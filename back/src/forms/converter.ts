@@ -294,9 +294,6 @@ function flattenNextDestinationInput(input: {
     nextDestinationCompanyAddress: chain(input.nextDestination, nd =>
       chain(nd.company, c => c.address)
     ),
-    nextDestinationCompanyCountry: chain(input.nextDestination, nd =>
-      chain(nd.company, c => c.country)
-    ),
     nextDestinationCompanyContact: chain(input.nextDestination, nd =>
       chain(nd.company, c => c.contact)
     ),
@@ -654,7 +651,6 @@ export async function expandFormFromDb(
             siret: forwardedIn.nextDestinationCompanySiret,
             vatNumber: forwardedIn.nextDestinationCompanyVatNumber,
             address: forwardedIn.nextDestinationCompanyAddress,
-            country: forwardedIn.nextDestinationCompanyCountry,
             contact: forwardedIn.nextDestinationCompanyContact,
             phone: forwardedIn.nextDestinationCompanyPhone,
             mail: forwardedIn.nextDestinationCompanyMail
@@ -667,7 +663,6 @@ export async function expandFormFromDb(
             siret: form.nextDestinationCompanySiret,
             vatNumber: form.nextDestinationCompanyVatNumber,
             address: form.nextDestinationCompanyAddress,
-            country: form.nextDestinationCompanyCountry,
             contact: form.nextDestinationCompanyContact,
             phone: form.nextDestinationCompanyPhone,
             mail: form.nextDestinationCompanyMail

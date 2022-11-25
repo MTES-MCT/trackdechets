@@ -28,7 +28,7 @@ input CompanyInput {
   "Numéro de téléphone de contact dans l'établissement"
   phone: String
 
-  "Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise"
+  "DEPRECATED - Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise"
   country: String
 
   """
