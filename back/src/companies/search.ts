@@ -26,7 +26,8 @@ const SIRET_OR_VAT_ERROR =
  * Supports Test SIRET and AnonymousCompany
  */
 export async function searchCompany(
-  clue: string
+  clue: string,
+  allowFrVat = false
 ): Promise<CompanySearchResult> {
   // remove non alphanumeric
   const cleanClue = clue.replace(/[\W_]+/g, "").toUpperCase();
@@ -64,7 +65,7 @@ export async function searchCompany(
     if (isSiret(cleanClue)) {
       companyInfo = await searchSireneOrNotFound(cleanClue);
     } else if (isVat(cleanClue)) {
-      companyInfo = await searchVatFrOnlyOrNotFound(cleanClue);
+      companyInfo = await searchVatOrNotFound(cleanClue, allowFrVat);
     }
   }
   // Concaténer données Company
@@ -171,10 +172,11 @@ async function searchSireneOrNotFound(
   }
 }
 
-async function searchVatFrOnlyOrNotFound(
-  vatNumber: string
+async function searchVatOrNotFound(
+  vatNumber: string,
+  allowFrVat = false
 ): Promise<CompanyVatSearchResult> {
-  if (isFRVat(vatNumber)) {
+  if (!allowFrVat && isFRVat(vatNumber)) {
     throw new UserInputError(
       "Une entreprise française doit être identifiée par son SIRET et pas par sa TVA intracommunautaire",
       {

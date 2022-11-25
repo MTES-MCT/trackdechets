@@ -26,11 +26,7 @@ import AccountCompanyAddVhuAgrement from "./accountCompanyAdd/AccountCompanyAddV
 import { InlineRadioButton } from "form/common/components/custom-inputs/RadioButton";
 import classNames from "classnames";
 import { MY_COMPANIES } from "./AccountCompanyList";
-import {
-  isFRVat,
-  isSiret,
-  isVat,
-} from "generated/constants/companySearchHelpers";
+import { isSiret, isVat } from "generated/constants/companySearchHelpers";
 const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
     createCompany(companyInput: $companyInput) {

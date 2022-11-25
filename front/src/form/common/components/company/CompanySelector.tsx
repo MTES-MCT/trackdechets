@@ -127,7 +127,7 @@ export default function CompanySelector({
   );
 
   /**
-   * CompanyPrivateInfos pour completer les informations
+   * CompanyPrivateInfos complète automatiquement les informations
    * de la Company courante enregistrée dans le BSD à son ouverture
    */
   const { data: selectedData } = useQuery<

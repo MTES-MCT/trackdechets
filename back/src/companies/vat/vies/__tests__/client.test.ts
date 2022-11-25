@@ -86,6 +86,20 @@ describe("Vat search VIES client", () => {
     expect(res).toStrictEqual(testValue);
   });
 
+  it(`should return a ViesResult with MC for Monaco addresses`, async () => {
+    const testValue = {
+      vatNumber: "FR09000029023",
+      address: "73 Avenue des Papayes, Immeuble Le Cycllope, BP 627, 98013 MONACO Cedex",
+      name: "ENTREPRISE MONEGASQUE",
+      codePaysEtrangerEtablissement: "MC",
+      statutDiffusionEtablissement: "O",
+      etatAdministratif: "A"
+    };
+    checkVatAsyncMock.mockResolvedValueOnce([testValue]);
+    const res = await client("FR09000029023", createClientTest);
+    expect(res).toStrictEqual(testValue);
+  });
+
   it(`should throw EXTERNAL_SERVICE_ERROR if
   the VIES Server returns an unavailibility error`, async () => {
     expect.assertions(2);

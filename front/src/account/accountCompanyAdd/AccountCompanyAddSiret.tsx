@@ -1,15 +1,12 @@
 import React, { useState } from "react";
+import cogoToast from "cogo-toast";
 import { gql, useLazyQuery, useMutation } from "@apollo/client";
 import { Field, Form, Formik } from "formik";
 import { COMPANY_PRIVATE_INFOS } from "form/common/components/company/query";
 import AccountCompanyAddMembershipRequest from "./AccountCompanyAddMembershipRequest";
 import styles from "../AccountCompanyAdd.module.scss";
 import { Mutation, Query } from "generated/graphql/types";
-import {
-  isFRVat,
-  isSiret,
-  isVat,
-} from "generated/constants/companySearchHelpers";
+import { isSiret, isVat } from "generated/constants/companySearchHelpers";
 import { CONTACT_EMAIL } from "common/config";
 
 import {
@@ -137,14 +134,24 @@ export default function AccountCompanyAddSiret({
   const [isRegistered, setIsRegistered] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isNonDiffusible, setIsNonDiffusible] = useState(false);
+  const [country, setCountry] = useState("");
   const [isClosed, setIsClosed] = useState(false);
 
   const [searchCompany, { loading, error }] = useLazyQuery<
     Pick<Query, "companyPrivateInfos">
   >(COMPANY_PRIVATE_INFOS, {
     onCompleted: data => {
-      if (data && data.companyPrivateInfos) {
+      if (data?.companyPrivateInfos) {
         const companyInfos = data.companyPrivateInfos;
+        const country = companyInfos.codePaysEtrangerEtablissement;
+        setCountry(country ?? "");
+        if (country === "FR" && isVat(companyInfos.vatNumber!!)) {
+          onCompanyInfos(null);
+          cogoToast.error(
+            "Vous devez obligatoirement entrer un numéro de SIRET pour une entreprise française"
+          );
+          return;
+        }
         if (companyInfos.etatAdministratif === "F") {
           setIsClosed(true);
         } else {
@@ -182,18 +189,19 @@ export default function AccountCompanyAddSiret({
             validate={values => {
               const isValidSiret = isSiret(values.siret);
               const isValidVat = isVat(values.siret);
+              // Commence par 2 chiffres mais pas un siret valid
               if (!isValidSiret && !/^[a-zA-Z]{2}/.test(values.siret)) {
                 return {
                   siret: "Vous devez entrer un SIRET de 14 chiffres",
                 };
-              } else if (!isValidVat && !/^[0-9]{14}$/.test(values.siret)) {
+                // Commence par 2 lettres mais n'est pas un numéro de TVA valide
+              } else if (!isValidVat && /^[a-zA-Z]{2}$/.test(values.siret)) {
                 return {
                   siret: `Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter à l'adresse ${CONTACT_EMAIL} avec un justificatif légal du pays d'origine.`,
                 };
-              } else if (isValidVat && isFRVat(values.siret)) {
+              } else if (country === "FR" && isValidVat) {
                 return {
-                  siret:
-                    "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et non son numéro de TVA",
+                  siret: `Vous devez entrer un numéro de SIRET pour une entreprise française`,
                 };
               }
             }}
@@ -217,10 +225,11 @@ export default function AccountCompanyAddSiret({
                         messageType={errors.siret ? "error" : ""}
                         message={errors.siret || ""}
                         onChange={e => {
+                          // Clean non-alphanumeric out
                           const siret = e.target.value
-                            .split(" ")
-                            .join("")
+                            .replace(/[\W_]+/g, "")
                             .toUpperCase();
+
                           setIsRegistered(false);
                           setFieldValue("siret", siret);
                         }}
