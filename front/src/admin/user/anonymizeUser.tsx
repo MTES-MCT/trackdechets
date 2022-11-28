@@ -24,6 +24,13 @@ function AnonymizeUser() {
           id: "",
         }}
         onSubmit={async (values, { resetForm }) => {
+          if (
+            !window.confirm(
+              `Souhaitez-vous supprimer l'utilisateur ${values.id} ? (action irréversible)`
+            )
+          ) {
+            return;
+          }
           const res = await anonymizeUser({ variables: { id: values.id } });
           resetForm();
           !!res?.data?.anonymizeUser
