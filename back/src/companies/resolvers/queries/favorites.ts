@@ -230,8 +230,12 @@ async function getRecentTransporters(defaultWhere: Prisma.FormWhereInput) {
       transporterReceipt: true
     }
   });
-  const transporterSirets = forms.map(f => f.transporterCompanySiret);
-  const transporterVatNumbers = forms.map(f => f.transporterCompanyVatNumber);
+  const transporterSirets = forms
+    .map(f => f.transporterCompanySiret)
+    .filter(s => !["", null].includes(s));
+  const transporterVatNumbers = forms
+    .map(f => f.transporterCompanyVatNumber)
+    .filter(s => !["", null].includes(s));
 
   const companies = await prisma.company.findMany({
     where: {

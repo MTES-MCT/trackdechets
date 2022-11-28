@@ -145,7 +145,8 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: emitter.siret,
-        recipientCompanySiret: company.siret
+        recipientCompanySiret: company.siret,
+        recipientsSirets: [company.siret]
       }
     });
 
@@ -275,7 +276,8 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        transporterCompanySiret: transporter.siret
+        transporterCompanySiret: transporter.siret,
+        transportersSirets: [transporter.siret]
       }
     });
 
@@ -443,7 +445,10 @@ describe("query favorites", () => {
 
     await formWithTempStorageFactory({
       ownerId: user.id,
-      opt: { emitterCompanySiret: company.siret },
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientsSirets: [destination.siret]
+      },
       forwardedInOpts: { recipientCompanySiret: destination.siret }
     });
 
@@ -722,7 +727,7 @@ describe("query favorites", () => {
     ]);
   });
 
-  it.skip("should return the user's company even if there are other results", async () => {
+  it("should return the user's company even if there are other results", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
         set: ["PRODUCER"]
@@ -734,13 +739,15 @@ describe("query favorites", () => {
     const firstForm = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: emitter1.siret
+        emitterCompanySiret: emitter1.siret,
+        recipientsSirets: [company.siret]
       }
     });
     const secondForm = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: emitter2.siret
+        emitterCompanySiret: emitter2.siret,
+        recipientsSirets: [company.siret]
       }
     });
 
@@ -768,7 +775,7 @@ describe("query favorites", () => {
     ]);
   });
 
-  it.skip("should return the user's company based on an existing BSD", async () => {
+  it("should return the user's company based on an existing BSD", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
         set: ["PRODUCER"]
@@ -780,13 +787,15 @@ describe("query favorites", () => {
     const firstForm = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: emitter1.siret
+        emitterCompanySiret: emitter1.siret,
+        recipientsSirets: [company.siret]
       }
     });
     const secondForm = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: emitter2.siret
+        emitterCompanySiret: emitter2.siret,
+        recipientsSirets: [company.siret]
       }
     });
     await formFactory({
@@ -820,7 +829,7 @@ describe("query favorites", () => {
     ]);
   });
 
-  it.skip("should not return the same company twice", async () => {
+  it("should not return the same company twice", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
         set: ["COLLECTOR"]
@@ -831,14 +840,16 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanyName: "A Name",
-        emitterCompanySiret: emitter.siret
+        emitterCompanySiret: emitter.siret,
+        recipientsSirets: [company.siret]
       }
     });
     await formFactory({
       ownerId: user.id,
       opt: {
         emitterCompanyName: "Another Name",
-        emitterCompanySiret: firstForm.emitterCompanySiret
+        emitterCompanySiret: firstForm.emitterCompanySiret,
+        recipientsSirets: [company.siret]
       }
     });
 
@@ -867,14 +878,16 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         transporterCompanyName: "A Name",
-        transporterCompanyVatNumber: transporter.vatNumber
+        transporterCompanyVatNumber: transporter.vatNumber,
+        recipientsSirets: [company.siret]
       }
     });
     await formFactory({
       ownerId: user.id,
       opt: {
         transporterCompanyName: "Another Name",
-        transporterCompanyVatNumber: transporter.vatNumber
+        transporterCompanyVatNumber: transporter.vatNumber,
+        recipientsSirets: [company.siret]
       }
     });
 
@@ -895,7 +908,7 @@ describe("query favorites", () => {
     );
   });
 
-  it.skip("should suggest a temporary storage detail destination", async () => {
+  it("should suggest a temporary storage detail destination", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
         set: ["PRODUCER"]
@@ -905,6 +918,7 @@ describe("query favorites", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
+        emitterCompanySiret: company.siret,
         recipientCompanySiret: "0".repeat(14),
         recipientIsTempStorage: true,
         forwardedIn: {
@@ -913,7 +927,8 @@ describe("query favorites", () => {
             ownerId: user.id,
             recipientCompanySiret: destination.siret
           }
-        }
+        },
+        recipientsSirets: ["0".repeat(14), destination.siret]
       }
     });
     const forwardedIn = await prisma.form
