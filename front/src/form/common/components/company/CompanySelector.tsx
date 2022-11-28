@@ -280,6 +280,7 @@ export default function CompanySelector({
     setFieldTouched,
     searchCompaniesQuery,
     field.name,
+    field.value.address,
     allowForeignCompanies,
   ]);
 

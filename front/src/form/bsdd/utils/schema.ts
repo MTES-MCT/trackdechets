@@ -23,7 +23,6 @@ import {
 import graphlClient from "graphql-client";
 import { COMPANY_INFOS } from "form/common/components/company/query";
 import {
-  isVat,
   isFRVat,
   isSiret,
   isForeignVat,

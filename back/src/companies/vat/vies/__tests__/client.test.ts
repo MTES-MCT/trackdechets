@@ -1,5 +1,6 @@
 import { client, makeSoapClient } from "../client";
 import { ErrorCode } from "../../../../common/errors";
+import { ViesResult } from "../types";
 
 describe("Vat search VIES client", () => {
   const checkVatAsyncMock = jest.fn();
@@ -73,6 +74,15 @@ describe("Vat search VIES client", () => {
   });
 
   it(`should return a ViesResult`, async () => {
+    const mockValue: ViesResult = {
+      vatNumber: "IT09301420155",
+      address: "address",
+      name: "name",
+      countryCode: "IT",
+      valid: true,
+      requestDate: new Date().toISOString()
+    };
+
     const testValue = {
       vatNumber: "IT09301420155",
       address: "address",
@@ -81,14 +91,14 @@ describe("Vat search VIES client", () => {
       statutDiffusionEtablissement: "O",
       etatAdministratif: "A"
     };
-    checkVatAsyncMock.mockResolvedValueOnce([testValue]);
+    checkVatAsyncMock.mockResolvedValueOnce([mockValue]);
     const res = await client("IT09301420155", createClientTest);
     expect(res).toStrictEqual(testValue);
   });
 
   it(`should return a ViesResult with MC for Monaco addresses`, async () => {
     const testValue = {
-      vatNumber: "FR09000029023",
+      vatNumber: "FR71814312724",
       address:
         "73 Avenue des Papayes, Immeuble Le Cycllope, BP 627, 98013 MONACO Cedex",
       name: "ENTREPRISE MONEGASQUE",
@@ -97,7 +107,7 @@ describe("Vat search VIES client", () => {
       etatAdministratif: "A"
     };
     checkVatAsyncMock.mockResolvedValueOnce([testValue]);
-    const res = await client("FR09000029023", createClientTest);
+    const res = await client("FR69892135112", createClientTest);
     expect(res).toStrictEqual(testValue);
   });
 
