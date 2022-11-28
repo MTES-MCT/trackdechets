@@ -143,19 +143,24 @@ async function getRecentRecipients(
 async function getRecentDestinationAfterTempStorage(
   defaultWhere: Prisma.FormWhereInput
 ): Promise<CompanyFavorite[]> {
+  // We over fetch to avoid a join
+  // The complete filter is applied in JS below
   const forms = await prisma.form.findMany({
     ...defaultArgs,
     where: {
       ...defaultWhere,
-      forwardedIn: {
-        NOT: [{ recipientCompanySiret: null }, { recipientCompanySiret: "" }]
+      recipientsSirets: {
+        isEmpty: false // Just check that we have recipientsSirets. Afterwards we will remove empty sirets and sirets which are the equal to recipientCompanySiret
       }
     },
-    select: { forwardedIn: { select: { recipientCompanySiret: true } } }
+    select: { recipientsSirets: true, recipientCompanySiret: true }
   });
-  const destinationSirets = forms.map(
-    f => f.forwardedIn?.recipientCompanySiret
-  );
+
+  const destinationSirets = forms
+    .flatMap(f =>
+      f.recipientsSirets.filter(siret => siret !== f.recipientCompanySiret)
+    )
+    .filter(Boolean);
   const companies = await prisma.company.findMany({
     where: { siret: { in: destinationSirets } }
   });
@@ -176,13 +181,20 @@ async function getRecentNextDestinations(
     },
     select: { nextDestinationCompanySiret: true }
   });
+
   const nextDestinationSirets = forms.map(f => f.nextDestinationCompanySiret);
-  const companies = (
-    await Promise.all(
-      nextDestinationSirets.map(siret => searchCompany(siret).catch(_ => null))
-    )
-  ).filter(c => c !== null);
-  return companies.map(c => companySearchResultToFavorite(c));
+  const favorites = await Promise.all(
+    nextDestinationSirets.map(async siret => {
+      try {
+        const company = await searchCompany(siret);
+        return companySearchResultToFavorite(company);
+      } catch (_) {
+        return null;
+      }
+    })
+  );
+
+  return favorites.filter(Boolean);
 }
 
 async function getRecentTransporters(defaultWhere: Prisma.FormWhereInput) {
@@ -216,12 +228,8 @@ async function getRecentTransporters(defaultWhere: Prisma.FormWhereInput) {
       transporterReceipt: true
     }
   });
-  const transporterSirets = forms
-    .map(f => f.transporterCompanySiret)
-    .filter(s => !["", null].includes(s));
-  const transporterVatNumbers = forms
-    .map(f => f.transporterCompanyVatNumber)
-    .filter(s => !["", null].includes(s));
+  const transporterSirets = forms.map(f => f.transporterCompanySiret);
+  const transporterVatNumbers = forms.map(f => f.transporterCompanyVatNumber);
 
   const companies = await prisma.company.findMany({
     where: {
@@ -245,23 +253,26 @@ async function getRecentTraders(
     },
     select: { traderCompanySiret: true }
   });
-  const traderSirets = forms.map(f => f.traderCompanySiret);
-  const companies = (
-    await Promise.all(
-      traderSirets.map(siret => searchCompany(siret).catch(_ => null))
-    )
-  ).filter(c => c !== null);
-  return Promise.all(
-    companies.map(async c => {
-      const favorite = companySearchResultToFavorite(c);
-      const traderReceipt = await prisma.company
-        .findUnique({
-          where: { siret: favorite.siret }
-        })
-        .traderReceipt();
-      return { ...favorite, traderReceipt };
+
+  const traderSirets = [...new Set(forms.map(f => f.traderCompanySiret))];
+  const favorites = await Promise.all(
+    traderSirets.map(async siret => {
+      try {
+        const company = await searchCompany(siret);
+        const favorite = companySearchResultToFavorite(company);
+        const traderReceipt = await prisma.company
+          .findUnique({
+            where: { siret: favorite.siret }
+          })
+          .traderReceipt();
+        return { ...favorite, traderReceipt };
+      } catch (_) {
+        return null;
+      }
     })
   );
+
+  return favorites.filter(Boolean);
 }
 
 async function getRecentBrokers(
@@ -275,24 +286,26 @@ async function getRecentBrokers(
     },
     select: { brokerCompanySiret: true }
   });
-  const brokerSirets = forms.map(f => f.brokerCompanySiret);
-  const companies = (
-    await Promise.all(
-      brokerSirets.map(siret => searchCompany(siret).catch(_ => null))
-    )
-  ).filter(c => c !== null);
 
-  return Promise.all(
-    companies.map(async c => {
-      const favorite = companySearchResultToFavorite(c);
-      const brokerReceipt = await prisma.company
-        .findUnique({
-          where: { siret: favorite.siret }
-        })
-        .brokerReceipt();
-      return { ...favorite, brokerReceipt };
+  const brokerSirets = [...new Set(forms.map(f => f.brokerCompanySiret))];
+  const favorites = await Promise.all(
+    brokerSirets.map(async siret => {
+      try {
+        const company = await searchCompany(siret);
+        const favorite = companySearchResultToFavorite(company);
+        const brokerReceipt = await prisma.company
+          .findUnique({
+            where: { siret: favorite.siret }
+          })
+          .brokerReceipt();
+        return { ...favorite, brokerReceipt };
+      } catch (_) {
+        return null;
+      }
     })
   );
+
+  return favorites.filter(Boolean);
 }
 
 /**
@@ -317,22 +330,10 @@ async function getRecentPartners(
     OR: [
       { emitterCompanySiret: siret },
       { ecoOrganismeSiret: siret },
-      { recipientCompanySiret: siret },
+      { recipientsSirets: { has: siret } },
       { traderCompanySiret: siret },
       { brokerCompanySiret: siret },
-      // hotfix problem perf
-      // {
-      //   forwardedIn: { recipientCompanySiret: siret }
-      // },
-      { transporterCompanySiret: siret }
-      // hotfix problem perf
-      // {
-      //   transportSegments: {
-      //     some: {
-      //       transporterCompanySiret: siret
-      //     }
-      //   }
-      // }
+      { transportersSirets: { has: siret } }
     ],
 
     // ignore drafts as they are likely to be incomplete
@@ -375,26 +376,35 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
   const company = await getCompanyOrCompanyNotFound({ siret });
   await checkIsCompanyMember({ id: user.id }, { siret: company.siret });
 
-  const favorites: CompanyFavorite[] = (
-    await getRecentPartners(company.siret, type)
-  )
-    // Remove duplicates (by company siret or VAT)
-    .reduce<CompanyFavorite[]>((prev, cur) => {
-      if (
-        prev.find(
-          el =>
-            el.siret === cur.siret ||
-            (el.vatNumber && cur.vatNumber && el.vatNumber === cur.vatNumber)
-        ) == null
-      ) {
-        // compute codePaysEtrangerEtablissement
-        cur.codePaysEtrangerEtablissement = !isForeignVat(cur.vatNumber)
-          ? "FR"
-          : checkVAT(cur.vatNumber, countries)?.country?.isoCode.short;
-        return prev.concat([cur]);
-      }
-      return prev;
-    }, []);
+  const recentPartners = await getRecentPartners(company.siret, type);
+  const favorites: CompanyFavorite[] = recentPartners.map(recentPartner => {
+    return {
+      ...recentPartner,
+      codePaysEtrangerEtablissement: !isForeignVat(recentPartner.vatNumber)
+        ? "FR"
+        : checkVAT(recentPartner.vatNumber, countries)?.country?.isoCode.short
+    };
+  });
+  // const favorites: CompanyFavorite[] = (
+  //   await getRecentPartners(company.siret, type)
+  // )
+  //   // Remove duplicates (by company siret or VAT)
+  //   .reduce<CompanyFavorite[]>((prev, cur) => {
+  //     if (
+  //       prev.find(
+  //         el =>
+  //           el.siret === cur.siret ||
+  //           (el.vatNumber && cur.vatNumber && el.vatNumber === cur.vatNumber)
+  //       ) == null
+  //     ) {
+  //       // compute codePaysEtrangerEtablissement
+  //       cur.codePaysEtrangerEtablissement = !isForeignVat(cur.vatNumber)
+  //         ? "FR"
+  //         : checkVAT(cur.vatNumber, countries)?.country?.isoCode.short;
+  //       return prev.concat([cur]);
+  //     }
+  //     return prev;
+  //   }, []);
 
   // return early
   if (favorites.length + 1 >= MAX_FAVORITES) {
