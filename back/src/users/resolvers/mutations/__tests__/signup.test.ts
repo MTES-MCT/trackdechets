@@ -1,5 +1,8 @@
 import { signupFn as signup } from "../signup";
 import prisma from "../../../../prisma";
+import configureYup from "../../../../common/yup/configureYup";
+
+configureYup();
 
 const userInfos = {
   id: "new_user",

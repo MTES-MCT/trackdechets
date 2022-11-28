@@ -150,6 +150,34 @@ describe("Mutation.signup", () => {
     expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 
+  it("should throw BAD_USER_INPUT if name contains unsafe SSTI chars", async () => {
+    const user = {
+      email: "newuser@td.io",
+      name: "Ihackoulol {{dump(app)}}",
+      phone: "06 00 00 00 00",
+      password: "newUserPassword"
+    };
+    const { errors } = await mutate(SIGNUP, {
+      variables: {
+        userInfos: {
+          email: user.email,
+          password: user.password,
+          name: user.name,
+          phone: user.phone
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Les caractères suivants sont interdits: { } % < > $ ' " =`,
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
   it("should accept pending invitations", async () => {
     const user = {
       email: "newuser@td.io",

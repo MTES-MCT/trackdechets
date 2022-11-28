@@ -1,10 +1,11 @@
 import * as yup from "yup";
 import { AnyObject } from "yup/lib/types";
-
+import { SSTI_CHARS } from "../constants";
 /* eslint-disable */
 declare module "yup" {
   interface BaseSchema<TCast = any, TContext = AnyObject, TOutput = any> {
     requiredIf<T>(condition: boolean, message?: string): this;
+    isSafeSSTI<T>(): this;
   }
 }
 /* eslint-enable */
@@ -34,6 +35,23 @@ export default function configureYup() {
       }
 
       return this.nullable().notRequired();
+    }
+  );
+
+  /**
+   * Validates string is safe against server-side template injections
+   */
+  yup.addMethod<yup.BaseSchema>(
+    yup.string,
+    "isSafeSSTI",
+    function safeSSSTIString() {
+      return this.test(
+        "safe-ssti",
+        `Les caractères suivants sont interdits: ${SSTI_CHARS.join(" ")}`,
+        function (value) {
+          return !SSTI_CHARS.some(char => value?.includes(char));
+        }
+      );
     }
   );
 }
