@@ -1,11 +1,9 @@
-import { nanoid } from "nanoid";
 import { User } from "@prisma/client";
 import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAdmin } from "../../../common/permissions";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { UserInputError } from "apollo-server-core";
-import { PRISMA_TRANSACTION_TIMEOUT } from "../../../common/repository/helper";
 import { PrismaTransaction } from "../../../common/repository/types";
 import { hashPassword } from "../../utils";
 import {
@@ -14,6 +12,7 @@ import {
 } from "../../../common/redis/users";
 import { redisClient } from "../../../common/redis";
 import { sess } from "../../../server";
+import { getUid } from "../../../utils";
 
 export async function checkCompanyAssociations(user: User): Promise<string[]> {
   const errors = [];
@@ -156,32 +155,29 @@ async function anonymizeUserFn(userId: string): Promise<string> {
     throw new Error(errors.join("\n"));
   }
 
-  const uuid = nanoid();
+  const uuid = getUid(16);
   const anonEmail = `${uuid}-anonymous@trackdechets.fr`;
   try {
-    await prisma.$transaction(
-      async transaction => {
-        await deleteUserCompanyAssociations(user, transaction);
-        await deleteUserActivationHashes(user, transaction);
-        await deleteUserAccessTokens(user, transaction);
-        await deleteUserGrants(user, transaction);
-        await deleteMembershipRequest(user, transaction);
-        await prisma.user.update({
-          where: {
-            id: userId
-          },
-          data: {
-            email: anonEmail,
-            name: uuid,
-            isActive: false,
-            phone: "00000000",
-            password: await hashPassword(nanoid())
-          }
-        });
-        await deleteAllUserSessions(user.id);
-      },
-      { timeout: PRISMA_TRANSACTION_TIMEOUT }
-    );
+    await prisma.$transaction(async transaction => {
+      await deleteUserCompanyAssociations(user, transaction);
+      await deleteUserActivationHashes(user, transaction);
+      await deleteUserAccessTokens(user, transaction);
+      await deleteUserGrants(user, transaction);
+      await deleteMembershipRequest(user, transaction);
+      await prisma.user.update({
+        where: {
+          id: userId
+        },
+        data: {
+          email: anonEmail,
+          name: uuid,
+          isActive: false,
+          phone: "00000000",
+          password: await hashPassword(getUid(16))
+        }
+      });
+      await deleteAllUserSessions(user.id);
+    });
 
     return anonEmail;
   } catch (err) {
