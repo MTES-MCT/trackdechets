@@ -64,18 +64,18 @@ export async function getCachedUserSiretOrVat(
 
 export const USER_SESSIONS_CACHE_KEY = "users-sessions-id";
 
+const genUserSessionKey = (userId: string): string =>
+  `${USER_SESSIONS_CACHE_KEY}-${userId}`;
+
 export async function storeUserSessionId(
   userId: string,
-  req: Express.Request
+  sessionId: string
 ): Promise<void> {
   if (!userId) {
     return;
   }
 
-  await redisClient.sadd(
-    `${USER_SESSIONS_CACHE_KEY}-${userId}`,
-    req.session.id
-  );
+  await redisClient.sadd(genUserSessionKey(userId), sessionId);
 }
 
 export async function getUserSessions(userId: string): Promise<string[]> {
@@ -83,5 +83,5 @@ export async function getUserSessions(userId: string): Promise<string[]> {
     return;
   }
 
-  return redisClient.smembers(`${USER_SESSIONS_CACHE_KEY}-${userId}`);
+  return redisClient.smembers(genUserSessionKey(userId));
 }
