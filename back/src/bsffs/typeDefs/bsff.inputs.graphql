@@ -300,11 +300,15 @@ input BsffPackagingNextDestinationInput {
 }
 
 input BsffFicheInterventionInput {
+  "Numéro de la fiche d'intervention mentionnée à l'article R. 543-82 du code de l'environnement"
   numero: String!
-  "Poids en kilogrammes"
+  "La quantité totale réelle ou estimée exprimée en kilogramme"
   weight: Float!
+  "Informations concernnt le détenteur de l'équipement"
   detenteur: BsffDetenteurInput!
+  "Informations concernant l'opérateur"
   operateur: BsffOperateurInput!
+  "Le code postal du lieu de collecte"
   postalCode: String!
 }
 input BsffDetenteurInput {
