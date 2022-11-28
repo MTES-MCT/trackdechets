@@ -23,7 +23,7 @@ export async function checkCompanyAssociations(user: User): Promise<string[]> {
       }
     },
     include: {
-      company: { select: { id: true } }
+      company: { select: { id: true, siret: true, vatNumber: true } }
     }
   });
 
@@ -45,7 +45,11 @@ export async function checkCompanyAssociations(user: User): Promise<string[]> {
     });
     if (otherAdmins.length <= 0) {
       errors.push(
-        `Impossible de supprimer cet utilisateur car il est le seul administrateur de l'entreprise ${association.company.id}.`
+        `Impossible de supprimer cet utilisateur car il est le seul administrateur de l'entreprise ${
+          association.company.id
+        } (SIRET OU TVA: ${
+          association.company.siret ?? association.company.vatNumber
+        }).`
       );
     }
   }
@@ -62,7 +66,7 @@ export async function checkApplications(user: User): Promise<string[]> {
   });
   for (const application of applications) {
     errors.push(
-      `Impossible de supprimer cet utilisateur car il est le seul administrateur de l'application ${application.id}.`
+      `Impossible de supprimer cet utilisateur car il est le seul administrateur de l'application ${application.id} (${application.name}).`
     );
   }
 
@@ -142,9 +146,14 @@ export async function deleteAllUserSessions(userId: string) {
  * @param userId
  */
 async function anonymizeUserFn(userId: string): Promise<string> {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const user = await prisma.user.findUnique({
+    where: { id: userId }
+  });
   if (!user) {
     throw new UserInputError(`Utilisateur ${userId} introuvable`);
+  }
+  if (!user.isActive) {
+    throw new UserInputError(`Utilisateur ${userId} déjà inactif`);
   }
   const errors = [
     ...(await checkCompanyAssociations(user)),
