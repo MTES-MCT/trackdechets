@@ -468,6 +468,11 @@ export const dashboardFormFragment = gql`
       transporter {
         company {
           siret
+          address
+          name
+          contact
+          phone
+          mail
         }
       }
       wasteDetails {
