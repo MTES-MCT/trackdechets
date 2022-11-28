@@ -109,7 +109,10 @@ describe("Workflow machine", () => {
   test("ACCEPTED -> AWAITING_GROUP", () => {
     const nextState = machine.transition(Status.ACCEPTED, {
       type: EventType.MarkAsProcessed,
-      formUpdateInput: { processingOperationDone: "R 12" }
+      formUpdateInput: {
+        nextDestinationCompanySiret: "12345678912345",
+        processingOperationDone: "R 12"
+      }
     });
     expect(nextState.value).toEqual(Status.AWAITING_GROUP);
   });
