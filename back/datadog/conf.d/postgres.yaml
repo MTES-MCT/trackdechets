@@ -11,3 +11,7 @@ instances:
     tags:
       - service.name:postgres
       - env:%%env_DD_ENV%%
+    relations:
+      - relation_regex: '.*'
+        schemas:
+        - 'default$default'
