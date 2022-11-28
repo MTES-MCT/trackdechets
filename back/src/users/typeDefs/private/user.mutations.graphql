@@ -105,4 +105,11 @@ type Mutation {
   Révoque l'ensemble des jetons d'accès personnels
   """
   revokeAllAccessTokens: [AccessToken!]!
+
+  """
+  USAGE INTERNE
+  Tente de désactiver un compte utilisateur (soft-delete et anonymisation)
+  """
+  anonymizeUser(id: ID!): String!
+
 }
