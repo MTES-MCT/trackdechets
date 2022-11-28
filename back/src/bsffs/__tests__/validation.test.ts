@@ -1,4 +1,8 @@
-import { WasteAcceptationStatus } from "@prisma/client";
+import {
+  CompanyType,
+  CompanyVerificationStatus,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import {
   receptionSchema,
   emitterSchemaFn,
@@ -8,6 +12,21 @@ import {
   acceptationSchema,
   operationSchema
 } from "../validation";
+
+jest.mock("../../prisma", () => ({
+  company: {
+    findUnique: jest.fn(() =>
+      Promise.resolve({
+        companyTypes: [
+          CompanyType.COLLECTOR,
+          CompanyType.WASTEPROCESSOR,
+          CompanyType.TRANSPORTER
+        ],
+        verificationStatus: CompanyVerificationStatus.VERIFIED
+      })
+    )
+  }
+}));
 
 describe("emitterSchema", () => {
   const emitter = {
@@ -56,8 +75,8 @@ describe("transporterSchema", () => {
 
   const transporterSchema = transporterSchemaFn(false);
 
-  test("valid data", () => {
-    expect(transporterSchema.isValidSync(transporter)).toEqual(true);
+  test("valid data", async () => {
+    expect(await transporterSchema.isValid(transporter)).toEqual(true);
   });
 
   test("invalid SIRET", async () => {
@@ -68,7 +87,7 @@ describe("transporterSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Transporteur : le n° SIRET n'est pas au bon format"
+      "transporterCompanySiret n'est pas un numéro de SIRET valide"
     );
   });
 
@@ -98,8 +117,8 @@ describe("destinationSchema", () => {
 
   const destinationSchema = destinationSchemaFn(false);
 
-  test("valid data", () => {
-    expect(destinationSchema.isValidSync(destination)).toEqual(true);
+  test("valid data", async () => {
+    expect(await destinationSchema.isValid(destination)).toEqual(true);
   });
 
   test("invalid SIRET", async () => {
@@ -110,7 +129,7 @@ describe("destinationSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Destination : le n°SIRET n'est pas au bon format"
+      "Destinataire: Le SIRET doit faire 14 caractères numériques"
     );
   });
 
