@@ -143,14 +143,14 @@ async function getRecentRecipients(
 async function getRecentDestinationAfterTempStorage(
   defaultWhere: Prisma.FormWhereInput
 ): Promise<CompanyFavorite[]> {
-  // We over fetch to avoid a join
-  // The complete filter is applied in JS below
   const forms = await prisma.form.findMany({
     ...defaultArgs,
     where: {
       ...defaultWhere,
+      // We over fetch to avoid a join - Only check if we have recipientsSirets.
+      // In JS we will remove empty sirets and sirets which are equal to recipientCompanySiret
       recipientsSirets: {
-        isEmpty: false // Just check that we have recipientsSirets. Afterwards we will remove empty sirets and sirets which are the equal to recipientCompanySiret
+        isEmpty: false
       }
     },
     select: { recipientsSirets: true, recipientCompanySiret: true }
@@ -182,7 +182,9 @@ async function getRecentNextDestinations(
     select: { nextDestinationCompanySiret: true }
   });
 
-  const nextDestinationSirets = forms.map(f => f.nextDestinationCompanySiret);
+  const nextDestinationSirets = [
+    ...new Set(forms.map(f => f.nextDestinationCompanySiret))
+  ];
   const favorites = await Promise.all(
     nextDestinationSirets.map(async siret => {
       try {
@@ -385,26 +387,6 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
         : checkVAT(recentPartner.vatNumber, countries)?.country?.isoCode.short
     };
   });
-  // const favorites: CompanyFavorite[] = (
-  //   await getRecentPartners(company.siret, type)
-  // )
-  //   // Remove duplicates (by company siret or VAT)
-  //   .reduce<CompanyFavorite[]>((prev, cur) => {
-  //     if (
-  //       prev.find(
-  //         el =>
-  //           el.siret === cur.siret ||
-  //           (el.vatNumber && cur.vatNumber && el.vatNumber === cur.vatNumber)
-  //       ) == null
-  //     ) {
-  //       // compute codePaysEtrangerEtablissement
-  //       cur.codePaysEtrangerEtablissement = !isForeignVat(cur.vatNumber)
-  //         ? "FR"
-  //         : checkVAT(cur.vatNumber, countries)?.country?.isoCode.short;
-  //       return prev.concat([cur]);
-  //     }
-  //     return prev;
-  //   }, []);
 
   // return early
   if (favorites.length + 1 >= MAX_FAVORITES) {
