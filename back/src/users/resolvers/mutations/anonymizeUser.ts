@@ -131,6 +131,13 @@ export async function deleteUserGrants(user: User, prisma: PrismaTransaction) {
     }
   });
 }
+
+export async function deleteAllUserSessions(userId: string) {
+  const sessions = await getUserSessions(userId);
+  sessions.forEach(sessionId => sess.store.destroy(sessionId));
+  await redisClient.del(`${USER_SESSIONS_CACHE_KEY}-${userId}`);
+}
+
 /**
  * Soft-delete by anonymizing a User
  * @param userId
@@ -171,9 +178,7 @@ async function anonymizeUserFn(userId: string): Promise<string> {
             password: await hashPassword(nanoid())
           }
         });
-        const sessions = await getUserSessions(user.id);
-        sessions.forEach(sessionId => sess.store.destroy(sessionId));
-        await redisClient.del(`${USER_SESSIONS_CACHE_KEY}-${user.id}`);
+        await deleteAllUserSessions(user.id);
       },
       { timeout: PRISMA_TRANSACTION_TIMEOUT }
     );

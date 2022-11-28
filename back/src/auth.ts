@@ -15,7 +15,6 @@ import {
   Strategy as ClientPasswordStrategy,
   VerifyFunction
 } from "passport-oauth2-client-password";
-import { storeUserSessionId } from "./common/redis/users";
 import prisma from "./prisma";
 import { GraphQLContext } from "./types";
 import {
@@ -187,16 +186,20 @@ passport.use(new ClientPasswordStrategy(verifyClient));
  * Custom passport callback that pass to next middleware
  * even if authorization fails (default behavior is to return
  * 401 Not Authorized). Fine grained control of authorization
- * will be handled in resolvers.
+ * will be handled in resolvers
  */
 async function passportCallback(
   err: Error,
   req: express.Request,
   next: express.NextFunction,
-  user: Express.User
+  user: Express.User,
+  callback?: () => Promise<any>
 ) {
   if (user) {
-    req.logIn(user, { session: false }, () => storeUserSessionId(user.id, req));
+    req.logIn(user, { session: false }, null);
+    if (callback) {
+      await callback();
+    }
   }
   next(err);
 }

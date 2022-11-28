@@ -34,7 +34,7 @@ function AnonymizeUser() {
                 }
               )
             : cogoToast.error(
-                `Cet utilisateur ne peut pas être supprimé, soit il n'existe pas, soit il doit être lié à des application ou des établissements existants en base de données, tentez de les supprimer si possible et réessayer de supprimer s'il vous plaît.`,
+                `Cet utilisateur ne peut pas être supprimé, soit il n'existe pas, soit il doit être lié à des applications ou des établissements existants en base de données, tentez de les supprimer si possible et réessayer de supprimer s'il vous plaît.`,
                 { hideAfter: 3 }
               );
         }}
@@ -50,11 +50,7 @@ function AnonymizeUser() {
                   et son compte définitivement désactivé.
                 </b>
                 )
-                <Field
-                  name="id"
-                  placeholder="qsdfg12345azerty"
-                  className="td-input"
-                />
+                <Field name="id" placeholder="userId" className="td-input" />
               </label>
               <RedErrorMessage name="id" />
             </div>
@@ -64,9 +60,7 @@ function AnonymizeUser() {
               className="btn btn--primary tw-mt-1"
               disabled={loading}
             >
-              {loading
-                ? "Désactivation en cours..."
-                : "Désactiver et anonymiser"}
+              {loading ? "Suppression en cours..." : "Supprimer"}
             </button>
           </Form>
         )}
