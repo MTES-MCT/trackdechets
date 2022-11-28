@@ -508,6 +508,38 @@ describe("Mutation.createCompany", () => {
     });
   });
 
+  it("should allow to create a MONACO TRANSPORTER company with VAT number", async () => {
+    const user = await userFactory();
+    const companyInput = {
+      orgId: "FR17579668",
+      companyName: "Acme in MONACO",
+      address: "98465 quelque part à Monaco CEDEX",
+      companyTypes: ["TRANSPORTER"]
+    };
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { data } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    expect(data).toEqual({
+      createCompany: {
+        allowBsdasriTakeOverWithoutSignature: false,
+        companyTypes: ["TRANSPORTER"],
+        ecoOrganismeAgreements: [],
+        gerepId: null,
+        name: "Acme in MONACO",
+        siret: "FR17579668",
+        address: "98465 quelque part à Monaco CEDEX",
+        traderReceipt: null,
+        transporterReceipt: null,
+        vatNumber: "FR17579668"
+      }
+    });
+  });
+
   it("should return an error when creating any type but a TRANSPORTER company with VAT number", async () => {
     const user = await userFactory();
 

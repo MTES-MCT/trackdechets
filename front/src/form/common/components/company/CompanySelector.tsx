@@ -251,7 +251,7 @@ export default function CompanySelector({
       const isValidVat = isVat(clue);
 
       if (isValidVat) {
-        if (isFRVat(clue)) {
+        if (isFRVat(clue, field.value.address!!)) {
           setFieldTouched(`${field.name}.siret`);
           return setFieldError(
             `${field.name}.siret`,

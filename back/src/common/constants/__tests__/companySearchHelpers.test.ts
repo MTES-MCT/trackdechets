@@ -6,11 +6,8 @@ test("isVat", () => {
 });
 
 test("isFRVat", () => {
-  expect(isFRVat("FR.87850019464")).toEqual(false);
-  expect(isFRVat("FR 87850019464")).toEqual(false);
-  expect(isFRVat("FR87-85-0019464")).toEqual(false);
-  expect(isFRVat("FR87850019464")).toEqual(true);
-  expect(isFRVat("BE0541696005")).toEqual(false);
+  expect(isFRVat("FR87850019464", "")).toEqual(true);
+  expect(isFRVat("FR87850019464", "98000 Rue de la Mar MONACO")).toEqual(false);
 });
 
 test("not isVat", () => {
@@ -20,10 +17,12 @@ test("not isVat", () => {
 });
 
 test("not isFRVat", () => {
-  expect(isFRVat("FR.87850019464")).toEqual(false);
-  expect(isFRVat("FR 87850019464")).toEqual(false);
-  expect(isFRVat("BE 0541696005")).toEqual(false);
-  expect(isFRVat("BE-0541696005")).toEqual(false);
+  expect(isFRVat("BE0541696005", "")).toEqual(false);
+  expect(isFRVat("FR87-85-0019464", "")).toEqual(false);
+  expect(isFRVat("FR.87850019464", "")).toEqual(false);
+  expect(isFRVat("FR 87850019464", "")).toEqual(false);
+  expect(isFRVat("BE 0541696005", "")).toEqual(false);
+  expect(isFRVat("BE-0541696005", "")).toEqual(false);
 });
 
 test("isOMI", () => {
@@ -37,9 +36,10 @@ test("isOMI", () => {
 });
 
 test("isForeignVat", () => {
-  expect(isForeignVat("FR.87850019464")).toEqual(false);
-  expect(isForeignVat("FR 87850019464")).toEqual(false);
-  expect(isForeignVat("FR87-85-0019464")).toEqual(false);
-  expect(isForeignVat("FR87850019464")).toEqual(false);
-  expect(isForeignVat("BE0541696005")).toEqual(true);
+  expect(isFRVat("FR87850019464", "98000 Rue de la Mar MONACO")).toEqual(true);
+  expect(isForeignVat("FR.87850019464", "")).toEqual(false);
+  expect(isForeignVat("FR 87850019464", "")).toEqual(false);
+  expect(isForeignVat("FR87-85-0019464", "")).toEqual(false);
+  expect(isForeignVat("FR87850019464", "")).toEqual(false);
+  expect(isForeignVat("BE0541696005", "")).toEqual(true);
 });

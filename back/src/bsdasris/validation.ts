@@ -310,12 +310,7 @@ export const transporterSchema: FactorySchemaOf<
       .ensure()
       .when(
         ["transporterCompanyVatNumber", "transporterCompanyAddress"],
-        {
-          is: (tva, address),
-          then: ,
-          otherwise
-        }
-        (tva, address, schema) => {
+        ([tva, address], schema) => {
           if (!tva && context.transportSignature) {
             return schema
               .required(`Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`)

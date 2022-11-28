@@ -109,20 +109,23 @@ export const transporterCompanySiretSchema = (isDraft: boolean) =>
         return true;
       }
     )
-    .when("transporterCompanyVatNumber", (tva, schema) => {
-      if (!tva && !isDraft) {
-        return schema
-          .required(`Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`)
-          .test(
-            "is-siret",
-            "${path} n'est pas un numéro de SIRET valide",
-            value => isSiret(value)
+    .when(
+      ["transporterCompanyVatNumber", "transporterCompanyAddress"],
+      ([tva, address], schema) => {
+        if (!tva && !isDraft) {
+          return schema
+            .required(`Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`)
+            .test(
+              "is-siret",
+              "${path} n'est pas un numéro de SIRET valide",
+              value => isSiret(value)
+            );
+        }
+        if (!isDraft && tva && isFRVat(tva, address)) {
+          return schema.required(
+            "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
           );
+        }
+        return schema.nullable().notRequired();
       }
-      if (!isDraft && tva && isFRVat(tva)) {
-        return schema.required(
-          "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
-        );
-      }
-      return schema.nullable().notRequired();
-    });
+    );

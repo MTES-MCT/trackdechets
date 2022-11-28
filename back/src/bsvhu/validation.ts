@@ -19,9 +19,8 @@ import * as yup from "yup";
 import { FactorySchemaOf } from "../common/yup/configureYup";
 import { BsvhuDestinationType } from "../generated/graphql/types";
 import {
-  isVat,
   isSiret,
-  isFRVat
+  isForeignVat
 } from "../common/constants/companySearchHelpers";
 
 type Emitter = Pick<
@@ -277,12 +276,19 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
         }),
       transporterCompanyVatNumber: yup
         .string()
-        .ensure()
-        .test(
-          "is-vat",
-          "${path} n'est pas un numéro de TVA intracommunautaire valide",
-          value => !value || (isVat(value) && !isFRVat(value))
-        ),
+        .when(["transporterCompanyVatNumber", "transporterCompanyAddress"], {
+          is: (vat, address) => !vat || isForeignVat(vat, address),
+          then: schema => schema.ensure(),
+          otherwise: schema =>
+            schema
+              .ensure()
+              .required(
+                [
+                  "transporterCompanyVatNumber n'est pas un numéro de TVA intracommunautaire valide.",
+                  "Seuls les numéros non-français sont valides, les entreprises françaises doivent être identifiées par leur numéro de SIRET"
+                ].join(" ")
+              )
+        }),
       transporterCompanyAddress: yup
         .string()
         .requiredIf(

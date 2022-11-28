@@ -162,14 +162,19 @@ const intermediariesShape: SchemaOf<Omit<CompanyInput, "__typename">> =
     contact: string().required(
       "Intermédiaires: les nom et prénom de contact sont obligatoires"
     ),
-    vatNumber: string()
-      .notRequired()
-      .nullable()
-      .test(
-        "is-fr-vat",
-        "Intermédiaires: seul les numéros de TVA en France sont valides",
-        vat => !vat || (isVat(vat) && isFRVat(vat))
-      ),
+    vatNumber: string().when(["vatNumber", "address"], {
+      is: (vat, address) => isFRVat(vat, address),
+      then: schema => schema.nullable(),
+      otherwise: schema =>
+        schema
+          .ensure()
+          .required(
+            [
+              "Le numéro de TVA n'est pas un numéro de TVA français valide.",
+              "Seuls les numéros français sont valides.",
+            ].join(" ")
+          ),
+    }),
     address: string().notRequired().nullable(),
     name: string().notRequired().nullable(),
     phone: string().notRequired().nullable(),

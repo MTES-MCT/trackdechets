@@ -65,7 +65,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   let vatNumber: string;
   if (isFRVat(orgId, address)) {
     throw new UserInputError(
-      "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indique un SIRET"
+      "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indiquer un SIRET"
     );
   }
   if (isVat(orgId)) {

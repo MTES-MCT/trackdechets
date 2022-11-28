@@ -176,7 +176,7 @@ async function searchVatOrNotFound(
   vatNumber: string,
   allowFrVat = false
 ): Promise<CompanyVatSearchResult> {
-  if (!allowFrVat && isFRVat(vatNumber)) {
+  if (!allowFrVat && isFRVat(vatNumber, undefined)) {
     throw new UserInputError(
       "Une entreprise française doit être identifiée par son SIRET et pas par sa TVA intracommunautaire",
       {

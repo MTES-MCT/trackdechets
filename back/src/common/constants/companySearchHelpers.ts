@@ -85,9 +85,7 @@ export const isSiret = (clue: string): boolean =>
 export const isVat = (clue: string): boolean => {
   if (!clue) return false;
   if (clue.match(/[\W_]/gim) !== null) return false;
-  const cleanClue = clue.replace(/[\W_]+/g, "");
-  if (!cleanClue) return false;
-  return checkVAT(cleanClue, countries).isValid;
+  return checkVAT(clue, countries).isValid;
 };
 
 /**
@@ -95,9 +93,8 @@ export const isVat = (clue: string): boolean => {
  */
 export const isForeignVat = (clue: string, address: string): boolean => {
   if (!isVat(clue)) return false;
-  const cleanClue = clue.replace(/[\W_]+/g, "");
-  if (!cleanClue) return false;
-  const isForeignPrefix = !cleanClue.slice(0, 2).toUpperCase().startsWith("FR");
+  const isForeignPrefix = !clue.slice(0, 2).toUpperCase().startsWith("FR");
+  // starts with FR but it's a Monaco address
   if (!isForeignPrefix && !!address) {
     if (!!address.match(MONACO_ADDRESS_REGEXP)) {
       return true;
@@ -110,7 +107,15 @@ export const isForeignVat = (clue: string, address: string): boolean => {
  * TVA Français
  */
 export const isFRVat = (clue: string, address: string): boolean => {
-  return !isForeignVat(clue, address);
+  if (!isVat(clue)) return false;
+  const isFRPrefix = clue.slice(0, 2).toUpperCase().startsWith("FR");
+  // starts with FR but it's a Monaco address
+  if (isFRPrefix && !!address) {
+    if (!!address.match(MONACO_ADDRESS_REGEXP)) {
+      return false;
+    }
+  }
+  return isFRPrefix;
 };
 
 /**
