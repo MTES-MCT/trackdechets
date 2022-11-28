@@ -699,9 +699,14 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
       transporterReceipt: yup
         .string()
         .when(
-          ["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"],
+          [
+            "transporterIsExemptedOfReceipt",
+            "transporterCompanyVatNumber",
+            "transporterCompanyAddress"
+          ],
           {
-            is: (isExempted, vat) => isForeignVat(vat) || isExempted,
+            is: (isExempted, vat, address) =>
+              isForeignVat(vat, address) || isExempted,
             then: schema => schema.notRequired().nullable(),
             otherwise: schema =>
               schema.requiredIf(
@@ -713,9 +718,13 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
       transporterDepartment: yup
         .string()
         .when(
-          ["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"],
+          [
+            "transporterIsExemptedOfReceipt",
+            "transporterCompanyVatNumber",
+            "transporterCompanyAddress"
+          ],
           {
-            is: (isExempted, vat) => isForeignVat(vat) || isExempted,
+            is: (isExempted, vat, address) => isForeignVat(vat, address) || isExempted,
             then: schema => schema.notRequired().nullable(),
             otherwise: schema =>
               schema.requiredIf(

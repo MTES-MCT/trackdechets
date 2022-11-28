@@ -52,7 +52,10 @@ export default function Transport({ status, editionDisabled = false }) {
           />
         </label>
       </div>
-      {!isForeignVat(values?.transporter?.company?.vatNumber!!) && (
+      {!isForeignVat(
+        values.transporter?.company?.vatNumber!!,
+        values.transporter?.company?.address!!
+      )  && (
         <>
           <h4 className="form__section-heading">Autorisations</h4>
           <div

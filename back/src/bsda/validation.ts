@@ -724,13 +724,14 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
           [
             "type",
             "transporterRecepisseIsExempted",
-            "transporterCompanyVatNumber"
+            "transporterCompanyVatNumber",
+            "transporterCompanyAddress"
           ],
           {
-            is: (type, isExempted, vat) =>
+            is: (type, isExempted, vat, address) =>
               type === BsdaType.COLLECTION_2710 ||
               isExempted ||
-              isForeignVat(vat),
+              isForeignVat(vat, address),
             then: schema => schema.nullable().notRequired(),
             otherwise: schema =>
               schema.requiredIf(
@@ -745,13 +746,14 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
           [
             "type",
             "transporterRecepisseIsExempted",
-            "transporterCompanyVatNumber"
+            "transporterCompanyVatNumber",
+            "transporterCompanyAddress"
           ],
           {
-            is: (type, isExempted, vat) =>
+            is: (type, isExempted, vat, address) =>
               type === BsdaType.COLLECTION_2710 ||
               isExempted ||
-              isForeignVat(vat),
+              isForeignVat(vat, address),
             then: schema => schema.nullable().notRequired(),
             otherwise: schema =>
               schema.requiredIf(
@@ -766,13 +768,14 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
           [
             "type",
             "transporterRecepisseIsExempted",
-            "transporterCompanyVatNumber"
+            "transporterCompanyVatNumber",
+            "transporterCompanyAddress"
           ],
           {
-            is: (type, isExempted, vat) =>
+            is: (type, isExempted, vat, address) =>
               type === BsdaType.COLLECTION_2710 ||
               isExempted ||
-              isForeignVat(vat),
+              isForeignVat(vat, address),
             then: schema => schema.nullable().notRequired(),
             otherwise: schema =>
               schema.requiredIf(

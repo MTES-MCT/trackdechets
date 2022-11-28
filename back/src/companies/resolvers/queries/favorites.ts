@@ -76,7 +76,10 @@ function companyToFavorite(
     phone: company.contactPhone,
     mail: company.contactEmail,
     isRegistered: !!company,
-    codePaysEtrangerEtablissement: !isForeignVat(company.vatNumber)
+    codePaysEtrangerEtablissement: !isForeignVat(
+      company.vatNumber,
+      company.address
+    )
       ? "FR"
       : checkVAT(company.vatNumber, countries)?.country?.isoCode.short,
     transporterReceipt: company.transporterReceipt
@@ -386,7 +389,10 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
   const favorites: CompanyFavorite[] = recentPartners.map(recentPartner => {
     return {
       ...recentPartner,
-      codePaysEtrangerEtablissement: !isForeignVat(recentPartner.vatNumber)
+      codePaysEtrangerEtablissement: !isForeignVat(
+        recentPartner.vatNumber,
+        recentPartner.address
+      )
         ? "FR"
         : checkVAT(recentPartner.vatNumber, countries)?.country?.isoCode.short
     };

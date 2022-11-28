@@ -89,7 +89,8 @@ describe("Vat search VIES client", () => {
   it(`should return a ViesResult with MC for Monaco addresses`, async () => {
     const testValue = {
       vatNumber: "FR09000029023",
-      address: "73 Avenue des Papayes, Immeuble Le Cycllope, BP 627, 98013 MONACO Cedex",
+      address:
+        "73 Avenue des Papayes, Immeuble Le Cycllope, BP 627, 98013 MONACO Cedex",
       name: "ENTREPRISE MONEGASQUE",
       codePaysEtrangerEtablissement: "MC",
       statutDiffusionEtablissement: "O",

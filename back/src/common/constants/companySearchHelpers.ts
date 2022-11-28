@@ -34,6 +34,8 @@ import {
   unitedKingdom
 } from "jsvat";
 
+import { CompanySearchResult } from "../../companies/types";
+
 export const countries = [
   andorra,
   austria,
@@ -69,6 +71,8 @@ export const countries = [
   unitedKingdom
 ];
 
+export const MONACO_ADDRESS_REGEXP = /98[0-9]{3}\s+MONACO/gim;
+
 /**
  * Validateur de numéro de SIRETs
  */
@@ -83,28 +87,30 @@ export const isVat = (clue: string): boolean => {
   if (clue.match(/[\W_]/gim) !== null) return false;
   const cleanClue = clue.replace(/[\W_]+/g, "");
   if (!cleanClue) return false;
-  const isRegexValid = checkVAT(cleanClue, countries);
-  return isRegexValid.isValid;
-};
-
-/**
- * TVA Français
- */
-export const isFRVat = (clue: string): boolean => {
-  if (!isVat(clue)) return false;
-  const cleanClue = clue.replace(/[\W_]+/g, "");
-  if (!cleanClue) return false;
-  return cleanClue.slice(0, 2).toUpperCase().startsWith("FR");
+  return checkVAT(cleanClue, countries).isValid;
 };
 
 /**
  * TVA Non-Français
  */
-export const isForeignVat = (clue: string): boolean => {
+export const isForeignVat = (clue: string, address: string): boolean => {
   if (!isVat(clue)) return false;
   const cleanClue = clue.replace(/[\W_]+/g, "");
   if (!cleanClue) return false;
-  return !cleanClue.slice(0, 2).toUpperCase().startsWith("FR");
+  const isForeignPrefix = !cleanClue.slice(0, 2).toUpperCase().startsWith("FR");
+  if (!isForeignPrefix && !!address) {
+    if (!!address.match(MONACO_ADDRESS_REGEXP)) {
+      return true;
+    }
+  }
+  return isForeignPrefix;
+};
+
+/**
+ * TVA Français
+ */
+export const isFRVat = (clue: string, address: string): boolean => {
+  return !isForeignVat(clue, address);
 };
 
 /**
@@ -116,3 +122,16 @@ export const isOmi = (clue: string): boolean => {
   const clean = clue.replace(/[\W_]+/g, "");
   return clean.match(/^OMI[0-9]{7}$/gim) !== null;
 };
+
+export function getCountryFromVAT(company: CompanySearchResult): string {
+  const vatCountryCode: string = checkVAT(company.vatNumber, countries).country
+    ?.isoCode.short;
+
+  if (vatCountryCode === "FR") {
+    // check Monaco
+    if (!!company.address.match(MONACO_ADDRESS_REGEXP)) {
+      return "MC";
+    }
+  }
+  return vatCountryCode;
+}

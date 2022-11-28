@@ -5,7 +5,8 @@ import { createClientAsync, Client, IOptions } from "soap";
 import { CompanyVatSearchResult, ViesResult } from "./types";
 import {
   countries,
-  isVat
+  isVat,
+  MONACO_ADDRESS_REGEXP
 } from "../../../common/constants/companySearchHelpers";
 import logger from "../../../logging/logger";
 import { ErrorCode } from "../../../common/errors";
@@ -83,7 +84,7 @@ export const client = async (
     const address = viesResult.address === "---" ? "" : viesResult.address;
     const name = viesResult.name === "---" ? "" : viesResult.name;
     const codePaysEtrangerEtablissement = !!viesResult.address.match(
-      /98[0-9]{3}\s+MONACO/gim
+      MONACO_ADDRESS_REGEXP
     )
       ? "MC"
       : viesResult.countryCode;

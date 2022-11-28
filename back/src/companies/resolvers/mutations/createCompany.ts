@@ -63,7 +63,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   // copy VAT number to the SIRET field in order to ensure backward compatibility
   const siret = orgId;
   let vatNumber: string;
-  if (isFRVat(orgId)) {
+  if (isFRVat(orgId, address)) {
     throw new UserInputError(
       "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indique un SIRET"
     );

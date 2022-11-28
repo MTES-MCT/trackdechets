@@ -308,23 +308,31 @@ export const transporterSchema: FactorySchemaOf<
     transporterCompanySiret: yup
       .string()
       .ensure()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva && context.transportSignature) {
-          return schema
-            .required(`Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`)
-            .test(
-              "is-siret",
-              "${path} n'est pas un numéro de SIRET valide",
-              value => isSiret(value)
+      .when(
+        ["transporterCompanyVatNumber", "transporterCompanyAddress"],
+        {
+          is: (tva, address),
+          then: ,
+          otherwise
+        }
+        (tva, address, schema) => {
+          if (!tva && context.transportSignature) {
+            return schema
+              .required(`Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`)
+              .test(
+                "is-siret",
+                "${path} n'est pas un numéro de SIRET valide",
+                value => isSiret(value)
+              );
+          }
+          if (context.transportSignature && tva && isFRVat(tva, address)) {
+            return schema.required(
+              "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
             );
+          }
+          return schema.nullable().notRequired();
         }
-        if (context.transportSignature && tva && isFRVat(tva)) {
-          return schema.required(
-            "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
-          );
-        }
-        return schema.nullable().notRequired();
-      }),
+      ),
     transporterCompanyVatNumber: yup
       .string()
       .ensure()

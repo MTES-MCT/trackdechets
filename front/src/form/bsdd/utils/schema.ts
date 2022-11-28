@@ -84,17 +84,16 @@ export const transporterSchema = object().shape({
                 "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
               )
     )
-    .when(
-      "transporter.company.vatNumber",
-      (transporterCompanyVatNumber, schema) =>
-        isForeignVat(transporterCompanyVatNumber)
-          ? schema.nullable(true)
-          : schema
-              .ensure()
-              .required(
-                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
-              )
-    ),
+    .when(["transporter.company.vatNumber", "transporter.company.address"], {
+      is: (vat, address) => isForeignVat(vat, address),
+      then: schema => schema.nullable(),
+      otherwise: schema =>
+        schema
+          .ensure()
+          .required(
+            "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+          ),
+    }),
   department: string()
     .when(
       "isExemptedOfReceipt",
@@ -103,15 +102,14 @@ export const transporterSchema = object().shape({
           ? schema.nullable(true)
           : schema.required("Le département du transporteur est obligatoire")
     )
-    .when(
-      "transporter.company.vatNumber",
-      (transporterCompanyVatNumber, schema) =>
-        isForeignVat(transporterCompanyVatNumber)
-          ? schema.nullable(true)
-          : schema
-              .ensure()
-              .required("Le département du transporteur est obligatoire")
-    ),
+    .when(["transporter.company.vatNumber", "transporter.company.address"], {
+      is: (vat, address) => isForeignVat(vat, address),
+      then: schema => schema.nullable(),
+      otherwise: schema =>
+        schema
+          .ensure()
+          .required("Le département du transporteur est obligatoire"),
+    }),
   validityLimit: date().nullable(true),
   numberPlate: string().nullable(true),
   company: companySchema,
