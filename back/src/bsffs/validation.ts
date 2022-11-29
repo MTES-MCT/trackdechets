@@ -13,7 +13,7 @@ import {
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { isFinalOperation, OPERATION } from "./constants";
 import prisma from "../prisma";
-import { isVat } from "../common/constants/companySearchHelpers";
+import { isForeignVat, isVat } from "../common/constants/companySearchHelpers";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { BSFF_WASTE_CODES } from "../common/constants";
 import {
@@ -143,8 +143,13 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
         .ensure()
         .test(
           "is-vat",
-          "Transporteur : le numéro de TVA intracommunautaire n'est pas au bon format",
-          value => !value || isVat(value)
+          [
+            "{path} n'est pas un numéro de TVA intracommunautaire valide.",
+            "Seuls les numéros non-français sont valides, les entreprises françaises doivent être identifiées par leur numéro de SIRET"
+          ].join(" "),
+          (value, context) =>
+            !value ||
+            isForeignVat(value, context.parent.transporterCompanyAddress)
         ),
       transporterCompanyAddress: yup
         .string()

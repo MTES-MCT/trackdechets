@@ -675,8 +675,13 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
         .ensure()
         .test(
           "is-vat",
-          "${path} n'est pas un numéro de TVA intracommunautaire valide",
-          value => !value || isVat(value)
+          [
+            "{path} n'est pas un numéro de TVA intracommunautaire valide.",
+            "Seuls les numéros non-français sont valides, les entreprises françaises doivent être identifiées par leur numéro de SIRET"
+          ].join(" "),
+          (value, context) =>
+            !value ||
+            isForeignVat(value, context.parent.transporterCompanyAddress)
         ),
       transporterCompanyAddress: yup
         .string()

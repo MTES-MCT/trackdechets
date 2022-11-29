@@ -276,19 +276,17 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
         }),
       transporterCompanyVatNumber: yup
         .string()
-        .when(["transporterCompanyVatNumber", "transporterCompanyAddress"], {
-          is: (vat, address) => !vat || isForeignVat(vat, address),
-          then: schema => schema.ensure(),
-          otherwise: schema =>
-            schema
-              .ensure()
-              .required(
-                [
-                  "transporterCompanyVatNumber n'est pas un numéro de TVA intracommunautaire valide.",
-                  "Seuls les numéros non-français sont valides, les entreprises françaises doivent être identifiées par leur numéro de SIRET"
-                ].join(" ")
-              )
-        }),
+        .ensure()
+        .test(
+          "is-vat",
+          [
+            "{path} n'est pas un numéro de TVA intracommunautaire valide.",
+            "Seuls les numéros non-français sont valides, les entreprises françaises doivent être identifiées par leur numéro de SIRET"
+          ].join(" "),
+          (value, context) =>
+            !value ||
+            isForeignVat(value, context.parent.transporterCompanyAddress)
+        ),
       transporterCompanyAddress: yup
         .string()
         .requiredIf(

@@ -12,7 +12,7 @@ import * as yup from "yup";
 import { BSDA_WASTE_CODES } from "../common/constants";
 import {
   isSiret,
-  isForeignVat
+  isForeignVat,
 } from "../common/constants/companySearchHelpers";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { validateCompany } from "../companies/validateCompany";
@@ -849,6 +849,19 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
             return true;
           }
         ),
+      transporterCompanyVatNumber: yup
+        .string()
+        .ensure()
+        .test(
+          "is-vat",
+          [
+            "{path} n'est pas un numéro de TVA intracommunautaire valide.",
+            "Seuls les numéros non-français sont valides, les entreprises françaises doivent être identifiées par leur numéro de SIRET"
+          ].join(" "),
+          (value, context) =>
+            !value ||
+            isForeignVat(value, context.parent.transporterCompanyAddress)
+        ),
       transporterCompanyAddress: yup.string().when("type", {
         is: BsdaType.COLLECTION_2710,
         then: schema => schema.nullable(),
@@ -858,21 +871,6 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
             `Transporteur: ${MISSING_COMPANY_ADDRESS}`
           )
       }),
-      transporterCompanyVatNumber: yup
-        .string()
-        .when(["transporterCompanyVatNumber", "transporterCompanyAddress"], {
-          is: (vat, address) => isForeignVat(vat, address),
-          then: schema => schema.ensure(),
-          otherwise: schema =>
-            schema
-              .ensure()
-              .required(
-                [
-                  "transporterCompanyVatNumber n'est pas un numéro de TVA intracommunautaire valide.",
-                  "Seuls les numéros non-français sont valides, les entreprises françaises doivent être identifiées par leur numéro de SIRET"
-                ].join(" ")
-              )
-        }),
       transporterCompanyContact: yup.string().when("type", {
         is: BsdaType.COLLECTION_2710,
         then: schema => schema.nullable(),
