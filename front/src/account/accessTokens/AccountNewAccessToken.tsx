@@ -20,7 +20,6 @@ export default function AccountNewAccessToken({
     <>
       <div className="notification success">
         <p>
-          {" "}
           Un nouveau jeton d'accès a été généré ! Pensez à le copier maintenant.
           Vous ne serez plus en mesure de le consulter ultérieurement.
         </p>
