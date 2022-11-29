@@ -182,7 +182,10 @@ export default function CompanySelector({
 
     // Automatiquement écraser le champ country
     if (company.vatNumber) {
-      const vatCountryCode = getCountryFromVAT(company);
+      const vatCountryCode = getCountryFromVAT({
+        vatNumber: company.vatNumber,
+        address: company.address!!,
+      });
       if (vatCountryCode) {
         fields.country = vatCountryCode;
       }

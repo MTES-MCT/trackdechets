@@ -34,8 +34,6 @@ import {
   unitedKingdom
 } from "jsvat";
 
-import { CompanySearchResult } from "../../companies/types";
-
 export const countries = [
   andorra,
   austria,
@@ -128,15 +126,19 @@ export const isOmi = (clue: string): boolean => {
   return clean.match(/^OMI[0-9]{7}$/gim) !== null;
 };
 
-export function getCountryFromVAT(company: CompanySearchResult): string {
-  const vatCountryCode: string = checkVAT(company.vatNumber, countries).country
-    ?.isoCode.short;
-
-  if (vatCountryCode === "FR") {
-    // check Monaco
-    if (!!company.address.match(MONACO_ADDRESS_REGEXP)) {
-      return "MC";
+export function getCountryFromVAT(company: {
+  vatNumber?: string;
+  address?: string;
+}): string | void {
+  if (company.vatNumber) {
+    const vatCountryCode = checkVAT(company.vatNumber, countries).country
+      ?.isoCode.short;
+    if (company.address && vatCountryCode === "FR") {
+      // check Monaco
+      if (!!company.address.match(MONACO_ADDRESS_REGEXP)) {
+        return "MC";
+      }
     }
+    return vatCountryCode;
   }
-  return vatCountryCode;
 }
