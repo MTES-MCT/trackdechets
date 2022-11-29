@@ -1,4 +1,10 @@
-import { isForeignVat, isFRVat, isOmi, isVat } from "../companySearchHelpers";
+import {
+  isForeignVat,
+  isFRVat,
+  isOmi,
+  isVat,
+  luhnCheck
+} from "../companySearchHelpers";
 
 test("isVat", () => {
   expect(isVat("FR87850019464")).toEqual(true);
@@ -42,4 +48,10 @@ test("isForeignVat", () => {
   expect(isForeignVat("FR87-85-0019464")).toEqual(false);
   expect(isForeignVat("FR87850019464")).toEqual(false);
   expect(isForeignVat("BE0541696005")).toEqual(true);
+});
+
+test("luhnCheck", () => {
+  expect(luhnCheck("4485275742308327")).toBeTruthy();
+  expect(luhnCheck(6011329933655299)).toBeTruthy();
+  expect(luhnCheck(123456789)).toBeFalsy();
 });
