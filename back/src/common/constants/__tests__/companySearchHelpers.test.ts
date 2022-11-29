@@ -12,13 +12,15 @@ test("isFRVat", () => {
   );
 });
 
-test("not isVat", () => {
+test("malformated not isVat", () => {
   expect(isVat("BE-05-41696005")).toEqual(false);
   expect(isVat("BE 05 41696005")).toEqual(false);
   expect(isVat("BE.05.41696005")).toEqual(false);
+  expect(isVat("FR87-85-0019464")).toEqual(false);
+  expect(isVat("FR.87850019464")).toEqual(false);
 });
 
-test("not isFRVat", () => {
+test("foreign or malformated is not isFRVat", () => {
   expect(isFRVat("BE0541696005", "")).toEqual(false);
   expect(isFRVat("FR87-85-0019464", "")).toEqual(false);
   expect(isFRVat("FR.87850019464", "")).toEqual(false);
@@ -37,7 +39,7 @@ test("isOMI", () => {
   expect(isOmi("OMI8785001")).toEqual(true);
 });
 
-test("isForeignVat", () => {
+test("isForeignVat: Monaco or foreign or malformated", () => {
   expect(
     isForeignVat("FR87850019464", "98000 Rue de la Mer 98000 MONACO CEDEX")
   ).toEqual(true);
