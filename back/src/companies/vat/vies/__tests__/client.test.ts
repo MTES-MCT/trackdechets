@@ -107,7 +107,7 @@ describe("Vat search VIES client", () => {
       etatAdministratif: "A"
     };
     checkVatAsyncMock.mockResolvedValueOnce([testValue]);
-    const res = await client("FR69892135112", createClientTest);
+    const res = await client("FR71814312724", createClientTest);
     expect(res).toStrictEqual(testValue);
   });
 

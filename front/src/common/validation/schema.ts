@@ -26,7 +26,7 @@ export const companySchema = object().shape({
     .ensure()
     .test(
       "is-vat",
-      "{path} n'est pas un numéro de TVA intracommunautaire valide.",
+      "${path} n'est pas un numéro de TVA intracommunautaire valide.",
       value => !value || isVat(value)
     ),
   address: string().required(),

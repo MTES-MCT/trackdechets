@@ -325,7 +325,7 @@ export const transporterSchema: FactorySchemaOf<
       .test(
         "is-vat",
         [
-          "{path} n'est pas un numéro de TVA intracommunautaire valide.",
+          "${path} n'est pas un numéro de TVA intracommunautaire valide.",
           "Seuls les numéros non-français sont valides, les entreprises françaises doivent être identifiées par leur numéro de SIRET"
         ].join(" "),
         (value, context) =>
