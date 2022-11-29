@@ -59,7 +59,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     companyInput.ecoOrganismeAgreements?.map(a => a.href) || [];
 
   // clean orgId
-  const orgId = companyInput.orgId.replace(/\s+|\.+/g, "");
+  const orgId = companyInput.orgId.replace(/[\W_]+/g, "");
   // copy VAT number to the SIRET field in order to ensure backward compatibility
   const siret = orgId;
   let vatNumber: string;

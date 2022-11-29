@@ -4,7 +4,7 @@ import { registerUpdater, Updater } from "./helper/helper";
 
 const BATCH_SIZE = 1000;
 
-@registerUpdater("Migrate events", `Migrate Psql events to Mongo`, true)
+@registerUpdater("Migrate events", `Migrate Psql events to Mongo`, false)
 export class SetContactsUpdater implements Updater {
   async run() {
     console.info("Starting script to migrate psql events...");

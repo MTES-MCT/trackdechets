@@ -28,8 +28,8 @@ const SIRET_OR_VAT_ERROR =
 export async function searchCompany(
   clue: string
 ): Promise<CompanySearchResult> {
-  // remove whitespaces
-  const cleanClue = clue.replace(/\s/g, "").toUpperCase();
+  // remove non alphanumeric
+  const cleanClue = clue.replace(/[\W_]+/g, "").toUpperCase();
   if (!cleanClue || (!isSiret(cleanClue) && !isVat(cleanClue))) {
     throw new UserInputError(SIRET_OR_VAT_ERROR, {
       invalidArgs: ["siret", "clue"]
@@ -114,6 +114,7 @@ export const makeSearchCompanies =
         )
         .catch(_ => []);
     }
+    // fuzzy searching when another text clue is sent
     return decoratedSearchCompanies(clue, department).then(async results => {
       let existingCompanies = [];
       if (results.length) {
