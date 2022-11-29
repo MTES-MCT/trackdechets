@@ -5,8 +5,7 @@ import {
   Consistence,
   QuantityType,
   WasteAcceptationStatus,
-  EmitterType,
-  Status
+  EmitterType
 } from "@prisma/client";
 import * as QRCode from "qrcode";
 import concatStream from "concat-stream";
@@ -35,7 +34,6 @@ import { getFullForm } from "../database";
 import prisma from "../../prisma";
 import { buildAddress } from "../../companies/sirene/utils";
 import { packagingsEqual } from "../../common/constants/formHelpers";
-import { CancelationStamp } from "../../common/pdf/components/CancelationStamp";
 
 type ReceiptFieldsProps = Partial<
   Pick<GraphQLForm["transporter"], "department" | "receipt" | "validityLimit">
@@ -362,7 +360,6 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                   {groupedIn.map(bsd => bsd.readableId)}
                 </>
               )}
-              {form.status === Status.CANCELED && <CancelationStamp />}
             </p>
           </div>
         </div>
