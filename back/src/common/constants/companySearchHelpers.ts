@@ -94,7 +94,8 @@ function siretValidatorLaPosteGroupe(number) {
 export const isSiret = (clue: string): boolean => {
   if (!clue) return false;
   const cleanClue = clue.replace(/[\W_]+/g, "");
-  if (!cleanClue || !/^[0-9]{14}$/.test(cleanClue)) return false;
+  if (!cleanClue || !/^[0-9]{14}$/.test(cleanClue) || /^0{14}$/.test(cleanClue))
+    return false;
   const luhnValid = luhn(cleanClue);
   if (luhnValid) return true;
   else if (siretValidatorLaPosteGroupe(cleanClue)) return true;
