@@ -468,6 +468,7 @@ export const dashboardFormFragment = gql`
       transporter {
         company {
           siret
+          vatNumber
           address
           name
           contact
