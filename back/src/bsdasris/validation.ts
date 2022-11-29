@@ -15,7 +15,6 @@ import {
 } from "../generated/graphql/types";
 import {
   isSiret,
-  isFRVat,
   isForeignVat
 } from "../common/constants/companySearchHelpers";
 import {

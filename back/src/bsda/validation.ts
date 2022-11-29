@@ -12,7 +12,7 @@ import * as yup from "yup";
 import { BSDA_WASTE_CODES } from "../common/constants";
 import {
   isSiret,
-  isForeignVat,
+  isForeignVat
 } from "../common/constants/companySearchHelpers";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { validateCompany } from "../companies/validateCompany";
