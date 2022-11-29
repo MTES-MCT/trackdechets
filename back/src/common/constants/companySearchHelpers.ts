@@ -33,7 +33,6 @@ import {
   switzerland,
   unitedKingdom
 } from "jsvat";
-import luhn from "fast-luhn";
 
 export const countries = [
   andorra,
@@ -70,23 +69,23 @@ export const countries = [
   unitedKingdom
 ];
 
-function siretValidatorLaPosteGroupe(number) {
-  const array = [0, 2, 4, 6, 8, 1, 3, 5, 7, 9];
-  if (typeof number !== "string") throw new TypeError("Expected string input");
-  if (!number) return false;
-  let length = number.length;
-  let bit = 1;
-  let sum = 0;
-  let value;
-
-  while (length) {
-    value = parseInt(number.charAt(--length), 10);
-    bit ^= 1;
-    sum += bit ? array[value] : value;
-  }
-
-  return sum % 5 === 0;
-}
+/**
+ * Implements the Luhn Algorithm used to validate SIRET or SIREN of identification numbers
+ */
+export const luhnCheck = (num: string | number, modulo = 10) => {
+  const arr = (num + "")
+    .split("")
+    .reverse()
+    .map(x => parseInt(x));
+  const lastDigit = arr.shift();
+  let sum = arr.reduce(
+    (acc, val, i) =>
+      i % 2 !== 0 ? acc + val : acc + ((val *= 2) > 9 ? val - 9 : val),
+    0
+  );
+  sum += lastDigit;
+  return sum % modulo === 0;
+};
 
 /**
  * Validateur de numéro de SIRETs
@@ -96,9 +95,9 @@ export const isSiret = (clue: string): boolean => {
   const cleanClue = clue.replace(/[\W_]+/g, "");
   if (!cleanClue || !/^[0-9]{14}$/.test(cleanClue) || /^0{14}$/.test(cleanClue))
     return false;
-  const luhnValid = luhn(cleanClue);
+  const luhnValid = luhnCheck(cleanClue);
   if (luhnValid) return true;
-  else if (siretValidatorLaPosteGroupe(cleanClue)) return true;
+  else if (luhnCheck(cleanClue, 5)) return true;
   return false;
 };
 
