@@ -312,10 +312,14 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
           .nullable(true),
         otherwise: yup
           .string()
-          .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
           .requiredIf(
             context.emissionSignature,
             `Émetteur: ${MISSING_COMPANY_SIRET}`
+          )
+          .test(
+            "is-siret",
+            "${path} n'est pas un numéro de SIRET valide",
+            value => isSiret(value)
           )
       }),
       emitterCompanyAddress: yup
@@ -401,10 +405,14 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           ),
       otherwise: schema =>
         schema
-          .length(14, `Entreprise de travaux: ${INVALID_SIRET_LENGTH}`)
           .requiredIf(
             context.emissionSignature,
             `Entreprise de travaux: ${MISSING_COMPANY_SIRET}`
+          )
+          .test(
+            "is-siret",
+            "${path} n'est pas un numéro de SIRET valide",
+            value => isSiret(value)
           )
     }),
     workerCompanyAddress: yup.string().when(["type", "workerIsDisabled"], {
@@ -512,6 +520,11 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         .requiredIf(
           context.emissionSignature,
           `Entreprise de destination: ${MISSING_COMPANY_SIRET}`
+        )
+        .test(
+          "is-siret",
+          "${path} n'est pas un numéro de SIRET valide",
+          value => isSiret(value)
         )
         .test(
           "is-recipient-registered-with-right-profile",
@@ -822,6 +835,11 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
                 .requiredIf(
                   context.workSignature,
                   `Transporteur: ${MISSING_COMPANY_SIRET}`
+                )
+                .test(
+                  "is-siret",
+                  "${path} n'est pas un numéro de SIRET valide",
+                  value => isSiret(value)
                 );
             })
         })

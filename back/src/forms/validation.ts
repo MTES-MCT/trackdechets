@@ -733,11 +733,13 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
       .string()
       .notRequired()
       .nullable()
-      .matches(/^$|^\d{14}$/, {
-        message: `Négociant: ${INVALID_SIRET_LENGTH}`
-      }),
+      .test(
+        "is-siret",
+        "Négociant ${path} n'est pas un numéro de SIRET valide",
+        value => !value || isSiret(value)
+      ),
     traderCompanyName: yup.string().when("traderCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => isSiret(siret),
       then: schema =>
         schema
           .ensure()
@@ -745,7 +747,7 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     traderCompanyAddress: yup.string().when("traderCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => isSiret(siret),
       then: schema =>
         schema
           .ensure()
@@ -753,7 +755,7 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     traderCompanyContact: yup.string().when("traderCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => isSiret(siret),
       then: schema =>
         schema
           .ensure()
@@ -761,7 +763,7 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     traderCompanyPhone: yup.string().when("traderCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => isSiret(siret),
       then: schema =>
         schema
           .ensure()
@@ -772,7 +774,7 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
       .string()
       .email()
       .when("traderCompanySiret", {
-        is: siret => siret?.length === 14,
+        is: siret => isSiret(siret),
         then: schema =>
           schema
             .ensure()
@@ -780,7 +782,7 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
         otherwise: schema => schema.notRequired().nullable()
       }),
     traderReceipt: yup.string().when("traderCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => isSiret(siret),
       then: schema =>
         schema
           .ensure()
@@ -788,7 +790,7 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     traderDepartment: yup.string().when("traderCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => isSiret(siret),
       then: schema =>
         schema
           .ensure()
@@ -796,7 +798,7 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     traderValidityLimit: yup.date().when("traderCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => isSiret(siret),
       then: schema =>
         schema.requiredIf(!isDraft, "Négociant : Date de validité obligatoire"),
       otherwise: schema => schema.notRequired().nullable()
@@ -809,11 +811,13 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       .string()
       .notRequired()
       .nullable()
-      .matches(/^$|^\d{14}$/, {
-        message: `Courtier : ${INVALID_SIRET_LENGTH}`
-      }),
+      .test(
+        "is-siret",
+        "Courtier ${path} n'est pas un numéro de SIRET valide",
+        value => !value || isSiret(value)
+      ),
     brokerCompanyName: yup.string().when("brokerCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => isSiret(siret),
       then: schema =>
         schema
           .ensure()
@@ -821,7 +825,7 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     brokerCompanyAddress: yup.string().when("brokerCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => isSiret(siret),
       then: schema =>
         schema
           .ensure()
@@ -829,7 +833,7 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     brokerCompanyContact: yup.string().when("brokerCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => isSiret(siret),
       then: schema =>
         schema
           .ensure()
@@ -837,7 +841,7 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     brokerCompanyPhone: yup.string().when("brokerCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => isSiret(siret),
       then: schema =>
         schema
           .ensure()
@@ -845,7 +849,7 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     brokerCompanyMail: yup.string().when("brokerCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => isSiret(siret),
       then: schema =>
         schema
           .ensure()
@@ -853,7 +857,7 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     brokerReceipt: yup.string().when("brokerCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => isSiret(siret),
       then: schema =>
         schema
           .ensure()
@@ -861,7 +865,7 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     brokerDepartment: yup.string().when("brokerCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => isSiret(siret),
       then: schema =>
         schema
           .ensure()
@@ -869,7 +873,7 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     brokerValidityLimit: yup.date().when("brokerCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => isSiret(siret),
       then: schema =>
         schema.requiredIf(!isDraft, "Courtier : Date de validité obligatoire"),
       otherwise: schema => schema.notRequired().nullable()
@@ -1005,9 +1009,10 @@ const withNextDestination = (required: boolean) =>
               .required(
                 `Destination ultérieure prévue : ${MISSING_COMPANY_SIRET}`
               )
-              .length(
-                14,
-                `Destination ultérieure prévue : ${INVALID_SIRET_LENGTH}`
+              .test(
+                "is-siret",
+                "${path} n'est pas un numéro de SIRET valide",
+                value => isSiret(value)
               )
           : schema.notRequired().nullable();
       }),
