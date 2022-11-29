@@ -511,9 +511,9 @@ describe("Mutation.createCompany", () => {
   it("should allow to create a MONACO TRANSPORTER company with VAT number", async () => {
     const user = await userFactory();
     const companyInput = {
-      orgId: "FR17579668",
+      orgId: "FR71814312724",
       companyName: "Acme in MONACO",
-      address: "98465 quelque part à Monaco CEDEX",
+      address: "quelque part à 98465 Monaco CEDEX",
       companyTypes: ["TRANSPORTER"]
     };
 
@@ -531,11 +531,11 @@ describe("Mutation.createCompany", () => {
         ecoOrganismeAgreements: [],
         gerepId: null,
         name: "Acme in MONACO",
-        siret: "FR17579668",
-        address: "98465 quelque part à Monaco CEDEX",
+        siret: "FR71814312724",
+        address: "quelque part à 98465 Monaco CEDEX",
         traderReceipt: null,
         transporterReceipt: null,
-        vatNumber: "FR17579668"
+        vatNumber: "FR71814312724"
       }
     });
   });
