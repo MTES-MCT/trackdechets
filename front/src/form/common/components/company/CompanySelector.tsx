@@ -228,7 +228,7 @@ export default function CompanySelector({
     const results = [...reshapedSearchResults, ...reshapedFavorites];
     setSearchResults(results);
 
-    // If the form is empty, we auto-select it.
+    // If the form is empty, we auto-select the first result.
     if (
       initialAutoSelectFirstCompany &&
       !optional &&
