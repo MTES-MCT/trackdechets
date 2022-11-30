@@ -1,6 +1,7 @@
 import { flattenFormInput } from "../converter";
 import { nullIfNoValues, safeInput, chain } from "../../common/converter";
 import { FormInput, WasteDetailsInput } from "../../generated/graphql/types";
+import { siretify } from "../../__tests__/factories";
 
 test("nullIfNoValues", () => {
   let obj = { a: null, b: null };
@@ -77,7 +78,7 @@ describe("flattenFormInput", () => {
           infos: "Site de stockage de boues"
         },
         company: {
-          siret: "11111111111111",
+          siret: siretify(1),
           name: "Boues and Co",
           address: "1 rue de paradis, 75010 PARIS",
           contact: "Jean Dupont de la Boue",
@@ -91,7 +92,7 @@ describe("flattenFormInput", () => {
       recipient: {
         processingOperation: "D 10",
         company: {
-          siret: "22222222222222",
+          siret: siretify(2),
           name: "Incinérateur du Grand Est",
           address: "1 avenue de Colmar 67100 Strasbourg",
           contact: "Thomas Largeron",

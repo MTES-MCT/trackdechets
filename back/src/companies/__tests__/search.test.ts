@@ -1,6 +1,7 @@
 import { makeSearchCompanies, searchCompany } from "../search";
 import { ErrorCode } from "../../common/errors";
 import prisma from "../../prisma";
+import { siretify } from "../../__tests__/factories";
 
 const createInput = {
   siret: "00000012345698",
@@ -88,8 +89,9 @@ describe("searchCompanies", () => {
   });
 
   it("should call searchCompany when the clue is formatted like a SIRET", async () => {
+    const siret = siretify(1);
     const company = {
-      siret: "11111111111111",
+      siret,
       name: "ACME",
       naf: "NAF",
       libelleNaf: "Autres activités",
@@ -102,14 +104,14 @@ describe("searchCompanies", () => {
       codePaysEtrangerEtablissement: "FR"
     };
     searchCompanyMock.mockResolvedValue(company);
-    const companies = await searchCompanies("11111111111111");
-    expect(searchCompanyMock).toHaveBeenCalledWith("11111111111111");
+    const companies = await searchCompanies(siret);
+    expect(searchCompanyMock).toHaveBeenCalledWith(siret);
     expect(companies[0]).toStrictEqual(company);
   });
 
   it("should call searchCompany when the clue is formatted like a VAT number", async () => {
     const company = {
-      siret: "11111111111111",
+      siret: siretify(1),
       vatNumber: "IT09301420155",
       name: "ACME",
       naf: "NAF",
@@ -127,8 +129,9 @@ describe("searchCompanies", () => {
   });
 
   it(`should not return closed companies when searching by SIRET`, async () => {
+    const siret = siretify(1);
     searchCompanyMock.mockResolvedValue({
-      siret: "11111111111111",
+      siret,
       name: "ACME",
       naf: "NAF",
       libelleNaf: "Autres activités",
@@ -139,15 +142,16 @@ describe("searchCompanies", () => {
       addressPostalCode: "13001",
       etatAdministratif: "F"
     });
-    const companies = await searchCompanies("11111111111111");
-    expect(searchCompanyMock).toHaveBeenCalledWith("11111111111111");
+    const companies = await searchCompanies(siret);
+    expect(searchCompanyMock).toHaveBeenCalledWith(siret);
     expect(companies).toStrictEqual([]);
   });
 
   it(`should return [] if SIRET does not exist when searching by SIRET`, async () => {
+    const siret = siretify(1);
     searchCompanyMock.mockRejectedValue(new Error("Not found"));
-    const companies = await searchCompanies("11111111111111");
-    expect(searchCompanyMock).toHaveBeenCalledWith("11111111111111");
+    const companies = await searchCompanies(siret);
+    expect(searchCompanyMock).toHaveBeenCalledWith(siret);
     expect(companies).toStrictEqual([]);
   });
 });

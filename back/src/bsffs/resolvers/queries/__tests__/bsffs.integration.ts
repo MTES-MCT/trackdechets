@@ -5,7 +5,8 @@ import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import { Query, QueryBsffsArgs } from "../../../../generated/graphql/types";
 import {
   userWithCompanyFactory,
-  companyAssociatedToExistingUserFactory
+  companyAssociatedToExistingUserFactory,
+  siretify
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { fullBsff } from "../../../fragments";
@@ -284,24 +285,19 @@ describe("Query.bsffs", () => {
 
   it("should work with a nested _or filter", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff1 = await createBsff(
-      { emitter },
-      {
-        destinationCompanySiret: "00000000000000"
-      }
-    );
-    const bsff2 = await createBsff(
-      { emitter },
-      {
-        destinationCompanySiret: "11111111111111"
-      }
-    );
-    await createBsff(
-      { emitter },
-      {
-        destinationCompanySiret: "22222222222222"
-      }
-    );
+
+    const newDestination = {
+      destinationCompanySiret: siretify(1)
+    };
+    const bsff1 = await createBsff({ emitter }, newDestination);
+    const newDestination_1 = {
+      destinationCompanySiret: siretify(2)
+    };
+    const bsff2 = await createBsff({ emitter }, newDestination_1);
+    const newDestination_2 = {
+      destinationCompanySiret: siretify(3)
+    };
+    await createBsff({ emitter }, newDestination_2);
 
     const { query } = makeClient(emitter.user);
     const { data } = await query<Pick<Query, "bsffs">, QueryBsffsArgs>(
@@ -311,10 +307,18 @@ describe("Query.bsffs", () => {
           where: {
             _or: [
               {
-                destination: { company: { siret: { _eq: "00000000000000" } } }
+                destination: {
+                  company: {
+                    siret: { _eq: newDestination.destinationCompanySiret }
+                  }
+                }
               },
               {
-                destination: { company: { siret: { _eq: "11111111111111" } } }
+                destination: {
+                  company: {
+                    siret: { _eq: newDestination_1.destinationCompanySiret }
+                  }
+                }
               }
             ]
           }

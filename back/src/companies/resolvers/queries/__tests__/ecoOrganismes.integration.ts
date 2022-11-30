@@ -1,6 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Query } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
+import { siretify } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
 const ECO_ORGANISMES = `query { ecoOrganismes { siret } }`;
@@ -10,7 +11,7 @@ describe("query ecoOrgansime", () => {
 
   it("should return list of registered ecoOrganismes", async () => {
     const { query } = makeClient();
-    const siret = "11111111111111";
+    const siret = siretify(1);
     await prisma.ecoOrganisme.create({
       data: { siret, name: "", address: "" }
     });

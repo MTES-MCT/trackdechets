@@ -3,6 +3,7 @@ import * as searchCompanyDecorated from "../searchCompany";
 import { searchCompany } from "../../search";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { AnonymousCompanyError } from "../errors";
+import { siretify } from "../../../__tests__/factories";
 
 const searchCompanySpy = jest.spyOn(searchCompanyDecorated, "default");
 // Mock the fact a siret is not found in SIRENE API's
@@ -20,7 +21,7 @@ describe("searchCompany", () => {
   it("should return anonymous company if it exists", async () => {
     // do not bypass sirene client call
     process.env.NODE_ENV = "production";
-    const siret = "11111111111111";
+    const siret = siretify(1);
     const anonymousCompany = await prisma.anonymousCompany.create({
       data: {
         siret,

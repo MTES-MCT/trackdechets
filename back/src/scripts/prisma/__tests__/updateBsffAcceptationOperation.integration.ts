@@ -2,6 +2,7 @@ import { BsffPackagingType, WasteAcceptationStatus } from "@prisma/client";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import prisma from "../../../prisma";
+import { siretify } from "../../../__tests__/factories";
 import updateBsffAcceptationOperation from "../updateBsffAcceptationOperation";
 
 describe("updateBsffPackagingOperationAcceptation", () => {
@@ -40,7 +41,7 @@ describe("updateBsffPackagingOperationAcceptation", () => {
         destinationOperationSignatureDate: new Date("2022-10-03"),
         destinationOperationSignatureAuthor: "Arya Stark",
         destinationOperationNextDestinationCompanyName: "Incinérateur",
-        destinationOperationNextDestinationCompanySiret: "11111111111111",
+        destinationOperationNextDestinationCompanySiret: siretify(1),
         destinationOperationNextDestinationCompanyAddress: "1 rue des héros",
         destinationOperationNextDestinationCompanyContact: "Tyrion Lannister",
         destinationOperationNextDestinationCompanyMail:
