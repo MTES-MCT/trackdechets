@@ -72,18 +72,18 @@ export const countries = [
 /**
  * Implements the Luhn Algorithm used to validate SIRET or SIREN of identification numbers
  */
-export const luhnCheck = (num: string | number, modulo = 10) => {
+export const luhnCheck = (num: string | number, modulo = 10): boolean => {
   const arr = (num + "")
     .split("")
     .reverse()
-    .map(x => parseInt(x));
+    .map(x => parseInt(x, 10));
   const lastDigit = arr.shift();
   let sum = arr.reduce(
     (acc, val, i) =>
       i % 2 !== 0 ? acc + val : acc + ((val *= 2) > 9 ? val - 9 : val),
     0
   );
-  sum += lastDigit;
+  sum += lastDigit ?? 0;
   return sum % modulo === 0;
 };
 
@@ -97,8 +97,8 @@ export const isSiret = (clue: string): boolean => {
     return false;
   const luhnValid = luhnCheck(cleanClue);
   if (luhnValid) return true;
-  else if (luhnCheck(cleanClue, 5)) return true;
-  return false;
+  // try with "5" (default is 10) for La Poste Groupe SIRET
+  return luhnCheck(cleanClue, 5);
 };
 
 /**
