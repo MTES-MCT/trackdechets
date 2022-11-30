@@ -1,7 +1,7 @@
 import { BsdaConsistence, BsdaType, Prisma } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
-import { upsertBaseSiret } from "../../__tests__/factories";
+import { siretify, upsertBaseSiret } from "../../__tests__/factories";
 
 export const bsdaFactory = async ({
   opt = {}

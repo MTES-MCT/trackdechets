@@ -735,7 +735,7 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
       .nullable()
       .test(
         "is-siret",
-        "Négociant ${path} n'est pas un numéro de SIRET valide",
+        "Négociant: ${originalValue} n'est pas un numéro de SIRET valide",
         value => !value || isSiret(value)
       ),
     traderCompanyName: yup.string().when("traderCompanySiret", {
@@ -813,7 +813,7 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       .nullable()
       .test(
         "is-siret",
-        "Courtier ${path} n'est pas un numéro de SIRET valide",
+        "Courtier: ${originalValue} n'est pas un numéro de SIRET valide",
         value => !value || isSiret(value)
       ),
     brokerCompanyName: yup.string().when("brokerCompanySiret", {
@@ -1011,7 +1011,7 @@ const withNextDestination = (required: boolean) =>
               )
               .test(
                 "is-siret",
-                "${path} = ${originalValue} n'est pas un numéro de SIRET valide",
+                "Destination ultérieure prévue : Le SIRET n'est pas valide",
                 value => isSiret(value)
               )
           : schema.notRequired().nullable();
