@@ -120,9 +120,10 @@ function getHasNextStepFilter(siret: string, hasNextStep?: boolean | null) {
               },
               {
                 AND: [
-                  {
-                    forwardedIn: { recipientCompanySiret: siret } // installation de destination finale
-                  },
+                  // Installation de destination finale
+                  // No join equivalent to {forwardedIn: { recipientCompanySiret: siret }}
+                  { recipientsSirets: { has: siret } },
+                  { recipientCompanySiret: { not: siret } },
                   {
                     status: {
                       in: [
