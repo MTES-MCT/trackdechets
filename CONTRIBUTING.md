@@ -20,6 +20,9 @@
     - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
     - [Nourrir la base de donnée avec des données par défaut](#nourrir-la-base-de-donnée-avec-des-données-par-défaut)
     - [Ajouter une nouvelle icône](#ajouter-une-nouvelle-icône)
+   - [Dépannage](#dépannage)
+      - [La base de donnée ne se crée pas](#la-base-de-donnée-ne-se-crée-pas)
+      - [Je n'arrive pas à (ré)indexer Elastic Search](#je-narrive-pas-à-réindexer-elastic-search)
 
 ## Mise en route
 
