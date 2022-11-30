@@ -17,7 +17,8 @@ const options = [
   },
   {
     value: BsffType.TracerFluide,
-    label: "Un autre détenteur de déchets",
+    label:
+      "Un détenteur de contenant(s) de déchets de fluides à tracer (sans fiche d'intervention)",
     tooltip:
       "Exemple : Centre VHU (fluides retirés des VHU), installation qui trace un contenant après rupture de traçabilité",
   },
