@@ -269,7 +269,7 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
           if (!tva && context.transportSignature) {
             return schema.test(
               "is-siret",
-              "${path} n'est pas un numéro de SIRET valide",
+              "${path} = ${originalValue} n'est pas un numéro de SIRET valide",
               value => isSiret(value)
             );
           }

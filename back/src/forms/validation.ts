@@ -1011,7 +1011,7 @@ const withNextDestination = (required: boolean) =>
               )
               .test(
                 "is-siret",
-                "${path} n'est pas un numéro de SIRET valide",
+                "${path} = ${originalValue} n'est pas un numéro de SIRET valide",
                 value => isSiret(value)
               )
           : schema.notRequired().nullable();

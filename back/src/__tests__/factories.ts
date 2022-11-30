@@ -1,4 +1,5 @@
 import { hash } from "bcrypt";
+import { faker } from "@faker-js/faker";
 import getReadableId from "../forms/readableId";
 import {
   CompanyType,
@@ -35,19 +36,11 @@ export const userFactory = async (
 };
 
 /**
- * Left pad a given index with 0s
+ * Return a random valid siret
  * @param index numerical index
  */
 function siretify(index) {
-  const siretLength = 14;
-  const siret = `${index}`;
-  if (siret.length === siretLength) {
-    return siret;
-  }
-  if (siret.length > siretLength) {
-    throw Error("Generated siret is too long");
-  }
-  return siret.padStart(14, "9");
+  return faker.helpers.replaceCreditCardSymbols(index + "############L");
 }
 
 /**
