@@ -314,7 +314,7 @@ export const transporterSchema: FactorySchemaOf<
             .required(`Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`)
             .test(
               "is-siret",
-              "${path} n'est pas un numéro de SIRET valide",
+              "${path} = ${originalValue} n'est pas un numéro de SIRET valide",
               value => isSiret(value)
             );
         }
