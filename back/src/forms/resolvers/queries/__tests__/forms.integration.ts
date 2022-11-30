@@ -5,6 +5,7 @@ import prisma from "../../../../prisma";
 import {
   companyFactory,
   formFactory,
+  siretify,
   transportSegmentFactory,
   userFactory,
   userWithCompanyFactory
@@ -104,7 +105,7 @@ describe("Query.forms", () => {
 
   it("should return forms for which user is emitter or receiver", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
-
+    const recipientCompanySiret = siretify(5);
     // 4 forms
     // - 2 as recipient
     // - 1 as emitter
@@ -127,8 +128,8 @@ describe("Query.forms", () => {
       },
       {
         recipientCompanyName: "a name",
-        recipientCompanySiret: "a siret",
-        recipientsSirets: ["a siret"]
+        recipientCompanySiret,
+        recipientsSirets: [recipientCompanySiret]
       }
     ]);
 
@@ -856,13 +857,13 @@ describe("Integration / Forms query for transporters", () => {
         }
       }
     );
-
+    const transporterCompanySiret = siretify(3);
     // create a form whose first tranporter is another one
     const form = await formFactory({
       ownerId: owner.id,
       opt: {
-        transporterCompanySiret: "6543",
-        transportersSirets: ["6543", transporter.siret], // pre populate with the transport segment siret
+        transporterCompanySiret,
+        transportersSirets: [transporterCompanySiret, transporter.siret], // pre populate with the transport segment siret
         status: "SEALED"
       }
     });

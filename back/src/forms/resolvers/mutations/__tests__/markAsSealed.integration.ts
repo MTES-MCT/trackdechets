@@ -65,7 +65,7 @@ const formdataForPrivateOrShip = {
   recipientCompanyMail: "recipient@td.io",
   recipientCompanyName: "WASTE COMPANY",
   recipientCompanyPhone: "06 18 76 02 99",
-  recipientCompanySiret: "56847895684123",
+  recipientCompanySiret: siretify(1),
   recipientProcessingOperation: "D 6",
   sentAt: "2019-11-20T00:00:00.000Z",
   sentBy: "signe",
@@ -689,7 +689,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: "12345654327896"
+        recipientCompanySiret: siretify(3)
       }
     });
     const { mutate } = makeClient(user);
@@ -756,7 +756,7 @@ describe("Mutation.markAsSealed", () => {
       where: { id: form.id },
       data: {
         forwardedIn: {
-          update: { recipientCompanySiret: "12345654327896" }
+          update: { recipientCompanySiret: siretify(3) }
         }
       }
     });
@@ -901,7 +901,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         status: "DRAFT",
-        emitterCompanySiret: "12345654327896",
+        emitterCompanySiret: siretify(3),
         emitterCompanyContact: "John Snow",
         emitterCompanyMail: "john.snow@trackdechets.fr",
         recipientCompanySiret: destination.siret
@@ -936,13 +936,13 @@ describe("Mutation.markAsSealed", () => {
         companyTypes: [CompanyType.WASTEPROCESSOR]
       }
     );
-
+    const emitterCompanySiret = siretify(3);
     // a previous non draft BSD already exists
     await formFactory({
       ownerId: user.id,
       opt: {
         status: "PROCESSED",
-        emitterCompanySiret: "12345654327896",
+        emitterCompanySiret,
         emitterCompanyContact: "John Snow",
         emitterCompanyMail: "john.snow@trackdechets.fr",
         recipientCompanySiret: destination.siret
@@ -953,7 +953,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         status: "DRAFT",
-        emitterCompanySiret: "12345654327896",
+        emitterCompanySiret,
         emitterCompanyContact: "John Snow",
         emitterCompanyMail: "john.snow@trackdechets.fr",
         recipientCompanySiret: destination.siret

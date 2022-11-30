@@ -1,7 +1,8 @@
 import {
   userWithCompanyFactory,
   formFactory,
-  userFactory
+  userFactory,
+  siretify
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
@@ -39,7 +40,7 @@ describe("{ mutation { markSegmentAsReadyToTakeOver} }", () => {
     const segment = await prisma.transportSegment.create({
       data: {
         form: { connect: { id: form.id } },
-        transporterCompanySiret: "98765",
+        transporterCompanySiret: siretify(4),
         mode: "ROAD",
         transporterCompanyAddress: "40 Boulevard Voltaire 13001 Marseille",
         transporterCompanyPhone: "01 00 00 00 00",

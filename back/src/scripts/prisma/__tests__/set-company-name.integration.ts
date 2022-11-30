@@ -18,14 +18,14 @@ describe.skip("setCompanyName", () => {
   it("should set company name where it was not previously set", async () => {
     // Frontier, name is set
     const frontier = await companyFactory({
-      siret: "81343950200028",
+      siret: siretify(1),
       name: "Frontier SAS",
       securityCode: 1234
     });
 
     // LP, name is not set
     const lp = await companyFactory({
-      siret: "51212357100022",
+      siret: siretify(2),
       name: null
     });
     const resp1 = { status: 200, data: { name: "LP" } };
