@@ -58,7 +58,7 @@
 4. Démarrer les containers
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx elasticsearch
+   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx elasticsearch mongodb
    ```
 
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
@@ -321,4 +321,53 @@ Pour s'y retrouver plus facilement, suivre la convention de nommage en place et 
 
 ```
    npm run reindex-partial-in-place -- bsdasri -f
+```
+
+## Dépannage
+
+### La base de donnée ne se crée pas
+
+Si la commande pour créer la base de données ne fonctionne pas (`npx prisma db push`), il est possible que le symbole $ dans le nom de la base (default$default) pose problème. Deux solutions:
+- Encapsulez l'URI de la base avec des guillements simple, ie: 
+`DATABASE_URL='postgresql://username:password@postgres:5432/prisma?schema=default$default'`
+- Enlevez complètement le paramètre schema:
+`DATABASE_URL=postgresql://username:password@postgres:5432/prisma`
+
+### Je n'arrive pas à (ré)indexer Elastic Search
+
+Vous pouvez vérifier vos indexes Eslastic Search avec la commande suivante:
+```
+curl -X GET "localhost:9200/_cat/indices"
+```
+
+Si les indexes sont incomplets ou si la commande a échoué, vous pouvez vous connecter au container de l'API et passer en mode verbose avant de relancer l'indexation:
+```
+# Pour se connecter au container de l'API
+docker exec -it $(docker ps -qf "name=td-api") bash
+
+export FORCE_LOGGER_CONSOLE=true
+
+npm run reindex-all-bsds-bulk:dev -- -f
+```
+
+Si le problème remonté est un "Segmentation fault", il est probable que la mémoire allouée au container soit insuffisante. Vous pouvez contourner le problème en limitant la taille des batches (dans votre .env):
+```
+BULK_INDEX_BATCH_SIZE=100
+```
+
+Vous pouvez également augmenter la taille mémoire allouée au container Docker, dans un fichier `docker-compose.override.yml` placé à la racine du répo:
+```
+[...]
+  postgres:
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 128M
+[...]
+  elasticsearch:
+    environment:
+      - "ES_JAVA_OPTS=-Xms1G -Xmx1G"
+[...]      
 ```
