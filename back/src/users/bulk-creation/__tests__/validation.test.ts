@@ -1,6 +1,7 @@
 import { ValidationError } from "yup";
 import { companyValidationSchema, validateRoleGenerator } from "../validations";
 import { CompanyType } from "@prisma/client";
+import { siretify } from "../../../__tests__/factories";
 
 const mockCompanyExists = jest.fn();
 const mockUserExists = jest.fn();
@@ -28,7 +29,7 @@ describe("company validation", () => {
 
   test("valid company", async () => {
     const company = {
-      siret: "12345678901234",
+      siret: siretify(1),
       companyTypes: ["PRODUCER"]
     };
     await expect(companyValidationSchema.validate(company)).resolves.toEqual(
@@ -51,10 +52,19 @@ describe("company validation", () => {
     ).rejects.toThrow(ValidationError);
   });
 
-  test("siret does not have lenght 14", async () => {
+  test("siret does not have length of 14", async () => {
     await expect(
       companyValidationSchema.validate({
         siret: "123",
+        companyTypes: ["PRODUCER"]
+      })
+    ).rejects.toThrow(ValidationError);
+  });
+
+  test("siret is not a well formatted 14 numbers", async () => {
+    await expect(
+      companyValidationSchema.validate({
+        siret: "12345678901234",
         companyTypes: ["PRODUCER"]
       })
     ).rejects.toThrow(ValidationError);
@@ -66,7 +76,7 @@ describe("company validation", () => {
     );
     await expect(
       companyValidationSchema.validate({
-        siret: "12345678901234",
+        siret: siretify(1),
         companyTypes: ["PRODUCER"]
       })
     ).rejects.toThrow(ValidationError);
@@ -76,7 +86,7 @@ describe("company validation", () => {
     mockCompanyExists.mockResolvedValueOnce(true);
     console.warn = jest.fn();
     await companyValidationSchema.validate({
-      siret: "12345678901234",
+      siret: siretify(1),
       companyTypes: ["PRODUCER"]
     });
     // a warning must be emitted
@@ -86,24 +96,24 @@ describe("company validation", () => {
   test("missing companyTypes", async () => {
     await expect(
       companyValidationSchema.validate({
-        siret: "12345678901234"
+        siret: siretify(1)
       })
     ).rejects.toThrow(ValidationError);
     await expect(
       companyValidationSchema.validate({
-        siret: "12345678901234",
+        siret: siretify(1),
         companyTypes: null
       })
     ).rejects.toThrow(ValidationError);
     await expect(
       companyValidationSchema.validate({
-        siret: "12345678901234",
+        siret: siretify(1),
         companyTypes: []
       })
     ).rejects.toThrow(ValidationError);
     await expect(
       companyValidationSchema.validate({
-        siret: "12345678901234",
+        siret: siretify(1),
         companyTypes: [""]
       })
     ).rejects.toThrow(ValidationError);
@@ -112,7 +122,7 @@ describe("company validation", () => {
   test("companyTypes includes bad value", async () => {
     await expect(
       companyValidationSchema.validate({
-        siret: "123",
+        siret: siretify(1),
         companyTypes: [
           "PRODUCE", // typo here
           "WASTE_PROCESSOR"
@@ -124,7 +134,7 @@ describe("company validation", () => {
   test("contactEmail format", async () => {
     // valid email
     const company = {
-      siret: "12345678901234",
+      siret: siretify(1),
       companyTypes: ["PRODUCER"],
       contactEmail: "john.snow@trackdechets.fr"
     };
@@ -134,7 +144,7 @@ describe("company validation", () => {
     // invalid email
     await expect(
       companyValidationSchema.validate({
-        siret: "12345678901234",
+        siret: siretify(1),
         companyTypes: ["PRODUCER"],
         contactEmail: "azerty"
       })
@@ -144,7 +154,7 @@ describe("company validation", () => {
   test("website format", async () => {
     // valid URL
     const company = {
-      siret: "12345678901234",
+      siret: siretify(1),
       companyTypes: ["PRODUCER"],
       website: "https://trackdechets.beta.gouv.fr"
     };
@@ -154,7 +164,7 @@ describe("company validation", () => {
     // invalid URL
     await expect(
       companyValidationSchema.validate({
-        siret: "12345678901234",
+        siret: siretify(1),
         companyTypes: ["PRODUCER"],
         website: "azerty"
       })
@@ -164,7 +174,7 @@ describe("company validation", () => {
   test("contactPhone format", async () => {
     // valid phone number
     let company = {
-      siret: "12345678901234",
+      siret: siretify(1),
       companyTypes: ["PRODUCER"],
       contactPhone: "0100000000"
     };
@@ -172,7 +182,7 @@ describe("company validation", () => {
       company
     );
     company = {
-      siret: "12345678901234",
+      siret: siretify(1),
       companyTypes: ["PRODUCER"],
       contactPhone: "01 00 00 00 00"
     };
@@ -181,7 +191,7 @@ describe("company validation", () => {
     );
 
     company = {
-      siret: "12345678901234",
+      siret: siretify(1),
       companyTypes: ["PRODUCER"],
       contactPhone: "01-00-00-00-00"
     };
@@ -191,7 +201,7 @@ describe("company validation", () => {
     // invalid phone number
     await expect(
       companyValidationSchema.validate({
-        siret: "12345678901234",
+        siret: siretify(1),
         companyTypes: ["PRODUCER"],
         contactPhone: "01-00-00-00" // missing two digits
       })
@@ -204,7 +214,7 @@ describe("company validation", () => {
     );
     await expect(
       companyValidationSchema.validate({
-        siret: "12345678901234",
+        siret: siretify(1),
         companyTypes: ["PRODUCER"]
       })
     ).rejects.toThrow(
@@ -215,14 +225,14 @@ describe("company validation", () => {
 
 describe("role validation", () => {
   const companies = [
-    { siret: "12345678901234", companyTypes: ["PRODUCER" as CompanyType] }
+    { siret: siretify(1), companyTypes: ["PRODUCER" as CompanyType] }
   ];
 
   const validateRole = validateRoleGenerator(companies as any);
 
   test("valid role", async () => {
     const role = {
-      siret: "12345678901234",
+      siret: siretify(1),
       email: "john.snow@trackdechets.fr",
       role: "MEMBER"
     };
@@ -232,20 +242,20 @@ describe("role validation", () => {
   test("missing email", async () => {
     await expect(
       validateRole({
-        siret: "12345678901234",
+        siret: siretify(1),
         role: "MEMBER"
       })
     ).rejects.toThrow(ValidationError);
     await expect(
       validateRole({
-        siret: "12345678901234",
+        siret: siretify(1),
         role: "MEMBER",
         email: null
       })
     ).rejects.toThrow(ValidationError);
     await expect(
       validateRole({
-        siret: "12345678901234",
+        siret: siretify(1),
         role: "MEMBER",
         email: ""
       })
@@ -256,7 +266,7 @@ describe("role validation", () => {
     mockUserExists.mockResolvedValueOnce(true);
     console.warn = jest.fn();
     await validateRole({
-      siret: "12345678901234",
+      siret: siretify(1),
       email: "john.snow@trackdechets.fr",
       role: "MEMBER"
     });

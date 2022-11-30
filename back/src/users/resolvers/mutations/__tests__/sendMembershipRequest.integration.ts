@@ -3,6 +3,7 @@ import prisma from "../../../../prisma";
 import * as mailsHelper from "../../../../mailer/mailing";
 import {
   companyFactory,
+  siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -185,7 +186,7 @@ describe("mutation sendMembershipRequest", () => {
     const user = await userFactory();
     const { mutate } = makeClient(user);
     const { errors } = await mutate(SEND_MEMBERSHIP_REQUEST, {
-      variables: { siret: "12365478958956" }
+      variables: { siret: siretify(1) }
     });
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual(
