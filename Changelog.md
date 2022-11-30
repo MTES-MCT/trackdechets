@@ -23,7 +23,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Prévention d'injection XSS sur le champ website [PR 1934](https://github.com/MTES-MCT/trackdechets/pull/1934)
 - BSFF - le type de contenant doit désormais être choisi dans une liste prédéfinie (bouteille, conteneur, citerne, autre). [PR 1893](https://github.com/MTES-MCT/trackdechets/pull/1893)
 - Améliorations sur la gestion et le renouvellement des mots de passe [PR 1857](https://github.com/MTES-MCT/trackdechets/pull/1857)
-
+- Le transporteur et le destinataire d'un BSFF doivent être inscrits sur Trackdéchets avec un profil idoine [PR 1861](https://github.com/MTES-MCT/trackdechets/pull/1861)
 
 #### :memo: Documentation
 
