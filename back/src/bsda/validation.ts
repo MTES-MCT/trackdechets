@@ -318,7 +318,7 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
           )
           .test(
             "is-siret",
-            "${path}: ${originalValue} n'est pas un numéro de SIRET valide",
+            "Émetteur: ${originalValue} n'est pas un numéro de SIRET valide",
             value => isSiret(value)
           )
       }),
@@ -403,7 +403,7 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           )
           .test(
             "is-siret",
-            "${path} = ${originalValue} n'est pas un numéro de SIRET valide",
+            "Entreprise de travaux: ${originalValue} n'est pas un numéro de SIRET valide",
             value => isSiret(value)
           )
     }),
@@ -515,7 +515,7 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         )
         .test(
           "is-siret",
-          "${path} = ${originalValue} n'est pas un numéro de SIRET valide",
+          "Entreprise de destination: ${originalValue} n'est pas un numéro de SIRET valide",
           value => isSiret(value)
         )
         .test(
@@ -818,7 +818,7 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
               if (!tva && context.transportSignature) {
                 return schema.test(
                   "is-siret",
-                  "${path} = ${originalValue} n'est pas un numéro de SIRET valide",
+                  "Transporteur: ${originalValue} n'est pas un numéro de SIRET valide",
                   value => isSiret(value)
                 );
               }
@@ -830,7 +830,7 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
                 )
                 .test(
                   "is-siret",
-                  "${path} = ${originalValue} n'est pas un numéro de SIRET valide",
+                  "Transporteur: ${originalValue} n'est pas un numéro de SIRET valide",
                   value => isSiret(value)
                 );
             })
