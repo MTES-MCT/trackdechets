@@ -12,6 +12,7 @@ import {
   destinationFactory,
   formFactory,
   formWithTempStorageFactory,
+  siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
