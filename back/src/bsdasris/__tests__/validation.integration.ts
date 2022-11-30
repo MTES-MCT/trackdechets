@@ -1,4 +1,5 @@
 import { ValidationError } from "yup";
+import { siretify } from "../../__tests__/factories";
 import { validateBsdasri } from "../validation";
 
 import { initialData, readyToTakeOverData } from "./factories";
@@ -45,7 +46,7 @@ describe("Mutation.signBsdasri emission", () => {
   it("should not validate without recipisse when it's a foreign transport", async () => {
     const dasri = await readyToTakeOverData({
       opt: {
-        transporterCompanySiret: "12345678901234",
+        transporterCompanySiret: siretify(1),
         transporterCompanyName: "transporteur FR"
       }
     });

@@ -6,6 +6,7 @@ import {
   destinationFactory,
   formFactory,
   formWithTempStorageFactory,
+  siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -417,7 +418,7 @@ describe("Mutation markAsResealed", () => {
       },
       forwardedInOpts: {
         // this SIRET is not registered in TD
-        recipientCompanySiret: "3".repeat(14)
+        recipientCompanySiret: siretify(3)
       }
     });
 

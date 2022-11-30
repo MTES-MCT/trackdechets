@@ -8,6 +8,7 @@ import { AuthType } from "../../../../auth";
 import prisma from "../../../../prisma";
 import {
   companyFactory,
+  siretify,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -75,7 +76,7 @@ describe("mutation verifyCompany", () => {
     const { mutate } = makeClient(user);
     const { errors } = await mutate(VERIFY_COMPANY, {
       variables: {
-        input: { siret: "3".repeat(14), code: company.verificationCode }
+        input: { siret: siretify(3), code: company.verificationCode }
       }
     });
     expect(errors).toEqual([

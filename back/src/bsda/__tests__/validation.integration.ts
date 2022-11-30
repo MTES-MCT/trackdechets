@@ -1,4 +1,5 @@
 import { ValidationError } from "yup";
+import { siretify } from "../../__tests__/factories";
 import { validateBsda } from "../validation";
 
 import { bsdaFactory } from "./factories";
@@ -27,7 +28,7 @@ describe("BSDA validation", () => {
   it("should not validate without recipisse when it's a french transport", async () => {
     const bsda = await bsdaFactory({
       opt: {
-        transporterCompanySiret: "12345678901234",
+        transporterCompanySiret: siretify(1),
         transporterCompanyName: "transporteur FR"
       }
     });

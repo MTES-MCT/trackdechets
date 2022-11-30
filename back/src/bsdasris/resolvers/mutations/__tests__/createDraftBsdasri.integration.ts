@@ -55,7 +55,7 @@ describe("Mutation.createDraftBsdasri", () => {
           input: {
             emitter: {
               company: {
-                siret: "9999"
+                siret: siretify(9)
               }
             }
           }

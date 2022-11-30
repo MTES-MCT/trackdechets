@@ -86,6 +86,18 @@ describe("transporterSchema", () => {
     const validateFn = () =>
       transporterSchema.validate({
         ...transporter,
+        transporterCompanySiret: "00000000000000"
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Transporteur : le n° SIRET n'est pas au bon format"
+    );
+  });
+
+  test("invalid SIRET length", async () => {
+    const validateFn = () =>
+      transporterSchema.validate({
+        ...transporter,
         transporterCompanySiret: "1"
       });
 
@@ -125,6 +137,18 @@ describe("destinationSchema", () => {
   });
 
   test("invalid SIRET", async () => {
+    const validateFn = () =>
+      destinationSchema.validate({
+        ...destination,
+        destinationCompanySiret: "11111111111111"
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Destination : le n°SIRET n'est pas au bon format"
+    );
+  });
+
+  test("invalid SIRET length", async () => {
     const validateFn = () =>
       destinationSchema.validate({
         ...destination,

@@ -1,6 +1,9 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  siretify,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdasriFactory } from "../../../__tests__/factories";
 import { BsdasriStatus } from "@prisma/client";
@@ -29,7 +32,7 @@ describe("Mutation.createDasri", () => {
     const toRegroup1 = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.PROCESSED,
-        emitterCompanySiret: "1234",
+        emitterCompanySiret: siretify(5),
         destinationCompanySiret: company.siret
       }
     });
@@ -94,7 +97,7 @@ describe("Mutation.createDasri", () => {
     const toRegroup1 = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.PROCESSED,
-        emitterCompanySiret: "1234",
+        emitterCompanySiret: siretify(1),
         destinationCompanySiret: company.siret,
         destinationOperationCode: "R1"
       }
@@ -158,7 +161,7 @@ describe("Mutation.createDasri", () => {
     const toRegroup1 = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.AWAITING_GROUP,
-        emitterCompanySiret: "1234",
+        emitterCompanySiret: siretify(1),
         destinationCompanySiret: company.siret,
         destinationOperationCode: "D12"
       }
@@ -167,7 +170,7 @@ describe("Mutation.createDasri", () => {
     const toRegroup2 = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.AWAITING_GROUP,
-        emitterCompanySiret: "1234",
+        emitterCompanySiret: siretify(1),
         destinationCompanySiret: company.siret,
         destinationOperationCode: "R12"
       }

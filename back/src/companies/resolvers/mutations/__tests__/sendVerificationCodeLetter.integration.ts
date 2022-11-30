@@ -4,6 +4,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import * as post from "../../../../common/post";
 import prisma from "../../../../prisma";
 import {
+  siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -51,7 +52,7 @@ describe("mutation sendVerificationCodeLetter", () => {
 
     const { mutate } = makeClient(admin);
     const { errors } = await mutate(SEND_VERIFICATION_CODE_LETTER, {
-      variables: { input: { siret: "31111111111112" } }
+      variables: { input: { siret: siretify(3) } }
     });
     expect(errors).toEqual([
       expect.objectContaining({

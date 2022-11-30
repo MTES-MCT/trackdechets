@@ -2,6 +2,7 @@ import {
   companyFactory,
   formFactory,
   formWithTempStorageFactory,
+  siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -181,7 +182,7 @@ describe("query favorites", () => {
     await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: "0".repeat(14),
+        emitterCompanySiret: siretify(1),
         recipientCompanySiret: company.siret
       }
     });
@@ -243,7 +244,7 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        recipientCompanySiret: "0".repeat(14)
+        recipientCompanySiret: siretify(1)
       }
     });
     const { query } = makeClient({ ...user, auth: AuthType.Session });
@@ -358,7 +359,7 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        transporterCompanySiret: "0".repeat(14)
+        transporterCompanySiret: siretify(1)
       }
     });
     const { query } = makeClient({ ...user, auth: AuthType.Session });
@@ -420,7 +421,7 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        recipientCompanySiret: "0".repeat(14),
+        recipientCompanySiret: siretify(1),
         recipientIsTempStorage: true
       }
     });
@@ -484,7 +485,7 @@ describe("query favorites", () => {
     await formWithTempStorageFactory({
       ownerId: user.id,
       opt: { emitterCompanySiret: company.siret },
-      forwardedInOpts: { recipientCompanySiret: "0".repeat(14) }
+      forwardedInOpts: { recipientCompanySiret: siretify(1) }
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
@@ -500,7 +501,7 @@ describe("query favorites", () => {
 
   it("should return recent next destinations", async () => {
     const destination: CompanySearchResult = {
-      siret: "0".repeat(14),
+      siret: siretify(1),
       address: "rue des 4 chemins",
       name: "Destination ultérieure",
       isRegistered: true,
@@ -560,7 +561,7 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        nextDestinationCompanySiret: "0".repeat(14)
+        nextDestinationCompanySiret: siretify(1)
       }
     });
 
@@ -919,7 +920,7 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        recipientCompanySiret: "0".repeat(14),
+        recipientCompanySiret: siretify(1),
         recipientIsTempStorage: true,
         forwardedIn: {
           create: {

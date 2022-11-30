@@ -7,6 +7,7 @@ import {
   companyFactory,
   formFactory,
   formWithTempStorageFactory,
+  siretify,
   transportSegmentFactory,
   userFactory,
   userWithCompanyFactory
@@ -53,7 +54,7 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: "5678" }
+      data: { currentTransporterSiret: siretify(3) }
     });
     await prepareRedis({
       emitterCompany,
@@ -99,7 +100,7 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: "5678" }
+      data: { currentTransporterSiret: siretify(3) }
     });
     await prepareRedis({
       emitterCompany,
@@ -376,7 +377,7 @@ describe("Test Form reception", () => {
       emitterCompany,
       recipientCompany
     });
-    const randomUserCompany = await companyFactory({ siret: "9999999" }); // this user does not belong to the form
+    const randomUserCompany = await companyFactory({ siret: siretify(2) }); // this user does not belong to the form
     const randomUser = await userFactory({
       companyAssociations: {
         create: {
@@ -418,14 +419,14 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: "5678" }
+      data: { currentTransporterSiret: siretify(3) }
     });
 
     // a taken over segment
     await transportSegmentFactory({
       formId: form.id,
       segmentPayload: {
-        transporterCompanySiret: "98765",
+        transporterCompanySiret: siretify(2),
         readyToTakeOver: true,
         takenOverAt: new Date("2020-01-01"),
         takenOverBy: "Jason Statham"
@@ -478,14 +479,14 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: "5678" }
+      data: { currentTransporterSiret: siretify(3) }
     });
 
     // a taken over segment
     await transportSegmentFactory({
       formId: form.id,
       segmentPayload: {
-        transporterCompanySiret: "98765",
+        transporterCompanySiret: siretify(3),
         readyToTakeOver: true,
         takenOverAt: new Date("2020-01-01"),
         takenOverBy: "Jason Statham"
@@ -495,7 +496,10 @@ describe("Test Form reception", () => {
     // this segment has not been taken over yet
     const staleSegment = await transportSegmentFactory({
       formId: form.id,
-      segmentPayload: { transporterCompanySiret: "7777", readyToTakeOver: true }
+      segmentPayload: {
+        transporterCompanySiret: siretify(4),
+        readyToTakeOver: true
+      }
     });
     await prepareRedis({
       emitterCompany,

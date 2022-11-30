@@ -3,6 +3,7 @@ import { ErrorCode } from "../../../../common/errors";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { securityCodeRenewal } from "../../../../mailer/templates";
 import * as utils from "../../../../utils";
+import { siretify } from "../../../../__tests__/factories";
 
 const companyMock = jest.fn();
 const updateCompanyMock = jest.fn();
@@ -72,12 +73,12 @@ describe("renewSecurityCode", () => {
     companyMock.mockResolvedValueOnce({
       securityCode: 1234,
       name: "Code en stock",
-      siret: "85001946400013"
+      siret: siretify(2)
     });
     randomNumberMock.mockReturnValueOnce(4567);
 
     updateCompanyMock.mockReturnValueOnce({
-      siret: "85001946400013",
+      siret: siretify(2),
       name: "Code en stock",
       securityCode: 4567
     });
@@ -92,7 +93,7 @@ describe("renewSecurityCode", () => {
       variables: {
         company: {
           name: "Code en stock",
-          siret: "85001946400013"
+          siret: siretify(2)
         }
       }
     });
@@ -103,7 +104,7 @@ describe("renewSecurityCode", () => {
     expect(sendMailMock).toHaveBeenCalledWith(mail);
 
     expect(updatedCompany).toEqual({
-      siret: "85001946400013",
+      siret: siretify(2),
       name: "Code en stock",
       securityCode: 4567
     });

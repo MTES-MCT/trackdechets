@@ -26,7 +26,7 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
 
   type: BsdaType.OTHER_COLLECTIONS,
   emitterCompanyName: "emitter company",
-  emitterCompanySiret: "15397456982146",
+  emitterCompanySiret: siretify(1),
   emitterCompanyAddress: "20 Avenue de l'Emitter, Emitter City",
   emitterCompanyContact: "Marc Martin",
   emitterCompanyPhone: "06 18 76 02 66",
@@ -51,7 +51,7 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
 
   destinationPlannedOperationCode: "D 5",
   destinationCompanyName: "I reveive waste INC",
-  destinationCompanySiret: "13254678974589",
+  destinationCompanySiret: siretify(2),
   destinationCompanyAddress: "14 boulevard Recipient, Recipient City",
   destinationCompanyContact: "André Recipient",
   destinationCompanyPhone: "05 05 05 05 05",
@@ -59,7 +59,7 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   destinationCap: "CAP",
 
   transporterCompanyName: "Transport facile",
-  transporterCompanySiret: siretify(1),
+  transporterCompanySiret: siretify(3),
   transporterCompanyAddress: "12 route du Transporter, Transporter City",
   transporterCompanyContact: "Henri Transport",
   transporterCompanyPhone: "06 06 06 06 06",
@@ -78,7 +78,7 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   destinationOperationDate: "2019-11-27T00:00:00.000Z",
 
   workerCompanyName: "Entreprise de travaux",
-  workerCompanySiret: "19345678974589",
+  workerCompanySiret: siretify(4),
   workerCompanyAddress: "1 route du travail, Travaux city",
   workerCompanyContact: "Jack Travaux",
   workerCompanyPhone: "05 05 05 05 05",

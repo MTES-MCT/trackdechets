@@ -7,7 +7,10 @@ import {
   MutationCreateBsffArgs,
   BsffOperationCode
 } from "../../../../generated/graphql/types";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  siretify,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { fullBsff } from "../../../fragments";
 
@@ -133,7 +136,7 @@ describe("Mutation.createBsff", () => {
           emitter: {
             company: {
               name: "Clim' Clean",
-              siret: "2".repeat(14),
+              siret: siretify(2),
               address: "12 rue de Laval 69000",
               contact: "Marco Polo",
               mail: "marco.polo@gmail.com"

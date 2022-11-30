@@ -2,6 +2,7 @@ import { bsddReducer } from "../reducer";
 import { aggregateStream } from "../../aggregator";
 import { BsddCreated, BsddEvent, BsddUpdated, BsddSigned } from "../types";
 import { Form } from "@prisma/client";
+import { siretify } from "../../../__tests__/factories";
 
 describe("ActivityEvent.Bsdd", () => {
   it("should get proper state when all events are aggregated", () => {
@@ -20,13 +21,13 @@ describe("ActivityEvent.Bsdd", () => {
         }
       }
     };
-
+    const emitterCompanySiret = siretify(6);
     const bsddUpdated: BsddUpdated = {
       actor: userId,
       streamId: bsddId,
       type: "BsddUpdated",
       data: {
-        content: { id: bsddId, emitterCompanySiret: "12345" }
+        content: { id: bsddId, emitterCompanySiret }
       }
     };
 
@@ -47,7 +48,7 @@ describe("ActivityEvent.Bsdd", () => {
       id: bsddId,
       status: "PROCESSED",
       emitterCompanyName: "Test company",
-      emitterCompanySiret: "12345"
+      emitterCompanySiret
     });
   });
 });

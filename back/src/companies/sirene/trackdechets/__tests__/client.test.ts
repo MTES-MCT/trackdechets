@@ -7,6 +7,7 @@ import {
 import { ErrorCode } from "../../../../common/errors";
 import client from "../esClient";
 import { SearchHit } from "../types";
+import { siretify } from "../../../../__tests__/factories";
 
 const { ResponseError } = errors;
 
@@ -18,10 +19,12 @@ describe("searchCompany", () => {
   });
 
   it("should retrieve a company by siret", async () => {
+    const siret = siretify(6);
+
     (client.get as jest.Mock).mockResolvedValueOnce({
       body: {
         _source: {
-          siret: "85001946400013",
+          siret,
           statutDiffusionEtablissement: "O",
           etatAdministratifEtablissement: "A",
           numeroVoieEtablissement: "4",
@@ -38,9 +41,9 @@ describe("searchCompany", () => {
         }
       }
     });
-    const company = await searchCompany("85001946400013");
+    const company = await searchCompany(siret);
     const expected = {
-      siret: "85001946400013",
+      siret,
       etatAdministratif: "A",
       statutDiffusionEtablissement: "O",
       address: "4 bis BD LONGCHAMP Bat G 13001 MARSEILLE",
@@ -58,17 +61,19 @@ describe("searchCompany", () => {
 
   // FIXME this case may not even exist in INSEE public data
   it("should raise AnonymousCompanyError if non-diffusible", async () => {
+    const siret = siretify(6);
+
     (client.get as jest.Mock).mockResolvedValueOnce({
       body: {
         _source: {
-          siret: "85001946400013",
+          siret,
           statutDiffusionEtablissement: "N"
         }
       }
     });
     expect.assertions(1);
     try {
-      await searchCompany("85001946400013");
+      await searchCompany(siret);
     } catch (e) {
       expect(e.extensions.code).toEqual(ErrorCode.FORBIDDEN);
     }
@@ -76,10 +81,12 @@ describe("searchCompany", () => {
 
   it(`should set name for an individual enterprise
       by concatenating first and last name`, async () => {
+    const siret = siretify(6);
+
     (client.get as jest.Mock).mockResolvedValueOnce({
       body: {
         _source: {
-          siret: "34393738900041",
+          siret,
           etatAdministratifEtablissement: "A",
           numeroVoieEtablissement: "4",
           typeVoieEtablissement: "RUE",
@@ -112,12 +119,14 @@ describe("searchCompany", () => {
 
   it(`should escalate other types of errors
           (network, internal server error, etc)`, async () => {
+    const siret = siretify(6);
+
     (client.get as jest.Mock).mockRejectedValueOnce({
       message: "Erreur inconnue"
     });
     expect.assertions(1);
     try {
-      await searchCompany("85001946400013");
+      await searchCompany(siret);
     } catch (e) {
       expect(e.message).toEqual("Erreur inconnue");
     }
@@ -130,13 +139,15 @@ describe("searchCompanies", () => {
   });
 
   it("perform a full text search based on a clue", async () => {
+    const siret = siretify(6);
+
     (client.search as jest.Mock).mockResolvedValueOnce({
       body: {
         hits: {
           hits: [
             {
               _source: {
-                siret: "85001946400013",
+                siret,
                 denominationUniteLegale: "CODE EN STOCK",
                 numeroVoieEtablissement: "4",
                 typeVoieEtablissement: "BD",
@@ -154,7 +165,7 @@ describe("searchCompanies", () => {
     const companies = await searchCompanies("code en stock");
     expect(companies).toHaveLength(1);
     const expected = {
-      siret: "85001946400013",
+      siret,
       address: "4 BD LONGCHAMP 13001 MARSEILLE",
       addressVoie: "4 BD LONGCHAMP",
       addressPostalCode: "13001",
@@ -169,13 +180,15 @@ describe("searchCompanies", () => {
   });
 
   it("should remove diacritics (accents) from clue", async () => {
+    const siret = siretify(6);
+
     (client.search as jest.Mock).mockResolvedValueOnce({
       body: {
         hits: {
           hits: [
             {
               _source: {
-                siret: "85001946400013",
+                siret,
                 denominationUniteLegale: "LE BAR A PAIN",
                 numeroVoieEtablissement: "40",
                 typeVoieEtablissement: "COURS",
@@ -193,7 +206,7 @@ describe("searchCompanies", () => {
     const companies = await searchCompanies("le bar à pain");
     expect(companies).toHaveLength(1);
     const expected = {
-      siret: "85001946400013",
+      siret,
       address: "40 COURS LONGCHAMP 13001 MARSEILLE",
       addressVoie: "40 COURS LONGCHAMP",
       addressPostalCode: "13001",
@@ -274,13 +287,15 @@ describe("searchCompanies", () => {
   });
 
   it("should search by siret if clue is formatted like a siret", async () => {
+    const siret = siretify(6);
+
     (client.search as jest.Mock).mockResolvedValueOnce({
       body: {
         hits: {
           hits: [
             {
               _source: {
-                siret: "85001946400013",
+                siret,
                 denominationUniteLegale: "CODE EN STOCK",
                 numeroVoieEtablissement: "4",
                 typeVoieEtablissement: "BD",
@@ -295,7 +310,7 @@ describe("searchCompanies", () => {
         }
       }
     });
-    const companies = await searchCompanies("85001946400013");
+    const companies = await searchCompanies(siret);
     expect(companies).toHaveLength(1);
   });
 });

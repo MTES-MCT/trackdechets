@@ -4,6 +4,7 @@ import {
   notifyUserOfInvite
 } from "../../../../mailer/templates";
 import { renderMail } from "../../../../mailer/templates/renderers";
+import { siretify } from "../../../../__tests__/factories";
 import { inviteUserToCompanyFn as inviteUserToCompany } from "../inviteUserToCompanyService";
 
 const userMock = jest.fn();
@@ -43,23 +44,19 @@ describe("inviteUserToCompany", () => {
   it("should associate existing user to company if user exists", async () => {
     const user = { id: "id", name: "Arya Stark" };
     userMock.mockResolvedValueOnce(user);
-
-    const company = { siret: "85001946400013", name: "Code en Stock" };
+    const siret = siretify(1);
+    const company = { siret, name: "Code en Stock" };
     companyMock.mockResolvedValueOnce(company);
 
     const adminUser = { name: "John Snow" } as User;
 
     await inviteUserToCompany(adminUser, {
       email: "arya.stark@trackdechets.fr",
-      siret: "85001946400013",
+      siret,
       role: "MEMBER"
     });
 
-    expect(associateUserToCompanyMock).toBeCalledWith(
-      "id",
-      "85001946400013",
-      "MEMBER"
-    );
+    expect(associateUserToCompanyMock).toBeCalledWith("id", siret, "MEMBER");
 
     expect(sendMailMock).toHaveBeenCalledWith(
       renderMail(notifyUserOfInvite, {
@@ -77,22 +74,22 @@ describe("inviteUserToCompany", () => {
       role: "MEMBER"
     };
     createUserAccountHashMock.mockResolvedValueOnce(userAccountHash);
-
-    const company = { siret: "85001946400013", name: "Code en Stock" };
+    const siret = siretify(1);
+    const company = { siret, name: "Code en Stock" };
     companyMock.mockResolvedValueOnce(company);
 
     const adminUser = { name: "John Snow" } as User;
 
     await inviteUserToCompany(adminUser, {
       email: "arya.stark@trackdechets.fr",
-      siret: "85001946400013",
+      siret,
       role: "MEMBER"
     });
 
     expect(createUserAccountHashMock).toHaveBeenCalledWith(
       "arya.stark@trackdechets.fr",
       "MEMBER",
-      "85001946400013"
+      siret
     );
 
     expect(sendMailMock).toHaveBeenCalledWith(
@@ -116,22 +113,22 @@ describe("inviteUserToCompany", () => {
       role: "MEMBER"
     };
     createUserAccountHashMock.mockResolvedValueOnce(userAccountHash);
-
-    const company = { siret: "85001946400013", name: "Code en Stock" };
+    const siret = siretify(1);
+    const company = { FileSystemDirectoryHandle, name: "Code en Stock" };
     companyMock.mockResolvedValueOnce(company);
 
     const adminUser = { name: "John Snow" } as User;
 
     await inviteUserToCompany(adminUser, {
       email: "arya.stark@trackdechets.fr",
-      siret: "85001946400013",
+      siret,
       role: "MEMBER"
     });
 
     expect(createUserAccountHashMock).toHaveBeenCalledWith(
       "arya.stark@trackdechets.fr",
       "MEMBER",
-      "85001946400013"
+      siret
     );
   });
 });

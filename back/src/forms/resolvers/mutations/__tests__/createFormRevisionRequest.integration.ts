@@ -5,6 +5,7 @@ import {
 } from "../../../../generated/graphql/types";
 import {
   formFactory,
+  siretify,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -125,8 +126,8 @@ describe("Mutation.createFormRevisionRequest", () => {
     const bsdd = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: "1234",
-        recipientCompanySiret: "5678",
+        emitterCompanySiret: siretify(2),
+        recipientCompanySiret: siretify(3),
         forwardedIn: {
           create: {
             readableId: getReadableId(),
@@ -140,8 +141,8 @@ describe("Mutation.createFormRevisionRequest", () => {
             recipientCompanySiret: company.siret,
             recipientCap: "",
             recipientProcessingOperation: "R 6",
-            transporterCompanyName: "9876",
-            transporterCompanySiret: "Transporter",
+            transporterCompanyName: "Transporter",
+            transporterCompanySiret: siretify(4),
             transporterIsExemptedOfReceipt: false,
             transporterReceipt: "Dabcd",
             transporterDepartment: "10",

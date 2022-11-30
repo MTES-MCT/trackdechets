@@ -15,6 +15,7 @@ import prisma from "../../../../prisma";
 import { associateUserToCompany } from "../../../../users/database";
 import {
   companyFactory,
+  siretify,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -231,7 +232,7 @@ describe("Mutation.updateBsff", () => {
         input: {
           emitter: {
             company: {
-              siret: "2".repeat(14)
+              siret: siretify(2)
             }
           }
         }

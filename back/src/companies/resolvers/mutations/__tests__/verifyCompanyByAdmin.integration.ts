@@ -7,6 +7,7 @@ import { gql } from "apollo-server-express";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import {
+  siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -55,7 +56,7 @@ describe("mutation verifyCompanyByAdmin", () => {
     const { errors } = await mutate(VERIFY_COMPANY_BY_ADMIN, {
       variables: {
         input: {
-          siret: "21111111111111"
+          siret: siretify(5)
         }
       }
     });

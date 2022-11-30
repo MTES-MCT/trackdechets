@@ -72,7 +72,7 @@ describe("Mutation.Vhu.create", () => {
           input: {
             emitter: {
               company: {
-                siret: "siret"
+                siret: siretify(7)
               }
             }
           }
