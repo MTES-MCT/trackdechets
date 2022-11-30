@@ -4,7 +4,7 @@ import prisma from "../../prisma";
 import { siretify } from "../../__tests__/factories";
 
 const createInput = {
-  siret: "00000012345698",
+  siret: siretify(3),
   name: "Établissement de test",
   address: "Adresse test",
   codeNaf: "XXXXX",

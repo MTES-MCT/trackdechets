@@ -5,6 +5,7 @@ import { ErrorCode } from "../../../../common/errors";
 import {
   companyFactory,
   formFactory,
+  siretify,
   toIntermediaryCompany,
   userFactory,
   userWithCompanyFactory
@@ -141,7 +142,7 @@ describe("Mutation.createForm", () => {
         createFormInput: {
           emitter: {
             company: {
-              siret: "siret"
+              siret: siretify(7)
             }
           }
         }
@@ -334,7 +335,7 @@ describe("Mutation.createForm", () => {
       },
       ecoOrganisme: {
         name: "",
-        siret: "does_not_exist"
+        siret: siretify(6)
       }
     };
     const { mutate } = makeClient(user);
@@ -538,7 +539,7 @@ describe("Mutation.createForm", () => {
 
   it("should fail creating a form with a recipient if the recipient is not registered", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-
+    const siret = siretify(9); // an unregistered siret
     const createFormInput = {
       emitter: {
         company: {
@@ -547,7 +548,7 @@ describe("Mutation.createForm", () => {
       },
       recipient: {
         company: {
-          siret: "01478520369874" // an unregistered siret
+          siret // an unregistered siret
         }
       }
     };
@@ -560,8 +561,7 @@ describe("Mutation.createForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "L'installation de destination avec le SIRET 01478520369874 n'est pas inscrite sur Trackdéchets",
+        message: `L'installation de destination avec le SIRET ${siret} n'est pas inscrite sur Trackdéchets`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -571,6 +571,7 @@ describe("Mutation.createForm", () => {
 
   it("should fail creating a form with a transporter if the transporter is not registered", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const siret = siretify(9); // an unregistered siret
 
     const createFormInput = {
       emitter: {
@@ -580,7 +581,7 @@ describe("Mutation.createForm", () => {
       },
       transporter: {
         company: {
-          siret: "01478520369874"
+          siret
         }
       }
     };
@@ -594,7 +595,7 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Le transporteur qui a été renseigné sur le bordereau (SIRET: 01478520369874) n'est pas inscrit sur Trackdéchets",
+          `Le transporteur qui a été renseigné sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -722,7 +723,7 @@ describe("Mutation.createForm", () => {
         },
         trader: {
           company: {
-            siret: "12345678901234",
+            siret: siretify(1),
             name: "Trader",
             address: "123 Wall Street, NY",
             contact: "Jane Doe",

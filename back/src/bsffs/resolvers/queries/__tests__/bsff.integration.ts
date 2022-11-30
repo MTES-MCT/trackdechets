@@ -1,7 +1,10 @@
 import { UserRole } from "@prisma/client";
 import { Query, QueryBsffArgs } from "../../../../generated/graphql/types";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  siretify,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import {
   createBsff,
@@ -115,6 +118,7 @@ describe("Query.bsff", () => {
 
     const bsffId = getReadableId(ReadableIdPrefix.FF);
     const ficheInterventionNumero = "0000001";
+    const siret = siretify(3);
     const bsff = await createBsff(
       {
         emitter
@@ -127,13 +131,13 @@ describe("Query.bsff", () => {
               numero: ficheInterventionNumero,
               weight: 2,
               detenteurCompanyName: "Acme",
-              detenteurCompanySiret: "2".repeat(14),
+              detenteurCompanySiret: siret,
               detenteurCompanyAddress: "12 rue de la Tige, 69000",
               detenteurCompanyMail: "contact@gmail.com",
               detenteurCompanyPhone: "06",
               detenteurCompanyContact: "Jeanne Michelin",
               operateurCompanyName: "Clim'op",
-              operateurCompanySiret: "2".repeat(14),
+              operateurCompanySiret: siret,
               operateurCompanyAddress: "12 rue de la Tige, 69000",
               operateurCompanyMail: "contact@climop.com",
               operateurCompanyPhone: "06",

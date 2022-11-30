@@ -1,7 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { TestQuery } from "../../../../__tests__/apollo-integration-testing";
-import { companyFactory } from "../../../../__tests__/factories";
+import { companyFactory, siretify } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import * as sirene from "../../../search";
 
@@ -20,9 +20,11 @@ describe("query { searchCompanies(clue, department) }", () => {
   });
 
   it("should return list of companies based on clue", async () => {
+    const siret = siretify(13);
+
     searchCompanySpy.mockResolvedValueOnce([
       {
-        siret: "85001946400013",
+        siret,
         address: "4 Boulevard Longchamp 13001 Marseille",
         name: "CODE EN STOCK",
         naf: "6201Z",
@@ -53,9 +55,11 @@ describe("query { searchCompanies(clue, department) }", () => {
   });
 
   it("should merge info from SIRENE and ICPE", async () => {
+    const siret = siretify(13);
+
     searchCompanySpy.mockResolvedValueOnce([
       {
-        siret: "85001946400013",
+        siret,
         address: "4 Boulevard Longchamp 13001 Marseille",
         name: "CODE EN STOCK",
         naf: "6201Z",
@@ -82,7 +86,7 @@ describe("query { searchCompanies(clue, department) }", () => {
     `;
 
     const icpe = {
-      s3icNumeroSiret: "85001946400013",
+      s3icNumeroSiret: siretify(5),
       codeS3ic: "0064.00001"
     };
 
@@ -94,9 +98,11 @@ describe("query { searchCompanies(clue, department) }", () => {
   });
 
   it("should fetch transporter and trader receipt info", async () => {
+    const siret = siretify(13);
+
     searchCompanySpy.mockResolvedValueOnce([
       {
-        siret: "85001946400013",
+        siret,
         address: "4 Boulevard Longchamp 13001 Marseille",
         name: "CODE EN STOCK",
         naf: "6201Z",
@@ -120,7 +126,7 @@ describe("query { searchCompanies(clue, department) }", () => {
     };
 
     await companyFactory({
-      siret: "85001946400013",
+      siret,
       name: "Code en Stock",
       securityCode: 1234,
       contactEmail: "john.snow@trackdechets.fr",

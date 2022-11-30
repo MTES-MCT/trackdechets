@@ -6,6 +6,7 @@ import {
   companyFactory,
   formFactory,
   formWithTempStorageFactory,
+  siretify,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -244,7 +245,7 @@ describe("mutation.markAsProcessed", () => {
             processingOperation: "D 1",
             company: {
               mail: "m@m.fr",
-              siret: "97874512984578",
+              siret: siretify(3),
               name: "company",
               phone: "0101010101",
               contact: "The famous bot",
@@ -285,7 +286,7 @@ describe("mutation.markAsProcessed", () => {
             processingOperation: "D 1",
             company: {
               mail: "m@m.fr",
-              siret: "97874512984578",
+              siret: siretify(3),
               name: "company",
               phone: "0101010101",
               contact: "The famous bot",
@@ -335,7 +336,7 @@ describe("mutation.markAsProcessed", () => {
             processingOperation: "D 1",
             company: {
               mail: "m@m.fr",
-              siret: "97874512984578",
+              siret: siretify(3),
               name: "company",
               phone: "0101010101",
               contact: "The famous bot",
@@ -420,7 +421,7 @@ describe("mutation.markAsProcessed", () => {
             processingOperation: "D 1",
             company: {
               mail: "m@m.fr",
-              siret: "0".repeat(14),
+              siret: siretify(4),
               name: "company",
               phone: "0101010101",
               contact: "The famous bot",
@@ -525,7 +526,7 @@ describe("mutation.markAsProcessed", () => {
       expect.objectContaining({
         message:
           "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire\n" +
-          "Destination ultérieure prévue : Le SIRET doit faire 14 caractères numériques"
+          "Destination ultérieure prévue : Le SIRET n'est pas valide"
       })
     ]);
   });

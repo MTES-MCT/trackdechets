@@ -3,7 +3,8 @@ import { ErrorCode } from "../../../../common/errors";
 import {
   userWithCompanyFactory,
   companyFactory,
-  ecoOrganismeFactory
+  ecoOrganismeFactory,
+  siretify
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
@@ -27,7 +28,7 @@ describe("Mutation.createDasri", () => {
     const { user, company: ecoOrgCompany } = await userWithCompanyFactory(
       "MEMBER",
       {
-        siret: "98764321"
+        siret: siretify(3)
       }
     );
     const otherCompany = await companyFactory();
@@ -190,7 +191,7 @@ describe("Mutation.createDasri", () => {
       emitter: {
         company: {
           name: "hopital blanc",
-          siret: "51299999900099", // unregistered company
+          siret: siretify(5), // unregistered company
           contact: "jean durand",
           phone: "06 18 76 02 00",
 

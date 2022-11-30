@@ -3,7 +3,11 @@ import prisma from "../../../../prisma";
 import { AuthType } from "../../../../auth";
 import { ErrorCode } from "../../../../common/errors";
 import * as mailsHelper from "../../../../mailer/mailing";
-import { companyFactory, userFactory } from "../../../../__tests__/factories";
+import {
+  companyFactory,
+  siretify,
+  userFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import * as geocode from "../../../geo/geocode";
 import { CompanyType } from "@prisma/client";
@@ -68,7 +72,7 @@ describe("Mutation.createCompany", () => {
     };
 
     searchSirene.mockResolvedValueOnce({
-      siret: "12345678912345",
+      siret: siretify(7),
       etatAdministratif: "A"
     });
 
@@ -125,7 +129,7 @@ describe("Mutation.createCompany", () => {
     };
 
     searchSirene.mockResolvedValueOnce({
-      siret: "12345678912345",
+      siret: siretify(7),
       etatAdministratif: "A"
     });
 
@@ -188,7 +192,7 @@ describe("Mutation.createCompany", () => {
     };
 
     searchSirene.mockResolvedValueOnce({
-      siret: "12345678912345",
+      siret: siretify(7),
       etatAdministratif: "A"
     });
 
@@ -232,7 +236,7 @@ describe("Mutation.createCompany", () => {
     };
 
     searchSirene.mockResolvedValueOnce({
-      siret: "12345678912345",
+      siret: siretify(7),
       etatAdministratif: "A"
     });
 
@@ -290,7 +294,7 @@ describe("Mutation.createCompany", () => {
   it("should return an error when creating an unknown eco-organisme", async () => {
     const user = await userFactory();
     searchSirene.mockResolvedValueOnce({
-      siret: "1".repeat(14),
+      siret: siretify(14),
       etatAdministratif: "A"
     });
 
@@ -324,7 +328,7 @@ describe("Mutation.createCompany", () => {
       companyTypes: ["ECO_ORGANISME"]
     };
     searchSirene.mockResolvedValueOnce({
-      siret: "1".repeat(14),
+      siret: siretify(14),
       etatAdministratif: "A"
     });
 
@@ -361,7 +365,7 @@ describe("Mutation.createCompany", () => {
       ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
     };
     searchSirene.mockResolvedValueOnce({
-      siret: "1".repeat(14),
+      siret: siretify(14),
       etatAdministratif: "A"
     });
 
@@ -399,7 +403,7 @@ describe("Mutation.createCompany", () => {
       ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
     };
     searchSirene.mockResolvedValueOnce({
-      siret: "1".repeat(14),
+      siret: siretify(14),
       etatAdministratif: "A"
     });
 
@@ -433,7 +437,7 @@ describe("Mutation.createCompany", () => {
     const searchCompanyReload = require("../../../sirene/searchCompany");
     const searchSireneMock = jest.spyOn(searchCompanyReload, "default");
     searchSireneMock.mockResolvedValueOnce({
-      siret: "12345678912345",
+      siret: siretify(7),
       etatAdministratif: "A"
     });
     // No mails
@@ -499,7 +503,7 @@ describe("Mutation.createCompany", () => {
         ecoOrganismeAgreements: [],
         gerepId: null,
         name: "Acme in EU",
-        siret: "RO17579668",
+        siret: "RO17579668", // FIXME backports VAT to  SIRET to ensure working "SIRET only" functions
         address: "Transporter street",
         traderReceipt: null,
         transporterReceipt: null,

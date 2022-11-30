@@ -2,6 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { BsdaInput, Mutation } from "../../../../generated/graphql/types";
 import {
+  siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -61,7 +62,7 @@ describe("Mutation.Bsda.create", () => {
         input: {
           emitter: {
             company: {
-              siret: "siret"
+              siret: siretify(12)
             }
           }
         }
@@ -99,7 +100,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: "22222222222222",
+          siret: siretify(2),
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -167,7 +168,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: "22222222222222",
+          siret: siretify(2),
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -234,7 +235,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: "22222222222222",
+          siret: siretify(2),
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -303,7 +304,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: "22222222222222",
+          siret: siretify(2),
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -380,7 +381,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: "22222222222222",
+          siret: siretify(2),
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -461,7 +462,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: "22222222222222",
+          siret: siretify(2),
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -789,7 +790,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: "22222222222222",
+          siret: siretify(2),
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -862,7 +863,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: "22222222222222",
+          siret: siretify(2),
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -937,7 +938,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: "22222222222222",
+          siret: siretify(2),
           name: "worker",
           address: "address",
           contact: "contactEmail",
@@ -1028,7 +1029,7 @@ describe("Mutation.Bsda.create", () => {
       },
       worker: {
         company: {
-          siret: "22222222222222",
+          siret: siretify(2),
           name: "worker",
           address: "address",
           contact: "contactEmail",

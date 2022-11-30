@@ -4,7 +4,7 @@ import {
   MutationCreateAnonymousCompanyArgs
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
-import { userFactory } from "../../../../__tests__/factories";
+import { siretify, userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
 const CREATE_ANONYMOUS_COMPANY = `
@@ -20,7 +20,7 @@ const validInput = {
   codeCommune: "69000",
   codeNaf: "0111Z",
   name: "Acme",
-  siret: "12345678901234"
+  siret: siretify(6)
 };
 
 describe("createAnonymousCompany", () => {

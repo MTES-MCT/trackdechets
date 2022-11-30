@@ -1,5 +1,5 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import { siretify, userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus, BsdasriType } from "@prisma/client";
 import prisma from "../../../../prisma";
@@ -23,7 +23,7 @@ mutation UpdateDasri($id: ID!, $input: BsdasriInput!) {
         }
       }
       synthesizing { id }
- 
+
   }
 }`;
 describe("Mutation.updateBsdasri", () => {
@@ -62,13 +62,14 @@ describe("Mutation.updateBsdasri", () => {
     });
 
     const { mutate } = makeClient(transporter);
-
+    const emitterCompanySiret = siretify(2);
+    const destinationCompanySiret = siretify(3);
     const toAssociate1 = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.SENT,
-        emitterCompanySiret: "7654",
+        emitterCompanySiret,
         transporterCompanySiret: transporterCompany.siret,
-        destinationCompanySiret: "2689",
+        destinationCompanySiret,
         destinationOperationCode: "D10",
         transporterWastePackagings: [
           { type: "BOITE_CARTON", volume: 10, quantity: 6 },
@@ -80,9 +81,9 @@ describe("Mutation.updateBsdasri", () => {
     const toAssociate2 = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.SENT,
-        emitterCompanySiret: "7654",
+        emitterCompanySiret,
         transporterCompanySiret: transporterCompany.siret,
-        destinationCompanySiret: "2689",
+        destinationCompanySiret,
         destinationOperationCode: "D10",
         transporterWastePackagings: [
           { type: "BOITE_CARTON", volume: 10, quantity: 10 },

@@ -5,7 +5,10 @@ import {
   Mutation,
   MutationCreateFicheInterventionBsffArgs
 } from "../../../../generated/graphql/types";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  siretify,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
 const ADD_FICHE_INTERVENTION = `
@@ -32,7 +35,7 @@ const ficheInterventionInput: BsffFicheInterventionInput = {
   operateur: {
     company: {
       name: "Clim'op",
-      siret: "2".repeat(14),
+      siret: siretify(2),
       address: "12 rue de la Tige, 69000",
       mail: "contact@climop.com",
       phone: "06",
@@ -42,7 +45,7 @@ const ficheInterventionInput: BsffFicheInterventionInput = {
   detenteur: {
     company: {
       name: "Acme",
-      siret: "3".repeat(14),
+      siret: siretify(3),
       address: "12 rue de la Tige, 69000",
       mail: "contact@gmail.com",
       phone: "06",

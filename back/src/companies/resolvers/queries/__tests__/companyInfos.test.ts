@@ -1,6 +1,7 @@
 import { UserInputError } from "apollo-server-express";
 import { getCompanyInfos } from "../companyInfos";
 import { ErrorCode } from "../../../../common/errors";
+import { siretify } from "../../../../__tests__/factories";
 
 const searchCompanyMock = jest.fn();
 const vatMock = jest.fn();
@@ -45,8 +46,9 @@ describe("companyInfos with SIRET", () => {
   });
 
   it("should merge info from SIRENE, TD and s3ic", async () => {
+    const siret = siretify(13);
     searchCompanyMock.mockResolvedValueOnce({
-      siret: "85001946400013",
+      siret,
       name: "Code en stock"
     });
     companyMock.mockResolvedValueOnce({
@@ -61,7 +63,7 @@ describe("companyInfos with SIRET", () => {
     const company = await getCompanyInfos("85001946400014");
 
     expect(company).toStrictEqual({
-      siret: "85001946400013",
+      siret,
       name: "Code en stock",
       contactEmail: "benoit.guigal@protonmail.com",
       contactPhone: "06 67 78 xx xx",
@@ -91,15 +93,17 @@ describe("companyInfos with SIRET", () => {
   });
 
   it("should return SIRET search only if not registered", async () => {
+    const siret = siretify(13);
+
     searchCompanyMock.mockResolvedValueOnce({
-      siret: "85001946400013",
+      siret,
       name: "Code en stock"
     });
     companyMock.mockResolvedValueOnce(null);
     const company = await getCompanyInfos("85001946400014");
 
     expect(company).toStrictEqual({
-      siret: "85001946400013",
+      siret,
       name: "Code en stock",
       isRegistered: false,
       companyTypes: [],
