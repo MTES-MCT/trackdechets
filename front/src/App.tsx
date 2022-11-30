@@ -21,7 +21,9 @@ export default function App() {
           <SimpleNotificationError
             message={
               `Une erreur s'est produite, nous nous en excusons.` +
-              `Si le problème persiste, merci de contacter le support ${CONTACT_EMAIL}`
+              `Si le problème persiste, merci de contacter 
+              <a href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
+              >l'équipe Trackdéchets</a>.`              `
             }
           />
         }
