@@ -3,7 +3,8 @@ import { ErrorCode } from "../../../../common/errors";
 import {
   userFactory,
   userWithCompanyFactory,
-  companyFactory
+  companyFactory,
+  siretify
 } from "../../../../__tests__/factories";
 import { CompanyType } from "@prisma/client";
 import makeClient from "../../../../__tests__/testClient";
@@ -84,7 +85,7 @@ describe("Mutation.createDraftBsdasri", () => {
       },
       destination: {
         company: {
-          siret: "11111111111111"
+          siret: siretify(1)
         }
       }
     };

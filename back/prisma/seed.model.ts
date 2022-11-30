@@ -1,6 +1,7 @@
 import { hashPassword, passwordVersion } from "../src/users/utils";
 
 import prisma from "../src/prisma";
+import { siretify } from "../src/__tests__/factories";
 
 export default async () => {
   await prisma.user.create({
@@ -16,7 +17,7 @@ export default async () => {
           role: "ADMIN",
           company: {
             create: {
-              siret: "11111111111111",
+              siret: siretify(1),
               securityCode: 1234,
               verificationCode: "4321",
               name: "PRODUCTEUR",

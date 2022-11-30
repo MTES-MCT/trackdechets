@@ -1,6 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Query } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
+import { siretify } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
 const INVITATION = `
@@ -22,7 +23,7 @@ describe("query / invitation", () => {
     const userAccountHash = await prisma.userAccountHash.create({
       data: {
         email: "john.snow@trackdechets.fr",
-        companySiret: "11111111111111",
+        companySiret: siretify(2),
         hash: "azerty",
         role: "MEMBER"
       }

@@ -8,6 +8,7 @@ import {
   transporterSchemaFn
 } from "../validation";
 import { ReceivedFormInput } from "../../generated/graphql/types";
+import { siretify } from "../../__tests__/factories";
 
 jest.mock("../../prisma", () => ({
   company: {
@@ -903,7 +904,7 @@ describe("processedInfoSchema", () => {
       noTraceability: true,
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
-      nextDestinationCompanySiret: "11111111111111",
+      nextDestinationCompanySiret: siretify(1),
       nextDestinationCompanyAddress: "4 rue du déchet",
       nextDestinationCompanyCountry: "FR",
       nextDestinationCompanyContact: "Arya Stark",
@@ -922,7 +923,7 @@ describe("processedInfoSchema", () => {
       noTraceability: false,
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
-      nextDestinationCompanySiret: "11111111111111",
+      nextDestinationCompanySiret: siretify(1),
       nextDestinationCompanyAddress: "4 rue du déchet",
       nextDestinationCompanyCountry: "FR",
       nextDestinationCompanyContact: "Arya Stark",
@@ -940,7 +941,7 @@ describe("processedInfoSchema", () => {
       processingOperationDescription: "Regroupement",
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
-      nextDestinationCompanySiret: "11111111111111",
+      nextDestinationCompanySiret: siretify(1),
       nextDestinationCompanyAddress: "4 rue du déchet",
       nextDestinationCompanyCountry: "FR",
       nextDestinationCompanyContact: "Arya Stark",
@@ -959,7 +960,7 @@ describe("processedInfoSchema", () => {
       noTraceability: false,
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
-      nextDestinationCompanySiret: "11111111111111",
+      nextDestinationCompanySiret: siretify(1),
       nextDestinationCompanyAddress: "4 rue du déchet",
       nextDestinationCompanyCountry: "FR",
       nextDestinationCompanyContact: "Arya Stark",

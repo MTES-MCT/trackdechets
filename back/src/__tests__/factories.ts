@@ -39,7 +39,7 @@ export const userFactory = async (
  * Return a random valid siret
  * @param index numerical index
  */
-function siretify(index) {
+export function siretify(index) {
   return faker.helpers.replaceCreditCardSymbols(index + "############L");
 }
 

@@ -10,6 +10,7 @@ import {
 import { format } from "date-fns";
 import prisma from "../../../../prisma";
 import {
+  siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -300,7 +301,7 @@ describe("mutation / importPaperForm", () => {
       input.processedInfo.processingOperationDone = "D 13";
       input.processedInfo.nextDestination = {
         company: {
-          siret: "11111111111111",
+          siret: siretify(1),
           name: "Incinérateur",
           contact: "John Snow",
           mail: "contact@incinerateur.fr",
@@ -332,7 +333,7 @@ describe("mutation / importPaperForm", () => {
       input.processedInfo.processingOperationDone = "R 13";
       input.processedInfo.nextDestination = {
         company: {
-          siret: "11111111111111",
+          siret: siretify(1),
           name: "Incinérateur",
           contact: "John Snow",
           mail: "contact@incinerateur.fr",
@@ -733,7 +734,7 @@ describe("mutation / importPaperForm", () => {
       data.processedInfo.processingOperationDone = "D 13";
       data.processedInfo.nextDestination = {
         company: {
-          siret: "11111111111111",
+          siret: siretify(1),
           name: "Incinérateur",
           contact: "John Snow",
           mail: "contact@incinerateur.fr",
@@ -783,7 +784,7 @@ describe("mutation / importPaperForm", () => {
       data.processedInfo.noTraceability = true;
       data.processedInfo.nextDestination = {
         company: {
-          siret: "11111111111111",
+          siret: siretify(1),
           name: "Incinérateur",
           contact: "John Snow",
           mail: "contact@incinerateur.fr",
