@@ -5,6 +5,7 @@ import {
 } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
+import { siretify } from "../../__tests__/factories";
 
 export const bsvhuFactory = async ({
   opt = {}
