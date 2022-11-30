@@ -47,7 +47,7 @@ const getVhuFormdata = (): Prisma.BsvhuCreateInput => ({
   weightIsEstimate: true,
 
   transporterCompanyName: "Transport facile",
-  transporterCompanySiret: "12345678974589",
+  transporterCompanySiret: siretify(1),
   transporterCompanyAddress: "12 route du Transporter, Transporter City",
   transporterCompanyContact: "Henri Transport",
   transporterCompanyPhone: "06 06 06 06 06",

@@ -82,7 +82,7 @@ const formdataForPrivateOrShip = {
   transporterCompanyName: "WASTE TRANSPORTER",
   transporterCompanyPhone: "06 18 76 02 66",
   transporterCompanyContact: "Walter Transporter",
-  transporterCompanySiret: "12345678974589",
+  transporterCompanySiret: siretify(1),
   transporterDepartment: "86",
   transporterIsExemptedOfReceipt: false,
   transporterNumberPlate: "aa22",
