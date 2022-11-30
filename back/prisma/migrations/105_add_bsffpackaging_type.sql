@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "BsffPackagingType" AS ENUM ('BOUTEILLE', 'CONTENEUR', 'CITERNE', 'AUTRE');
+CREATE TYPE "default$default"."BsffPackagingType" AS ENUM ('BOUTEILLE', 'CONTENEUR', 'CITERNE', 'AUTRE');
 
 -- AlterTable
 ALTER TABLE
