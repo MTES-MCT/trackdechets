@@ -1,5 +1,6 @@
 import { hash } from "bcrypt";
 import { faker } from "@faker-js/faker";
+import crypto from "crypto";
 import getReadableId from "../forms/readableId";
 import {
   CompanyType,
@@ -42,7 +43,7 @@ export const userFactory = async (
 export function siretify(index: number | undefined) {
   if (index === null || index > 9) {
     return faker.helpers.replaceCreditCardSymbols(
-      Math.floor(Math.random() * 9) + "############L"
+      Math.floor(Number(crypto.randomBytes(1))) + "############L"
     );
   }
   return faker.helpers.replaceCreditCardSymbols(
