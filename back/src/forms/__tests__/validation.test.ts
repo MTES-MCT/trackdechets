@@ -1057,7 +1057,7 @@ describe("processedInfoSchema", () => {
   test("transporter vatNumber is optional when a valid SIRET is present", async () => {
     const transporter = {
       transporterCompanyName: "Code en Stock",
-      transporterCompanySiret: siretify(12),
+      transporterCompanySiret: siretify(1),
       transporterCompanyAddress: "Marseille",
       transporterCompanyContact: "Contact",
       transporterCompanyPhone: "00 00 00 00 00",

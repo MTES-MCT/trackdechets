@@ -2,7 +2,7 @@ import { cache } from "../cache";
 import { resetCache } from "../../../../integration-tests/helper";
 import { siretify } from "../../../__tests__/factories";
 
-const siret = siretify(13);
+const siret = siretify(1);
 
 const company = {
   siret,

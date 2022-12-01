@@ -58,7 +58,7 @@ describe("Mutation.Bsda.createDraft", () => {
           input: {
             emitter: {
               company: {
-                siret: siretify(13)
+                siret: siretify(1)
               }
             }
           }
