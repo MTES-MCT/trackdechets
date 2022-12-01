@@ -103,8 +103,8 @@ export const transporterCompanySiretSchema = (isDraft: boolean) =>
           throw ctx.createError({
             message:
               `Le transporteur saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets` +
-              ` en tant qu'entreprise de transport. Cette installation ne peut donc pas être visée sur le bordereau.` +
-              ` Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil` +
+              ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
+              ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
               ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
           });
         }
