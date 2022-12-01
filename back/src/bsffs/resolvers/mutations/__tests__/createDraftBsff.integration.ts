@@ -619,5 +619,45 @@ describe("Mutation.createDraftBsff", () => {
         "Bouteille de récup"
       );
     });
+
+    it("should throw error when passing both name= and type= on a BSFF packagng", async () => {
+      const emitter = await userWithCompanyFactory("ADMIN");
+
+      const { mutate } = makeClient(emitter.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createDraftBsff">,
+        MutationCreateDraftBsffArgs
+      >(CREATE_DRAFT_BSFF, {
+        variables: {
+          input: {
+            type: BsffType.COLLECTE_PETITES_QUANTITES,
+            emitter: {
+              company: {
+                name: emitter.company.name,
+                siret: emitter.company.siret,
+                address: emitter.company.address,
+                contact: emitter.user.name,
+                mail: emitter.user.email
+              }
+            },
+            packagings: [
+              {
+                name: "Bouteille de récup",
+                type: "BOUTEILLE",
+                numero: "cont1",
+                volume: 1,
+                weight: 1
+              }
+            ]
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Vous ne pouvez pas préciser à la fois le champ `type` et le champ `name`"
+        })
+      ]);
+    });
   });
 });

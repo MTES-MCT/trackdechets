@@ -218,6 +218,12 @@ export function toBsffPackagingWithType({
     );
   }
 
+  if (!!packaging.type && !!name) {
+    throw new UserInputError(
+      "Vous ne pouvez pas préciser à la fois le champ `type` et le champ `name`"
+    );
+  }
+
   let type = packaging.type;
   let other = packaging.other;
   if (!packaging.type) {
