@@ -46,7 +46,7 @@ describe("companyInfos with SIRET", () => {
   });
 
   it("should merge info from SIRENE, TD and s3ic", async () => {
-    const siret = siretify(13);
+    const siret = siretify(1);
     searchCompanyMock.mockResolvedValueOnce({
       siret,
       name: "Code en stock"
@@ -93,7 +93,7 @@ describe("companyInfos with SIRET", () => {
   });
 
   it("should return SIRET search only if not registered", async () => {
-    const siret = siretify(13);
+    const siret = siretify(1);
 
     searchCompanyMock.mockResolvedValueOnce({
       siret,

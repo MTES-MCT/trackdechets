@@ -20,7 +20,7 @@ describe("query { searchCompanies(clue, department) }", () => {
   });
 
   it("should return list of companies based on clue", async () => {
-    const siret = siretify(13);
+    const siret = siretify(1);
 
     searchCompanySpy.mockResolvedValueOnce([
       {
@@ -55,7 +55,7 @@ describe("query { searchCompanies(clue, department) }", () => {
   });
 
   it("should merge info from SIRENE and ICPE", async () => {
-    const siret = siretify(13);
+    const siret = siretify(1);
 
     searchCompanySpy.mockResolvedValueOnce([
       {
@@ -98,7 +98,7 @@ describe("query { searchCompanies(clue, department) }", () => {
   });
 
   it("should fetch transporter and trader receipt info", async () => {
-    const siret = siretify(13);
+    const siret = siretify(1);
 
     searchCompanySpy.mockResolvedValueOnce([
       {

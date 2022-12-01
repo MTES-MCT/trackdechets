@@ -90,7 +90,7 @@ describe("transporterSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Transporteur : le n° SIRET n'est pas au bon format"
+      "Transporteur : 00000000000000 n'est pas un numéro de SIRET valide"
     );
   });
 
@@ -102,7 +102,7 @@ describe("transporterSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "transporterCompanySiret n'est pas un numéro de SIRET valide"
+      "Transporteur : 1 n'est pas un numéro de SIRET valide"
     );
   });
 

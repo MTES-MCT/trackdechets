@@ -31,7 +31,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Random company not registered in Trackdéchets", async () => {
-    const siret = siretify(13);
+    const siret = siretify(1);
 
     searchSirene.mockResolvedValueOnce({
       siret,
@@ -86,7 +86,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("ICPE registered in Trackdéchets", async () => {
-    const siret = siretify(13);
+    const siret = siretify(1);
 
     searchSirene.mockResolvedValueOnce({
       siret,
@@ -114,7 +114,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
 
     await prisma.installation.create({
       data: {
-        s3icNumeroSiret: siretify(14),
+        s3icNumeroSiret: siretify(1),
         codeS3ic: "0064.00001"
       }
     });
@@ -211,7 +211,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Trader company with trader receipt", async () => {
-    const siret = siretify(13);
+    const siret = siretify(1);
 
     searchSirene.mockResolvedValueOnce({
       siret,
@@ -257,7 +257,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Company with direct dasri takeover allowance", async () => {
-    const siret = siretify(13);
+    const siret = siretify(1);
 
     searchSirene.mockResolvedValueOnce({
       siret,
@@ -297,7 +297,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Closed company in INSEE public data", async () => {
-    const siret = siretify(13);
+    const siret = siretify(1);
 
     searchSirene.mockResolvedValueOnce({
       siret,
@@ -342,7 +342,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Hidden company in INSEE and not registered", async () => {
-    const siret = siretify(13);
+    const siret = siretify(1);
 
     searchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
     const gqlquery = `
@@ -382,7 +382,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Hidden company in INSEE and but registered without AnonymousCompany", async () => {
-    const siret = siretify(13);
+    const siret = siretify(1);
 
     searchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
     const company = await companyFactory({
@@ -475,7 +475,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Hidden company in INSEE, AnonymousCompany for Test is created and but not registered", async () => {
-    const siret = siretify(15);
+    const siret = siretify(1);
 
     const createInput = {
       siret,
@@ -519,7 +519,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Hidden company in INSEE, AnonymousCompany created and registered", async () => {
-    const siret = siretify(15);
+    const siret = siretify(1);
 
     const createInput = {
       siret,
@@ -578,7 +578,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Hidden company in INSEE, AnonymousCompany for TEST created and registered", async () => {
-    const siret = siretify(13);
+    const siret = siretify(1);
 
     const createInput = {
       siret,

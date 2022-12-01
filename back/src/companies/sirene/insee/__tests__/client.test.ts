@@ -17,7 +17,7 @@ describe("searchCompany", () => {
   });
 
   it("should retrieve a company by siret", async () => {
-    const siret = siretify(13);
+    const siret = siretify(1);
 
     axiosGet.mockResolvedValueOnce({
       ...axiosResponseDefault,
@@ -118,7 +118,7 @@ describe("searchCompany", () => {
 
   it(`should escalate other types of errors
   (network, internal server error, etc)`, async () => {
-    const siret = siretify(13);
+    const siret = siretify(1);
     axiosGet.mockRejectedValueOnce({
       message: "Erreur inconnue"
     });
@@ -137,7 +137,7 @@ describe("searchCompanies", () => {
   });
 
   it("perform a full text search based on a clue", async () => {
-    const siret = siretify(13);
+    const siret = siretify(1);
 
     axiosGet.mockResolvedValueOnce({
       ...axiosResponseDefault,

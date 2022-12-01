@@ -508,7 +508,6 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         ),
       destinationCompanySiret: yup
         .string()
-        .length(14, `Entreprise de destination: ${INVALID_SIRET_LENGTH}`)
         .requiredIf(
           context.emissionSignature,
           `Entreprise de destination: ${MISSING_COMPANY_SIRET}`
@@ -516,7 +515,7 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
         .test(
           "is-siret",
           "Entreprise de destination: ${originalValue} n'est pas un numéro de SIRET valide",
-          value => isSiret(value)
+          value => !value || isSiret(value)
         )
         .test(
           "is-recipient-registered-with-right-profile",
@@ -815,26 +814,27 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
               ),
           otherwise: schema =>
             schema.when("transporterCompanyVatNumber", (tva, schema) => {
-              if (!tva && context.transportSignature) {
-                return schema.test(
-                  "is-siret",
-                  "Transporteur: ${originalValue} n'est pas un numéro de SIRET valide",
-                  value => isSiret(value)
-                );
+              if (!tva) {
+                return schema
+                  .nullable()
+                  .requiredIf(
+                    context.transportSignature,
+                    `Transporteur: ${MISSING_COMPANY_SIRET}`
+                  );
               }
               return schema
                 .nullable()
                 .requiredIf(
                   context.workSignature,
                   `Transporteur: ${MISSING_COMPANY_SIRET}`
-                )
-                .test(
-                  "is-siret",
-                  "Transporteur: ${originalValue} n'est pas un numéro de SIRET valide",
-                  value => isSiret(value)
                 );
             })
         })
+        .test(
+          "is-siret",
+          "Transporteur: ${originalValue} n'est pas un numéro de SIRET valide",
+          value => !value || isSiret(value)
+        )
         .test(
           "is-transporter-registered-with-right-profile",
           ({ value }) =>
