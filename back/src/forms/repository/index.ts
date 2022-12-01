@@ -9,6 +9,7 @@ import buildCreateForm from "./form/create";
 import buildDeleteForm from "./form/delete";
 import buildDeleteFormStaleSegments from "./form/deleteStaleSegments";
 import buildFindAppendix2FormsById from "./form/findAppendix2FormsById";
+import buildFindFirstForm from "./form/findFirst";
 import buildFindForwardedInById from "./form/findForwardedInById";
 import buildFindFullFormById from "./form/findFullFormById";
 import buildFindUniqueForm from "./form/findUnique";
@@ -30,6 +31,7 @@ export type FormRepository = FormActions & FormRevisionRequestActions;
 export function getReadOnlyFormRepository() {
   return {
     findUnique: buildFindUniqueForm({ prisma }),
+    findFirst: buildFindFirstForm({ prisma }),
     findFullFormById: buildFindFullFormById({ prisma }),
     findAppendix2FormsById: buildFindAppendix2FormsById({ prisma }),
     findForwardedInById: buildFindForwardedInById({ prisma }),
