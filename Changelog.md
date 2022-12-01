@@ -18,7 +18,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Prévention des injections SSTI [PR 1924](https://github.com/MTES-MCT/trackdechets/pull/1924)
-
+- Prévention d'injection XSS sur le champ website [PR 1934](https://github.com/MTES-MCT/trackdechets/pull/1934)
 #### :memo: Documentation
 
 #### :house: Interne
