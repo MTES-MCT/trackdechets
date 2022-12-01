@@ -3,6 +3,7 @@ import {
   Bsff,
   BsffFicheIntervention as PrismaBsffFicheIntervention,
   BsffPackaging,
+  BsffPackagingType,
   BsffType,
   Prisma
 } from "@prisma/client";
@@ -27,6 +28,7 @@ import {
 } from "./validation";
 import { indexBsff } from "./elastic";
 import { GraphQLContext } from "../types";
+import { toBsffPackagingWithType } from "./compat";
 
 export async function getBsffOrNotFound(
   where: SetRequired<Prisma.BsffWhereInput, "id">
@@ -137,9 +139,11 @@ export async function createBsff(
         })
       : [];
 
+  const packagingsInput = input.packagings?.map(toBsffPackagingWithType);
+
   const futureBsff = {
     ...flatInput,
-    packagings: input.packagings
+    packagings: packagingsInput
   };
 
   await validateBsff(futureBsff);
@@ -176,7 +180,7 @@ export async function createBsff(
 
 export function getPackagingCreateInput(
   bsff: Partial<Bsff | Prisma.BsffCreateInput> & {
-    packagings?: BsffPackagingInput[];
+    packagings?: (BsffPackagingInput & { type: BsffPackagingType })[];
   },
   previousPackagings: BsffPackaging[]
 ): Prisma.BsffPackagingCreateWithoutBsffInput[] {
@@ -184,7 +188,8 @@ export function getPackagingCreateInput(
     ? // auto complete packagings based on inital packages in case of groupement or réexpédition,
       // overwriting user provided data if necessary.
       previousPackagings.map(p => ({
-        name: p.name,
+        type: p.type,
+        other: p.other,
         numero: p.numero,
         volume: p.volume,
         weight: p.acceptationWeight,
@@ -193,7 +198,8 @@ export function getPackagingCreateInput(
     : bsff.type === BsffType.RECONDITIONNEMENT && bsff.packagings?.length > 0
     ? [
         {
-          name: bsff.packagings[0].name,
+          type: bsff.packagings[0].type,
+          other: bsff.packagings[0].other,
           volume: bsff.packagings[0].volume,
           numero: bsff.packagings[0].numero,
           weight: bsff.packagings[0].weight,

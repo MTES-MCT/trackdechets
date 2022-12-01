@@ -19,6 +19,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Prévention des injections SSTI [PR 1924](https://github.com/MTES-MCT/trackdechets/pull/1924)
 - Prévention d'injection XSS sur le champ website [PR 1934](https://github.com/MTES-MCT/trackdechets/pull/1934)
+- BSFF - le type de contenant doit désormais être choisi dans une liste prédéfinie (bouteille, conteneur, citerne, autre). [PR 1893](https://github.com/MTES-MCT/trackdechets/pull/1893)
+
 #### :memo: Documentation
 
 #### :house: Interne

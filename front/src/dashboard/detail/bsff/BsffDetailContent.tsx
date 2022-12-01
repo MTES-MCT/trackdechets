@@ -37,6 +37,7 @@ import {
   TableRow,
 } from "common/components";
 import { formatDate } from "common/datetime";
+import { PACKAGINGS_NAMES } from "form/bsff/components/packagings/Packagings";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -457,7 +458,7 @@ function FicheInterventions({ form }: { form: Bsff }) {
             value={ficheIntervention.numero}
           />
           <DetailRow
-            label="Quantité fluides en kilo(s)"
+            label="Quantité fluides en kg"
             value={ficheIntervention.weight}
           />
           <DetailRow
@@ -487,8 +488,10 @@ function Packagings({ form }: { form: Bsff }) {
       <TableBody>
         {form.packagings.map(p => {
           return (
-            <TableRow>
-              <TableCell>{p.name}</TableCell>
+            <TableRow key={p.id}>
+              <TableCell>
+                {p.type === "AUTRE" ? p.other : PACKAGINGS_NAMES[p.type]}
+              </TableCell>
               <TableCell>{p.numero}</TableCell>
               <TableCell>{p.weight}</TableCell>
               <TableCell>{p.volume}</TableCell>

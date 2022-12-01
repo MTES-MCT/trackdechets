@@ -7,7 +7,8 @@ import {
   BsffFicheIntervention,
   BsffType,
   Prisma,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  BsffPackagingType
 } from "@prisma/client";
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { isFinalOperation, OPERATION } from "./constants";
@@ -202,15 +203,30 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
           )
           .of<
             yup.SchemaOf<
-              Pick<PrismaBsffPackaging, "name" | "numero" | "volume" | "weight">
+              Pick<
+                PrismaBsffPackaging,
+                "type" | "other" | "numero" | "volume" | "weight"
+              >
             >
           >(
             yup.object({
-              name: yup
+              type: yup
+                .mixed<BsffPackagingType>()
+                .required("Conditionnements : le type de contenant est requis"),
+              other: yup
                 .string()
-                .ensure()
-                .required(
-                  "Conditionnements : la dénomination du contenant est requise"
+                .when("type", (type, schema) =>
+                  type === "AUTRE"
+                    ? schema.requiredIf(
+                        !isDraft,
+                        "La description doit être précisée pour le conditionnement 'AUTRE'."
+                      )
+                    : schema
+                        .nullable()
+                        .max(
+                          0,
+                          "La description ne peut être renseigné que lorsque le type de conditionnement est 'AUTRE'."
+                        )
                 ),
               volume: yup
                 .number()
@@ -558,7 +574,10 @@ export const draftBsffSchema = baseBsffSchemaFn(true);
 
 export async function validateBsff(
   bsff: Partial<Bsff | Prisma.BsffCreateInput> & {
-    packagings?: Pick<BsffPackaging, "name" | "numero" | "volume" | "weight">[];
+    packagings?: Pick<
+      BsffPackaging,
+      "type" | "name" | "other" | "numero" | "volume" | "weight"
+    >[];
   }
 ) {
   try {

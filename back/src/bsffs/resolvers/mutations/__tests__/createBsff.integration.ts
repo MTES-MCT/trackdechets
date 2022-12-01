@@ -1,4 +1,4 @@
-import { BsffType, UserRole } from "@prisma/client";
+import { BsffPackagingType, BsffType, UserRole } from "@prisma/client";
 import { gql } from "apollo-server-core";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { BSFF_WASTE_CODES } from "../../../../common/constants";
@@ -76,7 +76,7 @@ describe("Mutation.createBsff", () => {
           },
           packagings: [
             {
-              name: "BOUTEILLE",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "123",
               weight: 1,
               volume: 1

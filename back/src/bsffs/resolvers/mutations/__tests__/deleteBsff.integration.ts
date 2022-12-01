@@ -1,4 +1,9 @@
-import { BsffStatus, BsffType, UserRole } from "@prisma/client";
+import {
+  BsffPackagingType,
+  BsffStatus,
+  BsffType,
+  UserRole
+} from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -172,7 +177,7 @@ describe("Mutation.deleteBsff", () => {
         emitterCompanySiret: ttr.company.siret,
         packagings: {
           create: initialBsff.packagings.map(p => ({
-            name: p.name,
+            type: p.type,
             numero: p.numero,
             volume: p.volume,
             weight: p.acceptationWeight,
@@ -239,7 +244,7 @@ describe("Mutation.deleteBsff", () => {
         emitterCompanySiret: ttr.company.siret,
         packagings: {
           create: {
-            name: "bouteille",
+            type: BsffPackagingType.BOUTEILLE,
             numero: "cont1",
             weight: 1,
             volume: 1,
@@ -308,8 +313,8 @@ describe("Mutation.deleteBsff", () => {
         emitterCompanySiret: ttr.company.siret,
         packagings: {
           create: {
-            name: initialBsff.packagings[0].name,
-            numero: initialBsff.packagings[0].name,
+            type: initialBsff.packagings[0].type,
+            numero: initialBsff.packagings[0].numero,
             weight: initialBsff.packagings[0].acceptationWeight,
             volume: initialBsff.packagings[0].volume,
             previousPackagings: {

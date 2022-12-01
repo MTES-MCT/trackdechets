@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "common/components";
 import { IconCheckCircle1 } from "common/components/Icons";
+import { PACKAGINGS_NAMES } from "form/bsff/components/packagings/Packagings";
 import { GET_BSFF_FORM } from "form/bsff/utils/queries";
 import {
   Bsff,
@@ -96,7 +97,10 @@ function BsffPackagingTable({ bsff }: BsffPackagingTableProps) {
       {
         id: "name",
         Header: "Type de contenant",
-        accessor: bsffPackaging => bsffPackaging.name,
+        accessor: bsffPackaging =>
+          bsffPackaging.type === "AUTRE"
+            ? bsffPackaging.other
+            : PACKAGINGS_NAMES[bsffPackaging.type],
         filter: "text",
       },
       {

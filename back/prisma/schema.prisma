@@ -1166,8 +1166,9 @@ model BsffFicheIntervention {
 }
 
 model BsffPackaging {
-  id     String @id @default(cuid())
-  name   String
+  id     String            @id @default(cuid())
+  type   BsffPackagingType
+  other  String?
   volume Float?
   weight Float
   numero String
@@ -1208,6 +1209,13 @@ model BsffPackaging {
 
   @@index([bsffId], map: "_BsffPackagingBsffId")
   @@index([nextPackagingId], map: "_BsffPackagingNextPackagingIdx")
+}
+
+enum BsffPackagingType {
+  BOUTEILLE
+  CONTENEUR
+  CITERNE
+  AUTRE
 }
 
 // ----------------

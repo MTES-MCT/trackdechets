@@ -93,12 +93,12 @@ export async function generateBsffPdf(
       .map(
         packaging =>
           `${[
-            packaging.name,
+            packaging.type === "AUTRE" ? packaging.other : packaging.type,
             packaging.volume ? `${packaging.volume}L` : null,
             `n°${packaging.numero}`
           ]
             .filter(Boolean)
-            .join(" ")} : ${packaging.weight} kilo(s)`
+            .join(" ")} : ${packaging.weight} kg`
       )
       .join(", "),
     receptionAccepted:
