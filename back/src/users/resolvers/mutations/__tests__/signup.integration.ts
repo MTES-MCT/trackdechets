@@ -205,7 +205,7 @@ describe("Mutation.signup", () => {
       variables: {
         userInfos: {
           email: user.email,
-          password: user.password,
+          password: viablePassword,
           name: user.name,
           phone: user.phone
         }

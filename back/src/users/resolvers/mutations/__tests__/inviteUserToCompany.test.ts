@@ -4,7 +4,7 @@ import {
   notifyUserOfInvite
 } from "../../../../mailer/templates";
 import { renderMail } from "../../../../mailer/templates/renderers";
-import { inviteUserToCompanyFn as inviteUserToCompany } from "../inviteUserToCompany";
+import { inviteUserToCompanyFn as inviteUserToCompany } from "../inviteUserToCompanyService";
 
 const userMock = jest.fn();
 const companyMock = jest.fn();
