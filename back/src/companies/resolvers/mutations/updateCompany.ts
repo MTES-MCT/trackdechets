@@ -9,6 +9,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
 import { checkIsCompanyAdmin } from "../../../users/permissions";
+import * as yup from "yup";
 
 export async function updateCompanyFn({
   id,
@@ -67,6 +68,13 @@ export async function updateCompanyFn({
         }
       : {})
   };
+
+  const companySchema = yup.object().shape({
+    website: yup.string().url("L'url est invalide")
+  });
+  // A string like javascript:alert("p0wned") might be reflected on company public page
+  // this is not filtered by the xss middleware
+  await companySchema.validate(data);
 
   const company = await prisma.company.update({
     where: { id },
