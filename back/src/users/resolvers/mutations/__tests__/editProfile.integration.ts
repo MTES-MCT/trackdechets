@@ -3,6 +3,7 @@ import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import prisma from "../../../../prisma";
+import { ErrorCode } from "../../../../common/errors";
 
 const EDIT_PROFILE = `
   mutation EditProfile($name: String, $phone: String){
@@ -27,5 +28,22 @@ describe("mutation editProfile", () => {
     });
     expect(updatedUser.name).toEqual(name);
     expect(updatedUser.phone).toEqual(phone);
+  });
+
+  it("should fail to edit profile when name payload contains unsafe chars", async () => {
+    const user = await userFactory();
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const name = "hackers{{lolo}}";
+
+    const { errors } = await mutate(EDIT_PROFILE, { variables: { name } });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Les caractères suivants sont interdits: { } % < > $ ' " =`,
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
   });
 });

@@ -19,8 +19,14 @@ export default function AccountNewAccessToken({
   return (
     <>
       <div className="notification success">
-        Un nouveau jeton d'accès a été généré ! Pensez à le copier maintenant.
-        Vous ne serez plus en mesure de le consulter ultérieurement.
+        <p>
+          Un nouveau jeton d'accès a été généré ! Pensez à le copier maintenant.
+          Vous ne serez plus en mesure de le consulter ultérieurement.
+        </p>
+        <strong>
+          🚨 Ce jeton est confidentiel, ne le diffusez pas, et consultez nos
+          recommendations de sécurité dans la documentation.
+        </strong>
       </div>
       <div className={`${styles.token} ${styles.newToken}`}>
         <div className={styles.newTokenGroupItems}>

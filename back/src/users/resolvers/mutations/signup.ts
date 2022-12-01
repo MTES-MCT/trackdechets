@@ -14,20 +14,23 @@ import { hashPassword } from "../../utils";
 import { onSignup } from "../../../mailer/templates";
 import { renderMail } from "../../../mailer/templates/renderers";
 
-export const signupSchema = yup.object({
-  userInfos: yup.object({
-    email: yup
-      .string()
-      .email("L'email saisi n'est pas conforme.")
-      .required("Vous devez saisir un email."),
-    password: yup
-      .string()
-      .required("Vous devez saisir un mot de passe.")
-      .min(8, "Le mot de passe doit faire au moins 8 caractères")
-  })
-});
-
 function validateArgs(args: MutationSignupArgs) {
+  const signupSchema = yup.object({
+    userInfos: yup.object({
+      name: yup
+        .string()
+        .isSafeSSTI()
+        .required("Vous devez saisir nom et prénom."),
+      email: yup
+        .string()
+        .email("L'email saisi n'est pas conforme.")
+        .required("Vous devez saisir un email."),
+      password: yup
+        .string()
+        .required("Vous devez saisir un mot de passe.")
+        .min(8, "Le mot de passe doit faire au moins 8 caractères")
+    })
+  });
   signupSchema.validateSync(args);
   return args;
 }
