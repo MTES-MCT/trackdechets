@@ -137,6 +137,14 @@ const updateFormResolver = async (
     };
   }
 
+  if (isOrWillBeTempStorage && !(forwardedIn || temporaryStorageDetail)) {
+    formUpdateInput.forwardedIn = {
+      create: {
+        owner: { connect: { id: user.id } },
+        readableId: `${existingForm.readableId}-suite`
+      }
+    };
+  }
   await checkIsFormContributor(
     user,
     nextFormCompanies,

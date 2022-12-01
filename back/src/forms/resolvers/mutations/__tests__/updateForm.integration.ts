@@ -822,6 +822,38 @@ describe("Mutation.updateForm", () => {
     );
   });
 
+  it("should add a temporary storage even if temporaryStorageDetail is empty ", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const updateFormInput = {
+      id: form.id,
+      recipient: {
+        isTempStorage: true
+      }
+    };
+    const { mutate } = makeClient(user);
+    await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput
+      }
+    });
+
+    const tempStorage = await prisma.form
+      .findUnique({
+        where: { id: form.id }
+      })
+      .forwardedIn();
+
+    expect(tempStorage.readableId).toBe(`${form.readableId}-suite`);
+  });
+
   it("should update the temporary storage", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const form = await formFactory({

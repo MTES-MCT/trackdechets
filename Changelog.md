@@ -13,6 +13,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Correctif d'un bug empêchant la signature d'un bsd avec entrposage provisoire[PR 1927](https://github.com/MTES-MCT/trackdechets/pull/1927)
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
