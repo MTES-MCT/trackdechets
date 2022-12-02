@@ -723,7 +723,7 @@ describe("mutation.markAsProcessed", () => {
         message:
           "Destination ultérieure : Le nom de l'entreprise est obligatoire\n" +
           "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire\n" +
-          "Destination ultérieure prévue : Le SIRET doit faire 14 caractères numériques\n" +
+          "Destination ultérieure prévue : Le SIRET n'est pas valide\n" +
           "Destination ultérieure : L'adresse de l'entreprise est obligatoire\n" +
           "Destination ultérieure : Le contact dans l'entreprise est obligatoire\n" +
           "Destination ultérieure : Le téléphone de l'entreprise est obligatoire\n" +
