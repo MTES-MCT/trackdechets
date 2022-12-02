@@ -315,7 +315,7 @@ describe("query favorites", () => {
     });
     const transporter = await companyFactory({
       vatNumber: "IT09301420155",
-      siret: ""
+      siret: "IT09301420155"
     });
     await formFactory({
       ownerId: user.id,

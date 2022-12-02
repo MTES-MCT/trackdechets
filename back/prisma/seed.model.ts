@@ -43,7 +43,7 @@ export default async () => {
           role: "ADMIN",
           company: {
             create: {
-              siret: "22222222222222",
+              siret: siretify(2),
               securityCode: 1234,
               verificationCode: "4321",
               name: "TRANSPORTEUR",
@@ -76,7 +76,7 @@ export default async () => {
           role: "ADMIN",
           company: {
             create: {
-              siret: "33333333333333",
+              siret: siretify(3),
               securityCode: 1234,
               verificationCode: "4321",
               name: "COLLECTEUR",
@@ -102,7 +102,7 @@ export default async () => {
           role: "ADMIN",
           company: {
             create: {
-              siret: "44444444444444",
+              siret: siretify(4),
               securityCode: 1234,
               verificationCode: "4321",
               name: "ECOORG",
@@ -119,7 +119,7 @@ export default async () => {
     data: {
       address: "34 RUE DU DECHETS 13001 MARSEILLE",
       name: "ECOORG",
-      siret: "44444444444444"
+      siret: siretify(5)
     }
   });
 };
