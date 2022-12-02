@@ -1345,7 +1345,7 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
+          "emitter.type doit être égal à APPENDIX2 ou APPENDIX1 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
       })
     ]);
   });
@@ -1379,7 +1379,7 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
+          "emitter.type doit être égal à APPENDIX2 ou APPENDIX1 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
       })
     ]);
   });
@@ -1725,5 +1725,173 @@ describe("Mutation.createForm", () => {
           "Déchet : le poids doit être inférieur à 40 tonnes lorsque le transport se fait par la route"
       })
     ]);
+  });
+
+  describe("Annexe 1", () => {
+    it("should create an APPENDIX1_PRODUCER form", async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { mutate } = makeClient(user);
+
+      const { data } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            emitter: {
+              type: "APPENDIX1_PRODUCER",
+              company: { siret: company.siret }
+            }
+          }
+        }
+      });
+
+      const form = await prisma.form.findUnique({
+        where: { id: data.createForm.id }
+      });
+
+      expect(form.emitterCompanySiret).toContain(company.siret);
+    });
+
+    it("should ignore unrelated fields when creating an APPENDIX1_PRODUCER", async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { mutate } = makeClient(user);
+
+      const { data } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            emitter: {
+              type: "APPENDIX1_PRODUCER",
+              company: { siret: company.siret }
+            },
+            transporter: { company: { siret: company.siret } }
+          }
+        }
+      });
+
+      expect(data.createForm.transporter).toBeNull();
+    });
+
+    it("should create an appendix 1 container and group appendix 1 items", async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { company: producerCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { mutate } = makeClient(user);
+
+      const appendix1_1 = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.SEALED,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          owner: { connect: { id: user.id } }
+        }
+      });
+      const appendix1_2 = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.SEALED,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          owner: { connect: { id: user.id } }
+        }
+      });
+
+      const { data } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            emitter: {
+              type: "APPENDIX1",
+              company: { siret: company.siret }
+            },
+            transporter: { company: { siret: company.siret } },
+            grouping: [
+              { form: { id: appendix1_1.id } },
+              { form: { id: appendix1_2.id } }
+            ]
+          }
+        }
+      });
+
+      expect(data.createForm.id).toBeDefined();
+      expect(data.createForm.grouping.length).toBe(2);
+    });
+
+    it("should seal grouped appendix 1 items when necessary", async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { company: producerCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { mutate } = makeClient(user);
+
+      const appendix1_1 = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.DRAFT,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          emitterCompanyName: producerCompany.name,
+          emitterCompanyAddress: producerCompany.address,
+          emitterCompanyContact: "Contact",
+          emitterCompanyPhone: "0101010101",
+          emitterCompanyMail: "contact@mail.com",
+          wasteDetailsCode: "01 01 01",
+          owner: { connect: { id: user.id } }
+        }
+      });
+      const appendix1_2 = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.DRAFT,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          emitterCompanyName: producerCompany.name,
+          emitterCompanyAddress: producerCompany.address,
+          emitterCompanyContact: "Contact",
+          emitterCompanyPhone: "0101010101",
+          emitterCompanyMail: "contact@mail.com",
+          wasteDetailsCode: "01 01 01",
+          owner: { connect: { id: user.id } }
+        }
+      });
+
+      const { data } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
+        variables: {
+          createFormInput: {
+            emitter: {
+              type: "APPENDIX1",
+              company: { siret: company.siret }
+            },
+            transporter: { company: { siret: company.siret } },
+            grouping: [
+              { form: { id: appendix1_1.id } },
+              { form: { id: appendix1_2.id } }
+            ]
+          }
+        }
+      });
+
+      expect(data.createForm.grouping.length).toBe(2);
+
+      const newAppendix1_1 = await prisma.form.findUnique({
+        where: { id: appendix1_1.id }
+      });
+      expect(newAppendix1_1.status).toBe(Status.SEALED);
+
+      const newAppendix1_2 = await prisma.form.findUnique({
+        where: { id: appendix1_2.id }
+      });
+      expect(newAppendix1_2.status).toBe(Status.SEALED);
+    });
   });
 });

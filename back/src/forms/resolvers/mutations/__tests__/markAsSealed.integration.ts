@@ -664,6 +664,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         status: "DRAFT",
+        emitterType: "APPENDIX2",
         emitterCompanySiret: company.siret,
         recipientCompanySiret: destination.siret,
         grouping: {

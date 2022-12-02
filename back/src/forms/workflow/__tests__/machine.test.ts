@@ -10,13 +10,6 @@ describe("Workflow machine", () => {
     expect(nextState.value).toEqual(Status.SEALED);
   });
 
-  test("DRAFT -> SENT", () => {
-    const nextState = machine.transition(Status.DRAFT, {
-      type: EventType.MarkAsSent
-    });
-    expect(nextState.value).toEqual(Status.SENT);
-  });
-
   test("SEALED -> SENT", () => {
     const nextState = machine.transition(Status.SEALED, {
       type: EventType.SignedByTransporter

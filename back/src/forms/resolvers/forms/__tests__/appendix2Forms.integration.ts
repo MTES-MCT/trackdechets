@@ -41,7 +41,7 @@ describe("appendix2Forms resolver", () => {
     );
     const form = await formFactory({
       ownerId: user.id,
-      opt: { emitterCompanySiret: emitter.siret }
+      opt: { emitterCompanySiret: emitter.siret, emitterType: "APPENDIX2" }
     });
     const { query } = makeClient(user);
     const { data } = await query<Pick<Query, "form">>(FORM, {
@@ -71,6 +71,7 @@ describe("appendix2Forms resolver", () => {
       ownerId: collector.id,
       opt: {
         emitterCompanySiret: collectorCompany.siret,
+        emitterType: "APPENDIX2",
         grouping: {
           create: {
             initialFormId: appendix2.id,
@@ -128,6 +129,7 @@ describe("appendix2Forms resolver", () => {
       ownerId: collector.id,
       opt: {
         emitterCompanySiret: collectorCompany.siret,
+        emitterType: "APPENDIX2",
         grouping: {
           create: {
             initialFormId: appendix2.id,

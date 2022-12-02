@@ -11,6 +11,7 @@ import "@reach/menu-button/styles.css";
 import classNames from "classnames";
 import routes from "common/routes";
 import {
+  IconAddCircle,
   IconChevronDown,
   IconChevronUp,
   IconDuplicateFile,
@@ -19,7 +20,7 @@ import {
   IconTrash,
   IconView,
 } from "common/components/Icons";
-import { Form, FormStatus } from "generated/graphql/types";
+import { EmitterType, Form, FormStatus } from "generated/graphql/types";
 import { DeleteModal } from "./DeleteModal";
 import { useDuplicate } from "./useDuplicate";
 import { useDownloadPdf } from "./useDownloadPdf";
@@ -98,6 +99,22 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
+              {form.emitter?.type === EmitterType.Appendix1 && (
+                <MenuLink
+                  as={Link}
+                  to={{
+                    pathname: generatePath(routes.dashboard.bsdds.view, {
+                      siret,
+                      id: form.id,
+                    }),
+                    search: "?selectedTab=3",
+                    state: { background: location },
+                  }}
+                >
+                  <IconAddCircle size="24px" color="blueLight" />
+                  Annexe 1
+                </MenuLink>
+              )}
 
               {form.status !== FormStatus.Draft && (
                 <MenuItem onSelect={() => downloadPdf()}>

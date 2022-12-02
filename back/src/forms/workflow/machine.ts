@@ -18,13 +18,11 @@ const machine = Machine<any, Event>(
       [Status.CANCELED]: { type: "final" },
       [Status.DRAFT]: {
         on: {
-          [EventType.MarkAsSealed]: [{ target: Status.SEALED }],
-          [EventType.MarkAsSent]: [{ target: Status.SENT }]
+          [EventType.MarkAsSealed]: [{ target: Status.SEALED }]
         }
       },
       [Status.SEALED]: {
         on: {
-          [EventType.MarkAsSent]: [{ target: Status.SENT }],
           [EventType.SignedByTransporter]: [
             {
               target: Status.SENT

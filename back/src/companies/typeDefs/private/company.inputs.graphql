@@ -375,3 +375,10 @@ input AnonymousCompanyInput {
   address: String!
   codeCommune: String!
 }
+
+input SignatureAutomationInput {
+  "ID de l'entreprise qui donne délégation"
+  from: ID!
+  "ID de l'entreprise qui a délagation"
+  to: ID!
+}

@@ -116,7 +116,7 @@ type Form {
   nextDestination: NextDestination
 
   "Bordereaux que celui-ci regroupe (Annexe 2)"
-  appendix2Forms: [Appendix2Form!] @deprecated(reason: "Utiliser `grouping`")
+  appendix2Forms: [InitialForm!] @deprecated(reason: "Utiliser `grouping`")
 
   "Bordereaux que celui-ci regroupe (Annexe 2)"
   grouping: [InitialFormFraction!]
@@ -150,13 +150,15 @@ type Form {
 
 """
 Information sur le bordereau initial lors d'une réexpédition après transformation ou traitement aboutissant
-à des déchets dont la provenance reste identifiable (annexe 2)
+à des déchets dont la provenance reste identifiable (annexe 2 ou 1)
 """
-type Appendix2Form {
+type InitialForm {
   "Identifiant unique du bordereau initial"
   id: ID!
   "Identifiant lisible du bordereau initial"
   readableId: String!
+  "Statut du bordereau initial"
+  status: FormStatus
   "Détails du déchet du bordereau initial (case 3)"
   wasteDetails: WasteDetails
   """
@@ -174,6 +176,10 @@ type Appendix2Form {
   Destinataire du bordereau initial
   """
   recipient: Recipient
+  """
+  Transporteur du bordereau initial
+  """
+  transporter: Transporter
   """
   Date d’acceptation du lot initial par l’installation réalisant une transformation ou un traitement aboutissant à des déchets
   dont la provenance reste identifiable. C'est la date qui figure au cadre 10 du bordereau initial.
@@ -199,7 +205,7 @@ Fraction d'un bordereau ajouté en annexe 2 d'un bordereau de regroupement
 """
 type InitialFormFraction {
   "Bordereau initial"
-  form: Appendix2Form!
+  form: InitialForm!
   "Quantité du bordereau initial affectée au bordereau de regroupement"
   quantity: Float!
 }

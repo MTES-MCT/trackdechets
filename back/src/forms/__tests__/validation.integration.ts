@@ -144,6 +144,7 @@ describe("sealedFormSchema", () => {
       };
 
       const isValid = await sealedFormSchema
+        .resolve({ value: testForm })
         .concat(ecoOrganismeSchema)
         .isValid(testForm);
       expect(isValid).toEqual(true);
@@ -157,6 +158,7 @@ describe("sealedFormSchema", () => {
       };
 
       const isValid = await sealedFormSchema
+        .resolve({ value: testForm })
         .concat(ecoOrganismeSchema)
         .isValid(testForm);
       expect(isValid).toEqual(true);
@@ -507,6 +509,7 @@ describe("sealedFormSchema", () => {
       };
 
       const isValid = await sealedFormSchema
+        .resolve({ value: testForm })
         .concat(ecoOrganismeSchema)
         .isValid(testForm);
       expect(isValid).toEqual(false);

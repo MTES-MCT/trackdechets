@@ -1,5 +1,5 @@
 import { FormResolvers } from "../../../generated/graphql/types";
-import { expandAppendix2FormFromDb } from "../../converter";
+import { expandInitialFormFromDb } from "../../converter";
 import { getFormRepository } from "../../repository";
 
 const appendix2FormsResolver: FormResolvers["appendix2Forms"] = async (
@@ -7,10 +7,14 @@ const appendix2FormsResolver: FormResolvers["appendix2Forms"] = async (
   _,
   { user, dataloaders }
 ) => {
-  const { findAppendix2FormsById } = getFormRepository(user);
-  const appendix2Forms = await findAppendix2FormsById(form.id);
+  if (form.emitter?.type !== "APPENDIX2") {
+    return null;
+  }
+
+  const { findGroupedFormsById } = getFormRepository(user);
+  const appendix2Forms = await findGroupedFormsById(form.id);
   return appendix2Forms.map(form =>
-    expandAppendix2FormFromDb(form, dataloaders.forwardedIns)
+    expandInitialFormFromDb(form, dataloaders.forwardedIns)
   );
 };
 

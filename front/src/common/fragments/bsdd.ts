@@ -238,6 +238,7 @@ const mutableFieldsFragment = gql`
       form {
         id
         readableId
+        status
         wasteDetails {
           code
           name
@@ -252,6 +253,13 @@ const mutableFieldsFragment = gql`
           company {
             orgId
             name
+            siret
+          }
+        }
+        transporter {
+          company {
+            orgId
+            siret
           }
         }
         recipient {

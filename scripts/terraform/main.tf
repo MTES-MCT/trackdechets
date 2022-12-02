@@ -2,7 +2,7 @@ terraform {
   required_providers {
     scalingo = {
       source = "Scalingo/scalingo"
-      version = "0.5.2"
+      version = "1.0.1"
     }
   }
 }
@@ -26,6 +26,10 @@ variable "api_environment_secrets" {}
 provider "scalingo" {
   api_token = "${var.scalingo_api_token}"
   region = "${var.scalingo_region}"
+}
+
+data "scalingo_scm_integration" "github" {
+  scm_type = "github"
 }
 
 resource "scalingo_app" "front" {
@@ -115,31 +119,34 @@ resource "scalingo_addon" "api_es" {
   app         = "${scalingo_app.api.id}"
 }
 
-resource "scalingo_github_link" "api_link" {
+resource "scalingo_addon" "api_mongo" {
+  provider_id = "scalingo-mongodb"
+  plan        = "mongo-sandbox"
+  app         = "${scalingo_app.api.id}"
+}
+
+resource "scalingo_scm_repo_link" "api_link" {
+  auth_integration_uuid           = data.scalingo_scm_integration.github.id
   app                             = "${scalingo_app.api.id}"
   source                          = "https://github.com/MTES-MCT/trackdechets"
   branch                          = "${var.github_branch}"
-  auto_deploy                     = true
-  deploy_on_branch_change         = true
-  review_apps                     = false
+  auto_deploy_enabled             = true
 }
 
-resource "scalingo_github_link" "ui_link" {
+resource "scalingo_scm_repo_link" "ui_link" {
+  auth_integration_uuid           = data.scalingo_scm_integration.github.id
   app                             = "${scalingo_app.front.id}"
   source                          = "https://github.com/MTES-MCT/trackdechets"
   branch                          = "${var.github_branch}"
-  auto_deploy                     = true
-  deploy_on_branch_change         = true
-  review_apps                     = false
+  auto_deploy_enabled             = true
 }
 
-resource "scalingo_github_link" "notifier_link" {
+resource "scalingo_scm_repo_link" "notifier_link" {
+  auth_integration_uuid           = data.scalingo_scm_integration.github.id
   app                             = "${scalingo_app.notifier.id}"
   source                          = "https://github.com/MTES-MCT/trackdechets"
   branch                          = "${var.github_branch}"
-  auto_deploy                     = true
-  deploy_on_branch_change         = true
-  review_apps                     = false
+  auto_deploy_enabled             = true
 }
 
 resource "scalingo_domain" "domain_front" {

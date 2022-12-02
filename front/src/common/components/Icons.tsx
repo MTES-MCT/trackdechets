@@ -1912,3 +1912,34 @@ export function IconEmitter({ ...props }: IconProps) {
     </svg>
   );
 }
+
+export function IconAddCircle({
+  color = "currentColor",
+  size = "1.5em",
+  ...props
+}: IconProps) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 14 14"
+      width={size}
+      height={size}
+      className={classNames(props.className, {
+        [styles.blue]: color === "blue",
+        [styles.blueLight]: color === "blueLight",
+        [styles.white]: color === "white",
+      })}
+    >
+      <g
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx={7} cy={7} r={6.5} />
+        <path d="M7 4v6M4 7h6" />
+      </g>
+    </svg>
+  );
+}

@@ -51,5 +51,5 @@ export const emitterTypeLabels = {
   [EmitterType.Appendix2]:
     "Personne ayant transformé ou réalisé un traitement dont la provenance reste identifiable",
   [EmitterType.Appendix1]:
-    "Collecteur de petites quantités de déchets relevant d’une même rubrique",
+    "Collecteur d'un bordereau de tournée dédiée (Annexe 1)",
 };

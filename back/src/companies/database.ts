@@ -284,7 +284,7 @@ export async function getWorkerCertificationOrNotFound({
 
 export function convertUrls<T extends Partial<Company>>(
   company: T
-): T & { ecoOrganismeAgreements: URL[] } {
+): T & { ecoOrganismeAgreements: URL[]; signatureAutomations: [] } {
   if (!company) {
     return null;
   }
@@ -295,6 +295,7 @@ export function convertUrls<T extends Partial<Company>>(
       ecoOrganismeAgreements: company.ecoOrganismeAgreements.map(
         a => new URL(a)
       )
-    })
+    }),
+    signatureAutomations: []
   };
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, FormStatus } from "generated/graphql/types";
+import { EmitterType, Form, FormStatus } from "generated/graphql/types";
 import MarkAsSealed from "./MarkAsSealed";
 import MarkAsReceived from "./MarkAsReceived";
 import MarkAsAccepted from "./MarkAsAccepted";
@@ -33,6 +33,12 @@ export function WorkflowAction(props: WorkflowActionProps) {
     case FormStatus.Draft:
       return <MarkAsSealed {...props} />;
     case FormStatus.Sealed: {
+      if (form.emitter?.type === EmitterType.Appendix1) {
+        return form.recipient?.company?.siret === siret ? (
+          <MarkAsReceived {...props} />
+        ) : null;
+      }
+
       if (
         [
           form.emitter?.company?.siret,
@@ -51,6 +57,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.Sent: {
+      if (form.emitter?.type === EmitterType.Appendix1Producer) {
+        return null;
+      }
+
       if (siret === form.recipient?.company?.siret && isActTab) {
         if (isTempStorage) {
           return <MarkAsTempStored {...props} />;

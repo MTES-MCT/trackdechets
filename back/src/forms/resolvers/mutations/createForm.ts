@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { EmitterType, Prisma } from "@prisma/client";
 import { isDangerous } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -94,13 +94,12 @@ const createFormResolver = async (
 
   const readableId = getReadableId();
 
+  const cleanedForm = await draftFormSchema.validate(form);
   const formCreateInput: Prisma.FormCreateInput = {
-    ...form,
+    ...cleanedForm,
     readableId,
     owner: { connect: { id: user.id } }
   };
-
-  await draftFormSchema.validate(formCreateInput);
 
   if (temporaryStorageDetail) {
     if (formContent.recipient?.isTempStorage !== true) {
@@ -138,8 +137,7 @@ const createFormResolver = async (
   }
 
   const isGroupement = grouping?.length > 0 || appendix2Forms?.length > 0;
-
-  const appendix2 = isGroupement
+  const formFractions = isGroupement
     ? await validateGroupement(
         formCreateInput,
         grouping?.length > 0
@@ -149,15 +147,25 @@ const createFormResolver = async (
     : null;
 
   const newForm = await runInTransaction(async transaction => {
-    const { create, setAppendix2 } = getFormRepository(user, transaction);
+    const { create, setAppendix1, setAppendix2 } = getFormRepository(
+      user,
+      transaction
+    );
     const newForm = await create(formCreateInput);
     if (isGroupement) {
-      await setAppendix2({
-        form: newForm,
-        appendix2,
-        currentAppendix2Forms: []
-      });
+      newForm.emitterType === EmitterType.APPENDIX1
+        ? await setAppendix1({
+            form: newForm,
+            appendix1: formFractions,
+            currentAppendix1Forms: []
+          })
+        : await setAppendix2({
+            form: newForm,
+            appendix2: formFractions,
+            currentAppendix2Forms: []
+          });
     }
+
     return newForm;
   });
 

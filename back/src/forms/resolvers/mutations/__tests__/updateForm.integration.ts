@@ -1364,7 +1364,7 @@ describe("Mutation.updateForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
+          "emitter.type doit être égal à APPENDIX2 ou APPENDIX1 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
       })
     ]);
   });
@@ -1409,7 +1409,7 @@ describe("Mutation.updateForm", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
+            "emitter.type doit être égal à APPENDIX2 ou APPENDIX1 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
         })
       ]);
     }
@@ -1461,7 +1461,7 @@ describe("Mutation.updateForm", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
+            "emitter.type doit être égal à APPENDIX2 ou APPENDIX1 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
         })
       ]);
     }
@@ -1507,8 +1507,8 @@ describe("Mutation.updateForm", () => {
         }
       }
     });
-    expect(data.updateForm.appendix2Forms).toEqual([]);
     expect(data.updateForm.grouping).toEqual([]);
+    expect(data.updateForm.appendix2Forms).toEqual(null);
   });
 
   it("should be possible to change both emitter.type and set grouping to []", async () => {
@@ -1551,8 +1551,8 @@ describe("Mutation.updateForm", () => {
         }
       }
     });
-    expect(data.updateForm.appendix2Forms).toEqual([]);
     expect(data.updateForm.grouping).toEqual([]);
+    expect(data.updateForm.appendix2Forms).toEqual(null);
   });
 
   it("should be possible to re-associate same appendix2 (using UpdateFormInput.appendix2Forms)", async () => {
@@ -1602,6 +1602,7 @@ describe("Mutation.updateForm", () => {
         }
       }
     });
+
     expect(data2.updateForm.appendix2Forms).toHaveLength(1);
   });
 
@@ -1908,13 +1909,81 @@ describe("Mutation.updateForm", () => {
         }
       }
     });
-
     expect(errors).toEqual([
       expect.objectContaining({
         message:
           "Déchet : le poids doit être inférieur à 40 tonnes lorsque le transport se fait par la route"
       })
     ]);
+  });
+
+  it("should clean appendix1 items on update", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: producerCompany } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+
+    const appendix1_1 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.DRAFT,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: producerCompany.siret,
+        emitterCompanyName: "ProducerCompany",
+        emitterCompanyAddress: "rue de l'annexe",
+        emitterCompanyContact: "Contact",
+        emitterCompanyPhone: "01 01 01 01 01",
+        emitterCompanyMail: "annexe1@test.com",
+        wasteDetailsCode: "01 01 01",
+        owner: { connect: { id: user.id } }
+      }
+    });
+    const appendix1_2 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.DRAFT,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: producerCompany.siret,
+        emitterCompanyName: "ProducerCompany",
+        emitterCompanyAddress: "rue de l'annexe",
+        emitterCompanyContact: "Contact",
+        emitterCompanyPhone: "01 01 01 01 01",
+        emitterCompanyMail: "annexe1@test.com",
+        wasteDetailsCode: "01 01 01",
+        owner: { connect: { id: user.id } }
+      }
+    });
+
+    // Group with appendix1_1
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SEALED,
+        emitterCompanySiret: company.siret,
+        emitterType: EmitterType.APPENDIX1,
+        grouping: { create: { initialFormId: appendix1_1.id, quantity: 0 } }
+      }
+    });
+
+    // Update and group with appendix1_2
+    const { data } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          grouping: [{ form: { id: appendix1_2.id } }]
+        }
+      }
+    });
+
+    expect(data.updateForm.grouping.length).toBe(1);
+
+    const updatedAppendix1_1 = await prisma.form.findUnique({
+      where: { id: appendix1_1.id },
+      include: { groupedIn: true }
+    });
+    expect(updatedAppendix1_1.groupedIn).toEqual([]);
   });
 
   it(

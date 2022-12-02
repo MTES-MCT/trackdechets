@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { generatePath, Link, useHistory, useParams } from "react-router-dom";
+import {
+  generatePath,
+  Link,
+  useHistory,
+  useLocation,
+  useParams,
+} from "react-router-dom";
 
 import { useDownloadPdf } from "dashboard/components/BSDList/BSDD/BSDDActions/useDownloadPdf";
 import { useDuplicate } from "dashboard/components/BSDList/BSDD/BSDDActions/useDuplicate";
@@ -50,10 +56,11 @@ import {
 } from "dashboard/detail/common/Components";
 import { WorkflowAction } from "dashboard/components/BSDList";
 import EditSegment from "./EditSegment";
-import { Loader } from "common/components";
+import { Loader, Modal } from "common/components";
 import { isDangerous } from "generated/constants";
 import { format } from "date-fns";
 import { isSiret } from "generated/constants/companySearchHelpers";
+import { Appendix1ProducerForm } from "form/bsdd/appendix1Producer/form";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -444,11 +451,96 @@ const Appendix2 = ({
   );
 };
 
+const Appendix1 = ({
+  siret,
+  container,
+}: {
+  siret: string;
+  container: Form;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div>
+      <div className="tw-pb-2 tw-flex tw-justify-end">
+        <button
+          type="button"
+          className="btn btn--outline-primary btn--small"
+          onClick={() => setIsOpen(true)}
+        >
+          <IconPdf size="16px" color="blueLight" />
+          <span>Ajouter une annexe 1</span>
+        </button>
+      </div>
+      {container?.grouping && container.grouping.length > 0 ? (
+        <table className="td-table">
+          <thead>
+            <tr className="td-table__head-tr">
+              <th>N° Bordereau</th>
+              <th>Emetteur</th>
+              <th>Code déchet</th>
+              <th>Dénomination usuelle</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {container.grouping.map(({ form }, index) => (
+              <tr key={index}>
+                <td>{form?.readableId}</td>
+                <td>
+                  {form?.emitter?.company?.name} {form?.emitter?.company?.siret}
+                </td>
+                <td>{form?.wasteDetails?.code}</td>
+                <td>{form?.wasteDetails?.name}</td>
+                <td>
+                  {form.status === FormStatus.Draft ? (
+                    <button
+                      type="button"
+                      className="btn btn--outline-primary"
+                      onClick={() => console.log(form.id)}
+                    >
+                      <IconTrash size="24px" color="blueLight" />
+                      <span>Supprimer</span>
+                    </button>
+                  ) : (
+                    <WorkflowAction siret={siret} form={form as any} />
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <span>Aucun bordereau annexé</span>
+      )}
+      <Modal
+        onClose={() => setIsOpen(false)}
+        ariaLabel="Ajout d'une annexe 1 au chapeau"
+        isOpen={isOpen}
+        padding={false}
+        wide={true}
+      >
+        <Appendix1ProducerForm
+          container={container}
+          close={() => setIsOpen(false)}
+        />
+      </Modal>
+    </div>
+  );
+};
+
+function useQuery() {
+  const { search } = useLocation();
+
+  return React.useMemo(() => new URLSearchParams(search), [search]);
+}
+
 export default function BSDDetailContent({
   form,
   children = null,
 }: BSDDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
+  const query = useQuery();
   const history = useHistory();
   const [isDeleting, setIsDeleting] = useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
@@ -466,6 +558,7 @@ export default function BSDDetailContent({
   const isMultiModal: boolean = !!form?.transportSegments?.length;
   const hasTempStorage: boolean = !!form?.temporaryStorageDetail;
   const isRegroupement: boolean = form?.emitter?.type === EmitterType.Appendix2;
+  const isChapeau: boolean = form?.emitter?.type === EmitterType.Appendix1;
 
   return (
     <>
@@ -548,7 +641,10 @@ export default function BSDDetailContent({
           </div>
         </div>
 
-        <Tabs selectedTabClassName={styles.detailTabSelected}>
+        <Tabs
+          defaultIndex={query.get("selectedTab") ?? 0}
+          selectedTabClassName={styles.detailTabSelected}
+        >
           {/* Tabs menu */}
           <TabList className={styles.detailTabs}>
             {isRegroupement && (
@@ -604,7 +700,7 @@ export default function BSDDetailContent({
               <IconRenewableEnergyEarth size="25px" />
               <span className={styles.detailTabCaption}>Destinataire</span>
             </Tab>
-            {form?.intermediaries?.length ? (
+            {Boolean(form?.intermediaries?.length) && (
               <Tab className={styles.detailTab}>
                 <IconWarehousePackage size="25px" />
                 <span className={styles.detailTabCaption}>
@@ -612,8 +708,16 @@ export default function BSDDetailContent({
                   {form?.intermediaries?.length > 1 ? "s" : ""}
                 </span>
               </Tab>
-            ) : (
-              ""
+            )}
+            {isChapeau && (
+              <Tab className={styles.detailTab}>
+                <div className="tw-flex tw-space-x-2">
+                  <IconWaterDam size="18px" />
+                  <IconWaterDam size="18px" />
+                  <IconWaterDam size="18px" />
+                </div>
+                <span className={styles.detailTabCaption}>Annexes 1</span>
+              </Tab>
             )}
           </TabList>
           {/* Tabs content */}
@@ -756,14 +860,23 @@ export default function BSDDetailContent({
               </div>
             </TabPanel>
             {/* Intermdiaries tab panel */}
-            {form?.intermediaries?.length ? (
+            {Boolean(form?.intermediaries?.length) && (
               <TabPanel className={styles.detailTabPanel}>
                 {form?.intermediaries?.map(intermediary => (
                   <Intermediary intermediary={intermediary} />
                 ))}
               </TabPanel>
-            ) : (
-              ""
+            )}
+            {/* Appendix 1 */}
+            {isChapeau && (
+              <TabPanel className={styles.detailTabPanel}>
+                <Appendix1
+                  container={form}
+                  siret={siret}
+                  id={form.id}
+                  grouping={form.grouping ?? []}
+                />
+              </TabPanel>
             )}
           </div>
         </Tabs>

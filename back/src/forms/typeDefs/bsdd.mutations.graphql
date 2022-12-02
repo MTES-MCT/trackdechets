@@ -94,17 +94,6 @@ type Mutation {
   """
   markAsSealed("ID d'un BSD" id: ID!): Form
 
-  "Valide l'envoi d'un BSD"
-  markAsSent(
-    "ID d'un BSD"
-    id: ID!
-    "Informations liées à l'envoi"
-    sentInfo: SentFormInput!
-  ): Form
-    @deprecated(
-      reason: "Utiliser la mutation signedByTransporter permettant d'apposer les signatures collecteur-transporteur (case 8) et émetteur (case 9)"
-    )
-
   "Valide l'acceptation du BSD"
   markAsAccepted(
     "ID d'un BSD"

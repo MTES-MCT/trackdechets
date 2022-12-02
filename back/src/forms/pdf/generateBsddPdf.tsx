@@ -27,7 +27,7 @@ import {
   TransportSegment
 } from "../../generated/graphql/types";
 import {
-  expandAppendix2FormFromDb,
+  expandInitialFormFromDb,
   expandFormFromDb,
   expandTransportSegmentFromDb
 } from "../converter";
@@ -280,7 +280,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
     ),
     grouping: await Promise.all(
       grouping.map(async ({ form, quantity }) => ({
-        form: await expandAppendix2FormFromDb(form),
+        form: await expandInitialFormFromDb(form),
         quantity
       }))
     ),

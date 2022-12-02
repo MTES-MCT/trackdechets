@@ -1,6 +1,6 @@
 import { FormResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
-import { expandAppendix2FormFromDb } from "../../converter";
+import { expandInitialFormFromDb } from "../../converter";
 
 const groupingResolver: FormResolvers["grouping"] = async (
   form,
@@ -14,7 +14,7 @@ const groupingResolver: FormResolvers["grouping"] = async (
   return Promise.all(
     formGroupements.map(async ({ quantity, initialForm }) => ({
       quantity,
-      form: await expandAppendix2FormFromDb(
+      form: await expandInitialFormFromDb(
         initialForm,
         context.dataloaders.forwardedIns
       )

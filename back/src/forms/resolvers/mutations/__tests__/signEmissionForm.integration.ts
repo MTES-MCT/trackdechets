@@ -1,3 +1,4 @@
+import { EmitterType, Status } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -582,5 +583,39 @@ describe("signEmissionForm", () => {
           "Vous ne pouvez pas faire cette action, ce bordereau a été annulé"
       })
     ]);
+  });
+
+  it("should forbid marking an appendix1 container as sent through signature", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const container = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SEALED,
+        emitterType: EmitterType.APPENDIX1,
+        emitterCompanySiret: company.siret,
+        emitterCompanyName: company.name,
+        transporterCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "signEmissionForm">,
+      MutationSignEmissionFormArgs
+    >(SIGN_EMISSION_FORM, {
+      variables: {
+        id: container.id,
+        input: {
+          emittedAt: new Date().toISOString() as unknown as Date,
+          emittedBy: "Collecteur annexe 1",
+          quantity: 1
+        }
+      }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toBe(
+      "Impossible de signer le transport d'un bordereau chapeau. C'est en signant les bordereaux d'annexe 1 que le statut de ce bordereau évoluera."
+    );
   });
 });

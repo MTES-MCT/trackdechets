@@ -1,4 +1,4 @@
-import { Status, WasteAcceptationStatus } from "@prisma/client";
+import { EmitterType, Status, WasteAcceptationStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
@@ -42,8 +42,15 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
         signedAt: new Date(acceptedInfo.signedAt)
       };
 
+  const groupedForms = await getFormRepository(user).findGroupedFormsById(
+    form.id
+  );
+
   const acceptedForm = await runInTransaction(async transaction => {
-    const { update, removeAppendix2 } = getFormRepository(user, transaction);
+    const { update, updateAppendix1Forms, removeAppendix2 } = getFormRepository(
+      user,
+      transaction
+    );
     const acceptedForm = await update(
       { id: form.id },
       {
@@ -56,9 +63,17 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
     );
 
     if (
+      form.emitterType === EmitterType.APPENDIX2 &&
       acceptedInfo.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED
     ) {
       await removeAppendix2(id);
+    }
+
+    if (form.emitterType === EmitterType.APPENDIX1) {
+      await updateAppendix1Forms({
+        container: acceptedForm,
+        grouped: groupedForms
+      });
     }
 
     return acceptedForm;
