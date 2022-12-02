@@ -31,7 +31,8 @@ function parseGqlDefinition(definition: DefinitionNode) {
   if (definition.kind !== "OperationDefinition") return undefined;
 
   const fieldSelections = definition.selectionSet.selections.filter(
-    (selection): selection is FieldNode => selection.kind === "Field"
+    (selection): selection is FieldNode =>
+      selection.kind === "Field" && selection.name.value !== "__typename"
   );
 
   return fieldSelections.map(field => ({
