@@ -2,6 +2,7 @@ import { resetDatabase } from "../../../../integration-tests/helper";
 import prisma from "../../../prisma";
 import {
   formFactory,
+  siretify,
   transportSegmentFactory,
   userFactory,
   userWithCompanyFactory
@@ -45,10 +46,12 @@ describe("{ mutation { editSegment } }", () => {
     const { mutate } = makeClient(firstTransporter);
     await mutate(
       `mutation  {
-            editSegment(id:"${segment.id}", siret:"${transporterSiret}", nextSegmentInfo: {
+            editSegment(id:"${
+              segment.id
+            }", siret:"${transporterSiret}", nextSegmentInfo: {
                 transporter: {
                   company: {
-                    siret: "5678956789"
+                    siret: "${siretify(2)}"
                     name: "White walkers social club"
                     address: "King's landing"
                     contact: "The king of the night"
@@ -94,10 +97,12 @@ describe("{ mutation { editSegment } }", () => {
     const { mutate } = makeClient(firstTransporter);
     await mutate(
       `mutation  {
-            editSegment(id:"${segment.id}", siret:"${transporterSiret}",   nextSegmentInfo: {
+            editSegment(id:"${
+              segment.id
+            }", siret:"${transporterSiret}",   nextSegmentInfo: {
                 transporter: {
                   company: {
-                    siret: "5678956789"
+                    siret: "${siretify(3)}"
                     name: "White walkers social club"
                     address: "King's landing"
                     contact: "The king of the night"
@@ -141,7 +146,7 @@ describe("{ mutation { editSegment } }", () => {
     const segment = await transportSegmentFactory({
       formId: form.id,
       segmentPayload: {
-        transporterCompanySiret: "98765",
+        transporterCompanySiret: siretify(4),
         readyToTakeOver: true
       }
     });
