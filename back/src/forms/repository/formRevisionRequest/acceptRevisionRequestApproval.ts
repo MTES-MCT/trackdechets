@@ -2,12 +2,16 @@ import {
   BsddRevisionRequest,
   Prisma,
   RevisionRequestApprovalStatus,
-  RevisionRequestStatus
+  RevisionRequestStatus,
+  Status
 } from "@prisma/client";
+import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "../../../common/constants";
+import { removeEmpty } from "../../../common/converter";
 import {
   LogMetadata,
   PrismaTransaction,
-  RepositoryFnDeps
+  RepositoryFnDeps,
+  RepositoryTransaction
 } from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
 
@@ -58,26 +62,32 @@ const buildAcceptRevisionRequestApproval: (
     });
     if (remainingApprovals !== 0) return;
 
-    const revisionRequest = await approveAndApplyRevisionRequest(
-      updatedApproval.revisionRequestId,
-      { prisma, user, logMetadata }
-    );
-
-    const updatedFormId = revisionRequest.bsddId;
-
-    if (updatedFormId) {
-      const { readableId } = await prisma.form.findUnique({
-        where: { id: updatedFormId },
-        select: { readableId: true }
-      });
-      prisma.addAfterCommitCallback(() => enqueueBsdToIndex(readableId));
-    }
+    await approveAndApplyRevisionRequest(updatedApproval.revisionRequestId, {
+      prisma,
+      user,
+      logMetadata
+    });
   };
 
-function getUpdateFromFormRevisionRequest(
-  revisionRequest: BsddRevisionRequest
-) {
+async function getUpdateFromFormRevisionRequest(
+  revisionRequest: BsddRevisionRequest,
+  prisma: PrismaTransaction
+): Promise<
+  [
+    Partial<Prisma.FormUpdateInput>,
+    Partial<Prisma.FormUpdateWithoutForwardingInput>
+  ]
+> {
+  const { status: currentStatus } = await prisma.form.findUnique({
+    where: { id: revisionRequest.bsddId },
+    select: { status: true }
+  });
+
   const bsddUpdate = {
+    status: getNewStatus(
+      currentStatus,
+      revisionRequest.processingOperationDone
+    ),
     recipientCap: revisionRequest.recipientCap,
     wasteDetailsCode: revisionRequest.wasteDetailsCode,
     wasteDetailsName: revisionRequest.wasteDetailsName,
@@ -108,28 +118,37 @@ function getUpdateFromFormRevisionRequest(
   };
 
   const temporaryStorageUpdate = {
-    destinationCap: revisionRequest.temporaryStorageDestinationCap,
-    destinationProcessingOperation:
+    recipientCap: revisionRequest.temporaryStorageDestinationCap,
+    recipientProcessingOperation:
       revisionRequest.temporaryStorageDestinationProcessingOperation
   };
 
-  function removeEmpty(obj) {
-    const cleanedObject = Object.fromEntries(
-      Object.entries(obj).filter(
-        ([_, v]) => v != null && (Array.isArray(v) ? v.length > 0 : true)
-      )
-    );
+  return [removeEmpty(bsddUpdate), removeEmpty(temporaryStorageUpdate)];
+}
 
-    return Object.keys(cleanedObject).length === 0 ? null : cleanedObject;
+function getNewStatus(status: Status, newOperationCode: string | null): Status {
+  if (
+    status === Status.PROCESSED &&
+    PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(newOperationCode)
+  ) {
+    return Status.AWAITING_GROUP;
   }
 
-  return [removeEmpty(bsddUpdate), removeEmpty(temporaryStorageUpdate)];
+  if (
+    status === Status.AWAITING_GROUP &&
+    newOperationCode &&
+    !PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(newOperationCode)
+  ) {
+    return Status.PROCESSED;
+  }
+
+  return status;
 }
 
 export async function approveAndApplyRevisionRequest(
   revisionRequestId: string,
   context: {
-    prisma: PrismaTransaction;
+    prisma: RepositoryTransaction;
     user: Express.User;
     logMetadata?: LogMetadata;
   }
@@ -144,16 +163,17 @@ export async function approveAndApplyRevisionRequest(
     data: { status: RevisionRequestStatus.ACCEPTED }
   });
   const [bsddUpdate, temporaryStorageUpdate] =
-    getUpdateFromFormRevisionRequest(revisionRequest);
+    await getUpdateFromFormRevisionRequest(revisionRequest, prisma);
 
-  await prisma.form.update({
+  const updatedBsdd = await prisma.form.update({
     where: { id: revisionRequest.bsddId },
     data: {
       ...bsddUpdate,
       ...(temporaryStorageUpdate && {
         forwardedIn: { update: { ...temporaryStorageUpdate } }
       })
-    }
+    },
+    select: { readableId: true }
   });
 
   await prisma.event.create({
@@ -168,6 +188,10 @@ export async function approveAndApplyRevisionRequest(
       metadata: { ...logMetadata, authType: user.auth }
     }
   });
+
+  prisma.addAfterCommitCallback(() =>
+    enqueueBsdToIndex(updatedBsdd.readableId)
+  );
 
   return updatedRevisionRequest;
 }

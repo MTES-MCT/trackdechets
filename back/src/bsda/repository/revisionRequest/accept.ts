@@ -4,10 +4,12 @@ import {
   RevisionRequestApprovalStatus,
   RevisionRequestStatus
 } from "@prisma/client";
+import { removeEmpty } from "../../../common/converter";
 import {
   LogMetadata,
   PrismaTransaction,
-  RepositoryFnDeps
+  RepositoryFnDeps,
+  RepositoryTransaction
 } from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
 import { PARTIAL_OPERATIONS } from "../../validation";
@@ -56,18 +58,11 @@ export function buildAcceptRevisionRequestApproval(
     });
     if (remainingApprovals > 0) return;
 
-    const revisionRequest = await approveAndApplyRevisionRequest(
-      updatedApproval.revisionRequestId,
-      {
-        prisma,
-        user,
-        logMetadata
-      }
-    );
-
-    prisma.addAfterCommitCallback(() =>
-      enqueueBsdToIndex(revisionRequest.bsdaId)
-    );
+    await approveAndApplyRevisionRequest(updatedApproval.revisionRequestId, {
+      prisma,
+      user,
+      logMetadata
+    });
   };
 }
 
@@ -125,22 +120,10 @@ function getNewStatus(
   return status;
 }
 
-function removeEmpty<T>(obj: T): Partial<T> {
-  const cleanedObject = Object.fromEntries(
-    Object.entries(obj).filter(
-      ([_, v]) => v != null && (Array.isArray(v) ? v.length > 0 : true)
-    )
-  );
-
-  return Object.keys(cleanedObject).length === 0
-    ? null
-    : (cleanedObject as Partial<T>);
-}
-
 export async function approveAndApplyRevisionRequest(
   revisionRequestId: string,
   context: {
-    prisma: PrismaTransaction;
+    prisma: RepositoryTransaction;
     user: Express.User;
     logMetadata?: LogMetadata;
   }
@@ -174,6 +157,10 @@ export async function approveAndApplyRevisionRequest(
       metadata: { ...logMetadata, authType: user.auth }
     }
   });
+
+  prisma.addAfterCommitCallback(() =>
+    enqueueBsdToIndex(updatedRevisionRequest.bsdaId)
+  );
 
   return updatedRevisionRequest;
 }
