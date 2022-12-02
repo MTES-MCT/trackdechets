@@ -55,6 +55,7 @@ interface CompanySelectorProps {
   isBsdaTransporter?: boolean;
   // whether the company is optional
   optional?: boolean;
+  initialAutoSelectFirstCompany?: boolean;
 }
 
 export default function CompanySelector({
@@ -68,6 +69,7 @@ export default function CompanySelector({
   skipFavorite = false,
   isBsdaTransporter = false,
   optional = false,
+  initialAutoSelectFirstCompany = true,
 }: CompanySelectorProps) {
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
@@ -226,8 +228,9 @@ export default function CompanySelector({
     const results = [...reshapedSearchResults, ...reshapedFavorites];
     setSearchResults(results);
 
-    // If the form is empty and we have a single result, we auto-select it.
+    // If the form is empty, we auto-select the first result.
     if (
+      initialAutoSelectFirstCompany &&
       !optional &&
       results.length >= 1 &&
       !field.value.siret?.length &&
