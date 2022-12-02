@@ -16,7 +16,7 @@ export default function App() {
   return (
     <BrowserDetect>
       <ErrorBoundary
-        fallback={
+        fallback={errorData => (
           <SimpleNotificationError
             message={
               <>
@@ -28,11 +28,11 @@ export default function App() {
                 >
                   l'équipe Trackdéchets
                 </a>
-                .
+                en précisant le numéro d'erreur suivant : ${errorData.eventId}.
               </>
             }
           />
-        }
+        )}
       >
         <ApolloProvider client={client}>
           <Router>
