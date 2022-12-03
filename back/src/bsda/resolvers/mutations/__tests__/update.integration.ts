@@ -555,7 +555,7 @@ describe("Mutation.updateBsda", () => {
         }
       ]
     };
-    const { data, errors } = await mutate<
+    const { data } = await mutate<
       Pick<Mutation, "updateBsda">,
       MutationUpdateBsdaArgs
     >(UPDATE_BSDA, {
@@ -564,7 +564,6 @@ describe("Mutation.updateBsda", () => {
         input
       }
     });
-    console.log(errors);
 
     expect(data.updateBsda.intermediaries.length).toBe(1);
     expect(data.updateBsda.intermediaries[0].siret).toBe(otherCompany.siret);

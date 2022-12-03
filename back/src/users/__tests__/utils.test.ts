@@ -3,9 +3,11 @@ import {
   generatePassword,
   canSeeEmail,
   getEmailDomain,
-  redactOrShowEmail
+  redactOrShowEmail,
+  minimalPasswordLength,
+  checkPasswordCriteria
 } from "../utils";
-
+import { UserInputError } from "apollo-server-express";
 describe("partiallyHideEmail", () => {
   it("should partially hide a well formatted email address", () => {
     const hidden = partiallyHideEmail("john.snow@trackdechets.fr");
@@ -93,7 +95,33 @@ describe("redactOrShowEmail", () => {
 describe("generatePassword", () => {
   it("should generate a 10 characters password", () => {
     const pw = generatePassword();
-    expect(pw.length).toEqual(10);
+    expect(pw.length).toEqual(minimalPasswordLength);
     expect(pw.toLowerCase()).toEqual(pw); // is lowercased ?
+  });
+});
+
+describe("checkPasswordCriteria", () => {
+  it("should accept a strong password", () => {
+    checkPasswordCriteria("trackdechets#");
+  });
+
+  it("should throw on short passwords", () => {
+    expect(() => {
+      checkPasswordCriteria("toto");
+    }).toThrow(UserInputError);
+  });
+
+  it("should throw on long passwords", () => {
+    expect(() => {
+      checkPasswordCriteria(
+        "Lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-Ut-volutpat"
+      );
+    }).toThrow(UserInputError);
+  });
+
+  it("should throw on easy passwords", () => {
+    expect(() => {
+      checkPasswordCriteria("aaaaaaaaaaaa");
+    }).toThrow(UserInputError);
   });
 });

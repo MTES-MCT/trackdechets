@@ -1,4 +1,4 @@
-import { renewSecurityCodeFn as renewSecurityCode } from "../renewSecurityCode";
+import { renewSecurityCodeFn as renewSecurityCode } from "../renewSecurityCodeService";
 import { ErrorCode } from "../../../../common/errors";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { securityCodeRenewal } from "../../../../mailer/templates";

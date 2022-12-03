@@ -1,4 +1,4 @@
-import { updateCompanyFn as updateCompany } from "../updateCompany";
+import { updateCompanyFn as updateCompany } from "../updateCompanyService";
 import { MutationUpdateCompanyArgs } from "../../../../generated/graphql/types";
 
 const updateCompanyMock = jest.fn();

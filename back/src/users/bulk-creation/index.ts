@@ -10,7 +10,8 @@ import { sendMail } from "../../mailer/mailing";
 import { UserInputError } from "apollo-server-express";
 import {
   associateUserToCompany,
-  acceptNewUserCompanyInvitations
+  acceptNewUserCompanyInvitations,
+  createUser
 } from "../database";
 import templateIds from "../../mailer/templates/provider/templateIds";
 import {
@@ -194,7 +195,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
       const hashedPassword = await hashPassword(password);
 
       console.info(`Create user ${email} / ${password}`);
-      user = await prisma.user.create({
+      user = await createUser({
         data: {
           name: email,
           email,

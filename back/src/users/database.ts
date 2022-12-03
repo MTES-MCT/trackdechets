@@ -11,6 +11,7 @@ import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail, hashToken } from "../utils";
 import { deleteCachedUserCompanies } from "../common/redis/users";
+import { hashPassword, passwordVersion } from "./utils";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
   const companyAssociations = await prisma.companyAssociation.findMany({
@@ -221,4 +222,32 @@ export async function getMembershipRequestOrNotFoundError(
     throw new UserInputError("Cette demande de rattachement n'existe pas");
   }
   return membershipRequest;
+}
+
+export async function createUser({
+  data
+}: {
+  data: Omit<Prisma.UserCreateInput, "passwordVersion">;
+}): Promise<User> {
+  const user = await prisma.user.create({
+    data: {
+      ...data,
+      passwordVersion
+    }
+  });
+  return user;
+}
+export async function updateUserPassword({
+  userId,
+  trimmedPassword
+}: {
+  userId: string;
+  trimmedPassword: string;
+}): Promise<User> {
+  const hashedPassword = await hashPassword(trimmedPassword);
+
+  return prisma.user.update({
+    where: { id: userId },
+    data: { password: hashedPassword, passwordVersion }
+  });
 }

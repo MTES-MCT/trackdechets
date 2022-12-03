@@ -91,13 +91,14 @@ export default function PasswordReset() {
         password: yup
           .string()
           .required("Le mot de passe est un champ requis")
-          .min(8, "Le mot de passe doit faire au moins 8 caractères"),
+          .min(10, "Le mot de passe doit faire au moins 10 caractères")
+          .max(64, "Le mot de passe doit faire au maximum 64 caractères"),
       })}
       onSubmit={(values, { setSubmitting }) => {
         const { password } = values;
-        resetPassword({ variables: { newPassword: password, hash } }).then(_ =>
-          setSubmitting(false)
-        );
+        resetPassword({ variables: { newPassword: password, hash } })
+          .then(_ => setSubmitting(false))
+          .catch(_ => setSubmitting(false));
       }}
     >
       {({ isSubmitting }) => (

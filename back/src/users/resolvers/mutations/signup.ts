@@ -9,8 +9,12 @@ import {
   MutationSignupArgs
 } from "../../../generated/graphql/types";
 import { sanitizeEmail } from "../../../utils";
-import { acceptNewUserCompanyInvitations, userExists } from "../../database";
-import { hashPassword } from "../../utils";
+import {
+  acceptNewUserCompanyInvitations,
+  userExists,
+  createUser
+} from "../../database";
+import { hashPassword, checkPasswordCriteria } from "../../utils";
 import { onSignup } from "../../../mailer/templates";
 import { renderMail } from "../../../mailer/templates/renderers";
 
@@ -28,7 +32,10 @@ function validateArgs(args: MutationSignupArgs) {
       password: yup
         .string()
         .required("Vous devez saisir un mot de passe.")
-        .min(8, "Le mot de passe doit faire au moins 8 caractères")
+        .test("new-user-password-meets-criteria", "", function (password) {
+          checkPasswordCriteria(password);
+          return true;
+        })
     })
   });
   signupSchema.validateSync(args);
@@ -47,7 +54,7 @@ export async function signupFn({
 
   const hashedPassword = await hashPassword(password);
 
-  const user = await prisma.user.create({
+  const user = await createUser({
     data: {
       name,
       email: sanitizeEmail(unsafeEmail),

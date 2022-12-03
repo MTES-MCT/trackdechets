@@ -1,11 +1,11 @@
 import { UserInputError } from "apollo-server-express";
-import prisma from "../../../prisma";
 import * as yup from "yup";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import {
   acceptNewUserCompanyInvitations,
   getUserAccountHashOrNotFound,
-  userExists
+  userExists,
+  createUser
 } from "../../database";
 import { hashPassword } from "../../utils";
 
@@ -39,7 +39,7 @@ const joinWithInviteResolver: MutationResolvers["joinWithInvite"] = async (
   }
 
   const hashedPassword = await hashPassword(password);
-  const user = await prisma.user.create({
+  const user = await createUser({
     data: {
       name,
       email: existingHash.email,

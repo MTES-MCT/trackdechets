@@ -12,6 +12,8 @@ import { renderMail } from "../../../../mailer/templates/renderers";
 import { onSignup } from "../../../../mailer/templates";
 import { Mutation } from "../../../../generated/graphql/types";
 
+const viablePassword = "trackdechets#";
+
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
@@ -51,12 +53,13 @@ describe("Mutation.signup", () => {
       variables: {
         userInfos: {
           email: user.email,
-          password: "newUserPassword",
+          password: viablePassword,
           name: user.name,
           phone: user.phone
         }
       }
     });
+
     expect(data.signup).toEqual(user);
 
     const newUser = await prisma.user.findUnique({
@@ -130,12 +133,53 @@ describe("Mutation.signup", () => {
     expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
   });
 
-  it("should throw BAD_USER_INPUT if password is less than 8 characters long", async () => {
+  it("should throw BAD_USER_INPUT if password is less than 10 characters long", async () => {
     const user = {
       email: "bademail",
       name: "New User",
       phone: "06 00 00 00 00",
-      password: "pass"
+      password: "loremipsu"
+    };
+    const { errors } = await mutate(SIGNUP, {
+      variables: {
+        userInfos: {
+          email: user.email,
+          password: user.password,
+          name: user.name,
+          phone: user.phone
+        }
+      }
+    });
+    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+  });
+
+  it("should throw BAD_USER_INPUT if password is not complex enough", async () => {
+    const user = {
+      email: "bademail",
+      name: "New User",
+      phone: "06 00 00 00 00",
+      password: "aaaaaaaaaaaa"
+    };
+    const { errors } = await mutate(SIGNUP, {
+      variables: {
+        userInfos: {
+          email: user.email,
+          password: user.password,
+          name: user.name,
+          phone: user.phone
+        }
+      }
+    });
+    expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
+  });
+
+  it("should throw BAD_USER_INPUT if password is to long", async () => {
+    const user = {
+      email: "bademail",
+      name: "New User",
+      phone: "06 00 00 00 00",
+      password:
+        "Lorem-ipsum-dolor-sit-amet-consectetur-adipiscing-elit-Ut-volutpat"
     };
     const { errors } = await mutate(SIGNUP, {
       variables: {
@@ -161,7 +205,7 @@ describe("Mutation.signup", () => {
       variables: {
         userInfos: {
           email: user.email,
-          password: user.password,
+          password: viablePassword,
           name: user.name,
           phone: user.phone
         }
@@ -201,7 +245,7 @@ describe("Mutation.signup", () => {
       variables: {
         userInfos: {
           email: user.email,
-          password: "newUserPassword",
+          password: viablePassword,
           name: user.name,
           phone: user.phone
         }
