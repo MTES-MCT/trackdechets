@@ -159,7 +159,9 @@ input BsffInput {
   waste: BsffWasteInput
   "Quantité"
   weight: BsffWeightInput
+  "Informations sur le trasnporteur du déchet. L'entreprise visée doit être inscrite sur Trackdéchets avec le profil transporteur"
   transporter: BsffTransporterInput
+  "Installation de traitement ou de tri transit regroupement. L'installation visée doit être insscrite sur Trackdéchets avec un profil idoine"
   destination: BsffDestinationInput
   ficheInterventions: [ID!]
   "Identifiant des contenant réexpédié dans ce BSFF. La liste de contenants doit faire partie du même BSFF"
@@ -300,11 +302,15 @@ input BsffPackagingNextDestinationInput {
 }
 
 input BsffFicheInterventionInput {
+  "Numéro de la fiche d'intervention mentionnée à l'article R. 543-82 du code de l'environnement"
   numero: String!
-  "Poids en kilogrammes"
+  "La quantité totale réelle ou estimée exprimée en kilogramme"
   weight: Float!
+  "Informations concernnt le détenteur de l'équipement"
   detenteur: BsffDetenteurInput!
+  "Informations concernant l'opérateur"
   operateur: BsffOperateurInput!
+  "Le code postal du lieu de collecte"
   postalCode: String!
 }
 input BsffDetenteurInput {

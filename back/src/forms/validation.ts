@@ -5,7 +5,6 @@ import {
   QuantityType,
   WasteAcceptationStatus,
   Prisma,
-  CompanyVerificationStatus,
   Status
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
@@ -26,11 +25,6 @@ import {
   Packagings
 } from "../generated/graphql/types";
 import {
-  isCollector,
-  isWasteProcessor,
-  isTransporter
-} from "../companies/validation";
-import {
   MISSING_COMPANY_NAME,
   MISSING_COMPANY_SIRET,
   INVALID_SIRET_LENGTH,
@@ -41,7 +35,6 @@ import {
   INVALID_WASTE_CODE,
   INVALID_PROCESSING_OPERATION,
   EXTRANEOUS_NEXT_DESTINATION,
-  MISSING_COMPANY_SIRET_OR_VAT,
   MISSING_PROCESSING_OPERATION,
   MISSING_COMPANY_OMI_NUMBER,
   INVALID_COMPANY_OMI_NUMBER,
@@ -56,10 +49,12 @@ import {
 } from "../common/constants/companySearchHelpers";
 import { validateCompany } from "../companies/validateCompany";
 import { Decimal } from "decimal.js-light";
+import {
+  destinationCompanySiretSchema,
+  transporterCompanySiretSchema
+} from "../companies/validation";
 // set yup default error messages
 configureYup();
-
-const { VERIFY_COMPANY } = process.env;
 
 // ************************************************
 // BREAK DOWN FORM TYPE INTO INDIVIDUAL FRAME TYPES
@@ -203,72 +198,6 @@ type ProcessedInfo = Pick<
 // *************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 1
 // *************************************************************
-
-const recipientCompanySiretSchema = yup
-  .string()
-  .ensure()
-  .matches(/^$|^\d{14}$/, {
-    message: `Destinataire: ${INVALID_SIRET_LENGTH}`
-  })
-  .test(
-    "is-recipient-registered-with-right-profile",
-    ({ value }) =>
-      `L'installation de destination avec le SIRET ${value} n'est pas inscrite sur Trackdéchets`,
-    async (siret, ctx) => {
-      if (!siret) return true;
-
-      const company = await prisma.company.findUnique({
-        where: { siret }
-      });
-      if (!company) {
-        return false;
-      }
-
-      if (!(isCollector(company) || isWasteProcessor(company))) {
-        throw ctx.createError({
-          message: `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${siret}" n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
-        });
-      }
-
-      if (
-        VERIFY_COMPANY === "true" &&
-        company.verificationStatus !== CompanyVerificationStatus.VERIFIED
-      ) {
-        throw ctx.createError({
-          message: `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau bordereau.`
-        });
-      }
-
-      return true;
-    }
-  );
-
-const transporterCompanySiretSchema = yup
-  .string()
-  .ensure()
-  .test(
-    "is-transporter-registered-with-right-profile",
-    ({ value }) =>
-      `Le transporteur qui a été renseigné sur le bordereau (SIRET: ${value}) n'est pas inscrit sur Trackdéchets`,
-    async (siret, ctx) => {
-      if (!siret) return true;
-
-      const company = await prisma.company.findUnique({
-        where: { siret }
-      });
-      if (!company) {
-        return false;
-      }
-
-      if (!isTransporter(company)) {
-        throw ctx.createError({
-          message: `Le transporteur saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
-        });
-      }
-
-      return true;
-    }
-  );
 
 // 1 - Émetteur du bordereau
 const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
@@ -531,7 +460,7 @@ const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
       .string()
       .ensure()
       .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_NAME}`),
-    recipientCompanySiret: recipientCompanySiretSchema.requiredIf(
+    recipientCompanySiret: destinationCompanySiretSchema.requiredIf(
       !isDraft,
       `Destinataire: ${MISSING_COMPANY_SIRET}`
     ),
@@ -740,26 +669,7 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
         .string()
         .ensure()
         .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_NAME}`),
-      transporterCompanySiret: transporterCompanySiretSchema.when(
-        "transporterCompanyVatNumber",
-        (tva, schema) => {
-          if (!tva && !isDraft) {
-            return schema
-              .required(`Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`)
-              .test(
-                "is-siret",
-                "${path} n'est pas un numéro de SIRET valide",
-                value => isSiret(value)
-              );
-          }
-          if (!isDraft && tva && isFRVat(tva)) {
-            return schema.required(
-              "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
-            );
-          }
-          return schema.nullable().notRequired();
-        }
-      ),
+      transporterCompanySiret: transporterCompanySiretSchema(isDraft),
       transporterCompanyVatNumber: yup
         .string()
         .ensure()
@@ -1290,12 +1200,12 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
     .forwardedIn();
 
   if (forwardedIn?.recipientCompanySiret) {
-    await recipientCompanySiretSchema.validate(
+    await destinationCompanySiretSchema.validate(
       forwardedIn.recipientCompanySiret
     );
   }
   if (forwardedIn?.transporterCompanySiret) {
-    await transporterCompanySiretSchema.validate(
+    await transporterCompanySiretSchema(false).validate(
       forwardedIn.transporterCompanySiret
     );
   }

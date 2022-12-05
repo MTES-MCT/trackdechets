@@ -13,13 +13,13 @@ import {
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { isFinalOperation, OPERATION } from "./constants";
 import prisma from "../prisma";
-import {
-  isVat,
-  isSiret,
-  isFRVat
-} from "../common/constants/companySearchHelpers";
+import { isVat } from "../common/constants/companySearchHelpers";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { BSFF_WASTE_CODES } from "../common/constants";
+import {
+  destinationCompanySiretSchema,
+  transporterCompanySiretSchema
+} from "../companies/validation";
 
 configureYup();
 
@@ -137,28 +137,7 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
           !isDraft,
           "Transporteur : le nom de l'établissement est requis"
         ),
-      transporterCompanySiret: yup
-        .string()
-        .ensure()
-        .when("transporterCompanyVatNumber", (tva, schema) => {
-          if (!tva && !isDraft) {
-            return schema
-              .required(
-                "Transporteur : le n° SIRET ou le numéro de TVA intracommunautaire est requis"
-              )
-              .test(
-                "is-siret",
-                "Transporteur : le n° SIRET n'est pas au bon format",
-                value => isSiret(value)
-              );
-          }
-          if (!isDraft && tva && isFRVat(tva)) {
-            return schema.required(
-              "Transporteur : le n° SIRET est requis pour un établissement français"
-            );
-          }
-          return schema.nullable().notRequired();
-        }),
+      transporterCompanySiret: transporterCompanySiretSchema(isDraft),
       transporterCompanyVatNumber: yup
         .string()
         .ensure()
@@ -284,15 +263,10 @@ export const destinationSchemaFn: FactorySchemaOf<boolean, Destination> =
           !isDraft,
           "Destination : le nom de l'établissement est requis"
         ),
-      destinationCompanySiret: yup
-        .string()
-        .requiredIf(
-          !isDraft,
-          "Destination : le n°SIRET de l'établissement est requis"
-        )
-        .matches(/^$|^\d{14}$/, {
-          message: "Destination : le n°SIRET n'est pas au bon format"
-        }),
+      destinationCompanySiret: destinationCompanySiretSchema.requiredIf(
+        !isDraft,
+        `Destination : le numéro SIRET est requis`
+      ),
       destinationCompanyAddress: yup
         .string()
         .requiredIf(
