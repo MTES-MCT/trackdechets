@@ -20,9 +20,9 @@
     - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
     - [Nourrir la base de donnée avec des données par défaut](#nourrir-la-base-de-donnée-avec-des-données-par-défaut)
     - [Ajouter une nouvelle icône](#ajouter-une-nouvelle-icône)
-   - [Dépannage](#dépannage)
-      - [La base de donnée ne se crée pas](#la-base-de-donnée-ne-se-crée-pas)
-      - [Je n'arrive pas à (ré)indexer Elastic Search](#je-narrive-pas-à-réindexer-elastic-search)
+  - [Dépannage](#dépannage)
+    - [La base de donnée ne se crée pas](#la-base-de-donnée-ne-se-crée-pas)
+    - [Je n'arrive pas à (ré)indexer Elastic Search](#je-narrive-pas-à-réindexer-elastic-search)
 
 ## Mise en route
 
@@ -93,9 +93,84 @@
 
 ### Installation alternative sans docker
 
-Vous pouvez également faire tourner l'ensemble des services sans docker. Veillez à utiliser la même version de Node.js que celle spécifiée dans les images Docker. Vous pouvez utiliser [NVM](https://github.com/nvm-sh/nvm) pour changer facilement de version de Node.
+Vous pouvez également faire tourner l'ensemble des services sans docker. Veillez à utiliser la même version de Node.js que celle spécifiée dans les images Docker. Vous pouvez utiliser [NVM](https://github.com/nvm-sh/nvm) pour changer facilement de version de Node. L'utilisation de fichier `.nvmrc` à la racine du dossier `back` et `front` permet de charger automatiquement la bonne version en faisant `nvm use`.
 
-1. Démarrer `postgres`, `redis`, et `nginx` sur votre machine hôte. Pour la configuration `nginx` vous pouvez vous inspirer du fichier `nginx/templates/default.conf.template`.
+1. Démarrer `postgres`, `redis`, `elasticsearch@6`, `nginx` et `mongodb` sur votre machine hôte. Exemple de setup sur MacOS avec puce Apple :
+
+- Installer Postgres 14 avec [Postgres.app](https://postgresapp.com) (Postgres 13 n'est pas dispo sur puce Apple, tout semble fonctionner comme il faut sur la version 14)
+- Installer `redis`, `nginx`, `mongodb`, `elasticsearch@6` avec `brew` :
+
+```
+brew install redis
+brew install nginx
+brew tap mongodb/brew
+brew update
+brew install mongodb-community@6.0
+brew install elasticsearch@6
+```
+
+- Configurer Nginx :
+
+```
+# fichier /opt/homebrew/etc/nginx/servers/api.trackdechets.local
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name api.trackdechets.local;
+
+    location / {
+        proxy_pass http://localhost:4000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+#  /opt/homebrew/etc/nginx/servers/notifier.trackdechets.local
+server {
+    listen 80;
+    listen [::]:80;
+    server_name notifier.trackdechets.local;
+
+    location / {
+        proxy_pass http://localhost:4001;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_set_header Connection '';
+        proxy_http_version 1.1;
+        chunked_transfer_encoding off;
+        proxy_buffering off;
+        proxy_cache off;
+        proxy_read_timeout 4h;
+    }
+}
+
+# /opt/homebrew/etc/nginx/servers/trackdechets.local
+server {
+    listen 80;
+    listen [::]:80;
+
+    server_name trackdechets.local;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+    }
+}
+```
+
+Pour la configuration `nginx` vous pouvez vous inspirer du fichier `nginx/templates/default.conf.template`.
 
 2. Créer un lien symbolique entre le fichier `.env` et le fichier `back/.env`
 
@@ -194,7 +269,6 @@ Note : l'équipe n'a pas de conventions strictes concernant le nom des branches 
 Le déploiement est géré par Scalingo à l'aide des fichiers de configuration `Procfile` et `.buildpacks` placés dans le front et l'api.
 Chaque update de la branche `dev` déclenche un déploiement sur l'environnement de recette. Chaque update de la branche `master` déclenche un déploiement sur les environnements sandbox et prod. Le déroulement dans le détails d'une mise en production est le suivant:
 
-
 1. Faire le cahier de recette pour vérifier qu'il n'y a pas eu de régression sur les fonctionnalités critiques de l'application (login, signup, rattachement établissement, invitation collaborateur, création BSD)
 2. Balayer le tableau [Favro "Recette du xx/xx/xx"](https://favro.com/organization/ab14a4f0460a99a9d64d4945/02f1ec52bd91efc0adb3c38b) pour vérifier que l'étiquette "Recette OK --> EN PROD" a bien été ajoutée sur toutes les cartes.
 3. Mettre à jour le [Changelog.md](./Changelog.md) avec un nouveau numéro de version (versionnage calendaire)
@@ -203,9 +277,8 @@ Chaque update de la branche `dev` déclenche un déploiement sur l'environnement
 6. Faire une relecture des différents changements apportés aux modèles de données et scripts de migration.
 7. Si possible faire tourner les migrations sur une copie de la base de prod en local.
 8. S'assurer que les nouvelles variables d'environnement (Cf `.env.model`) ont bien été ajoutée sur Scalingo dans les environnements sandbox et prod respectivement pour les applications `front` et `api`
-9.  Merger la PR et suivre l'avancement de la CI github.
+9. Merger la PR et suivre l'avancement de la CI github.
 10. Suivre l'avancement du déploiement sur Scalingo respectivement pour le front, l'api et la doc.
-
 
 ## Migrations
 
@@ -331,19 +404,22 @@ Pour s'y retrouver plus facilement, suivre la convention de nommage en place et 
 ### La base de donnée ne se crée pas
 
 Si la commande pour créer la base de données ne fonctionne pas (`npx prisma db push`), il est possible que le symbole $ dans le nom de la base (default$default) pose problème. Deux solutions:
-- Encapsulez l'URI de la base avec des guillements simple, ie: 
-`DATABASE_URL='postgresql://username:password@postgres:5432/prisma?schema=default$default'`
+
+- Encapsulez l'URI de la base avec des guillements simple, ie:
+  `DATABASE_URL='postgresql://username:password@postgres:5432/prisma?schema=default$default'`
 - Enlevez complètement le paramètre schema:
-`DATABASE_URL=postgresql://username:password@postgres:5432/prisma`
+  `DATABASE_URL=postgresql://username:password@postgres:5432/prisma`
 
 ### Je n'arrive pas à (ré)indexer Elastic Search
 
 Vous pouvez vérifier vos indexes Eslastic Search avec la commande suivante:
+
 ```
 curl -X GET "localhost:9200/_cat/indices"
 ```
 
 Si les indexes sont incomplets ou si la commande a échoué, vous pouvez vous connecter au container de l'API et passer en mode verbose avant de relancer l'indexation:
+
 ```
 # Pour se connecter au container de l'API
 docker exec -it $(docker ps -qf "name=td-api") bash
@@ -354,11 +430,13 @@ npm run reindex-all-bsds-bulk:dev -- -f
 ```
 
 Si le problème remonté est un "Segmentation fault", il est probable que la mémoire allouée au container soit insuffisante. Vous pouvez contourner le problème en limitant la taille des batches (dans votre .env):
+
 ```
 BULK_INDEX_BATCH_SIZE=100
 ```
 
 Vous pouvez également augmenter la taille mémoire allouée au container Docker, dans un fichier `docker-compose.override.yml` placé à la racine du répo:
+
 ```
 [...]
   postgres:
@@ -372,5 +450,5 @@ Vous pouvez également augmenter la taille mémoire allouée au container Docker
   elasticsearch:
     environment:
       - "ES_JAVA_OPTS=-Xms1G -Xmx1G"
-[...]      
+[...]
 ```
