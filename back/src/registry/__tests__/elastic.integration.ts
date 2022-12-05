@@ -485,7 +485,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         destination
       },
       {
-        detenteurCompanySirets: [detenteur.company.id],
+        detenteurCompanySirets: [detenteur.company.siret],
         ficheInterventions: { connect: { id: ficheIntervention.id } }
       }
     );
