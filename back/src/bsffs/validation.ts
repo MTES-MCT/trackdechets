@@ -263,7 +263,10 @@ export const destinationSchemaFn: FactorySchemaOf<boolean, Destination> =
           !isDraft,
           "Destination : le nom de l'établissement est requis"
         ),
-      destinationCompanySiret: destinationCompanySiretSchema(isDraft),
+      destinationCompanySiret: destinationCompanySiretSchema.requiredIf(
+        !isDraft,
+        `Destinatation : le numéro SIRET est requis`
+      ),
       destinationCompanyAddress: yup
         .string()
         .requiredIf(

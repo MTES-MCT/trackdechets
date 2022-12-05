@@ -6,7 +6,6 @@ import {
 } from "@prisma/client";
 import {
   INVALID_SIRET_LENGTH,
-  MISSING_COMPANY_SIRET,
   MISSING_COMPANY_SIRET_OR_VAT
 } from "../forms/errors";
 import prisma from "../prisma";
@@ -34,52 +33,50 @@ export function isTransporter(company: Company) {
 
 const { VERIFY_COMPANY } = process.env;
 
-export const destinationCompanySiretSchema = (isDraft: boolean) =>
-  yup
-    .string()
-    .ensure()
-    .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_SIRET}`)
-    .matches(/^$|^\d{14}$/, {
-      message: `Destinataire: ${INVALID_SIRET_LENGTH}`
-    })
-    .test(
-      "is-recipient-registered-with-right-profile",
-      ({ value }) =>
-        `L'installation de destination avec le SIRET ${value} n'est pas inscrite sur Trackdéchets`,
-      async (siret, ctx) => {
-        if (!siret) return true;
+export const destinationCompanySiretSchema = yup
+  .string()
+  .ensure()
+  .matches(/^$|^\d{14}$/, {
+    message: `Destinataire: ${INVALID_SIRET_LENGTH}`
+  })
+  .test(
+    "is-recipient-registered-with-right-profile",
+    ({ value }) =>
+      `L'installation de destination avec le SIRET ${value} n'est pas inscrite sur Trackdéchets`,
+    async (siret, ctx) => {
+      if (!siret) return true;
 
-        const company = await prisma.company.findUnique({
-          where: { siret }
-        });
-        if (!company) {
-          return false;
-        }
-
-        if (!(isCollector(company) || isWasteProcessor(company))) {
-          throw ctx.createError({
-            message:
-              `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${siret}" n'est pas inscrite` +
-              ` sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut` +
-              ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
-              ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
-          });
-        }
-
-        if (
-          VERIFY_COMPANY === "true" &&
-          company.verificationStatus !== CompanyVerificationStatus.VERIFIED
-        ) {
-          throw ctx.createError({
-            message:
-              `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue` +
-              ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau bordereau.`
-          });
-        }
-
-        return true;
+      const company = await prisma.company.findUnique({
+        where: { siret }
+      });
+      if (!company) {
+        return false;
       }
-    );
+
+      if (!(isCollector(company) || isWasteProcessor(company))) {
+        throw ctx.createError({
+          message:
+            `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${siret}" n'est pas inscrite` +
+            ` sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut` +
+            ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
+            ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+        });
+      }
+
+      if (
+        VERIFY_COMPANY === "true" &&
+        company.verificationStatus !== CompanyVerificationStatus.VERIFIED
+      ) {
+        throw ctx.createError({
+          message:
+            `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue` +
+            ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau bordereau.`
+        });
+      }
+
+      return true;
+    }
+  );
 
 export const transporterCompanySiretSchema = (isDraft: boolean) =>
   yup
