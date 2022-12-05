@@ -537,7 +537,7 @@ async function indexAllBsds(
           since
         });
       } else {
-        const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 1000;
+        const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
         const data = [];
         for (
           let incrementalSkip = 0;
