@@ -93,48 +93,55 @@
 
 ### Installation alternative sans docker
 
-Vous pouvez également faire tourner l'ensemble des services sans docker. Veillez à utiliser la même version de Node.js que celle spécifiée dans les images Docker. Vous pouvez utiliser [NVM](https://github.com/nvm-sh/nvm) pour changer facilement de version de Node. L'utilisation de fichier `.nvmrc` à la racine du dossier `back` et `front` permet de charger automatiquement la bonne version en faisant `nvm use`.
+- Vous pouvez également faire tourner l'ensemble des services sans docker.
 
-1. Démarrer `postgres`, `redis`, `elasticsearch@6`, `nginx` et `mongodb` sur votre machine hôte. Exemple de setup sur MacOS avec puce Apple :
+#### Pré-requis
 
-- Installer Postgres 14 avec [Postgres.app](https://postgresapp.com) (Postgres 13 n'est pas dispo sur puce Apple, tout semble fonctionner comme il faut sur la version 14)
-- Installer `redis`, `nginx`, `mongodb`, `elasticsearch@6` avec `brew` :
+- Veillez à utiliser la même version de Node.js que celle spécifiée dans les images Docker. Vous pouvez utiliser [NVM](https://github.com/nvm-sh/nvm) pour changer facilement de version de Node. L'utilisation de fichier `.nvmrc` à la racine du dossier `back` et `front` permet de charger automatiquement la bonne version en faisant `nvm use`.
 
-```
-brew install redis
-brew install nginx
-brew tap mongodb/brew
-brew update
-brew install mongodb-community@6.0
-brew install elasticsearch@6
-```
+1. Installer/Démarrer `postgres`, `redis`, `elasticsearch@6`, `nginx` et `mongodb` sur votre machine hôte. Exemple de setup sur `MacOS avec puce Apple`:
+
+   - Installer Postgres 14 avec [Postgres.app](https://postgresapp.com) (Postgres 13 n'est pas dispo sur puce Apple, tout semble fonctionner comme il faut sur la version 14)
+   - Installer `postgresql`, `redis`, `nginx`, `mongodb`, `elasticsearch@6` avec `brew` :
+
+   ```
+   brew install postgresql
+   brew install redis
+   brew install nginx
+   brew tap mongodb/brew
+   brew update
+   brew install mongodb-community@6.0
+   brew install elasticsearch@6
+   ```
 
 - Configurer Nginx :
 
-```
-# fichier /opt/homebrew/etc/nginx/servers/api.trackdechets.local
+  - creer les fichiers suivants:
 
-server {
-    listen 80;
-    listen [::]:80;
-    server_name api.trackdechets.local;
+  ```
+  # fichier /opt/homebrew/etc/nginx/servers/api.trackdechets.local
 
-    location / {
+  server {
+     listen 80;
+     listen [::]:80;
+     server_name api.trackdechets.local;
+
+     location / {
         proxy_pass http://localhost:4000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
+     }
+  }
 
-#  /opt/homebrew/etc/nginx/servers/notifier.trackdechets.local
-server {
-    listen 80;
-    listen [::]:80;
-    server_name notifier.trackdechets.local;
+  #  /opt/homebrew/etc/nginx/servers/notifier.trackdechets.local
+  server {
+     listen 80;
+     listen [::]:80;
+     server_name notifier.trackdechets.local;
 
-    location / {
+     location / {
         proxy_pass http://localhost:4001;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -147,17 +154,17 @@ server {
         proxy_buffering off;
         proxy_cache off;
         proxy_read_timeout 4h;
-    }
-}
+     }
+  }
 
-# /opt/homebrew/etc/nginx/servers/trackdechets.local
-server {
-    listen 80;
-    listen [::]:80;
+  # /opt/homebrew/etc/nginx/servers/trackdechets.local
+  server {
+     listen 80;
+     listen [::]:80;
 
-    server_name trackdechets.local;
+     server_name trackdechets.local;
 
-    location / {
+     location / {
         proxy_pass http://localhost:3000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
@@ -166,43 +173,98 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
-    }
-}
-```
+     }
+  }
+  ```
 
-Pour la configuration `nginx` vous pouvez vous inspirer du fichier `nginx/templates/default.conf.template`.
+  - `brew services reload nginx`
+  - `brew services restart nginx`
 
-2. Créer un lien symbolique entre le fichier `.env` et le fichier `back/.env`
+  Nb : Pour la configuration `nginx` vous pouvez vous inspirer du fichier `nginx/templates/default.conf.template`.
 
-```
-ln -s /path/to/trackdechets/.env /path/to/trackdechets/back/.env
-```
+- Fichier `.env` :
 
-> Il est également possible de démarrer ces trois services avec docker `docker-compose -f docker-compose.dev.yml up postgres redis nginx`. Dans ce cas, l'API doit être démarrée sur le port 4000 pour coller avec la configuration Nginx `API_PORT=4000`.
+  - dans le répertoire `back` créer un fichier `.env` (demander à un dev):
+    - modifer `POSTGRES_USER`avec votre nom de user postgres et `DATABASE_URL`mofifier le user de l'url
+  - dans le répertoire `front` créer un fichier `.env.development` (demander à un dev)
+
+- Configurer prisma :
+
+  ```
+     create database prisma
+     npx prisma db push
+  ```
+
+  - dans le répertoire `back/prisma` créer le fichier `seed.dev.ts` (demander à un dev)
+
+  - revenir dans le répertoire `back` peupler la db `npx prisma db seed`
+
+- Démarrer les services :
+
+  - Pour lister les services précédemment installés faire `brew services list`
+  - Démarrer tous les services exemple: `brew services nginx start`
+
+- Configurer elasticsearch:
+
+  - `npm run reindex-all-bsds-bulk:dev -- -f`
+  - `npm run generate`
+  - Vérifier que l'index est créé: `curl localhost:9200/_cat/indices`
+
+- mongodb:
+
+  - vérifier si installé `mongosh`
+  - `use admin`
+  - `db.createUser({user: "trackdechets" ,pwd: "password", roles: ["userAdminAnyDatabase", "dbAdminAnyDatabase", "readWriteAnyDatabase"]})`
+
+- Mapper les différentes URLs sur localhost dans votre fichier `host`
+
+  ```
+  127.0.0.1 api.trackdechets.local
+  127.0.0.1 trackdechets.local
+  127.0.0.1 developers.trackdechets.local
+  127.0.0.1 es.trackdechets.local
+  127.0.0.1 notifier.trackdechets.local
+  ```
+
+  > Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
+
+  > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `NOTIFIER_HOST`, `UI_HOST`, `DEVELOPERS_HOST` et `ELASTIC_SEARCH_HOST`
+
+2. (Optionnel) Créer un lien symbolique entre le fichier `.env` et le fichier `back/.env`
+
+   ```
+   ln -s /path/to/trackdechets/.env /path/to/trackdechets/back/.env
+   ```
+
+   > Il est également possible de démarrer ces trois services avec docker `docker-compose -f docker-compose.dev.yml up postgres redis nginx`. Dans ce cas, l'API doit être démarrée sur le port 4000 pour coller avec la configuration Nginx `API_PORT=4000`.
 
 3. Démarrer l'API
 
-```bash
-cd back
-npm install
-npm run dev
-```
+   ```bash
+   cd back
+   npm install
+   npm run dev
+   ```
+
+   - url: http://api.trackdechets.local/
 
 4. Démarrer l'UI
 
-```bash
-cd front
-npm install
-npm start
-```
+   ```bash
+   cd front
+   npm install
+   npm start
+   ```
+
+   - url: http://trackdechets.local
 
 5. (Optionnel) Démarrer la documentation
 
-```
-cd doc/website
-npm install
-npm start
-```
+   ```
+   cd doc/website
+   npm install
+   npm start
+   ```
 
 ### Conventions
 
