@@ -1113,6 +1113,9 @@ model Bsff {
   @@index([destinationCompanySiret], map: "_BsffDestinationCompanySiretIdx")
   @@index([status], map: "_BsffStatusIdx")
   @@index([updatedAt], map: "_BsffUpdatedAtIdx")
+  @@index([createdAt], map: "_BsffCreatedAtIdx")
+  @@index([emitterEmissionSignatureDate], map: "_BsffEmitterEmissionSignatureDateIdx")
+  @@index([transporterTransportSignatureDate], map: "_BsffTransporterTransportSignatureDateIdx")
 }
 
 enum BsffType {
@@ -1208,8 +1211,15 @@ model BsffPackaging {
   nextPackagingId    String?
   previousPackagings BsffPackaging[] @relation("NextPackaging")
 
+  //  partial indices _BsffPackagingOperationNoTraceabilityIdx
+
   @@index([bsffId], map: "_BsffPackagingBsffId")
   @@index([nextPackagingId], map: "_BsffPackagingNextPackagingIdx")
+  @@index([numero], map: "_BsffPackagingNumeroIdx")
+  @@index([acceptationWasteCode], map: "_BsffPackagingAcceptationWasteCodeIdx")
+  @@index([acceptationSignatureDate], map: "_BsffPackagingAcceptationSignatureDateIdx")
+  @@index([operationCode], map: "_BsffPackagingOperationCodeIdx")
+  @@index([operationSignatureDate], map: "_BsffPackagingOperationSignatureDateIdx")
 }
 
 enum BsffPackagingType {
