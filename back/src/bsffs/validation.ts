@@ -265,7 +265,7 @@ export const destinationSchemaFn: FactorySchemaOf<boolean, Destination> =
         ),
       destinationCompanySiret: destinationCompanySiretSchema.requiredIf(
         !isDraft,
-        `Destinatation : le numéro SIRET est requis`
+        `Destination : le numéro SIRET est requis`
       ),
       destinationCompanyAddress: yup
         .string()

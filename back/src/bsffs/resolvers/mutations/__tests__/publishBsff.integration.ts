@@ -44,7 +44,7 @@ describe("publishBsff", () => {
         message:
           "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
           "Destination : le nom de l'établissement est requis\n" +
-          "Destinataire: Le siret de l'entreprise est obligatoire\n" +
+          "Destination : le numéro SIRET est requis\n" +
           "Destination : l'adresse de l'établissement est requise\n" +
           "Destination : le nom du contact est requis\n" +
           "Destination : le numéro de téléphone est requis\n" +

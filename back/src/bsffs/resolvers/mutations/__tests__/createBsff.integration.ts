@@ -174,7 +174,7 @@ describe("Mutation.createBsff", () => {
         message:
           "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
           "Destination : le nom de l'établissement est requis\n" +
-          "Destinataire: Le siret de l'entreprise est obligatoire\n" +
+          "Destination : le numéro SIRET est requis\n" +
           "Destination : l'adresse de l'établissement est requise\n" +
           "Destination : le nom du contact est requis\n" +
           "Destination : le numéro de téléphone est requis\n" +
@@ -297,7 +297,7 @@ describe("Mutation.createBsff", () => {
           `Le transporteur saisi sur le bordereau (SIRET: ${transporter.company.siret}) n'est pas inscrit sur` +
           " Trackdéchets en tant qu'entreprise de transport. Cette installation ne peut donc pas" +
           " être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette" +
-          " installation pour qu'il modifie le profil de l'établissement depuis l'interface" +
+          " entreprise pour qu'il modifie le profil de l'établissement depuis l'interface" +
           " Trackdéchets Mon Compte > Établissements"
       })
     ]);
