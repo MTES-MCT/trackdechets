@@ -10,6 +10,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Ajout d'un formulaire réservé aux administrateurs pour désactiver un compte utilisateur et l'anonymiser définitivement [PR 1867](https://github.com/MTES-MCT/trackdechets/pull/1867)
+- ETQ détenteur d'équipement, j'ai accès au suivi des BSFFs sur lesquelles je suis visé [PR 1918](https://github.com/MTES-MCT/trackdechets/pull/1918)
+- ETQ opérateur fluide, je peux ajouter une fiche d'intervention sur laquelle le détenteur est un particulier [PR 1918](https://github.com/MTES-MCT/trackdechets/pull/1918)
 
 #### :bug: Corrections de bugs
 

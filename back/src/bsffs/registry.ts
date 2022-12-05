@@ -35,7 +35,10 @@ export function getRegistryFields(
     bsff.emitterEmissionSignatureDate &&
     bsff.transporterTransportSignatureDate
   ) {
-    registryFields.isOutgoingWasteFor.push(bsff.emitterCompanySiret);
+    registryFields.isOutgoingWasteFor.push(
+      bsff.emitterCompanySiret,
+      ...bsff.detenteurCompanySirets
+    );
     registryFields.isTransportedWasteFor.push(bsff.transporterCompanySiret);
   }
 

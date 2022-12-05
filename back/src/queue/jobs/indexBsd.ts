@@ -69,7 +69,7 @@ export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
   if (bsdId.startsWith("FF-")) {
     const bsff = await prisma.bsff.findUnique({
       where: { id: bsdId },
-      include: { packagings: true }
+      include: { packagings: true, ficheInterventions: true }
     });
 
     const elasticBsff = toBsffElastic(bsff);

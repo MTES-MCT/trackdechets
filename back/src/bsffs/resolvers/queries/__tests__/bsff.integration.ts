@@ -28,11 +28,16 @@ describe("Query.bsff", () => {
     const bsff = await createBsff({ emitter });
 
     const { query } = makeClient(emitter.user);
-    const { data } = await query<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF, {
-      variables: {
-        id: bsff.id
+    const { errors, data } = await query<Pick<Query, "bsff">, QueryBsffArgs>(
+      GET_BSFF,
+      {
+        variables: {
+          id: bsff.id
+        }
       }
-    });
+    );
+
+    expect(errors).toBeUndefined();
 
     expect(data.bsff).toEqual(
       expect.objectContaining({
@@ -56,7 +61,7 @@ describe("Query.bsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Le bordereau de fluides frigorigènes n°123 n'existe pas."
+        message: "Le BSFF n°123 n'existe pas."
       })
     ]);
   });
@@ -77,7 +82,7 @@ describe("Query.bsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le bordereau de fluides frigorigènes n°${bsff.id} n'existe pas.`
+        message: `Le BSFF n°${bsff.id} n'existe pas.`
       })
     ]);
   });
@@ -100,7 +105,7 @@ describe("Query.bsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le bordereau de fluides frigorigènes n°${bsff.id} n'existe pas.`
+        message: "Vous ne pouvez pas accéder à ce BSFF"
       })
     ]);
   });
@@ -181,11 +186,16 @@ describe("Query.bsff", () => {
     );
 
     const { query } = makeClient(destination.user);
-    const { data } = await query<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF, {
-      variables: {
-        id: bsff.id
+    const { data, errors } = await query<Pick<Query, "bsff">, QueryBsffArgs>(
+      GET_BSFF,
+      {
+        variables: {
+          id: bsff.id
+        }
       }
-    });
+    );
+
+    expect(errors).toBeUndefined();
 
     expect(data.bsff.grouping).toEqual([
       expect.objectContaining({ id: previousBsff.packagings[0].id })
@@ -210,11 +220,16 @@ describe("Query.bsff", () => {
       { type: "REEXPEDITION" }
     );
     const { query } = makeClient(destination.user);
-    const { data } = await query<Pick<Query, "bsff">, QueryBsffArgs>(GET_BSFF, {
-      variables: {
-        id: bsff.id
+    const { data, errors } = await query<Pick<Query, "bsff">, QueryBsffArgs>(
+      GET_BSFF,
+      {
+        variables: {
+          id: bsff.id
+        }
       }
-    });
+    );
+    expect(errors).toBeUndefined();
+
     expect(data.bsff.forwarding).toEqual([
       expect.objectContaining({ id: forwardedBsff.packagings[0].id })
     ]);

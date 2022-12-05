@@ -7,7 +7,7 @@ import {
   BsffType,
   Prisma
 } from "@prisma/client";
-import { UserInputError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
 import {
   BsffFicheIntervention,
@@ -20,7 +20,6 @@ import {
   expandBsffFromDB,
   expandFicheInterventionBsffFromDB
 } from "./converter";
-import { isBsffContributor } from "./permissions";
 import {
   validateBsff,
   validateFicheInterventions,
@@ -29,6 +28,13 @@ import {
 import { indexBsff } from "./elastic";
 import { GraphQLContext } from "../types";
 import { toBsffPackagingWithType } from "./compat";
+import {
+  checkCanWriteBsff,
+  checkCanWriteFicheIntervention,
+  isBsffContributor,
+  isBsffDetenteur
+} from "./permissions";
+import { getCachedUserSiretOrVat } from "../common/redis/users";
 
 export async function getBsffOrNotFound(
   where: SetRequired<Prisma.BsffWhereInput, "id">
@@ -39,9 +45,7 @@ export async function getBsffOrNotFound(
   });
 
   if (bsff == null) {
-    throw new UserInputError(
-      `Le bordereau de fluides frigorigènes n°${where.id} n'existe pas.`
-    );
+    throw new UserInputError(`Le BSFF n°${where.id} n'existe pas.`);
   }
 
   return bsff;
@@ -85,7 +89,7 @@ export async function getFicheInterventionBsffOrNotFound(
  */
 export async function getFicheInterventions({
   bsff,
-  context
+  context: { user }
 }: {
   bsff: Bsff;
   context: GraphQLContext;
@@ -94,24 +98,29 @@ export async function getFicheInterventions({
     .findUnique({ where: { id: bsff.id } })
     .ficheInterventions();
 
-  const unflattenedFicheInterventions = ficheInterventions.map(
+  const isContributor = await isBsffContributor(user, bsff);
+  const isDetenteur = await isBsffDetenteur(user, bsff);
+
+  const expandedFicheInterventions = ficheInterventions.map(
     expandFicheInterventionBsffFromDB
   );
 
-  // the user trying to read ficheInterventions might not be a contributor of the bsff
-  // for example they could be reading the ficheInterventions of a bsff that was forwarded:
-  // bsffs { forwarding { ficheInterventions } }
-  // in this case, they are still allowed to read ficheInterventions but not all fields
-  try {
-    await isBsffContributor(context.user, bsff);
-  } catch (err) {
-    unflattenedFicheInterventions.forEach(ficheIntervention => {
-      delete ficheIntervention.detenteur;
-      delete ficheIntervention.operateur;
-    });
+  if (isContributor) {
+    return expandedFicheInterventions;
   }
 
-  return unflattenedFicheInterventions;
+  if (isDetenteur) {
+    const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
+
+    // only return detenteur's fiche d'intervention
+    return expandedFicheInterventions.filter(fi =>
+      userCompaniesSiretOrVat.includes(fi.detenteur?.company?.siret)
+    );
+  }
+
+  throw new ForbiddenError(
+    "Vous n'êtes pas autorisé à consulter les fiches d'interventions de ce BSFF"
+  );
 }
 
 export async function createBsff(
@@ -126,7 +135,7 @@ export async function createBsff(
     ...additionalData
   };
 
-  await isBsffContributor(user, flatInput);
+  await checkCanWriteBsff(user, flatInput);
 
   if (!input.type) {
     throw new UserInputError("Vous devez préciser le type de BSFF");
@@ -140,6 +149,9 @@ export async function createBsff(
       : [];
 
   const packagingsInput = input.packagings?.map(toBsffPackagingWithType);
+  for (const ficheIntervention of ficheInterventions) {
+    await checkCanWriteFicheIntervention(user, ficheIntervention);
+  }
 
   const futureBsff = {
     ...flatInput,
@@ -167,6 +179,9 @@ export async function createBsff(
     data.ficheInterventions = {
       connect: ficheInterventions.map(({ id }) => ({ id }))
     };
+    data.detenteurCompanySirets = ficheInterventions
+      .map(fi => fi.detenteurCompanySiret)
+      .filter(Boolean);
   }
 
   const bsff = await prisma.bsff.create({

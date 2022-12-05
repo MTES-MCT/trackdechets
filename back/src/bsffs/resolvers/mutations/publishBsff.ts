@@ -1,7 +1,7 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound, getPreviousPackagings } from "../../database";
-import { isBsffContributor } from "../../permissions";
+import { checkCanWriteBsff } from "../../permissions";
 import prisma from "../../../prisma";
 import { expandBsffFromDB } from "../../converter";
 import { indexBsff } from "../../elastic";
@@ -24,7 +24,7 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
     .findUnique({ where: { id: existingBsff.id } })
     .packagings();
 
-  await isBsffContributor(user, existingBsff);
+  await checkCanWriteBsff(user, existingBsff);
 
   const previousPackagings = await getPreviousPackagings(
     existingBsff.packagings.map(p => p.id),

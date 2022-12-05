@@ -104,7 +104,7 @@ describe("Mutation.deleteBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Le bordereau de fluides frigorigènes n°123 n'existe pas."
+        message: "Le BSFF n°123 n'existe pas."
       })
     ]);
   });
@@ -125,7 +125,7 @@ describe("Mutation.deleteBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le bordereau de fluides frigorigènes n°${bsff.id} n'existe pas.`
+        message: `Le BSFF n°${bsff.id} n'existe pas.`
       })
     ]);
   });

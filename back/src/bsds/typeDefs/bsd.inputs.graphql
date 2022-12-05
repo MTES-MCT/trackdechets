@@ -49,8 +49,6 @@ input SignatureWhere {
   date: DateFilter
 }
 
-
 input CreatePdfAccessTokenInput {
-
   bsdId: ID!
 }

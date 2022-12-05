@@ -120,7 +120,8 @@ describe("Mutation.updateFicheInterventionBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Vous devez être membre de l'entreprise au SIRET ${variables.input.operateur.company.siret} pour pouvoir éditer une fiche d'intervention en son nom.`
+        message:
+          "Vous ne pouvez pas éditer une fiche d'intervention sur lequel le SIRET de votre entreprise n'apparaît pas."
       })
     ]);
   });

@@ -43,6 +43,13 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
 
+  const emitterSiret = form.bsffEmitter?.company?.siret;
+  const transporterSiret = form.bsffTransporter?.company?.siret;
+  const destinationSiret = form.bsffDestination?.company?.siret;
+  const canWrite = [emitterSiret, transporterSiret, destinationSiret].includes(
+    siret
+  );
+
   return (
     <>
       <Menu>
@@ -88,25 +95,28 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
               </MenuItem>
               {![BsffStatus.Processed, BsffStatus.Refused].includes(
                 form.bsffStatus
-              ) && (
-                <>
-                  <MenuLink
-                    as={Link}
-                    to={generatePath(routes.dashboard.bsffs.edit, {
-                      siret,
-                      id: form.id,
-                    })}
-                  >
-                    <IconPaperWrite size="24px" color="blueLight" />
-                    Modifier
-                  </MenuLink>
-                </>
+              ) &&
+                canWrite && (
+                  <>
+                    <MenuLink
+                      as={Link}
+                      to={generatePath(routes.dashboard.bsffs.edit, {
+                        siret,
+                        id: form.id,
+                      })}
+                    >
+                      <IconPaperWrite size="24px" color="blueLight" />
+                      Modifier
+                    </MenuLink>
+                  </>
+                )}
+              {canWrite && (
+                <MenuItem onSelect={() => duplicateBsff()}>
+                  <IconDuplicateFile size="24px" color="blueLight" />
+                  Dupliquer
+                </MenuItem>
               )}
-              <MenuItem onSelect={() => duplicateBsff()}>
-                <IconDuplicateFile size="24px" color="blueLight" />
-                Dupliquer
-              </MenuItem>
-              {form.bsffStatus === BsffStatus.Initial && (
+              {form.bsffStatus === BsffStatus.Initial && canWrite && (
                 <MenuItem onSelect={() => setIsDeleting(true)}>
                   <IconTrash color="blueLight" size="24px" />
                   Supprimer

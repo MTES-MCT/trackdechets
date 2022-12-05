@@ -10,6 +10,8 @@ import {
   MutationCreateDraftBsffArgs
 } from "../../../../generated/graphql/types";
 import {
+  companyFactory,
+  userFactory,
   UserWithCompany,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -24,6 +26,7 @@ import {
   createFicheIntervention
 } from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
+import { associateUserToCompany } from "../../../../users/database";
 
 const CREATE_DRAFT_BSFF = `
   mutation CreateDraftBsff($input: BsffInput!) {
@@ -166,6 +169,44 @@ describe("Mutation.createDraftBsff", () => {
 
     expect(errors).toBeUndefined();
     expect(data.createDraftBsff.ficheInterventions).toHaveLength(1);
+  });
+
+  it("should set detenteurCompanySirets when adding fiches d'intervention", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const detenteur = await userWithCompanyFactory(UserRole.ADMIN);
+    const ficheIntervention = await createFicheIntervention({
+      operateur: emitter,
+      detenteur
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { data } = await mutate<
+      Pick<Mutation, "createDraftBsff">,
+      MutationCreateDraftBsffArgs
+    >(CREATE_DRAFT_BSFF, {
+      variables: {
+        input: {
+          type: BsffType.COLLECTE_PETITES_QUANTITES,
+          emitter: {
+            company: {
+              name: emitter.company.name,
+              siret: emitter.company.siret,
+              address: emitter.company.address,
+              contact: emitter.user.name,
+              mail: emitter.user.email
+            }
+          },
+          ficheInterventions: [ficheIntervention.id]
+        }
+      }
+    });
+
+    const bsff = await prisma.bsff.findUnique({
+      where: { id: data.createDraftBsff.id }
+    });
+
+    expect(bsff.detenteurCompanySirets).toEqual([detenteur.company.siret]);
   });
 
   describe("when adding previous bsffs", () => {
@@ -547,38 +588,6 @@ describe("Mutation.createDraftBsff", () => {
       }
     );
 
-    it("should allow to create a BSFF packaging with deprecated field `name=bouteille`", async () => {
-      const emitter = await userWithCompanyFactory("ADMIN");
-
-      const { mutate } = makeClient(emitter.user);
-      const { data, errors } = await mutate<
-        Pick<Mutation, "createDraftBsff">,
-        MutationCreateDraftBsffArgs
-      >(CREATE_DRAFT_BSFF, {
-        variables: {
-          input: {
-            type: BsffType.COLLECTE_PETITES_QUANTITES,
-            emitter: {
-              company: {
-                name: emitter.company.name,
-                siret: emitter.company.siret,
-                address: emitter.company.address,
-                contact: emitter.user.name,
-                mail: emitter.user.email
-              }
-            },
-            packagings: [
-              { name: "Bouteille", numero: "cont1", volume: 1, weight: 1 }
-            ]
-          }
-        }
-      });
-      expect(errors).toBeUndefined();
-      expect(data.createDraftBsff.packagings[0].name).toEqual("BOUTEILLE");
-      expect(data.createDraftBsff.packagings[0].type).toEqual("BOUTEILLE");
-      expect(data.createDraftBsff.packagings[0].other).toBeNull();
-    });
-
     it("should allow to create a BSFF packaging with deprecated field `name=anything`", async () => {
       const emitter = await userWithCompanyFactory("ADMIN");
 
@@ -656,6 +665,115 @@ describe("Mutation.createDraftBsff", () => {
         expect.objectContaining({
           message:
             "Vous ne pouvez pas préciser à la fois le champ `type` et le champ `name`"
+        })
+      ]);
+    });
+
+    it("should not be possible to add fiche d'interventions on a Bsff type other than 'COLLECTE_PETITES_QUANTITES'", async () => {
+      const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+      const ficheIntervention = await createFicheIntervention({
+        operateur,
+        detenteur: await userWithCompanyFactory(UserRole.ADMIN)
+      });
+      const { mutate } = makeClient(operateur.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createDraftBsff">,
+        MutationCreateDraftBsffArgs
+      >(CREATE_DRAFT_BSFF, {
+        variables: {
+          input: {
+            type: BsffType.TRACER_FLUIDE,
+            emitter: {
+              company: {
+                name: operateur.company.name,
+                siret: operateur.company.siret,
+                address: operateur.company.address,
+                contact: operateur.user.name,
+                mail: operateur.user.email
+              }
+            },
+            ficheInterventions: [ficheIntervention.id]
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: `Le type de BSFF choisi ne permet pas d'associer des fiches d'intervention.`
+        })
+      ]);
+    });
+
+    it("should not be possible to add a fiche d'intervention the user cannot access", async () => {
+      const operateur = await userWithCompanyFactory(UserRole.ADMIN);
+      const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+      const ficheIntervention = await createFicheIntervention({
+        operateur,
+        detenteur: await userWithCompanyFactory(UserRole.ADMIN)
+      });
+      const { mutate } = makeClient(emitter.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createDraftBsff">,
+        MutationCreateDraftBsffArgs
+      >(CREATE_DRAFT_BSFF, {
+        variables: {
+          input: {
+            type: BsffType.COLLECTE_PETITES_QUANTITES,
+            emitter: {
+              company: {
+                name: emitter.company.name,
+                siret: emitter.company.siret,
+                address: emitter.company.address,
+                contact: emitter.user.name,
+                mail: emitter.user.email
+              }
+            },
+            ficheInterventions: [ficheIntervention.id]
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Vous ne pouvez pas éditer une fiche d'intervention sur lequel le SIRET de votre entreprise n'apparaît pas."
+        })
+      ]);
+    });
+
+    it("the BSFF emitter and fiche d'intervention operater should match", async () => {
+      const operateurUser = await userFactory();
+      const operateurCompany1 = await companyFactory();
+      const operateurCompany2 = await companyFactory();
+      for (const company of [operateurCompany1, operateurCompany2]) {
+        await associateUserToCompany(operateurUser.id, company.siret, "MEMBER");
+      }
+      const ficheIntervention = await createFicheIntervention({
+        operateur: { user: operateurUser, company: operateurCompany1 },
+        detenteur: await userWithCompanyFactory(UserRole.ADMIN)
+      });
+      const { mutate } = makeClient(operateurUser);
+      const { errors } = await mutate<
+        Pick<Mutation, "createDraftBsff">,
+        MutationCreateDraftBsffArgs
+      >(CREATE_DRAFT_BSFF, {
+        variables: {
+          input: {
+            type: BsffType.COLLECTE_PETITES_QUANTITES,
+            emitter: {
+              company: {
+                name: operateurCompany2.name,
+                siret: operateurCompany2.siret,
+                address: operateurCompany2.address,
+                contact: operateurUser.name,
+                mail: operateurUser.email
+              }
+            },
+            ficheInterventions: [ficheIntervention.id]
+          }
+        }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: `L'opérateur identifié sur la fiche d'intervention ${ficheIntervention.numero} ne correspond pas à l'émetteur de BSFF`
         })
       ]);
     });
