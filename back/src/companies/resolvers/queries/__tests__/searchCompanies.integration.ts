@@ -86,7 +86,7 @@ describe("query { searchCompanies(clue, department) }", () => {
     `;
 
     const icpe = {
-      s3icNumeroSiret: siretify(5),
+      s3icNumeroSiret: siret,
       codeS3ic: "0064.00001"
     };
 
