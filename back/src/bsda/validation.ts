@@ -25,7 +25,6 @@ import {
   isWasteProcessor
 } from "../companies/validation";
 import {
-  INVALID_SIRET_LENGTH,
   INVALID_WASTE_CODE,
   MISSING_COMPANY_ADDRESS,
   MISSING_COMPANY_CONTACT,
@@ -319,7 +318,7 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
           .test(
             "is-siret",
             "Émetteur: ${originalValue} n'est pas un numéro de SIRET valide",
-            value => isSiret(value)
+            value => !value || isSiret(value)
           )
       }),
       emitterCompanyAddress: yup
@@ -404,7 +403,7 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           .test(
             "is-siret",
             "Entreprise de travaux: ${originalValue} n'est pas un numéro de SIRET valide",
-            value => isSiret(value)
+            value => !value || isSiret(value)
           )
     }),
     workerCompanyAddress: yup.string().when(["type", "workerIsDisabled"], {
