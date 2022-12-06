@@ -114,7 +114,7 @@ describe("inviteUserToCompany", () => {
     };
     createUserAccountHashMock.mockResolvedValueOnce(userAccountHash);
     const siret = siretify(1);
-    const company = { FileSystemDirectoryHandle, name: "Code en Stock" };
+    const company = { siret, name: "Code en Stock" };
     companyMock.mockResolvedValueOnce(company);
 
     const adminUser = { name: "John Snow" } as User;
