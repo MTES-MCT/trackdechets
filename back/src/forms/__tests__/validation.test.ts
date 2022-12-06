@@ -1098,7 +1098,7 @@ describe("processedInfoSchema", () => {
     const validateFn = () => transporterSchemaFn(false).validate(transporter);
 
     await expect(validateFn()).rejects.toThrow(
-      "transporterCompanyVatNumber n'est pas un numéro de TVA intracommunautaire valide"
+      "transporterCompanyVatNumber n'est pas un numéro de TVA étranger valide"
     );
   });
 

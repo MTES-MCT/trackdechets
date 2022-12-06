@@ -291,7 +291,7 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
         .ensure()
         .test(
           "is-vat",
-          "${path} n'est pas un numéro de TVA intracommunautaire valide",
+          "${path} n'est pas un numéro de TVA étranger valide",
           value => !value || (isVat(value) && !isFRVat(value))
         ),
       transporterCompanyAddress: yup
