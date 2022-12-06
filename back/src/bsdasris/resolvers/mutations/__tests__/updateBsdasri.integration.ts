@@ -191,8 +191,7 @@ describe("Mutation.updateBsdasri", () => {
   );
   it("should allow eco organisme fields update for INITIAL bsdasris", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const count = await prisma.company.count();
-    const ecoOrg = await ecoOrganismeFactory({ count, handleBsdasri: true });
+    const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
     const { company: ecoOrgCompany } = await userWithCompanyFactory("MEMBER", {
       siret: ecoOrg.siret
     });
@@ -222,8 +221,7 @@ describe("Mutation.updateBsdasri", () => {
   });
   it("should allow eco organisme fields nulling for INITIAL bsdasris", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const count = await prisma.company.count();
-    const ecoOrg = await ecoOrganismeFactory({ count, handleBsdasri: true });
+    const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
     const { company: ecoOrgCompany } = await userWithCompanyFactory("MEMBER", {
       siret: ecoOrg.siret
     });
@@ -294,8 +292,7 @@ describe("Mutation.updateBsdasri", () => {
   });
   it("should disallow eco organisme fields update after emission signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    const count = await prisma.company.count();
-    const ecoOrg = await ecoOrganismeFactory({ count, handleBsdasri: true });
+    const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
     await userWithCompanyFactory("MEMBER", {
       siret: ecoOrg.siret
     });

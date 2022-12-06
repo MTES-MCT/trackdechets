@@ -404,21 +404,18 @@ export const applicationFactory = async () => {
 };
 
 export const ecoOrganismeFactory = async ({
-  count = null,
+  siret = null,
   handleBsdasri = false
 }: {
-  count?: number;
+  siret?: string;
   handleBsdasri?: boolean;
 }) => {
-  const ecoOrganismeIndex = !!count
-    ? count + 1
-    : (await prisma.ecoOrganisme.count()) + 1;
-
+  const ecoOrganismeIndex = (await prisma.ecoOrganisme.count()) + 1;
   const ecoOrganisme = await prisma.ecoOrganisme.create({
     data: {
       address: "",
       name: `Eco-Organisme ${ecoOrganismeIndex}`,
-      siret: siretify(ecoOrganismeIndex),
+      siret: siret ?? siretify(ecoOrganismeIndex),
       handleBsdasri
     }
   });
