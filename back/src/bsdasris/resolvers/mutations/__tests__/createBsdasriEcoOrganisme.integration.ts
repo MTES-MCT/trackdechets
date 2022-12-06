@@ -10,7 +10,6 @@ import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { gql } from "apollo-server-express";
-import prisma from "../../../../prisma";
 const CREATE_DASRI = gql`
   ${fullGroupingBsdasriFragment}
   mutation DasriCreate($input: BsdasriInput!) {

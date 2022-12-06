@@ -22,10 +22,7 @@ import { getFormOrFormNotFound } from "../../database";
 import { flattenBsddRevisionRequestInput } from "../../converter";
 import { checkCanRequestRevision } from "../../permissions";
 import { getFormRepository } from "../../repository";
-import {
-  INVALID_PROCESSING_OPERATION,
-  INVALID_WASTE_CODE
-} from "../../errors";
+import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
 import { packagingInfoFn } from "../../validation";
 import { isSiret } from "../../../common/constants/companySearchHelpers";
 
