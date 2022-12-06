@@ -38,7 +38,7 @@ export const destinationCompanySiretSchema = yup
   .ensure()
   .test(
     "is-siret",
-    "Destinataire: ${path} n'est pas un numéro de SIRET valide",
+    "Destination: ${path} n'est pas un numéro de SIRET valide",
     value => !value || isSiret(value)
   )
   .test(

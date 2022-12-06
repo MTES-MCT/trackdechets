@@ -120,8 +120,6 @@ const MISSING_COMPANY_ADDRESS = "L'adresse de l'entreprise est obligatoire";
 const MISSING_COMPANY_CONTACT = "Le contact dans l'entreprise est obligatoire";
 const MISSING_COMPANY_PHONE = "Le téléphone de l'entreprise est obligatoire";
 
-const INVALID_SIRET_LENGTH = "Le SIRET doit faire 14 caractères numériques";
-
 const INVALID_DASRI_WASTE_CODE =
   "Ce code déchet n'est pas autorisé pour les DASRI";
 const INVALID_PROCESSING_OPERATION =
@@ -137,7 +135,11 @@ export const emitterSchema: FactorySchemaOf<BsdasriValidationContext, Emitter> =
       ),
       emitterCompanySiret: yup
         .string()
-        .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
+        .test(
+          "is-siret",
+          "Émetteur: ${originalValue} n'est pas un numéro de SIRET valide",
+          value => !value || isSiret(value)
+        )
         .requiredIf(
           // field copied from transporter returning an error message would be confusing
           context.emissionSignature && !context?.isSynthesis,
@@ -277,6 +279,11 @@ export const ecoOrganismeSchema: FactorySchemaOf<
       .string()
       .notRequired()
       .nullable()
+      .test(
+        "is-siret",
+        "Éco-organisme: ${originalValue} n'est pas un numéro de SIRET valide",
+        value => !value || isSiret(value)
+      )
       .test(
         "is-known-bsdasri-eco-organisme",
         "L'éco-organisme avec le siret \"${value}\" n'est pas reconnu ou n'est pas autorisé à gérer des dasris.",
@@ -530,8 +537,11 @@ export const recipientSchema: FactorySchemaOf<
       ),
     destinationCompanySiret: yup
       .string()
-      .length(14, `Destinataire: ${INVALID_SIRET_LENGTH}`)
-
+      .test(
+        "is-siret",
+        "Destination : ${originalValue} n'est pas un numéro de SIRET valide",
+        value => !value || isSiret(value)
+      )
       .requiredIf(
         context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_SIRET}`

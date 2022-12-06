@@ -42,7 +42,7 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       .string()
       .ensure()
       .required("n°SIRET requis")
-      .test("is-siret", "n°SIRET invalide", value => isSiret(value)),
+      .test("is-siret", "n°SIRET invalide", value => !value || isSiret(value)),
   });
 
 export function CreateAnonymousCompany() {

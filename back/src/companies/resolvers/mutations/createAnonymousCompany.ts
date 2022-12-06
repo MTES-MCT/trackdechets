@@ -29,7 +29,7 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       .test(
         "is-siret",
         "AnonymousCompany: ${originalValue} n'est pas un numéro de SIRET valide",
-        value => isSiret(value)
+        value => !value || isSiret(value)
       )
   });
 
