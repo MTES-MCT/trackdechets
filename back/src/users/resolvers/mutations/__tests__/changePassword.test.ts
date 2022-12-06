@@ -20,7 +20,7 @@ jest.mock("../../../../common/redis/users", () => ({
 
 jest.mock("../../../../user/clearUserSessions", () => ({
   clearUserSessions: jest.fn((...args) => clearUserSessionsMock(...args))
-}))
+}));
 
 describe("changePassword", () => {
   beforeEach(() => {
