@@ -4,10 +4,7 @@ import {
   CompanyType,
   CompanyVerificationStatus
 } from "@prisma/client";
-import {
-  INVALID_SIRET_LENGTH,
-  MISSING_COMPANY_SIRET_OR_VAT
-} from "../forms/errors";
+import { MISSING_COMPANY_SIRET_OR_VAT } from "../forms/errors";
 import prisma from "../prisma";
 import { isFRVat, isSiret } from "../common/constants/companySearchHelpers";
 
