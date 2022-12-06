@@ -6,13 +6,13 @@ import { initialData, readyToTakeOverData } from "./factories";
 
 describe("Mutation.signBsdasri emission", () => {
   it("should validate emission", async () => {
-    const dasri = initialData({ siret: 12312345600000, name: "emetteur" });
+    const dasri = initialData({ siret: siretify(1), name: "emetteur" });
     await validateBsdasri(dasri, { emissionSignature: true });
   });
 
   it("should validate transport", async () => {
     const dasri = readyToTakeOverData({
-      siret: 53075596600047,
+      siret: siretify(1),
       name: "transporteur"
     });
     await validateBsdasri(dasri, { transportSignature: true });
@@ -20,9 +20,9 @@ describe("Mutation.signBsdasri emission", () => {
 
   it("should validate emission and transport", async () => {
     const dasri = {
-      ...initialData({ siret: 12312345600000, name: "emetteur" }),
+      ...initialData({ siret: siretify(1), name: "emetteur" }),
       ...readyToTakeOverData({
-        siret: 53075596600047,
+        siret: siretify(2),
         name: "transporteur"
       })
     };
