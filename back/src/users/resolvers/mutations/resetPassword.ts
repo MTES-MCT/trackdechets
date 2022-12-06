@@ -8,7 +8,7 @@ import {
 } from "../../../generated/graphql/types";
 import { checkPasswordCriteria } from "../../utils";
 import { updateUserPassword } from "../../database";
-import { clearUserSessions } from "../../../common/redis/users";
+import { clearUserSessions } from "../../clearUserSessions";
 /**
  * Update user password in a password reset workflow
  *

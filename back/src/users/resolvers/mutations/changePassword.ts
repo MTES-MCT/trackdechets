@@ -9,10 +9,8 @@ import {
 } from "../../../generated/graphql/types";
 import { checkPasswordCriteria } from "../../utils";
 import { updateUserPassword } from "../../database";
-import {
-  clearUserSessions,
-  storeUserSessionsId
-} from "../../../common/redis/users";
+import { storeUserSessionsId } from "../../../common/redis/users";
+import { clearUserSessions } from "../../clearUserSessions";
 
 /**
  * Change user password

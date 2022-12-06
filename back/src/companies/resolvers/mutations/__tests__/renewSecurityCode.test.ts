@@ -70,15 +70,16 @@ describe("renewSecurityCode", () => {
     expect(randomNumberMock).toHaveBeenCalledTimes(2);
   });
   it("should send a notification email to all users and return updated company", async () => {
+    const siret = siretify(2);
     companyMock.mockResolvedValueOnce({
       securityCode: 1234,
       name: "Code en stock",
-      siret: siretify(2)
+      siret
     });
     randomNumberMock.mockReturnValueOnce(4567);
 
     updateCompanyMock.mockReturnValueOnce({
-      siret: siretify(2),
+      siret,
       name: "Code en stock",
       securityCode: 4567
     });
@@ -93,18 +94,18 @@ describe("renewSecurityCode", () => {
       variables: {
         company: {
           name: "Code en stock",
-          siret: siretify(2)
+          siret
         }
       }
     });
     getCompanyActiveUsersMock.mockReturnValueOnce(users);
 
-    const updatedCompany = await renewSecurityCode("85001946400013");
+    const updatedCompany = await renewSecurityCode(siret);
 
     expect(sendMailMock).toHaveBeenCalledWith(mail);
 
     expect(updatedCompany).toEqual({
-      siret: siretify(2),
+      siret,
       name: "Code en stock",
       securityCode: 4567
     });
