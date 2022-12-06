@@ -916,11 +916,12 @@ describe("query favorites", () => {
       }
     });
     const destination = await companyFactory();
+    const recipientCompanySiret = siretify(1);
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        recipientCompanySiret: siretify(1),
+        recipientCompanySiret,
         recipientIsTempStorage: true,
         forwardedIn: {
           create: {
@@ -929,7 +930,7 @@ describe("query favorites", () => {
             recipientCompanySiret: destination.siret
           }
         },
-        recipientsSirets: ["0".repeat(14), destination.siret]
+        recipientsSirets: [recipientCompanySiret, destination.siret]
       }
     });
     const forwardedIn = await prisma.form

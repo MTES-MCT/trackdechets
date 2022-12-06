@@ -1,3 +1,6 @@
+// Allow front and back usage
+import * as process from "process";
+
 import {
   checkVAT,
   andorra,
@@ -68,6 +71,15 @@ export const countries = [
   switzerland,
   unitedKingdom
 ];
+export const TEST_COMPANY_PREFIX = "000000";
+
+// support all environments
+let ALLOW_TEST_COMPANY = false;
+try {
+  ALLOW_TEST_COMPANY = process.env.ALLOW_TEST_COMPANY === "true";
+} catch (e) {
+  ALLOW_TEST_COMPANY = false;
+}
 
 /**
  * Implements the Luhn Algorithm used to validate SIRET or SIREN of identification numbers
@@ -100,10 +112,7 @@ export const isSiret = (clue: string): boolean => {
   ) {
     return false;
   }
-  if (
-    process.env.ALLOW_TEST_COMPANY === "true" &&
-    cleanClue.startsWith("000000")
-  ) {
+  if (ALLOW_TEST_COMPANY && cleanClue.startsWith(TEST_COMPANY_PREFIX)) {
     return true;
   }
   const luhnValid = luhnCheck(cleanClue);
