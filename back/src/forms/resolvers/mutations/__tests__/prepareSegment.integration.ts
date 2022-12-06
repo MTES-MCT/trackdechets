@@ -328,6 +328,8 @@ describe("{ mutation { prepareSegment } }", () => {
       }`
     );
     expect(errors).toBeUndefined();
-    expect(data3.prepareSegment.transporter.company.siret).toBe("976345");
+    expect(data3.prepareSegment.transporter.company.siret).toBe(
+      transporterCompanySiret
+    );
   });
 });
