@@ -476,6 +476,8 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Hidden company in INSEE, AnonymousCompany for Test is created and but not registered", async () => {
+    const OLD_ENV = process.env;
+    process.env.ALLOW_TEST_COMPANY = "true";
     const siret = TEST_COMPANY_PREFIX + "12345698";
 
     const createInput = {
@@ -517,6 +519,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       statutDiffusionEtablissement: "O",
       isAnonymousCompany: true
     });
+    process.env = OLD_ENV;
   });
 
   it("Hidden company in INSEE, AnonymousCompany created and registered", async () => {
@@ -579,6 +582,8 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Hidden company in INSEE, AnonymousCompany for TEST created and registered", async () => {
+    const OLD_ENV = process.env;
+    process.env.ALLOW_TEST_COMPANY = "true";
     const siret = TEST_COMPANY_PREFIX + "12345698";
 
     const createInput = {
@@ -633,5 +638,6 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       statutDiffusionEtablissement: "O",
       isAnonymousCompany: true
     });
+    process.env = OLD_ENV;
   });
 });
