@@ -1,6 +1,7 @@
 import { CompanyType } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { AuthType } from "../../../../auth";
+import { TEST_COMPANY_PREFIX } from "../../../../common/constants/companySearchHelpers";
 import prisma from "../../../../prisma";
 import { TestQuery } from "../../../../__tests__/apollo-integration-testing";
 import {
@@ -114,7 +115,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
 
     await prisma.installation.create({
       data: {
-        s3icNumeroSiret: siretify(1),
+        s3icNumeroSiret: siret,
         codeS3ic: "0064.00001"
       }
     });
@@ -475,7 +476,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Hidden company in INSEE, AnonymousCompany for Test is created and but not registered", async () => {
-    const siret = siretify(1);
+    const siret = TEST_COMPANY_PREFIX + "12345698";
 
     const createInput = {
       siret,
@@ -578,7 +579,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Hidden company in INSEE, AnonymousCompany for TEST created and registered", async () => {
-    const siret = siretify(1);
+    const siret = TEST_COMPANY_PREFIX + "12345698";
 
     const createInput = {
       siret,
