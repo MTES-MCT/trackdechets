@@ -101,13 +101,13 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
 
     await prisma.installation.create({
       data: {
-        s3icNumeroSiret: siretify(7),
+        s3icNumeroSiret: siret,
         codeS3ic: "0064.00001"
       }
     });
     const gqlquery = `
       query {
-        siret,companyInfos(siret: "${siret}") {
+        companyInfos(siret: "${siret}") {
           siret
           etatAdministratif
           name
@@ -177,7 +177,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
 
     const gqlquery = `
       query {
-        siret,companyInfos(siret: "${siret}") {
+        companyInfos(siret: "${siret}") {
           transporterReceipt {
             receiptNumber
             validityLimit
@@ -223,7 +223,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
 
     const gqlquery = `
       query {
-        siret,companyInfos(siret: "${siret}") {
+        companyInfos(siret: "${siret}") {
           traderReceipt {
             receiptNumber
             validityLimit
@@ -263,7 +263,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
 
     const gqlquery = `
       query {
-        siret,companyInfos(siret: "${siret}") {
+        companyInfos(siret: "${siret}") {
           allowBsdasriTakeOverWithoutSignature
           isRegistered
         }
@@ -376,7 +376,7 @@ describe("query { companyInfos(siret: <SIRET>) }", () => {
     });
     const gqlquery = `
       query {
-        siret,companyInfos(siret: "${siret}") {
+        companyInfos(siret: "${siret}") {
           siret
           etatAdministratif
           name
