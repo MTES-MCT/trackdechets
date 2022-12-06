@@ -685,11 +685,12 @@ describe("Mutation.markAsSealed", () => {
     const { user, company: emitterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
+    const recipientCompanySiret = siretify(3);
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: siretify(3)
+        recipientCompanySiret
       }
     });
     const { mutate } = makeClient(user);
@@ -701,7 +702,7 @@ describe("Mutation.markAsSealed", () => {
       expect.objectContaining({
         message: [
           "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
-          `Erreur(s): L'installation de destination avec le SIRET 12345654327896 n'est pas inscrite sur Trackdéchets`
+          `Erreur(s): L'installation de destination avec le SIRET ${recipientCompanySiret} n'est pas inscrite sur Trackdéchets`
         ].join("\n")
       })
     ]);
@@ -752,11 +753,13 @@ describe("Mutation.markAsSealed", () => {
         recipientCompanySiret: collector.siret
       }
     });
+
+    const recipientCompanySiret = siretify(3);
     await prisma.form.update({
       where: { id: form.id },
       data: {
         forwardedIn: {
-          update: { recipientCompanySiret: siretify(3) }
+          update: { recipientCompanySiret }
         }
       }
     });
@@ -766,7 +769,7 @@ describe("Mutation.markAsSealed", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination avec le SIRET 12345654327896 n'est pas inscrite sur Trackdéchets`
+        message: `L'installation de destination avec le SIRET ${recipientCompanySiret} n'est pas inscrite sur Trackdéchets`
       })
     ]);
   });
