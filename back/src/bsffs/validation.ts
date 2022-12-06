@@ -1000,11 +1000,11 @@ export const ficheInterventionSchema: yup.SchemaOf<
       is: true,
       then: schema =>
         schema.required(
-          "L'addresse du détenteur de l'équipement (particulier) est requise"
+          "L'adresse du détenteur de l'équipement (particulier) est requise"
         ),
       otherwise: schema =>
         schema.required(
-          "L'addresse de l'entreprise détentrice de l'équipement est requise"
+          "L'adresse de l'entreprise détentrice de l'équipement est requise"
         )
     }),
   detenteurCompanyContact: yup
@@ -1042,11 +1042,11 @@ export const ficheInterventionSchema: yup.SchemaOf<
       is: true,
       then: schema =>
         schema.required(
-          "L'addresse email du détenteur de l'équipement (particulier) est requis"
+          "L'adresse email du détenteur de l'équipement (particulier) est requis"
         ),
       otherwise: schema =>
         schema.required(
-          "L'addresse email de l'entreprise détentrice de l'équipement est requis"
+          "L'adresse email de l'entreprise détentrice de l'équipement est requis"
         )
     }),
   operateurCompanyName: yup
@@ -1061,7 +1061,7 @@ export const ficheInterventionSchema: yup.SchemaOf<
     }),
   operateurCompanyAddress: yup
     .string()
-    .required("L'addresse de l'entreprise de l'opérateur est requis"),
+    .required("L'adresse de l'entreprise de l'opérateur est requis"),
   operateurCompanyContact: yup
     .string()
     .required("Le nom du contact de l'entreprise de l'opérateur est requis"),
@@ -1072,7 +1072,7 @@ export const ficheInterventionSchema: yup.SchemaOf<
     ),
   operateurCompanyMail: yup
     .string()
-    .required("L'addresse email de l'entreprise de l'opérateur est requis")
+    .required("L'adresse email de l'entreprise de l'opérateur est requis")
 });
 
 export function validateFicheIntervention(
