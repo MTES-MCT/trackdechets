@@ -2,6 +2,7 @@ import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
+import { TEST_COMPANY_PREFIX } from "../../../common/constants/companySearchHelpers";
 
 /**
  * Generate a new test siret by incrementing last generated siret
@@ -16,7 +17,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 async function generateTestSiret() {
   const testCompanies = await prisma.anonymousCompany.findMany({
     orderBy: { siret: "desc" },
-    where: { siret: { startsWith: "000000" } }
+    where: { siret: { startsWith: TEST_COMPANY_PREFIX } }
   });
   if (testCompanies.length === 0) {
     return "00000000000000";

@@ -8,7 +8,8 @@ import { convertUrls } from "./database";
 import {
   isSiret,
   isVat,
-  isFRVat
+  isFRVat,
+  TEST_COMPANY_PREFIX
 } from "../common/constants/companySearchHelpers";
 import { SireneSearchResult } from "./sirene/types";
 import { CompanyVatSearchResult } from "./vat/vies/types";
@@ -46,14 +47,14 @@ export async function searchCompany(
   if (anonymousCompany) {
     companyInfo = {
       ...anonymousCompany,
-      statutDiffusionEtablissement: cleanClue.startsWith("000000") ? "O" : "N",
+      statutDiffusionEtablissement: cleanClue.startsWith(TEST_COMPANY_PREFIX) ? "O" : "N",
       etatAdministratif: "A",
       naf: anonymousCompany.codeNaf,
       codePaysEtrangerEtablissement: "FR"
     };
   } else if (
     process.env.ALLOW_TEST_COMPANY === "true" &&
-    cleanClue.startsWith("000000")
+    cleanClue.startsWith(TEST_COMPANY_PREFIX)
   ) {
     // 404
     throw new UserInputError("Aucun établissement trouvé avec ce SIRET", {
