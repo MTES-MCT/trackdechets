@@ -60,7 +60,7 @@ describe("companyInfos with SIRET", () => {
       codeS3ic: "0055.14316"
     });
 
-    const company = await getCompanyInfos("85001946400014");
+    const company = await getCompanyInfos(siret);
 
     expect(company).toStrictEqual({
       siret,
@@ -100,7 +100,7 @@ describe("companyInfos with SIRET", () => {
       name: "Code en stock"
     });
     companyMock.mockResolvedValueOnce(null);
-    const company = await getCompanyInfos("85001946400014");
+    const company = await getCompanyInfos(siret);
 
     expect(company).toStrictEqual({
       siret,
