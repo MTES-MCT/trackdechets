@@ -78,8 +78,7 @@ describe("Mutation.createDasri", () => {
     ]);
   });
   it("should fail to create a bsdasri with an ecoorganisme not allowed to handle dasri", async () => {
-    const count = await prisma.company.count();
-    const ecoOrg = await ecoOrganismeFactory({ count });
+    const ecoOrg = await ecoOrganismeFactory({});
     const { user } = await userWithCompanyFactory("MEMBER", {
       siret: ecoOrg.siret
     });
@@ -130,8 +129,7 @@ describe("Mutation.createDasri", () => {
     ]);
   });
   it("create a dasri with an eco-organisme (eco-org user)", async () => {
-    const count = await prisma.company.count();
-    const ecoOrg = await ecoOrganismeFactory({ count, handleBsdasri: true });
+    const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
     const { user } = await userWithCompanyFactory("MEMBER", {
       siret: ecoOrg.siret
     });
@@ -180,18 +178,18 @@ describe("Mutation.createDasri", () => {
     expect(data.createBsdasri.ecoOrganisme.siret).toEqual(ecoOrg.siret);
   });
   it("create a dasri with an eco-organisme and an unregistered emitter(eco-org user)", async () => {
-    const count = await prisma.company.count();
-    const ecoOrg = await ecoOrganismeFactory({ count, handleBsdasri: true });
+    const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
     const { user } = await userWithCompanyFactory("MEMBER", {
       siret: ecoOrg.siret
     });
 
+    const siret = siretify(5);
     const input = {
       waste: { adr: "xyz 33", code: "18 01 03*" },
       emitter: {
         company: {
           name: "hopital blanc",
-          siret: siretify(5), // unregistered company
+          siret, // unregistered company
           contact: "jean durand",
           phone: "06 18 76 02 00",
 
@@ -228,11 +226,10 @@ describe("Mutation.createDasri", () => {
     expect(data.createBsdasri.type).toEqual("SIMPLE");
 
     expect(data.createBsdasri.ecoOrganisme.siret).toEqual(ecoOrg.siret);
-    expect(data.createBsdasri.emitter.company.siret).toEqual("51299999900099");
+    expect(data.createBsdasri.emitter.company.siret).toEqual(siret);
   });
   it("create a dasri with an eco-organism (emitter user)", async () => {
-    const count = await prisma.company.count();
-    const ecoOrg = await ecoOrganismeFactory({ count, handleBsdasri: true });
+    const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
     const { company: ecoOrgCompany } = await userWithCompanyFactory("MEMBER", {
       siret: ecoOrg.siret
     });
