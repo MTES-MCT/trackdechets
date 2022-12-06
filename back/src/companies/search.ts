@@ -47,7 +47,9 @@ export async function searchCompany(
   if (anonymousCompany) {
     companyInfo = {
       ...anonymousCompany,
-      statutDiffusionEtablissement: cleanClue.startsWith(TEST_COMPANY_PREFIX) ? "O" : "N",
+      statutDiffusionEtablissement: cleanClue.startsWith(TEST_COMPANY_PREFIX)
+        ? "O"
+        : "N",
       etatAdministratif: "A",
       naf: anonymousCompany.codeNaf,
       codePaysEtrangerEtablissement: "FR"
