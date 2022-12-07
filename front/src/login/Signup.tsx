@@ -188,7 +188,8 @@ export default function Signup() {
           </Text>
           <Text as="p">👉 Il peut mettre quelques minutes à arriver</Text>
           <Text as="p">👉 Vérifiez vos spams ou indésirables</Text>
-          <Text as="p">👉 Ajouter {CONTACT_EMAIL} à vos contacts</Text>
+          <Text as="p">👉 Ajoutez 
+            info@trackdechets.beta.gouv.fr à vos contacts</Text>
           <Text as="p">
             👉 Si vous n'avez pas reçu l'email de confirmation au bout d'une
             heure, vous pouvez le renvoyer depuis{" "}
