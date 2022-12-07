@@ -38,7 +38,7 @@
   }
   &Grid {
     display: inline-grid;
-    grid-template-columns: auto minmax(auto, 0.75fr);
+    grid-template-columns: minmax(auto, 0.75fr) minmax(auto, 0.75fr);
     grid-auto-rows: minmax(1.5rem, max-content);
     grid-gap: 1rem;
 
