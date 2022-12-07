@@ -207,9 +207,13 @@ export default function Signup() {
             Trackdéchets. 🚀
           </Text>
           <Text as="p">
-            Des questions, des interrogations ? N'hésitez pas à{" "}
-            <Link href={`mailto:${CONTACT_EMAIL}`} isSimple>
-              nous contacter
+            Des questions, des interrogations ? N'hésitez pas à nous contacter
+            via{" "}
+            <Link
+              href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
+              isSimple
+            >
+              la FAQ
             </Link>
             .
           </Text>
