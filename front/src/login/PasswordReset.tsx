@@ -12,7 +12,7 @@ import {
 import Loader from "common/components/Loaders";
 import { NotificationError } from "common/components/Error";
 import { Formik, Form, Field } from "formik";
-import PasswordMeter from "common/components/PasswordMeter";
+import PasswordHelper from "common/components/PasswordHelper";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import { IconLock1, IconView } from "common/components/Icons";
 import routes from "common/routes";
@@ -143,7 +143,7 @@ export default function PasswordReset() {
                           >
                             <IconView /> <span>Afficher le mot de passe</span>
                           </span>
-                          <PasswordMeter password={field.value} />
+                          <PasswordHelper password={field.value} />
                         </>
                       );
                     }}

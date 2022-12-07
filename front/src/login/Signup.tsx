@@ -3,6 +3,8 @@ import { useHistory } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 import { Mutation, MutationSignupArgs } from "generated/graphql/types";
 import { SIGNUP } from "./mutations";
+import PasswordHelper from "common/components/PasswordHelper";
+
 import routes from "common/routes";
 
 import {
@@ -19,7 +21,7 @@ import {
 } from "@dataesr/react-dsfr";
 import styles from "./Login.module.scss";
 
-import { CONTACT_EMAIL } from "common/config";
+import { SENDER_EMAIL } from "common/config";
 
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
@@ -28,6 +30,7 @@ export default function Signup() {
   const [signupCompleted, setSignupCompleted] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [userEmail, setUserEmail] = useState("");
+  const [passwordValue, setPasswordValue] = useState("");
 
   const [signup] =
     useMutation<Pick<Mutation, "signup">, MutationSignupArgs>(SIGNUP);
@@ -126,6 +129,7 @@ export default function Signup() {
               // @ts-ignore
               ref={passwordRef}
               onBlur={onChange}
+              onChange={e => setPasswordValue(e.target.value)}
             />
             <Button
               tertiary
@@ -136,6 +140,8 @@ export default function Signup() {
             >
               {showPassword ? "Masquer" : "Afficher"} le mot de passe
             </Button>
+
+            <PasswordHelper password={passwordValue} />
           </Col>
         </Row>
         <Row spacing="mb-2w">
@@ -188,7 +194,7 @@ export default function Signup() {
           </Text>
           <Text as="p">👉 Il peut mettre quelques minutes à arriver</Text>
           <Text as="p">👉 Vérifiez vos spams ou indésirables</Text>
-          <Text as="p">👉 Ajouter {CONTACT_EMAIL} à vos contacts</Text>
+          <Text as="p">👉 Ajoutez {SENDER_EMAIL} à vos contacts</Text>
           <Text as="p">
             👉 Si vous n'avez pas reçu l'email de confirmation au bout d'une
             heure, vous pouvez le renvoyer depuis{" "}
