@@ -259,9 +259,6 @@ cd back && npm run dev
 cd front && npm run dev
 ```
 
-- URL API: http://api.trackdechets.local/
-- URL UI : http://trackdechets.local
-
 13. (Optionnel) Démarrer Storybook
 
 ```bash
@@ -269,6 +266,10 @@ cd front
 npm install
 npm run storybook
 ```
+
+- URL API : http://api.trackdechets.local/
+- URL UI : http://trackdechets.local
+- Storybook UI : http://storybook.trackdechets.local
 
 ### Conventions
 
