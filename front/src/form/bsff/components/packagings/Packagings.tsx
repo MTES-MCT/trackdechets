@@ -1,6 +1,5 @@
 import { IconClose } from "common/components/Icons";
 import RedErrorMessage from "common/components/RedErrorMessage";
-import TdTooltip from "common/components/Tooltip";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import {
   Field,

@@ -25,6 +25,7 @@ export default function App() {
                 <a
                   target="_blank"
                   href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
+                  rel="noreferrer"
                 >
                   l'équipe Trackdéchets
                 </a>
