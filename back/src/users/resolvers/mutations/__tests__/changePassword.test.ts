@@ -18,7 +18,7 @@ jest.mock("../../../../common/redis/users", () => ({
   storeUserSessionsId: jest.fn((...args) => storeUserSessionsIdMock(...args))
 }));
 
-jest.mock("../../../../user/clearUserSessions", () => ({
+jest.mock("../../../clearUserSessions", () => ({
   clearUserSessions: jest.fn((...args) => clearUserSessionsMock(...args))
 }));
 

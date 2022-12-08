@@ -211,13 +211,14 @@ describe("searchCompanies", () => {
   });
 
   it("should filter results by departement", async () => {
+    const siret = siretify(1);
     axiosGet.mockResolvedValueOnce({
       ...axiosResponseDefault,
       status: 200,
       data: {
         etablissements: [
           {
-            siret: siretify(1),
+            siret,
             uniteLegale: {
               denominationUniteLegale: "BOULANGERIE",
               categorieJuridiqueUniteLegale: "",
@@ -246,7 +247,7 @@ describe("searchCompanies", () => {
     const companies = await searchCompanies("boulangerie", "07");
     expect(companies).toHaveLength(1);
     const expected = {
-      siret: siretify(1),
+      siret,
       address: "1 ROUTE DES BLÉS 07100 ANNONAY",
       addressVoie: "1 ROUTE DES BLÉS",
       addressPostalCode: "07100",

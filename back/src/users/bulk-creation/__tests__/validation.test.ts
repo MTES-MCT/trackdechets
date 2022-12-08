@@ -64,7 +64,7 @@ describe("company validation", () => {
   test("siret is not a well formatted 14 numbers", async () => {
     await expect(
       companyValidationSchema.validate({
-        siret: "12345678901234",
+        siret: "123456789 234",
         companyTypes: ["PRODUCER"]
       })
     ).rejects.toThrow(ValidationError);
@@ -212,13 +212,14 @@ describe("company validation", () => {
     mockSirene.mockImplementationOnce(() =>
       Promise.resolve({ etatAdministratif: "F" })
     );
+    const siret = siretify(1);
     await expect(
       companyValidationSchema.validate({
-        siret: siretify(1),
+        siret,
         companyTypes: ["PRODUCER"]
       })
     ).rejects.toThrow(
-      "Siret 12345678901234 was not found in SIRENE database or company is closed"
+      `Siret ${siret} was not found in SIRENE database or company is closed`
     );
   });
 });
@@ -232,7 +233,7 @@ describe("role validation", () => {
 
   test("valid role", async () => {
     const role = {
-      siret: siretify(1),
+      siret: companies[0].siret,
       email: "john.snow@trackdechets.fr",
       role: "MEMBER"
     };
@@ -262,11 +263,11 @@ describe("role validation", () => {
     ).rejects.toThrow(ValidationError);
   });
 
-  test("email already exists i TD", async () => {
+  test("email already exists in TD", async () => {
     mockUserExists.mockResolvedValueOnce(true);
     console.warn = jest.fn();
     await validateRole({
-      siret: siretify(1),
+      siret: companies[0].siret,
       email: "john.snow@trackdechets.fr",
       role: "MEMBER"
     });
