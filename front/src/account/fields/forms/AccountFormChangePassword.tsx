@@ -2,7 +2,7 @@ import React from "react";
 import { Formik, Form, Field } from "formik";
 import { useMutation, gql } from "@apollo/client";
 import RedErrorMessage from "common/components/RedErrorMessage";
-import PasswordMeter from "common/components/PasswordMeter";
+import PasswordHelper from "common/components/PasswordHelper";
 import styles from "./AccountForm.module.scss";
 import { object, string } from "yup";
 import { MutationChangePasswordArgs, Mutation } from "generated/graphql/types";
@@ -88,7 +88,7 @@ export default function AccountFormChangePassword({ toggleEdition }: Props) {
               type="password"
               name="newPassword"
             />
-            <PasswordMeter password={props.values.newPassword} />
+            <PasswordHelper password={props.values.newPassword} />
           </div>
           <div className="form__row">
             <label htmlFor="newPasswordConfirmation">
