@@ -1,8 +1,0 @@
-{
-  "jobs": [
-    {
-      "command": "0 0 3 * * npm run index",
-      "size": "2XL"
-    }
-  ]
-}
