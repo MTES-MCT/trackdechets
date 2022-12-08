@@ -1423,8 +1423,8 @@ export async function validateGroupement(
           ...acc,
           `La quantité restante à regrouper sur le BSDD ${
             initialForm.readableId
-          } est de ${quantityLeftToGroup.toFixed(
-            3
+          } est de ${Number.parseFloat(
+            quantityLeftToGroup.toFixed(4)
           )} T. Vous tentez de regrouper ${quantity} T.`
         ];
       }
