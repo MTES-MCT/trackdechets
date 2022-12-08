@@ -9,6 +9,7 @@ import {
 } from "common/components/Icons";
 import {
   Bsff,
+  BsffPackagingType,
   BsffStatus,
   BsffType,
   FormCompany,
@@ -278,7 +279,11 @@ function Emitter({ form }: { form: Bsff }) {
       <div className={styles.detailGrid}>
         {form.packagings?.length === 1 && (
           <DetailRow
-            value={`${form.packagings[0].name} ${form.packagings[0].numero} (${form.packagings[0].weight}kg)`}
+            value={`${
+              form.packagings[0].type === BsffPackagingType.Autre
+                ? form.packagings[0].other
+                : form.packagings[0].type
+            } ${form.packagings[0].numero} (${form.packagings[0].weight}kg)`}
             label="Conditionnement"
           />
         )}
