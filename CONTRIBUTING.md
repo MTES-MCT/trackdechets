@@ -52,16 +52,17 @@
    127.0.0.1 developers.trackdechets.local
    127.0.0.1 es.trackdechets.local
    127.0.0.1 notifier.trackdechets.local
+   127.0.0.1 storybook.trackdechets.local
    ```
 
    > Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
 
-   > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `NOTIFIER_HOST`, `UI_HOST`, `DEVELOPERS_HOST` et `ELASTIC_SEARCH_HOST`
+   > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `NOTIFIER_HOST`, `UI_HOST`, `DEVELOPERS_HOST`, `STORYBOOK_HOST` et `ELASTIC_SEARCH_HOST`
 
 4. Démarrer les containers
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx elasticsearch mongodb
+   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx elasticsearch mongodb storybook
    ```
 
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
@@ -181,6 +182,25 @@ server {
       proxy_set_header Connection "Upgrade";
    }
 }
+
+# /opt/homebrew/etc/nginx/servers/storybook.trackdechets.local
+server {
+   listen 80;
+   listen [::]:80;
+
+   server_name storybook.trackdechets.local;
+
+   location / {
+      proxy_pass http://localhost:6006;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "Upgrade";
+   }
+}
 ```
 
 Re-charger la config et redémarrer NGINX
@@ -197,6 +217,7 @@ brew services restart nginx
 127.0.0.1 api.trackdechets.local
 127.0.0.1 trackdechets.local
 127.0.0.1 notifier.trackdechets.local
+127.0.0.1 storybook.trackdechets.local
 ```
 
 7. Installer `nvm`
@@ -240,6 +261,14 @@ cd front && npm run dev
 
 - URL API: http://api.trackdechets.local/
 - URL UI : http://trackdechets.local
+
+13. (Optionnel) Démarrer Storybook
+
+```bash
+cd front
+npm install
+npm run storybook
+```
 
 ### Conventions
 
