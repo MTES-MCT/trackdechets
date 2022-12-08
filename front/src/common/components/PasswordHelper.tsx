@@ -1,6 +1,6 @@
 import React from "react";
 import zxcvbn from "zxcvbn";
-import { Alert } from "@dataesr/react-dsfr";
+import { Alert, Text } from "@dataesr/react-dsfr";
 type Props = {
   password: string;
 };
@@ -31,7 +31,7 @@ const getPasswordHint = (password: string): PasswordHintResult => {
         title: "Insuffisant",
         hintType: "error",
         message: `Votre mot de passe est trop simple, ajoutez de la diversité dans les caractères. 
-          Utiliser de préférence une phrase de passe ou un outil de gestion de mot de passe`,
+          Veuillez suivre les conseils ci-dessus.`,
       };
 };
 export default function PasswordHelper({ password }: Props) {
@@ -50,16 +50,16 @@ export function PasswordMeter({ password }: Props) {
 
 export const PassWordHints = () => (
   <div className="fr-messages-group" aria-live="assertive">
-    <p className="fr-message">Votre mot de passe doit :</p>
-    <p className="fr-message fr-message--info">
+    <Text as="p" spacing="mb-1w" className="fr-text--bold">
+      <span className="bold">Votre mot de passe doit </span>: <br />
+    </Text>
+    <Text as="p" spacing="mb-1w">
       - contenir {MIN_LENGTH} caractères minimum
-    </p>
-    <p className="fr-message fr-message--info">
-      - avoir une complexité suffisante{" "}
-    </p>
-    <p className="fr-message fr-message--info">
+      <br />
+      - avoir une complexité suffisante
+      <br />
       Nous vous recommandons d'utiliser une phrase de passe (plusieurs mots
       accolés) ou un gestionnaire de mots de passe
-    </p>
+    </Text>
   </div>
 );
