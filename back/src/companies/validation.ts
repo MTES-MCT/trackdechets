@@ -35,7 +35,7 @@ export const destinationCompanySiretSchema = yup
   .ensure()
   .test(
     "is-siret",
-    "Destination: ${path} n'est pas un numéro de SIRET valide",
+    "Destination: ${originalValue} n'est pas un numéro de SIRET valide",
     value => !value || isSiret(value)
   )
   .test(
@@ -110,7 +110,7 @@ export const transporterCompanySiretSchema = (isDraft: boolean) =>
     )
     .test(
       "is-siret",
-      "Transporteur : ${path} n'est pas un numéro de SIRET valide",
+      "Transporteur : ${originalValue} n'est pas un numéro de SIRET valide",
       value => !value || isSiret(value)
     )
     .when("transporterCompanyVatNumber", (tva, schema) => {
