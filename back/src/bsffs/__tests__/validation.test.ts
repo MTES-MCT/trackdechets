@@ -144,7 +144,7 @@ describe("destinationSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Destination : le n°SIRET n'est pas au bon format"
+      "Destination: 11111111111111 n'est pas un numéro de SIRET valide"
     );
   });
 
@@ -156,7 +156,7 @@ describe("destinationSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Destinataire: Le SIRET doit faire 14 caractères numériques"
+      "Destination: 1 n'est pas un numéro de SIRET valide"
     );
   });
 

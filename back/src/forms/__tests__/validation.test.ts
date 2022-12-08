@@ -672,7 +672,7 @@ describe("draftFormSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Émetteur: Le SIRET doit faire 14 caractères numériques"
+      "Émetteur: this is not a siret n'est pas un numéro de SIRET valide"
     );
   });
 
@@ -1136,7 +1136,6 @@ describe("processedInfoSchema", () => {
         "Destination ultérieure : L'opération de traitement est obligatoire",
         "Destination ultérieure : Le nom de l'entreprise est obligatoire",
         "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire",
-        "Destination ultérieure prévue : Le SIRET n'est pas valide",
         "Destination ultérieure : L'adresse de l'entreprise est obligatoire",
         "Destination ultérieure : Le contact dans l'entreprise est obligatoire",
         "Destination ultérieure : Le téléphone de l'entreprise est obligatoire",
