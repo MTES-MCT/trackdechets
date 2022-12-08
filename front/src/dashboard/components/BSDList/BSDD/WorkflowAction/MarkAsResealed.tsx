@@ -58,16 +58,6 @@ export default function MarkAsResealed({ form }: WorkflowActionProps) {
   >(MARK_RESEALED, {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
-    onCompleted: data => {
-      if (
-        data.markAsResealed &&
-        data.markAsResealed.status === FormStatus.Resealed
-      ) {
-        cogoToast.success(
-          `Les informations du BSD ont bien été complétées. Vous pouvez retrouver ce BSD dans l'onglet "Suivi"`
-        );
-      }
-    },
     onError: () => {
       // The error is handled in the UI
     },
