@@ -21,7 +21,6 @@ import { IconPaperWrite } from "common/components/Icons";
 import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
 import { NotificationError } from "common/components/Error";
-import cogoToast from "cogo-toast";
 import Transporter from "form/bsdd/Transporter";
 import { GET_BSDS } from "common/queries";
 
