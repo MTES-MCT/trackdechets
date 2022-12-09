@@ -112,7 +112,7 @@ function BsffPackagingTable({ bsff }: BsffPackagingTableProps) {
       {
         id: "weight",
         Header: "Masse du contenu (kg)",
-        accessor: bsffPackaging => bsffPackaging.volume,
+        accessor: bsffPackaging => bsffPackaging.weight,
       },
       {
         id: "wasteCode",
