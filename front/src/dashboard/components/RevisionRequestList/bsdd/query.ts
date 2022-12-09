@@ -136,6 +136,10 @@ export const SUBMIT_FORM_REVISION_REQUEST_APPROVAL = gql`
     submitFormRevisionRequestApproval(id: $id, isApproved: $isApproved) {
       id
       status
+      approvals {
+        approverSiret
+        status
+      }
     }
   }
 `;

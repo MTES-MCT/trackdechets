@@ -143,7 +143,17 @@ export function DisplayRevision({ review }: Props) {
       />
 
       <RevisionField
-        label="CAP"
+        label="CAP (destination finale)"
+        bsddValue={review.form.temporaryStorageDetail?.destination?.cap}
+        reviewValue={review.content.temporaryStorageDetail?.destination?.cap}
+      />
+
+      <RevisionField
+        label={
+          review.form?.temporaryStorageDetail
+            ? "CAP (entreposage provisoire ou reconditionnement)"
+            : "CAP"
+        }
         bsddValue={review.form.recipient?.cap}
         reviewValue={review.content.recipient?.cap}
       />

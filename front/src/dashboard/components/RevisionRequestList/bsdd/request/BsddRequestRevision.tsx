@@ -73,6 +73,8 @@ export function BsddRequestRevision({ bsdd }: Props) {
     MutationCreateFormRevisionRequestArgs
   >(CREATE_FORM_REVISION_REQUEST);
 
+  const isTempStorage = !!bsdd.temporaryStorageDetail;
+
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>
@@ -101,17 +103,46 @@ export function BsddRequestRevision({ bsdd }: Props) {
         {({ setFieldValue, values }) => (
           <Form>
             <div className={styles.fields}>
-              <ReviewableField
-                title="CAP"
-                value={bsdd.recipient?.cap}
-                name="content.recipient.cap"
-                defaultValue={initialReview.recipient.cap}
-              >
-                <Field
+              {isTempStorage ? (
+                <>
+                  <ReviewableField
+                    title="CAP destination finale"
+                    value={bsdd.temporaryStorageDetail?.destination?.cap}
+                    name="content.temporaryStorageDetail.destination.cap"
+                    defaultValue={
+                      initialReview.temporaryStorageDetail?.destination?.cap
+                    }
+                  >
+                    <Field
+                      name="content.temporaryStorageDetail.destination.cap"
+                      className="td-input td-input--medium"
+                    />
+                  </ReviewableField>
+                  <ReviewableField
+                    title="CAP entreposage provisoire ou reconditionnement"
+                    value={bsdd.recipient?.cap}
+                    name="content.recipient.cap"
+                    defaultValue={initialReview.recipient.cap}
+                  >
+                    <Field
+                      name="content.recipient.cap"
+                      className="td-input td-input--medium"
+                    />
+                  </ReviewableField>
+                </>
+              ) : (
+                <ReviewableField
+                  title="CAP"
+                  value={bsdd.recipient?.cap}
                   name="content.recipient.cap"
-                  className="td-input td-input--medium"
-                />
-              </ReviewableField>
+                  defaultValue={initialReview.recipient.cap}
+                >
+                  <Field
+                    name="content.recipient.cap"
+                    className="td-input td-input--medium"
+                  />
+                </ReviewableField>
+              )}
 
               <ReviewableField
                 title="Code déchet"
@@ -367,6 +398,20 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   </div>
                 </>
               </ReviewableField>
+
+              {bsdd.temporaryStorageDetail ? (
+                <ReviewableField
+                  title="CAP (entreposage provisoire)"
+                  value={bsdd.temporaryStorageDetail?.cap}
+                  name="content.temporaryStorageDetail.destination.cap"
+                  defaultValue={initialReview.recipient.cap}
+                >
+                  <Field
+                    name="content.recipient.cap"
+                    className="td-input td-input--medium"
+                  />
+                </ReviewableField>
+              ) : null}
 
               <div className="form__row">
                 <label>Commentaire à propos de la révision</label>
