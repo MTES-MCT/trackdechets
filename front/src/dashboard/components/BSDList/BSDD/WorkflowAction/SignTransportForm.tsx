@@ -22,6 +22,7 @@ import { FormJourneySummary } from "./FormJourneySummary";
 import { FormWasteTransportSummary } from "./FormWasteTransportSummary";
 import { GET_FORM } from "form/bsdd/utils/queries";
 import Loader from "common/components/Loaders";
+import DateInput from "form/common/components/custom-inputs/DateInput";
 
 const SIGN_TRANSPORT_FORM = gql`
   mutation SignTransportForm(
@@ -37,6 +38,7 @@ const SIGN_TRANSPORT_FORM = gql`
 `;
 
 const validationSchema = yup.object({
+  takenOverAt: yup.date().required("La date de prise en charge est requise"),
   takenOverBy: yup
     .string()
     .ensure()
@@ -90,6 +92,7 @@ function SignTransportFormModal({
       <Formik
         initialValues={{
           takenOverBy: "",
+          takenOverAt: new Date().toISOString(),
           securityCode: "",
           transporterNumberPlate:
             form.stateSummary?.transporterNumberPlate ?? "",
@@ -101,7 +104,7 @@ function SignTransportFormModal({
               variables: {
                 id: form.id,
                 input: {
-                  takenOverAt: new Date().toISOString(),
+                  takenOverAt: values.takenOverAt,
                   takenOverBy: values.takenOverBy,
                   transporterNumberPlate: values.transporterNumberPlate,
                 },
@@ -124,6 +127,20 @@ function SignTransportFormModal({
               que les informations ci-dessus sont correctes. En signant ce
               document, je déclare prendre en charge le déchet.
             </p>
+
+            <div className="form__row">
+              <label className="tw-font-semibold">
+                Date de prise en charge
+                <div className="td-date-wrapper">
+                  <Field
+                    name="takenOverAt"
+                    component={DateInput}
+                    className="td-input"
+                  />
+                </div>
+              </label>
+              <RedErrorMessage name="takenOverAt" />
+            </div>
 
             <div className="form__row">
               <label>
