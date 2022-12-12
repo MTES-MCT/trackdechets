@@ -24,6 +24,8 @@ import { GET_FORM } from "form/bsdd/utils/queries";
 import Loader from "common/components/Loaders";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 
+const TODAY = new Date();
+
 const SIGN_TRANSPORT_FORM = gql`
   mutation SignTransportForm(
     $id: ID!
@@ -38,7 +40,10 @@ const SIGN_TRANSPORT_FORM = gql`
 `;
 
 const validationSchema = yup.object({
-  takenOverAt: yup.date().required("La date de prise en charge est requise"),
+  takenOverAt: yup
+    .date()
+    .required("La date de prise en charge est requise")
+    .max(TODAY, "La date de prise en charge ne peut être dans le futur"),
   takenOverBy: yup
     .string()
     .ensure()
@@ -92,7 +97,7 @@ function SignTransportFormModal({
       <Formik
         initialValues={{
           takenOverBy: "",
-          takenOverAt: new Date().toISOString(),
+          takenOverAt: TODAY.toISOString(),
           securityCode: "",
           transporterNumberPlate:
             form.stateSummary?.transporterNumberPlate ?? "",
@@ -136,6 +141,7 @@ function SignTransportFormModal({
                     name="takenOverAt"
                     component={DateInput}
                     className="td-input"
+                    maxDate={TODAY}
                   />
                 </div>
               </label>

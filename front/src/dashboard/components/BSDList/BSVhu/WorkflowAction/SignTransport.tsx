@@ -16,8 +16,13 @@ import { generatePath, Link } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
 
+const TODAY = new Date();
+
 const validationSchema = yup.object({
-  takenOverAt: yup.date().required("La date de prise en charge est requise"),
+  takenOverAt: yup
+    .date()
+    .required("La date de prise en charge est requise")
+    .max(TODAY, "La date de prise en charge ne peut être dans le futur"),
   author: yup
     .string()
     .ensure()
@@ -65,7 +70,7 @@ export function SignTransport({ siret, bsvhuId }: Props) {
           <Formik
             initialValues={{
               author: "",
-              takenOverAt: new Date().toISOString(),
+              takenOverAt: TODAY.toISOString(),
             }}
             validationSchema={validationSchema}
             onSubmit={async values => {
@@ -104,6 +109,7 @@ export function SignTransport({ siret, bsvhuId }: Props) {
                         name="takenOverAt"
                         component={DateInput}
                         className="td-input"
+                        maxDate={TODAY}
                       />
                     </div>
                   </label>
