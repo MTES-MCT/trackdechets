@@ -2,10 +2,13 @@ import { useMutation } from "@apollo/client";
 import { RedErrorMessage } from "common/components";
 import { GET_BSDS } from "common/queries";
 import routes from "common/routes";
+import { UPDATE_VHU_FORM } from "form/bsvhu/utils/queries";
+import DateInput from "form/common/components/custom-inputs/DateInput";
 import { Field, Form, Formik } from "formik";
 import {
   Mutation,
   MutationSignBsvhuArgs,
+  MutationUpdateBsvhuArgs,
   SignatureTypeInput,
 } from "generated/graphql/types";
 import React from "react";
@@ -14,6 +17,7 @@ import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
 
 const validationSchema = yup.object({
+  takenOverAt: yup.date().required("La date de prise en charge est requise"),
   author: yup
     .string()
     .ensure()
@@ -22,10 +26,18 @@ const validationSchema = yup.object({
 
 type Props = { siret: string; bsvhuId: string };
 export function SignTransport({ siret, bsvhuId }: Props) {
-  const [signBsvhu, { loading }] = useMutation<
-    Pick<Mutation, "signBsvhu">,
-    MutationSignBsvhuArgs
-  >(SIGN_BSVHU, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
+  const [updateBsvhu, { loading: loadingUpdate, error: updateError }] =
+    useMutation<Pick<Mutation, "updateBsvhu">, MutationUpdateBsvhuArgs>(
+      UPDATE_VHU_FORM
+    );
+
+  const [signBsvhu, { loading: loadingSign, error: signatureError }] =
+    useMutation<Pick<Mutation, "signBsvhu">, MutationSignBsvhuArgs>(
+      SIGN_BSVHU,
+      { refetchQueries: [GET_BSDS], awaitRefetchQueries: true }
+    );
+
+  const loading = loadingUpdate || loadingSign;
 
   return (
     <SignBsvhu title="Signer l'enlèvement" bsvhuId={bsvhuId}>
@@ -53,13 +65,23 @@ export function SignTransport({ siret, bsvhuId }: Props) {
           <Formik
             initialValues={{
               author: "",
+              takenOverAt: new Date().toISOString(),
             }}
             validationSchema={validationSchema}
             onSubmit={async values => {
+              const { takenOverAt, ...sign } = values;
+
+              await updateBsvhu({
+                variables: {
+                  id: bsvhuId,
+                  input: { transporter: { transport: { takenOverAt } } },
+                },
+              });
+
               await signBsvhu({
                 variables: {
                   id: bsvhu.id,
-                  input: { ...values, type: SignatureTypeInput.Transport },
+                  input: { ...sign, type: SignatureTypeInput.Transport },
                 },
               });
               onClose();
@@ -73,6 +95,21 @@ export function SignTransport({ siret, bsvhuId }: Props) {
                   signant ce document, je déclare prendre en charge le déchet.
                   La signature est horodatée.
                 </p>
+
+                <div className="form__row">
+                  <label className="tw-font-semibold">
+                    Date de prise en charge
+                    <div className="td-date-wrapper">
+                      <Field
+                        name="takenOverAt"
+                        component={DateInput}
+                        className="td-input"
+                      />
+                    </div>
+                  </label>
+                  <RedErrorMessage name="takenOverAt" />
+                </div>
+
                 <div className="form__row">
                   <label>
                     Nom du signataire
@@ -85,6 +122,17 @@ export function SignTransport({ siret, bsvhuId }: Props) {
                   </label>
                   <RedErrorMessage name="author" />
                 </div>
+
+                {updateError && (
+                  <div className="notification notification--error">
+                    {updateError.message}
+                  </div>
+                )}
+                {signatureError && (
+                  <div className="notification notification--error">
+                    {signatureError.message}
+                  </div>
+                )}
 
                 <div className="form__actions">
                   <button
