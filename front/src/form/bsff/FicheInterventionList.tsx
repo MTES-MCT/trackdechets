@@ -60,14 +60,8 @@ const detenteurSchema: yup.SchemaOf<BsffFicheInterventionInput["detenteur"]> =
             .string()
             .ensure()
             .required("L'adresse du détenteur est requise"),
-          mail: yup
-            .string()
-            .ensure()
-            .required("Le courriel du détenteur est requis"),
-          phone: yup
-            .string()
-            .ensure()
-            .required("Le numéro de téléphone du détenteur est requis"),
+          mail: yup.string().nullable().notRequired(),
+          phone: yup.string().nullable().notRequired(),
         }),
     }),
   });
@@ -258,7 +252,7 @@ function PrivateIndividual() {
       </div>
       <div className="form__row">
         <label>
-          Téléphone
+          Téléphone (optionnel)
           <Field
             type="text"
             name="detenteur.company.phone"
@@ -269,7 +263,7 @@ function PrivateIndividual() {
       </div>
       <div className="form__row">
         <label>
-          Mail
+          Mail (optionnel)
           <Field
             type="text"
             name="detenteur.company.mail"

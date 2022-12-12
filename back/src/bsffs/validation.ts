@@ -1025,10 +1025,7 @@ export const ficheInterventionSchema: yup.SchemaOf<
     .ensure()
     .when("detenteurIsPrivateIndividual", {
       is: true,
-      then: schema =>
-        schema.required(
-          "Le numéro de téléphone du détenteur de l'équipement (particulier) est requis"
-        ),
+      then: schema => schema.nullable().notRequired(),
       otherwise: schema =>
         schema.required(
           "Le numéro de téléphone de l'entreprise détentrice de l'équipement est requis"
@@ -1040,10 +1037,7 @@ export const ficheInterventionSchema: yup.SchemaOf<
     .ensure()
     .when("detenteurIsPrivateIndividual", {
       is: true,
-      then: schema =>
-        schema.required(
-          "L'addresse email du détenteur de l'équipement (particulier) est requis"
-        ),
+      then: schema => schema.nullable().notRequired(),
       otherwise: schema =>
         schema.required(
           "L'addresse email de l'entreprise détentrice de l'équipement est requis"
