@@ -162,6 +162,7 @@ function Emitter({ form }: { form: Bsvhu }) {
 }
 
 function Transporter({ form }: { form: Bsvhu }) {
+  console.log("form", form);
   const { transporter, identification, packaging, quantity, weight } = form;
   return (
     <>
@@ -208,7 +209,6 @@ function Transporter({ form }: { form: Bsvhu }) {
           value={transporter?.transport?.takenOverAt}
           label="Emporté le"
         />
-
         <DateRow
           value={transporter?.transport?.signature?.date}
           label="Signé le"

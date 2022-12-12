@@ -151,6 +151,7 @@ export const FullBsvhuFragment = gql`
         validityLimit
       }
       transport {
+        takenOverAt
         signature {
           author
           date
