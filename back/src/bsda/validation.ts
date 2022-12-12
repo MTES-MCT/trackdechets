@@ -2,7 +2,6 @@ import {
   Bsda,
   BsdaStatus,
   BsdaType,
-  CompanyVerificationStatus,
   Prisma,
   TransportMode,
   WasteAcceptationStatus
@@ -12,7 +11,6 @@ import * as yup from "yup";
 import { BSDA_WASTE_CODES } from "../common/constants";
 import {
   isVat,
-  isSiret,
   isFRVat,
   isForeignVat
 } from "../common/constants/companySearchHelpers";
@@ -20,10 +18,6 @@ import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { validateCompany } from "../companies/validateCompany";
 import {
   destinationCompanySiretSchema,
-  isCollector,
-  isTransporter,
-  isWasteCenter,
-  isWasteProcessor,
   transporterCompanySiretSchema
 } from "../companies/validation";
 import {
@@ -42,7 +36,6 @@ import prisma from "../prisma";
 
 configureYup();
 
-const { VERIFY_COMPANY } = process.env;
 export const PARTIAL_OPERATIONS = ["R 13", "D 15"];
 export const OPERATIONS = ["R 5", "D 5", "D 9", ...PARTIAL_OPERATIONS];
 type Emitter = Pick<
