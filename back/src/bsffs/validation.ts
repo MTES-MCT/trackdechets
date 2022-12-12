@@ -137,7 +137,7 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
           !isDraft,
           "Transporteur : le nom de l'établissement est requis"
         ),
-      transporterCompanySiret: transporterCompanySiretSchema(isDraft),
+      transporterCompanySiret: transporterCompanySiretSchema(!isDraft),
       transporterCompanyVatNumber: yup
         .string()
         .ensure()
@@ -263,10 +263,7 @@ export const destinationSchemaFn: FactorySchemaOf<boolean, Destination> =
           !isDraft,
           "Destination : le nom de l'établissement est requis"
         ),
-      destinationCompanySiret: destinationCompanySiretSchema.requiredIf(
-        !isDraft,
-        `Destination : le numéro SIRET est requis`
-      ),
+      destinationCompanySiret: destinationCompanySiretSchema(!isDraft),
       destinationCompanyAddress: yup
         .string()
         .requiredIf(

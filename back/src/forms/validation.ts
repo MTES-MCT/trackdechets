@@ -460,10 +460,7 @@ const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
       .string()
       .ensure()
       .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_NAME}`),
-    recipientCompanySiret: destinationCompanySiretSchema.requiredIf(
-      !isDraft,
-      `Destinataire: ${MISSING_COMPANY_SIRET}`
-    ),
+    recipientCompanySiret: destinationCompanySiretSchema(!isDraft),
     recipientCompanyAddress: yup
       .string()
       .ensure()
@@ -669,7 +666,7 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
         .string()
         .ensure()
         .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_NAME}`),
-      transporterCompanySiret: transporterCompanySiretSchema(isDraft),
+      transporterCompanySiret: transporterCompanySiretSchema(!isDraft),
       transporterCompanyVatNumber: yup
         .string()
         .ensure()
@@ -1200,12 +1197,12 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
     .forwardedIn();
 
   if (forwardedIn?.recipientCompanySiret) {
-    await destinationCompanySiretSchema.validate(
+    await destinationCompanySiretSchema().validate(
       forwardedIn.recipientCompanySiret
     );
   }
   if (forwardedIn?.transporterCompanySiret) {
-    await transporterCompanySiretSchema(false).validate(
+    await transporterCompanySiretSchema().validate(
       forwardedIn.transporterCompanySiret
     );
   }
