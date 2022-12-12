@@ -21,7 +21,7 @@ export default async function edit(
   const user = checkIsAuthenticated(context);
 
   const existingBsda = await getBsdaOrNotFound(id, {
-    include: { intermediaries: true }
+    include: { intermediaries: true, grouping: true, forwarding: true }
   });
   await checkIsBsdaContributor(
     user,
@@ -30,17 +30,13 @@ export default async function edit(
   );
 
   const data = flattenBsdaInput(input);
-
-  const resultingBsda = {
-    ...existingBsda,
-    ...data
-  };
   const intermediaries = input.intermediaries ?? existingBsda.intermediaries;
 
   await checkIsBsdaContributor(
     user,
     {
-      ...resultingBsda,
+      ...existingBsda,
+      ...data,
       intermediaries
     },
     "Vous ne pouvez pas enlever votre établissement du bordereau"
@@ -50,16 +46,12 @@ export default async function edit(
 
   const forwardedBsda = input.forwarding
     ? await getBsdaOrNotFound(input.forwarding)
-    : existingBsda.forwardingId
-    ? await bsdaRepository.findUnique({ id: existingBsda.forwardingId })
-    : null;
+    : existingBsda.forwarding;
 
   const groupedBsdas =
     input.grouping?.length > 0
       ? await bsdaRepository.findMany({ id: { in: input.grouping } })
-      : await bsdaRepository
-          .findRelatedEntity({ id: existingBsda.id })
-          .grouping();
+      : existingBsda.grouping;
 
   const isForwarding = Boolean(forwardedBsda);
   const isGrouping = groupedBsdas.length > 0;
@@ -70,8 +62,17 @@ export default async function edit(
     );
   }
 
-  checkKeysEditability(input, { ...existingBsda, grouping: groupedBsdas });
+  checkKeysEditability(input, {
+    ...existingBsda,
+    grouping: groupedBsdas,
+    intermediaries: existingBsda.intermediaries
+  });
 
+  const { grouping, forwarding, ...existingBsdaToValidate } = existingBsda;
+  const resultingBsda = {
+    ...existingBsdaToValidate,
+    ...data
+  };
   const previousBsdas = [forwardedBsda, ...groupedBsdas].filter(Boolean);
   await validateBsda(
     resultingBsda,

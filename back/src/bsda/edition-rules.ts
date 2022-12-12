@@ -25,14 +25,11 @@ const SIGNATURES_HIERARCHY: {
 };
 
 const bsdaWithGrouping = Prisma.validator<Prisma.BsdaArgs>()({
-  include: { grouping: true }
+  include: { forwarding: true, grouping: true, intermediaries: true }
 });
-type BsdaWithGrouping = Prisma.BsdaGetPayload<typeof bsdaWithGrouping>;
+type ReferenceBsda = Prisma.BsdaGetPayload<typeof bsdaWithGrouping>;
 
-export function checkKeysEditability(
-  updates: BsdaInput,
-  bsda: BsdaWithGrouping
-) {
+export function checkKeysEditability(updates: BsdaInput, bsda: ReferenceBsda) {
   // Calculate diff between the update & the current form
   // as we allow reposting fields if they are not modified
   const diffInput = getDiffInput(updates, bsda);
@@ -101,13 +98,17 @@ function ifAwaitingSignature(
     bsda[signature.field] == null && ifAwaitingSignature(signature.next)(bsda);
 }
 
-function getDiffInput(updates: BsdaInput, currentForm: BsdaWithGrouping) {
+function getDiffInput(updates: BsdaInput, currentForm: ReferenceBsda) {
   const prismaForm = expandBsdaFromDb(currentForm);
 
   return objectDiff(
     {
       ...prismaForm,
-      grouping: currentForm.grouping?.map(g => g.id)
+      grouping: currentForm.grouping?.map(g => g.id),
+      intermediaries: currentForm.intermediaries?.map(intermediary => {
+        const { bsdaId, id, ...input } = intermediary; // To match the input, we remove some internal fields
+        return input;
+      })
     },
     updates
   );

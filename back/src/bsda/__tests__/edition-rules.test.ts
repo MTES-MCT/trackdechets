@@ -1,12 +1,16 @@
-import { Bsda, BsdaType } from "@prisma/client";
+import { Bsda, BsdaType, IntermediaryBsdaAssociation } from "@prisma/client";
 import { SealedFieldsError } from "../../bsvhu/errors";
 import { checkKeysEditability } from "../edition-rules";
 
-type BsdaWithGrouping = Bsda & { grouping: Bsda[] };
+type ReferenceBsda = Bsda & {
+  grouping: Bsda[];
+  forwarding: Bsda;
+  intermediaries: IntermediaryBsdaAssociation[];
+};
 describe("Bsda edition rules", () => {
   it("should allow edits before signature", () => {
     expect(() =>
-      checkKeysEditability({ type: BsdaType.GATHERING }, {} as BsdaWithGrouping)
+      checkKeysEditability({ type: BsdaType.GATHERING }, {} as ReferenceBsda)
     ).not.toThrow();
   });
 
@@ -14,7 +18,7 @@ describe("Bsda edition rules", () => {
     expect(() =>
       checkKeysEditability({ type: BsdaType.GATHERING }, {
         emitterEmissionSignatureDate: new Date()
-      } as BsdaWithGrouping)
+      } as ReferenceBsda)
     ).toThrow(SealedFieldsError);
   });
 
@@ -22,7 +26,7 @@ describe("Bsda edition rules", () => {
     expect(() =>
       checkKeysEditability({ type: BsdaType.GATHERING }, {
         destinationOperationSignatureDate: new Date()
-      } as BsdaWithGrouping)
+      } as ReferenceBsda)
     ).toThrow(SealedFieldsError);
   });
 
@@ -31,7 +35,7 @@ describe("Bsda edition rules", () => {
     try {
       checkKeysEditability({ type: BsdaType.GATHERING }, {
         emitterEmissionSignatureDate: new Date()
-      } as BsdaWithGrouping);
+      } as ReferenceBsda);
     } catch (err) {
       expect(err.message).toBe(
         "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: type"
@@ -44,7 +48,7 @@ describe("Bsda edition rules", () => {
     try {
       checkKeysEditability({ emitter: { company: { mail: "edit@td.com" } } }, {
         emitterEmissionSignatureDate: new Date()
-      } as BsdaWithGrouping);
+      } as ReferenceBsda);
     } catch (err) {
       expect(err.message).toBe(
         "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: emitter.company.mail"
@@ -59,7 +63,7 @@ describe("Bsda edition rules", () => {
         { destination: { company: { mail: "edit@td.com" } } },
         {
           emitterEmissionSignatureDate: new Date()
-        } as BsdaWithGrouping
+        } as ReferenceBsda
       );
     } catch (err) {
       expect(err.message).toBe(
