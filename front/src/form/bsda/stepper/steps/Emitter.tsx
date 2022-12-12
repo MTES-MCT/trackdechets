@@ -92,7 +92,7 @@ export function Emitter({ disabled }) {
           </div>
           <div className="form__row">
             <label>
-              Téléphone
+              Téléphone (optionnel)
               <Field
                 type="text"
                 name="emitter.company.phone"
@@ -103,7 +103,7 @@ export function Emitter({ disabled }) {
           </div>
           <div className="form__row">
             <label>
-              Mail
+              Mail (optionnel)
               <Field
                 type="text"
                 name="emitter.company.mail"

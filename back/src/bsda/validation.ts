@@ -334,19 +334,27 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
             `Émetteur: ${MISSING_COMPANY_CONTACT}`
           )
       }),
-      emitterCompanyPhone: yup
-        .string()
-        .requiredIf(
-          context.emissionSignature,
-          `Émetteur: ${MISSING_COMPANY_PHONE}`
-        ),
+      emitterCompanyPhone: yup.string().when("emitterIsPrivateIndividual", {
+        is: true,
+        then: schema => schema.nullable().notRequired(),
+        otherwise: schema =>
+          schema.requiredIf(
+            context.emissionSignature,
+            `Émetteur: ${MISSING_COMPANY_PHONE}`
+          )
+      }),
       emitterCompanyMail: yup
         .string()
         .email()
-        .requiredIf(
-          context.emissionSignature,
-          `Émetteur: ${MISSING_COMPANY_EMAIL}`
-        ),
+        .when("emitterIsPrivateIndividual", {
+          is: true,
+          then: schema => schema.nullable().notRequired(),
+          otherwise: schema =>
+            schema.requiredIf(
+              context.emissionSignature,
+              `Émetteur: ${MISSING_COMPANY_EMAIL}`
+            )
+        }),
       emitterPickupSiteAddress: yup.string().nullable(),
       emitterPickupSiteCity: yup.string().nullable(),
       emitterPickupSiteInfos: yup.string().nullable(),
