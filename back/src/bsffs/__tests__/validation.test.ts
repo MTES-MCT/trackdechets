@@ -567,11 +567,11 @@ describe("ficheInterventionSchema", () => {
     const data = {
       ...ficheIntevention,
       ...privateIndividual,
-      detenteurCompanyMail: null
+      detenteurCompanyAddress: null
     };
     const validateFn = () => ficheInterventionSchema.validate(data);
     await expect(validateFn()).rejects.toThrow(
-      "L'addresse email du détenteur de l'équipement (particulier) est requis"
+      "L'addresse du détenteur de l'équipement (particulier) est requise"
     );
   });
 
