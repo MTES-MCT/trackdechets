@@ -64,6 +64,8 @@ export default function Signup() {
         setErrorMessage(
           _.message || "Une erreur est survenue, veuillez réessayer."
         );
+        // error message might be off-screen, let's scroll to top
+        window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
         setSubmitting(false);
       });
   };
@@ -94,7 +96,6 @@ export default function Signup() {
   const formContent = (
     <form onSubmit={handleSubmit}>
       <Container className={styles.centralContainer} spacing="pt-10w">
-        {alert}
         <Row justifyContent="center" spacing="mb-2w">
           <Col spacing="m-auto">
             <Title as="h1" look="h3" spacing="mb-1w">
@@ -105,6 +106,7 @@ export default function Signup() {
               est préalable à l'enregistrement ou au rattachement d'une
               entreprise dans Trackdéchets.
             </Text>
+            {alert}
             <Text as="p" className="fr-text--bold">
               Vos informations :
             </Text>
