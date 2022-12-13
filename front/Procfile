@@ -1,2 +1,1 @@
-web: npm run start
-storybook: npm run storybook
+web: bash bin/start.sh
