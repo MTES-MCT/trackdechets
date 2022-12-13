@@ -5,7 +5,8 @@ import { createClientAsync, Client, IOptions } from "soap";
 import { CompanyVatSearchResult, ViesResult } from "./types";
 import {
   countries,
-  isVat
+  isVat,
+  MONACO_ADDRESS_REGEXP
 } from "../../../common/constants/companySearchHelpers";
 import logger from "../../../logging/logger";
 import { ErrorCode } from "../../../common/errors";
@@ -82,13 +83,18 @@ export const client = async (
     // auto-correct VIES "unknown data"
     const address = viesResult.address === "---" ? "" : viesResult.address;
     const name = viesResult.name === "---" ? "" : viesResult.name;
+    const codePaysEtrangerEtablissement = !!viesResult.address.match(
+      MONACO_ADDRESS_REGEXP
+    )
+      ? "MC"
+      : viesResult.countryCode;
 
     return {
       vatNumber: vatNumber,
       address: address,
       name: name,
       // Compat mapping avec SireneSearchResult
-      codePaysEtrangerEtablissement: country.isoCode.short,
+      codePaysEtrangerEtablissement,
       statutDiffusionEtablissement: "O",
       etatAdministratif: "A"
     };

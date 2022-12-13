@@ -1076,7 +1076,7 @@ describe("processedInfoSchema", () => {
     const validateFn = () => transporterSchemaFn(false).validate(transporter);
 
     await expect(validateFn()).rejects.toThrow(
-      "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
+      "transporterCompanyVatNumber n'est pas un numéro de TVA intracommunautaire valide. Seuls les numéros non-français sont valides, les entreprises françaises doivent être identifiées par leur numéro de SIRET"
     );
   });
 
@@ -1094,7 +1094,7 @@ describe("processedInfoSchema", () => {
     const validateFn = () => transporterSchemaFn(false).validate(transporter);
 
     await expect(validateFn()).rejects.toThrow(
-      "transporterCompanyVatNumber n'est pas un numéro de TVA intracommunautaire valide"
+      "transporterCompanyVatNumber n'est pas un numéro de TVA intracommunautaire valide. Seuls les numéros non-français sont valides, les entreprises françaises doivent être identifiées par leur numéro de SIRET"
     );
   });
 

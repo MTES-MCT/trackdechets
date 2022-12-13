@@ -23,7 +23,6 @@ import {
 import graphlClient from "graphql-client";
 import { COMPANY_INFOS } from "form/common/components/company/query";
 import {
-  isVat,
   isFRVat,
   isSiret,
   isForeignVat,
@@ -84,17 +83,16 @@ export const transporterSchema = object().shape({
                 "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
               )
     )
-    .when(
-      "transporter.company.vatNumber",
-      (transporterCompanyVatNumber, schema) =>
-        isForeignVat(transporterCompanyVatNumber)
-          ? schema.nullable(true)
-          : schema
-              .ensure()
-              .required(
-                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
-              )
-    ),
+    .when(["transporter.company.vatNumber", "transporter.company.address"], {
+      is: (vat, address) => isForeignVat(vat, address),
+      then: schema => schema.nullable(),
+      otherwise: schema =>
+        schema
+          .ensure()
+          .required(
+            "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+          ),
+    }),
   department: string()
     .when(
       "isExemptedOfReceipt",
@@ -164,14 +162,19 @@ const intermediariesShape: SchemaOf<Omit<CompanyInput, "__typename">> =
     contact: string().required(
       "Intermédiaires: les nom et prénom de contact sont obligatoires"
     ),
-    vatNumber: string()
-      .notRequired()
-      .nullable()
-      .test(
-        "is-fr-vat",
-        "Intermédiaires: seul les numéros de TVA en France sont valides",
-        vat => !vat || (isVat(vat) && isFRVat(vat))
-      ),
+    vatNumber: string().when(["vatNumber", "address"], {
+      is: (vat, address) => isFRVat(vat, address),
+      then: schema => schema.nullable(),
+      otherwise: schema =>
+        schema
+          .ensure()
+          .required(
+            [
+              "Le numéro de TVA n'est pas un numéro de TVA français valide.",
+              "Seuls les numéros français sont valides.",
+            ].join(" ")
+          ),
+    }),
     address: string().notRequired().nullable(),
     name: string().notRequired().nullable(),
     phone: string().notRequired().nullable(),

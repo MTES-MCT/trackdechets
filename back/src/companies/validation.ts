@@ -9,7 +9,7 @@ import {
   MISSING_COMPANY_SIRET_OR_VAT
 } from "../forms/errors";
 import prisma from "../prisma";
-import { isFRVat, isSiret } from "../common/constants/companySearchHelpers";
+import { isSiret } from "../common/constants/companySearchHelpers";
 
 export const receiptSchema = yup.object().shape({
   validityLimit: yup.date().required()
@@ -118,11 +118,6 @@ export const transporterCompanySiretSchema = (isDraft: boolean) =>
             "${path} n'est pas un numéro de SIRET valide",
             value => isSiret(value)
           );
-      }
-      if (!isDraft && tva && isFRVat(tva)) {
-        return schema.required(
-          "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
-        );
       }
       return schema.nullable().notRequired();
     });

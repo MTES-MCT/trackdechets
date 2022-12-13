@@ -17,7 +17,8 @@ import { searchCompany } from "../../search";
  * @param siretOrVat
  */
 export async function getCompanyInfos(
-  siretOrVat: string
+  siretOrVat: string,
+  allowFrVat = false
 ): Promise<CompanyPublic> {
   if (!siretOrVat) {
     throw new UserInputError(
@@ -27,7 +28,7 @@ export async function getCompanyInfos(
       }
     );
   }
-  const searchResult = await searchCompany(siretOrVat);
+  const searchResult = await searchCompany(siretOrVat, allowFrVat);
 
   return {
     siret: searchResult.siret,

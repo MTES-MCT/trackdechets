@@ -9,12 +9,12 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import { constantCase } from "constant-case";
 import { Field, useField, useFormikContext } from "formik";
 import {
-  countries as vatCountries,
   isFRVat,
   isVat,
   isForeignVat,
+  getCountryFromVAT,
 } from "generated/constants/companySearchHelpers";
-import { checkVAT } from "jsvat";
+
 import React, { useMemo, useRef, useState } from "react";
 
 import { debounce } from "common/helper";
@@ -76,7 +76,7 @@ export default function CompanySelector({
   const { setFieldError, setFieldValue, setFieldTouched } = useFormikContext();
   const [isForeignCompany, setIsForeignCompany] = useState(
     (field.value.country && field.value.country !== "FR") ||
-      isForeignVat(field.value.vatNumber!!)
+      isForeignVat(field.value.vatNumber!!, field.value.address!!)
   );
 
   const departmentInputRef = useRef<HTMLInputElement>(null);
@@ -126,7 +126,7 @@ export default function CompanySelector({
   );
 
   /**
-   * CompanyPrivateInfos pour completer les informations
+   * CompanyPrivateInfos complète automatiquement les informations
    * de la Company courante enregistrée dans le BSD à son ouverture
    */
   const { data: selectedData } = useQuery<
@@ -158,13 +158,16 @@ export default function CompanySelector({
         "Cet établissement existe mais nous ne pouvons pas remplir automatiquement le formulaire"
       );
     }
+    const isForeignCompany = isForeignVat(
+      company.vatNumber!!,
+      company.address!!
+    );
     // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
     setDisplayForeignCompanyWithUnknownInfos(
-      isForeignVat(company.vatNumber!!) &&
-        (company.name === "---" || company.name === "")
+      isForeignCompany && (company.name === "---" || company.name === "")
     );
 
-    setIsForeignCompany(isForeignVat(company.vatNumber!!));
+    setIsForeignCompany(isForeignCompany);
     // Prépare la mise à jour du Form
     const fields: FormCompany = {
       siret: company.siret,
@@ -179,8 +182,10 @@ export default function CompanySelector({
 
     // Automatiquement écraser le champ country
     if (company.vatNumber) {
-      const vatCountryCode = checkVAT(company.vatNumber, vatCountries)?.country
-        ?.isoCode.short;
+      const vatCountryCode = getCountryFromVAT({
+        vatNumber: company.vatNumber,
+        address: company.address!!,
+      });
       if (vatCountryCode) {
         fields.country = vatCountryCode;
       }
@@ -249,7 +254,7 @@ export default function CompanySelector({
       const isValidVat = isVat(clue);
 
       if (isValidVat) {
-        if (isFRVat(clue)) {
+        if (isFRVat(clue, field.value.address!!)) {
           setFieldTouched(`${field.name}.siret`);
           return setFieldError(
             `${field.name}.siret`,
@@ -278,6 +283,7 @@ export default function CompanySelector({
     setFieldTouched,
     searchCompaniesQuery,
     field.name,
+    field.value.address,
     allowForeignCompanies,
   ]);
 

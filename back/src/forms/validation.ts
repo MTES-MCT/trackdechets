@@ -675,8 +675,13 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
         .ensure()
         .test(
           "is-vat",
-          "${path} n'est pas un numéro de TVA intracommunautaire valide",
-          value => !value || isVat(value)
+          [
+            "${path} n'est pas un numéro de TVA intracommunautaire valide.",
+            "Seuls les numéros non-français sont valides, les entreprises françaises doivent être identifiées par leur numéro de SIRET"
+          ].join(" "),
+          (value, context) =>
+            !value ||
+            isForeignVat(value, context.parent.transporterCompanyAddress)
         ),
       transporterCompanyAddress: yup
         .string()
@@ -699,9 +704,14 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
       transporterReceipt: yup
         .string()
         .when(
-          ["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"],
+          [
+            "transporterIsExemptedOfReceipt",
+            "transporterCompanyVatNumber",
+            "transporterCompanyAddress"
+          ],
           {
-            is: (isExempted, vat) => isForeignVat(vat) || isExempted,
+            is: (isExempted, vat, address) =>
+              isForeignVat(vat, address) || isExempted,
             then: schema => schema.notRequired().nullable(),
             otherwise: schema =>
               schema.requiredIf(
@@ -713,9 +723,14 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
       transporterDepartment: yup
         .string()
         .when(
-          ["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"],
+          [
+            "transporterIsExemptedOfReceipt",
+            "transporterCompanyVatNumber",
+            "transporterCompanyAddress"
+          ],
           {
-            is: (isExempted, vat) => isForeignVat(vat) || isExempted,
+            is: (isExempted, vat, address) =>
+              isForeignVat(vat, address) || isExempted,
             then: schema => schema.notRequired().nullable(),
             otherwise: schema =>
               schema.requiredIf(
@@ -1232,10 +1247,12 @@ export const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
     .string()
     .notRequired()
     .nullable()
-    .test(
-      "is-fr-vat",
-      "Intermédiaires: seul les numéros de TVA en France sont valides",
-      vat => !vat || (isVat(vat) && isFRVat(vat))
+    .when("address", (address, schema) =>
+      schema.test(
+        "is-fr-vat",
+        "Intermédiaires: seul les numéros de TVA en France sont valides",
+        vat => !vat || isFRVat(vat, address)
+      )
     ),
   address: yup.string().notRequired().nullable(),
   name: yup.string().notRequired().nullable(),

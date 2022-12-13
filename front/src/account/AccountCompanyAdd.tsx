@@ -26,11 +26,7 @@ import AccountCompanyAddVhuAgrement from "./accountCompanyAdd/AccountCompanyAddV
 import { InlineRadioButton } from "form/common/components/custom-inputs/RadioButton";
 import classNames from "classnames";
 import { MY_COMPANIES } from "./AccountCompanyList";
-import {
-  isFRVat,
-  isSiret,
-  isVat,
-} from "generated/constants/companySearchHelpers";
+import { isSiret, isVat } from "generated/constants/companySearchHelpers";
 const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
     createCompany(companyInput: $companyInput) {
@@ -420,11 +416,11 @@ export default function AccountCompanyAdd() {
                 isAllowed:
                   "Vous devez certifier être autorisé à créer ce compte pour votre entreprise",
               }),
-              ...((isFRVat(values.vatNumber) ||
-                (!isSiret(values.siret) && !isVat(values.vatNumber))) && {
-                siret:
-                  "Le SIRET ou le numéro de TVA intracommunautaire doit être valides. (seuls les caractères alphanumériques sont acceptés, pas d'espaces ni de signes de ponctuation)",
-              }),
+              ...(!isSiret(values.siret) &&
+                !isVat(values.vatNumber) && {
+                  siret:
+                    "Le SIRET ou le numéro de TVA intracommunautaire doit être valides (seuls les caractères alphanumériques sont acceptés, pas d'espaces ni de signes de ponctuation).",
+                }),
               ...(anyTransporterReceipField &&
                 isTransporter_ &&
                 !values.transporterReceiptNumber && {

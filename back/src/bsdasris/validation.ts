@@ -14,9 +14,8 @@ import {
   BsdasriSignatureType
 } from "../generated/graphql/types";
 import {
-  isVat,
   isSiret,
-  isFRVat
+  isForeignVat
 } from "../common/constants/companySearchHelpers";
 import {
   MISSING_COMPANY_SIRET,
@@ -308,7 +307,7 @@ export const transporterSchema: FactorySchemaOf<
     transporterCompanySiret: yup
       .string()
       .ensure()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
+      .when(["transporterCompanyVatNumber"], (tva, schema) => {
         if (!tva && context.transportSignature) {
           return schema
             .required(`Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`)
@@ -318,11 +317,6 @@ export const transporterSchema: FactorySchemaOf<
               value => isSiret(value)
             );
         }
-        if (context.transportSignature && tva && isFRVat(tva)) {
-          return schema.required(
-            "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
-          );
-        }
         return schema.nullable().notRequired();
       }),
     transporterCompanyVatNumber: yup
@@ -330,8 +324,13 @@ export const transporterSchema: FactorySchemaOf<
       .ensure()
       .test(
         "is-vat",
-        "${path} n'est pas un numéro de TVA intracommunautaire valide",
-        value => !value || isVat(value)
+        [
+          "${path} n'est pas un numéro de TVA intracommunautaire valide.",
+          "Seuls les numéros non-français sont valides, les entreprises françaises doivent être identifiées par leur numéro de SIRET"
+        ].join(" "),
+        (value, context) =>
+          !value ||
+          isForeignVat(value, context.parent.transporterCompanyAddress)
       ),
     transporterCompanyAddress: yup
       .string()

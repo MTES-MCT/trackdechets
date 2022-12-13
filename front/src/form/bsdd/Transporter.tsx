@@ -51,7 +51,10 @@ export default function Transporter() {
         <Field name="transporter.mode" component={FieldTransportModeSelect} />
       </label>
 
-      {!isForeignVat(values.transporter?.company?.vatNumber!!) && (
+      {!isForeignVat(
+        values.transporter?.company?.vatNumber!!,
+        values.transporter?.company?.address!!
+      ) && (
         <>
           <h4 className="form__section-heading">Autorisations</h4>
           <div className="form__row">
@@ -71,7 +74,10 @@ export default function Transporter() {
         </>
       )}
       {!values.transporter.isExemptedOfReceipt &&
-        !isForeignVat(values.transporter?.company?.vatNumber!!) && (
+        !isForeignVat(
+          values.transporter?.company?.vatNumber!!,
+          values.transporter?.company?.address!!
+        ) && (
           <div className="form__row">
             <label>
               Numéro de récépissé

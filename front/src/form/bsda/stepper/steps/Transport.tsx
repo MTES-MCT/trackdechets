@@ -14,7 +14,10 @@ export function Transport({ disabled }: Props) {
 
   return (
     <>
-      {!isForeignVat(values.transporter?.company?.vatNumber!!) && (
+      {!isForeignVat(
+        values.transporter?.company?.vatNumber!!,
+        values.transporter?.company?.address!!
+      ) && (
         <>
           <h4 className="form__section-heading">
             Récépissé de déclaration de transport de déchets

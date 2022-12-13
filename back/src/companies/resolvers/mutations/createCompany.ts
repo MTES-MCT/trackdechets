@@ -63,16 +63,17 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   // copy VAT number to the SIRET field in order to ensure backward compatibility
   const siret = orgId;
   let vatNumber: string;
-  if (isFRVat(orgId)) {
-    throw new UserInputError(
-      "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indique un SIRET"
-    );
-  }
+
   if (isVat(orgId)) {
     vatNumber = orgId;
     if (companyTypes.join("") !== CompanyType.TRANSPORTER) {
       throw new UserInputError(
         "Impossible de créer un établissement identifié par un numéro de TVA d'un autre type que TRANSPORTER"
+      );
+    }
+    if (isFRVat(orgId, address)) {
+      throw new UserInputError(
+        "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indiquer un SIRET"
       );
     }
   } else if (!isSiret(orgId)) {

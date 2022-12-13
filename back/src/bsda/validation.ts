@@ -11,9 +11,7 @@ import { UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import { BSDA_WASTE_CODES } from "../common/constants";
 import {
-  isVat,
   isSiret,
-  isFRVat,
   isForeignVat
 } from "../common/constants/companySearchHelpers";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
@@ -724,13 +722,14 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
           [
             "type",
             "transporterRecepisseIsExempted",
-            "transporterCompanyVatNumber"
+            "transporterCompanyVatNumber",
+            "transporterCompanyAddress"
           ],
           {
-            is: (type, isExempted, vat) =>
+            is: (type, isExempted, vat, address) =>
               type === BsdaType.COLLECTION_2710 ||
               isExempted ||
-              isForeignVat(vat),
+              isForeignVat(vat, address),
             then: schema => schema.nullable().notRequired(),
             otherwise: schema =>
               schema.requiredIf(
@@ -745,13 +744,14 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
           [
             "type",
             "transporterRecepisseIsExempted",
-            "transporterCompanyVatNumber"
+            "transporterCompanyVatNumber",
+            "transporterCompanyAddress"
           ],
           {
-            is: (type, isExempted, vat) =>
+            is: (type, isExempted, vat, address) =>
               type === BsdaType.COLLECTION_2710 ||
               isExempted ||
-              isForeignVat(vat),
+              isForeignVat(vat, address),
             then: schema => schema.nullable().notRequired(),
             otherwise: schema =>
               schema.requiredIf(
@@ -766,13 +766,14 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
           [
             "type",
             "transporterRecepisseIsExempted",
-            "transporterCompanyVatNumber"
+            "transporterCompanyVatNumber",
+            "transporterCompanyAddress"
           ],
           {
-            is: (type, isExempted, vat) =>
+            is: (type, isExempted, vat, address) =>
               type === BsdaType.COLLECTION_2710 ||
               isExempted ||
-              isForeignVat(vat),
+              isForeignVat(vat, address),
             then: schema => schema.nullable().notRequired(),
             otherwise: schema =>
               schema.requiredIf(
@@ -853,8 +854,13 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
         .ensure()
         .test(
           "is-vat",
-          "${path} n'est pas un numéro de TVA intracommunautaire valide",
-          value => !value || (isVat(value) && !isFRVat(value))
+          [
+            "${path} n'est pas un numéro de TVA intracommunautaire valide.",
+            "Seuls les numéros non-français sont valides, les entreprises françaises doivent être identifiées par leur numéro de SIRET"
+          ].join(" "),
+          (value, context) =>
+            !value ||
+            isForeignVat(value, context.parent.transporterCompanyAddress)
         ),
       transporterCompanyAddress: yup.string().when("type", {
         is: BsdaType.COLLECTION_2710,

@@ -69,6 +69,8 @@ export const countries = [
   unitedKingdom
 ];
 
+export const MONACO_ADDRESS_REGEXP = /98[0-9]{3}\s+MONACO/gim;
+
 /**
  * Validateur de numéro de SIRETs
  */
@@ -90,21 +92,31 @@ export const isVat = (clue: string): boolean => {
 /**
  * TVA Français
  */
-export const isFRVat = (clue: string): boolean => {
+export const isFRVat = (clue: string, address = ""): boolean => {
   if (!isVat(clue)) return false;
-  const cleanClue = clue.replace(/[\W_]+/g, "");
-  if (!cleanClue) return false;
-  return cleanClue.slice(0, 2).toUpperCase().startsWith("FR");
+  const isFRPrefix = clue.slice(0, 2).toUpperCase().startsWith("FR");
+  // starts with FR but it's a Monaco address
+  if (isFRPrefix && !!address) {
+    if (!!address.match(MONACO_ADDRESS_REGEXP)) {
+      return false;
+    }
+  }
+  return isFRPrefix;
 };
 
 /**
  * TVA Non-Français
  */
-export const isForeignVat = (clue: string): boolean => {
+export const isForeignVat = (clue: string, address = ""): boolean => {
   if (!isVat(clue)) return false;
-  const cleanClue = clue.replace(/[\W_]+/g, "");
-  if (!cleanClue) return false;
-  return !cleanClue.slice(0, 2).toUpperCase().startsWith("FR");
+  const isForeignPrefix = !clue.slice(0, 2).toUpperCase().startsWith("FR");
+  // starts with FR but it's a Monaco address
+  if (!isForeignPrefix && !!address) {
+    if (!!address.match(MONACO_ADDRESS_REGEXP)) {
+      return true;
+    }
+  }
+  return isForeignPrefix;
 };
 
 /**
@@ -116,3 +128,23 @@ export const isOmi = (clue: string): boolean => {
   const clean = clue.replace(/[\W_]+/g, "");
   return clean.match(/^OMI[0-9]{7}$/gim) !== null;
 };
+
+/**
+ * Utility to determine the country from a VAT
+ */
+export function getCountryFromVAT(company: {
+  vatNumber?: string;
+  address?: string;
+}): string | void {
+  if (company.vatNumber) {
+    const vatCountryCode = checkVAT(company.vatNumber, countries).country
+      ?.isoCode.short;
+    if (company.address && vatCountryCode === "FR") {
+      // check Monaco
+      if (!!company.address.match(MONACO_ADDRESS_REGEXP)) {
+        return "MC";
+      }
+    }
+    return vatCountryCode;
+  }
+}
