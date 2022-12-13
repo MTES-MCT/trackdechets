@@ -60,6 +60,7 @@ export default function Destination({ disabled }) {
         disabled={disabled}
         name="destination.company"
         heading="Installation de destination"
+        registeredOnlyCompanies={true}
         onCompanySelected={destination => {
           const agrementNumber =
             values.destination?.type === "BROYEUR"
