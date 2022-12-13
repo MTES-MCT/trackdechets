@@ -37,9 +37,11 @@ export const destinationCompanySiretSchema = (isRequired = true) =>
   yup
     .string()
     .ensure()
-    .matches(/^$|^\d{14}$/, {
-      message: `Destinataire: ${INVALID_SIRET_LENGTH}`
-    })
+    .test(
+      "is-siret",
+      "Destinataire : SIRET invalide",
+      value => !value?.length || isSiret(value)
+    )
     .test(
       "is-recipient-registered-with-right-profile",
       ({ value }) =>
@@ -121,10 +123,8 @@ export const transporterCompanySiretSchema = (isRequired = true) =>
       if (!tva && isRequired) {
         return schema
           .required(`Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`)
-          .test(
-            "is-siret",
-            "${path} n'est pas un numéro de SIRET valide",
-            value => isSiret(value)
+          .test("is-siret", "Transporteur : SIRET invalide", value =>
+            isSiret(value)
           );
       }
       if (isRequired && tva && isFRVat(tva)) {

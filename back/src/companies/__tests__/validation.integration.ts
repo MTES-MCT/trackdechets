@@ -1,12 +1,18 @@
-import { destinationCompanySiretSchema } from "../validation";
+import {
+  destinationCompanySiretSchema,
+  transporterCompanySiretSchema
+} from "../validation";
 import * as yup from "yup";
 import configureYup from "../../common/yup/configureYup";
 import { companyFactory } from "../../__tests__/factories";
 import { CompanyType } from "@prisma/client";
+import { resetDatabase } from "../../../integration-tests/helper";
 
 configureYup();
 
 describe("destinationCompanySiretSchema", () => {
+  afterAll(resetDatabase);
+
   it("should be invalid when siret is not well formatted", async () => {
     const schema = yup.object({
       destinationCompanySiret: destinationCompanySiretSchema()
@@ -14,9 +20,7 @@ describe("destinationCompanySiretSchema", () => {
     const siret = "1";
     const validateFn = () =>
       schema.validate({ destinationCompanySiret: siret });
-    await expect(validateFn()).rejects.toThrow(
-      "Destinataire: Le SIRET doit faire 14 caractères numériques"
-    );
+    await expect(validateFn()).rejects.toThrow("Destinataire : SIRET invalide");
   });
 
   it("should be invalid when company does not exist in TD", async () => {
@@ -96,4 +100,93 @@ describe("destinationCompanySiretSchema", () => {
       );
     }
   );
+});
+
+describe("destinationCompanySiretSchema", () => {
+  afterAll(resetDatabase);
+
+  it("should be invalid when siret is not well formatted", async () => {
+    const schema = yup.object({
+      transporterCompanySiret: transporterCompanySiretSchema()
+    });
+    const siret = "1";
+    const validateFn = () =>
+      schema.validate({ transporterCompanySiret: siret });
+    await expect(validateFn()).rejects.toThrow("Transporteur : SIRET invalide");
+  });
+
+  it("should be invalid when company does not exist in TD", async () => {
+    const schema = yup.object({
+      transporterCompanySiret: transporterCompanySiretSchema()
+    });
+    const siret = "11111111111111";
+    const validateFn = () =>
+      schema.validate({ transporterCompanySiret: siret });
+    await expect(validateFn()).rejects.toThrow(
+      `Le transporteur qui a été renseigné sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets`
+    );
+  });
+
+  it("should be invalid when company exists but does not have the right profile", async () => {
+    const company = await companyFactory({
+      companyTypes: [CompanyType.PRODUCER]
+    });
+    const schema = yup.object({
+      transporterCompanySiret: transporterCompanySiretSchema()
+    });
+    const validateFn = () =>
+      schema.validate({ transporterCompanySiret: company.siret });
+    await expect(validateFn()).rejects.toThrow(
+      `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit` +
+        " sur Trackdéchets en tant qu'entreprise de transport. Cette entreprise ne peut" +
+        " donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur" +
+        " de cette entreprise pour qu'il modifie le profil de l'établissement depuis l'interface" +
+        " Trackdéchets Mon Compte > Établissements"
+    );
+  });
+
+  it("should be valid when company is registered with profile TRANSPORTER", async () => {
+    const company = await companyFactory({
+      companyTypes: [CompanyType.TRANSPORTER]
+    });
+    const schema = yup.object({
+      transporterCompanySiret: transporterCompanySiretSchema()
+    });
+
+    const isValidFn = () =>
+      schema.isValid({ transporterCompanySiret: company.siret });
+    expect(await isValidFn()).toEqual(true);
+  });
+
+  it.each([null, undefined, ""])(
+    "should be invalid when SIRET is %p and isRequired=true",
+    async value => {
+      const schema = yup.object({
+        transporterCompanySiret: transporterCompanySiretSchema(true)
+      });
+      const validateFn = () =>
+        schema.validate({ transporterCompanySiret: value });
+      expect(validateFn()).rejects.toThrow(
+        "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
+      );
+    }
+  );
+
+  it("should be valid when isRequired=true, siret nullish but a transporter VAT number is specified", async () => {
+    const company = await companyFactory({
+      companyTypes: [CompanyType.TRANSPORTER],
+      siret: "DE811569869",
+      vatNumber: "DE811569869"
+    });
+    const schema = yup.object({
+      transporterCompanySiret: transporterCompanySiretSchema(true)
+    });
+
+    const isValidFn = () =>
+      schema.isValid({
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: company.vatNumber
+      });
+    expect(await isValidFn()).toEqual(true);
+  });
 });
