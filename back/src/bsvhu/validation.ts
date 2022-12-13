@@ -18,11 +18,11 @@ import {
 import * as yup from "yup";
 import { FactorySchemaOf } from "../common/yup/configureYup";
 import { BsvhuDestinationType } from "../generated/graphql/types";
+import { isVat, isFRVat } from "../common/constants/companySearchHelpers";
 import {
-  isVat,
-  isSiret,
-  isFRVat
-} from "../common/constants/companySearchHelpers";
+  destinationCompanySiretSchema,
+  transporterCompanySiretSchema
+} from "../companies/validation";
 
 type Emitter = Pick<
   Bsvhu,
@@ -192,13 +192,9 @@ const destinationSchema: FactorySchemaOf<VhuValidationContext, Destination> =
           context.emissionSignature,
           `Destinataire: ${MISSING_COMPANY_NAME}`
         ),
-      destinationCompanySiret: yup
-        .string()
-        .length(14, `Destination: ${INVALID_SIRET_LENGTH}`)
-        .requiredIf(
-          context.emissionSignature,
-          `Destinataire: ${MISSING_COMPANY_SIRET}`
-        ),
+      destinationCompanySiret: destinationCompanySiretSchema(
+        context.emissionSignature === true
+      ),
       destinationCompanyAddress: yup.string().when("$emitterSignature", {
         is: true,
         then: s => s.required(`Destination: ${MISSING_COMPANY_ADDRESS}`),
@@ -262,19 +258,9 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
           context.transportSignature,
           `Transporteur: ${MISSING_COMPANY_NAME}`
         ),
-      transporterCompanySiret: yup
-        .string()
-        .ensure()
-        .when("transporterCompanyVatNumber", (tva, schema) => {
-          if (!tva && context.transportSignature) {
-            return schema.test(
-              "is-siret",
-              "${path} n'est pas un numéro de SIRET valide",
-              value => isSiret(value)
-            );
-          }
-          return schema.nullable().notRequired();
-        }),
+      transporterCompanySiret: transporterCompanySiretSchema(
+        context.transportSignature === true
+      ),
       transporterCompanyVatNumber: yup
         .string()
         .ensure()
