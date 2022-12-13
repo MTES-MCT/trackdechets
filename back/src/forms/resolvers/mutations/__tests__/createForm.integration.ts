@@ -1532,11 +1532,11 @@ describe("Mutation.createForm", () => {
     expect(data.createForm.wasteDetails.isDangerous).toBe(true);
   });
 
-  it("should be possible to fill both a SIRET number and a TVA number for transporter", async () => {
+  it("should not be possible to fill both a SIRET number and a FR TVA number for transporter", async () => {
     const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
     const transporter = await companyFactory();
     const { mutate } = makeClient(user);
-    const { data } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "createForm">,
       MutationCreateFormArgs
     >(CREATE_FORM, {
@@ -1551,10 +1551,17 @@ describe("Mutation.createForm", () => {
         }
       }
     });
-    expect(data?.createForm?.id).toBeDefined();
-  });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement",
+        extensions: {
+          code: "BAD_USER_INPUT"
+        }
+      })
+    ]);  });
 
-  it("should be possible to fill TVA number only for a foregin transporter", async () => {
+  it("should be possible to fill TVA number only for a foreign transporter", async () => {
     const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
     const { company: transporterCompany } = await userWithCompanyFactory(
       UserRole.MEMBER,
@@ -1627,7 +1634,7 @@ describe("Mutation.createForm", () => {
 
     const intermediaryCreation = toIntermediaryCompany(company);
 
-    const { data } = await mutate<
+    const { data, errors } = await mutate<
       Pick<Mutation, "createForm">,
       MutationCreateFormArgs
     >(CREATE_FORM, {

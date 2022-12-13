@@ -137,7 +137,7 @@ export const transporterCompanyVatNumberSchema = yup
       else if (isFRVat(value)) {
         return testContext.createError({
           message:
-            "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
+            "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
         });
       } else if (isForeignVat(value)) {
         return true;
