@@ -1,7 +1,9 @@
+import { CompanyType } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { Mutation } from "../../../../generated/graphql/types";
 import {
+  companyFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -93,6 +95,10 @@ describe("Mutation.Vhu.create", () => {
   it("should allow creating a valid form for the producer signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTE_VEHICLES]
+    });
+
     const input = {
       emitter: {
         company: {
@@ -120,7 +126,7 @@ describe("Mutation.Vhu.create", () => {
         type: "BROYEUR",
         plannedOperationCode: "R 12",
         company: {
-          siret: "11111111111111",
+          siret: destination.siret,
           name: "destination",
           address: "address",
           contact: "contactEmail",
@@ -149,6 +155,9 @@ describe("Mutation.Vhu.create", () => {
 
   it("should fail if a required field like the emitter agrement is missing", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTEPROCESSOR]
+    });
 
     const input = {
       emitter: {
@@ -176,7 +185,7 @@ describe("Mutation.Vhu.create", () => {
         type: "BROYEUR",
         plannedOperationCode: "R 12",
         company: {
-          siret: "11111111111111",
+          siret: destination.siret,
           name: "destination",
           address: "address",
           contact: "contactEmail",

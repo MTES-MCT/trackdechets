@@ -1,7 +1,9 @@
+import { CompanyType } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { Mutation } from "../../../../generated/graphql/types";
 import {
+  companyFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -92,6 +94,9 @@ describe("Mutation.Vhu.createDraft", () => {
 
   it("create a form with an emitter and a destination", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTE_VEHICLES]
+    });
 
     const input = {
       emitter: {
@@ -101,7 +106,7 @@ describe("Mutation.Vhu.createDraft", () => {
       },
       destination: {
         company: {
-          siret: "3".repeat(14)
+          siret: destination.siret
         }
       }
     };

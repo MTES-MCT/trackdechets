@@ -1,4 +1,6 @@
+import { CompanyType } from "@prisma/client";
 import { ValidationError } from "yup";
+import { companyFactory } from "../../__tests__/factories";
 import { validateBsdasri } from "../validation";
 
 import { initialData, readyToTakeOverData } from "./factories";
@@ -10,18 +12,24 @@ describe("Mutation.signBsdasri emission", () => {
   });
 
   it("should validate transport", async () => {
+    const transporter = await companyFactory({
+      companyTypes: [CompanyType.TRANSPORTER]
+    });
     const dasri = readyToTakeOverData({
-      siret: 53075596600047,
+      siret: transporter.siret,
       name: "transporteur"
     });
     await validateBsdasri(dasri, { transportSignature: true });
   });
 
   it("should validate emission and transport", async () => {
+    const transporter = await companyFactory({
+      companyTypes: [CompanyType.TRANSPORTER]
+    });
     const dasri = {
       ...initialData({ siret: 12312345600000, name: "emetteur" }),
       ...readyToTakeOverData({
-        siret: 53075596600047,
+        siret: transporter.siret,
         name: "transporteur"
       })
     };

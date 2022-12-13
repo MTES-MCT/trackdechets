@@ -174,7 +174,7 @@ describe("Mutation.createBsff", () => {
         message:
           "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
           "Destination : le nom de l'établissement est requis\n" +
-          "Destination : le numéro SIRET est requis\n" +
+          "Destinataire : le n°SIRET est un champ requis\n" +
           "Destination : l'adresse de l'établissement est requise\n" +
           "Destination : le nom du contact est requis\n" +
           "Destination : le numéro de téléphone est requis\n" +
@@ -182,7 +182,7 @@ describe("Mutation.createBsff", () => {
           "Le code de l'opération de traitement prévu est requis\n" +
           "Transporteur : le nom de l'établissement est requis\n" +
           "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire\n" +
-          "transporterCompanySiret n'est pas un numéro de SIRET valide\n" +
+          "Transporteur : SIRET invalide\n" +
           "Transporteur : l'adresse de l'établissement est requise\n" +
           "Transporteur : le nom du contact est requis\n" +
           "Transporteur : le numéro de téléphone est requis\n" +

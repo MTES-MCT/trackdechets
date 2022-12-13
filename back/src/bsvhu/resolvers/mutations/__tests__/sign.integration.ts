@@ -1,7 +1,11 @@
+import { CompanyType } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { Mutation } from "../../../../generated/graphql/types";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  companyFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsvhuFactory } from "../../../__tests__/factories.vhu";
 
@@ -45,9 +49,17 @@ describe("Mutation.Vhu.sign", () => {
 
   it("should set a default signature date if none is given", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory({
+      companyTypes: [CompanyType.TRANSPORTER]
+    });
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTE_VEHICLES]
+    });
     const bsvhu = await bsvhuFactory({
       opt: {
-        emitterCompanySiret: company.siret
+        emitterCompanySiret: company.siret,
+        transporterCompanySiret: transporter.siret,
+        destinationCompanySiret: destination.siret
       }
     });
 
@@ -65,9 +77,17 @@ describe("Mutation.Vhu.sign", () => {
 
   it("should use the provided date for the signature if  given", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory({
+      companyTypes: [CompanyType.TRANSPORTER]
+    });
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTE_VEHICLES]
+    });
     const bsvhu = await bsvhuFactory({
       opt: {
-        emitterCompanySiret: company.siret
+        emitterCompanySiret: company.siret,
+        transporterCompanySiret: transporter.siret,
+        destinationCompanySiret: destination.siret
       }
     });
 

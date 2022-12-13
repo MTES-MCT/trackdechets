@@ -2,11 +2,13 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { bsvhuFactory } from "../../../__tests__/factories.vhu";
 import {
+  companyFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
+import { CompanyType } from "@prisma/client";
 
 const UPDATE_VHU_FORM = `
 mutation EditVhuForm($id: ID!, $input: BsvhuInput!) {
@@ -102,9 +104,17 @@ describe("Mutation.Vhu.update", () => {
 
   it("should be possible to update a non signed form", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory({
+      companyTypes: [CompanyType.TRANSPORTER]
+    });
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTE_VEHICLES]
+    });
     const form = await bsvhuFactory({
       opt: {
-        emitterCompanySiret: company.siret
+        emitterCompanySiret: company.siret,
+        transporterCompanySiret: transporter.siret,
+        destinationCompanySiret: destination.siret
       }
     });
 
@@ -126,9 +136,18 @@ describe("Mutation.Vhu.update", () => {
 
   it("should allow emitter fields update before emitter signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory({
+      companyTypes: [CompanyType.TRANSPORTER]
+    });
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTE_VEHICLES]
+    });
+
     const form = await bsvhuFactory({
       opt: {
-        emitterCompanySiret: company.siret
+        emitterCompanySiret: company.siret,
+        transporterCompanySiret: transporter.siret,
+        destinationCompanySiret: destination.siret
       }
     });
 
@@ -184,11 +203,20 @@ describe("Mutation.Vhu.update", () => {
 
   it("should allow transporter fields update after emitter signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory({
+      companyTypes: [CompanyType.TRANSPORTER]
+    });
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTE_VEHICLES]
+    });
+
     const form = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureAuthor: "The Signatory",
-        emitterEmissionSignatureDate: new Date()
+        emitterEmissionSignatureDate: new Date(),
+        transporterCompanySiret: transporter.siret,
+        destinationCompanySiret: destination.siret
       }
     });
 

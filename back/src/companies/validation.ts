@@ -27,6 +27,10 @@ export function isWasteCenter(company: Company) {
   return company.companyTypes.includes(CompanyType.WASTE_CENTER);
 }
 
+export function isWasteVehicles(company: Company) {
+  return company.companyTypes.includes(CompanyType.WASTE_VEHICLES);
+}
+
 export function isTransporter(company: Company) {
   return company.companyTypes.includes(CompanyType.TRANSPORTER);
 }
@@ -60,7 +64,8 @@ export const destinationCompanySiretSchema = (isRequired = true) =>
           !(
             isCollector(company) ||
             isWasteProcessor(company) ||
-            isWasteCenter(company)
+            isWasteCenter(company) ||
+            isWasteVehicles(company)
           )
         ) {
           throw ctx.createError({
