@@ -3,7 +3,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { indexBsff } from "../../elastic";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { expandBsffFromDB } from "../../converter";
-import { isBsffContributor } from "../../permissions";
+import { checkCanWriteBsff } from "../../permissions";
 import { getBsffOrNotFound } from "../../database";
 import { GraphQLContext } from "../../../types";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
@@ -17,7 +17,7 @@ const duplicateBsff: MutationResolvers["duplicateBsff"] = async (
   const user = checkIsAuthenticated(context);
   const existingBsff = await getBsffOrNotFound({ id });
 
-  await isBsffContributor(user, existingBsff);
+  await checkCanWriteBsff(user, existingBsff);
 
   const duplicatedBsff = await prisma.bsff.create({
     data: {

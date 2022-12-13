@@ -4,6 +4,7 @@ import { IconCheckCircle1, IconCopyPaste } from "common/components/Icons";
 import { NewAccessToken } from "generated/graphql/types";
 import AccountAccessTokenRevoke from "./AccountAccessTokenRevoke";
 import styles from "./AccountAccessToken.module.scss";
+import { DEVELOPERS_DOCUMENTATION_URL } from "common/config";
 
 type AccountNewAccessTokenProps = {
   accessToken: NewAccessToken;
@@ -19,8 +20,21 @@ export default function AccountNewAccessToken({
   return (
     <>
       <div className="notification success">
-        Un nouveau jeton d'accès a été généré ! Pensez à le copier maintenant.
-        Vous ne serez plus en mesure de le consulter ultérieurement.
+        <p>
+          Un nouveau jeton d'accès a été généré ! Pensez à le copier maintenant.
+          Vous ne serez plus en mesure de le consulter ultérieurement.
+        </p>
+        <strong>
+          🚨 Ce jeton est confidentiel, ne le diffusez pas, et consultez nos{" "}
+          <a
+            href={`${DEVELOPERS_DOCUMENTATION_URL}/tutoriels/quickstart/access-token`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            recommandations de sécurité{" "}
+          </a>
+          dans la documentation.
+        </strong>
       </div>
       <div className={`${styles.token} ${styles.newToken}`}>
         <div className={styles.newTokenGroupItems}>

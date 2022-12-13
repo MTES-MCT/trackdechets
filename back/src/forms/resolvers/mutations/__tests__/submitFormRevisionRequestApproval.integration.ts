@@ -347,4 +347,88 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
 
     expect(updatedBsdd.wasteDetailsCode).not.toBe("01 03 08");
   });
+
+  it("should change the bsdd status when accepted, if the operation code is now a groupement one", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        status: "PROCESSED"
+      }
+    });
+
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret } },
+        processingOperationDone: "R 13",
+        comment: ""
+      }
+    });
+
+    await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">,
+      MutationSubmitFormRevisionRequestApprovalArgs
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    const updatedBsdd = await prisma.form.findUnique({
+      where: { id: bsdd.id }
+    });
+
+    expect(updatedBsdd.status).toBe("AWAITING_GROUP");
+  });
+
+  it("should change the bsdd status when accepted, if the operation code is now a final one", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        status: "AWAITING_GROUP"
+      }
+    });
+
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret } },
+        processingOperationDone: "D 5",
+        comment: ""
+      }
+    });
+
+    await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">,
+      MutationSubmitFormRevisionRequestApprovalArgs
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    const updatedBsdd = await prisma.form.findUnique({
+      where: { id: bsdd.id }
+    });
+
+    expect(updatedBsdd.status).toBe("PROCESSED");
+  });
 });

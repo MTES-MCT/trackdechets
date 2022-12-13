@@ -5,7 +5,7 @@ import {
   flattenFicheInterventionBsffInput,
   expandFicheInterventionBsffFromDB
 } from "../../converter";
-import { isFicheInterventionOperateur } from "../../permissions";
+import { checkCanWriteFicheIntervention } from "../../permissions";
 import { validateFicheIntervention } from "../../validation";
 
 const createFicheInterventionBsff: MutationResolvers["createFicheInterventionBsff"] =
@@ -13,7 +13,7 @@ const createFicheInterventionBsff: MutationResolvers["createFicheInterventionBsf
     const user = checkIsAuthenticated(context);
 
     const flatInput = flattenFicheInterventionBsffInput(input);
-    await isFicheInterventionOperateur(user, flatInput);
+    await checkCanWriteFicheIntervention(user, flatInput);
 
     await validateFicheIntervention(flatInput);
 

@@ -1,4 +1,9 @@
-import { WasteAcceptationStatus } from "@prisma/client";
+import {
+  CompanyType,
+  CompanyVerificationStatus,
+  WasteAcceptationStatus,
+  BsffFicheIntervention
+} from "@prisma/client";
 import {
   receptionSchema,
   emitterSchemaFn,
@@ -6,8 +11,24 @@ import {
   destinationSchemaFn,
   wasteDetailsSchemaFn,
   acceptationSchema,
-  operationSchema
+  operationSchema,
+  ficheInterventionSchema
 } from "../validation";
+
+jest.mock("../../prisma", () => ({
+  company: {
+    findUnique: jest.fn(() =>
+      Promise.resolve({
+        companyTypes: [
+          CompanyType.COLLECTOR,
+          CompanyType.WASTEPROCESSOR,
+          CompanyType.TRANSPORTER
+        ],
+        verificationStatus: CompanyVerificationStatus.VERIFIED
+      })
+    )
+  }
+}));
 
 describe("emitterSchema", () => {
   const emitter = {
@@ -56,8 +77,8 @@ describe("transporterSchema", () => {
 
   const transporterSchema = transporterSchemaFn(false);
 
-  test("valid data", () => {
-    expect(transporterSchema.isValidSync(transporter)).toEqual(true);
+  test("valid data", async () => {
+    expect(await transporterSchema.isValid(transporter)).toEqual(true);
   });
 
   test("invalid SIRET", async () => {
@@ -68,7 +89,7 @@ describe("transporterSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Transporteur : le n° SIRET n'est pas au bon format"
+      "transporterCompanySiret n'est pas un numéro de SIRET valide"
     );
   });
 
@@ -98,8 +119,8 @@ describe("destinationSchema", () => {
 
   const destinationSchema = destinationSchemaFn(false);
 
-  test("valid data", () => {
-    expect(destinationSchema.isValidSync(destination)).toEqual(true);
+  test("valid data", async () => {
+    expect(await destinationSchema.isValid(destination)).toEqual(true);
   });
 
   test("invalid SIRET", async () => {
@@ -110,7 +131,7 @@ describe("destinationSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Destination : le n°SIRET n'est pas au bon format"
+      "Destinataire: Le SIRET doit faire 14 caractères numériques"
     );
   });
 
@@ -148,7 +169,7 @@ describe("wasteDetailsSchema", () => {
     weightIsEstimate: true,
     packagings: [
       {
-        name: "BOUTEILLE",
+        type: "BOUTEILLE",
         numero: "123",
         weight: 1,
         volume: 1
@@ -475,6 +496,94 @@ describe("operationSchema", () => {
     const validateFn = () => operationSchema.validate(data);
     await expect(validateFn()).rejects.toThrow(
       "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : R2, R3, R12, R13, D10, D13, D14, D15"
+    );
+  });
+});
+
+describe("ficheInterventionSchema", () => {
+  const ficheIntevention: Partial<BsffFicheIntervention> = {
+    numero: "FI-1",
+    weight: 1,
+    postalCode: "13001",
+
+    operateurCompanyName: "Operateur",
+    operateurCompanySiret: "22222222222222",
+    operateurCompanyAddress: "Quelque part",
+    operateurCompanyContact: "Arya Stark",
+    operateurCompanyPhone: "01 00 00 00 00",
+    operateurCompanyMail: "arya.stark@trackdechets.fr"
+  };
+
+  const detenteurCompany: Partial<BsffFicheIntervention> = {
+    detenteurCompanyName: "Detenteur",
+    detenteurCompanySiret: "11111111111111",
+    detenteurCompanyAddress: "Quelque part",
+    detenteurCompanyContact: "John Snow",
+    detenteurCompanyPhone: "00 00 00 00 00",
+    detenteurCompanyMail: "john.snow@trackdechets.fr"
+  };
+
+  const privateIndividual: Partial<BsffFicheIntervention> = {
+    detenteurIsPrivateIndividual: true,
+    detenteurCompanySiret: null,
+    detenteurCompanyContact: null,
+    detenteurCompanyName: "John Snow",
+    detenteurCompanyAddress: "Quelque part",
+    detenteurCompanyMail: "john.snow@trackdechets.fr",
+    detenteurCompanyPhone: "00 00 00 00 00"
+  };
+
+  it("should be valid when company info is complete", () => {
+    expect(
+      ficheInterventionSchema.isValidSync({
+        ...ficheIntevention,
+        ...detenteurCompany
+      })
+    ).toBe(true);
+  });
+
+  it("should be invalid when a company field is missing", async () => {
+    const data = {
+      ...ficheIntevention,
+      ...detenteurCompany,
+      detenteurCompanyContact: null
+    };
+    const validateFn = () => ficheInterventionSchema.validate(data);
+    await expect(validateFn()).rejects.toThrow(
+      "Le nom du contact de l'entreprise détentrice de l'équipement est requis"
+    );
+  });
+
+  it("should be valid when private individual info is complete", () => {
+    expect(
+      ficheInterventionSchema.isValidSync({
+        ...ficheIntevention,
+        ...privateIndividual
+      })
+    ).toBe(true);
+  });
+
+  it("should be invalid when a private individual field is missing", async () => {
+    const data = {
+      ...ficheIntevention,
+      ...privateIndividual,
+      detenteurCompanyAddress: null
+    };
+    const validateFn = () => ficheInterventionSchema.validate(data);
+    await expect(validateFn()).rejects.toThrow(
+      "L'addresse du détenteur de l'équipement (particulier) est requise"
+    );
+  });
+
+  it("should not be valid when providing both company and private indivual info", async () => {
+    const data = {
+      ...ficheIntevention,
+      ...privateIndividual,
+      ...detenteurCompany
+    };
+    const validateFn = () => ficheInterventionSchema.validate(data);
+    await expect(validateFn()).rejects.toThrow(
+      "Vous ne pouvez pas renseigner de n°SIRET lorsque le détenteur est un particulier"
     );
   });
 });

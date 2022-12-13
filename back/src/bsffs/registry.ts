@@ -35,7 +35,10 @@ export function getRegistryFields(
     bsff.emitterEmissionSignatureDate &&
     bsff.transporterTransportSignatureDate
   ) {
-    registryFields.isOutgoingWasteFor.push(bsff.emitterCompanySiret);
+    registryFields.isOutgoingWasteFor.push(
+      bsff.emitterCompanySiret,
+      ...bsff.detenteurCompanySirets
+    );
     registryFields.isTransportedWasteFor.push(bsff.transporterCompanySiret);
   }
 
@@ -164,10 +167,14 @@ export function toOutgoingWaste(
 
   if (bsff.type === BsffType.REEXPEDITION) {
     const initialBsff = bsff.packagings[0]?.previousPackagings[0]?.bsff;
-    initialEmitter.initialEmitterCompanyAddress =
-      initialBsff.emitterCompanyAddress;
-    initialEmitter.initialEmitterCompanyName = initialBsff.emitterCompanyName;
-    initialEmitter.initialEmitterCompanySiret = initialBsff.emitterCompanySiret;
+    if (initialBsff) {
+      // Legagcy reexpedition BSFFs may have been created without linking to previous packagings
+      initialEmitter.initialEmitterCompanyAddress =
+        initialBsff.emitterCompanyAddress;
+      initialEmitter.initialEmitterCompanyName = initialBsff.emitterCompanyName;
+      initialEmitter.initialEmitterCompanySiret =
+        initialBsff.emitterCompanySiret;
+    }
   }
 
   if (

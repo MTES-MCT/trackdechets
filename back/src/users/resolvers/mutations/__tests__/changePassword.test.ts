@@ -12,22 +12,33 @@ jest.mock("../../../../prisma", () => ({
   }
 }));
 
+const clearUserSessionsMock = jest.fn();
+const storeUserSessionsIdMock = jest.fn();
+jest.mock("../../../../common/redis/users", () => ({
+  clearUserSessions: jest.fn((...args) => clearUserSessionsMock(...args)),
+  storeUserSessionsId: jest.fn((...args) => storeUserSessionsIdMock(...args))
+}));
+
 describe("changePassword", () => {
   beforeEach(() => {
     userMock.mockReset();
     updateUserMock.mockReset();
   });
 
-  it("should raise BAD_USER_INPU exception if hash comparison fails", async () => {
+  it("should raise BAD_USER_INPUT exception if hash comparison fails", async () => {
     userMock.mockResolvedValueOnce({
       password: await hashPassword("oldPassword")
     });
     expect.assertions(1);
     try {
-      await changePassword("userId", {
-        oldPassword: "badOldPassword",
-        newPassword: "newPassword"
-      });
+      await changePassword(
+        "userId",
+        {
+          oldPassword: "badOldPassword",
+          newPassword: "trackdechets#"
+        },
+        "xyz"
+      );
     } catch (e) {
       expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
     }
@@ -38,10 +49,14 @@ describe("changePassword", () => {
     userMock.mockResolvedValueOnce({
       password: hashedPassword
     });
-    await changePassword("userId", {
-      oldPassword: "oldPassword",
-      newPassword: "newPassword"
-    });
+    await changePassword(
+      "userId",
+      {
+        oldPassword: "oldPassword",
+        newPassword: "trackdechets#"
+      },
+      "xyz"
+    );
     expect(updateUserMock).toHaveBeenCalled();
   });
 });

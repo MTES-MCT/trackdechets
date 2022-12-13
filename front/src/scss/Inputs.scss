@@ -142,11 +142,11 @@ select:-moz-focusring {
   @include input;
 }
 .td-input--small {
-  width: 150px;
+  max-width: 150px;
   display: block;
 }
 .td-input--medium {
-  width: 400px;
+  max-width: 400px;
   display: block;
 }
 .td-date-wrapper {

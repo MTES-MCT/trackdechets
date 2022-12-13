@@ -5,7 +5,6 @@ import { BsffActions } from "./BsffActions/BsffActions";
 import { BsffFragment } from "./types";
 import { ActionButtonContext } from "common/components/ActionButton";
 import { WorkflowAction } from "./WorkflowAction";
-import { useParams } from "react-router-dom";
 import { bsffVerboseStatuses } from "form/bsff/utils/constants";
 import { UpdateTransporterCustomInfo } from "./BsffActions/UpdateTransporterCustomInfo";
 import { UpdateTransporterPlates } from "./BsffActions/UpdateTransporterPlates";
@@ -86,17 +85,18 @@ export const COLUMNS: Record<
   workflow: {
     accessor: () => null,
     Cell: ({ row }) => {
-      const { siret } = useParams<{ siret: string }>();
       return (
         <ActionButtonContext.Provider value={{ size: "small" }}>
-          <WorkflowAction siret={siret} form={row.original} />
+          <WorkflowAction form={row.original} />
         </ActionButtonContext.Provider>
       );
     },
   },
   actions: {
     accessor: () => null,
-    Cell: ({ row }) => <BsffActions form={row.original} />,
+    Cell: ({ row }) => {
+      return <BsffActions form={row.original} />;
+    },
   },
 };
 

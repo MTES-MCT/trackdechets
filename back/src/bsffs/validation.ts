@@ -7,18 +7,19 @@ import {
   BsffFicheIntervention,
   BsffType,
   Prisma,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  BsffPackagingType
 } from "@prisma/client";
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { isFinalOperation, OPERATION } from "./constants";
 import prisma from "../prisma";
-import {
-  isVat,
-  isSiret,
-  isFRVat
-} from "../common/constants/companySearchHelpers";
+import { isVat } from "../common/constants/companySearchHelpers";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { BSFF_WASTE_CODES } from "../common/constants";
+import {
+  destinationCompanySiretSchema,
+  transporterCompanySiretSchema
+} from "../companies/validation";
 
 configureYup();
 
@@ -136,28 +137,7 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
           !isDraft,
           "Transporteur : le nom de l'établissement est requis"
         ),
-      transporterCompanySiret: yup
-        .string()
-        .ensure()
-        .when("transporterCompanyVatNumber", (tva, schema) => {
-          if (!tva && !isDraft) {
-            return schema
-              .required(
-                "Transporteur : le n° SIRET ou le numéro de TVA intracommunautaire est requis"
-              )
-              .test(
-                "is-siret",
-                "Transporteur : le n° SIRET n'est pas au bon format",
-                value => isSiret(value)
-              );
-          }
-          if (!isDraft && tva && isFRVat(tva)) {
-            return schema.required(
-              "Transporteur : le n° SIRET est requis pour un établissement français"
-            );
-          }
-          return schema.nullable().notRequired();
-        }),
+      transporterCompanySiret: transporterCompanySiretSchema(isDraft),
       transporterCompanyVatNumber: yup
         .string()
         .ensure()
@@ -202,15 +182,30 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
           )
           .of<
             yup.SchemaOf<
-              Pick<PrismaBsffPackaging, "name" | "numero" | "volume" | "weight">
+              Pick<
+                PrismaBsffPackaging,
+                "type" | "other" | "numero" | "volume" | "weight"
+              >
             >
           >(
             yup.object({
-              name: yup
+              type: yup
+                .mixed<BsffPackagingType>()
+                .required("Conditionnements : le type de contenant est requis"),
+              other: yup
                 .string()
-                .ensure()
-                .required(
-                  "Conditionnements : la dénomination du contenant est requise"
+                .when("type", (type, schema) =>
+                  type === "AUTRE"
+                    ? schema.requiredIf(
+                        !isDraft,
+                        "La description doit être précisée pour le conditionnement 'AUTRE'."
+                      )
+                    : schema
+                        .nullable()
+                        .max(
+                          0,
+                          "La description ne peut être renseigné que lorsque le type de conditionnement est 'AUTRE'."
+                        )
                 ),
               volume: yup
                 .number()
@@ -268,15 +263,10 @@ export const destinationSchemaFn: FactorySchemaOf<boolean, Destination> =
           !isDraft,
           "Destination : le nom de l'établissement est requis"
         ),
-      destinationCompanySiret: yup
-        .string()
-        .requiredIf(
-          !isDraft,
-          "Destination : le n°SIRET de l'établissement est requis"
-        )
-        .matches(/^$|^\d{14}$/, {
-          message: "Destination : le n°SIRET n'est pas au bon format"
-        }),
+      destinationCompanySiret: destinationCompanySiretSchema.requiredIf(
+        !isDraft,
+        `Destination : le numéro SIRET est requis`
+      ),
       destinationCompanyAddress: yup
         .string()
         .requiredIf(
@@ -558,7 +548,10 @@ export const draftBsffSchema = baseBsffSchemaFn(true);
 
 export async function validateBsff(
   bsff: Partial<Bsff | Prisma.BsffCreateInput> & {
-    packagings?: Pick<BsffPackaging, "name" | "numero" | "volume" | "weight">[];
+    packagings?: Pick<
+      BsffPackaging,
+      "type" | "name" | "other" | "numero" | "volume" | "weight"
+    >[];
   }
 ) {
   try {
@@ -588,20 +581,23 @@ export async function validateFicheInterventions(
     return;
   }
 
-  const allowedTypes: BsffType[] = [
-    BsffType.TRACER_FLUIDE,
-    BsffType.COLLECTE_PETITES_QUANTITES
-  ];
+  const allowedTypes: BsffType[] = [BsffType.COLLECTE_PETITES_QUANTITES];
   if (!allowedTypes.includes(bsff.type)) {
     throw new UserInputError(
-      `Le type de bordereau choisi ne permet pas d'associer des fiches d'intervention.`
+      `Le type de BSFF choisi ne permet pas d'associer des fiches d'intervention.`
     );
   }
 
-  if (bsff.type === BsffType.TRACER_FLUIDE && ficheInterventions.length > 1) {
-    throw new UserInputError(
-      `Le type de bordereau choisi ne permet pas d'associer plusieurs fiches d'intervention.`
-    );
+  for (const ficheIntervention of ficheInterventions) {
+    if (
+      bsff.emitterCompanySiret &&
+      ficheIntervention.operateurCompanySiret &&
+      bsff.emitterCompanySiret !== ficheIntervention.operateurCompanySiret
+    ) {
+      throw new UserInputError(
+        `L'opérateur identifié sur la fiche d'intervention ${ficheIntervention.numero} ne correspond pas à l'émetteur de BSFF`
+      );
+    }
   }
 }
 
@@ -933,7 +929,7 @@ export function validateBeforeOperation(
   });
 }
 
-const ficheInterventionSchema: yup.SchemaOf<
+export const ficheInterventionSchema: yup.SchemaOf<
   Pick<
     BsffFicheIntervention,
     | "numero"
@@ -945,6 +941,7 @@ const ficheInterventionSchema: yup.SchemaOf<
     | "detenteurCompanyContact"
     | "detenteurCompanyPhone"
     | "detenteurCompanyMail"
+    | "detenteurIsPrivateIndividual"
     | "operateurCompanyName"
     | "operateurCompanySiret"
     | "operateurCompanyAddress"
@@ -960,36 +957,92 @@ const ficheInterventionSchema: yup.SchemaOf<
   postalCode: yup
     .string()
     .required("Le code postal du lieu de l'intervention est requis"),
+  detenteurIsPrivateIndividual: yup.boolean(),
+  detenteurCompanySiret: yup.string().when("detenteurIsPrivateIndividual", {
+    is: true,
+    then: schema =>
+      schema
+        .nullable()
+        .notRequired()
+        .max(
+          0,
+          "Vous ne pouvez pas renseigner de n°SIRET lorsque le détenteur est un particulier"
+        ),
+    otherwise: schema =>
+      schema
+        .ensure()
+        .required(
+          "Le SIRET de l'entreprise détentrice de l'équipement est requis"
+        )
+        .matches(/^$|^\d{14}$/, {
+          message:
+            "Le SIRET de l'entreprise détentrice de l'équipement n'est pas au bon format (${length} caractères)"
+        })
+  }),
   detenteurCompanyName: yup
     .string()
-    .required("Le nom de l'entreprise détentrice de l'équipement est requis"),
-  detenteurCompanySiret: yup
-    .string()
-    .required("Le SIRET de l'entreprise détentrice de l'équipement est requis")
-    .matches(/^$|^\d{14}$/, {
-      message:
-        "Le SIRET de l'entreprise détentrice de l'équipement n'est pas au bon format (${length} caractères)"
+    .ensure()
+    .when("detenteurIsPrivateIndividual", {
+      is: true,
+      then: schema =>
+        schema.required(
+          "Le nom du détenteur de l'équipement (particulier) est requis"
+        ),
+      otherwise: schema =>
+        schema.required(
+          "Le nom de l'entreprise détentrice de l'équipement est requise"
+        )
     }),
   detenteurCompanyAddress: yup
     .string()
-    .required(
-      "L'addresse de l'entreprise détentrice de l'équipement est requise"
-    ),
+    .ensure()
+    .when("detenteurIsPrivateIndividual", {
+      is: true,
+      then: schema =>
+        schema.required(
+          "L'addresse du détenteur de l'équipement (particulier) est requise"
+        ),
+      otherwise: schema =>
+        schema.required(
+          "L'addresse de l'entreprise détentrice de l'équipement est requise"
+        )
+    }),
   detenteurCompanyContact: yup
     .string()
-    .required(
-      "Le nom du contact de l'entreprise détentrice de l'équipement est requis"
-    ),
+    .ensure()
+    .when("detenteurIsPrivateIndividual", {
+      is: true,
+      then: schema => schema.nullable().notRequired(),
+      otherwise: schema =>
+        schema
+          .ensure()
+          .required(
+            "Le nom du contact de l'entreprise détentrice de l'équipement est requis"
+          )
+    }),
   detenteurCompanyPhone: yup
     .string()
-    .required(
-      "Le numéro de téléphone de l'entreprise détentrice de l'équipement est requis"
-    ),
+    .ensure()
+    .when("detenteurIsPrivateIndividual", {
+      is: true,
+      then: schema => schema.nullable().notRequired(),
+      otherwise: schema =>
+        schema.required(
+          "Le numéro de téléphone de l'entreprise détentrice de l'équipement est requis"
+        )
+    }),
   detenteurCompanyMail: yup
     .string()
-    .required(
-      "L'addresse email de l'entreprise détentrice de l'équipement est requis"
-    ),
+    .email()
+    .ensure()
+    .when("detenteurIsPrivateIndividual", {
+      is: true,
+      then: schema => schema.nullable().notRequired(),
+      otherwise: schema =>
+        schema.required(
+          "L'addresse email de l'entreprise détentrice de l'équipement est requis"
+        )
+    }),
   operateurCompanyName: yup
     .string()
     .required("Le nom de l'entreprise de l'opérateur est requis"),
@@ -1017,7 +1070,9 @@ const ficheInterventionSchema: yup.SchemaOf<
 });
 
 export function validateFicheIntervention(
-  ficheIntervention: typeof ficheInterventionSchema["__outputType"]
+  ficheIntervention:
+    | BsffFicheIntervention
+    | Prisma.BsffFicheInterventionCreateInput
 ) {
   return ficheInterventionSchema.validate(ficheIntervention, {
     abortEarly: false

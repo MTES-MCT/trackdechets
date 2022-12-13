@@ -339,8 +339,7 @@ describe("Mutation.creatPdfAccessToken", () => {
     );
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Vous ne pouvez pas éditer un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas.",
+        message: "Vous ne pouvez pas accéder à ce BSFF",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })

@@ -11,8 +11,27 @@ let LOG_PATH =
 // Avoid using undefined console.log() in jest context
 const LOG_TO_CONSOLE =
   process.env.FORCE_LOGGER_CONSOLE && process.env.JEST_WORKER_ID === undefined;
+// use http transport when datadog agent installation is impossible (eg. one-off container)
+const LOG_TO_HTTP = process.env.LOG_TO_HTTP && process.env.JEST_WORKER_ID === undefined;
 
-// Docs https://docs.datadoghq.com/fr/logs/log_collection/nodejs/?tab=winston30
+
+const logger_transports_fallbacks = [
+  LOG_TO_CONSOLE
+    ? new transports.Console({
+        // Simple `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
+        format: format.simple()
+      })
+    : LOG_TO_HTTP
+    ? new transports.Http({
+        host: "http-intake.logs.datadoghq.com",
+        path: `/api/v2/logs?dd-api-key=${
+          process.env.DD_API_KEY
+        }&ddsource=nodejs&service=${process.env.DD_APP_NAME || "search"}`,
+        ssl: true
+      })
+    : new transports.File({ filename: LOG_PATH })
+]
+
 const logger = createLogger({
   level: "info",
   exitOnError: false,
@@ -21,22 +40,9 @@ const logger = createLogger({
     format.metadata(),
     format.json()
   ),
-  transports: [
-    !LOG_TO_CONSOLE
-      ? new transports.File({ filename: LOG_PATH })
-      : new transports.Console({
-          // Simple `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
-          format: format.simple()
-        })
-  ],
+  transports: logger_transports_fallbacks,
   // capture exceptions, also for datadog to report it
-  exceptionHandlers: [
-    !LOG_TO_CONSOLE
-      ? new transports.File({ filename: LOG_PATH })
-      : new transports.Console({
-          format: format.simple()
-        })
-  ]
+  exceptionHandlers: logger_transports_fallbacks
 });
 
 export { logger };

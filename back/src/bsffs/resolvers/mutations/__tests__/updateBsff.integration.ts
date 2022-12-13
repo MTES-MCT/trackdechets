@@ -1,4 +1,9 @@
-import { UserRole, BsffType, BsffStatus } from "@prisma/client";
+import {
+  UserRole,
+  BsffType,
+  BsffStatus,
+  BsffPackagingType
+} from "@prisma/client";
 import { gql } from "apollo-server-core";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { BSFF_WASTE_CODES } from "../../../../common/constants";
@@ -68,7 +73,7 @@ describe("Mutation.updateBsff", () => {
       { emitter },
       {
         packagings: {
-          create: { name: "BOUTEILLE", weight: 1, numero: "1" }
+          create: { type: BsffPackagingType.BOUTEILLE, weight: 1, numero: "1" }
         },
         isDraft: true
       }
@@ -89,8 +94,18 @@ describe("Mutation.updateBsff", () => {
         id: bsff.id,
         input: {
           packagings: [
-            { name: "BOUTEILLE", weight: 1, numero: "2", volume: 1 },
-            { name: "BOUTEILLE", weight: 1, numero: "3", volume: 1 }
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              weight: 1,
+              numero: "2",
+              volume: 1
+            },
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              weight: 1,
+              numero: "3",
+              volume: 1
+            }
           ]
         }
       }
@@ -169,7 +184,7 @@ describe("Mutation.updateBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Le bordereau de fluides frigorigènes n°123 n'existe pas."
+        message: "Le BSFF n°123 n'existe pas."
       })
     ]);
   });
@@ -197,7 +212,7 @@ describe("Mutation.updateBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le bordereau de fluides frigorigènes n°${bsff.id} n'existe pas.`
+        message: `Le BSFF n°${bsff.id} n'existe pas.`
       })
     ]);
   });
@@ -701,7 +716,7 @@ describe("Mutation.updateBsff", () => {
         type: BsffType.RECONDITIONNEMENT,
         packagings: {
           create: {
-            name: "Citerne",
+            type: BsffPackagingType.BOUTEILLE,
             numero: "numero",
             volume: 1,
             weight: 1,
@@ -878,43 +893,58 @@ describe("Mutation.updateBsff", () => {
     expect(data.updateBsff.id).toBeTruthy();
   });
 
-  it("should update a bsff with fiches d'intervention", async () => {
+  it("should be possible to update a bsff's fiches d'intervention", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur1 = await userWithCompanyFactory(UserRole.ADMIN);
+    const detenteur2 = await userWithCompanyFactory(UserRole.ADMIN);
+
     const ficheInterventions = await Promise.all([
       createFicheIntervention({
         operateur: emitter,
-        detenteur: await userWithCompanyFactory(UserRole.ADMIN)
+        detenteur: detenteur1
       })
     ]);
     const bsff = await createBsffBeforeEmission(
       { emitter },
       {
         isDraft: true,
+        type: "COLLECTE_PETITES_QUANTITES",
+        detenteurCompanySirets: [detenteur1.company.siret],
         ficheInterventions: {
           connect: ficheInterventions.map(({ id }) => ({ id }))
         }
       }
     );
 
+    const ficheIntervention = await createFicheIntervention({
+      operateur: emitter,
+      detenteur: detenteur2
+    });
+
     const { mutate } = makeClient(emitter.user);
-    const { data, errors } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
       variables: {
         id: bsff.id,
         input: {
-          emitter: {
-            company: {
-              name: "New Name"
-            }
-          }
+          ficheInterventions: [ficheIntervention.id]
         }
       }
     });
 
     expect(errors).toBeUndefined();
-    expect(data.updateBsff.id).toBeTruthy();
+    const updatedBsff = await prisma.bsff.findUnique({
+      where: { id: bsff.id },
+      include: { ficheInterventions: true }
+    });
+    expect(updatedBsff.ficheInterventions).toEqual([
+      expect.objectContaining({ id: ficheIntervention.id })
+    ]);
+    expect(updatedBsff.detenteurCompanySirets).toEqual([
+      detenteur2.company.siret
+    ]);
   });
 
   it("should not be possible to update BSFF type", async () => {

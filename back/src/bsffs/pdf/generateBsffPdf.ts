@@ -42,7 +42,7 @@ export async function generateBsffPdf(
     .packagings();
 
   // TODO handle differenciate acceptation, analysis and treatment by packaging
-  const packaging = bsff.packagings[0];
+  const packaging = bsff.packagings?.length === 1 ? bsff.packagings[0] : null;
 
   const bsffType = {
     isTracerFluide: bsff.type === BsffType.TRACER_FLUIDE,
@@ -56,8 +56,7 @@ export async function generateBsffPdf(
     isRecuperationR2: packaging?.operationCode === OPERATION.R2.code,
     isRecyclageR3: packaging?.operationCode === OPERATION.R3.code,
     isIncinerationD10: packaging?.operationCode === OPERATION.D10.code,
-    isGroupementR12:
-      packaging?.operationCode === OPERATION.R12.code && bsffType.isGroupement,
+    isGroupementR12: packaging?.operationCode === OPERATION.R12.code,
     isGroupementD13: packaging?.operationCode === OPERATION.D13.code,
     isReconditionnementR12:
       packaging?.operationCode === OPERATION.R12.code &&
@@ -76,7 +75,7 @@ export async function generateBsffPdf(
   const signatures = {
     emission: bsff.emitterEmissionSignatureDate ? signature : "",
     transport: bsff.transporterTransportSignatureDate ? signature : "",
-    reception: bsff.destinationReceptionDate ? signature : "",
+    reception: packaging?.acceptationSignatureDate ? signature : "",
     operation: packaging?.operationSignatureDate ? signature : ""
   };
 
@@ -93,20 +92,21 @@ export async function generateBsffPdf(
       .map(
         packaging =>
           `${[
-            packaging.name,
+            packaging.type === "AUTRE" ? packaging.other : packaging.type,
             packaging.volume ? `${packaging.volume}L` : null,
             `n°${packaging.numero}`
           ]
             .filter(Boolean)
-            .join(" ")} : ${packaging.weight} kilo(s)`
+            .join(" ")} : ${packaging.weight} kg`
       )
       .join(", "),
+    packaging: packaging,
     receptionAccepted:
       !!bsff.destinationReceptionDate &&
-      packaging.acceptationStatus === WasteAcceptationStatus.ACCEPTED,
+      packaging?.acceptationStatus === WasteAcceptationStatus.ACCEPTED,
     recepetionRefused:
       !!bsff.destinationReceptionDate &&
-      packaging.acceptationStatus === WasteAcceptationStatus.REFUSED,
+      packaging?.acceptationStatus === WasteAcceptationStatus.REFUSED,
     ficheInterventions: [
       ...ficheInterventions,
 

@@ -7,7 +7,7 @@ import {
 } from "../../converter";
 import { validateFicheIntervention } from "../../validation";
 import { getFicheInterventionBsffOrNotFound } from "../../database";
-import { isFicheInterventionOperateur } from "../../permissions";
+import { checkCanWriteFicheIntervention } from "../../permissions";
 
 const updateFicheInterventionBsff: MutationResolvers["updateFicheInterventionBsff"] =
   async (_, { id, input }, context) => {
@@ -17,13 +17,13 @@ const updateFicheInterventionBsff: MutationResolvers["updateFicheInterventionBsf
     const existingFicheIntervention = await getFicheInterventionBsffOrNotFound({
       id
     });
-    await isFicheInterventionOperateur(user, existingFicheIntervention);
+    await checkCanWriteFicheIntervention(user, existingFicheIntervention);
 
     const futureFicheIntervention = {
       ...existingFicheIntervention,
       ...ficheInterventionData
     };
-    await isFicheInterventionOperateur(user, futureFicheIntervention);
+    await checkCanWriteFicheIntervention(user, futureFicheIntervention);
 
     await validateFicheIntervention(futureFicheIntervention);
 

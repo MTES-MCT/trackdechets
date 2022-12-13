@@ -6,6 +6,18 @@ const fs = require("fs");
 
 const app = express();
 
+const DEFAULT_SRC = [
+  "'self'",
+  "*.trackdechets.beta.gouv.fr",
+  "*.trackdechets.fr",
+];
+
+const CONNECT_SRC = [
+  ...DEFAULT_SRC,
+  "https://api-adresse.data.gouv.fr",
+  "https://sentry.incubateur.net",
+];
+
 app.use(
   helmet({
     frameguard: {
@@ -14,11 +26,8 @@ app.use(
     crossOriginEmbedderPolicy: false,
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: [
-          "'self'",
-          "*.trackdechets.beta.gouv.fr",
-          "*.trackdechets.fr",
-        ],
+        defaultSrc: DEFAULT_SRC,
+        connectSrc: CONNECT_SRC,
         baseUri: "'self'",
         formAction: ["http:"], // allow external redirects for oauth workflow
         fontSrc: ["'self'", "https:", "data:"],
@@ -46,11 +55,11 @@ const indexContent =
       )
     : raw;
 
-app.get("/*", function(req, res) {
+app.get("/*", function (req, res) {
   res.send(indexContent);
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, function() {
+app.listen(port, function () {
   console.log("Trackdechets front listening on", port);
 });

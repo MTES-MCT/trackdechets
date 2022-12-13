@@ -555,7 +555,7 @@ describe("Mutation.updateBsda", () => {
         }
       ]
     };
-    const { data, errors } = await mutate<
+    const { data } = await mutate<
       Pick<Mutation, "updateBsda">,
       MutationUpdateBsdaArgs
     >(UPDATE_BSDA, {
@@ -564,9 +564,106 @@ describe("Mutation.updateBsda", () => {
         input
       }
     });
-    console.log(errors);
 
     expect(data.updateBsda.intermediaries.length).toBe(1);
     expect(data.updateBsda.intermediaries[0].siret).toBe(otherCompany.siret);
+  });
+
+  it("should ignore intermediaries update if the value hasn't changed", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        status: "SENT", // Bsda is sent => intermediaries cannot be updated anymore
+        transporterTransportSignatureDate: new Date(),
+        intermediaries: {
+          create: {
+            siret: company.siret,
+            name: company.name,
+            address: company.address,
+            contact: "John Doe"
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    // We pass an update with the same value as before.
+    // Even if the field is locked, this should be ignored
+    const input = {
+      intermediaries: [
+        {
+          siret: company.siret,
+          name: company.name,
+          address: company.address,
+          contact: "John Doe"
+        }
+      ]
+    };
+    const { data } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(data.updateBsda.intermediaries.length).toBe(1);
+  });
+
+  it("should reject if updating intermediaries when its value is locked", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { company: otherCompany } = await userWithCompanyFactory(
+      UserRole.ADMIN
+    );
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        status: "SENT", // Bsda is sent => intermediaries cannot be updated anymore
+        transporterTransportSignatureDate: new Date(),
+        intermediaries: {
+          create: {
+            siret: company.siret,
+            name: company.name,
+            address: company.address,
+            contact: "John Doe"
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    // We pass an update with the same value as before.
+    // Even if the field is locked, this should be ignored
+    const input = {
+      intermediaries: [
+        {
+          siret: otherCompany.siret,
+          name: otherCompany.name,
+          address: otherCompany.address,
+          contact: "John Doe"
+        }
+      ]
+    };
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toBe(
+      "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: intermediaries"
+    );
   });
 });

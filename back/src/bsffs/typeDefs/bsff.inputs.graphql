@@ -159,8 +159,15 @@ input BsffInput {
   waste: BsffWasteInput
   "Quantité"
   weight: BsffWeightInput
+  "Informations sur le trasnporteur du déchet. L'entreprise visée doit être inscrite sur Trackdéchets avec le profil transporteur"
   transporter: BsffTransporterInput
+  "Installation de traitement ou de tri transit regroupement. L'installation visée doit être insscrite sur Trackdéchets avec un profil idoine"
   destination: BsffDestinationInput
+  """
+  Identifiants des fiches d'intervention permettant d'identifier le ou les détenteurs initiaux des équipements.
+  Peut être défini uniquement lorsque Bsff.type=COLLECTE_PETITES_QUANTITES. Les fiches d'intervention peuvent être
+  créees via la mutation `createFicheInterventionBsff`.
+  """
   ficheInterventions: [ID!]
   "Identifiant des contenant réexpédié dans ce BSFF. La liste de contenants doit faire partie du même BSFF"
   forwarding: [ID!]
@@ -178,8 +185,12 @@ input BsffEmitterInput {
 
 "Permet de renseigner les informations d'un contenant par l'émetteur du BSFF"
 input BsffPackagingInput {
-  "Dénomination du contenant."
-  name: String!
+  "Type de contenant : bouteille, ou autre à préciser ;"
+  type: BsffPackagingType
+  "Précision sur le type de contenant lorsque type=AUTRE"
+  other: String
+  "DEPRECATED - Dénomination du contenant."
+  name: String @deprecated(reason: "Utiliser `type`")
   "Volume du contenant."
   volume: Float!
   "Numéro du contenant."
@@ -296,15 +307,31 @@ input BsffPackagingNextDestinationInput {
 }
 
 input BsffFicheInterventionInput {
+  "Numéro de la fiche d'intervention mentionnée à l'article R. 543-82 du code de l'environnement"
   numero: String!
-  "Poids en kilogrammes"
+  "La quantité totale réelle ou estimée exprimée en kilogramme"
   weight: Float!
+  "Informations concernnt le détenteur de l'équipement"
   detenteur: BsffDetenteurInput!
+  "Informations concernant l'opérateur"
   operateur: BsffOperateurInput!
+  "Le code postal du lieu de collecte"
   postalCode: String!
 }
+
+"""
+Informations sur le détenteur d'un équipement. Il faut renseigner soit `company`
+dans le cas d'une entreprise, soit `privateIndividual` dans le cas d'une personne physique
+"""
 input BsffDetenteurInput {
-  company: CompanyInput!
+  "Informations sur l'entreprise détentrice (ou sur le particulier lorsque isPrivateIndividual=true)"
+  company: CompanyInput
+  """
+  Indique si le détenteur est un particulier ou une entreprise.
+  Dans le cas où le détenteur est un particulier, vous devez renseigner uniquement les champs `name`,
+  `address`, `mail` et `phone` de l'objet `company`
+  """
+  isPrivateIndividual: Boolean
 }
 input BsffOperateurInput {
   company: CompanyInput!

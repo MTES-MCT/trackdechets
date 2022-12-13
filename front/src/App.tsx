@@ -7,7 +7,6 @@ import LayoutContainer from "./layout/LayoutContainer";
 import setYupLocale from "./common/setYupLocale";
 import BrowserDetect from "./BrowserDetect";
 import { SimpleNotificationError } from "common/components/Error";
-import { CONTACT_EMAIL } from "common/config";
 
 // Defines app-wide french error messages for yup
 // See https://github.com/jquense/yup#using-a-custom-locale-dictionary
@@ -17,14 +16,24 @@ export default function App() {
   return (
     <BrowserDetect>
       <ErrorBoundary
-        fallback={
+        fallback={errorData => (
           <SimpleNotificationError
             message={
-              `Une erreur s'est produite, nous nous en excusons.` +
-              `Si le problème persiste, merci de contacter le support ${CONTACT_EMAIL}`
+              <>
+                Une erreur s'est produite, veuillez nous en excuser. Si le
+                problème persiste, merci de contacter{" "}
+                <a
+                  target="_blank"
+                  href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
+                  rel="noreferrer"
+                >
+                  l'équipe Trackdéchets
+                </a>
+                en précisant le numéro d'erreur suivant : ${errorData.eventId}.
+              </>
             }
           />
-        }
+        )}
       >
         <ApolloProvider client={client}>
           <Router>

@@ -201,8 +201,8 @@
             bsff.destinationReceptionSignatureAuthor }}<br />
             Date de présentation sur site : {{#formatDate}}{{
             bsff.destinationReceptionDate }}{{/formatDate}}<br />
-            Quantité réelle présentée en kilo(s) : {{
-            bsff.destinationReceptionWeight }}<br />
+            Quantité réelle présentée en kg : {{
+            packaging.acceptationWeight }}<br />
             Lot accepté : <input type="checkbox"
             {{#receptionAccepted}}checked{{/receptionAccepted}} /> Oui <input
             type="checkbox" {{#receptionRefused}}checked{{/receptionRefused}} />
@@ -246,11 +246,11 @@
             {{#bsffOperation.isReexpeditionD15}}checked{{/bsffOperation.isReexpeditionD15}}
             /> D15 <br />
             Date de réalisation : {{#formatDate}}{{
-            bsff.destinationOperationSignatureDate }}{{/formatDate}}
+            packaging.operationDate }}{{/formatDate}}
           </p>
           <p>
             Je soussigné (nom, prénom) : {{
-            bsff.destinationOperationSignatureAuthor }}<br />
+            packaging.operationSignatureAuthor }}<br />
             Certifie que les mentions dans les cadres 9 et 10 sont exactes et
             que l'opération indiquée ci-dessus a été réalisée. <br />
             Signature (cachet le cas échéant) : <br />
@@ -266,19 +266,18 @@
           </p>
           <p>
             <span class="Row">
-              <span class="Col"> N° TVA intracommunautaire : </span>
-              <span class="Col"> Nom (raison sociale) : </span>
+              <span class="Col"> N° SIRET : {{packaging.operationNextDestinationCompanySiret}}</span>
+              <span class="Col"> Nom (raison sociale) : {{packaging.operationNextDestinationCompanyName}}</span>
             </span>
             <span class="Row">
-              <span class="Col"> Adresse : </span>
-              <span class="Col"> Pays : </span>
+              <span class="Col"> Adresse : {{packaging.operationNextDestinationCompanyAddress}}</span>
             </span>
             <span class="Row">
-              <span class="Col"> Tél : </span>
-              <span class="Col"> Mail : </span>
-              <span class="Col"> Nom de la personne à contacter : </span>
+              <span class="Col"> Tél : {{packaging.operationNextDestinationCompanyPhone}}</span>
+              <span class="Col"> Mail : {{packaging.operationNextDestinationCompanyMail}}</span>
+              <span class="Col"> Nom de la personne à contacter : {{packaging.operationNextDestinationCompanyContact}}</span>
             </span>
-            Code D/R prévu :
+            Code D/R prévu : {{packaging.operationNextDestinationPlannedOperationCode}}
           </p>
         </div>
       </div>
@@ -304,7 +303,7 @@
       </div>
       <div class="BoxRow">
         <div class="BoxCol"><p>Numéro fiche d'intervention</p></div>
-        <div class="BoxCol"><p>Quantité fluide en kilo(s)</p></div>
+        <div class="BoxCol"><p>Quantité fluide en kg</p></div>
         <div class="BoxCol"><p>Code postal lieu de collecte</p></div>
       </div>
       {{#ficheInterventions}}
@@ -340,7 +339,7 @@
       <div class="BoxRow">
         <div class="BoxCol"><p>Numéro bordereau</p></div>
         <div class="BoxCol"><p>CAP</p></div>
-        <div class="BoxCol"><p>Quantité fluide en kilo(s)</p></div>
+        <div class="BoxCol"><p>Quantité fluide en kg</p></div>
       </div>
       {{#previousBsffs}}
       <div class="BoxRow">

@@ -1,4 +1,4 @@
-import { WasteAcceptationStatus } from "@prisma/client";
+import { BsffPackagingType, WasteAcceptationStatus } from "@prisma/client";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import prisma from "../../../prisma";
@@ -16,8 +16,18 @@ describe("updateBsffPackagingOperationAcceptation", () => {
         wasteDescription: "R410A",
         packagings: {
           create: [
-            { name: "Bouteille", numero: "cont1", weight: 1, volume: 1 },
-            { name: "Bouteille", numero: "cont2", weight: 1, volume: 1 }
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              numero: "cont1",
+              weight: 1,
+              volume: 1
+            },
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              numero: "cont2",
+              weight: 1,
+              volume: 1
+            }
           ]
         },
         destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
@@ -101,8 +111,18 @@ describe("updateBsffPackagingOperationAcceptation", () => {
         wasteDescription: "R410A",
         packagings: {
           create: [
-            { name: "Bouteille", numero: "cont1", weight: 1, volume: 1 },
-            { name: "Bouteille", numero: "cont2", weight: 1, volume: 1 }
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              numero: "cont1",
+              weight: 1,
+              volume: 1
+            },
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              numero: "cont2",
+              weight: 1,
+              volume: 1
+            }
           ]
         }
       }
@@ -115,8 +135,18 @@ describe("updateBsffPackagingOperationAcceptation", () => {
         wasteDescription: "R410A",
         packagings: {
           create: [
-            { name: "Bouteille", numero: "cont1", weight: 1, volume: 1 },
-            { name: "Bouteille", numero: "cont2", weight: 1, volume: 1 }
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              numero: "cont1",
+              weight: 1,
+              volume: 1
+            },
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              numero: "cont2",
+              weight: 1,
+              volume: 1
+            }
           ]
         },
         forwarding: { connect: { id: bsff.id } }
@@ -152,7 +182,14 @@ describe("updateBsffPackagingOperationAcceptation", () => {
         wasteCode: "14 06 01*",
         wasteDescription: "R410A",
         packagings: {
-          create: [{ name: "Bouteille", numero: "cont1", weight: 1, volume: 1 }]
+          create: [
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              numero: "cont1",
+              weight: 1,
+              volume: 1
+            }
+          ]
         }
       }
     });
@@ -163,7 +200,14 @@ describe("updateBsffPackagingOperationAcceptation", () => {
         wasteCode: "14 06 01*",
         wasteDescription: "R410A",
         packagings: {
-          create: [{ name: "Bouteille", numero: "cont2", weight: 1, volume: 1 }]
+          create: [
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              numero: "cont2",
+              weight: 1,
+              volume: 1
+            }
+          ]
         }
       }
     });
@@ -175,8 +219,18 @@ describe("updateBsffPackagingOperationAcceptation", () => {
         wasteDescription: "R410A",
         packagings: {
           create: [
-            { name: "Bouteille", numero: "cont1", weight: 1, volume: 1 },
-            { name: "Bouteille", numero: "cont2", weight: 1, volume: 1 }
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              numero: "cont1",
+              weight: 1,
+              volume: 1
+            },
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              numero: "cont2",
+              weight: 1,
+              volume: 1
+            }
           ]
         },
         grouping: { connect: [{ id: bsff1.id }, { id: bsff2.id }] }
@@ -217,7 +271,14 @@ describe("updateBsffPackagingOperationAcceptation", () => {
         wasteCode: "14 06 01*",
         wasteDescription: "R410A",
         packagings: {
-          create: [{ name: "Bouteille", numero: "cont1", weight: 1, volume: 1 }]
+          create: [
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              numero: "cont1",
+              weight: 1,
+              volume: 1
+            }
+          ]
         }
       }
     });
@@ -228,7 +289,14 @@ describe("updateBsffPackagingOperationAcceptation", () => {
         wasteCode: "14 06 01*",
         wasteDescription: "R410A",
         packagings: {
-          create: [{ name: "Bouteille", numero: "cont2", weight: 1, volume: 1 }]
+          create: [
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              numero: "cont2",
+              weight: 1,
+              volume: 1
+            }
+          ]
         }
       }
     });
@@ -239,7 +307,14 @@ describe("updateBsffPackagingOperationAcceptation", () => {
         wasteCode: "14 06 01*",
         wasteDescription: "R410A",
         packagings: {
-          create: [{ name: "Citerne", numero: "cont2", weight: 1, volume: 1 }]
+          create: [
+            {
+              type: BsffPackagingType.CITERNE,
+              numero: "cont2",
+              weight: 1,
+              volume: 1
+            }
+          ]
         },
         repackaging: { connect: [{ id: bsff1.id }, { id: bsff2.id }] }
       },

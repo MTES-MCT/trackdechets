@@ -423,7 +423,7 @@ export default function AccountCompanyAdd() {
               ...((isFRVat(values.vatNumber) ||
                 (!isSiret(values.siret) && !isVat(values.vatNumber))) && {
                 siret:
-                  "Le SIRET ou le numéro de TVA intracommunautaire doit être valides.",
+                  "Le SIRET ou le numéro de TVA intracommunautaire doit être valides. (seuls les caractères alphanumériques sont acceptés, pas d'espaces ni de signes de ponctuation)",
               }),
               ...(anyTransporterReceipField &&
                 isTransporter_ &&

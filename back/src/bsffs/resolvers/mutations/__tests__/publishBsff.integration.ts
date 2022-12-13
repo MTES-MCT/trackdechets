@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { BsffPackagingType, UserRole } from "@prisma/client";
 import { gql } from "apollo-server-core";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
@@ -44,15 +44,15 @@ describe("publishBsff", () => {
         message:
           "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
           "Destination : le nom de l'établissement est requis\n" +
-          "Destination : le n°SIRET de l'établissement est requis\n" +
+          "Destination : le numéro SIRET est requis\n" +
           "Destination : l'adresse de l'établissement est requise\n" +
           "Destination : le nom du contact est requis\n" +
           "Destination : le numéro de téléphone est requis\n" +
           "Destination : l'adresse email est requise\n" +
           "Le code de l'opération de traitement prévu est requis\n" +
           "Transporteur : le nom de l'établissement est requis\n" +
-          "Transporteur : le n° SIRET ou le numéro de TVA intracommunautaire est requis\n" +
-          "Transporteur : le n° SIRET n'est pas au bon format\n" +
+          "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire\n" +
+          "transporterCompanySiret n'est pas un numéro de SIRET valide\n" +
           "Transporteur : l'adresse de l'établissement est requise\n" +
           "Transporteur : le nom du contact est requis\n" +
           "Transporteur : le numéro de téléphone est requis\n" +
@@ -106,7 +106,12 @@ describe("publishBsff", () => {
         weightValue: 1,
         weightIsEstimate: false,
         packagings: {
-          create: { name: "BOUTEILLE", numero: "123", weight: 1, volume: 1 }
+          create: {
+            type: BsffPackagingType.BOUTEILLE,
+            numero: "123",
+            weight: 1,
+            volume: 1
+          }
         }
       }
     });

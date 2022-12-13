@@ -39,7 +39,6 @@ import {
   FAVORITES,
   SEARCH_COMPANIES,
 } from "./query";
-import { CONTACT_EMAIL } from "common/config";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -55,6 +54,7 @@ interface CompanySelectorProps {
   isBsdaTransporter?: boolean;
   // whether the company is optional
   optional?: boolean;
+  initialAutoSelectFirstCompany?: boolean;
 }
 
 export default function CompanySelector({
@@ -68,6 +68,7 @@ export default function CompanySelector({
   skipFavorite = false,
   isBsdaTransporter = false,
   optional = false,
+  initialAutoSelectFirstCompany = true,
 }: CompanySelectorProps) {
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
@@ -226,8 +227,9 @@ export default function CompanySelector({
     const results = [...reshapedSearchResults, ...reshapedFavorites];
     setSearchResults(results);
 
-    // If the form is empty and we have a single result, we auto-select it.
+    // If the form is empty, we auto-select the first result.
     if (
+      initialAutoSelectFirstCompany &&
       !optional &&
       results.length >= 1 &&
       !field.value.siret?.length &&
@@ -258,7 +260,7 @@ export default function CompanySelector({
           setFieldTouched(`${field.name}.siret`);
           return setFieldError(
             `${field.name}.siret`,
-            "Vous ne pouvez pas chercher un établissement par son numéro de TVA, mais par nom ou numéro de SIRET"
+            "Vous ne pouvez pas chercher un établissement par son numéro de TVA, mais seulement par nom ou numéro de SIRET"
           );
         }
       }
@@ -297,7 +299,17 @@ export default function CompanySelector({
             ) {
               return (
                 `Nous n'avons pas pu récupérer les informations.` +
-                `Veuillez nous contacter à l'adresse ${CONTACT_EMAIL} pour pouvoir procéder à la création de l'établissement`
+                `Veuillez nous contacter via ` +
+                (
+                  <a
+                    href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    la FAQ
+                  </a>
+                ) +
+                ` pour pouvoir procéder à la création de l'établissement`
               );
             }
             return error.message;

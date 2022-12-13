@@ -21,6 +21,21 @@ export function safeInput<K>(obj: K): Partial<K> {
 }
 
 /**
+ * Removes keys that are either null or an empty array from an object
+ */
+export function removeEmpty<T>(obj: T): Partial<T> {
+  const cleanedObject = Object.fromEntries(
+    Object.entries(obj).filter(
+      ([_, v]) => v != null && (Array.isArray(v) ? v.length > 0 : true)
+    )
+  );
+
+  return Object.keys(cleanedObject).length === 0
+    ? null
+    : (cleanedObject as Partial<T>);
+}
+
+/**
  * Equivalent to a typescript optional chaining operator foo?.bar
  * except that it returns "null" instead of "undefined" if "null" is encountered in the chain
  * It allows to differentiate between voluntary null update and field omission that should

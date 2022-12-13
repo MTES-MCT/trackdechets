@@ -47,6 +47,13 @@ export const FicheInterventionFragment = gql`
     numero
     weight
     postalCode
+    detenteur {
+      isPrivateIndividual
+      company {
+        name
+        siret
+      }
+    }
   }
 `;
 
@@ -69,7 +76,8 @@ export const FullBsffFragment = gql`
     }
     packagings {
       id
-      name
+      type
+      other
       numero
       volume
       weight

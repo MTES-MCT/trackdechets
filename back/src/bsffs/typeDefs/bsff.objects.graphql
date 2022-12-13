@@ -156,8 +156,12 @@ type BsffPackaging {
   bsffId: ID!
   "Numéro du contenant."
   numero: String!
-  "Dénomination du contenant."
-  name: String!
+  "Type de contenant : bouteille, ou autre à préciser ;"
+  type: BsffPackagingType!
+  "Précision sur le type de contenant lorsque type=AUTRE"
+  other: String
+  "DEPRECATED - Dénomination du contenant."
+  name: String @deprecated(reason: "Utiliser `type`")
   "Volume du contenant."
   volume: Float
   "Poids en kilogrammes."
@@ -296,9 +300,17 @@ type BsffFicheIntervention {
   "Code postal du lieu où l'intervention a eu lieu."
   postalCode: String!
 }
+
+"Informations sur le détenteur d'un équipement"
 type BsffDetenteur {
-  "Entreprise détentrice de l'équipement."
-  company: FormCompany!
+  "Informations sur l'entreprise détentrice (ou sur le particulier lorsque isPrivateIndividual=true)"
+  company: FormCompany
+  """
+  Indique si le détenteur est un particulier ou une entreprise.
+  Dans le cas où le détenteur est un particulier, seul les champs `name`,
+  `address`, `mail` et `phone` de l'objet `company` sont renseignés.
+  """
+  isPrivateIndividual: Boolean
 }
 type BsffOperateur {
   "Entreprise dont l'opérateur fait partie."

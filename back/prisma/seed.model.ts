@@ -1,4 +1,5 @@
-import { hashPassword } from "../src/users/utils";
+import { hashPassword, passwordVersion } from "../src/users/utils";
+
 import prisma from "../src/prisma";
 
 export default async () => {
@@ -6,6 +7,7 @@ export default async () => {
     data: {
       email: "hello@producteur.fr",
       password: await hashPassword("password"),
+      passwordVersion,
       isActive: true,
       name: "PRODUCTEUR",
       phone: "06 06 06 06 06",
@@ -31,6 +33,7 @@ export default async () => {
     data: {
       email: "hello@transporteur.fr",
       password: await hashPassword("password"),
+      passwordVersion,
       isActive: true,
       name: "TRANSPORTEUR",
       phone: "06 06 06 06 06",
@@ -63,6 +66,7 @@ export default async () => {
     data: {
       email: "hello@collecteur.fr",
       password: await hashPassword("password"),
+      passwordVersion,
       isActive: true,
       name: "COLLECTEUR",
       phone: "06 06 06 06 06",
@@ -88,6 +92,7 @@ export default async () => {
     data: {
       email: "hello@ecoorganisme.fr",
       password: await hashPassword("password"),
+      passwordVersion,
       isActive: true,
       name: "ECOORGANISME",
       phone: "06 06 06 06 06",

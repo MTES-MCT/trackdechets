@@ -73,14 +73,15 @@ export const countries = [
  * Validateur de numéro de SIRETs
  */
 export const isSiret = (clue: string): boolean =>
-  !!clue && /^[0-9]{14}$/.test(clue.replace(/\s/g, ""));
+  !!clue && /^[0-9]{14}$/.test(clue.replace(/[\W_]+/g, ""));
 
 /**
  * Validateur de numéro de TVA
  */
 export const isVat = (clue: string): boolean => {
   if (!clue) return false;
-  const cleanClue = clue.replace(/\s/g, "");
+  if (clue.match(/[\W_]/gim) !== null) return false;
+  const cleanClue = clue.replace(/[\W_]+/g, "");
   if (!cleanClue) return false;
   const isRegexValid = checkVAT(cleanClue, countries);
   return isRegexValid.isValid;
@@ -90,8 +91,8 @@ export const isVat = (clue: string): boolean => {
  * TVA Français
  */
 export const isFRVat = (clue: string): boolean => {
-  if (!clue) return false;
-  const cleanClue = clue.replace(/\s/g, "");
+  if (!isVat(clue)) return false;
+  const cleanClue = clue.replace(/[\W_]+/g, "");
   if (!cleanClue) return false;
   return cleanClue.slice(0, 2).toUpperCase().startsWith("FR");
 };
@@ -101,7 +102,7 @@ export const isFRVat = (clue: string): boolean => {
  */
 export const isForeignVat = (clue: string): boolean => {
   if (!isVat(clue)) return false;
-  const cleanClue = clue.replace(/\s/g, "");
+  const cleanClue = clue.replace(/[\W_]+/g, "");
   if (!cleanClue) return false;
   return !cleanClue.slice(0, 2).toUpperCase().startsWith("FR");
 };
@@ -111,10 +112,7 @@ export const isForeignVat = (clue: string): boolean => {
  */
 export const isOmi = (clue: string): boolean => {
   if (!clue) return false;
-  const clean = clue.replace(/\s/g, "");
-
-  return (
-    clean.slice(0, 3).toUpperCase().startsWith("OMI") &&
-    /[0-9]{7}/.test(clean.slice(3))
-  );
+  if (clue.match(/[\W_]/gim) !== null) return false;
+  const clean = clue.replace(/[\W_]+/g, "");
+  return clean.match(/^OMI[0-9]{7}$/gim) !== null;
 };

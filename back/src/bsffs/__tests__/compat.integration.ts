@@ -1,7 +1,12 @@
 import { resetDatabase } from "../../../integration-tests/helper";
 import prisma from "../../prisma";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
-import { BsffStatus, BsffType, WasteAcceptationStatus } from "@prisma/client";
+import {
+  BsffPackagingType,
+  BsffStatus,
+  BsffType,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import { getStatus, toBsffDestination } from "../compat";
 
 describe("toBsffDestination", () => {
@@ -15,13 +20,13 @@ describe("toBsffDestination", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1
@@ -51,7 +56,7 @@ describe("toBsffDestination", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1,
@@ -60,7 +65,7 @@ describe("toBsffDestination", () => {
               acceptationStatus: WasteAcceptationStatus.ACCEPTED
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1,
@@ -93,7 +98,7 @@ describe("toBsffDestination", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1,
@@ -103,7 +108,7 @@ describe("toBsffDestination", () => {
               acceptationRefusalReason: "non conforme"
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1,
@@ -137,7 +142,7 @@ describe("toBsffDestination", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1,
@@ -147,7 +152,7 @@ describe("toBsffDestination", () => {
               acceptationRefusalReason: "non conforme"
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1,
@@ -180,7 +185,7 @@ describe("toBsffDestination", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1,
@@ -192,7 +197,7 @@ describe("toBsffDestination", () => {
               operationCode: "R2"
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1,
@@ -204,7 +209,7 @@ describe("toBsffDestination", () => {
               operationCode: "R2"
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1,
@@ -244,7 +249,7 @@ describe("getStatus", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1,
@@ -252,7 +257,7 @@ describe("getStatus", () => {
               operationCode: "R2" // code de traitement final
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1,
@@ -276,7 +281,7 @@ describe("getStatus", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1,
@@ -285,7 +290,7 @@ describe("getStatus", () => {
               operationNoTraceability: true
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1,
@@ -310,7 +315,7 @@ describe("getStatus", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1,
@@ -318,7 +323,7 @@ describe("getStatus", () => {
               operationCode: "R12" // code de traitement non final
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1,
@@ -341,7 +346,7 @@ describe("getStatus", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1,
@@ -349,7 +354,7 @@ describe("getStatus", () => {
               operationCode: "R2" // code de traitement final
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1,
@@ -372,7 +377,7 @@ describe("getStatus", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1,
@@ -380,7 +385,7 @@ describe("getStatus", () => {
               acceptationStatus: WasteAcceptationStatus.ACCEPTED
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1,
@@ -403,7 +408,7 @@ describe("getStatus", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1,
@@ -412,7 +417,7 @@ describe("getStatus", () => {
               acceptationRefusalReason: "Parce que"
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1,
@@ -436,7 +441,7 @@ describe("getStatus", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1,
@@ -445,7 +450,7 @@ describe("getStatus", () => {
               acceptationRefusalReason: "Parce que"
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1,
@@ -468,7 +473,7 @@ describe("getStatus", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1,
@@ -477,7 +482,7 @@ describe("getStatus", () => {
               acceptationRefusalReason: "Parce que"
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1,
@@ -500,7 +505,7 @@ describe("getStatus", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1,
@@ -509,7 +514,7 @@ describe("getStatus", () => {
               acceptationRefusalReason: "Parce que"
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1,
@@ -533,7 +538,7 @@ describe("getStatus", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1,
@@ -542,7 +547,7 @@ describe("getStatus", () => {
               acceptationRefusalReason: "Parce que"
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1,
@@ -562,7 +567,7 @@ describe("getStatus", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont3",
               weight: 2,
               volume: 2,
@@ -590,7 +595,7 @@ describe("getStatus", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1,
@@ -599,7 +604,7 @@ describe("getStatus", () => {
               acceptationRefusalReason: "Parce que"
             },
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 1,
               volume: 1,
@@ -619,7 +624,7 @@ describe("getStatus", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont3",
               weight: 2,
               volume: 2,
@@ -648,7 +653,7 @@ describe("getStatus", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
               weight: 1,
               volume: 1,
@@ -673,7 +678,7 @@ describe("getStatus", () => {
         packagings: {
           create: [
             {
-              name: "Bouteille",
+              type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
               weight: 2,
               volume: 2,

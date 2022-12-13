@@ -1,4 +1,5 @@
 import { companySchema } from "common/validation/schema";
+import { BsffPackagingType } from "generated/graphql/types";
 import * as yup from "yup";
 import { OPERATION } from "./constants";
 
@@ -46,7 +47,23 @@ export const validationSchema = yup.object({
   packagings: yup
     .array(
       yup.object({
-        name: yup.string().required("La type de contenant est un champ requis"),
+        type: yup
+          .mixed<BsffPackagingType>()
+          .required("Conditionnements : le type de contenant est requis"),
+        other: yup
+          .string()
+          .when("type", (type, schema) =>
+            type === "AUTRE"
+              ? schema.required(
+                  "La description doit être précisée pour le conditionnement 'Autre'."
+                )
+              : schema
+                  .nullable()
+                  .max(
+                    0,
+                    "La description ne peut être renseignée que lorsque le type de conditionnement est 'AUTRE'."
+                  )
+          ),
         numero: yup
           .string()
           .required("Le numéro du contenant est un champ requis"),

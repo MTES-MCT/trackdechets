@@ -681,6 +681,7 @@ model User {
   id                    String                  @id @default(cuid())
   email                 String                  @unique
   password              String
+  passwordVersion       Int
   name                  String?
   phone                 String?
   createdAt             DateTime                @default(now()) @db.Timestamptz(6)
@@ -1019,6 +1020,9 @@ model Bsff {
   emitterCompanyMail    String?
   emitterCustomInfo     String?
 
+  // Denormalized detenteur sirets to speed up query `bsffs`
+  detenteurCompanySirets String[] @default([])
+
   emitterEmissionSignatureAuthor String?
   emitterEmissionSignatureDate   DateTime? @db.Timestamptz(6)
 
@@ -1112,6 +1116,9 @@ model Bsff {
   @@index([destinationCompanySiret], map: "_BsffDestinationCompanySiretIdx")
   @@index([status], map: "_BsffStatusIdx")
   @@index([updatedAt], map: "_BsffUpdatedAtIdx")
+  @@index([createdAt], map: "_BsffCreatedAtIdx")
+  @@index([emitterEmissionSignatureDate], map: "_BsffEmitterEmissionSignatureDateIdx")
+  @@index([transporterTransportSignatureDate], map: "_BsffTransporterTransportSignatureDateIdx")
 }
 
 enum BsffType {
@@ -1142,12 +1149,13 @@ model BsffFicheIntervention {
   weight     Float
   postalCode String
 
-  detenteurCompanyName    String
-  detenteurCompanySiret   String
-  detenteurCompanyAddress String
-  detenteurCompanyContact String
-  detenteurCompanyPhone   String
-  detenteurCompanyMail    String
+  detenteurCompanyName         String
+  detenteurCompanySiret        String?
+  detenteurCompanyAddress      String
+  detenteurCompanyContact      String?
+  detenteurCompanyPhone        String
+  detenteurCompanyMail         String
+  detenteurIsPrivateIndividual Boolean @default(false)
 
   operateurCompanyName    String
   operateurCompanySiret   String
@@ -1158,16 +1166,14 @@ model BsffFicheIntervention {
 
   bsffs Bsff[]
 
-  // The following property is not used anymore and should be removed in the next version
-  bsffId String?
-
   @@index([detenteurCompanySiret], map: "_BsffFicheInterventionDetenteurCompanySiretIdx")
   @@index([operateurCompanySiret], map: "_BsffFicheInterventionOperateurCompanySiretIdx")
 }
 
 model BsffPackaging {
-  id     String @id @default(cuid())
-  name   String
+  id     String            @id @default(cuid())
+  type   BsffPackagingType
+  other  String?
   volume Float?
   weight Float
   numero String
@@ -1206,8 +1212,22 @@ model BsffPackaging {
   nextPackagingId    String?
   previousPackagings BsffPackaging[] @relation("NextPackaging")
 
+  //  partial indices _BsffPackagingOperationNoTraceabilityIdx
+
   @@index([bsffId], map: "_BsffPackagingBsffId")
   @@index([nextPackagingId], map: "_BsffPackagingNextPackagingIdx")
+  @@index([numero], map: "_BsffPackagingNumeroIdx")
+  @@index([acceptationWasteCode], map: "_BsffPackagingAcceptationWasteCodeIdx")
+  @@index([acceptationSignatureDate], map: "_BsffPackagingAcceptationSignatureDateIdx")
+  @@index([operationCode], map: "_BsffPackagingOperationCodeIdx")
+  @@index([operationSignatureDate], map: "_BsffPackagingOperationSignatureDateIdx")
+}
+
+enum BsffPackagingType {
+  BOUTEILLE
+  CONTENEUR
+  CITERNE
+  AUTRE
 }
 
 // ----------------

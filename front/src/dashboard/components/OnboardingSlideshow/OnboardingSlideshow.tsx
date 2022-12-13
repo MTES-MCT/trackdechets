@@ -221,7 +221,7 @@ export function OnboardingSlideshow() {
                   }
                 >
                   Votre question n'est pas documentée dans la FAQ ? Vous pouvez
-                  nous contacter par email. L'équipe support est là pour vous
+                  nous contacter via la FAQ. L'équipe support est là pour vous
                   répondre !
                 </ListItem>
               </List>

@@ -20,6 +20,9 @@
     - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
     - [Nourrir la base de donnée avec des données par défaut](#nourrir-la-base-de-donnée-avec-des-données-par-défaut)
     - [Ajouter une nouvelle icône](#ajouter-une-nouvelle-icône)
+  - [Dépannage](#dépannage)
+    - [La base de donnée ne se crée pas](#la-base-de-donnée-ne-se-crée-pas)
+    - [Je n'arrive pas à (ré)indexer Elastic Search](#je-narrive-pas-à-réindexer-elastic-search)
 
 ## Mise en route
 
@@ -58,7 +61,7 @@
 4. Démarrer les containers
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx elasticsearch
+   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx elasticsearch mongodb
    ```
 
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
@@ -88,43 +91,155 @@
 
    C'est prêt ! Rendez-vous sur l'URL `UI_HOST` configurée dans votre fichier `.env` (par ex: `http://trackdechets.local`) pour commencer à utiliser l'application ou sur `API_HOST` (par ex `http://api.trackdechets.local`) pour accéder au playground GraphQL.
 
-### Installation alternative sans docker
+### Installation alternative sans docker sur MacOS avec puce Apple
 
-Vous pouvez également faire tourner l'ensemble des services sans docker. Veillez à utiliser la même version de Node.js que celle spécifiée dans les images Docker. Vous pouvez utiliser [NVM](https://github.com/nvm-sh/nvm) pour changer facilement de version de Node.
+> L'utilisation de Docker sur MacOS avec puce Apple est problématique car il n'existe pas d'image officielle pour Elasticsearch@6. Par ailleurs des problèmes de networking existe sur l'image Docker utilisée pour le back.
 
-1. Démarrer `postgres`, `redis`, et `nginx` sur votre machine hôte. Pour la configuration `nginx` vous pouvez vous inspirer du fichier `nginx/templates/default.conf.template`.
-
-2. Créer un lien symbolique entre le fichier `.env` et le fichier `back/.env`
+1. Installer `postgres`, `redis`, `elasticsearch@6`, `nginx` et `mongodb`
 
 ```
-ln -s /path/to/trackdechets/.env /path/to/trackdechets/back/.env
+brew install postgresql
+brew install redis
+brew install nginx
+brew tap mongodb/brew
+brew update
+brew install mongodb-community@6.0
+brew install elasticsearch@6
 ```
 
-> Il est également possible de démarrer ces trois services avec docker `docker-compose -f docker-compose.dev.yml up postgres redis nginx`. Dans ce cas, l'API doit être démarrée sur le port 4000 pour coller avec la configuration Nginx `API_PORT=4000`.
+2. Installer PostgreSQL 14 avec [Postgres.app](https://postgresapp.com/). Par défaut un utilisateur est crée avec votre nom d'user MacOS et un mot de passe vide.
 
-3. Démarrer l'API
+3. Se connecter à la base PostgresSQL avec la commande `psql` puis créer la DB : `create database prisma`.
 
-```bash
+4. Lancer les différents services :
+
+```
+brew services start redis
+brew services start nginx
+brew services start mongodb-community
+brew services start elasticsearch@6
+```
+
+puis vérifier qu'ils tournent avec `brew services list`. Vous pouvez vérifier également que Nginx est bien démarré en allant sur `http://localhost:8080`.
+
+5. Configurer Nginx pour servir l'API, l'UI et le notifier en créant les fichiers suivants :
+
+```
+# fichier /opt/homebrew/etc/nginx/servers/api.trackdechets.local
+
+server {
+   listen 80;
+   listen [::]:80;
+   server_name api.trackdechets.local;
+
+   location / {
+      proxy_pass http://localhost:4000;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+   }
+}
+
+#  /opt/homebrew/etc/nginx/servers/notifier.trackdechets.local
+server {
+   listen 80;
+   listen [::]:80;
+   server_name notifier.trackdechets.local;
+
+   location / {
+      proxy_pass http://localhost:4001;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+
+      proxy_set_header Connection '';
+      proxy_http_version 1.1;
+      chunked_transfer_encoding off;
+      proxy_buffering off;
+      proxy_cache off;
+      proxy_read_timeout 4h;
+   }
+}
+
+# /opt/homebrew/etc/nginx/servers/trackdechets.local
+server {
+   listen 80;
+   listen [::]:80;
+
+   server_name trackdechets.local;
+
+   location / {
+      proxy_pass http://localhost:3000;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "Upgrade";
+   }
+}
+```
+
+Re-charger la config et redémarrer NGINX
+
+```
+brew services reload nginx
+brew services restart nginx
+```
+
+6. Mapper les différentes URLs sur localhost dans votre fichier `host`
+
+```
+# /etc/hosts
+127.0.0.1 api.trackdechets.local
+127.0.0.1 trackdechets.local
+127.0.0.1 notifier.trackdechets.local
+```
+
+7. Installer `nvm`
+
+```
+brew install nvm
+nvm install 16.18.1 // version pour le back
+nvm install 14.21.1 // version pour le front
+echo v16.18.1 > back/.nvmrc
+echo 14.21.1 > front/.nvmrc
+cd back && nvm use && npm install && npm run generate
+cd front && nvm use && npm install
+```
+
+8. Ajouter un fichier `.env` dans le répertoire back et un fichier `.env.development` dans le répertoire `front`. (demander à un dev)
+
+9. Pousser le schéma de la base de données dans la table `prisma` et ajouter des données de tests en ajoutant un fichier `seed.dev.ts` dans le répertoire `back/prisma` (demander à un dev) :
+
+```
 cd back
-npm install
-npm run dev
+npx prisma db push
+npx prisma db seed
 ```
 
-4. Démarrer l'UI
+10. Créer l'index Elasticsearch : `cd back && npm run reindex-all-bsds-bulk:dev -- -f`. Puis vérifier qu'un index a bien été crée : `curl localhost:9200/_cat/indices`
 
-```bash
-cd front
-npm install
-npm start
-```
-
-5. (Optionnel) Démarrer la documentation
+11. Créer un utilisateur Mongo :
 
 ```
-cd doc/website
-npm install
-npm start
+mongosh
+> use admin
+> db.createUser({user: "trackdechets" ,pwd: "password", roles: ["userAdminAnyDatabase", "dbAdminAnyDatabase", "readWriteAnyDatabase"]})
 ```
+
+12. Démarrer le `back` et le `front` :
+
+```
+cd back && npm run dev
+cd front && npm run dev
+```
+
+- URL API: http://api.trackdechets.local/
+- URL UI : http://trackdechets.local
 
 ### Conventions
 
@@ -191,7 +306,6 @@ Note : l'équipe n'a pas de conventions strictes concernant le nom des branches 
 Le déploiement est géré par Scalingo à l'aide des fichiers de configuration `Procfile` et `.buildpacks` placés dans le front et l'api.
 Chaque update de la branche `dev` déclenche un déploiement sur l'environnement de recette. Chaque update de la branche `master` déclenche un déploiement sur les environnements sandbox et prod. Le déroulement dans le détails d'une mise en production est le suivant:
 
-
 1. Faire le cahier de recette pour vérifier qu'il n'y a pas eu de régression sur les fonctionnalités critiques de l'application (login, signup, rattachement établissement, invitation collaborateur, création BSD)
 2. Balayer le tableau [Favro "Recette du xx/xx/xx"](https://favro.com/organization/ab14a4f0460a99a9d64d4945/02f1ec52bd91efc0adb3c38b) pour vérifier que l'étiquette "Recette OK --> EN PROD" a bien été ajoutée sur toutes les cartes.
 3. Mettre à jour le [Changelog.md](./Changelog.md) avec un nouveau numéro de version (versionnage calendaire)
@@ -200,9 +314,8 @@ Chaque update de la branche `dev` déclenche un déploiement sur l'environnement
 6. Faire une relecture des différents changements apportés aux modèles de données et scripts de migration.
 7. Si possible faire tourner les migrations sur une copie de la base de prod en local.
 8. S'assurer que les nouvelles variables d'environnement (Cf `.env.model`) ont bien été ajoutée sur Scalingo dans les environnements sandbox et prod respectivement pour les applications `front` et `api`
-9.  Merger la PR et suivre l'avancement de la CI github.
+9. Merger la PR et suivre l'avancement de la CI github.
 10. Suivre l'avancement du déploiement sur Scalingo respectivement pour le front, l'api et la doc.
-
 
 ## Migrations
 
@@ -321,4 +434,58 @@ Pour s'y retrouver plus facilement, suivre la convention de nommage en place et 
 
 ```
    npm run reindex-partial-in-place -- bsdasri -f
+```
+
+## Dépannage
+
+### La base de donnée ne se crée pas
+
+Si la commande pour créer la base de données ne fonctionne pas (`npx prisma db push`), il est possible que le symbole $ dans le nom de la base (default$default) pose problème. Deux solutions:
+
+- Encapsulez l'URI de la base avec des guillements simple, ie:
+  `DATABASE_URL='postgresql://username:password@postgres:5432/prisma?schema=default$default'`
+- Enlevez complètement le paramètre schema:
+  `DATABASE_URL=postgresql://username:password@postgres:5432/prisma`
+
+### Je n'arrive pas à (ré)indexer Elastic Search
+
+Vous pouvez vérifier vos indexes Eslastic Search avec la commande suivante:
+
+```
+curl -X GET "localhost:9200/_cat/indices"
+```
+
+Si les indexes sont incomplets ou si la commande a échoué, vous pouvez vous connecter au container de l'API et passer en mode verbose avant de relancer l'indexation:
+
+```
+# Pour se connecter au container de l'API
+docker exec -it $(docker ps -qf "name=td-api") bash
+
+export FORCE_LOGGER_CONSOLE=true
+
+npm run reindex-all-bsds-bulk:dev -- -f
+```
+
+Si le problème remonté est un "Segmentation fault", il est probable que la mémoire allouée au container soit insuffisante. Vous pouvez contourner le problème en limitant la taille des batches (dans votre .env):
+
+```
+BULK_INDEX_BATCH_SIZE=100
+```
+
+Vous pouvez également augmenter la taille mémoire allouée au container Docker, dans un fichier `docker-compose.override.yml` placé à la racine du répo:
+
+```
+[...]
+  postgres:
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 128M
+[...]
+  elasticsearch:
+    environment:
+      - "ES_JAVA_OPTS=-Xms1G -Xmx1G"
+[...]
 ```

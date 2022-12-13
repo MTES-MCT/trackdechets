@@ -208,7 +208,10 @@ type Mutation {
   ): Bsff!
 
   """
-  Mutation permettant de créer une fiche d'intervention.
+  Mutation permettant de créer une fiche d'intervention dans Trackdéchets.
+  Permet de reporter une partie des infos d'une fiche d'intervention papier
+  et d'identifier un détenteur d'équipement. Une fois créee, la fiche d'intervention
+  peut-être jointe à un BSFF.
   """
   createFicheInterventionBsff(
     input: BsffFicheInterventionInput!

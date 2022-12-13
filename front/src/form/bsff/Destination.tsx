@@ -16,6 +16,7 @@ export default function Destination({ disabled }) {
 
       <CompanySelector
         disabled={disabled}
+        registeredOnlyCompanies={true}
         name="destination.company"
         heading="Installation de destination"
       />

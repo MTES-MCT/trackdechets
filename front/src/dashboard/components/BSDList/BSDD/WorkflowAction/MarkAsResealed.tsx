@@ -21,7 +21,6 @@ import { IconPaperWrite } from "common/components/Icons";
 import { gql, useMutation } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
 import { NotificationError } from "common/components/Error";
-import cogoToast from "cogo-toast";
 import Transporter from "form/bsdd/Transporter";
 import { GET_BSDS } from "common/queries";
 
@@ -58,16 +57,6 @@ export default function MarkAsResealed({ form }: WorkflowActionProps) {
   >(MARK_RESEALED, {
     refetchQueries: [GET_BSDS],
     awaitRefetchQueries: true,
-    onCompleted: data => {
-      if (
-        data.markAsResealed &&
-        data.markAsResealed.status === FormStatus.Resealed
-      ) {
-        cogoToast.success(
-          `Les informations du BSD ont bien été complétées. Vous pouvez retrouver ce BSD dans l'onglet "Suivi"`
-        );
-      }
-    },
     onError: () => {
       // The error is handled in the UI
     },

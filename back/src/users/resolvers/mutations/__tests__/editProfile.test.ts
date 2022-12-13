@@ -1,4 +1,7 @@
 import { editProfileFn as editProfile } from "../editProfile";
+import configureYup from "../../../../common/yup/configureYup";
+
+configureYup();
 
 const mockUpdateUser = jest.fn();
 

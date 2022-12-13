@@ -5,6 +5,32 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2022.12.1] 13/12/2022
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout d'un formulaire réservé aux administrateurs pour désactiver un compte utilisateur et l'anonymiser définitivement [PR 1867](https://github.com/MTES-MCT/trackdechets/pull/1867)
+- ETQ détenteur d'équipement, j'ai accès au suivi des BSFFs sur lesquelles je suis visé [PR 1918](https://github.com/MTES-MCT/trackdechets/pull/1918)
+- ETQ opérateur fluide, je peux ajouter une fiche d'intervention sur laquelle le détenteur est un particulier [PR 1918](https://github.com/MTES-MCT/trackdechets/pull/1918)
+
+#### :bug: Corrections de bugs
+
+- Correctif d'un bug empêchant la signature d'un bsd avec entrposage provisoire[PR 1927](https://github.com/MTES-MCT/trackdechets/pull/1927)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Prévention des injections SSTI [PR 1924](https://github.com/MTES-MCT/trackdechets/pull/1924)
+- Prévention d'injection XSS sur le champ website [PR 1934](https://github.com/MTES-MCT/trackdechets/pull/1934)
+- BSFF - le type de contenant doit désormais être choisi dans une liste prédéfinie (bouteille, conteneur, citerne, autre). [PR 1893](https://github.com/MTES-MCT/trackdechets/pull/1893)
+- Améliorations sur la gestion et le renouvellement des mots de passe [PR 1857](https://github.com/MTES-MCT/trackdechets/pull/1857)
+- Le transporteur et le destinataire d'un BSFF doivent être inscrits sur Trackdéchets avec un profil idoine [PR 1861](https://github.com/MTES-MCT/trackdechets/pull/1861)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2022.11.1] 21/11/2022
 
 #### :rocket: Nouvelles fonctionnalités

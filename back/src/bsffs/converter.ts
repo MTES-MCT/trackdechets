@@ -7,7 +7,7 @@ import {
 } from "../common/converter";
 import * as GraphQL from "../generated/graphql/types";
 import { BsdElastic } from "../common/elastic";
-import { BsffPackaging } from "@prisma/client";
+import { BsffPackaging, BsffPackagingType } from "@prisma/client";
 
 function flattenEmitterInput(input: { emitter?: GraphQL.BsffEmitter }) {
   return {
@@ -289,7 +289,12 @@ export function expandBsffPackagingFromDB(
     id: prismaBsffPackaging.id,
     bsffId: prismaBsffPackaging.bsffId,
     numero: prismaBsffPackaging.numero,
-    name: prismaBsffPackaging.name,
+    type: prismaBsffPackaging.type,
+    other: prismaBsffPackaging.other,
+    name:
+      prismaBsffPackaging.type === BsffPackagingType.AUTRE
+        ? prismaBsffPackaging.other
+        : prismaBsffPackaging.type,
     volume: prismaBsffPackaging.volume,
     weight: prismaBsffPackaging.weight,
     acceptation: nullIfNoValues<GraphQL.BsffPackagingAcceptation>({
@@ -359,23 +364,45 @@ export function flattenFicheInterventionBsffInput(
     weight: ficheInterventionInput.weight,
     postalCode: ficheInterventionInput.postalCode,
 
-    detenteurCompanyName: ficheInterventionInput.detenteur.company.name ?? "",
-    detenteurCompanySiret: ficheInterventionInput.detenteur.company.siret ?? "",
-    detenteurCompanyAddress:
-      ficheInterventionInput.detenteur.company.address ?? "",
-    detenteurCompanyContact:
-      ficheInterventionInput.detenteur.company.contact ?? "",
-    detenteurCompanyPhone: ficheInterventionInput.detenteur.company.phone ?? "",
-    detenteurCompanyMail: ficheInterventionInput.detenteur.company.mail ?? "",
-
-    operateurCompanyName: ficheInterventionInput.operateur.company.name ?? "",
-    operateurCompanySiret: ficheInterventionInput.operateur.company.siret ?? "",
-    operateurCompanyAddress:
-      ficheInterventionInput.operateur.company.address ?? "",
-    operateurCompanyContact:
-      ficheInterventionInput.operateur.company.contact ?? "",
-    operateurCompanyPhone: ficheInterventionInput.operateur.company.phone ?? "",
-    operateurCompanyMail: ficheInterventionInput.operateur.company.mail ?? ""
+    detenteurCompanyName: chain(ficheInterventionInput, fi =>
+      chain(fi.detenteur, d => chain(d.company, c => c.name))
+    ),
+    detenteurCompanySiret: chain(ficheInterventionInput, fi =>
+      chain(fi.detenteur, d => chain(d.company, c => c.siret))
+    ),
+    detenteurCompanyAddress: chain(ficheInterventionInput, fi =>
+      chain(fi.detenteur, d => chain(d.company, c => c.address))
+    ),
+    detenteurCompanyContact: chain(ficheInterventionInput, fi =>
+      chain(fi.detenteur, d => chain(d.company, c => c.contact))
+    ),
+    detenteurCompanyPhone: chain(ficheInterventionInput, fi =>
+      chain(fi.detenteur, d => chain(d.company, c => c.phone))
+    ),
+    detenteurCompanyMail: chain(ficheInterventionInput, fi =>
+      chain(fi.detenteur, d => chain(d.company, c => c.mail))
+    ),
+    detenteurIsPrivateIndividual: chain(ficheInterventionInput, fi =>
+      chain(fi.detenteur, d => d.isPrivateIndividual)
+    ),
+    operateurCompanyName: chain(ficheInterventionInput, fi =>
+      chain(fi.operateur, o => chain(o.company, c => c.name))
+    ),
+    operateurCompanySiret: chain(ficheInterventionInput, fi =>
+      chain(fi.operateur, o => chain(o.company, c => c.siret))
+    ),
+    operateurCompanyAddress: chain(ficheInterventionInput, fi =>
+      chain(fi.operateur, o => chain(o.company, c => c.address))
+    ),
+    operateurCompanyContact: chain(ficheInterventionInput, fi =>
+      chain(fi.operateur, o => chain(o.company, c => c.contact))
+    ),
+    operateurCompanyPhone: chain(ficheInterventionInput, fi =>
+      chain(fi.operateur, o => chain(o.company, c => c.phone))
+    ),
+    operateurCompanyMail: chain(ficheInterventionInput, fi =>
+      chain(fi.operateur, o => chain(o.company, c => c.mail))
+    )
   };
 }
 
@@ -387,26 +414,27 @@ export function expandFicheInterventionBsffFromDB(
     numero: prismaFicheIntervention.numero,
     weight: prismaFicheIntervention.weight,
     postalCode: prismaFicheIntervention.postalCode,
-    detenteur: {
-      company: {
+    detenteur: nullIfNoValues<GraphQL.BsffDetenteur>({
+      company: nullIfNoValues<GraphQL.FormCompany>({
         name: prismaFicheIntervention.detenteurCompanyName,
         siret: prismaFicheIntervention.detenteurCompanySiret,
         address: prismaFicheIntervention.detenteurCompanyAddress,
         contact: prismaFicheIntervention.detenteurCompanyContact,
         phone: prismaFicheIntervention.detenteurCompanyPhone,
         mail: prismaFicheIntervention.detenteurCompanyMail
-      }
-    },
-    operateur: {
-      company: {
+      }),
+      isPrivateIndividual: prismaFicheIntervention.detenteurIsPrivateIndividual
+    }),
+    operateur: nullIfNoValues<GraphQL.BsffOperateur>({
+      company: nullIfNoValues<GraphQL.FormCompany>({
         name: prismaFicheIntervention.operateurCompanyName,
         siret: prismaFicheIntervention.operateurCompanySiret,
         address: prismaFicheIntervention.operateurCompanyAddress,
         contact: prismaFicheIntervention.operateurCompanyContact,
         phone: prismaFicheIntervention.operateurCompanyPhone,
         mail: prismaFicheIntervention.operateurCompanyMail
-      }
-    }
+      })
+    })
   };
 }
 

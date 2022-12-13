@@ -133,7 +133,7 @@ describe("Query.bsffPackaging", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le contenant de fluide dont l'identifiant Trackdéchets est ${packaging.id} n'existe pas.`
+        message: "Vous ne pouvez pas accéder à ce BSFF"
       })
     ]);
   });

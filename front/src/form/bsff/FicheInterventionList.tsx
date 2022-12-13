@@ -5,8 +5,9 @@ import { IconClose } from "common/components/Icons";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
-import { Field, Form, Formik } from "formik";
+import { Field, Form, Formik, useFormikContext } from "formik";
 import {
+  BsffDetenteurInput,
   BsffFicheIntervention,
   BsffFicheInterventionInput,
   CompanyInput,
@@ -28,12 +29,14 @@ const CREATE_BSFF_FICHE_INTERVENTION = gql`
 `;
 
 const companySchema: yup.SchemaOf<CompanyInput> = yup.object({
-  address: yup.string().required(),
-  contact: yup.string().required(),
-  mail: yup.string().required(),
-  name: yup.string().required(),
-  phone: yup.string().required(),
-  siret: yup.string().required(),
+  address: yup.string().required("L'adresse de l'établissement est requis"),
+  contact: yup.string().required("Le contact de l'établissement est requis"),
+  mail: yup.string().required("L'email de contact est requis"),
+  name: yup.string().required("Le nom de l'établissement est requis"),
+  phone: yup
+    .string()
+    .required("Le numéro de téléphone de l'établissement est requis"),
+  siret: yup.string().required("Le numéro SIRET de l'établissement est requis"),
   vatNumber: yup.string().nullable(),
   country: yup
     .string()
@@ -43,7 +46,24 @@ const companySchema: yup.SchemaOf<CompanyInput> = yup.object({
 });
 const detenteurSchema: yup.SchemaOf<BsffFicheInterventionInput["detenteur"]> =
   yup.object({
-    company: companySchema,
+    isPrivateIndividual: yup.boolean().required(),
+    company: yup.object().when("isPrivateIndividual", {
+      is: false,
+      then: () => companySchema,
+      otherwise: schema =>
+        schema.shape({
+          name: yup
+            .string()
+            .ensure()
+            .required("Le nom du détenteur est requis"),
+          address: yup
+            .string()
+            .ensure()
+            .required("L'adresse du détenteur est requise"),
+          mail: yup.string().nullable().notRequired(),
+          phone: yup.string().nullable().notRequired(),
+        }),
+    }),
   });
 const operateurSchema: yup.SchemaOf<BsffFicheInterventionInput["operateur"]> =
   yup.object({
@@ -64,6 +84,10 @@ interface AddFicheInterventionModalProps {
   onClose: () => void;
 }
 
+type Values = BsffFicheInterventionInput & {
+  detenteur: BsffDetenteurInput & { isPrivateIndividual: boolean };
+};
+
 function AddFicheInterventionModal({
   initialOperateurCompany,
   onAddFicheIntervention,
@@ -82,11 +106,19 @@ function AddFicheInterventionModal({
     >
       <h2 className="td-modal-title">Ajouter une fiche d'intervention</h2>
 
-      <Formik<BsffFicheInterventionInput>
+      <div className="notification">
+        Reportez ici certaines des informations d'une fiche d'intervention
+        (formulaire 15497*03) dans Trackdéchets. L'ajout d'une fiche
+        d'intervention permet d'identifier le détenteur d'un équipement afin que
+        celui-ci ait accès au suivi du bordereau.
+      </div>
+
+      <Formik<Values>
         initialValues={{
           weight: 0,
           numero: "",
           detenteur: {
+            isPrivateIndividual: false,
             company: getInitialCompany(),
           },
           operateur: {
@@ -108,57 +140,139 @@ function AddFicheInterventionModal({
         }}
         validationSchema={ficheInterventionSchema}
       >
-        <Form>
-          <div className="form__row">
-            <label>
-              N° fiche d'intervention
-              <Field className="td-input" name="numero" />
-              <RedErrorMessage name="numero" />
-            </label>
-          </div>
+        {({ values }) => (
+          <Form>
+            <div className="form__row">
+              <label>
+                N° fiche d'intervention
+                <Field className="td-input" name="numero" />
+                <RedErrorMessage name="numero" />
+              </label>
+            </div>
 
-          <div className="form__row">
-            <label>
-              Quantité de fluide en kilos
-              <Field
-                component={NumberInput}
-                className="td-input"
-                name="weight"
-              />
-              <RedErrorMessage name="weight" />
-            </label>
-          </div>
+            <div className="form__row">
+              <label>
+                Quantité de fluide en kg
+                <Field
+                  component={NumberInput}
+                  className="td-input"
+                  name="weight"
+                />
+                <RedErrorMessage name="weight" />
+              </label>
+            </div>
 
-          <div className="form__row">
-            <label>
-              Code postal du lieu de collecte
-              <Field className="td-input" name="postalCode" />
-              <RedErrorMessage name="postalCode" />
-            </label>
-          </div>
+            <div className="form__row">
+              <label>
+                Code postal du lieu de collecte
+                <Field className="td-input" name="postalCode" />
+                <RedErrorMessage name="postalCode" />
+              </label>
+            </div>
 
-          <CompanySelector
-            heading="Détenteur de l'équipement"
-            name="detenteur.company"
-          />
+            <IsPrivateIndividualCheckbox />
+            {!values.detenteur.isPrivateIndividual &&
+              values.detenteur?.company && (
+                <CompanySelector
+                  heading="Détenteur de l'équipement"
+                  name="detenteur.company"
+                  skipFavorite={true}
+                />
+              )}
 
-          {error && <NotificationError apolloError={error} />}
+            {values.detenteur.isPrivateIndividual && <PrivateIndividual />}
 
-          <div className="td-modal-actions">
-            <button className="btn btn--outline-primary" onClick={onClose}>
-              Annuler
-            </button>
-            <button
-              type="submit"
-              className="btn btn--primary"
-              disabled={loading}
-            >
-              <span>{loading ? "Ajout en cours..." : "Ajouter"}</span>
-            </button>
-          </div>
-        </Form>
+            {error && <NotificationError apolloError={error} />}
+
+            <div className="td-modal-actions">
+              <button className="btn btn--outline-primary" onClick={onClose}>
+                Annuler
+              </button>
+              <button
+                type="submit"
+                className="btn btn--primary"
+                disabled={loading}
+              >
+                <span>{loading ? "Ajout en cours..." : "Ajouter"}</span>
+              </button>
+            </div>
+          </Form>
+        )}
       </Formik>
     </Modal>
+  );
+}
+
+function IsPrivateIndividualCheckbox() {
+  const { values, setFieldValue } = useFormikContext<Values>();
+
+  React.useEffect(() => {
+    setFieldValue("detenteur.company", getInitialCompany());
+  }, [values.detenteur?.isPrivateIndividual, setFieldValue]);
+
+  return (
+    <div className="form__row">
+      <label>
+        <Field
+          type="checkbox"
+          name="detenteur.isPrivateIndividual"
+          className="td-checkbox"
+        />
+        Le détenteur de l'équipement est un particulier
+      </label>
+    </div>
+  );
+}
+
+function PrivateIndividual() {
+  return (
+    <>
+      <h4 className="form__section-heading">Détenteur de l'équipement</h4>
+      <div className="form__row">
+        <label>
+          Nom et prénom
+          <Field
+            type="text"
+            name="detenteur.company.name"
+            className="td-input"
+          />
+        </label>
+        <RedErrorMessage name="detenteur.company.name" />
+      </div>
+      <div className="form__row">
+        <label>
+          Adresse
+          <Field
+            type="text"
+            name="detenteur.company.address"
+            className="td-input"
+          />
+        </label>
+        <RedErrorMessage name="detenteur.company.address" />
+      </div>
+      <div className="form__row">
+        <label>
+          Téléphone (optionnel)
+          <Field
+            type="text"
+            name="detenteur.company.phone"
+            className="td-input td-input--small"
+          />
+        </label>
+        <RedErrorMessage name="detenteur.company.phone" />
+      </div>
+      <div className="form__row">
+        <label>
+          Mail (optionnel)
+          <Field
+            type="text"
+            name="detenteur.company.mail"
+            className="td-input td-input--medium"
+          />
+        </label>
+        <RedErrorMessage name="detenteur.company.mail" />
+      </div>
+    </>
   );
 }
 
@@ -181,7 +295,9 @@ export function FicheInterventionList({
 
   return (
     <>
-      <h4 className="form__section-heading">Fiche(s) d'intervention</h4>
+      <h4 className="form__section-heading">
+        Détenteur(s) du ou des équipements
+      </h4>
 
       {ficheInterventions.map(ficheIntervention => (
         <div
@@ -190,7 +306,7 @@ export function FicheInterventionList({
         >
           <div className="tw-flex tw-mb-4 tw-items-end">
             <div className="tw-w-11/12 tw-flex">
-              <div className="tw-w-1/3 tw-px-2">
+              <div className="tw-w-1/4 tw-px-2">
                 <label>
                   Numéro fiche d'intervention
                   <input
@@ -201,9 +317,20 @@ export function FicheInterventionList({
                   />
                 </label>
               </div>
-              <div className="tw-w-1/3 tw-px-2">
+              <div className="tw-w-1/4 tw-px-2">
                 <label>
-                  Quantité fluides en kilo(s)
+                  Détenteur
+                  <input
+                    type="text"
+                    className="td-input"
+                    value={ficheIntervention.detenteur?.company?.name ?? ""}
+                    disabled
+                  />
+                </label>
+              </div>
+              <div className="tw-w-1/4 tw-px-2">
+                <label>
+                  Quantité de fluide en kg
                   <input
                     type="text"
                     className="td-input"
@@ -213,7 +340,7 @@ export function FicheInterventionList({
                 </label>
               </div>
 
-              <div className="tw-w-1/3 tw-px-2">
+              <div className="tw-w-1/4 tw-px-2">
                 <label>
                   Code postal du lieu de collecte
                   <input

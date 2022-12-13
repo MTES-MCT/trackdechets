@@ -5,6 +5,7 @@ import {
 } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { applyAuthStrategies, AuthType } from "../../../auth";
+import * as yup from "yup";
 
 /**
  * Edit user profile
@@ -17,12 +18,19 @@ export async function editProfileFn(
   userId: string,
   payload: MutationEditProfileArgs
 ) {
+  const editProfileSchema = yup.object({
+    name: yup.string().ensure().isSafeSSTI(),
+    phone: yup.string()
+  });
+  editProfileSchema.validateSync(payload);
+
   const { name, phone } = payload;
 
   const data = {
     ...(name !== undefined ? { name } : {}),
     ...(phone !== undefined ? { phone } : {})
   };
+
   const updatedUser = await prisma.user.update({
     where: { id: userId },
     data

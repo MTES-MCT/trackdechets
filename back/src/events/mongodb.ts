@@ -67,7 +67,7 @@ export async function insertStreamEvents(tdEvents: Event[]) {
 // The index is created only if it doesn't already exist.
 async function createIndexes() {
   try {
-    await eventsCollection.createIndex({ streamId: 1 });
+    await eventsCollection.createIndex({ streamId: 1, createdAt: 1 });
   } catch (err) {
     logger.error("Error while creating indexes", err);
   }

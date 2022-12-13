@@ -51,7 +51,7 @@ describe("mutation updateCompany", () => {
       contactEmail: "newContact@trackdechets.fr",
       contactPhone: "1111111111",
       givenName: "newGivenName",
-      website: "newWebsite@trackechets.fr",
+      website: "http://newWebsite@trackechets.fr",
       allowBsdasriTakeOverWithoutSignature: true
     };
     const { data } = await mutate<Pick<Mutation, "updateCompany">>(
@@ -66,6 +66,33 @@ describe("mutation updateCompany", () => {
       where: { id: company.id }
     });
     expect(updatedCompany).toMatchObject(variables);
+  });
+
+  it("should forbid xss injection on website field", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+
+    const variables = {
+      id: company.id,
+      gerepId: "newGerepId",
+      contactEmail: "newContact@trackdechets.fr",
+      contactPhone: "1111111111",
+      givenName: "newGivenName",
+      website: "javascript:alert(1)",
+      allowBsdasriTakeOverWithoutSignature: true
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateCompany">>(
+      UPDATE_COMPANY,
+      {
+        variables
+      }
+    );
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "L'url est invalide"
+      })
+    ]);
   });
 
   it("should return an error when trying to add eco-organisme agreements without the relevant type", async () => {

@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { BsffPackagingType, UserRole } from "@prisma/client";
 import { gql } from "apollo-server-express";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
@@ -184,7 +184,11 @@ describe("Query.bsffs", () => {
       { emitter },
       {
         packagings: {
-          create: { name: "Bouteille", numero: "AAAAA", weight: 1 }
+          create: {
+            type: BsffPackagingType.BOUTEILLE,
+            numero: "AAAAA",
+            weight: 1
+          }
         }
       }
     );
@@ -192,7 +196,11 @@ describe("Query.bsffs", () => {
       { emitter },
       {
         packagings: {
-          create: { name: "Bouteille", numero: "BBBBB", weight: 1 }
+          create: {
+            type: BsffPackagingType.BOUTEILLE,
+            numero: "BBBBB",
+            weight: 1
+          }
         }
       }
     );
@@ -200,7 +208,11 @@ describe("Query.bsffs", () => {
       { emitter },
       {
         packagings: {
-          create: { name: "Bouteille", numero: "CCCCC", weight: 1 }
+          create: {
+            type: BsffPackagingType.BOUTEILLE,
+            numero: "CCCCC",
+            weight: 1
+          }
         }
       }
     );

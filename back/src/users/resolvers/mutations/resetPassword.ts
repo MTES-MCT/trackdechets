@@ -6,8 +6,9 @@ import {
   MutationResetPasswordArgs,
   MutationResolvers
 } from "../../../generated/graphql/types";
-import { hashPassword, isPasswordLongEnough } from "../../utils";
-
+import { checkPasswordCriteria } from "../../utils";
+import { updateUserPassword } from "../../database";
+import { clearUserSessions } from "../../../common/redis/users";
 /**
  * Update user password in a password reset workflow
  *
@@ -31,23 +32,22 @@ const resetPasswordResolver: MutationResolvers["resetPassword"] = async (
     throw new UserInputError("Lien invalide ou trop ancien.");
   }
   const trimmedPassword = newPassword.trim();
-  if (!isPasswordLongEnough(trimmedPassword)) {
-    throw new UserInputError("Mot de passe trop court.");
-  }
+
   const user = await prisma.user.findUnique({
     where: { id: resetHash.userId }
   });
+  checkPasswordCriteria(trimmedPassword);
 
-  const hashedPassword = await hashPassword(trimmedPassword);
+  await updateUserPassword({ userId: user.id, trimmedPassword });
 
-  await prisma.user.update({
-    where: { id: user.id },
-
-    data: { password: hashedPassword }
+  // delete all user related UserResetPasswordHash
+  await prisma.userResetPasswordHash.deleteMany({
+    where: { userId: user.id }
   });
-  await prisma.userResetPasswordHash.delete({
-    where: { hash }
-  });
+
+  // bust opened sessions to disconnect user from all devices and browsers
+  await clearUserSessions(user.id);
+
   return true;
 };
 

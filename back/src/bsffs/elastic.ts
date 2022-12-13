@@ -44,7 +44,8 @@ export function toBsdElastic(
     sirets: [
       bsff.emitterCompanySiret,
       bsff.transporterCompanySiret,
-      bsff.destinationCompanySiret
+      bsff.destinationCompanySiret,
+      ...bsff.detenteurCompanySirets
     ],
     ...getRegistryFields(bsff),
     rawBsd: {
@@ -62,6 +63,7 @@ export function toBsdElastic(
       bsff.destinationCompanySiret
     );
   } else {
+    bsd.isFollowFor.push(...bsff.detenteurCompanySirets);
     switch (bsff.status) {
       case BsffStatus.INITIAL: {
         bsd.isForActionFor.push(bsff.emitterCompanySiret);
@@ -121,8 +123,9 @@ export function toBsdElastic(
 }
 
 export async function indexBsff(bsff: Bsff, ctx?: GraphQLContext) {
-  const packagings = await prisma.bsff
-    .findUnique({ where: { id: bsff.id } })
-    .packagings();
-  return indexBsd(toBsdElastic({ ...bsff, packagings }), ctx);
+  const fullBsff = await prisma.bsff.findUnique({
+    where: { id: bsff.id },
+    include: { packagings: true }
+  });
+  return indexBsd(toBsdElastic(fullBsff), ctx);
 }
