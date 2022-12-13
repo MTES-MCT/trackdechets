@@ -40,7 +40,6 @@ export const destinationCompanySiretSchema = (isRequired = true) =>
     .matches(/^$|^\d{14}$/, {
       message: `Destinataire: ${INVALID_SIRET_LENGTH}`
     })
-    .requiredIf(isRequired)
     .test(
       "is-recipient-registered-with-right-profile",
       ({ value }) =>
@@ -78,13 +77,14 @@ export const destinationCompanySiretSchema = (isRequired = true) =>
           throw ctx.createError({
             message:
               `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue` +
-              ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau bordereau.`
+              ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau.`
           });
         }
 
         return true;
       }
-    );
+    )
+    .requiredIf(isRequired, "Destinataire : le n°SIRET est un champ requis");
 
 export const transporterCompanySiretSchema = (isRequired = true) =>
   yup
