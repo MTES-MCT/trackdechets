@@ -109,10 +109,6 @@
     "@graphql-codegen/typescript-operations": "^2.3.4",
     "@graphql-codegen/typescript-resolvers": "^2.5.4",
     "@storybook/addon-actions": "^6.5.14",
-<<<<<<< HEAD
-=======
-    "@storybook/addon-storyshots": "^6.5.14",
->>>>>>> 445fb5606 (Adds Storyshots and a11y)
     "@storybook/addon-a11y": "^6.5.14",
     "@storybook/addon-essentials": "^6.5.14",
     "@storybook/addon-interactions": "^6.5.14",
