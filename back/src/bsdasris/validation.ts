@@ -17,15 +17,8 @@ import {
   BsdasriPackagingType,
   BsdasriSignatureType
 } from "../generated/graphql/types";
-import {
-  isVat,
-  isSiret,
-  isFRVat
-} from "../common/constants/companySearchHelpers";
-import {
-  MISSING_COMPANY_SIRET,
-  MISSING_COMPANY_SIRET_OR_VAT
-} from "../forms/errors";
+import { isVat } from "../common/constants/companySearchHelpers";
+import { MISSING_COMPANY_SIRET } from "../forms/errors";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
 
