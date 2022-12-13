@@ -39,7 +39,6 @@ import {
   FAVORITES,
   SEARCH_COMPANIES,
 } from "./query";
-import { CONTACT_EMAIL } from "common/config";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -300,7 +299,17 @@ export default function CompanySelector({
             ) {
               return (
                 `Nous n'avons pas pu récupérer les informations.` +
-                `Veuillez nous contacter à l'adresse ${CONTACT_EMAIL} pour pouvoir procéder à la création de l'établissement`
+                `Veuillez nous contacter via ` +
+                (
+                  <a
+                    href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    la FAQ
+                  </a>
+                ) +
+                ` pour pouvoir procéder à la création de l'établissement`
               );
             }
             return error.message;
