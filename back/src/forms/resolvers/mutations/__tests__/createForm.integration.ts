@@ -1559,7 +1559,8 @@ describe("Mutation.createForm", () => {
           code: "BAD_USER_INPUT"
         }
       })
-    ]);  });
+    ]);
+  });
 
   it("should be possible to fill TVA number only for a foreign transporter", async () => {
     const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
@@ -1634,7 +1635,7 @@ describe("Mutation.createForm", () => {
 
     const intermediaryCreation = toIntermediaryCompany(company);
 
-    const { data, errors } = await mutate<
+    const { data } = await mutate<
       Pick<Mutation, "createForm">,
       MutationCreateFormArgs
     >(CREATE_FORM, {
