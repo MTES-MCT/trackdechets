@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Formik, Field, Form, useFormikContext } from "formik";
 import {
-  PROCESSING_OPERATIONS,
+  PROCESSING_AND_REUSE_OPERATIONS,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
 } from "generated/constants";
 import DateInput from "form/common/components/custom-inputs/DateInput";
@@ -109,7 +109,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
           className="td-select"
         >
           <option value="">Choisissez...</option>
-          {PROCESSING_OPERATIONS.map(operation => (
+          {PROCESSING_AND_REUSE_OPERATIONS.map(operation => (
             <option key={operation.code} value={operation.code}>
               {operation.code} - {operation.description.substr(0, 50)}
               {operation.description.length > 50 ? "..." : ""}
@@ -170,7 +170,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
               className="td-select"
             >
               <option value="">Choisissez...</option>
-              {PROCESSING_OPERATIONS.map(operation => (
+              {PROCESSING_AND_REUSE_OPERATIONS.map(operation => (
                 <option key={operation.code} value={operation.code}>
                   {operation.code} - {operation.description.substr(0, 50)}
                   {operation.description.length > 50 ? "..." : ""}

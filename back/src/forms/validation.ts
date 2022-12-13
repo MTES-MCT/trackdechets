@@ -14,6 +14,7 @@ import * as yup from "yup";
 import {
   isDangerous,
   PROCESSING_OPERATIONS_CODES,
+  PROCESSING_AND_REUSE_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
   BSDD_WASTE_CODES
 } from "../common/constants";
@@ -1115,7 +1116,10 @@ const processedInfoSchemaFn: (value: any) => yup.SchemaOf<ProcessedInfo> =
       processedAt: yup.date().required(),
       processingOperationDone: yup
         .string()
-        .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION),
+        .oneOf(
+          PROCESSING_AND_REUSE_OPERATIONS_CODES,
+          INVALID_PROCESSING_OPERATION
+        ),
       processingOperationDescription: yup.string().nullable()
     });
 
