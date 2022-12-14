@@ -49,7 +49,14 @@ export class FixBSDVatUpdater implements Updater {
           await prisma.form.update({
             data: {
               transporterCompanyVatNumber:
-                formData.transporterCompanyVatNumber.replace(/[\W_]+/g, "")
+                formData.transporterCompanyVatNumber.replace(/[\W_]+/g, ""),
+              ...(formData.transporterCompanyVatNumber ===
+              formData.transporterCompanySiret
+                ? {
+                    transporterCompanySiret:
+                      formData.transporterCompanySiret.replace(/[\W_]+/g, "")
+                  }
+                : {})
             },
             where: { id: formData.id }
           });
