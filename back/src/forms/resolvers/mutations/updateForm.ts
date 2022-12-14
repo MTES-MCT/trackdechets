@@ -135,7 +135,8 @@ const updateFormResolver = async (
       recipientCompanySiret:
         temporaryStorageDetail?.destination?.company?.siret ??
         forwardedIn?.recipientCompanySiret,
-      transporterCompanySiret: forwardedIn?.transporterCompanySiret
+      transporterCompanySiret: forwardedIn?.transporterCompanySiret,
+      transporterCompanyVatNumber: forwardedIn?.transporterCompanyVatNumber
     };
   }
 

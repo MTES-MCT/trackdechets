@@ -73,7 +73,11 @@ export class FixBSDVatUpdater implements Updater {
         await prisma.bsda.update({
           data: {
             transporterCompanyVatNumber:
-              bsda.transporterCompanyVatNumber.replace(/[\W_]+/g, "")
+              bsda.transporterCompanyVatNumber.replace(/[\W_]+/g, ""),
+            transporterCompanySiret: bsda.transporterCompanySiret.replace(
+              /[\W_]+/g,
+              ""
+            )
           },
           where: { id: "BSDA-20220323-TXK0A50KQ" }
         });
@@ -100,7 +104,9 @@ export class FixBSDVatUpdater implements Updater {
           await prisma.bsvhu.update({
             data: {
               transporterCompanyVatNumber:
-                bsvhuData.transporterCompanyVatNumber.replace(/[\W_]+/g, "")
+                bsvhuData.transporterCompanyVatNumber.replace(/[\W_]+/g, ""),
+              transporterCompanySiret:
+                bsvhuData.transporterCompanySiret.replace(/[\W_]+/g, "")
             },
             where: { id: bsvhuData.id }
           });
