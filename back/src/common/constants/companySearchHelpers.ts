@@ -73,7 +73,8 @@ export const countries = [
 ];
 export const TEST_COMPANY_PREFIX = "000000";
 
-// support all environments
+// support all environments front and back
+// process.env is not available in frontend JS
 let ALLOW_TEST_COMPANY = false;
 try {
   ALLOW_TEST_COMPANY = process.env.ALLOW_TEST_COMPANY === "true";
