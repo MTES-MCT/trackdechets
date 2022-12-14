@@ -70,7 +70,7 @@ export class FixBSDVatUpdater implements Updater {
         where: { id: "BSDA-20220323-TXK0A50KQ" }
       });
       if (bsda) {
-        await prisma.form.update({
+        await prisma.bsda.update({
           data: {
             transporterCompanyVatNumber:
               bsda.transporterCompanyVatNumber.replace(/[\W_]+/g, "")
