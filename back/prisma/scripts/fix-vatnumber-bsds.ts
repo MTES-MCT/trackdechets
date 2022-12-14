@@ -81,10 +81,15 @@ export class FixBSDVatUpdater implements Updater {
           data: {
             transporterCompanyVatNumber:
               bsda.transporterCompanyVatNumber.replace(/[\W_]+/g, ""),
-            transporterCompanySiret: bsda.transporterCompanySiret.replace(
-              /[\W_]+/g,
-              ""
-            )
+            ...(bsda.transporterCompanySiret &&
+            bsda.transporterCompanyVatNumber === bsda.transporterCompanySiret
+              ? {
+                  transporterCompanySiret: bsda.transporterCompanySiret.replace(
+                    /[\W_]+/g,
+                    ""
+                  )
+                }
+              : {})
           },
           where: { id: "BSDA-20220323-TXK0A50KQ" }
         });
@@ -112,8 +117,14 @@ export class FixBSDVatUpdater implements Updater {
             data: {
               transporterCompanyVatNumber:
                 bsvhuData.transporterCompanyVatNumber.replace(/[\W_]+/g, ""),
-              transporterCompanySiret:
-                bsvhuData.transporterCompanySiret.replace(/[\W_]+/g, "")
+              ...(bsvhuData.transporterCompanySiret &&
+              bsvhuData.transporterCompanyVatNumber ===
+                bsvhuData.transporterCompanySiret
+                ? {
+                    transporterCompanySiret:
+                      bsvhuData.transporterCompanySiret.replace(/[\W_]+/g, "")
+                  }
+                : {})
             },
             where: { id: bsvhuData.id }
           });
