@@ -34,6 +34,8 @@ export default function Recipient() {
   // limite arbitraire du nombre d'intermédiaires qu'on peut ajouter
   const isAddIntermediaryButtonEnabled = values.intermediaries.length <= 20;
 
+  const isGrouping = values?.emitter?.type === "APPENDIX2";
+
   const intermediariesOptions: IntermediariesSelect[] = [
     ...(!hasTrader && !hasBroker
       ? [
@@ -160,8 +162,8 @@ export default function Recipient() {
         <Field
           component={ProcessingOperation}
           name="recipient.processingOperation"
+          enableReuse={isGrouping}
         />
-
         <RedErrorMessage name="recipient.processingOperation" />
       </div>
       <div className="form__row">

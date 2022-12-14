@@ -990,7 +990,7 @@ const withNextDestination = (required: boolean) =>
       .string()
       .required(`Destination ultérieure : ${MISSING_PROCESSING_OPERATION}`)
       .oneOf(
-        PROCESSING_OPERATIONS_CODES,
+        PROCESSING_AND_REUSE_OPERATIONS_CODES,
         `Destination ultérieure : ${INVALID_PROCESSING_OPERATION}`
       ),
     nextDestinationCompanyName: yup
