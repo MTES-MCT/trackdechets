@@ -1532,11 +1532,11 @@ describe("Mutation.createForm", () => {
     expect(data.createForm.wasteDetails.isDangerous).toBe(true);
   });
 
-  it("should be possible to fill both a SIRET number and a TVA number for transporter", async () => {
+  it("should not be possible to fill both a SIRET number and a FR TVA number for transporter", async () => {
     const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
     const transporter = await companyFactory();
     const { mutate } = makeClient(user);
-    const { data } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "createForm">,
       MutationCreateFormArgs
     >(CREATE_FORM, {
@@ -1551,7 +1551,15 @@ describe("Mutation.createForm", () => {
         }
       }
     });
-    expect(data?.createForm?.id).toBeDefined();
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "transporterCompanyVatNumber n'est pas un numéro de TVA intracommunautaire valide. Seuls les numéros non-français sont valides, les entreprises françaises doivent être identifiées par leur numéro de SIRET",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
   });
 
   it("should be possible to fill TVA number only for a foregin transporter", async () => {
