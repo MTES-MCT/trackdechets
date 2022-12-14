@@ -9,7 +9,7 @@ function sleep(ms) {
 @registerUpdater(
   "Fix name and address to companies",
   "Fix name and address to companies",
-  true
+  false
 )
 export class FixNameAddressCompanyUpdater implements Updater {
   async run() {
