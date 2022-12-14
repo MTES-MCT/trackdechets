@@ -109,6 +109,7 @@
     "@graphql-codegen/typescript-operations": "^2.3.4",
     "@graphql-codegen/typescript-resolvers": "^2.5.4",
     "@storybook/addon-actions": "^6.5.14",
+    "@storybook/addon-a11y": "^6.5.14",
     "@storybook/addon-essentials": "^6.5.14",
     "@storybook/addon-interactions": "^6.5.14",
     "@storybook/addon-links": "^6.5.14",
