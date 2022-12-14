@@ -1,7 +1,11 @@
+import { CompanyType } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { Mutation } from "../../../../generated/graphql/types";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  companyFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsvhuFactory } from "../../../__tests__/factories.vhu";
 
@@ -62,9 +66,17 @@ describe("Mutation.Vhu.publish", () => {
 
   it("should pass the form as non draft", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory({
+      companyTypes: [CompanyType.TRANSPORTER]
+    });
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.WASTE_VEHICLES]
+    });
     const form = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret,
+        transporterCompanySiret: transporter.siret,
+        destinationCompanySiret: destination.siret,
         isDraft: true
       }
     });

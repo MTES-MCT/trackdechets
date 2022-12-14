@@ -88,9 +88,7 @@ describe("transporterSchema", () => {
         transporterCompanySiret: "1"
       });
 
-    await expect(validateFn()).rejects.toThrow(
-      "transporterCompanySiret n'est pas un numéro de SIRET valide"
-    );
+    await expect(validateFn()).rejects.toThrow("Transporteur : SIRET invalide");
   });
 
   test("invalid email", async () => {
@@ -130,9 +128,7 @@ describe("destinationSchema", () => {
         destinationCompanySiret: "1"
       });
 
-    await expect(validateFn()).rejects.toThrow(
-      "Destinataire: Le SIRET doit faire 14 caractères numériques"
-    );
+    await expect(validateFn()).rejects.toThrow("Destinataire : SIRET invalide");
   });
 
   test("invalid email", async () => {

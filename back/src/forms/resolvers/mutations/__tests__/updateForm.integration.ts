@@ -296,7 +296,7 @@ describe("Mutation.updateForm", () => {
     expect(errors).toMatchObject([
       expect.objectContaining({
         extensions: { code: ErrorCode.BAD_USER_INPUT },
-        message: "Destinataire: Le siret de l'entreprise est obligatoire"
+        message: "Destinataire : le n°SIRET est un champ requis"
       })
     ]);
   });
