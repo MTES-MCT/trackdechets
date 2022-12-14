@@ -6,7 +6,10 @@ import { Bsdasri } from "@prisma/client";
 
 export type BsdasriSirets = Pick<
   Bsdasri,
-  "emitterCompanySiret" | "destinationCompanySiret" | "transporterCompanySiret"
+  | "emitterCompanySiret"
+  | "destinationCompanySiret"
+  | "transporterCompanySiret"
+  | "transporterCompanyVatNumber"
 > &
   Partial<Pick<Bsdasri, "ecoOrganismeSiret">>;
 
