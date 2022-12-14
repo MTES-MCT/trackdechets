@@ -525,7 +525,7 @@ describe("Mutation.createCompany", () => {
         ecoOrganismeAgreements: [],
         gerepId: null,
         name: "Acme in EU",
-        siret: "RO17579668", // FIXME backports VAT to  SIRET to ensure working "SIRET only" functions
+        siret: "",
         address: "Transporter street",
         traderReceipt: null,
         transporterReceipt: null,
