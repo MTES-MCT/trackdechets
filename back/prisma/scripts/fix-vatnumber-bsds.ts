@@ -17,14 +17,10 @@ export class FixBSDVatUpdater implements Updater {
         `select "id", "transporterCompanyVatNumber" from default$default."Form" as f where f."transporterCompanyVatNumber" ~ '(\\-|\\.|\\s)'`
       );
 
-      await prompts({
-        type: "confirm",
-        name: "force",
-        message: `Confirm to hard update ${forms.length} Forms ?`,
-        initial: false
-      });
-
       try {
+        const lines = forms.map(f =>
+          [f.id, f.transporterCompanyVatNumber].join(", ")
+        );
         fs.writeFileSync(
           path.join(
             __dirname,
@@ -32,10 +28,20 @@ export class FixBSDVatUpdater implements Updater {
             "..",
             "log-clean-Form-transporterCompanyVatNumber.log"
           ),
-          `${forms.map(f => f.id).join(", ")}`
+          `${lines.join("\r\n")}`
         );
       } catch (err) {
         console.error(err);
+      }
+
+      const { value } = await prompts({
+        type: "confirm",
+        name: "value",
+        message: `Confirm to hard update ${forms.length} Forms ?`,
+        initial: false
+      });
+      if (!value) {
+        process.exit(0);
       }
 
       for (const formData of forms) {
@@ -87,6 +93,9 @@ export class FixBSDVatUpdater implements Updater {
         }
       });
       for (const bsvhuData of bsvhus) {
+        if (!bsvhuData.transporterCompanyVatNumber) {
+          continue;
+        }
         try {
           await prisma.bsvhu.update({
             data: {
