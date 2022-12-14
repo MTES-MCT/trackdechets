@@ -1,9 +1,7 @@
 import React, { useEffect } from "react";
 import { Formik, Field, Form, useFormikContext } from "formik";
-import {
-  PROCESSING_AND_REUSE_OPERATIONS,
-  PROCESSING_OPERATIONS_GROUPEMENT_CODES,
-} from "generated/constants";
+import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "generated/constants";
+import { PROCESSING_AND_REUSE_OPERATIONS } from "generated/constants";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import {

@@ -1,4 +1,4 @@
-enum ProcessingOperationType {
+export enum ProcessingOperationType {
   Eliminiation = "ELIMINIATION",
   Valorisation = "VALORISATION",
   Groupement = "GROUPEMENT"
@@ -175,18 +175,6 @@ export const PROCESSING_OPERATIONS: ProcessingOperation[] = [
 export const PROCESSING_OPERATIONS_CODES: string[] = PROCESSING_OPERATIONS.map(
   operation => operation.code
 );
-
-export const PROCESSING_AND_REUSE_OPERATIONS = [
-  {
-    type: ProcessingOperationType.Valorisation,
-    code: "R 0",
-    description: "Réutilisation - réemploi"
-  },
-  ...PROCESSING_OPERATIONS
-];
-
-export const PROCESSING_AND_REUSE_OPERATIONS_CODES: string[] =
-  PROCESSING_AND_REUSE_OPERATIONS.map(operation => operation.code);
 
 export const PROCESSING_OPERATIONS_GROUPEMENT_CODES: string[] =
   PROCESSING_OPERATIONS.filter(
