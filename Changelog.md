@@ -9,7 +9,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
-- Vérification des numéro de TVA et de SIRET en entrée por tous les types de bordereaux [PR 1928](https://github.com/MTES-MCT/trackdechets/pull/1928)
+- Vérification des numéros de SIRET en entrée pour tous les types de bordereaux [PR 1928](https://github.com/MTES-MCT/trackdechets/pull/1928)
 
 #### :bug: Corrections de bugs
 
