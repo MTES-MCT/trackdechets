@@ -60,12 +60,13 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   // clean orgId
   const orgId = companyInput.orgId.replace(/[\W_]+/g, "");
-  // copy VAT number to the SIRET field in order to ensure backward compatibility
-  const siret = orgId;
+
+  let siret: string;
   let vatNumber: string;
+
   if (isFRVat(orgId)) {
     throw new UserInputError(
-      "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indique un SIRET"
+      "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indiquer un SIRET"
     );
   }
   if (isVat(orgId)) {
@@ -79,7 +80,10 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     throw new UserInputError(
       "Impossible de créer un établissement sans un SIRET valide ni un numéro de TVA étranger valide"
     );
+  } else {
+    siret = orgId;
   }
+
   const existingCompany = await prisma.company.findUnique({
     where: whereSiretOrVatNumber({ siret, vatNumber })
   });
