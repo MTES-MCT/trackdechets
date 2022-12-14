@@ -13,7 +13,6 @@ import countries from "world-countries";
 import * as yup from "yup";
 import {
   isDangerous,
-  PROCESSING_OPERATIONS_CODES,
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
   BSDD_WASTE_CODES
