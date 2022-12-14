@@ -107,8 +107,6 @@ const updateFormResolver = async (
       form.recipientCompanySiret ?? formCompanies.recipientCompanySiret,
     transporterCompanySiret:
       form.transporterCompanySiret ?? formCompanies.transporterCompanySiret,
-    transporterCompanyVatNumber:
-      form.transporterCompanyVatNumber ?? formCompanies.transporterCompanyVatNumber,
     traderCompanySiret:
       form.traderCompanySiret ?? formCompanies.traderCompanySiret,
     brokerCompanySiret:
@@ -135,8 +133,7 @@ const updateFormResolver = async (
       recipientCompanySiret:
         temporaryStorageDetail?.destination?.company?.siret ??
         forwardedIn?.recipientCompanySiret,
-      transporterCompanySiret: forwardedIn?.transporterCompanySiret,
-      transporterCompanyVatNumber: forwardedIn?.transporterCompanyVatNumber
+      transporterCompanySiret: forwardedIn?.transporterCompanySiret
     };
   }
 

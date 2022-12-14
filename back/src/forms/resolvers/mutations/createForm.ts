@@ -58,7 +58,6 @@ const createFormResolver = async (
     emitterCompanySiret: formContent.emitter?.company?.siret,
     recipientCompanySiret: formContent.recipient?.company?.siret,
     transporterCompanySiret: formContent.transporter?.company?.siret,
-    transporterCompanyVatNumber: formContent.transporter?.company?.vatNumber,
     traderCompanySiret: formContent.trader?.company?.siret,
     brokerCompanySiret: formContent.broker?.company?.siret,
     ecoOrganismeSiret: formContent.ecoOrganisme?.siret,
@@ -67,8 +66,7 @@ const createFormResolver = async (
           forwardedIn: {
             recipientCompanySiret:
               temporaryStorageDetail.destination.company.siret,
-            transporterCompanySiret: null,
-            transporterCompanyVatNumber: null
+            transporterCompanySiret: null
           }
         }
       : {}),

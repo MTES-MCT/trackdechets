@@ -15,7 +15,6 @@ export async function formToCompanies(form: Form): Promise<FormCompanies> {
     emitterCompanySiret: fullForm.emitterCompanySiret,
     recipientCompanySiret: fullForm.recipientCompanySiret,
     transporterCompanySiret: fullForm.transporterCompanySiret,
-    transporterCompanyVatNumber: fullForm.transporterCompanyVatNumber,
     traderCompanySiret: fullForm.traderCompanySiret,
     brokerCompanySiret: fullForm.brokerCompanySiret,
     ecoOrganismeSiret: fullForm.ecoOrganismeSiret,
@@ -41,9 +40,7 @@ export async function formToCompanies(form: Form): Promise<FormCompanies> {
           forwardedIn: {
             recipientCompanySiret: fullForm.forwardedIn.recipientCompanySiret,
             transporterCompanySiret:
-              fullForm.forwardedIn.transporterCompanySiret,
-            transporterCompanyVatNumber:
-              fullForm.forwardedIn.transporterCompanyVatNumber
+              fullForm.forwardedIn.transporterCompanySiret
           }
         }
       : {})
@@ -73,14 +70,11 @@ function isFormTransporter(
   userCompaniesSiretOrVat: string[],
   form: FormCompanies
 ) {
-  if (!form.transporterCompanySiret && !form.transporterCompanyVatNumber) {
+  if (!form.transporterCompanySiret) {
     return false;
   }
 
-  return (
-    userCompaniesSiretOrVat.includes(form.transporterCompanyVatNumber) ||
-    userCompaniesSiretOrVat.includes(form.transporterCompanySiret)
-  );
+  return userCompaniesSiretOrVat.includes(form.transporterCompanySiret);
 }
 
 function isFormTrader(userCompaniesSiretOrVat: string[], form: FormCompanies) {
@@ -131,13 +125,8 @@ function isFormTransporterAfterTempStorage(
     return false;
   }
 
-  return (
-    userCompaniesSiretOrVat.includes(
-      form.forwardedIn.transporterCompanySiret
-    ) ||
-    userCompaniesSiretOrVat.includes(
-      form.forwardedIn.transporterCompanyVatNumber
-    )
+  return userCompaniesSiretOrVat.includes(
+    form.forwardedIn.transporterCompanySiret
   );
 }
 
