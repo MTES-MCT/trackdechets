@@ -14,24 +14,24 @@ export class FixBSDVatUpdater implements Updater {
   async run() {
     try {
       const forms: Form[] = await prisma.$queryRawUnsafe(
-        `select "id", "transporterCompanyVatNumber" from default$default."Form" as f where f."transporterCompanyVatNumber" ~ '(\\-|\\.|\\s)'`
+        `select "id", "transporterCompanyVatNumber", "transporterCompanySiret", "transportersSirets" from default$default."Form" as f where f."transporterCompanyVatNumber" ~ '(\\-|\\.|\\s)'`
       );
 
+      const filePath = path.join(
+        __dirname,
+        "..",
+        "..",
+        "fix-vatnumber-bsds.csv"
+      );
       try {
+        // save to CSV all modified Forms
         const lines = forms.map(f =>
-          [f.id, f.transporterCompanyVatNumber].join(", ")
+          [f.id, f.transporterCompanyVatNumber].join(",")
         );
-        fs.writeFileSync(
-          path.join(
-            __dirname,
-            "..",
-            "..",
-            "log-clean-Form-transporterCompanyVatNumber.log"
-          ),
-          `${lines.join("\r\n")}`
-        );
+        fs.writeFileSync(filePath, `${lines.join("\r\n")}`);
       } catch (err) {
-        console.error(err);
+        console.error(`Error saving CSV log file ${filePath}`, err);
+        process.exit(1);
       }
 
       const { value } = await prompts({
@@ -45,17 +45,45 @@ export class FixBSDVatUpdater implements Updater {
       }
 
       for (const formData of forms) {
+        const {
+          transporterCompanyVatNumber,
+          transporterCompanySiret,
+          transportersSirets
+        } = formData;
+
         try {
+          const cleanVat = !!transporterCompanyVatNumber
+            ? transporterCompanyVatNumber.replace(/[\W_]+/g, "")
+            : "";
+          let cleanSiret = transporterCompanySiret;
+          // restrict to TVA copied to SIRET
+          if (
+            !!transporterCompanySiret &&
+            transporterCompanyVatNumber === transporterCompanySiret
+          ) {
+            cleanSiret = transporterCompanySiret.replace(/[\W_]+/g, "");
+          }
+          let cleanTransportersSirets = [];
+          if (!!transportersSirets) {
+            cleanTransportersSirets = transportersSirets.map(siret => {
+              if (siret === transporterCompanySiret) return cleanSiret;
+              else return siret;
+            });
+          }
+
           await prisma.form.update({
             data: {
-              transporterCompanyVatNumber:
-                formData.transporterCompanyVatNumber.replace(/[\W_]+/g, ""),
-              ...(formData.transporterCompanyVatNumber ===
-              formData.transporterCompanySiret
+              ...(!!transporterCompanyVatNumber
+                ? { transporterCompanyVatNumber: cleanVat }
+                : {}),
+              ...(!!transporterCompanySiret &&
+              transporterCompanyVatNumber === transporterCompanySiret
                 ? {
-                    transporterCompanySiret:
-                      formData.transporterCompanySiret.replace(/[\W_]+/g, "")
+                    transporterCompanySiret: cleanSiret
                   }
+                : {}),
+              ...(!!transportersSirets
+                ? { transportersSirets: cleanTransportersSirets }
                 : {})
             },
             where: { id: formData.id }
@@ -93,6 +121,7 @@ export class FixBSDVatUpdater implements Updater {
           },
           where: { id: "BSDA-20220323-TXK0A50KQ" }
         });
+        console.log(`Fixed BSDA ${bsda.id}`);
       }
     } catch (err) {
       console.error("☠ Something went wrong during the update of Bsda", err);
@@ -128,6 +157,7 @@ export class FixBSDVatUpdater implements Updater {
             },
             where: { id: bsvhuData.id }
           });
+          console.log(`Fixed BSVHU ${bsvhuData.id}`);
         } catch (err) {
           console.error(
             `Failed fixing bsvhu.transporterCompanyVatNumber on bsvhu ${bsvhuData.id}`,
