@@ -79,6 +79,7 @@ export async function searchCompany(
     ...where,
     select: {
       id: true,
+      orgId: true,
       siret: true,
       name: true,
       address: true,
@@ -117,7 +118,7 @@ export const makeSearchCompanies =
         )
         .catch(_ => []);
     }
-    // fuzzy searching when another text clue is sent
+    // fuzzy searching only for French companies
     return decoratedSearchCompanies(clue, department).then(async results => {
       let existingCompanies = [];
       if (results.length) {
@@ -127,8 +128,7 @@ export const makeSearchCompanies =
               siret: { in: results.map(r => r.siret) }
             },
             select: {
-              siret: true,
-              vatNumber: true
+              siret: true
             }
           })
         ).map(company => company.siret);

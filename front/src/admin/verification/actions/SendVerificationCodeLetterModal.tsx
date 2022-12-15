@@ -57,7 +57,7 @@ export default function SendVerificationCodeLetterModal({
         <h2 className="td-modal-title">Envoyer un courrier</h2>
         <div className="tw-mt-5">
           Vous êtes sur le point d'envoyer un courrier contenant un code de
-          vérification à l'établissement {company.name} - {company.siret}
+          vérification à l'établissement {company.name} - {company.orgId}
         </div>
         <div className="td-modal-actions">
           <button

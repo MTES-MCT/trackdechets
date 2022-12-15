@@ -53,6 +53,7 @@ import EditSegment from "./EditSegment";
 import { Loader } from "common/components";
 import { isDangerous } from "generated/constants";
 import { format } from "date-fns";
+import { isSiret } from "generated/constants/companySearchHelpers";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -179,8 +180,12 @@ const TempStorage = ({ form }) => {
             />
 
             <DetailRow
-              value={temporaryStorageDetail?.transporter?.company?.siret}
-              label="Siret"
+              value={temporaryStorageDetail?.transporter?.company?.orgId}
+              label={
+                isSiret(temporaryStorageDetail?.transporter?.company?.orgId)
+                  ? "Siret"
+                  : "Numéro de TVA"
+              }
             />
 
             <DetailRow

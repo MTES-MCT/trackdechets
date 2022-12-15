@@ -167,6 +167,7 @@ export default function CompanySelector({
     setIsForeignCompany(isForeignVat(company.vatNumber!!));
     // Prépare la mise à jour du Form
     const fields: FormCompany = {
+      orgId: company.orgId,
       siret: company.siret,
       vatNumber: company.vatNumber,
       name: company.name && company.name !== "---" ? company.name : "",
@@ -528,6 +529,7 @@ function favoriteToCompanySearchResult(
   company: CompanyFavorite
 ): CompanySearchResult {
   return {
+    orgId: company.orgId,
     siret: company.siret,
     vatNumber: company.vatNumber,
     name: company.name,

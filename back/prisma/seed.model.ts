@@ -4,6 +4,7 @@ import prisma from "../src/prisma";
 import { siretify } from "../src/__tests__/factories";
 
 export default async () => {
+  let siret = siretify(1);
   await prisma.user.create({
     data: {
       email: "hello@producteur.fr",
@@ -17,7 +18,8 @@ export default async () => {
           role: "ADMIN",
           company: {
             create: {
-              siret: siretify(1),
+              orgId: siret,
+              siret,
               securityCode: 1234,
               verificationCode: "4321",
               name: "PRODUCTEUR",
@@ -30,6 +32,7 @@ export default async () => {
       }
     }
   });
+  siret = siretify(2);
   await prisma.user.create({
     data: {
       email: "hello@transporteur.fr",
@@ -43,7 +46,8 @@ export default async () => {
           role: "ADMIN",
           company: {
             create: {
-              siret: siretify(2),
+              orgId: siret,
+              siret,
               securityCode: 1234,
               verificationCode: "4321",
               name: "TRANSPORTEUR",
@@ -63,6 +67,7 @@ export default async () => {
       }
     }
   });
+  siret = siretify(3);
   await prisma.user.create({
     data: {
       email: "hello@collecteur.fr",
@@ -76,7 +81,8 @@ export default async () => {
           role: "ADMIN",
           company: {
             create: {
-              siret: siretify(3),
+              orgId: siret,
+              siret,
               securityCode: 1234,
               verificationCode: "4321",
               name: "COLLECTEUR",
@@ -89,6 +95,7 @@ export default async () => {
       }
     }
   });
+  siret = siretify(4);
   await prisma.user.create({
     data: {
       email: "hello@ecoorganisme.fr",
@@ -102,7 +109,8 @@ export default async () => {
           role: "ADMIN",
           company: {
             create: {
-              siret: siretify(4),
+              orgId: siret,
+              siret,
               securityCode: 1234,
               verificationCode: "4321",
               name: "ECOORG",

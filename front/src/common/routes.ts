@@ -17,7 +17,7 @@ const routes = {
   resendActivationEmail: "/resend-activation-email",
   passwordResetRequest: "/password-reset-request",
   passwordReset: "/password-reset",
-  company: "/company/:siret",
+  company: "/company/:orgId",
   wasteTree: "/wasteTree",
   dashboard: {
     index: "/dashboard/:siret",

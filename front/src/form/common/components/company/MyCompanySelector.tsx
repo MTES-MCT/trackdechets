@@ -44,6 +44,7 @@ export default function MyCompanySelector({
       company: Pick<
         CompanyPrivate,
         | "siret"
+        | "vatNumber"
         | "name"
         | "contact"
         | "contactEmail"
@@ -52,6 +53,7 @@ export default function MyCompanySelector({
       >
     ) => {
       setFieldValue(`${fieldName}.siret`, company.siret ?? "");
+      setFieldValue(`${fieldName}.vatNumber`, company.vatNumber ?? "");
       setFieldValue(`${fieldName}.name`, company.name ?? "");
       setFieldValue(`${fieldName}.contact`, company.contact ?? "");
       setFieldValue(`${fieldName}.mail`, company.contactEmail ?? "");

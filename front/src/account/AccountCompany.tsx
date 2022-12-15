@@ -28,7 +28,9 @@ AccountCompany.fragments = {
     fragment AccountCompanyFragment on CompanyPrivate {
       id
       name
+      orgId
       siret
+      vatNumber
       userRole
       ...AccountCompanyInfoFragment
       ...AccountCompanySecurityFragment
@@ -105,7 +107,7 @@ export default function AccountCompany({ company }: Props) {
     <div className={["panel", styles.company].join(" ")}>
       <div className={styles.title}>
         <h6>
-          {company.name} ({company.siret})
+          {company.name} ({company.orgId})
         </h6>
         {isAdmin && (
           <h6 className={styles.admin}>

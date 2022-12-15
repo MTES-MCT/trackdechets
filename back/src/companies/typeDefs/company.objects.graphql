@@ -39,6 +39,9 @@ type CompanyPrivate {
   """
   givenName: String
 
+  "SIRET ou TVA de l'établissement"
+  orgId: String!
+
   "SIRET de l'établissement"
   siret: String!
 
@@ -115,6 +118,8 @@ type CompanyPrivateConnection {
 
 "Information sur un établissement accessible publiquement en recherche"
 type CompanyPublic {
+  "SIRET ou TVA de l'établissement"
+  orgId: String!
   "SIRET de l'établissement"
   siret: String
   "TVA de l'établissement"
@@ -199,6 +204,8 @@ type CompanyPublic {
 
 "Information sur un établissement accessible publiquement en recherche floue"
 type CompanySearchResult {
+  "SIRET ou TVA de l'établissement"
+  orgId: String
   "SIRET de l'établissement"
   siret: String
   "TVA de l'établissement"
@@ -284,7 +291,7 @@ type CompanySearchResult {
   Statut de diffusion des informations de l'établisement selon l'INSEE
   """
   statutDiffusionEtablissement: StatutDiffusionEtablissement
-  
+
   """
   Certification entreprise de travaux
   """

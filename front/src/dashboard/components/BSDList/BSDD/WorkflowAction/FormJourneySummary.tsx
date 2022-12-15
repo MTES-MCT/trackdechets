@@ -56,7 +56,7 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
         <JourneyStopName>Transporteur</JourneyStopName>
         {form.transporter?.company && (
           <JourneyStopDescription>
-            {form.transporter.company.name} ({form.transporter.company.siret})
+            {form.transporter.company.name} ({form.transporter.company.orgId})
             <br />
             {form.transporter.company.address}
           </JourneyStopDescription>
@@ -76,7 +76,7 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
             <JourneyStopName>Entreposage provisoire</JourneyStopName>
             {form.recipient?.company && (
               <JourneyStopDescription>
-                {form.recipient.company.name} ({form.recipient.company.siret})
+                {form.recipient.company.name} ({form.recipient.company.orgId})
                 <br />
                 {form.recipient.company.address}
               </JourneyStopDescription>
@@ -95,7 +95,7 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
             {form.temporaryStorageDetail.transporter?.company && (
               <JourneyStopDescription>
                 {form.temporaryStorageDetail.transporter.company.name} (
-                {form.temporaryStorageDetail.transporter.company.siret})
+                {form.temporaryStorageDetail.transporter.company.orgId})
                 <br />
                 {form.temporaryStorageDetail.transporter.company.address}
               </JourneyStopDescription>
@@ -115,7 +115,7 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
         <JourneyStopName>Destinataire</JourneyStopName>
         {finalRecipient.company && (
           <JourneyStopDescription>
-            {finalRecipient.company.name} ({finalRecipient.company.siret})
+            {finalRecipient.company.name} ({finalRecipient.company.orgId})
             <br />
             {finalRecipient.company.address}
           </JourneyStopDescription>

@@ -76,6 +76,7 @@ describe("Mutation.createCompany", () => {
     };
 
     searchCompany.mockResolvedValueOnce({
+      orgId,
       siret: orgId,
       etatAdministratif: "A"
     });
@@ -134,6 +135,7 @@ describe("Mutation.createCompany", () => {
     };
 
     searchCompany.mockResolvedValueOnce({
+      orgId,
       siret: orgId,
       etatAdministratif: "A"
     });
@@ -198,6 +200,7 @@ describe("Mutation.createCompany", () => {
     };
 
     searchCompany.mockResolvedValueOnce({
+      orgId,
       siret: orgId,
       etatAdministratif: "A"
     });
@@ -243,6 +246,7 @@ describe("Mutation.createCompany", () => {
     };
 
     searchCompany.mockResolvedValueOnce({
+      orgId,
       siret: orgId,
       etatAdministratif: "A"
     });
@@ -283,6 +287,7 @@ describe("Mutation.createCompany", () => {
     };
 
     searchCompany.mockResolvedValueOnce({
+      orgId: company.orgId,
       siret: company.siret,
       etatAdministratif: "A"
     });
@@ -302,6 +307,7 @@ describe("Mutation.createCompany", () => {
     const user = await userFactory();
     const siret = siretify(1);
     searchCompany.mockResolvedValueOnce({
+      orgId: siret,
       siret,
       etatAdministratif: "A"
     });
@@ -336,6 +342,7 @@ describe("Mutation.createCompany", () => {
       companyTypes: ["ECO_ORGANISME"]
     };
     searchCompany.mockResolvedValueOnce({
+      orgId: siret,
       siret,
       etatAdministratif: "A"
     });
@@ -374,6 +381,7 @@ describe("Mutation.createCompany", () => {
       ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
     };
     searchCompany.mockResolvedValueOnce({
+      orgId: siret,
       siret,
       etatAdministratif: "A"
     });
@@ -413,6 +421,7 @@ describe("Mutation.createCompany", () => {
       ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
     };
     searchCompany.mockResolvedValueOnce({
+      orgId: siret,
       siret,
       etatAdministratif: "A"
     });
@@ -502,6 +511,7 @@ describe("Mutation.createCompany", () => {
 
     // Company Infos are different
     const testValue = {
+      orgId: "RO17579668",
       vatNumber: "RO17579668",
       address: "RO Transporter street",
       name: "Acme in RO",
@@ -512,25 +522,22 @@ describe("Mutation.createCompany", () => {
     searchCompany.mockResolvedValue(testValue);
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { data } = await mutate(CREATE_COMPANY, {
+    const { data, errors } = await mutate(CREATE_COMPANY, {
       variables: {
         companyInput
       }
     });
 
-    expect(data).toEqual({
-      createCompany: {
-        allowBsdasriTakeOverWithoutSignature: false,
-        companyTypes: ["TRANSPORTER"],
-        ecoOrganismeAgreements: [],
-        gerepId: null,
-        name: "Acme in EU",
-        siret: "",
-        address: "Transporter street",
-        traderReceipt: null,
-        transporterReceipt: null,
-        vatNumber: "RO17579668"
-      }
+    expect(data.createCompany).toMatchObject({
+      allowBsdasriTakeOverWithoutSignature: false,
+      companyTypes: ["TRANSPORTER"],
+      ecoOrganismeAgreements: [],
+      gerepId: null,
+      name: "Acme in EU",
+      address: "Transporter street",
+      traderReceipt: null,
+      transporterReceipt: null,
+      vatNumber: "RO17579668"
     });
   });
 
@@ -562,5 +569,30 @@ describe("Mutation.createCompany", () => {
         })
       ]);
     }
+  });
+
+  it("should return an error when creating a company with FRENCH VAT number", async () => {
+    const user = await userFactory();
+
+    const companyInput = {
+      orgId: "FR87850019464",
+      companyName: "Acme in FR",
+      address: "une adresse",
+      companyTypes: [CompanyType.TRANSPORTER]
+    };
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indiquer un SIRET"
+      })
+    ]);
   });
 });

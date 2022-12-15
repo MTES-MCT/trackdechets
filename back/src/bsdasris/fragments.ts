@@ -3,7 +3,9 @@ import { gql } from "apollo-server-express";
 export const companyFragment = gql`
   fragment CompanyFragment on FormCompany {
     name
+    orgId
     siret
+    vatNumber
     address
     contact
     country

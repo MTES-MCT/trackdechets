@@ -60,7 +60,7 @@ export default function AccountCompanyList() {
           </div>
           {companies.map(company => (
             <AccountCompany
-              key={company.siret}
+              key={company.orgId}
               company={filter(AccountCompany.fragments.company, company)}
             />
           ))}
