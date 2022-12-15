@@ -381,7 +381,7 @@ describe("Test Form reception", () => {
     const randomUser = await userFactory({
       companyAssociations: {
         create: {
-          company: { connect: { siret: randomUserCompany.siret } },
+          company: { connect: { id: randomUserCompany.id } },
           role: "ADMIN" as UserRole
         }
       }

@@ -202,7 +202,7 @@ describe("Test formsLifeCycle query", () => {
       data: {
         user: { connect: { id: recipient.id } },
         role: "MEMBER" as UserRole,
-        company: { connect: { siret: otherCompany.siret } }
+        company: { connect: { id: otherCompany.id } }
       }
     });
     const otherForm = await formFactory({

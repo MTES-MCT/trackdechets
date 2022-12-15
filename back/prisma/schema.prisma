@@ -170,7 +170,8 @@ model Application {
 
 model Company {
   id                                   String                    @id @default(cuid())
-  siret                                String                    @unique
+  orgId                                String                    @unique
+  siret                                String?                   @unique @default(cuid())
   vatNumber                            String?                   @unique
   updatedAt                            DateTime                  @updatedAt @db.Timestamptz(6)
   createdAt                            DateTime                  @default(now()) @db.Timestamptz(6)

@@ -60,7 +60,6 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   // clean orgId
   const orgId = companyInput.orgId.replace(/[\W_]+/g, "");
-
   let siret: string;
   let vatNumber: string;
 
@@ -69,6 +68,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indiquer un SIRET"
     );
   }
+
   if (isVat(orgId)) {
     vatNumber = orgId;
     if (companyTypes.join("") !== CompanyType.TRANSPORTER) {
@@ -119,6 +119,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   }
 
   const companyCreateInput: Prisma.CompanyCreateInput = {
+    orgId,
     siret,
     vatNumber,
     codeNaf,

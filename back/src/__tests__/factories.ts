@@ -61,9 +61,11 @@ export const companyFactory = async (
   const opts = companyOpts || {};
 
   const companyIndex = (await prisma.company.count()) + 1;
+  const siret = opts.siret ? opts.siret : siretify(companyIndex);
   return prisma.company.create({
     data: {
-      siret: siretify(companyIndex),
+      orgId: siret,
+      siret,
       companyTypes: {
         set: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"]
       },
@@ -121,7 +123,7 @@ export const userWithCompanyFactory = async (
   const user = await userFactory({
     companyAssociations: {
       create: {
-        company: { connect: { siret: company.siret } },
+        company: { connect: { id: company.id } },
         role: role as UserRole
       }
     }
@@ -294,6 +296,7 @@ export const upsertBaseSiret = async siret => {
     try {
       await prisma.company.create({
         data: {
+          orgId: siret,
           siret,
           companyTypes: {
             set: ["TRANSPORTER", "WASTEPROCESSOR"]
