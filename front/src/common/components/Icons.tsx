@@ -1294,6 +1294,153 @@ export function IconBSDD(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
+export function IconBSDDThin(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width="41"
+      height="47"
+      viewBox="0 0 41 47"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M5.7312 44.5363V4.73792"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M35.9616 4.73792V44.5363"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M1.95239 4.73792H39.7404"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M1.95239 44.5364H39.7404"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M31.2381 31.2703H39.7404"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M1.95239 31.2703H11.3994"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M32.1828 18.004H39.7404"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M1.95239 18.004H9.51"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M34.0722 4.73795V1.89521C34.0722 1.37188 33.6493 0.947632 33.1275 0.947632H27.4593C26.9376 0.947632 26.5146 1.37188 26.5146 1.89521V4.73795"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M20.8464 30.3226V33.1654"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M17.0676 33.1653V29.61C14.7414 28.5715 13.2554 26.2432 13.2888 23.6895C13.2888 19.5029 16.6724 16.1089 20.8464 16.1089C25.0203 16.1089 28.404 19.5029 28.404 23.6895C28.4377 26.2428 26.9514 28.5707 24.6252 29.6081V33.1653"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M23.2082 22.7419C23.469 22.7419 23.6805 22.9541 23.6805 23.2157"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M22.7358 23.2157C22.7358 22.9541 22.9473 22.7419 23.2082 22.7419"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M23.2082 23.6896C22.9473 23.6896 22.7358 23.4775 22.7358 23.2158"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M23.6805 23.2158C23.6805 23.4775 23.469 23.6896 23.2082 23.6896"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M18.4846 22.7419C18.7455 22.7419 18.957 22.9541 18.957 23.2157"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M18.0123 23.2157C18.0123 22.9541 18.2238 22.7419 18.4846 22.7419"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M18.4846 23.6896C18.2238 23.6896 18.0123 23.4775 18.0123 23.2158"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M18.957 23.2158C18.957 23.4775 18.7455 23.6896 18.4846 23.6896"
+        stroke="black"
+        strokeWidth="0.967742"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 export function IconBSDasri(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
@@ -1309,6 +1456,70 @@ export function IconBSDasri(props: React.SVGProps<SVGSVGElement>) {
           strokeWidth="5.83333"
         />
       </g>
+    </svg>
+  );
+}
+export function IconBSDasriThin(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width="33"
+      height="38"
+      viewBox="0 0 33 38"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <g clipPath="url(#clip0_130_10898)">
+        <path
+          d="M16.5 31.6666V38"
+          stroke="black"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M10.9583 1.58325H22.0417"
+          stroke="black"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M10.9583 14.2499H15.7083"
+          stroke="black"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M10.9583 20.5833H15.7083"
+          stroke="black"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M10.9583 9.49988V25.3332V25.3332C10.7546 28.6074 13.2278 31.4339 16.5 31.6665H16.5C19.7714 31.4322 22.2437 28.6068 22.0417 25.3332V9.49988H10.9583Z"
+          stroke="black"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M18.875 1.58325H14.1266V9.49992H18.875V1.58325Z"
+          stroke="black"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M6.20834 9.49988H26.7917"
+          stroke="black"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_130_10898">
+          <rect width="33" height="38" fill="white" />
+        </clipPath>
+      </defs>
     </svg>
   );
 }
@@ -1335,6 +1546,67 @@ export function IconBSVhu(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+export function IconBSVhuThin(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width="33"
+      height="38"
+      viewBox="0 0 33 38"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <g clipPath="url(#clip0_130_10921)">
+        <path
+          d="M2.53377 24.3021C2.02448 23.8666 1.70714 23.2481 1.65039 22.5804C1.57716 21.7016 1.96211 20.8471 2.66886 20.3196L5.61039 17.5079L7.75859 12.7334C8.16234 11.8391 9.02018 11.2349 9.99817 11.156L17.5765 10.5282C18.4532 10.4553 19.3104 10.8147 19.873 11.4911L24.0886 15.9676L29.1625 17.4165C30.6445 17.731 31.5991 19.1776 31.3054 20.664C31.0643 21.8766 30.049 22.7828 28.8168 22.885L27.9056 22.9605"
+          stroke="black"
+          strokeWidth="1.04348"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M22.7934 23.3843L12.4497 24.2425"
+          stroke="black"
+          strokeWidth="1.04348"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M22.7655 24.0518C22.8868 25.5096 24.1668 26.593 25.6246 26.4719C27.0823 26.3508 28.1659 25.071 28.045 23.6132C27.9241 22.1554 26.6444 21.0717 25.1866 21.1924C24.4863 21.2504 23.8378 21.5843 23.3837 22.1206C22.9296 22.6569 22.7073 23.3516 22.7655 24.0518Z"
+          stroke="black"
+          strokeWidth="1.04348"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M2.22122 25.1564C2.22122 24.4249 2.81418 23.832 3.54564 23.832H4.20784C4.55632 23.8327 4.85833 23.5908 4.93362 23.2506C5.2083 22.0453 6.28009 21.1903 7.51623 21.1903C8.75237 21.1903 9.82416 22.0453 10.0988 23.2506C10.176 23.5902 10.4777 23.8314 10.8259 23.832H11.4882C12.2196 23.832 12.8126 24.4249 12.8126 25.1564C12.8126 25.8878 12.2196 26.4808 11.4882 26.4808H3.54166C2.81176 26.4786 2.22122 25.8863 2.22122 25.1564Z"
+          stroke="black"
+          strokeWidth="1.04348"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        <path
+          fillRule="evenodd"
+          clipRule="evenodd"
+          d="M20.1829 16.9569L17.6917 13.8141C17.3935 13.4422 16.9296 13.2435 16.4547 13.2843L12.5954 13.5995C12.4202 13.614 12.258 13.6975 12.1445 13.8317C12.031 13.9658 11.9754 14.1396 11.9901 14.3147L12.2086 16.9542C12.2231 17.1294 12.3066 17.2916 12.4408 17.4051C12.5749 17.5186 12.7487 17.5742 12.9238 17.5595L20.1829 16.9569Z"
+          stroke="black"
+          strokeWidth="1.04348"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+      <defs>
+        <clipPath id="clip0_130_10921">
+          <rect width="33" height="38" fill="white" />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+}
 
 export function IconBSFF(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -1350,6 +1622,51 @@ export function IconBSFF(props: React.SVGProps<SVGSVGElement>) {
         <circle cx={4.15} cy={3.499} r={3} />
         <path d="M3.65 3.5l1-1m3.7 9h0a4 4 0 10-8 0v11h0a1 1 0 001 1h6a1 1 0 001-1v-11zm-8 2h8m-8 6h8" />
       </g>
+    </svg>
+  );
+}
+export function IconBSFFMedium(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width="33"
+      height="38"
+      viewBox="0 0 33 38"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        d="M15.9458 10.2902C18.5691 10.2902 20.6958 8.16351 20.6958 5.54016C20.6958 2.91681 18.5691 0.790161 15.9458 0.790161C13.3224 0.790161 11.1958 2.91681 11.1958 5.54016C11.1958 8.16351 13.3224 10.2902 15.9458 10.2902Z"
+        stroke="black"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M15.1541 5.54171L16.7374 3.95837"
+        stroke="black"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M22.5958 18.2085C22.5958 14.7107 19.7602 11.8751 16.2624 11.8751C12.7646 11.8751 9.92911 14.7107 9.92911 18.2085V35.6251C9.92911 36.4996 10.638 37.2085 11.5124 37.2085H21.0124C21.8869 37.2085 22.5958 36.4996 22.5958 35.6251V18.2085Z"
+        stroke="black"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.92911 21.3751H22.5958"
+        stroke="black"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.92911 30.8751H22.5958"
+        stroke="black"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
@@ -1380,6 +1697,45 @@ export function IconBSDa(props: React.SVGProps<SVGSVGElement>) {
           </tspan>
         </text>
       </g>
+    </svg>
+  );
+}
+export function IconBSDaThin(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      width="41"
+      height="49"
+      viewBox="0 0 41 49"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M38.176 41.4175C38.351 43.0899 37.9161 44.7716 36.9817 46.035C36.0473 47.2983 34.7036 48.0216 33.2921 48.021H6.72407C5.31257 48.0216 3.96881 47.2983 3.03445 46.035C2.10009 44.7716 1.66513 43.0899 1.84015 41.4175L4.42807 16.6876H35.5881L38.176 41.4175Z"
+        stroke="black"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M10.1681 11.7917H7.81631C7.24036 11.7923 6.70687 12.1536 6.41083 12.7435L4.42807 16.6876H35.5881L33.6053 12.7435C33.3093 12.1536 32.7758 11.7923 32.1998 11.7917H29.8481"
+        stroke="black"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M26.5681 10.8126C26.5681 6.48635 23.631 2.97925 20.0081 2.97925C16.3851 2.97925 13.4481 6.48635 13.4481 10.8126V16.6876H26.5681V10.8126Z"
+        stroke="black"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M18.1924 35.0891C17.5011 35.0891 16.8737 34.9588 16.3103 34.6984C15.7468 34.4333 15.2994 34.0521 14.9679 33.555C14.6365 33.0531 14.4708 32.447 14.4708 31.7368C14.4708 31.1118 14.5939 30.6052 14.8401 30.2169C15.0863 29.8239 15.4154 29.5161 15.8273 29.2936C16.2393 29.0711 16.6938 28.9053 17.191 28.7964C17.6929 28.6828 18.1971 28.5928 18.7037 28.5266C19.3666 28.4413 19.904 28.3774 20.316 28.3348C20.7326 28.2874 21.0357 28.2093 21.225 28.1004C21.4192 27.9915 21.5162 27.8021 21.5162 27.5322V27.4754C21.5162 26.7747 21.3245 26.2302 20.941 25.8419C20.5622 25.4536 19.9869 25.2595 19.2151 25.2595C18.4149 25.2595 17.7875 25.4347 17.333 25.7851C16.8785 26.1355 16.5589 26.5095 16.3742 26.9072L14.7833 26.3391C15.0674 25.6762 15.4462 25.1601 15.9197 24.7908C16.3979 24.4167 16.9187 24.1563 17.4822 24.0095C18.0503 23.858 18.609 23.7822 19.1583 23.7822C19.5087 23.7822 19.9111 23.8249 20.3657 23.9101C20.825 23.9906 21.2677 24.1587 21.6938 24.4143C22.1247 24.67 22.4822 25.0559 22.7662 25.572C23.0503 26.0881 23.1924 26.7794 23.1924 27.6459V34.8334H21.5162V33.3561H21.431C21.3174 33.5928 21.128 33.8462 20.8628 34.116C20.5977 34.3859 20.2449 34.6156 19.8046 34.805C19.3643 34.9944 18.8268 35.0891 18.1924 35.0891ZM18.4481 33.5834C19.1109 33.5834 19.6697 33.4532 20.1242 33.1927C20.5835 32.9323 20.9291 32.5962 21.1611 32.1842C21.3979 31.7723 21.5162 31.3391 21.5162 30.8845V29.3504C21.4452 29.4356 21.289 29.5138 21.0475 29.5848C20.8107 29.6511 20.5361 29.7103 20.2236 29.7624C19.9159 29.8097 19.6152 29.8523 19.3216 29.8902C19.0328 29.9233 18.7984 29.9517 18.6185 29.9754C18.1829 30.0322 17.7757 30.1246 17.3969 30.2524C17.0229 30.3755 16.7198 30.5625 16.4878 30.8135C16.2606 31.0597 16.1469 31.3959 16.1469 31.822C16.1469 32.4044 16.3624 32.8447 16.7932 33.143C17.2288 33.4366 17.7804 33.5834 18.4481 33.5834Z"
+        fill="black"
+      />
     </svg>
   );
 }
@@ -1448,6 +1804,23 @@ export function IconTrackDechetsCheck({
           fill="#18753C"
         />
       </g>
+    </svg>
+  );
+}
+export function IconWeight({ ...props }: IconProps) {
+  return (
+    <svg
+      {...props}
+      width="12"
+      height="13"
+      viewBox="0 0 12 13"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M1.31417 4.87867L0.0285512 10.8779L0.0287007 10.8777C-0.0529007 11.2576 0.0415539 11.654 0.285913 11.956C0.53012 12.2581 0.897924 12.4335 1.28634 12.4333H10.7137C11.1021 12.4336 11.4699 12.2581 11.7141 11.956C11.9584 11.654 12.0529 11.2576 11.9713 10.8777L10.6857 4.87852L10.6858 4.87867C10.624 4.59097 10.4654 4.33331 10.2366 4.14844C10.0076 3.96356 9.72232 3.86283 9.42818 3.86298H8.22401C8.52815 3.33973 8.63784 2.72577 8.53398 2.12945C8.42996 1.53313 8.11893 0.992699 7.65564 0.603057C7.19235 0.213568 6.60632 0 6.00104 0C5.39576 0 4.80989 0.213568 4.34659 0.603057C3.88315 0.992699 3.57213 1.53313 3.46825 2.12945C3.36423 2.72577 3.47393 3.33973 3.77822 3.86298H2.57184C2.27771 3.86283 1.99239 3.96356 1.76344 4.14844C1.53462 4.33331 1.37605 4.59095 1.31419 4.87867H1.31417ZM10.7136 11.148H1.28624L2.57186 5.14879H9.42809L10.7136 11.148ZM4.71436 2.5777C4.71436 2.2368 4.84991 1.90979 5.09098 1.66872C5.33205 1.4275 5.65907 1.29209 5.99997 1.29209C6.34087 1.29209 6.66788 1.4275 6.90896 1.66872C7.15002 1.90979 7.28558 2.2368 7.28558 2.5777C7.28558 2.91861 7.15002 3.24561 6.90896 3.48669C6.66788 3.72776 6.34087 3.86316 5.99997 3.86316C5.65907 3.86316 5.33206 3.72775 5.09098 3.48669C4.84991 3.24562 4.71436 2.9186 4.71436 2.5777Z"
+        fill="#000091"
+      />
     </svg>
   );
 }
