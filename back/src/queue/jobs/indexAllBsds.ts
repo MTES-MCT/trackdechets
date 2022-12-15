@@ -20,6 +20,11 @@ const {
   BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_DOWN
 } = process.env;
 
+/**
+ * Récupère un Bearer Token valable 1 heure
+ * @param scalingoToken Token d'api
+ * @returns Bearer Token valable 1h
+ */
 async function getBearerToken(scalingoToken) {
   const response = await axios.post<{ token: string }>(
     "https://auth.scalingo.com/v1/tokens/exchange",
@@ -67,7 +72,7 @@ export async function indexChunkBsdJob(job: Job<string>) {
 }
 
 /**
- *
+ * Attend la fin des opération de scaling up pour demander le scale down
  */
 const sleepUntil = async (
   operationsUrl: string,
@@ -110,6 +115,17 @@ const sleepUntil = async (
 
 /**
  * Index all of BSD in other jobs
+ * Si l'environnement du worker passe BULK_INDEX_SCALINGO_ACTIVE_AUTOSCALING=true
+ * alors il est requis d'avoir aussi les autres variables présentes
+ *  SCALINGO_API_URL,
+ *  SCALINGO_APP_NAME,
+ *  SCALINGO_TOKEN,
+ *  BULK_INDEX_SCALINGO_ACTIVE_AUTOSCALING,
+ *  BULK_INDEX_SCALINGO_CONTAINER_NAME,
+ *  BULK_INDEX_SCALINGO_CONTAINER_SIZE_UP,
+ *  BULK_INDEX_SCALINGO_CONTAINER_SIZE_DOWN,
+ *  BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_UP,
+ *  BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_DOWN
  */
 export async function indexAllInBulk(job: Job<string>) {
   try {
@@ -154,7 +170,9 @@ export async function indexAllInBulk(job: Job<string>) {
         });
     }
 
-    // will index all BSD without downtime, only if need because of a mapping change
+    // Start jobs to index all BSD without downtime in chunks
+    // Each Chunk is a separate job in the queue.
+    // only if need because of a mapping change or if "force" is true
     await reindexAllBsdsInBulk({
       index,
       force,
@@ -162,10 +180,11 @@ export async function indexAllInBulk(job: Job<string>) {
     });
     if (BULK_INDEX_SCALINGO_ACTIVE_AUTOSCALING === "true") {
       // scale-down indexqueue workers
-      // After scaling-up, the status of the application will be changed to ‘scaling’ for the scaling duration.
-      // No other operation is doable until the app status has switched to “running” again.
       try {
-        // Wait or timeout after 60sec
+        // Wait or timeout after 60sec to scale down.
+        // Scalingo does-not support scaling operations while other operation are not finished
+        // After scaling-up, the status of the application will be changed to ‘scaling’ for the scaling duration.
+        // No other operation is doable until the app status has switched to “running” again.
         await sleepUntil(operationsUrl, 60000);
         // ready
         await scaleDownScalingo();
