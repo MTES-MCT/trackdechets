@@ -335,8 +335,10 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
         approvals: { create: { approverSiret: emitter.siret } },
         recipientCap: "TTR CAP",
         processingOperationDone: "R 3",
+        quantityReceived: 50,
         processingOperationDescription: "Recyclage",
         temporaryStorageDestinationCap: "EXUTOIRE CAP",
+        temporaryStorageTemporaryStorerQuantityReceived: 40,
         comment: "Changement opération"
       }
     });
@@ -358,10 +360,12 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
 
     expect(updatedBsdd.recipientCap).toEqual("TTR CAP");
     expect(updatedBsdd.forwardedIn.recipientCap).toEqual("EXUTOIRE CAP");
+    expect(updatedBsdd.quantityReceived).toEqual(40);
     expect(updatedBsdd.forwardedIn.processingOperationDone).toBe("R 3");
     expect(updatedBsdd.forwardedIn.processingOperationDescription).toBe(
       "Recyclage"
     );
+    expect(updatedBsdd.forwardedIn.quantityReceived).toBe(50);
   });
 
   it("should not edit bsdd when refused", async () => {

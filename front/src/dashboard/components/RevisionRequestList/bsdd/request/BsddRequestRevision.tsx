@@ -50,6 +50,9 @@ const initialReview = {
   processingOperationDone: "",
   processingOperationDescription: "",
   temporaryStorageDetail: {
+    temporaryStorer: {
+      quantityReceived: null,
+    },
     destination: {
       cap: "",
       processingOperation: "",
@@ -198,7 +201,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
               </ReviewableField>
 
               <ReviewableField
-                title="Quantité traitée"
+                title="Quantité reçue (tonnes)"
                 value={bsdd.quantityReceived}
                 name="content.quantityReceived"
                 defaultValue={initialReview.quantityReceived}
@@ -209,6 +212,27 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   component={NumberInput}
                 />
               </ReviewableField>
+
+              {isTempStorage && (
+                <ReviewableField
+                  title="Quantité reçue sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)"
+                  value={
+                    bsdd.temporaryStorageDetail?.temporaryStorer
+                      ?.quantityReceived
+                  }
+                  name="content.temporaryStorageDetail.temporaryStorer.quantityReceived"
+                  defaultValue={
+                    initialReview.temporaryStorageDetail?.temporaryStorer
+                      ?.quantityReceived
+                  }
+                >
+                  <Field
+                    name="content.temporaryStorageDetail.temporaryStorer.quantityReceived"
+                    className="td-input td-input--small"
+                    component={NumberInput}
+                  />
+                </ReviewableField>
+              )}
 
               <ReviewableField
                 title="Code de l'opération D/R"
@@ -398,20 +422,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   </div>
                 </>
               </ReviewableField>
-
-              {bsdd.temporaryStorageDetail ? (
-                <ReviewableField
-                  title="CAP (entreposage provisoire)"
-                  value={bsdd.temporaryStorageDetail?.cap}
-                  name="content.temporaryStorageDetail.destination.cap"
-                  defaultValue={initialReview.recipient.cap}
-                >
-                  <Field
-                    name="content.recipient.cap"
-                    className="td-input td-input--medium"
-                  />
-                </ReviewableField>
-              ) : null}
 
               <div className="form__row">
                 <label>Commentaire à propos de la révision</label>

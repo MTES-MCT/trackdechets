@@ -40,6 +40,9 @@ const reviewFragment = gql`
       processingOperationDone
       processingOperationDescription
       temporaryStorageDetail {
+        temporaryStorer {
+          quantityReceived
+        }
         destination {
           cap
           processingOperation
@@ -88,6 +91,9 @@ const reviewFragment = gql`
       processingOperationDone
       processingOperationDescription
       temporaryStorageDetail {
+        temporaryStorer {
+          quantityReceived
+        }
         destination {
           cap
           processingOperation

@@ -54,6 +54,7 @@ export type RevisionRequestContent = Pick<
   | "traderReceipt"
   | "traderDepartment"
   | "traderValidityLimit"
+  | "temporaryStorageTemporaryStorerQuantityReceived"
   | "temporaryStorageDestinationCap"
   | "temporaryStorageDestinationProcessingOperation"
 >;
@@ -223,11 +224,12 @@ async function getApproversSirets(
 function hasTemporaryStorageUpdate(content: RevisionRequestContent): boolean {
   return (
     content.temporaryStorageDestinationCap != null ||
-    content.temporaryStorageDestinationProcessingOperation != null
+    content.temporaryStorageDestinationProcessingOperation != null ||
+    content.temporaryStorageTemporaryStorerQuantityReceived != null
   );
 }
 
-const bsddRevisionRequestSchema = yup
+const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
   .object({
     recipientCap: yup.string().nullable(),
     wasteDetailsCode: yup
@@ -281,6 +283,10 @@ const bsddRevisionRequestSchema = yup
     traderDepartment: yup.string().nullable(),
     traderValidityLimit: yup.date().nullable(),
     temporaryStorageDestinationCap: yup.string().nullable(),
+    temporaryStorageTemporaryStorerQuantityReceived: yup
+      .number()
+      .min(0)
+      .nullable(),
     temporaryStorageDestinationProcessingOperation: yup
       .string()
       .oneOf(

@@ -86,7 +86,7 @@ async function getUpdateFromFormRevisionRequest(
 
   const hasTempStorage = !!revisionRequest.bsdd.forwardedInId;
 
-  const bsddUpdate = {
+  const bsddUpdate: Prisma.FormUpdateInput = {
     status: getNewStatus(
       currentStatus,
       revisionRequest.processingOperationDone
@@ -96,14 +96,17 @@ async function getUpdateFromFormRevisionRequest(
     wasteDetailsName: revisionRequest.wasteDetailsName,
     wasteDetailsPop: revisionRequest.wasteDetailsPop,
     wasteDetailsPackagingInfos: revisionRequest.wasteDetailsPackagingInfos,
-    quantityReceived: revisionRequest.quantityReceived,
-    ...(!hasTempStorage
+    ...(hasTempStorage
       ? {
+          quantityReceived:
+            revisionRequest.temporaryStorageTemporaryStorerQuantityReceived
+        }
+      : {
+          quantityReceived: revisionRequest.quantityReceived,
           processingOperationDone: revisionRequest.processingOperationDone,
           processingOperationDescription:
             revisionRequest.processingOperationDescription
-        }
-      : {}),
+        }),
     brokerCompanyName: revisionRequest.brokerCompanyName,
     brokerCompanySiret: revisionRequest.brokerCompanySiret,
     brokerCompanyAddress: revisionRequest.brokerCompanyAddress,
@@ -124,18 +127,17 @@ async function getUpdateFromFormRevisionRequest(
     traderValidityLimit: revisionRequest.traderValidityLimit
   };
 
-  const forwardedInUpdate = {
-    recipientCap: revisionRequest.temporaryStorageDestinationCap,
-    recipientProcessingOperation:
-      revisionRequest.temporaryStorageDestinationProcessingOperation,
-    ...(hasTempStorage
-      ? {
-          processingOperationDone: revisionRequest.processingOperationDone,
-          processingOperationDescription:
-            revisionRequest.processingOperationDescription
-        }
-      : {})
-  };
+  const forwardedInUpdate: Prisma.FormUpdateInput = hasTempStorage
+    ? {
+        recipientCap: revisionRequest.temporaryStorageDestinationCap,
+        recipientProcessingOperation:
+          revisionRequest.temporaryStorageDestinationProcessingOperation,
+        quantityReceived: revisionRequest.quantityReceived,
+        processingOperationDone: revisionRequest.processingOperationDone,
+        processingOperationDescription:
+          revisionRequest.processingOperationDescription
+      }
+    : {};
 
   return [removeEmpty(bsddUpdate), removeEmpty(forwardedInUpdate)];
 }

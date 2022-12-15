@@ -159,9 +159,20 @@ export function DisplayRevision({ review }: Props) {
       />
 
       <RevisionField
-        label="Poids reçu"
+        label="Quantité reçue (tonnes)"
         bsddValue={review.form.quantityReceived}
         reviewValue={review.content.quantityReceived}
+      />
+
+      <RevisionField
+        label="Quantité reçue sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)"
+        bsddValue={
+          review.form.temporaryStorageDetail?.temporaryStorer?.quantityReceived
+        }
+        reviewValue={
+          review.content.temporaryStorageDetail?.temporaryStorer
+            ?.quantityReceived
+        }
       />
 
       <RevisionField
