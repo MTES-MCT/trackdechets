@@ -96,8 +96,6 @@ type CompanyForVerificationConnection {
 
 type AnonymousCompany {
   id: String!
-  "SIRET ou TVA de l'établissement"
-  orgId: String!
   address: String!
   codeCommune: String!
   codeNaf: String!
