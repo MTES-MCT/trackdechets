@@ -37,6 +37,20 @@ async function exitScript() {
     // launch job by chunks in the queue only if argument is specified
     const useQueue = process.argv.includes("--useQueue");
     if (useQueue) {
+      /**
+       * Le job est dans `back/src/queue/jobs/indexAllBsds.ts`
+       * Si l'environnement du worker passe BULK_INDEX_SCALINGO_ACTIVE_AUTOSCALING=true
+       * alors il est requis d'avoir aussi les autres variables présentes
+       *  SCALINGO_API_URL,
+       *  SCALINGO_APP_NAME,
+       *  SCALINGO_TOKEN,
+       *  BULK_INDEX_SCALINGO_ACTIVE_AUTOSCALING,
+       *  BULK_INDEX_SCALINGO_CONTAINER_NAME,
+       *  BULK_INDEX_SCALINGO_CONTAINER_SIZE_UP,
+       *  BULK_INDEX_SCALINGO_CONTAINER_SIZE_DOWN,
+       *  BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_UP,
+       *  BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_DOWN
+       */
       await addReindexAllInBulkJob(force);
     } else {
       // will index all BSD without downtime, only if need because of a mapping change
