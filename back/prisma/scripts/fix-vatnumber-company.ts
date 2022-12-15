@@ -2,8 +2,12 @@ import { Updater, registerUpdater } from "./helper/helper";
 import prisma from "../../src/prisma";
 import { Company } from ".prisma/client";
 
-@registerUpdater("Clean VAT numbers", "Clean SIRET and VAT numbers", true)
-export class FixNameAddressCompanyUpdater implements Updater {
+@registerUpdater(
+  "Clean Company VAT numbers",
+  "Clean SIRET and VAT numbers in Company",
+  false
+)
+export class FixVatCompanyUpdater implements Updater {
   async run() {
     try {
       const companies: Company[] =
