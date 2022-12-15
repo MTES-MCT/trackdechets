@@ -21,13 +21,13 @@ const {
 } = process.env;
 
 async function getBearerToken(scalingoToken) {
-  const auth = Buffer.from(`:${scalingoToken}`).toString("base64");
-
   const response = await axios.post<{ token: string }>(
     "https://auth.scalingo.com/v1/tokens/exchange",
+    null,
     {
-      headers: {
-        Authorization: `Basic ${auth}`
+      auth: {
+        username: "",
+        password: scalingoToken
       }
     }
   );
@@ -71,11 +71,11 @@ export async function indexChunkBsdJob(job: Job<string>) {
  */
 const sleepUntil = async (
   operationsUrl: string,
-  timeoutMs: number,
-  bearerToken: string
+  timeoutMs: number
 ): Promise<void> => {
   const scalingoOperationStatus = async operationsUrl => {
     if (!operationsUrl) return true;
+    const { token: bearerToken } = await getBearerToken(SCALINGO_TOKEN);
     const { data } = await axios.get<{
       operation: {
         status: string;
@@ -116,10 +116,9 @@ export async function indexAllInBulk(job: Job<string>) {
     const { index, force }: { index: BsdIndex; force: boolean } = JSON.parse(
       job.data
     );
-    const { token: bearerToken } = await getBearerToken(SCALINGO_TOKEN);
-
     let operationsUrl;
     if (BULK_INDEX_SCALINGO_ACTIVE_AUTOSCALING === "true") {
+      const { token: bearerToken } = await getBearerToken(SCALINGO_TOKEN);
       // scale-up indexqueue workers
       axios({
         method: "post",
@@ -167,12 +166,12 @@ export async function indexAllInBulk(job: Job<string>) {
       // No other operation is doable until the app status has switched to “running” again.
       try {
         // Wait or timeout after 60sec
-        await sleepUntil(operationsUrl, 60000, bearerToken);
+        await sleepUntil(operationsUrl, 60000);
         // ready
-        await scaleDownScalingo(bearerToken);
+        await scaleDownScalingo();
       } catch {
         // timeout
-        await scaleDownScalingo(bearerToken);
+        await scaleDownScalingo();
       }
     }
     return null;
@@ -182,7 +181,8 @@ export async function indexAllInBulk(job: Job<string>) {
   }
 }
 
-function scaleDownScalingo(bearerToken) {
+async function scaleDownScalingo() {
+  const { token: bearerToken } = await getBearerToken(SCALINGO_TOKEN);
   axios({
     method: "post",
     url: `https://${SCALINGO_API_URL}/v1/apps/${SCALINGO_APP_NAME}/scale`,
