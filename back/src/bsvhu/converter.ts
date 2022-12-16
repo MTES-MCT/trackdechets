@@ -303,9 +303,7 @@ function flattenTransporterTransportInput(input: {
   }
 
   return {
-    transporterTransportTakenOverAt: chain(input.transport, t =>
-      t.takenOverAt ? t.takenOverAt : t.takenOverAt
-    )
+    transporterTransportTakenOverAt: chain(input.transport, t => t.takenOverAt)
   };
 }
 
