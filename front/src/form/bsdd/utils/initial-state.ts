@@ -44,6 +44,7 @@ export function getInitialBroker(broker?: Broker | null) {
  */
 export function getInitialCompany(company?: FormCompany | null) {
   return {
+    orgId: company?.orgId ?? "",
     siret: company?.siret ?? "",
     name: company?.name ?? "",
     address: company?.address ?? "",

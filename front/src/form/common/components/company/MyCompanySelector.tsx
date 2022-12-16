@@ -22,6 +22,8 @@ export const GET_ME = gql`
         name
         givenName
         siret
+        orgId
+        vatNumber
         contact
         contactEmail
         contactPhone
@@ -43,6 +45,7 @@ export default function MyCompanySelector({
     (
       company: Pick<
         CompanyPrivate,
+        | "orgId"
         | "siret"
         | "vatNumber"
         | "name"
@@ -52,6 +55,7 @@ export default function MyCompanySelector({
         | "address"
       >
     ) => {
+      setFieldValue(`${fieldName}.orgId`, company.orgId ?? "");
       setFieldValue(`${fieldName}.siret`, company.siret ?? "");
       setFieldValue(`${fieldName}.vatNumber`, company.vatNumber ?? "");
       setFieldValue(`${fieldName}.name`, company.name ?? "");
@@ -104,10 +108,10 @@ export default function MyCompanySelector({
         {siretEditable ? (
           <select
             className="td-select td-input--medium"
-            value={field.value?.siret}
+            value={field.value?.orgId}
             onChange={e => {
               const selectedCompany = companies.filter(
-                c => c.siret === e.target.value
+                c => c.orgId === e.target.value
               )?.[0];
               if (selectedCompany) {
                 onCompanySelect(selectedCompany);
@@ -123,9 +127,9 @@ export default function MyCompanySelector({
 
               return (
                 <option
-                  key={c.siret}
-                  value={c.siret}
-                  label={`${name} - ${c.siret}`}
+                  key={c.orgId}
+                  value={c.orgId}
+                  label={`${name} - ${c.orgId}`}
                 ></option>
               );
             })}

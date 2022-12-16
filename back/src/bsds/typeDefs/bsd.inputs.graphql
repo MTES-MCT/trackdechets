@@ -3,6 +3,10 @@ Payload d'un établissement
 """
 input CompanyInput {
   """
+  SIRET ou TVA de l'établissemen
+  """
+  origId: String
+  """
   SIRET de l'établissement composé de 14 caractères numériques
   """
   siret: String

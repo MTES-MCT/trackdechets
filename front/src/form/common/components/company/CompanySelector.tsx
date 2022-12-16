@@ -208,11 +208,7 @@ export default function CompanySelector({
         .filter(
           fav =>
             !skipFavorite &&
-            !searchCompanies.some(
-              company =>
-                company.siret === fav.siret ||
-                company.vatNumber === fav.vatNumber
-            )
+            !searchCompanies.some(company => company.orgId === fav.orgId)
         )
         .map(favorite => favoriteToCompanySearchResult(favorite)) ?? [];
 

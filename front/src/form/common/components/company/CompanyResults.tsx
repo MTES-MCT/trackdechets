@@ -20,6 +20,7 @@ interface CompanyResultsProps<T> {
 type CompanyResultBase = Pick<
   CompanySearchResult,
   | "siret"
+  | "orgId"
   | "name"
   | "address"
   | "isRegistered"
@@ -32,8 +33,7 @@ export function isSelected<T extends CompanyResultBase>(
   selectedItem: T | null
 ): boolean {
   return (
-    item.siret === selectedItem?.siret ||
-    (!!item.vatNumber && item.vatNumber === selectedItem?.vatNumber)
+    item.siret === selectedItem?.siret || item.orgId === selectedItem?.orgId
   );
 }
 
@@ -46,7 +46,7 @@ export default function CompanyResults<T extends CompanyResultBase>({
   // prepend selectedItem if it's not in the results
   if (
     selectedItem &&
-    (selectedItem.siret || selectedItem.vatNumber) &&
+    (selectedItem.siret || selectedItem.orgId) &&
     !results.some(result => isSelected(result, selectedItem))
   ) {
     results.unshift(selectedItem);
@@ -56,7 +56,7 @@ export default function CompanyResults<T extends CompanyResultBase>({
     <ul className={styles.results}>
       {results.map(item => (
         <CompanyResult
-          key={item.siret ?? item.vatNumber!}
+          key={item.orgId ?? item.siret!}
           item={item}
           selectedItem={selectedItem}
           onSelect={onSelect}
@@ -100,7 +100,7 @@ export function CompanyResult<T extends CompanyResultBase>({
           )}
         </h6>
         <p>
-          {item.siret?.length ? item.siret : item.vatNumber} -{" "}
+          {item.orgId ?? item.siret!} -{" "}
           {item.address ? item.address : "[Adresse inconnue]"}
           {item.codePaysEtrangerEtablissement
             ? ` - ${item.codePaysEtrangerEtablissement}`
@@ -109,7 +109,7 @@ export function CompanyResult<T extends CompanyResultBase>({
         <p>
           <a
             href={generatePath(routes.company, {
-              siret: item.siret?.length ? item.siret : item.vatNumber!,
+              orgId: item.orgId ?? item.siret!,
             })}
             onClick={e => e.stopPropagation()}
             target="_blank"
