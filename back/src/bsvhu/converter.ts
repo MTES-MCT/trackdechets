@@ -290,7 +290,20 @@ function flattenVhuTransporterInput({
     ),
     transporterRecepisseValidityLimit: chain(transporter, t =>
       chain(t.recepisse, r => r.validityLimit)
-    )
+    ),
+    ...flattenTransporterTransportInput(transporter)
+  };
+}
+
+function flattenTransporterTransportInput(input: {
+  transport?: BsvhuTransport;
+}) {
+  if (!input?.transport) {
+    return {};
+  }
+
+  return {
+    transporterTransportTakenOverAt: chain(input.transport, t => t.takenOverAt)
   };
 }
 

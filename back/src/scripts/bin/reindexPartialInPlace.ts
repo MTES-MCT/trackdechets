@@ -61,13 +61,16 @@ async function exitScript() {
         );
         return;
       }
-      await prompts({
+      const { value } = await prompts({
         type: "confirm",
-        name: "force",
+        name: "value",
         message:
           "Can you confirm to force delete bsds from the index before indexing them again ?",
         initial: false
       });
+      if (!value) {
+        process.exit(0);
+      }
     }
     await reindexPartialInPlace(
       index,

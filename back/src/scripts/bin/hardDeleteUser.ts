@@ -30,11 +30,14 @@ import deleteUser from "../prisma/hardDeleteUser";
     );
     return;
   }
-  await prompts({
+  const { value } = await prompts({
     type: "confirm",
-    name: "force",
+    name: "value",
     message: `Can you confirm to hard delete this user id=${user.id} email=${user.email}?`,
     initial: false
   });
+  if (!value) {
+    process.exit(0);
+  }
   await deleteUser(user);
 })();

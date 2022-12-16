@@ -6,7 +6,6 @@ import styles from "./EcoOrganismes.module.scss";
 import SearchInput from "common/components/SearchInput";
 import { Query, EcoOrganisme, Form } from "../../../../generated/graphql/types";
 import TdSwitch from "common/components/Switch";
-import { CONTACT_EMAIL } from "common/config";
 import { getInitialEcoOrganisme } from "form/bsdd/utils/initial-state";
 
 const GET_ECO_ORGANISMES = gql`
@@ -61,8 +60,12 @@ export default function EcoOrganismes(props: EcoOrganismesProps) {
                 Veuillez sélectionner ci-dessous un des éco-organismes
                 enregistrés dans Trackdéchets. Si votre éco-organisme n'apparait
                 pas et que vous pensez que c'est une erreur,{" "}
-                <a href={`mailto:${CONTACT_EMAIL}`} className="link">
-                  contactez le support.
+                <a
+                  href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  contactez le support
                 </a>
               </div>
               <SearchInput

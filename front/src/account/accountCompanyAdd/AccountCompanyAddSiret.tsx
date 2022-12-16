@@ -10,7 +10,6 @@ import {
   isSiret,
   isVat,
 } from "generated/constants/companySearchHelpers";
-import { CONTACT_EMAIL } from "common/config";
 
 import {
   Container,
@@ -103,11 +102,18 @@ const nonDiffusibleError = (
         <>
           <span>
             Nous n'avons pas pu récupérer les informations de cet établissement
-            car il n'est pas diffusible. Veuillez nous contacter à l'adresse{" "}
-            {CONTACT_EMAIL} <b>avec</b> votre certificat d'inscription au
-            répertoire des Entreprises et des Établissements (SIRENE) pour
-            pouvoir procéder à la création de l'établissement. Pour télécharger
-            votre certificat, RDV sur{" "}
+            car il n'est pas diffusible. Veuillez nous contacter via{" "}
+            <a
+              href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
+              target="_blank"
+              rel="noreferrer"
+            >
+              la FAQ
+            </a>{" "}
+            <b>avec</b> votre certificat d'inscription au répertoire des
+            Entreprises et des Établissements (SIRENE) pour pouvoir procéder à
+            la création de l'établissement. Pour télécharger votre certificat,
+            RDV sur{" "}
           </span>
           <a
             href="https://avis-situation-sirene.insee.fr/"
@@ -188,7 +194,7 @@ export default function AccountCompanyAddSiret({
                 };
               } else if (!isValidVat && !/^[0-9]{14}$/.test(values.siret)) {
                 return {
-                  siret: `Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter à l'adresse ${CONTACT_EMAIL} avec un justificatif légal du pays d'origine.`,
+                  siret: `Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter via la FAQ https://faq.trackdechets.fr/pour-aller-plus-loin/assistance avec un justificatif légal du pays d'origine.`,
                 };
               } else if (isValidVat && isFRVat(values.siret)) {
                 return {
