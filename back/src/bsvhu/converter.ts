@@ -299,12 +299,12 @@ function flattenTransporterTransportInput(input: {
   transport?: BsvhuTransport;
 }) {
   if (!input?.transport) {
-    return null;
+    return {};
   }
 
   return {
     transporterTransportTakenOverAt: chain(input.transport, t =>
-      t.takenOverAt ? new Date(t.takenOverAt) : t.takenOverAt
+      t.takenOverAt ? t.takenOverAt : t.takenOverAt
     )
   };
 }
