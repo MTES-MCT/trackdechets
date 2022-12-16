@@ -522,7 +522,7 @@ describe("Mutation.createCompany", () => {
     searchCompany.mockResolvedValue(testValue);
 
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
-    const { data, errors } = await mutate(CREATE_COMPANY, {
+    const { data } = await mutate(CREATE_COMPANY, {
       variables: {
         companyInput
       }
