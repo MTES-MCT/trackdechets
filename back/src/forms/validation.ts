@@ -15,6 +15,7 @@ import {
   isDangerous,
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
+  PROCESSING_OPERATIONS_CODES,
   BSDD_WASTE_CODES
 } from "../common/constants";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
@@ -455,7 +456,17 @@ const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
       .string()
       .label("Opération d’élimination / valorisation")
       .ensure()
-      .requiredIf(!isDraft),
+      .requiredIf(!isDraft)
+      .when("emitterType", (value, schema) => {
+        const oneOf =
+          value === EmitterType.APPENDIX2
+            ? PROCESSING_AND_REUSE_OPERATIONS_CODES
+            : PROCESSING_OPERATIONS_CODES;
+        return schema.oneOf(
+          ["", ...oneOf],
+          `Destination ultérieure : ${INVALID_PROCESSING_OPERATION}`
+        );
+      }),
     recipientCompanyName: yup
       .string()
       .ensure()
