@@ -1227,9 +1227,7 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
  * - SIRET is mandatory
  * - only french companies are allowed
  */
-export const intermediarySchema: yup.SchemaOf<
-  Omit<CompanyInput, "country" | "omiNumber" | "orgId">
-> = yup.object({
+export const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
   siret: yup
     .string()
     .required("Intermédiaires: le N° SIRET est obligatoire")
@@ -1253,7 +1251,10 @@ export const intermediarySchema: yup.SchemaOf<
   address: yup.string().notRequired().nullable(),
   name: yup.string().notRequired().nullable(),
   phone: yup.string().notRequired().nullable(),
-  mail: yup.string().notRequired().nullable()
+  mail: yup.string().notRequired().nullable(),
+  country: yup.string().notRequired().nullable(), // is ignored in db schema
+  omiNumber: yup.string().notRequired().nullable(), // is ignored in db schema
+  orgId: yup.string().notRequired().nullable() // is ignored in db schema
 });
 
 /**
