@@ -18,9 +18,10 @@ export default function App() {
       <ErrorBoundary
         fallback={errorData => {
           if (
-            errorData?.error?.message?.includes(
-              "error loading dynamically imported module"
-            )
+            // After a deploy, users navigating from one page to another without
+            // refreshing the page will encounter the error "Failed to fetch dynamically
+            // imported module"
+            errorData?.error?.message?.includes("dynamically imported module")
           ) {
             return (
               <SimpleNotificationError
@@ -34,7 +35,7 @@ export default function App() {
                       href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
                       rel="noreferrer"
                     >
-                      l'équipe Trackdéchets.
+                      l'assistance Trackdéchets.
                     </a>
                   </>
                 }
@@ -52,10 +53,9 @@ export default function App() {
                     href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
                     rel="noreferrer"
                   >
-                    l'équipe Trackdéchets
-                  </a>
-                  en précisant le numéro d'erreur suivant : ${errorData.eventId}
-                  .
+                    l'assistance Trackdéchets
+                  </a>{" "}
+                  en précisant le numéro d'erreur suivant : {errorData.eventId}.
                 </>
               }
             />
