@@ -5,7 +5,7 @@ input CompanyInput {
   """
   SIRET ou TVA de l'établissemen
   """
-  origId: String
+  orgId: String
   """
   SIRET de l'établissement composé de 14 caractères numériques
   """
