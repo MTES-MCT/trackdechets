@@ -4,7 +4,8 @@ import { checkVAT } from "jsvat";
 import {
   countries as vatCountries,
   isVat,
-  isSiret
+  isSiret,
+  BAD_CHARACTERS_REGEXP
 } from "../../../common/constants/companySearchHelpers";
 import { FormCompany } from "../../../generated/graphql/types";
 
@@ -108,7 +109,7 @@ export function getcompanyCountry(company: FormCompany): Country | null {
   } else if (company && isVat(company.vatNumber)) {
     // trouver automatiquement le pays selon le numéro de TVA
     const vatCountryCode = checkVAT(
-      company.vatNumber.replace(/[\W_\s]/gim, ""),
+      company.vatNumber.replace(BAD_CHARACTERS_REGEXP, ""),
       vatCountries
     )?.country?.isoCode.short;
 

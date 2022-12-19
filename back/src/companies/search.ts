@@ -23,6 +23,47 @@ const SIRET_OR_VAT_ERROR =
   "Il est obligatoire de rechercher soit avec un SIRET de 14 caractères soit avec un numéro de TVA intracommunautaire valide";
 
 /**
+ * Search TD db and merge company info from search engines
+ */
+async function findCompanyAndMergeInfos(
+  cleanClue: string,
+  companyInfo: SireneSearchResult | CompanyVatSearchResult
+): Promise<CompanySearchResult> {
+  const where = {
+    where: { orgId: cleanClue }
+  };
+  const trackdechetsCompanyInfo = await prisma.company.findUnique({
+    ...where,
+    select: {
+      id: true,
+      orgId: true,
+      siret: true,
+      name: true,
+      address: true,
+      vatNumber: true,
+      companyTypes: true,
+      contact: true,
+      contactEmail: true,
+      contactPhone: true,
+      website: true,
+      ecoOrganismeAgreements: true,
+      allowBsdasriTakeOverWithoutSignature: true
+    }
+  });
+  return {
+    // ensure compatibility with CompanyPublic
+    ecoOrganismeAgreements: [],
+    isRegistered: trackdechetsCompanyInfo != null,
+    companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
+    orgId: cleanClue,
+    ...convertUrls(trackdechetsCompanyInfo),
+    // override database infos with Sirene or VAT search
+    ...companyInfo
+  };
+}
+
+/**
+ * Common entry-point for all Company search
  * Search one company by SIRET or VAT number
  * Supports Test SIRET and AnonymousCompany
  */
@@ -46,7 +87,6 @@ export async function searchCompany(
       invalidArgs: ["siret", "clue"]
     });
   }
-  let companyInfo: SireneSearchResult | CompanyVatSearchResult;
   // search for test or anonymous companies first
   const anonymousCompany = await prisma.anonymousCompany.findUnique({
     where: {
@@ -55,7 +95,7 @@ export async function searchCompany(
   });
   // Anonymous Company search
   if (anonymousCompany) {
-    companyInfo = {
+    const companyInfo: SireneSearchResult = {
       ...anonymousCompany,
       statutDiffusionEtablissement: cleanClue.startsWith(TEST_COMPANY_PREFIX)
         ? "O"
@@ -64,60 +104,31 @@ export async function searchCompany(
       naf: anonymousCompany.codeNaf,
       codePaysEtrangerEtablissement: "FR"
     };
-  } else if (
-    process.env.ALLOW_TEST_COMPANY === "true" &&
-    cleanClue.startsWith(TEST_COMPANY_PREFIX)
-  ) {
+    return findCompanyAndMergeInfos(cleanClue, companyInfo);
+  } else if (isTestCompany) {
     // 404 if we are in a test environment with a test siret starting with 00000
     throw new UserInputError("Aucun établissement trouvé avec ce SIRET", {
       invalidArgs: ["siret", "clue"]
     });
-  } else {
-    // Search public company databases
-    if (isSiret(cleanClue)) {
-      companyInfo = await searchSireneOrNotFound(cleanClue);
-    } else if (isVat(cleanClue)) {
-      companyInfo = await searchVatFrOnlyOrNotFound(cleanClue);
-    } else {
-      // cleanClue is neither a valid SIRET nor a VAT
-      throw new UserInputError(SIRET_OR_VAT_ERROR, {
-        invalidArgs: ["siret", "clue"]
-      });
-    }
   }
-  // Concaténer données Company
-  const where = {
-    where: { orgId: cleanClue }
-  };
-  const trackdechetsCompanyInfo = await prisma.company.findUnique({
-    ...where,
-    select: {
-      id: true,
-      orgId: true,
-      siret: true,
-      name: true,
-      address: true,
-      vatNumber: true,
-      companyTypes: true,
-      contact: true,
-      contactEmail: true,
-      contactPhone: true,
-      website: true,
-      ecoOrganismeAgreements: true,
-      allowBsdasriTakeOverWithoutSignature: true
-    }
-  });
+  // Search public company databases
+  if (isSiret(cleanClue)) {
+    const companyInfo = await searchSireneOrNotFound(cleanClue);
+    return findCompanyAndMergeInfos(cleanClue, companyInfo);
+  }
 
-  return {
-    // ensure compatibility with CompanyPublic
-    ecoOrganismeAgreements: [],
-    isRegistered: trackdechetsCompanyInfo != null,
-    companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
-    orgId: cleanClue,
-    ...convertUrls(trackdechetsCompanyInfo),
-    // override database infos with Sirene or VAT search
-    ...companyInfo
-  };
+  // Search TD first to optimize response times
+  if (isVat(cleanClue)) {
+    const company = await findCompanyAndMergeInfos(cleanClue, {});
+    if (company.isRegistered === true) {
+      return company;
+    }
+    const companyInfo = await searchVatFrOnlyOrNotFound(cleanClue);
+    return {
+      ...company,
+      ...companyInfo
+    };
+  }
 }
 
 // used for dependency injection in tests to easily mock `searchCompany`
@@ -157,6 +168,9 @@ export const makeSearchCompanies =
     });
   };
 
+/**
+ * Search Sirene and handle anonymous companies
+ */
 async function searchSireneOrNotFound(
   siret: string
 ): Promise<SireneSearchResult> {
@@ -190,9 +204,24 @@ async function searchSireneOrNotFound(
   }
 }
 
+interface PartialCompanyVatSearchResult
+  extends Pick<
+    CompanyVatSearchResult,
+    | "vatNumber"
+    | "codePaysEtrangerEtablissement"
+    | "statutDiffusionEtablissement"
+    | "etatAdministratif"
+  > {
+  name?: string;
+  address?: string;
+}
+
+/**
+ * Search VAT with the VIES client eventually strpping empty/anonymous name and addresses
+ */
 async function searchVatFrOnlyOrNotFound(
   vatNumber: string
-): Promise<CompanyVatSearchResult> {
+): Promise<PartialCompanyVatSearchResult> {
   if (isFRVat(vatNumber)) {
     throw new UserInputError(
       "Une entreprise française doit être identifiée par son SIRET et pas par sa TVA intracommunautaire",
@@ -202,7 +231,12 @@ async function searchVatFrOnlyOrNotFound(
     );
   }
   // throws UserInputError if not found
-  return searchVat(vatNumber);
+  const viesResult = await searchVat(vatNumber);
+  // delete name and adresse if === ""
+  // in order to avoid db name and adresse to be replaced with empty string from the VIES api
+  if (viesResult.name === "") delete viesResult.name;
+  if (viesResult.address === "") delete viesResult.address;
+  return viesResult;
 }
 
 export const searchCompanies = makeSearchCompanies({ searchCompany });

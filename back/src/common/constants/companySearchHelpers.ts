@@ -77,6 +77,8 @@ export const TEST_COMPANY_PREFIX = "000000";
 // process.env is not available in frontend JS and import.meta.env not available in node.js
 const ALLOW_TEST_COMPANY = process?.env?.ALLOW_TEST_COMPANY === "true";
 
+export const BAD_CHARACTERS_REGEXP = /[\W_]/gim;
+
 /**
  * Implements the Luhn Algorithm used to validate SIRET or SIREN of identification numbers
  */
@@ -94,6 +96,9 @@ export const luhnCheck = (num: string | number, modulo = 10): boolean => {
   sum += lastDigit ?? 0;
   return sum % modulo === 0;
 };
+
+export const cleanClue = (clue: string): string =>
+  clue.replace(BAD_CHARACTERS_REGEXP, "").toUpperCase();
 
 /**
  * Validateur de numéro de SIRETs
@@ -125,11 +130,8 @@ export const isSiret = (clue: string, allowTestCompany?: boolean): boolean => {
  * Validateur de numéro de TVA
  */
 export const isVat = (clue: string): boolean => {
-  if (!clue || !clue.length) return false;
-  if (clue.match(/[\W_]/gim) !== null) return false;
-  const cleanClue = clue.replace(/[\W_]+/g, "");
-  if (!cleanClue) return false;
-  const isRegexValid = checkVAT(cleanClue, countries);
+  if (!clue || BAD_CHARACTERS_REGEXP.test(clue)) return false;
+  const isRegexValid = checkVAT(clue, countries);
   return isRegexValid.isValid;
 };
 
@@ -138,9 +140,9 @@ export const isVat = (clue: string): boolean => {
  */
 export const isFRVat = (clue: string): boolean => {
   if (!isVat(clue)) return false;
-  const cleanClue = clue.replace(/[\W_]+/g, "");
-  if (!cleanClue) return false;
-  return cleanClue.slice(0, 2).toUpperCase().startsWith("FR");
+  const cleanVat = cleanClue(clue);
+  if (!cleanVat) return false;
+  return cleanVat.slice(0, 2).toUpperCase().startsWith("FR");
 };
 
 /**
@@ -148,9 +150,9 @@ export const isFRVat = (clue: string): boolean => {
  */
 export const isForeignVat = (clue: string): boolean => {
   if (!isVat(clue)) return false;
-  const cleanClue = clue.replace(/[\W_]+/g, "");
-  if (!cleanClue) return false;
-  return !cleanClue.slice(0, 2).toUpperCase().startsWith("FR");
+  const cleanVat = cleanClue(clue);
+  if (!cleanVat) return false;
+  return !cleanVat.slice(0, 2).toUpperCase().startsWith("FR");
 };
 
 /**
@@ -158,8 +160,8 @@ export const isForeignVat = (clue: string): boolean => {
  */
 export const isOmi = (clue: string): boolean => {
   if (!clue) return false;
-  if (clue.match(/[\W_]/gim) !== null) return false;
-  const clean = clue.replace(/[\W_]+/g, "");
+  if (clue.match(BAD_CHARACTERS_REGEXP) !== null) return false;
+  const clean = cleanClue(clue);
   return clean.match(/^OMI[0-9]{7}$/gim) !== null;
 };
 

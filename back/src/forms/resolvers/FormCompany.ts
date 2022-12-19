@@ -2,7 +2,8 @@ import { checkVAT } from "jsvat";
 import {
   countries as vatCountries,
   isVat,
-  isSiret
+  isSiret,
+  BAD_CHARACTERS_REGEXP
 } from "../../common/constants/companySearchHelpers";
 import { FormCompanyResolvers } from "../../generated/graphql/types";
 
@@ -11,7 +12,7 @@ const formCompanyResolvers: FormCompanyResolvers = {
     if (isVat(parent.vatNumber)) {
       // ignore parent.country
       const vatCountryCode = checkVAT(
-        parent.vatNumber.replace(/[\W_\s]/gim, ""),
+        parent.vatNumber.replace(BAD_CHARACTERS_REGEXP, ""),
         vatCountries
       )?.country?.isoCode.short;
       return vatCountryCode ? vatCountryCode : parent.country ?? "FR";

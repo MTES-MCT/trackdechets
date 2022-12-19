@@ -12,6 +12,7 @@ import { renderMail } from "../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../mailer/templates";
 import { deleteCachedUserCompanies } from "../../../common/redis/users";
 import {
+  BAD_CHARACTERS_REGEXP,
   isFRVat,
   isSiret,
   isVat
@@ -60,10 +61,10 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   const ecoOrganismeAgreements =
     companyInput.ecoOrganismeAgreements?.map(a => a.href) || [];
   const siret = companyInput.siret
-    ? companyInput.siret.replace(/[\W_]+/g, "")
+    ? companyInput.siret.replace(BAD_CHARACTERS_REGEXP, "")
     : null;
   const vatNumber = companyInput.vatNumber
-    ? companyInput.vatNumber.replace(/[\W_]+/g, "")
+    ? companyInput.vatNumber.replace(BAD_CHARACTERS_REGEXP, "")
     : null;
   const orgId = siret ?? vatNumber;
 
