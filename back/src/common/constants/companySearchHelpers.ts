@@ -102,8 +102,11 @@ export const luhnCheck = (num: string | number, modulo = 10): boolean => {
 
 /**
  * Validateur de numéro de SIRETs
+ * @param clue string to validate
+ * @param allowTestCompany For the frontend to pass ALLOW_TEST_COMPANY
+ * @returns
  */
-export const isSiret = (clue: string): boolean => {
+export const isSiret = (clue: string, allowTestCompany = false): boolean => {
   if (!clue) return false;
   const cleanClue = clue.replace(/[\W_]+/g, "");
   if (
@@ -113,7 +116,10 @@ export const isSiret = (clue: string): boolean => {
   ) {
     return false;
   }
-  if (ALLOW_TEST_COMPANY && cleanClue.startsWith(TEST_COMPANY_PREFIX)) {
+  if (
+    (allowTestCompany || ALLOW_TEST_COMPANY) &&
+    cleanClue.startsWith(TEST_COMPANY_PREFIX)
+  ) {
     return true;
   }
   const luhnValid = luhnCheck(cleanClue);
