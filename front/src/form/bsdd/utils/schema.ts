@@ -160,7 +160,8 @@ const intermediariesShape: SchemaOf<Omit<CompanyInput, "__typename">> =
         "is-siret",
         "Intermédiaires: le SIRET n'est pas valide (14 chiffres obligatoires)",
         siret =>
-          !siret || isSiret(siret, import.meta.env.VITE_ALLOW_TEST_COMPANY)
+          !siret ||
+          isSiret(siret, import.meta.env.VITE_ALLOW_TEST_COMPANY === "true")
       ),
     contact: string().required(
       "Intermédiaires: les nom et prénom de contact sont obligatoires"

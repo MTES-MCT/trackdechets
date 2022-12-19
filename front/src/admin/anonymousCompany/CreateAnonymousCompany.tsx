@@ -46,7 +46,8 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
         "is-siret",
         "n°SIRET invalide",
         value =>
-          !value || isSiret(value, import.meta.env.VITE_ALLOW_TEST_COMPANY)
+          !value ||
+          isSiret(value, import.meta.env.VITE_ALLOW_TEST_COMPANY === "true")
       ),
   });
 

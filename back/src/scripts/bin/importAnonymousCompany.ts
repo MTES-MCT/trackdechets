@@ -50,6 +50,7 @@ async function runImport() {
     try {
       await prisma.anonymousCompany.create({
         data: {
+          orgId: company.siret,
           ...company,
           libelleNaf: nafCodes[company.codeNaf]
         }
