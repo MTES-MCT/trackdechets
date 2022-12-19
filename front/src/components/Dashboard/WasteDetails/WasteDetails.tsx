@@ -6,9 +6,9 @@ import {
   IconBSDDThin as IconBSDD,
   IconBSDasriThin as IconBSDasri,
   IconWeight,
-} from "../../common/components/Icons";
+} from "../../../common/components/Icons";
 import { WasteDetailsProps } from "./wasteTypes";
-import { BsdType } from "../../generated/graphql/types";
+import { BsdType } from "../../../generated/graphql/types";
 import "./wasteDetails.scss";
 
 function WasteDetails({

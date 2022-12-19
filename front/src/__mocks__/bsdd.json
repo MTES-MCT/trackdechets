@@ -1,0 +1,80 @@
+{
+  "id": "cl3y0e2l11942399smeriz622",
+  "readableId": "BSD-20220603-6CMTE78ZJ",
+  "customId": "",
+  "sentAt": null,
+  "emittedAt": null,
+  "emittedBy": null,
+  "emittedByEcoOrganisme": null,
+  "takenOverAt": null,
+  "status": "DRAFT",
+  "wasteDetails": {
+    "code": "10 10 10",
+    "name": "poussieres",
+    "packagingInfos": [
+      {
+        "type": "GRV",
+        "other": "",
+        "quantity": 20,
+        "__typename": "PackagingInfo"
+      }
+    ],
+    "__typename": "WasteDetails"
+  },
+  "emitter": {
+    "type": "APPENDIX2",
+    "isPrivateIndividual": false,
+    "company": {
+      "siret": "53230142100022",
+      "name": "L'ATELIER DE CELINE",
+      "omiNumber": null,
+      "__typename": "FormCompany"
+    },
+    "isForeignShip": false,
+    "__typename": "Emitter"
+  },
+  "recipient": {
+    "company": {
+      "siret": "13001045700013",
+      "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+      "__typename": "FormCompany"
+    },
+    "isTempStorage": false,
+    "__typename": "Recipient"
+  },
+  "transporter": {
+    "company": {
+      "siret": "13001045700013",
+      "__typename": "FormCompany"
+    },
+    "numberPlate": "",
+    "customInfo": null,
+    "__typename": "Transporter"
+  },
+  "ecoOrganisme": null,
+  "stateSummary": {
+    "transporterCustomInfo": null,
+    "transporterNumberPlate": "",
+    "transporter": {
+      "siret": "13001045700013",
+      "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+      "__typename": "FormCompany"
+    },
+    "recipient": {
+      "siret": "13001045700013",
+      "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+      "__typename": "FormCompany"
+    },
+    "emitter": {
+      "siret": "53230142100022",
+      "name": "L'ATELIER DE CELINE",
+      "__typename": "FormCompany"
+    },
+    "__typename": "StateSummary"
+  },
+  "temporaryStorageDetail": null,
+  "transportSegments": [],
+  "currentTransporterSiret": null,
+  "nextTransporterSiret": null,
+  "__typename": "Form"
+}

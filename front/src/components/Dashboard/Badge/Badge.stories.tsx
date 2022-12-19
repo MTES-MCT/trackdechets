@@ -5,7 +5,7 @@ import Badge from "./Badge";
 import { BadgeStatusCode } from "./badgeTypes";
 
 export default {
-  title: "COMPONENTS/Badge",
+  title: "COMPONENTS/DASHBOARD/Badge",
   component: Badge,
   decorators: [withDesign],
   argTypes: {

@@ -1,10 +1,10 @@
 import React from "react";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import WasteDetails from "./WasteDetails";
-import { BsdType } from "../../generated/graphql/types";
+import { BsdType } from "../../../generated/graphql/types";
 
 export default {
-  title: "COMPONENTS/WasteDetails",
+  title: "COMPONENTS/DASHBOARD/WasteDetails",
   component: WasteDetails,
 } as ComponentMeta<typeof WasteDetails>;
 
