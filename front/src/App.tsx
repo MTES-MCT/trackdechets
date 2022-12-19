@@ -16,24 +16,51 @@ export default function App() {
   return (
     <BrowserDetect>
       <ErrorBoundary
-        fallback={errorData => (
-          <SimpleNotificationError
-            message={
-              <>
-                Une erreur s'est produite, veuillez nous en excuser. Si le
-                problème persiste, merci de contacter{" "}
-                <a
-                  target="_blank"
-                  href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
-                  rel="noreferrer"
-                >
-                  l'équipe Trackdéchets
-                </a>
-                en précisant le numéro d'erreur suivant : ${errorData.eventId}.
-              </>
-            }
-          />
-        )}
+        fallback={errorData => {
+          if (
+            errorData?.error?.message?.includes(
+              "error loading dynamically imported module"
+            )
+          ) {
+            return (
+              <SimpleNotificationError
+                message={
+                  <>
+                    Une nouvelle version du site est disponible. Veuillez
+                    rafraichir votre page. Si le problème persiste, merci de
+                    contacter{" "}
+                    <a
+                      target="_blank"
+                      href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
+                      rel="noreferrer"
+                    >
+                      l'équipe Trackdéchets.
+                    </a>
+                  </>
+                }
+              />
+            );
+          }
+          return (
+            <SimpleNotificationError
+              message={
+                <>
+                  Une erreur s'est produite, veuillez nous en excuser. Si le
+                  problème persiste, merci de contacter{" "}
+                  <a
+                    target="_blank"
+                    href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
+                    rel="noreferrer"
+                  >
+                    l'équipe Trackdéchets
+                  </a>
+                  en précisant le numéro d'erreur suivant : ${errorData.eventId}
+                  .
+                </>
+              }
+            />
+          );
+        }}
       >
         <ApolloProvider client={client}>
           <Router>

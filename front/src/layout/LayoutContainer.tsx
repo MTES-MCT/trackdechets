@@ -16,6 +16,7 @@ import routes from "common/routes";
 import { useQuery, gql } from "@apollo/client";
 import { Query } from "../generated/graphql/types";
 import ResendActivationEmail from "login/ResendActivationEmail";
+import Login from "login/Login";
 
 const Admin = lazy(() => import("admin/Admin"));
 const Dashboard = lazy(() => import("dashboard/Dashboard"));
@@ -33,7 +34,6 @@ const WasteSelector = lazy(() => import("login/WasteSelector"));
 const Invite = lazy(() => import("login/Invite"));
 const PasswordResetRequest = lazy(() => import("login/PasswordResetRequest"));
 const PasswordReset = lazy(() => import("login/PasswordReset"));
-const Login = lazy(() => import("login/Login"));
 const Signup = lazy(() => import("login/Signup"));
 const Dialog = lazy(() => import("oauth2/Dialog"));
 const Company = lazy(() => import("company/Company"));
