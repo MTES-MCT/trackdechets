@@ -1,10 +1,10 @@
-ALTER TABLE "default$default"."Company"
+ALTER TABLE "default$default"."AnonymousCompany"
     ADD COLUMN "orgId" TEXT UNIQUE;
 
 UPDATE
-  "default$default"."Company"
+  "default$default"."AnonymousCompany"
 SET
   "orgId" = "siret";
 
-ALTER TABLE "default$default"."Company"
+ALTER TABLE "default$default"."AnonymousCompany"
 ALTER COLUMN "orgId" SET NOT NULL;

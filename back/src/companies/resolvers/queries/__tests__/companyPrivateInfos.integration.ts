@@ -436,6 +436,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
 
     const createInput = {
       siret,
+      orgId: siret,
       name: "Établissement de test",
       address: "Adresse test",
       codeNaf: "XXXXX",
@@ -480,6 +481,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
 
     const createInput = {
       siret,
+      orgId: siret,
       name: "Établissement de test",
       address: "Adresse test",
       codeNaf: "XXXXX",
@@ -524,6 +526,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
 
     const createInput = {
       siret,
+      orgId: siret,
       name: "Établissement de test",
       address: "Adresse test",
       codeNaf: "XXXXX",
@@ -583,6 +586,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
 
     const createInput = {
       siret,
+      orgId: siret,
       name: "Établissement de test",
       address: "Adresse test",
       codeNaf: "XXXXX",

@@ -46,7 +46,12 @@ const createTestCompany: MutationResolvers["createTestCompany"] = async (
     siret: await generateTestSiret(),
     ...fixtures
   };
-  const company = await prisma.anonymousCompany.create({ data: createInput });
+  const company = await prisma.anonymousCompany.create({
+    data: {
+      ...createInput,
+      orgId: createInput.siret
+    }
+  });
   return company.siret;
 };
 

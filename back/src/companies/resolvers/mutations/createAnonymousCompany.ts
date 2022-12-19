@@ -51,6 +51,7 @@ const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"
 
     const anonymousCompany = await prisma.anonymousCompany.create({
       data: {
+        orgId: input.siret,
         ...input,
         libelleNaf: nafCodes[input.codeNaf]
       }

@@ -15,7 +15,7 @@ const companyInfosResolvers: QueryResolvers["companyPrivateInfos"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   checkIsAuthenticated(context);
-  const cleanClue = args.clue.replace(/\s/g, "").toUpperCase();
+  const cleanClue = args.clue.replace(/[\W_\s]/gim, "").toUpperCase();
   const [companyInfos, isAnonymousCompany, company] = await Promise.all([
     getCompanyInfos(cleanClue),
     prisma.anonymousCompany.count({
@@ -27,6 +27,7 @@ const companyInfosResolvers: QueryResolvers["companyPrivateInfos"] = async (
         ...(isVat(cleanClue) && { vatNumber: cleanClue })
       },
       select: {
+        orgId: true,
         gerepId: true,
         securityCode: true,
         verificationCode: true,
@@ -34,6 +35,7 @@ const companyInfosResolvers: QueryResolvers["companyPrivateInfos"] = async (
       }
     })
   ]);
+  debugger;
   const companyInfosConvert: any = companyInfos;
   return {
     ...companyInfosConvert,

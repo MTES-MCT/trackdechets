@@ -226,7 +226,8 @@ model Company {
 // du rattachement d'établissements de test sur l'environnement sandbox
 model AnonymousCompany {
   id          String  @id @default(cuid())
-  siret       String  @unique
+  orgId       String  @unique
+  siret       String  @unique @default(cuid())
   vatNumber   String? @unique
   name        String
   address     String

@@ -80,7 +80,11 @@ describe("createAnonymousCompany", () => {
     const { mutate } = makeClient(user);
 
     await prisma.anonymousCompany.create({
-      data: { ...validInput, libelleNaf: "Libellé NAF" }
+      data: {
+        ...validInput,
+        orgId: validInput.siret,
+        libelleNaf: "Libellé NAF"
+      }
     });
 
     const { errors } = await mutate<

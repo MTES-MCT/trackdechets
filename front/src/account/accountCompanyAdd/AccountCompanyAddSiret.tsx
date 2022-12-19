@@ -186,7 +186,10 @@ export default function AccountCompanyAddSiret({
           <Formik
             initialValues={{ siret: "" }}
             validate={values => {
-              const isValidSiret = isSiret(values.siret);
+              const isValidSiret = isSiret(
+                values.siret,
+                import.meta.env.VITE_ALLOW_TEST_COMPANY
+              );
               const isValidVat = isVat(values.siret);
               if (!isValidSiret && !/^[a-zA-Z]{2}/.test(values.siret)) {
                 return {

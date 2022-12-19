@@ -69,7 +69,10 @@ describe("searchCompany", () => {
     jest.resetModules();
 
     const { siret } = await prisma.anonymousCompany.create({
-      data: createInput
+      data: {
+        orgId: createInput.siret,
+        ...createInput
+      }
     });
     const testCompany = await searchCompany(siret);
     expect(siret).toEqual(testCompany.siret);

@@ -36,7 +36,7 @@ export function FormCompanyFields({
       } else if (isVat(company.vatNumber)) {
         // trouver automatiquement le pays
         const vatCountryCode = checkVAT(
-          company.vatNumber.replace(/\s/g, ""),
+          company.vatNumber.replace(/[\W_\s]/gim, ""),
           vatCountries
         )?.country?.isoCode.short;
 

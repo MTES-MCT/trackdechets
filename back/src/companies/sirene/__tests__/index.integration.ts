@@ -25,6 +25,7 @@ describe("searchCompany", () => {
     const anonymousCompany = await prisma.anonymousCompany.create({
       data: {
         siret,
+        orgId: siret,
         name: "GENDARMERIE NATIONALE",
         address: "Rue des tropiques, Saint Tropez",
         codeNaf: "7150",

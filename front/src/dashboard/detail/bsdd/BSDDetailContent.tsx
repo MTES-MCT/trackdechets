@@ -182,7 +182,10 @@ const TempStorage = ({ form }) => {
             <DetailRow
               value={temporaryStorageDetail?.transporter?.company?.orgId}
               label={
-                isSiret(temporaryStorageDetail?.transporter?.company?.orgId)
+                isSiret(
+                  temporaryStorageDetail?.transporter?.company?.orgId,
+                  import.meta.env.VITE_ALLOW_TEST_COMPANY
+                )
                   ? "Siret"
                   : "Numéro de TVA"
               }

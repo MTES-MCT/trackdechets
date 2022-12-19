@@ -35,7 +35,7 @@ async function runImport() {
 
   const existingCompanies = await prisma.anonymousCompany.findMany({
     where: { siret: { in: companies.map(c => c.siret) } },
-    select: { siret: true }
+    select: { siret: true, orgId: true }
   });
   const existingSirets = existingCompanies.map(ec => ec.siret);
   const companiesToCreate = companies.filter(

@@ -68,7 +68,7 @@ export default function AccountCompanyInfo({ company }: Props) {
 
   return (
     <>
-      {isSiret(company.siret!) && (
+      {isSiret(company.siret!, import.meta.env.VITE_ALLOW_TEST_COMPANY) && (
         <AccountFieldNotEditable
           name="siret"
           label="Numéro SIRET"
