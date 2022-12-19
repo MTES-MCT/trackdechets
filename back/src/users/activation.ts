@@ -21,6 +21,8 @@ export const userActivationHandler = async (req, res) => {
     data: { isActive: true, activatedAt: new Date() }
   });
 
+  await prisma.userActivationHash.delete({ where: { hash } });
+
   const UI_BASE_URL = getUIBaseURL();
   return res.redirect(`${UI_BASE_URL}/login?signup=complete`);
 };
