@@ -49,6 +49,7 @@ describe("companyInfos with SIRET", () => {
     const siret = siretify(1);
     searchCompanyMock.mockResolvedValueOnce({
       siret,
+      orgId: siret,
       name: "Code en stock"
     });
     companyMock.mockResolvedValueOnce({
@@ -64,6 +65,7 @@ describe("companyInfos with SIRET", () => {
 
     expect(company).toStrictEqual({
       siret,
+      orgId: siret,
       name: "Code en stock",
       contactEmail: "benoit.guigal@protonmail.com",
       contactPhone: "06 67 78 xx xx",
@@ -97,6 +99,7 @@ describe("companyInfos with SIRET", () => {
 
     searchCompanyMock.mockResolvedValueOnce({
       siret,
+      orgId: siret,
       name: "Code en stock"
     });
     companyMock.mockResolvedValueOnce(null);
@@ -104,6 +107,7 @@ describe("companyInfos with SIRET", () => {
 
     expect(company).toStrictEqual({
       siret,
+      orgId: siret,
       name: "Code en stock",
       isRegistered: false,
       companyTypes: [],
@@ -158,6 +162,7 @@ describe("companyInfos search with a VAT number", () => {
       etatAdministratif: "A"
     });
     companyMock.mockResolvedValueOnce({
+      orgId: "IT09301420155",
       contactEmail: "benoit.guigal@protonmail.com",
       contactPhone: "06 67 78 xx xx",
       website: "http://benoitguigal.fr"
@@ -169,6 +174,7 @@ describe("companyInfos search with a VAT number", () => {
 
     expect(company).toStrictEqual({
       siret: undefined,
+      orgId: "IT09301420155",
       vatNumber: "IT09301420155",
       name: "Code en stock",
       address: "une adresse",
@@ -209,6 +215,7 @@ describe("companyInfos search with a VAT number", () => {
 
     expect(company).toStrictEqual({
       siret: undefined,
+      orgId: undefined,
       vatNumber: "IT09301420155",
       name: "Code en stock",
       address: "une adresse",
