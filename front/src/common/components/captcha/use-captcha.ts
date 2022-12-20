@@ -47,9 +47,6 @@ export function useCaptcha(displayCaptcha: boolean) {
 
   useEffect(() => {
     if (!displayCaptcha) {
-      // setLoading(false);
-      // setError(null);
-      // setCaptchaData(null);
       return;
     }
     getCaptchaData();

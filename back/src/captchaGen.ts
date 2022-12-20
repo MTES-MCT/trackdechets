@@ -17,7 +17,7 @@ function randomInt(max) {
 // IOT to provide captcha features we follow the following steps:
 // Captcha generation: captchaGen generates an image (data url) and a redis stored token associated to the captcha string
 // redis entries are short-lived (a few minutes) and deleted each time a checkCaptcha is performed (either success or failure)
-// Frontend displays the generated image, an input field, and store the token value in an hidden field or react state entry
+// Frontend displays the generated image, an input field, and stores the token value in an hidden field or react state entry
 // The input value and the token are sent back on form submit to be verified
 // Captcha verification: checkCaptcha verifies a given captcha input against the stored redis entry
 
@@ -38,16 +38,16 @@ export const captchaAsToken = async (
 };
 
 /**
- * Check given input matches decoded jwt captcha string and token is not expired
+ * Check given input matches captcha string associated to a gievn captcha token
  * @param inputCaptcha
- * @param jwtCaptcha
+ * @param captchaToken
  * @returns
  */
 export async function checkCaptcha(captchaInput, captchaToken) {
   if (!captchaInput || !captchaToken) {
     return false;
   }
-
+  // if token is expired, we get an empty string and the next equality fails
   const captchaString = await getCaptchaToken(captchaToken);
 
   const valid = !!captchaString && captchaString === captchaInput;
@@ -59,7 +59,7 @@ export async function checkCaptcha(captchaInput, captchaToken) {
 
 /**
  * As the name says.
- * @returns
+ * @returns "rgb(200, 100, 120)"
  */
 function randomColor(): `rgb(${number}, ${number}, ${number})` {
   const colorRange = 200; // avoid low contracts colors
@@ -147,7 +147,7 @@ function textToCaptcha(captchaString: string): string {
 }
 
 /**
- * Generate a random string,return this string as a data-url img and token referencing a redis entry
+ * Generate a random string, return this string as a data-url img and token referencing a redis entry
  * @param res
  */
 export async function captchaGen(res) {

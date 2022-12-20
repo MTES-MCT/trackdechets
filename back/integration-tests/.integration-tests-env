@@ -3,7 +3,6 @@ DATABASE_URL='postgresql://test:no_pass@postgres:5432/prisma?schema=default$defa
 REDIS_URL=redis://redis:6379
 MONGO_URL=mongodb://test:no_pass@mongodb:27017
 SESSION_SECRET=any_secret
-CAPTCHA_SECRET=any_secret
 API_TOKEN_SECRET=any_secret
 API_HOST=api.trackdechets.local
 UI_HOST=trackdechets.local
