@@ -11,6 +11,14 @@ type Options = {
   maxRequestsPerWindow: number;
 };
 
+/**
+ * Rate limiter middleware, use:
+ * - user email if available
+ * - user ip otherwise
+ * @param rateLimitedQuery
+ * @param options
+ * @returns
+ */
 export function graphqlRateLimiterMiddleware(
   rateLimitedQuery: GqlQueryKey,
   options: Options
@@ -20,7 +28,9 @@ export function graphqlRateLimiterMiddleware(
     rateLimiterMiddleware({
       windowMs: options.windowMs,
       maxRequestsPerWindow: options.maxRequestsPerWindow,
-      keyGenerator: (ip: string) => `gql_${rateLimitedQuery}_${ip}`
+      keyGenerator: (ip: string, req) => {
+        return `gql_${rateLimitedQuery}_${req?.user?.email ?? ip}`;
+      }
     })
   );
 }

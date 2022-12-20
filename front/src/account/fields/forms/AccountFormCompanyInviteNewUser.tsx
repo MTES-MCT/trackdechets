@@ -11,6 +11,7 @@ import {
   Mutation,
   MutationInviteUserToCompanyArgs,
 } from "generated/graphql/types";
+import cogoToast from "cogo-toast";
 
 type Props = {
   company: CompanyPrivate;
@@ -49,7 +50,19 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
   const [inviteUserToCompany, { loading }] = useMutation<
     Pick<Mutation, "inviteUserToCompany">,
     MutationInviteUserToCompanyArgs
-  >(INVITE_USER_TO_COMPANY);
+  >(INVITE_USER_TO_COMPANY, {
+    onCompleted: () => {
+      cogoToast.success("Invitation envoyée", { hideAfter: 5 });
+    },
+    onError: () => {
+      cogoToast.error(
+        "L'invitation n'a pas pu être envoyée. Veuillez réessayer dans quelques minutes.",
+        {
+          hideAfter: 5,
+        }
+      );
+    },
+  });
 
   return (
     <Formik

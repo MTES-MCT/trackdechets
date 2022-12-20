@@ -15,7 +15,10 @@ import {
 import styles from "./AccountOauth2AppCreateUpdate.module.scss";
 import { useHistory } from "react-router";
 import routes from "common/routes";
-import { NotificationError } from "common/components/Error";
+import {
+  NotificationError,
+  SimpleNotificationError,
+} from "common/components/Error";
 import Tooltip from "common/components/Tooltip";
 import {
   APPLICATION,
@@ -133,7 +136,10 @@ export default function AccountOauth2AppCreateUpdate({
               },
             });
           } else {
-            await createApplication({ variables: { input: values } });
+            const res = await createApplication({
+              variables: { input: values },
+            });
+            console.log(res);
           }
           history.push(routes.account.oauth2.list);
         }}
@@ -293,7 +299,10 @@ export default function AccountOauth2AppCreateUpdate({
           </Form>
         )}
       </Formik>
-      {createApplicationError && (
+      {createApplicationError && createApplicationError?.networkError && (
+        <SimpleNotificationError message="Pour des raisons de sécurité la création d'applications est limitée, merci de rééssayer dans une minute." />
+      )}
+      {createApplicationError && !createApplicationError?.networkError && (
         <NotificationError apolloError={createApplicationError} />
       )}
       {updateApplicationError && (

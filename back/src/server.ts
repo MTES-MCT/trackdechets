@@ -170,13 +170,7 @@ app.use(json());
 app.use(graphQLPath, graphqlBodyParser);
 app.use(graphQLPath, graphqlQueryParserMiddleware());
 app.use(graphQLPath, graphqlBatchLimiterMiddleware());
-app.use(
-  graphQLPath,
-  graphqlRateLimiterMiddleware("resendInvitation", {
-    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
-    maxRequestsPerWindow: 10 // 10 requests each 3 minutes
-  })
-);
+
 app.use(
   graphQLPath,
   graphqlRateLimiterMiddleware("createPasswordResetRequest", {
@@ -244,6 +238,41 @@ let blacklist = [];
 if (USERS_BLACKLIST_ENV?.length > 0) {
   blacklist = USERS_BLACKLIST_ENV.split(",");
 }
+
+// The following  middlewares use email to generate rate limit redis key and therefore
+// must stay after passport initialization to ensure req.user.email is available
+
+// Hacker might massively create apps or tokens to annoy us or exhaust our db
+app.use(
+  graphQLPath,
+  graphqlRateLimiterMiddleware("createApplication", {
+    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+    maxRequestsPerWindow: 3 // 3 requests each 3 minutes
+  })
+);
+app.use(
+  graphQLPath,
+  graphqlRateLimiterMiddleware("createAccessToken", {
+    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+    maxRequestsPerWindow: 3 // 3 requests each 3 minutes
+  })
+);
+// Hacker might massively invite or reinvite users to spam them
+app.use(
+  graphQLPath,
+  graphqlRateLimiterMiddleware("inviteUserToCompany", {
+    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+    maxRequestsPerWindow: 10 // 10 requests each 3 minutes
+  })
+);
+
+app.use(
+  graphQLPath,
+  graphqlRateLimiterMiddleware("resendInvitation", {
+    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+    maxRequestsPerWindow: 10 // 10 requests each 3 minutes
+  })
+);
 
 app.use((req, res, next) => {
   if (req.user && blacklist.includes(req.user.email)) {
