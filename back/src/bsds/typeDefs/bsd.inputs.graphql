@@ -3,7 +3,7 @@ Payload d'un établissement
 """
 input CompanyInput {
   """
-  SIRET ou TVA de l'établissemen
+  SIRET ou TVA de l'établissement
   """
   orgId: String
   """
