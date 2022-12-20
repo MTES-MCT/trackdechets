@@ -24,6 +24,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout de rate limit sur certaines mutations [PR 1948](https://github.com/MTES-MCT/trackdechets/pull/1948)
 - Les destinataires des BSDD peuvent désormais choisir l'option R0 (réemploi/réutilisation) [PR 1971](https://github.com/MTES-MCT/trackdechets/pull/1971)
 - Limite les valeurs de poids à 40 tonnes lorsque le transport se fait par route et à 50 000 T tout mode de transport confondu [PR 1995](https://github.com/MTES-MCT/trackdechets/pull/1995)
+- Mise en place de captchas sur les opérations de connexion, renvoi d'email d'activation, réinitialisation de mot de passe[PR 1955](https://github.com/MTES-MCT/trackdechets/pull/1955)
 
 #### :memo: Documentation
 
