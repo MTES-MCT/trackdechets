@@ -35,7 +35,6 @@ const companyInfosResolvers: QueryResolvers["companyPrivateInfos"] = async (
       }
     })
   ]);
-  debugger;
   const companyInfosConvert: any = companyInfos;
   return {
     ...companyInfosConvert,
