@@ -7,6 +7,8 @@ const fs = require("fs");
 
 const app = express();
 
+const SENTRY_DSN = process.env.VITE_SENTRY_DSN;
+
 const DEFAULT_SRC = [
   "'self'",
   "*.trackdechets.beta.gouv.fr",
@@ -62,12 +64,13 @@ app.use(bodyParser.text());
 // https://docs.sentry.io/platforms/javascript/troubleshooting/#using-the-tunnel-option
 // https://github.com/getsentry/examples/blob/master/tunneling/nextjs/pages/api/tunnel.js
 app.post("/sentry", async function (req, res) {
+  if (!SENTRY_DSN) {
+    return res.status(500).json({ status: "sentry n'est pas configuré" });
+  }
   try {
     const envelope = req.body;
-    const pieces = envelope.split("\n");
-    const header = JSON.parse(pieces[0]);
     // DSNs are of the form `https://<key>@o<orgId>.ingest.sentry.io/<projectId>`
-    const { host, pathname } = new URL(header.dsn);
+    const { host, pathname } = new URL(SENTRY_DSN);
     // Remove leading slash
     const projectId = pathname.substring(1);
     const sentryIngestURL = `https://${host}/api/${projectId}/envelope/`;
@@ -75,7 +78,6 @@ app.post("/sentry", async function (req, res) {
       method: "POST",
       body: envelope,
     });
-
     // Relay response from Sentry servers to front end
     sentryResponse.headers.forEach(h => res.setHeader(h[0], h[1]));
     res.status(sentryResponse.status).send(sentryResponse.body);
