@@ -15,6 +15,9 @@ if (import.meta.env.VITE_SENTRY_DSN) {
   Sentry.init({
     dsn: import.meta.env.VITE_SENTRY_DSN as string,
     environment: import.meta.env.VITE_SENTRY_ENVIRONMENT as string,
+    ...(import.meta.env.VITE_SENTRY_USE_TUNNEL === "true"
+      ? { tunnel: "/sentry" }
+      : {}),
     ignoreErrors: [
       // The user is having issues with their internet connection
       "NetworkError when attempting to fetch resource.",
