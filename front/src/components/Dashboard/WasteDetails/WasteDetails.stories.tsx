@@ -6,6 +6,12 @@ import { BsdType } from "../../../generated/graphql/types";
 export default {
   title: "COMPONENTS/DASHBOARD/WasteDetails",
   component: WasteDetails,
+  parameters: {
+    design: {
+      type: "figma",
+      url: "https://www.figma.com/file/tyefue5qFChEpujrFU1Jiz/Librairie-TD-dashboard?node-id=1%3A2441&t=0tYb1cF2o4m4Id2g-4",
+    },
+  },
 } as ComponentMeta<typeof WasteDetails>;
 
 const Template: ComponentStory<typeof WasteDetails> = args => (

@@ -1,0 +1,125 @@
+{
+  "id": "cktcnn4ul7181x79soidq7c3i",
+  "readableId": "BSD-20210909-0FPXX37GW",
+  "customId": null,
+  "sentAt": null,
+  "emittedAt": null,
+  "emittedBy": null,
+  "emittedByEcoOrganisme": null,
+  "takenOverAt": null,
+  "status": "DRAFT",
+  "wasteDetails": {
+    "code": "15 01 11*",
+    "name": "emballages amiante",
+    "packagingInfos": [
+      {
+        "type": "GRV",
+        "other": "",
+        "quantity": 5,
+        "__typename": "PackagingInfo"
+      },
+      {
+        "type": "AUTRE",
+        "other": "sac",
+        "quantity": 2,
+        "__typename": "PackagingInfo"
+      }
+    ],
+    "__typename": "WasteDetails"
+  },
+  "emitter": {
+    "type": "OTHER",
+    "isPrivateIndividual": false,
+    "company": {
+      "siret": "81232991000010",
+      "name": "BOULANGERIE AU 148",
+      "omiNumber": null,
+      "__typename": "FormCompany"
+    },
+    "isForeignShip": false,
+    "__typename": "Emitter"
+  },
+  "recipient": {
+    "company": {
+      "siret": "13001045700013",
+      "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+      "__typename": "FormCompany"
+    },
+    "isTempStorage": true,
+    "__typename": "Recipient"
+  },
+  "transporter": {
+    "company": {
+      "siret": "13001045700013",
+      "__typename": "FormCompany"
+    },
+    "numberPlate": null,
+    "customInfo": null,
+    "__typename": "Transporter"
+  },
+  "ecoOrganisme": {
+    "siret": "42248908800035",
+    "__typename": "FormEcoOrganisme"
+  },
+  "stateSummary": {
+    "transporterCustomInfo": null,
+    "transporterNumberPlate": null,
+    "transporter": {
+      "siret": "13001045700013",
+      "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+      "__typename": "FormCompany"
+    },
+    "recipient": {
+      "siret": "13001045700013",
+      "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+      "__typename": "FormCompany"
+    },
+    "emitter": {
+      "siret": "81232991000010",
+      "name": "BOULANGERIE AU 148",
+      "__typename": "FormCompany"
+    },
+    "__typename": "StateSummary"
+  },
+  "temporaryStorageDetail": {
+    "destination": {
+      "company": {
+        "siret": "53230142100022",
+        "address": "14 Rue des Marchands 17540 Vérines",
+        "name": "L'ATELIER DE CELINE",
+        "contact": "Céline",
+        "phone": "0145454545",
+        "mail": "hello@trackdechets.beta.gouv.fr",
+        "__typename": "FormCompany"
+      },
+      "cap": "CAP2",
+      "processingOperation": "D 1",
+      "__typename": "Destination"
+    },
+    "transporter": null,
+    "wasteDetails": {
+      "packagingInfos": [
+        {
+          "type": "GRV",
+          "other": "",
+          "quantity": 5,
+          "__typename": "PackagingInfo"
+        },
+        {
+          "type": "AUTRE",
+          "other": "sac",
+          "quantity": 2,
+          "__typename": "PackagingInfo"
+        }
+      ],
+      "quantity": 19,
+      "quantityType": "ESTIMATED",
+      "__typename": "WasteDetails"
+    },
+    "__typename": "TemporaryStorageDetail"
+  },
+  "transportSegments": [],
+  "currentTransporterSiret": null,
+  "nextTransporterSiret": null,
+  "__typename": "Form"
+}

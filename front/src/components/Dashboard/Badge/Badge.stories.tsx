@@ -2,7 +2,7 @@ import React from "react";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import { withDesign } from "storybook-addon-designs";
 import Badge from "./Badge";
-import { BadgeStatusCode } from "./badgeTypes";
+import { BsdStatusCode } from "../../../common/types/bsdTypes";
 
 export default {
   title: "COMPONENTS/DASHBOARD/Badge",
@@ -11,13 +11,13 @@ export default {
   argTypes: {
     status: {
       control: "select",
-      options: Object.values(BadgeStatusCode),
+      options: Object.values(BsdStatusCode),
     },
   },
   parameters: {
     design: {
       type: "figma",
-      url: "https://www.figma.com/file/tyefue5qFChEpujrFU1Jiz/Librairie-TD-dashboard?node-id=266%3A12457",
+      url: "https://www.figma.com/file/tyefue5qFChEpujrFU1Jiz/Librairie-TD-dashboard?node-id=1%3A2365&t=0tYb1cF2o4m4Id2g-4",
     },
   },
 } as ComponentMeta<typeof Badge>;
@@ -31,21 +31,21 @@ export const Sealed = Template.bind({});
 export const Refused = Template.bind({});
 
 Draft.args = {
-  status: BadgeStatusCode.DRAFT,
+  status: BsdStatusCode.DRAFT,
 };
 
 Received.args = {
-  status: BadgeStatusCode.RECEIVED,
+  status: BsdStatusCode.RECEIVED,
 };
 
 Processed.args = {
-  status: BadgeStatusCode.PROCESSED,
+  status: BsdStatusCode.PROCESSED,
 };
 
 Sealed.args = {
-  status: BadgeStatusCode.SEALED,
+  status: BsdStatusCode.SEALED,
 };
 
 Refused.args = {
-  status: BadgeStatusCode.REFUSED,
+  status: BsdStatusCode.REFUSED,
 };
