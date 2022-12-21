@@ -571,7 +571,7 @@ describe("ficheInterventionSchema", () => {
     };
     const validateFn = () => ficheInterventionSchema.validate(data);
     await expect(validateFn()).rejects.toThrow(
-      "L'addresse du détenteur de l'équipement (particulier) est requise"
+      "L'adresse du détenteur de l'équipement (particulier) est requise"
     );
   });
 
