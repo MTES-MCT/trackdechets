@@ -1153,8 +1153,8 @@ model BsffFicheIntervention {
   detenteurCompanySiret        String?
   detenteurCompanyAddress      String
   detenteurCompanyContact      String?
-  detenteurCompanyPhone        String
-  detenteurCompanyMail         String
+  detenteurCompanyPhone        String?
+  detenteurCompanyMail         String?
   detenteurIsPrivateIndividual Boolean @default(false)
 
   operateurCompanyName    String

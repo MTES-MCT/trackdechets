@@ -328,8 +328,9 @@ input BsffDetenteurInput {
   company: CompanyInput
   """
   Indique si le détenteur est un particulier ou une entreprise.
-  Dans le cas où le détenteur est un particulier, vous devez renseigner uniquement les champs `name`,
-  `address`, `mail` et `phone` de l'objet `company`
+  Dans le cas où le détenteur est un particulier, seuls les champs `name` et
+  `address` de l'objet `company` sont requis. La valeur par défaut de `isPrivateIndividual`
+  est `false`.
   """
   isPrivateIndividual: Boolean
 }

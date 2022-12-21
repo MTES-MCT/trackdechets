@@ -186,7 +186,7 @@ type BsffWaste {
   "Nature du fluide, laisser vide lorsqu'il est inconnu."
   description: String
   "Mention ADR."
-  adr: String!
+  adr: String
 }
 
 type BsffWeight {

@@ -40,6 +40,7 @@ const ficheInterventionInput: BsffFicheInterventionInput = {
     }
   },
   detenteur: {
+    isPrivateIndividual: false,
     company: {
       name: "Acme",
       siret: "3".repeat(14),
@@ -66,18 +67,7 @@ describe("Mutation.createFicheInterventionBsff", () => {
       MutationCreateFicheInterventionBsffArgs
     >(ADD_FICHE_INTERVENTION, {
       variables: {
-        input: {
-          ...ficheInterventionInput,
-          detenteur: {
-            isPrivateIndividual: true,
-            company: {
-              name: "Particulier",
-              address: "Quelque part",
-              phone: "00 00 00 00 00",
-              mail: "john.snow@trackdechets.fr"
-            }
-          }
-        }
+        input: ficheInterventionInput
       }
     });
 
@@ -85,6 +75,43 @@ describe("Mutation.createFicheInterventionBsff", () => {
     expect(data.createFicheInterventionBsff.numero).toBe(
       ficheInterventionInput.numero
     );
+  });
+
+  it("should throw error if detenteur company info is missing", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      siret: ficheInterventionInput.operateur.company.siret,
+      name: ficheInterventionInput.operateur.company.name
+    });
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFicheInterventionBsff">,
+      MutationCreateFicheInterventionBsffArgs
+    >(ADD_FICHE_INTERVENTION, {
+      variables: {
+        input: {
+          ...ficheInterventionInput,
+          detenteur: {
+            company: {
+              ...ficheInterventionInput.detenteur.company,
+              siret: undefined,
+              contact: undefined,
+              mail: undefined,
+              phone: undefined
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le SIRET de l'entreprise détentrice de l'équipement est requis\n" +
+          "Le nom du contact de l'entreprise détentrice de l'équipement est requis\n" +
+          "Le numéro de téléphone de l'entreprise détentrice de l'équipement est requis\n" +
+          "L'addresse email de l'entreprise détentrice de l'équipement est requis"
+      })
+    ]);
   });
 
   it("should allow user to create a fiche d'intervention with a private individual detenteur", async () => {
@@ -105,7 +132,9 @@ describe("Mutation.createFicheInterventionBsff", () => {
             company: {
               ...ficheInterventionInput.detenteur.company,
               siret: undefined,
-              contact: undefined
+              contact: undefined,
+              mail: undefined,
+              phone: undefined
             }
           }
         }
@@ -117,6 +146,43 @@ describe("Mutation.createFicheInterventionBsff", () => {
       true
     );
     expect(data.createFicheInterventionBsff.detenteur.company.siret).toBeNull();
+  });
+
+  it("should throw error if detenteur private individual info is missing", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
+      siret: ficheInterventionInput.operateur.company.siret,
+      name: ficheInterventionInput.operateur.company.name
+    });
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFicheInterventionBsff">,
+      MutationCreateFicheInterventionBsffArgs
+    >(ADD_FICHE_INTERVENTION, {
+      variables: {
+        input: {
+          ...ficheInterventionInput,
+          detenteur: {
+            isPrivateIndividual: true,
+            company: {
+              name: undefined,
+              address: undefined,
+              siret: undefined,
+              contact: undefined,
+              mail: undefined,
+              phone: undefined
+            }
+          }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Le nom du détenteur de l'équipement (particulier) est requis\n" +
+          "L'addresse du détenteur de l'équipement (particulier) est requise"
+      })
+    ]);
   });
 
   it("should disallow unauthenticated user to create a fiche d'intervention", async () => {
