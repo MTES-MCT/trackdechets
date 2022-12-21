@@ -727,4 +727,38 @@ describe("Test Form reception", () => {
       })
     ]);
   });
+
+  it("should throw an error if transport mode is road and quantity accepted > 40T", async () => {
+    const { emitterCompany, recipient, recipientCompany, form } =
+      await prepareDB();
+
+    expect(form.transporterTransportMode).toEqual("ROAD");
+
+    await prepareRedis({
+      emitterCompany,
+      recipientCompany
+    });
+
+    const { mutate } = makeClient(recipient);
+
+    const { errors } = await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Bill",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          signedAt: "2019-01-17T10:22:00+0100",
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: 50
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Réception : le poids doit être inférieur à 40 tonnes lorsque le transport se fait par la route"
+      })
+    ]);
+  });
 });

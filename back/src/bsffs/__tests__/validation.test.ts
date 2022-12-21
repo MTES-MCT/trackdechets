@@ -254,7 +254,7 @@ describe("wasteDetailsSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Conditionnements : le poids doit être supérieur à 0"
+      "Conditionnement : le poids doit être supérieur à 0"
     );
   });
 
@@ -339,7 +339,7 @@ describe("acceptationSchema", () => {
     };
     const validateFn = () => acceptationSchema.validate(data);
     await expect(validateFn()).rejects.toThrow(
-      "Vous devez saisir une quantité reçue supérieure à 0"
+      "Acceptation : le poids doit être supérieur à 0 lorsque le déchet est accepté ou accepté partiellement"
     );
   });
 
@@ -373,7 +373,7 @@ describe("acceptationSchema", () => {
     };
     const validateFn = () => acceptationSchema.validate(data);
     await expect(validateFn()).rejects.toThrow(
-      "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
+      "Acceptation : le poids doit être égal à 0 lorsque le déchet est refusé"
     );
   });
 

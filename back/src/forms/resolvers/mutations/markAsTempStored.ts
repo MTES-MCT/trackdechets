@@ -28,7 +28,10 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
     throw new DestinationCannotTempStore();
   }
 
-  await receivedInfoSchema.validate(tempStoredInfos);
+  await receivedInfoSchema.validate({
+    ...tempStoredInfos,
+    transporterTransportMode: form.transporterTransportMode
+  });
 
   const { quantityType, ...tmpStoredInfos } = tempStoredInfos;
 

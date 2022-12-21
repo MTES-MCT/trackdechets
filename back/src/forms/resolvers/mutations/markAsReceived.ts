@@ -29,6 +29,8 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   const form = await getFormOrFormNotFound({ id });
   await checkCanMarkAsReceived(user, form);
 
+  let transporterTransportMode = form.transporterTransportMode;
+
   if (form.recipientIsTempStorage === true) {
     // this form can be mark as received only if it has been
     // taken over by the transporter after temp storage
@@ -39,9 +41,14 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
     if (!forwardedIn?.emittedAt) {
       throw new TemporaryStorageCannotReceive();
     }
+
+    transporterTransportMode = forwardedIn.transporterTransportMode;
   }
 
-  await receivedInfoSchema.validate(receivedInfo);
+  await receivedInfoSchema.validate({
+    ...receivedInfo,
+    transporterTransportMode
+  });
 
   const formUpdateInput: Prisma.FormUpdateInput = form.forwardedInId
     ? {

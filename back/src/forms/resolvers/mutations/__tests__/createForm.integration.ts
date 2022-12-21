@@ -1660,4 +1660,30 @@ describe("Mutation.createForm", () => {
     expect(form.transportersSirets).toContain(company.siret);
     expect(form.intermediariesSirets).toContain(company.siret);
   });
+
+  it("should not be possible de set a weight > 50 T when transport mode is ROAD", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory();
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          wasteDetails: { quantity: 50 },
+          emitter: {
+            company: { siret: company.siret }
+          },
+          transporter: { mode: "ROAD", company: { siret: transporter.siret } }
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Déchet : le poids doit être inférieur à 40 tonnes lorsque le transport se fait par la route"
+      })
+    ]);
+  });
 });

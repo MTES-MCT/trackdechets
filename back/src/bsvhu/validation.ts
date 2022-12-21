@@ -19,6 +19,7 @@ import { FactorySchemaOf } from "../common/yup/configureYup";
 import { BsvhuDestinationType } from "../generated/graphql/types";
 import { isSiret } from "../common/constants/companySearchHelpers";
 import { transporterCompanyVatNumberSchema } from "../companies/validation";
+import { weight, WeightUnits } from "../common/validation";
 
 type Emitter = Pick<
   Bsvhu,
@@ -153,11 +154,11 @@ const destinationSchema: FactorySchemaOf<VhuValidationContext, Destination> =
           context.emissionSignature,
           `Destinataire: le type de destination est obligatoire`
         ),
-      destinationReceptionWeight: yup
-        .number()
+      destinationReceptionWeight: weight(WeightUnits.Kilogramme)
+        .label("Destinataire")
         .requiredIf(
           context.operationSignature,
-          `Destinataire: le poids reçu est obligatoire`
+          "${path}: le poids reçu est obligatoire"
         ),
       destinationReceptionRefusalReason: yup.string().nullable(),
       destinationAgrementNumber: yup
@@ -338,11 +339,11 @@ const quantitySchema: FactorySchemaOf<VhuValidationContext, Quantity> =
 
 const weightSchema: FactorySchemaOf<VhuValidationContext, Weight> = context =>
   yup.object({
-    weightValue: yup
-      .number()
+    weightValue: weight(WeightUnits.Kilogramme)
+      .label("Déchet")
       .requiredIf(
         context.emissionSignature,
-        `Déchet: le poids est obligatoire`
+        "${path}: le poids est obligatoire"
       ),
     weightIsEstimate: yup.boolean().nullable()
   });
