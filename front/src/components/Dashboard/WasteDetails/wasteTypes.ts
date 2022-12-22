@@ -2,7 +2,7 @@ import { BsdType } from "../../../generated/graphql/types";
 
 export interface WasteDetailsProps {
   wasteType: BsdType;
-  code: string;
+  code?: string;
   name?: string;
-  weight: string;
+  weight?: string;
 }

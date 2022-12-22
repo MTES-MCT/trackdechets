@@ -39,10 +39,12 @@ function WasteDetails({
       <div className="waste-details__infos">
         <p className="waste-details__infos__code">{code}</p>
         <p className="waste-details__infos__name">{name}</p>
-        <p className="waste-details__infos__weight">
-          <IconWeight />
-          <span>{weight}</span>
-        </p>
+        {weight && (
+          <p className="waste-details__infos__weight">
+            <IconWeight />
+            <span>{weight}</span>
+          </p>
+        )}
       </div>
     </div>
   );

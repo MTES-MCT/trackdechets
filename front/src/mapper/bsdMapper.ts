@@ -1,27 +1,17 @@
 import {
+  Bsff,
+  Bsd,
+  Form,
+  Bsda,
+  Bsdasri,
+  Bsvhu,
+  BsdType,
+} from "../generated/graphql/types";
+import {
   BsdDisplay,
   BsdStatusCode,
   BsdTypename,
 } from "../common/types/bsdTypes";
-import { Bsff, Bsd, Form, Bsda, Bsdasri, Bsvhu } from "generated/graphql/types";
-
-export const createBsd = (bsd: Bsd): BsdDisplay | null => {
-  switch (bsd.__typename) {
-    case BsdTypename.Bsdd:
-      return createBsdd(bsd);
-    case BsdTypename.Bsda:
-      return createBsda(bsd);
-    case BsdTypename.Bsdasri:
-      return createBsdasri(bsd);
-    case BsdTypename.Bsvhu:
-      return createBsvhu(bsd);
-    case BsdTypename.Bsff:
-      return createBsff(bsd);
-
-    default:
-      return null;
-  }
-};
 
 const mapStatusToBsdStatusEnum = (status: string): BsdStatusCode => {
   switch (status) {
@@ -77,9 +67,46 @@ const mapStatusToBsdStatusEnum = (status: string): BsdStatusCode => {
   }
 };
 
+const mapBsdTypeNameToBsdType = (typeName): BsdType => {
+  switch (typeName) {
+    case BsdTypename.Bsdd:
+      return BsdType.Bsdd;
+    case BsdTypename.Bsda:
+      return BsdType.Bsda;
+    case BsdTypename.Bsdasri:
+      return BsdType.Bsdasri;
+    case BsdTypename.Bsvhu:
+      return BsdType.Bsvhu;
+    case BsdTypename.Bsff:
+      return BsdType.Bsff;
+
+    default:
+      return BsdType.Bsdd;
+  }
+};
+
+export const formatBsd = (bsd: Bsd): BsdDisplay | null => {
+  switch (bsd.__typename) {
+    case BsdTypename.Bsdd:
+      return createBsdd(bsd);
+    case BsdTypename.Bsda:
+      return createBsda(bsd);
+    case BsdTypename.Bsdasri:
+      return createBsdasri(bsd);
+    case BsdTypename.Bsvhu:
+      return createBsvhu(bsd);
+    case BsdTypename.Bsff:
+      return createBsff(bsd);
+
+    default:
+      return null;
+  }
+};
+
 const createBsdd = (bsdd: Form): BsdDisplay => {
   const bsddFormatted: BsdDisplay = {
     id: bsdd.readableId,
+    type: mapBsdTypeNameToBsdType(bsdd.__typename),
     status: mapStatusToBsdStatusEnum(bsdd.status),
     wasteDetails: {
       code: bsdd.wasteDetails?.code,
@@ -96,6 +123,7 @@ const createBsdd = (bsdd: Form): BsdDisplay => {
 const createBsda = (bsda: Bsda): BsdDisplay => {
   const bsdaFormatted: BsdDisplay = {
     id: bsda.id,
+    type: mapBsdTypeNameToBsdType(bsda.__typename),
     status: mapStatusToBsdStatusEnum(bsda.status),
     wasteDetails: {
       code: bsda.waste?.code,
@@ -111,6 +139,7 @@ const createBsda = (bsda: Bsda): BsdDisplay => {
 const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
   const bsdasriFormatted: BsdDisplay = {
     id: bsdasri.id,
+    type: mapBsdTypeNameToBsdType(bsdasri.__typename),
     status: mapStatusToBsdStatusEnum(bsdasri.status),
     wasteDetails: {
       code: bsdasri.waste?.code,
@@ -124,6 +153,7 @@ const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
 const createBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
   const bsvhuFormatted: BsdDisplay = {
     id: bsvhu.id,
+    type: mapBsdTypeNameToBsdType(bsvhu.__typename),
     status: mapStatusToBsdStatusEnum(bsvhu.status),
     wasteDetails: {
       code: bsvhu?.wasteCode,
@@ -137,6 +167,7 @@ const createBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
 const createBsff = (bsff: Bsff): BsdDisplay => {
   const bsffFormatted: BsdDisplay = {
     id: bsff.id,
+    type: mapBsdTypeNameToBsdType(bsff.__typename),
     status: mapStatusToBsdStatusEnum(bsff.status),
     wasteDetails: {
       code: bsff.waste?.code,

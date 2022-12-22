@@ -1,9 +1,10 @@
 import React from "react";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
+import { Form } from "generated/graphql/types";
+
 import BsdCard from "./BsdCard";
 import bsddMockJson from "../../../__mocks__/bsdd.json";
 import bsddMockWithEntreposageJson from "../../../__mocks__/bsddWithEntreposage.json";
-import { Form } from "generated/graphql/types";
 
 export default {
   title: "COMPONENTS/DASHBOARD/BsdCard",

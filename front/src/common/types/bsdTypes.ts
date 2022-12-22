@@ -1,6 +1,7 @@
 import {
   BsdaEcoOrganisme,
   BsdaWeight,
+  BsdType,
   BsffWeight,
   BsvhuWeight,
   Maybe,
@@ -97,6 +98,7 @@ export const getBsdStatusLabel = (status: string) => {
 
 export interface BsdDisplay {
   id: string;
+  type: BsdType;
   status: BsdStatusCode;
   wasteDetails: {
     code?: Maybe<string>;
