@@ -6,8 +6,10 @@ import Badge from "../Badge/Badge";
 import LabelWithIcon from "../LabelWithIcon/LabelWithIcon";
 import { LabelIconCode } from "../LabelWithIcon/labelWithIconTypes";
 import { BsdCardProps } from "./bsdCardTypes";
-import "./bsdCard.scss";
 import WasteDetails from "../WasteDetails/WasteDetails";
+import { getCtaLabelFromStatus } from "../../../common/utils/dashboardUtils";
+
+import "./bsdCard.scss";
 
 function BsdCard({ bsd }: BsdCardProps): JSX.Element {
   const bsdDisplay = formatBsd(bsd);
@@ -16,12 +18,16 @@ function BsdCard({ bsd }: BsdCardProps): JSX.Element {
     ? formatDate(bsdDisplay.updatedAt)
     : "";
 
+  const ctaPrimaryLabel = bsdDisplay?.type
+    ? getCtaLabelFromStatus(bsdDisplay.type, bsdDisplay.status)
+    : "";
+
   return (
     <div className="bsd-card">
       {bsdDisplay && (
         <>
           <div className="bsd-card__header">
-            <p>N°: {bsdDisplay.id}</p>
+            <p className="bsd-number">N°: {bsdDisplay.id}</p>
             {bsdDisplay?.isTempStorage && (
               <LabelWithIcon labelCode={LabelIconCode.TempStorage} />
             )}
@@ -44,6 +50,16 @@ function BsdCard({ bsd }: BsdCardProps): JSX.Element {
               code={bsdDisplay.wasteDetails.code?.toString()}
               name={bsdDisplay.wasteDetails.name?.toString()}
             />
+
+            {/* TODO actors */}
+
+            <div className="bsd-card__content__cta">
+              {ctaPrimaryLabel && (
+                <button type="button" className="fr-btn fr-btn--sm">
+                  {ctaPrimaryLabel}
+                </button>
+              )}
+            </div>
           </div>
         </>
       )}

@@ -13,61 +13,14 @@ import {
   BsdTypename,
 } from "../common/types/bsdTypes";
 
-const mapStatusToBsdStatusEnum = (status: string): BsdStatusCode => {
-  switch (status) {
-    case BsdStatusCode.DRAFT:
-      return BsdStatusCode.DRAFT;
-    case BsdStatusCode.SEALED:
-      return BsdStatusCode.SEALED;
-    case BsdStatusCode.SENT:
-      return BsdStatusCode.SENT;
-    case BsdStatusCode.RECEIVED:
-      return BsdStatusCode.RECEIVED;
-    case BsdStatusCode.ACCEPTED:
-      return BsdStatusCode.ACCEPTED;
-    case BsdStatusCode.PROCESSED:
-      return BsdStatusCode.PROCESSED;
-    case BsdStatusCode.AWAITING_GROUP:
-      return BsdStatusCode.AWAITING_GROUP;
-    case BsdStatusCode.GROUPED:
-      return BsdStatusCode.GROUPED;
-    case BsdStatusCode.NO_TRACEABILITY:
-      return BsdStatusCode.NO_TRACEABILITY;
-    case BsdStatusCode.REFUSED:
-      return BsdStatusCode.REFUSED;
-    case BsdStatusCode.TEMP_STORED:
-      return BsdStatusCode.TEMP_STORED;
-    case BsdStatusCode.TEMP_STORER_ACCEPTED:
-      return BsdStatusCode.TEMP_STORER_ACCEPTED;
-    case BsdStatusCode.RESEALED:
-      return BsdStatusCode.RESEALED;
-    case BsdStatusCode.RESENT:
-      return BsdStatusCode.RESENT;
-    case BsdStatusCode.SIGNED_BY_PRODUCER:
-      return BsdStatusCode.SIGNED_BY_PRODUCER;
-    case BsdStatusCode.INITIAL:
-      return BsdStatusCode.INITIAL;
-    case BsdStatusCode.SIGNED_BY_EMITTER:
-      return BsdStatusCode.SIGNED_BY_EMITTER;
-    case BsdStatusCode.INTERMEDIATELY_PROCESSED:
-      return BsdStatusCode.INTERMEDIATELY_PROCESSED;
-    case BsdStatusCode.SIGNED_BY_TEMP_STORER:
-      return BsdStatusCode.SIGNED_BY_TEMP_STORER;
-    case BsdStatusCode.PARTIALLY_REFUSED:
-      return BsdStatusCode.PARTIALLY_REFUSED;
-    case BsdStatusCode.FOLLOWED_WITH_PNTTD:
-      return BsdStatusCode.FOLLOWED_WITH_PNTTD;
-    case BsdStatusCode.SIGNED_BY_WORKER:
-      return BsdStatusCode.SIGNED_BY_WORKER;
-    case BsdStatusCode.AWAITING_CHILD:
-      return BsdStatusCode.AWAITING_CHILD;
-
-    default:
-      return BsdStatusCode.DRAFT;
-  }
+const mapBsdStatusToBsdStatusEnum = (status: string): BsdStatusCode => {
+  const bsdStatusCode = Object.keys(BsdStatusCode).find(
+    key => status === key
+  ) as unknown as BsdStatusCode;
+  return bsdStatusCode;
 };
 
-const mapBsdTypeNameToBsdType = (typeName): BsdType => {
+const mapBsdTypeNameToBsdType = (typeName): BsdType | undefined => {
   switch (typeName) {
     case BsdTypename.Bsdd:
       return BsdType.Bsdd;
@@ -81,7 +34,7 @@ const mapBsdTypeNameToBsdType = (typeName): BsdType => {
       return BsdType.Bsff;
 
     default:
-      return BsdType.Bsdd;
+      return undefined;
   }
 };
 
@@ -107,7 +60,7 @@ const createBsdd = (bsdd: Form): BsdDisplay => {
   const bsddFormatted: BsdDisplay = {
     id: bsdd.readableId,
     type: mapBsdTypeNameToBsdType(bsdd.__typename),
-    status: mapStatusToBsdStatusEnum(bsdd.status),
+    status: mapBsdStatusToBsdStatusEnum(bsdd.status),
     wasteDetails: {
       code: bsdd.wasteDetails?.code,
       name: bsdd.wasteDetails?.name,
@@ -124,7 +77,7 @@ const createBsda = (bsda: Bsda): BsdDisplay => {
   const bsdaFormatted: BsdDisplay = {
     id: bsda.id,
     type: mapBsdTypeNameToBsdType(bsda.__typename),
-    status: mapStatusToBsdStatusEnum(bsda.status),
+    status: mapBsdStatusToBsdStatusEnum(bsda.status),
     wasteDetails: {
       code: bsda.waste?.code,
       name: bsda.waste?.materialName,
@@ -140,7 +93,7 @@ const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
   const bsdasriFormatted: BsdDisplay = {
     id: bsdasri.id,
     type: mapBsdTypeNameToBsdType(bsdasri.__typename),
-    status: mapStatusToBsdStatusEnum(bsdasri.status),
+    status: mapBsdStatusToBsdStatusEnum(bsdasri.status),
     wasteDetails: {
       code: bsdasri.waste?.code,
     },
@@ -154,7 +107,7 @@ const createBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
   const bsvhuFormatted: BsdDisplay = {
     id: bsvhu.id,
     type: mapBsdTypeNameToBsdType(bsvhu.__typename),
-    status: mapStatusToBsdStatusEnum(bsvhu.status),
+    status: mapBsdStatusToBsdStatusEnum(bsvhu.status),
     wasteDetails: {
       code: bsvhu?.wasteCode,
       weight: bsvhu?.weight,
@@ -168,7 +121,7 @@ const createBsff = (bsff: Bsff): BsdDisplay => {
   const bsffFormatted: BsdDisplay = {
     id: bsff.id,
     type: mapBsdTypeNameToBsdType(bsff.__typename),
-    status: mapStatusToBsdStatusEnum(bsff.status),
+    status: mapBsdStatusToBsdStatusEnum(bsff.status),
     wasteDetails: {
       code: bsff.waste?.code,
       name: bsff.waste?.description,

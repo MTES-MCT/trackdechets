@@ -19,18 +19,14 @@ const Template: ComponentStory<typeof BsdCard> = args => <BsdCard {...args} />;
 
 export const Bsdd = Template.bind({});
 export const BsddAvecEntreposage = Template.bind({});
-
-const bsddJson = JSON.stringify(bsddMockJson);
-let bsddParsed = JSON.parse(bsddJson);
-const bsddMock = bsddParsed as Form;
-
-const bsddWithEntreposageJson = JSON.stringify(bsddMockWithEntreposageJson);
-let bsddWithEntreposageParsed = JSON.parse(bsddWithEntreposageJson);
-const bsddWithEntreposageMock = bsddWithEntreposageParsed as Form;
+// export const BsddAvecAction = Template.bind({});
 
 Bsdd.args = {
-  bsd: bsddMock,
+  bsd: bsddMockJson as unknown as Form,
 };
 BsddAvecEntreposage.args = {
-  bsd: bsddWithEntreposageMock,
+  bsd: bsddMockWithEntreposageJson as unknown as Form,
 };
+/* BsddAvecAction.args = {
+  bsd: bsdListForActionsJson[0].node as unknown as Bsda, // le payload diffère ??
+}; */

@@ -8,24 +8,57 @@
    
     &__header {
         display: flex;
-        align-items: center;
+        flex-direction: column;
         color: #161616;
-        margin-bottom: 24px;
-        border-bottom: 1px solid #DDDDDD;
         p {
             margin: 2px;
             padding: 2px;
             font-size: 0.75rem; //12px
-            line-height: 20px;
+        }
+        @include desktop {
+            flex-direction: row;
+            align-items: center;
+            border-bottom: 1px solid #DDDDDD;
+            margin-bottom: 24px;
+        }
+
+        .bsd-number {
+            margin: 2px;
+            padding: 2px;
+            font-size: 1.125rem; //18px
+            line-height: 28px;
+            color: #000091;
+            @include desktop {
+                font-size: 0.75rem; //12px
+                line-height: 20px;
+                color: #161616;
+            }
         }
     }
 
     &__content {
         display: flex;
-        align-items: center;
-        
+        flex-direction: column;
+        @include desktop {
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+
         &__badge {
-            width: 40%;
+            @include desktop {
+                .badge {
+                    width: 40%;
+                }
+            }
+        }
+
+        &__cta {
+            display: flex;
+            justify-content: flex-end;
+            @include desktop {
+                justify-content: flex-start;
+            }
         }
     }
 }
