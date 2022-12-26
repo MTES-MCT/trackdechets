@@ -32,9 +32,7 @@ export function isSelected<T extends CompanyResultBase>(
   item: T,
   selectedItem: T | null
 ): boolean {
-  return (
-    item.siret === selectedItem?.siret || item.orgId === selectedItem?.orgId
-  );
+  return item.orgId === selectedItem?.orgId;
 }
 
 export default function CompanyResults<T extends CompanyResultBase>({
@@ -45,8 +43,7 @@ export default function CompanyResults<T extends CompanyResultBase>({
 }: CompanyResultsProps<T>) {
   // prepend selectedItem if it's not in the results
   if (
-    selectedItem &&
-    (selectedItem.siret || selectedItem.orgId) &&
+    selectedItem?.orgId &&
     !results.some(result => isSelected(result, selectedItem))
   ) {
     results.unshift(selectedItem);
@@ -56,7 +53,7 @@ export default function CompanyResults<T extends CompanyResultBase>({
     <ul className={styles.results}>
       {results.map(item => (
         <CompanyResult
-          key={item.orgId ?? item.siret!}
+          key={item.orgId!}
           item={item}
           selectedItem={selectedItem}
           onSelect={onSelect}
@@ -80,7 +77,7 @@ export function CompanyResult<T extends CompanyResultBase>({
 }: CompanyResultProp<T>) {
   return (
     <li
-      key={item.siret ?? item.vatNumber!}
+      key={item.orgId!}
       className={classNames(styles.resultsItem, {
         [styles.isSelected]: isSelected(item, selectedItem),
       })}
@@ -100,8 +97,7 @@ export function CompanyResult<T extends CompanyResultBase>({
           )}
         </h6>
         <p>
-          {item.orgId ?? item.siret!} -{" "}
-          {item.address ? item.address : "[Adresse inconnue]"}
+          {item.orgId} - {item.address ? item.address : "[Adresse inconnue]"}
           {item.codePaysEtrangerEtablissement
             ? ` - ${item.codePaysEtrangerEtablissement}`
             : ""}
@@ -109,7 +105,7 @@ export function CompanyResult<T extends CompanyResultBase>({
         <p>
           <a
             href={generatePath(routes.company, {
-              orgId: item.orgId ?? item.siret!,
+              orgId: item.orgId!,
             })}
             onClick={e => e.stopPropagation()}
             target="_blank"

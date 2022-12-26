@@ -68,6 +68,7 @@ function companyToFavorite(
   } & { brokerReceipt?: BrokerReceipt }
 ): CompanyFavorite {
   return {
+    orgId: company.orgId,
     name: company.name,
     siret: company.siret,
     vatNumber: company.vatNumber,
@@ -87,6 +88,7 @@ function companySearchResultToFavorite(
   companySearchResult: CompanySearchResult
 ): CompanyFavorite {
   return {
+    orgId: companySearchResult.orgId,
     name: companySearchResult.name,
     siret: companySearchResult.siret,
     vatNumber: companySearchResult.vatNumber,

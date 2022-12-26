@@ -40,8 +40,7 @@ export async function searchCompany(
   // search for test or anonymous companies first
   const anonymousCompany = await prisma.anonymousCompany.findUnique({
     where: {
-      ...(isSiret(cleanClue) && { siret: cleanClue }),
-      ...(!isSiret(cleanClue) && isVat(cleanClue) && { vatNumber: cleanClue })
+      orgId: cleanClue
     }
   });
   if (anonymousCompany) {
@@ -72,8 +71,7 @@ export async function searchCompany(
   }
   // Concaténer données Company
   const where = {
-    ...(isSiret(cleanClue) && { where: { siret: cleanClue } }),
-    ...(isVat(cleanClue) && { where: { vatNumber: cleanClue } })
+    where: { orgId: cleanClue }
   };
   const trackdechetsCompanyInfo = await prisma.company.findUnique({
     ...where,
@@ -99,6 +97,7 @@ export async function searchCompany(
     ecoOrganismeAgreements: [],
     isRegistered: trackdechetsCompanyInfo != null,
     companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
+    orgId: cleanClue,
     ...convertUrls(trackdechetsCompanyInfo),
     // override database infos with Sirene or VAT search
     ...companyInfo
@@ -125,17 +124,18 @@ export const makeSearchCompanies =
         existingCompanies = (
           await prisma.company.findMany({
             where: {
-              siret: { in: results.map(r => r.siret) }
+              orgId: { in: results.map(r => r.siret) }
             },
             select: {
-              siret: true
+              orgId: true
             }
           })
-        ).map(company => company.siret);
+        ).map(company => company.orgId);
       }
 
       return results.map(company => ({
         ...company,
+        orgId: company.siret,
         isRegistered: existingCompanies.includes(company.siret)
       }));
     });
