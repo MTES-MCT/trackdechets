@@ -1,10 +1,10 @@
 import React from "react";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
-import { Form } from "generated/graphql/types";
+import { Bsda, Bsdasri, Bsff, Bsvhu, Form } from "generated/graphql/types";
 
 import BsdCard from "./BsdCard";
-import bsddMockJson from "../../../__mocks__/bsdd.json";
-import bsddMockWithEntreposageJson from "../../../__mocks__/bsddWithEntreposage.json";
+import bsddListDraft from "../../../__mocks__/bsdListDraft.json";
+import bsdListActJson from "../../../__mocks__/bsdListAct.json";
 
 export default {
   title: "COMPONENTS/DASHBOARD/BsdCard",
@@ -17,16 +17,38 @@ export default {
 
 const Template: ComponentStory<typeof BsdCard> = args => <BsdCard {...args} />;
 
-export const Bsdd = Template.bind({});
-export const BsddAvecEntreposage = Template.bind({});
-// export const BsddAvecAction = Template.bind({});
+export const BsddDraftAvecInfosDechet = Template.bind({});
+export const BsddDraftSansInfosDechet = Template.bind({});
+export const BsvhuDraft = Template.bind({});
+export const BsddAvecIconeEntreposage = Template.bind({});
+export const BsdaAvecAction = Template.bind({});
+export const BsddAvecAction = Template.bind({});
+export const BsffAvecAction = Template.bind({});
+export const BsdasriAvecActionEtIconeDateDeDerniereModification = Template.bind(
+  {}
+);
 
-Bsdd.args = {
-  bsd: bsddMockJson as unknown as Form,
+BsddDraftAvecInfosDechet.args = {
+  bsd: bsddListDraft[10].node as unknown as Form,
 };
-BsddAvecEntreposage.args = {
-  bsd: bsddMockWithEntreposageJson as unknown as Form,
+BsddDraftSansInfosDechet.args = {
+  bsd: bsddListDraft[3].node as unknown as Form,
 };
-/* BsddAvecAction.args = {
-  bsd: bsdListForActionsJson[0].node as unknown as Bsda, // le payload diffère ??
-}; */
+BsddAvecIconeEntreposage.args = {
+  bsd: bsddListDraft[1].node as unknown as Form,
+};
+BsvhuDraft.args = {
+  bsd: bsddListDraft[9].node as unknown as Bsvhu,
+};
+BsdaAvecAction.args = {
+  bsd: bsdListActJson[0].node as unknown as Bsda,
+};
+BsddAvecAction.args = {
+  bsd: bsdListActJson[9].node as unknown as Form,
+};
+BsffAvecAction.args = {
+  bsd: bsdListActJson[3].node as unknown as Bsff,
+};
+BsdasriAvecActionEtIconeDateDeDerniereModification.args = {
+  bsd: bsdListActJson[4].node as unknown as Bsdasri,
+};

@@ -74,10 +74,11 @@ const createBsdd = (bsdd: Form): BsdDisplay => {
 };
 
 const createBsda = (bsda: Bsda): BsdDisplay => {
+  const statusCode = bsda?.status || bsda["bsdaStatus"]; // FIXME  ?
   const bsdaFormatted: BsdDisplay = {
     id: bsda.id,
     type: mapBsdTypeNameToBsdType(bsda.__typename),
-    status: mapBsdStatusToBsdStatusEnum(bsda.status),
+    status: mapBsdStatusToBsdStatusEnum(statusCode),
     wasteDetails: {
       code: bsda.waste?.code,
       name: bsda.waste?.materialName,
@@ -90,10 +91,11 @@ const createBsda = (bsda: Bsda): BsdDisplay => {
 };
 
 const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
+  const statusCode = bsdasri?.status || bsdasri["bsdasriStatus"]; // FIXME  ?
   const bsdasriFormatted: BsdDisplay = {
     id: bsdasri.id,
     type: mapBsdTypeNameToBsdType(bsdasri.__typename),
-    status: mapBsdStatusToBsdStatusEnum(bsdasri.status),
+    status: mapBsdStatusToBsdStatusEnum(statusCode),
     wasteDetails: {
       code: bsdasri.waste?.code,
     },
@@ -104,10 +106,11 @@ const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
 };
 
 const createBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
+  const statusCode = bsvhu?.status || bsvhu["bsvhuStatus"]; // FIXME ?
   const bsvhuFormatted: BsdDisplay = {
     id: bsvhu.id,
     type: mapBsdTypeNameToBsdType(bsvhu.__typename),
-    status: mapBsdStatusToBsdStatusEnum(bsvhu.status),
+    status: mapBsdStatusToBsdStatusEnum(statusCode),
     wasteDetails: {
       code: bsvhu?.wasteCode,
       weight: bsvhu?.weight,
@@ -118,10 +121,11 @@ const createBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
 };
 
 const createBsff = (bsff: Bsff): BsdDisplay => {
+  const statusCode = bsff?.status || bsff["bsffStatus"]; // FIXME ?
   const bsffFormatted: BsdDisplay = {
     id: bsff.id,
     type: mapBsdTypeNameToBsdType(bsff.__typename),
-    status: mapBsdStatusToBsdStatusEnum(bsff.status),
+    status: mapBsdStatusToBsdStatusEnum(statusCode),
     wasteDetails: {
       code: bsff.waste?.code,
       name: bsff.waste?.description,
