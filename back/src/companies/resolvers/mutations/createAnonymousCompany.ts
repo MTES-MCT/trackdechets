@@ -9,6 +9,7 @@ import { checkIsAdmin } from "../../../common/permissions";
 import prisma from "../../../prisma";
 import { nafCodes } from "../../../common/constants/NAF";
 import {
+  isForeignVat,
   isFRVat,
   isSiret,
   isVat
@@ -28,7 +29,6 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
     name: yup.string().required(),
     vatNumber: yup
       .string()
-      .ensure()
       .test(
         "is-vat",
         "AnonymousCompany: ${originalValue} n'est pas un numéro de TVA valide",
@@ -62,6 +62,11 @@ const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"
     checkIsAdmin(context);
 
     await AnonymousCompanyInputSchema.validate(input);
+
+    // ignore SIRET in this case
+    if (isForeignVat(input.vatNumber)) {
+      delete input.siret;
+    }
 
     const existingAnonymousCompany = await prisma.anonymousCompany.findUnique({
       where: { orgId: input.siret ?? input.vatNumber }

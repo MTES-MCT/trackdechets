@@ -43,7 +43,6 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
     name: yup.string().required(),
     vatNumber: yup
       .string()
-      .ensure()
       .test(
         "is-vat",
         "AnonymousCompany: ${originalValue} n'est pas un numéro de TVA valide",
@@ -51,13 +50,16 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       )
       .test(
         "is-not-fr-vat",
-        "AnonymousCompany: le numéro de SIRET est obligatoire pour les établissements français",
+        "AnonymousCompany: impossible de soumettre un numéro de TVA français, seul le SIRET est autorisé",
         value => !value || !isFRVat(value)
       ),
     siret: yup
       .string()
-      .ensure()
-      .required("n°SIRET requis")
+      .when("vatNumber", {
+        is: vatNumber => !vatNumber,
+        then: schema => schema.required(),
+        otherwise: schema => schema.ensure(),
+      })
       .test(
         "is-siret",
         "n°SIRET invalide",
@@ -85,7 +87,9 @@ export function CreateAnonymousCompany() {
       }}
       validationSchema={AnonymousCompanyInputSchema}
       onSubmit={async (values, { resetForm }) => {
-        const { data } = await createAnonymousCompany({ variables: { input: values } });
+        const { data } = await createAnonymousCompany({
+          variables: { input: values },
+        });
         resetForm();
         if (data) {
           cogoToast.success(
@@ -117,7 +121,7 @@ export function CreateAnonymousCompany() {
                 className="td-input"
               />
             </label>
-            <RedErrorMessage name="siret" />
+            <RedErrorMessage name="vatNumber" />
           </div>
           <div className="form__row">
             <label>
