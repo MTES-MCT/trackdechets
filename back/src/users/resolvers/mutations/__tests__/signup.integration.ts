@@ -235,7 +235,7 @@ describe("Mutation.signup", () => {
     const invitation = await prisma.userAccountHash.create({
       data: {
         email: user.email,
-        companySiret: company.siret,
+        companyId: company.id,
         hash: "hash",
         role: "MEMBER"
       }

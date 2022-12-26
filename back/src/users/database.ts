@@ -43,11 +43,11 @@ export async function getFullUser(user: User): Promise<FullUser> {
 export async function createUserAccountHash(
   email: string,
   role: UserRole,
-  siret: string
+  companyId: string
 ) {
   // check for existing records
   const existingHashes = await prisma.userAccountHash.findMany({
-    where: { email, companySiret: siret }
+    where: { email, companyId }
   });
 
   if (existingHashes && existingHashes.length > 0) {
@@ -66,7 +66,7 @@ export async function createUserAccountHash(
       hash: userAccoutHash,
       email,
       role,
-      companySiret: siret
+      companyId
     }
   });
 }
@@ -78,7 +78,7 @@ export async function createUserAccountHash(
  * @param siret
  * @param role
  */
-export async function associateUserToCompany(userId, siret, role) {
+export async function associateUserToCompany(userId, companyId, role) {
   // check for current associations
   const associations = await prisma.companyAssociation.findMany({
     where: {
@@ -86,7 +86,7 @@ export async function associateUserToCompany(userId, siret, role) {
         id: userId
       },
       company: {
-        siret
+        id: companyId
       }
     }
   });
@@ -101,7 +101,7 @@ export async function associateUserToCompany(userId, siret, role) {
     data: {
       user: { connect: { id: userId } },
       role,
-      company: { connect: { siret } }
+      company: { connect: { id: companyId } }
     }
   });
 
@@ -187,7 +187,7 @@ export async function acceptNewUserCompanyInvitations(user: User) {
     existingHashes.map(existingHash =>
       prisma.companyAssociation.create({
         data: {
-          company: { connect: { siret: existingHash.companySiret } },
+          company: { connect: { id: existingHash.companyId } },
           user: { connect: { id: user.id } },
           role: existingHash.role
         }

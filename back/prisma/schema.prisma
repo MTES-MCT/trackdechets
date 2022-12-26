@@ -171,7 +171,7 @@ model Application {
 model Company {
   id                                   String                    @id @default(cuid())
   orgId                                String                    @unique
-  siret                                String                    @unique @default(cuid())
+  siret                                String?                   @unique
   vatNumber                            String?                   @unique
   updatedAt                            DateTime                  @updatedAt @db.Timestamptz(6)
   createdAt                            DateTime                  @default(now()) @db.Timestamptz(6)
@@ -714,7 +714,7 @@ model User {
 model UserAccountHash {
   id           String    @id @default(cuid())
   email        String
-  companySiret String
+  companyId    String
   hash         String    @unique
   updatedAt    DateTime  @updatedAt @db.Timestamptz(6)
   createdAt    DateTime  @default(now()) @db.Timestamptz(6)
@@ -722,7 +722,7 @@ model UserAccountHash {
   acceptedAt   DateTime? @db.Timestamptz(6)
 
   @@index([email], map: "_UserAccountHashEmailIdx")
-  @@index([companySiret], map: "_UserAccountHashCompanySiretIdx")
+  @@index([companyId], map: "_UserAccountHashCompanyIdIdx")
 }
 
 model UserActivationHash {

@@ -19,19 +19,19 @@ import { renderMail } from "../../../mailer/templates/renderers";
 
 export async function inviteUserToCompanyFn(
   adminUser: User,
-  { email: unsafeEmail, siret, role }: MutationInviteUserToCompanyArgs
+  { email: unsafeEmail, orgId, role }: MutationInviteUserToCompanyArgs
 ): Promise<CompanyPrivate> {
   const email = sanitizeEmail(unsafeEmail);
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
 
-  const company = await prisma.company.findUnique({ where: { siret } });
+  const company = await prisma.company.findUnique({ where: { orgId } });
 
   if (existingUser) {
     // there is already an user with this email
     // associate the user with the company
 
-    await associateUserToCompany(existingUser.id, siret, role);
+    await associateUserToCompany(existingUser.id, company, role);
 
     const mail = renderMail(notifyUserOfInvite, {
       to: [{ email, name: existingUser.name }],
@@ -43,7 +43,7 @@ export async function inviteUserToCompanyFn(
     // and send a link inviting him to create an account. As soon
     // as the account is created, the association will be persisted
 
-    const userAccountHash = await createUserAccountHash(email, role, siret);
+    const userAccountHash = await createUserAccountHash(email, role, company);
 
     const mail = renderMail(inviteUserToJoin, {
       to: [{ email, name: email }],

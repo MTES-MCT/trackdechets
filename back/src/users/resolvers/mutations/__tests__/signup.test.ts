@@ -59,9 +59,9 @@ describe("signup", () => {
 
   test("should accept all pending invitations", async () => {
     const hashes = [
-      { companySiret: "", role: "ADMIN" },
-      { companySiret: "", role: "ADMIN" },
-      { companySiret: "", role: "ADMIN" }
+      { companyId: "", role: "ADMIN" },
+      { companyId: "", role: "ADMIN" },
+      { companyId: "", role: "ADMIN" }
     ];
     (prisma.userAccountHash.findMany as jest.Mock).mockResolvedValue(hashes);
 

@@ -10,8 +10,8 @@ type Invitation {
   "Email de l'utilisateur invité"
   email: String!
 
-  "Siret de l'entreprise à laquelle l'utilisateur est invité"
-  companySiret: String!
+  "Siret ou TVA de l'entreprise à laquelle l'utilisateur est invité"
+  companyId: String!
 
   "Hash unique inclus dans le lien d'invitation envoyé par email"
   hash: String!

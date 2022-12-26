@@ -220,7 +220,7 @@ describe("bulk create users and companies from csv files", () => {
     const invitation = await prisma.userAccountHash.create({
       data: {
         email: "john.snow@trackdechets.fr",
-        companySiret: company.siret,
+        companyId: company.id,
         role: "MEMBER",
         hash: "hash"
       }
@@ -258,7 +258,7 @@ describe("bulk create users and companies from csv files", () => {
     const invitation = await prisma.userAccountHash.create({
       data: {
         email: "john.snow@trackdechets.fr",
-        companySiret: company.siret,
+        companyId: company.id,
         role: "MEMBER",
         hash: "hash"
       }

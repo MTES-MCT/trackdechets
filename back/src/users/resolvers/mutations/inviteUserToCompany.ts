@@ -12,7 +12,7 @@ const inviteUserToCompanyResolver: MutationResolvers["inviteUserToCompany"] =
   async (parent, args, context) => {
     applyAuthStrategies(context, [AuthType.Session]);
     const user = checkIsAuthenticated(context);
-    const company = await getCompanyOrCompanyNotFound({ siret: args.siret });
+    const company = await getCompanyOrCompanyNotFound({ orgId: args.orgId });
     await checkIsCompanyAdmin(user, company);
     return inviteUserToCompanyFn(user, args);
   };

@@ -51,8 +51,8 @@ const REMOVE_USER_FROM_COMPANY = gql`
 `;
 
 const DELETE_INVITATION = gql`
-  mutation DeleteInvitation($email: String!, $siret: String!) {
-    deleteInvitation(email: $email, siret: $siret) {
+  mutation DeleteInvitation($email: String!, $orgId: String!) {
+    deleteInvitation(email: $email, orgId: $orgId) {
       id
       users {
         ...AccountCompanyMemberUserFragment
@@ -63,8 +63,8 @@ const DELETE_INVITATION = gql`
 `;
 
 const RESEND_INVITATION = gql`
-  mutation ResendInvitation($email: String!, $siret: String!) {
-    resendInvitation(email: $email, siret: $siret)
+  mutation ResendInvitation($email: String!, $orgId: String!) {
+    resendInvitation(email: $email, orgId: $orgId)
   }
 `;
 
@@ -141,7 +141,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
                 disabled={deleteLoading}
                 onClick={() => {
                   deleteInvitation({
-                    variables: { email: user.email, siret: company.siret! },
+                    variables: { email: user.email, orgId: company.orgId! },
                   });
                 }}
               >
@@ -157,7 +157,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
                 disabled={resendLoading}
                 onClick={() => {
                   resendInvitation({
-                    variables: { email: user.email, siret: company.siret },
+                    variables: { email: user.email, orgId: company.orgId },
                   });
                 }}
               >

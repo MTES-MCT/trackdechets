@@ -3,18 +3,18 @@ import prisma from "../prisma";
 
 export function createUserDataLoaders() {
   return {
-    activeUserAccountHashesBySiret: new DataLoader((sirets: string[]) =>
-      genActiveUserAccountHashesBySiret(sirets)
+    activeUserAccountHashesBySiret: new DataLoader((ids: string[]) =>
+      genActiveUserAccountHashesByIds(ids)
     )
   };
 }
 
-async function genActiveUserAccountHashesBySiret(companySirets: string[]) {
+async function genActiveUserAccountHashesByIds(companyIds: string[]) {
   const userAccountHashes = await prisma.userAccountHash.findMany({
-    where: { companySiret: { in: companySirets }, acceptedAt: null }
+    where: { companyId: { in: companyIds }, acceptedAt: null }
   });
 
-  return companySirets.map(siret =>
-    userAccountHashes.filter(hash => hash.companySiret === siret)
+  return companyIds.map(id =>
+    userAccountHashes.filter(hash => hash.companyId === id)
   );
 }

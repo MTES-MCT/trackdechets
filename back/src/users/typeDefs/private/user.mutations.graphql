@@ -41,7 +41,7 @@ type Mutation {
   """
   inviteUserToCompany(
     email: String!
-    siret: String!
+    orgId: String!
     role: UserRole!
   ): CompanyPrivate!
 
@@ -49,7 +49,7 @@ type Mutation {
   USAGE INTERNE
   Renvoie l'email d'invitation à un établissement
   """
-  resendInvitation(email: String!, siret: String!): Boolean!
+  resendInvitation(email: String!, orgId: String!): Boolean!
 
   """
   USAGE INTERNE
@@ -61,13 +61,13 @@ type Mutation {
   USAGE INTERNE
   Supprime les droits d'un utilisateurs sur un établissement
   """
-  removeUserFromCompany(userId: ID!, siret: String!): CompanyPrivate!
+  removeUserFromCompany(userId: ID!, orgId: String!): CompanyPrivate!
 
   """
   USAGE INTERNE
   Supprime une invitation à un établissement
   """
-  deleteInvitation(email: String!, siret: String!): CompanyPrivate!
+  deleteInvitation(email: String!, orgId: String!): CompanyPrivate!
 
   """
   USAGE INTERNE

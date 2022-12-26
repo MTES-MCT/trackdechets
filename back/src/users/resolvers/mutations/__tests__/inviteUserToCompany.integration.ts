@@ -10,8 +10,8 @@ import { AuthType } from "../../../../auth";
 import { Mutation } from "../../../../generated/graphql/types";
 
 const INVITE_USER_TO_COMPANY = `
-  mutation InviteUserToCompany($email: String!, $siret: String!, $role: UserRole!){
-    inviteUserToCompany(email: $email, siret: $siret, role: $role){
+  mutation InviteUserToCompany($email: String!, $orgId: String!, $role: UserRole!){
+    inviteUserToCompany(email: $email, orgId: $orgId, role: $role){
       users {
         email
       }
@@ -38,7 +38,7 @@ describe("mutation inviteUserToCompany", () => {
     const { data } = await mutate<Pick<Mutation, "inviteUserToCompany">>(
       INVITE_USER_TO_COMPANY,
       {
-        variables: { email: user.email, siret: company.siret, role: "MEMBER" }
+        variables: { email: user.email, orgId: company.orgId, role: "MEMBER" }
       }
     );
     expect(data.inviteUserToCompany.users.length).toBe(2);
@@ -71,14 +71,14 @@ describe("mutation inviteUserToCompany", () => {
     await mutate(INVITE_USER_TO_COMPANY, {
       variables: {
         email: invitedUserEmail,
-        siret: company.siret,
+        orgId: company.orgId,
         role: "MEMBER"
       }
     });
 
     // Check userAccountHash has been successfully created
     const hashes = await prisma.userAccountHash.findMany({
-      where: { email: invitedUserEmail, companySiret: company.siret }
+      where: { email: invitedUserEmail, companyId: company.id }
     });
     expect(hashes.length).toEqual(1);
 

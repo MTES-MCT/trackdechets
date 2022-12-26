@@ -18,30 +18,30 @@ describe("createUserAccountHash", () => {
   it("should return user account hash", async () => {
     const email = "john.snow@trackdechets.fr";
     const role = "MEMBER";
-    const siret = "00000000000000";
-    await createUserAccountHash(email, role, siret);
+    const companyId = "00000000000000";
+    await createUserAccountHash(email, role, companyId);
     const userAccountHashes = await prisma.userAccountHash.findMany();
     expect(userAccountHashes).toHaveLength(1);
     expect(userAccountHashes[0].email).toEqual(email);
     expect(userAccountHashes[0].role).toEqual(role);
-    expect(userAccountHashes[0].companySiret).toEqual(siret);
+    expect(userAccountHashes[0].companyId).toEqual(companyId);
   });
 
   it("should throw error if hash already exist", async () => {
     expect.assertions(2);
     const email = "john.snow@trackdechets.fr";
     const role = "MEMBER";
-    const siret = "00000000000000";
+    const companyId = "00000000000000";
     await prisma.userAccountHash.create({
       data: {
         email,
         role,
-        companySiret: siret,
+        companyId,
         hash: "hash"
       }
     });
     try {
-      await createUserAccountHash(email, role, siret);
+      await createUserAccountHash(email, role, companyId);
     } catch (err) {
       expect(err.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
       expect(err.message).toEqual("Cet utilisateur a déjà été invité");

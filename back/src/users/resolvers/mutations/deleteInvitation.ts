@@ -11,19 +11,21 @@ import { checkIsCompanyAdmin } from "../../permissions";
 
 const deleteInvitationResolver: MutationResolvers["deleteInvitation"] = async (
   parent,
-  { email, siret },
+  { email, orgId },
   context
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-  const company = await getCompanyOrCompanyNotFound({ siret });
+  const company = await getCompanyOrCompanyNotFound({ orgId });
   await checkIsCompanyAdmin(user, company);
   const hash = await getUserAccountHashOrNotFound({
     email,
-    companySiret: siret
+    companyId: company.id
   });
   await prisma.userAccountHash.delete({ where: { id: hash.id } });
-  const dbCompany = await prisma.company.findUnique({ where: { siret } });
+  const dbCompany = await prisma.company.findUnique({
+    where: { id: company.id }
+  });
   return convertUrls(dbCompany);
 };
 

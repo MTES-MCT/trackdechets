@@ -15,7 +15,7 @@ export default async function acceptPendingInvitations() {
       const isCompanyMember = await prisma.companyAssociation.findFirst({
         where: {
           user: { email: user.email },
-          company: { siret: invitation.companySiret }
+          company: { id: invitation.companyId }
         }
       });
       if (isCompanyMember) {
@@ -26,7 +26,7 @@ export default async function acceptPendingInvitations() {
         // user does not belong to company, create the association
         await associateUserToCompany(
           user.id,
-          invitation.companySiret,
+          invitation.companyId,
           invitation.role
         );
         await prisma.userAccountHash.update({

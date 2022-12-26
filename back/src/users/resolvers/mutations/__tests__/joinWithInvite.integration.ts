@@ -47,7 +47,7 @@ describe("joinWithInvite mutation", () => {
     const invitation = await prisma.userAccountHash.create({
       data: {
         email: invitee,
-        companySiret: company.siret,
+        companyId: company.id,
         role: "MEMBER",
         hash: "hash",
         acceptedAt: new Date()
@@ -71,7 +71,7 @@ describe("joinWithInvite mutation", () => {
     const invitation = await prisma.userAccountHash.create({
       data: {
         email: invitee,
-        companySiret: company.siret,
+        companyId: company.id,
         role: "MEMBER",
         hash: "hash"
       }
@@ -123,7 +123,7 @@ describe("joinWithInvite mutation", () => {
     const invitation1 = await prisma.userAccountHash.create({
       data: {
         email: invitee,
-        companySiret: company1.siret,
+        companyId: company1.id,
         role: "MEMBER",
         hash: "hash1"
       }
@@ -132,7 +132,7 @@ describe("joinWithInvite mutation", () => {
     const invitation2 = await prisma.userAccountHash.create({
       data: {
         email: invitee,
-        companySiret: company2.siret,
+        companyId: company2.id,
         role: "MEMBER",
         hash: "hash2"
       }
@@ -171,7 +171,7 @@ describe("joinWithInvite mutation", () => {
     const invitation = await prisma.userAccountHash.create({
       data: {
         email: invitee,
-        companySiret: company.siret,
+        companyId: company.id,
         role: "MEMBER",
         hash: "hash"
       }

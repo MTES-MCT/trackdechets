@@ -30,7 +30,7 @@ const INVITATION = gql`
     invitation(hash: $hash) {
       email
       acceptedAt
-      companySiret
+      orgId
     }
   }
 `;
@@ -46,7 +46,7 @@ const JOIN_WITH_INVITE = gql`
       email
       companies {
         name
-        siret
+        orgId
       }
     }
   }
@@ -160,7 +160,7 @@ export default function Invite() {
   }
 
   if (queryData && queryData.invitation) {
-    const { email, companySiret, acceptedAt } = queryData.invitation;
+    const { email, orgId, acceptedAt } = queryData.invitation;
 
     if (acceptedAt) {
       return pageContent(
@@ -173,7 +173,7 @@ export default function Invite() {
               <Text as="p" spacing="mb-1w">
                 Votre compte <strong>{email}</strong> a déjà été crée et le
                 rattachement à l'établissement dont le SIRET est{" "}
-                <strong>{companySiret}</strong> est effectif.
+                <strong>{orgId}</strong> est effectif.
               </Text>
               <Text as="p" spacing="mb-1w">
                 Connectez-vous à votre compte pour accéder à votre tableau de

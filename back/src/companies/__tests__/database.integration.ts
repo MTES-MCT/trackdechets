@@ -15,16 +15,13 @@ describe("getInvitedUsers", () => {
     await prisma.userAccountHash.create({
       data: {
         email: "john.snow@trackdechets.fr",
-        companySiret: company.siret,
+        companyId: company.id,
         hash: "hash1",
         role: "MEMBER",
         acceptedAt: new Date()
       }
     });
-    const invitedUsers = await getCompanyInvitedUsers(
-      company.siret,
-      dataloaders
-    );
+    const invitedUsers = await getCompanyInvitedUsers(company.id, dataloaders);
     expect(invitedUsers).toEqual([]);
   });
 
@@ -33,15 +30,12 @@ describe("getInvitedUsers", () => {
     const invitation = await prisma.userAccountHash.create({
       data: {
         email: "john.snow@trackdechets.fr",
-        companySiret: company.siret,
+        companyId: company.id,
         hash: "hash2",
         role: "MEMBER"
       }
     });
-    const invitedUsers = await getCompanyInvitedUsers(
-      company.siret,
-      dataloaders
-    );
+    const invitedUsers = await getCompanyInvitedUsers(company.id, dataloaders);
     expect(invitedUsers).toHaveLength(1);
     expect(invitedUsers[0]).toMatchObject({
       email: invitation.email,

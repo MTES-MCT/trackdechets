@@ -11,16 +11,16 @@ import { checkIsCompanyAdmin } from "../../permissions";
 
 const resendInvitationResolver: MutationResolvers["resendInvitation"] = async (
   parent,
-  { email, siret },
+  { email, orgId },
   context
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-  const company = await getCompanyOrCompanyNotFound({ siret });
+  const company = await getCompanyOrCompanyNotFound({ orgId });
   await checkIsCompanyAdmin(user, company);
 
   const invitations = await prisma.userAccountHash.findMany({
-    where: { email, companySiret: siret }
+    where: { email, companyId: company.id }
   });
 
   if (invitations.length === 0) {
