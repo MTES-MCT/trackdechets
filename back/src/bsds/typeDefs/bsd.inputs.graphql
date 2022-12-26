@@ -3,14 +3,9 @@ Payload d'un établissement
 """
 input CompanyInput {
   """
-  SIRET ou TVA de l'établissement
-  """
-  orgId: String
-  """
   SIRET de l'établissement composé de 14 caractères numériques
   """
   siret: String
-
   """
   Numéro de TVA intra-communautaire de l'établissement. À renseigner pour
   les transporteurs étrangers uniquement.

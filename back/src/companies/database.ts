@@ -21,10 +21,11 @@ import { AppDataloaders } from "../types";
  */
 export async function getCompanyOrCompanyNotFound({
   id,
+  orgId,
   siret,
   vatNumber
 }: Prisma.CompanyWhereUniqueInput) {
-  if (!id && !siret) {
+  if (!id && !siret && !orgId) {
     throw new UserInputError(
       "You should specify an id or a siret or a VAT number"
     );
@@ -36,6 +37,8 @@ export async function getCompanyOrCompanyNotFound({
     where = { siret };
   } else if (vatNumber) {
     where = { vatNumber };
+  } else if (orgId) {
+    where = { orgId };
   }
   const company = await prisma.company.findUnique({
     where
@@ -169,10 +172,10 @@ export function getCompanyActiveUsers(siret: string): Promise<CompanyMember[]> {
  * @param siret
  */
 export async function getCompanyInvitedUsers(
-  siret: string,
+  id: string,
   dataloaders: AppDataloaders
 ): Promise<CompanyMember[]> {
-  const hashes = await dataloaders.activeUserAccountHashesBySiret.load(siret);
+  const hashes = await dataloaders.activeUserAccountHashesBySiret.load(id);
   return hashes.map(h => {
     return {
       id: h.id,

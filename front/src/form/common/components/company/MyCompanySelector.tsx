@@ -65,7 +65,7 @@ export default function MyCompanySelector({
       setFieldValue(`${fieldName}.contact`, company.contact ?? "");
       setFieldValue(`${fieldName}.address`, company.address ?? "");
       if (onSelect) {
-        onSelect(company.siret ?? "");
+        onSelect(company.orgId ?? "");
       }
     },
     [fieldName, setFieldValue, onSelect]
