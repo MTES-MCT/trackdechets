@@ -96,12 +96,13 @@ type CompanyForVerificationConnection {
 
 type AnonymousCompany {
   id: String!
+  orgId: String!
   address: String!
   codeCommune: String!
   codeNaf: String!
   libelleNaf: String!
   name: String!
-  siret: String!
+  siret: String
   vatNumber: String
 }
 

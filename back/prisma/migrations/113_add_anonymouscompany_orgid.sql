@@ -8,3 +8,6 @@ SET
 
 ALTER TABLE "default$default"."AnonymousCompany"
 ALTER COLUMN "orgId" SET NOT NULL;
+
+ALTER TABLE "default$default"."AnonymousCompany"
+ALTER COLUMN "siret" DROP NOT NULL;

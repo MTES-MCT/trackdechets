@@ -10,7 +10,11 @@ import {
 } from "generated/graphql/types";
 import { InlineError } from "common/components/Error";
 import { RedErrorMessage } from "common/components";
-import { isSiret } from "generated/constants/companySearchHelpers";
+import {
+  isFRVat,
+  isSiret,
+  isVat,
+} from "generated/constants/companySearchHelpers";
 import { nafCodes } from "generated/constants/NAF";
 
 export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
@@ -20,8 +24,7 @@ export const MISSING_COMPANY_VAT =
 const CREATE_ANONYMOUS_COMPANY = gql`
   mutation CreateAnonymousCompany($input: AnonymousCompanyInput!) {
     createAnonymousCompany(input: $input) {
-      siret
-      vatNumber
+      orgId
     }
   }
 `;
@@ -38,6 +41,19 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       )
       .required(),
     name: yup.string().required(),
+    vatNumber: yup
+      .string()
+      .ensure()
+      .test(
+        "is-vat",
+        "AnonymousCompany: ${originalValue} n'est pas un numéro de TVA valide",
+        value => !value || isVat(value)
+      )
+      .test(
+        "is-not-fr-vat",
+        "AnonymousCompany: le numéro de SIRET est obligatoire pour les établissements français",
+        value => !value || !isFRVat(value)
+      ),
     siret: yup
       .string()
       .ensure()
@@ -65,15 +81,18 @@ export function CreateAnonymousCompany() {
         codeNaf: "",
         name: "",
         siret: "",
+        vatNumber: "",
       }}
       validationSchema={AnonymousCompanyInputSchema}
       onSubmit={async (values, { resetForm }) => {
-        await createAnonymousCompany({ variables: { input: values } });
+        const { data } = await createAnonymousCompany({ variables: { input: values } });
         resetForm();
-        cogoToast.success(
-          `L'entreprise au SIRET "${values.siret}" est maintenant connue de notre répertoire privé et peut être créée via l'interface.`,
-          { hideAfter: 6 }
-        );
+        if (data) {
+          cogoToast.success(
+            `L'entreprise "${data?.createAnonymousCompany.orgId}" est maintenant connue de notre répertoire privé et peut être créée via l'interface.`,
+            { hideAfter: 6 }
+          );
+        }
       }}
     >
       {() => (
@@ -84,6 +103,17 @@ export function CreateAnonymousCompany() {
               <Field
                 name="siret"
                 placeholder="12345678901234"
+                className="td-input"
+              />
+            </label>
+            <RedErrorMessage name="siret" />
+          </div>
+          <div className="form__row">
+            <label>
+              Numéro de TVA (pour les entreprises étrangères uniquement)
+              <Field
+                name="vatNumber"
+                placeholder="BE123456"
                 className="td-input"
               />
             </label>

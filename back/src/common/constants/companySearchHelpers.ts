@@ -74,13 +74,8 @@ export const countries = [
 export const TEST_COMPANY_PREFIX = "000000";
 
 // support all environments front and back
-// process.env is not available in frontend JS
-let ALLOW_TEST_COMPANY = false;
-try {
-  ALLOW_TEST_COMPANY = process.env.ALLOW_TEST_COMPANY === "true";
-} catch (e) {
-  ALLOW_TEST_COMPANY = false;
-}
+// process.env is not available in frontend JS and import.meta.env not available in node.js
+const ALLOW_TEST_COMPANY = process?.env?.ALLOW_TEST_COMPANY === "true";
 
 /**
  * Implements the Luhn Algorithm used to validate SIRET or SIREN of identification numbers
