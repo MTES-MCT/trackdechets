@@ -38,6 +38,7 @@ export const userFactory = async (
 
 /**
  * Return a random valid siret
+ * a random number will not pass the luhnCheck
  * @param index numerical index
  */
 export function siretify(index: number | undefined) {
