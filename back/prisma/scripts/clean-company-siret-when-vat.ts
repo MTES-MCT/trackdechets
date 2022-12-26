@@ -9,7 +9,7 @@ import prisma from "../../src/prisma";
 export class FixCompanySiretIsVatUpdater implements Updater {
   async run() {
     try {
-      await prisma.$queryRaw`UPDATE "default$default"."Company" SET "siret" = '' WHERE "vatNumber" = "siret" AND "siret" ~ '\\w\\w'`;
+      await prisma.$queryRaw`UPDATE "default$default"."Company" SET "siret" = REGEXP_REPLACE("siret", '^\\w\\w', '') WHERE "vatNumber" = "siret" AND "siret" ~ '\\w\\w'`;
     } catch (err) {
       console.error("☠ Something went wrong during the UPDATE of Company", err);
       throw new Error();
