@@ -36,6 +36,11 @@ input CompanyInput {
   Il est composé des trois lettres IMO suivi d'un nombre de sept chiffres (ex: IMO 1234567).
   """
   omiNumber: String
+
+  """
+  SIRET ou TVA de l'établissement
+  """
+  orgId: String
 }
 
 "Filtre pour les établissement"
