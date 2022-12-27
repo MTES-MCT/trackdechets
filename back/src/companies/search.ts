@@ -9,7 +9,8 @@ import {
   isSiret,
   isVat,
   isFRVat,
-  TEST_COMPANY_PREFIX
+  TEST_COMPANY_PREFIX,
+  cleanClue as cleanClueFn
 } from "../common/constants/companySearchHelpers";
 import { SireneSearchResult } from "./sirene/types";
 import { CompanyVatSearchResult } from "./vat/vies/types";
@@ -71,7 +72,7 @@ export async function searchCompany(
   clue: string
 ): Promise<CompanySearchResult> {
   // remove non alphanumeric
-  const cleanClue = clue.replace(/[\W_]+/g, "").toUpperCase();
+  const cleanClue = cleanClueFn(clue);
   const allowTestCompany = process.env.ALLOW_TEST_COMPANY === "true";
   const isTestCompany =
     allowTestCompany && cleanClue.startsWith(TEST_COMPANY_PREFIX);

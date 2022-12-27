@@ -140,9 +140,7 @@ export const isVat = (clue: string): boolean => {
  */
 export const isFRVat = (clue: string): boolean => {
   if (!isVat(clue)) return false;
-  const cleanVat = cleanClue(clue);
-  if (!cleanVat) return false;
-  return cleanVat.slice(0, 2).toUpperCase().startsWith("FR");
+  return clue.slice(0, 2).toUpperCase().startsWith("FR");
 };
 
 /**
@@ -150,9 +148,7 @@ export const isFRVat = (clue: string): boolean => {
  */
 export const isForeignVat = (clue: string): boolean => {
   if (!isVat(clue)) return false;
-  const cleanVat = cleanClue(clue);
-  if (!cleanVat) return false;
-  return !cleanVat.slice(0, 2).toUpperCase().startsWith("FR");
+  return !clue.slice(0, 2).toUpperCase().startsWith("FR");
 };
 
 /**
@@ -161,8 +157,7 @@ export const isForeignVat = (clue: string): boolean => {
 export const isOmi = (clue: string): boolean => {
   if (!clue) return false;
   if (clue.match(BAD_CHARACTERS_REGEXP) !== null) return false;
-  const clean = cleanClue(clue);
-  return clean.match(/^OMI[0-9]{7}$/gim) !== null;
+  return clue.match(/^OMI[0-9]{7}$/gim) !== null;
 };
 
 /**

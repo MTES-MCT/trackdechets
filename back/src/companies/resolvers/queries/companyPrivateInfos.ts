@@ -1,8 +1,8 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import {
-  BAD_CHARACTERS_REGEXP,
   isSiret,
-  isVat
+  isVat,
+  cleanClue as cleanClueFn
 } from "../../../common/constants/companySearchHelpers";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -19,7 +19,7 @@ const companyInfosResolvers: QueryResolvers["companyPrivateInfos"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   checkIsAuthenticated(context);
-  const cleanClue = args.clue.replace(BAD_CHARACTERS_REGEXP, "").toUpperCase();
+  const cleanClue = cleanClueFn(args.clue).toUpperCase();
   const [companyInfos, isAnonymousCompany, company] = await Promise.all([
     getCompanyInfos(cleanClue),
     prisma.anonymousCompany.count({
