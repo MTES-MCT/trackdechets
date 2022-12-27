@@ -12,12 +12,14 @@ export const dashboardBsffFragment = gql`
     bsffEmitter: emitter {
       company {
         siret
+        orgId
         name
       }
     }
     bsffTransporter: transporter {
       company {
         siret
+        orgId
         name
       }
       transport {
@@ -28,6 +30,7 @@ export const dashboardBsffFragment = gql`
     bsffDestination: destination {
       company {
         siret
+        orgId
         name
       }
     }
@@ -52,6 +55,7 @@ export const FicheInterventionFragment = gql`
       company {
         name
         siret
+        orgId
       }
     }
   }
@@ -115,6 +119,7 @@ export const FullBsffFragment = gql`
           company {
             name
             siret
+            orgId
           }
         }
       }
@@ -177,6 +182,7 @@ export const FullBsffFragment = gql`
           company {
             name
             siret
+            orgId
           }
         }
         waste {
@@ -197,6 +203,7 @@ export const FullBsffFragment = gql`
           company {
             name
             siret
+            orgId
           }
         }
         waste {
@@ -217,6 +224,7 @@ export const FullBsffFragment = gql`
           company {
             name
             siret
+            orgId
           }
         }
         waste {
@@ -247,6 +255,7 @@ export const PreviousBsffPackagingFragment = gql`
         company {
           name
           siret
+          orgId
         }
       }
       waste {
