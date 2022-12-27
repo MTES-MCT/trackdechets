@@ -26,7 +26,7 @@ const deleteCompanyResolver: MutationResolvers["deleteCompany"] = async (
   }
 
   const associatedUsers = await getCompanyActiveUsers(
-    companyAssociation.company.siret
+    companyAssociation.company.orgId
   );
 
   // clear cache

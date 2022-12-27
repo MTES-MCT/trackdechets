@@ -9,6 +9,22 @@ import { getFullUser } from "../users/database";
 import { ForbiddenError } from "apollo-server-express";
 import { getUserRole } from "./database";
 import { VhuAgrement } from "../generated/graphql/types";
+import { FullUser } from "../users/types";
+
+async function getRole(
+  companies,
+  fullUser: FullUser,
+  forbiddenError: ForbiddenError,
+  user: User
+) {
+  const orgIds = companies.map(c => c.orgId);
+  const found = fullUser.companies.find(c => orgIds.includes(c.orgId));
+  if (!found) {
+    throw forbiddenError;
+  }
+  const role = await getUserRole(user.id, found.orgId);
+  return role;
+}
 
 export async function checkCanReadUpdateDeleteTraderReceipt(
   user: User,
@@ -29,12 +45,7 @@ export async function checkCanReadUpdateDeleteTraderReceipt(
     // No companies associated with the receipt
     throw forbiddenError;
   } else {
-    const sirets = companies.map(c => c.siret);
-    const found = fullUser.companies.find(c => sirets.includes(c.siret));
-    if (!found) {
-      throw forbiddenError;
-    }
-    const role = await getUserRole(user.id, found.siret);
+    const role = await getRole(companies, fullUser, forbiddenError, user);
     if (role !== "ADMIN") {
       throw forbiddenError;
     }
@@ -62,12 +73,7 @@ export async function checkCanReadUpdateDeleteBrokerReceipt(
     // No companies associated with the receipt
     throw forbiddenError;
   } else {
-    const sirets = companies.map(c => c.siret);
-    const found = fullUser.companies.find(c => sirets.includes(c.siret));
-    if (!found) {
-      throw forbiddenError;
-    }
-    const role = await getUserRole(user.id, found.siret);
+    const role = await getRole(companies, fullUser, forbiddenError, user);
     if (role !== "ADMIN") {
       throw forbiddenError;
     }
@@ -95,12 +101,7 @@ export async function checkCanReadUpdateDeleteTransporterReceipt(
     // No companies associated with the receipt
     throw forbiddenError;
   } else {
-    const sirets = companies.map(c => c.siret);
-    const found = fullUser.companies.find(c => sirets.includes(c.siret));
-    if (!found) {
-      throw forbiddenError;
-    }
-    const role = await getUserRole(user.id, found.siret);
+    const role = await getRole(companies, fullUser, forbiddenError, user);
     if (role !== "ADMIN") {
       throw forbiddenError;
     }
@@ -133,12 +134,7 @@ export async function checkCanReadUpdateDeleteVhuAgrement(
     // No companies associated with the agrement
     throw forbiddenError;
   } else {
-    const sirets = companies.map(c => c.siret);
-    const found = fullUser.companies.find(c => sirets.includes(c.siret));
-    if (!found) {
-      throw forbiddenError;
-    }
-    const role = await getUserRole(user.id, found.siret);
+    const role = await getRole(companies, fullUser, forbiddenError, user);
     if (role !== "ADMIN") {
       throw forbiddenError;
     }
@@ -168,13 +164,7 @@ export async function checkCanReadUpdateDeleteWorkerCertification(
     // No companies associated with the certification
     throw forbiddenError;
   }
-
-  const sirets = companies.map(c => c.siret);
-  const found = fullUser.companies.find(c => sirets.includes(c.siret));
-  if (!found) {
-    throw forbiddenError;
-  }
-  const role = await getUserRole(user.id, found.siret);
+  const role = await getRole(companies, fullUser, forbiddenError, user);
   if (role !== "ADMIN") {
     throw forbiddenError;
   }

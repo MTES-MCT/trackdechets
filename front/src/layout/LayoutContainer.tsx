@@ -46,6 +46,7 @@ const GET_ME = gql`
       email
       isAdmin
       companies {
+        orgId
         siret
       }
     }
