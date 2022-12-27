@@ -1,7 +1,6 @@
 import { QueryResult } from "@apollo/client";
-import { Stepper, StepperItem } from "common/components";
-import { InlineError } from "common/components/Error";
 import { Formik, setNestedObjectValues } from "formik";
+import omitDeep from "omit-deep-lodash";
 import React, {
   Children,
   ReactElement,
@@ -10,6 +9,8 @@ import React, {
   useState,
 } from "react";
 import { useHistory } from "react-router-dom";
+import { Stepper, StepperItem } from "common/components";
+import { InlineError } from "common/components/Error";
 import "./GenericStepList.scss";
 import { IStepContainerProps } from "./Step";
 
@@ -22,6 +23,7 @@ interface Props {
   formQuery: QueryResult<any, any>;
   onSubmit: (values) => void;
 }
+
 export default function GenericStepList({
   children,
   formId,
@@ -67,7 +69,7 @@ export default function GenericStepList({
     event.preventDefault();
 
     if (isLastStep) {
-      onSubmit(values);
+      onSubmit(omitDeep(values, "orgId"));
     } else {
       setCurrentStep(currentStep + 1);
     }

@@ -4,7 +4,7 @@ type FormCompany {
   name: String
 
   "SIRET ou TVA de l'établissement"
-  orgId: String
+  orgId: String!
 
   "SIRET de l'établissement"
   siret: String
