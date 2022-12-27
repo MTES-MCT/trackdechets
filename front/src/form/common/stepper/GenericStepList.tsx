@@ -1,6 +1,5 @@
 import { QueryResult } from "@apollo/client";
 import { Formik, setNestedObjectValues } from "formik";
-import omitDeep from "omit-deep-lodash";
 import React, {
   Children,
   ReactElement,
@@ -69,7 +68,7 @@ export default function GenericStepList({
     event.preventDefault();
 
     if (isLastStep) {
-      onSubmit(omitDeep(values, "orgId"));
+      onSubmit(values);
     } else {
       setCurrentStep(currentStep + 1);
     }
