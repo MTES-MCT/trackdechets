@@ -39,25 +39,27 @@
     &__content {
         display: flex;
         flex-direction: column;
+        position: relative;
         @include desktop {
             flex-direction: row;
             align-items: center;
-            justify-content: space-between;
         }
 
         &__badge {
             @include desktop {
-                .badge {
-                    width: 40%;
-                }
+                width: 40%;
             }
         }
+        
 
         &__cta {
             display: flex;
             justify-content: flex-end;
+            
             @include desktop {
-                justify-content: flex-start;
+                display: block;
+                position: absolute;
+                right: 0;
             }
         }
     }
