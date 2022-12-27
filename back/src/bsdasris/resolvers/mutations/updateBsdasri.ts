@@ -20,7 +20,7 @@ import updateBsdasri from "./updateSimpleBsdasri";
 
 /**
  * Bsdasri update mutation
- 
+
  */
 const updateBsdasriResolver = async (
   _: ResolversParentTypes["Mutation"],
@@ -42,6 +42,7 @@ const updateBsdasriResolver = async (
     emitterCompanySiret: dbBsdasri?.emitterCompanySiret,
     destinationCompanySiret: dbBsdasri?.destinationCompanySiret,
     transporterCompanySiret: dbBsdasri?.transporterCompanySiret,
+    transporterCompanyVatNumber: dbBsdasri?.transporterCompanyVatNumber,
     ecoOrganismeSiret: dbBsdasri?.ecoOrganismeSiret
   };
 
