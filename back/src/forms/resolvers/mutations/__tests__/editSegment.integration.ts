@@ -1,13 +1,13 @@
-import { resetDatabase } from "../../../../integration-tests/helper";
-import prisma from "../../../prisma";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import prisma from "../../../../prisma";
 import {
   formFactory,
   siretify,
   transportSegmentFactory,
   userFactory,
   userWithCompanyFactory
-} from "../../../__tests__/factories";
-import makeClient from "../../../__tests__/testClient";
+} from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
 
 jest.mock("axios", () => ({
   default: {
