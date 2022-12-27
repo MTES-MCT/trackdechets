@@ -18,6 +18,7 @@ import { CompanySearchResult } from "../../../types";
 const FAVORITES = `query Favorites($siret: String!, $type: FavoriteType!) {
   favorites(siret: $siret, type: $type) {
     name
+    orgId
     siret
     vatNumber
     address
@@ -500,8 +501,10 @@ describe("query favorites", () => {
   });
 
   it("should return recent next destinations", async () => {
+    const siret = siretify(1);
     const destination: CompanySearchResult = {
-      siret: siretify(1),
+      siret,
+      orgId: siret,
       address: "rue des 4 chemins",
       name: "Destination ultérieure",
       isRegistered: true,
@@ -589,6 +592,7 @@ describe("query favorites", () => {
     });
 
     const traderSirene: CompanySearchResult = {
+      orgId: trader.siret,
       siret: trader.siret,
       address: "rue des 4 chemins",
       name: "Négociant",
@@ -654,6 +658,7 @@ describe("query favorites", () => {
 
     const brokerSirene: CompanySearchResult = {
       siret: broker.siret,
+      orgId: broker.siret,
       address: "rue des 4 chemins",
       name: "Courtier",
       isRegistered: true,

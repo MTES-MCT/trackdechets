@@ -25,6 +25,7 @@ describe("query { searchCompanies(clue, department) }", () => {
     searchCompanySpy.mockResolvedValueOnce([
       {
         siret,
+        orgId: siret,
         address: "4 Boulevard Longchamp 13001 Marseille",
         name: "CODE EN STOCK",
         naf: "6201Z",
@@ -60,6 +61,7 @@ describe("query { searchCompanies(clue, department) }", () => {
     searchCompanySpy.mockResolvedValueOnce([
       {
         siret,
+        orgId: siret,
         address: "4 Boulevard Longchamp 13001 Marseille",
         name: "CODE EN STOCK",
         naf: "6201Z",
@@ -103,6 +105,7 @@ describe("query { searchCompanies(clue, department) }", () => {
     searchCompanySpy.mockResolvedValueOnce([
       {
         siret,
+        orgId: siret,
         address: "4 Boulevard Longchamp 13001 Marseille",
         name: "CODE EN STOCK",
         naf: "6201Z",

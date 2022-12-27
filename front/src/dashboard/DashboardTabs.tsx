@@ -42,7 +42,7 @@ export function DashboardTabs({
           <li>
             <NavLink
               to={generatePath(routes.dashboard.bsds.drafts, {
-                siret: currentCompany.siret,
+                siret: currentCompany.orgId,
               })}
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
@@ -54,7 +54,7 @@ export function DashboardTabs({
           <li>
             <NavLink
               to={generatePath(routes.dashboard.bsds.act, {
-                siret: currentCompany.siret,
+                siret: currentCompany.orgId,
               })}
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
@@ -66,7 +66,7 @@ export function DashboardTabs({
           <li>
             <NavLink
               to={generatePath(routes.dashboard.bsds.follow, {
-                siret: currentCompany.siret,
+                siret: currentCompany.orgId,
               })}
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
@@ -77,7 +77,7 @@ export function DashboardTabs({
           <li>
             <NavLink
               to={generatePath(routes.dashboard.bsds.history, {
-                siret: currentCompany.siret,
+                siret: currentCompany.orgId,
               })}
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
@@ -88,7 +88,7 @@ export function DashboardTabs({
           <li>
             <NavLink
               to={generatePath(routes.dashboard.bsds.reviews, {
-                siret: currentCompany.siret,
+                siret: currentCompany.orgId,
               })}
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
@@ -105,7 +105,7 @@ export function DashboardTabs({
               <li>
                 <NavLink
                   to={generatePath(routes.dashboard.transport.toCollect, {
-                    siret: currentCompany.siret,
+                    siret: currentCompany.orgId,
                   })}
                   className="sidebar__link sidebar__link--indented"
                   activeClassName="sidebar__link--active"
@@ -116,7 +116,7 @@ export function DashboardTabs({
               <li>
                 <NavLink
                   to={generatePath(routes.dashboard.transport.collected, {
-                    siret: currentCompany.siret,
+                    siret: currentCompany.orgId,
                   })}
                   className="sidebar__link sidebar__link--indented"
                   activeClassName="sidebar__link--active"
@@ -132,7 +132,7 @@ export function DashboardTabs({
           <li>
             <NavLink
               to={generatePath(routes.dashboard.exports, {
-                siret: currentCompany.siret,
+                siret: currentCompany.orgId,
               })}
               className="sidebar__link sidebar__link--chapter"
               activeClassName="sidebar__link--active"

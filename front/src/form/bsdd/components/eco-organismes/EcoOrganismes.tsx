@@ -75,20 +75,29 @@ export default function EcoOrganismes(props: EcoOrganismesProps) {
                 onChange={event => setClue(event.target.value)}
               />
               <div className={styles.list}>
-                <CompanyResults<EcoOrganisme>
+                <CompanyResults<EcoOrganisme & { orgId: string }>
                   onSelect={eo =>
                     setFieldValue(field.name, {
                       name: eo.name,
                       siret: eo.siret,
+                      orgId: eo.orgId,
                     })
                   }
-                  results={data.ecoOrganismes.filter(eo =>
-                    eo.name.toLowerCase().includes(clue.toLowerCase())
-                  )}
+                  results={data.ecoOrganismes
+                    .filter(eo =>
+                      eo.name.toLowerCase().includes(clue.toLowerCase())
+                    )
+                    .map(eo => ({
+                      ...eo,
+                      orgId: eo.siret,
+                    }))}
                   selectedItem={
-                    data.ecoOrganismes.find(
-                      eo => eo.siret === field.value?.siret
-                    ) || null
+                    data.ecoOrganismes
+                      .map(eo => ({
+                        ...eo,
+                        orgId: eo.siret,
+                      }))
+                      .find(eo => eo.siret === field.value?.siret) || null
                   }
                 />
               </div>

@@ -16,7 +16,6 @@ import {
   isSiret,
   isVat
 } from "../../../common/constants/companySearchHelpers";
-import { whereSiretOrVatNumber } from "../CompanySearchResult";
 import { searchCompany } from "../../search";
 import {
   addToGeocodeCompanyQueue,

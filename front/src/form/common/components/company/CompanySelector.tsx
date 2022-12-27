@@ -142,7 +142,7 @@ export default function CompanySelector({
   /**
    * Selection d'un établissement dans le formulaire
    */
-  function selectCompany(company: CompanySearchResult) {
+  function selectCompany(company?: CompanySearchResult) {
     if (disabled) return;
     // empty the  selected company when null
     if (!company) return setFieldValue(field.name, getInitialCompany());
@@ -412,7 +412,7 @@ export default function CompanySelector({
         <RedErrorMessage name={`${field.name}.siret`} />
         <CompanyResults<CompanySearchResult>
           onSelect={company => selectCompany(company)}
-          onUnselect={() => selectCompany({})}
+          onUnselect={() => selectCompany()}
           results={searchResults}
           selectedItem={
             {

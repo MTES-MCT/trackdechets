@@ -265,7 +265,7 @@ export default withRouter(function LayoutContainer({ history }) {
                   data
                     ? data.me.companies.length > 0
                       ? generatePath(routes.dashboard.index, {
-                          siret: data.me.companies[0].siret,
+                          siret: data.me.companies[0].orgId,
                         })
                       : routes.account.companies.list
                     : routes.login

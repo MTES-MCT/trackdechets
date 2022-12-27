@@ -44,14 +44,13 @@ describe("{ mutation { editSegment } }", () => {
     });
 
     const { mutate } = makeClient(firstTransporter);
+    const editSegmentSiret = siretify(2);
     await mutate(
       `mutation  {
-            editSegment(id:"${
-              segment.id
-            }", siret:"${transporterSiret}", nextSegmentInfo: {
+            editSegment(id:"${segment.id}", siret:"${transporterSiret}", nextSegmentInfo: {
                 transporter: {
                   company: {
-                    siret: "${siretify(2)}"
+                    siret: "${editSegmentSiret}"
                     name: "White walkers social club"
                     address: "King's landing"
                     contact: "The king of the night"
@@ -67,7 +66,7 @@ describe("{ mutation { editSegment } }", () => {
     const editedSegment = await prisma.transportSegment.findUnique({
       where: { id: segment.id }
     });
-    expect(editedSegment.transporterCompanySiret).toBe("5678956789");
+    expect(editedSegment.transporterCompanySiret).toBe(editSegmentSiret);
   });
 
   it("should edit a segment when user is transporter and form owner", async () => {
@@ -95,14 +94,13 @@ describe("{ mutation { editSegment } }", () => {
     });
 
     const { mutate } = makeClient(firstTransporter);
+    const editSegmentSiret = siretify(3);
     await mutate(
       `mutation  {
-            editSegment(id:"${
-              segment.id
-            }", siret:"${transporterSiret}",   nextSegmentInfo: {
+            editSegment(id:"${segment.id}", siret:"${transporterSiret}",   nextSegmentInfo: {
                 transporter: {
                   company: {
-                    siret: "${siretify(3)}"
+                    siret: "${editSegmentSiret}"
                     name: "White walkers social club"
                     address: "King's landing"
                     contact: "The king of the night"
@@ -118,7 +116,7 @@ describe("{ mutation { editSegment } }", () => {
     const editedSegment = await prisma.transportSegment.findUnique({
       where: { id: segment.id }
     });
-    expect(editedSegment.transporterCompanySiret).toBe("5678956789");
+    expect(editedSegment.transporterCompanySiret).toBe(editSegmentSiret);
   });
 
   it("should edit a segment when user is the second transporter", async () => {
