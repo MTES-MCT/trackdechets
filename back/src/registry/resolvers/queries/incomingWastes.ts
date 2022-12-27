@@ -13,7 +13,7 @@ const incomingWastesResolver: QueryResolvers["incomingWastes"] = async (
   // bypass authorization if the user is authenticated from a service account
   if (!user.isRegistreNational) {
     for (const siret of args.sirets) {
-      await checkIsCompanyMember({ id: user.id }, { siret });
+      await checkIsCompanyMember({ id: user.id }, { orgId: siret });
     }
   }
 

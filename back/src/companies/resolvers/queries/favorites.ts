@@ -381,8 +381,8 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-  const company = await getCompanyOrCompanyNotFound({ siret });
-  await checkIsCompanyMember({ id: user.id }, { siret: company.siret });
+  const company = await getCompanyOrCompanyNotFound({ orgId: siret });
+  await checkIsCompanyMember({ id: user.id }, { orgId: company.orgId });
 
   const recentPartners = await getRecentPartners(company.siret, type);
   const favorites: CompanyFavorite[] = recentPartners.map(recentPartner => {

@@ -43,7 +43,7 @@ type CompanyPrivate {
   orgId: String!
 
   "SIRET de l'établissement"
-  siret: String!
+  siret: String
 
   "Numéro de TVA de l'établissement"
   vatNumber: String
@@ -545,8 +545,8 @@ enum StatutDiffusionEtablissement {
 }
 
 """
-Informations minimal sur une entreprise identifiée par son siret
-validées par requête à l'INSEE
+Informations minimales sur une entreprise identifiée par son SIRET
+Information validées par requête à l'INSEE pour utilisation dans Intermediary
 """
 type CompanyValidationInfos {
   siret: String!

@@ -104,11 +104,11 @@ export function getDeclarations(codeS3ic: string) {
  * There should be only one association between a user
  * and a company, so we return the first one
  * @param userId
- * @param siret
+ * @param orgId
  */
-export async function getUserRole(userId: string, siret: string) {
+export async function getUserRole(userId: string, orgId: string) {
   const associations = await prisma.company
-    .findUnique({ where: { siret } })
+    .findUnique({ where: { orgId } })
     .companyAssociations({ where: { userId } });
 
   if (associations.length > 0) {
@@ -135,14 +135,14 @@ export async function isCompanyMember(user: User, company: Company) {
 
 /**
  * Concat active company users and invited company users
- * @param siret
+ * @param orgId
  */
 export async function getCompanyUsers(
-  siret: string,
+  orgId: string,
   dataloaders: AppDataloaders
 ): Promise<CompanyMember[]> {
-  const activeUsers = await getCompanyActiveUsers(siret);
-  const invitedUsers = await getCompanyInvitedUsers(siret, dataloaders);
+  const activeUsers = await getCompanyActiveUsers(orgId);
+  const invitedUsers = await getCompanyInvitedUsers(orgId, dataloaders);
 
   return [...activeUsers, ...invitedUsers];
 }
@@ -151,9 +151,9 @@ export async function getCompanyUsers(
  * Returns company members that already have an account in TD
  * @param siret
  */
-export function getCompanyActiveUsers(siret: string): Promise<CompanyMember[]> {
+export function getCompanyActiveUsers(orgId: string): Promise<CompanyMember[]> {
   return prisma.company
-    .findUnique({ where: { siret: siret } })
+    .findUnique({ where: { orgId } })
     .companyAssociations({ include: { user: true } })
     .then(associations =>
       associations.map(a => {
@@ -172,10 +172,10 @@ export function getCompanyActiveUsers(siret: string): Promise<CompanyMember[]> {
  * @param siret
  */
 export async function getCompanyInvitedUsers(
-  siret: string,
+  orgId: string,
   dataloaders: AppDataloaders
 ): Promise<CompanyMember[]> {
-  const hashes = await dataloaders.activeUserAccountHashesBySiret.load(siret);
+  const hashes = await dataloaders.activeUserAccountHashesBySiret.load(orgId);
   return hashes.map(h => {
     return {
       id: h.id,
@@ -193,8 +193,8 @@ export async function getCompanyInvitedUsers(
  * of the company
  * @param siret
  */
-export async function getCompanyAdminUsers(siret: string) {
-  const users = await getCompanyActiveUsers(siret);
+export async function getCompanyAdminUsers(orgId: string) {
+  const users = await getCompanyActiveUsers(orgId);
   return users.filter(c => c.role === "ADMIN");
 }
 

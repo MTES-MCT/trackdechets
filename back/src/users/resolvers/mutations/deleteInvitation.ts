@@ -16,14 +16,16 @@ const deleteInvitationResolver: MutationResolvers["deleteInvitation"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-  const company = await getCompanyOrCompanyNotFound({ siret });
+  const company = await getCompanyOrCompanyNotFound({ orgId: siret });
   await checkIsCompanyAdmin(user, company);
   const hash = await getUserAccountHashOrNotFound({
     email,
     companySiret: siret
   });
   await prisma.userAccountHash.delete({ where: { id: hash.id } });
-  const dbCompany = await prisma.company.findUnique({ where: { siret } });
+  const dbCompany = await prisma.company.findUnique({
+    where: { orgId: siret }
+  });
   return convertUrls(dbCompany);
 };
 

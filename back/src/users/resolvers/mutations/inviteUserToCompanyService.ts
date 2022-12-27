@@ -3,7 +3,10 @@ import prisma from "../../../prisma";
 
 import { sendMail } from "../../../mailer/mailing";
 
-import { convertUrls } from "../../../companies/database";
+import {
+  convertUrls,
+  getCompanyOrCompanyNotFound
+} from "../../../companies/database";
 import {
   CompanyPrivate,
   MutationInviteUserToCompanyArgs
@@ -25,7 +28,7 @@ export async function inviteUserToCompanyFn(
 
   const existingUser = await prisma.user.findUnique({ where: { email } });
 
-  const company = await prisma.company.findUnique({ where: { siret } });
+  const company = await getCompanyOrCompanyNotFound({ orgId: siret });
 
   if (existingUser) {
     // there is already an user with this email

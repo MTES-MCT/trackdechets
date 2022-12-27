@@ -12,10 +12,10 @@ const verifyCompanyByAdminResolver: MutationResolvers["verifyCompanyByAdmin"] =
   async (parent, { input: { siret, verificationComment } }, context) => {
     applyAuthStrategies(context, [AuthType.Session]);
     checkIsAdmin(context);
-    const company = await getCompanyOrCompanyNotFound({ siret });
+    const company = await getCompanyOrCompanyNotFound({ orgId: siret });
 
     const verifiedCompany = await prisma.company.update({
-      where: { siret: company.siret },
+      where: { id: company.id },
       data: {
         verificationStatus: CompanyVerificationStatus.VERIFIED,
         verificationMode: CompanyVerificationMode.MANUAL,

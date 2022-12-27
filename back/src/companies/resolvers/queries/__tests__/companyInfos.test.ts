@@ -215,7 +215,7 @@ describe("companyInfos search with a VAT number", () => {
 
     expect(company).toStrictEqual({
       siret: undefined,
-      orgId: undefined,
+      orgId: "IT09301420155",
       vatNumber: "IT09301420155",
       name: "Code en stock",
       address: "une adresse",

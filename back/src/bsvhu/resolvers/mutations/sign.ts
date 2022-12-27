@@ -107,6 +107,6 @@ function checkAuthorization(
 
   return checkIsCompanyMember(
     { id: requestInfo.curretUserId },
-    { siret: signingCompanySiret }
+    { orgId: signingCompanySiret }
   );
 }

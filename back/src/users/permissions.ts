@@ -11,17 +11,20 @@ export async function checkIsCompanyAdmin(user: User, company: Company) {
   return true;
 }
 
+/**
+ * Search by SIRET or VAT number if a user is member of a company
+ */
 export async function checkIsCompanyMember(
   { id }: { id: string },
-  { siret }: { siret: string }
+  { orgId }: { orgId: string }
 ) {
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(id);
 
-  const isCompanyMember = userCompaniesSiretOrVat.includes(siret);
+  const isCompanyMember = userCompaniesSiretOrVat.includes(orgId);
 
   if (isCompanyMember) {
     return true;
   }
 
-  throw new NotCompanyMember(siret);
+  throw new NotCompanyMember(orgId);
 }

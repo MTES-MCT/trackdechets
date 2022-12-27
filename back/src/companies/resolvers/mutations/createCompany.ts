@@ -85,7 +85,9 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   }
 
   const existingCompany = await prisma.company.findUnique({
-    where: whereSiretOrVatNumber({ siret, vatNumber })
+    where: {
+      orgId
+    }
   });
 
   if (existingCompany) {
