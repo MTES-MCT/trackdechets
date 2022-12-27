@@ -172,10 +172,10 @@ export function getCompanyActiveUsers(siret: string): Promise<CompanyMember[]> {
  * @param siret
  */
 export async function getCompanyInvitedUsers(
-  id: string,
+  siret: string,
   dataloaders: AppDataloaders
 ): Promise<CompanyMember[]> {
-  const hashes = await dataloaders.activeUserAccountHashesBySiret.load(id);
+  const hashes = await dataloaders.activeUserAccountHashesBySiret.load(siret);
   return hashes.map(h => {
     return {
       id: h.id,

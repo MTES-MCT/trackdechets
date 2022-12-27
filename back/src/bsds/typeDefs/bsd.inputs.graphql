@@ -6,6 +6,7 @@ input CompanyInput {
   SIRET de l'établissement composé de 14 caractères numériques
   """
   siret: String
+
   """
   Numéro de TVA intra-communautaire de l'établissement. À renseigner pour
   les transporteurs étrangers uniquement.
