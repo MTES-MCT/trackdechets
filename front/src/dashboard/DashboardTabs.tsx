@@ -21,12 +21,12 @@ export function DashboardTabs({
       {companies.length > 1 ? (
         <div className="company-select">
           <DashboardCompanySelector
-            siret={currentCompany.siret!}
+            orgId={currentCompany.orgId}
             companies={companies}
-            handleCompanyChange={siret =>
+            handleCompanyChange={orgId =>
               history.push(
                 generatePath(routes.dashboard.bsds.drafts, {
-                  siret,
+                  siret: orgId,
                 })
               )
             }
