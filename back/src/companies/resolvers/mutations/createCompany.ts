@@ -199,13 +199,17 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       );
     }
   }
-
-  // Fill latitude, longitude and departement asynchronously
-  addToGeocodeCompanyQueue({ siret: company.siret, address: company.address });
-  addToSetCompanyDepartementQueue({
-    siret: company.siret,
-    codeCommune: companyInfo.codeCommune
-  });
+  if (company.siret) {
+    // Fill latitude, longitude and departement asynchronously
+    addToGeocodeCompanyQueue({
+      siret: company.siret,
+      address: company.address
+    });
+    addToSetCompanyDepartementQueue({
+      siret: company.siret,
+      codeCommune: companyInfo.codeCommune
+    });
+  }
 
   return convertUrls(company);
 };
