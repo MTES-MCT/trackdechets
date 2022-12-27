@@ -102,27 +102,21 @@ export const luhnCheck = (num: string | number, modulo = 10): boolean => {
  * @returns
  */
 export const isSiret = (clue: string, allowTestCompany = false): boolean => {
-  if (!clue) return false;
-  const cleanClue = clue.replace(/[\W_]+/g, "");
-  if (
-    !cleanClue ||
-    !/^[0-9]{14}$/.test(cleanClue) ||
-    /^0{14}$/.test(cleanClue)
-  ) {
+  if (!clue || !/^[0-9]{14}$/.test(clue) || /^0{14}$/.test(clue)) {
     return false;
   }
   if (
     (allowTestCompany || ALLOW_TEST_COMPANY) &&
-    cleanClue.startsWith(TEST_COMPANY_PREFIX)
+    clue.startsWith(TEST_COMPANY_PREFIX)
   ) {
     return true;
   }
-  const luhnValid = luhnCheck(cleanClue);
+  const luhnValid = luhnCheck(clue);
   if (luhnValid) {
     return true;
   }
   // try with "5" (default is 10) for La Poste Groupe SIRET
-  return luhnCheck(cleanClue, 5);
+  return luhnCheck(clue, 5);
 };
 
 /**

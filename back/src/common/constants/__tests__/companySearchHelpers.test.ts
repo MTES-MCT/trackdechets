@@ -2,6 +2,7 @@ import {
   isForeignVat,
   isFRVat,
   isOmi,
+  isSiret,
   isVat,
   luhnCheck
 } from "../companySearchHelpers";
@@ -54,4 +55,14 @@ test("luhnCheck", () => {
   expect(luhnCheck("4485275742308327")).toBeTruthy();
   expect(luhnCheck(6011329933655299)).toBeTruthy();
   expect(luhnCheck(123456789)).toBeFalsy();
+});
+
+test("isSiret", () => {
+  expect(isSiret("53075596600047")).toBeTruthy();
+  expect(isSiret("6011329933655299")).toBeFalsy();
+  expect(isSiret("123456789")).toBeFalsy();
+  expect(isSiret("12 34 56 789")).toBeFalsy();
+  expect(isSiret("1234567 89")).toBeFalsy();
+  expect(isSiret("1234567-89")).toBeFalsy();
+  expect(isSiret("44-85-27-57-42-30-83-27")).toBeFalsy();
 });
