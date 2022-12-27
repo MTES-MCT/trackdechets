@@ -171,7 +171,7 @@ model Application {
 model Company {
   id                                   String                    @id @default(cuid())
   orgId                                String                    @unique
-  siret                                String                    @unique @default(cuid())
+  siret                                String?                   @unique
   vatNumber                            String?                   @unique
   updatedAt                            DateTime                  @updatedAt @db.Timestamptz(6)
   createdAt                            DateTime                  @default(now()) @db.Timestamptz(6)
@@ -227,7 +227,7 @@ model Company {
 model AnonymousCompany {
   id          String  @id @default(cuid())
   orgId       String  @unique
-  siret       String  @unique @default(cuid())
+  siret       String? @unique
   vatNumber   String? @unique
   name        String
   address     String
