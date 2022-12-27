@@ -1,6 +1,4 @@
 import { QueryResult } from "@apollo/client";
-import { Stepper, StepperItem } from "common/components";
-import { InlineError } from "common/components/Error";
 import { Formik, setNestedObjectValues } from "formik";
 import React, {
   Children,
@@ -10,6 +8,8 @@ import React, {
   useState,
 } from "react";
 import { useHistory } from "react-router-dom";
+import { Stepper, StepperItem } from "common/components";
+import { InlineError } from "common/components/Error";
 import "./GenericStepList.scss";
 import { IStepContainerProps } from "./Step";
 
@@ -22,6 +22,7 @@ interface Props {
   formQuery: QueryResult<any, any>;
   onSubmit: (values) => void;
 }
+
 export default function GenericStepList({
   children,
   formId,

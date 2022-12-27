@@ -1,4 +1,5 @@
 import { ValidationError } from "yup";
+import { siretify } from "../../__tests__/factories";
 import { validateBsvhu } from "../validation";
 
 import { bsvhuFactory } from "./factories.vhu";
@@ -21,7 +22,7 @@ describe("BSVHU validation", () => {
   it("should not validate without recipisse when it's a foreign transport", async () => {
     const bsvhu = await bsvhuFactory({
       opt: {
-        transporterCompanySiret: "12345678901234",
+        transporterCompanySiret: siretify(1),
         transporterCompanyName: "transporteur FR"
       }
     });

@@ -1,12 +1,13 @@
-import { resetDatabase } from "../../../../integration-tests/helper";
-import prisma from "../../../prisma";
+import { resetDatabase } from "../../../../../integration-tests/helper";
+import prisma from "../../../../prisma";
 import {
   formFactory,
+  siretify,
   transportSegmentFactory,
   userFactory,
   userWithCompanyFactory
-} from "../../../__tests__/factories";
-import makeClient from "../../../__tests__/testClient";
+} from "../../../../__tests__/factories";
+import makeClient from "../../../../__tests__/testClient";
 
 jest.mock("axios", () => ({
   default: {
@@ -43,12 +44,13 @@ describe("{ mutation { editSegment } }", () => {
     });
 
     const { mutate } = makeClient(firstTransporter);
+    const editSegmentSiret = siretify(2);
     await mutate(
       `mutation  {
             editSegment(id:"${segment.id}", siret:"${transporterSiret}", nextSegmentInfo: {
                 transporter: {
                   company: {
-                    siret: "5678956789"
+                    siret: "${editSegmentSiret}"
                     name: "White walkers social club"
                     address: "King's landing"
                     contact: "The king of the night"
@@ -64,7 +66,7 @@ describe("{ mutation { editSegment } }", () => {
     const editedSegment = await prisma.transportSegment.findUnique({
       where: { id: segment.id }
     });
-    expect(editedSegment.transporterCompanySiret).toBe("5678956789");
+    expect(editedSegment.transporterCompanySiret).toBe(editSegmentSiret);
   });
 
   it("should edit a segment when user is transporter and form owner", async () => {
@@ -92,12 +94,13 @@ describe("{ mutation { editSegment } }", () => {
     });
 
     const { mutate } = makeClient(firstTransporter);
+    const editSegmentSiret = siretify(3);
     await mutate(
       `mutation  {
             editSegment(id:"${segment.id}", siret:"${transporterSiret}",   nextSegmentInfo: {
                 transporter: {
                   company: {
-                    siret: "5678956789"
+                    siret: "${editSegmentSiret}"
                     name: "White walkers social club"
                     address: "King's landing"
                     contact: "The king of the night"
@@ -113,7 +116,7 @@ describe("{ mutation { editSegment } }", () => {
     const editedSegment = await prisma.transportSegment.findUnique({
       where: { id: segment.id }
     });
-    expect(editedSegment.transporterCompanySiret).toBe("5678956789");
+    expect(editedSegment.transporterCompanySiret).toBe(editSegmentSiret);
   });
 
   it("should edit a segment when user is the second transporter", async () => {
@@ -141,7 +144,7 @@ describe("{ mutation { editSegment } }", () => {
     const segment = await transportSegmentFactory({
       formId: form.id,
       segmentPayload: {
-        transporterCompanySiret: "98765",
+        transporterCompanySiret: siretify(4),
         readyToTakeOver: true
       }
     });

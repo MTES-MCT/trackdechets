@@ -4,10 +4,7 @@ import {
   CompanyType,
   CompanyVerificationStatus
 } from "@prisma/client";
-import {
-  INVALID_SIRET_LENGTH,
-  MISSING_COMPANY_SIRET_OR_VAT
-} from "../forms/errors";
+import { MISSING_COMPANY_SIRET_OR_VAT } from "../forms/errors";
 import prisma from "../prisma";
 import { isFRVat, isSiret } from "../common/constants/companySearchHelpers";
 
@@ -36,9 +33,11 @@ const { VERIFY_COMPANY } = process.env;
 export const destinationCompanySiretSchema = yup
   .string()
   .ensure()
-  .matches(/^$|^\d{14}$/, {
-    message: `Destinataire: ${INVALID_SIRET_LENGTH}`
-  })
+  .test(
+    "is-siret",
+    "Destination: ${originalValue} n'est pas un numéro de SIRET valide",
+    value => !value || isSiret(value)
+  )
   .test(
     "is-recipient-registered-with-right-profile",
     ({ value }) =>
@@ -109,15 +108,16 @@ export const transporterCompanySiretSchema = (isDraft: boolean) =>
         return true;
       }
     )
+    .test(
+      "is-siret",
+      "Transporteur : ${originalValue} n'est pas un numéro de SIRET valide",
+      value => !value || isSiret(value)
+    )
     .when("transporterCompanyVatNumber", (tva, schema) => {
       if (!tva && !isDraft) {
-        return schema
-          .required(`Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`)
-          .test(
-            "is-siret",
-            "${path} n'est pas un numéro de SIRET valide",
-            value => isSiret(value)
-          );
+        return schema.required(
+          `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`
+        );
       }
       if (!isDraft && tva && isFRVat(tva)) {
         return schema.required(

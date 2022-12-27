@@ -4,6 +4,7 @@ import {
   WasteAcceptationStatus,
   BsffFicheIntervention
 } from "@prisma/client";
+import { siretify } from "../../__tests__/factories";
 import {
   receptionSchema,
   emitterSchemaFn,
@@ -33,7 +34,7 @@ jest.mock("../../prisma", () => ({
 describe("emitterSchema", () => {
   const emitter = {
     emitterCompanyName: "Emitter",
-    emitterCompanySiret: "11111111111111",
+    emitterCompanySiret: siretify(1),
     emitterCompanyAddress: "10 chemin fluide, 13001 Marseille",
     emitterCompanyContact: "John Clim",
     emitterCompanyPhone: "06 67 78 95 88",
@@ -68,7 +69,7 @@ describe("emitterSchema", () => {
 describe("transporterSchema", () => {
   const transporter = {
     transporterCompanyName: "Transporteur",
-    transporterCompanySiret: "11111111111111",
+    transporterCompanySiret: siretify(1),
     transporterCompanyAddress: "10 chemin fluide, 13001 Marseille",
     transporterCompanyContact: "John Clim",
     transporterCompanyPhone: "06 67 78 95 88",
@@ -85,11 +86,23 @@ describe("transporterSchema", () => {
     const validateFn = () =>
       transporterSchema.validate({
         ...transporter,
+        transporterCompanySiret: "00000000000000"
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Transporteur : 00000000000000 n'est pas un numéro de SIRET valide"
+    );
+  });
+
+  test("invalid SIRET length", async () => {
+    const validateFn = () =>
+      transporterSchema.validate({
+        ...transporter,
         transporterCompanySiret: "1"
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "transporterCompanySiret n'est pas un numéro de SIRET valide"
+      "Transporteur : 1 n'est pas un numéro de SIRET valide"
     );
   });
 
@@ -109,7 +122,7 @@ describe("transporterSchema", () => {
 describe("destinationSchema", () => {
   const destination = {
     destinationCompanyName: "Transporteur",
-    destinationCompanySiret: "11111111111111",
+    destinationCompanySiret: siretify(1),
     destinationCompanyAddress: "10 chemin fluide, 13001 Marseille",
     destinationCompanyContact: "John Clim",
     destinationCompanyPhone: "06 67 78 95 88",
@@ -127,11 +140,23 @@ describe("destinationSchema", () => {
     const validateFn = () =>
       destinationSchema.validate({
         ...destination,
+        destinationCompanySiret: "11111111111111"
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Destination: 11111111111111 n'est pas un numéro de SIRET valide"
+    );
+  });
+
+  test("invalid SIRET length", async () => {
+    const validateFn = () =>
+      destinationSchema.validate({
+        ...destination,
         destinationCompanySiret: "1"
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Destinataire: Le SIRET doit faire 14 caractères numériques"
+      "Destination: 1 n'est pas un numéro de SIRET valide"
     );
   });
 
@@ -403,7 +428,7 @@ describe("operationSchema", () => {
       operationNextDestinationCompanyName: "ACME INC",
       operationNextDestinationPlannedOperationCode: "R2",
       operationNextDestinationCap: "cap",
-      operationNextDestinationCompanySiret: "11111111111111",
+      operationNextDestinationCompanySiret: siretify(1),
       operationNextDestinationCompanyVatNumber: null,
       operationNextDestinationCompanyAddress: "Quelque part",
       operationNextDestinationCompanyContact: "Mr Déchet",
@@ -456,7 +481,7 @@ describe("operationSchema", () => {
       operationNextDestinationCompanyName: "ACME INC",
       operationNextDestinationPlannedOperationCode: "R2",
       operationNextDestinationCap: "cap",
-      operationNextDestinationCompanySiret: "11111111111111",
+      operationNextDestinationCompanySiret: siretify(1),
       operationNextDestinationCompanyVatNumber: null,
       operationNextDestinationCompanyAddress: "Quelque part",
       operationNextDestinationCompanyContact: "Mr Déchet",

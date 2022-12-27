@@ -12,12 +12,14 @@ export const bsdaFragment = gql`
       company {
         name
         siret
+        orgId
       }
     }
     destination {
       company {
         name
         siret
+        orgId
       }
     }
     worker {
@@ -25,12 +27,14 @@ export const bsdaFragment = gql`
       company {
         name
         siret
+        orgId
       }
     }
     transporter {
       company {
         name
         siret
+        orgId
       }
       customInfo
       transport {
@@ -166,7 +170,6 @@ export const FullBsdaFragment = gql`
     transporter {
       company {
         ...CompanyFragment
-        vatNumber
       }
       customInfo
       recepisse {
@@ -204,6 +207,7 @@ export const FullBsdaFragment = gql`
             company {
               siret
               name
+              orgId
             }
           }
         }

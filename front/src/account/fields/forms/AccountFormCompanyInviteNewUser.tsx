@@ -21,7 +21,7 @@ AccountFormCompanyInviteNewUser.fragments = {
   company: gql`
     fragment AccountFormCompanyInviteNewUserFragment on CompanyPrivate {
       id
-      siret
+      orgId
     }
   `,
 };
@@ -66,7 +66,7 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
 
   return (
     <Formik
-      initialValues={{ email: "", siret: company.siret, role: UserRole.Member }}
+      initialValues={{ email: "", siret: company.orgId, role: UserRole.Member }}
       validate={values => {
         if (!values.email) {
           return { email: "L'email est obligatoire" };

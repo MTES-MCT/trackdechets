@@ -16,7 +16,7 @@ AccountFieldCompanyVerificationStatus.fragments = {
   company: gql`
     fragment AccountFieldCompanyVerificationStatusFragment on CompanyPrivate {
       id
-      siret
+      orgId
       verificationStatus
     }
   `,
@@ -50,7 +50,7 @@ export default function AccountFieldCompanyVerificationStatus({
       modifier="Saisir le code"
       renderForm={toggleEdition => (
         <AccountFormVerifyCompany
-          siret={company.siret}
+          siret={company.orgId}
           toggleEdition={toggleEdition}
         />
       )}

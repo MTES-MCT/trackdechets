@@ -3,6 +3,7 @@ import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
 import {
   companyFactory,
+  siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -40,7 +41,7 @@ describe("query membershipRequest", () => {
     const { errors } = await query<Pick<Query, "membershipRequest">>(
       MEMBERSHIP_REQUEST,
       {
-        variables: { id: "id", siret: "siret" }
+        variables: { id: "id", siret: siretify(7) }
       }
     );
     expect(errors).toHaveLength(1);

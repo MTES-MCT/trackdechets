@@ -68,6 +68,7 @@ function companyToFavorite(
   } & { brokerReceipt?: BrokerReceipt }
 ): CompanyFavorite {
   return {
+    orgId: company.orgId,
     name: company.name,
     siret: company.siret,
     vatNumber: company.vatNumber,
@@ -87,6 +88,7 @@ function companySearchResultToFavorite(
   companySearchResult: CompanySearchResult
 ): CompanyFavorite {
   return {
+    orgId: companySearchResult.orgId,
     name: companySearchResult.name,
     siret: companySearchResult.siret,
     vatNumber: companySearchResult.vatNumber,
@@ -379,8 +381,8 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-  const company = await getCompanyOrCompanyNotFound({ siret });
-  await checkIsCompanyMember({ id: user.id }, { siret: company.siret });
+  const company = await getCompanyOrCompanyNotFound({ orgId: siret });
+  await checkIsCompanyMember({ id: user.id }, { orgId: company.orgId });
 
   const recentPartners = await getRecentPartners(company.siret, type);
   const favorites: CompanyFavorite[] = recentPartners.map(recentPartner => {

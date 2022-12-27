@@ -10,7 +10,11 @@ import {
 } from "generated/graphql/types";
 import { InlineError } from "common/components/Error";
 import { RedErrorMessage } from "common/components";
-import { isSiret } from "generated/constants/companySearchHelpers";
+import {
+  isFRVat,
+  isSiret,
+  isVat,
+} from "generated/constants/companySearchHelpers";
 import { nafCodes } from "generated/constants/NAF";
 
 export const MISSING_COMPANY_SIRET = "Le siret de l'entreprise est obligatoire";
@@ -20,8 +24,7 @@ export const MISSING_COMPANY_VAT =
 const CREATE_ANONYMOUS_COMPANY = gql`
   mutation CreateAnonymousCompany($input: AnonymousCompanyInput!) {
     createAnonymousCompany(input: $input) {
-      siret
-      vatNumber
+      orgId
     }
   }
 `;
@@ -38,11 +41,32 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       )
       .required(),
     name: yup.string().required(),
+    vatNumber: yup
+      .string()
+      .test(
+        "is-vat",
+        "AnonymousCompany: ${originalValue} n'est pas un numéro de TVA valide",
+        value => !value || isVat(value)
+      )
+      .test(
+        "is-not-fr-vat",
+        "AnonymousCompany: impossible de soumettre un numéro de TVA français, seul le SIRET est autorisé",
+        value => !value || !isFRVat(value)
+      ),
     siret: yup
       .string()
-      .ensure()
-      .required("n°SIRET requis")
-      .test("is-siret", "n°SIRET invalide", value => isSiret(value)),
+      .when("vatNumber", {
+        is: vatNumber => !vatNumber,
+        then: schema => schema.required(),
+        otherwise: schema => schema.ensure(),
+      })
+      .test(
+        "is-siret",
+        "n°SIRET invalide",
+        value =>
+          !value ||
+          isSiret(value, import.meta.env.VITE_ALLOW_TEST_COMPANY === "true")
+      ),
   });
 
 export function CreateAnonymousCompany() {
@@ -59,15 +83,20 @@ export function CreateAnonymousCompany() {
         codeNaf: "",
         name: "",
         siret: "",
+        vatNumber: "",
       }}
       validationSchema={AnonymousCompanyInputSchema}
       onSubmit={async (values, { resetForm }) => {
-        await createAnonymousCompany({ variables: { input: values } });
+        const { data } = await createAnonymousCompany({
+          variables: { input: values },
+        });
         resetForm();
-        cogoToast.success(
-          `L'entreprise au SIRET "${values.siret}" est maintenant connue de notre répertoire privé et peut être créée via l'interface.`,
-          { hideAfter: 6 }
-        );
+        if (data) {
+          cogoToast.success(
+            `L'entreprise "${data?.createAnonymousCompany.orgId}" est maintenant connue de notre répertoire privé et peut être créée via l'interface.`,
+            { hideAfter: 6 }
+          );
+        }
       }}
     >
       {() => (
@@ -82,6 +111,17 @@ export function CreateAnonymousCompany() {
               />
             </label>
             <RedErrorMessage name="siret" />
+          </div>
+          <div className="form__row">
+            <label>
+              Numéro de TVA (pour les entreprises étrangères uniquement)
+              <Field
+                name="vatNumber"
+                placeholder="BE123456"
+                className="td-input"
+              />
+            </label>
+            <RedErrorMessage name="vatNumber" />
           </div>
           <div className="form__row">
             <label>

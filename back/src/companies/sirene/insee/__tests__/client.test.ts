@@ -1,6 +1,7 @@
 import { searchCompany, searchCompanies } from "../client";
 import { ErrorCode } from "../../../../common/errors";
 import * as token from "../token";
+import { siretify } from "../../../../__tests__/factories";
 
 const axiosGet = jest.spyOn(token, "authorizedAxiosGet");
 
@@ -16,12 +17,14 @@ describe("searchCompany", () => {
   });
 
   it("should retrieve a company by siret", async () => {
+    const siret = siretify(1);
+
     axiosGet.mockResolvedValueOnce({
       ...axiosResponseDefault,
       status: 200,
       data: {
         etablissement: {
-          siret: "85001946400013",
+          siret,
           uniteLegale: {
             denominationUniteLegale: "CODE EN STOCK",
             categorieJuridiqueUniteLegale: "",
@@ -48,9 +51,9 @@ describe("searchCompany", () => {
       }
     });
 
-    const company = await searchCompany("85001946400013");
+    const company = await searchCompany(siret);
     const expected = {
-      siret: "85001946400013",
+      siret,
       etatAdministratif: "A",
       address: "4 bis BD LONGCHAMP Bat G 13001 Marseille",
       addressVoie: "4 bis BD LONGCHAMP Bat G",
@@ -71,7 +74,7 @@ describe("searchCompany", () => {
       status: 200,
       data: {
         etablissement: {
-          siret: "34393738900041",
+          siret: siretify(1),
           uniteLegale: {
             denominationUniteLegale: "",
             categorieJuridiqueUniteLegale: "1000",
@@ -114,13 +117,14 @@ describe("searchCompany", () => {
   });
 
   it(`should escalate other types of errors
-          (network, internal server error, etc)`, async () => {
+  (network, internal server error, etc)`, async () => {
+    const siret = siretify(1);
     axiosGet.mockRejectedValueOnce({
       message: "Erreur inconnue"
     });
     expect.assertions(1);
     try {
-      await searchCompany("85001946400013");
+      await searchCompany(siret);
     } catch (e) {
       expect(e.message).toEqual("Erreur inconnue");
     }
@@ -133,13 +137,15 @@ describe("searchCompanies", () => {
   });
 
   it("perform a full text search based on a clue", async () => {
+    const siret = siretify(1);
+
     axiosGet.mockResolvedValueOnce({
       ...axiosResponseDefault,
       status: 200,
       data: {
         etablissements: [
           {
-            siret: "85001946400013",
+            siret,
             uniteLegale: {
               denominationUniteLegale: "CODE EN STOCK",
               categorieJuridiqueUniteLegale: "",
@@ -167,7 +173,7 @@ describe("searchCompanies", () => {
     const companies = await searchCompanies("code en stock");
     expect(companies).toHaveLength(1);
     const expected = {
-      siret: "85001946400013",
+      siret,
       address: "4 BD LONGCHAMP 13001 Marseille",
       addressVoie: "4 BD LONGCHAMP",
       addressPostalCode: "13001",
@@ -205,13 +211,14 @@ describe("searchCompanies", () => {
   });
 
   it("should filter results by departement", async () => {
+    const siret = siretify(1);
     axiosGet.mockResolvedValueOnce({
       ...axiosResponseDefault,
       status: 200,
       data: {
         etablissements: [
           {
-            siret: "xxxxxxxxxxxxxx",
+            siret,
             uniteLegale: {
               denominationUniteLegale: "BOULANGERIE",
               categorieJuridiqueUniteLegale: "",
@@ -240,7 +247,7 @@ describe("searchCompanies", () => {
     const companies = await searchCompanies("boulangerie", "07");
     expect(companies).toHaveLength(1);
     const expected = {
-      siret: "xxxxxxxxxxxxxx",
+      siret,
       address: "1 ROUTE DES BLÉS 07100 ANNONAY",
       addressVoie: "1 ROUTE DES BLÉS",
       addressPostalCode: "07100",

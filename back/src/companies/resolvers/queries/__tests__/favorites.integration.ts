@@ -2,6 +2,7 @@ import {
   companyFactory,
   formFactory,
   formWithTempStorageFactory,
+  siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -17,6 +18,7 @@ import { CompanySearchResult } from "../../../types";
 const FAVORITES = `query Favorites($siret: String!, $type: FavoriteType!) {
   favorites(siret: $siret, type: $type) {
     name
+    orgId
     siret
     vatNumber
     address
@@ -181,7 +183,7 @@ describe("query favorites", () => {
     await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: "0".repeat(14),
+        emitterCompanySiret: siretify(1),
         recipientCompanySiret: company.siret
       }
     });
@@ -243,7 +245,7 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        recipientCompanySiret: "0".repeat(14)
+        recipientCompanySiret: siretify(1)
       }
     });
     const { query } = makeClient({ ...user, auth: AuthType.Session });
@@ -314,7 +316,7 @@ describe("query favorites", () => {
     });
     const transporter = await companyFactory({
       vatNumber: "IT09301420155",
-      siret: ""
+      siret: "IT09301420155"
     });
     await formFactory({
       ownerId: user.id,
@@ -358,7 +360,7 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        transporterCompanySiret: "0".repeat(14)
+        transporterCompanySiret: siretify(1)
       }
     });
     const { query } = makeClient({ ...user, auth: AuthType.Session });
@@ -420,7 +422,7 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        recipientCompanySiret: "0".repeat(14),
+        recipientCompanySiret: siretify(1),
         recipientIsTempStorage: true
       }
     });
@@ -484,7 +486,7 @@ describe("query favorites", () => {
     await formWithTempStorageFactory({
       ownerId: user.id,
       opt: { emitterCompanySiret: company.siret },
-      forwardedInOpts: { recipientCompanySiret: "0".repeat(14) }
+      forwardedInOpts: { recipientCompanySiret: siretify(1) }
     });
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });
@@ -499,8 +501,10 @@ describe("query favorites", () => {
   });
 
   it("should return recent next destinations", async () => {
+    const siret = siretify(1);
     const destination: CompanySearchResult = {
-      siret: "0".repeat(14),
+      siret,
+      orgId: siret,
       address: "rue des 4 chemins",
       name: "Destination ultérieure",
       isRegistered: true,
@@ -560,7 +564,7 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        nextDestinationCompanySiret: "0".repeat(14)
+        nextDestinationCompanySiret: siretify(1)
       }
     });
 
@@ -588,6 +592,7 @@ describe("query favorites", () => {
     });
 
     const traderSirene: CompanySearchResult = {
+      orgId: trader.siret,
       siret: trader.siret,
       address: "rue des 4 chemins",
       name: "Négociant",
@@ -653,6 +658,7 @@ describe("query favorites", () => {
 
     const brokerSirene: CompanySearchResult = {
       siret: broker.siret,
+      orgId: broker.siret,
       address: "rue des 4 chemins",
       name: "Courtier",
       isRegistered: true,
@@ -915,11 +921,12 @@ describe("query favorites", () => {
       }
     });
     const destination = await companyFactory();
+    const recipientCompanySiret = siretify(1);
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        recipientCompanySiret: "0".repeat(14),
+        recipientCompanySiret,
         recipientIsTempStorage: true,
         forwardedIn: {
           create: {
@@ -928,7 +935,7 @@ describe("query favorites", () => {
             recipientCompanySiret: destination.siret
           }
         },
-        recipientsSirets: ["0".repeat(14), destination.siret]
+        recipientsSirets: [recipientCompanySiret, destination.siret]
       }
     });
     const forwardedIn = await prisma.form

@@ -30,6 +30,7 @@ export async function getCompanyInfos(
   const searchResult = await searchCompany(siretOrVat);
 
   return {
+    orgId: searchResult.orgId,
     siret: searchResult.siret,
     vatNumber: searchResult.vatNumber,
     codePaysEtrangerEtablissement: searchResult.codePaysEtrangerEtablissement,
@@ -81,6 +82,7 @@ const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
   } else {
     // hide non-diffusible Company from public query
     return {
+      orgId: companyInfos.orgId,
       siret: companyInfos.siret,
       vatNumber: companyInfos.vatNumber,
       isRegistered: companyInfos.isRegistered,

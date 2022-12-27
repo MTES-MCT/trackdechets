@@ -35,11 +35,11 @@ export default function CompaniesVerificationTable({
       },
       {
         Header: "Établissement",
-        accessor: row => ({ siret: row.siret, name: row.name }),
+        accessor: row => ({ orgId: row.orgId, name: row.name }),
         disableFilters: true,
         Cell: ({ value }) => (
           <>
-            <div>{value.siret}</div>
+            <div>{value.orgId}</div>
             <div>{value.name}</div>
           </>
         ),

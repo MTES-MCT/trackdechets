@@ -4,6 +4,7 @@ import {
 } from "../../../integration-tests/helper";
 import getReadableId from "../../forms/readableId";
 import { BsdType } from "../../generated/graphql/types";
+import { siretify } from "../../__tests__/factories";
 import { BsdElastic, client, index, indexBsds } from "../elastic";
 
 const defaultOpts: BsdElastic = {
@@ -12,16 +13,16 @@ const defaultOpts: BsdElastic = {
   customId: null,
   type: "BSDD" as BsdType,
   emitterCompanyName: "emitter name",
-  emitterCompanySiret: "emitter siret",
+  emitterCompanySiret: siretify(1),
   transporterCompanyName: "transporter name",
-  transporterCompanySiret: "transporter siret",
+  transporterCompanySiret: siretify(2),
   transporterTakenOverAt: null,
   wasteCode: "01 01 01",
   wasteDescription: "déchets",
   transporterNumberPlate: [],
   transporterCustomInfo: null,
   destinationCompanyName: "destination name",
-  destinationCompanySiret: "destination siret",
+  destinationCompanySiret: siretify(3),
   destinationReceptionDate: null,
   destinationReceptionWeight: null,
   destinationOperationCode: "D10",

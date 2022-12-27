@@ -6,6 +6,7 @@ import {
   destinationFactory,
   formFactory,
   formWithTempStorageFactory,
+  siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -408,6 +409,7 @@ describe("Mutation markAsResealed", () => {
 
     const { mutate } = makeClient(user);
 
+    const recipientCompanySiret = siretify(3);
     const form = await formWithTempStorageFactory({
       ownerId: owner.id,
       opt: {
@@ -417,7 +419,7 @@ describe("Mutation markAsResealed", () => {
       },
       forwardedInOpts: {
         // this SIRET is not registered in TD
-        recipientCompanySiret: "3".repeat(14)
+        recipientCompanySiret
       }
     });
 
@@ -430,9 +432,7 @@ describe("Mutation markAsResealed", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination avec le SIRET ${"3".repeat(
-          14
-        )} n'est pas inscrite sur Trackdéchets`
+        message: `L'installation de destination avec le SIRET ${recipientCompanySiret} n'est pas inscrite sur Trackdéchets`
       })
     ]);
   });

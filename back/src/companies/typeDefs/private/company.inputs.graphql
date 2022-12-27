@@ -356,10 +356,8 @@ input SendVerificationCodeLetterInput {
 }
 
 input AnonymousCompanyInput {
-  """
-  SIRET ou TVA si entreprise étrangère
-  """
-  siret: String!
+  siret: String
+  vatNumber: String
   name: String!
   codeNaf: String!
   address: String!

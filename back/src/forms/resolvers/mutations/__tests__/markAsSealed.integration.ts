@@ -12,6 +12,7 @@ import {
   destinationFactory,
   formFactory,
   formWithTempStorageFactory,
+  siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -64,7 +65,7 @@ const formdataForPrivateOrShip = {
   recipientCompanyMail: "recipient@td.io",
   recipientCompanyName: "WASTE COMPANY",
   recipientCompanyPhone: "06 18 76 02 99",
-  recipientCompanySiret: "56847895684123",
+  recipientCompanySiret: siretify(1),
   recipientProcessingOperation: "D 6",
   sentAt: "2019-11-20T00:00:00.000Z",
   sentBy: "signe",
@@ -82,7 +83,7 @@ const formdataForPrivateOrShip = {
   transporterCompanyName: "WASTE TRANSPORTER",
   transporterCompanyPhone: "06 18 76 02 66",
   transporterCompanyContact: "Walter Transporter",
-  transporterCompanySiret: "12345678974589",
+  transporterCompanySiret: siretify(1),
   transporterDepartment: "86",
   transporterIsExemptedOfReceipt: false,
   transporterNumberPlate: "aa22",
@@ -684,11 +685,12 @@ describe("Mutation.markAsSealed", () => {
     const { user, company: emitterCompany } = await userWithCompanyFactory(
       "MEMBER"
     );
+    const recipientCompanySiret = siretify(3);
     const form = await formFactory({
       ownerId: user.id,
       opt: {
         emitterCompanySiret: emitterCompany.siret,
-        recipientCompanySiret: "12345654327896"
+        recipientCompanySiret
       }
     });
     const { mutate } = makeClient(user);
@@ -700,7 +702,7 @@ describe("Mutation.markAsSealed", () => {
       expect.objectContaining({
         message: [
           "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
-          `Erreur(s): L'installation de destination avec le SIRET 12345654327896 n'est pas inscrite sur Trackdéchets`
+          `Erreur(s): L'installation de destination avec le SIRET ${recipientCompanySiret} n'est pas inscrite sur Trackdéchets`
         ].join("\n")
       })
     ]);
@@ -751,11 +753,13 @@ describe("Mutation.markAsSealed", () => {
         recipientCompanySiret: collector.siret
       }
     });
+
+    const recipientCompanySiret = siretify(3);
     await prisma.form.update({
       where: { id: form.id },
       data: {
         forwardedIn: {
-          update: { recipientCompanySiret: "12345654327896" }
+          update: { recipientCompanySiret }
         }
       }
     });
@@ -765,7 +769,7 @@ describe("Mutation.markAsSealed", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination avec le SIRET 12345654327896 n'est pas inscrite sur Trackdéchets`
+        message: `L'installation de destination avec le SIRET ${recipientCompanySiret} n'est pas inscrite sur Trackdéchets`
       })
     ]);
   });
@@ -900,7 +904,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         status: "DRAFT",
-        emitterCompanySiret: "12345654327896",
+        emitterCompanySiret: siretify(3),
         emitterCompanyContact: "John Snow",
         emitterCompanyMail: "john.snow@trackdechets.fr",
         recipientCompanySiret: destination.siret
@@ -935,13 +939,13 @@ describe("Mutation.markAsSealed", () => {
         companyTypes: [CompanyType.WASTEPROCESSOR]
       }
     );
-
+    const emitterCompanySiret = siretify(3);
     // a previous non draft BSD already exists
     await formFactory({
       ownerId: user.id,
       opt: {
         status: "PROCESSED",
-        emitterCompanySiret: "12345654327896",
+        emitterCompanySiret,
         emitterCompanyContact: "John Snow",
         emitterCompanyMail: "john.snow@trackdechets.fr",
         recipientCompanySiret: destination.siret
@@ -952,7 +956,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         status: "DRAFT",
-        emitterCompanySiret: "12345654327896",
+        emitterCompanySiret,
         emitterCompanyContact: "John Snow",
         emitterCompanyMail: "john.snow@trackdechets.fr",
         recipientCompanySiret: destination.siret

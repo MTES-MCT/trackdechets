@@ -2,6 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { Mutation } from "../../../../generated/graphql/types";
 import {
+  siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -71,7 +72,7 @@ describe("Mutation.Vhu.createDraft", () => {
           input: {
             emitter: {
               company: {
-                siret: "siret"
+                siret: siretify(7)
               }
             }
           }
@@ -101,7 +102,7 @@ describe("Mutation.Vhu.createDraft", () => {
       },
       destination: {
         company: {
-          siret: "3".repeat(14)
+          siret: siretify(3)
         }
       }
     };

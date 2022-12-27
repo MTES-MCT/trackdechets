@@ -5,6 +5,7 @@ import prisma from "../../../../prisma";
 import {
   formFactory,
   formWithTempStorageFactory,
+  siretify,
   toIntermediaryCompany,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -47,7 +48,7 @@ describe("Mutation.duplicateForm", () => {
       "with an eco-organisme",
       {
         ecoOrganismeName: "COREPILE",
-        ecoOrganismeSiret: "12345678912345"
+        ecoOrganismeSiret: siretify(1)
       }
     ]
   ])("should duplicate a form %s", async (_, opt) => {

@@ -12,6 +12,7 @@ export const COMPANIES_FOR_VERIFICATION = gql`
         id
         createdAt
         siret
+        orgId
         name
         companyTypes
         verificationStatus

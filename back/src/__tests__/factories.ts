@@ -1,4 +1,6 @@
 import { hash } from "bcrypt";
+import { faker } from "@faker-js/faker";
+import crypto from "crypto";
 import getReadableId from "../forms/readableId";
 import {
   CompanyType,
@@ -35,19 +37,19 @@ export const userFactory = async (
 };
 
 /**
- * Left pad a given index with 0s
+ * Return a random valid siret
+ * a random number will not pass the luhnCheck
  * @param index numerical index
  */
-function siretify(index) {
-  const siretLength = 14;
-  const siret = `${index}`;
-  if (siret.length === siretLength) {
-    return siret;
+export function siretify(index: number | undefined) {
+  if (index === null || index > 9) {
+    return faker.helpers.replaceCreditCardSymbols(
+      Math.floor(Number(crypto.randomBytes(1))) + "############L"
+    );
   }
-  if (siret.length > siretLength) {
-    throw Error("Generated siret is too long");
-  }
-  return siret.padStart(14, "9");
+  return faker.helpers.replaceCreditCardSymbols(
+    Math.abs(index) + "############L"
+  );
 }
 
 /**
@@ -60,9 +62,11 @@ export const companyFactory = async (
   const opts = companyOpts || {};
 
   const companyIndex = (await prisma.company.count()) + 1;
+  const siret = opts.siret ? opts.siret : siretify(companyIndex);
   return prisma.company.create({
     data: {
-      siret: siretify(companyIndex),
+      orgId: siret,
+      siret,
       companyTypes: {
         set: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"]
       },
@@ -120,7 +124,7 @@ export const userWithCompanyFactory = async (
   const user = await userFactory({
     companyAssociations: {
       create: {
-        company: { connect: { siret: company.siret } },
+        company: { connect: { id: company.id } },
         role: role as UserRole
       }
     }
@@ -174,7 +178,7 @@ const formdata = {
   emitterCompanyMail: "emitter@compnay.fr",
   emitterCompanyName: "WASTE PRODUCER",
   emitterCompanyPhone: "06 18 76 02 96",
-  emitterCompanySiret: "15397456982146",
+  emitterCompanySiret: siretify(1),
   emitterType: "PRODUCER" as EmitterType,
   emitterWorkSiteAddress: "",
   emitterWorkSiteCity: "",
@@ -203,7 +207,7 @@ const formdata = {
   recipientCompanyMail: "recipient@td.io",
   recipientCompanyName: "WASTE COMPANY",
   recipientCompanyPhone: "06 18 76 02 99",
-  recipientCompanySiret: "56847895684123",
+  recipientCompanySiret: siretify(2),
   recipientProcessingOperation: "D 6",
   sentAt: "2019-11-20T00:00:00.000Z",
   sentBy: "signe",
@@ -223,7 +227,7 @@ const formdata = {
   transporterCompanyMail: "transporter@td.io",
   transporterCompanyName: "WASTE TRANSPORTER",
   transporterCompanyPhone: "06 18 76 02 66",
-  transporterCompanySiret: "12345678974589",
+  transporterCompanySiret: siretify(1),
   transporterDepartment: "86",
   transporterIsExemptedOfReceipt: false,
   transporterNumberPlate: "aa22",
@@ -250,7 +254,7 @@ export const forwardedInData: Partial<Prisma.FormCreateInput> = {
   receivedBy: "John Dupont",
   signedAt: "2019-12-20T00:00:00.000Z",
   recipientCompanyName: "Incinérateur du Grand Est",
-  recipientCompanySiret: "65478235968471",
+  recipientCompanySiret: siretify(3),
   recipientCompanyAddress: "4 chemin des déchets, Mulhouse",
   recipientCompanyContact: "Louis Henry",
   recipientCompanyPhone: "0700000000",
@@ -262,7 +266,7 @@ export const forwardedInData: Partial<Prisma.FormCreateInput> = {
   wasteDetailsQuantity: 1,
   wasteDetailsQuantityType: "ESTIMATED",
   transporterCompanyName: "Transporteur",
-  transporterCompanySiret: "36947581236985",
+  transporterCompanySiret: siretify(4),
   transporterCompanyAddress: "6 chemin des pneus, 07100 Bourg d'ici",
   transporterCompanyContact: "Mathieu O'connor",
   transporterCompanyPhone: "0700000000",
@@ -293,6 +297,7 @@ export const upsertBaseSiret = async siret => {
     try {
       await prisma.company.create({
         data: {
+          orgId: siret,
           siret,
           companyTypes: {
             set: ["TRANSPORTER", "WASTEPROCESSOR"]
@@ -403,21 +408,18 @@ export const applicationFactory = async () => {
 };
 
 export const ecoOrganismeFactory = async ({
-  count = null,
+  siret = null,
   handleBsdasri = false
 }: {
-  count?: number;
+  siret?: string;
   handleBsdasri?: boolean;
 }) => {
-  const ecoOrganismeIndex = !!count
-    ? count + 1
-    : (await prisma.ecoOrganisme.count()) + 1;
-
+  const ecoOrganismeIndex = (await prisma.ecoOrganisme.count()) + 1;
   const ecoOrganisme = await prisma.ecoOrganisme.create({
     data: {
       address: "",
       name: `Eco-Organisme ${ecoOrganismeIndex}`,
-      siret: siretify(ecoOrganismeIndex),
+      siret: siret ?? siretify(ecoOrganismeIndex),
       handleBsdasri
     }
   });

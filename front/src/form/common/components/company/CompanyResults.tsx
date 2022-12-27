@@ -20,6 +20,7 @@ interface CompanyResultsProps<T> {
 type CompanyResultBase = Pick<
   CompanySearchResult,
   | "siret"
+  | "orgId"
   | "name"
   | "address"
   | "isRegistered"
@@ -31,10 +32,7 @@ export function isSelected<T extends CompanyResultBase>(
   item: T,
   selectedItem: T | null
 ): boolean {
-  return (
-    item.siret === selectedItem?.siret ||
-    (!!item.vatNumber && item.vatNumber === selectedItem?.vatNumber)
-  );
+  return item.orgId === selectedItem?.orgId;
 }
 
 export default function CompanyResults<T extends CompanyResultBase>({
@@ -45,8 +43,7 @@ export default function CompanyResults<T extends CompanyResultBase>({
 }: CompanyResultsProps<T>) {
   // prepend selectedItem if it's not in the results
   if (
-    selectedItem &&
-    (selectedItem.siret || selectedItem.vatNumber) &&
+    selectedItem?.orgId &&
     !results.some(result => isSelected(result, selectedItem))
   ) {
     results.unshift(selectedItem);
@@ -56,7 +53,7 @@ export default function CompanyResults<T extends CompanyResultBase>({
     <ul className={styles.results}>
       {results.map(item => (
         <CompanyResult
-          key={item.siret ?? item.vatNumber!}
+          key={item.orgId!}
           item={item}
           selectedItem={selectedItem}
           onSelect={onSelect}
@@ -80,7 +77,7 @@ export function CompanyResult<T extends CompanyResultBase>({
 }: CompanyResultProp<T>) {
   return (
     <li
-      key={item.siret ?? item.vatNumber!}
+      key={item.orgId!}
       className={classNames(styles.resultsItem, {
         [styles.isSelected]: isSelected(item, selectedItem),
       })}
@@ -100,8 +97,7 @@ export function CompanyResult<T extends CompanyResultBase>({
           )}
         </h6>
         <p>
-          {item.siret?.length ? item.siret : item.vatNumber} -{" "}
-          {item.address ? item.address : "[Adresse inconnue]"}
+          {item.orgId} - {item.address ? item.address : "[Adresse inconnue]"}
           {item.codePaysEtrangerEtablissement
             ? ` - ${item.codePaysEtrangerEtablissement}`
             : ""}
@@ -109,7 +105,7 @@ export function CompanyResult<T extends CompanyResultBase>({
         <p>
           <a
             href={generatePath(routes.company, {
-              siret: item.siret?.length ? item.siret : item.vatNumber!,
+              orgId: item.orgId!,
             })}
             onClick={e => e.stopPropagation()}
             target="_blank"

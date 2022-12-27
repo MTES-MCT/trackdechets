@@ -19,8 +19,8 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
 
   if (siret) {
     // a siret is specified, check user has permission on this company
-    company = await getCompanyOrCompanyNotFound({ siret });
-    await checkIsCompanyMember({ id: user.id }, { siret });
+    company = await getCompanyOrCompanyNotFound({ orgId: siret });
+    await checkIsCompanyMember({ id: user.id }, { orgId: siret });
   } else {
     const userCompanies = await getUserCompanies(user.id);
 

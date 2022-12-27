@@ -95,7 +95,7 @@ const getSiretWhoSigns = async ({
     // One allowed siret ? let's use it
     [siretWhoSigns] = authorizedSirets;
     // Is this siret belonging to a current user ?
-    await checkIsCompanyMember({ id: userId }, { siret: siretWhoSigns });
+    await checkIsCompanyMember({ id: userId }, { orgId: siretWhoSigns });
   } else {
     // several allowed sirets ? take the first belonging to current user
     const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(userId);

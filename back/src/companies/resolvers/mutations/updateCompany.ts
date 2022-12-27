@@ -5,6 +5,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../database";
 import { checkIsCompanyAdmin } from "../../../users/permissions";
 import { updateCompanyFn } from "./updateCompanyService";
+import { isForeignVat } from "../../../common/constants/companySearchHelpers";
 
 const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   parent,
@@ -23,9 +24,9 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
     elt => elt !== "TRANSPORTER"
   );
   // check that a TRANSPORTER identified by VAT is not updated to any other type
-  if (company.vatNumber === company.siret && updateOtherThanTransporter) {
+  if (isForeignVat(company.vatNumber) && updateOtherThanTransporter) {
     throw new UserInputError(
-      "Impossible de changer de type TRANSPORTER pour un établissement transporteur identifié par son numéro de TVA"
+      "Impossible de changer de type TRANSPORTER pour un établissement transporteur étranger"
     );
   }
   if (companyTypes.includes("ECO_ORGANISME")) {

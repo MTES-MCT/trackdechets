@@ -163,7 +163,7 @@ describe("mutation updateCompany", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Impossible de changer de type TRANSPORTER pour un établissement transporteur identifié par son numéro de TVA"
+          "Impossible de changer de type TRANSPORTER pour un établissement transporteur étranger"
       })
     ]);
 

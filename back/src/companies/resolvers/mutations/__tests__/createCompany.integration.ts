@@ -3,16 +3,24 @@ import prisma from "../../../../prisma";
 import { AuthType } from "../../../../auth";
 import { ErrorCode } from "../../../../common/errors";
 import * as mailsHelper from "../../../../mailer/mailing";
-import { companyFactory, userFactory } from "../../../../__tests__/factories";
+import {
+  companyFactory,
+  siretify,
+  userFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import * as geocode from "../../../geo/geocode";
 import { CompanyType } from "@prisma/client";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../../mailer/templates";
-import { Mutation } from "../../../../generated/graphql/types";
-import * as searchCompany from "../../../sirene/searchCompany";
+import {
+  Mutation,
+  StatutDiffusionEtablissement
+} from "../../../../generated/graphql/types";
+import * as search from "../../../search";
 
-const searchSirene = jest.spyOn(searchCompany, "default");
+// Mock external search services
+const searchCompany = jest.spyOn(search, "searchCompany");
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -53,22 +61,23 @@ const CREATE_COMPANY = `
 describe("Mutation.createCompany", () => {
   afterEach(async () => {
     await resetDatabase();
-    searchSirene.mockReset();
+    searchCompany.mockReset();
   });
 
   it("should create company and userAssociation", async () => {
     const user = await userFactory();
-
+    const orgId = siretify(7);
     const companyInput = {
-      orgId: "12345678912345",
+      orgId,
       gerepId: "1234",
       companyName: "Acme",
       address: "3 rue des granges",
       companyTypes: ["PRODUCER"]
     };
 
-    searchSirene.mockResolvedValueOnce({
-      siret: "12345678912345",
+    searchCompany.mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
       etatAdministratif: "A"
     });
 
@@ -115,8 +124,9 @@ describe("Mutation.createCompany", () => {
   it("should create company allowing dasri direct takeOver", async () => {
     const user = await userFactory();
 
+    const orgId = siretify(1);
     const companyInput = {
-      orgId: "12345678912345",
+      orgId,
       gerepId: "1234",
       companyName: "Acme",
       address: "3 rue des granges",
@@ -124,8 +134,9 @@ describe("Mutation.createCompany", () => {
       allowBsdasriTakeOverWithoutSignature: true
     };
 
-    searchSirene.mockResolvedValueOnce({
-      siret: "12345678912345",
+    searchCompany.mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
       etatAdministratif: "A"
     });
 
@@ -179,16 +190,18 @@ describe("Mutation.createCompany", () => {
         department: "07"
       }
     });
+    const orgId = siretify(1);
     const companyInput = {
-      orgId: "12345678912345",
+      orgId,
       companyName: "Acme",
       address: "3 rue des granges",
       companyTypes: ["TRANSPORTER"],
       transporterReceiptId: transporterReceipt.id
     };
 
-    searchSirene.mockResolvedValueOnce({
-      siret: "12345678912345",
+    searchCompany.mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
       etatAdministratif: "A"
     });
 
@@ -223,16 +236,18 @@ describe("Mutation.createCompany", () => {
         department: "07"
       }
     });
+    const orgId = siretify(7);
     const companyInput = {
-      orgId: "12345678912345",
+      orgId,
       companyName: "Acme",
       address: "3 rue des granges",
       companyTypes: ["TRADER"],
       traderReceiptId: traderReceipt.id
     };
 
-    searchSirene.mockResolvedValueOnce({
-      siret: "12345678912345",
+    searchCompany.mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
       etatAdministratif: "A"
     });
 
@@ -271,7 +286,8 @@ describe("Mutation.createCompany", () => {
       companyTypes: company.companyTypes
     };
 
-    searchSirene.mockResolvedValueOnce({
+    searchCompany.mockResolvedValueOnce({
+      orgId: company.orgId,
       siret: company.siret,
       etatAdministratif: "A"
     });
@@ -289,8 +305,10 @@ describe("Mutation.createCompany", () => {
 
   it("should return an error when creating an unknown eco-organisme", async () => {
     const user = await userFactory();
-    searchSirene.mockResolvedValueOnce({
-      siret: "1".repeat(14),
+    const siret = siretify(1);
+    searchCompany.mockResolvedValueOnce({
+      orgId: siret,
+      siret,
       etatAdministratif: "A"
     });
 
@@ -298,7 +316,7 @@ describe("Mutation.createCompany", () => {
     const { errors } = await mutate(CREATE_COMPANY, {
       variables: {
         companyInput: {
-          orgId: "1".repeat(14),
+          orgId: siret,
           companyName: "UN BEL ECO ORGANISME",
           address: "3 rue des granges",
           companyTypes: ["ECO_ORGANISME"]
@@ -316,15 +334,16 @@ describe("Mutation.createCompany", () => {
 
   it("should return an error when creating an eco-organisme without its agreement", async () => {
     const user = await userFactory();
-
+    const siret = siretify(1);
     const companyInput = {
-      orgId: "1".repeat(14),
+      orgId: siret,
       companyName: "UN BEL ECO ORGANISME",
       address: "3 rue des granges",
       companyTypes: ["ECO_ORGANISME"]
     };
-    searchSirene.mockResolvedValueOnce({
-      siret: "1".repeat(14),
+    searchCompany.mockResolvedValueOnce({
+      orgId: siret,
+      siret,
       etatAdministratif: "A"
     });
 
@@ -353,15 +372,17 @@ describe("Mutation.createCompany", () => {
   it("should allow creating a known eco-organisme with its agreement", async () => {
     const user = await userFactory();
 
+    const siret = siretify(1);
     const companyInput = {
-      orgId: "1".repeat(14),
+      orgId: siret,
       companyName: "UN BEL ECO ORGANISME",
       address: "3 rue des granges",
       companyTypes: ["ECO_ORGANISME"],
       ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
     };
-    searchSirene.mockResolvedValueOnce({
-      siret: "1".repeat(14),
+    searchCompany.mockResolvedValueOnce({
+      orgId: siret,
+      siret,
       etatAdministratif: "A"
     });
 
@@ -390,16 +411,18 @@ describe("Mutation.createCompany", () => {
 
   it("should return an error when creating a producer company with eco-organisme agreements", async () => {
     const user = await userFactory();
+    const siret = siretify(1);
 
     const companyInput = {
-      orgId: "1".repeat(14),
+      orgId: siret,
       companyName: "UN BEL ECO ORGANISME",
       address: "3 rue des granges",
       companyTypes: ["PRODUCER"],
       ecoOrganismeAgreements: ["https://legifrance.com/agreement"]
     };
-    searchSirene.mockResolvedValueOnce({
-      siret: "1".repeat(14),
+    searchCompany.mockResolvedValueOnce({
+      orgId: siret,
+      siret,
       etatAdministratif: "A"
     });
 
@@ -432,8 +455,9 @@ describe("Mutation.createCompany", () => {
     const geocode = require("../../../geo/geocode");
     const searchCompanyReload = require("../../../sirene/searchCompany");
     const searchSireneMock = jest.spyOn(searchCompanyReload, "default");
+    const siret = siretify(8);
     searchSireneMock.mockResolvedValueOnce({
-      siret: "12345678912345",
+      siret,
       etatAdministratif: "A"
     });
     // No mails
@@ -447,7 +471,7 @@ describe("Mutation.createCompany", () => {
 
     const user = await userFactory();
     const companyInput = {
-      orgId: "12345678912345",
+      orgId: siret,
       gerepId: "1234",
       companyName: "Acme",
       address: "3 rue des granges",
@@ -485,6 +509,18 @@ describe("Mutation.createCompany", () => {
       companyTypes: ["TRANSPORTER"]
     };
 
+    // Company Infos are different
+    const testValue = {
+      orgId: "RO17579668",
+      vatNumber: "RO17579668",
+      address: "RO Transporter street",
+      name: "Acme in RO",
+      codePaysEtrangerEtablissement: "RO",
+      statutDiffusionEtablissement: "O" as StatutDiffusionEtablissement,
+      etatAdministratif: "A"
+    };
+    searchCompany.mockResolvedValue(testValue);
+
     const { mutate } = makeClient({ ...user, auth: AuthType.Session });
     const { data } = await mutate(CREATE_COMPANY, {
       variables: {
@@ -492,19 +528,16 @@ describe("Mutation.createCompany", () => {
       }
     });
 
-    expect(data).toEqual({
-      createCompany: {
-        allowBsdasriTakeOverWithoutSignature: false,
-        companyTypes: ["TRANSPORTER"],
-        ecoOrganismeAgreements: [],
-        gerepId: null,
-        name: "Acme in EU",
-        siret: "RO17579668",
-        address: "Transporter street",
-        traderReceipt: null,
-        transporterReceipt: null,
-        vatNumber: "RO17579668"
-      }
+    expect(data.createCompany).toMatchObject({
+      allowBsdasriTakeOverWithoutSignature: false,
+      companyTypes: ["TRANSPORTER"],
+      ecoOrganismeAgreements: [],
+      gerepId: null,
+      name: "Acme in EU",
+      address: "Transporter street",
+      traderReceipt: null,
+      transporterReceipt: null,
+      vatNumber: "RO17579668"
     });
   });
 
@@ -536,5 +569,30 @@ describe("Mutation.createCompany", () => {
         })
       ]);
     }
+  });
+
+  it("should return an error when creating a company with FRENCH VAT number", async () => {
+    const user = await userFactory();
+
+    const companyInput = {
+      orgId: "FR87850019464",
+      companyName: "Acme in FR",
+      address: "une adresse",
+      companyTypes: [CompanyType.TRANSPORTER]
+    };
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indiquer un SIRET"
+      })
+    ]);
   });
 });
