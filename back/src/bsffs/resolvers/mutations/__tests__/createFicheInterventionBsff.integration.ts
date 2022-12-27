@@ -112,7 +112,7 @@ describe("Mutation.createFicheInterventionBsff", () => {
           "Le SIRET de l'entreprise détentrice de l'équipement est requis\n" +
           "Le nom du contact de l'entreprise détentrice de l'équipement est requis\n" +
           "Le numéro de téléphone de l'entreprise détentrice de l'équipement est requis\n" +
-          "L'addresse email de l'entreprise détentrice de l'équipement est requis"
+          "L'adresse email de l'entreprise détentrice de l'équipement est requis"
       })
     ]);
   });
@@ -183,7 +183,7 @@ describe("Mutation.createFicheInterventionBsff", () => {
       expect.objectContaining({
         message:
           "Le nom du détenteur de l'équipement (particulier) est requis\n" +
-          "L'addresse du détenteur de l'équipement (particulier) est requise"
+          "L'adresse du détenteur de l'équipement (particulier) est requise"
       })
     ]);
   });
