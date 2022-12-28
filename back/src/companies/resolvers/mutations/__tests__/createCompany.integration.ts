@@ -596,4 +596,34 @@ describe("Mutation.createCompany", () => {
       })
     ]);
   });
+  it("should return an error when creating a closed company ", async () => {
+    const user = await userFactory();
+    const orgId = siretify(8);
+    searchCompany.mockResolvedValueOnce({
+      orgId,
+      siret: orgId,
+      etatAdministratif: "F"
+    });
+
+    const companyInput = {
+      orgId: "FR87850019464",
+      companyName: "Acme in FR",
+      address: "une adresse",
+      companyTypes: [CompanyType.TRANSPORTER]
+    };
+
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const { errors } = await mutate(CREATE_COMPANY, {
+      variables: {
+        companyInput
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indiquer un SIRET"
+      })
+    ]);
+  });
 });

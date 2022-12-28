@@ -7,7 +7,8 @@ import {
   beforeSignedByTransporterSchema,
   checkCanBeSealed,
   validateForwardedInCompanies,
-  wasteDetailsSchema
+  wasteDetailsSchema,
+  checkForClosedCompanies
 } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
@@ -60,6 +61,13 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
         where: { siret: form.emitterCompanySiret }
       })) > 0
     : false;
+
+  /**
+   * Check for closed companies or throw an exception
+   */
+  if (process.env.VERIFY_COMPANY === "true") {
+    await checkForClosedCompanies(form.id);
+  }
 
   const resultingForm = await runInTransaction(async transaction => {
     const formRepository = getFormRepository(user, transaction);

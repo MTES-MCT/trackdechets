@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { gql, useLazyQuery, useMutation } from "@apollo/client";
+import { ApolloError, gql, useLazyQuery, useMutation } from "@apollo/client";
+import cogoToast from "cogo-toast";
 import { Field, Form, Formik } from "formik";
+import React, { useState } from "react";
 import { COMPANY_PRIVATE_INFOS } from "form/common/components/company/query";
 import AccountCompanyAddMembershipRequest from "./AccountCompanyAddMembershipRequest";
 import styles from "../AccountCompanyAdd.module.scss";
@@ -9,6 +10,8 @@ import {
   isFRVat,
   isSiret,
   isVat,
+  isClosedCompany,
+  CLOSED_COMPANY_ERROR,
 } from "generated/constants/companySearchHelpers";
 
 import {
@@ -19,6 +22,7 @@ import {
   TextInput,
   Alert,
 } from "@dataesr/react-dsfr";
+import { GraphQLError } from "graphql";
 
 type IProps = {
   onCompanyInfos: (companyInfos) => void;
@@ -149,11 +153,9 @@ export default function AccountCompanyAddSiret({
     Pick<Query, "companyPrivateInfos">
   >(COMPANY_PRIVATE_INFOS, {
     onCompleted: data => {
-      if (data && data.companyPrivateInfos) {
+      if (data?.companyPrivateInfos) {
         const companyInfos = data.companyPrivateInfos;
-        if (companyInfos.etatAdministratif === "F") {
-          setIsClosed(true);
-        } else {
+        if (!isClosedCompany(companyInfos)) {
           // Non-diffusible mais pas encore inscrit en AnonymousCompany
           if (
             companyInfos?.statutDiffusionEtablissement === "N" &&
@@ -167,6 +169,21 @@ export default function AccountCompanyAddSiret({
           setIsDisabled(!companyInfos?.isRegistered);
           setIsRegistered(companyInfos?.isRegistered ?? false);
           setIsClosed(false);
+        } else {
+          // This is just a security if we change COMPANY_PRIVATE_INFOS behavior
+          // because it must raise an error in this case.
+          setIsClosed(true);
+        }
+      }
+    },
+    onError: (error: ApolloError) => {
+      if (error.graphQLErrors.length) {
+        if (
+          error.graphQLErrors.some(
+            error => error.message.search(CLOSED_COMPANY_ERROR) === -1
+          )
+        ) {
+          setIsClosed(true);
         }
       }
     },

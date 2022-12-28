@@ -16,6 +16,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Amélioration de la recherche par numéro de TVA et accélération requêtes pour les établissement déjà enregistrés [PR 1988](https://github.com/MTES-MCT/trackdechets/pull/1988)
+- API : il n'est plus possible de créer un établissement ni de valider un BSDD avec un SIRET qui est fermé ou introuvable selon l'insee [PR 2003](https://github.com/MTES-MCT/trackdechets/pull/2003)
 
 # [2023.1.3] 19/01/2023
 
