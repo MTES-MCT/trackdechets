@@ -1,6 +1,7 @@
 import {
   BsdaEcoOrganisme,
   BsdaWeight,
+  BsdaWorker,
   BsdType,
   BsffWeight,
   BsvhuWeight,
@@ -44,7 +45,8 @@ export enum BsdStatusCode {
 
 export interface BsdDisplay {
   id: string;
-  type?: BsdType | undefined;
+  type: BsdType;
+  isDraft: boolean;
   status: BsdStatusCode;
   wasteDetails: {
     code?: Maybe<string>;
@@ -58,4 +60,5 @@ export interface BsdDisplay {
   isTempStorage?: Maybe<boolean>;
   updatedAt?: Maybe<string> | Maybe<Scalars["DateTime"]>;
   emittedByEcoOrganisme?: Maybe<boolean> | Maybe<BsdaEcoOrganisme>;
+  worker?: Maybe<BsdaWorker> | undefined;
 }

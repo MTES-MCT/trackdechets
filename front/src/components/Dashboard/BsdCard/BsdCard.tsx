@@ -1,26 +1,39 @@
 import React from "react";
 
 import { formatDate } from "../../../common/datetime";
-import { formatBsd } from "../../../mapper/bsdMapper";
 import Badge from "../Badge/Badge";
 import LabelWithIcon from "../LabelWithIcon/LabelWithIcon";
 import { LabelIconCode } from "../LabelWithIcon/labelWithIconTypes";
 import { BsdCardProps } from "./bsdCardTypes";
 import WasteDetails from "../WasteDetails/WasteDetails";
-import { getCtaLabelFromStatus } from "../../../common/utils/dashboardUtils";
+import {
+  getBsdView,
+  getCtaLabelFromStatus,
+} from "../../../services/dashboard/dashboardServices";
 
 import "./bsdCard.scss";
 
-function BsdCard({ bsd }: BsdCardProps): JSX.Element {
-  const bsdDisplay = formatBsd(bsd);
+function BsdCard({ bsd, onValidate }: BsdCardProps): JSX.Element {
+  const bsdDisplay = getBsdView(bsd);
 
   const updatedAt = bsdDisplay?.updatedAt
     ? formatDate(bsdDisplay.updatedAt)
     : "";
 
   const ctaPrimaryLabel = bsdDisplay?.type
-    ? getCtaLabelFromStatus(bsdDisplay.type, bsdDisplay.status)
+    ? getCtaLabelFromStatus(
+        bsdDisplay.type,
+        bsdDisplay.status,
+        bsdDisplay?.isDraft,
+        bsdDisplay.worker?.isDisabled
+      )
     : "";
+
+  const handleValidationClick = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    onValidate(bsd);
+  };
 
   return (
     <div className="bsd-card">
@@ -43,7 +56,11 @@ function BsdCard({ bsd }: BsdCardProps): JSX.Element {
           </div>
           <div className="bsd-card__content">
             <div className="bsd-card__content__badge">
-              <Badge status={bsdDisplay.status} />
+              <Badge
+                status={bsdDisplay.status}
+                isDraft={bsdDisplay.isDraft}
+                bsdType={bsdDisplay.type}
+              />
             </div>
             <WasteDetails
               wasteType={bsdDisplay.type}
@@ -51,14 +68,20 @@ function BsdCard({ bsd }: BsdCardProps): JSX.Element {
               name={bsdDisplay.wasteDetails.name?.toString()}
             />
 
-            {/* TODO actors */}
+            {/* TODO Actors */}
 
             <div className="bsd-card__content__cta">
               {ctaPrimaryLabel && (
-                <button type="button" className="fr-btn fr-btn--sm">
+                <button
+                  type="button"
+                  className="fr-btn fr-btn--sm"
+                  onClick={handleValidationClick}
+                >
                   {ctaPrimaryLabel}
                 </button>
               )}
+
+              {/* TODO BsdAdditionalActionsButton */}
             </div>
           </div>
         </>

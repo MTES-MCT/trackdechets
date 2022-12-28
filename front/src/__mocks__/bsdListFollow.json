@@ -1,0 +1,559 @@
+[
+  {
+    "node": {
+      "id": "DASRI-20221208-RJZFA9H98",
+      "bsdasriStatus": "INITIAL",
+      "type": "SIMPLE",
+      "isDraft": false,
+      "bsdasriWaste": {
+        "code": "18 01 03*",
+        "__typename": "BsdasriWaste"
+      },
+      "emitter": {
+        "company": {
+          "name": "ISABELLE GIRY",
+          "orgId": "47992037300046",
+          "siret": "47992037300046",
+          "vatNumber": null,
+          "omiNumber": null,
+          "__typename": "FormCompany"
+        },
+        "emission": {
+          "isTakenOverWithoutEmitterSignature": false,
+          "isTakenOverWithSecretCode": false,
+          "__typename": "BsdasriEmission"
+        },
+        "__typename": "BsdasriEmitter"
+      },
+      "ecoOrganisme": null,
+      "transporter": {
+        "company": {
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "orgId": "13001045700013",
+          "siret": "13001045700013",
+          "vatNumber": null,
+          "omiNumber": null,
+          "__typename": "FormCompany"
+        },
+        "customInfo": "",
+        "transport": {
+          "plates": ["66TRE55"],
+          "__typename": "BsdasriTransport"
+        },
+        "__typename": "BsdasriTransporter"
+      },
+      "destination": {
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "orgId": "53230142100022",
+          "siret": "53230142100022",
+          "vatNumber": null,
+          "omiNumber": null,
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdasriDestination"
+      },
+      "grouping": [],
+      "synthesizing": [],
+      "createdAt": "2022-12-08T14:16:12.239Z",
+      "updatedAt": "2022-12-08T14:16:19.913Z",
+      "allowDirectTakeOver": true,
+      "synthesizedIn": null,
+      "__typename": "Bsdasri"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "FF-20221207-WA8H4QP1T",
+      "isDraft": false,
+      "bsffStatus": "INTERMEDIATELY_PROCESSED",
+      "bsffEmitter": {
+        "company": {
+          "siret": "00000000000404",
+          "orgId": "00000000000404",
+          "name": "Établissement de test",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsffEmitter"
+      },
+      "bsffTransporter": {
+        "company": {
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "__typename": "FormCompany"
+        },
+        "transport": {
+          "plates": ["6543ZZ33"],
+          "__typename": "BsffTransport"
+        },
+        "customInfo": null,
+        "__typename": "BsffTransporter"
+      },
+      "bsffDestination": {
+        "company": {
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "name": "L'ATELIER DE CELINE",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsffDestination"
+      },
+      "waste": {
+        "code": "14 06 01*",
+        "description": "R404",
+        "__typename": "BsffWaste"
+      },
+      "packagings": [
+        {
+          "numero": "F55",
+          "__typename": "BsffPackaging"
+        }
+      ],
+      "__typename": "Bsff"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "FF-20221207-GDS3GEXCV",
+      "isDraft": false,
+      "bsffStatus": "INTERMEDIATELY_PROCESSED",
+      "bsffEmitter": {
+        "company": {
+          "siret": "00000000000404",
+          "orgId": "00000000000404",
+          "name": "Établissement de test",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsffEmitter"
+      },
+      "bsffTransporter": {
+        "company": {
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "__typename": "FormCompany"
+        },
+        "transport": {
+          "plates": ["6543ZZ33"],
+          "__typename": "BsffTransport"
+        },
+        "customInfo": null,
+        "__typename": "BsffTransporter"
+      },
+      "bsffDestination": {
+        "company": {
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "name": "L'ATELIER DE CELINE",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsffDestination"
+      },
+      "waste": {
+        "code": "14 06 01*",
+        "description": "R404",
+        "__typename": "BsffWaste"
+      },
+      "packagings": [
+        {
+          "numero": "101",
+          "__typename": "BsffPackaging"
+        }
+      ],
+      "__typename": "Bsff"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "FF-20221206-AK0570Z2M",
+      "isDraft": false,
+      "bsffStatus": "INITIAL",
+      "bsffEmitter": {
+        "company": {
+          "siret": "32316232100240",
+          "orgId": "32316232100240",
+          "name": "MCDONALD'S SYSTEM OF FRANCE INC",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsffEmitter"
+      },
+      "bsffTransporter": {
+        "company": {
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "name": "L'ATELIER DE CELINE",
+          "__typename": "FormCompany"
+        },
+        "transport": {
+          "plates": [],
+          "__typename": "BsffTransport"
+        },
+        "customInfo": null,
+        "__typename": "BsffTransporter"
+      },
+      "bsffDestination": {
+        "company": {
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "name": "L'ATELIER DE CELINE",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsffDestination"
+      },
+      "waste": {
+        "code": "14 06 01*",
+        "description": "fluides",
+        "__typename": "BsffWaste"
+      },
+      "packagings": [
+        {
+          "numero": "11",
+          "__typename": "BsffPackaging"
+        }
+      ],
+      "__typename": "Bsff"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "FF-20221206-PV2VGCH2G",
+      "isDraft": false,
+      "bsffStatus": "INITIAL",
+      "bsffEmitter": {
+        "company": {
+          "siret": "32316232100240",
+          "orgId": "32316232100240",
+          "name": "MCDONALD'S SYSTEM OF FRANCE INC",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsffEmitter"
+      },
+      "bsffTransporter": {
+        "company": {
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "name": "L'ATELIER DE CELINE",
+          "__typename": "FormCompany"
+        },
+        "transport": {
+          "plates": [],
+          "__typename": "BsffTransport"
+        },
+        "customInfo": null,
+        "__typename": "BsffTransporter"
+      },
+      "bsffDestination": {
+        "company": {
+          "siret": "00000000000096",
+          "orgId": "00000000000096",
+          "name": "Établissement de test",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsffDestination"
+      },
+      "waste": {
+        "code": "14 06 01*",
+        "description": "fluides",
+        "__typename": "BsffWaste"
+      },
+      "packagings": [
+        {
+          "numero": "11",
+          "__typename": "BsffPackaging"
+        }
+      ],
+      "__typename": "Bsff"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "BSDA-20221205-VSZKWG53V",
+      "bsdaType": "OTHER_COLLECTIONS",
+      "isDraft": false,
+      "bsdaStatus": "SIGNED_BY_PRODUCER",
+      "emitter": {
+        "isPrivateIndividual": false,
+        "company": {
+          "name": "CLINIQUE DE CHATILLON",
+          "siret": "78531685200017",
+          "orgId": "78531685200017",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaEmitter"
+      },
+      "destination": {
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaDestination"
+      },
+      "worker": {
+        "isDisabled": true,
+        "company": null,
+        "__typename": "BsdaWorker"
+      },
+      "transporter": {
+        "company": {
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "__typename": "FormCompany"
+        },
+        "customInfo": null,
+        "transport": {
+          "plates": [],
+          "__typename": "BsdaTransport"
+        },
+        "__typename": "BsdaTransporter"
+      },
+      "waste": {
+        "materialName": "amiante",
+        "bsdaCode": "06 07 01*",
+        "__typename": "BsdaWaste"
+      },
+      "forwardedIn": null,
+      "groupedIn": null,
+      "__typename": "Bsda"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "FF-20221118-DZKTBGN6P",
+      "isDraft": false,
+      "bsffStatus": "ACCEPTED",
+      "bsffEmitter": {
+        "company": {
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "name": "L'ATELIER DE CELINE",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsffEmitter"
+      },
+      "bsffTransporter": {
+        "company": {
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "__typename": "FormCompany"
+        },
+        "transport": {
+          "plates": [],
+          "__typename": "BsffTransport"
+        },
+        "customInfo": null,
+        "__typename": "BsffTransporter"
+      },
+      "bsffDestination": {
+        "company": {
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsffDestination"
+      },
+      "waste": {
+        "code": "14 06 01*",
+        "description": "R555",
+        "__typename": "BsffWaste"
+      },
+      "packagings": [
+        {
+          "numero": "66",
+          "__typename": "BsffPackaging"
+        }
+      ],
+      "__typename": "Bsff"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "BSDA-20221013-R4M4AJ9A0",
+      "bsdaType": "OTHER_COLLECTIONS",
+      "isDraft": false,
+      "bsdaStatus": "SIGNED_BY_WORKER",
+      "emitter": {
+        "isPrivateIndividual": false,
+        "company": {
+          "name": "ISABELLE GIRY",
+          "siret": "47992037300046",
+          "orgId": "47992037300046",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaEmitter"
+      },
+      "destination": {
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaDestination"
+      },
+      "worker": {
+        "isDisabled": false,
+        "company": {
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaWorker"
+      },
+      "transporter": {
+        "company": {
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "__typename": "FormCompany"
+        },
+        "customInfo": null,
+        "transport": {
+          "plates": [],
+          "__typename": "BsdaTransport"
+        },
+        "__typename": "BsdaTransporter"
+      },
+      "waste": {
+        "materialName": "amiante",
+        "bsdaCode": "08 04 09*",
+        "__typename": "BsdaWaste"
+      },
+      "forwardedIn": null,
+      "groupedIn": null,
+      "__typename": "Bsda"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "BSDA-20220916-ATWNT0K3G",
+      "bsdaType": "RESHIPMENT",
+      "isDraft": false,
+      "bsdaStatus": "INITIAL",
+      "emitter": {
+        "isPrivateIndividual": false,
+        "company": {
+          "name": "Établissement de test",
+          "siret": "00000000000253",
+          "orgId": "00000000000253",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaEmitter"
+      },
+      "destination": {
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaDestination"
+      },
+      "worker": {
+        "isDisabled": false,
+        "company": null,
+        "__typename": "BsdaWorker"
+      },
+      "transporter": {
+        "company": {
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "__typename": "FormCompany"
+        },
+        "customInfo": null,
+        "transport": {
+          "plates": [],
+          "__typename": "BsdaTransport"
+        },
+        "__typename": "BsdaTransporter"
+      },
+      "waste": {
+        "materialName": "amiante syved",
+        "bsdaCode": "16 02 12*",
+        "__typename": "BsdaWaste"
+      },
+      "forwardedIn": null,
+      "groupedIn": null,
+      "__typename": "Bsda"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "BSDA-20220916-1SND77EEF",
+      "bsdaType": "OTHER_COLLECTIONS",
+      "isDraft": false,
+      "bsdaStatus": "AWAITING_CHILD",
+      "emitter": {
+        "isPrivateIndividual": false,
+        "company": {
+          "name": "ISABELLE GIRY",
+          "siret": "47992037300046",
+          "orgId": "47992037300046",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaEmitter"
+      },
+      "destination": {
+        "company": {
+          "name": "Établissement de test",
+          "siret": "00000000000253",
+          "orgId": "00000000000253",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaDestination"
+      },
+      "worker": {
+        "isDisabled": false,
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaWorker"
+      },
+      "transporter": {
+        "company": {
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "__typename": "FormCompany"
+        },
+        "customInfo": "tournée 16 sept",
+        "transport": {
+          "plates": ["TY555RR"],
+          "__typename": "BsdaTransport"
+        },
+        "__typename": "BsdaTransporter"
+      },
+      "waste": {
+        "materialName": "amiante syved",
+        "bsdaCode": "16 02 12*",
+        "__typename": "BsdaWaste"
+      },
+      "forwardedIn": {
+        "id": "BSDA-20220916-ATWNT0K3G",
+        "__typename": "Bsda"
+      },
+      "groupedIn": null,
+      "__typename": "Bsda"
+    },
+    "__typename": "BsdEdge"
+  }
+]

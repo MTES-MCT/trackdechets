@@ -5,6 +5,7 @@ import { Bsd } from "generated/graphql/types";
 import BsdCardList from "./BsdCardList";
 import bsddListDraft from "../../../__mocks__/bsdListDraft.json";
 import bsdListActJson from "../../../__mocks__/bsdListAct.json";
+import bsdListFollowJson from "../../../__mocks__/bsdListFollow.json";
 
 export default {
   title: "COMPONENTS/DASHBOARD/BsdCardList",
@@ -21,10 +22,14 @@ const Template: ComponentStory<typeof BsdCardList> = args => (
 
 export const BsddCardListDraft = Template.bind({});
 export const BsddCardListAct = Template.bind({});
+export const BsddCardListFollow = Template.bind({});
 
 BsddCardListDraft.args = {
   bsds: bsddListDraft as unknown as { node: Bsd }[],
 };
 BsddCardListAct.args = {
   bsds: bsdListActJson as unknown as { node: Bsd }[],
+};
+BsddCardListFollow.args = {
+  bsds: bsdListFollowJson as unknown as { node: Bsd }[],
 };

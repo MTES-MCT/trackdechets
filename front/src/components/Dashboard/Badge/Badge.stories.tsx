@@ -3,6 +3,7 @@ import { ComponentMeta, ComponentStory } from "@storybook/react";
 import { withDesign } from "storybook-addon-designs";
 import Badge from "./Badge";
 import { BsdStatusCode } from "../../../common/types/bsdTypes";
+import { BsdType } from "../../../generated/graphql/types";
 
 export default {
   title: "COMPONENTS/DASHBOARD/Badge",
@@ -24,14 +25,32 @@ export default {
 
 const Template: ComponentStory<typeof Badge> = args => <Badge {...args} />;
 
-export const Draft = Template.bind({});
+export const DraftBsdd = Template.bind({});
+export const Initial = Template.bind({});
+export const InitialNotDraft = Template.bind({});
+export const InitialDasriNotDraft = Template.bind({});
 export const Received = Template.bind({});
 export const Processed = Template.bind({});
 export const Sealed = Template.bind({});
 export const Refused = Template.bind({});
 
-Draft.args = {
+DraftBsdd.args = {
   status: BsdStatusCode.DRAFT,
+};
+
+Initial.args = {
+  status: BsdStatusCode.INITIAL,
+  isDraft: true,
+};
+
+InitialNotDraft.args = {
+  status: BsdStatusCode.INITIAL,
+  isDraft: false,
+};
+InitialDasriNotDraft.args = {
+  status: BsdStatusCode.INITIAL,
+  isDraft: false,
+  bsdType: BsdType.Bsdasri,
 };
 
 Received.args = {

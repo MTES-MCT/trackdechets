@@ -1,7 +1,17 @@
-import { BsdType } from "../../generated/graphql/types";
-import { BsdStatusCode } from "../types/bsdTypes";
+import { BsdDisplay, BsdStatusCode } from "../../common/types/bsdTypes";
+import { formatBsd } from "../../mapper/dashboard/bsdMapper";
+import { Bsd, BsdType } from "../../generated/graphql/types";
 
-export const getBsdStatusLabel = (status: string) => {
+export const getBsdView = (bsd): BsdDisplay | null => {
+  const bsdView = formatBsd(bsd);
+  return bsdView;
+};
+
+export const getBsdStatusLabel = (
+  status: string,
+  isDraft: boolean,
+  bsdType: BsdType
+) => {
   switch (status) {
     case BsdStatusCode.DRAFT:
       return "Brouillon"; // Bsdd
@@ -33,8 +43,14 @@ export const getBsdStatusLabel = (status: string) => {
       return "EN ATTENTE DE RÉCEPTION pour traitement"; // Bsdd;
     case BsdStatusCode.SIGNED_BY_PRODUCER:
       return "signé par le producteur"; // Bsvhu| Bsdd | Bsdasri | Bsda
-    case BsdStatusCode.INITIAL:
-      return "initial"; // Bsvhu| Bsdasri | Bsff | Bsda
+    case BsdStatusCode.INITIAL: // Bsvhu| Bsdasri | Bsff | Bsda
+      if (isDraft || (!isDraft && bsdType === BsdType.Bsdasri)) {
+        return "initial";
+      } else if (!isDraft) {
+        return "En attente de signature par l'émetteur";
+      } else {
+        return "initial";
+      }
     case BsdStatusCode.SIGNED_BY_EMITTER:
       return "signé par l’émetteur"; // Bsff
     case BsdStatusCode.INTERMEDIATELY_PROCESSED:
@@ -61,7 +77,9 @@ export const getBsdStatusLabel = (status: string) => {
 */
 export const getCtaLabelFromStatus = (
   bsdType: BsdType,
-  status: BsdStatusCode
+  status: BsdStatusCode,
+  isDraft: boolean | undefined,
+  isWorkerDisabled: boolean | undefined
 ) => {
   switch (status) {
     case BsdStatusCode.DRAFT:
@@ -70,14 +88,19 @@ export const getCtaLabelFromStatus = (
         return "Valider";
       }
       if (
-        bsdType === BsdType.Bsda ||
-        bsdType === BsdType.Bsff ||
-        bsdType === BsdType.Bsdasri ||
-        bsdType === BsdType.Bsvhu
+        isDraft &&
+        (bsdType === BsdType.Bsda ||
+          bsdType === BsdType.Bsff ||
+          bsdType === BsdType.Bsdasri ||
+          bsdType === BsdType.Bsvhu)
       ) {
         return "Publier";
+      } else {
+        if (bsdType === BsdType.Bsdasri) {
+          return "Signature producteur";
+        }
+        return "Signer en tant qu'émetteur";
       }
-      break;
     case BsdStatusCode.SEALED:
       if (bsdType === BsdType.Bsdd) {
         return "Signer en tant qu'émetteur";
@@ -85,18 +108,19 @@ export const getCtaLabelFromStatus = (
       if (bsdType === BsdType.Bsda || bsdType === BsdType.Bsff) {
         return "Signature émetteur";
       }
-      if (bsdType === BsdType.Bsdasri) {
-        return "Signature producteur";
-      }
       if (bsdType === BsdType.Bsvhu) {
         return "Signer";
       }
       break;
 
     case BsdStatusCode.SENT:
-      if (bsdType === BsdType.Bsdd || bsdType === BsdType.Bsdasri) {
-        return "Signature transporteur";
+      if (bsdType === BsdType.Bsdd) {
+        return "Valider la réception";
       }
+      /* if (bsdType === BsdType.Bsdasri) {
+        // TODO cas dasri sans synth(pas de bouton) et cas dasri avec synth (signature réception)
+        return "Signature réception";
+      } */
 
       if (
         bsdType === BsdType.Bsff ||
@@ -128,7 +152,10 @@ export const getCtaLabelFromStatus = (
       break;
 
     case BsdStatusCode.SIGNED_BY_PRODUCER:
-      return "Signer en tant qu'entreprise de travaux";
+      if (!isWorkerDisabled) {
+        return "Signer en tant qu'entreprise de travaux";
+      }
+      break;
 
     case BsdStatusCode.ACCEPTED:
       return "Valider le traitement";
@@ -136,4 +163,13 @@ export const getCtaLabelFromStatus = (
     default:
       return "";
   }
+};
+
+export const validateBsd = (bsd: Bsd) => {
+  /* TODO 
+
+    - validation selon le type de bsd
+    - query de validation
+    - ...
+*/
 };
