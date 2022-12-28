@@ -18,7 +18,8 @@ import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { BSFF_WASTE_CODES } from "../common/constants";
 import {
   destinationCompanySiretSchema,
-  transporterCompanySiretSchema
+  transporterCompanySiretSchema,
+  transporterCompanyVatNumberSchema
 } from "../companies/validation";
 
 configureYup();
@@ -138,14 +139,7 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
           "Transporteur : le nom de l'établissement est requis"
         ),
       transporterCompanySiret: transporterCompanySiretSchema(isDraft),
-      transporterCompanyVatNumber: yup
-        .string()
-        .ensure()
-        .test(
-          "is-vat",
-          "Transporteur : le numéro de TVA intracommunautaire n'est pas au bon format",
-          value => !value || isVat(value)
-        ),
+      transporterCompanyVatNumber: transporterCompanyVatNumberSchema,
       transporterCompanyAddress: yup
         .string()
         .requiredIf(
@@ -412,7 +406,7 @@ const withNextDestination = (required: boolean) =>
       .nullable()
       .test(
         "is-vat",
-        "${path} n'est pas un numéro de TVA intracommunautaire valide",
+        "Destination ultérieure : ${originalValue} n'est pas un numéro de TVA intracommunautaire valide",
         value => !value || isVat(value)
       ),
 

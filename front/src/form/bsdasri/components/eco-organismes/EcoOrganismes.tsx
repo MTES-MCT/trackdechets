@@ -10,7 +10,6 @@ import {
   BsdasriEcoOrganisme,
 } from "../../../../generated/graphql/types";
 import TdSwitch from "common/components/Switch";
-import { string } from "yup";
 
 const GET_ECO_ORGANISMES = gql`
   {

@@ -50,7 +50,8 @@ import { validateCompany } from "../companies/validateCompany";
 import { Decimal } from "decimal.js-light";
 import {
   destinationCompanySiretSchema,
-  transporterCompanySiretSchema
+  transporterCompanySiretSchema,
+  transporterCompanyVatNumberSchema
 } from "../companies/validation";
 // set yup default error messages
 configureYup();
@@ -676,14 +677,7 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
         .ensure()
         .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_NAME}`),
       transporterCompanySiret: transporterCompanySiretSchema(isDraft),
-      transporterCompanyVatNumber: yup
-        .string()
-        .ensure()
-        .test(
-          "is-vat",
-          "${path} n'est pas un numéro de TVA intracommunautaire valide",
-          value => !value || isVat(value)
-        ),
+      transporterCompanyVatNumber: transporterCompanyVatNumberSchema,
       transporterCompanyAddress: yup
         .string()
         .ensure()
@@ -1027,7 +1021,7 @@ const withNextDestination = (required: boolean) =>
       .ensure()
       .test(
         "is-vat",
-        "${path} n'est pas un numéro de TVA intracommunautaire valide",
+        "Destination ultérieure prévue : ${originalValue} n'est pas un numéro de TVA intracommunautaire valide",
         value => !value || isVat(value)
       ),
     nextDestinationCompanyAddress: yup

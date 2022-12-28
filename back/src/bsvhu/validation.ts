@@ -17,11 +17,8 @@ import {
 import * as yup from "yup";
 import { FactorySchemaOf } from "../common/yup/configureYup";
 import { BsvhuDestinationType } from "../generated/graphql/types";
-import {
-  isVat,
-  isSiret,
-  isFRVat
-} from "../common/constants/companySearchHelpers";
+import { isSiret } from "../common/constants/companySearchHelpers";
+import { transporterCompanyVatNumberSchema } from "../companies/validation";
 
 type Emitter = Pick<
   Bsvhu,
@@ -286,14 +283,7 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
           "Transporteur: ${originalValue} n'est pas un numéro de SIRET valide",
           value => !value || isSiret(value)
         ),
-      transporterCompanyVatNumber: yup
-        .string()
-        .ensure()
-        .test(
-          "is-vat",
-          "${path} n'est pas un numéro de TVA intracommunautaire valide",
-          value => !value || (isVat(value) && !isFRVat(value))
-        ),
+      transporterCompanyVatNumber: transporterCompanyVatNumberSchema,
       transporterCompanyAddress: yup
         .string()
         .requiredIf(

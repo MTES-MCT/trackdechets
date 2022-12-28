@@ -1,5 +1,8 @@
 import { WasteAcceptationStatus, Prisma, BsdasriType } from "@prisma/client";
-import { isCollector } from "../companies/validation";
+import {
+  isCollector,
+  transporterCompanyVatNumberSchema
+} from "../companies/validation";
 import * as yup from "yup";
 import {
   DASRI_WASTE_CODES,
@@ -13,11 +16,7 @@ import {
   BsdasriPackagingType,
   BsdasriSignatureType
 } from "../generated/graphql/types";
-import {
-  isVat,
-  isSiret,
-  isFRVat
-} from "../common/constants/companySearchHelpers";
+import { isSiret } from "../common/constants/companySearchHelpers";
 import {
   MISSING_COMPANY_SIRET,
   MISSING_COMPANY_SIRET_OR_VAT
@@ -321,11 +320,6 @@ export const transporterSchema: FactorySchemaOf<
             `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`
           );
         }
-        if (context.transportSignature && tva && isFRVat(tva)) {
-          return schema.required(
-            "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
-          );
-        }
         return schema.nullable().notRequired();
       })
       .test(
@@ -333,14 +327,7 @@ export const transporterSchema: FactorySchemaOf<
         "Transporteur : ${originalValue} n'est pas un numéro de SIRET valide",
         value => !value || isSiret(value)
       ),
-    transporterCompanyVatNumber: yup
-      .string()
-      .ensure()
-      .test(
-        "is-vat",
-        "${path} n'est pas un numéro de TVA intracommunautaire valide",
-        value => !value || isVat(value)
-      ),
+    transporterCompanyVatNumber: transporterCompanyVatNumberSchema,
     transporterCompanyAddress: yup
       .string()
       .ensure()

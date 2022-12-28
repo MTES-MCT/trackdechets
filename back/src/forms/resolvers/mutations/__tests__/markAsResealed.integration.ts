@@ -535,7 +535,7 @@ describe("Mutation markAsResealed", () => {
     ]);
   }, 10000);
 
-  it("should work when a transporter vat number is present", async () => {
+  it("should not work when a transporter french vat number is present along with a SIRET", async () => {
     const owner = await userFactory();
     const { user, company: collector } = await userWithCompanyFactory(
       "MEMBER",
@@ -561,7 +561,7 @@ describe("Mutation markAsResealed", () => {
       }
     });
 
-    const { data } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "markAsResealed">,
       MutationMarkAsResealedArgs
     >(
@@ -599,8 +599,14 @@ describe("Mutation markAsResealed", () => {
       }
     );
 
-    expect(
-      data.markAsResealed.temporaryStorageDetail.transporter.company.vatNumber
-    ).toEqual("FR87850019464");
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement",
+        extensions: {
+          code: "BAD_USER_INPUT"
+        }
+      })
+    ]);
   });
 });

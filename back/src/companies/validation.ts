@@ -6,7 +6,11 @@ import {
 } from "@prisma/client";
 import { MISSING_COMPANY_SIRET_OR_VAT } from "../forms/errors";
 import prisma from "../prisma";
-import { isFRVat, isSiret } from "../common/constants/companySearchHelpers";
+import {
+  isForeignVat,
+  isFRVat,
+  isSiret
+} from "../common/constants/companySearchHelpers";
 
 export const receiptSchema = yup.object().shape({
   validityLimit: yup.date().required()
@@ -119,10 +123,24 @@ export const transporterCompanySiretSchema = (isDraft: boolean) =>
           `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`
         );
       }
-      if (!isDraft && tva && isFRVat(tva)) {
-        return schema.required(
-          "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
-        );
-      }
       return schema.nullable().notRequired();
     });
+
+export const transporterCompanyVatNumberSchema = yup
+  .string()
+  .ensure()
+  .test(
+    "is-foreign-vat",
+    "Transporteur: ${originalValue} n'est pas un numéro de TVA étranger valide",
+    (value, testContext) => {
+      if (!value) return true;
+      else if (isFRVat(value)) {
+        return testContext.createError({
+          message:
+            "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
+        });
+      } else if (isForeignVat(value)) {
+        return true;
+      }
+    }
+  );

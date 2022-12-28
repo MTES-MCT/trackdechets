@@ -11,9 +11,7 @@ import { UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import { BSDA_WASTE_CODES } from "../common/constants";
 import {
-  isVat,
   isSiret,
-  isFRVat,
   isForeignVat
 } from "../common/constants/companySearchHelpers";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
@@ -22,7 +20,8 @@ import {
   isCollector,
   isTransporter,
   isWasteCenter,
-  isWasteProcessor
+  isWasteProcessor,
+  transporterCompanyVatNumberSchema
 } from "../companies/validation";
 import {
   INVALID_WASTE_CODE,
@@ -865,14 +864,7 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
             return true;
           }
         ),
-      transporterCompanyVatNumber: yup
-        .string()
-        .ensure()
-        .test(
-          "is-vat",
-          "${path} n'est pas un numéro de TVA intracommunautaire valide",
-          value => !value || (isVat(value) && !isFRVat(value))
-        ),
+      transporterCompanyVatNumber: transporterCompanyVatNumberSchema,
       transporterCompanyAddress: yup.string().when("type", {
         is: BsdaType.COLLECTION_2710,
         then: schema => schema.nullable(),
