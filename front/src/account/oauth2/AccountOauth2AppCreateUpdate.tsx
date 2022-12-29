@@ -115,7 +115,7 @@ export default function AccountOauth2AppCreateUpdate({
         En créant une application tierce vous pouvez proposer aux utilisateurs
         de Trackdéchets d'utiliser votre application afin d'enrichir leur
         utilisation de Trackdéchets. Afin que les utilisateurs puissent
-        autoriser votre application à utiliser leur données Trackdéchets, nous
+        autoriser votre application à utiliser leurs données Trackdéchets, nous
         utilisons le protocole OAuth2. Plus d'informations sur{" "}
         <a
           className="tw-underline"
