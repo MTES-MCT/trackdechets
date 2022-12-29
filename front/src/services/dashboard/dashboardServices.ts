@@ -1,6 +1,17 @@
-import { BsdDisplay, BsdStatusCode } from "../../common/types/bsdTypes";
+import {
+  BsdDisplay,
+  BsdStatusCode,
+  WorkflowDisplayType,
+} from "../../common/types/bsdTypes";
 import { formatBsd } from "../../mapper/dashboard/bsdMapper";
-import { Bsd, BsdType } from "../../generated/graphql/types";
+import {
+  Bsd,
+  BsdasriType,
+  BsdaType,
+  BsdType,
+  BsffType,
+  Maybe,
+} from "../../generated/graphql/types";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);
@@ -44,7 +55,13 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.SIGNED_BY_PRODUCER:
       return "signé par le producteur"; // Bsvhu| Bsdd | Bsdasri | Bsda
     case BsdStatusCode.INITIAL: // Bsvhu| Bsdasri | Bsff | Bsda
-      if (isDraft || (!isDraft && bsdType === BsdType.Bsdasri)) {
+      if (
+        isDraft ||
+        (!isDraft &&
+          (bsdType === BsdType.Bsdasri ||
+            bsdType === BsdType.Bsda ||
+            bsdType === BsdType.Bsvhu))
+      ) {
         return "initial";
       } else if (!isDraft) {
         return "En attente de signature par l'émetteur";
@@ -71,15 +88,13 @@ export const getBsdStatusLabel = (
   }
 };
 
-/* TODO à re vérifier 
-
-    bsd suite ?
-*/
+/* TODO à revoir avec harmonisation libéllés et status */
 export const getCtaLabelFromStatus = (
   bsdType: BsdType,
   status: BsdStatusCode,
   isDraft: boolean | undefined,
-  isWorkerDisabled: boolean | undefined
+  isWorkerDisabled: boolean | undefined,
+  bsdWorkflowType: Maybe<BsdaType> | BsdasriType | BsffType | undefined
 ) => {
   switch (status) {
     case BsdStatusCode.DRAFT:
@@ -99,6 +114,9 @@ export const getCtaLabelFromStatus = (
         if (bsdType === BsdType.Bsdasri) {
           return "Signature producteur";
         }
+        if (bsdType === BsdType.Bsvhu) {
+          return "Signer";
+        }
         return "Signer en tant qu'émetteur";
       }
     case BsdStatusCode.SEALED:
@@ -117,10 +135,13 @@ export const getCtaLabelFromStatus = (
       if (bsdType === BsdType.Bsdd) {
         return "Valider la réception";
       }
-      /* if (bsdType === BsdType.Bsdasri) {
-        // TODO cas dasri sans synth(pas de bouton) et cas dasri avec synth (signature réception)
+      if (
+        bsdType === BsdType.Bsdasri &&
+        bsdWorkflowType === BsdasriType.Synthesis
+      ) {
+        // TODO à revérifier cas dasri sans synth(pas de bouton) et cas dasri avec synth (signature réception)
         return "Signature réception";
-      } */
+      }
 
       if (
         bsdType === BsdType.Bsff ||
@@ -172,4 +193,33 @@ export const validateBsd = (bsd: Bsd) => {
     - query de validation
     - ...
 */
+};
+
+export const getWorkflowLabel = (
+  bsdWorkflowType: Maybe<BsdaType> | BsdasriType | BsffType | undefined
+): WorkflowDisplayType => {
+  switch (bsdWorkflowType) {
+    case BsdaType.Gathering:
+      return WorkflowDisplayType.GRP;
+    case BsdaType.Reshipment:
+      return WorkflowDisplayType.TRANSIT;
+
+    case BsdasriType.Grouping:
+      return WorkflowDisplayType.GRP;
+    case BsdasriType.Synthesis:
+      return WorkflowDisplayType.SYNTH;
+
+    case BsffType.Groupement:
+      return WorkflowDisplayType.GRP;
+    case BsffType.Reexpedition:
+      return WorkflowDisplayType.TRANSIT;
+
+    default:
+      return WorkflowDisplayType.DEFAULT;
+  }
+};
+
+export const hasBsdSuite = (bsdDisplay: BsdDisplay): boolean => {
+  //TODO
+  return false;
 };

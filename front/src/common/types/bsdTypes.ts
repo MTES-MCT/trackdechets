@@ -1,10 +1,16 @@
 import {
   BsdaEcoOrganisme,
+  BsdasriType,
+  BsdaType,
   BsdaWeight,
   BsdaWorker,
   BsdType,
+  BsffPackaging,
+  BsffType,
   BsffWeight,
   BsvhuWeight,
+  InitialBsdasri,
+  InitialFormFraction,
   Maybe,
   Scalars,
 } from "generated/graphql/types";
@@ -17,7 +23,7 @@ export enum BsdTypename {
   Bsff = "Bsff",
 }
 
-export enum BsdStatusCode {
+export enum BsdStatusCode { // TODO a revoir avec harmonisation des status
   DRAFT = "DRAFT",
   SEALED = "SEALED",
   SENT = "SENT",
@@ -61,4 +67,17 @@ export interface BsdDisplay {
   updatedAt?: Maybe<string> | Maybe<Scalars["DateTime"]>;
   emittedByEcoOrganisme?: Maybe<boolean> | Maybe<BsdaEcoOrganisme>;
   worker?: Maybe<BsdaWorker> | undefined;
+  bsdWorkflowType?: Maybe<BsdaType> | BsdasriType | BsffType;
+  grouping?:
+    | Maybe<Array<InitialFormFraction>>
+    | Maybe<Array<InitialBsdasri>>
+    | Array<BsffPackaging>;
+}
+
+export enum WorkflowDisplayType {
+  GRP = "Grp",
+  TRANSIT = "Transit",
+  SYNTH = "Synth",
+
+  DEFAULT = "",
 }

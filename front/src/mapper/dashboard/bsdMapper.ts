@@ -84,13 +84,14 @@ const createBsda = (bsda: Bsda): BsdDisplay => {
     isDraft: bsda.isDraft,
     status: mapBsdStatusToBsdStatusEnum(statusCode),
     wasteDetails: {
-      code: bsda.waste?.code,
+      code: bsda.waste?.code || bsda.waste?.["bsdaCode"],
       name: bsda.waste?.materialName,
       weight: bsda.weight,
     },
     updatedAt: bsda.updatedAt,
     emittedByEcoOrganisme: bsda.ecoOrganisme,
     worker: bsda.worker,
+    bsdWorkflowType: bsda.type || bsda["bsdaType"],
   };
   return bsdaFormatted;
 };
@@ -103,10 +104,11 @@ const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
     isDraft: bsdasri.isDraft,
     status: mapBsdStatusToBsdStatusEnum(statusCode),
     wasteDetails: {
-      code: bsdasri.waste?.code,
+      code: bsdasri.waste?.code || bsdasri["bsdasriWaste"]?.code,
     },
     updatedAt: bsdasri.updatedAt,
     emittedByEcoOrganisme: bsdasri.ecoOrganisme?.emittedByEcoOrganisme,
+    bsdWorkflowType: bsdasri.type,
   };
   return bsdasriFormatted;
 };
@@ -140,6 +142,7 @@ const createBsff = (bsff: Bsff): BsdDisplay => {
       weight: bsff?.weight,
     },
     updatedAt: bsff.updatedAt,
+    bsdWorkflowType: bsff.type,
   };
   return bsffFormatted;
 };

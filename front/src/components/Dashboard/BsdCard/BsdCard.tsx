@@ -9,6 +9,8 @@ import WasteDetails from "../WasteDetails/WasteDetails";
 import {
   getBsdView,
   getCtaLabelFromStatus,
+  getWorkflowLabel,
+  hasBsdSuite,
 } from "../../../services/dashboard/dashboardServices";
 
 import "./bsdCard.scss";
@@ -25,7 +27,8 @@ function BsdCard({ bsd, onValidate }: BsdCardProps): JSX.Element {
         bsdDisplay.type,
         bsdDisplay.status,
         bsdDisplay?.isDraft,
-        bsdDisplay.worker?.isDisabled
+        bsdDisplay.worker?.isDisabled,
+        bsdDisplay.bsdWorkflowType
       )
     : "";
 
@@ -62,15 +65,29 @@ function BsdCard({ bsd, onValidate }: BsdCardProps): JSX.Element {
                 bsdType={bsdDisplay.type}
               />
             </div>
-            <WasteDetails
-              wasteType={bsdDisplay.type}
-              code={bsdDisplay.wasteDetails.code?.toString()}
-              name={bsdDisplay.wasteDetails.name?.toString()}
-            />
+            <div className="bsd-card__content__waste">
+              <WasteDetails
+                wasteType={bsdDisplay.type}
+                code={bsdDisplay.wasteDetails.code?.toString()}
+                name={bsdDisplay.wasteDetails.name?.toString()}
+              />
+              <p className="workflow-type">
+                {getWorkflowLabel(bsdDisplay.bsdWorkflowType)}
+              </p>
+            </div>
 
             {/* TODO Actors */}
 
             <div className="bsd-card__content__cta">
+              {/* TODO BSD suite */}
+              {hasBsdSuite(bsdDisplay) && (
+                <button
+                  type="button"
+                  className="fr-btn fr-btn--sm fr-btn--secondary"
+                >
+                  Compléter le BSD suite
+                </button>
+              )}
               {ctaPrimaryLabel && (
                 <button
                   type="button"

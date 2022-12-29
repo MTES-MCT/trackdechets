@@ -50,16 +50,28 @@
                 width: 40%;
             }
         }
-        
+
+        &__waste {
+            .workflow-type {
+                margin: 0;
+                padding: 0 0 5px 0;
+                font-size: 0.75rem;
+            }
+        }
 
         &__cta {
             display: flex;
             justify-content: flex-end;
+
+            button {
+                margin: 0 2px;
+            }
             
             @include desktop {
                 display: block;
                 position: absolute;
                 right: 0;
+               
             }
         }
     }
