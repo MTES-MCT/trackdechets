@@ -120,11 +120,11 @@ const Worker = ({ form }: { form: Bsda }) => {
         <div className={styles.detailGrid}>
           <YesNoRow
             value={worker.certification?.hasSubSectionFour}
-            label="Travaux relevcant de la sous-section 4"
+            label="Travaux relevant de la sous-section 4"
           />
           <YesNoRow
             value={worker.certification?.hasSubSectionThree}
-            label="Travaux relevcant de la sous-section 3"
+            label="Travaux relevant de la sous-section 3"
           />
           {worker.certification?.hasSubSectionThree && (
             <>
