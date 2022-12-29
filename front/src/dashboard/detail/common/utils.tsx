@@ -51,7 +51,7 @@ export const getVerboseWeightType = (
     return "Estimé";
   }
   if (isEstimate === false) {
-    return "Réél";
+    return "Réel";
   }
 
   return "";
