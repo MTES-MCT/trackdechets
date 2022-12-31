@@ -1,7 +1,7 @@
-import { Grant } from "@prisma/client";
 import { createServer, grant, exchange, TokenError } from "oauth2orize";
-import prisma from "./prisma";
-import { getUid, hashToken } from "./utils";
+import prisma from "../prisma";
+import { getUid, hashToken } from "../utils";
+import { isExpired } from "./utils";
 
 // Create OAuth 2.0 server
 export const oauth2server = createServer();
@@ -117,14 +117,3 @@ oauth2server.exchange(
     return done(null, clearToken, null, params);
   })
 );
-
-/**
- * Check whether or not a grant has expired
- * @param grant
- */
-export function isExpired(grant: Grant): boolean {
-  const now = Date.now();
-  const createdAt = new Date(grant.createdAt);
-  const elapsed = (now - createdAt.getTime()) / 1000;
-  return elapsed > grant.expires;
-}

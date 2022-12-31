@@ -1,11 +1,11 @@
 import prisma from "../prisma";
 import { Router, Request, Response } from "express";
-import passport from "passport";
-import { oauth2server } from "../oauth/oauth2";
+import { oidc, exchange } from "../oauth/oidc";
 import ensureLoggedIn from "../common/middlewares/ensureLoggedIn";
 import { OAuth2, AuthorizationError } from "oauth2orize";
 
-export const oauth2Router = Router();
+export const oidcRouter = Router();
+// OpenID Connect router
 
 // User authorization endpoint.
 
@@ -14,13 +14,15 @@ export const oauth2Router = Router();
 // - the user is authenticated
 // - the client exists
 // - the redirectUri matches
-oauth2Router.get(
-  "/oauth2/authorize",
+// - the client is openIdEnabled
+oidcRouter.get(
+  "/oidc/authorize",
   ensureLoggedIn,
-  oauth2server.authorization(async (clientId, redirectUri, done) => {
+  oidc.authorization(async (clientId, redirectUri, done) => {
     const client = await prisma.application.findUnique({
       where: { id: clientId }
     });
+    // check state ?
     if (!client) {
       const err = new AuthorizationError(
         "Invalid client id",
@@ -31,6 +33,13 @@ oauth2Router.get(
     if (!client.redirectUris.includes(redirectUri)) {
       const err = new AuthorizationError(
         "Invalid redirect uri",
+        "unauthorized_client"
+      );
+      return done(err);
+    }
+    if (!client.openIdEnabled) {
+      const err = new AuthorizationError(
+        "OpenId Connect is not enabled on this application",
         "unauthorized_client"
       );
       return done(err);
@@ -51,20 +60,15 @@ oauth2Router.get(
     };
     return res.json(payload);
   },
-  oauth2server.errorHandler()
+  oidc.errorHandler()
 );
 
-oauth2Router.post(
-  "/oauth2/authorize/decision",
-  ensureLoggedIn,
-  oauth2server.decision()
-);
+oidcRouter.post("/oidc/authorize/decision", ensureLoggedIn, oidc.decision());
 
-oauth2Router.post(
-  "/oauth2/token",
-  passport.authenticate(["basic", "oauth2-client-password"], {
-    session: false
-  }),
-  oauth2server.token(),
-  oauth2server.errorHandler()
+oidcRouter.post(
+  "/oidc/token",
+  async (req, res, next) => {
+    return exchange(req, res, next);
+  },
+  oidc.errorHandler()
 );

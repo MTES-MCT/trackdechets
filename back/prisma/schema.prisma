@@ -154,18 +154,19 @@ model AccessToken {
 }
 
 model Application {
-  id           String           @id @default(cuid())
-  createdAt    DateTime         @default(now()) @db.Timestamptz(6)
-  updatedAt    DateTime         @updatedAt @db.Timestamptz(6)
-  clientSecret String
-  name         String
-  goal         ApplicationGoal?
-  logoUrl      String?
-  redirectUris String[]
-  admin        User?            @relation(fields: [adminId], references: [id])
-  adminId      String?
-  AccessToken  AccessToken[]
-  Grant        Grant[]
+  id            String           @id @default(cuid())
+  createdAt     DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime         @updatedAt @db.Timestamptz(6)
+  clientSecret  String
+  name          String
+  goal          ApplicationGoal?
+  logoUrl       String?
+  redirectUris  String[]
+  admin         User?            @relation(fields: [adminId], references: [id])
+  adminId       String?
+  openIdEnabled Boolean          @default(false)
+  AccessToken   AccessToken[]
+  Grant         Grant[]
 }
 
 model Company {
@@ -535,6 +536,8 @@ model Grant {
   expires       Int
   redirectUri   String
   applicationId String
+  openIdEnabled Boolean     @default(false)
+  scope String[] @default([])
   application   Application @relation(fields: [applicationId], references: [id])
   userId        String
   user          User        @relation(fields: [userId], references: [id])

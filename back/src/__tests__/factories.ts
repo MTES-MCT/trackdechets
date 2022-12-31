@@ -390,7 +390,7 @@ export const statusLogFactory = async ({
   });
 };
 
-export const applicationFactory = async () => {
+export const applicationFactory = async (openIdEnabled?: boolean) => {
   const admin = await userFactory();
 
   const applicationIndex = (await prisma.application.count()) + 1;
@@ -400,7 +400,8 @@ export const applicationFactory = async () => {
       admin: { connect: { id: admin.id } },
       clientSecret: `Secret_${applicationIndex}`,
       name: `Application_${applicationIndex}`,
-      redirectUris: ["https://acme.inc/authorize"]
+      redirectUris: ["https://acme.inc/authorize"],
+      openIdEnabled: !!openIdEnabled
     }
   });
 

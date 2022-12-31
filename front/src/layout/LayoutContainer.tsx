@@ -35,7 +35,8 @@ const Invite = lazy(() => import("login/Invite"));
 const PasswordResetRequest = lazy(() => import("login/PasswordResetRequest"));
 const PasswordReset = lazy(() => import("login/PasswordReset"));
 const Signup = lazy(() => import("login/Signup"));
-const Dialog = lazy(() => import("oauth2/Dialog"));
+const OauthDialog = lazy(() => import("oauth/Oauth2Dialog"));
+const OidcDialog = lazy(() => import("oauth/OidcDialog"));
 const Company = lazy(() => import("company/Company"));
 const WasteTree = lazy(() => import("search/WasteTree"));
 
@@ -88,9 +89,15 @@ export default withRouter(function LayoutContainer({ history }) {
           path="/oauth2/authorize/dialog"
           isAuthenticated={isAuthenticated}
         >
-          <Dialog />
+          <OauthDialog />
         </PrivateRoute>
-
+        <PrivateRoute
+          exact
+          path="/oidc/authorize/dialog"
+          isAuthenticated={isAuthenticated}
+        >
+          <OidcDialog />
+        </PrivateRoute>
         <Route>
           <Layout isAuthenticated={isAuthenticated} isAdmin={isAdmin}>
             <Switch>
