@@ -1,3 +1,4 @@
+import { checkVAT } from "jsvat";
 import prisma from "../prisma";
 import redundantCachedSearchSirene from "./sirene/searchCompany";
 import decoratedSearchCompanies from "./sirene/searchCompanies";
@@ -10,7 +11,8 @@ import {
   isVat,
   isFRVat,
   TEST_COMPANY_PREFIX,
-  cleanClue as cleanClueFn
+  cleanClue as cleanClueFn,
+  countries
 } from "../common/constants/companySearchHelpers";
 import { SireneSearchResult } from "./sirene/types";
 import { CompanyVatSearchResult } from "./vat/vies/types";
@@ -118,11 +120,19 @@ export async function searchCompany(
     return findCompanyAndMergeInfos(cleanClue, companyInfo);
   }
 
-  // Search TD first to optimize response times
+  // Search by VAT number first in our db, inder to to optimize response times
   if (isVat(cleanClue)) {
     const company = await findCompanyAndMergeInfos(cleanClue, {});
     if (company.isRegistered === true) {
-      return company;
+      // shorcut to return the result directly from database
+      const { country } = checkVAT(cleanClue, countries);
+      return {
+        codePaysEtrangerEtablissement: country.isoCode.short,
+        statutDiffusionEtablissement: "O",
+        etatAdministratif: "A",
+        vatNumber: cleanClue,
+        ...company
+      };
     }
     const companyInfo = await searchVatFrOnlyOrNotFound(cleanClue);
     return {

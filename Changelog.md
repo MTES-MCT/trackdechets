@@ -13,6 +13,10 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+#### :nail_care: Améliorations
+
+- Amélioration de la recherche par numéro de TVA et accélération requêtes pour les établissement déjà enregistrés [PR 1988](https://github.com/MTES-MCT/trackdechets/pull/1988)
+
 # [2023.1.3] 19/01/2023
 
 #### :rocket: Nouvelles fonctionnalités
