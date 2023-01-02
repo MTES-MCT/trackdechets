@@ -1,4 +1,9 @@
-import { CompanyType, CompanyVerificationStatus, Form } from "@prisma/client";
+import {
+  CompanyType,
+  CompanyVerificationStatus,
+  EmitterType,
+  Form
+} from "@prisma/client";
 import {
   draftFormSchema,
   sealedFormSchema,
@@ -262,6 +267,24 @@ describe("sealedFormSchema", () => {
       const isValid = await sealedFormSchema.isValid(partialForm);
       expect(isValid).toEqual(true);
     });
+
+    test("when is grouped and R0 is selected", async () => {
+      // Given
+      const processedInfo = {
+        ...form,
+        processedAt: new Date(),
+        processedBy: "John Snow",
+        emitterType: EmitterType.APPENDIX2,
+        recipientProcessingOperation: "R 0"
+      };
+
+      // When
+      const validateFn = () => sealedFormSchema.validate(processedInfo);
+      const isValid = await validateFn();
+
+      // Then
+      expect(isValid).toBeTruthy();
+    });
   });
 
   describe("form cannot be sealed", () => {
@@ -465,6 +488,30 @@ describe("sealedFormSchema", () => {
 
       const isValid = await sealedFormSchema.isValid(testForm);
       expect(isValid).toEqual(false);
+    });
+
+    test("when is NOT grouped and R0 is selected", async () => {
+      expect.assertions(1);
+
+      // Given
+      const processedInfo = {
+        ...form,
+        processedAt: new Date(),
+        processedBy: "John Snow",
+        emitterType: EmitterType.APPENDIX1,
+        recipientProcessingOperation: "R 0"
+      };
+
+      // When
+      const validateFn = () => sealedFormSchema.validate(processedInfo);
+      try {
+        await validateFn();
+      } catch (err) {
+        // Then
+        expect(err.errors).toEqual([
+          "Destination ultérieure : Cette opération d’élimination / valorisation n'existe pas."
+        ]);
+      }
     });
   });
 

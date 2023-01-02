@@ -13,8 +13,9 @@ import countries from "world-countries";
 import * as yup from "yup";
 import {
   isDangerous,
-  PROCESSING_OPERATIONS_CODES,
+  PROCESSING_AND_REUSE_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
+  PROCESSING_OPERATIONS_CODES,
   BSDD_WASTE_CODES
 } from "../common/constants";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
@@ -462,7 +463,17 @@ const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
       .string()
       .label("Opération d’élimination / valorisation")
       .ensure()
-      .requiredIf(!isDraft),
+      .requiredIf(!isDraft)
+      .when("emitterType", (value, schema) => {
+        const oneOf =
+          value === EmitterType.APPENDIX2
+            ? PROCESSING_AND_REUSE_OPERATIONS_CODES
+            : PROCESSING_OPERATIONS_CODES;
+        return schema.oneOf(
+          ["", ...oneOf],
+          `Destination ultérieure : ${INVALID_PROCESSING_OPERATION}`
+        );
+      }),
     recipientCompanyName: yup
       .string()
       .ensure()
@@ -993,7 +1004,7 @@ const withNextDestination = (required: boolean) =>
       .string()
       .required(`Destination ultérieure : ${MISSING_PROCESSING_OPERATION}`)
       .oneOf(
-        PROCESSING_OPERATIONS_CODES,
+        PROCESSING_AND_REUSE_OPERATIONS_CODES,
         `Destination ultérieure : ${INVALID_PROCESSING_OPERATION}`
       ),
     nextDestinationCompanyName: yup
@@ -1120,7 +1131,10 @@ const processedInfoSchemaFn: (value: any) => yup.SchemaOf<ProcessedInfo> =
       processedAt: yup.date().required(),
       processingOperationDone: yup
         .string()
-        .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION),
+        .oneOf(
+          PROCESSING_AND_REUSE_OPERATIONS_CODES,
+          INVALID_PROCESSING_OPERATION
+        ),
       processingOperationDescription: yup.string().nullable()
     });
 

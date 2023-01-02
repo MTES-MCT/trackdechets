@@ -18,8 +18,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
-- Les transporteurs peuvent désormais modifier la date de prise en charge pour les BSDD et BSVHU[PR 1962](https://github.com/MTES-MCT/trackdechets/pull/1962)
+- Les transporteurs peuvent désormais modifier la date de prise en charge pour les BSDD et BSVHU [PR 1962](https://github.com/MTES-MCT/trackdechets/pull/1962)
 - Ajout de rate limit sur certaines mutations [PR 1948](https://github.com/MTES-MCT/trackdechets/pull/1948)
+- Les destinataires des BSDD peuvent désormais choisir l'option R0 (réemploi/réutilisation) [PR 1971](https://github.com/MTES-MCT/trackdechets/pull/1971)
 
 #### :memo: Documentation
 
