@@ -5,7 +5,6 @@ import {
   AuthorizationError
 } from "oauth2orize";
 import { isExpired } from "./utils";
-
 import prisma from "../prisma";
 import { getUid } from "../utils";
 import { buildIdToken } from "./token";
@@ -113,12 +112,14 @@ export const tokenErrorMessages = {
 // 'invalid_grant': status = 403
 // 'unauthorized_client': status = 403
 // 'unsupported_grant_type': status = 501
-// invalid_scope': status = 400;
+// 'invalid_scope': status = 400;
 
 // Exchange authorization codes for a RSA signed ID token.
 export const exchange = async (req, res, next) => {
-  const { code, client_id, client_secret, redirect_uri, grant_type } = req.body;
+  const client_id = req.user.id; // user is an Application object
 
+  const { code, redirect_uri, grant_type } = req.body;
+  // Application checks (client id and secret) are performed by passport in router
   if (!code) {
     return next(
       new TokenError(tokenErrorMessages.invalid_code, "invalid_grant")
@@ -137,6 +138,7 @@ export const exchange = async (req, res, next) => {
   const grant = await prisma.grant.findFirst({
     where: {
       code,
+      applicationId: client_id,
       openIdEnabled: true
     },
     include: { user: true, application: true }
@@ -147,18 +149,7 @@ export const exchange = async (req, res, next) => {
       new TokenError(tokenErrorMessages.invalid_code, "invalid_grant")
     );
   }
-  // client id does not match
-  if (!client_id || grant.application.id !== client_id) {
-    return next(
-      new TokenError(tokenErrorMessages.invalid_client_id, "invalid_client")
-    );
-  }
-  // client secret does not match
-  if (!client_secret || grant.application.clientSecret !== client_secret) {
-    return next(
-      new TokenError(tokenErrorMessages.invalid_client_id, "invalid_client")
-    );
-  }
+
   // client redirect uri does not match
   if (!redirect_uri || !grant.application.redirectUris.includes(redirect_uri)) {
     return next(

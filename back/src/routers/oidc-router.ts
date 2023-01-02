@@ -3,6 +3,7 @@ import { Router, Request, Response } from "express";
 import { oidc, exchange } from "../oauth/oidc";
 import ensureLoggedIn from "../common/middlewares/ensureLoggedIn";
 import { OAuth2, AuthorizationError } from "oauth2orize";
+import passport from "passport";
 
 export const oidcRouter = Router();
 // OpenID Connect router
@@ -67,6 +68,9 @@ oidcRouter.post("/oidc/authorize/decision", ensureLoggedIn, oidc.decision());
 
 oidcRouter.post(
   "/oidc/token",
+  passport.authenticate(["basic", "oauth2-client-password"], {
+    session: false
+  }),
   async (req, res, next) => {
     return exchange(req, res, next);
   },

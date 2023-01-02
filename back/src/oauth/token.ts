@@ -4,10 +4,9 @@ import { Grant, Application, User } from "@prisma/client";
 import prisma from "../prisma";
 
 import { EMAIL_SCOPE, PROFILE_SCOPE, COMPANIES_SCOPE } from "./scopes";
+const { OIDC_PRIVATE_KEY } = process.env;
 
 const TOKEN_SIGNATURE_ALG = "RS256";
-const pkcs8 = process.env.OIDC_PRIVATE_KEY;
-
 const ISSUER = "trackdechets";
 
 const getCompanies = async userId => {
@@ -31,7 +30,10 @@ const getCompanies = async userId => {
 export const buildIdToken = async (
   grant: Grant & { application: Application; user: User }
 ): Promise<string> => {
-  const privateKey = await jose.importPKCS8(pkcs8, TOKEN_SIGNATURE_ALG);
+  const privateKey = await jose.importPKCS8(
+    OIDC_PRIVATE_KEY,
+    TOKEN_SIGNATURE_ALG
+  );
 
   // retrieve scopes and insert claims accordingly
   const profile = grant.scope.includes(PROFILE_SCOPE)
