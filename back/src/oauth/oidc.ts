@@ -115,13 +115,7 @@ export const tokenErrorMessages = {
 // 'unsupported_grant_type': status = 501
 // invalid_scope': status = 400;
 
-// Exchange authorization codes for ID token. The callback accepts the
-// `client`, which is exchanging `code` and any `redirectUri` from the
-// authorization request for verification. If these values are validated, the
-// application issues an access token on behalf of the user who authorized the
-// code. The issued access token response can include a refresh token and
-// custom parameters by adding these to the `done()` call
-
+// Exchange authorization codes for a RSA signed ID token.
 export const exchange = async (req, res, next) => {
   const { code, client_id, client_secret, redirect_uri, grant_type } = req.body;
 
