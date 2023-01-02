@@ -1,6 +1,5 @@
 import { MutationResolvers } from "../../generated/graphql/types";
 import signup from "./mutations/signup";
-import login from "./mutations/login";
 import changePassword from "./mutations/changePassword";
 import createPasswordResetRequest from "./mutations/createPasswordResetRequest";
 import resendActivationEmail from "./mutations/resendActivationEmail";
@@ -22,7 +21,6 @@ import anonymizeUser from "./mutations/anonymizeUser";
 
 const Mutation: MutationResolvers = {
   signup,
-  login,
   changePassword,
   createPasswordResetRequest,
   resetPassword,
