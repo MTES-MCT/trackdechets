@@ -188,6 +188,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                 <Field
                   component={ProcessingOperation}
                   name="content.processingOperationDone"
+                  enableReuse
                 />
               </ReviewableField>
 

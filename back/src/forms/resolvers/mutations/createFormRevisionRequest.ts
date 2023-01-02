@@ -8,7 +8,7 @@ import {
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import {
-  PROCESSING_OPERATIONS_CODES,
+  PROCESSING_AND_REUSE_OPERATIONS_CODES,
   BSDD_WASTE_CODES
 } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -242,7 +242,10 @@ const bsddRevisionRequestSchema = yup
     quantityReceived: yup.number().min(0).nullable(),
     processingOperationDone: yup
       .string()
-      .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
+      .oneOf(
+        PROCESSING_AND_REUSE_OPERATIONS_CODES,
+        INVALID_PROCESSING_OPERATION
+      )
       .nullable(),
     processingOperationDescription: yup.string().nullable(),
     brokerCompanyName: yup.string().nullable(),
@@ -280,7 +283,10 @@ const bsddRevisionRequestSchema = yup
     temporaryStorageDestinationCap: yup.string().nullable(),
     temporaryStorageDestinationProcessingOperation: yup
       .string()
-      .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION)
+      .oneOf(
+        PROCESSING_AND_REUSE_OPERATIONS_CODES,
+        INVALID_PROCESSING_OPERATION
+      )
       .nullable()
   })
   .noUnknown(
