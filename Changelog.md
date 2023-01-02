@@ -25,6 +25,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Suppression des hashes d'activation [PR 1948](https://github.com/MTES-MCT/trackdechets/pull/1990)
+
 # [2022.12.1] 13/12/2022
 
 #### :rocket: Nouvelles fonctionnalités
