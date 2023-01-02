@@ -4,7 +4,7 @@ import LabelWithIcon from "./LabelWithIcon";
 import { LabelIconCode } from "./labelWithIconTypes";
 
 export default {
-  title: "COMPONENTS/DASHBOARD/LabelWithIcon",
+  title: "COMPONENTS/DASHBOARD/BsdCard/LabelWithIcon",
   component: LabelWithIcon,
   design: {
     type: "figma",

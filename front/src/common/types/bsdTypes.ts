@@ -1,18 +1,37 @@
 import {
+  BsdaDestination,
   BsdaEcoOrganisme,
+  BsdaEmitter,
+  BsdasriDestination,
+  BsdasriEcoOrganisme,
+  BsdasriEmitter,
+  BsdasriTransporter,
   BsdasriType,
+  BsdaTransporter,
   BsdaType,
   BsdaWeight,
   BsdaWorker,
   BsdType,
+  BsffDestination,
+  BsffEmitter,
   BsffPackaging,
+  BsffTransporter,
   BsffType,
   BsffWeight,
+  BsvhuDestination,
+  BsvhuEmitter,
+  BsvhuTransporter,
   BsvhuWeight,
+  Emitter,
+  FormEcoOrganisme,
+  InitialBsda,
   InitialBsdasri,
   InitialFormFraction,
   Maybe,
+  Recipient,
   Scalars,
+  TemporaryStorageDetail,
+  Transporter,
 } from "generated/graphql/types";
 
 export enum BsdTypename {
@@ -64,6 +83,28 @@ export interface BsdDisplay {
       | Maybe<BsffWeight>;
   };
   isTempStorage?: Maybe<boolean>;
+  emitter?:
+    | Maybe<Emitter>
+    | Maybe<BsdaEmitter>
+    | Maybe<BsdasriEmitter>
+    | Maybe<BsvhuEmitter>
+    | Maybe<BsffEmitter>;
+  destination?:
+    | Maybe<Recipient>
+    | Maybe<BsdasriDestination>
+    | Maybe<BsdaDestination>
+    | Maybe<BsvhuDestination>
+    | Maybe<BsffDestination>;
+  transporter?:
+    | Maybe<Transporter>
+    | Maybe<BsdaTransporter>
+    | Maybe<BsdasriTransporter>
+    | Maybe<BsvhuTransporter>
+    | Maybe<BsffTransporter>;
+  ecoOrganisme?:
+    | Maybe<FormEcoOrganisme>
+    | Maybe<BsdaEcoOrganisme>
+    | Maybe<BsdasriEcoOrganisme>;
   updatedAt?: Maybe<string> | Maybe<Scalars["DateTime"]>;
   emittedByEcoOrganisme?: Maybe<boolean> | Maybe<BsdaEcoOrganisme>;
   worker?: Maybe<BsdaWorker> | undefined;
@@ -71,7 +112,10 @@ export interface BsdDisplay {
   grouping?:
     | Maybe<Array<InitialFormFraction>>
     | Maybe<Array<InitialBsdasri>>
-    | Array<BsffPackaging>;
+    | Array<BsffPackaging>
+    | Maybe<Array<InitialBsda>>;
+  synthesizing?: Maybe<Array<InitialBsdasri>>;
+  temporaryStorageDetail?: Maybe<TemporaryStorageDetail>;
 }
 
 export enum WorkflowDisplayType {

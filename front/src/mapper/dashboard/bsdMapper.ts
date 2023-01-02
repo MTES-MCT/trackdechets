@@ -70,8 +70,14 @@ const createBsdd = (bsdd: Form): BsdDisplay => {
       weight: bsdd.wasteDetails?.quantity,
     },
     isTempStorage: bsdd.recipient?.isTempStorage,
+    emitter: bsdd.emitter,
+    destination: bsdd.recipient,
+    transporter: bsdd.transporter,
+    ecoOrganisme: bsdd.ecoOrganisme,
     updatedAt: bsdd.updatedAt,
     emittedByEcoOrganisme: bsdd.emittedByEcoOrganisme,
+    grouping: bsdd.grouping,
+    temporaryStorageDetail: bsdd.temporaryStorageDetail,
   };
   return bsddFormatted;
 };
@@ -88,10 +94,15 @@ const createBsda = (bsda: Bsda): BsdDisplay => {
       name: bsda.waste?.materialName,
       weight: bsda.weight,
     },
+    emitter: bsda.emitter || bsda["bsdaEmitter"],
+    destination: bsda.destination || bsda["bsdaDestination"],
+    transporter: bsda.transporter || bsda["bsdaTransporter"],
+    ecoOrganisme: bsda.ecoOrganisme,
     updatedAt: bsda.updatedAt,
     emittedByEcoOrganisme: bsda.ecoOrganisme,
     worker: bsda.worker,
     bsdWorkflowType: bsda.type || bsda["bsdaType"],
+    grouping: bsda.grouping,
   };
   return bsdaFormatted;
 };
@@ -106,9 +117,15 @@ const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
     wasteDetails: {
       code: bsdasri.waste?.code || bsdasri["bsdasriWaste"]?.code,
     },
+    emitter: bsdasri.emitter || bsdasri["bsdasriEmitter"],
+    destination: bsdasri.destination || bsdasri["bsdasriDestination"],
+    transporter: bsdasri.transporter || bsdasri["bsdasriTransporter"],
+    ecoOrganisme: bsdasri.ecoOrganisme,
     updatedAt: bsdasri.updatedAt,
     emittedByEcoOrganisme: bsdasri.ecoOrganisme?.emittedByEcoOrganisme,
     bsdWorkflowType: bsdasri.type,
+    grouping: bsdasri.grouping,
+    synthesizing: bsdasri.synthesizing,
   };
   return bsdasriFormatted;
 };
@@ -124,6 +141,9 @@ const createBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
       code: bsvhu?.wasteCode,
       weight: bsvhu?.weight,
     },
+    emitter: bsvhu.emitter || bsvhu["bsvhuEmitter"],
+    destination: bsvhu.destination || bsvhu["bsvhuDestination"],
+    transporter: bsvhu.transporter || bsvhu["bsvhuTransporter"],
     updatedAt: bsvhu.updatedAt,
   };
   return bsvhuFormatted;
@@ -141,8 +161,12 @@ const createBsff = (bsff: Bsff): BsdDisplay => {
       name: bsff.waste?.description,
       weight: bsff?.weight,
     },
+    emitter: bsff.emitter || bsff["bsffEmitter"],
+    destination: bsff.destination || bsff["bsffDestination"],
+    transporter: bsff.transporter || bsff["bsffTransporter"],
     updatedAt: bsff.updatedAt,
     bsdWorkflowType: bsff.type,
+    grouping: bsff.grouping,
   };
   return bsffFormatted;
 };

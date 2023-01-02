@@ -7,6 +7,7 @@ import { LabelIconCode } from "../LabelWithIcon/labelWithIconTypes";
 import { BsdCardProps } from "./bsdCardTypes";
 import WasteDetails from "../WasteDetails/WasteDetails";
 import {
+  canPublishBsd,
   getBsdView,
   getCtaLabelFromStatus,
   getWorkflowLabel,
@@ -15,7 +16,7 @@ import {
 
 import "./bsdCard.scss";
 
-function BsdCard({ bsd, onValidate }: BsdCardProps): JSX.Element {
+function BsdCard({ bsd, currentSiret, onValidate }: BsdCardProps): JSX.Element {
   const bsdDisplay = getBsdView(bsd);
 
   const updatedAt = bsdDisplay?.updatedAt
@@ -23,13 +24,7 @@ function BsdCard({ bsd, onValidate }: BsdCardProps): JSX.Element {
     : "";
 
   const ctaPrimaryLabel = bsdDisplay?.type
-    ? getCtaLabelFromStatus(
-        bsdDisplay.type,
-        bsdDisplay.status,
-        bsdDisplay?.isDraft,
-        bsdDisplay.worker?.isDisabled,
-        bsdDisplay.bsdWorkflowType
-      )
+    ? getCtaLabelFromStatus(bsdDisplay, currentSiret)
     : "";
 
   const handleValidationClick = (
@@ -80,7 +75,7 @@ function BsdCard({ bsd, onValidate }: BsdCardProps): JSX.Element {
 
             <div className="bsd-card__content__cta">
               {/* TODO BSD suite */}
-              {hasBsdSuite(bsdDisplay) && (
+              {hasBsdSuite(bsdDisplay, currentSiret) && (
                 <button
                   type="button"
                   className="fr-btn fr-btn--sm fr-btn--secondary"
@@ -88,7 +83,7 @@ function BsdCard({ bsd, onValidate }: BsdCardProps): JSX.Element {
                   Compléter le BSD suite
                 </button>
               )}
-              {ctaPrimaryLabel && (
+              {canPublishBsd(bsdDisplay, currentSiret) && ctaPrimaryLabel && (
                 <button
                   type="button"
                   className="fr-btn fr-btn--sm"
