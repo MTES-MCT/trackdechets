@@ -3,15 +3,17 @@ title: Utiliser le protocole OpenID Connect
 ---
 
 :::note
-Cette fonctionalité est réservée à certains acteurs gouvernementaux.
+Cette fonctionalité est réservée à certains acteurs institutionnels.
 Avant de pouvoir implémenter le procotole OpenID Connect, vous aurez besoin d'une application sur la plateforme Trackdéchets. Vous pouvez créer une application depuis votre compte Trackdéchets dans la section Mon Compte > Développeurs > Mes Applications.
-L'activation d'OpenID sur une application doit être demandée au support.
+
+L'activation d'OpenID Connect sur une application doit être demandée au support.
 :::
 
+Une application de test (client/RP) est disponible sur https://github.com/MTES-MCT/trackdechets-openidconnect-demo.
 
-Le [protocole Open ID Connect](https://openid.net/specs/openid-connect-core-1_0.html) permet à des logiciels tiers  ("client") de construire un mécaisme d'authentification  en considérant l'identité d'un utilisateur de Trackdéchets comme une ressource.
+Le [protocole Open ID Connect](https://openid.net/specs/openid-connect-core-1_0.html) permet à des logiciels tiers ("client") de construire un mécanisme d'authentification en considérant l'identité d'un utilisateur de Trackdéchets comme une ressource.
 
-Le protocole Openid connect définit différents flow, seul le workflow "Authorization code flow" est implémenté. 
+
 
 ```
 +--------+                                   +--------+
@@ -36,4 +38,108 @@ Le protocole Openid connect définit différents flow, seul le workflow "Authori
 AuthN: Authentification, AuthZ: Authorization
 ```
 
-Clef publique
+Le protocole Openid connect définit différents workflows, seul l'_Authorization code flow_ est implémenté.
+
+```
+     +----------+
+     | Resource |
+     |   Owner  |
+     |          |
+     +----------+
+          ^
+          |
+         (B)
+     +----|-----+          Client Identifier      +---------------+
+     |         -+----(A)-- & Redirection URI ---->|               |
+     |  User-   |                                 |    OpenID     |
+     |  Agent  -+----(B)-- User authenticates --->|    Provider   |
+     |          |                                 |               |
+     |         -+----(C)-- Authorization Code ---<|               |
+     +-|----|---+                                 +---------------+
+       |    |                                         ^      v
+      (A)  (C)                                        |      |
+       |    |                                         |      |
+       ^    v                                         |      |
+     +---------+                                      |      |
+     |         |>---(D)-- Authorization Code ---------'      |
+     |   RP    |          & Redirection URI                  |
+     |  Client |                                             |
+     |         |<---(E)----- ID Token -----------------------+
+     +---------+
+
+   Note: The lines illustrating steps (A), (B), and (C) are broken into
+   two parts as they pass through the user-agent.
+
+                     Authorization Code Flow
+```
+
+- (A) L'application cliente initie le protocole en redirigeant l'utilisateur sur l'URL d'autorisation Trackdéchets `https://app.trackdechets.beta.gouv.fr/oidc/authorize/dialog`
+
+Les arguments suivants doivent être passés en "query string" de la requête:
+
+- `client_id={client_id}`: L'identifiant de l'application cliente
+- `response_type=code`
+- `redirect_url={redirect_uri}`: URL de redirection
+- `scope={openid profile email}`: le scope de la reuête, voir plus abs
+
+Exemple: `https://app.trackdechets.beta.gouv.fr/oidc/authorize/dialog?response_type=code&redirect_uri=https://client.example.com/cb&client_id=ck7d66y9s00x20784u4u7fp8l&scope=openid profile email`
+
+- (B) Le serveur d'autorisation authentifie l'utilisateur via le navigateur ("resource owner") et établit si oui ou non l'utilisateur autorise ou non l'application autorise l'accès
+
+- (C) Si l'utilisateur donne accès, le serveur d'autorisation redirige l'utilisateur vers l'application cliente en utilisant l'URL de redirection fournit à l'étape (A). L'URL de redirection inclut un code d'autorisation avec une durée de validité de 10 minutes. Par exemple: `https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA`.
+
+- (D) L'application cliente demande un jeton d'identité au serveur d'autorisation en incluant le code d'autorisation reçu à l'étape précédente en faisant un `POST` sur l'URL `https://api.trackdechets.beta.gouv.fr/oidc/token`.. Les paramètres suivants doivent être passés en utilisant le format "application/x-www-form-urlencoded".
+  - `grant_type=authorization_code`
+  - `code={code}` code reçu à l'étape précédente
+  - `redirect_uri={redirect_uri}` URL de redirection spécifié à l'étape (A)
+
+:::note
+La requête doit être authentifiée, 2 méthodes sont possibles:
+
+- via la [méthode basique](https://fr.wikipedia.org/wiki/Authentification_HTTP#M%C3%A9thode_%C2%AB_Basic_%C2%BB), en passant base64(`client_id`:`client_secret`)
+- en passant `client_id` et `client_secret` directement dans les paramètres POST
+:::
+
+- (E) Si la requête est valide et autorisée, le serveur d'autorisation émet un jeton d'identité (ID token). Par exemple
+
+```
+{
+  name: 'Jean Dupont',
+  phone: '06876543',
+  email: 'foo@barr.fr',
+  email_verified: true,
+  companies: [
+    { role: 'ADMIN', siret: '1234', vat_number: null },
+    { role: 'ADMIN', siret: '5678', vat_number: null },
+  ],
+  nonce: 'CYCTdEHKQAqB2ahOVWiOFSMbjdxUhGBb',
+  iat: 1672650576,
+  iss: 'trackdechets',
+  aud: 'your-app',
+  exp: 1672654176,
+  sub: 'ck03yr7q000di0728m7uwhc1i'
+}
+```
+
+:::caution
+Le token est signé via une clef RSA, il est indispensable de vérifier sa signature l'audience (aud) et issuer (iss) grâce à la clef publique.
+:::
+
+:::caution
+Le nonce est fourni pour éviter toute attaque par rejeu, il appartient au client de s'assurer que le nonce n'a jamais été utilisé
+:::
+
+## Scope
+
+Le scope définit les claims, cad les champs demandés qui seront inclus dans le token d'identité.
+
+Trackdéchets implémente 3 valeurs standard et une valeur spécifique:
+
+- openid : obligatoire, requête le `sub`, l'id de l'utilisateur
+- email : requête email et email_verified
+- profile : requête name & phone
+- companies : requête la liste des entreprises de l'utilisateur (role, siret et vat_number si disponible)
+
+:::tip
+Une application Openid de démonstration a été créée à l'adresse [https://openid-demo.trackdechets.beta.gouv.fr/](https://openid-demo.trackdechets.beta.gouv.fr/)
+:::
