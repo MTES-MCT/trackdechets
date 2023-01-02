@@ -13,6 +13,7 @@ import {
   transporterSchemaFn
 } from "../validation";
 import { ReceivedFormInput } from "../../generated/graphql/types";
+import { siretify } from "../../__tests__/factories";
 
 jest.mock("../../prisma", () => ({
   company: {
@@ -32,6 +33,9 @@ jest.mock("../../prisma", () => ({
   }
 }));
 
+const siret1 = siretify(1);
+const siret2 = siretify(2);
+const siret3 = siretify(3);
 const form: Partial<Form> = {
   id: "cjplbvecc000d0766j32r19am",
   readableId: "BSD-20210101-AAAAAAAA",
@@ -43,7 +47,7 @@ const form: Partial<Form> = {
   emitterWorkSitePostalCode: "",
   emitterWorkSiteInfos: "",
   emitterCompanyName: "A company 2",
-  emitterCompanySiret: "00000000000002",
+  emitterCompanySiret: siret1,
   emitterCompanyContact: "Emetteur",
   emitterCompanyPhone: "01",
   emitterCompanyAddress: "8 rue du Général de Gaulle",
@@ -51,7 +55,7 @@ const form: Partial<Form> = {
   recipientCap: "1234",
   recipientProcessingOperation: "D 6",
   recipientCompanyName: "A company 3",
-  recipientCompanySiret: "00000000000003",
+  recipientCompanySiret: siret2,
   recipientCompanyAddress: "8 rue du Général de Gaulle",
   recipientCompanyContact: "Destination",
   recipientCompanyPhone: "02",
@@ -60,7 +64,7 @@ const form: Partial<Form> = {
   transporterDepartment: "82",
   transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
   transporterCompanyName: "A company 4",
-  transporterCompanySiret: "00000000000004",
+  transporterCompanySiret: siret3,
   transporterCompanyAddress: "8 rue du Général de Gaulle",
   transporterCompanyContact: "Transporteur",
   transporterCompanyPhone: "03",
@@ -188,7 +192,7 @@ describe("sealedFormSchema", () => {
         recipientCap: "1234",
         recipientProcessingOperation: "D 6",
         recipientCompanyName: "A company 3",
-        recipientCompanySiret: "00000000000003",
+        recipientCompanySiret: siret2,
         recipientCompanyAddress: "8 rue du Général de Gaulle",
         recipientCompanyContact: "Destination",
         recipientCompanyPhone: "02",
@@ -197,7 +201,7 @@ describe("sealedFormSchema", () => {
         transporterDepartment: "82",
         transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
         transporterCompanyName: "A company 4",
-        transporterCompanySiret: "00000000000004",
+        transporterCompanySiret: siret3,
         transporterCompanyAddress: "8 rue du Général de Gaulle",
         transporterCompanyContact: "Transporteur",
         transporterCompanyPhone: "03",
@@ -234,7 +238,7 @@ describe("sealedFormSchema", () => {
         recipientCap: "1234",
         recipientProcessingOperation: "D 6",
         recipientCompanyName: "A company 3",
-        recipientCompanySiret: "00000000000003",
+        recipientCompanySiret: siret2,
         recipientCompanyAddress: "8 rue du Général de Gaulle",
         recipientCompanyContact: "Destination",
         recipientCompanyPhone: "02",
@@ -243,7 +247,7 @@ describe("sealedFormSchema", () => {
         transporterDepartment: "82",
         transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
         transporterCompanyName: "A company 4",
-        transporterCompanySiret: "00000000000004",
+        transporterCompanySiret: siret3,
         transporterCompanyAddress: "8 rue du Général de Gaulle",
         transporterCompanyContact: "Transporteur",
         transporterCompanyPhone: "03",
@@ -297,7 +301,7 @@ describe("sealedFormSchema", () => {
         emitterWorkSitePostalCode: "",
         emitterWorkSiteInfos: "",
         emitterCompanyName: "A company 2",
-        emitterCompanySiret: "00000000000002",
+        emitterCompanySiret: siret1,
         emitterCompanyContact: "Emetteur",
         emitterCompanyPhone: "01",
         emitterCompanyAddress: "8 rue du Général de Gaulle",
@@ -305,7 +309,7 @@ describe("sealedFormSchema", () => {
         recipientCap: "1234",
         recipientProcessingOperation: "D 6",
         recipientCompanyName: "A company 3",
-        recipientCompanySiret: "00000000000003",
+        recipientCompanySiret: siret2,
         recipientCompanyAddress: "8 rue du Général de Gaulle",
         recipientCompanyContact: "Destination",
         recipientCompanyPhone: "02",
@@ -314,7 +318,7 @@ describe("sealedFormSchema", () => {
         transporterDepartment: "82",
         transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
         transporterCompanyName: "A company 4",
-        transporterCompanySiret: "00000000000004",
+        transporterCompanySiret: siret3,
         transporterCompanyAddress: "8 rue du Général de Gaulle",
         transporterCompanyContact: "Transporteur",
         transporterCompanyPhone: "03",
@@ -346,7 +350,7 @@ describe("sealedFormSchema", () => {
         emitterWorkSitePostalCode: "",
         emitterWorkSiteInfos: "",
         emitterCompanyName: "A company 2",
-        emitterCompanySiret: "00000000000002",
+        emitterCompanySiret: siret1,
         emitterCompanyContact: "Emetteur",
         emitterCompanyPhone: "01",
         emitterCompanyAddress: "8 rue du Général de Gaulle",
@@ -355,7 +359,7 @@ describe("sealedFormSchema", () => {
         recipientCap: "1234",
         recipientProcessingOperation: "D 6",
         recipientCompanyName: "A company 3",
-        recipientCompanySiret: "00000000000003",
+        recipientCompanySiret: siret2,
         recipientCompanyAddress: "8 rue du Général de Gaulle",
         recipientCompanyContact: "Destination",
         recipientCompanyPhone: "02",
@@ -364,7 +368,7 @@ describe("sealedFormSchema", () => {
         transporterDepartment: "82",
         transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
         transporterCompanyName: "A company 4",
-        transporterCompanySiret: "00000000000004",
+        transporterCompanySiret: siret3,
         transporterCompanyAddress: "8 rue du Général de Gaulle",
         transporterCompanyContact: "Transporteur",
         transporterCompanyPhone: "03",
@@ -398,7 +402,7 @@ describe("sealedFormSchema", () => {
         emitterWorkSitePostalCode: "",
         emitterWorkSiteInfos: "",
         emitterCompanyName: "A company 2",
-        emitterCompanySiret: "00000000000002",
+        emitterCompanySiret: siret1,
         emitterCompanyContact: "Emetteur",
         emitterCompanyPhone: "01",
         emitterCompanyAddress: "8 rue du Général de Gaulle",
@@ -407,7 +411,7 @@ describe("sealedFormSchema", () => {
         recipientCap: "1234",
         recipientProcessingOperation: "D 6",
         recipientCompanyName: "A company 3",
-        recipientCompanySiret: "00000000000003",
+        recipientCompanySiret: siret2,
         recipientCompanyAddress: "8 rue du Général de Gaulle",
         recipientCompanyContact: "Destination",
         recipientCompanyPhone: "02",
@@ -416,7 +420,7 @@ describe("sealedFormSchema", () => {
         transporterDepartment: "82",
         transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
         transporterCompanyName: "A company 4",
-        transporterCompanySiret: "00000000000004",
+        transporterCompanySiret: siret3,
         transporterCompanyAddress: "8 rue du Général de Gaulle",
         transporterCompanyContact: "Transporteur",
         transporterCompanyPhone: "03",
@@ -450,7 +454,7 @@ describe("sealedFormSchema", () => {
       const testForm = {
         ...form,
         emitterType: "PRODUCER",
-        ecoOrganismeSiret: "12592018234951",
+        ecoOrganismeSiret: siretify(5),
         ecoOrganismeName: "Some eco-organisme"
       };
 
@@ -715,7 +719,7 @@ describe("draftFormSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Émetteur: Le SIRET doit faire 14 caractères numériques"
+      "Émetteur: this is not a siret n'est pas un numéro de SIRET valide"
     );
   });
 
@@ -950,7 +954,7 @@ describe("processedInfoSchema", () => {
       noTraceability: true,
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
-      nextDestinationCompanySiret: "11111111111111",
+      nextDestinationCompanySiret: siretify(1),
       nextDestinationCompanyAddress: "4 rue du déchet",
       nextDestinationCompanyCountry: "FR",
       nextDestinationCompanyContact: "Arya Stark",
@@ -969,7 +973,7 @@ describe("processedInfoSchema", () => {
       noTraceability: false,
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
-      nextDestinationCompanySiret: "11111111111111",
+      nextDestinationCompanySiret: siretify(1),
       nextDestinationCompanyAddress: "4 rue du déchet",
       nextDestinationCompanyCountry: "FR",
       nextDestinationCompanyContact: "Arya Stark",
@@ -987,7 +991,7 @@ describe("processedInfoSchema", () => {
       processingOperationDescription: "Regroupement",
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
-      nextDestinationCompanySiret: "11111111111111",
+      nextDestinationCompanySiret: siretify(1),
       nextDestinationCompanyAddress: "4 rue du déchet",
       nextDestinationCompanyCountry: "FR",
       nextDestinationCompanyContact: "Arya Stark",
@@ -1006,7 +1010,7 @@ describe("processedInfoSchema", () => {
       noTraceability: false,
       nextDestinationProcessingOperation: "D 8",
       nextDestinationCompanyName: "Exutoire",
-      nextDestinationCompanySiret: "11111111111111",
+      nextDestinationCompanySiret: siretify(1),
       nextDestinationCompanyAddress: "4 rue du déchet",
       nextDestinationCompanyCountry: "FR",
       nextDestinationCompanyContact: "Arya Stark",
@@ -1100,7 +1104,7 @@ describe("processedInfoSchema", () => {
   test("transporter vatNumber is optional when a valid SIRET is present", async () => {
     const transporter = {
       transporterCompanyName: "Code en Stock",
-      transporterCompanySiret: "85001946400021",
+      transporterCompanySiret: siretify(1),
       transporterCompanyAddress: "Marseille",
       transporterCompanyContact: "Contact",
       transporterCompanyPhone: "00 00 00 00 00",
@@ -1123,7 +1127,7 @@ describe("processedInfoSchema", () => {
     const validateFn = () => transporterSchemaFn(false).validate(transporter);
 
     await expect(validateFn()).rejects.toThrow(
-      "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
+      "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
     );
   });
 
@@ -1141,7 +1145,7 @@ describe("processedInfoSchema", () => {
     const validateFn = () => transporterSchemaFn(false).validate(transporter);
 
     await expect(validateFn()).rejects.toThrow(
-      "transporterCompanyVatNumber n'est pas un numéro de TVA intracommunautaire valide"
+      "Transporteur: invalid n'est pas un numéro de TVA étranger valide"
     );
   });
 
@@ -1179,7 +1183,6 @@ describe("processedInfoSchema", () => {
         "Destination ultérieure : L'opération de traitement est obligatoire",
         "Destination ultérieure : Le nom de l'entreprise est obligatoire",
         "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire",
-        "Destination ultérieure prévue : Le SIRET doit faire 14 caractères numériques",
         "Destination ultérieure : L'adresse de l'entreprise est obligatoire",
         "Destination ultérieure : Le contact dans l'entreprise est obligatoire",
         "Destination ultérieure : Le téléphone de l'entreprise est obligatoire",

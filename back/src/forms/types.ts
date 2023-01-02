@@ -22,11 +22,17 @@ export type FormCompanies = Pick<
   | "emitterCompanySiret"
   | "recipientCompanySiret"
   | "transporterCompanySiret"
+  | "transporterCompanyVatNumber"
   | "traderCompanySiret"
   | "brokerCompanySiret"
   | "ecoOrganismeSiret"
 > & {
-  forwardedIn?: Pick<Form, "transporterCompanySiret" | "recipientCompanySiret">;
+  forwardedIn?: Pick<
+    Form,
+    | "transporterCompanySiret"
+    | "recipientCompanySiret"
+    | "transporterCompanyVatNumber"
+  >;
 } & {
   transportSegments?: Pick<TransportSegment, "transporterCompanySiret">[];
 } & {

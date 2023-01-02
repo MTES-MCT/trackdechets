@@ -8,7 +8,12 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import prisma from "../../../prisma";
 import { nafCodes } from "../../../common/constants/NAF";
-import { isSiret } from "../../../common/constants/companySearchHelpers";
+import {
+  isForeignVat,
+  isFRVat,
+  isSiret,
+  isVat
+} from "../../../common/constants/companySearchHelpers";
 
 const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
   yup.object({
@@ -22,12 +27,32 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       )
       .required(),
     name: yup.string().required(),
+    vatNumber: yup
+      .string()
+      .test(
+        "is-vat",
+        "AnonymousCompany: ${originalValue} n'est pas un numéro de TVA valide",
+        value => !value || isVat(value)
+      )
+      .test(
+        "is-not-fr-vat",
+        "AnonymousCompany: le numéro de SIRET est obligatoire pour les établissements français",
+        value => !value || !isFRVat(value)
+      ),
     siret: yup
       .string()
-      .ensure()
-      .required("n°SIRET requis")
-      .test("is-siret", "${path} n'est pas un numéro de SIRET valide", value =>
-        isSiret(value)
+      .when("vatNumber", {
+        is: vatNumber => !vatNumber,
+        then: schema =>
+          schema.required(
+            "La sélection d'une entreprise par SIRET ou numéro de TVA (si l'entreprise n'est pas française) est obligatoire"
+          ),
+        otherwise: schema => schema.ensure()
+      })
+      .test(
+        "is-siret",
+        "AnonymousCompany: ${originalValue} n'est pas un numéro de SIRET valide",
+        value => !value || isSiret(value)
       )
   });
 
@@ -38,8 +63,13 @@ const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"
 
     await AnonymousCompanyInputSchema.validate(input);
 
+    // ignore SIRET in this case
+    if (isForeignVat(input.vatNumber)) {
+      delete input.siret;
+    }
+
     const existingAnonymousCompany = await prisma.anonymousCompany.findUnique({
-      where: { siret: input.siret }
+      where: { orgId: input.siret ?? input.vatNumber }
     });
     if (existingAnonymousCompany) {
       throw new UserInputError(
@@ -49,6 +79,7 @@ const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"
 
     const anonymousCompany = await prisma.anonymousCompany.create({
       data: {
+        orgId: input.siret ?? input.vatNumber,
         ...input,
         libelleNaf: nafCodes[input.codeNaf]
       }

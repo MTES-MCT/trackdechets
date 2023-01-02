@@ -10,3 +10,4 @@ ELASTIC_SEARCH_URL=http://elasticsearch:9200
 DD_TRACE_ENABLED=false
 QUEUE_NAME_SENDMAIL=td-integration-tests-queue
 TD_COMPANY_ELASTICSEARCH_INDEX=stocketablissement-production
+ALLOW_TEST_COMPANY=true

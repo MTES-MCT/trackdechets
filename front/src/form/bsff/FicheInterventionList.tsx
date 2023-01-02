@@ -43,6 +43,7 @@ const companySchema: yup.SchemaOf<CompanyInput> = yup.object({
     .oneOf([...countries.map(country => country.cca2), null])
     .nullable(),
   omiNumber: yup.string().nullable(),
+  orgId: yup.string().nullable(),
 });
 const detenteurSchema: yup.SchemaOf<BsffFicheInterventionInput["detenteur"]> =
   yup.object({

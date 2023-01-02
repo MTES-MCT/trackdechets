@@ -13,7 +13,7 @@ AccountFieldCompanySecurityCode.fragments = {
   company: gql`
     fragment AccountFieldCompanySecurityCodeFragment on CompanyPrivate {
       id
-      siret
+      orgId
       userRole
       securityCode
       allowBsdasriTakeOverWithoutSignature
@@ -38,7 +38,7 @@ export default function AccountFieldCompanySecurityCode({ company }: Props) {
           renderForm={toggleEdition => (
             <AccountFormCompanySecurityCode
               toggleEdition={toggleEdition}
-              mutationArgs={{ siret: company.siret }}
+              mutationArgs={{ siret: company.orgId }}
             />
           )}
           tooltip={tooltip}

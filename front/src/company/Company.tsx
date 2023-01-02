@@ -15,6 +15,7 @@ const COMPANY_INFOS = gql`
     companyInfos(siret: $siret) {
       siret
       vatNumber
+      orgId
       name
       address
       naf
@@ -110,7 +111,7 @@ export default function CompanyInfo() {
         <div className="container">
           <CompanyHeader
             name={!nonDiffusible ? company.name : "non diffusible"}
-            siret={company.siret || company.vatNumber}
+            siret={company.orgId}
             naf={!nonDiffusible ? company.naf : "non diffusible"}
             libelleNaf={!nonDiffusible ? company.libelleNaf : "non diffusible"}
           />

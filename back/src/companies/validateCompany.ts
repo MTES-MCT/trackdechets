@@ -45,12 +45,9 @@ export async function validateCompany(
     };
   } catch (exc) {
     if (exc instanceof UserInputError) {
-      throw new UserInputError(
-        `${errorPrefix}Numéro de SIRET ou de TVA invalide`,
-        {
-          invalidArgs: ["siret", "vatNumber"]
-        }
-      );
+      throw new UserInputError(`${errorPrefix} ${exc.message}`, {
+        invalidArgs: ["siret", "vatNumber"]
+      });
     } else {
       throw exc;
     }

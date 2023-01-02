@@ -9,6 +9,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Vérification des numéros de SIRET en entrée pour tous les types de bordereaux [PR 1928](https://github.com/MTES-MCT/trackdechets/pull/1928)
+- Vérification des numéros de TVA pour les transporteurs de tous les types de bordereaux (vérification si le format est valide et interdiction de tout numéro de TVA français) [PR 1947](https://github.com/MTES-MCT/trackdechets/pull/1947)
+
 #### :bug: Corrections de bugs
 
 #### :boom: Breaking changes
@@ -17,6 +20,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Les transporteurs peuvent désormais modifier la date de prise en charge pour les BSDD et BSVHU [PR 1962](https://github.com/MTES-MCT/trackdechets/pull/1962)
 - Les destinataires des BSDD peuvent désormais choisir l'option R0 (réemploi/réutilisation) [PR 1971](https://github.com/MTES-MCT/trackdechets/pull/1971)
+- Ajout de rate limit sur certaines mutations [PR 1948](https://github.com/MTES-MCT/trackdechets/pull/1948)
 
 #### :memo: Documentation
 

@@ -54,6 +54,7 @@ const createSynthesisBsdasri = async (
   const formSirets = {
     emitterCompanySiret: input.transporter?.company?.siret,
     transporterCompanySiret: input.transporter?.company?.siret,
+    transporterCompanyVatNumber: input.transporter?.company?.vatNumber,
     destinationCompanySiret: input.destination?.company?.siret
   };
 

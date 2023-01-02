@@ -16,7 +16,6 @@ import {
   isSiret,
   isVat
 } from "../../../common/constants/companySearchHelpers";
-import { whereSiretOrVatNumber } from "../CompanySearchResult";
 import { searchCompany } from "../../search";
 import {
   addToGeocodeCompanyQueue,
@@ -60,14 +59,15 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   // clean orgId
   const orgId = companyInput.orgId.replace(/[\W_]+/g, "");
-  // copy VAT number to the SIRET field in order to ensure backward compatibility
-  const siret = orgId;
+  let siret: string;
   let vatNumber: string;
+
   if (isFRVat(orgId)) {
     throw new UserInputError(
-      "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indique un SIRET"
+      "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indiquer un SIRET"
     );
   }
+
   if (isVat(orgId)) {
     vatNumber = orgId;
     if (companyTypes.join("") !== CompanyType.TRANSPORTER) {
@@ -79,9 +79,14 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     throw new UserInputError(
       "Impossible de créer un établissement sans un SIRET valide ni un numéro de TVA étranger valide"
     );
+  } else {
+    siret = orgId;
   }
+
   const existingCompany = await prisma.company.findUnique({
-    where: whereSiretOrVatNumber({ siret, vatNumber })
+    where: {
+      orgId
+    }
   });
 
   if (existingCompany) {
@@ -115,6 +120,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   }
 
   const companyCreateInput: Prisma.CompanyCreateInput = {
+    orgId,
     siret,
     vatNumber,
     codeNaf,
@@ -193,13 +199,17 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       );
     }
   }
-
-  // Fill latitude, longitude and departement asynchronously
-  addToGeocodeCompanyQueue({ siret: company.siret, address: company.address });
-  addToSetCompanyDepartementQueue({
-    siret: company.siret,
-    codeCommune: companyInfo.codeCommune
-  });
+  if (company.siret) {
+    // Fill latitude, longitude and departement asynchronously
+    addToGeocodeCompanyQueue({
+      siret: company.siret,
+      address: company.address
+    });
+    addToSetCompanyDepartementQueue({
+      siret: company.siret,
+      codeCommune: companyInfo.codeCommune
+    });
+  }
 
   return convertUrls(company);
 };

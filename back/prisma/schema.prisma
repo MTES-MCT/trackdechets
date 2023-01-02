@@ -170,7 +170,8 @@ model Application {
 
 model Company {
   id                                   String                    @id @default(cuid())
-  siret                                String                    @unique
+  orgId                                String                    @unique
+  siret                                String?                   @unique
   vatNumber                            String?                   @unique
   updatedAt                            DateTime                  @updatedAt @db.Timestamptz(6)
   createdAt                            DateTime                  @default(now()) @db.Timestamptz(6)
@@ -225,7 +226,8 @@ model Company {
 // du rattachement d'établissements de test sur l'environnement sandbox
 model AnonymousCompany {
   id          String  @id @default(cuid())
-  siret       String  @unique
+  orgId       String  @unique
+  siret       String? @unique
   vatNumber   String? @unique
   name        String
   address     String
@@ -1153,8 +1155,8 @@ model BsffFicheIntervention {
   detenteurCompanySiret        String?
   detenteurCompanyAddress      String
   detenteurCompanyContact      String?
-  detenteurCompanyPhone        String
-  detenteurCompanyMail         String
+  detenteurCompanyPhone        String?
+  detenteurCompanyMail         String?
   detenteurIsPrivateIndividual Boolean @default(false)
 
   operateurCompanyName    String

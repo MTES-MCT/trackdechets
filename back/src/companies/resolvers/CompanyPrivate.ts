@@ -5,7 +5,7 @@ import { getCompanyUsers, getUserRole } from "../database";
 const companyPrivateResolvers: CompanyPrivateResolvers = {
   users: async (parent, _, context) => {
     const userId = context.user.id;
-    const userRole = await getUserRole(userId, parent.siret);
+    const userRole = await getUserRole(userId, parent.orgId);
     if (userRole !== "ADMIN") {
       return [
         {
@@ -16,11 +16,11 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
       ];
     }
 
-    return getCompanyUsers(parent.siret, context.dataloaders);
+    return getCompanyUsers(parent.orgId, context.dataloaders);
   },
   userRole: (parent, _, context) => {
     const userId = context.user.id;
-    return getUserRole(userId, parent.siret);
+    return getUserRole(userId, parent.orgId);
   },
   transporterReceipt: parent => {
     return prisma.company
@@ -53,7 +53,7 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
       .workerCertification();
   },
   installation: (parent, _, context) => {
-    return context.dataloaders.installations.load(parent.siret);
+    return context.dataloaders.installations.load(parent.orgId);
   }
 };
 

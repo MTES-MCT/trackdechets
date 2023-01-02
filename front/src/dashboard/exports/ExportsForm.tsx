@@ -318,7 +318,7 @@ export default function ExportsForm({ companies }: IProps) {
                       } else {
                         setFieldValue(
                           "companies",
-                          companies.filter(c => c.siret === value)
+                          companies.filter(c => c.orgId === value)
                         );
                       }
                     }}
@@ -327,7 +327,7 @@ export default function ExportsForm({ companies }: IProps) {
                       Tous les établissements
                     </option>
                     {companies.map((company, key) => (
-                      <option value={company.siret} key={key}>
+                      <option value={company.orgId} key={key}>
                         {company.givenName || company.name}
                       </option>
                     ))}

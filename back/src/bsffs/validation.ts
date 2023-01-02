@@ -18,7 +18,8 @@ import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { BSFF_WASTE_CODES } from "../common/constants";
 import {
   destinationCompanySiretSchema,
-  transporterCompanySiretSchema
+  transporterCompanySiretSchema,
+  transporterCompanyVatNumberSchema
 } from "../companies/validation";
 
 configureYup();
@@ -138,14 +139,7 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
           "Transporteur : le nom de l'établissement est requis"
         ),
       transporterCompanySiret: transporterCompanySiretSchema(isDraft),
-      transporterCompanyVatNumber: yup
-        .string()
-        .ensure()
-        .test(
-          "is-vat",
-          "Transporteur : le numéro de TVA intracommunautaire n'est pas au bon format",
-          value => !value || isVat(value)
-        ),
+      transporterCompanyVatNumber: transporterCompanyVatNumberSchema,
       transporterCompanyAddress: yup
         .string()
         .requiredIf(
@@ -412,7 +406,7 @@ const withNextDestination = (required: boolean) =>
       .nullable()
       .test(
         "is-vat",
-        "${path} n'est pas un numéro de TVA intracommunautaire valide",
+        "Destination ultérieure : ${originalValue} n'est pas un numéro de TVA intracommunautaire valide",
         value => !value || isVat(value)
       ),
 
@@ -1000,11 +994,11 @@ export const ficheInterventionSchema: yup.SchemaOf<
       is: true,
       then: schema =>
         schema.required(
-          "L'addresse du détenteur de l'équipement (particulier) est requise"
+          "L'adresse du détenteur de l'équipement (particulier) est requise"
         ),
       otherwise: schema =>
         schema.required(
-          "L'addresse de l'entreprise détentrice de l'équipement est requise"
+          "L'adresse de l'entreprise détentrice de l'équipement est requise"
         )
     }),
   detenteurCompanyContact: yup
@@ -1040,7 +1034,7 @@ export const ficheInterventionSchema: yup.SchemaOf<
       then: schema => schema.nullable().notRequired(),
       otherwise: schema =>
         schema.required(
-          "L'addresse email de l'entreprise détentrice de l'équipement est requis"
+          "L'adresse email de l'entreprise détentrice de l'équipement est requis"
         )
     }),
   operateurCompanyName: yup
@@ -1055,7 +1049,7 @@ export const ficheInterventionSchema: yup.SchemaOf<
     }),
   operateurCompanyAddress: yup
     .string()
-    .required("L'addresse de l'entreprise de l'opérateur est requis"),
+    .required("L'adresse de l'entreprise de l'opérateur est requis"),
   operateurCompanyContact: yup
     .string()
     .required("Le nom du contact de l'entreprise de l'opérateur est requis"),
@@ -1066,7 +1060,7 @@ export const ficheInterventionSchema: yup.SchemaOf<
     ),
   operateurCompanyMail: yup
     .string()
-    .required("L'addresse email de l'entreprise de l'opérateur est requis")
+    .required("L'adresse email de l'entreprise de l'opérateur est requis")
 });
 
 export function validateFicheIntervention(

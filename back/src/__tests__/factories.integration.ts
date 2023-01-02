@@ -3,6 +3,7 @@ import { resetDatabase } from "../../integration-tests/helper";
 import {
   companyFactory,
   formFactory,
+  siretify,
   statusLogFactory,
   transportSegmentFactory,
   userFactory,
@@ -144,14 +145,16 @@ test("should create a transport segment", async () => {
   const frm = await formFactory({
     ownerId: usr.id
   });
-
+  const transporterCompanySiret = siretify(4);
   const newTransportSegment = await transportSegmentFactory({
     formId: frm.id,
-    segmentPayload: { transporterCompanySiret: "1234" }
+    segmentPayload: { transporterCompanySiret }
   });
 
   expect(newTransportSegment.id).toBeTruthy();
-  expect(newTransportSegment.transporterCompanySiret).toEqual("1234");
+  expect(newTransportSegment.transporterCompanySiret).toEqual(
+    transporterCompanySiret
+  );
   //check reverse access
   const segments = await prisma.form
     .findUnique({ where: { id: frm.id } })

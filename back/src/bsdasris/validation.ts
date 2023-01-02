@@ -1,5 +1,8 @@
 import { WasteAcceptationStatus, Prisma, BsdasriType } from "@prisma/client";
-import { isCollector } from "../companies/validation";
+import {
+  isCollector,
+  transporterCompanyVatNumberSchema
+} from "../companies/validation";
 import * as yup from "yup";
 import {
   DASRI_WASTE_CODES,
@@ -13,11 +16,7 @@ import {
   BsdasriPackagingType,
   BsdasriSignatureType
 } from "../generated/graphql/types";
-import {
-  isVat,
-  isSiret,
-  isFRVat
-} from "../common/constants/companySearchHelpers";
+import { isSiret } from "../common/constants/companySearchHelpers";
 import {
   MISSING_COMPANY_SIRET,
   MISSING_COMPANY_SIRET_OR_VAT
@@ -120,8 +119,6 @@ const MISSING_COMPANY_ADDRESS = "L'adresse de l'entreprise est obligatoire";
 const MISSING_COMPANY_CONTACT = "Le contact dans l'entreprise est obligatoire";
 const MISSING_COMPANY_PHONE = "Le téléphone de l'entreprise est obligatoire";
 
-const INVALID_SIRET_LENGTH = "Le SIRET doit faire 14 caractères numériques";
-
 const INVALID_DASRI_WASTE_CODE =
   "Ce code déchet n'est pas autorisé pour les DASRI";
 const INVALID_PROCESSING_OPERATION =
@@ -137,7 +134,11 @@ export const emitterSchema: FactorySchemaOf<BsdasriValidationContext, Emitter> =
       ),
       emitterCompanySiret: yup
         .string()
-        .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
+        .test(
+          "is-siret",
+          "Émetteur: ${originalValue} n'est pas un numéro de SIRET valide",
+          value => !value || isSiret(value)
+        )
         .requiredIf(
           // field copied from transporter returning an error message would be confusing
           context.emissionSignature && !context?.isSynthesis,
@@ -278,6 +279,11 @@ export const ecoOrganismeSchema: FactorySchemaOf<
       .notRequired()
       .nullable()
       .test(
+        "is-siret",
+        "Éco-organisme: ${originalValue} n'est pas un numéro de SIRET valide",
+        value => !value || isSiret(value)
+      )
+      .test(
         "is-known-bsdasri-eco-organisme",
         "L'éco-organisme avec le siret \"${value}\" n'est pas reconnu ou n'est pas autorisé à gérer des dasris.",
         ecoOrganismeSiret =>
@@ -310,29 +316,18 @@ export const transporterSchema: FactorySchemaOf<
       .ensure()
       .when("transporterCompanyVatNumber", (tva, schema) => {
         if (!tva && context.transportSignature) {
-          return schema
-            .required(`Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`)
-            .test(
-              "is-siret",
-              "${path} n'est pas un numéro de SIRET valide",
-              value => isSiret(value)
-            );
-        }
-        if (context.transportSignature && tva && isFRVat(tva)) {
           return schema.required(
-            "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
+            `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`
           );
         }
         return schema.nullable().notRequired();
-      }),
-    transporterCompanyVatNumber: yup
-      .string()
-      .ensure()
+      })
       .test(
-        "is-vat",
-        "${path} n'est pas un numéro de TVA intracommunautaire valide",
-        value => !value || isVat(value)
+        "is-siret",
+        "Transporteur : ${originalValue} n'est pas un numéro de SIRET valide",
+        value => !value || isSiret(value)
       ),
+    transporterCompanyVatNumber: transporterCompanyVatNumberSchema,
     transporterCompanyAddress: yup
       .string()
       .ensure()
@@ -529,8 +524,11 @@ export const recipientSchema: FactorySchemaOf<
       ),
     destinationCompanySiret: yup
       .string()
-      .length(14, `Destinataire: ${INVALID_SIRET_LENGTH}`)
-
+      .test(
+        "is-siret",
+        "Destination : ${originalValue} n'est pas un numéro de SIRET valide",
+        value => !value || isSiret(value)
+      )
       .requiredIf(
         context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_SIRET}`

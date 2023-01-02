@@ -1,0 +1,99 @@
+.fr-badge {
+    &--success, &--error {
+        &:before {
+            display: inline-block!important;
+        }
+    }
+    &--DRAFT {
+        background-color: #FBF6ED;
+        color: #716043;
+    }
+    &--SEALED {
+        background-color: #FEECC2;
+        color: #716043;
+    }
+    &--SENT {
+        background-color: #E5FBFD;
+        color: #006A6F;
+    }
+    &--RECEIVED {
+        background-color: #E5FBFD;
+        color: #006A6F;
+    }
+    &--ACCEPTED {
+        background-color: #E3FDEB;
+        color: #37635F;
+    }
+    &--PROCESSED {
+        background-color: #B8FEC9;
+        color: #18753C;
+    }
+    &--AWAITING_GROUP {
+        background-color: #E5FBFD;
+        color: #006A6F;
+    }
+    &--GROUPED {
+        background-color: #FBF6ED;
+        color: #716043;
+    }
+    &--NO_TRACEABILITY {
+        background-color: #FFE8E5;
+        color: #B34000;
+    }
+    &--REFUSED {
+        background-color: #FFE9E9;
+        color: #CE0500;
+    }
+    &--TEMP_STORED {
+        background-color: #E5FBFD;
+        color: #006A6F;
+    }
+    &--TEMP_STORER_ACCEPTED {
+        background-color: #E3FDEB;
+        color: #37635F;
+    }
+    &--RESEALED {
+        background-color: #E5FBFD;
+        color: #006A6F;
+    }
+    &--RESENT {
+        background-color: #E5FBFD;
+        color: #006A6F;
+    }
+    &--SIGNED_BY_PRODUCER {
+        background-color: #E6EEFE;
+        color: #3558A2;
+    }
+    &--INITIAL {
+        background-color: #FBF6ED;
+        color: #716043;
+    }
+    &--SIGNED_BY_EMITTER {
+        background-color: #E6EEFE;
+        color: #3558A2;
+    }
+    &--INTERMEDIATELY_PROCESSED {
+        background-color: #FBF6ED;
+        color: #716043;
+    }
+    &--SIGNED_BY_TEMP_STORER {
+        background-color: #E6EEFE;
+        color: #3558A2;
+    }
+    &--FOLLOWED_WITH_PNTTD {
+        background-color: #B8FEC9;
+        color: #18753C;
+    }
+    &--PARTIALLY_REFUSED {
+        background-color: #FFE9E9;
+        color: #CE0500;
+    }
+    &--SIGNED_BY_WORKER {
+        background-color: #E6EEFE;
+        color: #3558A2;
+    }
+    &--AWAITING_CHILD {
+        background-color: #E5FBFD;
+        color: #006A6F;
+    }
+}

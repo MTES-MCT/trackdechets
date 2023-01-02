@@ -17,6 +17,7 @@ const bsdaSiretFields = Prisma.validator<Prisma.BsdaArgs>()({
     emitterCompanySiret: true,
     destinationCompanySiret: true,
     transporterCompanySiret: true,
+    transporterCompanyVatNumber: true,
     workerCompanySiret: true,
     brokerCompanySiret: true,
     destinationOperationNextDestinationCompanySiret: true
@@ -44,6 +45,7 @@ export const BSDA_CONTRIBUTORS_FIELDS: Record<string, keyof BsdaContributors> =
     emitter: "emitterCompanySiret",
     destination: "destinationCompanySiret",
     transporter: "transporterCompanySiret",
+    transporterVat: "transporterCompanyVatNumber",
     worker: "workerCompanySiret",
     broker: "brokerCompanySiret",
     nextDestination: "destinationOperationNextDestinationCompanySiret"
@@ -83,7 +85,7 @@ export async function checkIsBsdaContributor(
 export async function isBsdaContributor(user: User, bsda: BsdaContributors) {
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
-  const formSirets = Object.values(BSDA_CONTRIBUTORS_FIELDS).map(
+  const bsdaSiretOrVat = Object.values(BSDA_CONTRIBUTORS_FIELDS).map(
     field => bsda[field]
   );
 
@@ -94,7 +96,7 @@ export async function isBsdaContributor(user: User, bsda: BsdaContributors) {
 
   return userCompaniesSiretOrVat.some(
     siret =>
-      formSirets.includes(siret) || intermerdiariesSirets?.includes(siret)
+      bsdaSiretOrVat.includes(siret) || intermerdiariesSirets?.includes(siret)
   );
 }
 

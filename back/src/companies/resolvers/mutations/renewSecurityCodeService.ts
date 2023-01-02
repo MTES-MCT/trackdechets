@@ -9,6 +9,7 @@ import { randomNumber } from "../../../utils";
 import { convertUrls, getCompanyActiveUsers } from "../../database";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { securityCodeRenewal } from "../../../mailer/templates";
+import { isSiret, isVat } from "../../../common/constants/companySearchHelpers";
 
 /**
  * This function is used to renew the security code
@@ -17,15 +18,15 @@ import { securityCodeRenewal } from "../../../mailer/templates";
  * @param siret
  */
 export async function renewSecurityCodeFn(
-  siret: string
+  orgId: string
 ): Promise<CompanyPrivate> {
-  if (siret.length !== 14) {
+  if (!isSiret(orgId) && !isVat(orgId)) {
     throw new UserInputError("Le siret doit faire 14 caractères", {
       invalidArgs: ["siret"]
     });
   }
 
-  const company = await prisma.company.findUnique({ where: { siret } });
+  const company = await prisma.company.findUnique({ where: { orgId } });
 
   if (!company) {
     throw new UserInputError(
@@ -45,13 +46,13 @@ export async function renewSecurityCodeFn(
   }
 
   const updatedCompany = await prisma.company.update({
-    where: { siret },
+    where: { orgId },
     data: {
       securityCode: newSecurityCode
     }
   });
 
-  const users = await getCompanyActiveUsers(siret);
+  const users = await getCompanyActiveUsers(orgId);
   const recipients = users.map(({ email, name }) => ({ email, name }));
 
   const mail = renderMail(securityCodeRenewal, {

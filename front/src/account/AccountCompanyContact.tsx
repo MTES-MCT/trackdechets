@@ -17,7 +17,9 @@ type Props = {
 AccountCompanyContact.fragments = {
   company: gql`
     fragment AccountCompanyContactFragment on CompanyPrivate {
+      orgId
       siret
+      vatNumber
       companyTypes
       ...AccountFieldCompanyContactFragment
       ...AccountFieldCompanyContactEmailFragment
@@ -37,7 +39,7 @@ export default function AccountCompanyContact({ company }: Props) {
   const companyPage =
     `${import.meta.env.VITE_URL_SCHEME}://` +
     `${import.meta.env.VITE_HOSTNAME}` +
-    generatePath(routes.company, { siret: company.siret });
+    generatePath(routes.company, { orgId: company.orgId });
 
   return (
     <>

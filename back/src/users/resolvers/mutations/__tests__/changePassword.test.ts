@@ -15,8 +15,11 @@ jest.mock("../../../../prisma", () => ({
 const clearUserSessionsMock = jest.fn();
 const storeUserSessionsIdMock = jest.fn();
 jest.mock("../../../../common/redis/users", () => ({
-  clearUserSessions: jest.fn((...args) => clearUserSessionsMock(...args)),
   storeUserSessionsId: jest.fn((...args) => storeUserSessionsIdMock(...args))
+}));
+
+jest.mock("../../../clearUserSessions", () => ({
+  clearUserSessions: jest.fn((...args) => clearUserSessionsMock(...args))
 }));
 
 describe("changePassword", () => {

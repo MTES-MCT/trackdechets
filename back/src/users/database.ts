@@ -75,10 +75,10 @@ export async function createUserAccountHash(
  * Associate an existing user with company
  * Make sure we do not create a double association
  * @param userId
- * @param siret
+ * @param orgId
  * @param role
  */
-export async function associateUserToCompany(userId, siret, role) {
+export async function associateUserToCompany(userId, orgId, role) {
   // check for current associations
   const associations = await prisma.companyAssociation.findMany({
     where: {
@@ -86,7 +86,7 @@ export async function associateUserToCompany(userId, siret, role) {
         id: userId
       },
       company: {
-        siret
+        orgId
       }
     }
   });
@@ -101,7 +101,7 @@ export async function associateUserToCompany(userId, siret, role) {
     data: {
       user: { connect: { id: userId } },
       role,
-      company: { connect: { siret } }
+      company: { connect: { orgId } }
     }
   });
 
@@ -187,7 +187,7 @@ export async function acceptNewUserCompanyInvitations(user: User) {
     existingHashes.map(existingHash =>
       prisma.companyAssociation.create({
         data: {
-          company: { connect: { siret: existingHash.companySiret } },
+          company: { connect: { orgId: existingHash.companySiret } },
           user: { connect: { id: user.id } },
           role: existingHash.role
         }

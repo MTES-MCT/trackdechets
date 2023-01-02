@@ -134,15 +134,15 @@ export default function CompanySelector({
     QueryCompanyPrivateInfosArgs
   >(COMPANY_SELECTOR_PRIVATE_INFOS, {
     variables: {
-      clue: getFormCompanyIdentifier(field.value),
+      clue: field.value.orgId!,
     },
-    skip: !getFormCompanyIdentifier(field.value).length,
+    skip: !field.value.orgId,
   });
 
   /**
    * Selection d'un établissement dans le formulaire
    */
-  function selectCompany(company: CompanySearchResult) {
+  function selectCompany(company?: CompanySearchResult) {
     if (disabled) return;
     // empty the  selected company when null
     if (!company) return setFieldValue(field.name, getInitialCompany());
@@ -167,6 +167,7 @@ export default function CompanySelector({
     setIsForeignCompany(isForeignVat(company.vatNumber!!));
     // Prépare la mise à jour du Form
     const fields: FormCompany = {
+      orgId: company.orgId,
       siret: company.siret,
       vatNumber: company.vatNumber,
       name: company.name && company.name !== "---" ? company.name : "",
@@ -207,11 +208,7 @@ export default function CompanySelector({
         .filter(
           fav =>
             !skipFavorite &&
-            !searchCompanies.some(
-              company =>
-                company.siret === fav.siret ||
-                company.vatNumber === fav.vatNumber
-            )
+            !searchCompanies.some(company => company.orgId === fav.orgId)
         )
         .map(favorite => favoriteToCompanySearchResult(favorite)) ?? [];
 
@@ -232,8 +229,7 @@ export default function CompanySelector({
       initialAutoSelectFirstCompany &&
       !optional &&
       results.length >= 1 &&
-      !field.value.siret?.length &&
-      !field.value.vatNumber?.length
+      !field.value.orgId?.length
     ) {
       selectCompany(results[0]);
     }
@@ -385,22 +381,19 @@ export default function CompanySelector({
             }
           />
         )}
-        {!isLoadingFavorites &&
-          !field.value.vatNumber &&
-          !field.value.siret &&
-          !optional && (
-            <SimpleNotificationError
-              message={
-                <>
-                  <span>
-                    {isBsdaTransporter
-                      ? "La sélection d'un transporteur sera obligatoire avant la signature de l'entreprise de travaux"
-                      : "La sélection d'un établissement est obligatoire"}
-                  </span>
-                </>
-              }
-            />
-          )}
+        {!isLoadingFavorites && !field.value.orgId && !optional && (
+          <SimpleNotificationError
+            message={
+              <>
+                <span>
+                  {isBsdaTransporter
+                    ? "La sélection d'un transporteur sera obligatoire avant la signature de l'entreprise de travaux"
+                    : "La sélection d'un établissement est obligatoire"}
+                </span>
+              </>
+            }
+          />
+        )}
         {mustBeRegistered && (
           <SimpleNotificationError
             message={
@@ -419,21 +412,25 @@ export default function CompanySelector({
         <RedErrorMessage name={`${field.name}.siret`} />
         <CompanyResults<CompanySearchResult>
           onSelect={company => selectCompany(company)}
-          onUnselect={() => selectCompany({})}
+          onUnselect={() => selectCompany()}
           results={searchResults}
-          selectedItem={{
-            siret: field.value.siret,
-            vatNumber: field.value.vatNumber,
-            name: field.value.name,
-            address: field.value.address,
-            codePaysEtrangerEtablissement: field.value.country,
-            // complete with companyPrivateInfos data
-            ...(selectedData?.companyPrivateInfos && {
-              isRegistered: selectedData?.companyPrivateInfos.isRegistered,
-              codePaysEtrangerEtablissement:
-                selectedData?.companyPrivateInfos.codePaysEtrangerEtablissement,
-            }),
-          }}
+          selectedItem={
+            {
+              orgId: field.value.orgId,
+              siret: field.value.siret,
+              vatNumber: field.value.vatNumber,
+              name: field.value.name,
+              address: field.value.address,
+              codePaysEtrangerEtablissement: field.value.country,
+              // complete with companyPrivateInfos data
+              ...(selectedData?.companyPrivateInfos && {
+                isRegistered: selectedData?.companyPrivateInfos.isRegistered,
+                codePaysEtrangerEtablissement:
+                  selectedData?.companyPrivateInfos
+                    .codePaysEtrangerEtablissement,
+              }),
+            } as CompanySearchResult
+          }
         />
         <div className="form__row">
           {allowForeignCompanies && isForeignCompany && (
@@ -528,6 +525,7 @@ function favoriteToCompanySearchResult(
   company: CompanyFavorite
 ): CompanySearchResult {
   return {
+    orgId: company.orgId,
     siret: company.siret,
     vatNumber: company.vatNumber,
     name: company.name,
@@ -546,13 +544,4 @@ function favoriteToCompanySearchResult(
     companyTypes: [],
     etatAdministratif: "A",
   };
-}
-
-function getFormCompanyIdentifier(company: FormCompany): string {
-  if (company.siret) {
-    return company.siret;
-  } else if (company.vatNumber) {
-    return company.vatNumber;
-  }
-  return "";
 }

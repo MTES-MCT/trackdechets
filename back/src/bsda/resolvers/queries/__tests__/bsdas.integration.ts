@@ -110,7 +110,7 @@ describe("Query.bsdas", () => {
 
   it.each(
     Object.keys(BSDA_CONTRIBUTORS_FIELDS).filter(
-      key => key !== "nextDestination"
+      key => key !== "nextDestination" && key !== "transporterVat"
     )
   )("should filter bsdas where user appears as %s", async role => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);

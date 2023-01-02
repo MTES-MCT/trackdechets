@@ -10,6 +10,7 @@ import {
 import { format } from "date-fns";
 import prisma from "../../../../prisma";
 import {
+  siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -49,7 +50,7 @@ describe("mutation / importPaperForm", () => {
         emitter: {
           type: EmitterType.PRODUCER,
           company: {
-            siret: "98767567182671",
+            siret: siretify(3),
             name: "Émetteur",
             address: "Somewhere",
             phone: "0000000000",
@@ -189,7 +190,7 @@ describe("mutation / importPaperForm", () => {
       const ecoOrganisme = await prisma.ecoOrganisme.create({
         data: {
           name: "EO",
-          siret: "67281782716256",
+          siret: siretify(3),
           address: "Somewhere"
         }
       });
@@ -232,7 +233,7 @@ describe("mutation / importPaperForm", () => {
       input.emitter.type = "OTHER";
       input.recipient.company.siret = company.siret;
       input.ecoOrganisme = {
-        siret: "92834192340512",
+        siret: siretify(3),
         name: "Some Eco-Organisme"
       };
 
@@ -300,7 +301,7 @@ describe("mutation / importPaperForm", () => {
       input.processedInfo.processingOperationDone = "D 13";
       input.processedInfo.nextDestination = {
         company: {
-          siret: "11111111111111",
+          siret: siretify(1),
           name: "Incinérateur",
           contact: "John Snow",
           mail: "contact@incinerateur.fr",
@@ -332,7 +333,7 @@ describe("mutation / importPaperForm", () => {
       input.processedInfo.processingOperationDone = "R 13";
       input.processedInfo.nextDestination = {
         company: {
-          siret: "11111111111111",
+          siret: siretify(1),
           name: "Incinérateur",
           contact: "John Snow",
           mail: "contact@incinerateur.fr",
@@ -368,7 +369,7 @@ describe("mutation / importPaperForm", () => {
       return {
         status: "SEALED",
         emitterType: "PRODUCER",
-        emitterCompanySiret: "98767567182671",
+        emitterCompanySiret: siretify(3),
         emitterCompanyName: "Émetteur",
         emitterCompanyAddress: "Somewhere",
         emitterCompanyPhone: "0000000000",
@@ -695,7 +696,7 @@ describe("mutation / importPaperForm", () => {
               ...importedData,
               emitter: {
                 company: {
-                  siret: "36987459856321"
+                  siret: siretify(3)
                 }
               }
             }
@@ -733,7 +734,7 @@ describe("mutation / importPaperForm", () => {
       data.processedInfo.processingOperationDone = "D 13";
       data.processedInfo.nextDestination = {
         company: {
-          siret: "11111111111111",
+          siret: siretify(1),
           name: "Incinérateur",
           contact: "John Snow",
           mail: "contact@incinerateur.fr",
@@ -783,7 +784,7 @@ describe("mutation / importPaperForm", () => {
       data.processedInfo.noTraceability = true;
       data.processedInfo.nextDestination = {
         company: {
-          siret: "11111111111111",
+          siret: siretify(1),
           name: "Incinérateur",
           contact: "John Snow",
           mail: "contact@incinerateur.fr",

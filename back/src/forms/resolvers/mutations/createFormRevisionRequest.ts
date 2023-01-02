@@ -22,12 +22,9 @@ import { getFormOrFormNotFound } from "../../database";
 import { flattenBsddRevisionRequestInput } from "../../converter";
 import { checkCanRequestRevision } from "../../permissions";
 import { getFormRepository } from "../../repository";
-import {
-  INVALID_PROCESSING_OPERATION,
-  INVALID_SIRET_LENGTH,
-  INVALID_WASTE_CODE
-} from "../../errors";
+import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
 import { packagingInfoFn } from "../../validation";
+import { isSiret } from "../../../common/constants/companySearchHelpers";
 
 export type RevisionRequestContent = Pick<
   Prisma.BsddRevisionRequestCreateInput,
@@ -252,9 +249,11 @@ const bsddRevisionRequestSchema = yup
     brokerCompanySiret: yup
       .string()
       .nullable()
-      .matches(/^$|^\d{14}$/, {
-        message: `Courtier: ${INVALID_SIRET_LENGTH}`
-      }),
+      .test(
+        "is-siret",
+        "Courtier: ${originalValue} n'est pas un numéro de SIRET valide",
+        value => !value || isSiret(value)
+      ),
     brokerCompanyAddress: yup.string().nullable(),
     brokerCompanyContact: yup.string().nullable(),
     brokerCompanyPhone: yup.string().nullable(),
@@ -266,9 +265,11 @@ const bsddRevisionRequestSchema = yup
     traderCompanySiret: yup
       .string()
       .nullable()
-      .matches(/^$|^\d{14}$/, {
-        message: `Négociant: ${INVALID_SIRET_LENGTH}`
-      }),
+      .test(
+        "is-siret",
+        "Négociant: ${originalValue} n'est pas un numéro de SIRET valide",
+        value => !value || isSiret(value)
+      ),
     traderCompanyAddress: yup.string().nullable(),
     traderCompanyContact: yup.string().nullable(),
     traderCompanyPhone: yup.string().nullable(),

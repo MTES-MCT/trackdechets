@@ -60,7 +60,7 @@ export async function wastesRegistryXlsResolverFn(
 ): Promise<FileDownload> {
   const user = checkIsAuthenticated(context);
   for (const siret of args.sirets) {
-    await checkIsCompanyMember({ id: user.id }, { siret });
+    await checkIsCompanyMember({ id: user.id }, { orgId: siret });
   }
   const hits = await searchBsds(args.registryType, args.sirets, args.where, {
     size: 1,

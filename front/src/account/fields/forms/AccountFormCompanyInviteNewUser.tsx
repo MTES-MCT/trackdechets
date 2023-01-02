@@ -11,6 +11,7 @@ import {
   Mutation,
   MutationInviteUserToCompanyArgs,
 } from "generated/graphql/types";
+import cogoToast from "cogo-toast";
 
 type Props = {
   company: CompanyPrivate;
@@ -20,7 +21,7 @@ AccountFormCompanyInviteNewUser.fragments = {
   company: gql`
     fragment AccountFormCompanyInviteNewUserFragment on CompanyPrivate {
       id
-      siret
+      orgId
     }
   `,
 };
@@ -49,11 +50,23 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
   const [inviteUserToCompany, { loading }] = useMutation<
     Pick<Mutation, "inviteUserToCompany">,
     MutationInviteUserToCompanyArgs
-  >(INVITE_USER_TO_COMPANY);
+  >(INVITE_USER_TO_COMPANY, {
+    onCompleted: () => {
+      cogoToast.success("Invitation envoyée", { hideAfter: 5 });
+    },
+    onError: () => {
+      cogoToast.error(
+        "L'invitation n'a pas pu être envoyée. Veuillez réessayer dans quelques minutes.",
+        {
+          hideAfter: 5,
+        }
+      );
+    },
+  });
 
   return (
     <Formik
-      initialValues={{ email: "", siret: company.siret, role: UserRole.Member }}
+      initialValues={{ email: "", siret: company.orgId, role: UserRole.Member }}
       validate={values => {
         if (!values.email) {
           return { email: "L'email est obligatoire" };

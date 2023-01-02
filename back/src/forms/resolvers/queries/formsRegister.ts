@@ -38,7 +38,7 @@ const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
 
   for (const siret of args.sirets) {
     // check user is member of every provided sirets
-    await checkIsCompanyMember({ id: user.id }, { siret: siret });
+    await checkIsCompanyMember({ id: user.id }, { orgId: siret });
   }
 
   const wasteRegistryArgs:

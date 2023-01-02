@@ -9,7 +9,7 @@ import {
   deleteUserCompanyAssociations,
   deleteUserGrants
 } from "../../users/resolvers/mutations/anonymizeUser";
-import { clearUserSessions } from "../../common/redis/users";
+import { clearUserSessions } from "../../users/clearUserSessions";
 
 /**
  * WARNING : this is irreversible

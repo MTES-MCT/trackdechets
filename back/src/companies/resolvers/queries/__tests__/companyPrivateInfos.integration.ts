@@ -1,9 +1,14 @@
 import { CompanyType } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { AuthType } from "../../../../auth";
+import { TEST_COMPANY_PREFIX } from "../../../../common/constants/companySearchHelpers";
 import prisma from "../../../../prisma";
 import { TestQuery } from "../../../../__tests__/apollo-integration-testing";
-import { companyFactory, userFactory } from "../../../../__tests__/factories";
+import {
+  companyFactory,
+  siretify,
+  userFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { AnonymousCompanyError } from "../../../sirene/errors";
 import * as searchCompany from "../../../sirene/searchCompany";
@@ -27,8 +32,10 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Random company not registered in Trackdéchets", async () => {
+    const siret = siretify(1);
+
     searchSirene.mockResolvedValueOnce({
-      siret: "85001946400013",
+      siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
       address: "4 Boulevard Longchamp 13001 Marseille",
@@ -42,7 +49,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
 
     const gqlquery = `
       query {
-        companyPrivateInfos(clue: "85001946400013") {
+        companyPrivateInfos(clue: "${siret}") {
           siret
           isAnonymousCompany
           etatAdministratif
@@ -63,7 +70,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     const response = await query<any>(gqlquery);
 
     expect(response.data.companyPrivateInfos).toEqual({
-      siret: "85001946400013",
+      siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
       address: "4 Boulevard Longchamp 13001 Marseille",
@@ -80,8 +87,10 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("ICPE registered in Trackdéchets", async () => {
+    const siret = siretify(1);
+
     searchSirene.mockResolvedValueOnce({
-      siret: "85001946400013",
+      siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
       address: "4 Boulevard Longchamp 13001 Marseille",
@@ -94,7 +103,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     });
 
     await companyFactory({
-      siret: "85001946400013",
+      siret,
       name: "Code en Stock",
       contactEmail: "john.snow@trackdechets.fr",
       contactPhone: "0600000000",
@@ -106,13 +115,13 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
 
     await prisma.installation.create({
       data: {
-        s3icNumeroSiret: "85001946400013",
+        s3icNumeroSiret: siret,
         codeS3ic: "0064.00001"
       }
     });
     const gqlquery = `
       query {
-        companyPrivateInfos(clue: "85001946400013") {
+        companyPrivateInfos(clue: "${siret}") {
           siret
           etatAdministratif
           name
@@ -133,7 +142,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     const response = await query<any>(gqlquery);
     // informations from insee, TD and ICPE database are merged
     expect(response.data.companyPrivateInfos).toEqual({
-      siret: "85001946400013",
+      siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
       address: "4 Boulevard Longchamp 13001 Marseille",
@@ -152,9 +161,9 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Transporter company with transporter receipt", async () => {
-    const siret = "85001946400013";
+    const siret = siretify(9);
     searchSirene.mockResolvedValueOnce({
-      siret: "85001946400013",
+      siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
       address: "4 Boulevard Longchamp 13001 Marseille",
@@ -173,7 +182,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     };
 
     await companyFactory({
-      siret: "85001946400013",
+      siret,
       name: "Code en Stock",
       securityCode: 1234,
       contactEmail: "john.snow@trackdechets.fr",
@@ -184,7 +193,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
 
     const gqlquery = `
       query {
-        companyPrivateInfos(clue: "85001946400013") {
+        companyPrivateInfos(clue: "${siret}") {
           siret
           isAnonymousCompany
           transporterReceipt {
@@ -203,8 +212,10 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Trader company with trader receipt", async () => {
+    const siret = siretify(1);
+
     searchSirene.mockResolvedValueOnce({
-      siret: "85001946400013",
+      siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
       address: "4 Boulevard Longchamp 13001 Marseille",
@@ -223,7 +234,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     };
 
     await companyFactory({
-      siret: "85001946400013",
+      siret,
       name: "Code en Stock",
       securityCode: 1234,
       contactEmail: "john.snow@trackdechets.fr",
@@ -234,7 +245,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
 
     const gqlquery = `
       query {
-        companyPrivateInfos(clue: "85001946400013") {
+        companyPrivateInfos(clue: "${siret}") {
           traderReceipt {
             receiptNumber
             validityLimit
@@ -247,8 +258,10 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Company with direct dasri takeover allowance", async () => {
+    const siret = siretify(1);
+
     searchSirene.mockResolvedValueOnce({
-      siret: "85001946400013",
+      siret,
       etatAdministratif: "A",
       name: "CODE EN STOCK",
       address: "4 Boulevard Longchamp 13001 Marseille",
@@ -261,7 +274,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     });
 
     await companyFactory({
-      siret: "85001946400013",
+      siret,
       name: "Code en Stock",
       securityCode: 1234,
       contactEmail: "john.snow@trackdechets.fr",
@@ -272,7 +285,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
 
     const gqlquery = `
       query {
-        companyPrivateInfos(clue: "85001946400013") {
+        companyPrivateInfos(clue: "${siret}") {
           allowBsdasriTakeOverWithoutSignature
           isRegistered
         }
@@ -285,15 +298,17 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Closed company in INSEE public data", async () => {
+    const siret = siretify(1);
+
     searchSirene.mockResolvedValueOnce({
-      siret: "41268783200011",
+      siret,
       etatAdministratif: "F",
       name: "OPTIQUE LES AIX",
       address: "49 Rue de la République 18220 Les Aix-d'Angillon"
     });
     const gqlquery = `
     query {
-      companyPrivateInfos(clue: "41268783200011") {
+      companyPrivateInfos(clue: "${siret}") {
         siret
         etatAdministratif
         name
@@ -312,7 +327,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     const response = await query<any>(gqlquery);
     const company = response.data.companyPrivateInfos;
     const expected = {
-      siret: "41268783200011",
+      siret,
       etatAdministratif: "F",
       name: "OPTIQUE LES AIX",
       address: "49 Rue de la République 18220 Les Aix-d'Angillon",
@@ -328,10 +343,12 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Hidden company in INSEE and not registered", async () => {
+    const siret = siretify(1);
+
     searchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
     const gqlquery = `
       query {
-        companyPrivateInfos(clue: "43317467900046") {
+        companyPrivateInfos(clue: "${siret}") {
           siret
           etatAdministratif
           name
@@ -360,15 +377,17 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
       libelleNaf: null,
       naf: null,
       name: null,
-      siret: "43317467900046",
+      siret,
       website: null
     });
   });
 
   it("Hidden company in INSEE and but registered without AnonymousCompany", async () => {
+    const siret = siretify(1);
+
     searchSirene.mockRejectedValueOnce(new AnonymousCompanyError());
     const company = await companyFactory({
-      siret: "85001946400013",
+      siret,
       name: "Code en Stock",
       contactEmail: "john.snow@trackdechets.fr",
       contactPhone: "0600000000",
@@ -379,7 +398,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     });
     const gqlquery = `
       query {
-        companyPrivateInfos(clue: "85001946400013") {
+        companyPrivateInfos(clue: "${siret}") {
           siret
           etatAdministratif
           name
@@ -413,8 +432,11 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Hidden company in INSEE, AnonymousCompany created and but not registered", async () => {
+    const siret = siretify(5);
+
     const createInput = {
-      siret: "50000012345698",
+      siret,
+      orgId: siret,
       name: "Établissement de test",
       address: "Adresse test",
       codeNaf: "XXXXX",
@@ -426,7 +448,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     });
     const gqlquery = `
       query {
-        companyPrivateInfos(clue: "50000012345698") {
+        companyPrivateInfos(clue: "${siret}") {
           siret
           etatAdministratif
           name
@@ -455,8 +477,11 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Hidden company in INSEE, AnonymousCompany for Test is created and but not registered", async () => {
+    const siret = TEST_COMPANY_PREFIX + "12345698";
+
     const createInput = {
-      siret: "00000012345698",
+      siret,
+      orgId: siret,
       name: "Établissement de test",
       address: "Adresse test",
       codeNaf: "XXXXX",
@@ -468,7 +493,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     });
     const gqlquery = `
       query {
-        companyPrivateInfos(clue: "00000012345698") {
+        companyPrivateInfos(clue: "${siret}") {
           siret
           etatAdministratif
           name
@@ -497,8 +522,11 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Hidden company in INSEE, AnonymousCompany created and registered", async () => {
+    const siret = siretify(1);
+
     const createInput = {
-      siret: "50000012345698",
+      siret,
+      orgId: siret,
       name: "Établissement de test",
       address: "Adresse test",
       codeNaf: "XXXXX",
@@ -516,7 +544,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     });
     const gqlquery = `
       query {
-        companyPrivateInfos(clue: "50000012345698") {
+        companyPrivateInfos(clue: "${siret}") {
           siret
           vatNumber
           etatAdministratif
@@ -554,8 +582,11 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
   });
 
   it("Hidden company in INSEE, AnonymousCompany for TEST created and registered", async () => {
+    const siret = TEST_COMPANY_PREFIX + "12345698";
+
     const createInput = {
-      siret: "00000012345698",
+      siret,
+      orgId: siret,
       name: "Établissement de test",
       address: "Adresse test",
       codeNaf: "XXXXX",
@@ -572,7 +603,7 @@ describe("query { companyPrivateInfos(clue: <SIRET>) }", () => {
     });
     const gqlquery = `
       query {
-        companyPrivateInfos(clue: "00000012345698") {
+        companyPrivateInfos(clue: "${siret}") {
           siret
           vatNumber
           etatAdministratif

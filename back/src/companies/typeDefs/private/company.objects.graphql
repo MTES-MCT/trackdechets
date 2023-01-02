@@ -7,6 +7,9 @@ type CompanyFavorite {
   "Nom de l'établissement"
   name: String
 
+  "SIRET ou TVA de l'établissement"
+  orgId: String!
+
   "SIRET de l'établissement"
   siret: String
 
@@ -66,6 +69,8 @@ type CompanyFavorite {
 
 type CompanyForVerification {
   id: ID!
+  "SIRET ou TVA de l'établissement"
+  orgId: String!
   siret: String!
   vatNumber: String
   name: String!
@@ -91,12 +96,13 @@ type CompanyForVerificationConnection {
 
 type AnonymousCompany {
   id: String!
+  orgId: String!
   address: String!
   codeCommune: String!
   codeNaf: String!
   libelleNaf: String!
   name: String!
-  siret: String!
+  siret: String
   vatNumber: String
 }
 
@@ -104,6 +110,9 @@ type AnonymousCompany {
 type CompanySearchPrivate {
   "Profil de l'établissement"
   companyTypes: [CompanyType!]!
+
+  "SIRET ou TVA de l'établissement"
+  orgId: String!
 
   "Identifiant GEREP"
   gerepId: String

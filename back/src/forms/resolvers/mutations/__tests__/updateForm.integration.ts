@@ -6,6 +6,7 @@ import {
   companyFactory,
   formFactory,
   formWithTempStorageFactory,
+  siretify,
   toIntermediaryCompany,
   userFactory,
   userWithCompanyFactory
@@ -317,7 +318,7 @@ describe("Mutation.updateForm", () => {
       // try to remove user's company from the form
       emitter: {
         company: {
-          siret: "3".repeat(14)
+          siret: siretify(7)
         }
       }
     };
@@ -416,7 +417,7 @@ describe("Mutation.updateForm", () => {
       },
       ecoOrganisme: {
         name: "",
-        siret: "does_not_exist"
+        siret: siretify(3)
       }
     };
     const { mutate } = makeClient(user);

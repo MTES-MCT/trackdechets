@@ -1,15 +1,6 @@
 type Mutation {
   """
-  DEPRECATED - La récupération de token pour le compte de tiers
-  doit s'effectuer avec le protocole OAuth2
-
-  Récupére un token à partir de l'email et du mot de passe
-  d'un utilisateur.
-  """
-  login(email: String!, password: String!): AuthPayload!
-
-  """
-  Envoie une demande de rattachement de l'utilisateur courant
+  DEPRECATED - Envoie une demande de rattachement de l'utilisateur courant
   à rejoindre l'établissement dont le siret est précisé en paramètre.
   Cette demande est communiquée à l'ensemble des administrateurs de
   l'établissement qui ont le choix de l'accepter ou de la refuser.

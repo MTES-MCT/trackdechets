@@ -1,5 +1,4 @@
 import { Workflow } from "../common/workflow";
-import prisma from "../prisma";
 import { userWithCompanyFactory, ecoOrganismeFactory } from "./factories";
 import makeClient from "./testClient";
 
@@ -9,15 +8,14 @@ async function testWorkflow(workflow: Workflow) {
 
   // create the different companies used in this workflow
   for (const workflowCompany of workflow.companies) {
-    if (workflowCompany.companyTypes.includes("ECO_ORGANISME")) {
-      // create ecoOrganisme to allow its user to perform api calls
-      const count = await prisma.company.count();
-      await ecoOrganismeFactory({ count, handleBsdasri: true });
-    }
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: workflowCompany.companyTypes,
       ...(workflowCompany?.opt || {})
     });
+    if (workflowCompany.companyTypes.includes("ECO_ORGANISME")) {
+      // create ecoOrganisme to allow its user to perform api calls
+      await ecoOrganismeFactory({ siret: company.siret, handleBsdasri: true });
+    }
 
     context = { ...context, [workflowCompany.name]: { ...company, user } };
   }

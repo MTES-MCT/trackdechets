@@ -6,6 +6,7 @@ import {
 } from "@apollo/client";
 import { onError } from "@apollo/client/link/error";
 import { relayStylePagination } from "@apollo/client/utilities";
+import omitDeep from "omit-deep-lodash";
 
 /**
  * Automatically erase `__typename` from variables
@@ -20,6 +21,18 @@ const cleanTypeNameLink = new ApolloLink((operation, forward) => {
       JSON.stringify(operation.variables),
       omitTypename
     );
+  }
+  return forward(operation);
+});
+
+/**
+ * Automatically erase `company.orgId` from variables
+ * This enable devs to use FormCompany object from the server
+ * and not worry about `orgId` breaking CompanyInput
+ */
+const cleanOrgIdLink = new ApolloLink((operation, forward) => {
+  if (operation.variables) {
+    operation.variables = omitDeep(operation.variables, "orgId");
   }
   return forward(operation);
 });
@@ -72,6 +85,11 @@ export default new ApolloClient({
       },
     },
   }),
-  link: ApolloLink.from([errorLink, cleanTypeNameLink, httpLink]),
+  link: ApolloLink.from([
+    errorLink,
+    cleanOrgIdLink,
+    cleanTypeNameLink,
+    httpLink,
+  ]),
   name: "trackdechets-front",
 });

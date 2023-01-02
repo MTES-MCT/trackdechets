@@ -16,7 +16,7 @@ const resendInvitationResolver: MutationResolvers["resendInvitation"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-  const company = await getCompanyOrCompanyNotFound({ siret });
+  const company = await getCompanyOrCompanyNotFound({ orgId: siret });
   await checkIsCompanyAdmin(user, company);
 
   const invitations = await prisma.userAccountHash.findMany({

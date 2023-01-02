@@ -4,6 +4,7 @@ import prisma from "../../../prisma";
 import {
   formFactory,
   formWithTempStorageFactory,
+  siretify,
   userFactory
 } from "../../../__tests__/factories";
 import { expandFormFromDb } from "../../converter";
@@ -82,7 +83,7 @@ describe("formDiff", () => {
         create: {
           readableId: getReadableId(),
           owner: { connect: { id: user.id } },
-          recipientCompanySiret: "11111111111111"
+          recipientCompanySiret: siretify(1)
         }
       }
     };

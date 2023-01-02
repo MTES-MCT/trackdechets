@@ -15,7 +15,10 @@ import {
 import styles from "./AccountOauth2AppCreateUpdate.module.scss";
 import { useHistory } from "react-router";
 import routes from "common/routes";
-import { NotificationError } from "common/components/Error";
+import {
+  NotificationError,
+  SimpleNotificationError,
+} from "common/components/Error";
 import Tooltip from "common/components/Tooltip";
 import {
   APPLICATION,
@@ -112,7 +115,7 @@ export default function AccountOauth2AppCreateUpdate({
         En créant une application tierce vous pouvez proposer aux utilisateurs
         de Trackdéchets d'utiliser votre application afin d'enrichir leur
         utilisation de Trackdéchets. Afin que les utilisateurs puissent
-        autoriser votre application à utiliser leur données Trackdéchets, nous
+        autoriser votre application à utiliser leurs données Trackdéchets, nous
         utilisons le protocole OAuth2. Plus d'informations sur{" "}
         <a
           className="tw-underline"
@@ -133,7 +136,10 @@ export default function AccountOauth2AppCreateUpdate({
               },
             });
           } else {
-            await createApplication({ variables: { input: values } });
+            const res = await createApplication({
+              variables: { input: values },
+            });
+            console.log(res);
           }
           history.push(routes.account.oauth2.list);
         }}
@@ -293,7 +299,10 @@ export default function AccountOauth2AppCreateUpdate({
           </Form>
         )}
       </Formik>
-      {createApplicationError && (
+      {createApplicationError && createApplicationError?.networkError && (
+        <SimpleNotificationError message="Pour des raisons de sécurité la création d'applications est limitée, merci de rééssayer dans une minute." />
+      )}
+      {createApplicationError && !createApplicationError?.networkError && (
         <NotificationError apolloError={createApplicationError} />
       )}
       {updateApplicationError && (

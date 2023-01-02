@@ -1,6 +1,7 @@
 import { UserInputError } from "apollo-server-express";
 import { getCompanyInfos } from "../companyInfos";
 import { ErrorCode } from "../../../../common/errors";
+import { siretify } from "../../../../__tests__/factories";
 
 const searchCompanyMock = jest.fn();
 const vatMock = jest.fn();
@@ -45,8 +46,10 @@ describe("companyInfos with SIRET", () => {
   });
 
   it("should merge info from SIRENE, TD and s3ic", async () => {
+    const siret = siretify(1);
     searchCompanyMock.mockResolvedValueOnce({
-      siret: "85001946400013",
+      siret,
+      orgId: siret,
       name: "Code en stock"
     });
     companyMock.mockResolvedValueOnce({
@@ -58,10 +61,11 @@ describe("companyInfos with SIRET", () => {
       codeS3ic: "0055.14316"
     });
 
-    const company = await getCompanyInfos("85001946400014");
+    const company = await getCompanyInfos(siret);
 
     expect(company).toStrictEqual({
-      siret: "85001946400013",
+      siret,
+      orgId: siret,
       name: "Code en stock",
       contactEmail: "benoit.guigal@protonmail.com",
       contactPhone: "06 67 78 xx xx",
@@ -91,15 +95,19 @@ describe("companyInfos with SIRET", () => {
   });
 
   it("should return SIRET search only if not registered", async () => {
+    const siret = siretify(1);
+
     searchCompanyMock.mockResolvedValueOnce({
-      siret: "85001946400013",
+      siret,
+      orgId: siret,
       name: "Code en stock"
     });
     companyMock.mockResolvedValueOnce(null);
-    const company = await getCompanyInfos("85001946400014");
+    const company = await getCompanyInfos(siret);
 
     expect(company).toStrictEqual({
-      siret: "85001946400013",
+      siret,
+      orgId: siret,
       name: "Code en stock",
       isRegistered: false,
       companyTypes: [],
@@ -154,6 +162,7 @@ describe("companyInfos search with a VAT number", () => {
       etatAdministratif: "A"
     });
     companyMock.mockResolvedValueOnce({
+      orgId: "IT09301420155",
       contactEmail: "benoit.guigal@protonmail.com",
       contactPhone: "06 67 78 xx xx",
       website: "http://benoitguigal.fr"
@@ -165,6 +174,7 @@ describe("companyInfos search with a VAT number", () => {
 
     expect(company).toStrictEqual({
       siret: undefined,
+      orgId: "IT09301420155",
       vatNumber: "IT09301420155",
       name: "Code en stock",
       address: "une adresse",
@@ -205,6 +215,7 @@ describe("companyInfos search with a VAT number", () => {
 
     expect(company).toStrictEqual({
       siret: undefined,
+      orgId: "IT09301420155",
       vatNumber: "IT09301420155",
       name: "Code en stock",
       address: "une adresse",

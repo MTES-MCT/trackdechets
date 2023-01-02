@@ -47,7 +47,7 @@ const acceptMembershipRequestResolver: MutationResolvers["acceptMembershipReques
       .user();
 
     // associate membership requester to company with the role decided by the admin
-    await associateUserToCompany(requester.id, company.siret, role);
+    await associateUserToCompany(requester.id, company.orgId, role);
 
     await prisma.membershipRequest.update({
       where: { id },

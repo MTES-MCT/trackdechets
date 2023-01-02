@@ -159,6 +159,7 @@ export const segmentFragment = gql`
       receipt
       company {
         siret
+        orgId
         name
         address
         contact
@@ -249,12 +250,14 @@ const mutableFieldsFragment = gql`
         }
         emitter {
           company {
+            orgId
             name
           }
         }
         recipient {
           company {
             siret
+            orgId
           }
         }
         signedAt
@@ -272,6 +275,7 @@ const mutableFieldsFragment = gql`
       destination {
         company {
           siret
+          orgId
         }
       }
     }
@@ -421,6 +425,7 @@ export const dashboardFormFragment = gql`
     recipient {
       company {
         siret
+        orgId
         name
       }
       isTempStorage
@@ -428,6 +433,7 @@ export const dashboardFormFragment = gql`
     transporter {
       company {
         siret
+        orgId
       }
       numberPlate
       customInfo
@@ -456,6 +462,7 @@ export const dashboardFormFragment = gql`
       destination {
         company {
           siret
+          orgId
           address
           name
           contact
@@ -468,6 +475,7 @@ export const dashboardFormFragment = gql`
       transporter {
         company {
           siret
+          orgId
           vatNumber
           address
           name

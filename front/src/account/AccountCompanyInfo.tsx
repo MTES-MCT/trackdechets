@@ -24,6 +24,7 @@ AccountCompanyInfo.fragments = {
   company: gql`
     fragment AccountCompanyInfoFragment on CompanyPrivate {
       id
+      orgId
       siret
       vatNumber
       address
@@ -67,7 +68,10 @@ export default function AccountCompanyInfo({ company }: Props) {
 
   return (
     <>
-      {isSiret(company.siret) && (
+      {isSiret(
+        company.siret!,
+        import.meta.env.VITE_ALLOW_TEST_COMPANY === "true"
+      ) && (
         <AccountFieldNotEditable
           name="siret"
           label="Numéro SIRET"
@@ -76,7 +80,7 @@ export default function AccountCompanyInfo({ company }: Props) {
       )}
       {isVat(company.vatNumber!) && (
         <AccountFieldNotEditable
-          name="siret"
+          name="vatNumber"
           label="Numéro de TVA intra-communautaire"
           value={company.vatNumber}
         />
