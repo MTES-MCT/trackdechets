@@ -596,7 +596,7 @@ describe("receivedInfosSchema", () => {
           quantityReceived: 0
         });
       await expect(validateFn()).rejects.toThrow(
-        "Vous devez saisir une quantité reçue supérieure à 0."
+        "Réception : le poids doit être supérieur à 0 lorsque le déchet est accepté ou accepté partiellement"
       );
     });
   });
@@ -631,7 +631,7 @@ describe("receivedInfosSchema", () => {
       const validateFn = () =>
         receivedInfoSchema.validate({ ...receivedInfo, quantityReceived: 1.0 });
       await expect(validateFn()).rejects.toThrow(
-        "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
+        "Réception : le poids doit être égal à 0 lorsque le déchet est refusé"
       );
     });
   });
@@ -666,7 +666,7 @@ describe("receivedInfosSchema", () => {
       const validateFn = () =>
         receivedInfoSchema.validate({ ...receivedInfo, quantityReceived: 0 });
       await expect(validateFn()).rejects.toThrow(
-        "Vous devez saisir une quantité reçue supérieure à 0."
+        "Réception : le poids doit être supérieur à 0 lorsque le déchet est accepté ou accepté partiellement"
       );
     });
   });

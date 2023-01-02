@@ -54,6 +54,7 @@ import {
   transporterCompanySiretSchema,
   transporterCompanyVatNumberSchema
 } from "../companies/validation";
+import { weight, weightConditions, WeightUnits } from "../common/validation";
 // set yup default error messages
 configureYup();
 
@@ -636,10 +637,13 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
           return true;
         }
       ),
-    wasteDetailsQuantity: yup
-      .number()
-      .requiredIf(!isDraft, "La quantité du déchet en tonnes est obligatoire")
-      .min(0, "La quantité doit être supérieure à 0"),
+    wasteDetailsQuantity: weight(WeightUnits.Tonne)
+      .label("Déchet")
+      .when(
+        "transporterTransportMode",
+        weightConditions.transportMode(WeightUnits.Tonne)
+      )
+      .requiredIf(!isDraft, "La quantité du déchet en tonnes est obligatoire"),
     wasteDetailsQuantityType: yup
       .mixed<QuantityType>()
       .requiredIf(
@@ -911,27 +915,12 @@ export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
     .required("Vous devez saisir un responsable de la réception."),
   receivedAt: yup.date().required(),
   signedAt: yup.date().nullable(),
-  quantityReceived: yup
-    .number()
-    // if waste is refused, quantityReceived must be 0
-    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-      ["REFUSED"].includes(wasteAcceptationStatus)
-        ? schema.test(
-            "is-zero",
-            "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé",
-            v => v === 0
-          )
-        : schema
-    )
-    // if waste is partially or totally accepted, we check it is a positive value
-    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-      ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-        ? schema.test(
-            "is-strictly-positive",
-            "Vous devez saisir une quantité reçue supérieure à 0.",
-            v => v > 0
-          )
-        : schema
+  quantityReceived: weight(WeightUnits.Tonne)
+    .label("Réception")
+    .when("wasteAcceptationStatus", weightConditions.wasteAcceptationStatus)
+    .when(
+      "transporterTransportMode",
+      weightConditions.transportMode(WeightUnits.Tonne)
     ),
   wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
   wasteRefusalReason: yup
@@ -958,29 +947,10 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
     .string()
     .ensure()
     .required("Vous devez saisir un responsable de la réception."),
-  quantityReceived: yup
-    .number()
-    .required()
-    // if waste is refused, quantityReceived must be 0
-    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-      ["REFUSED"].includes(wasteAcceptationStatus)
-        ? schema.test(
-            "is-zero",
-            "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé",
-            v => v === 0
-          )
-        : schema
-    )
-    // if waste is partially or totally accepted, we check it is a positive value
-    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-      ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-        ? schema.test(
-            "is-strictly-positive",
-            "Vous devez saisir une quantité reçue supérieure à 0.",
-            v => v > 0
-          )
-        : schema
-    ),
+  quantityReceived: weight(WeightUnits.Tonne)
+    .label("Réception")
+    .required("${path} : Le poids reçu en tonnes est obligatoire")
+    .when("wasteAcceptationStatus", weightConditions.wasteAcceptationStatus),
   wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>().required(),
   wasteRefusalReason: yup
     .string()

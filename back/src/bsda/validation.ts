@@ -14,6 +14,7 @@ import {
   isSiret,
   isForeignVat
 } from "../common/constants/companySearchHelpers";
+import { weight, weightConditions, WeightUnits } from "../common/validation";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { validateCompany } from "../companies/validateCompany";
 import {
@@ -620,25 +621,20 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
           context.operationSignature,
           `Entreprise de destination:vous devez préciser la date de réception`
         ) as any,
-      destinationReceptionWeight: yup
-        .number()
-        .when("destinationReceptionAcceptationStatus", {
-          is: value => value === WasteAcceptationStatus.REFUSED,
-          then: schema =>
-            schema
-              .oneOf(
-                [0, null],
-                "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
-              )
-              .nullable(),
-          otherwise: schema =>
-            schema
-              .positive("Vous devez saisir une quantité reçue supérieure à 0")
-              .requiredIf(
-                context.operationSignature,
-                `Entreprise de destination: vous devez préciser la quantité`
-              )
-        }),
+      destinationReceptionWeight: weight(WeightUnits.Kilogramme)
+        .label("Destination")
+        .when(
+          "destinationReceptionAcceptationStatus",
+          weightConditions.wasteAcceptationStatus
+        )
+        .when(
+          "transporterTransportMode",
+          weightConditions.transportMode(WeightUnits.Kilogramme)
+        )
+        .requiredIf(
+          context.operationSignature,
+          `Entreprise de destination: vous devez préciser la quantité`
+        ),
       destinationReceptionAcceptationStatus: yup
         .mixed<WasteAcceptationStatus>()
         .requiredIf(
@@ -983,7 +979,11 @@ const wasteDescriptionSchema: FactorySchemaOf<
     weightIsEstimate: yup
       .boolean()
       .requiredIf(context.workSignature, `Le type de quantité est obligatoire`),
-    weightValue: yup
-      .number()
+    weightValue: weight(WeightUnits.Kilogramme)
+      .label("Déchet")
+      .when(
+        "transporterTransportMode",
+        weightConditions.transportMode(WeightUnits.Kilogramme)
+      )
       .requiredIf(context.workSignature, `La quantité est obligatoire`)
   });

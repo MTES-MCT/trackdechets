@@ -11,7 +11,8 @@ import {
   UserRole,
   User,
   Prisma,
-  Company
+  Company,
+  TransportMode
 } from "@prisma/client";
 import prisma from "../prisma";
 import { hashToken } from "../utils";
@@ -230,6 +231,7 @@ const formdata = {
   transporterCompanySiret: siretify(1),
   transporterDepartment: "86",
   transporterIsExemptedOfReceipt: false,
+  transporterTransportMode: TransportMode.ROAD,
   transporterNumberPlate: "aa22",
   transporterReceipt: "33AA",
   transporterValidityLimit: "2019-11-27T00:00:00.000Z",

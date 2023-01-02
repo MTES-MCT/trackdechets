@@ -21,6 +21,7 @@ import {
   MISSING_COMPANY_SIRET,
   MISSING_COMPANY_SIRET_OR_VAT
 } from "../forms/errors";
+import { weight, weightConditions, WeightUnits } from "../common/validation";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
 
@@ -227,19 +228,20 @@ export const emissionSchema: FactorySchemaOf<
       .string()
       .ensure()
       .requiredIf(context.emissionSignature, `La mention ADR est obligatoire.`),
-
-    emitterWasteWeightValue: yup
-      .number()
-      .nullable()
-      .test(
-        "emission-quantity-required-if-type-is-provided",
-        "Le poids de déchets émis en kg est obligatoire si vous renseignez le type de pesée",
-        function (value) {
-          return !!this.parent.emitterWasteWeightIsEstimate ? !!value : true;
-        }
+    emitterWasteWeightValue: weight(WeightUnits.Kilogramme)
+      .label("Déchet")
+      .when("emitterWasteWeightIsEstimate", {
+        is: value => !!value,
+        then: schema =>
+          schema.required(
+            "Le poids de déchets émis en kg est obligatoire si vous renseignez le type de pesée"
+          )
+      })
+      .when(
+        "transporterTransportMode",
+        weightConditions.transportMode(WeightUnits.Kilogramme)
       )
-      .min(0.1, "Le poids de déchet émis doit être supérieur à 0"),
-
+      .positive("Le poids de déchet émis doit être supérieur à 0"),
     emitterWasteWeightIsEstimate: yup
       .boolean()
       .nullable()
@@ -447,26 +449,20 @@ export const transportSchema: FactorySchemaOf<
                 )
         )
     }),
-
-    transporterWasteWeightValue: yup
-      .number()
-      .nullable()
-
-      .test(
-        "transport-quantity-required-if-type-is-provided",
-        "Le poids de déchets transportés en kg est obligatoire si vous renseignez le type de pesée",
-        function (value) {
-          return !!this.parent.transporterWasteWeightIsEstimate
-            ? ![null, undefined].includes(value)
-            : true;
-        }
+    transporterWasteWeightValue: weight(WeightUnits.Kilogramme)
+      .label("Transporteur")
+      .when("transporterWasteWeightIsEstimate", {
+        is: value => !!value,
+        then: schema =>
+          schema.required(
+            "Le poids de déchets transportés en kg est obligatoire si vous renseignez le type de pesée"
+          )
+      })
+      .when(
+        "transporterTransportMode",
+        weightConditions.transportMode(WeightUnits.Kilogramme)
       )
-      .test(
-        "transport-quantity-strictly-positive",
-        "Le poids de déchets transportés doit être supérieur à 0",
-        v => ([null, undefined].includes(v) ? true : v > 0)
-      ),
-
+      .positive("Le poids de déchets transportés doit être supérieur à 0"),
     transporterWasteWeightIsEstimate: yup
       .boolean()
       .nullable()
@@ -633,8 +629,8 @@ export const operationSchema: FactorySchemaOf<
     : DASRI_ALL_OPERATIONS_CODES;
 
   return yup.object({
-    destinationReceptionWasteWeightValue: yup
-      .number()
+    destinationReceptionWasteWeightValue: weight(WeightUnits.Kilogramme)
+      .label("Destination")
       .test(
         "operation-quantity-required-if-final-processing-operation",
         "Le poids du déchet traité en kg est obligatoire si le code correspond à un traitement final",
@@ -650,8 +646,12 @@ export const operationSchema: FactorySchemaOf<
             : true;
         }
       )
-      .nullable()
-      .min(0, "Le poids doit être supérieur à 0"),
+      .when(
+        "transporterTransportMode",
+        weightConditions.transportMode(WeightUnits.Kilogramme)
+      )
+      .positive("Le poids doit être supérieur à 0"),
+
     destinationOperationCode: yup
       .string()
       .label("Opération d’élimination / valorisation")

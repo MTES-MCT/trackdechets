@@ -21,6 +21,7 @@ import {
   transporterCompanySiretSchema,
   transporterCompanyVatNumberSchema
 } from "../companies/validation";
+import { weight, weightConditions, WeightUnits } from "../common/validation";
 
 configureYup();
 
@@ -213,10 +214,11 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
                 .required(
                   "Conditionnements : le numéro d'identification est requis"
                 ),
-              weight: yup
-                .number()
-                .required("Conditionnements : Le poids est requis")
-                .positive("Conditionnements : le poids doit être supérieur à 0")
+
+              weight: weight(WeightUnits.Kilogramme)
+                .label("Conditionnement")
+                .required("${path} :Le poids est requis")
+                .positive("${path} : le poids doit être supérieur à 0")
             })
           );
 
@@ -236,8 +238,12 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
           "La dénomination usuelle du déchet est obligatoire"
         ),
       wasteAdr: yup.string().requiredIf(!isDraft, "La mention ADR est requise"),
-      weightValue: yup
-        .number()
+      weightValue: weight(WeightUnits.Kilogramme)
+        .label("Déchet")
+        .when(
+          "transporterTransportMode",
+          weightConditions.transportMode(WeightUnits.Kilogramme)
+        )
         .positive("Le poids doit être supérieur à 0")
         .requiredIf(!isDraft, "Le poids total est requis"),
       weightIsEstimate: yup
@@ -334,20 +340,10 @@ export const acceptationSchema: yup.SchemaOf<Acceptation> = yup.object({
               "Le motif du refus ne doit pas être renseigné si le déchet est accepté"
             )
     ),
-  acceptationWeight: yup
-    .number()
-    .nullable()
-    .required("Le poids en kilos du déchet reçu est requis")
-    .when("acceptationStatus", {
-      is: value => value === WasteAcceptationStatus.REFUSED,
-      then: schema =>
-        schema.oneOf(
-          [0],
-          "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
-        ),
-      otherwise: schema =>
-        schema.positive("Vous devez saisir une quantité reçue supérieure à 0")
-    }),
+  acceptationWeight: weight(WeightUnits.Kilogramme)
+    .label("Acceptation")
+    .required("Le poids en kilogramme du déchet reçu est requis")
+    .when("acceptationStatus", weightConditions.wasteAcceptationStatus),
   acceptationWasteCode: yup
     .string()
     .nullable()
@@ -947,7 +943,9 @@ export const ficheInterventionSchema: yup.SchemaOf<
   numero: yup
     .string()
     .required("Le numéro de la fiche d'intervention est requis"),
-  weight: yup.number().required("Le poids en kilos est requis"),
+  weight: weight(WeightUnits.Kilogramme).required(
+    "Le poids en kilogramme est requis"
+  ),
   postalCode: yup
     .string()
     .required("Le code postal du lieu de l'intervention est requis"),
