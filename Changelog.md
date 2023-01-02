@@ -14,6 +14,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Lorsqu'on duplique un BSDD, la destination ultérieure prévue ne devrait pas être dupliquée [PR 1961](https://github.com/MTES-MCT/trackdechets/pull/1961)
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
