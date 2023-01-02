@@ -1,10 +1,13 @@
 const express = require("express");
+const bodyParser = require("body-parser");
+const fetch = require("node-fetch");
 const helmet = require("helmet");
-
 const path = require("path");
 const fs = require("fs");
 
 const app = express();
+
+const SENTRY_DSN = process.env.VITE_SENTRY_DSN;
 
 const DEFAULT_SRC = [
   "'self'",
@@ -54,6 +57,34 @@ const indexContent =
         '<meta name="robots" content="noindex nofollow" />'
       )
     : raw;
+
+app.use(bodyParser.text());
+
+// Sentry tunnel to deal with ad blockers
+// https://docs.sentry.io/platforms/javascript/troubleshooting/#using-the-tunnel-option
+// https://github.com/getsentry/examples/blob/master/tunneling/nextjs/pages/api/tunnel.js
+app.post("/sentry", async function (req, res) {
+  if (!SENTRY_DSN) {
+    return res.status(500).json({ status: "sentry n'est pas configuré" });
+  }
+  try {
+    const envelope = req.body;
+    // DSNs are of the form `https://<key>@o<orgId>.ingest.sentry.io/<projectId>`
+    const { host, pathname } = new URL(SENTRY_DSN);
+    // Remove leading slash
+    const projectId = pathname.substring(1);
+    const sentryIngestURL = `https://${host}/api/${projectId}/envelope/`;
+    const sentryResponse = await fetch(sentryIngestURL, {
+      method: "POST",
+      body: envelope,
+    });
+    // Relay response from Sentry servers to front end
+    sentryResponse.headers.forEach(h => res.setHeader(h[0], h[1]));
+    res.status(sentryResponse.status).send(sentryResponse.body);
+  } catch (err) {
+    return res.status(400).json({ status: "invalid request" });
+  }
+});
 
 app.get("/*", function (req, res) {
   res.send(indexContent);
