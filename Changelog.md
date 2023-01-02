@@ -16,6 +16,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :bug: Corrections de bugs
 
 - Lorsqu'on duplique un BSDD, la destination ultérieure prévue ne devrait pas être dupliquée [PR 1961](https://github.com/MTES-MCT/trackdechets/pull/1961)
+- Le code de traitement en révision d'un BSDD avec entreposage provisoire doit s'appliquer sur le code de traitement final [PR 1977](https://github.com/MTES-MCT/trackdechets/pull/1977)
 
 #### :boom: Breaking changes
 
@@ -26,6 +27,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Les destinataires des BSDD peuvent désormais choisir l'option R0 (réemploi/réutilisation) [PR 1971](https://github.com/MTES-MCT/trackdechets/pull/1971)
 - Limite les valeurs de poids à 40 tonnes lorsque le transport se fait par route et à 50 000 T tout mode de transport confondu [PR 1995](https://github.com/MTES-MCT/trackdechets/pull/1995)
 - Mise en place de captchas sur les opérations de connexion, renvoi d'email d'activation, réinitialisation de mot de passe[PR 1955](https://github.com/MTES-MCT/trackdechets/pull/1955)
+- Ajout de la possibilité en cas de BSDD avec entreposage provisoire de réviser :
+  - soit la quantité reçue sur l'installation d'entreposage provisoire, soit la quantité reçue sur l'installation de destination finale [PR 1977](https://github.com/MTES-MCT/trackdechets/pull/1977)
+  - soit le CAP de l'installation d'entreposage provisoire, soit le CAP de l'installation de destination finale [PR 1977](https://github.com/MTES-MCT/trackdechets/pull/1977)
 
 #### :memo: Documentation
 
