@@ -8,21 +8,20 @@ import { checkCaptcha } from "../../../captchaGen";
 import { UserInputError } from "apollo-server-core";
 
 const resendActivationEmail: MutationResolvers["resendActivationEmail"] =
-  async (parent, { email, captchaInput }) => {
+  async (parent, { input }) => {
     const schema = object({
       email: string()
         .email("Cet email n'est pas correctement formatté")
         .required()
     });
+
+    const { email, captcha } = input;
     await schema.validate({ email });
 
-    const captchaIsValid = await checkCaptcha(
-      captchaInput.value,
-      captchaInput.token
-    );
+    const captchaIsValid = await checkCaptcha(captcha.value, captcha.token);
 
     if (!captchaIsValid) {
-      throw new UserInputError("Le test anti robots est incorrect");
+      throw new UserInputError("Le test anti-robots est incorrect");
     }
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {

@@ -80,7 +80,7 @@ export const getLoginError = (username: string) => ({
 
 export const ADMIN_IS_PERSONIFYING = "ADMIN_IS_PERSONIFYING";
 
-// apart from loggin the user in, we perform captcha verifications:
+// apart from logging the user in, we perform captcha verifications:
 // - if user as performed less than FAILED_ATTEMPTS_BEFORE_CAPTCHA in the last FAILED_LOGIN_EXPIRATION seconds, perform as usual
 // - if user as performed more failed attemps, check if captcha is correct
 // - if captcha is missing or incorrect, return appropriate error message

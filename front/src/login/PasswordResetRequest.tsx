@@ -21,10 +21,9 @@ import styles from "./Login.module.scss";
 
 const RESET_PASSWORD = gql`
   mutation CreatePasswordResetRequest(
-    $email: String!
-    $captchaInput: CaptchaInput!
+    $input: CreatePasswordResetRequestInput!
   ) {
-    createPasswordResetRequest(email: $email, captchaInput: $captchaInput)
+    createPasswordResetRequest(input: $input)
   }
 `;
 
@@ -44,8 +43,10 @@ export default function PasswordResetRequest() {
 
     createPasswordResetRequest({
       variables: {
-        email,
-        captchaInput: { token: captchaData?.token ?? "", value: captchaInput },
+        input: {
+          email,
+          captcha: { token: captchaData?.token ?? "", value: captchaInput },
+        },
       },
 
       onError: () => {

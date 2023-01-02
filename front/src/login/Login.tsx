@@ -27,7 +27,7 @@ function getErrorMessage(errorCode: string) {
     return "Email ou mot de passe incorrect - Veuillez également compléter le test anti-robots";
   }
   if (errorCode === "INVALID_CAPTCHA") {
-    return "Le test anti robots est incorrect";
+    return "Le test anti-robots est incorrect";
   }
 
   return "Email ou mot de passe incorrect";

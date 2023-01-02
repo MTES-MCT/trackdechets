@@ -20,11 +20,8 @@ import {
 import styles from "./Login.module.scss";
 
 const RESEND_ACTIVATION_EMAIL = gql`
-  mutation ResendActivationEmail(
-    $email: String!
-    $captchaInput: CaptchaInput!
-  ) {
-    resendActivationEmail(email: $email, captchaInput: $captchaInput)
+  mutation ResendActivationEmail($input: ResendActivationEmailInput!) {
+    resendActivationEmail(input: $input)
   }
 `;
 
@@ -44,8 +41,10 @@ export default function ResendActivationEmail() {
 
     resendActivationEmail({
       variables: {
-        email,
-        captchaInput: { token: captchaData?.token ?? "", value: captchaInput },
+        input: {
+          email,
+          captcha: { token: captchaData?.token ?? "", value: captchaInput },
+        },
       },
       onError: () => {
         setCaptchaInput("");

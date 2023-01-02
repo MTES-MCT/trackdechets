@@ -16,10 +16,9 @@ sendMailSpy.mockImplementation(() => Promise.resolve());
 
 const CREATE_PASSWORD_RESET_REQUEST = gql`
   mutation CreatePasswordResetRequest(
-    $email: String!
-    $captchaInput: CaptchaInput!
+    $input: CreatePasswordResetRequestInput!
   ) {
-    createPasswordResetRequest(email: $email, captchaInput: $captchaInput)
+    createPasswordResetRequest(input: $input)
   }
 `;
 
@@ -37,8 +36,10 @@ describe("mutation createPasswordResetRequest", () => {
       CREATE_PASSWORD_RESET_REQUEST,
       {
         variables: {
-          email: user.email,
-          captchaInput: { value: captcha, token: token }
+          input: {
+            email: user.email,
+            captcha: { value: captcha, token: token }
+          }
         }
       }
     );
@@ -71,8 +72,10 @@ describe("mutation createPasswordResetRequest", () => {
       Pick<Mutation, "createPasswordResetRequest">
     >(CREATE_PASSWORD_RESET_REQUEST, {
       variables: {
-        email: "donotexist@notfound.com",
-        captchaInput: { value: "plop", token: token }
+        input: {
+          email: "donotexist@notfound.com",
+          captcha: { value: "plop", token: token }
+        }
       }
     });
 
@@ -82,7 +85,7 @@ describe("mutation createPasswordResetRequest", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Le test anti robots est incorrect",
+        message: "Le test anti-robots est incorrect",
 
         extensions: {
           code: "BAD_USER_INPUT"
@@ -104,8 +107,10 @@ describe("mutation createPasswordResetRequest", () => {
       CREATE_PASSWORD_RESET_REQUEST,
       {
         variables: {
-          email: "donotexist@notfound.com",
-          captchaInput: { value: captcha, token: token }
+          input: {
+            email: "donotexist@notfound.com",
+            captcha: { value: captcha, token: token }
+          }
         }
       }
     );

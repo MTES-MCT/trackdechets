@@ -17,7 +17,20 @@ input CreateAccessTokenInput {
   description: String!
 }
 
+"Vérification de captcha"
 input CaptchaInput {
+  "Valeur utilisateur"
   value: String!
+  "Token permettant d'identifier le captcha côté back"
   token: String!
+}
+
+input ResendActivationEmailInput {
+  email: String!
+  captcha: CaptchaInput!
+}
+
+input CreatePasswordResetRequestInput {
+  email: String!
+  captcha: CaptchaInput!
 }

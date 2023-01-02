@@ -50,7 +50,7 @@ export async function checkCaptcha(captchaInput, captchaToken) {
   // if token is expired, we get an empty string and the next equality fails
   const captchaString = await getCaptchaToken(captchaToken);
 
-  const valid = !!captchaString && captchaString === captchaInput;
+  const valid = !!captchaString && captchaString === captchaInput.toUpperCase(); // captcha string is upper case
   // success or failure, delete the redis entry, token are not meant to be reused
   await clearCaptchaToken(captchaToken);
 

@@ -11,18 +11,17 @@ import { checkCaptcha } from "../../../captchaGen";
 
 import { UserInputError } from "apollo-server-core";
 const createPasswordResetRequestResolver: MutationResolvers["createPasswordResetRequest"] =
-  async (parent, { email, captchaInput }) => {
+  async (parent, { input }) => {
+    const { email, captcha } = input;
+
     const user = await prisma.user.findUnique({
       where: { email: sanitizeEmail(email) }
     });
 
-    const captchaIsValid = await checkCaptcha(
-      captchaInput.value,
-      captchaInput.token
-    );
+    const captchaIsValid = await checkCaptcha(captcha.value, captcha.token);
 
     if (!captchaIsValid) {
-      throw new UserInputError("Le test anti robots est incorrect");
+      throw new UserInputError("Le test anti-robots est incorrect");
     }
     if (!user) {
       // for security reason, do not leak  any clue

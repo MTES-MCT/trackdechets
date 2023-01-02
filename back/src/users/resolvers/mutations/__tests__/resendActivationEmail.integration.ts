@@ -8,12 +8,10 @@ import { renderMail } from "../../../../mailer/templates/renderers";
 import { onSignup } from "../../../../mailer/templates";
 import { setCaptchaToken } from "../../../../common/redis/captcha";
 import { Mutation } from "../../../../generated/graphql/types";
+
 const RESEND_ACTIVATION_EMAIL = gql`
-  mutation ResendActivationEmail(
-    $email: String!
-    $captchaInput: CaptchaInput!
-  ) {
-    resendActivationEmail(email: $email, captchaInput: $captchaInput)
+  mutation ResendActivationEmail($input: ResendActivationEmailInput!) {
+    resendActivationEmail(input: $input)
   }
 `;
 
@@ -39,8 +37,10 @@ describe("mutation resendActivationEmail", () => {
       RESEND_ACTIVATION_EMAIL,
       {
         variables: {
-          email: user.email,
-          captchaInput: { value: captcha, token: token }
+          input: {
+            email: user.email,
+            captcha: { value: captcha, token: token }
+          }
         }
       }
     );
@@ -59,8 +59,10 @@ describe("mutation resendActivationEmail", () => {
     await setCaptchaToken(token, captcha);
     const { data, errors } = await mutate(RESEND_ACTIVATION_EMAIL, {
       variables: {
-        email: "john.snow@trackdechets.fr",
-        captchaInput: { value: captcha, token: token }
+        input: {
+          email: "john.snow@trackdechets.fr",
+          captcha: { value: captcha, token: token }
+        }
       }
     });
     expect(data.resendActivationEmail).toEqual(true);
@@ -80,8 +82,10 @@ describe("mutation resendActivationEmail", () => {
     const { mutate } = makeClient();
     const { data, errors } = await mutate(RESEND_ACTIVATION_EMAIL, {
       variables: {
-        email: user.email,
-        captchaInput: { value: captcha, token: token }
+        input: {
+          email: user.email,
+          captcha: { value: captcha, token: token }
+        }
       }
     });
     expect(errors).toEqual(undefined);
@@ -102,14 +106,16 @@ describe("mutation resendActivationEmail", () => {
     const { mutate } = makeClient();
     const { errors } = await mutate(RESEND_ACTIVATION_EMAIL, {
       variables: {
-        email: user.email,
-        captchaInput: { value: "toto", token: token }
+        input: {
+          email: user.email,
+          captcha: { value: "toto", token: token }
+        }
       }
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Le test anti robots est incorrect",
+        message: "Le test anti-robots est incorrect",
 
         extensions: {
           code: "BAD_USER_INPUT"

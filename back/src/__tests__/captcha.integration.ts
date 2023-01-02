@@ -136,7 +136,7 @@ describe("POST /login", () => {
     await redisClient.unlink(key); // cleanup
   });
 
-  it("create a persistent session if login form and captcha are vamid", async () => {
+  it("create a persistent session if login form and captcha are valid", async () => {
     const user = await userFactory();
     const key = `user-login-failed:${user.email}`;
     await redisClient.set(key, 5); // simulates 5 failed logint attempts

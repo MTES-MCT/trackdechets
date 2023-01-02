@@ -9,7 +9,7 @@ type Mutation {
   USAGE INTERNE
   Renvoie un email d'activation
   """
-  resendActivationEmail(email: String!, captchaInput: CaptchaInput!): Boolean!
+  resendActivationEmail(input: ResendActivationEmailInput!): Boolean!
 
   """
   USAGE INTERNE
@@ -21,10 +21,7 @@ type Mutation {
   USAGE INTERNE
   Envoie un email pour la réinitialisation du mot de passe
   """
-  createPasswordResetRequest(
-    email: String!
-    captchaInput: CaptchaInput!
-  ): Boolean!
+  createPasswordResetRequest(input: CreatePasswordResetRequestInput!): Boolean!
 
   """
   USAGE INTERNE
