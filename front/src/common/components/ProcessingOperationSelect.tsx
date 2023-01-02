@@ -1,7 +1,9 @@
 import React from "react";
 import classNames from "classnames";
-import { PROCESSING_OPERATIONS } from "generated/constants";
-import { PROCESSING_AND_REUSE_OPERATIONS } from "generated/constants";
+import {
+  PROCESSING_OPERATIONS,
+  PROCESSING_AND_REUSE_OPERATIONS,
+} from "generated/constants";
 import styles from "./ProcessingOperationSelect.module.scss";
 
 const ProcessingOperationSelect = ({
