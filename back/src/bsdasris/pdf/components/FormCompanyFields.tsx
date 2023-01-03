@@ -1,18 +1,13 @@
 import * as React from "react";
-import countries from "world-countries";
+import { getcompanyCountry } from "../../../common/pdf/components/FormCompanyFields";
 import { FormCompany } from "../../../generated/graphql/types";
-
-const FRENCH_COUNTRY = countries.find(country => country.cca2 === "FR");
 
 type FormCompanyFieldsProps = {
   company?: FormCompany;
 };
 
 export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
-  const companyCountry = company
-    ? countries.find(country => country.cca2 === company?.country) ??
-      FRENCH_COUNTRY
-    : null;
+  const companyCountry = getcompanyCountry(company);
 
   return (
     <>
@@ -35,7 +30,7 @@ export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
       <p>
         N° SIRET : {company?.siret}
         <br />
-        {company?.vatNumber!! && (
+        {!!company?.vatNumber && (
           <>
             N° TVA intracommunautaire (le cas échéant) : {company?.vatNumber}
             <br />

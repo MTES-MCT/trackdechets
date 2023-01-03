@@ -3,8 +3,8 @@ import countries, { Country } from "world-countries";
 import { checkVAT } from "jsvat";
 import {
   countries as vatCountries,
-  isSiret,
-  isVat
+  isVat,
+  isSiret
 } from "../../../common/constants/companySearchHelpers";
 import { FormCompany } from "../../../generated/graphql/types";
 
@@ -23,29 +23,7 @@ export function FormCompanyFields({
   isPrivateIndividual,
   isEmailMandatory = true
 }: FormCompanyFieldsProps) {
-  let companyCountry: Country = FRENCH_COUNTRY;
-
-  if (company) {
-    // reconnaitre le pays directement dans le champ country
-    companyCountry = countries.find(
-      country => country.cca2 === company?.country
-    );
-    if (companyCountry === undefined) {
-      if (isSiret(company.siret)) {
-        companyCountry = countries.find(country => country.cca2 === "FR");
-      } else if (isVat(company.vatNumber)) {
-        // trouver automatiquement le pays
-        const vatCountryCode = checkVAT(
-          company.vatNumber.replace(/[\W_\s]/gim, ""),
-          vatCountries
-        )?.country?.isoCode.short;
-
-        companyCountry = countries.find(
-          country => country.cca2 === vatCountryCode
-        );
-      }
-    }
-  }
+  const companyCountry = getcompanyCountry(company);
 
   return (
     <>
@@ -115,4 +93,30 @@ export function FormCompanyFields({
       </p>
     </>
   );
+}
+
+export function getcompanyCountry(company: FormCompany): Country {
+  // reconnaitre le pays directement dans le champ country
+  let companyCountry = company
+    ? countries.find(country => country.cca2 === company?.country) ??
+      FRENCH_COUNTRY // default
+    : null;
+
+  if (company && !companyCountry) {
+    if (isSiret(company.siret)) {
+      // forcer FR si le siret est valide
+      companyCountry = countries.find(country => country.cca2 === "FR");
+    } else if (isVat(company.vatNumber)) {
+      // trouver automatiquement le pays selon le numéro de TVA
+      const vatCountryCode = checkVAT(
+        company.vatNumber.replace(/[\W_\s]/gim, ""),
+        vatCountries
+      )?.country?.isoCode.short;
+
+      companyCountry = countries.find(
+        country => country.cca2 === vatCountryCode
+      );
+    }
+  }
+  return companyCountry;
 }
