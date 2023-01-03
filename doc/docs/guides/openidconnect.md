@@ -9,11 +9,9 @@ Avant de pouvoir implémenter le procotole OpenID Connect, vous aurez besoin d'u
 L'activation d'OpenID Connect sur une application doit être demandée au support.
 :::
 
-Une application de test (client/RP) est disponible sur https://github.com/MTES-MCT/trackdechets-openidconnect-demo.
+Une [application de test](https://github.com/MTES-MCT/trackdechets-openidconnect-demo) (client/RP) est disponible.
 
 Le [protocole Open ID Connect](https://openid.net/specs/openid-connect-core-1_0.html) permet à des logiciels tiers ("client") de construire un mécanisme d'authentification en considérant l'identité d'un utilisateur de Trackdéchets comme une ressource.
-
-
 
 ```
 +--------+                                   +--------+
@@ -80,15 +78,16 @@ Les arguments suivants doivent être passés en "query string" de la requête:
 - `client_id={client_id}`: L'identifiant de l'application cliente
 - `response_type=code`
 - `redirect_url={redirect_uri}`: URL de redirection
-- `scope={openid profile email}`: le scope de la reuête, voir plus abs
+- `scope={openid profile email}`: le scope de la requête, voir plus bas
+- `state={random}`: une chaine aléatoire qui permet de vérifier que la réponse et la redirection (C) font partie d'une même séquence
 
-Exemple: `https://app.trackdechets.beta.gouv.fr/oidc/authorize/dialog?response_type=code&redirect_uri=https://client.example.com/cb&client_id=ck7d66y9s00x20784u4u7fp8l&scope=openid profile email`
+Exemple: `https://app.trackdechets.beta.gouv.fr/oidc/authorize/dialog?response_type=code&redirect_uri=https://client.example.com/cb&client_id=ck7d66y9s00x20784u4u7fp8l&scope=openid profile email&state=KTDRl4JI3p/TwSUJhgO2alwb`
 
 - (B) Le serveur d'autorisation authentifie l'utilisateur via le navigateur ("resource owner") et établit si oui ou non l'utilisateur autorise ou non l'application autorise l'accès
 
-- (C) Si l'utilisateur donne accès, le serveur d'autorisation redirige l'utilisateur vers l'application cliente en utilisant l'URL de redirection fournit à l'étape (A). L'URL de redirection inclut un code d'autorisation avec une durée de validité de 10 minutes. Par exemple: `https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA`.
+- (C) Si l'utilisateur donne accès, le serveur d'autorisation redirige l'utilisateur vers l'application cliente en utilisant l'URL de redirection fournit à l'étape (A). L'URL de redirection inclut un code d'autorisation d'une durée de validité de 1 minute. Par exemple: `https://client.example.com/cb?code=SplxlOBeZQQYbYS6WxSbIA&state=KTDRl4JI3p/TwSUJhgO2alwb`. Le state reçu ici doit correspondre à celui de (A)
 
-- (D) L'application cliente demande un jeton d'identité au serveur d'autorisation en incluant le code d'autorisation reçu à l'étape précédente en faisant un `POST` sur l'URL `https://api.trackdechets.beta.gouv.fr/oidc/token`.. Les paramètres suivants doivent être passés en utilisant le format "application/x-www-form-urlencoded".
+- (D) L'application cliente demande un jeton d'identité au serveur d'autorisation en incluant le code d'autorisation reçu à l'étape précédente en faisant un `POST` sur l'URL `https://api.trackdechets.beta.gouv.fr/oidc/token`. Les paramètres suivants doivent être passés en utilisant le format "application/x-www-form-urlencoded".
   - `grant_type=authorization_code`
   - `code={code}` code reçu à l'étape précédente
   - `redirect_uri={redirect_uri}` URL de redirection spécifié à l'étape (A)
