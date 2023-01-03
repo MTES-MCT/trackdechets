@@ -9,6 +9,9 @@ export const genUserCompanySiretCacheKey = (userId: string): string =>
 export const genUserCompaniesCacheKey = (userId: string): string =>
   generateKey("userCompanies", userId);
 
+export const getUserLoginFailedKey = (email: string): string =>
+  generateKey("userLoginFailed", email);
+
 /**
  * Delete the cached sirets for a given user
  * @param userId

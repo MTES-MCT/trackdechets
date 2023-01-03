@@ -86,3 +86,13 @@ export async function setInCache(
 
   return redisClient.set(key, value, setOptions);
 }
+
+/**
+ * Set or incr an int value in cache and set expiration
+ * @param key
+ * @expire value
+ * @returns
+ */
+export async function setOrIncr(key: string, expire: number) {
+  return redisClient.pipeline().incr(key).expire(key, expire).exec();
+}

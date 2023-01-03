@@ -75,6 +75,7 @@
     "bcrypt": "^5.0.0",
     "bull": "^4.10.1",
     "camel-case": "^4.1.1",
+    "canvas": "^2.10.2",
     "concat-stream": "^2.0.0",
     "connect-redis": "^6.0.0",
     "cors": "^2.8.5",
