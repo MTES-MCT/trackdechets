@@ -35,7 +35,7 @@ export function ReviewableField({
           label={""}
           className=""
         />
-        <span className="tw-font-bold tw-pr-2">{title}:</span> {value}
+        <span className="tw-font-bold tw-pr-2">{title} :</span> {value}
       </div>
 
       {isEditing && (

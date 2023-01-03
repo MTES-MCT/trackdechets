@@ -50,6 +50,9 @@ const initialReview = {
   processingOperationDone: "",
   processingOperationDescription: "",
   temporaryStorageDetail: {
+    temporaryStorer: {
+      quantityReceived: null,
+    },
     destination: {
       cap: "",
       processingOperation: "",
@@ -72,6 +75,8 @@ export function BsddRequestRevision({ bsdd }: Props) {
     Pick<Mutation, "createFormRevisionRequest">,
     MutationCreateFormRevisionRequestArgs
   >(CREATE_FORM_REVISION_REQUEST);
+
+  const isTempStorage = !!bsdd.temporaryStorageDetail;
 
   return (
     <div className={styles.container}>
@@ -101,17 +106,46 @@ export function BsddRequestRevision({ bsdd }: Props) {
         {({ setFieldValue, values }) => (
           <Form>
             <div className={styles.fields}>
-              <ReviewableField
-                title="CAP"
-                value={bsdd.recipient?.cap}
-                name="content.recipient.cap"
-                defaultValue={initialReview.recipient.cap}
-              >
-                <Field
+              {isTempStorage ? (
+                <>
+                  <ReviewableField
+                    title="CAP destination finale"
+                    value={bsdd.temporaryStorageDetail?.destination?.cap}
+                    name="content.temporaryStorageDetail.destination.cap"
+                    defaultValue={
+                      initialReview.temporaryStorageDetail?.destination?.cap
+                    }
+                  >
+                    <Field
+                      name="content.temporaryStorageDetail.destination.cap"
+                      className="td-input td-input--medium"
+                    />
+                  </ReviewableField>
+                  <ReviewableField
+                    title="CAP entreposage provisoire ou reconditionnement"
+                    value={bsdd.recipient?.cap}
+                    name="content.recipient.cap"
+                    defaultValue={initialReview.recipient.cap}
+                  >
+                    <Field
+                      name="content.recipient.cap"
+                      className="td-input td-input--medium"
+                    />
+                  </ReviewableField>
+                </>
+              ) : (
+                <ReviewableField
+                  title="CAP"
+                  value={bsdd.recipient?.cap}
                   name="content.recipient.cap"
-                  className="td-input td-input--medium"
-                />
-              </ReviewableField>
+                  defaultValue={initialReview.recipient.cap}
+                >
+                  <Field
+                    name="content.recipient.cap"
+                    className="td-input td-input--medium"
+                  />
+                </ReviewableField>
+              )}
 
               <ReviewableField
                 title="Code déchet"
@@ -167,7 +201,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
               </ReviewableField>
 
               <ReviewableField
-                title="Quantité traitée"
+                title="Quantité reçue (tonnes)"
                 value={bsdd.quantityReceived}
                 name="content.quantityReceived"
                 defaultValue={initialReview.quantityReceived}
@@ -178,6 +212,27 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   component={NumberInput}
                 />
               </ReviewableField>
+
+              {isTempStorage && (
+                <ReviewableField
+                  title="Quantité reçue sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)"
+                  value={
+                    bsdd.temporaryStorageDetail?.temporaryStorer
+                      ?.quantityReceived
+                  }
+                  name="content.temporaryStorageDetail.temporaryStorer.quantityReceived"
+                  defaultValue={
+                    initialReview.temporaryStorageDetail?.temporaryStorer
+                      ?.quantityReceived
+                  }
+                >
+                  <Field
+                    name="content.temporaryStorageDetail.temporaryStorer.quantityReceived"
+                    className="td-input td-input--small"
+                    component={NumberInput}
+                  />
+                </ReviewableField>
+              )}
 
               <ReviewableField
                 title="Code de l'opération D/R"

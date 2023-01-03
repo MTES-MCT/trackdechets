@@ -690,16 +690,16 @@ type FormRevisionRequestContent {
   "Courtier"
   broker: Broker
 
-  "Destination du déchet (édition partielle uniquement)"
+  "Informations sur l'installation de destination ou d’entreposage ou de reconditionnement prévue (édition partielle uniquement)"
   recipient: FormRevisionRequestRecipient
 
-  "Quantité reçue, en tonnes"
+  "Quantité reçue sur l'installation de destination, en tonnes"
   quantityReceived: Float
 
   "Traitement réalisé (code D/R)"
   processingOperationDone: String
 
-  "Description de l'opération d’élimination / valorisation (case 11)"
+  "Description de l'opération d’élimination / valorisation réalisée"
   processingOperationDescription: String
 
   "Entreposage provisoire (édition partielle uniquement)"
@@ -721,19 +721,28 @@ type FormRevisionRequestWasteDetails {
 }
 
 type FormRevisionRequestRecipient {
+  "CAP de l'installation de destination ou d'entreposage ou de reconditionnement prévue"
   cap: String
 }
 
 type FormRevisionRequestTemporaryStorageDetail {
+  "Révision des informations sur l'entreposage provisoire"
+  temporaryStorer: FormRevisionRequestTemporaryStorer
+  "Révision des informations du destinataire finale"
   destination: FormRevisionRequestDestination
 }
 
 type FormRevisionRequestDestination {
-  "N° de CAP"
+  "N° de CAP de l'installation de destination"
   cap: String
 
   "Opération d'élimination / valorisation prévue (code D/R)"
   processingOperation: String
+}
+
+type FormRevisionRequestTemporaryStorer {
+  "Quantité reçue sur l'installation d'entreposage provisoire ou de reconditionnement (en tonnes)"
+  quantityReceived: Float
 }
 
 type FormRevisionRequestConnection {
