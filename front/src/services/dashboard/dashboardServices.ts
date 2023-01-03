@@ -18,10 +18,11 @@ export const getBsdView = (bsd): BsdDisplay | null => {
   return bsdView;
 };
 
+// TODO a revoir avec harmonisation des codes status
 export const getBsdStatusLabel = (
   status: string,
-  isDraft: boolean,
-  bsdType: BsdType
+  isDraft: boolean | undefined,
+  bsdType: BsdType | undefined
 ) => {
   switch (status) {
     case BsdStatusCode.DRAFT:
