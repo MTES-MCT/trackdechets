@@ -356,11 +356,6 @@ export function flattenBsddRevisionRequestInput(
       chain(c.temporaryStorageDetail, t =>
         chain(t.destination, d => d.processingOperation)
       )
-    ),
-    temporaryStorageT: chain(reviewContent, c =>
-      chain(c.temporaryStorageDetail, t =>
-        chain(t.destination, d => d.processingOperation)
-      )
     )
   });
 }
