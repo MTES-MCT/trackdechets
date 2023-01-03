@@ -340,6 +340,15 @@ input PrivateCompanyInput {
   L'entreprise autorise l'enlèvement d'un Dasri sans sa signature
   """
   allowBsdasriTakeOverWithoutSignature: Boolean
+
+  "Prénom et nom du contact dans l'entreprise"
+  contact: String
+
+  "Email de contact"
+  contactEmail: String
+  
+  "Numéro de téléphone de contact"
+  contactPhone: String
 }
 
 input CompanyForVerificationWhere {
