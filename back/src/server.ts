@@ -37,6 +37,7 @@ import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
 import { oauth2Router } from "./routers/oauth2-router";
+import { oidcRouter } from "./routers/oidc-router";
 import { roadControlPdfHandler } from "./routers/roadControlPdfRouter";
 import { resolvers, typeDefs } from "./schema";
 import { userActivationHandler } from "./users/activation";
@@ -233,6 +234,7 @@ app.use(graphQLPath, graphqlRegenerateSessionMiddleware("changePassword"));
 // authentification routes used by td-ui (/login /logout, /isAuthenticated)
 app.use(authRouter);
 app.use(oauth2Router);
+app.use(oidcRouter);
 
 const USERS_BLACKLIST_ENV = process.env.USERS_BLACKLIST;
 let blacklist = [];

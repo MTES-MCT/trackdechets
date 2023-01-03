@@ -1,5 +1,5 @@
 import { Grant } from "@prisma/client";
-import { isExpired } from "../oauth2";
+import { isExpired } from "../oauth/utils";
 
 describe("isExpired", () => {
   const RealDate = Date;
