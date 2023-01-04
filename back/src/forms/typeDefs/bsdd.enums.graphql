@@ -56,6 +56,9 @@ enum FormStatus {
 
   "Déchet envoyé du site d'entreposage ou reconditionnement vers sa destination de traitement"
   RESENT
+
+  "Bordereau annulé"
+  CANCELED
 }
 
 enum FormRole {

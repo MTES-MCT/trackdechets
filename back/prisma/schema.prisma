@@ -93,6 +93,7 @@ enum Status {
   RESEALED
   SIGNED_BY_TEMP_STORER
   RESENT
+  CANCELED
 }
 
 enum TransportMode {
