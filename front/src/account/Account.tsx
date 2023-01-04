@@ -18,6 +18,7 @@ import AccountCompanyList from "./AccountCompanyList";
 import AccountContentWrapper from "./AccountContentWrapper";
 import AccountCompanyAdd from "./AccountCompanyAdd";
 import AccountCompanyAddProducer from "./AccountCompanyAddProducer";
+import AccountCompanyAddForeign from "./AccountCompanyAddForeign";
 import AccountOauth2AppList from "./oauth2/AccountOauth2AppList";
 import AccountOAuth2AppCreateUpdate from "./oauth2/AccountOauth2AppCreateUpdate";
 import { Query } from "generated/graphql/types";
@@ -134,6 +135,11 @@ export default withRouter(function Account({ match }: RouteComponentProps) {
             <Route path={routes.account.companies.create.pro}>
               <AccountContentWrapper title="Créer un établissement">
                 <AccountCompanyAdd />
+              </AccountContentWrapper>
+            </Route>
+            <Route path={routes.account.companies.create.foreign}>
+              <AccountContentWrapper title="Créer un transporteur étranger">
+                <AccountCompanyAddForeign />
               </AccountContentWrapper>
             </Route>
             <Redirect to={routes.account.info} />

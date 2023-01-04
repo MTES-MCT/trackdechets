@@ -32,6 +32,7 @@ import {
   FormRevisionRequestDestination,
   FormRevisionRequestRecipient,
   FormRevisionRequestTemporaryStorageDetail,
+  FormRevisionRequestTemporaryStorer,
   FormRevisionRequestWasteDetails,
   FormStatus,
   ImportPaperFormInput,
@@ -346,6 +347,11 @@ export function flattenBsddRevisionRequestInput(
     ...flattenBrokerInput(reviewContent),
     temporaryStorageDestinationCap: chain(reviewContent, c =>
       chain(c.temporaryStorageDetail, t => chain(t.destination, d => d.cap))
+    ),
+    temporaryStorageTemporaryStorerQuantityReceived: chain(reviewContent, c =>
+      chain(c.temporaryStorageDetail, t =>
+        chain(t.temporaryStorer, s => s.quantityReceived)
+      )
     ),
     temporaryStorageDestinationProcessingOperation: chain(reviewContent, c =>
       chain(c.temporaryStorageDetail, t =>
@@ -872,6 +878,10 @@ export function expandBsddRevisionRequestContent(
       bsddRevisionRequest.processingOperationDescription,
     temporaryStorageDetail:
       nullIfNoValues<FormRevisionRequestTemporaryStorageDetail>({
+        temporaryStorer: nullIfNoValues<FormRevisionRequestTemporaryStorer>({
+          quantityReceived:
+            bsddRevisionRequest.temporaryStorageTemporaryStorerQuantityReceived
+        }),
         destination: nullIfNoValues<FormRevisionRequestDestination>({
           cap: bsddRevisionRequest.temporaryStorageDestinationCap,
           processingOperation:

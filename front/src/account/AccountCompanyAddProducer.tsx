@@ -103,7 +103,7 @@ export default function AccountCompanyAddProducer() {
   }
 
   return (
-    <Container fluid spacing="ml-6w" className={styles.container}>
+    <Container fluid className={styles.container}>
       <Row>
         <Col n="12">
           <AccountCompanyAddSiret
