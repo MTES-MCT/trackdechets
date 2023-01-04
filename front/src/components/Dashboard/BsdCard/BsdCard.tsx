@@ -51,6 +51,9 @@ function BsdCard({ bsd, currentSiret, onValidate }: BsdCardProps): JSX.Element {
             {bsdDisplay?.emittedByEcoOrganisme && (
               <LabelWithIcon labelCode={LabelIconCode.EcoOrganism} />
             )}
+            <p className="workflow-type">
+              {getWorkflowLabel(bsdDisplay.bsdWorkflowType)}
+            </p>
           </div>
           <div className="bsd-card__content">
             <div className="bsd-card__content__badge">
@@ -60,21 +63,16 @@ function BsdCard({ bsd, currentSiret, onValidate }: BsdCardProps): JSX.Element {
                 bsdType={bsdDisplay.type}
               />
             </div>
-            <div className="bsd-card__content__waste">
-              <WasteDetails
-                wasteType={bsdDisplay.type}
-                code={bsdDisplay.wasteDetails.code?.toString()}
-                name={bsdDisplay.wasteDetails.name?.toString()}
-              />
-              <p className="workflow-type">
-                {getWorkflowLabel(bsdDisplay.bsdWorkflowType)}
-              </p>
-            </div>
+            <WasteDetails
+              wasteType={bsdDisplay.type}
+              code={bsdDisplay.wasteDetails.code?.toString()}
+              name={bsdDisplay.wasteDetails.name?.toString()}
+            />
 
             {/* TODO Actors */}
 
             <div className="bsd-card__content__cta">
-              {/* TODO BSD suite */}
+              {/* TODO move BSD suite to BsdAdditionnalActions */}
               {hasBsdSuite(bsdDisplay, currentSiret) && (
                 <button
                   type="button"

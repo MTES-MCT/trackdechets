@@ -7,6 +7,7 @@ import BsdCardList from "./BsdCardList";
 import bsddListDraft from "../../../__mocks__/bsdListDraft.json";
 import bsdListActJson from "../../../__mocks__/bsdListAct.json";
 import bsdListFollowJson from "../../../__mocks__/bsdListFollow.json";
+import bsdListArchiveJson from "../../../__mocks__/bsdListArchive.json";
 
 export default {
   title: "COMPONENTS/DASHBOARD/BsdCardList",
@@ -30,16 +31,20 @@ const Template: ComponentStory<typeof BsdCardList> = args => (
   <BsdCardList {...args} />
 );
 
-export const BsddCardListDraft = Template.bind({});
-export const BsddCardListAct = Template.bind({});
-export const BsddCardListFollow = Template.bind({});
+export const Brouillon = Template.bind({});
+export const PourAction = Template.bind({});
+export const Suvi = Template.bind({});
+export const Archives = Template.bind({});
 
-BsddCardListDraft.args = {
+Brouillon.args = {
   bsds: bsddListDraft as unknown as { node: Bsd }[],
 };
-BsddCardListAct.args = {
+PourAction.args = {
   bsds: bsdListActJson as unknown as { node: Bsd }[],
 };
-BsddCardListFollow.args = {
+Suvi.args = {
   bsds: bsdListFollowJson as unknown as { node: Bsd }[],
+};
+Archives.args = {
+  bsds: bsdListArchiveJson as unknown as { node: Bsd }[],
 };

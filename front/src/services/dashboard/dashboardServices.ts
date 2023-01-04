@@ -12,6 +12,48 @@ import {
   BsffType,
   Maybe,
 } from "../../generated/graphql/types";
+import {
+  ACCEPTE,
+  ANNEXE_BORDEREAU_REGROUPEMENT,
+  ARRIVE_ENTREPOS_PROVISOIRE,
+  BROUILLON,
+  ENTREPOS_TEMPORAIREMENT,
+  EN_ATTENTE_OU_BSD_SUITE,
+  EN_ATTENTE_RECEPTION,
+  EN_ATTENTE_REGROUPEMENT,
+  EN_ATTENTE_SIGNATURE,
+  EN_ATTENTE_SIGNATURE_EMETTEUR,
+  EN_ATTENTE_SIGNATURE_ENTREPOS_PROVISOIRE,
+  INITIAL,
+  PARTIELLEMENT_REFUSE,
+  PUBLIER,
+  RECU,
+  REFUSE,
+  REGROUPE_AVEC_RUPTURE_TRACABILITE,
+  SIGNATURE_ACCEPTATION_CONTENANT,
+  SIGNATURE_ECO_ORG,
+  SIGNATURE_EMETTEUR,
+  SIGNATURE_PRODUCTEUR,
+  SIGNATURE_TRANSPORTEUR,
+  SIGNER,
+  SIGNER_ENLEVEMENT,
+  SIGNER_ENTREPOSAGE_PROVISOIRE,
+  SIGNER_EN_TANT_QUE_TRAVAUX,
+  SIGNER_PAR_ENTREPOS_PROVISOIRE,
+  SIGNER_PAR_ENTREPRISE_TRAVAUX,
+  SIGNER_RECEPTION,
+  SIGNER_TRAITEMENT,
+  SIGNE_PAR_EMETTEUR,
+  SIGNE_PAR_PRODUCTEUR,
+  SUIVI_PAR_PNTTD,
+  TRAITE,
+  VALIDER,
+  VALIDER_ACCEPTATION,
+  VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE,
+  VALIDER_ENTREPOSAGE_PROVISOIRE,
+  VALIDER_RECEPTION,
+  VALIDER_TRAITEMENT,
+} from "../../assets/wordings/dashboard/wordingsDashboard";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);
@@ -26,35 +68,35 @@ export const getBsdStatusLabel = (
 ) => {
   switch (status) {
     case BsdStatusCode.DRAFT:
-      return "Brouillon"; // Bsdd
+      return BROUILLON; // Bsdd
     case BsdStatusCode.SEALED:
-      return "En attente de signature par l’émetteur"; // Bsdd
+      return EN_ATTENTE_SIGNATURE_EMETTEUR; // Bsdd
     case BsdStatusCode.SENT:
-      return "EN ATTENTE DE RÉCEPTION"; // Bsvhu| Bsdd | Bsdasri | Bsff | Bsda
+      return EN_ATTENTE_RECEPTION; // Bsvhu| Bsdd | Bsdasri | Bsff | Bsda
     case BsdStatusCode.RECEIVED:
-      return "reçu, en attente d’acceptation ou de refus"; // Bsdd | Bsdasri | Bsff
+      return RECU; // Bsdd | Bsdasri | Bsff
     case BsdStatusCode.ACCEPTED:
-      return "ACCEPTÉ, EN ATTENTE DE TRAITEMENT"; // bsdd | Bsff
+      return ACCEPTE; // bsdd | Bsff
     case BsdStatusCode.PROCESSED:
-      return "Traité"; // Bsvhu| Bsdd | Bsdasri | Bsff | Bsda
+      return TRAITE; // Bsvhu| Bsdd | Bsdasri | Bsff | Bsda
     case BsdStatusCode.AWAITING_GROUP:
-      return "EN ATTENTE DE REGROUPEMENT"; // Bsdd | Bsdasri;
+      return EN_ATTENTE_REGROUPEMENT; // Bsdd | Bsdasri;
     case BsdStatusCode.GROUPED:
-      return "ANNEXÉ À UN BORDEREAU DE REGROUPEMENT"; // Bsdd
+      return ANNEXE_BORDEREAU_REGROUPEMENT; // Bsdd
     case BsdStatusCode.NO_TRACEABILITY:
-      return "regroupé, avec autorisation de RUPTURE DE TRAÇABILITÉ"; // Bsdd
+      return REGROUPE_AVEC_RUPTURE_TRACABILITE; // Bsdd
     case BsdStatusCode.REFUSED:
-      return "REFUSÉ"; // Bsvhu| Bsdd | Bsdasri| Bsff | Bsda;
+      return REFUSE; // Bsvhu| Bsdd | Bsdasri| Bsff | Bsda;
     case BsdStatusCode.TEMP_STORED:
-      return "ARRIVÉ À L’ENTREPOSAGE PROVISOIRE, EN ATTENTE D’ACCEPTATION"; // Bsdd
+      return ARRIVE_ENTREPOS_PROVISOIRE; // Bsdd
     case BsdStatusCode.TEMP_STORER_ACCEPTED:
-      return "entreposé temporairement ou en reconditionnement"; // Bsdd;
+      return ENTREPOS_TEMPORAIREMENT; // Bsdd;
     case BsdStatusCode.RESEALED:
-      return "en attente de signature par l’installation d’entreposage provisoire"; // Bsdd
+      return EN_ATTENTE_SIGNATURE_ENTREPOS_PROVISOIRE; // Bsdd
     case BsdStatusCode.RESENT:
-      return "EN ATTENTE DE RÉCEPTION pour traitement"; // Bsdd;
+      return EN_ATTENTE_SIGNATURE; // Bsdd;
     case BsdStatusCode.SIGNED_BY_PRODUCER:
-      return "signé par le producteur"; // Bsvhu| Bsdd | Bsdasri | Bsda
+      return SIGNE_PAR_PRODUCTEUR; // Bsvhu| Bsdd | Bsdasri | Bsda
     case BsdStatusCode.INITIAL: // Bsvhu| Bsdasri | Bsff | Bsda
       if (
         isDraft ||
@@ -63,26 +105,26 @@ export const getBsdStatusLabel = (
             bsdType === BsdType.Bsda ||
             bsdType === BsdType.Bsvhu))
       ) {
-        return "initial";
+        return INITIAL;
       } else if (!isDraft) {
-        return "En attente de signature par l'émetteur";
+        return EN_ATTENTE_SIGNATURE_EMETTEUR;
       } else {
-        return "initial";
+        return INITIAL;
       }
     case BsdStatusCode.SIGNED_BY_EMITTER:
-      return "signé par l’émetteur"; // Bsff
+      return SIGNE_PAR_EMETTEUR; // Bsff
     case BsdStatusCode.INTERMEDIATELY_PROCESSED:
-      return "ANNEXÉ À UN BORDEREAU DE REGROUPEMENT"; // Bsff
+      return ANNEXE_BORDEREAU_REGROUPEMENT; // Bsff
     case BsdStatusCode.SIGNED_BY_TEMP_STORER:
-      return "Signé par l'installation d'entreposage provisoire"; // bsdd
+      return SIGNER_PAR_ENTREPOS_PROVISOIRE; // bsdd
     case BsdStatusCode.PARTIALLY_REFUSED:
-      return "Partiellement refusé"; // Bsff
+      return PARTIELLEMENT_REFUSE; // Bsff
     case BsdStatusCode.FOLLOWED_WITH_PNTTD:
-      return "Suivi via PNTTD"; // bsdd
+      return SUIVI_PAR_PNTTD; // bsdd
     case BsdStatusCode.SIGNED_BY_WORKER:
-      return "Signé par l'entreprise de travaux"; // Bsda
+      return SIGNER_PAR_ENTREPRISE_TRAVAUX; // Bsda
     case BsdStatusCode.AWAITING_CHILD:
-      return "En attente ou associé à un BSD suite"; // Bsda
+      return EN_ATTENTE_OU_BSD_SUITE; // Bsda
 
     default:
       return "Error unknown status";
@@ -153,6 +195,171 @@ const isBsff = (type: BsdType): boolean => type === BsdType.Bsff;
 const isBsdd = (type: BsdType): boolean => type === BsdType.Bsdd;
 const isBsdasri = (type: BsdType): boolean => type === BsdType.Bsdasri;
 
+const getDraftBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
+  if (isBsdd(bsd.type)) {
+    return VALIDER;
+  }
+  if (
+    bsd.isDraft &&
+    (isBsda(bsd.type) ||
+      isBsff(bsd.type) ||
+      isBsdasri(bsd.type) ||
+      isBsvhu(bsd.type))
+  ) {
+    return PUBLIER;
+
+    // isDraft=false
+  } else if (!bsd.isDraft) {
+    if (isBsvhu(bsd.type) && isSameSiretEmmiter(currentSiret, bsd)) {
+      return SIGNER;
+    }
+    if (
+      (isBsff(bsd.type) && isSameSiretEmmiter(currentSiret, bsd)) ||
+      (isBsda(bsd.type) &&
+        isCollection_2710(bsd.bsdWorkflowType?.toString()) &&
+        isSameSiretDestination(currentSiret, bsd)) ||
+      (isBsda(bsd.type) &&
+        // @ts-ignore
+        bsd.emitter?.isPrivateIndividual &&
+        bsd.worker?.isDisabled &&
+        isSameSiretTransporter(currentSiret, bsd))
+    ) {
+      return SIGNER;
+    }
+    if (isBsdasri(bsd.type)) {
+      const isEcoOrganisme = currentSiret === bsd.ecoOrganisme?.siret;
+      const isHolder = isSameSiretEmmiter(currentSiret, bsd) || isEcoOrganisme;
+      const isTransporter = isSameSiretTransporter(currentSiret, bsd);
+
+      // TODO isActTab see /dashboard/components/BSDList/BSDasri/WorkflowAction/WorkflowAction.tsx
+      if (isHolder && !isSynthesis(bsd.bsdWorkflowType?.toString())) {
+        if (isEcoOrganisme) {
+          return SIGNATURE_ECO_ORG;
+        }
+        return SIGNATURE_PRODUCTEUR;
+      }
+
+      // TODO isToCollectTab see /dashboard/components/BSDList/BSDasri/WorkflowAction/WorkflowAction.tsx
+      if (isTransporter && !isSynthesis(bsd.bsdWorkflowType?.toString())) {
+        return SIGNATURE_EMETTEUR;
+      }
+      return "";
+    }
+
+    if (isSameSiretEmmiter(currentSiret, bsd)) {
+      return SIGNATURE_EMETTEUR;
+    }
+  }
+  return "";
+};
+
+const getSealedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
+  if (isBsdd(bsd.type) && hasAllSiretActors(bsd, currentSiret)) {
+    if (hasEmmiterAndEcoOrganismeSiret(bsd, currentSiret)) {
+      return SIGNATURE_EMETTEUR;
+    }
+  }
+  if (isBsda(bsd.type) || isBsff(bsd.type)) {
+    return SIGNATURE_EMETTEUR;
+  }
+  if (isBsvhu(bsd.type)) {
+    return SIGNER;
+  }
+  return "";
+};
+
+const getSentBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
+  if (isBsdd(bsd.type)) {
+    if (isSameSiretDestination(currentSiret, bsd) && bsd.isTempStorage) {
+      return VALIDER_ENTREPOSAGE_PROVISOIRE;
+    }
+    return VALIDER_RECEPTION;
+  }
+  if (
+    (isBsdasri(bsd.type) &&
+      currentSiret ===
+        bsd.destination?.company
+          ?.siret) /* TODO && only isAct tab for dasri */ ||
+    (isBsff(bsd.type) && isSameSiretDestination(currentSiret, bsd))
+  ) {
+    return SIGNER_RECEPTION;
+  }
+
+  if (
+    isSameSiretDestination(currentSiret, bsd) &&
+    (isBsvhu(bsd.type) || isBsda(bsd.type))
+  ) {
+    return SIGNER_ENLEVEMENT;
+  }
+  return "";
+};
+
+const getReceivedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
+  if (
+    (isBsdd(bsd.type) &&
+      bsd.isTempStorage &&
+      isSameSiretTemporaryStorageDestination(currentSiret, bsd)) ||
+    (!bsd.isTempStorage && isSameSiretDestination(currentSiret, bsd))
+  ) {
+    return VALIDER_ACCEPTATION;
+  }
+  if (isBsda(bsd.type) || isBsvhu(bsd.type)) {
+    return SIGNER_TRAITEMENT;
+  }
+  if (isBsff(bsd.type) && isSameSiretDestination(currentSiret, bsd)) {
+    // TODO bsff status received with packagings see dashboard/components/BSDList/BSFF/WorkflowAction/WorkflowAction.tsx
+    return SIGNATURE_ACCEPTATION_CONTENANT;
+  }
+
+  if (
+    isBsdasri(bsd.type) &&
+    isSameSiretDestination(currentSiret, bsd) /* && TODO only for act list */
+  ) {
+    return SIGNER_RECEPTION;
+  }
+  return "";
+};
+
+const getSignByProducerBtnLabel = (
+  currentSiret: string,
+  bsd: BsdDisplay
+): string => {
+  if (
+    (isBsdd(bsd.type) && isSameSiretTransporter(currentSiret, bsd)) ||
+    (isBsdasri(bsd.type) &&
+      isSameSiretTransporter(currentSiret, bsd) &&
+      !isSynthesis(bsd.bsdWorkflowType?.toString()))
+  ) {
+    return SIGNATURE_TRANSPORTEUR;
+  }
+
+  if (
+    (isBsda(bsd.type) &&
+      (isGathering(bsd.bsdWorkflowType?.toString()) ||
+        isReshipment(bsd.bsdWorkflowType?.toString()) ||
+        bsd.worker?.isDisabled)) ||
+    (isBsvhu(bsd.type) && isSameSiretTransporter(currentSiret, bsd))
+  ) {
+    return SIGNER_ENLEVEMENT;
+  }
+
+  if (currentSiret === bsd.worker?.company?.siret) {
+    return SIGNER_EN_TANT_QUE_TRAVAUX;
+  }
+  return "";
+};
+
+const getAcceptedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
+  if (isBsff(bsd.type) && isSameSiretDestination(currentSiret, bsd)) {
+    // TODO bsff status accepted with packagings see dashboard/components/BSDList/BSFF/WorkflowAction/WorkflowAction.tsx
+    return SIGNATURE_ACCEPTATION_CONTENANT;
+  }
+  if (isSameSiretDestination(currentSiret, bsd)) {
+    return VALIDER_TRAITEMENT;
+  }
+  return "";
+};
+
 /* TODO à revoir avec harmonisation libéllés et status */
 export const getCtaLabelFromStatus = (
   bsd: BsdDisplay,
@@ -161,125 +368,37 @@ export const getCtaLabelFromStatus = (
   switch (bsd.status) {
     case BsdStatusCode.DRAFT:
     case BsdStatusCode.INITIAL:
-      if (isBsdd(bsd.type)) {
-        return "Valider";
-      }
-      if (
-        bsd.isDraft &&
-        (isBsda(bsd.type) ||
-          isBsff(bsd.type) ||
-          isBsdasri(bsd.type) ||
-          isBsvhu(bsd.type))
-      ) {
-        return "Publier";
-
-        // non DRAFT
-      } else if (!bsd.isDraft) {
-        if (isBsvhu(bsd.type) && isSameSiretEmmiter(currentSiret, bsd)) {
-          return "Signer";
-        }
-        if (
-          (isBsff(bsd.type) && isSameSiretEmmiter(currentSiret, bsd)) ||
-          (isBsda(bsd.type) &&
-            isCollection_2710(bsd.bsdWorkflowType?.toString()) &&
-            isSameSiretDestination(currentSiret, bsd)) ||
-          (isBsda(bsd.type) &&
-            // @ts-ignore
-            bsd.emitter?.isPrivateIndividual &&
-            bsd.worker?.isDisabled &&
-            isSameSiretTransporter(currentSiret, bsd))
-        ) {
-          return "Signer";
-        }
-        if (isBsdasri(bsd.type)) {
-          const isEcoOrganisme = currentSiret === bsd.ecoOrganisme?.siret;
-          const isHolder =
-            isSameSiretEmmiter(currentSiret, bsd) || isEcoOrganisme;
-          const isTransporter = isSameSiretTransporter(currentSiret, bsd);
-
-          // TODO only on act list tab
-          if (isHolder && !isSynthesis(bsd.bsdWorkflowType?.toString())) {
-            if (isEcoOrganisme) {
-              return "Signature Éco-organisme";
-            }
-            return "Signature producteur";
-          }
-
-          // TODO only to collect tab
-          if (isTransporter && !isSynthesis(bsd.bsdWorkflowType?.toString())) {
-            return "Signer en tant qu'émetteur";
-          }
-          return "";
-        }
-
-        if (isSameSiretEmmiter(currentSiret, bsd)) {
-          return "Signer en tant qu'émetteur";
-        }
-      }
-      break;
+      return getDraftBtnLabel(currentSiret, bsd);
     case BsdStatusCode.SEALED:
-      if (isBsdd(bsd.type) && hasAllSiretActors(bsd, currentSiret)) {
-        if (hasEmmiterAndEcoOrganismeSiret(bsd, currentSiret)) {
-          return "Signer en tant qu'émetteur";
-        }
-      }
-      if (isBsda(bsd.type) || isBsff(bsd.type)) {
-        return "Signature émetteur";
-      }
-      if (isBsvhu(bsd.type)) {
-        return "Signer";
-      }
-      break;
+      return getSealedBtnLabel(currentSiret, bsd);
 
     case BsdStatusCode.SENT:
-      if (isBsdd(bsd.type)) {
-        if (isSameSiretDestination(currentSiret, bsd) && bsd.isTempStorage) {
-          return "Valider l'entreposage provisoire";
-        }
-        return "Valider la réception";
-      }
-      if (
-        (isBsdasri(bsd.type) &&
-          currentSiret ===
-            bsd.destination?.company
-              ?.siret) /* TODO && only isAct tab for dasri */ ||
-        (isBsff(bsd.type) && isSameSiretDestination(currentSiret, bsd))
-      ) {
-        return "Signature réception";
-      }
-
-      if (
-        isSameSiretDestination(currentSiret, bsd) &&
-        (isBsvhu(bsd.type) || isBsda(bsd.type))
-      ) {
-        return "Signer l'enlèvement";
-      }
-      break;
+      return getSentBtnLabel(currentSiret, bsd);
 
     case BsdStatusCode.RESENT:
       if (
         isBsdd(bsd.type) &&
         isSameSiretTemporaryStorageDestination(currentSiret, bsd)
       ) {
-        return "Valider la réception";
+        return VALIDER_RECEPTION;
       }
       break;
 
     case BsdStatusCode.RESEALED:
       if (isBsdd(bsd.type) && hasTemporaryStorage(currentSiret, bsd)) {
-        return "Signer en tant qu'entreposage provisoire";
+        return SIGNER_ENTREPOSAGE_PROVISOIRE;
       }
       break;
 
     case BsdStatusCode.TEMP_STORED:
       if (isBsdd(bsd.type) && isSameSiretDestination(currentSiret, bsd)) {
-        return "Valider l'acceptation de l'entreposage provisoire";
+        return VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE;
       }
       break;
 
     case BsdStatusCode.TEMP_STORER_ACCEPTED:
       if (isBsdd(bsd.type) && isSameSiretDestination(currentSiret, bsd)) {
-        return "Valider le traitement";
+        return VALIDER_TRAITEMENT;
       }
       break;
 
@@ -288,75 +407,27 @@ export const getCtaLabelFromStatus = (
         isBsdd(bsd.type) &&
         isSameSiretTemporaryStorageTransporter(currentSiret, bsd)
       ) {
-        return "Signature transporteur";
+        return SIGNATURE_TRANSPORTEUR;
       }
       break;
 
     case BsdStatusCode.RECEIVED:
     case BsdStatusCode.PARTIALLY_REFUSED:
     case BsdStatusCode.AWAITING_CHILD:
-      if (
-        (isBsdd(bsd.type) &&
-          bsd.isTempStorage &&
-          isSameSiretTemporaryStorageDestination(currentSiret, bsd)) ||
-        (!bsd.isTempStorage && isSameSiretDestination(currentSiret, bsd))
-      ) {
-        return "Valider l'acceptation";
-      }
-      if (isBsda(bsd.type) || isBsvhu(bsd.type)) {
-        return "Signer le traitement";
-      }
-      if (isBsff(bsd.type) && isSameSiretDestination(currentSiret, bsd)) {
-        // TODO bsff packagings
-        return "Signature acceptation et traitement par contenant";
-      }
-
-      if (
-        isBsdasri(bsd.type) &&
-        isSameSiretDestination(
-          currentSiret,
-          bsd
-        ) /* && TODO only for act list */
-      ) {
-        return "Signer la réception";
-      }
-      break;
+      return getReceivedBtnLabel(currentSiret, bsd);
 
     case BsdStatusCode.SIGNED_BY_PRODUCER:
-      if (
-        (isBsdd(bsd.type) && isSameSiretTransporter(currentSiret, bsd)) ||
-        (isBsdasri(bsd.type) &&
-          isSameSiretTransporter(currentSiret, bsd) &&
-          !isSynthesis(bsd.bsdWorkflowType?.toString()))
-      ) {
-        return "Signature transporteur";
-      }
-
-      if (
-        (isBsda(bsd.type) &&
-          (isGathering(bsd.bsdWorkflowType?.toString()) ||
-            isReshipment(bsd.bsdWorkflowType?.toString()) ||
-            bsd.worker?.isDisabled)) ||
-        (isBsvhu(bsd.type) && isSameSiretTransporter(currentSiret, bsd))
-      ) {
-        return "Signer l'enlèvement";
-      }
-
-      if (currentSiret === bsd.worker?.company?.siret) {
-        return "Signer en tant qu'entreprise de travaux";
-      }
-      break;
+      return getSignByProducerBtnLabel(currentSiret, bsd);
 
     case BsdStatusCode.SIGNED_BY_EMITTER:
     case BsdStatusCode.SIGNED_BY_WORKER:
       if (isSameSiretTransporter(currentSiret, bsd)) {
-        return "Signer l'enlèvement";
+        return SIGNER_ENLEVEMENT;
       }
       break;
 
     case BsdStatusCode.ACCEPTED:
-      return "Valider le traitement";
-
+      return getAcceptedBtnLabel(currentSiret, bsd);
     default:
       return "";
   }

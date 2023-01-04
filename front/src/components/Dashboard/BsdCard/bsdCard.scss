@@ -34,6 +34,9 @@
                 color: #161616;
             }
         }
+        .workflow-type {
+            font-weight: bold;
+        }
     }
 
     &__content {
@@ -48,14 +51,6 @@
         &__badge {
             @include desktop {
                 width: 40%;
-            }
-        }
-
-        &__waste {
-            .workflow-type {
-                margin: 0;
-                padding: 0 0 5px 0;
-                font-size: 0.75rem;
             }
         }
 

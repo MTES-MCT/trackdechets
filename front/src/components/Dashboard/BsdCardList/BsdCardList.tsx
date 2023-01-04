@@ -12,7 +12,7 @@ function BsdCardList({ bsds }: BsdCardListProps): JSX.Element {
   const { siret } = useParams<{ siret: string }>(); // TODO move to dashboard page later
 
   const onBsdValidation = (bsd: Bsd) => {
-    // TODO
+    // TODO create favro card
     validateBsd(bsd);
   };
 

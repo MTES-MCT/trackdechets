@@ -22,7 +22,6 @@ export const BsddDraftSansInfosDechet = Template.bind({});
 export const BsvhuDraft = Template.bind({});
 export const BsddAvecIconeEntreposage = Template.bind({});
 export const BsdaAvecAction = Template.bind({});
-export const BsddAvecAction = Template.bind({});
 export const BsffAvecAction = Template.bind({});
 export const BsdasriAvecActionEtIconeDateDeDerniereModification = Template.bind(
   {}
@@ -54,11 +53,7 @@ BsdaAvecAction.args = {
   currentSiret,
   onValidate,
 };
-BsddAvecAction.args = {
-  bsd: bsdListActJson[9].node as unknown as Form,
-  currentSiret,
-  onValidate,
-};
+
 BsffAvecAction.args = {
   bsd: bsdListActJson[3].node as unknown as Bsff,
   currentSiret,
