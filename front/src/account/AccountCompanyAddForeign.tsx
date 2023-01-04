@@ -1,18 +1,18 @@
 import React, { useState, useMemo } from "react";
-import { useMutation, gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
 import { useHistory } from "react-router-dom";
-import routes from "common/routes";
-import { GET_ME } from "../dashboard/Dashboard";
 import { NotificationError } from "../common/components/Error";
 import styles from "./AccountCompanyAdd.module.scss";
 import {
   Mutation,
   MutationCreateCompanyArgs,
   CompanyType as _CompanyType,
-  PrivateCompanyInput,
 } from "generated/graphql/types";
-import { MY_COMPANIES } from "./AccountCompanyList";
+import {
+  CREATE_COMPANY,
+  CREATE_COMPANY_HOOK_OPTIONS,
+} from "./AccountCompanyAdd";
 import { isSiret, isVat } from "generated/constants/companySearchHelpers";
 
 import {
@@ -23,19 +23,6 @@ import {
   TextInput,
   Checkbox,
 } from "@dataesr/react-dsfr";
-
-const CREATE_COMPANY = gql`
-  mutation CreateCompany($companyInput: PrivateCompanyInput!) {
-    createCompany(companyInput: $companyInput) {
-      id
-      name
-      givenName
-      siret
-      vatNumber
-      companyTypes
-    }
-  }
-`;
 
 interface Values extends FormikValues {
   siret: string;
@@ -126,16 +113,7 @@ export default function AccountCompanyAddForeign() {
   const [createCompany, { error: savingError }] = useMutation<
     Pick<Mutation, "createCompany">,
     MutationCreateCompanyArgs
-  >(CREATE_COMPANY, {
-    refetchQueries: [
-      { query: GET_ME },
-      { query: MY_COMPANIES, variables: { first: 10 } },
-    ],
-    awaitRefetchQueries: true,
-    onCompleted: () => {
-      history.push(routes.account.companies.list);
-    },
-  });
+  >(CREATE_COMPANY, CREATE_COMPANY_HOOK_OPTIONS(history));
 
   const memoizedStrings = useMemo(() => {
     return localizedStrings[currentLanguage];
@@ -147,17 +125,11 @@ export default function AccountCompanyAddForeign() {
    */
   async function onSubmit(values: Values) {
     const { isAllowed, ...companyValues } = values;
-    const { siret, vatNumber, ...formInput } = companyValues;
-
-    const companyInput: PrivateCompanyInput = {
-      orgId: !!siret ? siret : vatNumber,
-      ...formInput,
-    };
 
     return createCompany({
       variables: {
         companyInput: {
-          ...companyInput,
+          ...companyValues,
         },
       },
     });
