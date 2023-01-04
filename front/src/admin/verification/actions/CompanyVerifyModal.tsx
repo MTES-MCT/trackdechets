@@ -1,3 +1,4 @@
+import cogoToast from "cogo-toast";
 import TdModal from "common/components/Modal";
 import { Formik, Form, Field } from "formik";
 import { gql, useMutation } from "@apollo/client";
@@ -9,6 +10,7 @@ import {
   MutationVerifyCompanyByAdminArgs,
 } from "generated/graphql/types";
 import { NotificationError } from "common/components/Error";
+import { isSiret } from "generated/constants/companySearchHelpers";
 
 type VerifyModalProps = {
   isOpen: boolean;
@@ -40,18 +42,35 @@ export default function CompanyVerifyModal({
     Pick<Mutation, "verifyCompanyByAdmin">,
     MutationVerifyCompanyByAdminArgs
   >(VERIFY_COMPANY_BY_ADMIN, {
-    onCompleted: onClose,
+    onCompleted: () => {
+      cogoToast.success("Verification envoyée", { hideAfter: 5 });
+      return onClose();
+    },
+    onError: () => {
+      cogoToast.error("La vérification n'a pas pu être envoyée", {
+        hideAfter: 5,
+      });
+    },
   });
 
   function onSubmit(values: Values) {
-    return verifyCompanyByAdmin({
-      variables: {
-        input: {
-          siret: company.siret,
-          verificationComment: values.verificationComment,
+    if (isSiret(company.siret!)) {
+      return verifyCompanyByAdmin({
+        variables: {
+          input: {
+            siret: company.siret!,
+            verificationComment: values.verificationComment,
+          },
         },
-      },
-    });
+      });
+    } else {
+      cogoToast.error(
+        "La vérification n'a pas pu être envoyée, l'établissement ne possède pas de SIRET valide",
+        {
+          hideAfter: 5,
+        }
+      );
+    }
   }
 
   return (

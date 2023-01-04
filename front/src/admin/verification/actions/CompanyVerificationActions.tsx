@@ -30,7 +30,7 @@ export default function CompanyVerificationActions({
       <button className="btn btn--primary" onClick={() => openVerifyModal()}>
         Vérifier
       </button>
-      {isSiret(company.siret) && (
+      {isSiret(company.orgId) && (
         <button
           className="btn btn--primary tw-mt-1"
           onClick={() => openSendVerificationCodeModal()}

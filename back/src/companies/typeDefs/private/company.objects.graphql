@@ -71,7 +71,7 @@ type CompanyForVerification {
   id: ID!
   "SIRET ou TVA de l'établissement"
   orgId: String!
-  siret: String!
+  siret: String
   vatNumber: String
   name: String!
   companyTypes: [CompanyType!]!
