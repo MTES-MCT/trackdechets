@@ -319,6 +319,7 @@ export function flattenBsddRevisionRequestInput(
   reviewContent: FormRevisionRequestContentInput
 ) {
   return safeInput({
+    isCanceled: chain(reviewContent, c => chain(c, r => r.isCanceled)),
     recipientCap: chain(reviewContent, c => chain(c.recipient, r => r.cap)),
     wasteDetailsCode: chain(reviewContent, c =>
       chain(c.wasteDetails, w => w.code)

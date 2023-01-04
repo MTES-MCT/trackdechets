@@ -28,6 +28,7 @@ import { isSiret } from "../../../common/constants/companySearchHelpers";
 
 export type RevisionRequestContent = Pick<
   Prisma.BsddRevisionRequestCreateInput,
+  | "isCanceled"
   | "recipientCap"
   | "wasteDetailsCode"
   | "wasteDetailsName"
@@ -187,6 +188,12 @@ async function getFlatContent(
     );
   }
 
+  if (flatContent.isCanceled && Object.values(flatContent).length > 1) {
+    throw new UserInputError(
+      "Impossible d'annuler et de modifier un bordereau."
+    );
+  }
+
   await bsddRevisionRequestSchema.validate(flatContent);
 
   return flatContent;
@@ -229,6 +236,7 @@ function hasTemporaryStorageUpdate(content: RevisionRequestContent): boolean {
 
 const bsddRevisionRequestSchema = yup
   .object({
+    isCanceled: yup.bool().nullable(),
     recipientCap: yup.string().nullable(),
     wasteDetailsCode: yup
       .string()

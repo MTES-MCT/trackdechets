@@ -820,6 +820,9 @@ input CreateFormRevisionRequestInput {
 
 "Payload du contenu de la révision d'un bordereau. Disponible sur une liste restreinte de champs."
 input FormRevisionRequestContentInput {
+  "Annuler le bordereau. Exclusif des autres opérations"
+  isCanceled: Boolean
+
   "Détails du déchet (édition partielle uniquement)"
   wasteDetails: FormRevisionRequestWasteDetailsInput
 

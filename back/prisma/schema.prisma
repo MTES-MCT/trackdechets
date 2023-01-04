@@ -496,6 +496,7 @@ model BsddRevisionRequest {
   traderValidityLimit                            DateTime? @db.Timestamptz(6)
   temporaryStorageDestinationCap                 String?
   temporaryStorageDestinationProcessingOperation String?
+  isCanceled                                     Boolean @default(false)
 
   comment String
 
