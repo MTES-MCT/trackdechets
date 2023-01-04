@@ -1606,7 +1606,7 @@ export function IconBSVhuThin(props: React.SVGProps<SVGSVGElement>) {
         />
       </g>
       <defs>
-        <clipPath id="clip0_130_10921">
+        <clipPath>
           <rect width="33" height="38" fill="white" />
         </clipPath>
       </defs>

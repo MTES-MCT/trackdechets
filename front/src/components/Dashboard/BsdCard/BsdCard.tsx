@@ -83,6 +83,7 @@ function BsdCard({ bsd, currentSiret, onValidate }: BsdCardProps): JSX.Element {
               )}
               {canPublishBsd(bsdDisplay, currentSiret) && ctaPrimaryLabel && (
                 <button
+                  data-testid="bsd-card-btn-primary"
                   type="button"
                   className="fr-btn fr-btn--sm"
                   onClick={handleValidationClick}

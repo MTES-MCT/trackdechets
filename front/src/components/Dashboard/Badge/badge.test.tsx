@@ -31,7 +31,7 @@ describe("Bsd Badge status", () => {
   describe("case: INITITAL(draft=false)", () => {
     test("Bsd[x] with Initial status should return 'en attente de signature par l'émetteur'", () => {
       render(<Badge status={BsdStatusCode.INITIAL} isDraft={false} />);
-      expect(screen.getByText(/En attente de signature par l'émetteur/i));
+      expect(screen.getByText(/En attente de signature par l’émetteur/i));
     });
 
     test("Bsdasri with Initial status should return Initial", () => {

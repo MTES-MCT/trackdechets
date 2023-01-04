@@ -131,7 +131,7 @@ export const getBsdStatusLabel = (
   }
 };
 
-const hasAllSiretActors = (bsd: BsdDisplay, siret: string): boolean => {
+const includesSiretActors = (bsd: BsdDisplay, siret: string): boolean => {
   return [
     bsd.emitter?.company?.siret,
     bsd.ecoOrganisme?.siret,
@@ -254,7 +254,7 @@ const getDraftBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
 };
 
 const getSealedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
-  if (isBsdd(bsd.type) && hasAllSiretActors(bsd, currentSiret)) {
+  if (isBsdd(bsd.type) && includesSiretActors(bsd, currentSiret)) {
     if (hasEmmiterAndEcoOrganismeSiret(bsd, currentSiret)) {
       return SIGNATURE_EMETTEUR;
     }
@@ -354,7 +354,10 @@ const getAcceptedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
     // TODO bsff status accepted with packagings see dashboard/components/BSDList/BSFF/WorkflowAction/WorkflowAction.tsx
     return SIGNATURE_ACCEPTATION_CONTENANT;
   }
-  if (isSameSiretDestination(currentSiret, bsd)) {
+  if (
+    isSameSiretDestination(currentSiret, bsd) ||
+    isSameSiretTemporaryStorageDestination(currentSiret, bsd)
+  ) {
     return VALIDER_TRAITEMENT;
   }
   return "";

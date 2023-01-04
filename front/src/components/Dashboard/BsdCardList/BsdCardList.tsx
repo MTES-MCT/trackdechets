@@ -6,11 +6,8 @@ import { validateBsd } from "../../../services/dashboard/dashboardServices";
 import { Bsd } from "../../../generated/graphql/types";
 
 import "./bsdCardList.scss";
-import { useParams } from "react-router-dom";
 
-function BsdCardList({ bsds }: BsdCardListProps): JSX.Element {
-  const { siret } = useParams<{ siret: string }>(); // TODO move to dashboard page later
-
+function BsdCardList({ siret, bsds }: BsdCardListProps): JSX.Element {
   const onBsdValidation = (bsd: Bsd) => {
     // TODO create favro card
     validateBsd(bsd);
