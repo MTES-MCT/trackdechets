@@ -545,8 +545,8 @@ enum StatutDiffusionEtablissement {
 }
 
 """
-Informations minimales sur une entreprise identifiée par son SIRET
-Information validées par requête à l'INSEE pour utilisation dans Intermediary
+Intermediary: entreprise identifiée par son SIRET obligatoire
+Information validées par requête à l'INSEE
 """
 type CompanyValidationInfos {
   siret: String!
