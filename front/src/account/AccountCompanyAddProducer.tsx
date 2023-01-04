@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import { useMutation, gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
 import { useHistory } from "react-router-dom";
-import routes from "common/routes";
-import { GET_ME } from "../dashboard/Dashboard";
 import { NotificationError } from "../common/components/Error";
 import AccountCompanyAddSiret from "./accountCompanyAdd/AccountCompanyAddSiret";
 import styles from "./AccountCompanyAdd.module.scss";
@@ -12,9 +10,7 @@ import {
   MutationCreateCompanyArgs,
   CompanyType as _CompanyType,
   CompanySearchResult,
-  PrivateCompanyInput,
 } from "generated/graphql/types";
-import { MY_COMPANIES } from "./AccountCompanyList";
 import { isSiret, isVat } from "generated/constants/companySearchHelpers";
 
 import {
@@ -27,19 +23,10 @@ import {
   Checkbox,
   Alert,
 } from "@dataesr/react-dsfr";
-
-const CREATE_COMPANY = gql`
-  mutation CreateCompany($companyInput: PrivateCompanyInput!) {
-    createCompany(companyInput: $companyInput) {
-      id
-      name
-      givenName
-      siret
-      vatNumber
-      companyTypes
-    }
-  }
-`;
+import {
+  CREATE_COMPANY,
+  CREATE_COMPANY_HOOK_OPTIONS,
+} from "./AccountCompanyAdd";
 
 interface Values extends FormikValues {
   siret: string;
@@ -68,16 +55,7 @@ export default function AccountCompanyAddProducer() {
   const [createCompany, { error: savingError }] = useMutation<
     Pick<Mutation, "createCompany">,
     MutationCreateCompanyArgs
-  >(CREATE_COMPANY, {
-    refetchQueries: [
-      { query: GET_ME },
-      { query: MY_COMPANIES, variables: { first: 10 } },
-    ],
-    awaitRefetchQueries: true,
-    onCompleted: () => {
-      history.push(routes.account.companies.list);
-    },
-  });
+  >(CREATE_COMPANY, CREATE_COMPANY_HOOK_OPTIONS(history));
 
   /**
    * Form submission callback
@@ -85,17 +63,10 @@ export default function AccountCompanyAddProducer() {
    */
   async function onSubmit(values: Values) {
     const { isAllowed, willManageDasris, ...companyValues } = values;
-
-    const { siret, vatNumber, ...formInput } = companyValues;
-    const companyInput: PrivateCompanyInput = {
-      orgId: !!siret ? siret : vatNumber,
-      ...formInput,
-    };
-
     return createCompany({
       variables: {
         companyInput: {
-          ...companyInput,
+          ...companyValues,
           allowBsdasriTakeOverWithoutSignature: willManageDasris,
         },
       },
