@@ -31,9 +31,9 @@ export default function ActionButton({
       {...props}
       className={classNames(
         `${props.secondary ? "btn--outline-primary" : "btn--primary"}`,
-        styles.ActionButton,
         {
           [styles.ActionButtonSmall]: size === "small",
+          [styles.ActionButton]: size === "normal",
         }
       )}
     >
@@ -54,8 +54,9 @@ export function ActionLink({ icon, children, to }: ActionLinkProps) {
   return (
     <Link
       to={to}
-      className={classNames("btn--primary", styles.ActionButton, {
+      className={classNames("btn--primary", {
         [styles.ActionButtonSmall]: size === "small",
+        [styles.ActionButton]: size === "normal",
       })}
     >
       <span className={styles.ActionButtonIcon}>{icon}</span>
