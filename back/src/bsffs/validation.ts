@@ -241,7 +241,7 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
       weightValue: weight(WeightUnits.Kilogramme)
         .label("Déchet")
         .when(
-          "transporterTransportMode",
+          ["transporterTransportMode", "createdAt"],
           weightConditions.transportMode(WeightUnits.Kilogramme)
         )
         .positive("Le poids doit être supérieur à 0")

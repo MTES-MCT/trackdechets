@@ -238,7 +238,7 @@ export const emissionSchema: FactorySchemaOf<
           )
       })
       .when(
-        "transporterTransportMode",
+        ["transporterTransportMode", "createdAt"],
         weightConditions.transportMode(WeightUnits.Kilogramme)
       )
       .positive("Le poids de déchet émis doit être supérieur à 0"),
@@ -459,7 +459,7 @@ export const transportSchema: FactorySchemaOf<
           )
       })
       .when(
-        "transporterTransportMode",
+        ["transporterTransportMode", "createdAt"],
         weightConditions.transportMode(WeightUnits.Kilogramme)
       )
       .positive("Le poids de déchets transportés doit être supérieur à 0"),
