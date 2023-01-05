@@ -30,7 +30,7 @@ export default function ActionButton({
     <button
       {...props}
       className={classNames(
-        `btn ${props.secondary ? "btn--outline-primary" : "btn--primary"}`,
+        `${props.secondary ? "btn--outline-primary" : "btn--primary"}`,
         styles.ActionButton,
         {
           [styles.ActionButtonSmall]: size === "small",
