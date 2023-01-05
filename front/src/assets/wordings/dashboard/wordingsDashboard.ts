@@ -54,3 +54,12 @@ export const SUIVI_PAR_PNTTD = "Suivi via PNTTD";
 export const SIGNER_PAR_ENTREPRISE_TRAVAUX =
   "Signé par l'entreprise de travaux";
 export const EN_ATTENTE_OU_BSD_SUITE = "En attente ou associé à un BSD suite";
+
+// Additional actions buttons
+export const apercu_action_label = "Vue détaillée";
+export const pdf_action_label = "PDF";
+export const modifier_action_label = "Modifier";
+export const dupliquer_action_label = "Dupliquer";
+export const revision_action_label = "Révision";
+export const supprimer_action_label = "Supprimer";
+export const completer_bsd_suite = "Compléter le BSD suite";

@@ -7,7 +7,7 @@ import { Bsda, Bsdasri, Bsff, Bsvhu, Form } from "generated/graphql/types";
 describe("Bsd card primary action label", () => {
   const siretEmmiter = "53230142100022";
   const siretTransporter = "13001045700013";
-  const onValidate = jest.fn();
+  const functionMock = jest.fn();
 
   describe("case: INITITAL(draft=true)", () => {
     test("Bsdd", () => {
@@ -140,7 +140,12 @@ describe("Bsd card primary action label", () => {
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsdd}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       expect(screen.getByTestId("bsd-card-btn-primary")).toHaveTextContent(
@@ -205,7 +210,12 @@ describe("Bsd card primary action label", () => {
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsda}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       expect(screen.getByTestId("bsd-card-btn-primary")).toHaveTextContent(
@@ -262,7 +272,12 @@ describe("Bsd card primary action label", () => {
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsvhu}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       expect(screen.getByTestId("bsd-card-btn-primary")).toHaveTextContent(
@@ -274,7 +289,12 @@ describe("Bsd card primary action label", () => {
         <BsdCard
           currentSiret={siretTransporter}
           bsd={bsvhu}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       expect(queryByTestId("bsd-card-btn-primary")).toBeFalsy();
@@ -339,7 +359,12 @@ describe("Bsd card primary action label", () => {
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsff}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
@@ -401,7 +426,12 @@ describe("Bsd card primary action label", () => {
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsda}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
@@ -497,7 +527,12 @@ describe("Bsd card primary action label", () => {
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsdd}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
@@ -614,7 +649,12 @@ describe("Bsd card primary action label", () => {
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsdd}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
@@ -694,7 +734,12 @@ describe("Bsd card primary action label", () => {
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsdari}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));

@@ -63,7 +63,7 @@
       }
 
       @include desktop {
-        display: block;
+        display: inline-flex;
         position: absolute;
         right: 0;
       }

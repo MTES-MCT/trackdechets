@@ -98,19 +98,20 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.SIGNED_BY_PRODUCER:
       return SIGNE_PAR_PRODUCTEUR; // Bsvhu| Bsdd | Bsdasri | Bsda
     case BsdStatusCode.INITIAL: // Bsvhu| Bsdasri | Bsff | Bsda
+      if (isDraft) {
+        return BROUILLON;
+      }
       if (
-        isDraft ||
-        (!isDraft &&
-          (bsdType === BsdType.Bsdasri ||
-            bsdType === BsdType.Bsda ||
-            bsdType === BsdType.Bsvhu))
+        !isDraft &&
+        (bsdType === BsdType.Bsdasri ||
+          bsdType === BsdType.Bsda ||
+          bsdType === BsdType.Bsvhu)
       ) {
         return INITIAL;
       } else if (!isDraft) {
         return EN_ATTENTE_SIGNATURE_EMETTEUR;
-      } else {
-        return INITIAL;
       }
+      break;
     case BsdStatusCode.SIGNED_BY_EMITTER:
       return SIGNE_PAR_EMETTEUR; // Bsff
     case BsdStatusCode.INTERMEDIATELY_PROCESSED:

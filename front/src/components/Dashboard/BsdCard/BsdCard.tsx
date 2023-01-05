@@ -13,10 +13,22 @@ import {
   getWorkflowLabel,
   hasBsdSuite,
 } from "../../../services/dashboard/dashboardServices";
+import BsdAdditionalActionsButton from "../BsdAdditionalActionsButton/BsdAdditionalActionsButton";
 
 import "./bsdCard.scss";
+import { completer_bsd_suite } from "../../../assets/wordings/dashboard/wordingsDashboard";
 
-function BsdCard({ bsd, currentSiret, onValidate }: BsdCardProps): JSX.Element {
+function BsdCard({
+  bsd,
+  currentSiret,
+  onValidate,
+  onOverview,
+  onDelete,
+  onDuplicate,
+  onPdf,
+  onUpdate,
+  onRevision,
+}: BsdCardProps) {
   const bsdDisplay = getBsdView(bsd);
 
   const updatedAt = bsdDisplay?.updatedAt
@@ -72,15 +84,6 @@ function BsdCard({ bsd, currentSiret, onValidate }: BsdCardProps): JSX.Element {
             {/* TODO Actors */}
 
             <div className="bsd-card__content__cta">
-              {/* TODO move BSD suite to BsdAdditionnalActions */}
-              {hasBsdSuite(bsdDisplay, currentSiret) && (
-                <button
-                  type="button"
-                  className="fr-btn fr-btn--sm fr-btn--secondary"
-                >
-                  Compléter le BSD suite
-                </button>
-              )}
               {canPublishBsd(bsdDisplay, currentSiret) && ctaPrimaryLabel && (
                 <button
                   data-testid="bsd-card-btn-primary"
@@ -92,7 +95,20 @@ function BsdCard({ bsd, currentSiret, onValidate }: BsdCardProps): JSX.Element {
                 </button>
               )}
 
-              {/* TODO BsdAdditionalActionsButton */}
+              <BsdAdditionalActionsButton
+                bsd={bsdDisplay}
+                currentSiret={currentSiret}
+                onOverview={onOverview!}
+                onDelete={onDelete!}
+                onDuplicate={onDuplicate!}
+                onUpdate={onUpdate!}
+                onRevision={onRevision!}
+                onPdf={onPdf!}
+              >
+                {hasBsdSuite(bsdDisplay, currentSiret) && (
+                  <button type="button">{completer_bsd_suite}</button>
+                )}
+              </BsdAdditionalActionsButton>
             </div>
           </div>
         </>

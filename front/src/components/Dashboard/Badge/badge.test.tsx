@@ -13,7 +13,7 @@ describe("Bsd Badge status", () => {
 
     test("Bsd[x] with Initial status should return Initial", () => {
       render(<Badge status={BsdStatusCode.INITIAL} isDraft />);
-      expect(screen.getByText(/Initial/i));
+      expect(screen.getByText(/Brouillon/i));
     });
 
     test("Bsdasri with Initial status should return Initial", () => {
@@ -24,7 +24,7 @@ describe("Bsd Badge status", () => {
           bsdType={BsdType.Bsdasri}
         />
       );
-      expect(screen.getByText(/Initial/i));
+      expect(screen.getByText(/Brouillon/i));
     });
   });
 

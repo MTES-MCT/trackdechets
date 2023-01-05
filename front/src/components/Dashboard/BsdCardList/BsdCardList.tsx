@@ -9,8 +9,26 @@ import "./bsdCardList.scss";
 
 function BsdCardList({ siret, bsds }: BsdCardListProps): JSX.Element {
   const onBsdValidation = (bsd: Bsd) => {
-    // TODO create favro card
+    // TODO dashboardservice method
     validateBsd(bsd);
+  };
+  const onBsdDelete = (bsd: Bsd) => {
+    // TODO dashboardservice method
+  };
+  const onBsdDuplication = (bsd: Bsd) => {
+    // TODO dashboardservice method
+  };
+  const onBsdUpdate = (bsd: Bsd) => {
+    // TODO dashboardservice method
+  };
+  const onBsdPdfGenerate = (bsd: Bsd) => {
+    // TODO dashboardservice method
+  };
+  const onBsdOverview = (bsd: Bsd) => {
+    // TODO dashboardservice method
+  };
+  const onBsdRevision = (bsd: Bsd) => {
+    // TODO dashboardservice method
   };
 
   return (
@@ -23,6 +41,12 @@ function BsdCardList({ siret, bsds }: BsdCardListProps): JSX.Element {
               bsd={node}
               currentSiret={siret}
               onValidate={onBsdValidation}
+              onDelete={onBsdDelete}
+              onDuplicate={onBsdDuplication}
+              onUpdate={onBsdUpdate}
+              onPdf={onBsdPdfGenerate}
+              onOverview={onBsdOverview}
+              onRevision={onBsdRevision}
             />
           </li>
         );
