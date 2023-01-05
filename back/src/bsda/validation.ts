@@ -982,7 +982,7 @@ const wasteDescriptionSchema: FactorySchemaOf<
     weightValue: weight(WeightUnits.Kilogramme)
       .label("Déchet")
       .when(
-        "transporterTransportMode",
+        ["transporterTransportMode", "createdAt"],
         weightConditions.transportMode(WeightUnits.Kilogramme)
       )
       .requiredIf(context.workSignature, `La quantité est obligatoire`)

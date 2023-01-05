@@ -640,7 +640,7 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
     wasteDetailsQuantity: weight(WeightUnits.Tonne)
       .label("Déchet")
       .when(
-        "transporterTransportMode",
+        ["transporterTransportMode", "createdAt"],
         weightConditions.transportMode(WeightUnits.Tonne)
       )
       .requiredIf(!isDraft, "La quantité du déchet en tonnes est obligatoire"),

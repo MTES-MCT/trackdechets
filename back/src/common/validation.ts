@@ -8,6 +8,16 @@ const MAX_WEIGHT_TONNES = 50000;
 // Poids maximum en tonnes quand le transport se fait sur route
 const MAX_WEIGHT_BY_ROAD_TONNES = 40;
 
+// De nombreux bordereaux en transit présentent des valeurs
+// de poids qui dépassent la valeur max autorisée en transport routier
+// Ces bordereaux ne passerait pas la validation après la MEP et causeraient
+// de nombreuses demandes au support. Cette variable permet de configurer
+// une date de création de bordereau `createdAt` avant laquelle la validation de poids
+// en cas de transport routier ne s'applique pas.
+const MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER = new Date(
+  process.env.MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER ?? 0
+);
+
 export enum WeightUnits {
   Tonne,
   Kilogramme
@@ -54,7 +64,12 @@ export const weightConditions: WeightConditions = {
     return weight;
   },
   transportMode: unit => ({
-    is: TransportMode.ROAD,
+    is: (mode: TransportMode, createdAt?: Date) => {
+      return (
+        mode === TransportMode.ROAD &&
+        (!createdAt || createdAt > MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER)
+      );
+    },
     then: weight =>
       weight.max(
         unit == WeightUnits.Kilogramme
