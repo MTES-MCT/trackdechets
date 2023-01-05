@@ -54,7 +54,7 @@ export function ActionLink({ icon, children, to }: ActionLinkProps) {
   return (
     <Link
       to={to}
-      className={classNames("btn btn--primary", styles.ActionButton, {
+      className={classNames("btn--primary", styles.ActionButton, {
         [styles.ActionButtonSmall]: size === "small",
       })}
     >
