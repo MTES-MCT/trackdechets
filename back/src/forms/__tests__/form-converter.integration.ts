@@ -142,18 +142,18 @@ describe("expandFormFromDb", () => {
         isFilledByEmitter: false
       },
       wasteDetails: {
-        code: null,
-        name: null,
-        onuCode: "",
-        packagingInfos: [],
-        packagings: [],
+        code: forwardedIn.wasteDetailsCode,
+        name: forwardedIn.wasteDetailsName,
+        onuCode: forwardedIn.wasteDetailsOnuCode,
+        packagingInfos: forwardedIn.wasteDetailsPackagingInfos,
+        packagings: ["CITERNE"],
         otherPackaging: undefined,
-        numberOfPackages: 0,
+        numberOfPackages: 1,
         quantity: 1,
         quantityType: "ESTIMATED",
-        consistence: null,
+        consistence: "SOLID",
         pop: false,
-        isDangerous: false
+        isDangerous: forwardedIn.wasteDetailsIsDangerous
       },
       transporter: {
         company: {
