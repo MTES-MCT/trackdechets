@@ -365,6 +365,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     expect(updatedBsdd.forwardedIn.processingOperationDescription).toBe(
       "Recyclage"
     );
+    expect(updatedBsdd.forwardedIn.wasteDetailsQuantity).toEqual(40);
     expect(updatedBsdd.forwardedIn.quantityReceived).toBe(50);
   });
 
