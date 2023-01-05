@@ -125,7 +125,11 @@ input BsdasriWasteInput {
 }
 
 input BsdasriEmissionInput {
-  "Quantité en kilogrammes"
+  """
+  Poids en kilogrammes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   weight: BsdasriWeightInput
   packagings: [BsdasriPackagingsInput!]
 }
@@ -147,14 +151,22 @@ input BsdasriEcoOrganismeInput {
 }
 
 input BsdasriWeightInput {
-  "Poids en kilogrammes"
+  """
+  Poids en kilogrammes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   value: Float
   "Le poids est il une estimation"
   isEstimate: Boolean
 }
 
 input BsdasriRealWeightInput {
-  "Poids en kilogrammes"
+  """
+  Poids en kilogrammes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   value: Float!
 }
 input BsdasriAcceptationInput {
@@ -167,7 +179,11 @@ input BsdasriAcceptationInput {
 }
 
 input BsdasriTransportInput {
-  "Poids"
+  """
+  Poids en kilogrammes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   weight: BsdasriWeightInput
   packagings: [BsdasriPackagingsInput!]
   takenOverAt: DateTime
@@ -220,6 +236,11 @@ input BsdasriReceptionInput {
 }
 
 input BsdasriOperationInput {
+  """
+  Poids en kilogrammes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   weight: BsdasriRealWeightInput
   """
   Code de traitement
