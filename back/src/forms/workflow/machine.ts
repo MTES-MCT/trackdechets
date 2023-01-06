@@ -1,6 +1,5 @@
 import { Status, WasteAcceptationStatus } from "@prisma/client";
 import { Machine } from "xstate";
-import updateApplicationResolver from "../../applications/resolvers/mutations/updateApplication";
 import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "../../common/constants";
 import { Event, EventType } from "./types";
 
