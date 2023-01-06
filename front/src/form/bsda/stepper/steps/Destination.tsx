@@ -41,6 +41,7 @@ export function Destination({ disabled }) {
       (values.intermediaries ?? []).concat([
         {
           siret: "",
+          orgId: "",
           name: "",
           address: "",
           contact: "",
