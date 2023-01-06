@@ -10,6 +10,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
+import { Status } from "@prisma/client";
 
 const CREATE_FORM_REVISION_REQUEST = `
   mutation CreateFormRevisionRequest($input: CreateFormRevisionRequestInput!) {
@@ -118,6 +119,39 @@ describe("Mutation.createFormRevisionRequest", () => {
 
     expect(errors[0].message).toBe(
       `Impossible d'annuler et de modifier un bordereau.`
+    );
+  });
+
+  it("should fail if the bsdd is canceled", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.CANCELED,
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { quantityReceived: 10 },
+          comment: "A comment",
+          authoringCompanySiret: company.siret
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      `Impossible de créer une révision sur ce bordereau, il a été annulé.`
     );
   });
 

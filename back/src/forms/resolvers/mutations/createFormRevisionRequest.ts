@@ -158,6 +158,12 @@ async function checkIfUserCanRequestRevisionOnBsdd(
     );
   }
 
+  if (bsdd.status === Status.CANCELED) {
+    throw new ForbiddenError(
+      "Impossible de créer une révision sur ce bordereau, il a été annulé."
+    );
+  }
+
   const unsettledRevisionRequestsOnBsdd = await getFormRepository(
     user
   ).countRevisionRequests({

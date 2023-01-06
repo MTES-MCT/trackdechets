@@ -302,7 +302,6 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
           <div className="BoxCol TextAlignCenter">
             <p>Art. R. 541-45 du code de l’environnement.</p>
             <p>Textes règlementaires</p>
-            {form.status === Status.CANCELED && <CancelationStamp />}
           </div>
           <div className="BoxCol TextAlignCenter">
             <p>Ministère de la Transition Ecologique</p>
@@ -363,6 +362,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                   {groupedIn.map(bsd => bsd.readableId)}
                 </>
               )}
+              {form.status === Status.CANCELED && <CancelationStamp />}
             </p>
           </div>
         </div>
