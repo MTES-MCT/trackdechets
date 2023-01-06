@@ -1,5 +1,6 @@
 import { Status, WasteAcceptationStatus } from "@prisma/client";
 import { Machine } from "xstate";
+import updateApplicationResolver from "../../applications/resolvers/mutations/updateApplication";
 import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "../../common/constants";
 import { Event, EventType } from "./types";
 
@@ -101,12 +102,12 @@ const machine = Machine<any, Event>(
               cond: "isExemptOfTraceability"
             },
             {
-              target: Status.AWAITING_GROUP,
-              cond: "awaitsGroup"
-            },
-            {
               target: Status.FOLLOWED_WITH_PNTTD,
               cond: "isFollowedWithPnttd"
+            },
+            {
+              target: Status.AWAITING_GROUP,
+              cond: "awaitsGroup"
             },
             {
               target: Status.PROCESSED
@@ -159,6 +160,10 @@ const machine = Machine<any, Event>(
             {
               target: Status.NO_TRACEABILITY,
               cond: "isExemptOfTraceability"
+            },
+            {
+              target: Status.FOLLOWED_WITH_PNTTD,
+              cond: "isFollowedWithPnttd"
             },
             {
               target: Status.AWAITING_GROUP,
@@ -222,47 +227,48 @@ const machine = Machine<any, Event>(
   },
   {
     guards: {
-      isExemptOfTraceability: (_, event) =>
-        !!event?.formUpdateInput?.noTraceability ||
-        !!event.formUpdateInput?.forwardedIn?.update?.noTraceability,
-      awaitsGroup: (_, event) =>
-        (!event.formUpdateInput?.nextDestinationCompanyCountry ||
-          event.formUpdateInput?.nextDestinationCompanyCountry === "FR") &&
-        (PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-          event.formUpdateInput?.processingOperationDone as string
-        ) ||
+      isExemptOfTraceability: (_, event) => {
+        const update =
+          event.formUpdateInput?.forwardedIn?.update ?? event?.formUpdateInput;
+        return update?.noTraceability === true;
+      },
+      awaitsGroup: (_, event) => {
+        const update =
+          event.formUpdateInput?.forwardedIn?.update ?? event.formUpdateInput;
+        return (
           PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-            event.formUpdateInput?.forwardedIn?.update
-              ?.processingOperationDone as string
-          )),
-      isFollowedWithPnttd: (_, event) =>
-        !!event.formUpdateInput?.nextDestinationCompanyCountry &&
-        event.formUpdateInput?.nextDestinationCompanyCountry !== "FR" &&
-        !event?.formUpdateInput?.noTraceability &&
-        !event.formUpdateInput?.forwardedIn?.update?.noTraceability &&
-        (PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-          event.formUpdateInput?.processingOperationDone as string
-        ) ||
+            update?.processingOperationDone as string
+          ) &&
+          (!update?.nextDestinationCompanyCountry ||
+            update?.nextDestinationCompanyCountry === "FR") &&
+          !(update?.noTraceability === true)
+        );
+      },
+      isFollowedWithPnttd: (_, event) => {
+        const update =
+          event.formUpdateInput?.forwardedIn?.update ?? event.formUpdateInput;
+        return (
           PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-            event.formUpdateInput?.forwardedIn?.update
-              ?.processingOperationDone as string
-          )),
-      isFormRefused: (_, event) =>
-        event.formUpdateInput?.wasteAcceptationStatus === "REFUSED" ||
-        event.formUpdateInput?.forwardedIn?.update?.wasteAcceptationStatus ===
-          "REFUSED",
-      isFormAccepted: (_, event) =>
-        [
+            update?.processingOperationDone as string
+          ) &&
+          !!update?.nextDestinationCompanyCountry &&
+          update?.nextDestinationCompanyCountry !== "FR" &&
+          !(update?.noTraceability === true)
+        );
+      },
+      isFormRefused: (_, event) => {
+        const update =
+          event.formUpdateInput?.forwardedIn?.update ?? event.formUpdateInput;
+        return update?.wasteAcceptationStatus === "REFUSED";
+      },
+      isFormAccepted: (_, event) => {
+        const update =
+          event.formUpdateInput?.forwardedIn?.update ?? event.formUpdateInput;
+        return [
           WasteAcceptationStatus.ACCEPTED,
           WasteAcceptationStatus.PARTIALLY_REFUSED
-        ].includes(event.formUpdateInput?.wasteAcceptationStatus as any) ||
-        [
-          WasteAcceptationStatus.ACCEPTED,
-          WasteAcceptationStatus.PARTIALLY_REFUSED
-        ].includes(
-          event.formUpdateInput?.forwardedIn?.update
-            ?.wasteAcceptationStatus as any
-        )
+        ].includes(update?.wasteAcceptationStatus as any);
+      }
     }
   }
 );
