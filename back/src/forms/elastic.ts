@@ -168,6 +168,7 @@ export function getSiretsByTab(
     case Status.REFUSED:
     case Status.PROCESSED:
     case Status.FOLLOWED_WITH_PNTTD:
+    case Status.CANCELED:
     case Status.NO_TRACEABILITY: {
       for (const siret of fieldTabs.keys()) {
         setFieldTab(siret, "isArchivedFor");
