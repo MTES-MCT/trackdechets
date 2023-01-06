@@ -3,11 +3,13 @@ import { useMutation } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
 import { useHistory } from "react-router-dom";
 import { NotificationError } from "../common/components/Error";
+import AccountCompanyAddSiret from "./accountCompanyAdd/AccountCompanyAddSiret";
 import styles from "./AccountCompanyAdd.module.scss";
 import {
   Mutation,
   MutationCreateCompanyArgs,
   CompanyType as _CompanyType,
+  CompanySearchResult,
 } from "generated/graphql/types";
 import {
   CREATE_COMPANY,
@@ -25,7 +27,6 @@ import {
 } from "@dataesr/react-dsfr";
 
 interface Values extends FormikValues {
-  siret: string;
   vatNumber: string;
   companyName: string;
   contact: string;
@@ -44,9 +45,9 @@ enum Language {
 const localizedStrings = {
   en: {
     translateButton: "Traduire en français 🇫🇷",
-    siret: {
+    vatNumber: {
       label: "Intra-community VAT number or identification number",
-      hint: "Example: BE0411905847",
+      hint: "Example: BE1234567890",
       error:
         "Intra-community VAT number or identification number must be valid",
     },
@@ -56,7 +57,7 @@ const localizedStrings = {
     contactEmail: "Contact email",
     contactPhone: {
       label: "Contact phone",
-      hint: "Example: +33605043210",
+      hint: "Example: +3212234567",
     },
     isAllowed: {
       label:
@@ -72,9 +73,9 @@ const localizedStrings = {
   },
   fr: {
     translateButton: "Translate in english 🇬🇧",
-    siret: {
+    vatNumber: {
       label: "N° de TVA intracommunautaire ou N° d'identification",
-      hint: "Exemple : BE0411905847",
+      hint: "Exemple : BE1234567890",
       error:
         "Le SIRET ou le numéro de TVA intracommunautaire doit être valide.",
     },
@@ -84,7 +85,7 @@ const localizedStrings = {
     contactEmail: "Mail de la personne responsable",
     contactPhone: {
       label: "Téléphone",
-      hint: "Exemple : +33605043210",
+      hint: "Exemple : +3212234567",
     },
     isAllowed: {
       label:
@@ -108,6 +109,10 @@ export default function AccountCompanyAddForeign() {
   const history = useHistory();
 
   const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.FR);
+
+  // STATE
+  const [companyInfos, setCompanyInfos] =
+    useState<CompanySearchResult | null>(null);
 
   // QUERIES AND MUTATIONS
   const [createCompany, { error: savingError }] = useMutation<
@@ -157,149 +162,164 @@ export default function AccountCompanyAddForeign() {
       </Row>
       <Row>
         <Col n="12">
-          <Formik<Values>
-            initialValues={{
-              siret: "",
-              vatNumber: "",
-              companyName: "",
-              companyTypes: [_CompanyType.Transporter],
-              address: "",
-              contact: "",
-              contactPhone: "",
-              contactEmail: "",
-              isAllowed: false,
+          <AccountCompanyAddSiret
+            onlyForeignVAT
+            {...{
+              onCompanyInfos: companyInfos => setCompanyInfos(companyInfos),
             }}
-            validate={values => {
-              return {
-                ...(!values.isAllowed && {
-                  isAllowed: memoizedStrings.isAllowed.error,
-                }),
-                ...(!(isSiret(values.siret) || isVat(values.siret)) && {
-                  siret: memoizedStrings.siret.error,
-                }),
-              };
-            }}
-            onSubmit={onSubmit}
-          >
-            {({ isSubmitting, errors, touched }) => (
-              <Form className={styles.companyAddForm}>
-                <Field name="siret">
-                  {({ field }) => {
-                    return (
-                      <TextInput
-                        label={memoizedStrings.siret.label}
-                        hint={memoizedStrings.siret.hint}
-                        messageType={errors.siret ? "error" : ""}
-                        message={errors.siret || ""}
-                        {...field}
-                      ></TextInput>
-                    );
-                  }}
-                </Field>
-
-                <Field name="companyName">
-                  {({ field }) => {
-                    return (
-                      <TextInput
-                        label={memoizedStrings.companyName}
-                        {...field}
-                      ></TextInput>
-                    );
-                  }}
-                </Field>
-
-                <Field name="address">
-                  {({ field }) => {
-                    return (
-                      <TextInput
-                        label={memoizedStrings.address}
-                        textarea
-                        {...field}
-                      ></TextInput>
-                    );
-                  }}
-                </Field>
-
-                <Field name="contact">
-                  {({ field }) => {
-                    return (
-                      <TextInput
-                        label={memoizedStrings.contact}
-                        {...field}
-                      ></TextInput>
-                    );
-                  }}
-                </Field>
-
-                <Field name="contactEmail">
-                  {({ field }) => {
-                    return (
-                      <TextInput
-                        label={memoizedStrings.contactEmail}
-                        {...field}
-                      ></TextInput>
-                    );
-                  }}
-                </Field>
-
-                <Field name="contactPhone">
-                  {({ field }) => {
-                    return (
-                      <TextInput
-                        label={memoizedStrings.contactPhone.label}
-                        {...field}
-                        hint={memoizedStrings.contactPhone.hint}
-                      ></TextInput>
-                    );
-                  }}
-                </Field>
-
-                <Field name="isAllowed">
-                  {({ field }) => {
-                    return (
-                      <Checkbox
-                        label={memoizedStrings.isAllowed.label}
-                        messageType={
-                          errors.isAllowed && touched.isAllowed ? "error" : ""
-                        }
-                        message={
-                          errors.isAllowed && touched.isAllowed
-                            ? errors.isAllowed
-                            : ""
-                        }
-                        id="isAllowed"
-                        // @ts-ignore
-                        checked={field.value}
-                        onChange={field.onChange}
-                        onBlur={field.onBlur}
-                      />
-                    );
-                  }}
-                </Field>
-
-                <div className={styles["submit-form"]}>
-                  <Button
-                    tertiary
-                    disabled={isSubmitting}
-                    onClick={() => {
-                      history.goBack();
-                    }}
-                  >
-                    {memoizedStrings.cancel}
-                  </Button>
-
-                  <Button submit disabled={isSubmitting}>
-                    {isSubmitting
-                      ? memoizedStrings.submit.submitting
-                      : memoizedStrings.submit.label}
-                  </Button>
-                </div>
-                {savingError && <NotificationError apolloError={savingError} />}
-              </Form>
-            )}
-          </Formik>
+          />
         </Col>
       </Row>
+      {companyInfos && !companyInfos.isRegistered && (
+        <Row>
+          <Col n="12">
+            <Formik<Values>
+              initialValues={{
+                vatNumber: companyInfos?.vatNumber ?? "",
+                companyName: companyInfos?.name ?? "",
+                companyTypes: [_CompanyType.Transporter],
+                address: companyInfos?.address ?? "",
+                contact: "",
+                contactPhone: "",
+                contactEmail: "",
+                isAllowed: false,
+              }}
+              validate={values => {
+                return {
+                  ...(!values.isAllowed && {
+                    isAllowed: memoizedStrings.isAllowed.error,
+                  }),
+                  ...(!(
+                    isSiret(values.vatNumber) || isVat(values.vatNumber)
+                  ) && {
+                    siret: memoizedStrings.vatNumber.error,
+                  }),
+                };
+              }}
+              onSubmit={onSubmit}
+            >
+              {({ isSubmitting, errors, touched }) => (
+                <Form className={styles.companyAddForm}>
+                  <Field name="vatNumber">
+                    {({ field }) => {
+                      return (
+                        <TextInput
+                          label={memoizedStrings.vatNumber.label}
+                          hint={memoizedStrings.vatNumber.hint}
+                          messageType={errors.vatNumber ? "error" : ""}
+                          message={errors.vatNumber || ""}
+                          {...field}
+                        ></TextInput>
+                      );
+                    }}
+                  </Field>
+
+                  <Field name="companyName">
+                    {({ field }) => {
+                      return (
+                        <TextInput
+                          label={memoizedStrings.companyName}
+                          {...field}
+                        ></TextInput>
+                      );
+                    }}
+                  </Field>
+
+                  <Field name="address">
+                    {({ field }) => {
+                      return (
+                        <TextInput
+                          label={memoizedStrings.address}
+                          textarea
+                          {...field}
+                        ></TextInput>
+                      );
+                    }}
+                  </Field>
+
+                  <Field name="contact">
+                    {({ field }) => {
+                      return (
+                        <TextInput
+                          label={memoizedStrings.contact}
+                          {...field}
+                        ></TextInput>
+                      );
+                    }}
+                  </Field>
+
+                  <Field name="contactEmail">
+                    {({ field }) => {
+                      return (
+                        <TextInput
+                          label={memoizedStrings.contactEmail}
+                          {...field}
+                        ></TextInput>
+                      );
+                    }}
+                  </Field>
+
+                  <Field name="contactPhone">
+                    {({ field }) => {
+                      return (
+                        <TextInput
+                          label={memoizedStrings.contactPhone.label}
+                          {...field}
+                          hint={memoizedStrings.contactPhone.hint}
+                        ></TextInput>
+                      );
+                    }}
+                  </Field>
+
+                  <Field name="isAllowed">
+                    {({ field }) => {
+                      return (
+                        <Checkbox
+                          label={memoizedStrings.isAllowed.label}
+                          messageType={
+                            errors.isAllowed && touched.isAllowed ? "error" : ""
+                          }
+                          message={
+                            errors.isAllowed && touched.isAllowed
+                              ? errors.isAllowed
+                              : ""
+                          }
+                          id="isAllowed"
+                          // @ts-ignore
+                          checked={field.value}
+                          onChange={field.onChange}
+                          onBlur={field.onBlur}
+                        />
+                      );
+                    }}
+                  </Field>
+
+                  <div className={styles["submit-form"]}>
+                    <Button
+                      tertiary
+                      disabled={isSubmitting}
+                      onClick={() => {
+                        history.goBack();
+                      }}
+                    >
+                      {memoizedStrings.cancel}
+                    </Button>
+
+                    <Button submit disabled={isSubmitting}>
+                      {isSubmitting
+                        ? memoizedStrings.submit.submitting
+                        : memoizedStrings.submit.label}
+                    </Button>
+                  </div>
+                  {savingError && (
+                    <NotificationError apolloError={savingError} />
+                  )}
+                </Form>
+              )}
+            </Formik>
+          </Col>
+        </Row>
+      )}
     </Container>
   );
 }

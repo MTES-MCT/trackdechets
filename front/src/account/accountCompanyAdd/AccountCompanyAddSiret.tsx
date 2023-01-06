@@ -11,6 +11,7 @@ import {
   isVat,
   isClosedCompany,
   CLOSED_COMPANY_ERROR,
+  isForeignVat,
 } from "generated/constants/companySearchHelpers";
 
 import {
@@ -25,6 +26,7 @@ import {
 type IProps = {
   onCompanyInfos: (companyInfos) => void;
   showIndividualInfo?: Boolean;
+  onlyForeignVAT?: Boolean;
 };
 
 const CREATE_TEST_COMPANY = gql`
@@ -126,6 +128,7 @@ const nonDiffusibleError = (
 export default function AccountCompanyAddSiret({
   onCompanyInfos,
   showIndividualInfo = false,
+  onlyForeignVAT = false,
 }: IProps) {
   const [isRegistered, setIsRegistered] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
@@ -191,19 +194,34 @@ export default function AccountCompanyAddSiret({
                 import.meta.env.VITE_ALLOW_TEST_COMPANY
               );
               const isValidVat = isVat(values.siret);
-              if (!isValidSiret && !/^[a-zA-Z]{2}/.test(values.siret)) {
-                return {
-                  siret: "Vous devez entrer un SIRET de 14 chiffres",
-                };
-              } else if (!isValidVat && !/^[0-9]{14}$/.test(values.siret)) {
-                return {
-                  siret: `Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter via la FAQ https://faq.trackdechets.fr/pour-aller-plus-loin/assistance avec un justificatif légal du pays d'origine.`,
-                };
-              } else if (isValidVat && isFRVat(values.siret)) {
-                return {
-                  siret:
-                    "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et non son numéro de TVA",
-                };
+
+              if (onlyForeignVAT) {
+                const isValidForeignVat = isForeignVat(values.siret);
+
+                console.log("onlyForeignVAT: " + onlyForeignVAT);
+                console.log("isValidForeignVat: " + isValidForeignVat);
+
+                if (!isValidForeignVat) {
+                  return {
+                    siret:
+                      "Vous devez entrer un numéro de TVA intracommunautaire valide. You must use a valid VAT number.",
+                  };
+                }
+              } else {
+                if (!isValidSiret && !/^[a-zA-Z]{2}/.test(values.siret)) {
+                  return {
+                    siret: "Vous devez entrer un SIRET de 14 chiffres",
+                  };
+                } else if (!isValidVat && !/^[0-9]{14}$/.test(values.siret)) {
+                  return {
+                    siret: `Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter via la FAQ https://faq.trackdechets.fr/pour-aller-plus-loin/assistance avec un justificatif légal du pays d'origine.`,
+                  };
+                } else if (isValidVat && isFRVat(values.siret)) {
+                  return {
+                    siret:
+                      "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et non son numéro de TVA",
+                  };
+                }
               }
             }}
             onSubmit={values => {
@@ -239,29 +257,33 @@ export default function AccountCompanyAddSiret({
                   }}
                 </Field>
 
-                {import.meta.env.VITE_ALLOW_TEST_COMPANY === "true" && (
-                  <Button
-                    tertiary
-                    disabled={loading || isDisabled}
-                    title="Génère un n°SIRET unique permettant la création d'un établissement factice pour la réalisation de vos tests"
-                    onClick={() =>
-                      createTestCompany().then(response => {
-                        setFieldValue(
-                          "siret",
-                          response.data?.createTestCompany
-                        );
-                      })
-                    }
-                  >
-                    Obtenir un n° SIRET factice
-                  </Button>
-                )}
+                {import.meta.env.VITE_ALLOW_TEST_COMPANY === "true" &&
+                  !onlyForeignVAT && (
+                    <Button
+                      tertiary
+                      disabled={loading || isDisabled}
+                      title="Génère un n°SIRET unique permettant la création d'un établissement factice pour la réalisation de vos tests"
+                      onClick={() =>
+                        createTestCompany().then(response => {
+                          setFieldValue(
+                            "siret",
+                            response.data?.createTestCompany
+                          );
+                        })
+                      }
+                    >
+                      Obtenir un n° SIRET factice
+                    </Button>
+                  )}
 
                 {isRegistered && (
                   <AccountCompanyAddMembershipRequest siret={values.siret} />
                 )}
                 <div className={styles["submit-form"]}>
-                  <Button disabled={loading || isDisabled} submit>
+                  <Button
+                    disabled={loading || isDisabled || isRegistered}
+                    submit
+                  >
                     {loading ? "Chargement..." : "Valider"}
                   </Button>
                 </div>
