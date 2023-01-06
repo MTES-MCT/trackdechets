@@ -548,6 +548,7 @@ export async function expandFormFromDb(
     transporter: nullIfNoValues<Transporter>({
       company: nullIfNoValues<FormCompany>({
         name: form.transporterCompanyName,
+        orgId: form.traderCompanySiret ?? form.transporterCompanyVatNumber,
         siret: form.transporterCompanySiret,
         vatNumber: form.transporterCompanyVatNumber,
         address: form.transporterCompanyAddress,
@@ -724,6 +725,9 @@ export async function expandFormFromDb(
           transporter: nullIfNoValues<Transporter>({
             company: nullIfNoValues<FormCompany>({
               name: forwardedIn.transporterCompanyName,
+              orgId:
+                forwardedIn.transporterCompanySiret ??
+                forwardedIn.transporterCompanyVatNumber,
               siret: forwardedIn.transporterCompanySiret,
               vatNumber: forwardedIn.transporterCompanyVatNumber,
               address: forwardedIn.transporterCompanyAddress,

@@ -101,6 +101,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
     transporter: nullIfNoValues<BsdasriTransporter>({
       company: nullIfNoValues<FormCompany>({
         name: bsdasri.transporterCompanyName,
+        orgId: bsdasri.transporterCompanySiret ?? bsdasri.transporterCompanyVatNumber,
         siret: bsdasri.transporterCompanySiret,
         vatNumber: bsdasri.transporterCompanyVatNumber,
         address: bsdasri.transporterCompanyAddress,

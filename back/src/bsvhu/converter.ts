@@ -109,6 +109,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
     transporter: nullIfNoValues<BsvhuTransporter>({
       company: nullIfNoValues<FormCompany>({
         name: form.transporterCompanyName,
+        orgId: form.transporterCompanySiret ?? form.transporterCompanyVatNumber,
         siret: form.transporterCompanySiret,
         address: form.transporterCompanyAddress,
         contact: form.transporterCompanyContact,

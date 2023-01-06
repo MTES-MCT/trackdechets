@@ -183,6 +183,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
     transporter: nullIfNoValues<BsdaTransporter>({
       company: nullIfNoValues<FormCompany>({
         name: form.transporterCompanyName,
+        orgId: form.transporterCompanySiret ?? form.transporterCompanyVatNumber,
         siret: form.transporterCompanySiret,
         vatNumber: form.transporterCompanyVatNumber,
         address: form.transporterCompanyAddress,

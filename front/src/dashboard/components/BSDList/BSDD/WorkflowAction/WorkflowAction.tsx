@@ -34,7 +34,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
         [
           form.emitter?.company?.siret,
           form.ecoOrganisme?.siret,
-          form.transporter?.company?.siret,
+          form.transporter?.company?.orgId,
         ].includes(siret)
       ) {
         return <SignEmissionForm {...props} />;
@@ -42,7 +42,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.SignedByProducer: {
-      if ([form.transporter?.company?.siret].includes(siret)) {
+      if ([form.transporter?.company?.orgId].includes(siret)) {
         return <SignTransportForm {...props} />;
       }
       return null;
@@ -113,7 +113,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.SignedByTempStorer: {
-      if (siret === form.temporaryStorageDetail?.transporter?.company?.siret) {
+      if (siret === form.temporaryStorageDetail?.transporter?.company?.orgId) {
         return <SignTransportForm {...props} />;
       }
       return null;
