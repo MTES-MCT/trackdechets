@@ -1,4 +1,4 @@
-import { Status, WasteAcceptationStatus } from "@prisma/client";
+import { Prisma, Status, WasteAcceptationStatus } from "@prisma/client";
 import { Machine } from "xstate";
 import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "../../common/constants";
 import { Event, EventType } from "./types";
@@ -227,50 +227,73 @@ const machine = Machine<any, Event>(
   {
     guards: {
       isExemptOfTraceability: (_, event) => {
-        const update =
-          event.formUpdateInput?.forwardedIn?.update ?? event?.formUpdateInput;
-        return update?.noTraceability === true;
+        function guard(update: Prisma.FormUpdateInput) {
+          if (!update) return false;
+          return update.noTraceability === true;
+        }
+        return (
+          guard(event.formUpdateInput) ||
+          guard(event.formUpdateInput?.forwardedIn?.update)
+        );
       },
       awaitsGroup: (_, event) => {
-        const update =
-          event.formUpdateInput?.forwardedIn?.update ?? event.formUpdateInput;
+        function guard(update: Prisma.FormUpdateInput) {
+          if (!update) return false;
+          return (
+            PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
+              update.processingOperationDone as string
+            ) &&
+            (!update.nextDestinationCompanyCountry ||
+              update.nextDestinationCompanyCountry === "FR") &&
+            !(update.noTraceability === true)
+          );
+        }
         return (
-          PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-            update?.processingOperationDone as string
-          ) &&
-          (!update?.nextDestinationCompanyCountry ||
-            update?.nextDestinationCompanyCountry === "FR") &&
-          !(update?.noTraceability === true)
+          guard(event.formUpdateInput) ||
+          guard(event.formUpdateInput?.forwardedIn?.update)
         );
       },
       isFollowedWithPnttd: (_, event) => {
-        const update =
-          event.formUpdateInput?.forwardedIn?.update ?? event.formUpdateInput;
+        function guard(update: Prisma.FormUpdateInput) {
+          if (!update) return false;
+          return (
+            PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
+              update.processingOperationDone as string
+            ) &&
+            !!update.nextDestinationCompanyCountry &&
+            update.nextDestinationCompanyCountry !== "FR" &&
+            !(update.noTraceability === true)
+          );
+        }
         return (
-          PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-            update?.processingOperationDone as string
-          ) &&
-          !!update?.nextDestinationCompanyCountry &&
-          update?.nextDestinationCompanyCountry !== "FR" &&
-          !(update?.noTraceability === true)
+          guard(event.formUpdateInput) ||
+          guard(event.formUpdateInput?.forwardedIn?.update)
         );
       },
-      isFormRefused: (_, event) =>
-        event.formUpdateInput?.wasteAcceptationStatus === "REFUSED" ||
-        event.formUpdateInput?.forwardedIn?.update?.wasteAcceptationStatus ===
-          "REFUSED",
-      isFormAccepted: (_, event) =>
-        [
-          WasteAcceptationStatus.ACCEPTED,
-          WasteAcceptationStatus.PARTIALLY_REFUSED
-        ].includes(event.formUpdateInput?.wasteAcceptationStatus as any) ||
-        [
-          WasteAcceptationStatus.ACCEPTED,
-          WasteAcceptationStatus.PARTIALLY_REFUSED
-        ].includes(
-          event.formUpdateInput?.forwardedIn?.update
-            ?.wasteAcceptationStatus as any
-        )
+      isFormRefused: (_, event) => {
+        function guard(update: Prisma.FormUpdateInput) {
+          if (!update) return false;
+          return update.wasteAcceptationStatus === "REFUSED";
+        }
+
+        return (
+          guard(event.formUpdateInput) ||
+          guard(event.formUpdateInput?.forwardedIn?.update)
+        );
+      },
+      isFormAccepted: (_, event) => {
+        function guard(update: Prisma.FormUpdateInput) {
+          if (!update) return false;
+          return [
+            WasteAcceptationStatus.ACCEPTED,
+            WasteAcceptationStatus.PARTIALLY_REFUSED
+          ].includes(update.wasteAcceptationStatus as any);
+        }
+        return (
+          guard(event.formUpdateInput) ||
+          guard(event.formUpdateInput?.forwardedIn?.update)
+        );
+      }
     }
   }
 );
