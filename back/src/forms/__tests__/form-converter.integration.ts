@@ -47,6 +47,7 @@ describe("expandFormFromDb", () => {
       transporter: {
         company: {
           name: form.transporterCompanyName,
+          orgId: form.transporterCompanySiret,
           siret: form.transporterCompanySiret,
           vatNumber: form.transporterCompanyVatNumber,
           address: form.transporterCompanyAddress,
@@ -158,6 +159,7 @@ describe("expandFormFromDb", () => {
       transporter: {
         company: {
           name: forwardedIn.transporterCompanyName,
+          orgId: forwardedIn.transporterCompanySiret,
           siret: forwardedIn.transporterCompanySiret,
           vatNumber: forwardedIn.transporterCompanyVatNumber,
           address: forwardedIn.transporterCompanyAddress,

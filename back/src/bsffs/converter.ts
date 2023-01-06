@@ -196,7 +196,9 @@ export function expandBsffFromDB(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
     transporter: nullIfNoValues<GraphQL.BsffTransporter>({
       company: nullIfNoValues<GraphQL.FormCompany>({
         name: prismaBsff.transporterCompanyName,
-        orgId: prismaBsff.transporterCompanySiret ?? prismaBsff.transporterCompanyVatNumber,
+        orgId:
+          prismaBsff.transporterCompanySiret ??
+          prismaBsff.transporterCompanyVatNumber,
         siret: prismaBsff.transporterCompanySiret,
         vatNumber: prismaBsff.transporterCompanyVatNumber,
         address: prismaBsff.transporterCompanyAddress,
