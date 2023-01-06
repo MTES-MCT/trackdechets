@@ -89,7 +89,8 @@ async function getUpdateFromFormRevisionRequest(
   const bsddUpdate: Prisma.FormUpdateInput = {
     status: getNewStatus(
       currentStatus,
-      revisionRequest.processingOperationDone
+      revisionRequest.processingOperationDone,
+      revisionRequest.isCanceled
     ),
     recipientCap: revisionRequest.recipientCap,
     wasteDetailsCode: revisionRequest.wasteDetailsCode,
@@ -142,7 +143,15 @@ async function getUpdateFromFormRevisionRequest(
   return [removeEmpty(bsddUpdate), removeEmpty(forwardedInUpdate)];
 }
 
-function getNewStatus(status: Status, newOperationCode: string | null): Status {
+function getNewStatus(
+  status: Status,
+  newOperationCode: string | null,
+  isCanceled = false
+): Status {
+  if (isCanceled) {
+    return Status.CANCELED;
+  }
+
   if (
     status === Status.PROCESSED &&
     PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(newOperationCode)
