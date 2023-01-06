@@ -75,9 +75,9 @@ export function FormCompanyFields({
         Adresse complète : {company?.address}
         <br />
         Pays (le cas échéant) :{" "}
-        {companyCountry == null || companyCountry.cca2 === "FR"
+        {companyCountry === null || companyCountry?.cca2 === "FR"
           ? null
-          : companyCountry.cca2}
+          : companyCountry?.cca2}
       </p>
       <p>
         Tel : {company?.phone}
@@ -95,28 +95,25 @@ export function FormCompanyFields({
   );
 }
 
-export function getcompanyCountry(company: FormCompany): Country {
+export function getcompanyCountry(company: FormCompany): Country | null {
   // reconnaitre le pays directement dans le champ country
   let companyCountry = company
     ? countries.find(country => country.cca2 === company?.country) ??
       FRENCH_COUNTRY // default
     : null;
 
-  if (company && !companyCountry) {
-    if (isSiret(company.siret)) {
-      // forcer FR si le siret est valide
-      companyCountry = countries.find(country => country.cca2 === "FR");
-    } else if (isVat(company.vatNumber)) {
-      // trouver automatiquement le pays selon le numéro de TVA
-      const vatCountryCode = checkVAT(
-        company.vatNumber.replace(/[\W_\s]/gim, ""),
-        vatCountries
-      )?.country?.isoCode.short;
+  // forcer FR si le siret est valide
+  if (company && isSiret(company.siret)) {
+    companyCountry = countries.find(country => country.cca2 === "FR");
+  } else if (company && isVat(company.vatNumber)) {
+    // trouver automatiquement le pays selon le numéro de TVA
+    const vatCountryCode = checkVAT(
+      company.vatNumber.replace(/[\W_\s]/gim, ""),
+      vatCountries
+    )?.country?.isoCode.short;
 
-      companyCountry = countries.find(
-        country => country.cca2 === vatCountryCode
-      );
-    }
+    companyCountry = countries.find(country => country.cca2 === vatCountryCode);
   }
+
   return companyCountry;
 }

@@ -12,17 +12,17 @@ export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
   return (
     <>
       <p>
-        Entreprise{" "}
+        Entreprise {" "}
         <input
           type="checkbox"
-          checked={companyCountry && companyCountry.cca2 === "FR"}
+          checked={companyCountry && companyCountry?.cca2 === "FR"}
           readOnly
         />
         française
         {"  "}
         <input
           type="checkbox"
-          checked={companyCountry && companyCountry.cca2 !== "FR"}
+          checked={companyCountry && companyCountry?.cca2 !== "FR"}
           readOnly
         />{" "}
         étrangère
@@ -40,8 +40,8 @@ export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
         <br />
         Adresse complète : {company?.address}
         <br />
-        {companyCountry == null || companyCountry.cca2 === "FR" ? null : (
-          <span>Pays: {companyCountry.name.common} </span>
+        {companyCountry === null || companyCountry?.cca2 === "FR" ? null : (
+          <span>Pays: {companyCountry?.name.common} </span>
         )}
       </p>
       <p>
