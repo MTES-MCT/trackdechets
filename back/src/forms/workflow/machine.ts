@@ -255,19 +255,22 @@ const machine = Machine<any, Event>(
           !(update?.noTraceability === true)
         );
       },
-      isFormRefused: (_, event) => {
-        const update =
-          event.formUpdateInput?.forwardedIn?.update ?? event.formUpdateInput;
-        return update?.wasteAcceptationStatus === "REFUSED";
-      },
-      isFormAccepted: (_, event) => {
-        const update =
-          event.formUpdateInput?.forwardedIn?.update ?? event.formUpdateInput;
-        return [
+      isFormRefused: (_, event) =>
+        event.formUpdateInput?.wasteAcceptationStatus === "REFUSED" ||
+        event.formUpdateInput?.forwardedIn?.update?.wasteAcceptationStatus ===
+          "REFUSED",
+      isFormAccepted: (_, event) =>
+        [
           WasteAcceptationStatus.ACCEPTED,
           WasteAcceptationStatus.PARTIALLY_REFUSED
-        ].includes(update?.wasteAcceptationStatus as any);
-      }
+        ].includes(event.formUpdateInput?.wasteAcceptationStatus as any) ||
+        [
+          WasteAcceptationStatus.ACCEPTED,
+          WasteAcceptationStatus.PARTIALLY_REFUSED
+        ].includes(
+          event.formUpdateInput?.forwardedIn?.update
+            ?.wasteAcceptationStatus as any
+        )
     }
   }
 );
