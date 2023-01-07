@@ -35,7 +35,7 @@ describe("Test the mail job queue", () => {
       templateId: templateIds.LAYOUT
     };
     const drainedPromise = new Promise<void>(resolve =>
-      mailQueue.once("global:drained", resolve)
+      mailQueue.once("drained", resolve)
     );
     // add to the queue
     await sendMail(mail);
