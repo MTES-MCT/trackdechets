@@ -492,7 +492,7 @@ export async function checkCanImportForm(user: User, form: Form) {
 
 export async function checkSecurityCode(siret: string, securityCode: number) {
   const exists = await prisma.company.findFirst({
-    where: { siret, securityCode }
+    where: { orgId: siret, securityCode }
   });
   if (!exists) {
     throw new InvaliSecurityCode();

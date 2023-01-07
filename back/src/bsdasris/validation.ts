@@ -18,8 +18,7 @@ import {
 } from "../generated/graphql/types";
 import {
   isForeignVat,
-  isSiret,
-  isVat
+  isSiret
 } from "../common/constants/companySearchHelpers";
 import {
   MISSING_COMPANY_SIRET,
