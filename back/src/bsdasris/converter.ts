@@ -41,6 +41,7 @@ import {
 import { BsdElastic } from "../common/elastic";
 import { Prisma, Bsdasri, BsdasriStatus } from "@prisma/client";
 import { Decimal } from "decimal.js-light";
+import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 
 export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
   return {
@@ -101,9 +102,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
     transporter: nullIfNoValues<BsdasriTransporter>({
       company: nullIfNoValues<FormCompany>({
         name: bsdasri.transporterCompanyName,
-        orgId:
-          bsdasri.transporterCompanySiret ??
-          bsdasri.transporterCompanyVatNumber,
+        orgId: getTransporterCompanyOrgId(bsdasri),
         siret: bsdasri.transporterCompanySiret,
         vatNumber: bsdasri.transporterCompanyVatNumber,
         address: bsdasri.transporterCompanyAddress,

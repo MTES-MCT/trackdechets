@@ -6,6 +6,7 @@ import { UserInputError } from "apollo-server-express";
 import { Bsdasri, BsdasriStatus, BsdasriType } from "@prisma/client";
 
 import { BsdasriEventType } from "../../workflow/types";
+import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 type checkEmitterAllowsDirectTakeOverFn = ({
   signatureParams: BsdasriSignatureInfos,
   bsdasri: Bsdasri
@@ -155,7 +156,7 @@ export const dasriSignatureMapping: Record<
     eventType: BsdasriEventType.SignEmissionWithSecretCode,
     validationContext: { emissionSignature: true },
     signatoryField: "emissionSignatory",
-    authorizedSirets: bsdasri => [bsdasri.transporterCompanySiret] // transporter can sign with emitter secret code (trs device)
+    authorizedSirets: bsdasri => [getTransporterCompanyOrgId(bsdasri)] // transporter can sign with emitter secret code (trs device)
   },
   TRANSPORT: {
     author: "transporterTransportSignatureAuthor",
@@ -164,7 +165,7 @@ export const dasriSignatureMapping: Record<
     validationContext: { emissionSignature: true, transportSignature: true }, // validate emission in case of direct takeover
 
     signatoryField: "transportSignatory",
-    authorizedSirets: bsdasri => [bsdasri.transporterCompanySiret]
+    authorizedSirets: bsdasri => [getTransporterCompanyOrgId(bsdasri)]
   },
 
   RECEPTION: {

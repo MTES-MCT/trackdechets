@@ -27,6 +27,7 @@ import { isFinalOperation } from "../../constants";
 import { getStatus } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 
 async function checkIsAllowed(
   siret: string | null,
@@ -42,7 +43,7 @@ async function checkIsAllowed(
   if (securityCode) {
     const count = await prisma.company.count({
       where: {
-        siret,
+        orgId: siret,
         securityCode
       }
     });
@@ -54,7 +55,7 @@ async function checkIsAllowed(
       where: {
         userId: user.id,
         company: {
-          siret
+          orgId: siret
         }
       }
     });
@@ -99,7 +100,7 @@ const signatures: Record<
     existingBsff
   ) => {
     await checkIsAllowed(
-      existingBsff.transporterCompanySiret,
+      getTransporterCompanyOrgId(existingBsff),
       user,
       securityCode
     );

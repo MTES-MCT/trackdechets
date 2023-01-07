@@ -24,6 +24,7 @@ const bsdasrisResolver: QueryResolvers["bsdasris"] = async (
     OR: [
       { emitterCompanySiret: { in: userCompaniesSiretOrVat } },
       { transporterCompanySiret: { in: userCompaniesSiretOrVat } },
+      { transporterCompanyVatNumber: { in: userCompaniesSiretOrVat } },
       { destinationCompanySiret: { in: userCompaniesSiretOrVat } },
       { ecoOrganismeSiret: { in: userCompaniesSiretOrVat } }
     ]

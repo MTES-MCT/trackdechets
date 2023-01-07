@@ -45,6 +45,7 @@ import {
   BsdaRevisionRequest
 } from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
+import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
   return {
     id: form.id,
@@ -183,7 +184,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
     transporter: nullIfNoValues<BsdaTransporter>({
       company: nullIfNoValues<FormCompany>({
         name: form.transporterCompanyName,
-        orgId: form.transporterCompanySiret ?? form.transporterCompanyVatNumber,
+        orgId: getTransporterCompanyOrgId(form),
         siret: form.transporterCompanySiret,
         vatNumber: form.transporterCompanyVatNumber,
         address: form.transporterCompanyAddress,

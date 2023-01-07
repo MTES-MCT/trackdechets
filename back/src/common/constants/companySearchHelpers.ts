@@ -160,3 +160,14 @@ export const isOmi = (clue: string): boolean => {
   const clean = clue.replace(/[\W_]+/g, "");
   return clean.match(/^OMI[0-9]{7}$/gim) !== null;
 };
+
+/**
+ * Works with any BSD in order to provide a default orgId
+ */
+export const getTransporterCompanyOrgId = (form: {
+  transporterCompanySiret: string;
+  transporterCompanyVatNumber: string;
+}): string =>
+  form.transporterCompanySiret?.length
+    ? form.transporterCompanySiret
+    : form.transporterCompanyVatNumber;

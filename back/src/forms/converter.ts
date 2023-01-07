@@ -6,6 +6,7 @@ import {
   TransportSegment as PrismaTransportSegment
 } from "@prisma/client";
 import DataLoader from "dataloader";
+import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import {
   chain,
   nullIfNoValues,
@@ -548,7 +549,7 @@ export async function expandFormFromDb(
     transporter: nullIfNoValues<Transporter>({
       company: nullIfNoValues<FormCompany>({
         name: form.transporterCompanyName,
-        orgId: form.transporterCompanySiret ?? form.transporterCompanyVatNumber,
+        orgId: getTransporterCompanyOrgId(form),
         siret: form.transporterCompanySiret,
         vatNumber: form.transporterCompanyVatNumber,
         address: form.transporterCompanyAddress,
@@ -725,9 +726,7 @@ export async function expandFormFromDb(
           transporter: nullIfNoValues<Transporter>({
             company: nullIfNoValues<FormCompany>({
               name: forwardedIn.transporterCompanyName,
-              orgId:
-                forwardedIn.transporterCompanySiret ??
-                forwardedIn.transporterCompanyVatNumber,
+              orgId: getTransporterCompanyOrgId(forwardedIn),
               siret: forwardedIn.transporterCompanySiret,
               vatNumber: forwardedIn.transporterCompanyVatNumber,
               address: forwardedIn.transporterCompanyAddress,

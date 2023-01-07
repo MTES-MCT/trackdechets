@@ -12,13 +12,14 @@ import { EventType } from "../../workflow/types";
 import { checkCanSignFor } from "../../permissions";
 import { expandFormFromDb } from "../../converter";
 import { getFormRepository } from "../../repository";
+import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 
 /**
  * Common function for signing
  */
 const signedByTransporterFn = async (user, args, existingForm) => {
   await checkCanSignFor(
-    existingForm.transporterCompanySiret,
+    getTransporterCompanyOrgId(existingForm),
     user,
     args.securityCode
   );
