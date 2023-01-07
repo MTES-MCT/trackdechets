@@ -35,7 +35,7 @@ export function BsvhuJourneySummary({ bsvhu }: Props) {
         <JourneyStopName>Transporteur</JourneyStopName>
         <JourneyStopDescription>
           {bsvhu.transporter?.company?.name} (
-          {bsvhu.transporter?.company?.siret})
+          {bsvhu.transporter?.company?.orgId})
           <br />
           {bsvhu.transporter?.company?.address}
         </JourneyStopDescription>

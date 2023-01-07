@@ -18,6 +18,7 @@ const COMPANY_INFOS = gql`
   query CompanyInfos($siret: String!) {
     companyInfos(siret: $siret) {
       siret
+      vatNumber
       name
       address
       companyTypes
@@ -74,7 +75,7 @@ export function Type({ disabled }: Props) {
     Pick<Query, "companyInfos">,
     QueryCompanyInfosArgs
   >(COMPANY_INFOS, {
-    variables: { siret },
+    variables: { clue: siret },
     fetchPolicy: "no-cache",
   });
 
@@ -94,8 +95,10 @@ export function Type({ disabled }: Props) {
       setFieldValue("emitter.company.address", data?.companyInfos.address);
       setFieldValue("emitter.company.name", data?.companyInfos.name);
       setFieldValue("transporter.company.siret", data?.companyInfos.siret);
-      // TODO
-      // setFieldValue("transporter.company.vatNumber", data?.companyInfos.vatNumber);
+      setFieldValue(
+        "transporter.company.vatNumber",
+        data?.companyInfos.vatNumber
+      );
       setFieldValue("transporter.company.address", data?.companyInfos.address);
       setFieldValue("transporter.company.name", data?.companyInfos.name);
       setFieldValue("grouping", []);
