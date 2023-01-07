@@ -16,7 +16,11 @@ import {
   BsdasriPackagingType,
   BsdasriSignatureType
 } from "../generated/graphql/types";
-import { isSiret } from "../common/constants/companySearchHelpers";
+import {
+  isForeignVat,
+  isSiret,
+  isVat
+} from "../common/constants/companySearchHelpers";
 import {
   MISSING_COMPANY_SIRET,
   MISSING_COMPANY_SIRET_OR_VAT
@@ -317,8 +321,9 @@ export const transporterSchema: FactorySchemaOf<
       .string()
       .ensure()
       .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva && context.transportSignature) {
-          return schema.required(
+        if (!isForeignVat(tva)) {
+          return schema.requiredIf(
+            context.transportSignature,
             `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`
           );
         }
@@ -356,7 +361,7 @@ export const transporterSchema: FactorySchemaOf<
       .string()
       .ensure()
       .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva) {
+        if (!isVat(tva)) {
           return schema.requiredIf(
             context.transportSignature,
             `Transporteur: le numéro de récépissé est obligatoire`
@@ -369,25 +374,25 @@ export const transporterSchema: FactorySchemaOf<
       .string()
       .ensure()
       .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva) {
+        if (!isForeignVat(tva)) {
           return schema.requiredIf(
             context.transportSignature,
             `Transporteur: le département associé au récépissé est obligatoire`
           );
         }
-        return schema.notRequired();
+        return schema.nullable().notRequired();
       }),
 
     transporterRecepisseValidityLimit: yup
       .date()
       .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva) {
+        if (!isForeignVat(tva)) {
           return schema.requiredIf(
             context.transportSignature || requiredForSynthesis,
             "La date de validité du récépissé est obligatoire"
           );
         }
-        return schema.notRequired();
+        return schema.nullable().notRequired();
       })
   });
 };

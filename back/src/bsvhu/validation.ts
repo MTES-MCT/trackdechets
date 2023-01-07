@@ -17,7 +17,10 @@ import {
 import * as yup from "yup";
 import { FactorySchemaOf } from "../common/yup/configureYup";
 import { BsvhuDestinationType } from "../generated/graphql/types";
-import { isSiret } from "../common/constants/companySearchHelpers";
+import {
+  isForeignVat,
+  isSiret
+} from "../common/constants/companySearchHelpers";
 import { transporterCompanyVatNumberSchema } from "../companies/validation";
 import { weight, WeightUnits } from "../common/validation";
 
@@ -236,7 +239,7 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
       transporterRecepisseDepartment: yup
         .string()
         .when("transporterCompanyVatNumber", (tva, schema) => {
-          if (!tva) {
+          if (!isForeignVat(tva)) {
             return schema.requiredIf(
               context.transportSignature,
               `Transporteur: le département associé au récépissé est obligatoire`
@@ -247,7 +250,7 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
       transporterRecepisseNumber: yup
         .string()
         .when("transporterCompanyVatNumber", (tva, schema) => {
-          if (!tva) {
+          if (!isForeignVat(tva)) {
             return schema.requiredIf(
               context.transportSignature,
               `Transporteur: le numéro de récépissé est obligatoire`
@@ -271,7 +274,7 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
         .string()
         .ensure()
         .when("transporterCompanyVatNumber", (tva, schema) => {
-          if (!tva) {
+          if (!isForeignVat(tva)) {
             return schema.requiredIf(
               context.transportSignature,
               `Transporteur: ${MISSING_COMPANY_SIRET}`

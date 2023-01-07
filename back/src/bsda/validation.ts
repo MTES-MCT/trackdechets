@@ -816,20 +816,13 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
               ),
           otherwise: schema =>
             schema.when("transporterCompanyVatNumber", (tva, schema) => {
-              if (!tva) {
-                return schema
-                  .nullable()
-                  .requiredIf(
-                    context.transportSignature,
-                    `Transporteur: ${MISSING_COMPANY_SIRET}`
-                  );
-              }
-              return schema
-                .nullable()
-                .requiredIf(
+              if (!isForeignVat(tva)) {
+                return schema.requiredIf(
                   context.workSignature,
                   `Transporteur: ${MISSING_COMPANY_SIRET}`
                 );
+              }
+              return schema.nullable().notRequired();
             })
         })
         .test(
