@@ -29,7 +29,7 @@ const signedByTransporterFn = async (user, args, existingForm) => {
     transporterNumberPlate:
       args.input.transporterNumberPlate ?? existingForm.transporterNumberPlate,
 
-    currentTransporterSiret: existingForm.transporterCompanySiret,
+    currentTransporterSiret: getTransporterCompanyOrgId(existingForm),
 
     // The following fields are deprecated
     // but we need to fill them until we remove them completely

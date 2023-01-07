@@ -33,7 +33,9 @@ export function getRegistryFields(
 
   if (form.receivedAt) {
     registryFields.isIncomingWasteFor.push(form.recipientCompanySiret);
-    registryFields.isTransportedWasteFor.push(form.transporterCompanySiret);
+    registryFields.isTransportedWasteFor.push(
+      getTransporterCompanyOrgIdform(form)
+    );
 
     if (form.transportSegments?.length) {
       for (const transportSegment of form.transportSegments) {
@@ -456,3 +458,7 @@ export function toAllWaste(
     transporter3CompanyMail: bsdd.transporter3CompanyMail
   };
 }
+function getTransporterCompanyOrgIdform(form: Form & { transportSegments: TransportSegment[]; }): any {
+  throw new Error("Function not implemented.");
+}
+

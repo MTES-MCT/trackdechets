@@ -1198,6 +1198,14 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
       forwardedIn.transporterCompanySiret
     );
   }
+  if (
+    forwardedIn?.transporterCompanyVatNumber?.length &&
+    !isForeignVat(forwardedIn?.transporterCompanyVatNumber)
+  ) {
+    throw new UserInputError(
+      "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
+    );
+  }
 }
 
 /**

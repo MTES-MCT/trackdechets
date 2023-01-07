@@ -123,7 +123,7 @@ export const isSiret = (clue: string, allowTestCompany = false): boolean => {
  * Validateur de numéro de TVA
  */
 export const isVat = (clue: string): boolean => {
-  if (!clue) return false;
+  if (!clue || !clue.length) return false;
   if (clue.match(/[\W_]/gim) !== null) return false;
   const cleanClue = clue.replace(/[\W_]+/g, "");
   if (!cleanClue) return false;
