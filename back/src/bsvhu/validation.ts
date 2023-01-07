@@ -239,7 +239,7 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
       transporterRecepisseDepartment: yup
         .string()
         .when("transporterCompanyVatNumber", (tva, schema) => {
-          if (!isForeignVat(tva)) {
+          if (!tva || !isForeignVat(tva)) {
             return schema.requiredIf(
               context.transportSignature,
               `Transporteur: le département associé au récépissé est obligatoire`
@@ -250,7 +250,7 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
       transporterRecepisseNumber: yup
         .string()
         .when("transporterCompanyVatNumber", (tva, schema) => {
-          if (!isForeignVat(tva)) {
+          if (!tva || !isForeignVat(tva)) {
             return schema.requiredIf(
               context.transportSignature,
               `Transporteur: le numéro de récépissé est obligatoire`
@@ -274,7 +274,7 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
         .string()
         .ensure()
         .when("transporterCompanyVatNumber", (tva, schema) => {
-          if (!isForeignVat(tva)) {
+          if (!tva || !isForeignVat(tva)) {
             return schema.requiredIf(
               context.transportSignature,
               `Transporteur: ${MISSING_COMPANY_SIRET}`

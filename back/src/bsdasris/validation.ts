@@ -321,7 +321,7 @@ export const transporterSchema: FactorySchemaOf<
       .string()
       .ensure()
       .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!isForeignVat(tva)) {
+        if (!tva || !isForeignVat(tva)) {
           return schema.requiredIf(
             context.transportSignature,
             `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`
@@ -361,7 +361,7 @@ export const transporterSchema: FactorySchemaOf<
       .string()
       .ensure()
       .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!isVat(tva)) {
+        if (!tva || !isForeignVat(tva)) {
           return schema.requiredIf(
             context.transportSignature,
             `Transporteur: le numéro de récépissé est obligatoire`
@@ -374,7 +374,7 @@ export const transporterSchema: FactorySchemaOf<
       .string()
       .ensure()
       .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!isForeignVat(tva)) {
+        if (!tva || !isForeignVat(tva)) {
           return schema.requiredIf(
             context.transportSignature,
             `Transporteur: le département associé au récépissé est obligatoire`
@@ -386,7 +386,7 @@ export const transporterSchema: FactorySchemaOf<
     transporterRecepisseValidityLimit: yup
       .date()
       .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!isForeignVat(tva)) {
+        if (!tva || !isForeignVat(tva)) {
           return schema.requiredIf(
             context.transportSignature || requiredForSynthesis,
             "La date de validité du récépissé est obligatoire"
