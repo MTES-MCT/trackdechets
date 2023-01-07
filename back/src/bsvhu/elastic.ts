@@ -1,6 +1,5 @@
 import { BsvhuStatus, Bsvhu } from "@prisma/client";
 import { BsdElastic, indexBsd } from "../common/elastic";
-import { transporterCompanyVatNumberSchema } from "../companies/validation";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 
