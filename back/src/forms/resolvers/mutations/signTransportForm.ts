@@ -82,7 +82,7 @@ const signatures: Partial<
     const existingFullForm = await getFullForm(existingForm);
 
     await checkCanSignFor(
-      existingFullForm.forwardedIn.transporterCompanySiret,
+      getTransporterCompanyOrgId(existingFullForm.forwardedIn),
       user,
       args.securityCode
     );
