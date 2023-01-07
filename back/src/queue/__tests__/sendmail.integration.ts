@@ -34,17 +34,26 @@ describe("Test the mail job queue", () => {
       body: "Bonjour, ceci est un email de test de Trackdéchets.",
       templateId: templateIds.LAYOUT
     };
-    const drainedPromise = new Promise<void>(resolve =>
-      mailQueue.once("drained", resolve)
-    );
     // add to the queue
     await sendMail(mail);
-    // wait for the queue to finish
-    await drainedPromise;
     // test the job is completed
-    const jobs = await mailQueue.getCompleted();
+    const jobs = await mailQueue.getJobs([
+      "active",
+      "completed",
+      "delayed",
+      "failed",
+      "paused",
+      "waiting"
+    ]);
     expect(jobs.length).toEqual(1);
-    const { data } = jobs[0];
+    await Promise.allSettled(
+      jobs.map(job => {
+        // Returns a promise that resolves or rejects when the job completes or fails.
+        job.finished();
+      })
+    );
+
+    const [{ data }] = await mailQueue.getCompleted();
     // assert parameters values
     // to right person
     expect(data.to[0].email).toEqual("test@trackdechets.local");
