@@ -51,13 +51,7 @@ export const Bsda: BsdaResolvers = {
       .findRelatedEntity({ id: bsda.id })
       .intermediaries();
 
-    if (intermediaries) {
-      return intermediaries.map(intermediary => ({
-        orgId: intermediary.siret,
-        ...intermediary
-      }));
-    }
-    return null;
+    return intermediaries ?? null;
   },
   metadata: bsda => {
     return {

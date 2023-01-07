@@ -15,7 +15,7 @@ import {
   isForeignVat,
 } from "generated/constants/companySearchHelpers";
 import { checkVAT } from "jsvat";
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { debounce } from "common/helper";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
@@ -88,6 +88,14 @@ export default function CompanySelector({
     setDisplayForeignCompanyWithUnknownInfos,
   ] = useState<boolean>(false);
 
+  // Initialize with either orgId (present in ForCompany but not in Intermediaries)
+  const [orgId, setOrgId] = useState<string | null>(
+    field.value.orgId ?? field.value.siret ?? null
+  );
+  // Listen for changes in field.value.siret and field.value.orgId
+  useEffect(() => {
+    setOrgId(field.value.orgId ?? field.value.siret ?? null);
+  }, [field.value.siret, field.value.orgId]);
   // Favortite type is deduced from the field prefix (transporter, emitter, etc)
   const favoriteType = constantCase(field.name.split(".")[0]) as FavoriteType;
   const {
@@ -134,9 +142,14 @@ export default function CompanySelector({
     QueryCompanyPrivateInfosArgs
   >(COMPANY_SELECTOR_PRIVATE_INFOS, {
     variables: {
-      clue: field.value.orgId!,
+      // Compatibility with intermediaries that don't have orgId
+      clue: orgId!,
     },
-    skip: !field.value.orgId,
+    skip: !orgId,
+    onCompleted: () => {
+      // do not intialize the field with an error
+      setFieldTouched(`${field.name}.siret`);
+    },
   });
 
   /**
@@ -229,7 +242,7 @@ export default function CompanySelector({
       initialAutoSelectFirstCompany &&
       !optional &&
       results.length >= 1 &&
-      !field.value.orgId?.length
+      !orgId
     ) {
       selectCompany(results[0]);
     }
@@ -381,7 +394,7 @@ export default function CompanySelector({
             }
           />
         )}
-        {!isLoadingFavorites && !field.value.orgId && !optional && (
+        {!isLoadingFavorites && !orgId && !optional && (
           <SimpleNotificationError
             message={
               <>
@@ -416,7 +429,7 @@ export default function CompanySelector({
           results={searchResults}
           selectedItem={
             {
-              orgId: field.value.orgId,
+              orgId,
               siret: field.value.siret,
               vatNumber: field.value.vatNumber,
               name: field.value.name,
