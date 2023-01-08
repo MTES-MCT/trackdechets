@@ -146,10 +146,6 @@ export default function CompanySelector({
       clue: orgId!,
     },
     skip: !orgId,
-    onCompleted: () => {
-      // do not intialize the field with an error
-      setFieldTouched(`${field.name}.siret`);
-    },
   });
 
   /**
@@ -388,13 +384,15 @@ export default function CompanySelector({
               <>
                 <span>
                   Cet établissement existe mais nous ne pouvons pas remplir
-                  automatiquement le formulaire
+                  automatiquement le formulaire car les informations sont
+                  cachées par le service de recherche administratif externe à
+                  Trackdéchets
                 </span>
               </>
             }
           />
         )}
-        {!isLoadingFavorites && !orgId && !optional && (
+        {!isLoadingFavorites && !isLoadingSearch && !orgId && !optional && (
           <SimpleNotificationError
             message={
               <>
