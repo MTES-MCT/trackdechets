@@ -1,4 +1,5 @@
 import { Form, TransportSegment } from "@prisma/client";
+import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import {
@@ -33,9 +34,7 @@ export function getRegistryFields(
 
   if (form.receivedAt) {
     registryFields.isIncomingWasteFor.push(form.recipientCompanySiret);
-    registryFields.isTransportedWasteFor.push(
-      getTransporterCompanyOrgIdform(form)
-    );
+    registryFields.isTransportedWasteFor.push(getTransporterCompanyOrgId(form));
 
     if (form.transportSegments?.length) {
       for (const transportSegment of form.transportSegments) {
@@ -458,7 +457,3 @@ export function toAllWaste(
     transporter3CompanyMail: bsdd.transporter3CompanyMail
   };
 }
-function getTransporterCompanyOrgIdform(form: Form & { transportSegments: TransportSegment[]; }): any {
-  throw new Error("Function not implemented.");
-}
-
