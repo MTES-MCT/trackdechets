@@ -125,7 +125,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
               className="btn btn--primary"
               onClick={() => {
                 removeUserFromCompany({
-                  variables: { siret: company.siret!, userId: user.id },
+                  variables: { siret: company.orgId!, userId: user.id },
                 });
               }}
             >
