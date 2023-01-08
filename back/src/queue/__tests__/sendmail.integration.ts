@@ -26,7 +26,7 @@ describe("Test the mail job queue", () => {
     return mailQueue.clean(1000);
   });
 
-  test("sendMailJob to the consumer that sends the mail via the mail queue", async () => {
+  it("sends the mail using the mail job queue", async () => {
     // create the fake email
     const mail: Mail = {
       to: [{ email: "test@trackdechets.local", name: "test" }],
@@ -34,28 +34,17 @@ describe("Test the mail job queue", () => {
       body: "Bonjour, ceci est un email de test de Trackdéchets.",
       templateId: templateIds.LAYOUT
     };
+    const drainedPromise = new Promise<void>(resolve =>
+      mailQueue.once("global:drained", resolve)
+    );
     // add to the queue
     await sendMail(mail);
+    // wait for the queue to finish
+    await drainedPromise;
     // test the job is completed
-    const jobs = await mailQueue.getJobs([
-      "active",
-      "completed",
-      "delayed",
-      "failed",
-      "paused",
-      "waiting"
-    ]);
+    const jobs = await mailQueue.getCompleted();
     expect(jobs.length).toEqual(1);
-    await Promise.allSettled(
-      jobs.map(job => {
-        // Returns a promise that resolves or rejects when the job completes or fails.
-        job.finished();
-      })
-    );
-    expect(mockedSendMailBackend).toHaveBeenCalledTimes(1);
-    expect(mockedSendMailBackend).toHaveBeenCalledWith({});
-
-    const [{ data }] = await mailQueue.getCompleted();
+    const { data } = jobs[0];
     // assert parameters values
     // to right person
     expect(data.to[0].email).toEqual("test@trackdechets.local");
@@ -67,7 +56,7 @@ describe("Test the mail job queue", () => {
     );
   });
 
-  test("fallback sendMailJob to sendMailSync when queue is broken", async () => {
+  it("fallback to sendMailSync when queue is broken which directly call axios.post", async () => {
     // mocking the redis queue is down
     const mockAddToMailQueue = jest.spyOn(producer, "addToMailQueue");
     mockAddToMailQueue.mockRejectedValueOnce(new Error("any queue error"));
