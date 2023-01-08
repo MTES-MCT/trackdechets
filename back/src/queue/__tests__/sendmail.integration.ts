@@ -26,7 +26,7 @@ describe("Test the mail job queue", () => {
     return mailQueue.clean(1000);
   });
 
-  test("sendMailJob to the consumer that sends the mail using axios", async () => {
+  test("sendMailJob to the consumer that sends the mail via the mail queue", async () => {
     // create the fake email
     const mail: Mail = {
       to: [{ email: "test@trackdechets.local", name: "test" }],
@@ -52,6 +52,8 @@ describe("Test the mail job queue", () => {
         job.finished();
       })
     );
+    expect(mockedSendMailBackend).toHaveBeenCalledTimes(1);
+    expect(mockedSendMailBackend).toHaveBeenCalledWith({});
 
     const [{ data }] = await mailQueue.getCompleted();
     // assert parameters values

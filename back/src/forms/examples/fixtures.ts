@@ -2,7 +2,7 @@
  * Fixtures used as building blocks of mutations inputs
  */
 
-function emitterCompanyInput(siret: string) {
+export function emitterCompanyInput(siret: string) {
   return {
     siret,
     name: "Déchets & Co",
@@ -13,14 +13,14 @@ function emitterCompanyInput(siret: string) {
   };
 }
 
-const workSiteInput = {
+export const workSiteInput = {
   address: "5 rue du chantier",
   postalCode: "75010",
   city: "Paris",
   infos: "Site de stockage de boues"
 };
 
-function emitterInput(siret: string) {
+export function emitterInput(siret: string) {
   return {
     type: "PRODUCER",
     workSite: workSiteInput,
@@ -28,7 +28,7 @@ function emitterInput(siret: string) {
   };
 }
 
-function transporterCompanyInput(siret: string) {
+export function transporterCompanyInput(siret: string) {
   return {
     siret,
     name: "Transport & Co",
@@ -39,7 +39,7 @@ function transporterCompanyInput(siret: string) {
   };
 }
 
-function transporter2CompanyInput(siret: string) {
+export function transporter2CompanyInput(siret: string) {
   return {
     siret,
     name: "Fret & Co",
@@ -50,21 +50,21 @@ function transporter2CompanyInput(siret: string) {
   };
 }
 
-const receiptInput = {
+export const receiptInput = {
   receipt: "12379",
   department: "07",
   validityLimit: "2020-06-30",
   numberPlate: "AD-007-TS"
 };
 
-function transporterInput(siret: string) {
+export function transporterInput(siret: string) {
   return {
     company: transporterCompanyInput(siret),
     ...receiptInput
   };
 }
 
-function traiteurCompanyInput(siret: string) {
+export function traiteurCompanyInput(siret: string) {
   return {
     siret,
     name: "Traiteur & Co",
@@ -75,7 +75,7 @@ function traiteurCompanyInput(siret: string) {
   };
 }
 
-function ttrCompanyInput(siret: string) {
+export function ttrCompanyInput(siret: string) {
   return {
     siret,
     name: "Entreposage & Co",
@@ -86,7 +86,7 @@ function ttrCompanyInput(siret: string) {
   };
 }
 
-function recipientInput(siret: string) {
+export function recipientInput(siret: string) {
   return {
     processingOperation: "D 10",
     cap: "CAP",
@@ -94,7 +94,7 @@ function recipientInput(siret: string) {
   };
 }
 
-function recipientIsTempStorageInput(siret: string) {
+export function recipientIsTempStorageInput(siret: string) {
   return {
     processingOperation: "D 13",
     cap: "CAP",
@@ -103,7 +103,7 @@ function recipientIsTempStorageInput(siret: string) {
   };
 }
 
-function ttrInput(siret: string) {
+export function ttrInput(siret: string) {
   return {
     processingOperation: "D 13",
     cap: "CAP",
@@ -111,7 +111,7 @@ function ttrInput(siret: string) {
   };
 }
 
-const wasteDetailsInput = {
+export const wasteDetailsInput = {
   code: "06 05 02*",
   onuCode: "Non Soumis",
   name: "Boues",
@@ -121,7 +121,7 @@ const wasteDetailsInput = {
   consistence: "LIQUID"
 };
 
-function signEmissionFormInput() {
+export function signEmissionFormInput() {
   return {
     quantity: 1,
     onuCode: "non soumis",
@@ -132,14 +132,14 @@ function signEmissionFormInput() {
   };
 }
 
-function signTransportFormInput() {
+export function signTransportFormInput() {
   return {
     takenOverAt: "2020-04-03T14:48:00",
     takenOverBy: "Isabelle Guichard"
   };
 }
 
-const receivedInfoInput = {
+export const receivedInfoInput = {
   wasteAcceptationStatus: "ACCEPTED",
   receivedBy: "Antoine Derieux",
   receivedAt: "2020-04-05T11:18:00",
@@ -147,14 +147,14 @@ const receivedInfoInput = {
   quantityReceived: 1
 };
 
-const processedInfoInput = {
+export const processedInfoInput = {
   processingOperationDone: "D 10",
   processingOperationDescription: "Incinération",
   processedBy: "Alfred Dujardin",
   processedAt: "2020-04-15T10:22:00"
 };
 
-function awaitingGroupInfoInput(nextDestinationSiret: string) {
+export function awaitingGroupInfoInput(nextDestinationSiret: string) {
   return {
     processingOperationDone: "D 13",
     processingOperationDescription: "Regroupement",
@@ -167,7 +167,7 @@ function awaitingGroupInfoInput(nextDestinationSiret: string) {
   };
 }
 
-const tempStoredInfosInput = {
+export const tempStoredInfosInput = {
   wasteAcceptationStatus: "ACCEPTED",
   receivedBy: "John Arnold",
   receivedAt: "2020-05-03T09:00:00",
@@ -176,13 +176,13 @@ const tempStoredInfosInput = {
   quantityType: "REAL"
 };
 
-function resealedInfosInput(siret: string) {
+export function resealedInfosInput(siret: string) {
   return {
     transporter: transporterInput(siret)
   };
 }
 
-function nextSegmentInfoInput(siret: string) {
+export function nextSegmentInfoInput(siret: string) {
   return {
     transporter: {
       company: transporter2CompanyInput(siret),
@@ -192,7 +192,7 @@ function nextSegmentInfoInput(siret: string) {
   };
 }
 
-const takeOverInfoInput = {
+export const takeOverInfoInput = {
   takenOverAt: "2020-04-04T09:00:00.000Z",
   takenOverBy: "Transporteur 2"
 };
