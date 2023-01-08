@@ -118,6 +118,7 @@ export default function PasswordResetRequest() {
               <TextInput
                 // @ts-ignore
                 name="email"
+                label="Email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
@@ -128,6 +129,8 @@ export default function PasswordResetRequest() {
             setCaptchaInput={setCaptchaInput}
             captchaImg={captchaData?.img}
             captchaInput={captchaInput}
+            captchaToken={captchaData?.token}
+            refetch={refetchCaptcha}
           />
           <Row justifyContent="right">
             <Col className={styles.resetFlexCol}>

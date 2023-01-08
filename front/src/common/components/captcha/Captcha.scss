@@ -1,0 +1,27 @@
+.captcha {
+  &__wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 12px 0;
+    @media (min-width: 749px) {
+      flex-direction: row;
+    }
+    &--narrow {
+      flex-direction: column;
+    }
+  }
+
+  &__components {
+    display: flex;
+    flex-direction: row;
+
+    @media (min-width: 749px) {
+      flex-direction: column;
+    }
+    &--narrow {
+      flex-direction: row;
+    }
+    gap: 12px;
+  }
+}

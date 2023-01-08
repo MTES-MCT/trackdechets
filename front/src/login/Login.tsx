@@ -64,9 +64,8 @@ export default function Login() {
     }
   }, [setEmail, location]);
 
-  const { captchaLoading, captchaError, captchaData } = useCaptcha(
-    displayCaptcha(location?.state?.errorCode)
-  );
+  const { captchaLoading, captchaError, captchaData, refetchCaptcha } =
+    useCaptcha(displayCaptcha(location?.state?.errorCode));
 
   if (captchaError) {
     return <div>{captchaError}</div>;
@@ -173,6 +172,9 @@ export default function Login() {
                     setCaptchaInput={setCaptchaInput}
                     captchaImg={captchaData.img}
                     captchaInput={captchaInput}
+                    captchaToken={captchaData.token}
+                    refetch={refetchCaptcha}
+                    narrow={true}
                   />
                 </>
               )}

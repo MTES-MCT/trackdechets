@@ -43,7 +43,7 @@ import { resolvers, typeDefs } from "./schema";
 import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
-import { captchaGen } from "./captchaGen";
+import { captchaGen, captchaSound } from "./captcha/captchaGen";
 
 const {
   SESSION_SECRET,
@@ -292,6 +292,9 @@ app.get("/ip", (req, res) => {
 
 app.get("/captcha", (_, res) => captchaGen(res));
 
+app.get("/captcha-audio/:tokenId", (req, res) => {
+  captchaSound(req.params.tokenId, res);
+});
 app.get("/userActivation", userActivationHandler);
 app.get("/download", downloadRouter);
 

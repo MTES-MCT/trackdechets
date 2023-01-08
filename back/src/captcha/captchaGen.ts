@@ -1,12 +1,12 @@
-import { genCaptchaString, getUid } from "./utils";
+import { genCaptchaString, getUid } from "../utils";
 import { createCanvas } from "canvas";
-
+import * as fs from "fs";
 import {
   setCaptchaToken,
   getCaptchaToken,
   clearCaptchaToken
-} from "./common/redis/captcha";
-
+} from "../common/redis/captcha";
+import path from "path";
 const CAPTCHA_LENGTH = 5;
 
 function randomInt(max) {
@@ -155,4 +155,47 @@ export async function captchaGen(res) {
   const token = await captchaAsToken(captchaString);
 
   res.send({ img: textToCaptcha(captchaString), token });
+}
+
+/**
+ * Given a captchaToken, retrieve the captcha text and generate a base64 encoded audio alternative
+ * @param res
+ */
+export async function captchaSound(captchaToken, res) {
+  // recorded message asking to refresh the captcha
+  const refreshAudio = fs.readFileSync(
+    path.join(__dirname, `sounds/refresh.mp3`),
+    { encoding: "base64" }
+  );
+  if (!captchaToken) {
+    return res.send({ audio: [refreshAudio], playList: [0] });
+  }
+
+  const captchaString = await getCaptchaToken(captchaToken);
+
+  if (!captchaString) {
+    return res.send({ audio: [refreshAudio], playList: [0] });
+  }
+
+  const captchaArray = captchaString.toLowerCase().split("");
+  const letters = Array.from(new Set(captchaArray)); // remove duplicates
+
+  const audio = [];
+  const playList = [];
+
+  for (const letter of letters) {
+    const contents = fs.readFileSync(
+      path.join(__dirname, `sounds/letter_${letter}.mp3`),
+      { encoding: "base64" }
+    );
+
+    audio.push(contents);
+  }
+  for (const letter of captchaArray) {
+    playList.push(letters.indexOf(letter));
+  }
+  // to spare some bandwidth when glyphs are duplicated, we return 2 items in the json response
+  // `audio` is an array of base64 encoded audios
+  // `playList` is an array referencing `audio` by each position
+  res.send({ audio, playList });
 }

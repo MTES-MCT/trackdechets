@@ -25,6 +25,29 @@ describe("Captcha endpoint", () => {
   });
 });
 
+describe("Captcha audio alternative", () => {
+  it("should return a captcha audio alternative", async () => {
+    const captchaToken = "audio123";
+    const captcha = "AX";
+    await setCaptchaToken(captchaToken, captcha);
+    const response = await request.get(`/captcha-audio/${captchaToken}`);
+
+    expect(response.status).toEqual(200);
+    expect(response.body.playList).toEqual([0, 1]);
+    expect(response.body.audio.length).toEqual(2);
+    // check response base64 audios items begin with appropriate strings
+    expect(
+      response.body.audio[0].startsWith(
+        "//NAxAAQeIosp0ZIAIHABe/xEZZAhD3v9kEMPBwGA0wQ"
+      )
+    ).toBe(true);
+    expect(
+      response.body.audio[1].startsWith(
+        "//NAxAAT+eJ4U1gQAA1gAyg7zsgLgFkCzCPj8pfmIQCIg"
+      )
+    ).toBe(true);
+  });
+});
 describe("POST /login", () => {
   afterEach(() => resetDatabase());
 

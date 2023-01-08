@@ -7,7 +7,7 @@ import { renderMail } from "../../../mailer/templates/renderers";
 import { createPasswordResetRequest } from "../../../mailer/templates";
 import { sanitizeEmail } from "../../../utils";
 import { addHours } from "date-fns";
-import { checkCaptcha } from "../../../captchaGen";
+import { checkCaptcha } from "../../../captcha/captchaGen";
 
 import { UserInputError } from "apollo-server-core";
 const createPasswordResetRequestResolver: MutationResolvers["createPasswordResetRequest"] =
