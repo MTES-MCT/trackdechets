@@ -76,7 +76,7 @@ const workflow: Workflow = {
     detenteur1: { siret: "SIRET_DETENTEUR_1" },
     detenteur2: { siret: "SIRET_DETENTEUR_2" },
     operateur: { siret: "SIRET_OPERATEUR" },
-    transporteur: { siret: "SIRET_TRANSPORTEUR" },
+    transporteur: { vatNumber: "VAT_TRANSPORTEUR" },
     ttr: { siret: "SIRET_TTR" },
     traiteur: { siret: "SIRET_TRAITEUR" },
     bsff: { id: "ID_BSFF" },

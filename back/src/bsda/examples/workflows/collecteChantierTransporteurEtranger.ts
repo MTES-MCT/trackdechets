@@ -43,7 +43,7 @@ const workflow: Workflow = {
   docContext: {
     producteur: { siret: "SIRET_PRODUCTEUR" },
     worker: { siret: "SIRET_WORKER" },
-    transporteur: { siret: "VAT_TRANSPORTEUR" },
+    transporteur: { vatNumber: "VAT_TRANSPORTEUR" },
     traiteur: { siret: "SIRET_TRAITEUR" },
     bsda: { id: "ID_BSD" }
   },

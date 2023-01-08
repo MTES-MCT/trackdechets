@@ -35,7 +35,7 @@ export default {
   ],
   docContext: {
     pred: { siret: "SIRET_PRODUCTEUR", securityCode: "XXXX" },
-    transporteur: { siret: "SIRET_TRANSPORTEUR" },
+    transporteur: { vatNumber: "VAT_TRANSPORTEUR" },
     traiteur: { siret: "SIRET_TRAITEUR" },
     bsd: { id: "ID_BSD" }
   },

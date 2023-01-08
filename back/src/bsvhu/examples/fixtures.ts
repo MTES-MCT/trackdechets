@@ -1,4 +1,4 @@
-function emitterCompanyInput(siret: string) {
+export function emitterCompanyInput(siret: string) {
   return {
     siret,
     name: "Casse auto",
@@ -9,14 +9,14 @@ function emitterCompanyInput(siret: string) {
   };
 }
 
-function emitterInput(siret: string) {
+export function emitterInput(siret: string) {
   return {
     agrementNumber: "1234",
     company: emitterCompanyInput(siret)
   };
 }
 
-const wasteDetailsInput = {
+export const wasteDetailsInput = {
   wasteCode: "16 01 06",
   packaging: "UNITE",
   identification: {
@@ -30,7 +30,7 @@ const wasteDetailsInput = {
   }
 };
 
-function transporterCompanyInput(siret: string) {
+export function transporterCompanyInput(siret: string) {
   return {
     siret,
     name: "Transport Inc",
@@ -41,19 +41,19 @@ function transporterCompanyInput(siret: string) {
   };
 }
 
-const receiptInput = {
+export const receiptInput = {
   number: "recepisse number",
   department: "75",
   validityLimit: "2020-06-30"
 };
 
-function transporterInput(siret: string) {
+export function transporterInput(siret: string) {
   return {
     company: transporterCompanyInput(siret)
   };
 }
 
-function broyeurCompanyInput(siret: string) {
+export function broyeurCompanyInput(siret: string) {
   return {
     siret,
     name: "Broyeur du Sud Est",
@@ -64,7 +64,7 @@ function broyeurCompanyInput(siret: string) {
   };
 }
 
-function broyeurInput(siret: string) {
+export function broyeurInput(siret: string) {
   return {
     type: "BROYEUR",
     agrementNumber: "456",
@@ -73,12 +73,12 @@ function broyeurInput(siret: string) {
   };
 }
 
-const receptionInput = {
+export const receptionInput = {
   weight: 1.4,
   acceptationStatus: "ACCEPTED"
 };
 
-const operationInput = {
+export const operationInput = {
   date: "2021-04-27",
   code: "R 12"
 };

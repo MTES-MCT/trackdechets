@@ -260,10 +260,15 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
         }),
       transporterRecepisseValidityLimit: yup
         .date()
-        .requiredIf(
-          context.transportSignature,
-          `Transporteur: ${MISSING_COMPANY_NAME}`
-        ) as any,
+        .when("transporterCompanyVatNumber", (tva, schema) => {
+          if (!tva || !isForeignVat(tva)) {
+            return schema.requiredIf(
+              context.transportSignature,
+              `Transporteur: la date de validité de récépissé est obligatoire`
+            );
+          }
+          return schema.nullable().notRequired();
+        }),
       transporterCompanyName: yup
         .string()
         .requiredIf(

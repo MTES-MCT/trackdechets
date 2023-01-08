@@ -12,7 +12,11 @@ export function createForm(company: string): WorkflowStep {
       createFormInput: {
         emitter: fixtures.emitterInput(producteur.siret),
         recipient: fixtures.recipientInput(traiteur.siret),
-        transporter: fixtures.transporterInput(transporteur.siret),
+        transporter: fixtures.transporterInput(
+          transporteur.siret?.length
+            ? transporteur.siret
+            : transporteur.vatNumber
+        ),
         wasteDetails: fixtures.wasteDetailsInput
       }
     }),
