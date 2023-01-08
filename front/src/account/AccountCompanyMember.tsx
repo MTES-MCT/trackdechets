@@ -141,7 +141,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
                 disabled={deleteLoading}
                 onClick={() => {
                   deleteInvitation({
-                    variables: { email: user.email, siret: company.siret! },
+                    variables: { email: user.email, siret: company.orgId! },
                   });
                 }}
               >
@@ -157,7 +157,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
                 disabled={resendLoading}
                 onClick={() => {
                   resendInvitation({
-                    variables: { email: user.email, siret: company.siret },
+                    variables: { email: user.email, siret: company.orgId },
                   });
                 }}
               >
