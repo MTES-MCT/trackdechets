@@ -55,7 +55,7 @@ export default function BsffStepsList(props: Props) {
         transporter: {
           ...transporter,
           isExemptedOfRecepisse:
-            !!bsff?.transporter?.company?.siret &&
+            !!bsff?.transporter?.company?.orgId &&
             bsff?.transporter?.recepisse === null,
         },
       };

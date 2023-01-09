@@ -19,7 +19,6 @@ export default async function edit(
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
-
   const existingBsda = await getBsdaOrNotFound(id, {
     include: { intermediaries: true, grouping: true, forwarding: true }
   });

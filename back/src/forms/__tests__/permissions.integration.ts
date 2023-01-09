@@ -360,6 +360,15 @@ describe("checkSecurityCode", () => {
     expect(check).toEqual(true);
   });
 
+  test("securityCode is valid for foreign transporter", async () => {
+    const company = await companyFactory({
+      siret: null,
+      vatNumber: "BE0541696005"
+    });
+    const check = await checkSecurityCode(company.orgId, company.securityCode);
+    expect(check).toEqual(true);
+  });
+
   test("securityCode is invalid", async () => {
     const company = await companyFactory();
     const checkFn = () => checkSecurityCode(company.siret, 1258478956);

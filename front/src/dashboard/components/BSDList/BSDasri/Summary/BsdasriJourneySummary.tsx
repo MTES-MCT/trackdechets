@@ -35,7 +35,7 @@ export function BsdasriJourneySummary({ bsdasri }: BsdasriJourneySummaryProps) {
         <JourneyStopName>Transporteur</JourneyStopName>
         <JourneyStopDescription>
           {bsdasri.transporter?.company?.name} (
-          {bsdasri.transporter?.company?.siret})
+          {bsdasri.transporter?.company?.orgId})
           <br />
           {bsdasri.transporter?.company?.address}
         </JourneyStopDescription>

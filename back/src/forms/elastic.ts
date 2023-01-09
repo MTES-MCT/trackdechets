@@ -51,6 +51,8 @@ export function getSiretsByTab(
     forwardedInDestinationCompanySiret: form.forwardedIn?.recipientCompanySiret,
     forwardedInTransporterCompanySiret:
       form.forwardedIn?.transporterCompanySiret,
+    forwardedInTransporterCompanyVatNumber:
+      form.forwardedIn?.transporterCompanyVatNumber,
     traderCompanySiret: form.traderCompanySiret,
     brokerCompanySiret: form.brokerCompanySiret,
     ecoOrganismeSiret: form.ecoOrganismeSiret,

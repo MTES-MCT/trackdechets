@@ -1,8 +1,11 @@
 import mutations from "../mutations";
-import fixtures from "../fixtures";
+import defaultFixtures from "../fixtures";
 import { WorkflowStep } from "../../../common/workflow";
 
-export function createForm(company: string): WorkflowStep {
+export function createForm(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
   return {
     description: `Les informations du BSDD sont remplies. Cette action peut-être effectuée
   par n'importe quel établissement apparaissant sur le BSDD. À ce stade il est toujours possible
@@ -12,7 +15,11 @@ export function createForm(company: string): WorkflowStep {
       createFormInput: {
         emitter: fixtures.emitterInput(producteur.siret),
         recipient: fixtures.recipientInput(traiteur.siret),
-        transporter: fixtures.transporterInput(transporteur.siret),
+        transporter: fixtures.transporterInput(
+          transporteur.siret?.length
+            ? transporteur.siret
+            : transporteur.vatNumber
+        ),
         wasteDetails: fixtures.wasteDetailsInput
       }
     }),
@@ -36,21 +43,31 @@ export function createFormMultiModal(company: string): WorkflowStep {
 }
 
 /** Creates a form that will be grouped */
-export function createInitialForm(company: string): WorkflowStep {
+export function createInitialForm(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
   return {
     ...createForm(company),
     variables: ({ producteur, transporteur, ttr }) => ({
       createFormInput: {
         emitter: fixtures.emitterInput(producteur.siret),
         recipient: fixtures.ttrInput(ttr.siret),
-        transporter: fixtures.transporterInput(transporteur.siret),
+        transporter: fixtures.transporterInput(
+          transporteur.siret?.length
+            ? transporteur.siret
+            : transporteur.vatNumber
+        ),
         wasteDetails: fixtures.wasteDetailsInput
       }
     })
   };
 }
 
-export function createGroupementForm(company: string): WorkflowStep {
+export function createGroupementForm(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
   return {
     ...createForm(company),
     description:
@@ -68,7 +85,11 @@ export function createGroupementForm(company: string): WorkflowStep {
             company: fixtures.ttrCompanyInput(ttr.siret)
           },
           recipient: fixtures.recipientInput(traiteur.siret),
-          transporter: fixtures.transporterInput(transporteur2.siret),
+          transporter: fixtures.transporterInput(
+            transporteur2.siret?.length
+              ? transporteur2.siret
+              : transporteur2.vatNumber
+          ),
           wasteDetails: fixtures.wasteDetailsInput,
           grouping: [
             {
@@ -82,14 +103,21 @@ export function createGroupementForm(company: string): WorkflowStep {
   };
 }
 
-export function createFormTempStorage(company: string): WorkflowStep {
+export function createFormTempStorage(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
   return {
     ...createForm(company),
     variables: ({ producteur, ttr, transporteur1, traiteur }) => ({
       createFormInput: {
         emitter: fixtures.emitterInput(producteur.siret),
         recipient: fixtures.recipientIsTempStorageInput(ttr.siret),
-        transporter: fixtures.transporterInput(transporteur1.siret),
+        transporter: fixtures.transporterInput(
+          transporteur1.siret?.length
+            ? transporteur1.siret
+            : transporteur1.vatNumber
+        ),
         wasteDetails: fixtures.wasteDetailsInput,
         temporaryStorageDetail: {
           destination: fixtures.recipientInput(traiteur.siret)

@@ -61,7 +61,7 @@ export function BsffDetailContent({ form: bsff }: Props) {
 
   const isBsffContributor = [
     bsff.emitter?.company?.siret,
-    bsff.transporter?.company?.siret,
+    bsff.transporter?.company?.orgId,
     bsff?.destination?.company?.siret,
   ]
     .filter(Boolean)
@@ -233,7 +233,7 @@ export function BsffDetailContent({ form: bsff }: Props) {
               },
               bsffTransporter: {
                 company: {
-                  siret: bsff.transporter?.company?.siret ?? undefined,
+                  siret: bsff.transporter?.company?.orgId ?? undefined,
                   name: bsff.transporter?.company?.name ?? undefined,
                 },
               },

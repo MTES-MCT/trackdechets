@@ -26,7 +26,7 @@ describe("Test the mail job queue", () => {
     return mailQueue.clean(1000);
   });
 
-  test("sendMailJob to the consumer that sends the mail using axios", async () => {
+  it("sends the mail using the mail job queue", async () => {
     // create the fake email
     const mail: Mail = {
       to: [{ email: "test@trackdechets.local", name: "test" }],
@@ -56,7 +56,7 @@ describe("Test the mail job queue", () => {
     );
   });
 
-  test("fallback sendMailJob to sendMailSync when queue is broken", async () => {
+  it("fallback to sendMailSync when queue is broken which directly call axios.post", async () => {
     // mocking the redis queue is down
     const mockAddToMailQueue = jest.spyOn(producer, "addToMailQueue");
     mockAddToMailQueue.mockRejectedValueOnce(new Error("any queue error"));

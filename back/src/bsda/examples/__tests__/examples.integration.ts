@@ -1,13 +1,14 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
 import testWorkflow from "../../../__tests__/testWorkflow";
 import collecteChantierWorkflow from "../workflows/collecteChantier";
+import collecteChantierTransporteurEtranger from "../workflows/collecteChantierTransporteurEtranger";
 import collecteChantierParticulierWorkflow from "../workflows/collecteChantierParticulier";
 import groupementWorkflow from "../workflows/groupement";
 
 describe("Exemples de circuit du bordereau de suivi amiante", () => {
   afterEach(resetDatabase);
 
-  test(
+  it(
     collecteChantierWorkflow.title,
     async () => {
       await testWorkflow(collecteChantierWorkflow);
@@ -15,7 +16,15 @@ describe("Exemples de circuit du bordereau de suivi amiante", () => {
     60000
   );
 
-  test(
+  it(
+    collecteChantierTransporteurEtranger.title,
+    async () => {
+      await testWorkflow(collecteChantierTransporteurEtranger);
+    },
+    60000
+  );
+
+  it(
     collecteChantierParticulierWorkflow.title,
     async () => {
       await testWorkflow(collecteChantierParticulierWorkflow);
@@ -23,7 +32,7 @@ describe("Exemples de circuit du bordereau de suivi amiante", () => {
     60000
   );
 
-  test(
+  it(
     groupementWorkflow.title,
     async () => {
       await testWorkflow(groupementWorkflow);

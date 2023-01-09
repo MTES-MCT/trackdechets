@@ -38,6 +38,9 @@ export const FAVORITES = gql`
   }
 `;
 
+/**
+ * TODO Clean up query, barely used anymore
+ */
 export const COMPANY_INFOS = gql`
   query CompanyInfos($siret: String!, $clue: String) {
     companyInfos(siret: $siret, clue: $clue) {

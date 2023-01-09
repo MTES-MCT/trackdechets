@@ -48,6 +48,7 @@ const identificationKey = "identification";
 const synthesizingKey = "synthesizing";
 const groupingKey = "grouping";
 const transporterCompanySiretKey = "transporter.company.siret";
+const transporterCompanyOrgIdKey = "transporter.company.orgId";
 const transporterCompanyVatNumberKey = "transporter.company.vatNumber";
 const transporterTransportPackagingsKey = "transporter.transport.packagings";
 const transporterTransportVolumeKey = "transporter.transport.volume";
@@ -57,6 +58,7 @@ const getCommonKeys = (bsdasriType: BsdasriType): string[] => {
     return [
       groupingKey,
       transporterCompanySiretKey,
+      transporterCompanyOrgIdKey,
       transporterCompanyVatNumberKey,
       transporterTransportPackagingsKey,
       transporterTransportVolumeKey,

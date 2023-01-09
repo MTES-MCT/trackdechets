@@ -35,7 +35,8 @@ function getWhere(
   const formSirets: Record<string, string | null | undefined> = {
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     destinationCompanySiret: bsvhu.destinationCompanySiret,
-    transporterCompanySiret: bsvhu.transporterCompanySiret
+    transporterCompanySiret: bsvhu.transporterCompanySiret,
+    transporterCompanyVatNumber: bsvhu.transporterCompanyVatNumber
   };
 
   const siretsFilters = new Map<string, keyof typeof where>(
@@ -113,6 +114,7 @@ export function toBsdElastic(bsvhu: Bsvhu): BsdElastic {
     emitterCompanySiret: bsvhu.emitterCompanySiret ?? "",
     transporterCompanyName: bsvhu.transporterCompanyName ?? "",
     transporterCompanySiret: bsvhu.transporterCompanySiret ?? "",
+    transporterCompanyVatNumber: bsvhu.transporterCompanyVatNumber ?? "",
     transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt?.getTime(),
     destinationCompanyName: bsvhu.destinationCompanyName ?? "",
     destinationCompanySiret: bsvhu.destinationCompanySiret ?? "",

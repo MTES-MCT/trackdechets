@@ -42,7 +42,7 @@ export default function FormContainer() {
             const TransporterComponent =
               state === "INITIAL" &&
               !bsdasri?.isDraft &&
-              siret === bsdasri?.transporter?.company?.siret
+              siret === bsdasri?.transporter?.company?.orgId
                 ? TransporterShowingTakeOverFields
                 : Transporter;
             // associated bsd can't be edited

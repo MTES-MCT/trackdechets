@@ -369,13 +369,7 @@ export const detailFormFragment = gql`
     }
     quantityGrouped
     intermediaries {
-      name
-      siret
-      vatNumber
-      phone
-      contact
-      mail
-      address
+      ...CompanyFragment
     }
   }
   ${transporterFormFragment}

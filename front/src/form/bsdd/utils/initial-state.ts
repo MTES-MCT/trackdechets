@@ -106,6 +106,7 @@ export function getInitialEcoOrganisme(ecoOrganisme?: FormEcoOrganisme | null) {
 export function getInitialIntermediaries(intermediaries?: FormCompany[]) {
   return intermediaries
     ? intermediaries.map(company => ({
+        orgId: company?.orgId ?? "",
         siret: company?.siret ?? "",
         name: company?.name ?? "",
         address: company?.address ?? "",
