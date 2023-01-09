@@ -167,7 +167,9 @@ export const isOmi = (clue: string): boolean => {
 export const getTransporterCompanyOrgId = (form: {
   transporterCompanySiret: string;
   transporterCompanyVatNumber: string;
-}): string =>
-  form?.transporterCompanySiret?.length
+}): string => {
+  if (!form) return null;
+  return form.transporterCompanySiret?.length
     ? form.transporterCompanySiret
     : form.transporterCompanyVatNumber;
+}
