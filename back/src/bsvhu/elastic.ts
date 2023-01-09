@@ -1,4 +1,5 @@
 import { BsvhuStatus, Bsvhu } from "@prisma/client";
+import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { BsdElastic, indexBsd } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
@@ -35,8 +36,7 @@ function getWhere(
   const formSirets: Record<string, string | null | undefined> = {
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     destinationCompanySiret: bsvhu.destinationCompanySiret,
-    transporterCompanySiret: bsvhu.transporterCompanySiret,
-    transporterCompanyVatNumber: bsvhu.transporterCompanyVatNumber
+    transporterCompanySiret: getTransporterCompanyOrgId(bsvhu)
   };
 
   const siretsFilters = new Map<string, keyof typeof where>(
