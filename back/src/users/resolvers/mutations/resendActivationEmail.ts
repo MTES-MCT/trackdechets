@@ -4,7 +4,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { onSignup } from "../../../mailer/templates";
 import { object, string } from "yup";
-import { checkCaptcha } from "../../../captchaGen";
+import { checkCaptcha } from "../../../captcha/captchaGen";
 import { UserInputError } from "apollo-server-core";
 
 const resendActivationEmail: MutationResolvers["resendActivationEmail"] =
