@@ -18,6 +18,7 @@ import {
 import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
 import { sendMail } from "../../../mailer/mailing";
 import { runInTransaction } from "../../../common/repository/helper";
+import { ForbiddenError } from "apollo-server-core";
 
 const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   parent,
@@ -28,6 +29,10 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   const { id, receivedInfo } = args;
   const form = await getFormOrFormNotFound({ id });
   await checkCanMarkAsReceived(user, form);
+
+  if (form.status === Status.CANCELED) {
+    throw new ForbiddenError("Ce bordereau a été annulé");
+  }
 
   let transporterTransportMode = form.transporterTransportMode;
 

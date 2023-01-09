@@ -763,4 +763,39 @@ describe("mutation.markAsProcessed", () => {
       })
     ]);
   });
+
+  it("should throw an error if the BSDD is canceled", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "CANCELED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const processingOperation = PROCESSING_OPERATIONS.find(
+      operation => operation.code === "D 1"
+    );
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<{
+      markAsProcessed: { processingOperationDescription: string };
+    }>(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDone: processingOperation.code,
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z"
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Ce bordereau a été annulé"
+      })
+    ]);
+  });
 });

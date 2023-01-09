@@ -11,6 +11,7 @@ import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
 import machine from "../../workflow/machine";
 import { runInTransaction } from "../../../common/repository/helper";
+import { ForbiddenError } from "apollo-server-core";
 
 const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   parent,
@@ -22,6 +23,10 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   const { id, processedInfo } = args;
 
   const form = await getFormOrFormNotFound({ id });
+
+  if (form.status === Status.CANCELED) {
+    throw new ForbiddenError("Ce bordereau a été annulé");
+  }
 
   await checkCanMarkAsProcessed(user, form);
 
