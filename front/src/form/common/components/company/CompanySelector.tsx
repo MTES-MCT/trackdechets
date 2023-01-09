@@ -91,11 +91,12 @@ export default function CompanySelector({
     setDisplayForeignCompanyWithUnknownInfos,
   ] = useState<boolean>(false);
 
-  // Listen for changes in field.value.siret and field.value.orgId
-  let orgId = field.value.orgId ?? field.value.siret ?? null;
-  useMemo(() => {
-    orgId = field.value.orgId ?? field.value.siret ?? null;
-  }, [field.value.siret, field.value.orgId]);
+  // Memoize for changes in field.value.siret and field.value.orgId
+  // To support both FormCompany and Intermediary (that don't have orgId)
+  const orgId = useMemo(
+    () => field.value.orgId ?? field.value.siret ?? null,
+    [field.value.siret, field.value.orgId]
+  );
   // Favortite type is deduced from the field prefix (transporter, emitter, etc)
   const favoriteType = constantCase(field.name.split(".")[0]) as FavoriteType;
   const {

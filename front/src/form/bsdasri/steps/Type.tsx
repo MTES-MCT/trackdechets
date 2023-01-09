@@ -17,6 +17,7 @@ type Props = { disabled: boolean };
 const COMPANY_INFOS = gql`
   query CompanyInfos($siret: String!) {
     companyInfos(siret: $siret) {
+      orgId
       siret
       vatNumber
       name
@@ -75,7 +76,7 @@ export function Type({ disabled }: Props) {
     Pick<Query, "companyInfos">,
     QueryCompanyInfosArgs
   >(COMPANY_INFOS, {
-    variables: { clue: siret },
+    variables: { siret },
     fetchPolicy: "no-cache",
   });
 
