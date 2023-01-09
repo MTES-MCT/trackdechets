@@ -168,6 +168,6 @@ export const getTransporterCompanyOrgId = (form: {
   transporterCompanySiret: string;
   transporterCompanyVatNumber: string;
 }): string =>
-  form.transporterCompanySiret?.length
+  form?.transporterCompanySiret?.length
     ? form.transporterCompanySiret
     : form.transporterCompanyVatNumber;
