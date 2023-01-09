@@ -14,6 +14,7 @@ import {
   Query,
   QueryFormArgs,
   ProcessedFormInput,
+  CompanyInput,
 } from "generated/graphql/types";
 import { gql, useMutation, useLazyQuery } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
@@ -271,7 +272,8 @@ export default function MarkAsProcessed({ form }: WorkflowActionProps) {
                 }}
                 onSubmit={({ nextDestination, ...values }) => {
                   if (nextDestination?.company) {
-                    delete nextDestination.company.omiNumber;
+                    // Avoid crashing type InternationalCompanyInput
+                    delete (nextDestination.company as CompanyInput).omiNumber;
                   }
                   return markAsProcessed({
                     variables: {
