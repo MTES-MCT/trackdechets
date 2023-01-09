@@ -270,6 +270,9 @@ export default function MarkAsProcessed({ form }: WorkflowActionProps) {
                   noTraceability: null,
                 }}
                 onSubmit={({ nextDestination, ...values }) => {
+                  if (nextDestination?.company) {
+                    delete nextDestination.company.omiNumber;
+                  }
                   return markAsProcessed({
                     variables: {
                       id: data?.form.id,
