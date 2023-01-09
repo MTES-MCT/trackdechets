@@ -1,4 +1,6 @@
-import {
+import fixtures from "./fixtures";
+
+const {
   wasteInput,
   emitterCompanyInput,
   emitterInput,
@@ -11,9 +13,9 @@ import {
   receptionInput,
   operationInput,
   operationForGroupingInput
-} from "./fixtures";
+} = fixtures;
 
-export function transporteurCompanyInput(vatNumber: string) {
+function transporteurCompanyInput(vatNumber: string) {
   return {
     siret: null,
     vatNumber,
@@ -25,7 +27,7 @@ export function transporteurCompanyInput(vatNumber: string) {
   };
 }
 
-export function transporterInput(vatNumber: string) {
+function transporterInput(vatNumber: string) {
   return {
     company: transporteurCompanyInput(vatNumber),
     recepisse: null

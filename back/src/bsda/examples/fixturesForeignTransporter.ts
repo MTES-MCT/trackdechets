@@ -1,4 +1,5 @@
-import {
+import fixtures from "./fixtures";
+const {
   emitterCompanyInput,
   emitterInput,
   privateIndividualEmitterInput,
@@ -15,7 +16,7 @@ import {
   workerSignatureUpdateInput,
   transporterSignatureUpdateInput,
   destinationSignatureUpdateInput
-} from "./fixtures";
+} = fixtures;
 
 function transporterCompanyInput(vatNumber: string) {
   return {

@@ -1,4 +1,6 @@
-import {
+import fixtures from "./fixtures";
+
+const {
   emitterCompanyInput,
   emitterInput,
   wasteDetailsInput,
@@ -6,9 +8,9 @@ import {
   broyeurInput,
   receptionInput,
   operationInput
-} from "./fixtures";
+} = fixtures;
 
-export const receiptInput = null;
+const receiptInput = null;
 
 function transporterCompanyInput(vatNumber: string) {
   return {

@@ -1,10 +1,10 @@
-export const wasteInput = {
+const wasteInput = {
   waste: {
     code: "18 01 03*",
     adr: "non soumis"
   }
 };
-export function emitterCompanyInput(siret: string) {
+function emitterCompanyInput(siret: string) {
   return {
     siret,
     name: "Hopital Saint Denis",
@@ -15,27 +15,27 @@ export function emitterCompanyInput(siret: string) {
   };
 }
 
-export function emitterInput(siret: string) {
+function emitterInput(siret: string) {
   return {
     company: emitterCompanyInput(siret)
   };
 }
 
-export const emissionInput = {
+const emissionInput = {
   weight: {
     value: 1,
     isEstimate: false
   },
   packagings: [{ type: "BOITE_CARTON", quantity: 1, volume: 1 }]
 };
-export function ecoorganismeInput(siret: string) {
+function ecoorganismeInput(siret: string) {
   return {
     siret,
     name: "Eco-organisme"
   };
 }
 
-export function transporteurCompanyInput(siret: string) {
+function transporteurCompanyInput(siret: string) {
   return {
     siret,
     name: "Transport Inc",
@@ -46,20 +46,20 @@ export function transporteurCompanyInput(siret: string) {
   };
 }
 
-export const recepisseInput = {
+const recepisseInput = {
   number: "KIH-458-87",
   department: "07",
   validityLimit: "2022-01-01"
 };
 
-export function transporterInput(siret: string) {
+function transporterInput(siret: string) {
   return {
     company: transporteurCompanyInput(siret),
     recepisse: recepisseInput
   };
 }
 
-export const transportInput = {
+const transportInput = {
   acceptation: { status: "ACCEPTED" },
 
   weight: {
@@ -71,7 +71,7 @@ export const transportInput = {
   takenOverAt: "2022-04-27"
 };
 
-export const synthesisTransportInput = {
+const synthesisTransportInput = {
   acceptation: { status: "ACCEPTED" },
 
   weight: {
@@ -81,7 +81,7 @@ export const synthesisTransportInput = {
 
   takenOverAt: "2022-04-27"
 };
-export function destinationCompanyInput(siret: string) {
+function destinationCompanyInput(siret: string) {
   return {
     siret,
     name: "Traiteur Inc",
@@ -92,13 +92,13 @@ export function destinationCompanyInput(siret: string) {
   };
 }
 
-export function destinationInput(siret: string) {
+function destinationInput(siret: string) {
   return {
     company: destinationCompanyInput(siret)
   };
 }
 
-export const receptionInput = {
+const receptionInput = {
   acceptation: { status: "ACCEPTED" },
 
   volume: 1,
@@ -107,7 +107,7 @@ export const receptionInput = {
   date: "2021-04-27"
 };
 
-export const operationInput = {
+const operationInput = {
   weight: {
     value: 1
   },
@@ -115,7 +115,7 @@ export const operationInput = {
   date: "2020-04-28"
 };
 
-export const operationForGroupingInput = {
+const operationForGroupingInput = {
   weight: {
     value: 1
   },

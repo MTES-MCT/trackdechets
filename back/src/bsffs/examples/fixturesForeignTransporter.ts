@@ -1,12 +1,14 @@
-import {
+import fixtures from "./fixtures";
+
+const {
   detenteurInput,
   nextDestinationInput,
   operateurInput,
   traiteurInput,
   ttrInput
-} from "./fixtures";
+} = fixtures;
 
-export function transporterInput(vatNumber: string) {
+function transporterInput(vatNumber: string) {
   return {
     company: {
       siret: null,
