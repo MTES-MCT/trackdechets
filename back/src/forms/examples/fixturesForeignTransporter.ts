@@ -1,4 +1,6 @@
-import {
+import fixtures from "./fixtures";
+
+const {
   emitterCompanyInput,
   emitterInput,
   receiptInput,
@@ -17,9 +19,9 @@ import {
   tempStoredInfosInput,
   nextSegmentInfoInput,
   takeOverInfoInput
-} from "./fixtures";
+} = fixtures;
 
-export function transporterCompanyInput(vatNumber: string) {
+function transporterCompanyInput(vatNumber: string) {
   return {
     siret: null,
     vatNumber,
@@ -31,7 +33,7 @@ export function transporterCompanyInput(vatNumber: string) {
   };
 }
 
-export function transporterInput(vatNumber: string) {
+function transporterInput(vatNumber: string) {
   return {
     company: transporterCompanyInput(vatNumber),
     receipt: null,
@@ -41,7 +43,7 @@ export function transporterInput(vatNumber: string) {
   };
 }
 
-export function resealedInfosInput(vatNumber: string) {
+function resealedInfosInput(vatNumber: string) {
   return {
     transporter: transporterInput(vatNumber)
   };

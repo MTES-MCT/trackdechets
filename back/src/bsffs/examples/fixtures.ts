@@ -1,4 +1,4 @@
-export function detenteurInput(siret: string) {
+function detenteurInput(siret: string) {
   return {
     company: {
       siret,
@@ -11,11 +11,11 @@ export function detenteurInput(siret: string) {
   };
 }
 
-export function operateurInput(siret: string) {
+function operateurInput(siret: string) {
   return { company: operateurCompanyInput(siret) };
 }
 
-export function operateurCompanyInput(siret: string) {
+function operateurCompanyInput(siret: string) {
   return {
     siret,
     name: "Les gentlemen du froid",
@@ -26,7 +26,7 @@ export function operateurCompanyInput(siret: string) {
   };
 }
 
-export function transporterInput(siret: string) {
+function transporterInput(siret: string) {
   return {
     company: {
       siret,
@@ -44,7 +44,7 @@ export function transporterInput(siret: string) {
   };
 }
 
-export function ttrInput(siret: string) {
+function ttrInput(siret: string) {
   return {
     company: {
       siret,
@@ -59,7 +59,7 @@ export function ttrInput(siret: string) {
   };
 }
 
-export function traiteurCompanyInput(siret: string) {
+function traiteurCompanyInput(siret: string) {
   return {
     siret,
     name: "Traiteur & Co",
@@ -70,7 +70,7 @@ export function traiteurCompanyInput(siret: string) {
   };
 }
 
-export function nextDestinationInput(siret: string) {
+function nextDestinationInput(siret: string) {
   return {
     plannedOperationCode: "R2",
     cap: "CAP 2",
@@ -78,7 +78,7 @@ export function nextDestinationInput(siret: string) {
   };
 }
 
-export function traiteurInput(siret: string) {
+function traiteurInput(siret: string) {
   return {
     cap: "CAP",
     plannedOperationCode: "R2",

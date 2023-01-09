@@ -2,7 +2,7 @@
  * Fixtures used as building blocks of mutations inputs
  */
 
-export function emitterCompanyInput(siret: string) {
+function emitterCompanyInput(siret: string) {
   return {
     siret,
     name: "Déchets & Co",
@@ -13,14 +13,14 @@ export function emitterCompanyInput(siret: string) {
   };
 }
 
-export const pickupSiteInput = {
+const pickupSiteInput = {
   address: "5 rue du chantier",
   postalCode: "75010",
   city: "Paris",
   infos: "Site de stockage de boues"
 };
 
-export function emitterInput(siret: string) {
+function emitterInput(siret: string) {
   return {
     isPrivateIndividual: false,
     company: emitterCompanyInput(siret),
@@ -28,7 +28,7 @@ export function emitterInput(siret: string) {
   };
 }
 
-export function privateIndividualEmitterInput() {
+function privateIndividualEmitterInput() {
   return {
     isPrivateIndividual: true,
     company: {
@@ -41,7 +41,7 @@ export function privateIndividualEmitterInput() {
   };
 }
 
-export function packagingsInput() {
+function packagingsInput() {
   return [
     {
       type: "BIG_BAG",
@@ -50,7 +50,7 @@ export function packagingsInput() {
   ];
 }
 
-export function wasteInput() {
+function wasteInput() {
   return {
     code: "16 01 11*",
     consistence: "SOLIDE",
@@ -61,14 +61,14 @@ export function wasteInput() {
   };
 }
 
-export function weightInput() {
+function weightInput() {
   return {
     isEstimate: true,
     value: 2.3
   };
 }
 
-export function transporterCompanyInput(siret: string) {
+function transporterCompanyInput(siret: string) {
   return {
     siret,
     name: "Transport & Co",
@@ -85,14 +85,14 @@ const recepisseInput = {
   validityLimit: "2020-06-30"
 };
 
-export function transporterInput(siret: string) {
+function transporterInput(siret: string) {
   return {
     company: transporterCompanyInput(siret),
     recepisse: recepisseInput
   };
 }
 
-export function traiteurCompanyInput(siret: string) {
+function traiteurCompanyInput(siret: string) {
   return {
     siret,
     name: "Traiteur & Co",
@@ -103,7 +103,7 @@ export function traiteurCompanyInput(siret: string) {
   };
 }
 
-export function destinationInput(siret: string) {
+function destinationInput(siret: string) {
   return {
     company: traiteurCompanyInput(siret),
     plannedOperationCode: "D 5",
@@ -111,13 +111,13 @@ export function destinationInput(siret: string) {
   };
 }
 
-export function workerInput(siret: string) {
+function workerInput(siret: string) {
   return {
     company: workerCompanyInput(siret)
   };
 }
 
-export function workerCompanyInput(siret: string) {
+function workerCompanyInput(siret: string) {
   return {
     siret,
     name: "Entreprise de travaux & Co",
@@ -128,15 +128,15 @@ export function workerCompanyInput(siret: string) {
   };
 }
 
-export function emitterSignatureUpdateInput() {
+function emitterSignatureUpdateInput() {
   return {};
 }
 
-export function workerSignatureUpdateInput() {
+function workerSignatureUpdateInput() {
   return {};
 }
 
-export function transporterSignatureUpdateInput() {
+function transporterSignatureUpdateInput() {
   return {
     transporter: {
       transport: {
@@ -148,7 +148,7 @@ export function transporterSignatureUpdateInput() {
   };
 }
 
-export function destinationSignatureUpdateInput() {
+function destinationSignatureUpdateInput() {
   return {
     destination: {
       reception: {
@@ -164,7 +164,7 @@ export function destinationSignatureUpdateInput() {
   };
 }
 
-export function transporterToGroupInput(siret: string) {
+function transporterToGroupInput(siret: string) {
   return {
     company: transporterCompanyInput(siret),
     recepisse: recepisseInput,
@@ -176,7 +176,7 @@ export function transporterToGroupInput(siret: string) {
   };
 }
 
-export function destinationToGroupInput(siret: string) {
+function destinationToGroupInput(siret: string) {
   return {
     company: traiteurCompanyInput(siret),
     plannedOperationCode: "D 15",
