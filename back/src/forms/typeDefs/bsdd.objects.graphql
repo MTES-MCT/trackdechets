@@ -704,6 +704,9 @@ type FormRevisionRequestContent {
 
   "Entreposage provisoire (édition partielle uniquement)"
   temporaryStorageDetail: FormRevisionRequestTemporaryStorageDetail
+
+  "Demande d'annulation du bordereau"
+  isCanceled: Boolean
 }
 
 type FormRevisionRequestWasteDetails {

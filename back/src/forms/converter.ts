@@ -887,7 +887,8 @@ export function expandBsddRevisionRequestContent(
           processingOperation:
             bsddRevisionRequest.temporaryStorageDestinationProcessingOperation
         })
-      })
+      }),
+    isCanceled: bsddRevisionRequest.isCanceled
   };
 }
 
