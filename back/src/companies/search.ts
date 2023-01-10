@@ -8,7 +8,8 @@ import { convertUrls } from "./database";
 import {
   isSiret,
   isVat,
-  isFRVat
+  isFRVat,
+  TEST_COMPANY_PREFIX
 } from "../common/constants/companySearchHelpers";
 import { SireneSearchResult } from "./sirene/types";
 import { CompanyVatSearchResult } from "./vat/vies/types";
@@ -39,21 +40,22 @@ export async function searchCompany(
   // search for test or anonymous companies first
   const anonymousCompany = await prisma.anonymousCompany.findUnique({
     where: {
-      ...(isSiret(cleanClue) && { siret: cleanClue }),
-      ...(!isSiret(cleanClue) && isVat(cleanClue) && { vatNumber: cleanClue })
+      orgId: cleanClue
     }
   });
   if (anonymousCompany) {
     companyInfo = {
       ...anonymousCompany,
-      statutDiffusionEtablissement: cleanClue.startsWith("000000") ? "O" : "N",
+      statutDiffusionEtablissement: cleanClue.startsWith(TEST_COMPANY_PREFIX)
+        ? "O"
+        : "N",
       etatAdministratif: "A",
       naf: anonymousCompany.codeNaf,
       codePaysEtrangerEtablissement: "FR"
     };
   } else if (
     process.env.ALLOW_TEST_COMPANY === "true" &&
-    cleanClue.startsWith("000000")
+    cleanClue.startsWith(TEST_COMPANY_PREFIX)
   ) {
     // 404
     throw new UserInputError("Aucun établissement trouvé avec ce SIRET", {
@@ -69,13 +71,13 @@ export async function searchCompany(
   }
   // Concaténer données Company
   const where = {
-    ...(isSiret(cleanClue) && { where: { siret: cleanClue } }),
-    ...(isVat(cleanClue) && { where: { vatNumber: cleanClue } })
+    where: { orgId: cleanClue }
   };
   const trackdechetsCompanyInfo = await prisma.company.findUnique({
     ...where,
     select: {
       id: true,
+      orgId: true,
       siret: true,
       name: true,
       address: true,
@@ -95,6 +97,7 @@ export async function searchCompany(
     ecoOrganismeAgreements: [],
     isRegistered: trackdechetsCompanyInfo != null,
     companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
+    orgId: cleanClue,
     ...convertUrls(trackdechetsCompanyInfo),
     // override database infos with Sirene or VAT search
     ...companyInfo
@@ -114,25 +117,25 @@ export const makeSearchCompanies =
         )
         .catch(_ => []);
     }
-    // fuzzy searching when another text clue is sent
+    // fuzzy searching only for French companies
     return decoratedSearchCompanies(clue, department).then(async results => {
       let existingCompanies = [];
       if (results.length) {
         existingCompanies = (
           await prisma.company.findMany({
             where: {
-              siret: { in: results.map(r => r.siret) }
+              orgId: { in: results.map(r => r.siret) }
             },
             select: {
-              siret: true,
-              vatNumber: true
+              orgId: true
             }
           })
-        ).map(company => company.siret);
+        ).map(company => company.orgId);
       }
 
       return results.map(company => ({
         ...company,
+        orgId: company.siret,
         isRegistered: existingCompanies.includes(company.siret)
       }));
     });

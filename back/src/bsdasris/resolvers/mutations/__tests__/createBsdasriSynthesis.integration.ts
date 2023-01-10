@@ -1,6 +1,9 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  siretify,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdasriFactory } from "../../../__tests__/factories";
 import { BsdasriStatus } from "@prisma/client";
@@ -34,9 +37,9 @@ describe("Mutation.createDasri", () => {
     const toAssociate1 = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.SENT,
-        emitterCompanySiret: "1234",
+        emitterCompanySiret: siretify(1),
         transporterCompanySiret: company.siret,
-        destinationCompanySiret: "9876",
+        destinationCompanySiret: siretify(2),
         destinationOperationCode: "D9",
         transporterWastePackagings: [
           { type: "BOITE_CARTON", volume: 10, quantity: 3 }
@@ -48,9 +51,9 @@ describe("Mutation.createDasri", () => {
     const toAssociate2 = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.SENT,
-        emitterCompanySiret: "7654",
+        emitterCompanySiret: siretify(3),
         transporterCompanySiret: company.siret,
-        destinationCompanySiret: "2689",
+        destinationCompanySiret: siretify(4),
         destinationOperationCode: "D10",
         transporterWastePackagings: [
           { type: "BOITE_CARTON", volume: 10, quantity: 6 },
@@ -142,9 +145,9 @@ describe("Mutation.createDasri", () => {
     const toAssociate1 = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.SENT,
-        emitterCompanySiret: "1234",
+        emitterCompanySiret: siretify(1),
         transporterCompanySiret: company.siret,
-        destinationCompanySiret: "9876",
+        destinationCompanySiret: siretify(2),
         destinationOperationCode: "D9",
         transporterWastePackagings: [
           { type: "BOITE_CARTON", volume: 10, quantity: 3 }
@@ -156,9 +159,9 @@ describe("Mutation.createDasri", () => {
     const toAssociate2 = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.SENT,
-        emitterCompanySiret: "7654",
+        emitterCompanySiret: siretify(3),
         transporterCompanySiret: company.siret,
-        destinationCompanySiret: "2689",
+        destinationCompanySiret: siretify(4),
         destinationOperationCode: "D10",
         transporterWastePackagings: [
           { type: "BOITE_CARTON", volume: 10, quantity: 6 },

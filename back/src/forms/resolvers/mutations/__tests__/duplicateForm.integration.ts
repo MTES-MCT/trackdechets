@@ -3,8 +3,10 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Mutation } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
+  companyFactory,
   formFactory,
   formWithTempStorageFactory,
+  siretify,
   toIntermediaryCompany,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -47,34 +49,29 @@ describe("Mutation.duplicateForm", () => {
       "with an eco-organisme",
       {
         ecoOrganismeName: "COREPILE",
-        ecoOrganismeSiret: "12345678912345"
+        ecoOrganismeSiret: siretify(1)
       }
     ]
   ])("should duplicate a form %s", async (_, opt) => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const {
       id,
-      nextDestinationProcessingOperation,
-      nextDestinationCompanyName,
-      nextDestinationCompanySiret,
-      nextDestinationCompanyAddress,
-      nextDestinationCompanyCountry,
-      nextDestinationCompanyContact,
-      nextDestinationCompanyPhone,
-      nextDestinationCompanyMail,
       emitterType,
       emitterPickupSite,
-      emitterWorkSiteName,
-      emitterWorkSiteAddress,
-      emitterWorkSiteCity,
-      emitterWorkSitePostalCode,
-      emitterWorkSiteInfos,
+      emitterIsPrivateIndividual,
+      emitterIsForeignShip,
       emitterCompanyName,
       emitterCompanySiret,
       emitterCompanyAddress,
       emitterCompanyContact,
       emitterCompanyPhone,
       emitterCompanyMail,
+      emitterCompanyOmiNumber,
+      emitterWorkSiteName,
+      emitterWorkSiteAddress,
+      emitterWorkSiteCity,
+      emitterWorkSitePostalCode,
+      emitterWorkSiteInfos,
       recipientCap,
       recipientProcessingOperation,
       recipientCompanyName,
@@ -83,24 +80,31 @@ describe("Mutation.duplicateForm", () => {
       recipientCompanyContact,
       recipientCompanyPhone,
       recipientCompanyMail,
+      recipientIsTempStorage,
       transporterCompanyName,
       transporterCompanySiret,
       transporterCompanyAddress,
       transporterCompanyContact,
       transporterCompanyPhone,
       transporterCompanyMail,
-      transporterIsExemptedOfReceipt,
+      transporterCompanyVatNumber,
       transporterReceipt,
       transporterDepartment,
       transporterValidityLimit,
+      transporterTransportMode,
+      transporterIsExemptedOfReceipt,
       wasteDetailsCode,
-      wasteDetailsName,
       wasteDetailsOnuCode,
       wasteDetailsPackagingInfos,
       wasteDetailsQuantity,
       wasteDetailsQuantityType,
-      wasteDetailsConsistence,
       wasteDetailsPop,
+      wasteDetailsIsDangerous,
+      wasteDetailsParcelNumbers,
+      wasteDetailsAnalysisReferences,
+      wasteDetailsLandIdentifiers,
+      wasteDetailsName,
+      wasteDetailsConsistence,
       traderCompanyName,
       traderCompanySiret,
       traderCompanyAddress,
@@ -110,9 +114,18 @@ describe("Mutation.duplicateForm", () => {
       traderReceipt,
       traderDepartment,
       traderValidityLimit,
+      brokerCompanyName,
+      brokerCompanySiret,
+      brokerCompanyAddress,
+      brokerCompanyContact,
+      brokerCompanyPhone,
+      brokerCompanyMail,
+      brokerReceipt,
+      brokerDepartment,
+      brokerValidityLimit,
       ecoOrganismeName,
       ecoOrganismeSiret,
-      nextTransporterSiret
+      ...rest
     } = await formFactory({
       ownerId: user.id,
       opt: {
@@ -120,6 +133,61 @@ describe("Mutation.duplicateForm", () => {
         ...opt
       }
     });
+
+    const expectedSkipped = [
+      "createdAt",
+      "updatedAt",
+      "transporterNumberPlate",
+      "readableId",
+      "status",
+      "emittedBy",
+      "emittedAt",
+      "emittedByEcoOrganisme",
+      "takenOverBy",
+      "takenOverAt",
+      "sentAt",
+      "sentBy",
+      "isAccepted",
+      "receivedAt",
+      "quantityReceived",
+      "quantityReceivedType",
+      "processingOperationDone",
+      "isDeleted",
+      "receivedBy",
+      "processedBy",
+      "processedAt",
+      "nextDestinationProcessingOperation",
+      "processingOperationDescription",
+      "noTraceability",
+      "signedByTransporter",
+      "customId",
+      "wasteAcceptationStatus",
+      "wasteRefusalReason",
+      "nextDestinationCompanyName",
+      "nextDestinationCompanySiret",
+      "nextDestinationCompanyAddress",
+      "nextDestinationCompanyContact",
+      "nextDestinationCompanyPhone",
+      "nextDestinationCompanyMail",
+      "nextDestinationCompanyCountry",
+      "nextDestinationCompanyVatNumber",
+      "transporterCustomInfo",
+      "signedAt",
+      "currentTransporterSiret",
+      "nextTransporterSiret",
+      "isImportedFromPaper",
+      "signedBy",
+      "ownerId",
+      "forwardedInId",
+      "recipientsSirets",
+      "transportersSirets",
+      "intermediariesSirets",
+      "forwardedIn"
+    ];
+
+    // make sure this test breaks when a new field is added to the Form model
+    // it will ensure we think of adding necessary fields to the duplicate input
+    expect(Object.keys(rest).sort()).toEqual(expectedSkipped.sort());
 
     const { mutate } = makeClient(user);
     const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
@@ -135,75 +203,55 @@ describe("Mutation.duplicateForm", () => {
     });
 
     expect(duplicatedForm).toMatchObject({
-      customId: null,
-      isDeleted: false,
-      isImportedFromPaper: false,
-      signedByTransporter: null,
-      status: "DRAFT",
-      sentAt: null,
-      sentBy: null,
-      isAccepted: false,
-      wasteAcceptationStatus: null,
-      wasteRefusalReason: null,
-      receivedBy: null,
-      receivedAt: null,
-      signedAt: null,
-      quantityReceived: null,
-      processedBy: null,
-      processedAt: null,
-      processingOperationDone: null,
-      processingOperationDescription: null,
-      noTraceability: null,
-      nextDestinationProcessingOperation,
-      nextDestinationCompanyName,
-      nextDestinationCompanySiret,
-      nextDestinationCompanyAddress,
-      nextDestinationCompanyCountry,
-      nextDestinationCompanyContact,
-      nextDestinationCompanyPhone,
-      nextDestinationCompanyMail,
       emitterType,
       emitterPickupSite,
-      emitterWorkSiteName,
-      emitterWorkSiteAddress,
-      emitterWorkSiteCity,
-      emitterWorkSitePostalCode,
-      emitterWorkSiteInfos,
+      emitterIsPrivateIndividual,
+      emitterIsForeignShip,
       emitterCompanyName,
       emitterCompanySiret,
       emitterCompanyAddress,
       emitterCompanyContact,
       emitterCompanyPhone,
       emitterCompanyMail,
+      emitterCompanyOmiNumber,
+      emitterWorkSiteName,
+      emitterWorkSiteAddress,
+      emitterWorkSiteCity,
+      emitterWorkSitePostalCode,
+      emitterWorkSiteInfos,
       recipientCap,
       recipientProcessingOperation,
-      recipientIsTempStorage: false,
       recipientCompanyName,
       recipientCompanySiret,
       recipientCompanyAddress,
       recipientCompanyContact,
       recipientCompanyPhone,
       recipientCompanyMail,
+      recipientIsTempStorage,
       transporterCompanyName,
       transporterCompanySiret,
       transporterCompanyAddress,
       transporterCompanyContact,
       transporterCompanyPhone,
       transporterCompanyMail,
-      transporterIsExemptedOfReceipt,
+      transporterCompanyVatNumber,
       transporterReceipt,
       transporterDepartment,
       transporterValidityLimit,
-      transporterNumberPlate: null,
-      transporterCustomInfo: null,
+      transporterTransportMode,
+      transporterIsExemptedOfReceipt,
       wasteDetailsCode,
-      wasteDetailsName,
       wasteDetailsOnuCode,
       wasteDetailsPackagingInfos,
       wasteDetailsQuantity,
       wasteDetailsQuantityType,
-      wasteDetailsConsistence,
       wasteDetailsPop,
+      wasteDetailsIsDangerous,
+      wasteDetailsParcelNumbers,
+      wasteDetailsAnalysisReferences,
+      wasteDetailsLandIdentifiers,
+      wasteDetailsName,
+      wasteDetailsConsistence,
       traderCompanyName,
       traderCompanySiret,
       traderCompanyAddress,
@@ -213,10 +261,17 @@ describe("Mutation.duplicateForm", () => {
       traderReceipt,
       traderDepartment,
       traderValidityLimit,
+      brokerCompanyName,
+      brokerCompanySiret,
+      brokerCompanyAddress,
+      brokerCompanyContact,
+      brokerCompanyPhone,
+      brokerCompanyMail,
+      brokerReceipt,
+      brokerDepartment,
+      brokerValidityLimit,
       ecoOrganismeName,
-      ecoOrganismeSiret,
-      currentTransporterSiret: null,
-      nextTransporterSiret
+      ecoOrganismeSiret
     });
   });
 
@@ -227,28 +282,29 @@ describe("Mutation.duplicateForm", () => {
       opt: { emitterCompanySiret: company.siret }
     });
     const {
+      emitterType,
+      emitterCompanyName,
+      emitterCompanySiret,
+      emitterCompanyAddress,
+      emitterCompanyContact,
+      emitterCompanyPhone,
+      emitterCompanyMail,
+      recipientCap,
+      recipientProcessingOperation,
       recipientCompanyName,
       recipientCompanySiret,
       recipientCompanyAddress,
       recipientCompanyContact,
       recipientCompanyPhone,
       recipientCompanyMail,
-      recipientCap,
-      recipientProcessingOperation,
-      wasteDetailsOnuCode,
+      wasteDetailsCode,
       wasteDetailsPackagingInfos,
-      wasteDetailsQuantity,
-      wasteDetailsQuantityType,
-      transporterCompanyName,
-      transporterCompanySiret,
-      transporterCompanyAddress,
-      transporterCompanyContact,
-      transporterCompanyPhone,
-      transporterCompanyMail,
-      transporterIsExemptedOfReceipt,
-      transporterReceipt,
-      transporterDepartment,
-      transporterValidityLimit
+      wasteDetailsOnuCode,
+      wasteDetailsPop,
+      wasteDetailsIsDangerous,
+      wasteDetailsName,
+      wasteDetailsConsistence,
+      ...rest
     } = await prisma.form.findUnique({ where: { id: form.id } }).forwardedIn();
 
     const { mutate } = makeClient(user);
@@ -263,7 +319,7 @@ describe("Mutation.duplicateForm", () => {
     const duplicatedForm = await prisma.form.findUnique({
       where: { id: data.duplicateForm.id }
     });
-    const duplicatedTemporaryStorageDetail = await prisma.form
+    const duplicatedForwardedIn = await prisma.form
       .findUnique({
         where: {
           id: duplicatedForm.id
@@ -272,40 +328,141 @@ describe("Mutation.duplicateForm", () => {
       .forwardedIn();
 
     expect(duplicatedForm.recipientIsTempStorage).toBe(true);
-    expect(duplicatedTemporaryStorageDetail).toMatchObject({
+    expect(duplicatedForwardedIn).toMatchObject({
       readableId: `${duplicatedForm.readableId}-suite`,
-      quantityReceived: null,
-      wasteAcceptationStatus: null,
-      wasteRefusalReason: null,
-      receivedAt: null,
-      receivedBy: null,
-      signedAt: null,
+      emitterType,
+      emitterCompanyName,
+      emitterCompanySiret,
+      emitterCompanyAddress,
+      emitterCompanyContact,
+      emitterCompanyPhone,
+      emitterCompanyMail,
+      recipientCap,
+      recipientProcessingOperation,
       recipientCompanyName,
       recipientCompanySiret,
       recipientCompanyAddress,
       recipientCompanyContact,
       recipientCompanyPhone,
       recipientCompanyMail,
-      recipientCap,
-      recipientProcessingOperation,
-      wasteDetailsOnuCode,
+      wasteDetailsCode,
       wasteDetailsPackagingInfos,
-      wasteDetailsQuantity,
-      wasteDetailsQuantityType,
-      transporterCompanyName,
-      transporterCompanySiret,
-      transporterCompanyAddress,
-      transporterCompanyContact,
-      transporterCompanyPhone,
-      transporterCompanyMail,
-      transporterIsExemptedOfReceipt,
-      transporterReceipt,
-      transporterDepartment,
-      transporterValidityLimit,
-      transporterNumberPlate: null,
+      wasteDetailsOnuCode,
+      wasteDetailsPop,
+      wasteDetailsIsDangerous,
+      wasteDetailsName,
+      wasteDetailsConsistence,
+      quantityReceived: null,
+      wasteAcceptationStatus: null,
+      wasteRefusalReason: null,
+      receivedAt: null,
+      receivedBy: null,
+      signedAt: null,
       signedByTransporter: null,
       signedBy: null
     });
+
+    const expectedSkipped = [
+      "id",
+      "createdAt",
+      "updatedAt",
+      "transporterNumberPlate",
+      "readableId",
+      "status",
+      "recipientIsTempStorage",
+      "emitterCompanyOmiNumber",
+      "emitterIsForeignShip",
+      "emitterIsPrivateIndividual",
+      "emitterPickupSite",
+      "emitterWorkSiteAddress",
+      "emitterWorkSiteCity",
+      "emitterWorkSiteInfos",
+      "emitterWorkSiteName",
+      "emitterWorkSitePostalCode",
+      "traderCompanyAddress",
+      "traderCompanyContact",
+      "traderCompanyMail",
+      "traderCompanyName",
+      "traderCompanyPhone",
+      "traderCompanySiret",
+      "traderDepartment",
+      "traderReceipt",
+      "traderValidityLimit",
+      "transporterCompanyAddress",
+      "transporterCompanyContact",
+      "transporterCompanyMail",
+      "transporterCompanyName",
+      "transporterCompanyPhone",
+      "transporterCompanySiret",
+      "transporterCompanyVatNumber",
+      "transporterDepartment",
+      "transporterIsExemptedOfReceipt",
+      "transporterReceipt",
+      "transporterTransportMode",
+      "transporterValidityLimit",
+      "wasteDetailsAnalysisReferences",
+      "wasteDetailsLandIdentifiers",
+      "wasteDetailsParcelNumbers",
+      "wasteDetailsQuantity",
+      "wasteDetailsQuantityType",
+      "emittedBy",
+      "emittedAt",
+      "emittedByEcoOrganisme",
+      "takenOverBy",
+      "takenOverAt",
+      "sentAt",
+      "sentBy",
+      "isAccepted",
+      "receivedAt",
+      "quantityReceived",
+      "quantityReceivedType",
+      "processingOperationDone",
+      "isDeleted",
+      "receivedBy",
+      "processedBy",
+      "processedAt",
+      "nextDestinationProcessingOperation",
+      "processingOperationDescription",
+      "noTraceability",
+      "signedByTransporter",
+      "customId",
+      "wasteAcceptationStatus",
+      "wasteRefusalReason",
+      "nextDestinationCompanyName",
+      "nextDestinationCompanySiret",
+      "nextDestinationCompanyAddress",
+      "nextDestinationCompanyContact",
+      "nextDestinationCompanyPhone",
+      "nextDestinationCompanyMail",
+      "nextDestinationCompanyCountry",
+      "nextDestinationCompanyVatNumber",
+      "transporterCustomInfo",
+      "signedAt",
+      "currentTransporterSiret",
+      "nextTransporterSiret",
+      "isImportedFromPaper",
+      "signedBy",
+      "ownerId",
+      "forwardedInId",
+      "recipientsSirets",
+      "transportersSirets",
+      "intermediariesSirets",
+      "brokerCompanyAddress",
+      "brokerCompanyContact",
+      "brokerCompanyMail",
+      "brokerCompanyName",
+      "brokerCompanyPhone",
+      "brokerCompanySiret",
+      "brokerDepartment",
+      "brokerReceipt",
+      "brokerValidityLimit",
+      "ecoOrganismeName",
+      "ecoOrganismeSiret"
+    ];
+
+    // make sure this test breaks when a new field is added to the Form model
+    // it will ensure we think of adding necessary fields to the duplicate forwardedIn input
+    expect(Object.keys(rest).sort()).toEqual(expectedSkipped.sort());
   });
 
   it("should create a status log", async () => {
@@ -370,5 +527,46 @@ describe("Mutation.duplicateForm", () => {
         siret: intermediary.company.siret
       })
     ]);
+  });
+
+  it("should not duplicate nextDestination info", async () => {
+    const { user, company } = await userWithCompanyFactory(UserRole.MEMBER);
+    const nextDestination = await companyFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        nextDestinationProcessingOperation: "R 2",
+        nextDestinationCompanySiret: nextDestination.siret,
+        nextDestinationCompanyName: nextDestination.name,
+        nextDestinationCompanyAddress: nextDestination.address,
+        nextDestinationCompanyContact: "John Snow",
+        nextDestinationCompanyCountry: "FR",
+        nextDestinationCompanyMail: "john.snow@trackdechets.fr",
+        nextDestinationCompanyPhone: "00 00 00 00 00",
+        nextDestinationCompanyVatNumber: "FRXX"
+      }
+    });
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+      DUPLICATE_FORM,
+      {
+        variables: {
+          id: form.id
+        }
+      }
+    );
+    const duplicatedForm = await prisma.form.findUnique({
+      where: { id: data.duplicateForm.id }
+    });
+    expect(duplicatedForm.nextDestinationProcessingOperation).toBeNull();
+    expect(duplicatedForm.nextDestinationCompanySiret).toBeNull();
+    expect(duplicatedForm.nextDestinationCompanyName).toBeNull();
+    expect(duplicatedForm.nextDestinationCompanyAddress).toBeNull();
+    expect(duplicatedForm.nextDestinationCompanyContact).toBeNull();
+    expect(duplicatedForm.nextDestinationCompanyCountry).toBeNull();
+    expect(duplicatedForm.nextDestinationCompanyMail).toBeNull();
+    expect(duplicatedForm.nextDestinationCompanyPhone).toBeNull();
+    expect(duplicatedForm.nextDestinationCompanyVatNumber).toBeNull();
   });
 });

@@ -1,8 +1,11 @@
 import mutations from "../mutations";
-import fixtures from "../fixtures";
+import defaultFixtures from "../fixtures";
 import { WorkflowStep } from "../../../common/workflow";
 
-export function createBsdasri(company: string): WorkflowStep {
+export function createBsdasri(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
   return {
     description: `Les informations du BSDASRI (PRED, transporteur, destinataire, déchets) sont remplies.`,
     mutation: mutations.createBsdasri,
@@ -14,7 +17,11 @@ export function createBsdasri(company: string): WorkflowStep {
           emission: fixtures.emissionInput
         },
         destination: fixtures.destinationInput(traiteur.siret),
-        transporter: fixtures.transporterInput(transporteur.siret)
+        transporter: fixtures.transporterInput(
+          transporteur.siret?.length
+            ? transporteur.siret
+            : transporteur.vatNumber
+        )
       }
     }),
     expected: { status: "INITIAL" },

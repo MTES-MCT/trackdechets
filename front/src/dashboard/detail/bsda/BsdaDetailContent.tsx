@@ -39,6 +39,7 @@ const Company = ({ company, label }: CompanyProps) => (
   <>
     <dt>{label}</dt> <dd>{company?.name}</dd>
     <dt>Siret</dt> <dd>{company?.siret}</dd>
+    <dt>Numéro de TVA</dt> <dd>{company?.vatNumber}</dd>
     <dt>Adresse</dt> <dd>{company?.address}</dd>
     <dt>Tél</dt> <dd>{company?.phone}</dd>
     <dt>Mél</dt> <dd>{company?.mail}</dd>
@@ -120,11 +121,11 @@ const Worker = ({ form }: { form: Bsda }) => {
         <div className={styles.detailGrid}>
           <YesNoRow
             value={worker.certification?.hasSubSectionFour}
-            label="Travaux relevcant de la sous-section 4"
+            label="Travaux relevant de la sous-section 4"
           />
           <YesNoRow
             value={worker.certification?.hasSubSectionThree}
-            label="Travaux relevcant de la sous-section 3"
+            label="Travaux relevant de la sous-section 3"
           />
           {worker.certification?.hasSubSectionThree && (
             <>

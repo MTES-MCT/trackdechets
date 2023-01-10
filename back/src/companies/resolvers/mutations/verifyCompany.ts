@@ -23,7 +23,7 @@ const verifyCompanyResolver: MutationResolvers["verifyCompany"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-  const company = await getCompanyOrCompanyNotFound({ siret });
+  const company = await getCompanyOrCompanyNotFound({ orgId: siret });
   await checkIsCompanyAdmin(user, company);
 
   if (code !== company.verificationCode) {
@@ -31,7 +31,7 @@ const verifyCompanyResolver: MutationResolvers["verifyCompany"] = async (
   }
 
   const verifiedCompany = await prisma.company.update({
-    where: { siret },
+    where: { id: company.id },
     data: {
       verificationStatus: CompanyVerificationStatus.VERIFIED,
       verificationMode: CompanyVerificationMode.LETTER,

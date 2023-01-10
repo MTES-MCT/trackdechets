@@ -1,7 +1,7 @@
 import prisma from "../prisma";
 import { Router, Request, Response } from "express";
 import passport from "passport";
-import { oauth2server } from "../oauth2";
+import { oauth2server } from "../oauth/oauth2";
 import ensureLoggedIn from "../common/middlewares/ensureLoggedIn";
 import { OAuth2, AuthorizationError } from "oauth2orize";
 

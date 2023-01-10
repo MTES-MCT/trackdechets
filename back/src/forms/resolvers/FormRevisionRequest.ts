@@ -26,12 +26,17 @@ const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
   form: async (parent: FormRevisionRequest & { bsddId: string }) => {
     const fullBsdd = await prisma.bsddRevisionRequest
       .findUnique({ where: { id: parent.id } })
-      .bsdd();
+      .bsdd({ include: { forwardedIn: true } });
     const bsdd = await getBsddFromActivityEvents(
       parent.bsddId,
       parent.createdAt
     );
-    return expandFormFromDb({ ...fullBsdd, ...bsdd });
+
+    return expandFormFromDb({
+      ...fullBsdd,
+      ...bsdd,
+      forwardedIn: fullBsdd.forwardedIn
+    });
   }
 };
 

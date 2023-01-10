@@ -29,6 +29,9 @@ const SEGMENT_ALREADY_SEALED = "Ce segment de transport est déjà scellé";
 const SEGMENTS_ALREADY_PREPARED =
   "Il y a d'autres segments après le vôtre, vous ne pouvez pas ajouter de segment";
 
+const MISSING_COMPANY_SIRET =
+  "Le siret est obligatoire. Les entreprises étrangères ne sont pas supportées pour le moment.";
+
 const segmentSchema = Yup.object<any>().shape({
   // id: Yup.string().label("Identifiant (id)").required(),
   mode: Yup.string().label("Mode de transport").required(),
@@ -101,7 +104,7 @@ export async function prepareSegment(
   const nextSegmentPayload = flattenTransportSegmentInput(nextSegmentInfo);
 
   if (!nextSegmentPayload.transporterCompanySiret) {
-    throw new ForbiddenError("Le siret est obligatoire");
+    throw new ForbiddenError(MISSING_COMPANY_SIRET);
   }
   const formRepository = getFormRepository(user);
   // get form and segments
@@ -161,7 +164,7 @@ export async function prepareSegment(
   }
 
   if (!nextSegmentPayload.transporterCompanySiret) {
-    throw new UserInputError("Le siret est obligatoire");
+    throw new UserInputError(MISSING_COMPANY_SIRET);
   }
 
   const segmentInput = {

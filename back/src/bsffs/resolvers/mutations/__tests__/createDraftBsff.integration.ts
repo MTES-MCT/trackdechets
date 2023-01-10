@@ -12,6 +12,7 @@ import {
 import {
   companyFactory,
   userFactory,
+  siretify,
   UserWithCompany,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -106,7 +107,7 @@ describe("Mutation.createDraftBsff", () => {
           emitter: {
             company: {
               name: "Clim' Clean",
-              siret: "2".repeat(14),
+              siret: siretify(2),
               address: "12 rue de Laval 69000",
               contact: "Marco Polo",
               mail: "marco.polo@gmail.com"

@@ -7,7 +7,10 @@ import {
   MutationCreateBsffArgs,
   BsffOperationCode
 } from "../../../../generated/graphql/types";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  siretify,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { fullBsff } from "../../../fragments";
 
@@ -133,7 +136,7 @@ describe("Mutation.createBsff", () => {
           emitter: {
             company: {
               name: "Clim' Clean",
-              siret: "2".repeat(14),
+              siret: siretify(2),
               address: "12 rue de Laval 69000",
               contact: "Marco Polo",
               mail: "marco.polo@gmail.com"
@@ -182,7 +185,6 @@ describe("Mutation.createBsff", () => {
           "Le code de l'opération de traitement prévu est requis\n" +
           "Transporteur : le nom de l'établissement est requis\n" +
           "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire\n" +
-          "transporterCompanySiret n'est pas un numéro de SIRET valide\n" +
           "Transporteur : l'adresse de l'établissement est requise\n" +
           "Transporteur : le nom du contact est requis\n" +
           "Transporteur : le numéro de téléphone est requis\n" +
@@ -206,6 +208,7 @@ describe("Mutation.createBsff", () => {
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
     const { mutate } = makeClient(emitter.user);
+    const siret = siretify(1);
     const { errors } = await mutate<
       Pick<Mutation, "createBsff">,
       MutationCreateBsffArgs
@@ -217,7 +220,7 @@ describe("Mutation.createBsff", () => {
             transporter: {
               company: {
                 name: "Transporter",
-                siret: "11111111111111",
+                siret,
                 address: "Quelque part",
                 contact: "John Snow",
                 mail: "john.snow@trackdechets.fr",
@@ -233,7 +236,7 @@ describe("Mutation.createBsff", () => {
       expect.objectContaining({
         message:
           "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
-          "Le transporteur qui a été renseigné sur le bordereau (SIRET: 11111111111111) n'est pas inscrit sur Trackdéchets"
+          `Le transporteur qui a été renseigné sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets`
       })
     ]);
   });
@@ -243,6 +246,7 @@ describe("Mutation.createBsff", () => {
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
     const { mutate } = makeClient(emitter.user);
+    const siret = siretify(1);
     const { errors } = await mutate<
       Pick<Mutation, "createBsff">,
       MutationCreateBsffArgs
@@ -253,7 +257,7 @@ describe("Mutation.createBsff", () => {
           destination: {
             company: {
               name: "Destination",
-              siret: "11111111111111",
+              siret,
               address: "Quelque part",
               contact: "John Snow",
               mail: "john.snow@trackdechets.fr",
@@ -269,7 +273,7 @@ describe("Mutation.createBsff", () => {
       expect.objectContaining({
         message:
           "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
-          "L'installation de destination avec le SIRET 11111111111111 n'est pas inscrite sur Trackdéchets"
+          `L'installation de destination avec le SIRET ${siret} n'est pas inscrite sur Trackdéchets`
       })
     ]);
   });

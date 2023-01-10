@@ -8,7 +8,7 @@ import { userFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
 const CREATE_APPLICATION = gql`
-  mutation CreateApplication($input: ApplicationInput!) {
+  mutation CreateApplication($input: CreateApplicationInput!) {
     createApplication(input: $input) {
       id
       clientSecret
@@ -19,7 +19,7 @@ const CREATE_APPLICATION = gql`
 describe("createApplication", () => {
   afterEach(resetDatabase);
 
-  it.skip("should create an application", async () => {
+  it("should create an application", async () => {
     const user = await userFactory();
     const { mutate } = makeClient(user);
 

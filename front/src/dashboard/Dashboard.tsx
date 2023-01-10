@@ -54,6 +54,7 @@ export const GET_ME = gql`
         name
         givenName
         siret
+        orgId
         companyTypes
       }
     }
@@ -83,7 +84,7 @@ export default function Dashboard() {
   }
 
   const companies = data.me.companies;
-  const currentCompany = companies.find(company => company.siret === siret);
+  const currentCompany = companies.find(company => company.orgId === siret);
 
   // if the user is not part of the company whose siret is in the url
   // redirect them to their first company or account if they're not part of any company
@@ -93,7 +94,7 @@ export default function Dashboard() {
         to={
           companies.length > 0
             ? generatePath(routes.dashboard.bsds.drafts, {
-                siret: companies[0].siret,
+                siret: companies[0].orgId,
               })
             : routes.account.companies.list
         }

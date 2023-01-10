@@ -11,7 +11,7 @@ const allWastesResolver: QueryResolvers["allWastes"] = async (
   const user = checkIsAuthenticated(context);
 
   for (const siret of args.sirets) {
-    await checkIsCompanyMember({ id: user.id }, { siret });
+    await checkIsCompanyMember({ id: user.id }, { orgId: siret });
   }
 
   return getWasteConnection("ALL", args);

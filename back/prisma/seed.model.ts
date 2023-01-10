@@ -1,8 +1,10 @@
 import { hashPassword, passwordVersion } from "../src/users/utils";
 
 import prisma from "../src/prisma";
+import { siretify } from "../src/__tests__/factories";
 
 export default async () => {
+  let siret = siretify(1);
   await prisma.user.create({
     data: {
       email: "hello@producteur.fr",
@@ -16,7 +18,8 @@ export default async () => {
           role: "ADMIN",
           company: {
             create: {
-              siret: "11111111111111",
+              orgId: siret,
+              siret,
               securityCode: 1234,
               verificationCode: "4321",
               name: "PRODUCTEUR",
@@ -29,6 +32,7 @@ export default async () => {
       }
     }
   });
+  siret = siretify(2);
   await prisma.user.create({
     data: {
       email: "hello@transporteur.fr",
@@ -42,7 +46,8 @@ export default async () => {
           role: "ADMIN",
           company: {
             create: {
-              siret: "22222222222222",
+              orgId: siret,
+              siret,
               securityCode: 1234,
               verificationCode: "4321",
               name: "TRANSPORTEUR",
@@ -62,6 +67,7 @@ export default async () => {
       }
     }
   });
+  siret = siretify(3);
   await prisma.user.create({
     data: {
       email: "hello@collecteur.fr",
@@ -75,7 +81,8 @@ export default async () => {
           role: "ADMIN",
           company: {
             create: {
-              siret: "33333333333333",
+              orgId: siret,
+              siret,
               securityCode: 1234,
               verificationCode: "4321",
               name: "COLLECTEUR",
@@ -88,6 +95,7 @@ export default async () => {
       }
     }
   });
+  siret = siretify(4);
   await prisma.user.create({
     data: {
       email: "hello@ecoorganisme.fr",
@@ -101,7 +109,8 @@ export default async () => {
           role: "ADMIN",
           company: {
             create: {
-              siret: "44444444444444",
+              orgId: siret,
+              siret,
               securityCode: 1234,
               verificationCode: "4321",
               name: "ECOORG",
@@ -118,7 +127,7 @@ export default async () => {
     data: {
       address: "34 RUE DU DECHETS 13001 MARSEILLE",
       name: "ECOORG",
-      siret: "44444444444444"
+      siret: siretify(5)
     }
   });
 };

@@ -2,6 +2,7 @@ import axios from "axios";
 import { authorizedAxiosGet, getToken, INSEE_TOKEN_KEY } from "../token";
 import { resetCache } from "../../../../../integration-tests/helper";
 import { setInCache } from "../../../../common/redis";
+import { siretify } from "../../../../__tests__/factories";
 
 const mockedAxiosPost = jest.spyOn(axios, "post");
 const mockedAxiosGet = jest.spyOn(axios, "get");
@@ -17,7 +18,7 @@ describe("authorizedAxiosGet", () => {
     const initialToken = await getToken();
     expect(initialToken).toBeNull();
 
-    const siret = "11111111111111";
+    const siret = siretify(1);
     const url = `/siret/${siret}`;
     const validToken = "valid_token";
 
@@ -62,7 +63,7 @@ describe("authorizedAxiosGet", () => {
     const initialToken = await getToken();
     expect(initialToken).toEqual(invalidToken);
 
-    const siret = "11111111111111";
+    const siret = siretify(1);
     const url = `/siret/${siret}`;
     const validToken = "valid_token";
 

@@ -118,7 +118,11 @@ input BsdaInput {
   waste: BsdaWasteInput
   "Conditionnement"
   packagings: [BsdaPackagingInput!]
-  "Quantité en tonnes, réelle ou estimée"
+  """
+  Poids en tonnes, réel ou estimé.
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   weight: BsdaWeightInput
 
   "Installation de destination"
@@ -199,7 +203,11 @@ input BsdaPackagingInput {
 input BsdaWeightInput {
   "Type de quantité (réelle ou estimé)"
   isEstimate: Boolean
-  "Quantité en tonne"
+  """
+  Poids en tonne.
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   value: Float
 }
 
@@ -221,7 +229,11 @@ input BsdaDestinationInput {
 input BsdaReceptionInput {
   "Date de présentation sur site"
   date: DateTime
-  "Quantité présentée en tonnes"
+  """
+  Quantité présentée en tonnes
+
+  Doit être inférieure à 40T en cas de transport routier et inférieure à 50 000 T tout type de transport confondu.
+  """
   weight: Float
   "Lot accepté, accepté partiellement ou refusé"
   acceptationStatus: WasteAcceptationStatus

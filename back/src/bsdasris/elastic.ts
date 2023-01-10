@@ -4,6 +4,7 @@ import { BsdElastic, indexBsd } from "../common/elastic";
 import { DASRI_WASTE_CODES_MAPPING } from "../common/constants/DASRI_CONSTANTS";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
+import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 
 // | state              | emitter | transporter | recipient |
 // |--------------------|---------|-------------|-----------|
@@ -40,7 +41,7 @@ function getWhere(
   const formSirets: Record<string, string | null | undefined> = {
     emitterCompanySiret: bsdasri.emitterCompanySiret,
     destinationCompanySiret: bsdasri.destinationCompanySiret,
-    transporterCompanySiret: bsdasri.transporterCompanySiret,
+    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
     ecoOrganismeSiret: bsdasri.ecoOrganismeSiret
   };
 
@@ -127,6 +128,7 @@ export function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
     emitterCompanySiret: bsdasri.emitterCompanySiret ?? "",
     transporterCompanyName: bsdasri.transporterCompanyName ?? "",
     transporterCompanySiret: bsdasri.transporterCompanySiret ?? "",
+    transporterCompanyVatNumber: bsdasri.transporterCompanyVatNumber ?? "",
     transporterTakenOverAt: bsdasri.transporterTakenOverAt?.getTime(),
     transporterCustomInfo: bsdasri.transporterCustomInfo ?? "",
     destinationCompanyName: bsdasri.destinationCompanyName ?? "",

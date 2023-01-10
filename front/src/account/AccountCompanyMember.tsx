@@ -20,6 +20,8 @@ type Props = {
 AccountCompanyMember.fragments = {
   company: gql`
     fragment AccountCompanyMemberCompanyFragment on CompanyPrivate {
+      orgId
+      vatNumber
       siret
     }
   `,
@@ -123,7 +125,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
               className="btn btn--primary"
               onClick={() => {
                 removeUserFromCompany({
-                  variables: { siret: company.siret, userId: user.id },
+                  variables: { siret: company.orgId!, userId: user.id },
                 });
               }}
             >
@@ -139,7 +141,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
                 disabled={deleteLoading}
                 onClick={() => {
                   deleteInvitation({
-                    variables: { email: user.email, siret: company.siret },
+                    variables: { email: user.email, siret: company.orgId! },
                   });
                 }}
               >
@@ -155,7 +157,7 @@ export default function AccountCompanyMember({ company, user }: Props) {
                 disabled={resendLoading}
                 onClick={() => {
                   resendInvitation({
-                    variables: { email: user.email, siret: company.siret },
+                    variables: { email: user.email, siret: company.orgId },
                   });
                 }}
               >

@@ -2,6 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { Mutation } from "../../../../generated/graphql/types";
 import {
+  siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -57,7 +58,7 @@ describe("Mutation.Bsda.createDraft", () => {
           input: {
             emitter: {
               company: {
-                siret: "siret"
+                siret: siretify(1)
               }
             }
           }

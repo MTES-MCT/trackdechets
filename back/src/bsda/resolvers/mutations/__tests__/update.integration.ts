@@ -5,7 +5,10 @@ import {
   MutationUpdateBsdaArgs
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  siretify,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../__tests__/factories";
 
@@ -190,7 +193,7 @@ describe("Mutation.updateBsda", () => {
         input: {
           emitter: {
             company: {
-              siret: "2".repeat(14)
+              siret: siretify(4)
             }
           }
         }

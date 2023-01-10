@@ -12,7 +12,7 @@ const renewSecurityCodeResolver: MutationResolvers["renewSecurityCode"] =
   async (parent, { siret }, context) => {
     applyAuthStrategies(context, [AuthType.Session]);
     const user = checkIsAuthenticated(context);
-    const company = await getCompanyOrCompanyNotFound({ siret });
+    const company = await getCompanyOrCompanyNotFound({ orgId: siret });
     await checkIsCompanyAdmin(user, company);
     return renewSecurityCodeFn(siret);
   };

@@ -3,7 +3,10 @@ import { Modal, RedErrorMessage } from "common/components";
 import { NewAccessToken } from "generated/graphql/types";
 import { useMutation } from "@apollo/client";
 import { CREATE_ACCESS_TOKEN } from "./queries";
-import { NotificationError } from "common/components/Error";
+import {
+  NotificationError,
+  SimpleNotificationError,
+} from "common/components/Error";
 import { Field, Form, Formik } from "formik";
 import styles from "../fields/AccountField.module.scss";
 import TdTooltip from "common/components/Tooltip";
@@ -71,7 +74,12 @@ export default function AccountAccessTokenCreate({
           </div>
         </Form>
       </Formik>
-      {error && <NotificationError apolloError={error} />}
+      {error && error?.networkError && (
+        <SimpleNotificationError message="Pour des raisons de sécurité la création de jetons est limitée, merci de rééssayer dans une minute." />
+      )}
+      {error && !error?.networkError && (
+        <NotificationError apolloError={error} />
+      )}
     </Modal>
   );
 }

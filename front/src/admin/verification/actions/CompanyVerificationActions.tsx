@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import CompanyVerifyModal from "./CompanyVerifyModal";
 import "@reach/menu-button/styles.css";
 import SendVerificationCodeLetterModal from "./SendVerificationCodeLetterModal";
+import { isSiret } from "generated/constants/companySearchHelpers";
 
 type VerificationActionsProps = {
   company: CompanyForVerification;
@@ -29,12 +30,14 @@ export default function CompanyVerificationActions({
       <button className="btn btn--primary" onClick={() => openVerifyModal()}>
         Vérifier
       </button>
-      <button
-        className="btn btn--primary tw-mt-1"
-        onClick={() => openSendVerificationCodeModal()}
-      >
-        Envoyer un courrier
-      </button>
+      {isSiret(company.orgId) && (
+        <button
+          className="btn btn--primary tw-mt-1"
+          onClick={() => openSendVerificationCodeModal()}
+        >
+          Envoyer un courrier
+        </button>
+      )}
 
       {showVerifyModal && (
         <CompanyVerifyModal

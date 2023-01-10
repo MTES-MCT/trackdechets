@@ -2,7 +2,8 @@ import {
   userWithCompanyFactory,
   formFactory,
   userFactory,
-  transportSegmentFactory
+  transportSegmentFactory,
+  siretify
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
@@ -37,7 +38,7 @@ describe("{ mutation { prepareSegment } }", () => {
         currentTransporterSiret: transporterSiret
       }
     });
-
+    const transporterCompanySiret = siretify(2);
     const { mutate } = makeClient(firstTransporter);
     const { data } = await mutate<Pick<Mutation, "prepareSegment">>(
       `mutation  {
@@ -46,7 +47,7 @@ describe("{ mutation { prepareSegment } }", () => {
          nextSegmentInfo: {
             transporter: {
               company: {
-                siret: "976345"
+                siret: "${transporterCompanySiret}"
                 name: "Nightwatch fight club"
                 address: "The north wall"
                 contact: "John Snow"
@@ -63,7 +64,7 @@ describe("{ mutation { prepareSegment } }", () => {
       where: { id: data.prepareSegment.id }
     });
 
-    expect(segment.transporterCompanySiret).toBe("976345");
+    expect(segment.transporterCompanySiret).toBe(transporterCompanySiret);
     expect(segment.transporterCompanyName).toBe("Nightwatch fight club");
     expect(segment.readyToTakeOver).toBe(false);
   });
@@ -86,7 +87,7 @@ describe("{ mutation { prepareSegment } }", () => {
         currentTransporterSiret: transporterSiret
       }
     });
-
+    const transporterCompanySiret = siretify(2);
     const { mutate } = makeClient(firstTransporter);
     const { data } = await mutate<Pick<Mutation, "prepareSegment">>(
       `mutation  {
@@ -95,7 +96,7 @@ describe("{ mutation { prepareSegment } }", () => {
          nextSegmentInfo: {
             transporter: {
               company: {
-                siret: "976345"
+                siret: "${transporterCompanySiret}"
                 name: "Nightwatch fight club"
                 address: "The north wall"
                 contact: "John Snow"
@@ -112,7 +113,7 @@ describe("{ mutation { prepareSegment } }", () => {
       where: { id: data.prepareSegment.id }
     });
 
-    expect(segment.transporterCompanySiret).toBe("976345");
+    expect(segment.transporterCompanySiret).toBe(transporterCompanySiret);
     expect(segment.transporterCompanyName).toBe("Nightwatch fight club");
     expect(segment.readyToTakeOver).toBe(false);
   });
@@ -139,9 +140,10 @@ describe("{ mutation { prepareSegment } }", () => {
     const otherForm = await formFactory({
       ownerId: owner.id
     });
+    const transporterCompanySiret = siretify(3);
     await transportSegmentFactory({
       formId: otherForm.id,
-      segmentPayload: { transporterCompanySiret: "98765" }
+      segmentPayload: { transporterCompanySiret }
     });
 
     const transporterSiret = company.siret;
@@ -260,7 +262,7 @@ describe("{ mutation { prepareSegment } }", () => {
        nextSegmentInfo: {
           transporter: {
             company: {
-              siret: "976345"
+              siret: "${transporterCompanySiret}"
               name: "Nightwatch fight club"
               address: "The north wall"
               contact: "John Snow"
@@ -305,7 +307,7 @@ describe("{ mutation { prepareSegment } }", () => {
          nextSegmentInfo: {
             transporter: {
               company: {
-                siret: "976345"
+                siret: "${transporterCompanySiret}"
                 name: "Nightwatch fight club"
                 address: "The north wall"
                 contact: "John Snow"
@@ -326,6 +328,8 @@ describe("{ mutation { prepareSegment } }", () => {
       }`
     );
     expect(errors).toBeUndefined();
-    expect(data3.prepareSegment.transporter.company.siret).toBe("976345");
+    expect(data3.prepareSegment.transporter.company.siret).toBe(
+      transporterCompanySiret
+    );
   });
 });

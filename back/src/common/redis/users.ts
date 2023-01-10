@@ -1,6 +1,5 @@
 import { redisClient, generateKey } from "./redis";
 import { getUserCompanies } from "../../users/database";
-import { sess } from "../../server";
 
 const CACHED_COMPANY_EXPIRATION = 10 * 60; // 10 minutes
 
@@ -9,6 +8,9 @@ export const genUserCompanySiretCacheKey = (userId: string): string =>
 
 export const genUserCompaniesCacheKey = (userId: string): string =>
   generateKey("userCompanies", userId);
+
+export const getUserLoginFailedKey = (email: string): string =>
+  generateKey("userLoginFailed", email);
 
 /**
  * Delete the cached sirets for a given user
@@ -90,17 +92,4 @@ export async function getUserSessions(userId: string): Promise<string[]> {
     return;
   }
   return redisClient.smembers(genUserSessionsIdsKey(userId));
-}
-
-/**
- * Delete all user sessions
- * Delete the sessionkeys referenced in USER_SESSIONS_CACHE_KEY
- * @param userId
- */
-export async function clearUserSessions(userId: string): Promise<void> {
-  const sessions = await getUserSessions(userId);
-
-  sessions.forEach(sessionId => sess.store.destroy(sessionId));
-
-  await redisClient.del(genUserSessionsIdsKey(userId));
 }

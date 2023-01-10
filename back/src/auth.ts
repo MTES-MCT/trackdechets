@@ -23,6 +23,12 @@ import {
   sanitizeEmail,
   hashToken
 } from "./utils";
+import {
+  setUserLoginFailed,
+  clearUserLoginNeedsCaptcha,
+  doesUserLoginNeedsCaptcha
+} from "./common/redis/captcha";
+import { checkCaptcha } from "./captcha/captchaGen";
 
 // Set specific type for req.user
 declare global {
@@ -42,7 +48,9 @@ export enum AuthType {
 
 enum LoginErrorCode {
   INVALID_USER_OR_PASSWORD = "INVALID_USER_OR_PASSWORD",
-  NOT_ACTIVATED = "NOT_ACTIVATED"
+  NOT_ACTIVATED = "NOT_ACTIVATED",
+  INVALID_USER_OR_PASSWORD_NEEDS_CAPTCHA = "INVALID_USER_OR_PASSWORD_NEEDS_CAPTCHA",
+  INVALID_CAPTCHA = "INVALID_CAPTCHA"
 }
 
 // verbose error message and related errored field
@@ -50,6 +58,16 @@ export const getLoginError = (username: string) => ({
   INVALID_USER_OR_PASSWORD: {
     code: LoginErrorCode.INVALID_USER_OR_PASSWORD,
     message: "Email ou mot de passe incorrect",
+    username: username
+  },
+  INVALID_USER_OR_PASSWORD_NEEDS_CAPTCHA: {
+    code: LoginErrorCode.INVALID_USER_OR_PASSWORD_NEEDS_CAPTCHA,
+    message: "Email ou mot de passe incorrect",
+    username: username
+  },
+  INVALID_CAPTCHA: {
+    code: LoginErrorCode.INVALID_CAPTCHA,
+    message: "Le test anti robots est incorrect",
     username: username
   },
   NOT_ACTIVATED: {
@@ -62,10 +80,39 @@ export const getLoginError = (username: string) => ({
 
 export const ADMIN_IS_PERSONIFYING = "ADMIN_IS_PERSONIFYING";
 
+// apart from logging the user in, we perform captcha verifications:
+// - if user as performed less than FAILED_ATTEMPTS_BEFORE_CAPTCHA in the last FAILED_LOGIN_EXPIRATION seconds, perform as usual
+// - if user as performed more failed attemps, check if captcha is correct
+// - if captcha is missing or incorrect, return appropriate error message
 passport.use(
   new LocalStrategy(
     { usernameField: "email", passReqToCallback: true },
     async (req, username, password, done) => {
+      const needsCaptcha = await doesUserLoginNeedsCaptcha(
+        sanitizeEmail(username)
+      );
+
+      if (needsCaptcha) {
+        if (!req.body?.captchaInput) {
+          await setUserLoginFailed(username);
+          return done(null, false, {
+            ...getLoginError(username).INVALID_USER_OR_PASSWORD_NEEDS_CAPTCHA
+          });
+        }
+
+        const captchaIsValid = await checkCaptcha(
+          req.body?.captchaInput,
+          req.body?.captchaToken
+        );
+
+        if (!captchaIsValid) {
+          await setUserLoginFailed(username);
+          return done(null, false, {
+            ...getLoginError(username).INVALID_CAPTCHA
+          });
+        }
+      }
+
       const user = await prisma.user.findUnique({
         where: { email: sanitizeEmail(username) }
       });
@@ -84,6 +131,7 @@ passport.use(
 
       const passwordValid = await compare(password, user.password);
       if (passwordValid) {
+        await clearUserLoginNeedsCaptcha(user.email);
         return done(null, user);
       }
 
@@ -91,8 +139,15 @@ passport.use(
         return done(null, user, { message: ADMIN_IS_PERSONIFYING });
       }
 
+      // if password is not valid and user is not admin, set a redis count to require captcha after several failed login attemps
+      await setUserLoginFailed(username);
+
+      // adds INVALID_USER_OR_PASSWORD_NEEDS_CAPTCHA if needsCaptcha to trigger captcha field display on the front
       return done(null, false, {
-        ...getLoginError(username).INVALID_USER_OR_PASSWORD
+        ...getLoginError(username).INVALID_USER_OR_PASSWORD,
+        ...(needsCaptcha
+          ? getLoginError(username).INVALID_USER_OR_PASSWORD_NEEDS_CAPTCHA
+          : {})
       });
     }
   )

@@ -54,6 +54,7 @@ const createSynthesisBsdasri = async (
   const formSirets = {
     emitterCompanySiret: input.transporter?.company?.siret,
     transporterCompanySiret: input.transporter?.company?.siret,
+    transporterCompanyVatNumber: input.transporter?.company?.vatNumber,
     destinationCompanySiret: input.destination?.company?.siret
   };
 
@@ -65,7 +66,8 @@ const createSynthesisBsdasri = async (
 
   const dasrisToAssociate = await getEligibleDasrisForSynthesis(
     synthesizing,
-    input.transporter.company.siret
+    null,
+    input.transporter.company
   );
 
   const aggregatedPackagings = aggregatePackagings(dasrisToAssociate);

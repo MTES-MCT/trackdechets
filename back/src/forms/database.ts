@@ -111,6 +111,7 @@ export function getFormSiretsByRole(
     ].filter(Boolean),
     transportersSirets: [
       form.transporterCompanySiret,
+      form.transporterCompanyVatNumber,
       ...form.transportSegments?.map(
         segment => segment.transporterCompanySiret
       ),

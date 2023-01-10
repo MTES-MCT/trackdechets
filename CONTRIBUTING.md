@@ -20,6 +20,7 @@
     - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
     - [Nourrir la base de donnée avec des données par défaut](#nourrir-la-base-de-donnée-avec-des-données-par-défaut)
     - [Ajouter une nouvelle icône](#ajouter-une-nouvelle-icône)
+    - [Clef de signature token OpenID](#clefs-de-signature-token-openid)
   - [Dépannage](#dépannage)
     - [La base de donnée ne se crée pas](#la-base-de-donnée-ne-se-crée-pas)
     - [Je n'arrive pas à (ré)indexer Elastic Search](#je-narrive-pas-à-réindexer-elastic-search)
@@ -52,16 +53,17 @@
    127.0.0.1 developers.trackdechets.local
    127.0.0.1 es.trackdechets.local
    127.0.0.1 notifier.trackdechets.local
+   127.0.0.1 storybook.trackdechets.local
    ```
 
    > Pour rappel, le fichier host est dans `C:\Windows\System32\drivers\etc` sous windows, `/etc/hosts` ou `/private/etc/hosts` sous Linux et Mac
 
-   > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `NOTIFIER_HOST`, `UI_HOST`, `DEVELOPERS_HOST` et `ELASTIC_SEARCH_HOST`
+   > La valeur des URLs doit correspondre aux variables d'environnement `API_HOST`, `NOTIFIER_HOST`, `UI_HOST`, `DEVELOPERS_HOST`, `STORYBOOK_HOST` et `ELASTIC_SEARCH_HOST`
 
 4. Démarrer les containers
 
    ```bash
-   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx elasticsearch mongodb
+   docker-compose -f docker-compose.dev.yml up postgres redis td-api td-ui nginx elasticsearch mongodb storybook
    ```
 
    NB: Pour éviter les envois de mails intempestifs, veillez à configurer la variable `EMAIL_BACKEND` sur `console`.
@@ -181,6 +183,25 @@ server {
       proxy_set_header Connection "Upgrade";
    }
 }
+
+# /opt/homebrew/etc/nginx/servers/storybook.trackdechets.local
+server {
+   listen 80;
+   listen [::]:80;
+
+   server_name storybook.trackdechets.local;
+
+   location / {
+      proxy_pass http://localhost:6006;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "Upgrade";
+   }
+}
 ```
 
 Re-charger la config et redémarrer NGINX
@@ -197,6 +218,7 @@ brew services restart nginx
 127.0.0.1 api.trackdechets.local
 127.0.0.1 trackdechets.local
 127.0.0.1 notifier.trackdechets.local
+127.0.0.1 storybook.trackdechets.local
 ```
 
 7. Installer `nvm`
@@ -238,8 +260,17 @@ cd back && npm run dev
 cd front && npm run dev
 ```
 
-- URL API: http://api.trackdechets.local/
+13. (Optionnel) Démarrer Storybook
+
+```bash
+cd front
+npm install
+npm run storybook
+```
+
+- URL API : http://api.trackdechets.local/
 - URL UI : http://trackdechets.local
+- Storybook UI : http://storybook.trackdechets.local
 
 ### Conventions
 
@@ -423,6 +454,20 @@ Voilà la procédure pour ajouter une icône au fichier `Icons.tsx` :
 3. [Convertir le SVG en JSX](https://react-svgr.com/playground/?expandProps=start&icon=true&replaceAttrValues=%23000%3D%22currentColor%22&typescript=true) et l'ajouter au fichier (adapter le code selon les exemples existants : props, remplacer `width`/`height` et `"currentColor"`).
 
 Pour s'y retrouver plus facilement, suivre la convention de nommage en place et utiliser le nom donné par streamlineicons.
+
+
+### Clefs de signature token OpenID
+
+Une clef de signature RSA est nécessaire pour signer les tokens d'identité d'Openid.
+
+```
+   openssl genrsa -out keypair.pem 2048
+   openssl rsa -in keypair.pem -pubout -out publickey.crt
+   openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in keypair.pem -out pkcs8.key
+```
+Le contenu de pkcs8.key va dans la vairable d'env OIDC_PRIVATE_KEY.
+Le contenu de publickey.crt est destiné aux applications clientes d'OpenId connect.
+
 
 ### Reindexer un bordereau individuel
 

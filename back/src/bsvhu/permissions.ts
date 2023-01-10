@@ -11,6 +11,7 @@ export async function checkIsBsvhuContributor(
       | "emitterCompanySiret"
       | "destinationCompanySiret"
       | "transporterCompanySiret"
+      | "transporterCompanyVatNumber"
     >
   >,
   errorMsg: string
@@ -27,13 +28,16 @@ export async function checkIsBsvhuContributor(
 export async function isBsvhuContributor(user: User, form: Partial<Bsvhu>) {
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
-  const formSirets = [
+  const bsvhuSiretsOrVat = [
     form.emitterCompanySiret,
     form.destinationCompanySiret,
-    form.transporterCompanySiret
+    form.transporterCompanySiret,
+    form.transporterCompanyVatNumber
   ];
 
-  return userCompaniesSiretOrVat.some(siret => formSirets.includes(siret));
+  return userCompaniesSiretOrVat.some(siret =>
+    bsvhuSiretsOrVat.includes(siret)
+  );
 }
 
 export async function checkCanDeleteBsdvhu(user: User, form: Bsvhu) {

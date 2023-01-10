@@ -5,7 +5,10 @@ import {
   Mutation,
   MutationCreateFicheInterventionBsffArgs
 } from "../../../../generated/graphql/types";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  siretify,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
 const ADD_FICHE_INTERVENTION = `
@@ -32,7 +35,7 @@ const ficheInterventionInput: BsffFicheInterventionInput = {
   operateur: {
     company: {
       name: "Clim'op",
-      siret: "2".repeat(14),
+      siret: siretify(2),
       address: "12 rue de la Tige, 69000",
       mail: "contact@climop.com",
       phone: "06",
@@ -43,7 +46,7 @@ const ficheInterventionInput: BsffFicheInterventionInput = {
     isPrivateIndividual: false,
     company: {
       name: "Acme",
-      siret: "3".repeat(14),
+      siret: siretify(3),
       address: "12 rue de la Tige, 69000",
       mail: "contact@gmail.com",
       phone: "06",
@@ -109,7 +112,7 @@ describe("Mutation.createFicheInterventionBsff", () => {
           "Le SIRET de l'entreprise détentrice de l'équipement est requis\n" +
           "Le nom du contact de l'entreprise détentrice de l'équipement est requis\n" +
           "Le numéro de téléphone de l'entreprise détentrice de l'équipement est requis\n" +
-          "L'addresse email de l'entreprise détentrice de l'équipement est requis"
+          "L'adresse email de l'entreprise détentrice de l'équipement est requis"
       })
     ]);
   });
@@ -180,7 +183,7 @@ describe("Mutation.createFicheInterventionBsff", () => {
       expect.objectContaining({
         message:
           "Le nom du détenteur de l'équipement (particulier) est requis\n" +
-          "L'addresse du détenteur de l'équipement (particulier) est requise"
+          "L'adresse du détenteur de l'équipement (particulier) est requise"
       })
     ]);
   });

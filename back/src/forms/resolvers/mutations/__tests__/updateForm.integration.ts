@@ -6,6 +6,7 @@ import {
   companyFactory,
   formFactory,
   formWithTempStorageFactory,
+  siretify,
   toIntermediaryCompany,
   userFactory,
   userWithCompanyFactory
@@ -317,7 +318,7 @@ describe("Mutation.updateForm", () => {
       // try to remove user's company from the form
       emitter: {
         company: {
-          siret: "3".repeat(14)
+          siret: siretify(7)
         }
       }
     };
@@ -416,7 +417,7 @@ describe("Mutation.updateForm", () => {
       },
       ecoOrganisme: {
         name: "",
-        siret: "does_not_exist"
+        siret: siretify(3)
       }
     };
     const { mutate } = makeClient(user);
@@ -1882,4 +1883,71 @@ describe("Mutation.updateForm", () => {
     expect(updatedForm.transportersSirets).toContain(company.siret);
     expect(updatedForm.intermediariesSirets).toContain(company.siret);
   });
+
+  it("should not be possible to update a weight > 40 T when transport mode is ROAD", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SEALED",
+        emitterCompanySiret: company.siret,
+        emitterType: EmitterType.APPENDIX2,
+        wasteDetailsCode: "01 03 04*",
+        transporterTransportMode: "ROAD"
+      }
+    });
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          wasteDetails: { quantity: 50 }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Déchet : le poids doit être inférieur à 40 tonnes lorsque le transport se fait par la route"
+      })
+    ]);
+  });
+
+  it(
+    "should be possible to update a form where transport is ROAD and wasteDetailsQuantity is > 40T " +
+      "if it was created before (<=) process.env.MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER",
+    async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const { mutate } = makeClient(user);
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          createdAt: new Date(0), // same as default value for MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER
+          status: "SEALED",
+          emitterCompanySiret: company.siret,
+          emitterType: EmitterType.APPENDIX2,
+          wasteDetailsCode: "01 03 04*",
+          transporterTransportMode: "ROAD",
+          wasteDetailsQuantity: 50
+        }
+      });
+      const { errors } = await mutate<
+        Pick<Mutation, "updateForm">,
+        MutationUpdateFormArgs
+      >(UPDATE_FORM, {
+        variables: {
+          updateFormInput: {
+            id: form.id,
+            wasteDetails: { consistence: "SOLID" }
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+    }
+  );
 });

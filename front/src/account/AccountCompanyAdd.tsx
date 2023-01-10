@@ -19,7 +19,6 @@ import {
   MutationCreateCompanyArgs,
   CompanyType as _CompanyType,
   CompanySearchResult,
-  PrivateCompanyInput,
 } from "generated/graphql/types";
 import Tooltip from "common/components/Tooltip";
 import AccountCompanyAddVhuAgrement from "./accountCompanyAdd/AccountCompanyAddVhuAgrement";
@@ -31,7 +30,8 @@ import {
   isSiret,
   isVat,
 } from "generated/constants/companySearchHelpers";
-const CREATE_COMPANY = gql`
+
+export const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
     createCompany(companyInput: $companyInput) {
       id
@@ -43,6 +43,17 @@ const CREATE_COMPANY = gql`
     }
   }
 `;
+
+export const CREATE_COMPANY_HOOK_OPTIONS = history => ({
+  refetchQueries: [
+    { query: GET_ME },
+    { query: MY_COMPANIES, variables: { first: 10 } },
+  ],
+  awaitRefetchQueries: true,
+  onCompleted: () => {
+    history.push(routes.account.companies.list);
+  },
+});
 
 const CREATE_TRANSPORTER_RECEIPT = gql`
   mutation CreateTransporterReceipt($input: CreateTransporterReceiptInput!) {
@@ -113,16 +124,7 @@ export default function AccountCompanyAdd() {
   const [createCompany, { error: savingError }] = useMutation<
     Pick<Mutation, "createCompany">,
     MutationCreateCompanyArgs
-  >(CREATE_COMPANY, {
-    refetchQueries: [
-      { query: GET_ME },
-      { query: MY_COMPANIES, variables: { first: 10 } },
-    ],
-    awaitRefetchQueries: true,
-    onCompleted: () => {
-      history.push(routes.account.companies.list);
-    },
-  });
+  >(CREATE_COMPANY, CREATE_COMPANY_HOOK_OPTIONS(history));
 
   const [createTransporterReceipt, { error: createTransporterReceiptError }] =
     useMutation(CREATE_TRANSPORTER_RECEIPT);
@@ -186,13 +188,7 @@ export default function AccountCompanyAdd() {
       ...companyValues
     } = values;
 
-    const { siret, vatNumber, ...formInput } = companyValues;
-    const companyInput: PrivateCompanyInput = {
-      orgId: !!siret ? siret : vatNumber,
-      ...formInput,
-    };
     let transporterReceiptId: string | null = null;
-
     // create transporter receipt if any
     if (
       !!transporterReceiptNumber &&
@@ -305,7 +301,7 @@ export default function AccountCompanyAdd() {
     return createCompany({
       variables: {
         companyInput: {
-          ...companyInput,
+          ...companyValues,
           transporterReceiptId,
           traderReceiptId,
           brokerReceiptId,
@@ -421,7 +417,11 @@ export default function AccountCompanyAdd() {
                   "Vous devez certifier être autorisé à créer ce compte pour votre entreprise",
               }),
               ...((isFRVat(values.vatNumber) ||
-                (!isSiret(values.siret) && !isVat(values.vatNumber))) && {
+                (!isSiret(
+                  values.siret,
+                  import.meta.env.VITE_ALLOW_TEST_COMPANY
+                ) &&
+                  !isVat(values.vatNumber))) && {
                 siret:
                   "Le SIRET ou le numéro de TVA intracommunautaire doit être valides. (seuls les caractères alphanumériques sont acceptés, pas d'espaces ni de signes de ponctuation)",
               }),

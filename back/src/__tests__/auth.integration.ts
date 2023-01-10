@@ -48,7 +48,7 @@ describe("POST /login", () => {
     });
   });
 
-  it("should authenticate user regarldess of their email's casing", async () => {
+  it("should authenticate user regardless of their email's casing", async () => {
     const user = await userFactory();
 
     const login = await request

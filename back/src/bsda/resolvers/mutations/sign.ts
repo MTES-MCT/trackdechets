@@ -22,6 +22,7 @@ import { machine } from "../../machine";
 import { getBsdaRepository } from "../../repository";
 import { runInTransaction } from "../../../common/repository/helper";
 import { validateBsda } from "../../validation";
+import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 
 type SignatureTypeInfos = {
   dbDateKey: keyof Bsda;
@@ -144,7 +145,7 @@ const signatureTypeMapping: Record<BsdaSignatureType, SignatureTypeInfos> = {
   TRANSPORT: {
     dbDateKey: "transporterTransportSignatureDate",
     dbAuthorKey: "transporterTransportSignatureAuthor",
-    getAuthorizedSiret: form => form.transporterCompanySiret
+    getAuthorizedSiret: form => getTransporterCompanyOrgId(form)
   }
 };
 
@@ -159,7 +160,7 @@ function checkAuthorization(
 
   return checkIsCompanyMember(
     { id: requestInfo.currentUserId },
-    { siret: signingCompanySiret }
+    { orgId: signingCompanySiret }
   );
 }
 

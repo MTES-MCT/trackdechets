@@ -99,12 +99,14 @@ export const client = async (
     }
 
     const fault = err.root?.Envelope?.Body?.Fault;
-    const faultMessage = getReadableErrorMsg(fault);
+    const faultMessage = getReadableErrorMsg(
+      fault ?? { faultstring: null, faultcode: null }
+    );
     // log the error to follow VIES service unavailibility
     logger.error(`VIES client error: ${faultMessage}`, err);
 
     // throws UserInputError when VIES client returns the error "INVALID_INPUT"
-    if (fault.faultstring === "INVALID_INPUT") {
+    if (fault?.faultstring === "INVALID_INPUT") {
       throw new UserInputError(faultMessage, {
         invalidArgs: ["clue"]
       });

@@ -6,6 +6,7 @@ import {
 import prisma from "../../../../prisma";
 import {
   formFactory,
+  formWithTempStorageFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -306,6 +307,66 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     });
 
     expect(updatedBsdd.wasteDetailsCode).toBe("01 03 08");
+  });
+
+  it("should update BSDD accordingly when there is a temporary storage", async () => {
+    const { company: ttr } = await userWithCompanyFactory("ADMIN");
+    const { company: exutoire } = await userWithCompanyFactory("ADMIN");
+    const { user, company: emitter } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsdd = await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: emitter.siret,
+        recipientCompanySiret: ttr.siret
+      },
+      forwardedInOpts: {
+        recipientCompanySiret: exutoire.siret,
+        processingOperationDone: "D 1",
+        processingOperationDescription: "Incinération"
+      }
+    });
+
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: exutoire.id,
+        approvals: { create: { approverSiret: emitter.siret } },
+        recipientCap: "TTR CAP",
+        processingOperationDone: "R 3",
+        quantityReceived: 50,
+        processingOperationDescription: "Recyclage",
+        temporaryStorageDestinationCap: "EXUTOIRE CAP",
+        temporaryStorageTemporaryStorerQuantityReceived: 40,
+        comment: "Changement opération"
+      }
+    });
+
+    await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">,
+      MutationSubmitFormRevisionRequestApprovalArgs
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    const updatedBsdd = await prisma.form.findUnique({
+      where: { id: bsdd.id },
+      include: { forwardedIn: true }
+    });
+
+    expect(updatedBsdd.recipientCap).toEqual("TTR CAP");
+    expect(updatedBsdd.forwardedIn.recipientCap).toEqual("EXUTOIRE CAP");
+    expect(updatedBsdd.quantityReceived).toEqual(40);
+    expect(updatedBsdd.forwardedIn.processingOperationDone).toBe("R 3");
+    expect(updatedBsdd.forwardedIn.processingOperationDescription).toBe(
+      "Recyclage"
+    );
+    expect(updatedBsdd.forwardedIn.wasteDetailsQuantity).toEqual(40);
+    expect(updatedBsdd.forwardedIn.quantityReceived).toBe(50);
   });
 
   it("should not edit bsdd when refused", async () => {

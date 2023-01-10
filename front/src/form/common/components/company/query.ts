@@ -3,6 +3,7 @@ import { gql } from "@apollo/client";
 export const FAVORITES = gql`
   query Favorites($siret: String!, $type: FavoriteType!) {
     favorites(siret: $siret, type: $type) {
+      orgId
       siret
       vatNumber
       name
@@ -37,9 +38,13 @@ export const FAVORITES = gql`
   }
 `;
 
+/**
+ * TODO Clean up query, barely used anymore
+ */
 export const COMPANY_INFOS = gql`
   query CompanyInfos($siret: String!, $clue: String) {
     companyInfos(siret: $siret, clue: $clue) {
+      orgId
       siret
       vatNumber
       name
@@ -90,6 +95,7 @@ export const COMPANY_INFOS = gql`
 export const SEARCH_COMPANIES = gql`
   query SearchCompanies($clue: String!, $department: String) {
     searchCompanies(clue: $clue, department: $department) {
+      orgId
       siret
       vatNumber
       name
@@ -141,6 +147,7 @@ export const SEARCH_COMPANIES = gql`
 export const COMPANY_PRIVATE_INFOS = gql`
   query CompanyPrivateInfos($clue: String!) {
     companyPrivateInfos(clue: $clue) {
+      orgId
       siret
       vatNumber
       name
@@ -183,6 +190,7 @@ export const COMPANY_PRIVATE_INFOS = gql`
 export const COMPANY_SELECTOR_PRIVATE_INFOS = gql`
   query CompanyPrivateInfos($clue: String!) {
     companyPrivateInfos(clue: $clue) {
+      orgId
       siret
       vatNumber
       etatAdministratif

@@ -1,17 +1,18 @@
 import { ValidationError } from "yup";
+import { siretify } from "../../__tests__/factories";
 import { validateBsdasri } from "../validation";
 
 import { initialData, readyToTakeOverData } from "./factories";
 
 describe("Mutation.signBsdasri emission", () => {
   it("should validate emission", async () => {
-    const dasri = initialData({ siret: 12312345600000, name: "emetteur" });
+    const dasri = initialData({ siret: siretify(1), name: "emetteur" });
     await validateBsdasri(dasri, { emissionSignature: true });
   });
 
   it("should validate transport", async () => {
     const dasri = readyToTakeOverData({
-      siret: 53075596600047,
+      siret: siretify(1),
       name: "transporteur"
     });
     await validateBsdasri(dasri, { transportSignature: true });
@@ -19,9 +20,9 @@ describe("Mutation.signBsdasri emission", () => {
 
   it("should validate emission and transport", async () => {
     const dasri = {
-      ...initialData({ siret: 12312345600000, name: "emetteur" }),
+      ...initialData({ siret: siretify(1), name: "emetteur" }),
       ...readyToTakeOverData({
-        siret: 53075596600047,
+        siret: siretify(2),
         name: "transporteur"
       })
     };
@@ -45,7 +46,7 @@ describe("Mutation.signBsdasri emission", () => {
   it("should not validate without recipisse when it's a foreign transport", async () => {
     const dasri = await readyToTakeOverData({
       opt: {
-        transporterCompanySiret: "12345678901234",
+        transporterCompanySiret: siretify(1),
         transporterCompanyName: "transporteur FR"
       }
     });

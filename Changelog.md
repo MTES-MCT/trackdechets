@@ -5,6 +5,39 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.1.1] 10/01/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Vérification des numéros de SIRET en entrée pour tous les types de bordereaux [PR 1928](https://github.com/MTES-MCT/trackdechets/pull/1928)
+- Vérification des numéros de TVA pour les transporteurs de tous les types de bordereaux (vérification si le format est valide et interdiction de tout numéro de TVA français) [PR 1947](https://github.com/MTES-MCT/trackdechets/pull/1947)
+- Implémentation du protocole OpenID [PR 2007](https://github.com/MTES-MCT/trackdechets/pull/2007)
+
+#### :bug: Corrections de bugs
+
+- Lorsqu'on duplique un BSDD, la destination ultérieure prévue ne devrait pas être dupliquée [PR 1961](https://github.com/MTES-MCT/trackdechets/pull/1961)
+- Le code de traitement en révision d'un BSDD avec entreposage provisoire doit s'appliquer sur le code de traitement final [PR 1977](https://github.com/MTES-MCT/trackdechets/pull/1977)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Les transporteurs peuvent désormais modifier la date de prise en charge pour les BSDD et BSVHU [PR 1962](https://github.com/MTES-MCT/trackdechets/pull/1962)
+- Ajout de rate limit sur certaines mutations [PR 1948](https://github.com/MTES-MCT/trackdechets/pull/1948)
+- Les destinataires des BSDD peuvent désormais choisir l'option R0 (réemploi/réutilisation) [PR 1971](https://github.com/MTES-MCT/trackdechets/pull/1971)
+- Limite les valeurs de poids à 40 tonnes lorsque le transport se fait par route et à 50 000 T tout mode de transport confondu [PR 1995](https://github.com/MTES-MCT/trackdechets/pull/1995)
+- Mise en place de captchas sur les opérations de connexion, renvoi d'email d'activation, réinitialisation de mot de passe[PR 1955](https://github.com/MTES-MCT/trackdechets/pull/1955)
+- Ajout de la possibilité en cas de BSDD avec entreposage provisoire de réviser :
+  - soit la quantité reçue sur l'installation d'entreposage provisoire, soit la quantité reçue sur l'installation de destination finale [PR 1977](https://github.com/MTES-MCT/trackdechets/pull/1977)
+  - soit le CAP de l'installation d'entreposage provisoire, soit le CAP de l'installation de destination finale [PR 1977](https://github.com/MTES-MCT/trackdechets/pull/1977)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Suppression des hashes d'activation [PR 1948](https://github.com/MTES-MCT/trackdechets/pull/1990)
+- Utilisation d'un proxy Sentry pour que les rapports d'erreur ne soient pas bloqués par les Ad blockers [PR 1993](https://github.com/MTES-MCT/trackdechets/pull/1993)
+
 # [2022.12.1] 13/12/2022
 
 #### :rocket: Nouvelles fonctionnalités

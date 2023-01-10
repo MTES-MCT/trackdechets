@@ -1,14 +1,13 @@
 import axios from "axios";
-import {  resetDatabase } from "../../../../integration-tests/helper";
+import { resetDatabase } from "../../../../integration-tests/helper";
 import prisma from "../../../prisma";
-import { companyFactory } from "../../../__tests__/factories";
+import { companyFactory, siretify } from "../../../__tests__/factories";
 import { setCompanyName } from "../set-company-name";
 
 jest.mock("axios");
 
 // Skip this test in a normal test run because it targets a function
 // that should be run only once in "npm run update"
-
 
 describe.skip("setCompanyName", () => {
   afterAll(async () => {
@@ -19,22 +18,23 @@ describe.skip("setCompanyName", () => {
   it("should set company name where it was not previously set", async () => {
     // Frontier, name is set
     const frontier = await companyFactory({
-      siret: "81343950200028",
+      siret: siretify(1),
       name: "Frontier SAS",
       securityCode: 1234
     });
 
     // LP, name is not set
     const lp = await companyFactory({
-      siret: "51212357100022",
+      siret: siretify(2),
       name: null
     });
     const resp1 = { status: 200, data: { name: "LP" } };
     (axios.get as jest.Mock).mockResolvedValueOnce(resp1);
 
+    const siret = siretify(6);
     // Code en stock, name is not set
     const codeEnStock = await companyFactory({
-      siret: "85001946400013",
+      siret,
       name: null
     });
     const resp2 = { status: 200, data: { name: "CODE EN STOCK" } };

@@ -1,3 +1,6 @@
+// Allow front and back usage
+import * as process from "process";
+
 import {
   checkVAT,
   andorra,
@@ -68,18 +71,59 @@ export const countries = [
   switzerland,
   unitedKingdom
 ];
+export const TEST_COMPANY_PREFIX = "000000";
+
+// support all environments front and back
+// process.env is not available in frontend JS and import.meta.env not available in node.js
+const ALLOW_TEST_COMPANY = process?.env?.ALLOW_TEST_COMPANY === "true";
+
+/**
+ * Implements the Luhn Algorithm used to validate SIRET or SIREN of identification numbers
+ */
+export const luhnCheck = (num: string | number, modulo = 10): boolean => {
+  const arr = (num + "")
+    .split("")
+    .reverse()
+    .map(x => parseInt(x, 10));
+  const lastDigit = arr.shift();
+  let sum = arr.reduce(
+    (acc, val, i) =>
+      i % 2 !== 0 ? acc + val : acc + ((val *= 2) > 9 ? val - 9 : val),
+    0
+  );
+  sum += lastDigit ?? 0;
+  return sum % modulo === 0;
+};
 
 /**
  * Validateur de numéro de SIRETs
+ * @param clue string to validate
+ * @param allowTestCompany For the frontend to pass ALLOW_TEST_COMPANY
+ * @returns
  */
-export const isSiret = (clue: string): boolean =>
-  !!clue && /^[0-9]{14}$/.test(clue.replace(/[\W_]+/g, ""));
+export const isSiret = (clue: string, allowTestCompany = false): boolean => {
+  if (!clue || !/^[0-9]{14}$/.test(clue) || /^0{14}$/.test(clue)) {
+    return false;
+  }
+  if (
+    (allowTestCompany || ALLOW_TEST_COMPANY) &&
+    clue.startsWith(TEST_COMPANY_PREFIX)
+  ) {
+    return true;
+  }
+  const luhnValid = luhnCheck(clue);
+  if (luhnValid) {
+    return true;
+  }
+  // try with "5" (default is 10) for La Poste Groupe SIRET
+  return luhnCheck(clue, 5);
+};
 
 /**
  * Validateur de numéro de TVA
  */
 export const isVat = (clue: string): boolean => {
-  if (!clue) return false;
+  if (!clue || !clue.length) return false;
   if (clue.match(/[\W_]/gim) !== null) return false;
   const cleanClue = clue.replace(/[\W_]+/g, "");
   if (!cleanClue) return false;
@@ -115,4 +159,17 @@ export const isOmi = (clue: string): boolean => {
   if (clue.match(/[\W_]/gim) !== null) return false;
   const clean = clue.replace(/[\W_]+/g, "");
   return clean.match(/^OMI[0-9]{7}$/gim) !== null;
+};
+
+/**
+ * Works with any BSD in order to provide a default orgId
+ */
+export const getTransporterCompanyOrgId = (form: {
+  transporterCompanySiret: string;
+  transporterCompanyVatNumber: string;
+}): string | null => {
+  if (!form) return null;
+  return form.transporterCompanySiret?.length
+    ? form.transporterCompanySiret
+    : form.transporterCompanyVatNumber;
 };

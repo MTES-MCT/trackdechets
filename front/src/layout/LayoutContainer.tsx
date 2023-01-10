@@ -16,6 +16,7 @@ import routes from "common/routes";
 import { useQuery, gql } from "@apollo/client";
 import { Query } from "../generated/graphql/types";
 import ResendActivationEmail from "login/ResendActivationEmail";
+import Login from "login/Login";
 
 const Admin = lazy(() => import("admin/Admin"));
 const Dashboard = lazy(() => import("dashboard/Dashboard"));
@@ -33,9 +34,9 @@ const WasteSelector = lazy(() => import("login/WasteSelector"));
 const Invite = lazy(() => import("login/Invite"));
 const PasswordResetRequest = lazy(() => import("login/PasswordResetRequest"));
 const PasswordReset = lazy(() => import("login/PasswordReset"));
-const Login = lazy(() => import("login/Login"));
 const Signup = lazy(() => import("login/Signup"));
-const Dialog = lazy(() => import("oauth2/Dialog"));
+const OauthDialog = lazy(() => import("oauth/Oauth2Dialog"));
+const OidcDialog = lazy(() => import("oauth/OidcDialog"));
 const Company = lazy(() => import("company/Company"));
 const WasteTree = lazy(() => import("search/WasteTree"));
 
@@ -46,6 +47,7 @@ const GET_ME = gql`
       email
       isAdmin
       companies {
+        orgId
         siret
       }
     }
@@ -87,9 +89,15 @@ export default withRouter(function LayoutContainer({ history }) {
           path="/oauth2/authorize/dialog"
           isAuthenticated={isAuthenticated}
         >
-          <Dialog />
+          <OauthDialog />
         </PrivateRoute>
-
+        <PrivateRoute
+          exact
+          path="/oidc/authorize/dialog"
+          isAuthenticated={isAuthenticated}
+        >
+          <OidcDialog />
+        </PrivateRoute>
         <Route>
           <Layout isAuthenticated={isAuthenticated} isAdmin={isAdmin}>
             <Switch>
@@ -265,7 +273,7 @@ export default withRouter(function LayoutContainer({ history }) {
                   data
                     ? data.me.companies.length > 0
                       ? generatePath(routes.dashboard.index, {
-                          siret: data.me.companies[0].siret,
+                          siret: data.me.companies[0].orgId,
                         })
                       : routes.account.companies.list
                     : routes.login

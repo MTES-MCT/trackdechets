@@ -6,6 +6,7 @@ import { generateBsddPdfToBase64 } from "../pdf";
 import DREALS from "../../common/constants/DREALS";
 import { formNotAccepted, formPartiallyRefused } from "../../mailer/templates";
 import { renderMail } from "../../mailer/templates/renderers";
+import { getTransporterCompanyOrgId } from "../../common/constants/companySearchHelpers";
 
 const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
@@ -98,7 +99,7 @@ export async function renderFormRefusedEmail(
               transporterIsExemptedOfReceipt:
                 forwardedIn.transporterIsExemptedOfReceipt,
               transporterCompanyName: forwardedIn.transporterCompanyName,
-              transporterCompanySiret: forwardedIn.transporterCompanySiret,
+              transporterCompanySiret: getTransporterCompanyOrgId(forwardedIn),
               transporterReceipt: forwardedIn.transporterReceipt,
               sentBy: forwardedIn.sentBy,
               quantityReceived: forwardedIn.quantityReceived
@@ -111,7 +112,7 @@ export async function renderFormRefusedEmail(
               transporterIsExemptedOfReceipt:
                 form.transporterIsExemptedOfReceipt,
               transporterCompanyName: form.transporterCompanyName,
-              transporterCompanySiret: form.transporterCompanySiret,
+              transporterCompanySiret: getTransporterCompanyOrgId(form),
               transporterReceipt: form.transporterReceipt,
               sentBy: form.sentBy,
               quantityReceived: form.quantityReceived

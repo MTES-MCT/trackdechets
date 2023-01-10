@@ -3,20 +3,20 @@ import { CompanyPrivate } from "generated/graphql/types";
 import { sortCompaniesByName } from "common/helper";
 
 interface IProps {
-  siret: string;
+  orgId: string;
   companies: CompanyPrivate[];
-  handleCompanyChange: (siret: string) => void;
+  handleCompanyChange: (orgId: string) => void;
 }
 
 export const SIRET_STORAGE_KEY = "td-selectedSiret";
 
 export default function DashboardCompanySelector({
-  siret,
+  orgId,
   companies,
   handleCompanyChange,
 }: IProps) {
-  const handleChange = (siret: string) => {
-    handleCompanyChange(siret);
+  const handleChange = (orgId: string) => {
+    handleCompanyChange(orgId);
   };
 
   const sortedCompanies = sortCompaniesByName(companies);
@@ -24,12 +24,12 @@ export default function DashboardCompanySelector({
   return (
     <select
       className="td-select"
-      value={siret}
+      value={orgId}
       onChange={e => handleChange(e.target.value)}
     >
       {sortedCompanies.map(c => (
-        <option key={c.siret} value={c.siret}>
-          {c.givenName || c.name} ({c.siret ?? c.vatNumber})
+        <option key={c.orgId} value={c.orgId}>
+          {c.givenName || c.name} ({c.orgId})
         </option>
       ))}
     </select>

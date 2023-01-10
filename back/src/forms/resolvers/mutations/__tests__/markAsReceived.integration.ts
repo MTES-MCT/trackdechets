@@ -7,6 +7,7 @@ import {
   companyFactory,
   formFactory,
   formWithTempStorageFactory,
+  siretify,
   transportSegmentFactory,
   userFactory,
   userWithCompanyFactory
@@ -53,7 +54,7 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: "5678" }
+      data: { currentTransporterSiret: siretify(3) }
     });
     await prepareRedis({
       emitterCompany,
@@ -99,7 +100,7 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: "5678" }
+      data: { currentTransporterSiret: siretify(3) }
     });
     await prepareRedis({
       emitterCompany,
@@ -376,11 +377,11 @@ describe("Test Form reception", () => {
       emitterCompany,
       recipientCompany
     });
-    const randomUserCompany = await companyFactory({ siret: "9999999" }); // this user does not belong to the form
+    const randomUserCompany = await companyFactory({ siret: siretify(2) }); // this user does not belong to the form
     const randomUser = await userFactory({
       companyAssociations: {
         create: {
-          company: { connect: { siret: randomUserCompany.siret } },
+          company: { connect: { id: randomUserCompany.id } },
           role: "ADMIN" as UserRole
         }
       }
@@ -418,14 +419,14 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: "5678" }
+      data: { currentTransporterSiret: siretify(3) }
     });
 
     // a taken over segment
     await transportSegmentFactory({
       formId: form.id,
       segmentPayload: {
-        transporterCompanySiret: "98765",
+        transporterCompanySiret: siretify(2),
         readyToTakeOver: true,
         takenOverAt: new Date("2020-01-01"),
         takenOverBy: "Jason Statham"
@@ -478,14 +479,14 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: "5678" }
+      data: { currentTransporterSiret: siretify(3) }
     });
 
     // a taken over segment
     await transportSegmentFactory({
       formId: form.id,
       segmentPayload: {
-        transporterCompanySiret: "98765",
+        transporterCompanySiret: siretify(3),
         readyToTakeOver: true,
         takenOverAt: new Date("2020-01-01"),
         takenOverBy: "Jason Statham"
@@ -495,7 +496,10 @@ describe("Test Form reception", () => {
     // this segment has not been taken over yet
     const staleSegment = await transportSegmentFactory({
       formId: form.id,
-      segmentPayload: { transporterCompanySiret: "7777", readyToTakeOver: true }
+      segmentPayload: {
+        transporterCompanySiret: siretify(4),
+        readyToTakeOver: true
+      }
     });
     await prepareRedis({
       emitterCompany,
@@ -720,6 +724,40 @@ describe("Test Form reception", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message: "Vous n'êtes pas autorisé à réceptionner ce bordereau"
+      })
+    ]);
+  });
+
+  it("should throw an error if transport mode is road and quantity accepted > 40T", async () => {
+    const { emitterCompany, recipient, recipientCompany, form } =
+      await prepareDB();
+
+    expect(form.transporterTransportMode).toEqual("ROAD");
+
+    await prepareRedis({
+      emitterCompany,
+      recipientCompany
+    });
+
+    const { mutate } = makeClient(recipient);
+
+    const { errors } = await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Bill",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          signedAt: "2019-01-17T10:22:00+0100",
+          wasteAcceptationStatus: "ACCEPTED",
+          quantityReceived: 50
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Réception : le poids doit être inférieur à 40 tonnes lorsque le transport se fait par la route"
       })
     ]);
   });

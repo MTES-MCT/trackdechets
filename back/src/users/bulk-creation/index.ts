@@ -155,6 +155,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
       console.info(`Create company ${company.siret}`);
       await prisma.company.create({
         data: {
+          orgId: company.siret,
           siret: company.siret,
           verificationStatus: CompanyVerificationStatus.VERIFIED,
           verificationMode: CompanyVerificationMode.MANUAL,

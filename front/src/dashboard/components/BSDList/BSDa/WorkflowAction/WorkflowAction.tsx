@@ -27,7 +27,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       if (
         form.emitter?.isPrivateIndividual &&
         form.worker?.isDisabled &&
-        siret === form.transporter?.company?.siret
+        siret === form.transporter?.company?.orgId
       ) {
         return <SignTransport {...props} bsdaId={form.id} />;
       }
@@ -46,7 +46,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
         form["bsdaType"] === "RESHIPMENT" ||
         form.worker?.isDisabled
       ) {
-        return siret === form.transporter?.company?.siret ? (
+        return siret === form.transporter?.company?.orgId ? (
           <SignTransport {...props} bsdaId={form.id} />
         ) : null;
       }
@@ -54,7 +54,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return <SignWork {...props} bsdaId={form.id} />;
 
     case BsdaStatus.SignedByWorker:
-      if (siret !== form.transporter?.company?.siret) return null;
+      if (siret !== form.transporter?.company?.orgId) return null;
       return <SignTransport {...props} bsdaId={form.id} />;
 
     case BsdaStatus.Sent:

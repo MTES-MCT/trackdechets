@@ -1,4 +1,12 @@
+@import "../../scss/Buttons.scss";
+
+.ActionButton {
+  @extend .btn;
+}
+
 .ActionButtonSmall {
+  @extend .btn;
+
   display: inline-flex;
   flex-direction: column;
   height: auto;

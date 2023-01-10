@@ -13,6 +13,7 @@ import { AlreadySignedError, InvalidSignatureError } from "../../errors";
 import { machine } from "../../machine";
 import { validateBsvhu } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
+import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 
 type SignatureTypeInfos = {
   dbDateKey: keyof Bsvhu;
@@ -92,7 +93,7 @@ const signatureTypeMapping: Record<SignatureTypeInput, SignatureTypeInfos> = {
   TRANSPORT: {
     dbDateKey: "transporterTransportSignatureDate",
     dbAuthorKey: "transporterTransportSignatureAuthor",
-    getAuthorizedSiret: form => form.transporterCompanySiret
+    getAuthorizedSiret: form => getTransporterCompanyOrgId(form)
   }
 };
 
@@ -107,6 +108,6 @@ function checkAuthorization(
 
   return checkIsCompanyMember(
     { id: requestInfo.curretUserId },
-    { siret: signingCompanySiret }
+    { orgId: signingCompanySiret }
   );
 }

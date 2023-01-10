@@ -1,4 +1,4 @@
-enum ProcessingOperationType {
+export enum ProcessingOperationType {
   Eliminiation = "ELIMINIATION",
   Valorisation = "VALORISATION",
   Groupement = "GROUPEMENT"

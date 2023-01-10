@@ -1,6 +1,9 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { bsdasriFactory } from "../../../__tests__/factories";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  siretify,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
 import { ErrorCode } from "../../../../common/errors";
@@ -32,7 +35,7 @@ describe("Mutation.updateBsdasri", () => {
     const toRegroup = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.AWAITING_GROUP,
-        emitterCompanySiret: "1234",
+        emitterCompanySiret: siretify(1),
         destinationCompanySiret: company.siret,
         destinationOperationCode: "R1"
       }
@@ -155,11 +158,11 @@ describe("Mutation.updateBsdasri", () => {
         set: ["COLLECTOR"]
       }
     });
-
+    const emitterCompanySiret = siretify(1);
     const regrouped = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.AWAITING_GROUP,
-        emitterCompanySiret: "1234",
+        emitterCompanySiret,
         destinationCompanySiret: company.siret,
         destinationOperationCode: "R12"
       }
@@ -176,7 +179,7 @@ describe("Mutation.updateBsdasri", () => {
     const toRegroup = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.AWAITING_GROUP,
-        emitterCompanySiret: "1234",
+        emitterCompanySiret,
         destinationCompanySiret: company.siret,
         destinationOperationCode: "R12"
       }

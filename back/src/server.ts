@@ -37,11 +37,13 @@ import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
 import { oauth2Router } from "./routers/oauth2-router";
+import { oidcRouter } from "./routers/oidc-router";
 import { roadControlPdfHandler } from "./routers/roadControlPdfRouter";
 import { resolvers, typeDefs } from "./schema";
 import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
+import { captchaGen, captchaSound } from "./captcha/captchaGen";
 
 const {
   SESSION_SECRET,
@@ -170,18 +172,12 @@ app.use(json());
 app.use(graphQLPath, graphqlBodyParser);
 app.use(graphQLPath, graphqlQueryParserMiddleware());
 app.use(graphQLPath, graphqlBatchLimiterMiddleware());
-app.use(
-  graphQLPath,
-  graphqlRateLimiterMiddleware("resendInvitation", {
-    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
-    maxRequestsPerWindow: 10 // 10 requests each 3 minutes
-  })
-);
+
 app.use(
   graphQLPath,
   graphqlRateLimiterMiddleware("createPasswordResetRequest", {
     windowMs: RATE_LIMIT_WINDOW_SECONDS * 1000,
-    maxRequestsPerWindow: 1
+    maxRequestsPerWindow: 3 // 3 requests each minute (captcha)
   })
 );
 
@@ -238,12 +234,48 @@ app.use(graphQLPath, graphqlRegenerateSessionMiddleware("changePassword"));
 // authentification routes used by td-ui (/login /logout, /isAuthenticated)
 app.use(authRouter);
 app.use(oauth2Router);
+app.use(oidcRouter);
 
 const USERS_BLACKLIST_ENV = process.env.USERS_BLACKLIST;
 let blacklist = [];
 if (USERS_BLACKLIST_ENV?.length > 0) {
   blacklist = USERS_BLACKLIST_ENV.split(",");
 }
+
+// The following  middlewares use email to generate rate limit redis key and therefore
+// must stay after passport initialization to ensure req.user.email is available
+
+// Hacker might massively create apps or tokens to annoy us or exhaust our db
+app.use(
+  graphQLPath,
+  graphqlRateLimiterMiddleware("createApplication", {
+    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+    maxRequestsPerWindow: 3 // 3 requests each 3 minutes
+  })
+);
+app.use(
+  graphQLPath,
+  graphqlRateLimiterMiddleware("createAccessToken", {
+    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+    maxRequestsPerWindow: 3 // 3 requests each 3 minutes
+  })
+);
+// Hacker might massively invite or reinvite users to spam them
+app.use(
+  graphQLPath,
+  graphqlRateLimiterMiddleware("inviteUserToCompany", {
+    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+    maxRequestsPerWindow: 10 // 10 requests each 3 minutes
+  })
+);
+
+app.use(
+  graphQLPath,
+  graphqlRateLimiterMiddleware("resendInvitation", {
+    windowMs: RATE_LIMIT_WINDOW_SECONDS * 3 * 1000,
+    maxRequestsPerWindow: 10 // 10 requests each 3 minutes
+  })
+);
 
 app.use((req, res, next) => {
   if (req.user && blacklist.includes(req.user.email)) {
@@ -258,6 +290,11 @@ app.get("/ip", (req, res) => {
   return res.send(`IP: ${req.ip} | XFF: ${req.get("X-Forwarded-For")}`);
 });
 
+app.get("/captcha", (_, res) => captchaGen(res));
+
+app.get("/captcha-audio/:tokenId", (req, res) => {
+  captchaSound(req.params.tokenId, res);
+});
 app.get("/userActivation", userActivationHandler);
 app.get("/download", downloadRouter);
 

@@ -579,9 +579,11 @@ async function indexAllBsds(
   }
   if (useQueue && jobs.length) {
     logger.info(`Waiting for all ${jobs.length} jobs in queue to finish`);
-    await Promise.all(
-      jobs.map(async job => {
-        await job.finished();
+    // returned promise fulfills when all of the input's promises settle (resolved or rejected)
+    await Promise.allSettled(
+      jobs.map(job => {
+        // Returns a promise that resolves or rejects when the job completes or fails.
+        job.finished();
       })
     );
   }

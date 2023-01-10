@@ -4,12 +4,13 @@ import {
   CompanyType,
   CompanyVerificationStatus
 } from "@prisma/client";
-import {
-  INVALID_SIRET_LENGTH,
-  MISSING_COMPANY_SIRET_OR_VAT
-} from "../forms/errors";
+import { MISSING_COMPANY_SIRET_OR_VAT } from "../forms/errors";
 import prisma from "../prisma";
-import { isFRVat, isSiret } from "../common/constants/companySearchHelpers";
+import {
+  isForeignVat,
+  isFRVat,
+  isSiret
+} from "../common/constants/companySearchHelpers";
 
 export const receiptSchema = yup.object().shape({
   validityLimit: yup.date().required()
@@ -36,9 +37,11 @@ const { VERIFY_COMPANY } = process.env;
 export const destinationCompanySiretSchema = yup
   .string()
   .ensure()
-  .matches(/^$|^\d{14}$/, {
-    message: `Destinataire: ${INVALID_SIRET_LENGTH}`
-  })
+  .test(
+    "is-siret",
+    "Destination: ${originalValue} n'est pas un numéro de SIRET valide",
+    value => !value || isSiret(value)
+  )
   .test(
     "is-recipient-registered-with-right-profile",
     ({ value }) =>
@@ -109,20 +112,35 @@ export const transporterCompanySiretSchema = (isDraft: boolean) =>
         return true;
       }
     )
+    .test(
+      "is-siret",
+      "Transporteur : ${originalValue} n'est pas un numéro de SIRET valide",
+      value => !value || isSiret(value)
+    )
     .when("transporterCompanyVatNumber", (tva, schema) => {
-      if (!tva && !isDraft) {
-        return schema
-          .required(`Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`)
-          .test(
-            "is-siret",
-            "${path} n'est pas un numéro de SIRET valide",
-            value => isSiret(value)
-          );
-      }
-      if (!isDraft && tva && isFRVat(tva)) {
+      if ((!tva || !isForeignVat(tva)) && !isDraft) {
         return schema.required(
-          "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
+          `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`
         );
       }
       return schema.nullable().notRequired();
     });
+
+export const transporterCompanyVatNumberSchema = yup
+  .string()
+  .ensure()
+  .test(
+    "is-foreign-vat",
+    "Transporteur: ${originalValue} n'est pas un numéro de TVA étranger valide",
+    (value, testContext) => {
+      if (!value) return true;
+      else if (isFRVat(value)) {
+        return testContext.createError({
+          message:
+            "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
+        });
+      } else if (isForeignVat(value)) {
+        return true;
+      }
+    }
+  );

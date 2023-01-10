@@ -89,7 +89,7 @@ Si la requête échoue à cause d'un paramètre invalide, une erreur est retourn
   - `code={code}` code reçu à l'étape précédente
   - `redirect_uri={redirect_uri}` URL de redirection spécifié à l'étape (A)
 
-La requête doit être authentifiée avec avec le `client_id` et `client_secret` ([méthode basique](https://fr.wikipedia.org/wiki/Authentification_HTTP#M%C3%A9thode_%C2%AB_Basic_%C2%BB)).
+La requête doit être authentifiée avec le `client_id` et `client_secret` ([méthode basique](https://fr.wikipedia.org/wiki/Authentification_HTTP#M%C3%A9thode_%C2%AB_Basic_%C2%BB)).
 
 ```
 POST /oauth2/token HTTP/1.1
@@ -126,5 +126,5 @@ Vous pouvez ensuite stocker ce token et l'utiliser pour accéder aux ressources 
 Si la requête échoue, le serveur répond par un message d'erreur tel que décrit [ici](https://tools.ietf.org/html/rfc6749#section-5.2)
 
 :::tip
-Une application OAuth2 de démonstration a été créee à l'adresse [https://td-oauth2-demo.osc-fr1.scalingo.io/](https://td-oauth2-demo.osc-fr1.scalingo.io/)
+Une application OAuth2 de démonstration a été créée à l'adresse [https://td-oauth2-demo.osc-fr1.scalingo.io/](https://td-oauth2-demo.osc-fr1.scalingo.io/)
 :::

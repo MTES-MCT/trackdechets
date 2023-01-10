@@ -2,15 +2,13 @@ import React from "react";
 import { IconCheckCircle1 } from "common/components/Icons";
 import Loader from "../common/components/Loaders";
 import styles from "./Dialog.module.scss";
-import { useOAuth2, AuthorizePayload } from "./use-oauth2";
+import { useOIDC, AuthorizePayload } from "./use-oidc";
 
-export default function Dialog() {
+export default function OidcDialog() {
   const { VITE_API_ENDPOINT } = import.meta.env;
+  const { loading, error, authorizePayload } = useOIDC();
 
-  const { loading, error, authorizePayload } = useOAuth2();
-
-  const authorizeDecisionUrl = `${VITE_API_ENDPOINT}/oauth2/authorize/decision`;
-
+  const authorizeDecisionUrl = `${VITE_API_ENDPOINT}/oidc/authorize/decision`;
   if (loading) {
     return <Loader />;
   }
@@ -18,7 +16,6 @@ export default function Dialog() {
   if (error) {
     return <div>{error}</div>;
   }
-
   const { transactionID, redirectURI, client, user } =
     authorizePayload as AuthorizePayload;
 
@@ -33,18 +30,15 @@ export default function Dialog() {
         <IconCheckCircle1 size="40px" />
         <img src="/trackdechets.png" alt="trackdechets" width="100px" />
       </div>
-      <h4 className="text-center">Autoriser {client.name}</h4>
+      <h4 className="text-center">S'identifier sur {client.name}</h4>
       <div className="panel tw-mt-2">
         <p className="text-center">
           {user.name}, l'application {client.name} souhaite accéder à votre
-          compte Trackdéchets.
+          compte Trackdéchets pour vous authentifier.
         </p>
         <p className="text-center notification success tw-mt-2">
-          L'application aura accès à tous les établissements dont vous faites
-          partie et sera en mesure de créer et signer des bordereaux de suivi de
-          déchets à votre place. Vous pourrez révoquer cet accès à tout moment
-          depuis Mon Compte {">"} Paramètres du compte {">"} Applications
-          autorisées
+          L'application pourra avoir accès en lecture à votre nom, email et aux
+          entreprises dont vous êtes membre.
         </p>
         <div className={styles.hr} />
         <form className="tw-mt-5" action={authorizeDecisionUrl} method="post">

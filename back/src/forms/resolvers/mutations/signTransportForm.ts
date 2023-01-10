@@ -12,13 +12,14 @@ import { EventType } from "../../workflow/types";
 import { checkCanSignFor } from "../../permissions";
 import { expandFormFromDb } from "../../converter";
 import { getFormRepository } from "../../repository";
+import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 
 /**
  * Common function for signing
  */
 const signedByTransporterFn = async (user, args, existingForm) => {
   await checkCanSignFor(
-    existingForm.transporterCompanySiret,
+    getTransporterCompanyOrgId(existingForm),
     user,
     args.securityCode
   );
@@ -28,7 +29,7 @@ const signedByTransporterFn = async (user, args, existingForm) => {
     transporterNumberPlate:
       args.input.transporterNumberPlate ?? existingForm.transporterNumberPlate,
 
-    currentTransporterSiret: existingForm.transporterCompanySiret,
+    currentTransporterSiret: getTransporterCompanyOrgId(existingForm),
 
     // The following fields are deprecated
     // but we need to fill them until we remove them completely
@@ -81,7 +82,7 @@ const signatures: Partial<
     const existingFullForm = await getFullForm(existingForm);
 
     await checkCanSignFor(
-      existingFullForm.forwardedIn.transporterCompanySiret,
+      getTransporterCompanyOrgId(existingFullForm.forwardedIn),
       user,
       args.securityCode
     );

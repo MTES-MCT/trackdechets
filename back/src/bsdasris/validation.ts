@@ -1,5 +1,8 @@
 import { WasteAcceptationStatus, Prisma, BsdasriType } from "@prisma/client";
-import { isCollector } from "../companies/validation";
+import {
+  isCollector,
+  transporterCompanyVatNumberSchema
+} from "../companies/validation";
 import * as yup from "yup";
 import {
   DASRI_WASTE_CODES,
@@ -14,14 +17,14 @@ import {
   BsdasriSignatureType
 } from "../generated/graphql/types";
 import {
-  isVat,
-  isSiret,
-  isFRVat
+  isForeignVat,
+  isSiret
 } from "../common/constants/companySearchHelpers";
 import {
   MISSING_COMPANY_SIRET,
   MISSING_COMPANY_SIRET_OR_VAT
 } from "../forms/errors";
+import { weight, weightConditions, WeightUnits } from "../common/validation";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
 
@@ -120,8 +123,6 @@ const MISSING_COMPANY_ADDRESS = "L'adresse de l'entreprise est obligatoire";
 const MISSING_COMPANY_CONTACT = "Le contact dans l'entreprise est obligatoire";
 const MISSING_COMPANY_PHONE = "Le téléphone de l'entreprise est obligatoire";
 
-const INVALID_SIRET_LENGTH = "Le SIRET doit faire 14 caractères numériques";
-
 const INVALID_DASRI_WASTE_CODE =
   "Ce code déchet n'est pas autorisé pour les DASRI";
 const INVALID_PROCESSING_OPERATION =
@@ -137,7 +138,11 @@ export const emitterSchema: FactorySchemaOf<BsdasriValidationContext, Emitter> =
       ),
       emitterCompanySiret: yup
         .string()
-        .length(14, `Émetteur: ${INVALID_SIRET_LENGTH}`)
+        .test(
+          "is-siret",
+          "Émetteur: ${originalValue} n'est pas un numéro de SIRET valide",
+          value => !value || isSiret(value)
+        )
         .requiredIf(
           // field copied from transporter returning an error message would be confusing
           context.emissionSignature && !context?.isSynthesis,
@@ -226,19 +231,20 @@ export const emissionSchema: FactorySchemaOf<
       .string()
       .ensure()
       .requiredIf(context.emissionSignature, `La mention ADR est obligatoire.`),
-
-    emitterWasteWeightValue: yup
-      .number()
-      .nullable()
-      .test(
-        "emission-quantity-required-if-type-is-provided",
-        "Le poids de déchets émis en kg est obligatoire si vous renseignez le type de pesée",
-        function (value) {
-          return !!this.parent.emitterWasteWeightIsEstimate ? !!value : true;
-        }
+    emitterWasteWeightValue: weight(WeightUnits.Kilogramme)
+      .label("Déchet")
+      .when("emitterWasteWeightIsEstimate", {
+        is: value => !!value,
+        then: schema =>
+          schema.required(
+            "Le poids de déchets émis en kg est obligatoire si vous renseignez le type de pesée"
+          )
+      })
+      .when(
+        ["transporterTransportMode", "createdAt"],
+        weightConditions.transportMode(WeightUnits.Kilogramme)
       )
-      .min(0.1, "Le poids de déchet émis doit être supérieur à 0"),
-
+      .positive("Le poids de déchet émis doit être supérieur à 0"),
     emitterWasteWeightIsEstimate: yup
       .boolean()
       .nullable()
@@ -278,6 +284,11 @@ export const ecoOrganismeSchema: FactorySchemaOf<
       .notRequired()
       .nullable()
       .test(
+        "is-siret",
+        "Éco-organisme: ${originalValue} n'est pas un numéro de SIRET valide",
+        value => !value || isSiret(value)
+      )
+      .test(
         "is-known-bsdasri-eco-organisme",
         "L'éco-organisme avec le siret \"${value}\" n'est pas reconnu ou n'est pas autorisé à gérer des dasris.",
         ecoOrganismeSiret =>
@@ -309,30 +320,20 @@ export const transporterSchema: FactorySchemaOf<
       .string()
       .ensure()
       .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva && context.transportSignature) {
-          return schema
-            .required(`Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`)
-            .test(
-              "is-siret",
-              "${path} n'est pas un numéro de SIRET valide",
-              value => isSiret(value)
-            );
-        }
-        if (context.transportSignature && tva && isFRVat(tva)) {
-          return schema.required(
-            "Transporteur : Le numéro SIRET est obligatoire pour un établissement français"
+        if (!tva || !isForeignVat(tva)) {
+          return schema.requiredIf(
+            context.transportSignature,
+            `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`
           );
         }
         return schema.nullable().notRequired();
-      }),
-    transporterCompanyVatNumber: yup
-      .string()
-      .ensure()
+      })
       .test(
-        "is-vat",
-        "${path} n'est pas un numéro de TVA intracommunautaire valide",
-        value => !value || isVat(value)
+        "is-siret",
+        "Transporteur : ${originalValue} n'est pas un numéro de SIRET valide",
+        value => !value || isSiret(value)
       ),
+    transporterCompanyVatNumber: transporterCompanyVatNumberSchema,
     transporterCompanyAddress: yup
       .string()
       .ensure()
@@ -359,7 +360,7 @@ export const transporterSchema: FactorySchemaOf<
       .string()
       .ensure()
       .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva) {
+        if (!tva || !isForeignVat(tva)) {
           return schema.requiredIf(
             context.transportSignature,
             `Transporteur: le numéro de récépissé est obligatoire`
@@ -372,25 +373,25 @@ export const transporterSchema: FactorySchemaOf<
       .string()
       .ensure()
       .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva) {
+        if (!tva || !isForeignVat(tva)) {
           return schema.requiredIf(
             context.transportSignature,
             `Transporteur: le département associé au récépissé est obligatoire`
           );
         }
-        return schema.notRequired();
+        return schema.nullable().notRequired();
       }),
 
     transporterRecepisseValidityLimit: yup
       .date()
       .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva) {
+        if (!tva || !isForeignVat(tva)) {
           return schema.requiredIf(
             context.transportSignature || requiredForSynthesis,
             "La date de validité du récépissé est obligatoire"
           );
         }
-        return schema.notRequired();
+        return schema.nullable().notRequired();
       })
   });
 };
@@ -452,26 +453,20 @@ export const transportSchema: FactorySchemaOf<
                 )
         )
     }),
-
-    transporterWasteWeightValue: yup
-      .number()
-      .nullable()
-
-      .test(
-        "transport-quantity-required-if-type-is-provided",
-        "Le poids de déchets transportés en kg est obligatoire si vous renseignez le type de pesée",
-        function (value) {
-          return !!this.parent.transporterWasteWeightIsEstimate
-            ? ![null, undefined].includes(value)
-            : true;
-        }
+    transporterWasteWeightValue: weight(WeightUnits.Kilogramme)
+      .label("Transporteur")
+      .when("transporterWasteWeightIsEstimate", {
+        is: value => !!value,
+        then: schema =>
+          schema.required(
+            "Le poids de déchets transportés en kg est obligatoire si vous renseignez le type de pesée"
+          )
+      })
+      .when(
+        ["transporterTransportMode", "createdAt"],
+        weightConditions.transportMode(WeightUnits.Kilogramme)
       )
-      .test(
-        "transport-quantity-strictly-positive",
-        "Le poids de déchets transportés doit être supérieur à 0",
-        v => ([null, undefined].includes(v) ? true : v > 0)
-      ),
-
+      .positive("Le poids de déchets transportés doit être supérieur à 0"),
     transporterWasteWeightIsEstimate: yup
       .boolean()
       .nullable()
@@ -529,8 +524,11 @@ export const recipientSchema: FactorySchemaOf<
       ),
     destinationCompanySiret: yup
       .string()
-      .length(14, `Destinataire: ${INVALID_SIRET_LENGTH}`)
-
+      .test(
+        "is-siret",
+        "Destination : ${originalValue} n'est pas un numéro de SIRET valide",
+        value => !value || isSiret(value)
+      )
       .requiredIf(
         context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_SIRET}`
@@ -635,8 +633,8 @@ export const operationSchema: FactorySchemaOf<
     : DASRI_ALL_OPERATIONS_CODES;
 
   return yup.object({
-    destinationReceptionWasteWeightValue: yup
-      .number()
+    destinationReceptionWasteWeightValue: weight(WeightUnits.Kilogramme)
+      .label("Destination")
       .test(
         "operation-quantity-required-if-final-processing-operation",
         "Le poids du déchet traité en kg est obligatoire si le code correspond à un traitement final",
@@ -652,8 +650,12 @@ export const operationSchema: FactorySchemaOf<
             : true;
         }
       )
-      .nullable()
-      .min(0, "Le poids doit être supérieur à 0"),
+      .when(
+        "transporterTransportMode",
+        weightConditions.transportMode(WeightUnits.Kilogramme)
+      )
+      .positive("Le poids doit être supérieur à 0"),
+
     destinationOperationCode: yup
       .string()
       .label("Opération d’élimination / valorisation")

@@ -52,7 +52,6 @@ describe("publishBsff", () => {
           "Le code de l'opération de traitement prévu est requis\n" +
           "Transporteur : le nom de l'établissement est requis\n" +
           "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire\n" +
-          "transporterCompanySiret n'est pas un numéro de SIRET valide\n" +
           "Transporteur : l'adresse de l'établissement est requise\n" +
           "Transporteur : le nom du contact est requis\n" +
           "Transporteur : le numéro de téléphone est requis\n" +

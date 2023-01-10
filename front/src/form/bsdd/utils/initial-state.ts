@@ -10,6 +10,7 @@ import {
   Trader,
   Broker,
   WorkSite,
+  TransportMode,
 } from "generated/graphql/types";
 
 /**
@@ -44,6 +45,7 @@ export function getInitialBroker(broker?: Broker | null) {
  */
 export function getInitialCompany(company?: FormCompany | null) {
   return {
+    orgId: company?.orgId ?? "",
     siret: company?.siret ?? "",
     name: company?.name ?? "",
     address: company?.address ?? "",
@@ -104,6 +106,7 @@ export function getInitialEcoOrganisme(ecoOrganisme?: FormEcoOrganisme | null) {
 export function getInitialIntermediaries(intermediaries?: FormCompany[]) {
   return intermediaries
     ? intermediaries.map(company => ({
+        orgId: company?.orgId ?? "",
         siret: company?.siret ?? "",
         name: company?.name ?? "",
         address: company?.address ?? "",
@@ -149,7 +152,7 @@ export function getInitialState(f?: Form | null): FormInput {
       numberPlate: f?.transporter?.numberPlate ?? "",
       customInfo: f?.transporter?.customInfo ?? null,
       company: getInitialCompany(f?.transporter?.company),
-      mode: f?.transporter?.mode,
+      mode: f?.transporter?.mode ?? TransportMode.Road,
     },
     trader: f?.trader
       ? {

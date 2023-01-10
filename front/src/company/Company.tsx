@@ -11,10 +11,11 @@ import CompanyRegistration from "./CompanyRegistration";
 import { Query, QueryCompanyInfosArgs } from "generated/graphql/types";
 
 const COMPANY_INFOS = gql`
-  query CompanyInfos($siret: String!) {
-    companyInfos(siret: $siret) {
+  query CompanyInfos($clue: String!) {
+    companyInfos(clue: $clue) {
       siret
       vatNumber
+      orgId
       name
       address
       naf
@@ -50,12 +51,12 @@ interface GeoInfo {
 }
 
 export default function CompanyInfo() {
-  const { siret } = useParams<{ siret: string }>();
+  const { orgId } = useParams<{ orgId: string }>();
   const { data, loading, error } = useQuery<
     Pick<Query, "companyInfos">,
     QueryCompanyInfosArgs
   >(COMPANY_INFOS, {
-    variables: { siret },
+    variables: { clue: orgId },
     fetchPolicy: "no-cache",
   });
 
@@ -110,7 +111,7 @@ export default function CompanyInfo() {
         <div className="container">
           <CompanyHeader
             name={!nonDiffusible ? company.name : "non diffusible"}
-            siret={company.siret || company.vatNumber}
+            siret={company.orgId}
             naf={!nonDiffusible ? company.naf : "non diffusible"}
             libelleNaf={!nonDiffusible ? company.libelleNaf : "non diffusible"}
           />

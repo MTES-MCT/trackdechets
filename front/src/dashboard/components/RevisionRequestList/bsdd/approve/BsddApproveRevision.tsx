@@ -143,15 +143,36 @@ export function DisplayRevision({ review }: Props) {
       />
 
       <RevisionField
-        label="CAP"
+        label="CAP (destination finale)"
+        bsddValue={review.form.temporaryStorageDetail?.destination?.cap}
+        reviewValue={review.content.temporaryStorageDetail?.destination?.cap}
+      />
+
+      <RevisionField
+        label={
+          review.form?.temporaryStorageDetail
+            ? "CAP (entreposage provisoire ou reconditionnement)"
+            : "CAP"
+        }
         bsddValue={review.form.recipient?.cap}
         reviewValue={review.content.recipient?.cap}
       />
 
       <RevisionField
-        label="Poids reçu"
+        label="Quantité reçue (tonnes)"
         bsddValue={review.form.quantityReceived}
         reviewValue={review.content.quantityReceived}
+      />
+
+      <RevisionField
+        label="Quantité reçue sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)"
+        bsddValue={
+          review.form.temporaryStorageDetail?.temporaryStorer?.quantityReceived
+        }
+        reviewValue={
+          review.content.temporaryStorageDetail?.temporaryStorer
+            ?.quantityReceived
+        }
       />
 
       <RevisionField

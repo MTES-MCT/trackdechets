@@ -1,29 +1,12 @@
 import React from "react";
-import {
-  Mutation,
-  MutationMarkAsReceivedArgs,
-  Query,
-  QueryFormArgs,
-} from "generated/graphql/types";
-import { gql, useMutation, useLazyQuery } from "@apollo/client";
-import { statusChangeFragment } from "common/fragments";
+import { Query, QueryFormArgs } from "generated/graphql/types";
+import { useLazyQuery } from "@apollo/client";
 import { WorkflowActionProps } from "./WorkflowAction";
 import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton, Loader } from "common/components";
 import { IconWaterDam } from "common/components/Icons";
 import ReceivedInfo from "./ReceivedInfo";
-import { NotificationError } from "common/components/Error";
-import { GET_BSDS } from "common/queries";
 import { GET_FORM } from "form/bsdd/utils/queries";
-
-const MARK_AS_RECEIVED = gql`
-  mutation MarkAsReceived($id: ID!, $receivedInfo: ReceivedFormInput!) {
-    markAsReceived(id: $id, receivedInfo: $receivedInfo) {
-      ...StatusChange
-    }
-  }
-  ${statusChangeFragment}
-`;
 
 export default function MarkAsReceived({ form }: WorkflowActionProps) {
   const [getBsdd, { data }] = useLazyQuery<Pick<Query, "form">, QueryFormArgs>(
@@ -36,16 +19,6 @@ export default function MarkAsReceived({ form }: WorkflowActionProps) {
       fetchPolicy: "network-only",
     }
   );
-  const [markAsReceived, { loading, error }] = useMutation<
-    Pick<Mutation, "markAsReceived">,
-    MutationMarkAsReceivedArgs
-  >(MARK_AS_RECEIVED, {
-    refetchQueries: [GET_BSDS],
-    awaitRefetchQueries: true,
-    onError: () => {
-      // The error is handled in the UI
-    },
-  });
 
   const actionLabel = "Valider la réception";
 
@@ -73,24 +46,9 @@ export default function MarkAsReceived({ form }: WorkflowActionProps) {
             <div>
               <ReceivedInfo
                 form={data.form}
-                onSubmit={values => {
-                  markAsReceived({
-                    variables: {
-                      id: data.form.id,
-                      receivedInfo: values,
-                    },
-                  });
-                  close();
-                }}
                 close={close}
+                isTempStorage={false}
               />
-              {error && (
-                <NotificationError
-                  className="action-error"
-                  apolloError={error}
-                />
-              )}
-              {loading && <Loader />}
             </div>
           );
         }

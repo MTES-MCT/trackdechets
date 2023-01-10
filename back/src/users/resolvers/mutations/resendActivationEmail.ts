@@ -4,16 +4,25 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { onSignup } from "../../../mailer/templates";
 import { object, string } from "yup";
+import { checkCaptcha } from "../../../captcha/captchaGen";
+import { UserInputError } from "apollo-server-core";
 
 const resendActivationEmail: MutationResolvers["resendActivationEmail"] =
-  async (parent, { email }) => {
+  async (parent, { input }) => {
     const schema = object({
       email: string()
         .email("Cet email n'est pas correctement formatté")
         .required()
     });
+
+    const { email, captcha } = input;
     await schema.validate({ email });
 
+    const captchaIsValid = await checkCaptcha(captcha.value, captcha.token);
+
+    if (!captchaIsValid) {
+      throw new UserInputError("Le test anti-robots est incorrect");
+    }
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
       // for security reason, do not leak  any clue

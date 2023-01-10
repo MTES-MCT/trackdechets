@@ -10,6 +10,12 @@ export function CompanyDescription({ company }: Props) {
     <p>
       N° SIRET : {company?.siret}
       <br />
+      {!!company?.vatNumber && (
+        <>
+          N° TVA intracommunautaire (le cas échéant) : {company?.vatNumber}
+          <br />
+        </>
+      )}
       Nom (raison sociale) : {company?.name}
       <br />
       Adresse : {company?.address}

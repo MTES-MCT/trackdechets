@@ -18,8 +18,10 @@ import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { BSFF_WASTE_CODES } from "../common/constants";
 import {
   destinationCompanySiretSchema,
-  transporterCompanySiretSchema
+  transporterCompanySiretSchema,
+  transporterCompanyVatNumberSchema
 } from "../companies/validation";
+import { weight, weightConditions, WeightUnits } from "../common/validation";
 
 configureYup();
 
@@ -138,14 +140,7 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
           "Transporteur : le nom de l'établissement est requis"
         ),
       transporterCompanySiret: transporterCompanySiretSchema(isDraft),
-      transporterCompanyVatNumber: yup
-        .string()
-        .ensure()
-        .test(
-          "is-vat",
-          "Transporteur : le numéro de TVA intracommunautaire n'est pas au bon format",
-          value => !value || isVat(value)
-        ),
+      transporterCompanyVatNumber: transporterCompanyVatNumberSchema,
       transporterCompanyAddress: yup
         .string()
         .requiredIf(
@@ -219,10 +214,11 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
                 .required(
                   "Conditionnements : le numéro d'identification est requis"
                 ),
-              weight: yup
-                .number()
-                .required("Conditionnements : Le poids est requis")
-                .positive("Conditionnements : le poids doit être supérieur à 0")
+
+              weight: weight(WeightUnits.Kilogramme)
+                .label("Conditionnement")
+                .required("${path} :Le poids est requis")
+                .positive("${path} : le poids doit être supérieur à 0")
             })
           );
 
@@ -242,8 +238,12 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
           "La dénomination usuelle du déchet est obligatoire"
         ),
       wasteAdr: yup.string().requiredIf(!isDraft, "La mention ADR est requise"),
-      weightValue: yup
-        .number()
+      weightValue: weight(WeightUnits.Kilogramme)
+        .label("Déchet")
+        .when(
+          ["transporterTransportMode", "createdAt"],
+          weightConditions.transportMode(WeightUnits.Kilogramme)
+        )
         .positive("Le poids doit être supérieur à 0")
         .requiredIf(!isDraft, "Le poids total est requis"),
       weightIsEstimate: yup
@@ -340,20 +340,10 @@ export const acceptationSchema: yup.SchemaOf<Acceptation> = yup.object({
               "Le motif du refus ne doit pas être renseigné si le déchet est accepté"
             )
     ),
-  acceptationWeight: yup
-    .number()
-    .nullable()
-    .required("Le poids en kilos du déchet reçu est requis")
-    .when("acceptationStatus", {
-      is: value => value === WasteAcceptationStatus.REFUSED,
-      then: schema =>
-        schema.oneOf(
-          [0],
-          "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé"
-        ),
-      otherwise: schema =>
-        schema.positive("Vous devez saisir une quantité reçue supérieure à 0")
-    }),
+  acceptationWeight: weight(WeightUnits.Kilogramme)
+    .label("Acceptation")
+    .required("Le poids en kilogramme du déchet reçu est requis")
+    .when("acceptationStatus", weightConditions.wasteAcceptationStatus),
   acceptationWasteCode: yup
     .string()
     .nullable()
@@ -412,7 +402,7 @@ const withNextDestination = (required: boolean) =>
       .nullable()
       .test(
         "is-vat",
-        "${path} n'est pas un numéro de TVA intracommunautaire valide",
+        "Destination ultérieure : ${originalValue} n'est pas un numéro de TVA intracommunautaire valide",
         value => !value || isVat(value)
       ),
 
@@ -953,7 +943,9 @@ export const ficheInterventionSchema: yup.SchemaOf<
   numero: yup
     .string()
     .required("Le numéro de la fiche d'intervention est requis"),
-  weight: yup.number().required("Le poids en kilos est requis"),
+  weight: weight(WeightUnits.Kilogramme).required(
+    "Le poids en kilogramme est requis"
+  ),
   postalCode: yup
     .string()
     .required("Le code postal du lieu de l'intervention est requis"),
@@ -1000,11 +992,11 @@ export const ficheInterventionSchema: yup.SchemaOf<
       is: true,
       then: schema =>
         schema.required(
-          "L'addresse du détenteur de l'équipement (particulier) est requise"
+          "L'adresse du détenteur de l'équipement (particulier) est requise"
         ),
       otherwise: schema =>
         schema.required(
-          "L'addresse de l'entreprise détentrice de l'équipement est requise"
+          "L'adresse de l'entreprise détentrice de l'équipement est requise"
         )
     }),
   detenteurCompanyContact: yup
@@ -1040,7 +1032,7 @@ export const ficheInterventionSchema: yup.SchemaOf<
       then: schema => schema.nullable().notRequired(),
       otherwise: schema =>
         schema.required(
-          "L'addresse email de l'entreprise détentrice de l'équipement est requis"
+          "L'adresse email de l'entreprise détentrice de l'équipement est requis"
         )
     }),
   operateurCompanyName: yup
@@ -1055,7 +1047,7 @@ export const ficheInterventionSchema: yup.SchemaOf<
     }),
   operateurCompanyAddress: yup
     .string()
-    .required("L'addresse de l'entreprise de l'opérateur est requis"),
+    .required("L'adresse de l'entreprise de l'opérateur est requis"),
   operateurCompanyContact: yup
     .string()
     .required("Le nom du contact de l'entreprise de l'opérateur est requis"),
@@ -1066,7 +1058,7 @@ export const ficheInterventionSchema: yup.SchemaOf<
     ),
   operateurCompanyMail: yup
     .string()
-    .required("L'addresse email de l'entreprise de l'opérateur est requis")
+    .required("L'adresse email de l'entreprise de l'opérateur est requis")
 });
 
 export function validateFicheIntervention(

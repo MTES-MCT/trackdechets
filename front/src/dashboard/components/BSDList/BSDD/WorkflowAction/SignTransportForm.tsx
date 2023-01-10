@@ -22,6 +22,9 @@ import { FormJourneySummary } from "./FormJourneySummary";
 import { FormWasteTransportSummary } from "./FormWasteTransportSummary";
 import { GET_FORM } from "form/bsdd/utils/queries";
 import Loader from "common/components/Loaders";
+import DateInput from "form/common/components/custom-inputs/DateInput";
+
+const TODAY = new Date();
 
 const SIGN_TRANSPORT_FORM = gql`
   mutation SignTransportForm(
@@ -37,6 +40,10 @@ const SIGN_TRANSPORT_FORM = gql`
 `;
 
 const validationSchema = yup.object({
+  takenOverAt: yup
+    .date()
+    .required("La date de prise en charge est requise")
+    .max(TODAY, "La date de prise en charge ne peut être dans le futur"),
   takenOverBy: yup
     .string()
     .ensure()
@@ -90,6 +97,7 @@ function SignTransportFormModal({
       <Formik
         initialValues={{
           takenOverBy: "",
+          takenOverAt: TODAY.toISOString(),
           securityCode: "",
           transporterNumberPlate:
             form.stateSummary?.transporterNumberPlate ?? "",
@@ -101,7 +109,7 @@ function SignTransportFormModal({
               variables: {
                 id: form.id,
                 input: {
-                  takenOverAt: new Date().toISOString(),
+                  takenOverAt: values.takenOverAt,
                   takenOverBy: values.takenOverBy,
                   transporterNumberPlate: values.transporterNumberPlate,
                 },
@@ -126,6 +134,21 @@ function SignTransportFormModal({
             </p>
 
             <div className="form__row">
+              <label className="tw-font-semibold">
+                Date de prise en charge
+                <div className="td-date-wrapper">
+                  <Field
+                    name="takenOverAt"
+                    component={DateInput}
+                    className="td-input"
+                    maxDate={TODAY}
+                  />
+                </div>
+              </label>
+              <RedErrorMessage name="takenOverAt" />
+            </div>
+
+            <div className="form__row">
               <label>
                 NOM et prénom du signataire
                 <Field
@@ -138,8 +161,8 @@ function SignTransportFormModal({
             </div>
 
             {![
-              form.transporter?.company?.siret,
-              form.temporaryStorageDetail?.transporter?.company?.siret,
+              form.transporter?.company?.orgId,
+              form.temporaryStorageDetail?.transporter?.company?.orgId,
             ].includes(siret) && (
               <div className="form__row">
                 <label>

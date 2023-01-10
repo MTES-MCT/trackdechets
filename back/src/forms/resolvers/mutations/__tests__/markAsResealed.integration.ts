@@ -6,6 +6,7 @@ import {
   destinationFactory,
   formFactory,
   formWithTempStorageFactory,
+  siretify,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -290,6 +291,49 @@ describe("Mutation markAsResealed", () => {
     );
   });
 
+  it("should not be possible de set a quantity > 40T when transport mode is ROAD", async () => {
+    const owner = await userFactory();
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const destination = await destinationFactory();
+
+    const { mutate } = makeClient(user);
+
+    const form = await formWithTempStorageFactory({
+      ownerId: owner.id,
+      opt: {
+        status: Status.RESEALED,
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
+      },
+      forwardedInOpts: { recipientCompanySiret: destination.siret }
+    });
+
+    const { errors } = await mutate<
+      Pick<Mutation, "markAsResealed">,
+      MutationMarkAsResealedArgs
+    >(MARK_AS_RESEALED, {
+      variables: {
+        id: form.id,
+        resealedInfos: {
+          wasteDetails: { quantity: 60 },
+          transporter: { mode: "ROAD" }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Déchet : le poids doit être inférieur à 40 tonnes lorsque le transport se fait par la route"
+      })
+    ]);
+  });
+
   test("when resealedInfos contains repackaging data", async () => {
     const owner = await userFactory();
     const { user, company: collector } = await userWithCompanyFactory(
@@ -408,6 +452,7 @@ describe("Mutation markAsResealed", () => {
 
     const { mutate } = makeClient(user);
 
+    const recipientCompanySiret = siretify(3);
     const form = await formWithTempStorageFactory({
       ownerId: owner.id,
       opt: {
@@ -417,7 +462,7 @@ describe("Mutation markAsResealed", () => {
       },
       forwardedInOpts: {
         // this SIRET is not registered in TD
-        recipientCompanySiret: "3".repeat(14)
+        recipientCompanySiret
       }
     });
 
@@ -430,9 +475,7 @@ describe("Mutation markAsResealed", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination avec le SIRET ${"3".repeat(
-          14
-        )} n'est pas inscrite sur Trackdéchets`
+        message: `L'installation de destination avec le SIRET ${recipientCompanySiret} n'est pas inscrite sur Trackdéchets`
       })
     ]);
   });
@@ -535,7 +578,7 @@ describe("Mutation markAsResealed", () => {
     ]);
   }, 10000);
 
-  it("should work when a transporter vat number is present", async () => {
+  it("should not work when a transporter french vat number is present along with a SIRET", async () => {
     const owner = await userFactory();
     const { user, company: collector } = await userWithCompanyFactory(
       "MEMBER",
@@ -561,7 +604,7 @@ describe("Mutation markAsResealed", () => {
       }
     });
 
-    const { data } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "markAsResealed">,
       MutationMarkAsResealedArgs
     >(
@@ -599,8 +642,14 @@ describe("Mutation markAsResealed", () => {
       }
     );
 
-    expect(
-      data.markAsResealed.temporaryStorageDetail.transporter.company.vatNumber
-    ).toEqual("FR87850019464");
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement",
+        extensions: {
+          code: "BAD_USER_INPUT"
+        }
+      })
+    ]);
   });
 });

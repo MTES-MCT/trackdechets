@@ -1,7 +1,7 @@
 import prisma from "../prisma";
 import supertest from "supertest";
 import { resetDatabase } from "../../integration-tests/helper";
-import { tokenErrorMessages } from "../oauth2";
+import { tokenErrorMessages } from "../oauth/oauth2";
 import { app } from "../server";
 import { getUid, hashToken } from "../utils";
 import { logIn } from "./auth.helper";
@@ -9,7 +9,7 @@ import { applicationFactory, userFactory } from "./factories";
 
 const request = supertest(app);
 
-describe("GET /oauth2/autorize", () => {
+describe("GET /oauth2/authorize", () => {
   afterAll(async () => {
     await resetDatabase();
   });

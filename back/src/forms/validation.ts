@@ -13,8 +13,9 @@ import countries from "world-countries";
 import * as yup from "yup";
 import {
   isDangerous,
-  PROCESSING_OPERATIONS_CODES,
+  PROCESSING_AND_REUSE_OPERATIONS_CODES,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
+  PROCESSING_OPERATIONS_CODES,
   BSDD_WASTE_CODES
 } from "../common/constants";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
@@ -27,7 +28,6 @@ import {
 import {
   MISSING_COMPANY_NAME,
   MISSING_COMPANY_SIRET,
-  INVALID_SIRET_LENGTH,
   MISSING_COMPANY_ADDRESS,
   MISSING_COMPANY_CONTACT,
   MISSING_COMPANY_PHONE,
@@ -51,8 +51,10 @@ import { validateCompany } from "../companies/validateCompany";
 import { Decimal } from "decimal.js-light";
 import {
   destinationCompanySiretSchema,
-  transporterCompanySiretSchema
+  transporterCompanySiretSchema,
+  transporterCompanyVatNumberSchema
 } from "../companies/validation";
+import { weight, weightConditions, WeightUnits } from "../common/validation";
 // set yup default error messages
 configureYup();
 
@@ -280,9 +282,11 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
           emitterIsPrivateIndividual === true ? schema.notRequired() : schema
       )
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_SIRET}`)
-      .matches(/^$|^\d{14}$/, {
-        message: `Émetteur: ${INVALID_SIRET_LENGTH}`
-      }),
+      .test(
+        "is-siret",
+        "Émetteur: ${originalValue} n'est pas un numéro de SIRET valide",
+        value => !value || isSiret(value)
+      ),
     emitterCompanyAddress: yup
       .string()
       .ensure()
@@ -419,6 +423,11 @@ export const ecoOrganismeSchema = yup.object().shape({
     .notRequired()
     .nullable()
     .test(
+      "is-siret",
+      "Éco-organisme: ${originalValue} n'est pas un numéro de SIRET valide",
+      value => !value || isSiret(value)
+    )
+    .test(
       "is-known-eco-organisme",
       "L'éco-organisme avec le siret \"${value}\" n'est pas reconnu.",
       ecoOrganismeSiret =>
@@ -455,7 +464,17 @@ const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
       .string()
       .label("Opération d’élimination / valorisation")
       .ensure()
-      .requiredIf(!isDraft),
+      .requiredIf(!isDraft)
+      .when("emitterType", (value, schema) => {
+        const oneOf =
+          value === EmitterType.APPENDIX2
+            ? PROCESSING_AND_REUSE_OPERATIONS_CODES
+            : PROCESSING_OPERATIONS_CODES;
+        return schema.oneOf(
+          ["", ...oneOf],
+          `Destination ultérieure : ${INVALID_PROCESSING_OPERATION}`
+        );
+      }),
     recipientCompanyName: yup
       .string()
       .ensure()
@@ -618,10 +637,13 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
           return true;
         }
       ),
-    wasteDetailsQuantity: yup
-      .number()
-      .requiredIf(!isDraft, "La quantité du déchet en tonnes est obligatoire")
-      .min(0, "La quantité doit être supérieure à 0"),
+    wasteDetailsQuantity: weight(WeightUnits.Tonne)
+      .label("Déchet")
+      .when(
+        ["transporterTransportMode", "createdAt"],
+        weightConditions.transportMode(WeightUnits.Tonne)
+      )
+      .requiredIf(!isDraft, "La quantité du déchet en tonnes est obligatoire"),
     wasteDetailsQuantityType: yup
       .mixed<QuantityType>()
       .requiredIf(
@@ -670,14 +692,7 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
         .ensure()
         .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_NAME}`),
       transporterCompanySiret: transporterCompanySiretSchema(isDraft),
-      transporterCompanyVatNumber: yup
-        .string()
-        .ensure()
-        .test(
-          "is-vat",
-          "${path} n'est pas un numéro de TVA intracommunautaire valide",
-          value => !value || isVat(value)
-        ),
+      transporterCompanyVatNumber: transporterCompanyVatNumberSchema,
       transporterCompanyAddress: yup
         .string()
         .ensure()
@@ -733,11 +748,13 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
       .string()
       .notRequired()
       .nullable()
-      .matches(/^$|^\d{14}$/, {
-        message: `Négociant: ${INVALID_SIRET_LENGTH}`
-      }),
+      .test(
+        "is-siret",
+        "Négociant: ${originalValue} n'est pas un numéro de SIRET valide",
+        value => !value || isSiret(value)
+      ),
     traderCompanyName: yup.string().when("traderCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => !!siret,
       then: schema =>
         schema
           .ensure()
@@ -745,7 +762,7 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     traderCompanyAddress: yup.string().when("traderCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => !!siret,
       then: schema =>
         schema
           .ensure()
@@ -753,7 +770,7 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     traderCompanyContact: yup.string().when("traderCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => !!siret,
       then: schema =>
         schema
           .ensure()
@@ -761,7 +778,7 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     traderCompanyPhone: yup.string().when("traderCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => !!siret,
       then: schema =>
         schema
           .ensure()
@@ -772,7 +789,7 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
       .string()
       .email()
       .when("traderCompanySiret", {
-        is: siret => siret?.length === 14,
+        is: siret => !!siret,
         then: schema =>
           schema
             .ensure()
@@ -780,7 +797,7 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
         otherwise: schema => schema.notRequired().nullable()
       }),
     traderReceipt: yup.string().when("traderCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => !!siret,
       then: schema =>
         schema
           .ensure()
@@ -788,7 +805,7 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     traderDepartment: yup.string().when("traderCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => !!siret,
       then: schema =>
         schema
           .ensure()
@@ -796,7 +813,7 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     traderValidityLimit: yup.date().when("traderCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => !!siret,
       then: schema =>
         schema.requiredIf(!isDraft, "Négociant : Date de validité obligatoire"),
       otherwise: schema => schema.notRequired().nullable()
@@ -809,11 +826,13 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       .string()
       .notRequired()
       .nullable()
-      .matches(/^$|^\d{14}$/, {
-        message: `Courtier : ${INVALID_SIRET_LENGTH}`
-      }),
+      .test(
+        "is-siret",
+        "Courtier: ${originalValue} n'est pas un numéro de SIRET valide",
+        value => !value || isSiret(value)
+      ),
     brokerCompanyName: yup.string().when("brokerCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => !!siret,
       then: schema =>
         schema
           .ensure()
@@ -821,7 +840,7 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     brokerCompanyAddress: yup.string().when("brokerCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => !!siret,
       then: schema =>
         schema
           .ensure()
@@ -829,7 +848,7 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     brokerCompanyContact: yup.string().when("brokerCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => !!siret,
       then: schema =>
         schema
           .ensure()
@@ -837,7 +856,7 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     brokerCompanyPhone: yup.string().when("brokerCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => !!siret,
       then: schema =>
         schema
           .ensure()
@@ -845,7 +864,7 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     brokerCompanyMail: yup.string().when("brokerCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => !!siret,
       then: schema =>
         schema
           .ensure()
@@ -853,7 +872,7 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     brokerReceipt: yup.string().when("brokerCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => !!siret,
       then: schema =>
         schema
           .ensure()
@@ -861,7 +880,7 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     brokerDepartment: yup.string().when("brokerCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => !!siret,
       then: schema =>
         schema
           .ensure()
@@ -869,7 +888,7 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
       otherwise: schema => schema.notRequired().nullable()
     }),
     brokerValidityLimit: yup.date().when("brokerCompanySiret", {
-      is: siret => siret?.length === 14,
+      is: siret => !!siret,
       then: schema =>
         schema.requiredIf(!isDraft, "Courtier : Date de validité obligatoire"),
       otherwise: schema => schema.notRequired().nullable()
@@ -896,27 +915,12 @@ export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
     .required("Vous devez saisir un responsable de la réception."),
   receivedAt: yup.date().required(),
   signedAt: yup.date().nullable(),
-  quantityReceived: yup
-    .number()
-    // if waste is refused, quantityReceived must be 0
-    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-      ["REFUSED"].includes(wasteAcceptationStatus)
-        ? schema.test(
-            "is-zero",
-            "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé",
-            v => v === 0
-          )
-        : schema
-    )
-    // if waste is partially or totally accepted, we check it is a positive value
-    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-      ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-        ? schema.test(
-            "is-strictly-positive",
-            "Vous devez saisir une quantité reçue supérieure à 0.",
-            v => v > 0
-          )
-        : schema
+  quantityReceived: weight(WeightUnits.Tonne)
+    .label("Réception")
+    .when("wasteAcceptationStatus", weightConditions.wasteAcceptationStatus)
+    .when(
+      "transporterTransportMode",
+      weightConditions.transportMode(WeightUnits.Tonne)
     ),
   wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
   wasteRefusalReason: yup
@@ -943,29 +947,10 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
     .string()
     .ensure()
     .required("Vous devez saisir un responsable de la réception."),
-  quantityReceived: yup
-    .number()
-    .required()
-    // if waste is refused, quantityReceived must be 0
-    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-      ["REFUSED"].includes(wasteAcceptationStatus)
-        ? schema.test(
-            "is-zero",
-            "Vous devez saisir une quantité égale à 0 lorsque le déchet est refusé",
-            v => v === 0
-          )
-        : schema
-    )
-    // if waste is partially or totally accepted, we check it is a positive value
-    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
-      ["ACCEPTED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
-        ? schema.test(
-            "is-strictly-positive",
-            "Vous devez saisir une quantité reçue supérieure à 0.",
-            v => v > 0
-          )
-        : schema
-    ),
+  quantityReceived: weight(WeightUnits.Tonne)
+    .label("Réception")
+    .required("${path} : Le poids reçu en tonnes est obligatoire")
+    .when("wasteAcceptationStatus", weightConditions.wasteAcceptationStatus),
   wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>().required(),
   wasteRefusalReason: yup
     .string()
@@ -989,7 +974,7 @@ const withNextDestination = (required: boolean) =>
       .string()
       .required(`Destination ultérieure : ${MISSING_PROCESSING_OPERATION}`)
       .oneOf(
-        PROCESSING_OPERATIONS_CODES,
+        PROCESSING_AND_REUSE_OPERATIONS_CODES,
         `Destination ultérieure : ${INVALID_PROCESSING_OPERATION}`
       ),
     nextDestinationCompanyName: yup
@@ -1005,9 +990,10 @@ const withNextDestination = (required: boolean) =>
               .required(
                 `Destination ultérieure prévue : ${MISSING_COMPANY_SIRET}`
               )
-              .length(
-                14,
-                `Destination ultérieure prévue : ${INVALID_SIRET_LENGTH}`
+              .test(
+                "is-siret",
+                "Destination ultérieure prévue : Le SIRET n'est pas valide",
+                value => !value || isSiret(value)
               )
           : schema.notRequired().nullable();
       }),
@@ -1016,7 +1002,7 @@ const withNextDestination = (required: boolean) =>
       .ensure()
       .test(
         "is-vat",
-        "${path} n'est pas un numéro de TVA intracommunautaire valide",
+        "Destination ultérieure prévue : ${originalValue} n'est pas un numéro de TVA intracommunautaire valide",
         value => !value || isVat(value)
       ),
     nextDestinationCompanyAddress: yup
@@ -1115,7 +1101,10 @@ const processedInfoSchemaFn: (value: any) => yup.SchemaOf<ProcessedInfo> =
       processedAt: yup.date().required(),
       processingOperationDone: yup
         .string()
-        .oneOf(PROCESSING_OPERATIONS_CODES, INVALID_PROCESSING_OPERATION),
+        .oneOf(
+          PROCESSING_AND_REUSE_OPERATIONS_CODES,
+          INVALID_PROCESSING_OPERATION
+        ),
       processingOperationDescription: yup.string().nullable()
     });
 
@@ -1209,6 +1198,14 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
       forwardedIn.transporterCompanySiret
     );
   }
+  if (
+    forwardedIn?.transporterCompanyVatNumber?.length &&
+    !isForeignVat(forwardedIn?.transporterCompanyVatNumber)
+  ) {
+    throw new UserInputError(
+      "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
+    );
+  }
 }
 
 /**
@@ -1241,8 +1238,9 @@ export const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
   name: yup.string().notRequired().nullable(),
   phone: yup.string().notRequired().nullable(),
   mail: yup.string().notRequired().nullable(),
-  country: yup.string().notRequired().nullable(), // ignored in db schema
-  omiNumber: yup.string().notRequired().nullable() // ignored in db schema
+  country: yup.string().notRequired().nullable(), // is ignored in db schema
+  omiNumber: yup.string().notRequired().nullable(), // is ignored in db schema
+  orgId: yup.string().notRequired().nullable() // is ignored in db schema
 });
 
 /**

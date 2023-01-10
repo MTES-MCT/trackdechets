@@ -3,7 +3,8 @@ import { ErrorCode } from "../../../../common/errors";
 import {
   userFactory,
   userWithCompanyFactory,
-  companyFactory
+  companyFactory,
+  siretify
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
@@ -53,7 +54,7 @@ describe("Mutation.createDasri", () => {
           input: {
             emitter: {
               company: {
-                siret: "siret"
+                siret: siretify(6)
               }
             }
           }

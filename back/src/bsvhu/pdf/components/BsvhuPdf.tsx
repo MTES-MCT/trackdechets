@@ -279,6 +279,10 @@ export function BsvhuPdf({ bsvhu, qrCode }: Props) {
                 N° SIRET : {bsvhu?.transporter?.company?.siret}
               </p>
               <p className="mb-3">
+                N° TVA intracommunautaire (le cas échéant) :{" "}
+                {bsvhu?.transporter?.company?.vatNumber}
+              </p>
+              <p className="mb-3">
                 NOM (Raison sociale) : {bsvhu?.transporter?.company?.name}
               </p>
               <p className="mb-3">

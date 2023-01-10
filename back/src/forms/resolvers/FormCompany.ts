@@ -9,6 +9,20 @@ const formCompanyResolvers: FormCompanyResolvers = {
       return "FR";
     }
     return null;
+  },
+  /**
+   * Fill orgId when the parent does not have it
+   */
+  orgId: parent => {
+    if (parent.orgId) {
+      return parent.orgId;
+    }
+    if (parent.siret) {
+      return parent.siret;
+    }
+    if (parent.vatNumber) {
+      return parent.vatNumber;
+    }
   }
 };
 

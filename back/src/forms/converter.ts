@@ -6,6 +6,7 @@ import {
   TransportSegment as PrismaTransportSegment
 } from "@prisma/client";
 import DataLoader from "dataloader";
+import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import {
   chain,
   nullIfNoValues,
@@ -32,6 +33,7 @@ import {
   FormRevisionRequestDestination,
   FormRevisionRequestRecipient,
   FormRevisionRequestTemporaryStorageDetail,
+  FormRevisionRequestTemporaryStorer,
   FormRevisionRequestWasteDetails,
   FormStatus,
   ImportPaperFormInput,
@@ -346,6 +348,11 @@ export function flattenBsddRevisionRequestInput(
     temporaryStorageDestinationCap: chain(reviewContent, c =>
       chain(c.temporaryStorageDetail, t => chain(t.destination, d => d.cap))
     ),
+    temporaryStorageTemporaryStorerQuantityReceived: chain(reviewContent, c =>
+      chain(c.temporaryStorageDetail, t =>
+        chain(t.temporaryStorer, s => s.quantityReceived)
+      )
+    ),
     temporaryStorageDestinationProcessingOperation: chain(reviewContent, c =>
       chain(c.temporaryStorageDetail, t =>
         chain(t.destination, d => d.processingOperation)
@@ -542,6 +549,7 @@ export async function expandFormFromDb(
     transporter: nullIfNoValues<Transporter>({
       company: nullIfNoValues<FormCompany>({
         name: form.transporterCompanyName,
+        orgId: getTransporterCompanyOrgId(form),
         siret: form.transporterCompanySiret,
         vatNumber: form.transporterCompanyVatNumber,
         address: form.transporterCompanyAddress,
@@ -718,6 +726,7 @@ export async function expandFormFromDb(
           transporter: nullIfNoValues<Transporter>({
             company: nullIfNoValues<FormCompany>({
               name: forwardedIn.transporterCompanyName,
+              orgId: getTransporterCompanyOrgId(forwardedIn),
               siret: forwardedIn.transporterCompanySiret,
               vatNumber: forwardedIn.transporterCompanyVatNumber,
               address: forwardedIn.transporterCompanyAddress,
@@ -871,6 +880,10 @@ export function expandBsddRevisionRequestContent(
       bsddRevisionRequest.processingOperationDescription,
     temporaryStorageDetail:
       nullIfNoValues<FormRevisionRequestTemporaryStorageDetail>({
+        temporaryStorer: nullIfNoValues<FormRevisionRequestTemporaryStorer>({
+          quantityReceived:
+            bsddRevisionRequest.temporaryStorageTemporaryStorerQuantityReceived
+        }),
         destination: nullIfNoValues<FormRevisionRequestDestination>({
           cap: bsddRevisionRequest.temporaryStorageDestinationCap,
           processingOperation:

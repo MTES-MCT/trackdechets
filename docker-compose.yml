@@ -42,7 +42,7 @@ services:
 
   td-ui:
     stdin_open: true
-    image: node:14.15.4
+    image: node:14.21.1
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     working_dir: /usr/src/front
     command: sh -c "npm install && npm run dev"
@@ -53,6 +53,19 @@ services:
       - ./back/src:/usr/src/back/src
     ports:
       - "3000:3000"
+
+  storybook:
+    stdin_open: true
+    image: node:14.21.1
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    working_dir: /usr/src/front
+    command: sh -c "npm install && npm run storybook"
+    expose:
+      - "6006"
+    volumes:
+      - ./front:/usr/src/front
+    ports:
+      - "6006:6006"
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:6.8.0
@@ -97,6 +110,7 @@ services:
       DEVELOPERS_HOST: $DEVELOPERS_HOST
       NGINX_PROXY_HOST: $NGINX_PROXY_HOST
       ELASTIC_SEARCH_HOST: $ELASTIC_SEARCH_HOST
+      STORYBOOK_HOST: $STORYBOOK_HOST
     ports:
       - "80:80"
 

@@ -19,14 +19,15 @@ export async function isDasriContributorHelper(
   dasri: BsdasriSirets
 ) {
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  const formSirets = [
+  const formSiretsOrVat = [
     dasri.emitterCompanySiret,
     dasri.transporterCompanySiret,
+    dasri.transporterCompanyVatNumber,
     dasri.destinationCompanySiret,
     dasri.ecoOrganismeSiret
   ].filter(Boolean);
 
-  return userCompaniesSiretOrVat.some(siret => formSirets.includes(siret));
+  return userCompaniesSiretOrVat.some(siret => formSiretsOrVat.includes(siret));
 }
 
 // Don't call directly in resolver to handle permissions

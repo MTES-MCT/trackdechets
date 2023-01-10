@@ -1,5 +1,6 @@
 import {
   BsddRevisionRequest,
+  Form,
   Prisma,
   RevisionRequestApprovalStatus,
   RevisionRequestStatus,
@@ -70,7 +71,7 @@ const buildAcceptRevisionRequestApproval: (
   };
 
 async function getUpdateFromFormRevisionRequest(
-  revisionRequest: BsddRevisionRequest,
+  revisionRequest: BsddRevisionRequest & { bsdd: Form },
   prisma: PrismaTransaction
 ): Promise<
   [
@@ -83,7 +84,9 @@ async function getUpdateFromFormRevisionRequest(
     select: { status: true }
   });
 
-  const bsddUpdate = {
+  const hasTempStorage = !!revisionRequest.bsdd.forwardedInId;
+
+  const bsddUpdate: Prisma.FormUpdateInput = {
     status: getNewStatus(
       currentStatus,
       revisionRequest.processingOperationDone
@@ -93,10 +96,17 @@ async function getUpdateFromFormRevisionRequest(
     wasteDetailsName: revisionRequest.wasteDetailsName,
     wasteDetailsPop: revisionRequest.wasteDetailsPop,
     wasteDetailsPackagingInfos: revisionRequest.wasteDetailsPackagingInfos,
-    quantityReceived: revisionRequest.quantityReceived,
-    processingOperationDone: revisionRequest.processingOperationDone,
-    processingOperationDescription:
-      revisionRequest.processingOperationDescription,
+    ...(hasTempStorage
+      ? {
+          quantityReceived:
+            revisionRequest.temporaryStorageTemporaryStorerQuantityReceived
+        }
+      : {
+          quantityReceived: revisionRequest.quantityReceived,
+          processingOperationDone: revisionRequest.processingOperationDone,
+          processingOperationDescription:
+            revisionRequest.processingOperationDescription
+        }),
     brokerCompanyName: revisionRequest.brokerCompanyName,
     brokerCompanySiret: revisionRequest.brokerCompanySiret,
     brokerCompanyAddress: revisionRequest.brokerCompanyAddress,
@@ -117,13 +127,21 @@ async function getUpdateFromFormRevisionRequest(
     traderValidityLimit: revisionRequest.traderValidityLimit
   };
 
-  const temporaryStorageUpdate = {
-    recipientCap: revisionRequest.temporaryStorageDestinationCap,
-    recipientProcessingOperation:
-      revisionRequest.temporaryStorageDestinationProcessingOperation
-  };
+  const forwardedInUpdate: Prisma.FormUpdateInput = hasTempStorage
+    ? {
+        recipientCap: revisionRequest.temporaryStorageDestinationCap,
+        recipientProcessingOperation:
+          revisionRequest.temporaryStorageDestinationProcessingOperation,
+        quantityReceived: revisionRequest.quantityReceived,
+        processingOperationDone: revisionRequest.processingOperationDone,
+        processingOperationDescription:
+          revisionRequest.processingOperationDescription,
+        wasteDetailsQuantity:
+          revisionRequest.temporaryStorageTemporaryStorerQuantityReceived
+      }
+    : {};
 
-  return [removeEmpty(bsddUpdate), removeEmpty(temporaryStorageUpdate)];
+  return [removeEmpty(bsddUpdate), removeEmpty(forwardedInUpdate)];
 }
 
 function getNewStatus(status: Status, newOperationCode: string | null): Status {
@@ -156,21 +174,23 @@ export async function approveAndApplyRevisionRequest(
   const { prisma, user, logMetadata } = context;
 
   const revisionRequest = await prisma.bsddRevisionRequest.findUnique({
-    where: { id: revisionRequestId }
+    where: { id: revisionRequestId },
+    include: { bsdd: true }
   });
+
   const updatedRevisionRequest = await prisma.bsddRevisionRequest.update({
     where: { id: revisionRequest.id },
     data: { status: RevisionRequestStatus.ACCEPTED }
   });
-  const [bsddUpdate, temporaryStorageUpdate] =
+  const [bsddUpdate, forwardedInUpdate] =
     await getUpdateFromFormRevisionRequest(revisionRequest, prisma);
 
   const updatedBsdd = await prisma.form.update({
     where: { id: revisionRequest.bsddId },
     data: {
       ...bsddUpdate,
-      ...(temporaryStorageUpdate && {
-        forwardedIn: { update: { ...temporaryStorageUpdate } }
+      ...(forwardedInUpdate && {
+        forwardedIn: { update: { ...forwardedInUpdate } }
       })
     },
     select: { readableId: true }

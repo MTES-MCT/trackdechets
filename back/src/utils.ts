@@ -23,6 +23,23 @@ export function getUid(len: number): string {
   return uid;
 }
 
+/**
+ * Return a unique identifier with the given `len`.
+ *
+ * @param {Number} length
+ * @return {String}
+ */
+export function genCaptchaString(len: number): string {
+  let captcha = "";
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ123456789"; // exclude I, 0 and O
+  const charsLength = chars.length;
+
+  for (let i = 0; i < len; ++i) {
+    captcha += chars[crypto.randomInt(0, charsLength - 1)];
+  }
+  return captcha;
+}
+
 export function getUIBaseURL() {
   const { UI_URL_SCHEME, UI_HOST } = process.env;
   return `${UI_URL_SCHEME || "http"}://${UI_HOST}`;

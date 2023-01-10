@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Formik, Field, Form, useFormikContext } from "formik";
 import {
-  PROCESSING_OPERATIONS,
+  PROCESSING_AND_REUSE_OPERATIONS,
   PROCESSING_OPERATIONS_GROUPEMENT_CODES,
 } from "generated/constants";
 import DateInput from "form/common/components/custom-inputs/DateInput";
@@ -14,6 +14,7 @@ import {
   Query,
   QueryFormArgs,
   ProcessedFormInput,
+  CompanyInput,
 } from "generated/graphql/types";
 import { gql, useMutation, useLazyQuery } from "@apollo/client";
 import { statusChangeFragment } from "common/fragments";
@@ -109,7 +110,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
           className="td-select"
         >
           <option value="">Choisissez...</option>
-          {PROCESSING_OPERATIONS.map(operation => (
+          {PROCESSING_AND_REUSE_OPERATIONS.map(operation => (
             <option key={operation.code} value={operation.code}>
               {operation.code} - {operation.description.substr(0, 50)}
               {operation.description.length > 50 ? "..." : ""}
@@ -170,7 +171,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
               className="td-select"
             >
               <option value="">Choisissez...</option>
-              {PROCESSING_OPERATIONS.map(operation => (
+              {PROCESSING_AND_REUSE_OPERATIONS.map(operation => (
                 <option key={operation.code} value={operation.code}>
                   {operation.code} - {operation.description.substr(0, 50)}
                   {operation.description.length > 50 ? "..." : ""}
@@ -270,6 +271,10 @@ export default function MarkAsProcessed({ form }: WorkflowActionProps) {
                   noTraceability: null,
                 }}
                 onSubmit={({ nextDestination, ...values }) => {
+                  if (nextDestination?.company) {
+                    // Avoid crashing type InternationalCompanyInput
+                    delete (nextDestination.company as CompanyInput).omiNumber;
+                  }
                   return markAsProcessed({
                     variables: {
                       id: data?.form.id,

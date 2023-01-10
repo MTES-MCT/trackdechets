@@ -26,6 +26,7 @@ import {
   Bsvhu as PrismaVhuForm,
   WasteAcceptationStatus
 } from "@prisma/client";
+import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 
 export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
   return {
@@ -109,6 +110,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
     transporter: nullIfNoValues<BsvhuTransporter>({
       company: nullIfNoValues<FormCompany>({
         name: form.transporterCompanyName,
+        orgId: getTransporterCompanyOrgId(form),
         siret: form.transporterCompanySiret,
         address: form.transporterCompanyAddress,
         contact: form.transporterCompanyContact,
@@ -290,7 +292,20 @@ function flattenVhuTransporterInput({
     ),
     transporterRecepisseValidityLimit: chain(transporter, t =>
       chain(t.recepisse, r => r.validityLimit)
-    )
+    ),
+    ...flattenTransporterTransportInput(transporter)
+  };
+}
+
+function flattenTransporterTransportInput(input: {
+  transport?: BsvhuTransport;
+}) {
+  if (!input?.transport) {
+    return {};
+  }
+
+  return {
+    transporterTransportTakenOverAt: chain(input.transport, t => t.takenOverAt)
   };
 }
 

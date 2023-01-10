@@ -1,33 +1,28 @@
 import * as React from "react";
-import countries from "world-countries";
+import { getcompanyCountry } from "../../../common/pdf/components/FormCompanyFields";
 import { FormCompany } from "../../../generated/graphql/types";
-
-const FRENCH_COUNTRY = countries.find(country => country.cca2 === "FR");
 
 type FormCompanyFieldsProps = {
   company?: FormCompany;
 };
 
 export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
-  const companyCountry = company
-    ? countries.find(country => country.cca2 === company?.country) ??
-      FRENCH_COUNTRY
-    : null;
+  const companyCountry = getcompanyCountry(company);
 
   return (
     <>
       <p>
-        Entreprise{" "}
+        Entreprise {" "}
         <input
           type="checkbox"
-          checked={companyCountry && companyCountry.cca2 === "FR"}
+          checked={companyCountry && companyCountry?.cca2 === "FR"}
           readOnly
         />
         française
         {"  "}
         <input
           type="checkbox"
-          checked={companyCountry && companyCountry.cca2 !== "FR"}
+          checked={companyCountry && companyCountry?.cca2 !== "FR"}
           readOnly
         />{" "}
         étrangère
@@ -35,7 +30,7 @@ export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
       <p>
         N° SIRET : {company?.siret}
         <br />
-        {company?.vatNumber!! && (
+        {!!company?.vatNumber && (
           <>
             N° TVA intracommunautaire (le cas échéant) : {company?.vatNumber}
             <br />
@@ -45,8 +40,8 @@ export function FormCompanyFields({ company }: FormCompanyFieldsProps) {
         <br />
         Adresse complète : {company?.address}
         <br />
-        {companyCountry == null || companyCountry.cca2 === "FR" ? null : (
-          <span>Pays: {companyCountry.name.common} </span>
+        {companyCountry === null || companyCountry?.cca2 === "FR" ? null : (
+          <span>Pays: {companyCountry?.name.common} </span>
         )}
       </p>
       <p>

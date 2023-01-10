@@ -35,6 +35,10 @@ export function getInitialEcoOrganisme(
 interface EcoOrganismesProps {
   name: string;
 }
+
+type EcoOrganismeWithOrgId = EcoOrganisme & {
+  orgId: string;
+};
 /**
  * First implementation of ecoOrganisme field
  * This will evole in the next future because ecoOrganisme expected behaviour on dasri slightly differs from bsd.
@@ -76,18 +80,27 @@ export default function BsdasriEcoOrganismes(props: EcoOrganismesProps) {
               </div>
 
               <div className={styles.list}>
-                <CompanyResults<EcoOrganisme>
+                <CompanyResults<EcoOrganismeWithOrgId>
                   onSelect={eo =>
                     setFieldValue(field.name, {
                       name: eo.name,
                       siret: eo.siret,
+                      orgId: eo.orgId,
                     })
                   }
-                  results={data.ecoOrganismes.filter(eo => !!eo.handleBsdasri)}
+                  results={data.ecoOrganismes
+                    .filter(eo => !!eo.handleBsdasri)
+                    .map(eo => ({
+                      ...eo,
+                      orgId: eo.siret,
+                    }))}
                   selectedItem={
-                    data.ecoOrganismes.find(
-                      eo => eo.siret === field.value?.siret
-                    ) || null
+                    data.ecoOrganismes
+                      .map(eo => ({
+                        ...eo,
+                        orgId: eo.siret,
+                      }))
+                      .find(eo => eo.siret === field.value?.siret) || null
                   }
                 />
               </div>

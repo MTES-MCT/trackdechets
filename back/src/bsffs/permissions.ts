@@ -9,19 +9,21 @@ export async function isBsffContributor(
       Bsff,
       | "emitterCompanySiret"
       | "transporterCompanySiret"
+      | "transporterCompanyVatNumber"
       | "destinationCompanySiret"
     >
   >
 ) {
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
-  const bsffSirets = [
+  const bsffSiretsOrVat = [
     bsff.emitterCompanySiret,
     bsff.transporterCompanySiret,
+    bsff.transporterCompanyVatNumber,
     bsff.destinationCompanySiret
   ].filter(Boolean);
 
-  return userCompaniesSiretOrVat.some(siret => bsffSirets.includes(siret));
+  return userCompaniesSiretOrVat.some(siret => bsffSiretsOrVat.includes(siret));
 }
 
 export async function isFicheInterventionOperateur(
@@ -69,6 +71,7 @@ export async function checkCanWriteBsff(
       Bsff,
       | "emitterCompanySiret"
       | "transporterCompanySiret"
+      | "transporterCompanyVatNumber"
       | "destinationCompanySiret"
     >
   >

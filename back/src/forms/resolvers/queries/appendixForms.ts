@@ -11,7 +11,7 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
-  await checkIsCompanyMember(user, { siret });
+  await checkIsCompanyMember(user, { orgId: siret });
 
   const queriedForms = await prisma.form.findMany({
     where: {

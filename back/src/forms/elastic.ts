@@ -3,6 +3,7 @@ import { BsdElastic, indexBsd } from "../common/elastic";
 import { FullForm } from "./types";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
+import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 
 /**
  * Computes which SIRET should appear on which tab in the frontend
@@ -49,13 +50,13 @@ export function getSiretsByTab(
     emitterCompanySiret: form.emitterCompanySiret,
     recipientCompanySiret: form.recipientCompanySiret,
     forwardedInDestinationCompanySiret: form.forwardedIn?.recipientCompanySiret,
-    forwardedInTransporterCompanySiret:
-      form.forwardedIn?.transporterCompanySiret,
+    forwardedInTransporterCompanySiret: getTransporterCompanyOrgId(
+      form.forwardedIn
+    ),
     traderCompanySiret: form.traderCompanySiret,
     brokerCompanySiret: form.brokerCompanySiret,
     ecoOrganismeSiret: form.ecoOrganismeSiret,
-    transporterCompanySiret: form.transporterCompanySiret,
-    transporterCompanyVatNumber: form.transporterCompanyVatNumber,
+    transporterCompanySiret: getTransporterCompanyOrgId(form),
     ...multimodalTransportersBySegmentId,
     ...intermediarySiretsReducer
   };
@@ -101,13 +102,11 @@ export function getSiretsByTab(
       setFieldTab("emitterCompanySiret", "isForActionFor");
       setFieldTab("ecoOrganismeSiret", "isForActionFor");
       setFieldTab("transporterCompanySiret", "isToCollectFor");
-      setFieldTab("transporterCompanyVatNumber", "isToCollectFor");
 
       break;
     }
     case Status.SIGNED_BY_PRODUCER: {
       setFieldTab("transporterCompanySiret", "isToCollectFor");
-      setFieldTab("transporterCompanyVatNumber", "isToCollectFor");
 
       break;
     }
@@ -129,7 +128,6 @@ export function getSiretsByTab(
 
       if (!hasBeenHandedOver) {
         setFieldTab("transporterCompanySiret", "isCollectedFor");
-        setFieldTab("transporterCompanyVatNumber", "isCollectedFor");
       }
 
       break;

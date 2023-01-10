@@ -8,6 +8,7 @@ import {
 import * as GraphQL from "../generated/graphql/types";
 import { BsdElastic } from "../common/elastic";
 import { BsffPackaging, BsffPackagingType } from "@prisma/client";
+import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 
 function flattenEmitterInput(input: { emitter?: GraphQL.BsffEmitter }) {
   return {
@@ -196,6 +197,7 @@ export function expandBsffFromDB(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
     transporter: nullIfNoValues<GraphQL.BsffTransporter>({
       company: nullIfNoValues<GraphQL.FormCompany>({
         name: prismaBsff.transporterCompanyName,
+        orgId: getTransporterCompanyOrgId(prismaBsff),
         siret: prismaBsff.transporterCompanySiret,
         vatNumber: prismaBsff.transporterCompanyVatNumber,
         address: prismaBsff.transporterCompanyAddress,

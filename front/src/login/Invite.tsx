@@ -122,8 +122,8 @@ export default function Invite() {
             </Text>
             <ul className="bullets">
               {user.companies?.map(company => (
-                <li key={company.siret}>
-                  {company.name} - ({company.siret})
+                <li key={company.orgId}>
+                  {company.name} - ({company.orgId})
                 </li>
               ))}
             </ul>

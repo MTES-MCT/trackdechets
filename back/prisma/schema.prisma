@@ -154,23 +154,25 @@ model AccessToken {
 }
 
 model Application {
-  id           String           @id @default(cuid())
-  createdAt    DateTime         @default(now()) @db.Timestamptz(6)
-  updatedAt    DateTime         @updatedAt @db.Timestamptz(6)
-  clientSecret String
-  name         String
-  goal         ApplicationGoal?
-  logoUrl      String?
-  redirectUris String[]
-  admin        User?            @relation(fields: [adminId], references: [id])
-  adminId      String?
-  AccessToken  AccessToken[]
-  Grant        Grant[]
+  id            String           @id @default(cuid())
+  createdAt     DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime         @updatedAt @db.Timestamptz(6)
+  clientSecret  String
+  name          String
+  goal          ApplicationGoal?
+  logoUrl       String?
+  redirectUris  String[]
+  admin         User?            @relation(fields: [adminId], references: [id])
+  adminId       String?
+  openIdEnabled Boolean          @default(false)
+  AccessToken   AccessToken[]
+  Grant         Grant[]
 }
 
 model Company {
   id                                   String                    @id @default(cuid())
-  siret                                String                    @unique
+  orgId                                String                    @unique
+  siret                                String?                   @unique
   vatNumber                            String?                   @unique
   updatedAt                            DateTime                  @updatedAt @db.Timestamptz(6)
   createdAt                            DateTime                  @default(now()) @db.Timestamptz(6)
@@ -225,7 +227,8 @@ model Company {
 // du rattachement d'établissements de test sur l'environnement sandbox
 model AnonymousCompany {
   id          String  @id @default(cuid())
-  siret       String  @unique
+  orgId       String  @unique
+  siret       String? @unique
   vatNumber   String? @unique
   name        String
   address     String
@@ -465,34 +468,35 @@ model BsddRevisionRequest {
 
   approvals BsddRevisionRequestApproval[]
 
-  recipientCap                                   String?
-  wasteDetailsCode                               String?
-  wasteDetailsName                               String?
-  wasteDetailsPop                                Boolean?
-  wasteDetailsPackagingInfos                     Json?
-  quantityReceived                               Float?
-  processingOperationDone                        String?
-  processingOperationDescription                 String?
-  brokerCompanyName                              String?
-  brokerCompanySiret                             String?
-  brokerCompanyAddress                           String?
-  brokerCompanyContact                           String?
-  brokerCompanyPhone                             String?
-  brokerCompanyMail                              String?
-  brokerReceipt                                  String?
-  brokerDepartment                               String?
-  brokerValidityLimit                            DateTime? @db.Timestamptz(6)
-  traderCompanyName                              String?
-  traderCompanySiret                             String?
-  traderCompanyAddress                           String?
-  traderCompanyContact                           String?
-  traderCompanyPhone                             String?
-  traderCompanyMail                              String?
-  traderReceipt                                  String?
-  traderDepartment                               String?
-  traderValidityLimit                            DateTime? @db.Timestamptz(6)
-  temporaryStorageDestinationCap                 String?
-  temporaryStorageDestinationProcessingOperation String?
+  recipientCap                                    String?
+  wasteDetailsCode                                String?
+  wasteDetailsName                                String?
+  wasteDetailsPop                                 Boolean?
+  wasteDetailsPackagingInfos                      Json?
+  quantityReceived                                Float?
+  processingOperationDone                         String?
+  processingOperationDescription                  String?
+  brokerCompanyName                               String?
+  brokerCompanySiret                              String?
+  brokerCompanyAddress                            String?
+  brokerCompanyContact                            String?
+  brokerCompanyPhone                              String?
+  brokerCompanyMail                               String?
+  brokerReceipt                                   String?
+  brokerDepartment                                String?
+  brokerValidityLimit                             DateTime? @db.Timestamptz(6)
+  traderCompanyName                               String?
+  traderCompanySiret                              String?
+  traderCompanyAddress                            String?
+  traderCompanyContact                            String?
+  traderCompanyPhone                              String?
+  traderCompanyMail                               String?
+  traderReceipt                                   String?
+  traderDepartment                                String?
+  traderValidityLimit                             DateTime? @db.Timestamptz(6)
+  temporaryStorageDestinationCap                  String?
+  temporaryStorageDestinationProcessingOperation  String?
+  temporaryStorageTemporaryStorerQuantityReceived Float?
 
   comment String
 
@@ -533,6 +537,8 @@ model Grant {
   expires       Int
   redirectUri   String
   applicationId String
+  openIdEnabled Boolean     @default(false)
+  scope String[] @default([])
   application   Application @relation(fields: [applicationId], references: [id])
   userId        String
   user          User        @relation(fields: [userId], references: [id])

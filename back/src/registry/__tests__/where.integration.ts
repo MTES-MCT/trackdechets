@@ -15,7 +15,7 @@ import { BsdElastic, client, index } from "../../common/elastic";
 import { getFullForm } from "../../forms/database";
 import { indexForm } from "../../forms/elastic";
 import { BsdType, WasteRegistryWhere } from "../../generated/graphql/types";
-import { formFactory, userFactory } from "../../__tests__/factories";
+import { formFactory, siretify, userFactory } from "../../__tests__/factories";
 import { toElasticFilter } from "../where";
 
 describe("toElasticFilter", () => {
@@ -1694,19 +1694,22 @@ describe("toElasticFilter", () => {
   it("should filter BSDDs on emitterCompanySiret (exact)", async () => {
     const user = await userFactory();
 
+    const testInput = { emitterCompanySiret: siretify(1) };
     const form1 = await formFactory({
       ownerId: user.id,
-      opt: { emitterCompanySiret: "11111111111111" }
+      opt: testInput
     });
 
+    const testInput_1 = { emitterCompanySiret: siretify(2) };
     const form2 = await formFactory({
       ownerId: user.id,
-      opt: { emitterCompanySiret: "22222222222222" }
+      opt: testInput_1
     });
 
+    const testInput_2 = { emitterCompanySiret: siretify(3) };
     const form3 = await formFactory({
       ownerId: user.id,
-      opt: { emitterCompanySiret: "33333333333333" }
+      opt: testInput_2
     });
 
     await Promise.all(
@@ -1718,7 +1721,7 @@ describe("toElasticFilter", () => {
 
     const where: WasteRegistryWhere = {
       emitterCompanySiret: {
-        _eq: "11111111111111"
+        _eq: testInput.emitterCompanySiret
       }
     };
     const bsds = await searchBsds(where);
@@ -1726,16 +1729,19 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([form1.id]);
   });
   it("should filter BSDAs on emitterCompanySiret (exact)", async () => {
+    const testInput_1 = { emitterCompanySiret: siretify(1) };
     const bsda1 = await bsdaFactory({
-      opt: { emitterCompanySiret: "11111111111111" }
+      opt: testInput_1
     });
 
+    const testInput = { emitterCompanySiret: siretify(2) };
     const bsda2 = await bsdaFactory({
-      opt: { emitterCompanySiret: "22222222222222" }
+      opt: testInput
     });
 
+    const testInput_2 = { emitterCompanySiret: siretify(3) };
     const bsda3 = await bsdaFactory({
-      opt: { emitterCompanySiret: "33333333333333" }
+      opt: testInput_2
     });
 
     await Promise.all(
@@ -1746,7 +1752,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       emitterCompanySiret: {
-        _eq: "11111111111111"
+        _eq: testInput_1.emitterCompanySiret
       }
     };
     const bsds = await searchBsds(where);
@@ -1754,16 +1760,19 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda1.id]);
   });
   it("should filter BSDASRIs on emitterCompanySiret (exact)", async () => {
+    const testInput = { emitterCompanySiret: siretify(1) };
     const bsdasri1 = await bsdasriFactory({
-      opt: { emitterCompanySiret: "11111111111111" }
+      opt: testInput
     });
 
+    const testInput_1 = { emitterCompanySiret: siretify(2) };
     const bsdasri2 = await bsdasriFactory({
-      opt: { emitterCompanySiret: "22222222222222" }
+      opt: testInput_1
     });
 
+    const testInput_2 = { emitterCompanySiret: siretify(3) };
     const bsdasri3 = await bsdasriFactory({
-      opt: { emitterCompanySiret: "33333333333333" }
+      opt: testInput_2
     });
 
     await Promise.all(
@@ -1774,7 +1783,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       emitterCompanySiret: {
-        _eq: "11111111111111"
+        _eq: testInput.emitterCompanySiret
       }
     };
     const bsds = await searchBsds(where);
@@ -1782,16 +1791,19 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id]);
   });
   it("should filter BSVHUs on emitterCompanySiret (exact)", async () => {
+    const testInput_1 = { emitterCompanySiret: siretify(1) };
     const bsvhu1 = await bsvhuFactory({
-      opt: { emitterCompanySiret: "11111111111111" }
+      opt: testInput_1
     });
 
+    const testInput = { emitterCompanySiret: siretify(2) };
     const bsvhu2 = await bsvhuFactory({
-      opt: { emitterCompanySiret: "22222222222222" }
+      opt: testInput
     });
 
+    const testInput_2 = { emitterCompanySiret: siretify(3) };
     const bsvhu3 = await bsvhuFactory({
-      opt: { emitterCompanySiret: "33333333333333" }
+      opt: testInput_2
     });
 
     await Promise.all(
@@ -1802,7 +1814,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       emitterCompanySiret: {
-        _eq: "11111111111111"
+        _eq: testInput_1.emitterCompanySiret
       }
     };
     const bsds = await searchBsds(where);
@@ -1810,20 +1822,12 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu1.id]);
   });
   it("should filter BSFFs on emitterCompanySiret (exact)", async () => {
-    const bsff1 = await createBsff(
-      {},
-      { emitterCompanySiret: "11111111111111" }
-    );
+    const testInput_3 = { emitterCompanySiret: siretify(1) };
+    const bsff1 = await createBsff({}, testInput_3);
 
-    const bsff2 = await createBsff(
-      {},
-      { emitterCompanySiret: "22222222222222" }
-    );
+    const bsff2 = await createBsff({}, { emitterCompanySiret: siretify(2) });
 
-    const bsff3 = await createBsff(
-      {},
-      { emitterCompanySiret: "33333333333333" }
-    );
+    const bsff3 = await createBsff({}, { emitterCompanySiret: siretify(3) });
 
     await Promise.all(
       [bsff1, bsff2, bsff3].map(async bsff => {
@@ -1833,7 +1837,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       emitterCompanySiret: {
-        _eq: "11111111111111"
+        _eq: testInput_3.emitterCompanySiret
       }
     };
     const bsds = await searchBsds(where);
@@ -1843,19 +1847,21 @@ describe("toElasticFilter", () => {
   it("should filter BSDDs on a list of emitterCompanySiret", async () => {
     const user = await userFactory();
 
+    const testInput_4 = { emitterCompanySiret: siretify(1) };
     const form1 = await formFactory({
       ownerId: user.id,
-      opt: { emitterCompanySiret: "11111111111111" }
+      opt: testInput_4
     });
 
+    const testInput = { emitterCompanySiret: siretify(2) };
     const form2 = await formFactory({
       ownerId: user.id,
-      opt: { emitterCompanySiret: "22222222222222" }
+      opt: testInput
     });
 
     const form3 = await formFactory({
       ownerId: user.id,
-      opt: { emitterCompanySiret: "33333333333333" }
+      opt: { emitterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -1866,7 +1872,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       emitterCompanySiret: {
-        _in: ["11111111111111", "22222222222222"]
+        _in: [testInput_4.emitterCompanySiret, testInput.emitterCompanySiret]
       }
     };
     const bsds = await searchBsds(where);
@@ -1874,16 +1880,18 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([form1.id, form2.id]);
   });
   it("should filter BSDAs on a list of emitterCompanySiret", async () => {
+    const testInput_1 = { emitterCompanySiret: siretify(1) };
     const bsda1 = await bsdaFactory({
-      opt: { emitterCompanySiret: "11111111111111" }
+      opt: testInput_1
     });
 
+    const testInput = { emitterCompanySiret: siretify(2) };
     const bsda2 = await bsdaFactory({
-      opt: { emitterCompanySiret: "22222222222222" }
+      opt: testInput
     });
 
     const bsda3 = await bsdaFactory({
-      opt: { emitterCompanySiret: "33333333333333" }
+      opt: { emitterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -1894,7 +1902,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       emitterCompanySiret: {
-        _in: ["11111111111111", "22222222222222"]
+        _in: [testInput_1.emitterCompanySiret, testInput.emitterCompanySiret]
       }
     };
     const bsds = await searchBsds(where);
@@ -1902,16 +1910,19 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda1.id, bsda2.id]);
   });
   it("should filter BSDASRIs on a list of emitterCompanySiret", async () => {
+    const testInput_1 = { emitterCompanySiret: siretify(1) };
+
     const bsdasri1 = await bsdasriFactory({
-      opt: { emitterCompanySiret: "11111111111111" }
+      opt: testInput_1
     });
 
+    const testInput = { emitterCompanySiret: siretify(2) };
     const bsdasri2 = await bsdasriFactory({
-      opt: { emitterCompanySiret: "22222222222222" }
+      opt: testInput
     });
 
     const bsdasri3 = await bsdasriFactory({
-      opt: { emitterCompanySiret: "33333333333333" }
+      opt: { emitterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -1922,7 +1933,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       emitterCompanySiret: {
-        _in: ["11111111111111", "22222222222222"]
+        _in: [testInput_1.emitterCompanySiret, testInput.emitterCompanySiret]
       }
     };
     const bsds = await searchBsds(where);
@@ -1930,16 +1941,18 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id, bsdasri2.id]);
   });
   it("should filter BSVHUs on a list of emitterCompanySiret", async () => {
+    const testInput_2 = { emitterCompanySiret: siretify(1) };
     const bsvhu1 = await bsvhuFactory({
-      opt: { emitterCompanySiret: "11111111111111" }
+      opt: testInput_2
     });
 
+    const testInput_1 = { emitterCompanySiret: siretify(2) };
     const bsvhu2 = await bsvhuFactory({
-      opt: { emitterCompanySiret: "22222222222222" }
+      opt: testInput_1
     });
 
     const bsvhu3 = await bsvhuFactory({
-      opt: { emitterCompanySiret: "33333333333333" }
+      opt: { emitterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -1950,7 +1963,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       emitterCompanySiret: {
-        _in: ["11111111111111", "22222222222222"]
+        _in: [testInput_2.emitterCompanySiret, testInput_1.emitterCompanySiret]
       }
     };
     const bsds = await searchBsds(where);
@@ -1958,20 +1971,13 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu1.id, bsvhu2.id]);
   });
   it("should filter BSFFs on a list of emitterCompanySiret", async () => {
-    const bsff1 = await createBsff(
-      {},
-      { emitterCompanySiret: "11111111111111" }
-    );
+    const testInput = { emitterCompanySiret: siretify(1) };
+    const bsff1 = await createBsff({}, testInput);
 
-    const bsff2 = await createBsff(
-      {},
-      { emitterCompanySiret: "22222222222222" }
-    );
+    const testInput_1 = { emitterCompanySiret: siretify(2) };
+    const bsff2 = await createBsff({}, testInput_1);
 
-    const bsff3 = await createBsff(
-      {},
-      { emitterCompanySiret: "33333333333333" }
-    );
+    const bsff3 = await createBsff({}, { emitterCompanySiret: siretify(3) });
 
     await Promise.all(
       [bsff1, bsff2, bsff3].map(async bsff => {
@@ -1981,7 +1987,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       emitterCompanySiret: {
-        _in: ["11111111111111", "22222222222222"]
+        _in: [testInput.emitterCompanySiret, testInput_1.emitterCompanySiret]
       }
     };
     const bsds = await searchBsds(where);
@@ -1991,19 +1997,20 @@ describe("toElasticFilter", () => {
   it("should filter BSDDs on a list of emitterCompanySiret", async () => {
     const user = await userFactory();
 
+    const testInput = { emitterCompanySiret: siretify(1) };
     const form1 = await formFactory({
       ownerId: user.id,
-      opt: { emitterCompanySiret: "11111111111111" }
+      opt: testInput
     });
 
     const form2 = await formFactory({
       ownerId: user.id,
-      opt: { emitterCompanySiret: "22222222222222" }
+      opt: { emitterCompanySiret: siretify(2) }
     });
 
     const form3 = await formFactory({
       ownerId: user.id,
-      opt: { emitterCompanySiret: "33333333333333" }
+      opt: { emitterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2014,7 +2021,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       emitterCompanySiret: {
-        _contains: "1111"
+        _contains: testInput.emitterCompanySiret.slice(4)
       }
     };
     const bsds = await searchBsds(where);
@@ -2022,16 +2029,17 @@ describe("toElasticFilter", () => {
   });
 
   it("should filter BSDAs on a substring of emitterCompanySiret", async () => {
+    const testInput_1 = { emitterCompanySiret: siretify(1) };
     const bsda1 = await bsdaFactory({
-      opt: { emitterCompanySiret: "11111111111111" }
+      opt: testInput_1
     });
 
     const bsda2 = await bsdaFactory({
-      opt: { emitterCompanySiret: "22222222222222" }
+      opt: { emitterCompanySiret: siretify(2) }
     });
 
     const bsda3 = await bsdaFactory({
-      opt: { emitterCompanySiret: "33333333333333" }
+      opt: { emitterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2042,23 +2050,24 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       emitterCompanySiret: {
-        _contains: "1111"
+        _contains: testInput_1.emitterCompanySiret.slice(4)
       }
     };
     const bsds = await searchBsds(where);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda1.id]);
   });
   it("should filter BSDASRIs on a substring of emitterCompanySiret", async () => {
+    const testInput = { emitterCompanySiret: siretify(1) };
     const bsdasri1 = await bsdasriFactory({
-      opt: { emitterCompanySiret: "11111111111111" }
+      opt: testInput
     });
 
     const bsdasri2 = await bsdasriFactory({
-      opt: { emitterCompanySiret: "22222222222222" }
+      opt: { emitterCompanySiret: siretify(2) }
     });
 
     const bsdasri3 = await bsdasriFactory({
-      opt: { emitterCompanySiret: "33333333333333" }
+      opt: { emitterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2069,23 +2078,24 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       emitterCompanySiret: {
-        _contains: "1111"
+        _contains: testInput.emitterCompanySiret.slice(4)
       }
     };
     const bsds = await searchBsds(where);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id]);
   });
   it("should filter BSVHUs on a substring of emitterCompanySiret", async () => {
+    const testInput_1 = { emitterCompanySiret: siretify(1) };
     const bsvhu1 = await bsvhuFactory({
-      opt: { emitterCompanySiret: "11111111111111" }
+      opt: testInput_1
     });
 
     const bsvhu2 = await bsvhuFactory({
-      opt: { emitterCompanySiret: "22222222222222" }
+      opt: { emitterCompanySiret: siretify(2) }
     });
 
     const bsvhu3 = await bsvhuFactory({
-      opt: { emitterCompanySiret: "33333333333333" }
+      opt: { emitterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2096,27 +2106,19 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       emitterCompanySiret: {
-        _contains: "1111"
+        _contains: testInput_1.emitterCompanySiret.slice(4)
       }
     };
     const bsds = await searchBsds(where);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu1.id]);
   });
   it("should filter BSFFs on a substring of emitterCompanySiret", async () => {
-    const bsff1 = await createBsff(
-      {},
-      { emitterCompanySiret: "11111111111111" }
-    );
+    const testInput = { emitterCompanySiret: siretify(1) };
+    const bsff1 = await createBsff({}, testInput);
 
-    const bsff2 = await createBsff(
-      {},
-      { emitterCompanySiret: "22222222222222" }
-    );
+    const bsff2 = await createBsff({}, { emitterCompanySiret: siretify(2) });
 
-    const bsff3 = await createBsff(
-      {},
-      { emitterCompanySiret: "33333333333333" }
-    );
+    const bsff3 = await createBsff({}, { emitterCompanySiret: siretify(3) });
 
     await Promise.all(
       [bsff1, bsff2, bsff3].map(async bsff => {
@@ -2126,7 +2128,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       emitterCompanySiret: {
-        _contains: "1111"
+        _contains: testInput.emitterCompanySiret.slice(4)
       }
     };
     const bsds = await searchBsds(where);
@@ -2136,19 +2138,20 @@ describe("toElasticFilter", () => {
   it("should filter BSDDs on transporterCompanySiret (exact)", async () => {
     const user = await userFactory();
 
+    const testInput_1 = { transporterCompanySiret: siretify(1) };
     const form1 = await formFactory({
       ownerId: user.id,
-      opt: { transporterCompanySiret: "11111111111111" }
+      opt: testInput_1
     });
 
     const form2 = await formFactory({
       ownerId: user.id,
-      opt: { transporterCompanySiret: "22222222222222" }
+      opt: { transporterCompanySiret: siretify(2) }
     });
 
     const form3 = await formFactory({
       ownerId: user.id,
-      opt: { transporterCompanySiret: "33333333333333" }
+      opt: { transporterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2160,7 +2163,7 @@ describe("toElasticFilter", () => {
 
     const where: WasteRegistryWhere = {
       transporterCompanySiret: {
-        _eq: "11111111111111"
+        _eq: testInput_1.transporterCompanySiret
       }
     };
     const bsds = await searchBsds(where);
@@ -2168,16 +2171,17 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([form1.id]);
   });
   it("should filter BSDAs on transporterCompanySiret (exact)", async () => {
+    const testInput = { transporterCompanySiret: siretify(1) };
     const bsda1 = await bsdaFactory({
-      opt: { transporterCompanySiret: "11111111111111" }
+      opt: testInput
     });
 
     const bsda2 = await bsdaFactory({
-      opt: { transporterCompanySiret: "22222222222222" }
+      opt: { transporterCompanySiret: siretify(2) }
     });
 
     const bsda3 = await bsdaFactory({
-      opt: { transporterCompanySiret: "33333333333333" }
+      opt: { transporterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2188,7 +2192,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       transporterCompanySiret: {
-        _eq: "11111111111111"
+        _eq: testInput.transporterCompanySiret
       }
     };
     const bsds = await searchBsds(where);
@@ -2196,16 +2200,17 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda1.id]);
   });
   it("should filter BSDASRIs on transporterCompanySiret (exact)", async () => {
+    const testInput_1 = { transporterCompanySiret: siretify(1) };
     const bsdasri1 = await bsdasriFactory({
-      opt: { transporterCompanySiret: "11111111111111" }
+      opt: testInput_1
     });
 
     const bsdasri2 = await bsdasriFactory({
-      opt: { transporterCompanySiret: "22222222222222" }
+      opt: { transporterCompanySiret: siretify(2) }
     });
 
     const bsdasri3 = await bsdasriFactory({
-      opt: { transporterCompanySiret: "33333333333333" }
+      opt: { transporterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2216,7 +2221,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       transporterCompanySiret: {
-        _eq: "11111111111111"
+        _eq: testInput_1.transporterCompanySiret
       }
     };
     const bsds = await searchBsds(where);
@@ -2224,16 +2229,17 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id]);
   });
   it("should filter BSVHUs on transporterCompanySiret (exact)", async () => {
+    const testInput = { transporterCompanySiret: siretify(1) };
     const bsvhu1 = await bsvhuFactory({
-      opt: { transporterCompanySiret: "11111111111111" }
+      opt: testInput
     });
 
     const bsvhu2 = await bsvhuFactory({
-      opt: { transporterCompanySiret: "22222222222222" }
+      opt: { transporterCompanySiret: siretify(2) }
     });
 
     const bsvhu3 = await bsvhuFactory({
-      opt: { transporterCompanySiret: "33333333333333" }
+      opt: { transporterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2244,7 +2250,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       transporterCompanySiret: {
-        _eq: "11111111111111"
+        _eq: testInput.transporterCompanySiret
       }
     };
     const bsds = await searchBsds(where);
@@ -2252,19 +2258,17 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu1.id]);
   });
   it("should filter BSFFs on transporterCompanySiret (exact)", async () => {
-    const bsff1 = await createBsff(
-      {},
-      { transporterCompanySiret: "11111111111111" }
-    );
+    const testInput_1 = { transporterCompanySiret: siretify(1) };
+    const bsff1 = await createBsff({}, testInput_1);
 
     const bsff2 = await createBsff(
       {},
-      { transporterCompanySiret: "22222222222222" }
+      { transporterCompanySiret: siretify(2) }
     );
 
     const bsff3 = await createBsff(
       {},
-      { transporterCompanySiret: "33333333333333" }
+      { transporterCompanySiret: siretify(3) }
     );
 
     await Promise.all(
@@ -2275,7 +2279,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       transporterCompanySiret: {
-        _eq: "11111111111111"
+        _eq: testInput_1.transporterCompanySiret
       }
     };
     const bsds = await searchBsds(where);
@@ -2285,19 +2289,21 @@ describe("toElasticFilter", () => {
   it("should filter BSDDs on a list of transporterCompanySiret", async () => {
     const user = await userFactory();
 
+    const testInput = { transporterCompanySiret: siretify(1) };
     const form1 = await formFactory({
       ownerId: user.id,
-      opt: { transporterCompanySiret: "11111111111111" }
+      opt: testInput
     });
 
+    const testInput_1 = { transporterCompanySiret: siretify(2) };
     const form2 = await formFactory({
       ownerId: user.id,
-      opt: { transporterCompanySiret: "22222222222222" }
+      opt: testInput_1
     });
 
     const form3 = await formFactory({
       ownerId: user.id,
-      opt: { transporterCompanySiret: "33333333333333" }
+      opt: { transporterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2308,7 +2314,10 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       transporterCompanySiret: {
-        _in: ["11111111111111", "22222222222222"]
+        _in: [
+          testInput.transporterCompanySiret,
+          testInput_1.transporterCompanySiret
+        ]
       }
     };
     const bsds = await searchBsds(where);
@@ -2316,16 +2325,18 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([form1.id, form2.id]);
   });
   it("should filter BSDAs on a list of transporterCompanySiret", async () => {
+    const testInput_2 = { transporterCompanySiret: siretify(1) };
     const bsda1 = await bsdaFactory({
-      opt: { transporterCompanySiret: "11111111111111" }
+      opt: testInput_2
     });
 
+    const testInput = { transporterCompanySiret: siretify(2) };
     const bsda2 = await bsdaFactory({
-      opt: { transporterCompanySiret: "22222222222222" }
+      opt: testInput
     });
 
     const bsda3 = await bsdaFactory({
-      opt: { transporterCompanySiret: "33333333333333" }
+      opt: { transporterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2336,7 +2347,10 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       transporterCompanySiret: {
-        _in: ["11111111111111", "22222222222222"]
+        _in: [
+          testInput_2.transporterCompanySiret,
+          testInput.transporterCompanySiret
+        ]
       }
     };
     const bsds = await searchBsds(where);
@@ -2344,16 +2358,18 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda1.id, bsda2.id]);
   });
   it("should filter BSDASRIs on a list of transporterCompanySiret", async () => {
+    const testInput_1 = { transporterCompanySiret: siretify(1) };
     const bsdasri1 = await bsdasriFactory({
-      opt: { transporterCompanySiret: "11111111111111" }
+      opt: testInput_1
     });
 
+    const testInput = { transporterCompanySiret: siretify(2) };
     const bsdasri2 = await bsdasriFactory({
-      opt: { transporterCompanySiret: "22222222222222" }
+      opt: testInput
     });
 
     const bsdasri3 = await bsdasriFactory({
-      opt: { transporterCompanySiret: "33333333333333" }
+      opt: { transporterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2364,7 +2380,10 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       transporterCompanySiret: {
-        _in: ["11111111111111", "22222222222222"]
+        _in: [
+          testInput_1.transporterCompanySiret,
+          testInput.transporterCompanySiret
+        ]
       }
     };
     const bsds = await searchBsds(where);
@@ -2372,16 +2391,18 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id, bsdasri2.id]);
   });
   it("should filter BSVHUs on a list of transporterCompanySiret", async () => {
+    const testInput_2 = { transporterCompanySiret: siretify(1) };
     const bsvhu1 = await bsvhuFactory({
-      opt: { transporterCompanySiret: "11111111111111" }
+      opt: testInput_2
     });
 
+    const testInput = { transporterCompanySiret: siretify(2) };
     const bsvhu2 = await bsvhuFactory({
-      opt: { transporterCompanySiret: "22222222222222" }
+      opt: testInput
     });
 
     const bsvhu3 = await bsvhuFactory({
-      opt: { transporterCompanySiret: "33333333333333" }
+      opt: { transporterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2392,7 +2413,10 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       transporterCompanySiret: {
-        _in: ["11111111111111", "22222222222222"]
+        _in: [
+          testInput_2.transporterCompanySiret,
+          testInput.transporterCompanySiret
+        ]
       }
     };
     const bsds = await searchBsds(where);
@@ -2400,19 +2424,15 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu1.id, bsvhu2.id]);
   });
   it("should filter BSFFs on a list of transporterCompanySiret", async () => {
-    const bsff1 = await createBsff(
-      {},
-      { transporterCompanySiret: "11111111111111" }
-    );
+    const testInput_1 = { transporterCompanySiret: siretify(1) };
+    const bsff1 = await createBsff({}, testInput_1);
 
-    const bsff2 = await createBsff(
-      {},
-      { transporterCompanySiret: "22222222222222" }
-    );
+    const testInput = { transporterCompanySiret: siretify(2) };
+    const bsff2 = await createBsff({}, testInput);
 
     const bsff3 = await createBsff(
       {},
-      { transporterCompanySiret: "33333333333333" }
+      { transporterCompanySiret: siretify(3) }
     );
 
     await Promise.all(
@@ -2423,7 +2443,10 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       transporterCompanySiret: {
-        _in: ["11111111111111", "22222222222222"]
+        _in: [
+          testInput_1.transporterCompanySiret,
+          testInput.transporterCompanySiret
+        ]
       }
     };
     const bsds = await searchBsds(where);
@@ -2433,19 +2456,20 @@ describe("toElasticFilter", () => {
   it("should filter BSDDs on a list of transporterCompanySiret", async () => {
     const user = await userFactory();
 
+    const testInput_5 = { transporterCompanySiret: siretify(1) };
     const form1 = await formFactory({
       ownerId: user.id,
-      opt: { transporterCompanySiret: "11111111111111" }
+      opt: testInput_5
     });
 
     const form2 = await formFactory({
       ownerId: user.id,
-      opt: { transporterCompanySiret: "22222222222222" }
+      opt: { transporterCompanySiret: siretify(2) }
     });
 
     const form3 = await formFactory({
       ownerId: user.id,
-      opt: { transporterCompanySiret: "33333333333333" }
+      opt: { transporterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2456,7 +2480,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       transporterCompanySiret: {
-        _contains: "1111"
+        _contains: testInput_5.transporterCompanySiret.slice(4)
       }
     };
     const bsds = await searchBsds(where);
@@ -2464,16 +2488,17 @@ describe("toElasticFilter", () => {
   });
 
   it("should filter BSDAs on a substring of transporterCompanySiret", async () => {
+    const testInput = { transporterCompanySiret: siretify(1) };
     const bsda1 = await bsdaFactory({
-      opt: { transporterCompanySiret: "11111111111111" }
+      opt: testInput
     });
 
     const bsda2 = await bsdaFactory({
-      opt: { transporterCompanySiret: "22222222222222" }
+      opt: { transporterCompanySiret: siretify(2) }
     });
 
     const bsda3 = await bsdaFactory({
-      opt: { transporterCompanySiret: "33333333333333" }
+      opt: { transporterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2484,23 +2509,24 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       transporterCompanySiret: {
-        _contains: "1111"
+        _contains: testInput.transporterCompanySiret.slice(4)
       }
     };
     const bsds = await searchBsds(where);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda1.id]);
   });
   it("should filter BSDASRIs on a substring of transporterCompanySiret", async () => {
+    const testInput_1 = { transporterCompanySiret: siretify(1) };
     const bsdasri1 = await bsdasriFactory({
-      opt: { transporterCompanySiret: "11111111111111" }
+      opt: testInput_1
     });
 
     const bsdasri2 = await bsdasriFactory({
-      opt: { transporterCompanySiret: "22222222222222" }
+      opt: { transporterCompanySiret: siretify(2) }
     });
 
     const bsdasri3 = await bsdasriFactory({
-      opt: { transporterCompanySiret: "33333333333333" }
+      opt: { transporterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2511,23 +2537,24 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       transporterCompanySiret: {
-        _contains: "1111"
+        _contains: testInput_1.transporterCompanySiret.slice(4)
       }
     };
     const bsds = await searchBsds(where);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id]);
   });
   it("should filter BSVHUs on a substring of transporterCompanySiret", async () => {
+    const testInput = { transporterCompanySiret: siretify(1) };
     const bsvhu1 = await bsvhuFactory({
-      opt: { transporterCompanySiret: "11111111111111" }
+      opt: testInput
     });
 
     const bsvhu2 = await bsvhuFactory({
-      opt: { transporterCompanySiret: "22222222222222" }
+      opt: { transporterCompanySiret: siretify(2) }
     });
 
     const bsvhu3 = await bsvhuFactory({
-      opt: { transporterCompanySiret: "33333333333333" }
+      opt: { transporterCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2538,26 +2565,24 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       transporterCompanySiret: {
-        _contains: "1111"
+        _contains: testInput.transporterCompanySiret.slice(4)
       }
     };
     const bsds = await searchBsds(where);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu1.id]);
   });
   it("should filter BSFFs on a substring of transporterCompanySiret", async () => {
-    const bsff1 = await createBsff(
-      {},
-      { transporterCompanySiret: "11111111111111" }
-    );
+    const testInput_1 = { transporterCompanySiret: siretify(1) };
+    const bsff1 = await createBsff({}, testInput_1);
 
     const bsff2 = await createBsff(
       {},
-      { transporterCompanySiret: "22222222222222" }
+      { transporterCompanySiret: siretify(2) }
     );
 
     const bsff3 = await createBsff(
       {},
-      { transporterCompanySiret: "33333333333333" }
+      { transporterCompanySiret: siretify(3) }
     );
 
     await Promise.all(
@@ -2568,7 +2593,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       transporterCompanySiret: {
-        _contains: "1111"
+        _contains: testInput_1.transporterCompanySiret.slice(4)
       }
     };
     const bsds = await searchBsds(where);
@@ -2580,19 +2605,20 @@ describe("toElasticFilter", () => {
   it("should filter BSDDs on destinationCompanySiret (exact)", async () => {
     const user = await userFactory();
 
+    const testInput = { recipientCompanySiret: siretify(1) };
     const form1 = await formFactory({
       ownerId: user.id,
-      opt: { recipientCompanySiret: "11111111111111" }
+      opt: testInput
     });
 
     const form2 = await formFactory({
       ownerId: user.id,
-      opt: { recipientCompanySiret: "22222222222222" }
+      opt: { recipientCompanySiret: siretify(2) }
     });
 
     const form3 = await formFactory({
       ownerId: user.id,
-      opt: { recipientCompanySiret: "33333333333333" }
+      opt: { recipientCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2604,7 +2630,7 @@ describe("toElasticFilter", () => {
 
     const where: WasteRegistryWhere = {
       destinationCompanySiret: {
-        _eq: "11111111111111"
+        _eq: testInput.recipientCompanySiret
       }
     };
     const bsds = await searchBsds(where);
@@ -2612,16 +2638,17 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([form1.id]);
   });
   it("should filter BSDAs on destinationCompanySiret (exact)", async () => {
+    const testInput_1 = { destinationCompanySiret: siretify(1) };
     const bsda1 = await bsdaFactory({
-      opt: { destinationCompanySiret: "11111111111111" }
+      opt: testInput_1
     });
 
     const bsda2 = await bsdaFactory({
-      opt: { destinationCompanySiret: "22222222222222" }
+      opt: { destinationCompanySiret: siretify(2) }
     });
 
     const bsda3 = await bsdaFactory({
-      opt: { destinationCompanySiret: "33333333333333" }
+      opt: { destinationCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2632,7 +2659,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       destinationCompanySiret: {
-        _eq: "11111111111111"
+        _eq: testInput_1.destinationCompanySiret
       }
     };
     const bsds = await searchBsds(where);
@@ -2640,16 +2667,17 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda1.id]);
   });
   it("should filter BSDASRIs on destinationCompanySiret (exact)", async () => {
+    const testInput = { destinationCompanySiret: siretify(1) };
     const bsdasri1 = await bsdasriFactory({
-      opt: { destinationCompanySiret: "11111111111111" }
+      opt: testInput
     });
 
     const bsdasri2 = await bsdasriFactory({
-      opt: { destinationCompanySiret: "22222222222222" }
+      opt: { destinationCompanySiret: siretify(2) }
     });
 
     const bsdasri3 = await bsdasriFactory({
-      opt: { destinationCompanySiret: "33333333333333" }
+      opt: { destinationCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2660,7 +2688,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       destinationCompanySiret: {
-        _eq: "11111111111111"
+        _eq: testInput.destinationCompanySiret
       }
     };
     const bsds = await searchBsds(where);
@@ -2668,16 +2696,17 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id]);
   });
   it("should filter BSVHUs on transporterCompanySiret (exact)", async () => {
+    const testInput_1 = { destinationCompanySiret: siretify(1) };
     const bsvhu1 = await bsvhuFactory({
-      opt: { destinationCompanySiret: "11111111111111" }
+      opt: testInput_1
     });
 
     const bsvhu2 = await bsvhuFactory({
-      opt: { destinationCompanySiret: "22222222222222" }
+      opt: { destinationCompanySiret: siretify(2) }
     });
 
     const bsvhu3 = await bsvhuFactory({
-      opt: { destinationCompanySiret: "33333333333333" }
+      opt: { destinationCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2688,7 +2717,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       destinationCompanySiret: {
-        _eq: "11111111111111"
+        _eq: testInput_1.destinationCompanySiret
       }
     };
     const bsds = await searchBsds(where);
@@ -2696,19 +2725,17 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu1.id]);
   });
   it("should filter BSFFs on destinationCompanySiret (exact)", async () => {
-    const bsff1 = await createBsff(
-      {},
-      { destinationCompanySiret: "11111111111111" }
-    );
+    const testInput = { destinationCompanySiret: siretify(1) };
+    const bsff1 = await createBsff({}, testInput);
 
     const bsff2 = await createBsff(
       {},
-      { destinationCompanySiret: "22222222222222" }
+      { destinationCompanySiret: siretify(2) }
     );
 
     const bsff3 = await createBsff(
       {},
-      { destinationCompanySiret: "33333333333333" }
+      { destinationCompanySiret: siretify(3) }
     );
 
     await Promise.all(
@@ -2719,7 +2746,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       destinationCompanySiret: {
-        _eq: "11111111111111"
+        _eq: testInput.destinationCompanySiret
       }
     };
     const bsds = await searchBsds(where);
@@ -2729,19 +2756,21 @@ describe("toElasticFilter", () => {
   it("should filter BSDDs on a list of destinationCompanySiret", async () => {
     const user = await userFactory();
 
+    const testInput_1 = { recipientCompanySiret: siretify(1) };
     const form1 = await formFactory({
       ownerId: user.id,
-      opt: { recipientCompanySiret: "11111111111111" }
+      opt: testInput_1
     });
 
+    const testInput = { recipientCompanySiret: siretify(2) };
     const form2 = await formFactory({
       ownerId: user.id,
-      opt: { recipientCompanySiret: "22222222222222" }
+      opt: testInput
     });
 
     const form3 = await formFactory({
       ownerId: user.id,
-      opt: { recipientCompanySiret: "33333333333333" }
+      opt: { recipientCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2752,7 +2781,10 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       destinationCompanySiret: {
-        _in: ["11111111111111", "22222222222222"]
+        _in: [
+          testInput_1.recipientCompanySiret,
+          testInput.recipientCompanySiret
+        ]
       }
     };
     const bsds = await searchBsds(where);
@@ -2760,16 +2792,18 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([form1.id, form2.id]);
   });
   it("should filter BSDAs on a list of destinationCompanySiret", async () => {
+    const testInput_2 = { destinationCompanySiret: siretify(1) };
     const bsda1 = await bsdaFactory({
-      opt: { destinationCompanySiret: "11111111111111" }
+      opt: testInput_2
     });
 
+    const testInput = { destinationCompanySiret: siretify(2) };
     const bsda2 = await bsdaFactory({
-      opt: { destinationCompanySiret: "22222222222222" }
+      opt: testInput
     });
 
     const bsda3 = await bsdaFactory({
-      opt: { destinationCompanySiret: "33333333333333" }
+      opt: { destinationCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2780,7 +2814,10 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       destinationCompanySiret: {
-        _in: ["11111111111111", "22222222222222"]
+        _in: [
+          testInput_2.destinationCompanySiret,
+          testInput.destinationCompanySiret
+        ]
       }
     };
     const bsds = await searchBsds(where);
@@ -2788,16 +2825,18 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda1.id, bsda2.id]);
   });
   it("should filter BSDASRIs on a list of destinationCompanySiret", async () => {
+    const testInput_1 = { destinationCompanySiret: siretify(1) };
     const bsdasri1 = await bsdasriFactory({
-      opt: { destinationCompanySiret: "11111111111111" }
+      opt: testInput_1
     });
 
+    const testInput = { destinationCompanySiret: siretify(2) };
     const bsdasri2 = await bsdasriFactory({
-      opt: { destinationCompanySiret: "22222222222222" }
+      opt: testInput
     });
 
     const bsdasri3 = await bsdasriFactory({
-      opt: { destinationCompanySiret: "33333333333333" }
+      opt: { destinationCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2808,7 +2847,10 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       destinationCompanySiret: {
-        _in: ["11111111111111", "22222222222222"]
+        _in: [
+          testInput_1.destinationCompanySiret,
+          testInput.destinationCompanySiret
+        ]
       }
     };
     const bsds = await searchBsds(where);
@@ -2816,16 +2858,18 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id, bsdasri2.id]);
   });
   it("should filter BSVHUs on a list of destinationCompanySiret", async () => {
+    const testInput_2 = { destinationCompanySiret: siretify(1) };
     const bsvhu1 = await bsvhuFactory({
-      opt: { destinationCompanySiret: "11111111111111" }
+      opt: testInput_2
     });
 
+    const testInput = { destinationCompanySiret: siretify(2) };
     const bsvhu2 = await bsvhuFactory({
-      opt: { destinationCompanySiret: "22222222222222" }
+      opt: testInput
     });
 
     const bsvhu3 = await bsvhuFactory({
-      opt: { destinationCompanySiret: "33333333333333" }
+      opt: { destinationCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2836,7 +2880,10 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       destinationCompanySiret: {
-        _in: ["11111111111111", "22222222222222"]
+        _in: [
+          testInput_2.destinationCompanySiret,
+          testInput.destinationCompanySiret
+        ]
       }
     };
     const bsds = await searchBsds(where);
@@ -2844,19 +2891,15 @@ describe("toElasticFilter", () => {
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu1.id, bsvhu2.id]);
   });
   it("should filter BSFFs on a list of destinationCompanySiret", async () => {
-    const bsff1 = await createBsff(
-      {},
-      { destinationCompanySiret: "11111111111111" }
-    );
+    const testInput_1 = { destinationCompanySiret: siretify(1) };
+    const bsff1 = await createBsff({}, testInput_1);
 
-    const bsff2 = await createBsff(
-      {},
-      { destinationCompanySiret: "22222222222222" }
-    );
+    const testInput = { destinationCompanySiret: siretify(2) };
+    const bsff2 = await createBsff({}, testInput);
 
     const bsff3 = await createBsff(
       {},
-      { destinationCompanySiret: "33333333333333" }
+      { destinationCompanySiret: siretify(3) }
     );
 
     await Promise.all(
@@ -2867,7 +2910,10 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       destinationCompanySiret: {
-        _in: ["11111111111111", "22222222222222"]
+        _in: [
+          testInput_1.destinationCompanySiret,
+          testInput.destinationCompanySiret
+        ]
       }
     };
     const bsds = await searchBsds(where);
@@ -2877,19 +2923,20 @@ describe("toElasticFilter", () => {
   it("should filter BSDDs on a list of destinationCompanySiret", async () => {
     const user = await userFactory();
 
+    const testInput_6 = { recipientCompanySiret: siretify(1) };
     const form1 = await formFactory({
       ownerId: user.id,
-      opt: { recipientCompanySiret: "11111111111111" }
+      opt: testInput_6
     });
 
     const form2 = await formFactory({
       ownerId: user.id,
-      opt: { recipientCompanySiret: "22222222222222" }
+      opt: { recipientCompanySiret: siretify(2) }
     });
 
     const form3 = await formFactory({
       ownerId: user.id,
-      opt: { recipientCompanySiret: "33333333333333" }
+      opt: { recipientCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2900,7 +2947,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       destinationCompanySiret: {
-        _contains: "1111"
+        _contains: testInput_6.recipientCompanySiret.slice(4)
       }
     };
     const bsds = await searchBsds(where);
@@ -2908,16 +2955,17 @@ describe("toElasticFilter", () => {
   });
 
   it("should filter BSDAs on a substring of destinationCompanySiret", async () => {
+    const testInput = { destinationCompanySiret: siretify(1) };
     const bsda1 = await bsdaFactory({
-      opt: { destinationCompanySiret: "11111111111111" }
+      opt: testInput
     });
 
     const bsda2 = await bsdaFactory({
-      opt: { destinationCompanySiret: "22222222222222" }
+      opt: { destinationCompanySiret: siretify(2) }
     });
 
     const bsda3 = await bsdaFactory({
-      opt: { destinationCompanySiret: "33333333333333" }
+      opt: { destinationCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2928,23 +2976,24 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       destinationCompanySiret: {
-        _contains: "1111"
+        _contains: testInput.destinationCompanySiret.slice(4)
       }
     };
     const bsds = await searchBsds(where);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda1.id]);
   });
   it("should filter BSDASRIs on a substring of destinationCompanySiret", async () => {
+    const testInput_1 = { destinationCompanySiret: siretify(1) };
     const bsdasri1 = await bsdasriFactory({
-      opt: { destinationCompanySiret: "11111111111111" }
+      opt: testInput_1
     });
 
     const bsdasri2 = await bsdasriFactory({
-      opt: { destinationCompanySiret: "22222222222222" }
+      opt: { destinationCompanySiret: siretify(2) }
     });
 
     const bsdasri3 = await bsdasriFactory({
-      opt: { destinationCompanySiret: "33333333333333" }
+      opt: { destinationCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2955,23 +3004,24 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       destinationCompanySiret: {
-        _contains: "1111"
+        _contains: testInput_1.destinationCompanySiret.slice(4)
       }
     };
     const bsds = await searchBsds(where);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri1.id]);
   });
   it("should filter BSVHUs on a substring of destinationCompanySiret", async () => {
+    const testInput = { destinationCompanySiret: siretify(1) };
     const bsvhu1 = await bsvhuFactory({
-      opt: { destinationCompanySiret: "11111111111111" }
+      opt: testInput
     });
 
     const bsvhu2 = await bsvhuFactory({
-      opt: { destinationCompanySiret: "22222222222222" }
+      opt: { destinationCompanySiret: siretify(2) }
     });
 
     const bsvhu3 = await bsvhuFactory({
-      opt: { destinationCompanySiret: "33333333333333" }
+      opt: { destinationCompanySiret: siretify(3) }
     });
 
     await Promise.all(
@@ -2982,26 +3032,24 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       destinationCompanySiret: {
-        _contains: "1111"
+        _contains: testInput.destinationCompanySiret.slice(4)
       }
     };
     const bsds = await searchBsds(where);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu1.id]);
   });
   it("should filter BSFFs on a substring of destinationCompanySiret", async () => {
-    const bsff1 = await createBsff(
-      {},
-      { destinationCompanySiret: "11111111111111" }
-    );
+    const testInput_1 = { destinationCompanySiret: siretify(1) };
+    const bsff1 = await createBsff({}, testInput_1);
 
     const bsff2 = await createBsff(
       {},
-      { destinationCompanySiret: "22222222222222" }
+      { destinationCompanySiret: siretify(2) }
     );
 
     const bsff3 = await createBsff(
       {},
-      { destinationCompanySiret: "33333333333333" }
+      { destinationCompanySiret: siretify(3) }
     );
 
     await Promise.all(
@@ -3012,7 +3060,7 @@ describe("toElasticFilter", () => {
     await refreshElasticSearch();
     const where: WasteRegistryWhere = {
       destinationCompanySiret: {
-        _contains: "1111"
+        _contains: testInput_1.destinationCompanySiret.slice(4)
       }
     };
     const bsds = await searchBsds(where);
