@@ -33,7 +33,6 @@ import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import CompanyResults from "./CompanyResults";
 import styles from "./CompanySelector.module.scss";
-import CountrySelector from "./CountrySelector";
 import {
   COMPANY_SELECTOR_PRIVATE_INFOS,
   FAVORITES,
@@ -458,7 +457,7 @@ export default function CompanySelector({
                   className="td-input"
                   name={`${field.name}.name`}
                   placeholder="Nom"
-                  disabled={disabled}
+                  disabled={true}
                 />
               </label>
 
@@ -471,23 +470,19 @@ export default function CompanySelector({
                   className="td-input"
                   name={`${field.name}.address`}
                   placeholder="Adresse"
-                  disabled={disabled}
+                  disabled={true}
                 />
               </label>
 
               <RedErrorMessage name={`${field.name}.address`} />
               <label>
                 Pays de l'entreprise
-                <Field name={`${field.name}.country`} disabled={disabled}>
-                  {({ field, form }) => (
-                    <CountrySelector
-                      {...field}
-                      onChange={code => form.setFieldValue(field.name, code)}
-                      value={field.value}
-                      placeholder="Pays"
-                    />
-                  )}
-                </Field>
+                <Field
+                  type="text"
+                  className="td-input"
+                  name={`${field.name}.country`}
+                  disabled={true}
+                />
               </label>
 
               <RedErrorMessage name={`${field.name}.country`} />
