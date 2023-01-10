@@ -309,6 +309,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         status: "DRAFT",
+        wasteDetailsCode: "16 06 01*",
         emitterType: "APPENDIX1",
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,

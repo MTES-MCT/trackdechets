@@ -555,6 +555,8 @@ export default function BSDDetailContent({
     },
   });
 
+  const selectedTab = query.get("selectedTab");
+
   const isMultiModal: boolean = !!form?.transportSegments?.length;
   const hasTempStorage: boolean = !!form?.temporaryStorageDetail;
   const isRegroupement: boolean = form?.emitter?.type === EmitterType.Appendix2;
@@ -642,7 +644,7 @@ export default function BSDDetailContent({
         </div>
 
         <Tabs
-          defaultIndex={query.get("selectedTab") ?? 0}
+          defaultIndex={selectedTab ? parseInt(selectedTab, 10) : 0}
           selectedTabClassName={styles.detailTabSelected}
         >
           {/* Tabs menu */}
@@ -870,12 +872,7 @@ export default function BSDDetailContent({
             {/* Appendix 1 */}
             {isChapeau && (
               <TabPanel className={styles.detailTabPanel}>
-                <Appendix1
-                  container={form}
-                  siret={siret}
-                  id={form.id}
-                  grouping={form.grouping ?? []}
-                />
+                <Appendix1 container={form} siret={siret} />
               </TabPanel>
             )}
           </div>

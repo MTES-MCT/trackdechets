@@ -2,58 +2,28 @@ import {
   Consistence,
   EmitterType,
   Form,
-  QuantityType,
-  WasteAcceptationStatus,
   Prisma,
-  Status
+  QuantityType,
+  Status,
+  WasteAcceptationStatus
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
-import prisma from "../prisma";
+import { Decimal } from "decimal.js-light";
+import { checkVAT } from "jsvat";
 import countries from "world-countries";
 import * as yup from "yup";
 import {
+  BSDD_APPENDIX1_WASTE_CODES,
+  BSDD_WASTE_CODES,
   isDangerous,
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
-  PROCESSING_OPERATIONS_GROUPEMENT_CODES,
   PROCESSING_OPERATIONS_CODES,
-  BSDD_WASTE_CODES
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "../common/constants";
-import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
-  CompanyInput,
-  CompanySearchResult,
-  InitialFormFractionInput,
-  PackagingInfo,
-  Packagings
-} from "../generated/graphql/types";
-import {
-  MISSING_COMPANY_NAME,
-  MISSING_COMPANY_SIRET,
-  MISSING_COMPANY_ADDRESS,
-  MISSING_COMPANY_CONTACT,
-  MISSING_COMPANY_PHONE,
-  MISSING_COMPANY_EMAIL,
-  INVALID_WASTE_CODE,
-  INVALID_PROCESSING_OPERATION,
-  EXTRANEOUS_NEXT_DESTINATION,
-  MISSING_PROCESSING_OPERATION,
-  MISSING_COMPANY_OMI_NUMBER,
-  INVALID_COMPANY_OMI_NUMBER,
-  INVALID_INDIVIDUAL_OR_FOREIGNSHIP,
-  MISSING_COMPANY_SIRET_OR_VAT
-} from "./errors";
-import {
-  isVat,
-  isSiret,
-  isFRVat,
-  isOmi,
-  isForeignVat,
-  countries as vatCountries,
-  BAD_CHARACTERS_REGEXP,
-  isClosedCompany
+  BAD_CHARACTERS_REGEXP, countries as vatCountries, isClosedCompany, isForeignVat, isFRVat,
+  isOmi, isSiret, isVat
 } from "../common/constants/companySearchHelpers";
-import { validateCompany } from "../companies/validateCompany";
-import { Decimal } from "decimal.js-light";
 import {
   foreignVatNumber,
   siret,
@@ -65,10 +35,32 @@ import {
   weightConditions,
   WeightUnits
 } from "../common/validation";
-import { checkVAT } from "jsvat";
+import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { searchCompany } from "../companies/search";
 import { AnonymousCompanyError } from "../companies/sirene/errors";
-import { SIRETS_BY_ROLE_INCLUDE, getFormSiretsByRole } from "./database";
+import { validateCompany } from "../companies/validateCompany";
+import {
+  CompanyInput,
+  CompanySearchResult,
+  InitialFormFractionInput,
+  PackagingInfo,
+  Packagings
+} from "../generated/graphql/types";
+import prisma from "../prisma";
+import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "./database";
+import {
+  EXTRANEOUS_NEXT_DESTINATION,
+  INVALID_COMPANY_OMI_NUMBER,
+  INVALID_INDIVIDUAL_OR_FOREIGNSHIP,
+  INVALID_PROCESSING_OPERATION,
+  INVALID_WASTE_CODE,
+  MISSING_COMPANY_ADDRESS,
+  MISSING_COMPANY_CONTACT,
+  MISSING_COMPANY_EMAIL,
+  MISSING_COMPANY_NAME,
+  MISSING_COMPANY_OMI_NUMBER, MISSING_COMPANY_PHONE,
+  MISSING_COMPANY_SIRET, MISSING_COMPANY_SIRET_OR_VAT, MISSING_PROCESSING_OPERATION
+} from "./errors";
 // set yup default error messages
 configureYup();
 
@@ -606,7 +598,10 @@ const wasteDetailsAppendix1SchemaFn: FactorySchemaOf<
     wasteDetailsCode: yup
       .string()
       .requiredIf(!isDraft, "Le code déchet est obligatoire")
-      .oneOf([...BSDD_WASTE_CODES, "", null], INVALID_WASTE_CODE),
+      .oneOf(
+        [...BSDD_APPENDIX1_WASTE_CODES, "", null],
+        "Le code déchet n'est pas utilisable sur une annexe 1."
+      ),
     wasteDetailsIsDangerous: yup.boolean().when("wasteDetailsCode", {
       is: (wasteCode: string) => isDangerous(wasteCode || ""),
       then: () =>
@@ -639,6 +634,11 @@ const fullWasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
   isDraft =>
     wasteDetailsAppendix1SchemaFn(isDraft).concat(
       yup.object({
+        // The code is redeclared as the possible values are different
+        wasteDetailsCode: yup
+          .string()
+          .requiredIf(!isDraft, "Le code déchet est obligatoire")
+          .oneOf([...BSDD_WASTE_CODES, "", null], INVALID_WASTE_CODE),
         wasteDetailsPackagingInfos: yup
           .array()
           .requiredIf(!isDraft, "Le détail du conditionnement est obligatoire")

@@ -5590,6 +5590,15 @@ export const BSFF_WASTES = ALL_WASTES.filter(w =>
   BSFF_WASTE_CODES.includes(w.code)
 );
 export const BSDD_WASTE_CODES = BSDD_WASTES.map(waste => waste.code);
+export const BSDD_APPENDIX1_WASTE_CODES = [
+  ...BSDD_WASTES.filter(waste => {
+    const prefixes = ["13 02", "13 05", "16 02", "16 07", "20 01"];
+    return prefixes.some(prefix => waste.code.startsWith(prefix));
+  }).map(waste => waste.code),
+  "15 01 10*",
+  "16 06 01*",
+  "19 08 10*"
+];
 
 function flatten(wastes: WasteNode[]): WasteNode[] {
   return wastes

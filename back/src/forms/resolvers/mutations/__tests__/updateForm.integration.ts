@@ -1933,7 +1933,7 @@ describe("Mutation.updateForm", () => {
         emitterCompanyContact: "Contact",
         emitterCompanyPhone: "01 01 01 01 01",
         emitterCompanyMail: "annexe1@test.com",
-        wasteDetailsCode: "01 01 01",
+        wasteDetailsCode: "16 06 01*",
         owner: { connect: { id: user.id } }
       }
     });
@@ -1948,7 +1948,7 @@ describe("Mutation.updateForm", () => {
         emitterCompanyContact: "Contact",
         emitterCompanyPhone: "01 01 01 01 01",
         emitterCompanyMail: "annexe1@test.com",
-        wasteDetailsCode: "01 01 01",
+        wasteDetailsCode: "16 06 01*",
         owner: { connect: { id: user.id } }
       }
     });
@@ -1958,6 +1958,7 @@ describe("Mutation.updateForm", () => {
       ownerId: user.id,
       opt: {
         status: Status.SEALED,
+        wasteDetailsCode: "16 06 01*",
         emitterCompanySiret: company.siret,
         emitterType: EmitterType.APPENDIX1,
         grouping: { create: { initialFormId: appendix1_1.id, quantity: 0 } }

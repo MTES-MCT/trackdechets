@@ -137,7 +137,7 @@ const signatures: Partial<
       existingForm.emitterCompanyOmiNumber;
     const isAppendix1WithAutomaticSignature =
       existingForm.emitterType === EmitterType.APPENDIX1_PRODUCER &&
-      (existingForm.ecoOrganismeSiret ||
+      (existingForm.emittedByEcoOrganisme ||
         (await hasSignatureAutomation({
           signedBy: existingForm.transporterCompanySiret,
           signedFor: existingForm.emitterCompanySiret

@@ -620,7 +620,7 @@ describe("signTransportForm", () => {
       await prisma.signatureAutomation.create({
         data: {
           fromId: producerCompany.id,
-          toId: company.siret
+          toId: company.id
         }
       });
 
@@ -685,6 +685,7 @@ describe("signTransportForm", () => {
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
           transporterCompanySiret: company.siret,
+          emittedByEcoOrganisme: true, // Container has an eco organisme (copied here)
           owner: { connect: { id: user.id } }
         }
       });

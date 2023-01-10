@@ -1842,7 +1842,7 @@ describe("Mutation.createForm", () => {
           emitterCompanyContact: "Contact",
           emitterCompanyPhone: "0101010101",
           emitterCompanyMail: "contact@mail.com",
-          wasteDetailsCode: "01 01 01",
+          wasteDetailsCode: "16 06 01*",
           owner: { connect: { id: user.id } }
         }
       });
@@ -1857,7 +1857,7 @@ describe("Mutation.createForm", () => {
           emitterCompanyContact: "Contact",
           emitterCompanyPhone: "0101010101",
           emitterCompanyMail: "contact@mail.com",
-          wasteDetailsCode: "01 01 01",
+          wasteDetailsCode: "16 06 01*",
           owner: { connect: { id: user.id } }
         }
       });

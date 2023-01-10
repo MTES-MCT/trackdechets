@@ -43,6 +43,11 @@ export function buildSetAppendix1({
     await prisma.form.updateMany({
       where: { id: { in: appendix1Ids } },
       data: {
+        // Most data are copied from the container form and not editable:
+        // - waste infos
+        // - transporter
+        // - recipient
+        // - if its emitted by an eco organisme or not
         wasteDetailsCode: form.wasteDetailsCode,
         wasteDetailsIsDangerous: form.wasteDetailsIsDangerous,
         wasteDetailsName: form.wasteDetailsName,
@@ -58,7 +63,8 @@ export function buildSetAppendix1({
         recipientCompanyAddress: form.recipientCompanyAddress,
         recipientCompanyContact: form.recipientCompanyContact,
         recipientCompanyPhone: form.recipientCompanyPhone,
-        recipientCompanyMail: form.recipientCompanyMail
+        recipientCompanyMail: form.recipientCompanyMail,
+        emittedByEcoOrganisme: form.emittedByEcoOrganisme
       }
     });
 
