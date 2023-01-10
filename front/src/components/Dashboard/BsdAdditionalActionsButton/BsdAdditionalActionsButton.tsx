@@ -141,6 +141,7 @@ const BsdAdditionalActionsButton = ({
     >
       <button
         type="button"
+        data-testid="bsd-actions-secondary-btn"
         className="bsd-actions-kebab-menu__button"
         onClick={onClick}
       >
@@ -170,7 +171,11 @@ const BsdAdditionalActionsButton = ({
           <li>{child}</li>
         ))}
         <li>
-          <button type="button" onClick={handleOverview}>
+          <button
+            type="button"
+            data-testid="bsd-overview-btn"
+            onClick={handleOverview}
+          >
             {apercu_action_label}
           </button>
         </li>
@@ -180,21 +185,33 @@ const BsdAdditionalActionsButton = ({
           canDeleteBsff ||
           canDeleteBsvhu) && (
           <li>
-            <button type="button" onClick={handleDelete}>
+            <button
+              type="button"
+              data-testid="bsd-delete-btn"
+              onClick={handleDelete}
+            >
               {supprimer_action_label}
             </button>
           </li>
         )}
         {(canReviewBsdd || canReviewBsda) && (
           <li>
-            <button type="button" onClick={handleRevision}>
+            <button
+              type="button"
+              data-testid="bsd-review-btn"
+              onClick={handleRevision}
+            >
               {revision_action_label}
             </button>
           </li>
         )}
         {(canDuplicate || canDuplicateBsff()) && (
           <li>
-            <button type="button" onClick={handleDuplicate}>
+            <button
+              type="button"
+              data-testid="bsd-duplicate-btn"
+              onClick={handleDuplicate}
+            >
               {dupliquer_action_label}
             </button>
           </li>
@@ -205,14 +222,18 @@ const BsdAdditionalActionsButton = ({
           canUpdateBsff ||
           canUpdateBsvhu) && (
           <li>
-            <button type="button" onClick={handleUpdate}>
+            <button
+              type="button"
+              data-testid="bsd-update-btn"
+              onClick={handleUpdate}
+            >
               {modifier_action_label}
             </button>
           </li>
         )}
         {(bsd.type === BsdType.Bsff || !bsd.isDraft) && (
           <li>
-            <button type="button" onClick={handlePdf}>
+            <button type="button" data-testid="bsd-pdf-btn" onClick={handlePdf}>
               {pdf_action_label}
             </button>
           </li>

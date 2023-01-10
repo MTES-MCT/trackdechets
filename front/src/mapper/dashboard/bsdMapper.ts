@@ -74,7 +74,7 @@ const createBsdd = (bsdd: Form): BsdDisplay => {
     destination: bsdd.recipient,
     transporter: bsdd.transporter,
     ecoOrganisme: bsdd.ecoOrganisme,
-    updatedAt: bsdd.updatedAt,
+    updatedAt: bsdd.stateSummary?.lastActionOn,
     emittedByEcoOrganisme: bsdd.emittedByEcoOrganisme,
     grouping: bsdd.grouping,
     temporaryStorageDetail: bsdd.temporaryStorageDetail,

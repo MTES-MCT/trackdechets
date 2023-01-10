@@ -106,7 +106,9 @@ function BsdCard({
                 onPdf={onPdf!}
               >
                 {hasBsdSuite(bsdDisplay, currentSiret) && (
-                  <button type="button">{completer_bsd_suite}</button>
+                  <button type="button" data-testid="bsd-suite-btn">
+                    {completer_bsd_suite}
+                  </button>
                 )}
               </BsdAdditionalActionsButton>
             </div>
