@@ -788,8 +788,6 @@ describe("Test Form reception", () => {
       }
     });
 
-    console.log("errors", errors);
-
     expect(errors).toEqual([
       expect.objectContaining({
         message: "Ce bordereau a été annulé"

@@ -17,6 +17,7 @@ import {
   Status
 } from "@prisma/client";
 import { getFormRepository } from "../../repository";
+import { ForbiddenError } from "apollo-server-core";
 
 const markAsResealed: MutationResolvers["markAsResealed"] = async (
   parent,
@@ -28,6 +29,11 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
   const { id, resealedInfos } = args;
 
   const form = await getFormOrFormNotFound({ id });
+
+  if (form.status === Status.CANCELED) {
+    throw new ForbiddenError("Ce bordereau a été annulé");
+  }
+
   const formRepository = getFormRepository(user);
 
   const { forwardedIn } = await formRepository.findFullFormById(form.id);

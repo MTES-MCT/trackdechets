@@ -473,4 +473,45 @@ describe("{ mutation { markAsTempStored } }", () => {
     const appendix2Forms = groupement.map(g => g.initialForm);
     expect(appendix2Forms).toEqual([]);
   });
+
+  it("should not be possible to mark a BSD as temp stored if it's canceled", async () => {
+    const { user, company: tempStorerCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const emitterCompany = await companyFactory();
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.CANCELED,
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: tempStorerCompany.siret,
+        recipientIsTempStorage: true,
+        forwardedIn: {
+          create: { readableId: getReadableId(), ownerId: user.id }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    const { errors } = await mutate(MARK_AS_TEMP_STORED, {
+      variables: {
+        id: form.id,
+        tempStoredInfos: {
+          wasteAcceptationStatus: "ACCEPTED",
+          wasteRefusalReason: "",
+          receivedBy: "John Doe",
+          receivedAt: "2018-12-11T00:00:00.000Z",
+          signedAt: "2018-12-11T00:00:00.000Z",
+          quantityReceived: 2.4,
+          quantityType: "REAL"
+        }
+      }
+    });
+
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toEqual("Ce bordereau a été annulé");
+  });
 });

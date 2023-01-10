@@ -7,11 +7,12 @@ import { receivedInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
 import { expandFormFromDb } from "../../converter";
 import { DestinationCannotTempStore } from "../../errors";
-import { Prisma, WasteAcceptationStatus } from "@prisma/client";
+import { Prisma, Status, WasteAcceptationStatus } from "@prisma/client";
 import { getFormRepository } from "../../repository";
 import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
 import { sendMail } from "../../../mailer/mailing";
 import { runInTransaction } from "../../../common/repository/helper";
+import { ForbiddenError } from "apollo-server-core";
 
 const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
   parent,
@@ -21,6 +22,10 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
   const user = checkIsAuthenticated(context);
   const { id, tempStoredInfos } = args;
   const form = await getFormOrFormNotFound({ id });
+
+  if (form.status === Status.CANCELED) {
+    throw new ForbiddenError("Ce bordereau a été annulé");
+  }
 
   await checkCanMarkAsTempStored(user, form);
 

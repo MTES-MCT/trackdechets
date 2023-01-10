@@ -10,6 +10,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
+import { Status } from "@prisma/client";
 
 const SIGN_EMISSION_FORM = `
   mutation SignEmissionForm($id: ID!, $input: SignEmissionFormInput!, $securityCode: Int) {
@@ -508,5 +509,39 @@ describe("signEmissionForm", () => {
     });
 
     expect(errors).not.toBeUndefined();
+  });
+
+  it("should throw error if bsd is canceled", async () => {
+    const temporaryStorage = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: temporaryStorage.user.id,
+      opt: {
+        status: Status.CANCELED
+      }
+    });
+    const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+
+    const { mutate } = makeClient(transporter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "signEmissionForm">,
+      MutationSignEmissionFormArgs
+    >(SIGN_EMISSION_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          emittedAt: emittedAt.toISOString() as unknown as Date,
+          emittedBy: temporaryStorage.user.name,
+          quantity: 1
+        },
+        securityCode: temporaryStorage.company.securityCode
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Ce bordereau a été annulé"
+      })
+    ]);
   });
 });

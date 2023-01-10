@@ -61,6 +61,9 @@ const signatures: Partial<
     ) => Promise<GraphQLForm>
   >
 > = {
+  [Status.CANCELED]: () => {
+    throw new ForbiddenError("Ce bordereau a été annulé");
+  },
   [Status.SEALED]: async (user, args, existingForm) => {
     // no signature needed
     if (

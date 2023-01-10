@@ -609,4 +609,43 @@ describe("Mutation markAsResealed", () => {
       })
     ]);
   });
+
+  it("should fail if bsd is canceled", async () => {
+    const owner = await userFactory();
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      { companyTypes: { set: [CompanyType.COLLECTOR] } }
+    );
+
+    const { mutate } = makeClient(user);
+
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.COLLECTOR]
+    });
+
+    const form = await formWithTempStorageFactory({
+      ownerId: owner.id,
+      opt: {
+        status: Status.CANCELED,
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
+      },
+      forwardedInOpts: {
+        recipientCompanySiret: destination.siret
+      }
+    });
+
+    const { errors } = await mutate(MARK_AS_RESEALED, {
+      variables: {
+        id: form.id,
+        resealedInfos: {}
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Ce bordereau a été annulé`
+      })
+    ]);
+  });
 });

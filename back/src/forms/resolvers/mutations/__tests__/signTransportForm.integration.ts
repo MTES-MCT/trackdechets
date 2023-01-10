@@ -10,6 +10,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
+import { Status } from "@prisma/client";
 
 const SIGN_TRANSPORT_FORM = `
   mutation SignTransportForm($id: ID!, $input: SignTransportFormInput!, $securityCode: Int) {
@@ -362,6 +363,38 @@ describe("signTransportForm", () => {
       expect.objectContaining({
         message:
           "Vous n'êtes pas autorisé à signer ce bordereau pour cet acteur"
+      })
+    ]);
+  });
+
+  it("should throw error is bsd is canceled", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("ADMIN");
+    const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.CANCELED
+      }
+    });
+
+    const { mutate } = makeClient(transporter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "signTransportForm">,
+      MutationSignTransportFormArgs
+    >(SIGN_TRANSPORT_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          takenOverAt: takenOverAt.toISOString() as unknown as Date,
+          takenOverBy: transporter.user.name
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Ce bordereau a été annulé"
       })
     ]);
   });
