@@ -65,7 +65,7 @@ export const transporterSchema = object().shape({
   ),
   validityLimit: date().nullable(true),
   numberPlate: string().nullable(true),
-  company: companySchema,
+  company: companySchema, // TransportSegment DOES NOT supports foreign companies
 });
 
 const validationSchema = yup.object({ transporter: transporterSchema });
