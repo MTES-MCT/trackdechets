@@ -41,7 +41,6 @@ export default {
   transporter: {
     company: {
       ...getInitialCompany(),
-      vatNumber: "",
     },
     recepisse: {
       number: "",

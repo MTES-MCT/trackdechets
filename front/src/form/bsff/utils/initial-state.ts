@@ -9,7 +9,6 @@ const initialState = {
   transporter: {
     company: {
       ...getInitialCompany(),
-      vatNumber: "",
     },
     isExemptedOfRecepisse: false,
     recepisse: {
