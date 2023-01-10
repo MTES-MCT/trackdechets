@@ -1,4 +1,5 @@
 import "@dataesr/react-dsfr/dist/index.min.cjs.js";
+import "../src/scss/index.scss";
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },

@@ -22,7 +22,7 @@ $shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
   &__dropdown {
     position: absolute;
     right: 0;
-    top: 30px;
+    top: 45px;
     transition: all 0.25s ease-out;
     transform: scale(0);
     transform-origin: 100% 0;
@@ -35,13 +35,13 @@ $shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
       display: block;
       width: 100%;
 
-      button {
+      .fr-btn {
         width: 133px;
         height: 56px;
-        text-align: right;
-        padding: 16px;
+        justify-content: end;
         margin: 0;
-        font-size: 1rem;
+        padding: 16px;
+        color: #000000;
       }
     }
   }

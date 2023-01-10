@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import classnames from "classnames";
+import FocusTrap from "focus-trap-react";
 import {
   apercu_action_label,
   dupliquer_action_label,
@@ -135,101 +136,134 @@ const BsdAdditionalActionsButton = ({
   const canDeleteBsvhu =
     bsd.type === BsdType.Bsvhu && bsd.status === BsdStatusCode.INITIAL;
 
-  return (
-    <div
-      ref={targetRef as React.RefObject<HTMLDivElement>}
-      className="bsd-actions-kebab-menu"
-    >
-      <button
-        type="button"
-        data-testid="bsd-actions-secondary-btn"
-        className="bsd-actions-kebab-menu__button"
-        onClick={onClick}
-      >
-        <figure className="dots"></figure>
-        <figure className="dots"></figure>
-        <figure className="dots"></figure>
-      </button>
+  const tabIndex = isOpen ? 0 : -1;
 
-      <ul
-        ref={dropdownRef as React.RefObject<HTMLUListElement>}
-        className={classnames("bsd-actions-kebab-menu__dropdown", {
-          "bsd-actions-kebab-menu__dropdown--active": isOpen,
-        })}
+  return (
+    <FocusTrap active={isOpen}>
+      <div
+        ref={targetRef as React.RefObject<HTMLDivElement>}
+        className="bsd-actions-kebab-menu"
       >
-        {React.Children.map(children, child => (
-          <li>{child}</li>
-        ))}
-        <li>
-          <button
-            type="button"
-            data-testid="bsd-overview-btn"
-            onClick={handleOverview}
-          >
-            {apercu_action_label}
-          </button>
-        </li>
-        {(canUpdateOrDeleteBsdd ||
-          canDeleteBsda ||
-          canDeleteBsdasri ||
-          canDeleteBsff ||
-          canDeleteBsvhu) && (
+        <button
+          type="button"
+          data-testid="bsd-actions-secondary-btn"
+          className="fr-btn fr-btn--tertiary-no-outline bsd-actions-kebab-menu__button"
+          aria-controls={`bsd-actions-dropdown_${bsd.id}`}
+          aria-expanded={isOpen}
+          onClick={onClick}
+        >
+          <span className="sr-only">
+            {isOpen ? "fermer menu actions" : "ouvrir menu actions"}
+          </span>
+          <figure aria-hidden={true} className="dots"></figure>
+          <figure aria-hidden={true} className="dots"></figure>
+          <figure aria-hidden={true} className="dots"></figure>
+        </button>
+
+        <ul
+          id={`bsd-actions-dropdown_${bsd.id}`}
+          aria-hidden={!isOpen}
+          ref={dropdownRef as React.RefObject<HTMLUListElement>}
+          className={classnames("bsd-actions-kebab-menu__dropdown", {
+            "bsd-actions-kebab-menu__dropdown--active": isOpen,
+          })}
+        >
+          {React.Children.map(children, child => {
+            const newChildWithTabIndex = child
+              ? React.cloneElement(child as React.ReactElement<HTMLElement>, {
+                  tabIndex,
+                })
+              : null;
+
+            return newChildWithTabIndex && <li>{newChildWithTabIndex}</li>;
+          })}
           <li>
             <button
               type="button"
-              data-testid="bsd-delete-btn"
-              onClick={handleDelete}
+              data-testid="bsd-overview-btn"
+              className="fr-btn fr-btn--tertiary-no-outline"
+              tabIndex={tabIndex}
+              onClick={handleOverview}
             >
-              {supprimer_action_label}
+              {apercu_action_label}
             </button>
           </li>
-        )}
-        {(canReviewBsdd || canReviewBsda) && (
-          <li>
-            <button
-              type="button"
-              data-testid="bsd-review-btn"
-              onClick={handleRevision}
-            >
-              {revision_action_label}
-            </button>
-          </li>
-        )}
-        {(canDuplicate || canDuplicateBsff()) && (
-          <li>
-            <button
-              type="button"
-              data-testid="bsd-duplicate-btn"
-              onClick={handleDuplicate}
-            >
-              {dupliquer_action_label}
-            </button>
-          </li>
-        )}
-        {(canUpdateOrDeleteBsdd ||
-          canUpdateBsda ||
-          canUpdateBsdasri ||
-          canUpdateBsff ||
-          canUpdateBsvhu) && (
-          <li>
-            <button
-              type="button"
-              data-testid="bsd-update-btn"
-              onClick={handleUpdate}
-            >
-              {modifier_action_label}
-            </button>
-          </li>
-        )}
-        {(bsd.type === BsdType.Bsff || !bsd.isDraft) && (
-          <li>
-            <button type="button" data-testid="bsd-pdf-btn" onClick={handlePdf}>
-              {pdf_action_label}
-            </button>
-          </li>
-        )}
-      </ul>
-    </div>
+          {(canUpdateOrDeleteBsdd ||
+            canDeleteBsda ||
+            canDeleteBsdasri ||
+            canDeleteBsff ||
+            canDeleteBsvhu) && (
+            <li>
+              <button
+                type="button"
+                data-testid="bsd-delete-btn"
+                className="fr-btn fr-btn--tertiary-no-outline"
+                tabIndex={tabIndex}
+                onClick={handleDelete}
+              >
+                {supprimer_action_label}
+              </button>
+            </li>
+          )}
+          {(canReviewBsdd || canReviewBsda) && (
+            <li>
+              <button
+                type="button"
+                data-testid="bsd-review-btn"
+                className="fr-btn fr-btn--tertiary-no-outline"
+                tabIndex={tabIndex}
+                onClick={handleRevision}
+              >
+                {revision_action_label}
+              </button>
+            </li>
+          )}
+          {(canDuplicate || canDuplicateBsff()) && (
+            <li>
+              <button
+                type="button"
+                data-testid="bsd-duplicate-btn"
+                className="fr-btn fr-btn--tertiary-no-outline"
+                tabIndex={tabIndex}
+                onClick={handleDuplicate}
+              >
+                {dupliquer_action_label}
+              </button>
+            </li>
+          )}
+          {(canUpdateOrDeleteBsdd ||
+            canUpdateBsda ||
+            canUpdateBsdasri ||
+            canUpdateBsff ||
+            canUpdateBsvhu) && (
+            <li>
+              <button
+                type="button"
+                data-testid="bsd-update-btn"
+                className="fr-btn fr-btn--tertiary-no-outline"
+                tabIndex={tabIndex}
+                onClick={handleUpdate}
+              >
+                {modifier_action_label}
+              </button>
+            </li>
+          )}
+          {(bsd.type === BsdType.Bsff || !bsd.isDraft) && (
+            <li>
+              <button
+                type="button"
+                data-testid="bsd-pdf-btn"
+                className="fr-btn fr-btn--tertiary-no-outline"
+                tabIndex={tabIndex}
+                onClick={handlePdf}
+              >
+                {pdf_action_label}
+              </button>
+            </li>
+          )}
+        </ul>
+      </div>
+    </FocusTrap>
   );
 };
 

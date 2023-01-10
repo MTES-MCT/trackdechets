@@ -46,7 +46,7 @@ function BsdCard({
   };
 
   return (
-    <div className="bsd-card">
+    <div className="bsd-card" tabIndex={0}>
       {bsdDisplay && (
         <>
           <div className="bsd-card__header">
@@ -106,7 +106,11 @@ function BsdCard({
                 onPdf={onPdf!}
               >
                 {hasBsdSuite(bsdDisplay, currentSiret) && (
-                  <button type="button" data-testid="bsd-suite-btn">
+                  <button
+                    type="button"
+                    data-testid="bsd-suite-btn"
+                    className="fr-btn fr-btn--tertiary-no-outline"
+                  >
                     {completer_bsd_suite}
                   </button>
                 )}
