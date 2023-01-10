@@ -1,87 +1,88 @@
-$cubic-out: cubic-bezier(.32, 2.04, .85, .54);
-$cubic-in: cubic-bezier(.72, 1.2, .71, .72);
+$cubic-out: cubic-bezier(0.32, 2.04, 0.85, 0.54);
+$cubic-in: cubic-bezier(0.72, 1.2, 0.71, 0.72);
 $shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
 
-
 .bsd-actions-kebab-menu {
+  position: relative;
+  &__button {
     position: relative;
-    &__button {
-        position: relative;
-        display: inline-block;
-        box-sizing: border-box;
-        padding: 3px 12px;
-        border: 1px solid #DDDDDD;
-        background: none;
+    display: inline-block;
+    box-sizing: border-box;
+    padding: 3px 12px;
+    border: 1px solid #dddddd;
+    background: none;
 
-        .dots {
-            width: 4px;
-            height: 4px;
-            border-radius: 5px;
-            background: #000091;
-            margin: 3px 0;
-        }
-
-        &__middle {
-            transition: all 0.25s $cubic-in;
-            transform: scale(1);
-            position: relative;
-            box-shadow: 0 0.1px 0.1px 0 rgba(0, 0, 0, 0.16), 0 0.1px 0.3px 0 rgba(0, 0, 0, 0.12);
-            filter: blur(.1px);
-        }
-
-        &__middle--active {
-            transform: scale(4.5);
-            transition: all 0.25s $cubic-out;
-            box-shadow: 0 0.1px 0.1px 0 rgba(0, 0, 0, 0.16), 0 0.1px 0.3px 0 rgba(0, 0, 0, 0.12);
-        }
-
-        &__cross {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            margin-top: -1px;
-            color: #fff;
-            transition: all 0.2s $cubic-in;
-            font-size: 22px;
-            user-select: none;
-        }
-
-        &__cross--active {
-            transform: translate(-50%, -50%) scale(1);
-            transition: all 0.15s $cubic-out;
-        }
+    .dots {
+      width: 4px;
+      height: 4px;
+      border-radius: 5px;
+      background: #000091;
+      margin: 3px 0;
     }
 
-    &__dropdown {
-        position: absolute;
-        right: 0;
-        top: 30px;
-        transition: all 0.25s ease-out;
-        transform: scale(0);
-        transform-origin: 100% 0;
-        box-shadow: $shadow;
-        background: #fff;
-        z-index: 99;
-        padding: 0;
-
-        li {
-            display: block;
-            width: 100%;
-
-            button {
-                width: 133px;
-                height: 56px;
-                text-align: right;
-                padding: 16px;
-                margin: 0;
-                font-size: 1rem;
-            }
-        }
+    &__middle {
+      transition: all 0.25s $cubic-in;
+      transform: scale(1);
+      position: relative;
+      box-shadow: 0 0.1px 0.1px 0 rgba(0, 0, 0, 0.16),
+        0 0.1px 0.3px 0 rgba(0, 0, 0, 0.12);
+      filter: blur(0.1px);
     }
 
-    &__dropdown--active {
-        transform: scale(1);
-        transition: all 0.25s cubic-bezier(.5, 1.8, .9, .8);
+    &__middle--active {
+      transform: scale(4.5);
+      transition: all 0.25s $cubic-out;
+      box-shadow: 0 0.1px 0.1px 0 rgba(0, 0, 0, 0.16),
+        0 0.1px 0.3px 0 rgba(0, 0, 0, 0.12);
     }
+
+    &__cross {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      margin-top: -1px;
+      color: #fff;
+      transition: all 0.2s $cubic-in;
+      font-size: 22px;
+      user-select: none;
+    }
+
+    &__cross--active {
+      transform: translate(-50%, -50%) scale(1);
+      transition: all 0.15s $cubic-out;
+    }
+  }
+
+  &__dropdown {
+    position: absolute;
+    right: 0;
+    top: 30px;
+    transition: all 0.25s ease-out;
+    transform: scale(0);
+    transform-origin: 100% 0;
+    box-shadow: $shadow;
+    background: #fff;
+    z-index: 99;
+    padding: 0;
+
+    li {
+      display: block;
+      width: 100%;
+
+      button {
+        width: 133px;
+        height: 56px;
+        text-align: right;
+        padding: 16px;
+        margin: 0;
+        font-size: 1rem;
+      }
+    }
+  }
+
+  &__dropdown--active {
+    transform: scale(1);
+    transition: all 0.25s cubic-bezier(0.5, 1.8, 0.9, 0.8);
+  }
 }
