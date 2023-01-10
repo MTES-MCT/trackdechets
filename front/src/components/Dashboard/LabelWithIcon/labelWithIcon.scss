@@ -1,38 +1,36 @@
 .label-icon {
-    margin:0;
-    padding:0;
-    display:flex;
-    align-items: center;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
 
-    &__TempStorage {
-        &:before { 
-            display: inline-block;
-            content: "";
-            background-image: url("/icons/dashboard/temp-storage.svg");
-            width: 24px;
-            height: 24px;
-        }   
+  &__TempStorage {
+    &:before {
+      display: inline-block;
+      content: "";
+      background-image: url("/icons/dashboard/temp-storage.svg");
+      width: 24px;
+      height: 24px;
     }
-    &__EcoOrganism {
-        &:before {
-                display: inline-block;
-                content: "";
-                background-image: url("/icons/dashboard/eco-organism.svg");
-                width: 16px;
-                height: 16px;
-                margin-right: 5px;
-        }
-
+  }
+  &__EcoOrganism {
+    &:before {
+      display: inline-block;
+      content: "";
+      background-image: url("/icons/dashboard/eco-organism.svg");
+      width: 16px;
+      height: 16px;
+      margin-right: 5px;
     }
-    &__LastModificationDate {
-        &:before {
-                display: inline-block;
-                content: "";
-                background-image: url("/icons/dashboard/last-modification-date.svg");
-                width: 15px;
-                height: 15px;
-                margin-right: 5px;
-        }
+  }
+  &__LastModificationDate {
+    &:before {
+      display: inline-block;
+      content: "";
+      background-image: url("/icons/dashboard/last-modification-date.svg");
+      width: 15px;
+      height: 15px;
+      margin-right: 5px;
     }
-    
+  }
 }

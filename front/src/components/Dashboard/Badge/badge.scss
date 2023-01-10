@@ -1,99 +1,100 @@
 .fr-badge {
-    &--success, &--error {
-        &:before {
-            display: inline-block!important;
-        }
+  &--success,
+  &--error {
+    &:before {
+      display: inline-block !important;
     }
-    &--DRAFT {
-        background-color: #FBF6ED;
-        color: #716043;
-    }
-    &--SEALED {
-        background-color: #FEECC2;
-        color: #716043;
-    }
-    &--SENT {
-        background-color: #E5FBFD;
-        color: #006A6F;
-    }
-    &--RECEIVED {
-        background-color: #E5FBFD;
-        color: #006A6F;
-    }
-    &--ACCEPTED {
-        background-color: #E3FDEB;
-        color: #37635F;
-    }
-    &--PROCESSED {
-        background-color: #B8FEC9;
-        color: #18753C;
-    }
-    &--AWAITING_GROUP {
-        background-color: #E5FBFD;
-        color: #006A6F;
-    }
-    &--GROUPED {
-        background-color: #FBF6ED;
-        color: #716043;
-    }
-    &--NO_TRACEABILITY {
-        background-color: #FFE8E5;
-        color: #B34000;
-    }
-    &--REFUSED {
-        background-color: #FFE9E9;
-        color: #CE0500;
-    }
-    &--TEMP_STORED {
-        background-color: #E5FBFD;
-        color: #006A6F;
-    }
-    &--TEMP_STORER_ACCEPTED {
-        background-color: #E3FDEB;
-        color: #37635F;
-    }
-    &--RESEALED {
-        background-color: #E5FBFD;
-        color: #006A6F;
-    }
-    &--RESENT {
-        background-color: #E5FBFD;
-        color: #006A6F;
-    }
-    &--SIGNED_BY_PRODUCER {
-        background-color: #E6EEFE;
-        color: #3558A2;
-    }
-    &--INITIAL {
-        background-color: #FBF6ED;
-        color: #716043;
-    }
-    &--SIGNED_BY_EMITTER {
-        background-color: #E6EEFE;
-        color: #3558A2;
-    }
-    &--INTERMEDIATELY_PROCESSED {
-        background-color: #FBF6ED;
-        color: #716043;
-    }
-    &--SIGNED_BY_TEMP_STORER {
-        background-color: #E6EEFE;
-        color: #3558A2;
-    }
-    &--FOLLOWED_WITH_PNTTD {
-        background-color: #B8FEC9;
-        color: #18753C;
-    }
-    &--PARTIALLY_REFUSED {
-        background-color: #FFE9E9;
-        color: #CE0500;
-    }
-    &--SIGNED_BY_WORKER {
-        background-color: #E6EEFE;
-        color: #3558A2;
-    }
-    &--AWAITING_CHILD {
-        background-color: #E5FBFD;
-        color: #006A6F;
-    }
+  }
+  &--DRAFT {
+    background-color: #fbf6ed;
+    color: #716043;
+  }
+  &--SEALED {
+    background-color: #feecc2;
+    color: #716043;
+  }
+  &--SENT {
+    background-color: #e5fbfd;
+    color: #006a6f;
+  }
+  &--RECEIVED {
+    background-color: #e5fbfd;
+    color: #006a6f;
+  }
+  &--ACCEPTED {
+    background-color: #e3fdeb;
+    color: #37635f;
+  }
+  &--PROCESSED {
+    background-color: #b8fec9;
+    color: #18753c;
+  }
+  &--AWAITING_GROUP {
+    background-color: #e5fbfd;
+    color: #006a6f;
+  }
+  &--GROUPED {
+    background-color: #fbf6ed;
+    color: #716043;
+  }
+  &--NO_TRACEABILITY {
+    background-color: #ffe8e5;
+    color: #b34000;
+  }
+  &--REFUSED {
+    background-color: #ffe9e9;
+    color: #ce0500;
+  }
+  &--TEMP_STORED {
+    background-color: #e5fbfd;
+    color: #006a6f;
+  }
+  &--TEMP_STORER_ACCEPTED {
+    background-color: #e3fdeb;
+    color: #37635f;
+  }
+  &--RESEALED {
+    background-color: #e5fbfd;
+    color: #006a6f;
+  }
+  &--RESENT {
+    background-color: #e5fbfd;
+    color: #006a6f;
+  }
+  &--SIGNED_BY_PRODUCER {
+    background-color: #e6eefe;
+    color: #3558a2;
+  }
+  &--INITIAL {
+    background-color: #fbf6ed;
+    color: #716043;
+  }
+  &--SIGNED_BY_EMITTER {
+    background-color: #e6eefe;
+    color: #3558a2;
+  }
+  &--INTERMEDIATELY_PROCESSED {
+    background-color: #fbf6ed;
+    color: #716043;
+  }
+  &--SIGNED_BY_TEMP_STORER {
+    background-color: #e6eefe;
+    color: #3558a2;
+  }
+  &--FOLLOWED_WITH_PNTTD {
+    background-color: #b8fec9;
+    color: #18753c;
+  }
+  &--PARTIALLY_REFUSED {
+    background-color: #ffe9e9;
+    color: #ce0500;
+  }
+  &--SIGNED_BY_WORKER {
+    background-color: #e6eefe;
+    color: #3558a2;
+  }
+  &--AWAITING_CHILD {
+    background-color: #e5fbfd;
+    color: #006a6f;
+  }
 }
