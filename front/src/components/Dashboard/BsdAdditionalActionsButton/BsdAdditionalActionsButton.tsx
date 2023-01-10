@@ -41,6 +41,7 @@ const BsdAdditionalActionsButton = ({
         current.scrollHeight
     ) {
       current.style.top = `-${current.offsetHeight + 20}px`;
+      current.style.transition = `none`;
     }
   }, [isOpen]);
 
@@ -146,18 +147,7 @@ const BsdAdditionalActionsButton = ({
         onClick={onClick}
       >
         <figure className="dots"></figure>
-        <figure
-          className={classnames("dots bsd-actions-kebab-menu__button__middle", {
-            "bsd-actions-kebab-menu__button__middle--active": isOpen,
-          })}
-        ></figure>
-        <p
-          className={classnames("bsd-actions-kebab-menu__button__cross", {
-            "bsd-actions-kebab-menu__button__cross--active": isOpen,
-          })}
-        >
-          x
-        </p>
+        <figure className="dots"></figure>
         <figure className="dots"></figure>
       </button>
 
