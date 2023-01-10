@@ -1,16 +1,19 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getBsffOrNotFound, getPreviousPackagings } from "../../database";
+import { getBsffOrNotFound } from "../../database";
 import { checkCanWriteBsff } from "../../permissions";
-import prisma from "../../../prisma";
 import { expandBsffFromDB } from "../../converter";
-import { indexBsff } from "../../elastic";
 import {
   validateBsff,
   validateFicheInterventions,
   validatePreviousPackagings
 } from "../../validation";
 import { BsffType } from "@prisma/client";
+import {
+  getBsffFicheInterventionRepository,
+  getBsffPackagingRepository,
+  getBsffRepository
+} from "../../repository";
 
 const publishBsffResolver: MutationResolvers["publishBsff"] = async (
   _,
@@ -20,13 +23,19 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
   const user = checkIsAuthenticated(context);
   const existingBsff = await getBsffOrNotFound({ id });
 
-  const packagings = await prisma.bsff
-    .findUnique({ where: { id: existingBsff.id } })
-    .packagings();
+  const { update: updateBsff, findUniqueGetPackagings } =
+    getBsffRepository(user);
+  const { findPreviousPackagings } = getBsffPackagingRepository(user);
+  const { findMany: findManyFicheIntervention } =
+    getBsffFicheInterventionRepository(user);
+
+  const packagings = await findUniqueGetPackagings({
+    where: { id: existingBsff.id }
+  });
 
   await checkCanWriteBsff(user, existingBsff);
 
-  const previousPackagings = await getPreviousPackagings(
+  const previousPackagings = await findPreviousPackagings(
     existingBsff.packagings.map(p => p.id),
     1
   );
@@ -42,7 +51,7 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
       : {})
   };
 
-  const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
+  const ficheInterventions = await findManyFicheIntervention({
     where: { bsffs: { some: { id: { in: [existingBsff.id] } } } }
   });
 
@@ -52,16 +61,14 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
   await validateFicheInterventions(fullBsff, ficheInterventions);
   await validatePreviousPackagings(fullBsff, previousPackagingsIds);
 
-  const updatedBsff = await prisma.bsff.update({
-    data: {
-      isDraft: false
-    },
+  const updatedBsff = await updateBsff({
     where: {
       id: existingBsff.id
+    },
+    data: {
+      isDraft: false
     }
   });
-
-  await indexBsff(updatedBsff, context);
 
   return expandBsffFromDB(updatedBsff);
 };

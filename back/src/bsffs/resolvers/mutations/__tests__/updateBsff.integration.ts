@@ -20,8 +20,8 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { OPERATION } from "../../../constants";
-import { getPreviousPackagings } from "../../../database";
 import { fullBsff } from "../../../fragments";
+import { getReadonlyBsffPackagingRepository } from "../../../repository";
 import {
   createBsff,
   createBsffAfterEmission,
@@ -613,10 +613,11 @@ describe("Mutation.updateBsff", () => {
       include: { packagings: true }
     });
 
-    const previousPackagings = await getPreviousPackagings(
-      updatedBsff.packagings.map(p => p.id),
-      1
-    );
+    const previousPackagings =
+      await getReadonlyBsffPackagingRepository().findPreviousPackagings(
+        updatedBsff.packagings.map(p => p.id),
+        1
+      );
 
     for (const packaging of previousPackagings) {
       expect(
@@ -683,10 +684,11 @@ describe("Mutation.updateBsff", () => {
       include: { packagings: true }
     });
 
-    const previousPackagings = await getPreviousPackagings(
-      updatedBsff.packagings.map(p => p.id),
-      1
-    );
+    const previousPackagings =
+      await getReadonlyBsffPackagingRepository().findPreviousPackagings(
+        updatedBsff.packagings.map(p => p.id),
+        1
+      );
     expect(previousPackagings).toHaveLength(1);
 
     expect(previousPackagings[0].id).toEqual(newForwarded.packagings[0].id);
@@ -756,10 +758,11 @@ describe("Mutation.updateBsff", () => {
 
     expect(errors).toBeUndefined();
 
-    const previousPackagings = await getPreviousPackagings(
-      bsff.packagings.map(p => p.id),
-      1
-    );
+    const previousPackagings =
+      await getReadonlyBsffPackagingRepository().findPreviousPackagings(
+        bsff.packagings.map(p => p.id),
+        1
+      );
 
     for (const previousPackaging of previousPackagings) {
       expect(newRepackaged.packagings.map(p => p.id)).toContain(

@@ -1,9 +1,9 @@
 import { BsffType } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
-import { getNextPackagings, getPreviousPackagings } from "../database";
+import { getReadonlyBsffPackagingRepository } from "../repository";
 import { createBsff } from "./factories";
 
-describe("getPreviousPackagings", () => {
+describe("findPreviousPackagings", () => {
   afterAll(resetDatabase);
 
   it("should return previous packagings according to the number of hops", async () => {
@@ -40,9 +40,10 @@ describe("getPreviousPackagings", () => {
       }
     );
 
-    const previousPackagings = await getPreviousPackagings(
-      bsff6.packagings.map(p => p.id)
-    );
+    const previousPackagings =
+      await getReadonlyBsffPackagingRepository().findPreviousPackagings(
+        bsff6.packagings.map(p => p.id)
+      );
 
     expect(previousPackagings.map(p => p.id)).toEqual([
       ...bsff1.packagings.map(p => p.id),
@@ -52,10 +53,11 @@ describe("getPreviousPackagings", () => {
       ...bsff5.packagings.map(p => p.id)
     ]);
 
-    const previousPackagingsMaxHops1 = await getPreviousPackagings(
-      bsff6.packagings.map(p => p.id),
-      1
-    );
+    const previousPackagingsMaxHops1 =
+      await getReadonlyBsffPackagingRepository().findPreviousPackagings(
+        bsff6.packagings.map(p => p.id),
+        1
+      );
 
     expect(previousPackagingsMaxHops1.map(p => p.id)).toEqual([
       ...bsff4.packagings.map(p => p.id),
@@ -101,7 +103,10 @@ describe("getNextPackagings", () => {
       }
     );
 
-    const nextPackagings = await getNextPackagings(bsff1.packagings[0].id);
+    const nextPackagings =
+      await getReadonlyBsffPackagingRepository().findNextPackagings(
+        bsff1.packagings[0].id
+      );
 
     expect(nextPackagings.map(p => p.id)).toEqual([
       bsff2.packagings[0].id,

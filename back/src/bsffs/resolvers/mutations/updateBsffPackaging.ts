@@ -1,4 +1,3 @@
-import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -8,6 +7,7 @@ import {
 import { getBsffPackagingOrNotFound } from "../../database";
 import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { UserInputError } from "apollo-server-core";
+import { getBsffPackagingRepository } from "../../repository";
 
 const updateBsffPackaging: MutationResolvers["updateBsffPackaging"] = async (
   _,
@@ -29,7 +29,11 @@ const updateBsffPackaging: MutationResolvers["updateBsffPackaging"] = async (
     );
   }
 
-  const updatedBsffPackaging = await prisma.bsffPackaging.update({
+  const { update: updateBsffPackaging } = getBsffPackagingRepository(
+    context.user
+  );
+
+  const updatedBsffPackaging = await updateBsffPackaging({
     where: { id },
     data: flattenBsffPackagingInput(input)
   });

@@ -13,7 +13,8 @@ import * as QRCode from "qrcode";
 import prisma from "../../prisma";
 import { OPERATION } from "../constants";
 import { generatePdf, TRANSPORT_MODE_LABELS } from "../../common/pdf";
-import { getPreviousPackagings } from "../database";
+
+import { getReadonlyBsffPackagingRepository } from "../repository";
 
 const assetsPath = path.join(__dirname, "assets");
 const templatePath = path.join(assetsPath, "index.html");
@@ -22,7 +23,8 @@ const signaturePath = path.join(assetsPath, "signature.svg");
 export async function generateBsffPdf(
   bsff: Bsff & { packagings: BsffPackaging[] }
 ) {
-  const previousPackagings = await getPreviousPackagings(
+  const { findPreviousPackagings } = await getReadonlyBsffPackagingRepository();
+  const previousPackagings = await findPreviousPackagings(
     bsff.packagings.map(p => p.id)
   );
   const previousBsffIds = [...new Set(previousPackagings.map(p => p.bsffId))];
