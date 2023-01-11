@@ -3,7 +3,7 @@ import {
   BsdStatusCode,
   WorkflowDisplayType,
 } from "../../common/types/bsdTypes";
-import { formatBsd } from "../../mapper/dashboard/bsdMapper";
+import { formatBsd } from "./bsdMapper";
 import {
   Bsd,
   BsdasriType,
@@ -508,6 +508,7 @@ export const hasBsdSuite = (bsd: BsdDisplay, currentSiret): boolean => {
   return (
     (bsd.status === BsdStatusCode.TEMP_STORER_ACCEPTED ||
       (bsd.status === BsdStatusCode.ACCEPTED && !bsd.isTempStorage)) &&
-    isSameSiretDestination(currentSiret, bsd)
+    isSameSiretDestination(currentSiret, bsd) &&
+    bsd.type === BsdType.Bsdd
   );
 };

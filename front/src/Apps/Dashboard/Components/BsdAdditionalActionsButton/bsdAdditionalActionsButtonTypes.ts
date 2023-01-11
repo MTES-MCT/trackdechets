@@ -1,7 +1,7 @@
 import { BsdDisplay } from "common/types/bsdTypes";
 
 export interface BsdAdditionalActionsButtonProps {
-  bsd: BsdDisplay; // maybe Bsd TODO
+  bsd: BsdDisplay;
   currentSiret: string;
   onOverview: Function;
   onPdf: Function;

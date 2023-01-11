@@ -2,8 +2,8 @@ import React from "react";
 import { ComponentMeta, ComponentStory } from "@storybook/react";
 import { withDesign } from "storybook-addon-designs";
 import Badge from "./Badge";
-import { BsdStatusCode } from "../../../common/types/bsdTypes";
-import { BsdType } from "../../../generated/graphql/types";
+import { BsdStatusCode } from "../../../../common/types/bsdTypes";
+import { BsdType } from "../../../../generated/graphql/types";
 
 export default {
   title: "COMPONENTS/DASHBOARD/Badge",

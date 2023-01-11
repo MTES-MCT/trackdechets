@@ -254,6 +254,7 @@ export default withRouter(function LayoutContainer({ history }) {
                 isAuthenticated={isAuthenticated}
               >
                 <Dashboard />
+                {/* <DashboardRoutes /> */}
               </PrivateRoute>
 
               <PrivateRoute

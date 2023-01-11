@@ -70,6 +70,7 @@ export enum BsdStatusCode { // TODO a revoir avec harmonisation des status
 
 export interface BsdDisplay {
   id: string;
+  readableid: string;
   type: BsdType;
   isDraft: boolean;
   status: BsdStatusCode;

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { formatDate } from "../../../common/datetime";
+import { formatDate } from "../../../../common/datetime";
 import Badge from "../Badge/Badge";
 import LabelWithIcon from "../LabelWithIcon/LabelWithIcon";
 import { LabelIconCode } from "../LabelWithIcon/labelWithIconTypes";
@@ -12,11 +12,11 @@ import {
   getCtaLabelFromStatus,
   getWorkflowLabel,
   hasBsdSuite,
-} from "../../../services/dashboard/dashboardServices";
+} from "../../dashboardServices";
 import BsdAdditionalActionsButton from "../BsdAdditionalActionsButton/BsdAdditionalActionsButton";
 
 import "./bsdCard.scss";
-import { completer_bsd_suite } from "../../../assets/wordings/dashboard/wordingsDashboard";
+import { completer_bsd_suite } from "../../../../assets/wordings/dashboard/wordingsDashboard";
 
 function BsdCard({
   bsd,
@@ -50,7 +50,7 @@ function BsdCard({
       {bsdDisplay && (
         <>
           <div className="bsd-card__header">
-            <p className="bsd-number">N°: {bsdDisplay.id}</p>
+            <p className="bsd-number">N°: {bsdDisplay.readableid}</p>
             {bsdDisplay?.isTempStorage && (
               <LabelWithIcon labelCode={LabelIconCode.TempStorage} />
             )}
