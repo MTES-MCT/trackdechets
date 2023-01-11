@@ -509,7 +509,7 @@ describe("sealedFormSchema", () => {
       } catch (err) {
         // Then
         expect(err.errors).toEqual([
-          "Destination ultérieure : Cette opération d’élimination / valorisation n'existe pas."
+          "Destination : Cette opération d’élimination / valorisation n'existe pas."
         ]);
       }
     });
