@@ -524,7 +524,7 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
-  it("should set country to FR by default", async () => {
+  it("should set nextDestinationCompanyCountry to FR by default is a SIRET is defined", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -614,6 +614,51 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.nextDestinationCompanyCountry).toBe("IE");
   });
 
+  it("should mark a form FOLLOWED_WITH_PNTTD with foreign next destination and auto-guess the country", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          nextDestination: {
+            processingOperation: "D 1",
+            company: {
+              mail: "m@m.fr",
+              siret: null,
+              vatNumber: "IE9513674T",
+              name: "IE company",
+              phone: "0101010101",
+              contact: "The famous bot",
+              address: "A beautiful place..."
+            }
+          }
+        }
+      }
+    });
+
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
+
+    expect(resultingForm.status).toBe("FOLLOWED_WITH_PNTTD");
+    expect(resultingForm.nextDestinationCompanyVatNumber).toEqual("IE9513674T");
+    expect(resultingForm.nextDestinationCompanyCountry).toBe("IE");
+  });
+
   it("should mark a form with temp storage FOLLOWED_WITH_PNTTD with foreign next destination", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formWithTempStorageFactory({
@@ -662,7 +707,7 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.forwardedIn.nextDestinationCompanyCountry).toBe("IE");
   });
 
-  it("should disallow a missing siret for a french next destination", async () => {
+  it("should disallow a missing siret for any next destination", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -686,7 +731,6 @@ describe("mutation.markAsProcessed", () => {
             processingOperation: "D 1",
             company: {
               mail: "m@m.fr",
-              country: "FR",
               name: "company",
               phone: "0101010101",
               contact: "The famous bot",
