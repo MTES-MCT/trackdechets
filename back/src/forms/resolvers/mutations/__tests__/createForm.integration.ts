@@ -183,7 +183,7 @@ describe("Mutation.createForm", () => {
     }
   );
 
-  it("should allow to create a form without space in code D/R", async () => {
+  it("should allow to create a form without space in recipientProcessingOperation", async () => {
     const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
     const transporter = await companyFactory();
     const destination = await companyFactory();
