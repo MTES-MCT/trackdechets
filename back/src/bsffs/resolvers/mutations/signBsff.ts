@@ -27,6 +27,9 @@ import { isFinalOperation } from "../../constants";
 import { getStatus } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
+import { getCachedUserSiretOrVat } from "../../../common/redis/users";
+import { checkSecurityCode } from "../../../forms/permissions";
 
 async function checkIsAllowed(
   siret: string | null,
@@ -40,25 +43,14 @@ async function checkIsAllowed(
   }
 
   if (securityCode) {
-    const count = await prisma.company.count({
-      where: {
-        siret,
-        securityCode
-      }
-    });
-    if (count <= 0) {
+    try {
+      await checkSecurityCode(siret, securityCode);
+    } catch (e) {
       throw new UserInputError(`Le code de sécurité est incorrect.`);
     }
   } else {
-    const count = await prisma.companyAssociation.count({
-      where: {
-        userId: user.id,
-        company: {
-          siret
-        }
-      }
-    });
-    if (count <= 0) {
+    const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
+    if (!userCompaniesSiretOrVat.includes(siret)) {
       throw new UserInputError(
         `Vous n'êtes pas autorisé à signer pour cet acteur.`
       );
@@ -99,7 +91,7 @@ const signatures: Record<
     existingBsff
   ) => {
     await checkIsAllowed(
-      existingBsff.transporterCompanySiret,
+      getTransporterCompanyOrgId(existingBsff),
       user,
       securityCode
     );

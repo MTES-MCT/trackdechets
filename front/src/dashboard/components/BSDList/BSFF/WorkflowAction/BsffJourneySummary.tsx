@@ -34,7 +34,7 @@ export function BsffJourneySummary({ bsff }: BsffJourneySummaryProps) {
       >
         <JourneyStopName>Transporteur</JourneyStopName>
         <JourneyStopDescription>
-          {bsff.transporter?.company?.name} ({bsff.transporter?.company?.siret})
+          {bsff.transporter?.company?.name} ({bsff.transporter?.company?.orgId})
           <br />
           {bsff.transporter?.company?.address}
         </JourneyStopDescription>

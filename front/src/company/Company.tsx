@@ -11,8 +11,8 @@ import CompanyRegistration from "./CompanyRegistration";
 import { Query, QueryCompanyInfosArgs } from "generated/graphql/types";
 
 const COMPANY_INFOS = gql`
-  query CompanyInfos($siret: String!) {
-    companyInfos(siret: $siret) {
+  query CompanyInfos($clue: String!) {
+    companyInfos(clue: $clue) {
       siret
       vatNumber
       orgId
@@ -51,12 +51,12 @@ interface GeoInfo {
 }
 
 export default function CompanyInfo() {
-  const { siret } = useParams<{ siret: string }>();
+  const { orgId } = useParams<{ orgId: string }>();
   const { data, loading, error } = useQuery<
     Pick<Query, "companyInfos">,
     QueryCompanyInfosArgs
   >(COMPANY_INFOS, {
-    variables: { siret },
+    variables: { clue: orgId },
     fetchPolicy: "no-cache",
   });
 

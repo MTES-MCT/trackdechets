@@ -32,7 +32,7 @@ export const GET_ME = gql`
         id
         name
         givenName
-        siret
+        orgId
         companyTypes
       }
     }
@@ -52,7 +52,7 @@ function MobileSubNav({ currentSiret }) {
 
   const companies = data.me.companies;
   const currentCompany = companies.find(
-    company => company.siret === currentSiret
+    company => company.orgId === currentSiret
   );
 
   if (currentCompany == null) {

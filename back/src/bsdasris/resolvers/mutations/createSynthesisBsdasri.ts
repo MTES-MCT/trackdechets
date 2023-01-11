@@ -66,7 +66,8 @@ const createSynthesisBsdasri = async (
 
   const dasrisToAssociate = await getEligibleDasrisForSynthesis(
     synthesizing,
-    input.transporter.company.siret
+    null,
+    input.transporter.company
   );
 
   const aggregatedPackagings = aggregatePackagings(dasrisToAssociate);

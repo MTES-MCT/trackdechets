@@ -39,6 +39,7 @@ app.use(
         imgSrc: ["'self'", "data:", "http:"], // allow oauth applications logos
         scriptSrc: ["'self'", "https:", "'unsafe-inline'", "'unsafe-eval'"],
         styleSrc: ["'self'", "https:", "'unsafe-inline'"],
+        mediaSrc: ["'self'", "data:"],
       },
     },
   })
@@ -63,7 +64,7 @@ app.use(bodyParser.text());
 // Sentry tunnel to deal with ad blockers
 // https://docs.sentry.io/platforms/javascript/troubleshooting/#using-the-tunnel-option
 // https://github.com/getsentry/examples/blob/master/tunneling/nextjs/pages/api/tunnel.js
-app.post("/sentry", async function (req, res) {
+app.post("/sentry", async function(req, res) {
   if (!SENTRY_DSN) {
     return res.status(500).json({ status: "sentry n'est pas configuré" });
   }
@@ -86,11 +87,11 @@ app.post("/sentry", async function (req, res) {
   }
 });
 
-app.get("/*", function (req, res) {
+app.get("/*", function(req, res) {
   res.send(indexContent);
 });
 
 const port = process.env.PORT || 3000;
-app.listen(port, function () {
+app.listen(port, function() {
   console.log("Trackdechets front listening on", port);
 });

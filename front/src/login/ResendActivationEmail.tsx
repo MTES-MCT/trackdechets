@@ -110,6 +110,7 @@ export default function ResendActivationEmail() {
               </Text>
               <TextInput
                 // @ts-ignore
+                label="Email"
                 name="email"
                 required
                 value={email}
@@ -122,6 +123,8 @@ export default function ResendActivationEmail() {
             setCaptchaInput={setCaptchaInput}
             captchaImg={captchaData?.img}
             captchaInput={captchaInput}
+            captchaToken={captchaData?.token}
+            refetch={refetchCaptcha}
           />
 
           <Row justifyContent="right">

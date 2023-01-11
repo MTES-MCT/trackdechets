@@ -111,7 +111,10 @@ const columns: Column[] = [
     label: "Champ libre transporteur"
   },
   { field: "transporterCompanyName", label: "Transporteur raison sociale" },
-  { field: "transporterCompanySiret", label: "Transporteur SIRET" },
+  {
+    field: "transporterCompanySiret",
+    label: "Transporteur SIRET ou numéro de TVA le cas échéant"
+  },
   { field: "transporterCompanyAddress", label: "Transporteur adresse" },
   {
     field: "transporterRecepisseIsExempted",

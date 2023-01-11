@@ -167,7 +167,7 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
                 <h4 className="form__section-heading">Siret</h4>
                 <CompanySelector
                   name="transporter.company"
-                  allowForeignCompanies={true}
+                  allowForeignCompanies={false}
                   registeredOnlyCompanies={true}
                   initialAutoSelectFirstCompany={false}
                   onCompanySelected={transporter => {

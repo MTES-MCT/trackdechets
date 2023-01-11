@@ -55,7 +55,7 @@ export function BsdaJourneySummary({ bsda }: Props) {
           <JourneyStopName>Transporteur</JourneyStopName>
           <JourneyStopDescription>
             {bsda.transporter?.company?.name} (
-            {bsda.transporter?.company?.siret})
+            {bsda.transporter?.company?.orgId})
             <br />
             {bsda.transporter?.company?.address}
           </JourneyStopDescription>

@@ -123,7 +123,7 @@ export const isSiret = (clue: string, allowTestCompany = false): boolean => {
  * Validateur de numéro de TVA
  */
 export const isVat = (clue: string): boolean => {
-  if (!clue) return false;
+  if (!clue || !clue.length) return false;
   if (clue.match(/[\W_]/gim) !== null) return false;
   const cleanClue = clue.replace(/[\W_]+/g, "");
   if (!cleanClue) return false;
@@ -159,4 +159,17 @@ export const isOmi = (clue: string): boolean => {
   if (clue.match(/[\W_]/gim) !== null) return false;
   const clean = clue.replace(/[\W_]+/g, "");
   return clean.match(/^OMI[0-9]{7}$/gim) !== null;
+};
+
+/**
+ * Works with any BSD in order to provide a default orgId
+ */
+export const getTransporterCompanyOrgId = (form: {
+  transporterCompanySiret: string;
+  transporterCompanyVatNumber: string;
+}): string | null => {
+  if (!form) return null;
+  return form.transporterCompanySiret?.length
+    ? form.transporterCompanySiret
+    : form.transporterCompanyVatNumber;
 };

@@ -640,7 +640,7 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
     wasteDetailsQuantity: weight(WeightUnits.Tonne)
       .label("Déchet")
       .when(
-        "transporterTransportMode",
+        ["transporterTransportMode", "createdAt"],
         weightConditions.transportMode(WeightUnits.Tonne)
       )
       .requiredIf(!isDraft, "La quantité du déchet en tonnes est obligatoire"),
@@ -1196,6 +1196,14 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
   if (forwardedIn?.transporterCompanySiret) {
     await transporterCompanySiretSchema(false).validate(
       forwardedIn.transporterCompanySiret
+    );
+  }
+  if (
+    forwardedIn?.transporterCompanyVatNumber?.length &&
+    !isForeignVat(forwardedIn?.transporterCompanyVatNumber)
+  ) {
+    throw new UserInputError(
+      "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
     );
   }
 }

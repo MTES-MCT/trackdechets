@@ -136,6 +136,7 @@ export default function Transporter({
 const COMPANY_INFOS = gql`
   query CompanyInfos($siret: String!) {
     companyInfos(siret: $siret) {
+      orgId
       siret
       vatNumber
       name
@@ -222,8 +223,7 @@ function CurrentCompanyWidget({ disabled = false }) {
           <div className={companyStyles.content}>
             <h6>{data?.companyInfos?.name}</h6>
             <p>
-              {data?.companyInfos?.siret || data?.companyInfos?.vatNumber} -{" "}
-              {data?.companyInfos?.address}
+              {data?.companyInfos?.orgId} - {data?.companyInfos?.address}
             </p>
           </div>
         </div>

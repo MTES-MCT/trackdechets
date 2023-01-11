@@ -285,8 +285,11 @@ input DeleteVhuAgrementInput {
 
 "Payload permettant le rattachement d'un établissement à un utilisateur"
 input PrivateCompanyInput {
-  "SIRET ou TVA de l'établissement"
-  orgId: String!
+  "SIRET de l'établissement"
+  siret: String
+
+  "TVA de l'établissement"
+  vatNumber: String
 
   "Identifiant GEREP de l'établissement"
   gerepId: String
@@ -346,7 +349,7 @@ input PrivateCompanyInput {
 
   "Email de contact"
   contactEmail: String
-  
+
   "Numéro de téléphone de contact"
   contactPhone: String
 }

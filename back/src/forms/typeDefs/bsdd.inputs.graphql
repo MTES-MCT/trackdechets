@@ -11,7 +11,11 @@ input SignEmissionFormInput {
   "Conditionnements"
   packagingInfos: [PackagingInfoInput!]
 
-  "Quantité en tonnes"
+  """
+  Poids en tonnes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   quantity: Float!
 
   "Code ONU"
@@ -67,7 +71,11 @@ input TransporterSignatureFormInput {
   "DEPRECATED - Conditionnement"
   packagings: [Packagings]
 
-  "Quantité en tonnes"
+  """
+  Poids en tonnes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   quantity: Float!
 
   "Code ONU"
@@ -97,8 +105,11 @@ input AcceptedFormInput {
 
   """
   Quantité réelle présentée en tonnes (case 10).
-   Doit être supérieure à 0 lorsque le déchet est accepté.
-   Doit être égale à 0 lorsque le déchet est refusé.
+
+  Doit être supérieure à 0 lorsque le déchet est accepté.
+  Doit être égale à 0 lorsque le déchet est refusé.
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
 }
@@ -122,8 +133,11 @@ input ReceivedFormInput {
 
   """
   Quantité réelle présentée en tonnes (case 10).
-   Doit être supérieure à 0 lorsque le déchet est accepté.
-   Doit être égale à 0 lorsque le déchet est refusé.
+
+  Doit être supérieure à 0 lorsque le déchet est accepté.
+  Doit être égale à 0 lorsque le déchet est refusé.
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float
 }
@@ -575,7 +589,11 @@ input WasteDetailsInput {
   "DEPRECATED - Nombre de colis"
   numberOfPackages: Int
 
-  "Quantité en tonnes"
+  """
+  Poids en tonnes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   quantity: Float
 
   "Réelle ou estimée"
@@ -640,7 +658,11 @@ input WasteDetailsRepackagingInput {
   "Conditionnements"
   packagingInfos: [PackagingInfoInput!]
 
-  "Quantité en tonnes"
+  """
+  Poids en tonnes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   quantity: Float
 
   "Réelle ou estimée"
@@ -662,8 +684,11 @@ input TempStorerAcceptedFormInput {
 
   """
   Quantité réelle présentée en tonnes (case 13)
-   Doit être supérieure à 0 lorsque le déchet est accepté.
-   Doit être égale à 0 lorsque le déchet est refusé.
+
+  Doit être supérieure à 0 lorsque le déchet est accepté.
+  Doit être égale à 0 lorsque le déchet est refusé.
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
 
@@ -689,8 +714,11 @@ input TempStoredFormInput {
 
   """
   Quantité réelle présentée en tonnes (case 13)
-   Doit être supérieure à 0 lorsque le déchet est accepté.
-   Doit être égale à 0 lorsque le déchet est refusé.
+
+  Doit être supérieure à 0 lorsque le déchet est accepté.
+  Doit être égale à 0 lorsque le déchet est refusé.
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
 
@@ -708,7 +736,11 @@ input WasteDetailsRepackagingInput {
   "Conditionnements"
   packagingInfos: [PackagingInfoInput!]
 
-  "Quantité en tonnes"
+  """
+  Poids en tonnes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   quantity: Float
 
   "Réelle ou estimée"

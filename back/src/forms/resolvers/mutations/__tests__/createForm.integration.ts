@@ -1661,7 +1661,7 @@ describe("Mutation.createForm", () => {
     expect(form.intermediariesSirets).toContain(company.siret);
   });
 
-  it("should not be possible de set a weight > 50 T when transport mode is ROAD", async () => {
+  it("should not be possible de set a weight > 40 T when transport mode is ROAD", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const transporter = await companyFactory();
     const { mutate } = makeClient(user);

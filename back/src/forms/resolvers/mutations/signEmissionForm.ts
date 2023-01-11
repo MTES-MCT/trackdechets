@@ -131,8 +131,8 @@ const signatures: Partial<
       }
     };
 
-    await wasteDetailsSchema.validate(futureFullForm);
-    await beforeSignedByTransporterSchema.validate(futureFullForm);
+    await wasteDetailsSchema.validate(futureFullForm.forwardedIn);
+    await beforeSignedByTransporterSchema.validate(futureFullForm.forwardedIn);
 
     const updatedForm = await getFormRepository(user).update(
       { id: existingForm.id },

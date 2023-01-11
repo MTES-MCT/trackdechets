@@ -161,8 +161,8 @@ function SignTransportFormModal({
             </div>
 
             {![
-              form.transporter?.company?.siret,
-              form.temporaryStorageDetail?.transporter?.company?.siret,
+              form.transporter?.company?.orgId,
+              form.temporaryStorageDetail?.transporter?.company?.orgId,
             ].includes(siret) && (
               <div className="form__row">
                 <label>

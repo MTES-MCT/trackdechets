@@ -19,6 +19,7 @@ import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
 import { Prisma } from "@prisma/client";
+import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 
 const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
   async (parent, args, context) => {
@@ -152,7 +153,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       takenOverBy: user.name,
 
       ...wasteDetails,
-      currentTransporterSiret: form.transporterCompanySiret
+      currentTransporterSiret: getTransporterCompanyOrgId(form)
     };
 
     const sentForm = await formRepository.update(

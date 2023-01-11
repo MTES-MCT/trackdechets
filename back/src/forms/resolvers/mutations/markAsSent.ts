@@ -8,6 +8,7 @@ import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
 import { runInTransaction } from "../../../common/repository/helper";
+import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 
 const markAsSentResolver: MutationResolvers["markAsSent"] = async (
   parent,
@@ -34,7 +35,7 @@ const markAsSentResolver: MutationResolvers["markAsSent"] = async (
   const formUpdateInput = {
     ...sentInfo,
     sentAt: new Date(sentInfo.sentAt),
-    currentTransporterSiret: form.transporterCompanySiret,
+    currentTransporterSiret: getTransporterCompanyOrgId(form),
     signedByTransporter: false
   };
 

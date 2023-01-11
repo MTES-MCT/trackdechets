@@ -47,6 +47,7 @@ describe("expandFormFromDb", () => {
       transporter: {
         company: {
           name: form.transporterCompanyName,
+          orgId: form.transporterCompanySiret,
           siret: form.transporterCompanySiret,
           vatNumber: form.transporterCompanyVatNumber,
           address: form.transporterCompanyAddress,
@@ -142,22 +143,23 @@ describe("expandFormFromDb", () => {
         isFilledByEmitter: false
       },
       wasteDetails: {
-        code: null,
-        name: null,
-        onuCode: "",
-        packagingInfos: [],
-        packagings: [],
+        code: forwardedIn.wasteDetailsCode,
+        name: forwardedIn.wasteDetailsName,
+        onuCode: forwardedIn.wasteDetailsOnuCode,
+        packagingInfos: forwardedIn.wasteDetailsPackagingInfos,
+        packagings: ["CITERNE"],
         otherPackaging: undefined,
-        numberOfPackages: 0,
+        numberOfPackages: 1,
         quantity: 1,
         quantityType: "ESTIMATED",
-        consistence: null,
+        consistence: "SOLID",
         pop: false,
-        isDangerous: false
+        isDangerous: forwardedIn.wasteDetailsIsDangerous
       },
       transporter: {
         company: {
           name: forwardedIn.transporterCompanyName,
+          orgId: forwardedIn.transporterCompanySiret,
           siret: forwardedIn.transporterCompanySiret,
           vatNumber: forwardedIn.transporterCompanyVatNumber,
           address: forwardedIn.transporterCompanyAddress,

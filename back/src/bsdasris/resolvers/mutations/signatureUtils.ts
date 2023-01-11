@@ -1,15 +1,25 @@
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { BsdasriValidationContext } from "../../validation";
 
-import { BsdasriSignatureType } from "../../../generated/graphql/types";
+import {
+  BsdasriSignatureInput,
+  BsdasriSignatureType,
+  SignatureAuthor
+} from "../../../generated/graphql/types";
 import { UserInputError } from "apollo-server-express";
 import { Bsdasri, BsdasriStatus, BsdasriType } from "@prisma/client";
 
 import { BsdasriEventType } from "../../workflow/types";
-type checkEmitterAllowsDirectTakeOverFn = ({
-  signatureParams: BsdasriSignatureInfos,
-  bsdasri: Bsdasri
-}) => Promise<boolean>;
+import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
+
+interface checkEmitterAllowsDirectTakeOverProps {
+  signatureParams: BsdasriSignatureInfos;
+  bsdasri: Bsdasri;
+}
+
+type checkEmitterAllowsDirectTakeOverFn = (
+  input: checkEmitterAllowsDirectTakeOverProps
+) => Promise<boolean>;
 /**
  * Dasri can be taken over by transporter directly if:
  * - without emitter signature if emitter explicitly allows this in company preferences
@@ -48,12 +58,15 @@ export const checkDirectakeOverIsAllowed: checkEmitterAllowsDirectTakeOverFn =
     return false;
   };
 
-type checkEmitterAllowsSignatureWithCodeFn = ({
-  signatureParams: BsdasriSignatureInfos,
-  bsdasri: Dasri,
-  securityCode: number,
-  emissionSignatureAuthor: SignatureAuthor
-}) => Promise<boolean>;
+interface checkEmitterAllowsSignatureWithCodeProps {
+  signatureParams: BsdasriSignatureInfos;
+  bsdasri: Bsdasri;
+  securityCode: number;
+  emissionSignatureAuthor: SignatureAuthor;
+}
+type checkEmitterAllowsSignatureWithCodeFn = (
+  input: checkEmitterAllowsSignatureWithCodeProps
+) => Promise<boolean>;
 /**
  * Dasri takeOver can be processed on the transporter device
  * To perform this, we expect a INITIAL -> SIGNED_BY_PRODUCER signature, then a SIGNED_BY_PRODUCER -> SENT one
@@ -155,7 +168,7 @@ export const dasriSignatureMapping: Record<
     eventType: BsdasriEventType.SignEmissionWithSecretCode,
     validationContext: { emissionSignature: true },
     signatoryField: "emissionSignatory",
-    authorizedSirets: bsdasri => [bsdasri.transporterCompanySiret] // transporter can sign with emitter secret code (trs device)
+    authorizedSirets: bsdasri => [getTransporterCompanyOrgId(bsdasri)] // transporter can sign with emitter secret code (trs device)
   },
   TRANSPORT: {
     author: "transporterTransportSignatureAuthor",
@@ -164,7 +177,7 @@ export const dasriSignatureMapping: Record<
     validationContext: { emissionSignature: true, transportSignature: true }, // validate emission in case of direct takeover
 
     signatoryField: "transportSignatory",
-    authorizedSirets: bsdasri => [bsdasri.transporterCompanySiret]
+    authorizedSirets: bsdasri => [getTransporterCompanyOrgId(bsdasri)]
   },
 
   RECEPTION: {
@@ -185,10 +198,12 @@ export const dasriSignatureMapping: Record<
   }
 };
 
-type getFieldsUpdateFn = ({
-  bsdasri: Dasri,
-  input: BsdasriSignatureInput
-}) => Partial<Bsdasri>;
+interface getFieldsUpdateProps {
+  bsdasri: Bsdasri;
+  input: BsdasriSignatureInput;
+}
+
+type getFieldsUpdateFn = (input: getFieldsUpdateProps) => Partial<Bsdasri>;
 
 /**
  * A few fields obey to a custom logic

@@ -1,4 +1,5 @@
 import { Bsda, BsdaStatus, IntermediaryBsdaAssociation } from "@prisma/client";
+import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { BsdElastic, indexBsd } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
@@ -55,7 +56,7 @@ function getWhere(
     emitterCompanySiret: bsda.emitterCompanySiret,
     workerCompanySiret: bsda.workerCompanySiret,
     destinationCompanySiret: bsda.destinationCompanySiret,
-    transporterCompanySiret: bsda.transporterCompanySiret,
+    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
     brokerCompanySiret: bsda.brokerCompanySiret,
     destinationOperationNextDestinationCompanySiret:
       bsda.destinationOperationNextDestinationCompanySiret,
@@ -158,6 +159,7 @@ export function toBsdElastic(bsda: BsdaToElastic): BsdElastic {
     emitterCompanySiret: bsda.emitterCompanySiret ?? "",
     transporterCompanyName: bsda.transporterCompanyName ?? "",
     transporterCompanySiret: bsda.transporterCompanySiret ?? "",
+    transporterCompanyVatNumber: bsda.transporterCompanyVatNumber ?? "",
     transporterTakenOverAt: bsda.transporterTransportTakenOverAt?.getTime(),
     transporterCustomInfo: bsda.transporterCustomInfo ?? "",
     transporterNumberPlate: bsda.transporterTransportPlates,

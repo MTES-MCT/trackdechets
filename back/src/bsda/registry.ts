@@ -1,4 +1,5 @@
 import { Bsda } from "@prisma/client";
+import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import {
@@ -34,7 +35,7 @@ export function getRegistryFields(
     if (bsda.workerCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsda.workerCompanySiret);
     }
-    registryFields.isTransportedWasteFor.push(bsda.transporterCompanySiret);
+    registryFields.isTransportedWasteFor.push(getTransporterCompanyOrgId(bsda));
     if (bsda.brokerCompanySiret) {
       registryFields.isManagedWasteFor.push(bsda.brokerCompanySiret);
     }
@@ -133,7 +134,7 @@ export function toIncomingWaste(
     brokerCompanySiret: bsda.brokerCompanySiret,
     brokerRecepisseNumber: null,
     transporterCompanyName: bsda.transporterCompanyName,
-    transporterCompanySiret: bsda.transporterCompanySiret,
+    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
     transporterRecepisseNumber: bsda.transporterRecepisseNumber,
     destinationOperationCode: bsda.destinationOperationCode,
     destinationCustomInfo: bsda.destinationCustomInfo,
@@ -200,7 +201,7 @@ export function toOutgoingWaste(
     traderRecepisseNumber: null,
     transporterCompanyAddress: null,
     transporterCompanyName: bsda.transporterCompanyName,
-    transporterCompanySiret: bsda.transporterCompanySiret,
+    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
     transporterTakenOverAt: bsda.transporterTransportTakenOverAt,
     transporterRecepisseNumber: bsda.transporterRecepisseNumber,
     weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
@@ -249,7 +250,7 @@ export function toTransportedWaste(
     destinationReceptionDate: bsda.destinationReceptionDate,
     weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
     transporterCompanyName: bsda.transporterCompanyName,
-    transporterCompanySiret: bsda.transporterCompanySiret,
+    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
     transporterCompanyAddress: bsda.transporterCompanyAddress,
     transporterNumberPlates: bsda.transporterTransportPlates,
     ...initialEmitter,
@@ -335,7 +336,7 @@ export function toManagedWaste(
     ...initialEmitter,
     transporterCompanyAddress: bsda.transporterCompanyAddress,
     transporterCompanyName: bsda.transporterCompanyName,
-    transporterCompanySiret: bsda.transporterCompanySiret,
+    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
     transporterRecepisseNumber: bsda.transporterRecepisseNumber,
     emitterCompanyMail: bsda.emitterCompanyMail,
     transporterCompanyMail: bsda.transporterCompanyMail,
@@ -402,7 +403,7 @@ export function toAllWaste(
     ...initialEmitter,
     transporterCompanyAddress: bsda.transporterCompanyAddress,
     transporterCompanyName: bsda.transporterCompanyName,
-    transporterCompanySiret: bsda.transporterCompanySiret,
+    transporterCompanySiret: getTransporterCompanyOrgId(bsda),
     transporterRecepisseNumber: bsda.transporterRecepisseNumber,
     transporterNumberPlates: bsda.transporterTransportPlates,
     weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
