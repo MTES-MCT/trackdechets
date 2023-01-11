@@ -540,7 +540,8 @@ describe("signEmissionForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Ce bordereau a été annulé"
+        message:
+          "Vous ne pouvez pas faire cette action, ce bordereau a été annulé"
       })
     ]);
   });

@@ -512,6 +512,8 @@ describe("{ mutation { markAsTempStored } }", () => {
     });
 
     expect(errors).toHaveLength(1);
-    expect(errors[0].message).toEqual("Ce bordereau a été annulé");
+    expect(errors[0].message).toEqual(
+      "Vous ne pouvez pas faire cette action, ce bordereau a été annulé"
+    );
   });
 });

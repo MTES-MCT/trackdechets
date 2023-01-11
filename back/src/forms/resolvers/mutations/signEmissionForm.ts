@@ -29,7 +29,9 @@ const signatures: Partial<
   >
 > = {
   [Status.CANCELED]: () => {
-    throw new ForbiddenError("Ce bordereau a été annulé");
+    throw new ForbiddenError(
+      "Vous ne pouvez pas faire cette action, ce bordereau a été annulé"
+    );
   },
   [Status.SEALED]: async (user, args, existingForm) => {
     if (args.input.emittedByEcoOrganisme) {
