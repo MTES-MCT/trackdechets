@@ -1037,7 +1037,7 @@ const withNextDestination = (required: boolean) =>
         return isSiret(siret) && required
           ? schema.test(
               "is-fr-country-valid",
-              "Destination ultérieure : le code du pays de l'entreprise ne peut pas différent de FR",
+              "Destination ultérieure : le code du pays de l'entreprise ne peut pas être différent de FR",
               value => !value || value === "FR"
             )
           : schema;
