@@ -8,6 +8,7 @@ type Props = {
   name: string;
   defaultValue: any;
   value: string | number | React.ReactNode;
+  disabled?: boolean;
 };
 
 export function ReviewableField({
@@ -16,6 +17,7 @@ export function ReviewableField({
   name,
   defaultValue,
   children,
+  disabled = false,
 }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [, , { setValue }] = useField(name);
@@ -30,6 +32,7 @@ export function ReviewableField({
     <div className="tw-pb-4">
       <div className="tw-flex">
         <TdSwitch
+          disabled={disabled}
           checked={isEditing}
           onChange={handleIsEditingChange}
           label={""}
