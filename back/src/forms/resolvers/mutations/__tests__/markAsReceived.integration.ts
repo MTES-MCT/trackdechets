@@ -91,6 +91,44 @@ describe("Test Form reception", () => {
     expect(logs[0].status).toBe("RECEIVED");
   });
 
+  it("should be possible to specify a quantityReceived=0 when acceptation status is not specified", async () => {
+    const {
+      emitterCompany,
+      recipient,
+      recipientCompany,
+      form: initialForm
+    } = await prepareDB();
+    const form = await prisma.form.update({
+      where: { id: initialForm.id },
+      data: { currentTransporterSiret: siretify(3) }
+    });
+    await prepareRedis({
+      emitterCompany,
+      recipientCompany
+    });
+
+    const { mutate } = makeClient(recipient);
+
+    const { errors } = await mutate(MARK_AS_RECEIVED, {
+      variables: {
+        id: form.id,
+        receivedInfo: {
+          receivedBy: "Bill",
+          receivedAt: "2019-01-17T10:22:00+0100",
+          quantityReceived: 0
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const receivedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
+
+    expect(receivedForm.status).toBe("RECEIVED");
+  });
+
   it("should mark a sent form as accepted if wasteAcceptationStatus is ACCEPTED", async () => {
     const {
       emitterCompany,
