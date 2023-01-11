@@ -468,11 +468,20 @@ const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
       .when("emitterType", (value, schema) => {
         const oneOf =
           value === EmitterType.APPENDIX2
-            ? PROCESSING_AND_REUSE_OPERATIONS_CODES
-            : PROCESSING_OPERATIONS_CODES;
+            ? [
+                ...PROCESSING_AND_REUSE_OPERATIONS_CODES,
+                ...PROCESSING_AND_REUSE_OPERATIONS_CODES.map(c =>
+                  c.replace(" ", "")
+                )
+              ]
+            : [
+                ...PROCESSING_OPERATIONS_CODES,
+                ...PROCESSING_OPERATIONS_CODES.map(c => c.replace(" ", ""))
+              ];
+
         return schema.oneOf(
           ["", ...oneOf],
-          `Destination ultérieure : ${INVALID_PROCESSING_OPERATION}`
+          `Destination : ${INVALID_PROCESSING_OPERATION}`
         );
       }),
     recipientCompanyName: yup
