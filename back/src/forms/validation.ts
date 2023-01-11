@@ -1012,10 +1012,16 @@ const withNextDestination = (required: boolean) =>
         required,
         `Destination ultérieure : ${MISSING_COMPANY_ADDRESS}`
       ),
-    nextDestinationCompanyCountry: yup.string().oneOf(
-      countries.map(country => country.cca2),
-      "Destination ultérieure : le code ISO 3166-1 alpha-2 du pays de l'entreprise n'est pas reconnu"
-    ),
+    nextDestinationCompanyCountry: yup
+      .string()
+      .requiredIf(
+        required,
+        `Destination ultérieure : le code ISO 3166-1 alpha-2 du pays est obligatoire`
+      )
+      .oneOf(
+        countries.map(country => country.cca2),
+        "Destination ultérieure : le code ISO 3166-1 alpha-2 du pays de l'entreprise n'est pas reconnu"
+      ),
     nextDestinationCompanyContact: yup
       .string()
       .ensure()

@@ -489,6 +489,41 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
+  it("should allow empty company as nextDestination when NO_TRACEABILITY is true", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 13",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          noTraceability: true,
+          nextDestination: {
+            processingOperation: "D 1",
+            company: null
+          }
+        }
+      }
+    });
+
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
+    expect(resultingForm.status).toBe("NO_TRACEABILITY");
+  });
+
   it("should set country to FR by default", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
