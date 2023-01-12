@@ -216,7 +216,7 @@ model Company {
   bsddRevisionRequests                 BsddRevisionRequest[]
   BsdaRevisionRequest                  BsdaRevisionRequest[]
   givenSignatureAutomations            SignatureAutomation[]     @relation("SignatureAutomationFrom")
-  receivedSignatudeAutomations         SignatureAutomation[]     @relation("SignatureAutomationTo")
+  receivedSignatureAutomations         SignatureAutomation[]     @relation("SignatureAutomationTo")
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")

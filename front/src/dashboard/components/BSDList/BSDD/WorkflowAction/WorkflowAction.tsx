@@ -28,6 +28,8 @@ export function WorkflowAction(props: WorkflowActionProps) {
   const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
 
   const isTempStorage = form.recipient?.isTempStorage;
+  const isAppendix1Producer =
+    form.emitter?.type === EmitterType.Appendix1Producer;
 
   switch (form.status) {
     case FormStatus.Draft:
@@ -57,7 +59,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.Sent: {
-      if (form.emitter?.type === EmitterType.Appendix1Producer) {
+      if (isAppendix1Producer) {
         return null;
       }
 
@@ -138,6 +140,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.Received: {
+      if (isAppendix1Producer) {
+        return null;
+      }
+
       if (
         (isTempStorage &&
           siret === form.temporaryStorageDetail?.destination?.company?.siret) ||
@@ -148,6 +154,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.Accepted: {
+      if (isAppendix1Producer) {
+        return null;
+      }
+
       if (!isTempStorage && siret === form.recipient?.company?.siret) {
         return (
           <div className="tw-flex tw-space-x-2">

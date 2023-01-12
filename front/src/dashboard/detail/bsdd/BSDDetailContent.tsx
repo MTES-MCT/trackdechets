@@ -19,6 +19,8 @@ import {
   FormStatus,
   EmitterType,
   InitialFormFraction,
+  Query,
+  QueryCompanyPrivateInfosArgs,
 } from "generated/graphql/types";
 import {
   emitterTypeLabels,
@@ -61,6 +63,8 @@ import { isDangerous } from "generated/constants";
 import { format } from "date-fns";
 import { isSiret } from "generated/constants/companySearchHelpers";
 import { Appendix1ProducerForm } from "form/bsdd/appendix1Producer/form";
+import SignTransportForm from "dashboard/components/BSDList/BSDD/WorkflowAction/SignTransportForm";
+import { gql, useQuery } from "@apollo/client";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -451,6 +455,19 @@ const Appendix2 = ({
   );
 };
 
+const COMPANY_PRIVATE_INFOS = gql`
+  query CompanyPrivateInfos($clue: String!) {
+    companyPrivateInfos(clue: $clue) {
+      siret
+      receivedSignatureAutomations {
+        from {
+          siret
+        }
+      }
+    }
+  }
+`;
+
 const Appendix1 = ({
   siret,
   container,
@@ -460,26 +477,47 @@ const Appendix1 = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  const { data } = useQuery<
+    Pick<Query, "companyPrivateInfos">,
+    QueryCompanyPrivateInfosArgs
+  >(COMPANY_PRIVATE_INFOS, {
+    variables: { clue: siret },
+  });
+  const siretsWithAutomaticSignature = data
+    ? data.companyPrivateInfos.receivedSignatureAutomations.map(
+        automation => automation.from.siret
+      )
+    : [];
+
   return (
     <div>
-      <div className="tw-pb-2 tw-flex tw-justify-end">
-        <button
-          type="button"
-          className="btn btn--outline-primary btn--small"
-          onClick={() => setIsOpen(true)}
-        >
-          <IconPdf size="16px" color="blueLight" />
-          <span>Ajouter une annexe 1</span>
-        </button>
-      </div>
+      {container.status === FormStatus.Draft && (
+        <div className="notification warning">
+          Avant de pouvoir ajouter des annexes 1, vous devez valider le
+          bordereau chapeau. Toutes les annexes 1 seront automatiquement
+          associées à ce bordereau chapeau, avec le même code déchet.
+        </div>
+      )}
+      {[FormStatus.Sealed, FormStatus.Sent].some(
+        status => status === container.status
+      ) && (
+        <div className="tw-pb-2 tw-flex tw-justify-end">
+          <button
+            type="button"
+            className="btn btn--outline-primary"
+            onClick={() => setIsOpen(true)}
+          >
+            <IconPdf size="16px" color="blueLight" />
+            <span>Ajouter une annexe 1</span>
+          </button>
+        </div>
+      )}
       {container?.grouping && container.grouping.length > 0 ? (
         <table className="td-table">
           <thead>
             <tr className="td-table__head-tr">
               <th>N° Bordereau</th>
               <th>Emetteur</th>
-              <th>Code déchet</th>
-              <th>Dénomination usuelle</th>
               <th>Action</th>
             </tr>
           </thead>
@@ -488,23 +526,19 @@ const Appendix1 = ({
               <tr key={index}>
                 <td>{form?.readableId}</td>
                 <td>
-                  {form?.emitter?.company?.name} {form?.emitter?.company?.siret}
+                  {form?.emitter?.company?.name}
+                  <br />
+                  {form?.emitter?.company?.siret}
                 </td>
-                <td>{form?.wasteDetails?.code}</td>
-                <td>{form?.wasteDetails?.name}</td>
                 <td>
-                  {form.status === FormStatus.Draft ? (
-                    <button
-                      type="button"
-                      className="btn btn--outline-primary"
-                      onClick={() => console.log(form.id)}
-                    >
-                      <IconTrash size="24px" color="blueLight" />
-                      <span>Supprimer</span>
-                    </button>
-                  ) : (
-                    <WorkflowAction siret={siret} form={form as any} />
-                  )}
+                  <WorkflowAction siret={siret} form={form as any} />
+                  {form.status === FormStatus.Sealed &&
+                    siretsWithAutomaticSignature.includes(
+                      form.emitter?.company?.siret
+                    ) &&
+                    form.transporter?.company?.orgId === siret && (
+                      <SignTransportForm form={form as any} siret={siret} />
+                    )}
                 </td>
               </tr>
             ))}
@@ -529,7 +563,7 @@ const Appendix1 = ({
   );
 };
 
-function useQuery() {
+function useQueryString() {
   const { search } = useLocation();
 
   return React.useMemo(() => new URLSearchParams(search), [search]);
@@ -540,7 +574,7 @@ export default function BSDDetailContent({
   children = null,
 }: BSDDetailContentProps) {
   const { siret } = useParams<{ siret: string }>();
-  const query = useQuery();
+  const query = useQueryString();
   const history = useHistory();
   const [isDeleting, setIsDeleting] = useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });

@@ -1,4 +1,4 @@
-import { Form, Prisma } from "@prisma/client";
+import { EmitterType, Form, Prisma } from "@prisma/client";
 import { deleteBsd } from "../../../common/elastic";
 import {
   LogMetadata,
@@ -6,6 +6,7 @@ import {
 } from "../../../common/repository/types";
 import { GraphQLContext } from "../../../types";
 import buildRemoveAppendix2 from "./removeAppendix2";
+import buildUpdateManyForms from "./updateMany";
 
 export type DeleteFormFn = (
   where: Prisma.FormWhereUniqueInput,
@@ -25,6 +26,27 @@ const buildDeleteForm: (deps: RepositoryFnDeps) => DeleteFormFn =
       await prisma.form.update({
         where,
         data: { forwardedIn: { update: { isDeleted: true } } }
+      });
+    }
+
+    // Removing an appendix1 container removes the appendix 1
+    if (deletedForm.emitterType === EmitterType.APPENDIX1) {
+      const annexis1 = await prisma.formGroupement.findMany({
+        where: { nextFormId: deletedForm.id },
+        select: { initialFormId: true }
+      });
+
+      const updateManyForms = buildUpdateManyForms({ prisma, user });
+      await updateManyForms(
+        annexis1.map(form => form.initialFormId),
+        { isDeleted: true }
+      );
+    }
+
+    // Removing an appendix1 unlinks it with its container
+    if (deletedForm.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+      await prisma.formGroupement.deleteMany({
+        where: { initialFormId: deletedForm.id }
       });
     }
 

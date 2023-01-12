@@ -60,6 +60,9 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     FormStatus.Refused,
   ].includes(form.status);
 
+  const isAppendix1Producer =
+    form.emitter?.type === EmitterType.Appendix1Producer;
+
   return (
     <>
       <Menu>
@@ -123,12 +126,14 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                 </MenuItem>
               )}
 
-              <MenuItem onSelect={() => duplicateForm()}>
-                <IconDuplicateFile size="24px" color="blueLight" />
-                Dupliquer
-              </MenuItem>
+              {!isAppendix1Producer && (
+                <MenuItem onSelect={() => duplicateForm()}>
+                  <IconDuplicateFile size="24px" color="blueLight" />
+                  Dupliquer
+                </MenuItem>
+              )}
 
-              {canDeleteAndUpdate && (
+              {canDeleteAndUpdate && !isAppendix1Producer && (
                 <>
                   <MenuLink
                     as={Link}
