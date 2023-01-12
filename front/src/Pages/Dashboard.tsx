@@ -36,10 +36,10 @@ import { IconDuplicateFile } from "common/components/Icons";
 import "./dashboard.scss";
 
 const DashboardPage = () => {
-  const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
-  const isDraftTab = !!useRouteMatch(routes.dashboard.bsds.drafts);
-  const isFollowTab = !!useRouteMatch(routes.dashboard.bsds.follow);
-  const isArchivesTab = !!useRouteMatch(routes.dashboard.bsds.history);
+  const isActTab = !!useRouteMatch(routes.dashboardv2.bsds.act);
+  const isDraftTab = !!useRouteMatch(routes.dashboardv2.bsds.drafts);
+  const isFollowTab = !!useRouteMatch(routes.dashboardv2.bsds.follow);
+  const isArchivesTab = !!useRouteMatch(routes.dashboardv2.bsds.history);
   const BSD_PER_PAGE = 10;
 
   const { siret } = useParams<{ siret: string }>();
@@ -117,7 +117,7 @@ const DashboardPage = () => {
   );
 
   useEffect(() => {
-    refetchWithDefaultWhere(defaultWhere);
+    refetchWithDefaultWhere({ where: defaultWhere });
   }, [isActTab, isDraftTab, defaultWhere, refetchWithDefaultWhere]);
 
   const getBreadcrumbItem = () => {

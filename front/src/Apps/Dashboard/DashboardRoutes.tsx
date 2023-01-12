@@ -38,8 +38,8 @@ import { RouteBsddRequestRevision } from "../../dashboard/components/RevisionReq
 import { RouteBsdaRequestRevision } from "../../dashboard/components/RevisionRequestList/bsda/request";
 import { OnboardingSlideshow } from "dashboard/components/OnboardingSlideshow";
 import SideMenu from "common/components/SideMenu";
-import { DashboardTabs } from "dashboard/DashboardTabs";
 import DashboardPage from "Pages/Dashboard";
+import DashboardTabs from "./Components/DashboardTabs/DashboardTabs";
 
 import "./dashboard.scss";
 
@@ -67,12 +67,12 @@ function DashboardRoutes() {
   const location = useLocation<{ background?: Location }>();
   const backgroundLocation = location.state?.background;
   const toCollectDashboard = {
-    pathname: generatePath(routes.dashboard.transport.toCollect, {
+    pathname: generatePath(routes.dashboardv2.transport.toCollect, {
       siret,
     }),
   };
   const actionDashboard = {
-    pathname: generatePath(routes.dashboard.bsds.act, {
+    pathname: generatePath(routes.dashboardv2.bsds.act, {
       siret,
     }),
   };
@@ -91,7 +91,7 @@ function DashboardRoutes() {
       <Redirect
         to={
           companies.length > 0
-            ? generatePath(routes.dashboard.bsds.drafts, {
+            ? generatePath(routes.dashboardv2.bsds.drafts, {
                 siret: companies[0].orgId,
               })
             : routes.account.companies.list
@@ -114,75 +114,75 @@ function DashboardRoutes() {
         </SideMenu>
         <div className="dashboard-content">
           <Switch location={backgroundLocation ?? location}>
-            <Route path="/dashboard/:siret/slips/view/:id" exact>
+            <Route path="/v2/dashboard/:siret/slips/view/:id" exact>
               {({
                 match,
               }: RouteChildrenProps<{ siret: string; id: string }>) => (
                 <Redirect
-                  to={generatePath(routes.dashboard.bsdds.view, {
+                  to={generatePath(routes.dashboardv2.bsdds.view, {
                     siret: match!.params.siret,
                     id: match!.params.id,
                   })}
                 />
               )}
             </Route>
-            <Route path="/dashboard/:siret/slips">
+            <Route path="/v2/dashboard/:siret/slips">
               {({ location }) => (
                 <Redirect to={location.pathname.replace(/slips/, "bsds")} />
               )}
             </Route>
 
-            <Route path={routes.dashboard.bsdds.view}>
+            <Route path={routes.dashboardv2.bsdds.view}>
               <RouteBSDDsView />
             </Route>
-            <Route path={routes.dashboard.bsdds.review}>
+            <Route path={routes.dashboardv2.bsdds.review}>
               <RouteBsddRequestRevision />
             </Route>
-            <Route path={routes.dashboard.bsdasris.view}>
+            <Route path={routes.dashboardv2.bsdasris.view}>
               <RouteBSDasrisView />
             </Route>
-            <Route path={routes.dashboard.bsvhus.view}>
+            <Route path={routes.dashboardv2.bsvhus.view}>
               <RouteBsvhusView />
             </Route>
-            <Route path={routes.dashboard.bsdas.view}>
+            <Route path={routes.dashboardv2.bsdas.view}>
               <RouteBSDasView />
             </Route>
-            <Route path={routes.dashboard.bsdas.review}>
+            <Route path={routes.dashboardv2.bsdas.review}>
               <RouteBsdaRequestRevision />
             </Route>
-            <Route path={routes.dashboard.bsffs.view}>
+            <Route path={routes.dashboardv2.bsffs.view}>
               <RouteBsffsView />
             </Route>
 
-            <Route path={routes.dashboard.bsds.drafts}>
+            <Route path={routes.dashboardv2.bsds.drafts}>
               {dashboardPageComponent}
             </Route>
-            <Route path={routes.dashboard.bsds.act}>
+            <Route path={routes.dashboardv2.bsds.act}>
               {dashboardPageComponent}
             </Route>
-            <Route path={routes.dashboard.bsds.follow}>
+            <Route path={routes.dashboardv2.bsds.follow}>
               {dashboardPageComponent}
             </Route>
-            <Route path={routes.dashboard.bsds.history}>
+            <Route path={routes.dashboardv2.bsds.history}>
               {dashboardPageComponent}
             </Route>
 
-            <Route path={routes.dashboard.bsds.reviews}>
+            <Route path={routes.dashboardv2.bsds.reviews}>
               <RouteBsdsReview />
             </Route>
-            <Route path={routes.dashboard.transport.toCollect}>
+            <Route path={routes.dashboardv2.transport.toCollect}>
               <RouteTransportToCollect />
             </Route>
-            <Route path={routes.dashboard.transport.collected}>
+            <Route path={routes.dashboardv2.transport.collected}>
               <RouteTransportCollected />
             </Route>
-            <Route path={routes.dashboard.exports}>
+            <Route path={routes.dashboardv2.exports}>
               <Exports
                 companies={filter(Exports.fragments.company, companies)}
               />
             </Route>
             <Redirect
-              to={generatePath(routes.dashboard.bsds.drafts, {
+              to={generatePath(routes.dashboardv2.bsds.drafts, {
                 siret,
               })}
             />
@@ -190,7 +190,7 @@ function DashboardRoutes() {
 
           {backgroundLocation && (
             <Switch location={location}>
-              <Route path={routes.dashboard.bsdds.view}>
+              <Route path={routes.dashboardv2.bsdds.view}>
                 <Modal
                   onClose={() => history.goBack()}
                   ariaLabel="Aperçu du bordereau"
@@ -201,7 +201,7 @@ function DashboardRoutes() {
                   <RouteBSDDsView />
                 </Modal>
               </Route>
-              <Route path={routes.dashboard.bsdds.review}>
+              <Route path={routes.dashboardv2.bsdds.review}>
                 <Modal
                   onClose={() => history.goBack()}
                   ariaLabel="Demande de révision"
@@ -212,7 +212,7 @@ function DashboardRoutes() {
                   <RouteBsddRequestRevision />
                 </Modal>
               </Route>
-              <Route path={routes.dashboard.roadControl}>
+              <Route path={routes.dashboardv2.roadControl}>
                 <Modal
                   onClose={() => history.goBack()}
                   ariaLabel="Contrôle routier"
@@ -221,7 +221,7 @@ function DashboardRoutes() {
                   <RouteControlPdf />
                 </Modal>
               </Route>
-              <Route path={routes.dashboard.bsdasris.sign.publish}>
+              <Route path={routes.dashboardv2.bsdasris.sign.publish}>
                 <Modal
                   onClose={() => history.goBack()}
                   ariaLabel="Publier un dasri"
@@ -231,7 +231,7 @@ function DashboardRoutes() {
                 </Modal>
               </Route>
 
-              <Route path={routes.dashboard.bsdasris.sign.emissionSecretCode}>
+              <Route path={routes.dashboardv2.bsdasris.sign.emissionSecretCode}>
                 <Modal
                   onClose={() => history.push(toCollectDashboard)}
                   ariaLabel="Signature producteur avec code de sécurité"
@@ -240,7 +240,7 @@ function DashboardRoutes() {
                   <RouteBSDasrisSignEmissionSecretCode />
                 </Modal>
               </Route>
-              <Route path={routes.dashboard.bsdasris.sign.directTakeover}>
+              <Route path={routes.dashboardv2.bsdasris.sign.directTakeover}>
                 <Modal
                   onClose={() => history.push(toCollectDashboard)}
                   ariaLabel="Emport direct transporteur"
@@ -251,7 +251,7 @@ function DashboardRoutes() {
                   />
                 </Modal>
               </Route>
-              <Route path={routes.dashboard.bsdasris.sign.synthesisTakeover}>
+              <Route path={routes.dashboardv2.bsdasris.sign.synthesisTakeover}>
                 <Modal
                   onClose={() => history.push(toCollectDashboard)}
                   ariaLabel="Bordereau de synthèse: Transporteur"
@@ -262,7 +262,7 @@ function DashboardRoutes() {
                   />
                 </Modal>
               </Route>
-              <Route path={routes.dashboard.bsdasris.sign.transporter}>
+              <Route path={routes.dashboardv2.bsdasris.sign.transporter}>
                 <Modal
                   onClose={() => history.push(actionDashboard)}
                   ariaLabel="Signature transporteur"
@@ -273,7 +273,7 @@ function DashboardRoutes() {
                   />
                 </Modal>
               </Route>
-              <Route path={routes.dashboard.bsdasris.sign.emission}>
+              <Route path={routes.dashboardv2.bsdasris.sign.emission}>
                 <Modal
                   onClose={() => history.push(actionDashboard)}
                   ariaLabel="Signature producteur"
@@ -284,7 +284,7 @@ function DashboardRoutes() {
                   />
                 </Modal>
               </Route>
-              <Route path={routes.dashboard.bsdasris.sign.reception}>
+              <Route path={routes.dashboardv2.bsdasris.sign.reception}>
                 <Modal
                   onClose={() => history.push(actionDashboard)}
                   ariaLabel="Signature réception"
@@ -295,7 +295,7 @@ function DashboardRoutes() {
                   />
                 </Modal>
               </Route>
-              <Route path={routes.dashboard.bsdasris.sign.operation}>
+              <Route path={routes.dashboardv2.bsdasris.sign.operation}>
                 <Modal
                   onClose={() => history.push(actionDashboard)}
                   ariaLabel="Signature traitement"
@@ -306,7 +306,7 @@ function DashboardRoutes() {
                   />
                 </Modal>
               </Route>
-              <Route path={routes.dashboard.bsdasris.view}>
+              <Route path={routes.dashboardv2.bsdasris.view}>
                 <Modal
                   onClose={() => history.goBack()}
                   ariaLabel="Aperçu du bordereau"
@@ -317,7 +317,7 @@ function DashboardRoutes() {
                   <RouteBSDasrisView />
                 </Modal>
               </Route>
-              <Route path={routes.dashboard.bsvhus.view}>
+              <Route path={routes.dashboardv2.bsvhus.view}>
                 <Modal
                   onClose={() => history.goBack()}
                   ariaLabel="Aperçu du bordereau"
@@ -328,7 +328,7 @@ function DashboardRoutes() {
                   <RouteBsvhusView />
                 </Modal>
               </Route>
-              <Route path={routes.dashboard.bsdas.view}>
+              <Route path={routes.dashboardv2.bsdas.view}>
                 <Modal
                   onClose={() => history.goBack()}
                   ariaLabel="Aperçu du bordereau"
@@ -339,7 +339,7 @@ function DashboardRoutes() {
                   <RouteBSDasView />
                 </Modal>
               </Route>
-              <Route path={routes.dashboard.bsdas.review}>
+              <Route path={routes.dashboardv2.bsdas.review}>
                 <Modal
                   onClose={() => history.goBack()}
                   ariaLabel="Demande de révision"
@@ -350,7 +350,7 @@ function DashboardRoutes() {
                   <RouteBsdaRequestRevision />
                 </Modal>
               </Route>
-              <Route path={routes.dashboard.bsffs.view}>
+              <Route path={routes.dashboardv2.bsffs.view}>
                 <Modal
                   onClose={() => history.goBack()}
                   ariaLabel="Aperçu du bordereau"

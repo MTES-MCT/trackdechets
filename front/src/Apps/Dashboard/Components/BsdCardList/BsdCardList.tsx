@@ -15,15 +15,15 @@ function BsdCardList({ siret, bsds }: BsdCardListProps): JSX.Element {
   const getOverviewPath = bsd => {
     switch (bsd.type) {
       case BsdType.Bsdd:
-        return routes.dashboard.bsdds.view;
+        return routes.dashboardv2.bsdds.view;
       case BsdType.Bsda:
-        return routes.dashboard.bsdas.view;
+        return routes.dashboardv2.bsdas.view;
       case BsdType.Bsdasri:
-        return routes.dashboard.bsdasris.view;
+        return routes.dashboardv2.bsdasris.view;
       case BsdType.Bsff:
-        return routes.dashboard.bsffs.view;
+        return routes.dashboardv2.bsffs.view;
       case BsdType.Bsvhu:
-        return routes.dashboard.bsvhus.view;
+        return routes.dashboardv2.bsvhus.view;
 
       default:
         break;
@@ -33,15 +33,15 @@ function BsdCardList({ siret, bsds }: BsdCardListProps): JSX.Element {
   const getUpdatePath = bsd => {
     switch (bsd.type) {
       case BsdType.Bsdd:
-        return routes.dashboard.bsdds.edit;
+        return routes.dashboardv2.bsdds.edit;
       case BsdType.Bsda:
-        return routes.dashboard.bsdas.edit;
+        return routes.dashboardv2.bsdas.edit;
       case BsdType.Bsdasri:
-        return routes.dashboard.bsdasris.edit;
+        return routes.dashboardv2.bsdasris.edit;
       case BsdType.Bsff:
-        return routes.dashboard.bsffs.edit;
+        return routes.dashboardv2.bsffs.edit;
       case BsdType.Bsvhu:
-        return routes.dashboard.bsvhus.edit;
+        return routes.dashboardv2.bsvhus.edit;
 
       default:
         break;
@@ -51,9 +51,9 @@ function BsdCardList({ siret, bsds }: BsdCardListProps): JSX.Element {
   const getRevisionPath = bsd => {
     switch (bsd.type) {
       case BsdType.Bsdd:
-        return routes.dashboard.bsdds.review;
+        return routes.dashboardv2.bsdds.review;
       case BsdType.Bsda:
-        return routes.dashboard.bsdas.review;
+        return routes.dashboardv2.bsdas.review;
 
       default:
         break;

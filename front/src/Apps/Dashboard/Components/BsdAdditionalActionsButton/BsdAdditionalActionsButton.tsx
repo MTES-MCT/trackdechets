@@ -50,22 +50,32 @@ const BsdAdditionalActionsButton = ({
     setisOpen(!isOpen);
   };
 
+  const closeMenu = () => {
+    setisOpen(false);
+  };
+
   const handleOverview = () => {
+    closeMenu();
     onOverview(bsd);
   };
   const handlePdf = () => {
+    closeMenu();
     onPdf(bsd);
   };
   const handleUpdate = () => {
+    closeMenu();
     onUpdate(bsd);
   };
   const handleDuplicate = () => {
+    closeMenu();
     onDuplicate(bsd);
   };
   const handleDelete = () => {
+    closeMenu();
     onDelete(bsd);
   };
   const handleRevision = () => {
+    closeMenu();
     onRevision(bsd);
   };
 

@@ -1,5 +1,13 @@
+@import "src/scss/Breakpoints.scss";
+
 .dashboard-page {
-  padding: 0 15px;
+  padding: 0 5px;
+
+  @include desktop {
+    max-width: 95%;
+    margin: 0 auto;
+  }
+
   &__bsd-dropdown {
     margin: 15px 8px;
   }
