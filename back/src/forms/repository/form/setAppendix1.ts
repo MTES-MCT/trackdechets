@@ -1,6 +1,7 @@
 import { Form, Status } from "@prisma/client";
 import { RepositoryFnDeps } from "../../../common/repository/types";
 import { checkCanBeSealed } from "../../validation";
+import buildUpdateManyForms from "./updateMany";
 
 class FormFraction {
   form: Form;
@@ -19,9 +20,11 @@ export type SetAppendix1Fn = (args: SetAppendix1Args) => Promise<void>;
  * This function is called each time an appendix1 form is added to a container form.
  */
 export function buildSetAppendix1({
-  prisma
+  prisma, user
 }: RepositoryFnDeps): SetAppendix1Fn {
   return async ({ form, appendix1, currentAppendix1Forms }) => {
+    const updateManyForms = buildUpdateManyForms({ prisma, user });
+    
     // First, seal all drafts
     const draftAppendix1Forms = appendix1
       .map(a => a.form)
@@ -40,33 +43,30 @@ export function buildSetAppendix1({
     // - the destination
     // - the waste infos (code & name)
     const appendix1Ids = appendix1.map(a => a.form.id);
-    await prisma.form.updateMany({
-      where: { id: { in: appendix1Ids } },
-      data: {
-        // Most data are copied from the container form and not editable:
-        // - waste infos
-        // - transporter
-        // - recipient
-        // - if its emitted by an eco organisme or not
-        wasteDetailsCode: form.wasteDetailsCode,
-        wasteDetailsIsDangerous: form.wasteDetailsIsDangerous,
-        wasteDetailsName: form.wasteDetailsName,
-        transporterCompanySiret: form.transporterCompanySiret,
-        transporterCompanyName: form.transporterCompanyName,
-        transporterCompanyAddress: form.transporterCompanyAddress,
-        transporterCompanyContact: form.transporterCompanyContact,
-        transporterCompanyVatNumber: form.transporterCompanyVatNumber,
-        transporterCompanyPhone: form.transporterCompanyPhone,
-        transporterCompanyMail: form.recipientCompanyMail,
-        recipientCompanySiret: form.recipientCompanySiret,
-        recipientCompanyName: form.recipientCompanyName,
-        recipientCompanyAddress: form.recipientCompanyAddress,
-        recipientCompanyContact: form.recipientCompanyContact,
-        recipientCompanyPhone: form.recipientCompanyPhone,
-        recipientCompanyMail: form.recipientCompanyMail,
-        emittedByEcoOrganisme: form.emittedByEcoOrganisme
-      }
-    });
+    await updateManyForms(appendix1Ids, {
+      // Most data are copied from the container form and not editable:
+      // - waste infos
+      // - transporter
+      // - recipient
+      // - if its emitted by an eco organisme or not
+      wasteDetailsCode: form.wasteDetailsCode,
+      wasteDetailsIsDangerous: form.wasteDetailsIsDangerous,
+      wasteDetailsName: form.wasteDetailsName,
+      transporterCompanySiret: form.transporterCompanySiret,
+      transporterCompanyName: form.transporterCompanyName,
+      transporterCompanyAddress: form.transporterCompanyAddress,
+      transporterCompanyContact: form.transporterCompanyContact,
+      transporterCompanyVatNumber: form.transporterCompanyVatNumber,
+      transporterCompanyPhone: form.transporterCompanyPhone,
+      transporterCompanyMail: form.recipientCompanyMail,
+      recipientCompanySiret: form.recipientCompanySiret,
+      recipientCompanyName: form.recipientCompanyName,
+      recipientCompanyAddress: form.recipientCompanyAddress,
+      recipientCompanyContact: form.recipientCompanyContact,
+      recipientCompanyPhone: form.recipientCompanyPhone,
+      recipientCompanyMail: form.recipientCompanyMail,
+      emittedByEcoOrganisme: form.emittedByEcoOrganisme
+    })
 
     // Lastly, manage groups...
     // Remove old ones
