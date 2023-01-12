@@ -383,11 +383,9 @@ function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
  * It allows to refresh the BSD list in real time after a create, update or delete operation from UI
  * https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-refresh.html
  */
-function refreshForDelete(ctx?: GraphQLContext): { refresh: boolean } {
-  return ctx?.user?.auth === AuthType.Session
-    ? { refresh: true }
-    : { refresh: false };
-}
+const refreshForDelete = (ctx?: GraphQLContext): { refresh: boolean } => ({
+  refresh: ctx?.user?.auth === AuthType.Session
+});
 
 /**
  * Create/update a document in Elastic Search.
