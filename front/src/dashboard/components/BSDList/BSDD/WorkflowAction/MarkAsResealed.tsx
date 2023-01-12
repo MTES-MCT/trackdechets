@@ -248,6 +248,7 @@ const emptyState = {
     numberPlate: "",
     company: {
       siret: "",
+      vatNumber: "",
       name: "",
       address: "",
       contact: "",
