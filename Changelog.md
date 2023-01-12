@@ -5,6 +5,24 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.1.2] 12/01/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+- Correction bug de suppression d'un BSDD de l'index ES [PR 2050](https://github.com/MTES-MCT/trackdechets/pull/2050)
+- Correctifs validation de Destination ultérieure et correction des réponses du champ Form "company.country" [PR 2046](https://github.com/MTES-MCT/trackdechets/pull/2046)
+
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2023.1.1] 10/01/2023
 
 #### :rocket: Nouvelles fonctionnalités
