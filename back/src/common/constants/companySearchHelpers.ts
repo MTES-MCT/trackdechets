@@ -111,12 +111,11 @@ export const isSiret = (clue: string, allowTestCompany = false): boolean => {
   ) {
     return true;
   }
-  const luhnValid = luhnCheck(clue);
-  if (luhnValid) {
-    return true;
+  // La Poste groupe specific rule (except for headquarters 35600000000048 that pass luhnChack)
+  if (clue.startsWith("356000000") && clue !== "35600000000048") {
+    return clue.split("").reduce((a, b) => a + parseInt(b, 10), 0) % 5 === 0;
   }
-  // try with "5" (default is 10) for La Poste Groupe SIRET
-  return luhnCheck(clue, 5);
+  return luhnCheck(clue);
 };
 
 /**
