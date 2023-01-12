@@ -1209,6 +1209,54 @@ describe("processedInfoSchema", () => {
     );
   });
 
+  test("SIRET for la poste is valid", async () => {
+    const transporter = {
+      transporterCompanyName: "la poste",
+      transporterCompanySiret: "35600000040773",
+      transporterCompanyAddress: "paris",
+      transporterCompanyContact: "Contact",
+      transporterCompanyPhone: "00 00 00 00 00",
+      transporterCompanyMail: "contact@laposte.com",
+      transporterIsExemptedOfReceipt: true
+    };
+    const validateFn = () => transporterSchemaFn(false).validate(transporter);
+
+    await expect(validateFn()).resolves.toMatchObject({
+      transporterCompanyAddress: "paris",
+      transporterCompanyContact: "Contact",
+      transporterCompanyMail: "contact@laposte.com",
+      transporterCompanyName: "la poste",
+      transporterCompanyPhone: "00 00 00 00 00",
+      transporterCompanySiret: "35600000040773",
+      transporterCompanyVatNumber: "",
+      transporterIsExemptedOfReceipt: true
+    });
+  });
+
+  test("SIRET for any valid SIRET is valid", async () => {
+    const transporter = {
+      transporterCompanyName: "la poste siege",
+      transporterCompanySiret: "35600000000048",
+      transporterCompanyAddress: "paris",
+      transporterCompanyContact: "Contact",
+      transporterCompanyPhone: "00 00 00 00 00",
+      transporterCompanyMail: "contact@laposte.com",
+      transporterIsExemptedOfReceipt: true
+    };
+    const validateFn = () => transporterSchemaFn(false).validate(transporter);
+
+    await expect(validateFn()).resolves.toMatchObject({
+      transporterCompanyAddress: "paris",
+      transporterCompanyContact: "Contact",
+      transporterCompanyMail: "contact@laposte.com",
+      transporterCompanyName: "la poste siege",
+      transporterCompanyPhone: "00 00 00 00 00",
+      transporterCompanySiret: "35600000000048",
+      transporterCompanyVatNumber: "",
+      transporterIsExemptedOfReceipt: true
+    });
+  });
+
   test("nextDestination should be defined when processing operation is groupement and noTraceability is false", async () => {
     const processedInfo = {
       processedBy: "John Snow",
