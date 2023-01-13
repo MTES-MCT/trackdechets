@@ -19,7 +19,7 @@ const companyInfosResolvers: QueryResolvers["companyPrivateInfos"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   checkIsAuthenticated(context);
-  const cleanClue = cleanClueFn(args.clue).toUpperCase();
+  const cleanClue = cleanClueFn(args.clue);
   const [companyInfos, isAnonymousCompany, company] = await Promise.all([
     getCompanyInfos(cleanClue),
     prisma.anonymousCompany.count({

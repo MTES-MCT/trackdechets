@@ -47,7 +47,8 @@ import {
   isFRVat,
   isOmi,
   isForeignVat,
-  countries as vatCountries
+  countries as vatCountries,
+  BAD_CHARACTERS_REGEXP
 } from "../common/constants/companySearchHelpers";
 import { validateCompany } from "../companies/validateCompany";
 import { Decimal } from "decimal.js-light";
@@ -990,8 +991,9 @@ const withNextDestination = (required: boolean) =>
               "Destination ultérieure : le code du pays de l'entreprise ne correspond pas au numéro de TVA entré",
               value =>
                 !value ||
-                checkVAT(vat.replace(/[\W_\s]/gim, ""), vatCountries)?.country
-                  ?.isoCode.short === value.replace(/[\W_\s]/gim, "")
+                checkVAT(vat.replace(BAD_CHARACTERS_REGEXP, ""), vatCountries)
+                  ?.country?.isoCode.short ===
+                  value.replace(BAD_CHARACTERS_REGEXP, "")
             )
           : schema;
       })

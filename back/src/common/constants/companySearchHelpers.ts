@@ -130,7 +130,7 @@ export const isSiret = (clue: string, allowTestCompany?: boolean): boolean => {
  * Validateur de numéro de TVA
  */
 export const isVat = (clue: string): boolean => {
-  if (!clue || BAD_CHARACTERS_REGEXP.test(clue)) return false;
+  if (!clue || clue.match(BAD_CHARACTERS_REGEXP) !== null) return false;
   const isRegexValid = checkVAT(clue, countries);
   return isRegexValid.isValid;
 };
@@ -148,7 +148,7 @@ export const isFRVat = (clue: string): boolean => {
  */
 export const isForeignVat = (clue: string): boolean => {
   if (!isVat(clue)) return false;
-  return !clue.slice(0, 2).toUpperCase().startsWith("FR");
+  return !isFRVat(clue);
 };
 
 /**
