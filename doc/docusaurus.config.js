@@ -2,7 +2,7 @@
 const path = require("path");
 
 module.exports = {
-  title: "Documentation de l'API Trackdéchets",
+  title: "Documentation technique de l'API Trackdéchets",
   tagline: "Connectez vos systèmes d'information à l'API Trackdéchets",
   url: "https://developers.trackdechets.beta.gouv.fr",
   baseUrl: "/",
