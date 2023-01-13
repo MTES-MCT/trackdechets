@@ -702,7 +702,7 @@ describe("Mutation.markAsSealed", () => {
       expect.objectContaining({
         message: [
           "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
-          `Erreur(s): L'installation de destination avec le SIRET ${recipientCompanySiret} n'est pas inscrite sur Trackdéchets`
+          `Erreur(s): Destinataire : l'établissement avec le SIRET ${recipientCompanySiret} n'est pas inscrit sur Trackdéchets`
         ].join("\n")
       })
     ]);
@@ -769,7 +769,7 @@ describe("Mutation.markAsSealed", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination avec le SIRET ${recipientCompanySiret} n'est pas inscrite sur Trackdéchets`
+        message: `Destination finale : l'établissement avec le SIRET ${recipientCompanySiret} n'est pas inscrit sur Trackdéchets`
       })
     ]);
   });

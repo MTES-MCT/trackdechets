@@ -76,6 +76,7 @@ describe("Mutation.createDraftBsdasri", () => {
 
   it("create a draft dasri with an emitter and a destination", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory();
 
     const input = {
       emitter: {
@@ -85,7 +86,7 @@ describe("Mutation.createDraftBsdasri", () => {
       },
       destination: {
         company: {
-          siret: siretify(1)
+          siret: destination.siret
         }
       }
     };

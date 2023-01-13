@@ -2,7 +2,6 @@ import {
   Bsda,
   BsdaStatus,
   BsdaType,
-  CompanyVerificationStatus,
   Prisma,
   TransportMode,
   WasteAcceptationStatus
@@ -10,20 +9,19 @@ import {
 import { UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import { BSDA_WASTE_CODES } from "../common/constants";
+import { isForeignVat } from "../common/constants/companySearchHelpers";
 import {
-  isSiret,
-  isForeignVat
-} from "../common/constants/companySearchHelpers";
-import { weight, weightConditions, WeightUnits } from "../common/validation";
+  foreignVatNumber,
+  siret,
+  siretConditions,
+  siretTests,
+  weight,
+  weightConditions,
+  WeightUnits
+} from "../common/validation";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { validateCompany } from "../companies/validateCompany";
-import {
-  isCollector,
-  isTransporter,
-  isWasteCenter,
-  isWasteProcessor,
-  transporterCompanyVatNumberSchema
-} from "../companies/validation";
+
 import {
   INVALID_WASTE_CODE,
   MISSING_COMPANY_ADDRESS,
@@ -39,7 +37,6 @@ import prisma from "../prisma";
 
 configureYup();
 
-const { VERIFY_COMPANY } = process.env;
 export const PARTIAL_OPERATIONS = ["R 13", "D 15"];
 export const OPERATIONS = ["R 5", "D 5", "D 9", ...PARTIAL_OPERATIONS];
 type Emitter = Pick<
@@ -144,12 +141,7 @@ export async function validateBsda(
   },
   context: BsdaValidationContext
 ) {
-  await emitterSchema(context)
-    .concat(workerSchema(context))
-    .concat(destinationSchema(context))
-    .concat(transporterSchema(context))
-    .concat(wasteDescriptionSchema(context))
-    .validate(bsda, { abortEarly: false });
+  await bsdaSchema(context).validate(bsda, { abortEarly: false });
 
   if (!context.skipPreviousBsdas) {
     await validatePreviousBsdas(bsda, previousBsdas);
@@ -300,27 +292,14 @@ const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
           context.emissionSignature,
           `Émetteur: ${MISSING_COMPANY_NAME}`
         ),
-      emitterCompanySiret: yup.string().when("emitterIsPrivateIndividual", {
-        is: true,
-        then: yup
-          .string()
-          .oneOf(
-            [null, ""],
-            "Émetteur: Le champ SIRET ne doit pas avoir de valeur dans le cas d'un particulier"
-          )
-          .nullable(true),
-        otherwise: yup
-          .string()
-          .requiredIf(
-            context.emissionSignature,
-            `Émetteur: ${MISSING_COMPANY_SIRET}`
-          )
-          .test(
-            "is-siret",
-            "Émetteur: ${originalValue} n'est pas un numéro de SIRET valide",
-            value => !value || isSiret(value)
-          )
-      }),
+      emitterCompanySiret: siret
+        .label("Émetteur")
+        .when("emitterIsPrivateIndividual", siretConditions.isPrivateIndividual)
+        .requiredIf(
+          context.emissionSignature,
+          `Émetteur: ${MISSING_COMPANY_SIRET}`
+        ),
+
       emitterCompanyAddress: yup
         .string()
         .requiredIf(
@@ -388,32 +367,28 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
           `Entreprise de travaux: ${MISSING_COMPANY_NAME}`
         )
     }),
-    workerCompanySiret: yup.string().when(["type", "workerIsDisabled"], {
-      is: (type, isDisabled) =>
-        [
-          BsdaType.RESHIPMENT,
-          BsdaType.GATHERING,
-          BsdaType.COLLECTION_2710
-        ].includes(type) || isDisabled,
-      then: schema =>
-        schema
-          .nullable()
-          .max(
-            0,
-            "Impossible de saisir le SIRET d'une entreprise de travaux pour ce type de bordereau"
-          ),
-      otherwise: schema =>
-        schema
-          .requiredIf(
+    workerCompanySiret: siret
+      .label("Entreprise de travaux")
+      .when(["type", "workerIsDisabled"], {
+        is: (type, isDisabled) =>
+          [
+            BsdaType.RESHIPMENT,
+            BsdaType.GATHERING,
+            BsdaType.COLLECTION_2710
+          ].includes(type) || isDisabled,
+        then: schema =>
+          schema
+            .nullable()
+            .max(
+              0,
+              "Impossible de saisir le SIRET d'une entreprise de travaux pour ce type de bordereau"
+            ),
+        otherwise: schema =>
+          schema.requiredIf(
             context.emissionSignature,
             `Entreprise de travaux: ${MISSING_COMPANY_SIRET}`
           )
-          .test(
-            "is-siret",
-            "Entreprise de travaux: ${originalValue} n'est pas un numéro de SIRET valide",
-            value => !value || isSiret(value)
-          )
-    }),
+      }),
     workerCompanyAddress: yup.string().when(["type", "workerIsDisabled"], {
       is: (type, isDisabled) =>
         [
@@ -513,52 +488,12 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
           context.emissionSignature,
           `Entreprise de destination: ${MISSING_COMPANY_NAME}`
         ),
-      destinationCompanySiret: yup
-        .string()
+      destinationCompanySiret: siret
+        .label("Destination")
+        .test(siretTests.isRegistered("DESTINATION"))
         .requiredIf(
           context.emissionSignature,
           `Entreprise de destination: ${MISSING_COMPANY_SIRET}`
-        )
-        .test(
-          "is-siret",
-          "Entreprise de destination: ${originalValue} n'est pas un numéro de SIRET valide",
-          value => !value || isSiret(value)
-        )
-        .test(
-          "is-recipient-registered-with-right-profile",
-          ({ value }) =>
-            `L'installation de destination avec le SIRET ${value} n'est pas inscrite sur Trackdéchets`,
-          async (siret, ctx) => {
-            if (!siret) return true;
-
-            const company = await prisma.company.findUnique({
-              where: { siret }
-            });
-            if (!company) {
-              return false;
-            }
-
-            if (
-              !isCollector(company) &&
-              !isWasteProcessor(company) &&
-              !isWasteCenter(company)
-            ) {
-              throw ctx.createError({
-                message: `L'installation de destination ou d'entreposage ou de reconditionnement avec le SIRET ${siret} n'est pas inscrite sur Trackdéchets en tant qu'installation de traitement, de tri transit regroupement ou déchetterie. Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements.`
-              });
-            }
-
-            if (
-              VERIFY_COMPANY === "true" &&
-              company.verificationStatus !== CompanyVerificationStatus.VERIFIED
-            ) {
-              throw ctx.createError({
-                message: `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau bordereau.`
-              });
-            }
-
-            return true;
-          }
         ),
       destinationCompanyAddress: yup
         .string()
@@ -802,9 +737,14 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
             `Transporteur: ${MISSING_COMPANY_NAME}`
           )
       }),
-      transporterCompanySiret: yup
-        .string()
-        .ensure()
+      transporterCompanySiret: siret
+        .label("Transporteur")
+        .requiredIf(
+          context.workSignature,
+          `Transporteur: ${MISSING_COMPANY_SIRET}`
+        )
+        .when("transporterCompanyVatNumber", siretConditions.companyVatNumber)
+        .test(siretTests.isRegistered("TRANSPORTER"))
         .when("type", {
           is: BsdaType.COLLECTION_2710,
           then: schema =>
@@ -813,47 +753,9 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
               .max(
                 0,
                 "Impossible de saisir le SIRET d'un transporteur pour ce type de bordereau"
-              ),
-          otherwise: schema =>
-            schema.when("transporterCompanyVatNumber", (tva, schema) => {
-              if (!tva || !isForeignVat(tva)) {
-                return schema.requiredIf(
-                  context.workSignature,
-                  `Transporteur: ${MISSING_COMPANY_SIRET}`
-                );
-              }
-              return schema.nullable().notRequired();
-            })
-        })
-        .test(
-          "is-siret",
-          "Transporteur: ${originalValue} n'est pas un numéro de SIRET valide",
-          value => !value || isSiret(value)
-        )
-        .test(
-          "is-transporter-registered-with-right-profile",
-          ({ value }) =>
-            `Le transporteur avec le SIRET ${value} n'est pas inscrit sur Trackdéchets`,
-          async (siret, ctx) => {
-            if (!siret) return true;
-
-            const company = await prisma.company.findUnique({
-              where: { siret }
-            });
-            if (!company) {
-              return false;
-            }
-
-            if (!isTransporter(company)) {
-              throw ctx.createError({
-                message: `Le transporteur avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport. Cet établissement ne peut donc pas être visé sur le bordereau. Veuillez vous rapprocher de l'administrateur de cet établissement pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements.`
-              });
-            }
-
-            return true;
-          }
-        ),
-      transporterCompanyVatNumber: transporterCompanyVatNumberSchema,
+              )
+        }),
+      transporterCompanyVatNumber: foreignVatNumber.label("Transporteur"),
       transporterCompanyAddress: yup.string().when("type", {
         is: BsdaType.COLLECTION_2710,
         then: schema => schema.nullable(),
@@ -980,3 +882,10 @@ const wasteDescriptionSchema: FactorySchemaOf<
       )
       .requiredIf(context.workSignature, `La quantité est obligatoire`)
   });
+
+export const bsdaSchema = (context: BsdaValidationContext) =>
+  emitterSchema(context)
+    .concat(workerSchema(context))
+    .concat(destinationSchema(context))
+    .concat(transporterSchema(context))
+    .concat(wasteDescriptionSchema(context));

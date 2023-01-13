@@ -13,15 +13,17 @@ import {
 import { BsffOperationCode, BsffPackaging } from "../generated/graphql/types";
 import { isFinalOperation, OPERATION } from "./constants";
 import prisma from "../prisma";
-import { isVat } from "../common/constants/companySearchHelpers";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { BSFF_WASTE_CODES } from "../common/constants";
 import {
-  destinationCompanySiretSchema,
-  transporterCompanySiretSchema,
-  transporterCompanyVatNumberSchema
-} from "../companies/validation";
-import { weight, weightConditions, WeightUnits } from "../common/validation";
+  foreignVatNumber,
+  siret,
+  siretConditions,
+  siretTests,
+  weight,
+  weightConditions,
+  WeightUnits
+} from "../common/validation";
 
 configureYup();
 
@@ -102,16 +104,12 @@ export const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
     emitterCompanyName: yup
       .string()
       .requiredIf(!isDraft, "Émetteur : le nom de l'établissement est requis"),
-    emitterCompanySiret: yup
-      .string()
+    emitterCompanySiret: siret
+      .label("Émetteur")
       .requiredIf(
         !isDraft,
         "Émetteur : le n°SIRET de l'établissement est requis"
-      )
-      .matches(/^$|^\d{14}$/, {
-        message:
-          "Émetteur : le n°SIRET de l'établissement n'est pas au bon format"
-      }),
+      ),
     emitterCompanyAddress: yup
       .string()
       .requiredIf(
@@ -139,8 +137,15 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
           !isDraft,
           "Transporteur : le nom de l'établissement est requis"
         ),
-      transporterCompanySiret: transporterCompanySiretSchema(isDraft),
-      transporterCompanyVatNumber: transporterCompanyVatNumberSchema,
+      transporterCompanySiret: siret
+        .label("Transporteur")
+        .requiredIf(
+          !isDraft,
+          "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
+        )
+        .when("transporterCompanyVatNumber", siretConditions.companyVatNumber)
+        .test(siretTests.isRegistered("TRANSPORTER")),
+      transporterCompanyVatNumber: foreignVatNumber.label("Transporteur"),
       transporterCompanyAddress: yup
         .string()
         .requiredIf(
@@ -263,10 +268,10 @@ export const destinationSchemaFn: FactorySchemaOf<boolean, Destination> =
           !isDraft,
           "Destination : le nom de l'établissement est requis"
         ),
-      destinationCompanySiret: destinationCompanySiretSchema.requiredIf(
-        !isDraft,
-        `Destination : le numéro SIRET est requis`
-      ),
+      destinationCompanySiret: siret
+        .label("Destination")
+        .requiredIf(!isDraft, `Destination : le numéro SIRET est requis`)
+        .test(siretTests.isRegistered("DESTINATION")),
       destinationCompanyAddress: yup
         .string()
         .requiredIf(
@@ -379,33 +384,19 @@ const withNextDestination = (required: boolean) =>
         required,
         "Destination ultérieure : le nom de l'établissement est requis"
       ),
-    operationNextDestinationCompanySiret: yup
-      .string()
-      .when("operationNextDestinationCompanyVatNumber", (vatNumber, schema) => {
-        return !!vatNumber
-          ? schema.notRequired().nullable()
-          : schema
-              .ensure()
-              .requiredIf(
-                required,
-                "Destination ultérieure : Le n° SIRET ou le n°TVA intracommunautaire est obligatoire"
-              )
-              .test(
-                "is-14-charachters",
-                `Destination ultérieure prévue : le n°SIRET doit faire 14 caractères`,
-                value => !value || value?.length === 14
-              );
-      }),
-    operationNextDestinationCompanyVatNumber: yup
-      .string()
-      .notRequired()
-      .nullable()
-      .test(
-        "is-vat",
-        "Destination ultérieure : ${originalValue} n'est pas un numéro de TVA intracommunautaire valide",
-        value => !value || isVat(value)
+    operationNextDestinationCompanySiret: siret
+      .label("Destination ultérieure")
+      .requiredIf(
+        required,
+        "Destination ultérieure : Le n° SIRET ou le n°TVA intracommunautaire est obligatoire"
+      )
+      .when(
+        "operationNextDestinationCompanyVatNumber",
+        siretConditions.companyVatNumber
       ),
-
+    operationNextDestinationCompanyVatNumber: foreignVatNumber.label(
+      "Destination ultérieure"
+    ),
     operationNextDestinationCompanyAddress: yup
       .string()
       .ensure()
@@ -950,27 +941,10 @@ export const ficheInterventionSchema: yup.SchemaOf<
     .string()
     .required("Le code postal du lieu de l'intervention est requis"),
   detenteurIsPrivateIndividual: yup.boolean(),
-  detenteurCompanySiret: yup.string().when("detenteurIsPrivateIndividual", {
-    is: true,
-    then: schema =>
-      schema
-        .nullable()
-        .notRequired()
-        .max(
-          0,
-          "Vous ne pouvez pas renseigner de n°SIRET lorsque le détenteur est un particulier"
-        ),
-    otherwise: schema =>
-      schema
-        .ensure()
-        .required(
-          "Le SIRET de l'entreprise détentrice de l'équipement est requis"
-        )
-        .matches(/^$|^\d{14}$/, {
-          message:
-            "Le SIRET de l'entreprise détentrice de l'équipement n'est pas au bon format (${length} caractères)"
-        })
-  }),
+  detenteurCompanySiret: siret
+    .label("Détenteur")
+    .required("Le SIRET de l'entreprise détentrice de l'équipement est requis")
+    .when("detenteurIsPrivateIndividual", siretConditions.isPrivateIndividual),
   detenteurCompanyName: yup
     .string()
     .ensure()
@@ -1038,13 +1012,9 @@ export const ficheInterventionSchema: yup.SchemaOf<
   operateurCompanyName: yup
     .string()
     .required("Le nom de l'entreprise de l'opérateur est requis"),
-  operateurCompanySiret: yup
-    .string()
-    .required("Le SIRET de l'entreprise de l'opérateur est requis")
-    .matches(/^$|^\d{14}$/, {
-      message:
-        "Le SIRET de l'entreprise de l'opérateur n'est pas au bon format (${length} caractères)"
-    }),
+  operateurCompanySiret: siret.required(
+    "Le SIRET de l'entreprise de l'opérateur est requis"
+  ),
   operateurCompanyAddress: yup
     .string()
     .required("L'adresse de l'entreprise de l'opérateur est requis"),

@@ -17,12 +17,15 @@ import {
 import * as yup from "yup";
 import { FactorySchemaOf } from "../common/yup/configureYup";
 import { BsvhuDestinationType } from "../generated/graphql/types";
+import { isForeignVat } from "../common/constants/companySearchHelpers";
 import {
-  isForeignVat,
-  isSiret
-} from "../common/constants/companySearchHelpers";
-import { transporterCompanyVatNumberSchema } from "../companies/validation";
-import { weight, WeightUnits } from "../common/validation";
+  foreignVatNumber,
+  siret,
+  siretConditions,
+  siretTests,
+  weight,
+  WeightUnits
+} from "../common/validation";
 
 type Emitter = Pick<
   Bsvhu,
@@ -104,13 +107,8 @@ const emitterSchema: FactorySchemaOf<VhuValidationContext, Emitter> = context =>
         context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_NAME}`
       ),
-    emitterCompanySiret: yup
-      .string()
-      .test(
-        "is-Émetteur",
-        "Transporteur: ${originalValue} n'est pas un numéro de SIRET valide",
-        value => !value || isSiret(value)
-      )
+    emitterCompanySiret: siret
+      .label("Émetteur")
       .requiredIf(
         context.emissionSignature,
         `Émetteur: ${MISSING_COMPANY_SIRET}`
@@ -196,13 +194,9 @@ const destinationSchema: FactorySchemaOf<VhuValidationContext, Destination> =
           context.emissionSignature,
           `Destinataire: ${MISSING_COMPANY_NAME}`
         ),
-      destinationCompanySiret: yup
-        .string()
-        .test(
-          "is-siret",
-          "Destinataire: ${originalValue} n'est pas un numéro de SIRET valide",
-          value => !value || isSiret(value)
-        )
+      destinationCompanySiret: siret
+        .label("Destination")
+        .test(siretTests.isRegistered("DESTINATION"))
         .requiredIf(
           context.emissionSignature,
           `Destinataire: ${MISSING_COMPANY_SIRET}`
@@ -275,24 +269,15 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
           context.transportSignature,
           `Transporteur: ${MISSING_COMPANY_NAME}`
         ),
-      transporterCompanySiret: yup
-        .string()
-        .ensure()
-        .when("transporterCompanyVatNumber", (tva, schema) => {
-          if (!tva || !isForeignVat(tva)) {
-            return schema.requiredIf(
-              context.transportSignature,
-              `Transporteur: ${MISSING_COMPANY_SIRET}`
-            );
-          }
-          return schema.nullable().notRequired();
-        })
-        .test(
-          "is-siret",
-          "Transporteur: ${originalValue} n'est pas un numéro de SIRET valide",
-          value => !value || isSiret(value)
-        ),
-      transporterCompanyVatNumber: transporterCompanyVatNumberSchema,
+      transporterCompanySiret: siret
+        .label("Transporteur")
+        .test(siretTests.isRegistered("TRANSPORTER"))
+        .requiredIf(
+          context.transportSignature,
+          `Transporteur: ${MISSING_COMPANY_SIRET}`
+        )
+        .when("transporterCompanyVatNumber", siretConditions.companyVatNumber),
+      transporterCompanyVatNumber: foreignVatNumber.label("Transporteur"),
       transporterCompanyAddress: yup
         .string()
         .requiredIf(

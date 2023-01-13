@@ -1,10 +1,6 @@
-import {
-  CompanyType,
-  CompanyVerificationStatus,
-  WasteAcceptationStatus,
-  BsffFicheIntervention
-} from "@prisma/client";
-import { siretify } from "../../__tests__/factories";
+import { WasteAcceptationStatus, BsffFicheIntervention } from "@prisma/client";
+import { resetDatabase } from "../../../integration-tests/helper";
+import { companyFactory, siretify } from "../../__tests__/factories";
 import {
   receptionSchema,
   emitterSchemaFn,
@@ -16,49 +12,43 @@ import {
   ficheInterventionSchema
 } from "../validation";
 
-jest.mock("../../prisma", () => ({
-  company: {
-    findUnique: jest.fn(() =>
-      Promise.resolve({
-        companyTypes: [
-          CompanyType.COLLECTOR,
-          CompanyType.WASTEPROCESSOR,
-          CompanyType.TRANSPORTER
-        ],
-        verificationStatus: CompanyVerificationStatus.VERIFIED
-      })
-    )
-  }
-}));
-
 describe("emitterSchema", () => {
-  const emitter = {
-    emitterCompanyName: "Emitter",
-    emitterCompanySiret: siretify(1),
-    emitterCompanyAddress: "10 chemin fluide, 13001 Marseille",
-    emitterCompanyContact: "John Clim",
-    emitterCompanyPhone: "06 67 78 95 88",
-    emitterCompanyMail: "john@clim.com"
-  };
+  afterAll(resetDatabase);
+
+  let emitterData;
+
+  beforeAll(async () => {
+    const emitter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+
+    emitterData = {
+      emitterCompanyName: "Emitter",
+      emitterCompanySiret: emitter.siret,
+      emitterCompanyAddress: "10 chemin fluide, 13001 Marseille",
+      emitterCompanyContact: "John Clim",
+      emitterCompanyPhone: "06 67 78 95 88",
+      emitterCompanyMail: "john@clim.com"
+    };
+  });
 
   const emitterSchema = emitterSchemaFn(false);
 
   test("valid data", () => {
-    expect(emitterSchema.isValidSync(emitter)).toEqual(true);
+    emitterSchema.validateSync(emitterData);
+    expect(emitterSchema.isValidSync(emitterData)).toEqual(true);
   });
 
   test("invalid SIRET", async () => {
     const validateFn = () =>
-      emitterSchema.validate({ ...emitter, emitterCompanySiret: "1" });
+      emitterSchema.validate({ ...emitterData, emitterCompanySiret: "1" });
 
     await expect(validateFn()).rejects.toThrow(
-      "Émetteur : le n°SIRET de l'établissement n'est pas au bon format"
+      "Émetteur: 1 n'est pas un numéro de SIRET valide"
     );
   });
 
   test("invalid email", async () => {
     const validateFn = () =>
-      emitterSchema.validate({ ...emitter, emitterCompanyMail: "00 00" });
+      emitterSchema.validate({ ...emitterData, emitterCompanyMail: "00 00" });
 
     await expect(validateFn()).rejects.toThrow(
       "Émetteur : l'adresse email est invalide"
@@ -67,49 +57,118 @@ describe("emitterSchema", () => {
 });
 
 describe("transporterSchema", () => {
-  const transporter = {
-    transporterCompanyName: "Transporteur",
-    transporterCompanySiret: siretify(1),
-    transporterCompanyAddress: "10 chemin fluide, 13001 Marseille",
-    transporterCompanyContact: "John Clim",
-    transporterCompanyPhone: "06 67 78 95 88",
-    transporterCompanyMail: "john@clim.com"
-  };
+  let transporterData;
+
+  afterAll(resetDatabase);
+
+  beforeAll(async () => {
+    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+
+    transporterData = {
+      transporterCompanyName: "Transporteur",
+      transporterCompanySiret: transporter.siret,
+      transporterCompanyAddress: "10 chemin fluide, 13001 Marseille",
+      transporterCompanyContact: "John Clim",
+      transporterCompanyPhone: "06 67 78 95 88",
+      transporterCompanyMail: "john@clim.com"
+    };
+  });
 
   const transporterSchema = transporterSchemaFn(false);
 
   test("valid data", async () => {
-    expect(await transporterSchema.isValid(transporter)).toEqual(true);
+    expect(await transporterSchema.isValid(transporterData)).toEqual(true);
+  });
+
+  test("valid data with foreign vat number", async () => {
+    expect(
+      await transporterSchema.isValid({
+        ...transporterData,
+        transporterCompanyVatNumber: "IT13029381004"
+      })
+    ).toEqual(true);
+  });
+
+  test("missing SIRET", async () => {
+    const validateFn = () =>
+      transporterSchema.validate({
+        ...transporterData,
+        transporterCompanySiret: null
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
+    );
+  });
+
+  test("missing SIRET and FR VAT", async () => {
+    const validateFn = () =>
+      transporterSchema.validate({
+        ...transporterData,
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: "FR35552049447"
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
+    );
+  });
+
+  test("company not registered in Trackdéchets", async () => {
+    const validateFn = () =>
+      transporterSchema.validate({
+        ...transporterData,
+        transporterCompanySiret: "55204944776279"
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Transporteur : l'établissement avec le SIRET 55204944776279 n'est pas inscrit sur Trackdéchets"
+    );
+  });
+
+  test("company registered in Trackdéchets but with wrong profile", async () => {
+    const company = await companyFactory({ companyTypes: ["PRODUCER"] });
+    const validateFn = () =>
+      transporterSchema.validate({
+        ...transporterData,
+        transporterCompanySiret: company.siret
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
+        " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
+        " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+    );
   });
 
   test("invalid SIRET", async () => {
     const validateFn = () =>
       transporterSchema.validate({
-        ...transporter,
+        ...transporterData,
         transporterCompanySiret: "00000000000000"
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Transporteur : 00000000000000 n'est pas un numéro de SIRET valide"
+      "Transporteur: 00000000000000 n'est pas un numéro de SIRET valide"
     );
   });
 
   test("invalid SIRET length", async () => {
     const validateFn = () =>
       transporterSchema.validate({
-        ...transporter,
+        ...transporterData,
         transporterCompanySiret: "1"
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Transporteur : 1 n'est pas un numéro de SIRET valide"
+      "Transporteur: 1 n'est pas un numéro de SIRET valide"
     );
   });
 
   test("invalid email", async () => {
     const validateFn = () =>
       transporterSchema.validate({
-        ...transporter,
+        ...transporterData,
         transporterCompanyMail: "00 00"
       });
 
@@ -120,26 +179,35 @@ describe("transporterSchema", () => {
 });
 
 describe("destinationSchema", () => {
-  const destination = {
-    destinationCompanyName: "Transporteur",
-    destinationCompanySiret: siretify(1),
-    destinationCompanyAddress: "10 chemin fluide, 13001 Marseille",
-    destinationCompanyContact: "John Clim",
-    destinationCompanyPhone: "06 67 78 95 88",
-    destinationCompanyMail: "john@clim.com",
-    destinationPlannedOperationCode: "R2"
-  };
+  let destinationData;
+
+  afterAll(resetDatabase);
+
+  beforeAll(async () => {
+    const destination = await companyFactory({
+      companyTypes: ["WASTEPROCESSOR"]
+    });
+    destinationData = {
+      destinationCompanyName: "Transporteur",
+      destinationCompanySiret: destination.siret,
+      destinationCompanyAddress: "10 chemin fluide, 13001 Marseille",
+      destinationCompanyContact: "John Clim",
+      destinationCompanyPhone: "06 67 78 95 88",
+      destinationCompanyMail: "john@clim.com",
+      destinationPlannedOperationCode: "R2"
+    };
+  });
 
   const destinationSchema = destinationSchemaFn(false);
 
   test("valid data", async () => {
-    expect(await destinationSchema.isValid(destination)).toEqual(true);
+    expect(await destinationSchema.isValid(destinationData)).toEqual(true);
   });
 
   test("invalid SIRET", async () => {
     const validateFn = () =>
       destinationSchema.validate({
-        ...destination,
+        ...destinationData,
         destinationCompanySiret: "11111111111111"
       });
 
@@ -151,7 +219,7 @@ describe("destinationSchema", () => {
   test("invalid SIRET length", async () => {
     const validateFn = () =>
       destinationSchema.validate({
-        ...destination,
+        ...destinationData,
         destinationCompanySiret: "1"
       });
 
@@ -160,10 +228,38 @@ describe("destinationSchema", () => {
     );
   });
 
+  test("company not registered in Trackdéchets", async () => {
+    const validateFn = () =>
+      destinationSchema.validate({
+        ...destinationData,
+        destinationCompanySiret: "85001946400021"
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Destination : l'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
+    );
+  });
+
+  test("company registered in Trackdéchets but with wrong profile", async () => {
+    const company = await companyFactory({ companyTypes: ["PRODUCER"] });
+    const validateFn = () =>
+      destinationSchema.validate({
+        ...destinationData,
+        destinationCompanySiret: company.siret
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET \"${company.siret}\" n'est pas inscrite sur` +
+        " Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc pas être" +
+        " visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil de" +
+        " l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+    );
+  });
+
   test("invalid email", async () => {
     const validateFn = () =>
       destinationSchema.validate({
-        ...destination,
+        ...destinationData,
         destinationCompanyMail: "00 00"
       });
 
@@ -175,7 +271,7 @@ describe("destinationSchema", () => {
   test("invalid planned operation code", async () => {
     const validateFn = () =>
       destinationSchema.validate({
-        ...destination,
+        ...destinationData,
         destinationPlannedOperationCode: "T2"
       });
 
@@ -470,7 +566,29 @@ describe("operationSchema", () => {
       operationNextDestinationCompanyMail: "contact@trackdechets.fr"
     };
     const validateFn = () => operationSchema.validate(data);
-    await expect(validateFn()).rejects.toThrow("");
+    await expect(validateFn()).rejects.toThrow(
+      "Destination ultérieure : Le n° SIRET ou le n°TVA intracommunautaire est obligatoire"
+    );
+  });
+
+  it("should not be valid when a french VAT is provided", async () => {
+    const data = {
+      ...operation,
+      operationCode: "D13",
+      operationNextDestinationCompanyName: "ACME INC",
+      operationNextDestinationPlannedOperationCode: "R2",
+      operationNextDestinationCap: "cap",
+      operationNextDestinationCompanySiret: null,
+      operationNextDestinationCompanyVatNumber: "FR35552049447",
+      operationNextDestinationCompanyAddress: "Quelque part",
+      operationNextDestinationCompanyContact: "Mr Déchet",
+      operationNextDestinationCompanyPhone: "01 00 00 00 00",
+      operationNextDestinationCompanyMail: "contact@trackdechets.fr"
+    };
+    const validateFn = () => operationSchema.validate(data);
+    await expect(validateFn()).rejects.toThrow(
+      "Destination ultérieure : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
+    );
   });
 
   it("should be valid when operation code is groupement, noTraceability is true and nextDestination is set", () => {
@@ -526,51 +644,67 @@ describe("operationSchema", () => {
 });
 
 describe("ficheInterventionSchema", () => {
-  const ficheIntevention: Partial<BsffFicheIntervention> = {
-    numero: "FI-1",
-    weight: 1,
-    postalCode: "13001",
+  let ficheInteventionData: Partial<BsffFicheIntervention>,
+    detenteurCompanyData: Partial<BsffFicheIntervention>,
+    privateIndividualData: Partial<BsffFicheIntervention>;
 
-    operateurCompanyName: "Operateur",
-    operateurCompanySiret: "22222222222222",
-    operateurCompanyAddress: "Quelque part",
-    operateurCompanyContact: "Arya Stark",
-    operateurCompanyPhone: "01 00 00 00 00",
-    operateurCompanyMail: "arya.stark@trackdechets.fr"
-  };
+  afterAll(resetDatabase);
 
-  const detenteurCompany: Partial<BsffFicheIntervention> = {
-    detenteurCompanyName: "Detenteur",
-    detenteurCompanySiret: "11111111111111",
-    detenteurCompanyAddress: "Quelque part",
-    detenteurCompanyContact: "John Snow",
-    detenteurCompanyPhone: "00 00 00 00 00",
-    detenteurCompanyMail: "john.snow@trackdechets.fr"
-  };
+  beforeAll(async () => {
+    const operateurCompany = await companyFactory({
+      companyTypes: ["PRODUCER"]
+    });
 
-  const privateIndividual: Partial<BsffFicheIntervention> = {
-    detenteurIsPrivateIndividual: true,
-    detenteurCompanySiret: null,
-    detenteurCompanyContact: null,
-    detenteurCompanyName: "John Snow",
-    detenteurCompanyAddress: "Quelque part",
-    detenteurCompanyMail: "john.snow@trackdechets.fr",
-    detenteurCompanyPhone: "00 00 00 00 00"
-  };
+    const detenteurCompany = await companyFactory({
+      companyTypes: ["PRODUCER"]
+    });
+
+    ficheInteventionData = {
+      numero: "FI-1",
+      weight: 1,
+      postalCode: "13001",
+
+      operateurCompanyName: "Operateur",
+      operateurCompanySiret: operateurCompany.siret,
+      operateurCompanyAddress: "Quelque part",
+      operateurCompanyContact: "Arya Stark",
+      operateurCompanyPhone: "01 00 00 00 00",
+      operateurCompanyMail: "arya.stark@trackdechets.fr"
+    };
+
+    detenteurCompanyData = {
+      detenteurCompanyName: "Detenteur",
+      detenteurCompanySiret: detenteurCompany.siret,
+      detenteurCompanyAddress: "Quelque part",
+      detenteurCompanyContact: "John Snow",
+      detenteurCompanyPhone: "00 00 00 00 00",
+      detenteurCompanyMail: "john.snow@trackdechets.fr"
+    };
+
+    privateIndividualData = {
+      detenteurIsPrivateIndividual: true,
+      detenteurCompanySiret: null,
+      detenteurCompanyContact: null,
+      detenteurCompanyName: "John Snow",
+      detenteurCompanyAddress: "Quelque part",
+      detenteurCompanyMail: "john.snow@trackdechets.fr",
+      detenteurCompanyPhone: "00 00 00 00 00"
+    };
+  });
 
   it("should be valid when company info is complete", () => {
     expect(
       ficheInterventionSchema.isValidSync({
-        ...ficheIntevention,
-        ...detenteurCompany
+        ...ficheInteventionData,
+        ...detenteurCompanyData
       })
     ).toBe(true);
   });
 
   it("should be invalid when a company field is missing", async () => {
     const data = {
-      ...ficheIntevention,
-      ...detenteurCompany,
+      ...ficheInteventionData,
+      ...detenteurCompanyData,
       detenteurCompanyContact: null
     };
     const validateFn = () => ficheInterventionSchema.validate(data);
@@ -582,16 +716,16 @@ describe("ficheInterventionSchema", () => {
   it("should be valid when private individual info is complete", () => {
     expect(
       ficheInterventionSchema.isValidSync({
-        ...ficheIntevention,
-        ...privateIndividual
+        ...ficheInteventionData,
+        ...privateIndividualData
       })
     ).toBe(true);
   });
 
   it("should be invalid when a private individual field is missing", async () => {
     const data = {
-      ...ficheIntevention,
-      ...privateIndividual,
+      ...ficheInteventionData,
+      ...privateIndividualData,
       detenteurCompanyAddress: null
     };
     const validateFn = () => ficheInterventionSchema.validate(data);
@@ -602,13 +736,13 @@ describe("ficheInterventionSchema", () => {
 
   it("should not be valid when providing both company and private indivual info", async () => {
     const data = {
-      ...ficheIntevention,
-      ...privateIndividual,
-      ...detenteurCompany
+      ...ficheInteventionData,
+      ...privateIndividualData,
+      ...detenteurCompanyData
     };
     const validateFn = () => ficheInterventionSchema.validate(data);
     await expect(validateFn()).rejects.toThrow(
-      "Vous ne pouvez pas renseigner de n°SIRET lorsque le détenteur est un particulier"
+      "Détenteur : vous ne pouvez pas renseigner de n°SIRET lorsque l'émetteur ou le détenteur est un particulier"
     );
   });
 });

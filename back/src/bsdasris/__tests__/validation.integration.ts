@@ -1,61 +1,266 @@
-import { ValidationError } from "yup";
-import { siretify } from "../../__tests__/factories";
+import { Bsdasri } from "@prisma/client";
+import { resetDatabase } from "../../../integration-tests/helper";
+import { companyFactory } from "../../__tests__/factories";
 import { validateBsdasri } from "../validation";
 
 import { initialData, readyToTakeOverData } from "./factories";
 
 describe("Mutation.signBsdasri emission", () => {
-  it("should validate emission", async () => {
-    const dasri = initialData({ siret: siretify(1), name: "emetteur" });
-    await validateBsdasri(dasri, { emissionSignature: true });
-  });
+  afterAll(resetDatabase);
 
-  it("should validate transport", async () => {
-    const dasri = readyToTakeOverData({
-      siret: siretify(1),
-      name: "transporteur"
-    });
-    await validateBsdasri(dasri, { transportSignature: true });
-  });
+  let bsdasri: Partial<Bsdasri>;
 
-  it("should validate emission and transport", async () => {
-    const dasri = {
-      ...initialData({ siret: siretify(1), name: "emetteur" }),
+  beforeAll(async () => {
+    const emitter = await companyFactory();
+    const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+    bsdasri = {
+      ...initialData(emitter),
       ...readyToTakeOverData({
-        siret: siretify(2),
+        siret: transporter.siret,
         name: "transporteur"
       })
     };
-    await validateBsdasri(dasri, {
-      emissionSignature: true,
-      transportSignature: true
+  });
+
+  describe("BSDASRI should be valid", () => {
+    test("before emission", async () => {
+      const validated = await validateBsdasri(
+        initialData(await companyFactory()),
+        {
+          emissionSignature: true
+        }
+      );
+      expect(validated).toBeDefined();
+    });
+
+    test("before transport", async () => {
+      const validated = await validateBsdasri(
+        readyToTakeOverData(
+          await companyFactory({ companyTypes: ["TRANSPORTER"] })
+        ),
+        { transportSignature: true }
+      );
+      expect(validated).toBeDefined();
+    });
+
+    test("before emission and transport", async () => {
+      const validated = await validateBsdasri(bsdasri, {
+        emissionSignature: true,
+        transportSignature: true
+      });
+      expect(validated).toBeDefined();
+    });
+
+    test("when there is foreign vat number and transporter siret is null", async () => {
+      const data = {
+        ...bsdasri,
+        transporterCompanyVatNumber: "BE0541696005",
+        transporterCompanySiret: null
+      };
+      const validated = await validateBsdasri(data, {
+        transportSignature: true
+      });
+      expect(validated).toBeDefined();
+    });
+
+    test("there is a foreign transporter and recepisse fields are null", async () => {
+      const data = {
+        ...bsdasri,
+        transporterCompanyVatNumber: "BE0541696005",
+        transporterRecepisseNumber: null,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseValidityLimit: null
+      };
+      const validated = await validateBsdasri(data, {
+        transportSignature: true
+      });
+      expect(validated).toBeDefined();
     });
   });
 
-  it("should validate without recipisse when it's a foreign transport", async () => {
-    const dasri = readyToTakeOverData({
-      vatNumber: "BE0541696005",
-      name: "transporteur DE"
-    });
-    delete dasri.transporterRecepisseNumber;
-    delete dasri.transporterRecepisseDepartment;
-    delete dasri.transporterRecepisseValidityLimit;
-    await validateBsdasri(dasri, { transportSignature: true });
-  });
+  describe("BSDASRI should not be valid", () => {
+    test("when transporter is FR and recepisse fields are null", async () => {
+      const data = {
+        ...bsdasri,
+        transporterRecepisseNumber: null,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseValidityLimit: null
+      };
 
-  it("should not validate without recipisse when it's a foreign transport", async () => {
-    const dasri = await readyToTakeOverData({
-      opt: {
-        transporterCompanySiret: siretify(1),
-        transporterCompanyName: "transporteur FR"
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          "Transporteur: le numéro de récépissé est obligatoire",
+          "Transporteur: le département associé au récépissé est obligatoire",
+          "La date de validité du récépissé est obligatoire"
+        ]);
       }
     });
-    delete dasri.transporterRecepisseDepartment;
-    delete dasri.transporterRecepisseNumber;
-    await expect(() =>
-      validateBsdasri(dasri, {
-        transportSignature: true
-      })
-    ).rejects.toThrow(ValidationError);
+
+    test("when emitter siret is not valid", async () => {
+      const data = {
+        ...bsdasri,
+        emitterCompanySiret: "1"
+      };
+
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          "Émetteur: 1 n'est pas un numéro de SIRET valide"
+        ]);
+      }
+    });
+
+    test("when transporter siret is not valid", async () => {
+      const data = {
+        ...bsdasri,
+        transporterCompanySiret: "1"
+      };
+
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          "Transporteur: 1 n'est pas un numéro de SIRET valide",
+          "Transporteur : l'établissement avec le SIRET 1 n'est pas inscrit sur Trackdéchets"
+        ]);
+      }
+    });
+
+    test("when transporter vatNumber is FR", async () => {
+      const data = {
+        ...bsdasri,
+        transporterCompanyVatNumber: "FR35552049447"
+      };
+
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
+        ]);
+      }
+    });
+
+    test("when transporter is not registered in Trackdéchets", async () => {
+      const data = {
+        ...bsdasri,
+        transporterCompanySiret: "85001946400021"
+      };
+
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          "Transporteur : l'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
+        ]);
+      }
+    });
+
+    test("when transporter is registered with the wrong profile Trackdéchets", async () => {
+      const company = await companyFactory({ companyTypes: ["PRODUCER"] });
+      const data = {
+        ...bsdasri,
+        transporterCompanySiret: company.siret
+      };
+
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
+            " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
+            " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+        ]);
+      }
+    });
+
+    test("when destination siret is not valid", async () => {
+      const data = {
+        ...bsdasri,
+        destinationCompanySiret: "1"
+      };
+
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          "Destination: 1 n'est pas un numéro de SIRET valide",
+          "Destination : l'établissement avec le SIRET 1 n'est pas inscrit sur Trackdéchets"
+        ]);
+      }
+    });
+
+    test("when destination is not registered in Trackdéchets", async () => {
+      const data = {
+        ...bsdasri,
+        destinationCompanySiret: "85001946400021"
+      };
+
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          "Destination : l'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
+        ]);
+      }
+    });
+
+    test("when destination is registered with the wrong profile Trackdéchets", async () => {
+      const company = await companyFactory({ companyTypes: ["PRODUCER"] });
+      const data = {
+        ...bsdasri,
+        destinationCompanySiret: company.siret
+      };
+
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET \"${company.siret}\" n'est pas inscrite` +
+            " sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc" +
+            " pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil" +
+            " de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+        ]);
+      }
+    });
   });
 });
