@@ -15,6 +15,8 @@ type Query {
     last: Int
     "Pagination décroissante avec last et before"
     before: ID
+    "Filtre par nom, siret ou numéro de TVA"
+    search: String
   ): CompanyPrivateConnection
 
   """

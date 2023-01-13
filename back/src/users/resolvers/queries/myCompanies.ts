@@ -18,6 +18,29 @@ const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
 
   const where = { userId: me.id };
 
+  const { search, ...paginationArgs } = args;
+
+  let searchQuery = {};
+
+  if (search) {
+    searchQuery = {
+      OR: [
+        {
+          name: { contains: search, mode: "insensitive" }
+        },
+        {
+          givenName: { contains: search, mode: "insensitive" }
+        },
+        {
+          siret: { contains: search, mode: "insensitive" }
+        },
+        {
+          vatNumber: { contains: search, mode: "insensitive" }
+        }
+      ]
+    };
+  }
+
   // retrieves all companies ids
   const associations = await prisma.companyAssociation.findMany({
     where,
@@ -32,7 +55,10 @@ const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
     totalCount,
     findMany: prismaPaginationArgs =>
       prisma.company.findMany({
-        where: { id: { in: companyIds } },
+        where: {
+          id: { in: companyIds },
+          ...searchQuery
+        },
         ...prismaPaginationArgs,
         orderBy: [
           {
@@ -49,7 +75,7 @@ const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
       const libelleNaf = naf in nafCodes ? nafCodes[naf] : "";
       return { ...companyPrivate, naf, libelleNaf, address };
     },
-    ...args
+    ...paginationArgs
   });
 };
 

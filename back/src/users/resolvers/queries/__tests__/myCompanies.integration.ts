@@ -143,4 +143,27 @@ describe("query { myCompanies }", () => {
       company1.id
     ]);
   }, 20000);
+
+  it("should return companies with the search parameter filtering on the name", async () => {
+    const user = await userFactory();
+    const company1 = await companyFactory({ name: "Banque" });
+    const company2 = await companyFactory({ name: "Boulangerie" });
+    const company3 = await companyFactory({ name: "Déchetterie" });
+
+    for (const company of [company1, company2, company3]) {
+      await associateUserToCompany(user.id, company.siret, "MEMBER");
+    }
+    const { query } = makeClient(user);
+    const { data: page1 } = await query<Pick<Query, "myCompanies">>(
+      MY_COMPANIES,
+      {
+        variables: { last: 3, search: "boulan" }
+      }
+    );
+
+    expect(page1.myCompanies.totalCount).toEqual(3);
+    expect(page1.myCompanies.edges.map(({ node }) => node.id)).toEqual([
+      company2.id
+    ]);
+  }, 20000);
 });
