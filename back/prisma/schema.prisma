@@ -469,36 +469,36 @@ model BsddRevisionRequest {
 
   approvals BsddRevisionRequestApproval[]
 
-  recipientCap                                   String?
-  wasteDetailsCode                               String?
-  wasteDetailsName                               String?
-  wasteDetailsPop                                Boolean?
-  wasteDetailsPackagingInfos                     Json?
-  quantityReceived                               Float?
-  processingOperationDone                        String?
-  processingOperationDescription                 String?
-  brokerCompanyName                              String?
-  brokerCompanySiret                             String?
-  brokerCompanyAddress                           String?
-  brokerCompanyContact                           String?
-  brokerCompanyPhone                             String?
-  brokerCompanyMail                              String?
-  brokerReceipt                                  String?
-  brokerDepartment                               String?
-  brokerValidityLimit                            DateTime? @db.Timestamptz(6)
-  traderCompanyName                              String?
-  traderCompanySiret                             String?
-  traderCompanyAddress                           String?
-  traderCompanyContact                           String?
-  traderCompanyPhone                             String?
-  traderCompanyMail                              String?
-  traderReceipt                                  String?
-  traderDepartment                               String?
-  traderValidityLimit                            DateTime? @db.Timestamptz(6)
-  temporaryStorageDestinationCap                 String?
-  temporaryStorageDestinationProcessingOperation String?
+  recipientCap                                    String?
+  wasteDetailsCode                                String?
+  wasteDetailsName                                String?
+  wasteDetailsPop                                 Boolean?
+  wasteDetailsPackagingInfos                      Json?
+  quantityReceived                                Float?
+  processingOperationDone                         String?
+  processingOperationDescription                  String?
+  brokerCompanyName                               String?
+  brokerCompanySiret                              String?
+  brokerCompanyAddress                            String?
+  brokerCompanyContact                            String?
+  brokerCompanyPhone                              String?
+  brokerCompanyMail                               String?
+  brokerReceipt                                   String?
+  brokerDepartment                                String?
+  brokerValidityLimit                             DateTime? @db.Timestamptz(6)
+  traderCompanyName                               String?
+  traderCompanySiret                              String?
+  traderCompanyAddress                            String?
+  traderCompanyContact                            String?
+  traderCompanyPhone                              String?
+  traderCompanyMail                               String?
+  traderReceipt                                   String?
+  traderDepartment                                String?
+  traderValidityLimit                             DateTime? @db.Timestamptz(6)
+  temporaryStorageDestinationCap                  String?
+  temporaryStorageDestinationProcessingOperation  String?
   temporaryStorageTemporaryStorerQuantityReceived Float?
-  isCanceled                                     Boolean @default(false)
+  isCanceled                                      Boolean   @default(false)
 
   comment String
 
@@ -540,7 +540,7 @@ model Grant {
   redirectUri   String
   applicationId String
   openIdEnabled Boolean     @default(false)
-  scope String[] @default([])
+  scope         String[]    @default([])
   application   Application @relation(fields: [applicationId], references: [id])
   userId        String
   user          User        @relation(fields: [userId], references: [id])
