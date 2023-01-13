@@ -108,7 +108,11 @@ export default function WasteInfo({ disabled }) {
         <RedErrorMessage name="waste.adr" />
       </div>
 
-      <h4 className="form__section-heading">Contenants</h4>
+      <h4 className="form__section-heading">
+        {values.type === BsffType.Reconditionnement
+          ? "Contenant de reconditionnement"
+          : "Contenants"}
+      </h4>
 
       <Field name="packagings" component={Packagings} disabled={disabled} />
 
