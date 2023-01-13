@@ -46,7 +46,10 @@ export function BSDDropdown({ siret }: Props) {
   return (
     <Menu>
       <MenuButton className="btn btn--primary">
-        Créer un bordereau <span aria-hidden>▾</span>
+        Créer un bordereau{" "}
+        <span className={styles.dropdownArrow} aria-hidden>
+          ▾
+        </span>
       </MenuButton>
       <MenuList className="fr-raw-link fr-raw-list">
         {links.map(link => (

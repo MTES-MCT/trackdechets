@@ -1450,7 +1450,12 @@ export function IconBSDasri(props: React.SVGProps<SVGSVGElement>) {
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
-      <g fill="none" stroke="#000" strokeLinecap="round" strokeLinejoin="round">
+      <g
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path
           d="M70 113.75v23.333M49.583 2.917h40.828M49.59 49.583h17.488M49.59 72.917h17.488M49.583 32.083v58.334A22.02 22.02 0 0070 113.75a22.032 22.032 0 0020.417-23.333V32.083zM61.256 2.917H78.75v29.166H61.256zM32.083 32.083h75.828"
           strokeWidth="5.83333"
@@ -1533,7 +1538,7 @@ export function IconBSVhu(props: React.SVGProps<SVGSVGElement>) {
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
-      <g fill="none" stroke="#000">
+      <g fill="none" stroke="currentColor">
         <path
           d="M8.487 95.556a11.25 11.25 0 01-3.89-7.584 11.273 11.273 0 014.485-9.957l12.956-12.384L31.5 44.6a11.893 11.893 0 019.864-6.947l33.378-2.765a11.89 11.89 0 0110.115 4.241l18.568 19.717 22.347 6.381c6.487 1.377 10.722 7.8 9.439 14.304-1.056 5.325-5.548 9.333-10.961 9.782l-4.013.333M97.72 91.513l-45.558 3.78"
           strokeWidth="5.83333"
@@ -1612,7 +1617,7 @@ export function IconBSFF(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg width="1em" height="1em" {...props} xmlns="http://www.w3.org/2000/svg">
       <g
-        transform="translate(1)"
+        transform="translate(8)"
         stroke="currentColor"
         fill="none"
         fillRule="evenodd"
@@ -1680,8 +1685,8 @@ export function IconBSDa(props: React.SVGProps<SVGSVGElement>) {
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
-      <g fill="none" fillRule="evenodd" stroke="#000">
-        <g stroke="#000" strokeLinecap="round" strokeLinejoin="round">
+      <g fill="none" fillRule="evenodd" stroke="currentColor">
+        <g stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
           <path d="M23.278 20.128A3 3 0 0120.3 23.5H4.1a3 3 0 01-2.978-3.372L2.7 7.5h19l1.578 12.628zM6.2 5H4.766a1 1 0 00-.857.486L2.7 7.5h19l-1.209-2.014A1 1 0 0019.634 5H18.2" />
           <path d="M16.2 4.5a4 4 0 10-8 0v3h8v-3z" />
         </g>
@@ -1689,7 +1694,7 @@ export function IconBSDa(props: React.SVGProps<SVGSVGElement>) {
           fontFamily="SourceSansPro-Semibold, Source Sans Pro"
           fontSize="16"
           fontWeight="500"
-          fill="#000"
+          fill="currentColor"
           transform="translate(1)"
         >
           <tspan x="7.2" y="20">
