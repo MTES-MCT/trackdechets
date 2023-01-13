@@ -415,7 +415,8 @@ input InternationalCompanyInput {
   Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
   https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
 
-  En l'absence de code, l'entreprise est considérée comme résidant en France.
+  En l'absence de code, le pays est FR si un siret est donné, ou détecté depuis le numéro de TVA si vatNumber est donné.
+  Une incohérence du pays avec le siret ou le numéro pays détecté du numéro de TVA résultera en une erreur type BAD_USER_INPUT.
   """
   country: String
 
