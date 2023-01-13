@@ -1610,7 +1610,7 @@ export function IconBSVhuThin(props: React.SVGProps<SVGSVGElement>) {
 
 export function IconBSFF(props: React.SVGProps<SVGSVGElement>) {
   return (
-    <svg {...props} width="1em" height="1em" xmlns="http://www.w3.org/2000/svg">
+    <svg width="1em" height="1em" {...props} xmlns="http://www.w3.org/2000/svg">
       <g
         transform="translate(1)"
         stroke="currentColor"
