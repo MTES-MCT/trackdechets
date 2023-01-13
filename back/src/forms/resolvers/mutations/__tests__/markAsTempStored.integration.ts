@@ -513,7 +513,7 @@ describe("{ mutation { markAsTempStored } }", () => {
 
     expect(errors).toHaveLength(1);
     expect(errors[0].message).toEqual(
-      "Vous ne pouvez pas faire cette action, ce bordereau a été annulé"
+      "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
     );
   });
 });

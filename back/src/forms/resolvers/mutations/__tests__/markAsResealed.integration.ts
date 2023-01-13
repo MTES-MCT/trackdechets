@@ -687,7 +687,7 @@ describe("Mutation markAsResealed", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Vous ne pouvez pas faire cette action, ce bordereau a été annulé`
+        message: `Vous ne pouvez pas passer ce bordereau à l'état souhaité.`
       })
     ]);
   });
