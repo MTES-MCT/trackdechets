@@ -22,6 +22,7 @@
     "decimal.js-light": "^2.5.1",
     "env-cmd": "^10.0.1",
     "express": "^4.18.1",
+    "focus-trap-react": "^10.0.2",
     "formik": "2.2.5",
     "graphql": "^16.0.2",
     "graphql-anywhere": "^4.2.7",

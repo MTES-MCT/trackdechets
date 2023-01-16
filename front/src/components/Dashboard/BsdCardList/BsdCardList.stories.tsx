@@ -25,7 +25,7 @@ export const Brouillon = Template.bind({});
 export const PourAction = Template.bind({});
 export const Suvi = Template.bind({});
 export const Archives = Template.bind({});
-const siret = "53230142100022";
+const siret = "53230142100022"; // les ateliers de céline
 Brouillon.args = {
   siret: siret,
   bsds: bsdListDraft as unknown as { node: Bsd }[],
@@ -35,7 +35,7 @@ PourAction.args = {
   bsds: bsdListActJson as unknown as { node: Bsd }[],
 };
 Suvi.args = {
-  siret: siret,
+  siret: "13001045700013", // dreal
   bsds: bsdListFollowJson as unknown as { node: Bsd }[],
 };
 Archives.args = {

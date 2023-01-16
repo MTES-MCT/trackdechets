@@ -1,13 +1,13 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { within } from "@testing-library/dom";
+import { fireEvent, within } from "@testing-library/dom";
 import BsdCard from "./BsdCard";
 import { Bsda, Bsdasri, Bsff, Bsvhu, Form } from "generated/graphql/types";
 
 describe("Bsd card primary action label", () => {
   const siretEmmiter = "53230142100022";
   const siretTransporter = "13001045700013";
-  const onValidate = jest.fn();
+  const functionMock = jest.fn();
 
   describe("case: INITITAL(draft=true)", () => {
     test("Bsdd", () => {
@@ -136,18 +136,35 @@ describe("Bsd card primary action label", () => {
         nextTransporterSiret: null,
         __typename: "Form",
       } as unknown as Form;
-      render(
+
+      const { queryByTestId } = render(
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsdd}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       expect(screen.getByTestId("bsd-card-btn-primary")).toHaveTextContent(
         "Valider"
       );
+
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
+      fireEvent.click(buttonActions);
+      expect(screen.getByTestId("bsd-overview-btn")).toBeInTheDocument();
+      expect(screen.getByTestId("bsd-delete-btn")).toBeInTheDocument();
+      expect(queryByTestId("bsd-review-btn")).toBeFalsy();
+      expect(screen.getByTestId("bsd-duplicate-btn")).toBeInTheDocument();
+      expect(screen.getByTestId("bsd-update-btn")).toBeInTheDocument();
+      expect(queryByTestId("bsd-pdf-btn")).toBeFalsy();
     });
-    test("other than Bsdd", () => {
+
+    test("other than Bsdd (bsda example)", () => {
       const bsda = {
         id: "BSDA-20220805-WZD4GYBT1",
         bsdaType: "OTHER_COLLECTIONS",
@@ -201,16 +218,32 @@ describe("Bsd card primary action label", () => {
         groupedIn: null,
         __typename: "Bsda",
       } as unknown as Bsda;
-      render(
+
+      const { queryByTestId } = render(
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsda}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       expect(screen.getByTestId("bsd-card-btn-primary")).toHaveTextContent(
         "Publier"
       );
+
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
+      fireEvent.click(buttonActions);
+      expect(screen.getByTestId("bsd-overview-btn")).toBeInTheDocument();
+      expect(screen.getByTestId("bsd-delete-btn")).toBeInTheDocument();
+      expect(queryByTestId("bsd-review-btn")).toBeFalsy();
+      expect(screen.getByTestId("bsd-duplicate-btn")).toBeInTheDocument();
+      expect(screen.getByTestId("bsd-update-btn")).toBeInTheDocument();
+      expect(queryByTestId("bsd-pdf-btn")).toBeFalsy();
     });
   });
 
@@ -257,96 +290,194 @@ describe("Bsd card primary action label", () => {
       wasteCode: "16 01 06",
       __typename: "Bsvhu",
     } as unknown as Bsvhu;
-    test("Bsvhu same emitter", () => {
-      render(
+
+    const bsvhuProcessed = { ...bsvhu, bsvhuStatus: "PROCESSED" };
+
+    const bsff = {
+      id: "FF-20220831-F7VSQ1FDA",
+      isDraft: false,
+      bsffStatus: "INITIAL",
+      bsffEmitter: {
+        company: {
+          siret: "53230142100022",
+          name: "L'ATELIER DE CELINE",
+          __typename: "FormCompany",
+        },
+        __typename: "BsffEmitter",
+      },
+      bsffTransporter: {
+        company: {
+          siret: "13001045700013",
+          name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          __typename: "FormCompany",
+        },
+        transport: {
+          plates: [],
+          __typename: "BsffTransport",
+        },
+        customInfo: null,
+        __typename: "BsffTransporter",
+      },
+      bsffDestination: {
+        company: {
+          siret: "13001045700013",
+          name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          __typename: "FormCompany",
+        },
+        __typename: "BsffDestination",
+      },
+      waste: {
+        code: "14 06 01*",
+        description: "DÉNO",
+        __typename: "BsffWaste",
+      },
+      packagings: [
+        {
+          numero: "888",
+          __typename: "BsffPackaging",
+        },
+        {
+          numero: "889",
+          __typename: "BsffPackaging",
+        },
+        {
+          numero: "34",
+          __typename: "BsffPackaging",
+        },
+      ],
+      __typename: "Bsff",
+    } as unknown as Bsff;
+
+    const bsffDifferentSiret = {
+      ...bsff,
+      bsffDestination: { company: { siret: "53230142100025" } },
+      bsffEmitter: { company: { siret: "53230142100028" } },
+      bsffTransporter: { company: { siret: "53230142100128" } },
+    };
+
+    test("Bsvhu same siret", () => {
+      const { queryByTestId } = render(
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsvhu}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       expect(screen.getByTestId("bsd-card-btn-primary")).toHaveTextContent(
         "Signer"
       );
+
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
+      fireEvent.click(buttonActions);
+      expect(screen.getByTestId("bsd-overview-btn")).toBeInTheDocument();
+      expect(screen.getByTestId("bsd-delete-btn")).toBeInTheDocument();
+      expect(queryByTestId("bsd-review-btn")).toBeFalsy();
+      expect(screen.getByTestId("bsd-duplicate-btn")).toBeInTheDocument();
+      expect(screen.getByTestId("bsd-update-btn")).toBeInTheDocument();
+      expect(screen.getByTestId("bsd-pdf-btn")).toBeInTheDocument();
     });
-    test("Bsvhu different emitter", () => {
+
+    test("Bsvhu same siret (status processed)", () => {
+      const { queryByTestId } = render(
+        <BsdCard
+          currentSiret={siretEmmiter}
+          bsd={bsvhuProcessed}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
+        />
+      );
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
+      fireEvent.click(buttonActions);
+      expect(queryByTestId("bsd-update-btn")).toBeFalsy();
+    });
+
+    test("Bsvhu different siret", () => {
       const { queryByTestId } = render(
         <BsdCard
           currentSiret={siretTransporter}
           bsd={bsvhu}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       expect(queryByTestId("bsd-card-btn-primary")).toBeFalsy();
+
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
     });
 
-    test("Bsff same emitter", () => {
-      const bsff = {
-        id: "FF-20220831-F7VSQ1FDA",
-        isDraft: false,
-        bsffStatus: "INITIAL",
-        bsffEmitter: {
-          company: {
-            siret: "53230142100022",
-            name: "L'ATELIER DE CELINE",
-            __typename: "FormCompany",
-          },
-          __typename: "BsffEmitter",
-        },
-        bsffTransporter: {
-          company: {
-            siret: "13001045700013",
-            name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-            __typename: "FormCompany",
-          },
-          transport: {
-            plates: [],
-            __typename: "BsffTransport",
-          },
-          customInfo: null,
-          __typename: "BsffTransporter",
-        },
-        bsffDestination: {
-          company: {
-            siret: "13001045700013",
-            name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-            __typename: "FormCompany",
-          },
-          __typename: "BsffDestination",
-        },
-        waste: {
-          code: "14 06 01*",
-          description: "DÉNO",
-          __typename: "BsffWaste",
-        },
-        packagings: [
-          {
-            numero: "888",
-            __typename: "BsffPackaging",
-          },
-          {
-            numero: "889",
-            __typename: "BsffPackaging",
-          },
-          {
-            numero: "34",
-            __typename: "BsffPackaging",
-          },
-        ],
-        __typename: "Bsff",
-      } as unknown as Bsff;
+    test("Bsff same siret", () => {
       render(
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsff}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
+
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
       expect(getByText("Signer")).toBeInTheDocument();
+
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
+      fireEvent.click(buttonActions);
+
+      expect(screen.getByTestId("bsd-overview-btn")).toBeInTheDocument();
+      expect(screen.getByTestId("bsd-delete-btn")).toBeInTheDocument();
+      expect(screen.getByTestId("bsd-duplicate-btn")).toBeInTheDocument();
+      expect(screen.getByTestId("bsd-update-btn")).toBeInTheDocument();
+      expect(screen.getByTestId("bsd-pdf-btn")).toBeInTheDocument();
     });
 
-    test("Bsda same emmiter", () => {
+    test("Bsff different siret", () => {
+      const { queryByTestId } = render(
+        <BsdCard
+          currentSiret={siretEmmiter}
+          bsd={bsffDifferentSiret}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
+        />
+      );
+
+      expect(queryByTestId("bsd-card-btn-primary")).toBeFalsy();
+
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
+      fireEvent.click(buttonActions);
+
+      expect(screen.getByTestId("bsd-overview-btn")).toBeInTheDocument();
+      expect(queryByTestId("bsd-delete-btn")).toBeFalsy();
+
+      expect(screen.getByTestId("bsd-duplicate-btn")).toBeInTheDocument();
+      expect(queryByTestId("bsd-update-btn")).toBeFalsy();
+      expect(screen.getByTestId("bsd-pdf-btn")).toBeInTheDocument();
+    });
+
+    test("Bsda same siret", () => {
       const bsda = {
         id: "BSDA-20220706-NAS1E8MET",
         bsdaType: "RESHIPMENT",
@@ -401,11 +532,19 @@ describe("Bsd card primary action label", () => {
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsda}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
       expect(getByText("Signer en tant qu'émetteur")).toBeInTheDocument();
+
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
     });
 
     // TODO bsdasri eco org / bsdari transporter /bsdari emmiter | bsda Collection_2710 / bsda isPrivateIndividual && worker isDisabled
@@ -493,15 +632,24 @@ describe("Bsd card primary action label", () => {
         nextTransporterSiret: null,
         __typename: "Form",
       } as unknown as Form;
-      render(
+      const { queryByTestId } = render(
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsdd}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
       expect(getByText("Signer en tant qu'émetteur")).toBeInTheDocument();
+
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
+      expect(queryByTestId("bsd-review-btn")).toBeFalsy();
     });
     // TODO bsvhu
   });
@@ -614,11 +762,19 @@ describe("Bsd card primary action label", () => {
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsdd}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
       expect(getByText("Valider la réception")).toBeInTheDocument();
+
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
     });
 
     test("Bsdasri", () => {
@@ -690,18 +846,133 @@ describe("Bsd card primary action label", () => {
         },
         __typename: "Bsdasri",
       } as unknown as Bsdasri;
-      render(
+      const { queryByTestId } = render(
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsdari}
-          onValidate={onValidate}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
         />
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
       expect(getByText("Signer la réception")).toBeInTheDocument();
+
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
+      expect(queryByTestId("bsd-delete-btn")).toBeFalsy();
     });
 
     // TODO bsvhu
+  });
+
+  describe("case: Bsd Suite", () => {
+    test("Bsdd", () => {
+      const bsdd = {
+        id: "cl32r54js30083339sw9nabhn0",
+        readableId: "BSD-20220512-6609ESJPV",
+        customId: null,
+        sentAt: "2022-05-12T08:32:24.592Z",
+        emittedAt: "2022-05-12T08:32:12.820Z",
+        emittedBy: "producteur",
+        emittedByEcoOrganisme: false,
+        takenOverAt: "2022-05-12T08:32:24.592Z",
+        status: "ACCEPTED",
+        wasteDetails: {
+          code: "14 06 01*",
+          name: "HFC",
+          packagingInfos: [
+            {
+              type: "AUTRE",
+              other: "bouteilles",
+              quantity: 3,
+              __typename: "PackagingInfo",
+            },
+          ],
+          __typename: "WasteDetails",
+        },
+        emitter: {
+          type: "PRODUCER",
+          isPrivateIndividual: false,
+          company: {
+            siret: "81232991000010",
+            name: "BOULANGERIE AU 148",
+            omiNumber: null,
+            __typename: "FormCompany",
+          },
+          isForeignShip: false,
+          __typename: "Emitter",
+        },
+        recipient: {
+          company: {
+            siret: "53230142100022",
+            orgId: "53230142100022",
+            name: "L'ATELIER DE CELINE",
+            __typename: "FormCompany",
+          },
+          isTempStorage: false,
+          __typename: "Recipient",
+        },
+        transporter: {
+          company: {
+            siret: "13001045700013",
+            orgId: "13001045700013",
+            __typename: "FormCompany",
+          },
+          numberPlate: "",
+          customInfo: null,
+          __typename: "Transporter",
+        },
+        ecoOrganisme: null,
+        stateSummary: {
+          transporterCustomInfo: null,
+          transporterNumberPlate: "",
+          transporter: {
+            siret: "13001045700013",
+            name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+            __typename: "FormCompany",
+          },
+          recipient: {
+            siret: "53230142100022",
+            name: "L'ATELIER DE CELINE",
+            __typename: "FormCompany",
+          },
+          emitter: {
+            siret: "81232991000010",
+            name: "BOULANGERIE AU 148",
+            __typename: "FormCompany",
+          },
+          __typename: "StateSummary",
+        },
+        temporaryStorageDetail: null,
+        transportSegments: [],
+        currentTransporterSiret: "",
+        nextTransporterSiret: null,
+        __typename: "Form",
+      } as unknown as Form;
+
+      render(
+        <BsdCard
+          currentSiret={siretEmmiter}
+          bsd={bsdd}
+          onValidate={functionMock}
+          onDelete={functionMock}
+          onDuplicate={functionMock}
+          onUpdate={functionMock}
+          onPdf={functionMock}
+          onOverview={functionMock}
+        />
+      );
+      const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
+      expect(getByText("Valider le traitement")).toBeInTheDocument();
+
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
+      expect(screen.getByTestId("bsd-suite-btn")).toBeInTheDocument();
+    });
   });
 
   // TODO received signByProducer Accepted
