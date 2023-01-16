@@ -17,7 +17,6 @@ const {
   processedInfoInput,
   awaitingGroupInfoInput,
   tempStoredInfosInput,
-  nextSegmentInfoInput,
   takeOverInfoInput
 } = fixtures;
 
@@ -30,6 +29,28 @@ function transporterCompanyInput(vatNumber: string) {
     contact: "Claire Dupuis",
     mail: "claire.dupuis@transportco.fr",
     phone: "04 00 00 00 00"
+  };
+}
+
+function transporter2CompanyInput(vatNumber: string) {
+  return {
+    siret: null,
+    vatNumber,
+    name: "Fret & Co",
+    address: "1 rue de la gare, 07100 ANNONAY",
+    contact: "Jean Le Cheminot",
+    mail: "jean.lecheminot@fretco.fr",
+    phone: "04 00 00 00 00"
+  };
+}
+
+function nextSegmentInfoInput(vatNumber: string) {
+  return {
+    transporter: {
+      company: transporter2CompanyInput(vatNumber),
+      ...receiptInput
+    },
+    mode: "RAIL"
   };
 }
 

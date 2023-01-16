@@ -37,8 +37,8 @@ describe("{ mutation { takeOverSegment } }", () => {
       opt: {
         transporterCompanySiret: firstTransporterCompany.siret,
         status: "SENT",
-        currentTransporterSiret: firstTransporterCompany.siret,
-        nextTransporterSiret: secondTransporterCompany.siret
+        currentTransporterOrgId: firstTransporterCompany.siret,
+        nextTransporterOrgId: secondTransporterCompany.siret
       }
     });
     // an attached readyToTakeOver segment to be taken over by the second transporter
@@ -77,13 +77,13 @@ describe("{ mutation { takeOverSegment } }", () => {
     );
     expect(takenOverSegment.takenOverBy).toBe("transporter suivant");
 
-    // form next and currentTransporterSiret have been updated
+    // form next and currentTransporterOrgId have been updated
     const udpatedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
-    expect(udpatedForm.currentTransporterSiret).toBe(
+    expect(udpatedForm.currentTransporterOrgId).toBe(
       secondTransporterCompany.siret
     );
-    expect(udpatedForm.nextTransporterSiret).toBe("");
+    expect(udpatedForm.nextTransporterOrgId).toBe("");
   });
 });

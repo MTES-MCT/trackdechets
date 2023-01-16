@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Field, Form as FormikForm, Formik } from "formik";
+import { string, object, date, boolean, StringSchema } from "yup";
 import cogoToast from "cogo-toast";
 import {
+  CompanySearchPrivate,
+  CompanySearchResult,
   Mutation,
   MutationEditSegmentArgs,
   NextSegmentInfoInput,
@@ -15,8 +18,10 @@ import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
 import TdSwitch from "common/components/Switch";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import { FieldTransportModeSelect } from "common/components";
+import { FieldTransportModeSelect, RedErrorMessage } from "common/components";
+import { transporterSchema } from "form/bsdd/utils/schema";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
+import { companySchema } from "common/validation/schema";
 
 const EDIT_SEGMENT = gql`
   mutation editSegment(
@@ -35,6 +40,67 @@ type Props = {
   siret: string;
   segment: TransportSegment;
 };
+
+export const validationSchema = object().shape({
+  transporter: object().shape({
+    isExemptedOfReceipt: boolean().nullable(),
+    receipt: string().when(["isExemptedOfReceipt", "company.vatNumber"], {
+      is: (isExemptedOfReceipt: boolean, transporterCompanyVatNumber: string) =>
+        isForeignVat(transporterCompanyVatNumber) || isExemptedOfReceipt,
+      then: schema => schema.nullable(true),
+      otherwise: schema =>
+        schema
+          .ensure()
+          .required(
+            "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+          ),
+    }),
+    department: string().when(["isExemptedOfReceipt", "company.vatNumber"], {
+      is: (isExemptedOfReceipt: boolean, transporterCompanyVatNumber: string) =>
+        isForeignVat(transporterCompanyVatNumber) || isExemptedOfReceipt,
+      then: schema => schema.nullable(true),
+      otherwise: schema =>
+        schema
+          .ensure()
+          .required("Le département du transporteur est obligatoire"),
+    }),
+    validityLimit: date().nullable(true),
+    numberPlate: string().nullable(true),
+    company: companySchema,
+  }),
+});
+
+/**
+ * Common onCompanySelected function
+ * @param setFieldValue Formik function
+ * @returns
+ */
+export const onCompanySelected =
+  setFieldValue =>
+  (transporter: CompanySearchResult | CompanySearchPrivate) => {
+    if (transporter.transporterReceipt) {
+      setFieldValue(
+        "transporter.receipt",
+        transporter.transporterReceipt.receiptNumber
+      );
+      setFieldValue(
+        "transporter.validityLimit",
+        transporter.transporterReceipt.validityLimit
+      );
+      setFieldValue(
+        "transporter.department",
+        transporter.transporterReceipt.department
+      );
+    } else {
+      setFieldValue("transporter.receipt", null);
+      setFieldValue("transporter.validityLimit", null);
+      setFieldValue("transporter.department", null);
+    }
+    // automatically check the receipt exemption
+    if (isForeignVat(transporter?.vatNumber!)) {
+      setFieldValue("transporter.isExemptedOfReceipt", true);
+    }
+  };
 
 export default function EditSegment({ siret, segment }: Props) {
   const [isOpen, setIsOpen] = useState(false);
@@ -71,6 +137,7 @@ export default function EditSegment({ siret, segment }: Props) {
         >
           <Formik
             initialValues={initialValues}
+            validationSchema={validationSchema}
             onSubmit={values =>
               editSegment({
                 variables: {
@@ -81,7 +148,7 @@ export default function EditSegment({ siret, segment }: Props) {
               })
             }
           >
-            {({ values, setFieldValue }) => (
+            {({ values, errors, setFieldValue }) => (
               <FormikForm>
                 <h3>Modifier un transfert multimodal</h3>
                 <div className="form__row">
@@ -100,33 +167,14 @@ export default function EditSegment({ siret, segment }: Props) {
                   />
                 </div>
                 <h4 className="form__section-heading">Transporteur</h4>
-
                 {!segment.readyToTakeOver ? (
                   <>
                     <CompanySelector
                       name="transporter.company"
                       allowForeignCompanies={true}
                       registeredOnlyCompanies={true}
-                      onCompanySelected={transporter => {
-                        if (transporter.transporterReceipt) {
-                          setFieldValue(
-                            "transporter.receipt",
-                            transporter.transporterReceipt.receiptNumber
-                          );
-                          setFieldValue(
-                            "transporter.validityLimit",
-                            transporter.transporterReceipt.validityLimit
-                          );
-                          setFieldValue(
-                            "transporter.department",
-                            transporter.transporterReceipt.department
-                          );
-                        } else {
-                          setFieldValue("transporter.receipt", "");
-                          setFieldValue("transporter.validityLimit", null);
-                          setFieldValue("transporter.department", "");
-                        }
-                      }}
+                      initialAutoSelectFirstCompany={false}
+                      onCompanySelected={onCompanySelected(setFieldValue)}
                     />
                   </>
                 ) : (

@@ -1610,7 +1610,7 @@ export async function checkForClosedCompanies(formId: string) {
     emitterCompanySiret: [form.emitterCompanySiret],
     brokerCompanySiret: [form.brokerCompanySiret],
     traderCompanySiret: [form.traderCompanySiret],
-    nextTransporterSiret: [form.nextTransporterSiret]
+    nextTransporterOrgId: [form.nextTransporterOrgId]
   };
   // We request in parallel only by type in order not to overload Sirene search server
   for (const siretType in allSirets) {
