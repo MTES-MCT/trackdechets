@@ -130,6 +130,27 @@ describe("searchCompanies", () => {
     expect(companies[0]).toStrictEqual(company);
   });
 
+  it("should call searchCompany when the clue is formatted like a SIRET but with bad characters", async () => {
+    const siret = siretify(1);
+    const company = {
+      siret,
+      name: "ACME",
+      naf: "NAF",
+      libelleNaf: "Autres activités",
+      codeCommune: "13001",
+      address: "40 boulevard Voltaire 13001 Marseille",
+      addressVoie: "40 boulevard",
+      addressCity: "Marseille",
+      addressPostalCode: "13001",
+      etatAdministratif: "A",
+      codePaysEtrangerEtablissement: "FR"
+    };
+    searchCompanyMock.mockResolvedValue(company);
+    const companies = await searchCompanies(siret.split("").join(" "));
+    expect(searchCompanyMock).toHaveBeenCalledWith(siret);
+    expect(companies[0]).toStrictEqual(company);
+  });
+
   it("should call searchCompany when the clue is formatted like a VAT number", async () => {
     const company = {
       siret: siretify(1),
@@ -148,6 +169,26 @@ describe("searchCompanies", () => {
     await searchCompanies("IT09301420155");
     expect(searchCompanyMock).toHaveBeenCalledTimes(1);
   });
+
+  it("should call searchCompany when the clue is formatted like a VAT number but with bad characters", async () => {
+    const company = {
+      siret: siretify(1),
+      vatNumber: "IT09301420155",
+      name: "ACME",
+      naf: "NAF",
+      libelleNaf: "Autres activités",
+      codeCommune: "13001",
+      address: "40 boulevard Voltaire 13001 Marseille",
+      addressVoie: "40 boulevard",
+      addressCity: "Marseille",
+      addressPostalCode: "13001",
+      etatAdministratif: "A"
+    };
+    searchCompanyMock.mockResolvedValue(company);
+    await searchCompanies("IT09301420155".split("").join("."));
+    expect(searchCompanyMock).toHaveBeenCalledTimes(1);
+  });
+
 
   it(`should not return closed companies when searching by SIRET`, async () => {
     const siret = siretify(1);

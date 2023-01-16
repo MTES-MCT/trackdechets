@@ -11,8 +11,8 @@ import {
   isVat,
   isFRVat,
   TEST_COMPANY_PREFIX,
-  cleanClue as cleanClueFn,
-  countries
+  countries,
+  cleanClue
 } from "../common/constants/companySearchHelpers";
 import { SireneSearchResult } from "./sirene/types";
 import { CompanyVatSearchResult } from "./vat/vies/types";
@@ -74,16 +74,16 @@ export async function searchCompany(
   clue: string
 ): Promise<CompanySearchResult> {
   // remove non alphanumeric
-  const cleanClue = cleanClueFn(clue);
+  const cleanedClue = cleanClue(clue);
   const allowTestCompany = process.env.ALLOW_TEST_COMPANY === "true";
   const isTestCompany =
-    allowTestCompany && cleanClue.startsWith(TEST_COMPANY_PREFIX);
+    allowTestCompany && cleanedClue.startsWith(TEST_COMPANY_PREFIX);
 
   // fail fast for bad input
   if (
-    !cleanClue ||
-    (!isSiret(cleanClue, allowTestCompany) &&
-      !isVat(cleanClue) &&
+    !cleanedClue ||
+    (!isSiret(cleanedClue, allowTestCompany) &&
+      !isVat(cleanedClue) &&
       !isTestCompany)
   ) {
     throw new UserInputError(SIRET_OR_VAT_ERROR, {
@@ -93,21 +93,21 @@ export async function searchCompany(
   // search for test or anonymous companies first
   const anonymousCompany = await prisma.anonymousCompany.findUnique({
     where: {
-      orgId: cleanClue
+      orgId: cleanedClue
     }
   });
   // Anonymous Company search
   if (anonymousCompany) {
     const companyInfo: SireneSearchResult = {
       ...anonymousCompany,
-      statutDiffusionEtablissement: cleanClue.startsWith(TEST_COMPANY_PREFIX)
+      statutDiffusionEtablissement: cleanedClue.startsWith(TEST_COMPANY_PREFIX)
         ? "O"
         : "N",
       etatAdministratif: "A",
       naf: anonymousCompany.codeNaf,
       codePaysEtrangerEtablissement: "FR"
     };
-    return findCompanyAndMergeInfos(cleanClue, companyInfo);
+    return findCompanyAndMergeInfos(cleanedClue, companyInfo);
   } else if (isTestCompany) {
     // 404 if we are in a test environment with a test siret starting with 00000
     throw new UserInputError("Aucun établissement trouvé avec ce SIRET", {
@@ -115,26 +115,26 @@ export async function searchCompany(
     });
   }
   // Search public company databases
-  if (isSiret(cleanClue)) {
-    const companyInfo = await searchSireneOrNotFound(cleanClue);
-    return findCompanyAndMergeInfos(cleanClue, companyInfo);
+  if (isSiret(cleanedClue)) {
+    const companyInfo = await searchSireneOrNotFound(cleanedClue);
+    return findCompanyAndMergeInfos(cleanedClue, companyInfo);
   }
 
   // Search by VAT number first in our db, inder to to optimize response times
-  if (isVat(cleanClue)) {
-    const company = await findCompanyAndMergeInfos(cleanClue, {});
+  if (isVat(cleanedClue)) {
+    const company = await findCompanyAndMergeInfos(cleanedClue, {});
     if (company.isRegistered === true) {
       // shorcut to return the result directly from database
-      const { country } = checkVAT(cleanClue, countries);
+      const { country } = checkVAT(cleanedClue, countries);
       return {
         codePaysEtrangerEtablissement: country.isoCode.short,
         statutDiffusionEtablissement: "O",
         etatAdministratif: "A",
-        vatNumber: cleanClue,
+        vatNumber: cleanedClue,
         ...company
       };
     }
-    const companyInfo = await searchVatFrOnlyOrNotFound(cleanClue);
+    const companyInfo = await searchVatFrOnlyOrNotFound(cleanedClue);
     return {
       ...company,
       ...companyInfo
@@ -146,9 +146,10 @@ export async function searchCompany(
 export const makeSearchCompanies =
   ({ searchCompany }: SearchCompaniesDeps) =>
   (clue: string, department?: string): Promise<CompanySearchResult[]> => {
+    const cleanedClue = cleanClue(clue);
     // clue can be formatted like a SIRET or a VAT number
-    if (isSiret(clue) || isVat(clue)) {
-      return searchCompany(clue)
+    if (isSiret(cleanedClue) || isVat(cleanedClue)) {
+      return searchCompany(cleanedClue)
         .then(c =>
           // Exclude closed companies
           [c].filter(c => c.etatAdministratif && c.etatAdministratif === "A")
@@ -156,27 +157,29 @@ export const makeSearchCompanies =
         .catch(_ => []);
     }
     // fuzzy searching only for French companies
-    return decoratedSearchCompanies(clue, department).then(async results => {
-      let existingCompanies = [];
-      if (results.length) {
-        existingCompanies = (
-          await prisma.company.findMany({
-            where: {
-              orgId: { in: results.map(r => r.siret) }
-            },
-            select: {
-              orgId: true
-            }
-          })
-        ).map(company => company.orgId);
-      }
+    return decoratedSearchCompanies(cleanedClue, department).then(
+      async results => {
+        let existingCompanies = [];
+        if (results.length) {
+          existingCompanies = (
+            await prisma.company.findMany({
+              where: {
+                orgId: { in: results.map(r => r.siret) }
+              },
+              select: {
+                orgId: true
+              }
+            })
+          ).map(company => company.orgId);
+        }
 
-      return results.map(company => ({
-        ...company,
-        orgId: company.siret,
-        isRegistered: existingCompanies.includes(company.siret)
-      }));
-    });
+        return results.map(company => ({
+          ...company,
+          orgId: company.siret,
+          isRegistered: existingCompanies.includes(company.siret)
+        }));
+      }
+    );
   };
 
 /**
