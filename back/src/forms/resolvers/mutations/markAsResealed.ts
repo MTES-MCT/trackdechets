@@ -17,7 +17,6 @@ import {
   Status
 } from "@prisma/client";
 import { getFormRepository } from "../../repository";
-import { ForbiddenError } from "apollo-server-core";
 
 const markAsResealed: MutationResolvers["markAsResealed"] = async (
   parent,

@@ -29,10 +29,6 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
 
   const form = await getFormOrFormNotFound({ id });
 
-  if (form.status === Status.CANCELED) {
-    throw new ForbiddenError("Ce bordereau a été annulé");
-  }
-
   await checkCanMarkAsProcessed(user, form);
 
   let formUpdateInput: Prisma.FormUpdateInput =

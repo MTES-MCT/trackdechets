@@ -18,7 +18,6 @@ import {
 import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
 import { sendMail } from "../../../mailer/mailing";
 import { runInTransaction } from "../../../common/repository/helper";
-import { ForbiddenError } from "apollo-server-core";
 
 const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   parent,
