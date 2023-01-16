@@ -379,15 +379,6 @@ function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
 }
 
 /**
- * Set refresh parameter to `wait_for` when user is logged in from UI
- * It allows to refresh the BSD list in real time after a create, update or delete operation from UI
- * https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-refresh.html
- */
-const refreshForDelete = (ctx?: GraphQLContext): { refresh: boolean } => ({
-  refresh: ctx?.user?.auth === AuthType.Session
-});
-
-/**
  * Create/update a document in Elastic Search.
  */
 export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
@@ -439,10 +430,10 @@ export function deleteBsd<T extends { id?: string; readableId?: string }>(
       {
         index: index.alias,
         type: index.type,
-        ...refreshForDelete(ctx),
+        conflicts: "proceed",
         body: {
           query: {
-            match: {
+            term: {
               readableId
             }
           }
