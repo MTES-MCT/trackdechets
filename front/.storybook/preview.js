@@ -9,3 +9,8 @@ export const parameters = {
     },
   },
 };
+
+// Initialize global jest.fn override
+window.jest = {
+  fn: fnc => fnc,
+};

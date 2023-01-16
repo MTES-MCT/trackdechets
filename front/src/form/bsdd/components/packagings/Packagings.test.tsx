@@ -1,5 +1,5 @@
 import * as React from "react";
-import { render, screen, fireEvent, wait } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import Packagings from "./Packagings";
 import { Field, Formik, FormikConfig, FormikProps } from "formik";
 
@@ -53,8 +53,7 @@ describe("<Packagings />", () => {
     it("should add 1 packaging when clicking 'Ajouter un conditionnement'", async () => {
       expect(screen.queryAllByLabelText(/Type/).length).toBe(0);
 
-      fireEvent.click(screen.getByText("Ajouter un conditionnement"));
-      await wait();
+      await fireEvent.click(screen.getByText("Ajouter un conditionnement"));
 
       expect(screen.queryAllByLabelText(/Type/).length).toBe(1);
     });
@@ -65,14 +64,12 @@ describe("<Packagings />", () => {
       screen.getAllByRole("combobox")[0].setAttribute("value", "BENNE");
 
       fireEvent.click(screen.getByText("Ajouter un conditionnement"));
-      screen.getAllByRole("combobox")[1].setAttribute("value", "FUT");
+      await screen.getAllByRole("combobox")[1].setAttribute("value", "FUT");
 
-      await wait();
       expect(screen.queryAllByLabelText(/Type/).length).toBe(2);
 
       // Click second close icon => remove "FUT"
-      fireEvent.click(screen.getAllByRole("button")[1]);
-      await wait();
+      await fireEvent.click(screen.getAllByRole("button")[1]);
 
       expect(screen.queryAllByLabelText(/Type/).length).toBe(1);
       expect(screen.getByRole("combobox").getAttribute("value")).toBe("BENNE");

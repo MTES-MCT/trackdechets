@@ -6,9 +6,9 @@ import {
   IconBSDDThin as IconBSDD,
   IconBSDasriThin as IconBSDasri,
   IconWeight,
-} from "../../common/components/Icons";
+} from "../../../common/components/Icons";
 import { WasteDetailsProps } from "./wasteTypes";
-import { BsdType } from "../../generated/graphql/types";
+import { BsdType } from "../../../generated/graphql/types";
 import "./wasteDetails.scss";
 
 function WasteDetails({
@@ -39,10 +39,12 @@ function WasteDetails({
       <div className="waste-details__infos">
         <p className="waste-details__infos__code">{code}</p>
         <p className="waste-details__infos__name">{name}</p>
-        <p className="waste-details__infos__weight">
-          <IconWeight />
-          <span>{weight}</span>
-        </p>
+        {weight && (
+          <p className="waste-details__infos__weight">
+            <IconWeight />
+            <span>{weight}</span>
+          </p>
+        )}
       </div>
     </div>
   );

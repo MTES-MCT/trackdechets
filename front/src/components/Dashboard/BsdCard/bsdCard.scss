@@ -1,0 +1,72 @@
+@import "src/scss/Breakpoints.scss";
+.bsd-card {
+  background: #ffffff;
+  border: 1px solid #dddddd;
+  display: flex;
+  flex-direction: column;
+  padding: 5px 15px;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    color: #161616;
+    p {
+      margin: 2px;
+      padding: 2px;
+      font-size: 0.75rem; //12px
+    }
+    @include desktop {
+      flex-direction: row;
+      align-items: center;
+      border-bottom: 1px solid #dddddd;
+      margin-bottom: 24px;
+    }
+
+    .bsd-number {
+      margin: 2px;
+      padding: 2px;
+      font-size: 1.125rem; //18px
+      line-height: 28px;
+      color: #000091;
+      @include desktop {
+        font-size: 0.75rem; //12px
+        line-height: 20px;
+        color: #161616;
+      }
+    }
+    .workflow-type {
+      font-weight: bold;
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    @include desktop {
+      flex-direction: row;
+      align-items: center;
+    }
+
+    &__badge {
+      @include desktop {
+        width: 40%;
+      }
+    }
+
+    &__cta {
+      display: flex;
+      justify-content: flex-end;
+
+      button {
+        margin: 0 2px;
+      }
+
+      @include desktop {
+        display: block;
+        position: absolute;
+        right: 0;
+      }
+    }
+  }
+}
