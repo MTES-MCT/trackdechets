@@ -28,6 +28,7 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
   const { id, resealedInfos } = args;
 
   const form = await getFormOrFormNotFound({ id });
+
   const formRepository = getFormRepository(user);
 
   const { forwardedIn } = await formRepository.findFullFormById(form.id);

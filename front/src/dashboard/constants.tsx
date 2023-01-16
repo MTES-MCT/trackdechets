@@ -23,6 +23,7 @@ export const statusLabels: { [key: string]: string } = {
   SIGNED_BY_TEMP_STORER: "Signé par l'installation d'entreposage provisoire",
   SIGNED_BY_WORKER: "Signé par l'entreprise de travaux",
   AWAITING_CHILD: "En attente ou associé à un BSD suite",
+  CANCELED: "Annulé",
 };
 
 export const ITEMS_PER_PAGE = 50;

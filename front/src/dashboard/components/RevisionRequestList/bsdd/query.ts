@@ -99,6 +99,7 @@ const reviewFragment = gql`
           processingOperation
         }
       }
+      isCanceled
     }
     status
     comment

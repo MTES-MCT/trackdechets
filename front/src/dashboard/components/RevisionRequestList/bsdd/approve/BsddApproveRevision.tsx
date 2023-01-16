@@ -103,6 +103,17 @@ export function BsddApproveRevision({ review }: Props) {
 }
 
 export function DisplayRevision({ review }: Props) {
+  if (review.content.isCanceled) {
+    return (
+      <div>
+        <p className="tw-pb-6">
+          L'entreprise <strong>{review.authoringCompany.name}</strong> a demandé
+          l'annulation du bordereau <strong>#{review.form.readableId}</strong>
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <p className="tw-pb-6">

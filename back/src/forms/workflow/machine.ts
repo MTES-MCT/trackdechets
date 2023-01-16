@@ -15,6 +15,7 @@ const machine = Machine<any, Event>(
     id: "form-workflow-machine",
     initial: Status.DRAFT,
     states: {
+      [Status.CANCELED]: { type: "final" },
       [Status.DRAFT]: {
         on: {
           [EventType.MarkAsSealed]: [{ target: Status.SEALED }],
