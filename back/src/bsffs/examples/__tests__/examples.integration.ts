@@ -1,12 +1,13 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
 import testWorkflow from "../../../__tests__/testWorkflow";
 import collectePetitesQuantitesWorkflow from "../workflows/collecteFluidesParOperateur";
+import collectePetitesQuantitesTransporteurEtrangerWorkflow from "../workflows/collecteFluidesParOperateurTransporteurEtranger";
 import groupementWorkflow from "../workflows/groupement";
 
 describe("Exemples de circuit du bordereau de suivi BSFF", () => {
   afterEach(resetDatabase);
 
-  test(
+  it(
     collectePetitesQuantitesWorkflow.title,
     async () => {
       await testWorkflow(collectePetitesQuantitesWorkflow);
@@ -14,7 +15,15 @@ describe("Exemples de circuit du bordereau de suivi BSFF", () => {
     60000
   );
 
-  test(
+  it(
+    collectePetitesQuantitesTransporteurEtrangerWorkflow.title,
+    async () => {
+      await testWorkflow(collectePetitesQuantitesTransporteurEtrangerWorkflow);
+    },
+    60000
+  );
+
+  it(
     groupementWorkflow.title,
     async () => {
       await testWorkflow(groupementWorkflow);

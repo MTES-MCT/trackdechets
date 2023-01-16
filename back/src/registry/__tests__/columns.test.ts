@@ -87,7 +87,7 @@ describe("formatRow", () => {
       "Courtier N°récepissé": "broker_recepisse",
       "Transporteur adresse": "transporter address",
       "Transporteur raison sociale": "transporter name",
-      "Transporteur SIRET": "transporter siret",
+      "Transporteur SIRET ou numéro de TVA le cas échéant": "transporter siret",
       "Transporteur récépissé": "transporter recepisse",
       "Code de traitement réalisée": "R10",
       "Date de réception": "2021-01-01",

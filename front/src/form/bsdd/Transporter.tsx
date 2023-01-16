@@ -21,7 +21,6 @@ export default function Transporter() {
       <h4 className="form__section-heading">Transporteur</h4>
       <CompanySelector
         name="transporter.company"
-        optional={true}
         allowForeignCompanies={true}
         registeredOnlyCompanies={true}
         onCompanySelected={transporter => {
@@ -63,7 +62,7 @@ export default function Transporter() {
                   !values.transporter.isExemptedOfReceipt
                 )
               }
-              disabled={values.transporter.company?.siret === null}
+              disabled={values.transporter.company?.orgId === null}
               label="Le transporteur déclare être exempté de récépissé conformément aux
             dispositions de l'article R.541-50 du code de l'environnement."
             />

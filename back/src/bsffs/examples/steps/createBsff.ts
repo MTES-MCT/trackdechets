@@ -1,8 +1,11 @@
-import fixtures from "../fixtures";
+import defaultFixtures from "../fixtures";
 import { WorkflowStep } from "../../../common/workflow";
 import mutations from "../mutations";
 
-export function createBsff(company: string): WorkflowStep {
+export function createBsff(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
   return {
     description: `L'opérateur crée un BSFF`,
     mutation: mutations.createBsff,
@@ -23,7 +26,11 @@ export function createBsff(company: string): WorkflowStep {
             value: 1,
             isEstimate: true
           },
-          transporter: fixtures.transporterInput(transporteur.siret),
+          transporter: fixtures.transporterInput(
+            transporteur.siret?.length
+              ? transporteur.siret
+              : transporteur.vatNumber
+          ),
           destination: fixtures.ttrInput(ttr.siret),
           ficheInterventions: ficheInterventions.map(fi => fi.id)
         }

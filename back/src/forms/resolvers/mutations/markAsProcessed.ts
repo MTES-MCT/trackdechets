@@ -11,7 +11,12 @@ import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";
 import machine from "../../workflow/machine";
 import { runInTransaction } from "../../../common/repository/helper";
-import { ForbiddenError } from "apollo-server-core";
+import { checkVAT } from "jsvat";
+import {
+  countries,
+  isSiret,
+  isVat
+} from "../../../common/constants/companySearchHelpers";
 
 const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   parent,
@@ -42,13 +47,27 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
   formUpdateInput.processingOperationDescription =
     processedInfo.processingOperationDescription || operation?.description;
 
+  // auto-fill nextDestinationCompanyCountry
   if (
-    formUpdateInput.nextDestinationCompanySiret &&
+    isSiret(formUpdateInput.nextDestinationCompanySiret as string) &&
     !formUpdateInput.nextDestinationCompanyCountry
   ) {
     // only default to "FR" if there's an actual nextDestination
     // otherwise keep it empty to avoid filling a field for an object that doesn't exist
     formUpdateInput.nextDestinationCompanyCountry = "FR";
+  }
+  if (
+    isVat(formUpdateInput.nextDestinationCompanyVatNumber as string) &&
+    !formUpdateInput.nextDestinationCompanyCountry
+  ) {
+    const vatCountryCode = checkVAT(
+      (formUpdateInput.nextDestinationCompanyVatNumber as string).replace(
+        /[\W_\s]/gim,
+        ""
+      ),
+      countries
+    )?.country?.isoCode.short;
+    formUpdateInput.nextDestinationCompanyCountry = vatCountryCode;
   }
 
   if (form.status === Status.TEMP_STORER_ACCEPTED) {

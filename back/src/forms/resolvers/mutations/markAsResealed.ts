@@ -30,10 +30,6 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
 
   const form = await getFormOrFormNotFound({ id });
 
-  if (form.status === Status.CANCELED) {
-    throw new ForbiddenError("Ce bordereau a été annulé");
-  }
-
   const formRepository = getFormRepository(user);
 
   const { forwardedIn } = await formRepository.findFullFormById(form.id);

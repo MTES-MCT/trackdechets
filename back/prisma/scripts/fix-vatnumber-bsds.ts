@@ -6,9 +6,9 @@ import prisma from "../../src/prisma";
 import { Form } from ".prisma/client";
 
 @registerUpdater(
-  "Clean BSD VAT numbers",
+  "Clean BSD SIRET and VAT numbers from bad characters",
   "Clean BSD SIRET and VAT numbers",
-  true
+  false
 )
 export class FixBSDVatUpdater implements Updater {
   async run() {

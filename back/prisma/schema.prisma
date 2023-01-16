@@ -498,7 +498,7 @@ model BsddRevisionRequest {
   temporaryStorageDestinationCap                 String?
   temporaryStorageDestinationProcessingOperation String?
   temporaryStorageTemporaryStorerQuantityReceived Float?
-  isCanceled                                     Boolean @default(false)
+  isCanceled                                      Boolean   @default(false)
 
   comment String
 
@@ -540,7 +540,7 @@ model Grant {
   redirectUri   String
   applicationId String
   openIdEnabled Boolean     @default(false)
-  scope String[] @default([])
+  scope         String[]    @default([])
   application   Application @relation(fields: [applicationId], references: [id])
   userId        String
   user          User        @relation(fields: [userId], references: [id])

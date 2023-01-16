@@ -1,4 +1,5 @@
 import { Bsff, BsffPackaging, BsffType } from "@prisma/client";
+import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { BsdElastic } from "../common/elastic";
 import {
   AllWaste,
@@ -39,7 +40,7 @@ export function getRegistryFields(
       bsff.emitterCompanySiret,
       ...bsff.detenteurCompanySirets
     );
-    registryFields.isTransportedWasteFor.push(bsff.transporterCompanySiret);
+    registryFields.isTransportedWasteFor.push(getTransporterCompanyOrgId(bsff));
   }
 
   if (bsff.destinationReceptionSignatureDate) {

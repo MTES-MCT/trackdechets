@@ -29,7 +29,9 @@ const signatures: Partial<
   >
 > = {
   [Status.CANCELED]: () => {
-    throw new ForbiddenError("Ce bordereau a été annulé");
+    throw new ForbiddenError(
+      "Vous ne pouvez pas faire cette action, ce bordereau a été annulé"
+    );
   },
   [Status.SEALED]: async (user, args, existingForm) => {
     if (args.input.emittedByEcoOrganisme) {
@@ -129,8 +131,8 @@ const signatures: Partial<
       }
     };
 
-    await wasteDetailsSchema.validate(futureFullForm);
-    await beforeSignedByTransporterSchema.validate(futureFullForm);
+    await wasteDetailsSchema.validate(futureFullForm.forwardedIn);
+    await beforeSignedByTransporterSchema.validate(futureFullForm.forwardedIn);
 
     const updatedForm = await getFormRepository(user).update(
       { id: existingForm.id },

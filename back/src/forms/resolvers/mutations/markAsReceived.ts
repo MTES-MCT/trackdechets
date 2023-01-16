@@ -28,9 +28,6 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   const user = checkIsAuthenticated(context);
   const { id, receivedInfo } = args;
   const form = await getFormOrFormNotFound({ id });
-  if (form.status === Status.CANCELED) {
-    throw new ForbiddenError("Ce bordereau a été annulé");
-  }
 
   await checkCanMarkAsReceived(user, form);
 

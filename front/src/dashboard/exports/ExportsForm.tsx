@@ -31,7 +31,7 @@ type Values = {
 ExportsForm.fragments = {
   company: gql`
     fragment ExportsFormCompanyFragment on CompanyPrivate {
-      siret
+      orgId
       name
       givenName
       companyTypes
@@ -176,7 +176,7 @@ export default function ExportsForm({ companies }: IProps) {
 
     downloadFile({
       variables: {
-        sirets: companies.map(c => c.siret),
+        sirets: companies.map(c => c.orgId),
         registryType: exportType,
         where: {
           ...dateFilter,

@@ -136,7 +136,9 @@ async function getUpdateFromFormRevisionRequest(
         quantityReceived: revisionRequest.quantityReceived,
         processingOperationDone: revisionRequest.processingOperationDone,
         processingOperationDescription:
-          revisionRequest.processingOperationDescription
+          revisionRequest.processingOperationDescription,
+        wasteDetailsQuantity:
+          revisionRequest.temporaryStorageTemporaryStorerQuantityReceived
       }
     : {};
 

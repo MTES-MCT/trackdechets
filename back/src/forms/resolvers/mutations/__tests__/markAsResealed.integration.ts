@@ -291,6 +291,49 @@ describe("Mutation markAsResealed", () => {
     );
   });
 
+  it("should not be possible de set a quantity > 40T when transport mode is ROAD", async () => {
+    const owner = await userFactory();
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: { set: [CompanyType.COLLECTOR] }
+      }
+    );
+    const destination = await destinationFactory();
+
+    const { mutate } = makeClient(user);
+
+    const form = await formWithTempStorageFactory({
+      ownerId: owner.id,
+      opt: {
+        status: Status.RESEALED,
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
+      },
+      forwardedInOpts: { recipientCompanySiret: destination.siret }
+    });
+
+    const { errors } = await mutate<
+      Pick<Mutation, "markAsResealed">,
+      MutationMarkAsResealedArgs
+    >(MARK_AS_RESEALED, {
+      variables: {
+        id: form.id,
+        resealedInfos: {
+          wasteDetails: { quantity: 60 },
+          transporter: { mode: "ROAD" }
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Déchet : le poids doit être inférieur à 40 tonnes lorsque le transport se fait par la route"
+      })
+    ]);
+  });
+
   test("when resealedInfos contains repackaging data", async () => {
     const owner = await userFactory();
     const { user, company: collector } = await userWithCompanyFactory(
@@ -644,7 +687,7 @@ describe("Mutation markAsResealed", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Ce bordereau a été annulé`
+        message: `Vous ne pouvez pas passer ce bordereau à l'état souhaité.`
       })
     ]);
   });

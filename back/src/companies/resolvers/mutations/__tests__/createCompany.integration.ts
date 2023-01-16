@@ -34,6 +34,7 @@ geocodeSpy.mockResolvedValue(geoInfo);
 const CREATE_COMPANY = `
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
     createCompany(companyInput: $companyInput) {
+      orgId
       siret
       vatNumber
       gerepId
@@ -68,7 +69,7 @@ describe("Mutation.createCompany", () => {
     const user = await userFactory();
     const orgId = siretify(7);
     const companyInput = {
-      orgId,
+      siret: orgId,
       gerepId: "1234",
       companyName: "Acme",
       address: "3 rue des granges",
@@ -92,7 +93,7 @@ describe("Mutation.createCompany", () => {
     );
 
     expect(data.createCompany).toMatchObject({
-      siret: companyInput.orgId,
+      siret: companyInput.siret,
       gerepId: companyInput.gerepId,
       name: companyInput.companyName,
       companyTypes: companyInput.companyTypes,
@@ -102,14 +103,14 @@ describe("Mutation.createCompany", () => {
     const newCompanyExists =
       (await prisma.company.findFirst({
         where: {
-          siret: companyInput.orgId
+          siret: companyInput.siret
         }
       })) != null;
     expect(newCompanyExists).toBe(true);
 
     const newCompanyAssociationExists =
       (await prisma.companyAssociation.findFirst({
-        where: { company: { siret: companyInput.orgId }, user: { id: user.id } }
+        where: { company: { siret: companyInput.siret }, user: { id: user.id } }
       })) != null;
     expect(newCompanyAssociationExists).toBe(true);
 
@@ -126,7 +127,7 @@ describe("Mutation.createCompany", () => {
 
     const orgId = siretify(1);
     const companyInput = {
-      orgId,
+      siret: orgId,
       gerepId: "1234",
       companyName: "Acme",
       address: "3 rue des granges",
@@ -151,7 +152,7 @@ describe("Mutation.createCompany", () => {
     );
 
     expect(data.createCompany).toMatchObject({
-      siret: companyInput.orgId,
+      siret: companyInput.siret,
       gerepId: companyInput.gerepId,
       name: companyInput.companyName,
       companyTypes: companyInput.companyTypes,
@@ -161,14 +162,14 @@ describe("Mutation.createCompany", () => {
     const newCompanyExists =
       (await prisma.company.findFirst({
         where: {
-          siret: companyInput.orgId
+          siret: companyInput.siret
         }
       })) != null;
     expect(newCompanyExists).toBe(true);
 
     const newCompanyAssociationExists =
       (await prisma.companyAssociation.findFirst({
-        where: { company: { siret: companyInput.orgId }, user: { id: user.id } }
+        where: { company: { siret: companyInput.siret }, user: { id: user.id } }
       })) != null;
     expect(newCompanyAssociationExists).toBe(true);
 
@@ -192,7 +193,7 @@ describe("Mutation.createCompany", () => {
     });
     const orgId = siretify(1);
     const companyInput = {
-      orgId,
+      siret: orgId,
       companyName: "Acme",
       address: "3 rue des granges",
       companyTypes: ["TRANSPORTER"],
@@ -238,7 +239,7 @@ describe("Mutation.createCompany", () => {
     });
     const orgId = siretify(7);
     const companyInput = {
-      orgId,
+      siret: orgId,
       companyName: "Acme",
       address: "3 rue des granges",
       companyTypes: ["TRADER"],
@@ -279,7 +280,7 @@ describe("Mutation.createCompany", () => {
 
     // try re-creating the same company
     const companyInput = {
-      orgId: company.siret,
+      siret: company.siret,
       gerepId: company.gerepId,
       companyName: company.name,
       address: "3 rue des granges",
@@ -287,7 +288,7 @@ describe("Mutation.createCompany", () => {
     };
 
     searchCompany.mockResolvedValueOnce({
-      orgId: company.orgId,
+      orgId: company.siret,
       siret: company.siret,
       etatAdministratif: "A"
     });
@@ -316,7 +317,7 @@ describe("Mutation.createCompany", () => {
     const { errors } = await mutate(CREATE_COMPANY, {
       variables: {
         companyInput: {
-          orgId: siret,
+          siret,
           companyName: "UN BEL ECO ORGANISME",
           address: "3 rue des granges",
           companyTypes: ["ECO_ORGANISME"]
@@ -336,7 +337,7 @@ describe("Mutation.createCompany", () => {
     const user = await userFactory();
     const siret = siretify(1);
     const companyInput = {
-      orgId: siret,
+      siret: siret,
       companyName: "UN BEL ECO ORGANISME",
       address: "3 rue des granges",
       companyTypes: ["ECO_ORGANISME"]
@@ -351,7 +352,7 @@ describe("Mutation.createCompany", () => {
       data: {
         address: "",
         name: "Eco-Organisme",
-        siret: companyInput.orgId
+        siret: companyInput.siret
       }
     });
 
@@ -374,7 +375,7 @@ describe("Mutation.createCompany", () => {
 
     const siret = siretify(1);
     const companyInput = {
-      orgId: siret,
+      siret,
       companyName: "UN BEL ECO ORGANISME",
       address: "3 rue des granges",
       companyTypes: ["ECO_ORGANISME"],
@@ -390,7 +391,7 @@ describe("Mutation.createCompany", () => {
       data: {
         address: "",
         name: "Eco-Organisme",
-        siret: companyInput.orgId
+        siret: companyInput.siret
       }
     });
 
@@ -414,7 +415,7 @@ describe("Mutation.createCompany", () => {
     const siret = siretify(1);
 
     const companyInput = {
-      orgId: siret,
+      siret,
       companyName: "UN BEL ECO ORGANISME",
       address: "3 rue des granges",
       companyTypes: ["PRODUCER"],
@@ -471,7 +472,7 @@ describe("Mutation.createCompany", () => {
 
     const user = await userFactory();
     const companyInput = {
-      orgId: siret,
+      siret,
       gerepId: "1234",
       companyName: "Acme",
       address: "3 rue des granges",
@@ -487,7 +488,7 @@ describe("Mutation.createCompany", () => {
     expect(errors).toBeUndefined();
 
     const company = await prisma.company.findUnique({
-      where: { siret: companyInput.orgId }
+      where: { siret: companyInput.siret }
     });
 
     expect(sendMailSpy).toHaveBeenCalledWith(
@@ -503,7 +504,7 @@ describe("Mutation.createCompany", () => {
   it("should allow to create a TRANSPORTER company with VAT number", async () => {
     const user = await userFactory();
     const companyInput = {
-      orgId: "RO17579668",
+      vatNumber: "RO17579668",
       companyName: "Acme in EU",
       address: "Transporter street",
       companyTypes: ["TRANSPORTER"]
@@ -549,7 +550,7 @@ describe("Mutation.createCompany", () => {
         continue;
       }
       const companyInput = {
-        orgId: "RO17579668",
+        vatNumber: "RO17579668",
         companyName: "Acme in EU",
         address: "Transporter street",
         companyTypes: [type]
@@ -575,7 +576,7 @@ describe("Mutation.createCompany", () => {
     const user = await userFactory();
 
     const companyInput = {
-      orgId: "FR87850019464",
+      vatNumber: "FR87850019464",
       companyName: "Acme in FR",
       address: "une adresse",
       companyTypes: [CompanyType.TRANSPORTER]

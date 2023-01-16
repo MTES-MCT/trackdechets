@@ -1,8 +1,11 @@
 import mutations from "../mutations";
-import fixtures from "../fixtures";
+import defaultFixtures from "../fixtures";
 import { WorkflowStep } from "../../../common/workflow";
 
-export function createBsvhu(company: string): WorkflowStep {
+export function createBsvhu(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
   return {
     description: `Création du BSVHU`,
     mutation: mutations.createBsvhu,
@@ -10,7 +13,11 @@ export function createBsvhu(company: string): WorkflowStep {
       input: {
         emitter: fixtures.emitterInput(producteur.siret),
         ...fixtures.wasteDetailsInput,
-        transporter: fixtures.transporterInput(transporteur.siret),
+        transporter: fixtures.transporterInput(
+          transporteur.siret?.length
+            ? transporteur.siret
+            : transporteur.vatNumber
+        ),
         destination: fixtures.broyeurInput(broyeur.siret)
       }
     }),

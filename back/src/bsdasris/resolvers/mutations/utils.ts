@@ -3,10 +3,12 @@ import { UserInputError } from "apollo-server-express";
 import { BsdasriStatus, BsdasriType, Bsdasri } from "@prisma/client";
 import { DASRI_GROUPING_OPERATIONS_CODES } from "../../../common/constants";
 import { getReadonlyBsdasriRepository } from "../../repository";
+import { CompanyInput } from "../../../generated/graphql/types";
 
 export const getEligibleDasrisForSynthesis = async (
   synthesizingIds: string[],
-  emitterSiret: string
+  bsdasri: Bsdasri,
+  company?: CompanyInput
 ): Promise<Bsdasri[]> => {
   if (!synthesizingIds) {
     return;
@@ -30,7 +32,18 @@ export const getEligibleDasrisForSynthesis = async (
     grouping: { none: {} },
     synthesizedIn: null,
     synthesizing: { none: {} },
-    transporterCompanySiret: emitterSiret
+    OR: [
+      {
+        transporterCompanySiret: bsdasri
+          ? bsdasri.transporterCompanySiret
+          : company.siret
+      },
+      {
+        transporterCompanyVatNumber: bsdasri
+          ? bsdasri.transporterCompanyVatNumber
+          : company.vatNumber
+      }
+    ]
   });
 
   const foundIds = found.map(el => el.id);

@@ -22,7 +22,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return <SignEmission {...props} bsvhuId={form.id} />;
 
     case BsvhuStatus.SignedByProducer:
-      if (siret !== form.transporter?.company?.siret) return null;
+      if (siret !== form.transporter?.company?.orgId) return null;
       return <SignTransport {...props} bsvhuId={form.id} />;
 
     case BsvhuStatus.Sent:

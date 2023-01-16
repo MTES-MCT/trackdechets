@@ -783,14 +783,14 @@ describe("Test Form reception", () => {
           receivedAt: "2019-01-17T10:22:00+0100",
           signedAt: "2019-01-17T10:22:00+0100",
           wasteAcceptationStatus: "ACCEPTED",
-          quantityReceived: 50
+          quantityReceived: 30
         }
       }
     });
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Ce bordereau a été annulé"
+        message: "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
       })
     ]);
   });

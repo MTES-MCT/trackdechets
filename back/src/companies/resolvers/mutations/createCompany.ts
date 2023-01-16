@@ -59,31 +59,29 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   const ecoOrganismeAgreements =
     companyInput.ecoOrganismeAgreements?.map(a => a.href) || [];
+  const siret = companyInput.siret
+    ? companyInput.siret.replace(/[\W_]+/g, "")
+    : null;
+  const vatNumber = companyInput.vatNumber
+    ? companyInput.vatNumber.replace(/[\W_]+/g, "")
+    : null;
+  const orgId = siret ?? vatNumber;
 
-  // clean orgId
-  const orgId = companyInput.orgId.replace(/[\W_]+/g, "");
-  let siret: string;
-  let vatNumber: string;
-
-  if (isFRVat(orgId)) {
-    throw new UserInputError(
-      "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indiquer un SIRET"
-    );
-  }
-
-  if (isVat(orgId)) {
-    vatNumber = orgId;
+  if (isVat(vatNumber)) {
+    if (isFRVat(vatNumber)) {
+      throw new UserInputError(
+        "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indiquer un SIRET"
+      );
+    }
     if (companyTypes.join("") !== CompanyType.TRANSPORTER) {
       throw new UserInputError(
         "Impossible de créer un établissement identifié par un numéro de TVA d'un autre type que TRANSPORTER"
       );
     }
-  } else if (!isSiret(orgId)) {
+  } else if (!isSiret(siret)) {
     throw new UserInputError(
       "Impossible de créer un établissement sans un SIRET valide ni un numéro de TVA étranger valide"
     );
-  } else {
-    siret = orgId;
   }
 
   const existingCompany = await prisma.company.findUnique({

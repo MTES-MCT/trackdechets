@@ -70,16 +70,19 @@ export default function CompanySelector({
   optional = false,
   initialAutoSelectFirstCompany = true,
 }: CompanySelectorProps) {
+  // siret is the current active company
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
   const [field] = useField<FormCompany>({ name });
   const { setFieldError, setFieldValue, setFieldTouched } = useFormikContext();
+  // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
     (field.value.country && field.value.country !== "FR") ||
       isForeignVat(field.value.vatNumber!!)
   );
 
   const departmentInputRef = useRef<HTMLInputElement>(null);
+  // this ref lets us transmit the input to both search input and department input
   const clueInputRef = useRef<HTMLInputElement>(null);
   const [mustBeRegistered, setMustBeRegistered] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<CompanySearchResult[]>([]);
@@ -88,7 +91,13 @@ export default function CompanySelector({
     setDisplayForeignCompanyWithUnknownInfos,
   ] = useState<boolean>(false);
 
-  // Favortite type is deduced from the field prefix (transporter, emitter, etc)
+  // Memoize for changes in field.value.siret and field.value.orgId
+  // To support both FormCompany and Intermediary (that don't have orgId)
+  const orgId = useMemo(
+    () => field.value.orgId ?? field.value.siret ?? null,
+    [field.value.siret, field.value.orgId]
+  );
+  // Favorite type is deduced from the field prefix (transporter, emitter, etc)
   const favoriteType = constantCase(field.name.split(".")[0]) as FavoriteType;
   const {
     loading: isLoadingFavorites,
@@ -134,9 +143,10 @@ export default function CompanySelector({
     QueryCompanyPrivateInfosArgs
   >(COMPANY_SELECTOR_PRIVATE_INFOS, {
     variables: {
-      clue: field.value.orgId!,
+      // Compatibility with intermediaries that don't have orgId
+      clue: orgId!,
     },
-    skip: !field.value.orgId,
+    skip: !orgId,
   });
 
   /**
@@ -145,7 +155,11 @@ export default function CompanySelector({
   function selectCompany(company?: CompanySearchResult) {
     if (disabled) return;
     // empty the  selected company when null
-    if (!company) return setFieldValue(field.name, getInitialCompany());
+    if (!company) {
+      setFieldValue(field.name, getInitialCompany());
+      setFieldTouched(`${field.name}`, true, true);
+      return;
+    }
 
     // Side effects
     const notVoidCompany = Object.keys(company).length !== 0; // unselect returns emtpy object {}
@@ -190,7 +204,7 @@ export default function CompanySelector({
     Object.keys(fields).forEach(key => {
       setFieldValue(`${field.name}.${key}`, fields[key]);
     });
-
+    setFieldTouched(`${field.name}`, true, true);
     onCompanySelected?.(company);
   }
 
@@ -229,7 +243,7 @@ export default function CompanySelector({
       initialAutoSelectFirstCompany &&
       !optional &&
       results.length >= 1 &&
-      !field.value.orgId?.length
+      !orgId
     ) {
       selectCompany(results[0]);
     }
@@ -375,13 +389,15 @@ export default function CompanySelector({
               <>
                 <span>
                   Cet établissement existe mais nous ne pouvons pas remplir
-                  automatiquement le formulaire
+                  automatiquement le formulaire car les informations sont
+                  cachées par le service de recherche administratif externe à
+                  Trackdéchets
                 </span>
               </>
             }
           />
         )}
-        {!isLoadingFavorites && !field.value.orgId && !optional && (
+        {!isLoadingFavorites && !isLoadingSearch && !orgId && !optional && (
           <SimpleNotificationError
             message={
               <>
@@ -416,7 +432,7 @@ export default function CompanySelector({
           results={searchResults}
           selectedItem={
             {
-              orgId: field.value.orgId,
+              orgId,
               siret: field.value.siret,
               vatNumber: field.value.vatNumber,
               name: field.value.name,

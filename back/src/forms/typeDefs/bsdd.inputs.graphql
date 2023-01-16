@@ -11,7 +11,11 @@ input SignEmissionFormInput {
   "Conditionnements"
   packagingInfos: [PackagingInfoInput!]
 
-  "Quantité en tonnes"
+  """
+  Poids en tonnes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   quantity: Float!
 
   "Code ONU"
@@ -67,7 +71,11 @@ input TransporterSignatureFormInput {
   "DEPRECATED - Conditionnement"
   packagings: [Packagings]
 
-  "Quantité en tonnes"
+  """
+  Poids en tonnes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   quantity: Float!
 
   "Code ONU"
@@ -97,8 +105,11 @@ input AcceptedFormInput {
 
   """
   Quantité réelle présentée en tonnes (case 10).
-   Doit être supérieure à 0 lorsque le déchet est accepté.
-   Doit être égale à 0 lorsque le déchet est refusé.
+
+  Doit être supérieure à 0 lorsque le déchet est accepté.
+  Doit être égale à 0 lorsque le déchet est refusé.
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
 }
@@ -122,8 +133,11 @@ input ReceivedFormInput {
 
   """
   Quantité réelle présentée en tonnes (case 10).
-   Doit être supérieure à 0 lorsque le déchet est accepté.
-   Doit être égale à 0 lorsque le déchet est refusé.
+
+  Doit être supérieure à 0 lorsque le déchet est accepté.
+  Doit être égale à 0 lorsque le déchet est refusé.
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float
 }
@@ -401,7 +415,8 @@ input InternationalCompanyInput {
   Code ISO 3166-1 alpha-2 du pays d'origine de l'entreprise :
   https://fr.wikipedia.org/wiki/ISO_3166-1_alpha-2
 
-  En l'absence de code, l'entreprise est considérée comme résidant en France.
+  En l'absence de code, le pays est FR si un siret est donné, ou détecté depuis le numéro de TVA si vatNumber est donné.
+  Une incohérence du pays avec le siret ou le numéro pays détecté du numéro de TVA résultera en une erreur type BAD_USER_INPUT.
   """
   country: String
 
@@ -575,7 +590,11 @@ input WasteDetailsInput {
   "DEPRECATED - Nombre de colis"
   numberOfPackages: Int
 
-  "Quantité en tonnes"
+  """
+  Poids en tonnes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   quantity: Float
 
   "Réelle ou estimée"
@@ -640,7 +659,11 @@ input WasteDetailsRepackagingInput {
   "Conditionnements"
   packagingInfos: [PackagingInfoInput!]
 
-  "Quantité en tonnes"
+  """
+  Poids en tonnes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   quantity: Float
 
   "Réelle ou estimée"
@@ -662,8 +685,11 @@ input TempStorerAcceptedFormInput {
 
   """
   Quantité réelle présentée en tonnes (case 13)
-   Doit être supérieure à 0 lorsque le déchet est accepté.
-   Doit être égale à 0 lorsque le déchet est refusé.
+
+  Doit être supérieure à 0 lorsque le déchet est accepté.
+  Doit être égale à 0 lorsque le déchet est refusé.
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
 
@@ -689,8 +715,11 @@ input TempStoredFormInput {
 
   """
   Quantité réelle présentée en tonnes (case 13)
-   Doit être supérieure à 0 lorsque le déchet est accepté.
-   Doit être égale à 0 lorsque le déchet est refusé.
+
+  Doit être supérieure à 0 lorsque le déchet est accepté.
+  Doit être égale à 0 lorsque le déchet est refusé.
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
   """
   quantityReceived: Float!
 
@@ -708,7 +737,11 @@ input WasteDetailsRepackagingInput {
   "Conditionnements"
   packagingInfos: [PackagingInfoInput!]
 
-  "Quantité en tonnes"
+  """
+  Poids en tonnes
+
+  Doit être inférieur à 40T en cas de transport routier et inférieur à 50 000 T tout type de transport confondu.
+  """
   quantity: Float
 
   "Réelle ou estimée"

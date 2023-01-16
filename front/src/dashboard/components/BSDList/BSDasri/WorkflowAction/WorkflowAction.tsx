@@ -43,7 +43,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
   const isSimple = form.type === BsdasriType.Simple;
   const isEmitter = siret === form.emitter?.company?.siret;
   const isEcoOrganisme = siret === form.ecoOrganisme?.siret;
-  const isTransporter = siret === form.transporter?.company?.siret;
+  const isTransporter = siret === form.transporter?.company?.orgId;
   const isDestination = siret === form.destination?.company?.siret;
 
   if (isAssociatedToSynthesis) {

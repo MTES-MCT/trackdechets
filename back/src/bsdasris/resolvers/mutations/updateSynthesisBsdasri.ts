@@ -87,10 +87,7 @@ const updateSynthesisBsdasri = async ({
       el => !dbSynthesizing.map(el => el.id).includes(el)
     );
     // check associated dasris meet eligibility criteria
-    await getEligibleDasrisForSynthesis(
-      newDasrisToAssociate,
-      dbBsdasri.transporterCompanySiret
-    );
+    await getEligibleDasrisForSynthesis(newDasrisToAssociate, dbBsdasri);
   }
 
   const bsdasriReadonlyRepository = getReadonlyBsdasriRepository();

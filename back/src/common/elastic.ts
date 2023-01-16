@@ -353,7 +353,7 @@ export const index: BsdIndex = {
   // increment when mapping has changed to trigger re-indexation on release
   // only use vX.Y.Z that matches regexp "v\d\.\d\.\d"
   // no special characters that are not supported by ES index names (like ":")
-  mappings_version: "v0.2.11",
+  mappings_version: "v0.2.12",
   mappings: {
     properties
   }
@@ -375,6 +375,17 @@ export const client = new Client({
 function refresh(ctx?: GraphQLContext): Partial<RequestParams.Index> {
   return ctx?.user?.auth === AuthType.Session
     ? { refresh: "wait_for" }
+    : { refresh: false };
+}
+
+/**
+ * Set refresh parameter to `wait_for` when user is logged in from UI
+ * It allows to refresh the BSD list in real time after a create, update or delete operation from UI
+ * https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-refresh.html
+ */
+function refreshForDelete(ctx?: GraphQLContext): { refresh: boolean } {
+  return ctx?.user?.auth === AuthType.Session
+    ? { refresh: true }
     : { refresh: false };
 }
 
@@ -421,10 +432,27 @@ export function indexBsds(indexName: string, bsds: BsdElastic[]) {
 /**
  * Delete a document in Elastic Search.
  */
-export function deleteBsd<T extends { id: string }>(
-  { id }: T,
+export function deleteBsd<T extends { id?: string; readableId?: string }>(
+  { id, readableId }: T,
   ctx?: GraphQLContext
 ) {
+  if (readableId && !id) {
+    return client.delete_by_query(
+      {
+        index: index.alias,
+        type: index.type,
+        ...refreshForDelete(ctx),
+        body: {
+          query: {
+            match: {
+              readableId
+            }
+          }
+        }
+      },
+      { ignore: [404] }
+    );
+  }
   return client.delete(
     {
       index: index.alias,

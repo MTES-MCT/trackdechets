@@ -23,6 +23,9 @@ function toPrismaBsffSimpleWhereInput(where: BsffWhere): Prisma.BsffWhereInput {
     transporterCompanySiret: toPrismaStringFilter(
       where.transporter?.company?.siret
     ),
+    transporterCompanyVatNumber: toPrismaStringFilter(
+      where.transporter?.company?.vatNumber
+    ),
     transporterTransportSignatureDate: toPrismaDateFilter(
       where.transporter?.transport?.signature?.date
     ),

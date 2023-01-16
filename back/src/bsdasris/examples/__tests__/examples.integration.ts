@@ -1,6 +1,7 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
 import testWorkflow from "../../../__tests__/testWorkflow";
 import acheminementDirect from "../workflows/acheminementDirect";
+import acheminementDirectTransporteurEtranger from "../workflows/acheminementDirectTransporteurEtranger";
 import emportDirect from "../workflows/emportDirect";
 import dasriDeSynthese from "../workflows/dasriDeSynthese";
 import dasriDeGroupement from "../workflows/dasriDeGroupement";
@@ -11,7 +12,7 @@ import signatureCodeSecretEcoOrganisme from "../workflows/signatureCodeSecretEco
 describe("Exemples de circuit du bordereau de suivi DASRI", () => {
   afterEach(resetDatabase);
 
-  test(
+  it(
     signatureCodeSecretEcoOrganisme.title,
     async () => {
       await testWorkflow(signatureCodeSecretEcoOrganisme);
@@ -19,7 +20,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
     60000
   );
 
-  test(
+  it(
     signatureCodeSecret.title,
     async () => {
       await testWorkflow(signatureCodeSecret);
@@ -27,7 +28,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
     60000
   );
 
-  test(
+  it(
     acheminementDirectEcoOrganisme.title,
     async () => {
       await testWorkflow(acheminementDirectEcoOrganisme);
@@ -35,7 +36,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
     60000
   );
 
-  test(
+  it(
     acheminementDirect.title,
     async () => {
       await testWorkflow(acheminementDirect);
@@ -43,7 +44,15 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
     60000
   );
 
-  test(
+  it(
+    acheminementDirectTransporteurEtranger.title,
+    async () => {
+      await testWorkflow(acheminementDirectTransporteurEtranger);
+    },
+    60000
+  );
+
+  it(
     emportDirect.title,
     async () => {
       await testWorkflow(emportDirect);
@@ -51,7 +60,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
     60000
   );
 
-  test(
+  it(
     dasriDeSynthese.title,
     async () => {
       await testWorkflow(dasriDeSynthese);
@@ -59,7 +68,7 @@ describe("Exemples de circuit du bordereau de suivi DASRI", () => {
     60000
   );
 
-  test(
+  it(
     dasriDeGroupement.title,
     async () => {
       await testWorkflow(dasriDeGroupement);

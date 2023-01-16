@@ -1,4 +1,5 @@
 import { Bsdasri } from "@prisma/client";
+import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import {
@@ -33,7 +34,9 @@ export function getRegistryFields(
     bsdasri.transporterTransportSignatureDate
   ) {
     registryFields.isOutgoingWasteFor.push(bsdasri.emitterCompanySiret);
-    registryFields.isTransportedWasteFor.push(bsdasri.transporterCompanySiret);
+    registryFields.isTransportedWasteFor.push(
+      getTransporterCompanyOrgId(bsdasri)
+    );
   }
 
   if (bsdasri.destinationReceptionSignatureDate) {
@@ -119,7 +122,7 @@ export function toIncomingWaste(
     brokerCompanySiret: null,
     brokerRecepisseNumber: null,
     transporterCompanyName: bsdasri.transporterCompanyName,
-    transporterCompanySiret: bsdasri.transporterCompanySiret,
+    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
     transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
     destinationOperationCode: bsdasri.destinationOperationCode,
     destinationCustomInfo: bsdasri.destinationCustomInfo,
@@ -177,7 +180,7 @@ export function toOutgoingWaste(
     traderRecepisseNumber: null,
     transporterCompanyAddress: null,
     transporterCompanyName: bsdasri.transporterCompanyName,
-    transporterCompanySiret: bsdasri.transporterCompanySiret,
+    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
     transporterTakenOverAt: bsdasri.transporterTakenOverAt,
     transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
     weight: bsdasri.emitterWasteWeightValue
@@ -221,7 +224,7 @@ export function toTransportedWaste(
       ? bsdasri.emitterWasteWeightValue / 1000
       : bsdasri.emitterWasteWeightValue,
     transporterCompanyName: bsdasri.transporterCompanyName,
-    transporterCompanySiret: bsdasri.transporterCompanySiret,
+    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
     transporterCompanyAddress: bsdasri.transporterCompanyAddress,
     transporterNumberPlates: bsdasri.transporterTransportPlates,
     ...initialEmitter,
@@ -302,7 +305,7 @@ export function toManagedWaste(
     ...initialEmitter,
     transporterCompanyAddress: bsdasri.transporterCompanyAddress,
     transporterCompanyName: bsdasri.transporterCompanyName,
-    transporterCompanySiret: bsdasri.transporterCompanySiret,
+    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
     transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
     emitterCompanyMail: bsdasri.emitterCompanyMail,
     transporterCompanyMail: bsdasri.transporterCompanyMail,
@@ -360,7 +363,7 @@ export function toAllWaste(
     ...initialEmitter,
     transporterCompanyAddress: bsdasri.transporterCompanyAddress,
     transporterCompanyName: bsdasri.transporterCompanyName,
-    transporterCompanySiret: bsdasri.transporterCompanySiret,
+    transporterCompanySiret: getTransporterCompanyOrgId(bsdasri),
     transporterRecepisseNumber: bsdasri.transporterRecepisseNumber,
     transporterNumberPlates: bsdasri.transporterTransportPlates,
     weight: bsdasri.emitterWasteWeightValue

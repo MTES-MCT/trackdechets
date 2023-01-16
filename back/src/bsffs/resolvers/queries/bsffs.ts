@@ -21,6 +21,7 @@ const bsffs: QueryResolvers["bsffs"] = async (
     OR: [
       { emitterCompanySiret: { in: userCompaniesSiretOrVat } },
       { transporterCompanySiret: { in: userCompaniesSiretOrVat } },
+      { transporterCompanyVatNumber: { in: userCompaniesSiretOrVat } },
       { destinationCompanySiret: { in: userCompaniesSiretOrVat } },
       { detenteurCompanySirets: { hasSome: userCompaniesSiretOrVat } }
     ]

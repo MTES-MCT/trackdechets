@@ -5,6 +5,7 @@ import {
 } from "../../../../generated/graphql/types";
 import {
   formFactory,
+  formWithTempStorageFactory,
   toIntermediaryCompany,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -375,20 +376,16 @@ describe("signEmissionForm", () => {
 
   it("should sign emission for the temporary storage", async () => {
     const temporaryStorage = await userWithCompanyFactory("ADMIN");
-    const form = await formFactory({
+
+    const form = await formWithTempStorageFactory({
       ownerId: temporaryStorage.user.id,
       opt: {
         status: "RESEALED",
         recipientCompanySiret: temporaryStorage.company.siret,
-        recipientCompanyName: temporaryStorage.company.name,
-        forwardedIn: {
-          create: {
-            readableId: getReadableId(),
-            ownerId: temporaryStorage.user.id
-          }
-        }
+        recipientCompanyName: temporaryStorage.company.name
       }
     });
+
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
 
     const { mutate } = makeClient(temporaryStorage.user);
@@ -420,25 +417,66 @@ describe("signEmissionForm", () => {
     );
   });
 
+  it(
+    "should not be possible to sign emission for the temporary storage and " +
+      "specify a weight > 40 T when transport mode is ROAD",
+    async () => {
+      const temporaryStorage = await userWithCompanyFactory("ADMIN");
+
+      const form = await formWithTempStorageFactory({
+        ownerId: temporaryStorage.user.id,
+        opt: {
+          status: "RESEALED",
+          recipientCompanySiret: temporaryStorage.company.siret,
+          recipientCompanyName: temporaryStorage.company.name
+        },
+        forwardedInOpts: { transporterTransportMode: "ROAD" }
+      });
+
+      const emittedAt = new Date("2018-12-11T00:00:00.000Z");
+
+      const { mutate } = makeClient(temporaryStorage.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signEmissionForm">,
+        MutationSignEmissionFormArgs
+      >(SIGN_EMISSION_FORM, {
+        variables: {
+          id: form.id,
+          input: {
+            emittedAt: emittedAt.toISOString() as unknown as Date,
+            emittedBy: temporaryStorage.user.name,
+            quantity: 50
+          }
+        }
+      });
+
+      expect(errors).toBeDefined();
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Déchet : le poids doit être inférieur à 40 tonnes lorsque le transport se fait par la route"
+        })
+      ]);
+    }
+  );
+
   it("should sign emission via temporary storage's security code", async () => {
     const temporaryStorage = await userWithCompanyFactory("ADMIN");
     const transporter = await userWithCompanyFactory("ADMIN");
-    const form = await formFactory({
+
+    const form = await formWithTempStorageFactory({
       ownerId: temporaryStorage.user.id,
       opt: {
         status: "RESEALED",
         recipientCompanySiret: temporaryStorage.company.siret,
-        recipientCompanyName: temporaryStorage.company.name,
-        forwardedIn: {
-          create: {
-            readableId: getReadableId(),
-            ownerId: temporaryStorage.user.id,
-            transporterCompanySiret: transporter.company.siret,
-            transporterCompanyName: transporter.company.name
-          }
-        }
+        recipientCompanyName: temporaryStorage.company.name
+      },
+      forwardedInOpts: {
+        transporterCompanySiret: transporter.company.siret,
+        transporterCompanyName: transporter.company.name
       }
     });
+
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
 
     const { mutate } = makeClient(transporter.user);
@@ -540,7 +578,8 @@ describe("signEmissionForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Ce bordereau a été annulé"
+        message:
+          "Vous ne pouvez pas faire cette action, ce bordereau a été annulé"
       })
     ]);
   });

@@ -4,6 +4,7 @@ import { BsdElastic, indexBsd } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { toBsffDestination } from "./compat";
+import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 
 export function toBsdElastic(
   bsff: Bsff & { packagings: BsffPackaging[] }
@@ -21,6 +22,7 @@ export function toBsdElastic(
     emitterCompanySiret: bsff.emitterCompanySiret ?? "",
     transporterCompanyName: bsff.transporterCompanyName ?? "",
     transporterCompanySiret: bsff.transporterCompanySiret ?? "",
+    transporterCompanyVatNumber: bsff.transporterCompanyVatNumber ?? "",
     transporterTakenOverAt:
       bsff.transporterTransportTakenOverAt?.getTime() ??
       bsff.transporterTransportSignatureDate?.getTime(),
@@ -59,7 +61,7 @@ export function toBsdElastic(
   if (bsff.isDraft) {
     bsd.isDraftFor.push(
       bsff.emitterCompanySiret,
-      bsff.transporterCompanySiret,
+      getTransporterCompanyOrgId(bsff),
       bsff.destinationCompanySiret
     );
   } else {
@@ -68,13 +70,13 @@ export function toBsdElastic(
       case BsffStatus.INITIAL: {
         bsd.isForActionFor.push(bsff.emitterCompanySiret);
         bsd.isFollowFor.push(
-          bsff.transporterCompanySiret,
+          getTransporterCompanyOrgId(bsff),
           bsff.destinationCompanySiret
         );
         break;
       }
       case BsffStatus.SIGNED_BY_EMITTER: {
-        bsd.isToCollectFor.push(bsff.transporterCompanySiret);
+        bsd.isToCollectFor.push(getTransporterCompanyOrgId(bsff));
         bsd.isFollowFor.push(
           bsff.emitterCompanySiret,
           bsff.destinationCompanySiret
@@ -82,7 +84,7 @@ export function toBsdElastic(
         break;
       }
       case BsffStatus.SENT: {
-        bsd.isCollectedFor.push(bsff.transporterCompanySiret);
+        bsd.isCollectedFor.push(getTransporterCompanyOrgId(bsff));
         bsd.isFollowFor.push(bsff.emitterCompanySiret);
         bsd.isForActionFor.push(bsff.destinationCompanySiret);
         break;
@@ -92,7 +94,7 @@ export function toBsdElastic(
       case BsffStatus.ACCEPTED: {
         bsd.isFollowFor.push(
           bsff.emitterCompanySiret,
-          bsff.transporterCompanySiret
+          getTransporterCompanyOrgId(bsff)
         );
         bsd.isForActionFor.push(bsff.destinationCompanySiret);
         break;
@@ -100,7 +102,7 @@ export function toBsdElastic(
       case BsffStatus.INTERMEDIATELY_PROCESSED: {
         bsd.isFollowFor.push(
           bsff.emitterCompanySiret,
-          bsff.transporterCompanySiret,
+          getTransporterCompanyOrgId(bsff),
           bsff.destinationCompanySiret
         );
         break;
@@ -109,7 +111,7 @@ export function toBsdElastic(
       case BsffStatus.PROCESSED: {
         bsd.isArchivedFor.push(
           bsff.emitterCompanySiret,
-          bsff.transporterCompanySiret,
+          getTransporterCompanyOrgId(bsff),
           bsff.destinationCompanySiret
         );
         break;

@@ -66,7 +66,7 @@ export const companyFactory = async (
   const siret = opts.siret ? opts.siret : siretify(companyIndex);
   return prisma.company.create({
     data: {
-      orgId: siret,
+      orgId: !opts.vatNumber?.length ? siret : opts.vatNumber,
       siret,
       companyTypes: {
         set: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"]
@@ -263,9 +263,12 @@ export const forwardedInData: Partial<Prisma.FormCreateInput> = {
   recipientCompanyMail: "louis.henry@idge.org",
   recipientCap: "CAP",
   recipientProcessingOperation: "R 1",
-  wasteDetailsOnuCode: "",
-  wasteDetailsPackagingInfos: [],
+  wasteDetailsCode: "05 01 04*",
+  wasteDetailsIsDangerous: true,
+  wasteDetailsOnuCode: "2003",
+  wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }],
   wasteDetailsQuantity: 1,
+  wasteDetailsConsistence: "SOLID" as Consistence,
   wasteDetailsQuantityType: "ESTIMATED",
   transporterCompanyName: "Transporteur",
   transporterCompanySiret: siretify(4),

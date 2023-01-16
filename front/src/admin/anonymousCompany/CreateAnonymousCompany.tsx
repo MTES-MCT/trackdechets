@@ -45,7 +45,8 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       .string()
       .test(
         "is-vat",
-        "AnonymousCompany: ${originalValue} n'est pas un numéro de TVA valide",
+        ({ originalValue }) =>
+          `AnonymousCompany: ${originalValue} n'est pas un numéro de TVA valide`,
         value => !value || isVat(value)
       )
       .test(

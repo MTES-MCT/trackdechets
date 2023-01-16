@@ -118,7 +118,7 @@ export const transporterCompanySiretSchema = (isDraft: boolean) =>
       value => !value || isSiret(value)
     )
     .when("transporterCompanyVatNumber", (tva, schema) => {
-      if (!tva && !isDraft) {
+      if ((!tva || !isForeignVat(tva)) && !isDraft) {
         return schema.required(
           `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`
         );

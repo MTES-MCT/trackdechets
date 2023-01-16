@@ -28,7 +28,7 @@ import {
   clearUserLoginNeedsCaptcha,
   doesUserLoginNeedsCaptcha
 } from "./common/redis/captcha";
-import { checkCaptcha } from "./captchaGen";
+import { checkCaptcha } from "./captcha/captchaGen";
 
 // Set specific type for req.user
 declare global {

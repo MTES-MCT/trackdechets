@@ -163,7 +163,7 @@ export default function BsffPackagings({
             {value.length >= maxPackagings && (
               <div className="notification">
                 Un seul contenant est autorisé dans le cadre d'un
-                reconditionnement
+                reconditionnement. Ex. : 1 citerne
               </div>
             )}
           </div>

@@ -94,6 +94,7 @@ export function checkIfHasPossibleSiretChange(data: Prisma.FormUpdateInput) {
   return Boolean(
     data.recipientCompanySiret ||
       data.transporterCompanySiret ||
+      data.transporterCompanyVatNumber ||
       data.intermediaries ||
       data.transportSegments ||
       data.forwardedIn

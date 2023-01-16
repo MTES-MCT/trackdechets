@@ -1,8 +1,11 @@
 import { WorkflowStep } from "../../../common/workflow";
-import fixtures from "../fixtures";
+import defaultFixtures from "../fixtures";
 import mutations from "../mutations";
 
-export function createBsda(company: string): WorkflowStep {
+export function createBsda(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
   return {
     description: `Les informations du BSDA sont remplies. Cette action peut-être effectuée
     par n'importe quel établissement apparaissant sur le BSDA. À ce stade il est toujours possible
@@ -13,7 +16,11 @@ export function createBsda(company: string): WorkflowStep {
         emitter: fixtures.emitterInput(producteur.siret),
         worker: fixtures.workerInput(worker.siret),
         destination: fixtures.destinationInput(traiteur.siret),
-        transporter: fixtures.transporterInput(transporteur.siret),
+        transporter: fixtures.transporterInput(
+          transporteur.siret?.length
+            ? transporteur.siret
+            : transporteur.vatNumber
+        ),
         waste: fixtures.wasteInput(),
         packagings: fixtures.packagingsInput(),
         weight: fixtures.weightInput()
@@ -26,7 +33,10 @@ export function createBsda(company: string): WorkflowStep {
   };
 }
 
-export function createPrivateIndividualBsda(company: string): WorkflowStep {
+export function createPrivateIndividualBsda(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
   return {
     description: `Les informations du BSDA sont remplies. L'émetteur est ici un particulier. Il n'aura pas à signer le bordereau sur Trackdéchets.
     La création du BSDA peut-être effectuée
@@ -51,7 +61,10 @@ export function createPrivateIndividualBsda(company: string): WorkflowStep {
   };
 }
 
-export function create2710Bsda(company: string): WorkflowStep {
+export function create2710Bsda(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
   return {
     description: `Les informations du BSDA sont remplies. Cette action est effectuée
     par la déchetterie. À ce stade il est toujours possible

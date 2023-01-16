@@ -4,9 +4,9 @@ import { NotCompanyAdmin, NotCompanyMember } from "../common/errors";
 import { getCachedUserSiretOrVat } from "../common/redis/users";
 
 export async function checkIsCompanyAdmin(user: User, company: Company) {
-  const admins = await getCompanyAdminUsers(company.siret);
+  const admins = await getCompanyAdminUsers(company.orgId);
   if (!admins.map(u => u.id).includes(user.id)) {
-    throw new NotCompanyAdmin(company.siret);
+    throw new NotCompanyAdmin(company.orgId);
   }
   return true;
 }

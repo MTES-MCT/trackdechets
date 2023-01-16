@@ -143,6 +143,98 @@ describe("mutation.markAsProcessed", () => {
     expect(updatedForm.status).toEqual("PROCESSED");
   });
 
+  it("should mark a form with temporary storage as AWAITING_GROUP and delete BSD suite", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: {
+        status: "TEMP_STORER_ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          nextDestination: {
+            processingOperation: "D 1",
+            company: {
+              mail: "m@m.fr",
+              siret: siretify(3),
+              name: "company",
+              phone: "0101010101",
+              contact: "The famous bot",
+              address: "A beautiful place..."
+            }
+          }
+        }
+      }
+    });
+
+    const updatedForm = await prisma.form.findFirst({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
+
+    expect(updatedForm.recipientIsTempStorage).toEqual(false);
+    expect(updatedForm.forwardedInId).toBeNull();
+    expect(updatedForm.status).toEqual("AWAITING_GROUP");
+  });
+
+  it("should mark a form with temporary storage as FOLLOWED_WITH_PNTTD and delete BSD suite", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: {
+        status: "TEMP_STORER_ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          nextDestination: {
+            processingOperation: "D 1",
+            company: {
+              mail: "m@m.fr",
+              siret: null,
+              vatNumber: "IE9513674T",
+              country: "IE",
+              name: "IE company",
+              phone: "0101010101",
+              contact: "The famous bot",
+              address: "A beautiful place..."
+            }
+          }
+        }
+      }
+    });
+
+    const updatedForm = await prisma.form.findFirst({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
+
+    expect(updatedForm.recipientIsTempStorage).toEqual(false);
+    expect(updatedForm.forwardedInId).toBeNull();
+    expect(updatedForm.status).toEqual("FOLLOWED_WITH_PNTTD");
+  });
+
   it("should fill the description with the operation's", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
@@ -397,7 +489,42 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
   });
 
-  it("should set country to FR by default", async () => {
+  it("should allow empty company as nextDestination when NO_TRACEABILITY is true", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 13",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          noTraceability: true,
+          nextDestination: {
+            processingOperation: "D 1",
+            company: null
+          }
+        }
+      }
+    });
+
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
+    expect(resultingForm.status).toBe("NO_TRACEABILITY");
+  });
+
+  it("should set nextDestinationCompanyCountry to FR by default is a SIRET is defined", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -487,7 +614,100 @@ describe("mutation.markAsProcessed", () => {
     expect(resultingForm.nextDestinationCompanyCountry).toBe("IE");
   });
 
-  it("should disallow a missing siret for a french next destination", async () => {
+  it("should mark a form FOLLOWED_WITH_PNTTD with foreign next destination and auto-guess the country", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "ACCEPTED",
+        recipientCompanyName: company.name,
+        recipientCompanySiret: company.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          nextDestination: {
+            processingOperation: "D 1",
+            company: {
+              mail: "m@m.fr",
+              siret: null,
+              vatNumber: "IE9513674T",
+              name: "IE company",
+              phone: "0101010101",
+              contact: "The famous bot",
+              address: "A beautiful place..."
+            }
+          }
+        }
+      }
+    });
+
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
+
+    expect(resultingForm.status).toBe("FOLLOWED_WITH_PNTTD");
+    expect(resultingForm.nextDestinationCompanyVatNumber).toEqual("IE9513674T");
+    expect(resultingForm.nextDestinationCompanyCountry).toBe("IE");
+  });
+
+  it("should mark a form with temp storage FOLLOWED_WITH_PNTTD with foreign next destination", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const form = await formWithTempStorageFactory({
+      ownerId: user.id,
+      opt: { status: "ACCEPTED" },
+      forwardedInOpts: {
+        recipientCompanySiret: company.siret,
+        recipientCompanyName: company.name
+      }
+    });
+    const { mutate } = makeClient(user);
+    await mutate(MARK_AS_PROCESSED, {
+      variables: {
+        id: form.id,
+        processedInfo: {
+          processingOperationDescription: "Une description",
+          processingOperationDone: "D 14",
+          processedBy: "A simple bot",
+          processedAt: "2018-12-11T00:00:00.000Z",
+          nextDestination: {
+            processingOperation: "D 1",
+            company: {
+              mail: "m@m.fr",
+              siret: null,
+              vatNumber: "IE9513674T",
+              country: "IE",
+              name: "IE company",
+              phone: "0101010101",
+              contact: "The famous bot",
+              address: "A beautiful place..."
+            }
+          }
+        }
+      }
+    });
+
+    const resultingForm = await prisma.form.findUnique({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
+
+    expect(resultingForm.status).toBe("FOLLOWED_WITH_PNTTD");
+    expect(resultingForm.forwardedIn.nextDestinationCompanyVatNumber).toEqual(
+      "IE9513674T"
+    );
+    expect(resultingForm.forwardedIn.nextDestinationCompanyCountry).toBe("IE");
+  });
+
+  it("should disallow a missing siret for any next destination", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const form = await formFactory({
       ownerId: user.id,
@@ -511,7 +731,6 @@ describe("mutation.markAsProcessed", () => {
             processingOperation: "D 1",
             company: {
               mail: "m@m.fr",
-              country: "FR",
               name: "company",
               phone: "0101010101",
               contact: "The famous bot",
@@ -794,7 +1013,7 @@ describe("mutation.markAsProcessed", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Ce bordereau a été annulé"
+        message: "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
       })
     ]);
   });

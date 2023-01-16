@@ -6,9 +6,10 @@ import { expandFormFromDb } from "../../converter";
 import { checkCanDuplicate } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
+import { FullForm } from "../../types";
 
 /**
- * Get the input to duplicate a form by stripping the properties that should not be copied.
+ * Get duplicable form fields
  *
  * @param {User} user user that should own the duplicated form
  * @param {Form} form the form to duplicate
@@ -91,6 +92,45 @@ function getDuplicateFormInput(user: User, form: Form): Prisma.FormCreateInput {
 }
 
 /**
+ * Get duplicable form fields on BSD suite
+ */
+function getDuplicateFormForwardedInInput(
+  user: User,
+  form: FullForm
+): Omit<Prisma.FormCreateInput, "readableId"> {
+  const forwardedIn = form.forwardedIn;
+
+  if (!forwardedIn) return null;
+
+  return {
+    status: Status.DRAFT,
+    owner: { connect: { id: user.id } },
+    emitterType: forwardedIn.emitterType,
+    emitterCompanyName: forwardedIn.emitterCompanyName,
+    emitterCompanySiret: forwardedIn.emitterCompanySiret,
+    emitterCompanyAddress: forwardedIn.emitterCompanyAddress,
+    emitterCompanyContact: forwardedIn.emitterCompanyContact,
+    emitterCompanyPhone: forwardedIn.emitterCompanyPhone,
+    emitterCompanyMail: forwardedIn.emitterCompanyMail,
+    recipientCap: forwardedIn.recipientCap,
+    recipientProcessingOperation: forwardedIn.recipientProcessingOperation,
+    recipientCompanyName: forwardedIn.recipientCompanyName,
+    recipientCompanySiret: forwardedIn.recipientCompanySiret,
+    recipientCompanyAddress: forwardedIn.recipientCompanyAddress,
+    recipientCompanyContact: forwardedIn.recipientCompanyContact,
+    recipientCompanyPhone: forwardedIn.recipientCompanyPhone,
+    recipientCompanyMail: forwardedIn.recipientCompanyMail,
+    wasteDetailsCode: forwardedIn.wasteDetailsCode,
+    wasteDetailsPackagingInfos: form.wasteDetailsPackagingInfos,
+    wasteDetailsOnuCode: forwardedIn.wasteDetailsOnuCode,
+    wasteDetailsPop: forwardedIn.wasteDetailsPop,
+    wasteDetailsIsDangerous: forwardedIn.wasteDetailsIsDangerous,
+    wasteDetailsName: forwardedIn.wasteDetailsName,
+    wasteDetailsConsistence: forwardedIn.wasteDetailsConsistence
+  };
+}
+
+/**
  * Duplicate the content of a form into a new DRAFT form
  * A new readable ID is generated and some fields which
  * are not duplicable are omitted
@@ -114,7 +154,7 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
   if (fullForm.forwardedIn) {
     newFormInput.forwardedIn = {
       create: {
-        ...getDuplicateFormInput(user, fullForm.forwardedIn),
+        ...getDuplicateFormForwardedInInput(user, fullForm),
         readableId: `${newFormInput.readableId}-suite`
       }
     };

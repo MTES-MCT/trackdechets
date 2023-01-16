@@ -8,8 +8,11 @@ import prisma from "../../prisma";
 
 export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
   const bsdId = job.data;
-
-  await deleteBsd({ id: bsdId });
+  if (bsdId.startsWith("BSD-") || bsdId.startsWith("TD-")) {
+    await deleteBsd({ readableId: bsdId });
+  } else {
+    await deleteBsd({ id: bsdId });
+  }
 
   if (bsdId.startsWith("BSDA-")) {
     const bsda = await prisma.bsda.findUnique({
