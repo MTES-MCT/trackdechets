@@ -189,7 +189,6 @@ describe("searchCompanies", () => {
     expect(searchCompanyMock).toHaveBeenCalledTimes(1);
   });
 
-
   it(`should not return closed companies when searching by SIRET`, async () => {
     const siret = siretify(1);
     searchCompanyMock.mockResolvedValue({
