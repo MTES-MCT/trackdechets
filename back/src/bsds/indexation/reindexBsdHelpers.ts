@@ -77,13 +77,13 @@ export async function reindex(bsdId, exitFn) {
 
   if (bsdId.startsWith("BSD-") || bsdId.startsWith("TD-")) {
     const bsdd = await prisma.form.findFirst({
-      where: { readableId: bsdId, isDeleted: false }
+      where: { readableId: bsdId }
     });
-    if (!!bsdd) {
+    if (bsdd.isDeleted) {
+      await deleteBsd({ id: bsdd.id });
+    } else {
       const fullBsdd = await getFullForm(bsdd);
       await indexForm(fullBsdd);
-    } else {
-      await deleteBsd({ id: bsdId });
     }
     return exitFn(true);
   }
