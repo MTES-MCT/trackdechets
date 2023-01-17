@@ -45,8 +45,7 @@ import {
   isSiret,
   isFRVat,
   isOmi,
-  isForeignVat,
-  countries as vatCountries
+  isForeignVat
 } from "../common/constants/companySearchHelpers";
 import { validateCompany } from "../companies/validateCompany";
 import { Decimal } from "decimal.js-light";
@@ -56,7 +55,6 @@ import {
   transporterCompanyVatNumberSchema
 } from "../companies/validation";
 import { weight, weightConditions, WeightUnits } from "../common/validation";
-import { checkVAT } from "jsvat";
 // set yup default error messages
 configureYup();
 
@@ -1023,34 +1021,10 @@ const withNextDestination = (required: boolean) =>
         required,
         `Destination ultérieure : ${MISSING_COMPANY_ADDRESS}`
       ),
-    nextDestinationCompanyCountry: yup
-      .string()
-      .ensure()
-      .oneOf(
-        ["", ...countries.map(country => country.cca2)],
-        "Destination ultérieure : le code ISO 3166-1 alpha-2 du pays de l'entreprise n'est pas reconnu"
-      )
-      .when("nextDestinationCompanyVatNumber", (vat, schema) => {
-        return isVat(vat) && required
-          ? schema.test(
-              "is-country-valid",
-              "Destination ultérieure : le code du pays de l'entreprise ne correspond pas au numéro de TVA entré",
-              value =>
-                !value ||
-                checkVAT(vat.replace(/[\W_\s]/gim, ""), vatCountries)?.country
-                  ?.isoCode.short === value.replace(/[\W_\s]/gim, "")
-            )
-          : schema;
-      })
-      .when("nextDestinationCompanySiret", (siret, schema) => {
-        return isSiret(siret) && required
-          ? schema.test(
-              "is-fr-country-valid",
-              "Destination ultérieure : le code du pays de l'entreprise ne peut pas être différent de FR",
-              value => !value || value === "FR"
-            )
-          : schema;
-      }),
+    nextDestinationCompanyCountry: yup.string().oneOf(
+      countries.map(country => country.cca2),
+      "Destination ultérieure : le code ISO 3166-1 alpha-2 du pays de l'entreprise n'est pas reconnu"
+    ),
     nextDestinationCompanyContact: yup
       .string()
       .ensure()

@@ -1,10 +1,6 @@
 import { Prisma, Status, WasteAcceptationStatus } from "@prisma/client";
 import { Machine } from "xstate";
 import { PROCESSING_OPERATIONS_GROUPEMENT_CODES } from "../../common/constants";
-import {
-  isForeignVat,
-  isSiret
-} from "../../common/constants/companySearchHelpers";
 import { Event, EventType } from "./types";
 
 /**
@@ -247,7 +243,8 @@ const machine = Machine<any, Event>(
             PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
               update.processingOperationDone as string
             ) &&
-            !isForeignNextDestination(update) &&
+            (!update.nextDestinationCompanyCountry ||
+              update.nextDestinationCompanyCountry === "FR") &&
             !(update.noTraceability === true)
           );
         }
@@ -263,7 +260,8 @@ const machine = Machine<any, Event>(
             PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
               update.processingOperationDone as string
             ) &&
-            isForeignNextDestination(update) &&
+            !!update.nextDestinationCompanyCountry &&
+            update.nextDestinationCompanyCountry !== "FR" &&
             !(update.noTraceability === true)
           );
         }
@@ -299,29 +297,5 @@ const machine = Machine<any, Event>(
     }
   }
 );
-
-/**
- * Determine whether nextDestionation is foreign based on a priority guessing system
- */
-function isForeignNextDestination(update: Prisma.FormUpdateInput) {
-  if (
-    update.nextDestinationCompanyVatNumber &&
-    isForeignVat(update.nextDestinationCompanyVatNumber as string)
-  ) {
-    return true;
-  }
-  if (
-    update.nextDestinationCompanySiret &&
-    isSiret(update.nextDestinationCompanySiret as string)
-  ) {
-    return false;
-  }
-  if (
-    !!update.nextDestinationCompanyCountry &&
-    update.nextDestinationCompanyCountry !== "FR"
-  ) {
-    return true;
-  }
-}
 
 export default machine;

@@ -1020,7 +1020,7 @@ describe("processedInfoSchema", () => {
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("nextDestinationCompany SIRET is required when no other identication is given", async () => {
+  test("nextDestinationCompany SIRET or VAT number is required", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1038,50 +1038,6 @@ describe("processedInfoSchema", () => {
 
     await expect(validateFn()).rejects.toThrow(
       "Destination ultérieure prévue : Le siret de l'entreprise est obligatoire"
-    );
-  });
-
-  test("nextDestinationCompany return an error when SIRET is given and country is not FR", async () => {
-    const processedInfo = {
-      processedBy: "John Snow",
-      processedAt: new Date(),
-      processingOperationDone: "D 13",
-      processingOperationDescription: "Regroupement",
-      nextDestinationProcessingOperation: "D 8",
-      nextDestinationCompanyName: "Exutoire",
-      nextDestinationCompanyAddress: "4 rue du déchet",
-      nextDestinationCompanySiret: siretify(1),
-      nextDestinationCompanyCountry: "IE",
-      nextDestinationCompanyContact: "Arya Stark",
-      nextDestinationCompanyPhone: "06 XX XX XX XX",
-      nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
-    };
-    const validateFn = () => processedInfoSchema.validate(processedInfo);
-
-    await expect(validateFn()).rejects.toThrow(
-      "Destination ultérieure : le code du pays de l'entreprise ne peut pas différent de FR"
-    );
-  });
-
-  test("nextDestinationCompany return an error when VAT is given and country is FR", async () => {
-    const processedInfo = {
-      processedBy: "John Snow",
-      processedAt: new Date(),
-      processingOperationDone: "D 13",
-      processingOperationDescription: "Regroupement",
-      nextDestinationProcessingOperation: "D 8",
-      nextDestinationCompanyName: "Exutoire",
-      nextDestinationCompanyAddress: "4 rue du déchet",
-      nextDestinationCompanyCountry: "FR",
-      nextDestinationCompanyVatNumber: "BE0541696005",
-      nextDestinationCompanyContact: "Arya Stark",
-      nextDestinationCompanyPhone: "06 XX XX XX XX",
-      nextDestinationCompanyMail: "arya.stark@trackdechets.fr"
-    };
-    const validateFn = () => processedInfoSchema.validate(processedInfo);
-
-    await expect(validateFn()).rejects.toThrow(
-      "Destination ultérieure : le code du pays de l'entreprise ne correspond pas au numéro de TVA entré"
     );
   });
 
