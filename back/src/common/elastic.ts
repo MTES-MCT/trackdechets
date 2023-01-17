@@ -421,27 +421,10 @@ export function indexBsds(indexName: string, bsds: BsdElastic[]) {
 /**
  * Delete a document in Elastic Search.
  */
-export function deleteBsd<T extends { id?: string; readableId?: string }>(
-  { id, readableId }: T,
+export function deleteBsd<T extends { id?: string }>(
+  { id }: T,
   ctx?: GraphQLContext
 ) {
-  if (readableId && !id) {
-    return client.delete_by_query(
-      {
-        index: index.alias,
-        type: index.type,
-        conflicts: "proceed",
-        body: {
-          query: {
-            term: {
-              readableId
-            }
-          }
-        }
-      },
-      { ignore: [404] }
-    );
-  }
   return client.delete(
     {
       index: index.alias,

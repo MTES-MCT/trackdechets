@@ -83,7 +83,7 @@ export async function reindex(bsdId, exitFn) {
       const fullBsdd = await getFullForm(bsdd);
       await indexForm(fullBsdd);
     } else {
-      await deleteBsd({ readableId: bsdId });
+      await deleteBsd({ id: bsdId });
     }
     return exitFn(true);
   }
