@@ -41,7 +41,7 @@ const deleteBsff: MutationResolvers["deleteBsff"] = async (
     });
   });
 
-  await elastic.deleteBsd({ id: updatedBsff.id }, context);
+  await elastic.deleteBsd(updatedBsff, context);
 
   return expandBsffFromDB(updatedBsff);
 };

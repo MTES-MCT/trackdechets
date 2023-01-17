@@ -38,9 +38,7 @@ const buildDeleteForm: (deps: RepositoryFnDeps) => DeleteFormFn =
       }
     });
 
-    await deleteBsd({ readableId: deletedForm.readableId }, {
-      user
-    } as GraphQLContext);
+    await deleteBsd(deletedForm, { user } as GraphQLContext);
 
     // disconnect appendix2 forms if any
     const removeAppendix2 = buildRemoveAppendix2({ prisma, user });
