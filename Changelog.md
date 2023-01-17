@@ -13,7 +13,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Correction bug de suppression d'un BSDD de l'index ES [PR 2050](https://github.com/MTES-MCT/trackdechets/pull/2050)
 - Correctifs validation de Destination ultérieure et correction des réponses du champ Form "company.country" [PR 2046](https://github.com/MTES-MCT/trackdechets/pull/2046)
-- Correction de la validation SIRET pour le groupe La Poste
+
 
 #### :boom: Breaking changes
 
