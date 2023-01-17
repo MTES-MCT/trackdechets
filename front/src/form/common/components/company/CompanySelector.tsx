@@ -97,7 +97,7 @@ export default function CompanySelector({
     () => field.value.orgId ?? field.value.siret ?? null,
     [field.value.siret, field.value.orgId]
   );
-  // Favorite type is deduced from the field prefix (transporter, emitter, etc)
+  // Favortite type is deduced from the field prefix (transporter, emitter, etc)
   const favoriteType = constantCase(field.name.split(".")[0]) as FavoriteType;
   const {
     loading: isLoadingFavorites,
@@ -155,11 +155,7 @@ export default function CompanySelector({
   function selectCompany(company?: CompanySearchResult) {
     if (disabled) return;
     // empty the  selected company when null
-    if (!company) {
-      setFieldValue(field.name, getInitialCompany());
-      setFieldTouched(`${field.name}`, true, true);
-      return;
-    }
+    if (!company) return setFieldValue(field.name, getInitialCompany());
 
     // Side effects
     const notVoidCompany = Object.keys(company).length !== 0; // unselect returns emtpy object {}
@@ -204,7 +200,7 @@ export default function CompanySelector({
     Object.keys(fields).forEach(key => {
       setFieldValue(`${field.name}.${key}`, fields[key]);
     });
-    setFieldTouched(`${field.name}`, true, true);
+
     onCompanySelected?.(company);
   }
 

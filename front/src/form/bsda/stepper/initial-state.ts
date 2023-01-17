@@ -45,6 +45,7 @@ const initialState = {
   transporter: {
     company: {
       ...getInitialCompany(),
+      vatNumber: "",
     },
     recepisse: {
       number: "",
