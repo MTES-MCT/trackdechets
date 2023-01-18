@@ -5,6 +5,7 @@ import {
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
+  companyFactory,
   formFactory,
   formWithTempStorageFactory,
   userWithCompanyFactory
@@ -130,6 +131,47 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
         bsddId: bsdd.id,
         authoringCompanyId: companyOfSomeoneElse.id,
         approvals: { create: { approverSiret: company.siret } },
+        comment: ""
+      }
+    });
+
+    const { data } = await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    expect(data.submitFormRevisionRequestApproval.status).toBe("ACCEPTED");
+  });
+
+  it("should work if the only approver approves the revisionRequest with a foreign transporter", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user } = await userWithCompanyFactory("ADMIN");
+    const transporter = await companyFactory({
+      siret: null,
+      vatNumber: "PT999999999"
+    });
+    const { mutate } = makeClient(user);
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: transporter.vatNumber
+      }
+    });
+
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: transporter.vatNumber } },
         comment: ""
       }
     });

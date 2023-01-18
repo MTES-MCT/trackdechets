@@ -73,7 +73,7 @@ async function getCurrentApproverSiret(
 
   const userCompanies = await getUserCompanies(user.id);
   const approvingCompaniesCandidates = userCompanies.filter(company =>
-    remainingApproverSirets.includes(company.siret)
+    remainingApproverSirets.includes(company.orgId)
   );
 
   if (approvingCompaniesCandidates.length === 0) {
@@ -82,5 +82,5 @@ async function getCurrentApproverSiret(
     );
   }
 
-  return approvingCompaniesCandidates[0].siret;
+  return approvingCompaniesCandidates[0].orgId;
 }

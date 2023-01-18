@@ -85,7 +85,7 @@ export default async function createFormRevisionRequest(
   const approversSirets = await getApproversSirets(
     existingBsdd,
     flatContent,
-    authoringCompany.siret,
+    authoringCompany.orgId,
     context.user
   );
 
@@ -123,7 +123,7 @@ async function getAuthoringCompany(
 
   const userCompanies = await getUserCompanies(user.id);
   const authoringCompany = userCompanies.find(
-    company => company.siret === authoringCompanySiret
+    company => company.orgId === authoringCompanySiret
   );
 
   if (!authoringCompany) {

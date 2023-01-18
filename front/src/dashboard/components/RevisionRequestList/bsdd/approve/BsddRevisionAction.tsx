@@ -27,7 +27,7 @@ export function BsddRevisionAction({ review }: Props) {
   }
 
   if (
-    review.authoringCompany.siret === siret &&
+    review.authoringCompany.orgId === siret &&
     review.status === RevisionRequestStatus.Pending
   ) {
     return (

@@ -23,7 +23,7 @@ const CREATE_FORM_REVISION_REQUEST = `
         wasteDetails { code }
       }
       authoringCompany {
-        siret
+        orgId
       }
       approvals {
         approverSiret
@@ -51,7 +51,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId,
           content: {},
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.orgId
         }
       }
     });
@@ -80,7 +80,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: {},
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.orgId
         }
       }
     });
@@ -112,7 +112,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: { isCanceled: true, quantityReceived: 10 },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.orgId
         }
       }
     });
@@ -145,7 +145,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: { quantityReceived: 10 },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.orgId
         }
       }
     });
@@ -182,8 +182,8 @@ describe("Mutation.createFormRevisionRequest", () => {
     });
 
     expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
-    expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
-      company.siret
+    expect(data.createFormRevisionRequest.authoringCompany.orgId).toBe(
+      company.orgId
     );
   });
 
@@ -229,14 +229,14 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: { wasteDetails: { code: "01 03 08" } },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.orgId
         }
       }
     });
 
     expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
-    expect(data.createFormRevisionRequest.authoringCompany.siret).toBe(
-      company.siret
+    expect(data.createFormRevisionRequest.authoringCompany.orgId).toBe(
+      company.orgId
     );
   });
 
@@ -269,7 +269,7 @@ describe("Mutation.createFormRevisionRequest", () => {
     expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
     expect(data.createFormRevisionRequest.approvals.length).toBe(1);
     expect(data.createFormRevisionRequest.approvals[0].approverSiret).toBe(
-      recipientCompany.siret
+      recipientCompany.orgId
     );
     expect(data.createFormRevisionRequest.approvals[0].status).toBe("PENDING");
   });
@@ -316,7 +316,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: { wasteDetails: { code: "Made up code" } },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.orgId
         }
       }
     });
@@ -378,7 +378,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: {},
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.orgId
         }
       }
     });
@@ -409,7 +409,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: {},
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.orgId
         }
       }
     });

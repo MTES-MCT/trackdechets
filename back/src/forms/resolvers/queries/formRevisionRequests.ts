@@ -21,7 +21,7 @@ export default async function formRevisionRequests(
 ) {
   const user = checkIsAuthenticated(context);
   await checkIsCompanyMember({ id: user.id }, { orgId: siret });
-  const company = await getCompanyOrCompanyNotFound({ siret });
+  const company = await getCompanyOrCompanyNotFound({ orgId: siret });
 
   const pageSize = Math.max(Math.min(first, MAX_SIZE), MIN_SIZE);
 
@@ -29,7 +29,7 @@ export default async function formRevisionRequests(
   const where = {
     OR: [
       { authoringCompanyId: company.id },
-      { approvals: { some: { approverSiret: company.siret } } }
+      { approvals: { some: { approverSiret: company.orgId } } }
     ],
     ...(status && { status })
   };

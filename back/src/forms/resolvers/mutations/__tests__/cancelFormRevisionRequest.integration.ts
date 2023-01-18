@@ -1,11 +1,13 @@
 import { RevisionRequestStatus } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import { transporterCompanySiretSchema } from "../../../../companies/validation";
 import {
   Mutation,
   MutationCancelFormRevisionRequestArgs
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
+  companyFactory,
   formFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -101,6 +103,49 @@ describe("Mutation.cancelFormRevisionRequest", () => {
     const bsdd = await formFactory({
       ownerId: user.id,
       opt: { emitterCompanySiret: company.siret }
+    });
+
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: company.id,
+        comment: ""
+      }
+    });
+
+    const revisionsCountBefore = await prisma.bsddRevisionRequest.count({
+      where: { authoringCompanyId: company.id }
+    });
+    expect(revisionsCountBefore).toBe(1);
+
+    await mutate<
+      Pick<Mutation, "cancelFormRevisionRequest">,
+      MutationCancelFormRevisionRequestArgs
+    >(CANCEL_FORM_REVISION_REQUEST, {
+      variables: { id: revisionRequest.id }
+    });
+
+    const revisionsCountAfter = await prisma.bsddRevisionRequest.count({
+      where: { authoringCompanyId: company.id }
+    });
+    expect(revisionsCountAfter).toBe(0);
+  });
+
+  it("should delete revision with foreign transporter", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const transporter = await companyFactory({
+      siret: null,
+      vatNumber: "PT999999999"
+    });
+    const { mutate } = makeClient(user);
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: transporter.vatNumber
+      }
     });
 
     const revisionRequest = await prisma.bsddRevisionRequest.create({

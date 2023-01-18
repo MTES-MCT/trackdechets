@@ -24,7 +24,7 @@ const COLUMNS = [
   {
     Header: "Demandeur",
     accessor: row =>
-      `${row.authoringCompany.name} (${row.authoringCompany.siret})`,
+      `${row.authoringCompany.name} (${row.authoringCompany.orgId})`,
   },
   {
     Header: "Statut",
