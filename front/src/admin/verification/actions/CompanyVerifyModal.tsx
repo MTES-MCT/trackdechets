@@ -10,7 +10,6 @@ import {
   MutationVerifyCompanyByAdminArgs,
 } from "generated/graphql/types";
 import { NotificationError } from "common/components/Error";
-import { isSiret } from "generated/constants/companySearchHelpers";
 
 type VerifyModalProps = {
   isOpen: boolean;
@@ -54,23 +53,14 @@ export default function CompanyVerifyModal({
   });
 
   function onSubmit(values: Values) {
-    if (isSiret(company.siret!)) {
-      return verifyCompanyByAdmin({
-        variables: {
-          input: {
-            siret: company.siret!,
-            verificationComment: values.verificationComment,
-          },
+    return verifyCompanyByAdmin({
+      variables: {
+        input: {
+          siret: company.orgId!,
+          verificationComment: values.verificationComment,
         },
-      });
-    } else {
-      cogoToast.error(
-        "La vérification n'a pas pu être envoyée, l'établissement ne possède pas de SIRET valide",
-        {
-          hideAfter: 5,
-        }
-      );
-    }
+      },
+    });
   }
 
   return (
@@ -82,7 +72,7 @@ export default function CompanyVerifyModal({
       ariaLabel="Vérifier l'établissment"
     >
       <div className={styles.VerifyModal}>
-        <h2 className="td-modal-title">Vérifier l'établissment</h2>
+        <h2 className="td-modal-title">Vérifier l'établissement</h2>
         <Formik<Values>
           initialValues={{ verificationComment: "" }}
           onSubmit={onSubmit}
