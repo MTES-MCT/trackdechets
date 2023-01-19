@@ -55,7 +55,7 @@ export const weightConditions: WeightConditions = {
       [
         WasteAcceptationStatus.ACCEPTED,
         WasteAcceptationStatus.PARTIALLY_REFUSED
-      ]
+      ].includes(status)
     ) {
       return weight.positive(
         "${path} : le poids doit être supérieur à 0 lorsque le déchet est accepté ou accepté partiellement"
