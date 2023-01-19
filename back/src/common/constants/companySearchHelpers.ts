@@ -102,7 +102,8 @@ export const luhnCheck = (num: string | number, modulo = 10): boolean => {
  * @returns
  */
 export const isSiret = (clue: string, allowTestCompany?: boolean): boolean => {
-  const allowTest = allowTestCompany !== undefined ? allowTestCompany : ALLOW_TEST_COMPANY;
+  const allowTest =
+    allowTestCompany !== undefined ? allowTestCompany : ALLOW_TEST_COMPANY;
   if (!clue || !/^[0-9]{14}$/.test(clue) || /^0{14}$/.test(clue)) {
     return false;
   }
