@@ -65,6 +65,7 @@ describe("Dasri permission helpers", () => {
       expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
     }
   });
+
   it("should grant synthesis dasri reading access to user whose siret is emitter on the associated form", async () => {
     const { user, company: initialCompany } = await userWithCompanyFactory(
       "MEMBER"

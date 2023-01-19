@@ -1,5 +1,5 @@
 import { User, Bsdasri, BsdasriStatus, BsdasriType } from "@prisma/client";
-import prisma from "../prisma";
+
 import { getCachedUserSiretOrVat } from "../common/redis/users";
 
 import { BsdasriSirets } from "./types";
@@ -19,6 +19,7 @@ export async function isDasriContributorHelper(
   dasri: BsdasriSirets
 ) {
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
+
   const formSiretsOrVat = [
     dasri.emitterCompanySiret,
     dasri.transporterCompanySiret,
@@ -31,16 +32,14 @@ export async function isDasriContributorHelper(
 }
 
 // Don't call directly in resolver to handle permissions
-export async function isDasriInitialEmitterHelper(user: User, dasriId: string) {
+export async function isDasriInitialEmitterHelper(
+  user: User,
+  bsdasri: Bsdasri
+) {
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  const bsdasris = await prisma.bsdasri.findMany({
-    where: { synthesizedIn: { id: dasriId } },
-    select: { emitterCompanySiret: true }
-  });
-  const synthesizedEmitterSirets = bsdasris.map(bsd => bsd.emitterCompanySiret);
 
   return userCompaniesSiretOrVat.some(siret =>
-    synthesizedEmitterSirets.includes(siret)
+    bsdasri.synthesisEmitterSirets.includes(siret)
   );
 }
 
@@ -82,15 +81,13 @@ export async function checkIsBsdasriPublishable(
  */
 export async function checkCanReadBsdasri(user: User, bsdasri: Bsdasri) {
   const isContributor = await isDasriContributorHelper(user, bsdasri);
+
   if (isContributor) {
     return true;
   }
 
   if (bsdasri.type === BsdasriType.SYNTHESIS) {
-    const isInitialEmitter = await isDasriInitialEmitterHelper(
-      user,
-      bsdasri.id
-    );
+    const isInitialEmitter = await isDasriInitialEmitterHelper(user, bsdasri);
     if (isInitialEmitter) {
       return true;
     }

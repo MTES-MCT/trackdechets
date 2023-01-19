@@ -32,7 +32,7 @@ describe("Mutation.signBsdasri emission with secret code", () => {
     const { user: transporter, company: transporterCompany } =
       await userWithCompanyFactory("MEMBER");
 
-    let dasri = await bsdasriFactory({
+    const dasri = await bsdasriFactory({
       opt: {
         ...initialData(emitterCompany),
         status: BsdasriStatus.INITIAL,
@@ -64,10 +64,10 @@ describe("Mutation.signBsdasri emission with secret code", () => {
         })
       })
     ]);
-    dasri = await prisma.bsdasri.findUnique({
+    const updatedDasri = await prisma.bsdasri.findUnique({
       where: { id: dasri.id }
     });
-    expect(dasri.status).toEqual("INITIAL");
+    expect(updatedDasri.status).toEqual("INITIAL");
   });
 
   it("should put emission signature on a dasri when correct code is provided", async () => {

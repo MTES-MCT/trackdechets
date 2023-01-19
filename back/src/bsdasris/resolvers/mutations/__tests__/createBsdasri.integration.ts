@@ -10,6 +10,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { gql } from "apollo-server-express";
+import prisma from "../../../../prisma";
 
 const CREATE_DASRI = gql`
   ${fullGroupingBsdasriFragment}
@@ -163,6 +164,10 @@ describe("Mutation.createDasri", () => {
     expect(data.createBsdasri.type).toEqual("SIMPLE");
 
     expect(data.createBsdasri.emitter.company.siret).toEqual(company.siret);
+    const created = await prisma.bsdasri.findUnique({
+      where: { id: data.createBsdasri.id }
+    });
+    expect(created.synthesisEmitterSirets).toEqual([]);
   });
 
   it("create a dasri with a default transport mode", async () => {

@@ -331,7 +331,7 @@ describe("Mutation.updateBsdasri", () => {
   });
   it("should allow transporter and destination fields update after emission signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    let dasri = await bsdasriFactory({
+    const dasri = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.SIGNED_BY_PRODUCER,
         emitterCompanySiret: company.siret,
@@ -362,13 +362,15 @@ describe("Mutation.updateBsdasri", () => {
       variables: { id: dasri.id, input }
     });
 
-    dasri = await prisma.bsdasri.findUnique({
+    const updatedDasri = await prisma.bsdasri.findUnique({
       where: { id: dasri.id }
     });
 
-    expect(dasri.destinationCompanyMail).toEqual("recipient@test.test");
-    expect(dasri.transporterCompanyMail).toEqual("transporter@test.test");
-    expect(dasri.type).toBe("SIMPLE");
+    expect(updatedDasri.destinationCompanyMail).toEqual("recipient@test.test");
+    expect(updatedDasri.transporterCompanyMail).toEqual(
+      "transporter@test.test"
+    );
+    expect(updatedDasri.type).toBe("SIMPLE");
   });
 
   it("should disallow emitter and transporter fields update after transport signature", async () => {
@@ -565,7 +567,7 @@ describe("Mutation.updateBsdasri", () => {
 
   it("should allow operation fields update after reception signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    let dasri = await bsdasriFactory({
+    const dasri = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.RECEIVED,
         emitterCompanySiret: company.siret,
@@ -586,9 +588,9 @@ describe("Mutation.updateBsdasri", () => {
       variables: { id: dasri.id, input }
     });
 
-    dasri = await prisma.bsdasri.findUnique({
+    const updatedDasri = await prisma.bsdasri.findUnique({
       where: { id: dasri.id }
     });
-    expect(dasri.destinationOperationCode).toEqual("D10");
+    expect(updatedDasri.destinationOperationCode).toEqual("D10");
   });
 });

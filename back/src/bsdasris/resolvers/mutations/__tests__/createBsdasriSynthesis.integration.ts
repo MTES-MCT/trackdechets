@@ -133,6 +133,11 @@ describe("Mutation.createDasri", () => {
     expect(created.emitterWasteVolume).toEqual(totalVolume);
     expect(created.transporterWastePackagings).toEqual(packaging);
     expect(created.transporterWasteVolume).toEqual(totalVolume);
+    // synthesized emitter sirets are denormalized in `synthesisEmitterSirets`
+    expect(created.synthesisEmitterSirets).toEqual([
+      toAssociate1.emitterCompanySiret,
+      toAssociate2.emitterCompanySiret
+    ]);
   });
 
   it("should forbid to mix grouping and synthesis arguments", async () => {

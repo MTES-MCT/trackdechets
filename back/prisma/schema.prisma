@@ -405,6 +405,7 @@ model Form {
 
   // partial index _FormIsDeletedIdx see migration82_missing_indices.sql
   // partial index _FormRecipientIsTempStorageIdx see 99_add_form_indices.sql
+  // gin indices see 104_denormalize_indexes.sql
 
   @@index([emitterCompanySiret], map: "_FormEmitterCompanySiretIdx")
   @@index([recipientCompanySiret], map: "_FormRecipientCompanySiretIdx")
@@ -994,7 +995,11 @@ model Bsdasri {
   synthesizedIn                               Bsdasri?                @relation("BsdasriSynthesizing", fields: [synthesizedInId], references: [id])
   synthesizedInId                             String?
 
+  // Denormalized fields, storing associated dasri sirets to speed up some queries
+  synthesisEmitterSirets String[] @default([])
+
   // partial indices _BsdasriTypeIdx, _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
+  // gin index see 119_dasri_denormalized_sirets.sql
 
   @@index([emitterCompanySiret], map: "_BsdasriEmitterCompanySiretIdx")
   @@index([transporterCompanySiret], map: "_BsdasriTransporterCompanySiretIdx")
