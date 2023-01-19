@@ -31,7 +31,17 @@ export async function searchCompany(
 ): Promise<CompanySearchResult> {
   // remove non alphanumeric
   const cleanClue = clue.replace(/[\W_]+/g, "").toUpperCase();
-  if (!cleanClue || (!isSiret(cleanClue) && !isVat(cleanClue))) {
+  const allowTestCompany = process.env.ALLOW_TEST_COMPANY === "true";
+  const isTestCompany =
+    allowTestCompany && cleanClue.startsWith(TEST_COMPANY_PREFIX);
+
+  // fail fast for bad input
+  if (
+    !cleanClue ||
+    (!isSiret(cleanClue, allowTestCompany) &&
+      !isVat(cleanClue) &&
+      !isTestCompany)
+  ) {
     throw new UserInputError(SIRET_OR_VAT_ERROR, {
       invalidArgs: ["siret", "clue"]
     });
@@ -43,6 +53,7 @@ export async function searchCompany(
       orgId: cleanClue
     }
   });
+  // Anonymous Company search
   if (anonymousCompany) {
     companyInfo = {
       ...anonymousCompany,
@@ -57,7 +68,7 @@ export async function searchCompany(
     process.env.ALLOW_TEST_COMPANY === "true" &&
     cleanClue.startsWith(TEST_COMPANY_PREFIX)
   ) {
-    // 404
+    // 404 if we are in a test environment with a test siret starting with 00000
     throw new UserInputError("Aucun établissement trouvé avec ce SIRET", {
       invalidArgs: ["siret", "clue"]
     });
@@ -67,6 +78,11 @@ export async function searchCompany(
       companyInfo = await searchSireneOrNotFound(cleanClue);
     } else if (isVat(cleanClue)) {
       companyInfo = await searchVatFrOnlyOrNotFound(cleanClue);
+    } else {
+      // cleanClue is neither a valid SIRET nor a VAT
+      throw new UserInputError(SIRET_OR_VAT_ERROR, {
+        invalidArgs: ["siret", "clue"]
+      });
     }
   }
   // Concaténer données Company
