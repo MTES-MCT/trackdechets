@@ -509,7 +509,7 @@ describe("sealedFormSchema", () => {
       } catch (err) {
         // Then
         expect(err.errors).toEqual([
-          "Destination ultérieure : Cette opération d’élimination / valorisation n'existe pas."
+          "Destination : Cette opération d’élimination / valorisation n'existe pas."
         ]);
       }
     });
@@ -1020,7 +1020,7 @@ describe("processedInfoSchema", () => {
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("nextDestinationCompany SIRET is required when no other identication is given", async () => {
+  test("nextDestinationCompany SIRET is required when no other identification is given", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1063,7 +1063,7 @@ describe("processedInfoSchema", () => {
     );
   });
 
-  test("nextDestinationCompany return an error when VAT is given and country is FR", async () => {
+  test("nextDestinationCompany return an error when a foreign VAT is given and country is FR", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
