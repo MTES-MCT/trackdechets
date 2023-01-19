@@ -4,8 +4,13 @@
   border: 1px solid #dddddd;
   display: flex;
   flex-direction: column;
-  height: 110px;
   justify-content: center;
+  padding: 8px;
+
+  @include desktop {
+    height: 110px;
+    padding: 0;
+  }
 
   &__header {
     display: flex;
