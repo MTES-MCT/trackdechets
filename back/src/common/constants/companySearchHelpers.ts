@@ -101,19 +101,21 @@ export const luhnCheck = (num: string | number, modulo = 10): boolean => {
  * @param allowTestCompany For the frontend to pass ALLOW_TEST_COMPANY
  * @returns
  */
-export const isSiret = (clue: string, allowTestCompany = false): boolean => {
+export const isSiret = (clue: string, allowTestCompany?: boolean): boolean => {
+  const allowTest = allowTestCompany !== undefined ? allowTestCompany : ALLOW_TEST_COMPANY;
   if (!clue || !/^[0-9]{14}$/.test(clue) || /^0{14}$/.test(clue)) {
     return false;
   }
-  if (
-    (allowTestCompany || ALLOW_TEST_COMPANY) &&
-    clue.startsWith(TEST_COMPANY_PREFIX)
-  ) {
+  if (allowTest && clue.startsWith(TEST_COMPANY_PREFIX)) {
     return true;
   }
   // La Poste groupe specific rule (except for headquarters 35600000000048 that pass luhnChack)
   if (clue.startsWith("356000000") && clue !== "35600000000048") {
     return clue.split("").reduce((a, b) => a + parseInt(b, 10), 0) % 5 === 0;
+  }
+  // "Trackdechets secours" company by-pass
+  if (clue === "11111111192062") {
+    return true;
   }
   return luhnCheck(clue);
 };

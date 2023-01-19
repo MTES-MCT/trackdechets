@@ -53,16 +53,21 @@ describe("searchCompany", () => {
     }
   });
 
-  it(`should not allow test company when env var ALLOW_TEST_COMPANY is not setup`, async () => {
+  it(`should not allow test company when env var ALLOW_TEST_COMPANY is not true`, async () => {
+    const OLD_ENV = process.env;
+    process.env.ALLOW_TEST_COMPANY = "false";
+    // re-load variables with custom env
+    jest.resetModules();
     expect.assertions(1);
     try {
-      await searchCompany("000000123546598");
+      await searchCompany("00000012354659");
     } catch (e) {
       expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
     }
+    process.env = OLD_ENV;
   });
 
-  it(`should allow test company when env var ALLOW_TEST_COMPANY is setup`, async () => {
+  it(`should allow searching test company when env var ALLOW_TEST_COMPANY is setup`, async () => {
     const OLD_ENV = process.env;
     process.env.ALLOW_TEST_COMPANY = "true";
     // re-load variables with custom env
@@ -78,6 +83,19 @@ describe("searchCompany", () => {
     expect(siret).toEqual(testCompany.siret);
     expect("FR").toEqual(testCompany.codePaysEtrangerEtablissement);
     process.env = OLD_ENV;
+  });
+
+  it(`should allow searching Trackdechets secours company`, async () => {
+    createInput.siret = "11111111192062";
+    const { siret } = await prisma.anonymousCompany.create({
+      data: {
+        orgId: createInput.siret,
+        ...createInput
+      }
+    });
+    const testCompany = await searchCompany(siret);
+    expect(siret).toEqual(testCompany.siret);
+    expect("FR").toEqual(testCompany.codePaysEtrangerEtablissement);
   });
 });
 
