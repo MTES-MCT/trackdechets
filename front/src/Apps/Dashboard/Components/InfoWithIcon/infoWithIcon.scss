@@ -33,4 +33,14 @@
       margin-right: 5px;
     }
   }
+  &__Transporter {
+    &:before {
+      display: inline-block;
+      content: "";
+      background-image: url("/icons/dashboard/ltransporter.svg");
+      font-size: 0.875rem;
+      font-weight: 700;
+      margin-right: 5px;
+    }
+  }
 }

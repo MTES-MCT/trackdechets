@@ -6,7 +6,7 @@ import { BsdStatusCode } from "../../../../common/types/bsdTypes";
 import { BsdType } from "../../../../generated/graphql/types";
 
 export default {
-  title: "COMPONENTS/DASHBOARD/Badge",
+  title: "COMPONENTS/DASHBOARD/BsdCard/Blocks/Badge",
   component: Badge,
   decorators: [withDesign],
   argTypes: {
