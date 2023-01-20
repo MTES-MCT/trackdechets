@@ -1,4 +1,4 @@
-import { Bsdasri } from "@prisma/client";
+import { Bsdasri, Company } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory } from "../../__tests__/factories";
 import { validateBsdasri } from "../validation";
@@ -9,10 +9,16 @@ describe("Mutation.signBsdasri emission", () => {
   afterAll(resetDatabase);
 
   let bsdasri: Partial<Bsdasri>;
+  let foreignTransporter: Company;
 
   beforeAll(async () => {
     const emitter = await companyFactory();
     const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
+    foreignTransporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"],
+      orgId: "IT13029381004",
+      vatNumber: "IT13029381004"
+    });
     bsdasri = {
       ...initialData(emitter),
       ...readyToTakeOverData({
@@ -54,7 +60,7 @@ describe("Mutation.signBsdasri emission", () => {
     test("when there is foreign vat number and transporter siret is null", async () => {
       const data = {
         ...bsdasri,
-        transporterCompanyVatNumber: "BE0541696005",
+        transporterCompanyVatNumber: foreignTransporter.vatNumber,
         transporterCompanySiret: null
       };
       const validated = await validateBsdasri(data, {
@@ -66,7 +72,8 @@ describe("Mutation.signBsdasri emission", () => {
     test("there is a foreign transporter and recepisse fields are null", async () => {
       const data = {
         ...bsdasri,
-        transporterCompanyVatNumber: "BE0541696005",
+        transporterCompanyVatNumber: foreignTransporter.vatNumber,
+        transporterCompanySiret: null,
         transporterRecepisseNumber: null,
         transporterRecepisseDepartment: null,
         transporterRecepisseValidityLimit: null
@@ -155,7 +162,8 @@ describe("Mutation.signBsdasri emission", () => {
         });
       } catch (err) {
         expect(err.errors).toEqual([
-          "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
+          "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement",
+          "Transporteur : le transporteur avec le n°de TVA FR35552049447 n'est pas inscrit sur Trackdéchets"
         ]);
       }
     });
@@ -179,6 +187,26 @@ describe("Mutation.signBsdasri emission", () => {
       }
     });
 
+    test("when foreign transporter is not registered in Trackdéchets", async () => {
+      const data = {
+        ...bsdasri,
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: "ESA15022510"
+      };
+
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          "Transporteur : le transporteur avec le n°de TVA ESA15022510 n'est pas inscrit sur Trackdéchets"
+        ]);
+      }
+    });
+
     test("when transporter is registered with the wrong profile Trackdéchets", async () => {
       const company = await companyFactory({ companyTypes: ["PRODUCER"] });
       const data = {
@@ -195,6 +223,33 @@ describe("Mutation.signBsdasri emission", () => {
       } catch (err) {
         expect(err.errors).toEqual([
           `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
+            " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
+            " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+        ]);
+      }
+    });
+
+    test("when foreign transporter is registered with the wrong profile Trackdéchets", async () => {
+      const company = await companyFactory({
+        companyTypes: ["PRODUCER"],
+        orgId: "ESA15022510",
+        vatNumber: "ESA15022510"
+      });
+      const data = {
+        ...bsdasri,
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: company.vatNumber
+      };
+
+      expect.assertions(1);
+
+      try {
+        await validateBsdasri(data, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
             " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
             " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
         ]);

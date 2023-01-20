@@ -23,6 +23,7 @@ import {
   siret,
   siretConditions,
   siretTests,
+  vatNumberTests,
   weight,
   WeightUnits
 } from "../common/validation";
@@ -277,7 +278,9 @@ const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
           `Transporteur: ${MISSING_COMPANY_SIRET}`
         )
         .when("transporterCompanyVatNumber", siretConditions.companyVatNumber),
-      transporterCompanyVatNumber: foreignVatNumber.label("Transporteur"),
+      transporterCompanyVatNumber: foreignVatNumber
+        .label("Transporteur")
+        .test(vatNumberTests.isRegisteredTransporter),
       transporterCompanyAddress: yup
         .string()
         .requiredIf(

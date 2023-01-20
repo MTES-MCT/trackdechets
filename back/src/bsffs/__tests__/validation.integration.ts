@@ -81,10 +81,15 @@ describe("transporterSchema", () => {
   });
 
   test("valid data with foreign vat number", async () => {
+    const foreignTransporter = await companyFactory({
+      orgId: "IT13029381004",
+      vatNumber: "IT13029381004"
+    });
     expect(
       await transporterSchema.isValid({
         ...transporterData,
-        transporterCompanyVatNumber: "IT13029381004"
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: foreignTransporter.vatNumber
       })
     ).toEqual(true);
   });
@@ -126,6 +131,19 @@ describe("transporterSchema", () => {
     );
   });
 
+  test("foreign transporter not registered in Trackdéchets", async () => {
+    const validateFn = () =>
+      transporterSchema.validate({
+        ...transporterData,
+        teansporterCompanySiret: null,
+        transporterCompanyVatNumber: "ESA15022510"
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      "Transporteur : le transporteur avec le n°de TVA ESA15022510 n'est pas inscrit sur Trackdéchets"
+    );
+  });
+
   test("company registered in Trackdéchets but with wrong profile", async () => {
     const company = await companyFactory({ companyTypes: ["PRODUCER"] });
     const validateFn = () =>
@@ -136,6 +154,26 @@ describe("transporterSchema", () => {
 
     await expect(validateFn()).rejects.toThrow(
       `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
+        " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
+        " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+    );
+  });
+
+  test("foreign transporter registered in Trackdéchets but with wrong profile", async () => {
+    const company = await companyFactory({
+      companyTypes: ["PRODUCER"],
+      orgId: "ESA15022510",
+      vatNumber: "ESA15022510"
+    });
+    const validateFn = () =>
+      transporterSchema.validate({
+        ...transporterData,
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: company.vatNumber
+      });
+
+    await expect(validateFn()).rejects.toThrow(
+      `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
         " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
         " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
     );

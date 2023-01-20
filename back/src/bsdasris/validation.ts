@@ -23,6 +23,7 @@ import {
   siret,
   siretConditions,
   siretTests,
+  vatNumberTests,
   weight,
   weightConditions,
   WeightUnits
@@ -310,7 +311,9 @@ export const transporterSchema: FactorySchemaOf<
       )
       .when("transporterCompanyVatNumber", siretConditions.companyVatNumber)
       .test(siretTests.isRegistered("TRANSPORTER")),
-    transporterCompanyVatNumber: foreignVatNumber.label("Transporteur"),
+    transporterCompanyVatNumber: foreignVatNumber
+      .label("Transporteur")
+      .test(vatNumberTests.isRegisteredTransporter),
     transporterCompanyAddress: yup
       .string()
       .ensure()

@@ -1,4 +1,4 @@
-import { Bsvhu } from "@prisma/client";
+import { Bsvhu, Company } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory } from "../../__tests__/factories";
 import { validateBsvhu } from "../validation";
@@ -9,6 +9,7 @@ describe("BSVHU validation", () => {
   afterAll(resetDatabase);
 
   let bsvhu: Bsvhu;
+  let foreignTransporter: Company;
 
   beforeAll(async () => {
     const emitterCompany = await companyFactory({ companyTypes: ["PRODUCER"] });
@@ -17,6 +18,11 @@ describe("BSVHU validation", () => {
     });
     const destinationCompany = await companyFactory({
       companyTypes: ["WASTEPROCESSOR"]
+    });
+    foreignTransporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"],
+      orgId: "IT13029381004",
+      vatNumber: "IT13029381004"
     });
 
     bsvhu = await bsvhuFactory({
@@ -32,7 +38,7 @@ describe("BSVHU validation", () => {
     test("when there is a foreign transporter vatNumber and transporter siret is null", async () => {
       const data = {
         ...bsvhu,
-        transporterCompanyVatNumber: "BE0541696005",
+        transporterCompanyVatNumber: foreignTransporter.vatNumber,
         transporterCompanySiret: null
       };
       const validated = await validateBsvhu(data, {
@@ -44,7 +50,8 @@ describe("BSVHU validation", () => {
     test("when there is a foreign transporter and recepisse fields are null", async () => {
       const data = {
         ...bsvhu,
-        transporterCompanyVatNumber: "BE0541696005",
+        transporterCompanyVatNumber: foreignTransporter.vatNumber,
+        transporterCompanySiret: null,
         transporterRecepisseDepartment: null,
         transporterRecepisseNumber: null
       };
@@ -111,6 +118,25 @@ describe("BSVHU validation", () => {
       }
     });
 
+    test("when foreign transporter is not registered in Trackdéchets", async () => {
+      const data = {
+        ...bsvhu,
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: "ESA15022510"
+      };
+      expect.assertions(1);
+
+      try {
+        await validateBsvhu(data, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          "Transporteur : le transporteur avec le n°de TVA ESA15022510 n'est pas inscrit sur Trackdéchets"
+        ]);
+      }
+    });
+
     test("when transporter is registered with wrong profile", async () => {
       const company = await companyFactory({ companyTypes: ["PRODUCER"] });
       const data = {
@@ -133,6 +159,33 @@ describe("BSVHU validation", () => {
       }
     });
 
+    test("when foreign transporter is registered with wrong profile", async () => {
+      const company = await companyFactory({
+        companyTypes: ["PRODUCER"],
+        orgId: "ESA15022510",
+        vatNumber: "ESA15022510"
+      });
+      const data = {
+        ...bsvhu,
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: company.vatNumber
+      };
+      expect.assertions(1);
+
+      try {
+        await validateBsvhu(data, {
+          transportSignature: true
+        });
+      } catch (err) {
+        expect(err.errors).toEqual([
+          `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets` +
+            " en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau." +
+            " Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de" +
+            " l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+        ]);
+      }
+    });
+
     test("when transporter vatNumber is FR", async () => {
       const data = {
         ...bsvhu,
@@ -146,7 +199,8 @@ describe("BSVHU validation", () => {
         });
       } catch (err) {
         expect(err.errors).toEqual([
-          "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
+          "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement",
+          "Transporteur : le transporteur avec le n°de TVA FR35552049447 n'est pas inscrit sur Trackdéchets"
         ]);
       }
     });
