@@ -409,6 +409,10 @@ function BsffPackagingAcceptation({
         {"  "}
         <input type="checkbox" checked={isRefused} /> Non
       </div>
+      <div>
+        Description du déchet : {packaging?.acceptation?.wasteCode}{" "}
+        {packaging?.acceptation?.wasteDescription}
+      </div>
       {isRefused ? (
         <div> Date de refus : {formatDate(packaging?.acceptation?.date)}</div>
       ) : (
