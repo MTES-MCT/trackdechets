@@ -113,372 +113,344 @@ export function BsddRequestRevision({ bsdd }: Props) {
 
           return (
             <Form>
-              {JSON.stringify(values)}
               <div className={styles.fields}>
                 <Switch
                   title="Annuler le bordereau"
                   defaultValue={initialReview.isCanceled}
                   onChange={value => setFieldValue("content.isCanceled", value)}
                 >
-                  Un bordereau annulé n'est pas supprimé mais il n'apparaît plus
-                  dans les différents dossiers.
+                  Si votre demande d'annulation est approuvée, ce bordereau
+                  passera dans l'onglet Archives pour tous les acteurs du
+                  bordereau.
                 </Switch>
 
-                <hr />
+                <div
+                  className={areModificationsDisabled ? "collapse" : "expand"}
+                >
+                  <hr />
 
-                {isTempStorage ? (
-                  <>
-                    <ReviewableField
-                      disabled={areModificationsDisabled}
-                      title="CAP destination finale"
-                      value={bsdd.temporaryStorageDetail?.destination?.cap}
-                      name="content.temporaryStorageDetail.destination.cap"
-                      defaultValue={
-                        initialReview.temporaryStorageDetail?.destination?.cap
-                      }
-                    >
-                      <Field
-                        disabled={areModificationsDisabled}
+                  {isTempStorage ? (
+                    <>
+                      <ReviewableField
+                        title="CAP destination finale"
+                        value={bsdd.temporaryStorageDetail?.destination?.cap}
                         name="content.temporaryStorageDetail.destination.cap"
-                        className="td-input td-input--medium"
-                      />
-                    </ReviewableField>
+                        defaultValue={
+                          initialReview.temporaryStorageDetail?.destination?.cap
+                        }
+                      >
+                        <Field
+                          name="content.temporaryStorageDetail.destination.cap"
+                          className="td-input td-input--medium"
+                        />
+                      </ReviewableField>
+                      <ReviewableField
+                        title="CAP entreposage provisoire ou reconditionnement"
+                        value={bsdd.recipient?.cap}
+                        name="content.recipient.cap"
+                        defaultValue={initialReview.recipient.cap}
+                      >
+                        <Field
+                          name="content.recipient.cap"
+                          className="td-input td-input--medium"
+                        />
+                      </ReviewableField>
+                    </>
+                  ) : (
                     <ReviewableField
-                      disabled={areModificationsDisabled}
-                      title="CAP entreposage provisoire ou reconditionnement"
+                      title="CAP"
                       value={bsdd.recipient?.cap}
                       name="content.recipient.cap"
                       defaultValue={initialReview.recipient.cap}
                     >
                       <Field
-                        disabled={areModificationsDisabled}
                         name="content.recipient.cap"
                         className="td-input td-input--medium"
                       />
                     </ReviewableField>
-                  </>
-                ) : (
+                  )}
+
                   <ReviewableField
-                    disabled={areModificationsDisabled}
-                    title="CAP"
-                    value={bsdd.recipient?.cap}
-                    name="content.recipient.cap"
-                    defaultValue={initialReview.recipient.cap}
+                    title="Code déchet"
+                    value={bsdd.wasteDetails?.code}
+                    name="content.wasteDetails.code"
+                    defaultValue={initialReview.wasteDetails.code}
                   >
                     <Field
-                      disabled={areModificationsDisabled}
-                      name="content.recipient.cap"
-                      className="td-input td-input--medium"
+                      name="content.wasteDetails.code"
+                      component={WasteCodeSelect}
+                      validate={wasteCodeValidator}
                     />
                   </ReviewableField>
-                )}
 
-                <ReviewableField
-                  disabled={areModificationsDisabled}
-                  title="Code déchet"
-                  value={bsdd.wasteDetails?.code}
-                  name="content.wasteDetails.code"
-                  defaultValue={initialReview.wasteDetails.code}
-                >
-                  <Field
-                    disabled={areModificationsDisabled}
-                    name="content.wasteDetails.code"
-                    component={WasteCodeSelect}
-                    validate={wasteCodeValidator}
-                  />
-                </ReviewableField>
-
-                <ReviewableField
-                  disabled={areModificationsDisabled}
-                  title="Description du déchet"
-                  value={bsdd.wasteDetails?.name}
-                  name="content.wasteDetails.name"
-                  defaultValue={initialReview.wasteDetails.name}
-                >
-                  <Field
-                    disabled={areModificationsDisabled}
-                    name="content.wasteDetails.name"
-                    className="td-input"
-                  />
-                </ReviewableField>
-
-                <ReviewableField
-                  disabled={areModificationsDisabled}
-                  title="Présence de polluants organiques persistants"
-                  value={Boolean(bsdd.wasteDetails?.pop) ? "Oui" : "Non"}
-                  name="content.wasteDetails.pop"
-                  defaultValue={initialReview.wasteDetails.pop}
-                >
-                  <Field
-                    disabled={areModificationsDisabled}
-                    type="checkbox"
-                    component={FieldSwitch}
-                    name="content.wasteDetails.pop"
-                    label=""
-                  />{" "}
-                  {Boolean(values.content.wasteDetails.pop) ? "Oui" : "Non"}
-                </ReviewableField>
-
-                <ReviewableField
-                  disabled={areModificationsDisabled}
-                  title="Conditionnement"
-                  value={
-                    bsdd.wasteDetails?.packagingInfos
-                      ? getPackagingInfosSummary(
-                          bsdd.wasteDetails.packagingInfos
-                        )
-                      : ""
-                  }
-                  name="content.wasteDetails.packagingInfos"
-                  defaultValue={initialReview.wasteDetails.packagingInfos}
-                >
-                  <Field
-                    disabled={areModificationsDisabled}
-                    name="content.wasteDetails.packagingInfos"
-                    component={Packagings}
-                  />
-                </ReviewableField>
-
-                <ReviewableField
-                  disabled={areModificationsDisabled}
-                  title="Quantité reçue (tonnes)"
-                  value={bsdd.quantityReceived}
-                  name="content.quantityReceived"
-                  defaultValue={initialReview.quantityReceived}
-                >
-                  <Field
-                    disabled={areModificationsDisabled}
-                    name="content.quantityReceived"
-                    className="td-input td-input--small"
-                    component={NumberInput}
-                  />
-                </ReviewableField>
-
-                {isTempStorage && (
                   <ReviewableField
-                    disabled={areModificationsDisabled}
-                    title="Quantité reçue sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)"
-                    value={
-                      bsdd.temporaryStorageDetail?.temporaryStorer
-                        ?.quantityReceived
-                    }
-                    name="content.temporaryStorageDetail.temporaryStorer.quantityReceived"
-                    defaultValue={
-                      initialReview.temporaryStorageDetail?.temporaryStorer
-                        ?.quantityReceived
-                    }
+                    title="Description du déchet"
+                    value={bsdd.wasteDetails?.name}
+                    name="content.wasteDetails.name"
+                    defaultValue={initialReview.wasteDetails.name}
                   >
                     <Field
-                      disabled={areModificationsDisabled}
-                      name="content.temporaryStorageDetail.temporaryStorer.quantityReceived"
+                      name="content.wasteDetails.name"
+                      className="td-input"
+                    />
+                  </ReviewableField>
+
+                  <ReviewableField
+                    title="Présence de polluants organiques persistants"
+                    value={Boolean(bsdd.wasteDetails?.pop) ? "Oui" : "Non"}
+                    name="content.wasteDetails.pop"
+                    defaultValue={initialReview.wasteDetails.pop}
+                  >
+                    <Field
+                      type="checkbox"
+                      component={FieldSwitch}
+                      name="content.wasteDetails.pop"
+                      label=""
+                    />{" "}
+                    {Boolean(values.content.wasteDetails.pop) ? "Oui" : "Non"}
+                  </ReviewableField>
+
+                  <ReviewableField
+                    title="Conditionnement"
+                    value={
+                      bsdd.wasteDetails?.packagingInfos
+                        ? getPackagingInfosSummary(
+                            bsdd.wasteDetails.packagingInfos
+                          )
+                        : ""
+                    }
+                    name="content.wasteDetails.packagingInfos"
+                    defaultValue={initialReview.wasteDetails.packagingInfos}
+                  >
+                    <Field
+                      name="content.wasteDetails.packagingInfos"
+                      component={Packagings}
+                    />
+                  </ReviewableField>
+
+                  <ReviewableField
+                    title="Quantité reçue (tonnes)"
+                    value={bsdd.quantityReceived}
+                    name="content.quantityReceived"
+                    defaultValue={initialReview.quantityReceived}
+                  >
+                    <Field
+                      name="content.quantityReceived"
                       className="td-input td-input--small"
                       component={NumberInput}
                     />
                   </ReviewableField>
-                )}
 
-                <ReviewableField
-                  disabled={areModificationsDisabled}
-                  title="Code de l'opération D/R"
-                  value={bsdd.processingOperationDone}
-                  name="content.processingOperationDone"
-                  defaultValue={initialReview.processingOperationDone}
-                >
-                  <Field
-                    disabled={areModificationsDisabled}
-                    component={ProcessingOperation}
+                  {isTempStorage && (
+                    <ReviewableField
+                      title="Quantité reçue sur l'installation d'entreposage provisoire ou reconditionnement (tonnes)"
+                      value={
+                        bsdd.temporaryStorageDetail?.temporaryStorer
+                          ?.quantityReceived
+                      }
+                      name="content.temporaryStorageDetail.temporaryStorer.quantityReceived"
+                      defaultValue={
+                        initialReview.temporaryStorageDetail?.temporaryStorer
+                          ?.quantityReceived
+                      }
+                    >
+                      <Field
+                        name="content.temporaryStorageDetail.temporaryStorer.quantityReceived"
+                        className="td-input td-input--small"
+                        component={NumberInput}
+                      />
+                    </ReviewableField>
+                  )}
+
+                  <ReviewableField
+                    title="Code de l'opération D/R"
+                    value={bsdd.processingOperationDone}
                     name="content.processingOperationDone"
-                    enableReuse
-                  />
-                </ReviewableField>
+                    defaultValue={initialReview.processingOperationDone}
+                  >
+                    <Field
+                      component={ProcessingOperation}
+                      name="content.processingOperationDone"
+                      enableReuse
+                    />
+                  </ReviewableField>
 
-                <ReviewableField
-                  disabled={areModificationsDisabled}
-                  title="Description de l'opération D/R"
-                  value={bsdd.processingOperationDescription}
-                  name="content.processingOperationDescription"
-                  defaultValue={initialReview.processingOperationDescription}
-                >
-                  <Field
-                    disabled={areModificationsDisabled}
+                  <ReviewableField
+                    title="Description de l'opération D/R"
+                    value={bsdd.processingOperationDescription}
                     name="content.processingOperationDescription"
-                    className="td-input"
-                  />
-                </ReviewableField>
-
-                <ReviewableField
-                  disabled={areModificationsDisabled}
-                  title="Courtier"
-                  value={
-                    bsdd.broker?.company?.name ? (
-                      <div>{bsdd.broker.company.name}</div>
-                    ) : (
-                      "Aucun"
-                    )
-                  }
-                  name="content.broker"
-                  defaultValue={initialReview.broker}
-                >
-                  <>
-                    <CompanySelector
-                      disabled={areModificationsDisabled}
-                      name="content.broker.company"
-                      onCompanySelected={broker => {
-                        if (broker.brokerReceipt) {
-                          setFieldValue(
-                            "content.broker.receipt",
-                            broker.brokerReceipt.receiptNumber
-                          );
-                          setFieldValue(
-                            "content.broker.validityLimit",
-                            broker.brokerReceipt.validityLimit
-                          );
-                          setFieldValue(
-                            "broker.department",
-                            broker.brokerReceipt.department
-                          );
-                        } else {
-                          setFieldValue("content.broker.receipt", "");
-                          setFieldValue("content.broker.validityLimit", null);
-                          setFieldValue("content.broker.department", "");
-                        }
-                      }}
+                    defaultValue={initialReview.processingOperationDescription}
+                  >
+                    <Field
+                      name="content.processingOperationDescription"
+                      className="td-input"
                     />
-                    <div className="form__row">
-                      <label>
-                        Numéro de récépissé
-                        <Field
-                          disabled={areModificationsDisabled}
-                          type="text"
-                          name="content.broker.receipt"
-                          className="td-input"
-                        />
-                      </label>
+                  </ReviewableField>
 
-                      <RedErrorMessage name="content.broker.receipt" />
-                    </div>
-                    <div className="form__row">
-                      <label>
-                        Département
-                        <Field
-                          disabled={areModificationsDisabled}
-                          type="text"
-                          name="content.broker.department"
-                          placeholder="Ex: 83"
-                          className={classNames(
-                            "td-input",
-                            styles.recipientDepartment
-                          )}
-                        />
-                      </label>
+                  <ReviewableField
+                    title="Courtier"
+                    value={
+                      bsdd.broker?.company?.name ? (
+                        <div>{bsdd.broker.company.name}</div>
+                      ) : (
+                        "Aucun"
+                      )
+                    }
+                    name="content.broker"
+                    defaultValue={initialReview.broker}
+                  >
+                    <>
+                      <CompanySelector
+                        name="content.broker.company"
+                        onCompanySelected={broker => {
+                          if (broker.brokerReceipt) {
+                            setFieldValue(
+                              "content.broker.receipt",
+                              broker.brokerReceipt.receiptNumber
+                            );
+                            setFieldValue(
+                              "content.broker.validityLimit",
+                              broker.brokerReceipt.validityLimit
+                            );
+                            setFieldValue(
+                              "broker.department",
+                              broker.brokerReceipt.department
+                            );
+                          } else {
+                            setFieldValue("content.broker.receipt", "");
+                            setFieldValue("content.broker.validityLimit", null);
+                            setFieldValue("content.broker.department", "");
+                          }
+                        }}
+                      />
+                      <div className="form__row">
+                        <label>
+                          Numéro de récépissé
+                          <Field
+                            type="text"
+                            name="content.broker.receipt"
+                            className="td-input"
+                          />
+                        </label>
 
-                      <RedErrorMessage name="content.broker.department" />
-                    </div>
-                    <div className="form__row">
-                      <label>
-                        Limite de validité
-                        <Field
-                          disabled={areModificationsDisabled}
-                          component={DateInput}
-                          name="content.broker.validityLimit"
-                          className={classNames(
-                            "td-input",
-                            styles.recipientValidityLimit
-                          )}
-                        />
-                      </label>
+                        <RedErrorMessage name="content.broker.receipt" />
+                      </div>
+                      <div className="form__row">
+                        <label>
+                          Département
+                          <Field
+                            type="text"
+                            name="content.broker.department"
+                            placeholder="Ex: 83"
+                            className={classNames(
+                              "td-input",
+                              styles.recipientDepartment
+                            )}
+                          />
+                        </label>
 
-                      <RedErrorMessage name="content.broker.validityLimit" />
-                    </div>
-                  </>
-                </ReviewableField>
+                        <RedErrorMessage name="content.broker.department" />
+                      </div>
+                      <div className="form__row">
+                        <label>
+                          Limite de validité
+                          <Field
+                            component={DateInput}
+                            name="content.broker.validityLimit"
+                            className={classNames(
+                              "td-input",
+                              styles.recipientValidityLimit
+                            )}
+                          />
+                        </label>
 
-                <ReviewableField
-                  disabled={areModificationsDisabled}
-                  title="Négociant"
-                  value={
-                    bsdd.trader?.company?.name ? (
-                      <div>{bsdd.trader.company.name}</div>
-                    ) : (
-                      "Aucun"
-                    )
-                  }
-                  name="content.trader"
-                  defaultValue={initialReview.trader}
-                >
-                  <>
-                    <CompanySelector
-                      disabled={areModificationsDisabled}
-                      name="content.trader.company"
-                      onCompanySelected={trader => {
-                        if (trader.traderReceipt) {
-                          setFieldValue(
-                            "content.trader.receipt",
-                            trader.traderReceipt.receiptNumber
-                          );
-                          setFieldValue(
-                            "content.trader.validityLimit",
-                            trader.traderReceipt.validityLimit
-                          );
-                          setFieldValue(
-                            "trader.department",
-                            trader.traderReceipt.department
-                          );
-                        } else {
-                          setFieldValue("content.trader.receipt", "");
-                          setFieldValue("content.trader.validityLimit", null);
-                          setFieldValue("content.trader.department", "");
-                        }
-                      }}
-                    />
-                    <div className="form__row">
-                      <label>
-                        Numéro de récépissé
-                        <Field
-                          disabled={areModificationsDisabled}
-                          type="text"
-                          name="content.trader.receipt"
-                          className="td-input"
-                        />
-                      </label>
+                        <RedErrorMessage name="content.broker.validityLimit" />
+                      </div>
+                    </>
+                  </ReviewableField>
 
-                      <RedErrorMessage name="content.trader.receipt" />
-                    </div>
-                    <div className="form__row">
-                      <label>
-                        Département
-                        <Field
-                          disabled={areModificationsDisabled}
-                          type="text"
-                          name="content.trader.department"
-                          placeholder="Ex: 83"
-                          className={classNames(
-                            "td-input",
-                            styles.recipientDepartment
-                          )}
-                        />
-                      </label>
+                  <ReviewableField
+                    title="Négociant"
+                    value={
+                      bsdd.trader?.company?.name ? (
+                        <div>{bsdd.trader.company.name}</div>
+                      ) : (
+                        "Aucun"
+                      )
+                    }
+                    name="content.trader"
+                    defaultValue={initialReview.trader}
+                  >
+                    <>
+                      <CompanySelector
+                        name="content.trader.company"
+                        onCompanySelected={trader => {
+                          if (trader.traderReceipt) {
+                            setFieldValue(
+                              "content.trader.receipt",
+                              trader.traderReceipt.receiptNumber
+                            );
+                            setFieldValue(
+                              "content.trader.validityLimit",
+                              trader.traderReceipt.validityLimit
+                            );
+                            setFieldValue(
+                              "trader.department",
+                              trader.traderReceipt.department
+                            );
+                          } else {
+                            setFieldValue("content.trader.receipt", "");
+                            setFieldValue("content.trader.validityLimit", null);
+                            setFieldValue("content.trader.department", "");
+                          }
+                        }}
+                      />
+                      <div className="form__row">
+                        <label>
+                          Numéro de récépissé
+                          <Field
+                            type="text"
+                            name="content.trader.receipt"
+                            className="td-input"
+                          />
+                        </label>
 
-                      <RedErrorMessage name="content.trader.department" />
-                    </div>
-                    <div className="form__row">
-                      <label>
-                        Limite de validité
-                        <Field
-                          disabled={areModificationsDisabled}
-                          component={DateInput}
-                          name="content.trader.validityLimit"
-                          className={classNames(
-                            "td-input",
-                            styles.recipientValidityLimit
-                          )}
-                        />
-                      </label>
+                        <RedErrorMessage name="content.trader.receipt" />
+                      </div>
+                      <div className="form__row">
+                        <label>
+                          Département
+                          <Field
+                            type="text"
+                            name="content.trader.department"
+                            placeholder="Ex: 83"
+                            className={classNames(
+                              "td-input",
+                              styles.recipientDepartment
+                            )}
+                          />
+                        </label>
 
-                      <RedErrorMessage name="content.trader.validityLimit" />
-                    </div>
-                  </>
-                </ReviewableField>
+                        <RedErrorMessage name="content.trader.department" />
+                      </div>
+                      <div className="form__row">
+                        <label>
+                          Limite de validité
+                          <Field
+                            component={DateInput}
+                            name="content.trader.validityLimit"
+                            className={classNames(
+                              "td-input",
+                              styles.recipientValidityLimit
+                            )}
+                          />
+                        </label>
+
+                        <RedErrorMessage name="content.trader.validityLimit" />
+                      </div>
+                    </>
+                  </ReviewableField>
+                </div>
 
                 <div className="form__row">
                   <label>Commentaire à propos de la révision</label>
