@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import TdSwitch from "common/components/Switch";
-import { useField } from "formik";
 
 type Props = {
   title: string;
