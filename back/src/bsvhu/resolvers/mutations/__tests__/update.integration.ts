@@ -2,6 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { bsvhuFactory } from "../../../__tests__/factories.vhu";
 import {
+  companyFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -184,6 +185,11 @@ describe("Mutation.Vhu.update", () => {
 
   it("should allow transporter fields update after emitter signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const foreignTransporter = await companyFactory({
+      companyTypes: ["TRANSPORTER"],
+      orgId: "NL004983269B01",
+      vatNumber: "NL004983269B01"
+    });
     const form = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret,
@@ -195,7 +201,7 @@ describe("Mutation.Vhu.update", () => {
     const { mutate } = makeClient(user);
     const input = {
       transporter: {
-        company: { vatNumber: "NL004983269B01" }
+        company: { vatNumber: foreignTransporter.vatNumber }
       }
     };
     const { data } = await mutate<Pick<Mutation, "updateBsvhu">>(
@@ -206,7 +212,7 @@ describe("Mutation.Vhu.update", () => {
     );
 
     expect(data.updateBsvhu.transporter.company.vatNumber).toBe(
-      "NL004983269B01"
+      foreignTransporter.vatNumber
     );
   });
 });
