@@ -79,7 +79,6 @@ export default function CompanySelector({
     (field.value.country && field.value.country !== "FR") ||
       isForeignVat(field.value.vatNumber!!)
   );
-
   const departmentInputRef = useRef<HTMLInputElement>(null);
   // this ref lets us transmit the input to both search input and department input
   const clueInputRef = useRef<HTMLInputElement>(null);
@@ -165,12 +164,7 @@ export default function CompanySelector({
     setMustBeRegistered(
       notVoidCompany && !company.isRegistered && registeredOnlyCompanies
     );
-    // On click display form error in a toast message
-    if (company.name === "---" || company.name === "") {
-      cogoToast.error(
-        "Cet établissement existe mais nous ne pouvons pas remplir automatiquement le formulaire"
-      );
-    }
+
     // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
     setDisplayForeignCompanyWithUnknownInfos(
       isForeignVat(company.vatNumber!!) &&
@@ -390,7 +384,8 @@ export default function CompanySelector({
                   Cet établissement existe mais nous ne pouvons pas remplir
                   automatiquement le formulaire car les informations sont
                   cachées par le service de recherche administratif externe à
-                  Trackdéchets
+                  Trackdéchets.{" "}
+                  <b>Merci de compléter les informations dans le formulaire.</b>
                 </span>
               </>
             }
@@ -457,7 +452,7 @@ export default function CompanySelector({
                   className="td-input"
                   name={`${field.name}.name`}
                   placeholder="Nom"
-                  disabled={true}
+                  disabled={!displayForeignCompanyWithUnknownInfos}
                 />
               </label>
 
@@ -470,7 +465,7 @@ export default function CompanySelector({
                   className="td-input"
                   name={`${field.name}.address`}
                   placeholder="Adresse"
-                  disabled={true}
+                  disabled={!displayForeignCompanyWithUnknownInfos}
                 />
               </label>
 
