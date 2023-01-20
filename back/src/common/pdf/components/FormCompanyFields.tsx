@@ -4,7 +4,8 @@ import { checkVAT } from "jsvat";
 import {
   countries as vatCountries,
   isVat,
-  isSiret
+  isSiret,
+  cleanClue
 } from "../../../common/constants/companySearchHelpers";
 import { FormCompany } from "../../../generated/graphql/types";
 
@@ -107,10 +108,8 @@ export function getcompanyCountry(company: FormCompany): Country | null {
     companyCountry = countries.find(country => country.cca2 === "FR");
   } else if (company && isVat(company.vatNumber)) {
     // trouver automatiquement le pays selon le numéro de TVA
-    const vatCountryCode = checkVAT(
-      company.vatNumber.replace(/[\W_\s]/gim, ""),
-      vatCountries
-    )?.country?.isoCode.short;
+    const vatCountryCode = checkVAT(cleanClue(company.vatNumber), vatCountries)
+      ?.country?.isoCode.short;
 
     companyCountry = countries.find(country => country.cca2 === vatCountryCode);
   }
