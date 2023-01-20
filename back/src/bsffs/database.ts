@@ -1,4 +1,3 @@
-import type { SetRequired } from "type-fest";
 import {
   Bsff,
   BsffFicheIntervention as PrismaBsffFicheIntervention,
@@ -8,7 +7,6 @@ import {
   Prisma
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import prisma from "../prisma";
 import {
   BsffFicheIntervention,
   BsffInput,
@@ -25,7 +23,6 @@ import {
   validateFicheInterventions,
   validatePreviousPackagings
 } from "./validation";
-import { indexBsff } from "./elastic";
 import { GraphQLContext } from "../types";
 import { toBsffPackagingWithType } from "./compat";
 import {
@@ -35,13 +32,17 @@ import {
   isBsffDetenteur
 } from "./permissions";
 import { getCachedUserSiretOrVat } from "../common/redis/users";
+import {
+  getBsffRepository,
+  getReadonlyBsffFicheInterventionRepository,
+  getReadonlyBsffPackagingRepository,
+  getReadonlyBsffRepository
+} from "./repository";
 
-export async function getBsffOrNotFound(
-  where: SetRequired<Prisma.BsffWhereInput, "id">
-) {
-  const bsff = await prisma.bsff.findFirst({
-    where: { ...where, isDeleted: false },
-    include: { packagings: true }
+export async function getBsffOrNotFound(where: Prisma.BsffWhereUniqueInput) {
+  const { findUnique } = getReadonlyBsffRepository();
+  const bsff = await findUnique({
+    where
   });
 
   if (bsff == null) {
@@ -52,11 +53,12 @@ export async function getBsffOrNotFound(
 }
 
 export async function getBsffPackagingOrNotFound(
-  where: SetRequired<Prisma.BsffPackagingWhereInput, "id">
+  where: Prisma.BsffPackagingWhereUniqueInput
 ) {
-  const bsffpackaging = await prisma.bsffPackaging.findFirst({
-    where,
-    include: { bsff: true }
+  const { findUnique } = getReadonlyBsffPackagingRepository();
+
+  const bsffpackaging = await findUnique({
+    where
   });
 
   if (bsffpackaging == null) {
@@ -69,9 +71,10 @@ export async function getBsffPackagingOrNotFound(
 }
 
 export async function getFicheInterventionBsffOrNotFound(
-  where: SetRequired<Prisma.BsffFicheInterventionWhereInput, "id">
+  where: Prisma.BsffFicheInterventionWhereUniqueInput
 ): Promise<PrismaBsffFicheIntervention> {
-  const ficheIntervention = await prisma.bsffFicheIntervention.findFirst({
+  const { findUnique } = getReadonlyBsffFicheInterventionRepository();
+  const ficheIntervention = await findUnique({
     where
   });
   if (ficheIntervention == null) {
@@ -94,10 +97,11 @@ export async function getFicheInterventions({
   bsff: Bsff;
   context: GraphQLContext;
 }): Promise<BsffFicheIntervention[]> {
-  const ficheInterventions = await prisma.bsff
-    .findUnique({ where: { id: bsff.id } })
-    .ficheInterventions();
+  const { findUniqueGetFicheInterventions } = getReadonlyBsffRepository();
 
+  const ficheInterventions = await findUniqueGetFicheInterventions({
+    where: { id: bsff.id }
+  });
   const isContributor = await isBsffContributor(user, bsff);
   const isDetenteur = await isBsffDetenteur(user, bsff);
 
@@ -141,9 +145,12 @@ export async function createBsff(
     throw new UserInputError("Vous devez préciser le type de BSFF");
   }
 
+  const { findMany: findManyFicheInterventions } =
+    getReadonlyBsffFicheInterventionRepository();
+
   const ficheInterventions =
     input.ficheInterventions?.length > 0
-      ? await prisma.bsffFicheIntervention.findMany({
+      ? await findManyFicheInterventions({
           where: { id: { in: input.ficheInterventions } }
         })
       : [];
@@ -184,11 +191,8 @@ export async function createBsff(
       .filter(Boolean);
   }
 
-  const bsff = await prisma.bsff.create({
-    data
-  });
-
-  await indexBsff(bsff, { user } as GraphQLContext);
+  const bsffRepository = getBsffRepository(user);
+  const bsff = await bsffRepository.create({ data });
 
   return expandBsffFromDB(bsff);
 }
@@ -224,75 +228,4 @@ export function getPackagingCreateInput(
         }
       ]
     : bsff.packagings ?? [];
-}
-
-/**
- * Returns previous packagings in the traceability history of one or several packagings
- * `maxHops` allows to only go back in the history for a specific number of hops
- */
-export async function getPreviousPackagings(
-  packagingIds: string[],
-  maxHops = Infinity
-): Promise<BsffPackaging[]> {
-  async function inner(
-    packagingIds: string[],
-    hops: number
-  ): Promise<BsffPackaging[]> {
-    if (hops >= maxHops) {
-      return [];
-    }
-
-    const packagings = await prisma.bsffPackaging.findMany({
-      where: { id: { in: packagingIds } },
-      include: { previousPackagings: true }
-    });
-
-    const previousPackagings = packagings.flatMap(p => p.previousPackagings);
-
-    if (previousPackagings.length === 0) {
-      return [];
-    }
-
-    return [
-      ...(await inner(
-        previousPackagings.map(p => p.id),
-        hops + 1
-      )),
-      ...previousPackagings
-    ];
-  }
-
-  return inner(packagingIds, 0);
-}
-
-/**
- * Returns next packagings in the traceability history of one packaging
- * `maxHops` allow to move forward in the history for a specific number of hops
- */
-export function getNextPackagings(
-  packagingId: string,
-  maxHops = Infinity
-): Promise<BsffPackaging[]> {
-  async function inner(
-    packagingId: string,
-    hops: number
-  ): Promise<BsffPackaging[]> {
-    if (hops >= maxHops) {
-      return [];
-    }
-
-    const nextPackaging = await prisma.bsffPackaging
-      .findUnique({
-        where: { id: packagingId }
-      })
-      .nextPackaging();
-
-    if (!nextPackaging) {
-      return [];
-    }
-
-    return [nextPackaging, ...(await inner(nextPackaging.id, hops + 1))];
-  }
-
-  return inner(packagingId, 0);
 }

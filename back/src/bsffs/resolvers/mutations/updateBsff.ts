@@ -1,14 +1,9 @@
 import { UserInputError } from "apollo-server-express";
 import omit from "object.omit";
 import { Prisma, BsffType } from "@prisma/client";
-import prisma from "../../../prisma";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import {
-  getBsffOrNotFound,
-  getPackagingCreateInput,
-  getPreviousPackagings
-} from "../../database";
+import { getBsffOrNotFound, getPackagingCreateInput } from "../../database";
 import { flattenBsffInput, expandBsffFromDB } from "../../converter";
 import { checkCanWriteBsff } from "../../permissions";
 import {
@@ -16,8 +11,12 @@ import {
   validateFicheInterventions,
   validatePreviousPackagings
 } from "../../validation";
-import { indexBsff } from "../../elastic";
 import { toBsffPackagingWithType } from "../../compat";
+import {
+  getBsffFicheInterventionRepository,
+  getBsffPackagingRepository,
+  getBsffRepository
+} from "../../repository";
 
 const updateBsff: MutationResolvers["updateBsff"] = async (
   _,
@@ -28,6 +27,11 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   const existingBsff = await getBsffOrNotFound({ id });
   await checkCanWriteBsff(user, existingBsff);
+
+  const { findPreviousPackagings } = getBsffPackagingRepository(user);
+  const { findMany: findManyFicheInterventions } =
+    getBsffFicheInterventionRepository(user);
+  const { update: updateBsff } = getBsffRepository(user);
 
   if (existingBsff.destinationReceptionSignatureDate) {
     throw new UserInputError(
@@ -122,12 +126,12 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     !!input.repackaging ||
     !!input.packagings;
 
-  const existingPreviousPackagings = await getPreviousPackagings(
+  const existingPreviousPackagings = await findPreviousPackagings(
     existingBsff.packagings.map(p => p.id),
     1
   );
 
-  const ficheInterventions = await prisma.bsffFicheIntervention.findMany({
+  const ficheInterventions = await findManyFicheInterventions({
     where:
       input.ficheInterventions?.length > 0
         ? { id: { in: input.ficheInterventions } }
@@ -186,12 +190,8 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       .map(fi => fi.detenteurCompanySiret)
       .filter(Boolean);
   }
-  const updatedBsff = await prisma.bsff.update({
-    data,
-    where: { id }
-  });
 
-  await indexBsff(updatedBsff, context);
+  const updatedBsff = await updateBsff({ where: { id }, data });
 
   return expandBsffFromDB(updatedBsff);
 };

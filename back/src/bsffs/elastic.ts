@@ -1,10 +1,10 @@
 import { Bsff, BsffStatus, BsffPackaging } from "@prisma/client";
-import prisma from "../prisma";
 import { BsdElastic, indexBsd } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { toBsffDestination } from "./compat";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { getReadonlyBsffRepository } from "./repository";
 
 export function toBsdElastic(
   bsff: Bsff & { packagings: BsffPackaging[] }
@@ -125,9 +125,9 @@ export function toBsdElastic(
 }
 
 export async function indexBsff(bsff: Bsff, ctx?: GraphQLContext) {
-  const fullBsff = await prisma.bsff.findUnique({
-    where: { id: bsff.id },
-    include: { packagings: true }
+  const { findUnique } = getReadonlyBsffRepository();
+  const fullBsff = await findUnique({
+    where: { id: bsff.id }
   });
   return indexBsd(toBsdElastic(fullBsff), ctx);
 }

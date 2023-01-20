@@ -1,14 +1,18 @@
-import prisma from "../../prisma";
 import { BsffResolvers } from "../../generated/graphql/types";
-import { getFicheInterventions, getPreviousPackagings } from "../database";
+import { getFicheInterventions } from "../database";
 import { dashboardOperationName } from "../../common/queries";
 import { isSessionUser } from "../../auth";
 import { expandBsffPackagingFromDB } from "../converter";
 import { BsffType } from "@prisma/client";
+import {
+  getReadonlyBsffPackagingRepository,
+  getReadonlyBsffRepository
+} from "../repository";
 
 export const Bsff: BsffResolvers = {
   ficheInterventions: async ({ id }, _, context) => {
-    const prismaBsff = await prisma.bsff.findUnique({
+    const { findUnique } = getReadonlyBsffRepository();
+    const prismaBsff = await findUnique({
       where: { id }
     });
     const ficheInterventions = await getFicheInterventions({
@@ -26,9 +30,13 @@ export const Bsff: BsffResolvers = {
     ) {
       packagings = bsff?.packagings ?? [];
     } else {
-      packagings = await prisma.bsff
-        .findUnique({ where: { id: bsff.id } })
-        .packagings({ orderBy: { numero: "asc" } });
+      const { findUniqueGetPackagings } = getReadonlyBsffRepository();
+      packagings = await findUniqueGetPackagings(
+        {
+          where: { id: bsff.id }
+        },
+        { orderBy: { numero: "asc" } }
+      );
     }
     return packagings.map(packaging => expandBsffPackagingFromDB(packaging));
   },
@@ -36,10 +44,15 @@ export const Bsff: BsffResolvers = {
     if (type !== BsffType.REEXPEDITION) {
       return [];
     }
-    const packagings = await prisma.bsff
-      .findUnique({ where: { id } })
-      .packagings({ select: { id: true } });
-    const forwarding = await getPreviousPackagings(
+    const { findUniqueGetPackagings } = getReadonlyBsffRepository();
+    const { findPreviousPackagings } = getReadonlyBsffPackagingRepository();
+    const packagings = await findUniqueGetPackagings(
+      {
+        where: { id }
+      },
+      { select: { id: true } }
+    );
+    const forwarding = await findPreviousPackagings(
       packagings.map(p => p.id),
       1
     );
@@ -49,10 +62,15 @@ export const Bsff: BsffResolvers = {
     if (type !== BsffType.RECONDITIONNEMENT) {
       return [];
     }
-    const packagings = await prisma.bsff
-      .findUnique({ where: { id } })
-      .packagings({ select: { id: true } });
-    const repackaging = await getPreviousPackagings(
+    const { findUniqueGetPackagings } = getReadonlyBsffRepository();
+    const { findPreviousPackagings } = getReadonlyBsffPackagingRepository();
+    const packagings = await findUniqueGetPackagings(
+      {
+        where: { id }
+      },
+      { select: { id: true } }
+    );
+    const repackaging = await findPreviousPackagings(
       packagings.map(p => p.id),
       1
     );
@@ -62,10 +80,15 @@ export const Bsff: BsffResolvers = {
     if (type !== BsffType.GROUPEMENT) {
       return [];
     }
-    const packagings = await prisma.bsff
-      .findUnique({ where: { id } })
-      .packagings({ select: { id: true } });
-    const grouping = await getPreviousPackagings(
+    const { findUniqueGetPackagings } = getReadonlyBsffRepository();
+    const { findPreviousPackagings } = getReadonlyBsffPackagingRepository();
+    const packagings = await findUniqueGetPackagings(
+      {
+        where: { id }
+      },
+      { select: { id: true } }
+    );
+    const grouping = await findPreviousPackagings(
       packagings.map(p => p.id),
       1
     );
