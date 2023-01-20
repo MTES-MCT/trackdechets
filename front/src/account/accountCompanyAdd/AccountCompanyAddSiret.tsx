@@ -1,5 +1,4 @@
 import { ApolloError, gql, useLazyQuery, useMutation } from "@apollo/client";
-import cogoToast from "cogo-toast";
 import { Field, Form, Formik } from "formik";
 import React, { useState } from "react";
 import { COMPANY_PRIVATE_INFOS } from "form/common/components/company/query";
@@ -22,7 +21,6 @@ import {
   TextInput,
   Alert,
 } from "@dataesr/react-dsfr";
-import { GraphQLError } from "graphql";
 
 type IProps = {
   onCompanyInfos: (companyInfos) => void;
