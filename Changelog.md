@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Les émetteurs & destinataires de déchets peuvent désormais annuler un BSDD via l'API [PR 2014](https://github.com/MTES-MCT/trackdechets/pull/2014)
+- Les émetteurs & destinataires de déchets peuvent désormais annuler un BSDD via l'interface, via le processus de révision [PR 2044](https://github.com/MTES-MCT/trackdechets/pull/2044)
 
 #### :bug: Corrections de bugs
 
