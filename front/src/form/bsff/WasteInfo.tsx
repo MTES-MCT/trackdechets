@@ -70,7 +70,12 @@ export default function WasteInfo({ disabled }) {
       <div className="form__row">
         <label>
           Code déchet
-          <Field as="select" name="waste.code" className="td-select">
+          <Field
+            as="select"
+            name="waste.code"
+            className="td-select"
+            disabled={disabled}
+          >
             <option />
             {BSFF_WASTES.map(item => (
               <option value={item.code} key={item.code}>
