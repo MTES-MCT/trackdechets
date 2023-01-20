@@ -85,10 +85,10 @@ export function FormCompanyFields({
         {`Mail ${isEmailMandatory ? "" : "(facultatif) "}: `}
         {company?.mail}
         {!isPrivateIndividual && (
-          <div>
+          <>
             <br />
             Personne à contacter : {company?.contact}
-          </div>
+          </>
         )}
       </p>
     </>

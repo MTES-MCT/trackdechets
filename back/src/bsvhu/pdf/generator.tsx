@@ -4,7 +4,6 @@ import * as React from "react";
 import * as ReactDOMServer from "react-dom/server";
 import { generatePdf } from "../../common/pdf";
 import { expandVhuFormFromDb } from "../converter";
-import prisma from "../../prisma";
 import { BsvhuPdf } from "./components/BsvhuPdf";
 
 export async function buildPdf(bsvhu: Bsvhu) {
