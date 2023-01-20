@@ -79,7 +79,7 @@ export async function reindex(bsdId, exitFn) {
     const bsdd = await prisma.form.findFirst({
       where: { readableId: bsdId }
     });
-    if (bsdd.isDeleted) {
+    if (!bsdd || bsdd.isDeleted) {
       await deleteBsd({ id: bsdd.id });
     } else {
       const fullBsdd = await getFullForm(bsdd);
