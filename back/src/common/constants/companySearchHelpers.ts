@@ -98,7 +98,7 @@ export const luhnCheck = (num: string | number, modulo = 10): boolean => {
 };
 
 export const cleanClue = (clue: string): string =>
-  clue.replace(BAD_CHARACTERS_REGEXP, "").toUpperCase();
+  clue ? clue.replace(BAD_CHARACTERS_REGEXP, "").toUpperCase() : "";
 
 /**
  * Validateur de numéro de SIRETs
