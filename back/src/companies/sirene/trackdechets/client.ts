@@ -145,7 +145,7 @@ export const searchCompanies = (
         // check this in indexInseeSiret.ts and "stocketablissement" index mapping
         td_search_companies: {
           query: qs,
-          operator: "and"
+          operator: "or"
         }
       }
     }
