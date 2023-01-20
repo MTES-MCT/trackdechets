@@ -111,11 +111,6 @@ td {
   height: auto;
 }
 
-.SignatureSmall svg {
-  width: 50px;
-  height: auto;
-}
-
 .Flex {
   display: flex;
 }

@@ -4,13 +4,14 @@ import {
 } from "../../../generated/graphql/types";
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getBsffOrNotFound, getPreviousPackagings } from "../../database";
+import { getBsffOrNotFound } from "../../database";
 import { checkCanReadBsff } from "../../permissions";
 import { createPDFResponse } from "../../../common/pdf";
 import { DownloadHandler } from "../../../routers/downloadRouter";
 import { buildPdf } from "../../pdf/generator";
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
+import { getReadonlyBsffPackagingRepository } from "../../repository";
 
 export const bsffPdfDownloadHandler: DownloadHandler<QueryBsffPdfArgs> = {
   name: "bsffPdf",
@@ -25,7 +26,9 @@ export const bsffPdfDownloadHandler: DownloadHandler<QueryBsffPdfArgs> = {
     if (bsff == null) {
       throw new UserInputError(`Le BSFF n°${id} n'existe pas.`);
     }
-    const previousPackagings = await getPreviousPackagings(
+    const { findPreviousPackagings } = getReadonlyBsffPackagingRepository();
+
+    const previousPackagings = await findPreviousPackagings(
       bsff.packagings.map(p => p.id)
     );
     const previousBsffIds = [...new Set(previousPackagings.map(p => p.bsffId))];

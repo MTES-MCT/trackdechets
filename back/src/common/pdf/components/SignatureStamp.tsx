@@ -9,18 +9,14 @@ export function SignatureStamp() {
 }
 
 export function SignatureStampSmall() {
-  return (
-    <div className="SignatureSmall">
-      <SignatureStampSvg />
-    </div>
-  );
+  return <SignatureStampSvg width="20%" />;
 }
 
-function SignatureStampSvg() {
+function SignatureStampSvg({ width = "40%" }) {
   return (
     <svg
-      width="40%"
-      height="40%"
+      width={width}
+      height="auto"
       viewBox="0 0 170 60"
       xmlns="http://www.w3.org/2000/svg"
       xmlSpace="preserve"
