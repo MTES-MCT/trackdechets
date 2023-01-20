@@ -1,6 +1,19 @@
-import { TransportMode, WasteAcceptationStatus } from "@prisma/client";
+import {
+  CompanyVerificationStatus,
+  TransportMode,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import * as yup from "yup";
 import { ConditionBuilder, ConditionConfig } from "yup/lib/Condition";
+import {
+  isCollector,
+  isTransporter,
+  isWasteCenter,
+  isWasteProcessor,
+  isWasteVehicles
+} from "../companies/validation";
+import prisma from "../prisma";
+import { isForeignVat, isSiret, isVat } from "./constants/companySearchHelpers";
 
 // Poids maximum en tonnes tout mode de transport confondu
 const MAX_WEIGHT_TONNES = 50000;
@@ -79,4 +92,176 @@ export const weightConditions: WeightConditions = {
           ` tonnes lorsque le transport se fait par la route`
       )
   })
+};
+
+export const siret = yup
+  .string()
+  .nullable() // makes sure `null` does not throw a type error
+  .test(
+    "is-siret",
+    "${path}: ${originalValue} n'est pas un numéro de SIRET valide",
+    value => !value || isSiret(value)
+  );
+
+// Differents conditions than can be applied to a siret number based on the
+// value of other sibling fields
+type SiretConditions = {
+  isForeignShip: ConditionBuilder<yup.StringSchema>;
+  isPrivateIndividual: ConditionBuilder<yup.StringSchema>;
+  companyVatNumber: ConditionBuilder<yup.StringSchema>;
+};
+
+// Different tests that can be applied to a siret number
+type SiretTests = {
+  isRegistered: (
+    role?: "DESTINATION" | "TRANSPORTER"
+  ) => yup.TestConfig<string>;
+};
+
+export const siretConditions: SiretConditions = {
+  isForeignShip: (isForeignShip: boolean, schema: yup.StringSchema) => {
+    if (isForeignShip === true) {
+      return schema
+        .notRequired()
+        .test(
+          "is-null-or-undefined-when-is-foreign-ship",
+          "Émetteur : vous ne pouvez pas enregistrer un numéro de SIRET en cas d'émetteur navire étranger",
+          value => !value
+        );
+    }
+    return schema;
+  },
+  isPrivateIndividual: (
+    isPrivateIndividual: boolean,
+    schema: yup.StringSchema
+  ) => {
+    if (isPrivateIndividual === true) {
+      return schema
+        .notRequired()
+        .test(
+          "is-null-or-undefined-when-is-private-individual",
+          "${path} : vous ne pouvez pas renseigner de n°SIRET lorsque l'émetteur ou le détenteur est un particulier",
+          value => !value
+        );
+    }
+    return schema;
+  },
+  companyVatNumber: (vatNumber, schema) => {
+    if (isForeignVat(vatNumber)) {
+      return schema.notRequired();
+    }
+    return schema;
+  }
+};
+
+const { VERIFY_COMPANY } = process.env;
+
+export const siretTests: SiretTests = {
+  isRegistered: role => ({
+    name: "is-registered-with-right-profile",
+    message: ({ path, value }) =>
+      `${path} : l'établissement avec le SIRET ${value} n'est pas inscrit sur Trackdéchets`,
+    test: async (siret, ctx) => {
+      if (!siret) return true;
+      const company = await prisma.company.findUnique({
+        where: { siret }
+      });
+      if (company === null) {
+        return false;
+      }
+      if (role === "DESTINATION") {
+        if (
+          !(
+            isCollector(company) ||
+            isWasteProcessor(company) ||
+            isWasteCenter(company) ||
+            isWasteVehicles(company)
+          )
+        ) {
+          return ctx.createError({
+            message:
+              `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET "${siret}" n'est pas inscrite` +
+              ` sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut` +
+              ` donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il` +
+              ` modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+          });
+        }
+        if (
+          VERIFY_COMPANY === "true" &&
+          company.verificationStatus !== CompanyVerificationStatus.VERIFIED
+        ) {
+          return ctx.createError({
+            message:
+              `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue` +
+              ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau bordereau.`
+          });
+        }
+      }
+      if (role === "TRANSPORTER" && !isTransporter(company)) {
+        return ctx.createError({
+          message:
+            `Le transporteur saisi sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets` +
+            ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
+            ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
+            ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+        });
+      }
+      return true;
+    }
+  })
+};
+
+// Different tests that can be applied to a vat number
+type VatNumberTests = {
+  isRegisteredTransporter: yup.TestConfig<string>;
+};
+
+export const vatNumber = yup
+  .string()
+  .nullable()
+  .test(
+    "is-vat",
+    "${path}: ${originalValue} n'est pas un numéro de TVA valide",
+    value => {
+      if (!value) {
+        return true;
+      }
+      return isVat(value);
+    }
+  );
+
+export const foreignVatNumber = vatNumber.test(
+  "is-foreign-vat",
+  "${path} : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement",
+  value => {
+    if (!value) return true;
+    return isForeignVat(value);
+  }
+);
+
+export const vatNumberTests: VatNumberTests = {
+  isRegisteredTransporter: {
+    name: "is-registered-foreign-transporter",
+    message: ({ path, value }) =>
+      `${path} : le transporteur avec le n°de TVA ${value} n'est pas inscrit sur Trackdéchets`,
+    test: async (vatNumber, ctx) => {
+      if (!vatNumber) return true;
+      const company = await prisma.company.findUnique({
+        where: { vatNumber }
+      });
+      if (company === null) {
+        return false;
+      }
+      if (!isTransporter(company)) {
+        return ctx.createError({
+          message:
+            `Le transporteur saisi sur le bordereau (numéro de TVA: ${vatNumber}) n'est pas inscrit sur Trackdéchets` +
+            ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
+            ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
+            ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+        });
+      }
+      return true;
+    }
+  }
 };

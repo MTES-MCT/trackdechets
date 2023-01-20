@@ -5,17 +5,25 @@ import {
 } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 import prisma from "../../prisma";
-import { siretify } from "../../__tests__/factories";
+import { companyFactory, siretify } from "../../__tests__/factories";
 
 export const bsvhuFactory = async ({
   opt = {}
 }: {
   opt?: Partial<Prisma.BsvhuCreateInput>;
 }) => {
-  const formParams = { ...getVhuFormdata(), ...opt };
+  const transporterCompany = await companyFactory({
+    companyTypes: ["TRANSPORTER"]
+  });
+  const destinationCompany = await companyFactory({
+    companyTypes: ["WASTEPROCESSOR"]
+  });
   return prisma.bsvhu.create({
     data: {
-      ...formParams
+      ...getVhuFormdata(),
+      transporterCompanySiret: transporterCompany.siret,
+      destinationCompanySiret: destinationCompany.siret,
+      ...opt
     }
   });
 };

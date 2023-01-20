@@ -601,7 +601,7 @@ describe("Mutation.createForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination avec le SIRET ${siret} n'est pas inscrite sur Trackdéchets`,
+        message: `Destinataire : l'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -634,7 +634,7 @@ describe("Mutation.createForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le transporteur qui a été renseigné sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets`,
+        message: `Transporteur : l'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

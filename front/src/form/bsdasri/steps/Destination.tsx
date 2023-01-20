@@ -34,6 +34,7 @@ export default function Destination({ status, stepName, disabled = false }) {
           name="destination.company"
           heading="Installation destinataire"
           disabled={receptionDisabled}
+          registeredOnlyCompanies={true}
           optionalMail={true}
         />
       </div>

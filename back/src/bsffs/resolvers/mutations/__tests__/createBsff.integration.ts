@@ -236,7 +236,7 @@ describe("Mutation.createBsff", () => {
       expect.objectContaining({
         message:
           "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
-          `Le transporteur qui a été renseigné sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets`
+          `Transporteur : l'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
       })
     ]);
   });
@@ -273,7 +273,7 @@ describe("Mutation.createBsff", () => {
       expect.objectContaining({
         message:
           "Erreur de validation des données. Des champs sont manquants ou mal formatés : \n" +
-          `L'installation de destination avec le SIRET ${siret} n'est pas inscrite sur Trackdéchets`
+          `Destination : l'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`
       })
     ]);
   });

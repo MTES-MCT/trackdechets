@@ -2,6 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { Mutation } from "../../../../generated/graphql/types";
 import {
+  companyFactory,
   siretify,
   userFactory,
   userWithCompanyFactory
@@ -93,6 +94,9 @@ describe("Mutation.Vhu.create", () => {
 
   it("should allow creating a valid form for the producer signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTEPROCESSOR"]
+    });
 
     const input = {
       emitter: {
@@ -121,7 +125,7 @@ describe("Mutation.Vhu.create", () => {
         type: "BROYEUR",
         plannedOperationCode: "R 12",
         company: {
-          siret: siretify(1),
+          siret: destinationCompany.siret,
           name: "destination",
           address: "address",
           contact: "contactEmail",
@@ -150,6 +154,9 @@ describe("Mutation.Vhu.create", () => {
 
   it("should fail if a required field like the emitter agrement is missing", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTEPROCESSOR"]
+    });
 
     const input = {
       emitter: {
@@ -177,7 +184,7 @@ describe("Mutation.Vhu.create", () => {
         type: "BROYEUR",
         plannedOperationCode: "R 12",
         company: {
-          siret: siretify(1),
+          siret: destinationCompany.siret,
           name: "destination",
           address: "address",
           contact: "contactEmail",

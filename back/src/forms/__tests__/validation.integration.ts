@@ -1,9 +1,4 @@
-import {
-  CompanyType,
-  CompanyVerificationStatus,
-  EmitterType,
-  Form
-} from "@prisma/client";
+import { EmitterType, Form } from "@prisma/client";
 import {
   draftFormSchema,
   sealedFormSchema,
@@ -13,30 +8,13 @@ import {
   transporterSchemaFn
 } from "../validation";
 import { ReceivedFormInput } from "../../generated/graphql/types";
-import { siretify } from "../../__tests__/factories";
-
-jest.mock("../../prisma", () => ({
-  company: {
-    findUnique: jest.fn(() =>
-      Promise.resolve({
-        companyTypes: [
-          CompanyType.COLLECTOR,
-          CompanyType.WASTEPROCESSOR,
-          CompanyType.TRANSPORTER
-        ],
-        verificationStatus: CompanyVerificationStatus.VERIFIED
-      })
-    )
-  },
-  ecoOrganisme: {
-    findFirst: jest.fn(() => Promise.resolve(null))
-  }
-}));
+import { companyFactory, siretify } from "../../__tests__/factories";
+import { resetDatabase } from "../../../integration-tests/helper";
 
 const siret1 = siretify(1);
 const siret2 = siretify(2);
 const siret3 = siretify(3);
-const form: Partial<Form> = {
+const formData: Partial<Form> = {
   id: "cjplbvecc000d0766j32r19am",
   readableId: "BSD-20210101-AAAAAAAA",
   status: "DRAFT",
@@ -82,15 +60,34 @@ const form: Partial<Form> = {
 };
 
 describe("sealedFormSchema", () => {
+  let sealedForm: Partial<Form>;
+
+  afterAll(resetDatabase);
+  beforeAll(async () => {
+    const emitterCompany = await companyFactory({ companyTypes: ["PRODUCER"] });
+    const transporterCompany = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTEPROCESSOR"]
+    });
+    sealedForm = {
+      ...formData,
+      emitterCompanySiret: emitterCompany.siret,
+      transporterCompanySiret: transporterCompany.siret,
+      recipientCompanySiret: destinationCompany.siret
+    };
+  });
+
   describe("form can be sealed", () => {
     test("when fully filled", async () => {
-      const isValid = await sealedFormSchema.isValid(form);
+      const isValid = await sealedFormSchema.isValid(sealedForm);
       expect(isValid).toEqual(true);
     });
 
     test("with empty strings for optionnal fields", async () => {
       const testForm = {
-        ...form,
+        ...sealedForm,
         transporterNumberPlate: ""
       };
       const isValid = await sealedFormSchema.isValid(testForm);
@@ -99,7 +96,7 @@ describe("sealedFormSchema", () => {
 
     test("with null values for optionnal fields", async () => {
       const testForm = {
-        ...form,
+        ...sealedForm,
         transporterNumberPlate: null
       };
       const isValid = await sealedFormSchema.isValid(testForm);
@@ -108,7 +105,7 @@ describe("sealedFormSchema", () => {
 
     test("with transporter receipt exemption R.541-50 ticked and no transportation infos", async () => {
       const testForm = {
-        ...form,
+        ...sealedForm,
         transporterIsExemptedOfReceipt: true,
         transporterReceipt: null,
         transporterDepartment: null
@@ -119,9 +116,13 @@ describe("sealedFormSchema", () => {
     });
 
     test("with foreign transporter receipt no need for exemption R.541-50", async () => {
+      const transporter = await companyFactory({
+        orgId: "BE0541696005",
+        vatNumber: "BE0541696005"
+      });
       const testForm = {
-        ...form,
-        transporterCompanyVatNumber: "BE0541696005",
+        ...sealedForm,
+        transporterCompanyVatNumber: transporter.vatNumber,
         transporterIsExemptedOfReceipt: null,
         transporterReceipt: null,
         transporterDepartment: null
@@ -137,7 +138,7 @@ describe("sealedFormSchema", () => {
 
     test("when there is an eco-organisme and emitter type is OTHER", async () => {
       const testForm = {
-        ...form,
+        ...sealedForm,
         emitterType: "OTHER",
         ecoOrganisme: { id: "an_id" }
       };
@@ -150,7 +151,7 @@ describe("sealedFormSchema", () => {
 
     test("when there is no eco-organisme and emitter type is OTHER", async () => {
       const testForm = {
-        ...form,
+        ...sealedForm,
         emitterType: "OTHER",
         ecoOrganisme: null
       };
@@ -165,7 +166,7 @@ describe("sealedFormSchema", () => {
       "when emitterType is (%p)",
       async emitterType => {
         const testForm = {
-          ...form,
+          ...sealedForm,
           emitterType
         };
 
@@ -176,46 +177,10 @@ describe("sealedFormSchema", () => {
 
     test("when emitterIsForeignShip is true without emitter company siret", async () => {
       const partialForm: Partial<Form> = {
-        id: "cjplbvecc000d0766j32r19am",
-        readableId: "BSD-20210101-AAAAAAAA",
-        status: "SEALED",
-        emitterType: "PRODUCER",
+        ...sealedForm,
         emitterIsForeignShip: true,
-        emitterWorkSiteName: "",
-        emitterWorkSiteAddress: "",
-        emitterWorkSiteCity: "",
-        emitterWorkSitePostalCode: "",
-        emitterWorkSiteInfos: "",
-        emitterCompanyName: "A company 2",
-        emitterCompanyAddress: "8 rue du Général de Gaulle",
-        emitterCompanyOmiNumber: "OMI1234567",
-        recipientCap: "1234",
-        recipientProcessingOperation: "D 6",
-        recipientCompanyName: "A company 3",
-        recipientCompanySiret: siret2,
-        recipientCompanyAddress: "8 rue du Général de Gaulle",
-        recipientCompanyContact: "Destination",
-        recipientCompanyPhone: "02",
-        recipientCompanyMail: "d@d.fr",
-        transporterReceipt: "sdfg",
-        transporterDepartment: "82",
-        transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
-        transporterCompanyName: "A company 4",
-        transporterCompanySiret: siret3,
-        transporterCompanyAddress: "8 rue du Général de Gaulle",
-        transporterCompanyContact: "Transporteur",
-        transporterCompanyPhone: "03",
-        transporterCompanyMail: "t@t.fr",
-        wasteDetailsCode: "01 03 04*",
-        wasteDetailsOnuCode: "AAA",
-        wasteDetailsPackagingInfos: [
-          { type: "FUT", other: null, quantity: 1 },
-          { type: "GRV", other: null, quantity: 1 }
-        ],
-        wasteDetailsQuantity: 1.5,
-        wasteDetailsQuantityType: "REAL",
-        wasteDetailsConsistence: "SOLID",
-        wasteDetailsPop: false
+        emitterCompanySiret: undefined,
+        emitterCompanyOmiNumber: "OMI1234567"
       };
       await sealedFormSchema.validate(partialForm);
       const isValid = await sealedFormSchema.isValid(partialForm);
@@ -223,45 +188,10 @@ describe("sealedFormSchema", () => {
     });
     test("when emitterIsPrivateIndividual is true without emitter company siret", async () => {
       const partialForm: Partial<Form> = {
-        id: "cjplbvecc000d0766j32r19am",
-        readableId: "BSD-20210101-AAAAAAAA",
-        status: "SEALED",
-        emitterType: "PRODUCER",
+        ...sealedForm,
         emitterIsPrivateIndividual: true,
-        emitterWorkSiteName: "",
-        emitterWorkSiteAddress: "",
-        emitterWorkSiteCity: "",
-        emitterWorkSitePostalCode: "",
-        emitterWorkSiteInfos: "",
-        emitterCompanyName: "A company 2",
-        emitterCompanyAddress: "8 rue du Général de Gaulle",
-        recipientCap: "1234",
-        recipientProcessingOperation: "D 6",
-        recipientCompanyName: "A company 3",
-        recipientCompanySiret: siret2,
-        recipientCompanyAddress: "8 rue du Général de Gaulle",
-        recipientCompanyContact: "Destination",
-        recipientCompanyPhone: "02",
-        recipientCompanyMail: "d@d.fr",
-        transporterReceipt: "sdfg",
-        transporterDepartment: "82",
-        transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
-        transporterCompanyName: "A company 4",
-        transporterCompanySiret: siret3,
-        transporterCompanyAddress: "8 rue du Général de Gaulle",
-        transporterCompanyContact: "Transporteur",
-        transporterCompanyPhone: "03",
-        transporterCompanyMail: "t@t.fr",
-        wasteDetailsCode: "01 03 04*",
-        wasteDetailsOnuCode: "AAA",
-        wasteDetailsPackagingInfos: [
-          { type: "FUT", other: null, quantity: 1 },
-          { type: "GRV", other: null, quantity: 1 }
-        ],
-        wasteDetailsQuantity: 1.5,
-        wasteDetailsQuantityType: "REAL",
-        wasteDetailsConsistence: "SOLID",
-        wasteDetailsPop: false
+        emitterCompanySiret: null,
+        emitterCompanyContact: null
       };
       await sealedFormSchema.validate(partialForm);
       const isValid = await sealedFormSchema.isValid(partialForm);
@@ -271,7 +201,7 @@ describe("sealedFormSchema", () => {
     test("when is grouped and R0 is selected", async () => {
       // Given
       const processedInfo = {
-        ...form,
+        ...sealedForm,
         processedAt: new Date(),
         processedBy: "John Snow",
         emitterType: EmitterType.APPENDIX2,
@@ -285,163 +215,281 @@ describe("sealedFormSchema", () => {
       // Then
       expect(isValid).toBeTruthy();
     });
+
+    test("when transporterVatNumber is defined and transporterCompanySiret is nullish", async () => {
+      const transporter = await companyFactory({
+        orgId: "ESA15022510",
+        vatNumber: "ESA15022510"
+      });
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: transporter.vatNumber
+      };
+      await sealedFormSchema.validate(partialForm);
+      const isValid = await sealedFormSchema.isValid(partialForm);
+      expect(isValid).toEqual(true);
+    });
+
+    test("when there is 2 bennes", async () => {
+      const testForm = {
+        ...sealedForm,
+        wasteDetailsPackagingInfos: [
+          { type: "BENNE", other: null, quantity: 2 }
+        ]
+      };
+
+      const isValid = await sealedFormSchema.isValid(testForm);
+      expect(isValid).toEqual(true);
+    });
+
+    test("when there is 2 citernes", async () => {
+      const testForm = {
+        ...sealedForm,
+        wasteDetailsPackagingInfos: [
+          { type: "CITERNE", other: null, quantity: 2 }
+        ]
+      };
+
+      const isValid = await sealedFormSchema.isValid(testForm);
+      expect(isValid).toEqual(true);
+    });
+
+    test("when there is more than 2 bennes", async () => {
+      const testForm = {
+        ...sealedForm,
+        wasteDetailsPackagingInfos: [
+          { type: "BENNE", other: null, quantity: 3 }
+        ]
+      };
+      const validateFn = () => sealedFormSchema.validate(testForm);
+      await expect(validateFn()).rejects.toThrow(
+        "Le nombre de benne ou de citerne ne peut être supérieur à 2."
+      );
+    });
+
+    test("when there is more than 2 citernes", async () => {
+      const testForm = {
+        ...sealedForm,
+        wasteDetailsPackagingInfos: [
+          { type: "CITERNE", other: null, quantity: 3 }
+        ]
+      };
+
+      const validateFn = () => sealedFormSchema.validate(testForm);
+      await expect(validateFn()).rejects.toThrow(
+        "Le nombre de benne ou de citerne ne peut être supérieur à 2."
+      );
+    });
+
+    test("when there is no waste details quantity", async () => {
+      const testForm = {
+        ...sealedForm,
+        wasteDetailsQuantity: null
+      };
+
+      const isValid = await sealedFormSchema.isValid(testForm);
+      expect(isValid).toEqual(false);
+    });
   });
 
   describe("form cannot be sealed", () => {
+    test("when emitterCompanySiret is not well formatted", async () => {
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        emitterCompanySiret: "123"
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+      await expect(validateFn()).rejects.toThrow(
+        "Émetteur: 123 n'est pas un numéro de SIRET valide"
+      );
+    });
+
+    test("when transporterCompanySiret is not well formatted", async () => {
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        transporterCompanySiret: "123"
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+      await expect(validateFn()).rejects.toThrow(
+        "Transporteur: 123 n'est pas un numéro de SIRET valide"
+      );
+    });
+
+    test("when transporter is not registered in Trackdéchets", async () => {
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        transporterCompanySiret: "85001946400021"
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+      await expect(validateFn()).rejects.toThrow(
+        "Transporteur : l'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
+      );
+    });
+
+    test("when foreign transporter is not registered in Trackdéchets", async () => {
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        transporterCompanyVatNumber: "IT13029381004"
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+      await expect(validateFn()).rejects.toThrow(
+        "Transporteur : le transporteur avec le n°de TVA IT13029381004 n'est pas inscrit sur Trackdéchets"
+      );
+    });
+
+    test("when transporter is registered in Trackdéchets with wrong profile", async () => {
+      const company = await companyFactory({ companyTypes: ["PRODUCER"] });
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        transporterCompanySiret: company.siret
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+      await expect(validateFn()).rejects.toThrow(
+        `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets` +
+          " en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau." +
+          " Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de" +
+          " l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+      );
+    });
+
+    test("when foreign transporter is registered in Trackdéchets with wrong profile", async () => {
+      const company = await companyFactory({
+        companyTypes: ["PRODUCER"],
+        orgId: "IT13029381004",
+        vatNumber: "IT13029381004"
+      });
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        transporterCompanyVatNumber: company.vatNumber
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+      await expect(validateFn()).rejects.toThrow(
+        `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets` +
+          " en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau." +
+          " Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de" +
+          " l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+      );
+    });
+
+    test("when recipientCompanySiret is not well formatted", async () => {
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        recipientCompanySiret: "123"
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+      await expect(validateFn()).rejects.toThrow(
+        "Destinataire: 123 n'est pas un numéro de SIRET valide"
+      );
+    });
+
+    test("when recipient is not registered in Trackdéchets", async () => {
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        recipientCompanySiret: "85001946400021"
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+      await expect(validateFn()).rejects.toThrow(
+        "Destinataire : l'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
+      );
+    });
+
+    test("when recipient is registered in Trackdéchets with wrong profile", async () => {
+      const company = await companyFactory({ companyTypes: ["PRODUCER"] });
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        recipientCompanySiret: company.siret
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+      await expect(validateFn()).rejects.toThrow(
+        `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET \"${company.siret}\" n'est` +
+          " pas inscrite sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement." +
+          " Cette installation ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur" +
+          " de cette installation pour qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+      );
+    });
+
     test("when emitterIsForeignShip is true without emitterCompanyOmiNumber", async () => {
       const partialForm: Partial<Form> = {
-        id: "cjplbvecc000d0766j32r19am",
-        readableId: "BSD-20210101-AAAAAAAA",
-        status: "SEALED",
-        emitterType: "PRODUCER",
+        ...sealedForm,
         emitterIsForeignShip: true,
-        emitterWorkSiteName: "",
-        emitterWorkSiteAddress: "",
-        emitterWorkSiteCity: "",
-        emitterWorkSitePostalCode: "",
-        emitterWorkSiteInfos: "",
-        emitterCompanyName: "A company 2",
-        emitterCompanySiret: siret1,
-        emitterCompanyContact: "Emetteur",
-        emitterCompanyPhone: "01",
-        emitterCompanyAddress: "8 rue du Général de Gaulle",
-        emitterCompanyMail: "e@e.fr",
-        recipientCap: "1234",
-        recipientProcessingOperation: "D 6",
-        recipientCompanyName: "A company 3",
-        recipientCompanySiret: siret2,
-        recipientCompanyAddress: "8 rue du Général de Gaulle",
-        recipientCompanyContact: "Destination",
-        recipientCompanyPhone: "02",
-        recipientCompanyMail: "d@d.fr",
-        transporterReceipt: "sdfg",
-        transporterDepartment: "82",
-        transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
-        transporterCompanyName: "A company 4",
-        transporterCompanySiret: siret3,
-        transporterCompanyAddress: "8 rue du Général de Gaulle",
-        transporterCompanyContact: "Transporteur",
-        transporterCompanyPhone: "03",
-        transporterCompanyMail: "t@t.fr",
-        wasteDetailsCode: "01 03 04*",
-        wasteDetailsOnuCode: "AAA",
-        wasteDetailsPackagingInfos: [
-          { type: "FUT", other: null, quantity: 1 },
-          { type: "GRV", other: null, quantity: 1 }
-        ],
-        wasteDetailsQuantity: 1.5,
-        wasteDetailsQuantityType: "REAL",
-        wasteDetailsConsistence: "SOLID",
-        wasteDetailsPop: false
+        emitterCompanySiret: null,
+        emitterCompanyOmiNumber: null
       };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+      await expect(validateFn()).rejects.toThrow(
+        "Émetteur: Le numéro OMI (Organisation maritime international) de l'entreprise est obligatoire"
+      );
+    });
+
+    test("when emitterIsForeignShip and siret is defined", async () => {
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        emitterIsForeignShip: true,
+        emitterCompanySiret: siret1,
+        emitterCompanyOmiNumber: "OMI1234567"
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+
+      await expect(validateFn()).rejects.toThrow(
+        "Émetteur : vous ne pouvez pas enregistrer un numéro de SIRET en cas d'émetteur navire étranger"
+      );
+
       const isValid = await sealedFormSchema.isValid(partialForm);
       expect(isValid).toEqual(false);
     });
+
     test("when emitterIsForeignShip is true with invalid emitterCompanyOmiNumber", async () => {
       const partialForm: Partial<Form> = {
-        id: "cjplbvecc000d0766j32r19am",
-        readableId: "BSD-20210101-AAAAAAAA",
-        status: "SEALED",
-        emitterType: "PRODUCER",
+        ...sealedForm,
         emitterIsForeignShip: true,
-        emitterWorkSiteName: "",
-        emitterWorkSiteAddress: "",
-        emitterWorkSiteCity: "",
-        emitterWorkSitePostalCode: "",
-        emitterWorkSiteInfos: "",
-        emitterCompanyName: "A company 2",
-        emitterCompanySiret: siret1,
-        emitterCompanyContact: "Emetteur",
-        emitterCompanyPhone: "01",
-        emitterCompanyAddress: "8 rue du Général de Gaulle",
-        emitterCompanyMail: "e@e.fr",
-        emitterCompanyOmiNumber: "OMI123",
-        recipientCap: "1234",
-        recipientProcessingOperation: "D 6",
-        recipientCompanyName: "A company 3",
-        recipientCompanySiret: siret2,
-        recipientCompanyAddress: "8 rue du Général de Gaulle",
-        recipientCompanyContact: "Destination",
-        recipientCompanyPhone: "02",
-        recipientCompanyMail: "d@d.fr",
-        transporterReceipt: "sdfg",
-        transporterDepartment: "82",
-        transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
-        transporterCompanyName: "A company 4",
-        transporterCompanySiret: siret3,
-        transporterCompanyAddress: "8 rue du Général de Gaulle",
-        transporterCompanyContact: "Transporteur",
-        transporterCompanyPhone: "03",
-        transporterCompanyMail: "t@t.fr",
-        wasteDetailsCode: "01 03 04*",
-        wasteDetailsOnuCode: "AAA",
-        wasteDetailsPackagingInfos: [
-          { type: "FUT", other: null, quantity: 1 },
-          { type: "GRV", other: null, quantity: 1 }
-        ],
-        wasteDetailsQuantity: 1.5,
-        wasteDetailsQuantityType: "REAL",
-        wasteDetailsConsistence: "SOLID",
-        wasteDetailsPop: false
+        emitterCompanySiret: null,
+        emitterCompanyOmiNumber: "foo"
       };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+
+      await expect(validateFn()).rejects.toThrow(
+        "Émetteur: Le numéro OMI (Organisation maritime international) de l'entreprise doit se composer des trois lettres OMI suivies de 7 chiffres (ex. OMI1234567)"
+      );
+
       const isValid = await sealedFormSchema.isValid(partialForm);
       expect(isValid).toEqual(false);
     });
 
     test("when emitterIsForeignShip and emitterIsPrivateIndividual both true", async () => {
       const partialForm: Partial<Form> = {
-        id: "cjplbvecc000d0766j32r19am",
-        readableId: "BSD-20210101-AAAAAAAA",
-        status: "SEALED",
-        emitterType: "PRODUCER",
+        ...sealedForm,
         emitterIsForeignShip: true,
+        emitterCompanySiret: null,
         emitterIsPrivateIndividual: true,
-        emitterWorkSiteName: "",
-        emitterWorkSiteAddress: "",
-        emitterWorkSiteCity: "",
-        emitterWorkSitePostalCode: "",
-        emitterWorkSiteInfos: "",
-        emitterCompanyName: "A company 2",
-        emitterCompanySiret: siret1,
-        emitterCompanyContact: "Emetteur",
-        emitterCompanyPhone: "01",
-        emitterCompanyAddress: "8 rue du Général de Gaulle",
-        emitterCompanyMail: "e@e.fr",
-        emitterCompanyOmiNumber: "OMI1234567",
-        recipientCap: "1234",
-        recipientProcessingOperation: "D 6",
-        recipientCompanyName: "A company 3",
-        recipientCompanySiret: siret2,
-        recipientCompanyAddress: "8 rue du Général de Gaulle",
-        recipientCompanyContact: "Destination",
-        recipientCompanyPhone: "02",
-        recipientCompanyMail: "d@d.fr",
-        transporterReceipt: "sdfg",
-        transporterDepartment: "82",
-        transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
-        transporterCompanyName: "A company 4",
-        transporterCompanySiret: siret3,
-        transporterCompanyAddress: "8 rue du Général de Gaulle",
-        transporterCompanyContact: "Transporteur",
-        transporterCompanyPhone: "03",
-        transporterCompanyMail: "t@t.fr",
-        wasteDetailsCode: "01 03 04*",
-        wasteDetailsOnuCode: "AAA",
-        wasteDetailsPackagingInfos: [
-          { type: "FUT", other: null, quantity: 1 },
-          { type: "GRV", other: null, quantity: 1 }
-        ],
-        wasteDetailsQuantity: 1.5,
-        wasteDetailsQuantityType: "REAL",
-        wasteDetailsConsistence: "SOLID",
-        wasteDetailsPop: false
+        emitterCompanyOmiNumber: "OMI1234567"
       };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+
+      await expect(validateFn()).rejects.toThrow(
+        "Émetteur: Impossible de définir un  numéro OMI avec un émetteur particulier"
+      );
+
       const isValid = await sealedFormSchema.isValid(partialForm);
       expect(isValid).toEqual(false);
     });
+
+    test("when emitterIsPrivateIndividual and siret is defined", async () => {
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        emitterIsPrivateIndividual: true,
+        emitterCompanyContact: null,
+        emitterCompanySiret: siret1
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+
+      await expect(validateFn()).rejects.toThrow(
+        "Émetteur : vous ne pouvez pas renseigner de n°SIRET lorsque l'émetteur ou le détenteur est un particulier"
+      );
+    });
     test("when there is no receipt exemption and no receipt", async () => {
       const testForm = {
-        ...form,
+        ...sealedForm,
         transporterIsExemptedOfReceipt: false,
         transporterReceipt: null
       };
@@ -452,7 +500,7 @@ describe("sealedFormSchema", () => {
 
     test("when there is an eco-organisme but emitter type is not OTHER", async () => {
       const testForm = {
-        ...form,
+        ...sealedForm,
         emitterType: "PRODUCER",
         ecoOrganismeSiret: siretify(5),
         ecoOrganismeName: "Some eco-organisme"
@@ -466,7 +514,7 @@ describe("sealedFormSchema", () => {
 
     test("when there is 1 citerne and another packaging", async () => {
       const testForm = {
-        ...form,
+        ...sealedForm,
         wasteDetailsPackagingInfos: [
           { type: "CITERNE", other: null, quantity: 1 },
           { type: "GRV", other: null, quantity: 1 }
@@ -479,7 +527,7 @@ describe("sealedFormSchema", () => {
 
     test("when there is 1 benne and another packaging", async () => {
       const testForm = {
-        ...form,
+        ...sealedForm,
         wasteDetailsPackagingInfos: [
           { type: "BENNE", other: null, quantity: 1 },
           { type: "GRV", other: null, quantity: 1 }
@@ -495,7 +543,7 @@ describe("sealedFormSchema", () => {
 
       // Given
       const processedInfo = {
-        ...form,
+        ...sealedForm,
         processedAt: new Date(),
         processedBy: "John Snow",
         emitterType: EmitterType.APPENDIX1,
@@ -513,63 +561,45 @@ describe("sealedFormSchema", () => {
         ]);
       }
     });
-  });
 
-  test("when there is 2 bennes", async () => {
-    const testForm = {
-      ...form,
-      wasteDetailsPackagingInfos: [{ type: "BENNE", other: null, quantity: 2 }]
-    };
+    test("when there is nor transporterCompanySiret nor transporterCompanyVatNumber", async () => {
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: null
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
 
-    const isValid = await sealedFormSchema.isValid(testForm);
-    expect(isValid).toEqual(true);
-  });
+      await expect(validateFn()).rejects.toThrow(
+        "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
+      );
+    });
 
-  test("when there is 2 citernes", async () => {
-    const testForm = {
-      ...form,
-      wasteDetailsPackagingInfos: [
-        { type: "CITERNE", other: null, quantity: 2 }
-      ]
-    };
+    test("when the transporterCompanyVatNumber is invalid", async () => {
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: "invalid"
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
 
-    const isValid = await sealedFormSchema.isValid(testForm);
-    expect(isValid).toEqual(true);
-  });
+      await expect(validateFn()).rejects.toThrow(
+        "Transporteur: invalid n'est pas un numéro de TVA valide"
+      );
+    });
 
-  test("when there is more than 2 bennes", async () => {
-    const testForm = {
-      ...form,
-      wasteDetailsPackagingInfos: [{ type: "BENNE", other: null, quantity: 3 }]
-    };
-    const validateFn = () => sealedFormSchema.validate(testForm);
-    await expect(validateFn()).rejects.toThrow(
-      "Le nombre de benne ou de citerne ne peut être supérieur à 2."
-    );
-  });
+    test("when the transporterCompanyVatNumber is FR", async () => {
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: "FR35552049447"
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
 
-  test("when there is more than 2 citernes", async () => {
-    const testForm = {
-      ...form,
-      wasteDetailsPackagingInfos: [
-        { type: "CITERNE", other: null, quantity: 3 }
-      ]
-    };
-
-    const validateFn = () => sealedFormSchema.validate(testForm);
-    await expect(validateFn()).rejects.toThrow(
-      "Le nombre de benne ou de citerne ne peut être supérieur à 2."
-    );
-  });
-
-  test("when there is no waste details quantity", async () => {
-    const testForm = {
-      ...form,
-      wasteDetailsQuantity: null
-    };
-
-    const isValid = await sealedFormSchema.isValid(testForm);
-    expect(isValid).toEqual(false);
+      await expect(validateFn()).rejects.toThrow(
+        "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
+      );
+    });
   });
 });
 
@@ -1133,9 +1163,13 @@ describe("processedInfoSchema", () => {
   });
 
   test("transporter SIRET is optional when a valid foreign vatNumber is present", async () => {
+    const transporterCompany = await companyFactory({
+      orgId: "BE0541696005",
+      vatNumber: "BE0541696005"
+    });
     const transporter = {
       transporterCompanyName: "Thalys",
-      transporterCompanyVatNumber: "BE0541696005",
+      transporterCompanyVatNumber: transporterCompany.vatNumber,
       transporterCompanyAddress: "Bruxelles",
       transporterCompanyContact: "Contact",
       transporterCompanyPhone: "00 00 00 00 00",
@@ -1146,9 +1180,12 @@ describe("processedInfoSchema", () => {
   });
 
   test("transporter vatNumber is optional when a valid SIRET is present", async () => {
+    const transporterCompany = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
     const transporter = {
       transporterCompanyName: "Code en Stock",
-      transporterCompanySiret: siretify(1),
+      transporterCompanySiret: transporterCompany.siret,
       transporterCompanyAddress: "Marseille",
       transporterCompanyContact: "Contact",
       transporterCompanyPhone: "00 00 00 00 00",
@@ -1189,7 +1226,7 @@ describe("processedInfoSchema", () => {
     const validateFn = () => transporterSchemaFn(false).validate(transporter);
 
     await expect(validateFn()).rejects.toThrow(
-      "Transporteur: invalid n'est pas un numéro de TVA étranger valide"
+      "Transporteur: invalid n'est pas un numéro de TVA valide"
     );
   });
 
@@ -1210,9 +1247,13 @@ describe("processedInfoSchema", () => {
   });
 
   test("SIRET for la poste is valid", async () => {
+    const transporterCompany = await companyFactory({
+      siret: "35600000040773",
+      companyTypes: ["TRANSPORTER"]
+    });
     const transporter = {
       transporterCompanyName: "la poste",
-      transporterCompanySiret: "35600000040773",
+      transporterCompanySiret: transporterCompany.siret,
       transporterCompanyAddress: "paris",
       transporterCompanyContact: "Contact",
       transporterCompanyPhone: "00 00 00 00 00",
@@ -1228,15 +1269,18 @@ describe("processedInfoSchema", () => {
       transporterCompanyName: "la poste",
       transporterCompanyPhone: "00 00 00 00 00",
       transporterCompanySiret: "35600000040773",
-      transporterCompanyVatNumber: "",
       transporterIsExemptedOfReceipt: true
     });
   });
 
   test("SIRET for any valid SIRET is valid", async () => {
+    const transporterCompany = await companyFactory({
+      siret: "35600000000048",
+      companyTypes: ["TRANSPORTER"]
+    });
     const transporter = {
       transporterCompanyName: "la poste siege",
-      transporterCompanySiret: "35600000000048",
+      transporterCompanySiret: transporterCompany.siret,
       transporterCompanyAddress: "paris",
       transporterCompanyContact: "Contact",
       transporterCompanyPhone: "00 00 00 00 00",
@@ -1251,8 +1295,7 @@ describe("processedInfoSchema", () => {
       transporterCompanyMail: "contact@laposte.com",
       transporterCompanyName: "la poste siege",
       transporterCompanyPhone: "00 00 00 00 00",
-      transporterCompanySiret: "35600000000048",
-      transporterCompanyVatNumber: "",
+      transporterCompanySiret: transporterCompany.siret,
       transporterIsExemptedOfReceipt: true
     });
   });
