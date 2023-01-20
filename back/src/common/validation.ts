@@ -211,6 +211,11 @@ export const siretTests: SiretTests = {
   })
 };
 
+// Different tests that can be applied to a vat number
+type VatNumberTests = {
+  isRegisteredTransporter: yup.TestConfig<string>;
+};
+
 export const vatNumber = yup
   .string()
   .nullable()
@@ -233,3 +238,30 @@ export const foreignVatNumber = vatNumber.test(
     return isForeignVat(value);
   }
 );
+
+export const vatNumberTests: VatNumberTests = {
+  isRegisteredTransporter: {
+    name: "is-registered-foreign-transporter",
+    message: ({ path, value }) =>
+      `${path} : le transporteur avec le n°de TVA ${value} n'est pas inscrit sur Trackdéchets`,
+    test: async (vatNumber, ctx) => {
+      if (!vatNumber) return true;
+      const company = await prisma.company.findUnique({
+        where: { vatNumber }
+      });
+      if (company === null) {
+        return false;
+      }
+      if (!isTransporter(company)) {
+        return ctx.createError({
+          message:
+            `Le transporteur saisi sur le bordereau (numéro de TVA: ${vatNumber}) n'est pas inscrit sur Trackdéchets` +
+            ` en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau.` +
+            ` Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil` +
+            ` de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements`
+        });
+      }
+      return true;
+    }
+  }
+};

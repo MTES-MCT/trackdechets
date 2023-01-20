@@ -116,9 +116,13 @@ describe("sealedFormSchema", () => {
     });
 
     test("with foreign transporter receipt no need for exemption R.541-50", async () => {
+      const transporter = await companyFactory({
+        orgId: "BE0541696005",
+        vatNumber: "BE0541696005"
+      });
       const testForm = {
         ...sealedForm,
-        transporterCompanyVatNumber: "BE0541696005",
+        transporterCompanyVatNumber: transporter.vatNumber,
         transporterIsExemptedOfReceipt: null,
         transporterReceipt: null,
         transporterDepartment: null
@@ -213,10 +217,14 @@ describe("sealedFormSchema", () => {
     });
 
     test("when transporterVatNumber is defined and transporterCompanySiret is nullish", async () => {
+      const transporter = await companyFactory({
+        orgId: "ESA15022510",
+        vatNumber: "ESA15022510"
+      });
       const partialForm: Partial<Form> = {
         ...sealedForm,
         transporterCompanySiret: null,
-        transporterCompanyVatNumber: "ESA15022510"
+        transporterCompanyVatNumber: transporter.vatNumber
       };
       await sealedFormSchema.validate(partialForm);
       const isValid = await sealedFormSchema.isValid(partialForm);
@@ -319,6 +327,17 @@ describe("sealedFormSchema", () => {
       );
     });
 
+    test("when foreign transporter is not registered in Trackdéchets", async () => {
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        transporterCompanyVatNumber: "IT13029381004"
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+      await expect(validateFn()).rejects.toThrow(
+        "Transporteur : le transporteur avec le n°de TVA IT13029381004 n'est pas inscrit sur Trackdéchets"
+      );
+    });
+
     test("when transporter is registered in Trackdéchets with wrong profile", async () => {
       const company = await companyFactory({ companyTypes: ["PRODUCER"] });
       const partialForm: Partial<Form> = {
@@ -328,6 +347,25 @@ describe("sealedFormSchema", () => {
       const validateFn = () => sealedFormSchema.validate(partialForm);
       await expect(validateFn()).rejects.toThrow(
         `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets` +
+          " en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau." +
+          " Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de" +
+          " l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+      );
+    });
+
+    test("when foreign transporter is registered in Trackdéchets with wrong profile", async () => {
+      const company = await companyFactory({
+        companyTypes: ["PRODUCER"],
+        orgId: "IT13029381004",
+        vatNumber: "IT13029381004"
+      });
+      const partialForm: Partial<Form> = {
+        ...sealedForm,
+        transporterCompanyVatNumber: company.vatNumber
+      };
+      const validateFn = () => sealedFormSchema.validate(partialForm);
+      await expect(validateFn()).rejects.toThrow(
+        `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets` +
           " en tant qu'entreprise de transport. Cette entreprise ne peut donc pas être visée sur le bordereau." +
           " Veuillez vous rapprocher de l'administrateur de cette entreprise pour qu'il modifie le profil de" +
           " l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
@@ -1125,9 +1163,13 @@ describe("processedInfoSchema", () => {
   });
 
   test("transporter SIRET is optional when a valid foreign vatNumber is present", async () => {
+    const transporterCompany = await companyFactory({
+      orgId: "BE0541696005",
+      vatNumber: "BE0541696005"
+    });
     const transporter = {
       transporterCompanyName: "Thalys",
-      transporterCompanyVatNumber: "BE0541696005",
+      transporterCompanyVatNumber: transporterCompany.vatNumber,
       transporterCompanyAddress: "Bruxelles",
       transporterCompanyContact: "Contact",
       transporterCompanyPhone: "00 00 00 00 00",

@@ -15,6 +15,7 @@ import {
   siret,
   siretConditions,
   siretTests,
+  vatNumberTests,
   weight,
   weightConditions,
   WeightUnits
@@ -755,7 +756,9 @@ const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
                 "Impossible de saisir le SIRET d'un transporteur pour ce type de bordereau"
               )
         }),
-      transporterCompanyVatNumber: foreignVatNumber.label("Transporteur"),
+      transporterCompanyVatNumber: foreignVatNumber
+        .label("Transporteur")
+        .test(vatNumberTests.isRegisteredTransporter),
       transporterCompanyAddress: yup.string().when("type", {
         is: BsdaType.COLLECTION_2710,
         then: schema => schema.nullable(),

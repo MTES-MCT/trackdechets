@@ -6,20 +6,29 @@ import { bsdaSchema } from "../validation";
 import { bsdaFactory } from "./factories";
 
 describe("BSDA validation", () => {
-  afterAll(resetDatabase);
-
   let bsda: Bsda;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     bsda = await bsdaFactory({});
   });
 
+  afterEach(resetDatabase);
+
   describe("BSDA should be valid", () => {
+    test("when all data is present", async () => {
+      const isValid = await bsdaSchema({}).isValid(bsda);
+      expect(isValid).toBe(true);
+    });
+
     test("when there is a foreign transporter and recepisse fields are null", async () => {
+      const foreignTransporter = await companyFactory({
+        orgId: "BE0541696005",
+        vatNumber: "BE0541696005"
+      });
       expect(
         await bsdaSchema({}).isValid({
           ...bsda,
-          transporterCompanyVatNumber: "BE0541696005",
+          transporterCompanyVatNumber: foreignTransporter.vatNumber,
           transporterCompanyName: "transporteur BE",
           transporterRecepisseDepartment: null,
           transporterRecepisseNumber: null,
@@ -29,10 +38,14 @@ describe("BSDA validation", () => {
     });
 
     test("when a foreign transporter vat number is specified and transporter siret is null", async () => {
+      const foreignTransporter = await companyFactory({
+        orgId: "BE0541696005",
+        vatNumber: "BE0541696005"
+      });
       const data = {
         ...bsda,
         transporterCompanySiret: null,
-        transporterCompanyVatNumber: "IT13029381004"
+        transporterCompanyVatNumber: foreignTransporter.vatNumber
       };
 
       const isValid = await bsdaSchema({}).isValid(data);
@@ -41,6 +54,7 @@ describe("BSDA validation", () => {
   });
 
   describe("BSDA should not be valid", () => {
+    afterEach(resetDatabase);
     test("when emitter siret is not valid", async () => {
       const data = {
         ...bsda,
@@ -79,7 +93,8 @@ describe("BSDA validation", () => {
         ...bsda,
         transporterCompanySiret: "85001946400021"
       };
-      const validateFn = () => bsdaSchema({}).validate(data);
+      const validateFn = () =>
+        bsdaSchema({}).validate(data, { abortEarly: false });
       await expect(validateFn()).rejects.toThrow(
         "Transporteur : l'établissement avec le SIRET 85001946400021 n'est pas inscrit sur Trackdéchets"
       );
@@ -94,6 +109,36 @@ describe("BSDA validation", () => {
       const validateFn = () => bsdaSchema({}).validate(data);
       await expect(validateFn()).rejects.toThrow(
         `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
+          " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
+          " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+      );
+    });
+
+    test("when foreign transporter is not registered in Trackdéchets", async () => {
+      const data = {
+        ...bsda,
+        trasnporterCompanySiret: null,
+        transporterCompanyVatNumber: "IT13029381004"
+      };
+      const validateFn = () => bsdaSchema({}).validate(data);
+      await expect(validateFn()).rejects.toThrow(
+        "Transporteur : le transporteur avec le n°de TVA IT13029381004 n'est pas inscrit sur Trackdéchets"
+      );
+    });
+
+    test("when foreign transporter is registered with wrong profile", async () => {
+      const company = await companyFactory({
+        companyTypes: ["PRODUCER"],
+        orgId: "IT13029381004",
+        vatNumber: "IT13029381004"
+      });
+      const data = {
+        ...bsda,
+        transporterCompanyVatNumber: company.vatNumber
+      };
+      const validateFn = () => bsdaSchema({}).validate(data);
+      await expect(validateFn()).rejects.toThrow(
+        `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
           " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
           " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
       );

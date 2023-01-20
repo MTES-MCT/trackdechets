@@ -57,6 +57,7 @@ import {
   siretConditions,
   siretTests,
   vatNumber,
+  vatNumberTests,
   weight,
   weightConditions,
   WeightUnits
@@ -681,7 +682,9 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
           siretConditions.companyVatNumber
         )
         .requiredIf(!isDraft, `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`),
-      transporterCompanyVatNumber: foreignVatNumber.label("Transporteur"),
+      transporterCompanyVatNumber: foreignVatNumber
+        .label("Transporteur")
+        .test(vatNumberTests.isRegisteredTransporter),
       transporterCompanyAddress: yup
         .string()
         .ensure()
@@ -1188,6 +1191,7 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
   if (forwardedIn?.transporterCompanyVatNumber) {
     await foreignVatNumber
       .label("Transporteur après entreposage provisoire")
+      .test(vatNumberTests.isRegisteredTransporter)
       .validate(forwardedIn?.transporterCompanyVatNumber);
   }
 }
