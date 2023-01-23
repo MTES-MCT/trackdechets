@@ -622,8 +622,7 @@ describe("Mutation.createCompany", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Impossible de créer un établissement identifié par un numéro de TVA français, merci d'indiquer un SIRET"
+        message: "Impossible de créer un établissement fermé selon l'INSEE"
       })
     ]);
   });
