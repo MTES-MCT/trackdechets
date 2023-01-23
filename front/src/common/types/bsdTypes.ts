@@ -42,7 +42,7 @@ export enum BsdTypename {
   Bsff = "Bsff",
 }
 
-export enum BsdStatusCode { // TODO a revoir avec harmonisation des status
+export enum BsdStatusCode { // a revoir avec harmonisation des status
   DRAFT = "DRAFT",
   SEALED = "SEALED",
   SENT = "SENT",

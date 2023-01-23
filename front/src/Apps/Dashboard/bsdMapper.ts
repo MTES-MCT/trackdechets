@@ -84,7 +84,7 @@ const createBsdd = (bsdd: Form): BsdDisplay => {
 };
 
 const createBsda = (bsda: Bsda): BsdDisplay => {
-  const statusCode = bsda?.status || bsda["bsdaStatus"]; // FIXME  ?
+  const statusCode = bsda?.status || bsda["bsdaStatus"];
   const bsdaFormatted: BsdDisplay = {
     id: bsda.id,
     readableid: bsda.id,
@@ -110,7 +110,7 @@ const createBsda = (bsda: Bsda): BsdDisplay => {
 };
 
 const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
-  const statusCode = bsdasri?.status || bsdasri["bsdasriStatus"]; // FIXME  ?
+  const statusCode = bsdasri?.status || bsdasri["bsdasriStatus"];
   const bsdasriFormatted: BsdDisplay = {
     id: bsdasri.id,
     readableid: bsdasri.id,
@@ -134,7 +134,7 @@ const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
 };
 
 const createBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
-  const statusCode = bsvhu?.status || bsvhu["bsvhuStatus"]; // FIXME ?
+  const statusCode = bsvhu?.status || bsvhu["bsvhuStatus"];
   const bsvhuFormatted: BsdDisplay = {
     id: bsvhu.id,
     readableid: bsvhu.id,
@@ -154,7 +154,7 @@ const createBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
 };
 
 const createBsff = (bsff: Bsff): BsdDisplay => {
-  const statusCode = bsff?.status || bsff["bsffStatus"]; // FIXME ?
+  const statusCode = bsff?.status || bsff["bsffStatus"];
   const bsffFormatted: BsdDisplay = {
     id: bsff.id,
     readableid: bsff.id,

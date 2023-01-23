@@ -60,7 +60,7 @@ export const getBsdView = (bsd): BsdDisplay | null => {
   return bsdView;
 };
 
-// TODO a revoir avec harmonisation des codes status
+// a revoir avec harmonisation des codes status
 export const getBsdStatusLabel = (
   status: string,
   isDraft: boolean | undefined,
@@ -68,36 +68,36 @@ export const getBsdStatusLabel = (
 ) => {
   switch (status) {
     case BsdStatusCode.DRAFT:
-      return BROUILLON; // Bsdd
+      return BROUILLON;
     case BsdStatusCode.SEALED:
-      return EN_ATTENTE_SIGNATURE_EMETTEUR; // Bsdd
+      return EN_ATTENTE_SIGNATURE_EMETTEUR;
     case BsdStatusCode.SENT:
-      return EN_ATTENTE_RECEPTION; // Bsvhu| Bsdd | Bsdasri | Bsff | Bsda
+      return EN_ATTENTE_RECEPTION;
     case BsdStatusCode.RECEIVED:
-      return RECU; // Bsdd | Bsdasri | Bsff
+      return RECU;
     case BsdStatusCode.ACCEPTED:
-      return ACCEPTE; // bsdd | Bsff
+      return ACCEPTE;
     case BsdStatusCode.PROCESSED:
-      return TRAITE; // Bsvhu| Bsdd | Bsdasri | Bsff | Bsda
+      return TRAITE;
     case BsdStatusCode.AWAITING_GROUP:
-      return EN_ATTENTE_REGROUPEMENT; // Bsdd | Bsdasri;
+      return EN_ATTENTE_REGROUPEMENT;
     case BsdStatusCode.GROUPED:
-      return ANNEXE_BORDEREAU_REGROUPEMENT; // Bsdd
+      return ANNEXE_BORDEREAU_REGROUPEMENT;
     case BsdStatusCode.NO_TRACEABILITY:
-      return REGROUPE_AVEC_RUPTURE_TRACABILITE; // Bsdd
+      return REGROUPE_AVEC_RUPTURE_TRACABILITE;
     case BsdStatusCode.REFUSED:
-      return REFUSE; // Bsvhu| Bsdd | Bsdasri| Bsff | Bsda;
+      return REFUSE;
     case BsdStatusCode.TEMP_STORED:
-      return ARRIVE_ENTREPOS_PROVISOIRE; // Bsdd
+      return ARRIVE_ENTREPOS_PROVISOIRE;
     case BsdStatusCode.TEMP_STORER_ACCEPTED:
-      return ENTREPOS_TEMPORAIREMENT; // Bsdd;
+      return ENTREPOS_TEMPORAIREMENT;
     case BsdStatusCode.RESEALED:
-      return EN_ATTENTE_SIGNATURE_ENTREPOS_PROVISOIRE; // Bsdd
+      return EN_ATTENTE_SIGNATURE_ENTREPOS_PROVISOIRE;
     case BsdStatusCode.RESENT:
-      return EN_ATTENTE_SIGNATURE; // Bsdd;
+      return EN_ATTENTE_SIGNATURE;
     case BsdStatusCode.SIGNED_BY_PRODUCER:
-      return SIGNE_PAR_PRODUCTEUR; // Bsvhu| Bsdd | Bsdasri | Bsda
-    case BsdStatusCode.INITIAL: // Bsvhu| Bsdasri | Bsff | Bsda
+      return SIGNE_PAR_PRODUCTEUR;
+    case BsdStatusCode.INITIAL:
       if (isDraft) {
         return BROUILLON;
       }
@@ -113,19 +113,19 @@ export const getBsdStatusLabel = (
       }
       break;
     case BsdStatusCode.SIGNED_BY_EMITTER:
-      return SIGNE_PAR_EMETTEUR; // Bsff
+      return SIGNE_PAR_EMETTEUR;
     case BsdStatusCode.INTERMEDIATELY_PROCESSED:
-      return ANNEXE_BORDEREAU_REGROUPEMENT; // Bsff
+      return ANNEXE_BORDEREAU_REGROUPEMENT;
     case BsdStatusCode.SIGNED_BY_TEMP_STORER:
-      return SIGNER_PAR_ENTREPOS_PROVISOIRE; // bsdd
+      return SIGNER_PAR_ENTREPOS_PROVISOIRE;
     case BsdStatusCode.PARTIALLY_REFUSED:
-      return PARTIELLEMENT_REFUSE; // Bsff
+      return PARTIELLEMENT_REFUSE;
     case BsdStatusCode.FOLLOWED_WITH_PNTTD:
-      return SUIVI_PAR_PNTTD; // bsdd
+      return SUIVI_PAR_PNTTD;
     case BsdStatusCode.SIGNED_BY_WORKER:
-      return SIGNER_PAR_ENTREPRISE_TRAVAUX; // Bsda
+      return SIGNER_PAR_ENTREPRISE_TRAVAUX;
     case BsdStatusCode.AWAITING_CHILD:
-      return EN_ATTENTE_OU_BSD_SUITE; // Bsda
+      return EN_ATTENTE_OU_BSD_SUITE;
 
     default:
       return "Error unknown status";
@@ -232,7 +232,7 @@ const getDraftBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
       const isHolder = isSameSiretEmmiter(currentSiret, bsd) || isEcoOrganisme;
       const isTransporter = isSameSiretTransporter(currentSiret, bsd);
 
-      // TODO isActTab see /dashboard/components/BSDList/BSDasri/WorkflowAction/WorkflowAction.tsx
+      // ajouter isActTab see /dashboard/components/BSDList/BSDasri/WorkflowAction/WorkflowAction.tsx
       if (isHolder && !isSynthesis(bsd.bsdWorkflowType?.toString())) {
         if (isEcoOrganisme) {
           return SIGNATURE_ECO_ORG;
@@ -240,7 +240,7 @@ const getDraftBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
         return SIGNATURE_PRODUCTEUR;
       }
 
-      // TODO isToCollectTab see /dashboard/components/BSDList/BSDasri/WorkflowAction/WorkflowAction.tsx
+      // ajouter isToCollectTab see /dashboard/components/BSDList/BSDasri/WorkflowAction/WorkflowAction.tsx
       if (isTransporter && !isSynthesis(bsd.bsdWorkflowType?.toString())) {
         return SIGNATURE_EMETTEUR;
       }
@@ -280,7 +280,7 @@ const getSentBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
     (isBsdasri(bsd.type) &&
       currentSiret ===
         bsd.destination?.company
-          ?.siret) /* TODO && only isAct tab for dasri */ ||
+          ?.siret) /* ajouter && only isAct tab for dasri */ ||
     (isBsff(bsd.type) && isSameSiretDestination(currentSiret, bsd))
   ) {
     return SIGNER_RECEPTION;
@@ -308,13 +308,13 @@ const getReceivedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
     return SIGNER_TRAITEMENT;
   }
   if (isBsff(bsd.type) && isSameSiretDestination(currentSiret, bsd)) {
-    // TODO bsff status received with packagings see dashboard/components/BSDList/BSFF/WorkflowAction/WorkflowAction.tsx
+    // ajouter bsff status received with packagings see dashboard/components/BSDList/BSFF/WorkflowAction/WorkflowAction.tsx
     return SIGNATURE_ACCEPTATION_CONTENANT;
   }
 
   if (
     isBsdasri(bsd.type) &&
-    isSameSiretDestination(currentSiret, bsd) /* && TODO only for act list */
+    isSameSiretDestination(currentSiret, bsd) /* ajouter && only for act list */
   ) {
     return SIGNER_RECEPTION;
   }
@@ -352,7 +352,7 @@ const getSignByProducerBtnLabel = (
 
 const getAcceptedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
   if (isBsff(bsd.type) && isSameSiretDestination(currentSiret, bsd)) {
-    // TODO bsff status accepted with packagings see dashboard/components/BSDList/BSFF/WorkflowAction/WorkflowAction.tsx
+    // ajouter bsff status accepted with packagings see dashboard/components/BSDList/BSFF/WorkflowAction/WorkflowAction.tsx
     return SIGNATURE_ACCEPTATION_CONTENANT;
   }
   if (
@@ -364,7 +364,7 @@ const getAcceptedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
   return "";
 };
 
-/* TODO à revoir avec harmonisation libéllés et status */
+/* ajouter à revoir avec harmonisation libéllés et status */
 export const getCtaLabelFromStatus = (
   bsd: BsdDisplay,
   currentSiret: string
@@ -441,7 +441,7 @@ export const canPublishBsd = (
   bsd: BsdDisplay,
   currentSiret: string
 ): boolean => {
-  // TODO vérif
+  // à vérifier
   if (isBsdasri(bsd.type) && bsd.isDraft) {
     if (isGrouping(bsd.bsdWorkflowType?.toString()) && !bsd.grouping?.length) {
       return false;
@@ -472,7 +472,7 @@ export const canPublishBsd = (
 };
 
 export const validateBsd = (bsd: Bsd) => {
-  /* TODO 
+  /* a faire 
 
     - validation selon le type de bsd
     - query de validation

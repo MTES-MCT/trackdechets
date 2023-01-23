@@ -81,8 +81,6 @@ function BsdCard({
               name={bsdDisplay.wasteDetails.name?.toString()}
             />
 
-            {/* TODO Actors */}
-
             <div className="bsd-card__content__cta">
               {canPublishBsd(bsdDisplay, currentSiret) && ctaPrimaryLabel && (
                 <button

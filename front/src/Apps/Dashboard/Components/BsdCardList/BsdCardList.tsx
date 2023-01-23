@@ -76,17 +76,17 @@ function BsdCardList({ siret, bsds }: BsdCardListProps): JSX.Element {
     validateBsd(bsd);
   };
   const onBsdDelete = (bsd: Bsd) => {
-    // TODO
+    // to implement
   };
   const onBsdDuplication = (bsd: Bsd) => {
-    // TODO
+    // to implement
   };
   const onBsdUpdate = (bsd: Bsd) => {
     const path = getUpdatePath(bsd);
     redirectToPath(path, bsd.id);
   };
   const onBsdPdfGenerate = (bsd: Bsd) => {
-    // TODO
+    // to implement
   };
   const onBsdOverview = (bsd: Bsd) => {
     const path = getOverviewPath(bsd);
