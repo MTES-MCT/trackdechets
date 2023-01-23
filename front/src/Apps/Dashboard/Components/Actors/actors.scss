@@ -1,0 +1,42 @@
+@import "src/scss/Breakpoints.scss";
+
+.actors {
+  &__item {
+    display: flex;
+    align-items: center;
+  }
+
+  &__label {
+    width: 250px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+    text-transform: lowercase;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-left: 5px;
+    color: #3a3a3a;
+
+    @include desktop {
+      width: 140px;
+    }
+  }
+
+  &__label:first-letter {
+    text-transform: capitalize;
+  }
+
+  &__emitter-icon {
+    width: 15px;
+    height: 17px;
+  }
+
+  &__transporter-icon {
+    width: 19px;
+    height: 19px;
+  }
+
+  &__destination-icon {
+    width: 19px;
+    height: 19px;
+  }
+}

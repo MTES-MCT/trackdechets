@@ -15,12 +15,12 @@ export default {
 
 const Template: ComponentStory<typeof BsdCard> = args => <BsdCard {...args} />;
 
-export const BsdExample = Template.bind({});
+export const BsdCardExample = Template.bind({});
 
 const currentSiret = "53230142100022";
 const onValidate = jest.fn();
 
-BsdExample.args = {
+BsdCardExample.args = {
   bsd: {
     id: "DASRI-20220603-CFZ337QCS",
     bsdasriStatus: "SENT",

@@ -2,8 +2,8 @@ import React from "react";
 
 import { formatDate } from "../../../../common/datetime";
 import Badge from "../Badge/Badge";
-import LabelWithIcon from "../LabelWithIcon/LabelWithIcon";
-import { LabelIconCode } from "../LabelWithIcon/labelWithIconTypes";
+import InfoWithIcon from "../InfoWithIcon/InfoWithIcon";
+import { InfoIconCode } from "../InfoWithIcon/infoWithIconTypes";
 import { BsdCardProps } from "./bsdCardTypes";
 import WasteDetails from "../WasteDetails/WasteDetails";
 import {
@@ -17,6 +17,7 @@ import BsdAdditionalActionsButton from "../BsdAdditionalActionsButton/BsdAdditio
 
 import "./bsdCard.scss";
 import { completer_bsd_suite } from "../../../../assets/wordings/dashboard/wordingsDashboard";
+import Actors from "../Actors/Actors";
 
 function BsdCard({
   bsd,
@@ -52,16 +53,16 @@ function BsdCard({
           <div className="bsd-card__header">
             <p className="bsd-number">N°: {bsdDisplay.readableid}</p>
             {bsdDisplay?.isTempStorage && (
-              <LabelWithIcon labelCode={LabelIconCode.TempStorage} />
+              <InfoWithIcon labelCode={InfoIconCode.TempStorage} />
             )}
             {updatedAt && (
-              <LabelWithIcon
-                labelCode={LabelIconCode.LastModificationDate}
+              <InfoWithIcon
+                labelCode={InfoIconCode.LastModificationDate}
                 date={updatedAt}
               />
             )}
             {bsdDisplay?.emittedByEcoOrganisme && (
-              <LabelWithIcon labelCode={LabelIconCode.EcoOrganism} />
+              <InfoWithIcon labelCode={InfoIconCode.EcoOrganism} />
             )}
             <p className="workflow-type">
               {getWorkflowLabel(bsdDisplay.bsdWorkflowType)}
@@ -75,11 +76,21 @@ function BsdCard({
                 bsdType={bsdDisplay.type}
               />
             </div>
-            <WasteDetails
-              wasteType={bsdDisplay.type}
-              code={bsdDisplay.wasteDetails.code?.toString()}
-              name={bsdDisplay.wasteDetails.name?.toString()}
-            />
+            <div className="bsd-card__content__waste">
+              <WasteDetails
+                wasteType={bsdDisplay.type}
+                code={bsdDisplay.wasteDetails.code?.toString()}
+                name={bsdDisplay.wasteDetails.name?.toString()}
+              />
+            </div>
+
+            <div className="bsd-card__content__actors">
+              <Actors
+                emitterName={bsdDisplay.emitter?.company?.name || ""}
+                transporterName={bsdDisplay.transporter?.company?.name || ""}
+                destinationName={bsdDisplay.destination?.company?.name || ""}
+              />
+            </div>
 
             <div className="bsd-card__content__cta">
               {canPublishBsd(bsdDisplay, currentSiret) && ctaPrimaryLabel && (

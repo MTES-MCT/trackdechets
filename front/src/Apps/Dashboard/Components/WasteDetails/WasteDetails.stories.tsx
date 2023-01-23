@@ -4,7 +4,7 @@ import WasteDetails from "./WasteDetails";
 import { BsdType } from "../../../../generated/graphql/types";
 
 export default {
-  title: "COMPONENTS/DASHBOARD/WasteDetails",
+  title: "COMPONENTS/DASHBOARD/BsdCard/Blocks/WasteDetails",
   component: WasteDetails,
   parameters: {
     design: {
