@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { generatePath, NavLink, useHistory } from "react-router-dom";
 import { CompanyPrivate, CompanyType } from "generated/graphql/types";
 import DashboardCompanySelector from "../../../../dashboard/DashboardCompanySelector";
@@ -16,6 +16,17 @@ export default function DashboardTabs({
 }: DashboardTabsProps) {
   const history = useHistory();
 
+  const handleCompanyChange = useCallback(
+    orgId => {
+      history.push(
+        generatePath(routes.dashboardv2.bsds.drafts, {
+          siret: orgId,
+        })
+      );
+    },
+    [history]
+  );
+
   return (
     <>
       {companies.length > 1 ? (
@@ -23,13 +34,7 @@ export default function DashboardTabs({
           <DashboardCompanySelector
             orgId={currentCompany.orgId}
             companies={companies}
-            handleCompanyChange={orgId =>
-              history.push(
-                generatePath(routes.dashboardv2.bsds.drafts, {
-                  siret: orgId,
-                })
-              )
-            }
+            handleCompanyChange={handleCompanyChange}
           />
         </div>
       ) : (

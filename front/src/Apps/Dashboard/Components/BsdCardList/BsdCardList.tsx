@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { generatePath, useHistory, useLocation } from "react-router-dom";
 import { BsdCardListProps } from "./bsdCardListTypes";
 import BsdCard from "../BsdCard/BsdCard";
@@ -12,7 +12,7 @@ function BsdCardList({ siret, bsds }: BsdCardListProps): JSX.Element {
   const history = useHistory();
   const location = useLocation();
 
-  const getOverviewPath = bsd => {
+  const getOverviewPath = useCallback(bsd => {
     switch (bsd.type) {
       case BsdType.Bsdd:
         return routes.dashboardv2.bsdds.view;
@@ -28,9 +28,9 @@ function BsdCardList({ siret, bsds }: BsdCardListProps): JSX.Element {
       default:
         break;
     }
-  };
+  }, []);
 
-  const getUpdatePath = bsd => {
+  const getUpdatePath = useCallback(bsd => {
     switch (bsd.type) {
       case BsdType.Bsdd:
         return routes.dashboardv2.bsdds.edit;
@@ -46,9 +46,9 @@ function BsdCardList({ siret, bsds }: BsdCardListProps): JSX.Element {
       default:
         break;
     }
-  };
+  }, []);
 
-  const getRevisionPath = bsd => {
+  const getRevisionPath = useCallback(bsd => {
     switch (bsd.type) {
       case BsdType.Bsdd:
         return routes.dashboardv2.bsdds.review;
@@ -58,44 +58,56 @@ function BsdCardList({ siret, bsds }: BsdCardListProps): JSX.Element {
       default:
         break;
     }
-  };
+  }, []);
 
-  const redirectToPath = (path, id) => {
-    if (path) {
-      history.push({
-        pathname: generatePath(path, {
-          siret,
-          id: id,
-        }),
-        state: { background: location },
-      });
-    }
-  };
+  const redirectToPath = useCallback(
+    (path, id) => {
+      if (path) {
+        history.push({
+          pathname: generatePath(path, {
+            siret,
+            id: id,
+          }),
+          state: { background: location },
+        });
+      }
+    },
+    [history, location, siret]
+  );
 
-  const onBsdValidation = (bsd: Bsd) => {
+  const onBsdValidation = useCallback((bsd: Bsd) => {
     validateBsd(bsd);
-  };
-  const onBsdDelete = (bsd: Bsd) => {
+  }, []);
+  const onBsdDelete = useCallback((bsd: Bsd) => {
     // to implement
-  };
-  const onBsdDuplication = (bsd: Bsd) => {
+  }, []);
+  const onBsdDuplication = useCallback((bsd: Bsd) => {
     // to implement
-  };
-  const onBsdUpdate = (bsd: Bsd) => {
-    const path = getUpdatePath(bsd);
-    redirectToPath(path, bsd.id);
-  };
-  const onBsdPdfGenerate = (bsd: Bsd) => {
+  }, []);
+  const onBsdUpdate = useCallback(
+    (bsd: Bsd) => {
+      const path = getUpdatePath(bsd);
+      redirectToPath(path, bsd.id);
+    },
+    [getUpdatePath, redirectToPath]
+  );
+  const onBsdPdfGenerate = useCallback((bsd: Bsd) => {
     // to implement
-  };
-  const onBsdOverview = (bsd: Bsd) => {
-    const path = getOverviewPath(bsd);
-    redirectToPath(path, bsd.id);
-  };
-  const onBsdRevision = (bsd: Bsd) => {
-    const path = getRevisionPath(bsd);
-    redirectToPath(path, bsd.id);
-  };
+  }, []);
+  const onBsdOverview = useCallback(
+    (bsd: Bsd) => {
+      const path = getOverviewPath(bsd);
+      redirectToPath(path, bsd.id);
+    },
+    [getOverviewPath, redirectToPath]
+  );
+  const onBsdRevision = useCallback(
+    (bsd: Bsd) => {
+      const path = getRevisionPath(bsd);
+      redirectToPath(path, bsd.id);
+    },
+    [getRevisionPath, redirectToPath]
+  );
 
   return (
     <ul className="bsd-card-list">

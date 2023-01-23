@@ -1,6 +1,6 @@
 import { useQuery, gql } from "@apollo/client";
 import { filter } from "graphql-anywhere";
-import React from "react";
+import React, { useCallback } from "react";
 import {
   generatePath,
   Redirect,
@@ -64,18 +64,29 @@ function DashboardRoutes() {
   const { data } = useQuery<Pick<Query, "me">>(GET_ME);
 
   const history = useHistory();
+
+  const goBack = useCallback(() => {
+    history.goBack();
+  }, [history]);
+
   const location = useLocation<{ background?: Location }>();
   const backgroundLocation = location.state?.background;
-  const toCollectDashboard = {
-    pathname: generatePath(routes.dashboardv2.transport.toCollect, {
-      siret,
-    }),
-  };
-  const actionDashboard = {
-    pathname: generatePath(routes.dashboardv2.bsds.act, {
-      siret,
-    }),
-  };
+
+  const goToCollectDashboard = useCallback(() => {
+    history.push({
+      pathname: generatePath(routes.dashboardv2.transport.toCollect, {
+        siret,
+      }),
+    });
+  }, [history, siret]);
+
+  const goToActionDashboard = useCallback(() => {
+    history.push({
+      pathname: generatePath(routes.dashboardv2.bsds.act, {
+        siret,
+      }),
+    });
+  }, [history, siret]);
 
   if (data?.me == null) {
     return <Loader />;
@@ -192,7 +203,7 @@ function DashboardRoutes() {
             <Switch location={location}>
               <Route path={routes.dashboardv2.bsdds.view}>
                 <Modal
-                  onClose={() => history.goBack()}
+                  onClose={goBack}
                   ariaLabel="Aperçu du bordereau"
                   isOpen
                   padding={false}
@@ -203,7 +214,7 @@ function DashboardRoutes() {
               </Route>
               <Route path={routes.dashboardv2.bsdds.review}>
                 <Modal
-                  onClose={() => history.goBack()}
+                  onClose={goBack}
                   ariaLabel="Demande de révision"
                   isOpen
                   padding={false}
@@ -213,27 +224,19 @@ function DashboardRoutes() {
                 </Modal>
               </Route>
               <Route path={routes.dashboardv2.roadControl}>
-                <Modal
-                  onClose={() => history.goBack()}
-                  ariaLabel="Contrôle routier"
-                  isOpen
-                >
+                <Modal onClose={goBack} ariaLabel="Contrôle routier" isOpen>
                   <RouteControlPdf />
                 </Modal>
               </Route>
               <Route path={routes.dashboardv2.bsdasris.sign.publish}>
-                <Modal
-                  onClose={() => history.goBack()}
-                  ariaLabel="Publier un dasri"
-                  isOpen
-                >
+                <Modal onClose={goBack} ariaLabel="Publier un dasri" isOpen>
                   <RoutePublishBsdasri />
                 </Modal>
               </Route>
 
               <Route path={routes.dashboardv2.bsdasris.sign.emissionSecretCode}>
                 <Modal
-                  onClose={() => history.push(toCollectDashboard)}
+                  onClose={goToCollectDashboard}
                   ariaLabel="Signature producteur avec code de sécurité"
                   isOpen
                 >
@@ -242,7 +245,7 @@ function DashboardRoutes() {
               </Route>
               <Route path={routes.dashboardv2.bsdasris.sign.directTakeover}>
                 <Modal
-                  onClose={() => history.push(toCollectDashboard)}
+                  onClose={goToCollectDashboard}
                   ariaLabel="Emport direct transporteur"
                   isOpen
                 >
@@ -253,7 +256,7 @@ function DashboardRoutes() {
               </Route>
               <Route path={routes.dashboardv2.bsdasris.sign.synthesisTakeover}>
                 <Modal
-                  onClose={() => history.push(toCollectDashboard)}
+                  onClose={goToCollectDashboard}
                   ariaLabel="Bordereau de synthèse: Transporteur"
                   isOpen
                 >
@@ -264,7 +267,7 @@ function DashboardRoutes() {
               </Route>
               <Route path={routes.dashboardv2.bsdasris.sign.transporter}>
                 <Modal
-                  onClose={() => history.push(actionDashboard)}
+                  onClose={goToActionDashboard}
                   ariaLabel="Signature transporteur"
                   isOpen
                 >
@@ -275,7 +278,7 @@ function DashboardRoutes() {
               </Route>
               <Route path={routes.dashboardv2.bsdasris.sign.emission}>
                 <Modal
-                  onClose={() => history.push(actionDashboard)}
+                  onClose={goToActionDashboard}
                   ariaLabel="Signature producteur"
                   isOpen
                 >
@@ -286,7 +289,7 @@ function DashboardRoutes() {
               </Route>
               <Route path={routes.dashboardv2.bsdasris.sign.reception}>
                 <Modal
-                  onClose={() => history.push(actionDashboard)}
+                  onClose={goToActionDashboard}
                   ariaLabel="Signature réception"
                   isOpen
                 >
@@ -297,7 +300,7 @@ function DashboardRoutes() {
               </Route>
               <Route path={routes.dashboardv2.bsdasris.sign.operation}>
                 <Modal
-                  onClose={() => history.push(actionDashboard)}
+                  onClose={goToActionDashboard}
                   ariaLabel="Signature traitement"
                   isOpen
                 >
@@ -308,7 +311,7 @@ function DashboardRoutes() {
               </Route>
               <Route path={routes.dashboardv2.bsdasris.view}>
                 <Modal
-                  onClose={() => history.goBack()}
+                  onClose={goBack}
                   ariaLabel="Aperçu du bordereau"
                   isOpen
                   padding={false}
@@ -319,7 +322,7 @@ function DashboardRoutes() {
               </Route>
               <Route path={routes.dashboardv2.bsvhus.view}>
                 <Modal
-                  onClose={() => history.goBack()}
+                  onClose={goBack}
                   ariaLabel="Aperçu du bordereau"
                   isOpen
                   padding={false}
@@ -330,7 +333,7 @@ function DashboardRoutes() {
               </Route>
               <Route path={routes.dashboardv2.bsdas.view}>
                 <Modal
-                  onClose={() => history.goBack()}
+                  onClose={goBack}
                   ariaLabel="Aperçu du bordereau"
                   isOpen
                   padding={false}
@@ -341,7 +344,7 @@ function DashboardRoutes() {
               </Route>
               <Route path={routes.dashboardv2.bsdas.review}>
                 <Modal
-                  onClose={() => history.goBack()}
+                  onClose={goBack}
                   ariaLabel="Demande de révision"
                   isOpen
                   padding={false}
@@ -352,7 +355,7 @@ function DashboardRoutes() {
               </Route>
               <Route path={routes.dashboardv2.bsffs.view}>
                 <Modal
-                  onClose={() => history.goBack()}
+                  onClose={goBack}
                   ariaLabel="Aperçu du bordereau"
                   isOpen
                   padding={false}

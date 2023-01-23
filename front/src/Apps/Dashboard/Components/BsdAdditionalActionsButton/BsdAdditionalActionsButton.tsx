@@ -11,12 +11,18 @@ import {
 } from "../../../../assets/wordings/dashboard/wordingsDashboard";
 import { BsdAdditionalActionsButtonProps } from "./bsdAdditionalActionsButtonTypes";
 import useOnClickOutsideRefTarget from "../../../../common/hooks/useOnClickOutsideRefTarget";
-import { BsdStatusCode } from "../../../../common/types/bsdTypes";
-import { BsdasriType, BsdType } from "../../../../generated/graphql/types";
+import {
+  canReviewBsd,
+  canDeleteBsd,
+  canDuplicateBsff,
+  canDuplicate,
+  canUpdateBsd,
+  canGeneratePdf,
+} from "../../dashboardServices";
 
 import "./bsdAdditionalActionsButton.scss";
 
-const BsdAdditionalActionsButton = ({
+function BsdAdditionalActionsButton({
   bsd,
   currentSiret,
   onOverview,
@@ -26,7 +32,7 @@ const BsdAdditionalActionsButton = ({
   onUpdate,
   onRevision,
   children,
-}: BsdAdditionalActionsButtonProps) => {
+}: BsdAdditionalActionsButtonProps) {
   const [isOpen, setisOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLElement>(null);
   const { targetRef } = useOnClickOutsideRefTarget({
@@ -78,73 +84,6 @@ const BsdAdditionalActionsButton = ({
     closeMenu();
     onRevision(bsd);
   };
-
-  const canUpdateOrDeleteBsdd =
-    bsd.type === BsdType.Bsdd &&
-    [BsdStatusCode.DRAFT, BsdStatusCode.SEALED].includes(bsd.status);
-
-  const canReviewBsdd =
-    bsd.type === BsdType.Bsdd &&
-    ![
-      BsdStatusCode.DRAFT,
-      BsdStatusCode.SEALED,
-      BsdStatusCode.REFUSED,
-    ].includes(bsd.status);
-
-  const canUpdateBsda =
-    bsd.type === BsdType.Bsda &&
-    ![
-      BsdStatusCode.PROCESSED,
-      BsdStatusCode.REFUSED,
-      BsdStatusCode.AWAITING_CHILD,
-    ].includes(bsd.status);
-
-  const canDeleteBsda =
-    bsd.type === BsdType.Bsda &&
-    (bsd.status === BsdStatusCode.INITIAL ||
-      (bsd.status === BsdStatusCode.SIGNED_BY_PRODUCER &&
-        bsd.emitter?.company?.siret === currentSiret));
-
-  const canReviewBsda = bsd.type === BsdType.Bsda && !canDeleteBsda;
-
-  const canDeleteBsdasri =
-    bsd.type === BsdType.Bsdasri && bsd.status === BsdStatusCode.INITIAL;
-
-  const canUpdateBsdasri =
-    bsd.type === BsdType.Bsdasri &&
-    ![BsdStatusCode.PROCESSED, BsdStatusCode.REFUSED].includes(bsd.status);
-
-  const canDuplicate =
-    bsd.type === BsdType.Bsdasri
-      ? bsd.bsdWorkflowType === BsdasriType.Simple
-      : true;
-
-  const canDuplicateBsff = () => {
-    const emitterSiret = bsd.emitter?.company?.siret;
-    const transporterSiret = bsd.transporter?.company?.siret;
-    const destinationSiret = bsd.destination?.company?.siret;
-    return (
-      bsd.type === BsdType.Bsff &&
-      [emitterSiret, transporterSiret, destinationSiret].includes(currentSiret)
-    );
-  };
-
-  const canUpdateBsff =
-    bsd.type === BsdType.Bsff &&
-    ![BsdStatusCode.PROCESSED, BsdStatusCode.REFUSED].includes(bsd.status) &&
-    canDuplicateBsff();
-
-  const canDeleteBsff =
-    bsd.type === BsdType.Bsff &&
-    bsd.status === BsdStatusCode.INITIAL &&
-    canDuplicateBsff();
-
-  const canUpdateBsvhu =
-    bsd.type === BsdType.Bsvhu &&
-    ![BsdStatusCode.PROCESSED, BsdStatusCode.REFUSED].includes(bsd.status);
-
-  const canDeleteBsvhu =
-    bsd.type === BsdType.Bsvhu && bsd.status === BsdStatusCode.INITIAL;
 
   const tabIndex = isOpen ? 0 : -1;
 
@@ -198,11 +137,7 @@ const BsdAdditionalActionsButton = ({
               {apercu_action_label}
             </button>
           </li>
-          {(canUpdateOrDeleteBsdd ||
-            canDeleteBsda ||
-            canDeleteBsdasri ||
-            canDeleteBsff ||
-            canDeleteBsvhu) && (
+          {canDeleteBsd(bsd, currentSiret) && (
             <li>
               <button
                 type="button"
@@ -215,7 +150,7 @@ const BsdAdditionalActionsButton = ({
               </button>
             </li>
           )}
-          {(canReviewBsdd || canReviewBsda) && (
+          {canReviewBsd(bsd, currentSiret) && (
             <li>
               <button
                 type="button"
@@ -228,7 +163,7 @@ const BsdAdditionalActionsButton = ({
               </button>
             </li>
           )}
-          {(canDuplicate || canDuplicateBsff()) && (
+          {(canDuplicate(bsd) || canDuplicateBsff(bsd, currentSiret)) && (
             <li>
               <button
                 type="button"
@@ -241,11 +176,7 @@ const BsdAdditionalActionsButton = ({
               </button>
             </li>
           )}
-          {(canUpdateOrDeleteBsdd ||
-            canUpdateBsda ||
-            canUpdateBsdasri ||
-            canUpdateBsff ||
-            canUpdateBsvhu) && (
+          {canUpdateBsd(bsd, currentSiret) && (
             <li>
               <button
                 type="button"
@@ -258,7 +189,7 @@ const BsdAdditionalActionsButton = ({
               </button>
             </li>
           )}
-          {(bsd.type === BsdType.Bsff || !bsd.isDraft) && (
+          {canGeneratePdf(bsd) && (
             <li>
               <button
                 type="button"
@@ -275,6 +206,6 @@ const BsdAdditionalActionsButton = ({
       </div>
     </FocusTrap>
   );
-};
+}
 
 export default BsdAdditionalActionsButton;
