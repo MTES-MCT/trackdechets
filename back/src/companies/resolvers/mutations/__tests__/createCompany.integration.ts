@@ -596,6 +596,7 @@ describe("Mutation.createCompany", () => {
       })
     ]);
   });
+
   it("should return an error when creating a closed company ", async () => {
     const user = await userFactory();
     const orgId = siretify(8);
@@ -606,7 +607,7 @@ describe("Mutation.createCompany", () => {
     });
 
     const companyInput = {
-      orgId: "FR87850019464",
+      siret: orgId,
       companyName: "Acme in FR",
       address: "une adresse",
       companyTypes: [CompanyType.TRANSPORTER]
