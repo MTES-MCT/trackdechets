@@ -60,7 +60,8 @@ export const formatBsd = (bsd: Bsd): BsdDisplay | null => {
 
 const createBsdd = (bsdd: Form): BsdDisplay => {
   const bsddFormatted: BsdDisplay = {
-    id: bsdd.readableId,
+    id: bsdd.id,
+    readableid: bsdd.readableId,
     type: mapBsdTypeNameToBsdType(bsdd.__typename) || BsdType.Bsdd,
     isDraft: bsdd.status === BsdStatusCode.DRAFT.toString(),
     status: mapBsdStatusToBsdStatusEnum(bsdd.status),
@@ -83,9 +84,10 @@ const createBsdd = (bsdd: Form): BsdDisplay => {
 };
 
 const createBsda = (bsda: Bsda): BsdDisplay => {
-  const statusCode = bsda?.status || bsda["bsdaStatus"]; // FIXME  ?
+  const statusCode = bsda?.status || bsda["bsdaStatus"];
   const bsdaFormatted: BsdDisplay = {
     id: bsda.id,
+    readableid: bsda.id,
     type: mapBsdTypeNameToBsdType(bsda.__typename) || BsdType.Bsda,
     isDraft: bsda.isDraft,
     status: mapBsdStatusToBsdStatusEnum(statusCode),
@@ -108,9 +110,10 @@ const createBsda = (bsda: Bsda): BsdDisplay => {
 };
 
 const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
-  const statusCode = bsdasri?.status || bsdasri["bsdasriStatus"]; // FIXME  ?
+  const statusCode = bsdasri?.status || bsdasri["bsdasriStatus"];
   const bsdasriFormatted: BsdDisplay = {
     id: bsdasri.id,
+    readableid: bsdasri.id,
     type: mapBsdTypeNameToBsdType(bsdasri.__typename) || BsdType.Bsdasri,
     isDraft: bsdasri.isDraft,
     status: mapBsdStatusToBsdStatusEnum(statusCode),
@@ -131,9 +134,10 @@ const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
 };
 
 const createBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
-  const statusCode = bsvhu?.status || bsvhu["bsvhuStatus"]; // FIXME ?
+  const statusCode = bsvhu?.status || bsvhu["bsvhuStatus"];
   const bsvhuFormatted: BsdDisplay = {
     id: bsvhu.id,
+    readableid: bsvhu.id,
     type: mapBsdTypeNameToBsdType(bsvhu.__typename) || BsdType.Bsvhu,
     isDraft: bsvhu.isDraft,
     status: mapBsdStatusToBsdStatusEnum(statusCode),
@@ -150,9 +154,10 @@ const createBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
 };
 
 const createBsff = (bsff: Bsff): BsdDisplay => {
-  const statusCode = bsff?.status || bsff["bsffStatus"]; // FIXME ?
+  const statusCode = bsff?.status || bsff["bsffStatus"];
   const bsffFormatted: BsdDisplay = {
     id: bsff.id,
+    readableid: bsff.id,
     type: mapBsdTypeNameToBsdType(bsff.__typename) || BsdType.Bsff,
     isDraft: bsff.isDraft,
     status: mapBsdStatusToBsdStatusEnum(statusCode),

@@ -2,8 +2,8 @@ import React from "react";
 import classnames from "classnames";
 import { BadgeProps } from "./badgeTypes";
 import "./badge.scss";
-import { BsdStatusCode } from "../../../common/types/bsdTypes";
-import { getBsdStatusLabel } from "../../../services/dashboard/dashboardServices";
+import { BsdStatusCode } from "../../../../common/types/bsdTypes";
+import { getBsdStatusLabel } from "../../dashboardServices";
 /*
     We don't use the @dataesr/react-dsfr Badge component because don't have the same colors/status but we reuse the same styles and override when needed
 */

@@ -546,8 +546,6 @@ describe("Bsd card primary action label", () => {
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
     });
-
-    // TODO bsdasri eco org / bsdari transporter /bsdari emmiter | bsda Collection_2710 / bsda isPrivateIndividual && worker isDisabled
   });
 
   describe("case: SEALED", () => {
@@ -651,7 +649,6 @@ describe("Bsd card primary action label", () => {
       expect(buttonActions).toBeInTheDocument();
       expect(queryByTestId("bsd-review-btn")).toBeFalsy();
     });
-    // TODO bsvhu
   });
 
   describe("case: SENT", () => {
@@ -865,8 +862,6 @@ describe("Bsd card primary action label", () => {
       expect(buttonActions).toBeInTheDocument();
       expect(queryByTestId("bsd-delete-btn")).toBeFalsy();
     });
-
-    // TODO bsvhu
   });
 
   describe("case: Bsd Suite", () => {
@@ -974,6 +969,4 @@ describe("Bsd card primary action label", () => {
       expect(screen.getByTestId("bsd-suite-btn")).toBeInTheDocument();
     });
   });
-
-  // TODO received signByProducer Accepted
 });
