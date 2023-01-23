@@ -30,7 +30,6 @@
     "jsvat": "^2.5.3",
     "libphonenumber-js": "^1.10.8",
     "local-storage": "^2.0.0",
-    "lodash.debounce": "^4.0.8",
     "mapbox-gl": "^1.11.1",
     "node-fetch": "^2.6.7",
     "object.omit": "^3.0.0",

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { filter } from "graphql-anywhere";
 import AccountCompany from "./AccountCompany";
@@ -7,7 +7,7 @@ import { Query } from "generated/graphql/types";
 import { Loader } from "common/components";
 import { NotificationError } from "common/components/Error";
 import routes from "common/routes";
-import debounce from "lodash.debounce";
+import { debounce } from "common/helper";
 
 import { Container, Row, Col, TextInput, Button } from "@dataesr/react-dsfr";
 
@@ -40,19 +40,22 @@ export default function AccountCompanyList() {
     Pick<Query, "myCompanies">
   >(MY_COMPANIES, { variables: { first: 10 } });
 
-  const debouncedSearch = useCallback(
-    debounce(params => {
-      refetch(params);
-      setStartSearch(false);
-    }, 1000),
-    [setStartSearch, refetch]
+  const debouncedSearch = useMemo(
+    () =>
+      debounce(params => {
+        refetch(params);
+        setStartSearch(false);
+      }, 1000),
+    [refetch, setStartSearch]
   );
 
   useEffect(() => {
-    debouncedSearch({
-      search: searchClue,
-    });
-  }, [debouncedSearch, searchClue]);
+    if (searchClue.length > 0) {
+      debouncedSearch({
+        search: searchClue,
+      });
+    }
+  }, [searchClue, debouncedSearch]);
 
   if (error) {
     return <NotificationError apolloError={error} />;
@@ -84,7 +87,7 @@ export default function AccountCompanyList() {
       if (searchClue.length === 0) {
         listTitle = `Vous êtes membre de ${data.myCompanies?.totalCount} établissement${plural}`;
       } else {
-        listTitle = `${companies.length} résultat${plural} pour la recherche: ${searchClue}`;
+        listTitle = `${companies.length} résultat${plural} pour la recherche : ${searchClue}`;
       }
 
       content = (
