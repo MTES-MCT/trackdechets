@@ -1,5 +1,4 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
-import cogoToast from "cogo-toast";
 import {
   NotificationError,
   SimpleNotificationError,
