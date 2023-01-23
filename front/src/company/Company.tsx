@@ -66,7 +66,10 @@ export default function CompanyInfo() {
 
   // Retrieves geo information from api-adresse.data.gouv.fr
   useEffect(() => {
-    if (data?.companyInfos.statutDiffusionEtablissement === "N") {
+    if (
+      data?.companyInfos.statutDiffusionEtablissement === "N" ||
+      data?.companyInfos.name === ""
+    ) {
       setNonDiffusible(true);
     }
     if (data?.companyInfos?.address) {

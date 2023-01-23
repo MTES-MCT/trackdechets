@@ -10,12 +10,10 @@ type Props = Pick<
 
 export default function CompanyRegistration(props: Props) {
   return (
-    <div className="columns">
+    <div className="rows">
       <div
         className={`notification ${
-          props.isRegistered || props.etatAdministratif?.toUpperCase() !== "F"
-            ? "notification--success"
-            : "notification--error"
+          props.isRegistered ? "notification--success" : "notification--error"
         }`}
         style={{ width: "100%" }}
       >
@@ -32,7 +30,7 @@ export default function CompanyRegistration(props: Props) {
               ))}
             </ul>
           </>
-        ) : props.etatAdministratif?.toUpperCase() !== "F" ? (
+        ) : (
           <>
             <span>
               Cette entreprise n'est pas encore inscrite sur Trackdéchets
@@ -43,13 +41,16 @@ export default function CompanyRegistration(props: Props) {
               <a href={routes.signup.index}>vous inscrivant</a>
             </span>
           </>
-        ) : (
-          <>
-            <span>Cet établissement est fermé</span>
-            <br />
-          </>
         )}
       </div>
+      {props.etatAdministratif?.toUpperCase() === "F" && (
+        <div
+          className={`notification notification--error`}
+          style={{ width: "100%" }}
+        >
+          <span>Cet établissement est fermé selon l'INSEE</span>
+        </div>
+      )}
     </div>
   );
 }
