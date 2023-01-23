@@ -13,7 +13,7 @@
     text-transform: lowercase;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-left: 5px;
+    margin: 0 0 0 5px;
     color: #3a3a3a;
 
     @include desktop {
