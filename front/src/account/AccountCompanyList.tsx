@@ -84,7 +84,7 @@ export default function AccountCompanyList() {
       if (searchClue.length === 0) {
         listTitle = `Vous êtes membre de ${data.myCompanies?.totalCount} établissement${plural}`;
       } else {
-        listTitle = `${data.myCompanies?.totalCount} résultat${plural} pour la recherche: ${searchClue}`;
+        listTitle = `${companies.length} résultat${plural} pour la recherche: ${searchClue}`;
       }
 
       content = (
@@ -124,7 +124,7 @@ export default function AccountCompanyList() {
         <Col n="6">
           <TextInput
             label="Filtrer mes établissement"
-            hint="Vous pouvez utiliser le nom, le n° de siret ou le n° de TVA"
+            hint="Vous pouvez utiliser le nom officiel ou usuel, le n° de siret ou le n° de TVA"
             onChange={e => {
               setStartSearch(true);
               setSearchClue(e.target.value);
