@@ -12,7 +12,8 @@ import {
   isFRVat,
   TEST_COMPANY_PREFIX,
   countries,
-  cleanClue
+  cleanClue,
+  isClosedCompany
 } from "../common/constants/companySearchHelpers";
 import { SireneSearchResult } from "./sirene/types";
 import { CompanyVatSearchResult } from "./vat/vies/types";
@@ -152,7 +153,7 @@ export const makeSearchCompanies =
       return searchCompany(cleanedClue)
         .then(c =>
           // Exclude closed companies
-          [c].filter(c => c.etatAdministratif && c.etatAdministratif === "A")
+          [c].filter(c => c.etatAdministratif && !isClosedCompany(c))
         )
         .catch(_ => []);
     }
@@ -189,7 +190,7 @@ async function searchSireneOrNotFound(
   siret: string
 ): Promise<SireneSearchResult> {
   try {
-    return await redundantCachedSearchSirene(siret);
+    return redundantCachedSearchSirene(siret);
   } catch (err) {
     // The SIRET was not found in public data
     // Try searching the anonymous companies

@@ -3,13 +3,20 @@ import { CompanySearchResult } from "generated/graphql/types";
 import routes from "common/routes";
 import { COMPANY_TYPES } from "login/CompanyType";
 
-type Props = Pick<CompanySearchResult, "isRegistered" | "companyTypes">;
+type Props = Pick<
+  CompanySearchResult,
+  "isRegistered" | "companyTypes" | "etatAdministratif"
+>;
 
 export default function CompanyRegistration(props: Props) {
   return (
     <div className="columns">
       <div
-        className={`notification ${props.isRegistered ? "success" : "warning"}`}
+        className={`notification ${
+          props.isRegistered || props.etatAdministratif?.toUpperCase() !== "F"
+            ? "notification--success"
+            : "notification--error"
+        }`}
         style={{ width: "100%" }}
       >
         {props.isRegistered ? (
@@ -25,7 +32,7 @@ export default function CompanyRegistration(props: Props) {
               ))}
             </ul>
           </>
-        ) : (
+        ) : props.etatAdministratif?.toUpperCase() !== "F" ? (
           <>
             <span>
               Cette entreprise n'est pas encore inscrite sur Trackdéchets
@@ -35,6 +42,11 @@ export default function CompanyRegistration(props: Props) {
               Il s'agit de votre entreprise ? Mettez à jour vos informations en{" "}
               <a href={routes.signup.index}>vous inscrivant</a>
             </span>
+          </>
+        ) : (
+          <>
+            <span>Cet établissement est fermé</span>
+            <br />
           </>
         )}
       </div>

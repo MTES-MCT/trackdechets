@@ -41,6 +41,7 @@ const COMPANY_INFOS = gql`
       }
       ecoOrganismeAgreements
       statutDiffusionEtablissement
+      etatAdministratif
     }
   }
 `;
@@ -118,6 +119,7 @@ export default function CompanyInfo() {
 
           <CompanyRegistration
             isRegistered={company.isRegistered}
+            etatAdministratif={company.etatAdministratif}
             companyTypes={company.companyTypes}
           />
 
