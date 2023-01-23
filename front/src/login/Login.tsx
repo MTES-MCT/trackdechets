@@ -51,7 +51,7 @@ export default function Login() {
     }>();
 
   useEffect(() => {
-    document.title = `Créer un compte | ${document.title}`;
+    document.title = `Se connecter | ${document.title}`;
   }, []);
 
   const [showPassword, setShowPassword] = useState(false);
