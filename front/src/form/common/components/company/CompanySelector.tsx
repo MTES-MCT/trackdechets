@@ -12,6 +12,7 @@ import {
   isFRVat,
   isVat,
   isForeignVat,
+  isSiret,
 } from "generated/constants/companySearchHelpers";
 import { checkVAT } from "jsvat";
 import React, { useMemo, useRef, useState } from "react";
@@ -146,6 +147,10 @@ export default function CompanySelector({
     skip: !orgId,
   });
 
+  function isUnknownCompanyName(company: CompanySearchResult): boolean {
+    return company.name === "---" || company.name === "";
+  }
+
   /**
    * Selection d'un établissement dans le formulaire
    */
@@ -166,8 +171,7 @@ export default function CompanySelector({
 
     // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
     setDisplayForeignCompanyWithUnknownInfos(
-      isForeignVat(company.vatNumber!!) &&
-        (company.name === "---" || company.name === "")
+      isForeignVat(company.vatNumber!!) && isUnknownCompanyName(company)
     );
 
     setIsForeignCompany(isForeignVat(company.vatNumber!!));
@@ -176,7 +180,7 @@ export default function CompanySelector({
       orgId: company.orgId,
       siret: company.siret,
       vatNumber: company.vatNumber,
-      name: company.name && company.name !== "---" ? company.name : "",
+      name: company.name && !isUnknownCompanyName(company) ? company.name : "",
       address: company.address ?? "",
       contact: company.contact ?? "",
       phone: company.contactPhone ?? "",
@@ -269,7 +273,7 @@ export default function CompanySelector({
       await searchCompaniesQuery({
         variables: {
           clue,
-          ...(!isValidVat && { department }),
+          ...(isSiret(clue) && { department }),
         },
       });
     }
