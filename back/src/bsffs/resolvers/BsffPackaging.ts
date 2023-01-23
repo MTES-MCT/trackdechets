@@ -1,13 +1,15 @@
-import prisma from "../../prisma";
 import { BsffPackagingResolvers } from "../../generated/graphql/types";
-import { getNextPackagings, getPreviousPackagings } from "../database";
 import { expandBsffFromDB } from "../converter";
+import {
+  getReadonlyBsffPackagingRepository,
+  getReadonlyBsffRepository
+} from "../repository";
 
 export const BsffPackaging: BsffPackagingResolvers = {
   bsff: async packaging => {
-    const bsff = await prisma.bsffPackaging
-      .findUnique({ where: { id: packaging.id } })
-      .bsff();
+    const { findUniqueGetBsff } = getReadonlyBsffPackagingRepository();
+    const bsff = await findUniqueGetBsff({ where: { id: packaging.id } });
+
     return {
       ...expandBsffFromDB(bsff),
       ficheInterventions: [],
@@ -18,9 +20,10 @@ export const BsffPackaging: BsffPackagingResolvers = {
     };
   },
   nextBsff: async packaging => {
-    const nextPackaging = await prisma.bsffPackaging
-      .findUnique({ where: { id: packaging.id } })
-      .nextPackaging({ include: { bsff: true } });
+    const { findUniqueGetNextPackaging } = getReadonlyBsffPackagingRepository();
+    const nextPackaging = await findUniqueGetNextPackaging({
+      where: { id: packaging.id }
+    });
     if (nextPackaging) {
       return {
         ...expandBsffFromDB(nextPackaging.bsff),
@@ -34,9 +37,11 @@ export const BsffPackaging: BsffPackagingResolvers = {
     return null;
   },
   nextBsffs: async packaging => {
-    const nextPackagings = await getNextPackagings(packaging.id);
+    const { findNextPackagings } = getReadonlyBsffPackagingRepository();
+    const { findMany: findManyBsff } = getReadonlyBsffRepository();
+    const nextPackagings = await findNextPackagings(packaging.id);
     const nextBsffIds = nextPackagings.map(p => p.bsffId);
-    const bsffs = await prisma.bsff.findMany({
+    const bsffs = await findManyBsff({
       where: { id: { in: nextPackagings.map(p => p.bsffId) } }
     });
     return nextBsffIds
@@ -52,9 +57,11 @@ export const BsffPackaging: BsffPackagingResolvers = {
       }));
   },
   previousBsffs: async packaging => {
-    const previousPackagings = await getPreviousPackagings([packaging.id]);
+    const { findPreviousPackagings } = getReadonlyBsffPackagingRepository();
+    const { findMany: findManyBsff } = getReadonlyBsffRepository();
+    const previousPackagings = await findPreviousPackagings([packaging.id]);
     const previousBsffIds = [...new Set(previousPackagings.map(p => p.bsffId))];
-    const bsffs = await prisma.bsff.findMany({
+    const bsffs = await findManyBsff({
       where: { id: { in: previousBsffIds } }
     });
     return previousBsffIds

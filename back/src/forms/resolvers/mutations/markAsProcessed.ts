@@ -13,6 +13,7 @@ import machine from "../../workflow/machine";
 import { runInTransaction } from "../../../common/repository/helper";
 import { checkVAT } from "jsvat";
 import {
+  cleanClue,
   countries,
   isSiret,
   isVat
@@ -57,10 +58,7 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
     !formUpdateInput.nextDestinationCompanyCountry
   ) {
     const vatCountryCode = checkVAT(
-      (formUpdateInput.nextDestinationCompanyVatNumber as string).replace(
-        /[\W_\s]/gim,
-        ""
-      ),
+      cleanClue(formUpdateInput.nextDestinationCompanyVatNumber as string),
       countries
     )?.country?.isoCode.short;
     formUpdateInput.nextDestinationCompanyCountry = vatCountryCode;

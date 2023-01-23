@@ -38,7 +38,8 @@ import {
   MISSING_PROCESSING_OPERATION,
   MISSING_COMPANY_OMI_NUMBER,
   INVALID_COMPANY_OMI_NUMBER,
-  INVALID_INDIVIDUAL_OR_FOREIGNSHIP
+  INVALID_INDIVIDUAL_OR_FOREIGNSHIP,
+  MISSING_COMPANY_SIRET_OR_VAT
 } from "./errors";
 import {
   isVat,
@@ -46,16 +47,22 @@ import {
   isFRVat,
   isOmi,
   isForeignVat,
-  countries as vatCountries
+  countries as vatCountries,
+  BAD_CHARACTERS_REGEXP
 } from "../common/constants/companySearchHelpers";
 import { validateCompany } from "../companies/validateCompany";
 import { Decimal } from "decimal.js-light";
 import {
-  destinationCompanySiretSchema,
-  transporterCompanySiretSchema,
-  transporterCompanyVatNumberSchema
-} from "../companies/validation";
-import { weight, weightConditions, WeightUnits } from "../common/validation";
+  foreignVatNumber,
+  siret,
+  siretConditions,
+  siretTests,
+  vatNumber,
+  vatNumberTests,
+  weight,
+  weightConditions,
+  WeightUnits
+} from "../common/validation";
 import { checkVAT } from "jsvat";
 // set yup default error messages
 configureYup();
@@ -251,44 +258,16 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
         emitterIsForeignShip === true ? schema.notRequired() : schema
       )
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_NAME}`),
-    emitterCompanySiret: yup
-      .string()
-      .test(
-        "company-siret-with-foreign-ship",
-        "Émetteur: vous ne pouvez pas enregistrer un numéro de SIRET en cas d'émetteur navire étranger",
-        function (value) {
-          const { emitterIsForeignShip } = this.parent;
-          if (emitterIsForeignShip === true && value) {
-            return false;
-          }
-          return true;
-        }
-      )
-      .test(
-        "company-siret-with-private",
-        "Émetteur: vous ne pouvez pas enregistrer un numéro de SIRET en cas d'émetteur particulier",
-        function (value) {
-          const { emitterIsPrivateIndividual } = this.parent;
-          if (emitterIsPrivateIndividual === true && value) {
-            return false;
-          }
-          return true;
-        }
-      )
-      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
-        emitterIsForeignShip === true ? schema.notRequired() : schema
-      )
-      .when(
-        "emitterIsPrivateIndividual",
-        (emitterIsPrivateIndividual, schema) =>
-          emitterIsPrivateIndividual === true ? schema.notRequired() : schema
-      )
-      .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_SIRET}`)
-      .test(
-        "is-siret",
-        "Émetteur: ${originalValue} n'est pas un numéro de SIRET valide",
-        value => !value || isSiret(value)
-      ),
+    emitterCompanySiret: siret
+      .label("Émetteur")
+      .when("emitterIsForeignShip", siretConditions.isForeignShip)
+      .when("emitterIsPrivateIndividual", siretConditions.isPrivateIndividual)
+      .when(["emitterIsForeignShip", "emitterIsPrivateIndividual"], {
+        is: (isForeignShip: boolean, isPrivateIndividual: boolean) =>
+          !isForeignShip && !isPrivateIndividual,
+        then: schema =>
+          schema.requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_SIRET}`)
+      }),
     emitterCompanyAddress: yup
       .string()
       .ensure()
@@ -420,15 +399,8 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
 
 // Optional validation schema for eco-organisme appearing in frame 1
 export const ecoOrganismeSchema = yup.object().shape({
-  ecoOrganismeSiret: yup
-    .string()
-    .notRequired()
-    .nullable()
-    .test(
-      "is-siret",
-      "Éco-organisme: ${originalValue} n'est pas un numéro de SIRET valide",
-      value => !value || isSiret(value)
-    )
+  ecoOrganismeSiret: siret
+    .label("Éco-organisme")
     .test(
       "is-known-eco-organisme",
       "L'éco-organisme avec le siret \"${value}\" n'est pas reconnu.",
@@ -470,21 +442,30 @@ const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
       .when("emitterType", (value, schema) => {
         const oneOf =
           value === EmitterType.APPENDIX2
-            ? PROCESSING_AND_REUSE_OPERATIONS_CODES
-            : PROCESSING_OPERATIONS_CODES;
+            ? [
+                ...PROCESSING_AND_REUSE_OPERATIONS_CODES,
+                ...PROCESSING_AND_REUSE_OPERATIONS_CODES.map(c =>
+                  c.replace(" ", "")
+                )
+              ]
+            : [
+                ...PROCESSING_OPERATIONS_CODES,
+                ...PROCESSING_OPERATIONS_CODES.map(c => c.replace(" ", ""))
+              ];
+
         return schema.oneOf(
           ["", ...oneOf],
-          `Destination ultérieure : ${INVALID_PROCESSING_OPERATION}`
+          `Destination : ${INVALID_PROCESSING_OPERATION}`
         );
       }),
     recipientCompanyName: yup
       .string()
       .ensure()
       .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_NAME}`),
-    recipientCompanySiret: destinationCompanySiretSchema.requiredIf(
-      !isDraft,
-      `Destinataire: ${MISSING_COMPANY_SIRET}`
-    ),
+    recipientCompanySiret: siret
+      .label("Destinataire")
+      .test(siretTests.isRegistered("DESTINATION"))
+      .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_SIRET}`),
     recipientCompanyAddress: yup
       .string()
       .ensure()
@@ -693,8 +674,18 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
         .string()
         .ensure()
         .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_NAME}`),
-      transporterCompanySiret: transporterCompanySiretSchema(isDraft),
-      transporterCompanyVatNumber: transporterCompanyVatNumberSchema,
+      transporterCompanySiret: siret
+        .label("Transporteur")
+        .test(siretTests.isRegistered("TRANSPORTER"))
+        .when(
+          "transporterCompanyVatNumber",
+          // set siret not required when vatNumber is defined and valid
+          siretConditions.companyVatNumber
+        )
+        .requiredIf(!isDraft, `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`),
+      transporterCompanyVatNumber: foreignVatNumber
+        .label("Transporteur")
+        .test(vatNumberTests.isRegisteredTransporter),
       transporterCompanyAddress: yup
         .string()
         .ensure()
@@ -746,15 +737,7 @@ export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
 
 export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
   yup.object({
-    traderCompanySiret: yup
-      .string()
-      .notRequired()
-      .nullable()
-      .test(
-        "is-siret",
-        "Négociant: ${originalValue} n'est pas un numéro de SIRET valide",
-        value => !value || isSiret(value)
-      ),
+    traderCompanySiret: siret.label("Négociant"),
     traderCompanyName: yup.string().when("traderCompanySiret", {
       is: siret => !!siret,
       then: schema =>
@@ -824,15 +807,7 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
 
 export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
   yup.object({
-    brokerCompanySiret: yup
-      .string()
-      .notRequired()
-      .nullable()
-      .test(
-        "is-siret",
-        "Courtier: ${originalValue} n'est pas un numéro de SIRET valide",
-        value => !value || isSiret(value)
-      ),
+    brokerCompanySiret: siret.label("Courtier"),
     brokerCompanyName: yup.string().when("brokerCompanySiret", {
       is: siret => !!siret,
       then: schema =>
@@ -983,30 +958,18 @@ const withNextDestination = (required: boolean) =>
       .string()
       .ensure()
       .requiredIf(required, `Destination ultérieure : ${MISSING_COMPANY_NAME}`),
-    nextDestinationCompanySiret: yup
-      .string()
+    nextDestinationCompanySiret: siret
+      .label("Destination ultérieure prévue")
       .when("nextDestinationCompanyVatNumber", (vat, schema) => {
         return !isVat(vat) && required
-          ? schema
-              .ensure()
-              .required(
-                `Destination ultérieure prévue : ${MISSING_COMPANY_SIRET}`
-              )
-              .test(
-                "is-siret",
-                "Destination ultérieure prévue : Le SIRET n'est pas valide",
-                value => !value || isSiret(value)
-              )
+          ? schema.required(
+              `Destination ultérieure prévue : ${MISSING_COMPANY_SIRET}`
+            )
           : schema.notRequired().nullable();
       }),
-    nextDestinationCompanyVatNumber: yup
-      .string()
-      .ensure()
-      .test(
-        "is-vat",
-        "Destination ultérieure prévue : ${originalValue} n'est pas un numéro de TVA intracommunautaire valide",
-        value => !value || isVat(value)
-      ),
+    nextDestinationCompanyVatNumber: vatNumber.label(
+      "Destination ultérieure prévue"
+    ),
     nextDestinationCompanyAddress: yup
       .string()
       .ensure()
@@ -1028,8 +991,9 @@ const withNextDestination = (required: boolean) =>
               "Destination ultérieure : le code du pays de l'entreprise ne correspond pas au numéro de TVA entré",
               value =>
                 !value ||
-                checkVAT(vat.replace(/[\W_\s]/gim, ""), vatCountries)?.country
-                  ?.isoCode.short === value.replace(/[\W_\s]/gim, "")
+                checkVAT(vat.replace(BAD_CHARACTERS_REGEXP, ""), vatCountries)
+                  ?.country?.isoCode.short ===
+                  value.replace(BAD_CHARACTERS_REGEXP, "")
             )
           : schema;
       })
@@ -1215,22 +1179,22 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
     .forwardedIn();
 
   if (forwardedIn?.recipientCompanySiret) {
-    await destinationCompanySiretSchema.validate(
-      forwardedIn.recipientCompanySiret
-    );
+    await siret
+      .label("Destination finale")
+      .test(siretTests.isRegistered("DESTINATION"))
+      .validate(forwardedIn.recipientCompanySiret);
   }
   if (forwardedIn?.transporterCompanySiret) {
-    await transporterCompanySiretSchema(false).validate(
-      forwardedIn.transporterCompanySiret
-    );
+    await siret
+      .label("Transporteur après entreposage provisoire")
+      .test(siretTests.isRegistered("TRANSPORTER"))
+      .validate(forwardedIn.transporterCompanySiret);
   }
-  if (
-    forwardedIn?.transporterCompanyVatNumber?.length &&
-    !isForeignVat(forwardedIn?.transporterCompanyVatNumber)
-  ) {
-    throw new UserInputError(
-      "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
-    );
+  if (forwardedIn?.transporterCompanyVatNumber) {
+    await foreignVatNumber
+      .label("Transporteur après entreposage provisoire")
+      .test(vatNumberTests.isRegisteredTransporter)
+      .validate(forwardedIn?.transporterCompanyVatNumber);
   }
 }
 
@@ -1240,14 +1204,9 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
  * - only french companies are allowed
  */
 export const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
-  siret: yup
-    .string()
-    .required("Intermédiaires: le N° SIRET est obligatoire")
-    .test(
-      "is-siret",
-      "Intermédiaires: le SIRET n'est pas valide (14 chiffres obligatoires)",
-      siret => !siret || isSiret(siret)
-    ),
+  siret: siret
+    .label("Intermédiaires")
+    .required("Intermédiaires: le N° SIRET est obligatoire"),
   contact: yup
     .string()
     .required("Intermédiaires: les nom et prénom de contact sont obligatoires"),

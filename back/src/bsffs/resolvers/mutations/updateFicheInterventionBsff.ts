@@ -1,6 +1,5 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import prisma from "../../../prisma";
 import {
   flattenFicheInterventionBsffInput,
   expandFicheInterventionBsffFromDB
@@ -8,6 +7,7 @@ import {
 import { validateFicheIntervention } from "../../validation";
 import { getFicheInterventionBsffOrNotFound } from "../../database";
 import { checkCanWriteFicheIntervention } from "../../permissions";
+import { getBsffFicheInterventionRepository } from "../../repository";
 
 const updateFicheInterventionBsff: MutationResolvers["updateFicheInterventionBsff"] =
   async (_, { id, input }, context) => {
@@ -27,7 +27,10 @@ const updateFicheInterventionBsff: MutationResolvers["updateFicheInterventionBsf
 
     await validateFicheIntervention(futureFicheIntervention);
 
-    const updatedFicheIntervention = await prisma.bsffFicheIntervention.update({
+    const { update: updateBsffFicheIntervention } =
+      getBsffFicheInterventionRepository(user);
+
+    const updatedFicheIntervention = await updateBsffFicheIntervention({
       data: ficheInterventionData,
       where: { id: existingFicheIntervention.id }
     });

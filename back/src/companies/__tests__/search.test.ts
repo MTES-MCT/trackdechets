@@ -53,16 +53,21 @@ describe("searchCompany", () => {
     }
   });
 
-  it(`should not allow test company when env var ALLOW_TEST_COMPANY is not setup`, async () => {
+  it(`should not allow test company when env var ALLOW_TEST_COMPANY is not true`, async () => {
+    const OLD_ENV = process.env;
+    process.env.ALLOW_TEST_COMPANY = "false";
+    // re-load variables with custom env
+    jest.resetModules();
     expect.assertions(1);
     try {
-      await searchCompany("000000123546598");
+      await searchCompany("00000012354659");
     } catch (e) {
       expect(e.extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
     }
+    process.env = OLD_ENV;
   });
 
-  it(`should allow test company when env var ALLOW_TEST_COMPANY is setup`, async () => {
+  it(`should allow searching test company when env var ALLOW_TEST_COMPANY is setup`, async () => {
     const OLD_ENV = process.env;
     process.env.ALLOW_TEST_COMPANY = "true";
     // re-load variables with custom env
@@ -78,6 +83,19 @@ describe("searchCompany", () => {
     expect(siret).toEqual(testCompany.siret);
     expect("FR").toEqual(testCompany.codePaysEtrangerEtablissement);
     process.env = OLD_ENV;
+  });
+
+  it(`should allow searching Trackdechets secours company`, async () => {
+    createInput.siret = "11111111192062";
+    const { siret } = await prisma.anonymousCompany.create({
+      data: {
+        orgId: createInput.siret,
+        ...createInput
+      }
+    });
+    const testCompany = await searchCompany(siret);
+    expect(siret).toEqual(testCompany.siret);
+    expect("FR").toEqual(testCompany.codePaysEtrangerEtablissement);
   });
 });
 
@@ -112,6 +130,27 @@ describe("searchCompanies", () => {
     expect(companies[0]).toStrictEqual(company);
   });
 
+  it("should call searchCompany when the clue is formatted like a SIRET but with bad characters", async () => {
+    const siret = siretify(1);
+    const company = {
+      siret,
+      name: "ACME",
+      naf: "NAF",
+      libelleNaf: "Autres activités",
+      codeCommune: "13001",
+      address: "40 boulevard Voltaire 13001 Marseille",
+      addressVoie: "40 boulevard",
+      addressCity: "Marseille",
+      addressPostalCode: "13001",
+      etatAdministratif: "A",
+      codePaysEtrangerEtablissement: "FR"
+    };
+    searchCompanyMock.mockResolvedValue(company);
+    const companies = await searchCompanies(siret.split("").join(" "));
+    expect(searchCompanyMock).toHaveBeenCalledWith(siret);
+    expect(companies[0]).toStrictEqual(company);
+  });
+
   it("should call searchCompany when the clue is formatted like a VAT number", async () => {
     const company = {
       siret: siretify(1),
@@ -128,6 +167,25 @@ describe("searchCompanies", () => {
     };
     searchCompanyMock.mockResolvedValue(company);
     await searchCompanies("IT09301420155");
+    expect(searchCompanyMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("should call searchCompany when the clue is formatted like a VAT number but with bad characters", async () => {
+    const company = {
+      siret: siretify(1),
+      vatNumber: "IT09301420155",
+      name: "ACME",
+      naf: "NAF",
+      libelleNaf: "Autres activités",
+      codeCommune: "13001",
+      address: "40 boulevard Voltaire 13001 Marseille",
+      addressVoie: "40 boulevard",
+      addressCity: "Marseille",
+      addressPostalCode: "13001",
+      etatAdministratif: "A"
+    };
+    searchCompanyMock.mockResolvedValue(company);
+    await searchCompanies("IT09301420155".split("").join("."));
     expect(searchCompanyMock).toHaveBeenCalledTimes(1);
   });
 

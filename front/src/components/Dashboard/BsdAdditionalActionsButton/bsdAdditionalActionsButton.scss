@@ -1,0 +1,53 @@
+$shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+
+.bsd-actions-kebab-menu {
+  position: relative;
+  &__button {
+    position: relative;
+    display: inline-block;
+    box-sizing: border-box;
+    padding: 3px 12px;
+    border: 1px solid #dddddd;
+    background: none;
+
+    .dots {
+      width: 4px;
+      height: 4px;
+      border-radius: 5px;
+      background: #000091;
+      margin: 3px 0;
+    }
+  }
+
+  &__dropdown {
+    position: absolute;
+    right: 0;
+    top: 45px;
+    transition: all 0.25s ease-out;
+    transform: scale(0);
+    transform-origin: 100% 0;
+    box-shadow: $shadow;
+    background: #fff;
+    z-index: 99;
+    padding: 0;
+
+    li {
+      display: block;
+      width: 100%;
+
+      .fr-btn {
+        width: 133px;
+        height: 56px;
+        justify-content: end;
+        margin: 0;
+        padding: 16px;
+        color: #000000;
+      }
+    }
+  }
+
+  &__dropdown--active {
+    transform: scale(1);
+    transition: all 0.25s cubic-bezier(0.5, 1.8, 0.9, 0.8);
+  }
+}

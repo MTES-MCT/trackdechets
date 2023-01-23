@@ -1,6 +1,7 @@
 import { useMutation, gql } from "@apollo/client";
 import { NotificationError } from "common/components/Error";
 import React from "react";
+import { cleanClue } from "../../generated/constants/companySearchHelpers";
 
 const SEND_MEMBERSHIP_REQUEST = gql`
   mutation SendMembershipRequest($siret: String!) {
@@ -62,7 +63,7 @@ export default function AccountCompanyAddInvitationRequest({ siret }) {
         className="btn btn--primary tw-mt-5"
         onClick={() =>
           sendMembershipRequest({
-            variables: { siret: siret.replace(/\s/g, "") },
+            variables: { siret: cleanClue(siret) },
           })
         }
       >

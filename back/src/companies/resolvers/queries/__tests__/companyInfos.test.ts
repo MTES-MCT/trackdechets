@@ -152,16 +152,18 @@ describe("companyInfos search with a VAT number", () => {
     }
   });
 
-  it("should merge info from VAT and TD without S3ic", async () => {
+  it("should return from TD when search for an existing VAT number", async () => {
     vatMock.mockResolvedValueOnce({
       vatNumber: "IT09301420155",
-      name: "Code en stock",
-      address: "une adresse",
+      name: "---", // mock VIES returning hidden company name
+      address: "---",
       codePaysEtrangerEtablissement: "IT",
       statutDiffusionEtablissement: "O",
       etatAdministratif: "A"
     });
     companyMock.mockResolvedValueOnce({
+      name: "Code en stock",
+      address: "une adresse",
       orgId: "IT09301420155",
       contactEmail: "benoit.guigal@protonmail.com",
       contactPhone: "06 67 78 xx xx",

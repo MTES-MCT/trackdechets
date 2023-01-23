@@ -1302,6 +1302,8 @@ export function IconBSDDThin(props: React.SVGProps<SVGSVGElement>) {
       viewBox="0 0 41 47"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
       {...props}
     >
       <path
@@ -1472,6 +1474,8 @@ export function IconBSDasriThin(props: React.SVGProps<SVGSVGElement>) {
       viewBox="0 0 33 38"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
       {...props}
     >
       <g clipPath="url(#clip0_130_10898)">
@@ -1521,7 +1525,7 @@ export function IconBSDasriThin(props: React.SVGProps<SVGSVGElement>) {
         />
       </g>
       <defs>
-        <clipPath id="clip0_130_10898">
+        <clipPath>
           <rect width="33" height="38" fill="white" />
         </clipPath>
       </defs>
@@ -1559,6 +1563,8 @@ export function IconBSVhuThin(props: React.SVGProps<SVGSVGElement>) {
       viewBox="0 0 33 38"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
       {...props}
     >
       <g clipPath="url(#clip0_130_10921)">
@@ -1605,7 +1611,7 @@ export function IconBSVhuThin(props: React.SVGProps<SVGSVGElement>) {
         />
       </g>
       <defs>
-        <clipPath id="clip0_130_10921">
+        <clipPath>
           <rect width="33" height="38" fill="white" />
         </clipPath>
       </defs>
@@ -1638,6 +1644,8 @@ export function IconBSFFMedium(props: React.SVGProps<SVGSVGElement>) {
       viewBox="0 0 33 38"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
       {...props}
     >
       <path
@@ -1713,6 +1721,8 @@ export function IconBSDaThin(props: React.SVGProps<SVGSVGElement>) {
       viewBox="0 0 41 49"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
       {...props}
     >
       <path
@@ -1815,12 +1825,14 @@ export function IconTrackDechetsCheck({
 export function IconWeight({ ...props }: IconProps) {
   return (
     <svg
-      {...props}
       width="12"
       height="13"
       viewBox="0 0 12 13"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      {...props}
     >
       <path
         d="M1.31417 4.87867L0.0285512 10.8779L0.0287007 10.8777C-0.0529007 11.2576 0.0415539 11.654 0.285913 11.956C0.53012 12.2581 0.897924 12.4335 1.28634 12.4333H10.7137C11.1021 12.4336 11.4699 12.2581 11.7141 11.956C11.9584 11.654 12.0529 11.2576 11.9713 10.8777L10.6857 4.87852L10.6858 4.87867C10.624 4.59097 10.4654 4.33331 10.2366 4.14844C10.0076 3.96356 9.72232 3.86283 9.42818 3.86298H8.22401C8.52815 3.33973 8.63784 2.72577 8.53398 2.12945C8.42996 1.53313 8.11893 0.992699 7.65564 0.603057C7.19235 0.213568 6.60632 0 6.00104 0C5.39576 0 4.80989 0.213568 4.34659 0.603057C3.88315 0.992699 3.57213 1.53313 3.46825 2.12945C3.36423 2.72577 3.47393 3.33973 3.77822 3.86298H2.57184C2.27771 3.86283 1.99239 3.96356 1.76344 4.14844C1.53462 4.33331 1.37605 4.59095 1.31419 4.87867H1.31417ZM10.7136 11.148H1.28624L2.57186 5.14879H9.42809L10.7136 11.148ZM4.71436 2.5777C4.71436 2.2368 4.84991 1.90979 5.09098 1.66872C5.33205 1.4275 5.65907 1.29209 5.99997 1.29209C6.34087 1.29209 6.66788 1.4275 6.90896 1.66872C7.15002 1.90979 7.28558 2.2368 7.28558 2.5777C7.28558 2.91861 7.15002 3.24561 6.90896 3.48669C6.66788 3.72776 6.34087 3.86316 5.99997 3.86316C5.65907 3.86316 5.33206 3.72775 5.09098 3.48669C4.84991 3.24562 4.71436 2.9186 4.71436 2.5777Z"

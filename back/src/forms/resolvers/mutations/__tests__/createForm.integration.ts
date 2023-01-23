@@ -29,6 +29,7 @@ const CREATE_FORM = `
         company {
           siret
         }
+        processingOperation
       }
       emitter {
         workSite {
@@ -166,7 +167,10 @@ describe("Mutation.createForm", () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
       const { mutate } = makeClient(user);
-      const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      const { data } = await mutate<
+        Pick<Mutation, "createForm">,
+        MutationCreateFormArgs
+      >(CREATE_FORM, {
         variables: {
           createFormInput: {
             [role]: {
@@ -178,6 +182,42 @@ describe("Mutation.createForm", () => {
       expect(data.createForm.id).toBeTruthy();
     }
   );
+
+  it("should allow to create a form without space in recipientProcessingOperation", async () => {
+    const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory();
+    const destination = await companyFactory();
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            type: "PRODUCER",
+            company: {
+              siret: emitter.siret
+            }
+          },
+          recipient: {
+            processingOperation: "R1",
+            company: {
+              siret: destination.siret
+            }
+          },
+          transporter: {
+            company: {
+              siret: transporter.siret
+            }
+          }
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+    expect(data.createForm.recipient.processingOperation).toEqual("R1");
+  });
 
   it("should allow an intermediary company to create a form", async () => {
     const intermediary = await userWithCompanyFactory(UserRole.MEMBER, {
@@ -561,7 +601,7 @@ describe("Mutation.createForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination avec le SIRET ${siret} n'est pas inscrite sur Trackdéchets`,
+        message: `Destinataire : l'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -594,7 +634,7 @@ describe("Mutation.createForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le transporteur qui a été renseigné sur le bordereau (SIRET: ${siret}) n'est pas inscrit sur Trackdéchets`,
+        message: `Transporteur : l'établissement avec le SIRET ${siret} n'est pas inscrit sur Trackdéchets`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

@@ -18,7 +18,6 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { OPERATION } from "../../../constants";
-import { getPreviousPackagings } from "../../../database";
 import {
   createBsff,
   createBsffAfterEmission,
@@ -28,6 +27,7 @@ import {
 } from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
 import { associateUserToCompany } from "../../../../users/database";
+import { getReadonlyBsffPackagingRepository } from "../../../repository";
 
 const CREATE_DRAFT_BSFF = `
   mutation CreateDraftBsff($input: BsffInput!) {
@@ -254,9 +254,10 @@ describe("Mutation.createDraftBsff", () => {
 
       expect(errors).toBeUndefined();
 
-      const previousPackagings = await getPreviousPackagings(
-        data.createDraftBsff.packagings.map(p => p.id)
-      );
+      const previousPackagings =
+        await getReadonlyBsffPackagingRepository().findPreviousPackagings(
+          data.createDraftBsff.packagings.map(p => p.id)
+        );
 
       expect(previousPackagings).toHaveLength(previousBsff.packagings.length);
 
@@ -299,9 +300,10 @@ describe("Mutation.createDraftBsff", () => {
 
       expect(errors).toBeUndefined();
 
-      const previousPackagings = await getPreviousPackagings(
-        data.createDraftBsff.packagings.map(p => p.id)
-      );
+      const previousPackagings =
+        await getReadonlyBsffPackagingRepository().findPreviousPackagings(
+          data.createDraftBsff.packagings.map(p => p.id)
+        );
 
       expect(previousPackagings).toHaveLength(1);
       expect(previousPackagings[0].id).toEqual(forwarded.packagings[0].id);
@@ -400,9 +402,10 @@ describe("Mutation.createDraftBsff", () => {
 
       expect(errors).toBeUndefined();
 
-      const previousPackagings = await getPreviousPackagings(
-        data.createDraftBsff.packagings.map(p => p.id)
-      );
+      const previousPackagings =
+        await getReadonlyBsffPackagingRepository().findPreviousPackagings(
+          data.createDraftBsff.packagings.map(p => p.id)
+        );
 
       expect(previousPackagings).toHaveLength(
         previousBsffs.flatMap(bsff => bsff.packagings).length

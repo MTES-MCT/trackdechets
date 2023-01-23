@@ -1,11 +1,10 @@
 import { UserInputError } from "apollo-server-express";
 import { MutationResolvers } from "../../../generated/graphql/types";
-import * as elastic from "../../../common/elastic";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { expandBsffFromDB } from "../../converter";
 import { checkCanWriteBsff } from "../../permissions";
 import { getBsffOrNotFound } from "../../database";
-import { runInTransaction } from "../../../common/repository/helper";
+import { getBsffRepository } from "../../repository";
 
 const deleteBsff: MutationResolvers["deleteBsff"] = async (
   _,
@@ -22,28 +21,11 @@ const deleteBsff: MutationResolvers["deleteBsff"] = async (
     );
   }
 
-  const updatedBsff = await runInTransaction(async transaction => {
-    // disconnect previous packagings
-    await transaction.bsffPackaging.updateMany({
-      where: {
-        nextPackagingId: { in: existingBsff.packagings.map(p => p.id) }
-      },
-      data: { nextPackagingId: null }
-    });
+  const { delete: deleteBsff } = getBsffRepository(user);
 
-    return transaction.bsff.update({
-      where: {
-        id
-      },
-      data: {
-        isDeleted: true
-      }
-    });
-  });
+  const deletedBsff = await deleteBsff({ where: { id } });
 
-  await elastic.deleteBsd({ id: updatedBsff.id }, context);
-
-  return expandBsffFromDB(updatedBsff);
+  return expandBsffFromDB(deletedBsff);
 };
 
 export default deleteBsff;
