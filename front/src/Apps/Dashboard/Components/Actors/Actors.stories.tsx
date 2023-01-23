@@ -17,35 +17,7 @@ const Template: ComponentStory<typeof Actors> = args => <Actors {...args} />;
 export const List = Template.bind({});
 
 List.args = {
-  emitter: {
-    company: {
-      name: "BOULANGERIE AU 148",
-      orgId: "81232991000010",
-      siret: "81232991000010",
-      vatNumber: null,
-      omiNumber: null,
-      __typename: "FormCompany",
-    },
-    emission: {
-      isTakenOverWithoutEmitterSignature: false,
-      isTakenOverWithSecretCode: false,
-      __typename: "BsdasriEmission",
-    },
-    __typename: "BsdasriEmitter",
-  },
-
-  transporter: {
-    company: {
-      name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-      orgId: "13001045700013",
-      siret: "13001045700013",
-      vatNumber: null,
-      omiNumber: null,
-      __typename: "FormCompany",
-    },
-    customInfo: "houlalalal",
-    transport: {
-      plates: ["obligé"],
-    },
-  },
+  emitterName: "BOULANGERIE AU 148",
+  transporterName:
+    "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
 };

@@ -1885,8 +1885,8 @@ export function IconDestination({ ...props }: IconProps) {
       {...props}
     >
       <path
-        fill-rule="evenodd"
-        clip-rule="evenodd"
+        fillRule="evenodd"
+        clipRule="evenodd"
         d="M12.8028 9.20832L8.55629 4.96182L9.67571 3.84241L15.8333 9.99999L9.67571 16.1576L8.55629 15.0382L12.8028 10.7917H3.16663V9.20832H12.8028Z"
         fill="#000091"
       />

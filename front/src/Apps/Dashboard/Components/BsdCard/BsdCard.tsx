@@ -86,9 +86,9 @@ function BsdCard({
 
             <div className="bsd-card__content__actors">
               <Actors
-                emitter={bsdDisplay.emitter}
-                transporter={bsdDisplay.transporter}
-                destination={bsdDisplay.destination}
+                emitterName={bsdDisplay.emitter?.company?.name || ""}
+                transporterName={bsdDisplay.transporter?.company?.name || ""}
+                destinationName={bsdDisplay.destination?.company?.name || ""}
               />
             </div>
 

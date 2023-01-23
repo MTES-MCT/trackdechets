@@ -7,25 +7,29 @@ import {
   IconTransporter,
 } from "../../../../common/components/Icons";
 
-function Actors({ emitter, transporter, destination }: ActorsProps) {
+function Actors({
+  emitterName,
+  transporterName,
+  destinationName,
+}: ActorsProps) {
   return (
     <div className="actors">
-      {emitter?.company?.name && (
+      {emitterName && (
         <div className="actors__item">
           <IconEmitter className="actors__emitter-icon" />
-          <p className="actors__label"> {emitter.company.name}</p>
+          <p className="actors__label"> {emitterName}</p>
         </div>
       )}
-      {transporter?.company?.name && (
+      {transporterName && (
         <div className="actors__item">
           <IconTransporter className="actors__transporter-icon" />
-          <p className="actors__label"> {transporter.company.name}</p>
+          <p className="actors__label"> {transporterName}</p>
         </div>
       )}
-      {destination?.company?.name && (
+      {destinationName && (
         <div className="actors__item">
           <IconDestination className="actors__destination-icon" />
-          <p className="actors__label"> {destination.company.name}</p>
+          <p className="actors__label"> {destinationName}</p>
         </div>
       )}
     </div>
