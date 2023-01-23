@@ -125,7 +125,9 @@ export function BsddRequestRevision({ bsdd }: Props) {
                 </Switch>
 
                 <div
-                  className={areModificationsDisabled ? "collapse" : "expand"}
+                  style={{
+                    display: areModificationsDisabled ? "none" : "inline",
+                  }}
                 >
                   <hr />
 
