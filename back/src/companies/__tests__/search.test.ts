@@ -1,7 +1,9 @@
 import { makeSearchCompanies, searchCompany } from "../search";
 import { ErrorCode } from "../../common/errors";
 import prisma from "../../prisma";
+import client from "../sirene/trackdechets/esClient";
 import { siretify } from "../../__tests__/factories";
+import { SearchHit } from "../sirene/trackdechets/types";
 
 const createInput = {
   siret: siretify(3),
@@ -18,9 +20,12 @@ jest.mock("../../prisma", () => ({
     findUnique: jest.fn(() => Promise.resolve(createInput))
   },
   company: {
-    findUnique: jest.fn(() => Promise.resolve(null))
+    findUnique: jest.fn(() => Promise.resolve(null)),
+    findMany: jest.fn(() => Promise.resolve([]))
   }
 }));
+
+jest.mock("../sirene/trackdechets/esClient");
 
 describe("searchCompany", () => {
   it(`should throw BAD_USER_INPUT error if
@@ -107,6 +112,7 @@ describe("searchCompanies", () => {
 
   beforeEach(() => {
     searchCompanyMock.mockReset();
+    (client.search as jest.Mock).mockReset();
   });
 
   it("should call searchCompany when the clue is formatted like a SIRET", async () => {
@@ -130,7 +136,7 @@ describe("searchCompanies", () => {
     expect(companies[0]).toStrictEqual(company);
   });
 
-  it("should call searchCompany when the clue is formatted like a SIRET but with bad characters", async () => {
+  it("should call searchCompany when the clue is formatted like a SIRET but without bad characters", async () => {
     const siret = siretify(1);
     const company = {
       siret,
@@ -170,7 +176,7 @@ describe("searchCompanies", () => {
     expect(searchCompanyMock).toHaveBeenCalledTimes(1);
   });
 
-  it("should call searchCompany when the clue is formatted like a VAT number but with bad characters", async () => {
+  it("should call searchCompany when the clue is formatted like a VAT number but without bad characters", async () => {
     const company = {
       siret: siretify(1),
       vatNumber: "IT09301420155",
@@ -187,6 +193,92 @@ describe("searchCompanies", () => {
     searchCompanyMock.mockResolvedValue(company);
     await searchCompanies("IT09301420155".split("").join("."));
     expect(searchCompanyMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("should call searchCompanies by name when the clue is formatted like a text and overwrite data from Sirene", async () => {
+    const siret = siretify(1);
+    const company = {
+      siret,
+      orgId: siret,
+      name: "ACME OF TRACKDECHETS",
+      naf: "NAF",
+      libelleNaf: "Autres activités",
+      codeCommune: "13001",
+      address: "40 boulevard Voltaire 13001 Marseille",
+      addressVoie: "40 boulevard",
+      addressCity: "Marseille",
+      addressPostalCode: "13001",
+      etatAdministratif: "A"
+    };
+    const companies = [company];
+    (prisma.company.findMany as jest.Mock).mockResolvedValue(companies);
+
+    // SIRENE return a different information
+    (client.search as jest.Mock).mockResolvedValueOnce({
+      body: {
+        hits: {
+          hits: [
+            {
+              _source: {
+                siret: company.siret,
+                denominationUniteLegale: company.name,
+                numeroVoieEtablissement: "4",
+                typeVoieEtablissement: "BD",
+                libelleVoieEtablissement: "LONGCHAMP",
+                codePostalEtablissement: "13001",
+                libelleCommuneEtablissement: "MARSEILLE",
+                activitePrincipaleEtablissement: "6201Z",
+                etatAdministratifEtablissement: company.etatAdministratif
+              }
+            }
+          ] as SearchHit[]
+        }
+      }
+    });
+    // check that searchCompanies return Sirene data instead of prisma.company data
+    const companiesSearched = await searchCompanies("ACME OF TRACKDECHETS");
+    expect(companiesSearched).toHaveLength(1);
+    const expected = {
+      siret: company.siret,
+      orgId: company.siret,
+      isRegistered: true,
+      statutDiffusionEtablissement: undefined,
+      address: "4 BD LONGCHAMP 13001 MARSEILLE",
+      addressVoie: "4 BD LONGCHAMP",
+      codeCommune: undefined,
+      codePaysEtrangerEtablissement: undefined,
+      addressPostalCode: company.addressPostalCode,
+      addressCity: "MARSEILLE",
+      name: company.name,
+      etatAdministratif: company.etatAdministratif,
+      libelleNaf: "Programmation informatique",
+      naf: "6201Z"
+    };
+    expect(companiesSearched[0]).toEqual(expected);
+    expect(client.search as jest.Mock).toHaveBeenCalledTimes(1);
+    expect(client.search as jest.Mock).toHaveBeenCalledWith(
+      {
+        body: {
+          query: {
+            bool: {
+              must: [
+                {
+                  match: {
+                    td_search_companies: {
+                      operator: "or",
+                      query: "ACME OF TRACKDECHETS"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        index: "stocketablissement-production"
+      },
+      undefined
+    );
+    expect(searchCompanyMock).toHaveBeenCalledTimes(0);
   });
 
   it(`should not return closed companies when searching by SIRET`, async () => {
