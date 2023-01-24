@@ -1,6 +1,6 @@
-import { UserInputError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import omit from "object.omit";
-import { Prisma, BsffType, Bsff } from "@prisma/client";
+import { Prisma, BsffType } from "@prisma/client";
 import {
   BsffSignatureType,
   MutationResolvers
@@ -62,56 +62,57 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     );
   }
 
-  let flatInput = { ...flattenBsffInput(input) };
+  const flatInput = { ...flattenBsffInput(input) };
+
+  const sealedErrorFields: string[] = [];
 
   if (existingBsff.emitterEmissionSignatureDate) {
-    flatInput = omit(flatInput, [
-      "type",
-      "emitterCompanyAddress",
-      "emitterCompanyContact",
-      "emitterCompanyMail",
-      "emitterCompanyName",
-      "emitterCompanyPhone",
-      "emitterCompanySiret",
-      "wasteCode",
-      "wasteDescription",
-      "weightValue",
-      "weightIsEstimate",
-      "destinationPlannedOperationCode"
-    ]);
+    for (const field of Object.keys(flatInput)) {
+      if (
+        !editableFieldsAfterEmission.includes(field) &&
+        existingBsff[field] !== flatInput[field]
+      ) {
+        sealedErrorFields.push(field);
+      }
+    }
 
-    delete input.grouping;
-    delete input.forwarding;
-    delete input.ficheInterventions;
+    for (const field of [
+      "ficheInterventions",
+      "packagings",
+      "forwarding",
+      "repackaging",
+      "grouping"
+    ]) {
+      if (Object.keys(input).includes(field)) {
+        sealedErrorFields.push(field);
+      }
+    }
   }
 
   if (existingBsff.transporterTransportSignatureDate) {
-    flatInput = omit(flatInput, [
-      "transporterCompanyAddress",
-      "transporterCompanyContact",
-      "transporterCompanyMail",
-      "transporterCompanyName",
-      "transporterCompanyPhone",
-      "transporterCompanySiret",
-      "transporterCompanyVatNumber",
-      "transporterRecepisseDepartment",
-      "transporterRecepisseNumber",
-      "transporterRecepisseValidityLimit",
-      "transporterTransportMode",
-      "wasteAdr"
-    ]);
+    for (const key of Object.keys(flatInput)) {
+      if (
+        !editableFieldsAfterTransport.includes(key) &&
+        existingBsff[key] !== flatInput[key]
+      ) {
+        sealedErrorFields.push(key);
+      }
+    }
   }
 
   if (existingBsff.destinationReceptionSignatureDate) {
-    flatInput = omit(flatInput, [
-      "destinationCompanyAddress",
-      "destinationCompanyContact",
-      "destinationCompanyMail",
-      "destinationCompanyName",
-      "destinationCompanyPhone",
-      "destinationCompanySiret",
-      "destinationReceptionDate"
-    ]);
+    for (const key of Object.keys(flatInput)) {
+      if (
+        !editableFieldsAfterReception.includes(key) &&
+        existingBsff[key] !== flatInput[key]
+      ) {
+        sealedErrorFields.push(key);
+      }
+    }
+  }
+
+  if (sealedErrorFields.length > 0) {
+    throw new SealedFieldError(sealedErrorFields);
   }
 
   const futureBsff = {
@@ -294,3 +295,17 @@ const editableFieldsAfterEmission = editableFields.filter(
 const editableFieldsAfterTransport = editableFieldsAfterEmission.filter(
   k => lockBsffFieldSchema[k] !== "TRANSPORT"
 );
+
+const editableFieldsAfterReception = editableFieldsAfterEmission.filter(
+  k => lockBsffFieldSchema[k] !== "RECEPTION"
+);
+
+export class SealedFieldError extends ForbiddenError {
+  constructor(fields: string[]) {
+    super(
+      `Des champs ont été vérouillés via signature et ne peuvent plus être modifiés : ${fields.join(
+        ", "
+      )}`
+    );
+  }
+}

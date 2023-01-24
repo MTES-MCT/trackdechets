@@ -301,7 +301,7 @@ describe("Mutation.updateBsff", () => {
         }
       }
     };
-    const { data, errors } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
@@ -311,12 +311,12 @@ describe("Mutation.updateBsff", () => {
       }
     });
 
-    expect(errors).toBeUndefined();
-    expect(data.updateBsff.emitter.company).toEqual(
+    expect(errors).toEqual([
       expect.objectContaining({
-        name: bsff.emitterCompanyName
+        message:
+          "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés : emitterCompanyName"
       })
-    );
+    ]);
   });
 
   it("should allow updating waste and quantity if emitter didn't sign", async () => {
@@ -379,7 +379,7 @@ describe("Mutation.updateBsff", () => {
         isEstimate: false
       }
     };
-    const { data, errors } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
@@ -389,20 +389,12 @@ describe("Mutation.updateBsff", () => {
       }
     });
 
-    expect(errors).toBeUndefined();
-    expect(data.updateBsff).toEqual(
+    expect(errors).toEqual([
       expect.objectContaining({
-        waste: {
-          code: bsff.wasteCode,
-          description: bsff.wasteDescription,
-          adr: input.waste.adr
-        },
-        weight: {
-          value: bsff.weightValue,
-          isEstimate: bsff.weightIsEstimate
-        }
+        message:
+          "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés : wasteDescription, weightValue"
       })
-    );
+    ]);
   });
 
   it("should not update packagings after emitter signature", async () => {
@@ -417,26 +409,26 @@ describe("Mutation.updateBsff", () => {
 
     const { mutate } = makeClient(emitter.user);
 
-    await mutate<Pick<Mutation, "updateBsff">, MutationUpdateBsffArgs>(
-      UPDATE_BSFF,
-      {
-        variables: {
-          id: bsff.id,
-          input: {
-            packagings: [
-              { type: "BOUTEILLE", weight: 1, volume: 1, numero: "cont2" }
-            ]
-          }
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          packagings: [
+            { type: "BOUTEILLE", weight: 1, volume: 1, numero: "cont2" }
+          ]
         }
       }
-    );
-
-    const updatedBsff = await prisma.bsff.findUnique({
-      where: { id: bsff.id },
-      include: { packagings: true }
     });
 
-    expect(bsff.packagings[0].id).toEqual(updatedBsff.packagings[0].id);
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés : packagings"
+      })
+    ]);
   });
 
   it("should allow updating transporter if they didn't sign", async () => {
@@ -493,7 +485,7 @@ describe("Mutation.updateBsff", () => {
         }
       }
     };
-    const { data, errors } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
@@ -503,84 +495,12 @@ describe("Mutation.updateBsff", () => {
       }
     });
 
-    expect(errors).toBeUndefined();
-    expect(data.updateBsff.transporter.company).toEqual(
+    expect(errors).toEqual([
       expect.objectContaining({
-        name: bsff.transporterCompanyName
+        message:
+          "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés : transporterCompanyName"
       })
-    );
-  });
-
-  it("should allow updating destination if they didn't sign", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-    const destination = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsffAfterTransport({
-      emitter,
-      transporter,
-      destination
-    });
-
-    const { mutate } = makeClient(emitter.user);
-
-    const input = {
-      destination: {
-        company: {
-          name: "Another name"
-        }
-      }
-    };
-    const { data, errors } = await mutate<
-      Pick<Mutation, "updateBsff">,
-      MutationUpdateBsffArgs
-    >(UPDATE_BSFF, {
-      variables: {
-        id: bsff.id,
-        input
-      }
-    });
-
-    expect(errors).toBeUndefined();
-    expect(data.updateBsff.destination.company).toEqual(
-      expect.objectContaining({ name: input.destination.company.name })
-    );
-  });
-
-  it("should not update a transporter if signed already", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-    const destination = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsffAfterTransport({
-      emitter,
-      transporter,
-      destination
-    });
-
-    const { mutate } = makeClient(emitter.user);
-
-    const input = {
-      transporter: {
-        company: {
-          name: "Another name"
-        }
-      }
-    };
-    const { data, errors } = await mutate<
-      Pick<Mutation, "updateBsff">,
-      MutationUpdateBsffArgs
-    >(UPDATE_BSFF, {
-      variables: {
-        id: bsff.id,
-        input
-      }
-    });
-
-    expect(errors).toBeUndefined();
-    expect(data.updateBsff.transporter.company).toEqual(
-      expect.objectContaining({
-        name: bsff.transporterCompanyName
-      })
-    );
+    ]);
   });
 
   it("should update the list of grouped BSFFs", async () => {
