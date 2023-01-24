@@ -157,29 +157,27 @@ export const makeSearchCompanies =
         .catch(_ => []);
     }
     // fuzzy searching only for French companies
-    return decoratedSearchCompanies(cleanedClue, department).then(
-      async results => {
-        let existingCompanies = [];
-        if (results.length) {
-          existingCompanies = (
-            await prisma.company.findMany({
-              where: {
-                orgId: { in: results.map(r => r.siret) }
-              },
-              select: {
-                orgId: true
-              }
-            })
-          ).map(company => company.orgId);
-        }
-
-        return results.map(company => ({
-          ...company,
-          orgId: company.siret,
-          isRegistered: existingCompanies.includes(company.siret)
-        }));
+    return decoratedSearchCompanies(clue, department).then(async results => {
+      let existingCompanies = [];
+      if (results.length) {
+        existingCompanies = (
+          await prisma.company.findMany({
+            where: {
+              orgId: { in: results.map(r => r.siret) }
+            },
+            select: {
+              orgId: true
+            }
+          })
+        ).map(company => company.orgId);
       }
-    );
+
+      return results.map(company => ({
+        ...company,
+        orgId: company.siret,
+        isRegistered: existingCompanies.includes(company.siret)
+      }));
+    });
   };
 
 /**
