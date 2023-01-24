@@ -28,10 +28,7 @@ import {
   isSiret,
   isForeignVat,
 } from "generated/constants/companySearchHelpers";
-import {
-  companySchema,
-  transporterCompanySchema,
-} from "common/validation/schema";
+import { companySchema } from "common/validation/schema";
 
 setLocale({
   mixed: {
@@ -117,7 +114,7 @@ export const transporterSchema = object().shape({
     ),
   validityLimit: date().nullable(true),
   numberPlate: string().nullable(true),
-  company: transporterCompanySchema,
+  company: companySchema,
 });
 
 const packagingInfo: SchemaOf<Omit<PackagingInfo, "__typename">> =

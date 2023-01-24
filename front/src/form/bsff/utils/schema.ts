@@ -1,7 +1,4 @@
-import {
-  companySchema,
-  transporterCompanySchema,
-} from "common/validation/schema";
+import { companySchema } from "common/validation/schema";
 import { BsffPackagingType } from "generated/graphql/types";
 import * as yup from "yup";
 import { OPERATION } from "./constants";
@@ -9,7 +6,7 @@ import { OPERATION } from "./constants";
 export const transporterSchema = yup.object().shape({
   isExemptedOfReceipt: yup.boolean().nullable(true),
   numberPlate: yup.string().nullable(true),
-  company: transporterCompanySchema,
+  company: companySchema,
   recepisse: yup.object({
     number: yup.string().nullable(true),
     department: yup
