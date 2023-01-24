@@ -109,6 +109,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
         }}
       >
         {({ setFieldValue, values }) => {
+          // One cannot ask for cancelation AND modifications, they are exclusive
           const areModificationsDisabled = values.content.isCanceled;
 
           return (
@@ -120,8 +121,7 @@ export function BsddRequestRevision({ bsdd }: Props) {
                   onChange={value => setFieldValue("content.isCanceled", value)}
                 >
                   Si votre demande d'annulation est approuvée, ce bordereau
-                  passera dans l'onglet Archives pour tous les acteurs du
-                  bordereau.
+                  passera au statut Annulé pour tous les acteurs du bordereau.
                 </Switch>
 
                 <div
