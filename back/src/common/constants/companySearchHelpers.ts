@@ -172,3 +172,12 @@ export const getTransporterCompanyOrgId = (form: {
     ? form.transporterCompanySiret
     : form.transporterCompanyVatNumber;
 };
+
+/**
+ * Check for etatAdministratif
+ */
+export const isClosedCompany = (companyInfos: any) =>
+  companyInfos.etatAdministratif === "F";
+
+export const CLOSED_COMPANY_ERROR =
+  "Impossible de créer un établissement fermé selon l'INSEE";

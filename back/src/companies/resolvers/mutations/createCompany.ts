@@ -13,9 +13,11 @@ import { verificationProcessInfo } from "../../../mailer/templates";
 import { deleteCachedUserCompanies } from "../../../common/redis/users";
 import {
   cleanClue,
+  isClosedCompany,
   isFRVat,
   isSiret,
-  isVat
+  isVat,
+  CLOSED_COMPANY_ERROR
 } from "../../../common/constants/companySearchHelpers";
 import { searchCompany } from "../../search";
 import {
@@ -97,6 +99,10 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   // check if orgId exists in public databases or in AnonymousCompany
   const companyInfo = await searchCompany(orgId);
+
+  if (isClosedCompany(companyInfo)) {
+    throw new UserInputError(CLOSED_COMPANY_ERROR);
+  }
 
   if (companyTypes.includes("ECO_ORGANISME") && siret) {
     const ecoOrganismeExists = await prisma.ecoOrganisme.findUnique({

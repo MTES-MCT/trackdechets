@@ -1,0 +1,5 @@
+export interface ActorsProps {
+  emitterName: string;
+  destinationName: string;
+  transporterName: string;
+}

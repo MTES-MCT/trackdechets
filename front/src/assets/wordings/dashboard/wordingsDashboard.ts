@@ -63,3 +63,34 @@ export const dupliquer_action_label = "Dupliquer";
 export const revision_action_label = "Révision";
 export const supprimer_action_label = "Supprimer";
 export const completer_bsd_suite = "Compléter le BSD suite";
+
+// breadcrumb
+export const breadcrumb_title = "Mes Bordereaux";
+export const breadcrumb_pour_action = "Pour Action";
+export const breadcrumb_brouillon = "Brouillons";
+export const breadcrumb_suivi = "Suivi";
+export const breadcrumb_archive = "Archives";
+
+// blankstate
+export const blankstate_action_title = "Il n'y a aucun bordereau à signer";
+export const blankstate_action_desc = `Bonne nouvelle, vous n'avez aucun bordereau à signer ! Des
+bordereaux apparaissent dans cet onglet uniquement lorsque vous avez
+une action à effectuer dans le cadre de leur cycle de vie (envoi,
+réception ou traitement...)`;
+export const blankstate_history_title = "Il n'y a aucun bordereau en archive";
+export const blankstate_history_desc = ` Des bordereaux apparaissent dans cet onglet lorsqu'ils ont terminé
+leur cycle de vie. Ils sont alors disponibles en lecture seule
+pour consultation.`;
+export const blankstate_draft_title = "Il n'y a aucun bordereau en brouillon";
+export const blankstate_draft_desc = `Si vous le souhaitez, vous pouvez créer un bordereau depuis le menu de
+création ci-dessus ou dupliquer un bordereau déjà existant dans un autre
+onglet grâce à l'icône `;
+export const blankstate_follow_title = "Il n'y a aucun bordereau à suivre";
+export const blankstate_follow_desc = `Des bordereaux apparaissent dans cet onglet lorsqu'ils sont en
+attente d'une action extérieure. Par exemple lorsqu'en tant que
+producteur vous attendez la réception d'un déchet ou son
+traitement. La colonne STATUT vous renseignera
+sur l'état précis du bordereau.`;
+
+// load more
+export const load_more_bsds = "Charger plus de bordereaux";

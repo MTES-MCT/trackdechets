@@ -17,6 +17,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Amélioration de la recherche par numéro de TVA et accélération requêtes pour les établissement déjà enregistrés [PR 1988](https://github.com/MTES-MCT/trackdechets/pull/1988)
 - Les transporteurs peuvent désormais choisir manuellement la date de prise en charge pour les BSFF [PR 2073](https://github.com/MTES-MCT/trackdechets/pull/2073)
+- Interdire la possibilité de créer un SIRET fermé selon l'INSEE, ni de valider ou re-valider (`markAsSealed` et `markAsResealed`) un BSDD avec un SIRET qui est fermé. Amélioration de l'affichage de la page publique `/company/1234` [PR 2003](https://github.com/MTES-MCT/trackdechets/pull/2003)
 
 # [2023.1.3] 19/01/2023
 
