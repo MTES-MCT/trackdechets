@@ -21,6 +21,7 @@ import {
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
   CompanyInput,
+  CompanySearchResult,
   InitialFormFractionInput,
   PackagingInfo,
   Packagings
@@ -48,7 +49,8 @@ import {
   isOmi,
   isForeignVat,
   countries as vatCountries,
-  BAD_CHARACTERS_REGEXP
+  BAD_CHARACTERS_REGEXP,
+  isClosedCompany
 } from "../common/constants/companySearchHelpers";
 import { validateCompany } from "../companies/validateCompany";
 import { Decimal } from "decimal.js-light";
@@ -64,6 +66,9 @@ import {
   WeightUnits
 } from "../common/validation";
 import { checkVAT } from "jsvat";
+import { searchCompany } from "../companies/search";
+import { AnonymousCompanyError } from "../companies/sirene/errors";
+import { SIRETS_BY_ROLE_INCLUDE, getFormSiretsByRole } from "./database";
 // set yup default error messages
 configureYup();
 
@@ -1422,4 +1427,66 @@ export async function validateGroupement(
   }
 
   return formFractions;
+}
+
+export async function checkForClosedCompanies(formId: string) {
+  const form = await prisma.form.findUnique({
+    where: { id: formId },
+    include: { ...SIRETS_BY_ROLE_INCLUDE, forwardedIn: true }
+  });
+  const allSirets = {
+    ...getFormSiretsByRole(form as any),
+    ...(form.forwardedIn
+      ? {
+          forwardedInSirets: [
+            form.forwardedIn.recipientCompanySiret,
+            form.forwardedIn.transporterCompanySiret
+          ]
+        }
+      : {}),
+    emitterCompanySiret: [form.emitterCompanySiret],
+    brokerCompanySiret: [form.brokerCompanySiret],
+    traderCompanySiret: [form.traderCompanySiret],
+    nextTransporterSiret: [form.nextTransporterSiret]
+  };
+  // We request in parallel only by type in order not to overload Sirene search server
+  for (const siretType in allSirets) {
+    // We reject at first rejection in order not to overload Sirene search server
+    // We may use Promise.allSettled in the future in order to query all the sirets at once if the servers can really handle the load
+    await Promise.all(
+      allSirets[siretType]?.map(async siret => {
+        try {
+          // this ony excludes empty or possible vat numbers
+          // nb: isSiret is indeed used in input validation
+          if (!isSiret(siret)) {
+            return;
+          }
+          const company = await searchCompany(siret);
+          if (company && isClosedCompany(company as CompanySearchResult)) {
+            // intentionally do not use UserInputError
+            throw new Error(
+              `Établissement ${siret} fermé, veuillez vérifier son numéro de SIRET`
+            );
+          }
+        } catch (exc) {
+          if (exc instanceof AnonymousCompanyError) {
+            // we cannot conclude if a non-diffusible company is active or closed
+            // or we return as if it's active.
+            return;
+          }
+          if (exc instanceof UserInputError) {
+            // 404 raised by searchCompany, we enhance the error message with the SIRET
+            throw new UserInputError(
+              `Établissement ${siret} introuvable, veuillez vérifier son numéro de SIRET`
+            );
+          }
+          // Throw other exceptions as is
+          throw exc;
+        }
+      })
+    ).catch(error => {
+      // We throw the first error back to the calling function
+      throw new UserInputError(error.message, error.args);
+    });
+  }
 }

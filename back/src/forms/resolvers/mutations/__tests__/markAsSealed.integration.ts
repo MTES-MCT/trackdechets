@@ -21,6 +21,7 @@ import * as mailer from "../../../../mailer/mailing";
 import { contentAwaitsGuest } from "../../../../mailer/templates";
 import { renderMail } from "../../../../mailer/templates/renderers";
 import getReadableId from "../../../readableId";
+import { UserInputError } from "apollo-server-core";
 
 jest.mock("axios", () => ({
   default: {
@@ -31,6 +32,10 @@ jest.mock("axios", () => ({
 // No mails
 const sendMailSpy = jest.spyOn(mailer, "sendMail");
 sendMailSpy.mockImplementation(() => Promise.resolve());
+
+// Mock external search services
+import * as search from "../../../../companies/sirene/searchCompany";
+const searchCompanyMock = jest.spyOn(search, "default");
 
 const MARK_AS_SEALED = `
   mutation MarkAsSealed($id: ID!) {
@@ -106,6 +111,7 @@ describe("Mutation.markAsSealed", () => {
 
   beforeEach(() => {
     jest.resetModules();
+    searchCompanyMock.mockReset();
     delete process.env.VERIFY_COMPANY;
   });
 
@@ -1174,4 +1180,131 @@ describe("Mutation.markAsSealed", () => {
 
     expect(data.markAsSealed.status).toBe("SIGNED_BY_PRODUCER");
   });
+
+  it("should throw an error if any SIRET does not exists", async () => {
+    // activate the tested feature
+    const OLD_ENV = process.env;
+    process.env.VERIFY_COMPANY = "true";
+
+    searchCompanyMock.mockRejectedValueOnce(
+      new UserInputError("Aucun établissement trouvé avec ce SIRET", {
+        invalidArgs: ["siret"]
+      })
+    );
+    const { user, company: emitterCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const recipientCompany = await companyFactory({
+      companyTypes: { set: [CompanyType.COLLECTOR] }
+    });
+    const transporterCompany = await companyFactory({
+      companyTypes: { set: [CompanyType.TRANSPORTER] }
+    });
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitterCompany.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        transporterCompanySiret: transporterCompany.siret
+      }
+    });
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: expect.stringMatching(
+          new RegExp(
+            `Établissement (${transporterCompany.siret}|${emitterCompany.siret}|${recipientCompany.siret}) introuvable, veuillez vérifier son numéro de SIRET`
+          )
+        )
+      })
+    ]);
+    process.env = OLD_ENV;
+  });
+  it.each(["emitter", "recipient", "trader", "broker", "transporter"])(
+    "%p of the BSD cannot seal it if any of the company SIRET is closed",
+    async role => {
+      // activate the tested feature
+      const OLD_ENV = process.env;
+      process.env.VERIFY_COMPANY = "true";
+
+      const companyType = (role: string) =>
+        ({
+          emitter: CompanyType.PRODUCER,
+          recipient: CompanyType.WASTEPROCESSOR,
+          trader: CompanyType.TRADER,
+          transporter: CompanyType.TRANSPORTER
+        }[role]);
+
+      const { user, company } = await userWithCompanyFactory("MEMBER", {
+        companyTypes: { set: [companyType(role)] }
+      });
+      const { siret: recipientCompanySiret } = await destinationFactory();
+
+      const form = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: "DRAFT",
+          [`${role}CompanySiret`]: company.siret,
+          ...(role !== "recipient" ? { recipientCompanySiret } : {}),
+          ...(["trader", "broker"].includes(role)
+            ? {
+                [`${role}CompanyName`]: "Trader or Broker",
+                [`${role}CompanyContact`]: "Mr Trader or Broker",
+                [`${role}CompanyMail`]: "traderbroker@trackdechets.fr",
+                [`${role}CompanyAddress`]: "Wall street",
+                [`${role}CompanyPhone`]: "00 00 00 00 00",
+                [`${role}Receipt`]: "receipt",
+                [`${role}Department`]: "07",
+                [`${role}ValidityLimit`]: new Date("2023-01-01")
+              }
+            : {})
+        }
+      });
+      searchCompanyMock.mockImplementation(siret => {
+        switch (siret) {
+          case form.transporterCompanySiret:
+          case form.emitterCompanySiret:
+          case form.brokerCompanySiret:
+          case form.traderCompanySiret:
+          case form.nextTransporterSiret:
+          case form.recipientCompanySiret: {
+            if (siret === company.siret) {
+              return Promise.resolve({
+                siret,
+                name: "Code en stock",
+                etatAdministratif: "F"
+              });
+            }
+            return Promise.resolve({
+              siret,
+              name: "Code en stock",
+              etatAdministratif: "A"
+            });
+          }
+          default: {
+            return Promise.resolve({
+              siret,
+              name: "Code en stock",
+              etatAdministratif: "A"
+            });
+          }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate(MARK_AS_SEALED, {
+        variables: { id: form.id }
+      });
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message: `Établissement ${company.siret} fermé, veuillez vérifier son numéro de SIRET`
+        })
+      ]);
+      process.env = OLD_ENV;
+    }
+  );
 });
