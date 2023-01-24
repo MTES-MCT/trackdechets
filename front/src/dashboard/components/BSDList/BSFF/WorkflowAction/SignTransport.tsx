@@ -15,8 +15,15 @@ import { NotificationError } from "common/components/Error";
 import { SIGN_BSFF, UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
 import { GET_BSDS } from "common/queries";
+import DateInput from "form/common/components/custom-inputs/DateInput";
+
+const TODAY = new Date();
 
 const validationSchema = yup.object({
+  takenOverAt: yup
+    .date()
+    .required("La date de prise en charge est requise")
+    .max(TODAY, "La date de prise en charge ne peut être dans le futur"),
   signatureAuthor: yup
     .string()
     .ensure()
@@ -43,6 +50,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
     <Formik
       initialValues={{
         signatureAuthor: "",
+        takenOverAt: TODAY.toISOString(),
       }}
       validationSchema={validationSchema}
       onSubmit={async values => {
@@ -52,7 +60,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
             input: {
               transporter: {
                 transport: {
-                  takenOverAt: new Date().toISOString(),
+                  takenOverAt: values.takenOverAt,
                   mode: bsff.transporter?.transport?.mode ?? TransportMode.Road,
                 },
               },
@@ -65,7 +73,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
             input: {
               type: BsffSignatureType.Transport,
               author: values.signatureAuthor,
-              date: new Date().toISOString(),
+              date: values.takenOverAt,
             },
           },
         });
@@ -79,6 +87,22 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
             les informations ci-dessus sont correctes. En signant ce document,
             je déclare prendre en charge le déchet.
           </p>
+
+          <div className="form__row">
+            <label className="tw-font-semibold">
+              Date de prise en charge
+              <div className="td-date-wrapper">
+                <Field
+                  name="takenOverAt"
+                  component={DateInput}
+                  className="td-input"
+                  maxDate={TODAY}
+                />
+              </div>
+            </label>
+            <RedErrorMessage name="takenOverAt" />
+          </div>
+
           <div className="form__row">
             <label>
               NOM et prénom du signataire
