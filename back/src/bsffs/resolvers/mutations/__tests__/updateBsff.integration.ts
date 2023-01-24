@@ -405,6 +405,40 @@ describe("Mutation.updateBsff", () => {
     );
   });
 
+  it("should not update packagings after emitter signature", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsffAfterEmission({
+      emitter,
+      transporter,
+      destination
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    await mutate<Pick<Mutation, "updateBsff">, MutationUpdateBsffArgs>(
+      UPDATE_BSFF,
+      {
+        variables: {
+          id: bsff.id,
+          input: {
+            packagings: [
+              { type: "BOUTEILLE", weight: 1, volume: 1, numero: "cont2" }
+            ]
+          }
+        }
+      }
+    );
+
+    const updatedBsff = await prisma.bsff.findUnique({
+      where: { id: bsff.id },
+      include: { packagings: true }
+    });
+
+    expect(bsff.packagings[0].id).toEqual(updatedBsff.packagings[0].id);
+  });
+
   it("should allow updating transporter if they didn't sign", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);

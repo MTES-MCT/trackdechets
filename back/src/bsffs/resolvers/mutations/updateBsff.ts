@@ -1,7 +1,10 @@
 import { UserInputError } from "apollo-server-express";
 import omit from "object.omit";
-import { Prisma, BsffType } from "@prisma/client";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import { Prisma, BsffType, Bsff } from "@prisma/client";
+import {
+  BsffSignatureType,
+  MutationResolvers
+} from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound, getPackagingCreateInput } from "../../database";
 import { flattenBsffInput, expandBsffFromDB } from "../../converter";
@@ -197,3 +200,97 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 };
 
 export default updateBsff;
+
+// Fields that can be updated via `updateBsff`
+type EditableFields = keyof Omit<
+  Prisma.BsffUpdateInput,
+  | "id"
+  | "createdAt"
+  | "updatedAt"
+  | "isDeleted"
+  | "isDraft"
+  | "status"
+  | "detenteurCompanySirets"
+  | "emitterEmissionSignatureAuthor"
+  | "emitterEmissionSignatureDate"
+  | "transporterTransportSignatureAuthor"
+  | "transporterTransportSignatureDate"
+  | "destinationOperationSignatureAuthor"
+  | "destinationOperationSignatureDate"
+  | "destinationReceptionSignatureAuthor"
+  | "destinationReceptionSignatureDate"
+  | "grouping"
+  | "groupedIn"
+  | "repackaging"
+  | "repackagedIn"
+  | "forwarding"
+  | "forwardedIn"
+>;
+
+/**
+ * For BSFF editable fields, defines until which signature
+ * they can be modified
+ */
+const lockBsffFieldSchema: Record<EditableFields, BsffSignatureType> = {
+  type: "EMISSION",
+  emitterCompanyName: "EMISSION",
+  emitterCompanySiret: "EMISSION",
+  emitterCompanyAddress: "EMISSION",
+  emitterCompanyContact: "EMISSION",
+  emitterCompanyPhone: "EMISSION",
+  emitterCompanyMail: "EMISSION",
+  emitterCustomInfo: "EMISSION",
+  wasteCode: "EMISSION",
+  wasteDescription: "EMISSION",
+  wasteAdr: "EMISSION",
+  weightValue: "EMISSION",
+  weightIsEstimate: "EMISSION",
+  transporterCompanyName: "TRANSPORT",
+  transporterCompanySiret: "TRANSPORT",
+  transporterCompanyVatNumber: "TRANSPORT",
+  transporterCompanyAddress: "TRANSPORT",
+  transporterCompanyContact: "TRANSPORT",
+  transporterCompanyPhone: "TRANSPORT",
+  transporterCompanyMail: "TRANSPORT",
+  transporterCustomInfo: "TRANSPORT",
+  transporterRecepisseNumber: "TRANSPORT",
+  transporterRecepisseDepartment: "TRANSPORT",
+  transporterRecepisseValidityLimit: "TRANSPORT",
+  transporterTransportMode: "TRANSPORT",
+  transporterTransportPlates: "TRANSPORT",
+  transporterTransportTakenOverAt: "TRANSPORT",
+  destinationCompanyName: "EMISSION",
+  destinationCompanySiret: "EMISSION",
+  destinationCompanyAddress: "EMISSION",
+  destinationCompanyContact: "EMISSION",
+  destinationCompanyPhone: "EMISSION",
+  destinationCompanyMail: "EMISSION",
+  destinationCap: "EMISSION",
+  destinationCustomInfo: "OPERATION",
+  destinationReceptionDate: "RECEPTION",
+  destinationPlannedOperationCode: "EMISSION",
+  // the below fields should be deleted on model Bsff
+  destinationReceptionWeight: "RECEPTION",
+  destinationOperationCode: "OPERATION",
+  destinationReceptionAcceptationStatus: "RECEPTION",
+  destinationReceptionRefusalReason: "RECEPTION",
+  destinationOperationNextDestinationCompanyName: "OPERATION",
+  destinationOperationNextDestinationCompanySiret: "OPERATION",
+  destinationOperationNextDestinationCompanyVatNumber: "OPERATION",
+  destinationOperationNextDestinationCompanyAddress: "OPERATION",
+  destinationOperationNextDestinationCompanyContact: "OPERATION",
+  destinationOperationNextDestinationCompanyPhone: "OPERATION",
+  destinationOperationNextDestinationCompanyMail: "OPERATION",
+  ficheInterventions: "EMISSION",
+  packagings: "EMISSION"
+};
+
+const editableFields = Object.keys(lockBsffFieldSchema) as string[];
+
+const editableFieldsAfterEmission = editableFields.filter(
+  k => lockBsffFieldSchema[k] !== "EMISSION"
+);
+
+const editableFieldsAfterTransport = editableFieldsAfterEmission.filter(
+  k => lockBsffFieldSchema[k] !== "TRANSPORT"
+);
