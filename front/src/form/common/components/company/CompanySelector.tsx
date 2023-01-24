@@ -1,5 +1,4 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
-import cogoToast from "cogo-toast";
 import {
   NotificationError,
   SimpleNotificationError,
@@ -34,7 +33,6 @@ import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import CompanyResults from "./CompanyResults";
 import styles from "./CompanySelector.module.scss";
-import CountrySelector from "./CountrySelector";
 import {
   COMPANY_SELECTOR_PRIVATE_INFOS,
   FAVORITES,
@@ -81,7 +79,6 @@ export default function CompanySelector({
     (field.value.country && field.value.country !== "FR") ||
       isForeignVat(field.value.vatNumber!!)
   );
-
   const departmentInputRef = useRef<HTMLInputElement>(null);
   // this ref lets us transmit the input to both search input and department input
   const clueInputRef = useRef<HTMLInputElement>(null);
@@ -171,12 +168,7 @@ export default function CompanySelector({
     setMustBeRegistered(
       notVoidCompany && !company.isRegistered && registeredOnlyCompanies
     );
-    // On click display form error in a toast message
-    if (isUnknownCompanyName(company)) {
-      cogoToast.error(
-        "Cet établissement existe mais nous ne pouvons pas remplir automatiquement le formulaire"
-      );
-    }
+
     // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
     setDisplayForeignCompanyWithUnknownInfos(
       isForeignVat(company.vatNumber!!) && isUnknownCompanyName(company)
@@ -395,7 +387,8 @@ export default function CompanySelector({
                   Cet établissement existe mais nous ne pouvons pas remplir
                   automatiquement le formulaire car les informations sont
                   cachées par le service de recherche administratif externe à
-                  Trackdéchets
+                  Trackdéchets.{" "}
+                  <b>Merci de compléter les informations dans le formulaire.</b>
                 </span>
               </>
             }
@@ -462,7 +455,7 @@ export default function CompanySelector({
                   className="td-input"
                   name={`${field.name}.name`}
                   placeholder="Nom"
-                  disabled={disabled}
+                  disabled={!displayForeignCompanyWithUnknownInfos}
                 />
               </label>
 
@@ -475,23 +468,19 @@ export default function CompanySelector({
                   className="td-input"
                   name={`${field.name}.address`}
                   placeholder="Adresse"
-                  disabled={disabled}
+                  disabled={!displayForeignCompanyWithUnknownInfos}
                 />
               </label>
 
               <RedErrorMessage name={`${field.name}.address`} />
               <label>
                 Pays de l'entreprise
-                <Field name={`${field.name}.country`} disabled={disabled}>
-                  {({ field, form }) => (
-                    <CountrySelector
-                      {...field}
-                      onChange={code => form.setFieldValue(field.name, code)}
-                      value={field.value}
-                      placeholder="Pays"
-                    />
-                  )}
-                </Field>
+                <Field
+                  type="text"
+                  className="td-input"
+                  name={`${field.name}.country`}
+                  disabled={true}
+                />
               </label>
 
               <RedErrorMessage name={`${field.name}.country`} />

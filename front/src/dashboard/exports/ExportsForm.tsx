@@ -14,6 +14,7 @@ import { ALL_WASTES, ALL_WASTES_TREE } from "generated/constants";
 import { useLazyQuery, gql } from "@apollo/client";
 import { NotificationError } from "common/components/Error";
 import RedErrorMessage from "common/components/RedErrorMessage";
+import { sortCompaniesByName } from "common/helper";
 
 interface IProps {
   companies: CompanyPrivate[];
@@ -129,6 +130,8 @@ function getPossibleExportTypes(companies: CompanyPrivate[]) {
 
 export default function ExportsForm({ companies }: IProps) {
   const [openWasteTreeModal, setOpenWasteTreeModal] = useState(false);
+
+  const sortedCompanies = sortCompaniesByName(companies);
 
   const now = new Date();
 
@@ -314,11 +317,11 @@ export default function ExportsForm({ companies }: IProps) {
                     onChange={evt => {
                       const value = evt.target.value;
                       if (value === "all") {
-                        setFieldValue("companies", companies);
+                        setFieldValue("companies", sortedCompanies);
                       } else {
                         setFieldValue(
                           "companies",
-                          companies.filter(c => c.orgId === value)
+                          sortedCompanies.filter(c => c.orgId === value)
                         );
                       }
                     }}
@@ -326,7 +329,7 @@ export default function ExportsForm({ companies }: IProps) {
                     <option value="all" key="all">
                       Tous les établissements
                     </option>
-                    {companies.map((company, key) => (
+                    {sortedCompanies.map((company, key) => (
                       <option value={company.orgId} key={key}>
                         {company.givenName || company.name}
                       </option>

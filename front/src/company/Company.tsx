@@ -41,6 +41,7 @@ const COMPANY_INFOS = gql`
       }
       ecoOrganismeAgreements
       statutDiffusionEtablissement
+      etatAdministratif
     }
   }
 `;
@@ -65,7 +66,10 @@ export default function CompanyInfo() {
 
   // Retrieves geo information from api-adresse.data.gouv.fr
   useEffect(() => {
-    if (data?.companyInfos.statutDiffusionEtablissement === "N") {
+    if (
+      data?.companyInfos.statutDiffusionEtablissement === "N" ||
+      data?.companyInfos.name === ""
+    ) {
       setNonDiffusible(true);
     }
     if (data?.companyInfos?.address) {
@@ -118,6 +122,7 @@ export default function CompanyInfo() {
 
           <CompanyRegistration
             isRegistered={company.isRegistered}
+            etatAdministratif={company.etatAdministratif}
             companyTypes={company.companyTypes}
           />
 

@@ -3,6 +3,7 @@ import * as yup from "yup";
 import prisma from "../../prisma";
 import { CompanyRow } from "./types";
 import { searchCompany } from "../../companies/search";
+import { isClosedCompany } from "../../common/constants/companySearchHelpers";
 
 /**
  * Validation schema for company
@@ -18,7 +19,7 @@ export const companyValidationSchema = yup.object({
       async value => {
         try {
           const company = await searchCompany(value);
-          if (company.etatAdministratif === "F") {
+          if (isClosedCompany(company)) {
             return false;
           }
           return true;

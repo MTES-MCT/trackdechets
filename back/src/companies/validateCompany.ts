@@ -7,7 +7,8 @@ import {
 import { searchCompany } from "./search";
 
 /**
- * Validate a Company input and return a partial CompanyInput with info from Sirene data
+ * Validate a Company input
+ * auto-complete information with info from INSEE Sirene
  */
 export async function validateCompany(
   company: CompanyValidationInput,

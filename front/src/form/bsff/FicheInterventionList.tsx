@@ -10,14 +10,13 @@ import {
   BsffDetenteurInput,
   BsffFicheIntervention,
   BsffFicheInterventionInput,
-  CompanyInput,
   Mutation,
   MutationCreateFicheInterventionBsffArgs,
 } from "generated/graphql/types";
 import * as React from "react";
-import countries from "world-countries";
 import * as yup from "yup";
 import { FicheInterventionFragment } from "common/fragments";
+import { companySchema } from "common/validation/schema";
 
 const CREATE_BSFF_FICHE_INTERVENTION = gql`
   mutation CreateBsffFicheIntervention($input: BsffFicheInterventionInput!) {
@@ -28,23 +27,6 @@ const CREATE_BSFF_FICHE_INTERVENTION = gql`
   ${FicheInterventionFragment}
 `;
 
-const companySchema: yup.SchemaOf<CompanyInput> = yup.object({
-  address: yup.string().required("L'adresse de l'établissement est requis"),
-  contact: yup.string().required("Le contact de l'établissement est requis"),
-  mail: yup.string().required("L'email de contact est requis"),
-  name: yup.string().required("Le nom de l'établissement est requis"),
-  phone: yup
-    .string()
-    .required("Le numéro de téléphone de l'établissement est requis"),
-  siret: yup.string().required("Le numéro SIRET de l'établissement est requis"),
-  vatNumber: yup.string().nullable(),
-  country: yup
-    .string()
-    .oneOf([...countries.map(country => country.cca2), null])
-    .nullable(),
-  omiNumber: yup.string().nullable(),
-  orgId: yup.string().nullable(),
-});
 const detenteurSchema: yup.SchemaOf<BsffFicheInterventionInput["detenteur"]> =
   yup.object({
     isPrivateIndividual: yup.boolean().required(),
