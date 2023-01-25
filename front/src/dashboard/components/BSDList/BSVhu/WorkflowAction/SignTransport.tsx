@@ -16,18 +16,17 @@ import { generatePath, Link } from "react-router-dom";
 import * as yup from "yup";
 import { SignBsvhu, SIGN_BSVHU } from "./SignBsvhu";
 
-const TODAY = new Date();
-
-const validationSchema = yup.object({
-  takenOverAt: yup
-    .date()
-    .required("La date de prise en charge est requise")
-    .max(TODAY, "La date de prise en charge ne peut être dans le futur"),
-  author: yup
-    .string()
-    .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-});
+const getValidationSchema = (today: Date) =>
+  yup.object({
+    takenOverAt: yup
+      .date()
+      .required("La date de prise en charge est requise")
+      .max(today, "La date de prise en charge ne peut être dans le futur"),
+    author: yup
+      .string()
+      .ensure()
+      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+  });
 
 type Props = { siret: string; bsvhuId: string };
 export function SignTransport({ siret, bsvhuId }: Props) {
@@ -43,6 +42,9 @@ export function SignTransport({ siret, bsvhuId }: Props) {
     );
 
   const loading = loadingUpdate || loadingSign;
+
+  const TODAY = new Date();
+  const validationSchema = getValidationSchema(TODAY);
 
   return (
     <SignBsvhu title="Signer l'enlèvement" bsvhuId={bsvhuId}>
