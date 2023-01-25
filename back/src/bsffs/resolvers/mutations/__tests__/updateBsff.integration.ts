@@ -371,8 +371,8 @@ describe("Mutation.updateBsff", () => {
           },
           packagings: [
             {
-              type: BsffPackagingType.BOUTEILLE,
-              numero: "123",
+              type: BsffPackagingType.CITERNE,
+              numero: "updated-numero",
               weight: 1,
               volume: 1
             }
@@ -387,9 +387,17 @@ describe("Mutation.updateBsff", () => {
           " emitterCompanyName, emitterCompanyAddress, emitterCompanyContact, emitterCompanyPhone," +
           " emitterCompanyMail, destinationCompanyName, destinationCompanySiret," +
           " destinationCompanyAddress, destinationCompanyContact, destinationCompanyPhone," +
-          " destinationCompanyMail, wasteCode, wasteDescription, wasteAdr, weightValue, packagings"
+          " destinationCompanyMail, wasteCode, wasteDescription, wasteAdr, weightValue"
       })
     ]);
+
+    const updatedBsff = await prisma.bsff.findUnique({
+      where: { id: bsff.id },
+      include: { packagings: true }
+    });
+
+    // check packagings update has been ignored
+    expect(updatedBsff.packagings[0].numero).toEqual("1234");
   });
 
   test("after emitter signature > it should be possible to update trasport fields", async () => {

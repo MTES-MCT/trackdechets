@@ -1,5 +1,5 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import { Prisma, BsffType } from "@prisma/client";
+import { Prisma, BsffType, Bsff } from "@prisma/client";
 import {
   BsffSignatureType,
   MutationResolvers
@@ -55,55 +55,15 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     );
   }
 
-  const flatInput = flattenBsffInput(input);
-
-  const sealedFieldErrors: string[] = [];
-
   if (existingBsff.emitterEmissionSignatureDate) {
-    for (const field of Object.keys(flatInput)) {
-      if (
-        !editableFieldsAfterEmission.includes(field) &&
-        existingBsff[field] !== flatInput[field]
-      ) {
-        sealedFieldErrors.push(field);
-      }
-    }
-
-    // linked objects cannot be modified after first signature
-    for (const field of [
-      "ficheInterventions",
-      "packagings",
-      "forwarding",
-      "repackaging",
-      "grouping"
-    ]) {
-      if (Object.keys(input).includes(field)) {
-        sealedFieldErrors.push(field);
-      }
-    }
+    // discard related objects updates after emission signatures
+    delete input.packagings;
+    delete input.grouping;
+    delete input.forwarding;
+    delete input.repackaging;
+    delete input.ficheInterventions;
   }
-
-  if (existingBsff.transporterTransportSignatureDate) {
-    for (const field of Object.keys(flatInput)) {
-      if (
-        !editableFieldsAfterTransport.includes(field) &&
-        existingBsff[field] !== flatInput[field]
-      ) {
-        sealedFieldErrors.push(field);
-      }
-    }
-  }
-
-  if (existingBsff.destinationReceptionSignatureDate) {
-    // do not allow any BSFF fields to be updated after reception
-    for (const field of Object.keys(flatInput)) {
-      sealedFieldErrors.push(field);
-    }
-  }
-
-  if (sealedFieldErrors.length > 0) {
-    throw new SealedFieldError(sealedFieldErrors);
-  }
+  const flatInput = flattenBsffInput(input);
 
   const futureBsff = {
     ...existingBsff,
@@ -114,11 +74,15 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   await checkCanWriteBsff(user, futureBsff);
 
+  await checkSealedFields(flatInput, existingBsff);
+
   const packagingHasChanged =
     !!input.forwarding ||
     !!input.grouping ||
     !!input.repackaging ||
     !!input.packagings;
+
+  await validateBsff(futureBsff);
 
   const existingPreviousPackagings = await findPreviousPackagings(
     existingBsff.packagings.map(p => p.id),
@@ -131,8 +95,6 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
         ? { id: { in: input.ficheInterventions } }
         : { bsffs: { some: { id: { in: [existingBsff.id] } } } }
   });
-
-  await validateBsff(futureBsff);
 
   await validateFicheInterventions(futureBsff, ficheInterventions);
 
@@ -296,5 +258,46 @@ export class SealedFieldError extends ForbiddenError {
         ", "
       )}`
     );
+  }
+}
+
+// check updated fields are not sealed by signature
+async function checkSealedFields(
+  flatInput: Prisma.BsffUpdateInput,
+  existingBsff: Bsff
+) {
+  const sealedFieldErrors: string[] = [];
+
+  if (existingBsff.emitterEmissionSignatureDate) {
+    for (const field of Object.keys(flatInput)) {
+      if (
+        !editableFieldsAfterEmission.includes(field) &&
+        existingBsff[field] !== flatInput[field]
+      ) {
+        sealedFieldErrors.push(field);
+      }
+    }
+  }
+
+  if (existingBsff.transporterTransportSignatureDate) {
+    for (const field of Object.keys(flatInput)) {
+      if (
+        !editableFieldsAfterTransport.includes(field) &&
+        existingBsff[field] !== flatInput[field]
+      ) {
+        sealedFieldErrors.push(field);
+      }
+    }
+  }
+
+  if (existingBsff.destinationReceptionSignatureDate) {
+    // do not allow any BSFF fields to be updated after reception
+    for (const field of Object.keys(flatInput)) {
+      sealedFieldErrors.push(field);
+    }
+  }
+
+  if (sealedFieldErrors.length > 0) {
+    throw new SealedFieldError(sealedFieldErrors);
   }
 }
