@@ -93,8 +93,6 @@ function SignTransportFormModal({
   const TODAY = new Date();
   const validationSchema = getValidationSchema(TODAY);
 
-  console.log("TODAY", TODAY);
-
   return (
     <Modal onClose={onClose} ariaLabel={title} isOpen>
       <h2 className="td-modal-title">{title}</h2>
