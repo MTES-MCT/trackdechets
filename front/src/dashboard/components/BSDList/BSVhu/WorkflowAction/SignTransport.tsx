@@ -43,13 +43,13 @@ export function SignTransport({ siret, bsvhuId }: Props) {
 
   const loading = loadingUpdate || loadingSign;
 
-  const TODAY = new Date();
-  const validationSchema = getValidationSchema(TODAY);
-
   return (
     <SignBsvhu title="Signer l'enlèvement" bsvhuId={bsvhuId}>
-      {({ bsvhu, onClose }) =>
-        bsvhu.metadata?.errors.some(
+      {({ bsvhu, onClose }) => {
+        const TODAY = new Date();
+        const validationSchema = getValidationSchema(TODAY);
+
+        return bsvhu.metadata?.errors.some(
           error => error.requiredFor === SignatureTypeInput.Transport
         ) ? (
           <>
@@ -169,8 +169,8 @@ export function SignTransport({ siret, bsvhuId }: Props) {
               </Form>
             )}
           </Formik>
-        )
-      }
+        );
+      }}
     </SignBsvhu>
   );
 }
