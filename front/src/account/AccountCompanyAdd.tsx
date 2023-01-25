@@ -12,7 +12,6 @@ import AccountCompanyAddTraderReceipt from "./accountCompanyAdd/AccountCompanyAd
 import AccountCompanyAddBrokerReceipt from "./accountCompanyAdd/AccountCompanyAddBrokerReceipt";
 import AccountCompanyAddSiret from "./accountCompanyAdd/AccountCompanyAddSiret";
 import AccountCompanyAddEcoOrganisme from "./accountCompanyAdd/AccountCompanyAddEcoOrganisme";
-import AccountCompanyAddMembershipRequest from "./accountCompanyAdd/AccountCompanyAddMembershipRequest";
 import styles from "./AccountCompanyAdd.module.scss";
 import {
   Mutation,
@@ -340,9 +339,6 @@ export default function AccountCompanyAdd() {
           onCompanyInfos: companyInfos => setCompanyInfos(companyInfos),
         }}
       />
-      {companyInfos && companyInfos.isRegistered && (
-        <AccountCompanyAddMembershipRequest siret={companyInfos.siret} />
-      )}
       {companyInfos && !companyInfos.isRegistered && (
         <Formik<Values>
           initialValues={{
