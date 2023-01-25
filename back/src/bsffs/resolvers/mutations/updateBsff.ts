@@ -36,12 +36,6 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     getBsffFicheInterventionRepository(user);
   const { update: updateBsff } = getBsffRepository(user);
 
-  if (existingBsff.destinationReceptionSignatureDate) {
-    throw new UserInputError(
-      `Il n'est pas possible d'éditer un BSFF qui a été récéptionné`
-    );
-  }
-
   if (input.type && input.type !== existingBsff.type) {
     throw new UserInputError(
       "Vous ne pouvez pas modifier le type de BSFF après création"
@@ -64,7 +58,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   const flatInput = { ...flattenBsffInput(input) };
 
-  const sealedErrorFields: string[] = [];
+  const sealedFieldErrors: string[] = [];
 
   if (existingBsff.emitterEmissionSignatureDate) {
     for (const field of Object.keys(flatInput)) {
@@ -72,10 +66,11 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
         !editableFieldsAfterEmission.includes(field) &&
         existingBsff[field] !== flatInput[field]
       ) {
-        sealedErrorFields.push(field);
+        sealedFieldErrors.push(field);
       }
     }
 
+    // linked objects cannot be modified after first signature
     for (const field of [
       "ficheInterventions",
       "packagings",
@@ -84,35 +79,31 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
       "grouping"
     ]) {
       if (Object.keys(input).includes(field)) {
-        sealedErrorFields.push(field);
+        sealedFieldErrors.push(field);
       }
     }
   }
 
   if (existingBsff.transporterTransportSignatureDate) {
-    for (const key of Object.keys(flatInput)) {
+    for (const field of Object.keys(flatInput)) {
       if (
-        !editableFieldsAfterTransport.includes(key) &&
-        existingBsff[key] !== flatInput[key]
+        !editableFieldsAfterTransport.includes(field) &&
+        existingBsff[field] !== flatInput[field]
       ) {
-        sealedErrorFields.push(key);
+        sealedFieldErrors.push(field);
       }
     }
   }
 
   if (existingBsff.destinationReceptionSignatureDate) {
-    for (const key of Object.keys(flatInput)) {
-      if (
-        !editableFieldsAfterReception.includes(key) &&
-        existingBsff[key] !== flatInput[key]
-      ) {
-        sealedErrorFields.push(key);
-      }
+    // do not allow any BSFF fields to be updated after reception
+    for (const field of Object.keys(flatInput)) {
+      sealedFieldErrors.push(field);
     }
   }
 
-  if (sealedErrorFields.length > 0) {
-    throw new SealedFieldError(sealedErrorFields);
+  if (sealedFieldErrors.length > 0) {
+    throw new SealedFieldError(sealedFieldErrors);
   }
 
   const futureBsff = {
@@ -226,13 +217,30 @@ type EditableFields = keyof Omit<
   | "repackagedIn"
   | "forwarding"
   | "forwardedIn"
+  | "ficheInterventions"
+  | "packagings"
+  // the below fields has been migrated to BsffPackaging and
+  // will be deleted in prisma schema
+  | "destinationReceptionWeight"
+  | "destinationOperationCode"
+  | "destinationReceptionAcceptationStatus"
+  | "destinationReceptionRefusalReason"
+  | "destinationOperationNextDestinationCompanyName"
+  | "destinationOperationNextDestinationCompanySiret"
+  | "destinationOperationNextDestinationCompanyVatNumber"
+  | "destinationOperationNextDestinationCompanyAddress"
+  | "destinationOperationNextDestinationCompanyContact"
+  | "destinationOperationNextDestinationCompanyPhone"
+  | "destinationOperationNextDestinationCompanyMail"
 >;
 
 /**
- * For BSFF editable fields, defines until which signature
- * they can be modified
+ * Defines until which signature editable fields can be modified
+ * The typing Record<EditableFields, BsffSignatureType> ensure that
+ * the typing will break anytime we add a field to the Bsff model so that
+ * we think of adding ther new field edition rule
  */
-const lockBsffFieldSchema: Record<EditableFields, BsffSignatureType> = {
+const editionRules: Record<EditableFields, BsffSignatureType> = {
   type: "EMISSION",
   emitterCompanyName: "EMISSION",
   emitterCompanySiret: "EMISSION",
@@ -269,35 +277,17 @@ const lockBsffFieldSchema: Record<EditableFields, BsffSignatureType> = {
   destinationCap: "EMISSION",
   destinationCustomInfo: "OPERATION",
   destinationReceptionDate: "RECEPTION",
-  destinationPlannedOperationCode: "EMISSION",
-  // the below fields should be deleted on model Bsff
-  destinationReceptionWeight: "RECEPTION",
-  destinationOperationCode: "OPERATION",
-  destinationReceptionAcceptationStatus: "RECEPTION",
-  destinationReceptionRefusalReason: "RECEPTION",
-  destinationOperationNextDestinationCompanyName: "OPERATION",
-  destinationOperationNextDestinationCompanySiret: "OPERATION",
-  destinationOperationNextDestinationCompanyVatNumber: "OPERATION",
-  destinationOperationNextDestinationCompanyAddress: "OPERATION",
-  destinationOperationNextDestinationCompanyContact: "OPERATION",
-  destinationOperationNextDestinationCompanyPhone: "OPERATION",
-  destinationOperationNextDestinationCompanyMail: "OPERATION",
-  ficheInterventions: "EMISSION",
-  packagings: "EMISSION"
+  destinationPlannedOperationCode: "EMISSION"
 };
 
-const editableFields = Object.keys(lockBsffFieldSchema) as string[];
+const editableFields = Object.keys(editionRules) as string[];
 
 const editableFieldsAfterEmission = editableFields.filter(
-  k => lockBsffFieldSchema[k] !== "EMISSION"
+  field => editionRules[field] !== "EMISSION"
 );
 
 const editableFieldsAfterTransport = editableFieldsAfterEmission.filter(
-  k => lockBsffFieldSchema[k] !== "TRANSPORT"
-);
-
-const editableFieldsAfterReception = editableFieldsAfterEmission.filter(
-  k => lockBsffFieldSchema[k] !== "RECEPTION"
+  field => editionRules[field] !== "TRANSPORT"
 );
 
 export class SealedFieldError extends ForbiddenError {
