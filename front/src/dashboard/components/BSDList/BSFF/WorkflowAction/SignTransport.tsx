@@ -17,18 +17,17 @@ import { SignBsff } from "./SignBsff";
 import { GET_BSDS } from "common/queries";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 
-const TODAY = new Date();
-
-const validationSchema = yup.object({
-  takenOverAt: yup
-    .date()
-    .required("La date de prise en charge est requise")
-    .max(TODAY, "La date de prise en charge ne peut être dans le futur"),
-  signatureAuthor: yup
-    .string()
-    .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-});
+const getValidationSchema = (today: Date) =>
+  yup.object({
+    takenOverAt: yup
+      .date()
+      .required("La date de prise en charge est requise")
+      .max(today, "La date de prise en charge ne peut être dans le futur"),
+    signatureAuthor: yup
+      .string()
+      .ensure()
+      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+  });
 
 interface SignTransportFormProps {
   bsff: Bsff;
@@ -45,6 +44,9 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
     Pick<Mutation, "signBsff">,
     MutationSignBsffArgs
   >(SIGN_BSFF, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
+
+  const TODAY = new Date();
+  const validationSchema = getValidationSchema(TODAY);
 
   return (
     <Formik
