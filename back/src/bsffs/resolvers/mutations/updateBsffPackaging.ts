@@ -51,7 +51,7 @@ const updateBsffPackaging: MutationResolvers["updateBsffPackaging"] = async (
 
   if (existingBsffPackaging.operationSignatureDate) {
     // do not allow any fields to be updated after operation signature
-    for (const field in Object.keys(flatInput)) {
+    for (const field of Object.keys(flatInput)) {
       sealedFieldErrors.push(field);
     }
   }
@@ -123,5 +123,5 @@ const editionRules: Record<EditableFields, BsffSignatureType> = {
 const editableFields = Object.keys(editionRules) as string[];
 
 const editableFieldsAfterAcceptation = editableFields.filter(
-  field => editionRules[field] !== "OPERATION"
+  field => editionRules[field] !== "ACCEPTATION"
 );

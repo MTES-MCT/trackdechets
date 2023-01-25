@@ -1,5 +1,4 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import omit from "object.omit";
 import { Prisma, BsffType } from "@prisma/client";
 import {
   BsffSignatureType,
@@ -56,7 +55,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     );
   }
 
-  const flatInput = { ...flattenBsffInput(input) };
+  const flatInput = flattenBsffInput(input);
 
   const sealedFieldErrors: string[] = [];
 
@@ -238,7 +237,7 @@ type EditableFields = keyof Omit<
  * Defines until which signature editable fields can be modified
  * The typing Record<EditableFields, BsffSignatureType> ensure that
  * the typing will break anytime we add a field to the Bsff model so that
- * we think of adding ther new field edition rule
+ * we think of adding a new edition rule
  */
 const editionRules: Record<EditableFields, BsffSignatureType> = {
   type: "EMISSION",
