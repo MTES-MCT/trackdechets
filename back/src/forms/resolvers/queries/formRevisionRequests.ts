@@ -21,6 +21,7 @@ export default async function formRevisionRequests(
 ) {
   const user = checkIsAuthenticated(context);
   await checkIsCompanyMember({ id: user.id }, { orgId: siret });
+  // TODO support orgId instead of siret for foreign companies
   const company = await getCompanyOrCompanyNotFound({ siret });
 
   const pageSize = Math.max(Math.min(first, MAX_SIZE), MIN_SIZE);

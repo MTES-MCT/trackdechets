@@ -43,21 +43,6 @@ const individualInfo = (
   </div>
 );
 
-const isRegisteredInfo = (
-  <div className={styles.alertWrapper}>
-    <Alert
-      title="Cet établissement existe déjà dans Trackdéchets"
-      type="error"
-      description={
-        <>
-          Vous pouvez demander à rejoindre cet établissement auprès de son
-          administrateur actuel.
-        </>
-      }
-    />
-  </div>
-);
-
 const closedCompanyError = (
   <div className={styles.alertWrapper}>
     <Alert
@@ -272,7 +257,6 @@ export default function AccountCompanyAddSiret({
                   </Button>
                 )}
 
-                {isRegistered && isRegisteredInfo}
                 {isRegistered && (
                   <AccountCompanyAddMembershipRequest siret={values.siret} />
                 )}
