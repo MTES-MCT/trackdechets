@@ -8,7 +8,10 @@ import { Loader } from "common/components";
 import { NotificationError } from "common/components/Error";
 import routes from "common/routes";
 import { debounce } from "common/helper";
-
+import {
+  MIN_MY_COMPANIES_SEARCH,
+  MAX_MY_COMPANIES_SEARCH,
+} from "generated/constants/COMPANY_CONSTANTS";
 import { Container, Row, Col, TextInput, Button } from "@dataesr/react-dsfr";
 
 export const MY_COMPANIES = gql`
@@ -30,6 +33,11 @@ export const MY_COMPANIES = gql`
   ${AccountCompany.fragments.company}
 `;
 
+// Prevent to short and long clues
+const isSearchClueValid = clue =>
+  clue.length >= MIN_MY_COMPANIES_SEARCH &&
+  clue.length <= MAX_MY_COMPANIES_SEARCH;
+
 export default function AccountCompanyList() {
   const [searchClue, setSearchClue] = useState("");
   const [startSearch, setStartSearch] = useState(false);
@@ -50,7 +58,7 @@ export default function AccountCompanyList() {
   );
 
   useEffect(() => {
-    if (searchClue.length > 0) {
+    if (isSearchClueValid(searchClue)) {
       debouncedSearch({
         search: searchClue,
       });
@@ -68,8 +76,10 @@ export default function AccountCompanyList() {
   } else if (data) {
     const companies = data.myCompanies?.edges.map(({ node }) => node);
 
+    const totalCount = data.myCompanies?.totalCount ?? 0;
+
     if (!companies || companies.length === 0) {
-      if (data.myCompanies?.totalCount === 0 && searchClue.length === 0) {
+      if (totalCount === 0 && searchClue.length === 0) {
         history.push({
           pathname: routes.account.companies.orientation,
         });
@@ -82,12 +92,12 @@ export default function AccountCompanyList() {
       }
     } else {
       let listTitle;
-      const plural = (data.myCompanies?.totalCount ?? 0) > 1 ? "s" : "";
+      const plural = totalCount > 1 ? "s" : "";
 
       if (searchClue.length === 0) {
-        listTitle = `Vous êtes membre de ${data.myCompanies?.totalCount} établissement${plural}`;
+        listTitle = `Vous êtes membre de ${totalCount} établissement${plural}`;
       } else {
-        listTitle = `${companies.length} résultat${plural} pour la recherche : ${searchClue}`;
+        listTitle = `${totalCount} résultat${plural} pour la recherche : ${searchClue}`;
       }
 
       content = (
@@ -126,10 +136,14 @@ export default function AccountCompanyList() {
       <Row spacing="mb-4w" alignItems={"bottom"}>
         <Col n="6">
           <TextInput
-            label="Filtrer mes établissement"
+            label="Filtrer mes établissements"
             hint="Vous pouvez utiliser le nom officiel ou usuel, le n° de siret ou le n° de TVA"
+            maxLength={MAX_MY_COMPANIES_SEARCH}
             onChange={e => {
-              setStartSearch(true);
+              if (isSearchClueValid(e.target.value)) {
+                setStartSearch(true);
+              }
+
               setSearchClue(e.target.value);
             }}
             value={searchClue}

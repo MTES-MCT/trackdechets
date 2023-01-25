@@ -7,7 +7,13 @@ import {
   CompanyPrivate,
   QueryResolvers
 } from "../../../generated/graphql/types";
+import { UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
+
+import {
+  MIN_MY_COMPANIES_SEARCH,
+  MAX_MY_COMPANIES_SEARCH
+} from "../../../common/constants/COMPANY_CONSTANTS";
 
 const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
   _parent,
@@ -16,30 +22,37 @@ const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
 ) => {
   const me = checkIsAuthenticated(context);
 
-  const where = { userId: me.id };
-
   const { search, ...paginationArgs } = args;
 
   let searchQuery = {};
 
   if (search) {
+    if (
+      search.length < MIN_MY_COMPANIES_SEARCH ||
+      search.length > MAX_MY_COMPANIES_SEARCH
+    ) {
+      throw new UserInputError(
+        `Le paramètre de recherche doit être compris entre ${MIN_MY_COMPANIES_SEARCH} et ${MAX_MY_COMPANIES_SEARCH} caractères.`
+      );
+    }
     searchQuery = {
       OR: [
         {
-          name: { contains: search, mode: "insensitive" }
+          company: { name: { contains: search, mode: "insensitive" } }
         },
         {
-          givenName: { contains: search, mode: "insensitive" }
+          company: { givenName: { contains: search, mode: "insensitive" } }
         },
         {
-          siret: { contains: search, mode: "insensitive" }
+          company: { siret: { contains: search, mode: "insensitive" } }
         },
         {
-          vatNumber: { contains: search, mode: "insensitive" }
+          company: { vatNumber: { contains: search, mode: "insensitive" } }
         }
       ]
     };
   }
+  const where = { userId: me.id, ...searchQuery };
 
   // retrieves all companies ids
   const associations = await prisma.companyAssociation.findMany({
@@ -56,8 +69,7 @@ const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
     findMany: prismaPaginationArgs =>
       prisma.company.findMany({
         where: {
-          id: { in: companyIds },
-          ...searchQuery
+          id: { in: companyIds }
         },
         ...prismaPaginationArgs,
         orderBy: [
