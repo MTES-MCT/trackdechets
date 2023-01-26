@@ -102,23 +102,46 @@ La requête doit être authentifiée, 2 méthodes sont possibles:
 - (E) Si la requête est valide et autorisée, le serveur d'autorisation émet un jeton d'identité (ID token). Par exemple
 
 ```
-{
-  name: 'Jean Dupont',
-  phone: '06876543',
-  email: 'foo@barr.fr',
+ {
+  name: "Jean Dupont",
+  phone: "06876543",
+  email: "foo@barr.fr",
   email_verified: true,
   companies: [
-    { role: 'ADMIN', siret: '1234', vat_number: null },
-    { role: 'ADMIN', siret: '5678', vat_number: null },
+    {
+      id: "wxcgh123",
+      role: "ADMIN",
+      siret: "1234",
+      vat_number: null,
+      name: "une entreprise A",
+      given_name: "Succursale Marseille",
+      types: ["PRODUCER"],
+      verified: true
+    },
+
+    {
+      id: "mlkj953",
+      role: "MEMBER",
+      siret: "9876",
+      vat_number: null,
+      name: "une entreprise B",
+      given_name: "Succursale Rouen",
+      types: ["COLLECTOR", "WASTEPROCESSOR"],
+      verified: false
+    }
   ],
-  nonce: 'CYCTdEHKQAqB2ahOVWiOFSMbjdxUhGBb',
+  nonce: "CYCTdEHKQAqB2ahOVWiOFSMbjdxUhGBb",
   iat: 1672650576,
-  iss: 'trackdechets',
-  aud: 'your-app',
+  iss: "trackdechets",
+  aud: "your-app",
   exp: 1672654176,
-  sub: 'ck03yr7q000di0728m7uwhc1i'
-}
+  sub: "ck03yr7q000di0728m7uwhc1i"
+};
 ```
+
+:::caution
+Le champ `sub`correspond à l'User Id de Trackdéchets
+:::
 
 :::caution
 Le token est signé via une clef RSA, il est indispensable de vérifier sa signature l'audience (aud) et issuer (iss) grâce à la clef publique.
@@ -137,7 +160,15 @@ Trackdéchets implémente 3 valeurs standard et une valeur spécifique:
 - openid : obligatoire, requête le `sub`, l'id de l'utilisateur
 - email : requête email et email_verified
 - profile : requête name & phone
-- companies : requête la liste des entreprises de l'utilisateur (role, siret et vat_number si disponible)
+- companies : requête la liste des établissements de l'utilisateur :
+    - id: identifiant unique au sein de Trackdéchets
+    - role : rôle de l'utilisateur, MEMBER ou ADMIN au sein de l'établissement
+    - siret : siret à 14 chiffres pour les entreprises françaises
+    - name : dénomination officielle de l'établissement
+    - given_name : nom usuel donné par l'admin de l'établissement
+    - types : CompanyTypes de l'établissement (eg. ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"])
+    - vat_number : numéro de tva si disponible, utilisé pour identifier les entreprises étrangères
+    - verified: true|false, précise si l'établissement est vérifié (la vérification n'est effectuée que sur certains type d'établissements )
 
 :::tip
 Une application Openid de démonstration a été créée à l'adresse [https://openid-demo.trackdechets.beta.gouv.fr/](https://openid-demo.trackdechets.beta.gouv.fr/)
