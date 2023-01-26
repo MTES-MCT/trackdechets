@@ -94,3 +94,25 @@ sur l'état précis du bordereau.`;
 
 // load more
 export const load_more_bsds = "Charger plus de bordereaux";
+
+// filters
+export const filter_show_btn = "Chercher par";
+export const filter_reset_btn = "Supprimer les filtres";
+export const filter_type_select_placeholder = "Selectionner un type de filtre";
+export const filter_type_select_label = "Type de filtre";
+export const filter_type_apply_btn = "Appliquer les filtres";
+export const filter_bsd_type = "Type de bordereau";
+export const filter_siret = "Siret";
+export const filter_waste_code = "Code déchet";
+export const filter_bsd_number = "Numéro du bordereau";
+export const filter_contenant_number = "Numéro de contenant (BSFF)";
+export const filter_immat_number = "Numéro d'immatriculation";
+export const filter_chantier_name = "Nom du chantier";
+export const filter_chantier_adress = "Adresse du chantier";
+export const filter_free_text = "Champs libres";
+export const bsd_type_option_bsdd = "Déchets Dangereux";
+export const bsd_type_option_bsvhu = "Véhicules Hors d'Usage";
+export const bsd_type_option_bsff = "Déchets de Fluides Frigorigènes";
+export const bsd_type_option_bsda = "Déchets d'Amiante";
+export const bsd_type_option_bsdasri =
+  "Déchets d'Activités de Soins à Risque Infectieux";

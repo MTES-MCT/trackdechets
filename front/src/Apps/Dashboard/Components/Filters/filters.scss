@@ -1,0 +1,62 @@
+@import "src/scss/Breakpoints.scss";
+
+.filters {
+  &__line {
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    margin-bottom: 15px;
+
+    @include desktop {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0;
+    }
+
+    &__item {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      flex: 2;
+
+      @include desktop {
+        width: fit-content;
+        flex-direction: row;
+        .item-to-fill {
+          width: 100%;
+        }
+      }
+
+      .fr-select-group {
+        margin-right: 5px;
+
+        @include desktop {
+          margin-right: 30px;
+        }
+      }
+    }
+
+    &__btn {
+      margin-top: 0.5rem;
+      width: fit-content;
+
+      @include desktop {
+        display: flex;
+        justify-content: flex-end;
+        flex: 1;
+      }
+
+      .fr-btn {
+        margin: 0 2px;
+        width: 40px;
+        height: 40px;
+      }
+    }
+  }
+
+  &__primary-cta {
+    margin: 20px 0;
+    text-align: right;
+  }
+}

@@ -1,14 +1,19 @@
-import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { useParams, useRouteMatch } from "react-router-dom";
+import React, {
+  useCallback,
+  useMemo,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
+import { generatePath, useParams, useRouteMatch } from "react-router-dom";
 import { useLazyQuery, useQuery } from "@apollo/client";
+import { Breadcrumb, BreadcrumbItem } from "@dataesr/react-dsfr";
 import routes from "../common/routes";
 import { GET_BSDS } from "../common/queries";
 import { Query, QueryBsdsArgs } from "generated/graphql/types";
 import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
 import BsdCardList from "Apps/Dashboard/Components/BsdCardList/BsdCardList";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
   Blankslate,
   BlankslateTitle,
   BlankslateDescription,
@@ -29,9 +34,13 @@ import {
   breadcrumb_pour_action,
   breadcrumb_suivi,
   breadcrumb_title,
+  filter_reset_btn,
+  filter_show_btn,
   load_more_bsds,
 } from "assets/wordings/dashboard/wordingsDashboard";
 import { IconDuplicateFile } from "common/components/Icons";
+import Filters from "Apps/Dashboard/Components/Filters/Filters";
+import { filterList } from "Apps/Dashboard/dashboardUtils";
 
 import "./dashboard.scss";
 
@@ -44,7 +53,19 @@ const DashboardPage = () => {
 
   const { siret } = useParams<{ siret: string }>();
 
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  const resetFiltersBlockVisibility = () => {
+    if (filterRef.current) {
+      filterRef.current.style.display = "";
+    }
+  };
+
   const getPredicate = useCallback(() => {
+    setIsFiltersOpen(false);
+    resetFiltersBlockVisibility();
     if (isActTab) {
       return {
         isForActionFor: [siret],
@@ -171,18 +192,36 @@ const DashboardPage = () => {
     }
   };
 
+  const toggleFiltersBlock = () => {
+    setIsFiltersOpen(!isFiltersOpen);
+  };
+
   const bsds = data?.bsds.edges;
 
   return (
     <div className="dashboard-page">
       <Breadcrumb>
-        <BreadcrumbItem>{breadcrumb_title}</BreadcrumbItem>
+        <BreadcrumbItem
+          href={generatePath(routes.dashboardv2.index, {
+            siret,
+          })}
+        >
+          {breadcrumb_title}
+        </BreadcrumbItem>
         <BreadcrumbItem>{getBreadcrumbItem()}</BreadcrumbItem>
       </Breadcrumb>
       {loading && <Loader />}
       <div className="dashboard-page__bsd-dropdown">
         <BSDDropdown siret={siret} />
+        <button
+          type="button"
+          className="fr-btn fr-btn--secondary"
+          onClick={toggleFiltersBlock}
+        >
+          {!isFiltersOpen ? filter_show_btn : filter_reset_btn}
+        </button>
       </div>
+
       {cachedData?.bsds.totalCount === 0 && (
         <Blankslate>
           <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
@@ -193,7 +232,14 @@ const DashboardPage = () => {
       )}
       <div>
         {!!data?.bsds.edges.length && (
-          <BsdCardList siret={siret} bsds={bsds!} />
+          <>
+            <div ref={filterRef}>
+              {isFiltersOpen && <Filters filters={filterList} />}
+            </div>
+            <>
+              <BsdCardList siret={siret} bsds={bsds!} />
+            </>
+          </>
         )}
       </div>
 

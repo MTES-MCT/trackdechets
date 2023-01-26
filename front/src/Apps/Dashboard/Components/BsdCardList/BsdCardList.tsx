@@ -111,7 +111,7 @@ function BsdCardList({ siret, bsds }: BsdCardListProps): JSX.Element {
 
   return (
     <ul className="bsd-card-list">
-      {bsds.map(bsd => {
+      {bsds?.map(bsd => {
         const { node } = bsd;
         return (
           <li className="bsd-card-list__item" key={node.id}>
@@ -133,4 +133,4 @@ function BsdCardList({ siret, bsds }: BsdCardListProps): JSX.Element {
   );
 }
 
-export default BsdCardList;
+export default React.memo(BsdCardList);
