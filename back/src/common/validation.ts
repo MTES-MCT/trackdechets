@@ -193,7 +193,7 @@ export const siretTests: SiretTests = {
           return ctx.createError({
             message:
               `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue` +
-              ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau bordereau.`
+              ` avec le SIRET ${siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau.`
           });
         }
       }
