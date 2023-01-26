@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useRef, useState, useMemo } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { filter } from "graphql-anywhere";
 import AccountCompany from "./AccountCompany";
@@ -39,9 +39,12 @@ const isSearchClueValid = clue =>
   clue.length <= MAX_MY_COMPANIES_SEARCH;
 
 export default function AccountCompanyList() {
+  const [isFiltered, setIsFiltered] = useState(false);
+  const [inputValue, setInputValue] = useState("");
   const [searchClue, setSearchClue] = useState("");
-  const [startSearch, setStartSearch] = useState(false);
+  const [displayPreloader, setDisplayPreloader] = useState(false);
 
+  const inputRef = useRef(null);
   const history = useHistory();
 
   const { data, loading, error, refetch, fetchMore } = useQuery<
@@ -51,111 +54,52 @@ export default function AccountCompanyList() {
   const debouncedSearch = useMemo(
     () =>
       debounce(params => {
-        refetch(params);
-        setStartSearch(false);
+        setSearchClue(params.search);
+        refetch(params).then(() => setDisplayPreloader(false));
       }, 1000),
-    [refetch, setStartSearch]
+    [refetch, setDisplayPreloader]
   );
 
-  useEffect(() => {
-    if (isSearchClueValid(searchClue)) {
+  const handleOnChangeSearch = newSearchClue => {
+    if (isSearchClueValid(newSearchClue)) {
+      setDisplayPreloader(true);
+      setIsFiltered(true);
       debouncedSearch({
-        search: searchClue,
+        search: newSearchClue,
       });
     }
-  }, [searchClue, debouncedSearch]);
 
-  if (error) {
-    return <NotificationError apolloError={error} />;
-  }
-
-  let content;
-
-  if (startSearch || loading) {
-    content = <Loader />;
-  } else if (data) {
-    const companies = data.myCompanies?.edges.map(({ node }) => node);
-
-    const totalCount = data.myCompanies?.totalCount ?? 0;
-
-    if (!companies || companies.length === 0) {
-      if (totalCount === 0 && searchClue.length === 0) {
-        history.push({
-          pathname: routes.account.companies.orientation,
-        });
-      } else {
-        content = (
-          <div className="tw-mb-3">
-            Aucun résultat pour la recherche: {searchClue}
-          </div>
-        );
-      }
-    } else {
-      let listTitle;
-      const plural = totalCount > 1 ? "s" : "";
-
-      if (searchClue.length === 0) {
-        listTitle = `Vous êtes membre de ${totalCount} établissement${plural}`;
-      } else {
-        listTitle = `${totalCount} résultat${plural} pour la recherche : ${searchClue}`;
-      }
-
-      content = (
-        <>
-          <div className="tw-mb-3">{listTitle}</div>
-          {companies.map(company => (
-            <AccountCompany
-              key={company.orgId}
-              company={filter(AccountCompany.fragments.company, company)}
-            />
-          ))}
-          {data.myCompanies?.pageInfo.hasNextPage && (
-            <div style={{ textAlign: "center" }}>
-              <button
-                className="center btn btn--primary small"
-                onClick={() =>
-                  fetchMore({
-                    variables: {
-                      first: 10,
-                      after: data.myCompanies?.pageInfo.endCursor,
-                    },
-                  })
-                }
-              >
-                Charger plus d'établissements
-              </button>
-            </div>
-          )}
-        </>
-      );
+    if (newSearchClue.length === 0) {
+      handleOnResetSearch();
     }
-  }
+  };
 
-  return (
+  const handleOnResetSearch = () => {
+    setInputValue("");
+    setDisplayPreloader(true);
+    setIsFiltered(false);
+    debouncedSearch({ search: "" });
+  };
+
+  const getPageContent = content => (
     <Container fluid>
       <Row spacing="mb-4w" alignItems={"bottom"}>
-        <Col n="6">
+        <Col n="4">
           <TextInput
-            label="Filtrer mes établissements"
-            hint="Vous pouvez utiliser le nom officiel ou usuel, le n° de siret ou le n° de TVA"
+            label="Filtrer mes établissements par nom, siret ou n° de TVA"
+            hint="Veuillez entrer au minimum 3 caractères"
             maxLength={MAX_MY_COMPANIES_SEARCH}
             onChange={e => {
-              if (isSearchClueValid(e.target.value)) {
-                setStartSearch(true);
-              }
-
-              setSearchClue(e.target.value);
+              setInputValue(e.target.value);
+              handleOnChangeSearch(e.target.value);
             }}
-            value={searchClue}
+            value={inputValue}
           ></TextInput>
         </Col>
         <Col n="4" spacing="ml-1w">
           <Button
-            onClick={() => {
-              setStartSearch(true);
-              setSearchClue("");
-            }}
-            disabled={!searchClue.length}
+            onClick={handleOnResetSearch}
+            disabled={displayPreloader || !searchClue.length}
           >
             Effacer le filtre
           </Button>
@@ -166,4 +110,70 @@ export default function AccountCompanyList() {
       </Row>
     </Container>
   );
+
+  if (error) {
+    return <NotificationError apolloError={error} />;
+  }
+
+  if (displayPreloader || loading) {
+    return getPageContent(<Loader />);
+  }
+
+  if (data) {
+    const companies = data.myCompanies?.edges.map(({ node }) => node);
+    const totalCount = data.myCompanies?.totalCount ?? 0;
+
+    if (!companies || totalCount === 0) {
+      if (isFiltered) {
+        return getPageContent(
+          <div className="tw-mb-3">
+            Aucun résultat pour la recherche: {searchClue}
+          </div>
+        );
+      }
+
+      // No results and we're not filtering, redirect to the create company screen
+      history.push({
+        pathname: routes.account.companies.orientation,
+      });
+      return <Loader />;
+    }
+
+    const plural = totalCount > 1 ? "s" : "";
+    const listTitle =
+      searchClue.length === 0
+        ? `Vous êtes membre de ${totalCount} établissement${plural}`
+        : `${totalCount} résultat${plural} pour la recherche : ${searchClue}`;
+
+    return getPageContent(
+      <>
+        <div className="tw-mb-3">{listTitle}</div>
+        {companies.map(company => (
+          <AccountCompany
+            key={company.orgId}
+            company={filter(AccountCompany.fragments.company, company)}
+          />
+        ))}
+        {data.myCompanies?.pageInfo.hasNextPage && (
+          <div style={{ textAlign: "center" }}>
+            <button
+              className="center btn btn--primary small"
+              onClick={() =>
+                fetchMore({
+                  variables: {
+                    first: 10,
+                    after: data.myCompanies?.pageInfo.endCursor,
+                  },
+                })
+              }
+            >
+              Charger plus d'établissements
+            </button>
+          </div>
+        )}
+      </>
+    );
+  }
+
+  return <Loader />;
 }
