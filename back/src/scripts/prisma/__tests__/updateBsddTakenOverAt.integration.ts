@@ -16,7 +16,6 @@ describe("updateBsddTakenOverAt", () => {
     const form1 = await formFactory({
       ownerId: user.id,
       opt: {
-        createdAt: new Date("2023-01-01"),
         emitterCompanySiret: company.siret,
         emittedAt: new Date("2023-01-22"),
         takenOverAt: new Date("2023-01-21")
@@ -27,7 +26,6 @@ describe("updateBsddTakenOverAt", () => {
     const form2 = await formFactory({
       ownerId: user.id,
       opt: {
-        createdAt: new Date("2023-01-02"),
         emitterCompanySiret: company.siret,
         emittedAt: new Date("2023-01-21"),
         takenOverAt: new Date("2023-01-22")
@@ -38,10 +36,9 @@ describe("updateBsddTakenOverAt", () => {
     const form3 = await formFactory({
       ownerId: user.id,
       opt: {
-        createdAt: new Date("2022-12-01"),
         emitterCompanySiret: company.siret,
-        emittedAt: new Date("2023-01-21"),
-        takenOverAt: new Date("2023-01-22")
+        emittedAt: new Date("2022-12-01"),
+        takenOverAt: new Date("2022-11-29")
       }
     });
 

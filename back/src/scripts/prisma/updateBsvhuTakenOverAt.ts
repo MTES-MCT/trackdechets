@@ -23,8 +23,8 @@ export async function updateBsvhuTakenOverAt({
     SELECT "id", "emitterEmissionSignatureDate", "transporterTransportTakenOverAt" FROM "default$default"."Bsvhu" 
     WHERE "emitterEmissionSignatureDate" > "transporterTransportTakenOverAt"
     AND "isDeleted" = false
-    AND "createdAt" >= ${gte}
-    AND "createdAt" <= ${lte};`;
+    AND "emitterEmissionSignatureDate" >= ${gte}
+    AND "emitterEmissionSignatureDate" <= ${lte};`;
   const user = { id: "support-td", authType: "script" };
 
   const { update } = getBsvhuRepository(user as any);

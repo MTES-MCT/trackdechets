@@ -13,7 +13,6 @@ describe("updateBsvhuTakenOverAt", () => {
     // this bsvhu should be updated
     const bsvhu1 = await bsvhuFactory({
       opt: {
-        createdAt: new Date("2023-01-01"),
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureDate: new Date("2023-01-22"),
         transporterTransportTakenOverAt: new Date("2023-01-21")
@@ -23,7 +22,6 @@ describe("updateBsvhuTakenOverAt", () => {
     // this bsvhu should not be updated
     const bsvhu2 = await bsvhuFactory({
       opt: {
-        createdAt: new Date("2023-01-02"),
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureDate: new Date("2023-01-21"),
         transporterTransportTakenOverAt: new Date("2023-01-22")
@@ -33,10 +31,9 @@ describe("updateBsvhuTakenOverAt", () => {
     // this form should not be updated
     const bsvhu3 = await bsvhuFactory({
       opt: {
-        createdAt: new Date("2022-12-01"),
         emitterCompanySiret: company.siret,
-        emitterEmissionSignatureDate: new Date("2023-01-21"),
-        transporterTransportTakenOverAt: new Date("2023-01-22")
+        emitterEmissionSignatureDate: new Date("2022-12-01"),
+        transporterTransportTakenOverAt: new Date("2022-11-29")
       }
     });
 

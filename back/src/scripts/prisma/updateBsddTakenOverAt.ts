@@ -23,8 +23,8 @@ export async function updateBsddTakenOverAt({
     SELECT "id", "emittedAt", "takenOverAt" FROM "default$default"."Form" 
     WHERE "emittedAt" > "takenOverAt"
     AND "isDeleted" = false
-    AND "createdAt" >= ${gte}
-    AND "createdAt" <= ${lte};`;
+    AND "emittedAt" >= ${gte}
+    AND "emittedAt" <= ${lte};`;
   const user = { id: "support-td", authType: "script" };
 
   const { update } = getFormRepository(user as any);
