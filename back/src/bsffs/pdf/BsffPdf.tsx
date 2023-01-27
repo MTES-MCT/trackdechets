@@ -403,7 +403,12 @@ function BsffPackagingAcceptation({
         Date de présentation sur site :{" "}
         {formatDate(bsff?.destination?.reception?.date)}
       </div>
-      <div>Quantité réelle présentée : {packaging?.acceptation?.weight} kg</div>
+      {isAccepted && (
+        <div>
+          Quantité réelle présentée : {packaging?.acceptation?.weight} kg
+        </div>
+      )}
+
       <div>
         Contenant accepté : <input type="checkbox" checked={isAccepted} /> Oui
         {"  "}

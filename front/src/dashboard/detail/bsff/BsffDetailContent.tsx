@@ -67,6 +67,13 @@ export function BsffDetailContent({ form: bsff }: Props) {
     .filter(Boolean)
     .includes(siret);
 
+  const totalWeight = bsff.packagings.reduce((w, p) => {
+    if (p.acceptation?.weight) {
+      return w + p.acceptation?.weight;
+    }
+    return w + p.weight;
+  }, 0);
+
   return (
     <>
       <div>
@@ -105,11 +112,7 @@ export function BsffDetailContent({ form: bsff }: Props) {
                   label="Type"
                 />
               )}
-              <DetailRow
-                value={bsff.weight?.value}
-                label="Poids total"
-                units="kg"
-              />
+              <DetailRow value={totalWeight} label="Poids total" units="kg" />
               <dt>Déchet</dt>
               <dd>
                 {bsff.waste?.code} {bsff.waste?.description}
