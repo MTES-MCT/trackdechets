@@ -13,7 +13,7 @@ type UpdateBsddTakenOvetAtProps = {
 };
 
 /**
- * BSDD - Set takenOverAt = emittedAt when takenOverAt < emittedAt
+ * BSVHU - Set transporterTransportTakenOverAt = emitterEmissionSignatureDate when transporterTransportTakenOverAt < emitterEmissionSignatureDate
  */
 export async function updateBsvhuTakenOverAt({
   gte,
