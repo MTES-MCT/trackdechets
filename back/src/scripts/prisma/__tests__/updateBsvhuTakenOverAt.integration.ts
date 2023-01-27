@@ -13,7 +13,7 @@ describe("updateBsvhuTakenOverAt", () => {
     // this bsvhu should be updated
     const bsvhu1 = await bsvhuFactory({
       opt: {
-        createdAt: new Date("2023-01-02"),
+        createdAt: new Date("2023-01-01"),
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureDate: new Date("2023-01-22"),
         transporterTransportTakenOverAt: new Date("2023-01-21")
@@ -41,8 +41,8 @@ describe("updateBsvhuTakenOverAt", () => {
     });
 
     const count = await updateBsvhuTakenOverAt({
-      gt: new Date("2023-01-01"),
-      lt: new Date("2023-01-25")
+      gte: new Date("2023-01-01"),
+      lte: new Date("2023-01-25")
     });
     expect(count).toEqual(1);
 

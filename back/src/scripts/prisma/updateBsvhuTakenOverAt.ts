@@ -8,23 +8,23 @@ type QueryRawReturnType = {
 }[];
 
 type UpdateBsddTakenOvetAtProps = {
-  gt: Date;
-  lt: Date;
+  gte: Date;
+  lte: Date;
 };
 
 /**
  * BSDD - Set takenOverAt = emittedAt when takenOverAt < emittedAt
  */
 export async function updateBsvhuTakenOverAt({
-  gt,
-  lt
+  gte,
+  lte
 }: UpdateBsddTakenOvetAtProps) {
   const bsvhus = await prisma.$queryRaw<QueryRawReturnType>`
     SELECT "id", "emitterEmissionSignatureDate", "transporterTransportTakenOverAt" FROM "default$default"."Bsvhu" 
     WHERE "emitterEmissionSignatureDate" > "transporterTransportTakenOverAt"
     AND "isDeleted" = false
-    AND "createdAt" > ${gt}
-    AND "createdAt" < ${lt};`;
+    AND "createdAt" >= ${gte}
+    AND "createdAt" <= ${lte};`;
   const user = { id: "support-td", authType: "script" };
 
   const { update } = getBsvhuRepository(user as any);

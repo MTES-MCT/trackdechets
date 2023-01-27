@@ -9,8 +9,8 @@ import { registerUpdater, Updater } from "./helper/helper";
 export class UpdateBSVHUTakenOverAt implements Updater {
   async run() {
     const nbr: number = await updateBsvhuTakenOverAt({
-      gt: new Date("2023-01-09"), // release 2023.1.1 du 10/01/23 introduction du bug tra-10777
-      lt: new Date("2023-01-24") // hotfix du 25/01/23
+      gte: new Date("2023-01-10"), // release 2023.1.1 du 10/01/23 introduction du bug tra-10777
+      lte: new Date("2023-01-25") // hotfix du 25/01/23
     });
 
     console.info(`${nbr} BSVHUs updated`);

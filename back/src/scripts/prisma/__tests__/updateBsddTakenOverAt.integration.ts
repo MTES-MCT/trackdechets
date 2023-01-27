@@ -16,7 +16,7 @@ describe("updateBsddTakenOverAt", () => {
     const form1 = await formFactory({
       ownerId: user.id,
       opt: {
-        createdAt: new Date("2023-01-02"),
+        createdAt: new Date("2023-01-01"),
         emitterCompanySiret: company.siret,
         emittedAt: new Date("2023-01-22"),
         takenOverAt: new Date("2023-01-21")
@@ -46,8 +46,8 @@ describe("updateBsddTakenOverAt", () => {
     });
 
     const count = await updateBsddTakenOverAt({
-      gt: new Date("2023-01-01"),
-      lt: new Date("2023-01-25")
+      gte: new Date("2023-01-01"),
+      lte: new Date("2023-01-25")
     });
     expect(count).toEqual(1);
 
