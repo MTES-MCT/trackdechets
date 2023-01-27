@@ -1,4 +1,4 @@
-import prisma from "../../src/prisma";
+import { updateBsvhuTakenOverAt } from "../../src/scripts/prisma/updateBsvhuTakenOverAt";
 import { registerUpdater, Updater } from "./helper/helper";
 
 @registerUpdater(
@@ -8,10 +8,10 @@ import { registerUpdater, Updater } from "./helper/helper";
 )
 export class UpdateBSVHUTakenOverAt implements Updater {
   async run() {
-    const nbr: number =
-      await prisma.$executeRaw`update "default$default"."Bsvhu"
-      set "transporterTransportTakenOverAt" = "emitterEmissionSignatureDate"
-      where "emitterEmissionSignatureDate" > "transporterTransportTakenOverAt";`;
+    const nbr: number = await updateBsvhuTakenOverAt({
+      gt: new Date("2023-01-09"), // release 2023.1.1 du 10/01/23 introduction du bug tra-10777
+      lt: new Date("2023-01-24") // hotfix du 25/01/23
+    });
 
     console.info(`${nbr} BSVHUs updated`);
   }
