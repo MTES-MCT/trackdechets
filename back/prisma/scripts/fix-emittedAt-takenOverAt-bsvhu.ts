@@ -6,7 +6,7 @@ import { registerUpdater, Updater } from "./helper/helper";
   "Set transporterTransportTakenOverAt = emitterEmissionSignatureDate for all BSVHUs where emitterEmissionSignatureDate > transporterTransportTakenOverAt",
   true
 )
-export class UpdateBSDDTakenOverAt implements Updater {
+export class UpdateBSVHUTakenOverAt implements Updater {
   async run() {
     const nbr: number =
       await prisma.$executeRaw`update "default$default"."Bsvhu"
