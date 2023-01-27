@@ -41,7 +41,12 @@ export default function Destination({ disabled }) {
       <div className="form__row">
         <label>
           Numéro de CAP (optionnel)
-          <Field type="text" name="destination.cap" className="td-input" />
+          <Field
+            type="text"
+            name="destination.cap"
+            disabled={disabled}
+            className="td-input"
+          />
         </label>
       </div>
     </>

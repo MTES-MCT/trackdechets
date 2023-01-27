@@ -8,6 +8,7 @@ import { gql } from "apollo-server-core";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { BSFF_WASTE_CODES } from "../../../../common/constants";
 import {
+  BsffOperationCode,
   Mutation,
   MutationUpdateBsffArgs
 } from "../../../../generated/graphql/types";
@@ -28,6 +29,7 @@ import {
   createBsffAfterOperation,
   createBsffAfterTransport,
   createBsffBeforeEmission,
+  createBsffAfterReception,
   createFicheIntervention
 } from "../../../__tests__/factories";
 
@@ -247,42 +249,158 @@ describe("Mutation.updateBsff", () => {
     ]);
   });
 
-  it("should allow updating emitter if they didn't sign", async () => {
+  test("before emitter signature > it should be possible to update any field", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsffBeforeEmission({
-      emitter,
-      transporter,
-      destination
-    });
-
+    const bsff = await createBsffBeforeEmission({ emitter });
     const { mutate } = makeClient(emitter.user);
-
-    const input = {
-      emitter: {
-        company: {
-          name: "Another name"
-        }
-      }
-    };
-    const { data, errors } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
       variables: {
         id: bsff.id,
-        input
+        input: {
+          emitter: {
+            company: {
+              name: emitter.company.name,
+              siret: emitter.company.siret,
+              address: emitter.company.address,
+              contact: emitter.user.name,
+              mail: emitter.user.email,
+              phone: emitter.company.contactPhone
+            }
+          },
+          transporter: {
+            company: {
+              name: transporter.company.name,
+              siret: transporter.company.siret,
+              address: transporter.company.address,
+              contact: transporter.user.name,
+              mail: transporter.user.email,
+              phone: transporter.company.contactPhone
+            }
+          },
+          destination: {
+            company: {
+              name: destination.company.name,
+              siret: destination.company.siret,
+              address: destination.company.address,
+              contact: destination.user.name,
+              mail: destination.user.email,
+              phone: destination.company.contactPhone
+            },
+            plannedOperationCode: "R12" as BsffOperationCode
+          },
+          waste: {
+            code: BSFF_WASTE_CODES[0],
+            adr: "Mention ADR",
+            description: "R410"
+          },
+          weight: {
+            value: 1,
+            isEstimate: true
+          },
+          packagings: [
+            {
+              type: BsffPackagingType.BOUTEILLE,
+              numero: "123",
+              weight: 1,
+              volume: 1
+            }
+          ]
+        }
       }
     });
-
     expect(errors).toBeUndefined();
-    expect(data.updateBsff.emitter.company).toEqual(
-      expect.objectContaining({ name: input.emitter.company.name })
-    );
   });
 
-  it("should not update emitter if they signed already", async () => {
+  test("after emitter signature > it should not be possible to update sealed fields", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await createBsffAfterEmission({ emitter });
+    const { mutate } = makeClient(emitter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          emitter: {
+            company: {
+              name: "Émetteur 2",
+              siret: emitter.company.siret,
+              address: "Adresse 2",
+              contact: "Contact 2",
+              mail: "Email 2",
+              phone: "0202020202"
+            }
+          },
+          transporter: {
+            company: {
+              name: "Transporteur 2",
+              siret: transporter.company.siret,
+              address: "Adresse 2",
+              contact: "Contact 2",
+              mail: "Email 2",
+              phone: "0202020202"
+            }
+          },
+          destination: {
+            company: {
+              name: "Destination 2",
+              siret: destination.company.siret,
+              address: "Adresse 2",
+              contact: "COntact 2",
+              mail: "Email 2",
+              phone: "0202020202"
+            },
+            plannedOperationCode: "D10" as BsffOperationCode
+          },
+          waste: {
+            code: "14 06 03*",
+            adr: "ADR",
+            description: "HFC"
+          },
+          weight: {
+            value: 2,
+            isEstimate: false
+          },
+          packagings: [
+            {
+              type: BsffPackagingType.CITERNE,
+              numero: "updated-numero",
+              weight: 1,
+              volume: 1
+            }
+          ]
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
+          " emitterCompanyName, emitterCompanyAddress, emitterCompanyContact, emitterCompanyPhone," +
+          " emitterCompanyMail, destinationCompanyName, destinationCompanySiret," +
+          " destinationCompanyAddress, destinationCompanyContact, destinationCompanyPhone," +
+          " destinationCompanyMail, wasteCode, wasteDescription, wasteAdr, weightValue"
+      })
+    ]);
+
+    const updatedBsff = await prisma.bsff.findUnique({
+      where: { id: bsff.id },
+      include: { packagings: true }
+    });
+
+    // check packagings update has been ignored
+    expect(updatedBsff.packagings[0].numero).toEqual("1234");
+  });
+
+  test("after emitter signature > it should be possible to update trasport fields", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
@@ -291,156 +409,28 @@ describe("Mutation.updateBsff", () => {
       transporter,
       destination
     });
-
-    const { mutate } = makeClient(emitter.user);
-
-    const input = {
-      emitter: {
-        company: {
-          name: "Another name"
+    const { mutate } = makeClient(transporter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          transporter: {
+            transport: {
+              takenOverAt: "2022-11-02" as any,
+              mode: "ROAD",
+              plates: ["BG-007-FR"]
+            }
+          }
         }
       }
-    };
-    const { data, errors } = await mutate<
-      Pick<Mutation, "updateBsff">,
-      MutationUpdateBsffArgs
-    >(UPDATE_BSFF, {
-      variables: {
-        id: bsff.id,
-        input
-      }
     });
-
     expect(errors).toBeUndefined();
-    expect(data.updateBsff.emitter.company).toEqual(
-      expect.objectContaining({
-        name: bsff.emitterCompanyName
-      })
-    );
   });
 
-  it("should allow updating waste and quantity if emitter didn't sign", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-    const destination = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsffBeforeEmission({
-      emitter,
-      transporter,
-      destination
-    });
-
-    const { mutate } = makeClient(emitter.user);
-
-    const input = {
-      waste: {
-        code: BSFF_WASTE_CODES[0],
-        description: "R10",
-        adr: "Mention ADR"
-      },
-      weight: {
-        value: 1,
-        isEstimate: false
-      }
-    };
-    const { data, errors } = await mutate<
-      Pick<Mutation, "updateBsff">,
-      MutationUpdateBsffArgs
-    >(UPDATE_BSFF, {
-      variables: {
-        id: bsff.id,
-        input
-      }
-    });
-
-    expect(errors).toBeUndefined();
-    expect(data.updateBsff).toEqual(expect.objectContaining(input));
-  });
-
-  it("should not update waste and quantity if emitter signed already", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-    const destination = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsffAfterEmission({
-      emitter,
-      transporter,
-      destination
-    });
-
-    const { mutate } = makeClient(emitter.user);
-
-    const input = {
-      waste: {
-        code: BSFF_WASTE_CODES[0],
-        description: "R10",
-        adr: "Mention ADR"
-      },
-      weight: {
-        value: 6,
-        isEstimate: false
-      }
-    };
-    const { data, errors } = await mutate<
-      Pick<Mutation, "updateBsff">,
-      MutationUpdateBsffArgs
-    >(UPDATE_BSFF, {
-      variables: {
-        id: bsff.id,
-        input
-      }
-    });
-
-    expect(errors).toBeUndefined();
-    expect(data.updateBsff).toEqual(
-      expect.objectContaining({
-        waste: {
-          code: bsff.wasteCode,
-          description: bsff.wasteDescription,
-          adr: input.waste.adr
-        },
-        weight: {
-          value: bsff.weightValue,
-          isEstimate: bsff.weightIsEstimate
-        }
-      })
-    );
-  });
-
-  it("should allow updating transporter if they didn't sign", async () => {
-    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
-    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
-    const destination = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsffAfterEmission({
-      emitter,
-      transporter,
-      destination
-    });
-
-    const { mutate } = makeClient(emitter.user);
-
-    const input = {
-      transporter: {
-        company: {
-          name: "Another name"
-        }
-      }
-    };
-    const { data, errors } = await mutate<
-      Pick<Mutation, "updateBsff">,
-      MutationUpdateBsffArgs
-    >(UPDATE_BSFF, {
-      variables: {
-        id: bsff.id,
-        input
-      }
-    });
-
-    expect(errors).toBeUndefined();
-    expect(data.updateBsff.transporter.company).toEqual(
-      expect.objectContaining(input.transporter.company)
-    );
-  });
-
-  it("should not update transporter if they signed already", async () => {
+  test("after transporter signature > it should not be possible to update sealed fields", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
@@ -449,35 +439,34 @@ describe("Mutation.updateBsff", () => {
       transporter,
       destination
     });
-
     const { mutate } = makeClient(emitter.user);
-
-    const input = {
-      transporter: {
-        company: {
-          name: "Another name"
-        }
-      }
-    };
-    const { data, errors } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
       variables: {
         id: bsff.id,
-        input
+        input: {
+          transporter: {
+            transport: {
+              takenOverAt: "2022-11-02" as any,
+              mode: "ROAD",
+              plates: ["BG-007-FR"]
+            }
+          }
+        }
       }
     });
-
-    expect(errors).toBeUndefined();
-    expect(data.updateBsff.transporter.company).toEqual(
+    expect(errors).toEqual([
       expect.objectContaining({
-        name: bsff.transporterCompanyName
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
+          " transporterTransportPlates, transporterTransportTakenOverAt"
       })
-    );
+    ]);
   });
 
-  it("should allow updating destination if they didn't sign", async () => {
+  test("after transporter signature > it should be possible to update reception fields", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
@@ -486,67 +475,56 @@ describe("Mutation.updateBsff", () => {
       transporter,
       destination
     });
-
-    const { mutate } = makeClient(emitter.user);
-
-    const input = {
-      destination: {
-        company: {
-          name: "Another name"
-        }
-      }
-    };
-    const { data, errors } = await mutate<
+    const { mutate } = makeClient(transporter.user);
+    const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
       variables: {
         id: bsff.id,
-        input
+        input: {
+          destination: {
+            reception: {
+              date: "2022-11-03" as any
+            }
+          }
+        }
       }
     });
-
     expect(errors).toBeUndefined();
-    expect(data.updateBsff.destination.company).toEqual(
-      expect.objectContaining({ name: input.destination.company.name })
-    );
   });
 
-  it("should not update a transporter if signed already", async () => {
+  test("after reception signature > it should not be possible to update sealed fields", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsffAfterTransport({
+    const bsff = await createBsffAfterReception({
       emitter,
       transporter,
       destination
     });
-
     const { mutate } = makeClient(emitter.user);
-
-    const input = {
-      transporter: {
-        company: {
-          name: "Another name"
-        }
-      }
-    };
-    const { data, errors } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
     >(UPDATE_BSFF, {
       variables: {
         id: bsff.id,
-        input
+        input: {
+          destination: {
+            reception: {
+              date: "2022-11-03" as any
+            }
+          }
+        }
       }
     });
-
-    expect(errors).toBeUndefined();
-    expect(data.updateBsff.transporter.company).toEqual(
+    expect(errors).toEqual([
       expect.objectContaining({
-        name: bsff.transporterCompanyName
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : destinationReceptionDate"
       })
-    );
+    ]);
   });
 
   it("should update the list of grouped BSFFs", async () => {

@@ -89,6 +89,7 @@ export default function Emitter({ disabled }) {
                   )
                 )
               }
+              disabled={disabled}
             />
           )}
         />

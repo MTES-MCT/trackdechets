@@ -1,7 +1,9 @@
-import { UserInputError } from "apollo-server-express";
-import omit from "object.omit";
-import { Prisma, BsffType } from "@prisma/client";
-import { MutationResolvers } from "../../../generated/graphql/types";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
+import { Prisma, BsffType, Bsff } from "@prisma/client";
+import {
+  BsffSignatureType,
+  MutationResolvers
+} from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsffOrNotFound, getPackagingCreateInput } from "../../database";
 import { flattenBsffInput, expandBsffFromDB } from "../../converter";
@@ -33,12 +35,6 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     getBsffFicheInterventionRepository(user);
   const { update: updateBsff } = getBsffRepository(user);
 
-  if (existingBsff.destinationReceptionSignatureDate) {
-    throw new UserInputError(
-      `Il n'est pas possible d'éditer un BSFF qui a été récéptionné`
-    );
-  }
-
   if (input.type && input.type !== existingBsff.type) {
     throw new UserInputError(
       "Vous ne pouvez pas modifier le type de BSFF après création"
@@ -59,57 +55,15 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     );
   }
 
-  let flatInput = { ...flattenBsffInput(input) };
-
   if (existingBsff.emitterEmissionSignatureDate) {
-    flatInput = omit(flatInput, [
-      "type",
-      "emitterCompanyAddress",
-      "emitterCompanyContact",
-      "emitterCompanyMail",
-      "emitterCompanyName",
-      "emitterCompanyPhone",
-      "emitterCompanySiret",
-      "wasteCode",
-      "wasteDescription",
-      "weightValue",
-      "weightIsEstimate",
-      "destinationPlannedOperationCode"
-    ]);
-
+    // discard related objects updates after emission signatures
+    delete input.packagings;
     delete input.grouping;
     delete input.forwarding;
+    delete input.repackaging;
     delete input.ficheInterventions;
   }
-
-  if (existingBsff.transporterTransportSignatureDate) {
-    flatInput = omit(flatInput, [
-      "transporterCompanyAddress",
-      "transporterCompanyContact",
-      "transporterCompanyMail",
-      "transporterCompanyName",
-      "transporterCompanyPhone",
-      "transporterCompanySiret",
-      "transporterCompanyVatNumber",
-      "transporterRecepisseDepartment",
-      "transporterRecepisseNumber",
-      "transporterRecepisseValidityLimit",
-      "transporterTransportMode",
-      "wasteAdr"
-    ]);
-  }
-
-  if (existingBsff.destinationReceptionSignatureDate) {
-    flatInput = omit(flatInput, [
-      "destinationCompanyAddress",
-      "destinationCompanyContact",
-      "destinationCompanyMail",
-      "destinationCompanyName",
-      "destinationCompanyPhone",
-      "destinationCompanySiret",
-      "destinationReceptionDate"
-    ]);
-  }
+  const flatInput = flattenBsffInput(input);
 
   const futureBsff = {
     ...existingBsff,
@@ -120,11 +74,15 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   await checkCanWriteBsff(user, futureBsff);
 
+  await checkSealedFields(flatInput, existingBsff);
+
   const packagingHasChanged =
     !!input.forwarding ||
     !!input.grouping ||
     !!input.repackaging ||
     !!input.packagings;
+
+  await validateBsff(futureBsff);
 
   const existingPreviousPackagings = await findPreviousPackagings(
     existingBsff.packagings.map(p => p.id),
@@ -137,8 +95,6 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
         ? { id: { in: input.ficheInterventions } }
         : { bsffs: { some: { id: { in: [existingBsff.id] } } } }
   });
-
-  await validateBsff(futureBsff);
 
   await validateFicheInterventions(futureBsff, ficheInterventions);
 
@@ -197,3 +153,151 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 };
 
 export default updateBsff;
+
+// Fields that can be updated via `updateBsff`
+type EditableFields = keyof Omit<
+  Prisma.BsffUpdateInput,
+  | "id"
+  | "createdAt"
+  | "updatedAt"
+  | "isDeleted"
+  | "isDraft"
+  | "status"
+  | "detenteurCompanySirets"
+  | "emitterEmissionSignatureAuthor"
+  | "emitterEmissionSignatureDate"
+  | "transporterTransportSignatureAuthor"
+  | "transporterTransportSignatureDate"
+  | "destinationOperationSignatureAuthor"
+  | "destinationOperationSignatureDate"
+  | "destinationReceptionSignatureAuthor"
+  | "destinationReceptionSignatureDate"
+  | "grouping"
+  | "groupedIn"
+  | "repackaging"
+  | "repackagedIn"
+  | "forwarding"
+  | "forwardedIn"
+  | "ficheInterventions"
+  | "packagings"
+  // the below fields has been migrated to BsffPackaging and
+  // will be deleted in prisma schema
+  | "destinationReceptionWeight"
+  | "destinationOperationCode"
+  | "destinationReceptionAcceptationStatus"
+  | "destinationReceptionRefusalReason"
+  | "destinationOperationNextDestinationCompanyName"
+  | "destinationOperationNextDestinationCompanySiret"
+  | "destinationOperationNextDestinationCompanyVatNumber"
+  | "destinationOperationNextDestinationCompanyAddress"
+  | "destinationOperationNextDestinationCompanyContact"
+  | "destinationOperationNextDestinationCompanyPhone"
+  | "destinationOperationNextDestinationCompanyMail"
+>;
+
+/**
+ * Defines until which signature editable fields can be modified
+ * The typing Record<EditableFields, BsffSignatureType> ensure that
+ * the typing will break anytime we add a field to the Bsff model so that
+ * we think of adding a new edition rule
+ */
+const editionRules: Record<EditableFields, BsffSignatureType> = {
+  type: "EMISSION",
+  emitterCompanyName: "EMISSION",
+  emitterCompanySiret: "EMISSION",
+  emitterCompanyAddress: "EMISSION",
+  emitterCompanyContact: "EMISSION",
+  emitterCompanyPhone: "EMISSION",
+  emitterCompanyMail: "EMISSION",
+  emitterCustomInfo: "EMISSION",
+  wasteCode: "EMISSION",
+  wasteDescription: "EMISSION",
+  wasteAdr: "EMISSION",
+  weightValue: "EMISSION",
+  weightIsEstimate: "EMISSION",
+  transporterCompanyName: "TRANSPORT",
+  transporterCompanySiret: "TRANSPORT",
+  transporterCompanyVatNumber: "TRANSPORT",
+  transporterCompanyAddress: "TRANSPORT",
+  transporterCompanyContact: "TRANSPORT",
+  transporterCompanyPhone: "TRANSPORT",
+  transporterCompanyMail: "TRANSPORT",
+  transporterCustomInfo: "TRANSPORT",
+  transporterRecepisseNumber: "TRANSPORT",
+  transporterRecepisseDepartment: "TRANSPORT",
+  transporterRecepisseValidityLimit: "TRANSPORT",
+  transporterTransportMode: "TRANSPORT",
+  transporterTransportPlates: "TRANSPORT",
+  transporterTransportTakenOverAt: "TRANSPORT",
+  destinationCompanyName: "EMISSION",
+  destinationCompanySiret: "EMISSION",
+  destinationCompanyAddress: "EMISSION",
+  destinationCompanyContact: "EMISSION",
+  destinationCompanyPhone: "EMISSION",
+  destinationCompanyMail: "EMISSION",
+  destinationCap: "EMISSION",
+  destinationCustomInfo: "OPERATION",
+  destinationReceptionDate: "RECEPTION",
+  destinationPlannedOperationCode: "EMISSION"
+};
+
+const editableFields = Object.keys(editionRules) as string[];
+
+const editableFieldsAfterEmission = editableFields.filter(
+  field => editionRules[field] !== "EMISSION"
+);
+
+const editableFieldsAfterTransport = editableFieldsAfterEmission.filter(
+  field => editionRules[field] !== "TRANSPORT"
+);
+
+export class SealedFieldError extends ForbiddenError {
+  constructor(fields: string[]) {
+    super(
+      `Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : ${fields.join(
+        ", "
+      )}`
+    );
+  }
+}
+
+// check updated fields are not sealed by signature
+async function checkSealedFields(
+  flatInput: Prisma.BsffUpdateInput,
+  existingBsff: Bsff
+) {
+  const sealedFieldErrors: string[] = [];
+
+  if (existingBsff.emitterEmissionSignatureDate) {
+    for (const field of Object.keys(flatInput)) {
+      if (
+        !editableFieldsAfterEmission.includes(field) &&
+        existingBsff[field] !== flatInput[field]
+      ) {
+        sealedFieldErrors.push(field);
+      }
+    }
+  }
+
+  if (existingBsff.transporterTransportSignatureDate) {
+    for (const field of Object.keys(flatInput)) {
+      if (
+        !editableFieldsAfterTransport.includes(field) &&
+        existingBsff[field] !== flatInput[field]
+      ) {
+        sealedFieldErrors.push(field);
+      }
+    }
+  }
+
+  if (existingBsff.destinationReceptionSignatureDate) {
+    // do not allow any BSFF fields to be updated after reception
+    for (const field of Object.keys(flatInput)) {
+      sealedFieldErrors.push(field);
+    }
+  }
+
+  if (sealedFieldErrors.length > 0) {
+    throw new SealedFieldError(sealedFieldErrors);
+  }
+}
