@@ -254,7 +254,7 @@ const editableFieldsAfterTransport = editableFieldsAfterEmission.filter(
 export class SealedFieldError extends ForbiddenError {
   constructor(fields: string[]) {
     super(
-      `Des champs ont été vérouillés via signature et ne peuvent plus être modifiés : ${fields.join(
+      `Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : ${fields.join(
         ", "
       )}`
     );

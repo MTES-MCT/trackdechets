@@ -170,7 +170,7 @@ describe("Mutation.updateBsffPackaging", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés" +
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés" +
           " : acceptationDate, acceptationWeight, acceptationWasteCode, acceptationWasteDescription"
       })
     ]);
@@ -268,7 +268,7 @@ describe("Mutation.updateBsffPackaging", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés :" +
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
           " operationDate, operationCode, operationDescription, operationNextDestinationPlannedOperationCode," +
           " operationNextDestinationCap, operationNextDestinationCompanyName, operationNextDestinationCompanySiret," +
           " operationNextDestinationCompanyAddress, operationNextDestinationCompanyContact," +
