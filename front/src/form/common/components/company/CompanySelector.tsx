@@ -79,8 +79,8 @@ export default function CompanySelector({
     (field.value.country && field.value.country !== "FR") ||
       isForeignVat(field.value.vatNumber!!)
   );
+  // this 2 input ref are to cross-link the value of the input in both search input and department input
   const departmentInputRef = useRef<HTMLInputElement>(null);
-  // this ref lets us transmit the input to both search input and department input
   const clueInputRef = useRef<HTMLInputElement>(null);
   const [mustBeRegistered, setMustBeRegistered] = useState<boolean>(false);
   const [searchResults, setSearchResults] = useState<CompanySearchResult[]>([]);
@@ -273,7 +273,7 @@ export default function CompanySelector({
       await searchCompaniesQuery({
         variables: {
           clue,
-          ...(isSiret(clue) && { department }),
+          ...(department && department.length >= 2 && { department }),
         },
       });
     }
