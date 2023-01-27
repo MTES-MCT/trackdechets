@@ -93,7 +93,7 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
                 <IconPdf size="24px" color="blueLight" />
                 Pdf
               </MenuItem>
-              {![BsffStatus.Processed, BsffStatus.Refused].includes(
+              {[BsffStatus.Initial, BsffStatus.SignedByEmitter].includes(
                 form.bsffStatus
               ) &&
                 canWrite && (
