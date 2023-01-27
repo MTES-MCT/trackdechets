@@ -67,7 +67,7 @@ describe("updateBsddTakenOverAt", () => {
       where: { id: form3.id }
     });
 
-    expect(updatedForm3.takenOverAt).not.toEqual(updatedForm2.emittedAt);
+    expect(updatedForm3.takenOverAt).not.toEqual(updatedForm3.emittedAt);
 
     const events = await prisma.event.findMany();
 
