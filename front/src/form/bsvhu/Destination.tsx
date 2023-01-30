@@ -1,12 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Field, useFormikContext } from "formik";
 import { RedErrorMessage } from "common/components";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import Operation from "./Operation";
-import { Bsvhu } from "generated/graphql/types";
+import { Bsvhu, CompanySearchResult } from "generated/graphql/types";
 
 export default function Destination({ disabled }) {
+  const [selectedDestination, setSelectedDestination] =
+    useState<CompanySearchResult | null>(null);
   const { setFieldValue, values } = useFormikContext<Bsvhu>();
 
   const isDangerousWasteCode = values.wasteCode === "16 01 04*";
@@ -15,6 +17,26 @@ export default function Destination({ disabled }) {
       setFieldValue("destination.type", "DEMOLISSEUR");
     }
   }, [isDangerousWasteCode, setFieldValue]);
+
+  const updateAgrementNumber = (destination, type?) => {
+    const destinationType = type || values.destination?.type;
+
+    const agrementNumber =
+      destinationType === "BROYEUR"
+        ? destination?.vhuAgrementBroyeur?.agrementNumber
+        : destination?.vhuAgrementDemolisseur?.agrementNumber;
+
+    if (agrementNumber) {
+      setFieldValue("destination.agrementNumber", agrementNumber);
+    } else {
+      setFieldValue("destination.agrementNumber", "");
+    }
+  };
+
+  const onChangeDestinationType = type => {
+    setFieldValue("destination.type", type);
+    updateAgrementNumber(selectedDestination, type);
+  };
 
   return (
     <>
@@ -43,6 +65,9 @@ export default function Destination({ disabled }) {
             label="Broyeur agréé"
             component={RadioButton}
             disabled={isDangerousWasteCode || disabled}
+            onChange={() => {
+              onChangeDestinationType("BROYEUR");
+            }}
           />
           <Field
             name="destination.type"
@@ -50,6 +75,9 @@ export default function Destination({ disabled }) {
             label="Démolisseur agréé"
             component={RadioButton}
             disabled={isDangerousWasteCode || disabled}
+            onChange={() => {
+              onChangeDestinationType("DEMOLISSEUR");
+            }}
           />
         </fieldset>
 
@@ -62,16 +90,8 @@ export default function Destination({ disabled }) {
         heading="Installation de destination"
         registeredOnlyCompanies={true}
         onCompanySelected={destination => {
-          const agrementNumber =
-            values.destination?.type === "BROYEUR"
-              ? destination?.vhuAgrementBroyeur?.agrementNumber
-              : destination?.vhuAgrementDemolisseur?.agrementNumber;
-
-          if (agrementNumber) {
-            setFieldValue("destination.agrementNumber", agrementNumber);
-          } else {
-            setFieldValue("destination.agrementNumber", "");
-          }
+          setSelectedDestination(destination);
+          updateAgrementNumber(destination);
         }}
       />
 
