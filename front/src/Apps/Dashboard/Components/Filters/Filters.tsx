@@ -1,14 +1,22 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Filter, FiltersProps, FilterType } from "./filtersTypes";
-import { filter_type_apply_btn } from "assets/wordings/dashboard/wordingsDashboard";
+import {
+  filter_type_apply_btn,
+  filter_type_select_option_placeholder,
+} from "../../../../assets/wordings/dashboard/wordingsDashboard";
 import FilterLine from "./FilterLine";
+import { MAX_FILTER } from "../../dashboardUtils";
 
 import "./filters.scss";
-import { MAX_FILTER } from "Apps/Dashboard/dashboardUtils";
 
-const Filters = ({ filters }: FiltersProps) => {
+const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
   const placeholderFilterRef = useRef<HTMLDivElement>(null);
   const [filterSelectedList, setFilterSelectedList] = useState<Filter[]>([]);
+  const [isApplyDisabled, setIsApplyDisabled] = useState<boolean>(true);
+  const [filterValues, setFilterValues] = useState({});
+  const [hasReachMaxFilter, setHasReachMaxFilter] = useState(false);
+  const [hasRemovedFilterLine, setHasRemovedFilterLine] =
+    useState<boolean>(false);
 
   // we can't select a filter twice
   const filterSelectedIds = filterSelectedList?.map(item => {
@@ -28,7 +36,7 @@ const Filters = ({ filters }: FiltersProps) => {
 
       if (filter) {
         setFilterSelectedList(filterList => [...filterList, filter]);
-        hidePlaceHolderFilter();
+        hideFilterSelector();
       }
     },
     [derivedFilters]
@@ -37,33 +45,62 @@ const Filters = ({ filters }: FiltersProps) => {
   const onAddFilterType = useCallback(() => {
     // 5 filters max displayed
     if (filterSelectedList.length < MAX_FILTER) {
-      showPlaceHolderFilter();
+      showFilterSelector();
     }
+    setHasRemovedFilterLine(false);
   }, [filterSelectedList]);
 
   const onRemoveFilterType = useCallback(
     (e, value) => {
-      if (!value && filterSelectedList.length) {
-        hidePlaceHolderFilter();
+      if (!filterSelectedList.length) {
+        // keep filter selector visible
+        return;
+      }
+      if (filterSelectedList.length && !value) {
+        hideFilterSelector();
       } else {
+        // remove from filter selected list
         setFilterSelectedList(filterList =>
           filterList.filter(f => f.value !== value)
         );
+
+        // remove from filter values
+        const newFilterValues = { ...filterValues };
+        delete newFilterValues[value];
+        setFilterValues(newFilterValues);
+        setHasRemovedFilterLine(true);
       }
     },
-    [filterSelectedList]
+    [filterSelectedList, filterValues]
   );
 
-  const showPlaceHolderFilter = () => {
+  const showFilterSelector = () => {
     if (placeholderFilterRef.current) {
       placeholderFilterRef.current.style.display = "block";
     }
   };
 
-  const hidePlaceHolderFilter = () => {
+  const hideFilterSelector = () => {
     if (placeholderFilterRef.current) {
       placeholderFilterRef.current.style.display = "none";
     }
+  };
+
+  const onFilterValueChange = (e, filterType) => {
+    const { value } = e.target;
+    const newFilterValues = { ...filterValues };
+    if (!newFilterValues[filterType] || newFilterValues[filterType] !== value) {
+      newFilterValues[filterType] = value;
+      setFilterValues(newFilterValues);
+      setIsApplyDisabled(false);
+    } else {
+      setIsApplyDisabled(true);
+    }
+  };
+
+  const onApply = () => {
+    onApplyFilters(filterValues);
+    setIsApplyDisabled(true);
   };
 
   const displayFilterItem = (filter: Filter) => {
@@ -78,6 +115,7 @@ const Filters = ({ filters }: FiltersProps) => {
             type="text"
             id={`${filter.value}_filter`}
             name={`${filter.value}`}
+            onChange={e => onFilterValueChange(e, filter.value)}
           ></input>
         </>
       );
@@ -92,10 +130,12 @@ const Filters = ({ filters }: FiltersProps) => {
           <select
             id={`${filter.value}_filter`}
             className="fr-select"
-            value={filter.value} // array if multiple
-            multiple={filter.isMultiple}
-            //onChange={onChange}
+            onChange={e => onFilterValueChange(e, filter.value)}
+            defaultValue=""
           >
+            <option value="" disabled hidden>
+              {filter_type_select_option_placeholder}
+            </option>
             {filter.options?.map(option => (
               <option key={option.value} value={option.value}>
                 {option.label}
@@ -109,13 +149,25 @@ const Filters = ({ filters }: FiltersProps) => {
 
   useEffect(() => {
     if (!filterSelectedList.length) {
-      showPlaceHolderFilter();
+      showFilterSelector();
+    }
+
+    if (filterSelectedList.length < MAX_FILTER) {
+      setHasReachMaxFilter(false);
+    } else {
+      setHasReachMaxFilter(true);
     }
   }, [filterSelectedList]);
 
+  useEffect(() => {
+    if (hasRemovedFilterLine && Object.keys(filterValues).length > 0) {
+      setIsApplyDisabled(false);
+    }
+  }, [filterValues, hasRemovedFilterLine]);
+
   return (
     <div className="filters">
-      {filterSelectedList.map(filter => {
+      {filterSelectedList.map((filter, i) => {
         return (
           <React.Fragment key={`${filter.value}_filter`}>
             <FilterLine
@@ -124,22 +176,32 @@ const Filters = ({ filters }: FiltersProps) => {
               onRemoveFilterType={onRemoveFilterType}
               value={filter.value}
               disabledSelect={true}
+              isMaxLine={hasReachMaxFilter}
+              isCurrentLine={i === filterSelectedList.length - 1}
             >
               {displayFilterItem(filter)}
             </FilterLine>
           </React.Fragment>
         );
       })}
+      {/* filter selector */}
       <div ref={placeholderFilterRef}>
         <FilterLine
           filters={derivedFilters}
           onChange={onSelectFilterType}
           onAddFilterType={onAddFilterType}
           onRemoveFilterType={onRemoveFilterType}
+          isMaxLine={hasReachMaxFilter}
+          isCurrentLine
         />
       </div>
       <div className="filters__primary-cta">
-        <button type="button" className="fr-btn">
+        <button
+          type="button"
+          className="fr-btn"
+          onClick={onApply}
+          disabled={isApplyDisabled}
+        >
           {filter_type_apply_btn}
         </button>
       </div>

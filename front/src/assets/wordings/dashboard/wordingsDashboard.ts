@@ -98,7 +98,7 @@ export const load_more_bsds = "Charger plus de bordereaux";
 // filters
 export const filter_show_btn = "Chercher par";
 export const filter_reset_btn = "Supprimer les filtres";
-export const filter_type_select_placeholder = "Selectionner un type de filtre";
+export const filter_type_select_placeholder = "Sélectionner un type de filtre";
 export const filter_type_select_label = "Type de filtre";
 export const filter_type_apply_btn = "Appliquer les filtres";
 export const filter_bsd_type = "Type de bordereau";
@@ -116,3 +116,8 @@ export const bsd_type_option_bsff = "Déchets de Fluides Frigorigènes";
 export const bsd_type_option_bsda = "Déchets d'Amiante";
 export const bsd_type_option_bsdasri =
   "Déchets d'Activités de Soins à Risque Infectieux";
+export const filter_type_select_option_placeholder = "Sélectionner une option";
+export const max_filter_autorized_label =
+  "Vous avez atteint le nombre de filtres maximum";
+export const sr_btn_delete_filter_line = "supprimer un filtre";
+export const sr_btn_add_filter_line = "ajouter un filtre";

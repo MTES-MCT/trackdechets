@@ -1,23 +1,23 @@
+import React from "react";
 import {
   filter_type_select_label,
   filter_type_select_placeholder,
-} from "assets/wordings/dashboard/wordingsDashboard";
-import React from "react";
+} from "../../../../assets/wordings/dashboard/wordingsDashboard";
 import { Filter } from "./filtersTypes";
 
-interface FilterPlaceholderSelectProps {
+interface FilterSelectorProps {
   filters: Filter[];
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
   disabled?: boolean;
   value?: string;
 }
 
-const FilterPlaceholderSelect = ({
+const FilterSelector = ({
   filters,
   onChange,
   disabled = false,
   value = "",
-}: FilterPlaceholderSelectProps) => {
+}: FilterSelectorProps) => {
   return (
     <div className="fr-select-group">
       <label className="fr-label" htmlFor={`${value}_select`}>
@@ -43,4 +43,4 @@ const FilterPlaceholderSelect = ({
   );
 };
 
-export default FilterPlaceholderSelect;
+export default FilterSelector;

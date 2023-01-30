@@ -6,15 +6,15 @@ import {
   bsd_type_option_bsvhu,
   filter_bsd_number,
   filter_bsd_type,
-  filter_chantier_adress,
-  filter_chantier_name,
-  filter_contenant_number,
+  // filter_chantier_adress,
+  // filter_chantier_name,
+  // filter_contenant_number,
   filter_free_text,
   filter_immat_number,
-  filter_siret,
+  // filter_siret,
   filter_waste_code,
-} from "assets/wordings/dashboard/wordingsDashboard";
-import { BsdType } from "generated/graphql/types";
+} from "../../assets/wordings/dashboard/wordingsDashboard";
+import { BsdType } from "../../generated/graphql/types";
 import { Filter, FilterType } from "./Components/Filters/filtersTypes";
 
 export const MAX_FILTER = 5;
@@ -43,49 +43,57 @@ const bsdTypeFilterSelectOptions = [
 ];
 export const filterList: Filter[] = [
   {
-    value: "bsd_type",
+    value: "types",
+    order: "type",
     label: filter_bsd_type,
     type: FilterType.select,
-    isMultiple: true,
     options: bsdTypeFilterSelectOptions,
   },
+  // {
+  //   value: "siret",
+  //   order: "siret",
+  //   label: filter_siret,
+  //   type: FilterType.input,
+  // },
   {
-    value: "siret",
-    label: filter_siret,
-    type: FilterType.input,
-  },
-  {
-    value: "waste_code",
+    value: "waste",
+    order: "wasteCode",
     label: filter_waste_code,
     type: FilterType.input,
   },
   {
-    value: "bsd_number",
+    value: "readableId",
+    order: "readableId",
     label: filter_bsd_number,
     type: FilterType.input,
   },
+  // {
+  //   value: "readableId",
+  //   order: "readableId",
+  //   label: filter_contenant_number,
+  //   type: FilterType.input,
+  // },
   {
-    value: "contenant_number",
-    label: filter_contenant_number,
-    type: FilterType.input,
-  },
-  {
-    value: "immat_number",
+    value: "transporterNumberPlate",
+    order: "transporterNumberPlate",
     label: filter_immat_number,
     type: FilterType.input,
   },
+  // {
+  //   value: "chantier_name",
+  //   order: "chantier_name",
+  //   label: filter_chantier_name,
+  //   type: FilterType.input,
+  // },
+  // {
+  //   value: "chantier_adress",
+  //   order: "chantier_adress",
+  //   label: filter_chantier_adress,
+  //   type: FilterType.input,
+  // },
   {
-    value: "chantier_name",
-    label: filter_chantier_name,
-    type: FilterType.input,
-  },
-  {
-    value: "chantier_adress",
-    label: filter_chantier_adress,
-    type: FilterType.input,
-  },
-  {
-    value: "free_text",
+    value: "transporterCustomInfo",
+    order: "transporterCustomInfo",
     label: filter_free_text,
     type: FilterType.input,
   },

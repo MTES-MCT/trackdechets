@@ -10,7 +10,7 @@ import { useLazyQuery, useQuery } from "@apollo/client";
 import { Breadcrumb, BreadcrumbItem } from "@dataesr/react-dsfr";
 import routes from "../common/routes";
 import { GET_BSDS } from "../common/queries";
-import { Query, QueryBsdsArgs } from "generated/graphql/types";
+import { OrderType, Query, QueryBsdsArgs } from "generated/graphql/types";
 import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
 import BsdCardList from "Apps/Dashboard/Components/BsdCardList/BsdCardList";
 import {
@@ -52,20 +52,10 @@ const DashboardPage = () => {
   const BSD_PER_PAGE = 10;
 
   const { siret } = useParams<{ siret: string }>();
-
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-
   const filterRef = useRef<HTMLDivElement>(null);
 
-  const resetFiltersBlockVisibility = () => {
-    if (filterRef.current) {
-      filterRef.current.style.display = "";
-    }
-  };
-
-  const getPredicate = useCallback(() => {
-    setIsFiltersOpen(false);
-    resetFiltersBlockVisibility();
+  const withRoutePredicate = useCallback(() => {
     if (isActTab) {
       return {
         isForActionFor: [siret],
@@ -87,7 +77,11 @@ const DashboardPage = () => {
       };
     }
   }, [isActTab, isDraftTab, isFollowTab, isArchivesTab, siret]);
-  const defaultWhere = useMemo(() => getPredicate(), [getPredicate]);
+
+  const defaultWhere = useMemo(
+    () => withRoutePredicate(),
+    [withRoutePredicate]
+  );
 
   const [bsdsVariables, setBsdsVariables] = useState<QueryBsdsArgs>({
     first: BSD_PER_PAGE,
@@ -102,15 +96,15 @@ const DashboardPage = () => {
     notifyOnNetworkStatusChange: true,
   });
 
-  const refetchBsds = React.useCallback(() => {
+  const fetchBsds = React.useCallback(() => {
     lazyFetchBsds({
       variables: bsdsVariables,
     });
   }, [lazyFetchBsds, bsdsVariables]);
 
-  useNotifier(siret, refetchBsds);
+  useNotifier(siret, fetchBsds);
 
-  const refetchWithDefaultWhere = React.useCallback(
+  const fetchWithDefaultWhere = React.useCallback(
     ({ where, ...args }) => {
       const newVariables = {
         ...args,
@@ -128,18 +122,53 @@ const DashboardPage = () => {
   const { data: cachedData } = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(
     GET_BSDS,
     {
-      variables: {
-        first: BSD_PER_PAGE,
-        where: defaultWhere,
-      },
+      variables: bsdsVariables,
       // read from the cache only to avoid duplicate requests
       fetchPolicy: "cache-only",
     }
   );
 
+  const handleFiltersSubmit = filterValues => {
+    const variables = {
+      where: {},
+      order: {},
+    };
+    const predicate = withRoutePredicate();
+    if (predicate) {
+      variables.where = predicate;
+    }
+    const filterKeys = Object.keys(filterValues);
+    const filters = filterList.filter(filter =>
+      filterKeys.includes(filter.value)
+    );
+    filters.forEach(f => {
+      variables.where[f.value] = filterValues[f.value];
+      variables.order[f.order] = OrderType.Asc;
+    });
+    setBsdsVariables(variables);
+  };
+
   useEffect(() => {
-    refetchWithDefaultWhere({ where: defaultWhere });
-  }, [isActTab, isDraftTab, defaultWhere, refetchWithDefaultWhere]);
+    setIsFiltersOpen(false);
+    fetchWithDefaultWhere({ where: defaultWhere });
+  }, [
+    isActTab,
+    isDraftTab,
+    isFollowTab,
+    isArchivesTab,
+    defaultWhere,
+    fetchWithDefaultWhere,
+  ]);
+
+  useEffect(() => {
+    fetchBsds();
+  }, [bsdsVariables, fetchBsds]);
+
+  useEffect(() => {
+    if (!isFiltersOpen) {
+      fetchWithDefaultWhere({ where: defaultWhere });
+    }
+  }, [isFiltersOpen, defaultWhere, fetchWithDefaultWhere]);
 
   const getBreadcrumbItem = () => {
     if (isActTab) {
@@ -217,9 +246,16 @@ const DashboardPage = () => {
           type="button"
           className="fr-btn fr-btn--secondary"
           onClick={toggleFiltersBlock}
+          disabled={loading}
         >
           {!isFiltersOpen ? filter_show_btn : filter_reset_btn}
         </button>
+      </div>
+
+      <div ref={filterRef}>
+        {isFiltersOpen && (
+          <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
+        )}
       </div>
 
       {cachedData?.bsds.totalCount === 0 && (
@@ -230,18 +266,8 @@ const DashboardPage = () => {
           </BlankslateDescription>
         </Blankslate>
       )}
-      <div>
-        {!!data?.bsds.edges.length && (
-          <>
-            <div ref={filterRef}>
-              {isFiltersOpen && <Filters filters={filterList} />}
-            </div>
-            <>
-              <BsdCardList siret={siret} bsds={bsds!} />
-            </>
-          </>
-        )}
-      </div>
+
+      {!!data?.bsds.edges.length && <BsdCardList siret={siret} bsds={bsds!} />}
 
       {data?.bsds.pageInfo.hasNextPage && (
         <div className="dashboard-page__loadmore">

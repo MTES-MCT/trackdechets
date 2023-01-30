@@ -1,5 +1,10 @@
 import React, { Children, ReactElement } from "react";
-import FilterPlaceholderSelect from "./FilterPlaceholderSelect";
+import {
+  max_filter_autorized_label,
+  sr_btn_add_filter_line,
+  sr_btn_delete_filter_line,
+} from "../../../../assets/wordings/dashboard/wordingsDashboard";
+import FilterSelector from "./FilterSelector";
 import { Filter } from "./filtersTypes";
 
 interface FilterLineProps {
@@ -15,6 +20,8 @@ interface FilterLineProps {
   disabledSelect?: boolean;
   value?: string;
   children?: ReactElement;
+  isMaxLine: boolean;
+  isCurrentLine: boolean;
 }
 
 const FilterLine = ({
@@ -25,10 +32,12 @@ const FilterLine = ({
   onAddFilterType,
   value,
   children,
+  isMaxLine,
+  isCurrentLine,
 }: FilterLineProps) => (
   <div className="filters__line">
     <div className="filters__line__item">
-      <FilterPlaceholderSelect
+      <FilterSelector
         filters={filters}
         onChange={onChange}
         value={value}
@@ -45,16 +54,20 @@ const FilterLine = ({
         onClick={e => onRemoveFilterType(e, value)}
         id={`${value}_delete_btn`}
       >
-        - <span className="sr-only">supprimer un filtre</span>
+        - <span className="sr-only">{sr_btn_delete_filter_line}</span>
       </button>
-      <button
-        type="button"
-        className="fr-btn fr-btn--secondary"
-        onClick={onAddFilterType}
-        id={`${value}_add_btn`}
-      >
-        + <span className="sr-only">ajouter un filtre</span>
-      </button>
+      {isCurrentLine && (
+        <button
+          type="button"
+          className="fr-btn fr-btn--secondary"
+          onClick={onAddFilterType}
+          id={`${value}_add_btn`}
+          title={isMaxLine ? max_filter_autorized_label : ""}
+          disabled={isMaxLine}
+        >
+          + <span className="sr-only">{sr_btn_add_filter_line}</span>
+        </button>
+      )}
     </div>
   </div>
 );

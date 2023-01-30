@@ -6,11 +6,12 @@ export enum FilterType {
 export type Filter = {
   value: string;
   label: string;
+  order: string;
   type: FilterType;
   options?: { value: string; label: string }[];
-  isMultiple?: boolean;
 };
 
 export interface FiltersProps {
   filters: Filter[];
+  onApplyFilters: (values: { [key: string]: string }) => void;
 }
