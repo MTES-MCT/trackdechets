@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import { resetCaches } from "graphql-tag";
 import logger from "./logging/logger";
 
