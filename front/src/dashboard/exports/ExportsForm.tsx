@@ -329,11 +329,18 @@ export default function ExportsForm({ companies }: IProps) {
                     <option value="all" key="all">
                       Tous les établissements
                     </option>
-                    {sortedCompanies.map((company, key) => (
-                      <option value={company.orgId} key={key}>
-                        {company.givenName || company.name}
-                      </option>
-                    ))}
+                    {sortedCompanies.map((company, key) => {
+                      const name =
+                        company.givenName && company.givenName !== ""
+                          ? company.givenName
+                          : company.name;
+
+                      return (
+                        <option value={company.orgId} key={key}>
+                          {`${name} - ${company.orgId}`}
+                        </option>
+                      );
+                    })}
                   </select>
                 )}
               </Field>
