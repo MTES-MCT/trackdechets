@@ -111,6 +111,7 @@ function BsdAdditionalActionsButton({
 
         <ul
           id={`bsd-actions-dropdown_${bsd.id}`}
+          data-testid={`bsd-actions-dropdown_${bsd.id}`}
           aria-hidden={!isOpen}
           ref={dropdownRef as React.RefObject<HTMLUListElement>}
           className={classnames("bsd-actions-kebab-menu__dropdown", {
