@@ -19,10 +19,7 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 
 const getValidationSchema = (today: Date) =>
   yup.object({
-    takenOverAt: yup
-      .date()
-      .required("La date de prise en charge est requise")
-      .max(today, "La date de prise en charge ne peut être dans le futur"),
+    takenOverAt: yup.date().required("La date de prise en charge est requise"),
     signatureAuthor: yup
       .string()
       .ensure()

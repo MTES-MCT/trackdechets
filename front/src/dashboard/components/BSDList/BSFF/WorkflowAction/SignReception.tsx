@@ -20,8 +20,7 @@ const getValidationSchema = (today: Date) =>
   yup.object({
     receptionDate: yup
       .date()
-      .required("La date de prise en charge est requise")
-      .max(today, "La date de prise en charge ne peut être dans le futur"),
+      .required("La date de prise en charge est requise"),
     signatureAuthor: yup
       .string()
       .ensure()
@@ -90,14 +89,16 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
           déclare réceptionner le déchet.
         </p>
         <div className="form__row">
-          <label>
+          <label className="tw-font-semibold">
             Date de réception
-            <Field
-              className="td-input"
-              name="receptionDate"
-              component={DateInput}
-              maxDate={TODAY}
-            />
+            <div className="td-date-wrapper">
+              <Field
+                className="td-input"
+                name="receptionDate"
+                component={DateInput}
+                maxDate={TODAY}
+              />
+            </div>
           </label>
           <RedErrorMessage name="receptionDate" />
         </div>
