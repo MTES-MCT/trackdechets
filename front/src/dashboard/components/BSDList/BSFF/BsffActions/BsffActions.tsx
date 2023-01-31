@@ -49,6 +49,11 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
   const canWrite = [emitterSiret, transporterSiret, destinationSiret].includes(
     siret
   );
+  const canDelete =
+    canWrite &&
+    (form.bsffStatus === BsffStatus.Initial ||
+      (form.bsffStatus === BsffStatus.SignedByEmitter &&
+        siret === emitterSiret));
 
   return (
     <>
@@ -116,7 +121,7 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
                   Dupliquer
                 </MenuItem>
               )}
-              {form.bsffStatus === BsffStatus.Initial && canWrite && (
+              {canDelete && (
                 <MenuItem onSelect={() => setIsDeleting(true)}>
                   <IconTrash color="blueLight" size="24px" />
                   Supprimer
