@@ -41,9 +41,7 @@ const getValidationSchema = (today: Date) =>
     analysisWasteDescription: yup.string().required(),
     acceptationDate: yup
       .date()
-      .required()
-      .required("La date d'acceptation ou de refus est requise")
-      .max(today, "La date d'acceptation ne peut être dans le futur"),
+      .required("La date d'acceptation ou de refus est requise"),
     acceptationStatus: yup
       .string()
       .oneOf([
@@ -273,17 +271,19 @@ export function SignBsffAcceptationOnePackagingModalContent({
               </label>
             </div>
             <div className="form__row">
-              <label>
+              <label className="tw-font-semibold">
                 Date{" "}
                 {values.acceptationStatus === WasteAcceptationStatus.Accepted
                   ? "de l'acceptation"
                   : "du refus"}
-                <Field
-                  className="td-input"
-                  name="acceptationDate"
-                  component={DateInput}
-                  maxDate={TODAY}
-                />
+                <div className="td-date-wrapper">
+                  <Field
+                    className="td-input"
+                    name="acceptationDate"
+                    component={DateInput}
+                    maxDate={TODAY}
+                  />
+                </div>
               </label>
               <RedErrorMessage name="acceptationDate" />
             </div>
