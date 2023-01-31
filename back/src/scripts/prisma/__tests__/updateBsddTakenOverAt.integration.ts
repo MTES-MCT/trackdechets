@@ -1,4 +1,5 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
+import { getStream } from "../../../activity-events";
 import prisma from "../../../prisma";
 import {
   formFactory,
@@ -66,7 +67,7 @@ describe("updateBsddTakenOverAt", () => {
 
     expect(updatedForm3.takenOverAt).not.toEqual(updatedForm3.emittedAt);
 
-    const events = await prisma.event.findMany();
+    const events = await getStream(form1.id);
 
     expect(events).toHaveLength(1);
 
