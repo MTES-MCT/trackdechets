@@ -12,7 +12,6 @@ import {
   isFRVat,
   isVat,
   isForeignVat,
-  isSiret,
 } from "generated/constants/companySearchHelpers";
 import { checkVAT } from "jsvat";
 import React, { useMemo, useRef, useState } from "react";
