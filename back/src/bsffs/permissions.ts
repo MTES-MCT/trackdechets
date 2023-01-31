@@ -87,6 +87,25 @@ export async function checkCanWriteBsff(
   return isContributor;
 }
 
+export async function checkCanDelete(user: User, bsff: Bsff) {
+  const userSirets = await getCachedUserSiretOrVat(user.id);
+
+  if (bsff.emitterEmissionSignatureDate) {
+    if (
+      !bsff.transporterTransportSignatureDate &&
+      userSirets.includes(bsff.emitterCompanySiret)
+    ) {
+      return true;
+    }
+
+    throw new ForbiddenError(
+      `Il n'est pas possible de supprimer un bordereau qui a été signé par un des acteurs`
+    );
+  }
+
+  return true;
+}
+
 export async function checkCanReadBsff(user: User, bsff: Bsff) {
   const isContributor = await isBsffContributor(user, bsff);
   const isDetenteur = await isBsffDetenteur(user, bsff);

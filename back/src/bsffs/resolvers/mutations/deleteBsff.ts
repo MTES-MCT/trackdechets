@@ -2,7 +2,7 @@ import { UserInputError } from "apollo-server-express";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { expandBsffFromDB } from "../../converter";
-import { checkCanWriteBsff } from "../../permissions";
+import { checkCanDelete, checkCanWriteBsff } from "../../permissions";
 import { getBsffOrNotFound } from "../../database";
 import { getBsffRepository } from "../../repository";
 
@@ -15,11 +15,7 @@ const deleteBsff: MutationResolvers["deleteBsff"] = async (
   const existingBsff = await getBsffOrNotFound({ id });
   await checkCanWriteBsff(user, existingBsff);
 
-  if (existingBsff.emitterEmissionSignatureDate) {
-    throw new UserInputError(
-      `Il n'est pas possible de supprimer un bordereau qui a été signé par un des acteurs`
-    );
-  }
+  await checkCanDelete(user, existingBsff);
 
   const { delete: deleteBsff } = getBsffRepository(user);
 
