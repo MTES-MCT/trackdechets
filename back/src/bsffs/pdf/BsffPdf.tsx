@@ -467,6 +467,11 @@ function BsffOnePackagingOperation({
         R 2
       </div>
       <div>
+        Recyclage ou récupération d’autres matières inorganiques{" "}
+        <input type="checkbox" checked={packaging?.operation?.code === "R5"} />{" "}
+        R 5
+      </div>
+      <div>
         Recyclage ou récupération des substances organiques R 3 Incinération à
         terre{" "}
         <input type="checkbox" checked={packaging?.operation?.code === "D10"} />{" "}
