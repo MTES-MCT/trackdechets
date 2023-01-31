@@ -4,7 +4,7 @@ import prisma from "../../src/prisma";
 @registerUpdater(
   "Clean Transporter SIRET when it's a copy of VAT",
   "Clean Transporter SIRET after enforcing SIRET validation",
-  true
+  false
 )
 export class FixTransporterSiretIsVatUpdater implements Updater {
   async run() {
