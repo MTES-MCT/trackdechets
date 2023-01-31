@@ -505,7 +505,7 @@ function BsffOnePackagingOperation({
         <input type="checkbox" checked={packaging?.operation?.code === "D15"} />{" "}
         D 15
       </div>
-      <div> Date de réalisation : {formatDate(packaging.operation?.date)}</div>
+      <div> Date de réalisation : {formatDate(packaging?.operation?.date)}</div>
       <br />
       <div>
         Je soussigné (nom, prénom) : {packaging?.operation?.signature?.author}
@@ -552,8 +552,8 @@ function BsffPackagingOperation({ packaging }: { packaging: BsffPackaging }) {
     <div>
       <div>Nom du responsable : {packaging?.operation?.signature?.author}</div>
       <div>
-        Code D/R : {packaging.operation?.code} (
-        {packaging.operation?.description})
+        Code D/R : {packaging?.operation?.code} (
+        {packaging?.operation?.description})
       </div>
       {packaging?.operation?.noTraceability && (
         <div>Rupture de traçabilité autorisée par arrêté préfectoral</div>
