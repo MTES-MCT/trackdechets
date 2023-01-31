@@ -12,9 +12,12 @@ import { renderMail } from "../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../mailer/templates";
 import { deleteCachedUserCompanies } from "../../../common/redis/users";
 import {
+  cleanClue,
+  isClosedCompany,
   isFRVat,
   isSiret,
-  isVat
+  isVat,
+  CLOSED_COMPANY_ERROR
 } from "../../../common/constants/companySearchHelpers";
 import { searchCompany } from "../../search";
 import {
@@ -59,11 +62,9 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   const ecoOrganismeAgreements =
     companyInput.ecoOrganismeAgreements?.map(a => a.href) || [];
-  const siret = companyInput.siret
-    ? companyInput.siret.replace(/[\W_]+/g, "")
-    : null;
+  const siret = companyInput.siret ? cleanClue(companyInput.siret) : null;
   const vatNumber = companyInput.vatNumber
-    ? companyInput.vatNumber.replace(/[\W_]+/g, "")
+    ? cleanClue(companyInput.vatNumber)
     : null;
   const orgId = siret ?? vatNumber;
 
@@ -98,6 +99,10 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   // check if orgId exists in public databases or in AnonymousCompany
   const companyInfo = await searchCompany(orgId);
+
+  if (isClosedCompany(companyInfo)) {
+    throw new UserInputError(CLOSED_COMPANY_ERROR);
+  }
 
   if (companyTypes.includes("ECO_ORGANISME") && siret) {
     const ecoOrganismeExists = await prisma.ecoOrganisme.findUnique({

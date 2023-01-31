@@ -475,7 +475,7 @@ describe("Mutation markAsResealed", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `L'installation de destination avec le SIRET ${recipientCompanySiret} n'est pas inscrite sur Trackdéchets`
+        message: `Destinataire : l'établissement avec le SIRET ${recipientCompanySiret} n'est pas inscrit sur Trackdéchets`
       })
     ]);
   });
@@ -573,7 +573,7 @@ describe("Mutation markAsResealed", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue avec le SIRET ${destination.siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau bordereau.`
+        message: `Le compte de l'installation de destination ou d’entreposage ou de reconditionnement prévue avec le SIRET ${destination.siret} n'a pas encore été vérifié. Cette installation ne peut pas être visée sur le bordereau.`
       })
     ]);
   }, 10000);
@@ -649,6 +649,45 @@ describe("Mutation markAsResealed", () => {
         extensions: {
           code: "BAD_USER_INPUT"
         }
+      })
+    ]);
+  });
+
+  it("should fail if bsd is canceled", async () => {
+    const owner = await userFactory();
+    const { user, company: collector } = await userWithCompanyFactory(
+      "MEMBER",
+      { companyTypes: { set: [CompanyType.COLLECTOR] } }
+    );
+
+    const { mutate } = makeClient(user);
+
+    const destination = await companyFactory({
+      companyTypes: [CompanyType.COLLECTOR]
+    });
+
+    const form = await formWithTempStorageFactory({
+      ownerId: owner.id,
+      opt: {
+        status: Status.CANCELED,
+        recipientCompanySiret: collector.siret,
+        quantityReceived: 1
+      },
+      forwardedInOpts: {
+        recipientCompanySiret: destination.siret
+      }
+    });
+
+    const { errors } = await mutate(MARK_AS_RESEALED, {
+      variables: {
+        id: form.id,
+        resealedInfos: {}
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Vous ne pouvez pas passer ce bordereau à l'état souhaité.`
       })
     ]);
   });

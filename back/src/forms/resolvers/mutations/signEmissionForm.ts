@@ -1,5 +1,5 @@
 import { Form, Prisma, Status } from "@prisma/client";
-import { UserInputError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 import {
   MutationResolvers,
   MutationSignEmissionFormArgs,
@@ -28,6 +28,11 @@ const signatures: Partial<
     ) => Promise<GraphQLForm>
   >
 > = {
+  [Status.CANCELED]: () => {
+    throw new ForbiddenError(
+      "Vous ne pouvez pas faire cette action, ce bordereau a été annulé"
+    );
+  },
   [Status.SEALED]: async (user, args, existingForm) => {
     if (args.input.emittedByEcoOrganisme) {
       await checkCanSignFor(

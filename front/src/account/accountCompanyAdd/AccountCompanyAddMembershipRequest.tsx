@@ -1,6 +1,7 @@
 import { useMutation, gql } from "@apollo/client";
 import { NotificationError } from "common/components/Error";
 import React from "react";
+import { cleanClue } from "../../generated/constants/companySearchHelpers";
 
 const SEND_MEMBERSHIP_REQUEST = gql`
   mutation SendMembershipRequest($siret: String!) {
@@ -42,7 +43,7 @@ export default function AccountCompanyAddInvitationRequest({ siret }) {
 
   if (data) {
     return (
-      <div className="notification notification--success">
+      <div className="notification notification--success tw-mt-1">
         <p>
           Demande de rattachement envoyée. Vous recevrez un email de
           confirmation lorsque votre demande sera validée. <br />
@@ -53,7 +54,7 @@ export default function AccountCompanyAddInvitationRequest({ siret }) {
   }
 
   return (
-    <div className="notification">
+    <div className="notification tw-mt-1">
       <p>
         Vous pouvez demander à l'administrateur de rejoindre l'établissement
       </p>
@@ -62,7 +63,7 @@ export default function AccountCompanyAddInvitationRequest({ siret }) {
         className="btn btn--primary tw-mt-5"
         onClick={() =>
           sendMembershipRequest({
-            variables: { siret: siret.replace(/\s/g, "") },
+            variables: { siret: cleanClue(siret) },
           })
         }
       >

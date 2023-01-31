@@ -70,7 +70,12 @@ export default function WasteInfo({ disabled }) {
       <div className="form__row">
         <label>
           Code déchet
-          <Field as="select" name="waste.code" className="td-select">
+          <Field
+            as="select"
+            name="waste.code"
+            className="td-select"
+            disabled={disabled}
+          >
             <option />
             {BSFF_WASTES.map(item => (
               <option value={item.code} key={item.code}>
@@ -108,7 +113,11 @@ export default function WasteInfo({ disabled }) {
         <RedErrorMessage name="waste.adr" />
       </div>
 
-      <h4 className="form__section-heading">Contenants</h4>
+      <h4 className="form__section-heading">
+        {values.type === BsffType.Reconditionnement
+          ? "Contenant de reconditionnement"
+          : "Contenants"}
+      </h4>
 
       <Field name="packagings" component={Packagings} disabled={disabled} />
 

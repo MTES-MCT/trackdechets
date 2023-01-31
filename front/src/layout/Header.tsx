@@ -64,7 +64,12 @@ function MobileSubNav({ currentSiret }) {
   );
 }
 
-const getMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
+const getMenuEntries = (
+  isAuthenticated,
+  isAdmin,
+  currentSiret,
+  isProduction
+) => {
   const common = [
     {
       caption: "Ressources",
@@ -97,6 +102,19 @@ const getMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
       navlink: true,
     },
   ];
+  const dashboardV2 = [
+    {
+      caption: "Dashboard v2",
+      href: currentSiret
+        ? generatePath(routes.dashboardv2.index, {
+            siret: currentSiret,
+          })
+        : "/",
+      onClick: () => trackEvent("navbar", "mon-espace-v2"),
+
+      navlink: true,
+    },
+  ];
 
   const connected = [
     {
@@ -122,6 +140,7 @@ const getMenuEntries = (isAuthenticated, isAdmin, currentSiret) => {
     ...common,
     ...(isAuthenticated ? connected : []),
     ...(isAdmin ? admin : []),
+    ...(!isProduction && isAdmin ? dashboardV2 : []),
   ];
 };
 
@@ -180,7 +199,9 @@ export default withRouter(function Header({
   location,
   history,
 }: RouteComponentProps & HeaderProps) {
-  const { VITE_API_ENDPOINT } = import.meta.env;
+  const { VITE_API_ENDPOINT, NODE_ENV } = import.meta.env;
+  const isProduction = NODE_ENV === "production";
+
   const [menuHidden, toggleMenu] = useState(true);
 
   const isMobile = useMedia({ maxWidth: MEDIA_QUERIES.handHeld });
@@ -206,11 +227,30 @@ export default withRouter(function Header({
     strict: false,
   });
 
+  let matchDashboardV2;
+  if (!isProduction) {
+    matchDashboardV2 = matchPath(location.pathname, {
+      path: routes.dashboardv2.index,
+      exact: false,
+      strict: false,
+    });
+  }
+
   const menuClass = menuHidden && isMobile ? styles.headerNavHidden : "";
 
   // Catching siret from url when not available from props (just after login)
-  const currentSiret = matchDashboard?.params["siret"];
-  const menuEntries = getMenuEntries(isAuthenticated, isAdmin, currentSiret);
+  let currentSiret = matchDashboard?.params["siret"];
+
+  if (!isProduction && matchDashboardV2) {
+    currentSiret =
+      matchDashboard?.params["siret"] || matchDashboardV2?.params["siret"];
+  }
+  const menuEntries = getMenuEntries(
+    isAuthenticated,
+    isAdmin,
+    currentSiret,
+    isProduction
+  );
 
   const mobileNav = () => {
     if (!isAuthenticated || !isMobile) {

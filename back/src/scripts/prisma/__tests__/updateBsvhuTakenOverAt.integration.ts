@@ -1,4 +1,5 @@
 import { resetDatabase } from "../../../../integration-tests/helper";
+import { getStream } from "../../../activity-events";
 import { bsvhuFactory } from "../../../bsvhu/__tests__/factories.vhu";
 import prisma from "../../../prisma";
 import { userWithCompanyFactory } from "../../../__tests__/factories";
@@ -67,7 +68,7 @@ describe("updateBsvhuTakenOverAt", () => {
       updatedBsvhu3.emitterEmissionSignatureDate
     );
 
-    const events = await prisma.event.findMany();
+    const events = await getStream(bsvhu1.id);
 
     expect(events).toHaveLength(1);
 

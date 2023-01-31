@@ -253,35 +253,48 @@ export function expandBsffFromDB(prismaBsff: Prisma.Bsff): GraphQL.Bsff {
 export function flattenBsffPackagingInput(
   input: GraphQL.UpdateBsffPackagingInput
 ) {
-  return {
-    acceptationDate: input.acceptation?.date,
-    acceptationWeight: input.acceptation?.weight,
-    acceptationStatus: input.acceptation?.status,
-    acceptationRefusalReason: input.acceptation?.refusalReason,
-    acceptationWasteCode: input.acceptation?.wasteCode,
-    acceptationWasteDescription: input.acceptation?.wasteDescription,
-    operationDate: input.operation?.date,
-    operationNoTraceability: input.operation?.noTraceability,
-    operationCode: input.operation?.code,
-    operationDescription: input.operation?.description,
-    operationNextDestinationPlannedOperationCode:
-      input.operation?.nextDestination?.plannedOperationCode,
-    operationNextDestinationCap: input.operation?.nextDestination?.cap,
-    operationNextDestinationCompanyName:
-      input.operation?.nextDestination?.company?.name,
-    operationNextDestinationCompanySiret:
-      input.operation?.nextDestination?.company?.siret,
-    operationNextDestinationCompanyVatNumber:
-      input.operation?.nextDestination?.company?.vatNumber,
-    operationNextDestinationCompanyAddress:
-      input.operation?.nextDestination?.company?.address,
-    operationNextDestinationCompanyContact:
-      input.operation?.nextDestination?.company?.contact,
-    operationNextDestinationCompanyPhone:
-      input.operation?.nextDestination?.company?.phone,
-    operationNextDestinationCompanyMail:
-      input.operation?.nextDestination?.company?.mail
-  };
+  return safeInput({
+    acceptationDate: chain(input.acceptation, a => a.date),
+    acceptationWeight: chain(input.acceptation, a => a.weight),
+    acceptationStatus: chain(input.acceptation, a => a.status),
+    acceptationRefusalReason: chain(input.acceptation, a => a.refusalReason),
+    acceptationWasteCode: chain(input.acceptation, a => a.wasteCode),
+    acceptationWasteDescription: chain(
+      input.acceptation,
+      a => a.wasteDescription
+    ),
+    operationDate: chain(input.operation, o => o.date),
+    operationNoTraceability: chain(input.operation, o => o.noTraceability),
+    operationCode: chain(input.operation, o => o.code),
+    operationDescription: chain(input.operation, o => o.description),
+    operationNextDestinationPlannedOperationCode: chain(input.operation, o =>
+      chain(o.nextDestination, nd => nd.plannedOperationCode)
+    ),
+    operationNextDestinationCap: chain(input.operation, o =>
+      chain(o.nextDestination, nd => nd.cap)
+    ),
+    operationNextDestinationCompanyName: chain(input.operation, o =>
+      chain(o.nextDestination, nd => chain(nd.company, c => c.name))
+    ),
+    operationNextDestinationCompanySiret: chain(input.operation, o =>
+      chain(o.nextDestination, nd => chain(nd.company, c => c.siret))
+    ),
+    operationNextDestinationCompanyVatNumber: chain(input.operation, o =>
+      chain(o.nextDestination, nd => chain(nd.company, c => c.vatNumber))
+    ),
+    operationNextDestinationCompanyAddress: chain(input.operation, o =>
+      chain(o.nextDestination, nd => chain(nd.company, c => c.address))
+    ),
+    operationNextDestinationCompanyContact: chain(input.operation, o =>
+      chain(o.nextDestination, nd => chain(nd.company, c => c.contact))
+    ),
+    operationNextDestinationCompanyPhone: chain(input.operation, o =>
+      chain(o.nextDestination, nd => chain(nd.company, c => c.phone))
+    ),
+    operationNextDestinationCompanyMail: chain(input.operation, o =>
+      chain(o.nextDestination, nd => chain(nd.company, c => c.mail))
+    )
+  });
 }
 
 export function expandBsffPackagingFromDB(

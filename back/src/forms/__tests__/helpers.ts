@@ -2,6 +2,7 @@ import { COMPANY_INFOS_CACHE_KEY } from "../../companies/sirene/cache";
 import { cachedGet } from "../../common/redis";
 
 import { formFactory, userWithCompanyFactory } from "../../__tests__/factories";
+import { Prisma } from "@prisma/client";
 
 export const storeRedisCompanyInfo = async ({ company, companyTypes = [] }) => {
   const companyInfos = async () => [
@@ -29,7 +30,7 @@ export const prepareRedis = async ({ emitterCompany, recipientCompany }) => {
   });
 };
 
-export const prepareDB = async () => {
+export const prepareDB = async (opt?: Partial<Prisma.FormCreateInput>) => {
   const { user: emitter, company: emitterCompany } =
     await userWithCompanyFactory("ADMIN");
   const { user: recipient, company: recipientCompany } =
@@ -41,7 +42,8 @@ export const prepareDB = async () => {
       emitterCompanyName: emitterCompany.name,
       emitterCompanySiret: emitterCompany.siret,
       recipientCompanySiret: recipientCompany.siret,
-      recipientsSirets: [recipientCompany.siret]
+      recipientsSirets: [recipientCompany.siret],
+      ...opt
     }
   });
 

@@ -20,6 +20,7 @@ import Login from "login/Login";
 
 const Admin = lazy(() => import("admin/Admin"));
 const Dashboard = lazy(() => import("dashboard/Dashboard"));
+const DashboardRoutes = lazy(() => import("Apps/Dashboard/DashboardRoutes"));
 const Account = lazy(() => import("account/Account"));
 const AccountMembershipRequest = lazy(
   () => import("account/AccountMembershipRequest")
@@ -160,8 +161,30 @@ export default withRouter(function LayoutContainer({ history }) {
                   />
                 )}
               </Route>
+
+              <Route path="/v2/dashboard/:siret/bsds/edit/:id" exact>
+                {({
+                  match,
+                }: RouteChildrenProps<{ siret: string; id: string }>) => (
+                  <Redirect
+                    to={generatePath(routes.dashboardv2.bsdds.edit, {
+                      siret: match!.params.siret,
+                      id: match!.params.id,
+                    })}
+                  />
+                )}
+              </Route>
+
               <PrivateRoute
                 path={routes.dashboard.bsdds.edit}
+                isAuthenticated={isAuthenticated}
+                exact
+              >
+                <FormContainer />
+              </PrivateRoute>
+
+              <PrivateRoute
+                path={routes.dashboardv2.bsdds.edit}
                 isAuthenticated={isAuthenticated}
                 exact
               >
@@ -254,6 +277,13 @@ export default withRouter(function LayoutContainer({ history }) {
                 isAuthenticated={isAuthenticated}
               >
                 <Dashboard />
+              </PrivateRoute>
+
+              <PrivateRoute
+                path={routes.dashboardv2.index}
+                isAuthenticated={isAdmin}
+              >
+                <DashboardRoutes />
               </PrivateRoute>
 
               <PrivateRoute

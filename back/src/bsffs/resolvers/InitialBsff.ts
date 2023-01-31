@@ -1,14 +1,15 @@
-import prisma from "../../prisma";
 import { BsffResolvers } from "../../generated/graphql/types";
 import { checkCanReadBsff } from "../permissions";
 import { ForbiddenError } from "apollo-server-express";
 import { Bsff } from "./Bsff";
+import { getReadonlyBsffRepository } from "../repository";
 
 export const InitialBsff: BsffResolvers = {
   packagings: Bsff.packagings,
   ficheInterventions: Bsff.ficheInterventions,
   emitter: async ({ id, emitter }, _, { user }) => {
-    const bsff = await prisma.bsff.findUnique({
+    const { findUnique } = getReadonlyBsffRepository();
+    const bsff = await findUnique({
       where: { id }
     });
     try {

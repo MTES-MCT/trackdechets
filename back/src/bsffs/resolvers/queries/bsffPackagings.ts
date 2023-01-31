@@ -1,4 +1,3 @@
-import prisma from "../../../prisma";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { expandBsffPackagingFromDB } from "../../converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
@@ -7,6 +6,7 @@ import { applyMask } from "../../../common/where";
 import { getConnection } from "../../../common/pagination";
 import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { Prisma } from "@prisma/client";
+import { getBsffPackagingRepository } from "../../repository";
 
 const bsffPackagings: QueryResolvers["bsffPackagings"] = async (
   _,
@@ -34,12 +34,15 @@ const bsffPackagings: QueryResolvers["bsffPackagings"] = async (
 
   const where: Prisma.BsffPackagingWhereInput = applyMask(prismaWhere, mask);
 
-  const totalCount = await prisma.bsffPackaging.count({ where });
+  const { count: countPackagings, findMany: findManyPackagings } =
+    getBsffPackagingRepository(user);
+
+  const totalCount = await countPackagings({ where });
 
   return getConnection({
     totalCount,
     findMany: prismaPaginationArgs =>
-      prisma.bsffPackaging.findMany({
+      findManyPackagings({
         where,
         ...prismaPaginationArgs,
         orderBy: { bsff: { createdAt: "desc" } }

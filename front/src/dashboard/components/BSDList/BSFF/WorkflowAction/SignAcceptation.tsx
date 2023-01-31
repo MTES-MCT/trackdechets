@@ -35,41 +35,47 @@ import { BsffSummary } from "./BsffSummary";
 import TdTooltip from "common/components/Tooltip";
 import { BsffPackagingSummary } from "./BsffPackagingSummary";
 
-const validationSchema = yup.object({
-  analysisWasteCode: yup.string().required(),
-  analysisWasteDescription: yup.string().required(),
-  acceptationDate: yup.date().required(),
-  acceptationStatus: yup
-    .string()
-    .oneOf([
-      "",
-      null,
-      WasteAcceptationStatus.Accepted,
-      WasteAcceptationStatus.Refused,
-    ]),
-  acceptationWeight: yup
-    .number()
-    .required()
-    .when("acceptationStatus", {
+const getValidationSchema = (today: Date) =>
+  yup.object({
+    analysisWasteCode: yup.string().required(),
+    analysisWasteDescription: yup.string().required(),
+    acceptationDate: yup
+      .date()
+      .required("La date d'acceptation ou de refus est requise"),
+    acceptationStatus: yup
+      .string()
+      .oneOf([
+        "",
+        null,
+        WasteAcceptationStatus.Accepted,
+        WasteAcceptationStatus.Refused,
+      ]),
+    acceptationWeight: yup
+      .number()
+      .required()
+      .when("acceptationStatus", {
+        is: value => value === WasteAcceptationStatus.Refused,
+        then: schema =>
+          schema.max(
+            0,
+            "La quantité reçue doit être égale à 0 en cas de refus"
+          ),
+        otherwise: schema =>
+          schema.moreThan(0, "Vous devez saisir une quantité supérieure à 0"),
+      }),
+    acceptationRefusalReason: yup.string().when("acceptationStatus", {
       is: value => value === WasteAcceptationStatus.Refused,
       then: schema =>
-        schema.max(0, "La quantité reçue doit être égale à 0 en cas de refus"),
-      otherwise: schema =>
-        schema.moreThan(0, "Vous devez saisir une quantité supérieure à 0"),
+        schema
+          .ensure()
+          .min(1, "Le motif du refus doit être complété en cas de refus"),
+      otherwise: schema => schema.nullable(),
     }),
-  acceptationRefusalReason: yup.string().when("acceptationStatus", {
-    is: value => value === WasteAcceptationStatus.Refused,
-    then: schema =>
-      schema
-        .ensure()
-        .min(1, "Le motif du refus doit être complété en cas de refus"),
-    otherwise: schema => schema.nullable(),
-  }),
-  signatureAuthor: yup
-    .string()
-    .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-});
+    signatureAuthor: yup
+      .string()
+      .ensure()
+      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+  });
 
 interface SignBsffAcceptationOnePackagingProps {
   bsffId: string;
@@ -158,6 +164,9 @@ export function SignBsffAcceptationOnePackagingModalContent({
     Pick<Mutation, "signBsff">,
     MutationSignBsffArgs
   >(SIGN_BSFF, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
+
+  const TODAY = new Date();
+  const validationSchema = getValidationSchema(TODAY);
 
   const loading = updateBsffPackagingResult.loading || signBsffResult.loading;
   const error = updateBsffPackagingResult.error ?? signBsffResult.error;
@@ -262,16 +271,19 @@ export function SignBsffAcceptationOnePackagingModalContent({
               </label>
             </div>
             <div className="form__row">
-              <label>
+              <label className="tw-font-semibold">
                 Date{" "}
                 {values.acceptationStatus === WasteAcceptationStatus.Accepted
                   ? "de l'acceptation"
                   : "du refus"}
-                <Field
-                  className="td-input"
-                  name="acceptationDate"
-                  component={DateInput}
-                />
+                <div className="td-date-wrapper">
+                  <Field
+                    className="td-input"
+                    name="acceptationDate"
+                    component={DateInput}
+                    maxDate={TODAY}
+                  />
+                </div>
               </label>
               <RedErrorMessage name="acceptationDate" />
             </div>

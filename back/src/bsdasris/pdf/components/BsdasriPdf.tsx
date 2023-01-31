@@ -39,8 +39,9 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
         {/* 3-parts header */}
         <div className="BoxRow">
           <div className="BoxCol TextAlignCenter">
-            <p>Art. R. 541-45 du code de l’environnement.</p>
             <p>Textes règlementaires</p>
+            <p>Art. R. 541-45 du code de l’environnement.</p>
+            <p>Assimilé au CERFA 11351*4</p>
           </div>
           <div className="BoxCol TextAlignCenter">
             <p>Ministère en charge de la Santé</p>

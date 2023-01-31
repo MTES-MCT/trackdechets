@@ -3,13 +3,18 @@ import { CompanySearchResult } from "generated/graphql/types";
 import routes from "common/routes";
 import { COMPANY_TYPES } from "login/CompanyType";
 
-type Props = Pick<CompanySearchResult, "isRegistered" | "companyTypes">;
+type Props = Pick<
+  CompanySearchResult,
+  "isRegistered" | "companyTypes" | "etatAdministratif"
+>;
 
 export default function CompanyRegistration(props: Props) {
   return (
-    <div className="columns">
+    <div className="rows">
       <div
-        className={`notification ${props.isRegistered ? "success" : "warning"}`}
+        className={`notification ${
+          props.isRegistered ? "notification--success" : "notification--error"
+        }`}
         style={{ width: "100%" }}
       >
         {props.isRegistered ? (
@@ -38,6 +43,14 @@ export default function CompanyRegistration(props: Props) {
           </>
         )}
       </div>
+      {props.etatAdministratif?.toUpperCase() === "F" && (
+        <div
+          className={`notification notification--error`}
+          style={{ width: "100%" }}
+        >
+          <span>Cet établissement est fermé selon l'INSEE</span>
+        </div>
+      )}
     </div>
   );
 }

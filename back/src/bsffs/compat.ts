@@ -5,10 +5,12 @@ import {
   BsffStatus,
   WasteAcceptationStatus
 } from "@prisma/client";
+import prismaClient from "../prisma";
 import { UserInputError } from "apollo-server-core";
+import { RepositoryFnDeps } from "../common/repository/types";
 import { BsffPackagingInput } from "../generated/graphql/types";
 import { isFinalOperation } from "./constants";
-import { getNextPackagings } from "./database";
+import { getBsffPackagingRepository } from "./repository";
 
 type BsffDestination = {
   receptionWeight: number;
@@ -106,81 +108,74 @@ export function toBsffDestination(
  * Compute BSFF status based on the acceptation and processing information
  * of each packaging
  */
-export async function getStatus(bsff: Bsff & { packagings: BsffPackaging[] }) {
+export async function getStatus(
+  bsff: Bsff & { packagings?: BsffPackaging[] },
+  ctx?: RepositoryFnDeps
+) {
+  const prisma = ctx?.prisma ?? prismaClient;
+
+  const { findNextPackagings } = getBsffPackagingRepository(ctx?.user, prisma);
+
+  const packagingsSimple =
+    bsff.packagings ??
+    (await prisma.bsff.findUnique({ where: { id: bsff.id } }).packagings());
+
   const packagings = await Promise.all(
-    bsff.packagings.map(async p => ({
+    packagingsSimple.map(async p => ({
       ...p,
-      lastPackaging: (await getNextPackagings(p.id)).reverse()[0]
+      lastPackaging: (await findNextPackagings(p.id)).reverse()[0]
     }))
   );
 
-  const {
-    allAccepted,
-    allRefused,
-    allAcceptedOrRefused,
-    allProcessed,
-    allIntermediatelyProcessed,
-    allProcessedOrIntermediatelyProcessed
-  } = packagings.reduce(
-    (acc, packaging) => {
-      const accepted =
-        !!packaging.acceptationSignatureDate &&
-        packaging.acceptationStatus === WasteAcceptationStatus.ACCEPTED;
-      const refused =
-        (!!packaging.lastPackaging?.acceptationSignatureDate &&
-          packaging.lastPackaging?.acceptationStatus ===
-            WasteAcceptationStatus.REFUSED) ||
-        (!!packaging.acceptationSignatureDate &&
-          packaging.acceptationStatus === WasteAcceptationStatus.REFUSED);
-      const acceptedOrRefused = accepted || refused;
-      const processed =
-        refused ||
-        (!!packaging.operationSignatureDate &&
-          (isFinalOperation(
-            packaging.operationCode,
-            packaging.operationNoTraceability
-          ) ||
-            isFinalOperation(
-              packaging.lastPackaging?.operationCode,
-              packaging.lastPackaging?.operationNoTraceability
-            )));
-      const intermediatelyProcessed =
-        refused ||
-        (!!packaging.operationSignatureDate &&
-          !isFinalOperation(
-            packaging.operationCode,
-            packaging.operationNoTraceability
-          ));
-      const processedOrIntermediatelyProcessed =
-        processed || intermediatelyProcessed;
+  let allAccepted = true,
+    allRefused = true,
+    allAcceptedOrRefused = true,
+    allProcessed = true,
+    allIntermediatelyProcessed = true,
+    allProcessedOrIntermediatelyProcessed = true;
 
-      return {
-        allAccepted: acc.allAccepted && accepted,
-        allRefused: acc.allRefused && refused,
-        allAcceptedOrRefused: acc.allAcceptedOrRefused && acceptedOrRefused,
-        allProcessed: acc.allProcessed && processed,
-        allIntermediatelyProcessed:
-          acc.allIntermediatelyProcessed && intermediatelyProcessed,
-        allProcessedOrIntermediatelyProcessed:
-          acc.allProcessedOrIntermediatelyProcessed &&
-          processedOrIntermediatelyProcessed
-      };
-    },
-    {
-      // Tous les contenants ont été acceptés
-      allAccepted: true,
-      // Tous les contenants ont été refusés
-      allRefused: true,
-      // Tous les contenants ont été acceptés ou refusés
-      allAcceptedOrRefused: true,
-      // Tous les contenants ont été traités (régénération ou destruction)
-      allProcessed: true,
-      // Tous les contenants ont été groupés, reconditionnés ou réexpédiés
-      allIntermediatelyProcessed: true,
-      // Tous les contenants ont été soit traités, soit groupés, soit reconditionnés soit réexpédiés
-      allProcessedOrIntermediatelyProcessed: true
-    }
-  );
+  for (const packaging of packagings) {
+    const accepted =
+      !!packaging.acceptationSignatureDate &&
+      packaging.acceptationStatus === WasteAcceptationStatus.ACCEPTED;
+    const refused =
+      (!!packaging.lastPackaging?.acceptationSignatureDate &&
+        packaging.lastPackaging?.acceptationStatus ===
+          WasteAcceptationStatus.REFUSED) ||
+      (!!packaging.acceptationSignatureDate &&
+        packaging.acceptationStatus === WasteAcceptationStatus.REFUSED);
+    const acceptedOrRefused = accepted || refused;
+    const processed =
+      refused ||
+      (!!packaging.operationSignatureDate &&
+        (isFinalOperation(
+          packaging.operationCode,
+          packaging.operationNoTraceability
+        ) ||
+          isFinalOperation(
+            packaging.lastPackaging?.operationCode,
+            packaging.lastPackaging?.operationNoTraceability
+          )));
+    const intermediatelyProcessed =
+      refused ||
+      (!!packaging.operationSignatureDate &&
+        !isFinalOperation(
+          packaging.operationCode,
+          packaging.operationNoTraceability
+        ));
+    const processedOrIntermediatelyProcessed =
+      processed || intermediatelyProcessed;
+
+    allAccepted = allAccepted && accepted;
+    allRefused = allRefused && refused;
+    allAcceptedOrRefused = allAcceptedOrRefused && acceptedOrRefused;
+    allProcessed = allProcessed && processed;
+    allIntermediatelyProcessed =
+      allIntermediatelyProcessed && intermediatelyProcessed;
+    allProcessedOrIntermediatelyProcessed =
+      allProcessedOrIntermediatelyProcessed &&
+      processedOrIntermediatelyProcessed;
+  }
 
   if (allRefused) {
     return BsffStatus.REFUSED;

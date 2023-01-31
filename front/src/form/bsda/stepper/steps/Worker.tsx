@@ -1,5 +1,5 @@
+import { formatDate } from "common/datetime";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import DateInput from "form/common/components/custom-inputs/DateInput";
 import { Field, useFormikContext } from "formik";
 import { Bsda, BsdaType } from "generated/graphql/types";
 import React from "react";
@@ -103,77 +103,44 @@ export function Worker({ disabled }) {
           />
 
           <h4 className="form__section-heading">
-            Catégorie entreprise de travaux amiante
+            Certification déclarée dans le profil entreprise
           </h4>
 
           <div className="form__row">
-            <label>
-              <Field
-                disabled={disabled}
-                type="checkbox"
-                name="worker.certification.hasSubSectionFour"
-                className="td-checkbox"
-              />
-              Entreprise de travaux déclarée Sous-section 4
-            </label>
+            {!values?.worker?.certification?.hasSubSectionFour &&
+              !values?.worker?.certification?.hasSubSectionThree && (
+                <p>
+                  Absence de certification déclarée dans le profil. Il
+                  appartient à l'entreprise de travaux de le mettre à jour le
+                  cas échéant
+                </p>
+              )}
           </div>
 
           <div className="form__row">
-            <label>
-              <Field
-                disabled={disabled}
-                type="checkbox"
-                name="worker.certification.hasSubSectionThree"
-                className="td-checkbox"
-              />
-              Entreprise de travaux déclarée Sous-section 3
-            </label>
+            {values?.worker?.certification?.hasSubSectionFour && (
+              <>
+                <p>
+                  SS4 <span aria-hidden> ✅</span>
+                </p>
+              </>
+            )}
           </div>
 
-          {values?.worker?.certification?.hasSubSectionThree && (
-            <>
-              <div className="form__row">
-                <label>
-                  Numéro de certification
-                  <Field
-                    type="text"
-                    name="worker.certification.certificationNumber"
-                    className="td-input td-input--medium"
-                  />
-                </label>
-              </div>
-              <div className="form__row">
-                <label>
-                  Limite de validité
-                  <Field
-                    component={DateInput}
-                    name="worker.certification.validityLimit"
-                    className="td-input td-input--small"
-                    disabled={disabled}
-                  />
-                </label>
-              </div>
-              <div className="form__row">
-                <label>
-                  Organisme
-                  <Field
-                    as="select"
-                    name="worker.certification.organisation"
-                    className="td-select"
-                  >
-                    <option value="...">Sélectionnez une valeur...</option>
-                    <option value="AFNOR Certification">
-                      AFNOR Certification
-                    </option>
-                    <option value="GLOBAL CERTIFICATION">
-                      GLOBAL CERTIFICATION
-                    </option>
-                    <option value="QUALIBAT">QUALIBAT</option>
-                  </Field>
-                </label>
-              </div>
-            </>
-          )}
+          <div className="form__row">
+            {values?.worker?.certification?.hasSubSectionThree && (
+              <>
+                <p>
+                  SS3 <span aria-hidden> ✅</span> numéro:{" "}
+                  {values?.worker?.certification?.certificationNumber} date de
+                  validité:{" "}
+                  {formatDate(values?.worker?.certification?.validityLimit!)}
+                  {" - "}
+                  organisme: {values?.worker?.certification?.organisation}
+                </p>
+              </>
+            )}
+          </div>
         </>
       )}
     </>

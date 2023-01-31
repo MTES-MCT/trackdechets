@@ -50,6 +50,10 @@ export default function Login() {
       username?: string;
     }>();
 
+  useEffect(() => {
+    document.title = `Se connecter | ${document.title}`;
+  }, []);
+
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

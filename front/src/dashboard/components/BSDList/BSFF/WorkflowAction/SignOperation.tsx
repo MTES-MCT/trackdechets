@@ -45,33 +45,34 @@ const operationCode = yup
     "Le code de l'opération de traitement ne fait pas partie de la liste reconnue"
   );
 
-const validationSchema = yup.object({
-  code: operationCode,
-  description: yup
-    .string()
-    .ensure()
-    .required("La description de l'opération réalisée est obligatoire"),
-  date: yup.date().required("La date de l'opération est requise"),
-  author: yup
-    .string()
-    .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-  nextDestination: yup.object().when("code", {
-    is: (code: string) => OPERATION[code]?.successors?.length > 0,
-    then: schema =>
-      schema.when("noTraceability", {
-        is: true,
-        then: schema => schema.nullable(),
-        otherwise: schema =>
-          schema.shape({
-            plannedOperationCode: operationCode,
-            company: companySchema,
-            cap: yup.string().nullable().notRequired(),
-          }),
-      }),
-    otherwise: schema => schema.nullable(),
-  }),
-});
+const getValidationSchema = (today: Date) =>
+  yup.object({
+    code: operationCode,
+    description: yup
+      .string()
+      .ensure()
+      .required("La description de l'opération réalisée est obligatoire"),
+    date: yup.date().required("La date de l'opération est requise"),
+    author: yup
+      .string()
+      .ensure()
+      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+    nextDestination: yup.object().when("code", {
+      is: (code: string) => OPERATION[code]?.successors?.length > 0,
+      then: schema =>
+        schema.when("noTraceability", {
+          is: true,
+          then: schema => schema.nullable(),
+          otherwise: schema =>
+            schema.shape({
+              plannedOperationCode: operationCode,
+              company: companySchema,
+              cap: yup.string().nullable().notRequired(),
+            }),
+        }),
+      otherwise: schema => schema.nullable(),
+    }),
+  });
 
 interface SignBsffOperationProps {
   bsffId: string;
@@ -249,6 +250,9 @@ export function SignBsffOperationOnePackagingModalContent({
     MutationSignBsffArgs
   >(SIGN_BSFF, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
+  const TODAY = new Date();
+  const validationSchema = getValidationSchema(TODAY);
+
   const loading = updateBsffPackagingResult.loading || signBsffResult.loading;
   const error = updateBsffPackagingResult.error ?? signBsffResult.error;
 
@@ -301,9 +305,16 @@ export function SignBsffOperationOnePackagingModalContent({
         {({ values, setValues }) => (
           <Form>
             <div className="form__row">
-              <label>
+              <label className="tw-font-semibold">
                 Date du traitement
-                <Field className="td-input" name="date" component={DateInput} />
+                <div className="td-date-wrapper">
+                  <Field
+                    className="td-input"
+                    name="date"
+                    component={DateInput}
+                    maxDate={TODAY}
+                  />
+                </div>
               </label>
               <RedErrorMessage name="date" />
             </div>

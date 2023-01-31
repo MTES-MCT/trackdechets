@@ -2,6 +2,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { Mutation } from "../../../../generated/graphql/types";
 import {
+  companyFactory,
   siretify,
   userFactory,
   userWithCompanyFactory
@@ -93,6 +94,9 @@ describe("Mutation.Vhu.createDraft", () => {
 
   it("create a form with an emitter and a destination", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await companyFactory({
+      companyTypes: ["WASTEPROCESSOR"]
+    });
 
     const input = {
       emitter: {
@@ -102,7 +106,7 @@ describe("Mutation.Vhu.createDraft", () => {
       },
       destination: {
         company: {
-          siret: siretify(3)
+          siret: destination.siret
         }
       }
     };

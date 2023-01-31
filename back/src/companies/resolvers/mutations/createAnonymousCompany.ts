@@ -8,12 +8,12 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import prisma from "../../../prisma";
 import { nafCodes } from "../../../common/constants/NAF";
+import { isForeignVat } from "../../../common/constants/companySearchHelpers";
 import {
-  isForeignVat,
-  isFRVat,
-  isSiret,
-  isVat
-} from "../../../common/constants/companySearchHelpers";
+  foreignVatNumber,
+  siret,
+  siretConditions
+} from "../../../common/validation";
 
 const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
   yup.object({
@@ -27,33 +27,13 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
       )
       .required(),
     name: yup.string().required(),
-    vatNumber: yup
-      .string()
-      .test(
-        "is-vat",
-        "AnonymousCompany: ${originalValue} n'est pas un numéro de TVA valide",
-        value => !value || isVat(value)
+    vatNumber: foreignVatNumber,
+
+    siret: siret
+      .required(
+        "La sélection d'une entreprise par SIRET ou numéro de TVA (si l'entreprise n'est pas française) est obligatoire"
       )
-      .test(
-        "is-not-fr-vat",
-        "AnonymousCompany: le numéro de SIRET est obligatoire pour les établissements français",
-        value => !value || !isFRVat(value)
-      ),
-    siret: yup
-      .string()
-      .when("vatNumber", {
-        is: vatNumber => !vatNumber,
-        then: schema =>
-          schema.required(
-            "La sélection d'une entreprise par SIRET ou numéro de TVA (si l'entreprise n'est pas française) est obligatoire"
-          ),
-        otherwise: schema => schema.ensure()
-      })
-      .test(
-        "is-siret",
-        "AnonymousCompany: ${originalValue} n'est pas un numéro de SIRET valide",
-        value => !value || isSiret(value)
-      )
+      .when("vatNumber", siretConditions.companyVatNumber)
   });
 
 const createAnonymousCompanyResolver: MutationResolvers["createAnonymousCompany"] =

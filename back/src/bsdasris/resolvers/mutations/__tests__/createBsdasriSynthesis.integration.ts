@@ -30,7 +30,7 @@ describe("Mutation.createDasri", () => {
   it("should build a synthesis dasri", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER", {
       companyTypes: {
-        set: ["COLLECTOR"]
+        set: ["COLLECTOR", "TRANSPORTER"]
       }
     });
 

@@ -1,4 +1,4 @@
-import React, { useState, createRef } from "react";
+import React, { useState, createRef, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 import { Mutation, MutationSignupArgs } from "generated/graphql/types";
@@ -41,6 +41,10 @@ export default function Signup() {
   const emailRef = createRef<HTMLInputElement>();
   const passwordRef = createRef<HTMLInputElement>();
   const cguRef = createRef<HTMLInputElement>();
+
+  useEffect(() => {
+    document.title = `Créer un compte | ${document.title}`;
+  }, []);
 
   const handleSubmit = event => {
     event?.preventDefault();

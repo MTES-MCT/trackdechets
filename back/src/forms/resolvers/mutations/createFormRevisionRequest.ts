@@ -28,6 +28,7 @@ import { isSiret } from "../../../common/constants/companySearchHelpers";
 
 export type RevisionRequestContent = Pick<
   Prisma.BsddRevisionRequestCreateInput,
+  | "isCanceled"
   | "recipientCap"
   | "wasteDetailsCode"
   | "wasteDetailsName"
@@ -157,6 +158,12 @@ async function checkIfUserCanRequestRevisionOnBsdd(
     );
   }
 
+  if (bsdd.status === Status.CANCELED) {
+    throw new ForbiddenError(
+      "Impossible de créer une révision sur ce bordereau, il a été annulé."
+    );
+  }
+
   const unsettledRevisionRequestsOnBsdd = await getFormRepository(
     user
   ).countRevisionRequests({
@@ -185,6 +192,12 @@ async function getFlatContent(
   if (bsdd.forwardedInId == null && hasTemporaryStorageUpdate(flatContent)) {
     throw new UserInputError(
       "Impossible de réviser l'entreposage provisoire, ce bordereau n'est pas concerné."
+    );
+  }
+
+  if (flatContent.isCanceled && Object.values(flatContent).length > 1) {
+    throw new UserInputError(
+      "Impossible d'annuler et de modifier un bordereau."
     );
   }
 
@@ -231,6 +244,7 @@ function hasTemporaryStorageUpdate(content: RevisionRequestContent): boolean {
 
 const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
   .object({
+    isCanceled: yup.bool().nullable(),
     recipientCap: yup.string().nullable(),
     wasteDetailsCode: yup
       .string()

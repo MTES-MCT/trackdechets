@@ -283,6 +283,7 @@ interface FicheInterventionListProps {
   initialOperateurCompany: BsffFicheInterventionInput["operateur"]["company"];
   onAddFicheIntervention: (ficheIntervention: BsffFicheIntervention) => void;
   onRemoveFicheIntervention: (ficheIntervention: BsffFicheIntervention) => void;
+  disabled: boolean;
 }
 
 export function FicheInterventionList({
@@ -291,6 +292,7 @@ export function FicheInterventionList({
   initialOperateurCompany,
   onAddFicheIntervention,
   onRemoveFicheIntervention,
+  disabled,
 }: FicheInterventionListProps) {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
@@ -364,33 +366,34 @@ export function FicheInterventionList({
           </div>
         </div>
       ))}
+      {!disabled && (
+        <button
+          type="button"
+          className="btn btn--outline-primary"
+          onClick={() => {
+            companySchema
+              .validate(initialOperateurCompany)
+              .then(() => {
+                if (ficheInterventions.length >= max) {
+                  window.alert(
+                    `Vous ne pouvez pas ajouter plus de ${max} fiche(s) d'intervention avec ce type de BSFF.`
+                  );
+                  return;
+                }
 
-      <button
-        type="button"
-        className="btn btn--outline-primary"
-        onClick={() => {
-          companySchema
-            .validate(initialOperateurCompany)
-            .then(() => {
-              if (ficheInterventions.length >= max) {
+                setIsModalOpen(true);
+              })
+              .catch(() => {
                 window.alert(
-                  `Vous ne pouvez pas ajouter plus de ${max} fiche(s) d'intervention avec ce type de BSFF.`
+                  `Veuillez compléter les champs de l'opérateur avant l'ajout d'une fiche d'intervention.`
                 );
                 return;
-              }
-
-              setIsModalOpen(true);
-            })
-            .catch(() => {
-              window.alert(
-                `Veuillez compléter les champs de l'opérateur avant l'ajout d'une fiche d'intervention.`
-              );
-              return;
-            });
-        }}
-      >
-        Ajouter une fiche d'intervention
-      </button>
+              });
+          }}
+        >
+          Ajouter une fiche d'intervention
+        </button>
+      )}
 
       {isModalOpen && (
         <AddFicheInterventionModal

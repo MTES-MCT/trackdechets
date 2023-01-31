@@ -1,0 +1,647 @@
+[
+  {
+    "node": {
+      "id": "clcok03qs006n9s2x7xx4xdsl",
+      "readableId": "BSD-20230109-Q67KEDGW3",
+      "customId": "",
+      "sentAt": null,
+      "emittedAt": null,
+      "emittedBy": null,
+      "emittedByEcoOrganisme": null,
+      "takenOverAt": null,
+      "status": "DRAFT",
+      "wasteDetails": {
+        "code": "10 04 01*",
+        "name": "scories suite tests",
+        "packagingInfos": [
+          {
+            "type": "FUT",
+            "other": "",
+            "quantity": 2,
+            "__typename": "PackagingInfo"
+          }
+        ],
+        "__typename": "WasteDetails"
+      },
+      "emitter": {
+        "type": "APPENDIX2",
+        "isPrivateIndividual": false,
+        "company": {
+          "siret": "53230142100022",
+          "name": "L'ATELIER DE CELINE",
+          "omiNumber": "",
+          "__typename": "FormCompany"
+        },
+        "isForeignShip": false,
+        "__typename": "Emitter"
+      },
+      "recipient": {
+        "company": {
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "__typename": "FormCompany"
+        },
+        "isTempStorage": false,
+        "__typename": "Recipient"
+      },
+      "transporter": {
+        "company": {
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "__typename": "FormCompany"
+        },
+        "numberPlate": "",
+        "customInfo": null,
+        "__typename": "Transporter"
+      },
+      "ecoOrganisme": null,
+      "stateSummary": {
+        "transporterCustomInfo": null,
+        "transporterNumberPlate": "",
+        "transporter": {
+          "siret": "13001045700013",
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "__typename": "FormCompany"
+        },
+        "recipient": {
+          "siret": "13001045700013",
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "__typename": "FormCompany"
+        },
+        "emitter": {
+          "siret": "53230142100022",
+          "name": "L'ATELIER DE CELINE",
+          "__typename": "FormCompany"
+        },
+        "__typename": "StateSummary"
+      },
+      "temporaryStorageDetail": null,
+      "transportSegments": [],
+      "currentTransporterSiret": null,
+      "nextTransporterSiret": null,
+      "__typename": "Form"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "BSDA-20221205-RGBP1PMHW",
+      "bsdaType": "OTHER_COLLECTIONS",
+      "isDraft": true,
+      "bsdaStatus": "INITIAL",
+      "emitter": {
+        "isPrivateIndividual": false,
+        "company": {
+          "name": "CLINIQUE DE CHATILLON",
+          "siret": "78531685200017",
+          "orgId": "78531685200017",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaEmitter"
+      },
+      "destination": {
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaDestination"
+      },
+      "worker": {
+        "isDisabled": true,
+        "company": null,
+        "__typename": "BsdaWorker"
+      },
+      "transporter": {
+        "company": {
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "__typename": "FormCompany"
+        },
+        "customInfo": null,
+        "transport": {
+          "plates": [],
+          "__typename": "BsdaTransport"
+        },
+        "__typename": "BsdaTransporter"
+      },
+      "waste": {
+        "materialName": "amiante",
+        "bsdaCode": "06 07 01*",
+        "__typename": "BsdaWaste"
+      },
+      "forwardedIn": null,
+      "groupedIn": null,
+      "__typename": "Bsda"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "DASRI-20221107-ZA5FSCX8P",
+      "bsdasriStatus": "INITIAL",
+      "type": "SIMPLE",
+      "isDraft": true,
+      "bsdasriWaste": {
+        "code": "18 02 02*",
+        "__typename": "BsdasriWaste"
+      },
+      "emitter": {
+        "company": {
+          "name": "PAOLETTI*LAURENT/",
+          "orgId": "51212357100022",
+          "siret": "51212357100022",
+          "vatNumber": null,
+          "omiNumber": null,
+          "__typename": "FormCompany"
+        },
+        "emission": {
+          "isTakenOverWithoutEmitterSignature": false,
+          "isTakenOverWithSecretCode": false,
+          "__typename": "BsdasriEmission"
+        },
+        "__typename": "BsdasriEmitter"
+      },
+      "ecoOrganisme": null,
+      "transporter": {
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "orgId": "53230142100022",
+          "siret": "53230142100022",
+          "vatNumber": null,
+          "omiNumber": null,
+          "__typename": "FormCompany"
+        },
+        "customInfo": "",
+        "transport": {
+          "plates": [],
+          "__typename": "BsdasriTransport"
+        },
+        "__typename": "BsdasriTransporter"
+      },
+      "destination": {
+        "company": {
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "orgId": "13001045700013",
+          "siret": "13001045700013",
+          "vatNumber": null,
+          "omiNumber": null,
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdasriDestination"
+      },
+      "grouping": [],
+      "synthesizing": [],
+      "createdAt": "2022-11-07T15:46:44.882Z",
+      "updatedAt": "2022-11-07T15:52:02.545Z",
+      "allowDirectTakeOver": false,
+      "synthesizedIn": null,
+      "__typename": "Bsdasri"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "cl9pq5vhj255912z9sn749ygwt",
+      "readableId": "BSD-20221026-YZEEHWGPQ",
+      "customId": "",
+      "sentAt": null,
+      "emittedAt": null,
+      "emittedBy": null,
+      "emittedByEcoOrganisme": null,
+      "takenOverAt": null,
+      "status": "DRAFT",
+      "wasteDetails": {
+        "code": "",
+        "name": "",
+        "packagingInfos": [
+          {
+            "type": "BENNE",
+            "other": "",
+            "quantity": 2,
+            "__typename": "PackagingInfo"
+          }
+        ],
+        "__typename": "WasteDetails"
+      },
+      "emitter": {
+        "type": "APPENDIX2",
+        "isPrivateIndividual": false,
+        "company": {
+          "siret": "53230142100022",
+          "name": "L'ATELIER DE CELINE",
+          "omiNumber": "",
+          "__typename": "FormCompany"
+        },
+        "isForeignShip": false,
+        "__typename": "Emitter"
+      },
+      "recipient": {
+        "company": {
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "__typename": "FormCompany"
+        },
+        "isTempStorage": false,
+        "__typename": "Recipient"
+      },
+      "transporter": {
+        "company": {
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "__typename": "FormCompany"
+        },
+        "numberPlate": "",
+        "customInfo": null,
+        "__typename": "Transporter"
+      },
+      "ecoOrganisme": {
+        "siret": "48232394600012",
+        "__typename": "FormEcoOrganisme"
+      },
+      "stateSummary": {
+        "transporterCustomInfo": null,
+        "transporterNumberPlate": "",
+        "transporter": {
+          "siret": "13001045700013",
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "__typename": "FormCompany"
+        },
+        "recipient": {
+          "siret": "13001045700013",
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "__typename": "FormCompany"
+        },
+        "emitter": {
+          "siret": "53230142100022",
+          "name": "L'ATELIER DE CELINE",
+          "__typename": "FormCompany"
+        },
+        "__typename": "StateSummary"
+      },
+      "temporaryStorageDetail": null,
+      "transportSegments": [],
+      "currentTransporterSiret": null,
+      "nextTransporterSiret": null,
+      "__typename": "Form"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "BSDA-20220805-WZD4GYBT1",
+      "bsdaType": "OTHER_COLLECTIONS",
+      "isDraft": true,
+      "bsdaStatus": "INITIAL",
+      "emitter": {
+        "isPrivateIndividual": true,
+        "company": {
+          "name": "Emmanuel Flahaut",
+          "siret": null,
+          "orgId": null,
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaEmitter"
+      },
+      "destination": {
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaDestination"
+      },
+      "worker": {
+        "isDisabled": false,
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaWorker"
+      },
+      "transporter": {
+        "company": {
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "__typename": "FormCompany"
+        },
+        "customInfo": null,
+        "transport": {
+          "plates": [],
+          "__typename": "BsdaTransport"
+        },
+        "__typename": "BsdaTransporter"
+      },
+      "waste": {
+        "materialName": "amiante",
+        "bsdaCode": "08 01 17*",
+        "__typename": "BsdaWaste"
+      },
+      "forwardedIn": null,
+      "groupedIn": null,
+      "__typename": "Bsda"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "BSDA-20220805-7GAFX6050",
+      "bsdaType": "OTHER_COLLECTIONS",
+      "isDraft": true,
+      "bsdaStatus": "INITIAL",
+      "emitter": {
+        "isPrivateIndividual": true,
+        "company": {
+          "name": "Emmanuel Flahaut",
+          "siret": null,
+          "orgId": null,
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaEmitter"
+      },
+      "destination": {
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaDestination"
+      },
+      "worker": {
+        "isDisabled": false,
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaWorker"
+      },
+      "transporter": {
+        "company": {
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "__typename": "FormCompany"
+        },
+        "customInfo": null,
+        "transport": {
+          "plates": [],
+          "__typename": "BsdaTransport"
+        },
+        "__typename": "BsdaTransporter"
+      },
+      "waste": {
+        "materialName": "amiante",
+        "bsdaCode": "08 01 17*",
+        "__typename": "BsdaWaste"
+      },
+      "forwardedIn": null,
+      "groupedIn": null,
+      "__typename": "Bsda"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "BSDA-20220805-NQA0VMJEX",
+      "bsdaType": "OTHER_COLLECTIONS",
+      "isDraft": true,
+      "bsdaStatus": "INITIAL",
+      "emitter": {
+        "isPrivateIndividual": false,
+        "company": {
+          "name": "BOULANGERIE AU 148",
+          "siret": "81232991000010",
+          "orgId": "81232991000010",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaEmitter"
+      },
+      "destination": {
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaDestination"
+      },
+      "worker": {
+        "isDisabled": false,
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaWorker"
+      },
+      "transporter": {
+        "company": {
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "__typename": "FormCompany"
+        },
+        "customInfo": null,
+        "transport": {
+          "plates": [],
+          "__typename": "BsdaTransport"
+        },
+        "__typename": "BsdaTransporter"
+      },
+      "waste": {
+        "materialName": "EPI amiante",
+        "bsdaCode": "16 02 12*",
+        "__typename": "BsdaWaste"
+      },
+      "forwardedIn": null,
+      "groupedIn": null,
+      "__typename": "Bsda"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "DASRI-20220803-FBPS4PR2C",
+      "bsdasriStatus": "INITIAL",
+      "type": "SIMPLE",
+      "isDraft": true,
+      "bsdasriWaste": {
+        "code": "18 02 02*",
+        "__typename": "BsdasriWaste"
+      },
+      "emitter": {
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "orgId": "53230142100022",
+          "siret": "53230142100022",
+          "vatNumber": null,
+          "omiNumber": null,
+          "__typename": "FormCompany"
+        },
+        "emission": {
+          "isTakenOverWithoutEmitterSignature": false,
+          "isTakenOverWithSecretCode": false,
+          "__typename": "BsdasriEmission"
+        },
+        "__typename": "BsdasriEmitter"
+      },
+      "ecoOrganisme": {
+        "siret": "79250555400032",
+        "emittedByEcoOrganisme": null,
+        "__typename": "BsdasriEcoOrganisme"
+      },
+      "transporter": {
+        "company": {
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "orgId": "13001045700013",
+          "siret": "13001045700013",
+          "vatNumber": null,
+          "omiNumber": null,
+          "__typename": "FormCompany"
+        },
+        "customInfo": "",
+        "transport": {
+          "plates": [],
+          "__typename": "BsdasriTransport"
+        },
+        "__typename": "BsdasriTransporter"
+      },
+      "destination": {
+        "company": {
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "orgId": "13001045700013",
+          "siret": "13001045700013",
+          "vatNumber": null,
+          "omiNumber": null,
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdasriDestination"
+      },
+      "grouping": [],
+      "synthesizing": [],
+      "createdAt": "2022-08-03T11:53:28.663Z",
+      "updatedAt": "2022-08-03T11:55:04.067Z",
+      "allowDirectTakeOver": true,
+      "synthesizedIn": null,
+      "__typename": "Bsdasri"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "BSDA-20220706-TWQ8R8ZHF",
+      "bsdaType": "OTHER_COLLECTIONS",
+      "isDraft": true,
+      "bsdaStatus": "INITIAL",
+      "emitter": {
+        "isPrivateIndividual": false,
+        "company": {
+          "name": "BOULANGERIE AU 148",
+          "siret": "81232991000010",
+          "orgId": "81232991000010",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaEmitter"
+      },
+      "destination": {
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaDestination"
+      },
+      "worker": {
+        "isDisabled": false,
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "siret": "53230142100022",
+          "orgId": "53230142100022",
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsdaWorker"
+      },
+      "transporter": {
+        "company": {
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "siret": "13001045700013",
+          "orgId": "13001045700013",
+          "__typename": "FormCompany"
+        },
+        "customInfo": null,
+        "transport": {
+          "plates": [],
+          "__typename": "BsdaTransport"
+        },
+        "__typename": "BsdaTransporter"
+      },
+      "waste": {
+        "materialName": "amiante",
+        "bsdaCode": "12 01 16*",
+        "__typename": "BsdaWaste"
+      },
+      "forwardedIn": null,
+      "groupedIn": null,
+      "__typename": "Bsda"
+    },
+    "__typename": "BsdEdge"
+  },
+  {
+    "node": {
+      "id": "VHU-20220616-Z30X29CYG",
+      "bsvhuStatus": "INITIAL",
+      "isDraft": true,
+      "emitter": {
+        "agrementNumber": "démol148",
+        "company": {
+          "name": "BOULANGERIE AU 148",
+          "orgId": "81232991000010",
+          "siret": "81232991000010",
+          "vatNumber": null,
+          "omiNumber": null,
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsvhuEmitter"
+      },
+      "transporter": {
+        "company": {
+          "name": "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          "orgId": "13001045700013",
+          "siret": "13001045700013",
+          "vatNumber": "",
+          "omiNumber": null,
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsvhuTransporter"
+      },
+      "destination": {
+        "type": "BROYEUR",
+        "company": {
+          "name": "L'ATELIER DE CELINE",
+          "orgId": "53230142100022",
+          "siret": "53230142100022",
+          "vatNumber": null,
+          "omiNumber": null,
+          "__typename": "FormCompany"
+        },
+        "__typename": "BsvhuDestination"
+      },
+      "wasteCode": "16 01 06",
+      "__typename": "Bsvhu"
+    },
+    "__typename": "BsdEdge"
+  }
+]

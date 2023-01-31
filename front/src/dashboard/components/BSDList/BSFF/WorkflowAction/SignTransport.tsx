@@ -15,13 +15,16 @@ import { NotificationError } from "common/components/Error";
 import { SIGN_BSFF, UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
 import { GET_BSDS } from "common/queries";
+import DateInput from "form/common/components/custom-inputs/DateInput";
 
-const validationSchema = yup.object({
-  signatureAuthor: yup
-    .string()
-    .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-});
+const getValidationSchema = (today: Date) =>
+  yup.object({
+    takenOverAt: yup.date().required("La date de prise en charge est requise"),
+    signatureAuthor: yup
+      .string()
+      .ensure()
+      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+  });
 
 interface SignTransportFormProps {
   bsff: Bsff;
@@ -39,10 +42,14 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
     MutationSignBsffArgs
   >(SIGN_BSFF, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
+  const TODAY = new Date();
+  const validationSchema = getValidationSchema(TODAY);
+
   return (
     <Formik
       initialValues={{
         signatureAuthor: "",
+        takenOverAt: TODAY.toISOString(),
       }}
       validationSchema={validationSchema}
       onSubmit={async values => {
@@ -52,7 +59,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
             input: {
               transporter: {
                 transport: {
-                  takenOverAt: new Date().toISOString(),
+                  takenOverAt: values.takenOverAt,
                   mode: bsff.transporter?.transport?.mode ?? TransportMode.Road,
                 },
               },
@@ -65,7 +72,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
             input: {
               type: BsffSignatureType.Transport,
               author: values.signatureAuthor,
-              date: new Date().toISOString(),
+              date: values.takenOverAt,
             },
           },
         });
@@ -79,6 +86,22 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
             les informations ci-dessus sont correctes. En signant ce document,
             je déclare prendre en charge le déchet.
           </p>
+
+          <div className="form__row">
+            <label className="tw-font-semibold">
+              Date de prise en charge
+              <div className="td-date-wrapper">
+                <Field
+                  name="takenOverAt"
+                  component={DateInput}
+                  className="td-input"
+                  maxDate={TODAY}
+                />
+              </div>
+            </label>
+            <RedErrorMessage name="takenOverAt" />
+          </div>
+
           <div className="form__row">
             <label>
               NOM et prénom du signataire

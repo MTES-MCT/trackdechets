@@ -54,7 +54,7 @@ describe("Test the mail job queue", () => {
     expect(data.body).toContain(
       "Bonjour, ceci est un email de test de Trackdéchets."
     );
-  });
+  }, 60000);
 
   it("fallback to sendMailSync when queue is broken which directly call axios.post", async () => {
     // mocking the redis queue is down

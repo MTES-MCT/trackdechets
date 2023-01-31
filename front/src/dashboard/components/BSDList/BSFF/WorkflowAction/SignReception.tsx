@@ -16,13 +16,16 @@ import { SIGN_BSFF, UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
 import { GET_BSDS } from "common/queries";
 
-const validationSchema = yup.object({
-  receptionDate: yup.date().required(),
-  signatureAuthor: yup
-    .string()
-    .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-});
+const getValidationSchema = (today: Date) =>
+  yup.object({
+    receptionDate: yup
+      .date()
+      .required("La date de prise en charge est requise"),
+    signatureAuthor: yup
+      .string()
+      .ensure()
+      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+  });
 
 interface SignReceptionModalProps {
   bsff: Bsff;
@@ -38,6 +41,9 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
     Pick<Mutation, "signBsff">,
     MutationSignBsffArgs
   >(SIGN_BSFF, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
+
+  const TODAY = new Date();
+  const validationSchema = getValidationSchema(TODAY);
 
   const loading = updateBsffResult.loading || signBsffResult.loading;
   const error = updateBsffResult.error ?? signBsffResult.error;
@@ -83,13 +89,16 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
           déclare réceptionner le déchet.
         </p>
         <div className="form__row">
-          <label>
+          <label className="tw-font-semibold">
             Date de réception
-            <Field
-              className="td-input"
-              name="receptionDate"
-              component={DateInput}
-            />
+            <div className="td-date-wrapper">
+              <Field
+                className="td-input"
+                name="receptionDate"
+                component={DateInput}
+                maxDate={TODAY}
+              />
+            </div>
           </label>
           <RedErrorMessage name="receptionDate" />
         </div>

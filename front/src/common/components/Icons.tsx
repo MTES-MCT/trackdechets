@@ -1302,6 +1302,8 @@ export function IconBSDDThin(props: React.SVGProps<SVGSVGElement>) {
       viewBox="0 0 41 47"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
       {...props}
     >
       <path
@@ -1450,7 +1452,12 @@ export function IconBSDasri(props: React.SVGProps<SVGSVGElement>) {
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
-      <g fill="none" stroke="#000" strokeLinecap="round" strokeLinejoin="round">
+      <g
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
         <path
           d="M70 113.75v23.333M49.583 2.917h40.828M49.59 49.583h17.488M49.59 72.917h17.488M49.583 32.083v58.334A22.02 22.02 0 0070 113.75a22.032 22.032 0 0020.417-23.333V32.083zM61.256 2.917H78.75v29.166H61.256zM32.083 32.083h75.828"
           strokeWidth="5.83333"
@@ -1467,6 +1474,8 @@ export function IconBSDasriThin(props: React.SVGProps<SVGSVGElement>) {
       viewBox="0 0 33 38"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
       {...props}
     >
       <g clipPath="url(#clip0_130_10898)">
@@ -1516,7 +1525,7 @@ export function IconBSDasriThin(props: React.SVGProps<SVGSVGElement>) {
         />
       </g>
       <defs>
-        <clipPath id="clip0_130_10898">
+        <clipPath>
           <rect width="33" height="38" fill="white" />
         </clipPath>
       </defs>
@@ -1533,7 +1542,7 @@ export function IconBSVhu(props: React.SVGProps<SVGSVGElement>) {
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
-      <g fill="none" stroke="#000">
+      <g fill="none" stroke="currentColor">
         <path
           d="M8.487 95.556a11.25 11.25 0 01-3.89-7.584 11.273 11.273 0 014.485-9.957l12.956-12.384L31.5 44.6a11.893 11.893 0 019.864-6.947l33.378-2.765a11.89 11.89 0 0110.115 4.241l18.568 19.717 22.347 6.381c6.487 1.377 10.722 7.8 9.439 14.304-1.056 5.325-5.548 9.333-10.961 9.782l-4.013.333M97.72 91.513l-45.558 3.78"
           strokeWidth="5.83333"
@@ -1554,6 +1563,8 @@ export function IconBSVhuThin(props: React.SVGProps<SVGSVGElement>) {
       viewBox="0 0 33 38"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
       {...props}
     >
       <g clipPath="url(#clip0_130_10921)">
@@ -1600,7 +1611,7 @@ export function IconBSVhuThin(props: React.SVGProps<SVGSVGElement>) {
         />
       </g>
       <defs>
-        <clipPath id="clip0_130_10921">
+        <clipPath>
           <rect width="33" height="38" fill="white" />
         </clipPath>
       </defs>
@@ -1610,9 +1621,9 @@ export function IconBSVhuThin(props: React.SVGProps<SVGSVGElement>) {
 
 export function IconBSFF(props: React.SVGProps<SVGSVGElement>) {
   return (
-    <svg {...props} width="1em" height="1em" xmlns="http://www.w3.org/2000/svg">
+    <svg width="1em" height="1em" {...props} xmlns="http://www.w3.org/2000/svg">
       <g
-        transform="translate(1)"
+        transform="translate(8)"
         stroke="currentColor"
         fill="none"
         fillRule="evenodd"
@@ -1633,6 +1644,8 @@ export function IconBSFFMedium(props: React.SVGProps<SVGSVGElement>) {
       viewBox="0 0 33 38"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
       {...props}
     >
       <path
@@ -1680,8 +1693,8 @@ export function IconBSDa(props: React.SVGProps<SVGSVGElement>) {
       xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
-      <g fill="none" fillRule="evenodd" stroke="#000">
-        <g stroke="#000" strokeLinecap="round" strokeLinejoin="round">
+      <g fill="none" fillRule="evenodd" stroke="currentColor">
+        <g stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
           <path d="M23.278 20.128A3 3 0 0120.3 23.5H4.1a3 3 0 01-2.978-3.372L2.7 7.5h19l1.578 12.628zM6.2 5H4.766a1 1 0 00-.857.486L2.7 7.5h19l-1.209-2.014A1 1 0 0019.634 5H18.2" />
           <path d="M16.2 4.5a4 4 0 10-8 0v3h8v-3z" />
         </g>
@@ -1689,7 +1702,7 @@ export function IconBSDa(props: React.SVGProps<SVGSVGElement>) {
           fontFamily="SourceSansPro-Semibold, Source Sans Pro"
           fontSize="16"
           fontWeight="500"
-          fill="#000"
+          fill="currentColor"
           transform="translate(1)"
         >
           <tspan x="7.2" y="20">
@@ -1708,6 +1721,8 @@ export function IconBSDaThin(props: React.SVGProps<SVGSVGElement>) {
       viewBox="0 0 41 49"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
       {...props}
     >
       <path
@@ -1810,15 +1825,88 @@ export function IconTrackDechetsCheck({
 export function IconWeight({ ...props }: IconProps) {
   return (
     <svg
-      {...props}
       width="12"
       height="13"
       viewBox="0 0 12 13"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      {...props}
     >
       <path
         d="M1.31417 4.87867L0.0285512 10.8779L0.0287007 10.8777C-0.0529007 11.2576 0.0415539 11.654 0.285913 11.956C0.53012 12.2581 0.897924 12.4335 1.28634 12.4333H10.7137C11.1021 12.4336 11.4699 12.2581 11.7141 11.956C11.9584 11.654 12.0529 11.2576 11.9713 10.8777L10.6857 4.87852L10.6858 4.87867C10.624 4.59097 10.4654 4.33331 10.2366 4.14844C10.0076 3.96356 9.72232 3.86283 9.42818 3.86298H8.22401C8.52815 3.33973 8.63784 2.72577 8.53398 2.12945C8.42996 1.53313 8.11893 0.992699 7.65564 0.603057C7.19235 0.213568 6.60632 0 6.00104 0C5.39576 0 4.80989 0.213568 4.34659 0.603057C3.88315 0.992699 3.57213 1.53313 3.46825 2.12945C3.36423 2.72577 3.47393 3.33973 3.77822 3.86298H2.57184C2.27771 3.86283 1.99239 3.96356 1.76344 4.14844C1.53462 4.33331 1.37605 4.59095 1.31419 4.87867H1.31417ZM10.7136 11.148H1.28624L2.57186 5.14879H9.42809L10.7136 11.148ZM4.71436 2.5777C4.71436 2.2368 4.84991 1.90979 5.09098 1.66872C5.33205 1.4275 5.65907 1.29209 5.99997 1.29209C6.34087 1.29209 6.66788 1.4275 6.90896 1.66872C7.15002 1.90979 7.28558 2.2368 7.28558 2.5777C7.28558 2.91861 7.15002 3.24561 6.90896 3.48669C6.66788 3.72776 6.34087 3.86316 5.99997 3.86316C5.65907 3.86316 5.33206 3.72775 5.09098 3.48669C4.84991 3.24562 4.71436 2.9186 4.71436 2.5777Z"
+        fill="#000091"
+      />
+    </svg>
+  );
+}
+export function IconTransporter({ ...props }: IconProps) {
+  return (
+    <svg
+      width="19"
+      height="20"
+      viewBox="0 0 19 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      {...props}
+    >
+      <g>
+        <path
+          d="M13.4583 6.83337H15.8333L18.2083 10.0444V14.75H16.5973C16.5031 15.4105 16.1739 16.0149 15.67 16.4521C15.166 16.8893 14.5213 17.13 13.8541 17.13C13.187 17.13 12.5422 16.8893 12.0383 16.4521C11.5344 16.0149 11.2051 15.4105 11.111 14.75H7.09725C7.00314 15.4105 6.67388 16.0149 6.16996 16.4521C5.66603 16.8893 5.02128 17.13 4.35413 17.13C3.68697 17.13 3.04222 16.8893 2.5383 16.4521C2.03437 16.0149 1.70511 15.4105 1.611 14.75H0.791626V5.25004C0.791626 5.04008 0.875033 4.83871 1.0235 4.69025C1.17197 4.54178 1.37333 4.45837 1.58329 4.45837H12.6666C12.8766 4.45837 13.078 4.54178 13.2264 4.69025C13.3749 4.83871 13.4583 5.04008 13.4583 5.25004V6.83337ZM13.4583 8.41671V10.7917H16.625V10.5661L15.0353 8.41671H13.4583Z"
+          fill="#000091"
+        />
+      </g>
+      <defs>
+        <clipPath>
+          <rect
+            width="19"
+            height="19"
+            fill="white"
+            transform="translate(0 0.5)"
+          />
+        </clipPath>
+      </defs>
+    </svg>
+  );
+}
+export function IconDestination({ ...props }: IconProps) {
+  return (
+    <svg
+      width="19"
+      height="20"
+      viewBox="0 0 19 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      {...props}
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M12.8028 9.20832L8.55629 4.96182L9.67571 3.84241L15.8333 9.99999L9.67571 16.1576L8.55629 15.0382L12.8028 10.7917H3.16663V9.20832H12.8028Z"
+        fill="#000091"
+      />
+    </svg>
+  );
+}
+export function IconEmitter({ ...props }: IconProps) {
+  return (
+    <svg
+      width="15"
+      height="18"
+      viewBox="0 0 15 18"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      focusable="false"
+      {...props}
+    >
+      <path
+        d="M12.5382 12.2465L7.5 17.2846L2.46184 12.2465C1.4654 11.25 0.786814 9.98047 0.511902 8.59836C0.236989 7.21625 0.378093 5.78365 0.91737 4.48173C1.45665 3.17982 2.36988 2.06705 3.54157 1.28415C4.71327 0.501246 6.09081 0.083374 7.5 0.083374C8.90919 0.083374 10.2867 0.501246 11.4584 1.28415C12.6301 2.06705 13.5434 3.17982 14.0826 4.48173C14.6219 5.78365 14.763 7.21625 14.4881 8.59836C14.2132 9.98047 13.5346 11.25 12.5382 12.2465ZM7.5 8.79165C7.91993 8.79165 8.32265 8.62483 8.61959 8.3279C8.91652 8.03096 9.08333 7.62824 9.08333 7.20831C9.08333 6.78839 8.91652 6.38566 8.61959 6.08873C8.32265 5.79179 7.91993 5.62498 7.5 5.62498C7.08008 5.62498 6.67735 5.79179 6.38042 6.08873C6.08348 6.38566 5.91667 6.78839 5.91667 7.20831C5.91667 7.62824 6.08348 8.03096 6.38042 8.3279C6.67735 8.62483 7.08008 8.79165 7.5 8.79165Z"
         fill="#000091"
       />
     </svg>

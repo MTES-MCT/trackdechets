@@ -19,7 +19,7 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
   async (parent, { siret }, context) => {
     const user = checkIsAuthenticated(context);
 
-    const company = await getCompanyOrCompanyNotFound({ siret });
+    const company = await getCompanyOrCompanyNotFound({ orgId: siret });
 
     // check user is not already member of company
     const isMember = await isCompanyMember(user, company);
@@ -68,7 +68,7 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
         variables: {
           userEmail: user.email,
           companyName: company.name,
-          companySiret: company.siret,
+          companySiret: company.orgId,
           membershipRequestId: membershipRequest.id
         }
       })
@@ -86,7 +86,7 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
         to: [{ email: user.email, name: user.name }],
         variables: {
           companyName: company.name,
-          companySiret: company.siret,
+          companySiret: company.orgId,
           adminEmailsInfo: adminEmailsInfo
         }
       })
@@ -95,7 +95,7 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
     return {
       ...membershipRequest,
       email: user.email,
-      siret: company.siret,
+      siret: company.orgId,
       name: company.name
     };
   };

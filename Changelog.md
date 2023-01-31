@@ -5,6 +5,43 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.1.4] 31/01/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Les émetteurs & destinataires de déchets peuvent désormais annuler un BSDD via l'API [PR 2014](https://github.com/MTES-MCT/trackdechets/pull/2014)
+- Les émetteurs & destinataires de déchets peuvent désormais annuler un BSDD via l'interface, via le processus de révision [PR 2044](https://github.com/MTES-MCT/trackdechets/pull/2044)
+
+#### :bug: Corrections de bugs
+
+- BSFF - Il ne devrait pas être possible de modifier les contenants après signature [PR 2076](https://github.com/MTES-MCT/trackdechets/pull/2076)
+- BSFF - Le bouton d'ajout d'une FI laisse croire à tort qu'on peut ajouter une FI après signature du BSFF [PR 2076](https://github.com/MTES-MCT/trackdechets/pull/2076)
+
+#### :nail_care: Améliorations
+
+- Amélioration de la recherche par numéro de TVA et accélération requêtes pour les établissement déjà enregistrés [PR 1988](https://github.com/MTES-MCT/trackdechets/pull/1988)
+- Les transporteurs peuvent désormais choisir manuellement la date de prise en charge pour les BSFF [PR 2073](https://github.com/MTES-MCT/trackdechets/pull/2073)
+- Interdire la possibilité de créer un SIRET fermé selon l'INSEE, ni de valider ou re-valider (`markAsSealed` et `markAsResealed`) un BSDD avec un SIRET qui est fermé. Amélioration de l'affichage de la page publique `/company/1234` [PR 2003](https://github.com/MTES-MCT/trackdechets/pull/2003)
+- Les champs relatifs à l'agrément SS4 amiante s'auto-complète dans l'interface Trackdéchets [PR 2064](https://github.com/MTES-MCT/trackdechets/pull/2064)
+- Les noms des établissements dans le sélecteur d'établissements du registre sont ordonnés par ordre alphabétique [PR 2047](https://github.com/MTES-MCT/trackdechets/pull/2047)
+- BSFF - Adapter le récepissé PDF à la gestion multi-contenants [PR 2035](https://github.com/MTES-MCT/trackdechets/pull/2035)
+- Ne pas permettre de modifier les coordonées d'un transporteur étranger si on a bien récupéré les infos via le service VIES [PR 2040](https://github.com/MTES-MCT/trackdechets/pull/2040)
+
+#### :boom: Breaking changes
+
+- ETQ émetteur d'un bordereau, je ne dois pas pouvoir ajouter un transporteur non inscrit sur Trackdéchets avec un profil "Transporteur" (BSDASRI et BSVHU) [PR 2054](https://github.com/MTES-MCT/trackdechets/pull/2054).
+- ETQ émetteur d'un bordereau, je ne dois pas pouvoir ajouter un destinataire non inscrit sur Trackdéchets avec un profil
+  "Installation de traitement", "Installation de Transit, regroupement ou tri de déchets" ou "Installation de traitement VHU" (BSDASRI et BSVHU) [PR 2054](https://github.com/MTES-MCT/trackdechets/pull/2054).
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- BSFF - Mettre en place le pattern "repository" [PR 2041](https://github.com/MTES-MCT/trackdechets/pull/2041)
+- BSFF - Indexer les bordereaux en asynchrone [PR 2041](https://github.com/MTES-MCT/trackdechets/pull/2041)
+- BSFF - Logguer les événements [PR 2041](https://github.com/MTES-MCT/trackdechets/pull/2041)
+- Ajout d'un lien en recette vers la V2 du dashboard pour les utilisateurs admin [PR 2049](https://github.com/MTES-MCT/trackdechets/pull/2049)
+
 # [2023.1.3] 19/01/2023
 
 #### :rocket: Nouvelles fonctionnalités
