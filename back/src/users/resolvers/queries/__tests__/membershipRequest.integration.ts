@@ -129,4 +129,34 @@ describe("query membershipRequest", () => {
       name: company.name
     });
   });
+
+  it("should return a membership request by id when company is a foreign transporter", async () => {
+    const { user: admin, company } = await userWithCompanyFactory("ADMIN", {
+      siret: null,
+      orgId: "IT13029381004",
+      vatNumber: "IT13029381004"
+    });
+    const requester = await userFactory();
+    const membershipRequest = await prisma.membershipRequest.create({
+      data: {
+        user: { connect: { id: requester.id } },
+        company: { connect: { id: company.id } }
+      }
+    });
+    const { query } = makeClient(admin);
+    const { data, errors } = await query<Pick<Query, "membershipRequest">>(
+      MEMBERSHIP_REQUEST,
+      {
+        variables: { id: membershipRequest.id }
+      }
+    );
+    expect(errors).toBeUndefined();
+    expect(data.membershipRequest).toMatchObject({
+      id: membershipRequest.id,
+      status: "PENDING",
+      email: requester.email,
+      siret: company.orgId,
+      name: company.name
+    });
+  });
 });
