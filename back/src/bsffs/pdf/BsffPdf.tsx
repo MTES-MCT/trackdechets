@@ -505,13 +505,10 @@ function BsffOnePackagingOperation({
         <input type="checkbox" checked={packaging?.operation?.code === "D15"} />{" "}
         D 15
       </div>
-      <div>
-        {" "}
-        Date de réalisation : {formatDate(packaging.operation?.signature?.date)}
-      </div>
+      <div> Date de réalisation : {formatDate(packaging.operation?.date)}</div>
       <br />
       <div>
-        Je soussigné (nom, prénom) : {packaging?.acceptation?.signature?.author}
+        Je soussigné (nom, prénom) : {packaging?.operation?.signature?.author}
       </div>
       <div>
         Certifie que les mentions dans les cadres 9 et 10 sont exactes et que

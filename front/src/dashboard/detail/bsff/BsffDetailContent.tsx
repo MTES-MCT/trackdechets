@@ -369,10 +369,6 @@ function Destination({ form }: { form: Bsff }) {
       </div>
       <div className={styles.detailGrid}>
         <DateRow value={form.destination?.reception?.date} label="Reçu le" />
-        <DateRow
-          value={form.destination?.reception?.signature?.date}
-          label="Réception signée le"
-        />
         <DetailRow
           value={form.destination?.reception?.signature?.author}
           label="Réception signée par"
@@ -389,7 +385,7 @@ function Destination({ form }: { form: Bsff }) {
                   />
                   <DetailRow
                     value={form.packagings[0].acceptation?.signature?.author}
-                    label="Accepté par"
+                    label="Acceptation signée par"
                   />
                   <DetailRow
                     value={form.packagings[0].acceptation?.weight}
@@ -405,7 +401,7 @@ function Destination({ form }: { form: Bsff }) {
                   />
                   <DetailRow
                     value={form.packagings[0].acceptation?.signature?.author}
-                    label="Refusé par"
+                    label="Refus signé par"
                   />
                   <DetailRow
                     value={form.packagings[0].acceptation?.refusalReason}
@@ -436,8 +432,8 @@ function Destination({ form }: { form: Bsff }) {
               label="Opération de traitement"
             />
             <DateRow
-              value={form.packagings[0].operation?.signature?.date}
-              label="Traitement signé le"
+              value={form.packagings[0].operation?.date}
+              label="Traitement réalisé le"
             />
             <DetailRow
               value={form.packagings[0].operation?.signature?.author}
