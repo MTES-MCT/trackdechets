@@ -12,7 +12,6 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
-import { Status } from "@prisma/client";
 
 const SIGN_TRANSPORT_FORM = `
   mutation SignTransportForm($id: ID!, $input: SignTransportFormInput!, $securityCode: Int) {

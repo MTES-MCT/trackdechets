@@ -21,8 +21,14 @@ import {
   PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "../common/constants";
 import {
-  BAD_CHARACTERS_REGEXP, countries as vatCountries, isClosedCompany, isForeignVat, isFRVat,
-  isOmi, isSiret, isVat
+  BAD_CHARACTERS_REGEXP,
+  countries as vatCountries,
+  isClosedCompany,
+  isForeignVat,
+  isFRVat,
+  isOmi,
+  isSiret,
+  isVat
 } from "../common/constants/companySearchHelpers";
 import {
   foreignVatNumber,
@@ -58,8 +64,11 @@ import {
   MISSING_COMPANY_CONTACT,
   MISSING_COMPANY_EMAIL,
   MISSING_COMPANY_NAME,
-  MISSING_COMPANY_OMI_NUMBER, MISSING_COMPANY_PHONE,
-  MISSING_COMPANY_SIRET, MISSING_COMPANY_SIRET_OR_VAT, MISSING_PROCESSING_OPERATION
+  MISSING_COMPANY_OMI_NUMBER,
+  MISSING_COMPANY_PHONE,
+  MISSING_COMPANY_SIRET,
+  MISSING_COMPANY_SIRET_OR_VAT,
+  MISSING_PROCESSING_OPERATION
 } from "./errors";
 // set yup default error messages
 configureYup();
