@@ -18,6 +18,9 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
   const [hasRemovedFilterLine, setHasRemovedFilterLine] =
     useState<boolean>(false);
 
+  const newInputElementRef = useRef<HTMLInputElement>(null);
+  const newSelectElementRef = useRef<HTMLSelectElement>(null);
+
   // we can't select a filter twice
   const filterSelectedIds = filterSelectedList?.map(item => {
     return item.value;
@@ -111,6 +114,7 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
             {filter.label}
           </label>
           <input
+            ref={newInputElementRef}
             className="fr-input"
             type="text"
             id={`${filter.value}_filter`}
@@ -128,6 +132,7 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
             {filter.label}
           </label>
           <select
+            ref={newSelectElementRef}
             id={`${filter.value}_filter`}
             className="fr-select"
             onChange={e => onFilterValueChange(e, filter.value)}
@@ -156,6 +161,14 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
       setHasReachMaxFilter(false);
     } else {
       setHasReachMaxFilter(true);
+    }
+
+    if (newInputElementRef.current) {
+      newInputElementRef.current.focus();
+    }
+
+    if (newSelectElementRef.current) {
+      newSelectElementRef.current.focus();
     }
   }, [filterSelectedList]);
 

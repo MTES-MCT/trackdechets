@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useMemo,
-  useState,
-  useEffect,
-  useRef,
-} from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { generatePath, useParams, useRouteMatch } from "react-router-dom";
 import { useLazyQuery, useQuery } from "@apollo/client";
 import { Breadcrumb, BreadcrumbItem } from "@dataesr/react-dsfr";
@@ -53,7 +47,6 @@ const DashboardPage = () => {
 
   const { siret } = useParams<{ siret: string }>();
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-  const filterRef = useRef<HTMLDivElement>(null);
 
   const withRoutePredicate = useCallback(() => {
     if (isActTab) {
@@ -245,6 +238,7 @@ const DashboardPage = () => {
         <button
           type="button"
           className="fr-btn fr-btn--secondary"
+          aria-expanded={isFiltersOpen}
           onClick={toggleFiltersBlock}
           disabled={loading}
         >
@@ -252,11 +246,9 @@ const DashboardPage = () => {
         </button>
       </div>
 
-      <div ref={filterRef}>
-        {isFiltersOpen && (
-          <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
-        )}
-      </div>
+      {isFiltersOpen && (
+        <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
+      )}
 
       {cachedData?.bsds.totalCount === 0 && (
         <Blankslate>
