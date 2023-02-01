@@ -8,7 +8,7 @@ import {
   pdf_action_label,
   revision_action_label,
   supprimer_action_label,
-} from "../../../../assets/wordings/dashboard/wordingsDashboard";
+} from "../../../Common/wordings/dashboard/wordingsDashboard";
 import { BsdAdditionalActionsButtonProps } from "./bsdAdditionalActionsButtonTypes";
 import useOnClickOutsideRefTarget from "../../../../common/hooks/useOnClickOutsideRefTarget";
 import {

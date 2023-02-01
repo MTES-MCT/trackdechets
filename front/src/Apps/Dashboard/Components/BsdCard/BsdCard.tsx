@@ -16,7 +16,7 @@ import {
 import BsdAdditionalActionsButton from "../BsdAdditionalActionsButton/BsdAdditionalActionsButton";
 
 import "./bsdCard.scss";
-import { completer_bsd_suite } from "../../../../assets/wordings/dashboard/wordingsDashboard";
+import { completer_bsd_suite } from "../../../Common/wordings/dashboard/wordingsDashboard";
 import Actors from "../Actors/Actors";
 
 function BsdCard({

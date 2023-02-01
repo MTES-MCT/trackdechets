@@ -31,14 +31,14 @@ import {
   filter_reset_btn,
   filter_show_btn,
   load_more_bsds,
-} from "assets/wordings/dashboard/wordingsDashboard";
+} from "Apps/Common/wordings/dashboard/wordingsDashboard";
 import { IconDuplicateFile } from "common/components/Icons";
-import Filters from "Apps/Dashboard/Components/Filters/Filters";
+import Filters from "Apps/Common/Components/Filters/Filters";
 import {
   filterList,
   dropdownCreateLinks,
 } from "../Apps/Dashboard/dashboardUtils";
-import BsdCreateDropdown from "../Apps/Dashboard/Components/DropdownMenu/DropdownMenu";
+import BsdCreateDropdown from "../Apps/Common/Components/DropdownMenu/DropdownMenu";
 
 import "./dashboard.scss";
 

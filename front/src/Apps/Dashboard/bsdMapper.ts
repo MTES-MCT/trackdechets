@@ -11,7 +11,7 @@ import {
   BsdDisplay,
   BsdStatusCode,
   BsdTypename,
-} from "../../common/types/bsdTypes";
+} from "../Common/types/bsdTypes";
 
 const mapBsdStatusToBsdStatusEnum = (status: string): BsdStatusCode => {
   const bsdStatusCode = Object.keys(BsdStatusCode).find(

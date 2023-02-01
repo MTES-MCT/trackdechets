@@ -2,7 +2,7 @@ import {
   BsdDisplay,
   BsdStatusCode,
   WorkflowDisplayType,
-} from "../../common/types/bsdTypes";
+} from "../Common/types/bsdTypes";
 import { formatBsd } from "./bsdMapper";
 import {
   Bsd,
@@ -53,7 +53,7 @@ import {
   VALIDER_ENTREPOSAGE_PROVISOIRE,
   VALIDER_RECEPTION,
   VALIDER_TRAITEMENT,
-} from "../../assets/wordings/dashboard/wordingsDashboard";
+} from "../Common/wordings/dashboard/wordingsDashboard";
 
 export const getBsdView = (bsd): BsdDisplay | null => {
   const bsdView = formatBsd(bsd);

@@ -1,7 +1,7 @@
 import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react";
 import BsdAdditionalActionsButton from "./BsdAdditionalActionsButton";
-import { BsdDisplay, BsdStatusCode } from "common/types/bsdTypes";
+import { BsdDisplay, BsdStatusCode } from "Apps/Common/types/bsdTypes";
 import { BsdType } from "generated/graphql/types";
 
 const bsd = { id: "1", readableid: "1" } as unknown as BsdDisplay;

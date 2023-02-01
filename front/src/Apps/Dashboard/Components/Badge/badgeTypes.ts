@@ -1,4 +1,4 @@
-import { BsdStatusCode } from "common/types/bsdTypes";
+import { BsdStatusCode } from "Apps/Common/types/bsdTypes";
 import { BsdType } from "generated/graphql/types";
 
 export interface BadgeProps {

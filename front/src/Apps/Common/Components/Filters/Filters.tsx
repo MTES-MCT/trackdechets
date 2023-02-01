@@ -3,9 +3,9 @@ import { Filter, FiltersProps, FilterType } from "./filtersTypes";
 import {
   filter_type_apply_btn,
   filter_type_select_option_placeholder,
-} from "../../../../assets/wordings/dashboard/wordingsDashboard";
+} from "../../wordings/dashboard/wordingsDashboard";
 import FilterLine from "./FilterLine";
-import { MAX_FILTER } from "../../dashboardUtils";
+import { MAX_FILTER } from "../../../Dashboard/dashboardUtils";
 
 import "./filters.scss";
 

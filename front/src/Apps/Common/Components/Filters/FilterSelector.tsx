@@ -2,7 +2,7 @@ import React from "react";
 import {
   filter_type_select_label,
   filter_type_select_placeholder,
-} from "../../../../assets/wordings/dashboard/wordingsDashboard";
+} from "../../wordings/dashboard/wordingsDashboard";
 import { Filter } from "./filtersTypes";
 
 interface FilterSelectorProps {

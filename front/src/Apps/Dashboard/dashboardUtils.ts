@@ -20,9 +20,9 @@ import {
   filter_immat_number,
   // filter_siret,
   filter_waste_code,
-} from "../../assets/wordings/dashboard/wordingsDashboard";
+} from "../Common/wordings/dashboard/wordingsDashboard";
 import { BsdType } from "../../generated/graphql/types";
-import { Filter, FilterType } from "./Components/Filters/filtersTypes";
+import { Filter, FilterType } from "../Common/Components/Filters/filtersTypes";
 
 export const MAX_FILTER = 5;
 
