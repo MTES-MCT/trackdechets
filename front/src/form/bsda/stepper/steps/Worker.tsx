@@ -103,16 +103,16 @@ export function Worker({ disabled }) {
           />
 
           <h4 className="form__section-heading">
-            Certification déclarée dans le profil entreprise
+            Catégorie entreprise de travaux déclarée dans le profil entreprise
           </h4>
 
           <div className="form__row">
             {!values?.worker?.certification?.hasSubSectionFour &&
               !values?.worker?.certification?.hasSubSectionThree && (
                 <p>
-                  Absence de certification déclarée dans le profil. Il
-                  appartient à l'entreprise de travaux de le mettre à jour le
-                  cas échéant
+                  Absence de catégorie entreprise de travaux déclarée dans le
+                  profil entreprise. Il appartient à l'entreprise de travaux de
+                  le mettre à jour le cas échéant
                 </p>
               )}
           </div>
