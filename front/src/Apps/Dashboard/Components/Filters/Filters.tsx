@@ -27,8 +27,11 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
   });
   const derivedFilters =
     filterSelectedIds.length > 0
-      ? filters.filter(f => {
-          return !filterSelectedIds.includes(f.value);
+      ? filters.map(filter => {
+          if (filterSelectedIds.includes(filter.value)) {
+            return { ...filter, isActive: false };
+          }
+          return filter;
         })
       : filters;
 
@@ -184,7 +187,7 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
         return (
           <React.Fragment key={`${filter.value}_filter`}>
             <FilterLine
-              filters={filters}
+              filters={derivedFilters}
               onAddFilterType={onAddFilterType}
               onRemoveFilterType={onRemoveFilterType}
               value={filter.value}

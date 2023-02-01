@@ -97,7 +97,7 @@ export const load_more_bsds = "Charger plus de bordereaux";
 
 // filters
 export const filter_show_btn = "Chercher par";
-export const filter_reset_btn = "Supprimer les filtres";
+export const filter_reset_btn = "Annuler les filtres";
 export const filter_type_select_placeholder = "Sélectionner un type de filtre";
 export const filter_type_select_label = "Type de filtre";
 export const filter_type_apply_btn = "Appliquer les filtres";

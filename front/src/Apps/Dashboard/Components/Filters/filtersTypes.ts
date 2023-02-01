@@ -8,6 +8,7 @@ export type Filter = {
   label: string;
   order: string;
   type: FilterType;
+  isActive: boolean;
   options?: { value: string; label: string }[];
 };
 

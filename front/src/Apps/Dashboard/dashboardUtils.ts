@@ -48,6 +48,7 @@ export const filterList: Filter[] = [
     label: filter_bsd_type,
     type: FilterType.select,
     options: bsdTypeFilterSelectOptions,
+    isActive: true,
   },
   // {
   //   value: "siret",
@@ -60,12 +61,14 @@ export const filterList: Filter[] = [
     order: "wasteCode",
     label: filter_waste_code,
     type: FilterType.input,
+    isActive: true,
   },
   {
     value: "readableId",
     order: "readableId",
     label: filter_bsd_number,
     type: FilterType.input,
+    isActive: true,
   },
   // {
   //   value: "readableId",
@@ -78,6 +81,7 @@ export const filterList: Filter[] = [
     order: "transporterNumberPlate",
     label: filter_immat_number,
     type: FilterType.input,
+    isActive: true,
   },
   // {
   //   value: "chantier_name",
@@ -96,5 +100,6 @@ export const filterList: Filter[] = [
     order: "transporterCustomInfo",
     label: filter_free_text,
     type: FilterType.input,
+    isActive: true,
   },
 ];

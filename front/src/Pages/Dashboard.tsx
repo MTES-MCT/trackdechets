@@ -232,7 +232,6 @@ const DashboardPage = () => {
         </BreadcrumbItem>
         <BreadcrumbItem>{getBreadcrumbItem()}</BreadcrumbItem>
       </Breadcrumb>
-      {loading && <Loader />}
       <div className="dashboard-page__bsd-dropdown">
         <BSDDropdown siret={siret} />
         <button
@@ -245,51 +244,59 @@ const DashboardPage = () => {
           {!isFiltersOpen ? filter_show_btn : filter_reset_btn}
         </button>
       </div>
-
       {isFiltersOpen && (
         <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
       )}
+      {loading ? (
+        <Loader />
+      ) : (
+        <>
+          {cachedData?.bsds.totalCount === 0 && (
+            <Blankslate>
+              <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
+              <BlankslateDescription>
+                {getBlankstateDescription()}
+              </BlankslateDescription>
+            </Blankslate>
+          )}
 
-      {cachedData?.bsds.totalCount === 0 && (
-        <Blankslate>
-          <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
-          <BlankslateDescription>
-            {getBlankstateDescription()}
-          </BlankslateDescription>
-        </Blankslate>
-      )}
+          {!!data?.bsds.edges.length && (
+            <BsdCardList siret={siret} bsds={bsds!} />
+          )}
 
-      {!!data?.bsds.edges.length && <BsdCardList siret={siret} bsds={bsds!} />}
-
-      {data?.bsds.pageInfo.hasNextPage && (
-        <div className="dashboard-page__loadmore">
-          <button
-            className="fr-btn"
-            onClick={() =>
-              fetchMore({
-                variables: {
-                  after: data?.bsds.pageInfo.endCursor,
-                },
-                updateQuery: (prev, { fetchMoreResult }) => {
-                  if (fetchMoreResult == null) {
-                    return prev;
-                  }
-
-                  return {
-                    ...prev,
-                    bsds: {
-                      ...prev.bsds,
-                      ...fetchMoreResult.bsds,
-                      edges: prev.bsds.edges.concat(fetchMoreResult.bsds.edges),
+          {data?.bsds.pageInfo.hasNextPage && (
+            <div className="dashboard-page__loadmore">
+              <button
+                className="fr-btn"
+                onClick={() =>
+                  fetchMore({
+                    variables: {
+                      after: data?.bsds.pageInfo.endCursor,
                     },
-                  };
-                },
-              })
-            }
-          >
-            {load_more_bsds}
-          </button>
-        </div>
+                    updateQuery: (prev, { fetchMoreResult }) => {
+                      if (fetchMoreResult == null) {
+                        return prev;
+                      }
+
+                      return {
+                        ...prev,
+                        bsds: {
+                          ...prev.bsds,
+                          ...fetchMoreResult.bsds,
+                          edges: prev.bsds.edges.concat(
+                            fetchMoreResult.bsds.edges
+                          ),
+                        },
+                      };
+                    },
+                  })
+                }
+              >
+                {load_more_bsds}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

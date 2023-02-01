@@ -34,7 +34,11 @@ const FilterSelector = ({
           {filter_type_select_placeholder}
         </option>
         {filters.map(filter => (
-          <option key={filter.value} value={filter.value}>
+          <option
+            key={filter.value}
+            value={filter.value}
+            disabled={!filter.isActive}
+          >
             {filter.label}
           </option>
         ))}

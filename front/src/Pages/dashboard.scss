@@ -21,6 +21,18 @@
     }
     .fr-btn {
       margin: 5px 0;
+      width: 180px;
+      justify-content: center;
+      box-sizing: content-box;
+      padding: 0;
+      &:after {
+        content: "";
+        display: inline-block;
+        background: url("/icons/dashboard/icon-filter.svg");
+        width: 16px;
+        height: 16px;
+        margin-left: 5px;
+      }
     }
     @include desktop {
       flex-direction: row;
