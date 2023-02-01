@@ -14,6 +14,7 @@ describe("Filters component", () => {
       label: "Filter 1",
       order: "order",
       type: FilterType.input,
+      isActive: true,
     },
     {
       value: "filter2",
@@ -21,6 +22,7 @@ describe("Filters component", () => {
       order: "order",
       type: FilterType.select,
       options: [{ value: "option1", label: "option 1" }],
+      isActive: true,
     },
   ];
 

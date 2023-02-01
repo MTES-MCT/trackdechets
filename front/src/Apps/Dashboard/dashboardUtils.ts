@@ -1,9 +1,16 @@
+import { generatePath } from "react-router-dom";
+import routes from "../../common/routes";
 import {
   bsd_type_option_bsda,
   bsd_type_option_bsdasri,
   bsd_type_option_bsdd,
   bsd_type_option_bsff,
   bsd_type_option_bsvhu,
+  dropdown_create_bsda,
+  dropdown_create_bsdasri,
+  dropdown_create_bsdd,
+  dropdown_create_bsff,
+  dropdown_create_bsvhu,
   filter_bsd_number,
   filter_bsd_type,
   // filter_chantier_adress,
@@ -101,5 +108,29 @@ export const filterList: Filter[] = [
     label: filter_free_text,
     type: FilterType.input,
     isActive: true,
+  },
+];
+
+export const dropdownCreateLinks = siret => [
+  {
+    title: dropdown_create_bsdd,
+    route: generatePath(routes.dashboard.bsdds.create, { siret }),
+  },
+  {
+    title: dropdown_create_bsdasri,
+    route: generatePath(routes.dashboard.bsdasris.create, { siret }),
+  },
+
+  {
+    title: dropdown_create_bsvhu,
+    route: generatePath(routes.dashboard.bsvhus.create, { siret }),
+  },
+  {
+    title: dropdown_create_bsff,
+    route: generatePath(routes.dashboard.bsffs.create, { siret }),
+  },
+  {
+    title: dropdown_create_bsda,
+    route: generatePath(routes.dashboard.bsdas.create, { siret }),
   },
 ];

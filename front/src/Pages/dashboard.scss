@@ -10,36 +10,55 @@
     max-width: 95%;
   }
 
-  &__bsd-dropdown {
+  &__actions {
     display: flex;
     flex-direction: column;
     align-items: baseline;
     margin: 0 0 2rem 0.5rem;
 
-    .btn {
-      width: fit-content;
-    }
-    .fr-btn {
-      margin: 5px 0;
-      width: 180px;
-      justify-content: center;
-      box-sizing: content-box;
-      padding: 0;
-      &:after {
-        content: "";
-        display: inline-block;
-        background: url("/icons/dashboard/icon-filter.svg");
-        width: 16px;
-        height: 16px;
-        margin-left: 5px;
+    .create-btn {
+      .fr-btn {
+        margin: 5px 0;
+        box-sizing: content-box;
+        padding: 0px 10px;
+        justify-content: center;
+
+        &:after {
+          content: "";
+          display: inline-block;
+          background: url("/icons/dashboard/arrow-s-line.svg");
+          width: 16px;
+          height: 16px;
+          margin-left: 5px;
+        }
       }
     }
+
+    .filter-btn {
+      .fr-btn {
+        margin: 5px 0;
+        width: 180px;
+        justify-content: center;
+        box-sizing: content-box;
+        padding: 0px;
+        &:after {
+          content: "";
+          display: inline-block;
+          background: url("/icons/dashboard/icon-filter.svg");
+          width: 16px;
+          height: 16px;
+          margin-left: 5px;
+        }
+      }
+    }
+
     @include desktop {
       flex-direction: row;
       margin: 0 0 2.5rem 0.5rem;
-
-      .fr-btn {
-        margin: 5px 20px;
+      .filter-btn {
+        .fr-btn {
+          margin: 5px 20px;
+        }
       }
     }
   }

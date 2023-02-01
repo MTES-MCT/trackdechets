@@ -13,7 +13,6 @@ import {
   BlankslateDescription,
   Loader,
 } from "common/components";
-import { BSDDropdown } from "dashboard/components/BSDList/BSDDropdown";
 import {
   blankstate_action_desc,
   blankstate_action_title,
@@ -28,13 +27,18 @@ import {
   breadcrumb_pour_action,
   breadcrumb_suivi,
   breadcrumb_title,
+  dropdown_create_btn,
   filter_reset_btn,
   filter_show_btn,
   load_more_bsds,
 } from "assets/wordings/dashboard/wordingsDashboard";
 import { IconDuplicateFile } from "common/components/Icons";
 import Filters from "Apps/Dashboard/Components/Filters/Filters";
-import { filterList } from "Apps/Dashboard/dashboardUtils";
+import {
+  filterList,
+  dropdownCreateLinks,
+} from "../Apps/Dashboard/dashboardUtils";
+import BsdCreateDropdown from "../Apps/Dashboard/Components/DropdownMenu/DropdownMenu";
 
 import "./dashboard.scss";
 
@@ -232,17 +236,25 @@ const DashboardPage = () => {
         </BreadcrumbItem>
         <BreadcrumbItem>{getBreadcrumbItem()}</BreadcrumbItem>
       </Breadcrumb>
-      <div className="dashboard-page__bsd-dropdown">
-        <BSDDropdown siret={siret} />
-        <button
-          type="button"
-          className="fr-btn fr-btn--secondary"
-          aria-expanded={isFiltersOpen}
-          onClick={toggleFiltersBlock}
-          disabled={loading}
-        >
-          {!isFiltersOpen ? filter_show_btn : filter_reset_btn}
-        </button>
+      <div className="dashboard-page__actions">
+        <div className="create-btn">
+          <BsdCreateDropdown
+            links={dropdownCreateLinks(siret)}
+            isDisabled={loading}
+            menuTitle={dropdown_create_btn}
+          />
+        </div>
+        <div className="filter-btn">
+          <button
+            type="button"
+            className="fr-btn fr-btn--secondary"
+            aria-expanded={isFiltersOpen}
+            onClick={toggleFiltersBlock}
+            disabled={loading}
+          >
+            {!isFiltersOpen ? filter_show_btn : filter_reset_btn}
+          </button>
+        </div>
       </div>
       {isFiltersOpen && (
         <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />

@@ -121,3 +121,11 @@ export const max_filter_autorized_label =
   "Vous avez atteint le nombre de filtres maximum";
 export const sr_btn_delete_filter_line = "supprimer un filtre";
 export const sr_btn_add_filter_line = "ajouter un filtre";
+
+// create dropdown
+export const dropdown_create_btn = "Créer un bordereau";
+export const dropdown_create_bsdd = "Déchets dangereux";
+export const dropdown_create_bsda = "Amiante";
+export const dropdown_create_bsdasri = "DASRI";
+export const dropdown_create_bsvhu = "Véhicule Hors d’Usage";
+export const dropdown_create_bsff = "Flux Frigorifique";

@@ -4,7 +4,7 @@ import Filters from "./Filters";
 import { FilterType } from "./filtersTypes";
 
 export default {
-  title: "COMPONENTS/DASHBOARD/Filters",
+  title: "COMPONENTS/COMMON/Filters",
   component: Filters,
   design: {
     type: "figma",
@@ -25,6 +25,7 @@ Primary.args = {
       order: "type",
       label: "type de bordereau",
       type: FilterType.select,
+      isActive: true,
       options: [
         {
           value: "bsdd",
@@ -41,6 +42,7 @@ Primary.args = {
       order: "wasteCode",
       label: "Code déchet",
       type: FilterType.input,
+      isActive: true,
     },
   ],
   onApplyFilters: () => onApplyFilters(values),
