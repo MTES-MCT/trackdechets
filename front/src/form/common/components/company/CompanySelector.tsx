@@ -455,7 +455,9 @@ export default function CompanySelector({
                   className="td-input"
                   name={`${field.name}.name`}
                   placeholder="Nom"
-                  disabled={!displayForeignCompanyWithUnknownInfos}
+                  disabled={
+                    !!field.value.name && !displayForeignCompanyWithUnknownInfos
+                  }
                 />
               </label>
 
@@ -468,7 +470,10 @@ export default function CompanySelector({
                   className="td-input"
                   name={`${field.name}.address`}
                   placeholder="Adresse"
-                  disabled={!displayForeignCompanyWithUnknownInfos}
+                  disabled={
+                    !!field.value.address &&
+                    !displayForeignCompanyWithUnknownInfos
+                  }
                 />
               </label>
 
