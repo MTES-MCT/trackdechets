@@ -31,13 +31,17 @@ const bsdaRevisionRequestResolvers: BsdaRevisionRequestResolvers = {
     }
     return authoringCompany;
   },
-  bsda: async (parent: BsdaRevisionRequest & { bsdaId: string }) => {
+  bsda: async (
+    parent: BsdaRevisionRequest & { bsdaId: string },
+    _,
+    { dataloaders }
+  ) => {
     const actualBsda = await prisma.bsdaRevisionRequest
       .findUnique({ where: { id: parent.id } })
       .bsda();
     const bsdaFromEvents = await getBsdaFromActivityEvents(
-      parent.bsdaId,
-      parent.createdAt
+      { bsdaId: parent.bsdaId, at: parent.createdAt },
+      { dataloader: dataloaders.events }
     );
     return expandBsdaFromDb({ ...actualBsda, ...bsdaFromEvents });
   }

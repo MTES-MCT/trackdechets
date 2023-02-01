@@ -32,6 +32,7 @@ import sentryReporter from "./common/plugins/sentryReporter";
 import { redisClient } from "./common/redis";
 import { initSentry } from "./common/sentry";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
+import { createEventsDataLoaders } from "./activity-events/dataloader";
 import { createFormDataLoaders } from "./forms/dataloader";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
@@ -85,7 +86,8 @@ export const server = new ApolloServer({
       dataloaders: {
         ...createUserDataLoaders(),
         ...createCompanyDataLoaders(),
-        ...createFormDataLoaders()
+        ...createFormDataLoaders(),
+        ...createEventsDataLoaders()
       }
     };
   },
