@@ -34,13 +34,12 @@ describe("Test the mail job queue", () => {
       body: "Bonjour, ceci est un email de test de Trackdéchets.",
       templateId: templateIds.LAYOUT
     };
-    const drainedPromise = new Promise<void>(resolve =>
-      mailQueue.once("global:drained", resolve)
-    );
+
     // add to the queue
-    await sendMail(mail);
-    // wait for the queue to finish
-    await drainedPromise;
+    const job = await sendMail(mail);
+    expect(job).toBeDefined();
+    await job.finished();
+
     // test the job is completed
     const jobs = await mailQueue.getCompleted();
     expect(jobs.length).toEqual(1);
@@ -54,7 +53,7 @@ describe("Test the mail job queue", () => {
     expect(data.body).toContain(
       "Bonjour, ceci est un email de test de Trackdéchets."
     );
-  }, 60000);
+  });
 
   it("fallback to sendMailSync when queue is broken which directly call axios.post", async () => {
     // mocking the redis queue is down

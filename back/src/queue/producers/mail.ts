@@ -32,7 +32,7 @@ export const mailQueue = new Queue(`${QUEUE_NAME_SENDMAIL}`, `${REDIS_URL}`, {
 export const addToMailQueue = async (
   jobData: Mail,
   options?: JobOptions
-): Promise<void> => {
+): Promise<Queue.Job<Mail>> => {
   // default options can be overwritten by the calling function
   const jobOptions: JobOptions = {
     attempts: 3,
@@ -41,7 +41,7 @@ export const addToMailQueue = async (
     timeout: 10000,
     ...options
   };
-  await mailQueue.add(jobData, jobOptions);
+  return mailQueue.add(jobData, jobOptions);
 };
 
 /**
