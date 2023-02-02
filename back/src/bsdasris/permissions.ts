@@ -107,11 +107,21 @@ export async function checkCanDeleteBsdasri(user: User, bsdasri: Bsdasri) {
     "Vous n'êtes pas autorisé à supprimer ce bordereau."
   );
 
-  if (bsdasri.status !== BsdasriStatus.INITIAL) {
+  const isUserOnlySignatory = async () =>
+    bsdasri.status === BsdasriStatus.SIGNED_BY_PRODUCER &&
+    (await getCachedUserSiretOrVat(user.id)).includes(
+      bsdasri.emitterCompanySiret
+    );
+
+  if (
+    bsdasri.status !== BsdasriStatus.INITIAL &&
+    !(await isUserOnlySignatory())
+  ) {
     throw new ForbiddenError(
       "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés"
     );
   }
+
   // INITIAL dasris should not be synthesized or grouped, but let's keep a safeguard here
   if (!!bsdasri.synthesizedInId || !!bsdasri.groupedInId) {
     throw new ForbiddenError(
