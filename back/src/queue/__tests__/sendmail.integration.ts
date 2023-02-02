@@ -46,7 +46,7 @@ describe("Test the mail job queue", () => {
     // test the job is completed
     const jobs = await mailQueue.getCompleted();
     expect(jobs.length).toEqual(completedBeforeSend + 1);
-    const { data } = [...jobs].reverse()[0];
+    const { data } = jobs[0];
     // assert parameters values
     // to right person
     expect(data.to[0].email).toEqual("test@trackdechets.local");
