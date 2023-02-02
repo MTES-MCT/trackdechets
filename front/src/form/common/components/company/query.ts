@@ -34,6 +34,13 @@ export const FAVORITES = gql`
       vhuAgrementBroyeur {
         agrementNumber
       }
+      workerCertification {
+        hasSubSectionFour
+        hasSubSectionThree
+        certificationNumber
+        validityLimit
+        organisation
+      }
     }
   }
 `;

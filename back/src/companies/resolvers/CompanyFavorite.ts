@@ -41,6 +41,11 @@ const companyFavoriteResolvers: CompanyFavoriteResolvers = {
         where: whereSiretOrVatNumber(parent as CompanyBaseIdentifiers)
       })
       .vhuAgrementDemolisseur();
+  },
+  workerCertification: parent => {
+    return prisma.company
+      .findUnique({ where: { orgId: parent.orgId } })
+      .workerCertification();
   }
 };
 
