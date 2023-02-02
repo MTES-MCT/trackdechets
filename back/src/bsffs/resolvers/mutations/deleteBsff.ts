@@ -1,4 +1,3 @@
-import { UserInputError } from "apollo-server-express";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { expandBsffFromDB } from "../../converter";
