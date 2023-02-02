@@ -5,6 +5,7 @@ import { Mail } from "../../mailer/types";
 import * as producer from "../producers/mail";
 import { mailQueue } from "../producers/mail";
 import { backend } from "../../mailer";
+import { resetCache } from "../../../integration-tests/helper";
 
 // Intercept calls
 const mockedSendMailBackend = jest.spyOn(backend, "sendMail");
@@ -23,6 +24,8 @@ describe("Test the mail job queue", () => {
     mockedSendMailSync.mockClear();
   });
 
+  afterAll(resetCache);
+
   it("sends the mail using the mail job queue", async () => {
     // create the fake email
     const mail: Mail = {
@@ -37,12 +40,13 @@ describe("Test the mail job queue", () => {
     const completedBeforeSend = await mailQueue.getCompletedCount();
     // add to the queue
     await sendMail(mail);
+
     // wait for the queue to finish
     await drainedPromise;
     // test the job is completed
     const jobs = await mailQueue.getCompleted();
     expect(jobs.length).toEqual(completedBeforeSend + 1);
-    const { data } = jobs[0];
+    const { data } = [...jobs].reverse()[0];
     // assert parameters values
     // to right person
     expect(data.to[0].email).toEqual("test@trackdechets.local");
