@@ -73,6 +73,10 @@ export default function CompanySelector({
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
   const [field] = useField<FormCompany>({ name });
+  const [selectedCompanyDetails, setSelectedCompanyDetails] = useState({
+    name: field.value?.name,
+    address: field.value?.address,
+  });
   const { setFieldError, setFieldValue, setFieldTouched } = useFormikContext();
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
@@ -202,6 +206,11 @@ export default function CompanySelector({
     });
     setFieldTouched(`${field.name}`, true, true);
     onCompanySelected?.(company);
+
+    setSelectedCompanyDetails({
+      name: company.name,
+      address: company.address,
+    });
   }
 
   /**
@@ -456,7 +465,8 @@ export default function CompanySelector({
                   name={`${field.name}.name`}
                   placeholder="Nom"
                   disabled={
-                    !!field.value.name && !displayForeignCompanyWithUnknownInfos
+                    !!selectedCompanyDetails.name &&
+                    !displayForeignCompanyWithUnknownInfos
                   }
                 />
               </label>
@@ -471,7 +481,7 @@ export default function CompanySelector({
                   name={`${field.name}.address`}
                   placeholder="Adresse"
                   disabled={
-                    !!field.value.address &&
+                    !!selectedCompanyDetails.address &&
                     !displayForeignCompanyWithUnknownInfos
                   }
                 />
