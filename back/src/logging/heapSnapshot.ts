@@ -24,34 +24,37 @@ export async function heapSnapshotToS3Router(req: Request, res: Response) {
   // Return early so that the heavy work is done in background (avoiding the 1min HTTP timeout)
   res.status(202).send(fileName);
 
-  const fileStream = createWriteStream(fileName);
-  const snapshotStream = v8.getHeapSnapshot();
-  snapshotStream.pipe(fileStream);
+  // Break execution to allow http response to be sent
+  setTimeout(async () => {
+    const fileStream = createWriteStream(fileName);
+    const snapshotStream = v8.getHeapSnapshot();
+    snapshotStream.pipe(fileStream);
 
-  try {
-    const parallelUploads3 = new Upload({
-      client: new S3Client({
-        endpoint: process.env.S3_ENDPOINT,
-        region: process.env.S3_REGION,
-        credentials: {
-          accessKeyId: process.env.S3_ACCESS_KEY_ID,
-          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
-        }
-      }),
-      params: {
-        Bucket: process.env.S3_BUCKET,
-        Key: fileName,
-        Body: snapshotStream
-      },
-      leavePartsOnError: false
-    });
+    try {
+      const parallelUploads3 = new Upload({
+        client: new S3Client({
+          endpoint: process.env.S3_ENDPOINT,
+          region: process.env.S3_REGION,
+          credentials: {
+            accessKeyId: process.env.S3_ACCESS_KEY_ID,
+            secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+          }
+        }),
+        params: {
+          Bucket: process.env.S3_BUCKET,
+          Key: fileName,
+          Body: snapshotStream
+        },
+        leavePartsOnError: false
+      });
 
-    parallelUploads3.on("httpUploadProgress", progress => {
-      logger.info(progress);
-    });
+      parallelUploads3.on("httpUploadProgress", progress => {
+        logger.info(progress);
+      });
 
-    await parallelUploads3.done();
-  } catch (e) {
-    logger.error("Error while uploading heapdump", e);
-  }
+      await parallelUploads3.done();
+    } catch (e) {
+      logger.error("Error while uploading heapdump", e);
+    }
+  });
 }
