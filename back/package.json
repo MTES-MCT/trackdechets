@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "postinstall": "patch-package",
     "predev": "npm run generate",
     "dev": "npm run watch:all",
     "watch:all": "concurrently -k -p \"[{name}]\" -n \"Api,Queue,Notifier\" -c \"yellow.bold,cyan.bold,blue.bold\" \"npm run watch:node\" \"npm run watch:queue\" \"npm run watch:notifier\"",
@@ -112,6 +113,7 @@
     "passport-http-bearer": "^1.0.1",
     "passport-local": "^1.0.0",
     "passport-oauth2-client-password": "^0.1.2",
+    "patch-package": "^6.5.1",
     "pg": "^8.5.1",
     "postgres-migrations": "^5.1.0",
     "prisma": "^4.6.1",

@@ -1,0 +1,15 @@
+diff --git a/node_modules/graphql-tag/lib/index.js b/node_modules/graphql-tag/lib/index.js
+index 81db598..88ebc9c 100644
+--- a/node_modules/graphql-tag/lib/index.js
++++ b/node_modules/graphql-tag/lib/index.js
+@@ -1,7 +1,8 @@
+ import { __assign } from "tslib";
+ import { parse } from 'graphql';
+-var docCache = new Map();
+-var fragmentSourceMap = new Map();
++import LRUCache from "lru-cache";
++var docCache = new LRUCache({max: 500});
++var fragmentSourceMap = new LRUCache({max: 500});
+ var printFragmentWarnings = true;
+ var experimentalFragmentVariables = false;
+ function normalize(string) {
