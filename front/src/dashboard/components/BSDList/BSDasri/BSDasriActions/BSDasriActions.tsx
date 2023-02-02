@@ -41,6 +41,12 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
 
+  const emitterSiret = form.emitter?.company?.siret;
+  const canDelete =
+    form["bsdasriStatus"] === BsdasriStatus.Initial ||
+    (form["bsdasriStatus"] === BsdasriStatus.SignedByProducer &&
+      siret === emitterSiret);
+
   return (
     <>
       <Menu>
@@ -81,7 +87,7 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
 
               <TableRoadControlButton siret={siret} form={form} />
 
-              {form["bsdasriStatus"] === BsdasriStatus.Initial && (
+              {canDelete && (
                 <MenuItem onSelect={() => setIsDeleting(true)}>
                   <IconTrash color="blueLight" size="24px" />
                   Supprimer
