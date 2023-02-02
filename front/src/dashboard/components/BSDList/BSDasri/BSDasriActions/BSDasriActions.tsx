@@ -41,11 +41,11 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
 
+  const status = form["bsdasriStatus"];
   const emitterSiret = form.emitter?.company?.siret;
   const canDelete =
-    form["bsdasriStatus"] === BsdasriStatus.Initial ||
-    (form["bsdasriStatus"] === BsdasriStatus.SignedByProducer &&
-      siret === emitterSiret);
+    status === BsdasriStatus.Initial ||
+    (status === BsdasriStatus.SignedByProducer && siret === emitterSiret);
 
   return (
     <>
@@ -100,7 +100,7 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
                 </MenuItem>
               )}
               {![BsdasriStatus.Processed, BsdasriStatus.Refused].includes(
-                form["bsdasriStatus"]
+                status
               ) && (
                 <>
                   <MenuLink

@@ -42,6 +42,14 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
 
+  const emitterSiret = form.emitter?.company?.siret;
+
+  const status = form["bsvhuStatus"];
+
+  const canDelete =
+    status === BsvhuStatus.Initial ||
+    (status === BsvhuStatus.SignedByProducer && siret === emitterSiret);
+
   return (
     <>
       <Menu>
@@ -88,7 +96,7 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
                 </MenuItem>
               )}
               {![BsvhuStatus.Processed, BsvhuStatus.Refused].includes(
-                form["bsvhuStatus"]
+                status
               ) && (
                 <>
                   <MenuLink
@@ -107,7 +115,7 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
                 <IconDuplicateFile size="24px" color="blueLight" />
                 Dupliquer
               </MenuItem>
-              {form["bsvhuStatus"] === BsvhuStatus.Initial && (
+              {canDelete && (
                 <MenuItem onSelect={() => setIsDeleting(true)}>
                   <IconTrash color="blueLight" size="24px" />
                   Supprimer
