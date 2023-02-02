@@ -296,6 +296,14 @@ export default function CompanySelector({
     allowForeignCompanies,
   ]);
 
+  // Disable the name field for foreign companies whose name is filled
+  const disableNameField =
+    !!selectedCompanyDetails.name && !displayForeignCompanyWithUnknownInfos;
+
+  // Disable the address field for foreign companies whose address is filled
+  const disableAddressField =
+    !!selectedCompanyDetails.address && !displayForeignCompanyWithUnknownInfos;
+
   return (
     <>
       {favoritesError && (
@@ -464,10 +472,7 @@ export default function CompanySelector({
                   className="td-input"
                   name={`${field.name}.name`}
                   placeholder="Nom"
-                  disabled={
-                    !!selectedCompanyDetails.name &&
-                    !displayForeignCompanyWithUnknownInfos
-                  }
+                  disabled={disableNameField}
                 />
               </label>
 
@@ -480,10 +485,7 @@ export default function CompanySelector({
                   className="td-input"
                   name={`${field.name}.address`}
                   placeholder="Adresse"
-                  disabled={
-                    !!selectedCompanyDetails.address &&
-                    !displayForeignCompanyWithUnknownInfos
-                  }
+                  disabled={disableAddressField}
                 />
               </label>
 
