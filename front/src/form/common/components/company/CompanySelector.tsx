@@ -543,6 +543,7 @@ function favoriteToCompanySearchResult(
     brokerReceipt: company.brokerReceipt,
     vhuAgrementDemolisseur: company.vhuAgrementDemolisseur,
     vhuAgrementBroyeur: company.vhuAgrementBroyeur,
+    workerCertification: company.workerCertification,
     codePaysEtrangerEtablissement:
       company.codePaysEtrangerEtablissement || "FR",
     contact: company.contact,
