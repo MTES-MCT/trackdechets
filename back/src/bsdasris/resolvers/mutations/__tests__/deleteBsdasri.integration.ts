@@ -140,7 +140,7 @@ describe("Mutation.deleteBsdasri", () => {
     expect(deletedBsdasri.isDeleted).toBe(true);
   });
 
-  it("should disallow emitter to delete a bsff with transporteur signature", async () => {
+  it("should disallow emitter to delete a bsdasri with transporteur signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const bsdasri = await bsdasriFactory({
