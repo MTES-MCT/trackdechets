@@ -12,7 +12,7 @@ import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { UserInputError } from "apollo-server-core";
 import { getBsffPackagingRepository } from "../../repository";
 import { Prisma } from "@prisma/client";
-import { SealedFieldError } from "./updateBsff";
+import { SealedFieldError } from "../../../common/errors";
 
 const updateBsffPackaging: MutationResolvers["updateBsffPackaging"] = async (
   _,

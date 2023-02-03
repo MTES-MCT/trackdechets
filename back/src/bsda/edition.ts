@@ -1,5 +1,6 @@
 import { Bsda, IntermediaryBsdaAssociation, User } from "@prisma/client";
-import { ForbiddenError } from "apollo-server-core";
+import { safeInput } from "../common/converter";
+import { SealedFieldError } from "../common/errors";
 import { getCachedUserSiretOrVat } from "../common/redis/users";
 import { objectDiff } from "../forms/workflow/diff";
 import { BsdaInput, BsdaSignatureType } from "../generated/graphql/types";
@@ -186,12 +187,12 @@ function getUpdatedFields(
 ): string[] {
   const updatedFields = [];
 
-  const flatInput = {
+  const flatInput = safeInput({
     ...flattenBsdaInput(input),
     grouping: input.grouping,
     forwarding: input.forwarding,
     intermediaries: input.intermediaries
-  };
+  });
   const { grouping, intermediaries, forwarding, ...bsda } = existingBsda;
 
   // only pick keys present in the input to compute the diff between
@@ -219,16 +220,6 @@ function getUpdatedFields(
   }
 
   return updatedFields;
-}
-
-export class SealedFieldError extends ForbiddenError {
-  constructor(fields: string[]) {
-    super(
-      `Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : ${fields.join(
-        ", "
-      )}`
-    );
-  }
 }
 
 const SIGNATURES_HIERARCHY: {

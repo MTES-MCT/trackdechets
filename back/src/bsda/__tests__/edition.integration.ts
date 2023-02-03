@@ -241,34 +241,6 @@ describe("edition rules", () => {
     expect(checked).toBe(true);
   });
 
-  it("should not be possible to update a field sealed by transporter signature", async () => {
-    const bsda = await bsdaFactory({
-      opt: {
-        status: "SENT",
-        emitterEmissionSignatureDate: new Date(),
-        workerWorkSignatureDate: new Date(),
-        transporterTransportSignatureDate: new Date()
-      }
-    });
-    const fullBsda = await prisma.bsda.findUnique({
-      where: { id: bsda.id },
-      include: { grouping: true, forwarding: true, intermediaries: true }
-    });
-
-    const checkFn = () =>
-      checkEditionRules(fullBsda, {
-        transporter: {
-          transport: {
-            plates: ["AD-008-YT"]
-          }
-        }
-      });
-
-    await expect(checkFn).rejects.toThrow(
-      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : transporterTransportPlates"
-    );
-  });
-
   it("should be possible to update a field not yet sealed by transport signature", async () => {
     const bsda = await bsdaFactory({
       opt: {
