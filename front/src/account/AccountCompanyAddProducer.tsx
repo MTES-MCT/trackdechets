@@ -194,6 +194,28 @@ export default function AccountCompanyAddProducer() {
                     </Field>
                   )}
 
+                  <div className={styles.alertWrapper}>
+                    <Alert
+                      severity="info"
+                      title="Information"
+                      description={
+                        <>
+                          Ce profil comprend le transport de mes déchets dans
+                          les conditions de{" "}
+                          <a
+                            href="https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000044266537/"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="fr-link"
+                          >
+                            l'article R.541-50 du code de l'environnement
+                          </a>
+                          .
+                        </>
+                      }
+                    />
+                  </div>
+
                   <Field name="willManageDasris">
                     {({ field }) => {
                       return (
