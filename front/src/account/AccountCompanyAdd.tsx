@@ -28,12 +28,14 @@ import {
   isFRVat,
   isSiret,
   isVat,
+  isForeignVat,
 } from "generated/constants/companySearchHelpers";
 import {
   CREATE_WORKER_CERTIFICATION,
   UPDATE_COMPANY_WORKER_CERTIFICATION,
 } from "./fields/forms/AccountFormCompanyWorkerCertification";
 import DateInput from "form/common/components/custom-inputs/DateInput";
+import { Container, Row, Col, Alert, Button } from "@dataesr/react-dsfr";
 
 export const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
@@ -383,533 +385,585 @@ export default function AccountCompanyAdd() {
     return [];
   }
 
+  const isForeignCompany =
+    companyInfos?.vatNumber && isForeignVat(companyInfos.vatNumber);
+
   return (
-    <div className="panel">
-      <h5 className={styles.subtitle}>Identification</h5>
-      <AccountCompanyAddSiret
-        {...{
-          onCompanyInfos: companyInfos => setCompanyInfos(companyInfos),
-        }}
-      />
-      {companyInfos && !companyInfos.isRegistered && (
-        <Formik<Values>
-          initialValues={{
-            siret: companyInfos?.siret ?? "",
-            vatNumber: companyInfos?.vatNumber ?? "",
-            companyName: companyInfos?.name ?? "",
-            givenName: "",
-            address: companyInfos?.address ?? "",
-            companyTypes: initCompanyTypes(companyInfos),
-            gerepId: companyInfos?.installation?.codeS3ic ?? "",
-            codeNaf: companyInfos?.naf ?? "",
-            isAllowed: false,
-            willManageDasris: false,
-            allowBsdasriTakeOverWithoutSignature: null,
-            transporterReceiptNumber: "",
-            transporterReceiptValidity: "",
-            transporterReceiptDepartment: "",
-            traderReceiptNumber: "",
-            traderReceiptValidity: "",
-            traderReceiptDepartment: "",
-            brokerReceiptNumber: "",
-            brokerReceiptValidity: "",
-            brokerReceiptDepartment: "",
-            vhuAgrementBroyeurNumber: "",
-            vhuAgrementBroyeurDepartment: "",
-            vhuAgrementDemolisseurNumber: "",
-            vhuAgrementDemolisseurDepartment: "",
-            ecoOrganismeAgreements: [],
-            hasSubSectionFour: false,
-            hasSubSectionThree: false,
-            certificationNumber: "",
-            validityLimit: null,
-            organisation: "",
-          }}
-          validate={values => {
-            // whether or not one of the transporter receipt field is set
-            const anyTransporterReceipField =
-              !!values.transporterReceiptNumber ||
-              !!values.transporterReceiptValidity ||
-              !!values.transporterReceiptDepartment;
-
-            const isTransporter_ = isTransporter(values.companyTypes);
-
-            // whether or not one of the trader receipt field is set
-            const anyTraderReceipField =
-              !!values.traderReceiptNumber ||
-              !!values.traderReceiptValidity ||
-              !!values.traderReceiptDepartment;
-
-            const isTrader_ = isTrader(values.companyTypes);
-
-            // whether or not one of the broker receipt field is set
-            const anyBrokerReceipField =
-              !!values.brokerReceiptNumber ||
-              !!values.brokerReceiptValidity ||
-              !!values.brokerReceiptDepartment;
-
-            const isBroker_ = isBroker(values.companyTypes);
-
-            return {
-              ...(!values.companyName && {
-                companyName: "Champ obligatoire",
-              }),
-              ...(!values.address && {
-                address: "Champ obligatoire",
-              }),
-              ...(values.willManageDasris &&
-                values.allowBsdasriTakeOverWithoutSignature === null && {
-                  allowBsdasriTakeOverWithoutSignature:
-                    "Si établissement est susceptible de produire des DASRI, ce choix est obligatoire",
-                }),
-              ...(values.companyTypes.length === 0 && {
-                companyTypes: "Vous devez préciser le type d'établissement",
-              }),
-              ...(!values.isAllowed && {
-                isAllowed:
-                  "Vous devez certifier être autorisé à créer ce compte pour votre entreprise",
-              }),
-              ...((isFRVat(values.vatNumber) ||
-                (!isSiret(
-                  values.siret,
-                  import.meta.env.VITE_ALLOW_TEST_COMPANY
-                ) &&
-                  !isVat(values.vatNumber))) && {
-                siret:
-                  "Le SIRET ou le numéro de TVA intracommunautaire doit être valides. (seuls les caractères alphanumériques sont acceptés, pas d'espaces ni de signes de ponctuation)",
-              }),
-              ...(anyTransporterReceipField &&
-                isTransporter_ &&
-                !values.transporterReceiptNumber && {
-                  transporterReceiptNumber: "Champ obligatoire",
-                }),
-              ...(anyTransporterReceipField &&
-                isTransporter_ &&
-                !values.transporterReceiptValidity && {
-                  transporterReceiptValidity: "Champ obligatoire",
-                }),
-              ...(anyTraderReceipField &&
-                isTrader_ &&
-                !values.traderReceiptDepartment && {
-                  traderReceiptDepartment: "Champ obligatoire",
-                }),
-              ...(anyTraderReceipField &&
-                isTrader_ &&
-                !values.traderReceiptNumber && {
-                  traderReceiptNumber: "Champ obligatoire",
-                }),
-              ...(anyTraderReceipField &&
-                isTrader_ &&
-                !values.traderReceiptValidity && {
-                  traderReceiptValidity: "Champ obligatoire",
-                }),
-              ...(anyTraderReceipField &&
-                isTrader_ &&
-                !values.traderReceiptDepartment && {
-                  traderReceiptDepartment: "Champ obligatoire",
-                }),
-              ...(anyBrokerReceipField &&
-                isBroker_ &&
-                !values.brokerReceiptDepartment && {
-                  brokerReceiptDepartment: "Champ obligatoire",
-                }),
-              ...(anyBrokerReceipField &&
-                isBroker_ &&
-                !values.brokerReceiptNumber && {
-                  brokerReceiptNumber: "Champ obligatoire",
-                }),
-              ...(anyBrokerReceipField &&
-                isBroker_ &&
-                !values.brokerReceiptValidity && {
-                  brokerReceiptValidity: "Champ obligatoire",
-                }),
-              ...(anyBrokerReceipField &&
-                isBroker_ &&
-                !values.brokerReceiptDepartment && {
-                  brokerReceiptDepartment: "Champ obligatoire",
-                }),
-              ...(isEcoOrganisme(values.companyTypes) &&
-                values.ecoOrganismeAgreements.length < 1 && {
-                  ecoOrganismeAgreements: "Champ obligatoire",
-                }),
-              ...(values.hasSubSectionThree &&
-                !values.certificationNumber && {
-                  certificationNumber: "Champ obligatoire",
-                }),
-              ...(values.hasSubSectionThree &&
-                !values.validityLimit && {
-                  validityLimit: "Champ obligatoire",
-                }),
-              ...(values.hasSubSectionThree &&
-                !values.organisation && {
-                  organisation: "Champ obligatoire",
-                }),
-            };
-          }}
-          onSubmit={onSubmit}
-        >
-          {({ values, setFieldValue, isSubmitting }) => (
-            <Form className={styles.companyAddForm}>
-              <div className={styles.field}>
-                <label className={`text-right ${styles.bold}`}>
-                  Raison sociale
-                </label>
-
-                <div className={styles.field__value}>
-                  {companyInfos?.name || (
+    <Container fluid className={styles.container}>
+      <Row spacing="mb-2w">
+        <Col n="12">
+          <h5 className={styles.subtitle}>Identification</h5>
+          <AccountCompanyAddSiret
+            {...{
+              onCompanyInfos: companyInfos => setCompanyInfos(companyInfos),
+            }}
+          />
+          {companyInfos && !companyInfos.isRegistered && isForeignCompany && (
+            <>
+              <div className={styles.alertWrapper}>
+                <Alert
+                  type="error"
+                  title="Cet établissement n'est pas immatriculé en France"
+                  description={
                     <>
-                      <Field
-                        type="text"
-                        name="companyName"
-                        className={`td-input ${styles.textField}`}
-                        disabled={!!companyInfos?.name}
-                      />
-                      <RedErrorMessage name="companyName" />
+                      Votre entreprise n'est pas immatriculée en France, mais
+                      vous transportez des déchets dangereux sur le territoire
+                      français. Vous devez passer par la création de
+                      transporteur étranger.
+                      <br />
+                      Your company is not registered in France but you are
+                      transporting hazardous waste on french territory. You must
+                      create a foreign transporter.
                     </>
-                  )}
-                </div>
+                  }
+                />
               </div>
+              <Button
+                tertiary
+                onClick={() => {
+                  history.push({
+                    pathname: routes.account.companies.create.foreign,
+                    state: { vatNumber: companyInfos.vatNumber },
+                  });
+                }}
+              >
+                Créer un transporteur étranger / Create a foreign transporter
+              </Button>
+            </>
+          )}
+          {companyInfos && !isForeignCompany && !companyInfos.isRegistered && (
+            <Formik<Values>
+              initialValues={{
+                siret: companyInfos?.siret ?? "",
+                vatNumber: companyInfos?.vatNumber ?? "",
+                companyName: companyInfos?.name ?? "",
+                givenName: "",
+                address: companyInfos?.address ?? "",
+                companyTypes: initCompanyTypes(companyInfos),
+                gerepId: companyInfos?.installation?.codeS3ic ?? "",
+                codeNaf: companyInfos?.naf ?? "",
+                isAllowed: false,
+                willManageDasris: false,
+                allowBsdasriTakeOverWithoutSignature: null,
+                transporterReceiptNumber: "",
+                transporterReceiptValidity: "",
+                transporterReceiptDepartment: "",
+                traderReceiptNumber: "",
+                traderReceiptValidity: "",
+                traderReceiptDepartment: "",
+                brokerReceiptNumber: "",
+                brokerReceiptValidity: "",
+                brokerReceiptDepartment: "",
+                vhuAgrementBroyeurNumber: "",
+                vhuAgrementBroyeurDepartment: "",
+                vhuAgrementDemolisseurNumber: "",
+                vhuAgrementDemolisseurDepartment: "",
+                ecoOrganismeAgreements: [],
+                hasSubSectionFour: false,
+                hasSubSectionThree: false,
+                certificationNumber: "",
+                validityLimit: null,
+                organisation: "",
+              }}
+              validate={values => {
+                // whether or not one of the transporter receipt field is set
+                const anyTransporterReceipField =
+                  !!values.transporterReceiptNumber ||
+                  !!values.transporterReceiptValidity ||
+                  !!values.transporterReceiptDepartment;
 
-              <div className={styles.field}>
-                <label className={`text-right ${styles.bold}`}>
-                  Nom usuel{" "}
-                  <Tooltip msg="Nom usuel de l'établissement qui permet de différencier plusieurs établissements ayant la même raison sociale" />
-                  (optionnel)
-                </label>
-                <div className={styles.field__value}>
-                  <Field
-                    type="text"
-                    name="givenName"
-                    className={`td-input ${styles.textField}`}
-                  />
-                </div>
-              </div>
+                const isTransporter_ = isTransporter(values.companyTypes);
 
-              <div className={styles.field}>
-                <label className={`text-right ${styles.bold}`}>Code NAF</label>
-                <div className={styles.field__value}>
-                  {companyInfos?.naf ? (
-                    `${companyInfos?.naf} - ${companyInfos?.libelleNaf}`
-                  ) : (
-                    <Field
-                      type="text"
-                      name="codeNaf"
-                      className={`td-input ${styles.textField}`}
-                      disabled={isForcedTransporter(companyInfos)}
-                    />
-                  )}
-                </div>
-              </div>
+                // whether or not one of the trader receipt field is set
+                const anyTraderReceipField =
+                  !!values.traderReceiptNumber ||
+                  !!values.traderReceiptValidity ||
+                  !!values.traderReceiptDepartment;
 
-              <div className={styles.field}>
-                <label className={`text-right ${styles.bold}`}>Adresse</label>
-                <div className={styles.field__value}>
-                  {companyInfos?.address || (
-                    <>
-                      <Field
-                        type="text"
-                        name="address"
-                        className={`td-input ${styles.textField}`}
-                        disabled={!!companyInfos?.address}
-                      />
-                      <RedErrorMessage name="address" />
-                    </>
-                  )}
-                </div>
-              </div>
+                const isTrader_ = isTrader(values.companyTypes);
 
-              <h5 className={styles.subtitle}>Activité</h5>
+                // whether or not one of the broker receipt field is set
+                const anyBrokerReceipField =
+                  !!values.brokerReceiptNumber ||
+                  !!values.brokerReceiptValidity ||
+                  !!values.brokerReceiptDepartment;
 
-              <div className={styles.field}>
-                <label className={`text-right ${styles.bold}`}>Profil</label>
-                <div className={styles.field__value}>
-                  {isForcedTransporter(companyInfos) ? (
-                    <Field
-                      name="companyTypes"
-                      value={[_CompanyType.Transporter]}
-                      component={CompanyType}
-                      disabled={true}
-                    />
-                  ) : (
-                    <Field name="companyTypes" component={CompanyType} />
-                  )}
-                  <RedErrorMessage name="companyTypes" />
-                </div>
-              </div>
+                const isBroker_ = isBroker(values.companyTypes);
 
-              {isTransporter(values.companyTypes) && (
-                <AccountCompanyAddTransporterReceipt />
-              )}
-
-              {isWorker(values.companyTypes) && (
-                <>
-                  <div className={styles.workerCertif}>
-                    <div className={styles.workerCertifItem}>
-                      <label>Travaux relevant de la sous-section 4</label>
-                      <Field
-                        type="checkbox"
-                        name="hasSubSectionFour"
-                        className="td-checkbox"
-                      />
-                    </div>
-                    <div className={styles.workerCertifItem}>
-                      <label>
-                        Travaux relevant de la sous-section 3{" "}
-                        <Tooltip msg="Ce profil correspond à une entreprise disposant d'une certification Amiante (NFX 46-010)" />
-                      </label>
-                      <Field
-                        type="checkbox"
-                        name="hasSubSectionThree"
-                        className="td-checkbox"
-                      />
-                    </div>
-                    <div className={styles.workCertifSubSectionThree}>
-                      {values.hasSubSectionThree && (
-                        <div>
-                          <div>
-                            <label>N° certification</label>
-                            <Field
-                              type="text"
-                              name="certificationNumber"
-                              className="td-input"
-                            />
-                            <RedErrorMessage name="certificationNumber" />
-                          </div>
-                          <div>
-                            <label>Date de validité</label>
-                            <Field
-                              name="validityLimit"
-                              component={DateInput}
-                              className="td-input td-date"
-                            />
-                            <RedErrorMessage name="validityLimit" />
-                          </div>
-                          <div>
-                            <label>Organisme</label>
-                            <Field
-                              as="select"
-                              name="organisation"
-                              className="td-select"
-                            >
-                              <option value="...">
-                                Sélectionnez une valeur...
-                              </option>
-                              <option value="AFNOR Certification">
-                                AFNOR Certification
-                              </option>
-                              <option value="GLOBAL CERTIFICATION">
-                                GLOBAL CERTIFICATION
-                              </option>
-                              <option value="QUALIBAT">QUALIBAT</option>
-                            </Field>
-                            <RedErrorMessage name="organisation" />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {isTrader(values.companyTypes) && (
-                <AccountCompanyAddTraderReceipt />
-              )}
-
-              {isBroker(values.companyTypes) && (
-                <AccountCompanyAddBrokerReceipt />
-              )}
-
-              {isEcoOrganisme(values.companyTypes) && (
-                <AccountCompanyAddEcoOrganisme />
-              )}
-
-              {isVhu(values.companyTypes) && <AccountCompanyAddVhuAgrement />}
-
-              {!isForcedTransporter(companyInfos) && (
-                <>
+                return {
+                  ...(!values.companyName && {
+                    companyName: "Champ obligatoire",
+                  }),
+                  ...(!values.address && {
+                    address: "Champ obligatoire",
+                  }),
+                  ...(values.willManageDasris &&
+                    values.allowBsdasriTakeOverWithoutSignature === null && {
+                      allowBsdasriTakeOverWithoutSignature:
+                        "Si établissement est susceptible de produire des DASRI, ce choix est obligatoire",
+                    }),
+                  ...(values.companyTypes.length === 0 && {
+                    companyTypes: "Vous devez préciser le type d'établissement",
+                  }),
+                  ...(!values.isAllowed && {
+                    isAllowed:
+                      "Vous devez certifier être autorisé à créer ce compte pour votre entreprise",
+                  }),
+                  ...((isFRVat(values.vatNumber) ||
+                    (!isSiret(
+                      values.siret,
+                      import.meta.env.VITE_ALLOW_TEST_COMPANY
+                    ) &&
+                      !isVat(values.vatNumber))) && {
+                    siret:
+                      "Le SIRET ou le numéro de TVA intracommunautaire doit être valides. (seuls les caractères alphanumériques sont acceptés, pas d'espaces ni de signes de ponctuation)",
+                  }),
+                  ...(anyTransporterReceipField &&
+                    isTransporter_ &&
+                    !values.transporterReceiptNumber && {
+                      transporterReceiptNumber: "Champ obligatoire",
+                    }),
+                  ...(anyTransporterReceipField &&
+                    isTransporter_ &&
+                    !values.transporterReceiptValidity && {
+                      transporterReceiptValidity: "Champ obligatoire",
+                    }),
+                  ...(anyTraderReceipField &&
+                    isTrader_ &&
+                    !values.traderReceiptDepartment && {
+                      traderReceiptDepartment: "Champ obligatoire",
+                    }),
+                  ...(anyTraderReceipField &&
+                    isTrader_ &&
+                    !values.traderReceiptNumber && {
+                      traderReceiptNumber: "Champ obligatoire",
+                    }),
+                  ...(anyTraderReceipField &&
+                    isTrader_ &&
+                    !values.traderReceiptValidity && {
+                      traderReceiptValidity: "Champ obligatoire",
+                    }),
+                  ...(anyTraderReceipField &&
+                    isTrader_ &&
+                    !values.traderReceiptDepartment && {
+                      traderReceiptDepartment: "Champ obligatoire",
+                    }),
+                  ...(anyBrokerReceipField &&
+                    isBroker_ &&
+                    !values.brokerReceiptDepartment && {
+                      brokerReceiptDepartment: "Champ obligatoire",
+                    }),
+                  ...(anyBrokerReceipField &&
+                    isBroker_ &&
+                    !values.brokerReceiptNumber && {
+                      brokerReceiptNumber: "Champ obligatoire",
+                    }),
+                  ...(anyBrokerReceipField &&
+                    isBroker_ &&
+                    !values.brokerReceiptValidity && {
+                      brokerReceiptValidity: "Champ obligatoire",
+                    }),
+                  ...(anyBrokerReceipField &&
+                    isBroker_ &&
+                    !values.brokerReceiptDepartment && {
+                      brokerReceiptDepartment: "Champ obligatoire",
+                    }),
+                  ...(isEcoOrganisme(values.companyTypes) &&
+                    values.ecoOrganismeAgreements.length < 1 && {
+                      ecoOrganismeAgreements: "Champ obligatoire",
+                    }),
+                  ...(values.hasSubSectionThree &&
+                    !values.certificationNumber && {
+                      certificationNumber: "Champ obligatoire",
+                    }),
+                  ...(values.hasSubSectionThree &&
+                    !values.validityLimit && {
+                      validityLimit: "Champ obligatoire",
+                    }),
+                  ...(values.hasSubSectionThree &&
+                    !values.organisation && {
+                      organisation: "Champ obligatoire",
+                    }),
+                };
+              }}
+              onSubmit={onSubmit}
+            >
+              {({ values, setFieldValue, isSubmitting }) => (
+                <Form className={styles.companyAddForm}>
                   <div className={styles.field}>
                     <label className={`text-right ${styles.bold}`}>
-                      Identifiant GEREP (optionnel){" "}
-                      <Tooltip msg="Toute installation de traitement classée et reconnue par l’état (ICPE) et toute entreprise produisant plus de 2 tonnes de déchets et/ou 2000 tonnes de déchets non dangereux est tenue de réaliser annuellement une déclaration d’émissions polluantes et de déchets en ligne. Elle peut le faire via l’application ministérielle web GEREP. Pour ce faire, elle dispose d’un identifiant GEREP." />
+                      Raison sociale
                     </label>
-                    <div className={styles.field__value}>
-                      <Field
-                        type="text"
-                        name="gerepId"
-                        className={`td-input ${styles.textField}`}
-                      />
-                    </div>
-                  </div>
 
-                  <div className={classNames(styles.field)}>
-                    <div>
-                      <label className="tw-flex tw-items-center">
-                        <Field
-                          type="checkbox"
-                          name="willManageDasris"
-                          className="td-checkbox"
-                          onChange={() => {
-                            setFieldValue(
-                              "allowBsdasriTakeOverWithoutSignature",
-                              null
-                            );
-                            setFieldValue(
-                              "willManageDasris",
-                              !values.willManageDasris
-                            );
-                          }}
-                        />
-                        Cet établissement est susceptible de produire des DASRI
-                        (déchets d'activité de soins à risques infectieux)
-                      </label>
-                      {values.willManageDasris && (
+                    <div className={styles.field__value}>
+                      {companyInfos?.name || (
                         <>
-                          <div className="form__row">
-                            <fieldset className="tw-flex tw-items-center">
-                              <legend className="tw-font-semibold tw-mb-3">
-                                J'autorise l'emport direct de Dasri
-                              </legend>
-                              <Field
-                                name="allowBsdasriTakeOverWithoutSignature"
-                                checked={
-                                  values.allowBsdasriTakeOverWithoutSignature ===
-                                  true
-                                }
-                                id="Oui"
-                                label="Oui"
-                                component={InlineRadioButton}
-                                onChange={() =>
-                                  setFieldValue(
-                                    "allowBsdasriTakeOverWithoutSignature",
-                                    true
-                                  )
-                                }
-                              />
-                              <Field
-                                name="allowBsdasriTakeOverWithoutSignature"
-                                checked={
-                                  values.allowBsdasriTakeOverWithoutSignature ===
-                                  false
-                                }
-                                id="Non"
-                                label="Non"
-                                component={InlineRadioButton}
-                                onChange={() =>
-                                  setFieldValue(
-                                    "allowBsdasriTakeOverWithoutSignature",
-                                    false
-                                  )
-                                }
-                              />
-                            </fieldset>
-                            <RedErrorMessage name="allowBsdasriTakeOverWithoutSignature" />
-                            <div className="notification tw-mt-2">
-                              <p className="tw-italic">
-                                En cochant "oui", j'atteste avoir signé une
-                                convention avec un collecteur pour mes DASRI et
-                                j'accepte que ce collecteur les prenne en charge
-                                sans ma signature (lors de la collecte) si je ne
-                                suis pas disponible. Dans ce cas, je suis
-                                informé que je pourrai suivre les bordereaux sur
-                                Trackdéchets et disposer de leur archivage sur
-                                la plateforme.
-                              </p>
-                              <p className="tw-italic">
-                                Je pourrai modifier ce choix ultérieurement.
-                              </p>
-                            </div>
-                          </div>
+                          <Field
+                            type="text"
+                            name="companyName"
+                            className={`td-input ${styles.textField}`}
+                            disabled={!!companyInfos?.name}
+                          />
+                          <RedErrorMessage name="companyName" />
                         </>
                       )}
                     </div>
                   </div>
-                </>
-              )}
-              <hr />
-              <div className={styles.field}>
-                <div>
-                  <label className="tw-flex tw-items-center">
-                    <Field
-                      type="checkbox"
-                      name="isAllowed"
-                      className="td-checkbox"
-                    />
-                    Je certifie disposer du pouvoir pour créer un compte au nom
-                    de mon entreprise
-                  </label>
-                  <RedErrorMessage name="isAllowed" />
-                  <div className="notification tw-mt-2">
-                    <p className="tw-italic">
-                      En tant qu'administrateur de l'établissement, j'ai pris
-                      connaissance des{" "}
-                      <a
-                        href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        modalités de gestion des membres
-                      </a>
-                      .
-                    </p>
-                    <p className="tw-italic">
-                      Je m'engage notamment à traiter les éventuelles demandes
-                      de rattachement et à ce que, à tout moment, au moins un
-                      administrateur ait accès à cet établissement dans
-                      Trackdéchets.
-                    </p>
+
+                  <div className={styles.field}>
+                    <label className={`text-right ${styles.bold}`}>
+                      Nom usuel{" "}
+                      <Tooltip msg="Nom usuel de l'établissement qui permet de différencier plusieurs établissements ayant la même raison sociale" />
+                      (optionnel)
+                    </label>
+                    <div className={styles.field__value}>
+                      <Field
+                        type="text"
+                        name="givenName"
+                        className={`td-input ${styles.textField}`}
+                      />
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              <div className={styles["submit-form"]}>
-                <button
-                  className="btn btn--outline-primary"
-                  disabled={isSubmitting}
-                  onClick={() => {
-                    history.goBack();
-                  }}
-                >
-                  Annuler
-                </button>
+                  <div className={styles.field}>
+                    <label className={`text-right ${styles.bold}`}>
+                      Code NAF
+                    </label>
+                    <div className={styles.field__value}>
+                      {companyInfos?.naf ? (
+                        `${companyInfos?.naf} - ${companyInfos?.libelleNaf}`
+                      ) : (
+                        <Field
+                          type="text"
+                          name="codeNaf"
+                          className={`td-input ${styles.textField}`}
+                          disabled={isForcedTransporter(companyInfos)}
+                        />
+                      )}
+                    </div>
+                  </div>
 
-                <button
-                  className="btn btn--primary"
-                  type="submit"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Création..." : "Créer"}
-                </button>
-              </div>
-              {/* // ERRORS */}
-              {createTransporterReceiptError && (
-                <NotificationError
-                  apolloError={createTransporterReceiptError}
-                />
+                  <div className={styles.field}>
+                    <label className={`text-right ${styles.bold}`}>
+                      Adresse
+                    </label>
+                    <div className={styles.field__value}>
+                      {companyInfos?.address || (
+                        <>
+                          <Field
+                            type="text"
+                            name="address"
+                            className={`td-input ${styles.textField}`}
+                            disabled={!!companyInfos?.address}
+                          />
+                          <RedErrorMessage name="address" />
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  <h5 className={styles.subtitle}>Activité</h5>
+
+                  <div className={styles.field}>
+                    <label className={`text-right ${styles.bold}`}>
+                      Profil
+                    </label>
+                    <div className={styles.field__value}>
+                      {isForcedTransporter(companyInfos) ? (
+                        <Field
+                          name="companyTypes"
+                          value={[_CompanyType.Transporter]}
+                          component={CompanyType}
+                          disabled={true}
+                        />
+                      ) : (
+                        <Field name="companyTypes" component={CompanyType} />
+                      )}
+                      <RedErrorMessage name="companyTypes" />
+                    </div>
+                  </div>
+
+                  {isTransporter(values.companyTypes) && (
+                    <AccountCompanyAddTransporterReceipt />
+                  )}
+
+                  {isWorker(values.companyTypes) && (
+                    <>
+                      <div className={styles.workerCertif}>
+                        <div className={styles.workerCertifItem}>
+                          <label>Travaux relevant de la sous-section 4</label>
+                          <Field
+                            type="checkbox"
+                            name="hasSubSectionFour"
+                            className="td-checkbox"
+                          />
+                        </div>
+                        <div className={styles.workerCertifItem}>
+                          <label>
+                            Travaux relevant de la sous-section 3{" "}
+                            <Tooltip msg="Ce profil correspond à une entreprise disposant d'une certification Amiante (NFX 46-010)" />
+                          </label>
+                          <Field
+                            type="checkbox"
+                            name="hasSubSectionThree"
+                            className="td-checkbox"
+                          />
+                        </div>
+                        <div className={styles.workCertifSubSectionThree}>
+                          {values.hasSubSectionThree && (
+                            <div>
+                              <div>
+                                <label>N° certification</label>
+                                <Field
+                                  type="text"
+                                  name="certificationNumber"
+                                  className="td-input"
+                                />
+                                <RedErrorMessage name="certificationNumber" />
+                              </div>
+                              <div>
+                                <label>Date de validité</label>
+                                <Field
+                                  name="validityLimit"
+                                  component={DateInput}
+                                  className="td-input td-date"
+                                />
+                                <RedErrorMessage name="validityLimit" />
+                              </div>
+                              <div>
+                                <label>Organisme</label>
+                                <Field
+                                  as="select"
+                                  name="organisation"
+                                  className="td-select"
+                                >
+                                  <option value="...">
+                                    Sélectionnez une valeur...
+                                  </option>
+                                  <option value="AFNOR Certification">
+                                    AFNOR Certification
+                                  </option>
+                                  <option value="GLOBAL CERTIFICATION">
+                                    GLOBAL CERTIFICATION
+                                  </option>
+                                  <option value="QUALIBAT">QUALIBAT</option>
+                                </Field>
+                                <RedErrorMessage name="organisation" />
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {isTrader(values.companyTypes) && (
+                    <AccountCompanyAddTraderReceipt />
+                  )}
+
+                  {isBroker(values.companyTypes) && (
+                    <AccountCompanyAddBrokerReceipt />
+                  )}
+
+                  {isEcoOrganisme(values.companyTypes) && (
+                    <AccountCompanyAddEcoOrganisme />
+                  )}
+
+                  {isVhu(values.companyTypes) && (
+                    <AccountCompanyAddVhuAgrement />
+                  )}
+
+                  {!isForcedTransporter(companyInfos) && (
+                    <>
+                      <div className={styles.field}>
+                        <label className={`text-right ${styles.bold}`}>
+                          Identifiant GEREP (optionnel){" "}
+                          <Tooltip msg="Toute installation de traitement classée et reconnue par l’état (ICPE) et toute entreprise produisant plus de 2 tonnes de déchets et/ou 2000 tonnes de déchets non dangereux est tenue de réaliser annuellement une déclaration d’émissions polluantes et de déchets en ligne. Elle peut le faire via l’application ministérielle web GEREP. Pour ce faire, elle dispose d’un identifiant GEREP." />
+                        </label>
+                        <div className={styles.field__value}>
+                          <Field
+                            type="text"
+                            name="gerepId"
+                            className={`td-input ${styles.textField}`}
+                          />
+                        </div>
+                      </div>
+
+                      <div className={classNames(styles.field)}>
+                        <div>
+                          <label className="tw-flex tw-items-center">
+                            <Field
+                              type="checkbox"
+                              name="willManageDasris"
+                              className="td-checkbox"
+                              onChange={() => {
+                                setFieldValue(
+                                  "allowBsdasriTakeOverWithoutSignature",
+                                  null
+                                );
+                                setFieldValue(
+                                  "willManageDasris",
+                                  !values.willManageDasris
+                                );
+                              }}
+                            />
+                            Cet établissement est susceptible de produire des
+                            DASRI (déchets d'activité de soins à risques
+                            infectieux)
+                          </label>
+                          {values.willManageDasris && (
+                            <>
+                              <div className="form__row">
+                                <fieldset className="tw-flex tw-items-center">
+                                  <legend className="tw-font-semibold tw-mb-3">
+                                    J'autorise l'emport direct de Dasri
+                                  </legend>
+                                  <Field
+                                    name="allowBsdasriTakeOverWithoutSignature"
+                                    checked={
+                                      values.allowBsdasriTakeOverWithoutSignature ===
+                                      true
+                                    }
+                                    id="Oui"
+                                    label="Oui"
+                                    component={InlineRadioButton}
+                                    onChange={() =>
+                                      setFieldValue(
+                                        "allowBsdasriTakeOverWithoutSignature",
+                                        true
+                                      )
+                                    }
+                                  />
+                                  <Field
+                                    name="allowBsdasriTakeOverWithoutSignature"
+                                    checked={
+                                      values.allowBsdasriTakeOverWithoutSignature ===
+                                      false
+                                    }
+                                    id="Non"
+                                    label="Non"
+                                    component={InlineRadioButton}
+                                    onChange={() =>
+                                      setFieldValue(
+                                        "allowBsdasriTakeOverWithoutSignature",
+                                        false
+                                      )
+                                    }
+                                  />
+                                </fieldset>
+                                <RedErrorMessage name="allowBsdasriTakeOverWithoutSignature" />
+                                <div className="notification tw-mt-2">
+                                  <p className="tw-italic">
+                                    En cochant "oui", j'atteste avoir signé une
+                                    convention avec un collecteur pour mes DASRI
+                                    et j'accepte que ce collecteur les prenne en
+                                    charge sans ma signature (lors de la
+                                    collecte) si je ne suis pas disponible. Dans
+                                    ce cas, je suis informé que je pourrai
+                                    suivre les bordereaux sur Trackdéchets et
+                                    disposer de leur archivage sur la
+                                    plateforme.
+                                  </p>
+                                  <p className="tw-italic">
+                                    Je pourrai modifier ce choix ultérieurement.
+                                  </p>
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  <hr />
+                  <div className={styles.field}>
+                    <div>
+                      <label className="tw-flex tw-items-center">
+                        <Field
+                          type="checkbox"
+                          name="isAllowed"
+                          className="td-checkbox"
+                        />
+                        Je certifie disposer du pouvoir pour créer un compte au
+                        nom de mon entreprise
+                      </label>
+                      <RedErrorMessage name="isAllowed" />
+                      <div className="notification tw-mt-2">
+                        <p className="tw-italic">
+                          En tant qu'administrateur de l'établissement, j'ai
+                          pris connaissance des{" "}
+                          <a
+                            href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            modalités de gestion des membres
+                          </a>
+                          .
+                        </p>
+                        <p className="tw-italic">
+                          Je m'engage notamment à traiter les éventuelles
+                          demandes de rattachement et à ce que, à tout moment,
+                          au moins un administrateur ait accès à cet
+                          établissement dans Trackdéchets.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className={styles["submit-form"]}>
+                    <button
+                      className="btn btn--outline-primary"
+                      disabled={isSubmitting}
+                      onClick={() => {
+                        history.goBack();
+                      }}
+                    >
+                      Annuler
+                    </button>
+
+                    <button
+                      className="btn btn--primary"
+                      type="submit"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? "Création..." : "Créer"}
+                    </button>
+                  </div>
+                  {/* // ERRORS */}
+                  {createTransporterReceiptError && (
+                    <NotificationError
+                      apolloError={createTransporterReceiptError}
+                    />
+                  )}
+                  {createTraderReceiptError && (
+                    <NotificationError apolloError={createTraderReceiptError} />
+                  )}
+                  {createBrokerReceiptError && (
+                    <NotificationError apolloError={createBrokerReceiptError} />
+                  )}
+                  {createVhuAgrementError && (
+                    <NotificationError apolloError={createVhuAgrementError} />
+                  )}
+                  {createWorkerCertificationError && (
+                    <NotificationError
+                      apolloError={createWorkerCertificationError}
+                    />
+                  )}
+                  {updateCompanyWorkerCertificationError && (
+                    <NotificationError
+                      apolloError={updateCompanyWorkerCertificationError}
+                    />
+                  )}
+                  {savingError && (
+                    <NotificationError apolloError={savingError} />
+                  )}
+                </Form>
               )}
-              {createTraderReceiptError && (
-                <NotificationError apolloError={createTraderReceiptError} />
-              )}
-              {createBrokerReceiptError && (
-                <NotificationError apolloError={createBrokerReceiptError} />
-              )}
-              {createVhuAgrementError && (
-                <NotificationError apolloError={createVhuAgrementError} />
-              )}
-              {createWorkerCertificationError && (
-                <NotificationError
-                  apolloError={createWorkerCertificationError}
-                />
-              )}
-              {updateCompanyWorkerCertificationError && (
-                <NotificationError
-                  apolloError={updateCompanyWorkerCertificationError}
-                />
-              )}
-              {savingError && <NotificationError apolloError={savingError} />}
-            </Form>
+            </Formik>
           )}
-        </Formik>
-      )}
-    </div>
+        </Col>
+      </Row>
+    </Container>
   );
 }

@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from "react";
 import { useMutation } from "@apollo/client";
 import { Field, Form, Formik, FormikValues } from "formik";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
+import { Location } from "history";
 import { NotificationError } from "../common/components/Error";
 import AccountCompanyAddSiret from "./accountCompanyAdd/AccountCompanyAddSiret";
 import styles from "./AccountCompanyAdd.module.scss";
@@ -107,6 +108,8 @@ const localizedStrings = {
  */
 export default function AccountCompanyAddForeign() {
   const history = useHistory();
+  const location = useLocation<{ vatNumber?: Location }>();
+  const defaultVatNumber = location.state?.vatNumber;
 
   const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.FR);
 
@@ -163,6 +166,7 @@ export default function AccountCompanyAddForeign() {
       <Row>
         <Col n="12">
           <AccountCompanyAddSiret
+            defaultQuery={defaultVatNumber}
             onlyForeignVAT
             {...{
               onCompanyInfos: companyInfos => setCompanyInfos(companyInfos),

@@ -1,6 +1,6 @@
 import { ApolloError, gql, useLazyQuery, useMutation } from "@apollo/client";
-import { Field, Form, Formik } from "formik";
-import React, { useState } from "react";
+import { Field, Form, Formik, useFormikContext } from "formik";
+import React, { useEffect, useState } from "react";
 import { COMPANY_PRIVATE_INFOS } from "form/common/components/company/query";
 import AccountCompanyAddMembershipRequest from "./AccountCompanyAddMembershipRequest";
 import styles from "../AccountCompanyAdd.module.scss";
@@ -27,6 +27,7 @@ type IProps = {
   onCompanyInfos: (companyInfos) => void;
   showIndividualInfo?: Boolean;
   onlyForeignVAT?: Boolean;
+  defaultQuery?: string;
 };
 
 const CREATE_TEST_COMPANY = gql`
@@ -117,6 +118,19 @@ const nonDiffusibleError = (
   </div>
 );
 
+const AutoSubmitSiret = ({ defaultSiret, didAutoSubmit }) => {
+  const { submitForm, values } = useFormikContext<any>();
+
+  useEffect(() => {
+    if (defaultSiret === values.siret) {
+      submitForm();
+      didAutoSubmit();
+    }
+  }, [didAutoSubmit, submitForm]);
+
+  return null;
+};
+
 /**
  * SIRET Formik field for company creation
  * The siret is checked against query { companyInfos }
@@ -129,11 +143,13 @@ export default function AccountCompanyAddSiret({
   onCompanyInfos,
   showIndividualInfo = false,
   onlyForeignVAT = false,
+  defaultQuery = "",
 }: IProps) {
   const [isRegistered, setIsRegistered] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isNonDiffusible, setIsNonDiffusible] = useState(false);
   const [isClosed, setIsClosed] = useState(false);
+  const [isPreloaded, setIsPreloaded] = useState(false);
 
   const [searchCompany, { loading, error }] = useLazyQuery<
     Pick<Query, "companyPrivateInfos">
@@ -179,6 +195,8 @@ export default function AccountCompanyAddSiret({
   const [createTestCompany] =
     useMutation<Pick<Mutation, "createTestCompany">>(CREATE_TEST_COMPANY);
 
+  const shouldAutoSubmit = !isPreloaded && defaultQuery !== "" && !loading;
+
   return (
     <Container fluid>
       <Row>
@@ -187,7 +205,7 @@ export default function AccountCompanyAddSiret({
             <Alert type="error" title="Erreur" description={error.message} />
           )}
           <Formik
-            initialValues={{ siret: "" }}
+            initialValues={{ siret: defaultQuery }}
             validate={values => {
               const isValidSiret = isSiret(
                 values.siret,
@@ -197,9 +215,6 @@ export default function AccountCompanyAddSiret({
 
               if (onlyForeignVAT) {
                 const isValidForeignVat = isForeignVat(values.siret);
-
-                console.log("onlyForeignVAT: " + onlyForeignVAT);
-                console.log("isValidForeignVat: " + isValidForeignVat);
 
                 if (!isValidForeignVat) {
                   return {
@@ -234,6 +249,14 @@ export default function AccountCompanyAddSiret({
           >
             {({ setFieldValue, errors, values }) => (
               <Form className={styles.companyAddForm}>
+                {shouldAutoSubmit && (
+                  <AutoSubmitSiret
+                    defaultSiret={defaultQuery}
+                    didAutoSubmit={() => {
+                      setIsPreloaded(true);
+                    }}
+                  ></AutoSubmitSiret>
+                )}
                 <Field name="siret">
                   {({ field }) => {
                     return (
