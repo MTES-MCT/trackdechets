@@ -10,6 +10,7 @@ export type Filter = {
   type: FilterType;
   isActive: boolean;
   options?: { value: string; label: string }[];
+  isMultiple?: boolean;
 };
 
 export interface FiltersProps {

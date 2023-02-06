@@ -103,6 +103,20 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
       setIsApplyDisabled(true);
     }
   };
+  const onFilterSelectMultipleValueChange = (e, filterType) => {
+    const { options } = e.target;
+    const values = [];
+    for (let i = 0; i < options.length; i++) {
+      if (options[i].selected) {
+        // @ts-ignore
+        values.push(options[i].value);
+      }
+    }
+    const newFilterValues = { ...filterValues };
+    newFilterValues[filterType] = values;
+    setFilterValues(newFilterValues);
+    setIsApplyDisabled(false);
+  };
 
   const onApply = () => {
     onApplyFilters(filterValues);
@@ -138,8 +152,13 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
             ref={newSelectElementRef}
             id={`${filter.value}_filter`}
             className="fr-select"
-            onChange={e => onFilterValueChange(e, filter.value)}
-            defaultValue=""
+            onChange={e =>
+              !filter.isMultiple
+                ? onFilterValueChange(e, filter.value)
+                : onFilterSelectMultipleValueChange(e, filter.value)
+            }
+            defaultValue={!filter.isMultiple ? "" : [""]}
+            multiple={filter.isMultiple}
           >
             <option value="" disabled hidden>
               {filter_type_select_option_placeholder}

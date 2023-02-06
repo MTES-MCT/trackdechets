@@ -28,9 +28,7 @@
         }
       }
 
-      .fr-select-group {
-        margin-right: 5px;
-
+      & > .fr-select-group {
         @include desktop {
           margin-right: 30px;
         }

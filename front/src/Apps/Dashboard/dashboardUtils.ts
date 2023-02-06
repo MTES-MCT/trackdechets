@@ -54,6 +54,7 @@ export const filterList: Filter[] = [
     order: "type",
     label: filter_bsd_type,
     type: FilterType.select,
+    isMultiple: true,
     options: bsdTypeFilterSelectOptions,
     isActive: true,
   },
