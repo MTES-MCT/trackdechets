@@ -96,6 +96,9 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
       grouping: { connect: groupedBsdas.map(({ id }) => ({ id })) }
     }),
     ...(hasIntermediaries && {
+      intermediariesSiretOrTva: input.intermediaries
+        .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
+        .filter(Boolean),
       intermediaries: {
         createMany: {
           data: companyToIntermediaryInput(input.intermediaries)

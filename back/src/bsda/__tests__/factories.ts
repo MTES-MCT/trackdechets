@@ -14,11 +14,24 @@ export const bsdaFactory = async ({
   await upsertBaseSiret(bsdaObject.destinationCompanySiret);
 
   const formParams = { ...bsdaObject, ...opt };
-  return prisma.bsda.create({
+  const created = await prisma.bsda.create({
     data: {
       ...formParams
-    }
+    },
+    include: { intermediaries: true }
   });
+  if (created?.intermediaries) {
+    return prisma.bsda.update({
+      where: { id: created.id },
+      data: {
+        intermediariesSiretOrTva: created.intermediaries
+          .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
+          .filter(Boolean)
+      }
+    });
+  }
+
+  return created;
 };
 
 const getBsdaObject = (): Prisma.BsdaCreateInput => ({

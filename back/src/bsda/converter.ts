@@ -230,7 +230,7 @@ export function expandBsdaFromElastic(
 }
 export function flattenBsdaInput(
   formInput: BsdaInput
-): Partial<Prisma.BsdaCreateInput> {
+): Partial<Omit<Prisma.BsdaCreateInput, "intermediariesSiretOrTva">> {
   return safeInput({
     type: chain(formInput, f => f.type),
     ...flattenBsdaEmitterInput(formInput),
