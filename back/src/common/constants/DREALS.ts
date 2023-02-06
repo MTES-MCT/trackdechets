@@ -334,7 +334,7 @@ const Dreals = [
     DrealRegion: "DREAL Pays Loire",
     name: "UD53 (Unité Départementale Laval)",
     Dept: "53",
-    email: "ud53.dreal-pays-loire@developpement-durable.gouv.fr"
+    email: "ud53.dreal-paysdelaloire@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DREAL Grand Est",
