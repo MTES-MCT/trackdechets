@@ -16,7 +16,7 @@ import {
   getBsffPackagingRepository,
   getBsffRepository
 } from "../../repository";
-import { checkEditionRules } from "../../edition";
+import { checkEditionRules } from "../../edition/bsffEdition";
 
 const updateBsff: MutationResolvers["updateBsff"] = async (
   _,

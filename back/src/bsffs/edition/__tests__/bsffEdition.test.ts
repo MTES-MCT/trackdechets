@@ -1,7 +1,7 @@
 import { Bsff } from "@prisma/client";
-import { BsffInput } from "../../generated/graphql/types";
-import { flattenBsffInput } from "../converter";
-import { editionRules, isAwaitingSignature } from "../edition";
+import { BsffInput } from "../../../generated/graphql/types";
+import { flattenBsffInput } from "../../converter";
+import { editionRules, isAwaitingSignature } from "../bsffEdition";
 
 describe("edition", () => {
   test("an edition rule should be defined for every key in BsffInput", () => {
@@ -63,7 +63,6 @@ describe("edition", () => {
       repackaging: []
     };
     const flatInput = flattenBsffInput(input);
-    console.log(flatInput);
     for (const key of Object.keys(flatInput)) {
       expect(Object.keys(editionRules)).toContain(key);
     }

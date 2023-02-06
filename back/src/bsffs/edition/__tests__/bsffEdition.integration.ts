@@ -1,14 +1,14 @@
-import prisma from "../../prisma";
-import { checkEditionRules } from "../edition";
-import { userWithCompanyFactory } from "../../__tests__/factories";
-import { resetDatabase } from "../../../integration-tests/helper";
+import prisma from "../../../prisma";
 import {
   createBsff,
   createBsffAfterEmission,
   createBsffAfterReception,
   createBsffAfterTransport,
   createFicheIntervention
-} from "./factories";
+} from "../../__tests__/factories";
+import { userWithCompanyFactory } from "../../../__tests__/factories";
+import { resetDatabase } from "../../../../integration-tests/helper";
+import { checkEditionRules } from "../bsffEdition";
 
 describe("edition rules", () => {
   afterAll(resetDatabase);

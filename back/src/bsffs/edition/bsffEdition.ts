@@ -1,15 +1,14 @@
 import { Bsff, BsffPackaging, User } from "@prisma/client";
-import { safeInput } from "../common/converter";
-import { SealedFieldError } from "../common/errors";
-import { getCachedUserSiretOrVat } from "../common/redis/users";
-import { objectDiff } from "../forms/workflow/diff";
-import { BsffInput, BsffSignatureType } from "../generated/graphql/types";
-import { flattenBsffInput } from "./converter";
+import { safeInput } from "../../common/converter";
+import { SealedFieldError } from "../../common/errors";
+import { getCachedUserSiretOrVat } from "../../common/redis/users";
+import { objectDiff } from "../../forms/workflow/diff";
+import { BsffInput, BsffSignatureType } from "../../generated/graphql/types";
+import { flattenBsffInput } from "../converter";
 import {
   getReadonlyBsffPackagingRepository,
   getReadonlyBsffRepository
-} from "./repository";
-import bsff from "./resolvers/queries/bsff";
+} from "../repository";
 
 type BsffSignatureTypeUntilReception = Extract<
   BsffSignatureType,
@@ -17,7 +16,7 @@ type BsffSignatureTypeUntilReception = Extract<
 >;
 
 // Defines until which signature BSFF fields can be modified
-// The test in edition.test.ts ensures that every possible key in BsffInput
+// The test in bsffEdition.test.ts ensures that every possible key in BsffInput
 // has a corresponding edition rule
 export const editionRules = {
   type: "EMISSION",
