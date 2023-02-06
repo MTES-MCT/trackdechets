@@ -101,7 +101,7 @@ const updateSynthesisBsdasri = async ({
   );
   const flattenedInput = flattenBsdasriInput(rest);
 
-  await checkEditionRules(dbBsdasri, input);
+  await checkEditionRules(dbBsdasri, input, user);
 
   const flattenedArgs = {
     ...flattenedInput,

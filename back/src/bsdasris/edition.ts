@@ -112,6 +112,10 @@ export async function checkEditionRules(
   const userSirets = user?.id ? await getCachedUserSiretOrVat(user.id) : [];
   const isEmitter = userSirets.includes(bsdasri.emitterCompanySiret);
 
+  if (bsdasri.status == "SIGNED_BY_PRODUCER" && isEmitter) {
+    return true;
+  }
+
   // Inner function used to recursively checks that the diff
   // does not contain any fields sealed by signature
   function checkSealedFields(
@@ -125,12 +129,9 @@ export async function checkEditionRules(
       );
     }
 
-    if (
-      isAwaitingSignature(signatureType, bsdasri) ||
-      (signatureType === "EMISSION" && isEmitter)
-    ) {
+    if (isAwaitingSignature(signatureType, bsdasri)) {
       // do not perform additional checks if we are still awaiting
-      // for this signature type or if the emitter is updating his own signed data
+      // for this signature type
       return true;
     }
     for (const field of updatedFields) {

@@ -116,6 +116,10 @@ export async function checkEditionRules(
   const userSirets = user?.id ? await getCachedUserSiretOrVat(user.id) : [];
   const isEmitter = userSirets.includes(bsda.emitterCompanySiret);
 
+  if (bsda.status === "SIGNED_BY_PRODUCER" && isEmitter) {
+    return true;
+  }
+
   const sealedFieldErrors: string[] = [];
 
   const updatedFields = await getUpdatedFields(bsda, input);
@@ -133,12 +137,9 @@ export async function checkEditionRules(
       );
     }
 
-    if (
-      isAwaitingSignature(signatureType, bsda) ||
-      (signatureType === "EMISSION" && isEmitter)
-    ) {
+    if (isAwaitingSignature(signatureType, bsda)) {
       // do not perform additional checks if we are still awaiting
-      // for this signature type or if the emitter is updating his own signed data
+      // for this signature type
       return true;
     }
     for (const field of updatedFields) {

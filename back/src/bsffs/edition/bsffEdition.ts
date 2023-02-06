@@ -76,6 +76,10 @@ export async function checkEditionRules(
   const userSirets = user?.id ? await getCachedUserSiretOrVat(user.id) : [];
   const isEmitter = userSirets.includes(existingBsff.emitterCompanySiret);
 
+  if (existingBsff.status === "SIGNED_BY_EMITTER" && isEmitter) {
+    return true;
+  }
+
   const { packagings, ...bsff } = existingBsff;
 
   const sealedFieldErrors: string[] = [];
@@ -95,12 +99,9 @@ export async function checkEditionRules(
       );
     }
 
-    if (
-      isAwaitingSignature(signatureType, bsff) ||
-      (signatureType === "EMISSION" && isEmitter)
-    ) {
+    if (isAwaitingSignature(signatureType, bsff)) {
       // do not perform additional checks if we are still awaiting
-      // for this signature type or if the emitter is updating his own signed data
+      // for this signature type
       return true;
     }
     for (const field of updatedFields) {

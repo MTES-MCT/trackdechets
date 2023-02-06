@@ -93,7 +93,7 @@ const updateBsdasri = async ({
     isGrouping: isGroupingType
   });
 
-  await checkEditionRules(dbBsdasri, input);
+  await checkEditionRules(dbBsdasri, input, user);
 
   const bsdasriRepository = getBsdasriRepository(user);
 

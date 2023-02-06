@@ -9,7 +9,8 @@ import WasteInfo from "./WasteInfo";
 import { BsffTypeSelector } from "./BsffTypeSelector";
 
 export default function FormContainer() {
-  const { id } = useParams<{ id?: string }>();
+  const { id, siret } = useParams<{ id?: string; siret: string }>();
+
   return (
     <main className="main">
       <div className="container">
@@ -19,6 +20,10 @@ export default function FormContainer() {
               bsff?.emitter?.emission?.signature?.author != null;
             const transporterSigned =
               bsff?.transporter?.transport?.signature?.author != null;
+            const isEmitter = bsff?.emitter?.company?.siret === siret;
+            // emitter can still update any field after his own signature
+            const disabledAfterEmission =
+              (emitterSigned && !isEmitter) || transporterSigned;
 
             return (
               <>
@@ -29,12 +34,12 @@ export default function FormContainer() {
                 <StepContainer
                   component={Emitter}
                   title="Émetteur du déchet"
-                  disabled={emitterSigned}
+                  disabled={disabledAfterEmission}
                 />
                 <StepContainer
                   component={WasteInfo}
                   title="Détail du déchet"
-                  disabled={emitterSigned}
+                  disabled={disabledAfterEmission}
                 />
                 <StepContainer
                   component={Transporter}
@@ -44,7 +49,7 @@ export default function FormContainer() {
                 <StepContainer
                   component={Recipient}
                   title="Destination du déchet"
-                  disabled={emitterSigned}
+                  disabled={disabledAfterEmission}
                 />
               </>
             );

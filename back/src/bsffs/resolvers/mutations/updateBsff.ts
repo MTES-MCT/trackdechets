@@ -72,7 +72,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   await checkCanWriteBsff(user, futureBsff);
 
-  await checkEditionRules(existingBsff, input);
+  await checkEditionRules(existingBsff, input, user);
 
   const packagingHasChanged =
     !!input.forwarding ||

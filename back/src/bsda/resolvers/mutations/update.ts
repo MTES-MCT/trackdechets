@@ -61,7 +61,7 @@ export default async function edit(
     );
   }
 
-  await checkEditionRules(existingBsda, input);
+  await checkEditionRules(existingBsda, input, user);
 
   const { grouping, forwarding, ...existingBsdaToValidate } = existingBsda;
   const resultingBsda = {

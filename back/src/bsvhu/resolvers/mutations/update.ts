@@ -31,7 +31,7 @@ export default async function edit(
     "Vous ne pouvez pas enlever votre établissement du bordereau"
   );
 
-  await checkEditionRules(prismaForm, input);
+  await checkEditionRules(prismaForm, input, user);
 
   await validateBsvhu(resultingForm, {
     emissionSignature: prismaForm.emitterEmissionSignatureAuthor != null,
