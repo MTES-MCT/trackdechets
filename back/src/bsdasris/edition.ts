@@ -105,16 +105,8 @@ export async function checkEditionRules(
 
   const updatedFields = await getUpdatedFields(bsdasri, input);
 
-  if (bsdasri.status === "INITIAL") {
-    if (bsdasri.type === "SYNTHESIS") {
-      for (const field of updatedFields) {
-        if (synthesisBlackList.includes(field)) {
-          sealedFieldErrors.push(field);
-        }
-      }
-    } else {
-      return true;
-    }
+  if (bsdasri.status === "INITIAL" && bsdasri.type !== "SYNTHESIS") {
+    return true;
   }
 
   const userSirets = user?.id ? await getCachedUserSiretOrVat(user.id) : [];
@@ -157,7 +149,15 @@ export async function checkEditionRules(
     }
   }
 
-  checkSealedFields(null, Object.keys(editionRules));
+  if (bsdasri.status === "INITIAL" && bsdasri.type === "SYNTHESIS") {
+    for (const field of updatedFields) {
+      if (synthesisBlackList.includes(field)) {
+        sealedFieldErrors.push(field);
+      }
+    }
+  } else {
+    checkSealedFields(null, Object.keys(editionRules));
+  }
 
   if (sealedFieldErrors?.length > 0) {
     throw new SealedFieldError([...new Set(sealedFieldErrors)]);
