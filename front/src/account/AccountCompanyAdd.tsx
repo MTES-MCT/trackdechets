@@ -29,6 +29,11 @@ import {
   isSiret,
   isVat,
 } from "generated/constants/companySearchHelpers";
+import {
+  CREATE_WORKER_CERTIFICATION,
+  UPDATE_COMPANY_WORKER_CERTIFICATION,
+} from "./fields/forms/AccountFormCompanyWorkerCertification";
+import DateInput from "form/common/components/custom-inputs/DateInput";
 
 export const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
@@ -137,6 +142,14 @@ export default function AccountCompanyAdd() {
   const [createVhuAgrement, { error: createVhuAgrementError }] =
     useMutation(CREATE_VHU_AGREMENT);
 
+  const [createWorkerCertification, { error: createWorkerCertificationError }] =
+    useMutation(CREATE_WORKER_CERTIFICATION);
+
+  const [
+    updateCompanyWorkerCertification,
+    { error: updateCompanyWorkerCertificationError },
+  ] = useMutation(UPDATE_COMPANY_WORKER_CERTIFICATION);
+
   function isTransporter(companyTypes: _CompanyType[]) {
     return companyTypes.includes(_CompanyType.Transporter);
   }
@@ -159,6 +172,10 @@ export default function AccountCompanyAdd() {
 
   function isForcedTransporter(companyInfos: CompanySearchResult) {
     return !!companyInfos.vatNumber && !companyInfos.siret;
+  }
+
+  function isWorker(companyTypes: _CompanyType[]) {
+    return companyTypes.includes(_CompanyType.Worker);
   }
 
   /**
@@ -297,6 +314,32 @@ export default function AccountCompanyAdd() {
       }
     }
 
+    let workerCertificationId: string | null = null;
+
+    if (isWorker(values.companyTypes)) {
+      const input = {
+        hasSubSectionFour: values.hasSubSectionFour,
+        hasSubSectionThree: values.hasSubSectionThree,
+        certificationNumber: values.certificationNumber,
+        validityLimit: values.validityLimit,
+        organisation: values.organisation,
+      };
+      const { data } = await createWorkerCertification({
+        variables: { input },
+      });
+
+      if (data) {
+        workerCertificationId = data.createWorkerCertification.id;
+      }
+    }
+
+    // remove those values from company creation
+    delete companyValues.hasSubSectionFour;
+    delete companyValues.hasSubSectionThree;
+    delete companyValues.certificationNumber;
+    delete companyValues.validityLimit;
+    delete companyValues.organisation;
+
     return createCompany({
       variables: {
         companyInput: {
@@ -313,6 +356,15 @@ export default function AccountCompanyAdd() {
             : {}),
         },
       },
+    }).then(res => {
+      if (workerCertificationId) {
+        updateCompanyWorkerCertification({
+          variables: {
+            id: res.data?.createCompany.id,
+            workerCertificationId,
+          },
+        });
+      }
     });
   }
 
@@ -367,6 +419,11 @@ export default function AccountCompanyAdd() {
             vhuAgrementDemolisseurNumber: "",
             vhuAgrementDemolisseurDepartment: "",
             ecoOrganismeAgreements: [],
+            hasSubSectionFour: false,
+            hasSubSectionThree: false,
+            certificationNumber: "",
+            validityLimit: null,
+            organisation: "",
           }}
           validate={values => {
             // whether or not one of the transporter receipt field is set
@@ -475,6 +532,18 @@ export default function AccountCompanyAdd() {
                 values.ecoOrganismeAgreements.length < 1 && {
                   ecoOrganismeAgreements: "Champ obligatoire",
                 }),
+              ...(values.hasSubSectionThree &&
+                !values.certificationNumber && {
+                  certificationNumber: "Champ obligatoire",
+                }),
+              ...(values.hasSubSectionThree &&
+                !values.validityLimit && {
+                  validityLimit: "Champ obligatoire",
+                }),
+              ...(values.hasSubSectionThree &&
+                !values.organisation && {
+                  organisation: "Champ obligatoire",
+                }),
             };
           }}
           onSubmit={onSubmit}
@@ -570,6 +639,76 @@ export default function AccountCompanyAdd() {
 
               {isTransporter(values.companyTypes) && (
                 <AccountCompanyAddTransporterReceipt />
+              )}
+
+              {isWorker(values.companyTypes) && (
+                <>
+                  <div className={styles.workerCertif}>
+                    <div className={styles.workerCertifItem}>
+                      <label>Travaux relevant de la sous-section 4</label>
+                      <Field
+                        type="checkbox"
+                        name="hasSubSectionFour"
+                        className="td-checkbox"
+                      />
+                    </div>
+                    <div className={styles.workerCertifItem}>
+                      <label>
+                        Travaux relevant de la sous-section 3{" "}
+                        <Tooltip msg="Ce profil correspond à une entreprise disposant d'une certification Amiante (NFX 46-010)" />
+                      </label>
+                      <Field
+                        type="checkbox"
+                        name="hasSubSectionThree"
+                        className="td-checkbox"
+                      />
+                    </div>
+                    <div className={styles.workCertifSubSectionThree}>
+                      {values.hasSubSectionThree && (
+                        <div>
+                          <div>
+                            <label>N° certification</label>
+                            <Field
+                              type="text"
+                              name="certificationNumber"
+                              className="td-input"
+                            />
+                            <RedErrorMessage name="certificationNumber" />
+                          </div>
+                          <div>
+                            <label>Date de validité</label>
+                            <Field
+                              name="validityLimit"
+                              component={DateInput}
+                              className="td-input td-date"
+                            />
+                            <RedErrorMessage name="validityLimit" />
+                          </div>
+                          <div>
+                            <label>Organisme</label>
+                            <Field
+                              as="select"
+                              name="organisation"
+                              className="td-select"
+                            >
+                              <option value="...">
+                                Sélectionnez une valeur...
+                              </option>
+                              <option value="AFNOR Certification">
+                                AFNOR Certification
+                              </option>
+                              <option value="GLOBAL CERTIFICATION">
+                                GLOBAL CERTIFICATION
+                              </option>
+                              <option value="QUALIBAT">QUALIBAT</option>
+                            </Field>
+                            <RedErrorMessage name="organisation" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </>
               )}
 
               {isTrader(values.companyTypes) && (
@@ -755,6 +894,16 @@ export default function AccountCompanyAdd() {
               )}
               {createVhuAgrementError && (
                 <NotificationError apolloError={createVhuAgrementError} />
+              )}
+              {createWorkerCertificationError && (
+                <NotificationError
+                  apolloError={createWorkerCertificationError}
+                />
+              )}
+              {updateCompanyWorkerCertificationError && (
+                <NotificationError
+                  apolloError={updateCompanyWorkerCertificationError}
+                />
               )}
               {savingError && <NotificationError apolloError={savingError} />}
             </Form>
