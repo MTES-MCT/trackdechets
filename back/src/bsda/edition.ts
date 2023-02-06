@@ -9,7 +9,7 @@ import { flattenBsdaInput } from "./converter";
 // Defines until which signature BSDA fields can be modified
 // The test in edition.test.ts ensures that every possible key in BsdaInput
 // has a corresponding edition rule
-export const editionRules = {
+export const editionRules: { [key: string]: BsdaSignatureType } = {
   type: "EMISSION",
   emitterIsPrivateIndividual: "EMISSION",
   emitterCompanyName: "EMISSION",
@@ -80,7 +80,7 @@ export const editionRules = {
   workerCertificationValidityLimit: "WORK",
   workerCertificationOrganisation: "WORK",
   brokerCompanyName: "EMISSION",
-  brokerCompanySiret: "",
+  brokerCompanySiret: "EMISSION",
   brokerCompanyAddress: "EMISSION",
   brokerCompanyContact: "EMISSION",
   brokerCompanyPhone: "EMISSION",
@@ -165,7 +165,7 @@ export async function checkEditionRules(
   checkSealedFields(null, Object.keys(editionRules));
 
   if (sealedFieldErrors?.length > 0) {
-    throw new SealedFieldError(sealedFieldErrors);
+    throw new SealedFieldError([...new Set(sealedFieldErrors)]);
   }
 
   return true;

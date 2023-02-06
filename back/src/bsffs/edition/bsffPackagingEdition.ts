@@ -15,7 +15,7 @@ type BsffSignatureTypeAfterReception = Extract<
 // Defines until which signature BsffPackaging fields can be modified
 // The test in bsffPackagingEdition.test.ts ensures that every possible key in BsffPackagingInput
 // has a corresponding edition rule
-export const editionRules = {
+export const editionRules: { [key: string]: BsffSignatureType } = {
   acceptationDate: "ACCEPTATION",
   acceptationStatus: "ACCEPTATION",
   acceptationWeight: "ACCEPTATION",
@@ -82,7 +82,7 @@ export async function checkEditionRules(
   checkSealedFields(null, Object.keys(editionRules));
 
   if (sealedFieldErrors?.length > 0) {
-    throw new SealedFieldError(sealedFieldErrors);
+    throw new SealedFieldError([...new Set(sealedFieldErrors)]);
   }
 
   return true;

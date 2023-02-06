@@ -18,7 +18,7 @@ type BsffSignatureTypeUntilReception = Extract<
 // Defines until which signature BSFF fields can be modified
 // The test in bsffEdition.test.ts ensures that every possible key in BsffInput
 // has a corresponding edition rule
-export const editionRules = {
+export const editionRules: { [key: string]: BsffSignatureType } = {
   type: "EMISSION",
   emitterCompanyName: "EMISSION",
   emitterCompanySiret: "EMISSION",
@@ -122,7 +122,7 @@ export async function checkEditionRules(
   checkSealedFields(null, Object.keys(editionRules));
 
   if (sealedFieldErrors?.length > 0) {
-    throw new SealedFieldError(sealedFieldErrors);
+    throw new SealedFieldError([...new Set(sealedFieldErrors)]);
   }
 
   return true;

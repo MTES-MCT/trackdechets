@@ -287,7 +287,7 @@ describe("Mutation.updateBsdasri", () => {
       })
     ]);
     expect(errors[0].message).toContain(
-      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés:"
+      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : emitterCompanyMail"
     );
   });
   it("should disallow eco organisme fields update after emission signature", async () => {
@@ -326,7 +326,7 @@ describe("Mutation.updateBsdasri", () => {
       })
     ]);
     expect(errors[0].message).toContain(
-      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés:"
+      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : ecoOrganismeName, ecoOrganismeSiret"
     );
   });
   it("should allow transporter and destination fields update after emission signature", async () => {
@@ -407,7 +407,7 @@ describe("Mutation.updateBsdasri", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés: emitterCompanyMail,transporterCompanyMail",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : emitterCompanyMail, transporterCompanyMail",
 
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
@@ -477,7 +477,7 @@ describe("Mutation.updateBsdasri", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés: handedOverToRecipientAt",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : handedOverToRecipientAt",
 
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
@@ -554,7 +554,7 @@ describe("Mutation.updateBsdasri", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés: destinationCompanyMail,destinationReceptionAcceptationStatus",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : destinationCompanyMail, destinationReceptionAcceptationStatus",
 
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
