@@ -320,8 +320,9 @@ describe("Mutation.updateBsff", () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsffAfterEmission({ emitter });
-    const { mutate } = makeClient(emitter.user);
+
+    const bsff = await createBsffAfterEmission({ emitter, destination });
+    const { mutate } = makeClient(destination.user);
     const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
@@ -385,7 +386,7 @@ describe("Mutation.updateBsff", () => {
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
           " emitterCompanyName, emitterCompanyAddress, emitterCompanyContact, emitterCompanyPhone," +
-          " emitterCompanyMail, destinationCompanyName, destinationCompanySiret," +
+          " emitterCompanyMail, destinationCompanyName," +
           " destinationCompanyAddress, destinationCompanyContact, destinationCompanyPhone," +
           " destinationCompanyMail, wasteCode, wasteDescription, wasteAdr, weightValue"
       })
