@@ -1,5 +1,17 @@
 import { Bsff } from "@prisma/client";
-import { BsffInput } from "../../../generated/graphql/types";
+import {
+  BsffDestinationInput,
+  BsffDestinationReceptionInput,
+  BsffEmitterInput,
+  BsffInput,
+  BsffPackagingInput,
+  BsffTransporterInput,
+  BsffTransporterRecepisseInput,
+  BsffTransporterTransportInput,
+  BsffWasteInput,
+  BsffWeightInput,
+  CompanyInput
+} from "../../../generated/graphql/types";
 import { flattenBsffInput } from "../../converter";
 import { editionRules, isAwaitingSignature } from "../bsffEdition";
 
@@ -8,55 +20,83 @@ describe("edition", () => {
     // Create a dummy BSFF input where every possible key is present
     // The typing will break whenever a field is added or modified
     // to BSFF input so that we think of adding an entry to the edition rules
+
+    const company: Required<CompanyInput> = {
+      siret: "",
+      name: "",
+      address: "",
+      contact: "",
+      phone: "",
+      mail: "",
+      vatNumber: "",
+      omiNumber: "",
+      country: ""
+    };
+
+    const waste: Required<BsffWasteInput> = {
+      code: "",
+      description: "",
+      adr: ""
+    };
+
+    const recepisse: Required<BsffTransporterRecepisseInput> = {
+      number: "XXXX",
+      department: "",
+      validityLimit: new Date()
+    };
+
+    const transport: Required<BsffTransporterTransportInput> = {
+      mode: "ROAD",
+      plates: [],
+      takenOverAt: new Date()
+    };
+
+    const transporter: Required<BsffTransporterInput> = {
+      company,
+      recepisse,
+      customInfo: "",
+      transport
+    };
+
+    const packaging: Required<BsffPackagingInput> = {
+      numero: "",
+      volume: 1,
+      weight: 1,
+      name: "",
+      type: "BOUTEILLE",
+      other: ""
+    };
+
+    const weight: Required<BsffWeightInput> = {
+      value: 1,
+      isEstimate: true
+    };
+
+    const reception: Required<BsffDestinationReceptionInput> = {
+      date: new Date()
+    };
+
+    const destination: Required<BsffDestinationInput> = {
+      company,
+      cap: "",
+      plannedOperationCode: "D13",
+      customInfo: "",
+      reception
+    };
+
+    const emitter: Required<BsffEmitterInput> = {
+      company,
+      customInfo: ""
+    };
+
     const input: Required<BsffInput> = {
       type: "COLLECTE_PETITES_QUANTITES",
-      emitter: {
-        company: {
-          siret: "",
-          name: "",
-          address: "",
-          contact: "",
-          phone: "",
-          mail: ""
-        }
-      },
-      packagings: [],
-      waste: {
-        code: "",
-        description: "",
-        adr: ""
-      },
-      weight: {
-        value: 1,
-        isEstimate: true
-      },
-      transporter: {
-        company: {
-          siret: "",
-          name: "",
-          address: "",
-          contact: "",
-          mail: "",
-          phone: ""
-        },
-        recepisse: {
-          number: "XXXX",
-          department: "",
-          validityLimit: new Date()
-        }
-      },
-      destination: {
-        company: {
-          siret: "",
-          name: "",
-          address: "",
-          contact: "",
-          phone: "",
-          mail: ""
-        },
-        cap: "",
-        plannedOperationCode: "D13"
-      },
+      emitter,
+      packagings: [packaging],
+      waste,
+      weight,
+      transporter,
+      destination,
       ficheInterventions: [],
       forwarding: [],
       grouping: [],

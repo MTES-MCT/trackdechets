@@ -1,5 +1,25 @@
 import { Bsda } from "@prisma/client";
-import { BsdaInput } from "../../generated/graphql/types";
+import {
+  BsdaBrokerInput,
+  BsdaDestinationInput,
+  BsdaEmitterInput,
+  BsdaInput,
+  BsdaNextDestinationInput,
+  BsdaOperationInput,
+  BsdaPackagingInput,
+  BsdaRecepisseInput,
+  BsdaReceptionInput,
+  BsdaTransporterInput,
+  BsdaTransportInput,
+  BsdaWasteInput,
+  BsdaWeightInput,
+  BsdaWorkerCertificationInput,
+  BsdaWorkerInput,
+  BsdaWorkInput,
+  CompanyInput,
+  EcoOrganismeInput,
+  PickupSiteInput
+} from "../../generated/graphql/types";
 import { flattenBsdaInput } from "../converter";
 import { editionRules, isAwaitingSignature } from "../edition";
 
@@ -8,153 +28,139 @@ describe("edition", () => {
     // Create a dummy BSDA input where every possible key is present
     // The typing will break whenever a field is added or modified
     // to BSDA input so that we think of adding an entry to the edition rules
+
+    const company: Required<CompanyInput> = {
+      siret: "",
+      vatNumber: "",
+      name: "",
+      address: "",
+      contact: "",
+      mail: "",
+      phone: "",
+      country: "",
+      omiNumber: ""
+    };
+
+    const recepisse: Required<BsdaRecepisseInput> = {
+      isExempted: true,
+      number: "",
+      department: "",
+      validityLimit: new Date()
+    };
+
+    const pickupSite: Required<PickupSiteInput> = {
+      name: "",
+      address: "",
+      city: "",
+      postalCode: "",
+      infos: ""
+    };
+
+    const emitter: Required<BsdaEmitterInput> = {
+      isPrivateIndividual: false,
+      company,
+      pickupSite,
+      customInfo: ""
+    };
+
+    const reception: Required<BsdaReceptionInput> = {
+      date: new Date(),
+      weight: 1,
+      acceptationStatus: "ACCEPTED",
+      refusalReason: ""
+    };
+
+    const nextDestination: Required<BsdaNextDestinationInput> = {
+      company,
+      cap: "",
+      plannedOperationCode: ""
+    };
+
+    const operation: Required<BsdaOperationInput> = {
+      code: "",
+      description: "",
+      date: new Date(),
+      nextDestination
+    };
+
+    const destination: Required<BsdaDestinationInput> = {
+      company,
+      cap: "",
+      plannedOperationCode: "",
+      reception,
+      operation,
+      customInfo: "OPEATION"
+    };
+
+    const waste: Required<BsdaWasteInput> = {
+      code: "",
+      name: "",
+      familyCode: "",
+      materialName: "",
+      consistence: "SOLIDE",
+      sealNumbers: [],
+      adr: "WORK",
+      pop: false
+    };
+
+    const packaging: Required<BsdaPackagingInput> = {
+      other: "",
+      quantity: 1,
+      type: "BIG_BAG"
+    };
+
+    const weight: Required<BsdaWeightInput> = { value: 1, isEstimate: true };
+
+    const certification: Required<BsdaWorkerCertificationInput> = {
+      hasSubSectionFour: false,
+      hasSubSectionThree: false,
+      certificationNumber: "",
+      validityLimit: new Date(),
+      organisation: ""
+    };
+
+    const work: Required<BsdaWorkInput> = {
+      hasEmitterPaperSignature: false
+    };
+
+    const worker: Required<BsdaWorkerInput> = {
+      isDisabled: false,
+      company,
+      certification,
+      work
+    };
+
+    const broker: Required<BsdaBrokerInput> = {
+      company,
+      recepisse
+    };
+
+    const transport: Required<BsdaTransportInput> = {
+      mode: "ROAD",
+      plates: [],
+      takenOverAt: new Date()
+    };
+
+    const transporter: Required<BsdaTransporterInput> = {
+      company,
+      customInfo: "",
+      recepisse,
+      transport
+    };
+
+    const ecoOrganisme: Required<EcoOrganismeInput> = { name: "", siret: "" };
+
     const input: Required<BsdaInput> = {
       type: "COLLECTION_2710",
-      emitter: {
-        isPrivateIndividual: false,
-        company: {
-          siret: "",
-          vatNumber: "",
-          name: "",
-          address: "",
-          contact: "",
-          mail: "",
-          phone: "",
-          country: "",
-          omiNumber: ""
-        },
-        pickupSite: {
-          name: "",
-          address: "",
-          city: "",
-          postalCode: "",
-          infos: ""
-        },
-        customInfo: ""
-      },
-      destination: {
-        company: {
-          siret: "",
-          vatNumber: "",
-          name: "",
-          address: "",
-          contact: "",
-          mail: "",
-          phone: "",
-          country: "",
-          omiNumber: ""
-        },
-        cap: "",
-        plannedOperationCode: "",
-        reception: {
-          date: new Date(),
-          weight: 1,
-          acceptationStatus: "ACCEPTED",
-          refusalReason: ""
-        },
-        operation: {
-          code: "",
-          description: "",
-          date: new Date(),
-          nextDestination: {
-            company: {
-              siret: "",
-              vatNumber: "",
-              name: "",
-              address: "",
-              contact: "",
-              mail: "",
-              phone: "",
-              country: "",
-              omiNumber: ""
-            },
-            cap: "",
-            plannedOperationCode: ""
-          }
-        },
-        customInfo: "OPEATION"
-      },
-      waste: {
-        code: "",
-        name: "",
-        familyCode: "",
-        materialName: "",
-        consistence: "SOLIDE",
-        sealNumbers: [],
-        adr: "WORK",
-        pop: false
-      },
-      packagings: [],
-      weight: { value: 1, isEstimate: true },
-      worker: {
-        isDisabled: false,
-        company: {
-          siret: "",
-          vatNumber: "",
-          name: "",
-          address: "",
-          contact: "",
-          mail: "",
-          phone: "",
-          country: "",
-          omiNumber: ""
-        },
-        certification: {
-          hasSubSectionFour: false,
-          hasSubSectionThree: false,
-          certificationNumber: "",
-          validityLimit: new Date(),
-          organisation: ""
-        },
-        work: {
-          hasEmitterPaperSignature: false
-        }
-      },
-      broker: {
-        company: {
-          siret: "",
-          vatNumber: "",
-          name: "",
-          address: "",
-          contact: "",
-          mail: "",
-          phone: "",
-          country: "",
-          omiNumber: ""
-        },
-        recepisse: {
-          isExempted: true,
-          number: "",
-          department: "",
-          validityLimit: new Date()
-        }
-      },
-      transporter: {
-        company: {
-          siret: "",
-          vatNumber: "",
-          name: "",
-          address: "",
-          contact: "",
-          mail: "",
-          phone: "",
-          country: "",
-          omiNumber: ""
-        },
-        customInfo: "",
-        recepisse: {
-          isExempted: true,
-          number: "",
-          department: "",
-          validityLimit: new Date()
-        },
-        transport: {
-          mode: "ROAD",
-          plates: [],
-          takenOverAt: new Date()
-        }
-      },
-      ecoOrganisme: { name: "", siret: "" },
+      emitter,
+      destination,
+      waste,
+      packagings: [packaging],
+      weight,
+      worker,
+      broker,
+      transporter,
+      ecoOrganisme,
       forwarding: "",
       grouping: [],
       intermediaries: []

@@ -3,9 +3,7 @@ import { BsdasriStatus, BsdasriType, Bsdasri } from "@prisma/client";
 
 import { BsdasriInput } from "../../../generated/graphql/types";
 import { validateBsdasri } from "../../validation";
-import { ForbiddenError, UserInputError } from "apollo-server-express";
-
-import { getFieldsAllorwedForUpdate } from "./fieldsUpdateRules";
+import { UserInputError } from "apollo-server-express";
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
 import { getBsdasriRepository } from "../../repository";
 import { checkEditionRules } from "../../edition";
