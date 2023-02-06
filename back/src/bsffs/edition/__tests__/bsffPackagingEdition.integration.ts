@@ -1,13 +1,7 @@
-import prisma from "../../../prisma";
 import {
   createBsffAfterAcceptation,
-  createBsffAfterEmission,
   createBsffAfterOperation,
-  createBsffAfterReception,
-  createBsffAfterTransport,
-  createBsffBeforeAcceptation,
-  createBsffPackagingAfterAcceptation,
-  createFicheIntervention
+  createBsffAfterReception
 } from "../../__tests__/factories";
 import { userWithCompanyFactory } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";

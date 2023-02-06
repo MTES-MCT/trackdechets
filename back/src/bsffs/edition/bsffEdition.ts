@@ -100,7 +100,7 @@ export async function checkEditionRules(
       (signatureType === "EMISSION" && isEmitter)
     ) {
       // do not perform additional checks if we are still awaiting
-      // for this signature type or if the emitter is updating is own signed data
+      // for this signature type or if the emitter is updating his own signed data
       return true;
     }
     for (const field of updatedFields) {
@@ -154,13 +154,16 @@ async function getUpdatedFields(
 
   const { findPreviousPackagings } = getReadonlyBsffPackagingRepository();
   const { findUniqueGetFicheInterventions } = getReadonlyBsffRepository();
-  const previousPackagings = await findPreviousPackagings(
-    packagings.map(p => p.id),
-    1
-  );
-  const ficheInterventions = await findUniqueGetFicheInterventions({
-    where: { id: existingBsff.id }
-  });
+
+  const [previousPackagings, ficheInterventions] = await Promise.all([
+    findPreviousPackagings(
+      packagings.map(p => p.id),
+      1
+    ),
+    findUniqueGetFicheInterventions({
+      where: { id: existingBsff.id }
+    })
+  ]);
 
   // only pick keys present in the input to compute the diff between
   // the input and the data in DB

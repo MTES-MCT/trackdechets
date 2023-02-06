@@ -60,7 +60,7 @@ export async function checkEditionRules(
 
     if (isAwaitingSignature(signatureType, existingBsffPackaging)) {
       // do not perform additional checks if we are still awaiting
-      // for this signature type or if the emitter is updating is own signed data
+      // for this signature type or if the emitter is updating his own signed data
       return true;
     }
     for (const field of updatedFields) {

@@ -16,11 +16,7 @@ describe("edition rules", () => {
         status: "INITIAL"
       }
     });
-    const fullBsda = await prisma.bsda.findUnique({
-      where: { id: bsda.id },
-      include: { grouping: true, forwarding: true, intermediaries: true }
-    });
-    const checked = await checkEditionRules(fullBsda, {
+    const checked = await checkEditionRules(bsda, {
       emitter: { company: { name: "ACME" } }
     });
     expect(checked).toBe(true);
@@ -33,13 +29,9 @@ describe("edition rules", () => {
         emitterEmissionSignatureDate: new Date()
       }
     });
-    const fullBsda = await prisma.bsda.findUnique({
-      where: { id: bsda.id },
-      include: { grouping: true, forwarding: true, intermediaries: true }
-    });
 
     const checkFn = () =>
-      checkEditionRules(fullBsda, {
+      checkEditionRules(bsda, {
         emitter: { company: { name: "ACME" } }
       });
 
@@ -57,13 +49,9 @@ describe("edition rules", () => {
         emitterEmissionSignatureDate: new Date()
       }
     });
-    const fullBsda = await prisma.bsda.findUnique({
-      where: { id: bsda.id },
-      include: { grouping: true, forwarding: true, intermediaries: true }
-    });
 
     const checked = await checkEditionRules(
-      fullBsda,
+      bsda,
       {
         emitter: { company: { name: "ACME" } }
       },
@@ -93,15 +81,11 @@ describe("edition rules", () => {
         contact: "contact"
       }
     });
-    const fullBsda = await prisma.bsda.findUnique({
-      where: { id: bsda.id },
-      include: { grouping: true, forwarding: true, intermediaries: true }
-    });
 
-    const checked = await checkEditionRules(fullBsda, {
-      emitter: { company: { siret: fullBsda.emitterCompanySiret } },
-      forwarding: fullBsda.forwardingId,
-      grouping: fullBsda.grouping.map(bsda => bsda.id),
+    const checked = await checkEditionRules(bsda, {
+      emitter: { company: { siret: bsda.emitterCompanySiret } },
+      forwarding: bsda.forwardingId,
+      grouping: grouping.map(bsda => bsda.id),
       intermediaries: [
         {
           siret: intermediary.siret,
@@ -120,12 +104,8 @@ describe("edition rules", () => {
         emitterEmissionSignatureDate: new Date()
       }
     });
-    const fullBsda = await prisma.bsda.findUnique({
-      where: { id: bsda.id },
-      include: { grouping: true, forwarding: true, intermediaries: true }
-    });
 
-    const checked = await checkEditionRules(fullBsda, {
+    const checked = await checkEditionRules(bsda, {
       transporter: { transport: { plates: ["AD-008-TS"] } }
     });
     expect(checked).toBe(true);
@@ -139,17 +119,12 @@ describe("edition rules", () => {
         workerWorkSignatureDate: new Date()
       }
     });
-    const fullBsda = await prisma.bsda.findUnique({
-      where: { id: bsda.id },
-      include: { grouping: true, forwarding: true, intermediaries: true }
-    });
 
     const checkFn = () =>
-      checkEditionRules(fullBsda, {
+      checkEditionRules(bsda, {
         worker: {
           work: {
-            hasEmitterPaperSignature:
-              !fullBsda.workerWorkHasEmitterPaperSignature
+            hasEmitterPaperSignature: !bsda.workerWorkHasEmitterPaperSignature
           }
         }
       });
@@ -167,12 +142,8 @@ describe("edition rules", () => {
         workerWorkSignatureDate: new Date()
       }
     });
-    const fullBsda = await prisma.bsda.findUnique({
-      where: { id: bsda.id },
-      include: { grouping: true, forwarding: true, intermediaries: true }
-    });
 
-    const checked = await checkEditionRules(fullBsda, {
+    const checked = await checkEditionRules(bsda, {
       transporter: { transport: { plates: ["AD-008-TS"] } }
     });
     expect(checked).toBe(true);
@@ -187,13 +158,9 @@ describe("edition rules", () => {
         transporterTransportSignatureDate: new Date()
       }
     });
-    const fullBsda = await prisma.bsda.findUnique({
-      where: { id: bsda.id },
-      include: { grouping: true, forwarding: true, intermediaries: true }
-    });
 
     const checkFn = () =>
-      checkEditionRules(fullBsda, {
+      checkEditionRules(bsda, {
         transporter: {
           transport: {
             plates: ["AD-008-YT"]
@@ -223,13 +190,9 @@ describe("edition rules", () => {
         contact: "contact"
       }
     });
-    const fullBsda = await prisma.bsda.findUnique({
-      where: { id: bsda.id },
-      include: { grouping: true, forwarding: true, intermediaries: true }
-    });
 
-    const checked = await checkEditionRules(fullBsda, {
-      transporter: { company: { siret: fullBsda.transporterCompanySiret } },
+    const checked = await checkEditionRules(bsda, {
+      transporter: { company: { siret: bsda.transporterCompanySiret } },
       intermediaries: [
         {
           siret: intermediary.siret,
@@ -250,12 +213,8 @@ describe("edition rules", () => {
         transporterTransportSignatureDate: new Date()
       }
     });
-    const fullBsda = await prisma.bsda.findUnique({
-      where: { id: bsda.id },
-      include: { grouping: true, forwarding: true, intermediaries: true }
-    });
 
-    const checked = await checkEditionRules(fullBsda, {
+    const checked = await checkEditionRules(bsda, {
       destination: { reception: { weight: 300 } }
     });
     expect(checked).toBe(true);
@@ -271,13 +230,9 @@ describe("edition rules", () => {
         destinationOperationSignatureDate: new Date()
       }
     });
-    const fullBsda = await prisma.bsda.findUnique({
-      where: { id: bsda.id },
-      include: { grouping: true, forwarding: true, intermediaries: true }
-    });
 
     const checkFn = () =>
-      checkEditionRules(fullBsda, {
+      checkEditionRules(bsda, {
         destination: { reception: { weight: 300 } }
       });
 

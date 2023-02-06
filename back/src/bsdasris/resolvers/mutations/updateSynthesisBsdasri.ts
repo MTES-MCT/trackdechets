@@ -3,15 +3,14 @@ import { Bsdasri, BsdasriStatus, BsdasriType } from "@prisma/client";
 import { BsdasriInput } from "../../../generated/graphql/types";
 
 import { validateBsdasri } from "../../validation";
-import { ForbiddenError, UserInputError } from "apollo-server-express";
+import { UserInputError } from "apollo-server-express";
 
 import { getEligibleDasrisForSynthesis, aggregatePackagings } from "./utils";
 import {
   getBsdasriRepository,
   getReadonlyBsdasriRepository
 } from "../../repository";
-
-import { getFieldsAllorwedForUpdate } from "./fieldsUpdateRules";
+import { checkEditionRules } from "../../edition";
 
 const buildSynthesizedBsdasriArgs = async (
   dasrisToAssociate: Bsdasri[] | null | undefined,
@@ -101,14 +100,9 @@ const updateSynthesisBsdasri = async ({
     dbBsdasri.status
   );
   const flattenedInput = flattenBsdasriInput(rest);
-  const flattenedFields = Object.keys(flattenedInput);
-  const allowedFields = getFieldsAllorwedForUpdate(dbBsdasri);
-  const diff = flattenedFields.filter(el => !allowedFields.includes(el));
 
-  if (!!diff.length) {
-    const errMessage = `Des champs ont été verrouillés via signature ou ne sont pas modifiables sur le dasri de synthèse: ${diff.join()}`;
-    throw new ForbiddenError(errMessage);
-  }
+  await checkEditionRules(dbBsdasri, input);
+
   const flattenedArgs = {
     ...flattenedInput,
     ...synthesizedBsdasriArgs

@@ -7,8 +7,8 @@ import { BsdasriInput, BsdasriSignatureType } from "../generated/graphql/types";
 import { flattenBsdasriInput } from "./converter";
 import { getReadonlyBsdasriRepository } from "./repository";
 
-// Defines until which signature BSDA fields can be modified
-// The test in edition.test.ts ensures that every possible key in BsdaInput
+// Defines until which signature BSDASRI fields can be modified
+// The test in edition.test.ts ensures that every possible key in BsdasriInput
 // has a corresponding edition rule
 export const editionRules: { [key: string]: BsdasriSignatureType } = {
   wasteCode: "EMISSION",
@@ -138,7 +138,7 @@ export async function checkEditionRules(
       (signatureType === "EMISSION" && isEmitter)
     ) {
       // do not perform additional checks if we are still awaiting
-      // for this signature type or if the emitter is updating is own signed data
+      // for this signature type or if the emitter is updating his own signed data
       return true;
     }
     for (const field of updatedFields) {
@@ -186,10 +186,13 @@ async function getUpdatedFields(
 
   const { ...bsdasri } = existingBsda;
   const { findRelatedEntity } = getReadonlyBsdasriRepository();
-  const grouping = await findRelatedEntity({ id: bsdasri.id }).grouping();
-  const synthesizing = await findRelatedEntity({
-    id: bsdasri.id
-  }).synthesizing();
+
+  const [grouping, synthesizing] = await Promise.all([
+    findRelatedEntity({ id: bsdasri.id }).grouping(),
+    findRelatedEntity({
+      id: bsdasri.id
+    }).synthesizing()
+  ]);
 
   // only pick keys present in the input to compute the diff between
   // the input and the data in DB

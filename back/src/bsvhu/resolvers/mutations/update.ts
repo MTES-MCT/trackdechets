@@ -3,11 +3,10 @@ import { MutationUpdateBsvhuArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { expandVhuFormFromDb, flattenVhuInput } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
-import { getNotEditableKeys } from "../../edition-rules";
-import { SealedFieldsError } from "../../errors";
 import { checkIsBsvhuContributor } from "../../permissions";
 import { validateBsvhu } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
+import { checkEditionRules } from "../../edition";
 
 export default async function edit(
   _,
@@ -23,11 +22,6 @@ export default async function edit(
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  const invalidKeys = getNotEditableKeys(input, prismaForm);
-  if (invalidKeys.length) {
-    throw new SealedFieldsError(invalidKeys);
-  }
-
   const formUpdate = flattenVhuInput(input);
 
   const resultingForm = { ...prismaForm, ...formUpdate };
@@ -36,6 +30,8 @@ export default async function edit(
     resultingForm,
     "Vous ne pouvez pas enlever votre établissement du bordereau"
   );
+
+  await checkEditionRules(prismaForm, input);
 
   await validateBsvhu(resultingForm, {
     emissionSignature: prismaForm.emitterEmissionSignatureAuthor != null,

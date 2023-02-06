@@ -1,10 +1,11 @@
-import { Bsda, IntermediaryBsdaAssociation, User } from "@prisma/client";
+import { Bsda, User } from "@prisma/client";
 import { safeInput } from "../common/converter";
 import { SealedFieldError } from "../common/errors";
 import { getCachedUserSiretOrVat } from "../common/redis/users";
 import { objectDiff } from "../forms/workflow/diff";
 import { BsdaInput, BsdaSignatureType } from "../generated/graphql/types";
 import { flattenBsdaInput } from "./converter";
+import { getReadonlyBsdaRepository } from "./repository";
 
 // Defines until which signature BSDA fields can be modified
 // The test in edition.test.ts ensures that every possible key in BsdaInput
@@ -104,26 +105,20 @@ export const editionRules: { [key: string]: BsdaSignatureType } = {
 };
 
 export async function checkEditionRules(
-  existingBsda: Bsda & {
-    grouping: Bsda[];
-    intermediaries: IntermediaryBsdaAssociation[];
-    forwarding: Bsda;
-  },
+  bsda: Bsda,
   input: BsdaInput,
   user?: User
 ) {
-  if (existingBsda.status === "INITIAL") {
+  if (bsda.status === "INITIAL") {
     return true;
   }
 
   const userSirets = user?.id ? await getCachedUserSiretOrVat(user.id) : [];
-  const isEmitter = userSirets.includes(existingBsda.emitterCompanySiret);
-
-  const { grouping, intermediaries, forwarding, ...bsda } = existingBsda;
+  const isEmitter = userSirets.includes(bsda.emitterCompanySiret);
 
   const sealedFieldErrors: string[] = [];
 
-  const updatedFields = getUpdatedFields(existingBsda, input);
+  const updatedFields = await getUpdatedFields(bsda, input);
 
   // Inner function used to recursively checks that the diff
   // does not contain any fields sealed by signature
@@ -143,7 +138,7 @@ export async function checkEditionRules(
       (signatureType === "EMISSION" && isEmitter)
     ) {
       // do not perform additional checks if we are still awaiting
-      // for this signature type or if the emitter is updating is own signed data
+      // for this signature type or if the emitter is updating his own signed data
       return true;
     }
     for (const field of updatedFields) {
@@ -177,14 +172,10 @@ export async function checkEditionRules(
  * data present in the DB, we do not return it as we want to
  * allow reposting fields if they are not modified
  */
-function getUpdatedFields(
-  existingBsda: Bsda & {
-    grouping: Bsda[];
-    intermediaries: IntermediaryBsdaAssociation[];
-    forwarding: Bsda;
-  },
+async function getUpdatedFields(
+  bsda: Bsda,
   input: BsdaInput
-): string[] {
+): Promise<string[]> {
   const updatedFields = [];
 
   const flatInput = safeInput({
@@ -193,7 +184,16 @@ function getUpdatedFields(
     forwarding: input.forwarding,
     intermediaries: input.intermediaries
   });
-  const { grouping, intermediaries, forwarding, ...bsda } = existingBsda;
+
+  const { findRelatedEntity } = getReadonlyBsdaRepository();
+
+  const [grouping, intermediaries, forwarding] = await Promise.all([
+    findRelatedEntity({ id: bsda.id }).grouping(),
+    findRelatedEntity({
+      id: bsda.id
+    }).intermediaries(),
+    findRelatedEntity({ id: bsda.id }).forwarding()
+  ]);
 
   // only pick keys present in the input to compute the diff between
   // the input and the data in DB
