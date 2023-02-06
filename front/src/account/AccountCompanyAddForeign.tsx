@@ -212,6 +212,7 @@ export default function AccountCompanyAddForeign() {
                           hint={memoizedStrings.vatNumber.hint}
                           messageType={errors.vatNumber ? "error" : ""}
                           message={errors.vatNumber || ""}
+                          disabled={companyInfos?.vatNumber}
                           {...field}
                         ></TextInput>
                       );
@@ -223,6 +224,7 @@ export default function AccountCompanyAddForeign() {
                       return (
                         <TextInput
                           label={memoizedStrings.companyName}
+                          disabled={companyInfos?.name}
                           {...field}
                         ></TextInput>
                       );
@@ -234,6 +236,7 @@ export default function AccountCompanyAddForeign() {
                       return (
                         <TextInput
                           label={memoizedStrings.address}
+                          disabled={companyInfos?.address}
                           textarea
                           {...field}
                         ></TextInput>
