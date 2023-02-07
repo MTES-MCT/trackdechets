@@ -51,6 +51,7 @@ const DashboardPage = () => {
 
   const { siret } = useParams<{ siret: string }>();
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isFethingMore, setIsFetchingMore] = useState(false);
 
   const withRoutePredicate = useCallback(() => {
     if (isActTab) {
@@ -144,6 +145,31 @@ const DashboardPage = () => {
     });
     setBsdsVariables(variables);
   };
+
+  const loadMoreBsds = React.useCallback(() => {
+    setIsFetchingMore(true);
+    fetchMore({
+      variables: {
+        after: data?.bsds.pageInfo.endCursor,
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (fetchMoreResult == null) {
+          return prev;
+        }
+
+        return {
+          ...prev,
+          bsds: {
+            ...prev.bsds,
+            ...fetchMoreResult.bsds,
+            edges: prev.bsds.edges.concat(fetchMoreResult.bsds.edges),
+          },
+        };
+      },
+    }).then(() => {
+      setIsFetchingMore(false);
+    });
+  }, [data?.bsds.pageInfo.endCursor, fetchMore]);
 
   useEffect(() => {
     setIsFiltersOpen(false);
@@ -259,7 +285,8 @@ const DashboardPage = () => {
       {isFiltersOpen && (
         <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
       )}
-      {loading ? (
+      {isFethingMore && <Loader />}
+      {loading && !isFethingMore ? (
         <Loader />
       ) : (
         <>
@@ -280,29 +307,8 @@ const DashboardPage = () => {
             <div className="dashboard-page__loadmore">
               <button
                 className="fr-btn"
-                onClick={() =>
-                  fetchMore({
-                    variables: {
-                      after: data?.bsds.pageInfo.endCursor,
-                    },
-                    updateQuery: (prev, { fetchMoreResult }) => {
-                      if (fetchMoreResult == null) {
-                        return prev;
-                      }
-
-                      return {
-                        ...prev,
-                        bsds: {
-                          ...prev.bsds,
-                          ...fetchMoreResult.bsds,
-                          edges: prev.bsds.edges.concat(
-                            fetchMoreResult.bsds.edges
-                          ),
-                        },
-                      };
-                    },
-                  })
-                }
+                onClick={loadMoreBsds}
+                disabled={isFethingMore}
               >
                 {load_more_bsds}
               </button>
