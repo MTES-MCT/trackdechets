@@ -355,14 +355,16 @@ export function FicheInterventionList({
                 </label>
               </div>
             </div>
-            <div className="tw-px-2">
-              <button
-                type="button"
-                onClick={() => onRemoveFicheIntervention(ficheIntervention)}
-              >
-                <IconClose />
-              </button>
-            </div>
+            {!disabled && (
+              <div className="tw-px-2">
+                <button
+                  type="button"
+                  onClick={() => onRemoveFicheIntervention(ficheIntervention)}
+                >
+                  <IconClose />
+                </button>
+              </div>
+            )}
           </div>
         </div>
       ))}
