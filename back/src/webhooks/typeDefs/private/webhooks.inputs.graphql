@@ -1,0 +1,12 @@
+input WebhookSettingCreateInput {
+  companyId: String!
+  endpointUri: String!
+  token: String!
+  activated: Boolean!
+}
+
+input WebhookSettingUpdateInput {
+  endpointUri: String
+  token: String
+  activated: Boolean
+}

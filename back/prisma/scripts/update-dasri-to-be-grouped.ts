@@ -1,7 +1,7 @@
 import prisma from "../../src/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
 import { BsdasriType, BsdasriStatus } from "@prisma/client";
-import { enqueueBsdToIndex } from "../../src/queue/producers/elastic";
+import { enqueueUpdatedBsdToIndex } from "../../src/queue/producers/elastic";
 @registerUpdater(
   "Update groupable dasris to AWAITING_GROUP",
   "Update groupable dasris to AWAITING_GROUP",
@@ -43,7 +43,7 @@ export class UpdateBsdasriStatusEligibleFirGrouping implements Updater {
     });
 
     for (const bsdId of toUpdateIds) {
-      await enqueueBsdToIndex(bsdId);
+      await enqueueUpdatedBsdToIndex(bsdId);
     }
     console.log(`${updated.count} dasris where updated`);
   }

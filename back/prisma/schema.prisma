@@ -216,6 +216,7 @@ model Company {
   BsdaRevisionRequest                  BsdaRevisionRequest[]
   givenSignatureAutomations            SignatureAutomation[]     @relation("SignatureAutomationFrom")
   receivedSignatureAutomations         SignatureAutomation[]     @relation("SignatureAutomationTo")
+  WebhookSetting                       WebhookSetting[]
 
   @@index([name], map: "_CompanyNameIdx")
   @@index([givenName], map: "_CompanyGivenNameIdx")
@@ -1514,4 +1515,18 @@ model PdfAccessToken {
   visitedAt DateTime? @db.Timestamptz(6)
 
   @@index([token], map: "_PdfAccessTokenTokenIdx")
+}
+
+model WebhookSetting {
+  id          String    @id @default(cuid())
+  createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+  companyId   String
+  company     Company   @relation(fields: [companyId], references: [id])
+  endpointUri String
+  token       String
+  orgId       String
+  activated   Boolean   @default(value: false)
+
+  @@unique([orgId, endpointUri])
+  @@index([orgId], map: "_WebhookSettingOrgIdIdx")
 }

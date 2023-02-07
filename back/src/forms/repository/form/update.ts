@@ -3,7 +3,7 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
-import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 import { formDiff } from "../../workflow/diff";
 
@@ -84,7 +84,7 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
     }
 
     prisma.addAfterCommitCallback(() =>
-      enqueueBsdToIndex(updatedForm.readableId)
+      enqueueUpdatedBsdToIndex(updatedForm.readableId)
     );
 
     return updatedForm;
