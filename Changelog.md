@@ -20,6 +20,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 - Dénormalisation du bsdasri [PR 2090](https://github.com/MTES-MCT/trackdechets/pull/2090)
+- Dénormalisation du bsda [PR 2118](https://github.com/MTES-MCT/trackdechets/pull/2118)
 
 # [2023.1.4] 31/01/2023
 
