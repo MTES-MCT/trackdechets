@@ -357,15 +357,13 @@ export const acceptationSchema: yup.SchemaOf<Acceptation> = yup.object({
   acceptationWasteCode: yup
     .string()
     .nullable()
-    .required("Le code déchet après analyse est requis")
     .oneOf(
-      BSFF_WASTE_CODES,
-      "Le code déchet ne fait pas partie de la liste reconnue : ${values}"
+      [null, ...BSFF_WASTE_CODES],
+      `Le code déchet ne fait pas partie de la liste reconnue : ${BSFF_WASTE_CODES.join(
+        ", "
+      )}`
     ),
-  acceptationWasteDescription: yup
-    .string()
-    .ensure()
-    .required("La description du déchet après analyse est requise")
+  acceptationWasteDescription: yup.string()
 });
 
 const withNextDestination = (required: boolean) =>

@@ -42,10 +42,8 @@ export default function WasteInfo({ disabled }) {
   useEffect(() => {
     if ([BsffType.Groupement, BsffType.Reexpedition].includes(values.type)) {
       if (values.previousPackagings?.length && !values.waste?.code) {
-        const wasteCode =
-          values.previousPackagings[0].acceptation?.wasteCode ??
-          values.previousPackagings[0]?.bsff?.waste?.code;
-        setFieldValue("waste.code", wasteCode);
+        const wasteCode = values.previousPackagings[0].acceptation?.wasteCode;
+        setFieldValue("waste.code", wasteCode ?? "");
       }
       if (!values.previousPackagings?.length && values.waste?.code) {
         setFieldValue("waste.code", "");

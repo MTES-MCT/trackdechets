@@ -99,10 +99,7 @@ export function PreviousPackagingsPicker({
       [BsffType.Groupement, BsffType.Reexpedition].includes(bsff.type)
     ) {
       const pickedPackaging = previousPackagings[0];
-      return (
-        pickedPackaging.acceptation?.wasteCode ??
-        pickedPackaging?.bsff?.waste?.code
-      );
+      return pickedPackaging.acceptation?.wasteCode;
     }
     return null;
   }, [previousPackagings, bsff.type]);
