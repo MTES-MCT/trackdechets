@@ -24,7 +24,7 @@ export function toElasticFilter(
         bool: {
           should: [
             idFilterToElasticFilter("id", where.id),
-            idFilterToElasticFilter("readableId.keyword" as any, where.id)
+            idFilterToElasticFilter("readableId" as any, where.id)
           ]
         }
       }
@@ -40,7 +40,7 @@ export function toElasticFilter(
     filter = [
       ...filter,
       dateFilterToElasticFilter(
-        "transporterTakenOverAt",
+        "transporterTransportTakenOverAt",
         where.transporterTakenOverAt
       )
     ];
@@ -125,7 +125,7 @@ export function toElasticFilter(
     filter = [
       ...filter,
       numericFilterToElasticFilter(
-        "destinationReceptionWeight",
+        "destinationAcceptationWeight",
         where.destinationReceptionWeight
       )
     ];

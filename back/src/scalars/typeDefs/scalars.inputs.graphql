@@ -31,8 +31,16 @@ input StringFilter {
 
 "Filtre pour les listes de chaînes de caractères"
 input StringNullableListFilter {
-  _in: [String!]
+  "Au moins une valeur existe dans la liste"
+  _in: [String!] @deprecated(reason: "use _hasSome instead")
+  "La liste correspond exactement à la liste fournie. N'est pas implémenté dans la query `bsds`"
   _eq: [String!]
+  "Au moins une valeur existe dans la liste"
+  _hasSome: [String!]
+  "La valeur est présente dans la liste"
   _has: String
+  "Toutes les valeurs existes dans la liste"
   _hasEvery: [String!]
+  "La chaîne de caractère est contenu dans au moins un élément de la liste. N'est impléménté que sur la query `bsds`"
+  _itemContains: String
 }

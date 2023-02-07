@@ -11,7 +11,7 @@ import { indexBsff } from "../../bsffs/elastic";
 import { createBsff } from "../../bsffs/__tests__/factories";
 import { indexBsvhu } from "../../bsvhu/elastic";
 import { bsvhuFactory } from "../../bsvhu/__tests__/factories.vhu";
-import { BsdElastic, client, index } from "../../common/elastic";
+import { client, index } from "../../common/elastic";
 import { getFullForm } from "../../forms/database";
 import { indexForm } from "../../forms/elastic";
 import { BsdType, WasteRegistryWhere } from "../../generated/graphql/types";
@@ -140,10 +140,10 @@ describe("toElasticFilter", () => {
   ])("should filter BSDDs between two %p dates (strict)", async date => {
     // convert elastic key to form key
     const toFormKey: {
-      [P in keyof BsdElastic]?: keyof Form;
+      [P in keyof WasteRegistryWhere]?: keyof Form;
     } = {
       createdAt: "createdAt",
-      transporterTakenOverAt: "sentAt",
+      transporterTakenOverAt: "takenOverAt",
       destinationReceptionDate: "receivedAt",
       destinationOperationDate: "processedAt"
     };
@@ -197,7 +197,7 @@ describe("toElasticFilter", () => {
   ])("should filter BSDAs between two %p dates (strict)", async date => {
     // convert elastic key to bsda key
     const toBsdaKey: {
-      [P in keyof BsdElastic]?: keyof Bsda;
+      [P in keyof WasteRegistryWhere]?: keyof Bsda;
     } = {
       createdAt: "createdAt",
       transporterTakenOverAt: "transporterTransportTakenOverAt",
@@ -248,7 +248,7 @@ describe("toElasticFilter", () => {
   ])("should filter BSDASRIs between two %p dates (strict)", async date => {
     // convert elastic key to bsdasri key
     const toBsdasriKey: {
-      [P in keyof BsdElastic]?: keyof Bsdasri;
+      [P in keyof WasteRegistryWhere]?: keyof Bsdasri;
     } = {
       createdAt: "createdAt",
       transporterTakenOverAt: "transporterTakenOverAt",
@@ -299,7 +299,7 @@ describe("toElasticFilter", () => {
   ])("should filter BSVHUs between two %p dates (strict)", async date => {
     // convert elastic key to bsvhu key
     const toBsvhuKey: {
-      [P in keyof BsdElastic]?: keyof Bsvhu;
+      [P in keyof WasteRegistryWhere]?: keyof Bsvhu;
     } = {
       createdAt: "createdAt",
       transporterTakenOverAt: "transporterTransportTakenOverAt",
@@ -347,7 +347,7 @@ describe("toElasticFilter", () => {
     async date => {
       // convert elastic key to bsff key
       const toBsffKey: {
-        [P in keyof BsdElastic]?: keyof Bsff;
+        [P in keyof WasteRegistryWhere]?: keyof Bsff;
       } = {
         createdAt: "createdAt",
         transporterTakenOverAt: "transporterTransportTakenOverAt",
@@ -468,10 +468,10 @@ describe("toElasticFilter", () => {
   ])("should filter BSDDs between two %p dates (not strict)", async date => {
     // convert elastic key to form key
     const toFormKey: {
-      [P in keyof BsdElastic]?: keyof Form;
+      [P in keyof WasteRegistryWhere]?: keyof Form;
     } = {
       createdAt: "createdAt",
-      transporterTakenOverAt: "sentAt",
+      transporterTakenOverAt: "takenOverAt",
       destinationReceptionDate: "receivedAt",
       destinationOperationDate: "processedAt"
     };
@@ -525,7 +525,7 @@ describe("toElasticFilter", () => {
   ])("should filter BSDAs between two %p dates (not strict)", async date => {
     // convert elastic key to bsda key
     const toBsdaKey: {
-      [P in keyof BsdElastic]?: keyof Bsda;
+      [P in keyof WasteRegistryWhere]?: keyof Bsda;
     } = {
       createdAt: "createdAt",
       transporterTakenOverAt: "transporterTransportTakenOverAt",
@@ -576,7 +576,7 @@ describe("toElasticFilter", () => {
   ])("should filter BSDASRIs between two %p dates (not strict)", async date => {
     // convert elastic key to bsdasri key
     const toBsdasriKey: {
-      [P in keyof BsdElastic]?: keyof Bsdasri;
+      [P in keyof WasteRegistryWhere]?: keyof Bsdasri;
     } = {
       createdAt: "createdAt",
       transporterTakenOverAt: "transporterTakenOverAt",
@@ -631,7 +631,7 @@ describe("toElasticFilter", () => {
   ])("should filter BSVHUs between two %p dates (not strict)", async date => {
     // convert elastic key to bsvhu key
     const toBsvhuKey: {
-      [P in keyof BsdElastic]?: keyof Bsvhu;
+      [P in keyof WasteRegistryWhere]?: keyof Bsvhu;
     } = {
       createdAt: "createdAt",
       transporterTakenOverAt: "transporterTransportTakenOverAt",
@@ -679,7 +679,7 @@ describe("toElasticFilter", () => {
     async date => {
       // convert elastic key to bsff key
       const toBsffKey: {
-        [P in keyof BsdElastic]?: keyof Bsff;
+        [P in keyof WasteRegistryWhere]?: keyof Bsff;
       } = {
         createdAt: "createdAt",
         transporterTakenOverAt: "transporterTransportTakenOverAt",
@@ -800,10 +800,10 @@ describe("toElasticFilter", () => {
   ])("should filter BSDDs on %p (exact date)", async date => {
     // convert elastic key to form key
     const toFormKey: {
-      [P in keyof BsdElastic]?: keyof Form;
+      [P in keyof WasteRegistryWhere]?: keyof Form;
     } = {
       createdAt: "createdAt",
-      transporterTakenOverAt: "sentAt",
+      transporterTakenOverAt: "takenOverAt",
       destinationReceptionDate: "receivedAt",
       destinationOperationDate: "processedAt"
     };
@@ -856,7 +856,7 @@ describe("toElasticFilter", () => {
   ])("should filter BSDAs on %p (exact date)", async date => {
     // convert elastic key to bsda key
     const toBsdaKey: {
-      [P in keyof BsdElastic]?: keyof Bsda;
+      [P in keyof WasteRegistryWhere]?: keyof Bsda;
     } = {
       createdAt: "createdAt",
       transporterTakenOverAt: "transporterTransportTakenOverAt",
@@ -906,7 +906,7 @@ describe("toElasticFilter", () => {
   ])("should filter BSDASRIs on %p (exact date)", async date => {
     // convert elastic key to bsdasri key
     const toBsdasriKey: {
-      [P in keyof BsdElastic]?: keyof Bsdasri;
+      [P in keyof WasteRegistryWhere]?: keyof Bsdasri;
     } = {
       createdAt: "createdAt",
       transporterTakenOverAt: "transporterTakenOverAt",
@@ -956,7 +956,7 @@ describe("toElasticFilter", () => {
   ])("should filter BSVHUs on %p (exact date)", async date => {
     // convert elastic key to bsvhu key
     const toBsvhuKey: {
-      [P in keyof BsdElastic]?: keyof Bsvhu;
+      [P in keyof WasteRegistryWhere]?: keyof Bsvhu;
     } = {
       createdAt: "createdAt",
       transporterTakenOverAt: "transporterTransportTakenOverAt",
@@ -1003,7 +1003,7 @@ describe("toElasticFilter", () => {
     async date => {
       // convert elastic key to bsff key
       const toBsffKey: {
-        [P in keyof BsdElastic]?: keyof Bsff;
+        [P in keyof WasteRegistryWhere]?: keyof Bsff;
       } = {
         createdAt: "createdAt",
         transporterTakenOverAt: "transporterTransportTakenOverAt",

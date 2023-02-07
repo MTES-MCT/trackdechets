@@ -64,7 +64,7 @@ const prismaModels = {
 
 const prismaFindManyOptions = {
   bsff: {
-    include: { packagings: true }
+    include: { packagings: true, ficheInterventions: true }
   },
   bsvhu: {},
   bsda: {

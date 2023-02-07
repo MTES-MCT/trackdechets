@@ -6,9 +6,11 @@ import {
 } from "@prisma/client";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
-export type FindUniqueBsffFn = (
-  args: Prisma.BsffFindUniqueArgs
-) => Promise<Bsff & { packagings: BsffPackaging[] }>;
+export type FindUniqueBsffFn = (args: Prisma.BsffFindUniqueArgs) => Promise<
+  Bsff & { packagings: BsffPackaging[] } & {
+    ficheInterventions: BsffFicheIntervention[];
+  }
+>;
 
 export type FindUniqueBsffGetPackagingsFn = (
   bsffFindUniqueArgs: Prisma.BsffFindUniqueArgs,
@@ -27,7 +29,11 @@ export function buildFinduniqueBsff({
     const bsff = await prisma.bsff.findFirst({
       ...args,
       where: { ...args.where, isDeleted: false },
-      include: { packagings: true, ...(args.include ?? {}) }
+      include: {
+        packagings: true,
+        ficheInterventions: true,
+        ...(args.include ?? {})
+      }
     });
     return bsff;
   };

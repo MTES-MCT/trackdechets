@@ -1,4 +1,10 @@
-import { Bsff, BsffStatus, BsffPackaging } from "@prisma/client";
+import {
+  Bsff,
+  BsffStatus,
+  BsffPackaging,
+  BsffFicheIntervention,
+  BsdType
+} from "@prisma/client";
 import { BsdElastic, indexBsd } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
@@ -7,36 +13,84 @@ import { getTransporterCompanyOrgId } from "../common/constants/companySearchHel
 import { getReadonlyBsffRepository } from "./repository";
 
 export function toBsdElastic(
-  bsff: Bsff & { packagings: BsffPackaging[] }
+  bsff: Bsff & {
+    packagings: BsffPackaging[];
+  } & {
+    ficheInterventions: BsffFicheIntervention[];
+  }
 ): BsdElastic {
   const bsffDestination = toBsffDestination(bsff.packagings);
 
   const bsd = {
-    type: "BSFF" as const,
+    type: BsdType.BSFF,
+    createdAt: bsff.createdAt?.getTime(),
+    updatedAt: bsff.updatedAt?.getTime(),
     id: bsff.id,
     readableId: bsff.id,
     customId: "",
-    createdAt: bsff.createdAt.getTime(),
-    updatedAt: bsff.updatedAt.getTime(),
+    status: bsff.status,
+    wasteCode: bsff.wasteCode ?? "",
+    wasteAdr: bsff.wasteAdr ?? "",
+    wasteDescription: bsff.wasteDescription ?? "",
+    packagingNumbers: bsff.packagings?.map(p => p.numero) ?? [],
+    wasteSealNumbers: [],
+    identificationNumbers: [],
+    ficheInterventionNumbers:
+      bsff.ficheInterventions?.map(fi => fi.numero) ?? [],
     emitterCompanyName: bsff.emitterCompanyName ?? "",
     emitterCompanySiret: bsff.emitterCompanySiret ?? "",
+    emitterCompanyAddress: bsff.emitterCompanyAddress ?? "",
+    emitterPickupSiteName: "",
+    emitterPickupSiteAddress: "",
+    emitterCustomInfo: bsff.emitterCustomInfo ?? "",
+    workerCompanyName: "",
+    workerCompanySiret: "",
+    workerCompanyAddress: "",
+
     transporterCompanyName: bsff.transporterCompanyName ?? "",
     transporterCompanySiret: bsff.transporterCompanySiret ?? "",
     transporterCompanyVatNumber: bsff.transporterCompanyVatNumber ?? "",
-    transporterTakenOverAt:
-      bsff.transporterTransportTakenOverAt?.getTime() ??
-      bsff.transporterTransportSignatureDate?.getTime(),
+    transporterCompanyAddress: bsff.transporterCompanyAddress ?? "",
     transporterCustomInfo: bsff.transporterCustomInfo ?? "",
-    transporterNumberPlate: bsff.transporterTransportPlates ?? [],
+    transporterTransportPlates: bsff.transporterTransportPlates ?? [],
+
     destinationCompanyName: bsff.destinationCompanyName ?? "",
     destinationCompanySiret: bsff.destinationCompanySiret ?? "",
+    destinationCompanyAddress: bsff.destinationCompanyAddress ?? "",
+    destinationCustomInfo: bsff.destinationCustomInfo ?? "",
+    destinationCap: bsff.destinationCap ?? "",
+
+    brokerCompanyName: "",
+    brokerCompanySiret: "",
+    brokerCompanyAddress: "",
+
+    traderCompanyName: "",
+    traderCompanySiret: "",
+    traderCompanyAddress: "",
+
+    ecoOrganismeName: "",
+    ecoOrganismeSiret: "",
+
+    nextDestinationCompanyName:
+      bsff.destinationOperationNextDestinationCompanyName ?? "",
+    nextDestinationCompanySiret:
+      bsff.destinationOperationNextDestinationCompanySiret ?? "",
+    nextDestinationCompanyVatNumber:
+      bsff.destinationOperationNextDestinationCompanyVatNumber ?? "",
+    nextDestinationCompanyAddress:
+      bsff.destinationOperationNextDestinationCompanyAddress ?? "",
+
+    destinationOperationCode: bsff.destinationOperationCode ?? "",
+
+    emitterEmissionDate: bsff.emitterEmissionSignatureDate?.getTime(),
+    workerWorkDate: null,
+    transporterTransportTakenOverAt:
+      bsff.transporterTransportTakenOverAt?.getTime() ??
+      bsff.transporterTransportSignatureDate?.getTime(),
     destinationReceptionDate: bsff.destinationReceptionDate?.getTime(),
-    destinationReceptionWeight: bsffDestination.receptionWeight,
-    destinationOperationCode: bsffDestination.operationCode ?? "",
-    destinationOperationDate: bsffDestination.operationDate?.getTime(),
-    wasteCode: bsff.wasteCode ?? "",
-    wasteDescription: bsff.wasteDescription ?? "",
-    containers: bsff.packagings.map(packaging => packaging.numero),
+    destinationAcceptationDate: bsffDestination?.receptionDate?.getTime(),
+    destinationAcceptationWeight: bsffDestination?.receptionWeight,
+    destinationOperationDate: bsffDestination?.operationDate?.getTime(),
     isDraftFor: [],
     isForActionFor: [],
     isFollowFor: [],

@@ -1,4 +1,4 @@
-import { BsvhuStatus, Bsvhu } from "@prisma/client";
+import { BsvhuStatus, Bsvhu, BsdType } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { BsdElastic, indexBsd } from "../common/elastic";
 import { GraphQLContext } from "../types";
@@ -104,26 +104,73 @@ export function toBsdElastic(bsvhu: Bsvhu): BsdElastic {
   const where = getWhere(bsvhu);
 
   return {
-    type: "BSVHU",
+    type: BsdType.BSVHU,
+    createdAt: bsvhu.createdAt?.getTime(),
+    updatedAt: bsvhu.updatedAt?.getTime(),
     id: bsvhu.id,
     readableId: bsvhu.id,
     customId: "",
-    createdAt: bsvhu.createdAt.getTime(),
-    updatedAt: bsvhu.updatedAt.getTime(),
+    status: bsvhu.status,
+    wasteCode: bsvhu.wasteCode ?? "",
+    wasteAdr: "",
+    wasteDescription: "",
+    packagingNumbers: [],
+    wasteSealNumbers: [],
+    identificationNumbers: bsvhu.identificationNumbers ?? [],
+    ficheInterventionNumbers: [],
     emitterCompanyName: bsvhu.emitterCompanyName ?? "",
     emitterCompanySiret: bsvhu.emitterCompanySiret ?? "",
+    emitterCompanyAddress: bsvhu.emitterCompanyAddress ?? "",
+    emitterPickupSiteName: "",
+    emitterPickupSiteAddress: "",
+    emitterCustomInfo: bsvhu.emitterCustomInfo ?? "",
+    workerCompanyName: "",
+    workerCompanySiret: "",
+    workerCompanyAddress: "",
+
     transporterCompanyName: bsvhu.transporterCompanyName ?? "",
     transporterCompanySiret: bsvhu.transporterCompanySiret ?? "",
     transporterCompanyVatNumber: bsvhu.transporterCompanyVatNumber ?? "",
-    transporterTakenOverAt: bsvhu.transporterTransportTakenOverAt?.getTime(),
+    transporterCompanyAddress: bsvhu.transporterCompanyAddress ?? "",
+    transporterCustomInfo: bsvhu.transporterCustomInfo ?? "",
+    transporterTransportPlates: bsvhu.transporterTransportPlates ?? [],
+
     destinationCompanyName: bsvhu.destinationCompanyName ?? "",
     destinationCompanySiret: bsvhu.destinationCompanySiret ?? "",
-    destinationReceptionDate: bsvhu.destinationReceptionDate?.getTime(),
-    destinationReceptionWeight: bsvhu.destinationReceptionWeight,
+    destinationCompanyAddress: bsvhu.destinationCompanyAddress ?? "",
+    destinationCustomInfo: "",
+    destinationCap: "",
+
+    brokerCompanyName: "",
+    brokerCompanySiret: "",
+    brokerCompanyAddress: "",
+
+    traderCompanyName: "",
+    traderCompanySiret: "",
+    traderCompanyAddress: "",
+
+    ecoOrganismeName: "",
+    ecoOrganismeSiret: "",
+
+    nextDestinationCompanyName:
+      bsvhu.destinationOperationNextDestinationCompanyName ?? "",
+    nextDestinationCompanySiret:
+      bsvhu.destinationOperationNextDestinationCompanySiret ?? "",
+    nextDestinationCompanyVatNumber:
+      bsvhu.destinationOperationNextDestinationCompanyVatNumber ?? "",
+    nextDestinationCompanyAddress:
+      bsvhu.destinationOperationNextDestinationCompanyAddress ?? "",
+
     destinationOperationCode: bsvhu.destinationOperationCode ?? "",
+
+    emitterEmissionDate: bsvhu.emitterEmissionSignatureDate?.getTime(),
+    workerWorkDate: null,
+    transporterTransportTakenOverAt:
+      bsvhu.transporterTransportTakenOverAt?.getTime(),
+    destinationReceptionDate: bsvhu.destinationReceptionDate?.getTime(),
+    destinationAcceptationDate: bsvhu.destinationReceptionDate?.getTime(),
+    destinationAcceptationWeight: bsvhu.destinationReceptionWeight,
     destinationOperationDate: bsvhu.destinationOperationDate?.getTime(),
-    wasteCode: bsvhu.wasteCode ?? "",
-    wasteDescription: "",
     ...where,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsvhu),

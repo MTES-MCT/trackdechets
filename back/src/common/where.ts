@@ -166,7 +166,7 @@ export function toPrismaStringNullableListFilter(
   }
 
   return safeInput<Prisma.StringNullableListFilter>({
-    hasSome: stringNullableListFilter._in,
+    hasSome: stringNullableListFilter._hasSome ?? stringNullableListFilter._in,
     equals: stringNullableListFilter._eq,
     has: stringNullableListFilter._has,
     hasEvery: stringNullableListFilter._hasEvery

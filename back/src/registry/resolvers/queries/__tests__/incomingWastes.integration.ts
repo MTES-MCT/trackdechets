@@ -86,6 +86,7 @@ describe("Incoming wastes registry", () => {
         quantityReceived: 1000,
         createdAt: new Date("2021-04-01"),
         sentAt: new Date("2021-04-01"),
+        takenOverAt: new Date("2021-04-01"),
         receivedAt: new Date("2021-04-01"),
         processedAt: new Date("2021-04-01"),
         processingOperationDone: "R 1"
@@ -161,6 +162,7 @@ describe("Incoming wastes registry", () => {
       },
       {
         acceptationWeight: 200,
+        acceptationDate: new Date("2021-08-01"),
         operationCode: "R2",
         operationSignatureDate: new Date("2021-08-01")
       }

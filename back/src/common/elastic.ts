@@ -1,38 +1,83 @@
 import fs from "fs";
 import path from "path";
 import { Client, RequestParams } from "@elastic/elasticsearch";
-import { BsdType, FormCompany } from "../generated/graphql/types";
 import { GraphQLContext } from "../types";
 import { AuthType } from "../auth";
 import prisma from "../prisma";
 import { Bsda, Bsdasri, Bsff, Bsvhu, Form, Prisma } from "@prisma/client";
 import logger from "../logging/logger";
+import { BsdType, FormCompany } from "../generated/graphql/types";
 
 export interface BsdElastic {
   type: BsdType;
+
   id: string;
+  readableId: string;
+
   createdAt: number;
   updatedAt: number;
-  readableId: string;
+
   customId: string;
+
+  status: string;
+
+  wasteCode: string;
+  wasteAdr: string;
+  wasteDescription: string;
+  packagingNumbers: string[];
+  wasteSealNumbers: string[];
+  identificationNumbers: string[];
+  ficheInterventionNumbers: string[];
+
   emitterCompanyName: string;
   emitterCompanySiret: string;
+  emitterCompanyAddress: string;
+  emitterPickupSiteName: string;
+  emitterPickupSiteAddress: string;
+  emitterCustomInfo: string;
+
+  workerCompanyName: string;
+  workerCompanySiret: string;
+  workerCompanyAddress: string;
+
   transporterCompanyName: string;
   transporterCompanySiret: string;
-  transporterCompanyVatNumber?: string;
-  transporterTakenOverAt: number;
-  wasteCode: string;
-  wasteDescription: string;
-  containers?: string[];
-  transporterNumberPlate?: string[];
-  transporterCustomInfo?: string;
+  transporterCompanyVatNumber: string;
+  transporterCompanyAddress: string;
+  transporterCustomInfo: string;
+  transporterTransportPlates: string[];
+
   destinationCompanyName: string;
   destinationCompanySiret: string;
-  destinationReceptionDate: number;
-  destinationReceptionWeight: number;
+  destinationCompanyAddress: string;
+  destinationCustomInfo: string;
+  destinationCap: string;
+
+  brokerCompanyName: string;
+  brokerCompanySiret: string;
+  brokerCompanyAddress: string;
+
+  traderCompanyName: string;
+  traderCompanySiret: string;
+  traderCompanyAddress: string;
+
+  ecoOrganismeName: string;
+  ecoOrganismeSiret: string;
+
+  nextDestinationCompanyName: string;
+  nextDestinationCompanySiret: string;
+  nextDestinationCompanyVatNumber: string;
+  nextDestinationCompanyAddress: string;
+
   destinationOperationCode: string;
+
+  emitterEmissionDate: number;
+  workerWorkDate: number;
+  transporterTransportTakenOverAt: number;
+  destinationReceptionDate: number;
+  destinationAcceptationDate: number;
+  destinationAcceptationWeight: number;
   destinationOperationDate: number;
-  intermediaries?: FormCompany[];
 
   isDraftFor: string[];
   isForActionFor: string[];
@@ -47,297 +92,184 @@ export interface BsdElastic {
   isTransportedWasteFor: string[];
   isManagedWasteFor: string[];
 
+  intermediaries?: FormCompany[];
+
   rawBsd: any;
 }
 
-// Custom analyzers for readableId and waste fields
-// See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/analysis-ngram-tokenizer.html
+const textField = { type: "text" };
+
+const stringField = {
+  type: "keyword",
+  normalizer: "lowercase",
+  fields: {
+    ngram: {
+      type: "text",
+      analyzer: "ngram_analyzer",
+      search_analyzer: "ngram_search"
+    }
+  }
+};
+
+const dateField = { type: "date" };
+
+const numericField = {
+  type: "float"
+};
+
+const rawField = {
+  // enabled false only compatible with object type on ES 6.8
+  type: "object",
+  // store, do not index
+  enabled: false
+};
+
 const settings = {
   analysis: {
     analyzer: {
-      // BSD-20210101-H7F59G71G => [bs, bsd, sd, 20, 201, ..., 20210101, ..., h7f59g71, hf59g71g]
-      readableId: {
-        tokenizer: "readableId_ngram",
+      ngram_analyzer: {
+        tokenizer: "ngram_tokenizer",
         filter: ["lowercase"]
       },
-      // BSD-20210101-H7F59G71G => [bsd, 20210101, hf59g71g]
-      // H7F5 => [h7f5]
-      readableId_search: {
-        tokenizer: "readableId_char_group",
-        filter: ["lowercase"]
-      },
-      // 01 01 01* => ["01", "01 ", "1 ", .. "01 01 01*"]
-      waste_ngram: {
-        tokenizer: "waste_ngram"
-      },
-      // accepts whatever text it is given and outputs the exact same text as a single term
-      waste_ngram_search: {
-        tokenizer: "keyword"
-      },
-      numberPlate: {
-        tokenizer: "numberPlate_ngram",
-        filter: ["lowercase"]
-      },
-      numberPlate_search: {
-        tokenizer: "numberPlate_char_group",
-        filter: ["lowercase"]
-      },
-      container: {
-        tokenizer: "container_ngram",
-        filter: ["lowercase"]
-      },
-      container_search: {
-        tokenizer: "container_char_group",
+      ngram_search: {
+        tokenizer: "char_group",
         filter: ["lowercase"]
       }
     },
     tokenizer: {
-      readableId_ngram: {
-        type: "ngram",
-        min_gram: 2,
-        max_gram: 9, // max token length is the random part of the readableId
-        token_chars: ["letter", "digit"] // split on "-"
-      },
-      readableId_char_group: {
-        type: "char_group",
-        tokenize_on_chars: ["whitespace", "-"]
-      },
-      customId_ngram: {
-        type: "ngram",
-        token_chars: ["letter", "digit"]
-      },
-      customId_char_group: {
-        type: "char_group",
-        tokenize_on_chars: ["whitespace", "-", "_"]
-      },
-      waste_ngram: {
-        type: "ngram",
-        min_gram: 1, // allow to search on "*" to get dangerous waste only
-        max_gram: 9, // "xx xx xx*" is 9 char length
-        // do not include letter in `token_chars` to discard waste description from the index
-        token_chars: ["digit", "whitespace", "punctuation", "symbol"]
-      },
-      numberPlate_ngram: {
-        type: "ngram",
-        min_gram: 2,
-        max_gram: 3,
-        token_chars: ["letter", "digit"]
-      },
-      numberPlate_char_group: {
-        type: "char_group",
-        tokenize_on_chars: ["whitespace", "-"]
-      },
-      container_ngram: {
+      // Ngram are used to perform substring match without relying to wildcard queries
+      // See https://stackoverflow.com/questions/6467067/how-to-search-for-a-part-of-a-word-with-elasticsearch
+      // We use different analyzers at index time and search time.
+      // Example with the following string : "BEN"
+      // At index time => [b, e, n, be, en, ben]
+      // At search time if the search query is "BE" => [be] and it match !
+      // To avoid having a high max_gram (14 for siret number) which will take a lot of disk space we split the
+      // search query every 5 characters see bsds/where.ts
+      // There is a small risk of false positive by permutation though
+      // Ex searching for BENGUI => [BENGU, I] will match IBENGU
+      ngram_tokenizer: {
         type: "ngram",
         min_gram: 1,
-        max_gram: 10,
-        token_chars: ["letter", "digit", "punctuation"]
+        max_gram: 5,
+        token_chars: ["letter", "digit", "symbol", "punctuation"]
       },
-      container_char_group: {
+      char_group: {
         type: "char_group",
-        tokenize_on_chars: ["whitespace"]
+        tokenize_on_chars: ["whitespace", "-"]
+      }
+    },
+    normalizer: {
+      lowercase: {
+        type: "custom",
+        filter: ["lowercase"]
       }
     }
-  },
-  index: {
-    max_ngram_diff: 20 // compatibility with ES 7+, max_ngram_diff > any of max_gram above
   }
 };
 
 const properties: Record<keyof BsdElastic, Record<string, unknown>> = {
-  // "keyword" is used for exact matches
-  // "text" for fuzzy matches
-  // but it's not possible to sort on "text" fields
-  // so that's why text fields have a secondary field "keyword" used to sort
-  id: {
-    type: "keyword"
-  },
-  readableId: {
-    type: "text",
-    analyzer: "readableId",
-    search_analyzer: "readableId_search",
-    fields: {
-      keyword: {
-        type: "keyword"
-      }
-    }
-  },
-  customId: {
-    type: "keyword"
-  },
-  type: {
-    type: "keyword"
-  },
-  emitterCompanyName: {
-    type: "text",
-    fields: {
-      keyword: {
-        type: "keyword"
-      }
-    }
-  },
-  emitterCompanySiret: {
-    type: "keyword"
-  },
-  transporterCompanyName: {
-    type: "text",
-    fields: {
-      keyword: {
-        type: "keyword"
-      }
-    }
-  },
-  transporterCompanySiret: {
-    type: "keyword"
-  },
-  transporterCompanyVatNumber: {
-    type: "keyword"
-  },
-  transporterTakenOverAt: {
-    type: "date"
-  },
-  destinationCompanyName: {
-    type: "text",
-    fields: {
-      keyword: {
-        type: "keyword"
-      }
-    }
-  },
-  destinationReceptionDate: {
-    type: "date"
-  },
-  destinationReceptionWeight: {
-    type: "float"
-  },
-  destinationOperationCode: {
-    type: "keyword"
-  },
-  destinationOperationDate: {
-    type: "date"
-  },
-  destinationCompanySiret: {
-    type: "keyword"
-  },
-  wasteCode: {
-    type: "keyword",
-    fields: {
-      ngram: {
-        type: "text",
-        analyzer: "waste_ngram",
-        search_analyzer: "waste_ngram_search"
-      }
-    }
-  },
-  wasteDescription: {
-    type: "text",
-    fields: {
-      keyword: {
-        type: "keyword"
-      }
-    }
-  },
-  containers: {
-    type: "text",
-    analyzer: "container",
-    search_analyzer: "container_search",
-    fields: {
-      keyword: {
-        type: "keyword"
-      }
-    }
-  },
-  transporterNumberPlate: {
-    type: "text",
-    analyzer: "numberPlate",
-    search_analyzer: "numberPlate_search",
-    fields: {
-      keyword: {
-        type: "keyword"
-      }
-    }
-  },
-  transporterCustomInfo: {
-    type: "text",
-    fields: {
-      keyword: {
-        type: "keyword"
-      }
-    }
-  },
-  createdAt: {
-    type: "date"
-  },
-  updatedAt: {
-    type: "date"
-  },
-  isDraftFor: {
-    type: "keyword"
-  },
-  isFollowFor: {
-    type: "keyword"
-  },
-  isForActionFor: {
-    type: "keyword"
-  },
-  isArchivedFor: {
-    type: "keyword"
-  },
-  isToCollectFor: {
-    type: "keyword"
-  },
-  isCollectedFor: {
-    type: "keyword"
-  },
-  sirets: {
-    type: "keyword"
-  },
-  // établissement pour lesquelles ce BSD doit apparaitre sur le registre de déchets entrants
-  isIncomingWasteFor: {
-    type: "keyword"
-  },
-  // établissements pour lesquelles ce BSD doit apparaitre sur le registre de déchets sortants
-  isOutgoingWasteFor: {
-    type: "keyword"
-  },
-  // établissements pour lesquelles ce BSD doit apparaitre sur le registre de déchets transportés
-  isTransportedWasteFor: {
-    type: "keyword"
-  },
-  // établissements pour lesquelles ce BSD doit apparaitre sur le registre de déchets gérés
-  isManagedWasteFor: {
-    type: "keyword"
-  },
+  type: stringField,
+  id: stringField,
+  readableId: stringField,
+  createdAt: dateField,
+  updatedAt: dateField,
+  customId: stringField,
+  status: stringField,
+  wasteCode: stringField,
+  wasteAdr: textField,
+  wasteDescription: textField,
+  packagingNumbers: stringField,
+  wasteSealNumbers: stringField,
+  identificationNumbers: stringField,
+  ficheInterventionNumbers: stringField,
+
+  emitterCompanyName: textField,
+  emitterCompanySiret: stringField,
+  emitterCompanyAddress: textField,
+  emitterPickupSiteName: textField,
+  emitterPickupSiteAddress: textField,
+  emitterCustomInfo: textField,
+
+  workerCompanyName: textField,
+  workerCompanySiret: stringField,
+  workerCompanyAddress: textField,
+
+  transporterCompanyName: textField,
+  transporterCompanySiret: stringField,
+  transporterCompanyVatNumber: stringField,
+  transporterCompanyAddress: textField,
+  transporterCustomInfo: textField,
+  transporterTransportPlates: stringField,
+
+  destinationCompanyName: textField,
+  destinationCompanySiret: stringField,
+  destinationCompanyAddress: textField,
+  destinationCustomInfo: textField,
+  destinationCap: textField,
+
+  brokerCompanyName: textField,
+  brokerCompanySiret: stringField,
+  brokerCompanyAddress: textField,
+
+  traderCompanyName: textField,
+  traderCompanySiret: stringField,
+  traderCompanyAddress: textField,
+
+  ecoOrganismeName: textField,
+  ecoOrganismeSiret: stringField,
+
+  nextDestinationCompanyName: textField,
+  nextDestinationCompanySiret: stringField,
+  nextDestinationCompanyVatNumber: stringField,
+  nextDestinationCompanyAddress: textField,
+
+  destinationOperationCode: stringField,
+  emitterEmissionDate: dateField,
+
+  workerWorkDate: dateField,
+  transporterTransportTakenOverAt: dateField,
+  destinationReceptionDate: dateField,
+  destinationAcceptationDate: dateField,
+  destinationAcceptationWeight: numericField,
+  destinationOperationDate: dateField,
+
+  isDraftFor: stringField,
+  isForActionFor: stringField,
+  isFollowFor: stringField,
+  isArchivedFor: stringField,
+  isToCollectFor: stringField,
+  isCollectedFor: stringField,
+  sirets: stringField,
+
+  isIncomingWasteFor: stringField,
+  isOutgoingWasteFor: stringField,
+  isTransportedWasteFor: stringField,
+  isManagedWasteFor: stringField,
+
   intermediaries: {
     properties: {
-      name: { type: "text" },
-      siret: { type: "keyword" },
-      address: { type: "text" },
-      country: { type: "text" },
-      contact: { type: "text" },
-      phone: { type: "text" },
-      mail: { type: "text" },
-      vatNumber: { type: "keyword" },
-      createdAt: {
-        type: "date"
-      },
-      formId: { type: "keyword" },
-      id: { type: "keyword" }
+      name: textField,
+      siret: stringField,
+      address: textField,
+      country: textField,
+      contact: textField,
+      phone: textField,
+      mail: textField,
+      vatNumber: stringField,
+      createdAt: dateField,
+      formId: stringField,
+      id: stringField
     }
   },
-  rawBsd: {
-    // enabled false only compatible with object type on ES 6.8
-    type: "object",
-    // store, do not index
-    enabled: false
-  }
+
+  rawBsd: rawField
 };
 
 export type BsdIndex = {
   alias: string;
   type: string;
-  settings: typeof settings;
   mappings_version: string;
+  settings: any;
   mappings: {
     properties: typeof properties;
   };
@@ -350,10 +282,11 @@ export const index: BsdIndex = {
   // so while it's required for the current version, we are not using it too much
   type: "_doc",
   settings,
+
   // increment when mapping has changed to trigger re-indexation on release
   // only use vX.Y.Z that matches regexp "v\d\.\d\.\d"
   // no special characters that are not supported by ES index names (like ":")
-  mappings_version: "v0.2.12",
+  mappings_version: "v1.0.0",
   mappings: {
     properties
   }

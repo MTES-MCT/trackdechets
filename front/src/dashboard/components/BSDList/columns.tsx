@@ -30,31 +30,52 @@ import * as bsda from "./BSDa";
 // that don't have an equivalent in the API
 export const COLUMNS_PARAMETERS_NAME = {
   type: {
-    filter: "types",
+    filter: value => ({ type: { _in: value } }),
     order: "type",
   },
   readableId: {
-    filter: "readableId",
+    filter: value => ({
+      _or: [
+        { readableId: { _contains: value } },
+        { packagingNumbers: { _hasSome: value } },
+        { packagingNumbers: { _itemContains: value } },
+      ],
+    }),
     order: "readableId",
   },
   emitter: {
-    filter: "emitter",
+    filter: value => ({
+      _or: [
+        { emitterCompanyName: { _match: value } },
+        { emitterCompanySiret: { _contains: value } },
+      ],
+    }),
     order: "emitterCompanyName",
   },
   recipient: {
-    filter: "recipient",
+    filter: value => ({
+      _or: [
+        { destinationCompanyName: { _match: value } },
+        { destinationCompanySiret: { _contains: value } },
+      ],
+    }),
     order: "destinationCompanyName",
   },
   transporterNumberPlate: {
-    filter: "transporterNumberPlate",
+    filter: value => ({ transporterTransportPlates: { _eq: value } }),
     order: "transporterNumberPlate",
   },
   transporterCustomInfo: {
-    filter: "transporterCustomInfo",
+    filter: value => ({ transporterCustomInfo: { _match: value } }),
     order: "transporterCustomInfo",
   },
   waste: {
-    filter: "waste",
+    filter: value => ({
+      _or: [
+        { wasteCode: { _contains: value } },
+        { wasteDescription: { _match: value } },
+      ],
+    }),
     order: "wasteCode",
   },
 };

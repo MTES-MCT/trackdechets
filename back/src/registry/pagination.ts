@@ -12,11 +12,11 @@ function buildSort(
   order: OrderType
 ): { [key in keyof BsdElastic]?: OrderType }[] {
   const sortKey: { [key in WasteRegistryType]: keyof BsdElastic } = {
-    OUTGOING: "transporterTakenOverAt",
+    OUTGOING: "transporterTransportTakenOverAt",
     INCOMING: "destinationReceptionDate",
-    TRANSPORTED: "transporterTakenOverAt",
-    MANAGED: "transporterTakenOverAt",
-    ALL: "transporterTakenOverAt"
+    TRANSPORTED: "transporterTransportTakenOverAt",
+    MANAGED: "transporterTransportTakenOverAt",
+    ALL: "transporterTransportTakenOverAt"
   };
 
   return [

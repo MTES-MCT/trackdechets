@@ -1,17 +1,86 @@
 input BsdWhere {
-  readableId: String
-  emitter: String
-  recipient: String
-  waste: String
-  transporterNumberPlate: String
-  transporterCustomInfo: String
-  types: [BsdType!]
+  createdAt: DateFilter
+  updatedAt: DateFilter
+
+  id: StringFilter
+  readableId: StringFilter
+  customId: StringFilter
+
+  type: StringFilter
+  status: StringFilter
+
+  wasteCode: StringFilter
+  wasteAdr: TextFilter
+  wasteDescription: TextFilter
+  packagingNumbers: StringNullableListFilter
+  wasteSealNumbers: StringNullableListFilter
+  identificationNumbers: StringNullableListFilter
+  ficheInterventionNumbers: StringNullableListFilter
+
+  emitterCompanyName: TextFilter
+  emitterCompanySiret: StringFilter
+  emitterCompanyAddress: TextFilter
+  emitterPickupSiteName: TextFilter
+  emitterPickupSiteAddress: TextFilter
+  emitterCustomInfo: TextFilter
+
+  workerCompanyName: TextFilter
+  workerCompanySiret: StringFilter
+  workerCompanyAddress: TextFilter
+
+  transporterCompanyName: TextFilter
+  transporterCompanySiret: StringFilter
+  transporterCompanyVatNumber: StringFilter
+  transporterCompanyAddress: TextFilter
+  transporterCustomInfo: TextFilter
+  transporterTransportPlates: StringNullableListFilter
+
+  destinationCompanyName: TextFilter
+  destinationCompanySiret: StringFilter
+  destinationCompanyAddress: TextFilter
+  destinationCustomInfo: TextFilter
+  destinationCap: TextFilter
+
+  brokerCompanyName: TextFilter
+  brokerCompanySiret: StringFilter
+  brokerCompanyAddress: TextFilter
+
+  traderCompanyName: TextFilter
+  traderCompanySiret: StringFilter
+  traderCompanyAddress: TextFilter
+
+  ecoOrganismeName: TextFilter
+  ecoOrganismeSiret: StringFilter
+
+  nextDestinationCompanyName: TextFilter
+  nextDestinationCompanySiret: StringFilter
+  nextDestinationCompanyVatNumber: StringFilter
+  nextDestinationCompanyAddress: TextFilter
+
+  destinationOperationCode: StringFilter
+
+  emitterEmissionDate: DateFilter
+  workerWorkDate: DateFilter
+  transporterTransportTakenOverAt: DateFilter
+  destinationReceptionDate: DateFilter
+  destinationAcceptationDate: DateFilter
+  destinationOperationDate: DateFilter
+
   isDraftFor: [String!]
   isForActionFor: [String!]
   isFollowFor: [String!]
   isArchivedFor: [String!]
   isToCollectFor: [String!]
   isCollectedFor: [String!]
+
+  sirets: StringNullableListFilter
+
+  _and: [BsdWhere!]
+  _or: [BsdWhere!]
+}
+
+input TextFilter {
+  _match: String
 }
 
 input OrderBy {
