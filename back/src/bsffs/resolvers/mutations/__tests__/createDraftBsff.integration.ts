@@ -357,6 +357,55 @@ describe("Mutation.createDraftBsff", () => {
       ]);
     });
 
+    it("should not be possible to add packagings with different waste codes in case of réexpédition", async () => {
+      let bsff = await createBsffAfterOperation(
+        { emitter, transporter, destination },
+        {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        { operationCode: OPERATION.R13.code, acceptationWasteCode: "14 06 01*" }
+      );
+
+      const { id, ...packagingData } = bsff.packagings[0];
+      await prisma.bsffPackaging.create({
+        data: { ...packagingData, acceptationWasteCode: "14 06 02*" }
+      });
+
+      bsff = await prisma.bsff.findUnique({
+        where: { id: bsff.id },
+        include: { packagings: true }
+      });
+
+      const { mutate } = makeClient(destination.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createDraftBsff">,
+        MutationCreateDraftBsffArgs
+      >(CREATE_DRAFT_BSFF, {
+        variables: {
+          input: {
+            type: BsffType.REEXPEDITION,
+            emitter: {
+              company: {
+                name: destination.company.name,
+                siret: destination.company.siret,
+                address: destination.company.address,
+                contact: destination.user.name,
+                mail: destination.user.email
+              }
+            },
+            forwarding: bsff.packagings.map(p => p.id)
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Vous ne pouvez pas réexpédier des contenants ayant des codes déchet différents : 14 06 01*, 14 06 02*"
+        })
+      ]);
+    });
+
     it("should add bsffs for repackaging", async () => {
       const previousBsffs = await Promise.all([
         createBsffAfterOperation(
@@ -541,7 +590,7 @@ describe("Mutation.createDraftBsff", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "Vous ne pouvez pas regrouper des contenants ayant des codes déchets différents : 14 06 01*, 14 06 02*"
+            "Vous ne pouvez pas regrouper des contenants ayant des codes déchet différents : 14 06 01*, 14 06 02*"
         })
       ]);
     });

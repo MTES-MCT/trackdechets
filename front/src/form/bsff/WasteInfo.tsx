@@ -1,7 +1,7 @@
 import { FieldSwitch, RedErrorMessage } from "common/components";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { Field, useFormikContext } from "formik";
-import { Bsff, BsffType } from "generated/graphql/types";
+import { Bsff, BsffPackaging, BsffType } from "generated/graphql/types";
 import { BSFF_WASTES } from "generated/constants";
 import React, { useEffect, useMemo } from "react";
 import Packagings from "./components/packagings/Packagings";
@@ -9,7 +9,7 @@ import { PreviousPackagingsPicker } from "./components/PreviousPackagingsPicker"
 
 export default function WasteInfo({ disabled }) {
   const { setFieldValue, values } =
-    useFormikContext<Bsff & { previousPackagings: Bsff[] }>();
+    useFormikContext<Bsff & { previousPackagings: BsffPackaging[] }>();
 
   const [hasPreviousPackagingsChanged, setHasPreviousPackagingsChanged] =
     React.useState(false);
@@ -39,6 +39,24 @@ export default function WasteInfo({ disabled }) {
     () => values.ficheInterventions?.reduce((w, FI) => w + FI.weight, 0),
     [values.ficheInterventions]
   );
+  useEffect(() => {
+    if ([BsffType.Groupement, BsffType.Reexpedition].includes(values.type)) {
+      if (values.previousPackagings?.length && !values.waste?.code) {
+        const wasteCode =
+          values.previousPackagings[0].acceptation?.wasteCode ??
+          values.previousPackagings[0]?.bsff?.waste?.code;
+        setFieldValue("waste.code", wasteCode);
+      }
+      if (!values.previousPackagings?.length && values.waste?.code) {
+        setFieldValue("waste.code", "");
+      }
+    }
+  }, [values.previousPackagings, values.type, setFieldValue, values.waste]);
+
+  const wasteCodeDisabled = [
+    BsffType.Groupement,
+    BsffType.Reexpedition,
+  ].includes(values.type);
 
   return (
     <>
@@ -79,7 +97,7 @@ export default function WasteInfo({ disabled }) {
             as="select"
             name="waste.code"
             className="td-select"
-            disabled={disabled}
+            disabled={disabled || wasteCodeDisabled}
           >
             <option />
             {BSFF_WASTES.map(item => (

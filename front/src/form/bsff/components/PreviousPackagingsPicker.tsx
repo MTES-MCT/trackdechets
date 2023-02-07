@@ -79,17 +79,36 @@ export function PreviousPackagingsPicker({
 
   const instruction =
     bsff.type === BsffType.Groupement
-      ? "Retrouvez ci-dessous la liste des contenants qui sont en attente d'un groupement."
+      ? "Retrouvez ci-dessous la liste des contenants qui sont en attente d'un groupement." +
+        " Les contenants à regrouper doivent avoir le même code déchet."
       : bsff.type === BsffType.Reconditionnement
       ? "Retrouvez ci-dessous la liste des contenants qui sont en attente d'un reconditionnement."
       : bsff.type === BsffType.Reexpedition
-      ? "Retrouvez ci-dessous la liste des contenants qui sont en attente d'une réexpédition."
+      ? "Retrouvez ci-dessous la liste des contenants qui sont en attente d'une réexpédition." +
+        " Les contenants à réexpédier doivent faire partie du même bordereau initial et avoir le même code déchet"
       : "";
 
   const [{ value: previousPackagings }] =
     useField<BsffPackaging[]>("previousPackagings");
 
+  // En cas de regroupement ou de réexpédition, tous les contenants sélectionnés
+  // doivent avoir le même code déchet
+  let wasteCode = React.useMemo(() => {
+    if (
+      previousPackagings?.length &&
+      [BsffType.Groupement, BsffType.Reexpedition].includes(bsff.type)
+    ) {
+      const pickedPackaging = previousPackagings[0];
+      return (
+        pickedPackaging.acceptation?.wasteCode ??
+        pickedPackaging?.bsff?.waste?.code
+      );
+    }
+    return null;
+  }, [previousPackagings, bsff.type]);
+
   let where: BsffPackagingWhere = {
+    ...(wasteCode ? { acceptation: { wasteCode: { _eq: wasteCode } } } : {}),
     operation: { code: { _in: code_in }, noTraceability: false },
     bsff: {
       destination: {

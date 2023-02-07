@@ -668,6 +668,32 @@ export async function validatePreviousPackagings(
     );
   }
 
+  if (isForwarding) {
+    const bsffIds = forwardedPackagings.map(p => p.bsffId);
+    const areOnSameBsff = bsffIds.every(id => id === bsffIds[0]);
+    if (!areOnSameBsff) {
+      throw new UserInputError(
+        "Tous les contenants réexpédiés doivent apparaitre sur le même BSFF initial"
+      );
+    }
+  }
+
+  const forwardedWasteCodes = [
+    ...new Set(
+      forwardedPackagings
+        .map(p => p.acceptationWasteCode ?? p.bsff?.wasteCode)
+        .filter(code => code?.length > 0)
+    )
+  ].sort();
+
+  if (forwardedWasteCodes?.length > 1) {
+    throw new UserInputError(
+      `Vous ne pouvez pas réexpédier des contenants ayant des codes déchet différents : ${forwardedWasteCodes.join(
+        ", "
+      )}`
+    );
+  }
+
   // contenants qui sont reconditionnés dans ce BSFF
   const repackagedPackagings = isRepackaging
     ? await prisma.bsffPackaging.findMany({
@@ -710,11 +736,11 @@ export async function validatePreviousPackagings(
     ...new Set(
       groupedPackagings.map(p => p.acceptationWasteCode ?? p.bsff?.wasteCode)
     )
-  ];
+  ].sort();
 
   if (groupedWasteCodes?.length > 1) {
     throw new UserInputError(
-      `Vous ne pouvez pas regrouper des contenants ayant des codes déchets différents : ${groupedWasteCodes.join(
+      `Vous ne pouvez pas regrouper des contenants ayant des codes déchet différents : ${groupedWasteCodes.join(
         ", "
       )}`
     );
@@ -737,16 +763,6 @@ export async function validatePreviousPackagings(
     throw new UserInputError(
       "Vous devez saisir des contenants en transit en cas de groupement, reconditionnement ou réexpédition"
     );
-  }
-
-  if (isForwarding) {
-    const bsffIds = forwardedPackagings.map(p => p.bsffId);
-    const areOnSameBsff = bsffIds.every(id => id === bsffIds[0]);
-    if (!areOnSameBsff) {
-      throw new UserInputError(
-        "Tous les contenants réexpédiés doivent apparaitre sur le même BSFF initial"
-      );
-    }
   }
 
   const errors = previousPackagings.reduce((acc, packaging) => {
