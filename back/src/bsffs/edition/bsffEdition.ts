@@ -141,8 +141,6 @@ async function getUpdatedFields(
   },
   input: BsffInput
 ): Promise<string[]> {
-  const updatedFields = [];
-
   const flatInput = safeInput({
     ...flattenBsffInput(input),
     packagings: input.packagings,
@@ -196,11 +194,7 @@ async function getUpdatedFields(
 
   const diff = objectDiff(flatInput, compareTo);
 
-  for (const field of Object.keys(diff)) {
-    updatedFields.push(field);
-  }
-
-  return updatedFields;
+  return Object.keys(diff);
 }
 
 const SIGNATURES_HIERARCHY: {

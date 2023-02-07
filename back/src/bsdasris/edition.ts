@@ -177,8 +177,6 @@ async function getUpdatedFields(
   existingBsda: Bsdasri,
   input: BsdasriInput
 ): Promise<string[]> {
-  const updatedFields = [];
-
   const flatInput = safeInput({
     ...flattenBsdasriInput(input),
     grouping: input.grouping,
@@ -209,11 +207,7 @@ async function getUpdatedFields(
 
   const diff = objectDiff(flatInput, compareTo);
 
-  for (const field of Object.keys(diff)) {
-    updatedFields.push(field);
-  }
-
-  return updatedFields;
+  return Object.keys(diff);
 }
 
 const SIGNATURES_HIERARCHY: {

@@ -131,8 +131,6 @@ export async function checkEditionRules(
  * allow reposting fields if they are not modified
  */
 function getUpdatedFields(bsvhu: Bsvhu, input: BsvhuInput): string[] {
-  const updatedFields = [];
-
   const flatInput = flattenVhuInput(input);
   // only pick keys present in the input to compute the diff between
   // the input and the data in DB
@@ -144,11 +142,7 @@ function getUpdatedFields(bsvhu: Bsvhu, input: BsvhuInput): string[] {
 
   const diff = objectDiff(flatInput, compareTo);
 
-  for (const field of Object.keys(diff)) {
-    updatedFields.push(field);
-  }
-
-  return updatedFields;
+  return Object.keys(diff);
 }
 
 const SIGNATURES_HIERARCHY: {

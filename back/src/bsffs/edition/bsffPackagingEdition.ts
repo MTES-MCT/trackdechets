@@ -98,8 +98,6 @@ async function getUpdatedFields(
   existingBsffPackaging: BsffPackaging,
   input: UpdateBsffPackagingInput
 ): Promise<string[]> {
-  const updatedFields = [];
-
   const flatInput = flattenBsffPackagingInput(input);
 
   // only pick keys present in the input to compute the diff between
@@ -112,11 +110,7 @@ async function getUpdatedFields(
 
   const diff = objectDiff(flatInput, compareTo);
 
-  for (const field of Object.keys(diff)) {
-    updatedFields.push(field);
-  }
-
-  return updatedFields;
+  return Object.keys(diff);
 }
 
 const SIGNATURES_HIERARCHY: {
