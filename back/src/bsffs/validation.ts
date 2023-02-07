@@ -706,6 +706,20 @@ export async function validatePreviousPackagings(
     );
   }
 
+  const groupedWasteCodes = [
+    ...new Set(
+      groupedPackagings.map(p => p.acceptationWasteCode ?? p.bsff?.wasteCode)
+    )
+  ];
+
+  if (groupedWasteCodes?.length > 1) {
+    throw new UserInputError(
+      `Vous ne pouvez pas regrouper des contenants ayant des codes déchets différents : ${groupedWasteCodes.join(
+        ", "
+      )}`
+    );
+  }
+
   const previousPackagings = [
     ...(isForwarding ? forwardedPackagings : []),
     ...(isGrouping ? groupedPackagings : []),

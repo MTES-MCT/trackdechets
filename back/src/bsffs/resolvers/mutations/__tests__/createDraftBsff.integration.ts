@@ -210,7 +210,7 @@ describe("Mutation.createDraftBsff", () => {
     expect(bsff.detenteurCompanySirets).toEqual([detenteur.company.siret]);
   });
 
-  describe("when adding previous bsffs", () => {
+  describe("when adding previous packagings", () => {
     let emitter: UserWithCompany;
     let transporter: UserWithCompany;
     let destination: UserWithCompany;
@@ -496,6 +496,52 @@ describe("Mutation.createDraftBsff", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message: `Le BSFF ${previousBsff.id} sur lequel apparait le contenant ${previousPackaging.id} (${previousPackaging.numero}) n'a pas été traité sur l'installation émettrice du nouveau BSFF ${destination.company.siret}`
+        })
+      ]);
+    });
+
+    it("should not be possible to group packagings with different waste codes", async () => {
+      const previousBsffs = await Promise.all([
+        createBsff(
+          { emitter, transporter, destination },
+          {},
+          { acceptationWasteCode: "14 06 01*" }
+        ),
+        createBsff(
+          { emitter, transporter, destination },
+          {},
+          { acceptationWasteCode: "14 06 02*" }
+        )
+      ]);
+
+      const previousPackagings = previousBsffs.flatMap(bsff => bsff.packagings);
+
+      const { mutate } = makeClient(destination.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createDraftBsff">,
+        MutationCreateDraftBsffArgs
+      >(CREATE_DRAFT_BSFF, {
+        variables: {
+          input: {
+            type: BsffType.GROUPEMENT,
+            emitter: {
+              company: {
+                name: destination.company.name,
+                siret: destination.company.siret,
+                address: destination.company.address,
+                contact: destination.user.name,
+                mail: destination.user.email
+              }
+            },
+            grouping: previousPackagings.map(p => p.id)
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Vous ne pouvez pas regrouper des contenants ayant des codes déchets différents : 14 06 01*, 14 06 02*"
         })
       ]);
     });
