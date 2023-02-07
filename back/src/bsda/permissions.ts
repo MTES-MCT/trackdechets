@@ -89,7 +89,7 @@ export async function isBsdaContributor(user: User, bsda: BsdaContributors) {
 
   const bsdaSiretOrVat = [
     ...Object.values(BSDA_CONTRIBUTORS_FIELDS).map(field => bsda[field]),
-    ...bsda.intermediariesSiretOrTva
+    ...(bsda.intermediariesSiretOrTva ? bsda.intermediariesSiretOrTva : [])
   ].filter(Boolean);
 
   const updatedIntermediariesSirets = bsda?.intermediaries
