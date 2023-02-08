@@ -26,6 +26,7 @@ Primary.args = {
       label: "type de bordereau",
       type: FilterType.select,
       isActive: true,
+      isMultiple: true,
       options: [
         {
           value: "bsdd",

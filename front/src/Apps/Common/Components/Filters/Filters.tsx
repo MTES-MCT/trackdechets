@@ -8,6 +8,7 @@ import FilterLine from "./FilterLine";
 import { MAX_FILTER } from "../../../Dashboard/dashboardUtils";
 
 import "./filters.scss";
+import MultiSelectWrapper from "../MultiSelect/MultiSelect";
 
 const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
   const placeholderFilterRef = useRef<HTMLDivElement>(null);
@@ -17,6 +18,7 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
   const [hasReachMaxFilter, setHasReachMaxFilter] = useState(false);
   const [hasRemovedFilterLine, setHasRemovedFilterLine] =
     useState<boolean>(false);
+  const [selectMultipleValueArray, setSelectMultipleValueArray] = useState([]);
 
   const newInputElementRef = useRef<HTMLInputElement>(null);
   const newSelectElementRef = useRef<HTMLSelectElement>(null);
@@ -103,19 +105,16 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
       setIsApplyDisabled(true);
     }
   };
-  const onFilterSelectMultipleValueChange = (e, filterType) => {
-    const { options } = e.target;
-    const values = [];
-    for (let i = 0; i < options.length; i++) {
-      if (options[i].selected) {
-        // @ts-ignore
-        values.push(options[i].value);
-      }
-    }
+  const onFilterSelectMultipleValueChange = (selectList, filterType) => {
+    setSelectMultipleValueArray(selectList);
     const newFilterValues = { ...filterValues };
-    newFilterValues[filterType] = values;
+    newFilterValues[filterType] = selectList.map(selected => selected.value);
     setFilterValues(newFilterValues);
-    setIsApplyDisabled(false);
+    if (selectList.length) {
+      setIsApplyDisabled(false);
+    } else {
+      setIsApplyDisabled(true);
+    }
   };
 
   const onApply = () => {
@@ -148,27 +147,33 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
           <label className="fr-label" htmlFor={`${filter.value}_filter`}>
             {filter.label}
           </label>
-          <select
-            ref={newSelectElementRef}
-            id={`${filter.value}_filter`}
-            className="fr-select"
-            onChange={e =>
-              !filter.isMultiple
-                ? onFilterValueChange(e, filter.value)
-                : onFilterSelectMultipleValueChange(e, filter.value)
-            }
-            defaultValue={!filter.isMultiple ? "" : [""]}
-            multiple={filter.isMultiple}
-          >
-            <option value="" disabled hidden>
-              {filter_type_select_option_placeholder}
-            </option>
-            {filter.options?.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
+          {!filter.isMultiple ? (
+            <select
+              ref={newSelectElementRef}
+              id={`${filter.value}_filter`}
+              className="fr-select"
+              onChange={e => onFilterValueChange(e, filter.value)}
+              defaultValue=""
+            >
+              <option value="" disabled hidden>
+                {filter_type_select_option_placeholder}
               </option>
-            ))}
-          </select>
+              {filter.options?.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <MultiSelectWrapper
+              options={filter.options!}
+              selected={selectMultipleValueArray}
+              onChange={selectList =>
+                onFilterSelectMultipleValueChange(selectList, filter.value)
+              }
+              disableSearch
+            />
+          )}
         </div>
       );
     }
