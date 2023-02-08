@@ -14,6 +14,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Ajout de champs au scope company sur le token openId connect [PR 2080](https://github.com/MTES-MCT/trackdechets/pull/2080)
+
 #### :memo: Documentation
 
 - Ajoute les statuts Bsda à la documentation technique [PR 2129](https://github.com/MTES-MCT/trackdechets/pull/2129)
