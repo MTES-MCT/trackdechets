@@ -12,6 +12,9 @@ export function RevisionField({
   reviewValue,
   formatter = value => value,
 }: Props) {
+  console.log("bsddvalue", bsddValue);
+  console.log("reviewValue", reviewValue);
+
   const formattedBsddValue = useMemo(
     () => formatter(bsddValue),
     [formatter, bsddValue]
@@ -21,7 +24,8 @@ export function RevisionField({
     [formatter, reviewValue]
   );
 
-  if (!formattedReviewValue) return null;
+  if (formattedReviewValue === null || formattedReviewValue === undefined)
+    return null;
 
   return (
     <div className="tw-py-2 tw-border-t-2">
