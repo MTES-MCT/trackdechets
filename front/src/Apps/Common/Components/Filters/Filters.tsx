@@ -1,14 +1,13 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import { Filter, FiltersProps, FilterType } from "./filtersTypes";
-import {
-  filter_type_apply_btn,
-  filter_type_select_option_placeholder,
-} from "../../wordings/dashboard/wordingsDashboard";
+import { filter_type_apply_btn } from "../../wordings/dashboard/wordingsDashboard";
 import FilterLine from "./FilterLine";
 import { MAX_FILTER } from "../../../Dashboard/dashboardUtils";
+import Input from "../Input/Input";
+import { inputType } from "../../types/commonTypes";
+import Select from "../Select/Select";
 
 import "./filters.scss";
-import MultiSelectWrapper from "../MultiSelect/MultiSelect";
 
 const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
   const placeholderFilterRef = useRef<HTMLDivElement>(null);
@@ -125,56 +124,35 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
   const displayFilterItem = (filter: Filter) => {
     if (filter?.type === FilterType.input) {
       return (
-        <>
-          <label className="fr-label" htmlFor={`${filter.value}_filter`}>
-            {filter.label}
-          </label>
-          <input
-            ref={newInputElementRef}
-            className="fr-input"
-            type="text"
-            id={`${filter.value}_filter`}
-            name={`${filter.value}`}
-            onChange={e => onFilterValueChange(e, filter.value)}
-          ></input>
-        </>
+        <Input
+          ref={newInputElementRef}
+          type={inputType.text}
+          htmlFor={`${filter.value}_filter`}
+          id={`${filter.value}_filter`}
+          label={filter.label}
+          value={filter.value}
+          onChange={e => onFilterValueChange(e, filter.value)}
+        />
       );
     }
 
     if (filter?.type === FilterType.select) {
       return (
-        <div className="fr-select-group">
-          <label className="fr-label" htmlFor={`${filter.value}_filter`}>
-            {filter.label}
-          </label>
-          {!filter.isMultiple ? (
-            <select
-              ref={newSelectElementRef}
-              id={`${filter.value}_filter`}
-              className="fr-select"
-              onChange={e => onFilterValueChange(e, filter.value)}
-              defaultValue=""
-            >
-              <option value="" disabled hidden>
-                {filter_type_select_option_placeholder}
-              </option>
-              {filter.options?.map(option => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <MultiSelectWrapper
-              options={filter.options!}
-              selected={selectMultipleValueArray}
-              onChange={selectList =>
-                onFilterSelectMultipleValueChange(selectList, filter.value)
-              }
-              disableSearch
-            />
-          )}
-        </div>
+        <Select
+          ref={newSelectElementRef}
+          id={`${filter.value}_filter`}
+          onChange={e =>
+            !filter.isMultiple
+              ? onFilterValueChange(e, filter.value)
+              : onFilterSelectMultipleValueChange(e, filter.value)
+          }
+          defaultValue=""
+          label={filter.label}
+          isMultiple={filter.isMultiple}
+          options={filter.options!}
+          selected={selectMultipleValueArray}
+          disableSearch={filter.isMultiple}
+        />
       );
     }
   };
