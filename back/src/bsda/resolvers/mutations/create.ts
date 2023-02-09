@@ -35,6 +35,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
   const user = checkIsAuthenticated(context);
 
   const bsda = flattenBsdaInput(input);
+
   await checkIsBsdaContributor(
     user,
     { ...bsda, intermediaries: input.intermediaries },
@@ -96,7 +97,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
       grouping: { connect: groupedBsdas.map(({ id }) => ({ id })) }
     }),
     ...(hasIntermediaries && {
-      intermediariesSiretOrTva: input.intermediaries
+      intermediariesOrgIds: input.intermediaries
         .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
         .filter(Boolean),
       intermediaries: {

@@ -21,6 +21,6 @@ describe("Bsda factories", () => {
       }
     });
 
-    expect(bsda.intermediariesSiretOrTva).toEqual([company.siret]);
+    expect(bsda.intermediariesOrgIds).toEqual([company.siret]);
   });
 });

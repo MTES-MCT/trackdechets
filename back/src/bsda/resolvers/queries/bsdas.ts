@@ -23,7 +23,7 @@ export default async function bsdas(
       ...Object.values(BSDA_CONTRIBUTORS_FIELDS).map(field => ({
         [field]: { in: userCompaniesSiretOrVat }
       })),
-      { intermediariesSiretOrTva: { hasSome: userCompaniesSiretOrVat } }
+      { intermediariesOrgIds: { hasSome: userCompaniesSiretOrVat } }
     ]
   };
 

@@ -99,7 +99,7 @@ export default async function edit(
         forwarding: { connect: { id: input.forwarding } }
       }),
       ...(shouldUpdateIntermediaries && {
-        intermediariesSiretOrTva: input.intermediaries
+        intermediariesOrgIds: input.intermediaries
           .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
           .filter(Boolean),
         intermediaries: {

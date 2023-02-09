@@ -24,7 +24,7 @@ export const bsdaFactory = async ({
     return prisma.bsda.update({
       where: { id: created.id },
       data: {
-        intermediariesSiretOrTva: created.intermediaries
+        intermediariesOrgIds: created.intermediaries
           .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
           .filter(Boolean)
       }

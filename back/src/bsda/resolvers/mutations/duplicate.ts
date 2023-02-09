@@ -63,7 +63,7 @@ function duplicateBsda({
   forwardingId,
   groupedInId,
   intermediaries,
-  intermediariesSiretOrTva,
+  intermediariesOrgIds,
   ...rest
 }: Bsda & {
   intermediaries: IntermediaryBsdaAssociation[];
@@ -87,7 +87,7 @@ function duplicateBsda({
           }))
         }
       },
-      intermediariesSiretOrTva
+      intermediariesOrgIds
     })
   };
 }

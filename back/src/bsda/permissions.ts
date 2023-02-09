@@ -21,7 +21,7 @@ const bsdaSiretFields = Prisma.validator<Prisma.BsdaArgs>()({
     workerCompanySiret: true,
     brokerCompanySiret: true,
     destinationOperationNextDestinationCompanySiret: true,
-    intermediariesSiretOrTva: true
+    intermediariesOrgIds: true
   }
 });
 type BsdaFlatSiretsFields = Prisma.BsdaGetPayload<typeof bsdaSiretFields>;
@@ -87,19 +87,16 @@ export async function checkIsBsdaContributor(
 export async function isBsdaContributor(user: User, bsda: BsdaContributors) {
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
-  const bsdaSiretOrVat = [
+  // for bdsda updates, we rely on `intermediariesOrgIds` field:
+  // - if intermediaries are not updated, we get the denormalized `intermediariesOrgIds` field
+  // - if they are, we pass a flattened list of orgIds to permission to `checkIsBsdaContributor`
+  const intermediariesOrgIds = [
     ...Object.values(BSDA_CONTRIBUTORS_FIELDS).map(field => bsda[field]),
-    ...(bsda.intermediariesSiretOrTva ? bsda.intermediariesSiretOrTva : [])
+    ...(bsda.intermediariesOrgIds ? bsda.intermediariesOrgIds : [])
   ].filter(Boolean);
 
-  const updatedIntermediariesSirets = bsda?.intermediaries
-    ?.flatMap(i => [i.siret, i.vatNumber])
-    .filter(Boolean);
-
-  return userCompaniesSiretOrVat.some(
-    siret =>
-      bsdaSiretOrVat.includes(siret) ||
-      updatedIntermediariesSirets?.includes(siret)
+  return userCompaniesSiretOrVat.some(siret =>
+    intermediariesOrgIds.includes(siret)
   );
 }
 

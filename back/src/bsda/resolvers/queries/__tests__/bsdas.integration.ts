@@ -47,7 +47,7 @@ describe("Query.bsdas", () => {
     expect(data.bsdas.edges.length).toBe(1);
   });
 
-  it("should return bsdas where suer company is an intermediary", async () => {
+  it("should return bsdas where user company is an intermediary", async () => {
     const otherCompany = await companyFactory();
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     await bsdaFactory({
