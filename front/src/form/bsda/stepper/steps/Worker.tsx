@@ -112,7 +112,7 @@ export function Worker({ disabled }) {
                 <p>
                   Absence de catégorie entreprise de travaux déclarée dans le
                   profil entreprise. Il appartient à l'entreprise de travaux de
-                  le mettre à jour le cas échéant
+                  la mettre à jour le cas échéant
                 </p>
               )}
           </div>
