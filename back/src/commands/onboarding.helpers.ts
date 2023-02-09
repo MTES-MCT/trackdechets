@@ -5,7 +5,8 @@ import * as COMPANY_TYPES from "../common/constants/COMPANY_TYPES";
 import {
   onboardingFirstStep,
   onboardingProducerSecondStep,
-  onboardingProfessionalSecondStep
+  onboardingProfessionalSecondStep,
+  membershipRequestDetailsEmail
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
 /**
@@ -107,6 +108,53 @@ export const sendSecondOnboardingEmail = async () => {
       const payload = renderMail(mailTemplate, {
         to: [{ email: recipient.email, name: recipient.name }]
       });
+      return sendMail(payload);
+    })
+  );
+  await prisma.$disconnect();
+};
+
+// Retrieve users whose account was created x daysAgo,
+// but who never issued a membership request
+export const getRecentlyRegisteredUsersWithNoMembershipRequest = async (
+  daysAgo: number
+) => {
+  const now = new Date();
+
+  const associatedDateGt = xDaysAgo(now, daysAgo);
+  const associatedDateLt = xDaysAgo(now, daysAgo - 1);
+
+  const users = await prisma.user.findMany({
+    where: {
+      createdAt: { gt: associatedDateGt, lt: associatedDateLt },
+      isActive: true
+    },
+    include: {
+      companyAssociations: { include: { company: true } },
+      MembershipRequest: { include: { company: true } }
+    }
+  });
+
+  return users.filter(
+    user =>
+      user.companyAssociations.length === 0 &&
+      user.MembershipRequest.length === 0
+  );
+};
+
+/**
+ * Send a mail to users who registered recently and who haven't
+ * issued a single MembershipRequest yet
+ */
+export const sendMembershipRequestDetailsEmail = async () => {
+  const recipients = await getRecentlyRegisteredUsersWithNoMembershipRequest(7);
+
+  await Promise.all(
+    recipients.map(recipient => {
+      const payload = renderMail(membershipRequestDetailsEmail, {
+        to: [{ email: recipient.email, name: recipient.name }]
+      });
+
       return sendMail(payload);
     })
   );
