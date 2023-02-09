@@ -1,9 +1,13 @@
 import { getUid } from "../utils";
 import * as jose from "jose";
-import { Grant, Application, User } from "@prisma/client";
+import {
+  Grant,
+  Application,
+  User,
+  CompanyVerificationStatus
+} from "@prisma/client";
 import prisma from "../prisma";
 import { EMAIL_SCOPE, PROFILE_SCOPE, COMPANIES_SCOPE } from "./scopes";
-import { CompanyVerificationStatus } from "@prisma/client";
 
 const { OIDC_PRIVATE_KEY } = process.env;
 
