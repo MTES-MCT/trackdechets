@@ -3,7 +3,7 @@ import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { Field, useFormikContext } from "formik";
 import { Bsff, BsffType } from "generated/graphql/types";
 import { BSFF_WASTES } from "generated/constants";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import Packagings from "./components/packagings/Packagings";
 import { PreviousPackagingsPicker } from "./components/PreviousPackagingsPicker";
 
@@ -34,6 +34,11 @@ export default function WasteInfo({ disabled }) {
     }, 0);
     setFieldValue("weight.value", totalWeight);
   }, [values.packagings, setFieldValue]);
+
+  const ficheInterventionsWeight = useMemo(
+    () => values.ficheInterventions?.reduce((w, FI) => w + FI.weight, 0),
+    [values.ficheInterventions]
+  );
 
   return (
     <>
@@ -122,6 +127,13 @@ export default function WasteInfo({ disabled }) {
       <Field name="packagings" component={Packagings} disabled={disabled} />
 
       <h4 className="form__section-heading">Quantité</h4>
+
+      {values.ficheInterventions?.length > 0 && (
+        <div className="notification">
+          Pour information, la somme des poids renseignés sur les fiches
+          d'intervention est de {ficheInterventionsWeight} kg
+        </div>
+      )}
 
       <div className="form__row">
         <label>
