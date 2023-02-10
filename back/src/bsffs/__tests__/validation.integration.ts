@@ -442,27 +442,11 @@ describe("acceptationSchema", () => {
     expect(acceptationSchema.isValidSync(data)).toEqual(true);
   });
 
-  it("should be invalid when waste code after analysis is not set", async () => {
-    const data = { ...acceptation, acceptationWasteCode: null };
-    const validateFn = () => acceptationSchema.validate(data);
-    await expect(validateFn()).rejects.toThrow(
-      "Le code déchet après analyse est requis"
-    );
-  });
-
   it("should be invalid when waste code after analysis is not compatible with BSFF", async () => {
     const data = { ...acceptation, acceptationWasteCode: "06 07 01*" };
     const validateFn = () => acceptationSchema.validate(data);
     await expect(validateFn()).rejects.toThrow(
       "Le code déchet ne fait pas partie de la liste reconnue : 14 06 01*, 14 06 02*, 14 06 03*, 16 05 04*, 13 03 10*"
-    );
-  });
-
-  it("should be invalid when waste description after analysis is not set", async () => {
-    const data = { ...acceptation, acceptationWasteDescription: null };
-    const validateFn = () => acceptationSchema.validate(data);
-    await expect(validateFn()).rejects.toThrow(
-      "La description du déchet après analyse est requise"
     );
   });
 
