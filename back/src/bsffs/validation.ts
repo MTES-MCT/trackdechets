@@ -299,7 +299,9 @@ export const destinationSchemaFn: FactorySchemaOf<boolean, Destination> =
         .nullable()
         .oneOf(
           [null, ...Object.keys(OPERATION)],
-          "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
+          `Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${Object.keys(
+            OPERATION
+          ).join(", ")}`
         )
         .requiredIf(
           !isDraft,
