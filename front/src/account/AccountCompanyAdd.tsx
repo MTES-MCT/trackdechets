@@ -500,7 +500,7 @@ export default function AccountCompanyAdd() {
                   ...(values.willManageDasris &&
                     values.allowBsdasriTakeOverWithoutSignature === null && {
                       allowBsdasriTakeOverWithoutSignature:
-                        "Si établissement est susceptible de produire des DASRI, ce choix est obligatoire",
+                        "Si l'établissement est susceptible de produire des DASRI, ce choix est obligatoire",
                     }),
                   ...(values.companyTypes.length === 0 && {
                     companyTypes: "Vous devez préciser le type d'établissement",

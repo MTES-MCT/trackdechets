@@ -126,7 +126,7 @@ const AutoSubmitSiret = ({ defaultSiret, didAutoSubmit }) => {
       submitForm();
       didAutoSubmit();
     }
-  }, [didAutoSubmit, submitForm]);
+  }, [didAutoSubmit, submitForm, defaultSiret, values.siret]);
 
   return null;
 };
