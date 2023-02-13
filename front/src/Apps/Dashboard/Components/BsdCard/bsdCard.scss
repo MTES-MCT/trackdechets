@@ -58,19 +58,24 @@
 
     &__badge {
       @include desktop {
-        width: 40%;
+        width: 95%;
+        margin-right: 10px;
       }
     }
     &__waste {
       margin-top: 15px;
       @include desktop {
-        margin: 0;
+        margin: 0 10px 0 0;
+        .waste-details {
+          width: 145px;
+        }
       }
     }
     &__actors {
       margin: 15px 0;
       @include desktop {
         margin: 0;
+        width: 100%;
       }
     }
 
@@ -79,12 +84,8 @@
       justify-content: flex-end;
       width: 100%;
 
-      button {
+      .fr-btn {
         margin: 0 2px;
-      }
-
-      @include desktop {
-        width: 50%;
       }
     }
   }

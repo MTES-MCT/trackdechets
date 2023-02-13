@@ -1,8 +1,15 @@
 .fr-badge {
-  &--success,
+  &--success {
+    &:before {
+      display: inline-block !important;
+      -webkit-mask-image: url("/icons/system/fr--success-fill.svg") !important;
+    }
+  }
+
   &--error {
     &:before {
       display: inline-block !important;
+      -webkit-mask-image: url("/icons/system/fr--error-fill.svg") !important;
     }
   }
   &--DRAFT {

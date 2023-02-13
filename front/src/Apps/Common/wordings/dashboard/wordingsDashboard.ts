@@ -94,3 +94,39 @@ sur l'état précis du bordereau.`;
 
 // load more
 export const load_more_bsds = "Charger plus de bordereaux";
+
+// filters
+export const filter_show_btn = "Chercher par";
+export const filter_reset_btn = "Annuler les filtres";
+export const filter_type_select_placeholder = "Sélectionner un type de filtre";
+export const filter_type_select_label = "Type de filtre";
+export const filter_type_apply_btn = "Appliquer les filtres";
+export const filter_bsd_type = "Type de bordereau";
+export const filter_siret = "Siret";
+export const filter_waste_code = "Code déchet";
+export const filter_bsd_number = "Numéro du bordereau";
+export const filter_contenant_number = "Numéro de contenant (BSFF)";
+export const filter_immat_number = "Numéro d'immatriculation";
+export const filter_chantier_name = "Nom du chantier";
+export const filter_chantier_adress = "Adresse du chantier";
+export const filter_free_text = "Champs libres";
+export const bsd_type_option_bsdd = "Déchets Dangereux";
+export const bsd_type_option_bsvhu = "Véhicules Hors d'Usage";
+export const bsd_type_option_bsff = "Déchets de Fluides Frigorigènes";
+export const bsd_type_option_bsda = "Déchets d'Amiante";
+export const bsd_type_option_bsdasri =
+  "Déchets d'Activités de Soins à Risque Infectieux";
+export const filter_type_select_option_placeholder = "Sélectionner une option";
+export const max_filter_autorized_label =
+  "Vous avez atteint le nombre de filtres maximum";
+export const sr_btn_delete_filter_line = "supprimer un filtre";
+export const sr_btn_add_filter_line = "ajouter un filtre";
+export const multi_select_select_all_label = "Tout sélectionner";
+
+// create dropdown
+export const dropdown_create_btn = "Créer un bordereau";
+export const dropdown_create_bsdd = "Déchets dangereux";
+export const dropdown_create_bsda = "Amiante";
+export const dropdown_create_bsdasri = "DASRI";
+export const dropdown_create_bsvhu = "Véhicule Hors d’Usage";
+export const dropdown_create_bsff = "Fluide Frigorifique";

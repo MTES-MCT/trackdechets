@@ -8,7 +8,7 @@ import {
   pdf_action_label,
   revision_action_label,
   supprimer_action_label,
-} from "../../../../assets/wordings/dashboard/wordingsDashboard";
+} from "../../../Common/wordings/dashboard/wordingsDashboard";
 import { BsdAdditionalActionsButtonProps } from "./bsdAdditionalActionsButtonTypes";
 import useOnClickOutsideRefTarget from "../../../../common/hooks/useOnClickOutsideRefTarget";
 import {
@@ -111,6 +111,7 @@ function BsdAdditionalActionsButton({
 
         <ul
           id={`bsd-actions-dropdown_${bsd.id}`}
+          data-testid={`bsd-actions-dropdown_${bsd.id}`}
           aria-hidden={!isOpen}
           ref={dropdownRef as React.RefObject<HTMLUListElement>}
           className={classnames("bsd-actions-kebab-menu__dropdown", {
