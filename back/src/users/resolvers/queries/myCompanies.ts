@@ -9,7 +9,7 @@ import {
 } from "../../../generated/graphql/types";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../../../prisma";
-
+import { AuthType } from "../../../auth";
 import {
   MIN_MY_COMPANIES_SEARCH,
   MAX_MY_COMPANIES_SEARCH
@@ -23,7 +23,11 @@ const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
   const me = checkIsAuthenticated(context);
 
   const { search, ...paginationArgs } = args;
-
+  if (!!search && context.user.auth !== AuthType.Session) {
+    throw new UserInputError(
+      `Le paramètre de recherche "search" est réservé à usage interne et n'est pas disponible via l'api.`
+    );
+  }
   let searchQuery = {};
 
   if (search) {

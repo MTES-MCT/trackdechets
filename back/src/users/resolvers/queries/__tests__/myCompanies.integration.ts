@@ -9,6 +9,7 @@ import { Query } from "../../../../generated/graphql/types";
 import { associateUserToCompany } from "../../../database";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
+import { AuthType } from "../../../../auth";
 
 const MY_COMPANIES = gql`
   query MyCompanies(
@@ -156,6 +157,22 @@ describe("query { myCompanies }", () => {
       company1.id
     ]);
   }, 20000);
+
+  it("should disallow search parameter for user authenticated through API", async () => {
+    const user = await userFactory();
+    const { query } = makeClient({ ...user, auth: AuthType.Bearer });
+    const { errors } = await query<Pick<Query, "myCompanies">>(MY_COMPANIES, {
+      variables: { search: "az" }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Le paramètre de recherche "search" est réservé à usage interne et n'est pas disponible via l'api.`,
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
 
   it("should raise an error on short search clues", async () => {
     const user = await userFactory();
