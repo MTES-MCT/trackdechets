@@ -5,7 +5,7 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-[2023.2.1] 21/02/2023
+# [2023.2.1] 21/02/2023
 #### :rocket: Nouvelles fonctionnalités
 
 #### :bug: Corrections de bugs
@@ -19,7 +19,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajoute les statuts Bsda à la documentation technique [PR 2129](https://github.com/MTES-MCT/trackdechets/pull/2129)
 
 #### :house: Interne
-
+- Dénormalisation du bsdasri [PR 2090](https://github.com/MTES-MCT/trackdechets/pull/2090)
 
 # [2023.1.4] 31/01/2023
 
