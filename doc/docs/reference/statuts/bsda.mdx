@@ -1,0 +1,42 @@
+---
+title: BSDA
+---
+
+import Mermaid from '../../../src/components/Mermaid';
+
+Au cours de son cycle de vie, le BSDA peut passer par différents états décrits [ici](../api-reference/bsdasri/enums#bsdasristatus).
+
+
+- `INITIAL` (initial): : C'est l'état dans lequel le Bsda est créé. `readableId` est affecté.
+- `SIGNED_BY_PRODUCER` : Bsda signé par le producteur
+- `SIGNED_BY_WORKER` : Bsda signé par l'entreprise de travaux
+- `SENT` : Bsda pris en charge par le transporteur
+- `PROCESSED` : Bsda traité
+- `REFUSED` : Bsda refusé
+- `AWAITING_CHILD` : Bsda en attente d'un bordereau suite
+
+
+Le diagramme ci dessous retrace le cycle de vie d'un Bsda dans Trackdéchets:
+
+<Mermaid chart={`
+graph TD
+AO(NO STATE) -->|createDraftBsda| A
+AO(NO STATE) -->|createBsda| B
+A -->|"updateBsda"| A
+B -->|"updateBsda"| B
+C-->|"updateBsda"| C
+D-->|"updateBsda"| D
+E-->|"updateBsda"| E
+A["INITIAL (isDraft=true)"] -->|publishBsda| B("INITIAL (isDraft=false)")
+B -->|"signBsda (EMISSION)"| C(SIGNED_BY_PRODUCER)
+B -->|"signBsda (WORK)"| D(SIGNED_BY_WORKER)
+B -->|"signBsda (TRANSPORT)"| E(SENT)
+B -->|"signBsda (OPERATION) 2710 & groupement/réexpédition"| G(AWAITING_CHILD)
+B -->|"signBsda (OPERATION) 2710"| F(PROCESSED)
+C -->|"signBsda (WORK)"| D(SIGNED_BY_WORKER)
+C -->|"signBsda (TRANSPORT)"| D(SENT)
+D -->|"signBsda (TRANSPORT)"| E(SENT)
+E -->|"signBsda (OPERATION)"| F(PROCESSED)
+E -->|"signBsda (OPERATION) groupement"| G(AWAITING_CHILD)
+E -->|"signBsda (OPERATION) refus"| H(REFUSED)
+`}/>
