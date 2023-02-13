@@ -1,12 +1,17 @@
+.rmsc {
+  --rmsc-border: initial;
+  --rmsc-h: initial;
+}
+
 .rmsc .dropdown-container {
   position: relative;
-  outline: 0;
-  background-color: initial;
-  border: none;
-  border-radius: initial;
+  outline: initial;
+  background-color: initial !important;
+  border: none !important;
+  border-radius: initial !important;
   &:focus-within {
-    border: none;
-    box-shadow: initial;
+    border: none !important;
+    box-shadow: initial !important;
   }
 }
 
@@ -18,7 +23,7 @@
   width: 100%;
   height: inherit;
   cursor: default;
-  outline: 0;
+  outline: none !important;
 }
 
 .rmsc .dropdown-heading .dropdown-heading-value {
@@ -30,7 +35,7 @@
 }
 
 .rmsc .gray {
-  color: initial;
+  color: initial !important;
 }
 
 .rmsc.multi-select.fr-select {
