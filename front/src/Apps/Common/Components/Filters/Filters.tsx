@@ -127,10 +127,9 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
         <Input
           ref={newInputElementRef}
           type={inputType.text}
-          htmlFor={`${filter.value}_filter`}
           id={`${filter.value}_filter`}
           label={filter.label}
-          value={filter.value}
+          name={filter.value}
           onChange={e => onFilterValueChange(e, filter.value)}
         />
       );

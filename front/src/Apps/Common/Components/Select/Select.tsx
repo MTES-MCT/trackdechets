@@ -3,7 +3,6 @@ import { filter_type_select_option_placeholder } from "../../wordings/dashboard/
 import MultiSelectWrapper from "../MultiSelect/MultiSelect";
 
 interface SelectProps {
-  htmlFor?: string;
   label?: string;
   id?: string;
   options: { value: string; label: string }[];
@@ -17,7 +16,6 @@ interface SelectProps {
 const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   (
     {
-      htmlFor,
       label,
       options,
       id,
@@ -33,7 +31,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       <>
         <div className="fr-select-group">
           {label && (
-            <label className="fr-label" htmlFor={htmlFor}>
+            <label className="fr-label" htmlFor={id}>
               {label}
             </label>
           )}
