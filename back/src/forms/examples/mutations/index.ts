@@ -7,6 +7,7 @@ function loadMutation(name: string) {
 
 export default {
   createForm: loadMutation("createForm"),
+  updateForm: loadMutation("updateForm"),
   markAsSealed: loadMutation("markAsSealed"),
   signEmissionForm: loadMutation("signEmissionForm"),
   signTransportForm: loadMutation("signTransportForm"),

@@ -98,9 +98,18 @@ export const COLUMNS: Record<
     accessor: () => null,
     Cell: ({ row }) => {
       const { siret } = useParams<{ siret: string }>();
+      const form = row.original;
       return (
         <ActionButtonContext.Provider value={{ size: "small" }}>
-          <WorkflowAction siret={siret} form={row.original} />
+          <WorkflowAction
+            siret={siret}
+            form={form}
+            options={{
+              canSkipEmission:
+                form.emitter?.type === EmitterType.Appendix1Producer &&
+                Boolean(form.ecoOrganisme?.siret),
+            }}
+          />
         </ActionButtonContext.Provider>
       );
     },

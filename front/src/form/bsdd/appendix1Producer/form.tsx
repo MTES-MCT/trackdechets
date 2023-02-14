@@ -5,7 +5,6 @@ import { Field, Form, Formik } from "formik";
 import {
   EmitterType,
   Form as Bsdd,
-  InitialFormFraction,
   Mutation,
   MutationCreateFormArgs,
   MutationUpdateFormArgs,

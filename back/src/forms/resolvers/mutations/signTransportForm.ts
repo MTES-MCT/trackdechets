@@ -3,7 +3,8 @@ import { ForbiddenError, UserInputError } from "apollo-server-express";
 import {
   MutationResolvers,
   Form as GraphQLForm,
-  MutationSignTransportFormArgs
+  MutationSignTransportFormArgs,
+  PackagingInfo
 } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound, getFullForm } from "../../database";
@@ -14,6 +15,7 @@ import { expandFormFromDb } from "../../converter";
 import { getFormRepository } from "../../repository";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 import { runInTransaction } from "../../../common/repository/helper";
+import { sumPackagingInfos } from "../../repository/helper";
 
 /**
  * Common function for signing
@@ -96,6 +98,12 @@ const signedByTransporterFn = async (
         );
       }
 
+      // During transporter signature, we recompute the total packaging infos
+      const appendix1Forms = await findGroupedFormsById(appendix1ContainerId);
+      const wasteDetailsPackagingInfos = appendix1Forms.map(
+        form => form.wasteDetailsPackagingInfos as PackagingInfo[]
+      );
+
       await update(
         { id: appendix1ContainerId },
         {
@@ -104,7 +112,10 @@ const signedByTransporterFn = async (
             formUpdateInput
           }),
           emittedAt: formUpdateInput.sentAt,
-          sentAt: formUpdateInput.sentAt
+          sentAt: formUpdateInput.sentAt,
+          wasteDetailsPackagingInfos: sumPackagingInfos(
+            wasteDetailsPackagingInfos
+          )
         }
       );
     }
@@ -137,7 +148,7 @@ const signatures: Partial<
       existingForm.emitterCompanyOmiNumber;
     const isAppendix1WithAutomaticSignature =
       existingForm.emitterType === EmitterType.APPENDIX1_PRODUCER &&
-      (existingForm.emittedByEcoOrganisme ||
+      (existingForm.ecoOrganismeSiret ||
         (await hasSignatureAutomation({
           signedBy: existingForm.transporterCompanySiret,
           signedFor: existingForm.emitterCompanySiret

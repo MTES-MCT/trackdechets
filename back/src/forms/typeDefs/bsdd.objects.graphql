@@ -180,6 +180,8 @@ type InitialForm {
   Transporteur du bordereau initial
   """
   transporter: Transporter
+  "Date à laquelle le transporteur a signé l'enlèvement initial."
+  takenOverAt: DateTime
   """
   Date d’acceptation du lot initial par l’installation réalisant une transformation ou un traitement aboutissant à des déchets
   dont la provenance reste identifiable. C'est la date qui figure au cadre 10 du bordereau initial.

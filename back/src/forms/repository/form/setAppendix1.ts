@@ -1,6 +1,9 @@
 import { Form, Status } from "@prisma/client";
 import { RepositoryFnDeps } from "../../../common/repository/types";
+import { PackagingInfo } from "../../../generated/graphql/types";
 import { checkCanBeSealed } from "../../validation";
+import { sumPackagingInfos } from "../helper";
+import buildUpdateForm from "./update";
 import buildUpdateManyForms from "./updateMany";
 
 class FormFraction {
@@ -17,17 +20,21 @@ class SetAppendix1Args {
 export type SetAppendix1Fn = (args: SetAppendix1Args) => Promise<void>;
 
 /**
- * This function is called each time an appendix1 form is added to a container form.
+ * This function is called each time an appendix1 form is added to a container form (or updated).
  */
 export function buildSetAppendix1({
   prisma,
   user
 }: RepositoryFnDeps): SetAppendix1Fn {
-  return async ({ form, appendix1, currentAppendix1Forms }) => {
+  return async ({
+    form,
+    appendix1: newAppendix1Fractions,
+    currentAppendix1Forms
+  }) => {
     const updateManyForms = buildUpdateManyForms({ prisma, user });
 
     // First, seal all drafts
-    const draftAppendix1Forms = appendix1
+    const draftAppendix1Forms = newAppendix1Fractions
       .map(a => a.form)
       .filter(f => f.status === Status.DRAFT);
     for (const draft of draftAppendix1Forms) {
@@ -43,7 +50,7 @@ export function buildSetAppendix1({
     // - the destination
     // - the waste infos (code & name)
     await updateManyForms(
-      appendix1.map(a => a.form.id),
+      newAppendix1Fractions.map(a => a.form.id),
       {
         // Most data are copied from the container form and not editable:
         // - waste infos
@@ -60,20 +67,37 @@ export function buildSetAppendix1({
         transporterCompanyVatNumber: form.transporterCompanyVatNumber,
         transporterCompanyPhone: form.transporterCompanyPhone,
         transporterCompanyMail: form.recipientCompanyMail,
-        recipientCompanySiret: form.recipientCompanySiret,
-        recipientCompanyName: form.recipientCompanyName,
-        recipientCompanyAddress: form.recipientCompanyAddress,
-        recipientCompanyContact: form.recipientCompanyContact,
-        recipientCompanyPhone: form.recipientCompanyPhone,
-        recipientCompanyMail: form.recipientCompanyMail,
-        emittedByEcoOrganisme: form.emittedByEcoOrganisme
+        recipientCompanySiret: form.emitterCompanySiret,
+        recipientCompanyName: form.emitterCompanyName,
+        recipientCompanyAddress: form.emitterCompanyAddress,
+        recipientCompanyContact: form.emitterCompanyContact,
+        recipientCompanyPhone: form.emitterCompanyPhone,
+        recipientCompanyMail: form.emitterCompanyMail,
+        ecoOrganismeName: form.ecoOrganismeName,
+        ecoOrganismeSiret: form.ecoOrganismeSiret
+      }
+    );
+
+    // Update container packagings
+    const updateForm = buildUpdateForm({ prisma, user });
+    await updateForm(
+      { id: form.id },
+      {
+        wasteDetailsPackagingInfos: sumPackagingInfos(
+          newAppendix1Fractions.map(
+            fraction =>
+              fraction.form.wasteDetailsPackagingInfos as PackagingInfo[]
+          )
+        )
       }
     );
 
     // Lastly, manage groups...
     // Remove old ones
     const formsNoLongerGroupedIds = currentAppendix1Forms
-      .filter(cf => appendix1.every(({ form }) => form.id !== cf.id))
+      .filter(cf =>
+        newAppendix1Fractions.every(({ form }) => form.id !== cf.id)
+      )
       .map(form => form.id);
     await prisma.formGroupement.deleteMany({
       where: {
@@ -82,7 +106,7 @@ export function buildSetAppendix1({
       }
     });
     // And create new ones
-    const fractionsNewlyGrouped = appendix1.filter(({ form }) =>
+    const fractionsNewlyGrouped = newAppendix1Fractions.filter(({ form }) =>
       currentAppendix1Forms.every(cf => cf.id !== form.id)
     );
     await prisma.formGroupement.createMany({

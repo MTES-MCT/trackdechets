@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Link, generatePath, useLocation, useParams } from "react-router-dom";
 import { CellProps } from "react-table";
-import { Bsd } from "generated/graphql/types";
+import { Bsd, EmitterType } from "generated/graphql/types";
 import routes from "common/routes";
 import { IconView } from "common/components/Icons";
 import { WorkflowAction } from "../BSDD/WorkflowAction";
@@ -72,7 +72,15 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
               </>
             )}
             {form.__typename === "Form" ? (
-              <WorkflowAction siret={siret} form={form} />
+              <WorkflowAction
+                siret={siret}
+                form={form}
+                options={{
+                  canSkipEmission:
+                    form.emitter?.type === EmitterType.Appendix1Producer &&
+                    Boolean(form.ecoOrganisme?.siret),
+                }}
+              />
             ) : null}
             {form.__typename === "Bsdasri" ? (
               <BsdasriWorkflowAction siret={siret} form={form} />

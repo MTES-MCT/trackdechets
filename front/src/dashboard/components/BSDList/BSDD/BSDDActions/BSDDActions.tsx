@@ -44,6 +44,9 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
   let canDeleteAndUpdate = [FormStatus.Draft, FormStatus.Sealed].includes(
     form.status
   );
+  const showAppendix1Button =
+    form.emitter?.type === EmitterType.Appendix1 &&
+    [FormStatus.Sealed, FormStatus.Sent].includes(form.status);
   if (form.status === FormStatus.SignedByProducer) {
     // if the bsd is only signed by the emitter, they can still update/delete it
     // so if it's signed by the emitter, they can do it but not the eco organisme
@@ -102,7 +105,10 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
-              {form.emitter?.type === EmitterType.Appendix1 && (
+
+              <TableRoadControlButton siret={siret} form={form} />
+
+              {showAppendix1Button && (
                 <MenuLink
                   as={Link}
                   to={{
@@ -110,7 +116,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                       siret,
                       id: form.id,
                     }),
-                    search: "?selectedTab=3",
+                    search: "?selectedTab=0",
                     state: { background: location },
                   }}
                 >

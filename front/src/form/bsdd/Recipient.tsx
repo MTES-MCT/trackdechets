@@ -34,6 +34,7 @@ export default function Recipient() {
   // limite arbitraire du nombre d'intermédiaires qu'on peut ajouter
   const isAddIntermediaryButtonEnabled = values.intermediaries.length <= 20;
 
+  const isChapeau = values?.emitter?.type === "APPENDIX1";
   const isGrouping = values?.emitter?.type === "APPENDIX2";
 
   const intermediariesOptions: IntermediariesSelect[] = [
@@ -118,14 +119,16 @@ export default function Recipient() {
 
   return (
     <>
-      <div className="form__row">
-        <TdSwitch
-          checked={!!values.recipient?.isTempStorage}
-          onChange={handleTempStorageToggle}
-          label="Le BSD va passer par une étape d'entreposage provisoire ou
+      {!isChapeau && (
+        <div className="form__row">
+          <TdSwitch
+            checked={!!values.recipient?.isTempStorage}
+            onChange={handleTempStorageToggle}
+            label="Le BSD va passer par une étape d'entreposage provisoire ou
           reconditionnement"
-        />
-      </div>
+          />
+        </div>
+      )}
       {isTempStorage && (
         <div className="notification tw-mt-2">
           Vous avez sélectionné "Entreposage provisoire ou reconditionnement".

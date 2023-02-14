@@ -376,9 +376,13 @@ input AnonymousCompanyInput {
   codeCommune: String!
 }
 
+"""
+Payload pour permettre à une entreprise de ne pas avoir à signer la collecte de ses annexes 1.
+Si l'entreprise ciblée collecte l'annexe 1, Trackdéchets signera automatiquement pour l'entreprise émettrice.
+"""
 input SignatureAutomationInput {
   "ID de l'entreprise qui donne délégation"
   from: ID!
-  "ID de l'entreprise qui a délagation"
+  "ID de l'entreprise qui a délégation"
   to: ID!
 }

@@ -84,11 +84,15 @@ const createFormResolver = async (
       : {})
   };
 
-  await checkIsFormContributor(
-    user,
-    formCompanies,
-    "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
-  );
+  // APPENDIX1_PRODUCER is the only type of forms for which you don't necessarely appear during creation.
+  // The destination and transporter will be auto completed
+  if (formContent?.emitter?.type !== "APPENDIX1_PRODUCER") {
+    await checkIsFormContributor(
+      user,
+      formCompanies,
+      "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
+    );
+  }
 
   const form = flattenFormInput(formContent);
 

@@ -73,10 +73,19 @@ export function buildUpdateAppendix1Forms(
           ...(formUpdatesByStatus.get(status) ?? []),
           id
         ]);
-      } else if (container.status === Status.PROCESSED) {
+      } else if (
+        [
+          Status.PROCESSED,
+          Status.NO_TRACEABILITY,
+          Status.FOLLOWED_WITH_PNTTD,
+          Status.AWAITING_GROUP,
+          Status.RESEALED
+        ].some(status => status === container.status)
+      ) {
         const status = transitionForm(form, {
           type: EventType.MarkAsProcessed,
           formUpdateInput: {
+            emitterType: form.emitterType, // So that the machine doesn't mark as AWAITING_GROUP if the container is used in an appendix 2
             noTraceability: container.noTraceability,
             processedAt: container.processedAt,
             processedBy: container.processedBy,

@@ -255,7 +255,7 @@ const updateFormResolver = async (
     const updatedSiret = formUpdateInput?.emitterCompanySiret;
     if (!!updatedSiret && updatedSiret !== existingForm?.emitterCompanySiret) {
       throw new UserInputError(
-        "Des bordereaux figurent dans l'annexe 2, le siret de l'émetteur ne peut pas être modifié."
+        "Des bordereaux figurent dans l'annexe, le siret de l'émetteur ne peut pas être modifié."
       );
     }
   }

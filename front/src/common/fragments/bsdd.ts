@@ -364,7 +364,11 @@ export const detailFormFragment = gql`
     grouping {
       quantity
       form {
+        status
         readableId
+        emitter {
+          type
+        }
         wasteDetails {
           code
           name

@@ -1,6 +1,10 @@
 import { FieldProps } from "formik";
 import React, { useState } from "react";
-import { BSDD_WASTES } from "generated/constants";
+import {
+  BSDD_WASTES,
+  BSDD_APPENDIX1_WASTE_TREE,
+  BSDD_WASTES_TREE,
+} from "generated/constants";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import WasteTreeModal from "search/WasteTreeModal";
 import styles from "./WasteCode.module.scss";
@@ -36,6 +40,11 @@ export function WasteCodeSelect({ field, form }: FieldProps) {
             Vous hésitez sur le type de code déchet à choisir ? Sélectionnez un
             code via le bouton de liste des codes déchets
             <WasteTreeModal
+              wasteTree={
+                form.values?.emitter?.type === "APPENDIX1"
+                  ? BSDD_APPENDIX1_WASTE_TREE
+                  : BSDD_WASTES_TREE
+              }
               open={openModal}
               onClose={() => setOpenModal(false)}
               onSelect={codes => {

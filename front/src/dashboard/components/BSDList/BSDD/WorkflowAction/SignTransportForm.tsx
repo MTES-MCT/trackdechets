@@ -75,11 +75,24 @@ function SignTransportFormModal({
     },
     fetchPolicy: "no-cache",
   });
-  const [signTransportForm, { loading, error }] =
-    useMutation<
-      Pick<Mutation, "signTransportForm">,
-      MutationSignTransportFormArgs
-    >(SIGN_TRANSPORT_FORM);
+  const [signTransportForm, { loading, error }] = useMutation<
+    Pick<Mutation, "signTransportForm">,
+    MutationSignTransportFormArgs
+  >(SIGN_TRANSPORT_FORM, {
+    // When we sign a Form, we must manually update the cached InitialForm as well
+    update(cache, { data }) {
+      cache.writeFragment({
+        id: `InitialForm:${formId}`,
+        fragment: gql`
+          fragment InitialFormFragment on InitialForm {
+            id
+            status
+          }
+        `,
+        data: { id: formId, status: data?.signTransportForm.status },
+      });
+    },
+  });
 
   if (formLoading) return <Loader />;
   if (formError) return <InlineError apolloError={formError} />;

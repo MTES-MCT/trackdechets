@@ -173,34 +173,39 @@ export function AccountFormCompanySignatureAutomation({ company }: Props) {
             plus tard.
           </span>
         )}
-        {data?.searchCompanies
-          .filter(result => Boolean(result.trackdechetsId))
-          .map(result => {
-            return (
-              <div
-                className="tw-p-2 tw-my-2 tw-rounded tw-bg-gray-300 tw-flex tw-items-center"
-                key={`${result.name}-${result.siret ?? result.vatNumber}`}
-              >
-                <span className="tw-flex-1">
-                  {result.name} - {result.siret}
-                </span>
-                <button
-                  className="btn btn--primary small"
-                  onClick={() => {
-                    if (isAdding) return;
-                    addSignatureAutomation({
-                      variables: {
-                        input: { from: company.id, to: result.trackdechetsId! },
-                      },
-                    });
-                  }}
-                  disabled={isAdding}
+        {Boolean(clue) &&
+          data?.searchCompanies
+            .filter(result => Boolean(result.trackdechetsId))
+            .map(result => {
+              return (
+                <div
+                  className="tw-p-2 tw-my-2 tw-rounded tw-bg-gray-300 tw-flex tw-items-center"
+                  key={`${result.name}-${result.siret ?? result.vatNumber}`}
                 >
-                  Ajouter
-                </button>
-              </div>
-            );
-          })}
+                  <span className="tw-flex-1">
+                    {result.name} - {result.siret}
+                  </span>
+                  <button
+                    className="btn btn--primary small"
+                    onClick={() => {
+                      if (isAdding) return;
+                      addSignatureAutomation({
+                        variables: {
+                          input: {
+                            from: company.id,
+                            to: result.trackdechetsId!,
+                          },
+                        },
+                      });
+                      setClue("");
+                    }}
+                    disabled={isAdding}
+                  >
+                    Ajouter
+                  </button>
+                </div>
+              );
+            })}
       </div>
     </div>
   );

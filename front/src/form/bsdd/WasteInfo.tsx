@@ -138,7 +138,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
             <span>
               Vous créez un bordereau de tournée dédiée. Vous pourrez ensuite
               rattacher des bordereaux d'annexe 1 à cette tournée. Ce
-              rattrachement sera à faire dans un second temps, après la création
+              rattachement sera à faire dans un second temps, après la création
               de ce bordereau de tournée.
             </span>
           </div>

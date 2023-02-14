@@ -54,9 +54,9 @@ export default function Emitter({ disabled }) {
           <MyCompanySelector
             fieldName="emitter.company"
             siretEditable={!id}
-            onSelect={companyOrgId => {
+            onSelect={company => {
               if (
-                companyOrgId?.length &&
+                company.orgId?.length &&
                 previousPackagings?.length &&
                 window.confirm(
                   "L'établissement sélectionné n'est pas compatible avec les bordereaux initiaux sélectionnés. Nous allons donc les dissocier."

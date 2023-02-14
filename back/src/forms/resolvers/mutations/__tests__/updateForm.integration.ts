@@ -1204,7 +1204,7 @@ describe("Mutation.updateForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des bordereaux figurent dans l'annexe 2, le siret de l'émetteur ne peut pas être modifié.",
+          "Des bordereaux figurent dans l'annexe, le siret de l'émetteur ne peut pas être modifié.",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

@@ -22,6 +22,7 @@ interface ActionButtonProps extends HTMLAttributes<HTMLButtonElement> {
 export default function ActionButton({
   icon,
   children,
+  secondary,
   ...props
 }: ActionButtonProps) {
   const { size } = useContext(ActionButtonContext);
@@ -30,7 +31,7 @@ export default function ActionButton({
     <button
       {...props}
       className={classNames(
-        `${props.secondary ? "btn--outline-primary" : "btn--primary"}`,
+        `${secondary ? "btn--outline-primary" : "btn--primary"}`,
         {
           [styles.ActionButtonSmall]: size === "small",
           [styles.ActionButton]: size === "normal",

@@ -37,13 +37,17 @@ export default function MyCompanySelector({
   fieldName,
   onSelect,
   siretEditable = true,
+}: {
+  fieldName: string;
+  onSelect: (company) => void;
+  siretEditable: boolean;
 }) {
   const { setFieldValue } = useFormikContext<CreateFormInput>();
   const [field] = useField({ name: fieldName });
 
   const onCompanySelect = useCallback(
     (
-      company: Pick<
+      privateCompany: Pick<
         CompanyPrivate,
         | "orgId"
         | "siret"
@@ -55,17 +59,19 @@ export default function MyCompanySelector({
         | "address"
       >
     ) => {
-      setFieldValue(`${fieldName}.orgId`, company.orgId ?? "");
-      setFieldValue(`${fieldName}.siret`, company.siret ?? "");
-      setFieldValue(`${fieldName}.vatNumber`, company.vatNumber ?? "");
-      setFieldValue(`${fieldName}.name`, company.name ?? "");
-      setFieldValue(`${fieldName}.contact`, company.contact ?? "");
-      setFieldValue(`${fieldName}.mail`, company.contactEmail ?? "");
-      setFieldValue(`${fieldName}.phone`, company.contactPhone ?? "");
-      setFieldValue(`${fieldName}.contact`, company.contact ?? "");
-      setFieldValue(`${fieldName}.address`, company.address ?? "");
+      const company = {
+        orgId: privateCompany.orgId ?? "",
+        siret: privateCompany.siret ?? "",
+        vatNumber: privateCompany.vatNumber ?? "",
+        name: privateCompany.name ?? "",
+        contact: privateCompany.contact ?? "",
+        mail: privateCompany.contactEmail ?? "",
+        phone: privateCompany.contactPhone ?? "",
+        address: privateCompany.address ?? "",
+      };
+      setFieldValue(fieldName, company);
       if (onSelect) {
-        onSelect(company.orgId ?? "");
+        onSelect(company);
       }
     },
     [fieldName, setFieldValue, onSelect]
@@ -82,6 +88,7 @@ export default function MyCompanySelector({
 
       if (!companies.map(c => c.siret).includes(field.value.siret)) {
         if (companies.length === 1) {
+          const [company] = companies;
           onCompanySelect(companies[0]);
         } else {
           onCompanySelect(getInitialCompany());
@@ -159,7 +166,7 @@ export default function MyCompanySelector({
             />
           </label>
 
-          <RedErrorMessage name={`${fieldName.name}.contact`} />
+          <RedErrorMessage name={`${fieldName}.contact`} />
         </div>
         <div className="form__row">
           <label>
@@ -172,7 +179,7 @@ export default function MyCompanySelector({
             />
           </label>
 
-          <RedErrorMessage name={`${fieldName.name}.phone`} />
+          <RedErrorMessage name={`${fieldName}.phone`} />
         </div>
         <div className="form__row">
           <label>
@@ -184,7 +191,7 @@ export default function MyCompanySelector({
             />
           </label>
 
-          <RedErrorMessage name={`${fieldName.name}.mail`} />
+          <RedErrorMessage name={`${fieldName}.mail`} />
         </div>
       </>
     );

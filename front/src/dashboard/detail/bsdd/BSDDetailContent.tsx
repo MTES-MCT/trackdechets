@@ -12,6 +12,7 @@ import { useDuplicate } from "dashboard/components/BSDList/BSDD/BSDDActions/useD
 
 import { DeleteModal } from "dashboard/components/BSDList/BSDD/BSDDActions/DeleteModal";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import classNames from "classnames";
 import {
   TransportSegment,
   Form,
@@ -63,7 +64,6 @@ import { isDangerous } from "generated/constants";
 import { format } from "date-fns";
 import { isSiret } from "generated/constants/companySearchHelpers";
 import { Appendix1ProducerForm } from "form/bsdd/appendix1Producer/form";
-import SignTransportForm from "dashboard/components/BSDList/BSDD/WorkflowAction/SignTransportForm";
 import { gql, useQuery } from "@apollo/client";
 
 type CompanyProps = {
@@ -490,7 +490,7 @@ const Appendix1 = ({
     : [];
 
   return (
-    <div>
+    <div className="tw-w-full">
       {container.status === FormStatus.Draft && (
         <div className="notification warning">
           Avant de pouvoir ajouter des annexes 1, vous devez valider le
@@ -518,27 +518,32 @@ const Appendix1 = ({
             <tr className="td-table__head-tr">
               <th>N° Bordereau</th>
               <th>Emetteur</th>
+              <th>Statut</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {container.grouping.map(({ form }, index) => (
               <tr key={index}>
-                <td>{form?.readableId}</td>
+                <td>{form.readableId}</td>
                 <td>
-                  {form?.emitter?.company?.name}
+                  {form.emitter?.company?.name}
                   <br />
-                  {form?.emitter?.company?.siret}
+                  {form.emitter?.company?.siret}
                 </td>
+                <td>{form.status ? statusLabels[form.status] : "-"}</td>
                 <td>
-                  <WorkflowAction siret={siret} form={form as any} />
-                  {form.status === FormStatus.Sealed &&
-                    siretsWithAutomaticSignature.includes(
-                      form.emitter?.company?.siret
-                    ) &&
-                    form.transporter?.company?.orgId === siret && (
-                      <SignTransportForm form={form as any} siret={siret} />
-                    )}
+                  <WorkflowAction
+                    siret={siret}
+                    form={form as any}
+                    options={{
+                      canSkipEmission:
+                        Boolean(container.ecoOrganisme?.siret) ||
+                        siretsWithAutomaticSignature.includes(
+                          form.emitter?.company?.siret
+                        ),
+                    }}
+                  />
                 </td>
               </tr>
             ))}
@@ -693,6 +698,16 @@ export default function BSDDetailContent({
                 <span className={styles.detailTabCaption}>Annexes 2</span>
               </Tab>
             )}
+            {isChapeau && (
+              <Tab className={styles.detailTab}>
+                <div className="tw-flex tw-space-x-2">
+                  <IconWaterDam size="18px" />
+                  <IconWaterDam size="18px" />
+                  <IconWaterDam size="18px" />
+                </div>
+                <span className={styles.detailTabCaption}>Annexes 1</span>
+              </Tab>
+            )}
 
             <Tab className={styles.detailTab}>
               <IconWaterDam size="25px" />
@@ -745,16 +760,6 @@ export default function BSDDetailContent({
                 </span>
               </Tab>
             )}
-            {isChapeau && (
-              <Tab className={styles.detailTab}>
-                <div className="tw-flex tw-space-x-2">
-                  <IconWaterDam size="18px" />
-                  <IconWaterDam size="18px" />
-                  <IconWaterDam size="18px" />
-                </div>
-                <span className={styles.detailTabCaption}>Annexes 1</span>
-              </Tab>
-            )}
           </TabList>
           {/* Tabs content */}
           <div className={styles.detailTabPanels}>
@@ -762,6 +767,14 @@ export default function BSDDetailContent({
             {isRegroupement && (
               <TabPanel className={styles.detailTabPanel}>
                 <Appendix2 grouping={form.grouping} />
+              </TabPanel>
+            )}
+            {/* Appendix 1 */}
+            {isChapeau && (
+              <TabPanel
+                className={classNames(styles.detailTabPanel, "tw-flex-1")}
+              >
+                <Appendix1 container={form} siret={siret} />
               </TabPanel>
             )}
             {/* Emitter tab panel */}
@@ -901,12 +914,6 @@ export default function BSDDetailContent({
                 {form?.intermediaries?.map(intermediary => (
                   <Intermediary intermediary={intermediary} />
                 ))}
-              </TabPanel>
-            )}
-            {/* Appendix 1 */}
-            {isChapeau && (
-              <TabPanel className={styles.detailTabPanel}>
-                <Appendix1 container={form} siret={siret} />
               </TabPanel>
             )}
           </div>

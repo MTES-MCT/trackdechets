@@ -247,7 +247,8 @@ const machine = Machine<any, Event>(
               update.processingOperationDone as string
             ) &&
             !isForeignNextDestination(update) &&
-            !(update.noTraceability === true)
+            !(update.noTraceability === true) &&
+            update.emitterType !== "APPENDIX1_PRODUCER"
           );
         }
         return (

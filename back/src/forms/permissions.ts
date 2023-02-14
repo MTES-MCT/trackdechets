@@ -250,6 +250,11 @@ export async function checkCanUpdate(user: User, form: Form) {
     "Vous n'êtes pas autorisé à modifier ce bordereau"
   );
 
+  // TODO: should we limit which field remains editable for appendix 1 ?
+  if (form.emitterType === EmitterType.APPENDIX1 && form.status === "SENT") {
+    return true;
+  }
+
   if (form.status === "SIGNED_BY_PRODUCER") {
     const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
