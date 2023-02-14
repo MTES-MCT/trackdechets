@@ -14,7 +14,7 @@ import {
 import { Type } from "./stepper/steps/Type";
 
 export default function FormContainer() {
-  const { id } = useParams<{ id?: string }>();
+  const { id, siret } = useParams<{ id?: string; siret: string }>();
 
   const location = useLocation();
   const { step } = queryString.parse(location.search);
@@ -33,18 +33,22 @@ export default function FormContainer() {
             const emitterSigned =
               bsda?.emitter?.emission?.signature?.author != null ||
               workerSigned;
+            const isEmitter = bsda?.emitter?.company?.siret === siret;
+            // emitter can still update any field after his own signature
+            const disabledAfterEmission =
+              (emitterSigned && !isEmitter) || transporterSigned;
 
             return (
               <>
                 <StepContainer
                   component={Type}
                   title="Type de bordereau"
-                  disabled={emitterSigned}
+                  disabled={disabledAfterEmission}
                 />
                 <StepContainer
                   component={Emitter}
                   title="Émetteur"
-                  disabled={emitterSigned}
+                  disabled={disabledAfterEmission}
                 />
                 <StepContainer
                   component={WasteInfo}
@@ -64,7 +68,7 @@ export default function FormContainer() {
                 <StepContainer
                   component={Destination}
                   title="Destination"
-                  disabled={emitterSigned}
+                  disabled={disabledAfterEmission}
                 />
               </>
             );

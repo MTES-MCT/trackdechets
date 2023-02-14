@@ -253,17 +253,19 @@ describe("Mutation.updateBsdasri", () => {
   });
   it("should disallow emitter fields update after emission signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.SIGNED_BY_PRODUCER,
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureAuthor: user.name,
         emissionSignatory: { connect: { id: user.id } },
-        emitterEmissionSignatureDate: new Date().toISOString()
+        emitterEmissionSignatureDate: new Date().toISOString(),
+        destinationCompanySiret: destination.company.siret
       }
     });
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(destination.user);
     const input = {
       emitter: {
         company: {
@@ -287,12 +289,14 @@ describe("Mutation.updateBsdasri", () => {
       })
     ]);
     expect(errors[0].message).toContain(
-      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés:"
+      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : emitterCompanyMail"
     );
   });
   it("should disallow eco organisme fields update after emission signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
+    const destination = await userWithCompanyFactory("MEMBER");
+
     await userWithCompanyFactory("MEMBER", {
       siret: ecoOrg.siret
     });
@@ -302,11 +306,12 @@ describe("Mutation.updateBsdasri", () => {
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureAuthor: user.name,
         emissionSignatory: { connect: { id: user.id } },
-        emitterEmissionSignatureDate: new Date().toISOString()
+        emitterEmissionSignatureDate: new Date().toISOString(),
+        destinationCompanySiret: destination.company.siret
       }
     });
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(destination.user);
     const input = {
       ecoOrganisme: { siret: ecoOrg.siret, name: "eco-org" }
     };
@@ -326,7 +331,7 @@ describe("Mutation.updateBsdasri", () => {
       })
     ]);
     expect(errors[0].message).toContain(
-      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés:"
+      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : ecoOrganismeName, ecoOrganismeSiret"
     );
   });
   it("should allow transporter and destination fields update after emission signature", async () => {
@@ -409,7 +414,7 @@ describe("Mutation.updateBsdasri", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés: emitterCompanyMail,transporterCompanyMail",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : emitterCompanyMail, transporterCompanyMail",
 
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
@@ -479,7 +484,7 @@ describe("Mutation.updateBsdasri", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés: handedOverToRecipientAt",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : handedOverToRecipientAt",
 
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
@@ -556,7 +561,7 @@ describe("Mutation.updateBsdasri", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés: destinationCompanyMail,destinationReceptionAcceptationStatus",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : destinationCompanyMail, destinationReceptionAcceptationStatus",
 
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
