@@ -86,7 +86,7 @@ export default function AccountCompanyList() {
       <Row spacing="mb-4w" alignItems={"bottom"}>
         <Col n="4">
           <TextInput
-            label="Filtrer mes établissements par nom, siret ou n° de TVA"
+            label="Filtrer mes établissements par nom, SIRET ou n° de TVA"
             hint="Veuillez entrer au minimum 3 caractères"
             maxLength={MAX_MY_COMPANIES_SEARCH}
             onChange={e => {
