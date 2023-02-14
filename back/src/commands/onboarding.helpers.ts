@@ -1,7 +1,7 @@
 import prisma from "../prisma";
 import { sendMail } from "../mailer/mailing";
 import { Company, CompanyAssociation, User } from "@prisma/client";
-import * as COMPANY_TYPES from "../common/constants/COMPANY_TYPES";
+import * as COMPANY_CONSTANTS from "../common/constants/COMPANY_CONSTANTS";
 import {
   onboardingFirstStep,
   onboardingProducerSecondStep,
@@ -82,7 +82,9 @@ export const selectSecondOnboardingEmail = (recipient: recipientType) => {
     recipient.companyAssociations.flatMap(c => c.company.companyTypes)
   );
 
-  if ([...companyTypes].some(ct => COMPANY_TYPES.PROFESSIONALS.includes(ct))) {
+  if (
+    [...companyTypes].some(ct => COMPANY_CONSTANTS.PROFESSIONALS.includes(ct))
+  ) {
     return onboardingProfessionalSecondStep;
   }
 

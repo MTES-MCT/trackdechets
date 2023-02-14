@@ -7,7 +7,7 @@ import {
   CompanyPrivate,
   CompanyVerificationStatus,
 } from "generated/graphql/types";
-import * as COMPANY_TYPES from "generated/constants/COMPANY_TYPES";
+import * as COMPANY_CONSTANTS from "generated/constants/COMPANY_CONSTANTS";
 
 const { VITE_VERIFY_COMPANY } = import.meta.env;
 
@@ -32,7 +32,7 @@ AccountCompanyMemberList.fragments = {
 
 export default function AccountCompanyMemberList({ company }: Props) {
   const isProfessional = company.companyTypes.some(ct =>
-    COMPANY_TYPES.PROFESSIONALS.includes(ct)
+    COMPANY_CONSTANTS.PROFESSIONALS.includes(ct)
   );
 
   const isVerified =

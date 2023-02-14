@@ -1,6 +1,6 @@
 import { CompanyType, CompanyVerificationStatus } from "@prisma/client";
 import { addDays } from "date-fns";
-import * as COMPANY_TYPES from "../common/constants/COMPANY_TYPES";
+import * as COMPANY_CONSTANTS from "../common/constants/COMPANY_CONSTANTS";
 import { sendVerificationCodeLetter } from "../common/post";
 import prisma from "../prisma";
 import { sameDayMidnight } from "../utils";
@@ -25,7 +25,7 @@ export async function sendVerificationCodeLetters() {
       createdAt: { gte: addDays(today, -4), lt: addDays(today, -3) },
       verificationStatus: CompanyVerificationStatus.TO_BE_VERIFIED,
       companyTypes: {
-        hasSome: COMPANY_TYPES.PROFESSIONALS as CompanyType[]
+        hasSome: COMPANY_CONSTANTS.PROFESSIONALS as CompanyType[]
       }
     }
   });

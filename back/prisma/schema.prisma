@@ -214,6 +214,9 @@ model Company {
   allowBsdasriTakeOverWithoutSignature Boolean                   @default(false)
   bsddRevisionRequests                 BsddRevisionRequest[]
   BsdaRevisionRequest                  BsdaRevisionRequest[]
+
+  @@index([name], map: "_CompanyNameIdx")
+  @@index([givenName], map: "_CompanyGivenNameIdx")
 }
 
 // Companies with restricted diffusion of SIRENE or VAT information (police, army, etc)
