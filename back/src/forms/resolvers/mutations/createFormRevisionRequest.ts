@@ -26,6 +26,31 @@ import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
 import { packagingInfoFn } from "../../validation";
 import { isSiret } from "../../../common/constants/companySearchHelpers";
 
+export const CANCELLABLE_BSDD_STATUSES: Status[] = [
+  // Status.DRAFT,
+  // Status.SEALED,
+  Status.SIGNED_BY_PRODUCER,
+  Status.SENT,
+  // Status.RECEIVED,
+  // Status.ACCEPTED,
+  // Status.PROCESSED,
+  // Status.FOLLOWED_WITH_PNTTD,
+  // Status.AWAITING_GROUP,
+  // Status.GROUPED,
+  // Status.NO_TRACEABILITY,
+  // Status.REFUSED,
+  Status.TEMP_STORED,
+  Status.TEMP_STORER_ACCEPTED,
+  Status.RESEALED,
+  Status.SIGNED_BY_TEMP_STORER,
+  Status.RESENT
+  // Status.CANCELED,
+];
+
+export const NON_CANCELLABLE_BSDD_STATUSES: Status[] = Object.values(
+  Status
+).filter(status => !CANCELLABLE_BSDD_STATUSES.includes(status));
+
 export type RevisionRequestContent = Pick<
   Prisma.BsddRevisionRequestCreateInput,
   | "isCanceled"
@@ -198,6 +223,16 @@ async function getFlatContent(
   if (flatContent.isCanceled && Object.values(flatContent).length > 1) {
     throw new UserInputError(
       "Impossible d'annuler et de modifier un bordereau."
+    );
+  }
+
+  // One cannot request a CANCELATION if the BSDD has advanced too far in the workflow
+  if (
+    flatContent.isCanceled &&
+    NON_CANCELLABLE_BSDD_STATUSES.includes(bsdd.status)
+  ) {
+    throw new ForbiddenError(
+      "Impossible de créer une révision d'annulation sur ce bordereau, il est à un stade trop avancé."
     );
   }
 

@@ -11,6 +11,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Status } from "@prisma/client";
+import { NON_CANCELLABLE_BSDD_STATUSES } from "../createFormRevisionRequest";
 
 const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = `
   mutation SubmitFormRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
@@ -535,4 +536,43 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
 
     expect(updatedBsdd.status).toBe(Status.CANCELED);
   });
+
+  it.each(NON_CANCELLABLE_BSDD_STATUSES)(
+    "should fail if request is about cancelation & the BSDD has a non-cancellable status",
+    async (status: Status) => {
+      const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const { mutate } = makeClient(user);
+
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: { status, emitterCompanySiret: companyOfSomeoneElse.siret }
+      });
+
+      const revisionRequest = await prisma.bsddRevisionRequest.create({
+        data: {
+          isCanceled: true,
+          bsddId: bsdd.id,
+          authoringCompanyId: companyOfSomeoneElse.id,
+          approvals: { create: { approverSiret: company.siret } },
+          comment: ""
+        }
+      });
+
+      const { errors } = await mutate<
+        Pick<Mutation, "submitFormRevisionRequestApproval">
+      >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequest.id,
+          isApproved: true
+        }
+      });
+
+      expect(errors[0].message).toBe(
+        "Impossible d'annuler ce bordereau, il est à un stade trop avancé."
+      );
+    }
+  );
 });

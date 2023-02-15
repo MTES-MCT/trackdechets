@@ -15,6 +15,8 @@ import {
   RepositoryTransaction
 } from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { NON_CANCELLABLE_BSDD_STATUSES } from "../../resolvers/mutations/createFormRevisionRequest";
+import { ForbiddenError } from "apollo-server-core";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -151,6 +153,12 @@ function getNewStatus(
   isCanceled = false
 ): Status {
   if (isCanceled) {
+    if (NON_CANCELLABLE_BSDD_STATUSES.includes(status)) {
+      throw new ForbiddenError(
+        "Impossible d'annuler ce bordereau, il est à un stade trop avancé."
+      );
+    }
+
     return Status.CANCELED;
   }
 
