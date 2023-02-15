@@ -109,6 +109,8 @@ export function Emitter({ status, stepName, disabled = false }) {
   const editionAllowed =
     !disabled &&
     (status === BsdasriStatus.Initial ||
+      // status is not set yet when a new bsdasri is created
+      !status ||
       // emitter can still update any field after his own signature
       (status === BsdasriStatus.SignedByProducer && isUserCurrentEmitter));
   const editionDisabled = !editionAllowed;

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { filter } from "graphql-anywhere";
 import AccountCompany from "./AccountCompany";
@@ -44,7 +44,6 @@ export default function AccountCompanyList() {
   const [searchClue, setSearchClue] = useState("");
   const [displayPreloader, setDisplayPreloader] = useState(false);
 
-  const inputRef = useRef(null);
   const history = useHistory();
 
   const { data, loading, error, refetch, fetchMore } = useQuery<
