@@ -23,6 +23,7 @@ import { expandVhuFormFromDb } from "../../../bsvhu/converter";
 import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { expandBsdaFromElastic } from "../../../bsda/converter";
 import { expandBsffFromElastic } from "../../../bsffs/converter";
+import { bsdSearchSchema } from "../../validation";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -399,6 +400,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   const MAX_SIZE = 100;
   const { first = MAX_SIZE } = args;
   const size = Math.max(Math.min(first, MAX_SIZE), MIN_SIZE);
+  await bsdSearchSchema.validate(args.where, { abortEarly: false });
 
   const query = await buildQuery(args, user);
   const sort = buildSort(args);

@@ -123,6 +123,7 @@ export function BSDTable({ bsds, refetch, ...props }: BSDTableProps) {
                 {column.canFilter
                   ? column.render("Filter", {
                       placeHolder: column["filterPlaceHolder"],
+                      maxLength: column["filterMaxLength"],
                     })
                   : null}
               </TableHeaderCell>
