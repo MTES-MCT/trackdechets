@@ -495,48 +495,6 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     expect(updatedBsdd.status).toBe("PROCESSED");
   });
 
-  it("should change the bsdd status to CANCELED, if the operation code is now a final one", async () => {
-    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
-      "ADMIN"
-    );
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const { mutate } = makeClient(user);
-
-    const bsdd = await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: companyOfSomeoneElse.siret,
-        status: "AWAITING_GROUP"
-      }
-    });
-
-    const revisionRequest = await prisma.bsddRevisionRequest.create({
-      data: {
-        bsddId: bsdd.id,
-        authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
-        isCanceled: true,
-        comment: ""
-      }
-    });
-
-    await mutate<
-      Pick<Mutation, "submitFormRevisionRequestApproval">,
-      MutationSubmitFormRevisionRequestApprovalArgs
-    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
-      variables: {
-        id: revisionRequest.id,
-        isApproved: true
-      }
-    });
-
-    const updatedBsdd = await prisma.form.findUnique({
-      where: { id: bsdd.id }
-    });
-
-    expect(updatedBsdd.status).toBe(Status.CANCELED);
-  });
-
   it.each(NON_CANCELLABLE_BSDD_STATUSES)(
     "should fail if request is about cancelation & the BSDD has a non-cancellable status",
     async (status: Status) => {
