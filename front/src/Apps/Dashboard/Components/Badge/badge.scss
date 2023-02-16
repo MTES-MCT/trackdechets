@@ -1,3 +1,5 @@
+@import "src/scss/Breakpoints.scss";
+
 .fr-badge {
   &--success {
     &:before {
@@ -31,6 +33,9 @@
   &--ACCEPTED {
     background-color: #e3fdeb;
     color: #37635f;
+    @include desktop {
+      width: 200px;
+    }
   }
   &--PROCESSED {
     background-color: #b8fec9;
@@ -55,14 +60,23 @@
   &--TEMP_STORED {
     background-color: #e5fbfd;
     color: #006a6f;
+    @include desktop {
+      width: 200px;
+    }
   }
   &--TEMP_STORER_ACCEPTED {
     background-color: #e3fdeb;
     color: #37635f;
+    @include desktop {
+      width: 205px;
+    }
   }
   &--RESEALED {
     background-color: #e5fbfd;
     color: #006a6f;
+    @include desktop {
+      width: 200px;
+    }
   }
   &--RESENT {
     background-color: #e5fbfd;
@@ -76,6 +90,7 @@
     background-color: #fbf6ed;
     color: #716043;
   }
+
   &--SIGNED_BY_EMITTER {
     background-color: #e6eefe;
     color: #3558a2;
@@ -83,10 +98,16 @@
   &--INTERMEDIATELY_PROCESSED {
     background-color: #fbf6ed;
     color: #716043;
+    @include desktop {
+      width: 200px;
+    }
   }
   &--SIGNED_BY_TEMP_STORER {
     background-color: #e6eefe;
     color: #3558a2;
+    @include desktop {
+      width: 200px;
+    }
   }
   &--FOLLOWED_WITH_PNTTD {
     background-color: #b8fec9;
@@ -99,6 +120,9 @@
   &--SIGNED_BY_WORKER {
     background-color: #e6eefe;
     color: #3558a2;
+    @include desktop {
+      width: 200px;
+    }
   }
   &--AWAITING_CHILD {
     background-color: #e5fbfd;

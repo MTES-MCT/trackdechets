@@ -56,11 +56,11 @@ export const SIGNER_PAR_ENTREPRISE_TRAVAUX =
 export const EN_ATTENTE_OU_BSD_SUITE = "En attente ou associé à un BSD suite";
 
 // Additional actions buttons
-export const apercu_action_label = "Vue détaillée";
+export const apercu_action_label = "Aperçu";
 export const pdf_action_label = "PDF";
 export const modifier_action_label = "Modifier";
 export const dupliquer_action_label = "Dupliquer";
-export const revision_action_label = "Révision";
+export const revision_action_label = "Réviser";
 export const supprimer_action_label = "Supprimer";
 export const completer_bsd_suite = "Compléter le BSD suite";
 

@@ -69,29 +69,28 @@ function BsdCard({
             </p>
           </div>
           <div className="bsd-card__content">
-            <div className="bsd-card__content__badge">
-              <Badge
-                status={bsdDisplay.status}
-                isDraft={bsdDisplay.isDraft}
-                bsdType={bsdDisplay.type}
-              />
-            </div>
-            <div className="bsd-card__content__waste">
-              <WasteDetails
-                wasteType={bsdDisplay.type}
-                code={bsdDisplay.wasteDetails.code?.toString()}
-                name={bsdDisplay.wasteDetails.name?.toString()}
-              />
-            </div>
+            <div className="bsd-card__content__infos">
+              <div className="bsd-card__content__infos__status">
+                <Badge
+                  status={bsdDisplay.status}
+                  isDraft={bsdDisplay.isDraft}
+                  bsdType={bsdDisplay.type}
+                />
+              </div>
+              <div className="bsd-card__content__infos__other">
+                <WasteDetails
+                  wasteType={bsdDisplay.type}
+                  code={bsdDisplay.wasteDetails.code?.toString()}
+                  name={bsdDisplay.wasteDetails.name?.toString()}
+                />
 
-            <div className="bsd-card__content__actors">
-              <Actors
-                emitterName={bsdDisplay.emitter?.company?.name || ""}
-                transporterName={bsdDisplay.transporter?.company?.name || ""}
-                destinationName={bsdDisplay.destination?.company?.name || ""}
-              />
+                <Actors
+                  emitterName={bsdDisplay.emitter?.company?.name || ""}
+                  transporterName={bsdDisplay.transporter?.company?.name || ""}
+                  destinationName={bsdDisplay.destination?.company?.name || ""}
+                />
+              </div>
             </div>
-
             <div className="bsd-card__content__cta">
               {canPublishBsd(bsdDisplay, currentSiret) && ctaPrimaryLabel && (
                 <button
