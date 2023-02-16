@@ -1,5 +1,9 @@
 import React from "react";
-import { BsffPackagingType, BsffType } from "@prisma/client";
+import {
+  BsffPackagingType,
+  BsffType,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import {
   Document,
   formatDate,
@@ -15,6 +19,7 @@ import {
 } from "../../generated/graphql/types";
 import { BSFF_WASTES } from "../../common/constants";
 import { extractPostalCode } from "../../utils";
+import { boolean } from "yup";
 
 type Props = {
   bsff: Bsff & { packagings: BsffPackaging[] } & {
@@ -731,7 +736,21 @@ function PreviousBsffsTable({ bsff }: Pick<Props, "bsff">) {
             <tr key={previous.id}>
               <td>{previous.id}</td>
               <td>{previous.destination?.cap}</td>
-              <td>{previous.weight?.value}</td>
+              <td>
+                {/*  sum acceptation.weight if all packagings are accepted, else use previous bsff expected weight*/}
+                {previous.packagings
+                  .map(
+                    p =>
+                      p.acceptation?.status === WasteAcceptationStatus.ACCEPTED
+                  )
+                  .every(Boolean)
+                  ? Math.round(
+                      previous.packagings
+                        .map(p => p.acceptation.weight)
+                        .reduce((acc, el) => acc + el, 0) * 100
+                    ) / 100
+                  : previous.weight?.value}
+              </td>
               <td>
                 {previous.packagings
                   .map(p => p.numero)
