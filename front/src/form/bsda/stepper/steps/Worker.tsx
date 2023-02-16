@@ -110,9 +110,9 @@ export function Worker({ disabled }) {
             {!values?.worker?.certification?.hasSubSectionFour &&
               !values?.worker?.certification?.hasSubSectionThree && (
                 <p>
-                  Absence de catégorie entreprise de travaux déclarée dans le
-                  profil entreprise. Il appartient à l'entreprise de travaux de
-                  la mettre à jour le cas échéant
+                  L'entreprise de travaux amiante n'a pas complété ces
+                  informations dans son profil. Nous ne pouvons pas afficher la
+                  catégorie de travaux SS3 ou SS4 de l'entreprise.
                 </p>
               )}
           </div>
