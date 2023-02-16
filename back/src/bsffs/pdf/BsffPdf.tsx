@@ -19,7 +19,6 @@ import {
 } from "../../generated/graphql/types";
 import { BSFF_WASTES } from "../../common/constants";
 import { extractPostalCode } from "../../utils";
-import { boolean } from "yup";
 
 type Props = {
   bsff: Bsff & { packagings: BsffPackaging[] } & {
