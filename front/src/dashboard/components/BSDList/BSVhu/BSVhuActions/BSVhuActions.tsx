@@ -74,6 +74,8 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
                 styles.BSDDActionsMenu
               )}
             >
+              <TableRoadControlButton siret={siret} form={form} />
+
               <MenuLink
                 as={Link}
                 to={{
@@ -87,7 +89,6 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
-              <TableRoadControlButton siret={siret} form={form} />
 
               {!form.isDraft && (
                 <MenuItem onSelect={() => downloadPdf()}>
@@ -95,6 +96,10 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
                   Pdf
                 </MenuItem>
               )}
+              <MenuItem onSelect={() => duplicateBsvhu()}>
+                <IconDuplicateFile size="24px" color="blueLight" />
+                Dupliquer
+              </MenuItem>
               {![BsvhuStatus.Processed, BsvhuStatus.Refused].includes(
                 status
               ) && (
@@ -111,10 +116,7 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
                   </MenuLink>
                 </>
               )}
-              <MenuItem onSelect={() => duplicateBsvhu()}>
-                <IconDuplicateFile size="24px" color="blueLight" />
-                Dupliquer
-              </MenuItem>
+
               {canDelete && (
                 <MenuItem onSelect={() => setIsDeleting(true)}>
                   <IconTrash color="blueLight" size="24px" />
