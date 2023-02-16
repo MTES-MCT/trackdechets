@@ -12,7 +12,7 @@ import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton, RedErrorMessage } from "common/components";
 import { IconCogApproved } from "common/components/Icons";
 import { RevisionField } from "./RevisionField";
-import { useMutation } from "@apollo/client";
+import { ApolloError, useMutation } from "@apollo/client";
 import { SUBMIT_FORM_REVISION_REQUEST_APPROVAL } from "../query";
 import { Field, Form, Formik } from "formik";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
@@ -28,7 +28,7 @@ const validationSchema = yup.object({
 });
 
 export function BsddApproveRevision({ review }: Props) {
-  const [submitFormRevisionRequestApproval, { loading }] = useMutation<
+  const [submitFormRevisionRequestApproval, { loading, error }] = useMutation<
     Pick<Mutation, "submitFormRevisionRequestApproval">,
     MutationSubmitFormRevisionRequestApprovalArgs
   >(SUBMIT_FORM_REVISION_REQUEST_APPROVAL);
@@ -76,6 +76,16 @@ export function BsddApproveRevision({ review }: Props) {
                   </fieldset>
                   <RedErrorMessage name="isApproved" />
                 </div>
+
+                {error && (
+                  <div
+                    style={{ marginTop: "2em", marginBottom: "2em" }}
+                    className="notification notification--warning"
+                  >
+                    {error.message}
+                  </div>
+                )}
+
                 <div className="form__actions">
                   <button
                     type="button"
