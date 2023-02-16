@@ -53,7 +53,7 @@ describe("Query.bsds validation", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "La Longueur maximale de ce paramètre de recherche est de 50 caractères",
+          "La longueur maximale de ce paramètre de recherche est de 50 caractères",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -88,7 +88,7 @@ describe("Query.bsds validation", () => {
       expect(errors).toEqual([
         expect.objectContaining({
           message:
-            "La Longueur maximale de ce paramètre de recherche est de 50 caractères",
+            "La longueur maximale de ce paramètre de recherche est de 50 caractères",
           extensions: expect.objectContaining({
             code: ErrorCode.BAD_USER_INPUT
           })
@@ -122,7 +122,7 @@ describe("Query.bsds validation", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "La Longueur maximale de ce paramètre de recherche est de 20 caractères",
+          "La longueur maximale de ce paramètre de recherche est de 20 caractères",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -155,7 +155,7 @@ describe("Query.bsds validation", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "La Longueur maximale de ce paramètre de recherche est de 30 caractères",
+          "La longueur maximale de ce paramètre de recherche est de 30 caractères",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -188,7 +188,7 @@ describe("Query.bsds validation", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "La Longueur maximale de ce paramètre de recherche est de 20 caractères",
+          "La longueur maximale de ce paramètre de recherche est de 20 caractères",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -221,7 +221,7 @@ describe("Query.bsds validation", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "La Longueur maximale de ce paramètre de recherche est de 20 caractères",
+          "La longueur maximale de ce paramètre de recherche est de 20 caractères",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

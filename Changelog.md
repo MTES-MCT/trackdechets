@@ -15,7 +15,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Ajout de champs au scope company sur le token openId connect [PR 2080](https://github.com/MTES-MCT/trackdechets/pull/2080)
-- Limite la longueur des parmaaètres de la query getBsds [PR 2135](https://github.com/MTES-MCT/trackdechets/pull/2135)
+- Limite la longueur des paramètres de la query getBsds [PR 2135](https://github.com/MTES-MCT/trackdechets/pull/2135)
 
 #### :memo: Documentation
 

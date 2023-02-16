@@ -15,7 +15,7 @@ const maxLengthString = (maxLength: number) =>
     .string()
     .max(
       maxLength,
-      `La Longueur maximale de ce paramètre de recherche est de ${maxLength} caractères`
+      `La longueur maximale de ce paramètre de recherche est de ${maxLength} caractères`
     );
 
 export const bsdSearchSchema: yup.SchemaOf<BsdWhere> = yup.object({
