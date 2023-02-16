@@ -142,6 +142,7 @@ const COMPANY_INFOS = gql`
       name
       address
       companyTypes
+      contact
       contactEmail
       contactPhone
       transporterReceipt {
@@ -171,7 +172,12 @@ function CurrentCompanyWidget({ disabled = false }) {
           data?.companyInfos?.contactEmail
         );
       }
-
+      if (!values?.transporter?.company?.contact) {
+        setFieldValue(
+          `transporter.company.contact`,
+          data?.companyInfos?.contact
+        );
+      }
       if (!values?.transporter?.company?.phone) {
         setFieldValue(
           `transporter.company.phone`,
