@@ -72,6 +72,10 @@ export default function CompanySelector({
   const { siret } = useParams<{ siret: string }>();
   const [uniqId] = useState(() => uuidv4());
   const [field] = useField<FormCompany>({ name });
+  const [selectedCompanyDetails, setSelectedCompanyDetails] = useState({
+    name: field.value?.name,
+    address: field.value?.address,
+  });
   const { setFieldError, setFieldValue, setFieldTouched } = useFormikContext();
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
@@ -201,6 +205,11 @@ export default function CompanySelector({
     });
     setFieldTouched(`${field.name}`, true, true);
     onCompanySelected?.(company);
+
+    setSelectedCompanyDetails({
+      name: company.name,
+      address: company.address,
+    });
   }
 
   /**
@@ -285,6 +294,14 @@ export default function CompanySelector({
     field.name,
     allowForeignCompanies,
   ]);
+
+  // Disable the name field for foreign companies whose name is filled
+  const disableNameField =
+    !!selectedCompanyDetails.name && !displayForeignCompanyWithUnknownInfos;
+
+  // Disable the address field for foreign companies whose address is filled
+  const disableAddressField =
+    !!selectedCompanyDetails.address && !displayForeignCompanyWithUnknownInfos;
 
   return (
     <>
@@ -454,7 +471,7 @@ export default function CompanySelector({
                   className="td-input"
                   name={`${field.name}.name`}
                   placeholder="Nom"
-                  disabled={!displayForeignCompanyWithUnknownInfos}
+                  disabled={disableNameField}
                 />
               </label>
 
@@ -467,7 +484,7 @@ export default function CompanySelector({
                   className="td-input"
                   name={`${field.name}.address`}
                   placeholder="Adresse"
-                  disabled={!displayForeignCompanyWithUnknownInfos}
+                  disabled={disableAddressField}
                 />
               </label>
 
@@ -543,6 +560,7 @@ function favoriteToCompanySearchResult(
     brokerReceipt: company.brokerReceipt,
     vhuAgrementDemolisseur: company.vhuAgrementDemolisseur,
     vhuAgrementBroyeur: company.vhuAgrementBroyeur,
+    workerCertification: company.workerCertification,
     codePaysEtrangerEtablissement:
       company.codePaysEtrangerEtablissement || "FR",
     contact: company.contact,
