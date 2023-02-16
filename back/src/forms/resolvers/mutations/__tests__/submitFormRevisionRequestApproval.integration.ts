@@ -5,12 +5,14 @@ import {
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
+  destinationFactory,
   formFactory,
   formWithTempStorageFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Status } from "@prisma/client";
+import { MARK_AS_SEALED } from "./markAsSealed.integration";
 
 const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = `
   mutation SubmitFormRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
@@ -534,5 +536,67 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     });
 
     expect(updatedBsdd.status).toBe(Status.CANCELED);
+  });
+
+  it("should free BSD from group if group parent BSD is canceled", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await destinationFactory();
+
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: { status: "AWAITING_GROUP", quantityReceived: 1 }
+    });
+
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret,
+        grouping: {
+          create: {
+            initialFormId: appendix2.id,
+            quantity: appendix2.quantityReceived
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+
+    const appendix2grouped = await prisma.form.findUnique({
+      where: { id: appendix2.id }
+    });
+    expect(appendix2grouped.status).toEqual("GROUPED");
+
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: form.id,
+        authoringCompanyId: company.id,
+        approvals: { create: { approverSiret: company.siret } },
+        isCanceled: true,
+        comment: "test cancel"
+      }
+    });
+
+    await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">,
+      MutationSubmitFormRevisionRequestApprovalArgs
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    const updatedBsdd = await prisma.form.findUnique({
+      where: { id: appendix2.id }
+    });
+
+    expect(updatedBsdd.status).toBe(Status.AWAITING_GROUP);
   });
 });
