@@ -1,5 +1,9 @@
 import React from "react";
-import { BsffPackagingType, BsffType } from "@prisma/client";
+import {
+  BsffPackagingType,
+  BsffType,
+  WasteAcceptationStatus
+} from "@prisma/client";
 import {
   Document,
   formatDate,
@@ -129,7 +133,7 @@ function BsffEmitterType({ bsff }: Pick<Props, "bsff">) {
         <p>
           <input
             type="checkbox"
-            checked={bsff.type === BsffType.COLLECTE_PETITES_QUANTITES}
+            defaultChecked={bsff.type === BsffType.COLLECTE_PETITES_QUANTITES}
             readOnly
           />{" "}
           Un opérateur qui collecte des déchets dangereux de fluides
@@ -139,7 +143,7 @@ function BsffEmitterType({ bsff }: Pick<Props, "bsff">) {
         <p>
           <input
             type="checkbox"
-            checked={bsff.type === BsffType.TRACER_FLUIDE}
+            defaultChecked={bsff.type === BsffType.TRACER_FLUIDE}
             readOnly
           />{" "}
           Un autre détenteur de déchets
@@ -147,7 +151,7 @@ function BsffEmitterType({ bsff }: Pick<Props, "bsff">) {
         <p>
           <input
             type="checkbox"
-            checked={bsff.type === BsffType.GROUPEMENT}
+            defaultChecked={bsff.type === BsffType.GROUPEMENT}
             readOnly
           />{" "}
           Une installation dans le cadre d'un regroupement
@@ -155,7 +159,7 @@ function BsffEmitterType({ bsff }: Pick<Props, "bsff">) {
         <p>
           <input
             type="checkbox"
-            checked={bsff.type === BsffType.REEXPEDITION}
+            defaultChecked={bsff.type === BsffType.REEXPEDITION}
             readOnly
           />{" "}
           Une installation dans le cadre d'une réexpédition
@@ -163,7 +167,7 @@ function BsffEmitterType({ bsff }: Pick<Props, "bsff">) {
         <p>
           <input
             type="checkbox"
-            checked={bsff.type === BsffType.RECONDITIONNEMENT}
+            defaultChecked={bsff.type === BsffType.RECONDITIONNEMENT}
             readOnly
           />{" "}
           Une installation dans le cadre d'un reconditionnement
@@ -288,7 +292,7 @@ function BsffQuantity({ bsff }: Pick<Props, "bsff">) {
             <span>
               <input
                 type="checkbox"
-                checked={!bsff.weight?.isEstimate}
+                defaultChecked={!bsff.weight?.isEstimate}
                 readOnly
               />{" "}
               Réelle
@@ -296,7 +300,7 @@ function BsffQuantity({ bsff }: Pick<Props, "bsff">) {
             <span>
               <input
                 type="checkbox"
-                checked={bsff.weight?.isEstimate}
+                defaultChecked={bsff.weight?.isEstimate}
                 readOnly
               />{" "}
               Estimée
@@ -347,9 +351,9 @@ function BsffTransporter({ bsff }: Pick<Props, "bsff">) {
             {bsff.transporter?.company?.siret &&
             !bsff.transporter?.recepisse ? (
               <p>
-                <input type="checkbox" checked readOnly /> Je déclare être
-                exempté de récépissé au titre de l'article R.541-50 du code de
-                l'environnement
+                <input type="checkbox" defaultChecked readOnly /> Je déclare
+                être exempté de récépissé au titre de l'article R.541-50 du code
+                de l'environnement
               </p>
             ) : (
               <p>
@@ -410,9 +414,10 @@ function BsffPackagingAcceptation({
       )}
 
       <div>
-        Contenant accepté : <input type="checkbox" checked={isAccepted} /> Oui
+        Contenant accepté :{" "}
+        <input type="checkbox" defaultChecked={isAccepted} /> Oui
         {"  "}
-        <input type="checkbox" checked={isRefused} /> Non
+        <input type="checkbox" defaultChecked={isRefused} /> Non
       </div>
       <div>
         Description du déchet : {packaging?.acceptation?.wasteCode}{" "}
@@ -463,18 +468,34 @@ function BsffOnePackagingOperation({
       </p>
       <div>
         Récupération ou régénération des solvants{" "}
-        <input type="checkbox" checked={packaging?.operation?.code === "R2"} />{" "}
+        <input
+          type="checkbox"
+          defaultChecked={packaging?.operation?.code === "R2"}
+        />{" "}
         R 2
       </div>
       <div>
+        Recyclage ou récupération des substances organiques{" "}
+        <input
+          type="checkbox"
+          defaultChecked={packaging?.operation?.code === "R3"}
+        />{" "}
+        R 3
+      </div>
+      <div>
         Recyclage ou récupération d’autres matières inorganiques{" "}
-        <input type="checkbox" checked={packaging?.operation?.code === "R5"} />{" "}
+        <input
+          type="checkbox"
+          defaultChecked={packaging?.operation?.code === "R5"}
+        />{" "}
         R 5
       </div>
       <div>
-        Recyclage ou récupération des substances organiques R 3 Incinération à
-        terre{" "}
-        <input type="checkbox" checked={packaging?.operation?.code === "D10"} />{" "}
+        Incinération à terre{" "}
+        <input
+          type="checkbox"
+          defaultChecked={packaging?.operation?.code === "D10"}
+        />{" "}
         D 10
       </div>
       <div>
@@ -482,10 +503,13 @@ function BsffOnePackagingOperation({
         Groupement de contenants{" "}
         <input
           type="checkbox"
-          checked={packaging?.operation?.code === "R12"}
+          defaultChecked={packaging?.operation?.code === "R12"}
         />{" "}
         R12{" "}
-        <input type="checkbox" checked={packaging?.operation?.code === "D13"} />{" "}
+        <input
+          type="checkbox"
+          defaultChecked={packaging?.operation?.code === "D13"}
+        />{" "}
         D 13
       </div>
       <div>
@@ -493,10 +517,13 @@ function BsffOnePackagingOperation({
         Reconditionnement dans un nouveau contenant{" "}
         <input
           type="checkbox"
-          checked={packaging?.operation?.code === "R12"}
+          defaultChecked={packaging?.operation?.code === "R12"}
         />{" "}
         R 12{" "}
-        <input type="checkbox" checked={packaging?.operation?.code === "D14"} />{" "}
+        <input
+          type="checkbox"
+          defaultChecked={packaging?.operation?.code === "D14"}
+        />{" "}
         D 14
       </div>
       <div>
@@ -504,10 +531,13 @@ function BsffOnePackagingOperation({
         Entreposage provisoire avant réexpédition{" "}
         <input
           type="checkbox"
-          checked={packaging?.operation?.code === "R13"}
+          defaultChecked={packaging?.operation?.code === "R13"}
         />{" "}
         R13{" "}
-        <input type="checkbox" checked={packaging?.operation?.code === "D15"} />{" "}
+        <input
+          type="checkbox"
+          defaultChecked={packaging?.operation?.code === "D15"}
+        />{" "}
         D 15
       </div>
       <div> Date de réalisation : {formatDate(packaging?.operation?.date)}</div>
@@ -557,8 +587,10 @@ function BsffPackagingOperation({ packaging }: { packaging: BsffPackaging }) {
     <div>
       <div>Nom du responsable : {packaging?.operation?.signature?.author}</div>
       <div>
-        Code D/R : {packaging?.operation?.code} (
-        {packaging?.operation?.description})
+        Code D/R : {packaging?.operation?.code}{" "}
+        {packaging?.operation?.description &&
+          `(
+        ${packaging?.operation?.description})`}
       </div>
       {packaging?.operation?.noTraceability && (
         <div>Rupture de traçabilité autorisée par arrêté préfectoral</div>
@@ -703,7 +735,21 @@ function PreviousBsffsTable({ bsff }: Pick<Props, "bsff">) {
             <tr key={previous.id}>
               <td>{previous.id}</td>
               <td>{previous.destination?.cap}</td>
-              <td>{previous.weight?.value}</td>
+              <td>
+                {/*  sum acceptation.weight if all packagings are accepted, else use previous bsff expected weight*/}
+                {previous.packagings
+                  .map(
+                    p =>
+                      p.acceptation?.status === WasteAcceptationStatus.ACCEPTED
+                  )
+                  .every(Boolean)
+                  ? Math.round(
+                      previous.packagings
+                        .map(p => p.acceptation.weight)
+                        .reduce((acc, el) => acc + el, 0) * 100
+                    ) / 100
+                  : previous.weight?.value}
+              </td>
               <td>
                 {previous.packagings
                   .map(p => p.numero)
