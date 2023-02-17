@@ -66,6 +66,8 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
                 styles.BSDDActionsMenu
               )}
             >
+              <TableRoadControlButton siret={siret} form={form} />
+
               <MenuLink
                 as={Link}
                 to={{
@@ -80,14 +82,18 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
                 Aperçu
               </MenuLink>
 
-              <TableRoadControlButton siret={siret} form={form} />
-
               {!form.isDraft && (
                 <MenuItem onSelect={() => downloadPdf()}>
                   <IconPdf size="24px" color="blueLight" />
                   Pdf
                 </MenuItem>
               )}
+
+              <MenuItem onSelect={() => duplicateBsda()}>
+                <IconDuplicateFile size="24px" color="blueLight" />
+                Dupliquer
+              </MenuItem>
+
               {![
                 BsdaStatus.Processed,
                 BsdaStatus.Refused,
@@ -106,10 +112,7 @@ export const BSDaActions = ({ form }: BSdaActionsProps) => {
                   </MenuLink>
                 </>
               )}
-              <MenuItem onSelect={() => duplicateBsda()}>
-                <IconDuplicateFile size="24px" color="blueLight" />
-                Dupliquer
-              </MenuItem>
+
               {form["bsdaStatus"] === BsdaStatus.Initial ||
               (form["bsdaStatus"] === BsdaStatus.SignedByProducer &&
                 form.emitter?.company?.siret === siret) ? (

@@ -73,6 +73,8 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
                 styles.BSDDActionsMenu
               )}
             >
+              <TableRoadControlButton siret={siret} form={form} />
+
               <MenuLink
                 as={Link}
                 to={{
@@ -86,12 +88,19 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
-              <TableRoadControlButton siret={siret} form={form} />
 
-              <MenuItem onSelect={() => downloadPdf()}>
-                <IconPdf size="24px" color="blueLight" />
-                Pdf
+              {!form.isDraft && (
+                <MenuItem onSelect={() => downloadPdf()}>
+                  <IconPdf size="24px" color="blueLight" />
+                  Pdf
+                </MenuItem>
+              )}
+
+              <MenuItem onSelect={() => duplicateBsff()}>
+                <IconDuplicateFile size="24px" color="blueLight" />
+                Dupliquer
               </MenuItem>
+
               {[BsffStatus.Initial, BsffStatus.SignedByEmitter].includes(
                 form.bsffStatus
               ) && (
@@ -108,11 +117,6 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
                   </MenuLink>
                 </>
               )}
-
-              <MenuItem onSelect={() => duplicateBsff()}>
-                <IconDuplicateFile size="24px" color="blueLight" />
-                Dupliquer
-              </MenuItem>
 
               {canDelete && (
                 <MenuItem onSelect={() => setIsDeleting(true)}>
