@@ -1736,8 +1736,8 @@ export function IconBSDaThin(props: React.SVGProps<SVGSVGElement>) {
       <path
         d="M10.1681 9.91675H7.81631C7.24036 9.91719 6.70687 10.2093 6.41083 10.6862L4.42807 13.8751H35.5881L33.6053 10.6862C33.3093 10.2093 32.7758 9.91719 32.1998 9.91675H29.8481"
         stroke="black"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         fillRule="evenodd"

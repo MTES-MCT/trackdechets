@@ -80,14 +80,14 @@ function BsdCard({
               <div className="bsd-card__content__infos__other">
                 <WasteDetails
                   wasteType={bsdDisplay.type}
-                  code={bsdDisplay.wasteDetails.code?.toString()}
-                  name={bsdDisplay.wasteDetails.name?.toString()}
+                  code={bsdDisplay.wasteDetails.code!}
+                  name={bsdDisplay.wasteDetails.name!}
                 />
 
                 <Actors
-                  emitterName={bsdDisplay.emitter?.company?.name || ""}
-                  transporterName={bsdDisplay.transporter?.company?.name || ""}
-                  destinationName={bsdDisplay.destination?.company?.name || ""}
+                  emitterName={bsdDisplay.emitter?.company?.name!}
+                  transporterName={bsdDisplay.transporter?.company?.name!}
+                  destinationName={bsdDisplay.destination?.company?.name!}
                 />
               </div>
             </div>
