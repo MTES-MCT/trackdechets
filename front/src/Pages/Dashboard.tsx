@@ -39,6 +39,7 @@ import {
   dropdownCreateLinks,
 } from "../Apps/Dashboard/dashboardUtils";
 import BsdCreateDropdown from "../Apps/Common/Components/DropdownMenu/DropdownMenu";
+import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
 
 import "./dashboard.scss";
 
@@ -48,6 +49,13 @@ const DashboardPage = () => {
   const isFollowTab = !!useRouteMatch(routes.dashboardv2.bsds.follow);
   const isArchivesTab = !!useRouteMatch(routes.dashboardv2.bsds.history);
   const BSD_PER_PAGE = 10;
+
+  const bsdCurrentTab: BsdCurrentTab = {
+    isActTab,
+    isDraftTab,
+    isFollowTab,
+    isArchivesTab,
+  };
 
   const { siret } = useParams<{ siret: string }>();
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
@@ -300,7 +308,11 @@ const DashboardPage = () => {
           )}
 
           {!!data?.bsds.edges.length && (
-            <BsdCardList siret={siret} bsds={bsds!} />
+            <BsdCardList
+              siret={siret}
+              bsds={bsds!}
+              bsdCurrentTab={bsdCurrentTab}
+            />
           )}
 
           {data?.bsds.pageInfo.hasNextPage && (

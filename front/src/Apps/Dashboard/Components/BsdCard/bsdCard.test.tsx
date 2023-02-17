@@ -3,11 +3,18 @@ import { render, screen } from "@testing-library/react";
 import { fireEvent, within } from "@testing-library/dom";
 import BsdCard from "./BsdCard";
 import { Bsda, Bsdasri, Bsff, Bsvhu, Form } from "generated/graphql/types";
+import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
 
 describe("Bsd card primary action label", () => {
   const siretEmmiter = "53230142100022";
   const siretTransporter = "13001045700013";
   const functionMock = jest.fn();
+  const bsdCurrentTab: BsdCurrentTab = {
+    isActTab: false,
+    isDraftTab: false,
+    isFollowTab: false,
+    isArchivesTab: false,
+  };
 
   describe("case: INITITAL(draft=true)", () => {
     test("Bsdd", () => {
@@ -426,6 +433,7 @@ describe("Bsd card primary action label", () => {
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsff}
+          bsdCurrentTab={bsdCurrentTab}
           onValidate={functionMock}
           onDelete={functionMock}
           onDuplicate={functionMock}
@@ -454,6 +462,7 @@ describe("Bsd card primary action label", () => {
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsffDifferentSiret}
+          bsdCurrentTab={bsdCurrentTab}
           onValidate={functionMock}
           onDelete={functionMock}
           onDuplicate={functionMock}
@@ -847,6 +856,7 @@ describe("Bsd card primary action label", () => {
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsdari}
+          bsdCurrentTab={{ ...bsdCurrentTab, isActTab: true }}
           onValidate={functionMock}
           onDelete={functionMock}
           onDuplicate={functionMock}

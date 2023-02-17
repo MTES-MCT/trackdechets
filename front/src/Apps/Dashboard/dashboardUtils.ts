@@ -135,3 +135,51 @@ export const dropdownCreateLinks = siret => [
     route: generatePath(routes.dashboard.bsdas.create, { siret }),
   },
 ];
+
+export const getOverviewPath = bsd => {
+  switch (bsd.type) {
+    case BsdType.Bsdd:
+      return routes.dashboardv2.bsdds.view;
+    case BsdType.Bsda:
+      return routes.dashboardv2.bsdas.view;
+    case BsdType.Bsdasri:
+      return routes.dashboardv2.bsdasris.view;
+    case BsdType.Bsff:
+      return routes.dashboardv2.bsffs.view;
+    case BsdType.Bsvhu:
+      return routes.dashboardv2.bsvhus.view;
+
+    default:
+      break;
+  }
+};
+
+export const getUpdatePath = bsd => {
+  switch (bsd.type) {
+    case BsdType.Bsdd:
+      return routes.dashboardv2.bsdds.edit;
+    case BsdType.Bsda:
+      return routes.dashboardv2.bsdas.edit;
+    case BsdType.Bsdasri:
+      return routes.dashboardv2.bsdasris.edit;
+    case BsdType.Bsff:
+      return routes.dashboardv2.bsffs.edit;
+    case BsdType.Bsvhu:
+      return routes.dashboardv2.bsvhus.edit;
+
+    default:
+      break;
+  }
+};
+
+export const getRevisionPath = bsd => {
+  switch (bsd.type) {
+    case BsdType.Bsdd:
+      return routes.dashboardv2.bsdds.review;
+    case BsdType.Bsda:
+      return routes.dashboardv2.bsdas.review;
+
+    default:
+      break;
+  }
+};

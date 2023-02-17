@@ -3,6 +3,7 @@ import { ComponentMeta, ComponentStory } from "@storybook/react";
 import { Bsdasri } from "generated/graphql/types";
 
 import BsdCard from "./BsdCard";
+import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
 
 export default {
   title: "COMPONENTS/DASHBOARD/BsdCard",
@@ -19,6 +20,12 @@ export const BsdCardExample = Template.bind({});
 
 const currentSiret = "53230142100022";
 const onValidate = jest.fn();
+const bsdCurrentTab: BsdCurrentTab = {
+  isActTab: true,
+  isDraftTab: false,
+  isFollowTab: false,
+  isArchivesTab: false,
+};
 
 BsdCardExample.args = {
   bsd: {
@@ -91,4 +98,5 @@ BsdCardExample.args = {
   } as unknown as Bsdasri,
   currentSiret,
   onValidate,
+  bsdCurrentTab,
 };
