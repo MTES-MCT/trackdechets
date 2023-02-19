@@ -1,4 +1,4 @@
-FROM node:16.16
+FROM node:16.19.0
 WORKDIR /usr/src/app
 COPY package*.json ./
 RUN npm install --quiet
