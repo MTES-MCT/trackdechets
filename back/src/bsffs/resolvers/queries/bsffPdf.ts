@@ -34,7 +34,10 @@ export const bsffPdfDownloadHandler: DownloadHandler<QueryBsffPdfArgs> = {
     const previousBsffIds = [...new Set(previousPackagings.map(p => p.bsffId))];
     const previousBsffs = await prisma.bsff.findMany({
       where: { id: { in: previousBsffIds } },
-      include: { packagings: true }
+      include: {
+        // includes only packagings in the dependency graph of the BSFF
+        packagings: { where: { id: { in: previousPackagings.map(p => p.id) } } }
+      }
     });
     const readableStream = await buildPdf({ ...bsff, previousBsffs });
     readableStream.pipe(createPDFResponse(res, bsff.id));
