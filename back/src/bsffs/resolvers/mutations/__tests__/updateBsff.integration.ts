@@ -876,6 +876,50 @@ describe("Mutation.updateBsff", () => {
     expect(data.updateBsff.id).toBeTruthy();
   });
 
+  it("should update a BSFF of type RECONDITIONNEMENT", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const repackagingBsff = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.D14.code }
+    );
+    const bsff = await createBsffBeforeEmission(
+      { emitter: ttr, previousPackagings: repackagingBsff.packagings },
+      {
+        type: BsffType.RECONDITIONNEMENT,
+        isDraft: true
+      }
+    );
+
+    const { mutate } = makeClient(ttr.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          destination: {
+            cap: "nouveau cap"
+          },
+          packagings: [
+            { numero: "citerne-1", type: "CITERNE", volume: 1, weight: 1 }
+          ],
+          repackaging: repackagingBsff.packagings.map(p => p.id)
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.updateBsff.destination?.cap).toEqual("nouveau cap");
+  });
+
   it("should be possible to update a bsff's fiches d'intervention", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const detenteur1 = await userWithCompanyFactory(UserRole.ADMIN);
