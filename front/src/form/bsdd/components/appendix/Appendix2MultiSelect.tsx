@@ -106,12 +106,14 @@ export default function Appendix2MultiSelect() {
     // avoid overwriting values on first render when updating a BSDD
     if (!values.id || hasChanged) {
       // Computes sum of quantities of appendix2
-      const totalQuantity = appendix2Selected.reduce((q, { quantity }) => {
-        if (!quantity) {
-          return q;
-        }
-        return q + quantity;
-      }, 0);
+      const totalQuantity = appendix2Selected
+        .reduce((q, { quantity }) => {
+          if (!quantity) {
+            return q;
+          }
+          return q.plus(quantity);
+        }, new Decimal(0))
+        .toNumber();
 
       // Computes the sum of packagingsInfos of appendix2
       const totalPackagings = (() => {
