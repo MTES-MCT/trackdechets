@@ -2,10 +2,9 @@ export enum inputType {
   text = "text",
 }
 
-export interface BsdCurrentTab {
-  isDraftTab?: boolean;
-  isActTab?: boolean;
-  isToCollectTab?: boolean;
-  isFollowTab?: boolean;
-  isArchivesTab?: boolean;
-}
+export type BsdCurrentTab =
+  | "draftTab"
+  | "actTab"
+  | "toCollectTab"
+  | "followTab"
+  | "archivesTab";

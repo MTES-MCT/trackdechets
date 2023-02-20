@@ -48,14 +48,32 @@ const DashboardPage = () => {
   const isDraftTab = !!useRouteMatch(routes.dashboardv2.bsds.drafts);
   const isFollowTab = !!useRouteMatch(routes.dashboardv2.bsds.follow);
   const isArchivesTab = !!useRouteMatch(routes.dashboardv2.bsds.history);
+  const isToCollectTab = !!useRouteMatch(
+    routes.dashboardv2.transport.toCollect
+  );
   const BSD_PER_PAGE = 10;
 
-  const bsdCurrentTab: BsdCurrentTab = {
-    isActTab,
-    isDraftTab,
-    isFollowTab,
-    isArchivesTab,
+  const getBsdCurrentTab = (): BsdCurrentTab => {
+    if (isDraftTab) {
+      return "draftTab";
+    }
+    if (isActTab) {
+      return "actTab";
+    }
+    if (isFollowTab) {
+      return "followTab";
+    }
+    if (isArchivesTab) {
+      return "archivesTab";
+    }
+    if (isToCollectTab) {
+      return "toCollectTab";
+    }
+    // default tab
+    return "draftTab";
   };
+
+  const bsdCurrentTab = getBsdCurrentTab();
 
   const { siret } = useParams<{ siret: string }>();
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);

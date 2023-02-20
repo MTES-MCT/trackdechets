@@ -230,10 +230,10 @@ const isBsffSign = (
   bsd: BsdDisplay,
   currentSiret: string,
   bsdCurrentTab: BsdCurrentTab
-) =>
-  isBsff(bsd.type) &&
-  !bsdCurrentTab.isActTab &&
-  isSameSiretEmmiter(currentSiret, bsd);
+) => {
+  const isActTab = bsdCurrentTab === "actTab";
+  return isBsff(bsd.type) && !isActTab && isSameSiretEmmiter(currentSiret, bsd);
+};
 
 const isEmetteurSign = (bsd: BsdDisplay, isTransporter: boolean) =>
   isTransporter && !isSynthesis(bsd.bsdWorkflowType?.toString());
@@ -246,6 +246,9 @@ const getIsNonDraftLabel = (
   currentSiret: string,
   bsdCurrentTab: BsdCurrentTab
 ): string => {
+  const isActTab = bsdCurrentTab === "actTab";
+  const isToCollectTab = bsdCurrentTab === "toCollectTab";
+
   if (isBsvhuSign(bsd, currentSiret)) {
     return SIGNER;
   }
@@ -260,14 +263,14 @@ const getIsNonDraftLabel = (
     const isHolder = isSameSiretEmmiter(currentSiret, bsd) || isEcoOrganisme;
     const isTransporter = isSameSiretTransporter(currentSiret, bsd);
 
-    if (bsdCurrentTab.isActTab && isEcoOrgSign(bsd, isHolder)) {
+    if (isActTab && isEcoOrgSign(bsd, isHolder)) {
       if (isEcoOrganisme) {
         return SIGNATURE_ECO_ORG;
       }
       return SIGNATURE_PRODUCTEUR;
     }
 
-    if (bsdCurrentTab.isToCollectTab && isEmetteurSign(bsd, isTransporter)) {
+    if (isToCollectTab && isEmetteurSign(bsd, isTransporter)) {
       return SIGNATURE_EMETTEUR;
     }
     return "";
@@ -315,6 +318,8 @@ const getSentBtnLabel = (
   bsd: BsdDisplay,
   bsdCurrentTab: BsdCurrentTab
 ): string => {
+  const isActTab = bsdCurrentTab === "actTab";
+
   if (isBsdd(bsd.type)) {
     if (isSameSiretDestination(currentSiret, bsd) && bsd.isTempStorage) {
       return VALIDER_ENTREPOSAGE_PROVISOIRE;
@@ -323,11 +328,9 @@ const getSentBtnLabel = (
   }
   if (
     (isBsdasri(bsd.type) &&
-      bsdCurrentTab.isActTab &&
+      isActTab &&
       currentSiret === bsd.destination?.company?.siret) ||
-    (isBsff(bsd.type) &&
-      bsdCurrentTab.isActTab &&
-      isSameSiretDestination(currentSiret, bsd))
+    (isBsff(bsd.type) && isActTab && isSameSiretDestination(currentSiret, bsd))
   ) {
     return SIGNER_RECEPTION;
   }
@@ -346,6 +349,7 @@ const getReceivedBtnLabel = (
   bsd: BsdDisplay,
   bsdCurrentTab: BsdCurrentTab
 ): string => {
+  const isActTab = bsdCurrentTab === "actTab";
   if (
     (isBsdd(bsd.type) &&
       bsd.isTempStorage &&
@@ -359,7 +363,7 @@ const getReceivedBtnLabel = (
   }
   if (
     isBsff(bsd.type) &&
-    bsdCurrentTab.isActTab &&
+    isActTab &&
     isSameSiretDestination(currentSiret, bsd)
   ) {
     // ajouter bsff status received with packagings see dashboard/components/BSDList/BSFF/WorkflowAction/WorkflowAction.tsx
@@ -368,7 +372,7 @@ const getReceivedBtnLabel = (
 
   if (
     isBsdasri(bsd.type) &&
-    bsdCurrentTab.isActTab &&
+    isActTab &&
     isSameSiretDestination(currentSiret, bsd)
   ) {
     return SIGNER_RECEPTION;
@@ -381,15 +385,14 @@ const getSignByProducerBtnLabel = (
   bsd: BsdDisplay,
   bsdCurrentTab: BsdCurrentTab
 ): string => {
+  const isToCollectTab = bsdCurrentTab === "toCollectTab";
+
   if (isBsdd(bsd.type) && isSameSiretTransporter(currentSiret, bsd)) {
     return SIGNATURE_TRANSPORTEUR;
   }
 
   if (isBsdasri(bsd.type)) {
-    if (
-      !isSameSiretTransporter(currentSiret, bsd) ||
-      !bsdCurrentTab.isToCollectTab
-    ) {
+    if (!isSameSiretTransporter(currentSiret, bsd) || !isToCollectTab) {
       return "";
     }
 
@@ -422,9 +425,11 @@ const getSignedByEmitterLabel = (
   bsd: BsdDisplay,
   bsdCurrentTab: BsdCurrentTab
 ): string => {
+  const isToCollectTab = bsdCurrentTab === "toCollectTab";
+
   if (
     isBsff(bsd.type) &&
-    bsdCurrentTab.isToCollectTab &&
+    isToCollectTab &&
     isSameSiretTransporter(currentSiret, bsd)
   ) {
     return SIGNER_ENLEVEMENT;

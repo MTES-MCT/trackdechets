@@ -20,12 +20,7 @@ export const BsdCardExample = Template.bind({});
 
 const currentSiret = "53230142100022";
 const onValidate = jest.fn();
-const bsdCurrentTab: BsdCurrentTab = {
-  isActTab: true,
-  isDraftTab: false,
-  isFollowTab: false,
-  isArchivesTab: false,
-};
+const bsdCurrentTab: BsdCurrentTab = "actTab";
 
 BsdCardExample.args = {
   bsd: {

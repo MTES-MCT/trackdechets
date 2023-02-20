@@ -37,12 +37,7 @@ export const PourAction = Template.bind({});
 export const Suvi = Template.bind({});
 export const Archives = Template.bind({});
 const siret = "53230142100022"; // les ateliers de céline
-const bsdCurrentTab: BsdCurrentTab = {
-  isActTab: false,
-  isDraftTab: false,
-  isFollowTab: false,
-  isArchivesTab: false,
-};
+const bsdCurrentTab: BsdCurrentTab = "draftTab";
 Brouillon.args = {
   siret: siret,
   bsds: bsdListDraft as unknown as BsdEdge[],

@@ -9,12 +9,7 @@ describe("Bsd card primary action label", () => {
   const siretEmmiter = "53230142100022";
   const siretTransporter = "13001045700013";
   const functionMock = jest.fn();
-  const bsdCurrentTab: BsdCurrentTab = {
-    isActTab: false,
-    isDraftTab: false,
-    isFollowTab: false,
-    isArchivesTab: false,
-  };
+  const bsdCurrentTab: BsdCurrentTab = "draftTab";
 
   describe("case: INITITAL(draft=true)", () => {
     test("Bsdd", () => {
@@ -856,7 +851,7 @@ describe("Bsd card primary action label", () => {
         <BsdCard
           currentSiret={siretEmmiter}
           bsd={bsdari}
-          bsdCurrentTab={{ ...bsdCurrentTab, isActTab: true }}
+          bsdCurrentTab="actTab"
           onValidate={functionMock}
           onDelete={functionMock}
           onDuplicate={functionMock}
