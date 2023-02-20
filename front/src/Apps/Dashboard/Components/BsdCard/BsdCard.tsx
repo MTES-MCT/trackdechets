@@ -21,6 +21,7 @@ import Actors from "../Actors/Actors";
 
 function BsdCard({
   bsd,
+  bsdCurrentTab,
   currentSiret,
   onValidate,
   onOverview,
@@ -37,7 +38,7 @@ function BsdCard({
     : "";
 
   const ctaPrimaryLabel = bsdDisplay?.type
-    ? getCtaLabelFromStatus(bsdDisplay, currentSiret)
+    ? getCtaLabelFromStatus(bsdDisplay, currentSiret, bsdCurrentTab)
     : "";
 
   const handleValidationClick = (

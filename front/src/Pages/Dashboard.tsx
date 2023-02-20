@@ -39,6 +39,7 @@ import {
   dropdownCreateLinks,
 } from "../Apps/Dashboard/dashboardUtils";
 import BsdCreateDropdown from "../Apps/Common/Components/DropdownMenu/DropdownMenu";
+import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
 
 import "./dashboard.scss";
 
@@ -47,11 +48,36 @@ const DashboardPage = () => {
   const isDraftTab = !!useRouteMatch(routes.dashboardv2.bsds.drafts);
   const isFollowTab = !!useRouteMatch(routes.dashboardv2.bsds.follow);
   const isArchivesTab = !!useRouteMatch(routes.dashboardv2.bsds.history);
+  const isToCollectTab = !!useRouteMatch(
+    routes.dashboardv2.transport.toCollect
+  );
   const BSD_PER_PAGE = 10;
+
+  const getBsdCurrentTab = (): BsdCurrentTab => {
+    if (isDraftTab) {
+      return "draftTab";
+    }
+    if (isActTab) {
+      return "actTab";
+    }
+    if (isFollowTab) {
+      return "followTab";
+    }
+    if (isArchivesTab) {
+      return "archivesTab";
+    }
+    if (isToCollectTab) {
+      return "toCollectTab";
+    }
+    // default tab
+    return "draftTab";
+  };
+
+  const bsdCurrentTab = getBsdCurrentTab();
 
   const { siret } = useParams<{ siret: string }>();
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-  const [isFethingMore, setIsFetchingMore] = useState(false);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const withRoutePredicate = useCallback(() => {
     if (isActTab) {
@@ -285,8 +311,8 @@ const DashboardPage = () => {
       {isFiltersOpen && (
         <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
       )}
-      {isFethingMore && <Loader />}
-      {loading && !isFethingMore ? (
+      {isFetchingMore && <Loader />}
+      {loading && !isFetchingMore ? (
         <Loader />
       ) : (
         <>
@@ -300,7 +326,11 @@ const DashboardPage = () => {
           )}
 
           {!!data?.bsds.edges.length && (
-            <BsdCardList siret={siret} bsds={bsds!} />
+            <BsdCardList
+              siret={siret}
+              bsds={bsds!}
+              bsdCurrentTab={bsdCurrentTab}
+            />
           )}
 
           {data?.bsds.pageInfo.hasNextPage && (
@@ -308,7 +338,7 @@ const DashboardPage = () => {
               <button
                 className="fr-btn"
                 onClick={loadMoreBsds}
-                disabled={isFethingMore}
+                disabled={isFetchingMore}
               >
                 {load_more_bsds}
               </button>
