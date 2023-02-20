@@ -126,21 +126,13 @@ export const getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest =
     const users = await prisma.user.findMany({
       where: {
         createdAt: { gt: associatedDateGt, lt: associatedDateLt },
-        isActive: true
-      },
-      include: {
-        companyAssociations: {},
-        MembershipRequest: {}
+        isActive: true,
+        companyAssociations: { none: {} },
+        MembershipRequest: { none: {} }
       }
     });
 
-    const filtered = users.filter(
-      user =>
-        user.companyAssociations.length === 0 &&
-        user.MembershipRequest.length === 0
-    );
-
-    return filtered;
+    return users;
   };
 
 /**
