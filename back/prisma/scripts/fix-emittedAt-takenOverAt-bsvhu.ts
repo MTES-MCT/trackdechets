@@ -4,7 +4,7 @@ import { registerUpdater, Updater } from "./helper/helper";
 @registerUpdater(
   "Set transporterTransportTakenOverAt = emitterEmissionSignatureDate for all BSVHUs where emitterEmissionSignatureDate > transporterTransportTakenOverAt",
   "Set transporterTransportTakenOverAt = emitterEmissionSignatureDate for all BSVHUs where emitterEmissionSignatureDate > transporterTransportTakenOverAt",
-  true
+  false
 )
 export class UpdateBSVHUTakenOverAt implements Updater {
   async run() {

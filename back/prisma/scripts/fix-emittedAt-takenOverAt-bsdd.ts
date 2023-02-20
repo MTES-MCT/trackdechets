@@ -4,7 +4,7 @@ import { registerUpdater, Updater } from "./helper/helper";
 @registerUpdater(
   "Set takenOverAt = emittedAt for all BSDDs where emittedAt > takenOverAt",
   "Set takenOverAt = emittedAt for all BSDDs where emittedAt > takenOverAt",
-  true
+  false
 )
 export class UpdateBSDDTakenOverAt implements Updater {
   async run() {
