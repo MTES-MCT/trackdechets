@@ -13,6 +13,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Message d'erreur lorsqu'on modifie un BSFF de reconditionnement en brouillon [PR 2155](https://github.com/MTES-MCT/trackdechets/pull/2155)
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
