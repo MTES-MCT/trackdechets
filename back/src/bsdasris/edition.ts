@@ -1,4 +1,4 @@
-import { Bsdasri, User } from "@prisma/client";
+import { Bsdasri, User, Prisma } from "@prisma/client";
 import { safeInput } from "../common/converter";
 import { SealedFieldError } from "../common/errors";
 import { getCachedUserSiretOrVat } from "../common/redis/users";
@@ -7,10 +7,42 @@ import { BsdasriInput, BsdasriSignatureType } from "../generated/graphql/types";
 import { flattenBsdasriInput } from "./converter";
 import { getReadonlyBsdasriRepository } from "./repository";
 
+type EditableBsdasriFields = Required<
+  Omit<
+    Prisma.BsdasriCreateInput,
+    | "id"
+    | "createdAt"
+    | "updatedAt"
+    | "isDraft"
+    | "isDeleted"
+    | "status"
+    | "type"
+    | "groupedIn"
+    | "synthesizedIn"
+    | "synthesisEmitterSirets"
+    | "transportSignatory"
+    | "emissionSignatory"
+    | "emitterEmissionSignatureDate"
+    | "emitterEmissionSignatureAuthor"
+    | "transporterTransportSignatureDate"
+    | "transporterTransportSignatureAuthor"
+    | "receptionSignatory"
+    | "destinationReceptionSignatureDate"
+    | "destinationReceptionSignatureAuthor"
+    | "operationSignatory"
+    | "destinationOperationSignatureDate"
+    | "destinationOperationSignatureAuthor"
+    | "isEmissionDirectTakenOver"
+    | "isEmissionTakenOverWithSecretCode"
+    | "emittedByEcoOrganisme"
+  >
+>;
 // Defines until which signature BSDASRI fields can be modified
 // The test in edition.test.ts ensures that every possible key in BsdasriInput
 // has a corresponding edition rule
-export const editionRules: { [key: string]: BsdasriSignatureType } = {
+export const editionRules: {
+  [key in keyof EditableBsdasriFields]: BsdasriSignatureType;
+} = {
   wasteCode: "EMISSION",
   wasteAdr: "EMISSION",
   emitterCompanyName: "EMISSION",
