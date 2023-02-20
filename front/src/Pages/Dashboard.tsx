@@ -59,7 +59,7 @@ const DashboardPage = () => {
 
   const { siret } = useParams<{ siret: string }>();
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
-  const [isFethingMore, setIsFetchingMore] = useState(false);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const withRoutePredicate = useCallback(() => {
     if (isActTab) {
@@ -293,8 +293,8 @@ const DashboardPage = () => {
       {isFiltersOpen && (
         <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
       )}
-      {isFethingMore && <Loader />}
-      {loading && !isFethingMore ? (
+      {isFetchingMore && <Loader />}
+      {loading && !isFetchingMore ? (
         <Loader />
       ) : (
         <>
@@ -320,7 +320,7 @@ const DashboardPage = () => {
               <button
                 className="fr-btn"
                 onClick={loadMoreBsds}
-                disabled={isFethingMore}
+                disabled={isFetchingMore}
               >
                 {load_more_bsds}
               </button>
