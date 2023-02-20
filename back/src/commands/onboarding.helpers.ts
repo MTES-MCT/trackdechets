@@ -116,38 +116,40 @@ export const sendSecondOnboardingEmail = async () => {
 
 // Retrieve users whose account was created x daysAgo,
 // but who never issued a membership request
-export const getRecentlyRegisteredUsersWithNoMembershipRequest = async (
-  daysAgo: number
-) => {
-  const now = new Date();
+export const getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest =
+  async (daysAgo: number) => {
+    const now = new Date();
 
-  const associatedDateGt = xDaysAgo(now, daysAgo);
-  const associatedDateLt = xDaysAgo(now, daysAgo - 1);
+    const associatedDateGt = xDaysAgo(now, daysAgo);
+    const associatedDateLt = xDaysAgo(now, daysAgo - 1);
 
-  const users = await prisma.user.findMany({
-    where: {
-      createdAt: { gt: associatedDateGt, lt: associatedDateLt },
-      isActive: true
-    },
-    include: {
-      companyAssociations: { include: { company: true } },
-      MembershipRequest: { include: { company: true } }
-    }
-  });
+    const users = await prisma.user.findMany({
+      where: {
+        createdAt: { gt: associatedDateGt, lt: associatedDateLt },
+        isActive: true
+      },
+      include: {
+        companyAssociations: {},
+        MembershipRequest: {}
+      }
+    });
 
-  return users.filter(
-    user =>
-      user.companyAssociations.length === 0 &&
-      user.MembershipRequest.length === 0
-  );
-};
+    const filtered = users.filter(
+      user =>
+        user.companyAssociations.length === 0 &&
+        user.MembershipRequest.length === 0
+    );
+
+    return filtered;
+  };
 
 /**
  * Send a mail to users who registered recently and who haven't
  * issued a single MembershipRequest yet
  */
 export const sendMembershipRequestDetailsEmail = async () => {
-  const recipients = await getRecentlyRegisteredUsersWithNoMembershipRequest(7);
+  const recipients =
+    await getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest(7);
 
   await Promise.all(
     recipients.map(recipient => {
