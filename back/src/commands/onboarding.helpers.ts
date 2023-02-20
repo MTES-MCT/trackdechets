@@ -114,8 +114,11 @@ export const sendSecondOnboardingEmail = async () => {
   await prisma.$disconnect();
 };
 
-// Retrieve users whose account was created x daysAgo,
-// but who never issued a membership request
+// Retrieve users:
+// - who are active
+// - whose account was created x daysAgo
+// - who never issued a membership request
+// - who do not belong to a company
 export const getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest =
   async (daysAgo: number) => {
     const now = new Date();
