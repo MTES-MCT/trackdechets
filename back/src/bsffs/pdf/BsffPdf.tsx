@@ -19,6 +19,7 @@ import {
 } from "../../generated/graphql/types";
 import { BSFF_WASTES } from "../../common/constants";
 import { extractPostalCode } from "../../utils";
+import { Decimal } from "decimal.js-light";
 
 type Props = {
   bsff: Bsff & { packagings: BsffPackaging[] } & {
@@ -731,36 +732,36 @@ function PreviousBsffsTable({ bsff }: Pick<Props, "bsff">) {
           </tr>
         </thead>
         <tbody>
-          {bsff.previousBsffs.map(previous => (
-            <tr key={previous.id}>
-              <td>{previous.id}</td>
-              <td>{previous.destination?.cap}</td>
-              <td>
-                {/*  sum acceptation.weight if all packagings are accepted, else use previous bsff expected weight*/}
-                {previous.packagings
-                  .map(
-                    p =>
-                      p.acceptation?.status === WasteAcceptationStatus.ACCEPTED
+          {[...bsff.previousBsffs]
+            .sort(
+              (bsff1, bsff2) =>
+                // display most recent BSFF first
+                bsff2.createdAt.getTime() - bsff1.createdAt.getTime()
+            )
+            .map(previous => (
+              <tr key={previous.id}>
+                <td>{previous.id}</td>
+                <td>{previous.destination?.cap}</td>
+                <td>
+                  {new Decimal(
+                    previous.packagings.reduce((w, p) => {
+                      // fallback to initial packaging weight even if all previous packagings
+                      // are supposed to be accepted
+                      const weight =
+                        p.acceptation?.status ===
+                        WasteAcceptationStatus.ACCEPTED
+                          ? p.acceptation?.weight
+                          : p.weight;
+                      return w + weight;
+                    }, 0)
                   )
-                  .every(Boolean)
-                  ? Math.round(
-                      previous.packagings
-                        .map(p => p.acceptation.weight)
-                        .reduce((acc, el) => acc + el, 0) * 100
-                    ) / 100
-                  : previous.weight?.value}
-              </td>
-              <td>
-                {previous.packagings
-                  .map(p => p.numero)
-                  .filter(numero =>
-                    bsff.packagings.map(p => p.numero).includes(numero)
-                  )
-                  .join(" ")}
-              </td>
-              <td>{extractPostalCode(previous.emitter?.company?.address)}</td>
-            </tr>
-          ))}
+                    .toDecimalPlaces(3) // precision to gramme
+                    .toNumber()}
+                </td>
+                <td>{previous.packagings.map(p => p.numero).join(" ")}</td>
+                <td>{extractPostalCode(previous.emitter?.company?.address)}</td>
+              </tr>
+            ))}
         </tbody>
       </table>
     </div>

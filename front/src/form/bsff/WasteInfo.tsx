@@ -17,7 +17,13 @@ export default function WasteInfo({ disabled }) {
   useEffect(() => {
     if ([BsffType.Reexpedition, BsffType.Groupement].includes(values.type)) {
       if (!values.id || hasPreviousPackagingsChanged) {
-        setFieldValue("packagings", values.previousPackagings);
+        setFieldValue(
+          "packagings",
+          values.previousPackagings.map(p => ({
+            ...p,
+            weight: p.acceptation?.weight ?? p.weight,
+          }))
+        );
       }
     }
   }, [
