@@ -4,19 +4,11 @@ import { BadgeProps } from "./badgeTypes";
 import "./badge.scss";
 import { BsdStatusCode } from "../../../Common/types/bsdTypes";
 import { getBsdStatusLabel } from "../../dashboardServices";
-/*
-    We don't use the @dataesr/react-dsfr Badge component because don't have the same colors/status but we reuse the same styles and override when needed
-*/
-function Badge({
-  status,
-  isDraft,
-  bsdType,
-  isSmall = false,
-}: BadgeProps): JSX.Element {
+
+function Badge({ status, isDraft, bsdType }: BadgeProps): JSX.Element {
   return (
     <p
-      className={classnames(`fr-badge fr-badge--${status}`, {
-        "fr-badge--sm": isSmall,
+      className={classnames(`fr-badge fr-badge--sm fr-badge--${status}`, {
         "fr-badge--success": status === BsdStatusCode.PROCESSED,
         "fr-badge--error": status === BsdStatusCode.REFUSED,
       })}

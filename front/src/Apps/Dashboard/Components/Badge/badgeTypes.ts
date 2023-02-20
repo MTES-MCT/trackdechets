@@ -5,5 +5,4 @@ export interface BadgeProps {
   status: BsdStatusCode;
   isDraft?: boolean;
   bsdType?: BsdType;
-  isSmall?: boolean;
 }

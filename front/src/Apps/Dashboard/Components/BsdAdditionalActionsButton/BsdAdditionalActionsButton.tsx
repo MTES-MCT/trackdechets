@@ -138,29 +138,16 @@ function BsdAdditionalActionsButton({
               {apercu_action_label}
             </button>
           </li>
-          {canDeleteBsd(bsd, currentSiret) && (
+          {canGeneratePdf(bsd) && (
             <li>
               <button
                 type="button"
-                data-testid="bsd-delete-btn"
+                data-testid="bsd-pdf-btn"
                 className="fr-btn fr-btn--tertiary-no-outline"
                 tabIndex={tabIndex}
-                onClick={handleDelete}
+                onClick={handlePdf}
               >
-                {supprimer_action_label}
-              </button>
-            </li>
-          )}
-          {canReviewBsd(bsd, currentSiret) && (
-            <li>
-              <button
-                type="button"
-                data-testid="bsd-review-btn"
-                className="fr-btn fr-btn--tertiary-no-outline"
-                tabIndex={tabIndex}
-                onClick={handleRevision}
-              >
-                {revision_action_label}
+                {pdf_action_label}
               </button>
             </li>
           )}
@@ -190,16 +177,29 @@ function BsdAdditionalActionsButton({
               </button>
             </li>
           )}
-          {canGeneratePdf(bsd) && (
+          {canReviewBsd(bsd, currentSiret) && (
             <li>
               <button
                 type="button"
-                data-testid="bsd-pdf-btn"
+                data-testid="bsd-review-btn"
                 className="fr-btn fr-btn--tertiary-no-outline"
                 tabIndex={tabIndex}
-                onClick={handlePdf}
+                onClick={handleRevision}
               >
-                {pdf_action_label}
+                {revision_action_label}
+              </button>
+            </li>
+          )}
+          {canDeleteBsd(bsd, currentSiret) && (
+            <li>
+              <button
+                type="button"
+                data-testid="bsd-delete-btn"
+                className="fr-btn fr-btn--tertiary-no-outline"
+                tabIndex={tabIndex}
+                onClick={handleDelete}
+              >
+                {supprimer_action_label}
               </button>
             </li>
           )}
