@@ -29,15 +29,15 @@ export function toElasticSimpleQuery(where: BsdWhere): QueryDslQueryContainer {
         toElasticDateQuery("updatedAt", where.updatedAt),
         toElasticStringQuery("customId", where.customId),
         toElasticStringQuery("status", where.status),
-        toElasticStringQuery("wasteCode", where.wasteCode),
-        toElasticTextQuery("wasteAdr", where.wasteAdr),
+        toElasticStringQuery("wasteCode", where.waste?.code),
+        toElasticTextQuery("wasteAdr", where.waste?.adr),
         toElasticTextQuery(
           "wasteDescription",
-          where.wasteDescription,
+          where.waste?.description,
           GET_BSDS_WASTE_MAX_LENGTH
         ),
         toElasticStringListQuery("packagingNumbers", where.packagingNumbers),
-        toElasticStringListQuery("wasteSealNumbers", where.wasteSealNumbers),
+        toElasticStringListQuery("wasteSealNumbers", where.sealNumbers),
         toElasticStringListQuery(
           "identificationNumbers",
           where.identificationNumbers
@@ -46,117 +46,138 @@ export function toElasticSimpleQuery(where: BsdWhere): QueryDslQueryContainer {
           "ficheInterventionNumbers",
           where.ficheInterventionNumbers
         ),
-        toElasticTextQuery("emitterCompanyName", where.emitterCompanyName),
-        toElasticStringQuery("emitterCompanySiret", where.emitterCompanySiret),
+        toElasticTextQuery("emitterCompanyName", where.emitter?.company?.name),
+        toElasticStringQuery(
+          "emitterCompanySiret",
+          where.emitter?.company?.siret
+        ),
         toElasticTextQuery(
           "emitterCompanyAddress",
-          where.emitterCompanyAddress
+          where.emitter?.company?.address
         ),
         toElasticTextQuery(
           "emitterPickupSiteName",
-          where.emitterPickupSiteName
+          where.emitter?.pickupSite?.name
         ),
         toElasticTextQuery(
           "emitterPickupSiteAddress",
-          where.emitterPickupSiteAddress
+          where.emitter?.pickupSite?.address
         ),
         toElasticTextQuery(
           "emitterCustomInfo",
-          where.emitterCustomInfo,
+          where.emitter?.customInfo,
           GET_BSDS_CUSTOM_INFO_MAX_LENGTH
         ),
-        toElasticTextQuery("workerCompanyName", where.workerCompanyName),
-        toElasticStringQuery("workerCompanySiret", where.workerCompanySiret),
-        toElasticTextQuery("workerCompanyAddress", where.workerCompanyAddress),
+        toElasticTextQuery("workerCompanyName", where.worker?.company?.name),
+        toElasticStringQuery(
+          "workerCompanySiret",
+          where.worker?.company?.siret
+        ),
+        toElasticTextQuery("workerCompanyAddress", where.worker?.company?.name),
         toElasticTextQuery(
           "transporterCompanyName",
-          where.transporterCompanyName
+          where.transporter?.company?.name
         ),
         toElasticStringQuery(
           "transporterCompanySiret",
-          where.transporterCompanySiret
+          where.transporter?.company?.siret
         ),
         toElasticStringQuery(
           "transporterCompanyVatNumber",
-          where.transporterCompanyVatNumber
+          where.transporter?.company?.vatNumber
         ),
         toElasticTextQuery(
           "transporterCompanyAddress",
-          where.transporterCompanyAddress
+          where.transporter?.company?.address
         ),
         toElasticTextQuery(
           "transporterCustomInfo",
-          where.transporterCustomInfo,
+          where.transporter?.customInfo,
           GET_BSDS_CUSTOM_INFO_MAX_LENGTH
         ),
         toElasticStringListQuery(
           "transporterTransportPlates",
-          where.transporterTransportPlates,
+          where.transporter?.transport?.plates,
           GET_BSDS_PLATES_MAX_LENGTH
         ),
         toElasticTextQuery(
           "destinationCompanyName",
-          where.destinationCompanyName
+          where.destination?.company?.name
         ),
         toElasticStringQuery(
           "destinationCompanySiret",
-          where.destinationCompanySiret
+          where.destination?.company?.siret
         ),
         toElasticTextQuery(
           "destinationCompanyAddress",
-          where.destinationCompanyAddress
+          where.destination?.company?.address
         ),
         toElasticTextQuery(
           "destinationCustomInfo",
-          where.destinationCustomInfo,
+          where.destination?.customInfo,
           GET_BSDS_CUSTOM_INFO_MAX_LENGTH
         ),
-        toElasticTextQuery("destinationCap", where.destinationCap),
-        toElasticTextQuery("brokerCompanyName", where.brokerCompanyName),
-        toElasticStringQuery("brokerCompanySiret", where.brokerCompanySiret),
-        toElasticTextQuery("brokerCompanyAddress", where.brokerCompanyAddress),
-        toElasticTextQuery("traderCompanyName", where.traderCompanyName),
-        toElasticStringQuery("traderCompanySiret", where.traderCompanySiret),
-        toElasticTextQuery("traderCompanyAddress", where.traderCompanyAddress),
-        toElasticTextQuery("ecoOrganismeName", where.ecoOrganismeName),
-        toElasticStringQuery("ecoOrganismeSiret", where.ecoOrganismeSiret),
+        toElasticTextQuery("destinationCap", where.destination?.cap),
+        toElasticTextQuery("brokerCompanyName", where.broker?.company?.name),
+        toElasticStringQuery(
+          "brokerCompanySiret",
+          where.broker?.company?.siret
+        ),
+        toElasticTextQuery(
+          "brokerCompanyAddress",
+          where.broker?.company?.address
+        ),
+        toElasticTextQuery("traderCompanyName", where.trader?.company?.name),
+        toElasticStringQuery(
+          "traderCompanySiret",
+          where.trader?.company?.siret
+        ),
+        toElasticTextQuery(
+          "traderCompanyAddress",
+          where.trader?.company?.address
+        ),
+        toElasticTextQuery("ecoOrganismeName", where.ecoOrganisme?.name),
+        toElasticStringQuery("ecoOrganismeSiret", where.ecoOrganisme?.siret),
         toElasticTextQuery(
           "nextDestinationCompanyName",
-          where.nextDestinationCompanyName
+          where.destination?.operation?.nextDestination?.company?.name
         ),
         toElasticStringQuery(
           "nextDestinationCompanySiret",
-          where.nextDestinationCompanySiret
+          where.destination?.operation?.nextDestination?.company?.siret
         ),
         toElasticStringQuery(
           "nextDestinationCompanyVatNumber",
-          where.nextDestinationCompanyVatNumber
+          where.destination?.operation?.nextDestination?.company?.vatNumber
         ),
         toElasticTextQuery(
           "nextDestinationCompanyAddress",
-          where.nextDestinationCompanyAddress
+          where.destination?.operation?.nextDestination?.company?.address
         ),
         toElasticStringQuery(
           "destinationOperationCode",
-          where.destinationOperationCode
+          where.destination?.operation?.code
         ),
-        toElasticDateQuery("emitterEmissionDate", where.emitterEmissionDate),
-        toElasticDateQuery("workerWorkDate", where.workerWorkDate),
+        toElasticDateQuery(
+          "emitterEmissionDate",
+          where.emitter?.emission?.date
+        ),
+        toElasticDateQuery("workerWorkDate", where.worker?.work?.date),
         toElasticDateQuery(
           "transporterTransportTakenOverAt",
-          where.transporterTransportTakenOverAt
+          where.transporter?.transport?.takenOverAt
         ),
         toElasticDateQuery(
           "destinationReceptionDate",
-          where.destinationReceptionDate
+          where.destination?.reception?.date
         ),
         toElasticDateQuery(
           "destinationAcceptationDate",
-          where.destinationAcceptationDate
+          where.destination?.acceptation?.date
         ),
         toElasticDateQuery(
           "destinationOperationDate",
-          where.destinationOperationDate
+          where.destination?.operation?.date
         ),
         toElasticStringListQuery("sirets", where.sirets)
       ].filter(f => !!f)

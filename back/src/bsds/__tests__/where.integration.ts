@@ -119,7 +119,9 @@ describe("StringFilter to elastic query", () => {
 
   test("_contains match should work on long strings", async () => {
     const stringFilter: BsdWhere = {
-      emitterCompanySiret: { _contains: "798249827" } // match on SIREN
+      emitter: {
+        company: { siret: { _contains: "798249827" } } // match on SIREN
+      }
     };
 
     const result = await client.search({
@@ -175,7 +177,7 @@ describe("TextFilter to elastic query", () => {
 
   it("should perform a full text match", async () => {
     const stringFilter: BsdWhere = {
-      emitterCompanyName: { _match: "CODE" }
+      emitter: { company: { name: { _match: "CODE" } } }
     };
 
     const result = await client.search({
@@ -193,7 +195,7 @@ describe("TextFilter to elastic query", () => {
 
   it("should perform a full text match with fuzziness of 1", async () => {
     const stringFilter: BsdWhere = {
-      emitterCompanyName: { _match: "CADE" }
+      emitter: { company: { name: { _match: "CADE" } } }
     };
 
     const result = await client.search({
@@ -211,7 +213,7 @@ describe("TextFilter to elastic query", () => {
 
   it("should match if we provide several tokens in the search query", async () => {
     const stringFilter: BsdWhere = {
-      emitterCompanyName: { _match: "CDDE EN STOCK" }
+      emitter: { company: { name: { _match: "CDDE EN STOCK" } } }
     };
 
     const result = await client.search({
@@ -229,7 +231,7 @@ describe("TextFilter to elastic query", () => {
 
   it("should not be case sensitive", async () => {
     const stringFilter: BsdWhere = {
-      emitterCompanyName: { _match: "code" }
+      emitter: { company: { name: { _match: "code" } } }
     };
 
     const result = await client.search({
@@ -267,7 +269,7 @@ describe("StringNullableFilter to elastic query", () => {
 
   it("should match for _has when the value is present", async () => {
     const listFilter: BsdWhere = {
-      transporterTransportPlates: { _has: "AD-008-TS" }
+      transporter: { transport: { plates: { _has: "AD-008-TS" } } }
     };
 
     const result = await client.search({
@@ -285,7 +287,7 @@ describe("StringNullableFilter to elastic query", () => {
 
   it("should not match for _has when the value is not present", async () => {
     const listFilter: BsdWhere = {
-      transporterTransportPlates: { _has: "toto" }
+      transporter: { transport: { plates: { _has: "toto" } } }
     };
 
     const result = await client.search({
@@ -302,7 +304,9 @@ describe("StringNullableFilter to elastic query", () => {
 
   it("should match for _hasEvery when all values are present", async () => {
     const listFilter: BsdWhere = {
-      transporterTransportPlates: { _hasEvery: ["AD-008-TS", "HY-987-DE"] }
+      transporter: {
+        transport: { plates: { _hasEvery: ["AD-008-TS", "HY-987-DE"] } }
+      }
     };
 
     const result = await client.search({
@@ -320,7 +324,9 @@ describe("StringNullableFilter to elastic query", () => {
 
   it("should not match for _hasEvery when one value is not present", async () => {
     const listFilter: BsdWhere = {
-      transporterTransportPlates: { _hasEvery: ["AD-008-TS", "toto"] }
+      transporter: {
+        transport: { plates: { _hasEvery: ["AD-008-TS", "toto"] } }
+      }
     };
 
     const result = await client.search({
@@ -337,7 +343,9 @@ describe("StringNullableFilter to elastic query", () => {
 
   it("should match for _hasSome when at least one value is present", async () => {
     const listFilter: BsdWhere = {
-      transporterTransportPlates: { _hasSome: ["AD-008-TS", "toto"] }
+      transporter: {
+        transport: { plates: { _hasSome: ["AD-008-TS", "toto"] } }
+      }
     };
 
     const result = await client.search({
@@ -355,7 +363,7 @@ describe("StringNullableFilter to elastic query", () => {
 
   it("should not match for _hasSome when no value is present", async () => {
     const listFilter: BsdWhere = {
-      transporterTransportPlates: { _hasSome: ["titi", "toto"] }
+      transporter: { transport: { plates: { _hasSome: ["titi", "toto"] } } }
     };
 
     const result = await client.search({
@@ -372,7 +380,7 @@ describe("StringNullableFilter to elastic query", () => {
 
   it("should match for _itemContains when one element contains the substring", async () => {
     const listFilter: BsdWhere = {
-      transporterTransportPlates: { _itemContains: "AD" }
+      transporter: { transport: { plates: { _itemContains: "AD" } } }
     };
 
     const result = await client.search({
@@ -513,7 +521,7 @@ describe("Compound filter to elastic query", () => {
         {
           status: { _eq: "SENT" }
         },
-        { wasteCode: { _eq: "01 01 01" } }
+        { waste: { code: { _eq: "01 01 01" } } }
       ]
     };
     const result = await client.search({
@@ -533,9 +541,9 @@ describe("Compound filter to elastic query", () => {
     const where: BsdWhere = {
       _or: [
         {
-          wasteCode: { _eq: "01 01 01" }
+          waste: { code: { _eq: "01 01 01" } }
         },
-        { wasteCode: { _eq: "03 03 03" } }
+        { waste: { code: { _eq: "03 03 03" } } }
       ]
     };
     const result = await client.search({
@@ -557,13 +565,13 @@ describe("Compound filter to elastic query", () => {
         {
           _and: [
             { status: { _eq: "SENT" } },
-            { wasteCode: { _eq: "01 01 01" } }
+            { waste: { code: { _eq: "01 01 01" } } }
           ]
         },
         {
           _and: [
             { status: { _eq: "PROCESSED" } },
-            { wasteCode: { _eq: "03 03 03" } }
+            { waste: { code: { _eq: "03 03 03" } } }
           ]
         }
       ]
@@ -585,7 +593,7 @@ describe("Compound filter to elastic query", () => {
     const where: BsdWhere = {
       _or: [
         {
-          _and: [{ _or: [{ wasteCode: { _eq: "02 02 02" } }] }]
+          _and: [{ _or: [{ waste: { code: { _eq: "02 02 02" } } }] }]
         }
       ]
     };
@@ -598,12 +606,12 @@ describe("Compound filter to elastic query", () => {
     const where: BsdWhere = {
       _or: [
         {
-          wasteCode: { _eq: "01 01 01" }
+          waste: { code: { _eq: "01 01 01" } }
         }
       ],
       _and: [
         {
-          wasteCode: { _eq: "02 02 02" }
+          waste: { code: { _eq: "02 02 02" } }
         }
       ]
     };
@@ -617,7 +625,7 @@ describe("Compound filter to elastic query", () => {
       status: { _eq: "SENT" },
       _or: [
         {
-          wasteCode: { _eq: "01 01 01" }
+          waste: { code: { _eq: "01 01 01" } }
         }
       ]
     };
@@ -631,7 +639,7 @@ describe("Compound filter to elastic query", () => {
       status: { _eq: "SENT" },
       _and: [
         {
-          wasteCode: { _eq: "01 01 01" }
+          waste: { code: { _eq: "01 01 01" } }
         }
       ]
     };
@@ -722,7 +730,7 @@ describe("search on wasteCode", () => {
 
   it("should match on *", async () => {
     const where: BsdWhere = {
-      wasteCode: { _contains: "*" }
+      waste: { code: { _contains: "*" } }
     };
     const result = await client.search({
       index: index.alias,

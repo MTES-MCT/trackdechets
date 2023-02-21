@@ -6,65 +6,22 @@ input BsdWhere {
   readableId: StringFilter
   customId: StringFilter
 
-  type: StringFilter
+  type: BsdTypeFilter
   status: StringFilter
 
-  wasteCode: StringFilter
-  wasteAdr: TextFilter
-  wasteDescription: TextFilter
   packagingNumbers: StringNullableListFilter
-  wasteSealNumbers: StringNullableListFilter
+  sealNumbers: StringNullableListFilter
   identificationNumbers: StringNullableListFilter
   ficheInterventionNumbers: StringNullableListFilter
 
-  emitterCompanyName: TextFilter
-  emitterCompanySiret: StringFilter
-  emitterCompanyAddress: TextFilter
-  emitterPickupSiteName: TextFilter
-  emitterPickupSiteAddress: TextFilter
-  emitterCustomInfo: TextFilter
-
-  workerCompanyName: TextFilter
-  workerCompanySiret: StringFilter
-  workerCompanyAddress: TextFilter
-
-  transporterCompanyName: TextFilter
-  transporterCompanySiret: StringFilter
-  transporterCompanyVatNumber: StringFilter
-  transporterCompanyAddress: TextFilter
-  transporterCustomInfo: TextFilter
-  transporterTransportPlates: StringNullableListFilter
-
-  destinationCompanyName: TextFilter
-  destinationCompanySiret: StringFilter
-  destinationCompanyAddress: TextFilter
-  destinationCustomInfo: TextFilter
-  destinationCap: TextFilter
-
-  brokerCompanyName: TextFilter
-  brokerCompanySiret: StringFilter
-  brokerCompanyAddress: TextFilter
-
-  traderCompanyName: TextFilter
-  traderCompanySiret: StringFilter
-  traderCompanyAddress: TextFilter
-
-  ecoOrganismeName: TextFilter
-  ecoOrganismeSiret: StringFilter
-
-  nextDestinationCompanyName: TextFilter
-  nextDestinationCompanySiret: StringFilter
-  nextDestinationCompanyVatNumber: StringFilter
-  nextDestinationCompanyAddress: TextFilter
-
-  destinationOperationCode: StringFilter
-
-  emitterEmissionDate: DateFilter
-  workerWorkDate: DateFilter
-  transporterTransportTakenOverAt: DateFilter
-  destinationReceptionDate: DateFilter
-  destinationAcceptationDate: DateFilter
-  destinationOperationDate: DateFilter
+  emitter: BsdEmitterWhere
+  transporter: BsdTransporterWhere
+  waste: BsdWasteWhere
+  worker: BsdWorkerWhere
+  destination: BsdDestinationWhere
+  broker: BsdBrokerWhere
+  trader: BsdTraderWhere
+  ecoOrganisme: BsdEcoOrganismeWhere
 
   isDraftFor: [String!]
   isForActionFor: [String!]
@@ -89,4 +46,105 @@ input OrderBy {
   emitterCompanyName: OrderType
   destinationCompanyName: OrderType
   wasteCode: OrderType
+}
+
+input BsdCompanyWhere {
+  name: TextFilter
+  siret: StringFilter
+  vatNumber: StringFilter
+  address: TextFilter
+}
+
+input BsdEmissionWhere {
+  date: DateFilter
+}
+
+input BsdPickupSiteWhere {
+  name: TextFilter
+  address: TextFilter
+}
+
+"Champs possible pour le filtre sur l'émetteur."
+input BsdEmitterWhere {
+  company: BsdCompanyWhere
+  emission: BsdEmissionWhere
+  pickupSite: BsdPickupSiteWhere
+  customInfo: TextFilter
+}
+
+input BsdWasteWhere {
+  code: StringFilter
+  adr: TextFilter
+  description: TextFilter
+}
+
+input BsdWorkWhere {
+  date: DateFilter
+}
+
+input BsdWorkerWhere {
+  company: BsdCompanyWhere
+  work: BsdWorkWhere
+}
+
+input BsdTransportWhere {
+  plates: StringNullableListFilter
+  takenOverAt: DateFilter
+}
+
+input BsdTransporterWhere {
+  company: BsdCompanyWhere
+  customInfo: TextFilter
+  transport: BsdTransportWhere
+}
+
+input BsdNextDestinationWhere {
+  company: BsdCompanyWhere
+}
+
+input BsdOperationWhere {
+  code: StringFilter
+  date: DateFilter
+  nextDestination: BsdNextDestinationWhere
+}
+
+input BsdReceptionWhere {
+  date: DateFilter
+}
+
+input BsdAcceptationWhere {
+  date: DateFilter
+  status: WasteAcceptationStatusFilter
+}
+
+input BsdDestinationWhere {
+  company: BsdCompanyWhere
+  customInfo: TextFilter
+  cap: TextFilter
+  reception: BsdReceptionWhere
+  acceptation: BsdAcceptationWhere
+  operation: BsdOperationWhere
+}
+
+input BsdBrokerWhere {
+  company: BsdCompanyWhere
+}
+
+input BsdTraderWhere {
+  company: BsdCompanyWhere
+}
+
+input BsdEcoOrganismeWhere {
+  name: TextFilter
+  siret: StringFilter
+}
+
+input WasteAcceptationStatusFilter {
+  _eq: WasteAcceptationStatus
+  _in: [WasteAcceptationStatus!]
+}
+
+input BsdTypeFilter {
+  _eq: BsdType
+  _in: [BsdType!]
 }

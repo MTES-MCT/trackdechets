@@ -79,7 +79,7 @@ describe("Query.bsds validation", () => {
         {
           variables: {
             where: {
-              [`${term}CompanyName`]: { _match: tooLong }
+              [term]: { company: { name: { _match: tooLong } } }
             }
           }
         }
@@ -145,7 +145,7 @@ describe("Query.bsds validation", () => {
       {
         variables: {
           where: {
-            wasteDescription: { _match: tooLong }
+            waste: { description: { _match: tooLong } }
           }
         }
       }
@@ -178,7 +178,7 @@ describe("Query.bsds validation", () => {
       {
         variables: {
           where: {
-            transporterCustomInfo: { _match: tooLong }
+            transporter: { customInfo: { _match: tooLong } }
           }
         }
       }
@@ -211,7 +211,7 @@ describe("Query.bsds validation", () => {
       {
         variables: {
           where: {
-            transporterTransportPlates: { _itemContains: tooLong }
+            transporter: { transport: { plates: { _itemContains: tooLong } } }
           }
         }
       }

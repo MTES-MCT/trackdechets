@@ -2,3 +2,11 @@ enum OrderType {
   ASC
   DESC
 }
+
+enum BsdType {
+  BSDD
+  BSDA
+  BSFF
+  BSDASRI
+  BSVHU
+}
