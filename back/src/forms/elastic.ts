@@ -276,7 +276,8 @@ export function toBsdElastic(
 
     emitterEmissionDate: form.emittedAt?.getTime(),
     workerWorkDate: null,
-    transporterTransportTakenOverAt: form.takenOverAt?.getTime(),
+    transporterTransportTakenOverAt:
+      form.takenOverAt?.getTime() ?? form.sentAt?.getTime(),
     destinationReceptionDate: form.receivedAt?.getTime(),
     destinationAcceptationDate: form.signedAt?.getTime(),
     destinationAcceptationWeight: form.quantityReceived,

@@ -44,7 +44,14 @@ async function buildSearchAfter(
   });
 
   return sort.reduce(
-    (acc, item) => [...acc, ...Object.entries(item).map(([key]) => bsd[key])],
+    (acc, item) => [
+      ...acc,
+      ...Object.entries(item).map(([key]) => {
+        return typeof bsd[key] === "string"
+          ? bsd[key].toLowerCase() // keyword fields have a lowercase normalizer
+          : bsd[key];
+      })
+    ],
     []
   );
 }
