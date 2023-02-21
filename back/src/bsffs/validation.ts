@@ -651,7 +651,7 @@ export async function validatePreviousPackagings(
   const forwardedPackagings = isForwarding
     ? await prisma.bsffPackaging.findMany({
         where: { id: { in: forwarding } },
-        include: { bsff: true }
+        include: { bsff: true, nextPackaging: { select: { bsffId: true } } }
       })
     : [];
 
@@ -696,7 +696,7 @@ export async function validatePreviousPackagings(
   const repackagedPackagings = isRepackaging
     ? await prisma.bsffPackaging.findMany({
         where: { id: { in: repackaging } },
-        include: { bsff: true }
+        include: { bsff: true, nextPackaging: { select: { bsffId: true } } }
       })
     : [];
 
@@ -715,7 +715,7 @@ export async function validatePreviousPackagings(
   const groupedPackagings = isGrouping
     ? await prisma.bsffPackaging.findMany({
         where: { id: { in: grouping } },
-        include: { bsff: true }
+        include: { bsff: true, nextPackaging: { select: { bsffId: true } } }
       })
     : [];
 
@@ -790,7 +790,7 @@ export async function validatePreviousPackagings(
 
     if (
       !!packaging.nextPackagingId &&
-      !bsff.packagings?.map(p => p.id).includes(packaging.nextPackagingId)
+      packaging.nextPackaging.bsffId !== bsff.id
     ) {
       return [
         ...acc,
