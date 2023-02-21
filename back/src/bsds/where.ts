@@ -1,135 +1,41 @@
 import { UserInputError } from "apollo-server-core";
 import {
-  BsdWhere,
-  DateFilter,
-  StringFilter,
-  StringNullableListFilter,
-  TextFilter
-} from "../generated/graphql/types";
+  GET_BSDS_CUSTOM_INFO_MAX_LENGTH,
+  GET_BSDS_PLATES_MAX_LENGTH,
+  GET_BSDS_READABLE_ID_MAX_LENGTH,
+  GET_BSDS_WASTE_MAX_LENGTH
+} from "../common/constants/GET_BSDS_CONSTANTS";
+import {
+  toElasticDateQuery,
+  toElasticStringListQuery,
+  toElasticStringQuery,
+  toElasticTextQuery
+} from "../common/where";
+import { BsdWhere } from "../generated/graphql/types";
+import { QueryDslQueryContainer } from "@elastic/elasticsearch/api/types";
 
-function toElasticTextQuery(
-  fieldName: string,
-  textFilter: TextFilter | undefined
-) {
-  if (!textFilter) {
-    return undefined;
-  }
-  return {
-    match: { [fieldName]: { query: textFilter._match, fuzziness: "AUTO" } }
-  };
-}
-
-function toElasticStringQuery(
-  fieldName: string,
-  stringFilter: StringFilter | undefined
-) {
-  if (!stringFilter) {
-    return undefined;
-  }
-
-  if (stringFilter._eq) {
-    return { term: { [fieldName]: stringFilter._eq } };
-  }
-
-  if (stringFilter._contains) {
-    return {
-      match: {
-        [`${fieldName}.ngram`]: {
-          // upper limit 3 should be the same as max_gram in ngram_tokenizer
-          query: stringFilter._contains.match(/.{1,5}/g).join(" "),
-          operator: "and"
-        }
-      }
-    };
-  }
-
-  if (stringFilter._in) {
-    return { terms: { [fieldName]: stringFilter._in } };
-  }
-}
-
-function toElasticStringListQuery(
-  fieldName: string,
-  stringListFilter: StringNullableListFilter | undefined
-) {
-  if (!stringListFilter) {
-    return undefined;
-  }
-
-  if (stringListFilter._hasEvery) {
-    return {
-      bool: {
-        must: stringListFilter._hasEvery.map(value => ({
-          term: { [fieldName]: value }
-        }))
-      }
-    };
-  }
-
-  if (stringListFilter._hasSome || stringListFilter._in) {
-    return {
-      terms: {
-        [fieldName]: stringListFilter._hasSome ?? stringListFilter._in
-      }
-    };
-  }
-
-  if (stringListFilter._has) {
-    return { term: { [fieldName]: stringListFilter._has } };
-  }
-
-  if (stringListFilter._itemContains) {
-    return {
-      match: {
-        [`${fieldName}.ngram`]: {
-          query: stringListFilter._itemContains,
-          operator: "and"
-        }
-      }
-    };
-  }
-
-  throw new UserInputError("_eq n'est pas implémenté sur la query `bsds`");
-}
-
-function toElasticDateQuery(
-  fieldName: string,
-  dateFilter: DateFilter | undefined
-) {
-  if (!dateFilter) {
-    return undefined;
-  }
-
-  if (dateFilter._eq) {
-    return { match: { [fieldName]: dateFilter._eq } };
-  }
-
-  return {
-    range: {
-      [fieldName]: {
-        ...(dateFilter._gt ? { gt: dateFilter._gt.getTime() } : {}),
-        ...(dateFilter._gte ? { gte: dateFilter._gte.getTime() } : {}),
-        ...(dateFilter._lt ? { lt: dateFilter._lt.getTime() } : {}),
-        ...(dateFilter._lte ? { lte: dateFilter._lte.getTime() } : {})
-      }
-    }
-  };
-}
-
-export function toElasticSimpleQuery(where: BsdWhere) {
+export function toElasticSimpleQuery(where: BsdWhere): QueryDslQueryContainer {
   return {
     bool: {
       must: [
         toElasticStringQuery("type", where.type),
-        toElasticStringQuery("id", where.id),
-        toElasticStringQuery("readableId", where.readableId),
+        toElasticStringQuery("id", where.id, GET_BSDS_READABLE_ID_MAX_LENGTH),
+        toElasticStringQuery(
+          "readableId",
+          where.readableId,
+          GET_BSDS_READABLE_ID_MAX_LENGTH
+        ),
         toElasticDateQuery("createdAt", where.createdAt),
         toElasticDateQuery("updatedAt", where.updatedAt),
         toElasticStringQuery("customId", where.customId),
         toElasticStringQuery("status", where.status),
         toElasticStringQuery("wasteCode", where.wasteCode),
         toElasticTextQuery("wasteAdr", where.wasteAdr),
-        toElasticTextQuery("wasteDescription", where.wasteDescription),
+        toElasticTextQuery(
+          "wasteDescription",
+          where.wasteDescription,
+          GET_BSDS_WASTE_MAX_LENGTH
+        ),
         toElasticStringListQuery("packagingNumbers", where.packagingNumbers),
         toElasticStringListQuery("wasteSealNumbers", where.wasteSealNumbers),
         toElasticStringListQuery(
@@ -154,7 +60,11 @@ export function toElasticSimpleQuery(where: BsdWhere) {
           "emitterPickupSiteAddress",
           where.emitterPickupSiteAddress
         ),
-        toElasticTextQuery("emitterCustomInfo", where.emitterCustomInfo),
+        toElasticTextQuery(
+          "emitterCustomInfo",
+          where.emitterCustomInfo,
+          GET_BSDS_CUSTOM_INFO_MAX_LENGTH
+        ),
         toElasticTextQuery("workerCompanyName", where.workerCompanyName),
         toElasticStringQuery("workerCompanySiret", where.workerCompanySiret),
         toElasticTextQuery("workerCompanyAddress", where.workerCompanyAddress),
@@ -176,11 +86,13 @@ export function toElasticSimpleQuery(where: BsdWhere) {
         ),
         toElasticTextQuery(
           "transporterCustomInfo",
-          where.transporterCustomInfo
+          where.transporterCustomInfo,
+          GET_BSDS_CUSTOM_INFO_MAX_LENGTH
         ),
         toElasticStringListQuery(
           "transporterTransportPlates",
-          where.transporterTransportPlates
+          where.transporterTransportPlates,
+          GET_BSDS_PLATES_MAX_LENGTH
         ),
         toElasticTextQuery(
           "destinationCompanyName",
@@ -196,7 +108,8 @@ export function toElasticSimpleQuery(where: BsdWhere) {
         ),
         toElasticTextQuery(
           "destinationCustomInfo",
-          where.destinationCustomInfo
+          where.destinationCustomInfo,
+          GET_BSDS_CUSTOM_INFO_MAX_LENGTH
         ),
         toElasticTextQuery("destinationCap", where.destinationCap),
         toElasticTextQuery("brokerCompanyName", where.brokerCompanyName),
@@ -251,7 +164,7 @@ export function toElasticSimpleQuery(where: BsdWhere) {
   };
 }
 
-export function toElasticQuery(where: BsdWhere): Record<string, any> {
+export function toElasticQuery(where: BsdWhere): QueryDslQueryContainer {
   function inner(where: BsdWhere, depth = 0) {
     if (depth > 2) {
       throw new NestingWhereError(2);
@@ -278,7 +191,10 @@ export function toElasticQuery(where: BsdWhere): Record<string, any> {
     if (_and) {
       return {
         bool: {
-          must: [...simpleQuery.bool.must, ...arrayToInner(_and)],
+          must: [
+            ...(simpleQuery.bool.must as QueryDslQueryContainer[]),
+            ...arrayToInner(_and)
+          ],
           should: []
         }
       };

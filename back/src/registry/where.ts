@@ -1,6 +1,7 @@
 import { QueryDslQueryContainer } from "@elastic/elasticsearch/api/types";
 import { UserInputError } from "apollo-server-express";
 import { BsdElastic } from "../common/elastic";
+import { toElasticDateQuery, toElasticStringQuery } from "../common/where";
 import {
   BsdTypeFilter,
   DateFilter,
@@ -145,55 +146,14 @@ function dateFilterToElasticFilter(
   fieldName: keyof BsdElastic,
   dateFilter: DateFilter
 ): QueryDslQueryContainer {
-  if (dateFilter._eq) {
-    return { term: { [fieldName]: dateFilter._eq.getTime() } };
-  }
-  if (dateFilter._gt || dateFilter._gte || dateFilter._lt || dateFilter._lte) {
-    if (dateFilter._gt && dateFilter._gte) {
-      throw new UserInputError(
-        "Vous ne pouvez pas filtrer par _gt et _gte en même temps"
-      );
-    }
-    if (dateFilter._lt && dateFilter._lte) {
-      throw new UserInputError(
-        "Vous ne pouvez pas filtrer par _lt et _lte en même temps"
-      );
-    }
-    // `where` argument may have been serialized in Redis, so we need to call new Date()
-    return {
-      range: {
-        [fieldName]: {
-          ...(dateFilter._gt ? { gt: new Date(dateFilter._gt).getTime() } : {}),
-          ...(dateFilter._gte
-            ? { gte: new Date(dateFilter._gte).getTime() }
-            : {}),
-          ...(dateFilter._lt ? { lt: new Date(dateFilter._lt).getTime() } : {}),
-          ...(dateFilter._lte
-            ? { lte: new Date(dateFilter._lte).getTime() }
-            : {})
-        }
-      }
-    };
-  }
-  return {};
+  return toElasticDateQuery(fieldName, dateFilter) ?? {};
 }
 
 function stringFilterToElasticFilter(
   fieldName: keyof BsdElastic,
   stringFilter: StringFilter
 ): QueryDslQueryContainer {
-  if (stringFilter._eq) {
-    return { term: { [fieldName]: stringFilter._eq } };
-  }
-  if (stringFilter._in) {
-    return { terms: { [fieldName]: stringFilter._in } };
-  }
-  if (stringFilter._contains) {
-    return {
-      wildcard: { [fieldName]: { value: `*${stringFilter._contains}*` } }
-    };
-  }
-  return {};
+  return toElasticStringQuery(fieldName, stringFilter) ?? {};
 }
 
 function idFilterToElasticFilter(

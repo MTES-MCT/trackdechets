@@ -1,12 +1,13 @@
+import { QueryDslQueryContainer } from "@elastic/elasticsearch/api/types";
 import { Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { safeInput } from "../common/converter";
-
 import {
   DateFilter,
   StringFilter,
   IdFilter,
-  StringNullableListFilter
+  StringNullableListFilter,
+  TextFilter
 } from "../generated/graphql/types";
 
 type EnumFilter<E> = {
@@ -32,6 +33,14 @@ export class NestingWhereError extends UserInputError {
     super(
       `Vous ne pouvez pas imbriquer des opérations` +
         ` _and, _or et _not sur plus de ${depthLimit - 1} niveaux`
+    );
+  }
+}
+
+export class MaxLengthSearchError extends UserInputError {
+  constructor(fieldName: string, maxLength: number) {
+    super(
+      `La longueur maximale du paramètre de recherche ${fieldName} est de ${maxLength} caractères`
     );
   }
 }
@@ -195,4 +204,152 @@ export function applyMask<W extends GenericWhereInput>(
     : [];
 
   return { ...where, AND: [...AND, mask] };
+}
+
+// Conversion functions between GraphQL filters and Elastic query
+
+export function toElasticTextQuery(
+  fieldName: string,
+  textFilter: TextFilter | undefined,
+  maxLength = 50
+): QueryDslQueryContainer {
+  if (!textFilter) {
+    return undefined;
+  }
+  if (textFilter._match?.length > maxLength) {
+    throw new MaxLengthSearchError(fieldName, maxLength);
+  }
+  return {
+    match: { [fieldName]: { query: textFilter._match, fuzziness: 1 } }
+  };
+}
+
+export function toElasticStringQuery(
+  fieldName: string,
+  stringFilter: StringFilter | undefined,
+  maxLength = 50
+): QueryDslQueryContainer {
+  if (!stringFilter) {
+    return undefined;
+  }
+
+  if (
+    stringFilter._eq?.length > maxLength ||
+    stringFilter._contains?.length > maxLength ||
+    stringFilter._in?.some(s => s.length > maxLength)
+  ) {
+    throw new MaxLengthSearchError(fieldName, maxLength);
+  }
+
+  if (stringFilter._eq) {
+    return { term: { [fieldName]: stringFilter._eq } };
+  }
+
+  if (stringFilter._contains) {
+    return {
+      match: {
+        [`${fieldName}.ngram`]: {
+          // upper limit 5 should be the same as max_gram in ngram_tokenizer
+          query: stringFilter._contains.match(/.{1,5}/g).join(" "),
+          operator: "and"
+        }
+      }
+    };
+  }
+
+  if (stringFilter._in) {
+    return { terms: { [fieldName]: stringFilter._in } };
+  }
+}
+
+export function toElasticStringListQuery(
+  fieldName: string,
+  stringListFilter: StringNullableListFilter | undefined,
+  maxLength = 50
+): QueryDslQueryContainer {
+  if (!stringListFilter) {
+    return undefined;
+  }
+
+  if (
+    stringListFilter._hasEvery?.some(s => s.length > maxLength) ||
+    stringListFilter._hasSome?.some(s => s.length > maxLength) ||
+    stringListFilter._in?.some(s => s.length > maxLength) ||
+    stringListFilter._has?.length > maxLength ||
+    stringListFilter._itemContains?.length > maxLength
+  ) {
+    throw new MaxLengthSearchError(fieldName, maxLength);
+  }
+
+  if (stringListFilter._hasEvery) {
+    return {
+      bool: {
+        must: stringListFilter._hasEvery.map(value => ({
+          term: { [fieldName]: value }
+        }))
+      }
+    };
+  }
+
+  if (stringListFilter._hasSome || stringListFilter._in) {
+    return {
+      terms: {
+        [fieldName]: stringListFilter._hasSome ?? stringListFilter._in
+      }
+    };
+  }
+
+  if (stringListFilter._has) {
+    return { term: { [fieldName]: stringListFilter._has } };
+  }
+
+  if (stringListFilter._itemContains) {
+    return {
+      match: {
+        [`${fieldName}.ngram`]: {
+          query: stringListFilter._itemContains,
+          operator: "and"
+        }
+      }
+    };
+  }
+
+  throw new UserInputError("_eq n'est pas implémenté sur la query `bsds`");
+}
+
+export function toElasticDateQuery(
+  fieldName: string,
+  dateFilter: DateFilter | undefined
+): QueryDslQueryContainer {
+  if (!dateFilter) {
+    return undefined;
+  }
+
+  if (dateFilter._eq) {
+    return { match: { [fieldName]: dateFilter._eq.getTime() } };
+  }
+
+  if (dateFilter._gt && dateFilter._gte) {
+    throw new UserInputError(
+      "Vous ne pouvez pas filtrer par _gt et _gte en même temps"
+    );
+  }
+  if (dateFilter._lt && dateFilter._lte) {
+    throw new UserInputError(
+      "Vous ne pouvez pas filtrer par _lt et _lte en même temps"
+    );
+  }
+
+  return {
+    range: {
+      [fieldName]: {
+        ...(dateFilter._gt ? { gt: new Date(dateFilter._gt).getTime() } : {}),
+        ...(dateFilter._gte
+          ? { gte: new Date(dateFilter._gte).getTime() }
+          : {}),
+        ...(dateFilter._lt ? { lt: new Date(dateFilter._lt).getTime() } : {}),
+        ...(dateFilter._lte ? { lte: new Date(dateFilter._lte).getTime() } : {})
+      }
+    }
+  };
 }
