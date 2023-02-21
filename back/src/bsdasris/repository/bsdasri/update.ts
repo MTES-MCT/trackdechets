@@ -18,8 +18,24 @@ export type UpdateBsdasriFn = (
 export function buildUpdateBsdasri(deps: RepositoryFnDeps): UpdateBsdasriFn {
   return async (where, data, logMetadata?) => {
     const { prisma, user } = deps;
+    const bsdasri = await prisma.bsdasri.update({
+      where,
+      data,
+      include: { synthesizing: !!data?.synthesizing }
+    });
 
-    const bsdasri = await prisma.bsdasri.update({ where, data });
+    if (!!data?.synthesizing) {
+      const synthesisEmitterSirets = [
+        ...new Set(
+          bsdasri.synthesizing.map(associated => associated.emitterCompanySiret)
+        )
+      ].filter(Boolean);
+
+      await prisma.bsdasri.update({
+        where,
+        data: { synthesisEmitterSirets }
+      });
+    }
 
     await prisma.event.create({
       data: {

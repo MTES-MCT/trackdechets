@@ -108,7 +108,7 @@ export interface BsdDisplay {
     | Maybe<BsdasriEcoOrganisme>;
   updatedAt?: Maybe<string> | Maybe<Scalars["DateTime"]>;
   emittedByEcoOrganisme?: Maybe<boolean> | Maybe<BsdaEcoOrganisme>;
-  worker?: Maybe<BsdaWorker> | undefined;
+  worker?: Maybe<BsdaWorker>;
   bsdWorkflowType?: Maybe<BsdaType> | BsdasriType | BsffType;
   grouping?:
     | Maybe<Array<InitialFormFraction>>

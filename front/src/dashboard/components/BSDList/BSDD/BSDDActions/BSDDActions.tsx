@@ -53,6 +53,12 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     canDeleteAndUpdate = siret === signedBySiret;
   }
 
+  const canRequestRevision = ![
+    FormStatus.Draft,
+    FormStatus.Sealed,
+    FormStatus.Refused,
+  ].includes(form.status);
+
   return (
     <>
       <Menu>
@@ -77,6 +83,8 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                 styles.BSDDActionsMenu
               )}
             >
+              <TableRoadControlButton siret={siret} form={form} />
+
               <MenuLink
                 as={Link}
                 to={{
@@ -90,7 +98,6 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
-              <TableRoadControlButton siret={siret} form={form} />
 
               {form.status !== FormStatus.Draft && (
                 <MenuItem onSelect={() => downloadPdf()}>
@@ -98,12 +105,14 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                   Pdf
                 </MenuItem>
               )}
+
+              <MenuItem onSelect={() => duplicateForm()}>
+                <IconDuplicateFile size="24px" color="blueLight" />
+                Dupliquer
+              </MenuItem>
+
               {canDeleteAndUpdate && (
                 <>
-                  <MenuItem onSelect={() => setIsDeleting(true)}>
-                    <IconTrash color="blueLight" size="24px" />
-                    Supprimer
-                  </MenuItem>
                   <MenuLink
                     as={Link}
                     to={generatePath(routes.dashboard.bsdds.edit, {
@@ -116,11 +125,8 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                   </MenuLink>
                 </>
               )}
-              {![
-                FormStatus.Draft,
-                FormStatus.Sealed,
-                FormStatus.Refused,
-              ].includes(form.status) && (
+
+              {canRequestRevision && (
                 <MenuLink
                   as={Link}
                   to={{
@@ -135,10 +141,15 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                   Révision
                 </MenuLink>
               )}
-              <MenuItem onSelect={() => duplicateForm()}>
-                <IconDuplicateFile size="24px" color="blueLight" />
-                Dupliquer
-              </MenuItem>
+
+              {canDeleteAndUpdate && (
+                <>
+                  <MenuItem onSelect={() => setIsDeleting(true)}>
+                    <IconTrash color="blueLight" size="24px" />
+                    Supprimer
+                  </MenuItem>
+                </>
+              )}
             </MenuList>
           </>
         )}

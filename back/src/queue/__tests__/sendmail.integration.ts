@@ -5,9 +5,8 @@ import { Mail } from "../../mailer/types";
 import * as producer from "../producers/mail";
 import { mailQueue } from "../producers/mail";
 import { backend } from "../../mailer";
-import { sendMailJob } from "../jobs/sendmail";
+import { resetCache } from "../../../integration-tests/helper";
 
-mailQueue.process(sendMailJob);
 // Intercept calls
 const mockedSendMailBackend = jest.spyOn(backend, "sendMail");
 const mockedSendMailSync = jest.spyOn(mailing, "sendMailSync");
@@ -23,8 +22,9 @@ describe("Test the mail job queue", () => {
     axiosSpy.mockClear();
     mockedSendMailBackend.mockClear();
     mockedSendMailSync.mockClear();
-    return mailQueue.clean(1000);
   });
+
+  afterAll(resetCache);
 
   it("sends the mail using the mail job queue", async () => {
     // create the fake email
@@ -37,13 +37,15 @@ describe("Test the mail job queue", () => {
     const drainedPromise = new Promise<void>(resolve =>
       mailQueue.once("global:drained", resolve)
     );
+    const completedBeforeSend = await mailQueue.getCompletedCount();
     // add to the queue
     await sendMail(mail);
+
     // wait for the queue to finish
     await drainedPromise;
     // test the job is completed
     const jobs = await mailQueue.getCompleted();
-    expect(jobs.length).toEqual(1);
+    expect(jobs.length).toEqual(completedBeforeSend + 1);
     const { data } = jobs[0];
     // assert parameters values
     // to right person
@@ -54,7 +56,7 @@ describe("Test the mail job queue", () => {
     expect(data.body).toContain(
       "Bonjour, ceci est un email de test de Trackdéchets."
     );
-  }, 60000);
+  });
 
   it("fallback to sendMailSync when queue is broken which directly call axios.post", async () => {
     // mocking the redis queue is down

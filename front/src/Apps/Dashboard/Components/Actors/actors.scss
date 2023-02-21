@@ -5,20 +5,38 @@
     display: flex;
     align-items: center;
   }
+  position: relative;
 
   &__label {
-    width: 250px;
     font-size: 0.875rem;
-    white-space: nowrap;
     text-transform: lowercase;
-    overflow: hidden;
-    text-overflow: ellipsis;
     margin: 0 0 0 5px;
     color: #3a3a3a;
+    height: 25px;
 
-    @include desktop {
-      width: 140px;
+    & > span {
+      display: inline-block;
+      width: 150px;
+      @include desktop {
+        width: 146px;
+      }
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
+
+    &:after {
+      position: absolute;
+      content: attr(data-truncate);
+      left: 175px;
+      @include desktop {
+        left: 162px;
+      }
+      white-space: nowrap;
+    }
+  }
+  &__label:first-letter {
+    text-transform: capitalize;
   }
 
   &__label:first-letter {
@@ -26,7 +44,7 @@
   }
 
   &__emitter-icon {
-    width: 15px;
+    width: 19px;
     height: 17px;
   }
 

@@ -40,18 +40,24 @@ export async function isBsvhuContributor(user: User, form: Partial<Bsvhu>) {
   );
 }
 
-export async function checkCanDeleteBsdvhu(user: User, form: Bsvhu) {
+export async function checkCanDeleteBsdvhu(user: User, bsvhu: Bsvhu) {
   await checkIsBsvhuContributor(
     user,
-    form,
+    bsvhu,
     "Vous n'êtes pas autorisé à supprimer ce bordereau."
   );
 
-  if (form.status !== BsvhuStatus.INITIAL) {
-    throw new ForbiddenError(
-      "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés"
+  const isUserOnlySignatory = async () =>
+    bsvhu.status === BsvhuStatus.SIGNED_BY_PRODUCER &&
+    (await getCachedUserSiretOrVat(user.id)).includes(
+      bsvhu.emitterCompanySiret
     );
+
+  if (bsvhu.status === BsvhuStatus.INITIAL || (await isUserOnlySignatory())) {
+    return true;
   }
 
-  return true;
+  throw new ForbiddenError(
+    "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés"
+  );
 }

@@ -2,7 +2,10 @@ import { UserRole } from "@prisma/client";
 import { gql } from "apollo-server-express";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Query } from "../../../../generated/graphql/types";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  userWithCompanyFactory,
+  companyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { fullBsda } from "../../../fragments";
 import { bsdaFactory } from "../../../__tests__/factories";
@@ -34,5 +37,25 @@ describe("Query.Bsda", () => {
     });
 
     expect(data.bsda.id).toBe(form.id);
+  });
+
+  it("should get a bsda by id if current user is an intermediary", async () => {
+    const otherCompany = await companyFactory();
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: otherCompany.siret,
+        intermediaries: {
+          create: [{ siret: company.siret, name: company.name, contact: "joe" }]
+        }
+      }
+    });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query<Pick<Query, "bsda">>(GET_BSDA, {
+      variables: { id: bsda.id }
+    });
+    expect(data.bsda.id).toBe(bsda.id);
   });
 });

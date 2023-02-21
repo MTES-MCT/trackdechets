@@ -5,12 +5,42 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.2.1] 21/02/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Ajout du code de traitement R5 sur le BSFF [PR 2100](https://github.com/MTES-MCT/trackdechets/pull/2100)
+
+#### :bug: Corrections de bugs
+
+- Message d'erreur lorsqu'on modifie un BSFF de reconditionnement en brouillon [PR 2155](https://github.com/MTES-MCT/trackdechets/pull/2155)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Ajout de champs au scope company sur le token openId connect [PR 2080](https://github.com/MTES-MCT/trackdechets/pull/2080)
+- Limite la longueur des paramètres de la query getBsds [PR 2135](https://github.com/MTES-MCT/trackdechets/pull/2135)
+- ETQ installation de transit BSFF, je ne peux regrouper que des contenants ayant le même code déchet [PR 2124](https://github.com/MTES-MCT/trackdechets/pull/2124)
+- ETQ émetteur d'un bordereau je peux le supprimer ou le modifier tant que je suis le seul à avoir signé [PR 2103](https://github.com/MTES-MCT/trackdechets/pull/2103)
+- Ajout d'un message d'info sur le poids cumulé des fiches d'intervention [PR 2101](https://github.com/MTES-MCT/trackdechets/pull/2101)
+
+#### :memo: Documentation
+
+- Ajoute les statuts Bsda à la documentation technique [PR 2129](https://github.com/MTES-MCT/trackdechets/pull/2129)
+
+#### :house: Interne
+
+- Dénormalisation du bsdasri [PR 2090](https://github.com/MTES-MCT/trackdechets/pull/2090)
+- Dénormalisation du bsda [PR 2118](https://github.com/MTES-MCT/trackdechets/pull/2118)
+
 # [2023.1.4] 31/01/2023
 
 #### :rocket: Nouvelles fonctionnalités
 
 - Les émetteurs & destinataires de déchets peuvent désormais annuler un BSDD via l'API [PR 2014](https://github.com/MTES-MCT/trackdechets/pull/2014)
 - Les émetteurs & destinataires de déchets peuvent désormais annuler un BSDD via l'interface, via le processus de révision [PR 2044](https://github.com/MTES-MCT/trackdechets/pull/2044)
+- Possibilité de chercher parmi ses établissements [PR 2057](https://github.com/MTES-MCT/trackdechets/pull/2057)
 
 #### :bug: Corrections de bugs
 
@@ -26,6 +56,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Les noms des établissements dans le sélecteur d'établissements du registre sont ordonnés par ordre alphabétique [PR 2047](https://github.com/MTES-MCT/trackdechets/pull/2047)
 - BSFF - Adapter le récepissé PDF à la gestion multi-contenants [PR 2035](https://github.com/MTES-MCT/trackdechets/pull/2035)
 - Ne pas permettre de modifier les coordonées d'un transporteur étranger si on a bien récupéré les infos via le service VIES [PR 2040](https://github.com/MTES-MCT/trackdechets/pull/2040)
+- L' émetteur d'un bordereau peut le supprimer / modifier tant qu'il est le seul à avoir signé [PR 2103](https://github.com/MTES-MCT/trackdechets/pull/2103)
 
 #### :boom: Breaking changes
 

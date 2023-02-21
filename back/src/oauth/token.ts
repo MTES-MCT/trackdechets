@@ -1,9 +1,14 @@
 import { getUid } from "../utils";
 import * as jose from "jose";
-import { Grant, Application, User } from "@prisma/client";
+import {
+  Grant,
+  Application,
+  User,
+  CompanyVerificationStatus
+} from "@prisma/client";
 import prisma from "../prisma";
-
 import { EMAIL_SCOPE, PROFILE_SCOPE, COMPANIES_SCOPE } from "./scopes";
+
 const { OIDC_PRIVATE_KEY } = process.env;
 
 const TOKEN_SIGNATURE_ALG = "RS256";
@@ -16,9 +21,15 @@ const getCompanies = async userId => {
   });
 
   return associations.map(asso => ({
+    id: asso.company.id,
     role: asso.role,
     siret: asso.company.siret,
-    vat_number: asso.company.vatNumber
+    name: asso.company.name,
+    given_name: asso.company.givenName,
+    vat_number: asso.company.vatNumber,
+    types: asso.company.companyTypes,
+    verified:
+      asso.company.verificationStatus === CompanyVerificationStatus.VERIFIED
   }));
 };
 

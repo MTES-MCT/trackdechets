@@ -7,7 +7,7 @@ import { sendMail } from "../../../mailer/mailing";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { randomNumber } from "../../../utils";
-import * as COMPANY_TYPES from "../../../common/constants/COMPANY_TYPES";
+import * as COMPANY_CONSTANTS from "../../../common/constants/COMPANY_CONSTANTS";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { verificationProcessInfo } from "../../../mailer/templates";
 import { deleteCachedUserCompanies } from "../../../common/redis/users";
@@ -197,7 +197,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
 
   if (VERIFY_COMPANY === "true") {
     const isProfessional = company.companyTypes.some(ct => {
-      return COMPANY_TYPES.PROFESSIONALS.includes(ct);
+      return COMPANY_CONSTANTS.PROFESSIONALS.includes(ct);
     });
     if (isProfessional) {
       await sendMail(

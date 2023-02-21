@@ -8,7 +8,7 @@ import {
   flattenBsdaInput
 } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
-import { checkKeysEditability } from "../../edition-rules";
+import { checkEditionRules } from "../../edition";
 import { checkIsBsdaContributor } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
 import { validateBsda } from "../../validation";
@@ -61,11 +61,7 @@ export default async function edit(
     );
   }
 
-  checkKeysEditability(input, {
-    ...existingBsda,
-    grouping: groupedBsdas,
-    intermediaries: existingBsda.intermediaries
-  });
+  await checkEditionRules(existingBsda, input, user);
 
   const { grouping, forwarding, ...existingBsdaToValidate } = existingBsda;
   const resultingBsda = {
@@ -99,6 +95,9 @@ export default async function edit(
         forwarding: { connect: { id: input.forwarding } }
       }),
       ...(shouldUpdateIntermediaries && {
+        intermediariesOrgIds: input.intermediaries
+          .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
+          .filter(Boolean),
         intermediaries: {
           deleteMany: {},
           createMany: { data: companyToIntermediaryInput(input.intermediaries) }

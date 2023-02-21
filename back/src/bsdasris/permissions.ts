@@ -1,5 +1,5 @@
 import { User, Bsdasri, BsdasriStatus, BsdasriType } from "@prisma/client";
-import prisma from "../prisma";
+
 import { getCachedUserSiretOrVat } from "../common/redis/users";
 
 import { BsdasriSirets } from "./types";
@@ -19,6 +19,7 @@ export async function isDasriContributorHelper(
   dasri: BsdasriSirets
 ) {
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
+
   const formSiretsOrVat = [
     dasri.emitterCompanySiret,
     dasri.transporterCompanySiret,
@@ -31,16 +32,14 @@ export async function isDasriContributorHelper(
 }
 
 // Don't call directly in resolver to handle permissions
-export async function isDasriInitialEmitterHelper(user: User, dasriId: string) {
+export async function isDasriInitialEmitterHelper(
+  user: User,
+  bsdasri: Bsdasri
+) {
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  const bsdasris = await prisma.bsdasri.findMany({
-    where: { synthesizedIn: { id: dasriId } },
-    select: { emitterCompanySiret: true }
-  });
-  const synthesizedEmitterSirets = bsdasris.map(bsd => bsd.emitterCompanySiret);
 
   return userCompaniesSiretOrVat.some(siret =>
-    synthesizedEmitterSirets.includes(siret)
+    bsdasri.synthesisEmitterSirets.includes(siret)
   );
 }
 
@@ -82,15 +81,13 @@ export async function checkIsBsdasriPublishable(
  */
 export async function checkCanReadBsdasri(user: User, bsdasri: Bsdasri) {
   const isContributor = await isDasriContributorHelper(user, bsdasri);
+
   if (isContributor) {
     return true;
   }
 
   if (bsdasri.type === BsdasriType.SYNTHESIS) {
-    const isInitialEmitter = await isDasriInitialEmitterHelper(
-      user,
-      bsdasri.id
-    );
+    const isInitialEmitter = await isDasriInitialEmitterHelper(user, bsdasri);
     if (isInitialEmitter) {
       return true;
     }
@@ -107,11 +104,21 @@ export async function checkCanDeleteBsdasri(user: User, bsdasri: Bsdasri) {
     "Vous n'êtes pas autorisé à supprimer ce bordereau."
   );
 
-  if (bsdasri.status !== BsdasriStatus.INITIAL) {
+  const isUserOnlySignatory = async () =>
+    bsdasri.status === BsdasriStatus.SIGNED_BY_PRODUCER &&
+    (await getCachedUserSiretOrVat(user.id)).includes(
+      bsdasri.emitterCompanySiret
+    );
+
+  if (
+    bsdasri.status !== BsdasriStatus.INITIAL &&
+    !(await isUserOnlySignatory())
+  ) {
     throw new ForbiddenError(
       "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés"
     );
   }
+
   // INITIAL dasris should not be synthesized or grouped, but let's keep a safeguard here
   if (!!bsdasri.synthesizedInId || !!bsdasri.groupedInId) {
     throw new ForbiddenError(
