@@ -60,6 +60,4 @@ export async function checkCanDeleteBsdvhu(user: User, bsvhu: Bsvhu) {
   throw new ForbiddenError(
     "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés"
   );
-
-  return true;
 }
