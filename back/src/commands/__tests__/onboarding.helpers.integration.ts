@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { MembershipRequestStatus, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import {
   companyAssociatedToExistingUserFactory,
@@ -6,7 +6,10 @@ import {
   createMembershipRequest,
   userFactory
 } from "../../__tests__/factories";
-import { getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest } from "../onboarding.helpers";
+import {
+  getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest,
+  getUsersWithPendingMembershipRequests
+} from "../onboarding.helpers";
 
 const xDaysAgo = (x: number): Date => {
   const date = new Date();
@@ -157,5 +160,80 @@ describe("getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest", () => {
 
     expect(users.length).toEqual(1);
     expect(users[0].id).toEqual(userCreated3DaysAgo.id);
+  });
+});
+
+describe("getUsersWithPendingMembershipRequests", () => {
+  afterEach(resetDatabase);
+
+  it("should return user that created a membership request X days ago", async () => {
+    const company = await companyFactory();
+
+    // Should return this user
+    const user = await userFactory();
+    await createMembershipRequest(user, company, {
+      createdAt: THREE_DAYS_AGO
+    });
+
+    // Should not return this user because 2 days ago, not 3
+    const user2DaysAgo = await userFactory();
+    await createMembershipRequest(user2DaysAgo, company, {
+      createdAt: TWO_DAYS_AGO
+    });
+
+    // Should not return this user because no membership request
+    await userFactory();
+
+    const users = await getUsersWithPendingMembershipRequests(3);
+
+    expect(users.length).toEqual(1);
+    expect(users[0].id).toEqual(user.id);
+  });
+
+  it("should return user that created a membership request X days ago only once", async () => {
+    const user = await userFactory();
+    const company0 = await companyFactory();
+    const company1 = await companyFactory();
+
+    await createMembershipRequest(user, company0, {
+      createdAt: THREE_DAYS_AGO
+    });
+
+    await createMembershipRequest(user, company1, {
+      createdAt: THREE_DAYS_AGO
+    });
+
+    const users = await getUsersWithPendingMembershipRequests(3);
+
+    expect(users.length).toEqual(1);
+    expect(users[0].id).toEqual(user.id);
+  });
+
+  it("should return user that created a membership request X days ago with PENDING status only", async () => {
+    const company = await companyFactory();
+
+    // Should be the only one returned cause status PENDING
+    const user0 = await userFactory();
+    await createMembershipRequest(user0, company, {
+      createdAt: THREE_DAYS_AGO,
+      status: MembershipRequestStatus.PENDING
+    });
+
+    const user1 = await userFactory();
+    await createMembershipRequest(user1, company, {
+      createdAt: THREE_DAYS_AGO,
+      status: MembershipRequestStatus.REFUSED
+    });
+
+    const user2 = await userFactory();
+    await createMembershipRequest(user2, company, {
+      createdAt: THREE_DAYS_AGO,
+      status: MembershipRequestStatus.ACCEPTED
+    });
+
+    const users = await getUsersWithPendingMembershipRequests(3);
+
+    expect(users.length).toEqual(1);
+    expect(users[0].id).toEqual(user0.id);
   });
 });

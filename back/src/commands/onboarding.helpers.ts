@@ -1,12 +1,18 @@
 import prisma from "../prisma";
 import { sendMail } from "../mailer/mailing";
-import { Company, CompanyAssociation, User } from "@prisma/client";
+import {
+  Company,
+  CompanyAssociation,
+  MembershipRequestStatus,
+  User
+} from "@prisma/client";
 import * as COMPANY_TYPES from "../common/constants/COMPANY_TYPES";
 import {
   onboardingFirstStep,
   onboardingProducerSecondStep,
   onboardingProfessionalSecondStep,
-  membershipRequestDetailsEmail
+  membershipRequestDetailsEmail,
+  pendingMembershipRequestDetailsEmail
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
 /**
@@ -149,6 +155,53 @@ export const sendMembershipRequestDetailsEmail = async () => {
   await Promise.all(
     recipients.map(recipient => {
       const payload = renderMail(membershipRequestDetailsEmail, {
+        to: [{ email: recipient.email, name: recipient.name }]
+      });
+
+      return sendMail(payload);
+    })
+  );
+  await prisma.$disconnect();
+};
+
+export const getUsersWithPendingMembershipRequests = async (
+  daysAgo: number
+) => {
+  const now = new Date();
+
+  const requestDateGt = xDaysAgo(now, daysAgo);
+  const requestDateLt = xDaysAgo(now, daysAgo - 1);
+
+  const pendingMembershipRequests = await prisma.membershipRequest.findMany({
+    where: {
+      createdAt: { gt: requestDateGt, lt: requestDateLt },
+      status: MembershipRequestStatus.PENDING
+    }
+  });
+
+  const uniqueUserIds = [
+    ...new Set(pendingMembershipRequests.map(p => p.userId))
+  ];
+
+  const users = await prisma.user.findMany({
+    where: {
+      id: { in: uniqueUserIds }
+    }
+  });
+
+  return users;
+};
+
+/**
+ * Send a mail to all users who issued a membership request and who
+ * got no answer
+ */
+export const sendPendingMembershipRequestDetailsEmail = async () => {
+  const recipients = await getUsersWithPendingMembershipRequests(14);
+
+  await Promise.all(
+    recipients.map(recipient => {
+      const payload = renderMail(pendingMembershipRequestDetailsEmail, {
         to: [{ email: recipient.email, name: recipient.name }]
       });
 
