@@ -106,7 +106,7 @@ describe("Query.bsds validation", () => {
 
     const { query } = makeClient(emitter.user);
 
-    const tooLong = "BSD-1234567890-ABCDEFG";
+    const tooLong = "BSD-1234567890-ABCDEFG-12345678"; // 31 chars
 
     const { errors } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
       GET_BSDS,
@@ -122,7 +122,7 @@ describe("Query.bsds validation", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "La longueur maximale de ce paramètre de recherche est de 20 caractères",
+          "La longueur maximale de ce paramètre de recherche est de 30 caractères",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
