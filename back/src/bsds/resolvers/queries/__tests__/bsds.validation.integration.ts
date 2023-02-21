@@ -121,7 +121,7 @@ describe("Query.bsds validation", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "La longueur maximale du paramètre de recherche readableId est de 20 caractères",
+          "La longueur maximale du paramètre de recherche readableId est de 30 caractères",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
