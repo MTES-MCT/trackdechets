@@ -1,14 +1,40 @@
-import { Bsvhu, User } from "@prisma/client";
+import { Bsvhu, User, Prisma } from "@prisma/client";
 import { SealedFieldError } from "../common/errors";
 import { getCachedUserSiretOrVat } from "../common/redis/users";
 import { objectDiff } from "../forms/workflow/diff";
 import { BsvhuInput, SignatureTypeInput } from "../generated/graphql/types";
 import { flattenVhuInput } from "./converter";
 
+type EditableBsvhuFields = Required<
+  Omit<
+    Prisma.BsvhuCreateInput,
+    | "id"
+    | "createdAt"
+    | "updatedAt"
+    | "isDraft"
+    | "isDeleted"
+    | "status"
+    | "type"
+    | "emitterEmissionSignatureDate"
+    | "emitterEmissionSignatureAuthor"
+    | "transporterTransportSignatureDate"
+    | "transporterTransportSignatureAuthor"
+    | "destinationOperationSignatureDate"
+    | "destinationOperationSignatureAuthor"
+    | "isEmissionDirectTakenOver"
+    | "isEmissionTakenOverWithSecretCode"
+    | "emitterCustomInfo"
+    | "destinationCustomInfo"
+    | "transporterCustomInfo"
+    | "transporterTransportPlates"
+  >
+>;
 // Defines until which signature BSVHU fields can be modified
 // The test in edition.test.ts ensures that every possible key in BsvhuInput
 // has a corresponding edition rule
-export const editionRules: { [key: string]: SignatureTypeInput } = {
+export const editionRules: {
+  [key in keyof EditableBsvhuFields]: SignatureTypeInput;
+} = {
   emitterAgrementNumber: "EMISSION",
   emitterCompanyName: "EMISSION",
   emitterCompanySiret: "EMISSION",

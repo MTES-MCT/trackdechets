@@ -1,4 +1,4 @@
-import { BsffPackaging } from "@prisma/client";
+import { BsffPackaging, Prisma } from "@prisma/client";
 import { SealedFieldError } from "../../common/errors";
 import { objectDiff } from "../../forms/workflow/diff";
 import {
@@ -11,11 +11,30 @@ type BsffSignatureTypeAfterReception = Extract<
   BsffSignatureType,
   "ACCEPTATION" | "OPERATION"
 >;
-
+type EditableBsffPackagingFields = Required<
+  Omit<
+    Prisma.BsffPackagingCreateInput,
+    | "id"
+    | "type"
+    | "other"
+    | "volume"
+    | "weight"
+    | "numero"
+    | "acceptationSignatureAuthor"
+    | "acceptationSignatureDate"
+    | "operationSignatureAuthor"
+    | "operationSignatureDate"
+    | "bsff"
+    | "nextPackaging"
+    | "previousPackagings"
+  >
+>;
 // Defines until which signature BsffPackaging fields can be modified
 // The test in bsffPackagingEdition.test.ts ensures that every possible key in BsffPackagingInput
 // has a corresponding edition rule
-export const editionRules: { [key: string]: BsffSignatureType } = {
+export const editionRules: {
+  [key in keyof EditableBsffPackagingFields]: BsffSignatureType;
+} = {
   acceptationDate: "ACCEPTATION",
   acceptationStatus: "ACCEPTATION",
   acceptationWeight: "ACCEPTATION",

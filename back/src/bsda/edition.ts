@@ -1,4 +1,4 @@
-import { Bsda, User } from "@prisma/client";
+import { Bsda, User, Prisma } from "@prisma/client";
 import { safeInput } from "../common/converter";
 import { SealedFieldError } from "../common/errors";
 import { getCachedUserSiretOrVat } from "../common/redis/users";
@@ -7,10 +7,38 @@ import { BsdaInput, BsdaSignatureType } from "../generated/graphql/types";
 import { flattenBsdaInput } from "./converter";
 import { getReadonlyBsdaRepository } from "./repository";
 
+type EditableBsdaFields = Required<
+  Omit<
+    Prisma.BsdaCreateInput,
+    | "id"
+    | "createdAt"
+    | "updatedAt"
+    | "isDraft"
+    | "isDeleted"
+    | "status"
+    | "emitterEmissionSignatureDate"
+    | "emitterEmissionSignatureAuthor"
+    | "transporterTransportSignatureAuthor"
+    | "transporterTransportSignatureDate"
+    | "workerWorkSignatureAuthor"
+    | "workerWorkSignatureDate"
+    | "destinationOperationSignatureAuthor"
+    | "destinationOperationSignatureDate"
+    | "groupedInId"
+    | "forwardingId"
+    | "groupedIn"
+    | "forwardedIn"
+    | "BsdaRevisionRequest"
+    | "intermediariesOrgIds"
+  >
+>;
+
 // Defines until which signature BSDA fields can be modified
 // The test in edition.test.ts ensures that every possible key in BsdaInput
 // has a corresponding edition rule
-export const editionRules: { [key: string]: BsdaSignatureType } = {
+export const editionRules: {
+  [Key in keyof EditableBsdaFields]: BsdaSignatureType;
+} = {
   type: "EMISSION",
   emitterIsPrivateIndividual: "EMISSION",
   emitterCompanyName: "EMISSION",
