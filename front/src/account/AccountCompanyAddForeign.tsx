@@ -19,6 +19,7 @@ import {
 import { isSiret, isVat } from "generated/constants/companySearchHelpers";
 
 import {
+  Alert,
   Container,
   Row,
   Col,
@@ -65,6 +66,22 @@ const localizedStrings = {
         "I hereby certify that I have the authority to create an account in the name of my company.",
       error:
         "You must certify that you have the authority to create the account in the name of your company",
+      disclaimer: (
+        <>
+          As the administrator of this company, I understand I will have to{" "}
+          <a
+            href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte"
+            target="_blank"
+            rel="noreferrer"
+          >
+            manage its members in Trackdéchets
+          </a>
+          .<br />
+          In particular, I commit to processing user requests to join the
+          company, and to ensure that, at all times, at least one administrator
+          is available to manage this company on Trackdéchets.
+        </>
+      ),
     },
     submit: {
       submitting: "Creating...",
@@ -93,6 +110,23 @@ const localizedStrings = {
         "Je certifie disposer du pouvoir pour créer un compte au nom de mon entreprise.",
       error:
         "Vous devez certifier être autorisé à créer ce compte pour votre entreprise",
+      disclaimer: (
+        <>
+          En tant qu'administrateur de l'établissement, j'ai pris connaissance
+          des{" "}
+          <a
+            href="https://faq.trackdechets.fr/inscription-et-gestion-de-compte/gerer-son-compte"
+            target="_blank"
+            rel="noreferrer"
+          >
+            modalités de gestion des membres
+          </a>
+          .<br />
+          Je m'engage notamment à traiter les éventuelles demandes de
+          rattachement et à ce que, à tout moment, au moins un administrateur
+          ait accès à cet établissement dans Trackdéchets.
+        </>
+      ),
     },
     submit: {
       submitting: "Création...",
@@ -277,6 +311,13 @@ export default function AccountCompanyAddForeign() {
                       );
                     }}
                   </Field>
+
+                  <div className={styles.alertWrapper}>
+                    <Alert
+                      title="Information"
+                      description={memoizedStrings.isAllowed.disclaimer}
+                    />
+                  </div>
 
                   <Field name="isAllowed">
                     {({ field }) => {
