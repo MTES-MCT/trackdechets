@@ -9,6 +9,8 @@ import MarkAsResealed from "./MarkAsResealed";
 import MarkAsTempStorerAccepted from "./MarkAsTempStorerAccepted";
 import SignEmissionForm from "./SignEmissionForm";
 import SignTransportForm from "./SignTransportForm";
+import { useRouteMatch } from "react-router-dom";
+import routes from "common/routes";
 
 import {
   PrepareSegment,
@@ -23,7 +25,7 @@ export interface WorkflowActionProps {
 
 export function WorkflowAction(props: WorkflowActionProps) {
   const { form, siret } = props;
-
+  const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
   const isTempStorage = form.recipient?.isTempStorage;
 
   switch (form.status) {
@@ -48,11 +50,13 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.Sent: {
-      if (siret === form.recipient?.company?.siret) {
-        if (isTempStorage) {
-          return <MarkAsTempStored {...props} />;
+      if (isActTab) {
+        if (siret === form.recipient?.company?.siret) {
+          if (isTempStorage) {
+            return <MarkAsTempStored {...props} />;
+          }
+          return <MarkAsReceived {...props} />;
         }
-        return <MarkAsReceived {...props} />;
       }
 
       const transportSegments = form.transportSegments ?? [];
