@@ -185,6 +185,7 @@ export const getUsersWithPendingMembershipRequests = async (
 
   const users = await prisma.user.findMany({
     where: {
+      isActive: true,
       id: { in: uniqueUserIds }
     }
   });

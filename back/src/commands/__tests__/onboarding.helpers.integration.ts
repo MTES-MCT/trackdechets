@@ -175,6 +175,12 @@ describe("getUsersWithPendingMembershipRequests", () => {
       createdAt: THREE_DAYS_AGO
     });
 
+    // Should not return this user because unactive
+    const unactiveUser = await userFactory({ isActive: false });
+    await createMembershipRequest(unactiveUser, company, {
+      createdAt: THREE_DAYS_AGO
+    });
+
     // Should not return this user because 2 days ago, not 3
     const user2DaysAgo = await userFactory();
     await createMembershipRequest(user2DaysAgo, company, {
