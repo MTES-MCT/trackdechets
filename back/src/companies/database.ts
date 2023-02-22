@@ -203,7 +203,7 @@ export async function getCompanyAdminUsers(orgId: string) {
  * @param companyIds
  * @returns
  */
-export async function getAdminsByCompanyIds(companyIds: string[]) {
+export async function getActiveAdminsByCompanyIds(companyIds: string[]) {
   const users = await prisma.companyAssociation
     .findMany({
       where: { companyId: { in: companyIds }, role: "ADMIN" },
@@ -218,7 +218,7 @@ export async function getAdminsByCompanyIds(companyIds: string[]) {
       })
     );
 
-  return users;
+  return users.filter(u => u.isActive);
 }
 
 export async function getTraderReceiptOrNotFound({

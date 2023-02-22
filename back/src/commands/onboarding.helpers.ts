@@ -16,7 +16,7 @@ import {
   pendingMembershipRequestAdminDetailsEmail
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
-import { getAdminsByCompanyIds } from "../companies/database";
+import { getActiveAdminsByCompanyIds } from "../companies/database";
 /**
  * Compute a past date relative to baseDate
  *
@@ -240,7 +240,7 @@ export const getPendingMembershipRequestsAndAssociatedAdmins = async (
   ];
 
   // Get all the admins from all those companies
-  const admins = await getAdminsByCompanyIds(companyIds);
+  const admins = await getActiveAdminsByCompanyIds(companyIds);
 
   return pendingMembershipRequests.map(request => {
     const requestAdmins = admins.filter(a => a.companyId === request.companyId);
