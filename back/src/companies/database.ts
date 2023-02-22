@@ -198,6 +198,29 @@ export async function getCompanyAdminUsers(orgId: string) {
   return users.filter(c => c.role === "ADMIN");
 }
 
+/**
+ * Get all the admins from companies, by companyIds
+ * @param companyIds
+ * @returns
+ */
+export async function getAdminsByCompanyIds(companyIds: string[]) {
+  const users = await prisma.companyAssociation
+    .findMany({
+      where: { companyId: { in: companyIds }, role: "ADMIN" },
+      include: { user: true }
+    })
+    .then(associations =>
+      associations.map(a => {
+        return {
+          ...a.user,
+          companyId: a.companyId
+        };
+      })
+    );
+
+  return users;
+}
+
 export async function getTraderReceiptOrNotFound({
   id
 }: Prisma.TraderReceiptWhereUniqueInput) {

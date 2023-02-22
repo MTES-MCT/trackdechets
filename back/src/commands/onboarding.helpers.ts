@@ -12,9 +12,11 @@ import {
   onboardingProducerSecondStep,
   onboardingProfessionalSecondStep,
   membershipRequestDetailsEmail,
-  pendingMembershipRequestDetailsEmail
+  pendingMembershipRequestDetailsEmail,
+  pendingMembershipRequestAdminDetailsEmail
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
+import { getAdminsByCompanyIds } from "../companies/database";
 /**
  * Compute a past date relative to baseDate
  *
@@ -206,6 +208,67 @@ export const sendPendingMembershipRequestDetailsEmail = async () => {
       });
 
       return sendMail(payload);
+    })
+  );
+  await prisma.$disconnect();
+};
+
+export const getPendingMembershipRequestsAndAssociatedAdmins = async (
+  daysAgo: number
+) => {
+  const now = new Date();
+
+  const requestDateGt = xDaysAgo(now, daysAgo);
+  const requestDateLt = xDaysAgo(now, daysAgo - 1);
+
+  // First, fetch all unanswered membership requests
+  const pendingMembershipRequests = await prisma.membershipRequest.findMany({
+    where: {
+      createdAt: { gt: requestDateGt, lt: requestDateLt },
+      status: MembershipRequestStatus.PENDING
+    },
+    include: {
+      // We need the issuer email and company orgId in the email
+      user: { select: { email: true } },
+      company: { select: { name: true, orgId: true } }
+    }
+  });
+
+  // Get unique companyIds
+  const companyIds = [
+    ...new Set(pendingMembershipRequests.map(p => p.companyId))
+  ];
+
+  // Get all the admins from all those companies
+  const admins = await getAdminsByCompanyIds(companyIds);
+
+  return pendingMembershipRequests.map(request => {
+    const requestAdmins = admins.filter(a => a.companyId === request.companyId);
+
+    return { ...request, admins: requestAdmins };
+  });
+};
+
+export const sendPendingMembershipRequestToAdminDetailsEmail = async () => {
+  const requests = await getPendingMembershipRequestsAndAssociatedAdmins(14);
+
+  await Promise.all(
+    requests.map(request => {
+      const variables = {
+        requestId: request.id,
+        email: request.user.email,
+        orgName: request.company.name,
+        orgId: request.company.orgId
+      };
+
+      request.admins.map(admin => {
+        const payload = renderMail(pendingMembershipRequestAdminDetailsEmail, {
+          to: [{ email: admin.email, name: admin.name }],
+          variables
+        });
+
+        return sendMail(payload);
+      });
     })
   );
   await prisma.$disconnect();
