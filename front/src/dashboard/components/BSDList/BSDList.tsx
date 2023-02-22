@@ -112,7 +112,11 @@ export function BSDList({
 
   const refetchWithDefaultWhere = React.useCallback(
     ({ where, ...args }) => {
-      const newVariables = { ...args, where: { ...where, ...defaultWhere } };
+      const newVariables = {
+        ...bsdsVariables,
+        ...args,
+        where: { ...where, ...defaultWhere },
+      };
       setBsdsVariables(newVariables);
       lazyFetchBsds({
         variables: newVariables,
