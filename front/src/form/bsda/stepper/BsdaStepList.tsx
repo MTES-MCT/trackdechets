@@ -69,6 +69,13 @@ export default function BsdaStepsList(props: Props) {
       computedState.emitter.pickupSite = null;
     }
 
+    if (
+      computedState.worker?.certification &&
+      existingBsda?.worker?.certification === null
+    ) {
+      computedState.worker.certification = null;
+    }
+
     return computedState;
   }, [formQuery.data]);
 
