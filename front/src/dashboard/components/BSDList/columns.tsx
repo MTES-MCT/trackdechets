@@ -46,8 +46,8 @@ export const COLUMNS_PARAMETERS_NAME = {
   emitter: {
     filter: value => ({
       _or: [
-        { emitterCompanyName: { _match: value } },
-        { emitterCompanySiret: { _contains: value } },
+        { emitter: { company: { name: { _match: value } } } },
+        { emitter: { company: { siret: { _contains: value } } } },
       ],
     }),
     order: "emitterCompanyName",
@@ -55,25 +55,27 @@ export const COLUMNS_PARAMETERS_NAME = {
   recipient: {
     filter: value => ({
       _or: [
-        { destinationCompanyName: { _match: value } },
-        { destinationCompanySiret: { _contains: value } },
+        { destination: { company: { name: { _match: value } } } },
+        { destination: { company: { siret: { _contains: value } } } },
       ],
     }),
     order: "destinationCompanyName",
   },
   transporterNumberPlate: {
-    filter: value => ({ transporterTransportPlates: { _eq: value } }),
+    filter: value => ({
+      transporter: { transport: { plates: { _eq: value } } },
+    }),
     order: "transporterNumberPlate",
   },
   transporterCustomInfo: {
-    filter: value => ({ transporterCustomInfo: { _match: value } }),
+    filter: value => ({ transporter: { customInfo: { _match: value } } }),
     order: "transporterCustomInfo",
   },
   waste: {
     filter: value => ({
       _or: [
-        { wasteCode: { _contains: value } },
-        { wasteDescription: { _match: value } },
+        { waste: { code: { _contains: value } } },
+        { waste: { description: { _match: value } } },
       ],
     }),
     order: "wasteCode",

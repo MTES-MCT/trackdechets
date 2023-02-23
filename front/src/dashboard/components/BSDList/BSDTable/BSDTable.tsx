@@ -104,8 +104,6 @@ export function BSDTable({ bsds, refetch, ...props }: BSDTableProps) {
       { _and: [] } as BsdWhere
     );
 
-    console.log(variables.where);
-
     sortBy.forEach(sort => {
       const sortName = COLUMNS_PARAMETERS_NAME[sort.id]?.order;
 
