@@ -63,7 +63,7 @@ export const COLUMNS_PARAMETERS_NAME = {
   },
   transporterNumberPlate: {
     filter: value => ({
-      transporter: { transport: { plates: { _eq: value } } },
+      transporter: { transport: { plates: { _itemContains: value } } },
     }),
     order: "transporterNumberPlate",
   },
