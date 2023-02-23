@@ -229,26 +229,35 @@ export const getPendingMembershipRequestsAndAssociatedAdmins = async (
     },
     include: {
       // We need the issuer email and company orgId in the email
-      user: { select: { email: true } },
+      user: { select: { email: true, isActive: true } },
       company: { select: { name: true, orgId: true } }
     }
   });
 
+  // Keep only active users
+  const activePendingMembershipRequests = pendingMembershipRequests.filter(
+    r => r.user.isActive
+  );
+
   // Get unique companyIds
   const companyIds = [
-    ...new Set(pendingMembershipRequests.map(p => p.companyId))
+    ...new Set(activePendingMembershipRequests.map(p => p.companyId))
   ];
 
   // Get all the admins from all those companies
   const admins = await getActiveAdminsByCompanyIds(companyIds);
 
-  return pendingMembershipRequests.map(request => {
+  return activePendingMembershipRequests.map(request => {
     const requestAdmins = admins.filter(a => a.companyId === request.companyId);
 
     return { ...request, admins: requestAdmins };
   });
 };
 
+/**
+ * For each unanswered membership request issued X days ago, send an
+ * email to all the admins of request's targeted company
+ */
 export const sendPendingMembershipRequestToAdminDetailsEmail = async () => {
   const requests = await getPendingMembershipRequestsAndAssociatedAdmins(14);
 
