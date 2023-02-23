@@ -164,7 +164,7 @@ export const sendMembershipRequestDetailsEmail = async () => {
   await prisma.$disconnect();
 };
 
-export const getUsersWithPendingMembershipRequests = async (
+export const getActiveUsersWithPendingMembershipRequests = async (
   daysAgo: number
 ) => {
   const now = new Date();
@@ -198,7 +198,7 @@ export const getUsersWithPendingMembershipRequests = async (
  * got no answer
  */
 export const sendPendingMembershipRequestDetailsEmail = async () => {
-  const recipients = await getUsersWithPendingMembershipRequests(14);
+  const recipients = await getActiveUsersWithPendingMembershipRequests(14);
 
   await Promise.all(
     recipients.map(recipient => {
