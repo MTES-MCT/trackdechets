@@ -220,7 +220,13 @@ export function toElasticTextQuery(
     throw new MaxLengthSearchError(fieldName, maxLength);
   }
   return {
-    match: { [fieldName]: { query: textFilter._match, fuzziness: 1 } }
+    match: {
+      [fieldName]: {
+        query: textFilter._match,
+        fuzziness: 0,
+        operator: "and"
+      }
+    }
   };
 }
 

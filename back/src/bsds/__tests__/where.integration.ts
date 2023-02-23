@@ -193,7 +193,7 @@ describe("TextFilter to elastic query", () => {
     expect(hits[0]._source.id).toEqual("1");
   });
 
-  it("should perform a full text match with fuzziness of 1", async () => {
+  it("should not allow fuzzy search", async () => {
     const stringFilter: BsdWhere = {
       emitter: { company: { name: { _match: "CADE" } } }
     };
@@ -207,13 +207,12 @@ describe("TextFilter to elastic query", () => {
 
     const hits = result.body.hits.hits;
 
-    expect(hits).toHaveLength(1);
-    expect(hits[0]._source.id).toEqual("1");
+    expect(hits).toHaveLength(0);
   });
 
   it("should match if we provide several tokens in the search query", async () => {
     const stringFilter: BsdWhere = {
-      emitter: { company: { name: { _match: "CDDE EN STOCK" } } }
+      emitter: { company: { name: { _match: "CODE EN STOCK" } } }
     };
 
     const result = await client.search({
