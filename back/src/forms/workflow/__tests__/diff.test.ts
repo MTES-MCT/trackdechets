@@ -252,7 +252,6 @@ describe("dateDiff", () => {
   });
 
   test("diff with empty string", () => {
-    // same date but different object
     const string1 = "";
     const string2 = null;
 
