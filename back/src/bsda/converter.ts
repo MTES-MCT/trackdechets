@@ -442,7 +442,7 @@ function flattenBsdaTransporterInput({
 
 function flattenBsdaWorkerInput({ worker }: Pick<BsdaInput, "worker">) {
   return {
-    workerIsDisabled: chain(worker, w => w.isDisabled),
+    workerIsDisabled: chain(worker, w => Boolean(w.isDisabled)),
     workerCompanyName: chain(worker, w => chain(w.company, c => c.name)),
     workerCompanySiret: chain(worker, w => chain(w.company, c => c.siret)),
     workerCompanyAddress: chain(worker, w => chain(w.company, c => c.address)),
