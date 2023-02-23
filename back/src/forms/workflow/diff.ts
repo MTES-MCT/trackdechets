@@ -10,6 +10,10 @@ export function isObject(obj) {
   return {}.toString.apply(obj) === "[object Object]";
 }
 
+export function isString(obj) {
+  return {}.toString.call(obj) === "[object String]";
+}
+
 export function isEmpty(obj) {
   return Object.keys(obj).length === 0;
 }
@@ -29,6 +33,10 @@ export function arraysEqual(a, b) {
     } else if (sortedA[i] !== sortedB[i]) return false;
   }
   return true;
+}
+
+export function stringEqual(s1: string, s2: string) {
+  return (s1 ?? "") === (s2 ?? "");
 }
 
 export function objectDiff(o1, o2) {
@@ -51,6 +59,15 @@ export function objectDiff(o1, o2) {
     }
     if (isDate(o2[key])) {
       if (o1[key] && isEqual(o2[key], o1[key])) {
+        return diff;
+      }
+      return {
+        ...diff,
+        [key]: o2[key]
+      };
+    }
+    if (isString(o2[key]) || isString(o1[key])) {
+      if (stringEqual(o1[key], o2[key])) {
         return diff;
       }
       return {
