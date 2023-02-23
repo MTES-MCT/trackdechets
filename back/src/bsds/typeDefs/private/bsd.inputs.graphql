@@ -36,7 +36,9 @@ input BsdWhere {
   _or: [BsdWhere!]
 }
 
+"Filtre pour les champs textuels"
 input TextFilter {
+  "Le texte de l'enregistrement a une correspondance en recherche textuelle avec la valeur du filtre"
   _match: String
 }
 

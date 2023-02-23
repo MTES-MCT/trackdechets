@@ -208,6 +208,18 @@ export function applyMask<W extends GenericWhereInput>(
 
 // Conversion functions between GraphQL filters and Elastic query
 
+function ngramMatch(fieldName: string, value: string): QueryDslQueryContainer {
+  return {
+    match: {
+      [`${fieldName}.ngram`]: {
+        // upper limit 5 should be the same as max_gram in ngram_tokenizer
+        query: value.match(/.{1,5}/g).join(" "),
+        operator: "and"
+      }
+    }
+  };
+}
+
 export function toElasticTextQuery(
   fieldName: string,
   textFilter: TextFilter | undefined,
@@ -220,12 +232,19 @@ export function toElasticTextQuery(
     throw new MaxLengthSearchError(fieldName, maxLength);
   }
   return {
-    match: {
-      [fieldName]: {
-        query: textFilter._match,
-        fuzziness: 0,
-        operator: "and"
-      }
+    bool: {
+      should: [
+        {
+          match: {
+            [fieldName]: {
+              query: textFilter._match,
+              fuzziness: 0,
+              operator: "and"
+            }
+          }
+        },
+        ngramMatch(fieldName, textFilter._match)
+      ]
     }
   };
 }
@@ -252,15 +271,7 @@ export function toElasticStringQuery(
   }
 
   if (stringFilter._contains) {
-    return {
-      match: {
-        [`${fieldName}.ngram`]: {
-          // upper limit 5 should be the same as max_gram in ngram_tokenizer
-          query: stringFilter._contains.match(/.{1,5}/g).join(" "),
-          operator: "and"
-        }
-      }
-    };
+    return ngramMatch(fieldName, stringFilter._contains);
   }
 
   if (stringFilter._in) {
@@ -310,14 +321,7 @@ export function toElasticStringListQuery(
   }
 
   if (stringListFilter._itemContains) {
-    return {
-      match: {
-        [`${fieldName}.ngram`]: {
-          query: stringListFilter._itemContains,
-          operator: "and"
-        }
-      }
-    };
+    return ngramMatch(fieldName, stringListFilter._itemContains);
   }
 
   throw new UserInputError("_eq n'est pas implémenté sur la query `bsds`");

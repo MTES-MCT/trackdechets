@@ -176,14 +176,51 @@ describe("TextFilter to elastic query", () => {
   });
 
   it("should perform a full text match", async () => {
-    const stringFilter: BsdWhere = {
-      emitter: { company: { name: { _match: "CODE" } } }
+    const textFilter: BsdWhere = {
+      emitter: { company: { name: { _match: "déchets co" } } }
     };
 
     const result = await client.search({
       index: index.alias,
       body: {
-        query: toElasticQuery(stringFilter)
+        query: toElasticQuery(textFilter)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(1);
+    expect(hits[0]._source.id).toEqual("2");
+  });
+
+  it("should match on substring", async () => {
+    const textFilter: BsdWhere = {
+      emitter: { company: { name: { _match: "co" } } }
+    };
+
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(textFilter)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(2);
+    expect(hits.map(h => h._source.id)).toContain("1");
+    expect(hits.map(h => h._source.id)).toContain("2");
+  });
+
+  it("should match on substring (bis)", async () => {
+    const textFilter: BsdWhere = {
+      emitter: { company: { name: { _match: "cod" } } }
+    };
+
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(textFilter)
       }
     });
 
@@ -194,14 +231,14 @@ describe("TextFilter to elastic query", () => {
   });
 
   it("should not allow fuzzy search", async () => {
-    const stringFilter: BsdWhere = {
+    const textFilter: BsdWhere = {
       emitter: { company: { name: { _match: "CADE" } } }
     };
 
     const result = await client.search({
       index: index.alias,
       body: {
-        query: toElasticQuery(stringFilter)
+        query: toElasticQuery(textFilter)
       }
     });
 
@@ -211,14 +248,14 @@ describe("TextFilter to elastic query", () => {
   });
 
   it("should match if we provide several tokens in the search query", async () => {
-    const stringFilter: BsdWhere = {
+    const textFilter: BsdWhere = {
       emitter: { company: { name: { _match: "CODE EN STOCK" } } }
     };
 
     const result = await client.search({
       index: index.alias,
       body: {
-        query: toElasticQuery(stringFilter)
+        query: toElasticQuery(textFilter)
       }
     });
 
@@ -229,14 +266,14 @@ describe("TextFilter to elastic query", () => {
   });
 
   it("should not be case sensitive", async () => {
-    const stringFilter: BsdWhere = {
+    const textFilter: BsdWhere = {
       emitter: { company: { name: { _match: "code" } } }
     };
 
     const result = await client.search({
       index: index.alias,
       body: {
-        query: toElasticQuery(stringFilter)
+        query: toElasticQuery(textFilter)
       }
     });
 

@@ -97,7 +97,16 @@ export interface BsdElastic {
   rawBsd: any;
 }
 
-const textField = { type: "text" };
+const textField = {
+  type: "text",
+  fields: {
+    ngram: {
+      type: "text",
+      analyzer: "ngram_analyzer",
+      search_analyzer: "ngram_search"
+    }
+  }
+};
 
 const stringField = {
   type: "keyword",
