@@ -28,6 +28,7 @@ import { bsvhuFactory } from "../../../../bsvhu/__tests__/factories.vhu";
 import { getFullForm } from "../../../../forms/database";
 import { indexForm } from "../../../../forms/elastic";
 import { Query } from "../../../../generated/graphql/types";
+import { TestQuery } from "../../../../__tests__/apollo-integration-testing";
 import {
   companyFactory,
   formFactory,
@@ -49,6 +50,8 @@ describe("Incoming wastes registry", () => {
   let bsd3: Bsdasri;
   let bsd4: Bsvhu;
   let bsd5: Bsff;
+
+  const OLD_ENV = process.env;
 
   beforeAll(async () => {
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
@@ -176,6 +179,11 @@ describe("Incoming wastes registry", () => {
     ]);
     await refreshElasticSearch();
   });
+
+  afterEach(() => {
+    process.env = OLD_ENV;
+  });
+
   afterAll(resetDatabase);
 
   it("should return an error if the user is not authenticated", async () => {
@@ -212,21 +220,6 @@ describe("Incoming wastes registry", () => {
         message: `Vous n'êtes pas membre de l'entreprise portant le siret "${destination2.company.siret}".`
       })
     );
-  });
-
-  it("should allow user to request any siret if authenticated from a service account", async () => {
-    const user = await userFactory({ isRegistreNational: true });
-    const { query } = makeClient(user);
-    const { data } = await query<Pick<Query, "incomingWastes">>(
-      INCOMING_WASTES,
-      {
-        variables: {
-          sirets: [destination.company.siret],
-          first: 2
-        }
-      }
-    );
-    expect(data.incomingWastes.edges).toHaveLength(2);
   });
 
   it("should paginate forward with first and after", async () => {
@@ -366,5 +359,53 @@ describe("Incoming wastes registry", () => {
     expect(incomingWaste.initialEmitterCompanySiret).toBeNull();
     expect(incomingWaste.initialEmitterCompanyName).toBeNull();
     expect(incomingWaste.initialEmitterPostalCodes).toEqual(["07100"]);
+  });
+
+  it("should allow user to request any siret if authenticated from a service account", async () => {
+    jest.resetModules();
+    process.env = { ...OLD_ENV, REGISTRY_WHITE_LIST_IP: "127.0.0.1" };
+    const server = require("../../../../server").server;
+    await server.start();
+    const makeClientLocal: (user?: Express.User) => {
+      query: TestQuery;
+    } = require("../../../../__tests__/testClient").default;
+    const user = await userFactory({ isRegistreNational: true });
+    const { query } = makeClientLocal(user);
+    const { data } = await query<Pick<Query, "incomingWastes">>(
+      INCOMING_WASTES,
+      {
+        variables: {
+          sirets: [destination.company.siret],
+          first: 2
+        }
+      }
+    );
+    expect(data.incomingWastes.edges).toHaveLength(2);
+  });
+
+  it("should not accept service account connection from IP address not in the white list", async () => {
+    jest.resetModules();
+    process.env = { ...OLD_ENV, REGISTRY_WHITE_LIST_IP: "86.70.221.61" };
+    const server = require("../../../../server").server;
+    await server.start();
+    const makeClientLocal: (user?: Express.User) => {
+      query: TestQuery;
+    } = require("../../../../__tests__/testClient").default;
+    const user = await userFactory({ isRegistreNational: true });
+    const { query } = makeClientLocal(user);
+    const { errors } = await query<Pick<Query, "incomingWastes">>(
+      INCOMING_WASTES,
+      {
+        variables: {
+          sirets: [destination.company.siret],
+          first: 2
+        }
+      }
+    );
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Vous n'êtes pas membre de l'entreprise portant le siret "${destination.company.siret}".`
+      })
+    ]);
   });
 });
