@@ -332,7 +332,7 @@ describe("Outgoing wastes registry", () => {
 
   it("should not accept service account connection from IP address not in the white list", async () => {
     jest.resetModules();
-    process.env = { ...OLD_ENV, REGISTRY_WHITE_LIST_IP: "86.70.221.61" };
+    process.env = { ...OLD_ENV, REGISTRY_WHITE_LIST_IP: undefined };
     const server = require("../../../../server").server;
     await server.start();
     const makeClientLocal: (user?: Express.User) => {
