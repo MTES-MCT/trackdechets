@@ -27,6 +27,7 @@ const sendInBlueBackend = {
     const payload = {
       subject: mail.subject,
       to: mail.to,
+      messageVersions: mail.messageVersions,
       sender: {
         email: SENDER_EMAIL_ADDRESS,
         name: SENDER_NAME
@@ -50,7 +51,22 @@ const sendInBlueBackend = {
     });
     return req
       .then(() => {
-        const allRecipients = [...mail.to, ...(!!mail.cc ? mail.cc : [])];
+        const allRecipients = [];
+
+        if (mail.to) {
+          allRecipients.push(...mail.to);
+        }
+
+        if (mail.cc) {
+          allRecipients.push(...mail.cc);
+        }
+
+        if (mail.messageVersions) {
+          mail.messageVersions.forEach(messageVersion =>
+            messageVersion.to.forEach(to => allRecipients.push(to))
+          );
+        }
+
         for (const recipient of allRecipients) {
           logger.info(
             `Mail sent via SIB to ${recipient.email} - Subject: ${mail.subject}`

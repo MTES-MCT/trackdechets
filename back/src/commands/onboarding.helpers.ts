@@ -9,6 +9,7 @@ import {
   membershipRequestDetailsEmail
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
+import { MessageVersion } from "../mailer/types";
 /**
  * Compute a past date relative to baseDate
  *
@@ -146,14 +147,15 @@ export const sendMembershipRequestDetailsEmail = async () => {
   const recipients =
     await getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest(7);
 
-  await Promise.all(
-    recipients.map(recipient => {
-      const payload = renderMail(membershipRequestDetailsEmail, {
-        to: [{ email: recipient.email, name: recipient.name }]
-      });
+  const messageVersions: MessageVersion[] = recipients.map(recipient => ({
+    to: [{ email: recipient.email, name: recipient.name }]
+  }));
 
-      return sendMail(payload);
-    })
-  );
+  const payload = renderMail(membershipRequestDetailsEmail, {
+    messageVersions
+  });
+
+  await sendMail(payload);
+
   await prisma.$disconnect();
 };

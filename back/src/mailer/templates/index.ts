@@ -198,9 +198,7 @@ export const finalDestinationModified: MailTemplate<{
   templateId: templateIds.LAYOUT
 };
 
-export const membershipRequestDetailsEmail: MailTemplate<{
-  company: { siret: string; name?: string };
-}> = {
+export const membershipRequestDetailsEmail: MailTemplate = {
   subject: "Passez à la prochaine étape sur Trackdéchets",
   body: mustacheRenderer("membership-request-details.html"),
   templateId: templateIds.LAYOUT
