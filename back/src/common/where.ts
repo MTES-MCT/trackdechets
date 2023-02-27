@@ -282,7 +282,8 @@ export function toElasticStringQuery(
 export function toElasticStringListQuery(
   fieldName: string,
   stringListFilter: StringNullableListFilter | undefined,
-  maxLength = 50
+  maxLength = 50,
+  filter = (s: string) => s // optional pre-processing function
 ): QueryDslQueryContainer {
   if (!stringListFilter) {
     return undefined;
@@ -302,26 +303,34 @@ export function toElasticStringListQuery(
     return {
       bool: {
         must: stringListFilter._hasEvery.map(value => ({
-          term: { [fieldName]: value }
+          term: { [fieldName]: filter(value) }
         }))
       }
     };
   }
 
-  if (stringListFilter._hasSome || stringListFilter._in) {
+  if (stringListFilter._hasSome) {
     return {
       terms: {
-        [fieldName]: stringListFilter._hasSome ?? stringListFilter._in
+        [fieldName]: stringListFilter._hasSome.map(filter)
+      }
+    };
+  }
+
+  if (stringListFilter._in) {
+    return {
+      terms: {
+        [fieldName]: stringListFilter._in.map(filter)
       }
     };
   }
 
   if (stringListFilter._has) {
-    return { term: { [fieldName]: stringListFilter._has } };
+    return { term: { [fieldName]: filter(stringListFilter._has) } };
   }
 
   if (stringListFilter._itemContains) {
-    return ngramMatch(fieldName, stringListFilter._itemContains);
+    return ngramMatch(fieldName, filter(stringListFilter._itemContains));
   }
 
   throw new UserInputError("_eq n'est pas implémenté sur la query `bsds`");

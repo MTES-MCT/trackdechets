@@ -5,7 +5,7 @@ import {
   IntermediaryBsdaAssociation
 } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
-import { BsdElastic, indexBsd } from "../common/elastic";
+import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
@@ -189,7 +189,8 @@ export function toBsdElastic(bsda: BsdaToElastic): BsdElastic {
 
     transporterCompanyAddress: bsda.transporterCompanyAddress ?? "",
     transporterCustomInfo: bsda.transporterCustomInfo ?? "",
-    transporterTransportPlates: bsda.transporterTransportPlates ?? [],
+    transporterTransportPlates:
+      bsda.transporterTransportPlates.map(transportPlateFilter) ?? [],
 
     destinationCompanyName: bsda.destinationCompanyName ?? "",
     destinationCompanySiret: bsda.destinationCompanySiret ?? "",

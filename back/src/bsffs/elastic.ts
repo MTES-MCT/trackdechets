@@ -5,7 +5,7 @@ import {
   BsffFicheIntervention,
   BsdType
 } from "@prisma/client";
-import { BsdElastic, indexBsd } from "../common/elastic";
+import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { toBsffDestination } from "./compat";
@@ -52,7 +52,8 @@ export function toBsdElastic(
     transporterCompanyVatNumber: bsff.transporterCompanyVatNumber ?? "",
     transporterCompanyAddress: bsff.transporterCompanyAddress ?? "",
     transporterCustomInfo: bsff.transporterCustomInfo ?? "",
-    transporterTransportPlates: bsff.transporterTransportPlates ?? [],
+    transporterTransportPlates:
+      bsff.transporterTransportPlates.map(transportPlateFilter) ?? [],
 
     destinationCompanyName: bsff.destinationCompanyName ?? "",
     destinationCompanySiret: bsff.destinationCompanySiret ?? "",

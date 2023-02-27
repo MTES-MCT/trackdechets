@@ -164,7 +164,7 @@ const settings = {
       },
       char_group: {
         type: "char_group",
-        tokenize_on_chars: ["whitespace", "-"]
+        tokenize_on_chars: ["whitespace"]
       }
     },
     normalizer: {
@@ -465,4 +465,13 @@ export async function toPrismaBsds(
     prismaBsdsPromises
   );
   return { bsdds, bsdasris, bsvhus, bsdas, bsffs };
+}
+
+// This filter is used to exlude "-" from number plates in a pre-processing step
+// See https://favro.com/organization/ab14a4f0460a99a9d64d4945/b64d96be58e6a57fe4d5c049?card=tra-9384
+export function transportPlateFilter(plate: string) {
+  if (!plate) {
+    return plate;
+  }
+  return plate.replace(/-/g, "");
 }

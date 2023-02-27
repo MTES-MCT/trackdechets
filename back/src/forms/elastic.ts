@@ -1,5 +1,5 @@
 import { Form, Status } from "@prisma/client";
-import { BsdElastic, indexBsd } from "../common/elastic";
+import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { FullForm } from "./types";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
@@ -247,7 +247,7 @@ export function toBsdElastic(
     transporterCompanyAddress: form.transporterCompanyAddress ?? "",
     transporterCustomInfo: form.transporterCustomInfo ?? "",
     transporterTransportPlates: form.transporterNumberPlate
-      ? [form.transporterNumberPlate]
+      ? [transportPlateFilter(form.transporterNumberPlate)]
       : [],
 
     destinationCompanyName: recipient.name ?? "",

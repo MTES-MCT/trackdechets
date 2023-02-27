@@ -13,6 +13,7 @@ import {
 } from "../common/where";
 import { BsdWhere } from "../generated/graphql/types";
 import { QueryDslQueryContainer } from "@elastic/elasticsearch/api/types";
+import { transportPlateFilter } from "../common/elastic";
 
 export function toElasticSimpleQuery(where: BsdWhere): QueryDslQueryContainer {
   return {
@@ -98,7 +99,8 @@ export function toElasticSimpleQuery(where: BsdWhere): QueryDslQueryContainer {
         toElasticStringListQuery(
           "transporterTransportPlates",
           where.transporter?.transport?.plates,
-          GET_BSDS_PLATES_MAX_LENGTH
+          GET_BSDS_PLATES_MAX_LENGTH,
+          transportPlateFilter
         ),
         toElasticTextQuery(
           "destinationCompanyName",

@@ -2,7 +2,13 @@ import {
   resetDatabase,
   refreshElasticSearch
 } from "../../../integration-tests/helper";
-import { BsdElastic, client, index, indexBsds } from "../../common/elastic";
+import {
+  BsdElastic,
+  client,
+  index,
+  indexBsds,
+  transportPlateFilter
+} from "../../common/elastic";
 import { BsdWhere } from "../../generated/graphql/types";
 import { toElasticQuery } from "../where";
 
@@ -291,11 +297,13 @@ describe("StringNullableFilter to elastic query", () => {
     const bsds: Partial<BsdElastic>[] = [
       {
         id: "1",
-        transporterTransportPlates: ["AD-008-TS", "HY-987-DE", "JG-987-AQ"]
+        transporterTransportPlates: ["AD-008-TS", "HY-987-DE", "JG-987-AQ"].map(
+          transportPlateFilter
+        )
       },
       {
         id: "2",
-        transporterTransportPlates: ["JU-874-KL"]
+        transporterTransportPlates: ["JU-874-KL"].map(transportPlateFilter)
       }
     ];
 
@@ -417,6 +425,24 @@ describe("StringNullableFilter to elastic query", () => {
   it("should match for _itemContains when one element contains the substring", async () => {
     const listFilter: BsdWhere = {
       transporter: { transport: { plates: { _itemContains: "AD" } } }
+    };
+
+    const result = await client.search({
+      index: index.alias,
+      body: {
+        query: toElasticQuery(listFilter)
+      }
+    });
+
+    const hits = result.body.hits.hits;
+
+    expect(hits).toHaveLength(1);
+    expect(hits[0]._source.id).toEqual("1");
+  });
+
+  it("should match plate without dash", async () => {
+    const listFilter: BsdWhere = {
+      transporter: { transport: { plates: { _has: "AD008TS" } } }
     };
 
     const result = await client.search({
