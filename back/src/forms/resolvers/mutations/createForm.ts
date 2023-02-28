@@ -16,14 +16,12 @@ import { checkIsFormContributor } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
 import { FormCompanies } from "../../types";
-import {
-  draftFormSchema,
-  validateGroupement,
-  validateIntermediariesInput
-} from "../../validation";
+import { draftFormSchema, validateGroupement } from "../../validation";
 import { UserInputError } from "apollo-server-core";
 import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
+import sirenify from "../../sirenify";
+import { validateIntermediariesInput } from "../../../common/validation";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -38,7 +36,7 @@ const createFormResolver = async (
     temporaryStorageDetail,
     intermediaries,
     ...formContent
-  } = createFormInput;
+  } = await sirenify(createFormInput, user);
 
   if (appendix2Forms && grouping) {
     throw new UserInputError(
@@ -132,9 +130,18 @@ const createFormResolver = async (
   }
 
   if (intermediaries) {
+    await validateIntermediariesInput(intermediaries);
     formCreateInput.intermediaries = {
       createMany: {
-        data: await validateIntermediariesInput(intermediaries),
+        data: intermediaries.map(i => ({
+          name: i.name!, // enforced through validation schema
+          siret: i.siret!, // enforced through validation schema
+          contact: i.contact!, // enforced through validation schema
+          address: i.address,
+          vatNumber: i.vatNumber,
+          phone: i.phone,
+          mail: i.mail
+        })),
         skipDuplicates: true
       }
     };

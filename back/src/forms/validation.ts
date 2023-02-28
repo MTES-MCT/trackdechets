@@ -25,7 +25,6 @@ import {
   countries as vatCountries,
   isClosedCompany,
   isForeignVat,
-  isFRVat,
   isOmi,
   isSiret,
   isVat
@@ -44,9 +43,7 @@ import {
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { searchCompany } from "../companies/search";
 import { AnonymousCompanyError } from "../companies/sirene/errors";
-import { validateCompany } from "../companies/validateCompany";
 import {
-  CompanyInput,
   CompanySearchResult,
   InitialFormFractionInput,
   PackagingInfo,
@@ -1281,73 +1278,6 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
       .test(vatNumberTests.isRegisteredTransporter)
       .validate(forwardedIn?.transporterCompanyVatNumber);
   }
-}
-
-/**
- * Constraints on CompanyInput that apply to intermediary company input
- * - SIRET is mandatory
- * - only french companies are allowed
- */
-export const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
-  siret: siret
-    .label("Intermédiaires")
-    .required("Intermédiaires: le N° SIRET est obligatoire"),
-  contact: yup
-    .string()
-    .required("Intermédiaires: les nom et prénom de contact sont obligatoires"),
-  vatNumber: yup
-    .string()
-    .notRequired()
-    .nullable()
-    .test(
-      "is-fr-vat",
-      "Intermédiaires: seul les numéros de TVA en France sont valides",
-      vat => !vat || (isVat(vat) && isFRVat(vat))
-    ),
-  address: yup.string().notRequired().nullable(),
-  name: yup.string().notRequired().nullable(),
-  phone: yup.string().notRequired().nullable(),
-  mail: yup.string().notRequired().nullable(),
-  country: yup.string().notRequired().nullable(), // is ignored in db schema
-  omiNumber: yup.string().notRequired().nullable(), // is ignored in db schema
-  orgId: yup.string().notRequired().nullable() // is ignored in db schema
-});
-
-/**
- * Validate Intermediary Input
- * - an intermediary company should be identified by a SIRET (french only) or VAT number
- * - address and name from SIRENE database takes precedence over user input data
- */
-export function validateIntermediariesInput(
-  companies: CompanyInput[]
-): Promise<Prisma.IntermediaryFormAssociationCreateManyFormInput[]> {
-  // check we do not add the same SIRET twice
-  const intermediarySirets = companies.map(c => c.siret || c.vatNumber);
-  const hasDuplicate = intermediarySirets.reduce((acc, curr, idx) => {
-    return acc || intermediarySirets.indexOf(curr) !== idx;
-  }, false);
-  if (hasDuplicate) {
-    throw new UserInputError(
-      "Intermédiaires: impossible d'ajouter le même établissement en intermédiaire plusieurs fois"
-    );
-  }
-
-  return Promise.all(
-    companies.map(async company => {
-      const validated = await validateCompany(
-        await intermediarySchema.validate(company)
-      );
-      return {
-        siret: validated.siret,
-        vatNumber: validated.vatNumber ?? "",
-        name: validated.name ?? "",
-        address: validated.address ?? "",
-        contact: company.contact ?? "",
-        phone: company.phone ?? "",
-        mail: company.mail ?? ""
-      };
-    })
-  );
 }
 
 const BSDD_MAX_APPENDIX2 = parseInt(process.env.BSDD_MAX_APPENDIX2, 10) || 250;

@@ -7,6 +7,11 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import * as sirenify from "../../../sirenify";
+
+const sirenifyMock = jest
+  .spyOn(sirenify, "default")
+  .mockImplementation(input => Promise.resolve(input));
 
 const CREATE_BSDA = `
 mutation CreateBsda($input: BsdaInput!) {
@@ -35,7 +40,10 @@ mutation CreateBsda($input: BsdaInput!) {
 `;
 
 describe("Mutation.Bsda.create", () => {
-  afterEach(resetDatabase);
+  afterEach(async () => {
+    await resetDatabase();
+    sirenifyMock.mockClear();
+  });
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
@@ -146,6 +154,8 @@ describe("Mutation.Bsda.create", () => {
     expect(data.createBsda.destination.company.siret).toBe(
       input.destination.company.siret
     );
+    // check input is sirenified
+    expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
 
   it("should allow creating a valid form with null sealNumbers field", async () => {
@@ -1096,7 +1106,7 @@ describe("Mutation.Bsda.create", () => {
     });
 
     expect(errors[0].message).toBe(
-      "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires sur un BSDA"
+      "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires"
     );
   });
 });

@@ -7,6 +7,7 @@ import { checkIsBsvhuContributor } from "../../permissions";
 import { validateBsvhu } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
 import { checkEditionRules } from "../../edition";
+import sirenify from "../../sirenify";
 
 export default async function edit(
   _,
@@ -22,7 +23,8 @@ export default async function edit(
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  const formUpdate = flattenVhuInput(input);
+  const sirenifiedInput = await sirenify(input, user);
+  const formUpdate = flattenVhuInput(sirenifiedInput);
 
   const resultingForm = { ...prismaForm, ...formUpdate };
   await checkIsBsvhuContributor(

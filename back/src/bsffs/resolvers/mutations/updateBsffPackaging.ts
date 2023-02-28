@@ -9,6 +9,7 @@ import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { UserInputError } from "apollo-server-core";
 import { getBsffPackagingRepository } from "../../repository";
 import { checkEditionRules } from "../../edition/bsffPackagingEdition";
+import { sirenifyBsffPackagingInput } from "../../sirenify";
 
 const updateBsffPackaging: MutationResolvers["updateBsffPackaging"] = async (
   _,
@@ -30,7 +31,8 @@ const updateBsffPackaging: MutationResolvers["updateBsffPackaging"] = async (
     );
   }
 
-  const flatInput = flattenBsffPackagingInput(input);
+  const sirenifiedInput = await sirenifyBsffPackagingInput(input, user);
+  const flatInput = flattenBsffPackagingInput(sirenifiedInput);
 
   await checkEditionRules(existingBsffPackaging, input);
 

@@ -13,6 +13,11 @@ import {
 } from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import * as sirenify from "../../../sirenify";
+
+const sirenifyMock = jest
+  .spyOn(sirenify, "sirenifyBsffPackagingInput")
+  .mockImplementation(input => Promise.resolve(input));
 
 const UPDATE_BSFF_PACKAGING = gql`
   mutation UpdateBsffPackaging($id: ID!, $input: UpdateBsffPackagingInput!) {
@@ -23,7 +28,10 @@ const UPDATE_BSFF_PACKAGING = gql`
 `;
 
 describe("Mutation.updateBsffPackaging", () => {
-  afterEach(resetDatabase);
+  afterEach(async () => {
+    await resetDatabase();
+    sirenifyMock.mockClear();
+  });
 
   test("before acceptation > it should be possible to update acceptation fields", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
@@ -60,6 +68,8 @@ describe("Mutation.updateBsffPackaging", () => {
     expect(updatedPackaging.acceptationStatus).toEqual(
       WasteAcceptationStatus.ACCEPTED
     );
+    // check input is sirenified
+    expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
 
   it("should throw error if the mutation is not called by the destination", async () => {

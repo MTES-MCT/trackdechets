@@ -13,6 +13,11 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { fullBsff } from "../../../fragments";
+import * as sirenify from "../../../sirenify";
+
+const sirenifyMock = jest
+  .spyOn(sirenify, "sirenifyBsffInput")
+  .mockImplementation(input => Promise.resolve(input));
 
 const CREATE_BSFF = gql`
   mutation CreateBsff($input: BsffInput!) {
@@ -76,7 +81,10 @@ const createInput = (emitter, transporter, destination) => ({
 });
 
 describe("Mutation.createBsff", () => {
-  afterEach(resetDatabase);
+  afterEach(async () => {
+    await resetDatabase();
+    sirenifyMock.mockClear();
+  });
 
   it("should allow user to create a bsff", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
@@ -101,6 +109,8 @@ describe("Mutation.createBsff", () => {
         weight: 1
       })
     ]);
+    // check input is sirenified
+    expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
 
   it("should disallow unauthenticated user from creating a bsff", async () => {

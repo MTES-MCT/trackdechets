@@ -47,6 +47,15 @@ const searchResponseToCompany = (
     etablissement.libelleCommuneEtablissement
   ]);
 
+  let companyName = etablissement.denominationUniteLegale;
+  if (etablissement.sigleUniteLegale?.length > 0) {
+    companyName = companyName.concat(` (${etablissement.sigleUniteLegale})`);
+  } else if (etablissement.enseigne1Etablissement?.length > 0) {
+    companyName = companyName.concat(
+      ` (${etablissement.enseigne1Etablissement})`
+    );
+  }
+
   const company: SireneSearchResult = {
     siret: etablissement.siret,
     etatAdministratif: etablissement.etatAdministratifEtablissement,
@@ -55,7 +64,7 @@ const searchResponseToCompany = (
     addressPostalCode: etablissement.codePostalEtablissement,
     addressCity: etablissement.libelleCommuneEtablissement,
     codeCommune: etablissement.codeCommuneEtablissement,
-    name: etablissement.denominationUniteLegale,
+    name: companyName,
     naf: etablissement.activitePrincipaleEtablissement,
     libelleNaf: etablissement.activitePrincipaleEtablissement
       ? libelleFromCodeNaf(etablissement.activitePrincipaleEtablissement)

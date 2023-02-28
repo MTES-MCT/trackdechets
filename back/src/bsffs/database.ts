@@ -38,6 +38,7 @@ import {
   getReadonlyBsffPackagingRepository,
   getReadonlyBsffRepository
 } from "./repository";
+import { sirenifyBsffInput } from "./sirenify";
 
 export async function getBsffOrNotFound(where: Prisma.BsffWhereUniqueInput) {
   const { findUnique } = getReadonlyBsffRepository();
@@ -132,10 +133,12 @@ export async function createBsff(
   input: BsffInput,
   additionalData: Partial<Bsff> = {}
 ) {
+  const sirenifiedInput = await sirenifyBsffInput(input, user);
+
   const flatInput: Prisma.BsffCreateInput = {
     id: getReadableId(ReadableIdPrefix.FF),
     isDraft: false,
-    ...flattenBsffInput(input),
+    ...flattenBsffInput(sirenifiedInput),
     ...additionalData
   };
 
