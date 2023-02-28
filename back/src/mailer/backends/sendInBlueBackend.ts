@@ -63,7 +63,7 @@ const sendInBlueBackend = {
 
         if (mail.messageVersions) {
           mail.messageVersions.forEach(messageVersion =>
-            messageVersion.to.forEach(to => allRecipients.push(to))
+            allRecipients.push(...messageVersion.to)
           );
         }
 
