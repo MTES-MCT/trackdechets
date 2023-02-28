@@ -6,18 +6,15 @@ import {
   createMembershipRequest,
   userFactory
 } from "../../__tests__/factories";
-import { getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest } from "../onboarding.helpers";
-
-const xDaysAgo = (x: number): Date => {
-  const date = new Date();
-  date.setDate(date.getDate() - x);
-  return date;
-};
+import {
+  getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest,
+  xDaysAgo
+} from "../onboarding.helpers";
 
 const TODAY = new Date();
-const TWO_DAYS_AGO = xDaysAgo(2);
-const THREE_DAYS_AGO = xDaysAgo(3);
-const FOUR_DAYS_AGO = xDaysAgo(4);
+const TWO_DAYS_AGO = xDaysAgo(TODAY, 2);
+const THREE_DAYS_AGO = xDaysAgo(TODAY, 3);
+const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
 
 describe("getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest", () => {
   afterEach(resetDatabase);
