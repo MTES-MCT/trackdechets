@@ -16,7 +16,7 @@ const SIB_SMTP_URL = `${SIB_BASE_URL}/smtp/email`;
 const SIB_CONTACT_URL = `${SIB_BASE_URL}/contacts`;
 
 // Really is 1000 but let's be cautious
-export const MESSAGE_VERSIONS_BULK_LIMIT = 2;
+export const MESSAGE_VERSIONS_BULK_LIMIT = 950;
 
 const headers = {
   "api-key": SIB_APIKEY,
