@@ -1,4 +1,6 @@
-import sendInBlueBackend from "../backends/sendInBlueBackend";
+import sendInBlueBackend, {
+  MESSAGE_VERSIONS_BULK_LIMIT
+} from "../backends/sendInBlueBackend";
 import axios from "axios";
 
 const mockedAxiosPost = jest.spyOn(axios, "post");
@@ -107,5 +109,76 @@ describe("sendInBlue backend", () => {
     expect(payload.messageVersions[1].to[0].email).toEqual("email2@mail.com");
     expect(payload.messageVersions[1].htmlContent).toEqual("htmlContent2");
     expect(payload.messageVersions[1].subject).toEqual("subject2");
+  });
+
+  it("should split the mail into chunks if messageVersions is too big", async () => {
+    (mockedAxiosPost as jest.Mock<any>).mockImplementation(() =>
+      Promise.resolve({
+        data: { result: "ok" }
+      })
+    );
+
+    const oversizedBatchMail = {
+      ...batchMail,
+      messageVersions: Array.from(
+        Array(MESSAGE_VERSIONS_BULK_LIMIT + 10).keys()
+      ).map(i => ({
+        to: [{ name: `user${i}`, email: `user${i}@mail.com` }],
+        htmlContent: `htmlContent${i}`,
+        subject: `subject${i}`
+      }))
+    };
+
+    sendInBlueBackend.sendMail(oversizedBatchMail);
+
+    // 2 batches should be sent, so axios should be called twice
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(2);
+
+    const args: any = mockedAxiosPost.mock.calls;
+
+    // right service was called
+
+    expect(args[0][0]).toEqual("http://mailservice/smtp/email");
+    expect(args[1][0]).toEqual("http://mailservice/smtp/email");
+
+    const payload0 = args[0][1];
+
+    // regular stuff
+    expect(payload0.templateId).toEqual(33);
+    expect(payload0.params.body).toEqual("<p>Donéc non massa pretïum</p>");
+    expect(payload0.attachment).toEqual([
+      {
+        content: "base64abc",
+        name: "file.pdf"
+      }
+    ]);
+
+    // message versions stuff
+    expect(payload0.messageVersions.length).toEqual(
+      MESSAGE_VERSIONS_BULK_LIMIT
+    );
+    expect(payload0.messageVersions[0].to[0].name).toEqual("user0");
+    expect(payload0.messageVersions[0].to[0].email).toEqual("user0@mail.com");
+    expect(payload0.messageVersions[0].htmlContent).toEqual("htmlContent0");
+    expect(payload0.messageVersions[0].subject).toEqual("subject0");
+
+    const payload1 = args[1][1];
+
+    // regular stuff
+    expect(payload1.messageVersions.length).toEqual(10);
+    expect(payload1.templateId).toEqual(33);
+    expect(payload1.params.body).toEqual("<p>Donéc non massa pretïum</p>");
+    expect(payload1.attachment).toEqual([
+      {
+        content: "base64abc",
+        name: "file.pdf"
+      }
+    ]);
+
+    // message versions stuff
+    expect(payload1.messageVersions[0].to[0].name).toEqual("user950");
+    expect(payload1.messageVersions[0].to[0].email).toEqual("user950@mail.com");
+    expect(payload1.messageVersions[0].htmlContent).toEqual("htmlContent950");
+    expect(payload1.messageVersions[0].subject).toEqual("subject950");
   });
 });
