@@ -3,7 +3,7 @@ import React, { InputHTMLAttributes } from "react";
 import Tooltip from "common/components/Tooltip";
 import { CompanyType } from "../generated/graphql/types";
 
-export const COMPANY_TYPES = [
+export const COMPANY_CONSTANTS = [
   {
     value: CompanyType.Producer,
     label:
@@ -80,7 +80,7 @@ export default function CompanyTypeField({
       name={name}
       render={arrayHelpers => (
         <fieldset className={name + "-fieldset"}>
-          {COMPANY_TYPES.map((companyType, idx) => (
+          {COMPANY_CONSTANTS.map((companyType, idx) => (
             <div key={idx}>
               <label
                 className="tw-flex tw-items-center"

@@ -31,3 +31,21 @@ const frMonth = [
 export const toFrFormat = (date: Date): string => {
   return `${date.getDate()} ${frMonth[date.getMonth()]} ${date.getFullYear()}`;
 };
+
+/**
+ * Will split an array into smaller arrays of max size maxChunkSize
+ */
+export const splitArrayIntoChunks = (arr: any[], maxChunkSize: number) => {
+  if (!arr.length) {
+    return [[]];
+  }
+
+  const result = [];
+
+  for (let i = 0; i < arr.length; i += maxChunkSize) {
+    const chunk = arr.slice(i, i + maxChunkSize);
+    result.push(chunk);
+  }
+
+  return result;
+};

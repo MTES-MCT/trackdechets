@@ -320,8 +320,9 @@ describe("Mutation.updateBsff", () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
-    const bsff = await createBsffAfterEmission({ emitter });
-    const { mutate } = makeClient(emitter.user);
+
+    const bsff = await createBsffAfterEmission({ emitter, destination });
+    const { mutate } = makeClient(destination.user);
     const { errors } = await mutate<
       Pick<Mutation, "updateBsff">,
       MutationUpdateBsffArgs
@@ -385,7 +386,7 @@ describe("Mutation.updateBsff", () => {
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés :" +
           " emitterCompanyName, emitterCompanyAddress, emitterCompanyContact, emitterCompanyPhone," +
-          " emitterCompanyMail, destinationCompanyName, destinationCompanySiret," +
+          " emitterCompanyMail, destinationCompanyName," +
           " destinationCompanyAddress, destinationCompanyContact, destinationCompanyPhone," +
           " destinationCompanyMail, wasteCode, wasteDescription, wasteAdr, weightValue"
       })
@@ -873,6 +874,50 @@ describe("Mutation.updateBsff", () => {
 
     expect(errors).toBeUndefined();
     expect(data.updateBsff.id).toBeTruthy();
+  });
+
+  it("should update a BSFF of type RECONDITIONNEMENT", async () => {
+    const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+    const repackagingBsff = await createBsffAfterOperation(
+      {
+        emitter: await userWithCompanyFactory(UserRole.ADMIN),
+        transporter: await userWithCompanyFactory(UserRole.ADMIN),
+        destination: ttr
+      },
+      {
+        status: BsffStatus.INTERMEDIATELY_PROCESSED
+      },
+      { operationCode: OPERATION.D14.code }
+    );
+    const bsff = await createBsffBeforeEmission(
+      { emitter: ttr, previousPackagings: repackagingBsff.packagings },
+      {
+        type: BsffType.RECONDITIONNEMENT,
+        isDraft: true
+      }
+    );
+
+    const { mutate } = makeClient(ttr.user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "updateBsff">,
+      MutationUpdateBsffArgs
+    >(UPDATE_BSFF, {
+      variables: {
+        id: bsff.id,
+        input: {
+          destination: {
+            cap: "nouveau cap"
+          },
+          packagings: [
+            { numero: "citerne-1", type: "CITERNE", volume: 1, weight: 1 }
+          ],
+          repackaging: repackagingBsff.packagings.map(p => p.id)
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
+    expect(data.updateBsff.destination?.cap).toEqual("nouveau cap");
   });
 
   it("should be possible to update a bsff's fiches d'intervention", async () => {

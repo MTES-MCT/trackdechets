@@ -1,4 +1,10 @@
-import { User, Bsff, BsffFicheIntervention, Prisma } from "@prisma/client";
+import {
+  User,
+  Bsff,
+  BsffFicheIntervention,
+  Prisma,
+  BsffStatus
+} from "@prisma/client";
 import { ForbiddenError } from "apollo-server-express";
 import { getCachedUserSiretOrVat } from "../common/redis/users";
 
@@ -85,6 +91,22 @@ export async function checkCanWriteBsff(
   }
 
   return isContributor;
+}
+
+export async function checkCanDelete(user: User, bsff: Bsff) {
+  await checkCanWriteBsff(user, bsff);
+
+  const isUserOnlySignatory = async () =>
+    bsff.status === BsffStatus.SIGNED_BY_EMITTER &&
+    (await getCachedUserSiretOrVat(user.id)).includes(bsff.emitterCompanySiret);
+
+  if (bsff.status === BsffStatus.INITIAL || (await isUserOnlySignatory())) {
+    return true;
+  }
+
+  throw new ForbiddenError(
+    `Il n'est pas possible de supprimer un bordereau qui a été signé par un des acteurs`
+  );
 }
 
 export async function checkCanReadBsff(user: User, bsff: Bsff) {

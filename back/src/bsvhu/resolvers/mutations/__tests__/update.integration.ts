@@ -150,16 +150,19 @@ describe("Mutation.Vhu.update", () => {
   });
 
   it("should disallow emitter fields update after emitter signature", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const emitter = await companyFactory();
+    const destination = await userWithCompanyFactory("MEMBER");
     const form = await bsvhuFactory({
       opt: {
-        emitterCompanySiret: company.siret,
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: emitter.siret,
+        destinationCompanySiret: destination.company.siret,
         emitterEmissionSignatureAuthor: "The Signatory",
         emitterEmissionSignatureDate: new Date()
       }
     });
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(destination.user);
     const input = {
       emitter: {
         agrementNumber: "new agrement"
@@ -175,7 +178,7 @@ describe("Mutation.Vhu.update", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: emitter.agrementNumber",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : emitterAgrementNumber",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })

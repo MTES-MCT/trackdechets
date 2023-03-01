@@ -16,7 +16,7 @@ const useOnClickOutsideRefTarget = ({ onClickOutside }) => {
     return () => {
       document.removeEventListener("mousedown", clickEvent!);
     };
-  }, []);
+  }, [onClickOutside]);
   return { targetRef };
 };
 

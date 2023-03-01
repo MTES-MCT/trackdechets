@@ -18,14 +18,18 @@
     padding: 0 15px;
 
     p {
-      margin: 2px;
-      padding: 2px;
       font-size: 0.75rem; //12px
     }
+
     @include desktop {
       flex-direction: row;
       align-items: center;
       border-bottom: 1px solid #dddddd;
+
+      p {
+        margin: 2px;
+        padding: 2px;
+      }
     }
 
     .bsd-number {
@@ -48,7 +52,6 @@
   &__content {
     display: flex;
     flex-direction: column;
-    position: relative;
     padding: 5px 15px;
 
     @include desktop {
@@ -56,35 +59,58 @@
       align-items: center;
     }
 
-    &__badge {
-      @include desktop {
-        width: 40%;
+    &__infos {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+
+      &__status {
+        margin: 5px 0;
       }
-    }
-    &__waste {
-      margin-top: 15px;
+
       @include desktop {
-        margin: 0;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: wrap;
+
+        &__status {
+          margin: 0;
+          width: 285px;
+        }
       }
-    }
-    &__actors {
-      margin: 15px 0;
-      @include desktop {
-        margin: 0;
+
+      &__other {
+        display: flex;
+        flex-direction: column;
+
+        .waste-details,
+        .actors {
+          margin: 5px 0;
+        }
+
+        @include desktop {
+          flex-direction: row;
+
+          .waste-details {
+            width: 170px;
+            margin: 0 16px;
+          }
+
+          .actors {
+            width: 230px;
+            margin: 0 50px 0 20px;
+          }
+        }
       }
     }
 
     &__cta {
       display: flex;
       justify-content: flex-end;
-      width: 100%;
+      align-items: center;
 
-      button {
+      .fr-btn {
         margin: 0 2px;
-      }
-
-      @include desktop {
-        width: 50%;
       }
     }
   }

@@ -52,10 +52,7 @@ const getValidationSchema = (today: Date) =>
       .string()
       .ensure()
       .required("La description de l'opération réalisée est obligatoire"),
-    date: yup
-      .date()
-      .required("La date de l'opération est requise")
-      .max(today, "La date de l'opération ne peut être dans le futur"),
+    date: yup.date().required("La date de l'opération est requise"),
     author: yup
       .string()
       .ensure()
@@ -308,14 +305,16 @@ export function SignBsffOperationOnePackagingModalContent({
         {({ values, setValues }) => (
           <Form>
             <div className="form__row">
-              <label>
+              <label className="tw-font-semibold">
                 Date du traitement
-                <Field
-                  className="td-input"
-                  name="date"
-                  component={DateInput}
-                  maxDate={TODAY}
-                />
+                <div className="td-date-wrapper">
+                  <Field
+                    className="td-input"
+                    name="date"
+                    component={DateInput}
+                    maxDate={TODAY}
+                  />
+                </div>
               </label>
               <RedErrorMessage name="date" />
             </div>

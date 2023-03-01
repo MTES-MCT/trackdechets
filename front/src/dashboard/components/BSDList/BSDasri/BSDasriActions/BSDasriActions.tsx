@@ -41,6 +41,12 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
 
+  const status = form["bsdasriStatus"];
+  const emitterSiret = form.emitter?.company?.siret;
+  const canDelete =
+    status === BsdasriStatus.Initial ||
+    (status === BsdasriStatus.SignedByProducer && siret === emitterSiret);
+
   return (
     <>
       <Menu>
@@ -59,12 +65,15 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
                 <IconChevronDown size="14px" color="blueLight" />
               )}
             </MenuButton>
+
             <MenuList
               className={classNames(
                 "fr-raw-link fr-raw-list",
                 styles.BSDDActionsMenu
               )}
             >
+              <TableRoadControlButton siret={siret} form={form} />
+
               <MenuLink
                 as={Link}
                 to={{
@@ -79,22 +88,22 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
                 Aperçu
               </MenuLink>
 
-              <TableRoadControlButton siret={siret} form={form} />
-
-              {form["bsdasriStatus"] === BsdasriStatus.Initial && (
-                <MenuItem onSelect={() => setIsDeleting(true)}>
-                  <IconTrash color="blueLight" size="24px" />
-                  Supprimer
-                </MenuItem>
-              )}
               {!form.isDraft && (
                 <MenuItem onSelect={() => downloadPdf()}>
                   <IconPdf size="24px" color="blueLight" />
                   Pdf
                 </MenuItem>
               )}
+
+              {form.type === BsdasriType.Simple && (
+                <MenuItem onSelect={() => duplicateBsdasri()}>
+                  <IconDuplicateFile size="24px" color="blueLight" />
+                  Dupliquer
+                </MenuItem>
+              )}
+
               {![BsdasriStatus.Processed, BsdasriStatus.Refused].includes(
-                form["bsdasriStatus"]
+                status
               ) && (
                 <>
                   <MenuLink
@@ -109,10 +118,11 @@ export const BSDAsriActions = ({ form }: BSDAsriActionsProps) => {
                   </MenuLink>
                 </>
               )}
-              {form.type === BsdasriType.Simple && (
-                <MenuItem onSelect={() => duplicateBsdasri()}>
-                  <IconDuplicateFile size="24px" color="blueLight" />
-                  Dupliquer
+
+              {canDelete && (
+                <MenuItem onSelect={() => setIsDeleting(true)}>
+                  <IconTrash color="blueLight" size="24px" />
+                  Supprimer
                 </MenuItem>
               )}
             </MenuList>

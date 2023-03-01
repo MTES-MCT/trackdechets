@@ -2,6 +2,13 @@ $shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
 
 .bsd-actions-kebab-menu {
   position: relative;
+
+  &__button.fr-btn {
+    width: 32px !important;
+    min-height: 32px !important;
+    height: 32px !important;
+  }
+
   &__button {
     position: relative;
     display: inline-block;
@@ -36,9 +43,8 @@ $shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
       width: 100%;
 
       .fr-btn {
-        width: 133px;
+        width: max-content;
         height: 56px;
-        justify-content: end;
         margin: 0;
         padding: 16px;
         color: #000000;

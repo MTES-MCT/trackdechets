@@ -148,7 +148,7 @@ export function BsffDetailContent({ form: bsff }: Props) {
             </Tab>
             <Tab className={styles.detailTab}>
               <IconBSFF />
-              <span className={styles.detailTabCaption}>Contenants</span>
+              <span className={styles.detailTabCaption}>Contenant(s)</span>
             </Tab>
           </TabList>
           {/* Tabs content */}

@@ -31,6 +31,7 @@ export default function GenericEmitter({ status, stepName, disabled = false }) {
   if (isSynthesizing) {
     return SynthesisEmitter({ status, stepName, editionDisabled: disabled });
   }
+
   return Emitter({ status, stepName, disabled });
 }
 
@@ -97,13 +98,6 @@ export function SynthesisEmitter({
   );
 }
 export function Emitter({ status, stepName, disabled = false }) {
-  const editionDisabled =
-    disabled ||
-    [
-      BsdasriStatus.SignedByProducer,
-      BsdasriStatus.Sent,
-      BsdasriStatus.Received,
-    ].includes(status);
   const { values } = useFormikContext<Bsdasri>();
   const isRegrouping = values.type === BsdasriType.Grouping;
 
@@ -111,6 +105,16 @@ export function Emitter({ status, stepName, disabled = false }) {
 
   const { siret } = useParams<{ siret: string }>();
   const isUserCurrentEmitter = values?.emitter?.company?.siret === siret;
+
+  const editionAllowed =
+    !disabled &&
+    (status === BsdasriStatus.Initial ||
+      // status is not set yet when a new bsdasri is created
+      !status ||
+      // emitter can still update any field after his own signature
+      (status === BsdasriStatus.SignedByProducer && isUserCurrentEmitter));
+  const editionDisabled = !editionAllowed;
+
   return (
     <>
       {emissionEmphasis && <FillFieldsInfo />}

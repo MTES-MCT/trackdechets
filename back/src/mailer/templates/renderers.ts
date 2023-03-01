@@ -2,7 +2,13 @@ import fs from "fs";
 import path from "path";
 import mustache from "mustache";
 import { getUIBaseURL, getAPIBaseURL } from "../../utils";
-import { Attachment, Mail, MailTemplate, Recipient } from "../types";
+import {
+  Attachment,
+  Mail,
+  MailTemplate,
+  MessageVersion,
+  Recipient
+} from "../types";
 
 const TEMPLATE_DIR = `${__dirname}/mustache`;
 
@@ -27,12 +33,15 @@ export function mustacheRenderer(filename: string) {
   return render;
 }
 
-type MailRendererInput<V> = {
-  to: Recipient[];
+export type MailRendererInput<V> = {
   cc?: Recipient[];
   attachment?: Attachment;
   variables?: V;
-};
+} & (
+  | // 'to' or 'messageVersions' are mandatory (one or the other)
+  { messageVersions: MessageVersion[]; to?: never }
+  | { to: Recipient[]; messageVersions?: never }
+);
 
 // These variables will be made available to all templates
 const context = { UI_URL: getUIBaseURL(), API_URL: getAPIBaseURL() };

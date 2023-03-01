@@ -45,7 +45,7 @@ function matchesFavoriteType(
   const NEXT_DESTINATION = RECIPIENT;
   const TEMPORARY_STORAGE_DETAIL = RECIPIENT;
 
-  const COMPANY_TYPES: Record<FavoriteType, CompanyType[]> = {
+  const COMPANY_CONSTANTS: Record<FavoriteType, CompanyType[]> = {
     EMITTER,
     TRANSPORTER,
     TRADER,
@@ -57,7 +57,7 @@ function matchesFavoriteType(
     WORKER
   };
 
-  return COMPANY_TYPES[favoriteType].some(matchingCompanyType =>
+  return COMPANY_CONSTANTS[favoriteType].some(matchingCompanyType =>
     company.companyTypes.includes(matchingCompanyType)
   );
 }
