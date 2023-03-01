@@ -2,6 +2,7 @@ import { Mail, Contact } from "../types";
 import axios from "axios";
 import * as Sentry from "@sentry/node";
 import logger from "../../logging/logger";
+import { splitArrayIntoChunks } from "../helpers";
 
 const {
   SIB_APIKEY,
@@ -14,6 +15,9 @@ const {
 const SIB_SMTP_URL = `${SIB_BASE_URL}/smtp/email`;
 const SIB_CONTACT_URL = `${SIB_BASE_URL}/contacts`;
 
+// Really is 1000 but let's be cautious
+export const MESSAGE_VERSIONS_BULK_LIMIT = 950;
+
 const headers = {
   "api-key": SIB_APIKEY,
   "Content-Type": "application/json"
@@ -22,11 +26,29 @@ const sendInBlueBackend = {
   backendName: "SendInBlue",
 
   sendMail: function (mail: Mail) {
+    // Careful: SIB has a chunk limit for messageVersions
+    if (
+      mail.messageVersions &&
+      mail.messageVersions.length > MESSAGE_VERSIONS_BULK_LIMIT
+    ) {
+      const messageVersionsChunks = splitArrayIntoChunks(
+        mail.messageVersions,
+        MESSAGE_VERSIONS_BULK_LIMIT
+      );
+
+      return Promise.all(
+        messageVersionsChunks.map(chunk =>
+          this.sendMail({ ...mail, messageVersions: [...chunk] })
+        )
+      );
+    }
+
     const params = { body: mail.body ?? "" };
 
     const payload = {
       subject: mail.subject,
       to: mail.to,
+      messageVersions: mail.messageVersions,
       sender: {
         email: SENDER_EMAIL_ADDRESS,
         name: SENDER_NAME
@@ -50,7 +72,22 @@ const sendInBlueBackend = {
     });
     return req
       .then(() => {
-        const allRecipients = [...mail.to, ...(!!mail.cc ? mail.cc : [])];
+        const allRecipients = [];
+
+        if (mail.to) {
+          allRecipients.push(...mail.to);
+        }
+
+        if (mail.cc) {
+          allRecipients.push(...mail.cc);
+        }
+
+        if (mail.messageVersions) {
+          mail.messageVersions.forEach(messageVersion =>
+            allRecipients.push(...messageVersion.to)
+          );
+        }
+
         for (const recipient of allRecipients) {
           logger.info(
             `Mail sent via SIB to ${recipient.email} - Subject: ${mail.subject}`

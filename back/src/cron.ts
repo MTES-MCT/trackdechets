@@ -2,6 +2,7 @@ import * as cron from "cron";
 import cronValidator from "cron-validate";
 import {
   sendFirstOnboardingEmail,
+  sendMembershipRequestDetailsEmail,
   sendSecondOnboardingEmail
 } from "./commands/onboarding.helpers";
 import { initSentry } from "./common/sentry";
@@ -46,6 +47,14 @@ if (CRON_ONBOARDING_SCHEDULE) {
       cronTime: CRON_ONBOARDING_SCHEDULE,
       onTick: async () => {
         await sendSecondOnboardingEmail();
+      },
+      timeZone: "Europe/Paris"
+    }),
+    // new users with no company membership request
+    new cron.CronJob({
+      cronTime: CRON_ONBOARDING_SCHEDULE,
+      onTick: async () => {
+        await sendMembershipRequestDetailsEmail();
       },
       timeZone: "Europe/Paris"
     })

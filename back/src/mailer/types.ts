@@ -6,17 +6,25 @@ export type Recipient = {
   name: string;
   email: string;
 };
+export type MessageVersion = {
+  to: Recipient[];
+  htmlContent?: string;
+  subject?: string;
+};
 
 // Rendered email that can be passed to the mail backend
 export type Mail = {
-  to: Recipient[];
   cc?: Recipient[];
   subject: string;
   body: string;
   attachment?: Attachment;
   templateId: number;
   vars?: { [id: string]: any };
-};
+} & (
+  | // 'to' or 'messageVersions' are mandatory (one or the other)
+  { messageVersions: MessageVersion[]; to?: never }
+  | { to: Recipient[]; messageVersions?: never }
+);
 
 export type Contact = {
   email: string;
