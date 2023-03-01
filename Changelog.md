@@ -17,6 +17,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Il est maintenant impossible d'annuler un BSDD qui a été réceptionné par le destinataire (ou à un statut ultérieur) [PR 2136](https://github.com/MTES-MCT/trackdechets/pull/2136) 
+
 #### :memo: Documentation
 
 #### :house: Interne
