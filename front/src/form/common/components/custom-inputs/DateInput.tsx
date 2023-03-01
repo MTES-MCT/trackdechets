@@ -1,5 +1,5 @@
 import { parseDate } from "common/datetime";
-import { format } from "date-fns";
+import { format, isValid } from "date-fns";
 import fr from "date-fns/locale/fr";
 import { FieldProps } from "formik";
 import React from "react";
@@ -23,13 +23,19 @@ export default function DateInput({
 } & ReactDatePickerProps) {
   const { value, ...rest } = field;
 
+  const setSelectedDate = () => {
+    const parsedDate = value ? parseDate(value) : null;
+    if (isValid(parsedDate)) {
+      return parsedDate;
+    }
+  };
   return (
     <DatePicker
       {...rest}
       {...props}
       dateFormat="dd/MM/yyyy"
       autoComplete="off"
-      selected={value ? parseDate(value) : null}
+      selected={setSelectedDate()}
       onChange={(value: Date | null) => {
         setFieldValue(field.name, value ? format(value, "yyyy-MM-dd") : null);
       }}
