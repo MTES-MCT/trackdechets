@@ -21,35 +21,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
-# [2023.2.1] 21/02/2023
-
-#### :rocket: Nouvelles fonctionnalités
-
-- Ajout du code de traitement R5 sur le BSFF [PR 2100](https://github.com/MTES-MCT/trackdechets/pull/2100)
-
-#### :bug: Corrections de bugs
-
-- Message d'erreur lorsqu'on modifie un BSFF de reconditionnement en brouillon [PR 2155](https://github.com/MTES-MCT/trackdechets/pull/2155)
-
-#### :boom: Breaking changes
-
-#### :nail_care: Améliorations
-
-- Ajout de champs au scope company sur le token openId connect [PR 2080](https://github.com/MTES-MCT/trackdechets/pull/2080)
-- Limite la longueur des paramètres de la query getBsds [PR 2135](https://github.com/MTES-MCT/trackdechets/pull/2135)
-- ETQ installation de transit BSFF, je ne peux regrouper que des contenants ayant le même code déchet [PR 2124](https://github.com/MTES-MCT/trackdechets/pull/2124)
-- ETQ émetteur d'un bordereau je peux le supprimer ou le modifier tant que je suis le seul à avoir signé [PR 2103](https://github.com/MTES-MCT/trackdechets/pull/2103)
-- Ajout d'un message d'info sur le poids cumulé des fiches d'intervention [PR 2101](https://github.com/MTES-MCT/trackdechets/pull/2101)
-
-#### :memo: Documentation
-
-- Ajoute les statuts Bsda à la documentation technique [PR 2129](https://github.com/MTES-MCT/trackdechets/pull/2129)
-
-#### :house: Interne
-
-- Dénormalisation du bsdasri [PR 2090](https://github.com/MTES-MCT/trackdechets/pull/2090)
-- Dénormalisation du bsda [PR 2118](https://github.com/MTES-MCT/trackdechets/pull/2118)
-
 # [2023.1.4] 31/01/2023
 
 #### :rocket: Nouvelles fonctionnalités
