@@ -8,6 +8,7 @@ import {
   MutationDeleteBsdasriArgs
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
+
 const DELETE_DASRI = `
 mutation DeleteDasri($id: ID!){
   deleteBsdasri(id: $id)  {
@@ -81,6 +82,8 @@ describe("Mutation.deleteBsdasri", () => {
     const dasri = await bsdasriFactory({
       opt: {
         ...initialData(company),
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date(),
         status: "SENT"
       }
     });
@@ -103,6 +106,66 @@ describe("Mutation.deleteBsdasri", () => {
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
+      })
+    ]);
+  });
+
+  it("should allow emitter to delete a bsdasri with only his signature", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        emitterEmissionSignatureDate: new Date(),
+        status: "SIGNED_BY_PRODUCER"
+      }
+    });
+    const { mutate } = makeClient(user);
+
+    const { errors } = await mutate<
+      Pick<Mutation, "deleteBsdasri">,
+      MutationDeleteBsdasriArgs
+    >(DELETE_DASRI, {
+      variables: {
+        id: bsdasri.id
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const deletedBsdasri = await prisma.bsdasri.findUnique({
+      where: { id: bsdasri.id }
+    });
+
+    expect(deletedBsdasri.isDeleted).toBe(true);
+  });
+
+  it("should disallow emitter to delete a bsdasri with transporteur signature", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const bsdasri = await bsdasriFactory({
+      opt: {
+        ...initialData(company),
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date(),
+        status: "SENT"
+      }
+    });
+    const { mutate } = makeClient(user);
+
+    const { errors } = await mutate<
+      Pick<Mutation, "deleteBsdasri">,
+      MutationDeleteBsdasriArgs
+    >(DELETE_DASRI, {
+      variables: {
+        id: bsdasri.id
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés"
       })
     ]);
   });

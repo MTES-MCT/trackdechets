@@ -32,7 +32,7 @@ const UPDATE_WORKER_CERTIFICATION = gql`
   }
 `;
 
-const CREATE_WORKER_CERTIFICATION = gql`
+export const CREATE_WORKER_CERTIFICATION = gql`
   mutation CreateWorkerCertification($input: CreateWorkerCertificationInput!) {
     createWorkerCertification(input: $input) {
       id
@@ -45,7 +45,7 @@ const CREATE_WORKER_CERTIFICATION = gql`
   }
 `;
 
-const UPDATE_COMPANY_WORKER_CERTIFICATION = gql`
+export const UPDATE_COMPANY_WORKER_CERTIFICATION = gql`
   mutation UpdateCompany($id: String!, $workerCertificationId: String!) {
     updateCompany(id: $id, workerCertificationId: $workerCertificationId) {
       id

@@ -49,7 +49,7 @@ const invitationRequestResolver: QueryResolvers["membershipRequest"] = async (
   const isRequester = user.email === email;
 
   if (!isRequester) {
-    const admins = await getCompanyAdminUsers(company.siret);
+    const admins = await getCompanyAdminUsers(company.orgId);
     if (!admins.map(u => u.id).includes(user.id)) {
       // user is neither requester nor admin of the company, throw error
       throw new ForbiddenError(
@@ -63,7 +63,7 @@ const invitationRequestResolver: QueryResolvers["membershipRequest"] = async (
     sentTo: invitationRequest.sentTo,
     status: invitationRequest.status,
     email,
-    siret: company.siret,
+    siret: company.orgId,
     name: company.name
   };
 };

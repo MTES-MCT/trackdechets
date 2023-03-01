@@ -103,16 +103,16 @@ export function Worker({ disabled }) {
           />
 
           <h4 className="form__section-heading">
-            Certification déclarée dans le profil entreprise
+            Catégorie entreprise de travaux déclarée dans le profil entreprise
           </h4>
 
           <div className="form__row">
             {!values?.worker?.certification?.hasSubSectionFour &&
               !values?.worker?.certification?.hasSubSectionThree && (
                 <p>
-                  Absence de certification déclarée dans le profil. Il
-                  appartient à l'entreprise de travaux de le mettre à jour le
-                  cas échéant
+                  L'entreprise de travaux amiante n'a pas complété ces
+                  informations dans son profil. Nous ne pouvons pas afficher la
+                  catégorie de travaux SS3 ou SS4 de l'entreprise.
                 </p>
               )}
           </div>

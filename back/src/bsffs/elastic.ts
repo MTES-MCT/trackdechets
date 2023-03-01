@@ -65,13 +65,13 @@ export function toBsdElastic(
       bsff.destinationCompanySiret
     );
   } else {
-    bsd.isFollowFor.push(...bsff.detenteurCompanySirets);
     switch (bsff.status) {
       case BsffStatus.INITIAL: {
         bsd.isForActionFor.push(bsff.emitterCompanySiret);
         bsd.isFollowFor.push(
           getTransporterCompanyOrgId(bsff),
-          bsff.destinationCompanySiret
+          bsff.destinationCompanySiret,
+          ...bsff.detenteurCompanySirets
         );
         break;
       }
@@ -79,13 +79,17 @@ export function toBsdElastic(
         bsd.isToCollectFor.push(getTransporterCompanyOrgId(bsff));
         bsd.isFollowFor.push(
           bsff.emitterCompanySiret,
-          bsff.destinationCompanySiret
+          bsff.destinationCompanySiret,
+          ...bsff.detenteurCompanySirets
         );
         break;
       }
       case BsffStatus.SENT: {
         bsd.isCollectedFor.push(getTransporterCompanyOrgId(bsff));
-        bsd.isFollowFor.push(bsff.emitterCompanySiret);
+        bsd.isFollowFor.push(
+          bsff.emitterCompanySiret,
+          ...bsff.detenteurCompanySirets
+        );
         bsd.isForActionFor.push(bsff.destinationCompanySiret);
         break;
       }
@@ -94,7 +98,8 @@ export function toBsdElastic(
       case BsffStatus.ACCEPTED: {
         bsd.isFollowFor.push(
           bsff.emitterCompanySiret,
-          getTransporterCompanyOrgId(bsff)
+          getTransporterCompanyOrgId(bsff),
+          ...bsff.detenteurCompanySirets
         );
         bsd.isForActionFor.push(bsff.destinationCompanySiret);
         break;
@@ -103,7 +108,8 @@ export function toBsdElastic(
         bsd.isFollowFor.push(
           bsff.emitterCompanySiret,
           getTransporterCompanyOrgId(bsff),
-          bsff.destinationCompanySiret
+          bsff.destinationCompanySiret,
+          ...bsff.detenteurCompanySirets
         );
         break;
       }
@@ -112,7 +118,8 @@ export function toBsdElastic(
         bsd.isArchivedFor.push(
           bsff.emitterCompanySiret,
           getTransporterCompanyOrgId(bsff),
-          bsff.destinationCompanySiret
+          bsff.destinationCompanySiret,
+          ...bsff.detenteurCompanySirets
         );
         break;
       }

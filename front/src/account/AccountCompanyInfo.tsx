@@ -15,7 +15,7 @@ import AccountFieldCompanyVerificationStatus from "./fields/AccountFieldCompanyV
 import AccountFieldCompanyVhuAgrementBroyeur from "./fields/AccountFieldCompanyVhuAgrementBroyeur";
 import AccountFieldCompanyVhuAgrementDemolisseur from "./fields/AccountFieldCompanyVhuAgrementDemolisseur";
 import AccountFieldCompanyWorkerCertification from "./fields/AccountFieldCompanyWorkerCertification";
-import * as COMPANY_TYPES from "generated/constants/COMPANY_TYPES";
+import * as COMPANY_CONSTANTS from "generated/constants/COMPANY_CONSTANTS";
 import { isSiret, isVat } from "generated/constants/companySearchHelpers";
 
 type Props = { company: CompanyPrivate };
@@ -63,7 +63,7 @@ const { VITE_VERIFY_COMPANY } = import.meta.env;
 
 export default function AccountCompanyInfo({ company }: Props) {
   const isWasteProfessional = company.companyTypes.some(ct =>
-    COMPANY_TYPES.PROFESSIONALS.includes(ct)
+    COMPANY_CONSTANTS.PROFESSIONALS.includes(ct)
   );
 
   return (

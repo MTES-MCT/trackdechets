@@ -1,7 +1,7 @@
 import React from "react";
 import { CompanySearchResult } from "generated/graphql/types";
 import routes from "common/routes";
-import { COMPANY_TYPES } from "login/CompanyType";
+import { COMPANY_CONSTANTS } from "login/CompanyType";
 
 type Props = Pick<
   CompanySearchResult,
@@ -25,7 +25,7 @@ export default function CompanyRegistration(props: Props) {
             <ul className="tw-list-disc tw-list-inside">
               {props.companyTypes?.map((companyType, idx) => (
                 <li key={idx}>
-                  {COMPANY_TYPES.find(t => t.value === companyType)?.label}
+                  {COMPANY_CONSTANTS.find(t => t.value === companyType)?.label}
                 </li>
               ))}
             </ul>

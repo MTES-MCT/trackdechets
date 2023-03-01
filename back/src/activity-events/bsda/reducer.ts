@@ -7,8 +7,14 @@ export function bsdaReducer(
 ): Partial<Bsda> {
   switch (event.type) {
     case "BsdaCreated": {
-      const { updatedAt, createdAt, grouping, wasteSealNumbers, ...bsda } =
-        event.data;
+      const {
+        updatedAt,
+        createdAt,
+        grouping,
+        wasteSealNumbers,
+        intermediariesOrgIds,
+        ...bsda
+      } = event.data;
 
       return {
         id: event.streamId,
@@ -16,7 +22,14 @@ export function bsdaReducer(
       };
     }
     case "BsdaUpdated": {
-      const { id, updatedAt, createdAt, grouping, ...bsda } = event.data;
+      const {
+        id,
+        updatedAt,
+        createdAt,
+        grouping,
+        intermediariesOrgIds,
+        ...bsda
+      } = event.data;
 
       return {
         ...currentState,

@@ -42,6 +42,14 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [downloadPdf] = useDownloadPdf({ variables: { id: form.id } });
 
+  const emitterSiret = form.emitter?.company?.siret;
+
+  const status = form["bsvhuStatus"];
+
+  const canDelete =
+    status === BsvhuStatus.Initial ||
+    (status === BsvhuStatus.SignedByProducer && siret === emitterSiret);
+
   return (
     <>
       <Menu>
@@ -66,6 +74,8 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
                 styles.BSDDActionsMenu
               )}
             >
+              <TableRoadControlButton siret={siret} form={form} />
+
               <MenuLink
                 as={Link}
                 to={{
@@ -79,7 +89,6 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
                 <IconView color="blueLight" size="24px" />
                 Aperçu
               </MenuLink>
-              <TableRoadControlButton siret={siret} form={form} />
 
               {!form.isDraft && (
                 <MenuItem onSelect={() => downloadPdf()}>
@@ -87,8 +96,12 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
                   Pdf
                 </MenuItem>
               )}
+              <MenuItem onSelect={() => duplicateBsvhu()}>
+                <IconDuplicateFile size="24px" color="blueLight" />
+                Dupliquer
+              </MenuItem>
               {![BsvhuStatus.Processed, BsvhuStatus.Refused].includes(
-                form["bsvhuStatus"]
+                status
               ) && (
                 <>
                   <MenuLink
@@ -103,11 +116,8 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
                   </MenuLink>
                 </>
               )}
-              <MenuItem onSelect={() => duplicateBsvhu()}>
-                <IconDuplicateFile size="24px" color="blueLight" />
-                Dupliquer
-              </MenuItem>
-              {form["bsvhuStatus"] === BsvhuStatus.Initial && (
+
+              {canDelete && (
                 <MenuItem onSelect={() => setIsDeleting(true)}>
                   <IconTrash color="blueLight" size="24px" />
                   Supprimer

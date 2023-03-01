@@ -323,7 +323,7 @@ function ensureLoggedInAndAdmin() {
 }
 app.use(bullBoardPath, ensureLoggedInAndAdmin(), serverAdapter.getRouter());
 // TEMP until memory leaks are fixed
-app.post("/heap", ensureLoggedInAndAdmin(), heapSnapshotToS3Router);
+app.post("/heap/:container?", ensureLoggedInAndAdmin(), heapSnapshotToS3Router);
 
 // Apply passport auth middlewares to the graphQL endpoint
 app.use(graphQLPath, passportBearerMiddleware);

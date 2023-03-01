@@ -241,7 +241,8 @@ describe("Mutation.updateBsda", () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
       opt: {
-        emitterCompanySiret: company.siret,
+        status: "SIGNED_BY_PRODUCER",
+        destinationCompanySiret: company.siret,
         emitterEmissionSignatureDate: new Date()
       }
     });
@@ -268,7 +269,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: emitter.company.name"
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : emitterCompanyName"
       })
     ]);
   });
@@ -277,6 +278,7 @@ describe("Mutation.updateBsda", () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
       opt: {
+        status: "SIGNED_BY_PRODUCER",
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureDate: new Date()
       }
@@ -311,6 +313,7 @@ describe("Mutation.updateBsda", () => {
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
       opt: {
+        status: "SENT",
         emitterCompanySiret: emitter.company.siret,
         transporterCompanySiret: transporter.company.siret,
         emitterEmissionSignatureDate: new Date(),
@@ -340,7 +343,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: transporter.company.name"
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : transporterCompanyName"
       })
     ]);
   });
@@ -666,7 +669,7 @@ describe("Mutation.updateBsda", () => {
 
     expect(errors.length).toBe(1);
     expect(errors[0].message).toBe(
-      "Des champs ont été vérouillés via signature et ne peuvent plus être modifiés: intermediaries"
+      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : intermediaries"
     );
   });
 });

@@ -10,7 +10,8 @@ import {
   toPrismaGenericWhereInput,
   toPrismaEnumFilter,
   toPrismaIdFilter,
-  toPrismaRelationIdFilter
+  toPrismaRelationIdFilter,
+  toPrismaStringNullableListFilter
 } from "../common/where";
 
 function toPrismaBsdaWhereInput(where: BsdaWhere): Prisma.BsdaWhereInput {
@@ -35,6 +36,9 @@ function toPrismaBsdaWhereInput(where: BsdaWhere): Prisma.BsdaWhereInput {
     workerCompanySiret: toPrismaStringFilter(where.worker?.company?.siret),
     workerWorkSignatureDate: toPrismaDateFilter(
       where.worker?.work?.signature?.date
+    ),
+    transporterTransportPlates: toPrismaStringNullableListFilter(
+      where.transporter?.transport?.plates
     ),
     destinationCompanySiret: toPrismaStringFilter(
       where.destination?.company?.siret

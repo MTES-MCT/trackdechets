@@ -266,6 +266,19 @@ export function createBsffPackagingAfterAcceptation(
   );
 }
 
+export function createBsffAfterAcceptation(
+  args: SetRequired<CreateBsffArgs, "emitter" | "transporter" | "destination">,
+  initialData: Partial<Prisma.BsffCreateInput> = {}
+) {
+  return createBsffBeforeAcceptation(args, {
+    status: BsffStatus.ACCEPTED,
+    packagings: {
+      create: createBsffPackagingAfterAcceptation({}, args.previousPackagings)
+    },
+    ...initialData
+  });
+}
+
 export function createBsffPackagingBeforeOperation(
   args: Partial<Prisma.BsffPackagingCreateInput>,
   previousPackagings?: BsffPackaging[]

@@ -3,7 +3,7 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
-import * as COMPANY_TYPES from "../../../common/constants/COMPANY_TYPES";
+import * as COMPANY_CONSTANTS from "../../../common/constants/COMPANY_CONSTANTS";
 import { getPrismaPaginationArgs } from "../../../common/pagination";
 
 const companiesForVerificationResolver: QueryResolvers["companiesForVerification"] =
@@ -19,7 +19,9 @@ const companiesForVerificationResolver: QueryResolvers["companiesForVerification
 
     const whereInput = {
       ...where,
-      companyTypes: { hasSome: COMPANY_TYPES.PROFESSIONALS as CompanyType[] }
+      companyTypes: {
+        hasSome: COMPANY_CONSTANTS.PROFESSIONALS as CompanyType[]
+      }
     };
 
     const totalCount = await prisma.company.count({ where: whereInput });

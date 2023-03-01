@@ -11,6 +11,7 @@ export function buildFindManyBsdasri({
 }: ReadRepositoryFnDeps): FindManyBsdasriFn {
   return (where, options?) => {
     const input = { where, ...options };
+
     return prisma.bsdasri.findMany(input);
   };
 }
