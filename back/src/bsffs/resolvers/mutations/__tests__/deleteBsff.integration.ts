@@ -14,7 +14,8 @@ import makeClient from "../../../../__tests__/testClient";
 import {
   createBsff,
   createBsffAfterEmission,
-  createBsffAfterOperation
+  createBsffAfterOperation,
+  createBsffAfterTransport
 } from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
@@ -134,9 +135,65 @@ describe("Mutation.deleteBsff", () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);
     const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const { mutate } = makeClient(destination.user);
+
+    const bsff = await createBsffAfterEmission({
+      emitter,
+      transporter,
+      destination
+    });
+    const { errors } = await mutate<
+      Pick<Mutation, "deleteBsff">,
+      MutationDeleteBsffArgs
+    >(DELETE_BSFF, {
+      variables: {
+        id: bsff.id
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Il n'est pas possible de supprimer un bordereau qui a été signé par un des acteurs`
+      })
+    ]);
+  });
+
+  it("should allow emitter to delete a bsff with only his signature", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
     const { mutate } = makeClient(emitter.user);
 
     const bsff = await createBsffAfterEmission({
+      emitter,
+      transporter,
+      destination
+    });
+    const { errors } = await mutate<
+      Pick<Mutation, "deleteBsff">,
+      MutationDeleteBsffArgs
+    >(DELETE_BSFF, {
+      variables: {
+        id: bsff.id
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const deletedBsff = await prisma.bsff.findUnique({
+      where: { id: bsff.id }
+    });
+
+    expect(deletedBsff.isDeleted).toBe(true);
+  });
+
+  it("should disallow emitter to delete a bsff with transporteur signature", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const transporter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const { mutate } = makeClient(emitter.user);
+
+    const bsff = await createBsffAfterTransport({
       emitter,
       transporter,
       destination

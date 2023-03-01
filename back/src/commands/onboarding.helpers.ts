@@ -6,7 +6,7 @@ import {
   MembershipRequestStatus,
   User
 } from "@prisma/client";
-import * as COMPANY_TYPES from "../common/constants/COMPANY_TYPES";
+import * as COMPANY_CONSTANTS from "../common/constants/COMPANY_CONSTANTS";
 import {
   onboardingFirstStep,
   onboardingProducerSecondStep,
@@ -17,6 +17,8 @@ import {
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
 import { getActiveAdminsByCompanyIds } from "../companies/database";
+import { MessageVersion } from "../mailer/types";
+
 /**
  * Compute a past date relative to baseDate
  *
@@ -91,7 +93,9 @@ export const selectSecondOnboardingEmail = (recipient: recipientType) => {
     recipient.companyAssociations.flatMap(c => c.company.companyTypes)
   );
 
-  if ([...companyTypes].some(ct => COMPANY_TYPES.PROFESSIONALS.includes(ct))) {
+  if (
+    [...companyTypes].some(ct => COMPANY_CONSTANTS.PROFESSIONALS.includes(ct))
+  ) {
     return onboardingProfessionalSecondStep;
   }
 
@@ -136,7 +140,7 @@ export const getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest =
 
     const users = await prisma.user.findMany({
       where: {
-        createdAt: { gt: associatedDateGt, lt: associatedDateLt },
+        createdAt: { gte: associatedDateGt, lt: associatedDateLt },
         isActive: true,
         companyAssociations: { none: {} },
         MembershipRequest: { none: {} }
@@ -154,15 +158,16 @@ export const sendMembershipRequestDetailsEmail = async () => {
   const recipients =
     await getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest(7);
 
-  await Promise.all(
-    recipients.map(recipient => {
-      const payload = renderMail(membershipRequestDetailsEmail, {
-        to: [{ email: recipient.email, name: recipient.name }]
-      });
+  const messageVersions: MessageVersion[] = recipients.map(recipient => ({
+    to: [{ email: recipient.email, name: recipient.name }]
+  }));
 
-      return sendMail(payload);
-    })
-  );
+  const payload = renderMail(membershipRequestDetailsEmail, {
+    messageVersions
+  });
+
+  await sendMail(payload);
+
   await prisma.$disconnect();
 };
 
@@ -201,15 +206,16 @@ export const getUsersWithPendingMembershipRequests = async (
 export const sendPendingMembershipRequestDetailsEmail = async () => {
   const recipients = await getUsersWithPendingMembershipRequests(14);
 
-  await Promise.all(
-    recipients.map(recipient => {
-      const payload = renderMail(pendingMembershipRequestDetailsEmail, {
-        to: [{ email: recipient.email, name: recipient.name }]
-      });
+  const messageVersions: MessageVersion[] = recipients.map(recipient => ({
+    to: [{ email: recipient.email, name: recipient.name }]
+  }));
 
-      return sendMail(payload);
-    })
-  );
+  const payload = renderMail(pendingMembershipRequestDetailsEmail, {
+    messageVersions
+  });
+
+  await sendMail(payload);
+
   await prisma.$disconnect();
 };
 
@@ -224,7 +230,7 @@ export const getPendingMembershipRequestsAndAssociatedAdmins = async (
   // First, fetch all unanswered membership requests
   const pendingMembershipRequests = await prisma.membershipRequest.findMany({
     where: {
-      createdAt: { gt: requestDateGt, lt: requestDateLt },
+      createdAt: { gte: requestDateGt, lt: requestDateLt },
       status: MembershipRequestStatus.PENDING
     },
     include: {

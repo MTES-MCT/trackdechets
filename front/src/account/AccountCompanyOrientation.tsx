@@ -100,7 +100,7 @@ export default function AccountCompanyOrientation() {
             </Button>
           </Callout>
         </Col>
-        {/* <Col n="12">
+        <Col n="12">
           <Callout hasInfoIcon={false}>
             <CalloutTitle as="h2" size="lg">
               Transporteur hors France, Non-French carrier
@@ -125,7 +125,7 @@ export default function AccountCompanyOrientation() {
               Créer votre établissement
             </Button>
           </Callout>
-        </Col> */}
+        </Col>
       </Row>
     </Container>
   );

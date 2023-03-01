@@ -1,6 +1,5 @@
 import { userFactory } from "../../../../__tests__/factories";
 import { AuthType } from "../../../../auth";
-import prisma from "../../../../prisma";
 import getReadableId, { ReadableIdPrefix } from "../../../../forms/readableId";
 import { getBsffRepository } from "../..";
 import {
@@ -10,6 +9,7 @@ import {
 import { ApiResponse } from "@elastic/elasticsearch";
 import { SearchResponse } from "@elastic/elasticsearch/api/types";
 import { client, BsdElastic, index } from "../../../../common/elastic";
+import { getStream } from "../../../../activity-events";
 
 describe("bsffRepository.create", () => {
   afterEach(resetDatabase);
@@ -24,7 +24,7 @@ describe("bsffRepository.create", () => {
     const bsff = await createBsff({
       data: { id: getReadableId(ReadableIdPrefix.FF), wasteDescription: "HFC" }
     });
-    const events = await prisma.event.findMany();
+    const events = await getStream(bsff.id);
     expect(events).toHaveLength(1);
     expect(events[0]).toMatchObject({
       streamId: bsff.id,

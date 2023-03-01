@@ -4,7 +4,7 @@ import { registerUpdater, Updater } from "./helper/helper";
 @registerUpdater(
   "Delete stale activation hashes",
   "Delete stale activation hashes",
-  true
+  false
 )
 export class DeleteStaleActivationHAshes implements Updater {
   async run() {

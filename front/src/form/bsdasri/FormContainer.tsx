@@ -47,6 +47,7 @@ export default function FormContainer() {
                 : Transporter;
             // associated bsd can't be edited
             const editionDisabled = !!bsdasri?.synthesizedIn?.id;
+
             return (
               <>
                 <StepContainer

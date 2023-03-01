@@ -53,9 +53,11 @@ export const TableRoadControlButton = ({ siret, form }) => {
       }}
     >
       <IconQrCode color="blueLight" size="24px" />
-      Contrôle
-      <br />
-      routier
+      <span className="tw-m-1 tw-leading-tight tw-text-center">
+        Contrôle
+        <br />
+        routier
+      </span>
     </MenuLink>
   );
 };

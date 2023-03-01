@@ -108,6 +108,69 @@ describe("Mutation.deleteBsdasri", () => {
     ]);
   });
 
+  it("should allow emitter to delete a bsvhu with only his signature", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        status: "SIGNED_BY_PRODUCER"
+      }
+    });
+
+    const { mutate } = makeClient(user); // emitter
+    const { errors } = await mutate<
+      Pick<Mutation, "deleteBsvhu">,
+      MutationDeleteBsvhuArgs
+    >(DELETE_VHU, {
+      variables: {
+        id: bsvhu.id
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const deletedBsvhu = await prisma.bsvhu.findUnique({
+      where: { id: bsvhu.id }
+    });
+
+    expect(deletedBsvhu.isDeleted).toBe(true);
+  });
+
+  it("should disallow emitter to delete a bsvhu with transporteur signature", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const bsvhu = await bsvhuFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        transporterTransportSignatureDate: new Date(),
+        status: "SENT"
+      }
+    });
+
+    const { mutate } = makeClient(user); // emitter
+    const { errors } = await mutate<
+      Pick<Mutation, "deleteBsvhu">,
+      MutationDeleteBsvhuArgs
+    >(DELETE_VHU, {
+      variables: {
+        id: bsvhu.id
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés",
+        extensions: expect.objectContaining({
+          code: ErrorCode.FORBIDDEN
+        })
+      })
+    ]);
+  });
+
   it("should mark a vhu as deleted", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 

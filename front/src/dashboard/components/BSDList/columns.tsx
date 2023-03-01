@@ -8,6 +8,13 @@ import {
 import { Bsd, Bsdasri, Bsda, Form, Bsvhu } from "generated/graphql/types";
 import { BSDTypeFilter } from "./BSDTypeFilter";
 import { TextInputFilter } from "./TextInputFilter";
+import {
+  GET_BSDS_ACTOR_MAX_LENGTH,
+  GET_BSDS_READABLE_ID_MAX_LENGTH,
+  GET_BSDS_PLATES_MAX_LENGTH,
+  GET_BSDS_CUSTOM_INFO_MAX_LENGTH,
+  GET_BSDS_WASTE_MAX_LENGTH,
+} from "generated/constants/GET_BSDS_CONSTANTS";
 import * as bsdd from "./BSDD";
 import * as bsdasri from "./BSDasri";
 import * as bsvhu from "./BSVhu";
@@ -64,6 +71,7 @@ export type Column<T extends object = Bsd> = ColumnWithLooseAccessor<T> &
         disableFilters: true;
         disableSortBy: true;
         filterPlaceHolder?: string;
+        filterMaxLength?: number;
       }
   );
 
@@ -143,36 +151,42 @@ export const COLUMNS: Record<string, Column> = {
     Filter: TextInputFilter,
     filter: "text",
     filterPlaceHolder: "N° BSD ou contenant",
+    filterMaxLength: GET_BSDS_READABLE_ID_MAX_LENGTH,
   }),
   emitter: createColumn({
     id: "emitter",
     Header: "Émetteur",
     Filter: TextInputFilter,
     filter: "text",
+    filterMaxLength: GET_BSDS_ACTOR_MAX_LENGTH,
   }),
   recipient: createColumn({
     id: "recipient",
     Header: "Destinataire",
     Filter: TextInputFilter,
     filter: "text",
+    filterMaxLength: GET_BSDS_ACTOR_MAX_LENGTH,
   }),
   waste: createColumn({
     id: "waste",
     Header: "Déchet",
     Filter: TextInputFilter,
     filter: "text",
+    filterMaxLength: GET_BSDS_WASTE_MAX_LENGTH,
   }),
   transporterCustomInfo: createColumn({
     id: "transporterCustomInfo",
     Header: "Champ libre",
     filter: "text",
     Filter: TextInputFilter,
+    filterMaxLength: GET_BSDS_CUSTOM_INFO_MAX_LENGTH,
   }),
   transporterNumberPlate: createColumn({
     id: "transporterNumberPlate",
     Header: "Plaque immat.",
     filter: "text",
     Filter: TextInputFilter,
+    filterMaxLength: GET_BSDS_PLATES_MAX_LENGTH,
   }),
   status: createColumn({
     id: "status",

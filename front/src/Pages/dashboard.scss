@@ -1,19 +1,79 @@
 @import "src/scss/Breakpoints.scss";
 
 .dashboard-page {
-  padding: 0 5px;
+  display: flex;
+  flex-direction: column;
+  max-width: 90%;
+  margin: 0 auto;
 
   @include desktop {
     max-width: 95%;
-    margin: 0 auto;
   }
 
-  &__bsd-dropdown {
-    margin: 15px 8px;
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    margin: 0 0 2rem 0.5rem;
+
+    .create-btn {
+      .fr-btn {
+        margin: 5px 0;
+        box-sizing: content-box;
+        padding: 0px 10px;
+        justify-content: center;
+
+        &:after {
+          content: "";
+          display: inline-block;
+          background: url("/icons/dashboard/arrow-s-line.svg");
+          width: 16px;
+          height: 16px;
+          margin-left: 5px;
+        }
+      }
+    }
+
+    .filter-btn {
+      .fr-btn {
+        margin: 5px 0;
+        width: 180px;
+        justify-content: center;
+        box-sizing: content-box;
+        padding: 0px;
+        &:after {
+          content: "";
+          display: inline-block;
+          background: url("/icons/dashboard/icon-filter.svg");
+          width: 16px;
+          height: 16px;
+          margin-left: 5px;
+        }
+      }
+    }
+
+    @include desktop {
+      flex-direction: row;
+      margin: 0 0 2.5rem 0.5rem;
+      .filter-btn {
+        .fr-btn {
+          margin: 5px 20px;
+        }
+      }
+    }
   }
 
   &__loadmore {
     text-align: center;
     margin: 15px;
+  }
+
+  .filters {
+    width: 99%;
+    margin: 0 auto;
+  }
+
+  .fr-breadcrumb__list li:not(:first-child):before {
+    -webkit-mask-image: url("/icons/system/arrow-right-s-line.svg");
   }
 }

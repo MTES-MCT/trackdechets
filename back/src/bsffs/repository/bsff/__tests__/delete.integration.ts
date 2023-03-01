@@ -16,6 +16,7 @@ import {
   indexBsd
 } from "../../../../common/elastic";
 import { toBsdElastic } from "../../../elastic";
+import { getStream } from "../../../../activity-events";
 
 describe("bsffRepository.delete", () => {
   afterEach(resetDatabase);
@@ -58,7 +59,7 @@ describe("bsffRepository.delete", () => {
     });
     expect(deletedBsff.isDeleted).toBe(true);
 
-    const events = await prisma.event.findMany();
+    const events = await getStream(deletedBsff.id);
     expect(events).toHaveLength(1);
     expect(events[0]).toMatchObject({
       streamId: bsff.id,

@@ -11,7 +11,8 @@ const DEBOUNCE_DELAY = 500;
 export function TextInputFilter({
   column: { filterValue = "", setFilter },
   placeHolder = "Filtrer...",
-}: FilterProps<Bsd> & { placeHolder?: string }) {
+  maxLength = 0,
+}: FilterProps<Bsd> & { placeHolder?: string; maxLength?: number }) {
   const [value, setValue] = React.useState(filterValue);
   const timeout = React.useRef<number | null>();
   const ref = React.useRef<{ value: string; filterValue: string }>();
@@ -64,6 +65,7 @@ export function TextInputFilter({
       onChange={event => setValue(event.target.value)}
       value={value}
       placeholder={placeHolder}
+      {...(!!maxLength ? { maxLength } : {})}
       style={{ marginTop: "0.5rem" }}
     />
   );

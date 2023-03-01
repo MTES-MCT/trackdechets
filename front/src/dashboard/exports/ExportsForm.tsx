@@ -94,6 +94,7 @@ function getPossibleExportTypes(companies: CompanyPrivate[]) {
         CompanyType.WasteVehicles,
         CompanyType.WasteCenter,
         CompanyType.Collector,
+        CompanyType.Worker,
       ].includes(t)
     ).length > 0
   ) {

@@ -1,4 +1,4 @@
-import { Bsdasri, Prisma } from "@prisma/client";
+import { Bsdasri, Prisma, BsdasriType } from "@prisma/client";
 import {
   LogMetadata,
   RepositoryFnDeps
@@ -15,7 +15,23 @@ export function buildCreateBsdasri(deps: RepositoryFnDeps): CreateBsdasriFn {
   return async (data, logMetadata?) => {
     const { prisma, user } = deps;
 
-    const bsdasri = await prisma.bsdasri.create({ data });
+    const bsdasri = await prisma.bsdasri.create({
+      data,
+      include: { synthesizing: true }
+    });
+
+    if (bsdasri.type === BsdasriType.SYNTHESIS) {
+      const synthesisEmitterSirets = [
+        ...new Set(
+          bsdasri.synthesizing.map(associated => associated.emitterCompanySiret)
+        )
+      ].filter(Boolean);
+
+      await prisma.bsdasri.update({
+        where: { id: bsdasri.id },
+        data: { synthesisEmitterSirets }
+      });
+    }
 
     await prisma.event.create({
       data: {

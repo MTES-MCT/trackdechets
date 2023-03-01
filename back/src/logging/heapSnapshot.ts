@@ -9,17 +9,24 @@ export async function heapSnapshotToS3Router(req: Request, res: Response) {
   if (process.env.DEBUG_HEAPDUMP !== "active") {
     return res.send("Inactive");
   }
-  const snapshotStream = v8.getHeapSnapshot();
+
+  // Once we have a first snapshot, we need the second one to be from the same container
+  if (req.params.container && req.params.container !== process.env.CONTAINER) {
+    return res.send("Wrong container, try again");
+  }
+
   // It's important that the filename end with `.heapsnapshot`,
   // otherwise Chrome DevTools won't open it.
   const fileName = `${process.env.DD_ENV}_${
     process.env.CONTAINER
   }_${Date.now()}.heapsnapshot`;
-  const fileStream = createWriteStream(fileName);
-  snapshotStream.pipe(fileStream);
 
-  res.send(fileName);
-  res.status(202);
+  // Return early so that the heavy work is done in background (avoiding the 1min HTTP timeout)
+  res.status(202).send(fileName);
+
+  const fileStream = createWriteStream(fileName);
+  const snapshotStream = v8.getHeapSnapshot();
+  snapshotStream.pipe(fileStream);
 
   try {
     const parallelUploads3 = new Upload({
