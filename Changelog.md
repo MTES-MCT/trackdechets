@@ -56,7 +56,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Les émetteurs & destinataires de déchets peuvent désormais annuler un BSDD via l'API [PR 2014](https://github.com/MTES-MCT/trackdechets/pull/2014)
 - Les émetteurs & destinataires de déchets peuvent désormais annuler un BSDD via l'interface, via le processus de révision [PR 2044](https://github.com/MTES-MCT/trackdechets/pull/2044)
-- Possibilité de chercher parmi ses établissements [PR 2057](https://github.com/MTES-MCT/trackdechets/pull/2057)
 
 #### :bug: Corrections de bugs
 
@@ -72,7 +71,6 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Les noms des établissements dans le sélecteur d'établissements du registre sont ordonnés par ordre alphabétique [PR 2047](https://github.com/MTES-MCT/trackdechets/pull/2047)
 - BSFF - Adapter le récepissé PDF à la gestion multi-contenants [PR 2035](https://github.com/MTES-MCT/trackdechets/pull/2035)
 - Ne pas permettre de modifier les coordonées d'un transporteur étranger si on a bien récupéré les infos via le service VIES [PR 2040](https://github.com/MTES-MCT/trackdechets/pull/2040)
-- L' émetteur d'un bordereau peut le supprimer / modifier tant qu'il est le seul à avoir signé [PR 2103](https://github.com/MTES-MCT/trackdechets/pull/2103)
 
 #### :boom: Breaking changes
 
