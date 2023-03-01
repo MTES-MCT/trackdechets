@@ -1,7 +1,13 @@
+@import "src/scss/Breakpoints.scss";
+
 .bsd-card-list {
   list-style-type: none;
 
   &__item {
-    margin: 5px 8px;
+    margin: 5px 0px;
+
+    @include desktop {
+      margin: 5px 8px;
+    }
   }
 }

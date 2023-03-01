@@ -8,6 +8,7 @@ import { WorkflowAction } from "./WorkflowAction";
 import { bsffVerboseStatuses } from "form/bsff/utils/constants";
 import { UpdateTransporterCustomInfo } from "./BsffActions/UpdateTransporterCustomInfo";
 import { UpdateTransporterPlates } from "./BsffActions/UpdateTransporterPlates";
+import { BsffStatus } from "generated/graphql/types";
 
 export const COLUMNS: Record<
   string,
@@ -63,7 +64,9 @@ export const COLUMNS: Record<
     Cell: ({ value, row }) => (
       <>
         <span style={{ marginRight: "0.5rem" }}>{value}</span>
-        <UpdateTransporterCustomInfo bsff={row.original} />
+        {[BsffStatus.Initial, BsffStatus.SignedByEmitter].includes(
+          row.original.bsffStatus
+        ) && <UpdateTransporterCustomInfo bsff={row.original} />}
       </>
     ),
   },
@@ -74,7 +77,9 @@ export const COLUMNS: Record<
     Cell: ({ value, row }) => (
       <>
         <span style={{ marginRight: "0.5rem" }}>{value.join(", ")}</span>
-        <UpdateTransporterPlates bsff={row.original} />
+        {[BsffStatus.Initial, BsffStatus.SignedByEmitter].includes(
+          row.original.bsffStatus
+        ) && <UpdateTransporterPlates bsff={row.original} />}
       </>
     ),
   },

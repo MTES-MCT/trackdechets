@@ -1,6 +1,6 @@
 import { ApolloError, gql, useLazyQuery, useMutation } from "@apollo/client";
-import { Field, Form, Formik } from "formik";
-import React, { useState } from "react";
+import { Field, Form, Formik, useFormikContext } from "formik";
+import React, { useEffect, useState } from "react";
 import { COMPANY_PRIVATE_INFOS } from "form/common/components/company/query";
 import AccountCompanyAddMembershipRequest from "./AccountCompanyAddMembershipRequest";
 import styles from "../AccountCompanyAdd.module.scss";
@@ -11,6 +11,7 @@ import {
   isVat,
   isClosedCompany,
   CLOSED_COMPANY_ERROR,
+  isForeignVat,
 } from "generated/constants/companySearchHelpers";
 
 import {
@@ -25,6 +26,8 @@ import {
 type IProps = {
   onCompanyInfos: (companyInfos) => void;
   showIndividualInfo?: Boolean;
+  onlyForeignVAT?: Boolean;
+  defaultQuery?: string;
 };
 
 const CREATE_TEST_COMPANY = gql`
@@ -115,6 +118,19 @@ const nonDiffusibleError = (
   </div>
 );
 
+const AutoSubmitSiret = ({ defaultSiret, didAutoSubmit }) => {
+  const { submitForm, values } = useFormikContext<any>();
+
+  useEffect(() => {
+    if (defaultSiret === values.siret) {
+      submitForm();
+      didAutoSubmit();
+    }
+  }, [didAutoSubmit, submitForm, defaultSiret, values.siret]);
+
+  return null;
+};
+
 /**
  * SIRET Formik field for company creation
  * The siret is checked against query { companyInfos }
@@ -126,11 +142,14 @@ const nonDiffusibleError = (
 export default function AccountCompanyAddSiret({
   onCompanyInfos,
   showIndividualInfo = false,
+  onlyForeignVAT = false,
+  defaultQuery = "",
 }: IProps) {
   const [isRegistered, setIsRegistered] = useState(false);
   const [isDisabled, setIsDisabled] = useState(false);
   const [isNonDiffusible, setIsNonDiffusible] = useState(false);
   const [isClosed, setIsClosed] = useState(false);
+  const [isPreloaded, setIsPreloaded] = useState(false);
 
   const [searchCompany, { loading, error }] = useLazyQuery<
     Pick<Query, "companyPrivateInfos">
@@ -176,6 +195,8 @@ export default function AccountCompanyAddSiret({
   const [createTestCompany] =
     useMutation<Pick<Mutation, "createTestCompany">>(CREATE_TEST_COMPANY);
 
+  const shouldAutoSubmit = !isPreloaded && defaultQuery !== "" && !loading;
+
   return (
     <Container fluid>
       <Row>
@@ -184,26 +205,38 @@ export default function AccountCompanyAddSiret({
             <Alert type="error" title="Erreur" description={error.message} />
           )}
           <Formik
-            initialValues={{ siret: "" }}
+            initialValues={{ siret: defaultQuery }}
             validate={values => {
               const isValidSiret = isSiret(
                 values.siret,
                 import.meta.env.VITE_ALLOW_TEST_COMPANY
               );
               const isValidVat = isVat(values.siret);
-              if (!isValidSiret && !/^[a-zA-Z]{2}/.test(values.siret)) {
-                return {
-                  siret: "Vous devez entrer un SIRET de 14 chiffres",
-                };
-              } else if (!isValidVat && !/^[0-9]{14}$/.test(values.siret)) {
-                return {
-                  siret: `Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter via la FAQ https://faq.trackdechets.fr/pour-aller-plus-loin/assistance avec un justificatif légal du pays d'origine.`,
-                };
-              } else if (isValidVat && isFRVat(values.siret)) {
-                return {
-                  siret:
-                    "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et non son numéro de TVA",
-                };
+
+              if (onlyForeignVAT) {
+                const isValidForeignVat = isForeignVat(values.siret);
+
+                if (!isValidForeignVat) {
+                  return {
+                    siret:
+                      "Vous devez entrer un numéro de TVA intracommunautaire valide. You must use a valid VAT number.",
+                  };
+                }
+              } else {
+                if (!isValidSiret && !/^[a-zA-Z]{2}/.test(values.siret)) {
+                  return {
+                    siret: "Vous devez entrer un SIRET de 14 chiffres",
+                  };
+                } else if (!isValidVat && !/^[0-9]{14}$/.test(values.siret)) {
+                  return {
+                    siret: `Vous devez entrer un numéro de TVA intracommunautaire valide. Veuillez nous contacter via la FAQ https://faq.trackdechets.fr/pour-aller-plus-loin/assistance avec un justificatif légal du pays d'origine.`,
+                  };
+                } else if (isValidVat && isFRVat(values.siret)) {
+                  return {
+                    siret:
+                      "Vous devez identifier un établissement français par son numéro de SIRET (14 chiffres) et non son numéro de TVA",
+                  };
+                }
               }
             }}
             onSubmit={values => {
@@ -216,6 +249,14 @@ export default function AccountCompanyAddSiret({
           >
             {({ setFieldValue, errors, values }) => (
               <Form className={styles.companyAddForm}>
+                {shouldAutoSubmit && (
+                  <AutoSubmitSiret
+                    defaultSiret={defaultQuery}
+                    didAutoSubmit={() => {
+                      setIsPreloaded(true);
+                    }}
+                  ></AutoSubmitSiret>
+                )}
                 <Field name="siret">
                   {({ field }) => {
                     return (
@@ -239,29 +280,33 @@ export default function AccountCompanyAddSiret({
                   }}
                 </Field>
 
-                {import.meta.env.VITE_ALLOW_TEST_COMPANY === "true" && (
-                  <Button
-                    tertiary
-                    disabled={loading || isDisabled}
-                    title="Génère un n°SIRET unique permettant la création d'un établissement factice pour la réalisation de vos tests"
-                    onClick={() =>
-                      createTestCompany().then(response => {
-                        setFieldValue(
-                          "siret",
-                          response.data?.createTestCompany
-                        );
-                      })
-                    }
-                  >
-                    Obtenir un n° SIRET factice
-                  </Button>
-                )}
+                {import.meta.env.VITE_ALLOW_TEST_COMPANY === "true" &&
+                  !onlyForeignVAT && (
+                    <Button
+                      tertiary
+                      disabled={loading || isDisabled}
+                      title="Génère un n°SIRET unique permettant la création d'un établissement factice pour la réalisation de vos tests"
+                      onClick={() =>
+                        createTestCompany().then(response => {
+                          setFieldValue(
+                            "siret",
+                            response.data?.createTestCompany
+                          );
+                        })
+                      }
+                    >
+                      Obtenir un n° SIRET factice
+                    </Button>
+                  )}
 
                 {isRegistered && (
                   <AccountCompanyAddMembershipRequest siret={values.siret} />
                 )}
                 <div className={styles["submit-form"]}>
-                  <Button disabled={loading || isDisabled} submit>
+                  <Button
+                    disabled={loading || isDisabled || isRegistered}
+                    submit
+                  >
                     {loading ? "Chargement..." : "Valider"}
                   </Button>
                 </div>

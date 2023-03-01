@@ -24,8 +24,6 @@ import { GET_FORM } from "form/bsdd/utils/queries";
 import Loader from "common/components/Loaders";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 
-const TODAY = new Date();
-
 const SIGN_TRANSPORT_FORM = gql`
   mutation SignTransportForm(
     $id: ID!
@@ -39,20 +37,21 @@ const SIGN_TRANSPORT_FORM = gql`
   ${fullFormFragment}
 `;
 
-const validationSchema = yup.object({
-  takenOverAt: yup
-    .date()
-    .required("La date de prise en charge est requise")
-    .max(TODAY, "La date de prise en charge ne peut être dans le futur"),
-  takenOverBy: yup
-    .string()
-    .ensure()
-    .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
-  securityCode: yup
-    .string()
-    .nullable()
-    .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
-});
+const getValidationSchema = (today: Date) =>
+  yup.object({
+    takenOverAt: yup
+      .date()
+      .required("La date de prise en charge est requise")
+      .max(today, "La date de prise en charge ne peut être dans le futur"),
+    takenOverBy: yup
+      .string()
+      .ensure()
+      .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
+    securityCode: yup
+      .string()
+      .nullable()
+      .matches(/[0-9]{4}/, "Le code de signature est composé de 4 chiffres"),
+  });
 interface SignTransportFormModalProps {
   title: string;
   siret: string;
@@ -90,6 +89,10 @@ function SignTransportFormModal({
     );
   }
   const form = data?.form;
+
+  const TODAY = new Date();
+  const validationSchema = getValidationSchema(TODAY);
+
   return (
     <Modal onClose={onClose} ariaLabel={title} isOpen>
       <h2 className="td-modal-title">{title}</h2>

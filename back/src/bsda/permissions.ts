@@ -2,8 +2,8 @@ import {
   User,
   Bsda,
   BsdaStatus,
-  IntermediaryBsdaAssociation,
-  Prisma
+  Prisma,
+  IntermediaryBsdaAssociation
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { NotFormContributor } from "../forms/errors";
@@ -20,16 +20,18 @@ const bsdaSiretFields = Prisma.validator<Prisma.BsdaArgs>()({
     transporterCompanyVatNumber: true,
     workerCompanySiret: true,
     brokerCompanySiret: true,
-    destinationOperationNextDestinationCompanySiret: true
+    destinationOperationNextDestinationCompanySiret: true,
+    intermediariesOrgIds: true
   }
 });
 type BsdaFlatSiretsFields = Prisma.BsdaGetPayload<typeof bsdaSiretFields>;
 
-type BsdaContributors = Partial<BsdaFlatSiretsFields> & {
-  intermediaries: Partial<
-    Pick<IntermediaryBsdaAssociation, "siret" | "vatNumber">
-  >[];
-};
+type BsdaContributors = Partial<BsdaFlatSiretsFields> &
+  Partial<{
+    intermediaries: Partial<
+      Pick<IntermediaryBsdaAssociation, "siret" | "vatNumber">
+    >[];
+  }>;
 
 export const BSDA_REVISION_REQUESTER_FIELDS: Record<
   string,
@@ -85,18 +87,16 @@ export async function checkIsBsdaContributor(
 export async function isBsdaContributor(user: User, bsda: BsdaContributors) {
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
-  const bsdaSiretOrVat = Object.values(BSDA_CONTRIBUTORS_FIELDS).map(
-    field => bsda[field]
-  );
+  // for bdsda updates, we rely on `intermediariesOrgIds` field:
+  // - if intermediaries are not updated, we get the denormalized `intermediariesOrgIds` field
+  // - if they are, we pass a flattened list of orgIds to permission to `checkIsBsdaContributor`
+  const intermediariesOrgIds = [
+    ...Object.values(BSDA_CONTRIBUTORS_FIELDS).map(field => bsda[field]),
+    ...(bsda.intermediariesOrgIds ? bsda.intermediariesOrgIds : [])
+  ].filter(Boolean);
 
-  const intermerdiariesSirets = bsda.intermediaries?.flatMap(i => [
-    i.siret,
-    i.vatNumber
-  ]);
-
-  return userCompaniesSiretOrVat.some(
-    siret =>
-      bsdaSiretOrVat.includes(siret) || intermerdiariesSirets?.includes(siret)
+  return userCompaniesSiretOrVat.some(siret =>
+    intermediariesOrgIds.includes(siret)
   );
 }
 

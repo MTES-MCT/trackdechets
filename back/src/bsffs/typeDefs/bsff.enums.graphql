@@ -62,6 +62,8 @@ enum BsffOperationCode {
   R2
   "Recyclage ou récupération des substances organiques qui ne sont pas utilisées comme solvants (y compris les opérations de compostage et autres transformations biologiques)"
   R3
+  "Recyclage ou récupération d’autres matières inorganiques"
+  R5
   "Échange de déchets en vue de les soumettre à l'une des opérations numérotées R1 à R11"
   R12
   "Stockage de déchets préalablement à l’une des opérations R1 à R12 (à l’exclusion du stockage temporaire, avant collecte, sur le site de production)."

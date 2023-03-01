@@ -133,6 +133,7 @@ describe("Query.BsdasriPdf", () => {
         synthesizing: { connect: [{ id: initialBsdasri.id }] }
       }
     });
+    // user from inital company tries to access pdf
     const { query } = makeClient(user);
 
     const { data } = await query<Pick<Query, "bsdasriPdf">>(BSDASRI_PDF, {

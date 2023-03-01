@@ -61,6 +61,7 @@ export default function BsffStepsList(props: Props) {
       };
     }
     const bsff = formQuery.data?.bsff;
+
     return getComputedState(initialState, bsff ? getCurrentState(bsff) : null);
   }, [formQuery.data]);
 

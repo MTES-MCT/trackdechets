@@ -8,7 +8,8 @@ import { SignReception } from "./SignReception";
 import { SignBsffOperationOnePackaging } from "./SignOperation";
 import { SignBsffAcceptationOnePackaging } from "./SignAcceptation";
 import { SignPackagings } from "./SignPackagings";
-import { useParams } from "react-router-dom";
+import { useParams, useRouteMatch } from "react-router-dom";
+import routes from "common/routes";
 
 export interface WorkflowActionProps {
   form: BsffFragment;
@@ -18,6 +19,8 @@ export function WorkflowAction(props: WorkflowActionProps) {
   const { siret } = useParams<{ siret: string }>();
   const { form } = props;
 
+  const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
+  const isToCollectTab = !!useRouteMatch(routes.dashboard.transport.toCollect);
   const emitterSiret = form.bsffEmitter?.company?.siret;
   const transporterSiret = form.bsffTransporter?.company?.siret;
   const destinationSiret = form.bsffDestination?.company?.siret;
@@ -31,19 +34,19 @@ export function WorkflowAction(props: WorkflowActionProps) {
 
   switch (form.bsffStatus) {
     case BsffStatus.Initial:
-      if (siret !== emitterSiret) return null;
+      if (siret !== emitterSiret || !isActTab) return null;
       return <SignEmission bsffId={form.id} />;
 
     case BsffStatus.SignedByEmitter:
-      if (siret !== transporterSiret) return null;
+      if (siret !== transporterSiret || !isToCollectTab) return null;
       return <SignTransport bsffId={form.id} />;
 
     case BsffStatus.Sent:
-      if (siret !== destinationSiret) return null;
+      if (siret !== destinationSiret || !isActTab) return null;
       return <SignReception bsffId={form.id} />;
 
     case BsffStatus.Received:
-      if (siret !== destinationSiret) return null;
+      if (siret !== destinationSiret || !isActTab) return null;
       if (form.packagings?.length === 1) {
         return <SignBsffAcceptationOnePackaging bsffId={form.id} />;
       }

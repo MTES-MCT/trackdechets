@@ -1,5 +1,8 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  userWithCompanyFactory,
+  companyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 
 import {
@@ -50,6 +53,7 @@ describe("Query.Bsdasris", () => {
     };
 
     const initialDasri = await bsdasriFactory(initialParams);
+
     const params = {
       opt: {
         ...initialData(company),
@@ -57,6 +61,7 @@ describe("Query.Bsdasris", () => {
         synthesizing: { connect: [{ id: initialDasri.id }] }
       }
     };
+
     const synthesizingDasri = await bsdasriFactory(params);
 
     const { query } = makeClient(user);
@@ -115,5 +120,34 @@ describe("Query.Bsdasris", () => {
     ];
 
     expect(data.bsdasri.synthesizing).toStrictEqual(expectedSynthesizedInfo);
+  });
+
+  it("should allow emitter from synthesized dasri to access synthesizing dasri", async () => {
+    const { user, company: initialCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const mainCompany = await companyFactory();
+
+    const initialBsdasri = await bsdasriFactory({
+      opt: {
+        ...initialData(initialCompany)
+      }
+    });
+    const synthesisBsdasri = await bsdasriFactory({
+      opt: {
+        type: BsdasriType.SYNTHESIS,
+        ...initialData(mainCompany),
+        synthesizing: { connect: [{ id: initialBsdasri.id }] }
+      }
+    });
+
+    // user from inital company tries to access bsdasri
+    const { query } = makeClient(user);
+
+    const { data } = await query<Pick<Query, "bsdasri">>(GET_BSDASRI, {
+      variables: { id: synthesisBsdasri.id }
+    });
+
+    expect(data.bsdasri.id).toBe(synthesisBsdasri.id);
   });
 });

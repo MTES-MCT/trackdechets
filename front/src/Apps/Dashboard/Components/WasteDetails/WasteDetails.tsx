@@ -35,7 +35,7 @@ function WasteDetails({
   };
   return (
     <div className="waste-details">
-      <div className="waste-details__icon">{displayIconWaste()}</div>
+      <div>{displayIconWaste()}</div>
       <div className="waste-details__infos">
         <p className="waste-details__infos__code">{code}</p>
         <p className="waste-details__infos__name">{name}</p>

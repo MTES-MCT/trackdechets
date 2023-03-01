@@ -166,6 +166,18 @@ export const userWithAccessTokenFactory = async (opt = {}) => {
   return { user, accessToken: clearToken };
 };
 
+/**
+ * Will create a membership request from user to company
+ */
+export const createMembershipRequest = async (user: User, company: Company) => {
+  await prisma.membershipRequest.create({
+    data: {
+      userId: user.id,
+      companyId: company.id
+    }
+  });
+};
+
 const formdata = {
   brokerCompanyAddress: "",
   brokerCompanyContact: "",

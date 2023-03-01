@@ -19,9 +19,7 @@ export const bsdaPdfDownloadHandler: DownloadHandler<QueryBsdaPdfArgs> = {
 
 export default async function bsdaPdf(_, { id }: QueryBsdaPdfArgs, context) {
   const user = checkIsAuthenticated(context);
-  const bsda = await getBsdaOrNotFound(id, {
-    include: { intermediaries: true }
-  });
+  const bsda = await getBsdaOrNotFound(id);
 
   await checkCanAccessBsdaPdf(user, bsda);
 

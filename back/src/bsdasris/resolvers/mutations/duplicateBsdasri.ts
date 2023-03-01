@@ -12,7 +12,6 @@ import { checkIsBsdasriContributor } from "../../permissions";
 import { ForbiddenError } from "apollo-server-express";
 import { getBsdasriRepository } from "../../repository";
 
-import { indexBsdasri } from "../../elastic";
 /**
  *
  * Duplicate a bsdasri
@@ -45,7 +44,6 @@ const duplicateBsdasriResolver: MutationResolvers["duplicateBsdasri"] = async (
   );
 
   const newBsdasri = await duplicateBsdasri(user, bsdasri);
-  await indexBsdasri(newBsdasri, context);
   return expandBsdasriFromDB(newBsdasri);
 };
 
@@ -96,7 +94,7 @@ function duplicateBsdasri(
     groupedInId,
     synthesizedInId,
     identificationNumbers,
-
+    synthesisEmitterSirets,
     ...fieldsToCopy
   }: Bsdasri
 ) {

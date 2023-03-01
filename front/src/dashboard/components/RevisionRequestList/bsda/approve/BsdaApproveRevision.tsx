@@ -240,7 +240,10 @@ function booleanFormatter(entity: boolean | undefined): React.ReactNode {
 }
 
 function sealNumbersFormatter(entity: string[] | undefined): React.ReactNode {
-  if (!entity) return null;
+  // prisma does not allow nullable lists so we can't tell apart `no change requested` vs `change to empty array`
+  // this is not an issue on this field as we do not want to set sealNumbers to [] on a reivsion
+  // so we consider empty arrays as falsy, they are ignored when reivsion is applied
+  if (!entity || !entity?.length) return null;
 
   return entity.join(", ");
 }

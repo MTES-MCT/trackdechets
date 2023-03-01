@@ -84,14 +84,7 @@ const removeSections = (
   const commonKeys = getCommonKeys(bsdasriType);
   const mapping: Partial<Record<BsdasriStatus, string[]>> = {
     INITIAL: [...commonKeys],
-    SIGNED_BY_PRODUCER: [
-      wasteKey,
-      ecoOrganismeKey,
-      emitterKey,
-      synthesizingKey,
-      groupingKey,
-      ...commonKeys,
-    ],
+    SIGNED_BY_PRODUCER: [...commonKeys],
     SENT: [
       wasteKey,
       ecoOrganismeKey,

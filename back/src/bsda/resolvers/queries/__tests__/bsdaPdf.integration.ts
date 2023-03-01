@@ -1,5 +1,8 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  companyFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { ErrorCode } from "../../../../common/errors";
 import { bsdaFactory } from "../../../__tests__/factories";
@@ -92,6 +95,27 @@ describe("Query.BsdaPdf", () => {
 
     const { data } = await query<Pick<Query, "bsdaPdf">>(BSDA_PDF, {
       variables: { id: forwardingBsda.id }
+    });
+
+    expect(data.bsdaPdf.token).toBeTruthy();
+  });
+
+  it("should return a token for requested id if current user is an intermediary", async () => {
+    const otherCompany = await companyFactory();
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: otherCompany.siret,
+        intermediaries: {
+          create: [{ siret: company.siret, name: company.name, contact: "joe" }]
+        }
+      }
+    });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query<Pick<Query, "bsdaPdf">>(BSDA_PDF, {
+      variables: { id: bsda.id }
     });
 
     expect(data.bsdaPdf.token).toBeTruthy();
