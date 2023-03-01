@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Envoi d'un email à inscription + 7 jours aux nouveaux inscrits qui n'ont pas encore créé de demande de rattachement [PR 2128](https://github.com/MTES-MCT/trackdechets/pull/2128)
+- Envoi d'un email 14 jours après une demande de rattachement pour les utilisateurs n'ayant pas de réponse [PR 2160](https://github.com/MTES-MCT/trackdechets/pull/2160)
 
 #### :bug: Corrections de bugs
 

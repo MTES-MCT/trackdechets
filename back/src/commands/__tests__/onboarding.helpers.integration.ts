@@ -8,9 +8,9 @@ import {
   userWithCompanyFactory
 } from "../../__tests__/factories";
 import {
+  getActiveUsersWithPendingMembershipRequests,
   getPendingMembershipRequestsAndAssociatedAdmins,
   getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest,
-  getUsersWithPendingMembershipRequests,
   xDaysAgo
 } from "../onboarding.helpers";
 
@@ -160,7 +160,7 @@ describe("getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest", () => {
   });
 });
 
-describe("getUsersWithPendingMembershipRequests", () => {
+describe("getActiveUsersWithPendingMembershipRequests", () => {
   afterEach(resetDatabase);
 
   it("should return user that created a membership request X days ago", async () => {
@@ -169,6 +169,12 @@ describe("getUsersWithPendingMembershipRequests", () => {
     // Should return this user
     const user = await userFactory();
     await createMembershipRequest(user, company, {
+      createdAt: THREE_DAYS_AGO
+    });
+
+    // Should not return this user because unactive
+    const unactiveUser = await userFactory({ isActive: false });
+    await createMembershipRequest(unactiveUser, company, {
       createdAt: THREE_DAYS_AGO
     });
 
@@ -181,7 +187,14 @@ describe("getUsersWithPendingMembershipRequests", () => {
     // Should not return this user because no membership request
     await userFactory();
 
-    const users = await getUsersWithPendingMembershipRequests(3);
+    // Should not return because request is not PENDING
+    const userWithPendingRequest = await userFactory();
+    await createMembershipRequest(userWithPendingRequest, company, {
+      status: MembershipRequestStatus.ACCEPTED,
+      createdAt: TWO_DAYS_AGO
+    });
+
+    const users = await getActiveUsersWithPendingMembershipRequests(3);
 
     expect(users.length).toEqual(1);
     expect(users[0].id).toEqual(user.id);
@@ -200,7 +213,7 @@ describe("getUsersWithPendingMembershipRequests", () => {
       createdAt: THREE_DAYS_AGO
     });
 
-    const users = await getUsersWithPendingMembershipRequests(3);
+    const users = await getActiveUsersWithPendingMembershipRequests(3);
 
     expect(users.length).toEqual(1);
     expect(users[0].id).toEqual(user.id);
@@ -228,7 +241,7 @@ describe("getUsersWithPendingMembershipRequests", () => {
       status: MembershipRequestStatus.ACCEPTED
     });
 
-    const users = await getUsersWithPendingMembershipRequests(3);
+    const users = await getActiveUsersWithPendingMembershipRequests(3);
 
     expect(users.length).toEqual(1);
     expect(users[0].id).toEqual(user0.id);

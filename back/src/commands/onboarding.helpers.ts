@@ -171,7 +171,7 @@ export const sendMembershipRequestDetailsEmail = async () => {
   await prisma.$disconnect();
 };
 
-export const getUsersWithPendingMembershipRequests = async (
+export const getActiveUsersWithPendingMembershipRequests = async (
   daysAgo: number
 ) => {
   const now = new Date();
@@ -181,7 +181,7 @@ export const getUsersWithPendingMembershipRequests = async (
 
   const pendingMembershipRequests = await prisma.membershipRequest.findMany({
     where: {
-      createdAt: { gt: requestDateGt, lt: requestDateLt },
+      createdAt: { gte: requestDateGt, lt: requestDateLt },
       status: MembershipRequestStatus.PENDING
     }
   });
@@ -192,6 +192,7 @@ export const getUsersWithPendingMembershipRequests = async (
 
   const users = await prisma.user.findMany({
     where: {
+      isActive: true,
       id: { in: uniqueUserIds }
     }
   });
@@ -204,7 +205,7 @@ export const getUsersWithPendingMembershipRequests = async (
  * got no answer
  */
 export const sendPendingMembershipRequestDetailsEmail = async () => {
-  const recipients = await getUsersWithPendingMembershipRequests(14);
+  const recipients = await getActiveUsersWithPendingMembershipRequests(14);
 
   const messageVersions: MessageVersion[] = recipients.map(recipient => ({
     to: [{ email: recipient.email, name: recipient.name }]
