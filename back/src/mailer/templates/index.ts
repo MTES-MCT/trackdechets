@@ -198,17 +198,13 @@ export const finalDestinationModified: MailTemplate<{
   templateId: templateIds.LAYOUT
 };
 
-export const membershipRequestDetailsEmail: MailTemplate<{
-  company: { siret: string; name?: string };
-}> = {
+export const membershipRequestDetailsEmail: MailTemplate = {
   subject: "Passez à la prochaine étape sur Trackdéchets",
   body: mustacheRenderer("membership-request-details.html"),
   templateId: templateIds.LAYOUT
 };
 
-export const pendingMembershipRequestDetailsEmail: MailTemplate<{
-  company: { siret: string; name?: string };
-}> = {
+export const pendingMembershipRequestDetailsEmail: MailTemplate = {
   subject: "Suite à votre demande de rattachement sur Trackdéchets",
   body: mustacheRenderer("pending-membership-request-details.html"),
   templateId: templateIds.LAYOUT

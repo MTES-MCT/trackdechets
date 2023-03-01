@@ -1,0 +1,56 @@
+.rmsc {
+  --rmsc-border: initial;
+  --rmsc-h: initial;
+}
+
+.rmsc .dropdown-container {
+  position: relative;
+  outline: initial;
+  background-color: initial !important;
+  border: none !important;
+  border-radius: initial !important;
+  &:focus-within {
+    border: none !important;
+    box-shadow: initial !important;
+  }
+}
+
+.rmsc .dropdown-heading {
+  position: relative;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: inherit;
+  cursor: default;
+  outline: none !important;
+}
+
+.rmsc .dropdown-heading .dropdown-heading-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 150px;
+  padding: 0.5rem 2.5rem 0.5rem 1rem;
+}
+
+.rmsc .gray {
+  color: initial !important;
+}
+
+.rmsc.multi-select.fr-select {
+  background-image: none !important;
+  padding: 0;
+}
+
+.rmsc .dropdown-content {
+  .item-renderer {
+    align-items: center;
+    input[type="checkbox"] {
+      appearance: checkbox;
+      &:before {
+        height: 0;
+      }
+    }
+  }
+}

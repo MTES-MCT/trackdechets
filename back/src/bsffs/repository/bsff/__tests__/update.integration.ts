@@ -16,6 +16,7 @@ import {
   indexBsd
 } from "../../../../common/elastic";
 import { toBsdElastic } from "../../../elastic";
+import { getStream } from "../../../../activity-events";
 
 describe("bsffRepository.update", () => {
   afterEach(resetDatabase);
@@ -59,7 +60,7 @@ describe("bsffRepository.update", () => {
     });
     expect(updatedBsff.wasteCode).toEqual("14 06 02*");
 
-    const events = await prisma.event.findMany();
+    const events = await getStream(updatedBsff.id);
     expect(events).toHaveLength(1);
     expect(events[0]).toMatchObject({
       streamId: bsff.id,

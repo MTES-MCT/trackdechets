@@ -253,17 +253,19 @@ describe("Mutation.updateBsdasri", () => {
   });
   it("should disallow emitter fields update after emission signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.SIGNED_BY_PRODUCER,
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureAuthor: user.name,
         emissionSignatory: { connect: { id: user.id } },
-        emitterEmissionSignatureDate: new Date().toISOString()
+        emitterEmissionSignatureDate: new Date().toISOString(),
+        destinationCompanySiret: destination.company.siret
       }
     });
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(destination.user);
     const input = {
       emitter: {
         company: {
@@ -287,12 +289,14 @@ describe("Mutation.updateBsdasri", () => {
       })
     ]);
     expect(errors[0].message).toContain(
-      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés:"
+      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : emitterCompanyMail"
     );
   });
   it("should disallow eco organisme fields update after emission signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
+    const destination = await userWithCompanyFactory("MEMBER");
+
     await userWithCompanyFactory("MEMBER", {
       siret: ecoOrg.siret
     });
@@ -302,11 +306,12 @@ describe("Mutation.updateBsdasri", () => {
         emitterCompanySiret: company.siret,
         emitterEmissionSignatureAuthor: user.name,
         emissionSignatory: { connect: { id: user.id } },
-        emitterEmissionSignatureDate: new Date().toISOString()
+        emitterEmissionSignatureDate: new Date().toISOString(),
+        destinationCompanySiret: destination.company.siret
       }
     });
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(destination.user);
     const input = {
       ecoOrganisme: { siret: ecoOrg.siret, name: "eco-org" }
     };
@@ -326,12 +331,12 @@ describe("Mutation.updateBsdasri", () => {
       })
     ]);
     expect(errors[0].message).toContain(
-      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés:"
+      "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : ecoOrganismeName, ecoOrganismeSiret"
     );
   });
   it("should allow transporter and destination fields update after emission signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    let dasri = await bsdasriFactory({
+    const dasri = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.SIGNED_BY_PRODUCER,
         emitterCompanySiret: company.siret,
@@ -362,13 +367,15 @@ describe("Mutation.updateBsdasri", () => {
       variables: { id: dasri.id, input }
     });
 
-    dasri = await prisma.bsdasri.findUnique({
+    const updatedDasri = await prisma.bsdasri.findUnique({
       where: { id: dasri.id }
     });
 
-    expect(dasri.destinationCompanyMail).toEqual("recipient@test.test");
-    expect(dasri.transporterCompanyMail).toEqual("transporter@test.test");
-    expect(dasri.type).toBe("SIMPLE");
+    expect(updatedDasri.destinationCompanyMail).toEqual("recipient@test.test");
+    expect(updatedDasri.transporterCompanyMail).toEqual(
+      "transporter@test.test"
+    );
+    expect(updatedDasri.type).toBe("SIMPLE");
   });
 
   it("should disallow emitter and transporter fields update after transport signature", async () => {
@@ -407,7 +414,7 @@ describe("Mutation.updateBsdasri", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés: emitterCompanyMail,transporterCompanyMail",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : emitterCompanyMail, transporterCompanyMail",
 
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
@@ -477,7 +484,7 @@ describe("Mutation.updateBsdasri", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés: handedOverToRecipientAt",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : handedOverToRecipientAt",
 
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
@@ -554,7 +561,7 @@ describe("Mutation.updateBsdasri", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés: destinationCompanyMail,destinationReceptionAcceptationStatus",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : destinationCompanyMail, destinationReceptionAcceptationStatus",
 
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
@@ -565,7 +572,7 @@ describe("Mutation.updateBsdasri", () => {
 
   it("should allow operation fields update after reception signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
-    let dasri = await bsdasriFactory({
+    const dasri = await bsdasriFactory({
       opt: {
         status: BsdasriStatus.RECEIVED,
         emitterCompanySiret: company.siret,
@@ -586,9 +593,9 @@ describe("Mutation.updateBsdasri", () => {
       variables: { id: dasri.id, input }
     });
 
-    dasri = await prisma.bsdasri.findUnique({
+    const updatedDasri = await prisma.bsdasri.findUnique({
       where: { id: dasri.id }
     });
-    expect(dasri.destinationOperationCode).toEqual("D10");
+    expect(updatedDasri.destinationOperationCode).toEqual("D10");
   });
 });

@@ -83,3 +83,13 @@ export class InvalidDateTime extends UserInputError {
     super(`Le format de date du champ ${field} est invalide.`);
   }
 }
+
+export class SealedFieldError extends ForbiddenError {
+  constructor(fields: string[]) {
+    super(
+      `Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : ${fields.join(
+        ", "
+      )}`
+    );
+  }
+}

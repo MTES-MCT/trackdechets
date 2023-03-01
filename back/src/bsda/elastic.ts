@@ -160,7 +160,9 @@ export function toBsdElastic(bsda: BsdaToElastic): BsdElastic {
     transporterCompanyName: bsda.transporterCompanyName ?? "",
     transporterCompanySiret: bsda.transporterCompanySiret ?? "",
     transporterCompanyVatNumber: bsda.transporterCompanyVatNumber ?? "",
-    transporterTakenOverAt: bsda.transporterTransportTakenOverAt?.getTime(),
+    transporterTakenOverAt:
+      bsda.transporterTransportTakenOverAt?.getTime() ??
+      bsda.transporterTransportSignatureDate?.getTime(),
     transporterCustomInfo: bsda.transporterCustomInfo ?? "",
     transporterNumberPlate: bsda.transporterTransportPlates,
     destinationCompanyName: bsda.destinationCompanyName ?? "",

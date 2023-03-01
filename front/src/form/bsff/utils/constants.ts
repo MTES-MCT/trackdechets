@@ -31,6 +31,11 @@ export const OPERATION: Record<
       "Recyclage ou récupération des substances organiques qui ne sont pas utilisées comme solvants (y compris les opérations de compostage et autres transformations biologiques)",
     successors: [],
   },
+  [BsffOperationCode.R5]: {
+    code: BsffOperationCode.R5,
+    description: "Recyclage ou récupération d’autres matières inorganiques",
+    successors: [],
+  },
   [BsffOperationCode.R12]: {
     code: BsffOperationCode.R12,
     description:

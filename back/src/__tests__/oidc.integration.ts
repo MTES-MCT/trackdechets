@@ -10,7 +10,7 @@ import {
   userFactory,
   userWithCompanyFactory
 } from "./factories";
-
+import { CompanyVerificationStatus } from "@prisma/client";
 import * as jose from "jose";
 
 const request = supertest(app);
@@ -517,7 +517,10 @@ describe("/oidc/token - id/secret auth", () => {
     const application = await applicationFactory(true);
 
     const { user, company } = await userWithCompanyFactory("ADMIN", {
-      vatNumber: "BE0541696005"
+      vatNumber: "ES0541696002",
+      name: "the company",
+      givenName: "happy company",
+      verificationStatus: CompanyVerificationStatus.TO_BE_VERIFIED
     });
 
     const code = getUid(16);
@@ -566,7 +569,16 @@ describe("/oidc/token - id/secret auth", () => {
     expect(payload.name).toBe(undefined);
     expect(payload.phone).toBe(undefined);
     expect(payload.companies).toEqual([
-      { role: "ADMIN", siret: company.siret, vat_number: company.vatNumber }
+      {
+        role: "ADMIN",
+        id: company.id,
+        siret: company.siret,
+        vat_number: "ES0541696002",
+        name: "the company",
+        given_name: "happy company",
+        types: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"],
+        verified: false
+      }
     ]);
   });
 
@@ -996,7 +1008,9 @@ describe("/oidc/token - basic auth", () => {
     const application = await applicationFactory(true);
 
     const { user, company } = await userWithCompanyFactory("ADMIN", {
-      vatNumber: "BE0541696002"
+      vatNumber: "BE0541696002",
+      name: "the company",
+      givenName: "happy company"
     });
 
     const code = getUid(16);
@@ -1048,7 +1062,16 @@ describe("/oidc/token - basic auth", () => {
     expect(payload.name).toBe(undefined);
     expect(payload.phone).toBe(undefined);
     expect(payload.companies).toEqual([
-      { role: "ADMIN", siret: company.siret, vat_number: company.vatNumber }
+      {
+        role: "ADMIN",
+        id: company.id,
+        siret: company.siret,
+        vat_number: "BE0541696002",
+        name: "the company",
+        given_name: "happy company",
+        types: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"],
+        verified: true
+      }
     ]);
   });
 

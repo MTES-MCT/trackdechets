@@ -169,7 +169,10 @@ const signatures: Record<
           where: { id: packagingId },
           data: {
             acceptationSignatureDate: date,
-            acceptationSignatureAuthor: author
+            acceptationSignatureAuthor: author,
+            // set acceptation waste code if it was not set explicitly
+            acceptationWasteCode:
+              packaging.acceptationWasteCode ?? existingBsff.wasteCode
           }
         });
       } else {
@@ -183,6 +186,14 @@ const signatures: Record<
           data: {
             acceptationSignatureDate: date,
             acceptationSignatureAuthor: author
+          }
+        });
+
+        // set acceptation waste code if it was not set explicitly
+        await updateManyBsffPackaging({
+          where: { bsffId: id, acceptationWasteCode: null },
+          data: {
+            acceptationWasteCode: existingBsff.wasteCode
           }
         });
       }

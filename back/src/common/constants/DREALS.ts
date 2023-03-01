@@ -334,7 +334,7 @@ const Dreals = [
     DrealRegion: "DREAL Pays Loire",
     name: "UD53 (Unité Départementale Laval)",
     Dept: "53",
-    email: "ud53.dreal-pays-loire@developpement-durable.gouv.fr"
+    email: "ud53.dreal-paysdelaloire@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DREAL Grand Est",
@@ -466,7 +466,7 @@ const Dreals = [
     DrealRegion: "DREAL Pays Loire",
     name: "UD72 (Unité Départementale Le Mans)",
     Dept: "72",
-    email: "ud72.dreal-pays-loire@developpement-durable.gouv.fr"
+    email: "ud72.dreal-paysdelaloire@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DREAL Auvergne Rhone Alpes",

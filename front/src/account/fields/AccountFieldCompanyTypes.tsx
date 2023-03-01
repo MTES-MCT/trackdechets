@@ -2,7 +2,7 @@ import React from "react";
 import { gql } from "@apollo/client";
 import AccountField from "./AccountField";
 import AccountFormCompanyTypes from "./forms/AccountFormCompanyTypes";
-import { COMPANY_TYPES } from "../../login/CompanyType";
+import { COMPANY_CONSTANTS } from "../../login/CompanyType";
 import { CompanyPrivate, UserRole } from "generated/graphql/types";
 import AccountFieldNotEditable from "./AccountFieldNotEditable";
 
@@ -25,7 +25,7 @@ export default function AccountFieldCompanyTypes({ company }: Props) {
   const companyTypes = company.companyTypes || [];
 
   const companyTypesLabel = companyTypes.map(ut => {
-    const obj = COMPANY_TYPES.find(t => t.value === ut);
+    const obj = COMPANY_CONSTANTS.find(t => t.value === ut);
     return obj ? obj.label : "";
   });
 

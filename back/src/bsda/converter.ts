@@ -228,10 +228,13 @@ export function expandBsdaFromElastic(
     forwardedIn: bsda?.forwardedIn
   };
 }
-export function flattenBsdaInput(
-  formInput: BsdaInput
-): Partial<Prisma.BsdaCreateInput> {
-  return safeInput({
+
+type FlattenedBsdaInput = Partial<
+  Omit<Prisma.BsdaCreateInput, "intermediariesOrgIds">
+>;
+
+export function flattenBsdaInput(formInput: BsdaInput) {
+  return safeInput<FlattenedBsdaInput>({
     type: chain(formInput, f => f.type),
     ...flattenBsdaEmitterInput(formInput),
     ...flattenBsdaEcoOrganismeInput(formInput),

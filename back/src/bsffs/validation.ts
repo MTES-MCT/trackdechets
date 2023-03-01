@@ -299,7 +299,9 @@ export const destinationSchemaFn: FactorySchemaOf<boolean, Destination> =
         .nullable()
         .oneOf(
           [null, ...Object.keys(OPERATION)],
-          "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
+          `Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${Object.keys(
+            OPERATION
+          ).join(", ")}`
         )
         .requiredIf(
           !isDraft,
@@ -355,15 +357,13 @@ export const acceptationSchema: yup.SchemaOf<Acceptation> = yup.object({
   acceptationWasteCode: yup
     .string()
     .nullable()
-    .required("Le code déchet après analyse est requis")
     .oneOf(
-      BSFF_WASTE_CODES,
-      "Le code déchet ne fait pas partie de la liste reconnue : ${values}"
+      [null, ...BSFF_WASTE_CODES],
+      `Le code déchet ne fait pas partie de la liste reconnue : ${BSFF_WASTE_CODES.join(
+        ", "
+      )}`
     ),
-  acceptationWasteDescription: yup
-    .string()
-    .ensure()
-    .required("La description du déchet après analyse est requise")
+  acceptationWasteDescription: yup.string()
 });
 
 const withNextDestination = (required: boolean) =>
@@ -651,7 +651,7 @@ export async function validatePreviousPackagings(
   const forwardedPackagings = isForwarding
     ? await prisma.bsffPackaging.findMany({
         where: { id: { in: forwarding } },
-        include: { bsff: true }
+        include: { bsff: true, nextPackaging: { select: { bsffId: true } } }
       })
     : [];
 
@@ -666,11 +666,37 @@ export async function validatePreviousPackagings(
     );
   }
 
+  if (isForwarding) {
+    const bsffIds = forwardedPackagings.map(p => p.bsffId);
+    const areOnSameBsff = bsffIds.every(id => id === bsffIds[0]);
+    if (!areOnSameBsff) {
+      throw new UserInputError(
+        "Tous les contenants réexpédiés doivent apparaitre sur le même BSFF initial"
+      );
+    }
+  }
+
+  const forwardedWasteCodes = [
+    ...new Set(
+      forwardedPackagings
+        .map(p => p.acceptationWasteCode ?? p.bsff?.wasteCode)
+        .filter(code => code?.length > 0)
+    )
+  ].sort();
+
+  if (forwardedWasteCodes?.length > 1) {
+    throw new UserInputError(
+      `Vous ne pouvez pas réexpédier des contenants ayant des codes déchet différents : ${forwardedWasteCodes.join(
+        ", "
+      )}`
+    );
+  }
+
   // contenants qui sont reconditionnés dans ce BSFF
   const repackagedPackagings = isRepackaging
     ? await prisma.bsffPackaging.findMany({
         where: { id: { in: repackaging } },
-        include: { bsff: true }
+        include: { bsff: true, nextPackaging: { select: { bsffId: true } } }
       })
     : [];
 
@@ -689,7 +715,7 @@ export async function validatePreviousPackagings(
   const groupedPackagings = isGrouping
     ? await prisma.bsffPackaging.findMany({
         where: { id: { in: grouping } },
-        include: { bsff: true }
+        include: { bsff: true, nextPackaging: { select: { bsffId: true } } }
       })
     : [];
 
@@ -701,6 +727,20 @@ export async function validatePreviousPackagings(
       `Les identifiants de contenants de fluide à grouper ${notFoundIds.join(
         ", "
       )} n'existent pas`
+    );
+  }
+
+  const groupedWasteCodes = [
+    ...new Set(
+      groupedPackagings.map(p => p.acceptationWasteCode ?? p.bsff?.wasteCode)
+    )
+  ].sort();
+
+  if (groupedWasteCodes?.length > 1) {
+    throw new UserInputError(
+      `Vous ne pouvez pas regrouper des contenants ayant des codes déchet différents : ${groupedWasteCodes.join(
+        ", "
+      )}`
     );
   }
 
@@ -721,16 +761,6 @@ export async function validatePreviousPackagings(
     throw new UserInputError(
       "Vous devez saisir des contenants en transit en cas de groupement, reconditionnement ou réexpédition"
     );
-  }
-
-  if (isForwarding) {
-    const bsffIds = forwardedPackagings.map(p => p.bsffId);
-    const areOnSameBsff = bsffIds.every(id => id === bsffIds[0]);
-    if (!areOnSameBsff) {
-      throw new UserInputError(
-        "Tous les contenants réexpédiés doivent apparaitre sur le même BSFF initial"
-      );
-    }
   }
 
   const errors = previousPackagings.reduce((acc, packaging) => {
@@ -760,7 +790,7 @@ export async function validatePreviousPackagings(
 
     if (
       !!packaging.nextPackagingId &&
-      !bsff.packagings?.map(p => p.id).includes(packaging.nextPackagingId)
+      packaging.nextPackaging.bsffId !== bsff.id
     ) {
       return [
         ...acc,

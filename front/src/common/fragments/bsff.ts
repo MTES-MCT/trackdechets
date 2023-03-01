@@ -241,13 +241,15 @@ export const PreviousBsffPackagingFragment = gql`
   fragment PreviousBsffPackaging on BsffPackaging {
     id
     numero
+    type
+    other
     weight
     volume
-    name
     bsffId
     acceptation {
       wasteCode
       wasteDescription
+      weight
     }
     bsff {
       id

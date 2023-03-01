@@ -20,11 +20,12 @@ function makeReference(apiId) {
 }
 
 const referenceDefs = [
-  { id: "bsdd", label: "Déchets dangereux" },
-  { id: "bsdasri", label: "DASRI" },
-  { id: "bsvhu", label: "VHU" },
-  { id: "bsff", label: "Fluides Frigorigènes" },
   { id: "bsda", label: "Amiante" },
+  { id: "bsdasri", label: "DASRI" },
+  { id: "bsdd", label: "Déchets dangereux" },
+  { id: "bsff", label: "Fluides Frigorigènes" },
+  { id: "bsvhu", label: "VHU" },
+
   { id: "user-company", label: "Utilisateurs et Établissements" },
   { id: "registre", label: "Registre" },
 ];
@@ -110,8 +111,9 @@ module.exports = {
         },
         {
           Statuts: [
-            "reference/statuts/bsdd",
+            "reference/statuts/bsda",
             "reference/statuts/bsdasri",
+            "reference/statuts/bsdd",
             "reference/statuts/bsff",
           ],
         },

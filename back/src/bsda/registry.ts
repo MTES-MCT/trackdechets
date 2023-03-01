@@ -202,7 +202,9 @@ export function toOutgoingWaste(
     transporterCompanyAddress: null,
     transporterCompanyName: bsda.transporterCompanyName,
     transporterCompanySiret: getTransporterCompanyOrgId(bsda),
-    transporterTakenOverAt: bsda.transporterTransportTakenOverAt,
+    transporterTakenOverAt:
+      bsda.transporterTransportTakenOverAt ??
+      bsda.transporterTransportSignatureDate,
     transporterRecepisseNumber: bsda.transporterRecepisseNumber,
     weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
     emitterCustomInfo: bsda.emitterCustomInfo,
@@ -246,7 +248,9 @@ export function toTransportedWaste(
 
   return {
     ...genericWaste,
-    transporterTakenOverAt: bsda.transporterTransportTakenOverAt,
+    transporterTakenOverAt:
+      bsda.transporterTransportTakenOverAt ??
+      bsda.transporterTransportSignatureDate,
     destinationReceptionDate: bsda.destinationReceptionDate,
     weight: bsda.weightValue ? bsda.weightValue / 1000 : bsda.weightValue,
     transporterCompanyName: bsda.transporterCompanyName,
@@ -380,7 +384,9 @@ export function toAllWaste(
   return {
     ...genericWaste,
     createdAt: bsda.createdAt,
-    transporterTakenOverAt: bsda.transporterTransportTakenOverAt,
+    transporterTakenOverAt:
+      bsda.transporterTransportTakenOverAt ??
+      bsda.transporterTransportSignatureDate,
     destinationReceptionDate: bsda.destinationReceptionDate,
     brokerCompanyName: bsda.brokerCompanyName,
     brokerCompanySiret: bsda.brokerCompanySiret,

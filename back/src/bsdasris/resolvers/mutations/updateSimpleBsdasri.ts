@@ -3,11 +3,10 @@ import { BsdasriStatus, BsdasriType, Bsdasri } from "@prisma/client";
 
 import { BsdasriInput } from "../../../generated/graphql/types";
 import { validateBsdasri } from "../../validation";
-import { ForbiddenError, UserInputError } from "apollo-server-express";
-
-import { getFieldsAllorwedForUpdate } from "./fieldsUpdateRules";
+import { UserInputError } from "apollo-server-express";
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
 import { getBsdasriRepository } from "../../repository";
+import { checkEditionRules } from "../../edition";
 
 const getGroupedBsdasriArgs = (
   inputRegroupedBsdasris: string[] | null | undefined
@@ -94,19 +93,7 @@ const updateBsdasri = async ({
     isGrouping: isGroupingType
   });
 
-  const flattenedFields = Object.keys(flattenedInput);
-
-  // except for draft and sealed status, update fields are whitelisted
-  if (dbBsdasri.status !== "INITIAL") {
-    const allowedFields = getFieldsAllorwedForUpdate(dbBsdasri);
-
-    const diff = flattenedFields.filter(el => !allowedFields.includes(el));
-
-    if (!!diff.length) {
-      const errMessage = `Des champs ont été verrouillés via signature et ne peuvent plus être modifiés: ${diff.join()}`;
-      throw new ForbiddenError(errMessage);
-    }
-  }
+  await checkEditionRules(dbBsdasri, input, user);
 
   const bsdasriRepository = getBsdasriRepository(user);
 

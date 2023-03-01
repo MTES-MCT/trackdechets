@@ -26,8 +26,8 @@
     "build-workflow-plugin": "tsc --project plugin/tsconfig.json && copyfiles -u 1 ../back/src/**/*.gql plugin/build"
   },
   "dependencies": {
-    "@docusaurus/core": "^2.1.0",
-    "@docusaurus/preset-classic": "2.1.0",
+    "@docusaurus/core": "^2.3.1",
+    "@docusaurus/preset-classic": "^2.3.1",
     "@mdx-js/react": "^1.6.21",
     "@svgr/webpack": "^5.5.0",
     "clsx": "^1.1.1",
@@ -53,8 +53,8 @@
     ]
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "^2.0.0-beta.3",
-    "@docusaurus/types": "^2.0.0-beta.3",
+    "@docusaurus/module-type-aliases": "^2.3.1",
+    "@docusaurus/types": "^2.3.1",
     "@tsconfig/docusaurus": "^1.0.2",
     "@types/react": "^17.0.13",
     "copyfiles": "^2.4.1",

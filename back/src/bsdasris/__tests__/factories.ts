@@ -1,5 +1,10 @@
 import prisma from "../../prisma";
-import { BsdasriStatus, WasteAcceptationStatus, Prisma } from "@prisma/client";
+import {
+  BsdasriStatus,
+  WasteAcceptationStatus,
+  Prisma,
+  BsdasriType
+} from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
 
 const dasriData = () => ({
@@ -14,11 +19,27 @@ export const bsdasriFactory = async ({
   opt?: Partial<Prisma.BsdasriCreateInput>;
 }) => {
   const dasriParams = { ...dasriData(), ...opt };
-  return prisma.bsdasri.create({
+  const created = await prisma.bsdasri.create({
     data: {
       ...dasriParams
-    }
+    },
+    include: { synthesizing: true }
   });
+
+  if (created.type === BsdasriType.SYNTHESIS) {
+    const synthesisEmitterSirets = [
+      ...new Set(
+        created.synthesizing.map(associated => associated.emitterCompanySiret)
+      )
+    ].filter(Boolean);
+
+    return prisma.bsdasri.update({
+      where: { id: created.id },
+      data: { synthesisEmitterSirets }
+    });
+  }
+
+  return created;
 };
 
 export const initialData = company => ({

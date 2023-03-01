@@ -1,20 +1,18 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { useParams, useRouteMatch } from "react-router-dom";
+import { generatePath, useParams, useRouteMatch } from "react-router-dom";
 import { useLazyQuery, useQuery } from "@apollo/client";
+import { Breadcrumb, BreadcrumbItem } from "@dataesr/react-dsfr";
 import routes from "../common/routes";
 import { GET_BSDS } from "../common/queries";
-import { Query, QueryBsdsArgs } from "generated/graphql/types";
+import { OrderType, Query, QueryBsdsArgs } from "generated/graphql/types";
 import { useNotifier } from "../dashboard/components/BSDList/useNotifier";
 import BsdCardList from "Apps/Dashboard/Components/BsdCardList/BsdCardList";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
   Blankslate,
   BlankslateTitle,
   BlankslateDescription,
   Loader,
 } from "common/components";
-import { BSDDropdown } from "dashboard/components/BSDList/BSDDropdown";
 import {
   blankstate_action_desc,
   blankstate_action_title,
@@ -29,9 +27,19 @@ import {
   breadcrumb_pour_action,
   breadcrumb_suivi,
   breadcrumb_title,
+  dropdown_create_btn,
+  filter_reset_btn,
+  filter_show_btn,
   load_more_bsds,
-} from "assets/wordings/dashboard/wordingsDashboard";
+} from "Apps/Common/wordings/dashboard/wordingsDashboard";
 import { IconDuplicateFile } from "common/components/Icons";
+import Filters from "Apps/Common/Components/Filters/Filters";
+import {
+  filterList,
+  dropdownCreateLinks,
+} from "../Apps/Dashboard/dashboardUtils";
+import BsdCreateDropdown from "../Apps/Common/Components/DropdownMenu/DropdownMenu";
+import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
 
 import "./dashboard.scss";
 
@@ -40,11 +48,38 @@ const DashboardPage = () => {
   const isDraftTab = !!useRouteMatch(routes.dashboardv2.bsds.drafts);
   const isFollowTab = !!useRouteMatch(routes.dashboardv2.bsds.follow);
   const isArchivesTab = !!useRouteMatch(routes.dashboardv2.bsds.history);
+  const isToCollectTab = !!useRouteMatch(
+    routes.dashboardv2.transport.toCollect
+  );
   const BSD_PER_PAGE = 10;
 
-  const { siret } = useParams<{ siret: string }>();
+  const getBsdCurrentTab = (): BsdCurrentTab => {
+    if (isDraftTab) {
+      return "draftTab";
+    }
+    if (isActTab) {
+      return "actTab";
+    }
+    if (isFollowTab) {
+      return "followTab";
+    }
+    if (isArchivesTab) {
+      return "archivesTab";
+    }
+    if (isToCollectTab) {
+      return "toCollectTab";
+    }
+    // default tab
+    return "draftTab";
+  };
 
-  const getPredicate = useCallback(() => {
+  const bsdCurrentTab = getBsdCurrentTab();
+
+  const { siret } = useParams<{ siret: string }>();
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+
+  const withRoutePredicate = useCallback(() => {
     if (isActTab) {
       return {
         isForActionFor: [siret],
@@ -66,7 +101,11 @@ const DashboardPage = () => {
       };
     }
   }, [isActTab, isDraftTab, isFollowTab, isArchivesTab, siret]);
-  const defaultWhere = useMemo(() => getPredicate(), [getPredicate]);
+
+  const defaultWhere = useMemo(
+    () => withRoutePredicate(),
+    [withRoutePredicate]
+  );
 
   const [bsdsVariables, setBsdsVariables] = useState<QueryBsdsArgs>({
     first: BSD_PER_PAGE,
@@ -81,15 +120,15 @@ const DashboardPage = () => {
     notifyOnNetworkStatusChange: true,
   });
 
-  const refetchBsds = React.useCallback(() => {
+  const fetchBsds = React.useCallback(() => {
     lazyFetchBsds({
       variables: bsdsVariables,
     });
   }, [lazyFetchBsds, bsdsVariables]);
 
-  useNotifier(siret, refetchBsds);
+  useNotifier(siret, fetchBsds);
 
-  const refetchWithDefaultWhere = React.useCallback(
+  const fetchWithDefaultWhere = React.useCallback(
     ({ where, ...args }) => {
       const newVariables = {
         ...args,
@@ -107,18 +146,78 @@ const DashboardPage = () => {
   const { data: cachedData } = useQuery<Pick<Query, "bsds">, QueryBsdsArgs>(
     GET_BSDS,
     {
-      variables: {
-        first: BSD_PER_PAGE,
-        where: defaultWhere,
-      },
+      variables: bsdsVariables,
       // read from the cache only to avoid duplicate requests
       fetchPolicy: "cache-only",
     }
   );
 
+  const handleFiltersSubmit = filterValues => {
+    const variables = {
+      where: {},
+      order: {},
+    };
+    const predicate = withRoutePredicate();
+    if (predicate) {
+      variables.where = predicate;
+    }
+    const filterKeys = Object.keys(filterValues);
+    const filters = filterList.filter(filter =>
+      filterKeys.includes(filter.value)
+    );
+    filters.forEach(f => {
+      variables.where[f.value] = filterValues[f.value];
+      variables.order[f.order] = OrderType.Asc;
+    });
+    setBsdsVariables(variables);
+  };
+
+  const loadMoreBsds = React.useCallback(() => {
+    setIsFetchingMore(true);
+    fetchMore({
+      variables: {
+        after: data?.bsds.pageInfo.endCursor,
+      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (fetchMoreResult == null) {
+          return prev;
+        }
+
+        return {
+          ...prev,
+          bsds: {
+            ...prev.bsds,
+            ...fetchMoreResult.bsds,
+            edges: prev.bsds.edges.concat(fetchMoreResult.bsds.edges),
+          },
+        };
+      },
+    }).then(() => {
+      setIsFetchingMore(false);
+    });
+  }, [data?.bsds.pageInfo.endCursor, fetchMore]);
+
   useEffect(() => {
-    refetchWithDefaultWhere({ where: defaultWhere });
-  }, [isActTab, isDraftTab, defaultWhere, refetchWithDefaultWhere]);
+    setIsFiltersOpen(false);
+    fetchWithDefaultWhere({ where: defaultWhere });
+  }, [
+    isActTab,
+    isDraftTab,
+    isFollowTab,
+    isArchivesTab,
+    defaultWhere,
+    fetchWithDefaultWhere,
+  ]);
+
+  useEffect(() => {
+    fetchBsds();
+  }, [bsdsVariables, fetchBsds]);
+
+  useEffect(() => {
+    if (!isFiltersOpen) {
+      fetchWithDefaultWhere({ where: defaultWhere });
+    }
+  }, [isFiltersOpen, defaultWhere, fetchWithDefaultWhere]);
 
   const getBreadcrumbItem = () => {
     if (isActTab) {
@@ -171,61 +270,81 @@ const DashboardPage = () => {
     }
   };
 
+  const toggleFiltersBlock = () => {
+    setIsFiltersOpen(!isFiltersOpen);
+  };
+
   const bsds = data?.bsds.edges;
 
   return (
     <div className="dashboard-page">
       <Breadcrumb>
-        <BreadcrumbItem>{breadcrumb_title}</BreadcrumbItem>
+        <BreadcrumbItem
+          href={generatePath(routes.dashboardv2.index, {
+            siret,
+          })}
+        >
+          {breadcrumb_title}
+        </BreadcrumbItem>
         <BreadcrumbItem>{getBreadcrumbItem()}</BreadcrumbItem>
       </Breadcrumb>
-      {loading && <Loader />}
-      <div className="dashboard-page__bsd-dropdown">
-        <BSDDropdown siret={siret} />
-      </div>
-      {cachedData?.bsds.totalCount === 0 && (
-        <Blankslate>
-          <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
-          <BlankslateDescription>
-            {getBlankstateDescription()}
-          </BlankslateDescription>
-        </Blankslate>
-      )}
-      <div>
-        {!!data?.bsds.edges.length && (
-          <BsdCardList siret={siret} bsds={bsds!} />
-        )}
-      </div>
-
-      {data?.bsds.pageInfo.hasNextPage && (
-        <div className="dashboard-page__loadmore">
+      <div className="dashboard-page__actions">
+        <div className="create-btn">
+          <BsdCreateDropdown
+            links={dropdownCreateLinks(siret)}
+            isDisabled={loading}
+            menuTitle={dropdown_create_btn}
+          />
+        </div>
+        <div className="filter-btn">
           <button
-            className="fr-btn"
-            onClick={() =>
-              fetchMore({
-                variables: {
-                  after: data?.bsds.pageInfo.endCursor,
-                },
-                updateQuery: (prev, { fetchMoreResult }) => {
-                  if (fetchMoreResult == null) {
-                    return prev;
-                  }
-
-                  return {
-                    ...prev,
-                    bsds: {
-                      ...prev.bsds,
-                      ...fetchMoreResult.bsds,
-                      edges: prev.bsds.edges.concat(fetchMoreResult.bsds.edges),
-                    },
-                  };
-                },
-              })
-            }
+            type="button"
+            className="fr-btn fr-btn--secondary"
+            aria-expanded={isFiltersOpen}
+            onClick={toggleFiltersBlock}
+            disabled={loading}
           >
-            {load_more_bsds}
+            {!isFiltersOpen ? filter_show_btn : filter_reset_btn}
           </button>
         </div>
+      </div>
+      {isFiltersOpen && (
+        <Filters filters={filterList} onApplyFilters={handleFiltersSubmit} />
+      )}
+      {isFetchingMore && <Loader />}
+      {loading && !isFetchingMore ? (
+        <Loader />
+      ) : (
+        <>
+          {cachedData?.bsds.totalCount === 0 && (
+            <Blankslate>
+              <BlankslateTitle>{getBlankstateTitle()}</BlankslateTitle>
+              <BlankslateDescription>
+                {getBlankstateDescription()}
+              </BlankslateDescription>
+            </Blankslate>
+          )}
+
+          {!!data?.bsds.edges.length && (
+            <BsdCardList
+              siret={siret}
+              bsds={bsds!}
+              bsdCurrentTab={bsdCurrentTab}
+            />
+          )}
+
+          {data?.bsds.pageInfo.hasNextPage && (
+            <div className="dashboard-page__loadmore">
+              <button
+                className="fr-btn"
+                onClick={loadMoreBsds}
+                disabled={isFetchingMore}
+              >
+                {load_more_bsds}
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

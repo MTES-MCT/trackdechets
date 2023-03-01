@@ -1,6 +1,6 @@
 import { CompanyVerificationStatus } from "@prisma/client";
 import { sendVerificationCodeLetter } from "../../common/post";
-import * as COMPANY_TYPES from "../../common/constants/COMPANY_TYPES";
+import * as COMPANY_CONSTANTS from "../../common/constants/COMPANY_CONSTANTS";
 import prisma from "../../prisma";
 import { CompanyType } from "@prisma/client";
 
@@ -11,7 +11,9 @@ export default async function sendVerificationCodeLetters() {
     const companies = await prisma.company.findMany({
       where: {
         verificationStatus: CompanyVerificationStatus.TO_BE_VERIFIED,
-        companyTypes: { hasSome: COMPANY_TYPES.PROFESSIONALS as CompanyType[] }
+        companyTypes: {
+          hasSome: COMPANY_CONSTANTS.PROFESSIONALS as CompanyType[]
+        }
       }
     });
 

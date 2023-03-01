@@ -8,6 +8,7 @@ import {
   BsffType,
 } from "generated/graphql/types";
 import Tooltip from "common/components/Tooltip";
+import initialState from "./utils/initial-state";
 
 const options = [
   {
@@ -46,6 +47,8 @@ export function BsffTypeSelector() {
     useField<BsffFicheIntervention[]>("ficheInterventions");
   const [{ value: previousPackagings }, , { setValue: setPreviousBsffs }] =
     useField<Bsff[]>("previousPackagings");
+  const [, , { setValue: setWasteCode }] =
+    useField<string | null>("waste.code");
 
   return (
     <>
@@ -94,6 +97,7 @@ export function BsffTypeSelector() {
                     setPackagings([]);
                     setWeight({ value: 0, isEstimate: false });
                     setFicheInterventions([]);
+                    setWasteCode(initialState.waste?.code);
                     setType(option.value);
                     return;
                   }
@@ -132,6 +136,7 @@ export function BsffTypeSelector() {
                     setPackagings([]);
                     setWeight({ value: 0, isEstimate: false });
                     setFicheInterventions([]);
+                    setWasteCode("");
                     setType(option.value);
                     return;
                   }
@@ -164,6 +169,7 @@ export function BsffTypeSelector() {
                     setPackagings([]);
                     setWeight({ value: 0, isEstimate: false });
                     setFicheInterventions([]);
+                    setWasteCode("");
                     setType(option.value);
                     return;
                   }
@@ -202,6 +208,7 @@ export function BsffTypeSelector() {
                     setPackagings([]);
                     setWeight({ value: 0, isEstimate: false });
                     setFicheInterventions([]);
+                    setWasteCode("");
                     setType(option.value);
                     return;
                   }
