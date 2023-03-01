@@ -9,6 +9,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import getReadableId from "../../../readableId";
 
 const GET_FORM_QUERY = `
   query GetForm($id: ID, $readableId: String) {
@@ -163,5 +164,51 @@ describe("Query.form", () => {
         siret: intermediary.company.siret
       })
     ]);
+  });
+
+  it("should not allow the theorical next destination to read the form, but should allow the real next destination", async () => {
+    const { user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { user: theroricalUser, company: theoricalCompany } =
+      await userWithCompanyFactory(UserRole.ADMIN);
+    const { user: realUser, company: realCompany } =
+      await userWithCompanyFactory(UserRole.ADMIN);
+
+    const form = await createForm({
+      status: "AWAITING_GROUP",
+      nextDestinationCompanySiret: theoricalCompany.siret,
+      quantityReceived: 1,
+      forwardedIn: {
+        create: {
+          readableId: getReadableId(),
+          ownerId: user.id,
+          quantityReceived: 1,
+          recipientCompanySiret: realCompany.siret
+        }
+      }
+    });
+
+    const { query: queryTheoricalUser } = makeClient(theroricalUser);
+    const { errors } = await queryTheoricalUser<Pick<Query, "form">>(
+      GET_FORM_QUERY,
+      {
+        variables: {
+          readableId: form.readableId
+        }
+      }
+    );
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toBe(
+      "Vous n'êtes pas autorisé à accéder à ce bordereau"
+    );
+
+    const { query: quaryRealUser } = makeClient(realUser);
+    const { data } = await quaryRealUser<Pick<Query, "form">>(GET_FORM_QUERY, {
+      variables: {
+        readableId: form.readableId
+      }
+    });
+
+    expect(data.form.id).toBe(form.id);
   });
 });
