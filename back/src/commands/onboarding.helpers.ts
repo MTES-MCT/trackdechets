@@ -204,15 +204,15 @@ export const getActiveUsersWithPendingMembershipRequests = async (
 export const sendPendingMembershipRequestDetailsEmail = async () => {
   const recipients = await getActiveUsersWithPendingMembershipRequests(14);
 
-  await Promise.all(
-    recipients.map(recipient => {
-      const payload = renderMail(pendingMembershipRequestDetailsEmail, {
-        to: [{ email: recipient.email, name: recipient.name }]
-      });
+  const messageVersions: MessageVersion[] = recipients.map(recipient => ({
+    to: [{ email: recipient.email, name: recipient.name }]
+  }));
 
-      return sendMail(payload);
-    })
-  );
+  const payload = renderMail(pendingMembershipRequestDetailsEmail, {
+    messageVersions
+  });
+
+  await sendMail(payload);
 
   await prisma.$disconnect();
 };
