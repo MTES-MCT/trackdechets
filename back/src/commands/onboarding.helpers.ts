@@ -268,24 +268,35 @@ export const getPendingMembershipRequestsAndAssociatedAdmins = async (
 export const sendPendingMembershipRequestToAdminDetailsEmail = async () => {
   const requests = await getPendingMembershipRequestsAndAssociatedAdmins(14);
 
-  await Promise.all(
-    requests.map(request => {
-      const variables = {
-        requestId: request.id,
-        email: request.user.email,
-        orgName: request.company.name,
-        orgId: request.company.orgId
-      };
+  const messageVersions: MessageVersion[] = requests.map(request => {
+    const variables = {
+      requestId: request.id,
+      email: request.user.email,
+      orgName: request.company.name,
+      orgId: request.company.orgId
+    };
 
-      request.admins.map(admin => {
-        const payload = renderMail(pendingMembershipRequestAdminDetailsEmail, {
-          to: [{ email: admin.email, name: admin.name }],
-          variables
-        });
+    const template = renderMail(pendingMembershipRequestAdminDetailsEmail, {
+      variables,
+      messageVersions: []
+    });
 
-        return sendMail(payload);
-      });
-    })
-  );
+    return {
+      to: request.admins.map(admin => ({
+        email: admin.email,
+        name: admin.name
+      })),
+      params: {
+        body: template.body
+      }
+    };
+  });
+
+  const payload = renderMail(pendingMembershipRequestAdminDetailsEmail, {
+    messageVersions
+  });
+
+  await sendMail(payload);
+
   await prisma.$disconnect();
 };

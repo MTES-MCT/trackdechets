@@ -21,12 +21,12 @@ const batchMail: Mail = {
   messageVersions: [
     {
       to: [{ name: "name1", email: "email1@mail.com" }],
-      htmlContent: "htmlContent1",
+      params: { body: "htmlContent1" },
       subject: "subject1"
     },
     {
       to: [{ name: "name2", email: "email2@mail.com" }],
-      htmlContent: "htmlContent2",
+      params: { body: "htmlContent2" },
       subject: "subject2"
     }
   ],
@@ -102,12 +102,12 @@ describe("sendInBlue backend", () => {
     // message versions stuff
     expect(payload.messageVersions[0].to[0].name).toEqual("name1");
     expect(payload.messageVersions[0].to[0].email).toEqual("email1@mail.com");
-    expect(payload.messageVersions[0].htmlContent).toEqual("htmlContent1");
+    expect(payload.messageVersions[0].params.body).toEqual("htmlContent1");
     expect(payload.messageVersions[0].subject).toEqual("subject1");
 
     expect(payload.messageVersions[1].to[0].name).toEqual("name2");
     expect(payload.messageVersions[1].to[0].email).toEqual("email2@mail.com");
-    expect(payload.messageVersions[1].htmlContent).toEqual("htmlContent2");
+    expect(payload.messageVersions[1].params.body).toEqual("htmlContent2");
     expect(payload.messageVersions[1].subject).toEqual("subject2");
   });
 
@@ -124,7 +124,7 @@ describe("sendInBlue backend", () => {
         Array(MESSAGE_VERSIONS_BULK_LIMIT + 10).keys()
       ).map(i => ({
         to: [{ name: `user${i}`, email: `user${i}@mail.com` }],
-        htmlContent: `htmlContent${i}`,
+        params: { body: `htmlContent${i}` },
         subject: `subject${i}`
       }))
     };
@@ -159,7 +159,7 @@ describe("sendInBlue backend", () => {
     );
     expect(payload0.messageVersions[0].to[0].name).toEqual("user0");
     expect(payload0.messageVersions[0].to[0].email).toEqual("user0@mail.com");
-    expect(payload0.messageVersions[0].htmlContent).toEqual("htmlContent0");
+    expect(payload0.messageVersions[0].params.body).toEqual("htmlContent0");
     expect(payload0.messageVersions[0].subject).toEqual("subject0");
 
     const payload1 = args[1][1];
@@ -178,7 +178,7 @@ describe("sendInBlue backend", () => {
     // message versions stuff
     expect(payload1.messageVersions[0].to[0].name).toEqual("user950");
     expect(payload1.messageVersions[0].to[0].email).toEqual("user950@mail.com");
-    expect(payload1.messageVersions[0].htmlContent).toEqual("htmlContent950");
+    expect(payload1.messageVersions[0].params.body).toEqual("htmlContent950");
     expect(payload1.messageVersions[0].subject).toEqual("subject950");
   });
 });
