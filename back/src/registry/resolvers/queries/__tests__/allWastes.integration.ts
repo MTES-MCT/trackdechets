@@ -194,6 +194,7 @@ describe("All wastes registry", () => {
   });
 
   it("should not allow user to request any siret if authenticated from a service account", async () => {
+    // service account access is limited to incomingWastes, outgoingWastes, transportedWastes and managedWastes
     const user = await userFactory({ isRegistreNational: true });
     const { query } = makeClient(user);
     const { errors } = await query<Pick<Query, "allWastes">>(ALL_WASTES, {
