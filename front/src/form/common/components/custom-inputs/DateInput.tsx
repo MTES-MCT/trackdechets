@@ -23,7 +23,7 @@ export default function DateInput({
 } & ReactDatePickerProps) {
   const { value, ...rest } = field;
 
-  const setSelectedDate = () => {
+  const getSelectedDate = () => {
     const parsedDate = value ? parseDate(value) : null;
     if (isValid(parsedDate)) {
       return parsedDate;
@@ -35,7 +35,7 @@ export default function DateInput({
       {...props}
       dateFormat="dd/MM/yyyy"
       autoComplete="off"
-      selected={setSelectedDate()}
+      selected={getSelectedDate()}
       onChange={(value: Date | null) => {
         setFieldValue(field.name, value ? format(value, "yyyy-MM-dd") : null);
       }}
