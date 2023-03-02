@@ -40,6 +40,36 @@ describe("edition rules", () => {
     );
   });
 
+  it("should be possible to set a sealed field to null if it was empty", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterEmissionSignatureDate: new Date(),
+        emitterPickupSiteAddress: ""
+      }
+    });
+
+    const checked = await checkEditionRules(bsda, {
+      emitter: { pickupSite: { address: null } }
+    });
+    expect(checked).toBe(true);
+  });
+
+  it("should be possible to set a sealed field to an empty string if it was null", async () => {
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterEmissionSignatureDate: new Date(),
+        emitterPickupSiteAddress: null
+      }
+    });
+
+    const checked = await checkEditionRules(bsda, {
+      emitter: { pickupSite: { address: "" } }
+    });
+    expect(checked).toBe(true);
+  });
+
   it("should be possible for the emitter to update a field sealed by emission signature", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const bsda = await bsdaFactory({
