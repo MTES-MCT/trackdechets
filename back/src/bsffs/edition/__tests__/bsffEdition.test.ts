@@ -112,7 +112,7 @@ describe("edition", () => {
     const bsff = {
       emitterEmissionSignatureDate: null,
       transporterTransportSignatureDate: null,
-      destinationOperationSignatureDate: null
+      destinationReceptionSignatureDate: null
     } as Bsff;
     expect(isAwaitingSignature("EMISSION", bsff)).toEqual(true);
     expect(isAwaitingSignature("TRANSPORT", bsff)).toEqual(true);
