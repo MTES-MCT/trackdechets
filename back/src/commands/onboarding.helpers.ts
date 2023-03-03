@@ -1,11 +1,17 @@
 import prisma from "../prisma";
 import { sendMail } from "../mailer/mailing";
-import { Company, CompanyAssociation, User } from "@prisma/client";
+import {
+  Company,
+  CompanyAssociation,
+  MembershipRequestStatus,
+  User
+} from "@prisma/client";
 import * as COMPANY_CONSTANTS from "../common/constants/COMPANY_CONSTANTS";
 import {
   onboardingFirstStep,
   onboardingProducerSecondStep,
   onboardingProfessionalSecondStep,
+  pendingMembershipRequestDetailsEmail,
   membershipRequestDetailsEmail
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
@@ -154,6 +160,55 @@ export const sendMembershipRequestDetailsEmail = async () => {
   }));
 
   const payload = renderMail(membershipRequestDetailsEmail, {
+    messageVersions
+  });
+
+  await sendMail(payload);
+
+  await prisma.$disconnect();
+};
+
+export const getActiveUsersWithPendingMembershipRequests = async (
+  daysAgo: number
+) => {
+  const now = new Date();
+
+  const requestDateGt = xDaysAgo(now, daysAgo);
+  const requestDateLt = xDaysAgo(now, daysAgo - 1);
+
+  const pendingMembershipRequests = await prisma.membershipRequest.findMany({
+    where: {
+      createdAt: { gte: requestDateGt, lt: requestDateLt },
+      status: MembershipRequestStatus.PENDING
+    }
+  });
+
+  const uniqueUserIds = [
+    ...new Set(pendingMembershipRequests.map(p => p.userId))
+  ];
+
+  const users = await prisma.user.findMany({
+    where: {
+      isActive: true,
+      id: { in: uniqueUserIds }
+    }
+  });
+
+  return users;
+};
+
+/**
+ * Send a mail to all users who issued a membership request and who
+ * got no answer
+ */
+export const sendPendingMembershipRequestDetailsEmail = async () => {
+  const recipients = await getActiveUsersWithPendingMembershipRequests(14);
+
+  const messageVersions: MessageVersion[] = recipients.map(recipient => ({
+    to: [{ email: recipient.email, name: recipient.name }]
+  }));
+
+  const payload = renderMail(pendingMembershipRequestDetailsEmail, {
     messageVersions
   });
 
