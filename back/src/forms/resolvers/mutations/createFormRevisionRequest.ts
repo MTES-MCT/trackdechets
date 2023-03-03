@@ -232,7 +232,7 @@ async function getFlatContent(
     NON_CANCELLABLE_BSDD_STATUSES.includes(bsdd.status)
   ) {
     throw new ForbiddenError(
-      "Impossible de créer une révision d'annulation sur ce bordereau, il est à un stade trop avancé."
+      "Impossible d'annuler un bordereau qui a été réceptionné sur l'installation de destination."
     );
   }
 

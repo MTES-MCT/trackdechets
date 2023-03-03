@@ -529,7 +529,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       });
 
       expect(errors[0].message).toBe(
-        "Impossible d'annuler ce bordereau, il est à un stade trop avancé."
+        "Impossible d'annuler un bordereau qui a été réceptionné sur l'installation de destination."
       );
     }
   );

@@ -155,7 +155,7 @@ function getNewStatus(
   if (isCanceled) {
     if (NON_CANCELLABLE_BSDD_STATUSES.includes(status)) {
       throw new ForbiddenError(
-        "Impossible d'annuler ce bordereau, il est à un stade trop avancé."
+        "Impossible d'annuler un bordereau qui a été réceptionné sur l'installation de destination."
       );
     }
 
