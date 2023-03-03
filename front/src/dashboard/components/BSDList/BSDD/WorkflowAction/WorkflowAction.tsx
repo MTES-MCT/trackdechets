@@ -9,6 +9,8 @@ import MarkAsResealed from "./MarkAsResealed";
 import MarkAsTempStorerAccepted from "./MarkAsTempStorerAccepted";
 import SignEmissionForm from "./SignEmissionForm";
 import SignTransportForm from "./SignTransportForm";
+import routes from "common/routes";
+import { useRouteMatch } from "react-router-dom";
 
 import {
   PrepareSegment,
@@ -23,6 +25,7 @@ export interface WorkflowActionProps {
 
 export function WorkflowAction(props: WorkflowActionProps) {
   const { form, siret } = props;
+  const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
 
   const isTempStorage = form.recipient?.isTempStorage;
 
@@ -48,7 +51,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.Sent: {
-      if (siret === form.recipient?.company?.siret) {
+      if (siret === form.recipient?.company?.siret && isActTab) {
         if (isTempStorage) {
           return <MarkAsTempStored {...props} />;
         }
