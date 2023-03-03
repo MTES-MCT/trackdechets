@@ -12,7 +12,7 @@ import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton, RedErrorMessage } from "common/components";
 import { IconCogApproved } from "common/components/Icons";
 import { RevisionField } from "./RevisionField";
-import { ApolloError, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { SUBMIT_FORM_REVISION_REQUEST_APPROVAL } from "../query";
 import { Field, Form, Formik } from "formik";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
