@@ -1079,47 +1079,12 @@ model Bsff {
 
   destinationCustomInfo String?
 
-  destinationReceptionDate              DateTime?               @db.Timestamptz(6)
-  // DEPRECATED - TODO delete after data migration
-  destinationReceptionWeight            Float?
-  destinationReceptionAcceptationStatus WasteAcceptationStatus?
-  destinationReceptionRefusalReason     String?
+  destinationReceptionDate DateTime? @db.Timestamptz(6)
 
   destinationReceptionSignatureAuthor String?
   destinationReceptionSignatureDate   DateTime? @db.Timestamptz(6)
 
   destinationPlannedOperationCode String?
-
-  // DEPRECATED - TODO delete after data migration
-  destinationOperationCode String?
-
-  // DEPRECATED - TODO delete after data migration
-  destinationOperationNextDestinationCompanyName      String?
-  destinationOperationNextDestinationCompanySiret     String?
-  destinationOperationNextDestinationCompanyVatNumber String?
-  destinationOperationNextDestinationCompanyAddress   String?
-  destinationOperationNextDestinationCompanyContact   String?
-  destinationOperationNextDestinationCompanyPhone     String?
-  destinationOperationNextDestinationCompanyMail      String?
-
-  // DEPRECATED - TODO delete after data migration
-  destinationOperationSignatureAuthor String?
-  destinationOperationSignatureDate   DateTime? @db.Timestamptz(6)
-
-  // DEPRECATED - TODO delete after data migration
-  grouping    Bsff[]  @relation("BsffGrouping")
-  groupedIn   Bsff?   @relation("BsffGrouping", fields: [groupedInId], references: [id])
-  groupedInId String?
-
-  // DEPRECATED - TODO delete after data migration
-  repackaging    Bsff[]  @relation("BsffRepackaging")
-  repackagedIn   Bsff?   @relation("BsffRepackaging", fields: [repackagedInId], references: [id])
-  repackagedInId String?
-
-  // DEPRECATED - TODO delete after data migration
-  forwarding   Bsff?   @relation("BsffForwarding", fields: [forwardingId], references: [id])
-  forwardingId String? @unique
-  forwardedIn  Bsff?   @relation("BsffForwarding")
 
   ficheInterventions BsffFicheIntervention[]
 

@@ -90,6 +90,7 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   destinationOperationCode: "D 9",
   destinationOperationDate: "2019-11-27T00:00:00.000Z",
 
+  workerIsDisabled: false,
   workerCompanyName: "Entreprise de travaux",
   workerCompanySiret: siretify(4),
   workerCompanyAddress: "1 route du travail, Travaux city",

@@ -27,33 +27,22 @@ type EditableBsffFields = Required<
     | "emitterEmissionSignatureDate"
     | "transporterTransportSignatureAuthor"
     | "transporterTransportSignatureDate"
-    | "destinationReceptionWeight"
-    | "destinationReceptionAcceptationStatus"
-    | "destinationReceptionRefusalReason"
     | "destinationReceptionSignatureAuthor"
     | "destinationReceptionSignatureDate"
-    | "destinationOperationCode"
-    | "destinationOperationNextDestinationCompanyName"
-    | "destinationOperationNextDestinationCompanySiret"
-    | "destinationOperationNextDestinationCompanyVatNumber"
     | "detenteurCompanySirets"
-    | "destinationOperationNextDestinationCompanyAddress"
-    | "destinationOperationNextDestinationCompanyContact"
-    | "destinationOperationNextDestinationCompanyPhone"
-    | "destinationOperationNextDestinationCompanyMail"
-    | "destinationOperationSignatureDate"
-    | "destinationOperationSignatureAuthor"
-    | "repackagedIn"
     | "packagings"
-    | "groupedIn"
-    | "forwardedIn"
   >
 >;
+
 // Defines until which signature BSFF fields can be modified
 // The test in bsffEdition.test.ts ensures that every possible key in BsffInput
 // has a corresponding edition rule
 export const editionRules: {
-  [key in keyof EditableBsffFields]: BsffSignatureType;
+  [key in
+    | keyof EditableBsffFields
+    | "grouping"
+    | "forwarding"
+    | "repackaging"]: BsffSignatureType;
 } = {
   type: "EMISSION",
   emitterCompanyName: "EMISSION",

@@ -17,6 +17,7 @@ import {
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
 import { NON_CANCELLABLE_BSDD_STATUSES } from "../../resolvers/mutations/createFormRevisionRequest";
 import { ForbiddenError } from "apollo-server-core";
+import buildRemoveAppendix2 from "../form/removeAppendix2";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -212,6 +213,12 @@ export async function approveAndApplyRevisionRequest(
     },
     select: { readableId: true }
   });
+
+  if (revisionRequest.isCanceled) {
+    // Disconnect appendix2 forms if any
+    const removeAppendix2 = buildRemoveAppendix2({ prisma, user });
+    await removeAppendix2(revisionRequest.bsddId);
+  }
 
   await prisma.event.create({
     data: {

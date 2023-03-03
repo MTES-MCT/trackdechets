@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Envoi d'un email à inscription + 7 jours aux nouveaux inscrits qui n'ont pas encore créé de demande de rattachement [PR 2128](https://github.com/MTES-MCT/trackdechets/pull/2128)
+- Envoi d'un email 14 jours après une demande de rattachement pour les utilisateurs n'ayant pas de réponse [PR 2160](https://github.com/MTES-MCT/trackdechets/pull/2160)
 
 #### :bug: Corrections de bugs
 
@@ -18,6 +19,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Il est maintenant impossible d'annuler un BSDD qui a été réceptionné par le destinataire (ou à un statut ultérieur) [PR 2136](https://github.com/MTES-MCT/trackdechets/pull/2136) 
+- Si un BSDD de regroupement est annulé, les BSDD initiaux qui y étaient regroupés sont libérés [PR 2141](https://github.com/MTES-MCT/trackdechets/pull/2141)
 
 #### :memo: Documentation
 

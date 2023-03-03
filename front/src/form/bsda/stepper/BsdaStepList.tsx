@@ -49,17 +49,31 @@ export default function BsdaStepsList(props: Props) {
   });
 
   const formState = useMemo(() => {
+    const existingBsda = formQuery.data?.bsda;
+
     const computedState = prefillTransportMode(
-      getComputedState(initialState, formQuery.data?.bsda)
+      getComputedState(initialState, existingBsda)
     );
 
-    if (formQuery.data?.bsda?.grouping) {
-      computedState.grouping = formQuery.data?.bsda.grouping.map(
-        bsda => bsda.id
-      );
+    if (existingBsda?.grouping) {
+      computedState.grouping = existingBsda.grouping.map(bsda => bsda.id);
     }
-    if (formQuery.data?.bsda?.forwarding) {
-      computedState.forwarding = formQuery.data?.bsda.forwarding.id;
+    if (existingBsda?.forwarding) {
+      computedState.forwarding = existingBsda.forwarding.id;
+    }
+
+    if (
+      computedState.emitter?.pickupSite &&
+      existingBsda?.emitter?.pickupSite === null
+    ) {
+      computedState.emitter.pickupSite = null;
+    }
+
+    if (
+      computedState.worker?.certification &&
+      existingBsda?.worker?.certification === null
+    ) {
+      computedState.worker.certification = null;
     }
 
     return computedState;

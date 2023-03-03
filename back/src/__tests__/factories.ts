@@ -169,11 +169,16 @@ export const userWithAccessTokenFactory = async (opt = {}) => {
 /**
  * Will create a membership request from user to company
  */
-export const createMembershipRequest = async (user: User, company: Company) => {
+export const createMembershipRequest = async (
+  user: User,
+  company: Company,
+  opt = {}
+) => {
   await prisma.membershipRequest.create({
     data: {
       userId: user.id,
-      companyId: company.id
+      companyId: company.id,
+      ...opt
     }
   });
 };
