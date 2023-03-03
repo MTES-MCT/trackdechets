@@ -598,5 +598,11 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     });
 
     expect(updatedBsdd.status).toBe(Status.AWAITING_GROUP);
+
+    const groupement = await prisma.formGroupement.findMany({
+      where: { nextFormId: form.id }
+    });
+
+    expect(groupement.length).toEqual(0);
   });
 });
