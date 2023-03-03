@@ -37,7 +37,7 @@ sendMailSpy.mockImplementation(() => Promise.resolve());
 import * as search from "../../../../companies/sirene/searchCompany";
 const searchCompanyMock = jest.spyOn(search, "default");
 
-const MARK_AS_SEALED = `
+export const MARK_AS_SEALED = `
   mutation MarkAsSealed($id: ID!) {
     markAsSealed(id: $id) {
       id
