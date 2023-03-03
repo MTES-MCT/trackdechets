@@ -1,6 +1,5 @@
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import {
   BsdaInput,
   MutationCreateBsdaArgs
@@ -12,10 +11,9 @@ import {
   expandBsdaFromDb,
   flattenBsdaInput
 } from "../../converter";
-import { getBsdaOrNotFound } from "../../database";
 import { checkIsBsdaContributor } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
-import { validateBsda } from "../../validation";
+import { getContextualBsdaSchema } from "../../validation/validate";
 
 type CreateBsda = {
   isDraft: boolean;
@@ -34,29 +32,12 @@ export default async function create(
 export async function genericCreate({ isDraft, input, context }: CreateBsda) {
   const user = checkIsAuthenticated(context);
 
-  const bsda = flattenBsdaInput(input);
-
-  await checkIsBsdaContributor(
-    user,
-    { ...bsda, intermediaries: input.intermediaries },
-    "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
-  );
-
-  const isForwarding = Boolean(input.forwarding);
-  const isGrouping = input.grouping?.length > 0;
-
-  if ([isForwarding, isGrouping].filter(b => b).length > 1) {
-    throw new UserInputError(
-      "Les opérations d'entreposage provisoire et groupement ne sont pas compatibles entre elles"
-    );
-  }
-
   const companies = await getUserCompanies(user.id);
   const destinationCompany = companies.find(
     company => company.siret === input.destination?.company?.siret
   );
   if (
-    bsda.type === "COLLECTION_2710" &&
+    input.type === "COLLECTION_2710" &&
     !destinationCompany?.companyTypes.includes("WASTE_CENTER")
   ) {
     throw new UserInputError(
@@ -64,48 +45,39 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     );
   }
 
-  const bsdaRepository = getBsdaRepository(user);
-  const forwardedBsda = isForwarding
-    ? await getBsdaOrNotFound(input.forwarding)
-    : null;
-  const groupedBsdas = isGrouping
-    ? await bsdaRepository.findMany({ id: { in: input.grouping } })
-    : [];
+  const unparsedBsda = flattenBsdaInput(input);
 
-  const previousBsdas = [
-    ...(isForwarding ? [forwardedBsda] : []),
-    ...(isGrouping ? groupedBsdas : [])
-  ];
-  const hasIntermediaries = input.intermediaries?.length > 0;
-
-  await validateBsda(
-    bsda,
-    { previousBsdas, intermediaries: input.intermediaries },
-    {
-      emissionSignature: !isDraft
-    }
+  await checkIsBsdaContributor(
+    user,
+    { ...unparsedBsda, intermediaries: input.intermediaries },
+    "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  const newBsda = await bsdaRepository.create({
-    ...bsda,
-    id: getReadableId(ReadableIdPrefix.BSDA),
-    isDraft,
-    ...(isForwarding && {
-      forwarding: { connect: { id: input.forwarding } }
-    }),
-    ...(isGrouping && {
-      grouping: { connect: groupedBsdas.map(({ id }) => ({ id })) }
-    }),
-    ...(hasIntermediaries && {
-      intermediariesOrgIds: input.intermediaries
-        .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
-        .filter(Boolean),
-      intermediaries: {
-        createMany: {
-          data: companyToIntermediaryInput(input.intermediaries)
+  const bsda = await getContextualBsdaSchema({
+    currentSignatureType: !isDraft ? "EMISSION" : undefined
+  }).parseAsync({ ...unparsedBsda, isDraft });
+
+  const forwarding = Boolean(bsda.forwarding)
+    ? { connect: { id: bsda.forwarding } }
+    : undefined;
+  const grouping =
+    bsda.grouping && bsda.grouping.length > 0
+      ? { connect: bsda.grouping.map(id => ({ id })) }
+      : undefined;
+  const intermediaries =
+    bsda.intermediaries && bsda.intermediaries.length > 0
+      ? {
+          createMany: {
+            data: companyToIntermediaryInput(bsda.intermediaries)
+          }
         }
-      }
-    })
+      : undefined;
+
+  const newBsda = await getBsdaRepository(user).create({
+    ...bsda,
+    forwarding,
+    grouping,
+    intermediaries
   });
 
   return expandBsdaFromDb(newBsda);

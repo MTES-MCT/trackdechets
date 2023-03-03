@@ -245,7 +245,7 @@ async function getUpdatedFields(
   return Object.keys(diff);
 }
 
-const SIGNATURES_HIERARCHY: {
+export const SIGNATURES_HIERARCHY: {
   [key in BsdaSignatureType]: { field: keyof Bsda; next?: BsdaSignatureType };
 } = {
   EMISSION: { field: "emitterEmissionSignatureDate", next: "WORK" },

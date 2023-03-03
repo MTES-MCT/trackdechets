@@ -38,8 +38,8 @@ import prisma from "../prisma";
 
 configureYup();
 
-export const PARTIAL_OPERATIONS = ["R 13", "D 15"];
-export const OPERATIONS = ["R 5", "D 5", "D 9", ...PARTIAL_OPERATIONS];
+export const PARTIAL_OPERATIONS = ["R 13", "D 15"] as const;
+export const OPERATIONS = ["R 5", "D 5", "D 9", ...PARTIAL_OPERATIONS] as const;
 type Emitter = Pick<
   Bsda,
   | "emitterIsPrivateIndividual"
@@ -264,7 +264,11 @@ async function validatePreviousBsdas(
       ]);
     }
 
-    if (!PARTIAL_OPERATIONS.includes(previousBsda.destinationOperationCode)) {
+    if (
+      !PARTIAL_OPERATIONS.some(
+        op => op === previousBsda.destinationOperationCode
+      )
+    ) {
       return acc.concat([
         `Le bordereau n°${previousBsda.id} a déclaré un traitement qui ne permet pas de lui donner la suite voulue.`
       ]);

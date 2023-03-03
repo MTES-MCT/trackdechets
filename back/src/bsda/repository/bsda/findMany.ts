@@ -1,16 +1,17 @@
 import { Bsda, Prisma } from "@prisma/client";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
-export type FindManyBsdaFn = (
+export type FindManyBsdaFn = <Args extends Prisma.BsdaArgs>(
   where: Prisma.BsdaWhereInput,
-  options?: Omit<Prisma.BsdaFindManyArgs, "where">
-) => Promise<Bsda[]>;
+  options?: Args
+) => Promise<Prisma.BsdaGetPayload<Args>[]>;
 
 export function buildFindManyBsda({
   prisma
 }: ReadRepositoryFnDeps): FindManyBsdaFn {
-  return (where, options?) => {
+  return async <Args>(where, options?) => {
     const input = { where, ...options };
-    return prisma.bsda.findMany(input);
+    const bsdas = await prisma.bsda.findMany(input);
+    return bsdas as Prisma.BsdaGetPayload<Args>[];
   };
 }
