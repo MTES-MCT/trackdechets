@@ -1,6 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
+  MutationSignEmissionFormArgs,
   MutationSubmitFormRevisionRequestApprovalArgs
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
@@ -14,6 +15,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { Status } from "@prisma/client";
 import { NON_CANCELLABLE_BSDD_STATUSES } from "../createFormRevisionRequest";
 import { MARK_AS_SEALED } from "./markAsSealed.integration";
+import { SIGN_EMISSION_FORM } from "./signEmissionForm.integration";
 
 const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = `
   mutation SubmitFormRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
@@ -525,6 +527,21 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
 
     await mutate(MARK_AS_SEALED, {
       variables: { id: form.id }
+    });
+
+    // Sign by producer, cause can't cancel a draft BSD
+    await mutate<
+      Pick<Mutation, "signEmissionForm">,
+      MutationSignEmissionFormArgs
+    >(SIGN_EMISSION_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          emittedAt: new Date().toISOString() as unknown as Date,
+          emittedBy: "Producer",
+          quantity: 1
+        }
+      }
     });
 
     const appendix2grouped = await prisma.form.findUnique({
