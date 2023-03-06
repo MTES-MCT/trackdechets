@@ -194,6 +194,22 @@ describe("Query.bsds workflow", () => {
       ]);
     });
 
+    it("should not be listed in the emitter's to action for", async () => {
+      const { query } = makeClient(emitter.user);
+      const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
+        GET_BSDS,
+        {
+          variables: {
+            where: {
+              isForActionFor: [emitter.company.siret]
+            }
+          }
+        }
+      );
+
+      expect(data.bsds.edges).toHaveLength(0);
+    });
+
     it("should list the intermediaries", async () => {
       const { query } = makeClient(emitter.user);
       const { data } = await query<Pick<Query, "bsds">, QueryBsdsArgs>(
