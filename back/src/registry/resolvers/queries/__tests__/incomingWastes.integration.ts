@@ -39,6 +39,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { INCOMING_WASTES } from "./queries";
 import supertest from "supertest";
 import { app } from "../../../../server";
+import { REGISTRY_WHITE_LIST_IP } from "../../../permissions";
 
 describe("Incoming wastes registry", () => {
   let emitter: { user: User; company: Company };
@@ -369,8 +370,7 @@ describe("Incoming wastes registry", () => {
       isRegistreNational: true
     });
 
-    const allowedIP = "11.11.11.11"; // defined in integration tests env
-
+    const allowedIP = REGISTRY_WHITE_LIST_IP[0];
     const res = await request
       .post("/")
       .send({
@@ -389,15 +389,13 @@ describe("Incoming wastes registry", () => {
       isRegistreNational: true
     });
 
-    const forbiddenIP = "22.22.22.22";
-
     const res = await request
       .post("/")
       .send({
         query: `{ incomingWastes(sirets: ["${destination.company.siret}"]) { totalCount } }`
       })
       .set("Authorization", `Bearer ${accessToken}`)
-      .set("X-Forwarded-For", forbiddenIP);
+      .set("X-Forwarded-For", "localhost");
 
     expect(res.body).toEqual({
       data: null,
