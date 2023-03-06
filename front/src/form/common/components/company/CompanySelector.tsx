@@ -79,8 +79,8 @@ export default function CompanySelector({
   const { setFieldError, setFieldValue, setFieldTouched } = useFormikContext();
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
-    (field.value.country && field.value.country !== "FR") ||
-      isForeignVat(field.value.vatNumber!!)
+    (field.value?.country && field.value?.country !== "FR") ||
+      isForeignVat(field.value?.vatNumber!!)
   );
   // this 2 input ref are to cross-link the value of the input in both search input and department input
   const departmentInputRef = useRef<HTMLInputElement>(null);
@@ -95,8 +95,8 @@ export default function CompanySelector({
   // Memoize for changes in field.value.siret and field.value.orgId
   // To support both FormCompany and Intermediary (that don't have orgId)
   const orgId = useMemo(
-    () => field.value.orgId ?? field.value.siret ?? null,
-    [field.value.siret, field.value.orgId]
+    () => field.value?.orgId ?? field.value?.siret ?? null,
+    [field.value?.siret, field.value?.orgId]
   );
   // Favorite type is deduced from the field prefix (transporter, emitter, etc)
   const favoriteType = constantCase(field.name.split(".")[0]) as FavoriteType;
@@ -446,11 +446,11 @@ export default function CompanySelector({
           selectedItem={
             {
               orgId,
-              siret: field.value.siret,
-              vatNumber: field.value.vatNumber,
-              name: field.value.name,
-              address: field.value.address,
-              codePaysEtrangerEtablissement: field.value.country,
+              siret: field.value?.siret,
+              vatNumber: field.value?.vatNumber,
+              name: field.value?.name,
+              address: field.value?.address,
+              codePaysEtrangerEtablissement: field.value?.country,
               // complete with companyPrivateInfos data
               ...(selectedData?.companyPrivateInfos && {
                 isRegistered: selectedData?.companyPrivateInfos.isRegistered,
