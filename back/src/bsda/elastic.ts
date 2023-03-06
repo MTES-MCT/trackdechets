@@ -1,6 +1,12 @@
-import { Bsda, BsdaStatus, IntermediaryBsdaAssociation } from "@prisma/client";
+import {
+  Bsda,
+  BsdaStatus,
+  BsdType,
+  IntermediaryBsdaAssociation
+} from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
-import { BsdElastic, indexBsd } from "../common/elastic";
+import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
+import { buildAddress } from "../companies/sirene/utils";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 
@@ -149,30 +155,81 @@ export function toBsdElastic(bsda: BsdaToElastic): BsdElastic {
   const where = getWhere(bsda);
 
   return {
-    type: "BSDA",
+    type: BsdType.BSDA,
+    createdAt: bsda.createdAt?.getTime(),
+    updatedAt: bsda.updatedAt?.getTime(),
     id: bsda.id,
-    customId: "",
     readableId: bsda.id,
-    createdAt: bsda.createdAt.getTime(),
-    updatedAt: bsda.updatedAt.getTime(),
+    customId: "",
+    status: bsda.status,
+    wasteCode: bsda.wasteCode ?? "",
+    wasteAdr: bsda.wasteAdr ?? "",
+    wasteDescription: bsda.wasteMaterialName ?? "",
+    packagingNumbers: [],
+    wasteSealNumbers: bsda.wasteSealNumbers ?? [],
+    identificationNumbers: [],
+    ficheInterventionNumbers: [],
     emitterCompanyName: bsda.emitterCompanyName ?? "",
     emitterCompanySiret: bsda.emitterCompanySiret ?? "",
+    emitterCompanyAddress: bsda.emitterCompanyAddress ?? "",
+    emitterPickupSiteName: bsda.emitterPickupSiteName ?? "",
+    emitterPickupSiteAddress: buildAddress([
+      bsda.emitterPickupSiteAddress,
+      bsda.emitterPickupSitePostalCode,
+      bsda.emitterPickupSiteCity
+    ]),
+    emitterCustomInfo: bsda.emitterCustomInfo ?? "",
+    workerCompanyName: bsda.workerCompanyName ?? "",
+    workerCompanySiret: bsda.workerCompanySiret ?? "",
+    workerCompanyAddress: bsda.workerCompanyAddress ?? "",
+
     transporterCompanyName: bsda.transporterCompanyName ?? "",
     transporterCompanySiret: bsda.transporterCompanySiret ?? "",
     transporterCompanyVatNumber: bsda.transporterCompanyVatNumber ?? "",
-    transporterTakenOverAt:
-      bsda.transporterTransportTakenOverAt?.getTime() ??
-      bsda.transporterTransportSignatureDate?.getTime(),
+
+    transporterCompanyAddress: bsda.transporterCompanyAddress ?? "",
     transporterCustomInfo: bsda.transporterCustomInfo ?? "",
-    transporterNumberPlate: bsda.transporterTransportPlates,
+    transporterTransportPlates:
+      bsda.transporterTransportPlates.map(transportPlateFilter) ?? [],
+
     destinationCompanyName: bsda.destinationCompanyName ?? "",
     destinationCompanySiret: bsda.destinationCompanySiret ?? "",
-    destinationReceptionDate: bsda.destinationReceptionDate?.getTime(),
-    destinationReceptionWeight: bsda.destinationReceptionWeight,
+    destinationCompanyAddress: bsda.destinationCompanyAddress ?? "",
+    destinationCustomInfo: "",
+    destinationCap: bsda.destinationCap ?? "",
+
+    brokerCompanyName: bsda.brokerCompanyName ?? "",
+    brokerCompanySiret: bsda.brokerCompanySiret ?? "",
+    brokerCompanyAddress: bsda.brokerCompanyAddress ?? "",
+
+    traderCompanyName: "",
+    traderCompanySiret: "",
+    traderCompanyAddress: "",
+
+    ecoOrganismeName: bsda.ecoOrganismeName ?? "",
+    ecoOrganismeSiret: bsda.ecoOrganismeSiret ?? "",
+
+    nextDestinationCompanyName:
+      bsda.destinationOperationNextDestinationCompanyName ?? "",
+    nextDestinationCompanySiret:
+      bsda.destinationOperationNextDestinationCompanySiret ?? "",
+    nextDestinationCompanyVatNumber:
+      bsda.destinationOperationNextDestinationCompanyVatNumber ?? "",
+    nextDestinationCompanyAddress:
+      bsda.destinationOperationNextDestinationCompanyAddress ?? "",
+
     destinationOperationCode: bsda.destinationOperationCode ?? "",
+
+    emitterEmissionDate: bsda.emitterEmissionSignatureDate?.getTime(),
+    workerWorkDate: bsda.workerWorkSignatureDate?.getTime(),
+    transporterTransportTakenOverAt:
+      bsda.transporterTransportTakenOverAt?.getTime() ??
+      bsda.transporterTransportSignatureDate?.getTime(),
+    destinationReceptionDate: bsda.destinationReceptionDate?.getTime(),
+    destinationAcceptationDate: bsda.destinationReceptionDate?.getTime(),
+    destinationAcceptationWeight: bsda.destinationReceptionWeight,
     destinationOperationDate: bsda.destinationOperationDate?.getTime(),
-    wasteCode: bsda.wasteCode ?? "",
-    wasteDescription: bsda.wasteMaterialName,
+
     ...where,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsda),

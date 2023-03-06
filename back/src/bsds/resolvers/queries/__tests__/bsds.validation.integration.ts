@@ -61,7 +61,7 @@ describe("Query.bsds validation", () => {
     ]);
   });
 
-  it.each(["recipient", "emitter"])(
+  it.each(["destination", "emitter"])(
     "should block long search terms on %p",
     async term => {
       const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
@@ -79,7 +79,7 @@ describe("Query.bsds validation", () => {
         {
           variables: {
             where: {
-              [term]: tooLong
+              [term]: { company: { name: { _match: tooLong } } }
             }
           }
         }
@@ -87,8 +87,7 @@ describe("Query.bsds validation", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message:
-            "La longueur maximale de ce paramètre de recherche est de 50 caractères",
+          message: `La longueur maximale du paramètre de recherche ${term}CompanyName est de 50 caractères`,
           extensions: expect.objectContaining({
             code: ErrorCode.BAD_USER_INPUT
           })
@@ -113,7 +112,7 @@ describe("Query.bsds validation", () => {
       {
         variables: {
           where: {
-            readableId: tooLong
+            readableId: { _eq: tooLong }
           }
         }
       }
@@ -122,7 +121,7 @@ describe("Query.bsds validation", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "La longueur maximale de ce paramètre de recherche est de 30 caractères",
+          "La longueur maximale du paramètre de recherche readableId est de 30 caractères",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -146,7 +145,7 @@ describe("Query.bsds validation", () => {
       {
         variables: {
           where: {
-            waste: tooLong
+            waste: { description: { _match: tooLong } }
           }
         }
       }
@@ -155,7 +154,7 @@ describe("Query.bsds validation", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "La longueur maximale de ce paramètre de recherche est de 30 caractères",
+          "La longueur maximale du paramètre de recherche wasteDescription est de 30 caractères",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -179,7 +178,7 @@ describe("Query.bsds validation", () => {
       {
         variables: {
           where: {
-            transporterCustomInfo: tooLong
+            transporter: { customInfo: { _match: tooLong } }
           }
         }
       }
@@ -188,7 +187,7 @@ describe("Query.bsds validation", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "La longueur maximale de ce paramètre de recherche est de 20 caractères",
+          "La longueur maximale du paramètre de recherche transporterCustomInfo est de 20 caractères",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
@@ -212,7 +211,7 @@ describe("Query.bsds validation", () => {
       {
         variables: {
           where: {
-            transporterNumberPlate: tooLong
+            transporter: { transport: { plates: { _itemContains: tooLong } } }
           }
         }
       }
@@ -221,7 +220,7 @@ describe("Query.bsds validation", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "La longueur maximale de ce paramètre de recherche est de 20 caractères",
+          "La longueur maximale du paramètre de recherche transporterTransportPlates est de 20 caractères",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

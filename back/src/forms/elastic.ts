@@ -1,9 +1,10 @@
 import { Form, Status } from "@prisma/client";
-import { BsdElastic, indexBsd } from "../common/elastic";
+import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { FullForm } from "./types";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { buildAddress } from "../companies/sirene/utils";
 
 /**
  * Computes which SIRET should appear on which tab in the frontend
@@ -190,9 +191,16 @@ function getRecipient(form: FullForm) {
   return form.forwardedIn?.emittedAt
     ? {
         name: form.forwardedIn.recipientCompanyName,
-        siret: form.forwardedIn.recipientCompanySiret
+        siret: form.forwardedIn.recipientCompanySiret,
+        address: form.forwardedIn.recipientCompanyAddress,
+        cap: form.forwardedIn.recipientCap
       }
-    : { name: form.recipientCompanyName, siret: form.recipientCompanySiret };
+    : {
+        name: form.recipientCompanyName,
+        siret: form.recipientCompanySiret,
+        address: form.recipientCompanyAddress,
+        cap: form.recipientCap
+      };
 }
 
 /**
@@ -204,32 +212,76 @@ export function toBsdElastic(
   const siretsByTab = getSiretsByTab(form);
   const recipient = getRecipient(form);
 
-  // const forwardedIn: Form = form.forwardedIn
-  // ? await prisma.form.findUnique({ where: { id: form.id } }).forwardedIn()
-  // : null;
   return {
     type: "BSDD",
+    createdAt: form.createdAt?.getTime(),
+    updatedAt: form.updatedAt?.getTime(),
     id: form.id,
     readableId: form.readableId,
-    customId: form.customId,
-    createdAt: form.createdAt.getTime(),
-    updatedAt: form.updatedAt.getTime(),
+    customId: form.customId ?? "",
+    status: form.status,
+    wasteCode: form.wasteDetailsCode ?? "",
+    wasteAdr: form.wasteDetailsOnuCode ?? "",
+    wasteDescription: form.wasteDetailsName ?? "",
+    packagingNumbers: [],
+    wasteSealNumbers: [],
+    identificationNumbers: [],
+    ficheInterventionNumbers: [],
     emitterCompanyName: form.emitterCompanyName ?? "",
     emitterCompanySiret: form.emitterCompanySiret ?? "",
+    emitterCompanyAddress: form.emitterCompanyAddress ?? "",
+    emitterPickupSiteName: form.emitterWorkSiteName ?? "",
+    emitterPickupSiteAddress: buildAddress([
+      form.emitterWorkSiteAddress,
+      form.emitterWorkSitePostalCode,
+      form.emitterWorkSiteCity
+    ]),
+    emitterCustomInfo: "",
+    workerCompanyName: "",
+    workerCompanySiret: "",
+    workerCompanyAddress: "",
+
     transporterCompanyName: form.transporterCompanyName ?? "",
     transporterCompanySiret: form.transporterCompanySiret ?? "",
     transporterCompanyVatNumber: form.transporterCompanyVatNumber ?? "",
-    transporterTakenOverAt: form.sentAt?.getTime(),
+    transporterCompanyAddress: form.transporterCompanyAddress ?? "",
+    transporterCustomInfo: form.transporterCustomInfo ?? "",
+    transporterTransportPlates: form.transporterNumberPlate
+      ? [transportPlateFilter(form.transporterNumberPlate)]
+      : [],
+
     destinationCompanyName: recipient.name ?? "",
     destinationCompanySiret: recipient.siret ?? "",
-    destinationReceptionDate: form.receivedAt?.getTime(),
-    destinationReceptionWeight: form.quantityReceived,
+    destinationCompanyAddress: recipient.address ?? "",
+    destinationCustomInfo: "",
+    destinationCap: recipient.cap ?? "",
+
+    brokerCompanyName: form.brokerCompanyName ?? "",
+    brokerCompanySiret: form.brokerCompanySiret ?? "",
+    brokerCompanyAddress: form.brokerCompanyAddress ?? "",
+
+    traderCompanyName: "",
+    traderCompanySiret: "",
+    traderCompanyAddress: "",
+
+    ecoOrganismeName: form.ecoOrganismeName ?? "",
+    ecoOrganismeSiret: form.ecoOrganismeSiret ?? "",
+
+    nextDestinationCompanyName: form.nextDestinationCompanyName ?? "",
+    nextDestinationCompanySiret: form.nextDestinationCompanySiret ?? "",
+    nextDestinationCompanyVatNumber: form.nextDestinationCompanyVatNumber ?? "",
+    nextDestinationCompanyAddress: form.nextDestinationCompanyAddress ?? "",
+
     destinationOperationCode: form.processingOperationDone ?? "",
+
+    emitterEmissionDate: form.emittedAt?.getTime(),
+    workerWorkDate: null,
+    transporterTransportTakenOverAt:
+      form.takenOverAt?.getTime() ?? form.sentAt?.getTime(),
+    destinationReceptionDate: form.receivedAt?.getTime(),
+    destinationAcceptationDate: form.signedAt?.getTime(),
+    destinationAcceptationWeight: form.quantityReceived,
     destinationOperationDate: form.processedAt?.getTime(),
-    wasteCode: form.wasteDetailsCode ?? "",
-    wasteDescription: form.wasteDetailsName,
-    transporterNumberPlate: [form.transporterNumberPlate],
-    transporterCustomInfo: form.transporterCustomInfo,
     ...(form.forwarding
       ? {
           // do not display BSD suite in dashboard

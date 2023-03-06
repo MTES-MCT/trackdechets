@@ -18,6 +18,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Si un BSDD de regroupement est annulé, les BSDD initiaux qui y étaient regroupés sont libérés [PR 2141](https://github.com/MTES-MCT/trackdechets/pull/2141)
+
 #### :memo: Documentation
 
 #### :house: Interne
