@@ -13,7 +13,7 @@ import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
 import { Status } from "@prisma/client";
 
-const SIGN_EMISSION_FORM = `
+export const SIGN_EMISSION_FORM = `
   mutation SignEmissionForm($id: ID!, $input: SignEmissionFormInput!, $securityCode: Int) {
     signEmissionForm(id: $id, input: $input, securityCode: $securityCode) {
       id

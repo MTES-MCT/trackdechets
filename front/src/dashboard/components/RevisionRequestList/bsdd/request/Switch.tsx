@@ -6,9 +6,16 @@ type Props = {
   children: React.ReactNode;
   defaultValue: any;
   onChange: (toggled: boolean) => void;
+  disabled?: boolean;
 };
 
-export function Switch({ title, defaultValue, onChange, children }: Props) {
+export function Switch({
+  title,
+  defaultValue,
+  onChange,
+  disabled = false,
+  children,
+}: Props) {
   const [isToggled, setIsToggled] = useState(defaultValue);
 
   const onToggle = () => {
@@ -24,6 +31,7 @@ export function Switch({ title, defaultValue, onChange, children }: Props) {
           onChange={onToggle}
           label={""}
           className=""
+          disabled={disabled}
         />
         <span className="tw-font-bold tw-pr-2">{title}</span>
       </div>

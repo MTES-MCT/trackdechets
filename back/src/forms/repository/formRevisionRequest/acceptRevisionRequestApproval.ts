@@ -15,6 +15,8 @@ import {
   RepositoryTransaction
 } from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { NON_CANCELLABLE_BSDD_STATUSES } from "../../resolvers/mutations/createFormRevisionRequest";
+import { ForbiddenError } from "apollo-server-core";
 import buildRemoveAppendix2 from "../form/removeAppendix2";
 
 export type AcceptRevisionRequestApprovalFn = (
@@ -152,6 +154,12 @@ function getNewStatus(
   isCanceled = false
 ): Status {
   if (isCanceled) {
+    if (NON_CANCELLABLE_BSDD_STATUSES.includes(status)) {
+      throw new ForbiddenError(
+        "Impossible d'annuler un bordereau qui a été réceptionné sur l'installation de destination."
+      );
+    }
+
     return Status.CANCELED;
   }
 
