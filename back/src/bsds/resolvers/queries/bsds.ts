@@ -80,6 +80,23 @@ async function buildQuery(
     }
   };
 
+  Object.entries({
+    isDraftFor: where.isDraftFor,
+    isForActionFor: where.isForActionFor,
+    isFollowFor: where.isFollowFor,
+    isArchivedFor: where.isArchivedFor,
+    isToCollectFor: where.isToCollectFor,
+    isCollectedFor: where.isCollectedFor
+  })
+    .filter(([_, value]) => value != null)
+    .forEach(([key, value]) => {
+      query.bool.filter.push({
+        terms: {
+          [key]: value
+        }
+      });
+    });
+
   if (clue) {
     (query.bool.must as QueryDslQueryContainer[]).push({
       multi_match: {
