@@ -2,6 +2,7 @@ import { Form as Bsdd, FormStatus } from "generated/graphql/types";
 import React from "react";
 import { Switch } from "./request/Switch";
 
+// If you modify this, also modify it in the backend
 const CANCELLABLE_BSDD_STATUSES = [
   // FormStatus.Draft,
   // FormStatus.Sealed,
