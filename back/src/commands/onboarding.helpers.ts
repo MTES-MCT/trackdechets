@@ -16,7 +16,6 @@ import {
   pendingMembershipRequestAdminDetailsEmail
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
-import { getActiveAdminsByCompanyIds } from "../companies/database";
 import { MessageVersion } from "../mailer/types";
 
 /**
@@ -228,36 +227,23 @@ export const getPendingMembershipRequestsAndAssociatedAdmins = async (
   const requestDateGt = xDaysAgo(now, daysAgo);
   const requestDateLt = xDaysAgo(now, daysAgo - 1);
 
-  // First, fetch all unanswered membership requests
-  const pendingMembershipRequests = await prisma.membershipRequest.findMany({
+  return prisma.membershipRequest.findMany({
     where: {
       createdAt: { gte: requestDateGt, lt: requestDateLt },
-      status: MembershipRequestStatus.PENDING
+      status: MembershipRequestStatus.PENDING,
+      user: { isActive: true }
     },
     include: {
-      // We need the issuer email and company orgId in the email
-      user: { select: { email: true, isActive: true } },
-      company: { select: { name: true, orgId: true } }
+      user: true,
+      company: {
+        include: {
+          companyAssociations: {
+            where: { role: "ADMIN", user: { isActive: true } },
+            include: { user: true }
+          }
+        }
+      }
     }
-  });
-
-  // Keep only active users
-  const activePendingMembershipRequests = pendingMembershipRequests.filter(
-    r => r.user.isActive
-  );
-
-  // Get unique companyIds
-  const companyIds = [
-    ...new Set(activePendingMembershipRequests.map(p => p.companyId))
-  ];
-
-  // Get all the admins from all those companies
-  const admins = await getActiveAdminsByCompanyIds(companyIds);
-
-  return activePendingMembershipRequests.map(request => {
-    const requestAdmins = admins.filter(a => a.companyId === request.companyId);
-
-    return { ...request, admins: requestAdmins };
   });
 };
 
@@ -282,9 +268,9 @@ export const sendPendingMembershipRequestToAdminDetailsEmail = async () => {
     });
 
     return {
-      to: request.admins.map(admin => ({
-        email: admin.email,
-        name: admin.name
+      to: request.company.companyAssociations.map(companyAssociation => ({
+        email: companyAssociation.user.email,
+        name: companyAssociation.user.name
       })),
       params: {
         body: template.body

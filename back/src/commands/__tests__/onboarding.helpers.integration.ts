@@ -307,7 +307,7 @@ describe("getPendingMembershipRequestsAndAssociatedAdmins", () => {
       requestId: r.id,
       email: r.user.email,
       orgId: r.company.orgId,
-      adminIds: r.admins.map(a => a.id).sort()
+      adminIds: r.company.companyAssociations.map(a => a.user.id).sort()
     }));
 
     expect(expectedResult).toEqual(actualResult);
@@ -367,7 +367,7 @@ describe("getPendingMembershipRequestsAndAssociatedAdmins", () => {
       requestId: r.id,
       email: r.user.email,
       orgId: r.company.orgId,
-      adminIds: r.admins.map(a => a.id).sort()
+      adminIds: r.company.companyAssociations.map(a => a.user.id).sort()
     }));
 
     expect(expectedResult).toEqual(actualResult);
@@ -426,7 +426,7 @@ describe("getPendingMembershipRequestsAndAssociatedAdmins", () => {
         requestId: r.id,
         email: r.user.email,
         orgId: r.company.orgId,
-        adminIds: r.admins.map(a => a.id).sort()
+        adminIds: r.company.companyAssociations.map(a => a.user.id).sort()
       }))
       .sort();
 

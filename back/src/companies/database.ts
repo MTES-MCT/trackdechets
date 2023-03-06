@@ -218,7 +218,16 @@ export async function getActiveAdminsByCompanyIds(companyIds: string[]) {
       })
     );
 
-  return users.filter(u => u.isActive);
+  const res = {};
+
+  users
+    .filter(user => user.isActive)
+    .forEach(user => {
+      if (res[user.companyId]) res[user.companyId].push(user);
+      else res[user.companyId] = [user];
+    });
+
+  return res;
 }
 
 export async function getTraderReceiptOrNotFound({

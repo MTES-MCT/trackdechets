@@ -90,13 +90,16 @@ describe("getActiveAdminsByCompanyIds", () => {
       company.id
     ]);
 
-    expect(result.length).toEqual(2);
-
-    const expectedUserIds = [userAndCompany0, userAndCompany1]
-      .map(u => u.user.id)
-      .sort();
-    const resultUserIds = result.map(u => u.id).sort();
-
-    expect(expectedUserIds).toEqual(resultUserIds);
+    expect(Object.keys(result).length).toEqual(2);
+    expect(Object.keys(result).sort()).toEqual([
+      userAndCompany0.company.id,
+      userAndCompany1.company.id
+    ]);
+    expect(result[userAndCompany0.company.id][0].id).toEqual(
+      userAndCompany0.user.id
+    );
+    expect(result[userAndCompany1.company.id][0].id).toEqual(
+      userAndCompany1.user.id
+    );
   });
 });
