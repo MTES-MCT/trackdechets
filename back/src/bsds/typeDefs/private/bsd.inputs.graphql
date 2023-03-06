@@ -1,17 +1,45 @@
 input BsdWhere {
-  readableId: String
-  emitter: String
-  recipient: String
-  waste: String
-  transporterNumberPlate: String
-  transporterCustomInfo: String
-  types: [BsdType!]
+  createdAt: DateFilter
+  updatedAt: DateFilter
+
+  id: StringFilter
+  readableId: StringFilter
+  customId: StringFilter
+
+  type: BsdTypeFilter
+  status: StringFilter
+
+  packagingNumbers: StringNullableListFilter
+  sealNumbers: StringNullableListFilter
+  identificationNumbers: StringNullableListFilter
+  ficheInterventionNumbers: StringNullableListFilter
+
+  emitter: BsdEmitterWhere
+  transporter: BsdTransporterWhere
+  waste: BsdWasteWhere
+  worker: BsdWorkerWhere
+  destination: BsdDestinationWhere
+  broker: BsdBrokerWhere
+  trader: BsdTraderWhere
+  ecoOrganisme: BsdEcoOrganismeWhere
+
   isDraftFor: [String!]
   isForActionFor: [String!]
   isFollowFor: [String!]
   isArchivedFor: [String!]
   isToCollectFor: [String!]
   isCollectedFor: [String!]
+
+  sirets: StringNullableListFilter
+
+  _and: [BsdWhere!]
+  _or: [BsdWhere!]
+}
+
+"Filtre pour les champs textuels"
+input TextFilter {
+  "Le texte de l'enregistrement a une correspondance en recherche textuelle avec la valeur du filtre"
+  _match: String
 }
 
 input OrderBy {
@@ -20,4 +48,105 @@ input OrderBy {
   emitterCompanyName: OrderType
   destinationCompanyName: OrderType
   wasteCode: OrderType
+}
+
+input BsdCompanyWhere {
+  name: TextFilter
+  siret: StringFilter
+  vatNumber: StringFilter
+  address: TextFilter
+}
+
+input BsdEmissionWhere {
+  date: DateFilter
+}
+
+input BsdPickupSiteWhere {
+  name: TextFilter
+  address: TextFilter
+}
+
+"Champs possible pour le filtre sur l'émetteur."
+input BsdEmitterWhere {
+  company: BsdCompanyWhere
+  emission: BsdEmissionWhere
+  pickupSite: BsdPickupSiteWhere
+  customInfo: TextFilter
+}
+
+input BsdWasteWhere {
+  code: StringFilter
+  adr: TextFilter
+  description: TextFilter
+}
+
+input BsdWorkWhere {
+  date: DateFilter
+}
+
+input BsdWorkerWhere {
+  company: BsdCompanyWhere
+  work: BsdWorkWhere
+}
+
+input BsdTransportWhere {
+  plates: StringNullableListFilter
+  takenOverAt: DateFilter
+}
+
+input BsdTransporterWhere {
+  company: BsdCompanyWhere
+  customInfo: TextFilter
+  transport: BsdTransportWhere
+}
+
+input BsdNextDestinationWhere {
+  company: BsdCompanyWhere
+}
+
+input BsdOperationWhere {
+  code: StringFilter
+  date: DateFilter
+  nextDestination: BsdNextDestinationWhere
+}
+
+input BsdReceptionWhere {
+  date: DateFilter
+}
+
+input BsdAcceptationWhere {
+  date: DateFilter
+  status: WasteAcceptationStatusFilter
+}
+
+input BsdDestinationWhere {
+  company: BsdCompanyWhere
+  customInfo: TextFilter
+  cap: TextFilter
+  reception: BsdReceptionWhere
+  acceptation: BsdAcceptationWhere
+  operation: BsdOperationWhere
+}
+
+input BsdBrokerWhere {
+  company: BsdCompanyWhere
+}
+
+input BsdTraderWhere {
+  company: BsdCompanyWhere
+}
+
+input BsdEcoOrganismeWhere {
+  name: TextFilter
+  siret: StringFilter
+}
+
+input WasteAcceptationStatusFilter {
+  _eq: WasteAcceptationStatus
+  _in: [WasteAcceptationStatus!]
+}
+
+input BsdTypeFilter {
+  _eq: BsdType
+  _in: [BsdType!]
 }

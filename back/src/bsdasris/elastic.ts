@@ -1,10 +1,9 @@
-import { BsdasriStatus, Bsdasri, BsdasriType } from "@prisma/client";
-import { BsdElastic, indexBsd } from "../common/elastic";
-
-import { DASRI_WASTE_CODES_MAPPING } from "../common/constants/DASRI_CONSTANTS";
+import { BsdasriStatus, Bsdasri, BsdasriType, BsdType } from "@prisma/client";
+import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { buildAddress } from "../companies/sirene/utils";
 
 // | state              | emitter | transporter | recipient |
 // |--------------------|---------|-------------|-----------|
@@ -120,28 +119,73 @@ export function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
   const where = getWhere(bsdasri);
 
   return {
+    type: BsdType.BSDASRI,
+    createdAt: bsdasri.createdAt?.getTime(),
+    updatedAt: bsdasri.updatedAt?.getTime(),
     id: bsdasri.id,
     readableId: bsdasri.id,
     customId: "",
-    type: "BSDASRI",
+    status: bsdasri.status,
+    wasteCode: bsdasri.wasteCode ?? "",
+    wasteAdr: bsdasri.wasteAdr ?? "",
+    wasteDescription: "",
+    packagingNumbers: [],
+    wasteSealNumbers: [],
+    identificationNumbers: [],
+    ficheInterventionNumbers: [],
     emitterCompanyName: bsdasri.emitterCompanyName ?? "",
     emitterCompanySiret: bsdasri.emitterCompanySiret ?? "",
+    emitterCompanyAddress: bsdasri.emitterCompanyAddress ?? "",
+    emitterPickupSiteName: bsdasri.emitterPickupSiteName ?? "",
+    emitterPickupSiteAddress: buildAddress([
+      bsdasri.emitterPickupSiteAddress,
+      bsdasri.emitterPickupSitePostalCode,
+      bsdasri.emitterPickupSiteCity
+    ]),
+    emitterCustomInfo: bsdasri.emitterCustomInfo ?? "",
+    workerCompanyName: "",
+    workerCompanySiret: "",
+    workerCompanyAddress: "",
+
     transporterCompanyName: bsdasri.transporterCompanyName ?? "",
     transporterCompanySiret: bsdasri.transporterCompanySiret ?? "",
     transporterCompanyVatNumber: bsdasri.transporterCompanyVatNumber ?? "",
-    transporterTakenOverAt: bsdasri.transporterTakenOverAt?.getTime(),
+    transporterCompanyAddress: bsdasri.transporterCompanyAddress ?? "",
     transporterCustomInfo: bsdasri.transporterCustomInfo ?? "",
+    transporterTransportPlates:
+      bsdasri.transporterTransportPlates.map(transportPlateFilter) ?? [],
+
     destinationCompanyName: bsdasri.destinationCompanyName ?? "",
     destinationCompanySiret: bsdasri.destinationCompanySiret ?? "",
-    destinationReceptionDate: bsdasri.destinationReceptionDate?.getTime(),
-    destinationReceptionWeight: bsdasri.destinationReceptionWasteWeightValue,
+    destinationCompanyAddress: bsdasri.destinationCompanyAddress ?? "",
+    destinationCustomInfo: bsdasri.destinationCustomInfo ?? "",
+    destinationCap: "",
+
+    brokerCompanyName: "",
+    brokerCompanySiret: "",
+    brokerCompanyAddress: "",
+
+    traderCompanyName: "",
+    traderCompanySiret: "",
+    traderCompanyAddress: "",
+
+    ecoOrganismeName: bsdasri.ecoOrganismeName ?? "",
+    ecoOrganismeSiret: bsdasri.ecoOrganismeSiret ?? "",
+
+    nextDestinationCompanyName: "",
+    nextDestinationCompanySiret: "",
+    nextDestinationCompanyVatNumber: "",
+    nextDestinationCompanyAddress: "",
+
     destinationOperationCode: bsdasri.destinationOperationCode ?? "",
+
+    emitterEmissionDate: bsdasri.emitterEmissionSignatureDate?.getTime(),
+    workerWorkDate: null,
+    transporterTransportTakenOverAt: bsdasri.transporterTakenOverAt?.getTime(),
+    destinationReceptionDate: bsdasri.destinationReceptionDate?.getTime(),
+    destinationAcceptationDate: bsdasri.destinationReceptionDate?.getTime(),
+    destinationAcceptationWeight: bsdasri.destinationReceptionWasteWeightValue,
     destinationOperationDate: bsdasri.destinationOperationDate?.getTime(),
-    wasteCode: bsdasri.wasteCode ?? "",
-    wasteDescription: DASRI_WASTE_CODES_MAPPING[bsdasri.wasteCode],
-    transporterNumberPlate: bsdasri.transporterTransportPlates,
-    createdAt: bsdasri.createdAt.getTime(),
-    updatedAt: bsdasri.updatedAt.getTime(),
     ...where,
     sirets: Object.values(where).flat(),
     ...getRegistryFields(bsdasri),

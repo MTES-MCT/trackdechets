@@ -36,7 +36,7 @@ export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
   if (bsdId.startsWith("FF-")) {
     const bsff = await prisma.bsff.findUnique({
       where: { id: bsdId },
-      include: { packagings: true }
+      include: { packagings: true, ficheInterventions: true }
     });
     return toBsffElastic(bsff);
   }

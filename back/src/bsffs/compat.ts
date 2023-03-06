@@ -15,6 +15,7 @@ import { getBsffPackagingRepository } from "./repository";
 type BsffDestination = {
   receptionWeight: number;
   receptionAcceptationStatus: WasteAcceptationStatus;
+  receptionDate: Date;
   receptionRefusalReason: string;
   operationCode: string;
   operationDate: Date;
@@ -62,6 +63,15 @@ export function toBsffDestination(
       })()
     : null;
 
+  // returns last date
+  const receptionDate = hasAnyReception
+    ? [
+        ...packagings
+          .filter(p => !!p.acceptationDate)
+          .map(p => p.acceptationDate)
+      ].sort((d1, d2) => d2.getTime() - d1.getTime())[0]
+    : null;
+
   const receptionRefusalReason = [
     WasteAcceptationStatus.REFUSED,
     WasteAcceptationStatus.PARTIALLY_REFUSED
@@ -96,6 +106,7 @@ export function toBsffDestination(
     : null;
 
   return {
+    receptionDate,
     receptionWeight,
     receptionAcceptationStatus,
     receptionRefusalReason,

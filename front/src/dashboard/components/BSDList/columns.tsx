@@ -30,31 +30,54 @@ import * as bsda from "./BSDa";
 // that don't have an equivalent in the API
 export const COLUMNS_PARAMETERS_NAME = {
   type: {
-    filter: "types",
+    filter: value => ({ type: { _in: value } }),
     order: "type",
   },
   readableId: {
-    filter: "readableId",
+    filter: value => ({
+      _or: [
+        { readableId: { _contains: value } },
+        { packagingNumbers: { _hasSome: value } },
+        { packagingNumbers: { _itemContains: value } },
+      ],
+    }),
     order: "readableId",
   },
   emitter: {
-    filter: "emitter",
+    filter: value => ({
+      _or: [
+        { emitter: { company: { name: { _match: value } } } },
+        { emitter: { company: { siret: { _contains: value } } } },
+      ],
+    }),
     order: "emitterCompanyName",
   },
   recipient: {
-    filter: "recipient",
+    filter: value => ({
+      _or: [
+        { destination: { company: { name: { _match: value } } } },
+        { destination: { company: { siret: { _contains: value } } } },
+      ],
+    }),
     order: "destinationCompanyName",
   },
   transporterNumberPlate: {
-    filter: "transporterNumberPlate",
+    filter: value => ({
+      transporter: { transport: { plates: { _itemContains: value } } },
+    }),
     order: "transporterNumberPlate",
   },
   transporterCustomInfo: {
-    filter: "transporterCustomInfo",
+    filter: value => ({ transporter: { customInfo: { _match: value } } }),
     order: "transporterCustomInfo",
   },
   waste: {
-    filter: "waste",
+    filter: value => ({
+      _or: [
+        { waste: { code: { _contains: value } } },
+        { waste: { description: { _match: value } } },
+      ],
+    }),
     order: "wasteCode",
   },
 };

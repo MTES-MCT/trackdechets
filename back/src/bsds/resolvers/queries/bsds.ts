@@ -24,6 +24,8 @@ import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { expandBsdaFromElastic } from "../../../bsda/converter";
 import { expandBsffFromElastic } from "../../../bsffs/converter";
 import { bsdSearchSchema } from "../../validation";
+import { toElasticQuery } from "../../where";
+import { QueryDslQueryContainer } from "@elastic/elasticsearch/api/types";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -73,164 +75,13 @@ async function buildQuery(
 ) {
   const query = {
     bool: {
-      must: [],
+      ...toElasticQuery(where).bool,
       filter: []
     }
   };
 
-  Object.entries({
-    type: where.types,
-    isDraftFor: where.isDraftFor,
-    isForActionFor: where.isForActionFor,
-    isFollowFor: where.isFollowFor,
-    isArchivedFor: where.isArchivedFor,
-    isToCollectFor: where.isToCollectFor,
-    isCollectedFor: where.isCollectedFor
-  })
-    .filter(([_, value]) => value != null)
-    .forEach(([key, value]) => {
-      query.bool.filter.push({
-        terms: {
-          [key]: value
-        }
-      });
-    });
-
-  if (where.emitter) {
-    query.bool.must.push({
-      // behaves like an OR
-      bool: {
-        should: [
-          {
-            match: {
-              emitterCompanyName: {
-                query: where.emitter,
-                fuzziness: "AUTO"
-              }
-            }
-          },
-          {
-            wildcard: {
-              emitterCompanyName: {
-                value: `${where.emitter}*`
-              }
-            }
-          },
-          { term: { emitterCompanySiret: where.emitter } }
-        ]
-      }
-    });
-  }
-
-  if (where.recipient) {
-    query.bool.must.push({
-      bool: {
-        should: [
-          {
-            match: {
-              destinationCompanyName: {
-                query: where.recipient,
-                fuzziness: "AUTO"
-              }
-            }
-          },
-          {
-            wildcard: {
-              destinationCompanyName: {
-                value: `${where.emitter}*`
-              }
-            }
-          },
-          { term: { destinationCompanySiret: where.recipient } }
-        ]
-      }
-    });
-  }
-
-  if (where.transporterCustomInfo) {
-    query.bool.must.push({
-      match: {
-        transporterCustomInfo: {
-          query: where.transporterCustomInfo,
-          fuzziness: 0
-        }
-      }
-    });
-  }
-
-  if (where.readableId) {
-    query.bool.must.push({
-      bool: {
-        // behaves like an OR
-        should: [
-          {
-            match: {
-              readableId: {
-                query: where.readableId,
-                // we need `and` operator here because the different components of
-                // the readableId (prefix, date and random chars) emit different tokens
-                operator: "and"
-              }
-            }
-          },
-          { term: { customId: where.readableId } },
-          {
-            match: { containers: { query: where.readableId, operator: "and" } }
-          }
-        ]
-      }
-    });
-  }
-
-  if (where.transporterNumberPlate) {
-    query.bool.must.push({
-      match: {
-        transporterNumberPlate: {
-          query: where.transporterNumberPlate,
-          // we need `and` operator here because the different components of
-          // the number plate emit different tokens
-          operator: "and"
-        }
-      }
-    });
-  }
-
-  if (where.waste) {
-    query.bool.must.push({
-      bool: {
-        should: [
-          // behaves like an OR
-          {
-            match: {
-              // match on waste code
-              "wasteCode.ngram": {
-                query: where.waste
-              }
-            }
-          },
-          {
-            match: {
-              wasteDescription: {
-                // match on waste description
-                query: where.waste,
-                fuzziness: "AUTO"
-              }
-            }
-          },
-          {
-            wildcard: {
-              wasteDescription: {
-                value: `${where.waste}*`
-              }
-            }
-          }
-        ]
-      }
-    });
-  }
-
   if (clue) {
-    query.bool.must.push({
+    (query.bool.must as QueryDslQueryContainer[]).push({
       multi_match: {
         query: clue,
         fields: [
