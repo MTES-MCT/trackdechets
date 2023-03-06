@@ -4,10 +4,12 @@ import {
   companyAssociatedToExistingUserFactory,
   companyFactory,
   createMembershipRequest,
-  userFactory
+  userFactory,
+  userWithCompanyFactory
 } from "../../__tests__/factories";
 import {
   getActiveUsersWithPendingMembershipRequests,
+  getPendingMembershipRequestsAndAssociatedAdmins,
   getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest,
   xDaysAgo
 } from "../onboarding.helpers";
@@ -243,5 +245,191 @@ describe("getActiveUsersWithPendingMembershipRequests", () => {
 
     expect(users.length).toEqual(1);
     expect(users[0].id).toEqual(user0.id);
+  });
+});
+
+describe("getPendingMembershipRequestsAndAssociatedAdmins", () => {
+  afterEach(resetDatabase);
+
+  it("should return pending membership requests created X days ago with all associated company admins", async () => {
+    const user0 = await userFactory();
+    const user1 = await userFactory();
+    const user2 = await userFactory();
+    const user3 = await userFactory({ isActive: false });
+
+    const companyAndAdmin0 = await userWithCompanyFactory("ADMIN");
+    const companyAndAdmin1 = await userWithCompanyFactory("ADMIN");
+    const companyAndAdmin2 = await userWithCompanyFactory("ADMIN");
+    const companyAndAdmin3 = await userWithCompanyFactory("ADMIN");
+
+    // Should be returned, along with admin
+    const request0 = await createMembershipRequest(
+      user0,
+      companyAndAdmin0.company,
+      {
+        createdAt: THREE_DAYS_AGO,
+        status: MembershipRequestStatus.PENDING
+      }
+    );
+
+    // Should not be returned, because 2 days ago
+    await createMembershipRequest(user1, companyAndAdmin1.company, {
+      createdAt: TWO_DAYS_AGO,
+      status: MembershipRequestStatus.PENDING
+    });
+
+    // Should not be returned, because request was accepted
+    await createMembershipRequest(user2, companyAndAdmin2.company, {
+      createdAt: THREE_DAYS_AGO,
+      status: MembershipRequestStatus.ACCEPTED
+    });
+
+    // Should not be returned, because user is unactive
+    await createMembershipRequest(user3, companyAndAdmin3.company, {
+      createdAt: THREE_DAYS_AGO,
+      status: MembershipRequestStatus.PENDING
+    });
+
+    const requests = await getPendingMembershipRequestsAndAssociatedAdmins(3);
+
+    expect(requests.length).toEqual(1);
+
+    const expectedResult = [
+      {
+        requestId: request0.id,
+        email: user0.email,
+        orgId: companyAndAdmin0.company.orgId,
+        adminIds: [companyAndAdmin0.user.id]
+      }
+    ];
+
+    const actualResult = requests.map(r => ({
+      requestId: r.id,
+      email: r.user.email,
+      orgId: r.company.orgId,
+      adminIds: r.company.companyAssociations.map(a => a.user.id).sort()
+    }));
+
+    expect(expectedResult).toEqual(actualResult);
+  });
+
+  it("should return ALL active admins from request's company", async () => {
+    const user0 = await userFactory();
+
+    // Should be returned
+    const companyAndAdmin0 = await userWithCompanyFactory("ADMIN");
+
+    // Should be returned
+    const admin1 = await userFactory({
+      companyAssociations: {
+        create: {
+          company: { connect: { id: companyAndAdmin0.company.id } },
+          role: "ADMIN"
+        }
+      }
+    });
+
+    // Should not be returned, because unactive
+    await userFactory({
+      isActive: false,
+      companyAssociations: {
+        create: {
+          company: { connect: { id: companyAndAdmin0.company.id } },
+          role: "ADMIN"
+        }
+      }
+    });
+
+    // Should be returned, along with both admins
+    const request0 = await createMembershipRequest(
+      user0,
+      companyAndAdmin0.company,
+      {
+        createdAt: THREE_DAYS_AGO,
+        status: MembershipRequestStatus.PENDING
+      }
+    );
+
+    const requests = await getPendingMembershipRequestsAndAssociatedAdmins(3);
+
+    expect(requests.length).toEqual(1);
+
+    const expectedResult = [
+      {
+        requestId: request0.id,
+        email: user0.email,
+        orgId: companyAndAdmin0.company.orgId,
+        adminIds: [companyAndAdmin0.user.id, admin1.id].sort()
+      }
+    ];
+
+    const actualResult = requests.map(r => ({
+      requestId: r.id,
+      email: r.user.email,
+      orgId: r.company.orgId,
+      adminIds: r.company.companyAssociations.map(a => a.user.id).sort()
+    }));
+
+    expect(expectedResult).toEqual(actualResult);
+  });
+
+  it("should return all requests from a user, even if targeting different companies", async () => {
+    const user0 = await userFactory();
+
+    // Should be returned
+    const companyAndAdmin0 = await userWithCompanyFactory("ADMIN");
+
+    // Should be returned
+    const companyAndAdmin1 = await userWithCompanyFactory("ADMIN");
+
+    // Should be returned, along with admin
+    const request0 = await createMembershipRequest(
+      user0,
+      companyAndAdmin0.company,
+      {
+        createdAt: THREE_DAYS_AGO,
+        status: MembershipRequestStatus.PENDING
+      }
+    );
+
+    // Should be returned, along with admin
+    const request1 = await createMembershipRequest(
+      user0,
+      companyAndAdmin1.company,
+      {
+        createdAt: THREE_DAYS_AGO,
+        status: MembershipRequestStatus.PENDING
+      }
+    );
+
+    const requests = await getPendingMembershipRequestsAndAssociatedAdmins(3);
+
+    expect(requests.length).toEqual(2);
+
+    const expectedResult = [
+      {
+        requestId: request0.id,
+        email: user0.email,
+        orgId: companyAndAdmin0.company.orgId,
+        adminIds: [companyAndAdmin0.user.id]
+      },
+      {
+        requestId: request1.id,
+        email: user0.email,
+        orgId: companyAndAdmin1.company.orgId,
+        adminIds: [companyAndAdmin1.user.id]
+      }
+    ].sort();
+
+    const actualResult = requests
+      .map(r => ({
+        requestId: r.id,
+        email: r.user.email,
+        orgId: r.company.orgId,
+        adminIds: r.company.companyAssociations.map(a => a.user.id).sort()
+      }))
+      .sort();
+
+    expect(expectedResult).toEqual(actualResult);
   });
 });

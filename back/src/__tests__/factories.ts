@@ -118,11 +118,13 @@ export interface UserWithCompany {
  */
 export const userWithCompanyFactory = async (
   role: UserRole,
-  companyOpts: Partial<Prisma.CompanyCreateInput> = {}
+  companyOpts: Partial<Prisma.CompanyCreateInput> = {},
+  userOpts: Partial<Prisma.UserCreateInput> = {}
 ): Promise<UserWithCompany> => {
   const company = await companyFactory(companyOpts);
 
   const user = await userFactory({
+    ...userOpts,
     companyAssociations: {
       create: {
         company: { connect: { id: company.id } },
@@ -174,7 +176,7 @@ export const createMembershipRequest = async (
   company: Company,
   opt = {}
 ) => {
-  await prisma.membershipRequest.create({
+  return await prisma.membershipRequest.create({
     data: {
       userId: user.id,
       companyId: company.id,

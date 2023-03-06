@@ -8,7 +8,7 @@ export type Recipient = {
 };
 export type MessageVersion = {
   to: Recipient[];
-  htmlContent?: string;
+  params?: { body: string };
   subject?: string;
 };
 

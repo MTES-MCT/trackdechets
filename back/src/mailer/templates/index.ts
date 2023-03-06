@@ -209,3 +209,13 @@ export const pendingMembershipRequestDetailsEmail: MailTemplate = {
   body: mustacheRenderer("pending-membership-request-details.html"),
   templateId: templateIds.LAYOUT
 };
+
+export const pendingMembershipRequestAdminDetailsEmail: MailTemplate<{
+  requestId: string;
+  email: string;
+  orgId: string;
+}> = {
+  subject: "Un utilisateur est en attente de réponse de votre part",
+  body: mustacheRenderer("pending-membership-request-admin-details.html"),
+  templateId: templateIds.LAYOUT
+};

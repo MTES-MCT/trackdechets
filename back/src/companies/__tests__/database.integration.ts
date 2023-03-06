@@ -1,7 +1,13 @@
 import prisma from "../../prisma";
 import { resetDatabase } from "../../../integration-tests/helper";
-import { companyFactory } from "../../__tests__/factories";
-import { getCompanyInvitedUsers } from "../database";
+import {
+  companyFactory,
+  userWithCompanyFactory
+} from "../../__tests__/factories";
+import {
+  getActiveAdminsByCompanyIds,
+  getCompanyInvitedUsers
+} from "../database";
 import { createUserDataLoaders } from "../../users/dataloaders";
 import { AppDataloaders } from "../../types";
 
@@ -49,5 +55,51 @@ describe("getInvitedUsers", () => {
       name: "Invité",
       role: invitation.role
     });
+  });
+});
+
+describe("getActiveAdminsByCompanyIds", () => {
+  it("should return active admins belonging to companies", async () => {
+    // Should be returned
+    const userAndCompany0 = await userWithCompanyFactory("ADMIN");
+
+    // Should be returned
+    const userAndCompany1 = await userWithCompanyFactory("ADMIN");
+
+    // Should not be returned, cause not active
+    const userAndCompany2 = await userWithCompanyFactory(
+      "ADMIN",
+      {},
+      { isActive: false }
+    );
+
+    // Should not be returned, cause not admin
+    const userAndCompany3 = await userWithCompanyFactory("MEMBER");
+
+    // Should not be returned, cause not in query
+    await userWithCompanyFactory("ADMIN");
+
+    // Should not return any admin as no user is member of company
+    const company = await companyFactory();
+
+    const result = await getActiveAdminsByCompanyIds([
+      userAndCompany0.company.id,
+      userAndCompany1.company.id,
+      userAndCompany2.company.id,
+      userAndCompany3.company.id,
+      company.id
+    ]);
+
+    expect(Object.keys(result).length).toEqual(2);
+    expect(Object.keys(result).sort()).toEqual([
+      userAndCompany0.company.id,
+      userAndCompany1.company.id
+    ]);
+    expect(result[userAndCompany0.company.id][0].id).toEqual(
+      userAndCompany0.user.id
+    );
+    expect(result[userAndCompany1.company.id][0].id).toEqual(
+      userAndCompany1.user.id
+    );
   });
 });

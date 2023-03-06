@@ -11,11 +11,13 @@ import {
   onboardingFirstStep,
   onboardingProducerSecondStep,
   onboardingProfessionalSecondStep,
+  membershipRequestDetailsEmail,
   pendingMembershipRequestDetailsEmail,
-  membershipRequestDetailsEmail
+  pendingMembershipRequestAdminDetailsEmail
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
 import { MessageVersion } from "../mailer/types";
+
 /**
  * Compute a past date relative to baseDate
  *
@@ -209,6 +211,74 @@ export const sendPendingMembershipRequestDetailsEmail = async () => {
   }));
 
   const payload = renderMail(pendingMembershipRequestDetailsEmail, {
+    messageVersions
+  });
+
+  await sendMail(payload);
+
+  await prisma.$disconnect();
+};
+
+export const getPendingMembershipRequestsAndAssociatedAdmins = async (
+  daysAgo: number
+) => {
+  const now = new Date();
+
+  const requestDateGt = xDaysAgo(now, daysAgo);
+  const requestDateLt = xDaysAgo(now, daysAgo - 1);
+
+  return prisma.membershipRequest.findMany({
+    where: {
+      createdAt: { gte: requestDateGt, lt: requestDateLt },
+      status: MembershipRequestStatus.PENDING,
+      user: { isActive: true }
+    },
+    include: {
+      user: true,
+      company: {
+        include: {
+          companyAssociations: {
+            where: { role: "ADMIN", user: { isActive: true } },
+            include: { user: true }
+          }
+        }
+      }
+    }
+  });
+};
+
+/**
+ * For each unanswered membership request issued X days ago, send an
+ * email to all the admins of request's targeted company
+ */
+export const sendPendingMembershipRequestToAdminDetailsEmail = async () => {
+  const requests = await getPendingMembershipRequestsAndAssociatedAdmins(14);
+
+  const messageVersions: MessageVersion[] = requests.map(request => {
+    const variables = {
+      requestId: request.id,
+      email: request.user.email,
+      orgName: request.company.name,
+      orgId: request.company.orgId
+    };
+
+    const template = renderMail(pendingMembershipRequestAdminDetailsEmail, {
+      variables,
+      messageVersions: []
+    });
+
+    return {
+      to: request.company.companyAssociations.map(companyAssociation => ({
+        email: companyAssociation.user.email,
+        name: companyAssociation.user.name
+      })),
+      params: {
+        body: template.body
+      }
+    };
+  });
+
+  const payload = renderMail(pendingMembershipRequestAdminDetailsEmail, {
     messageVersions
   });
 
