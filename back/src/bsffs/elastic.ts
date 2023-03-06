@@ -72,16 +72,12 @@ export function toBsdElastic(
     ecoOrganismeName: "",
     ecoOrganismeSiret: "",
 
-    nextDestinationCompanyName:
-      bsff.destinationOperationNextDestinationCompanyName ?? "",
-    nextDestinationCompanySiret:
-      bsff.destinationOperationNextDestinationCompanySiret ?? "",
-    nextDestinationCompanyVatNumber:
-      bsff.destinationOperationNextDestinationCompanyVatNumber ?? "",
-    nextDestinationCompanyAddress:
-      bsff.destinationOperationNextDestinationCompanyAddress ?? "",
+    nextDestinationCompanyName: "",
+    nextDestinationCompanySiret: "",
+    nextDestinationCompanyVatNumber: "",
+    nextDestinationCompanyAddress: "",
 
-    destinationOperationCode: bsff.destinationOperationCode ?? "",
+    destinationOperationCode: "",
 
     emitterEmissionDate: bsff.emitterEmissionSignatureDate?.getTime(),
     workerWorkDate: null,
