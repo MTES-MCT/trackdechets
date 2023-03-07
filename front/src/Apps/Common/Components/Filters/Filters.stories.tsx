@@ -37,6 +37,7 @@ Primary.args = {
           label: "Déchets d'Activités de Soins à Risque Infectieux",
         },
       ],
+      where: v => ({ type: { _in: v } }),
     },
     {
       value: "waste",
@@ -44,6 +45,7 @@ Primary.args = {
       label: "Code déchet",
       type: FilterType.input,
       isActive: true,
+      where: v => ({ waste: { code: { _contains: v } } }),
     },
   ],
   onApplyFilters: () => onApplyFilters(values),
