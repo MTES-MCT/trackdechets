@@ -14,16 +14,21 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Le bouton "Adresse chantier" sur le BSDA ne devrait pas se ré-enclencher lors d'une modification lorsque je l'ai manuellement désactivé [PR 2168](https://github.com/MTES-MCT/trackdechets/pull/2168)
+
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
 
-- Il est maintenant impossible d'annuler un BSDD qui a été réceptionné par le destinataire (ou à un statut ultérieur) [PR 2136](https://github.com/MTES-MCT/trackdechets/pull/2136) 
+- Il est maintenant impossible d'annuler un BSDD qui a été réceptionné par le destinataire (ou à un statut ultérieur) [PR 2136](https://github.com/MTES-MCT/trackdechets/pull/2136)
 - Si un BSDD de regroupement est annulé, les BSDD initiaux qui y étaient regroupés sont libérés [PR 2141](https://github.com/MTES-MCT/trackdechets/pull/2141)
+- Mise en place de nouveaux filtres backend sur la query `bsds` utilisée pour afficher le tableau de bord [PR 2126](https://github.com/MTES-MCT/trackdechets/pull/2126)
 
 #### :memo: Documentation
 
 #### :house: Interne
+
+- Ajout d'une liste blanche d'adresses IP pouvant être utilisées pour se connecter avec le compte de service du registre national [PR 2170](https://github.com/MTES-MCT/trackdechets/pull/2170)
 
 # [2023.2.1] 21/02/2023
 
