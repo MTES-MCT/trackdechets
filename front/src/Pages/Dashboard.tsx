@@ -166,7 +166,10 @@ const DashboardPage = () => {
       filterKeys.includes(filter.value)
     );
     filters.forEach(f => {
-      variables.where[f.value] = filterValues[f.value];
+      variables.where = {
+        ...variables.where,
+        ...f.where(filterValues[f.value]),
+      };
       variables.order[f.order] = OrderType.Asc;
     });
     setBsdsVariables(variables);

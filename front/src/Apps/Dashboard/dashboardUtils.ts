@@ -57,6 +57,7 @@ export const filterList: Filter[] = [
     isMultiple: true,
     options: bsdTypeFilterSelectOptions,
     isActive: true,
+    where: v => ({ type: { _in: v } }),
   },
   // {
   //   value: "siret",
@@ -70,6 +71,7 @@ export const filterList: Filter[] = [
     label: filter_waste_code,
     type: FilterType.input,
     isActive: true,
+    where: v => ({ waste: { code: { _contains: v } } }),
   },
   {
     value: "readableId",
@@ -77,6 +79,7 @@ export const filterList: Filter[] = [
     label: filter_bsd_number,
     type: FilterType.input,
     isActive: true,
+    where: v => ({ readableId: { _contains: v } }),
   },
   // {
   //   value: "readableId",
@@ -90,6 +93,9 @@ export const filterList: Filter[] = [
     label: filter_immat_number,
     type: FilterType.input,
     isActive: true,
+    where: v => ({
+      transporter: { transport: { plates: { _itemContains: v } } },
+    }),
   },
   // {
   //   value: "chantier_name",
@@ -109,6 +115,7 @@ export const filterList: Filter[] = [
     label: filter_free_text,
     type: FilterType.input,
     isActive: true,
+    where: v => ({ transporter: { customInfo: { _match: v } } }),
   },
 ];
 
