@@ -7,7 +7,7 @@ import {
 } from "./onboarding.helpers";
 
 // Declare the jobs that can be called by the script
-const CRON_JOBS = {
+const METHODS = {
   sendFirstOnboardingEmail,
   sendMembershipRequestDetailsEmail,
   sendPendingMembershipRequestDetailsEmail,
@@ -15,16 +15,16 @@ const CRON_JOBS = {
   sendSecondOnboardingEmail
 };
 
-// Usage (in the back/ folder): npm run testCronJob -- methodName parameter
-// ex: npm run testCronJob -- sendPendingMembershipRequestToAdminDetailsEmail 10
+// Usage (in the back/ folder): npm run testMethod -- methodName parameter
+// ex: npm run testMethod -- sendPendingMembershipRequestToAdminDetailsEmail 10
 const job = process.argv[2];
 const param = process.argv[3];
 
-console.log(`Trying to execute script '${job}' with param '${param}'`);
+console.log(`Trying to execute method '${job}' with param '${param}'`);
 
-if (!CRON_JOBS[job]) {
-  throw `Job '${job}' does not exist`;
+if (!METHODS[job]) {
+  throw `Method '${job}' does not exist`;
 }
 
 // Execute job
-CRON_JOBS[job](param);
+METHODS[job](param);

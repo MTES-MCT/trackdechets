@@ -42,7 +42,7 @@
     "queue:obliterate": "node dist/src/queue/obliterate.js",
     "purge-pdf-token": "node dist/src/scripts/bin/purgePdfAccessToken.js",
     "purge-pdf-token:dev": "ts-node -r dotenv/config ./src/scripts/bin/purgePdfAccessToken.ts",
-    "testCronJob": "ts-node -r dotenv/config ./src/commands/testCronJob.ts"
+    "testMethod": "ts-node -r dotenv/config ./src/commands/testMethod.ts"
   },
   "engines": {
     "node": "^16"
