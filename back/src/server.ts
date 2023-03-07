@@ -78,7 +78,7 @@ export const server = new ApolloServer({
     return {
       ...ctx,
       // req.user is made available by passport
-      user: ctx.req?.user ?? null,
+      user: ctx.req?.user ? { ...ctx.req?.user, ip: ctx.req?.ip } : null,
       dataloaders: {
         ...createUserDataLoaders(),
         ...createCompanyDataLoaders(),

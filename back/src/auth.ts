@@ -36,6 +36,7 @@ declare global {
   namespace Express {
     interface User extends PrismaUser {
       auth?: AuthType;
+      ip?: string;
     }
   }
 }

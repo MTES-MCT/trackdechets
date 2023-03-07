@@ -29,6 +29,7 @@ import { indexForm } from "../../../../forms/elastic";
 import { Query } from "../../../../generated/graphql/types";
 import {
   formFactory,
+  userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -190,6 +191,23 @@ describe("All wastes registry", () => {
         message: `Vous n'êtes pas membre de l'entreprise portant le siret "${destination2.company.siret}".`
       })
     );
+  });
+
+  it("should not allow user to request any siret if authenticated from a service account", async () => {
+    // service account access is limited to incomingWastes, outgoingWastes, transportedWastes and managedWastes
+    const user = await userFactory({ isRegistreNational: true });
+    const { query } = makeClient(user);
+    const { errors } = await query<Pick<Query, "allWastes">>(ALL_WASTES, {
+      variables: {
+        sirets: [destination.company.siret],
+        first: 2
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `Vous n'êtes pas membre de l'entreprise portant le siret "${destination.company.siret}".`
+      })
+    ]);
   });
 
   it("should paginate forward with first and after", async () => {
