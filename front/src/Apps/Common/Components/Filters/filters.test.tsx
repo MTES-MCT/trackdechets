@@ -15,6 +15,7 @@ describe("Filters component", () => {
       order: "order",
       type: FilterType.input,
       isActive: true,
+      where: v => ({ waste: { code: { _contains: v } } }),
     },
     {
       value: "filter2",
@@ -23,6 +24,7 @@ describe("Filters component", () => {
       type: FilterType.select,
       options: [{ value: "option1", label: "option 1" }],
       isActive: true,
+      where: v => ({ type: { _in: v } }),
     },
   ];
 
