@@ -23,6 +23,8 @@ import sendVerificationCodeLetter from "./mutations/sendVerificationCodeLetter";
 import createTestCompany from "./mutations/createTestCompany";
 import deleteCompany from "./mutations/deleteCompany";
 import createAnonymousCompany from "./mutations/createAnonymousCompany";
+import { addSignatureAutomation } from "./mutations/addSignatureAutomation";
+import { removeSignatureAutomation } from "./mutations/removeSignatureAutomation";
 
 const Mutation: MutationResolvers = {
   createCompany,
@@ -48,7 +50,9 @@ const Mutation: MutationResolvers = {
   sendVerificationCodeLetter,
   createTestCompany,
   deleteCompany,
-  createAnonymousCompany
+  createAnonymousCompany,
+  addSignatureAutomation: addSignatureAutomation as any,
+  removeSignatureAutomation: removeSignatureAutomation as any
 };
 
 export default Mutation;

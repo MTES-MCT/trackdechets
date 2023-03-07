@@ -126,3 +126,62 @@ export function createFormTempStorage(
     })
   };
 }
+
+export function createAppendix1Form(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
+  return {
+    ...createForm(company),
+    description: `Le BSD chapeau est un bordereau simplifié, qui précise un émetteur, un transporteur, un destinataire et des informations de base sur le déchet (code et dénomination).
+    A noter que tous les codes déchets ne sont pas éligibles à bordereau chapeau.`,
+    variables: ({ collecteur, traiteur }) => {
+      return {
+        createFormInput: {
+          emitter: {
+            type: "APPENDIX1",
+            company: fixtures.emitterCompanyInput(collecteur.siret)
+          },
+          recipient: fixtures.recipientInput(traiteur.siret),
+          transporter: fixtures.transporterInput(collecteur.siret),
+          wasteDetails: {
+            code: "13 05 02*",
+            onuCode: "Non Soumis",
+            name: "Huiles"
+          }
+        }
+      };
+    },
+    setContext: (ctx, data) => ({
+      ...ctx,
+      bsd: data,
+      chapeau: data
+    })
+  };
+}
+
+export function createAppendix1ProducerForm(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
+  return {
+    ...createForm(company),
+    description: `On crée un bordereau d'annexe 1 en précisant uniquement l'émetteur et le type de bordereau.
+    Lors du rattachement au chapeau, les autres informations seront automatiquement renseignées: destinataire et code déchet notamment.`,
+    variables: ({ producteur }) => {
+      return {
+        createFormInput: {
+          emitter: {
+            type: "APPENDIX1_PRODUCER",
+            company: fixtures.emitterCompanyInput(producteur.siret)
+          }
+        }
+      };
+    },
+    setContext: (ctx, data) => ({
+      ...ctx,
+      bsd: data,
+      appendix1Items: [data]
+    })
+  };
+}

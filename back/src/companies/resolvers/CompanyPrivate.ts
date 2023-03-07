@@ -54,6 +54,11 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
   },
   installation: (parent, _, context) => {
     return context.dataloaders.installations.load(parent.orgId);
+  },
+  signatureAutomations: parent => {
+    return prisma.company
+      .findUnique({ where: { id: parent.id } })
+      .givenSignatureAutomations({ include: { from: true, to: true } }) as any;
   }
 };
 

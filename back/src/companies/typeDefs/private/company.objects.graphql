@@ -221,4 +221,9 @@ type CompanySearchPrivate {
 
   "Nom du contact"
   contact: String
+
+  """
+  Liste des automatisations de signature reçues par l'entreprise
+  """
+  receivedSignatureAutomations: [SignatureAutomation!]!
 }

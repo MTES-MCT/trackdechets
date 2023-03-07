@@ -1,5 +1,6 @@
 import {
   CompanyType,
+  EmitterType,
   Status,
   UserRole,
   WasteAcceptationStatus
@@ -22,6 +23,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { prepareDB, prepareRedis } from "../../../__tests__/helpers";
 import * as mailsHelper from "../../../../mailer/mailing";
 import * as generateBsddPdf from "../../../pdf/generateBsddPdf";
+import getReadableId from "../../../readableId";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -495,5 +497,101 @@ describe("Test Form reception", () => {
         message: "Vous n'êtes pas autorisé à marquer ce bordereau comme accepté"
       })
     ]);
+  });
+
+  describe("Annexe 1", () => {
+    it("should prevent marking an appendix1 item as accepted", async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const appendix1_item = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.RECEIVED,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: company.siret,
+          transporterCompanySiret: company.siret,
+          owner: { connect: { id: user.id } }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "markAsAccepted">,
+        MutationMarkAsAcceptedArgs
+      >(MARK_AS_ACCEPTED, {
+        variables: {
+          id: appendix1_item.id,
+          acceptedInfo: {
+            wasteAcceptationStatus: "ACCEPTED",
+            quantityReceived: 1,
+            signedAt: new Date("2022-01-01").toISOString() as any,
+            signedBy: "John Snow"
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Un bordereau d'annexe 1 ne peut pas avoir être marqué comme accepté. Il suit son bordereau de tournée."
+        })
+      ]);
+    });
+
+    it("should mark the appendix1 items as ACCEPTED when the container form if marked as ACCEPTED", async () => {
+      const { company: producerCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const appendix1_item = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.RECEIVED,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          transporterCompanySiret: company.siret,
+          owner: { connect: { id: user.id } }
+        }
+      });
+
+      const container = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.RECEIVED,
+          emitterType: EmitterType.APPENDIX1,
+          emitterCompanySiret: company.siret,
+          emitterCompanyName: company.name,
+          transporterCompanySiret: company.siret,
+          recipientCompanySiret: company.siret,
+          grouping: {
+            create: { initialFormId: appendix1_item.id, quantity: 0 }
+          }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data } = await mutate<
+        Pick<Mutation, "markAsAccepted">,
+        MutationMarkAsAcceptedArgs
+      >(MARK_AS_ACCEPTED, {
+        variables: {
+          id: container.id,
+          acceptedInfo: {
+            wasteAcceptationStatus: "ACCEPTED",
+            quantityReceived: 1,
+            signedAt: new Date("2022-01-01").toISOString() as any,
+            signedBy: "Collecteur annexe 1"
+          }
+        }
+      });
+
+      expect(data.markAsAccepted.status).toBe(Status.ACCEPTED);
+
+      const refreshedItem = await prisma.form.findUnique({
+        where: { id: appendix1_item.id }
+      });
+      expect(refreshedItem.status).toBe(Status.ACCEPTED);
+    });
   });
 });

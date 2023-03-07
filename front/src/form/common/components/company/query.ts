@@ -110,6 +110,7 @@ export const SEARCH_COMPANIES = gql`
       etatAdministratif
       codePaysEtrangerEtablissement
       isRegistered
+      trackdechetsId
       contact
       contactPhone
       contactEmail

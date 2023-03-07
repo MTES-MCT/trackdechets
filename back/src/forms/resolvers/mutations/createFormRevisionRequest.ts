@@ -1,4 +1,5 @@
 import {
+  EmitterType,
   Form,
   Prisma,
   RevisionRequestStatus,
@@ -170,6 +171,11 @@ async function checkIfUserCanRequestRevisionOnBsdd(
   if (bsdd.emitterIsPrivateIndividual || bsdd.emitterIsForeignShip) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau car l'émetteur est un particulier ou un navire étranger."
+    );
+  }
+  if (bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+    throw new ForbiddenError(
+      "Impossible de créer une révision sur un bordereau d'annexe 1."
     );
   }
   if (Status.DRAFT === bsdd.status || Status.SEALED === bsdd.status) {

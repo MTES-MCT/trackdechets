@@ -2,58 +2,34 @@ import {
   Consistence,
   EmitterType,
   Form,
-  QuantityType,
-  WasteAcceptationStatus,
   Prisma,
-  Status
+  QuantityType,
+  Status,
+  WasteAcceptationStatus
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
-import prisma from "../prisma";
+import { Decimal } from "decimal.js-light";
+import { checkVAT } from "jsvat";
 import countries from "world-countries";
 import * as yup from "yup";
 import {
+  BSDD_APPENDIX1_WASTE_CODES,
+  BSDD_WASTE_CODES,
   isDangerous,
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
-  PROCESSING_OPERATIONS_GROUPEMENT_CODES,
   PROCESSING_OPERATIONS_CODES,
-  BSDD_WASTE_CODES
+  PROCESSING_OPERATIONS_GROUPEMENT_CODES
 } from "../common/constants";
-import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import {
-  CompanyInput,
-  CompanySearchResult,
-  InitialFormFractionInput,
-  PackagingInfo,
-  Packagings
-} from "../generated/graphql/types";
-import {
-  MISSING_COMPANY_NAME,
-  MISSING_COMPANY_SIRET,
-  MISSING_COMPANY_ADDRESS,
-  MISSING_COMPANY_CONTACT,
-  MISSING_COMPANY_PHONE,
-  MISSING_COMPANY_EMAIL,
-  INVALID_WASTE_CODE,
-  INVALID_PROCESSING_OPERATION,
-  EXTRANEOUS_NEXT_DESTINATION,
-  MISSING_PROCESSING_OPERATION,
-  MISSING_COMPANY_OMI_NUMBER,
-  INVALID_COMPANY_OMI_NUMBER,
-  INVALID_INDIVIDUAL_OR_FOREIGNSHIP,
-  MISSING_COMPANY_SIRET_OR_VAT
-} from "./errors";
-import {
-  isVat,
-  isSiret,
+  BAD_CHARACTERS_REGEXP,
+  countries as vatCountries,
+  isClosedCompany,
+  isForeignVat,
   isFRVat,
   isOmi,
-  isForeignVat,
-  countries as vatCountries,
-  BAD_CHARACTERS_REGEXP,
-  isClosedCompany
+  isSiret,
+  isVat
 } from "../common/constants/companySearchHelpers";
-import { validateCompany } from "../companies/validateCompany";
-import { Decimal } from "decimal.js-light";
 import {
   foreignVatNumber,
   siret,
@@ -65,10 +41,35 @@ import {
   weightConditions,
   WeightUnits
 } from "../common/validation";
-import { checkVAT } from "jsvat";
+import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
 import { searchCompany } from "../companies/search";
 import { AnonymousCompanyError } from "../companies/sirene/errors";
-import { SIRETS_BY_ROLE_INCLUDE, getFormSiretsByRole } from "./database";
+import { validateCompany } from "../companies/validateCompany";
+import {
+  CompanyInput,
+  CompanySearchResult,
+  InitialFormFractionInput,
+  PackagingInfo,
+  Packagings
+} from "../generated/graphql/types";
+import prisma from "../prisma";
+import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "./database";
+import {
+  EXTRANEOUS_NEXT_DESTINATION,
+  INVALID_COMPANY_OMI_NUMBER,
+  INVALID_INDIVIDUAL_OR_FOREIGNSHIP,
+  INVALID_PROCESSING_OPERATION,
+  INVALID_WASTE_CODE,
+  MISSING_COMPANY_ADDRESS,
+  MISSING_COMPANY_CONTACT,
+  MISSING_COMPANY_EMAIL,
+  MISSING_COMPANY_NAME,
+  MISSING_COMPANY_OMI_NUMBER,
+  MISSING_COMPANY_PHONE,
+  MISSING_COMPANY_SIRET,
+  MISSING_COMPANY_SIRET_OR_VAT,
+  MISSING_PROCESSING_OPERATION
+} from "./errors";
 // set yup default error messages
 configureYup();
 
@@ -109,20 +110,32 @@ type Recipient = Pick<
   | "recipientCompanyMail"
 >;
 
-type WasteDetails = Pick<
+type WasteDetailsAppendix1Producer = Pick<
   Prisma.FormCreateInput,
-  | "wasteDetailsCode"
-  | "wasteDetailsName"
-  | "wasteDetailsOnuCode"
-  | "wasteDetailsPackagingInfos"
-  | "wasteDetailsQuantity"
-  | "wasteDetailsQuantityType"
-  | "wasteDetailsConsistence"
-  | "wasteDetailsPop"
-  | "wasteDetailsParcelNumbers"
-  | "wasteDetailsAnalysisReferences"
-  | "wasteDetailsLandIdentifiers"
+  "wasteDetailsName" | "wasteDetailsCode" | "wasteDetailsIsDangerous"
 >;
+
+type WasteDetailsAppendix1 = WasteDetailsAppendix1Producer &
+  Pick<
+    Prisma.FormCreateInput,
+    | "wasteDetailsName"
+    | "wasteDetailsCode"
+    | "wasteDetailsIsDangerous"
+    | "wasteDetailsOnuCode"
+    | "wasteDetailsParcelNumbers"
+    | "wasteDetailsAnalysisReferences"
+    | "wasteDetailsLandIdentifiers"
+  >;
+
+type WasteDetails = WasteDetailsAppendix1 &
+  Pick<
+    Prisma.FormCreateInput,
+    | "wasteDetailsPackagingInfos"
+    | "wasteDetailsQuantity"
+    | "wasteDetailsQuantityType"
+    | "wasteDetailsConsistence"
+    | "wasteDetailsPop"
+  >;
 
 type Transporter = Pick<
   Prisma.FormCreateInput,
@@ -432,7 +445,12 @@ const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
         "Le champ CAP est obligatoire pour les déchets dangereux",
         (value, testContext) => {
           const rootValue = testContext.parent;
-          if (!isDraft && rootValue?.wasteDetailsIsDangerous && !value) {
+          if (
+            !isDraft &&
+            rootValue?.wasteDetailsIsDangerous &&
+            !value &&
+            rootValue?.emitterType !== EmitterType.APPENDIX1
+          ) {
             return false;
           }
           return true;
@@ -580,13 +598,29 @@ const parcelInfos = yup.lazy(value => {
 // 4 - Mentions au titre des règlements ADR, RID, ADNR, IMDG
 // 5 - Conditionnement
 // 6 - Quantité
-const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
+const wasteDetailsAppendix1SchemaFn: FactorySchemaOf<
+  boolean,
+  WasteDetailsAppendix1
+> = isDraft =>
   yup.object({
     wasteDetailsName: yup.string().nullable(),
     wasteDetailsCode: yup
       .string()
       .requiredIf(!isDraft, "Le code déchet est obligatoire")
-      .oneOf([...BSDD_WASTE_CODES, "", null], INVALID_WASTE_CODE),
+      .oneOf(
+        [...BSDD_APPENDIX1_WASTE_CODES, "", null],
+        "Le code déchet n'est pas utilisable sur une annexe 1."
+      ),
+    wasteDetailsIsDangerous: yup.boolean().when("wasteDetailsCode", {
+      is: (wasteCode: string) => isDangerous(wasteCode || ""),
+      then: () =>
+        yup
+          .boolean()
+          .isTrue(
+            `Un déchet avec un code comportant un astérisque est forcément dangereux`
+          ),
+      otherwise: () => yup.boolean()
+    }),
     wasteDetailsOnuCode: yup.string().when("wasteDetailsIsDangerous", {
       is: (wasteDetailsIsDangerous: boolean) =>
         wasteDetailsIsDangerous === true,
@@ -600,73 +634,94 @@ const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> = isDraft =>
           ),
       otherwise: () => yup.string().nullable()
     }),
-    wasteDetailsPackagingInfos: yup
-      .array()
-      .requiredIf(!isDraft, "Le détail du conditionnement est obligatoire")
-      .of(packagingInfoFn(isDraft))
-      .test(
-        "is-valid-packaging-infos",
-        "${path} ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
-        (infos: PackagingInfo[]) => {
-          const hasCiterne = infos?.find(i => i.type === "CITERNE");
-          const hasBenne = infos?.find(i => i.type === "BENNE");
-
-          if (hasCiterne && hasBenne) {
-            return false;
-          }
-
-          const hasOtherPackaging = infos?.find(
-            i => !["CITERNE", "BENNE"].includes(i.type)
-          );
-          if ((hasCiterne || hasBenne) && hasOtherPackaging) {
-            return false;
-          }
-
-          return true;
-        }
-      ),
-    wasteDetailsQuantity: weight(WeightUnits.Tonne)
-      .label("Déchet")
-      .when(
-        ["transporterTransportMode", "createdAt"],
-        weightConditions.transportMode(WeightUnits.Tonne)
-      )
-      .requiredIf(!isDraft, "La quantité du déchet en tonnes est obligatoire"),
-    wasteDetailsQuantityType: yup
-      .mixed<QuantityType>()
-      .requiredIf(
-        !isDraft,
-        "Le type de quantité (réelle ou estimée) doit être précisé"
-      ),
-    wasteDetailsConsistence: yup
-      .mixed<Consistence>()
-      .requiredIf(!isDraft, "La consistance du déchet doit être précisée"),
-    wasteDetailsPop: yup
-      .boolean()
-      .requiredIf(!isDraft, "La présence (ou non) de POP doit être précisée"),
-    wasteDetailsIsDangerous: yup.string().when("wasteDetailsCode", {
-      is: (wasteCode: string) => isDangerous(wasteCode || ""),
-      then: () =>
-        yup
-          .boolean()
-          .isTrue(
-            `Un déchet avec un code comportant un astérisque est forcément dangereux`
-          ),
-      otherwise: () => yup.boolean()
-    }),
     wasteDetailsParcelNumbers: yup.array().of(parcelInfos as any),
     wasteDetailsAnalysisReferences: yup.array().of(yup.string()),
     wasteDetailsLandIdentifiers: yup.array().of(yup.string())
   });
 
-export const wasteDetailsSchema = wasteDetailsSchemaFn(false);
+const fullWasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
+  isDraft =>
+    wasteDetailsAppendix1SchemaFn(isDraft).concat(
+      yup.object({
+        // The code is redeclared as the possible values are different
+        wasteDetailsCode: yup
+          .string()
+          .requiredIf(!isDraft, "Le code déchet est obligatoire")
+          .oneOf([...BSDD_WASTE_CODES, "", null], INVALID_WASTE_CODE),
+        wasteDetailsPackagingInfos: yup
+          .array()
+          .requiredIf(!isDraft, "Le détail du conditionnement est obligatoire")
+          .of(packagingInfoFn(isDraft))
+          .test(
+            "is-valid-packaging-infos",
+            "${path} ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
+            (infos: PackagingInfo[]) => {
+              const hasCiterne = infos?.find(i => i.type === "CITERNE");
+              const hasBenne = infos?.find(i => i.type === "BENNE");
+
+              if (hasCiterne && hasBenne) {
+                return false;
+              }
+
+              const hasOtherPackaging = infos?.find(
+                i => !["CITERNE", "BENNE"].includes(i.type)
+              );
+              if ((hasCiterne || hasBenne) && hasOtherPackaging) {
+                return false;
+              }
+
+              return true;
+            }
+          ),
+        wasteDetailsQuantity: weight(WeightUnits.Tonne)
+          .label("Déchet")
+          .when(
+            ["transporterTransportMode", "createdAt"],
+            weightConditions.transportMode(WeightUnits.Tonne)
+          )
+          .requiredIf(
+            !isDraft,
+            "La quantité du déchet en tonnes est obligatoire"
+          ),
+        wasteDetailsQuantityType: yup
+          .mixed<QuantityType>()
+          .requiredIf(
+            !isDraft,
+            "Le type de quantité (réelle ou estimée) doit être précisé"
+          ),
+        wasteDetailsConsistence: yup
+          .mixed<Consistence>()
+          .requiredIf(!isDraft, "La consistance du déchet doit être précisée"),
+        wasteDetailsPop: yup
+          .boolean()
+          .requiredIf(
+            !isDraft,
+            "La présence (ou non) de POP doit être précisée"
+          )
+      })
+    );
+
+const wasteDetailsSchemaFn = isDraft =>
+  yup.lazy(value => {
+    if (value.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+      return yup.object();
+    }
+
+    if (value.emitterType === EmitterType.APPENDIX1) {
+      return wasteDetailsAppendix1SchemaFn(isDraft);
+    }
+    return fullWasteDetailsSchemaFn(isDraft);
+  });
 
 export const beforeSignedByTransporterSchema: yup.SchemaOf<
   Pick<Form, "wasteDetailsPackagingInfos">
 > = yup.object({
-  wasteDetailsPackagingInfos: yup
-    .array()
-    .min(1, "Le nombre de contenants doit être supérieur à 0")
+  wasteDetailsPackagingInfos: yup.array().when("emitterType", {
+    is: EmitterType.APPENDIX1_PRODUCER,
+    then: schema => schema.nullable(),
+    otherwise: schema =>
+      schema.min(1, "Le nombre de contenants doit être supérieur à 0")
+  })
 });
 
 // 8 - Collecteur-transporteur
@@ -904,7 +959,19 @@ export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
       "transporterTransportMode",
       weightConditions.transportMode(WeightUnits.Tonne)
     ),
-  wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>(),
+  wasteAcceptationStatus: yup
+    .mixed<WasteAcceptationStatus>()
+    .test(
+      "is-not-partial-on-appendix1",
+      "Impossible de faire une acceptation partielle sur un bordereau de tournée",
+      (value, context) => {
+        const emitterType = context.parent.emitterType;
+        return (
+          emitterType !== EmitterType.APPENDIX1 ||
+          value !== WasteAcceptationStatus.PARTIALLY_REFUSED
+        );
+      }
+    ),
   wasteRefusalReason: yup
     .string()
     .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
@@ -1131,20 +1198,33 @@ export const processedInfoSchema = yup.lazy(processedInfoSchemaFn);
 
 // validation schema for BSD before it can be sealed
 const baseFormSchemaFn = (isDraft: boolean) =>
-  emitterSchemaFn(isDraft)
-    .concat(ecoOrganismeSchema)
-    .concat(recipientSchemaFn(isDraft))
-    .concat(wasteDetailsSchemaFn(isDraft))
-    .concat(transporterSchemaFn(isDraft))
-    .concat(traderSchemaFn(isDraft))
-    .concat(brokerSchemaFn(isDraft));
+  yup.lazy(value => {
+    if (value.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+      return emitterSchemaFn(isDraft).noUnknown();
+    }
 
+    const lazyWasteDetailsSchema = wasteDetailsSchemaFn(isDraft).resolve({
+      value
+    });
+
+    return yup
+      .object()
+      .concat(emitterSchemaFn(isDraft))
+      .concat(ecoOrganismeSchema)
+      .concat(recipientSchemaFn(isDraft))
+      .concat(transporterSchemaFn(isDraft))
+      .concat(traderSchemaFn(isDraft))
+      .concat(brokerSchemaFn(isDraft))
+      .concat(lazyWasteDetailsSchema);
+  });
 export const sealedFormSchema = baseFormSchemaFn(false);
 export const draftFormSchema = baseFormSchemaFn(true);
+export const wasteDetailsSchema = wasteDetailsSchemaFn(false);
 
 // validation schema for a BSD with a processed status
 export const processedFormSchema = yup.lazy((value: any) =>
   sealedFormSchema
+    .resolve({ value })
     .concat(signingInfoSchema)
     .concat(receivedInfoSchema)
     .concat(processedInfoSchemaFn(value))
@@ -1284,20 +1364,36 @@ const BSDD_MAX_APPENDIX2 = parseInt(process.env.BSDD_MAX_APPENDIX2, 10) || 250;
 export async function validateGroupement(
   form: Partial<Form | Prisma.FormCreateInput>,
   grouping: InitialFormFractionInput[]
-) {
+): Promise<
+  {
+    form: Form;
+    quantity: number;
+  }[]
+> {
   if (!grouping || grouping?.length === 0) {
     return [];
   }
 
+  if (form.emitterType === EmitterType.APPENDIX2) {
+    return validateAppendix2Groupement(form, grouping);
+  }
+
+  if (form.emitterType === EmitterType.APPENDIX1) {
+    return validateAppendix1Groupement(form, grouping);
+  }
+
+  throw new UserInputError(
+    "emitter.type doit être égal à APPENDIX2 ou APPENDIX1 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
+  );
+}
+
+export async function validateAppendix2Groupement(
+  form: Partial<Form | Prisma.FormCreateInput>,
+  grouping: InitialFormFractionInput[]
+) {
   if (grouping.length > BSDD_MAX_APPENDIX2) {
     throw new UserInputError(
       `Vous ne pouvez pas regrouper plus de ${BSDD_MAX_APPENDIX2} BSDDs initiaux`
-    );
-  }
-
-  if (form.emitterType !== EmitterType.APPENDIX2) {
-    throw new UserInputError(
-      "emitter.type doit être égal à APPENDIX2 lorsque `appendix2Forms` ou `grouping` n'est pas vide"
     );
   }
 
@@ -1425,6 +1521,77 @@ export async function validateGroupement(
   if (errors.length > 0) {
     throw new UserInputError(errors.join("\n"));
   }
+
+  return formFractions;
+}
+
+export async function validateAppendix1Groupement(
+  form: Partial<Form | Prisma.FormCreateInput>,
+  grouping: InitialFormFractionInput[]
+) {
+  if (!form.emitterCompanySiret) {
+    throw new UserInputError(
+      "Vous devez renseigner le numéro SIRET de l'établissement de collecte du BSDD de tournée dédiée"
+    );
+  }
+
+  const formIds = grouping.map(({ form }) => form.id);
+  const duplicates = formIds.filter(
+    (id, index) => formIds.indexOf(id) !== index
+  );
+  if (duplicates.length > 0) {
+    throw new UserInputError(
+      `Un même bordereau d'annexe 1 ne peut pas être rattaché plusieurs fois à un bordereau de tournée. Bordereaux concernés: ${duplicates.join(
+        ", "
+      )}`
+    );
+  }
+
+  const initialForms = await prisma.form.findMany({
+    where: {
+      id: { in: grouping.map(({ form }) => form.id) },
+      emitterType: EmitterType.APPENDIX1_PRODUCER,
+      status: {
+        in: [
+          Status.DRAFT,
+          Status.SEALED,
+          Status.SIGNED_BY_PRODUCER,
+          Status.SENT
+        ]
+      },
+      isDeleted: false
+    },
+    include: {
+      groupedIn: true
+    }
+  });
+
+  if (grouping.length > 0 && initialForms.length < grouping.length) {
+    const notFoundIds = grouping
+      .map(({ form }) => form.id)
+      .filter(id => !initialForms.map(p => p.id).includes(id));
+    throw new UserInputError(
+      `Les BSDD d'annexe 1 ${notFoundIds.join(
+        ", "
+      )} n'existent pas ou ne sont pas des bordereaux d'annexe 1`
+    );
+  }
+
+  const formFractions = initialForms.map(initialForm => {
+    if (
+      initialForm.groupedIn?.length === 1 &&
+      initialForm.groupedIn[0].nextFormId !== form.id
+    ) {
+      throw new UserInputError(
+        `Une annexe 1 ne peut pas être rattachée à plusieurs bordereaux de tournée. Le bordereau ${initialForm.id} est déjà rattaché au bordereau de tournée ${initialForm.groupedIn[0].id}`
+      );
+    }
+
+    return {
+      form: initialForm,
+      quantity: initialForm.quantityReceived ?? 0
+    };
+  });
 
   return formFractions;
 }

@@ -57,6 +57,7 @@ async function findCompanyAndMergeInfos(
     // ensure compatibility with CompanyPublic
     ecoOrganismeAgreements: [],
     isRegistered: trackdechetsCompanyInfo != null,
+    trackdechetsId: trackdechetsCompanyInfo?.id,
     companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
     orgId: cleanClue,
     ...convertUrls(trackdechetsCompanyInfo),

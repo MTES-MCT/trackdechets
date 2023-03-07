@@ -47,7 +47,7 @@ const formData: Partial<Form> = {
   transporterCompanyContact: "Transporteur",
   transporterCompanyPhone: "03",
   transporterCompanyMail: "t@t.fr",
-  wasteDetailsCode: "01 03 04*",
+  wasteDetailsCode: "16 06 01*",
   wasteDetailsOnuCode: "AAA",
   wasteDetailsPackagingInfos: [
     { type: "FUT", other: null, quantity: 1 },
@@ -144,6 +144,7 @@ describe("sealedFormSchema", () => {
       };
 
       const isValid = await sealedFormSchema
+        .resolve({ value: testForm })
         .concat(ecoOrganismeSchema)
         .isValid(testForm);
       expect(isValid).toEqual(true);
@@ -157,6 +158,7 @@ describe("sealedFormSchema", () => {
       };
 
       const isValid = await sealedFormSchema
+        .resolve({ value: testForm })
         .concat(ecoOrganismeSchema)
         .isValid(testForm);
       expect(isValid).toEqual(true);
@@ -171,6 +173,7 @@ describe("sealedFormSchema", () => {
         };
 
         const isValid = await sealedFormSchema.isValid(testForm);
+
         expect(isValid).toEqual(true);
       }
     );
@@ -507,6 +510,7 @@ describe("sealedFormSchema", () => {
       };
 
       const isValid = await sealedFormSchema
+        .resolve({ value: testForm })
         .concat(ecoOrganismeSchema)
         .isValid(testForm);
       expect(isValid).toEqual(false);

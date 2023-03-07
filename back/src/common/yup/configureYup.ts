@@ -22,6 +22,9 @@ export default function configureYup() {
       notType: "${path} ne peut pas être null",
       oneOf: "${path} doit prendre l'une des valeurs suivantes: ${values}",
       defined: "${path} doit avoir une valeur"
+    },
+    object: {
+      noUnknown: "Le champ ${path} a des valeurs invalides: ${unknown}"
     }
   });
 

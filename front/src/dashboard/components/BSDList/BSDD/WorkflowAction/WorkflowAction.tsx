@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, FormStatus } from "generated/graphql/types";
+import { EmitterType, Form, FormStatus } from "generated/graphql/types";
 import MarkAsSealed from "./MarkAsSealed";
 import MarkAsReceived from "./MarkAsReceived";
 import MarkAsAccepted from "./MarkAsAccepted";
@@ -21,6 +21,7 @@ import {
 export interface WorkflowActionProps {
   form: Form;
   siret: string;
+  options?: { canSkipEmission: boolean };
 }
 
 export function WorkflowAction(props: WorkflowActionProps) {
@@ -28,11 +29,37 @@ export function WorkflowAction(props: WorkflowActionProps) {
   const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
 
   const isTempStorage = form.recipient?.isTempStorage;
+  const isAppendix1 = form.emitter?.type === EmitterType.Appendix1;
+  const isAppendix1Producer =
+    form.emitter?.type === EmitterType.Appendix1Producer;
 
   switch (form.status) {
     case FormStatus.Draft:
       return <MarkAsSealed {...props} />;
     case FormStatus.Sealed: {
+      if (isAppendix1) {
+        return form.recipient?.company?.siret === siret ? (
+          <MarkAsReceived {...props} />
+        ) : null;
+      }
+
+      if (isAppendix1Producer) {
+        return (
+          <>
+            {[
+              form.emitter?.company?.siret,
+              form.ecoOrganisme?.siret,
+              form.transporter?.company?.orgId,
+            ].includes(siret) && <SignEmissionForm {...props} />}
+
+            {props.options?.canSkipEmission &&
+              form.transporter?.company?.orgId === siret && (
+                <SignTransportForm {...props} />
+              )}
+          </>
+        );
+      }
+
       if (
         [
           form.emitter?.company?.siret,
@@ -51,6 +78,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.Sent: {
+      if (isAppendix1Producer) {
+        return null;
+      }
+
       if (siret === form.recipient?.company?.siret && isActTab) {
         if (isTempStorage) {
           return <MarkAsTempStored {...props} />;
@@ -128,6 +159,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.Received: {
+      if (isAppendix1Producer) {
+        return null;
+      }
+
       if (
         (isTempStorage &&
           siret === form.temporaryStorageDetail?.destination?.company?.siret) ||
@@ -138,10 +173,14 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return null;
     }
     case FormStatus.Accepted: {
+      if (isAppendix1Producer) {
+        return null;
+      }
+
       if (!isTempStorage && siret === form.recipient?.company?.siret) {
         return (
           <div className="tw-flex tw-space-x-2">
-            <MarkAsResealed {...props} />
+            {!isAppendix1 && <MarkAsResealed {...props} />}
             <MarkAsProcessed {...props} />
           </div>
         );

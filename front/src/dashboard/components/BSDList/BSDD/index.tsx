@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useParams } from "react-router";
-import { Form } from "generated/graphql/types";
+import { EmitterType, Form } from "generated/graphql/types";
 import { CellProps, CellValue } from "react-table";
 import { ActionButtonContext } from "common/components/ActionButton";
 import { BSDDActions } from "dashboard/components/BSDList/BSDD/BSDDActions/BSDDActions";
@@ -17,8 +17,15 @@ export const COLUMNS: Record<
   }
 > = {
   type: {
-    accessor: () => null,
-    Cell: () => <IconBSDD style={{ fontSize: "24px" }} />,
+    accessor: bsdd => bsdd.emitter?.type,
+    Cell: ({ value }) => (
+      <>
+        <IconBSDD style={{ fontSize: "24px" }} />
+        {value === EmitterType.Appendix2 && <span>Grp</span>}
+        {value === EmitterType.Appendix1 && <span>Tournée</span>}
+        {value === EmitterType.Appendix1Producer && <span>Annexe 1</span>}
+      </>
+    ),
   },
   readableId: {
     accessor: form => {
@@ -91,9 +98,18 @@ export const COLUMNS: Record<
     accessor: () => null,
     Cell: ({ row }) => {
       const { siret } = useParams<{ siret: string }>();
+      const form = row.original;
       return (
         <ActionButtonContext.Provider value={{ size: "small" }}>
-          <WorkflowAction siret={siret} form={row.original} />
+          <WorkflowAction
+            siret={siret}
+            form={form}
+            options={{
+              canSkipEmission:
+                form.emitter?.type === EmitterType.Appendix1Producer &&
+                Boolean(form.ecoOrganisme?.siret),
+            }}
+          />
         </ActionButtonContext.Provider>
       );
     },

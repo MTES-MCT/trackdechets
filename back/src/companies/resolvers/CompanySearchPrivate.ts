@@ -40,6 +40,13 @@ const companySearchPrivateResolvers: CompanySearchPrivateResolvers = {
         where: whereSiretOrVatNumber(parent as CompanyBaseIdentifiers)
       })
       .vhuAgrementDemolisseur();
+  },
+  receivedSignatureAutomations: parent => {
+    return prisma.company
+      .findUnique({ where: { orgId: parent.orgId } })
+      .receivedSignatureAutomations({
+        include: { from: true, to: true }
+      }) as any;
   }
 };
 

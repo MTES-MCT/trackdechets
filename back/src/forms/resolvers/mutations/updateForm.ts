@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { EmitterType, Prisma } from "@prisma/client";
 import { isDangerous, BSDD_WASTE_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -79,7 +79,19 @@ const updateFormResolver = async (
   const futureForm = { ...existingForm, ...form };
 
   // Construct form update payload
-  const formUpdateInput: Prisma.FormUpdateInput = form;
+  // This bit is a bit confusing. We are NOT in strict mode, so Yup doesnt complain if we pass unknown values.
+  // To remove those unknown values, we cast the object. This makes sure our input has a shape that fits our validator
+  // But upon casting, somes keys might "appear": a yup.string() will be casted to an empty string even if it was undefined in the first place.
+  // To remediate this, after casting we remove the keys that were not present initially.
+  // So this is a 2 way constraint:
+  // - casting remove keys in the input but unknown to the validator
+  // - then we remove keys present in the casting result but not present in the input
+  const formUpdateInput: Prisma.FormUpdateInput = draftFormSchema.cast(form);
+  for (const key of Object.keys(formUpdateInput)) {
+    if (!(key in form)) {
+      delete formUpdateInput[key];
+    }
+  }
 
   // Validate form input
   if (existingForm.status === "DRAFT") {
@@ -235,15 +247,15 @@ const updateFormResolver = async (
     .findUnique({ where: { id: existingForm.id } })
     .grouping({ include: { initialForm: true } });
 
-  const existingAppendix2Forms = existingFormFractions.map(
+  const existingAppendixForms = existingFormFractions.map(
     ({ initialForm }) => initialForm
   );
 
-  if (existingAppendix2Forms?.length) {
+  if (existingAppendixForms?.length) {
     const updatedSiret = formUpdateInput?.emitterCompanySiret;
     if (!!updatedSiret && updatedSiret !== existingForm?.emitterCompanySiret) {
       throw new UserInputError(
-        "Des bordereaux figurent dans l'annexe 2, le siret de l'émetteur ne peut pas être modifié."
+        "Des bordereaux figurent dans l'annexe, le siret de l'émetteur ne peut pas être modifié."
       );
     }
   }
@@ -253,29 +265,40 @@ const updateFormResolver = async (
     !!appendix2Forms ||
     futureForm.emitterType !== existingForm.emitterType;
 
-  const appendix2 = isGroupementUpdated
-    ? await validateGroupement(
-        futureForm,
-        grouping
-          ? grouping
-          : appendix2Forms
-          ? appendix2toFormFractions(appendix2Forms)
-          : existingFormFractions.map(({ quantity, initialFormId }) => ({
-              form: { id: initialFormId },
-              quantity
-            }))
-      )
+  const existingFormFractionsInput = existingFormFractions.map(
+    ({ quantity, initialFormId }) => ({
+      form: { id: initialFormId },
+      quantity
+    })
+  );
+
+  const formFractionsInput = grouping
+    ? grouping
+    : appendix2Forms
+    ? appendix2toFormFractions(appendix2Forms)
+    : existingFormFractionsInput;
+  const formFractions = isGroupementUpdated
+    ? await validateGroupement(futureForm, formFractionsInput)
     : null;
 
   const updatedForm = await runInTransaction(async transaction => {
-    const { update, setAppendix2 } = getFormRepository(user, transaction);
+    const { update, setAppendix1, setAppendix2 } = getFormRepository(
+      user,
+      transaction
+    );
     const updatedForm = await update({ id }, formUpdateInput);
     if (isGroupementUpdated) {
-      await setAppendix2({
-        form: updatedForm,
-        appendix2,
-        currentAppendix2Forms: existingAppendix2Forms
-      });
+      updatedForm.emitterType === EmitterType.APPENDIX1
+        ? await setAppendix1({
+            form: updatedForm,
+            appendix1: formFractions,
+            currentAppendix1Forms: existingAppendixForms
+          })
+        : await setAppendix2({
+            form: updatedForm,
+            appendix2: formFractions,
+            currentAppendix2Forms: existingAppendixForms
+          });
     }
     return updatedForm;
   });

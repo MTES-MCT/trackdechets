@@ -16,7 +16,7 @@ import {
 } from "../common/converter";
 import { BsdElastic } from "../common/elastic";
 import {
-  Appendix2Form as GraphQLAppendix2Form,
+  InitialForm,
   Broker,
   BrokerInput,
   Destination,
@@ -771,16 +771,18 @@ export async function expandFormFromElastic(
   return { ...expanded, transportSegments: form.transportSegments };
 }
 
-export async function expandAppendix2FormFromDb(
+export async function expandInitialFormFromDb(
   prismaForm: PrismaForm,
   dataloader?: DataLoader<string, Form, string>
-): Promise<GraphQLAppendix2Form> {
+): Promise<InitialForm> {
   const {
     id,
     readableId,
+    status,
     wasteDetails,
     emitter,
     recipient,
+    transporter,
     signedAt,
     quantityReceived,
     processingOperationDone,
@@ -792,6 +794,7 @@ export async function expandAppendix2FormFromDb(
   return {
     id,
     readableId,
+    status,
     wasteDetails,
     emitter,
     emitterPostalCode: hasPickupSite
@@ -799,6 +802,7 @@ export async function expandAppendix2FormFromDb(
       : extractPostalCode(emitter?.company?.address),
     signedAt: processDate(signedAt),
     recipient,
+    transporter,
     quantityReceived,
     quantityGrouped,
     processingOperationDone

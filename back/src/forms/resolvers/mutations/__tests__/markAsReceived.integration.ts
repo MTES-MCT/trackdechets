@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { CompanyType, Status, UserRole } from "@prisma/client";
+import { CompanyType, EmitterType, Status, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import * as mailsHelper from "../../../../mailer/mailing";
@@ -20,6 +20,7 @@ import {
   MutationMarkAsReceivedArgs
 } from "../../../../generated/graphql/types";
 import * as generateBsddPdf from "../../../pdf/generateBsddPdf";
+import getReadableId from "../../../readableId";
 
 // No mails
 const sendMailSpy = jest.spyOn(mailsHelper, "sendMail");
@@ -831,5 +832,254 @@ describe("Test Form reception", () => {
         message: "Vous ne pouvez pas passer ce bordereau à l'état souhaité."
       })
     ]);
+  });
+
+  describe("Annexe 1", () => {
+    it("should prevent marking an appendix1 item as received", async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const appendix1_item = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.SENT,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: company.siret,
+          transporterCompanySiret: company.siret,
+          owner: { connect: { id: user.id } }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "markAsReceived">,
+        MutationMarkAsReceivedArgs
+      >(MARK_AS_RECEIVED, {
+        variables: {
+          id: appendix1_item.id,
+          receivedInfo: {
+            wasteAcceptationStatus: "ACCEPTED",
+            receivedAt: new Date("2022-01-01").toISOString() as any,
+            receivedBy: "John",
+            quantityReceived: 1
+          }
+        }
+      });
+
+      expect(errors).toEqual([
+        expect.objectContaining({
+          message:
+            "Un bordereau d'annexe 1 ne peut pas être marqué comme reçu. C'est la réception du bordereau de tournée qui mettra à jour le statut de ce bordereau."
+        })
+      ]);
+    });
+
+    it("should mark the appendix1 items as ACCEPTED when the container form if marked as ACCEPTED", async () => {
+      const { company: producerCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const appendix1_item = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.SENT,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          transporterCompanySiret: company.siret,
+          owner: { connect: { id: user.id } }
+        }
+      });
+
+      const container = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.SENT,
+          emitterType: EmitterType.APPENDIX1,
+          emitterCompanySiret: company.siret,
+          emitterCompanyName: company.name,
+          transporterCompanySiret: company.siret,
+          recipientCompanySiret: company.siret,
+          grouping: {
+            create: { initialFormId: appendix1_item.id, quantity: 0 }
+          }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data } = await mutate<
+        Pick<Mutation, "markAsReceived">,
+        MutationMarkAsReceivedArgs
+      >(MARK_AS_RECEIVED, {
+        variables: {
+          id: container.id,
+          receivedInfo: {
+            wasteAcceptationStatus: "ACCEPTED",
+            receivedAt: new Date("2022-01-01").toISOString() as any,
+            receivedBy: "John",
+            quantityReceived: 1
+          }
+        }
+      });
+
+      expect(data.markAsReceived.status).toBe(Status.ACCEPTED);
+
+      const refreshedItem = await prisma.form.findUnique({
+        where: { id: appendix1_item.id }
+      });
+      expect(refreshedItem.status).toBe(Status.ACCEPTED);
+    });
+
+    it("should mark the appendix1 items as RECEIVED when the container form if marked as RECEIVED", async () => {
+      const { company: producerCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      const appendix1_item = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.SENT,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          transporterCompanySiret: company.siret,
+          owner: { connect: { id: user.id } }
+        }
+      });
+
+      const container = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.SENT,
+          emitterType: EmitterType.APPENDIX1,
+          emitterCompanySiret: company.siret,
+          emitterCompanyName: company.name,
+          transporterCompanySiret: company.siret,
+          recipientCompanySiret: company.siret,
+          grouping: {
+            create: { initialFormId: appendix1_item.id, quantity: 0 }
+          }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data } = await mutate<
+        Pick<Mutation, "markAsReceived">,
+        MutationMarkAsReceivedArgs
+      >(MARK_AS_RECEIVED, {
+        variables: {
+          id: container.id,
+          receivedInfo: {
+            receivedAt: new Date("2022-01-01").toISOString() as any,
+            receivedBy: "John",
+            quantityReceived: 1
+          }
+        }
+      });
+
+      expect(data.markAsReceived.status).toBe(Status.RECEIVED);
+
+      const refreshedItem = await prisma.form.findUnique({
+        where: { id: appendix1_item.id }
+      });
+      expect(refreshedItem.status).toBe(Status.RECEIVED);
+    });
+
+    it("should remove the appendix1 items that have not been marked as SENT when receiving the container form", async () => {
+      const { company: producerCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+
+      // This one is SENT
+      const appendix1_1 = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.SENT,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          transporterCompanySiret: company.siret,
+          owner: { connect: { id: user.id } }
+        }
+      });
+      // This one hasnt been signed by the transporter
+      const appendix1_2 = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.SIGNED_BY_PRODUCER,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          transporterCompanySiret: company.siret,
+          owner: { connect: { id: user.id } }
+        }
+      });
+      // This one hasnt been signed at all
+      const appendix1_3 = await prisma.form.create({
+        data: {
+          readableId: getReadableId(),
+          status: Status.SEALED,
+          emitterType: EmitterType.APPENDIX1_PRODUCER,
+          emitterCompanySiret: producerCompany.siret,
+          transporterCompanySiret: company.siret,
+          owner: { connect: { id: user.id } }
+        }
+      });
+
+      const container = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status: Status.SENT,
+          emitterType: EmitterType.APPENDIX1,
+          emitterCompanySiret: company.siret,
+          emitterCompanyName: company.name,
+          transporterCompanySiret: company.siret,
+          recipientCompanySiret: company.siret,
+          grouping: {
+            createMany: {
+              data: [
+                { initialFormId: appendix1_1.id, quantity: 0 },
+                { initialFormId: appendix1_2.id, quantity: 0 },
+                { initialFormId: appendix1_3.id, quantity: 0 }
+              ]
+            }
+          }
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data } = await mutate<
+        Pick<Mutation, "markAsReceived">,
+        MutationMarkAsReceivedArgs
+      >(MARK_AS_RECEIVED, {
+        variables: {
+          id: container.id,
+          receivedInfo: {
+            receivedAt: new Date("2022-01-01").toISOString() as any,
+            receivedBy: "John",
+            quantityReceived: 1
+          }
+        }
+      });
+
+      expect(data.markAsReceived.status).toBe(Status.RECEIVED);
+      const links = await prisma.formGroupement.findMany({
+        where: { nextFormId: container.id }
+      });
+      expect(links.length).toBe(1);
+
+      const refreshedItem1 = await prisma.form.findUnique({
+        where: { id: appendix1_1.id }
+      });
+      expect(refreshedItem1.status).toBe(Status.RECEIVED);
+
+      const refreshedItem2 = await prisma.form.findUnique({
+        where: { id: appendix1_2.id }
+      });
+      expect(refreshedItem2.isDeleted).toBe(true);
+
+      const refreshedItem3 = await prisma.form.findUnique({
+        where: { id: appendix1_3.id }
+      });
+      expect(refreshedItem3.isDeleted).toBe(true);
+    });
   });
 });

@@ -3,7 +3,6 @@ import { Prisma } from "@prisma/client";
 // Xstate event type
 export enum EventType {
   MarkAsSealed = "MARK_AS_SEALED",
-  MarkAsSent = "MARK_AS_SENT",
   SignedByProducer = "SIGNED_BY_PRODUCER",
   SignedByTransporter = "SIGNED_BY_TRANSPORTER",
   MarkAsReceived = "MARK_AS_RECEIVED",

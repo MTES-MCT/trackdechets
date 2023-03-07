@@ -36,15 +36,6 @@ const MARK_AS_SEALED = `
   }
 `;
 
-const MARK_AS_SENT = `
-  mutation MarkAsSent($id: ID!, $sentInfo: SentFormInput!){
-    markAsSent(id: $id, sentInfo: $sentInfo){
-      id
-      status
-    }
-  }
-`;
-
 const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = `
   mutation SubmitFormRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
     submitFormRevisionRequestApproval(id: $id, isApproved: $isApproved) {
@@ -180,24 +171,6 @@ describe("ActivityEvent.Bsdd", () => {
 
     const eventsAfterSealed = await getStream(formId);
     expect(eventsAfterSealed.length).toBe(4); // +2, update + signature
-
-    // Mark as sent
-    await mutate(MARK_AS_SENT, {
-      variables: {
-        id: formId,
-        sentInfo: { sentAt: "2018-12-11T00:00:00.000Z", sentBy: "John Doe" }
-      }
-    });
-
-    const formAfterSent = await prisma.form.findUnique({
-      where: { id: formId }
-    });
-    const formFromEventsAfterSent = await getBsddFromActivityEvents(formId);
-    expect(formAfterSent).toMatchObject(formFromEventsAfterSent);
-    expect(formFromEventsAfterSent.status).toBe("SENT");
-
-    const eventsAfterSent = await getStream(formId);
-    expect(eventsAfterSent.length).toBe(6); // +2, update + signature
   }, 10000);
 
   it("should create a bsdd event when a revision request is applied", async () => {

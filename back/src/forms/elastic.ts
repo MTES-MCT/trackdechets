@@ -1,4 +1,4 @@
-import { Form, Status } from "@prisma/client";
+import { EmitterType, Form, Status } from "@prisma/client";
 import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { FullForm } from "./types";
 import { GraphQLContext } from "../types";
@@ -47,20 +47,28 @@ export function getSiretsByTab(
     {}
   );
 
-  const formSirets = {
-    emitterCompanySiret: form.emitterCompanySiret,
-    recipientCompanySiret: form.recipientCompanySiret,
-    forwardedInDestinationCompanySiret: form.forwardedIn?.recipientCompanySiret,
-    forwardedInTransporterCompanySiret: getTransporterCompanyOrgId(
-      form.forwardedIn
-    ),
-    traderCompanySiret: form.traderCompanySiret,
-    brokerCompanySiret: form.brokerCompanySiret,
-    ecoOrganismeSiret: form.ecoOrganismeSiret,
-    transporterCompanySiret: getTransporterCompanyOrgId(form),
-    ...multimodalTransportersBySegmentId,
-    ...intermediarySiretsReducer
-  };
+  const formSirets =
+    form.emitterType === EmitterType.APPENDIX1_PRODUCER
+      ? {
+          // Appendix 1 only appears in the dashboard for emitters & transporters
+          emitterCompanySiret: form.emitterCompanySiret,
+          transporterCompanySiret: getTransporterCompanyOrgId(form)
+        }
+      : {
+          emitterCompanySiret: form.emitterCompanySiret,
+          recipientCompanySiret: form.recipientCompanySiret,
+          forwardedInDestinationCompanySiret:
+            form.forwardedIn?.recipientCompanySiret,
+          forwardedInTransporterCompanySiret: getTransporterCompanyOrgId(
+            form.forwardedIn
+          ),
+          traderCompanySiret: form.traderCompanySiret,
+          brokerCompanySiret: form.brokerCompanySiret,
+          ecoOrganismeSiret: form.ecoOrganismeSiret,
+          transporterCompanySiret: getTransporterCompanyOrgId(form),
+          ...multimodalTransportersBySegmentId,
+          ...intermediarySiretsReducer
+        };
 
   const siretsByTab = {
     isDraftFor: [],
@@ -162,7 +170,6 @@ export function getSiretsByTab(
 
       break;
     }
-    case Status.AWAITING_GROUP:
     case Status.GROUPED:
     case Status.REFUSED:
     case Status.PROCESSED:
@@ -174,6 +181,7 @@ export function getSiretsByTab(
       }
       break;
     }
+    case Status.AWAITING_GROUP:
     default:
       break;
   }

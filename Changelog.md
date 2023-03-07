@@ -18,6 +18,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :boom: Breaking changes
 
+- Implémentation de l'annexe 1 BSDD dématérialisée de bout en bout. Le comportement qui existait auparavant est déprécié, il n'y a plus besoin d'imprimer des annexes papier [PR 1986](https://github.com/MTES-MCT/trackdechets/pull/1986)
+
 #### :nail_care: Améliorations
 
 - Il est maintenant impossible d'annuler un BSDD qui a été réceptionné par le destinataire (ou à un statut ultérieur) [PR 2136](https://github.com/MTES-MCT/trackdechets/pull/2136)
