@@ -23,8 +23,20 @@ const validationSchema = yup.object({
     .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
 });
 
-type Props = { siret: string; bsvhuId: string };
-export function SignOperation({ siret, bsvhuId }: Props) {
+type Props = {
+  siret: string;
+  bsvhuId: string;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+  displayActionButton?: boolean;
+};
+export function SignOperation({
+  siret,
+  bsvhuId,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+  displayActionButton,
+}: Props) {
   const [updateBsvhu, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsvhu">,
     MutationUpdateBsvhuArgs
@@ -35,7 +47,13 @@ export function SignOperation({ siret, bsvhuId }: Props) {
   >(SIGN_BSVHU, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   return (
-    <SignBsvhu title="Signer le traitement" bsvhuId={bsvhuId}>
+    <SignBsvhu
+      title="Signer le traitement"
+      bsvhuId={bsvhuId}
+      isModalOpenFromParent={isModalOpenFromParent}
+      onModalCloseFromParent={onModalCloseFromParent}
+      displayActionButton={displayActionButton}
+    >
       {({ bsvhu, onClose }) => (
         <Formik
           initialValues={{

@@ -35,36 +35,36 @@ export const Sealed = Template.bind({});
 export const Refused = Template.bind({});
 
 DraftBsdd.args = {
-  status: BsdStatusCode.DRAFT,
+  status: BsdStatusCode.Draft,
 };
 
 Initial.args = {
-  status: BsdStatusCode.INITIAL,
+  status: BsdStatusCode.Initial,
   isDraft: true,
 };
 
 InitialNotDraft.args = {
-  status: BsdStatusCode.INITIAL,
+  status: BsdStatusCode.Initial,
   isDraft: false,
 };
 InitialDasriNotDraft.args = {
-  status: BsdStatusCode.INITIAL,
+  status: BsdStatusCode.Initial,
   isDraft: false,
   bsdType: BsdType.Bsdasri,
 };
 
 Received.args = {
-  status: BsdStatusCode.RECEIVED,
+  status: BsdStatusCode.Received,
 };
 
 Processed.args = {
-  status: BsdStatusCode.PROCESSED,
+  status: BsdStatusCode.Processed,
 };
 
 Sealed.args = {
-  status: BsdStatusCode.SEALED,
+  status: BsdStatusCode.Sealed,
 };
 
 Refused.args = {
-  status: BsdStatusCode.REFUSED,
+  status: BsdStatusCode.Refused,
 };

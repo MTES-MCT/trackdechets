@@ -9,6 +9,7 @@ export const SIGNER_EN_TANT_QUE_TRAVAUX =
 export const SIGNATURE_ECO_ORG = "Signature Éco-organisme";
 export const SIGNATURE_PRODUCTEUR = "Signature producteur";
 export const SIGNATURE_EMETTEUR = "Signer en tant qu'émetteur";
+export const FAIRE_SIGNER_EMETTEUR = "Faire signer l'émetteur";
 export const SIGNATURE_TRANSPORTEUR = "Signature transporteur";
 export const VALIDER_ENTREPOSAGE_PROVISOIRE =
   "Valider l'entreposage provisoire";
@@ -130,3 +131,27 @@ export const dropdown_create_bsda = "Amiante";
 export const dropdown_create_bsdasri = "DASRI";
 export const dropdown_create_bsvhu = "Véhicule Hors d’Usage";
 export const dropdown_create_bsff = "Fluide Frigorifique";
+
+export const bsddValidationDraftText = `Cette action aura pour effet de valider les données du bordereau et
+            de le faire apparaitre dans l'onglet "Pour action" de l'émetteur
+            ainsi que l'onglet "À collecter" du transporteur. Un identifiant
+            unique lui sera attribué et vous pourrez générer un PDF. Le
+            bordereau pourra cependant toujours être modifié ou supprimé depuis
+            l'onglet "Pour action", "À collecter" ou "Suivi".`;
+
+export const bsdaPublishDraft = ` Cette action aura pour effet de démarrer le cycle de vie du
+            bordereau en le faisant apparaître dans l'onglet
+            <strong>“Pour action”</strong> du tableau de bord de l'émetteur. Le
+            bordereau pourra toujours être modifié ou supprimé tant qu'aucune
+            signature n'a été apposée.`;
+
+export const bsffPublishDraft = `Cette action aura pour effet de démarrer le cycle de vie du
+            bordereau en le faisant apparaître dans l'onglet
+            <strong>“Pour action”</strong> du tableau de bord de l'émetteur. Le
+            bordereau pourra toujours être modifié ou supprimé tant qu'aucune
+            signature n'a été apposée.`;
+export const bsvhuPublishDraft = `Cette action aura pour effet de démarrer le cycle de vie du
+            bordereau en le faisant apparaître dans l'onglet
+            <strong>“Pour action”</strong> du tableau de bord de l'émetteur. Le
+            bordereau pourra toujours être modifié ou supprimé tant qu'aucune
+            signature n'a été apposée.`;

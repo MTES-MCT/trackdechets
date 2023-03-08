@@ -146,11 +146,25 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
 
 interface SignTransportProps {
   bsffId: string;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+  displayActionButton?: boolean;
 }
 
-export function SignTransport({ bsffId }: SignTransportProps) {
+export function SignTransport({
+  bsffId,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+  displayActionButton,
+}: SignTransportProps) {
   return (
-    <SignBsff title="Signer l'enlèvement" bsffId={bsffId}>
+    <SignBsff
+      title="Signer l'enlèvement"
+      bsffId={bsffId}
+      isModalOpenFromParent={isModalOpenFromParent}
+      onModalCloseFromParent={onModalCloseFromParent}
+      displayActionButton={displayActionButton}
+    >
       {({ bsff, onClose }) => (
         <SignTransportForm bsff={bsff} onCancel={onClose} />
       )}

@@ -11,12 +11,13 @@ import {
   BsdDisplay,
   BsdStatusCode,
   BsdTypename,
+  TBsdStatusCode,
 } from "../Common/types/bsdTypes";
 
-const mapBsdStatusToBsdStatusEnum = (status: string): BsdStatusCode => {
-  const bsdStatusCode = Object.keys(BsdStatusCode).find(
-    key => status === key
-  ) as unknown as BsdStatusCode;
+const mapBsdStatusToBsdStatusEnum = (status: string): TBsdStatusCode => {
+  const bsdStatusCode = Object.values(BsdStatusCode).find(
+    key => status === key.toUpperCase()
+  ) as unknown as TBsdStatusCode;
   return bsdStatusCode;
 };
 
@@ -63,7 +64,8 @@ const createBsdd = (bsdd: Form): BsdDisplay => {
     id: bsdd.id,
     readableid: bsdd.readableId,
     type: mapBsdTypeNameToBsdType(bsdd.__typename) || BsdType.Bsdd,
-    isDraft: bsdd.status === BsdStatusCode.DRAFT.toString(),
+    isDraft: bsdd.status === BsdStatusCode.Draft,
+    emitterType: bsdd.emitter?.type,
     status: mapBsdStatusToBsdStatusEnum(bsdd.status),
     wasteDetails: {
       code: bsdd.wasteDetails?.code,
