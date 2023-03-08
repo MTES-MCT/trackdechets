@@ -4,9 +4,8 @@ export enum FilterType {
 }
 
 export type Filter = {
-  value: string;
+  name: string;
   label: string;
-  order: string;
   type: FilterType;
   isActive: boolean;
   options?: { value: string; label: string }[];

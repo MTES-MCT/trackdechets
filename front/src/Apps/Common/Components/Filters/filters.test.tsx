@@ -10,16 +10,14 @@ import { FilterType } from "./filtersTypes";
 describe("Filters component", () => {
   const filters = [
     {
-      value: "filter1",
+      name: "filter1",
       label: "Filter 1",
-      order: "order",
       type: FilterType.input,
       isActive: true,
     },
     {
-      value: "filter2",
+      name: "filter2",
       label: "Filter 2",
-      order: "order",
       type: FilterType.select,
       options: [{ value: "option1", label: "option 1" }],
       isActive: true,

@@ -37,6 +37,7 @@ import Filters from "Apps/Common/Components/Filters/Filters";
 import {
   filterList,
   dropdownCreateLinks,
+  filterPredicates,
 } from "../Apps/Dashboard/dashboardUtils";
 import BsdCreateDropdown from "../Apps/Common/Components/DropdownMenu/DropdownMenu";
 import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
@@ -152,25 +153,37 @@ const DashboardPage = () => {
     }
   );
 
-  const handleFiltersSubmit = filterValues => {
-    const variables = {
-      where: {},
-      order: {},
-    };
-    const predicate = withRoutePredicate();
-    if (predicate) {
-      variables.where = predicate;
-    }
-    const filterKeys = Object.keys(filterValues);
-    const filters = filterList.filter(filter =>
-      filterKeys.includes(filter.value)
-    );
-    filters.forEach(f => {
-      variables.where[f.value] = filterValues[f.value];
-      variables.order[f.order] = OrderType.Asc;
-    });
-    setBsdsVariables(variables);
-  };
+  const handleFiltersSubmit = React.useCallback(
+    filterValues => {
+      const variables = {
+        where: {},
+        order: {},
+      };
+      const routePredicate = withRoutePredicate();
+      if (routePredicate) {
+        variables.where = routePredicate;
+      }
+      const filterKeys = Object.keys(filterValues);
+      const filters = filterList.filter(filter =>
+        filterKeys.includes(filter.name)
+      );
+      filters.forEach(f => {
+        const predicate = filterPredicates.find(
+          filterPredicate => filterPredicate.filterName === f.name
+        );
+        if (predicate) {
+          const filterValue = filterValues[f.name];
+          variables.where = {
+            ...variables.where,
+            ...predicate.where(filterValue),
+          };
+          variables.order[predicate.order] = OrderType.Asc;
+        }
+      });
+      setBsdsVariables(variables);
+    },
+    [withRoutePredicate]
+  );
 
   const loadMoreBsds = React.useCallback(() => {
     setIsFetchingMore(true);

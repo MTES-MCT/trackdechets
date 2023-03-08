@@ -21,7 +21,7 @@ import {
   // filter_siret,
   filter_waste_code,
 } from "../Common/wordings/dashboard/wordingsDashboard";
-import { BsdType } from "../../generated/graphql/types";
+import { BsdType, BsdWhere } from "../../generated/graphql/types";
 import { Filter, FilterType } from "../Common/Components/Filters/filtersTypes";
 
 export const MAX_FILTER = 5;
@@ -48,10 +48,18 @@ const bsdTypeFilterSelectOptions = [
     label: bsd_type_option_bsda,
   },
 ];
+
+enum FilterName {
+  types = "types",
+  waste = "waste",
+  readableId = "readableId",
+  transporterNumberPlate = "transporterNumberPlate",
+  transporterCustomInfo = "transporterCustomInfo",
+}
+
 export const filterList: Filter[] = [
   {
-    value: "types",
-    order: "type",
+    name: FilterName.types,
     label: filter_bsd_type,
     type: FilterType.select,
     isMultiple: true,
@@ -59,56 +67,86 @@ export const filterList: Filter[] = [
     isActive: true,
   },
   // {
-  //   value: "siret",
+  //   name: "siret",
   //   order: "siret",
   //   label: filter_siret,
   //   type: FilterType.input,
   // },
   {
-    value: "waste",
-    order: "wasteCode",
+    name: FilterName.waste,
     label: filter_waste_code,
     type: FilterType.input,
     isActive: true,
   },
   {
-    value: "readableId",
-    order: "readableId",
+    name: FilterName.readableId,
     label: filter_bsd_number,
     type: FilterType.input,
     isActive: true,
   },
   // {
-  //   value: "readableId",
+  //   name: "readableId",
   //   order: "readableId",
   //   label: filter_contenant_number,
   //   type: FilterType.input,
   // },
   {
-    value: "transporterNumberPlate",
-    order: "transporterNumberPlate",
+    name: FilterName.transporterNumberPlate,
     label: filter_immat_number,
     type: FilterType.input,
     isActive: true,
   },
   // {
-  //   value: "chantier_name",
+  //   name: "chantier_name",
   //   order: "chantier_name",
   //   label: filter_chantier_name,
   //   type: FilterType.input,
   // },
   // {
-  //   value: "chantier_adress",
+  //   name: "chantier_adress",
   //   order: "chantier_adress",
   //   label: filter_chantier_adress,
   //   type: FilterType.input,
   // },
   {
-    value: "transporterCustomInfo",
-    order: "transporterCustomInfo",
+    name: FilterName.transporterCustomInfo,
     label: filter_free_text,
     type: FilterType.input,
     isActive: true,
+  },
+];
+
+export const filterPredicates: {
+  filterName: string;
+  where: (value: any) => BsdWhere;
+  order: string;
+}[] = [
+  {
+    filterName: FilterName.types,
+    where: value => ({ type: { _in: value } }),
+    order: "type",
+  },
+  {
+    filterName: FilterName.waste,
+    where: value => ({ waste: { code: { _contains: value } } }),
+    order: "wasteCode",
+  },
+  {
+    filterName: FilterName.readableId,
+    where: value => ({ readableId: { _contains: value } }),
+    order: "readableId",
+  },
+  {
+    filterName: FilterName.transporterNumberPlate,
+    order: "transporterNumberPlate",
+    where: value => ({
+      transporter: { transport: { plates: { _itemContains: value } } },
+    }),
+  },
+  {
+    filterName: FilterName.transporterCustomInfo,
+    where: value => ({ transporter: { customInfo: { _match: value } } }),
+    order: "transporterCustomInfo",
   },
 ];
 
