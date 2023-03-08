@@ -209,7 +209,9 @@ async function getFlatContent(
 ): Promise<RevisionRequestContent> {
   const flatContent = flattenBsddRevisionRequestInput(content);
 
-  if (Object.keys(flatContent).length === 0) {
+  const { isCanceled, ...revisionFields } = flatContent;
+
+  if (!isCanceled && Object.keys(revisionFields).length === 0) {
     throw new UserInputError(
       "Impossible de créer une révision sans modifications."
     );
@@ -221,7 +223,7 @@ async function getFlatContent(
     );
   }
 
-  if (flatContent.isCanceled && Object.values(flatContent).length > 1) {
+  if (flatContent.isCanceled && Object.values(revisionFields).length > 0) {
     throw new UserInputError(
       "Impossible d'annuler et de modifier un bordereau."
     );
