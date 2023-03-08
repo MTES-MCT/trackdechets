@@ -44,14 +44,9 @@ async function getBearerToken(scalingoToken) {
  */
 export async function indexChunkBsdJob(job: Job<string>) {
   try {
-    const {
-      bsdName,
-      index,
-      skip,
-      total,
-      take,
-      since
-    }: FindManyAndIndexBsdsFnSignature = JSON.parse(job.data);
+    const { bsdName, index, ids }: FindManyAndIndexBsdsFnSignature = JSON.parse(
+      job.data
+    );
     logger.info(
       `Started job indexChunk for the following bsd and index names : "${bsdName}", "${index}"`
     );
@@ -59,10 +54,7 @@ export async function indexChunkBsdJob(job: Job<string>) {
     await findManyAndIndexBsds({
       bsdName,
       index,
-      skip,
-      total,
-      take,
-      since
+      ids
     });
     return null;
   } catch (error) {
