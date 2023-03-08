@@ -61,8 +61,8 @@ export const getRecentlyAssociatedUsers = async ({
 /**
  * Send first step onboarding email to active users who suscribed yesterday
  */
-export const sendFirstOnboardingEmail = async () => {
-  const recipients = await getRecentlyAssociatedUsers({ daysAgo: 1 });
+export const sendFirstOnboardingEmail = async (daysAgo = 1) => {
+  const recipients = await getRecentlyAssociatedUsers({ daysAgo });
   await Promise.all(
     recipients.map(recipient => {
       const payload = renderMail(onboardingFirstStep, {
@@ -106,11 +106,11 @@ export const selectSecondOnboardingEmail = (recipient: recipientType) => {
  * email function (and template id) depends upon user profile
  */
 
-export const sendSecondOnboardingEmail = async () => {
+export const sendSecondOnboardingEmail = async (daysAgo = 3) => {
   // we explictly retrieve user companies to tell apart producers from waste
   // professionals to selectthe right email template
   const recipients = await getRecentlyAssociatedUsers({
-    daysAgo: 3,
+    daysAgo,
     retrieveCompanies: true
   });
   await Promise.all(
@@ -153,9 +153,9 @@ export const getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest =
  * Send a mail to users who registered recently and who haven't
  * issued a single MembershipRequest yet
  */
-export const sendMembershipRequestDetailsEmail = async () => {
+export const sendMembershipRequestDetailsEmail = async (daysAgo = 7) => {
   const recipients =
-    await getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest(7);
+    await getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest(daysAgo);
 
   const messageVersions: MessageVersion[] = recipients.map(recipient => ({
     to: [{ email: recipient.email, name: recipient.name }]
@@ -203,8 +203,10 @@ export const getActiveUsersWithPendingMembershipRequests = async (
  * Send a mail to all users who issued a membership request and who
  * got no answer
  */
-export const sendPendingMembershipRequestDetailsEmail = async () => {
-  const recipients = await getActiveUsersWithPendingMembershipRequests(14);
+export const sendPendingMembershipRequestDetailsEmail = async (
+  daysAgo = 14
+) => {
+  const recipients = await getActiveUsersWithPendingMembershipRequests(daysAgo);
 
   const messageVersions: MessageVersion[] = recipients.map(recipient => ({
     to: [{ email: recipient.email, name: recipient.name }]
@@ -251,8 +253,12 @@ export const getPendingMembershipRequestsAndAssociatedAdmins = async (
  * For each unanswered membership request issued X days ago, send an
  * email to all the admins of request's targeted company
  */
-export const sendPendingMembershipRequestToAdminDetailsEmail = async () => {
-  const requests = await getPendingMembershipRequestsAndAssociatedAdmins(14);
+export const sendPendingMembershipRequestToAdminDetailsEmail = async (
+  daysAgo = 14
+) => {
+  const requests = await getPendingMembershipRequestsAndAssociatedAdmins(
+    daysAgo
+  );
 
   const messageVersions: MessageVersion[] = requests.map(request => {
     const variables = {
