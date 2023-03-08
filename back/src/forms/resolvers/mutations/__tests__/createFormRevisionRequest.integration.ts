@@ -126,6 +126,38 @@ describe("Mutation.createFormRevisionRequest", () => {
     );
   });
 
+  it("should fail if revision has no modifications", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { isCanceled: false },
+          comment: "A comment",
+          authoringCompanySiret: company.siret
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      `Impossible de créer une révision sans modifications.`
+    );
+  });
+
   it("should fail if the bsdd is canceled", async () => {
     const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
     const { user, company } = await userWithCompanyFactory("ADMIN");
