@@ -364,12 +364,12 @@ Toutes ces migrations sont jouées avec la commande `npm run update:dev`. (sans 
 Depuis un one-off container de taille XL
 
 - Réindexation globale sans downtime en utilisant les workers d'indexation
-  La réidexation ne sera déclenchée que si la version du mapping ES a changé
+  La réindexation ne sera déclenchée que si la version du mapping ES a changé
 
 `FORCE_LOGGER_CONSOLE=true npm run reindex-all-bsds-bulk -- --useQueue`
 
 - Réindexation globale sans downtime depuis la console (le travail ne sera pas parallélisé)
-  La réidexation ne sera déclenchée que si la version du mapping ES a changé
+  La réindexation ne sera déclenchée que si la version du mapping ES a changé
 
 `FORCE_LOGGER_CONSOLE=true npm run reindex-all-bsds-bulk`
 
