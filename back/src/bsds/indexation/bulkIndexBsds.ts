@@ -32,7 +32,7 @@ export const INDEX_DATETIME_SEPARATOR = "===";
 type IndexAllFnSignature = {
   bsdName: string;
   index: string;
-  since: Date;
+  since?: Date;
 };
 
 export type FindManyAndIndexBsdsFnSignature = {
@@ -451,7 +451,7 @@ export async function addReindexAllInBulkJob(
 /**
  * Retrieves all BSD identifiers for a given BSD type
  */
-async function getBsdIdentifiers(
+export async function getBsdIdentifiers(
   bsdName: string,
   since?: Date
 ): Promise<string[]> {
@@ -468,11 +468,11 @@ async function getBsdIdentifiers(
   return bsds.map(bsd => bsd.id);
 }
 
-async function processBsdIdentifiersByChunk(
+export async function processBsdIdentifiersByChunk(
   ids: string[],
-  fn: (chunk: string[]) => Promise<any>
+  fn: (chunk: string[]) => Promise<any>,
+  chunkSize = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100
 ) {
-  const chunkSize = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
   for (let i = 0; i < ids.length; i += chunkSize) {
     const chunk = ids.slice(i, i + chunkSize);
     await fn(chunk);
@@ -482,29 +482,29 @@ async function processBsdIdentifiersByChunk(
 /**
  * Index in chunks all BSDs of a given type in a synchronous manner
  */
-async function indexAllBsdTypeSync({
+export async function indexAllBsdTypeSync({
   bsdName,
   index,
   since
-}: IndexAllFnSignature): Promise<IndexAllFnSignature | void> {
+}: IndexAllFnSignature): Promise<void> {
   const ids = await getBsdIdentifiers(bsdName, since);
 
   logger.info(`Starting synchronous indexation of ${ids.length} ${bsdName}`);
 
-  processBsdIdentifiersByChunk(ids, async chunk => {
-    await findManyAndIndexBsds({
+  await processBsdIdentifiersByChunk(ids, chunk =>
+    findManyAndIndexBsds({
       bsdName,
       index,
       ids: chunk
-    });
-  });
+    })
+  );
 }
 
 /**
  * Index in chunks all BSDs of a given type by adding jobs
  * to the job queue
  */
-async function indexAllBsdTypeConcurrently({
+export async function indexAllBsdTypeConcurrently({
   bsdName,
   index,
   since
@@ -516,7 +516,7 @@ async function indexAllBsdTypeConcurrently({
   const ids = await getBsdIdentifiers(bsdName, since);
   logger.info(`Starting indexation of ${ids.length} ${bsdName}`);
 
-  processBsdIdentifiersByChunk(ids, async chunk => {
+  await processBsdIdentifiersByChunk(ids, async chunk => {
     data.push({
       name: "indexChunk",
       data: JSON.stringify({
@@ -561,7 +561,7 @@ async function indexAllBsdTypeConcurrently({
 /**
  * Generic indexation function for all bsd of a given type
  */
-async function indexAllBsds(
+export async function indexAllBsds(
   index: string,
   useQueue = false,
   bsdType?: BsdType,
