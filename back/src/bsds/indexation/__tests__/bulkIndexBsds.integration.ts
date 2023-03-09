@@ -343,8 +343,6 @@ describe("indexAllBsds", () => {
     const bsvhu = await bsvhuFactory({});
     const bsds = [form, bsda, bsdasri, bsff, bsvhu];
 
-    await formFactory({ ownerId: user.id });
-
     await indexAllBsds(index.alias, false);
     await refreshElasticSearch();
 
