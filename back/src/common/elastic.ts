@@ -134,6 +134,9 @@ const rawField = {
 };
 
 const settings = {
+  index: {
+    max_ngram_diff: 4
+  },
   analysis: {
     analyzer: {
       ngram_analyzer: {
