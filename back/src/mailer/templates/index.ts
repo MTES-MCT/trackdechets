@@ -215,7 +215,7 @@ export const pendingMembershipRequestAdminDetailsEmail: MailTemplate<{
   email: string;
   orgId: string;
 }> = {
-  subject: "Un utilisateur est en attente de réponse de votre part",
+  subject: "Un utilisateur est toujours en attente de réponse de votre part",
   body: mustacheRenderer("pending-membership-request-admin-details.html"),
   templateId: templateIds.LAYOUT
 };
