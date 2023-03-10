@@ -50,7 +50,11 @@ export type TestQuery = <
 >(
   operation: StringOrAst,
   options?: Options<V>
-) => Promise<ExecutionResult<T>>;
+) => Promise<
+  Required<{
+    [P in keyof ExecutionResult<T>]: NonNullable<ExecutionResult<T>[P]>;
+  }>
+>; // TODO to ease strictNullChecks migration, assert that all ExecutionResult results have a value for now
 
 export type TestSetOptions = (options: {
   request?: RequestOptions;

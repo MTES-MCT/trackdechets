@@ -22,6 +22,7 @@ describe("Repository.helper", () => {
         data: {
           orgId: siret,
           siret,
+          name: "",
           securityCode: 1,
           verificationCode: "1111"
         }
@@ -49,6 +50,7 @@ describe("Repository.helper", () => {
       return transaction.company.create({
         data: {
           orgId: siret,
+          name: "",
           siret,
           securityCode: 1,
           verificationCode: "1111"

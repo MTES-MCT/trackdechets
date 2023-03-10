@@ -5,7 +5,7 @@ const warningMessageResolver: QueryResolvers["warningMessage"] = async (
   args,
   context
 ) => {
-  return context.req.session.warningMessage;
+  return context.req.session.warningMessage ?? "";
 };
 
 export default warningMessageResolver;

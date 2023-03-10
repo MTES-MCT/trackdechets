@@ -13,7 +13,7 @@ const userResolvers: UserResolvers = {
       const companyPrivate: CompanyPrivate = convertUrls(company);
 
       const { codeNaf: naf, address } = company;
-      const libelleNaf = naf in nafCodes ? nafCodes[naf] : "";
+      const libelleNaf = naf && naf in nafCodes ? nafCodes[naf] : "";
 
       return { ...companyPrivate, naf, libelleNaf, address };
     });

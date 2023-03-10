@@ -30,7 +30,7 @@ describe("passwordResetRequest", () => {
         variables: { hash: "abcdef" }
       }
     );
-    expect(data.passwordResetRequest).toEqual(resetHash.id);
+    expect(data!.passwordResetRequest).toEqual(resetHash.id);
   });
 
   it("querying an inexistant hash", async () => {
@@ -50,7 +50,7 @@ describe("passwordResetRequest", () => {
         variables: { hash: "xyz" }
       }
     );
-    expect(data.passwordResetRequest).toEqual(null);
+    expect(data!.passwordResetRequest).toEqual(null);
   });
 
   it("querying an expired hash", async () => {
@@ -70,6 +70,6 @@ describe("passwordResetRequest", () => {
         variables: { hash: "abcdef" }
       }
     );
-    expect(data.passwordResetRequest).toEqual(null);
+    expect(data!.passwordResetRequest).toEqual(null);
   });
 });

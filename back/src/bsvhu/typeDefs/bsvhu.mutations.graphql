@@ -2,22 +2,22 @@ type Mutation {
   """
   Crée un BSVHU
   """
-  createBsvhu(input: BsvhuInput!): Bsvhu
+  createBsvhu(input: BsvhuInput!): Bsvhu!
 
   """
   Crée un BSVHU en brouillon
   """
-  createDraftBsvhu(input: BsvhuInput!): Bsvhu
+  createDraftBsvhu(input: BsvhuInput!): Bsvhu!
 
   """
   Met à jour un BSVHU
   """
-  updateBsvhu(id: ID!, input: BsvhuInput!): Bsvhu
+  updateBsvhu(id: ID!, input: BsvhuInput!): Bsvhu!
 
   """
   Permet de publier un brouillon pour le marquer comme prêt à être envoyé
   """
-  publishBsvhu(id: ID!): Bsvhu
+  publishBsvhu(id: ID!): Bsvhu!
 
   """
   Signe un BSVHU.
@@ -93,15 +93,15 @@ type Mutation {
   }
   ```
   """
-  signBsvhu(id: ID!, input: BsvhuSignatureInput!): Bsvhu
+  signBsvhu(id: ID!, input: BsvhuSignatureInput!): Bsvhu!
 
   """
   Duplique un BSVHU
   """
-  duplicateBsvhu("ID d'un BSD VHU" id: ID!): Bsvhu
+  duplicateBsvhu("ID d'un BSD VHU" id: ID!): Bsvhu!
 
   """
   Supprime un BSVHU
   """
-  deleteBsvhu("ID d'un BSD VHU" id: ID!): Bsvhu
+  deleteBsvhu("ID d'un BSD VHU" id: ID!): Bsvhu!
 }

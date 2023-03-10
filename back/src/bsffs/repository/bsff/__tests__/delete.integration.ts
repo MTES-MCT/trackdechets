@@ -54,7 +54,7 @@ describe("bsffRepository.delete", () => {
 
     await deleteBsff({ where: { id: bsff.id } });
 
-    const deletedBsff = await prisma.bsff.findUnique({
+    const deletedBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsff.id }
     });
     expect(deletedBsff.isDeleted).toBe(true);

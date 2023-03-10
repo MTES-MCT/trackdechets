@@ -2,12 +2,11 @@ import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyAdminUsers } from "../../../companies/database";
 import { QueryResolvers } from "../../../generated/graphql/types";
-import { MembershipRequest } from "@prisma/client";
 import prisma from "../../../prisma";
 import { getMembershipRequestOrNotFoundError } from "../../database";
 
 const invitationRequestResolver: QueryResolvers["membershipRequest"] = async (
-  parent,
+  _,
   { id, siret },
   context
 ) => {
@@ -19,25 +18,18 @@ const invitationRequestResolver: QueryResolvers["membershipRequest"] = async (
     );
   }
 
-  let invitationRequest: MembershipRequest = null;
-
-  if (id) {
-    invitationRequest = await getMembershipRequestOrNotFoundError({ id });
+  if (!id && !siret) {
+    throw new UserInputError(
+      "Vous devez saisir soit `id` soit `siret` comme paramètre de recherche"
+    );
   }
 
-  if (siret) {
-    // search a matching invitation for authenticated user and siret
-    const requests = await prisma.membershipRequest.findMany({
-      where: { user: { id: user.id }, company: { siret } }
-    });
-    if (requests.length === 0) {
-      return null;
-    } else {
-      invitationRequest = requests[0];
-    }
+  const invitationRequest = await getInvitationRequest({ id, siret }, user);
+  if (!invitationRequest) {
+    throw new UserInputError("Demande de rattachement non trouvée");
   }
 
-  const { email } = await prisma.membershipRequest
+  const membershipRequestUser = await prisma.membershipRequest
     .findUnique({ where: { id: invitationRequest.id } })
     .user();
 
@@ -45,8 +37,14 @@ const invitationRequestResolver: QueryResolvers["membershipRequest"] = async (
     .findUnique({ where: { id: invitationRequest.id } })
     .company();
 
+  if (!membershipRequestUser || !company) {
+    throw new Error(
+      `Cannot fond company or user for membershipRequest ${invitationRequest.id}`
+    );
+  }
+
   // check user is requester or company admin
-  const isRequester = user.email === email;
+  const isRequester = user.email === membershipRequestUser.email;
 
   if (!isRequester) {
     const admins = await getCompanyAdminUsers(company.orgId);
@@ -62,10 +60,31 @@ const invitationRequestResolver: QueryResolvers["membershipRequest"] = async (
     id: invitationRequest.id,
     sentTo: invitationRequest.sentTo,
     status: invitationRequest.status,
-    email,
+    email: membershipRequestUser.email,
     siret: company.orgId,
-    name: company.name
+    name: company.name ?? ""
   };
 };
 
 export default invitationRequestResolver;
+
+async function getInvitationRequest(
+  { id, siret }: { id?: string | null; siret?: string | null },
+  user: Express.User
+) {
+  if (id) {
+    return getMembershipRequestOrNotFoundError({ id });
+  }
+
+  if (siret) {
+    // search a matching invitation for authenticated user and siret
+    const requests = await prisma.membershipRequest.findMany({
+      where: { user: { id: user.id }, company: { siret } }
+    });
+    if (requests.length === 0) {
+      return;
+    }
+
+    return requests[0];
+  }
+}

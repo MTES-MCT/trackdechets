@@ -180,7 +180,7 @@ describe("Mutation.deleteBsff", () => {
 
     expect(errors).toBeUndefined();
 
-    const deletedBsff = await prisma.bsff.findUnique({
+    const deletedBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsff.id }
     });
 
@@ -245,7 +245,7 @@ describe("Mutation.deleteBsff", () => {
       include: { packagings: true }
     });
 
-    initialBsff = await prisma.bsff.findUnique({
+    initialBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: initialBsff.id },
       include: { packagings: true }
     });
@@ -271,7 +271,7 @@ describe("Mutation.deleteBsff", () => {
       }
     );
 
-    initialBsff = await prisma.bsff.findUnique({
+    initialBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: initialBsff.id },
       include: { packagings: true }
     });
@@ -314,7 +314,7 @@ describe("Mutation.deleteBsff", () => {
       include: { packagings: true }
     });
 
-    initialBsff = await prisma.bsff.findUnique({
+    initialBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: initialBsff.id },
       include: { packagings: true }
     });
@@ -340,7 +340,7 @@ describe("Mutation.deleteBsff", () => {
       }
     );
 
-    initialBsff = await prisma.bsff.findUnique({
+    initialBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: initialBsff.id },
       include: { packagings: true }
     });
@@ -383,7 +383,7 @@ describe("Mutation.deleteBsff", () => {
       include: { packagings: true }
     });
 
-    initialBsff = await prisma.bsff.findUnique({
+    initialBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: initialBsff.id },
       include: { packagings: true }
     });
@@ -409,7 +409,7 @@ describe("Mutation.deleteBsff", () => {
       }
     );
 
-    initialBsff = await prisma.bsff.findUnique({
+    initialBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: initialBsff.id },
       include: { packagings: true }
     });

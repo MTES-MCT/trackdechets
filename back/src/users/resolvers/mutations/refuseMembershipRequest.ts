@@ -26,6 +26,12 @@ const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipReques
       .findUnique({ where: { id: membershipRequest.id } })
       .company();
 
+    if (!company) {
+      throw new Error(
+        `Cannot find company for membershipRequest ${membershipRequest.id}`
+      );
+    }
+
     // check authenticated user is admin of the company
     await checkIsCompanyAdmin(user, company);
 
@@ -51,6 +57,9 @@ const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipReques
     const requester = await prisma.membershipRequest
       .findUnique({ where: { id } })
       .user();
+    if (!requester) {
+      throw new Error(`Cannot find requester for membershipRequest ${id}`);
+    }
     const mail = renderMail(membershipRequestRefused, {
       to: [{ email: requester.email, name: requester.name }],
       variables: { companyName: company.name, companySiret: company.siret }
@@ -60,7 +69,7 @@ const refuseMembershipRequestResolver: MutationResolvers["refuseMembershipReques
     const dbCompany = await prisma.company.findUnique({
       where: { id: company.id }
     });
-    return convertUrls(dbCompany);
+    return convertUrls(dbCompany!);
   };
 
 export default refuseMembershipRequestResolver;

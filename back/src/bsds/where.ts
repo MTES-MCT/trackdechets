@@ -15,7 +15,7 @@ import { BsdWhere } from "../generated/graphql/types";
 import { QueryDslQueryContainer } from "@elastic/elasticsearch/api/types";
 import { transportPlateFilter } from "../common/elastic";
 
-export function toElasticSimpleQuery(where: BsdWhere): QueryDslQueryContainer {
+export function toElasticSimpleQuery(where: BsdWhere) {
   return {
     bool: {
       must: [
@@ -182,7 +182,7 @@ export function toElasticSimpleQuery(where: BsdWhere): QueryDslQueryContainer {
           where.destination?.operation?.date
         ),
         toElasticStringListQuery("sirets", where.sirets)
-      ].filter(f => !!f)
+      ].filter(Boolean)
     }
   };
 }
@@ -214,10 +214,7 @@ export function toElasticQuery(where: BsdWhere): QueryDslQueryContainer {
     if (_and) {
       return {
         bool: {
-          must: [
-            ...(simpleQuery.bool.must as QueryDslQueryContainer[]),
-            ...arrayToInner(_and)
-          ],
+          must: [...simpleQuery.bool.must, ...arrayToInner(_and)],
           should: []
         }
       };

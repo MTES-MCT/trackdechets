@@ -2,22 +2,22 @@ type Mutation {
   """
   Crée un Bsda
   """
-  createBsda(input: BsdaInput!): Bsda
+  createBsda(input: BsdaInput!): Bsda!
 
   """
   Crée un Bsda en brouillon
   """
-  createDraftBsda(input: BsdaInput!): Bsda
+  createDraftBsda(input: BsdaInput!): Bsda!
 
   """
   Met à jour un Bsda
   """
-  updateBsda(id: ID!, input: BsdaInput!): Bsda
+  updateBsda(id: ID!, input: BsdaInput!): Bsda!
 
   """
   Permet de publier un brouillon pour le marquer comme prêt à être envoyé
   """
-  publishBsda(id: ID!): Bsda
+  publishBsda(id: ID!): Bsda!
 
   """
   Signe un Bsda.
@@ -112,24 +112,24 @@ type Mutation {
   }
   ```
   """
-  signBsda(id: ID!, input: BsdaSignatureInput!): Bsda
+  signBsda(id: ID!, input: BsdaSignatureInput!): Bsda!
 
   """
   Duplique un Bsda
   """
-  duplicateBsda("ID d'un BSDA" id: ID!): Bsda
+  duplicateBsda("ID d'un BSDA" id: ID!): Bsda!
 
   """
   Supprime un Bsda
   """
-  deleteBsda("ID d'un BSDA" id: ID!): Bsda
+  deleteBsda("ID d'un BSDA" id: ID!): Bsda!
 
   """
   Crée une demande de révision sur un Bsda existant
   """
   createBsdaRevisionRequest(
     input: CreateBsdaRevisionRequestInput!
-  ): BsdaRevisionRequest
+  ): BsdaRevisionRequest!
 
   """
   Annule une demande de révision de Bsda.
@@ -138,7 +138,7 @@ type Mutation {
   cancelBsdaRevisionRequest(
     "Identifiant de la demande de révision"
     id: ID!
-  ): Boolean
+  ): Boolean!
 
   """
   Répond à une demande d'approbation d'une révision.
@@ -152,5 +152,5 @@ type Mutation {
     isApproved: Boolean!
     "Commentaire facultatif"
     comment: String
-  ): BsdaRevisionRequest
+  ): BsdaRevisionRequest!
 }

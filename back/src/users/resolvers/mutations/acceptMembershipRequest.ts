@@ -17,7 +17,7 @@ import { renderMail } from "../../../mailer/templates/renderers";
 import { membershipRequestAccepted } from "../../../mailer/templates";
 
 const acceptMembershipRequestResolver: MutationResolvers["acceptMembershipRequest"] =
-  async (parent, { id, role }, context) => {
+  async (_, { id, role }, context) => {
     applyAuthStrategies(context, [AuthType.Session]);
 
     const user = checkIsAuthenticated(context);
@@ -28,6 +28,12 @@ const acceptMembershipRequestResolver: MutationResolvers["acceptMembershipReques
     const company = await prisma.membershipRequest
       .findUnique({ where: { id: membershipRequest.id } })
       .company();
+
+    if (!company) {
+      throw new Error(
+        `Cannot find company for membershipRequest ${membershipRequest.id}`
+      );
+    }
 
     // check authenticated user is admin of the company
     await checkIsCompanyAdmin(user, company);
@@ -45,6 +51,12 @@ const acceptMembershipRequestResolver: MutationResolvers["acceptMembershipReques
     const requester = await prisma.membershipRequest
       .findUnique({ where: { id: membershipRequest.id } })
       .user();
+
+    if (!requester) {
+      throw new Error(
+        `Cannot find requester for membershipRequest ${membershipRequest.id}`
+      );
+    }
 
     // associate membership requester to company with the role decided by the admin
     await associateUserToCompany(requester.id, company.orgId, role);
@@ -67,7 +79,7 @@ const acceptMembershipRequestResolver: MutationResolvers["acceptMembershipReques
     const dbCompany = await prisma.company.findUnique({
       where: { id: company.id }
     });
-    return convertUrls(dbCompany);
+    return convertUrls(dbCompany!);
   };
 
 export default acceptMembershipRequestResolver;

@@ -35,7 +35,7 @@ import {
 async function checkIsAllowed(
   siret: string | null,
   user: Express.User,
-  securityCode: number | null
+  securityCode: number | null | undefined
 ) {
   if (siret == null) {
     throw new UserInputError(
@@ -308,8 +308,10 @@ const signatures: Record<
         data: { status }
       });
 
-      const finalOperationPackagings = packagings.filter(p =>
-        isFinalOperation(p.operationCode, p.operationNoTraceability)
+      const finalOperationPackagings = packagings.filter(
+        p =>
+          p.operationCode &&
+          isFinalOperation(p.operationCode, p.operationNoTraceability)
       );
 
       const previousPackagings = await findPreviousPackagings(

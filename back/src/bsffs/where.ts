@@ -9,7 +9,9 @@ import {
   toPrismaGenericWhereInput
 } from "../common/where";
 
-function toPrismaBsffSimpleWhereInput(where: BsffWhere): Prisma.BsffWhereInput {
+function toPrismaBsffSimpleWhereInput(
+  where: BsffWhere
+): Prisma.BsffWhereInput | undefined {
   if (!where) {
     return undefined;
   }
@@ -43,7 +45,7 @@ function toPrismaBsffSimpleWhereInput(where: BsffWhere): Prisma.BsffWhereInput {
 }
 export function toPrismaBsffWhereInput(
   where: BsffWhere
-): Prisma.BsffWhereInput {
+): Prisma.BsffWhereInput | undefined {
   if (!where) {
     return undefined;
   }

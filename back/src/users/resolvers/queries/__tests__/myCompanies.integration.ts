@@ -65,8 +65,8 @@ describe("query { myCompanies }", () => {
     );
     const { query } = makeClient(user1);
     const { data } = await query<Pick<Query, "myCompanies">>(MY_COMPANIES);
-    expect(data.myCompanies.totalCount).toEqual(1);
-    expect(data.myCompanies.edges.map(({ node }) => node.id)).toEqual([
+    expect(data!.myCompanies.totalCount).toEqual(1);
+    expect(data!.myCompanies.edges.map(({ node }) => node.id)).toEqual([
       company1.id
     ]);
   }, 20000);
@@ -87,12 +87,12 @@ describe("query { myCompanies }", () => {
         variables: { first: 3 }
       }
     );
-    expect(page1.myCompanies.totalCount).toEqual(4);
-    expect(page1.myCompanies.pageInfo.hasPreviousPage).toEqual(false);
-    expect(page1.myCompanies.pageInfo.hasNextPage).toEqual(true);
-    expect(page1.myCompanies.pageInfo.endCursor).toEqual(company3.id);
-    expect(page1.myCompanies.pageInfo.startCursor).toEqual(company1.id);
-    expect(page1.myCompanies.edges.map(({ node }) => node.id)).toEqual([
+    expect(page1!.myCompanies.totalCount).toEqual(4);
+    expect(page1!.myCompanies.pageInfo.hasPreviousPage).toEqual(false);
+    expect(page1!.myCompanies.pageInfo.hasNextPage).toEqual(true);
+    expect(page1!.myCompanies.pageInfo.endCursor).toEqual(company3.id);
+    expect(page1!.myCompanies.pageInfo.startCursor).toEqual(company1.id);
+    expect(page1!.myCompanies.edges.map(({ node }) => node.id)).toEqual([
       company1.id,
       company2.id,
       company3.id
@@ -100,15 +100,15 @@ describe("query { myCompanies }", () => {
     const { data: page2 } = await query<Pick<Query, "myCompanies">>(
       MY_COMPANIES,
       {
-        variables: { first: 3, after: page1.myCompanies.pageInfo.endCursor }
+        variables: { first: 3, after: page1!.myCompanies.pageInfo.endCursor }
       }
     );
-    expect(page2.myCompanies.totalCount).toEqual(4);
-    expect(page2.myCompanies.pageInfo.hasPreviousPage).toEqual(true);
-    expect(page2.myCompanies.pageInfo.hasNextPage).toEqual(false);
-    expect(page2.myCompanies.pageInfo.endCursor).toEqual(company4.id);
-    expect(page2.myCompanies.pageInfo.startCursor).toEqual(company4.id);
-    expect(page2.myCompanies.edges.map(({ node }) => node.id)).toEqual([
+    expect(page2!.myCompanies.totalCount).toEqual(4);
+    expect(page2!.myCompanies.pageInfo.hasPreviousPage).toEqual(true);
+    expect(page2!.myCompanies.pageInfo.hasNextPage).toEqual(false);
+    expect(page2!.myCompanies.pageInfo.endCursor).toEqual(company4.id);
+    expect(page2!.myCompanies.pageInfo.startCursor).toEqual(company4.id);
+    expect(page2!.myCompanies.edges.map(({ node }) => node.id)).toEqual([
       company4.id
     ]);
   }, 20000);
@@ -131,12 +131,12 @@ describe("query { myCompanies }", () => {
       }
     );
 
-    expect(page1.myCompanies.totalCount).toEqual(4);
-    expect(page1.myCompanies.pageInfo.hasPreviousPage).toEqual(true);
-    expect(page1.myCompanies.pageInfo.hasNextPage).toEqual(false);
-    expect(page1.myCompanies.pageInfo.endCursor).toEqual(company4.id);
-    expect(page1.myCompanies.pageInfo.startCursor).toEqual(company2.id);
-    expect(page1.myCompanies.edges.map(({ node }) => node.id)).toEqual([
+    expect(page1!.myCompanies.totalCount).toEqual(4);
+    expect(page1!.myCompanies.pageInfo.hasPreviousPage).toEqual(true);
+    expect(page1!.myCompanies.pageInfo.hasNextPage).toEqual(false);
+    expect(page1!.myCompanies.pageInfo.endCursor).toEqual(company4.id);
+    expect(page1!.myCompanies.pageInfo.startCursor).toEqual(company2.id);
+    expect(page1!.myCompanies.edges.map(({ node }) => node.id)).toEqual([
       company2.id,
       company3.id,
       company4.id
@@ -144,16 +144,16 @@ describe("query { myCompanies }", () => {
     const { data: page2 } = await query<Pick<Query, "myCompanies">>(
       MY_COMPANIES,
       {
-        variables: { last: 3, before: page1.myCompanies.pageInfo.startCursor }
+        variables: { last: 3, before: page1!.myCompanies.pageInfo.startCursor }
       }
     );
 
-    expect(page2.myCompanies.totalCount).toEqual(4);
-    expect(page2.myCompanies.pageInfo.hasPreviousPage).toEqual(false);
-    expect(page2.myCompanies.pageInfo.hasNextPage).toEqual(true);
-    expect(page2.myCompanies.pageInfo.endCursor).toEqual(company1.id);
-    expect(page2.myCompanies.pageInfo.startCursor).toEqual(company1.id);
-    expect(page2.myCompanies.edges.map(({ node }) => node.id)).toEqual([
+    expect(page2!.myCompanies.totalCount).toEqual(4);
+    expect(page2!.myCompanies.pageInfo.hasPreviousPage).toEqual(false);
+    expect(page2!.myCompanies.pageInfo.hasNextPage).toEqual(true);
+    expect(page2!.myCompanies.pageInfo.endCursor).toEqual(company1.id);
+    expect(page2!.myCompanies.pageInfo.startCursor).toEqual(company1.id);
+    expect(page2!.myCompanies.edges.map(({ node }) => node.id)).toEqual([
       company1.id
     ]);
   }, 20000);
@@ -229,8 +229,8 @@ describe("query { myCompanies }", () => {
       }
     );
 
-    expect(page1.myCompanies.totalCount).toEqual(1);
-    expect(page1.myCompanies.edges.map(({ node }) => node.id)).toEqual([
+    expect(page1!.myCompanies.totalCount).toEqual(1);
+    expect(page1!.myCompanies.edges.map(({ node }) => node.id)).toEqual([
       company2.id
     ]);
   }, 20000);
@@ -252,8 +252,8 @@ describe("query { myCompanies }", () => {
       }
     );
 
-    expect(page1.myCompanies.totalCount).toEqual(1);
-    expect(page1.myCompanies.edges.map(({ node }) => node.id)).toEqual([
+    expect(page1!.myCompanies.totalCount).toEqual(1);
+    expect(page1!.myCompanies.edges.map(({ node }) => node.id)).toEqual([
       company2.id
     ]);
   }, 20000);
@@ -275,8 +275,8 @@ describe("query { myCompanies }", () => {
       }
     );
 
-    expect(page1.myCompanies.totalCount).toEqual(1);
-    expect(page1.myCompanies.edges.map(({ node }) => node.id)).toEqual([
+    expect(page1!.myCompanies.totalCount).toEqual(1);
+    expect(page1!.myCompanies.edges.map(({ node }) => node.id)).toEqual([
       company3.id
     ]);
   }, 20000);
@@ -298,8 +298,8 @@ describe("query { myCompanies }", () => {
       }
     );
 
-    expect(page1.myCompanies.totalCount).toEqual(1);
-    expect(page1.myCompanies.edges.map(({ node }) => node.id)).toEqual([
+    expect(page1!.myCompanies.totalCount).toEqual(1);
+    expect(page1!.myCompanies.edges.map(({ node }) => node.id)).toEqual([
       company2.id
     ]);
   }, 20000);
@@ -321,12 +321,12 @@ describe("query { myCompanies }", () => {
         variables: { first: 3, search: "Lorient" }
       }
     );
-    expect(page1.myCompanies.totalCount).toEqual(4);
-    expect(page1.myCompanies.pageInfo.hasPreviousPage).toEqual(false);
-    expect(page1.myCompanies.pageInfo.hasNextPage).toEqual(true);
-    expect(page1.myCompanies.pageInfo.endCursor).toEqual(company3.id);
-    expect(page1.myCompanies.pageInfo.startCursor).toEqual(company1.id);
-    expect(page1.myCompanies.edges.map(({ node }) => node.id)).toEqual([
+    expect(page1!.myCompanies.totalCount).toEqual(4);
+    expect(page1!.myCompanies.pageInfo.hasPreviousPage).toEqual(false);
+    expect(page1!.myCompanies.pageInfo.hasNextPage).toEqual(true);
+    expect(page1!.myCompanies.pageInfo.endCursor).toEqual(company3.id);
+    expect(page1!.myCompanies.pageInfo.startCursor).toEqual(company1.id);
+    expect(page1!.myCompanies.edges.map(({ node }) => node.id)).toEqual([
       company1.id,
       company2.id,
       company3.id
@@ -336,17 +336,17 @@ describe("query { myCompanies }", () => {
       {
         variables: {
           first: 3,
-          after: page1.myCompanies.pageInfo.endCursor,
+          after: page1!.myCompanies.pageInfo.endCursor,
           search: "Lorient"
         }
       }
     );
-    expect(page2.myCompanies.totalCount).toEqual(4);
-    expect(page2.myCompanies.pageInfo.hasPreviousPage).toEqual(true);
-    expect(page2.myCompanies.pageInfo.hasNextPage).toEqual(false);
-    expect(page2.myCompanies.pageInfo.endCursor).toEqual(company4.id);
-    expect(page2.myCompanies.pageInfo.startCursor).toEqual(company4.id);
-    expect(page2.myCompanies.edges.map(({ node }) => node.id)).toEqual([
+    expect(page2!.myCompanies.totalCount).toEqual(4);
+    expect(page2!.myCompanies.pageInfo.hasPreviousPage).toEqual(true);
+    expect(page2!.myCompanies.pageInfo.hasNextPage).toEqual(false);
+    expect(page2!.myCompanies.pageInfo.endCursor).toEqual(company4.id);
+    expect(page2!.myCompanies.pageInfo.startCursor).toEqual(company4.id);
+    expect(page2!.myCompanies.edges.map(({ node }) => node.id)).toEqual([
       company4.id
     ]);
   }, 20000);

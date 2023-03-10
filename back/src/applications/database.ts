@@ -7,7 +7,7 @@ import { ApplicationNotFound } from "./errors";
  */
 export async function getApplicationOrApplicationNotFound({
   id
-}: Prisma.ApplicationWhereUniqueInput) {
+}: Required<Prisma.ApplicationWhereUniqueInput>) {
   const application = await prisma.application.findUnique({
     where: { id }
   });

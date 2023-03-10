@@ -115,7 +115,7 @@ export const hashToken = (token: string) =>
 /**
  *Try extracting a valid postal code
  */
-export function extractPostalCode(address: string) {
+export function extractPostalCode(address: string | null | undefined) {
   if (address) {
     const matches = address.match(/([0-9]{5})/);
     if (matches && matches.length > 0) {

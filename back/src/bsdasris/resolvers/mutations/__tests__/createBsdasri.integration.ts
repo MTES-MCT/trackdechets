@@ -163,8 +163,8 @@ describe("Mutation.createDasri", () => {
     expect(data.createBsdasri.status).toEqual("INITIAL");
     expect(data.createBsdasri.type).toEqual("SIMPLE");
 
-    expect(data.createBsdasri.emitter.company.siret).toEqual(company.siret);
-    const created = await prisma.bsdasri.findUnique({
+    expect(data.createBsdasri.emitter!.company!.siret).toEqual(company.siret);
+    const created = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: data.createBsdasri.id }
     });
     expect(created.synthesisEmitterSirets).toEqual([]);
@@ -237,7 +237,7 @@ describe("Mutation.createDasri", () => {
     expect(data.createBsdasri.status).toEqual("INITIAL");
     expect(data.createBsdasri.type).toEqual("SIMPLE");
 
-    expect(data.createBsdasri.emitter.company.siret).toEqual(company.siret);
+    expect(data.createBsdasri.emitter!.company!.siret).toEqual(company.siret);
   });
 });
 
@@ -377,7 +377,7 @@ describe("Mutation.createDasri validation scenarii", () => {
     expect(data.createBsdasri.isDraft).toEqual(false);
     expect(data.createBsdasri.status).toEqual("INITIAL");
 
-    expect(data.createBsdasri.emitter.company.siret).toEqual(company.siret);
+    expect(data.createBsdasri.emitter!.company!.siret).toEqual(company.siret);
   });
 
   it("Transport weight isEstimate is required when value is provided", async () => {
@@ -575,7 +575,7 @@ describe("Mutation.createDasri validation scenarii", () => {
         }
       }
     );
-    expect(data.createBsdasri.identification.numbers).toEqual([
+    expect(data.createBsdasri.identification!.numbers).toEqual([
       "GRV-XY12345",
       "GRV-VB45678"
     ]);
@@ -641,7 +641,9 @@ describe("Mutation.createDasri validation scenarii", () => {
         }
       }
     );
-    expect(data.createBsdasri.transporter.transport.plates.length).toEqual(2);
+    expect(data.createBsdasri.transporter!.transport!.plates!.length).toEqual(
+      2
+    );
   });
 
   it("should fail creating the form if more than 2 plates are submitted", async () => {
@@ -773,7 +775,7 @@ describe("Mutation.createDasri validation scenarii", () => {
     expect(data.createBsdasri.isDraft).toEqual(false);
     expect(data.createBsdasri.status).toEqual("INITIAL");
 
-    expect(data.createBsdasri.emitter.company.siret).toEqual(company.siret);
+    expect(data.createBsdasri.emitter!.company!.siret).toEqual(company.siret);
   });
 
   it("should convert 18 01 02* to 18 02 02*", async () => {
@@ -812,7 +814,7 @@ describe("Mutation.createDasri validation scenarii", () => {
       }
     );
 
-    expect(data.createBsdasri.waste.code).toEqual("18 02 02*");
+    expect(data.createBsdasri.waste!.code).toEqual("18 02 02*");
   });
 
   it("should allow decimal volume", async () => {

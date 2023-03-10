@@ -63,7 +63,7 @@ export class FixBSDVatUpdater implements Updater {
           ) {
             cleanSiret = transporterCompanySiret.replace(/[\W_]+/g, "");
           }
-          let cleanTransportersSirets = [];
+          let cleanTransportersSirets: string[] = [];
           if (!!transportersSirets) {
             cleanTransportersSirets = transportersSirets.map(siret => {
               if (siret === transporterCompanySiret) return cleanSiret;

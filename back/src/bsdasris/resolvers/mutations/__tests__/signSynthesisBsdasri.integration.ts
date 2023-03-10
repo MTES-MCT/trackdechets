@@ -99,7 +99,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
       }
     });
 
-    const takenOverDasri = await prisma.bsdasri.findUnique({
+    const takenOverDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(takenOverDasri.status).toEqual("SENT");
@@ -108,7 +108,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
     expect(takenOverDasri.transportSignatoryId).toEqual(transporter.id);
 
     // signature data are cascaded on synthesizeBsdasri
-    const updatedSynthesizeBsdasri = await prisma.bsdasri.findUnique({
+    const updatedSynthesizeBsdasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
 
@@ -223,7 +223,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
       }
     });
 
-    const receivedDasri = await prisma.bsdasri.findUnique({
+    const receivedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(receivedDasri.status).toEqual("RECEIVED");
@@ -234,7 +234,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
     expect(receivedDasri.receptionSignatoryId).toEqual(recipient.id);
 
     // signature data are cascaded on synthesizeBsdasri
-    const updatedSynthesizeBsdasri = await prisma.bsdasri.findUnique({
+    const updatedSynthesizeBsdasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
 
@@ -354,7 +354,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
       }
     });
 
-    const receivedDasri = await prisma.bsdasri.findUnique({
+    const receivedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(receivedDasri.status).toEqual("PROCESSED");
@@ -367,7 +367,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
     expect(receivedDasri.operationSignatoryId).toEqual(recipient.id);
 
     // signature data are cascaded on synthesizeBsdasri
-    const updatedSynthesizeBsdasri = await prisma.bsdasri.findUnique({
+    const updatedSynthesizeBsdasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
 

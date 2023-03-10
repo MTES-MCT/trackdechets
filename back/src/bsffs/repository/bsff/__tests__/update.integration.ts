@@ -55,7 +55,7 @@ describe("bsffRepository.update", () => {
       data: { wasteCode: "14 06 02*" }
     });
 
-    const updatedBsff = await prisma.bsff.findUnique({
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsff.id }
     });
     expect(updatedBsff.wasteCode).toEqual("14 06 02*");
