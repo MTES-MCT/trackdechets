@@ -25,6 +25,7 @@ import {
   siretTests,
   vatNumberTests,
   weight,
+  weightConditions,
   WeightUnits
 } from "../common/validation";
 
@@ -158,6 +159,10 @@ const destinationSchema: FactorySchemaOf<VhuValidationContext, Destination> =
         ),
       destinationReceptionWeight: weight(WeightUnits.Kilogramme)
         .label("Destinataire")
+        .when(
+          "destinationReceptionAcceptationStatus",
+          weightConditions.wasteAcceptationStatus
+        )
         .requiredIf(
           context.operationSignature,
           "${path}: le poids reçu est obligatoire"
