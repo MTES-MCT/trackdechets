@@ -359,6 +359,42 @@ Attention, contrairement aux scripts SQL ces migrations ne sont pas jouées une 
 
 Toutes ces migrations sont jouées avec la commande `npm run update:dev`. (sans le suffixe `:dev` en production)
 
+## Réindexation Elasticsearch
+
+Depuis un one-off container de taille XL
+
+- Réindexation globale sans downtime en utilisant les workers d'indexation
+  La réindexation ne sera déclenchée que si la version du mapping ES a changé
+
+`FORCE_LOGGER_CONSOLE=true npm run reindex-all-bsds-bulk -- --useQueue`
+
+- Réindexation globale sans downtime depuis la console (le travail ne sera pas parallélisé)
+  La réindexation ne sera déclenchée que si la version du mapping ES a changé
+
+`FORCE_LOGGER_CONSOLE=true npm run reindex-all-bsds-bulk`
+
+- Réindexation globale sans downtime en utilisant les workers d'indexation
+  Le paramètre -f permet de forcer la réindexation même si le mapping n'a pas changé
+
+`FORCE_LOGGER_CONSOLE=true npm run reindex-all-bsds-bulk -- --useQueue -f`
+
+- Réindexation globale sans downtime depuis la console (le travail ne sera pas parallélisé)
+  Le paramètre -f permet de forcer la réindexation même si le mapping n'a pas changé
+
+`FORCE_LOGGER_CONSOLE=true npm run reindex-all-bsds-bulk -- -f`
+
+- Réindexation de tous les bordereaux d'un certain type (en place)
+
+`FORCE_LOGGER_CONSOLE=true npm run reindex-partial-in-place BSFF`
+
+- Réindexation de tous les bordereaux d'un certain type (en supprimant tous les bordereaux de ce type avant)
+
+`FORCE_LOGGER_CONSOLE=true npm run reindex-partial-in-place -- -f BSFF`
+
+- Réindexation de tous les bordereaux depuis une certaine date (en place)
+
+`FORCE_LOGGER_CONSOLE=true npm run reindex-partial-in-place -- --since 2023-03-01`
+
 ## Guides
 
 ### Mettre à jour le changelog
@@ -455,7 +491,6 @@ Voilà la procédure pour ajouter une icône au fichier `Icons.tsx` :
 
 Pour s'y retrouver plus facilement, suivre la convention de nommage en place et utiliser le nom donné par streamlineicons.
 
-
 ### Clefs de signature token OpenID
 
 Une clef de signature RSA est nécessaire pour signer les tokens d'identité d'Openid.
@@ -465,9 +500,9 @@ Une clef de signature RSA est nécessaire pour signer les tokens d'identité d'O
    openssl rsa -in keypair.pem -pubout -out publickey.crt
    openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in keypair.pem -out pkcs8.key
 ```
+
 Le contenu de pkcs8.key va dans la vairable d'env OIDC_PRIVATE_KEY.
 Le contenu de publickey.crt est destiné aux applications clientes d'OpenId connect.
-
 
 ### Reindexer un bordereau individuel
 
