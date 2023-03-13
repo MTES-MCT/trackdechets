@@ -61,11 +61,6 @@ export default function StepsList(props: Props) {
       : createForm({ variables: { createFormInput: input } });
   }
 
-  const redirectTo =
-    formQuery.data?.form?.status === "SEALED"
-      ? generatePath(routes.dashboard.bsds.follow, { siret })
-      : generatePath(routes.dashboard.bsds.drafts, { siret });
-
   function onSubmit(values) {
     const { temporaryStorageDetail, ecoOrganisme, grouping, ...rest } = values;
 
@@ -88,7 +83,7 @@ export default function StepsList(props: Props) {
     };
 
     saveForm(formInput)
-      .then(_ => history.push(redirectTo))
+      .then(_ => history.goBack())
       .catch(err => formInputToastError(err));
   }
 

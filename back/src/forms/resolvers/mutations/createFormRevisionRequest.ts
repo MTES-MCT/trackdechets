@@ -10,7 +10,8 @@ import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import {
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
-  BSDD_WASTE_CODES
+  BSDD_WASTE_CODES,
+  BSDD_APPENDIX1_WASTE_CODES
 } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -246,6 +247,16 @@ async function getFlatContent(
   }
 
   await bsddRevisionRequestSchema.validate(flatContent);
+
+  if (
+    bsdd.emitterType === EmitterType.APPENDIX1 &&
+    flatContent.wasteDetailsCode &&
+    !BSDD_APPENDIX1_WASTE_CODES.includes(flatContent.wasteDetailsCode)
+  ) {
+    throw new ForbiddenError(
+      "Impossible d'utiliser ce code déchet sur un bordereau de tournée d'annexe 1."
+    );
+  }
 
   return flatContent;
 }

@@ -1,7 +1,12 @@
 import * as React from "react";
 import { Link, generatePath, useLocation, useParams } from "react-router-dom";
 import { CellProps } from "react-table";
-import { Bsd, EmitterType } from "generated/graphql/types";
+import {
+  Bsd,
+  EmitterType,
+  Query,
+  QueryCompanyPrivateInfosArgs,
+} from "generated/graphql/types";
 import routes from "common/routes";
 import { IconView } from "common/components/Icons";
 import { WorkflowAction } from "../BSDD/WorkflowAction";
@@ -14,6 +19,8 @@ import styles from "./BSDCards.module.scss";
 import { BsdTypename } from "dashboard/constants";
 import { BsffFragment } from "../BSFF";
 import { CardRoadControlButton } from "../RoadControlButton";
+import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "form/common/components/company/query";
+import { useQuery } from "@apollo/client";
 interface BSDCardsProps {
   bsds: Bsd[];
   columns: Column[];
@@ -22,6 +29,18 @@ interface BSDCardsProps {
 export function BSDCards({ bsds, columns }: BSDCardsProps) {
   const location = useLocation();
   const { siret } = useParams<{ siret: string }>();
+
+  const { data } = useQuery<
+    Pick<Query, "companyPrivateInfos">,
+    QueryCompanyPrivateInfosArgs
+  >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
+    variables: { clue: siret },
+  });
+  const siretsWithAutomaticSignature = data
+    ? data.companyPrivateInfos.receivedSignatureAutomations.map(
+        automation => automation.from.siret
+      )
+    : [];
 
   return (
     <div className={styles.BSDCards}>
@@ -78,7 +97,10 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
                 options={{
                   canSkipEmission:
                     form.emitter?.type === EmitterType.Appendix1Producer &&
-                    Boolean(form.ecoOrganisme?.siret),
+                    (Boolean(form.ecoOrganisme?.siret) ||
+                      siretsWithAutomaticSignature.includes(
+                        form.emitter?.company?.siret
+                      )),
                 }}
               />
             ) : null}

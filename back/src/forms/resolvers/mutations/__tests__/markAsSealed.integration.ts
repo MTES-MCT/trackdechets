@@ -1104,7 +1104,7 @@ describe("Mutation.markAsSealed", () => {
     ]);
   });
 
-  it("should fail if bsd has an private producer and the wrong emitterType", async () => {
+  it("should fail if bsd has a private producer and the wrong emitterType", async () => {
     const recipientCompany = await destinationFactory();
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -1140,7 +1140,7 @@ describe("Mutation.markAsSealed", () => {
       expect.objectContaining({
         message: [
           "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
-          `Erreur(s): Émetteur: Le type d'émetteur doit être \"PRODUCER\" lorsque l'émetteur est un particulier`
+          `Erreur(s): Émetteur: Le type d'émetteur doit être \"PRODUCER\" ou \"APPENDIX1_PRODUCER\" lorsque l'émetteur est un particulier`
         ].join("\n")
       })
     ]);

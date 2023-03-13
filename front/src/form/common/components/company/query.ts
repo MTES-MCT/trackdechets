@@ -195,6 +195,19 @@ export const COMPANY_PRIVATE_INFOS = gql`
   }
 `;
 
+export const COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS = gql`
+  query CompanyPrivateInfos($clue: String!) {
+    companyPrivateInfos(clue: $clue) {
+      siret
+      receivedSignatureAutomations {
+        from {
+          siret
+        }
+      }
+    }
+  }
+`;
+
 export const COMPANY_SELECTOR_PRIVATE_INFOS = gql`
   query CompanyPrivateInfos($clue: String!) {
     companyPrivateInfos(clue: $clue) {

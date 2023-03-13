@@ -1,6 +1,11 @@
 import * as React from "react";
 import { useParams } from "react-router";
-import { EmitterType, Form } from "generated/graphql/types";
+import {
+  EmitterType,
+  Form,
+  Query,
+  QueryCompanyPrivateInfosArgs,
+} from "generated/graphql/types";
 import { CellProps, CellValue } from "react-table";
 import { ActionButtonContext } from "common/components/ActionButton";
 import { BSDDActions } from "dashboard/components/BSDList/BSDD/BSDDActions/BSDDActions";
@@ -8,6 +13,8 @@ import { IconBSDD } from "common/components/Icons";
 import { statusLabels } from "../../../constants";
 import TransporterInfoEdit from "./TransporterInfoEdit";
 import { WorkflowAction } from "./WorkflowAction";
+import { useQuery } from "@apollo/client";
+import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "form/common/components/company/query";
 
 export const COLUMNS: Record<
   string,
@@ -98,6 +105,18 @@ export const COLUMNS: Record<
     accessor: () => null,
     Cell: ({ row }) => {
       const { siret } = useParams<{ siret: string }>();
+      const { data } = useQuery<
+        Pick<Query, "companyPrivateInfos">,
+        QueryCompanyPrivateInfosArgs
+      >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
+        variables: { clue: siret },
+      });
+      const siretsWithAutomaticSignature = data
+        ? data.companyPrivateInfos.receivedSignatureAutomations.map(
+            automation => automation.from.siret
+          )
+        : [];
+
       const form = row.original;
       return (
         <ActionButtonContext.Provider value={{ size: "small" }}>
@@ -107,7 +126,10 @@ export const COLUMNS: Record<
             options={{
               canSkipEmission:
                 form.emitter?.type === EmitterType.Appendix1Producer &&
-                Boolean(form.ecoOrganisme?.siret),
+                (Boolean(form.ecoOrganisme?.siret) ||
+                  siretsWithAutomaticSignature.includes(
+                    form.emitter?.company?.siret
+                  )),
             }}
           />
         </ActionButtonContext.Provider>
