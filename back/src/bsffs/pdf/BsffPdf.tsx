@@ -468,6 +468,15 @@ function BsffOnePackagingOperation({
         <strong>9. Réalisation de l'opération</strong>
       </p>
       <div>
+        Utilisation principale comme combustible ou autre moyen de produire de
+        l'énergie
+        <input
+          type="checkbox"
+          defaultChecked={packaging?.operation?.code === "R1"}
+        />{" "}
+        R 1
+      </div>
+      <div>
         Récupération ou régénération des solvants{" "}
         <input
           type="checkbox"
