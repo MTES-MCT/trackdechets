@@ -37,6 +37,7 @@ export const COLUMNS_PARAMETERS_NAME = {
     filter: value => ({
       _or: [
         { readableId: { _contains: value } },
+        { customId: { _contains: value } },
         { packagingNumbers: { _hasSome: value } },
         { packagingNumbers: { _itemContains: value } },
       ],
