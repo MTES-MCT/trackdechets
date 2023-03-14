@@ -150,7 +150,7 @@ const signatures: Record<
       const {
         update: updateBsffPackaging,
         updateMany: updateManyBsffPackaging,
-        findPreviousPackagings
+        findMany: findManyBsffPackaging
       } = getBsffPackagingRepository(user, transaction);
 
       if (packagingId) {
@@ -172,7 +172,10 @@ const signatures: Record<
             acceptationSignatureAuthor: author,
             // set acceptation waste code if it was not set explicitly
             acceptationWasteCode:
-              packaging.acceptationWasteCode ?? existingBsff.wasteCode
+              packaging.acceptationWasteCode ?? existingBsff.wasteCode,
+            ...(packaging.acceptationStatus === "REFUSED"
+              ? { previousPackagings: { set: [] } }
+              : {})
           }
         });
       } else {
@@ -196,13 +199,26 @@ const signatures: Record<
             acceptationWasteCode: existingBsff.wasteCode
           }
         });
+
+        const refusedPackagings = await findManyBsffPackaging({
+          where: {
+            bsffId: id,
+            acceptationStatus: WasteAcceptationStatus.REFUSED
+          }
+        });
+
+        for (const refusedPackaging of refusedPackagings) {
+          await updateBsffPackaging({
+            where: { id: refusedPackaging.id },
+            data: { previousPackagings: { set: [] } }
+          });
+        }
       }
 
-      const {
-        update: updateBsff,
-        findMany: findManyBsffs,
-        findUniqueGetPackagings
-      } = getBsffRepository(user, transaction);
+      const { update: updateBsff, findUniqueGetPackagings } = getBsffRepository(
+        user,
+        transaction
+      );
 
       const packagings = await findUniqueGetPackagings({
         where: { id }
@@ -217,34 +233,6 @@ const signatures: Record<
       );
 
       const updatedBsff = await updateBsff({ where: { id }, data: { status } });
-
-      const refusedPackagings = packagings.filter(
-        p => p.acceptationStatus === WasteAcceptationStatus.REFUSED
-      );
-
-      const previousPackagings = await findPreviousPackagings(
-        refusedPackagings.map(p => p.id)
-      );
-
-      const bsffs = await findManyBsffs({
-        where: { id: { in: previousPackagings.map(p => p.bsffId) } }
-      });
-
-      await Promise.all(
-        bsffs.map(async bsff => {
-          const newStatus = await getStatus(bsff, {
-            user,
-            prisma: transaction
-          });
-          if (newStatus !== bsff.status) {
-            return updateBsff({
-              where: { id: bsff.id },
-              data: { status: newStatus }
-            });
-          }
-          return bsff;
-        })
-      );
 
       return updatedBsff;
     });
