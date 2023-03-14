@@ -7,7 +7,7 @@ import {
   DataListDescription,
 } from "common/components";
 import { PACKAGINGS_NAMES } from "form/bsff/components/packagings/Packagings";
-
+import { entitiesToEscapedUnicode } from "common/components/xss";
 interface BsffWasteSummaryProps {
   bsff: Bsff;
 }
@@ -31,7 +31,7 @@ export function BsffWasteSummary({ bsff }: BsffWasteSummaryProps) {
             <DataListTerm>Dénomination usuelle</DataListTerm>
             <DataListDescription>
               {bsff.packagings[0].acceptation?.wasteDescription ??
-                (bsff.waste?.description || "inconnue")}
+                (entitiesToEscapedUnicode(bsff.waste?.description) || "inconnue")}
             </DataListDescription>
           </DataListItem>
         </>

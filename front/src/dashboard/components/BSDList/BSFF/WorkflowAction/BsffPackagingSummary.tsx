@@ -6,7 +6,7 @@ import {
   DataListTerm,
   DataListDescription,
 } from "common/components";
-
+import { entitiesToEscapedUnicode } from "common/components/xss";
 interface BsffPackagingSummaryProps {
   bsff: Bsff;
   packaging: BsffPackaging;
@@ -36,7 +36,7 @@ export function BsffPackagingSummary({
         <DataListTerm>Nature du fluide</DataListTerm>
         <DataListDescription>
           {packaging?.acceptation?.wasteDescription ??
-            (bsff.waste?.description || "inconnue")}
+            (entitiesToEscapedUnicode(bsff.waste?.description) || "inconnue")}
         </DataListDescription>
       </DataListItem>
       <DataListItem>

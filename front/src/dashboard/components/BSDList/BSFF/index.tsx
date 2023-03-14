@@ -9,7 +9,7 @@ import { bsffVerboseStatuses } from "form/bsff/utils/constants";
 import { UpdateTransporterCustomInfo } from "./BsffActions/UpdateTransporterCustomInfo";
 import { UpdateTransporterPlates } from "./BsffActions/UpdateTransporterPlates";
 import { BsffStatus } from "generated/graphql/types";
-
+import { entitiesToEscapedUnicode } from "common/components/xss";
 export const COLUMNS: Record<
   string,
   {
@@ -57,7 +57,9 @@ export const COLUMNS: Record<
   },
   waste: {
     accessor: bsff =>
-      [bsff.waste?.code, bsff.waste?.description].filter(Boolean).join(" "),
+      entitiesToEscapedUnicode(
+        [bsff.waste?.code, bsff.waste?.description].filter(Boolean).join(" ")
+      ),
   },
   transporterCustomInfo: {
     accessor: bsff => bsff.bsffTransporter?.customInfo ?? "",

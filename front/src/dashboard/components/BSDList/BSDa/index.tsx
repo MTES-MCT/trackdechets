@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom";
 import { ActionButtonContext } from "common/components/ActionButton";
 import { WorkflowAction } from "./WorkflowAction/WorkflowAction";
 import { TransporterInfoEdit } from "./WorkflowAction/TransporterInfoEdit";
+import { entitiesToEscapedUnicode } from "common/components/xss";
 
 const bsdaVerboseStatuses: Record<BsdaStatus, string> = {
   INITIAL: "Initial",
@@ -60,9 +61,11 @@ export const COLUMNS: Record<
   },
   waste: {
     accessor: bsda =>
-      [bsda?.waste?.["bsdaCode"], bsda?.waste?.materialName]
-        .filter(Boolean)
-        .join(" - "),
+      entitiesToEscapedUnicode(
+        [bsda?.waste?.["bsdaCode"], bsda?.waste?.materialName]
+          .filter(Boolean)
+          .join(" - ")
+      ),
   },
   transporterCustomInfo: {
     accessor: bsda => bsda.transporter?.customInfo,

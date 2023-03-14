@@ -30,7 +30,7 @@ import QRCodeIcon from "react-qr-code";
 import { generatePath, useHistory, useParams } from "react-router-dom";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import { InitialBsdas } from "./InitialBsdas";
-
+import { entitiesToEscapedUnicode } from "common/components/xss";
 type CompanyProps = {
   company?: FormCompany | null;
   label: string;
@@ -470,7 +470,7 @@ export default function BsdaDetailContent({ form }: SlipDetailContentProps) {
             <dt>Code déchet</dt>
             <dd>{form.waste?.code}</dd>
             <dt>Description du déchet</dt>
-            <dd>{form.waste?.materialName}</dd>
+            <dd>{entitiesToEscapedUnicode(form.waste?.materialName)}</dd>
             <dt>Code famille</dt>
             <dd>{form.waste?.familyCode}</dd>
             <dt>

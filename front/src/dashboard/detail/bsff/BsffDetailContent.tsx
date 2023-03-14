@@ -39,7 +39,7 @@ import {
 } from "common/components";
 import { formatDate } from "common/datetime";
 import { PACKAGINGS_NAMES } from "form/bsff/components/packagings/Packagings";
-
+import { entitiesToEscapedUnicode } from "common/components/xss";
 type CompanyProps = {
   company?: FormCompany | null;
   label: string;
@@ -115,7 +115,8 @@ export function BsffDetailContent({ form: bsff }: Props) {
               <DetailRow value={totalWeight} label="Poids total" units="kg" />
               <dt>Déchet</dt>
               <dd>
-                {bsff.waste?.code} {bsff.waste?.description}
+                {bsff.waste?.code}{" "}
+                {entitiesToEscapedUnicode(bsff.waste?.description)}
               </dd>
             </div>
           </div>

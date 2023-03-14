@@ -65,7 +65,7 @@ import { format } from "date-fns";
 import { isSiret } from "generated/constants/companySearchHelpers";
 import { Appendix1ProducerForm } from "form/bsdd/appendix1Producer/form";
 import { gql, useQuery } from "@apollo/client";
-
+import { entitiesToEscapedUnicode } from "common/components/xss";
 type CompanyProps = {
   company?: FormCompany | null;
   label: string;
@@ -641,7 +641,10 @@ export default function BSDDetailContent({
                   form.wasteDetails?.isDangerous &&
                   " (dangereux)"}
               </dd>
-              <DetailRow value={form.wasteDetails?.name} label="Nom usuel" />
+              <DetailRow
+                value={entitiesToEscapedUnicode(form.wasteDetails?.name)}
+                label="Nom usuel"
+              />
               <dt>Quantité</dt>
               <dd>{form.stateSummary?.quantity ?? "?"} tonnes</dd>
               <PackagingRow

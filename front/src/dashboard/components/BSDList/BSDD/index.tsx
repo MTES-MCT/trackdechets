@@ -15,6 +15,7 @@ import TransporterInfoEdit from "./TransporterInfoEdit";
 import { WorkflowAction } from "./WorkflowAction";
 import { useQuery } from "@apollo/client";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "form/common/components/company/query";
+import { entitiesToEscapedUnicode } from "common/components/xss";
 
 export const COLUMNS: Record<
   string,
@@ -68,9 +69,11 @@ export const COLUMNS: Record<
   },
   waste: {
     accessor: form =>
-      [form.wasteDetails?.code, form.wasteDetails?.name]
-        .filter(Boolean)
-        .join(" "),
+      entitiesToEscapedUnicode(
+        [form.wasteDetails?.code, form.wasteDetails?.name]
+          .filter(Boolean)
+          .join(" ")
+      ),
   },
   transporterCustomInfo: {
     accessor: form => form.stateSummary?.transporterCustomInfo ?? "",

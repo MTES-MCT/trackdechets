@@ -21,7 +21,7 @@ import {
 } from "common/components";
 import { OPERATION } from "../utils/constants";
 import { useTable, Column, useFilters } from "react-table";
-
+import { entitiesToEscapedUnicode } from "common/components/xss";
 interface PreviousBsffsPickerProps {
   bsff: Bsff;
   onAddOrRemove: () => void;
@@ -58,10 +58,10 @@ export function PreviousPackagingsPicker({
           `${
             bsffPackaging?.acceptation?.wasteCode ??
             bsffPackaging.bsff?.waste?.code
-          } - ${
+          } - ${entitiesToEscapedUnicode(
             bsffPackaging?.acceptation?.wasteDescription ??
-            bsffPackaging.bsff?.waste?.description
-          }`,
+              bsffPackaging.bsff?.waste?.description
+          )}`,
         canFilter: true,
         filter: "text",
       },
