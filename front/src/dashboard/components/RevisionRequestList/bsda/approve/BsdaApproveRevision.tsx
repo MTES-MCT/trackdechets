@@ -113,7 +113,6 @@ export function BsdaApproveRevision({ review }: Props) {
 }
 
 export function DisplayRevision({ review }: Props) {
-  console.log(review.content);
   if (review.content.isCanceled) {
     return (
       <div>
