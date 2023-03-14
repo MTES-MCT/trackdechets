@@ -99,7 +99,8 @@ describe("formRepository.delete", () => {
     const hits = await searchBsds();
     // both BSD and BSD suite should be indexed
     expect(hits).toHaveLength(2);
-    expect(hits[0]._id).toEqual(form.id);
+    expect([form.id, form.forwardedInId]).toContain(hits[0]._id);
+    expect([form.id, form.forwardedInId]).toContain(hits[1]._id);
 
     const { delete: deleteForm } = getFormRepository({
       ...user,
