@@ -36,6 +36,7 @@ export default function plugin(): Plugin<any> {
           ),
           regroupement: parseWorkflow(bsdWorkflows.regroupement),
           importBsdPapier: parseWorkflow(bsdWorkflows.importBsdPapier),
+          annexe1: parseWorkflow(bsdWorkflows.annexe1),
         },
         bsdasri: {
           acheminementDirect: parseWorkflow(
