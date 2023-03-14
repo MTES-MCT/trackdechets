@@ -401,7 +401,9 @@ const Recipient = ({
         <DateRow value={form.processedAt} label="Traitement effectué le" />
         <DetailRow value={form.processedBy} label="Traitement effectué par" />
         {!!form.groupedIn?.length &&
-          form.groupedIn.map(({ form }) => <GroupedIn form={form} />)}
+          form.groupedIn.map(({ form }) => (
+            <GroupedIn form={form} key={form.id} />
+          ))}
       </div>
     </>
   );
@@ -550,7 +552,7 @@ const Appendix1 = ({
           </tbody>
         </table>
       ) : (
-        <span>Aucun bordereau annexé</span>
+        <div className="tw-py-6">Aucun bordereau annexé</div>
       )}
       <Modal
         onClose={() => setIsOpen(false)}
@@ -771,9 +773,7 @@ export default function BSDDetailContent({
             )}
             {/* Appendix 1 */}
             {isChapeau && (
-              <TabPanel
-                className={classNames(styles.detailTabPanel, "tw-flex-1")}
-              >
+              <TabPanel className={styles.detailTabPanel}>
                 <Appendix1 container={form} siret={siret} />
               </TabPanel>
             )}
@@ -950,16 +950,18 @@ export default function BSDDetailContent({
                 <span>Supprimer</span>
               </button>
 
-              <Link
-                to={generatePath(routes.dashboard.bsdds.edit, {
-                  siret,
-                  id: form.id,
-                })}
-                className="btn btn--outline-primary"
-              >
-                <IconPaperWrite size="24px" color="blueLight" />
-                <span>Modifier</span>
-              </Link>
+              {EmitterType.Appendix1Producer !== form.emitter?.type && (
+                <Link
+                  to={generatePath(routes.dashboard.bsdds.edit, {
+                    siret,
+                    id: form.id,
+                  })}
+                  className="btn btn--outline-primary"
+                >
+                  <IconPaperWrite size="24px" color="blueLight" />
+                  <span>Modifier</span>
+                </Link>
+              )}
             </>
           )}
 

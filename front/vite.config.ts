@@ -25,6 +25,7 @@ export default defineConfig({
   build: {
     outDir: "build",
     sourcemap: NODE_ENV !== "production",
+    minify: NODE_ENV !== "production" ? false : "esbuild",
   },
   plugins: [
     reactRefresh(),

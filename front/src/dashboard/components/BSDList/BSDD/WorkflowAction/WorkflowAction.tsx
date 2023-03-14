@@ -38,9 +38,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       return <MarkAsSealed {...props} />;
     case FormStatus.Sealed: {
       if (isAppendix1) {
-        return form.recipient?.company?.siret === siret ? (
-          <MarkAsReceived {...props} />
-        ) : null;
+        return null;
       }
 
       if (isAppendix1Producer) {

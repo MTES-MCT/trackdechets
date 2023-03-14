@@ -253,8 +253,8 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
         otherwise: yup
           .mixed()
           .oneOf(
-            ["PRODUCER"],
-            `Émetteur: Le type d'émetteur doit être "PRODUCER" lorsque l'émetteur est un particulier`
+            ["PRODUCER", "APPENDIX1_PRODUCER"],
+            `Émetteur: Le type d'émetteur doit être "PRODUCER" ou "APPENDIX1_PRODUCER" lorsque l'émetteur est un particulier`
           )
       })
       .when("emitterIsForeignShip", {

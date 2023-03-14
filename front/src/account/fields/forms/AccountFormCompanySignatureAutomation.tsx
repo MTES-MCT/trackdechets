@@ -111,7 +111,7 @@ export function AccountFormCompanySignatureAutomation({ company }: Props) {
       <p className="tw-pb-6">
         J'autorise Trackdéchets à apposer ma signature électronique au moment de
         la collecte de déchets avec une annexe 1 pour le ou le(s)
-        établissement(s) que je désigne ci-après comme collecteur autorisés,
+        établissement(s) que je désigne ci-après comme collecteurs autorisés,
         avec lesquels j'ai un contrat de collecte.
       </p>
       <p>
