@@ -1,9 +1,9 @@
-import { Appendix2FormResolvers } from "../../generated/graphql/types";
+import { InitialFormResolvers } from "../../generated/graphql/types";
 import prisma from "../../prisma";
 import { isFormContributor } from "../permissions";
 import quantityGrouped from "./forms/quantityGrouped";
 
-const appendix2FormResolvers: Appendix2FormResolvers = {
+const initialFormResolvers: InitialFormResolvers = {
   emitter: async (parent, _, { user }) => {
     const form = await prisma.form.findUnique({ where: { id: parent.id } });
     if (!(await isFormContributor(user, form))) {
@@ -14,4 +14,4 @@ const appendix2FormResolvers: Appendix2FormResolvers = {
   quantityGrouped
 };
 
-export default appendix2FormResolvers;
+export default initialFormResolvers;

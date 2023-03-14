@@ -1,4 +1,4 @@
-import { Form, Status, User } from "@prisma/client";
+import { EmitterType, Form, Status, User } from "@prisma/client";
 import { ForbiddenError } from "apollo-server-express";
 import prisma from "../prisma";
 import { FormCompanies } from "./types";
@@ -190,8 +190,8 @@ export async function isFormContributor(user: User, form: FormCompanies) {
 }
 
 async function isFormInitialEmitter(user: User, form: Form) {
-  const { findAppendix2FormsById } = getFormRepository(user);
-  const appendix2Forms = await findAppendix2FormsById(form.id);
+  const { findGroupedFormsById } = getFormRepository(user);
+  const appendix2Forms = await findGroupedFormsById(form.id);
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   return appendix2Forms.reduce(
     (acc, f) => acc || isFormEmitter(userCompaniesSiretOrVat, f),
@@ -223,7 +223,11 @@ export async function checkCanRead(user: User, form: Form) {
   if (isContributor) {
     return true;
   }
-  if (form.emitterType === "APPENDIX2") {
+  if (
+    [EmitterType.APPENDIX1, EmitterType.APPENDIX2].some(
+      type => form.emitterType === type
+    )
+  ) {
     const isInitialEmitter = await isFormInitialEmitter(user, form);
     if (isInitialEmitter) {
       return true;
@@ -249,6 +253,11 @@ export async function checkCanUpdate(user: User, form: Form) {
     await formToCompanies(form),
     "Vous n'êtes pas autorisé à modifier ce bordereau"
   );
+
+  // TODO: should we limit which field remains editable for appendix 1 ?
+  if (form.emitterType === EmitterType.APPENDIX1 && form.status === "SENT") {
+    return true;
+  }
 
   if (form.status === "SIGNED_BY_PRODUCER") {
     const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
@@ -325,21 +334,6 @@ export async function checkCanMarkAsSealed(user: User, form: Form) {
   );
 }
 
-export async function checkCanMarkAsSent(user: User, form: Form) {
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  const formCompanies = await formToCompanies(form);
-
-  const isAuthorized = [isFormRecipient, isFormEmitter].some(isFormRole =>
-    isFormRole(userCompaniesSiretOrVat, formCompanies)
-  );
-  if (!isAuthorized) {
-    throw new ForbiddenError(
-      "Vous n'êtes pas autorisé à marquer ce bordereau comme envoyé"
-    );
-  }
-  return true;
-}
-
 export async function checkCanSignFor(
   siret: string,
   user: User,
@@ -361,6 +355,12 @@ export async function checkCanSignFor(
 }
 
 export async function checkCanSignedByTransporter(user: User, form: Form) {
+  if (EmitterType.APPENDIX1 === form.emitterType) {
+    throw new ForbiddenError(
+      "Un bordereau de tournée ne peut pas être marqué comme signé par le transporteur. Son statut sera mis à jour à la signature des annexes 1 qu'il contient."
+    );
+  }
+
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const formCompanies = await formToCompanies(form);
   const isAuthorized = [
@@ -377,6 +377,12 @@ export async function checkCanSignedByTransporter(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsReceived(user: User, form: Form) {
+  if (EmitterType.APPENDIX1_PRODUCER === form.emitterType) {
+    throw new ForbiddenError(
+      "Un bordereau d'annexe 1 ne peut pas être marqué comme reçu. C'est la réception du bordereau de tournée qui mettra à jour le statut de ce bordereau."
+    );
+  }
+
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const formCompanies = await formToCompanies(form);
   const isAuthorized = form.forwardedInId
@@ -392,6 +398,12 @@ export async function checkCanMarkAsReceived(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsAccepted(user: User, form: Form) {
+  if (EmitterType.APPENDIX1_PRODUCER === form.emitterType) {
+    throw new ForbiddenError(
+      "Un bordereau d'annexe 1 ne peut pas avoir être marqué comme accepté. Il suit son bordereau de tournée."
+    );
+  }
+
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const formCompanies = await formToCompanies(form);
   const isAuthorized = form.forwardedInId
@@ -406,6 +418,12 @@ export async function checkCanMarkAsAccepted(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsProcessed(user: User, form: Form) {
+  if (EmitterType.APPENDIX1_PRODUCER === form.emitterType) {
+    throw new ForbiddenError(
+      "Un bordereau d'annexe 1 ne peut pas avoir être marqué comme traité. Il suit son bordereau de tournée."
+    );
+  }
+
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const formCompanies = await formToCompanies(form);
   const isAuthorized = form.forwardedInId
@@ -427,6 +445,12 @@ export async function checkCanMarkAsProcessed(user: User, form: Form) {
 }
 
 export async function checkCanMarkAsTempStored(user: User, form: Form) {
+  if (EmitterType.APPENDIX1_PRODUCER === form.emitterType) {
+    throw new ForbiddenError(
+      "Un bordereau d'annexe 1 ne peut pas avoir d'entreposage provisoire. Il suit son bordereau de tournée."
+    );
+  }
+
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   const formCompanies = await formToCompanies(form);
 
@@ -522,4 +546,18 @@ export async function checkCanRequestRevision(
   }
 
   return true;
+}
+
+export async function hasSignatureAutomation({
+  signedBy,
+  signedFor
+}: {
+  signedBy: string;
+  signedFor: string;
+}) {
+  const firstMatchingAutomation = await prisma.signatureAutomation.findFirst({
+    where: { from: { siret: signedFor }, to: { siret: signedBy } }
+  });
+
+  return firstMatchingAutomation != null;
 }

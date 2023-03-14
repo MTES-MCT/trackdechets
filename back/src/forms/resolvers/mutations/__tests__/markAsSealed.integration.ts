@@ -37,7 +37,7 @@ sendMailSpy.mockImplementation(() => Promise.resolve());
 import * as search from "../../../../companies/sirene/searchCompany";
 const searchCompanyMock = jest.spyOn(search, "default");
 
-const MARK_AS_SEALED = `
+export const MARK_AS_SEALED = `
   mutation MarkAsSealed($id: ID!) {
     markAsSealed(id: $id) {
       id
@@ -309,6 +309,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         status: "DRAFT",
+        wasteDetailsCode: "16 06 01*",
         emitterType: "APPENDIX1",
         emitterCompanySiret: emitterCompany.siret,
         recipientCompanySiret: recipientCompany.siret,
@@ -664,6 +665,7 @@ describe("Mutation.markAsSealed", () => {
       ownerId: user.id,
       opt: {
         status: "DRAFT",
+        emitterType: "APPENDIX2",
         emitterCompanySiret: company.siret,
         recipientCompanySiret: destination.siret,
         grouping: {
@@ -1102,7 +1104,7 @@ describe("Mutation.markAsSealed", () => {
     ]);
   });
 
-  it("should fail if bsd has an private producer and the wrong emitterType", async () => {
+  it("should fail if bsd has a private producer and the wrong emitterType", async () => {
     const recipientCompany = await destinationFactory();
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
@@ -1138,7 +1140,7 @@ describe("Mutation.markAsSealed", () => {
       expect.objectContaining({
         message: [
           "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.",
-          `Erreur(s): Émetteur: Le type d'émetteur doit être \"PRODUCER\" lorsque l'émetteur est un particulier`
+          `Erreur(s): Émetteur: Le type d'émetteur doit être \"PRODUCER\" ou \"APPENDIX1_PRODUCER\" lorsque l'émetteur est un particulier`
         ].join("\n")
       })
     ]);

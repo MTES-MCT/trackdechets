@@ -32,11 +32,14 @@ import {
   companyFactory,
   formFactory,
   formWithTempStorageFactory,
-  userFactory,
+  userWithAccessTokenFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { INCOMING_WASTES } from "./queries";
+import supertest from "supertest";
+import { app } from "../../../../server";
+import { REGISTRY_WHITE_LIST_IP } from "../../../permissions";
 
 describe("Incoming wastes registry", () => {
   let emitter: { user: User; company: Company };
@@ -49,6 +52,8 @@ describe("Incoming wastes registry", () => {
   let bsd3: Bsdasri;
   let bsd4: Bsvhu;
   let bsd5: Bsff;
+
+  const OLD_ENV = process.env;
 
   beforeAll(async () => {
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
@@ -86,6 +91,7 @@ describe("Incoming wastes registry", () => {
         quantityReceived: 1000,
         createdAt: new Date("2021-04-01"),
         sentAt: new Date("2021-04-01"),
+        takenOverAt: new Date("2021-04-01"),
         receivedAt: new Date("2021-04-01"),
         processedAt: new Date("2021-04-01"),
         processingOperationDone: "R 1"
@@ -161,6 +167,7 @@ describe("Incoming wastes registry", () => {
       },
       {
         acceptationWeight: 200,
+        acceptationDate: new Date("2021-08-01"),
         operationCode: "R2",
         operationSignatureDate: new Date("2021-08-01")
       }
@@ -174,6 +181,11 @@ describe("Incoming wastes registry", () => {
     ]);
     await refreshElasticSearch();
   });
+
+  afterEach(() => {
+    process.env = OLD_ENV;
+  });
+
   afterAll(resetDatabase);
 
   it("should return an error if the user is not authenticated", async () => {
@@ -210,21 +222,6 @@ describe("Incoming wastes registry", () => {
         message: `Vous n'êtes pas membre de l'entreprise portant le siret "${destination2.company.siret}".`
       })
     );
-  });
-
-  it("should allow user to request any siret if authenticated from a service account", async () => {
-    const user = await userFactory({ isRegistreNational: true });
-    const { query } = makeClient(user);
-    const { data } = await query<Pick<Query, "incomingWastes">>(
-      INCOMING_WASTES,
-      {
-        variables: {
-          sirets: [destination.company.siret],
-          first: 2
-        }
-      }
-    );
-    expect(data.incomingWastes.edges).toHaveLength(2);
   });
 
   it("should paginate forward with first and after", async () => {
@@ -364,5 +361,49 @@ describe("Incoming wastes registry", () => {
     expect(incomingWaste.initialEmitterCompanySiret).toBeNull();
     expect(incomingWaste.initialEmitterCompanyName).toBeNull();
     expect(incomingWaste.initialEmitterPostalCodes).toEqual(["07100"]);
+  });
+
+  it("should allow user to request any siret if authenticated from a service account", async () => {
+    const request = supertest(app);
+
+    const { accessToken } = await userWithAccessTokenFactory({
+      isRegistreNational: true
+    });
+
+    const allowedIP = REGISTRY_WHITE_LIST_IP[0];
+    const res = await request
+      .post("/")
+      .send({
+        query: `{ incomingWastes(sirets: ["${destination.company.siret}"]) { totalCount } }`
+      })
+      .set("Authorization", `Bearer ${accessToken}`)
+      .set("X-Forwarded-For", allowedIP);
+
+    expect(res.body).toEqual({ data: { incomingWastes: { totalCount: 5 } } });
+  });
+
+  it("should not accept service account connection from IP address not in the white list", async () => {
+    const request = supertest(app);
+
+    const { accessToken } = await userWithAccessTokenFactory({
+      isRegistreNational: true
+    });
+
+    const res = await request
+      .post("/")
+      .send({
+        query: `{ incomingWastes(sirets: ["${destination.company.siret}"]) { totalCount } }`
+      })
+      .set("Authorization", `Bearer ${accessToken}`)
+      .set("X-Forwarded-For", "localhost");
+
+    expect(res.body).toEqual({
+      data: null,
+      errors: [
+        expect.objectContaining({
+          message: `Vous n'êtes pas membre de l'entreprise portant le siret "${destination.company.siret}".`
+        })
+      ]
+    });
   });
 });

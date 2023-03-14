@@ -34,6 +34,7 @@ export default function Recipient() {
   // limite arbitraire du nombre d'intermédiaires qu'on peut ajouter
   const isAddIntermediaryButtonEnabled = values.intermediaries.length <= 20;
 
+  const isChapeau = values?.emitter?.type === "APPENDIX1";
   const isGrouping = values?.emitter?.type === "APPENDIX2";
 
   const intermediariesOptions: IntermediariesSelect[] = [
@@ -118,14 +119,16 @@ export default function Recipient() {
 
   return (
     <>
-      <div className="form__row">
-        <TdSwitch
-          checked={!!values.recipient?.isTempStorage}
-          onChange={handleTempStorageToggle}
-          label="Le BSD va passer par une étape d'entreposage provisoire ou
+      {!isChapeau && (
+        <div className="form__row">
+          <TdSwitch
+            checked={!!values.recipient?.isTempStorage}
+            onChange={handleTempStorageToggle}
+            label="Le BSD va passer par une étape d'entreposage provisoire ou
           reconditionnement"
-        />
-      </div>
+          />
+        </div>
+      )}
       {isTempStorage && (
         <div className="notification tw-mt-2">
           Vous avez sélectionné "Entreposage provisoire ou reconditionnement".
@@ -167,24 +170,26 @@ export default function Recipient() {
         />
         <RedErrorMessage name="recipient.processingOperation" />
       </div>
-      <div className="form__row">
-        <label>
-          Numéro de CAP
-          {isDangerousWaste ? (
-            <Tooltip
-              msg={`Le champ CAP est obligatoire pour les déchets dangereux.
+      {values?.emitter?.type !== "APPENDIX1" && (
+        <div className="form__row">
+          <label>
+            Numéro de CAP
+            {isDangerousWaste ? (
+              <Tooltip
+                msg={`Le champ CAP est obligatoire pour les déchets dangereux.
 Il est important car il qualifie les conditions de gestion et de traitement du déchet entre le producteur et l'entreprise de destination.`}
+              />
+            ) : (
+              " (Optionnel pour les déchets non dangereux)"
+            )}
+            <Field
+              type="text"
+              name="recipient.cap"
+              className={classNames("td-input", styles.recipientCap)}
             />
-          ) : (
-            " (Optionnel pour les déchets non dangereux)"
-          )}
-          <Field
-            type="text"
-            name="recipient.cap"
-            className={classNames("td-input", styles.recipientCap)}
-          />
-        </label>
-      </div>
+          </label>
+        </div>
+      )}
       <div className="form__row">
         <div className="td-input">
           <label> Ajout d'intermédiaires:</label>

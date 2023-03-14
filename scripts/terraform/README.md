@@ -59,3 +59,8 @@ $ scalingo -a trackdechets-test_app-api run bash
 ```
 
 You should be good to go !
+
+Things to check if it doesn't work:
+
+- missing envs ? Add them to the terraform config if needed
+- are the resources scaled up ? Sometimes, Scalingo assigns 0 containers to every app except web

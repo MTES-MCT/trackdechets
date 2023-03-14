@@ -6,6 +6,7 @@ import importBsdPapier from "./importBsdPapier";
 import multiModal from "./multiModal";
 import regroupement from "./regroupement";
 import regroupementTransporteurEtranger from "./regroupementTransporteurEtranger";
+import annexe1 from "./annexe1";
 
 export default {
   acheminementDirect,
@@ -15,5 +16,6 @@ export default {
   importBsdPapier,
   multiModal,
   regroupement,
-  regroupementTransporteurEtranger
+  regroupementTransporteurEtranger,
+  annexe1
 };

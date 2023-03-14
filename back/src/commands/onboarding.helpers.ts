@@ -1,13 +1,23 @@
 import prisma from "../prisma";
 import { sendMail } from "../mailer/mailing";
-import { Company, CompanyAssociation, User } from "@prisma/client";
+import {
+  Company,
+  CompanyAssociation,
+  MembershipRequestStatus,
+  User
+} from "@prisma/client";
 import * as COMPANY_CONSTANTS from "../common/constants/COMPANY_CONSTANTS";
 import {
   onboardingFirstStep,
   onboardingProducerSecondStep,
-  onboardingProfessionalSecondStep
+  onboardingProfessionalSecondStep,
+  membershipRequestDetailsEmail,
+  pendingMembershipRequestDetailsEmail,
+  pendingMembershipRequestAdminDetailsEmail
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
+import { MessageVersion } from "../mailer/types";
+
 /**
  * Compute a past date relative to baseDate
  *
@@ -51,8 +61,8 @@ export const getRecentlyAssociatedUsers = async ({
 /**
  * Send first step onboarding email to active users who suscribed yesterday
  */
-export const sendFirstOnboardingEmail = async () => {
-  const recipients = await getRecentlyAssociatedUsers({ daysAgo: 1 });
+export const sendFirstOnboardingEmail = async (daysAgo = 1) => {
+  const recipients = await getRecentlyAssociatedUsers({ daysAgo });
   await Promise.all(
     recipients.map(recipient => {
       const payload = renderMail(onboardingFirstStep, {
@@ -96,11 +106,11 @@ export const selectSecondOnboardingEmail = (recipient: recipientType) => {
  * email function (and template id) depends upon user profile
  */
 
-export const sendSecondOnboardingEmail = async () => {
+export const sendSecondOnboardingEmail = async (daysAgo = 3) => {
   // we explictly retrieve user companies to tell apart producers from waste
   // professionals to selectthe right email template
   const recipients = await getRecentlyAssociatedUsers({
-    daysAgo: 3,
+    daysAgo,
     retrieveCompanies: true
   });
   await Promise.all(
@@ -112,5 +122,173 @@ export const sendSecondOnboardingEmail = async () => {
       return sendMail(payload);
     })
   );
+  await prisma.$disconnect();
+};
+
+// Retrieve users:
+// - who are active
+// - whose account was created x daysAgo
+// - who never issued a membership request
+// - who do not belong to a company
+export const getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest =
+  async (daysAgo: number) => {
+    const now = new Date();
+
+    const associatedDateGt = xDaysAgo(now, daysAgo);
+    const associatedDateLt = xDaysAgo(now, daysAgo - 1);
+
+    const users = await prisma.user.findMany({
+      where: {
+        createdAt: { gte: associatedDateGt, lt: associatedDateLt },
+        isActive: true,
+        companyAssociations: { none: {} },
+        MembershipRequest: { none: {} }
+      }
+    });
+
+    return users;
+  };
+
+/**
+ * Send a mail to users who registered recently and who haven't
+ * issued a single MembershipRequest yet
+ */
+export const sendMembershipRequestDetailsEmail = async (daysAgo = 7) => {
+  const recipients =
+    await getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest(daysAgo);
+
+  const messageVersions: MessageVersion[] = recipients.map(recipient => ({
+    to: [{ email: recipient.email, name: recipient.name }]
+  }));
+
+  const payload = renderMail(membershipRequestDetailsEmail, {
+    messageVersions
+  });
+
+  await sendMail(payload);
+
+  await prisma.$disconnect();
+};
+
+export const getActiveUsersWithPendingMembershipRequests = async (
+  daysAgo: number
+) => {
+  const now = new Date();
+
+  const requestDateGt = xDaysAgo(now, daysAgo);
+  const requestDateLt = xDaysAgo(now, daysAgo - 1);
+
+  const pendingMembershipRequests = await prisma.membershipRequest.findMany({
+    where: {
+      createdAt: { gte: requestDateGt, lt: requestDateLt },
+      status: MembershipRequestStatus.PENDING
+    }
+  });
+
+  const uniqueUserIds = [
+    ...new Set(pendingMembershipRequests.map(p => p.userId))
+  ];
+
+  const users = await prisma.user.findMany({
+    where: {
+      isActive: true,
+      id: { in: uniqueUserIds }
+    }
+  });
+
+  return users;
+};
+
+/**
+ * Send a mail to all users who issued a membership request and who
+ * got no answer
+ */
+export const sendPendingMembershipRequestDetailsEmail = async (
+  daysAgo = 14
+) => {
+  const recipients = await getActiveUsersWithPendingMembershipRequests(daysAgo);
+
+  const messageVersions: MessageVersion[] = recipients.map(recipient => ({
+    to: [{ email: recipient.email, name: recipient.name }]
+  }));
+
+  const payload = renderMail(pendingMembershipRequestDetailsEmail, {
+    messageVersions
+  });
+
+  await sendMail(payload);
+
+  await prisma.$disconnect();
+};
+
+export const getPendingMembershipRequestsAndAssociatedAdmins = async (
+  daysAgo: number
+) => {
+  const now = new Date();
+
+  const requestDateGt = xDaysAgo(now, daysAgo);
+  const requestDateLt = xDaysAgo(now, daysAgo - 1);
+
+  return prisma.membershipRequest.findMany({
+    where: {
+      createdAt: { gte: requestDateGt, lt: requestDateLt },
+      status: MembershipRequestStatus.PENDING,
+      user: { isActive: true }
+    },
+    include: {
+      user: true,
+      company: {
+        include: {
+          companyAssociations: {
+            where: { role: "ADMIN", user: { isActive: true } },
+            include: { user: true }
+          }
+        }
+      }
+    }
+  });
+};
+
+/**
+ * For each unanswered membership request issued X days ago, send an
+ * email to all the admins of request's targeted company
+ */
+export const sendPendingMembershipRequestToAdminDetailsEmail = async (
+  daysAgo = 14
+) => {
+  const requests = await getPendingMembershipRequestsAndAssociatedAdmins(
+    daysAgo
+  );
+
+  const messageVersions: MessageVersion[] = requests.map(request => {
+    const variables = {
+      requestId: request.id,
+      email: request.user.email,
+      orgName: request.company.name,
+      orgId: request.company.orgId
+    };
+
+    const template = renderMail(pendingMembershipRequestAdminDetailsEmail, {
+      variables,
+      messageVersions: []
+    });
+
+    return {
+      to: request.company.companyAssociations.map(companyAssociation => ({
+        email: companyAssociation.user.email,
+        name: companyAssociation.user.name
+      })),
+      params: {
+        body: template.body
+      }
+    };
+  });
+
+  const payload = renderMail(pendingMembershipRequestAdminDetailsEmail, {
+    messageVersions
+  });
+
+  await sendMail(payload);
+
   await prisma.$disconnect();
 };

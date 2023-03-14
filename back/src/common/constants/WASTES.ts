@@ -5581,6 +5581,7 @@ export const BSDD_WASTES_TREE = toWasteTree(ALL_WASTES_TREE, {
 export const ALL_WASTES = flatten(ALL_WASTES_TREE);
 
 export const BSDD_WASTES = flatten(BSDD_WASTES_TREE);
+export const BSDD_WASTE_CODES = BSDD_WASTES.map(waste => waste.code);
 
 export const BSDA_WASTES = ALL_WASTES.filter(w =>
   BSDA_WASTE_CODES.includes(w.code)
@@ -5589,7 +5590,19 @@ export const BSDA_WASTES = ALL_WASTES.filter(w =>
 export const BSFF_WASTES = ALL_WASTES.filter(w =>
   BSFF_WASTE_CODES.includes(w.code)
 );
-export const BSDD_WASTE_CODES = BSDD_WASTES.map(waste => waste.code);
+
+export const BSDD_APPENDIX1_WASTE_CODES = [
+  ...BSDD_WASTES.filter(waste => {
+    const prefixes = ["13 02", "13 05", "16 02", "16 07", "20 01"];
+    return prefixes.some(prefix => waste.code.startsWith(prefix));
+  }).map(waste => waste.code),
+  "15 01 10*",
+  "16 06 01*",
+  "19 08 10*"
+];
+export const BSDD_APPENDIX1_WASTE_TREE = toWasteTree(ALL_WASTES_TREE, {
+  include: BSDD_APPENDIX1_WASTE_CODES
+});
 
 function flatten(wastes: WasteNode[]): WasteNode[] {
   return wastes
@@ -5606,13 +5619,17 @@ function flatten(wastes: WasteNode[]): WasteNode[] {
 
 export function toWasteTree(
   wasteNodes: WasteNode[],
-  opts?: { exclude?: string[] }
+  opts?: { exclude?: string[] } | { include?: string[] }
 ): WasteNode[] {
   return wasteNodes
     .filter(({ code }) => {
-      if (opts?.exclude?.length) {
+      if (opts && "exclude" in opts && opts.exclude?.length) {
         return !opts.exclude.includes(code);
       }
+      if (opts && "include" in opts && opts.include?.length) {
+        return opts.include.some(includedCode => includedCode.startsWith(code));
+      }
+
       return true;
     })
     .map(({ code, description, children }) => {

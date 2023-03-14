@@ -21,8 +21,7 @@ const onApplyFilters = values => {};
 Primary.args = {
   filters: [
     {
-      value: "types",
-      order: "type",
+      name: "types",
       label: "type de bordereau",
       type: FilterType.select,
       isActive: true,
@@ -39,8 +38,7 @@ Primary.args = {
       ],
     },
     {
-      value: "waste",
-      order: "wasteCode",
+      name: "waste",
       label: "Code déchet",
       type: FilterType.input,
       isActive: true,

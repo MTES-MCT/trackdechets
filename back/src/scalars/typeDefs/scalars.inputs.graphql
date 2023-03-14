@@ -1,9 +1,14 @@
 "Filtre de date"
 input DateFilter {
+  "La date de l'enregistrement est supérieure ou égale à la date du filtre"
   _gte: DateTime
+  "La date de l'enregistrement est strictement supérieure à la date du filtre"
   _gt: DateTime
+  "La date de l'enregistrement est inférieure ou égale à la date du filtre"
   _lte: DateTime
+  "La date de l'enregistrement est strictement inférieure à la date du filtre"
   _lt: DateTime
+  "La date de l'enregistrement est strictement égale à la date du filtre"
   _eq: DateTime
 }
 
@@ -18,21 +23,34 @@ input NumericFilter {
 
 "Filtre pour les identifiants"
 input IdFilter {
+  "L'identifiant de l'enregistrement est exactement égale à la valeur du filtre"
   _eq: ID
+  "L'identifiant de l'enregistrement fait partie de la liste du filtre"
   _in: [ID!]
 }
 
-"Filtre pour les champs textuels"
+"Filtre pour les chaîne de caractères"
 input StringFilter {
+  "La chaîne de caractère de l'enregistrement doit correspondre exactement à la valeur du filtre"
   _eq: String
+  "La chaîne de caractère de l'enregistrement existe dans la liste du filtre"
   _in: [String!]
+  "La chaîne de caractère de l'enregistrement contient la valeur du filtre"
   _contains: String
 }
 
 "Filtre pour les listes de chaînes de caractères"
 input StringNullableListFilter {
-  _in: [String!]
+  "Au moins une valeur existe dans la liste"
+  _in: [String!] @deprecated(reason: "use _hasSome instead")
+  "La liste correspond exactement à la liste fournie. N'est pas implémenté dans la query `bsds`"
   _eq: [String!]
+  "Au moins une valeur existe dans la liste"
+  _hasSome: [String!]
+  "La valeur est présente dans la liste"
   _has: String
+  "Toutes les valeurs existes dans la liste"
   _hasEvery: [String!]
+  "La chaîne de caractère est contenu dans au moins un élément de la liste. N'est impléménté que sur la query `bsds`"
+  _itemContains: String
 }

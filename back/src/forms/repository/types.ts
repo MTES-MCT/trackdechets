@@ -3,12 +3,13 @@ import { CountFormsFn } from "./form/count";
 import { CreateFormFn } from "./form/create";
 import { DeleteFormFn } from "./form/delete";
 import { DeleteFormStaleSegmentsFn } from "./form/deleteStaleSegments";
-import { FindAppendix2FormsByIdFn } from "./form/findAppendix2FormsById";
+import { FindGroupedFormsByIdFn } from "./form/findGroupedFormsById";
 import { FindFirstFormFn } from "./form/findFirst";
 import { FindForwardedInByIdFn } from "./form/findForwardedInById";
 import { FindFullFormByIdFn } from "./form/findFullFormById";
 import { FindUniqueFormFn } from "./form/findUnique";
 import { RemoveAppendix2Fn } from "./form/removeAppendix2";
+import { SetAppendix1Fn } from "./form/setAppendix1";
 import { SetAppendix2Fn } from "./form/setAppendix2";
 import { UpdateFormFn } from "./form/update";
 import { UpdateAppendix2Forms } from "./form/updateAppendix2Forms";
@@ -19,6 +20,7 @@ import { CountRevisionRequestsFn } from "./formRevisionRequest/countRevisionRequ
 import { CreateRevisionRequestFn } from "./formRevisionRequest/createRevisionRequest";
 import { GetRevisionRequestByIdFn } from "./formRevisionRequest/getRevisionRequestById";
 import { RefuseRevisionRequestFn } from "./formRevisionRequest/refuseRevisionRequestApproval";
+import { UpdateAppendix1Forms } from "./form/updateAppendix1Forms";
 
 const formWithLinkedObjects = Prisma.validator<Prisma.FormArgs>()({
   include: {
@@ -34,7 +36,7 @@ export type FormActions = {
   findUnique: FindUniqueFormFn;
   findFirst: FindFirstFormFn;
   findFullFormById: FindFullFormByIdFn;
-  findAppendix2FormsById: FindAppendix2FormsByIdFn;
+  findGroupedFormsById: FindGroupedFormsByIdFn;
   findForwardedInById: FindForwardedInByIdFn;
   create: CreateFormFn;
   update: UpdateFormFn;
@@ -42,7 +44,9 @@ export type FormActions = {
   delete: DeleteFormFn;
   count: CountFormsFn;
   removeAppendix2: RemoveAppendix2Fn;
+  setAppendix1: SetAppendix1Fn;
   setAppendix2: SetAppendix2Fn;
+  updateAppendix1Forms: UpdateAppendix1Forms;
   updateAppendix2Forms: UpdateAppendix2Forms;
   deleteStaleSegments: DeleteFormStaleSegmentsFn;
 };

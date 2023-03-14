@@ -27,7 +27,7 @@ import {
   TransportSegment
 } from "../../generated/graphql/types";
 import {
-  expandAppendix2FormFromDb,
+  expandInitialFormFromDb,
   expandFormFromDb,
   expandTransportSegmentFromDb
 } from "../converter";
@@ -280,7 +280,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
     ),
     grouping: await Promise.all(
       grouping.map(async ({ form, quantity }) => ({
-        form: await expandAppendix2FormFromDb(form),
+        form: await expandInitialFormFromDb(form),
         quantity
       }))
     ),
@@ -337,8 +337,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 checked={form.emitter?.type === EmitterType.APPENDIX1}
                 readOnly
               />{" "}
-              la collecte de petites quantité de déchets relevant de la même
-              rubrique (annexe 1 doit être conservée){" "}
+              un bordereau de tournée dédiée{" "}
               <input
                 type="checkbox"
                 checked={form.emitter?.type === EmitterType.APPENDIX2}
@@ -941,27 +940,47 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
           <div className="BoxRow">
             <div className="BoxCol">
               <p>
-                <strong>ANNEXE 2</strong>
+                <strong>BORDEREAUX ANNEXÉS</strong>
               </p>
             </div>
           </div>
 
-          <div className="BoxRow">
-            <div className="BoxCol">
-              <p>
-                <strong>
-                  Bordereaux associés, constituant l’historique de la
-                  traçabilité
-                </strong>
-              </p>
-              <p>
-                (Sur Trackdéchets, l’annexe 2 sera intégrée à un bordereau de
-                regroupement, lors d’une réexpédition après transformation ou
-                traitement aboutissant à des déchets dont la provenance reste
-                identifiable / le nombre de ligne s’ajustera automatiquement)
-              </p>
+          {form.emitter?.type === EmitterType.APPENDIX1 ? (
+            <div className="BoxRow">
+              <div className="BoxCol">
+                <p>
+                  <strong>
+                    Bordereaux associés, constituant la tournée de collecte
+                  </strong>
+                </p>
+                <p>
+                  La tournée de collecte est constituée de toutes les annexes 1
+                  prévues dans la tournée, tant que le bordereau est vivant. Dès
+                  que la prise en charge est effective à l'installation de
+                  destination, la liste des annexes 1 est constituée des
+                  collectes effectives. (celles prévues et non réalisées sont
+                  supprimées)
+                </p>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="BoxRow">
+              <div className="BoxCol">
+                <p>
+                  <strong>
+                    Bordereaux associés, constituant l’historique de la
+                    traçabilité
+                  </strong>
+                </p>
+                <p>
+                  (Sur Trackdéchets, l’annexe 2 sera intégrée à un bordereau de
+                  regroupement, lors d’une réexpédition après transformation ou
+                  traitement aboutissant à des déchets dont la provenance reste
+                  identifiable / le nombre de ligne s’ajustera automatiquement)
+                </p>
+              </div>
+            </div>
+          )}
           <div className="BoxRow">
             <div className="BoxCol">
               <table>
@@ -973,7 +992,9 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                     <th>Dénomination usuelle</th>
                     <th>Pesée (tonne)</th>
                     <th>Réelle / estimée</th>
-                    <th>Fraction regroupée (tonne)</th>
+                    {form?.emitter?.type !== EmitterType.APPENDIX1_PRODUCER && (
+                      <th>Fraction regroupée (tonne)</th>
+                    )}
                     <th>Date de prise en charge initiale</th>
                     <th>Code postal lieu de collecte</th>
                   </tr>
@@ -1000,8 +1021,13 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                           ? "R"
                           : form?.wasteDetails?.quantityType?.charAt(0)}
                       </td>
-                      <td>{quantity}</td>
-                      <td>{formatDate(form?.signedAt)}</td>
+                      {form?.emitter?.type !==
+                        EmitterType.APPENDIX1_PRODUCER && <td>{quantity}</td>}
+                      <td>
+                        {form?.emitter?.type === EmitterType.APPENDIX1_PRODUCER
+                          ? formatDate(form?.takenOverAt)
+                          : formatDate(form?.signedAt)}
+                      </td>
                       <td>{form?.emitterPostalCode}</td>
                     </tr>
                   ))}

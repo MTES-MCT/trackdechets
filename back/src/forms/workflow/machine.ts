@@ -18,13 +18,11 @@ const machine = Machine<any, Event>(
       [Status.CANCELED]: { type: "final" },
       [Status.DRAFT]: {
         on: {
-          [EventType.MarkAsSealed]: [{ target: Status.SEALED }],
-          [EventType.MarkAsSent]: [{ target: Status.SENT }]
+          [EventType.MarkAsSealed]: [{ target: Status.SEALED }]
         }
       },
       [Status.SEALED]: {
         on: {
-          [EventType.MarkAsSent]: [{ target: Status.SENT }],
           [EventType.SignedByTransporter]: [
             {
               target: Status.SENT
@@ -249,7 +247,8 @@ const machine = Machine<any, Event>(
               update.processingOperationDone as string
             ) &&
             !isForeignNextDestination(update) &&
-            !(update.noTraceability === true)
+            !(update.noTraceability === true) &&
+            update.emitterType !== "APPENDIX1_PRODUCER"
           );
         }
         return (

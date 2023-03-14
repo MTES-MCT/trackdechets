@@ -1,4 +1,5 @@
 import {
+  EmitterType,
   Form,
   Prisma,
   RevisionRequestStatus,
@@ -9,7 +10,8 @@ import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
 import {
   PROCESSING_AND_REUSE_OPERATIONS_CODES,
-  BSDD_WASTE_CODES
+  BSDD_WASTE_CODES,
+  BSDD_APPENDIX1_WASTE_CODES
 } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -25,6 +27,32 @@ import { getFormRepository } from "../../repository";
 import { INVALID_PROCESSING_OPERATION, INVALID_WASTE_CODE } from "../../errors";
 import { packagingInfoFn } from "../../validation";
 import { isSiret } from "../../../common/constants/companySearchHelpers";
+
+// If you modify this, also modify it in the frontend
+export const CANCELLABLE_BSDD_STATUSES: Status[] = [
+  // Status.DRAFT,
+  // Status.SEALED,
+  Status.SIGNED_BY_PRODUCER,
+  Status.SENT,
+  // Status.RECEIVED,
+  // Status.ACCEPTED,
+  // Status.PROCESSED,
+  // Status.FOLLOWED_WITH_PNTTD,
+  // Status.AWAITING_GROUP,
+  // Status.GROUPED,
+  // Status.NO_TRACEABILITY,
+  // Status.REFUSED,
+  Status.TEMP_STORED,
+  Status.TEMP_STORER_ACCEPTED,
+  Status.RESEALED,
+  Status.SIGNED_BY_TEMP_STORER,
+  Status.RESENT
+  // Status.CANCELED,
+];
+
+export const NON_CANCELLABLE_BSDD_STATUSES: Status[] = Object.values(
+  Status
+).filter(status => !CANCELLABLE_BSDD_STATUSES.includes(status));
 
 export type RevisionRequestContent = Pick<
   Prisma.BsddRevisionRequestCreateInput,
@@ -146,6 +174,11 @@ async function checkIfUserCanRequestRevisionOnBsdd(
       "Impossible de créer une révision sur ce bordereau car l'émetteur est un particulier ou un navire étranger."
     );
   }
+  if (bsdd.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+    throw new ForbiddenError(
+      "Impossible de créer une révision sur un bordereau d'annexe 1."
+    );
+  }
   if (Status.DRAFT === bsdd.status || Status.SEALED === bsdd.status) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau. Vous pouvez le modifier directement, aucune signature bloquante n'a encore été apposée."
@@ -183,7 +216,9 @@ async function getFlatContent(
 ): Promise<RevisionRequestContent> {
   const flatContent = flattenBsddRevisionRequestInput(content);
 
-  if (Object.keys(flatContent).length === 0) {
+  const { isCanceled, ...revisionFields } = flatContent;
+
+  if (!isCanceled && Object.keys(revisionFields).length === 0) {
     throw new UserInputError(
       "Impossible de créer une révision sans modifications."
     );
@@ -195,13 +230,33 @@ async function getFlatContent(
     );
   }
 
-  if (flatContent.isCanceled && Object.values(flatContent).length > 1) {
+  if (flatContent.isCanceled && Object.values(revisionFields).length > 0) {
     throw new UserInputError(
       "Impossible d'annuler et de modifier un bordereau."
     );
   }
 
+  // One cannot request a CANCELATION if the BSDD has advanced too far in the workflow
+  if (
+    flatContent.isCanceled &&
+    NON_CANCELLABLE_BSDD_STATUSES.includes(bsdd.status)
+  ) {
+    throw new ForbiddenError(
+      "Impossible d'annuler un bordereau qui a été réceptionné sur l'installation de destination."
+    );
+  }
+
   await bsddRevisionRequestSchema.validate(flatContent);
+
+  if (
+    bsdd.emitterType === EmitterType.APPENDIX1 &&
+    flatContent.wasteDetailsCode &&
+    !BSDD_APPENDIX1_WASTE_CODES.includes(flatContent.wasteDetailsCode)
+  ) {
+    throw new ForbiddenError(
+      "Impossible d'utiliser ce code déchet sur un bordereau de tournée d'annexe 1."
+    );
+  }
 
   return flatContent;
 }

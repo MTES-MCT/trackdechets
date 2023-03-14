@@ -10,6 +10,7 @@ import { TemporaryStorageCannotReceive } from "../../errors";
 
 import { getFormRepository } from "../../repository";
 import {
+  EmitterType,
   Prisma,
   QuantityType,
   Status,
@@ -75,9 +76,18 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
         currentTransporterSiret: ""
       };
 
+  const groupedForms = await getFormRepository(user).findGroupedFormsById(
+    form.id
+  );
+
   const receivedForm = await runInTransaction(async transaction => {
-    const formRepository = getFormRepository(user, transaction);
-    const receivedForm = await formRepository.update(
+    const {
+      update,
+      deleteStaleSegments,
+      removeAppendix2,
+      updateAppendix1Forms
+    } = getFormRepository(user, transaction);
+    const receivedForm = await update(
       { id: form.id },
       {
         status: transitionForm(form, {
@@ -90,13 +100,22 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
 
     // check for stale transport segments and delete them
     // quick fix https://trackdechets.zammad.com/#ticket/zoom/1696
-    await formRepository.deleteStaleSegments({ id: form.id });
+    await deleteStaleSegments({ id: form.id });
 
     if (
+      form.emitterType === EmitterType.APPENDIX2 &&
       receivedInfo.wasteAcceptationStatus === WasteAcceptationStatus.REFUSED
     ) {
-      await formRepository.removeAppendix2(id);
+      await removeAppendix2(id);
     }
+
+    if (form.emitterType === EmitterType.APPENDIX1) {
+      await updateAppendix1Forms({
+        container: receivedForm,
+        grouped: groupedForms
+      });
+    }
+
     return receivedForm;
   });
 

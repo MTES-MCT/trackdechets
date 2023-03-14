@@ -4,7 +4,7 @@ import { registerUpdater, Updater } from "./helper/helper";
 @registerUpdater(
   "Denormalize dasris",
   "Denormalize synthesis dasris by caching child bsd emitter sirets",
-  true
+  false
 )
 export class UpdateBsdasrisSyntesizedEmitters implements Updater {
   async run() {

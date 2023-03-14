@@ -198,6 +198,38 @@ export async function getCompanyAdminUsers(orgId: string) {
   return users.filter(c => c.role === "ADMIN");
 }
 
+/**
+ * Get all the admins from companies, by companyIds
+ * @param companyIds
+ * @returns
+ */
+export async function getActiveAdminsByCompanyIds(companyIds: string[]) {
+  const users = await prisma.companyAssociation
+    .findMany({
+      where: { companyId: { in: companyIds }, role: "ADMIN" },
+      include: { user: true }
+    })
+    .then(associations =>
+      associations.map(a => {
+        return {
+          ...a.user,
+          companyId: a.companyId
+        };
+      })
+    );
+
+  const res = {};
+
+  users
+    .filter(user => user.isActive)
+    .forEach(user => {
+      if (res[user.companyId]) res[user.companyId].push(user);
+      else res[user.companyId] = [user];
+    });
+
+  return res;
+}
+
 export async function getTraderReceiptOrNotFound({
   id
 }: Prisma.TraderReceiptWhereUniqueInput) {
@@ -252,7 +284,7 @@ export async function getWorkerCertificationOrNotFound({
 
 export function convertUrls<T extends Partial<Company>>(
   company: T
-): T & { ecoOrganismeAgreements: URL[] } {
+): T & { ecoOrganismeAgreements: URL[]; signatureAutomations: [] } {
   if (!company) {
     return null;
   }
@@ -263,6 +295,7 @@ export function convertUrls<T extends Partial<Company>>(
       ecoOrganismeAgreements: company.ecoOrganismeAgreements.map(
         a => new URL(a)
       )
-    })
+    }),
+    signatureAutomations: []
   };
 }

@@ -24,12 +24,12 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
 
   // we can't select a filter twice
   const filterSelectedIds = filterSelectedList?.map(item => {
-    return item.value;
+    return item.name;
   });
   const derivedFilters =
     filterSelectedIds.length > 0
       ? filters.map(filter => {
-          if (filterSelectedIds.includes(filter.value)) {
+          if (filterSelectedIds.includes(filter.name)) {
             return { ...filter, isActive: false };
           }
           return filter;
@@ -39,7 +39,7 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
   const onSelectFilterType = useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
       const { value } = event.target;
-      const filter = derivedFilters.find(filter => filter.value === value);
+      const filter = derivedFilters.find(filter => filter.name === value);
 
       if (filter) {
         setFilterSelectedList(filterList => [...filterList, filter]);
@@ -68,7 +68,7 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
       } else {
         // remove from filter selected list
         setFilterSelectedList(filterList =>
-          filterList.filter(f => f.value !== value)
+          filterList.filter(f => f.name !== value)
         );
 
         // remove from filter values
@@ -93,21 +93,21 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
     }
   };
 
-  const onFilterValueChange = (e, filterType) => {
+  const onFilterValueChange = (e, filterName) => {
     const { value } = e.target;
     const newFilterValues = { ...filterValues };
-    if (!newFilterValues[filterType] || newFilterValues[filterType] !== value) {
-      newFilterValues[filterType] = value;
+    if (!newFilterValues[filterName] || newFilterValues[filterName] !== value) {
+      newFilterValues[filterName] = value;
       setFilterValues(newFilterValues);
       setIsApplyDisabled(false);
     } else {
       setIsApplyDisabled(true);
     }
   };
-  const onFilterSelectMultipleValueChange = (selectList, filterType) => {
+  const onFilterSelectMultipleValueChange = (selectList, filterName) => {
     setSelectMultipleValueArray(selectList);
     const newFilterValues = { ...filterValues };
-    newFilterValues[filterType] = selectList.map(selected => selected.value);
+    newFilterValues[filterName] = selectList.map(selected => selected.value);
     setFilterValues(newFilterValues);
     if (selectList.length) {
       setIsApplyDisabled(false);
@@ -127,10 +127,10 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
         <Input
           ref={newInputElementRef}
           type={inputType.text}
-          id={`${filter.value}_filter`}
+          id={`${filter.name}_filter`}
           label={filter.label}
-          name={filter.value}
-          onChange={e => onFilterValueChange(e, filter.value)}
+          name={filter.name}
+          onChange={e => onFilterValueChange(e, filter.name)}
         />
       );
     }
@@ -139,11 +139,11 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
       return (
         <Select
           ref={newSelectElementRef}
-          id={`${filter.value}_filter`}
+          id={`${filter.name}_filter`}
           onChange={e =>
             !filter.isMultiple
-              ? onFilterValueChange(e, filter.value)
-              : onFilterSelectMultipleValueChange(e, filter.value)
+              ? onFilterValueChange(e, filter.name)
+              : onFilterSelectMultipleValueChange(e, filter.name)
           }
           defaultValue=""
           label={filter.label}
@@ -186,12 +186,12 @@ const Filters = ({ filters, onApplyFilters }: FiltersProps) => {
     <div className="filters">
       {filterSelectedList.map((filter, i) => {
         return (
-          <React.Fragment key={`${filter.value}_filter`}>
+          <React.Fragment key={`${filter.name}_filter`}>
             <FilterLine
               filters={derivedFilters}
               onAddFilterType={onAddFilterType}
               onRemoveFilterType={onRemoveFilterType}
-              value={filter.value}
+              value={filter.name}
               disabledSelect={true}
               isMaxLine={hasReachMaxFilter}
               isCurrentLine={i === filterSelectedList.length - 1}

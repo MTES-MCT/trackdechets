@@ -11,6 +11,7 @@ import "@reach/menu-button/styles.css";
 import classNames from "classnames";
 import routes from "common/routes";
 import {
+  IconAddCircle,
   IconChevronDown,
   IconChevronUp,
   IconDuplicateFile,
@@ -19,7 +20,7 @@ import {
   IconTrash,
   IconView,
 } from "common/components/Icons";
-import { Form, FormStatus } from "generated/graphql/types";
+import { EmitterType, Form, FormStatus } from "generated/graphql/types";
 import { DeleteModal } from "./DeleteModal";
 import { useDuplicate } from "./useDuplicate";
 import { useDownloadPdf } from "./useDownloadPdf";
@@ -43,6 +44,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
   let canDeleteAndUpdate = [FormStatus.Draft, FormStatus.Sealed].includes(
     form.status
   );
+
   if (form.status === FormStatus.SignedByProducer) {
     // if the bsd is only signed by the emitter, they can still update/delete it
     // so if it's signed by the emitter, they can do it but not the eco organisme
@@ -58,6 +60,12 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     FormStatus.Sealed,
     FormStatus.Refused,
   ].includes(form.status);
+
+  const isAppendix1 = form.emitter?.type === EmitterType.Appendix1;
+  const isAppendix1Producer =
+    form.emitter?.type === EmitterType.Appendix1Producer;
+  const showAppendix1Button =
+    isAppendix1 && [FormStatus.Sealed, FormStatus.Sent].includes(form.status);
 
   return (
     <>
@@ -99,6 +107,25 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                 Aperçu
               </MenuLink>
 
+              <TableRoadControlButton siret={siret} form={form} />
+
+              {showAppendix1Button && (
+                <MenuLink
+                  as={Link}
+                  to={{
+                    pathname: generatePath(routes.dashboard.bsdds.view, {
+                      siret,
+                      id: form.id,
+                    }),
+                    search: "?selectedTab=0",
+                    state: { background: location },
+                  }}
+                >
+                  <IconAddCircle size="24px" color="blueLight" />
+                  Annexe 1
+                </MenuLink>
+              )}
+
               {form.status !== FormStatus.Draft && (
                 <MenuItem onSelect={() => downloadPdf()}>
                   <IconPdf size="24px" color="blueLight" />
@@ -106,12 +133,14 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                 </MenuItem>
               )}
 
-              <MenuItem onSelect={() => duplicateForm()}>
-                <IconDuplicateFile size="24px" color="blueLight" />
-                Dupliquer
-              </MenuItem>
+              {!isAppendix1Producer && (
+                <MenuItem onSelect={() => duplicateForm()}>
+                  <IconDuplicateFile size="24px" color="blueLight" />
+                  Dupliquer
+                </MenuItem>
+              )}
 
-              {canDeleteAndUpdate && (
+              {canDeleteAndUpdate && !isAppendix1Producer && (
                 <>
                   <MenuLink
                     as={Link}

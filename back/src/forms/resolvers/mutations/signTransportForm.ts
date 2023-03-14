@@ -1,23 +1,35 @@
-import { Form, Prisma, Status } from "@prisma/client";
+import { EmitterType, Form, Prisma, Status } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import {
   MutationResolvers,
   Form as GraphQLForm,
-  MutationSignTransportFormArgs
+  MutationSignTransportFormArgs,
+  PackagingInfo
 } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getFormOrFormNotFound, getFullForm } from "../../database";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
-import { checkCanSignFor } from "../../permissions";
+import { checkCanSignFor, hasSignatureAutomation } from "../../permissions";
 import { expandFormFromDb } from "../../converter";
 import { getFormRepository } from "../../repository";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
+import { runInTransaction } from "../../../common/repository/helper";
+import { sumPackagingInfos } from "../../repository/helper";
 
 /**
  * Common function for signing
  */
-const signedByTransporterFn = async (user, args, existingForm) => {
+const signedByTransporterFn = async (
+  user: Express.User,
+  args: MutationSignTransportFormArgs,
+  existingForm: Form
+) => {
+  if (existingForm.emitterType === EmitterType.APPENDIX1) {
+    throw new UserInputError(
+      "Impossible de signer le transport d'un bordereau chapeau. C'est en signant les bordereaux d'annexe 1 que le statut de ce bordereau évoluera."
+    );
+  }
   await checkCanSignFor(
     getTransporterCompanyOrgId(existingForm),
     user,
@@ -35,19 +47,83 @@ const signedByTransporterFn = async (user, args, existingForm) => {
     // but we need to fill them until we remove them completely
     signedByTransporter: true,
     sentAt: args.input.takenOverAt,
-    sentBy: existingForm.emittedBy
+    sentBy: existingForm.emittedBy,
+
+    // If it's an appendix1 and the emitter hasn't signed, TD automatically "signs" for him
+    ...(!existingForm.emittedAt &&
+      existingForm.emitterType === EmitterType.APPENDIX1_PRODUCER && {
+        emittedAt: args.input.takenOverAt,
+        emittedBy: "Signature automatique Trackdéchets"
+      })
   };
 
-  const updatedForm = await getFormRepository(user).update(
-    { id: existingForm.id },
-    {
-      status: transitionForm(existingForm, {
-        type: EventType.SignedByTransporter,
-        formUpdateInput
-      }),
-      ...formUpdateInput
+  const updatedForm = await runInTransaction(async transaction => {
+    const { update, updateAppendix2Forms, findGroupedFormsById, findUnique } =
+      getFormRepository(user, transaction);
+
+    const updatedForm = await update(
+      { id: existingForm.id },
+      {
+        status: transitionForm(existingForm, {
+          type: EventType.SignedByTransporter,
+          formUpdateInput
+        }),
+        ...formUpdateInput
+      }
+    );
+
+    if (existingForm.emitterType === EmitterType.APPENDIX2) {
+      const appendix2Forms = await findGroupedFormsById(existingForm.id);
+      await updateAppendix2Forms(appendix2Forms);
     }
-  );
+
+    if (existingForm.emitterType === EmitterType.APPENDIX1_PRODUCER) {
+      const include = {
+        include: { groupedIn: { include: { nextForm: true } } }
+      };
+      const { groupedIn } = await findUnique<typeof include>(
+        { id: existingForm.id },
+        include
+      );
+      const appendix1ContainerId = groupedIn?.[0]?.nextFormId;
+      if (!appendix1ContainerId) {
+        throw new ForbiddenError(
+          "Impossible de signer un bordereau d'annexe 1 si cette annexe n'est pas rattachée à un bordereau chapeau."
+        );
+      }
+
+      if (groupedIn[0].nextForm.status === Status.DRAFT) {
+        throw new ForbiddenError(
+          "Impossible de signer le transport d'un bordereau d'annexe 1 quand le bordereau chapeau est en brouillon. Veuillez d'abord sceller le bordereau chapeau."
+        );
+      }
+
+      // During transporter signature, we recompute the total packaging infos
+      const appendix1Forms = await findGroupedFormsById(appendix1ContainerId);
+      const wasteDetailsPackagingInfos = appendix1Forms.map(
+        form => form.wasteDetailsPackagingInfos as PackagingInfo[]
+      );
+
+      await update(
+        { id: appendix1ContainerId },
+        {
+          status: transitionForm(existingForm, {
+            type: EventType.SignedByTransporter,
+            formUpdateInput
+          }),
+          emittedAt: formUpdateInput.sentAt,
+          sentAt: formUpdateInput.sentAt,
+          takenOverAt: formUpdateInput.takenOverAt,
+          takenOverBy: formUpdateInput.takenOverBy,
+          transporterNumberPlate: formUpdateInput.transporterNumberPlate,
+          wasteDetailsPackagingInfos: sumPackagingInfos(
+            wasteDetailsPackagingInfos
+          )
+        }
+      );
+    }
+    return updatedForm;
+  });
 
   return expandFormFromDb(updatedForm);
 };
@@ -68,11 +144,27 @@ const signatures: Partial<
     );
   },
   [Status.SEALED]: async (user, args, existingForm) => {
-    // no signature needed
+    const isPrivateIndividual =
+      existingForm.emitterIsPrivateIndividual === true;
+    const isForeignShip =
+      existingForm.emitterIsForeignShip === true &&
+      existingForm.emitterCompanyOmiNumber;
+    const isAppendix1WithAutomaticSignature =
+      existingForm.emitterType === EmitterType.APPENDIX1_PRODUCER &&
+      (existingForm.ecoOrganismeSiret ||
+        (await hasSignatureAutomation({
+          signedBy: existingForm.transporterCompanySiret,
+          signedFor: existingForm.emitterCompanySiret
+        })));
+
+    // no signature needed for
+    // - individuals
+    // - foreign ships
+    // - appendix1 when signatureAutomation is enabled for the transporter, or the form has an eco organisme
     if (
-      existingForm.emitterIsPrivateIndividual === true ||
-      (existingForm.emitterIsForeignShip === true &&
-        existingForm.emitterCompanyOmiNumber)
+      isPrivateIndividual ||
+      isForeignShip ||
+      isAppendix1WithAutomaticSignature
     ) {
       return signedByTransporterFn(user, args, existingForm);
     } else {

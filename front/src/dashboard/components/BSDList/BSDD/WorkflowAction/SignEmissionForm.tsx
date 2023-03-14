@@ -78,11 +78,24 @@ function SignEmissionFormModal({
     fetchPolicy: "no-cache",
   });
 
-  const [signEmissionForm, { loading, error }] =
-    useMutation<
-      Pick<Mutation, "signEmissionForm">,
-      MutationSignEmissionFormArgs
-    >(SIGN_EMISSION_FORM);
+  const [signEmissionForm, { loading, error }] = useMutation<
+    Pick<Mutation, "signEmissionForm">,
+    MutationSignEmissionFormArgs
+  >(SIGN_EMISSION_FORM, {
+    // When we sign a Form, we must manually update the cached InitialForm as well
+    update(cache, { data }) {
+      cache.writeFragment({
+        id: `InitialForm:${formId}`,
+        fragment: gql`
+          fragment InitialFormFragment on InitialForm {
+            id
+            status
+          }
+        `,
+        data: { id: formId, status: data?.signEmissionForm.status },
+      });
+    },
+  });
 
   if (formLoading) return <Loader />;
   if (formError) return <InlineError apolloError={formError} />;

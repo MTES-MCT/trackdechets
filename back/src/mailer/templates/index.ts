@@ -197,3 +197,25 @@ export const finalDestinationModified: MailTemplate<{
   body: mustacheRenderer("destination-finale-modifiee.html"),
   templateId: templateIds.LAYOUT
 };
+
+export const membershipRequestDetailsEmail: MailTemplate = {
+  subject: "Passez à la prochaine étape sur Trackdéchets",
+  body: mustacheRenderer("membership-request-details.html"),
+  templateId: templateIds.LAYOUT
+};
+
+export const pendingMembershipRequestDetailsEmail: MailTemplate = {
+  subject: "Suite à votre demande de rattachement sur Trackdéchets",
+  body: mustacheRenderer("pending-membership-request-details.html"),
+  templateId: templateIds.LAYOUT
+};
+
+export const pendingMembershipRequestAdminDetailsEmail: MailTemplate<{
+  requestId: string;
+  email: string;
+  orgId: string;
+}> = {
+  subject: "Un utilisateur est toujours en attente de réponse de votre part",
+  body: mustacheRenderer("pending-membership-request-admin-details.html"),
+  templateId: templateIds.LAYOUT
+};

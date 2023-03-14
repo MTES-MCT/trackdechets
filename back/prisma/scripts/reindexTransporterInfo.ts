@@ -28,7 +28,7 @@ export class ReindexTransporterInfo implements Updater {
 
     const bsffs = await prisma.bsff.findMany({
       where: { transporterCustomInfo: { not: null } },
-      include: { packagings: true }
+      include: { packagings: true, ficheInterventions: true }
     });
 
     await indexBsds(index.alias, [

@@ -763,6 +763,7 @@ describe("mutation.markAsProcessed", () => {
       ownerId: user.id,
       opt: {
         status: "ACCEPTED",
+        emitterType: "APPENDIX2",
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
         grouping: {

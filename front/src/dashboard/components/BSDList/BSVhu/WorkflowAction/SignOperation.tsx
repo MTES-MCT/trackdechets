@@ -25,11 +25,11 @@ const validationSchema = yup.object({
 
 type Props = { siret: string; bsvhuId: string };
 export function SignOperation({ siret, bsvhuId }: Props) {
-  const [updateBsvhu] =
+  const [updateBsvhu, { error: updateError }] =
     useMutation<Pick<Mutation, "updateBsvhu">, MutationUpdateBsvhuArgs>(
       UPDATE_VHU_FORM
     );
-  const [signBsvhu, { loading, error }] = useMutation<
+  const [signBsvhu, { loading, error: signError }] = useMutation<
     Pick<Mutation, "signBsvhu">,
     MutationSignBsvhuArgs
   >(SIGN_BSVHU, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
@@ -104,7 +104,12 @@ export function SignOperation({ siret, bsvhuId }: Props) {
                 <RedErrorMessage name="author" />
               </div>
 
-              {error && <div className="error-message">{error.message}</div>}
+              {updateError && (
+                <div className="error-message">{updateError.message}</div>
+              )}
+              {signError && (
+                <div className="error-message">{signError.message}</div>
+              )}
 
               <div className="form__actions">
                 <button

@@ -1,12 +1,3 @@
-"Payload de signature d'un BSD"
-input SentFormInput {
-  "Date de l'envoi du déchet par l'émetteur et de prise en charge du déchet par le transporteur"
-  sentAt: DateTime!
-
-  "Nom de la personne responsable de l'envoi du déchet (case 9)"
-  sentBy: String!
-}
-
 input SignEmissionFormInput {
   "Conditionnements"
   packagingInfos: [PackagingInfoInput!]
@@ -344,7 +335,7 @@ input AppendixFormInput {
 }
 
 """
-Fraction d'un bordereau ajouté en annexe 2 d'un bordereau de regroupement
+Fraction d'un bordereau ajouté en annexe d'un bordereau de regroupement
 """
 input InitialFormFractionInput {
   "Bordereau annexé"
@@ -353,6 +344,7 @@ input InitialFormFractionInput {
   Quantité du bordereau initial affectée au bordereau de regroupement. Si omis,
   la totalité de la quantité restante est affectée. La quantité renseignée ne peut
   pas être supérieure à la quantité restante.
+  Cette quantité est ignorée dans le cas des annexes 1.
   """
   quantity: Float
 }

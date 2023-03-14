@@ -2,6 +2,9 @@ import * as cron from "cron";
 import cronValidator from "cron-validate";
 import {
   sendFirstOnboardingEmail,
+  sendMembershipRequestDetailsEmail,
+  sendPendingMembershipRequestDetailsEmail,
+  sendPendingMembershipRequestToAdminDetailsEmail,
   sendSecondOnboardingEmail
 } from "./commands/onboarding.helpers";
 import { initSentry } from "./common/sentry";
@@ -46,6 +49,30 @@ if (CRON_ONBOARDING_SCHEDULE) {
       cronTime: CRON_ONBOARDING_SCHEDULE,
       onTick: async () => {
         await sendSecondOnboardingEmail();
+      },
+      timeZone: "Europe/Paris"
+    }),
+    // new users with no company nor membership request
+    new cron.CronJob({
+      cronTime: CRON_ONBOARDING_SCHEDULE,
+      onTick: async () => {
+        await sendMembershipRequestDetailsEmail();
+      },
+      timeZone: "Europe/Paris"
+    }),
+    // users with no answer to their membership requests
+    new cron.CronJob({
+      cronTime: CRON_ONBOARDING_SCHEDULE,
+      onTick: async () => {
+        await sendPendingMembershipRequestDetailsEmail();
+      },
+      timeZone: "Europe/Paris"
+    }),
+    // admins who did not answer to membership requests
+    new cron.CronJob({
+      cronTime: CRON_ONBOARDING_SCHEDULE,
+      onTick: async () => {
+        await sendPendingMembershipRequestToAdminDetailsEmail();
       },
       timeZone: "Europe/Paris"
     })

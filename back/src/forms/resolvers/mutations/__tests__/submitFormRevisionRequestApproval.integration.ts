@@ -1,16 +1,21 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
+  MutationSignEmissionFormArgs,
   MutationSubmitFormRevisionRequestApprovalArgs
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
+  destinationFactory,
   formFactory,
   formWithTempStorageFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Status } from "@prisma/client";
+import { NON_CANCELLABLE_BSDD_STATUSES } from "../createFormRevisionRequest";
+import { MARK_AS_SEALED } from "./markAsSealed.integration";
+import { SIGN_EMISSION_FORM } from "./signEmissionForm.integration";
 
 const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = `
   mutation SubmitFormRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
@@ -494,28 +499,64 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     expect(updatedBsdd.status).toBe("PROCESSED");
   });
 
-  it("should change the bsdd status to CANCELED, if the operation code is now a final one", async () => {
-    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
-      "ADMIN"
-    );
-    const { user, company } = await userWithCompanyFactory("ADMIN");
-    const { mutate } = makeClient(user);
+  it("should free BSD from group if group parent BSD is canceled", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const destination = await destinationFactory();
 
-    const bsdd = await formFactory({
+    const appendix2 = await formFactory({
+      ownerId: user.id,
+      opt: { status: "AWAITING_GROUP", quantityReceived: 1 }
+    });
+
+    const form = await formFactory({
       ownerId: user.id,
       opt: {
-        emitterCompanySiret: companyOfSomeoneElse.siret,
-        status: "AWAITING_GROUP"
+        status: "DRAFT",
+        emitterType: "APPENDIX2",
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: destination.siret,
+        grouping: {
+          create: {
+            initialFormId: appendix2.id,
+            quantity: appendix2.quantityReceived
+          }
+        }
       }
     });
 
+    const { mutate } = makeClient(user);
+
+    await mutate(MARK_AS_SEALED, {
+      variables: { id: form.id }
+    });
+
+    // Sign by producer, cause can't cancel a draft BSD
+    await mutate<
+      Pick<Mutation, "signEmissionForm">,
+      MutationSignEmissionFormArgs
+    >(SIGN_EMISSION_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          emittedAt: new Date().toISOString() as unknown as Date,
+          emittedBy: "Producer",
+          quantity: 1
+        }
+      }
+    });
+
+    const appendix2grouped = await prisma.form.findUnique({
+      where: { id: appendix2.id }
+    });
+    expect(appendix2grouped.status).toEqual("GROUPED");
+
     const revisionRequest = await prisma.bsddRevisionRequest.create({
       data: {
-        bsddId: bsdd.id,
-        authoringCompanyId: companyOfSomeoneElse.id,
+        bsddId: form.id,
+        authoringCompanyId: company.id,
         approvals: { create: { approverSiret: company.siret } },
         isCanceled: true,
-        comment: ""
+        comment: "test cancel"
       }
     });
 
@@ -530,9 +571,53 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     });
 
     const updatedBsdd = await prisma.form.findUnique({
-      where: { id: bsdd.id }
+      where: { id: appendix2.id }
     });
 
-    expect(updatedBsdd.status).toBe(Status.CANCELED);
+    expect(updatedBsdd.status).toBe(Status.AWAITING_GROUP);
+
+    const groupement = await prisma.formGroupement.findMany({
+      where: { nextFormId: form.id }
+    });
+
+    expect(groupement.length).toEqual(0);
   });
+
+  it.each(NON_CANCELLABLE_BSDD_STATUSES)(
+    "should fail if request is about cancelation & the BSDD has a non-cancellable status",
+    async (status: Status) => {
+      const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const { mutate } = makeClient(user);
+
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: { status, emitterCompanySiret: companyOfSomeoneElse.siret }
+      });
+
+      const revisionRequest = await prisma.bsddRevisionRequest.create({
+        data: {
+          isCanceled: true,
+          bsddId: bsdd.id,
+          authoringCompanyId: companyOfSomeoneElse.id,
+          approvals: { create: { approverSiret: company.siret } },
+          comment: ""
+        }
+      });
+
+      const { errors } = await mutate<
+        Pick<Mutation, "submitFormRevisionRequestApproval">
+      >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequest.id,
+          isApproved: true
+        }
+      });
+      expect(errors[0].message).toBe(
+        "Impossible d'annuler un bordereau qui a été réceptionné sur l'installation de destination."
+      );
+    }
+  );
 });

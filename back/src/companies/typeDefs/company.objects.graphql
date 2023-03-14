@@ -103,6 +103,11 @@ type CompanyPrivate {
 
   "L'entreprise autorise l'enlèvement d'un Dasri sans sa signature"
   allowBsdasriTakeOverWithoutSignature: Boolean!
+
+  """
+  Liste des automatisations de signature accordées par l'entreprise
+  """
+  signatureAutomations: [SignatureAutomation!]!
 }
 
 type CompanyPrivateEdge {
@@ -248,6 +253,10 @@ type CompanySearchResult {
   Si oui on non cet établissement est inscrit sur la plateforme Trackdéchets
   """
   isRegistered: Boolean
+  """
+  Identifiant de l'entreprise sur la plateforme Trackdéchets. N'a une valeur que si l'entreprise est inscrite sur Trackdéchets (`isRegistered=true`)
+  """
+  trackdechetsId: ID
   """
   Profil de l'établissement sur Trackdéchets
   ayant pour valeur un tableau vide quand l'établissement
@@ -559,4 +568,19 @@ type CompanyValidationInfos {
   statutDiffusionEtablissement: StatutDiffusionEtablissement
   "Etat ouvert ou fermé selon l'INSEE"
   etatAdministratif: EtatAdministratif
+}
+
+"""
+Automatisation de la signature pour les annexes 1.
+Permet à une entreprise de ne pas avoir à signer la collecte de ses annexes.
+Si l'entreprise ciblée collecte l'annexe 1, Trackdéchets signera automatiquement pour l'entreprise émettrice.
+"""
+type SignatureAutomation {
+  id: ID!
+  "Entreprise qui met en place l'automatisation"
+  from: CompanyPublic!
+  "Entreprise qui, si collecteur, déclenche la signature automatique"
+  to: CompanyPublic!
+  "Date de création de l'automatisation de signature"
+  createdAt: DateTime!
 }

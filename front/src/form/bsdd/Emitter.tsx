@@ -1,8 +1,8 @@
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { RadioButton } from "form/common/components/custom-inputs/RadioButton";
 import { Field, useField, useFormikContext } from "formik";
-import { Form } from "generated/graphql/types";
-import React, { useEffect, useState } from "react";
+import { EmitterType, Form } from "generated/graphql/types";
+import React, { useEffect } from "react";
 import EcoOrganismes from "./components/eco-organismes/EcoOrganismes";
 import WorkSite from "form/common/components/work-site/WorkSite";
 import { getInitialEmitterWorkSite } from "form/bsdd/utils/initial-state";
@@ -11,6 +11,7 @@ import MyCompanySelector from "form/common/components/company/MyCompanySelector"
 import { emitterTypeLabels } from "dashboard/constants";
 import { isOmi } from "generated/constants/companySearchHelpers";
 import { RedErrorMessage } from "common/components";
+import Tooltip from "common/components/Tooltip";
 
 export default function Emitter({ disabled }) {
   const ctx = useFormikContext<Form>();
@@ -19,18 +20,19 @@ export default function Emitter({ disabled }) {
 
   const hasInitialGrouping = !!initialValues?.grouping?.length; // siret is non editable once bsd contains grouped bsds
   const siretNonEditable = hasInitialGrouping && !!values?.id;
-
-  const [lockEmitterProducer, setLockEmitterProducer] = useState(
-    values.emitter?.isForeignShip || values.emitter?.isPrivateIndividual
+  const isGrouping = [EmitterType.Appendix2, EmitterType.Appendix1].some(
+    type => values.emitter?.type === type
   );
+  const lockEmitterProducer =
+    hasInitialGrouping ||
+    values.emitter?.isForeignShip ||
+    values.emitter?.isPrivateIndividual;
 
   useEffect(() => {
     if (values.emitter?.isForeignShip || values.emitter?.isPrivateIndividual) {
-      setLockEmitterProducer(true);
       setFieldValue("emitter.type", "PRODUCER");
       return;
     }
-    setLockEmitterProducer(false);
   }, [
     values.emitter?.isForeignShip,
     values.emitter?.isPrivateIndividual,
@@ -109,104 +111,110 @@ export default function Emitter({ disabled }) {
           <Field
             name="emitter.type"
             id="APPENDIX1"
-            label={emitterTypeLabels["APPENDIX1"]}
+            label={
+              <div className="tw-flex tw-items-start">
+                <span>{emitterTypeLabels["APPENDIX1"]}</span>
+                <Tooltip msg="La collecte de tournée dédiée permet une collecte plus facile (ancienne annexe 1), mais son usage est conditionné à certains déchets et certains acteurs." />
+              </div>
+            }
             component={RadioButton}
             onChange={onChangeEmitterType}
             disabled={lockEmitterProducer}
           />
         </fieldset>
       </div>
-      <div className="form__row">
-        <label>
-          <Field
-            disabled={disabled}
-            type="checkbox"
-            name="emitter.isPrivateIndividual"
-            className="td-checkbox"
-            onChange={e => {
-              handleChange(e);
-              setFieldValue("emitter.company.siret", null);
-              setFieldValue("emitter.company.vatNumber", null);
-              setFieldValue("emitter.company.omiNumber", null);
-              setFieldValue("emitter.company.contact", null);
-              setFieldValue("emitter.company.name", null);
-              setFieldValue("emitter.company.address", null);
-              setFieldValue("emitter.company.country", null);
-              setFieldValue("emitter.isForeignShip", false);
-            }}
-          />
-          L'émetteur est un particulier
-        </label>
-        <label>
-          <Field
-            disabled={disabled}
-            type="checkbox"
-            name="emitter.isForeignShip"
-            className="td-checkbox"
-            onChange={e => {
-              handleChange(e);
-              setFieldValue("emitter.company.siret", null);
-              setFieldValue("emitter.company.vatNumber", null);
-              setFieldValue("emitter.company.contact", null);
-              setFieldValue("emitter.company.name", null);
-              setFieldValue("emitter.company.address", null);
-              setFieldValue("emitter.company.country", null);
-              setFieldValue("emitter.isPrivateIndividual", false);
-            }}
-          />
-          L'émetteur est un navire étranger
-        </label>
-      </div>
-      {values.emitter?.type !== "APPENDIX2" &&
-        values.emitter?.isPrivateIndividual && (
+      {!isGrouping && (
+        <div className="form__row">
+          <label>
+            <Field
+              disabled={disabled}
+              type="checkbox"
+              name="emitter.isPrivateIndividual"
+              className="td-checkbox"
+              onChange={e => {
+                handleChange(e);
+                setFieldValue("emitter.company.siret", null);
+                setFieldValue("emitter.company.vatNumber", null);
+                setFieldValue("emitter.company.omiNumber", null);
+                setFieldValue("emitter.company.contact", null);
+                setFieldValue("emitter.company.name", null);
+                setFieldValue("emitter.company.address", null);
+                setFieldValue("emitter.company.country", null);
+                setFieldValue("emitter.isForeignShip", false);
+              }}
+            />
+            L'émetteur est un particulier
+          </label>
+          <label>
+            <Field
+              disabled={disabled}
+              type="checkbox"
+              name="emitter.isForeignShip"
+              className="td-checkbox"
+              onChange={e => {
+                handleChange(e);
+                setFieldValue("emitter.company.siret", null);
+                setFieldValue("emitter.company.vatNumber", null);
+                setFieldValue("emitter.company.contact", null);
+                setFieldValue("emitter.company.name", null);
+                setFieldValue("emitter.company.address", null);
+                setFieldValue("emitter.company.country", null);
+                setFieldValue("emitter.isPrivateIndividual", false);
+              }}
+            />
+            L'émetteur est un navire étranger
+          </label>
+        </div>
+      )}
+      {!isGrouping && values.emitter?.isPrivateIndividual && (
+        <div className="form__row">
           <div className="form__row">
-            <div className="form__row">
-              <label>
-                Nom et prénom
-                <Field
-                  type="text"
-                  name="emitter.company.name"
-                  className="td-input"
-                  disabled={disabled}
-                />
-              </label>
-            </div>
-            <div className="form__row">
-              <label>
-                Adresse
-                <Field
-                  type="text"
-                  name="emitter.company.address"
-                  className="td-input"
-                  disabled={disabled}
-                />
-              </label>
-            </div>
-            <div className="form__row">
-              <label>
-                Téléphone (optionnel)
-                <Field
-                  type="text"
-                  name="emitter.company.phone"
-                  className="td-input td-input--small"
-                  disabled={disabled}
-                />
-              </label>
-            </div>
-            <div className="form__row">
-              <label>
-                Mail (optionnel)
-                <Field
-                  type="text"
-                  name="emitter.company.mail"
-                  className="td-input td-input--medium"
-                  disabled={disabled}
-                />
-              </label>
-            </div>
+            <label>
+              Nom et prénom
+              <Field
+                type="text"
+                name="emitter.company.name"
+                className="td-input"
+                disabled={disabled}
+              />
+            </label>
           </div>
-        )}
-      {values.emitter?.type !== "APPENDIX2" && values.emitter?.isForeignShip && (
+          <div className="form__row">
+            <label>
+              Adresse
+              <Field
+                type="text"
+                name="emitter.company.address"
+                className="td-input"
+                disabled={disabled}
+              />
+            </label>
+          </div>
+          <div className="form__row">
+            <label>
+              Téléphone (optionnel)
+              <Field
+                type="text"
+                name="emitter.company.phone"
+                className="td-input td-input--small"
+                disabled={disabled}
+              />
+            </label>
+          </div>
+          <div className="form__row">
+            <label>
+              Mail (optionnel)
+              <Field
+                type="text"
+                name="emitter.company.mail"
+                className="td-input td-input--medium"
+                disabled={disabled}
+              />
+            </label>
+          </div>
+        </div>
+      )}
+      {!isGrouping && values.emitter?.isForeignShip && (
         <div className="form__row">
           <div className="form__row">
             <label>
@@ -270,24 +278,27 @@ export default function Emitter({ disabled }) {
         </div>
       )}
 
-      {values.emitter?.type === "APPENDIX2" && (
+      {isGrouping && (
         <div className="tw-my-6">
           <h4 className="form__section-heading">Entreprise émettrice</h4>
           <MyCompanySelector
             fieldName="emitter.company"
             siretEditable={!siretNonEditable}
-            onSelect={() => {
+            onSelect={company => {
               if (values.grouping?.length) {
                 // make sure to empty appendix2 forms because new emitter may
                 // not be recipient of the select appendix 2 forms
                 setFieldValue("grouping", []);
+              }
+              if (values.emitter?.type === EmitterType.Appendix1) {
+                setFieldValue("transporter.company", company);
               }
             }}
           />
         </div>
       )}
 
-      {values.emitter?.type !== "APPENDIX2" &&
+      {!isGrouping &&
         !values.emitter?.isPrivateIndividual &&
         !values.emitter?.isForeignShip && (
           <CompanySelector
@@ -296,12 +307,14 @@ export default function Emitter({ disabled }) {
           />
         )}
 
-      <WorkSite
-        switchLabel="Je souhaite ajouter une adresse de chantier ou de collecte"
-        headingTitle="Adresse chantier"
-        designation="du chantier ou lieu de collecte"
-        getInitialEmitterWorkSiteFn={getInitialEmitterWorkSite}
-      />
+      {!isGrouping && (
+        <WorkSite
+          switchLabel="Je souhaite ajouter une adresse de chantier ou de collecte"
+          headingTitle="Adresse chantier"
+          designation="du chantier ou lieu de collecte"
+          getInitialEmitterWorkSiteFn={getInitialEmitterWorkSite}
+        />
+      )}
     </>
   );
 }

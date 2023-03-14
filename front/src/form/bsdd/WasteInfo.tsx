@@ -10,7 +10,6 @@ import {
 } from "generated/constants";
 import React, { useEffect } from "react";
 import Appendix2MultiSelect from "./components/appendix/Appendix2MultiSelect";
-import AppendixInfo from "./components/appendix/AppendixInfo";
 import Packagings from "./components/packagings/Packagings";
 import { ParcelNumbersSelector } from "./components/parcel-number/ParcelNumber";
 import { WasteCodeSelect, wasteCodeValidator } from "./components/waste-code";
@@ -132,7 +131,19 @@ export default connect<{}, Values>(function WasteInfo(props) {
         </div>
       </div>
 
-      {values.emitter.type === "APPENDIX1" && <AppendixInfo />}
+      {values.emitter.type === "APPENDIX1" && (
+        <div>
+          <h4 className="form__section-heading">Bordereau de tournée dédiée</h4>
+          <div className="notification warning">
+            <span>
+              Vous créez un bordereau de tournée dédiée. Vous pourrez ensuite
+              rattacher des bordereaux d'annexe 1 à cette tournée. Ce
+              rattachement sera à faire dans un second temps, après la création
+              de ce bordereau de tournée.
+            </span>
+          </div>
+        </div>
+      )}
 
       {values.emitter.type === "APPENDIX2" && (
         <>
@@ -151,77 +162,82 @@ export default connect<{}, Values>(function WasteInfo(props) {
         </>
       )}
 
-      <h4 className="form__section-heading">Conditionnement</h4>
+      {values.emitter.type !== "APPENDIX1" && (
+        <>
+          <h4 className="form__section-heading">Conditionnement</h4>
 
-      <Field name="wasteDetails.packagingInfos" component={Packagings} />
+          <Field name="wasteDetails.packagingInfos" component={Packagings} />
 
-      <div className="form__row">
-        <fieldset>
-          <legend>Consistance</legend>
-          <div className="tw-flex">
-            <Field
-              name="wasteDetails.consistence"
-              id="SOLID"
-              label="Solide"
-              component={RadioButton}
-            />
-            <Field
-              name="wasteDetails.consistence"
-              id="LIQUID"
-              label="Liquide"
-              component={RadioButton}
-            />
-            <Field
-              name="wasteDetails.consistence"
-              id="GASEOUS"
-              label="Gazeux"
-              component={RadioButton}
-            />
-            <Field
-              name="wasteDetails.consistence"
-              id="DOUGHY"
-              label="Pâteux"
-              component={RadioButton}
-            />
+          <div className="form__row">
+            <fieldset>
+              <legend>Consistance</legend>
+              <div className="tw-flex">
+                <Field
+                  name="wasteDetails.consistence"
+                  id="SOLID"
+                  label="Solide"
+                  component={RadioButton}
+                />
+                <Field
+                  name="wasteDetails.consistence"
+                  id="LIQUID"
+                  label="Liquide"
+                  component={RadioButton}
+                />
+                <Field
+                  name="wasteDetails.consistence"
+                  id="GASEOUS"
+                  label="Gazeux"
+                  component={RadioButton}
+                />
+                <Field
+                  name="wasteDetails.consistence"
+                  id="DOUGHY"
+                  label="Pâteux"
+                  component={RadioButton}
+                />
+              </div>
+            </fieldset>
+
+            <RedErrorMessage name="wasteDetails.consistence" />
           </div>
-        </fieldset>
 
-        <RedErrorMessage name="wasteDetails.consistence" />
-      </div>
+          <h4 className="form__section-heading">Quantité en tonnes</h4>
+          <div className="form__row">
+            <label>
+              <Field
+                component={NumberInput}
+                name="wasteDetails.quantity"
+                className="td-input waste-details__quantity"
+                placeholder="En tonnes"
+                min="0"
+                step="0.001"
+              />
+              <span className="tw-ml-2">Tonnes</span>
+            </label>
+            <RedErrorMessage name="wasteDetails.quantity" />
 
-      <h4 className="form__section-heading">Quantité en tonnes</h4>
-      <div className="form__row">
-        <label>
-          <Field
-            component={NumberInput}
-            name="wasteDetails.quantity"
-            className="td-input waste-details__quantity"
-            placeholder="En tonnes"
-            min="0"
-            step="0.001"
-          />
-          <span className="tw-ml-2">Tonnes</span>
-        </label>
-        <RedErrorMessage name="wasteDetails.quantity" />
+            <fieldset className="tw-mt-3">
+              <legend>Cette quantité est</legend>
+              <Field
+                name="wasteDetails.quantityType"
+                id="REAL"
+                label="Réelle"
+                component={RadioButton}
+              />
+              <Field
+                name="wasteDetails.quantityType"
+                id="ESTIMATED"
+                label="Estimée"
+                component={RadioButton}
+              />
+            </fieldset>
 
-        <fieldset className="tw-mt-3">
-          <legend>Cette quantité est</legend>
-          <Field
-            name="wasteDetails.quantityType"
-            id="REAL"
-            label="Réelle"
-            component={RadioButton}
-          />
-          <Field
-            name="wasteDetails.quantityType"
-            id="ESTIMATED"
-            label="Estimée"
-            component={RadioButton}
-          />
-        </fieldset>
+            <RedErrorMessage name="wasteDetails.quantityType" />
+          </div>
+        </>
+      )}
 
-        <RedErrorMessage name="wasteDetails.quantityType" />
-      </div>
       <div className="form__row">
         <label>
           Mentions au titre des règlements ADR, RID, ADNR, IMDG{" "}

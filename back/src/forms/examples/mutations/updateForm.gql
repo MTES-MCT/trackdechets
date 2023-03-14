@@ -1,0 +1,6 @@
+mutation UpdateForm($updateFormInput: UpdateFormInput!) {
+  updateForm(updateFormInput: $updateFormInput) {
+    id
+    status
+  }
+}

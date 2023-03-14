@@ -12,11 +12,11 @@ function buildSort(
   order: OrderType
 ): { [key in keyof BsdElastic]?: OrderType }[] {
   const sortKey: { [key in WasteRegistryType]: keyof BsdElastic } = {
-    OUTGOING: "transporterTakenOverAt",
+    OUTGOING: "transporterTransportTakenOverAt",
     INCOMING: "destinationReceptionDate",
-    TRANSPORTED: "transporterTakenOverAt",
-    MANAGED: "transporterTakenOverAt",
-    ALL: "transporterTakenOverAt"
+    TRANSPORTED: "transporterTransportTakenOverAt",
+    MANAGED: "transporterTransportTakenOverAt",
+    ALL: "transporterTransportTakenOverAt"
   };
 
   return [
@@ -44,7 +44,14 @@ async function buildSearchAfter(
   });
 
   return sort.reduce(
-    (acc, item) => [...acc, ...Object.entries(item).map(([key]) => bsd[key])],
+    (acc, item) => [
+      ...acc,
+      ...Object.entries(item).map(([key]) => {
+        return typeof bsd[key] === "string"
+          ? bsd[key].toLowerCase() // keyword fields have a lowercase normalizer
+          : bsd[key];
+      })
+    ],
     []
   );
 }

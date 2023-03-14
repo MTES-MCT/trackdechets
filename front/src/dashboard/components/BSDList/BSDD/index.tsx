@@ -1,6 +1,11 @@
 import * as React from "react";
 import { useParams } from "react-router";
-import { Form } from "generated/graphql/types";
+import {
+  EmitterType,
+  Form,
+  Query,
+  QueryCompanyPrivateInfosArgs,
+} from "generated/graphql/types";
 import { CellProps, CellValue } from "react-table";
 import { ActionButtonContext } from "common/components/ActionButton";
 import { BSDDActions } from "dashboard/components/BSDList/BSDD/BSDDActions/BSDDActions";
@@ -8,6 +13,8 @@ import { IconBSDD } from "common/components/Icons";
 import { statusLabels } from "../../../constants";
 import TransporterInfoEdit from "./TransporterInfoEdit";
 import { WorkflowAction } from "./WorkflowAction";
+import { useQuery } from "@apollo/client";
+import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "form/common/components/company/query";
 
 export const COLUMNS: Record<
   string,
@@ -17,8 +24,15 @@ export const COLUMNS: Record<
   }
 > = {
   type: {
-    accessor: () => null,
-    Cell: () => <IconBSDD style={{ fontSize: "24px" }} />,
+    accessor: bsdd => bsdd.emitter?.type,
+    Cell: ({ value }) => (
+      <>
+        <IconBSDD style={{ fontSize: "24px" }} />
+        {value === EmitterType.Appendix2 && <span>Grp</span>}
+        {value === EmitterType.Appendix1 && <span>Tournée</span>}
+        {value === EmitterType.Appendix1Producer && <span>Annexe 1</span>}
+      </>
+    ),
   },
   readableId: {
     accessor: form => {
@@ -91,9 +105,33 @@ export const COLUMNS: Record<
     accessor: () => null,
     Cell: ({ row }) => {
       const { siret } = useParams<{ siret: string }>();
+      const { data } = useQuery<
+        Pick<Query, "companyPrivateInfos">,
+        QueryCompanyPrivateInfosArgs
+      >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
+        variables: { clue: siret },
+      });
+      const siretsWithAutomaticSignature = data
+        ? data.companyPrivateInfos.receivedSignatureAutomations.map(
+            automation => automation.from.siret
+          )
+        : [];
+
+      const form = row.original;
       return (
         <ActionButtonContext.Provider value={{ size: "small" }}>
-          <WorkflowAction siret={siret} form={row.original} />
+          <WorkflowAction
+            siret={siret}
+            form={form}
+            options={{
+              canSkipEmission:
+                form.emitter?.type === EmitterType.Appendix1Producer &&
+                (Boolean(form.ecoOrganisme?.siret) ||
+                  siretsWithAutomaticSignature.includes(
+                    form.emitter?.company?.siret
+                  )),
+            }}
+          />
         </ActionButtonContext.Provider>
       );
     },

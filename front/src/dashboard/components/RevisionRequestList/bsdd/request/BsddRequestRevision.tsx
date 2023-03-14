@@ -29,7 +29,7 @@ import { removeEmptyKeys } from "../../../../../common/helper";
 import { CREATE_FORM_REVISION_REQUEST } from "../query";
 import styles from "./BsddRequestRevision.module.scss";
 import { ReviewableField } from "./ReviewableField";
-import { Switch } from "./Switch";
+import { BsddRequestRevisionCancelationInput } from "../BsddRequestRevisionCancelationInput";
 
 type Props = {
   bsdd: Bsdd;
@@ -115,14 +115,11 @@ export function BsddRequestRevision({ bsdd }: Props) {
           return (
             <Form>
               <div className={styles.fields}>
-                <Switch
-                  title="Annuler le bordereau"
+                <BsddRequestRevisionCancelationInput
+                  bsdd={bsdd}
                   defaultValue={initialReview.isCanceled}
                   onChange={value => setFieldValue("content.isCanceled", value)}
-                >
-                  Si votre demande d'annulation est approuvée, ce bordereau
-                  passera au statut Annulé pour tous les acteurs du bordereau.
-                </Switch>
+                />
 
                 <div
                   style={{

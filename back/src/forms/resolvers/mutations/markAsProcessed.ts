@@ -1,4 +1,4 @@
-import { Prisma, Status } from "@prisma/client";
+import { EmitterType, Prisma, Status } from "@prisma/client";
 import { PROCESSING_OPERATIONS } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
@@ -87,15 +87,13 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
     };
   }
 
-  const appendix2Forms = await getFormRepository(user).findAppendix2FormsById(
+  const groupedForms = await getFormRepository(user).findGroupedFormsById(
     form.id
   );
 
   const processedForm = await runInTransaction(async transaction => {
-    const { updateAppendix2Forms, update } = getFormRepository(
-      user,
-      transaction
-    );
+    const { updateAppendix1Forms, updateAppendix2Forms, update } =
+      getFormRepository(user, transaction);
 
     const processedForm = await update(
       { id: form.id },
@@ -109,8 +107,15 @@ const markAsProcessedResolver: MutationResolvers["markAsProcessed"] = async (
     );
 
     // mark appendix2Forms as PROCESSED
-    if (appendix2Forms.length > 0) {
-      await updateAppendix2Forms(appendix2Forms);
+    if (form.emitterType === EmitterType.APPENDIX2) {
+      await updateAppendix2Forms(groupedForms);
+    }
+
+    if (form.emitterType === EmitterType.APPENDIX1) {
+      await updateAppendix1Forms({
+        container: processedForm,
+        grouped: groupedForms
+      });
     }
 
     return processedForm;

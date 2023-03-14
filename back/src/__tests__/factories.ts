@@ -118,11 +118,13 @@ export interface UserWithCompany {
  */
 export const userWithCompanyFactory = async (
   role: UserRole,
-  companyOpts: Partial<Prisma.CompanyCreateInput> = {}
+  companyOpts: Partial<Prisma.CompanyCreateInput> = {},
+  userOpts: Partial<Prisma.UserCreateInput> = {}
 ): Promise<UserWithCompany> => {
   const company = await companyFactory(companyOpts);
 
   const user = await userFactory({
+    ...userOpts,
     companyAssociations: {
       create: {
         company: { connect: { id: company.id } },
@@ -164,6 +166,23 @@ export const userWithAccessTokenFactory = async (opt = {}) => {
     }
   });
   return { user, accessToken: clearToken };
+};
+
+/**
+ * Will create a membership request from user to company
+ */
+export const createMembershipRequest = async (
+  user: User,
+  company: Company,
+  opt = {}
+) => {
+  return await prisma.membershipRequest.create({
+    data: {
+      userId: user.id,
+      companyId: company.id,
+      ...opt
+    }
+  });
 };
 
 const formdata = {

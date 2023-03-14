@@ -11,6 +11,10 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
 import { Status } from "@prisma/client";
+import {
+  CANCELLABLE_BSDD_STATUSES,
+  NON_CANCELLABLE_BSDD_STATUSES
+} from "../createFormRevisionRequest";
 
 const CREATE_FORM_REVISION_REQUEST = `
   mutation CreateFormRevisionRequest($input: CreateFormRevisionRequestInput!) {
@@ -119,6 +123,38 @@ describe("Mutation.createFormRevisionRequest", () => {
 
     expect(errors[0].message).toBe(
       `Impossible d'annuler et de modifier un bordereau.`
+    );
+  });
+
+  it("should fail if revision has no modifications", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createFormRevisionRequest">,
+      MutationCreateFormRevisionRequestArgs
+    >(CREATE_FORM_REVISION_REQUEST, {
+      variables: {
+        input: {
+          formId: bsdd.id,
+          content: { isCanceled: false },
+          comment: "A comment",
+          authoringCompanySiret: company.siret
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      `Impossible de créer une révision sans modifications.`
     );
   });
 
@@ -418,4 +454,79 @@ describe("Mutation.createFormRevisionRequest", () => {
       `Vous n'êtes pas autorisé à réviser ce bordereau`
     );
   });
+
+  it.each(CANCELLABLE_BSDD_STATUSES)(
+    "should succeed if status is in cancellable list",
+    async (status: Status) => {
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: { isCanceled: true },
+            comment: "A comment",
+            authoringCompanySiret: company.siret
+          }
+        }
+      });
+
+      expect(data.createFormRevisionRequest.form.id).toBe(bsdd.id);
+      expect(errors).toBeUndefined();
+    }
+  );
+
+  it.each(NON_CANCELLABLE_BSDD_STATUSES)(
+    "should fail if status is in non-cancellable list",
+    async (status: Status) => {
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+
+      const bsdd = await formFactory({
+        ownerId: user.id,
+        opt: {
+          status,
+          emitterCompanySiret: company.siret,
+          recipientCompanySiret: recipientCompany.siret
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createFormRevisionRequest">,
+        MutationCreateFormRevisionRequestArgs
+      >(CREATE_FORM_REVISION_REQUEST, {
+        variables: {
+          input: {
+            formId: bsdd.id,
+            content: { isCanceled: true },
+            comment: "A comment",
+            authoringCompanySiret: company.siret
+          }
+        }
+      });
+
+      // Because the error messages vary depending on the status,
+      // let's just check that there is an error and not focus on the msg
+      expect(errors.length).toBeGreaterThan(0);
+    }
+  );
 });

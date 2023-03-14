@@ -110,6 +110,7 @@ export const SEARCH_COMPANIES = gql`
       etatAdministratif
       codePaysEtrangerEtablissement
       isRegistered
+      trackdechetsId
       contact
       contactPhone
       contactEmail
@@ -189,6 +190,19 @@ export const COMPANY_PRIVATE_INFOS = gql`
         receiptNumber
         validityLimit
         department
+      }
+    }
+  }
+`;
+
+export const COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS = gql`
+  query CompanyPrivateInfos($clue: String!) {
+    companyPrivateInfos(clue: $clue) {
+      siret
+      receivedSignatureAutomations {
+        from {
+          siret
+        }
       }
     }
   }

@@ -15,7 +15,7 @@ import { EventType } from "../../workflow/types";
 import { sendMail } from "../../../mailer/mailing";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { contentAwaitsGuest } from "../../../mailer/templates";
-import { Form, Status } from "@prisma/client";
+import { EmitterType, Form, Status } from "@prisma/client";
 import { FormRepository, getFormRepository } from "../../repository";
 import prisma from "../../../prisma";
 import { runInTransaction } from "../../../common/repository/helper";
@@ -80,11 +80,11 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
       }
     );
 
-    const appendix2Forms = await formRepository.findAppendix2FormsById(form.id);
-    if (appendix2Forms.length > 0) {
+    if (sealedForm.emitterType === EmitterType.APPENDIX2) {
+      const groupedForms = await formRepository.findGroupedFormsById(form.id);
       // mark appendix2Forms as GROUPED if all its grouping forms are sealed
       // and quantityGrouped is equal to quantityReceived
-      await formRepository.updateAppendix2Forms(appendix2Forms);
+      await formRepository.updateAppendix2Forms(groupedForms);
     }
 
     // send welcome email to emitter if it is not registered in TD

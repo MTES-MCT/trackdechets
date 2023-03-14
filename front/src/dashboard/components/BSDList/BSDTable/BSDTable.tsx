@@ -1,6 +1,11 @@
 import * as React from "react";
 import { useTable, useFilters, useSortBy } from "react-table";
-import { Bsd, OrderType, QueryBsdsArgs } from "generated/graphql/types";
+import {
+  Bsd,
+  BsdWhere,
+  OrderType,
+  QueryBsdsArgs,
+} from "generated/graphql/types";
 import {
   Table,
   TableHead,
@@ -71,17 +76,33 @@ export function BSDTable({ bsds, refetch, ...props }: BSDTableProps) {
     };
 
     filters.forEach(filter => {
-      const filterName = COLUMNS_PARAMETERS_NAME[filter.id]?.filter;
+      const filterFn = COLUMNS_PARAMETERS_NAME[filter.id]?.filter;
 
-      if (filterName == null) {
+      if (filterFn == null) {
         console.error(
           `The filter "${filter.id}" doesn't have an equivalent in the API, it's ignored.`
         );
         return;
       }
 
-      variables.where[filterName] = filter.value;
+      variables.where["_"] = filter.value;
     });
+
+    variables.where = filters.reduce(
+      (w, filter) => {
+        const filterFn = COLUMNS_PARAMETERS_NAME[filter.id]?.filter;
+        if (filterFn == null) {
+          console.error(
+            `The filter "${filter.id}" doesn't have an equivalent in the API, it's ignored.`
+          );
+        }
+        if (filter.value) {
+          return { _and: [...w._and!, filterFn(filter.value)] };
+        }
+        return w;
+      },
+      { _and: [] } as BsdWhere
+    );
 
     sortBy.forEach(sort => {
       const sortName = COLUMNS_PARAMETERS_NAME[sort.id]?.order;

@@ -1,4 +1,4 @@
-import { Form, Prisma, Status } from "@prisma/client";
+import { EmitterType, Form, Prisma, Status } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import {
   MutationResolvers,
@@ -34,6 +34,12 @@ const signatures: Partial<
     );
   },
   [Status.SEALED]: async (user, args, existingForm) => {
+    if (existingForm.emitterType === EmitterType.APPENDIX1) {
+      throw new UserInputError(
+        "Impossible de signer le transport d'un bordereau chapeau. C'est en signant les bordereaux d'annexe 1 que le statut de ce bordereau évoluera."
+      );
+    }
+
     if (args.input.emittedByEcoOrganisme) {
       await checkCanSignFor(
         existingForm.ecoOrganismeSiret,

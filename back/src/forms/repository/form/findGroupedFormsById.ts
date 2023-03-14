@@ -1,11 +1,11 @@
 import { Form } from "@prisma/client";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
-export type FindAppendix2FormsByIdFn = (id: string) => Promise<Form[]>;
+export type FindGroupedFormsByIdFn = (id: string) => Promise<Form[]>;
 
-const buildFindAppendix2FormsById: (
+const buildFindGroupedFormsById: (
   deps: ReadRepositoryFnDeps
-) => FindAppendix2FormsByIdFn =
+) => FindGroupedFormsByIdFn =
   ({ prisma }) =>
   async id => {
     const grouping = await prisma.form
@@ -14,4 +14,4 @@ const buildFindAppendix2FormsById: (
     return grouping.map(g => g.initialForm);
   };
 
-export default buildFindAppendix2FormsById;
+export default buildFindGroupedFormsById;

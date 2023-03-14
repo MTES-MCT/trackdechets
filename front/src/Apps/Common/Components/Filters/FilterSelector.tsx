@@ -35,8 +35,8 @@ const FilterSelector = ({
         </option>
         {filters.map(filter => (
           <option
-            key={filter.value}
-            value={filter.value}
+            key={filter.name}
+            value={filter.name}
             disabled={!filter.isActive}
           >
             {filter.label}

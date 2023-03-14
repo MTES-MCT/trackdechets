@@ -5,6 +5,33 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.2.2] 07/03/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Envoi d'un email à inscription + 7 jours aux nouveaux inscrits qui n'ont pas encore créé de demande de rattachement [PR 2128](https://github.com/MTES-MCT/trackdechets/pull/2128)
+- Envoi d'un email 14 jours après une demande de rattachement pour les utilisateurs n'ayant pas de réponse [PR 2160](https://github.com/MTES-MCT/trackdechets/pull/2160)
+
+#### :bug: Corrections de bugs
+
+- Le bouton "Adresse chantier" sur le BSDA ne devrait pas se ré-enclencher lors d'une modification lorsque je l'ai manuellement désactivé [PR 2168](https://github.com/MTES-MCT/trackdechets/pull/2168)
+
+#### :boom: Breaking changes
+
+- Implémentation de l'annexe 1 BSDD dématérialisée de bout en bout. Le comportement qui existait auparavant est déprécié, il n'y a plus besoin d'imprimer des annexes papier [PR 1986](https://github.com/MTES-MCT/trackdechets/pull/1986)
+
+#### :nail_care: Améliorations
+
+- Il est maintenant impossible d'annuler un BSDD qui a été réceptionné par le destinataire (ou à un statut ultérieur) [PR 2136](https://github.com/MTES-MCT/trackdechets/pull/2136)
+- Si un BSDD de regroupement est annulé, les BSDD initiaux qui y étaient regroupés sont libérés [PR 2141](https://github.com/MTES-MCT/trackdechets/pull/2141)
+- Mise en place de nouveaux filtres backend sur la query `bsds` utilisée pour afficher le tableau de bord [PR 2126](https://github.com/MTES-MCT/trackdechets/pull/2126)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Ajout d'une liste blanche d'adresses IP pouvant être utilisées pour se connecter avec le compte de service du registre national [PR 2170](https://github.com/MTES-MCT/trackdechets/pull/2170)
+
 # [2023.2.1] 21/02/2023
 
 #### :rocket: Nouvelles fonctionnalités

@@ -89,6 +89,9 @@ enum EmitterType {
   "Collecteur de petites quantités de déchets relevant de la même rubrique"
   APPENDIX1
 
+  "Producteur d'un déchet collecté dans le cadre d'une annexe 1"
+  APPENDIX1_PRODUCER
+
   "Personne ayant transformé ou réalisé un traitement dont la provenance des déchets reste identifiable"
   APPENDIX2
 }

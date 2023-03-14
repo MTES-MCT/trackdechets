@@ -53,6 +53,7 @@ describe("Appendix2Form", () => {
     const regroupement = await formFactory({
       ownerId: emitterUser.id,
       opt: {
+        emitterType: "APPENDIX2",
         recipientCompanySiret: destination.siret,
         grouping: {
           create: {

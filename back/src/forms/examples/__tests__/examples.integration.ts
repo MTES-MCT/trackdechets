@@ -8,6 +8,7 @@ import entreposageProvisoireTransporterEtrangerWorkflow from "../workflows/entre
 import importBsdPapier from "../workflows/importBsdPapier";
 import regroupement from "../workflows/regroupement";
 import regroupementTransporterEtranger from "../workflows/regroupementTransporteurEtranger";
+import annexe1 from "../workflows/annexe1";
 
 describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () => {
   afterEach(resetDatabase);
@@ -72,6 +73,14 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     importBsdPapier.title,
     async () => {
       await testWorkflow(importBsdPapier);
+    },
+    60000
+  );
+
+  it(
+    annexe1.title,
+    async () => {
+      await testWorkflow(annexe1);
     },
     60000
   );
