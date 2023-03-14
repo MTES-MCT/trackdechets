@@ -113,6 +113,18 @@ export function BsdaApproveRevision({ review }: Props) {
 }
 
 export function DisplayRevision({ review }: Props) {
+  console.log(review.content);
+  if (review.content.isCanceled) {
+    return (
+      <div>
+        <p className="tw-pb-6">
+          L'entreprise <strong>{review.authoringCompany.name}</strong> a demandé
+          l'annulation du bordereau <strong>#{review.bsda.id}</strong>
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <p className="tw-pb-6">

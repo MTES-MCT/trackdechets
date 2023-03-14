@@ -12,6 +12,8 @@ import { Signature } from "./Signature";
 import { TraceabilityTable } from "./TraceabilityTable";
 import { WasteDescription } from "./WasteDescription";
 import { WasteDetails } from "./WasteDetails";
+import { BsdaStatus } from "@prisma/client";
+import { CancelationStamp } from "../../../common/pdf/components/CancelationStamp";
 
 const PACKAGINGS_NAMES = {
   BIG_BAG: "Big-bag / GRV",
@@ -85,6 +87,7 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
           <div className="BoxCol">
             <p>
               <strong>N° Bordereau :</strong> {bsda.id}
+              {bsda.status === BsdaStatus.CANCELED && <CancelationStamp />}
             </p>
           </div>
         </div>

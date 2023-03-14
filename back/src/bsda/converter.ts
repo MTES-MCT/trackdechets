@@ -598,7 +598,8 @@ export function flattenBsdaRevisionRequestInput(
       chain(r.destination, d =>
         chain(d.reception, r => (r.weight ? r.weight * 1000 : r.weight))
       )
-    )
+    ),
+    isCanceled: chain(reviewContent, c => chain(c, r => r.isCanceled))
   });
 }
 
@@ -648,7 +649,8 @@ export function expandBsdaRevisionRequestContent(
           ? bsdaRevisionRequest.destinationReceptionWeight / 1000
           : bsdaRevisionRequest.destinationReceptionWeight
       })
-    })
+    }),
+    isCanceled: bsdaRevisionRequest.isCanceled
   };
 }
 

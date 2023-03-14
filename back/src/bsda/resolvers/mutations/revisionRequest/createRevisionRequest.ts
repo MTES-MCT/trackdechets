@@ -50,6 +50,7 @@ export type RevisionRequestContent = Pick<
   | "emitterPickupSiteCity"
   | "emitterPickupSitePostalCode"
   | "emitterPickupSiteInfos"
+  | "isCanceled"
 >;
 
 export async function createBsdaRevisionRequest(
@@ -103,6 +104,12 @@ async function checkIfUserCanRequestRevisionOnBsda(
   if (bsda.status === BsdaStatus.REFUSED || bsda.isDeleted) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau, il a été refusé ou supprimé."
+    );
+  }
+
+  if (bsda.status === BsdaStatus.CANCELED) {
+    throw new ForbiddenError(
+      "Impossible de créer une révision sur ce bordereau, il a été annulé."
     );
   }
 
@@ -162,10 +169,17 @@ async function getFlatContent(
   content: BsdaRevisionRequestContentInput
 ): Promise<RevisionRequestContent> {
   const flatContent = flattenBsdaRevisionRequestInput(content);
+  const { isCanceled, ...fields } = flatContent;
 
   if (Object.keys(flatContent).length === 0) {
     throw new UserInputError(
       "Impossible de créer une révision sans modifications."
+    );
+  }
+
+  if (isCanceled && Object.values(fields).length > 0) {
+    throw new UserInputError(
+      "Impossible d'annuler et de modifier un bordereau."
     );
   }
 
@@ -206,5 +220,6 @@ const revisionRequestContentSchema = yup.object({
   emitterPickupSiteAddress: yup.string().nullable(),
   emitterPickupSiteCity: yup.string().nullable(),
   emitterPickupSitePostalCode: yup.string().nullable(),
-  emitterPickupSiteInfos: yup.string().nullable()
+  emitterPickupSiteInfos: yup.string().nullable(),
+  isCanceled: yup.bool().nullable()
 });

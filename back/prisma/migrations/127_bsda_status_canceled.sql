@@ -1,0 +1,1 @@
+ALTER TYPE "default$default"."BsdaStatus" ADD VALUE 'CANCELED';

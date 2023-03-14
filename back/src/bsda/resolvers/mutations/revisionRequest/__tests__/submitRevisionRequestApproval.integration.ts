@@ -469,4 +469,45 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
 
     expect(updatedBsda.status).toBe("SENT");
   });
+
+  it("should change the bsda status to CANCELED if revision asks for cancellation", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        status: "SENT"
+      }
+    });
+
+    const revisionRequest = await prisma.bsdaRevisionRequest.create({
+      data: {
+        bsdaId: bsda.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret } },
+        comment: "Cancel",
+        isCanceled: true
+      }
+    });
+
+    await mutate<
+      Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+      MutationSubmitBsdaRevisionRequestApprovalArgs
+    >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    const updatedBsda = await prisma.bsda.findUnique({
+      where: { id: bsda.id }
+    });
+
+    expect(updatedBsda.status).toBe("CANCELED");
+  });
 });

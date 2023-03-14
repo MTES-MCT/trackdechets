@@ -78,6 +78,7 @@ async function getUpdateFromRevisionRequest(
     createdAt,
     id,
     status,
+    isCanceled,
     ...bsdaUpdate
   } = revisionRequest;
 
@@ -87,7 +88,8 @@ async function getUpdateFromRevisionRequest(
   });
   const newStatus = getNewStatus(
     currentStatus,
-    bsdaUpdate.destinationOperationCode
+    bsdaUpdate.destinationOperationCode,
+    isCanceled
   );
 
   return removeEmpty({
@@ -100,8 +102,13 @@ async function getUpdateFromRevisionRequest(
 
 function getNewStatus(
   status: BsdaStatus,
-  newOperationCode: string | null
+  newOperationCode: string | null,
+  isCanceled = false
 ): BsdaStatus {
+  if (isCanceled) {
+    return BsdaStatus.CANCELED;
+  }
+
   if (
     status === BsdaStatus.PROCESSED &&
     PARTIAL_OPERATIONS.includes(newOperationCode)

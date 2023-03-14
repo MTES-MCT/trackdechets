@@ -329,4 +329,70 @@ describe("Mutation.createBsdaRevisionRequest", () => {
     expect(data.createBsdaRevisionRequest.bsda.id).toBe(bsda.id);
     expect(data.createBsdaRevisionRequest.approvals.length).toBe(1);
   });
+
+  it("should fail if trying to cancel AND modify the bsda", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        destinationCompanySiret: recipientCompany.siret,
+        workerCompanySiret: recipientCompany.siret,
+        status: "SENT"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: { isCanceled: true, waste: { code: "16 01 11*" } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      `Impossible d'annuler et de modifier un bordereau.`
+    );
+  });
+
+  it("should fail if the bsda is canceled", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        destinationCompanySiret: recipientCompany.siret,
+        workerCompanySiret: recipientCompany.siret,
+        status: "CANCELED"
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createBsdaRevisionRequest">,
+      MutationCreateBsdaRevisionRequestArgs
+    >(CREATE_BSDA_REVISION_REQUEST, {
+      variables: {
+        input: {
+          bsdaId: bsda.id,
+          content: { waste: { code: "16 01 11*" } },
+          comment: "A comment",
+          authoringCompanySiret: company.siret
+        }
+      }
+    });
+
+    expect(errors[0].message).toBe(
+      `Impossible de créer une révision sur ce bordereau, il a été annulé.`
+    );
+  });
 });
