@@ -12,7 +12,7 @@ import { useDuplicate } from "dashboard/components/BSDList/BSDD/BSDDActions/useD
 
 import { DeleteModal } from "dashboard/components/BSDList/BSDD/BSDDActions/DeleteModal";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-import classNames from "classnames";
+
 import {
   TransportSegment,
   Form,
