@@ -7,6 +7,8 @@ import {
   Mutation,
   MutationSubmitBsdaRevisionRequestApprovalArgs
 } from "../../../../../generated/graphql/types";
+import { NON_CANCELLABLE_BSDA_STATUSES } from "../createRevisionRequest";
+import { BsdaStatus } from "@prisma/client";
 
 const SUBMIT_BSDA_REVISION_REQUEST_APPROVAL = `
   mutation SubmitBsdaRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
@@ -510,4 +512,46 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
 
     expect(updatedBsda.status).toBe("CANCELED");
   });
+
+  it.each(NON_CANCELLABLE_BSDA_STATUSES)(
+    "should fail if request is about cancelation & the BSDA has a non-cancellable status",
+    async (status: BsdaStatus) => {
+      const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const { mutate } = makeClient(user);
+
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: companyOfSomeoneElse.siret,
+          status
+        }
+      });
+
+      const revisionRequest = await prisma.bsdaRevisionRequest.create({
+        data: {
+          bsdaId: bsda.id,
+          authoringCompanyId: companyOfSomeoneElse.id,
+          approvals: { create: { approverSiret: company.siret } },
+          comment: "Cancel",
+          isCanceled: true
+        }
+      });
+
+      const { errors } = await mutate<
+        Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+        MutationSubmitBsdaRevisionRequestApprovalArgs
+      >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequest.id,
+          isApproved: true
+        }
+      });
+
+      expect(errors[0].message).toBe(
+        "Impossible d'annuler un bordereau qui a été réceptionné sur l'installation de destination."
+      );
+    }
+  );
 });

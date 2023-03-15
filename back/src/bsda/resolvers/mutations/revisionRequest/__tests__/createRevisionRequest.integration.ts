@@ -6,6 +6,11 @@ import {
 import { userWithCompanyFactory } from "../../../../../__tests__/factories";
 import makeClient from "../../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../../__tests__/factories";
+import {
+  CANCELLABLE_BSDA_STATUSES,
+  NON_CANCELLABLE_BSDA_STATUSES
+} from "../createRevisionRequest";
+import { BsdaStatus } from "@prisma/client";
 
 const CREATE_BSDA_REVISION_REQUEST = `
   mutation CreateBsdaRevisionRequest($input: CreateBsdaRevisionRequestInput!) {
@@ -395,4 +400,79 @@ describe("Mutation.createBsdaRevisionRequest", () => {
       `Impossible de créer une révision sur ce bordereau, il a été annulé.`
     );
   });
+
+  it.each(CANCELLABLE_BSDA_STATUSES)(
+    "should succeed if status is in cancellable list",
+    async (status: BsdaStatus) => {
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: recipientCompany.siret,
+          workerCompanySiret: recipientCompany.siret,
+          status
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { data, errors } = await mutate<
+        Pick<Mutation, "createBsdaRevisionRequest">,
+        MutationCreateBsdaRevisionRequestArgs
+      >(CREATE_BSDA_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdaId: bsda.id,
+            content: { isCanceled: true },
+            comment: "A comment",
+            authoringCompanySiret: company.siret
+          }
+        }
+      });
+
+      expect(data.createBsdaRevisionRequest.bsda.id).toBe(bsda.id);
+      expect(errors).toBeUndefined();
+    }
+  );
+
+  it.each(NON_CANCELLABLE_BSDA_STATUSES)(
+    "should fail if status is in non-cancellable list",
+    async (status: BsdaStatus) => {
+      const { company: recipientCompany } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: company.siret,
+          destinationCompanySiret: recipientCompany.siret,
+          workerCompanySiret: recipientCompany.siret,
+          status
+        }
+      });
+
+      const { mutate } = makeClient(user);
+      const { errors } = await mutate<
+        Pick<Mutation, "createBsdaRevisionRequest">,
+        MutationCreateBsdaRevisionRequestArgs
+      >(CREATE_BSDA_REVISION_REQUEST, {
+        variables: {
+          input: {
+            bsdaId: bsda.id,
+            content: { isCanceled: true },
+            comment: "A comment",
+            authoringCompanySiret: company.siret
+          }
+        }
+      });
+
+      // Because the error messages vary depending on the status,
+      // let's just check that there is an error and not focus on the msg
+      expect(errors.length).toBeGreaterThan(0);
+    }
+  );
 });
