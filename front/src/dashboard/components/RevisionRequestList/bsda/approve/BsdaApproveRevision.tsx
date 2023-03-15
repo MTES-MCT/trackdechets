@@ -115,12 +115,19 @@ export function BsdaApproveRevision({ review }: Props) {
 export function DisplayRevision({ review }: Props) {
   if (review.content.isCanceled) {
     return (
-      <div>
-        <p className="tw-pb-6">
-          L'entreprise <strong>{review.authoringCompany.name}</strong> a demandé
-          l'annulation du bordereau <strong>#{review.bsda.id}</strong>
-        </p>
-      </div>
+      <>
+        <div>
+          <p className="tw-pb-6">
+            L'entreprise <strong>{review.authoringCompany.name}</strong> a
+            demandé l'annulation du bordereau <strong>#{review.bsda.id}</strong>
+          </p>
+        </div>
+
+        <div className="tw-flex tw-py-2">
+          <p className="tw-w-1/4 tw-font-bold">Commentaire</p>
+          <p className="tw-w-3/4">{review.comment}</p>
+        </div>
+      </>
     );
   }
 
