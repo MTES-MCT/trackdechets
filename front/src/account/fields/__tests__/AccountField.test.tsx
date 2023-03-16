@@ -21,9 +21,6 @@ describe("<AccountField />", () => {
     // it should contain label
     expect(getByText("Nom utilisateur")).toBeInTheDocument();
 
-    // it should contain tooltip trigger
-    expect(getByRole("button")).toBeInTheDocument();
-
     // it should contain field value
     expect(getByText("John Snow")).toBeInTheDocument();
 

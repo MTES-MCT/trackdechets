@@ -1,7 +1,16 @@
-import { FieldArray, FieldProps } from "formik";
+import { FieldArray, FieldProps, Field } from "formik";
 import React, { InputHTMLAttributes } from "react";
 import Tooltip from "common/components/Tooltip";
 import { CompanyType } from "../generated/graphql/types";
+import styles from "./CompanyType.module.scss";
+
+import {
+  Container,
+  Row,
+  Col,
+  Checkbox,
+  CheckboxGroup,
+} from "@dataesr/react-dsfr";
 
 export const COMPANY_CONSTANTS = [
   {
@@ -72,42 +81,60 @@ export const COMPANY_CONSTANTS = [
 interface CompanyTypeFieldProps {
   handleChange(e, arrayHelpers, companyType, value): void;
 }
+
 export default function CompanyTypeField({
   field: { name, value },
   id,
   label,
   handleChange,
+  subfields,
   ...props
-}: FieldProps & { label: string } & InputHTMLAttributes<HTMLInputElement> &
+}: FieldProps & {
+  label: string;
+  subfields?: object;
+} & InputHTMLAttributes<HTMLInputElement> &
   CompanyTypeFieldProps) {
   return (
     <FieldArray
       name={name}
       render={arrayHelpers => (
-        <fieldset className={name + "-fieldset"}>
-          {COMPANY_CONSTANTS.map((companyType, idx) => (
-            <div key={idx}>
-              <label
-                className="tw-flex tw-items-center"
-                key={companyType.value}
-              >
-                <input
-                  type="checkbox"
-                  name={name}
-                  className="td-checkbox"
-                  value={companyType.value}
-                  checked={value.includes(companyType.value)}
-                  disabled={props.disabled}
-                  onChange={e =>
-                    handleChange(e, arrayHelpers, companyType, value)
-                  }
-                />
-                {companyType.label}
-                <Tooltip msg={companyType.helpText} />
-              </label>
-            </div>
-          ))}
-        </fieldset>
+        <CheckboxGroup legend="Profil">
+          <Container fluid>
+            {COMPANY_CONSTANTS.map((companyType, idx) => (
+              <div key={idx}>
+                <Row gutters>
+                  <Col n="11">
+                    <Field name="companyTypes">
+                      {({ field }) => {
+                        return (
+                          <Checkbox
+                            id={companyType.value}
+                            label={companyType.label}
+                            defaultChecked={value.includes(companyType.value)}
+                            disabled={props.disabled}
+                            onClick={e =>
+                              handleChange(e, arrayHelpers, companyType, value)
+                            }
+                            {...field}
+                          ></Checkbox>
+                        );
+                      }}
+                    </Field>
+                  </Col>
+
+                  <Col n="1">
+                    <Tooltip msg={companyType.helpText} />
+                  </Col>
+                </Row>
+                {subfields?.[companyType.value] ? (
+                  <Row className={styles.subfields}>
+                    {subfields?.[companyType.value]}
+                  </Row>
+                ) : null}
+              </div>
+            ))}
+          </Container>
+        </CheckboxGroup>
       )}
     />
   );
