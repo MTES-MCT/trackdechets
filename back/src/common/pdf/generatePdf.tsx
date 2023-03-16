@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { toPDF } from "./pdf";
 import { CSS_PATHS } from "./components";
 
-export function formatDate(date?: Date) {
+export function formatDate(date?: Date | null) {
   return date ? format(date, "dd/MM/yyyy") : "__/__/____";
 }
 

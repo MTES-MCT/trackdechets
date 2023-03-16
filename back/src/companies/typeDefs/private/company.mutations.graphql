@@ -58,7 +58,7 @@ type Mutation {
   """
   createTransporterReceipt(
     input: CreateTransporterReceiptInput!
-  ): TransporterReceipt
+  ): TransporterReceipt!
 
   """
   USAGE INTERNE
@@ -66,7 +66,7 @@ type Mutation {
   """
   updateTransporterReceipt(
     input: UpdateTransporterReceiptInput!
-  ): TransporterReceipt
+  ): TransporterReceipt!
 
   """
   USAGE INTERNE
@@ -74,61 +74,61 @@ type Mutation {
   """
   deleteTransporterReceipt(
     input: DeleteTransporterReceiptInput!
-  ): TransporterReceipt
+  ): TransporterReceipt!
 
   """
   USAGE INTERNE
   Crée un récépissé négociant
   """
-  createTraderReceipt(input: CreateTraderReceiptInput!): TraderReceipt
+  createTraderReceipt(input: CreateTraderReceiptInput!): TraderReceipt!
 
   """
   USAGE INTERNE
   Édite les informations d'un récépissé négociant
   """
-  updateTraderReceipt(input: UpdateTraderReceiptInput!): TraderReceipt
+  updateTraderReceipt(input: UpdateTraderReceiptInput!): TraderReceipt!
 
   """
   USAGE INTERNE
   Supprime un récépissé négociant
   """
-  deleteTraderReceipt(input: DeleteTraderReceiptInput!): TraderReceipt
+  deleteTraderReceipt(input: DeleteTraderReceiptInput!): TraderReceipt!
 
   """
   USAGE INTERNE
   Crée un récépissé courtier
   """
-  createBrokerReceipt(input: CreateBrokerReceiptInput!): BrokerReceipt
+  createBrokerReceipt(input: CreateBrokerReceiptInput!): BrokerReceipt!
 
   """
   USAGE INTERNE
   Édite les informations d'un récépissé courtier
   """
-  updateBrokerReceipt(input: UpdateBrokerReceiptInput!): BrokerReceipt
+  updateBrokerReceipt(input: UpdateBrokerReceiptInput!): BrokerReceipt!
 
   """
   USAGE INTERNE
   Supprime un récépissé courtier
   """
-  deleteBrokerReceipt(input: DeleteBrokerReceiptInput!): BrokerReceipt
+  deleteBrokerReceipt(input: DeleteBrokerReceiptInput!): BrokerReceipt!
 
   """
   USAGE INTERNE
   Crée un agrément VHU
   """
-  createVhuAgrement(input: CreateVhuAgrementInput!): VhuAgrement
+  createVhuAgrement(input: CreateVhuAgrementInput!): VhuAgrement!
 
   """
   USAGE INTERNE
   Édite un agrément VHU
   """
-  updateVhuAgrement(input: UpdateVhuAgrementInput!): VhuAgrement
+  updateVhuAgrement(input: UpdateVhuAgrementInput!): VhuAgrement!
 
   """
   USAGE INTERNE
   Supprime un agrément VHU
   """
-  deleteVhuAgrement(input: DeleteVhuAgrementInput!): VhuAgrement
+  deleteVhuAgrement(input: DeleteVhuAgrementInput!): VhuAgrement!
 
   """
   USAGE INTERNE
@@ -136,7 +136,7 @@ type Mutation {
   """
   createWorkerCertification(
     input: CreateWorkerCertificationInput!
-  ): WorkerCertification
+  ): WorkerCertification!
 
   """
   USAGE INTERNE
@@ -144,7 +144,7 @@ type Mutation {
   """
   updateWorkerCertification(
     input: UpdateWorkerCertificationInput!
-  ): WorkerCertification
+  ): WorkerCertification!
 
   """
   USAGE INTERNE
@@ -152,7 +152,7 @@ type Mutation {
   """
   deleteWorkerCertification(
     input: DeleteWorkerCertificationInput!
-  ): WorkerCertification
+  ): WorkerCertification!
 
   """
   USAGE INTERNE

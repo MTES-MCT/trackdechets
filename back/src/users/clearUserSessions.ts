@@ -11,7 +11,7 @@ import { getUserSessions, genUserSessionsIdsKey } from "../common/redis/users";
 export async function clearUserSessions(userId: string): Promise<void> {
   const sessions = await getUserSessions(userId);
 
-  sessions.forEach(sessionId => sess.store.destroy(sessionId));
+  sessions.forEach(sessionId => sess.store?.destroy(sessionId));
 
   await redisClient.del(genUserSessionsIdsKey(userId));
 }

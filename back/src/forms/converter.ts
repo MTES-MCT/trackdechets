@@ -494,7 +494,7 @@ export async function expandFormFromDb(
   form: any,
   dataloader?: DataLoader<string, Form, string>
 ): Promise<GraphQLForm> {
-  let forwardedIn: Form;
+  let forwardedIn: Form | null;
   // if form is rawBsd, forwardedIn is already computed
   if (form?.forwardedIn) {
     forwardedIn = form.forwardedIn;
@@ -762,7 +762,7 @@ export async function expandFormFromDb(
 
 export async function expandFormFromElastic(
   form: BsdElastic["rawBsd"]
-): Promise<GraphQLForm> {
+): Promise<GraphQLForm | null> {
   const expanded = await expandFormFromDb(form);
 
   if (!expanded) {
@@ -789,7 +789,8 @@ export async function expandInitialFormFromDb(
     quantityGrouped
   } = await expandFormFromDb(prismaForm, dataloader);
 
-  const hasPickupSite = emitter?.workSite?.postalCode?.length > 0;
+  const hasPickupSite =
+    emitter?.workSite?.postalCode && emitter.workSite.postalCode.length > 0;
 
   return {
     id,

@@ -17,7 +17,7 @@ type Query {
     before: ID
     "USAGE INTERNE - Filtre par nom, siret ou numéro de TVA - chaîne comprise entre 3 et 30 caractères"
     search: String
-  ): CompanyPrivateConnection
+  ): CompanyPrivateConnection!
 
   """
   Récupère une demande de rattachement effectuée par l'utilisateur courant
@@ -27,5 +27,5 @@ type Query {
   permet notamment de suivre l'état d'avancement de la demande de rattachement
   (en attente, accepté, refusé)
   """
-  membershipRequest(id: ID, siret: String): MembershipRequest
+  membershipRequest(id: ID, siret: String): MembershipRequest!
 }

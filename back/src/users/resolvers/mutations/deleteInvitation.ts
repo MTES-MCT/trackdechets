@@ -26,7 +26,7 @@ const deleteInvitationResolver: MutationResolvers["deleteInvitation"] = async (
   const dbCompany = await prisma.company.findUnique({
     where: { orgId: siret }
   });
-  return convertUrls(dbCompany);
+  return convertUrls(dbCompany!);
 };
 
 export default deleteInvitationResolver;

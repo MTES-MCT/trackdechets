@@ -15,6 +15,10 @@ const revokeAuthorizedApplicationResolver: MutationResolvers["revokeAuthorizedAp
         where: { id: application.id }
       })
       .admin();
+    if (!owner) {
+      throw new Error(`Cannot find admin for application ${application.id}`);
+    }
+
     const accessTokens = await prisma.accessToken.findMany({
       where: { userId: user.id, applicationId: id }
     });

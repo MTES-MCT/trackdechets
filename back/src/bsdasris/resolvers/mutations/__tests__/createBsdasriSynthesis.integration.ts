@@ -97,22 +97,22 @@ describe("Mutation.createDasri", () => {
         }
       }
     );
-    expect(data.createBsdasri.synthesizing.map(bsd => bsd.id)).toEqual([
+    expect(data.createBsdasri.synthesizing?.map(bsd => bsd.id)).toEqual([
       toAssociate1.id,
       toAssociate2.id
     ]);
     expect(data.createBsdasri.type).toEqual("SYNTHESIS");
-    const grouped1 = await prisma.bsdasri.findUnique({
+    const grouped1 = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: toAssociate1.id }
     });
-    const grouped2 = await prisma.bsdasri.findUnique({
+    const grouped2 = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: toAssociate2.id }
     });
     expect(grouped1.synthesizedInId).toEqual(data.createBsdasri.id);
 
     expect(grouped2.synthesizedInId).toEqual(data.createBsdasri.id);
 
-    const created = await prisma.bsdasri.findUnique({
+    const created = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: data.createBsdasri.id }
     });
     const packaging = [

@@ -36,6 +36,11 @@ const resetPasswordResolver: MutationResolvers["resetPassword"] = async (
   const user = await prisma.user.findUnique({
     where: { id: resetHash.userId }
   });
+  if (!user) {
+    throw new Error(
+      `Cannot find user ${resetHash.userId} for resetHash ${resetHash.id}`
+    );
+  }
   checkPasswordCriteria(trimmedPassword);
 
   await updateUserPassword({ userId: user.id, trimmedPassword });

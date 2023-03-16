@@ -31,7 +31,7 @@ const removeUserFromCompanyResolver: MutationResolvers["removeUserFromCompany"] 
       where: { orgId: siret }
     });
 
-    return convertUrls(dbCompany);
+    return convertUrls(dbCompany!);
   };
 
 export default removeUserFromCompanyResolver;

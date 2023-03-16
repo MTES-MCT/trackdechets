@@ -26,15 +26,14 @@ const authorizedApplicationsResolver: QueryResolvers["authorizedApplications"] =
     const authorizedApplicationsById = accessTokens.reduce(
       (acc, accessToken) => {
         const application = accessToken.application;
+        if (!application) return acc;
+
         if (acc[application.id]) {
           const current = acc[application.id];
           let lastConnection = current.lastConnection;
-          if (accessToken.lastUsed) {
+          if (lastConnection && accessToken.lastUsed) {
             lastConnection = new Date(
-              Math.max(
-                lastConnection?.getTime(),
-                accessToken.lastUsed?.getTime()
-              )
+              Math.max(lastConnection.getTime(), accessToken.lastUsed.getTime())
             );
           }
           return { ...acc, [application.id]: { ...current, lastConnection } };
@@ -46,7 +45,9 @@ const authorizedApplicationsResolver: QueryResolvers["authorizedApplications"] =
               name: application.name,
               admin: application.admin?.email,
               logoUrl: application.logoUrl,
-              lastConnection: new Date(accessToken.lastUsed)
+              lastConnection: accessToken.lastUsed
+                ? new Date(accessToken.lastUsed)
+                : undefined
             }
           };
         }

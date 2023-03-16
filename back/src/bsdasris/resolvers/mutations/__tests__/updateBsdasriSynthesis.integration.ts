@@ -104,7 +104,7 @@ describe("Mutation.updateBsdasri", () => {
       }
     });
 
-    const updatedDasri = await prisma.bsdasri.findUnique({
+    const updatedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id },
       include: {
         synthesizing: { select: { id: true } }
@@ -345,7 +345,7 @@ describe("Mutation.updateBsdasri", () => {
         }
       });
 
-      const updatedDasri = await prisma.bsdasri.findUnique({
+      const updatedDasri = await prisma.bsdasri.findUniqueOrThrow({
         where: { id: dasri.id },
         include: {
           synthesizing: { select: { id: true } }

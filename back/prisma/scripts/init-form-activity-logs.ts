@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import prisma from "../../src/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
 
@@ -32,7 +33,7 @@ export class LoadAnonymousCompaniesUpdater implements Updater {
         `🔢 There are ${formsCount} forms to process. Chunk size is ${CHUNK_SIZE}`
       );
 
-      let cursor = null;
+      let cursor: string | null = null;
       for (let i = 0; i < formsCount; i += CHUNK_SIZE) {
         const chunkForms = await prisma.form.findMany({
           where,
@@ -50,7 +51,7 @@ export class LoadAnonymousCompaniesUpdater implements Updater {
             type: "BsddCreated",
             actor: "script",
             data: {
-              content: JSON.parse(JSON.stringify(form))
+              content: JSON.parse(JSON.stringify(form)) as Prisma.InputJsonValue
             },
             metadata: { fake: true, origin: "initial migration" }
           }))
