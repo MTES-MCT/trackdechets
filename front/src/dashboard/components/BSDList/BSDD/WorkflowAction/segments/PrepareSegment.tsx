@@ -158,12 +158,24 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
                   valider la réception.
                 </div>
                 <h4 className="form__section-heading">Transporteur</h4>
-                <label htmlFor="id_mode">Mode de transport</label>
-                <Field
-                  id="id_mode"
-                  name="mode"
-                  component={FieldTransportModeSelect}
-                ></Field>
+                <div className="form__row">
+                  <label htmlFor="id_mode">Mode de transport</label>
+                  <Field
+                    id="id_mode"
+                    name="mode"
+                    component={FieldTransportModeSelect}
+                  ></Field>
+                  <label htmlFor="id_numberPlate">
+                    Immatriculation (optionnel)
+                  </label>
+                  <Field
+                    type="text"
+                    name="transporter.numberPlate"
+                    id="id_numberPlate"
+                    className="td-input"
+                  />
+                  <RedErrorMessage name="transporter.numberPlate" />
+                </div>
                 <h4 className="form__section-heading">Siret</h4>
                 <CompanySelector
                   name="transporter.company"
@@ -191,7 +203,9 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
                     }
                   }}
                 />
-                <h4 className="form__section-heading">Autorisations</h4>
+                <h4 className="form__section-heading">
+                  Récépissé de déclaration de transport de déchets
+                </h4>
 
                 <div className="form__row">
                   <TdSwitch
@@ -207,46 +221,6 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
                     l'environnement."
                   />
                 </div>
-                {!values.transporter.isExemptedOfReceipt && (
-                  <div className="form__row">
-                    <label htmlFor="id_receipt">Numéro de récépissé</label>
-                    <Field
-                      type="text"
-                      name="transporter.receipt"
-                      id="id_receipt"
-                      className="td-input"
-                    />
-                    <RedErrorMessage name="transporter.receipt" />
-                    <label htmlFor="id_department">Département</label>
-                    <Field
-                      type="text"
-                      name="transporter.department"
-                      id="id_department"
-                      className="td-input"
-                    />
-                    <RedErrorMessage name="transporter.department" />
-                    <label htmlFor="id_validityLimit">
-                      Limite de validité (optionnel)
-                    </label>
-                    <Field
-                      name="transporter.validityLimit"
-                      component={DateInput}
-                      id="id_validityLimit"
-                      className="td-input"
-                    />
-                    <RedErrorMessage name="transporter.validityLimit" />
-                    <label htmlFor="id_numberPlate">
-                      Immatriculation (optionnel)
-                    </label>
-                    <Field
-                      type="text"
-                      name="transporter.numberPlate"
-                      id="id_numberPlate"
-                      className="td-input"
-                    />
-                    <RedErrorMessage name="transporter.numberPlate" />
-                  </div>
-                )}
                 {error && <NotificationError apolloError={error} />}
 
                 <div className="form__actions">

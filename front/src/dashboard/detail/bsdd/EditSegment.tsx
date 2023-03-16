@@ -83,12 +83,21 @@ export default function EditSegment({ siret, segment }: Props) {
             {({ values, setFieldValue }) => (
               <FormikForm>
                 <h3>Modifier un transfert multimodal</h3>
-                <label htmlFor="id_mode">Mode de transport</label>
-                <Field
-                  id="id_mode"
-                  name="mode"
-                  component={FieldTransportModeSelect}
-                ></Field>
+                <div className="form__row">
+                  <label htmlFor="id_mode">Mode de transport</label>
+                  <Field
+                    id="id_mode"
+                    name="mode"
+                    component={FieldTransportModeSelect}
+                  ></Field>
+                  <label htmlFor="id_numberPlate">Immatriculation</label>
+                  <Field
+                    type="text"
+                    name="transporter.numberPlate"
+                    id="id_numberPlate"
+                    className="td-input"
+                  />
+                </div>
                 <h4 className="form__section-heading">Transporteur</h4>
 
                 {!segment.readyToTakeOver ? (
@@ -148,7 +157,9 @@ export default function EditSegment({ siret, segment }: Props) {
                   </>
                 )}
 
-                <h4 className="form__section-heading">Autorisations</h4>
+                <h4 className="form__section-heading">
+                  Récépissé de déclaration de transport de déchets
+                </h4>
                 <div className="form__row">
                   <label htmlFor="isExemptedOfReceipt" className="tw-mb-2">
                     <Field
@@ -163,38 +174,7 @@ export default function EditSegment({ siret, segment }: Props) {
                     de l'environnement.
                   </label>
                 </div>
-                {!values?.transporter?.isExemptedOfReceipt && (
-                  <div className="form__row">
-                    <label htmlFor="id_receipt">Numéro de récépissé</label>
-                    <Field
-                      type="text"
-                      name="transporter.receipt"
-                      id="id_receipt"
-                      className="td-input"
-                    />
-                    <label htmlFor="id_department">Département</label>
-                    <Field
-                      type="text"
-                      name="transporter.department"
-                      id="id_department"
-                      className="td-input"
-                    />
-                    <label htmlFor="id_validityLimit">Limite de validité</label>
-                    <Field
-                      component={DateInput}
-                      name="transporter.validityLimit"
-                      id="id_validityLimit"
-                      className="td-input"
-                    />
-                    <label htmlFor="id_numberPlate">Immatriculation</label>
-                    <Field
-                      type="text"
-                      name="transporter.numberPlate"
-                      id="id_numberPlate"
-                      className="td-input"
-                    />
-                  </div>
-                )}
+
                 {error && <NotificationError apolloError={error} />}
 
                 <div className="form__actions">

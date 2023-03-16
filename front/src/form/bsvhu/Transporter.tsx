@@ -49,49 +49,6 @@ export default function Transporter({ disabled }) {
         }}
       />
 
-      {!isForeignVat(values?.transporter?.company?.vatNumber!!) && (
-        <>
-          <h4 className="form__section-heading">Autorisations</h4>
-          <div className="form__row">
-            <label>
-              Numéro de récépissé
-              <Field
-                type="text"
-                name="transporter.recepisse.number"
-                className="td-input"
-                disabled={disabled}
-              />
-            </label>
-
-            <RedErrorMessage name="transporter.recepisse.number" />
-
-            <label>
-              Département
-              <Field
-                type="text"
-                name="transporter.recepisse.department"
-                placeholder="Ex: 83"
-                className={`td-input ${styles.transporterDepartment}`}
-                disabled={disabled}
-              />
-            </label>
-
-            <RedErrorMessage name="transporter.recepisse.department" />
-
-            <label>
-              Limite de validité
-              <Field
-                component={DateInput}
-                name="transporter.recepisse.validityLimit"
-                className={`td-input ${styles.transporterValidityLimit}`}
-                disabled={disabled}
-              />
-            </label>
-
-            <RedErrorMessage name="transporter.recepisse.validityLimit" />
-          </div>
-        </>
-      )}
     </>
   );
 }

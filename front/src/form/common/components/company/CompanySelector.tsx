@@ -27,6 +27,7 @@ import {
   QueryCompanyPrivateInfosArgs,
   QueryFavoritesArgs,
   QuerySearchCompaniesArgs,
+  Transporter,
 } from "generated/graphql/types";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -37,6 +38,7 @@ import {
   FAVORITES,
   SEARCH_COMPANIES,
 } from "./query";
+import { formatDate } from "common/datetime";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -76,7 +78,8 @@ export default function CompanySelector({
     name: field.value?.name,
     address: field.value?.address,
   });
-  const { setFieldError, setFieldValue, setFieldTouched } = useFormikContext();
+  const { setFieldError, setFieldValue, setFieldTouched, values } =
+    useFormikContext<{ transporter: Transporter }>();
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
     (field.value?.country && field.value?.country !== "FR") ||
@@ -541,6 +544,27 @@ export default function CompanySelector({
 
           <RedErrorMessage name={`${field.name}.mail`} />
         </div>
+        {!isForeignVat(values.transporter?.company?.vatNumber!!) &&
+          name == "transporter.company" && (
+            <>
+              <h4 className="form__section-heading">
+                Récépissé de déclaration de transport de déchets
+              </h4>
+              {values?.transporter?.receipt ? (
+                <p>
+                  Numéro {values?.transporter?.receipt}, départment{" "}
+                  {values?.transporter?.department}, date limite de validité{" "}
+                  {formatDate(values?.transporter?.validityLimit!)}
+                </p>
+              ) : (
+                <p>
+                  L'entreprise de transport n'a pas complété ces informations
+                  dans son profil. Nous ne pouvons pas afficher les information.
+                  Il lui appartient de les compléter.
+                </p>
+              )}
+            </>
+          )}
       </div>
     </>
   );
