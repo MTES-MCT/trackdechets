@@ -32,18 +32,13 @@ export const INDEX_DATETIME_SEPARATOR = "===";
 type IndexAllFnSignature = {
   bsdName: string;
   index: string;
-  skip: number;
-  total: number;
-  since: Date;
+  since?: Date;
 };
 
 export type FindManyAndIndexBsdsFnSignature = {
   bsdName: string;
   index: string;
-  skip: number;
-  total: number;
-  since: Date;
-  take: number;
+  ids: string[];
 };
 
 const bsdNameToBsdElasticFns = {
@@ -454,139 +449,162 @@ export async function addReindexAllInBulkJob(
 }
 
 /**
- * Index in chunks all BSDs of a given type in a synchronous manner
+ * Retrieves all BSD identifiers for a given BSD type
  */
-async function indexAllBsdTypeSync({
-  bsdName,
-  index,
-  skip,
-  total,
-  since
-}: IndexAllFnSignature): Promise<IndexAllFnSignature | void> {
-  const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
-
-  const continueChunks = await findManyAndIndexBsds({
-    bsdName,
-    index,
-    skip,
-    total,
-    take,
-    since
-  });
-
-  if (!continueChunks) {
-    return;
-  }
-  // synchronous indexation takes place in the database order
-  return indexAllBsdTypeSync({
-    bsdName,
-    index,
-    skip: skip + take,
-    total,
-    since
-  });
-}
-
-async function getIndexTypeCount(bsdName: string, since: Date) {
+export async function getBsdIdentifiers(
+  bsdName: string,
+  since?: Date
+): Promise<string[]> {
   const prismaModelDelegate = prismaModels[bsdName];
-  return prismaModelDelegate.count({
+
+  const bsds = await prismaModelDelegate.findMany({
     where: {
       isDeleted: false,
       ...(since ? { updatedAt: { gte: since } } : {})
-    }
+    },
+    select: { id: true }
   });
+
+  return bsds.map(bsd => bsd.id);
+}
+
+export async function processBsdIdentifiersByChunk(
+  ids: string[],
+  fn: (chunk: string[]) => Promise<any>,
+  chunkSize = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100
+) {
+  for (let i = 0; i < ids.length; i += chunkSize) {
+    const chunk = ids.slice(i, i + chunkSize);
+    await fn(chunk);
+  }
+}
+
+/**
+ * Index in chunks all BSDs of a given type in a synchronous manner
+ */
+export async function indexAllBsdTypeSync({
+  bsdName,
+  index,
+  since
+}: IndexAllFnSignature): Promise<void> {
+  const ids = await getBsdIdentifiers(bsdName, since);
+
+  logger.info(`Starting synchronous indexation of ${ids.length} ${bsdName}`);
+
+  await processBsdIdentifiersByChunk(ids, chunk =>
+    findManyAndIndexBsds({
+      bsdName,
+      index,
+      ids: chunk
+    })
+  );
+}
+
+/**
+ * Index in chunks all BSDs of a given type by adding jobs
+ * to the job queue
+ */
+export async function indexAllBsdTypeConcurrently({
+  bsdName,
+  index,
+  since
+}: IndexAllFnSignature) {
+  const jobs: Job<string>[] = [];
+
+  const data = [];
+
+  const ids = await getBsdIdentifiers(bsdName, since);
+  logger.info(`Starting indexation of ${ids.length} ${bsdName}`);
+
+  await processBsdIdentifiersByChunk(ids, async chunk => {
+    data.push({
+      name: "indexChunk",
+      data: JSON.stringify({
+        bsdName,
+        index,
+        ids: chunk
+      }),
+      opts: {
+        lifo: true,
+        stackTraceLimit: 100,
+        attempts: 1,
+        timeout: 600_000 // 10 min
+      }
+    });
+  });
+
+  // control concurrency of addBulk
+  const chunkSize = parseInt(process.env.BULK_INDEX_BATCH_ADD, 10) || 5;
+  for (let i = 0; i < data.length; i += chunkSize) {
+    const chunk = data.slice(i, i + chunkSize);
+    // all jobs are succesfully added in bulk or all jobs will fail
+    const bulkJobs = await indexQueue.addBulk(chunk);
+    jobs.push(...bulkJobs);
+  }
+
+  logger.info(
+    `Added ${data.length} bulk jobs to index chunks of "${bsdName}" to index "${index}"`
+  );
+
+  if (jobs.length) {
+    logger.info(`Waiting for all ${jobs.length} jobs in queue to finish`);
+    // returned promise fulfills when all of the input's promises settle (resolved or rejected)
+    return Promise.allSettled(
+      jobs.map(job => {
+        // Returns a promise that resolves or rejects when the job completes or fails.
+        return job.finished();
+      })
+    );
+  }
 }
 
 /**
  * Generic indexation function for all bsd of a given type
  */
-async function indexAllBsds(
+export async function indexAllBsds(
   index: string,
   useQueue = false,
   bsdType?: BsdType,
   updatedSince?: Date
 ): Promise<void> {
-  let since: Date;
-  const jobs: Job<string>[] = [];
+  const startDate = new Date();
+
   const allBsdTypes: BsdType[] = ["BSDD", "BSDA", "BSDASRI", "BSVHU", "BSFF"];
 
   for (const loopType of allBsdTypes) {
     if (!bsdType || bsdType === loopType) {
       const bsdName = loopType.toLowerCase();
-      // initialize the total counter
-      const total = await getIndexTypeCount(bsdName, updatedSince);
-      logger.info(`Starting indexation of ${total} ${loopType}`);
+
       if (!useQueue) {
-        since = new Date();
         await indexAllBsdTypeSync({
           bsdName,
           index,
-          skip: 0,
-          total,
-          since: updatedSince ?? undefined
-        });
-        logger.info(
-          `Catching-up indexation of ${bsdName} updated in database since ${since.toISOString()}`
-        );
-        const totalSince = await getIndexTypeCount(bsdName, since);
-        await indexAllBsdTypeSync({
-          bsdName,
-          index,
-          skip: 0,
-          total: totalSince,
-          since
+          since: updatedSince
         });
       } else {
-        const take = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100;
-        const data = [];
-        for (
-          let incrementalSkip = 0;
-          incrementalSkip < total;
-          incrementalSkip += take
-        ) {
-          data.push({
-            name: "indexChunk",
-            data: JSON.stringify({
-              bsdName,
-              index,
-              skip: incrementalSkip,
-              total,
-              take,
-              since
-            }),
-            opts: {
-              lifo: true,
-              stackTraceLimit: 100,
-              attempts: 1,
-              timeout: 600_000 // 10 min
-            }
-          });
-        }
-        // control concurrency of addBulk
-        const chunkSize = parseInt(process.env.BULK_INDEX_BATCH_ADD, 10) || 5;
-        for (let i = 0; i < data.length; i += chunkSize) {
-          const chunk = data.slice(i, i + chunkSize);
-          // all jobs are succesfully added in bulk or all jobs will fail
-          const bulkJobs = await indexQueue.addBulk(chunk);
-          jobs.push(...bulkJobs);
-        }
-
-        logger.info(
-          `Added ${data.length} bulk jobs to index chunks of "${loopType}" to index "${index}"`
-        );
+        await indexAllBsdTypeConcurrently({
+          bsdName,
+          index,
+          since: updatedSince
+        });
       }
     }
   }
-  if (useQueue && jobs.length) {
-    logger.info(`Waiting for all ${jobs.length} jobs in queue to finish`);
-    // returned promise fulfills when all of the input's promises settle (resolved or rejected)
-    await Promise.allSettled(
-      jobs.map(job => {
-        // Returns a promise that resolves or rejects when the job completes or fails.
-        job.finished();
-      })
-    );
+
+  logger.info(
+    `Catching-up indexation of BSDs updated in database since ${startDate.toISOString()}`
+  );
+  for (const loopType of allBsdTypes) {
+    if (!bsdType || bsdType === loopType) {
+      const bsdName = loopType.toLowerCase();
+      await indexAllBsdTypeSync({
+        bsdName,
+        index,
+        since: startDate
+      });
+    }
   }
+
   logger.info("All types of BSD have been indexed");
 }
 
@@ -596,11 +614,8 @@ async function indexAllBsds(
 export async function findManyAndIndexBsds({
   bsdName,
   index,
-  skip,
-  take,
-  total,
-  since
-}: FindManyAndIndexBsdsFnSignature): Promise<boolean> {
+  ids
+}: FindManyAndIndexBsdsFnSignature): Promise<void> {
   const prismaModelDelegate = prismaModels[bsdName];
   const toBsdElasticFn = bsdNameToBsdElasticFns[bsdName];
   if (!toBsdElasticFn || !prismaModelDelegate) {
@@ -609,42 +624,14 @@ export async function findManyAndIndexBsds({
     throw new Error(msg);
   }
   const bsds = await prismaModelDelegate.findMany({
-    skip,
-    take,
-    // orderBy gives consistency in SELECT with OFFSET and LIMIT.
-    // Job queue is LIFO so the last inserted should be the first job processed
-    // All BSD have an SQL INDEX on updatedAt
-    orderBy: { updatedAt: "desc" },
-    where: {
-      isDeleted: false,
-      ...(since
-        ? { OR: [{ updatedAt: { gte: since } }, { createdAt: { gte: since } }] }
-        : {})
-    },
+    where: { id: { in: ids } },
     ...prismaFindManyOptions[bsdName]
   });
 
-  if (bsds.length === 0) {
-    logger.info(`No ${bsdName} to index, exit`, since);
-    return false;
-  }
-
   await indexBsds(
     index,
-    bsds.map(form => toBsdElasticFn(form))
+    bsds.map(bsd => toBsdElasticFn(bsd))
   );
 
-  if (bsds.length < take) {
-    logger.info(
-      `Indexed ${bsdName} the last/unique batch from cursor ${skip} to ${total} on total of ${total}`
-    );
-    return false;
-  } else {
-    logger.info(
-      `Indexed ${bsdName} batch from cursor ${skip} to ${
-        skip + take
-      } on total of ${total}`
-    );
-  }
-  return true;
+  logger.info(`Indexed ${bsdName} batch of ${bsds.length}`);
 }

@@ -366,7 +366,7 @@ export function indexBsds(indexName: string, bsds: BsdElastic[]) {
 /**
  * Delete a document in Elastic Search.
  */
-export function deleteBsd<T extends { id?: string }>(
+export function deleteBsd<T extends { id: string }>(
   { id }: T,
   ctx?: GraphQLContext
 ) {

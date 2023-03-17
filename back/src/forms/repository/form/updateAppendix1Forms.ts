@@ -2,7 +2,7 @@ import { Form, Status } from "@prisma/client";
 import { RepositoryFnDeps } from "../../../common/repository/types";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
-import buildUpdateForm from "./update";
+import buildDeleteForm from "./delete";
 import buildUpdateManyForms from "./updateMany";
 
 export type UpdateAppendix1Forms = (params: {
@@ -115,17 +115,9 @@ export function buildUpdateAppendix1Forms(
 
     // Unlink & deletions
     // Note: We cannot updates relations in an updateMany (yet ?)
-    const updateForm = buildUpdateForm({ prisma, user });
+    const deleteForm = buildDeleteForm({ prisma, user });
     for (const id of formsToDelete) {
-      promises.push(
-        updateForm(
-          { id },
-          {
-            isDeleted: true,
-            groupedIn: { deleteMany: {} }
-          }
-        )
-      );
+      promises.push(deleteForm({ id }));
     }
 
     await Promise.all(promises);

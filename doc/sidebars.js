@@ -60,6 +60,7 @@ module.exports = {
                 "tutoriels/examples/bsdd/entreposage-provisoire",
                 "tutoriels/examples/bsdd/regroupement",
                 "tutoriels/examples/bsdd/import-bsd-papier",
+                "tutoriels/examples/bsdd/annexe-1",
               ],
               BSDASRI: [
                 "tutoriels/examples/bsdasri/acheminement-direct",

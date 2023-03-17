@@ -19,7 +19,7 @@ const store =
       });
 
 export function rateLimiterMiddleware(options: Options) {
-  options.keyGenerator = options.keyGenerator ?? (ip => ip);
+  const keyGenerator = options.keyGenerator ?? (ip => ip);
 
   return rateLimit({
     message: `Quota de ${options.maxRequestsPerWindow} requêtes par minute excédé pour cette adresse IP, merci de réessayer plus tard.`,
@@ -27,7 +27,7 @@ export function rateLimiterMiddleware(options: Options) {
     max: options.maxRequestsPerWindow,
     store,
     keyGenerator: (request: Request) => {
-      return options.keyGenerator(request.ip, request);
+      return keyGenerator(request.ip, request);
     }
   });
 }

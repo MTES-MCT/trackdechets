@@ -66,13 +66,13 @@ export function buildSetAppendix1({
         transporterCompanyContact: form.transporterCompanyContact,
         transporterCompanyVatNumber: form.transporterCompanyVatNumber,
         transporterCompanyPhone: form.transporterCompanyPhone,
-        transporterCompanyMail: form.recipientCompanyMail,
-        recipientCompanySiret: form.emitterCompanySiret,
-        recipientCompanyName: form.emitterCompanyName,
-        recipientCompanyAddress: form.emitterCompanyAddress,
-        recipientCompanyContact: form.emitterCompanyContact,
-        recipientCompanyPhone: form.emitterCompanyPhone,
-        recipientCompanyMail: form.emitterCompanyMail,
+        transporterCompanyMail: form.transporterCompanyMail,
+        recipientCompanySiret: form.recipientCompanySiret,
+        recipientCompanyName: form.recipientCompanyName,
+        recipientCompanyAddress: form.recipientCompanyAddress,
+        recipientCompanyContact: form.recipientCompanyContact,
+        recipientCompanyPhone: form.recipientCompanyPhone,
+        recipientCompanyMail: form.recipientCompanyMail,
         ecoOrganismeName: form.ecoOrganismeName,
         ecoOrganismeSiret: form.ecoOrganismeSiret
       }
@@ -88,6 +88,10 @@ export function buildSetAppendix1({
             fraction =>
               fraction.form.wasteDetailsPackagingInfos as PackagingInfo[]
           )
+        ),
+        wasteDetailsQuantity: newAppendix1Fractions.reduce(
+          (sum, fraction) => sum + fraction.form.wasteDetailsQuantity ?? 0,
+          0
         )
       }
     );

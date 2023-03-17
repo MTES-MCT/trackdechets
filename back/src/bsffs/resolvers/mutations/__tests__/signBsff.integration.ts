@@ -425,7 +425,7 @@ describe("Mutation.signBsff", () => {
       ]);
     });
 
-    it("should update status of previous BSFFs when refused", async () => {
+    it("should disconnect previous packagings when refused", async () => {
       const ttr = await userWithCompanyFactory(UserRole.ADMIN);
 
       const bsff = await createBsffAfterOperation(
@@ -456,9 +456,58 @@ describe("Mutation.signBsff", () => {
       });
 
       const updatedBsff = await prisma.bsff.findUnique({
-        where: { id: bsff.id }
+        where: { id: bsff.id },
+        include: { packagings: true }
       });
-      expect(updatedBsff.status).toEqual(BsffStatus.REFUSED);
+      expect(updatedBsff.status).toEqual(BsffStatus.INTERMEDIATELY_PROCESSED);
+      for (const packaging of updatedBsff.packagings) {
+        expect(packaging.nextPackagingId).toEqual(null);
+      }
+    });
+
+    it("should disconnect previous packagings when refused and signing for a specific packaging", async () => {
+      const ttr = await userWithCompanyFactory(UserRole.ADMIN);
+
+      const bsff = await createBsffAfterOperation(
+        { emitter, transporter, destination: ttr },
+        {
+          status: BsffStatus.INTERMEDIATELY_PROCESSED
+        },
+        { operationCode: OPERATION.R13.code }
+      );
+
+      const nextBsff = await createBsffBeforeRefusal({
+        emitter: ttr,
+        transporter,
+        destination,
+        previousPackagings: bsff.packagings
+      });
+
+      const { mutate } = makeClient(destination.user);
+      await mutate<Pick<Mutation, "signBsff">, MutationSignBsffArgs>(SIGN, {
+        variables: {
+          id: nextBsff.id,
+          input: {
+            packagingId: bsff.packagings[0].id,
+            type: "ACCEPTATION",
+            date: new Date().toISOString() as any,
+            author: destination.user.name
+          }
+        }
+      });
+
+      const updatedBsff = await prisma.bsff.findUnique({
+        where: { id: bsff.id },
+        include: { packagings: true }
+      });
+      expect(updatedBsff.status).toEqual(BsffStatus.INTERMEDIATELY_PROCESSED);
+
+      const refusedPackaging = await prisma.bsffPackaging.findUnique({
+        where: { id: bsff.packagings[0].id },
+        include: { previousPackagings: true }
+      });
+
+      expect(refusedPackaging.previousPackagings).toEqual([]);
     });
 
     it(

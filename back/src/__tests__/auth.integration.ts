@@ -26,7 +26,9 @@ describe("POST /login", () => {
     // should send trackdechets.connect.sid cookie
     expect(login.header["set-cookie"]).toHaveLength(1);
     const cookieRegExp = new RegExp(
-      `${sess.name}=(.+); Domain=${sess.cookie.domain}; Path=/; Expires=.+; HttpOnly`
+      `${sess.name}=(.+); Domain=${
+        sess.cookie!.domain
+      }; Path=/; Expires=.+; HttpOnly`
     );
     const sessionCookie = login.header["set-cookie"][0];
     expect(sessionCookie).toMatch(cookieRegExp);
@@ -259,7 +261,7 @@ describe("Authentification with token", () => {
       me: { email: user.email }
     });
 
-    const dbToken = await prisma.accessToken.findUnique({
+    const dbToken = await prisma.accessToken.findUniqueOrThrow({
       where: { token: hashToken(accessToken) }
     });
     expect(dbToken.lastUsed).not.toBeNull();
@@ -307,7 +309,7 @@ describe("Authentification with token", () => {
     });
 
     // should update lastUsed field
-    const accessToken = await prisma.accessToken.findUnique({
+    const accessToken = await prisma.accessToken.findUniqueOrThrow({
       where: { token: hashToken(token) }
     });
     expect(accessToken.lastUsed).not.toBeNull();

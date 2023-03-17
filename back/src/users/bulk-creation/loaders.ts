@@ -13,7 +13,7 @@ export function readCsv<Row>(
   csvpath: string,
   transform?: (row: any) => Row
 ): Promise<Row[]> {
-  const rows = [];
+  const rows: Row[] = [];
   return new Promise((resolve, reject) => {
     fs.createReadStream(csvpath)
       .pipe(csv({ separator }))

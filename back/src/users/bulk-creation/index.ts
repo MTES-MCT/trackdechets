@@ -18,6 +18,7 @@ import {
   CompanyVerificationMode,
   CompanyVerificationStatus
 } from "@prisma/client";
+import { CompanyRow } from "./types";
 
 function printHelp() {
   console.log(`
@@ -73,7 +74,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
 
   let isValid = true;
 
-  const companies = [];
+  const companies: CompanyRow[] = [];
 
   // perform validation
   for (const company of companiesRows) {

@@ -210,7 +210,7 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
       })
     }),
     grouping: [],
-    metadata: null
+    metadata: undefined as any
   };
 }
 export function expandBsdaFromElastic(
@@ -218,9 +218,6 @@ export function expandBsdaFromElastic(
 ): GraphqlBsda & { groupedIn?: string; forwardedIn?: string } {
   const expanded = expandBsdaFromDb(bsda);
 
-  if (!expanded) {
-    return null;
-  }
   // pass down related field to sub-resolvers
   return {
     ...expanded,
@@ -235,7 +232,7 @@ type FlattenedBsdaInput = Partial<
 
 export function flattenBsdaInput(formInput: BsdaInput) {
   return safeInput<FlattenedBsdaInput>({
-    type: chain(formInput, f => f.type),
+    type: formInput?.type ?? undefined,
     ...flattenBsdaEmitterInput(formInput),
     ...flattenBsdaEcoOrganismeInput(formInput),
     ...flattenBsdaDestinationInput(formInput),
@@ -431,8 +428,9 @@ function flattenBsdaTransporterInput({
     transporterTransportMode: chain(transporter, t =>
       chain(t.transport, tr => tr.mode)
     ),
-    transporterTransportPlates: chain(transporter, t =>
-      chain(t.transport, tr => tr.plates)
+    transporterTransportPlates: undefinedOrDefault(
+      chain(transporter, t => chain(t.transport, tr => tr.plates)),
+      []
     ),
     transporterTransportTakenOverAt: chain(transporter, t =>
       chain(t.transport, tr => tr.takenOverAt)
@@ -508,10 +506,14 @@ function flattenBsdaWasteInput({ waste }: Pick<BsdaInput, "waste">) {
     wasteMaterialName:
       chain(waste, w => w.materialName) ?? chain(waste, w => w.name),
     wasteConsistence: chain(waste, w => w.consistence),
-    wasteSealNumbers: chain(waste, w =>
-      w.sealNumbers === null ? undefined : w.sealNumbers
+    wasteSealNumbers: undefinedOrDefault(
+      chain(waste, w => w.sealNumbers),
+      []
     ),
-    wastePop: chain(waste, w => w.pop)
+    wastePop: undefinedOrDefault(
+      chain(waste, w => w.pop),
+      false
+    )
   };
 }
 
@@ -528,7 +530,7 @@ export function toInitialBsda(bsda: GraphqlBsda): GraphQLInitialBsda {
     waste: bsda.waste,
     weight: bsda.weight,
     destination: bsda.destination,
-    packagings: bsda.packagings
+    packagings: bsda.packagings ?? []
   };
 }
 
@@ -582,11 +584,15 @@ export function flattenBsdaRevisionRequestInput(
     wasteMaterialName: chain(reviewContent, r =>
       chain(r.waste, w => w.materialName)
     ),
-    wasteSealNumbers: chain(reviewContent, r =>
-      chain(r.waste, w => (w.sealNumbers === null ? undefined : w.sealNumbers))
+    wasteSealNumbers: undefinedOrDefault(
+      chain(reviewContent, r => chain(r.waste, w => w.sealNumbers)),
+      []
     ),
     wastePop: chain(reviewContent, r => chain(r.waste, w => w.pop)),
-    packagings: chain(reviewContent, r => r.packagings),
+    packagings: undefinedOrDefault(
+      chain(reviewContent, r => r.packagings),
+      []
+    ),
     destinationOperationCode: chain(reviewContent, r =>
       chain(r.destination, d => chain(d.operation, o => o.code))
     ),
@@ -661,11 +667,11 @@ export function companyToIntermediaryInput(
 
   return companies.map(company => {
     return {
-      name: company.name,
-      siret: company.siret,
+      name: company.name!,
+      siret: company.siret!,
       vatNumber: company.vatNumber,
       address: company.address,
-      contact: company.contact,
+      contact: company.contact!,
       phone: company.phone,
       mail: company.mail
     };

@@ -22,10 +22,10 @@ export type NestedWhere<W> = {
 };
 
 export type GenericWhere = {
-  id?: IdFilter;
-  isDraft?: boolean;
-  createdAt?: DateFilter;
-  updatedAt?: DateFilter;
+  id?: IdFilter | null;
+  isDraft?: boolean | null;
+  createdAt?: DateFilter | null;
+  updatedAt?: DateFilter | null;
 };
 
 export class NestingWhereError extends UserInputError {
@@ -56,11 +56,10 @@ const cleanMerge = <A, B>(arr1: A[], arr2: B[]): (A | B)[] | undefined => {
  * Recursively compose where input with OR, AND and NOT logic
  * until depth limit is reached
  */
-export function toPrismaNestedWhereInput<W extends NestedWhere<W>, P>(
-  where: W,
-  converter: (where: W) => P,
-  depthLimit = 2
-) {
+export function toPrismaNestedWhereInput<
+  W extends NestedWhere<W>,
+  P extends Record<string, unknown>
+>(where: W, converter: (where: W) => P, depthLimit = 2) {
   function inner(where: W, depth = 0): Partial<P> {
     if (depth >= depthLimit) {
       throw new NestingWhereError(depthLimit);
@@ -77,8 +76,8 @@ export function toPrismaNestedWhereInput<W extends NestedWhere<W>, P>(
 
     return safeInput<P>({
       ...converted,
-      AND: cleanMerge(arrayToInner(_and), converted["AND"] || []),
-      OR: cleanMerge(arrayToInner(_or), converted["OR"] || []),
+      AND: cleanMerge(arrayToInner(_and), (converted["AND"] as string[]) || []),
+      OR: cleanMerge(arrayToInner(_or), (converted["OR"] as string[]) || []),
       NOT: where?._not ? inner(where._not, depth + 1) : undefined
     });
   }
@@ -100,8 +99,8 @@ export function toPrismaGenericWhereInput(where: GenericWhere) {
 }
 
 export function toPrismaDateFilter(
-  dateFilter: DateFilter | undefined
-): Prisma.DateTimeFilter {
+  dateFilter: DateFilter | null | undefined
+): Prisma.DateTimeFilter | undefined {
   if (!dateFilter) {
     return undefined;
   }
@@ -115,7 +114,7 @@ export function toPrismaDateFilter(
   });
 }
 
-export function toPrismaEnumFilter<E>(enumFilter: EnumFilter<E>) {
+export function toPrismaEnumFilter<E>(enumFilter: EnumFilter<E> | undefined) {
   if (!enumFilter) {
     return undefined;
   }
@@ -125,7 +124,7 @@ export function toPrismaEnumFilter<E>(enumFilter: EnumFilter<E>) {
   });
 }
 
-export function toPrismaIdFilter(idFilter: IdFilter | undefined) {
+export function toPrismaIdFilter(idFilter: IdFilter | null | undefined) {
   if (!idFilter) {
     return undefined;
   }
@@ -135,7 +134,9 @@ export function toPrismaIdFilter(idFilter: IdFilter | undefined) {
   });
 }
 
-export function toPrismaRelationIdFilter(idFilter: IdFilter | undefined) {
+export function toPrismaRelationIdFilter(
+  idFilter: IdFilter | null | undefined
+) {
   if (!idFilter) {
     return undefined;
   }
@@ -153,8 +154,8 @@ export function toPrismaRelationIdFilter(idFilter: IdFilter | undefined) {
 }
 
 export function toPrismaStringFilter(
-  stringFilter: StringFilter | undefined
-): Prisma.StringFilter {
+  stringFilter: StringFilter | null | undefined
+): Prisma.StringFilter | undefined {
   if (!stringFilter) {
     return undefined;
   }
@@ -168,8 +169,8 @@ export function toPrismaStringFilter(
 
 /** Converter */
 export function toPrismaStringNullableListFilter(
-  stringNullableListFilter: StringNullableListFilter | undefined
-): Prisma.StringNullableListFilter {
+  stringNullableListFilter: StringNullableListFilter | null | undefined
+): Prisma.StringNullableListFilter | undefined {
   if (!stringNullableListFilter) {
     return undefined;
   }
@@ -222,9 +223,9 @@ function ngramMatch(fieldName: string, value: string): QueryDslQueryContainer {
 
 export function toElasticTextQuery(
   fieldName: string,
-  textFilter: TextFilter | undefined,
+  textFilter: TextFilter | null | undefined,
   maxLength = 50
-): QueryDslQueryContainer {
+): QueryDslQueryContainer | undefined {
   if (!textFilter) {
     return undefined;
   }
@@ -251,9 +252,9 @@ export function toElasticTextQuery(
 
 export function toElasticStringQuery(
   fieldName: string,
-  stringFilter: StringFilter | undefined,
+  stringFilter: StringFilter | null | undefined,
   maxLength = 50
-): QueryDslQueryContainer {
+): QueryDslQueryContainer | undefined {
   if (!stringFilter) {
     return undefined;
   }
@@ -281,10 +282,10 @@ export function toElasticStringQuery(
 
 export function toElasticStringListQuery(
   fieldName: string,
-  stringListFilter: StringNullableListFilter | undefined,
+  stringListFilter: StringNullableListFilter | null | undefined,
   maxLength = 50,
   filter = (s: string) => s // optional pre-processing function
-): QueryDslQueryContainer {
+): QueryDslQueryContainer | undefined {
   if (!stringListFilter) {
     return undefined;
   }
@@ -338,8 +339,8 @@ export function toElasticStringListQuery(
 
 export function toElasticDateQuery(
   fieldName: string,
-  dateFilter: DateFilter | undefined
-): QueryDslQueryContainer {
+  dateFilter: DateFilter | null | undefined
+): QueryDslQueryContainer | undefined {
   if (!dateFilter) {
     return undefined;
   }

@@ -223,7 +223,11 @@ export async function checkCanRead(user: User, form: Form) {
   if (isContributor) {
     return true;
   }
-  if (form.emitterType === "APPENDIX2") {
+  if (
+    [EmitterType.APPENDIX1, EmitterType.APPENDIX2].some(
+      type => form.emitterType === type
+    )
+  ) {
     const isInitialEmitter = await isFormInitialEmitter(user, form);
     if (isInitialEmitter) {
       return true;

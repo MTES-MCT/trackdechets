@@ -184,7 +184,7 @@ model Company {
   verificationMode                     CompanyVerificationMode?
   verificationComment                  String?
   verifiedAt                           DateTime?                 @db.Timestamptz(6)
-  name                                 String?
+  name                                 String
   address                              String?
   codeDepartement                      String?
   longitude                            Float?
@@ -709,7 +709,7 @@ model User {
   email                 String                  @unique
   password              String
   passwordVersion       Int
-  name                  String?
+  name                  String
   phone                 String?
   createdAt             DateTime                @default(now()) @db.Timestamptz(6)
   updatedAt             DateTime                @updatedAt @db.Timestamptz(6)

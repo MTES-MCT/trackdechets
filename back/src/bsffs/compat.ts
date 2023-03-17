@@ -10,7 +10,7 @@ import { UserInputError } from "apollo-server-core";
 import { RepositoryFnDeps } from "../common/repository/types";
 import { BsffPackagingInput } from "../generated/graphql/types";
 import { isFinalOperation } from "./constants";
-import { getBsffPackagingRepository } from "./repository";
+import { getReadonlyBsffPackagingRepository } from "./repository";
 
 type BsffDestination = {
   receptionWeight: number;
@@ -125,7 +125,7 @@ export async function getStatus(
 ) {
   const prisma = ctx?.prisma ?? prismaClient;
 
-  const { findNextPackagings } = getBsffPackagingRepository(ctx?.user, prisma);
+  const { findNextPackagings } = getReadonlyBsffPackagingRepository(prisma);
 
   const packagingsSimple =
     bsff.packagings ??

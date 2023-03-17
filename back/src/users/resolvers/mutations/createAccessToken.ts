@@ -14,7 +14,7 @@ const createAccessTokenResolver: MutationResolvers["createAccessToken"] =
     return {
       id: accessToken.id,
       token: accessToken.token,
-      description: accessToken.description
+      description: accessToken.description ?? ""
     };
   };
 

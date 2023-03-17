@@ -97,7 +97,7 @@ export async function downloadRouter(req: Request, res: Response) {
     return res.status(403).send("Token invalide ou expiré.");
   }
 
-  const { handler, params }: FileDownloadPayload = JSON.parse(redisValue);
+  const { handler, params } = JSON.parse(redisValue) as FileDownloadPayload;
 
   const handlerFn = downloadHandlers[handler];
 

@@ -12,7 +12,7 @@ type Mutation {
   ): Form!
 
   "DEPRECATED - Sauvegarde un BSD (création ou modification, si `FormInput` contient un ID)"
-  saveForm("Payload du BSD" formInput: FormInput!): Form
+  saveForm("Payload du BSD" formInput: FormInput!): Form!
     @deprecated(reason: "Utiliser createForm / updateForm selon le besoin")
 
   """
@@ -26,13 +26,13 @@ type Mutation {
     transporterNumberPlate: String
     "Champ libre, utilisable par exemple pour noter les tournées des transporteurs"
     transporterCustomInfo: String
-  ): Form
+  ): Form!
 
   "Supprime un BSD"
-  deleteForm("ID d'un BSD" id: ID!): Form
+  deleteForm("ID d'un BSD" id: ID!): Form!
 
   "Duplique un BSD"
-  duplicateForm("ID d'un BSD" id: ID!): Form
+  duplicateForm("ID d'un BSD" id: ID!): Form!
 
   """
   Finalise un BSD
@@ -92,7 +92,7 @@ type Mutation {
   Lorsqu'un courtier ou un négociant est présent sur le BSDD, les informations de contact,
   ainsi que le numéro, la limite de validité et le département du récépissé sont obligatoires.
   """
-  markAsSealed("ID d'un BSD" id: ID!): Form
+  markAsSealed("ID d'un BSD" id: ID!): Form!
 
   "Valide l'acceptation du BSD"
   markAsAccepted(
@@ -100,7 +100,7 @@ type Mutation {
     id: ID!
     "Informations liées à l'arrivée"
     acceptedInfo: AcceptedFormInput!
-  ): Form
+  ): Form!
 
   "Valide la réception d'un BSD"
   markAsReceived(
@@ -108,7 +108,7 @@ type Mutation {
     id: ID!
     "Informations liées à la réception"
     receivedInfo: ReceivedFormInput!
-  ): Form
+  ): Form!
 
   "Valide le traitement d'un BSD"
   markAsProcessed(
@@ -116,7 +116,7 @@ type Mutation {
     id: ID!
     "Informations liées au traitement"
     processedInfo: ProcessedFormInput!
-  ): Form
+  ): Form!
 
   """
   Permet de signer pour le détenteur du déchet afin de le transférer au transporteur.
@@ -160,22 +160,22 @@ type Mutation {
     id: ID!
     "Informations liées aux signatures transporteur et émetteur (case 8 et 9)"
     signingInfo: TransporterSignatureFormInput!
-  ): Form @deprecated(reason: "Remplacé par signEmission et signTransport")
+  ): Form! @deprecated(reason: "Remplacé par signEmission et signTransport")
 
   "Valide la réception d'un BSD d'un entreposage provisoire ou reconditionnement"
-  markAsTempStored(id: ID!, tempStoredInfos: TempStoredFormInput!): Form
+  markAsTempStored(id: ID!, tempStoredInfos: TempStoredFormInput!): Form!
 
   "Valide l'acceptation ou le refus d'un BSD d'un entreposage provisoire ou reconditionnement"
   markAsTempStorerAccepted(
     id: ID!
     tempStorerAcceptedInfo: TempStorerAcceptedFormInput!
-  ): Form
+  ): Form!
 
   "Valide la complétion des cadres 14 à 19 lors d'un entreposage provisoire ou reconditionnement"
-  markAsResealed(id: ID!, resealedInfos: ResealedFormInput!): Form
+  markAsResealed(id: ID!, resealedInfos: ResealedFormInput!): Form!
 
   "Valide l'envoi du BSD après un entreposage provisoire ou reconditionnement"
-  markAsResent(id: ID!, resentInfos: ResentFormInput!): Form
+  markAsResent(id: ID!, resentInfos: ResentFormInput!): Form!
     @deprecated(
       reason: "Utiliser la mutation signedByTransporter permettant d'apposer les signatures du collecteur-transporteur (case 18) et de l'exploitant du site d'entreposage provisoire ou de reconditionnement (case 19)"
     )
@@ -186,34 +186,34 @@ type Mutation {
   être en mesure de retrouver le bordereau papier correspondant à un bordereau numérique. Le champ `customId`
   de l'input peut-être utilisé pour faire le lien.
   """
-  importPaperForm(input: ImportPaperFormInput!): Form
+  importPaperForm(input: ImportPaperFormInput!): Form!
 
   "Prépare un nouveau segment de transport multimodal"
   prepareSegment(
     id: ID!
     siret: String!
     nextSegmentInfo: NextSegmentInfoInput!
-  ): TransportSegment
+  ): TransportSegment!
 
   "Marque un segment de transport comme prêt à être emporté"
-  markSegmentAsReadyToTakeOver(id: ID!): TransportSegment
+  markSegmentAsReadyToTakeOver(id: ID!): TransportSegment!
 
   "Marque un segment comme pris en charge par le nouveau transporteur"
-  takeOverSegment(id: ID!, takeOverInfo: TakeOverInput!): TransportSegment
+  takeOverSegment(id: ID!, takeOverInfo: TakeOverInput!): TransportSegment!
 
   "Édite un segment existant"
   editSegment(
     id: ID!
     siret: String!
     nextSegmentInfo: NextSegmentInfoInput!
-  ): TransportSegment
+  ): TransportSegment!
 
   """
   Crée une demande de révision sur un BSDD existant
   """
   createFormRevisionRequest(
     input: CreateFormRevisionRequestInput!
-  ): FormRevisionRequest
+  ): FormRevisionRequest!
 
   """
   Annule une demande de révision de BSDD.
@@ -222,7 +222,7 @@ type Mutation {
   cancelFormRevisionRequest(
     "Identifiant de la demande de révision"
     id: ID!
-  ): Boolean
+  ): Boolean!
 
   """
   Répond à une demande d'approbation d'une révision.
@@ -236,5 +236,5 @@ type Mutation {
     isApproved: Boolean!
     "Commentaire facultatif"
     comment: String
-  ): FormRevisionRequest
+  ): FormRevisionRequest!
 }

@@ -76,7 +76,7 @@ export function Appendix1ProducerForm({
           }
         }}
       >
-        {({ isSubmitting, values }) => (
+        {({ isSubmitting, values, handleChange, setFieldValue }) => (
           <Form>
             <h4 className="form__section-heading">Entreprise émettrice</h4>
             <div className="form__row">
@@ -85,6 +85,17 @@ export function Appendix1ProducerForm({
                   type="checkbox"
                   name="emitter.isPrivateIndividual"
                   className="td-checkbox"
+                  onChange={e => {
+                    handleChange(e);
+                    setFieldValue("emitter.company.siret", null);
+                    setFieldValue("emitter.company.vatNumber", null);
+                    setFieldValue("emitter.company.omiNumber", null);
+                    setFieldValue("emitter.company.contact", null);
+                    setFieldValue("emitter.company.name", null);
+                    setFieldValue("emitter.company.address", null);
+                    setFieldValue("emitter.company.country", null);
+                    setFieldValue("emitter.isForeignShip", false);
+                  }}
                 />
                 L'émetteur est un particulier
               </label>

@@ -8,7 +8,7 @@ export async function getBsdaOrNotFound<Include extends Prisma.BsdaInclude>(
 ) {
   const bsda = await getReadonlyBsdaRepository().findUnique<{
     include: Include;
-  }>({ id }, { include });
+  }>({ id }, include ? { include } : undefined);
 
   if (bsda == null || bsda.isDeleted) {
     throw new FormNotFound(id.toString());
@@ -23,19 +23,25 @@ export async function getBsdaOrNotFound<Include extends Prisma.BsdaInclude>(
 export async function getPreviousBsdas(
   bsda: Pick<Bsda, "id" | "forwardingId">
 ) {
+  const bsdaWithItermediaries = Prisma.validator<Prisma.BsdaArgs>()({
+    include: { intermediaries: true }
+  });
+
   const bsdaRepository = getReadonlyBsdaRepository();
   const forwardedBsda = bsda.forwardingId
     ? await bsdaRepository.findUnique(
         { id: bsda.forwardingId },
-        { include: { intermediaries: true } }
+        bsdaWithItermediaries
       )
     : null;
 
   const groupedBsdas = await bsdaRepository
     .findRelatedEntity({ id: bsda.id })
-    .grouping({ include: { intermediaries: true } });
+    .grouping(bsdaWithItermediaries);
 
-  return [forwardedBsda, ...groupedBsdas].filter(Boolean);
+  return [forwardedBsda, ...groupedBsdas].filter(
+    Boolean
+  ) as Prisma.BsdaGetPayload<typeof bsdaWithItermediaries>[];
 }
 
 /**

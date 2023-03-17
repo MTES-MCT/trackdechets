@@ -113,6 +113,9 @@ const signedByTransporterFn = async (
           }),
           emittedAt: formUpdateInput.sentAt,
           sentAt: formUpdateInput.sentAt,
+          takenOverAt: formUpdateInput.takenOverAt,
+          takenOverBy: formUpdateInput.takenOverBy,
+          transporterNumberPlate: formUpdateInput.transporterNumberPlate,
           wasteDetailsPackagingInfos: sumPackagingInfos(
             wasteDetailsPackagingInfos
           )

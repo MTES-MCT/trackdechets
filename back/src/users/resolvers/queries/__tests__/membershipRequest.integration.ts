@@ -32,7 +32,7 @@ describe("query membershipRequest", () => {
       MEMBERSHIP_REQUEST
     );
     expect(errors).toHaveLength(1);
-    expect(errors[0].extensions.code).toEqual(ErrorCode.UNAUTHENTICATED);
+    expect(errors[0].extensions?.code).toEqual(ErrorCode.UNAUTHENTICATED);
   });
 
   it("should return an error when trying to pass both id and siret", async () => {
@@ -65,17 +65,18 @@ describe("query membershipRequest", () => {
     );
   });
 
-  it("should return null when no request found for authenticated user and siret", async () => {
+  it("should throw when no request found for authenticated user and siret", async () => {
     const user = await userFactory();
     const company = await companyFactory();
     const { query } = makeClient(user);
-    const { data } = await query<Pick<Query, "membershipRequest">>(
+    const { errors } = await query<Pick<Query, "membershipRequest">>(
       MEMBERSHIP_REQUEST,
       {
         variables: { siret: company.siret }
       }
     );
-    expect(data.membershipRequest).toBeNull();
+    expect(errors).toHaveLength(1);
+    expect(errors[0].message).toBe("Demande de rattachement non trouvée");
   });
 
   it("should return an invitation request by id", async () => {

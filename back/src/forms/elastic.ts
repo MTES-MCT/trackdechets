@@ -110,7 +110,9 @@ export function getSiretsByTab(
     case Status.SEALED: {
       setFieldTab("emitterCompanySiret", "isForActionFor");
       setFieldTab("ecoOrganismeSiret", "isForActionFor");
-      setFieldTab("transporterCompanySiret", "isToCollectFor");
+      if (form.emitterType !== EmitterType.APPENDIX1) {
+        setFieldTab("transporterCompanySiret", "isToCollectFor");
+      }
 
       break;
     }

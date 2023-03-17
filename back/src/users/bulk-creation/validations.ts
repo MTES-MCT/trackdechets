@@ -16,7 +16,7 @@ export const companyValidationSchema = yup.object({
     .test(
       "sirene-validation-failed",
       "Siret ${value} was not found in SIRENE database or company is closed",
-      async value => {
+      async (value: string) => {
         try {
           const company = await searchCompany(value);
           if (isClosedCompany(company)) {

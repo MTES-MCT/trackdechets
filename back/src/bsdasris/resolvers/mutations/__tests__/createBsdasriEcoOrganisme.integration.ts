@@ -174,7 +174,7 @@ describe("Mutation.createDasri", () => {
     expect(data.createBsdasri.status).toEqual("INITIAL");
     expect(data.createBsdasri.type).toEqual("SIMPLE");
 
-    expect(data.createBsdasri.ecoOrganisme.siret).toEqual(ecoOrg.siret);
+    expect(data.createBsdasri.ecoOrganisme?.siret).toEqual(ecoOrg.siret);
   });
   it("create a dasri with an eco-organisme and an unregistered emitter(eco-org user)", async () => {
     const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
@@ -224,8 +224,8 @@ describe("Mutation.createDasri", () => {
     expect(data.createBsdasri.status).toEqual("INITIAL");
     expect(data.createBsdasri.type).toEqual("SIMPLE");
 
-    expect(data.createBsdasri.ecoOrganisme.siret).toEqual(ecoOrg.siret);
-    expect(data.createBsdasri.emitter.company.siret).toEqual(siret);
+    expect(data.createBsdasri.ecoOrganisme?.siret).toEqual(ecoOrg.siret);
+    expect(data.createBsdasri.emitter?.company?.siret).toEqual(siret);
   });
   it("create a dasri with an eco-organism (emitter user)", async () => {
     const ecoOrg = await ecoOrganismeFactory({ handleBsdasri: true });
@@ -275,9 +275,9 @@ describe("Mutation.createDasri", () => {
     expect(data.createBsdasri.status).toEqual("INITIAL");
     expect(data.createBsdasri.type).toEqual("SIMPLE");
 
-    expect(data.createBsdasri.emitter.company.siret).toEqual(
+    expect(data.createBsdasri.emitter?.company?.siret).toEqual(
       otherCompany.siret
     );
-    expect(data.createBsdasri.ecoOrganisme.siret).toEqual(ecoOrg.siret);
+    expect(data.createBsdasri.ecoOrganisme?.siret).toEqual(ecoOrg.siret);
   });
 });

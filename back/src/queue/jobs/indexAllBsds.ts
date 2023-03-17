@@ -44,14 +44,9 @@ async function getBearerToken(scalingoToken) {
  */
 export async function indexChunkBsdJob(job: Job<string>) {
   try {
-    const {
-      bsdName,
-      index,
-      skip,
-      total,
-      take,
-      since
-    }: FindManyAndIndexBsdsFnSignature = JSON.parse(job.data);
+    const { bsdName, index, ids } = JSON.parse(
+      job.data
+    ) as FindManyAndIndexBsdsFnSignature;
     logger.info(
       `Started job indexChunk for the following bsd and index names : "${bsdName}", "${index}"`
     );
@@ -59,10 +54,7 @@ export async function indexChunkBsdJob(job: Job<string>) {
     await findManyAndIndexBsds({
       bsdName,
       index,
-      skip,
-      total,
-      take,
-      since
+      ids
     });
     return null;
   } catch (error) {
@@ -129,9 +121,10 @@ const sleepUntil = async (
  */
 export async function indexAllInBulk(job: Job<string>) {
   try {
-    const { index, force }: { index: BsdIndex; force: boolean } = JSON.parse(
-      job.data
-    );
+    const { index, force } = JSON.parse(job.data) as {
+      index: BsdIndex;
+      force: boolean;
+    };
     let operationsUrl;
     if (BULK_INDEX_SCALINGO_ACTIVE_AUTOSCALING === "true") {
       const { token: bearerToken } = await getBearerToken(SCALINGO_TOKEN);

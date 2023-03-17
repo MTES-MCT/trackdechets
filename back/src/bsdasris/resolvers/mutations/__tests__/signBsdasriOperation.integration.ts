@@ -57,7 +57,7 @@ describe("Mutation.signBsdasri operation", () => {
       })
     ]);
 
-    const receivedDasri = await prisma.bsdasri.findUnique({
+    const receivedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(receivedDasri.status).toEqual("RECEIVED");
@@ -91,7 +91,7 @@ describe("Mutation.signBsdasri operation", () => {
       }
     });
 
-    const receivedDasri = await prisma.bsdasri.findUnique({
+    const receivedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(receivedDasri.status).toEqual("PROCESSED");
@@ -133,7 +133,7 @@ describe("Mutation.signBsdasri operation", () => {
       }
     });
 
-    const receivedDasri = await prisma.bsdasri.findUnique({
+    const receivedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(receivedDasri.status).toEqual("AWAITING_GROUP");
@@ -181,7 +181,7 @@ describe("Mutation.signBsdasri operation", () => {
         })
       })
     ]);
-    const receivedDasri = await prisma.bsdasri.findUnique({
+    const receivedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(receivedDasri.status).toEqual("RECEIVED");
@@ -221,7 +221,7 @@ describe("Mutation.signBsdasri operation", () => {
       }
     });
 
-    const receivedDasri = await prisma.bsdasri.findUnique({
+    const receivedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(receivedDasri.status).toEqual("AWAITING_GROUP");

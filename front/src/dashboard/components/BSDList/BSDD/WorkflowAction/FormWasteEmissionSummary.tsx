@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Field, useFormikContext } from "formik";
 import {
+  EmitterType,
   Form,
   QuantityType,
   SignEmissionFormInput,
@@ -108,6 +109,7 @@ export function FormWasteEmissionSummary({
             {values.packagingInfos
               ?.map(packaging => `${packaging.quantity} ${packaging.type}(s)`)
               .join(", ")}
+
             <button
               type="button"
               onClick={() => addField("packagingInfos")}
@@ -117,32 +119,38 @@ export function FormWasteEmissionSummary({
             </button>
           </DataListDescription>
         </DataListItem>
-        <DataListItem>
-          <DataListTerm>Code ADR (ONU)</DataListTerm>
-          <DataListDescription>
-            {values.onuCode ?? "Non soumis"}
-            <button
-              type="button"
-              onClick={() => addField("onuCode")}
-              className="tw-ml-2"
-            >
-              <IconPaperWrite color="blue" />
-            </button>
-          </DataListDescription>
-        </DataListItem>
-        <DataListItem>
-          <DataListTerm>Plaque d'immatriculation</DataListTerm>
-          <DataListDescription>
-            {values.transporterNumberPlate}
-            <button
-              type="button"
-              onClick={() => addField("transporterNumberPlate")}
-              className="tw-ml-2"
-            >
-              <IconPaperWrite color="blue" />
-            </button>
-          </DataListDescription>
-        </DataListItem>
+        {form.emitter?.type !== EmitterType.Appendix1Producer && (
+          <DataListItem>
+            <DataListTerm>Code ADR (ONU)</DataListTerm>
+            <DataListDescription>
+              {values.onuCode ?? "Non soumis"}
+              <button
+                type="button"
+                onClick={() => addField("onuCode")}
+                className="tw-ml-2"
+              >
+                <IconPaperWrite color="blue" />
+              </button>
+              )
+            </DataListDescription>
+          </DataListItem>
+        )}
+        {form.emitter?.type !== EmitterType.Appendix1Producer && (
+          <DataListItem>
+            <DataListTerm>Plaque d'immatriculation</DataListTerm>
+            <DataListDescription>
+              {values.transporterNumberPlate}
+
+              <button
+                type="button"
+                onClick={() => addField("transporterNumberPlate")}
+                className="tw-ml-2"
+              >
+                <IconPaperWrite color="blue" />
+              </button>
+            </DataListDescription>
+          </DataListItem>
+        )}
       </DataList>
       {fields.length > 0 && (
         <div className="tw-mb-4">

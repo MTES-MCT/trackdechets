@@ -44,9 +44,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
   let canDeleteAndUpdate = [FormStatus.Draft, FormStatus.Sealed].includes(
     form.status
   );
-  const showAppendix1Button =
-    form.emitter?.type === EmitterType.Appendix1 &&
-    [FormStatus.Sealed, FormStatus.Sent].includes(form.status);
+
   if (form.status === FormStatus.SignedByProducer) {
     // if the bsd is only signed by the emitter, they can still update/delete it
     // so if it's signed by the emitter, they can do it but not the eco organisme
@@ -63,8 +61,11 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     FormStatus.Refused,
   ].includes(form.status);
 
+  const isAppendix1 = form.emitter?.type === EmitterType.Appendix1;
   const isAppendix1Producer =
     form.emitter?.type === EmitterType.Appendix1Producer;
+  const showAppendix1Button =
+    isAppendix1 && [FormStatus.Sealed, FormStatus.Sent].includes(form.status);
 
   return (
     <>

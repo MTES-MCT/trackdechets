@@ -6,7 +6,7 @@ import { app } from "../src/server";
 import { client as elasticSearch, index } from "../src/common/elastic";
 import { indexQueue } from "../src/queue/producers/elastic";
 
-let httpServerInstance: HttpServer | HttpsServer = null;
+let httpServerInstance: HttpServer | HttpsServer | null = null;
 
 export function startServer() {
   if (!httpServerInstance) {
@@ -16,11 +16,11 @@ export function startServer() {
 }
 
 export async function closeServer() {
-  if (!httpServerInstance) {
-    return Promise.resolve();
-  }
-
   return new Promise<void>(resolve => {
+    if (!httpServerInstance) {
+      return resolve();
+    }
+
     httpServerInstance.close(() => {
       httpServerInstance = null;
       resolve();

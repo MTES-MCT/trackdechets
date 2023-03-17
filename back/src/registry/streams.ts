@@ -11,7 +11,7 @@ export interface WasteReaderOptions extends ReadableOptions {
   read?(this: WasteReader, size: number): void;
 }
 export class WasteReader extends Readable {
-  after: string;
+  after: string | null;
   constructor(opts?: WasteReaderOptions) {
     super(opts);
     this.after = null;

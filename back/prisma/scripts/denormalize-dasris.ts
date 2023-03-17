@@ -26,7 +26,7 @@ export class UpdateBsdasrisSyntesizedEmitters implements Updater {
             ...new Set(
               bsd.synthesizing.map(associated => associated.emitterCompanySiret)
             )
-          ].filter(Boolean)
+          ].filter(Boolean) as string[]
         }
       });
     }

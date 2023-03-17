@@ -58,16 +58,16 @@ describe("mutation revokeAuthorizedApplication", () => {
     >(REVOKE_AUTHORIZED_APPLICATION, {
       variables: { id: application.id }
     });
-    accessToken1 = await prisma.accessToken.findFirst({
+    accessToken1 = await prisma.accessToken.findFirstOrThrow({
       where: { id: accessToken1.id }
     });
-    accessToken2 = await prisma.accessToken.findFirst({
+    accessToken2 = await prisma.accessToken.findFirstOrThrow({
       where: { id: accessToken2.id }
     });
-    accessToken3 = await prisma.accessToken.findFirst({
+    accessToken3 = await prisma.accessToken.findFirstOrThrow({
       where: { id: accessToken3.id }
     });
-    accessToken4 = await prisma.accessToken.findFirst({
+    accessToken4 = await prisma.accessToken.findFirstOrThrow({
       where: { id: accessToken4.id }
     });
     expect(accessToken1.isRevoked).toEqual(true);

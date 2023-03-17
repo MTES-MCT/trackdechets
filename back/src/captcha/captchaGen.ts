@@ -180,8 +180,8 @@ export async function captchaSound(captchaToken, res) {
   const captchaArray = captchaString.toLowerCase().split("");
   const letters = Array.from(new Set(captchaArray)); // remove duplicates
 
-  const audio = [];
-  const playList = [];
+  const audio: string[] = [];
+  const playList: number[] = [];
 
   for (const letter of letters) {
     const contents = fs.readFileSync(

@@ -337,8 +337,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 checked={form.emitter?.type === EmitterType.APPENDIX1}
                 readOnly
               />{" "}
-              la collecte de petites quantité de déchets relevant de la même
-              rubrique (annexe 1 doit être conservée){" "}
+              un bordereau de tournée dédiée{" "}
               <input
                 type="checkbox"
                 checked={form.emitter?.type === EmitterType.APPENDIX2}
@@ -993,7 +992,9 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                     <th>Dénomination usuelle</th>
                     <th>Pesée (tonne)</th>
                     <th>Réelle / estimée</th>
-                    <th>Fraction regroupée (tonne)</th>
+                    {form?.emitter?.type !== EmitterType.APPENDIX1_PRODUCER && (
+                      <th>Fraction regroupée (tonne)</th>
+                    )}
                     <th>Date de prise en charge initiale</th>
                     <th>Code postal lieu de collecte</th>
                   </tr>
@@ -1020,9 +1021,10 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                           ? "R"
                           : form?.wasteDetails?.quantityType?.charAt(0)}
                       </td>
-                      <td>{quantity}</td>
+                      {form?.emitter?.type !==
+                        EmitterType.APPENDIX1_PRODUCER && <td>{quantity}</td>}
                       <td>
-                        {form?.emitter?.type === EmitterType.APPENDIX1
+                        {form?.emitter?.type === EmitterType.APPENDIX1_PRODUCER
                           ? formatDate(form?.takenOverAt)
                           : formatDate(form?.signedAt)}
                       </td>

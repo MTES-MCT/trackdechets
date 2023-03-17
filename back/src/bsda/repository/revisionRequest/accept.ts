@@ -84,7 +84,7 @@ async function getUpdateFromRevisionRequest(
     ...bsdaUpdate
   } = revisionRequest;
 
-  const { status: currentStatus } = await prisma.bsda.findUnique({
+  const { status: currentStatus } = await prisma.bsda.findUniqueOrThrow({
     where: { id: bsdaId },
     select: { status: true }
   });
@@ -119,6 +119,7 @@ function getNewStatus(
 
   if (
     status === BsdaStatus.PROCESSED &&
+    newOperationCode &&
     PARTIAL_OPERATIONS.includes(newOperationCode)
   ) {
     return BsdaStatus.AWAITING_CHILD;
@@ -157,7 +158,7 @@ export async function approveAndApplyRevisionRequest(
 
   const updatedBsda = await prisma.bsda.update({
     where: { id: updatedRevisionRequest.bsdaId },
-    data: updateData
+    data: { ...updateData }
   });
 
   await prisma.event.create({
@@ -183,7 +184,7 @@ export async function approveAndApplyRevisionRequest(
     });
   }
 
-  prisma.addAfterCommitCallback(() =>
+  prisma.addAfterCommitCallback?.(() =>
     enqueueBsdToIndex(updatedRevisionRequest.bsdaId)
   );
 
