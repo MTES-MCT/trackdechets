@@ -35,6 +35,8 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
 
   const { forwardedIn } = await formRepository.findFullFormById(form.id);
 
+  await checkCanMarkAsResealed(user, form);
+
   const { destination, transporter, wasteDetails } =
     await sirenifyResealedFormInput(resealedInfos, user);
 
