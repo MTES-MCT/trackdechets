@@ -155,7 +155,7 @@ export async function approveAndApplyRevisionRequest(
     prisma
   );
 
-  await prisma.bsda.update({
+  const updatedBsda = await prisma.bsda.update({
     where: { id: updatedRevisionRequest.bsdaId },
     data: updateData
   });
@@ -172,6 +172,16 @@ export async function approveAndApplyRevisionRequest(
       metadata: { ...logMetadata, authType: user.auth }
     }
   });
+
+  // If the bsda was a grouping bsda, and is cancelled, free the children
+  if (updateData.status === BsdaStatus.CANCELED) {
+    await prisma.bsda.updateMany({
+      where: { groupedInId: updatedBsda.id },
+      data: {
+        groupedInId: null
+      }
+    });
+  }
 
   prisma.addAfterCommitCallback(() =>
     enqueueBsdToIndex(updatedRevisionRequest.bsdaId)
