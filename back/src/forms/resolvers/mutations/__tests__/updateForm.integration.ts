@@ -21,7 +21,7 @@ import getReadableId from "../../../readableId";
 import * as sirenify from "../../../sirenify";
 
 const sirenifyMock = jest
-  .spyOn(sirenify, "default")
+  .spyOn(sirenify, "sirenifyFormInput")
   .mockImplementation(input => Promise.resolve(input));
 
 const UPDATE_FORM = `

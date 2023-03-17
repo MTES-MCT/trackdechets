@@ -1,14 +1,17 @@
 import { CompanySearchResult } from "../../companies/types";
 import { userWithCompanyFactory } from "../../__tests__/factories";
 import * as search from "../../companies/search";
-import { CreateFormInput } from "../../generated/graphql/types";
-import sirenify from "../sirenify";
+import {
+  CreateFormInput,
+  ResealedFormInput
+} from "../../generated/graphql/types";
+import { sirenifyFormInput, sirenifyResealedFormInput } from "../sirenify";
 import { AuthType } from "../../auth";
 import { resetDatabase } from "../../../integration-tests/helper";
 
 const searchCompanySpy = jest.spyOn(search, "searchCompany");
 
-describe("sirenify", () => {
+describe("sirenifyFormInput", () => {
   afterEach(resetDatabase);
 
   it("should overwrite `name` and `address` based on SIRENE data if `name` and `address` are provided", async () => {
@@ -101,7 +104,7 @@ describe("sirenify", () => {
       }
     };
 
-    const sirenified = await sirenify(formInput, {
+    const sirenified = await sirenifyFormInput(formInput, {
       email: "john.snow@trackdechets.fr",
       auth: AuthType.Bearer
     } as Express.User);
@@ -232,7 +235,7 @@ describe("sirenify", () => {
       }
     };
 
-    const sirenified = await sirenify(formInput, {
+    const sirenified = await sirenifyFormInput(formInput, {
       email: "john.snow@trackdechets.fr",
       auth: AuthType.Bearer
     } as Express.User);
@@ -284,6 +287,118 @@ describe("sirenify", () => {
     );
     expect(sirenified.intermediaries[1].address).toEqual(
       searchResults[intermediary2.company.siret].address
+    );
+  });
+});
+
+describe("sirenifyResealedFormInput", () => {
+  afterEach(resetDatabase);
+
+  it("should overwrite `name` and `address` based on SIRENE data if `name` and `address` are provided", async () => {
+    const transporter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+
+    function searchResult(companyName: string) {
+      return {
+        name: companyName,
+        address: `Adresse ${companyName}`
+      } as CompanySearchResult;
+    }
+
+    const searchResults = {
+      [transporter.company.siret]: searchResult("transporteur"),
+      [destination.company.siret]: searchResult("destination")
+    };
+
+    searchCompanySpy.mockImplementation((clue: string) => {
+      return Promise.resolve(searchResults[clue]);
+    });
+
+    const resealedFormInput: ResealedFormInput = {
+      transporter: {
+        company: {
+          siret: transporter.company.siret,
+          name: "N'importe",
+          address: "Nawak"
+        }
+      },
+      destination: {
+        company: {
+          siret: destination.company.siret,
+          name: "N'importe",
+          address: "Nawak"
+        }
+      }
+    };
+
+    const sirenified = await sirenifyResealedFormInput(resealedFormInput, {
+      email: "john.snow@trackdechets.fr",
+      auth: AuthType.Bearer
+    } as Express.User);
+
+    expect(sirenified.transporter.company.name).toEqual(
+      searchResults[transporter.company.siret].name
+    );
+    expect(sirenified.transporter.company.address).toEqual(
+      searchResults[transporter.company.siret].address
+    );
+    expect(sirenified.destination.company.name).toEqual(
+      searchResults[destination.company.siret].name
+    );
+    expect(sirenified.destination.company.address).toEqual(
+      searchResults[destination.company.siret].address
+    );
+  });
+
+  it("should overwrite `name` and `address` based on SIRENE data if `name` and `address` is not provided", async () => {
+    const transporter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+
+    function searchResult(companyName: string) {
+      return {
+        name: companyName,
+        address: `Adresse ${companyName}`
+      } as CompanySearchResult;
+    }
+
+    const searchResults = {
+      [transporter.company.siret]: searchResult("transporteur"),
+      [destination.company.siret]: searchResult("destination")
+    };
+
+    searchCompanySpy.mockImplementation((clue: string) => {
+      return Promise.resolve(searchResults[clue]);
+    });
+
+    const resealedFormInput: ResealedFormInput = {
+      transporter: {
+        company: {
+          siret: transporter.company.siret
+        }
+      },
+      destination: {
+        company: {
+          siret: destination.company.siret
+        }
+      }
+    };
+
+    const sirenified = await sirenifyResealedFormInput(resealedFormInput, {
+      email: "john.snow@trackdechets.fr",
+      auth: AuthType.Bearer
+    } as Express.User);
+
+    expect(sirenified.transporter.company.name).toEqual(
+      searchResults[transporter.company.siret].name
+    );
+    expect(sirenified.transporter.company.address).toEqual(
+      searchResults[transporter.company.siret].address
+    );
+    expect(sirenified.destination.company.name).toEqual(
+      searchResults[destination.company.siret].name
+    );
+    expect(sirenified.destination.company.address).toEqual(
+      searchResults[destination.company.siret].address
     );
   });
 });

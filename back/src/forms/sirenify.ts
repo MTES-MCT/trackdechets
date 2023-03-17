@@ -2,12 +2,13 @@ import buildSirenify from "../companies/sirenify";
 import {
   CompanyInput,
   CreateFormInput,
+  ResealedFormInput,
   UpdateFormInput
 } from "../generated/graphql/types";
 
 type FormInput = CreateFormInput | UpdateFormInput;
 
-const accessors = (input: FormInput) => [
+const formInputAccessors = (input: FormInput) => [
   {
     getter: () => input?.emitter?.company,
     setter: (input: FormInput, companyInput: CompanyInput) => ({
@@ -67,6 +68,25 @@ const accessors = (input: FormInput) => [
   }))
 ];
 
-const sirenify = buildSirenify(accessors);
+export const sirenifyFormInput = buildSirenify(formInputAccessors);
 
-export default sirenify;
+const resealedFormInputAccessors = (input: ResealedFormInput) => [
+  {
+    getter: () => input?.transporter?.company,
+    setter: (input: ResealedFormInput, companyInput: CompanyInput) => ({
+      ...input,
+      transporter: { ...input.transporter, company: companyInput }
+    })
+  },
+  {
+    getter: () => input?.destination?.company,
+    setter: (input: ResealedFormInput, companyInput: CompanyInput) => ({
+      ...input,
+      destination: { ...input.destination, company: companyInput }
+    })
+  }
+];
+
+export const sirenifyResealedFormInput = buildSirenify(
+  resealedFormInputAccessors
+);

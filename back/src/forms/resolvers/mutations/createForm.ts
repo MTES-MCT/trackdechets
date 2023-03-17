@@ -20,7 +20,7 @@ import { draftFormSchema, validateGroupement } from "../../validation";
 import { UserInputError } from "apollo-server-core";
 import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
-import sirenify from "../../sirenify";
+import { sirenifyFormInput } from "../../sirenify";
 import { validateIntermediariesInput } from "../../../common/validation";
 
 const createFormResolver = async (
@@ -36,7 +36,7 @@ const createFormResolver = async (
     temporaryStorageDetail,
     intermediaries,
     ...formContent
-  } = await sirenify(createFormInput, user);
+  } = await sirenifyFormInput(createFormInput, user);
 
   if (appendix2Forms && grouping) {
     throw new UserInputError(

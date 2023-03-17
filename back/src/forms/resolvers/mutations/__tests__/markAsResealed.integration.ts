@@ -17,6 +17,11 @@ import {
   MutationMarkAsResealedArgs
 } from "../../../../generated/graphql/types";
 import { gql } from "apollo-server-core";
+import * as sirenify from "../../../sirenify";
+
+const sirenifyMock = jest
+  .spyOn(sirenify, "sirenifyResealedFormInput")
+  .mockImplementation(input => Promise.resolve(input));
 
 const MARK_AS_RESEALED = gql`
   mutation MarkAsResealed($id: ID!, $resealedInfos: ResealedFormInput!) {
@@ -28,8 +33,6 @@ const MARK_AS_RESEALED = gql`
 `;
 
 describe("Mutation markAsResealed", () => {
-  afterEach(resetDatabase);
-
   const OLD_ENV = process.env;
 
   beforeEach(() => {
@@ -37,11 +40,11 @@ describe("Mutation markAsResealed", () => {
     delete process.env.VERIFY_COMPANY;
   });
 
-  afterEach(() => {
+  afterEach(async () => {
     process.env = OLD_ENV;
+    sirenifyMock.mockClear();
+    await resetDatabase();
   });
-
-  afterAll(resetDatabase);
 
   test("the temp storer of the BSD can reseal it", async () => {
     const owner = await userFactory();
@@ -76,6 +79,8 @@ describe("Mutation markAsResealed", () => {
       where: { id: form.id }
     });
     expect(resealedForm.status).toEqual("RESEALED");
+    // check input is sirenified
+    expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
 
   test("can convert a simple form to a form with temporary storage", async () => {

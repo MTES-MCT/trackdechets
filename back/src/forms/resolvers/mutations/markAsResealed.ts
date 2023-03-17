@@ -18,6 +18,7 @@ import {
   Status
 } from "@prisma/client";
 import { getFormRepository } from "../../repository";
+import { sirenifyResealedFormInput } from "../../sirenify";
 
 const markAsResealed: MutationResolvers["markAsResealed"] = async (
   parent,
@@ -34,9 +35,8 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
 
   const { forwardedIn } = await formRepository.findFullFormById(form.id);
 
-  await checkCanMarkAsResealed(user, form);
-
-  const { destination, transporter, wasteDetails } = resealedInfos;
+  const { destination, transporter, wasteDetails } =
+    await sirenifyResealedFormInput(resealedInfos, user);
 
   // copy basic info from initial BSD and overwrite it with resealedInfos
   const updateInput = {

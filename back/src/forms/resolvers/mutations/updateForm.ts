@@ -29,7 +29,7 @@ import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
 import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
-import sirenify from "../../sirenify";
+import { sirenifyFormInput } from "../../sirenify";
 import { validateIntermediariesInput } from "../../../common/validation";
 
 function validateArgs(args: MutationUpdateFormArgs) {
@@ -57,7 +57,7 @@ const updateFormResolver = async (
     temporaryStorageDetail,
     intermediaries,
     ...formContent
-  } = await sirenify(updateFormInput, user);
+  } = await sirenifyFormInput(updateFormInput, user);
 
   if (appendix2Forms && grouping) {
     throw new UserInputError(
