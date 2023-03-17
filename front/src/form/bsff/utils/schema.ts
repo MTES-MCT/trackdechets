@@ -69,7 +69,8 @@ export const validationSchema = yup.object({
           .required("Le numéro du contenant est un champ requis"),
         volume: yup
           .number()
-          .required("Le volume du contenant est un champ requis")
+          .nullable()
+          .notRequired()
           .positive("Le volume du contenant doit être supérieur 0"),
         weight: yup
           .number()

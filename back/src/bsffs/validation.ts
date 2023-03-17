@@ -212,7 +212,8 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
                 ),
               volume: yup
                 .number()
-                .required("Conditionnements : le volume est requis")
+                .nullable()
+                .notRequired()
                 .positive(
                   "Conditionnements : le volume doit être supérieur à 0"
                 ),

@@ -247,7 +247,7 @@ function BsffPackagingFull({ packaging }: { packaging: BsffPackaging }) {
         <span>{packaging.type} </span>
       )}
       <span>n°{packaging.numero} </span>
-      <span>{packaging.volume}L </span>
+      {packaging.volume !== null && <span>{packaging.volume}L </span>}
       <span>{packaging.weight}kg</span>
     </div>
   );
