@@ -620,6 +620,111 @@ describe("Mutation.signBsff", () => {
         );
       }
     );
+
+    it(
+      "should set acceptationNumero to default value when not set explicitly" +
+        " (in case of signature for all packagings)",
+      async () => {
+        const bsff = await createBsffBeforeAcceptation({
+          emitter,
+          transporter,
+          destination
+        });
+
+        // make sure packaging acceptation numero is not defined
+        await prisma.bsffPackaging.update({
+          where: { id: bsff.packagings[0].id },
+          data: { numero: "cont1", acceptationNumero: null }
+        });
+
+        const { mutate } = makeClient(destination.user);
+        const { errors } = await mutate<
+          Pick<Mutation, "signBsff">,
+          MutationSignBsffArgs
+        >(SIGN, {
+          variables: {
+            id: bsff.id,
+            input: {
+              type: "ACCEPTATION",
+              date: new Date().toISOString() as any,
+              author: destination.user.name
+            }
+          }
+        });
+        expect(errors).toBeUndefined();
+
+        const acceptedBsffPackaging = await prisma.bsffPackaging.findUnique({
+          where: { id: bsff.packagings[0].id }
+        });
+
+        expect(acceptedBsffPackaging.acceptationNumero).toEqual("cont1");
+      }
+    );
+
+    it(
+      "should set acceptationWasteCode to default value when not set explicitly" +
+        " (in case of signature for a specific packaging)",
+      async () => {
+        const bsff = await createBsffBeforeAcceptation({
+          emitter,
+          transporter,
+          destination
+        });
+
+        // make sure packaging acceptation waste code is not defined
+        await prisma.bsffPackaging.update({
+          where: { id: bsff.packagings[0].id },
+          data: { numero: "cont1", acceptationNumero: null }
+        });
+
+        const { id, ...packagingData } = bsff.packagings[0];
+        await prisma.bsffPackaging.create({
+          data: { ...packagingData, acceptationWasteCode: "14 06 02*" }
+        });
+
+        const packagings = await prisma.bsff
+          .findUnique({ where: { id: bsff.id } })
+          .packagings();
+
+        const { mutate } = makeClient(destination.user);
+        await mutate<Pick<Mutation, "signBsff">, MutationSignBsffArgs>(SIGN, {
+          variables: {
+            id: bsff.id,
+            input: {
+              packagingId: packagings[0].id,
+              type: "ACCEPTATION",
+              date: new Date().toISOString() as any,
+              author: destination.user.name
+            }
+          }
+        });
+
+        await mutate<Pick<Mutation, "signBsff">, MutationSignBsffArgs>(SIGN, {
+          variables: {
+            id: bsff.id,
+            input: {
+              packagingId: packagings[1].id,
+              type: "ACCEPTATION",
+              date: new Date().toISOString() as any,
+              author: destination.user.name
+            }
+          }
+        });
+
+        const acceptedBsffPackagings = await prisma.bsff
+          .findUnique({
+            where: { id: bsff.id }
+          })
+          .packagings();
+
+        expect(acceptedBsffPackagings[0].acceptationWasteCode).toEqual(
+          "14 06 01*"
+        );
+        expect(acceptedBsffPackagings[1].acceptationWasteCode).toEqual(
+          "14 06 02*"
+        );
+      }
+    );
   });
 
   describe("OPERATION", () => {

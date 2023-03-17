@@ -209,7 +209,7 @@ export function getPackagingCreateInput(
       previousPackagings.map(p => ({
         type: p.type,
         other: p.other,
-        numero: p.numero,
+        numero: p.acceptationNumero,
         volume: p.volume,
         weight: p.acceptationWeight,
         previousPackagings: { connect: { id: p.id } }

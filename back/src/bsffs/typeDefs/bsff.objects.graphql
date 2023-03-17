@@ -251,6 +251,8 @@ type BsffPackagingAcceptation {
   wasteCode: String
   "Dénomination usuelle du déchet après analyse"
   wasteDescription: String
+  "Numéro du contenant lors de l'acceptation. Permet de corriger une éventuelle erreur de saisie à la création du BSFF."
+  numero: String
   "Signature de la destination lors de l'acceptation ou du refus du déchet."
   signature: Signature
 }

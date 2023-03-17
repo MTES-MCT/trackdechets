@@ -170,6 +170,7 @@ const signatures: Record<
           data: {
             acceptationSignatureDate: date,
             acceptationSignatureAuthor: author,
+            acceptationNumero: packaging.acceptationNumero ?? packaging.numero,
             // set acceptation waste code if it was not set explicitly
             acceptationWasteCode:
               packaging.acceptationWasteCode ?? existingBsff.wasteCode,
@@ -199,6 +200,18 @@ const signatures: Record<
             acceptationWasteCode: existingBsff.wasteCode
           }
         });
+
+        // set acceptation numero if it was not set explicitly
+        await Promise.all(
+          existingBsff.packagings
+            .filter(p => p.acceptationNumero === null)
+            .map(p => {
+              return updateBsffPackaging({
+                where: { id: p.id },
+                data: { acceptationNumero: p.numero }
+              });
+            })
+        );
 
         const refusedPackagings = await findManyBsffPackaging({
           where: {

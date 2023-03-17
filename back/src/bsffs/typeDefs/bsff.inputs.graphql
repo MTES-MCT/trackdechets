@@ -215,10 +215,17 @@ input BsffPackagingAcceptationInput {
   status: WasteAcceptationStatus!
   "En cas de refus, la raison"
   refusalReason: String
-  "Code déchet après une éventuelle analyse. Si omis, c'est le code déchet du BSFF qui s'applique."
+  """
+  Code déchet après une éventuelle analyse. Si omis, c'est le code déchet du BSFF qui s'applique au moment de la signature de l'acceptation.
+  """
   wasteCode: String
   "Dénomination usuelle du déchet après une éventuelle analyse."
   wasteDescription: String
+  """
+  Numéro du contenant lors de l'acceptation. Permet de corriger une éventuelle erreur de saisie à la création du BSFF.
+  Si omis, c'est le numéro initial qui s'applique au moment de la signature de l'acceptation.
+  """
+  numero: String
 }
 
 input BsffPackagingOperationInput {

@@ -32,7 +32,8 @@ export function toBsdElastic(
     wasteCode: bsff.wasteCode ?? "",
     wasteAdr: bsff.wasteAdr ?? "",
     wasteDescription: bsff.wasteDescription ?? "",
-    packagingNumbers: bsff.packagings?.map(p => p.numero) ?? [],
+    packagingNumbers:
+      bsff.packagings?.map(p => p.acceptationNumero ?? p.numero) ?? [],
     wasteSealNumbers: [],
     identificationNumbers: [],
     ficheInterventionNumbers:

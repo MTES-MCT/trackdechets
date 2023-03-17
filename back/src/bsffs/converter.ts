@@ -263,6 +263,7 @@ export function flattenBsffPackagingInput(
       input.acceptation,
       a => a.wasteDescription
     ),
+    acceptationNumero: chain(input.acceptation, a => a.numero),
     operationDate: chain(input.operation, o => o.date),
     operationNoTraceability: chain(input.operation, o => o.noTraceability),
     operationCode: chain(input.operation, o => o.code),
@@ -319,6 +320,7 @@ export function expandBsffPackagingFromDB(
       refusalReason: prismaBsffPackaging.acceptationRefusalReason,
       wasteCode: prismaBsffPackaging.acceptationWasteCode,
       wasteDescription: prismaBsffPackaging.acceptationWasteDescription,
+      numero: prismaBsffPackaging.acceptationNumero,
       signature: nullIfNoValues<GraphQL.Signature>({
         date: processDate(prismaBsffPackaging.acceptationSignatureDate),
         author: prismaBsffPackaging.acceptationSignatureAuthor

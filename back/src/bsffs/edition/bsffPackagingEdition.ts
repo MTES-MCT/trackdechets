@@ -41,6 +41,7 @@ export const editionRules: {
   acceptationRefusalReason: "ACCEPTATION",
   acceptationWasteCode: "ACCEPTATION",
   acceptationWasteDescription: "ACCEPTATION",
+  acceptationNumero: "ACCEPTATION",
   operationDate: "OPERATION",
   operationCode: "OPERATION",
   operationDescription: "OPERATION",
