@@ -142,12 +142,13 @@ export default function BsffPackagings({
                   <RedErrorMessage name={`${fieldName}.numero`} />
                   <RedErrorMessage name={`${fieldName}.volume`} />
                   <RedErrorMessage name={`${fieldName}.weight`} />
-                  {typeof p.volume === "number" && p.weight > p.volume && (
-                    <div className="notification notification--warning">
-                      Le poids renseigné semble trop grand par rapport à la
-                      contenance du contenant.
-                    </div>
-                  )}
+                  {typeof p.volume === "number" &&
+                    p.weight > p.volume * 1.5 && (
+                      <div className="notification notification--warning">
+                        Le poids renseigné semble trop élevé au regard du volume
+                        du contenant.
+                      </div>
+                    )}
                 </div>
               );
             })}
