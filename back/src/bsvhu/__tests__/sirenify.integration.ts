@@ -4,10 +4,13 @@ import * as search from "../../companies/search";
 import { BsvhuInput } from "../../generated/graphql/types";
 import sirenify from "../sirenify";
 import { AuthType } from "../../auth";
+import { resetDatabase } from "../../../integration-tests/helper";
 
 const searchCompanySpy = jest.spyOn(search, "searchCompany");
 
 describe("sirenify", () => {
+  afterEach(resetDatabase);
+
   it("should overwrite `name` and `address` based on SIRENE data if `name` and `address` are provided", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const transporter = await userWithCompanyFactory("MEMBER");

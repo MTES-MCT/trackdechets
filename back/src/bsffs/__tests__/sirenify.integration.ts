@@ -12,10 +12,13 @@ import {
   sirenifyBsffFicheInterventionInput
 } from "../sirenify";
 import { AuthType } from "../../auth";
+import { resetDatabase } from "../../../integration-tests/helper";
 
 const searchCompanySpy = jest.spyOn(search, "searchCompany");
 
 describe("sirenifyBsffInput", () => {
+  afterEach(resetDatabase);
+
   it("should overwrite `name` and `address` based on SIRENE data if `name` and `address` are provided", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const transporter = await userWithCompanyFactory("MEMBER");
@@ -154,6 +157,8 @@ describe("sirenifyBsffInput", () => {
 });
 
 describe("sirenifyBsffPackagingInput", () => {
+  afterEach(resetDatabase);
+
   it("should overwrite `name` and `address` based on SIRENE data if `name` and `address` are provided", async () => {
     const nextDestination = await userWithCompanyFactory("MEMBER");
 
@@ -246,6 +251,8 @@ describe("sirenifyBsffPackagingInput", () => {
 });
 
 describe("sirenifyBsffFicheInterventionInput", () => {
+  afterEach(resetDatabase);
+
   it("should overwrite `name` and `address` based on SIRENE data if `name` and `address` are provided", async () => {
     const detenteur = await userWithCompanyFactory("MEMBER");
     const operateur = await userWithCompanyFactory("MEMBER");
