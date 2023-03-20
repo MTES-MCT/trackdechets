@@ -203,7 +203,7 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
                   }}
                 />
                 <h4 className="form__section-heading">
-                  Récépissé de déclaration de transport de déchets
+                  Exemption de récépissé de déclaration de transport de déchets
                 </h4>
 
                 <div className="form__row">

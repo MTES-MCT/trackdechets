@@ -49,7 +49,7 @@ export default function Transporter({ disabled }) {
       {!isForeignVat(values?.transporter?.company?.vatNumber!!) && (
         <>
           <h4 className="form__section-heading">
-            Récépissé de déclaration de transport de déchets
+            Exemption de récépissé de déclaration de transport de déchets
           </h4>
           <div className="form__row">
             <Switch
@@ -64,32 +64,32 @@ export default function Transporter({ disabled }) {
               label="Le transporteur déclare être exempté de récépissé conformément aux dispositions de l'article R.541-50 du code de l'environnement."
             />
           </div>
-          <h4 className="form__section-heading">Détails</h4>
-          <div className="form__row">
-            <label>
-              Mode de transport:
-              <Field
-                id="id_mode"
-                name="transporter.transport.mode"
-                component={FieldTransportModeSelect}
-                disabled={disabled}
-              ></Field>
-            </label>
-          </div>
-
-          <div className="form__row">
-            <label>
-              Immatriculations
-              <TdTooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
-              <TagsInput
-                name="transporter.transport.plates"
-                disabled={disabled}
-                limit={2}
-              />
-            </label>
-          </div>
         </>
       )}
+      <h4 className="form__section-heading">Détails</h4>
+      <div className="form__row">
+        <label>
+          Mode de transport:
+          <Field
+            id="id_mode"
+            name="transporter.transport.mode"
+            component={FieldTransportModeSelect}
+            disabled={disabled}
+          ></Field>
+        </label>
+      </div>
+
+      <div className="form__row">
+        <label>
+          Immatriculations
+          <TdTooltip msg="Saisissez les numéros un par un. Appuyez sur la touche <Entrée> ou <Tab> pour valider chacun" />
+          <TagsInput
+            name="transporter.transport.plates"
+            disabled={disabled}
+            limit={2}
+          />
+        </label>
+      </div>
     </>
   );
 }

@@ -43,28 +43,10 @@ export default function Transporter() {
           }
         }}
       />
-
-      <div className="form__row">
-        <label>
-          Mode de transport
-          <Field name="transporter.mode" component={FieldTransportModeSelect} />
-        </label>
-        <label>
-          Immatriculation (optionnel)
-          <Field
-            type="text"
-            className={`td-input ${styles.transporterNumberPlate}`}
-            name="transporter.numberPlate"
-            placeholder="Plaque d'immatriculation du véhicule"
-          />
-        </label>
-
-        <RedErrorMessage name="transporter.numberPlate" />
-      </div>
       {!isForeignVat(values.transporter?.company?.vatNumber!!) && (
         <>
           <h4 className="form__section-heading">
-            Récépissé de déclaration de transport de déchets
+            Exemption de récépissé de déclaration de transport de déchets
           </h4>
           <div className="form__row">
             <TdSwitch
@@ -82,6 +64,23 @@ export default function Transporter() {
           </div>
         </>
       )}
+      <div className="form__row">
+        <label>
+          Mode de transport
+          <Field name="transporter.mode" component={FieldTransportModeSelect} />
+        </label>
+        <label>
+          Immatriculation (optionnel)
+          <Field
+            type="text"
+            className={`td-input ${styles.transporterNumberPlate}`}
+            name="transporter.numberPlate"
+            placeholder="Plaque d'immatriculation du véhicule"
+          />
+        </label>
+
+        <RedErrorMessage name="transporter.numberPlate" />
+      </div>
     </>
   );
 }

@@ -157,7 +157,7 @@ export default function EditSegment({ siret, segment }: Props) {
                 )}
 
                 <h4 className="form__section-heading">
-                  Récépissé de déclaration de transport de déchets
+                  Exemption de récépissé de déclaration de transport de déchets
                 </h4>
                 <div className="form__row">
                   <label htmlFor="isExemptedOfReceipt" className="tw-mb-2">
