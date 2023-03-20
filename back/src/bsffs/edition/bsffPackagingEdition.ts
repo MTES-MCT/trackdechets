@@ -19,7 +19,7 @@ type EditableBsffPackagingFields = Required<
     | "other"
     | "volume"
     | "weight"
-    | "numero"
+    | "emissionNumero"
     | "acceptationSignatureAuthor"
     | "acceptationSignatureDate"
     | "operationSignatureAuthor"
@@ -35,6 +35,7 @@ type EditableBsffPackagingFields = Required<
 export const editionRules: {
   [key in keyof EditableBsffPackagingFields]: BsffSignatureType;
 } = {
+  numero: "ACCEPTATION",
   acceptationDate: "ACCEPTATION",
   acceptationStatus: "ACCEPTATION",
   acceptationWeight: "ACCEPTATION",
