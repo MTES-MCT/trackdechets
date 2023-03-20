@@ -24,6 +24,7 @@ import {
   FieldTransportModeSelect,
   RedErrorMessage,
 } from "common/components";
+import { isForeignVat } from "generated/constants/companySearchHelpers";
 
 const PREPARE_SEGMENT = gql`
   mutation prepareSegment(
@@ -52,7 +53,7 @@ export const transporterSchema = object().shape({
         : schema
             .ensure()
             .required(
-              "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+              "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, le numéro est donc est obligatoire"
             )
   ),
   department: string().when(
@@ -60,7 +61,9 @@ export const transporterSchema = object().shape({
     (isExemptedOfReceipt: boolean, schema: StringSchema) =>
       isExemptedOfReceipt
         ? schema.nullable(true)
-        : schema.required("Le département du transporteur est obligatoire")
+        : schema.required(
+            "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, le département est donc est obligatoire"
+          )
   ),
   validityLimit: date().nullable(true),
   numberPlate: string().nullable(true),
@@ -202,24 +205,30 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
                     }
                   }}
                 />
-                <h4 className="form__section-heading">
-                  Exemption de récépissé de déclaration de transport de déchets
-                </h4>
+                {!isForeignVat(values.transporter?.company?.vatNumber!!) &&
+                  !values.transporter.receipt && (
+                    <>
+                      <h4 className="form__section-heading">
+                        Exemption de récépissé de déclaration de transport de
+                        déchets
+                      </h4>
 
-                <div className="form__row">
-                  <TdSwitch
-                    checked={!!values.transporter.isExemptedOfReceipt}
-                    onChange={() =>
-                      setFieldValue(
-                        "transporter.isExemptedOfReceipt",
-                        !values.transporter.isExemptedOfReceipt
-                      )
-                    }
-                    label="Le transporteur déclare être exempté de récépissé conformément
-                    aux dispositions de l'article R.541-50 du code de
-                    l'environnement."
-                  />
-                </div>
+                      <div className="form__row">
+                        <TdSwitch
+                          checked={!!values.transporter.isExemptedOfReceipt}
+                          onChange={() =>
+                            setFieldValue(
+                              "transporter.isExemptedOfReceipt",
+                              !values.transporter.isExemptedOfReceipt
+                            )
+                          }
+                          label="Le transporteur déclare être exempté de récépissé conformément
+                      aux dispositions de l'article R.541-50 du code de
+                      l'environnement."
+                        />
+                      </div>
+                    </>
+                  )}
                 {error && <NotificationError apolloError={error} />}
 
                 <div className="form__actions">

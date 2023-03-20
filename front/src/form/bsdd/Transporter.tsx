@@ -43,27 +43,28 @@ export default function Transporter() {
           }
         }}
       />
-      {!isForeignVat(values.transporter?.company?.vatNumber!!) && (
-        <>
-          <h4 className="form__section-heading">
-            Exemption de récépissé de déclaration de transport de déchets
-          </h4>
-          <div className="form__row">
-            <TdSwitch
-              checked={!!values.transporter.isExemptedOfReceipt}
-              onChange={() =>
-                setFieldValue(
-                  "transporter.isExemptedOfReceipt",
-                  !values.transporter.isExemptedOfReceipt
-                )
-              }
-              disabled={values.transporter.company?.orgId === null}
-              label="Le transporteur déclare être exempté de récépissé conformément aux
+      {!isForeignVat(values.transporter?.company?.vatNumber!!) &&
+        !values.transporter?.receipt && (
+          <>
+            <h4 className="form__section-heading">
+              Exemption de récépissé de déclaration de transport de déchets
+            </h4>
+            <div className="form__row">
+              <TdSwitch
+                checked={!!values.transporter.isExemptedOfReceipt}
+                onChange={() =>
+                  setFieldValue(
+                    "transporter.isExemptedOfReceipt",
+                    !values.transporter.isExemptedOfReceipt
+                  )
+                }
+                disabled={values.transporter.company?.orgId === null}
+                label="Le transporteur déclare être exempté de récépissé conformément aux
             dispositions de l'article R.541-50 du code de l'environnement."
-            />
-          </div>
-        </>
-      )}
+              />
+            </div>
+          </>
+        )}
       <div className="form__row">
         <label>
           Mode de transport

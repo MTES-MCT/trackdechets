@@ -81,7 +81,7 @@ export const transporterSchema = object().shape({
           : schema
               .ensure()
               .required(
-                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, le numéro est donc est obligatoire"
               )
     )
     .when(
@@ -92,7 +92,7 @@ export const transporterSchema = object().shape({
           : schema
               .ensure()
               .required(
-                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, le numéro est donc est obligatoire"
               )
     ),
   department: string()
@@ -101,7 +101,9 @@ export const transporterSchema = object().shape({
       (isExemptedOfReceipt: boolean, schema: StringSchema) =>
         isExemptedOfReceipt
           ? schema.nullable(true)
-          : schema.required("Le département du transporteur est obligatoire")
+          : schema.required(
+              "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, le département est donc est obligatoire"
+            )
     )
     .when(
       "transporter.company.vatNumber",
@@ -110,7 +112,9 @@ export const transporterSchema = object().shape({
           ? schema.nullable(true)
           : schema
               .ensure()
-              .required("Le département du transporteur est obligatoire")
+              .required(
+                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, le département du transporteur est obligatoire"
+              )
     ),
   validityLimit: date().nullable(true),
   numberPlate: string().nullable(true),
