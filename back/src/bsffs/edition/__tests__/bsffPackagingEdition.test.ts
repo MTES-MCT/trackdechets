@@ -51,6 +51,7 @@ describe("edition", () => {
     };
 
     const input: Required<UpdateBsffPackagingInput> = {
+      numero: "1234",
       acceptation,
       operation
     };

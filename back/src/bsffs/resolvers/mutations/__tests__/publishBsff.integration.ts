@@ -108,6 +108,7 @@ describe("publishBsff", () => {
           create: {
             type: BsffPackagingType.BOUTEILLE,
             numero: "123",
+            emissionNumero: "123",
             weight: 1,
             volume: 1
           }

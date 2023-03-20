@@ -232,5 +232,5 @@ export function getPackagingCreateInput(
           }
         }
       ]
-    : bsff.packagings.map(p => ({ ...p, emissionNumero: p.numero })) ?? [];
+    : bsff.packagings?.map(p => ({ ...p, emissionNumero: p.numero })) ?? [];
 }
