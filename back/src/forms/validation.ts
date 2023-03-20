@@ -1146,6 +1146,10 @@ const withoutNextDestination = yup.object().shape({
   nextDestinationCompanyMail: yup
     .string()
     .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  nextDestinationNotificationNumber: yup
+    .string()
+    .ensure()
     .max(0, EXTRANEOUS_NEXT_DESTINATION)
 });
 
