@@ -23,6 +23,7 @@ import { FormWasteTransportSummary } from "./FormWasteTransportSummary";
 import { GET_FORM } from "form/bsdd/utils/queries";
 import Loader from "common/components/Loaders";
 import DateInput from "form/common/components/custom-inputs/DateInput";
+import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 
 const SIGN_TRANSPORT_FORM = gql`
   mutation SignTransportForm(
@@ -142,7 +143,7 @@ function SignTransportFormModal({
           <FormikForm>
             <FormWasteTransportSummary form={form} />
             <FormJourneySummary form={form} />
-
+            <TransporterReceipt transporter={form.transporter!} />
             <p>
               En qualité de <strong>transporteur du déchet</strong>, j'atteste
               que les informations ci-dessus sont correctes. En signant ce

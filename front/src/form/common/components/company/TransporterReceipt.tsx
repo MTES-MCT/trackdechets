@@ -8,7 +8,6 @@ import {
   BsffTransporter,
   Scalars,
 } from "generated/graphql/types";
-import { Maybe } from "graphql/jsutils/Maybe";
 
 interface UniversalRecepisse {
   /** Numéro de récépissé */
@@ -16,16 +15,16 @@ interface UniversalRecepisse {
   /** Département */
   department: string;
   /** Date limite de validité */
-  validityLimit?: Maybe<Scalars["DateTime"]>;
+  validityLimit?: Scalars["DateTime"];
 }
 
 type NotFormTransporter =
-  | Maybe<BsdaTransporter>
-  | Maybe<BsdasriTransporter>
-  | Maybe<BsvhuTransporter>
-  | Maybe<BsffTransporter>;
+  | BsdaTransporter
+  | BsdasriTransporter
+  | BsvhuTransporter
+  | BsffTransporter;
 
-type UniversalTransporter = Maybe<Transporter> | NotFormTransporter;
+type UniversalTransporter = Transporter | NotFormTransporter;
 
 export default function TransporterReceipt({
   transporter,

@@ -10,6 +10,7 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 import { BsdasriStatus, Bsdasri, BsdasriType } from "generated/graphql/types";
 import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 import { customInfoToolTip } from "./Emitter";
+import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export default function Transport({ status, editionDisabled = false }) {
@@ -51,6 +52,9 @@ export default function Transport({ status, editionDisabled = false }) {
         </label>
       </div>
       <h4 className="form__section-heading">Transport du déchet</h4>
+      <div className="form__row">
+        <TransporterReceipt transporter={values.transporter!} />
+      </div>
       <div className="form__row">
         <label>Mode de transport</label>
         <Field

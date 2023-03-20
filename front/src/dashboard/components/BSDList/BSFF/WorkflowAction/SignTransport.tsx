@@ -16,6 +16,7 @@ import { SIGN_BSFF, UPDATE_BSFF_FORM } from "form/bsff/utils/queries";
 import { SignBsff } from "./SignBsff";
 import { GET_BSDS } from "common/queries";
 import DateInput from "form/common/components/custom-inputs/DateInput";
+import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 
 const getValidationSchema = (today: Date) =>
   yup.object({
@@ -86,7 +87,7 @@ function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
             les informations ci-dessus sont correctes. En signant ce document,
             je déclare prendre en charge le déchet.
           </p>
-
+          <TransporterReceipt transporter={bsff.transporter!} />
           <div className="form__row">
             <label className="tw-font-semibold">
               Date de prise en charge

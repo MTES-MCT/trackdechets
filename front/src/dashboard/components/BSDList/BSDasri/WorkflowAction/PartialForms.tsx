@@ -16,6 +16,7 @@ import omitDeep from "omit-deep-lodash";
 import { getInitialWeightFn } from "form/bsdasri/utils/initial-state";
 import { Bsdasri, BsdasriType } from "generated/graphql/types";
 import Transport from "form/bsdasri/steps/Transport";
+import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 
 export function EmitterSignatureForm() {
   return (
@@ -100,7 +101,7 @@ export function TransportSignatureForm() {
 }
 
 export function SynthesisTransportSignatureForm() {
-  const { setFieldValue } = useFormikContext<Bsdasri>();
+  const { setFieldValue, values } = useFormikContext<Bsdasri>();
 
   // is always accepted for synthesis
   useEffect(() => {
@@ -110,56 +111,7 @@ export function SynthesisTransportSignatureForm() {
   return (
     <>
       <div className="form__row">
-        <label>
-          Numéro de récépissé
-          <Field
-            type="text"
-            name="transporter.recepisse.number"
-            className="td-input"
-          />
-        </label>
-
-        <RedErrorMessage name="transporter.recepisse.number" />
-      </div>
-      <div className="form__row">
-        <label>
-          Département
-          <Field
-            type="text"
-            name="transporter.recepisse.department"
-            placeholder="Ex: 83"
-            className="td-input td-department"
-          />
-        </label>
-
-        <RedErrorMessage name="transporter.recepisse.department" />
-      </div>
-      <div className="form__row">
-        <label>
-          Limite de validité
-          <div className="td-date-wrapper">
-            <Field
-              component={DateInput}
-              name="transporter.recepisse.validityLimit"
-              className="td-input td-date"
-            />
-          </div>
-        </label>
-
-        <RedErrorMessage name="transporter.recepisse.validityLimit" />
-      </div>
-
-      <div className="form__row">
-        <label>
-          Date de prise en charge
-          <div className="td-date-wrapper">
-            <Field
-              name="transporter.transport.takenOverAt"
-              component={DateInput}
-              className="td-input"
-            />
-          </div>
-        </label>
+        <TransporterReceipt transporter={values.transporter!} />
       </div>
       <div className="form__row">
         <Field
