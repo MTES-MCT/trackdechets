@@ -1,15 +1,11 @@
-import RedErrorMessage from "common/components/RedErrorMessage";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import DateInput from "form/common/components/custom-inputs/DateInput";
-import { Field, useFormikContext } from "formik";
-import { isForeignVat } from "generated/constants/companySearchHelpers";
+import { useFormikContext } from "formik";
 import { Bsvhu } from "generated/graphql/types";
 import React from "react";
-import styles from "./Transporter.module.scss";
 import initialState from "./utils/initial-state";
 
 export default function Transporter({ disabled }) {
-  const { setFieldValue, values } = useFormikContext<Bsvhu>();
+  const { setFieldValue } = useFormikContext<Bsvhu>();
   return (
     <>
       {disabled && (
@@ -48,7 +44,6 @@ export default function Transporter({ disabled }) {
           }
         }}
       />
-
     </>
   );
 }

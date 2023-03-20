@@ -1,18 +1,13 @@
 import React, { lazy } from "react";
-import { Field, useFormikContext } from "formik";
-import { Bsda } from "generated/graphql/types";
-import { RedErrorMessage, FieldTransportModeSelect } from "common/components";
+import { Field } from "formik";
+import { FieldTransportModeSelect } from "common/components";
 import Tooltip from "common/components/Tooltip";
 import DateInput from "form/common/components/custom-inputs/DateInput";
-import { isForeignVat } from "generated/constants/companySearchHelpers";
-import { truncate } from "fs";
 
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 type Props = { disabled: boolean };
 export function Transport({ disabled }: Props) {
-  const { values } = useFormikContext<Bsda>();
-
   return (
     <>
       <h4 className="form__section-heading">Détails</h4>

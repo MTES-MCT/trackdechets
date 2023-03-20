@@ -16,7 +16,6 @@ import ActionButton from "common/components/ActionButton";
 import { NotificationError } from "common/components/Error";
 import { IconBusTransfer } from "common/components/Icons";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import DateInput from "form/common/components/custom-inputs/DateInput";
 import { WorkflowActionProps } from "../WorkflowAction";
 import TdSwitch from "common/components/Switch";
 import { GET_BSDS, GET_DETAIL_FORM } from "common/queries";

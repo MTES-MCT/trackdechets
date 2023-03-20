@@ -14,7 +14,6 @@ import { NotificationError } from "common/components/Error";
 import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import DateInput from "form/common/components/custom-inputs/DateInput";
 import { FieldTransportModeSelect } from "common/components";
 
 const EDIT_SEGMENT = gql`

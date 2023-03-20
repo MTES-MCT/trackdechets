@@ -1,12 +1,9 @@
 import React, { lazy } from "react";
 import { FieldTransportModeSelect, Switch } from "common/components";
-import RedErrorMessage from "common/components/RedErrorMessage";
 import TdTooltip from "common/components/Tooltip";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import DateInput from "form/common/components/custom-inputs/DateInput";
 import { Field, useField, useFormikContext } from "formik";
 import { Bsff } from "generated/graphql/types";
-import styles from "./Transporter.module.scss";
 import initialState from "./utils/initial-state";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));

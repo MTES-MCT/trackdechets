@@ -19,10 +19,15 @@ import React, { useMemo, useRef, useState } from "react";
 import { debounce } from "common/helper";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import {
+  BsdasriTransporter,
+  BsdaTransporter,
+  BsffTransporter,
+  BsvhuTransporter,
   CompanyFavorite,
   CompanySearchResult,
   FavoriteType,
   FormCompany,
+  Maybe,
   Query,
   QueryCompanyPrivateInfosArgs,
   QueryFavoritesArgs,
@@ -38,7 +43,7 @@ import {
   FAVORITES,
   SEARCH_COMPANIES,
 } from "./query";
-import { formatDate } from "common/datetime";
+import TransporterReceipt from "./TransporterReceipt";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -79,7 +84,14 @@ export default function CompanySelector({
     address: field.value?.address,
   });
   const { setFieldError, setFieldValue, setFieldTouched, values } =
-    useFormikContext<{ transporter: Transporter }>();
+    useFormikContext<{
+      transporter:
+        | Maybe<Transporter>
+        | Maybe<BsdaTransporter>
+        | Maybe<BsdasriTransporter>
+        | Maybe<BsvhuTransporter>
+        | Maybe<BsffTransporter>;
+    }>();
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
     (field.value?.country && field.value?.country !== "FR") ||
@@ -544,26 +556,10 @@ export default function CompanySelector({
 
           <RedErrorMessage name={`${field.name}.mail`} />
         </div>
-        {!isForeignVat(values.transporter?.company?.vatNumber!!) &&
-          name == "transporter.company" && (
-            <>
-              <h4 className="form__section-heading">
-                Récépissé de déclaration de transport de déchets
-              </h4>
-              {values?.transporter?.receipt ? (
-                <p>
-                  Numéro {values?.transporter?.receipt}, départment{" "}
-                  {values?.transporter?.department}, date limite de validité{" "}
-                  {formatDate(values?.transporter?.validityLimit!)}
-                </p>
-              ) : (
-                <p>
-                  L'entreprise de transport n'a pas complété ces informations
-                  dans son profil. Nous ne pouvons pas afficher les information.
-                  Il lui appartient de les compléter.
-                </p>
-              )}
-            </>
+        {!!values.transporter &&
+          !isForeignCompany &&
+          name === "transporter.company" && (
+            <TransporterReceipt transporter={values.transporter} />
           )}
       </div>
     </>

@@ -1,7 +1,6 @@
 import { Field, useFormikContext } from "formik";
 import React, { lazy } from "react";
 import classNames from "classnames";
-import RedErrorMessage from "common/components/RedErrorMessage";
 import Tooltip from "common/components/Tooltip";
 import WeightWidget from "../components/Weight";
 import { FieldTransportModeSelect } from "common/components";
@@ -11,7 +10,6 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 import { BsdasriStatus, Bsdasri, BsdasriType } from "generated/graphql/types";
 import Acceptation from "form/bsdasri/components/acceptation/Acceptation";
 import { customInfoToolTip } from "./Emitter";
-import { isForeignVat } from "generated/constants/companySearchHelpers";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export default function Transport({ status, editionDisabled = false }) {
