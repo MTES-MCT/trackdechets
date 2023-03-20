@@ -147,7 +147,8 @@ function BsffEmitterType({ bsff }: Pick<Props, "bsff">) {
             defaultChecked={bsff.type === BsffType.TRACER_FLUIDE}
             readOnly
           />{" "}
-          Un autre détenteur de déchets
+          Un détenteur de contenant(s) de déchets de fluides à tracer (sans
+          fiche d'intervention)
         </p>
         <p>
           <input
