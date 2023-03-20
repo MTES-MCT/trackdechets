@@ -1104,6 +1104,7 @@ const withNextDestination = (required: boolean) =>
     nextDestinationNotificationNumber: yup
       .string()
       .notRequired()
+      .nullable()
       .matches(
         /^[a-zA-Z]{2}[0-9]{4}$|^$/,
         "Destination ultérieure : Le numéro d'identication ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
