@@ -290,6 +290,10 @@ function flattenNextDestinationInput(input: {
       input.nextDestination,
       nd => nd.processingOperation
     ),
+    flattenNextDestinationInput: chain(
+      input.nextDestination,
+      nd => nd.notificationNumber
+    ),
     nextDestinationCompanySiret: chain(input.nextDestination, nd =>
       chain(nd.company, c => c.siret)
     ),
@@ -658,6 +662,7 @@ export async function expandFormFromDb(
     nextDestination: forwardedIn
       ? nullIfNoValues<NextDestination>({
           processingOperation: forwardedIn.nextDestinationProcessingOperation,
+          notificationNumber: forwardedIn.nextDestinationNotificationNumber,
           company: nullIfNoValues<FormCompany>({
             name: forwardedIn.nextDestinationCompanyName,
             siret: forwardedIn.nextDestinationCompanySiret,
@@ -671,6 +676,7 @@ export async function expandFormFromDb(
         })
       : nullIfNoValues<NextDestination>({
           processingOperation: form.nextDestinationProcessingOperation,
+          notificationNumber: form.nextDestinationNotificationNumber,
           company: nullIfNoValues<FormCompany>({
             name: form.nextDestinationCompanyName,
             siret: form.nextDestinationCompanySiret,

@@ -741,7 +741,8 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 <p>
                   N° du document prévu à l'annexe I-B du règlement n°1013/2006
                   ou le numéro de notification et numéro de saisie du document
-                  prévue à l'annexe I-B du règlement N°1013/2006 (si connu) :
+                  prévue à l'annexe I-B du règlement N°1013/2006 (si connu) :{" "}
+                  {form.nextDestination?.notificationNumber}
                 </p>
               </div>
             </div>
