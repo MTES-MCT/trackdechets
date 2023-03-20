@@ -290,7 +290,7 @@ function flattenNextDestinationInput(input: {
       input.nextDestination,
       nd => nd.processingOperation
     ),
-    flattenNextDestinationInput: chain(
+    nextDestinationNotificationNumber: chain(
       input.nextDestination,
       nd => nd.notificationNumber
     ),
