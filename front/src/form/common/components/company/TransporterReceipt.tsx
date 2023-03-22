@@ -8,6 +8,7 @@ import {
   BsffTransporter,
   Scalars,
 } from "generated/graphql/types";
+import { Alert, Row } from "@dataesr/react-dsfr";
 
 interface UniversalRecepisse {
   /** Numéro de récépissé */
@@ -46,22 +47,26 @@ export default function TransporterReceipt({
       "",
   };
   return (
-    <>
-      <h4 className="form__section-heading">
-        Récépissé de déclaration de transport de déchets
-      </h4>
-      {recepisse.number ? (
-        <p>
-          Numéro {recepisse.number}, départment {recepisse.department}, date
-          limite de validité {formatDate(recepisse.validityLimit!)}
-        </p>
-      ) : (
-        <p>
-          L'entreprise de transport n'a pas complété ces informations dans son
-          profil. Nous ne pouvons pas afficher les information. Il lui
-          appartient de les compléter.
-        </p>
-      )}
-    </>
+    <Row spacing="mb-2w mt-2w">
+      <Alert
+        title={"Récépissé de déclaration de transport de déchets"}
+        description={
+          <>
+            {recepisse.number ? (
+              <p>
+                Numéro {recepisse.number}, départment {recepisse.department},
+                date limite de validité {formatDate(recepisse.validityLimit!)}
+              </p>
+            ) : (
+              <p>
+                L'entreprise de transport n'a pas complété ces informations dans
+                son profil. Nous ne pouvons pas afficher les information. Il lui
+                appartient de les compléter.
+              </p>
+            )}
+          </>
+        }
+      />
+    </Row>
   );
 }

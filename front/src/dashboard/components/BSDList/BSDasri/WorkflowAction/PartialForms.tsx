@@ -68,6 +68,8 @@ export function EmitterSignatureForm() {
   );
 }
 export function TransportSignatureForm() {
+  const { values } = useFormikContext<Bsdasri>();
+
   return (
     <>
       <div className="form__row">
@@ -96,6 +98,7 @@ export function TransportSignatureForm() {
       </div>
 
       <Transport status={BsdasriStatus.SignedByProducer} />
+      <TransporterReceipt transporter={values.transporter!} />
     </>
   );
 }
@@ -110,9 +113,7 @@ export function SynthesisTransportSignatureForm() {
 
   return (
     <>
-      <div className="form__row">
-        <TransporterReceipt transporter={values.transporter!} />
-      </div>
+      <TransporterReceipt transporter={values.transporter!} />
       <div className="form__row">
         <label>
           Date de prise en charge
