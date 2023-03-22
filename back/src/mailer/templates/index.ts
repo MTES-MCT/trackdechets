@@ -187,6 +187,11 @@ export const verificationDone: MailTemplate<{
   })
 };
 
+export const verifiedForeignCompany: MailTemplate = {
+  subject: "Welcome to Trackdéchets !",
+  templateId: templateIds.VERIFIED_FOREIGN_COMPANY
+};
+
 export const finalDestinationModified: MailTemplate<{
   id: string;
   emitter: { name?: string; siret: string };
