@@ -5289,10 +5289,10 @@ dns-packet@^5.2.2:
   dependencies:
     "@leichtgewicht/ip-codec" "^2.0.1"
 
-docusaurus-graphql-plugin@^0.8.0:
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/docusaurus-graphql-plugin/-/docusaurus-graphql-plugin-0.8.0.tgz#02ed433e80e6bbf1ee1938a5ee65969ccd958589"
-  integrity sha512-AZKTr7mYD3KCoMSMeX5fQuDO4Aib6dvT1+ahuGYzQvo4sQ+ZCPHS2ukaoyzO1Ms7Jo8KkbcwwGVgUUbhoUl6Ow==
+docusaurus-graphql-plugin@^0.8.2:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/docusaurus-graphql-plugin/-/docusaurus-graphql-plugin-0.8.2.tgz#3abab2be2afa17ee40392815a9205591a81c13a7"
+  integrity sha512-OBCz13tHJaTcGCa6Z9YW1ZJqwk2J8P2HGvtBOiyMPyoc+2bAGWv2EcHxBkgrvy3F70kzqN1DTTTbyVQM7lkVEA==
   dependencies:
     "@graphql-tools/graphql-file-loader" "^7.3.12"
     "@graphql-tools/json-file-loader" "^7.3.12"
