@@ -53,9 +53,6 @@ export default function Transport({ status, editionDisabled = false }) {
       </div>
       <h4 className="form__section-heading">Transport du déchet</h4>
       <div className="form__row">
-        <TransporterReceipt transporter={values.transporter!} />
-      </div>
-      <div className="form__row">
         <label>Mode de transport</label>
         <Field
           id="id_mode"
@@ -77,6 +74,9 @@ export default function Transport({ status, editionDisabled = false }) {
           </label>
         </div>
       )}
+      <div className="form__row">
+        <TransporterReceipt transporter={values.transporter!} />
+      </div>
       {showTransportFields && (
         <>
           <div

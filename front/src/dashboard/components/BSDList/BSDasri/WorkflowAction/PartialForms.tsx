@@ -114,6 +114,18 @@ export function SynthesisTransportSignatureForm() {
         <TransporterReceipt transporter={values.transporter!} />
       </div>
       <div className="form__row">
+        <label>
+          Date de prise en charge
+          <div className="td-date-wrapper">
+            <Field
+              name="transporter.transport.takenOverAt"
+              component={DateInput}
+              className="td-input"
+            />
+          </div>
+        </label>
+      </div>
+      <div className="form__row">
         <Field
           name="transporter.transport.packagingInfos"
           component={Packagings}

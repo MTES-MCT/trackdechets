@@ -155,33 +155,25 @@ export default function EditSegment({ siret, segment }: Props) {
                     </div>
                   </>
                 )}
-                {!isForeignVat(values.transporter?.company?.vatNumber!!) &&
-                  !values.transporter?.receipt && (
-                    <>
-                      <h4 className="form__section-heading">
-                        Exemption de récépissé de déclaration de transport de
-                        déchets
-                      </h4>
-                      <div className="form__row">
-                        <label
-                          htmlFor="isExemptedOfReceipt"
-                          className="tw-mb-2"
-                        >
-                          <Field
-                            type="checkbox"
-                            name="transporter.isExemptedOfReceipt"
-                            id="isExemptedOfReceipt"
-                            checked={values?.transporter?.isExemptedOfReceipt}
-                            className="td-input"
-                          />
-                          Le transporteur déclare être exempté de récépissé
-                          conformément aux dispositions de l'article R.541-50 du
-                          code de l'environnement.
-                        </label>
-                      </div>
-                    </>
-                  )}
+                <h4 className="form__section-heading">
+                  Exemption de récépissé de déclaration de transport de déchets
+                </h4>
+                <div className="form__row">
+                  <label htmlFor="isExemptedOfReceipt" className="tw-mb-2">
+                    <Field
+                      type="checkbox"
+                      name="transporter.isExemptedOfReceipt"
+                      id="isExemptedOfReceipt"
+                      checked={values?.transporter?.isExemptedOfReceipt}
+                      className="td-input"
+                    />
+                    Le transporteur déclare être exempté de récépissé
+                    conformément aux dispositions de l'article R.541-50 du code
+                    de l'environnement.
+                  </label>
+                </div>
                 {error && <NotificationError apolloError={error} />}
+
                 <div className="form__actions">
                   <button
                     type="button"
