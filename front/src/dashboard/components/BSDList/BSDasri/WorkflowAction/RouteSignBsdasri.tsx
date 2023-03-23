@@ -135,14 +135,14 @@ export function RouteSignBsdasri({
     },
     fetchPolicy: "no-cache",
   });
-  const [updateBsdasri, { error: updateError }] =
-    useMutation<Pick<Mutation, "updateBsdasri">, MutationUpdateBsdasriArgs>(
-      UPDATE_BSDASRI
-    );
-  const [signBsdasri, { error: signError }] =
-    useMutation<Pick<Mutation, "signBsdasri">, MutationSignBsdasriArgs>(
-      SIGN_BSDASRI
-    );
+  const [updateBsdasri, { error: updateError }] = useMutation<
+    Pick<Mutation, "updateBsdasri">,
+    MutationUpdateBsdasriArgs
+  >(UPDATE_BSDASRI);
+  const [signBsdasri, { error: signError }] = useMutation<
+    Pick<Mutation, "signBsdasri">,
+    MutationSignBsdasriArgs
+  >(SIGN_BSDASRI);
   if (error) {
     return <InlineError apolloError={error} />;
   }

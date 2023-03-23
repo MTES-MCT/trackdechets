@@ -32,10 +32,10 @@ interface SignTransportFormProps {
 }
 
 function SignTransportForm({ bsff, onCancel }: SignTransportFormProps) {
-  const [updateBsff, updateBsffResult] =
-    useMutation<Pick<Mutation, "updateBsff">, MutationUpdateBsffArgs>(
-      UPDATE_BSFF_FORM
-    );
+  const [updateBsff, updateBsffResult] = useMutation<
+    Pick<Mutation, "updateBsff">,
+    MutationUpdateBsffArgs
+  >(UPDATE_BSFF_FORM);
 
   const [signBsff, signBsffResult] = useMutation<
     Pick<Mutation, "signBsff">,

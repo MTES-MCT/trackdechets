@@ -20,15 +20,15 @@ export function Appendix1ProducerForm({
   container: Bsdd;
   close: () => void;
 }) {
-  const [createForm] =
-    useMutation<Pick<Mutation, "createForm">, MutationCreateFormArgs>(
-      CREATE_FORM
-    );
+  const [createForm] = useMutation<
+    Pick<Mutation, "createForm">,
+    MutationCreateFormArgs
+  >(CREATE_FORM);
 
-  const [updateForm] =
-    useMutation<Pick<Mutation, "updateForm">, MutationUpdateFormArgs>(
-      UPDATE_FORM
-    );
+  const [updateForm] = useMutation<
+    Pick<Mutation, "updateForm">,
+    MutationUpdateFormArgs
+  >(UPDATE_FORM);
 
   const currentGrouping =
     container.grouping?.map(g => ({

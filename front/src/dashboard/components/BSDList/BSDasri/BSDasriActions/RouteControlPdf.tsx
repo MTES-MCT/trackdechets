@@ -20,11 +20,10 @@ const CREATE_PDF_ACCESS_TOKEN = gql`
 `;
 
 export function RouteControlPdf() {
-  const { id } =
-    useParams<{
-      id: string;
-      siret: string;
-    }>();
+  const { id } = useParams<{
+    id: string;
+    siret: string;
+  }>();
   const history = useHistory();
 
   const [createPdfAccessToken, { data, loading, error }] = useMutation<

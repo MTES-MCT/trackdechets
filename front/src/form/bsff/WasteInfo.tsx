@@ -8,8 +8,9 @@ import Packagings from "./components/packagings/Packagings";
 import { PreviousPackagingsPicker } from "./components/PreviousPackagingsPicker";
 
 export default function WasteInfo({ disabled }) {
-  const { setFieldValue, values } =
-    useFormikContext<Bsff & { previousPackagings: BsffPackaging[] }>();
+  const { setFieldValue, values } = useFormikContext<
+    Bsff & { previousPackagings: BsffPackaging[] }
+  >();
 
   const [hasPreviousPackagingsChanged, setHasPreviousPackagingsChanged] =
     React.useState(false);

@@ -148,8 +148,9 @@ export default function AccountCompanyAddForeign() {
   const [currentLanguage, setCurrentLanguage] = useState<Language>(Language.FR);
 
   // STATE
-  const [companyInfos, setCompanyInfos] =
-    useState<CompanySearchResult | null>(null);
+  const [companyInfos, setCompanyInfos] = useState<CompanySearchResult | null>(
+    null
+  );
 
   // QUERIES AND MUTATIONS
   const [createCompany, { error: savingError }] = useMutation<
