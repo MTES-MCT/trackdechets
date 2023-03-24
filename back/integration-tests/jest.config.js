@@ -1,7 +1,5 @@
 module.exports = {
-  transform: {
-    "^.+\\.(t|j)sx?$": "@swc/jest",
-  },
+  preset: "ts-jest",
   testEnvironment: "node",
   testTimeout: 30000,
   testMatch: ["**/__tests__/**/?(*.)+(integration).[jt]s?(x)"],
