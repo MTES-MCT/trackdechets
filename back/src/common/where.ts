@@ -209,7 +209,10 @@ export function applyMask<W extends GenericWhereInput>(
 
 // Conversion functions between GraphQL filters and Elastic query
 
-function ngramMatch(fieldName: string, value: string): estypes.QueryDslQueryContainer {
+function ngramMatch(
+  fieldName: string,
+  value: string
+): estypes.QueryDslQueryContainer {
   return {
     match: {
       [`${fieldName}.ngram`]: {
