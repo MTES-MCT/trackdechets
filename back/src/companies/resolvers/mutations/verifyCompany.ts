@@ -9,13 +9,14 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { sendMail } from "../../../mailer/mailing";
 import {
   verificationDone,
-  verifiedForeignCompany
+  verifiedForeignTransporterCompany
 } from "../../../mailer/templates";
 import { renderMail } from "../../../mailer/templates/renderers";
 import prisma from "../../../prisma";
 import { checkIsCompanyAdmin } from "../../../users/permissions";
 import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
 import { isForeignVat } from "../../../common/constants/companySearchHelpers";
+import { isTransporter } from "../../validation";
 
 /**
  * Verify a company from a verification code sent in a letter
@@ -50,10 +51,14 @@ const verifyCompanyResolver: MutationResolvers["verifyCompany"] = async (
     })
   );
 
-  // If foreign company, send appropriate email
-  if (isForeignVat(verifiedCompany.vatNumber)) {
+  // TODO: must do the same in verifyCompanyByAdmin ?
+  // If foreign transporter company, send appropriate email
+  if (
+    isTransporter(verifiedCompany) &&
+    isForeignVat(verifiedCompany.vatNumber)
+  ) {
     await sendMail(
-      renderMail(verifiedForeignCompany, {
+      renderMail(verifiedForeignTransporterCompany, {
         to: [{ name: user.name, email: user.email }],
         variables: { company: verifiedCompany }
       })
