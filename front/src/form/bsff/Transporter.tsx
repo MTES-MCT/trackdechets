@@ -56,10 +56,6 @@ export default function Transporter({ disabled }) {
               checked={isExemptedOfReceipt}
               onChange={checked => {
                 setFieldValue("transporter.isExemptedOfReceipt", checked);
-                setFieldValue(
-                  "transporter.recepisse",
-                  initialState.transporter.recepisse
-                );
               }}
               label="Le transporteur déclare être exempté de récépissé conformément aux dispositions de l'article R.541-50 du code de l'environnement."
             />
