@@ -6,10 +6,7 @@ import Error from "Pages/Error";
 // refreshing the page will encounter the error "Failed to fetch dynamically
 // imported module"
 const isBundleLoadingError = error => {
-  return (
-    /^Loading chunk [0-9]+ failed/.test(error.message) ||
-    error.message?.includes("dynamically imported module")
-  );
+  return error.message?.includes("dynamically imported module");
 };
 
 const getLogErrorLevel = error => {
@@ -67,10 +64,7 @@ class ErrorBoundary extends Component {
 
   render() {
     const { BUILD_ENV } = import.meta.env;
-    const isDevelopment =
-      BUILD_ENV !== "production" ||
-      BUILD_ENV !== "recette" ||
-      BUILD_ENV !== "sandbox";
+    const isDevelopment = !BUILD_ENV;
     const { children } = this.props;
     //@ts-ignore
     const { hasError, hideReloadPageCTA, eventId, errorInfo, error } =
