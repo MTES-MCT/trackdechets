@@ -63,7 +63,7 @@ interface BSDListProps {
 }
 
 // Number of bsds per page
-const FIRST = 10;
+const FIRST = 25;
 
 export function BSDList({
   siret,
@@ -112,7 +112,11 @@ export function BSDList({
 
   const refetchWithDefaultWhere = React.useCallback(
     ({ where, ...args }) => {
-      const newVariables = { ...args, where: { ...where, ...defaultWhere } };
+      const newVariables = {
+        ...args,
+        where: { ...where, ...defaultWhere },
+        first: FIRST,
+      };
       setBsdsVariables(newVariables);
       lazyFetchBsds({
         variables: newVariables,
