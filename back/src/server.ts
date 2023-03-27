@@ -32,7 +32,6 @@ import { redisClient } from "./common/redis";
 import { initSentry } from "./common/sentry";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
 import { createFormDataLoaders } from "./forms/dataloader";
-import { heapSnapshotToS3Router } from "./logging/heapSnapshot";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
@@ -322,8 +321,6 @@ function ensureLoggedInAndAdmin() {
   };
 }
 app.use(bullBoardPath, ensureLoggedInAndAdmin(), serverAdapter.getRouter());
-// TEMP until memory leaks are fixed
-app.post("/heap/:container?", ensureLoggedInAndAdmin(), heapSnapshotToS3Router);
 
 // Apply passport auth middlewares to the graphQL endpoint
 app.use(graphQLPath, passportBearerMiddleware);
