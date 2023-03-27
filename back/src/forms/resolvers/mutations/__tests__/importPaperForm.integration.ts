@@ -620,7 +620,7 @@ describe("mutation / importPaperForm", () => {
       );
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toEqual(
-        "Vous devez apparaitre en tant que destinataire du bordereau (case 2) pour pouvoir mettre à jour ce bordereau"
+        "Vous devez apparaitre en tant que destinataire du bordereau (case 2) pour pouvoir importer ce bordereau"
       );
     });
 

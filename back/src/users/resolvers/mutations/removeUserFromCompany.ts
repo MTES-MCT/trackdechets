@@ -7,15 +7,21 @@ import {
 } from "../../../companies/database";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getCompanyAssociationOrNotFound } from "../../database";
-import { checkIsCompanyAdmin } from "../../permissions";
-import { deleteCachedUserCompanies } from "../../../common/redis/users";
+import { deleteCachedUserRoles } from "../../../common/redis/users";
+import { checkUserPermissions, Permission } from "../../../permissions";
+import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 
 const removeUserFromCompanyResolver: MutationResolvers["removeUserFromCompany"] =
   async (parent, { userId, siret }, context) => {
     applyAuthStrategies(context, [AuthType.Session]);
     const user = checkIsAuthenticated(context);
     const company = await getCompanyOrCompanyNotFound({ orgId: siret });
-    await checkIsCompanyAdmin(user, company);
+    await checkUserPermissions(
+      user,
+      company.orgId,
+      Permission.CompanyCanManageMembers,
+      NotCompanyAdminErrorMsg(company.orgId)
+    );
     const companyAssociation = await getCompanyAssociationOrNotFound({
       user: { id: userId },
       company: { id: company.id }
@@ -25,7 +31,7 @@ const removeUserFromCompanyResolver: MutationResolvers["removeUserFromCompany"] 
     });
 
     // clear cache
-    await deleteCachedUserCompanies(userId);
+    await deleteCachedUserRoles(userId);
 
     const dbCompany = await prisma.company.findUnique({
       where: { orgId: siret }

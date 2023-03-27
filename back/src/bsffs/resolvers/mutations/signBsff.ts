@@ -25,39 +25,11 @@ import { isFinalOperation } from "../../constants";
 import { getStatus } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
-import { getCachedUserSiretOrVat } from "../../../common/redis/users";
-import { checkSecurityCode } from "../../../forms/permissions";
 import {
   getBsffPackagingRepository,
   getBsffRepository
 } from "../../repository";
-
-async function checkIsAllowed(
-  siret: string | null,
-  user: Express.User,
-  securityCode: number | null | undefined
-) {
-  if (siret == null) {
-    throw new UserInputError(
-      `Les informations relatives à l'acteur pour lequel vous souhaitez signer sont manquantes.`
-    );
-  }
-
-  if (securityCode) {
-    try {
-      await checkSecurityCode(siret, securityCode);
-    } catch (e) {
-      throw new UserInputError(`Le code de sécurité est incorrect.`);
-    }
-  } else {
-    const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-    if (!userCompaniesSiretOrVat.includes(siret)) {
-      throw new UserInputError(
-        `Vous n'êtes pas autorisé à signer pour cet acteur.`
-      );
-    }
-  }
-}
+import { checkCanSignFor } from "../../permissions";
 
 const signatures: Record<
   BsffSignatureType,
@@ -72,7 +44,8 @@ const signatures: Record<
     user,
     existingBsff
   ) => {
-    await checkIsAllowed(existingBsff.emitterCompanySiret, user, securityCode);
+    await checkCanSignFor(user, existingBsff.emitterCompanySiret, securityCode);
+
     await validateBeforeEmission(existingBsff as any);
 
     const { update: updateBsff } = getBsffRepository(user);
@@ -91,9 +64,9 @@ const signatures: Record<
     user,
     existingBsff
   ) => {
-    await checkIsAllowed(
-      getTransporterCompanyOrgId(existingBsff),
+    await checkCanSignFor(
       user,
+      getTransporterCompanyOrgId(existingBsff),
       securityCode
     );
 
@@ -115,9 +88,9 @@ const signatures: Record<
     user,
     existingBsff
   ) => {
-    await checkIsAllowed(
-      existingBsff.destinationCompanySiret,
+    await checkCanSignFor(
       user,
+      existingBsff.destinationCompanySiret,
       securityCode
     );
     await validateBeforeReception(existingBsff as any);
@@ -138,9 +111,9 @@ const signatures: Record<
     user,
     existingBsff
   ) => {
-    await checkIsAllowed(
-      existingBsff.destinationCompanySiret,
+    await checkCanSignFor(
       user,
+      existingBsff.destinationCompanySiret,
       securityCode
     );
 
@@ -243,9 +216,9 @@ const signatures: Record<
     user,
     existingBsff
   ) => {
-    await checkIsAllowed(
-      existingBsff.destinationCompanySiret,
+    await checkCanSignFor(
       user,
+      existingBsff.destinationCompanySiret,
       securityCode
     );
     await validateAfterReception(existingBsff as any);

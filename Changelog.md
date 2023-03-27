@@ -73,6 +73,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Les permissions associées à chaque rôle (`ADMIN` ou `MEMBER`) sont désormais rendues explicites dans le code backend [PR 2229](https://github.com/MTES-MCT/trackdechets/pull/2229)
+
 # [2023.4.1] 04/04/2023
 
 #### :rocket: Nouvelles fonctionnalités

@@ -4,7 +4,6 @@ import {
   QueryWastesRegistryXlsArgs
 } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkIsCompanyMember } from "../../../users/permissions";
 import { getFileDownload } from "../../../common/fileDownload";
 import { DownloadHandler } from "../../../routers/downloadRouter";
 import { getRegistryFileName } from "../../filename";
@@ -14,6 +13,7 @@ import { getXlsxHeaders } from "../../columns";
 import { searchBsds } from "../../elastic";
 import { UserInputError } from "apollo-server-express";
 import { GraphQLContext } from "../../../types";
+import { Permission, checkUserPermissions } from "../../../permissions";
 
 export const wastesRegistryXlsDownloadHandler: DownloadHandler<QueryWastesRegistryXlsArgs> =
   {
@@ -60,7 +60,12 @@ export async function wastesRegistryXlsResolverFn(
 ): Promise<FileDownload> {
   const user = checkIsAuthenticated(context);
   for (const siret of args.sirets) {
-    await checkIsCompanyMember({ id: user.id }, { orgId: siret });
+    await checkUserPermissions(
+      user,
+      [siret].filter(Boolean),
+      Permission.RegistryCanRead,
+      `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${siret}`
+    );
   }
   const hits = await searchBsds(args.registryType, args.sirets, args.where, {
     size: 1,

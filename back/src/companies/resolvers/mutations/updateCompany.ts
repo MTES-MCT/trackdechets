@@ -3,9 +3,10 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../database";
-import { checkIsCompanyAdmin } from "../../../users/permissions";
 import { updateCompanyFn } from "./updateCompanyService";
 import { isForeignVat } from "../../../common/constants/companySearchHelpers";
+import { checkUserPermissions, Permission } from "../../../permissions";
+import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 
 const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   parent,
@@ -15,7 +16,13 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ id: args.id });
-  await checkIsCompanyAdmin(user, company);
+
+  await checkUserPermissions(
+    user,
+    company.orgId,
+    Permission.CompanyCanUpdate,
+    NotCompanyAdminErrorMsg(company.orgId)
+  );
 
   const companyTypes = args.companyTypes || company.companyTypes;
   const { ecoOrganismeAgreements } = args;

@@ -4,10 +4,9 @@ import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb } from "../../converter";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
-import { BSDA_CONTRIBUTORS_FIELDS } from "../../permissions";
 import { getConnection } from "../../../common/pagination";
-import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { getBsdaRepository } from "../../repository";
+import { Permission, can, getUserRoles } from "../../../permissions";
 
 export default async function bsdas(
   _,
@@ -16,14 +15,25 @@ export default async function bsdas(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
+  const roles = await getUserRoles(user.id);
+  const orgIdsWithListPermission = Object.keys(roles).filter(orgId =>
+    can(roles[orgId], Permission.BsdCanList)
+  );
 
   const mask = {
     OR: [
-      ...Object.values(BSDA_CONTRIBUTORS_FIELDS).map(field => ({
-        [field]: { in: userCompaniesSiretOrVat }
-      })),
-      { intermediariesOrgIds: { hasSome: userCompaniesSiretOrVat } }
+      { emitterCompanySiret: { in: orgIdsWithListPermission } },
+      { destinationCompanySiret: { in: orgIdsWithListPermission } },
+      { transporterCompanySiret: { in: orgIdsWithListPermission } },
+      { transporterCompanyVatNumber: { in: orgIdsWithListPermission } },
+      { workerCompanySiret: { in: orgIdsWithListPermission } },
+      { brokerCompanySiret: { in: orgIdsWithListPermission } },
+      {
+        destinationOperationNextDestinationCompanySiret: {
+          in: orgIdsWithListPermission
+        }
+      },
+      { intermediariesOrgIds: { hasSome: orgIdsWithListPermission } }
     ]
   };
 

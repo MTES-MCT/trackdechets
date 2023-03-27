@@ -1,11 +1,10 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
+import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { MutationResolvers } from "../../../generated/graphql/types";
-
-import { checkIsCompanyAdmin } from "../../permissions";
-
+import { checkUserPermissions, Permission } from "../../../permissions";
 import { inviteUserToCompanyFn } from "./inviteUserToCompanyService";
 
 const inviteUserToCompanyResolver: MutationResolvers["inviteUserToCompany"] =
@@ -13,7 +12,12 @@ const inviteUserToCompanyResolver: MutationResolvers["inviteUserToCompany"] =
     applyAuthStrategies(context, [AuthType.Session]);
     const user = checkIsAuthenticated(context);
     const company = await getCompanyOrCompanyNotFound({ orgId: args.siret });
-    await checkIsCompanyAdmin(user, company);
+    await checkUserPermissions(
+      user,
+      company.orgId,
+      Permission.CompanyCanManageMembers,
+      NotCompanyAdminErrorMsg(company.orgId)
+    );
     return inviteUserToCompanyFn(user, args);
   };
 

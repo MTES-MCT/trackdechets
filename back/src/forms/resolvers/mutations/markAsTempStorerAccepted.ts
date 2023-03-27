@@ -2,7 +2,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import transitionForm from "../../workflow/transitionForm";
 import { getFormOrFormNotFound } from "../../database";
-import { checkCanMarkAsTempStorerAccepted } from "../../permissions";
+import { checkCanMarkAsTempStored } from "../../permissions";
 import { EventType } from "../../workflow/types";
 import { expandFormFromDb } from "../../converter";
 import { Prisma, WasteAcceptationStatus } from "@prisma/client";
@@ -19,7 +19,7 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
     const { id, tempStorerAcceptedInfo } = args;
     const form = await getFormOrFormNotFound({ id });
 
-    await checkCanMarkAsTempStorerAccepted(user, form);
+    await checkCanMarkAsTempStored(user, form);
 
     await acceptedInfoSchema.validate(tempStorerAcceptedInfo);
 

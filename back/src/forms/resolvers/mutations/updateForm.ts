@@ -6,11 +6,7 @@ import {
   ResolversParentTypes
 } from "../../../generated/graphql/types";
 import { InvalidWasteCode, MissingTempStorageFlag } from "../../errors";
-import {
-  checkCanUpdate,
-  checkIsFormContributor,
-  formToCompanies
-} from "../../permissions";
+import { checkCanUpdate } from "../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
 import {
@@ -19,7 +15,6 @@ import {
   flattenTemporaryStorageDetailInput
 } from "../../converter";
 import { getFormRepository } from "../../repository";
-import { FormCompanies } from "../../types";
 import {
   draftFormSchema,
   sealedFormSchema,
@@ -75,7 +70,7 @@ const updateFormResolver = async (
 
   const existingForm = await getFormOrFormNotFound({ id });
 
-  await checkCanUpdate(user, existingForm);
+  await checkCanUpdate(user, existingForm, updateFormInput);
 
   const form = flattenFormInput(formContent);
   const futureForm = { ...existingForm, ...form };
@@ -113,50 +108,6 @@ const updateFormResolver = async (
     })
     .forwardedIn();
 
-  const formCompanies = await formToCompanies(existingForm);
-  const nextFormCompanies: FormCompanies = {
-    emitterCompanySiret:
-      form.emitterCompanySiret ?? formCompanies.emitterCompanySiret,
-    recipientCompanySiret:
-      form.recipientCompanySiret ?? formCompanies.recipientCompanySiret,
-    transporterCompanySiret:
-      form.transporterCompanySiret ?? formCompanies.transporterCompanySiret,
-    transporterCompanyVatNumber:
-      form.transporterCompanyVatNumber ??
-      formCompanies.transporterCompanyVatNumber,
-    traderCompanySiret:
-      form.traderCompanySiret ?? formCompanies.traderCompanySiret,
-    brokerCompanySiret:
-      form.brokerCompanySiret ?? formCompanies.brokerCompanySiret,
-    ecoOrganismeSiret:
-      form.ecoOrganismeSiret ?? formCompanies.ecoOrganismeSiret,
-    ...(intermediaries?.length
-      ? {
-          intermediariesVatNumbers: intermediaries
-            ?.map(intermediary => intermediary.vatNumber)
-            .filter(Boolean),
-          intermediariesSirets: intermediaries
-            ?.map(intermediary => intermediary.siret)
-            .filter(Boolean)
-        }
-      : {
-          intermediariesVatNumbers: formCompanies.intermediariesVatNumbers,
-          intermediariesSirets: formCompanies.intermediariesSirets
-        })
-  };
-
-  if (temporaryStorageDetail || forwardedIn) {
-    nextFormCompanies.forwardedIn = {
-      recipientCompanySiret:
-        temporaryStorageDetail?.destination?.company?.siret ??
-        forwardedIn?.recipientCompanySiret ??
-        null,
-      transporterCompanySiret: forwardedIn?.transporterCompanySiret ?? null,
-      transporterCompanyVatNumber:
-        forwardedIn?.transporterCompanyVatNumber ?? null
-    };
-  }
-
   if (isOrWillBeTempStorage && !(forwardedIn || temporaryStorageDetail)) {
     formUpdateInput.forwardedIn = {
       create: {
@@ -165,11 +116,6 @@ const updateFormResolver = async (
       }
     };
   }
-  await checkIsFormContributor(
-    user,
-    nextFormCompanies,
-    "Vous ne pouvez pas enlever votre établissement du bordereau"
-  );
 
   // Delete temporaryStorageDetail
   if (

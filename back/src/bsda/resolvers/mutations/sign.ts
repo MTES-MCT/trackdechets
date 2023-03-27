@@ -5,7 +5,6 @@ import {
   InvalidSignatureError
 } from "../../../bsvhu/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkSecurityCode } from "../../../forms/permissions";
 import {
   BsdaSignatureInput,
   BsdaSignatureType,
@@ -15,7 +14,6 @@ import { sendMail } from "../../../mailer/mailing";
 import { finalDestinationModified } from "../../../mailer/templates";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { GraphQLContext } from "../../../types";
-import { checkIsCompanyMember } from "../../../users/permissions";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaHistory, getBsdaOrNotFound } from "../../database";
 import { machine } from "../../machine";
@@ -23,6 +21,7 @@ import { getBsdaRepository } from "../../repository";
 import { runInTransaction } from "../../../common/repository/helper";
 import { validateBsda } from "../../validation";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
+import { checkCanSignFor } from "../../permissions";
 
 type SignatureTypeInfos = {
   dbDateKey: keyof Bsda;
@@ -43,9 +42,10 @@ export default async function sign(
   // To sign a form for a company, you must either:
   // - be part of that company
   // - provide the company security code
-  await checkAuthorization(
-    { currentUserId: user.id, securityCode: input.securityCode },
-    signatureTypeInfos.getAuthorizedSiret(bsda)
+  await checkCanSignFor(
+    user,
+    signatureTypeInfos.getAuthorizedSiret(bsda),
+    input.securityCode
   );
 
   // Cannot re-sign a form
@@ -156,27 +156,6 @@ const signatureTypeMapping: Record<BsdaSignatureType, SignatureTypeInfos> = {
     getAuthorizedSiret: form => getTransporterCompanyOrgId(form)
   }
 };
-
-function checkAuthorization(
-  requestInfo: { currentUserId: string; securityCode?: number | null },
-  signingCompanySiret: string | null
-) {
-  if (!signingCompanySiret) {
-    throw new UserInputError(
-      "SIRET manquant pour pouvoir apposer cette signature."
-    );
-  }
-
-  // If there is a security code provided, it must be authorized
-  if (requestInfo.securityCode) {
-    return checkSecurityCode(signingCompanySiret, requestInfo.securityCode);
-  }
-
-  return checkIsCompanyMember(
-    { id: requestInfo.currentUserId },
-    { orgId: signingCompanySiret }
-  );
-}
 
 function checkBsdaTypeSpecificRules(bsda: Bsda, input: BsdaSignatureInput) {
   if (bsda.type === BsdaType.COLLECTION_2710 && input.type !== "OPERATION") {

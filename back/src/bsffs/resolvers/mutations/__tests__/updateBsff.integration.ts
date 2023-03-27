@@ -259,7 +259,7 @@ describe("Mutation.updateBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Vous ne pouvez pas éditer un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas."
+          "Vous ne pouvez pas enlever votre propre établissement de ce BSFF"
       })
     ]);
   });

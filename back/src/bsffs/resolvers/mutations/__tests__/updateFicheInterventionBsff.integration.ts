@@ -123,8 +123,7 @@ describe("Mutation.updateFicheInterventionBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Vous ne pouvez pas éditer une fiche d'intervention sur lequel le SIRET de votre entreprise n'apparaît pas."
+        message: "Seul l'opérateur peut modifier une fiche d'intervention."
       })
     ]);
   });

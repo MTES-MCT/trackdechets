@@ -183,7 +183,7 @@ describe("Mutation.signBsff", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message: "Vous n'êtes pas autorisé à signer pour cet acteur."
+          message: "Vous ne pouvez pas signer ce BSFF"
         })
       ]);
     });
@@ -213,7 +213,7 @@ describe("Mutation.signBsff", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message: "Le code de sécurité est incorrect."
+          message: "Le code de signature est invalide."
         })
       ]);
     });

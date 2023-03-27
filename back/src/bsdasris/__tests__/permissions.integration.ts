@@ -1,4 +1,4 @@
-import { checkCanReadBsdasri } from "../permissions";
+import { checkCanRead } from "../permissions";
 import { BsdasriType } from "@prisma/client";
 
 import { resetDatabase } from "../../../integration-tests/helper";
@@ -23,7 +23,7 @@ describe("Dasri permission helpers", () => {
     });
 
     try {
-      await checkCanReadBsdasri(user, dasri);
+      await checkCanRead(user, dasri);
     } catch (err) {
       expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
     }
@@ -38,7 +38,7 @@ describe("Dasri permission helpers", () => {
       }
     });
 
-    const grant = await checkCanReadBsdasri(user, dasri);
+    const grant = await checkCanRead(user, dasri);
 
     expect(grant).toBe(true);
   });
@@ -60,7 +60,7 @@ describe("Dasri permission helpers", () => {
       }
     });
     try {
-      await checkCanReadBsdasri(user, synthesisBsdasri);
+      await checkCanRead(user, synthesisBsdasri);
     } catch (err) {
       expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
     }
@@ -85,7 +85,7 @@ describe("Dasri permission helpers", () => {
       }
     });
 
-    const grant = await checkCanReadBsdasri(user, synthesisBsdasri);
+    const grant = await checkCanRead(user, synthesisBsdasri);
 
     expect(grant).toBe(true);
   });

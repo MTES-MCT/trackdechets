@@ -75,12 +75,12 @@ describe("Mutation.duplicateBsff", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Vous ne pouvez pas éditer un bordereau sur lequel le SIRET de votre entreprise n'apparaît pas."
+          "Vous ne pouvez pas dupliquer un bordereau sur lequel votre entreprise n'apparait pas"
       })
     ]);
   });
 
-  it("should throw an error if the bsff being deleted doesn't exist", async () => {
+  it("should throw an error if the bsff being duplicated doesn't exist", async () => {
     const { user } = await userWithCompanyFactory(UserRole.ADMIN);
     const { mutate } = makeClient(user);
 
@@ -100,7 +100,7 @@ describe("Mutation.duplicateBsff", () => {
     ]);
   });
 
-  it("should throw an error if the bsff has already been deleted", async () => {
+  it("should throw an error if the bsff being duplicated has been deleted", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const { mutate } = makeClient(emitter.user);
 

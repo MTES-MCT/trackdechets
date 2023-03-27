@@ -8,7 +8,6 @@ import {
 } from "../../../generated/graphql/types";
 import { UserInputError } from "apollo-server-express";
 import { Bsdasri, BsdasriStatus, BsdasriType } from "@prisma/client";
-
 import { BsdasriEventType } from "../../workflow/types";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 

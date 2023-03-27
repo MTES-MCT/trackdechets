@@ -13,10 +13,10 @@ import {
   flattenBsdaInput
 } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
-import { checkIsBsdaContributor } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
 import sirenify from "../../sirenify";
 import { validateBsda } from "../../validation";
+import { checkCanCreate } from "../../permissions";
 
 type CreateBsda = {
   isDraft: boolean;
@@ -38,11 +38,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
   const sirenifiedInput = await sirenify(input, user);
   const bsda = flattenBsdaInput(sirenifiedInput);
 
-  await checkIsBsdaContributor(
-    user,
-    { ...bsda, intermediaries: input.intermediaries },
-    "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
-  );
+  await checkCanCreate(user, input);
 
   const isForwarding = Boolean(input.forwarding);
   const isGrouping = input.grouping && input.grouping.length > 0;

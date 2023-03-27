@@ -3,7 +3,8 @@ import {
   Form,
   Prisma,
   RevisionRequestStatus,
-  Status
+  Status,
+  User
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
@@ -98,9 +99,8 @@ export default async function createFormRevisionRequest(
   const existingBsdd = await getFormOrFormNotFound({ id: formId });
 
   const formRepository = getFormRepository(user);
-  const forwardedIn = await formRepository.findForwardedInById(formId);
 
-  await checkIfUserCanRequestRevisionOnBsdd(user, existingBsdd, forwardedIn);
+  await checkIfUserCanRequestRevisionOnBsdd(user, existingBsdd);
 
   const flatContent = await getFlatContent(content, existingBsdd);
 
@@ -163,11 +163,10 @@ async function getAuthoringCompany(
 }
 
 async function checkIfUserCanRequestRevisionOnBsdd(
-  user: Express.User,
-  bsdd: Form,
-  forwardedIn?: Form | null
+  user: User,
+  bsdd: Form
 ): Promise<void> {
-  await checkCanRequestRevision(user, bsdd, forwardedIn);
+  await checkCanRequestRevision(user, bsdd);
   if (bsdd.emitterIsPrivateIndividual || bsdd.emitterIsForeignShip) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau car l'émetteur est un particulier ou un navire étranger."
@@ -197,7 +196,7 @@ async function checkIfUserCanRequestRevisionOnBsdd(
   }
 
   const unsettledRevisionRequestsOnBsdd = await getFormRepository(
-    user
+    user as Express.User
   ).countRevisionRequests({
     bsddId: bsdd.id,
     status: RevisionRequestStatus.PENDING

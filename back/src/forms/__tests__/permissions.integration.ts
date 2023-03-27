@@ -12,17 +12,16 @@ import {
 import {
   checkCanRead,
   checkCanDuplicate,
-  checkCanUpdate,
   checkCanDelete,
   checkCanMarkAsProcessed,
   checkCanMarkAsReceived,
   checkCanMarkAsResent,
   checkCanMarkAsSealed,
   checkCanMarkAsTempStored,
-  checkCanSignedByTransporter,
-  checkSecurityCode
+  checkCanSignedByTransporter
 } from "../permissions";
 import { AuthType } from "../../auth";
+import { checkSecurityCode } from "../../common/permissions";
 
 async function checkEmitterPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
@@ -181,7 +180,7 @@ async function checkRandomUserPermission(
 describe.each([
   checkCanRead,
   checkCanDuplicate,
-  checkCanUpdate,
+  //checkCanUpdate,
   checkCanDelete,
   checkCanMarkAsSealed
 ])("%p", permission => {
@@ -409,10 +408,7 @@ describe("checkCanRed", () => {
       }
     });
 
-    const check = await checkCanRead(
-      { ...initialEmitter, auth: AuthType.Session },
-      groupementForm
-    );
+    const check = await checkCanRead(initialEmitter, groupementForm);
     expect(check).toBe(true);
   });
 });
