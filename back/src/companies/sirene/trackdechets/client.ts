@@ -60,7 +60,10 @@ const searchResponseToCompany = (
     libelleNaf: etablissement.activitePrincipaleEtablissement
       ? libelleFromCodeNaf(etablissement.activitePrincipaleEtablissement)
       : "",
-    statutDiffusionEtablissement: etablissement.statutDiffusionEtablissement,
+    statutDiffusionEtablissement:
+      etablissement.statutDiffusionEtablissement === "P"
+        ? "N"
+        : etablissement.statutDiffusionEtablissement,
     // La variable codePaysEtrangerEtablissement commence toujours par 99 si elle est renseignée dans la base sirene INSEE
     // Les 3 caractères suivants sont le code du pays étranger.
     codePaysEtrangerEtablissement: etablissement.codePaysEtrangerEtablissement
@@ -86,38 +89,37 @@ const searchResponseToCompany = (
  * Search a company by SIRET
  * @param siret
  */
-export const searchCompany = (siret: string): Promise<SireneSearchResult> =>
-  client
-    .get<GetResponse<SearchStockEtablissement>>({
+export const searchCompany = async (
+  siret: string
+): Promise<SireneSearchResult> => {
+  try {
+    const response = await client.get<GetResponse<SearchStockEtablissement>>({
       id: siret,
       index
-    })
-    .then(r => {
-      if (r.warnings) {
-        logger.warn(r.warnings);
-      }
-      if (r.body._source.statutDiffusionEtablissement === "N") {
-        throw new AnonymousCompanyError();
-      }
-      return searchResponseToCompany(r.body._source);
-    })
-    .catch((error: Error) => {
-      if (error instanceof AnonymousCompanyError) {
-        throw error;
-      }
-      // 404 may mean Anonymous Company
-      // rely on `redundancy` to fallback on INSEE api to verify that or if SIRET does not exists.
-      if (error instanceof ResponseError && error.meta.statusCode === 404) {
-        throw new CompanyNotFoundInTrackdechetsSearch(
-          ProviderErrors.SiretNotFound
-        );
-      }
-      logger.error(
-        `${ProviderErrors.ServerError}: ${error.name}, ${error.message}, \n`,
-        { stacktrace: error.stack }
-      );
-      throw new Error(ProviderErrors.ServerError);
     });
+    const company = searchResponseToCompany(response.body._source);
+    if (company.statutDiffusionEtablissement === "N") {
+      throw new AnonymousCompanyError();
+    }
+    return company;
+  } catch (error) {
+    if (error instanceof AnonymousCompanyError) {
+      throw error;
+    }
+    // 404 may mean Anonymous Company
+    // rely on `redundancy` to fallback on INSEE api to verify that or if SIRET does not exists.
+    if (error instanceof ResponseError && error.meta.statusCode === 404) {
+      throw new CompanyNotFoundInTrackdechetsSearch(
+        ProviderErrors.SiretNotFound
+      );
+    }
+    logger.error(
+      `${ProviderErrors.ServerError}: ${error.name}, ${error.message}, \n`,
+      { stacktrace: error.stack }
+    );
+    throw new Error(ProviderErrors.ServerError);
+  }
+};
 
 /**
  * Build a list of company objects from a full text search response

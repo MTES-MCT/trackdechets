@@ -151,10 +151,17 @@ export const makeSearchCompanies =
     // clue can be formatted like a SIRET or a VAT number
     if (isSiret(cleanedClue) || isVat(cleanedClue)) {
       return searchCompany(cleanedClue)
-        .then(c =>
-          // Exclude closed companies
-          [c].filter(c => c.etatAdministratif && c.etatAdministratif === "A")
-        )
+        .then(c => {
+          return (
+            [c]
+              // Exclude closed companies
+              .filter(c => c.etatAdministratif && c.etatAdministratif === "A")
+              // Exclude anonymous company not registered in TD
+              .filter(
+                c => c.statutDiffusionEtablissement === "O" || c.isRegistered
+              )
+          );
+        })
         .catch(_ => []);
     }
     // fuzzy searching only for French companies
