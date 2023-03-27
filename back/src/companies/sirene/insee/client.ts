@@ -100,6 +100,7 @@ export async function searchCompany(
       });
     }
     if (error.response?.status === 403) {
+      // this is not supposed to happen anymore since https://www.insee.fr/fr/information/6683782
       throw new AnonymousCompanyError();
     }
 
