@@ -29,7 +29,6 @@ import {
   QuerySearchCompaniesArgs,
 } from "generated/graphql/types";
 import { useParams } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
 import CompanyResults from "./CompanyResults";
 import styles from "./CompanySelector.module.scss";
 import {
@@ -70,7 +69,7 @@ export default function CompanySelector({
 }: CompanySelectorProps) {
   // siret is the current active company
   const { siret } = useParams<{ siret: string }>();
-  const [uniqId] = useState(() => uuidv4());
+  const [uniqId] = useState(() => crypto.randomUUID());
   const [field] = useField<FormCompany>({ name });
   const [selectedCompanyDetails, setSelectedCompanyDetails] = useState({
     name: field.value?.name,
