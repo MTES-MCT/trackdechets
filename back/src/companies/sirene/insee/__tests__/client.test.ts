@@ -67,7 +67,7 @@ describe("searchCompany", () => {
     expect(company).toEqual(expected);
   });
 
-  it("should raise AnonymousCompanyError if non-diffusible", async () => {
+  it("should raise AnonymousCompanyError if partially diffusible", async () => {
     const siret = siretify(6);
 
     axiosGet.mockResolvedValueOnce({
@@ -77,6 +77,50 @@ describe("searchCompany", () => {
         etablissement: {
           siret,
           statutDiffusionEtablissement: "P",
+          uniteLegale: {
+            denominationUniteLegale: "CODE EN STOCK",
+            categorieJuridiqueUniteLegale: "",
+            prenom1UniteLegale: "",
+            nomUniteLegale: ""
+          },
+          adresseEtablissement: {
+            numeroVoieEtablissement: "[ND]",
+            indiceRepetitionEtablissement: "[ND]",
+            typeVoieEtablissement: "[ND]",
+            complementAdresseEtablissement: "[ND]",
+            libelleVoieEtablissement: "[ND]",
+            codePostalEtablissement: "[ND]",
+            libelleCommuneEtablissement: "[ND]",
+            codeCommuneEtablissement: "[ND]"
+          },
+          periodesEtablissement: [
+            {
+              etatAdministratifEtablissement: "A",
+              activitePrincipaleEtablissement: "[ND]"
+            }
+          ]
+        }
+      }
+    });
+
+    expect.assertions(1);
+    try {
+      await searchCompany(siret);
+    } catch (e) {
+      expect(e.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
+  });
+
+  it("should raise AnonymousCompanyError if non diffusible", async () => {
+    const siret = siretify(6);
+
+    axiosGet.mockResolvedValueOnce({
+      ...axiosResponseDefault,
+      status: 200,
+      data: {
+        etablissement: {
+          siret,
+          statutDiffusionEtablissement: "N",
           uniteLegale: {
             denominationUniteLegale: "CODE EN STOCK",
             categorieJuridiqueUniteLegale: "",
