@@ -53,7 +53,7 @@ interface EtablissementInsee {
     codeCommuneEtablissement: string;
   };
   periodesEtablissement: PeriodeEtablissementInsee[];
-  statutDiffusionEtablissement: "O" | "N";
+  statutDiffusionEtablissement: "O" | "N" | "P";
 }
 
 // Response from https://api.insee.fr/entreprises/siret/V3/siret/<VOTRE_SIRET>
