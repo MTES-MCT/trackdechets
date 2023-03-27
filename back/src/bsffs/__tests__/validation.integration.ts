@@ -383,7 +383,7 @@ describe("wasteDetailsSchema", () => {
       wasteDetailsSchema.validate({
         ...wasteDetails,
         packagings: [
-          { name: "bouteille", numero: "numero", weight: 0, volume: 1 }
+          { type: "BOUTEILLE", numero: "numero", weight: 0, volume: 1 }
         ]
       });
 
@@ -397,13 +397,24 @@ describe("wasteDetailsSchema", () => {
       wasteDetailsSchema.validate({
         ...wasteDetails,
         packagings: [
-          { name: "bouteille", numero: "numero", weight: 1, volume: 0 }
+          { type: "BOUTEILLE", numero: "numero", weight: 1, volume: 0 }
         ]
       });
 
     await expect(validateFn()).rejects.toThrow(
       "Conditionnements : le volume doit être supérieur à 0"
     );
+  });
+
+  test("packaging volume can be null", async () => {
+    const isValid = await wasteDetailsSchema.isValid({
+      ...wasteDetails,
+      packagings: [
+        { type: "BOUTEILLE", numero: "numero", weight: 1, volume: null }
+      ]
+    });
+
+    expect(isValid).toEqual(true);
   });
 });
 
