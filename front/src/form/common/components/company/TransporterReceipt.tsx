@@ -19,7 +19,7 @@ interface UniversalRecepisse {
   validityLimit?: Scalars["DateTime"];
 }
 
-type NotFormTransporter =
+export type NotFormTransporter =
   | BsdaTransporter
   | BsdasriTransporter
   | BsvhuTransporter

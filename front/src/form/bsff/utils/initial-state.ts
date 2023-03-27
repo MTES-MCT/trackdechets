@@ -10,7 +10,7 @@ const initialState = {
     company: {
       ...getInitialCompany(),
     },
-    isExemptedOfRecepisse: false,
+    isExemptedOfReceipt: false,
     recepisse: {
       number: "",
       department: "",

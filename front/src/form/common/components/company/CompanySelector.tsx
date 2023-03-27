@@ -22,6 +22,7 @@ import {
   BsdasriTransporter,
   BsdaTransporter,
   BsffTransporter,
+  BsffTransporterInput,
   BsvhuTransporter,
   CompanyFavorite,
   CompanySearchResult,
@@ -92,6 +93,18 @@ export default function CompanySelector({
         | Maybe<BsvhuTransporter>
         | Maybe<BsffTransporter>;
     }>();
+
+  const isExemptedOfReceipt = useMemo(
+    () =>
+      !!(values.transporter as Transporter).isExemptedOfReceipt
+        ? (values.transporter as Transporter).isExemptedOfReceipt
+        : !!(values.transporter as BsdaTransporter)?.recepisse?.isExempted
+        ? (values.transporter as BsdaTransporter)?.recepisse?.isExempted
+        : !!(values.transporter as BsffTransporterInput)?.isExemptedOfReceipt
+        ? (values.transporter as BsffTransporterInput)?.isExemptedOfReceipt
+        : false,
+    [values.transporter]
+  );
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
     (field.value?.country && field.value?.country !== "FR") ||
@@ -558,6 +571,7 @@ export default function CompanySelector({
         </div>
         {!!values.transporter &&
           !isForeignCompany &&
+          !isExemptedOfReceipt &&
           name === "transporter.company" && (
             <TransporterReceipt transporter={values.transporter} />
           )}

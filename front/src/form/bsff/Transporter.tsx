@@ -11,8 +11,8 @@ const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 export default function Transporter({ disabled }) {
   const { setFieldValue, values } = useFormikContext<Bsff>();
 
-  const [{ value: isExemptedOfRecepisse }, ,] = useField<boolean>(
-    "transporter.isExemptedOfRecepisse"
+  const [{ value: isExemptedOfReceipt }, ,] = useField<boolean>(
+    "transporter.isExemptedOfReceipt"
   );
 
   return (
@@ -53,9 +53,9 @@ export default function Transporter({ disabled }) {
           </h4>
           <div className="form__row">
             <Switch
-              checked={isExemptedOfRecepisse}
+              checked={isExemptedOfReceipt}
               onChange={checked => {
-                setFieldValue("transporter.isExemptedOfRecepisse", checked);
+                setFieldValue("transporter.isExemptedOfReceipt", checked);
                 setFieldValue(
                   "transporter.recepisse",
                   initialState.transporter.recepisse
