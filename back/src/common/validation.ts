@@ -3,6 +3,7 @@ import {
   TransportMode,
   WasteAcceptationStatus
 } from "@prisma/client";
+import { UserInputError } from "apollo-server-core";
 import * as yup from "yup";
 import { ConditionBuilder, ConditionConfig } from "yup/lib/Condition";
 import {
@@ -12,8 +13,14 @@ import {
   isWasteProcessor,
   isWasteVehicles
 } from "../companies/validation";
+import { CompanyInput } from "../generated/graphql/types";
 import prisma from "../prisma";
-import { isForeignVat, isSiret, isVat } from "./constants/companySearchHelpers";
+import {
+  isForeignVat,
+  isFRVat,
+  isSiret,
+  isVat
+} from "./constants/companySearchHelpers";
 
 // Poids maximum en tonnes tout mode de transport confondu
 const MAX_WEIGHT_TONNES = 50000;
@@ -265,3 +272,75 @@ export const vatNumberTests: VatNumberTests = {
     }
   }
 };
+
+/**
+ * Constraints on CompanyInput that apply to intermediary company input
+ * - SIRET is mandatory
+ * - Only french companies are allowed
+ */
+export const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
+  siret: siret
+    .label("Intermédiaires")
+    .required("Intermédiaires : le N° SIRET est obligatoire"),
+  contact: yup
+    .string()
+    .required(
+      "Intermédiaires : les nom et prénom de contact sont obligatoires"
+    ),
+  vatNumber: yup
+    .string()
+    .notRequired()
+    .nullable()
+    .test(
+      "is-fr-vat",
+      "Intermédiaires : seul les numéros de TVA en France sont valides",
+      vat => !vat || (isVat(vat) && isFRVat(vat))
+    ),
+  address: yup
+    .string()
+    .required("Intermédiaires : l'adresse de l'établissement est obligatoire"), // should be auto-completed through sirenify
+  name: yup.string().required(
+    "Intermédiaires : la raison sociale de l'établissement est obligatoire" // should be auto-completed through sirenify
+  ),
+  phone: yup.string().notRequired().nullable(),
+  mail: yup.string().notRequired().nullable(),
+  country: yup.string().notRequired().nullable(), // is ignored in db schema
+  omiNumber: yup.string().notRequired().nullable(), // is ignored in db schema
+  orgId: yup.string().notRequired().nullable() // is ignored in db schema
+});
+
+/**
+ * Validate Intermediary Input
+ */
+export async function validateIntermediariesInput(
+  intermediaries: CompanyInput[]
+): Promise<CompanyInput[]> {
+  if (!intermediaries || intermediaries.length === 0) {
+    return intermediaries;
+  }
+
+  if (intermediaries.length > 3) {
+    throw new UserInputError(
+      "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires"
+    );
+  }
+
+  // check we do not add the same SIRET twice
+  const intermediarySirets = intermediaries.map(c => c.siret);
+
+  const hasDuplicate =
+    new Set(intermediarySirets).size !== intermediarySirets.length;
+
+  if (hasDuplicate) {
+    throw new UserInputError(
+      "Intermédiaires: impossible d'ajouter le même établissement en intermédiaire plusieurs fois"
+    );
+  }
+
+  for (const companyInput of intermediaries) {
+    // ensure a SIRET number is present
+    await intermediarySchema.validate(companyInput, { abortEarly: false });
+  }
+
+  return intermediaries;
+}

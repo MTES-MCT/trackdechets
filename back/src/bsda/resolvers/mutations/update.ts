@@ -11,6 +11,7 @@ import { getBsdaOrNotFound } from "../../database";
 import { checkEditionRules } from "../../edition";
 import { checkIsBsdaContributor } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
+import sirenify from "../../sirenify";
 import { validateBsda } from "../../validation";
 
 export default async function edit(
@@ -28,7 +29,8 @@ export default async function edit(
     "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
   );
 
-  const data = flattenBsdaInput(input);
+  const sirenifiedInput = await sirenify(input, user);
+  const data = flattenBsdaInput(sirenifiedInput);
   const intermediaries = input.intermediaries ?? existingBsda.intermediaries;
 
   await checkIsBsdaContributor(

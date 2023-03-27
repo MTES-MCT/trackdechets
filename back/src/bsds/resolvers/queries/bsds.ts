@@ -178,7 +178,6 @@ function getFieldNameFromKeyword(keywordFieldName: string): keyof BsdElastic {
       `The field "${keywordFieldName}" doesn't match a property declared in the mappings.`
     );
   }
-
   return fieldName as keyof BsdElastic;
 }
 
@@ -218,11 +217,21 @@ async function buildSearchAfter(
     index: index.alias,
     type: index.type
   });
+  // we need to lowercase bsd ids to make pagination work, as ids are lowercased by stringfield's normalizer and
+  // appear as such in result sort
+  const lowerCaseStr = el => {
+    if (typeof el === "string") {
+      return el.toLowerCase();
+    }
+    return el;
+  };
 
   return sort.reduce(
     (acc, item) =>
       acc.concat(
-        Object.entries(item).map(([key]) => bsd[getFieldNameFromKeyword(key)])
+        Object.entries(item).map(([key]) =>
+          lowerCaseStr(bsd[getFieldNameFromKeyword(key)])
+        )
       ),
     []
   );
@@ -289,6 +298,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
       }
     }
   );
+
   const hits = body.hits.hits.slice(0, size);
 
   const {

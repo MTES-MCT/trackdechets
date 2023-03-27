@@ -147,7 +147,8 @@ function BsffEmitterType({ bsff }: Pick<Props, "bsff">) {
             defaultChecked={bsff.type === BsffType.TRACER_FLUIDE}
             readOnly
           />{" "}
-          Un autre détenteur de déchets
+          Un détenteur de contenant(s) de déchets de fluides à tracer (sans
+          fiche d'intervention)
         </p>
         <p>
           <input
@@ -247,7 +248,7 @@ function BsffPackagingFull({ packaging }: { packaging: BsffPackaging }) {
         <span>{packaging.type} </span>
       )}
       <span>n°{packaging.numero} </span>
-      <span>{packaging.volume}L </span>
+      {packaging.volume !== null && <span>{packaging.volume}L </span>}
       <span>{packaging.weight}kg</span>
     </div>
   );
@@ -467,6 +468,15 @@ function BsffOnePackagingOperation({
       <p>
         <strong>9. Réalisation de l'opération</strong>
       </p>
+      <div>
+        Utilisation principale comme combustible ou autre moyen de produire de
+        l'énergie
+        <input
+          type="checkbox"
+          defaultChecked={packaging?.operation?.code === "R1"}
+        />{" "}
+        R 1
+      </div>
       <div>
         Récupération ou régénération des solvants{" "}
         <input

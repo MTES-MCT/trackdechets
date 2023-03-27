@@ -88,7 +88,6 @@ export default function MyCompanySelector({
 
       if (!companies.map(c => c.siret).includes(field.value.siret)) {
         if (companies.length === 1) {
-          const [company] = companies;
           onCompanySelect(companies[0]);
         } else {
           onCompanySelect(getInitialCompany());

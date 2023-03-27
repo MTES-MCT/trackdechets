@@ -47,6 +47,9 @@ export const COLUMNS: Record<
           {bsda.emitter?.company?.name ?? ""}
           {bsda.emitter?.isPrivateIndividual ? " (particulier)" : ""}
         </div>
+        {bsda.emitter?.pickupSite?.name && (
+          <div>{bsda.emitter?.pickupSite?.name}</div>
+        )}
         <div>{bsda.emitter?.company?.siret}</div>
       </>
     ),

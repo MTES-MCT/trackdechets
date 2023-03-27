@@ -49,6 +49,9 @@ export const COLUMNS: Record<
           {form.emitter?.company?.name ?? ""}
           {form.emitter?.isPrivateIndividual ? " (particulier)" : ""}
         </div>
+        {form.emitter?.workSite?.name && (
+          <div>{form.emitter?.workSite?.name}</div>
+        )}
         <div>{form.emitter?.company?.siret ?? ""}</div>
         <div>
           {form.emitter?.company?.omiNumber

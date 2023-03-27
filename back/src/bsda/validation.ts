@@ -15,14 +15,13 @@ import {
   siret,
   siretConditions,
   siretTests,
+  validateIntermediariesInput,
   vatNumberTests,
   weight,
   weightConditions,
   WeightUnits
 } from "../common/validation";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
-import { validateCompany } from "../companies/validateCompany";
-
 import {
   INVALID_WASTE_CODE,
   MISSING_COMPANY_ADDRESS,
@@ -32,7 +31,6 @@ import {
   MISSING_COMPANY_PHONE,
   MISSING_COMPANY_SIRET
 } from "../forms/errors";
-import { intermediarySchema } from "../forms/validation";
 import { BsdaConsistence, CompanyInput } from "../generated/graphql/types";
 import prisma from "../prisma";
 
@@ -147,37 +145,7 @@ export async function validateBsda(
   if (!context.skipPreviousBsdas) {
     await validatePreviousBsdas(bsda, previousBsdas);
   }
-  await validateIntermediaries(intermediaries);
-}
-
-async function validateIntermediaries(
-  intermediaries: CompanyInput[] | undefined
-) {
-  if (!intermediaries || intermediaries.length === 0) {
-    return;
-  }
-
-  if (intermediaries.length > 3) {
-    throw new UserInputError(
-      "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires sur un BSDA"
-    );
-  }
-
-  const intermediaryIdentifiers = intermediaries.map(
-    c => c.siret || c.vatNumber
-  );
-  const hasDuplicate =
-    new Set(intermediaryIdentifiers).size !== intermediaryIdentifiers.length;
-  if (hasDuplicate) {
-    throw new UserInputError(
-      "Intermédiaires: impossible d'ajouter le même établissement en intermédiaire plusieurs fois"
-    );
-  }
-
-  for (const intermediary of intermediaries) {
-    await intermediarySchema.validate(intermediary);
-    await validateCompany(intermediary);
-  }
+  await validateIntermediariesInput(intermediaries);
 }
 
 async function validatePreviousBsdas(

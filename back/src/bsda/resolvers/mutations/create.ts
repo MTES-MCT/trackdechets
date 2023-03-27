@@ -15,6 +15,7 @@ import {
 import { getBsdaOrNotFound } from "../../database";
 import { checkIsBsdaContributor } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
+import sirenify from "../../sirenify";
 import { validateBsda } from "../../validation";
 
 type CreateBsda = {
@@ -34,7 +35,8 @@ export default async function create(
 export async function genericCreate({ isDraft, input, context }: CreateBsda) {
   const user = checkIsAuthenticated(context);
 
-  const bsda = flattenBsdaInput(input);
+  const sirenifiedInput = await sirenify(input, user);
+  const bsda = flattenBsdaInput(sirenifiedInput);
 
   await checkIsBsdaContributor(
     user,

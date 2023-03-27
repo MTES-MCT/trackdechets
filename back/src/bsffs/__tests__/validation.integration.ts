@@ -314,7 +314,7 @@ describe("destinationSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : R2, R3, R5, R12, R13, D10, D13, D14, D15"
+      "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : R1, R2, R3, R5, R12, R13, D10, D13, D14, D15"
     );
   });
 });
@@ -383,7 +383,7 @@ describe("wasteDetailsSchema", () => {
       wasteDetailsSchema.validate({
         ...wasteDetails,
         packagings: [
-          { name: "bouteille", numero: "numero", weight: 0, volume: 1 }
+          { type: "BOUTEILLE", numero: "numero", weight: 0, volume: 1 }
         ]
       });
 
@@ -397,13 +397,24 @@ describe("wasteDetailsSchema", () => {
       wasteDetailsSchema.validate({
         ...wasteDetails,
         packagings: [
-          { name: "bouteille", numero: "numero", weight: 1, volume: 0 }
+          { type: "BOUTEILLE", numero: "numero", weight: 1, volume: 0 }
         ]
       });
 
     await expect(validateFn()).rejects.toThrow(
       "Conditionnements : le volume doit être supérieur à 0"
     );
+  });
+
+  test("packaging volume can be null", async () => {
+    const isValid = await wasteDetailsSchema.isValid({
+      ...wasteDetails,
+      packagings: [
+        { type: "BOUTEILLE", numero: "numero", weight: 1, volume: null }
+      ]
+    });
+
+    expect(isValid).toEqual(true);
   });
 });
 
@@ -660,7 +671,7 @@ describe("operationSchema", () => {
     };
     const validateFn = () => operationSchema.validate(data);
     await expect(validateFn()).rejects.toThrow(
-      "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : R2, R3, R5, R12, R13, D10, D13, D14, D15"
+      "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : R1, R2, R3, R5, R12, R13, D10, D13, D14, D15"
     );
   });
 });
