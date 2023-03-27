@@ -66,8 +66,11 @@ class ErrorBoundary extends Component {
   }
 
   render() {
-    const { NODE_ENV } = import.meta.env;
-    const isProduction = NODE_ENV === "production";
+    const { BUILD_ENV } = import.meta.env;
+    const isDevelopment =
+      BUILD_ENV !== "production" ||
+      BUILD_ENV !== "recette" ||
+      BUILD_ENV !== "sandbox";
     const { children } = this.props;
     //@ts-ignore
     const { hasError, hideReloadPageCTA, eventId, errorInfo, error } =
@@ -109,7 +112,7 @@ class ErrorBoundary extends Component {
           }}
         >
           <Error hideReloadPageCTA={hideReloadPageCTA} message={message} />
-          {!isProduction && (
+          {isDevelopment && (
             <div style={{ whiteSpace: "pre-wrap" }}>
               {error?.toString()}
               {errorInfo?.componentStack}

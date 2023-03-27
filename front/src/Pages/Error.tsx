@@ -14,7 +14,7 @@ const Error = ({ message, hideReloadPageCTA }: ErrorProps) => {
 
       {!hideReloadPageCTA && (
         <button type="button" className="fr-btn" onClick={onClick}>
-          Raffraichir la page
+          Rafraîchir la page
         </button>
       )}
     </>
