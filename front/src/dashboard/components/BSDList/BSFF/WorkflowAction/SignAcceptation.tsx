@@ -37,6 +37,7 @@ import { BsffPackagingSummary } from "./BsffPackagingSummary";
 
 const getValidationSchema = (today: Date) =>
   yup.object({
+    numero: yup.string(),
     analysisWasteCode: yup.string().required(),
     analysisWasteDescription: yup.string().required(),
     acceptationDate: yup
@@ -178,6 +179,7 @@ export function SignBsffAcceptationOnePackagingModalContent({
       )}
       <Formik
         initialValues={{
+          numero: packaging.numero,
           analysisWasteCode:
             packaging?.acceptation?.wasteCode ?? bsff.waste?.code ?? "",
           analysisWasteDescription:
@@ -197,6 +199,7 @@ export function SignBsffAcceptationOnePackagingModalContent({
             variables: {
               id: packaging.id,
               input: {
+                numero: values.numero,
                 acceptation: {
                   wasteCode: values.analysisWasteCode,
                   wasteDescription: values.analysisWasteDescription,
@@ -250,6 +253,14 @@ export function SignBsffAcceptationOnePackagingModalContent({
                 <Field className="td-input" name="analysisWasteDescription" />
               </label>
               <RedErrorMessage name="analysisWasteDescription" />
+            </div>
+            <div className="form__row">
+              <label>
+                Numéro du contenant{" "}
+                <TdTooltip msg="Permet de rectifier le numéro du contenant en cas de saisie erronée par l'émetteur du BSFF" />
+                <Field className="td-input" name="numero" />
+              </label>
+              <RedErrorMessage name="numero" />
             </div>
             <div className="form__row">
               <label>
