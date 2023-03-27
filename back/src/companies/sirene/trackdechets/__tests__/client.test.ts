@@ -59,7 +59,6 @@ describe("searchCompany", () => {
     expect(company).toEqual(expected);
   });
 
-  // FIXME this case may not even exist in INSEE public data
   it("should raise AnonymousCompanyError if non-diffusible", async () => {
     const siret = siretify(6);
 
@@ -67,7 +66,7 @@ describe("searchCompany", () => {
       body: {
         _source: {
           siret,
-          statutDiffusionEtablissement: "N"
+          statutDiffusionEtablissement: "P"
         }
       }
     });

@@ -158,7 +158,7 @@ export const makeSearchCompanies =
               .filter(c => c.etatAdministratif && c.etatAdministratif === "A")
               // Exclude anonymous company not registered in TD
               .filter(
-                c => c.statutDiffusionEtablissement === "O" || c.isRegistered
+                c => c.statutDiffusionEtablissement !== "N" || c.isRegistered
               )
           );
         })

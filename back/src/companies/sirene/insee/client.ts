@@ -50,7 +50,7 @@ function searchResponseToCompany({
     libelleNaf: "",
     statutDiffusionEtablissement:
       etablissement.statutDiffusionEtablissement === "P"
-        ? "N"
+        ? "N" // Patch https://www.insee.fr/fr/information/6683782 for retro-compatibility
         : etablissement.statutDiffusionEtablissement
   };
 

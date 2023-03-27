@@ -62,7 +62,7 @@ const searchResponseToCompany = (
       : "",
     statutDiffusionEtablissement:
       etablissement.statutDiffusionEtablissement === "P"
-        ? "N"
+        ? "N" // Patch https://www.insee.fr/fr/information/6683782 for retro-compatibility
         : etablissement.statutDiffusionEtablissement,
     // La variable codePaysEtrangerEtablissement commence toujours par 99 si elle est renseignée dans la base sirene INSEE
     // Les 3 caractères suivants sont le code du pays étranger.
