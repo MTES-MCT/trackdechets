@@ -53,7 +53,7 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
               return (
                 <li key={column.id} className={styles.BSDCardListItem}>
                   <div className={styles.BSDCardListItemLabel}>
-                    {column.Header}
+                    {column.Header as string}
                   </div>
                   <div className={styles.BSDCardListItemValue}>
                     <Cell

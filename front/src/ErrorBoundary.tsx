@@ -23,7 +23,7 @@ const getLogErrorLevel = error => {
   return "error";
 };
 
-class ErrorBoundary extends Component {
+class ErrorBoundary extends Component<React.PropsWithChildren> {
   constructor(props) {
     super(props);
     this.state = {

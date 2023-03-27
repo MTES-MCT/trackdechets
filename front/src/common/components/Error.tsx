@@ -6,6 +6,7 @@ type Props = {
   apolloError: ApolloError;
   className?: string;
   message?: (err: ApolloError) => string;
+  children?: (props: { error; idx? }) => ReactElement;
 };
 
 export const isFunction = (obj: any): obj is Function =>
