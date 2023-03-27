@@ -31,6 +31,12 @@ const updateBsffPackaging: MutationResolvers["updateBsffPackaging"] = async (
     );
   }
 
+  if (input.numero === null || input.numero === "") {
+    throw new UserInputError(
+      "Le numéro de contenant ne peut pas être nul ou vide"
+    );
+  }
+
   const sirenifiedInput = await sirenifyBsffPackagingInput(input, user);
   const flatInput = flattenBsffPackagingInput(sirenifiedInput);
 

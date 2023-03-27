@@ -9,6 +9,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- ETQ destinataire d'un BSFF, je peux modifier le numéro de contenant lors de l'acceptation [PR 2208](https://github.com/MTES-MCT/trackdechets/pull/2208)
+
 #### :bug: Corrections de bugs
 
 #### :boom: Breaking changes

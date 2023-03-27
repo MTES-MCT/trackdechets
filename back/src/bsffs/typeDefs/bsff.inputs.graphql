@@ -200,6 +200,8 @@ input BsffPackagingInput {
 }
 
 input UpdateBsffPackagingInput {
+  "Permet au destintaire du contenant de rectifier le numéro du contenant en cas d'erreur de saisie"
+  numero: String
   "Informations sur l'acceptation du contenant sur l'installation de destination"
   acceptation: BsffPackagingAcceptationInput
   "Informations sur le traitement effectué par contenant"

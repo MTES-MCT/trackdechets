@@ -1167,12 +1167,13 @@ model BsffFicheIntervention {
 }
 
 model BsffPackaging {
-  id     String            @id @default(cuid())
-  type   BsffPackagingType
-  other  String?
-  volume Float?
-  weight Float
-  numero String
+  id             String            @id @default(cuid())
+  type           BsffPackagingType
+  other          String?
+  volume         Float?
+  weight         Float
+  emissionNumero String
+  numero         String
 
   acceptationDate             DateTime?               @db.Timestamptz(6)
   acceptationWeight           Float?

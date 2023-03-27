@@ -188,6 +188,7 @@ describe("Query.bsffs", () => {
           create: {
             type: BsffPackagingType.BOUTEILLE,
             numero: "AAAAA",
+            emissionNumero: "AAAAA",
             weight: 1
           }
         }
@@ -200,6 +201,7 @@ describe("Query.bsffs", () => {
           create: {
             type: BsffPackagingType.BOUTEILLE,
             numero: "BBBBB",
+            emissionNumero: "BBBBB",
             weight: 1
           }
         }
@@ -212,6 +214,7 @@ describe("Query.bsffs", () => {
           create: {
             type: BsffPackagingType.BOUTEILLE,
             numero: "CCCCC",
+            emissionNumero: "CCCCC",
             weight: 1
           }
         }

@@ -86,7 +86,12 @@ describe("Mutation.updateBsff", () => {
       { emitter },
       {
         packagings: {
-          create: { type: BsffPackagingType.BOUTEILLE, weight: 1, numero: "1" }
+          create: {
+            type: BsffPackagingType.BOUTEILLE,
+            weight: 1,
+            numero: "1",
+            emissionNumero: "1"
+          }
         },
         isDraft: true
       }
@@ -710,6 +715,7 @@ describe("Mutation.updateBsff", () => {
           create: {
             type: BsffPackagingType.BOUTEILLE,
             numero: "numero",
+            emissionNumero: "numero",
             volume: 1,
             weight: 1,
             previousPackagings: {

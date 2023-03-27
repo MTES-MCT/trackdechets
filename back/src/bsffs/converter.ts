@@ -254,6 +254,7 @@ export function flattenBsffPackagingInput(
   input: GraphQL.UpdateBsffPackagingInput
 ) {
   return safeInput({
+    numero: input.numero,
     acceptationDate: chain(input.acceptation, a => a.date),
     acceptationWeight: chain(input.acceptation, a => a.weight),
     acceptationStatus: chain(input.acceptation, a => a.status),

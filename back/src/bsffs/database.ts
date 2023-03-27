@@ -213,6 +213,7 @@ export function getPackagingCreateInput(
         type: p.type,
         other: p.other,
         numero: p.numero,
+        emissionNumero: p.numero,
         volume: p.volume,
         weight: p.acceptationWeight,
         previousPackagings: { connect: { id: p.id } }
@@ -224,11 +225,12 @@ export function getPackagingCreateInput(
           other: bsff.packagings[0].other,
           volume: bsff.packagings[0].volume,
           numero: bsff.packagings[0].numero,
+          emissionNumero: bsff.packagings[0].numero,
           weight: bsff.packagings[0].weight,
           previousPackagings: {
             connect: previousPackagings.map(p => ({ id: p.id }))
           }
         }
       ]
-    : bsff.packagings ?? [];
+    : bsff.packagings?.map(p => ({ ...p, emissionNumero: p.numero })) ?? [];
 }
