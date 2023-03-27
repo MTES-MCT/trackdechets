@@ -314,7 +314,7 @@ describe("destinationSchema", () => {
       });
 
     await expect(validateFn()).rejects.toThrow(
-      "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : R2, R3, R5, R12, R13, D10, D13, D14, D15"
+      "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : R1, R2, R3, R5, R12, R13, D10, D13, D14, D15"
     );
   });
 });
@@ -660,7 +660,7 @@ describe("operationSchema", () => {
     };
     const validateFn = () => operationSchema.validate(data);
     await expect(validateFn()).rejects.toThrow(
-      "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : R2, R3, R5, R12, R13, D10, D13, D14, D15"
+      "Le code de l'opération de traitement ne fait pas partie de la liste reconnue : R1, R2, R3, R5, R12, R13, D10, D13, D14, D15"
     );
   });
 });
