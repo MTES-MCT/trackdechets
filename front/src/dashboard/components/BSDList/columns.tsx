@@ -49,6 +49,7 @@ export const COLUMNS_PARAMETERS_NAME = {
       _or: [
         { emitter: { company: { name: { _match: value } } } },
         { emitter: { company: { siret: { _contains: value } } } },
+        { emitter: { pickupSite: { name: { _match: value } } } },
       ],
     }),
     order: "emitterCompanyName",

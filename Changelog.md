@@ -5,6 +5,24 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.4.1] 07/03/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Les adresses et raisons sociales des établissements présents sur les bordereaux sont automatiquement complétées lorsqu'une correspondance est trouvée sur le n°SIRET dans la base SIRENE. [PR 2171](https://github.com/MTES-MCT/trackdechets/pull/2171)
+- Le champ `name` de `CompanyPublic` et `CompanySearchResult` contient désormais le sigle commercial ou la dénomination usuelle de l'établissement. [PR 2171](https://github.com/MTES-MCT/trackdechets/pull/2171)
+- Ajout de la possibilité de filter par le nom de l'adresse chantier / collecte dans l'interface Trackdéchets [PR 2171](https://github.com/MTES-MCT/trackdechets/pull/2171)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2023.2.2] 07/03/2023
 
 #### :rocket: Nouvelles fonctionnalités

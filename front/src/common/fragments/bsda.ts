@@ -14,6 +14,9 @@ export const bsdaFragment = gql`
         siret
         orgId
       }
+      pickupSite {
+        name
+      }
     }
     destination {
       company {

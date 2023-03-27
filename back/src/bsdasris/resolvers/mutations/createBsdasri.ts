@@ -8,6 +8,7 @@ import { checkIsBsdasriContributor } from "../../permissions";
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
 import { BsdasriType } from "@prisma/client";
 import { getBsdasriRepository } from "../../repository";
+import sirenify from "../../sirenify";
 
 const getValidationContext = ({
   isDraft,
@@ -52,7 +53,8 @@ const createBsdasri = async (
     "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparaît pas"
   );
 
-  const flattenedInput = flattenBsdasriInput(rest);
+  const sirenifiedInput = await sirenify(rest, user);
+  const flattenedInput = flattenBsdasriInput(sirenifiedInput);
 
   const isGrouping = !!grouping && !!grouping.length;
 

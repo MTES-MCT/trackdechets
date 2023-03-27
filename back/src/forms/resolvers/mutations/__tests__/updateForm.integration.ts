@@ -17,8 +17,12 @@ import {
   MutationUpdateFormArgs,
   UpdateFormInput
 } from "../../../../generated/graphql/types";
-import * as validation from "../../../validation";
 import getReadableId from "../../../readableId";
+import * as sirenify from "../../../sirenify";
+
+const sirenifyMock = jest
+  .spyOn(sirenify, "sirenifyFormInput")
+  .mockImplementation(input => Promise.resolve(input));
 
 const UPDATE_FORM = `
   mutation UpdateForm($updateFormInput: UpdateFormInput!) {
@@ -71,17 +75,11 @@ const UPDATE_FORM = `
   }
 `;
 
-const validateSpy = jest.spyOn(validation, "validateIntermediariesInput");
-const validateIntermediariesInputMock = jest.fn();
-validateSpy.mockImplementation((...args) =>
-  validateIntermediariesInputMock(...args)
-);
-
 describe("Mutation.updateForm", () => {
-  beforeEach(() => {
-    validateIntermediariesInputMock.mockReset();
+  afterEach(async () => {
+    await resetDatabase();
+    sirenifyMock.mockClear();
   });
-  afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -202,6 +200,8 @@ describe("Mutation.updateForm", () => {
       expect(data.updateForm.wasteDetails).toMatchObject(
         updateFormInput.wasteDetails
       );
+      // check input is sirenified
+      expect(sirenifyMock).toHaveBeenCalledTimes(1);
     }
   );
 
@@ -540,9 +540,7 @@ describe("Mutation.updateForm", () => {
         emitterCompanySiret: company.siret
       }
     });
-    validateIntermediariesInputMock.mockResolvedValueOnce([
-      toIntermediaryCompany(intermediary.company)
-    ]);
+
     const { mutate } = makeClient(user);
     const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
       variables: {
@@ -576,9 +574,7 @@ describe("Mutation.updateForm", () => {
         }
       }
     });
-    validateIntermediariesInputMock.mockResolvedValueOnce([
-      toIntermediaryCompany(intermediary2.company)
-    ]);
+
     const { mutate } = makeClient(user);
     const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
       variables: {
@@ -597,10 +593,6 @@ describe("Mutation.updateForm", () => {
         name: intermediary2.company.name,
         siret: intermediary2.company.siret
       })
-    ]);
-    validateIntermediariesInputMock.mockResolvedValueOnce([
-      toIntermediaryCompany(intermediary2.company),
-      toIntermediaryCompany(intermediary.company)
     ]);
     //update a 2nd time
     const { data: data2 } = await mutate<Pick<Mutation, "updateForm">>(
@@ -1859,9 +1851,6 @@ describe("Mutation.updateForm", () => {
       }
     });
 
-    validateIntermediariesInputMock.mockResolvedValueOnce([
-      toIntermediaryCompany(company)
-    ]);
     const { data } = await mutate<
       Pick<Mutation, "updateForm">,
       MutationUpdateFormArgs

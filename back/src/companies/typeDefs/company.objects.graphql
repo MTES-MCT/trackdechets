@@ -554,23 +554,6 @@ enum StatutDiffusionEtablissement {
 }
 
 """
-Intermediary: entreprise identifiée par son SIRET obligatoire
-Information validées par requête à l'INSEE
-"""
-type CompanyValidationInfos {
-  siret: String!
-  vatNumber: String
-  address: String
-  name: String
-  "Enregistré sur Trackdéchets"
-  isRegistered: Boolean!
-  "Statuts de diffusion autorisée ou non selon l'INSEE"
-  statutDiffusionEtablissement: StatutDiffusionEtablissement
-  "Etat ouvert ou fermé selon l'INSEE"
-  etatAdministratif: EtatAdministratif
-}
-
-"""
 Automatisation de la signature pour les annexes 1.
 Permet à une entreprise de ne pas avoir à signer la collecte de ses annexes.
 Si l'entreprise ciblée collecte l'annexe 1, Trackdéchets signera automatiquement pour l'entreprise émettrice.

@@ -106,6 +106,62 @@ describe("searchCompany", () => {
     expect(company.name).toEqual("JOHN SNOW");
   });
 
+  it("should add sigleUniteLegale in parenthesis if present", async () => {
+    const siret = siretify(6);
+
+    (client.get as jest.Mock).mockResolvedValueOnce({
+      body: {
+        _source: {
+          siret,
+          statutDiffusionEtablissement: "O",
+          etatAdministratifEtablissement: "A",
+          numeroVoieEtablissement: "4",
+          indiceRepetitionEtablissement: "bis",
+          typeVoieEtablissement: "BD",
+          libelleVoieEtablissement: "LONGCHAMP",
+          complementAdresseEtablissement: "Bat G",
+          codePostalEtablissement: "13001",
+          codeCommuneEtablissement: "13201",
+          libelleCommuneEtablissement: "MARSEILLE",
+          activitePrincipaleEtablissement: "62.01Z",
+          denominationUniteLegale: "CODE EN STOCK",
+          codePaysEtrangerEtablissement: "",
+          sigleUniteLegale: "CES"
+        }
+      }
+    });
+    const company = await searchCompany(siret);
+    expect(company.name).toEqual("CODE EN STOCK (CES)");
+  });
+
+  it("should add enseigne1Etablissement in parenthesis if present", async () => {
+    const siret = siretify(6);
+
+    (client.get as jest.Mock).mockResolvedValueOnce({
+      body: {
+        _source: {
+          siret,
+          statutDiffusionEtablissement: "O",
+          etatAdministratifEtablissement: "A",
+          numeroVoieEtablissement: "4",
+          indiceRepetitionEtablissement: "bis",
+          typeVoieEtablissement: "BD",
+          libelleVoieEtablissement: "LONGCHAMP",
+          complementAdresseEtablissement: "Bat G",
+          codePostalEtablissement: "13001",
+          codeCommuneEtablissement: "13201",
+          libelleCommuneEtablissement: "MARSEILLE",
+          activitePrincipaleEtablissement: "62.01Z",
+          denominationUniteLegale: "CODE EN STOCK",
+          codePaysEtrangerEtablissement: "",
+          enseigne1Etablissement: "CES"
+        }
+      }
+    });
+    const company = await searchCompany(siret);
+    expect(company.name).toEqual("CODE EN STOCK (CES)");
+  });
+
   it("should raise CompanyNotFound if error 404 (siret not found)", async () => {
     (client.get as jest.Mock).mockRejectedValueOnce(
       new ResponseError({

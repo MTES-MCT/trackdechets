@@ -9,6 +9,11 @@ import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
+import * as sirenify from "../../../sirenify";
+
+const sirenifyMock = jest
+  .spyOn(sirenify, "default")
+  .mockImplementation(input => Promise.resolve(input));
 
 const UPDATE_DASRI = `
 mutation UpdateDasri($id: ID!, $input: BsdasriInput!) {
@@ -24,7 +29,10 @@ mutation UpdateDasri($id: ID!, $input: BsdasriInput!) {
   }
 }`;
 describe("Mutation.updateBsdasri", () => {
-  afterEach(resetDatabase);
+  afterEach(async () => {
+    await resetDatabase();
+    sirenifyMock.mockClear();
+  });
 
   it("should disallow unauthenticated user to edit a dasri", async () => {
     const { mutate } = makeClient();
@@ -187,6 +195,8 @@ describe("Mutation.updateBsdasri", () => {
 
       expect(data.updateBsdasri.emitter.company.mail).toBe("test@test.test");
       expect(data.updateBsdasri.type).toBe("SIMPLE");
+      // check input is sirenified
+      expect(sirenifyMock).toHaveBeenCalledTimes(1);
     }
   );
   it("should allow eco organisme fields update for INITIAL bsdasris", async () => {

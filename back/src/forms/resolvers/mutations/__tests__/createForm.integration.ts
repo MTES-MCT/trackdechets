@@ -20,6 +20,11 @@ import {
 } from "../../../../generated/graphql/types";
 import { EmitterType, Status, UserRole } from "@prisma/client";
 import getReadableId from "../../../readableId";
+import * as sirenify from "../../../sirenify";
+
+const sirenifyMock = jest
+  .spyOn(sirenify, "sirenifyFormInput")
+  .mockImplementation(input => Promise.resolve(input));
 
 const CREATE_FORM = `
   mutation CreateForm($createFormInput: CreateFormInput!) {
@@ -116,7 +121,10 @@ const CREATE_FORM = `
 `;
 
 describe("Mutation.createForm", () => {
-  afterEach(resetDatabase);
+  afterEach(async () => {
+    await resetDatabase();
+    sirenifyMock.mockClear();
+  });
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
@@ -180,6 +188,8 @@ describe("Mutation.createForm", () => {
         }
       });
       expect(data.createForm.id).toBeTruthy();
+      // check input is sirenified
+      expect(sirenifyMock).toHaveBeenCalledTimes(1);
     }
   );
 
@@ -287,7 +297,8 @@ describe("Mutation.createForm", () => {
             {
               vatNumber: "BE0541696005",
               name: "Belgian Co",
-              contact: "Benoit"
+              contact: "Benoit",
+              address: "Quelque part en Belgique"
             }
           ]
         }
@@ -296,7 +307,8 @@ describe("Mutation.createForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Intermédiaires: seul les numéros de TVA en France sont valides",
+          "Intermédiaires : le N° SIRET est obligatoire\n" +
+          "Intermédiaires : seul les numéros de TVA en France sont valides",
         extensions: {
           code: "BAD_USER_INPUT"
         }
@@ -319,7 +331,8 @@ describe("Mutation.createForm", () => {
             {
               vatNumber: "FR87850019464",
               name: "Belgian Co",
-              contact: "Benoit"
+              contact: "Benoit",
+              address: "Quelque part en Belgique"
             }
           ]
         }
@@ -327,7 +340,7 @@ describe("Mutation.createForm", () => {
     });
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Intermédiaires: le N° SIRET est obligatoire",
+        message: "Intermédiaires : le N° SIRET est obligatoire",
         extensions: {
           code: "BAD_USER_INPUT"
         }
@@ -699,8 +712,8 @@ describe("Mutation.createForm", () => {
       transporter: {
         company: {
           siret: transporterCompany.siret,
-          name: "Transporter",
-          address: "123 whatever street, Somewhere",
+          name: transporterCompany.name,
+          address: transporterCompany.address,
           contact: "Jane Doe",
           mail: "janedoe@transporter.com",
           phone: "06"
