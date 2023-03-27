@@ -48,9 +48,15 @@ const searchResponseToCompany = (
   ]);
 
   let companyName = etablissement.denominationUniteLegale;
-  if (etablissement.sigleUniteLegale?.length > 0) {
+  if (
+    etablissement.sigleUniteLegale?.length > 0 &&
+    etablissement.sigleUniteLegale !== companyName
+  ) {
     companyName = companyName.concat(` (${etablissement.sigleUniteLegale})`);
-  } else if (etablissement.enseigne1Etablissement?.length > 0) {
+  } else if (
+    etablissement.enseigne1Etablissement?.length > 0 &&
+    etablissement.enseigne1Etablissement !== companyName
+  ) {
     companyName = companyName.concat(
       ` (${etablissement.enseigne1Etablissement})`
     );

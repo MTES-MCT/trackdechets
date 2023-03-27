@@ -10,6 +10,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - ETQ destinataire d'un BSFF, je peux modifier le numéro de contenant lors de l'acceptation [PR 2208](https://github.com/MTES-MCT/trackdechets/pull/2208)
+- Ajout du code R1 sur le BSFF [PR 2194](https://github.com/MTES-MCT/trackdechets/pull/2194)
 
 #### :bug: Corrections de bugs
 
@@ -20,6 +21,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Les adresses et raisons sociales des établissements présents sur les bordereaux sont automatiquement complétées lorsqu'une correspondance est trouvée sur le n°SIRET dans la base SIRENE. [PR 2171](https://github.com/MTES-MCT/trackdechets/pull/2171)
 - Le champ `name` de `CompanyPublic` et `CompanySearchResult` contient désormais le sigle commercial ou la dénomination usuelle de l'établissement. [PR 2171](https://github.com/MTES-MCT/trackdechets/pull/2171)
 - Ajout de la possibilité de filter par le nom de l'adresse chantier / collecte dans l'interface Trackdéchets [PR 2171](https://github.com/MTES-MCT/trackdechets/pull/2171)
+- Le volume des contenants est optionnel sur le BSFF [PR 2207](https://github.com/MTES-MCT/trackdechets/pull/2207)
 
 #### :memo: Documentation
 
