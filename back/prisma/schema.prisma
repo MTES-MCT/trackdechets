@@ -1443,8 +1443,8 @@ model BsdaRevisionRequest {
   comment String
 
   status RevisionRequestStatus @default(PENDING)
-  
-  isCanceled                                      Boolean   @default(false)
+
+  isCanceled Boolean @default(false)
 
   @@index([authoringCompanyId], map: "_BsdaRevisionRequestAuthoringCompanyIdIdx")
   @@index([bsdaId], map: "_BsdaRevisionRequestBsdaIdIdx")
