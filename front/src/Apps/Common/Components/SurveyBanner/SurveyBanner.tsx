@@ -1,7 +1,7 @@
 import React from "react";
 import { SurveyBannerProps } from "./surveyBannerTypes";
 
-import { Button } from "@dataesr/react-dsfr";
+import { Button, Link } from "@dataesr/react-dsfr";
 
 import "./surveyBanner.scss";
 
@@ -144,14 +144,18 @@ const SurveyBanner = ({ message, button, onClickClose }: SurveyBannerProps) => {
         </div>
         <div className="survey-banner__group">
           <div className="survey-banner__link">
-            <Button
-              secondary
+            <Link
               icon={"ri-questionnaire-fill"}
               iconPosition="right"
-              onClick={() => window.open(button.href, "_blank")}
+              target="_blank"
+              href={button.href}
+              isSimple
+              display="flex"
+              className="survey-banner__link__a"
+              iconSize="1x"
             >
               {button.title}
-            </Button>
+            </Link>
           </div>
           <div className="survey-banner__close">
             <Button

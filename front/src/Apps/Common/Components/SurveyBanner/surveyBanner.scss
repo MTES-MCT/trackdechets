@@ -25,7 +25,22 @@
     margin-right: 16px;
   }
 
-  &__close {
+  &__close,
+  &__link {
     align-self: center;
+  }
+
+  &__link__a {
+    box-shadow: rgb(0, 0, 145) 0px 0px 0px 1px inset;
+    padding: 0.5rem 1rem;
+    text-align: center;
+
+    &:hover {
+      background-color: rgb(246, 246, 246) !important;
+    }
+
+    &::after {
+      display: none;
+    }
   }
 }
