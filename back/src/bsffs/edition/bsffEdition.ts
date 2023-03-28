@@ -257,3 +257,15 @@ export function isAwaitingSignature(
   }
   return true;
 }
+
+/**
+ * BSFF does not store isExemptedOfReceipt so we transform the input to empty transporter.recepisse
+ * @param bsffInput
+ * @returns
+ */
+export function applyReceiptExemption(bsffInput: BsffInput): BsffInput {
+  if (bsffInput.transporter?.isExemptedOfReceipt === true) {
+    bsffInput.transporter.recepisse = null;
+  }
+  return bsffInput;
+}
