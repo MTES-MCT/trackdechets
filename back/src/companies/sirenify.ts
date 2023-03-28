@@ -71,12 +71,15 @@ export default function buildSirenify<T>(
           );
         }
 
-        const { setter, getter } = accessors[idx];
-        sirenifiedInput = setter(sirenifiedInput, {
-          ...getter(), // overwrite user provided data
-          name: companySearchResult.name,
-          address: companySearchResult.address
-        });
+        if (companySearchResult.statutDiffusionEtablissement === "O") {
+          const { setter, getter } = accessors[idx];
+
+          sirenifiedInput = setter(sirenifiedInput, {
+            ...getter(), // overwrite user provided data
+            name: companySearchResult.name,
+            address: companySearchResult.address
+          });
+        }
       }
     });
 
