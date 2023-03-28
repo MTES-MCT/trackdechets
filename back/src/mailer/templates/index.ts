@@ -224,3 +224,15 @@ export const pendingMembershipRequestAdminDetailsEmail: MailTemplate<{
   body: mustacheRenderer("pending-membership-request-admin-details.html"),
   templateId: templateIds.LAYOUT
 };
+
+export const professionalsSecondOnboardingEmail: MailTemplate = {
+  subject:
+    "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
+  templateId: templateIds.PROFESSIONALS_SECOND_ONBOARDING
+};
+
+export const nonProfessionalsSecondOnboardingEmail: MailTemplate = {
+  subject:
+    "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
+  templateId: templateIds.NON_PROFESSIONALS_SECOND_ONBOARDING
+};
