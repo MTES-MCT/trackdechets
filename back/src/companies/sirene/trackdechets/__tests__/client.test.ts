@@ -59,8 +59,26 @@ describe("searchCompany", () => {
     expect(company).toEqual(expected);
   });
 
-  // FIXME this case may not even exist in INSEE public data
-  it("should raise AnonymousCompanyError if non-diffusible", async () => {
+  it("should raise AnonymousCompanyError if partially diffusible", async () => {
+    const siret = siretify(6);
+
+    (client.get as jest.Mock).mockResolvedValueOnce({
+      body: {
+        _source: {
+          siret,
+          statutDiffusionEtablissement: "P"
+        }
+      }
+    });
+    expect.assertions(1);
+    try {
+      await searchCompany(siret);
+    } catch (e) {
+      expect(e.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
+  });
+
+  it("should raise AnonymousCompanyError if non diffusible", async () => {
     const siret = siretify(6);
 
     (client.get as jest.Mock).mockResolvedValueOnce({
