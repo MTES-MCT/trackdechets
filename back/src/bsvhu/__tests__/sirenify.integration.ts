@@ -19,7 +19,8 @@ describe("sirenify", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 
@@ -90,7 +91,8 @@ describe("sirenify", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 
