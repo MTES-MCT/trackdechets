@@ -264,7 +264,7 @@ export function isAwaitingSignature(
  * @returns
  */
 export function applyReceiptExemption(bsffInput: BsffInput): BsffInput {
-  if (bsffInput.transporter?.isExemptedOfReceipt === true) {
+  if (bsffInput.transporter?.isExemptedOfReceipt) {
     bsffInput.transporter.recepisse = null;
   }
   return bsffInput;

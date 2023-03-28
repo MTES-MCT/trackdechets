@@ -65,15 +65,15 @@ export default function BsffStepsList(props: Props) {
     return getComputedState(initialState, bsff ? getCurrentState(bsff) : null);
   }, [formQuery.data]);
 
-  const [createDraftBsff, { loading: creating }] = useMutation<
-    Pick<Mutation, "createDraftBsff">,
-    MutationCreateDraftBsffArgs
-  >(CREATE_DRAFT_BSFF);
+  const [createDraftBsff, { loading: creating }] =
+    useMutation<Pick<Mutation, "createDraftBsff">, MutationCreateDraftBsffArgs>(
+      CREATE_DRAFT_BSFF
+    );
 
-  const [updateBsffForm, { loading: updating }] = useMutation<
-    Pick<Mutation, "updateBsff">,
-    MutationUpdateBsffArgs
-  >(UPDATE_BSFF_FORM);
+  const [updateBsffForm, { loading: updating }] =
+    useMutation<Pick<Mutation, "updateBsff">, MutationUpdateBsffArgs>(
+      UPDATE_BSFF_FORM
+    );
 
   function saveForm(input: BsffInput): Promise<any> {
     return formState.id
@@ -99,13 +99,12 @@ export default function BsffStepsList(props: Props) {
       type,
       ...input,
       transporter: {
-        recepisse: isExemptedOfReceipt
-          ? null
-          : {
-              ...recepisse,
-              validityLimit:
-                recepisse.validityLimit === "" ? null : recepisse.validityLimit,
-            },
+        isExemptedOfReceipt,
+        recepisse: {
+          ...recepisse,
+          validityLimit:
+            recepisse.validityLimit === "" ? null : recepisse.validityLimit,
+        },
         ...transporter,
       },
       destination: {
