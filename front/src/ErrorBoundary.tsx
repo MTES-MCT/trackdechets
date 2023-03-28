@@ -63,8 +63,8 @@ class ErrorBoundary extends Component<React.PropsWithChildren> {
   }
 
   render() {
-    const { BUILD_ENV } = import.meta.env;
-    const isDevelopment = !BUILD_ENV;
+    const { DEV } = import.meta.env; //built-in variable exposed with Vite
+    const isDevelopment = DEV;
     const { children } = this.props;
     //@ts-ignore
     const { hasError, hideReloadPageCTA, eventId, errorInfo, error } =
