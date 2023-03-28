@@ -1,4 +1,4 @@
-import { QueryDslQueryContainer } from "@elastic/elasticsearch/api/types";
+import { estypes } from "@elastic/elasticsearch";
 import { Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { safeInput } from "../common/converter";
@@ -209,7 +209,10 @@ export function applyMask<W extends GenericWhereInput>(
 
 // Conversion functions between GraphQL filters and Elastic query
 
-function ngramMatch(fieldName: string, value: string): QueryDslQueryContainer {
+function ngramMatch(
+  fieldName: string,
+  value: string
+): estypes.QueryDslQueryContainer {
   return {
     match: {
       [`${fieldName}.ngram`]: {
@@ -225,7 +228,7 @@ export function toElasticTextQuery(
   fieldName: string,
   textFilter: TextFilter | null | undefined,
   maxLength = 50
-): QueryDslQueryContainer | undefined {
+): estypes.QueryDslQueryContainer | undefined {
   if (!textFilter) {
     return undefined;
   }
@@ -254,7 +257,7 @@ export function toElasticStringQuery(
   fieldName: string,
   stringFilter: StringFilter | null | undefined,
   maxLength = 50
-): QueryDslQueryContainer | undefined {
+): estypes.QueryDslQueryContainer | undefined {
   if (!stringFilter) {
     return undefined;
   }
@@ -285,7 +288,7 @@ export function toElasticStringListQuery(
   stringListFilter: StringNullableListFilter | null | undefined,
   maxLength = 50,
   filter = (s: string) => s // optional pre-processing function
-): QueryDslQueryContainer | undefined {
+): estypes.QueryDslQueryContainer | undefined {
   if (!stringListFilter) {
     return undefined;
   }
@@ -340,7 +343,7 @@ export function toElasticStringListQuery(
 export function toElasticDateQuery(
   fieldName: string,
   dateFilter: DateFilter | null | undefined
-): QueryDslQueryContainer | undefined {
+): estypes.QueryDslQueryContainer | undefined {
   if (!dateFilter) {
     return undefined;
   }

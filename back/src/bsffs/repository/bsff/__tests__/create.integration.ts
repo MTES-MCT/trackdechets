@@ -6,8 +6,7 @@ import {
   refreshElasticSearch,
   resetDatabase
 } from "../../../../../integration-tests/helper";
-import { ApiResponse } from "@elastic/elasticsearch";
-import { SearchResponse } from "@elastic/elasticsearch/api/types";
+import { ApiResponse, estypes } from "@elastic/elasticsearch";
 import { client, BsdElastic, index } from "../../../../common/elastic";
 import { getStream } from "../../../../activity-events";
 
@@ -36,7 +35,7 @@ describe("bsffRepository.create", () => {
 
     await refreshElasticSearch();
 
-    const { body }: ApiResponse<SearchResponse<BsdElastic>> =
+    const { body }: ApiResponse<estypes.SearchResponse<BsdElastic>> =
       await client.search({
         index: index.alias,
         body: {

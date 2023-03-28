@@ -1,5 +1,4 @@
-import { ApiResponse } from "@elastic/elasticsearch";
-import { SearchResponse } from "@elastic/elasticsearch/api/types";
+import { ApiResponse, estypes } from "@elastic/elasticsearch";
 import {
   refreshElasticSearch,
   resetDatabase
@@ -17,6 +16,8 @@ import {
   indexAllBsdTypeSync,
   processBsdIdentifiersByChunk
 } from "../bulkIndexBsds";
+
+type SearchResponse<Doc> = estypes.SearchResponse<Doc>;
 
 describe("processBsdIdentifiersByChunk", () => {
   it("should process every chunk", async () => {

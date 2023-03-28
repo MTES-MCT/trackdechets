@@ -31,14 +31,13 @@ export default function AccountFormAgreements({
   id,
   toggleEdition,
 }: AccountFormAgreementsProps) {
-  const [updateAgreements, { loading, error }] =
-    useMutation<
-      {},
-      {
-        id: string;
-        ecoOrganismeAgreements: string[];
-      }
-    >(UPDATE_AGREEMENTS);
+  const [updateAgreements, { loading, error }] = useMutation<
+    {},
+    {
+      id: string;
+      ecoOrganismeAgreements: string[];
+    }
+  >(UPDATE_AGREEMENTS);
 
   return (
     <Formik<{ ecoOrganismeAgreements: string[] }>

@@ -129,186 +129,184 @@ export const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
       .requiredIf(!isDraft, "Émetteur : l'adresse email est requise")
   });
 
-export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
-  isDraft =>
-    yup.object({
-      transporterCompanyName: yup
-        .string()
-        .requiredIf(
-          !isDraft,
-          "Transporteur : le nom de l'établissement est requis"
-        ),
-      transporterCompanySiret: siret
-        .label("Transporteur")
-        .requiredIf(
-          !isDraft,
-          "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
-        )
-        .when("transporterCompanyVatNumber", siretConditions.companyVatNumber)
-        .test(siretTests.isRegistered("TRANSPORTER")),
-      transporterCompanyVatNumber: foreignVatNumber
-        .label("Transporteur")
-        .test(vatNumberTests.isRegisteredTransporter),
-      transporterCompanyAddress: yup
-        .string()
-        .requiredIf(
-          !isDraft,
-          "Transporteur : l'adresse de l'établissement est requise"
-        ),
-      transporterCompanyContact: yup
-        .string()
-        .requiredIf(!isDraft, "Transporteur : le nom du contact est requis"),
-      transporterCompanyPhone: yup
-        .string()
-        .requiredIf(
-          !isDraft,
-          "Transporteur : le numéro de téléphone est requis"
-        ),
-      transporterCompanyMail: yup
-        .string()
-        .email("Transporteur : l'adresse email est invalide")
-        .requiredIf(!isDraft, "Transporteur : l'adresse email est requise"),
-      transporterRecepisseNumber: yup.string().nullable(),
-      transporterRecepisseDepartment: yup.string().nullable(),
-      transporterRecepisseValidityLimit: yup.date().nullable()
-    });
+export const transporterSchemaFn: FactorySchemaOf<
+  boolean,
+  Transporter
+> = isDraft =>
+  yup.object({
+    transporterCompanyName: yup
+      .string()
+      .requiredIf(
+        !isDraft,
+        "Transporteur : le nom de l'établissement est requis"
+      ),
+    transporterCompanySiret: siret
+      .label("Transporteur")
+      .requiredIf(
+        !isDraft,
+        "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
+      )
+      .when("transporterCompanyVatNumber", siretConditions.companyVatNumber)
+      .test(siretTests.isRegistered("TRANSPORTER")),
+    transporterCompanyVatNumber: foreignVatNumber
+      .label("Transporteur")
+      .test(vatNumberTests.isRegisteredTransporter),
+    transporterCompanyAddress: yup
+      .string()
+      .requiredIf(
+        !isDraft,
+        "Transporteur : l'adresse de l'établissement est requise"
+      ),
+    transporterCompanyContact: yup
+      .string()
+      .requiredIf(!isDraft, "Transporteur : le nom du contact est requis"),
+    transporterCompanyPhone: yup
+      .string()
+      .requiredIf(!isDraft, "Transporteur : le numéro de téléphone est requis"),
+    transporterCompanyMail: yup
+      .string()
+      .email("Transporteur : l'adresse email est invalide")
+      .requiredIf(!isDraft, "Transporteur : l'adresse email est requise"),
+    transporterRecepisseNumber: yup.string().nullable(),
+    transporterRecepisseDepartment: yup.string().nullable(),
+    transporterRecepisseValidityLimit: yup.date().nullable()
+  });
 
-export const wasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
-  isDraft => {
-    const packagings = isDraft
-      ? yup.array().nullable().notRequired()
-      : yup
-          .array()
-          .min(
-            1,
-            "Conditionnements : le nombre de contenants doit être supérieur ou égal à 1"
-          )
-          .of<
-            yup.SchemaOf<
-              Pick<
-                PrismaBsffPackaging,
-                "type" | "other" | "numero" | "volume" | "weight"
-              >
+export const wasteDetailsSchemaFn: FactorySchemaOf<
+  boolean,
+  WasteDetails
+> = isDraft => {
+  const packagings = isDraft
+    ? yup.array().nullable().notRequired()
+    : yup
+        .array()
+        .min(
+          1,
+          "Conditionnements : le nombre de contenants doit être supérieur ou égal à 1"
+        )
+        .of<
+          yup.SchemaOf<
+            Pick<
+              PrismaBsffPackaging,
+              "type" | "other" | "numero" | "volume" | "weight"
             >
-          >(
-            yup.object({
-              type: yup
-                .mixed<BsffPackagingType>()
-                .required("Conditionnements : le type de contenant est requis"),
-              other: yup
-                .string()
-                .when("type", (type, schema) =>
-                  type === "AUTRE"
-                    ? schema.requiredIf(
-                        !isDraft,
-                        "La description doit être précisée pour le conditionnement 'AUTRE'."
+          >
+        >(
+          yup.object({
+            type: yup
+              .mixed<BsffPackagingType>()
+              .required("Conditionnements : le type de contenant est requis"),
+            other: yup
+              .string()
+              .when("type", (type, schema) =>
+                type === "AUTRE"
+                  ? schema.requiredIf(
+                      !isDraft,
+                      "La description doit être précisée pour le conditionnement 'AUTRE'."
+                    )
+                  : schema
+                      .nullable()
+                      .max(
+                        0,
+                        "La description ne peut être renseigné que lorsque le type de conditionnement est 'AUTRE'."
                       )
-                    : schema
-                        .nullable()
-                        .max(
-                          0,
-                          "La description ne peut être renseigné que lorsque le type de conditionnement est 'AUTRE'."
-                        )
-                ),
-              volume: yup
-                .number()
-                .nullable()
-                .notRequired()
-                .positive(
-                  "Conditionnements : le volume doit être supérieur à 0"
-                ),
-              numero: yup
-                .string()
-                .ensure()
-                .required(
-                  "Conditionnements : le numéro d'identification est requis"
-                ),
+              ),
+            volume: yup
+              .number()
+              .nullable()
+              .notRequired()
+              .positive("Conditionnements : le volume doit être supérieur à 0"),
+            numero: yup
+              .string()
+              .ensure()
+              .required(
+                "Conditionnements : le numéro d'identification est requis"
+              ),
 
-              weight: weight(WeightUnits.Kilogramme)
-                .label("Conditionnement")
-                .required("${path} :Le poids est requis")
-                .positive("${path} : le poids doit être supérieur à 0")
-            })
-          );
+            weight: weight(WeightUnits.Kilogramme)
+              .label("Conditionnement")
+              .required("${path} :Le poids est requis")
+              .positive("${path} : le poids doit être supérieur à 0")
+          })
+        );
 
-    return yup.object({
-      wasteCode: yup
-        .string()
-        .nullable()
-        .oneOf(
-          [null, ...BSFF_WASTE_CODES],
-          "Le code déchet ne fait pas partie de la liste reconnue : ${values}"
-        )
-        .requiredIf(!isDraft, "Le code déchet est requis"),
-      wasteDescription: yup
-        .string()
-        .requiredIf(
-          !isDraft,
-          "La dénomination usuelle du déchet est obligatoire"
-        ),
-      wasteAdr: yup.string().requiredIf(!isDraft, "La mention ADR est requise"),
-      weightValue: weight(WeightUnits.Kilogramme)
-        .label("Déchet")
-        .when(
-          ["transporterTransportMode", "createdAt"],
-          weightConditions.transportMode(WeightUnits.Kilogramme)
-        )
-        .positive("Le poids doit être supérieur à 0")
-        .requiredIf(!isDraft, "Le poids total est requis"),
-      weightIsEstimate: yup
-        .boolean()
-        .requiredIf(!isDraft, "Le type de poids (estimé ou non) est un requis"),
-      packagings: packagings as any
-    });
-  };
+  return yup.object({
+    wasteCode: yup
+      .string()
+      .nullable()
+      .oneOf(
+        [null, ...BSFF_WASTE_CODES],
+        "Le code déchet ne fait pas partie de la liste reconnue : ${values}"
+      )
+      .requiredIf(!isDraft, "Le code déchet est requis"),
+    wasteDescription: yup
+      .string()
+      .requiredIf(
+        !isDraft,
+        "La dénomination usuelle du déchet est obligatoire"
+      ),
+    wasteAdr: yup.string().requiredIf(!isDraft, "La mention ADR est requise"),
+    weightValue: weight(WeightUnits.Kilogramme)
+      .label("Déchet")
+      .when(
+        ["transporterTransportMode", "createdAt"],
+        weightConditions.transportMode(WeightUnits.Kilogramme)
+      )
+      .positive("Le poids doit être supérieur à 0")
+      .requiredIf(!isDraft, "Le poids total est requis"),
+    weightIsEstimate: yup
+      .boolean()
+      .requiredIf(!isDraft, "Le type de poids (estimé ou non) est un requis"),
+    packagings: packagings as any
+  });
+};
 
-export const destinationSchemaFn: FactorySchemaOf<boolean, Destination> =
-  isDraft =>
-    yup.object({
-      destinationCompanyName: yup
-        .string()
-        .nullable()
-        .requiredIf(
-          !isDraft,
-          "Destination : le nom de l'établissement est requis"
-        ),
-      destinationCompanySiret: siret
-        .label("Destination")
-        .requiredIf(!isDraft, `Destination : le numéro SIRET est requis`)
-        .test(siretTests.isRegistered("DESTINATION")),
-      destinationCompanyAddress: yup
-        .string()
-        .requiredIf(
-          !isDraft,
-          "Destination : l'adresse de l'établissement est requise"
-        ),
-      destinationCompanyContact: yup
-        .string()
-        .requiredIf(!isDraft, "Destination : le nom du contact est requis"),
-      destinationCompanyPhone: yup
-        .string()
-        .requiredIf(
-          !isDraft,
-          "Destination : le numéro de téléphone est requis"
-        ),
-      destinationCompanyMail: yup
-        .string()
-        .email("Destination : l'adresse email est invalide")
-        .requiredIf(!isDraft, "Destination : l'adresse email est requise"),
-      destinationPlannedOperationCode: yup
-        .string()
-        .nullable()
-        .oneOf(
-          [null, ...Object.keys(OPERATION)],
-          `Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${Object.keys(
-            OPERATION
-          ).join(", ")}`
-        )
-        .requiredIf(
-          !isDraft,
-          "Le code de l'opération de traitement prévu est requis"
-        )
-    });
+export const destinationSchemaFn: FactorySchemaOf<
+  boolean,
+  Destination
+> = isDraft =>
+  yup.object({
+    destinationCompanyName: yup
+      .string()
+      .nullable()
+      .requiredIf(
+        !isDraft,
+        "Destination : le nom de l'établissement est requis"
+      ),
+    destinationCompanySiret: siret
+      .label("Destination")
+      .requiredIf(!isDraft, `Destination : le numéro SIRET est requis`)
+      .test(siretTests.isRegistered("DESTINATION")),
+    destinationCompanyAddress: yup
+      .string()
+      .requiredIf(
+        !isDraft,
+        "Destination : l'adresse de l'établissement est requise"
+      ),
+    destinationCompanyContact: yup
+      .string()
+      .requiredIf(!isDraft, "Destination : le nom du contact est requis"),
+    destinationCompanyPhone: yup
+      .string()
+      .requiredIf(!isDraft, "Destination : le numéro de téléphone est requis"),
+    destinationCompanyMail: yup
+      .string()
+      .email("Destination : l'adresse email est invalide")
+      .requiredIf(!isDraft, "Destination : l'adresse email est requise"),
+    destinationPlannedOperationCode: yup
+      .string()
+      .nullable()
+      .oneOf(
+        [null, ...Object.keys(OPERATION)],
+        `Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${Object.keys(
+          OPERATION
+        ).join(", ")}`
+      )
+      .requiredIf(
+        !isDraft,
+        "Le code de l'opération de traitement prévu est requis"
+      )
+  });
 
 export const transportSchema: yup.SchemaOf<Transport> = yup.object({
   transporterTransportMode: yup
@@ -829,7 +827,7 @@ const beforeEmissionSchema = bsffSchema.concat(
 );
 
 export function validateBeforeEmission(
-  bsff: typeof beforeEmissionSchema["__outputType"]
+  bsff: (typeof beforeEmissionSchema)["__outputType"]
 ) {
   return beforeEmissionSchema.validate(bsff, {
     abortEarly: false
@@ -856,7 +854,7 @@ const beforeTransportSchema = bsffSchema.concat(transportSchema).concat(
 );
 
 export function validateBeforeTransport(
-  bsff: typeof beforeTransportSchema["__outputType"]
+  bsff: (typeof beforeTransportSchema)["__outputType"]
 ) {
   return beforeTransportSchema.validate(bsff, {
     abortEarly: false
@@ -886,7 +884,7 @@ export const beforeReceptionSchema = bsffSchema
   );
 
 export function validateBeforeReception(
-  bsff: typeof beforeReceptionSchema["__outputType"]
+  bsff: (typeof beforeReceptionSchema)["__outputType"]
 ) {
   return beforeReceptionSchema.validate(bsff, {
     abortEarly: false
@@ -908,7 +906,7 @@ export const afterReceptionSchema = bsffSchema
   );
 
 export function validateAfterReception(
-  bsff: typeof beforeReceptionSchema["__outputType"]
+  bsff: (typeof beforeReceptionSchema)["__outputType"]
 ) {
   return afterReceptionSchema.validate(bsff, {
     abortEarly: false
@@ -916,7 +914,7 @@ export function validateAfterReception(
 }
 
 export function validateBeforeAcceptation(
-  bsffPackaging: typeof acceptationSchema["__outputType"]
+  bsffPackaging: (typeof acceptationSchema)["__outputType"]
 ) {
   return acceptationSchema.validate(bsffPackaging, {
     abortEarly: false
@@ -937,7 +935,7 @@ const beforeOperationSchema = yup.lazy(value =>
 );
 
 export function validateBeforeOperation(
-  bsffPackaging: typeof beforeOperationSchema["__outputType"]
+  bsffPackaging: (typeof beforeOperationSchema)["__outputType"]
 ) {
   return beforeOperationSchema.validate(bsffPackaging, {
     abortEarly: false

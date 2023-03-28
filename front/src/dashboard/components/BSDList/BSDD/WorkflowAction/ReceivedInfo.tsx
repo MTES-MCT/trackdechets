@@ -255,23 +255,24 @@ export default function ReceivedInfo({
               </label>
               <RedErrorMessage name="quantityReceived" />
             </div>
-            {form.recipient?.isTempStorage && form.status === FormStatus.Sent && (
-              <fieldset className="form__row">
-                <legend>Cette quantité est</legend>
-                <Field
-                  name="quantityType"
-                  id="REAL"
-                  label="Réelle"
-                  component={RadioButton}
-                />
-                <Field
-                  name="quantityType"
-                  id="ESTIMATED"
-                  label="Estimée"
-                  component={RadioButton}
-                />
-              </fieldset>
-            )}
+            {form.recipient?.isTempStorage &&
+              form.status === FormStatus.Sent && (
+                <fieldset className="form__row">
+                  <legend>Cette quantité est</legend>
+                  <Field
+                    name="quantityType"
+                    id="REAL"
+                    label="Réelle"
+                    component={RadioButton}
+                  />
+                  <Field
+                    name="quantityType"
+                    id="ESTIMATED"
+                    label="Estimée"
+                    component={RadioButton}
+                  />
+                </fieldset>
+              )}
             {/* Display wasteRefusalReason field if waste is refused or partially refused*/}
             {values.wasteAcceptationStatus &&
               [

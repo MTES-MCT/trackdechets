@@ -123,8 +123,9 @@ export default function AccountCompanyAdd() {
   const history = useHistory();
 
   // STATE
-  const [companyInfos, setCompanyInfos] =
-    useState<CompanySearchResult | null>(null);
+  const [companyInfos, setCompanyInfos] = useState<CompanySearchResult | null>(
+    null
+  );
 
   // QUERIES AND MUTATIONS
   const [createCompany, { error: savingError }] = useMutation<

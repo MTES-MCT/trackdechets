@@ -87,8 +87,9 @@ export const server = new ApolloServer({
   },
   formatError: err => {
     // Catch Yup `ValidationError` and throw a `UserInputError` instead of an `InternalServerError`
-    if (err.extensions.exception?.name === "ValidationError") {
-      return new UserInputError(err.extensions.exception.errors.join("\n"));
+    const customError = err.extensions.exception as any;
+    if (customError?.name === "ValidationError") {
+      return new UserInputError(customError.errors.join("\n"));
     }
     if (
       err.extensions.code === ErrorCode.INTERNAL_SERVER_ERROR &&
@@ -153,7 +154,7 @@ app.use(
         ],
         connectSrc: [process.env.API_HOST],
         formAction: ["self"],
-        ...(NODE_ENV === "production" && { upgradeInsecureRequests: [] })
+        upgradeInsecureRequests: NODE_ENV === "production" ? [] : null
       }
     }
   })

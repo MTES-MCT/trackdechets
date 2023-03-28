@@ -20,7 +20,7 @@ export async function doesUserLoginNeedsCaptcha(
   const key = getUserLoginFailedKey(userEmail);
   const redisValue = await redisClient.get(key).catch(_ => 0);
   // Captcha is displayed a the N+1th attempt, so we substract 1
-  return redisValue >= FAILED_ATTEMPTS_BEFORE_CAPTCHA - 1;
+  return +redisValue >= FAILED_ATTEMPTS_BEFORE_CAPTCHA - 1;
 }
 
 /**

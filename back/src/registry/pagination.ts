@@ -1,5 +1,4 @@
-import { ApiResponse } from "@elastic/elasticsearch";
-import { GetResponse } from "@elastic/elasticsearch/api/types";
+import { ApiResponse, estypes } from "@elastic/elasticsearch";
 import { BsdElastic, client, index } from "../common/elastic";
 import {
   GraphqlPaginationArgs,
@@ -37,7 +36,7 @@ async function buildSearchAfter(
 ): Promise<(string | number)[]> {
   const {
     body: { _source: bsd }
-  }: ApiResponse<GetResponse<BsdElastic>> = await client.get({
+  }: ApiResponse<estypes.GetResponse<BsdElastic>> = await client.get({
     id: cursor,
     index: index.alias,
     type: index.type

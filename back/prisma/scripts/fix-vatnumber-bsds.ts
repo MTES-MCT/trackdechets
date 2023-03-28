@@ -3,7 +3,7 @@ import path from "path";
 import prompts from "prompts";
 import { Updater, registerUpdater } from "./helper/helper";
 import prisma from "../../src/prisma";
-import { Form } from ".prisma/client";
+import { Form } from "@prisma/client";
 
 @registerUpdater(
   "Clean BSD SIRET and VAT numbers from bad characters",

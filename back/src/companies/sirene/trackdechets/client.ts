@@ -1,8 +1,4 @@
-import {
-  GetResponse,
-  QueryDslQueryContainer
-} from "@elastic/elasticsearch/api/types";
-import { errors } from "@elastic/elasticsearch";
+import { errors, estypes } from "@elastic/elasticsearch";
 import logger from "../../../logging/logger";
 import { libelleFromCodeNaf, buildAddress, removeDiacritics } from "../utils";
 import { AnonymousCompanyError } from "../errors";
@@ -108,7 +104,9 @@ export const searchCompany = async (
   siret: string
 ): Promise<SireneSearchResult> => {
   try {
-    const response = await client.get<GetResponse<SearchStockEtablissement>>({
+    const response = await client.get<
+      estypes.GetResponse<SearchStockEtablissement>
+    >({
       id: siret,
       index
     });
@@ -155,7 +153,7 @@ export const searchCompanies = (
 ): Promise<SireneSearchResult[]> => {
   const qs = removeDiacritics(clue);
   // Match query on the merged field td_search_companies
-  const must: QueryDslQueryContainer[] = [
+  const must: estypes.QueryDslQueryContainer[] = [
     {
       match: {
         // field created during indexation from the copy of multiple fields

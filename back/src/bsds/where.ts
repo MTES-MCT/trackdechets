@@ -12,8 +12,8 @@ import {
   toElasticTextQuery
 } from "../common/where";
 import { BsdWhere } from "../generated/graphql/types";
-import { QueryDslQueryContainer } from "@elastic/elasticsearch/api/types";
 import { transportPlateFilter } from "../common/elastic";
+import { estypes } from "@elastic/elasticsearch";
 
 export function toElasticSimpleQuery(where: BsdWhere) {
   return {
@@ -187,7 +187,9 @@ export function toElasticSimpleQuery(where: BsdWhere) {
   };
 }
 
-export function toElasticQuery(where: BsdWhere): QueryDslQueryContainer {
+export function toElasticQuery(
+  where: BsdWhere
+): estypes.QueryDslQueryContainer {
   function inner(where: BsdWhere, depth = 0) {
     if (depth > 2) {
       throw new NestingWhereError(2);
