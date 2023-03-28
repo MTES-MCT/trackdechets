@@ -12,6 +12,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - ETQ utilisateur je peux annuler un BSDA (via le processus de révision) [PR 2200](https://github.com/MTES-MCT/trackdechets/pull/2200)
 - ETQ destinataire d'un BSFF, je peux modifier le numéro de contenant lors de l'acceptation [PR 2208](https://github.com/MTES-MCT/trackdechets/pull/2208)
 - Ajout du code R1 sur le BSFF [PR 2194](https://github.com/MTES-MCT/trackdechets/pull/2194)
+- Ajout du champ "Notification" sur le BSDD lorsque la destination finale est à l'étranger [PR 2209](https://github.com/MTES-MCT/trackdechets/pull/2209)
 
 #### :bug: Corrections de bugs
 
@@ -23,10 +24,14 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Le champ `name` de `CompanyPublic` et `CompanySearchResult` contient désormais le sigle commercial ou la dénomination usuelle de l'établissement. [PR 2171](https://github.com/MTES-MCT/trackdechets/pull/2171)
 - Ajout de la possibilité de filter par le nom de l'adresse chantier / collecte dans l'interface Trackdéchets [PR 2171](https://github.com/MTES-MCT/trackdechets/pull/2171)
 - Le volume des contenants est optionnel sur le BSFF [PR 2207](https://github.com/MTES-MCT/trackdechets/pull/2207)
+- On ne peut plus renseigner une entreprise n'ayant pas le profil "Installation de traitement" dans la partie exutoire final du BSDA [PR 2211](https://github.com/MTES-MCT/trackdechets/pull/2211)
 
 #### :memo: Documentation
 
 #### :house: Interne
+
+- Suppression de la route permettant de générer des snapshots mémoire au profit de l'utilisation des SIGNAL Unix [PR 2218](https://github.com/MTES-MCT/trackdechets/pull/2218)
+- Préparation de la code base en vue de l'activation des "strictNullCheck" [PR 2189](https://github.com/MTES-MCT/trackdechets/pull/2218)
 
 # [2023.2.2] 07/03/2023
 
