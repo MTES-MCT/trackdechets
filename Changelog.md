@@ -5,7 +5,7 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2023.4.1] 07/03/2023
+# [2023.4.1] 04/04/2023
 
 #### :rocket: Nouvelles fonctionnalités
 
@@ -25,6 +25,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Ajout de la possibilité de filter par le nom de l'adresse chantier / collecte dans l'interface Trackdéchets [PR 2171](https://github.com/MTES-MCT/trackdechets/pull/2171)
 - Le volume des contenants est optionnel sur le BSFF [PR 2207](https://github.com/MTES-MCT/trackdechets/pull/2207)
 - On ne peut plus renseigner une entreprise n'ayant pas le profil "Installation de traitement" dans la partie exutoire final du BSDA [PR 2211](https://github.com/MTES-MCT/trackdechets/pull/2211)
+- Modification des libellés pour le type d'émetteur sur le PDF BSFF [PR 2210](https://github.com/MTES-MCT/trackdechets/pull/2210)
 
 #### :memo: Documentation
 
@@ -33,6 +34,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Suppression de la route permettant de générer des snapshots mémoire au profit de l'utilisation des SIGNAL Unix [PR 2218](https://github.com/MTES-MCT/trackdechets/pull/2218)
 - Préparation de la code base en vue de l'activation des "strictNullCheck" [PR 2189](https://github.com/MTES-MCT/trackdechets/pull/2218)
 - Ajout d'une bannière pour mesurer la satisfaction des utilisateurs [PR 2221](https://github.com/MTES-MCT/trackdechets/pull/2221)
+- Patch SIRENE suite au déploiement des nouvelles modalités de diffusion [PR 2222](https://github.com/MTES-MCT/trackdechets/pull/2222)
 
 # [2023.2.2] 07/03/2023
 
