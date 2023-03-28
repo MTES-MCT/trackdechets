@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { usePopperTooltip } from "react-popper-tooltip";
 import { IconQuestionCircle } from "common/components/Icons";
 import style from "./Tooltip.module.scss";

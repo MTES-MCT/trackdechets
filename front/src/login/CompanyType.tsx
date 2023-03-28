@@ -1,4 +1,4 @@
-import { FieldArray, FieldProps, Field } from "formik";
+import { FieldArray, FieldProps } from "formik";
 import React, { InputHTMLAttributes } from "react";
 import Tooltip from "common/components/Tooltip";
 import { CompanyType } from "../generated/graphql/types";
@@ -102,24 +102,17 @@ export default function CompanyTypeField({
           <Container fluid>
             {COMPANY_CONSTANTS.map((companyType, idx) => (
               <div key={idx}>
-                <Row gutters>
+                <Row gutters key={companyType.value}>
                   <Col n="11">
-                    <Field name="companyTypes">
-                      {({ field }) => {
-                        return (
-                          <Checkbox
-                            id={companyType.value}
-                            label={companyType.label}
-                            defaultChecked={value.includes(companyType.value)}
-                            disabled={props.disabled}
-                            onClick={e =>
-                              handleChange(e, arrayHelpers, companyType, value)
-                            }
-                            {...field}
-                          ></Checkbox>
-                        );
-                      }}
-                    </Field>
+                    <Checkbox
+                      id={companyType.value}
+                      label={companyType.label}
+                      defaultChecked={value.includes(companyType.value)}
+                      disabled={props.disabled}
+                      onClick={e =>
+                        handleChange(e, arrayHelpers, companyType, value)
+                      }
+                    />
                   </Col>
 
                   <Col n="1">
