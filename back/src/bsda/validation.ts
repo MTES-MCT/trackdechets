@@ -88,6 +88,7 @@ type Destination = Pick<
   | "destinationOperationDescription"
   | "destinationOperationDate"
   | "destinationOperationNextDestinationCap"
+  | "destinationOperationNextDestinationCompanySiret"
 >;
 
 type Transporter = Pick<
@@ -621,7 +622,11 @@ const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
               `Entreprise de destination ultérieure prévue: CAP obligatoire`
             ),
           otherwise: schema => schema.nullable()
-        })
+        }),
+      destinationOperationNextDestinationCompanySiret: siret
+        .label("Entreprise de destination ultérieure prévue")
+        .test(siretTests.isRegistered("DESTINATION"))
+        .nullable()
     });
 
 const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
