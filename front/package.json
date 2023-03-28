@@ -90,6 +90,7 @@
     "tailwindcss": "^1.9.6",
     "text-security": "^3.2.1",
     "use-media": "^1.4.0",
+    "uuid": "^9.0.0",
     "world-countries": "^4.0.0",
     "yup": "^0.32.11",
     "zxcvbn": "^4.4.2"

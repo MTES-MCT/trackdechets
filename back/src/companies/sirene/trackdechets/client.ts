@@ -104,7 +104,9 @@ export const searchCompany = async (
   siret: string
 ): Promise<SireneSearchResult> => {
   try {
-    const response = await client.get<estypes.GetResponse<SearchStockEtablissement>>({
+    const response = await client.get<
+      estypes.GetResponse<SearchStockEtablissement>
+    >({
       id: siret,
       index
     });

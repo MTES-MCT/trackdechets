@@ -154,7 +154,7 @@ app.use(
         ],
         connectSrc: [process.env.API_HOST],
         formAction: ["self"],
-        ...(NODE_ENV === "production" && { upgradeInsecureRequests: [] })
+        upgradeInsecureRequests: NODE_ENV === "production" ? [] : null
       }
     }
   })
