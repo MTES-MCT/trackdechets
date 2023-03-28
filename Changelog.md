@@ -32,6 +32,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 - Suppression de la route permettant de générer des snapshots mémoire au profit de l'utilisation des SIGNAL Unix [PR 2218](https://github.com/MTES-MCT/trackdechets/pull/2218)
 - Préparation de la code base en vue de l'activation des "strictNullCheck" [PR 2189](https://github.com/MTES-MCT/trackdechets/pull/2218)
+- Ajout d'une bannière pour mesurer la satisfaction des utilisateurs [PR 2221](https://github.com/MTES-MCT/trackdechets/pull/2221)
 
 # [2023.2.2] 07/03/2023
 

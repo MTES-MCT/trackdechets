@@ -1,0 +1,46 @@
+.survey-banner {
+  background-color: #e3e3fd;
+
+  &__container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    max-width: 1920px;
+    margin: auto;
+  }
+
+  &__group {
+    display: flex;
+  }
+
+  &__message {
+    align-self: center;
+    font-weight: 700;
+  }
+
+  &__link,
+  &__icon,
+  &__message {
+    margin-right: 16px;
+  }
+
+  &__close,
+  &__link {
+    align-self: center;
+  }
+
+  &__link__a {
+    box-shadow: rgb(0, 0, 145) 0px 0px 0px 1px inset;
+    padding: 0.5rem 1rem;
+    text-align: center;
+
+    &:hover {
+      background-color: rgb(246, 246, 246) !important;
+    }
+
+    &::after {
+      display: none;
+    }
+  }
+}
