@@ -36,14 +36,14 @@ if (CRON_ONBOARDING_SCHEDULE) {
 
   jobs = [
     ...jobs,
-    // first onboarding email
-    new cron.CronJob({
-      cronTime: CRON_ONBOARDING_SCHEDULE,
-      onTick: async () => {
-        await sendFirstOnboardingEmail();
-      },
-      timeZone: "Europe/Paris"
-    }),
+    // // first onboarding email
+    // new cron.CronJob({
+    //   cronTime: CRON_ONBOARDING_SCHEDULE,
+    //   onTick: async () => {
+    //     await sendFirstOnboardingEmail();
+    //   },
+    //   timeZone: "Europe/Paris"
+    // }),
     // second onbarding email
     new cron.CronJob({
       cronTime: CRON_ONBOARDING_SCHEDULE,

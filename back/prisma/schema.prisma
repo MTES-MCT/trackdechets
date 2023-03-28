@@ -251,6 +251,7 @@ model CompanyAssociation {
   company   Company  @relation(fields: [companyId], references: [id])
   userId    String
   user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
 
   @@index([userId], map: "_CompanyAssociationUserIdIdx")
   @@index([companyId], map: "_CompanyAssociationCompanyIdIdx")

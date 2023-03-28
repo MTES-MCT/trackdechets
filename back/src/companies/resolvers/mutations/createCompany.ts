@@ -9,7 +9,10 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { randomNumber } from "../../../utils";
 import * as COMPANY_CONSTANTS from "../../../common/constants/COMPANY_CONSTANTS";
 import { renderMail } from "../../../mailer/templates/renderers";
-import { verificationProcessInfo } from "../../../mailer/templates";
+import {
+  onboardingFirstStep,
+  verificationProcessInfo
+} from "../../../mailer/templates";
 import { deleteCachedUserCompanies } from "../../../common/redis/users";
 import {
   cleanClue,
@@ -218,6 +221,21 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       siret: company.siret,
       codeCommune: companyInfo.codeCommune
     });
+  }
+
+  // If the company is NOT professional, send onboarding email
+  // (professional onboarding mail is sent on verify)
+  if (
+    ![...company.companyTypes].some(ct =>
+      COMPANY_CONSTANTS.PROFESSIONALS.includes(ct)
+    )
+  ) {
+    await sendMail(
+      renderMail(onboardingFirstStep, {
+        to: [{ email: user.email, name: user.name }],
+        variables: { company }
+      })
+    );
   }
 
   return convertUrls(company);

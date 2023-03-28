@@ -58,21 +58,21 @@ export const getRecentlyAssociatedUsers = async ({
   });
 };
 
-/**
- * Send first step onboarding email to active users who suscribed yesterday
- */
-export const sendFirstOnboardingEmail = async (daysAgo = 1) => {
-  const recipients = await getRecentlyAssociatedUsers({ daysAgo });
-  await Promise.all(
-    recipients.map(recipient => {
-      const payload = renderMail(onboardingFirstStep, {
-        to: [{ name: recipient.name, email: recipient.email }]
-      });
-      return sendMail(payload);
-    })
-  );
-  await prisma.$disconnect();
-};
+// /**
+//  * Send first step onboarding email to active users who suscribed yesterday
+//  */
+// export const sendFirstOnboardingEmail = async (daysAgo = 1) => {
+//   const recipients = await getRecentlyAssociatedUsers({ daysAgo });
+//   await Promise.all(
+//     recipients.map(recipient => {
+//       const payload = renderMail(onboardingFirstStep, {
+//         to: [{ name: recipient.name, email: recipient.email }]
+//       });
+//       return sendMail(payload);
+//     })
+//   );
+//   await prisma.$disconnect();
+// };
 
 type recipientType = User & {
   companyAssociations: (CompanyAssociation & {
