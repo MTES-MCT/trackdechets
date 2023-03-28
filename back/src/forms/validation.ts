@@ -219,6 +219,7 @@ type ProcessedInfo = Pick<
   | "nextDestinationCompanyPhone"
   | "nextDestinationCompanyMail"
   | "nextDestinationCompanyVatNumber"
+  | "nextDestinationNotificationNumber"
 >;
 
 // *************************************************************
@@ -1093,7 +1094,18 @@ const withNextDestination = (required: boolean) =>
       .string()
       .email()
       .ensure()
-      .requiredIf(required, `Destination ultérieure : ${MISSING_COMPANY_EMAIL}`)
+      .requiredIf(
+        required,
+        `Destination ultérieure : ${MISSING_COMPANY_EMAIL}`
+      ),
+    nextDestinationNotificationNumber: yup
+      .string()
+      .notRequired()
+      .nullable()
+      .matches(
+        /^[a-zA-Z]{2}[0-9]{4}$|^$/,
+        "Destination ultérieure : Le numéro d'identication ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
+      )
   });
 
 const withoutNextDestination = yup.object().shape({
@@ -1130,6 +1142,10 @@ const withoutNextDestination = yup.object().shape({
     .ensure()
     .max(0, EXTRANEOUS_NEXT_DESTINATION),
   nextDestinationCompanyMail: yup
+    .string()
+    .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  nextDestinationNotificationNumber: yup
     .string()
     .ensure()
     .max(0, EXTRANEOUS_NEXT_DESTINATION)

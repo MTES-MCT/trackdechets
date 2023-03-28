@@ -406,6 +406,13 @@ type NextDestination {
   "Traitement prévue (code D/R)"
   processingOperation: String
 
+  """
+  N° du document prévu à l'annexe I-B du règlement n°1013/2006
+  ou le numéro de notification et numéro de saisie du document
+  prévue à l'annexe I-B du règlement N°1013/2006 (si connu).
+  """
+  notificationNumber: String
+
   "Établissement ultérieure"
   company: FormCompany
 }

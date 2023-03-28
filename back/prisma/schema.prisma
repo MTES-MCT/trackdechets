@@ -387,6 +387,7 @@ model Form {
   nextDestinationCompanyMail         String?
   nextDestinationCompanyCountry      String?
   nextDestinationCompanyVatNumber    String?
+  nextDestinationNotificationNumber  String?
   emitterWorkSiteName                String?
   emitterWorkSiteAddress             String?
   emitterWorkSiteCity                String?
