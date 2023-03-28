@@ -13,6 +13,8 @@ import {
 } from "../../../common/repository/types";
 import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
 import { PARTIAL_OPERATIONS } from "../../validation";
+import { NON_CANCELLABLE_BSDA_STATUSES } from "../../resolvers/mutations/revisionRequest/createRevisionRequest";
+import { ForbiddenError } from "apollo-server-core";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -78,6 +80,7 @@ async function getUpdateFromRevisionRequest(
     createdAt,
     id,
     status,
+    isCanceled,
     ...bsdaUpdate
   } = revisionRequest;
 
@@ -87,7 +90,8 @@ async function getUpdateFromRevisionRequest(
   });
   const newStatus = getNewStatus(
     currentStatus,
-    bsdaUpdate.destinationOperationCode
+    bsdaUpdate.destinationOperationCode,
+    isCanceled
   );
 
   return removeEmpty({
@@ -100,8 +104,19 @@ async function getUpdateFromRevisionRequest(
 
 function getNewStatus(
   status: BsdaStatus,
-  newOperationCode: string | null
+  newOperationCode: string | null,
+  isCanceled = false
 ): BsdaStatus {
+  if (isCanceled) {
+    if (NON_CANCELLABLE_BSDA_STATUSES.includes(status)) {
+      throw new ForbiddenError(
+        "Impossible d'annuler un bordereau qui a été réceptionné sur l'installation de destination."
+      );
+    }
+
+    return BsdaStatus.CANCELED;
+  }
+
   if (
     status === BsdaStatus.PROCESSED &&
     newOperationCode &&
@@ -141,7 +156,7 @@ export async function approveAndApplyRevisionRequest(
     prisma
   );
 
-  await prisma.bsda.update({
+  const updatedBsda = await prisma.bsda.update({
     where: { id: updatedRevisionRequest.bsdaId },
     data: { ...updateData }
   });
@@ -158,6 +173,16 @@ export async function approveAndApplyRevisionRequest(
       metadata: { ...logMetadata, authType: user.auth }
     }
   });
+
+  // If the bsda was a grouping bsda, and is cancelled, free the children
+  if (updateData.status === BsdaStatus.CANCELED) {
+    await prisma.bsda.updateMany({
+      where: { groupedInId: updatedBsda.id },
+      data: {
+        groupedInId: null
+      }
+    });
+  }
 
   prisma.addAfterCommitCallback?.(() =>
     enqueueBsdToIndex(updatedRevisionRequest.bsdaId)

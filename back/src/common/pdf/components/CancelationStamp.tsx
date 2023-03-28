@@ -2,7 +2,10 @@ import * as React from "react";
 
 export function CancelationStamp() {
   return (
-    <div className="Signature">
+    <div
+      className="Signature"
+      style={{ position: "absolute", top: "8px", right: "8px" }}
+    >
       <svg
         width="100%"
         height="100%"

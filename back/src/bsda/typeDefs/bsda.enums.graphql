@@ -32,6 +32,8 @@ enum BsdaStatus {
   REFUSED
   "En attente d'un bordereau suite"
   AWAITING_CHILD
+  "Bordereau annulé. L'annulation peut être demandée via le processus de révision"
+  CANCELED
 }
 
 "Type de packaging du déchet"

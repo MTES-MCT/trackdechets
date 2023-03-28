@@ -19,6 +19,7 @@ export const machine = createMachine<Record<string, never>, Event>(
     id: "bsda-workflow",
     initial: BsdaStatus.INITIAL,
     states: {
+      [BsdaStatus.CANCELED]: { type: "final" },
       [BsdaStatus.INITIAL]: {
         on: {
           EMISSION: {

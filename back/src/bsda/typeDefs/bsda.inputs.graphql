@@ -385,6 +385,9 @@ input BsdaRevisionRequestContentInput {
 
   "Conditionnement"
   packagings: [BsdaPackagingInput!]
+
+  "Annuler le bordereau. Exclusif des autres opérations"
+  isCanceled: Boolean
 }
 
 input BsdaRevisionRequestEmitterInput {
