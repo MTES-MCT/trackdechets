@@ -34,6 +34,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Préparation de la code base en vue de l'activation des "strictNullCheck" [PR 2189](https://github.com/MTES-MCT/trackdechets/pull/2218)
 - Ajout d'une bannière pour mesurer la satisfaction des utilisateurs [PR 2221](https://github.com/MTES-MCT/trackdechets/pull/2221)
 
+- Afficher une page de debug en localhost pour un crash front [PR 2131](https://github.com/MTES-MCT/trackdechets/pull/2131)
+
 # [2023.2.2] 07/03/2023
 
 #### :rocket: Nouvelles fonctionnalités
