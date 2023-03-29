@@ -30,10 +30,12 @@
     align-self: center;
   }
 
-  &__link__a {
-    box-shadow: rgb(0, 0, 145) 0px 0px 0px 1px inset;
-    padding: 0.5rem 1rem;
+  &__link a {
+    display: flex;
+    align-items: center;
     text-align: center;
+    padding: 0.5rem 1rem;
+    box-shadow: rgb(0, 0, 145) 0px 0px 0px 1px inset;
 
     &:hover {
       background-color: rgb(246, 246, 246) !important;
