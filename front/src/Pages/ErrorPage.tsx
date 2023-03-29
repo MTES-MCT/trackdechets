@@ -5,7 +5,7 @@ interface ErrorProps {
   message: string | ReactElement;
   hideReloadPageCTA: boolean;
 }
-const Error = ({ message, hideReloadPageCTA }: ErrorProps) => {
+const ErrorPage = ({ message, hideReloadPageCTA }: ErrorProps) => {
   const onClick = () => window.location.reload();
 
   return (
@@ -20,4 +20,4 @@ const Error = ({ message, hideReloadPageCTA }: ErrorProps) => {
     </>
   );
 };
-export default Error;
+export default ErrorPage;
