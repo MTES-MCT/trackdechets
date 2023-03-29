@@ -98,7 +98,7 @@ export function BsffTypeSelector() {
                     setPackagings([]);
                     setWeight({ value: 0, isEstimate: false });
                     setFicheInterventions([]);
-                    setWasteCode(initialState.waste?.code);
+                    setWasteCode(initialState.waste?.code!);
                     setType(option.value);
                     return;
                   }

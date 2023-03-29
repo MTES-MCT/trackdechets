@@ -90,7 +90,7 @@ export default function Destination({ disabled }) {
         heading="Installation de destination"
         registeredOnlyCompanies={true}
         onCompanySelected={destination => {
-          setSelectedDestination(destination);
+          setSelectedDestination(destination as CompanySearchResult);
           updateAgrementNumber(destination);
         }}
       />
@@ -136,8 +136,10 @@ export default function Destination({ disabled }) {
           onCompanySelected={destination => {
             const agrementNumber =
               values.destination?.type === "BROYEUR"
-                ? destination?.vhuAgrementBroyeur?.agrementNumber
-                : destination?.vhuAgrementDemolisseur?.agrementNumber;
+                ? (destination as CompanySearchResult)?.vhuAgrementBroyeur
+                    ?.agrementNumber
+                : (destination as CompanySearchResult)?.vhuAgrementDemolisseur
+                    ?.agrementNumber;
 
             if (agrementNumber) {
               setFieldValue("destination.agrementNumber", agrementNumber);
