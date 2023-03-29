@@ -1,10 +1,10 @@
 import { resetDatabase } from "../../../integration-tests/helper";
-import { CompanyType } from "@prisma/client";
+// import { CompanyType } from "@prisma/client";
 import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
 import prisma from "../../prisma";
 import {
-  getRecentlyAssociatedUsers,
-  selectSecondOnboardingEmail
+  getRecentlyAssociatedUsers
+  // selectSecondOnboardingEmail
 } from "../onboarding.helpers";
 
 describe("Retrieve relevant users for onboarding emails", () => {
@@ -40,79 +40,79 @@ describe("Retrieve relevant users for onboarding emails", () => {
     expect(recipients[0].companyAssociations[0].company.id).toEqual(company.id);
   });
 });
-// hardcoded values matching test .env config
-const PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID = 11;
-const PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID = 10;
-describe("Select relevant email template function", () => {
-  afterEach(resetDatabase);
+// // hardcoded values matching test .env config
+// const PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID = 11;
+// const PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID = 10;
+// describe("Select relevant email template function", () => {
+//   afterEach(resetDatabase);
 
-  it.each([CompanyType.PRODUCER, CompanyType.WASTE_CENTER])(
-    "should select onboarding email for producers",
-    async companyType => {
-      await userWithCompanyFactory("ADMIN", {
-        companyTypes: {
-          set: [companyType]
-        }
-      }); // producer
+//   it.each([CompanyType.PRODUCER, CompanyType.WASTE_CENTER])(
+//     "should select onboarding email for producers",
+//     async companyType => {
+//       await userWithCompanyFactory("ADMIN", {
+//         companyTypes: {
+//           set: [companyType]
+//         }
+//       }); // producer
 
-      const recipients = await prisma.user.findMany({
-        include: { companyAssociations: { include: { company: true } } }
-      });
+//       const recipients = await prisma.user.findMany({
+//         include: { companyAssociations: { include: { company: true } } }
+//       });
 
-      const mailTemplate = selectSecondOnboardingEmail(recipients[0]);
-      expect(mailTemplate.templateId).toEqual(
-        PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID
-      );
-    }
-  );
+//       const mailTemplate = selectSecondOnboardingEmail(recipients[0]);
+//       expect(mailTemplate.templateId).toEqual(
+//         PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID
+//       );
+//     }
+//   );
 
-  it.each([
-    CompanyType.COLLECTOR,
-    CompanyType.WASTEPROCESSOR,
-    CompanyType.TRANSPORTER,
-    CompanyType.WASTE_VEHICLES,
-    CompanyType.TRADER,
-    CompanyType.ECO_ORGANISME,
-    CompanyType.BROKER
-  ])(
-    "should select onboarding email for professionals (%p)",
-    async companyType => {
-      await userWithCompanyFactory("ADMIN", {
-        companyTypes: {
-          set: [companyType as CompanyType]
-        }
-      });
+//   it.each([
+//     CompanyType.COLLECTOR,
+//     CompanyType.WASTEPROCESSOR,
+//     CompanyType.TRANSPORTER,
+//     CompanyType.WASTE_VEHICLES,
+//     CompanyType.TRADER,
+//     CompanyType.ECO_ORGANISME,
+//     CompanyType.BROKER
+//   ])(
+//     "should select onboarding email for professionals (%p)",
+//     async companyType => {
+//       await userWithCompanyFactory("ADMIN", {
+//         companyTypes: {
+//           set: [companyType as CompanyType]
+//         }
+//       });
 
-      const recipients = await prisma.user.findMany({
-        include: { companyAssociations: { include: { company: true } } }
-      });
-      const mailTemplate = selectSecondOnboardingEmail(recipients[0]);
-      expect(mailTemplate.templateId).toEqual(
-        PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
-      );
-    }
-  );
+//       const recipients = await prisma.user.findMany({
+//         include: { companyAssociations: { include: { company: true } } }
+//       });
+//       const mailTemplate = selectSecondOnboardingEmail(recipients[0]);
+//       expect(mailTemplate.templateId).toEqual(
+//         PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
+//       );
+//     }
+//   );
 
-  it.each([
-    ["PRODUCER", "TRANSPORTER"],
-    ["TRANSPORTER", "WASTEPROCESSOR"]
-  ])(
-    "should select onboarding email for professionals when company belongs to several categories",
-    async (companyType1, companyType2) => {
-      //when a company belongs to several category, the professional onboarding email is selected
-      await userWithCompanyFactory("ADMIN", {
-        companyTypes: {
-          set: [companyType1 as CompanyType, companyType2 as CompanyType]
-        }
-      }); // prod
-      const recipients = await prisma.user.findMany({
-        include: { companyAssociations: { include: { company: true } } }
-      });
+//   it.each([
+//     ["PRODUCER", "TRANSPORTER"],
+//     ["TRANSPORTER", "WASTEPROCESSOR"]
+//   ])(
+//     "should select onboarding email for professionals when company belongs to several categories",
+//     async (companyType1, companyType2) => {
+//       //when a company belongs to several category, the professional onboarding email is selected
+//       await userWithCompanyFactory("ADMIN", {
+//         companyTypes: {
+//           set: [companyType1 as CompanyType, companyType2 as CompanyType]
+//         }
+//       }); // prod
+//       const recipients = await prisma.user.findMany({
+//         include: { companyAssociations: { include: { company: true } } }
+//       });
 
-      const mailTemplate = selectSecondOnboardingEmail(recipients[0]);
-      expect(mailTemplate.templateId).toEqual(
-        PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
-      );
-    }
-  );
-});
+//       const mailTemplate = selectSecondOnboardingEmail(recipients[0]);
+//       expect(mailTemplate.templateId).toEqual(
+//         PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
+//       );
+//     }
+//   );
+// });

@@ -44,17 +44,17 @@ export const onboardingFirstStep: MailTemplate = {
   templateId: templateIds.FIRST_ONBOARDING
 };
 
-export const onboardingProducerSecondStep: MailTemplate = {
-  subject:
-    "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
-  templateId: templateIds.PRODUCER_SECOND_ONBOARDING
-};
+// export const onboardingProducerSecondStep: MailTemplate = {
+//   subject:
+//     "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
+//   templateId: templateIds.PRODUCER_SECOND_ONBOARDING
+// };
 
-export const onboardingProfessionalSecondStep: MailTemplate = {
-  subject:
-    "Trackdéchets vous accompagne pour mettre en oeuvre la traçabilité dématérialisée",
-  templateId: templateIds.PROFESSIONAL_SECOND_ONBOARDING
-};
+// export const onboardingProfesionalSecondStep: MailTemplate = {
+//   subject:
+//     "Trackdéchets vous accompagne pour mettre en oeuvre la traçabilité dématérialisée",
+//   templateId: templateIds.PROFESSIONAL_SECOND_ONBOARDING
+// };
 
 export const createPasswordResetRequest: MailTemplate<{
   resetHash: string;
@@ -225,14 +225,14 @@ export const pendingMembershipRequestAdminDetailsEmail: MailTemplate<{
   templateId: templateIds.LAYOUT
 };
 
-export const professionalsSecondOnboardingEmail: MailTemplate = {
+export const profesionalsSecondOnboardingEmail: MailTemplate = {
   subject:
     "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
-  templateId: templateIds.PROFESSIONALS_SECOND_ONBOARDING
+  templateId: templateIds.PROFESIONALS_SECOND_ONBOARDING
 };
 
-export const nonProfessionalsSecondOnboardingEmail: MailTemplate = {
+export const nonProfesionalsSecondOnboardingEmail: MailTemplate = {
   subject:
     "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
-  templateId: templateIds.NON_PROFESSIONALS_SECOND_ONBOARDING
+  templateId: templateIds.NON_PROFESIONALS_SECOND_ONBOARDING
 };

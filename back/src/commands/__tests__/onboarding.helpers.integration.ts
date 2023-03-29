@@ -1,6 +1,7 @@
 import { MembershipRequestStatus, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import {
+  addUserToCompany,
   companyAssociatedToExistingUserFactory,
   companyFactory,
   createMembershipRequest,
@@ -10,11 +11,13 @@ import {
 import {
   getActiveUsersWithPendingMembershipRequests,
   getPendingMembershipRequestsAndAssociatedAdmins,
+  getRecentlyRegisteredProfesionals,
   getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest,
   xDaysAgo
 } from "../onboarding.helpers";
 
 const TODAY = new Date();
+const ONE_DAY_AGO = xDaysAgo(TODAY, 1);
 const TWO_DAYS_AGO = xDaysAgo(TODAY, 2);
 const THREE_DAYS_AGO = xDaysAgo(TODAY, 3);
 const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
@@ -431,5 +434,227 @@ describe("getPendingMembershipRequestsAndAssociatedAdmins", () => {
       .sort();
 
     expect(expectedResult).toEqual(actualResult);
+  });
+});
+
+describe("getRecentlyRegisteredProfesionals", () => {
+  afterEach(resetDatabase);
+
+  it("should return users who created companies who got verified x days ago", async () => {
+    // Given
+
+    // Should be returned
+    const company0AndAdmin0 = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: THREE_DAYS_AGO,
+        verifiedAt: TWO_DAYS_AGO,
+        companyTypes: ["COLLECTOR"]
+      },
+      {},
+      { createdAt: THREE_DAYS_AGO }
+    );
+    const admin0 = company0AndAdmin0.user;
+
+    // Should not be returned because company got verified 3 days ago
+    await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: THREE_DAYS_AGO,
+        verifiedAt: THREE_DAYS_AGO,
+        companyTypes: ["COLLECTOR"]
+      },
+      {},
+      { createdAt: THREE_DAYS_AGO }
+    );
+
+    // Should not be returned because company got verified 1 day ago
+    await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: THREE_DAYS_AGO,
+        verifiedAt: ONE_DAY_AGO,
+        companyTypes: ["COLLECTOR"]
+      },
+      {},
+      { createdAt: THREE_DAYS_AGO }
+    );
+
+    // Should not be returned because is company creator and company got verified 1 day ago
+    await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: TWO_DAYS_AGO,
+        verifiedAt: ONE_DAY_AGO,
+        companyTypes: ["COLLECTOR"]
+      },
+      {},
+      { createdAt: TWO_DAYS_AGO }
+    );
+
+    // When
+    const profesionnals = await getRecentlyRegisteredProfesionals();
+
+    // Then
+    const expectedResult = [
+      {
+        id: admin0.id,
+        name: admin0.name,
+        email: admin0.email
+      }
+    ];
+
+    const actualResult = profesionnals.map(u => ({
+      id: u.id,
+      name: u.name,
+      email: u.email
+    }));
+
+    expect(actualResult).toEqual(expectedResult);
+  });
+
+  it("should not return users who created companies which didn't get verified", async () => {
+    // Given
+
+    // Should be returned
+    await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: THREE_DAYS_AGO,
+        companyTypes: ["COLLECTOR"]
+      },
+      {},
+      { createdAt: THREE_DAYS_AGO }
+    );
+
+    // When
+    const profesionnals = await getRecentlyRegisteredProfesionals();
+
+    // Then
+    expect(profesionnals).toEqual([]);
+  });
+
+  it("should return users who recently joined professional company (previously verified)", async () => {
+    // Given
+
+    // Should be returned
+    const company0AndAdmin0 = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: FOUR_DAYS_AGO,
+        verifiedAt: FOUR_DAYS_AGO,
+        companyTypes: ["COLLECTOR"]
+      },
+      {},
+      { createdAt: FOUR_DAYS_AGO }
+    );
+
+    // Should be returned
+    const company0user1 = await userFactory();
+    addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
+      createdAt: TWO_DAYS_AGO
+    });
+
+    // Should not be returned cause joined 3 days ago
+    const company0user2 = await userFactory();
+    addUserToCompany(company0user2, company0AndAdmin0.company, "MEMBER", {
+      createdAt: THREE_DAYS_AGO
+    });
+
+    // Should not be returned cause joined 1 day ago
+    const company0user3 = await userFactory();
+    addUserToCompany(company0user3, company0AndAdmin0.company, "MEMBER", {
+      createdAt: ONE_DAY_AGO
+    });
+
+    // When
+    const profesionnals = await getRecentlyRegisteredProfesionals();
+
+    // Then
+    expect(profesionnals).toEqual([
+      {
+        id: company0user1.id,
+        name: company0user1.name,
+        email: company0user1.email
+      }
+    ]);
+  });
+
+  it("should not return users who recently joined non-professional company", async () => {
+    // Given
+
+    // Should not be returned because non-profesional
+    const company0AndAdmin0 = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: FOUR_DAYS_AGO,
+        verifiedAt: FOUR_DAYS_AGO,
+        companyTypes: ["PRODUCER"]
+      },
+      {},
+      { createdAt: FOUR_DAYS_AGO }
+    );
+
+    // Should not be returned because non-profesional
+    const company0user1 = await userFactory();
+    addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
+      createdAt: TWO_DAYS_AGO
+    });
+
+    // When
+    const profesionnals = await getRecentlyRegisteredProfesionals();
+
+    // Then
+    expect(profesionnals).toEqual([]);
+  });
+
+  it("should not return creators from non-professional companies", async () => {
+    // Given
+
+    // Should not be returned because not professional
+    await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: THREE_DAYS_AGO,
+        verifiedAt: TWO_DAYS_AGO,
+        companyTypes: ["PRODUCER"]
+      },
+      {},
+      { createdAt: THREE_DAYS_AGO }
+    );
+
+    // When
+    const profesionnals = await getRecentlyRegisteredProfesionals();
+
+    // Then
+    expect(profesionnals).toEqual([]);
+  });
+
+  it("should not return users from non-professional companies", async () => {
+    // Given
+
+    // Should not be returned because not professional
+    const company0AndAdmin0 = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: FOUR_DAYS_AGO,
+        verifiedAt: FOUR_DAYS_AGO,
+        companyTypes: ["PRODUCER"]
+      },
+      {},
+      { createdAt: FOUR_DAYS_AGO }
+    );
+
+    // Should not be returned because belongs to non-profesional company
+    const company0user1 = await userFactory();
+    addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
+      createdAt: TWO_DAYS_AGO
+    });
+
+    // When
+    const profesionnals = await getRecentlyRegisteredProfesionals();
+
+    // Then
+    expect(profesionnals).toEqual([]);
   });
 });

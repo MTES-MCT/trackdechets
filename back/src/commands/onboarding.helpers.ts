@@ -9,13 +9,13 @@ import {
 } from "@prisma/client";
 import * as COMPANY_CONSTANTS from "../common/constants/COMPANY_CONSTANTS";
 import {
-  onboardingProducerSecondStep,
-  onboardingProfessionalSecondStep,
+  // onboardingProducerSecondStep,
+  // onboardingProfesionalSecondStep,
   membershipRequestDetailsEmail,
   pendingMembershipRequestDetailsEmail,
   pendingMembershipRequestAdminDetailsEmail,
-  professionalsSecondOnboardingEmail,
-  nonProfessionalsSecondOnboardingEmail
+  profesionalsSecondOnboardingEmail,
+  nonProfesionalsSecondOnboardingEmail
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
 import { MessageVersion } from "../mailer/types";
@@ -47,7 +47,7 @@ export const getRecentlyAssociatedUsers = async ({
   const associatedDateGt = xDaysAgo(now, daysAgo);
   const associatedDateLt = xDaysAgo(now, daysAgo - 1);
   // retrieve users whose account was created xDaysAgo
-  // and associated company(ies) to tell apart producers and waste professionals according to their type
+  // and associated company(ies) to tell apart producers and waste profesionals according to their type
 
   return prisma.user.findMany({
     where: {
@@ -76,40 +76,40 @@ export const getRecentlyAssociatedUsers = async ({
 //   await prisma.$disconnect();
 // };
 
-type recipientType = User & {
-  companyAssociations: (CompanyAssociation & {
-    company: Company;
-  })[];
-};
+// type recipientType = User & {
+//   companyAssociations: (CompanyAssociation & {
+//     company: Company;
+//   })[];
+// };
 
 // TODO: no longer needed ?
 /**
  * Which email should we send ?
  * We retrieve user company(ies), then check their type
  * If the only type is PRODUCER, we send onboardingProducerSecondStep else
- * we send onboardingProfessionalSecondStep
+ * we send onboardingProfesionalSecondStep
  * We also have to handle users who belong to several companies
  */
-export const selectSecondOnboardingEmail = (recipient: recipientType) => {
-  const companyTypes = new Set(
-    recipient.companyAssociations.flatMap(c => c.company.companyTypes)
-  );
+// export const selectSecondOnboardingEmail = (recipient: recipientType) => {
+//   const companyTypes = new Set(
+//     recipient.companyAssociations.flatMap(c => c.company.companyTypes)
+//   );
 
-  if (
-    [...companyTypes].some(ct => COMPANY_CONSTANTS.PROFESSIONALS.includes(ct))
-  ) {
-    return onboardingProfessionalSecondStep;
-  }
+//   if (
+//     [...companyTypes].some(ct => COMPANY_CONSTANTS.PROFESSIONALS.includes(ct))
+//   ) {
+//     return onboardingProfesionalSecondStep;
+//   }
 
-  return onboardingProducerSecondStep;
-};
+//   return onboardingProducerSecondStep;
+// };
 
 /**
- * Return recently "registered" professionals. That means either:
+ * Return recently "registered" profesionals. That means either:
  * - Users who joined a verified pro company x days ago
  * - Users who joined a pro company that was verified x days ago, before its verification
  */
-export const getRecentlySubscribedProfessionals = async (daysAgo = 2) => {
+export const getRecentlyRegisteredProfesionals = async (daysAgo = 2) => {
   const now = new Date();
 
   const dateGt = xDaysAgo(now, daysAgo);
@@ -124,7 +124,7 @@ export const getRecentlySubscribedProfessionals = async (daysAgo = 2) => {
           companyTypes: {
             hasSome: COMPANY_CONSTANTS.PROFESSIONALS as CompanyType[]
           },
-          verifiedAt: { not: null }
+          verifiedAt: { lte: dateGt }
         }
       },
       include: {
@@ -162,7 +162,7 @@ export const getRecentlySubscribedProfessionals = async (daysAgo = 2) => {
   return uniqueUsers;
 };
 
-export const getRecentlySubscribedNonProfessionals = async (daysAgo = 2) => {
+export const getRecentlyRegisteredNonProfesionals = async (daysAgo = 2) => {
   const now = new Date();
 
   const dateGt = xDaysAgo(now, daysAgo);
@@ -170,8 +170,8 @@ export const getRecentlySubscribedNonProfessionals = async (daysAgo = 2) => {
 
   const associations = await prisma.companyAssociation.findMany({
     where: {
+      createdAt: { gte: dateGt, lt: dateLt },
       company: {
-        createdAt: { gte: dateGt, lt: dateLt },
         companyTypes: {
           hasSome: COMPANY_CONSTANTS.NON_PROFESSIONALS as CompanyType[]
         }
@@ -186,29 +186,33 @@ export const getRecentlySubscribedNonProfessionals = async (daysAgo = 2) => {
 };
 
 /**
- * Second onboarding email. Different for professionals & non-professionals
+ * Second onboarding email. Different for profesionals & non-profesionals
  */
 export const sendSecondOnboardingEmail = async (daysAgo = 2) => {
   // Pros
-  const recentProfessionals = await getRecentlySubscribedProfessionals(daysAgo);
-  const proMessageVersions: MessageVersion[] = recentProfessionals.map(pro => ({
+  const recentProfesionals = await getRecentlyRegisteredProfesionals(daysAgo);
+  const proMessageVersions: MessageVersion[] = recentProfesionals.map(pro => ({
     to: [{ email: pro.email, name: pro.name }]
   }));
-  const proPayload = renderMail(professionalsSecondOnboardingEmail, {
+  const proPayload = renderMail(profesionalsSecondOnboardingEmail, {
     messageVersions: proMessageVersions
   });
   await sendMail(proPayload);
 
-  // Non-pros
-  const recentNonProfessionals = await getRecentlySubscribedNonProfessionals(
+  // Non-pros. If already in pro list, remove (only 1 email, pro has priority)
+  const recentNonProfesionals = await getRecentlyRegisteredNonProfesionals(
     daysAgo
   );
-  const nonProMessageVersions: MessageVersion[] = recentNonProfessionals.map(
+  const profesionalsIds = recentProfesionals.map(p => p.id);
+  const filteredNonProfesionals = recentNonProfesionals.filter(
+    r => !profesionalsIds.includes(r.id)
+  );
+  const nonProMessageVersions: MessageVersion[] = filteredNonProfesionals.map(
     nonPro => ({
       to: [{ email: nonPro.email, name: nonPro.name }]
     })
   );
-  const nonProPayload = renderMail(nonProfessionalsSecondOnboardingEmail, {
+  const nonProPayload = renderMail(nonProfesionalsSecondOnboardingEmail, {
     messageVersions: nonProMessageVersions
   });
   await sendMail(nonProPayload);

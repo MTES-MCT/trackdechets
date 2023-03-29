@@ -119,7 +119,8 @@ export interface UserWithCompany {
 export const userWithCompanyFactory = async (
   role: UserRole,
   companyOpts: Partial<Prisma.CompanyCreateInput> = {},
-  userOpts: Partial<Prisma.UserCreateInput> = {}
+  userOpts: Partial<Prisma.UserCreateInput> = {},
+  companyAssociationOpts: Partial<Prisma.CompanyAssociationCreateInput> = {}
 ): Promise<UserWithCompany> => {
   const company = await companyFactory(companyOpts);
 
@@ -128,7 +129,8 @@ export const userWithCompanyFactory = async (
     companyAssociations: {
       create: {
         company: { connect: { id: company.id } },
-        role: role as UserRole
+        role: role as UserRole,
+        ...companyAssociationOpts
       }
     }
   });
@@ -183,6 +185,24 @@ export const createMembershipRequest = async (
       ...opt
     }
   });
+};
+
+export const addUserToCompany = async (
+  user: User,
+  company: Company,
+  role: UserRole = "MEMBER",
+  opt: Partial<Prisma.CompanyAssociationCreateInput> = {}
+) => {
+  await prisma.companyAssociation.create({
+    data: {
+      company: { connect: { id: company.id } },
+      user: { connect: { id: user.id } },
+      role: role,
+      ...opt
+    }
+  });
+
+  return company;
 };
 
 const formdata = {
