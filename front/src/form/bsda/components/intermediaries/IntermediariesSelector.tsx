@@ -2,7 +2,11 @@ import cogoToast from "cogo-toast";
 import { IconClose } from "common/components/Icons";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { FieldArray, FieldProps } from "formik";
-import { CompanyInput, CompanySearchResult } from "generated/graphql/types";
+import {
+  CompanyInput,
+  CompanySearchPrivate,
+  CompanySearchResult,
+} from "generated/graphql/types";
 import React, { useCallback } from "react";
 
 export function IntermediariesSelector({
@@ -10,7 +14,7 @@ export function IntermediariesSelector({
   maxNbOfIntermediaries,
 }: FieldProps<CompanyInput[]> & { maxNbOfIntermediaries?: number }) {
   const onIntermediarySelectedCallback = useCallback(
-    (company: CompanySearchResult) => {
+    (company: CompanySearchResult | CompanySearchPrivate) => {
       if (!company.isRegistered) {
         cogoToast.warn(
           `Intermédiaire: l'établissement sélectionné n'est pas enregistré sur Trackdéchets, le suivi du bordereau ne sera pas possible sur la plateforme`,

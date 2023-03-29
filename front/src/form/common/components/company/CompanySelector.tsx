@@ -19,11 +19,13 @@ import React, { useMemo, useRef, useState } from "react";
 import { debounce } from "common/helper";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import {
-  BsdasriTransporter,
+  BsdasriTransporterInput,
   BsdaTransporter,
-  BsvhuTransporter,
+  BsdaTransporterInput,
+  BsvhuTransporterInput,
   CompanyFavorite,
   CompanySearchResult,
+  CompanySearchPrivate,
   FavoriteType,
   FormCompany,
   Maybe,
@@ -32,6 +34,7 @@ import {
   QueryFavoritesArgs,
   QuerySearchCompaniesArgs,
   Transporter,
+  TransporterInput,
 } from "generated/graphql/types";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -49,7 +52,9 @@ const DEBOUNCE_DELAY = 500;
 
 interface CompanySelectorProps {
   name: string;
-  onCompanySelected?: (company: CompanySearchResult) => void;
+  onCompanySelected?: (
+    company: CompanySearchResult | CompanySearchPrivate
+  ) => void;
   allowForeignCompanies?: boolean;
   registeredOnlyCompanies?: boolean;
   heading?: string;
@@ -86,10 +91,10 @@ export default function CompanySelector({
   const { setFieldError, setFieldValue, setFieldTouched, values } =
     useFormikContext<{
       transporter:
-        | Maybe<Transporter>
-        | Maybe<BsdaTransporter>
-        | Maybe<BsdasriTransporter>
-        | Maybe<BsvhuTransporter>
+        | Maybe<TransporterInput>
+        | Maybe<BsdaTransporterInput>
+        | Maybe<BsdasriTransporterInput>
+        | Maybe<BsvhuTransporterInput>
         | Maybe<BsffFormTransporterInput>;
     }>();
 
@@ -179,12 +184,7 @@ export default function CompanySelector({
     },
     skip: !orgId,
     onCompleted(data) {
-      setFieldValue("transporter.recepisse", {
-        number: data.companyPrivateInfos.transporterReceipt?.receiptNumber,
-        validityLimit:
-          data.companyPrivateInfos.transporterReceipt?.validityLimit,
-        department: data.companyPrivateInfos.transporterReceipt?.department,
-      });
+      onCompanySelected?.(data.companyPrivateInfos);
     },
   });
 
