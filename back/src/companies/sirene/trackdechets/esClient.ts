@@ -12,6 +12,11 @@ if (fs.existsSync(certPath)) {
   ssl = { ca: process.env.TD_COMPANY_ELASTICSEARCH_CACERT };
 }
 
+// bypass ssl verif
+if (process.env.TD_COMPANY_ELASTICSEARCH_IGNORE_SSL === "true") {
+  ssl.rejectUnauthorized = false;
+}
+
 const client = new Client({
   node: process.env.TD_COMPANY_ELASTICSEARCH_URL || "http://elasticsearch:9200",
   ssl
