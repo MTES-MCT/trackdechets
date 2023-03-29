@@ -130,7 +130,7 @@ describe("Mutation.Bsda.createDraft", () => {
       }
     );
 
-    expect(data.createDraftBsda.destination.company).toMatchObject(
+    expect(data.createDraftBsda.destination!.company).toMatchObject(
       input.destination.company
     );
   });
@@ -160,7 +160,7 @@ describe("Mutation.Bsda.createDraft", () => {
       }
     );
     expect(errors).toBeUndefined();
-    const bsda = await prisma.bsda.findUnique({
+    const bsda = await prisma.bsda.findUniqueOrThrow({
       where: { id: data.createDraftBsda.id }
     });
     expect(bsda.workerIsDisabled).toEqual(false);

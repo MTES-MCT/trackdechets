@@ -59,25 +59,25 @@ describe("mutation sendMembershipRequest", () => {
         variables: { siret: company.siret }
       }
     );
-    const { id, status, sentTo, email, siret } = data.sendMembershipRequest;
+    const { id, status, sentTo, email, siret } = data.sendMembershipRequest!;
     expect(status).toEqual("PENDING");
     // emails should be hidden
     expect(sentTo).toEqual(["jo****@trackdechets.fr"]);
     expect(email).toEqual(requester.email);
     expect(siret).toEqual(company.siret);
-    const membershipRequest = await prisma.membershipRequest.findUnique({
+    const membershipRequest = await prisma.membershipRequest.findUniqueOrThrow({
       where: { id }
     });
 
     // check relation to user was created
     const linkedUser = await prisma.membershipRequest
-      .findUnique({ where: { id } })
+      .findUniqueOrThrow({ where: { id } })
       .user();
     expect(linkedUser.id).toEqual(requester.id);
 
     // check relation to company was created
     const linkedCompany = await prisma.membershipRequest
-      .findUnique({ where: { id } })
+      .findUniqueOrThrow({ where: { id } })
       .company();
     expect(linkedCompany.id).toEqual(company.id);
 
@@ -129,25 +129,25 @@ describe("mutation sendMembershipRequest", () => {
         variables: { siret: company.siret }
       }
     );
-    const { id, status, sentTo, email, siret } = data.sendMembershipRequest;
+    const { id, status, sentTo, email, siret } = data.sendMembershipRequest!;
     expect(status).toEqual("PENDING");
     // emails should be hidden
     expect(sentTo).toEqual([`admin${userIndex}@trackdechets.fr`]);
     expect(email).toEqual(requester.email);
     expect(siret).toEqual(company.siret);
-    const membershipRequest = await prisma.membershipRequest.findUnique({
+    const membershipRequest = await prisma.membershipRequest.findUniqueOrThrow({
       where: { id }
     });
 
     // check relation to user was created
     const linkedUser = await prisma.membershipRequest
-      .findUnique({ where: { id } })
+      .findUniqueOrThrow({ where: { id } })
       .user();
     expect(linkedUser.id).toEqual(requester.id);
 
     // check relation to company was created
     const linkedCompany = await prisma.membershipRequest
-      .findUnique({ where: { id } })
+      .findUniqueOrThrow({ where: { id } })
       .company();
     expect(linkedCompany.id).toEqual(company.id);
 

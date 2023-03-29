@@ -26,7 +26,7 @@ describe.skip("setCompanyName", () => {
     // LP, name is not set
     const lp = await companyFactory({
       siret: siretify(2),
-      name: null
+      name: null as any
     });
     const resp1 = { status: 200, data: { name: "LP" } };
     (axios.get as jest.Mock).mockResolvedValueOnce(resp1);
@@ -35,7 +35,7 @@ describe.skip("setCompanyName", () => {
     // Code en stock, name is not set
     const codeEnStock = await companyFactory({
       siret,
-      name: null
+      name: null as any
     });
     const resp2 = { status: 200, data: { name: "CODE EN STOCK" } };
     (axios.get as jest.Mock).mockResolvedValueOnce(resp2);
@@ -43,7 +43,7 @@ describe.skip("setCompanyName", () => {
     // Unknown SIRET, name is not set
     const unknown = await companyFactory({
       siret: "xxxxxxxxxxxxxx",
-      name: null
+      name: null as any
     });
 
     // expect insee service to retunr 404
@@ -53,29 +53,29 @@ describe.skip("setCompanyName", () => {
     await setCompanyName();
 
     // Frontier name was already set, it should be unchanged
-    const frontierUpdated = await prisma.company.findUnique({
-      where: { siret: frontier.siret }
+    const frontierUpdated = await prisma.company.findUniqueOrThrow({
+      where: { siret: frontier.siret! }
     });
     expect(frontierUpdated.name).toEqual(frontier.name);
 
     // LP name should be set
-    const lpUpdated = await prisma.company.findUnique({
-      where: { siret: lp.siret }
+    const lpUpdated = await prisma.company.findUniqueOrThrow({
+      where: { siret: lp.siret! }
     });
     expect(lpUpdated.name).toEqual("LP");
 
     // Code en Stock name should be set
-    const codeEnStockUpdated = await prisma.company.findUnique({
+    const codeEnStockUpdated = await prisma.company.findUniqueOrThrow({
       where: {
-        siret: codeEnStock.siret
+        siret: codeEnStock.siret!
       }
     });
     expect(codeEnStockUpdated.name).toEqual("CODE EN STOCK");
 
     // Unknown company name should not be set
-    const unknownUpdated = await prisma.company.findUnique({
+    const unknownUpdated = await prisma.company.findUniqueOrThrow({
       where: {
-        siret: unknown.siret
+        siret: unknown.siret!
       }
     });
     expect(unknownUpdated.name).toBeNull();

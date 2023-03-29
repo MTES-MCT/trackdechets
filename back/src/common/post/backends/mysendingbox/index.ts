@@ -5,7 +5,7 @@ const MY_SENDING_BOX_URL = "https://api.MySendingBox.fr";
 const { MY_SENDING_BOX_API_KEY } = process.env;
 
 const config = {
-  auth: { username: MY_SENDING_BOX_API_KEY, password: "" }
+  auth: { username: MY_SENDING_BOX_API_KEY!, password: "" }
 };
 
 const mysendingboxBackend = {

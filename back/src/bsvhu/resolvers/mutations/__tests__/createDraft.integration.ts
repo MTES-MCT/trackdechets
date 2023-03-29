@@ -128,7 +128,7 @@ describe("Mutation.Vhu.createDraft", () => {
       }
     );
 
-    expect(data.createDraftBsvhu.destination.company).toMatchObject(
+    expect(data.createDraftBsvhu.destination!.company).toMatchObject(
       input.destination.company
     );
     // check input is sirenified

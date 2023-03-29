@@ -4,7 +4,7 @@ import { Client } from "@elastic/elasticsearch";
 
 const certPath = path.join(__dirname, "es.cert");
 
-let ssl = undefined;
+let ssl;
 
 if (fs.existsSync(certPath)) {
   ssl = { ca: fs.readFileSync(certPath, "utf-8") };

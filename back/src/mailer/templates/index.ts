@@ -98,7 +98,7 @@ export const formPartiallyRefused: MailTemplate<{ form: Form }> = {
           form.transporterCompanyName
         ),
         quantityPartiallyRefused:
-          form.wasteDetailsQuantity - form.quantityReceived,
+          form.wasteDetailsQuantity! - form.quantityReceived!,
         receivedAt: form.receivedAt
           ? toFrFormat(new Date(form.receivedAt))
           : "",

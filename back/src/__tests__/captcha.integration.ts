@@ -178,7 +178,9 @@ describe("POST /login", () => {
     // should send trackdechets.connect.sid cookie
     expect(login.header["set-cookie"]).toHaveLength(1);
     const cookieRegExp = new RegExp(
-      `${sess.name}=(.+); Domain=${sess.cookie.domain}; Path=/; Expires=.+; HttpOnly`
+      `${sess.name}=(.+); Domain=${
+        sess.cookie!.domain
+      }; Path=/; Expires=.+; HttpOnly`
     );
     const sessionCookie = login.header["set-cookie"][0];
     expect(sessionCookie).toMatch(cookieRegExp);

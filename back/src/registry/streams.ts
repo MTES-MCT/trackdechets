@@ -20,7 +20,7 @@ export class WasteReader extends Readable {
 export interface WasteReaderArgs {
   registryType: WasteRegistryType;
   sirets: string[];
-  where?: WasteRegistryWhere;
+  where?: WasteRegistryWhere | null;
   chunk?: number;
 }
 

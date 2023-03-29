@@ -28,12 +28,12 @@ describe("sirenify", () => {
     }
 
     const searchResults = {
-      [emitter.company.siret]: searchResult("émetteur"),
-      [transporter.company.siret]: searchResult("transporteur"),
-      [destination.company.siret]: searchResult("destinataire"),
-      [worker.company.siret]: searchResult("courtier"),
-      [intermediary1.company.siret]: searchResult("intermédiaire 1"),
-      [intermediary2.company.siret]: searchResult("intermédiaire 2")
+      [emitter.company.siret!]: searchResult("émetteur"),
+      [transporter.company.siret!]: searchResult("transporteur"),
+      [destination.company.siret!]: searchResult("destinataire"),
+      [worker.company.siret!]: searchResult("courtier"),
+      [intermediary1.company.siret!]: searchResult("intermédiaire 1"),
+      [intermediary2.company.siret!]: searchResult("intermédiaire 2")
     };
 
     searchCompanySpy.mockImplementation((clue: string) => {
@@ -90,41 +90,41 @@ describe("sirenify", () => {
       auth: AuthType.Bearer
     } as Express.User);
 
-    expect(sirenified.emitter.company.name).toEqual(
-      searchResults[emitter.company.siret].name
+    expect(sirenified.emitter!.company!.name).toEqual(
+      searchResults[emitter.company.siret!].name
     );
-    expect(sirenified.emitter.company.address).toEqual(
-      searchResults[emitter.company.siret].address
+    expect(sirenified.emitter!.company!.address).toEqual(
+      searchResults[emitter.company.siret!].address
     );
-    expect(sirenified.transporter.company.name).toEqual(
-      searchResults[transporter.company.siret].name
+    expect(sirenified.transporter!.company!.name).toEqual(
+      searchResults[transporter.company.siret!].name
     );
-    expect(sirenified.transporter.company.address).toEqual(
-      searchResults[transporter.company.siret].address
+    expect(sirenified.transporter!.company!.address).toEqual(
+      searchResults[transporter.company.siret!].address
     );
-    expect(sirenified.destination.company.name).toEqual(
-      searchResults[destination.company.siret].name
+    expect(sirenified.destination!.company!.name).toEqual(
+      searchResults[destination.company.siret!].name
     );
-    expect(sirenified.destination.company.address).toEqual(
-      searchResults[destination.company.siret].address
+    expect(sirenified.destination!.company!.address).toEqual(
+      searchResults[destination.company.siret!].address
     );
-    expect(sirenified.worker.company.name).toEqual(
-      searchResults[worker.company.siret].name
+    expect(sirenified.worker!.company!.name).toEqual(
+      searchResults[worker.company.siret!].name
     );
-    expect(sirenified.worker.company.address).toEqual(
-      searchResults[worker.company.siret].address
+    expect(sirenified.worker!.company!.address).toEqual(
+      searchResults[worker.company.siret!].address
     );
-    expect(sirenified.intermediaries[0].name).toEqual(
-      searchResults[intermediary1.company.siret].name
+    expect(sirenified.intermediaries![0].name).toEqual(
+      searchResults[intermediary1.company.siret!].name
     );
-    expect(sirenified.intermediaries[0].address).toEqual(
-      searchResults[intermediary1.company.siret].address
+    expect(sirenified.intermediaries![0].address).toEqual(
+      searchResults[intermediary1.company.siret!].address
     );
-    expect(sirenified.intermediaries[1].name).toEqual(
-      searchResults[intermediary2.company.siret].name
+    expect(sirenified.intermediaries![1].name).toEqual(
+      searchResults[intermediary2.company.siret!].name
     );
-    expect(sirenified.intermediaries[1].address).toEqual(
-      searchResults[intermediary2.company.siret].address
+    expect(sirenified.intermediaries![1].address).toEqual(
+      searchResults[intermediary2.company.siret!].address
     );
   });
 
@@ -145,12 +145,12 @@ describe("sirenify", () => {
     }
 
     const searchResults = {
-      [emitter.company.siret]: searchResult("émetteur"),
-      [transporter.company.siret]: searchResult("transporteur"),
-      [destination.company.siret]: searchResult("destinataire"),
-      [worker.company.siret]: searchResult("courtier"),
-      [intermediary1.company.siret]: searchResult("intermédiaire 1"),
-      [intermediary2.company.siret]: searchResult("intermédiaire 2")
+      [emitter.company.siret!]: searchResult("émetteur"),
+      [transporter.company.siret!]: searchResult("transporteur"),
+      [destination.company.siret!]: searchResult("destinataire"),
+      [worker.company.siret!]: searchResult("courtier"),
+      [intermediary1.company.siret!]: searchResult("intermédiaire 1"),
+      [intermediary2.company.siret!]: searchResult("intermédiaire 2")
     };
 
     searchCompanySpy.mockImplementation((clue: string) => {
@@ -193,41 +193,41 @@ describe("sirenify", () => {
       auth: AuthType.Bearer
     } as Express.User);
 
-    expect(sirenified.emitter.company.name).toEqual(
-      searchResults[emitter.company.siret].name
+    expect(sirenified.emitter!.company!.name).toEqual(
+      searchResults[emitter.company.siret!].name
     );
-    expect(sirenified.emitter.company.address).toEqual(
-      searchResults[emitter.company.siret].address
+    expect(sirenified.emitter!.company!.address).toEqual(
+      searchResults[emitter.company.siret!].address
     );
-    expect(sirenified.transporter.company.name).toEqual(
-      searchResults[transporter.company.siret].name
+    expect(sirenified.transporter!.company!.name).toEqual(
+      searchResults[transporter.company.siret!].name
     );
-    expect(sirenified.transporter.company.address).toEqual(
-      searchResults[transporter.company.siret].address
+    expect(sirenified.transporter!.company!.address).toEqual(
+      searchResults[transporter.company.siret!].address
     );
-    expect(sirenified.destination.company.name).toEqual(
-      searchResults[destination.company.siret].name
+    expect(sirenified.destination!.company!.name).toEqual(
+      searchResults[destination.company.siret!].name
     );
-    expect(sirenified.destination.company.address).toEqual(
-      searchResults[destination.company.siret].address
+    expect(sirenified.destination!.company!.address).toEqual(
+      searchResults[destination.company.siret!].address
     );
-    expect(sirenified.worker.company.name).toEqual(
-      searchResults[worker.company.siret].name
+    expect(sirenified.worker!.company!.name).toEqual(
+      searchResults[worker.company.siret!].name
     );
-    expect(sirenified.worker.company.address).toEqual(
-      searchResults[worker.company.siret].address
+    expect(sirenified.worker!.company!.address).toEqual(
+      searchResults[worker.company.siret!].address
     );
-    expect(sirenified.intermediaries[0].name).toEqual(
-      searchResults[intermediary1.company.siret].name
+    expect(sirenified.intermediaries![0].name).toEqual(
+      searchResults[intermediary1.company.siret!].name
     );
-    expect(sirenified.intermediaries[0].address).toEqual(
-      searchResults[intermediary1.company.siret].address
+    expect(sirenified.intermediaries![0].address).toEqual(
+      searchResults[intermediary1.company.siret!].address
     );
-    expect(sirenified.intermediaries[1].name).toEqual(
-      searchResults[intermediary2.company.siret].name
+    expect(sirenified.intermediaries![1].name).toEqual(
+      searchResults[intermediary2.company.siret!].name
     );
-    expect(sirenified.intermediaries[1].address).toEqual(
-      searchResults[intermediary2.company.siret].address
+    expect(sirenified.intermediaries![1].address).toEqual(
+      searchResults[intermediary2.company.siret!].address
     );
   });
 });

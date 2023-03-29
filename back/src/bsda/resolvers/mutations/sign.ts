@@ -27,7 +27,7 @@ import { getTransporterCompanyOrgId } from "../../../common/constants/companySea
 type SignatureTypeInfos = {
   dbDateKey: keyof Bsda;
   dbAuthorKey: keyof Bsda;
-  getAuthorizedSiret: (form: Bsda) => string;
+  getAuthorizedSiret: (form: Bsda) => string | null;
 };
 
 export default async function sign(
@@ -65,7 +65,7 @@ export default async function sign(
   } = bsda;
   // Check that all necessary fields are filled
   await validateBsda(
-    simpleBsda,
+    simpleBsda as any,
     { previousBsdas: [], intermediaries: [] },
     {
       skipPreviousBsdas: true,
@@ -158,9 +158,15 @@ const signatureTypeMapping: Record<BsdaSignatureType, SignatureTypeInfos> = {
 };
 
 function checkAuthorization(
-  requestInfo: { currentUserId: string; securityCode?: number },
-  signingCompanySiret: string
+  requestInfo: { currentUserId: string; securityCode?: number | null },
+  signingCompanySiret: string | null
 ) {
+  if (!signingCompanySiret) {
+    throw new UserInputError(
+      "SIRET manquant pour pouvoir apposer cette signature."
+    );
+  }
+
   // If there is a security code provided, it must be authorized
   if (requestInfo.securityCode) {
     return checkSecurityCode(signingCompanySiret, requestInfo.securityCode);
@@ -210,23 +216,23 @@ async function sendAlertIfFollowingBsdaChangedPlannedDestination(bsda: Bsda) {
       const mail = renderMail(finalDestinationModified, {
         to: [
           {
-            email: previousBsda.emitterCompanyMail,
-            name: previousBsda.emitterCompanyName
+            email: previousBsda.emitterCompanyMail!,
+            name: previousBsda.emitterCompanyName!
           }
         ],
         variables: {
           id: previousBsda.id,
           emitter: {
-            siret: bsda.emitterCompanySiret,
-            name: bsda.emitterCompanyName
+            siret: bsda.emitterCompanySiret!,
+            name: bsda.emitterCompanyName!
           },
           destination: {
-            siret: bsda.destinationCompanySiret,
-            name: bsda.destinationCompanyName
+            siret: bsda.destinationCompanySiret!,
+            name: bsda.destinationCompanyName!
           },
           plannedDestination: {
             siret: previousBsda.destinationOperationNextDestinationCompanySiret,
-            name: previousBsda.destinationOperationNextDestinationCompanyName
+            name: previousBsda.destinationOperationNextDestinationCompanyName!
           }
         }
       });

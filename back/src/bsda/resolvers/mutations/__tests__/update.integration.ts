@@ -313,7 +313,7 @@ describe("Mutation.updateBsda", () => {
       }
     });
 
-    expect(data.updateBsda.transporter.recepisse.number).toEqual(
+    expect(data.updateBsda.transporter!.recepisse!.number).toEqual(
       "Num recepisse"
     );
   });
@@ -466,7 +466,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toBeUndefined();
 
     const actualForwarded = await prisma.bsda
-      .findUnique({ where: { id: bsda.id } })
+      .findUniqueOrThrow({ where: { id: bsda.id } })
       .forwarding();
 
     expect(actualForwarded.id).toEqual(newForwarded.id);
@@ -550,7 +550,7 @@ describe("Mutation.updateBsda", () => {
         emitterCompanySiret: company.siret,
         intermediaries: {
           create: {
-            siret: company.siret,
+            siret: company.siret!,
             name: company.name,
             address: company.address,
             contact: "John Doe"
@@ -581,8 +581,8 @@ describe("Mutation.updateBsda", () => {
       }
     });
 
-    expect(data.updateBsda.intermediaries.length).toBe(1);
-    expect(data.updateBsda.intermediaries[0].siret).toBe(otherCompany.siret);
+    expect(data.updateBsda.intermediaries!.length).toBe(1);
+    expect(data.updateBsda.intermediaries![0].siret).toBe(otherCompany.siret);
   });
 
   it("should ignore intermediaries update if the value hasn't changed", async () => {
@@ -595,7 +595,7 @@ describe("Mutation.updateBsda", () => {
         transporterTransportSignatureDate: new Date(),
         intermediaries: {
           create: {
-            siret: company.siret,
+            siret: company.siret!,
             name: company.name,
             address: company.address,
             contact: "John Doe"
@@ -628,7 +628,7 @@ describe("Mutation.updateBsda", () => {
       }
     });
 
-    expect(data.updateBsda.intermediaries.length).toBe(1);
+    expect(data.updateBsda.intermediaries!.length).toBe(1);
   });
 
   it("should reject if updating intermediaries when its value is locked", async () => {
@@ -644,7 +644,7 @@ describe("Mutation.updateBsda", () => {
         transporterTransportSignatureDate: new Date(),
         intermediaries: {
           create: {
-            siret: company.siret,
+            siret: company.siret!,
             name: company.name,
             address: company.address,
             contact: "John Doe"

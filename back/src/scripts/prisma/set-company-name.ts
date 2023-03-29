@@ -7,9 +7,12 @@ function sleep(ms) {
 
 export async function setCompanyName() {
   // filter companies where name field is not set
-  const companies = await prisma.company.findMany({ where: { name: null } });
+  const companies = await prisma.company.findMany({
+    where: { name: null as any }
+  });
 
   for (const company of companies) {
+    if (!company.siret) continue;
     console.log(`Setting name for company ${company.siret}`);
 
     try {
@@ -17,7 +20,7 @@ export async function setCompanyName() {
 
       await prisma.company.update({
         data: {
-          name: companyInfo.name
+          name: companyInfo.name!
         },
         where: {
           id: company.id

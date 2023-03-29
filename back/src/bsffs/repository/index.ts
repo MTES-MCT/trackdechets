@@ -9,6 +9,7 @@ import { buildCreateBsff } from "./bsff/create";
 import { buildUpdateBsff } from "./bsff/update";
 import { buildUpdateBsffPackaging } from "./bsffPackaging/update";
 import {
+  PrismaTransaction,
   RepositoryFnBuilder,
   RepositoryTransaction
 } from "../../common/repository/types";
@@ -39,7 +40,7 @@ export type BsffRepository = BsffActions;
 export type BsffPackagingRepository = BsffPackagingActions;
 export type BsffFicheInterventionRepository = BsffFicheInterventionActions;
 
-export function getReadonlyBsffRepository(transaction?: RepositoryTransaction) {
+export function getReadonlyBsffRepository(transaction?: PrismaTransaction) {
   const deps = { prisma: transaction ?? prisma };
   return {
     count: buildCountBsff(deps),
@@ -52,7 +53,7 @@ export function getReadonlyBsffRepository(transaction?: RepositoryTransaction) {
 }
 
 export function getReadonlyBsffPackagingRepository(
-  transaction?: RepositoryTransaction
+  transaction?: PrismaTransaction
 ) {
   const deps = { prisma: transaction ?? prisma };
   return {
@@ -68,7 +69,7 @@ export function getReadonlyBsffPackagingRepository(
 }
 
 export function getReadonlyBsffFicheInterventionRepository(
-  transaction?: RepositoryTransaction
+  transaction?: PrismaTransaction
 ) {
   const deps = { prisma: transaction ?? prisma };
   return {

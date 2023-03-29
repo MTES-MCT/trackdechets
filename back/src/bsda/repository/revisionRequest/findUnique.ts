@@ -4,7 +4,7 @@ import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 export type FindUniqueRevisionRequestFn = (
   where: Prisma.BsdaRevisionRequestWhereUniqueInput,
   options?: Omit<Prisma.BsdaRevisionRequestFindUniqueArgs, "where">
-) => Promise<BsdaRevisionRequest>;
+) => Promise<BsdaRevisionRequest | null>;
 
 export function buildFindUniqueRevisionRequest({
   prisma

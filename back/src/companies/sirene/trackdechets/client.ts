@@ -13,7 +13,7 @@ import {
 import client from "./esClient";
 
 const { ResponseError } = errors;
-const index = process.env.TD_COMPANY_ELASTICSEARCH_INDEX;
+const index = process.env.TD_COMPANY_ELASTICSEARCH_INDEX!;
 
 /**
  * Specific Error class
@@ -144,6 +144,9 @@ export const searchCompany = async (
       id: siret,
       index
     });
+    if (!response.body._source) {
+      throw new Error(`No _source in ES body for id ${siret} & index ${index}`);
+    }
     const company = searchResponseToCompany(response.body._source);
     if (company.statutDiffusionEtablissement === "N") {
       throw new AnonymousCompanyError();
@@ -200,7 +203,7 @@ export const searchCompanies = (
     }
   ];
 
-  if (department?.length >= 2 && department?.length <= 3) {
+  if (department && department.length >= 2 && department.length <= 3) {
     // this might a french department code
     must.push({
       wildcard: { codePostalEtablissement: `${department}*` }

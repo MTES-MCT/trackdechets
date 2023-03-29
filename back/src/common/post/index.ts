@@ -27,6 +27,11 @@ function truncate(s: string) {
 }
 
 export async function sendVerificationCodeLetter(company: Company) {
+  if (!company.siret) {
+    throw new Error(
+      `Cannot send verification code letter, company ${company.id} hyas no siret`
+    );
+  }
   const sireneInfo = await searchCompany(company.siret);
   const admin = await prisma.companyAssociation
     .findFirst({
@@ -38,8 +43,8 @@ export async function sendVerificationCodeLetter(company: Company) {
     return sendLetter({
       description: "Code de vérification",
       to: {
-        address_line1: truncate(sireneInfo.addressVoie),
-        address_city: truncate(sireneInfo.addressCity),
+        address_line1: truncate(sireneInfo.addressVoie ?? ""),
+        address_city: truncate(sireneInfo.addressCity ?? ""),
         address_postalcode: sireneInfo.addressPostalCode,
         address_country: "France",
         company: truncate(company.name),

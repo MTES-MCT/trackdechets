@@ -55,5 +55,5 @@ type Query {
   Ce token doit être transmis à la route /download pour obtenir le fichier.
   Il est valable 10 secondes
   """
-  bsvhuPdf("ID d'un bordereau" id: ID): FileDownload!
+  bsvhuPdf("ID d'un bordereau" id: ID!): FileDownload!
 }

@@ -60,7 +60,7 @@ describe("{ mutation { prepareSegment } }", () => {
       }`
     );
 
-    const segment = await prisma.transportSegment.findUnique({
+    const segment = await prisma.transportSegment.findUniqueOrThrow({
       where: { id: data.prepareSegment.id }
     });
 
@@ -109,7 +109,7 @@ describe("{ mutation { prepareSegment } }", () => {
       }`
     );
 
-    const segment = await prisma.transportSegment.findUnique({
+    const segment = await prisma.transportSegment.findUniqueOrThrow({
       where: { id: data.prepareSegment.id }
     });
 
@@ -186,8 +186,10 @@ describe("{ mutation { prepareSegment } }", () => {
       }`
     );
 
-    expect(data.prepareSegment.transporter.company.siret).toBe(company2.siret);
-    const segment = await prisma.transportSegment.findFirst({
+    expect(data.prepareSegment.transporter!.company!.siret).toBe(
+      company2.siret
+    );
+    const segment = await prisma.transportSegment.findFirstOrThrow({
       where: { form: { id: form.id } }
     });
 
@@ -241,7 +243,9 @@ describe("{ mutation { prepareSegment } }", () => {
       }`
     );
 
-    expect(data2.prepareSegment.transporter.company.siret).toBe(company3.siret);
+    expect(data2.prepareSegment.transporter!.company!.siret).toBe(
+      company3.siret
+    );
     const { errors: markReadyErrors2 } = await mutate2(
       `mutation  {
         markSegmentAsReadyToTakeOver(id:"${data2.prepareSegment.id}") {
@@ -328,7 +332,7 @@ describe("{ mutation { prepareSegment } }", () => {
       }`
     );
     expect(errors).toBeUndefined();
-    expect(data3.prepareSegment.transporter.company.siret).toBe(
+    expect(data3.prepareSegment.transporter!.company!.siret).toBe(
       transporterCompanySiret
     );
   });

@@ -67,8 +67,8 @@ export function getFormRepository(
 
   const formRevisionRequestActions: FormRevisionRequestActions = {
     // READ operations
-    getRevisionRequestById: buildGetRevisionRequestById({ prisma, user }),
-    countRevisionRequests: buildCountRevisionRequests({ prisma, user }),
+    getRevisionRequestById: buildGetRevisionRequestById({ prisma }),
+    countRevisionRequests: buildCountRevisionRequests({ prisma }),
     // WRITE operations - wrapped into a transaction
     cancelRevisionRequest: useTransaction(buildCancelRevisionRequest),
     createRevisionRequest: useTransaction(buildCreateRevisionRequest),

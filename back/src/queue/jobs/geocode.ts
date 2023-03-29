@@ -6,7 +6,7 @@ import { Company } from "@prisma/client";
 
 export async function geocodeJob(
   job: Job<GeocodeJobData>
-): Promise<Pick<Company, "siret" | "latitude" | "longitude">> {
+): Promise<Pick<Company, "siret" | "latitude" | "longitude"> | null> {
   const { latitude, longitude } = await geocode(job.data.address);
   if (latitude && longitude) {
     return prisma.company.update({

@@ -153,7 +153,7 @@ describe("mutation resetPassword", () => {
       await redisClient.exists(genUserSessionsIdsKey(user.id))
     ).toBeFalsy();
 
-    const updatedUser = await prisma.user.findUnique({
+    const updatedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }
     });
 
@@ -195,7 +195,7 @@ describe("mutation resetPassword", () => {
     });
     expect(resetHashExists).toEqual(1);
 
-    const updatedUser = await prisma.user.findUnique({
+    const updatedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }
     });
 
@@ -236,7 +236,7 @@ describe("mutation resetPassword", () => {
     });
     expect(resetHashExists).toEqual(1);
 
-    const updatedUser = await prisma.user.findUnique({
+    const updatedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }
     });
 
@@ -278,7 +278,7 @@ describe("mutation resetPassword", () => {
     });
     expect(resetHashExists).toEqual(1);
 
-    const updatedUser = await prisma.user.findUnique({
+    const updatedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }
     });
 

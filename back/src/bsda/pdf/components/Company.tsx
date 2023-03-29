@@ -2,7 +2,7 @@ import * as React from "react";
 import { FormCompany } from "../../../generated/graphql/types";
 
 type Props = {
-  company?: FormCompany;
+  company?: FormCompany | null;
 };
 
 export function CompanyDescription({ company }: Props) {

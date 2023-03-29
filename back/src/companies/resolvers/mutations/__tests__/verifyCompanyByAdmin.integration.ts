@@ -87,8 +87,8 @@ describe("mutation verifyCompanyByAdmin", () => {
       }
     });
 
-    const verifiedCompany = await prisma.company.findUnique({
-      where: { siret: company.siret }
+    const verifiedCompany = await prisma.company.findUniqueOrThrow({
+      where: { siret: company.siret! }
     });
 
     expect(verifiedCompany.verificationStatus).toEqual(
@@ -123,7 +123,7 @@ describe("mutation verifyCompanyByAdmin", () => {
       }
     });
 
-    const verifiedCompany = await prisma.company.findUnique({
+    const verifiedCompany = await prisma.company.findUniqueOrThrow({
       where: { orgId: company.orgId }
     });
 

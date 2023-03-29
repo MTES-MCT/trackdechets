@@ -101,7 +101,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       data: {
         bsddId: bsdd.id,
         authoringCompanyId: company.id,
-        approvals: { create: { approverSiret: companyOfSomeoneElse.siret } },
+        approvals: { create: { approverSiret: companyOfSomeoneElse.siret! } },
         comment: ""
       }
     });
@@ -134,7 +134,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       data: {
         bsddId: bsdd.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -168,8 +168,8 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
         authoringCompanyId: secondCompany.id,
         approvals: {
           create: [
-            { approverSiret: company.siret },
-            { approverSiret: thirdCompany.siret }
+            { approverSiret: company.siret! },
+            { approverSiret: thirdCompany.siret! }
           ]
         },
         comment: ""
@@ -190,13 +190,13 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     expect(
       data.submitFormRevisionRequestApproval.approvals.find(
         val => val.approverSiret === company.siret
-      ).status
+      )!.status
     ).toBe("ACCEPTED");
 
     expect(
       data.submitFormRevisionRequestApproval.approvals.find(
         val => val.approverSiret === thirdCompany.siret
-      ).status
+      )!.status
     ).toBe("PENDING");
   });
 
@@ -217,8 +217,8 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
         authoringCompanyId: secondCompany.id,
         approvals: {
           create: [
-            { approverSiret: company.siret },
-            { approverSiret: thirdCompany.siret }
+            { approverSiret: company.siret! },
+            { approverSiret: thirdCompany.siret! }
           ]
         },
         comment: ""
@@ -237,7 +237,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
     expect(
       data.submitFormRevisionRequestApproval.approvals.find(
         val => val.approverSiret === company.siret
-      ).status
+      )!.status
     ).toBe("REFUSED");
     expect(data.submitFormRevisionRequestApproval.status).toBe("REFUSED");
   });
@@ -258,7 +258,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       data: {
         bsddId: bsdd.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -292,7 +292,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       data: {
         bsddId: bsdd.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         wasteDetailsCode: "01 03 08",
         comment: ""
       }
@@ -308,7 +308,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       }
     });
 
-    const updatedBsdd = await prisma.form.findUnique({
+    const updatedBsdd = await prisma.form.findUniqueOrThrow({
       where: { id: bsdd.id }
     });
 
@@ -338,7 +338,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       data: {
         bsddId: bsdd.id,
         authoringCompanyId: exutoire.id,
-        approvals: { create: { approverSiret: emitter.siret } },
+        approvals: { create: { approverSiret: emitter.siret! } },
         recipientCap: "TTR CAP",
         processingOperationDone: "R 3",
         quantityReceived: 50,
@@ -359,20 +359,20 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       }
     });
 
-    const updatedBsdd = await prisma.form.findUnique({
+    const updatedBsdd = await prisma.form.findUniqueOrThrow({
       where: { id: bsdd.id },
       include: { forwardedIn: true }
     });
 
     expect(updatedBsdd.recipientCap).toEqual("TTR CAP");
-    expect(updatedBsdd.forwardedIn.recipientCap).toEqual("EXUTOIRE CAP");
+    expect(updatedBsdd.forwardedIn!.recipientCap).toEqual("EXUTOIRE CAP");
     expect(updatedBsdd.quantityReceived).toEqual(40);
-    expect(updatedBsdd.forwardedIn.processingOperationDone).toBe("R 3");
-    expect(updatedBsdd.forwardedIn.processingOperationDescription).toBe(
+    expect(updatedBsdd.forwardedIn!.processingOperationDone).toBe("R 3");
+    expect(updatedBsdd.forwardedIn!.processingOperationDescription).toBe(
       "Recyclage"
     );
-    expect(updatedBsdd.forwardedIn.wasteDetailsQuantity).toEqual(40);
-    expect(updatedBsdd.forwardedIn.quantityReceived).toBe(50);
+    expect(updatedBsdd.forwardedIn!.wasteDetailsQuantity).toEqual(40);
+    expect(updatedBsdd.forwardedIn!.quantityReceived).toBe(50);
   });
 
   it("should not edit bsdd when refused", async () => {
@@ -392,7 +392,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       data: {
         bsddId: bsdd.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         wasteDetailsCode: "01 03 08",
         comment: ""
       }
@@ -408,7 +408,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       }
     });
 
-    const updatedBsdd = await prisma.form.findUnique({
+    const updatedBsdd = await prisma.form.findUniqueOrThrow({
       where: { id: bsdd.id }
     });
 
@@ -434,7 +434,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       data: {
         bsddId: bsdd.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         processingOperationDone: "R 13",
         comment: ""
       }
@@ -450,7 +450,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       }
     });
 
-    const updatedBsdd = await prisma.form.findUnique({
+    const updatedBsdd = await prisma.form.findUniqueOrThrow({
       where: { id: bsdd.id }
     });
 
@@ -476,7 +476,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       data: {
         bsddId: bsdd.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         processingOperationDone: "D 5",
         comment: ""
       }
@@ -492,7 +492,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       }
     });
 
-    const updatedBsdd = await prisma.form.findUnique({
+    const updatedBsdd = await prisma.form.findUniqueOrThrow({
       where: { id: bsdd.id }
     });
 
@@ -518,7 +518,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
         grouping: {
           create: {
             initialFormId: appendix2.id,
-            quantity: appendix2.quantityReceived
+            quantity: appendix2.quantityReceived!
           }
         }
       }
@@ -545,7 +545,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       }
     });
 
-    const appendix2grouped = await prisma.form.findUnique({
+    const appendix2grouped = await prisma.form.findUniqueOrThrow({
       where: { id: appendix2.id }
     });
     expect(appendix2grouped.status).toEqual("GROUPED");
@@ -554,7 +554,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       data: {
         bsddId: form.id,
         authoringCompanyId: company.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         isCanceled: true,
         comment: "test cancel"
       }
@@ -570,7 +570,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
       }
     });
 
-    const updatedBsdd = await prisma.form.findUnique({
+    const updatedBsdd = await prisma.form.findUniqueOrThrow({
       where: { id: appendix2.id }
     });
 
@@ -602,7 +602,7 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
           isCanceled: true,
           bsddId: bsdd.id,
           authoringCompanyId: companyOfSomeoneElse.id,
-          approvals: { create: { approverSiret: company.siret } },
+          approvals: { create: { approverSiret: company.siret! } },
           comment: ""
         }
       });

@@ -18,7 +18,7 @@ const SIRENIFY_BYPASS_USER_EMAILS =
  * defines a getter and a setter for a nested company input
  */
 type CompanyInputAccessor<T> = {
-  getter: () => CompanyInput;
+  getter: () => CompanyInput | null | undefined;
   setter: (input: T, companyInput: CompanyInput) => T;
 };
 
@@ -56,7 +56,9 @@ export default function buildSirenify<T>(
     // check if we found a corresponding companySearchResult based on siret
     const companySearchResults = await Promise.all(
       companyInputs.map(companyInput =>
-        companyInput ? searchCompanyFailFast(companyInput.siret) : null
+        companyInput && companyInput.siret
+          ? searchCompanyFailFast(companyInput.siret)
+          : null
       )
     );
 
@@ -89,7 +91,7 @@ export default function buildSirenify<T>(
 
 export async function searchCompanyFailFast(
   siret: string
-): Promise<CompanySearchResult> {
+): Promise<CompanySearchResult | null> {
   // make sure we do not wait more thant 1s here to avoid bottlenecks
   const raceWith = new Promise<null>(resolve =>
     setTimeout(resolve, 1000, null)

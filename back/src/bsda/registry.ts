@@ -12,16 +12,15 @@ import {
 import { GenericWaste } from "../registry/types";
 import { extractPostalCode } from "../utils";
 
-export function getRegistryFields(
-  bsda: Bsda
-): Pick<
-  BsdElastic,
+type RegistryFields =
   | "isIncomingWasteFor"
   | "isOutgoingWasteFor"
   | "isTransportedWasteFor"
-  | "isManagedWasteFor"
-> {
-  const registryFields = {
+  | "isManagedWasteFor";
+export function getRegistryFields(
+  bsda: Bsda
+): Pick<BsdElastic, RegistryFields> {
+  const registryFields: Record<RegistryFields, string[]> = {
     isIncomingWasteFor: [],
     isOutgoingWasteFor: [],
     isTransportedWasteFor: [],
@@ -35,14 +34,18 @@ export function getRegistryFields(
     if (bsda.workerCompanySiret) {
       registryFields.isOutgoingWasteFor.push(bsda.workerCompanySiret);
     }
-    registryFields.isTransportedWasteFor.push(getTransporterCompanyOrgId(bsda));
+
+    const transporterCompanyOrgId = getTransporterCompanyOrgId(bsda);
+    if (transporterCompanyOrgId) {
+      registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
+    }
     if (bsda.brokerCompanySiret) {
       registryFields.isManagedWasteFor.push(bsda.brokerCompanySiret);
     }
   }
 
   // There is no signature at reception on the BSDA so we use the operation signature
-  if (bsda.destinationOperationSignatureDate) {
+  if (bsda.destinationOperationSignatureDate && bsda.destinationCompanySiret) {
     registryFields.isIncomingWasteFor.push(bsda.destinationCompanySiret);
   }
 
@@ -121,12 +124,14 @@ export function toIncomingWaste(
     emitterCompanySiret: bsda.emitterCompanySiret,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     ...initialEmitter,
-    emitterPickupsiteAddress: buildAddress([
-      bsda.emitterPickupSiteName,
-      bsda.emitterPickupSiteAddress,
-      bsda.emitterPickupSitePostalCode,
-      bsda.emitterPickupSiteCity
-    ]),
+    emitterPickupsiteAddress: buildAddress(
+      [
+        bsda.emitterPickupSiteName,
+        bsda.emitterPickupSiteAddress,
+        bsda.emitterPickupSitePostalCode,
+        bsda.emitterPickupSiteCity
+      ].filter(Boolean)
+    ),
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -189,12 +194,14 @@ export function toOutgoingWaste(
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
-    emitterPickupsiteAddress: buildAddress([
-      bsda.emitterPickupSiteName,
-      bsda.emitterPickupSiteAddress,
-      bsda.emitterPickupSitePostalCode,
-      bsda.emitterPickupSiteCity
-    ]),
+    emitterPickupsiteAddress: buildAddress(
+      [
+        bsda.emitterPickupSiteName,
+        bsda.emitterPickupSiteAddress,
+        bsda.emitterPickupSitePostalCode,
+        bsda.emitterPickupSiteCity
+      ].filter(Boolean)
+    ),
     ...initialEmitter,
     traderCompanyName: null,
     traderCompanySiret: null,
@@ -261,12 +268,14 @@ export function toTransportedWaste(
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
-    emitterPickupsiteAddress: buildAddress([
-      bsda.emitterPickupSiteName,
-      bsda.emitterPickupSiteAddress,
-      bsda.emitterPickupSitePostalCode,
-      bsda.emitterPickupSiteCity
-    ]),
+    emitterPickupsiteAddress: buildAddress(
+      [
+        bsda.emitterPickupSiteName,
+        bsda.emitterPickupSiteAddress,
+        bsda.emitterPickupSitePostalCode,
+        bsda.emitterPickupSiteCity
+      ].filter(Boolean)
+    ),
     traderCompanyName: null,
     traderCompanySiret: null,
     traderRecepisseNumber: null,
@@ -331,12 +340,14 @@ export function toManagedWaste(
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
-    emitterPickupsiteAddress: buildAddress([
-      bsda.emitterPickupSiteName,
-      bsda.emitterPickupSiteAddress,
-      bsda.emitterPickupSitePostalCode,
-      bsda.emitterPickupSiteCity
-    ]),
+    emitterPickupsiteAddress: buildAddress(
+      [
+        bsda.emitterPickupSiteName,
+        bsda.emitterPickupSiteAddress,
+        bsda.emitterPickupSitePostalCode,
+        bsda.emitterPickupSiteCity
+      ].filter(Boolean)
+    ),
     ...initialEmitter,
     transporterCompanyAddress: bsda.transporterCompanyAddress,
     transporterCompanyName: bsda.transporterCompanyName,
@@ -400,12 +411,14 @@ export function toAllWaste(
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
-    emitterPickupsiteAddress: buildAddress([
-      bsda.emitterPickupSiteName,
-      bsda.emitterPickupSiteAddress,
-      bsda.emitterPickupSitePostalCode,
-      bsda.emitterPickupSiteCity
-    ]),
+    emitterPickupsiteAddress: buildAddress(
+      [
+        bsda.emitterPickupSiteName,
+        bsda.emitterPickupSiteAddress,
+        bsda.emitterPickupSitePostalCode,
+        bsda.emitterPickupSiteCity
+      ].filter(Boolean)
+    ),
     ...initialEmitter,
     transporterCompanyAddress: bsda.transporterCompanyAddress,
     transporterCompanyName: bsda.transporterCompanyName,

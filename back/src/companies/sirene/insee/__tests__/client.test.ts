@@ -49,7 +49,7 @@ describe("searchCompany", () => {
           ]
         }
       }
-    });
+    } as any);
 
     const company = await searchCompany(siret);
     const expected = {
@@ -101,7 +101,7 @@ describe("searchCompany", () => {
           ]
         }
       }
-    });
+    } as any);
 
     expect.assertions(1);
     try {
@@ -145,7 +145,7 @@ describe("searchCompany", () => {
           ]
         }
       }
-    });
+    } as any);
 
     expect.assertions(1);
     try {
@@ -185,7 +185,7 @@ describe("searchCompany", () => {
           ]
         }
       }
-    });
+    } as any);
     const company = await searchCompany("34393738900041");
     expect(company.name).toEqual("JOHN SNOW");
   });
@@ -257,7 +257,7 @@ describe("searchCompanies", () => {
           }
         ]
       }
-    });
+    } as any);
     const companies = await searchCompanies("code en stock");
     expect(companies).toHaveLength(1);
     const expected = {
@@ -330,7 +330,7 @@ describe("searchCompanies", () => {
           }
         ]
       }
-    });
+    } as any);
 
     const companies = await searchCompanies("boulangerie", "07");
     expect(companies).toHaveLength(1);

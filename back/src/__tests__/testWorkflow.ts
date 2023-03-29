@@ -14,7 +14,7 @@ async function testWorkflow(workflow: Workflow) {
     });
     if (workflowCompany.companyTypes.includes("ECO_ORGANISME")) {
       // create ecoOrganisme to allow its user to perform api calls
-      await ecoOrganismeFactory({ siret: company.siret, handleBsdasri: true });
+      await ecoOrganismeFactory({ siret: company.siret!, handleBsdasri: true });
     }
 
     context = { ...context, [workflowCompany.name]: { ...company, user } };
@@ -34,6 +34,7 @@ async function testWorkflow(workflow: Workflow) {
           variables: step.variables(context)
         });
       }
+      throw new Error();
     })();
 
     expect(errors).toBeUndefined();

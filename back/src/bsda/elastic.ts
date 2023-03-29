@@ -14,6 +14,13 @@ export type BsdaToElastic = Bsda & {
   intermediaries: IntermediaryBsdaAssociation[];
 };
 
+type WhereKeys =
+  | "isDraftFor"
+  | "isForActionFor"
+  | "isFollowFor"
+  | "isArchivedFor"
+  | "isToCollectFor"
+  | "isCollectedFor";
 // | state              | emitter         | worker          | transporter | destination     | nextDestination | intermediary |
 // | ------------------ | --------------- | --------------- | ----------- | --------------- | --------------- | ------------ |
 // | INITIAL (draft)    | draft           | draft           | draft       | draft           | follow          | follow       |
@@ -24,18 +31,8 @@ export type BsdaToElastic = Bsda & {
 // | PROCESSED          | archive         | archive         | archive     | archive         | follow          | archive      |
 // | REFUSED            | archive         | archive         | archive     | archive         | follow          | archive      |
 // | AWAITING_CHILD     | follow          | follow          | follow      | follow          | follow          | follow       |
-function getWhere(
-  bsda: BsdaToElastic
-): Pick<
-  BsdElastic,
-  | "isDraftFor"
-  | "isForActionFor"
-  | "isFollowFor"
-  | "isArchivedFor"
-  | "isToCollectFor"
-  | "isCollectedFor"
-> {
-  const where = {
+function getWhere(bsda: BsdaToElastic): Pick<BsdElastic, WhereKeys> {
+  const where: Record<WhereKeys, string[]> = {
     isDraftFor: [],
     isForActionFor: [],
     isFollowFor: [],
@@ -174,11 +171,13 @@ export function toBsdElastic(bsda: BsdaToElastic): BsdElastic {
     emitterCompanySiret: bsda.emitterCompanySiret ?? "",
     emitterCompanyAddress: bsda.emitterCompanyAddress ?? "",
     emitterPickupSiteName: bsda.emitterPickupSiteName ?? "",
-    emitterPickupSiteAddress: buildAddress([
-      bsda.emitterPickupSiteAddress,
-      bsda.emitterPickupSitePostalCode,
-      bsda.emitterPickupSiteCity
-    ]),
+    emitterPickupSiteAddress: buildAddress(
+      [
+        bsda.emitterPickupSiteAddress,
+        bsda.emitterPickupSitePostalCode,
+        bsda.emitterPickupSiteCity
+      ].filter(Boolean)
+    ),
     emitterCustomInfo: bsda.emitterCustomInfo ?? "",
     workerCompanyName: bsda.workerCompanyName ?? "",
     workerCompanySiret: bsda.workerCompanySiret ?? "",

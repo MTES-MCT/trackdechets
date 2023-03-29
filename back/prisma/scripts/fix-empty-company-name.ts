@@ -21,6 +21,7 @@ export class FixNameAddressCompanyUpdater implements Updater {
       });
       for (const company of companies) {
         try {
+          if (!company.siret) continue;
           const companyInfo = await searchCompany(company.siret);
           await prisma.company.update({
             data: {

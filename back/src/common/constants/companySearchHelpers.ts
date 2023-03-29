@@ -106,7 +106,10 @@ export const cleanClue = (clue: string): string =>
  * @param allowTestCompany For the frontend to pass ALLOW_TEST_COMPANY
  * @returns
  */
-export const isSiret = (clue: string, allowTestCompany?: boolean): boolean => {
+export const isSiret = (
+  clue: string | null | undefined,
+  allowTestCompany?: boolean
+): boolean => {
   const allowTest =
     allowTestCompany !== undefined ? allowTestCompany : ALLOW_TEST_COMPANY;
   if (!clue || !/^[0-9]{14}$/.test(clue) || /^0{14}$/.test(clue)) {
@@ -129,7 +132,7 @@ export const isSiret = (clue: string, allowTestCompany?: boolean): boolean => {
 /**
  * Validateur de numéro de TVA
  */
-export const isVat = (clue: string): boolean => {
+export const isVat = (clue: string | null | undefined): boolean => {
   if (!clue || clue.match(BAD_CHARACTERS_REGEXP) !== null) return false;
   const isRegexValid = checkVAT(clue, countries);
   return isRegexValid.isValid;
@@ -138,15 +141,15 @@ export const isVat = (clue: string): boolean => {
 /**
  * TVA Français
  */
-export const isFRVat = (clue: string): boolean => {
-  if (!isVat(clue)) return false;
+export const isFRVat = (clue: string | null | undefined): boolean => {
+  if (!clue || !isVat(clue)) return false;
   return clue.slice(0, 2).toUpperCase().startsWith("FR");
 };
 
 /**
  * TVA Non-Français
  */
-export const isForeignVat = (clue: string): boolean => {
+export const isForeignVat = (clue: string | null | undefined): boolean => {
   if (!isVat(clue)) return false;
   return !isFRVat(clue);
 };

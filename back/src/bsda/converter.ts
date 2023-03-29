@@ -605,7 +605,10 @@ export function flattenBsdaRevisionRequestInput(
         chain(d.reception, r => (r.weight ? r.weight * 1000 : r.weight))
       )
     ),
-    isCanceled: chain(reviewContent, c => chain(c, r => r.isCanceled))
+    isCanceled: undefinedOrDefault(
+      chain(reviewContent, c => chain(c, r => r.isCanceled)),
+      false
+    )
   });
 }
 

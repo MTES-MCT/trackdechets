@@ -21,7 +21,7 @@ const workflow: Workflow = {
     { name: "broyeur", companyTypes: ["WASTE_VEHICLES", "WASTEPROCESSOR"] }
   ],
   steps: [
-    createBsvhu("producteur", fixtures),
+    createBsvhu("producteur", fixtures as any),
     signForProducer("producteur"),
     signTransport("transporteur"),
     updateDestination("broyeur"),

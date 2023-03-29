@@ -9,9 +9,9 @@ import {
   toPrismaNestedWhereInput,
   toPrismaGenericWhereInput,
   toPrismaEnumFilter,
-  toPrismaIdFilter,
   toPrismaRelationIdFilter,
-  toPrismaStringNullableListFilter
+  toPrismaStringNullableListFilter,
+  toPrismaStringNullableFilter
 } from "../common/where";
 
 function toPrismaBsdaWhereInput(where: BsdaWhere): Prisma.BsdaWhereInput {
@@ -54,7 +54,7 @@ function toPrismaBsdaWhereInput(where: BsdaWhere): Prisma.BsdaWhereInput {
     ),
     destinationCustomInfo: toPrismaStringFilter(where.destination?.customInfo),
     brokerCompanySiret: toPrismaStringFilter(where.broker?.company?.siret),
-    groupedInId: toPrismaIdFilter(where.groupedIn),
+    groupedInId: toPrismaStringNullableFilter(where.groupedIn),
     forwardedIn: toPrismaRelationIdFilter(where.forwardedIn) as Prisma.XOR<
       Prisma.BsdaRelationFilter,
       Prisma.BsdaWhereInput

@@ -10,16 +10,15 @@ import {
 import { GenericWaste } from "../registry/types";
 import { getWasteDescription } from "./utils";
 
-export function getRegistryFields(
-  bsvhu: Bsvhu
-): Pick<
-  BsdElastic,
+type RegistryFields =
   | "isIncomingWasteFor"
   | "isOutgoingWasteFor"
   | "isTransportedWasteFor"
-  | "isManagedWasteFor"
-> {
-  const registryFields = {
+  | "isManagedWasteFor";
+export function getRegistryFields(
+  bsvhu: Bsvhu
+): Pick<BsdElastic, RegistryFields> {
+  const registryFields: Record<RegistryFields, string[]> = {
     isIncomingWasteFor: [],
     isOutgoingWasteFor: [],
     isTransportedWasteFor: [],
@@ -30,11 +29,18 @@ export function getRegistryFields(
     bsvhu.emitterEmissionSignatureDate &&
     bsvhu.transporterTransportSignatureDate
   ) {
-    registryFields.isOutgoingWasteFor.push(bsvhu.emitterCompanySiret);
-    registryFields.isTransportedWasteFor.push(bsvhu.transporterCompanySiret);
+    if (bsvhu.emitterCompanySiret) {
+      registryFields.isOutgoingWasteFor.push(bsvhu.emitterCompanySiret);
+    }
+    if (bsvhu.transporterCompanySiret) {
+      registryFields.isTransportedWasteFor.push(bsvhu.transporterCompanySiret);
+    }
   }
 
-  if (bsvhu.destinationOperationSignatureDate) {
+  if (
+    bsvhu.destinationOperationSignatureDate &&
+    bsvhu.destinationCompanySiret
+  ) {
     registryFields.isIncomingWasteFor.push(bsvhu.destinationCompanySiret);
   }
 

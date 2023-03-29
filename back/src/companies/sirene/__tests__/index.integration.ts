@@ -4,6 +4,7 @@ import { searchCompany } from "../../search";
 import { resetDatabase } from "../../../../integration-tests/helper";
 import { AnonymousCompanyError } from "../errors";
 import { siretify } from "../../../__tests__/factories";
+import { removeEmptyKeys } from "../../../common/converter";
 
 const searchCompanySpy = jest.spyOn(searchCompanyDecorated, "default");
 // Mock the fact a siret is not found in SIRENE API's
@@ -34,6 +35,6 @@ describe("searchCompany", () => {
       }
     });
     const searchResult = await searchCompany(siret);
-    expect(searchResult).toMatchObject(anonymousCompany);
+    expect(searchResult).toMatchObject(removeEmptyKeys(anonymousCompany));
   });
 });

@@ -191,7 +191,7 @@ describe("/oidc/authorize/decision", () => {
       }
     });
 
-    expect(grant.scope).toEqual(["openid", "profile", "email", "companies"]);
+    expect(grant!.scope).toEqual(["openid", "profile", "email", "companies"]);
   });
 
   it("should forbid funny scope values", async () => {
@@ -319,7 +319,7 @@ describe("/oidc/token - id/secret auth", () => {
 
     await prisma.grant.create({
       data: {
-        user: { connect: { id: application.adminId } },
+        user: { connect: { id: application.adminId! } },
         code: getUid(16),
         application: { connect: { id: application.id } },
         expires: 1 * 60, // 1 minute
@@ -343,7 +343,7 @@ describe("/oidc/token - id/secret auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -396,7 +396,7 @@ describe("/oidc/token - id/secret auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -454,7 +454,7 @@ describe("/oidc/token - id/secret auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -512,7 +512,7 @@ describe("/oidc/token - id/secret auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -739,7 +739,7 @@ describe("/oidc/token - basic auth", () => {
 
     await prisma.grant.create({
       data: {
-        user: { connect: { id: application.adminId } },
+        user: { connect: { id: application.adminId! } },
         code: getUid(16),
         application: { connect: { id: application.id } },
         expires: 1 * 60, // 1 minute
@@ -767,7 +767,7 @@ describe("/oidc/token - basic auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -822,7 +822,7 @@ describe("/oidc/token - basic auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -883,7 +883,7 @@ describe("/oidc/token - basic auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -945,7 +945,7 @@ describe("/oidc/token - basic auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -1003,7 +1003,7 @@ describe("/oidc/token - basic auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 

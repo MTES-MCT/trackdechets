@@ -37,8 +37,8 @@ describe("Test Caching", () => {
     const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
     expect(userCompaniesSiretOrVat.length).toEqual(2);
-    expect(userCompaniesSiretOrVat.includes(company.siret)).toBe(true);
-    expect(userCompaniesSiretOrVat.includes(otherCompany.siret)).toBe(true);
+    expect(userCompaniesSiretOrVat.includes(company.siret!)).toBe(true);
+    expect(userCompaniesSiretOrVat.includes(otherCompany.siret!)).toBe(true);
 
     // redis key exists now
     exists = await redisClient.exists(key);

@@ -38,7 +38,7 @@ describe("Road control pdf Router", () => {
       res.header.location.startsWith(`http://${API_HOST}/download?token=`)
     ).toBe(true);
 
-    const tkn = await prisma.pdfAccessToken.findUnique({
+    const tkn = await prisma.pdfAccessToken.findUniqueOrThrow({
       where: {
         id: token.id
       }

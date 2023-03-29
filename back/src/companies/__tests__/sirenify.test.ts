@@ -147,6 +147,6 @@ describe("searchCompanyFailFast", () => {
   it("should return result if searchCompany takes less than 1 second to respond", async () => {
     searchCompanySpy.mockResolvedValue(searchResult);
     const r = await searchCompanyFailFast("85001946400021");
-    expect(r.name).toEqual("CODE EN STOCK");
+    expect(r!.name).toEqual("CODE EN STOCK");
   });
 });

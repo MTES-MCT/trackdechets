@@ -9,7 +9,7 @@ export type FindUniqueBsdaFn = <Args extends Prisma.BsdaArgs>(
 export function buildFindUniqueBsda({
   prisma
 }: ReadRepositoryFnDeps): FindUniqueBsdaFn {
-  return async <Args>(where, options?) => {
+  return async <Args extends Prisma.BsdaArgs>(where, options?) => {
     const input = { where, ...options };
     const bsda = await prisma.bsda.findUnique(input);
     return bsda as Prisma.BsdaGetPayload<Args>;
