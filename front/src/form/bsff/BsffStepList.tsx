@@ -65,15 +65,15 @@ export default function BsffStepsList(props: Props) {
     return getComputedState(initialState, bsff ? getCurrentState(bsff) : null);
   }, [formQuery.data]);
 
-  const [createDraftBsff, { loading: creating }] =
-    useMutation<Pick<Mutation, "createDraftBsff">, MutationCreateDraftBsffArgs>(
-      CREATE_DRAFT_BSFF
-    );
+  const [createDraftBsff, { loading: creating }] = useMutation<
+    Pick<Mutation, "createDraftBsff">,
+    MutationCreateDraftBsffArgs
+  >(CREATE_DRAFT_BSFF);
 
-  const [updateBsffForm, { loading: updating }] =
-    useMutation<Pick<Mutation, "updateBsff">, MutationUpdateBsffArgs>(
-      UPDATE_BSFF_FORM
-    );
+  const [updateBsffForm, { loading: updating }] = useMutation<
+    Pick<Mutation, "updateBsff">,
+    MutationUpdateBsffArgs
+  >(UPDATE_BSFF_FORM);
 
   function saveForm(input: BsffInput): Promise<any> {
     return formState.id
