@@ -11,6 +11,7 @@ import {
 import {
   getActiveUsersWithPendingMembershipRequests,
   getPendingMembershipRequestsAndAssociatedAdmins,
+  getRecentlyRegisteredNonProfesionals,
   getRecentlyRegisteredProfesionals,
   getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest,
   xDaysAgo
@@ -653,6 +654,102 @@ describe("getRecentlyRegisteredProfesionals", () => {
 
     // When
     const profesionnals = await getRecentlyRegisteredProfesionals();
+
+    // Then
+    expect(profesionnals).toEqual([]);
+  });
+});
+
+describe("getRecentlyRegisteredNonProfesionals", () => {
+  afterEach(resetDatabase);
+
+  it("should return users who recently joined non-profesional companies", async () => {
+    // Given
+
+    // Should be returned
+    const company0AndAdmin0 = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: FOUR_DAYS_AGO,
+        companyTypes: ["PRODUCER"]
+      },
+      {},
+      { createdAt: TWO_DAYS_AGO }
+    );
+
+    // Should be returned
+    const company0user1 = await userFactory();
+    addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
+      createdAt: TWO_DAYS_AGO
+    });
+
+    // Should not be returned because three days ago
+    const company1AndAdmin0 = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: FOUR_DAYS_AGO,
+        companyTypes: ["PRODUCER"]
+      },
+      {},
+      { createdAt: THREE_DAYS_AGO }
+    );
+
+    // Should not be returned because one day ago
+    const company1user1 = await userFactory();
+    addUserToCompany(company1user1, company1AndAdmin0.company, "MEMBER", {
+      createdAt: ONE_DAY_AGO
+    });
+
+    // When
+    const profesionnals = await getRecentlyRegisteredNonProfesionals();
+
+    // Then
+    const expectedResult = [
+      {
+        id: company0AndAdmin0.user.id,
+        name: company0AndAdmin0.user.name,
+        email: company0AndAdmin0.user.email
+      },
+      {
+        id: company0user1.id,
+        name: company0user1.name,
+        email: company0user1.email
+      }
+    ].sort((a, b) => a.id.localeCompare(b.id));
+
+    const actualResult = profesionnals
+      .map(u => ({
+        id: u.id,
+        name: u.name,
+        email: u.email
+      }))
+      .sort((a, b) => a.id.localeCompare(b.id));
+
+    expect(actualResult).toEqual(expectedResult);
+  });
+
+  it("should not return users from profesional companies", async () => {
+    // Given
+
+    // Should not be returned
+    const company0AndAdmin0 = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: FOUR_DAYS_AGO,
+        companyTypes: ["COLLECTOR"]
+      },
+      {},
+      { createdAt: TWO_DAYS_AGO }
+    );
+
+    // Should not be returned
+    const company0user1 = await userFactory();
+    addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
+      createdAt: TWO_DAYS_AGO
+    });
+
+    // When
+    const profesionnals = await getRecentlyRegisteredNonProfesionals();
 
     // Then
     expect(profesionnals).toEqual([]);
