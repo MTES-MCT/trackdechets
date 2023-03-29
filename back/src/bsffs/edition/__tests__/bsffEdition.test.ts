@@ -55,7 +55,8 @@ describe("edition", () => {
       company,
       recepisse,
       customInfo: "",
-      transport
+      transport,
+      isExemptedOfReceipt: false
     };
 
     const packaging: Required<BsffPackagingInput> = {
