@@ -89,7 +89,7 @@ const localizedStrings = {
     cancel: "Cancel",
   },
   fr: {
-    translateButton: "Translate in english 🇬🇧",
+    translateButton: "Translate in English 🇬🇧",
     vatNumber: {
       label: "N° de TVA intracommunautaire ou N° d'identification",
       hint: "Exemple : BE1234567890",
