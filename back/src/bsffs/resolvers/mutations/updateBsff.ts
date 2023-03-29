@@ -16,10 +16,7 @@ import {
   getBsffPackagingRepository,
   getBsffRepository
 } from "../../repository";
-import {
-  transformReceiptExemption,
-  checkEditionRules
-} from "../../edition/bsffEdition";
+import { checkEditionRules } from "../../edition/bsffEdition";
 import { sirenifyBsffInput } from "../../sirenify";
 
 const updateBsff: MutationResolvers["updateBsff"] = async (
@@ -66,9 +63,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     delete input.ficheInterventions;
   }
   const sirenifiedInput = await sirenifyBsffInput(input, user);
-  const flatInput = flattenBsffInput(
-    transformReceiptExemption(sirenifiedInput)
-  );
+  const flatInput = flattenBsffInput(sirenifiedInput);
 
   const futureBsff = {
     ...existingBsff,

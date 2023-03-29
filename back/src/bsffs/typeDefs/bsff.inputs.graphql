@@ -262,8 +262,6 @@ input BsffTransporterInput {
   transport: BsffTransporterTransportInput
   "Champ libre"
   customInfo: String
-  "Exemption de récépissé (conformément aux dispositions de l'article R.541-50 du code de l'environnement)"
-  isExemptedOfReceipt: Boolean
 }
 input BsffTransporterRecepisseInput {
   "Le cas échéant, numéro de récépissé mentionné à l'article R. 541-51 du code de l'environnement."

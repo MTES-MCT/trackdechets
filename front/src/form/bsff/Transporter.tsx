@@ -4,15 +4,14 @@ import TdTooltip from "common/components/Tooltip";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { Field, useField, useFormikContext } from "formik";
 import { Bsff } from "generated/graphql/types";
-import initialState from "./utils/initial-state";
+import initialState, { BsffFormTransporterInput } from "./utils/initial-state";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export default function Transporter({ disabled }) {
-  const { setFieldValue, values, initialValues } = useFormikContext<Bsff>();
-
-  const [{ value: isExemptedOfReceipt }, ,] = useField<boolean>(
-    "transporter.isExemptedOfReceipt"
+  const { setFieldValue, values } = useFormikContext<Bsff>();
+  const [{ value: isExemptedOfRecepisse }, ,] = useField<boolean>(
+    "transporter.isExemptedOfRecepisse"
   );
 
   return (
@@ -53,9 +52,9 @@ export default function Transporter({ disabled }) {
           </h4>
           <div className="form__row">
             <Switch
-              checked={isExemptedOfReceipt}
+              checked={isExemptedOfRecepisse}
               onChange={checked => {
-                setFieldValue("transporter.isExemptedOfReceipt", checked);
+                setFieldValue("transporter.isExemptedOfRecepisse", checked);
               }}
               label="Le transporteur déclare être exempté de récépissé conformément aux dispositions de l'article R.541-50 du code de l'environnement."
             />

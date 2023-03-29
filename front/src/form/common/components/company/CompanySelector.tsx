@@ -21,8 +21,6 @@ import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import {
   BsdasriTransporter,
   BsdaTransporter,
-  BsffTransporter,
-  BsffTransporterInput,
   BsvhuTransporter,
   CompanyFavorite,
   CompanySearchResult,
@@ -45,6 +43,7 @@ import {
   SEARCH_COMPANIES,
 } from "./query";
 import TransporterReceipt from "./TransporterReceipt";
+import { BsffFormTransporterInput } from "form/bsff/utils/initial-state";
 
 const DEBOUNCE_DELAY = 500;
 
@@ -91,7 +90,7 @@ export default function CompanySelector({
         | Maybe<BsdaTransporter>
         | Maybe<BsdasriTransporter>
         | Maybe<BsvhuTransporter>
-        | Maybe<BsffTransporter>;
+        | Maybe<BsffFormTransporterInput>;
     }>();
 
   const isExemptedOfReceipt = useMemo(
@@ -100,8 +99,11 @@ export default function CompanySelector({
         ? (values.transporter as Transporter).isExemptedOfReceipt
         : !!(values.transporter as BsdaTransporter)?.recepisse?.isExempted
         ? (values.transporter as BsdaTransporter)?.recepisse?.isExempted
-        : !!(values.transporter as BsffTransporterInput)?.isExemptedOfReceipt
-        ? (values.transporter as BsffTransporterInput)?.isExemptedOfReceipt
+        : // BSFF form as specific values
+        !!(values.transporter as BsffFormTransporterInput)
+            ?.isExemptedOfRecepisse
+        ? (values.transporter as BsffFormTransporterInput)
+            ?.isExemptedOfRecepisse
         : false,
     [values.transporter]
   );
@@ -176,6 +178,14 @@ export default function CompanySelector({
       clue: orgId!,
     },
     skip: !orgId,
+    onCompleted(data) {
+      setFieldValue("transporter.recepisse", {
+        number: data.companyPrivateInfos.transporterReceipt?.receiptNumber,
+        validityLimit:
+          data.companyPrivateInfos.transporterReceipt?.validityLimit,
+        department: data.companyPrivateInfos.transporterReceipt?.department,
+      });
+    },
   });
 
   function isUnknownCompanyName(company: CompanySearchResult): boolean {

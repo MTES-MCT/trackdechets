@@ -39,7 +39,6 @@ import {
   getReadonlyBsffRepository
 } from "./repository";
 import { sirenifyBsffInput } from "./sirenify";
-import { transformReceiptExemption } from "./edition/bsffEdition";
 
 export async function getBsffOrNotFound(where: Prisma.BsffWhereUniqueInput) {
   const { findUnique } = getReadonlyBsffRepository();
@@ -134,10 +133,7 @@ export async function createBsff(
   input: BsffInput,
   additionalData: Partial<Bsff> = {}
 ) {
-  const sirenifiedInput = await sirenifyBsffInput(
-    transformReceiptExemption(input),
-    user
-  );
+  const sirenifiedInput = await sirenifyBsffInput(input, user);
 
   const flatInput: Prisma.BsffCreateInput = {
     id: getReadableId(ReadableIdPrefix.FF),

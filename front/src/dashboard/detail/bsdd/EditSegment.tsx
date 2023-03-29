@@ -15,7 +15,6 @@ import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { FieldTransportModeSelect } from "common/components";
-import { isForeignVat } from "generated/constants/companySearchHelpers";
 
 const EDIT_SEGMENT = gql`
   mutation editSegment(
@@ -99,6 +98,7 @@ export default function EditSegment({ siret, segment }: Props) {
                   />
                 </div>
                 <h4 className="form__section-heading">Transporteur</h4>
+
                 {!segment.readyToTakeOver ? (
                   <>
                     <CompanySelector

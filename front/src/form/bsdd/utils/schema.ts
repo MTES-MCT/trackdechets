@@ -1,3 +1,4 @@
+import { gql } from "@apollo/client";
 import {
   string,
   object,
@@ -21,7 +22,7 @@ import {
   CompanyInput,
 } from "generated/graphql/types";
 import graphlClient from "graphql-client";
-import { COMPANY_INFOS } from "form/common/components/company/query";
+import { COMPANY_INFOS_REGISTRATION } from "form/common/components/company/query";
 import {
   isVat,
   isFRVat,
@@ -48,7 +49,7 @@ const destinationSchema = companySchema.concat(
       async value => {
         if (value) {
           const { data } = await graphlClient.query({
-            query: COMPANY_INFOS,
+            query: COMPANY_INFOS_REGISTRATION,
             variables: { siret: value },
           });
           // it should be registered to TD

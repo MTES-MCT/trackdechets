@@ -64,6 +64,7 @@ import { format } from "date-fns";
 import { isSiret } from "generated/constants/companySearchHelpers";
 import { Appendix1ProducerForm } from "form/bsdd/appendix1Producer/form";
 import { gql, useQuery } from "@apollo/client";
+import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "form/common/components/company/query";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -456,19 +457,6 @@ const Appendix2 = ({
   );
 };
 
-const COMPANY_PRIVATE_INFOS = gql`
-  query CompanyPrivateInfos($clue: String!) {
-    companyPrivateInfos(clue: $clue) {
-      siret
-      receivedSignatureAutomations {
-        from {
-          siret
-        }
-      }
-    }
-  }
-`;
-
 const Appendix1 = ({
   siret,
   container,
@@ -481,7 +469,7 @@ const Appendix1 = ({
   const { data } = useQuery<
     Pick<Query, "companyPrivateInfos">,
     QueryCompanyPrivateInfosArgs
-  >(COMPANY_PRIVATE_INFOS, {
+  >(COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS, {
     variables: { clue: siret },
   });
   const siretsWithAutomaticSignature = data
