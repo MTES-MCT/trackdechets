@@ -1,6 +1,5 @@
-import { UserInputError } from "apollo-server-express";
 import type { AsyncReturnType } from "type-fest";
-import { AnonymousCompanyError } from "./errors";
+import { AnonymousCompanyError, SiretNotFoundError } from "./errors";
 
 /**
  * Loop over the functions until one of them returns a result
@@ -15,12 +14,13 @@ export function redundant<F extends (...args: any[]) => any>(...fns: F[]) {
         return response;
       } catch (error) {
         // fail fast for user-input errors
-        if (error instanceof AnonymousCompanyError) {
+        if (
+          error instanceof SiretNotFoundError ||
+          error instanceof AnonymousCompanyError
+        ) {
           throw error;
         }
-        if (error instanceof UserInputError) {
-          throw error;
-        }
+
         if (firstError == null) {
           firstError = error;
         }

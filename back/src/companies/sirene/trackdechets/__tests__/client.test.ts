@@ -1,13 +1,10 @@
 import { ApiResponse, errors } from "@elastic/elasticsearch";
-import {
-  searchCompany,
-  searchCompanies,
-  CompanyNotFoundInTrackdechetsSearch
-} from "../client";
+import { searchCompany, searchCompanies } from "../client";
 import { ErrorCode } from "../../../../common/errors";
 import client from "../esClient";
 import { SearchHit } from "../types";
 import { siretify } from "../../../../__tests__/factories";
+import { SiretNotFoundError } from "../../errors";
 
 const { ResponseError } = errors;
 
@@ -180,15 +177,13 @@ describe("searchCompany", () => {
     expect(company.name).toEqual("CODE EN STOCK (CES)");
   });
 
-  it("should raise CompanyNotFound if error 404 (siret not found)", async () => {
+  it("should raise SiretNotFound if error 404 (siret not found)", async () => {
     (client.get as jest.Mock).mockRejectedValueOnce(
       new ResponseError({
         statusCode: 404
       } as unknown as ApiResponse)
     );
-    expect(searchCompany("xxxxxxxxxxxxxx")).rejects.toThrow(
-      CompanyNotFoundInTrackdechetsSearch
-    );
+    expect(searchCompany("xxxxxxxxxxxxxx")).rejects.toThrow(SiretNotFoundError);
   });
 
   it(`should escalate other types of errors

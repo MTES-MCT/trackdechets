@@ -1,4 +1,4 @@
-import { ForbiddenError } from "apollo-server-express";
+import { ForbiddenError, UserInputError } from "apollo-server-express";
 
 export class AnonymousCompanyError extends ForbiddenError {
   constructor() {
@@ -6,5 +6,13 @@ export class AnonymousCompanyError extends ForbiddenError {
       `Les informations de cet établissement ne sont pas disponibles car son propriétaire` +
         ` a choisi de ne pas les rendre publiques lors de son enregistrement au Répertoire des Entreprises et des Établissements (SIRENE)`
     );
+  }
+}
+
+export class SiretNotFoundError extends UserInputError {
+  constructor() {
+    super("Aucun établissement trouvé avec ce SIRET", {
+      invalidArgs: ["siret"]
+    });
   }
 }

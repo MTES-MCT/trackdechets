@@ -1,26 +1,18 @@
 import { errors, estypes } from "@elastic/elasticsearch";
 import logger from "../../../logging/logger";
 import { libelleFromCodeNaf, buildAddress, removeDiacritics } from "../utils";
-import { AnonymousCompanyError } from "../errors";
+import { AnonymousCompanyError, SiretNotFoundError } from "../errors";
 import { SireneSearchResult } from "../types";
 import {
   SearchHit,
   SearchOptions,
   SearchResponse,
-  SearchStockEtablissement,
-  ProviderErrors
+  SearchStockEtablissement
 } from "./types";
 import client from "./esClient";
 
 const { ResponseError } = errors;
 const index = process.env.TD_COMPANY_ELASTICSEARCH_INDEX;
-
-/**
- * Specific Error class
- * to handle falling back to INSEE API client for hidden companies in public data
- * check redundancy.ts for processing company search client errors
- */
-export class CompanyNotFoundInTrackdechetsSearch extends Error {}
 
 /**
  * Build a company object from a search response
@@ -116,21 +108,14 @@ export const searchCompany = async (
     }
     return company;
   } catch (error) {
-    if (error instanceof AnonymousCompanyError) {
-      throw error;
-    }
-    // 404 may mean Anonymous Company
-    // rely on `redundancy` to fallback on INSEE api to verify that or if SIRET does not exists.
     if (error instanceof ResponseError && error.meta.statusCode === 404) {
-      throw new CompanyNotFoundInTrackdechetsSearch(
-        ProviderErrors.SiretNotFound
-      );
+      throw new SiretNotFoundError();
     }
-    logger.error(
-      `${ProviderErrors.ServerError}: ${error.name}, ${error.message}, \n`,
-      { stacktrace: error.stack }
-    );
-    throw new Error(ProviderErrors.ServerError);
+    logger.error(`"Erreur inconnue": ${error.name}, ${error.message}, \n`, {
+      stacktrace: error.stack
+    });
+
+    throw error;
   }
 };
 
@@ -206,7 +191,7 @@ export const searchCompanies = (
       return fullTextSearchResponseToCompanies(r.body.hits.hits);
     })
     .catch(error => {
-      logger.error(`${ProviderErrors.ServerError}\n`, error);
-      throw new Error(ProviderErrors.ServerError);
+      logger.error(`Erreur inconnue\n`, error);
+      throw error;
     });
 };
