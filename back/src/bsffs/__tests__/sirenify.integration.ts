@@ -27,7 +27,8 @@ describe("sirenifyBsffInput", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 
@@ -98,7 +99,8 @@ describe("sirenifyBsffInput", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 
@@ -165,7 +167,8 @@ describe("sirenifyBsffPackagingInput", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 
@@ -211,7 +214,8 @@ describe("sirenifyBsffPackagingInput", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 
@@ -260,7 +264,8 @@ describe("sirenifyBsffFicheInterventionInput", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 
@@ -322,7 +327,8 @@ describe("sirenifyBsffFicheInterventionInput", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 

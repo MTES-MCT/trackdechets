@@ -27,7 +27,8 @@ describe("sirenifyFormInput", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 
@@ -172,7 +173,8 @@ describe("sirenifyFormInput", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 
@@ -301,7 +303,8 @@ describe("sirenifyResealedFormInput", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 
@@ -357,7 +360,8 @@ describe("sirenifyResealedFormInput", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 

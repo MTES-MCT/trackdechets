@@ -78,6 +78,28 @@ describe("sirenify", () => {
     expect(sirenified).toEqual(input);
   });
 
+  it("should by pass auto-completion of name and address if company is non diffusible", async () => {
+    searchCompanySpy.mockResolvedValueOnce({
+      ...searchResult,
+      statutDiffusionEtablissement: "N"
+    });
+
+    const input: Input = {
+      company: {
+        siret: searchResult.siret,
+        name: "Cabinet médical Dumont",
+        address: "1 rue Pasteur"
+      }
+    };
+
+    const sirenified = await sirenify(input, {
+      email: "john.snow@trackdechets.fr",
+      auth: AuthType.BEARER
+    } as Express.User);
+
+    expect(sirenified).toEqual(input);
+  });
+
   it("should by pass auto-completion of name and address if user is in by pass list", async () => {
     const OLD_ENV = process.env;
     jest.resetModules();
