@@ -242,7 +242,7 @@ const transporterSchema: FactorySchemaOf<
   yup.object({
     transporterRecepisseDepartment: yup
       .string()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
+      .when("transporterCompanyVatNumber", ([tva], schema) => {
         if (!tva || !isForeignVat(tva)) {
           return schema.requiredIf(
             context.transportSignature,
@@ -253,7 +253,7 @@ const transporterSchema: FactorySchemaOf<
       }),
     transporterRecepisseNumber: yup
       .string()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
+      .when("transporterCompanyVatNumber", ([tva], schema) => {
         if (!tva || !isForeignVat(tva)) {
           return schema.requiredIf(
             context.transportSignature,
@@ -264,7 +264,7 @@ const transporterSchema: FactorySchemaOf<
       }),
     transporterRecepisseValidityLimit: yup
       .date()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
+      .when("transporterCompanyVatNumber", ([tva], schema) => {
         if (!tva || !isForeignVat(tva)) {
           return schema.requiredIf(
             context.transportSignature,

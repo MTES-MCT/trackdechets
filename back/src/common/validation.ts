@@ -5,7 +5,6 @@ import {
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-core";
 import * as yup from "yup";
-import { ConditionBuilder, ConditionConfig } from "yup/lib/Condition";
 import {
   isCollector,
   isTransporter,
@@ -55,15 +54,16 @@ export const weight = (unit = WeightUnits.Kilogramme) =>
       `\${path} : le poids doit être inférieur à ${MAX_WEIGHT_TONNES} tonnes`
     );
 
+type ConditionBuilder<T> = (values: any[], schema: T) => yup.ISchema<any>;
 // Differents conditions than can be applied to a weight based on the
 // value of other sibling fields
 type WeightConditions = {
   wasteAcceptationStatus: ConditionBuilder<yup.NumberSchema>;
-  transportMode: (unit: WeightUnits) => ConditionConfig<yup.NumberSchema>;
+  transportMode: (unit: WeightUnits) => ConditionBuilder<yup.NumberSchema>;
 };
 
 export const weightConditions: WeightConditions = {
-  wasteAcceptationStatus: (status, weight) => {
+  wasteAcceptationStatus: ([status, weight]) => {
     if (status === WasteAcceptationStatus.REFUSED) {
       return weight.test({
         name: "is-0",
@@ -83,22 +83,27 @@ export const weightConditions: WeightConditions = {
     }
     return weight;
   },
-  transportMode: unit => ({
-    is: (mode: TransportMode, createdAt?: Date) => {
-      return (
+  transportMode:
+    unit =>
+    (
+      [mode, createdAt]: [TransportMode, Date | undefined],
+      schema: yup.NumberSchema
+    ) => {
+      if (
         mode === TransportMode.ROAD &&
         (!createdAt || createdAt > MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER)
-      );
-    },
-    then: weight =>
-      weight.max(
-        unit == WeightUnits.Kilogramme
-          ? MAX_WEIGHT_BY_ROAD_TONNES * 1000
-          : MAX_WEIGHT_BY_ROAD_TONNES,
-        `\${path} : le poids doit être inférieur à ${MAX_WEIGHT_BY_ROAD_TONNES}` +
-          ` tonnes lorsque le transport se fait par la route`
-      )
-  })
+      ) {
+        return schema.max(
+          unit == WeightUnits.Kilogramme
+            ? MAX_WEIGHT_BY_ROAD_TONNES * 1000
+            : MAX_WEIGHT_BY_ROAD_TONNES,
+          `\${path} : le poids doit être inférieur à ${MAX_WEIGHT_BY_ROAD_TONNES}` +
+            ` tonnes lorsque le transport se fait par la route`
+        );
+      }
+
+      return schema;
+    }
 };
 
 export const siret = yup
@@ -126,7 +131,7 @@ type SiretTests = {
 };
 
 export const siretConditions: SiretConditions = {
-  isForeignShip: (isForeignShip: boolean, schema: yup.StringSchema) => {
+  isForeignShip: ([isForeignShip]: [boolean], schema: yup.StringSchema) => {
     if (isForeignShip === true) {
       return schema
         .notRequired()
@@ -139,7 +144,7 @@ export const siretConditions: SiretConditions = {
     return schema;
   },
   isPrivateIndividual: (
-    isPrivateIndividual: boolean,
+    [isPrivateIndividual]: [boolean],
     schema: yup.StringSchema
   ) => {
     if (isPrivateIndividual === true) {
@@ -153,7 +158,7 @@ export const siretConditions: SiretConditions = {
     }
     return schema;
   },
-  companyVatNumber: (vatNumber, schema) => {
+  companyVatNumber: ([vatNumber], schema) => {
     if (isForeignVat(vatNumber)) {
       return schema.notRequired();
     }
@@ -278,7 +283,7 @@ export const vatNumberTests: VatNumberTests = {
  * - SIRET is mandatory
  * - Only french companies are allowed
  */
-export const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
+export const intermediarySchema: yup.ObjectSchema<CompanyInput> = yup.object({
   siret: siret
     .label("Intermédiaires")
     .required("Intermédiaires : le N° SIRET est obligatoire"),

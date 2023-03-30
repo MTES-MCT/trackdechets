@@ -15,7 +15,7 @@ import {
   siretConditions
 } from "../../../common/validation";
 
-const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
+const AnonymousCompanyInputSchema: yup.ObjectSchema<AnonymousCompanyInput> =
   yup.object({
     address: yup.string().required(),
     codeCommune: yup.string().required(),

@@ -280,10 +280,9 @@ const emitterSchema: FactorySchemaOf<
       ),
     emitterCompanyContact: yup.string().when("emitterIsPrivateIndividual", {
       is: true,
-      then: yup.string().nullable(true),
-      otherwise: yup
-        .string()
-        .requiredIf(
+      then: schema => schema.nullable(),
+      otherwise: schema =>
+        schema.requiredIf(
           context.emissionSignature,
           `Émetteur: ${MISSING_COMPANY_CONTACT}`
         )
@@ -554,7 +553,7 @@ const destinationSchema: FactorySchemaOf<
       .string()
       .when(
         "destinationReceptionAcceptationStatus",
-        (acceptationStatus, schema) =>
+        ([acceptationStatus], schema) =>
           [
             WasteAcceptationStatus.REFUSED,
             WasteAcceptationStatus.PARTIALLY_REFUSED
@@ -824,8 +823,8 @@ const packagingsSchema = yup.object({
 });
 
 const wasteDescriptionSchema: FactorySchemaOf<
-  BsdaValidationContext,
-  WasteDescription
+    BsdaValidationContext,
+    WasteDescription
 > = context =>
   yup.object({
     wasteCode: yup

@@ -184,21 +184,14 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<
           1,
           "Conditionnements : le nombre de contenants doit être supérieur ou égal à 1"
         )
-        .of<
-          yup.SchemaOf<
-            Pick<
-              PrismaBsffPackaging,
-              "type" | "other" | "numero" | "volume" | "weight"
-            >
-          >
-        >(
+        .of(
           yup.object({
             type: yup
               .mixed<BsffPackagingType>()
               .required("Conditionnements : le type de contenant est requis"),
             other: yup
               .string()
-              .when("type", (type, schema) =>
+              .when("type", ([type], schema) =>
                 type === "AUTRE"
                   ? schema.requiredIf(
                       !isDraft,
@@ -308,7 +301,7 @@ export const destinationSchemaFn: FactorySchemaOf<
       )
   });
 
-export const transportSchema: yup.SchemaOf<Transport> = yup.object({
+export const transportSchema: yup.ObjectSchema<Transport> = yup.object({
   transporterTransportMode: yup
     .mixed<TransportMode>()
     .nullable()
@@ -322,14 +315,14 @@ export const transportSchema: yup.SchemaOf<Transport> = yup.object({
     .required("La date de prise en charge par le transporteur est requise")
 });
 
-export const receptionSchema: yup.SchemaOf<Reception> = yup.object({
+export const receptionSchema: yup.ObjectSchema<Reception> = yup.object({
   destinationReceptionDate: yup
     .date()
     .nullable()
     .required("La date de réception du déchet est requise") as any // https://github.com/jquense/yup/issues/1302
 });
 
-export const acceptationSchema: yup.SchemaOf<Acceptation> = yup.object({
+export const acceptationSchema: yup.ObjectSchema<Acceptation> = yup.object({
   acceptationStatus: yup
     .mixed<WasteAcceptationStatus>()
     .required()
@@ -339,7 +332,7 @@ export const acceptationSchema: yup.SchemaOf<Acceptation> = yup.object({
     ),
   acceptationRefusalReason: yup
     .string()
-    .when("acceptationStatus", (acceptationStatus, schema) =>
+    .when("acceptationStatus", ([acceptationStatus], schema) =>
       acceptationStatus === WasteAcceptationStatus.REFUSED
         ? schema.ensure().required("Vous devez saisir un motif de refus")
         : schema
@@ -485,7 +478,9 @@ const traceabilityBreakForbidden = yup.object({
     )
 });
 
-const operationSchemaFn: (value: any) => yup.SchemaOf<Operation> = value => {
+const operationSchemaFn: (
+  value: any
+) => yup.ObjectSchema<Operation> = value => {
   const base = yup.object({
     operationDate: yup
       .date()
@@ -854,7 +849,7 @@ const beforeTransportSchema = bsffSchema.concat(transportSchema).concat(
 );
 
 export function validateBeforeTransport(
-  bsff: (typeof beforeTransportSchema)["__outputType"]
+  bsff: yup.InferType<typeof beforeTransportSchema>
 ) {
   return beforeTransportSchema.validate(bsff, {
     abortEarly: false
@@ -942,7 +937,7 @@ export function validateBeforeOperation(
   });
 }
 
-export const ficheInterventionSchema: yup.SchemaOf<
+export const ficheInterventionSchema: yup.ObjectSchema<
   Pick<
     BsffFicheIntervention,
     | "numero"

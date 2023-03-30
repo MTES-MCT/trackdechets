@@ -49,12 +49,12 @@ const segmentSchema = Yup.object<any>().shape({
   transporterCompanyMail: Yup.string()
     .email("Le format d'adresse email est incorrect")
     .required("L'email est obligatoire"),
-  transporterIsExemptedOfReceipt: Yup.boolean().nullable(true),
+  transporterIsExemptedOfReceipt: Yup.boolean().nullable(),
   transporterReceipt: Yup.string().when(
     "transporterIsExemptedOfReceipt",
     (isExemptedOfReceipt, schema) =>
       isExemptedOfReceipt
-        ? schema.nullable(true)
+        ? schema.nullable()
         : schema.required(
             "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
           )
@@ -63,12 +63,12 @@ const segmentSchema = Yup.object<any>().shape({
     "transporterIsExemptedOfReceipt",
     (isExemptedOfReceipt, schema) =>
       isExemptedOfReceipt
-        ? schema.nullable(true)
+        ? schema.nullable()
         : schema.required("Le département du transporteur est obligatoire")
   ),
 
   transporterValidityLimit: Yup.date().nullable(),
-  transporterNumberPlate: Yup.string().nullable(true)
+  transporterNumberPlate: Yup.string().nullable()
 });
 
 const takeOverInfoSchema = Yup.object<any>().shape({

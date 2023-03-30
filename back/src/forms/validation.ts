@@ -239,30 +239,34 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
       .mixed<EmitterType>()
       .when("ecoOrganismeSiret", {
         is: ecoOrganismeSiret => !ecoOrganismeSiret,
-        then: yup
-          .mixed()
-          .requiredIf(!isDraft, `Émetteur: Le type d'émetteur est obligatoire`)
+        then: schema =>
+          schema.requiredIf(
+            !isDraft,
+            `Émetteur: Le type d'émetteur est obligatoire`
+          )
       })
       .when("emitterIsPrivateIndividual", {
         is: emitterIsPrivateIndividual => !emitterIsPrivateIndividual,
-        then: yup
-          .mixed()
-          .requiredIf(!isDraft, `Émetteur: Le type d'émetteur est obligatoire`),
-        otherwise: yup
-          .mixed()
-          .oneOf(
+        then: schema =>
+          schema.requiredIf(
+            !isDraft,
+            `Émetteur: Le type d'émetteur est obligatoire`
+          ),
+        otherwise: schema =>
+          schema.oneOf(
             ["PRODUCER", "APPENDIX1_PRODUCER"],
             `Émetteur: Le type d'émetteur doit être "PRODUCER" ou "APPENDIX1_PRODUCER" lorsque l'émetteur est un particulier`
           )
       })
       .when("emitterIsForeignShip", {
         is: emitterIsForeignShip => !emitterIsForeignShip,
-        then: yup
-          .mixed()
-          .requiredIf(!isDraft, `Émetteur: Le type d'émetteur est obligatoire`),
-        otherwise: yup
-          .mixed()
-          .oneOf(
+        then: schema =>
+          schema.requiredIf(
+            !isDraft,
+            `Émetteur: Le type d'émetteur est obligatoire`
+          ),
+        otherwise: schema =>
+          schema.oneOf(
             ["PRODUCER"],
             `Émetteur: Le type d'émetteur doit être "PRODUCER" lorsque l'émetteur est un navire étranger`
           )
@@ -270,7 +274,7 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
     emitterCompanyName: yup
       .string()
       .ensure()
-      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+      .when("emitterIsForeignShip", ([emitterIsForeignShip], schema) =>
         emitterIsForeignShip === true ? schema.notRequired() : schema
       )
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_NAME}`),
@@ -287,19 +291,19 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
     emitterCompanyAddress: yup
       .string()
       .ensure()
-      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+      .when("emitterIsForeignShip", ([emitterIsForeignShip], schema) =>
         emitterIsForeignShip === true ? schema.notRequired() : schema
       )
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_ADDRESS}`),
     emitterCompanyContact: yup
       .string()
       .ensure()
-      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+      .when("emitterIsForeignShip", ([emitterIsForeignShip], schema) =>
         emitterIsForeignShip === true ? schema.notRequired() : schema
       )
       .when(
         "emitterIsPrivateIndividual",
-        (emitterIsPrivateIndividual, schema) =>
+        ([emitterIsPrivateIndividual], schema) =>
           emitterIsPrivateIndividual === true ? schema.notRequired() : schema
       )
       .test(
@@ -317,12 +321,12 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
     emitterCompanyPhone: yup
       .string()
       .ensure()
-      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+      .when("emitterIsForeignShip", ([emitterIsForeignShip], schema) =>
         emitterIsForeignShip === true ? schema.notRequired() : schema
       )
       .when(
         "emitterIsPrivateIndividual",
-        (emitterIsPrivateIndividual, schema) =>
+        ([emitterIsPrivateIndividual], schema) =>
           emitterIsPrivateIndividual === true ? schema.notRequired() : schema
       )
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_PHONE}`),
@@ -330,12 +334,12 @@ const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
       .string()
       .email()
       .ensure()
-      .when("emitterIsForeignShip", (emitterIsForeignShip, schema) =>
+      .when("emitterIsForeignShip", ([emitterIsForeignShip], schema) =>
         emitterIsForeignShip === true ? schema.notRequired() : schema
       )
       .when(
         "emitterIsPrivateIndividual",
-        (emitterIsPrivateIndividual, schema) =>
+        ([emitterIsPrivateIndividual], schema) =>
           emitterIsPrivateIndividual === true ? schema.notRequired() : schema
       )
       .requiredIf(!isDraft, `Émetteur: ${MISSING_COMPANY_EMAIL}`),
@@ -460,7 +464,7 @@ const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
       .label("Opération d’élimination / valorisation")
       .ensure()
       .requiredIf(!isDraft)
-      .when("emitterType", (value, schema) => {
+      .when("emitterType", ([value], schema) => {
         const oneOf =
           value === EmitterType.APPENDIX2
             ? [
@@ -513,7 +517,7 @@ export const packagingInfoFn = (isDraft: boolean) =>
       .required("Le type de conditionnement doit être précisé."),
     other: yup
       .string()
-      .when("type", (type, schema) =>
+      .when("type", ([type], schema) =>
         type === "AUTRE"
           ? schema.requiredIf(
               !isDraft,
@@ -534,7 +538,7 @@ export const packagingInfoFn = (isDraft: boolean) =>
       )
       .integer()
       .min(1, "Le nombre de colis doit être supérieur à 0.")
-      .when("type", (type, schema) =>
+      .when("type", ([type], schema) =>
         ["CITERNE", "BENNE"].includes(type)
           ? schema.max(
               2,
@@ -611,28 +615,24 @@ const wasteDetailsAppendix1SchemaFn: FactorySchemaOf<
       ),
     wasteDetailsIsDangerous: yup.boolean().when("wasteDetailsCode", {
       is: (wasteCode: string) => isDangerous(wasteCode || ""),
-      then: () =>
-        yup
-          .boolean()
-          .isTrue(
-            `Un déchet avec un code comportant un astérisque est forcément dangereux`
-          ),
-      otherwise: () => yup.boolean()
+      then: schema =>
+        schema.isTrue(
+          `Un déchet avec un code comportant un astérisque est forcément dangereux`
+        )
     }),
     wasteDetailsOnuCode: yup.string().when("wasteDetailsIsDangerous", {
       is: (wasteDetailsIsDangerous: boolean) =>
         wasteDetailsIsDangerous === true,
-      then: () =>
-        yup
-          .string()
+      then: schema =>
+        schema
           .ensure()
           .requiredIf(
             !isDraft,
             `La mention ADR est obligatoire pour les déchets dangereux. Merci d'indiquer "non soumis" si nécessaire.`
           ),
-      otherwise: () => yup.string().nullable()
+      otherwise: schema => schema.nullable()
     }),
-    wasteDetailsParcelNumbers: yup.array().of(parcelInfos as any),
+    wasteDetailsParcelNumbers: yup.array().of(parcelInfos),
     wasteDetailsAnalysisReferences: yup.array().of(yup.string()),
     wasteDetailsLandIdentifiers: yup.array().of(yup.string())
   });
@@ -710,7 +710,7 @@ const wasteDetailsSchemaFn = isDraft =>
     return fullWasteDetailsSchemaFn(isDraft);
   });
 
-export const beforeSignedByTransporterSchema: yup.SchemaOf<
+export const beforeSignedByTransporterSchema: yup.ObjectSchema<
   Pick<Form, "wasteDetailsPackagingInfos">
 > = yup.object({
   wasteDetailsPackagingInfos: yup.array().when("emitterType", {
@@ -927,7 +927,7 @@ export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
 
 // 8 - Collecteur-transporteur
 // 9 - Déclaration générale de l’émetteur du bordereau :
-export const signingInfoSchema: yup.SchemaOf<SigningInfo> = yup.object({
+export const signingInfoSchema: yup.ObjectSchema<SigningInfo> = yup.object({
   signedByTransporter: yup.boolean().nullable(),
   sentAt: yup.date().required(),
   sentBy: yup
@@ -937,7 +937,7 @@ export const signingInfoSchema: yup.SchemaOf<SigningInfo> = yup.object({
 });
 
 // 10 - Expédition reçue à l’installation de destination
-export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
+export const receivedInfoSchema: yup.ObjectSchema<ReceivedInfo> = yup.object({
   isAccepted: yup.boolean(),
   receivedBy: yup
     .string()
@@ -967,7 +967,7 @@ export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
     ),
   wasteRefusalReason: yup
     .string()
-    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+    .when("wasteAcceptationStatus", ([wasteAcceptationStatus], schema) =>
       ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
         ? schema.ensure().required("Vous devez saisir un motif de refus")
         : schema
@@ -982,7 +982,7 @@ export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
 });
 
 // 10 - Expédition acceptée (ou refusée) à l’installation de destination
-export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
+export const acceptedInfoSchema: yup.ObjectSchema<AcceptedInfo> = yup.object({
   isAccepted: yup.boolean(),
   signedAt: yup.date().nullable(),
   signedBy: yup
@@ -996,7 +996,7 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
   wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>().required(),
   wasteRefusalReason: yup
     .string()
-    .when("wasteAcceptationStatus", (wasteAcceptationStatus, schema) =>
+    .when("wasteAcceptationStatus", ([wasteAcceptationStatus], schema) =>
       ["REFUSED", "PARTIALLY_REFUSED"].includes(wasteAcceptationStatus)
         ? schema.ensure().required("Vous devez saisir un motif de refus")
         : schema
@@ -1025,7 +1025,7 @@ const withNextDestination = (required: boolean) =>
       .requiredIf(required, `Destination ultérieure : ${MISSING_COMPANY_NAME}`),
     nextDestinationCompanySiret: siret
       .label("Destination ultérieure prévue")
-      .when("nextDestinationCompanyVatNumber", (vat, schema) => {
+      .when("nextDestinationCompanyVatNumber", ([vat], schema) => {
         return !isVat(vat) && required
           ? schema.required(
               `Destination ultérieure prévue : ${MISSING_COMPANY_SIRET}`
@@ -1049,7 +1049,7 @@ const withNextDestination = (required: boolean) =>
         ["", ...countries.map(country => country.cca2)],
         "Destination ultérieure : le code ISO 3166-1 alpha-2 du pays de l'entreprise n'est pas reconnu"
       )
-      .when("nextDestinationCompanyVatNumber", (vat, schema) => {
+      .when("nextDestinationCompanyVatNumber", ([vat], schema) => {
         return isVat(vat) && required
           ? schema.test(
               "is-country-valid",
@@ -1062,7 +1062,7 @@ const withNextDestination = (required: boolean) =>
             )
           : schema;
       })
-      .when("nextDestinationCompanySiret", (siret, schema) => {
+      .when("nextDestinationCompanySiret", ([siret], schema) => {
         return isSiret(siret) && required
           ? schema.test(
               "is-fr-country-valid",
@@ -1163,7 +1163,7 @@ const traceabilityBreakForbidden = yup.object({
 // 11 - Réalisation de l’opération :
 const processedInfoSchemaFn: (
   value: any
-) => yup.SchemaOf<ProcessedInfo> = value => {
+) => yup.ObjectSchema<ProcessedInfo> = value => {
   const base = yup.object({
     processedBy: yup
       .string()
@@ -1224,7 +1224,7 @@ const baseFormSchemaFn = (isDraft: boolean) =>
       .concat(transporterSchemaFn(isDraft))
       .concat(traderSchemaFn(isDraft))
       .concat(brokerSchemaFn(isDraft))
-      .concat(lazyWasteDetailsSchema);
+      .concat(lazyWasteDetailsSchema as any);
   });
 export const sealedFormSchema = baseFormSchemaFn(false);
 export const draftFormSchema = baseFormSchemaFn(true);
@@ -1234,9 +1234,9 @@ export const wasteDetailsSchema = wasteDetailsSchemaFn(false);
 export const processedFormSchema = yup.lazy((value: any) =>
   sealedFormSchema
     .resolve({ value })
-    .concat(signingInfoSchema)
-    .concat(receivedInfoSchema)
-    .concat(processedInfoSchemaFn(value))
+    .concat(signingInfoSchema as any)
+    .concat(receivedInfoSchema as any)
+    .concat(processedInfoSchemaFn(value) as any)
 );
 
 // *******************************************************************

@@ -1,18 +1,16 @@
 import * as yup from "yup";
-import { AnyObject } from "yup/lib/types";
 import { SSTI_CHARS } from "../constants";
-/* eslint-disable */
+
 declare module "yup" {
-  interface BaseSchema<TCast = any, TContext = AnyObject, TOutput = any> {
-    requiredIf<T>(condition: boolean, message?: string): this;
-    isSafeSSTI<T>(): this;
+  interface Schema<TType, TContext, TDefault, TFlags> {
+    requiredIf(condition: boolean, message?: string): this;
+    isSafeSSTI(): this;
   }
 }
-/* eslint-enable */
 
 export type FactorySchemaOf<Context, Type> = (
   context: Context
-) => yup.SchemaOf<Type>;
+) => yup.ObjectSchema<Type>;
 
 export default function configureYup() {
   yup.setLocale({
@@ -28,33 +26,40 @@ export default function configureYup() {
     }
   });
 
-  yup.addMethod<yup.BaseSchema>(
+  const types = [
     yup.mixed,
-    "requiredIf",
-    function requiredIf(condition: boolean, message?: string) {
-      if (condition) {
-        // nullable to treat null as a missing value, not a type error
-        return this.nullable().required(message);
-      }
+    yup.string,
+    yup.number,
+    yup.object,
+    yup.boolean,
+    yup.date,
+    yup.array
+  ] as const;
+  for (const type of types) {
+    yup.addMethod(
+      type as (...args: any) => yup.Schema<any>,
+      "requiredIf",
+      function requiredIf(condition: boolean, message?: string) {
+        if (condition) {
+          // nullable to treat null as a missing value, not a type error
+          return this.nullable().required(message);
+        }
 
-      return this.nullable().notRequired();
-    }
-  );
+        return this.nullable().notRequired();
+      }
+    );
+  }
 
   /**
    * Validates string is safe against server-side template injections
    */
-  yup.addMethod<yup.BaseSchema>(
-    yup.string,
-    "isSafeSSTI",
-    function safeSSSTIString() {
-      return this.test(
-        "safe-ssti",
-        `Les caractères suivants sont interdits: ${SSTI_CHARS.join(" ")}`,
-        function (value) {
-          return !SSTI_CHARS.some(char => value?.includes(char));
-        }
-      );
-    }
-  );
+  yup.addMethod(yup.string, "isSafeSSTI", function safeSSSTIString() {
+    return this.test(
+      "safe-ssti",
+      `Les caractères suivants sont interdits: ${SSTI_CHARS.join(" ")}`,
+      function (value) {
+        return !SSTI_CHARS.some(char => value?.includes(char));
+      }
+    );
+  });
 }

@@ -297,7 +297,7 @@ function hasTemporaryStorageUpdate(content: RevisionRequestContent): boolean {
   );
 }
 
-const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
+const bsddRevisionRequestSchema: yup.ObjectSchema<RevisionRequestContent> = yup
   .object({
     isCanceled: yup.bool().nullable(),
     recipientCap: yup.string().nullable(),

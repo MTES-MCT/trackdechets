@@ -10,7 +10,7 @@ const maxLengthString = (maxLength: number) =>
       `La longueur maximale de ce paramètre de recherche est de ${maxLength} caractères`
     );
 
-export const bsdSearchSchema: yup.SchemaOf<
+export const bsdSearchSchema: yup.ObjectSchema<
   Pick<
     BsdWhere,
     | "isArchivedFor"

@@ -124,7 +124,7 @@
     "world-countries": "^4.0.0",
     "xss": "^1.0.10",
     "xstate": "^4.25.0",
-    "yup": "^0.32.11",
+    "yup": "^1.0.2",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {

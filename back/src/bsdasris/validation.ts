@@ -36,7 +36,7 @@ configureYup();
 
 export type FactorySchemaOf<Context, Type> = (
   context: Context
-) => yup.SchemaOf<Type>;
+) => yup.ObjectSchema<Type>;
 
 // *************************************************
 // BREAK DOWN DASRI TYPE INTO INDIVIDUAL FRAME TYPES
@@ -187,7 +187,7 @@ export const packagingInfo = _ =>
       .oneOf(packagingsTypes),
     other: yup
       .string()
-      .when("type", (type, schema) =>
+      .when("type", ([type], schema) =>
         type === "AUTRE"
           ? schema.required(
               "La description doit être précisée pour le conditionnement 'AUTRE'."
@@ -341,7 +341,7 @@ export const transporterSchema: FactorySchemaOf<
     transporterRecepisseNumber: yup
       .string()
       .ensure()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
+      .when("transporterCompanyVatNumber", ([tva], schema) => {
         if (!tva || !isForeignVat(tva)) {
           return schema.requiredIf(
             context.transportSignature,
@@ -354,7 +354,7 @@ export const transporterSchema: FactorySchemaOf<
     transporterRecepisseDepartment: yup
       .string()
       .ensure()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
+      .when("transporterCompanyVatNumber", ([tva], schema) => {
         if (!tva || !isForeignVat(tva)) {
           return schema.requiredIf(
             context.transportSignature,
@@ -366,7 +366,7 @@ export const transporterSchema: FactorySchemaOf<
 
     transporterRecepisseValidityLimit: yup
       .date()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
+      .when("transporterCompanyVatNumber", ([tva], schema) => {
         if (!tva || !isForeignVat(tva)) {
           return schema.requiredIf(
             context.transportSignature || requiredForSynthesis,
@@ -403,7 +403,7 @@ export const transportSchema: FactorySchemaOf<
       is: BsdasriType.SYNTHESIS,
       then: schema => schema.nullable().notRequired(), // Synthesis dasri can't be refused
       otherwise: schema =>
-        schema.when("transporterAcceptationStatus", (type, schema) =>
+        schema.when("transporterAcceptationStatus", ([type], schema) =>
           ["REFUSED", "PARTIALLY_REFUSED"].includes(type)
             ? schema
                 .required("Le poids de déchets refusés doit être précisé.")
@@ -422,7 +422,7 @@ export const transportSchema: FactorySchemaOf<
       is: BsdasriType.SYNTHESIS,
       then: schema => schema.nullable().notRequired(), // Synthesis dasri can't be refused
       otherwise: schema =>
-        schema.when("transporterAcceptationStatus", (type, schema) =>
+        schema.when("transporterAcceptationStatus", ([type], schema) =>
           ["REFUSED", "PARTIALLY_REFUSED"].includes(type)
             ? schema.required("Vous devez saisir un motif de refus")
             : schema
@@ -565,7 +565,7 @@ export const receptionSchema: FactorySchemaOf<
       is: BsdasriType.SYNTHESIS,
       then: schema => schema.nullable().notRequired(), // Synthesis dasri can't be refused
       otherwise: schema =>
-        schema.when("destinationReceptionAcceptationStatus", (type, schema) =>
+        schema.when("destinationReceptionAcceptationStatus", ([type], schema) =>
           ["REFUSED", "PARTIALLY_REFUSED"].includes(type)
             ? schema.required("Vous devez saisir un motif de refus")
             : schema

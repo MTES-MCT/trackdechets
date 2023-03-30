@@ -190,7 +190,7 @@ export function validateGqlPaginationArgs({
 
 const positiveInteger = yup
   .number()
-  .nullable(true)
+  .nullable()
   .notRequired()
   .integer("`${path}` doit être un entier")
   .positive("`${path}` doit être positif"); // strictly positive (n > 0)
