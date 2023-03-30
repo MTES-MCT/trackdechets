@@ -124,7 +124,16 @@ describe("searchCompany", () => {
     expect(company.name).toEqual("JOHN SNOW");
   });
 
-  it("should add sigleUniteLegale in parenthesis if present", async () => {
+  it.each([
+    "denominationUsuelleEtablissement",
+    "denominationUsuelle1UniteLegale",
+    "denominationUsuelle2UniteLegale",
+    "denominationUsuelle3UniteLegale",
+    "enseigne1Etablissement",
+    "enseigne2Etablissement",
+    "enseigne3Etablissement",
+    "sigleUniteLegale"
+  ])("should add %p in parenthsis if present", async field => {
     const siret = siretify(6);
 
     (client.get as jest.Mock).mockResolvedValueOnce({
@@ -144,7 +153,7 @@ describe("searchCompany", () => {
           activitePrincipaleEtablissement: "62.01Z",
           denominationUniteLegale: "CODE EN STOCK",
           codePaysEtrangerEtablissement: "",
-          sigleUniteLegale: "CES"
+          [field]: "CES"
         }
       }
     });
@@ -152,7 +161,7 @@ describe("searchCompany", () => {
     expect(company.name).toEqual("CODE EN STOCK (CES)");
   });
 
-  it("should add enseigne1Etablissement in parenthesis if present", async () => {
+  it("should set only one secondary name in parenthesis", async () => {
     const siret = siretify(6);
 
     (client.get as jest.Mock).mockResolvedValueOnce({
@@ -172,12 +181,41 @@ describe("searchCompany", () => {
           activitePrincipaleEtablissement: "62.01Z",
           denominationUniteLegale: "CODE EN STOCK",
           codePaysEtrangerEtablissement: "",
+          denominationUsuelleEtablissement: "The awesome company",
           enseigne1Etablissement: "CES"
         }
       }
     });
     const company = await searchCompany(siret);
-    expect(company.name).toEqual("CODE EN STOCK (CES)");
+    expect(company.name).toEqual("CODE EN STOCK (The awesome company)");
+  });
+
+  it("should not set secondary name in parenthesis if it is equal to company name", async () => {
+    const siret = siretify(6);
+
+    (client.get as jest.Mock).mockResolvedValueOnce({
+      body: {
+        _source: {
+          siret,
+          statutDiffusionEtablissement: "O",
+          etatAdministratifEtablissement: "A",
+          numeroVoieEtablissement: "4",
+          indiceRepetitionEtablissement: "bis",
+          typeVoieEtablissement: "BD",
+          libelleVoieEtablissement: "LONGCHAMP",
+          complementAdresseEtablissement: "Bat G",
+          codePostalEtablissement: "13001",
+          codeCommuneEtablissement: "13201",
+          libelleCommuneEtablissement: "MARSEILLE",
+          activitePrincipaleEtablissement: "62.01Z",
+          denominationUniteLegale: "CODE EN STOCK",
+          codePaysEtrangerEtablissement: "",
+          denominationUsuelleEtablissement: "CODE EN STOCK"
+        }
+      }
+    });
+    const company = await searchCompany(siret);
+    expect(company.name).toEqual("CODE EN STOCK");
   });
 
   it("should raise CompanyNotFound if error 404 (siret not found)", async () => {
