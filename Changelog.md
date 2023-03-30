@@ -47,6 +47,23 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+# [2023.4.2] 25/04/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+- Interdiction des requêtes groupées de plus de 5 query gql parallèles [PR 2256](https://github.com/MTES-MCT/trackdechets/pull/2256)
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2023.4.1] 04/04/2023
 
 #### :rocket: Nouvelles fonctionnalités
