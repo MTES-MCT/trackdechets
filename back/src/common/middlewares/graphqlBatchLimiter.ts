@@ -10,10 +10,22 @@ export function graphqlBatchLimiterMiddleware() {
   ) {
     const { body } = req;
 
-    if (Array.isArray(body) && body.length > MAX_OPERATIONS_PER_REQUEST) {
-      return res.status(400).send({
-        error: `Batching is limited to ${MAX_OPERATIONS_PER_REQUEST} operations per request.`
-      });
+    if (Array.isArray(body)) {
+      if (body.length > MAX_OPERATIONS_PER_REQUEST) {
+        return res.status(400).send({
+          error: `Batching is limited to ${MAX_OPERATIONS_PER_REQUEST} operations per request.`
+        });
+      }
+      next();
+    }
+
+    if (body !== null && typeof body === "object") {
+      if (Object.keys(body).length > MAX_OPERATIONS_PER_REQUEST) {
+        return res.status(400).send({
+          error: `Batching is limited to ${MAX_OPERATIONS_PER_REQUEST} operations per query.`
+        });
+      }
+      next();
     }
 
     next();

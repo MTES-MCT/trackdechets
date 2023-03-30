@@ -42,4 +42,39 @@ describe("graphqlBatchLimiterMiddleware", () => {
       "Batching is limited to 5 operations per request."
     );
   });
+
+  it("should allow query batching that respect the batch limit", async () => {
+    const body = JSON.stringify({
+      foo: "bar",
+      zou: "pop",
+      ket: "fol",
+      bip: "bip",
+      pap: "pif"
+    });
+
+    const response = await request
+      .post(graphQLPath)
+      .set("Content-Type", "application/json")
+      .send(body);
+    expect(response.status).toEqual(200);
+  });
+
+  it("should fail if query batching has too many operations", async () => {
+    const body = JSON.stringify({
+      foo: "bar",
+      zou: "pop",
+      ket: "fol",
+      bip: "bip",
+      pap: "pif",
+      pof: "bim"
+    });
+    const response = await request
+      .post(graphQLPath)
+      .set("Content-Type", "application/json")
+      .send(body);
+    expect(response.status).toEqual(400);
+    expect(response.text).toContain(
+      "Batching is limited to 5 operations per query."
+    );
+  });
 });
