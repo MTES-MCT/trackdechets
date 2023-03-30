@@ -4,7 +4,7 @@ import TdTooltip from "common/components/Tooltip";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { Field, useField, useFormikContext } from "formik";
 import { Bsff } from "generated/graphql/types";
-import initialState, { BsffFormTransporterInput } from "./utils/initial-state";
+import initialState from "./utils/initial-state";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
