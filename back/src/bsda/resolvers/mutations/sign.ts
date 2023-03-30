@@ -54,10 +54,18 @@ export default async function sign(
   }
 
   checkBsdaTypeSpecificRules(bsda, input);
-
+  const {
+    intermediaries,
+    BsdaRevisionRequest,
+    groupedIn,
+    grouping,
+    forwardedIn,
+    forwarding,
+    ...simpleBsda
+  } = bsda;
   // Check that all necessary fields are filled
   await validateBsda(
-    bsda,
+    simpleBsda,
     { previousBsdas: [], intermediaries: [] },
     {
       skipPreviousBsdas: true,
