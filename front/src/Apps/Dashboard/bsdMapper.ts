@@ -81,6 +81,7 @@ const createBsdd = (bsdd: Form): BsdDisplay => {
     emittedByEcoOrganisme: bsdd.emittedByEcoOrganisme,
     grouping: bsdd.grouping,
     temporaryStorageDetail: bsdd.temporaryStorageDetail,
+    bsdWorkflowType: bsdd.emitter?.type,
   };
   return bsddFormatted;
 };
@@ -96,13 +97,13 @@ const createBsda = (bsda: Bsda): BsdDisplay => {
     wasteDetails: {
       code: bsda.waste?.code || bsda.waste?.["bsdaCode"],
       name: bsda.waste?.materialName,
-      weight: bsda.weight,
+      weight: bsda?.weight?.value,
     },
     emitter: bsda.emitter || bsda["bsdaEmitter"],
     destination: bsda.destination || bsda["bsdaDestination"],
     transporter: bsda.transporter || bsda["bsdaTransporter"],
     ecoOrganisme: bsda.ecoOrganisme,
-    updatedAt: bsda.updatedAt,
+    updatedAt: bsda["bsdaUpdatedAt"],
     emittedByEcoOrganisme: bsda.ecoOrganisme,
     worker: bsda.worker,
     bsdWorkflowType: bsda.type || bsda["bsdaType"],
@@ -145,12 +146,12 @@ const createBsvhu = (bsvhu: Bsvhu): BsdDisplay => {
     status: mapBsdStatusToBsdStatusEnum(statusCode),
     wasteDetails: {
       code: bsvhu?.wasteCode,
-      weight: bsvhu?.weight,
+      weight: bsvhu?.weight?.value,
     },
     emitter: bsvhu.emitter || bsvhu["bsvhuEmitter"],
     destination: bsvhu.destination || bsvhu["bsvhuDestination"],
     transporter: bsvhu.transporter || bsvhu["bsvhuTransporter"],
-    updatedAt: bsvhu.updatedAt,
+    updatedAt: bsvhu["bsvhuUpdatedAt"],
   };
   return bsvhuFormatted;
 };
@@ -166,12 +167,12 @@ const createBsff = (bsff: Bsff): BsdDisplay => {
     wasteDetails: {
       code: bsff.waste?.code,
       name: bsff.waste?.description,
-      weight: bsff?.weight,
+      weight: bsff?.weight?.value || bsff["bsffWeight"]?.value,
     },
     emitter: bsff.emitter || bsff["bsffEmitter"],
     destination: bsff.destination || bsff["bsffDestination"],
     transporter: bsff.transporter || bsff["bsffTransporter"],
-    updatedAt: bsff.updatedAt,
+    updatedAt: bsff["bsffUpdatedAt"],
     bsdWorkflowType: bsff.type,
     grouping: bsff.grouping,
   };

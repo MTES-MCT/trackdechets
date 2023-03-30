@@ -5,7 +5,6 @@ import {
   IconBSVhuThin as IconBSVhu,
   IconBSDDThin as IconBSDD,
   IconBSDasriThin as IconBSDasri,
-  IconWeight,
 } from "../../../../common/components/Icons";
 import { WasteDetailsProps } from "./wasteTypes";
 import { BsdType } from "../../../../generated/graphql/types";
@@ -15,7 +14,6 @@ function WasteDetails({
   wasteType,
   code,
   name,
-  weight,
 }: WasteDetailsProps): JSX.Element {
   const displayIconWaste = () => {
     switch (wasteType) {
@@ -39,12 +37,6 @@ function WasteDetails({
       <div className="waste-details__infos">
         <p className="waste-details__infos__code">{code}</p>
         <p className="waste-details__infos__name">{name}</p>
-        {weight && (
-          <p className="waste-details__infos__weight">
-            <IconWeight />
-            <span>{weight}</span>
-          </p>
-        )}
       </div>
     </div>
   );

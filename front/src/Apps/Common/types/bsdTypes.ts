@@ -11,7 +11,6 @@ import {
   BsdaStatus,
   BsdaTransporter,
   BsdaType,
-  BsdaWeight,
   BsdaWorker,
   BsdType,
   BsffDestination,
@@ -20,12 +19,10 @@ import {
   BsffStatus,
   BsffTransporter,
   BsffType,
-  BsffWeight,
   BsvhuDestination,
   BsvhuEmitter,
   BsvhuStatus,
   BsvhuTransporter,
-  BsvhuWeight,
   Emitter,
   EmitterType,
   FormEcoOrganisme,
@@ -67,11 +64,7 @@ export interface BsdDisplay {
   wasteDetails: {
     code?: Maybe<string>;
     name?: Maybe<string>;
-    weight?:
-      | Maybe<number>
-      | Maybe<BsdaWeight>
-      | Maybe<BsvhuWeight>
-      | Maybe<BsffWeight>;
+    weight?: Maybe<number>;
   };
   isTempStorage?: Maybe<boolean>;
   emitter?:
@@ -100,7 +93,11 @@ export interface BsdDisplay {
   updatedAt?: Maybe<string> | Maybe<Scalars["DateTime"]>;
   emittedByEcoOrganisme?: Maybe<boolean> | Maybe<BsdaEcoOrganisme>;
   worker?: Maybe<BsdaWorker>;
-  bsdWorkflowType?: Maybe<BsdaType> | BsdasriType | BsffType;
+  bsdWorkflowType?:
+    | Maybe<BsdaType>
+    | BsdasriType
+    | BsffType
+    | Maybe<EmitterType>;
   grouping?:
     | Maybe<Array<InitialFormFraction>>
     | Maybe<Array<InitialBsdasri>>
@@ -114,6 +111,9 @@ export enum WorkflowDisplayType {
   GRP = "Grp",
   TRANSIT = "Transit",
   SYNTH = "Synth",
+  TOURNEE = "Tournée",
+  ANNEXE_1 = "Annexe 1",
+  ANNEXE_2 = "Grp",
 
   DEFAULT = "",
 }

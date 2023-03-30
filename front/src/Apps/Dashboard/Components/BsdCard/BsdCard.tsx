@@ -34,6 +34,7 @@ import {
 import { Loader } from "common/components";
 import { BsdDisplay } from "Apps/Common/types/bsdTypes";
 import DeleteModal from "../DeleteModal/DeleteModal";
+import { IconWeight } from "common/components/Icons";
 
 function BsdCard({
   bsd,
@@ -150,6 +151,13 @@ function BsdCard({
     setIsDeleteModalOpen(true);
   };
 
+  const transporterNameEmmiter =
+    bsdDisplay?.emitter?.company?.siret ===
+    bsdDisplay?.transporter?.company?.siret
+      ? bsdDisplay?.emitter?.company?.name
+      : bsdDisplay?.transporter?.company?.name;
+
+  const transporterName = transporterNameEmmiter || "Non renseigné";
   return (
     <>
       <div className="bsd-card" tabIndex={0}>
@@ -181,6 +189,12 @@ function BsdCard({
                     isDraft={bsdDisplay.isDraft}
                     bsdType={bsdDisplay.type}
                   />
+                  {Boolean(bsdDisplay.wasteDetails?.weight) && (
+                    <p className="bsd-card__content__infos__weight">
+                      <IconWeight />
+                      <span>{bsdDisplay.wasteDetails.weight} t</span>
+                    </p>
+                  )}
                 </div>
                 <div className="bsd-card__content__infos__other">
                   <WasteDetails
@@ -191,7 +205,7 @@ function BsdCard({
 
                   <Actors
                     emitterName={bsdDisplay.emitter?.company?.name!}
-                    transporterName={bsdDisplay.transporter?.company?.name!}
+                    transporterName={transporterName}
                     destinationName={bsdDisplay.destination?.company?.name!}
                   />
                 </div>

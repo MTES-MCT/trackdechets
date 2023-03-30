@@ -310,25 +310,30 @@ const canSkipEmission = (bsd: BsdDisplay): boolean =>
 
 const getSealedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
   if (isBsdd(bsd.type)) {
-    if (canSkipEmission(bsd) && isSameSiretTransporter(currentSiret, bsd)) {
-      return SIGNATURE_TRANSPORTEUR;
-    }
-
-    if (includesSiretActors(bsd, currentSiret)) {
-      if (isAppendix1(bsd) && isSameSiretDestination(currentSiret, bsd)) {
-        return VALIDER_RECEPTION;
+    if (!isAppendix1(bsd)) {
+      if (canSkipEmission(bsd) && isSameSiretTransporter(currentSiret, bsd)) {
+        return SIGNATURE_TRANSPORTEUR;
       }
-      if (isAppendix1Producer(bsd)) {
+
+      if (includesSiretActors(bsd, currentSiret)) {
+        if (isAppendix1Producer(bsd)) {
+          if (hasEmmiterAndEcoOrganismeSiret(bsd, currentSiret)) {
+            return SIGNATURE_EMETTEUR;
+          } else {
+            return FAIRE_SIGNER_EMETTEUR;
+          }
+        }
         if (hasEmmiterAndEcoOrganismeSiret(bsd, currentSiret)) {
           return SIGNATURE_EMETTEUR;
         } else {
           return FAIRE_SIGNER_EMETTEUR;
         }
       }
-      if (hasEmmiterAndEcoOrganismeSiret(bsd, currentSiret)) {
-        return SIGNATURE_EMETTEUR;
-      } else {
-        return FAIRE_SIGNER_EMETTEUR;
+    } else {
+      if (includesSiretActors(bsd, currentSiret)) {
+        if (isAppendix1(bsd) && isSameSiretDestination(currentSiret, bsd)) {
+          return VALIDER_RECEPTION;
+        }
       }
     }
   }
@@ -640,7 +645,12 @@ export const canPublishBsd = (
 };
 
 export const getWorkflowLabel = (
-  bsdWorkflowType: Maybe<BsdaType> | BsdasriType | BsffType | undefined
+  bsdWorkflowType:
+    | Maybe<BsdaType>
+    | BsdasriType
+    | BsffType
+    | EmitterType
+    | undefined
 ): WorkflowDisplayType => {
   switch (bsdWorkflowType) {
     case BsdaType.Gathering:
@@ -657,6 +667,15 @@ export const getWorkflowLabel = (
       return WorkflowDisplayType.GRP;
     case BsffType.Reexpedition:
       return WorkflowDisplayType.TRANSIT;
+
+    case EmitterType.Appendix2:
+      return WorkflowDisplayType.ANNEXE_2;
+
+    case EmitterType.Appendix1:
+      return WorkflowDisplayType.TOURNEE;
+
+    case EmitterType.Appendix1Producer:
+      return WorkflowDisplayType.ANNEXE_1;
 
     default:
       return WorkflowDisplayType.DEFAULT;
