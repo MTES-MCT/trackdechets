@@ -28,9 +28,10 @@ describe("Query.Bsdasri", () => {
   it("should disallow unauthenticated user", async () => {
     const { query } = makeClient();
     const { company } = await userWithCompanyFactory("MEMBER");
+    const { company: destination } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(company)
+        ...initialData(company, destination)
       }
     });
 
@@ -49,9 +50,10 @@ describe("Query.Bsdasri", () => {
 
   it("should forbid access to user not on the bsd", async () => {
     const { company } = await userWithCompanyFactory("MEMBER");
+    const { company: destination } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(company)
+        ...initialData(company, destination)
       }
     });
     const { user: otherUser } = await userWithCompanyFactory("MEMBER");
@@ -72,9 +74,10 @@ describe("Query.Bsdasri", () => {
 
   it("should get a dasri by id", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destination } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(company)
+        ...initialData(company, destination)
       }
     });
 
@@ -91,11 +94,12 @@ describe("Query.Bsdasri", () => {
 
   it("should retrieve regrouped dasris", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destination } = await userWithCompanyFactory("MEMBER");
     const transporterTakenOverAt = new Date();
     const toRegroup = await bsdasriFactory({
       opt: {
-        ...initialData(company),
-        ...readyToReceiveData(company),
+        ...initialData(company, destination),
+        ...readyToReceiveData(),
         ...readyToProcessData,
         status: "PROCESSED",
         transporterTakenOverAt
@@ -104,7 +108,7 @@ describe("Query.Bsdasri", () => {
 
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(company),
+        ...initialData(company, destination),
         type: BsdasriType.GROUPING,
         grouping: { connect: [{ id: toRegroup.id }] }
       }

@@ -380,30 +380,23 @@ export const transportSchema: FactorySchemaOf<
                 )
         )
     }),
-    transporterWasteRefusalReason: yup.string().when("type", {
-      is: BsdasriType.SYNTHESIS,
-      then: schema => schema.nullable().notRequired(), // Synthesis dasri can't be refused
-      otherwise: schema =>
-        schema.when("transporterAcceptationStatus", (type, schema) =>
-          ["REFUSED", "PARTIALLY_REFUSED"].includes(type)
-            ? schema.required("Vous devez saisir un motif de refus")
-            : schema
-                .nullable()
-                .notRequired()
-                .test(
-                  "is-empty",
-                  "Le champ transporterWasteRefusalReason ne doit pas être renseigné si le déchet est accepté ",
-                  v => !v
-                )
-        )
-    }),
-    transporterWasteWeightValue: weight(WeightUnits.Kilogramme)
-      .label("Transporteur")
-      .when("transporterWasteWeightIsEstimate", {
-        is: value => !!value,
-        then: schema =>
-          schema.required(
-            "Le poids de déchets transportés en kg est obligatoire si vous renseignez le type de pesée"
+    transporterWasteRefusalReason: yup
+      .string()
+      .when("type", {
+        is: BsdasriType.SYNTHESIS,
+        then: schema => schema.nullable().notRequired(), // Synthesis dasri can't be refused
+        otherwise: schema =>
+          schema.when("transporterAcceptationStatus", (type, schema) =>
+            ["REFUSED", "PARTIALLY_REFUSED"].includes(type)
+              ? schema.required("Vous devez saisir un motif de refus")
+              : schema
+                  .nullable()
+                  .notRequired()
+                  .test(
+                    "is-empty",
+                    "Le champ transporterWasteRefusalReason ne doit pas être renseigné si le déchet est accepté ",
+                    v => !v
+                  )
           )
       })
       .when(
@@ -463,13 +456,13 @@ export const recipientSchema: FactorySchemaOf<
     destinationCompanyName: yup
       .string()
       .requiredIf(
-        context.receptionSignature,
+        context.emissionSignature || context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_NAME}`
       ),
     destinationCompanySiret: siret
       .label("Destination")
       .requiredIf(
-        context.receptionSignature,
+        context.emissionSignature || context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_SIRET}`
       )
       .test(siretTests.isRegistered("DESTINATION")),
@@ -477,21 +470,21 @@ export const recipientSchema: FactorySchemaOf<
       .string()
 
       .requiredIf(
-        context.receptionSignature,
+        context.emissionSignature || context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_ADDRESS}`
       ),
     destinationCompanyContact: yup
       .string()
 
       .requiredIf(
-        context.receptionSignature,
+        context.emissionSignature || context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_CONTACT}`
       ),
     destinationCompanyPhone: yup
       .string()
       .ensure()
       .requiredIf(
-        context.receptionSignature,
+        context.emissionSignature || context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_PHONE}`
       ),
     destinationCompanyMail: yup.string().email().ensure()

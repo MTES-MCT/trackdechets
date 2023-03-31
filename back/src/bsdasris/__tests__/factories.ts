@@ -42,7 +42,7 @@ export const bsdasriFactory = async ({
   return created;
 };
 
-export const initialData = company => ({
+export const initialData = (company, destination) => ({
   emitterCompanySiret: company.siret,
   emitterCompanyName: company.name,
   emitterCompanyContact: "Contact",
@@ -54,7 +54,13 @@ export const initialData = company => ({
   emitterWasteWeightValue: 22,
   emitterWasteWeightIsEstimate: true,
   emitterWasteVolume: 66,
-  emitterWastePackagings: [{ type: "BOITE_CARTON", volume: 22, quantity: 3 }]
+  emitterWastePackagings: [{ type: "BOITE_CARTON", volume: 22, quantity: 3 }],
+  destinationCompanyName: destination.name,
+  destinationCompanySiret: destination.siret,
+  destinationCompanyAddress: "rue Legrand",
+  destinationCompanyContact: " Contact",
+  destinationCompanyPhone: "1234567",
+  destinationCompanyMail: "recipient@test.fr"
 });
 
 export const readyToTakeOverData = company => ({
@@ -79,14 +85,7 @@ export const readyToTakeOverData = company => ({
   transporterTakenOverAt: new Date()
 });
 
-export const readyToReceiveData = company => ({
-  destinationCompanyName: company.name,
-  destinationCompanySiret: company.siret,
-
-  destinationCompanyAddress: "rue Legrand",
-  destinationCompanyContact: " Contact",
-  destinationCompanyPhone: "1234567",
-  destinationCompanyMail: "recipient@test.fr",
+export const readyToReceiveData = () => ({
   destinationWastePackagings: [
     { type: "BOITE_CARTON", volume: 22, quantity: 3 }
   ],
@@ -94,6 +93,7 @@ export const readyToReceiveData = company => ({
   destinationReceptionAcceptationStatus: WasteAcceptationStatus.ACCEPTED,
   destinationReceptionDate: new Date()
 });
+
 export const readyToProcessData = {
   destinationOperationCode: "D10",
   destinationReceptionWasteWeightValue: 70,

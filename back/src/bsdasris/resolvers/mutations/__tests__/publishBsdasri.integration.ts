@@ -45,11 +45,12 @@ describe("Mutation.publishBsdasri", () => {
 
   it("should publish a draft dasri", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destination } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
       opt: {
         isDraft: true,
-        ...initialData(company)
+        ...initialData(company, destination)
       }
     });
 
@@ -70,10 +71,11 @@ describe("Mutation.publishBsdasri", () => {
 
   it("should not publish an already published dasri", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destination } = await userWithCompanyFactory("MEMBER");
 
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(company)
+        ...initialData(company, destination)
       }
     });
 
@@ -100,11 +102,13 @@ describe("Mutation.publishBsdasri", () => {
 
   it("should not publish a draft dasri if mandatory fields are not filled", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destination } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
         isDraft: true,
-        ...initialData(company),
-        emitterCompanyName: null // missing field
+        ...initialData(company, destination),
+        emitterCompanyName: null, // missing field
+        destinationCompanyName: null // missing field
       }
     });
     const { mutate } = makeClient(user); // emitter
@@ -120,7 +124,8 @@ describe("Mutation.publishBsdasri", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Émetteur: Le nom de l'entreprise est obligatoire",
+        message: `Destinataire: Le nom de l'entreprise est obligatoire
+Émetteur: Le nom de l'entreprise est obligatoire`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

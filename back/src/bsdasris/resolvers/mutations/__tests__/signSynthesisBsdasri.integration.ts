@@ -1,5 +1,8 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { userWithCompanyFactory } from "../../../../__tests__/factories";
+import {
+  destinationFactory,
+  userWithCompanyFactory
+} from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import {
   BsdasriStatus,
@@ -26,11 +29,14 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { user: transporter, company: transporterCompany } =
       await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     // this dasri will be grouped by the synthesis dasris
     const synthesizeBsdasri = await bsdasriFactory({
       opt: {
-        ...initialData(emitterCompany),
+        ...initialData(emitterCompany, destinationCompany),
         ...readyToTakeOverData(transporterCompany),
         status: BsdasriStatus.SENT
       }
@@ -39,7 +45,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
     // synthesis dasris
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(transporterCompany),
+        ...initialData(transporterCompany, destinationCompany),
         ...readyToTakeOverData(transporterCompany),
         status: BsdasriStatus.INITIAL,
         type: BsdasriType.SYNTHESIS,
@@ -69,11 +75,14 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { user: transporter, company: transporterCompany } =
       await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     // this dasri will be grouped by the synthesis dasris
     const synthesizeBsdasri = await bsdasriFactory({
       opt: {
-        ...initialData(emitterCompany),
+        ...initialData(emitterCompany, destinationCompany),
         ...readyToTakeOverData(transporterCompany),
         status: BsdasriStatus.SENT
       }
@@ -82,7 +91,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
     // synthesis dasris
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(transporterCompany),
+        ...initialData(transporterCompany, destinationCompany),
         ...readyToTakeOverData(transporterCompany),
         status: BsdasriStatus.INITIAL,
         type: BsdasriType.SYNTHESIS,
@@ -136,11 +145,14 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
       );
       const { user: transporter, company: transporterCompany } =
         await userWithCompanyFactory("MEMBER");
+      const { company: destinationCompany } = await userWithCompanyFactory(
+        "MEMBER"
+      );
 
       // this dasri will be grouped by the synthesis dasris
       const synthesizeBsdasri = await bsdasriFactory({
         opt: {
-          ...initialData(emitterCompany),
+          ...initialData(emitterCompany, destinationCompany),
           ...readyToTakeOverData(transporterCompany),
           status: BsdasriStatus.SENT
         }
@@ -149,7 +161,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
       // synthesis dasris
       const dasri = await bsdasriFactory({
         opt: {
-          ...initialData(transporterCompany),
+          ...initialData(transporterCompany, destinationCompany),
           ...readyToTakeOverData(transporterCompany),
           status: BsdasriStatus.INITIAL,
           type: BsdasriType.SYNTHESIS,
@@ -194,7 +206,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
     // this dasri will be grouped by the synthesis dasris
     const synthesizeBsdasri = await bsdasriFactory({
       opt: {
-        ...initialData(emitterCompany),
+        ...initialData(emitterCompany, recipientCompany),
         ...readyToTakeOverData(transporterCompany),
 
         status: BsdasriStatus.SENT
@@ -204,9 +216,9 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
     // synthesis dasris
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(transporterCompany),
+        ...initialData(transporterCompany, recipientCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(recipientCompany),
+        ...readyToReceiveData(),
         status: BsdasriStatus.SENT,
         type: BsdasriType.SYNTHESIS,
         destinationReceptionDate: new Date("2020-12-15T11:00:00.000Z"),
@@ -268,7 +280,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
       // this dasri will be grouped by the synthesis dasris
       const synthesizeBsdasri = await bsdasriFactory({
         opt: {
-          ...initialData(emitterCompany),
+          ...initialData(emitterCompany, recipientCompany),
           ...readyToTakeOverData(transporterCompany),
 
           status: BsdasriStatus.SENT
@@ -278,9 +290,9 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
       // synthesis dasris
       const dasri = await bsdasriFactory({
         opt: {
-          ...initialData(transporterCompany),
+          ...initialData(transporterCompany, recipientCompany),
           ...readyToTakeOverData(transporterCompany),
-          ...readyToReceiveData(recipientCompany),
+          ...readyToReceiveData(),
           status: BsdasriStatus.SENT,
           type: BsdasriType.SYNTHESIS,
           destinationReceptionDate: new Date("2020-12-15T11:00:00.000Z"),
@@ -325,7 +337,7 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
     // this dasri will be grouped by the synthesis dasris
     const synthesizeBsdasri = await bsdasriFactory({
       opt: {
-        ...initialData(emitterCompany),
+        ...initialData(emitterCompany, recipientCompany),
         ...readyToTakeOverData(transporterCompany),
 
         status: BsdasriStatus.SENT
@@ -335,9 +347,9 @@ describe("Mutation.signBsdasri on synthesis bsd", () => {
     // synthesis dasris
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(transporterCompany),
+        ...initialData(transporterCompany, recipientCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(recipientCompany),
+        ...readyToReceiveData(),
         ...readyToProcessData,
         status: BsdasriStatus.RECEIVED,
         type: BsdasriType.SYNTHESIS,

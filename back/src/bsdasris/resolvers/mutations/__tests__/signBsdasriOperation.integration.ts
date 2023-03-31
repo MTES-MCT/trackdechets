@@ -28,9 +28,9 @@ describe("Mutation.signBsdasri operation", () => {
 
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(emitterCompany),
+        ...initialData(emitterCompany, destinationCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(destinationCompany),
+        ...readyToReceiveData(),
         ...{
           destinationOperationCode: "XYZ",
           destinationOperationDate: new Date()
@@ -75,9 +75,9 @@ describe("Mutation.signBsdasri operation", () => {
 
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(emitterCompany),
+        ...initialData(emitterCompany, destinationCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(destinationCompany),
+        ...readyToReceiveData(),
         ...readyToProcessData,
         status: BsdasriStatus.RECEIVED
       }
@@ -116,9 +116,9 @@ describe("Mutation.signBsdasri operation", () => {
 
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(emitterCompany),
+        ...initialData(emitterCompany, destinationCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(destinationCompany),
+        ...readyToReceiveData(),
         ...readyToProcessData,
         destinationOperationCode: "D12",
         status: BsdasriStatus.RECEIVED
@@ -157,9 +157,9 @@ describe("Mutation.signBsdasri operation", () => {
     } = readyToProcessData;
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(emitterCompany),
+        ...initialData(emitterCompany, destinationCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(destinationCompany),
+        ...readyToReceiveData(),
         ...processDataWithoutQuantity,
         status: BsdasriStatus.RECEIVED
       }
@@ -204,9 +204,9 @@ describe("Mutation.signBsdasri operation", () => {
 
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(emitterCompany),
+        ...initialData(emitterCompany, destinationCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(destinationCompany),
+        ...readyToReceiveData(),
         ...readyToProcessData,
         destinationOperationCode: "D12",
         status: BsdasriStatus.RECEIVED
