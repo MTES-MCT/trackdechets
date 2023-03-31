@@ -120,8 +120,7 @@ export function OnboardingSlideshow() {
                     <IconCheckCircle1 className={styles.CheckmarkIcon} />
                   }
                 >
-                  Consultez le BSD en temps réel avec la vue de synthèse ou le
-                  PDF
+                  Consultez le BSD en temps réel avec l'aperçu ou le PDF
                 </ListItem>
                 <ListItem
                   startIcon={
