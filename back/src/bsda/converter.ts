@@ -46,6 +46,8 @@ import {
 } from "@prisma/client";
 import { BsdElastic } from "../common/elastic";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import { Decimal } from "decimal.js-light";
+
 export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
   return {
     id: form.id,
@@ -96,7 +98,9 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
     }),
     weight: nullIfNoValues<BsdaWeight>({
       isEstimate: form.weightIsEstimate,
-      value: form.weightValue ? form.weightValue / 1000 : form.weightValue
+      value: form.weightValue
+        ? new Decimal(form.weightValue).dividedBy(1000).toNumber()
+        : form.weightValue
     }),
     destination: nullIfNoValues<BsdaDestination>({
       company: nullIfNoValues<FormCompany>({
@@ -115,7 +119,9 @@ export function expandBsdaFromDb(form: PrismaBsda): GraphqlBsda {
         refusalReason: form.destinationReceptionRefusalReason,
         date: processDate(form.destinationReceptionDate),
         weight: form.destinationReceptionWeight
-          ? form.destinationReceptionWeight / 1000
+          ? new Decimal(form.destinationReceptionWeight)
+              .dividedBy(1000)
+              .toNumber()
           : form.destinationReceptionWeight
       }),
       operation: nullIfNoValues<BsdaOperation>({
@@ -325,7 +331,9 @@ function flattenBsdaDestinationInput({
       chain(d.reception, r => r.date)
     ),
     destinationReceptionWeight: chain(destination, d =>
-      chain(d.reception, r => (r.weight ? r.weight * 1000 : r.weight))
+      chain(d.reception, r =>
+        r.weight ? new Decimal(r.weight).times(1000).toNumber() : r.weight
+      )
     ),
     destinationReceptionAcceptationStatus: chain(destination, d =>
       chain(d.reception, r => r.acceptationStatus)
@@ -493,7 +501,9 @@ function flattenBsdaBrokerInput({ broker }: Pick<BsdaInput, "broker">) {
 function flattenBsdaWeightInput({ weight }: Pick<BsdaInput, "weight">) {
   return {
     weightIsEstimate: chain(weight, q => q.isEstimate),
-    weightValue: chain(weight, q => (q.value ? q.value * 1000 : q.value))
+    weightValue: chain(weight, q =>
+      q.value ? new Decimal(q.value).times(1000).toNumber() : q.value
+    )
   };
 }
 
@@ -596,7 +606,9 @@ export function flattenBsdaRevisionRequestInput(
     destinationCap: chain(reviewContent, r => chain(r.destination, d => d.cap)),
     destinationReceptionWeight: chain(reviewContent, r =>
       chain(r.destination, d =>
-        chain(d.reception, r => (r.weight ? r.weight * 1000 : r.weight))
+        chain(d.reception, r =>
+          r.weight ? new Decimal(r.weight).times(1000).toNumber() : r.weight
+        )
       )
     )
   });
@@ -645,7 +657,9 @@ export function expandBsdaRevisionRequestContent(
       }),
       reception: nullIfNoValues<BsdaRevisionRequestReception>({
         weight: bsdaRevisionRequest.destinationReceptionWeight
-          ? bsdaRevisionRequest.destinationReceptionWeight / 1000
+          ? new Decimal(bsdaRevisionRequest.destinationReceptionWeight)
+              .dividedBy(1000)
+              .toNumber()
           : bsdaRevisionRequest.destinationReceptionWeight
       })
     })
