@@ -71,7 +71,7 @@
     "apollo-server-express": "^3.10.1",
     "apollo-server-plugin-base": "^3.6.2",
     "app-root-path": "^3.0.0",
-    "axios": "^0.23.0",
+    "axios": "^0.27.2",
     "bcrypt": "^5.0.0",
     "bull": "^4.10.1",
     "camel-case": "^4.1.1",
