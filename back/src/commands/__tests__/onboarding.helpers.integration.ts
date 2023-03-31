@@ -514,10 +514,72 @@ describe("getRecentlyRegisteredProfesionals", () => {
     expect(actualResult).toEqual(expectedResult);
   });
 
-  it("should not return users who created companies which didn't get verified", async () => {
+  it("should not return duplicates", async () => {
     // Given
 
     // Should be returned
+    const company0 = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: THREE_DAYS_AGO,
+        verifiedAt: TWO_DAYS_AGO,
+        companyTypes: ["COLLECTOR"]
+      },
+      {},
+      { createdAt: THREE_DAYS_AGO }
+    );
+    const admin0 = company0.user;
+
+    // Should be returned
+    const company1 = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: THREE_DAYS_AGO,
+        verifiedAt: TWO_DAYS_AGO,
+        companyTypes: ["COLLECTOR"]
+      },
+      {},
+      { createdAt: THREE_DAYS_AGO }
+    );
+    const admin1 = company1.user;
+
+    // Admin0 is in 2 elligible companies, but should be returned only once
+    addUserToCompany(admin0, company1.company, "MEMBER", {
+      createdAt: TWO_DAYS_AGO
+    });
+
+    // When
+    const profesionnals = await getRecentlyRegisteredProfesionals();
+
+    // Then
+    const expectedResult = [
+      {
+        id: admin0.id,
+        name: admin0.name,
+        email: admin0.email
+      },
+      {
+        id: admin1.id,
+        name: admin1.name,
+        email: admin1.email
+      }
+    ].sort((a, b) => a.id.localeCompare(b.id));
+
+    const actualResult = profesionnals
+      .map(u => ({
+        id: u.id,
+        name: u.name,
+        email: u.email
+      }))
+      .sort((a, b) => a.id.localeCompare(b.id));
+
+    expect(actualResult).toEqual(expectedResult);
+  });
+
+  it("should not return users who created companies which didn't get verified", async () => {
+    // Given
+
+    // Should not be returned
     await userWithCompanyFactory(
       "ADMIN",
       {
@@ -526,6 +588,17 @@ describe("getRecentlyRegisteredProfesionals", () => {
       },
       {},
       { createdAt: THREE_DAYS_AGO }
+    );
+
+    // Should not be returned
+    await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: TWO_DAYS_AGO,
+        companyTypes: ["COLLECTOR"]
+      },
+      {},
+      { createdAt: TWO_DAYS_AGO }
     );
 
     // When
@@ -579,6 +652,49 @@ describe("getRecentlyRegisteredProfesionals", () => {
         email: company0user1.email
       }
     ]);
+  });
+
+  it("edge-case: company created, verified & association on the same day", async () => {
+    // Given
+
+    // Should be returned
+    const company0AndAdmin0 = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: TWO_DAYS_AGO,
+        verifiedAt: TWO_DAYS_AGO,
+        companyTypes: ["COLLECTOR"]
+      },
+      {},
+      { createdAt: TWO_DAYS_AGO }
+    );
+    const admin0 = company0AndAdmin0.user;
+
+    // Should be returned
+    const company0user1 = await userFactory();
+    addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
+      createdAt: TWO_DAYS_AGO
+    });
+
+    // When
+    const profesionnals = await getRecentlyRegisteredProfesionals();
+
+    // Then
+    const expectedResult = [
+      {
+        id: admin0.id,
+        name: admin0.name,
+        email: admin0.email
+      },
+      {
+        id: company0user1.id,
+        name: company0user1.name,
+        email: company0user1.email
+      }
+    ].sort((a, b) => a.id.localeCompare(b.id));
+    const actualResult = profesionnals.sort((a, b) => a.id.localeCompare(b.id));
+
+    expect(actualResult).toEqual(expectedResult);
   });
 
   it("should not return users who recently joined non-professional company", async () => {
@@ -714,6 +830,66 @@ describe("getRecentlyRegisteredNonProfesionals", () => {
         id: company0user1.id,
         name: company0user1.name,
         email: company0user1.email
+      }
+    ].sort((a, b) => a.id.localeCompare(b.id));
+
+    const actualResult = profesionnals
+      .map(u => ({
+        id: u.id,
+        name: u.name,
+        email: u.email
+      }))
+      .sort((a, b) => a.id.localeCompare(b.id));
+
+    expect(actualResult).toEqual(expectedResult);
+  });
+
+  it("should not return duplicates", async () => {
+    // Given
+
+    // Should be returned
+    const company0AndAdmin0 = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: FOUR_DAYS_AGO,
+        companyTypes: ["PRODUCER"]
+      },
+      {},
+      { createdAt: TWO_DAYS_AGO }
+    );
+    const admin0 = company0AndAdmin0.user;
+
+    // Should be returned
+    const company1AndAdmin1 = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: FOUR_DAYS_AGO,
+        companyTypes: ["PRODUCER"]
+      },
+      {},
+      { createdAt: TWO_DAYS_AGO }
+    );
+    const admin1 = company1AndAdmin1.user;
+
+    // Should not be returned twice!
+    addUserToCompany(admin0, company1AndAdmin1.company, "MEMBER", {
+      createdAt: TWO_DAYS_AGO
+    });
+
+    // When
+    const profesionnals = await getRecentlyRegisteredNonProfesionals();
+
+    // Then
+    const expectedResult = [
+      {
+        id: admin0.id,
+        name: admin0.name,
+        email: admin0.email
+      },
+      {
+        id: admin1.id,
+        name: admin1.name,
+        email: admin1.email
       }
     ].sort((a, b) => a.id.localeCompare(b.id));
 

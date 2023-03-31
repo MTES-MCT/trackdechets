@@ -182,7 +182,13 @@ export const getRecentlyRegisteredNonProfesionals = async (daysAgo = 2) => {
     }
   });
 
-  return associations.map(a => a.user);
+  const uniqueUsers = associations
+    .map(a => a.user)
+    .filter(
+      (user, index, self) => self.findIndex(v => v.id === user.id) === index
+    );
+
+  return uniqueUsers;
 };
 
 /**
@@ -190,8 +196,8 @@ export const getRecentlyRegisteredNonProfesionals = async (daysAgo = 2) => {
  */
 export const sendSecondOnboardingEmail = async (daysAgo = 2) => {
   // Pros
-  const recentProfesionals = await getRecentlyRegisteredProfesionals(daysAgo);
-  const proMessageVersions: MessageVersion[] = recentProfesionals.map(pro => ({
+  const profesionals = await getRecentlyRegisteredProfesionals(daysAgo);
+  const proMessageVersions: MessageVersion[] = profesionals.map(pro => ({
     to: [{ email: pro.email, name: pro.name }]
   }));
   const proPayload = renderMail(profesionalsSecondOnboardingEmail, {
@@ -200,11 +206,9 @@ export const sendSecondOnboardingEmail = async (daysAgo = 2) => {
   await sendMail(proPayload);
 
   // Non-pros. If already in pro list, remove (only 1 email, pro has priority)
-  const recentNonProfesionals = await getRecentlyRegisteredNonProfesionals(
-    daysAgo
-  );
-  const profesionalsIds = recentProfesionals.map(p => p.id);
-  const filteredNonProfesionals = recentNonProfesionals.filter(
+  const nonProfesionals = await getRecentlyRegisteredNonProfesionals(daysAgo);
+  const profesionalsIds = profesionals.map(p => p.id);
+  const filteredNonProfesionals = nonProfesionals.filter(
     r => !profesionalsIds.includes(r.id)
   );
   const nonProMessageVersions: MessageVersion[] = filteredNonProfesionals.map(
