@@ -2,11 +2,12 @@ import React from "react";
 import { formatDate } from "common/datetime";
 import {
   Transporter,
-  BsdaTransporter,
-  BsdasriTransporter,
-  BsvhuTransporter,
-  BsffTransporter,
   Scalars,
+  BsffTransporterInput,
+  BsdasriTransporterInput,
+  BsdaTransporterInput,
+  BsvhuTransporterInput,
+  TransporterInput,
 } from "generated/graphql/types";
 import { Alert, Row } from "@dataesr/react-dsfr";
 
@@ -20,12 +21,12 @@ interface UniversalRecepisse {
 }
 
 export type NotFormTransporter =
-  | BsdaTransporter
-  | BsdasriTransporter
-  | BsvhuTransporter
-  | BsffTransporter;
+  | BsdaTransporterInput
+  | BsdasriTransporterInput
+  | BsvhuTransporterInput
+  | BsffTransporterInput;
 
-type UniversalTransporter = Transporter | NotFormTransporter;
+type UniversalTransporter = TransporterInput | NotFormTransporter;
 
 export default function TransporterReceipt({
   transporter,
@@ -50,6 +51,7 @@ export default function TransporterReceipt({
     <Row spacing="mb-2w mt-2w">
       <Alert
         title={"Récépissé de déclaration de transport de déchets"}
+        type={recepisse.number?.length ? "info" : "error"}
         description={
           <>
             {recepisse.number ? (

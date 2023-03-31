@@ -205,30 +205,29 @@ export function PrepareSegment({ form, siret }: WorkflowActionProps) {
                     }
                   }}
                 />
-                {!isForeignVat(values.transporter?.company?.vatNumber!!) &&
-                  !values.transporter.receipt && (
-                    <>
-                      <h4 className="form__section-heading">
-                        Exemption de récépissé de déclaration de transport de
-                        déchets
-                      </h4>
+                {!isForeignVat(values.transporter?.company?.vatNumber!!) && (
+                  <>
+                    <h4 className="form__section-heading">
+                      Exemption de récépissé de déclaration de transport de
+                      déchets
+                    </h4>
 
-                      <div className="form__row">
-                        <TdSwitch
-                          checked={!!values.transporter.isExemptedOfReceipt}
-                          onChange={() =>
-                            setFieldValue(
-                              "transporter.isExemptedOfReceipt",
-                              !values.transporter.isExemptedOfReceipt
-                            )
-                          }
-                          label="Le transporteur déclare être exempté de récépissé conformément
+                    <div className="form__row">
+                      <TdSwitch
+                        checked={!!values.transporter.isExemptedOfReceipt}
+                        onChange={checked =>
+                          setFieldValue(
+                            "transporter.isExemptedOfReceipt",
+                            checked
+                          )
+                        }
+                        label="Le transporteur déclare être exempté de récépissé conformément
                       aux dispositions de l'article R.541-50 du code de
                       l'environnement."
-                        />
-                      </div>
-                    </>
-                  )}
+                      />
+                    </div>
+                  </>
+                )}
                 {error && <NotificationError apolloError={error} />}
 
                 <div className="form__actions">

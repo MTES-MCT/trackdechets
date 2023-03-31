@@ -579,7 +579,9 @@ export default function CompanySelector({
 
           <RedErrorMessage name={`${field.name}.mail`} />
         </div>
-        {!!values.transporter &&
+
+        {values.transporter &&
+          !!orgId &&
           !isForeignCompany &&
           !isExemptedOfReceipt &&
           name === "transporter.company" && (
