@@ -139,10 +139,10 @@ const SurveyBanner = ({ message, button, onClickClose }: SurveyBannerProps) => {
     <div className="survey-banner">
       <div className="survey-banner__container">
         <div className="survey-banner__group">
-          <div className="survey-banner__icon">{iconSurvey}</div>
-          <div className="survey-banner__message">{message}</div>
-        </div>
-        <div className="survey-banner__group">
+          <div className="survey-banner__subgroup">
+            <div className="survey-banner__icon">{iconSurvey}</div>
+            <div className="survey-banner__message">{message}</div>
+          </div>
           <div className="survey-banner__link">
             <Link
               icon={"ri-questionnaire-fill"}
@@ -157,6 +157,8 @@ const SurveyBanner = ({ message, button, onClickClose }: SurveyBannerProps) => {
               {button.title}
             </Link>
           </div>
+        </div>
+        <div className="survey-banner__group">
           <div className="survey-banner__close">
             <Button
               tertiary
