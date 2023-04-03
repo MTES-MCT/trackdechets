@@ -16,16 +16,12 @@ export function graphqlBatchLimiterMiddleware() {
           error: `Batching is limited to ${MAX_OPERATIONS_PER_REQUEST} operations per request.`
         });
       }
-      next();
     }
 
-    if (body !== null && typeof body === "object") {
-      if (Object.keys(body).length > MAX_OPERATIONS_PER_REQUEST) {
-        return res.status(400).send({
-          error: `Batching is limited to ${MAX_OPERATIONS_PER_REQUEST} operations per query.`
-        });
-      }
-      next();
+    if (Object.keys(body).length > MAX_OPERATIONS_PER_REQUEST) {
+      return res.status(400).send({
+        error: `Batching is limited to ${MAX_OPERATIONS_PER_REQUEST} operations per query.`
+      });
     }
 
     next();
