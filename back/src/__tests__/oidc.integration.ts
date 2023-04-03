@@ -373,10 +373,10 @@ describe("/oidc/token - id/secret auth", () => {
 
     expect(res.status).toEqual(200);
 
-    const { idToken } = res.body;
+    const { id_token } = res.body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
@@ -428,10 +428,10 @@ describe("/oidc/token - id/secret auth", () => {
 
     const body = res.body;
 
-    const { idToken } = body;
+    const { id_token } = body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
@@ -486,10 +486,10 @@ describe("/oidc/token - id/secret auth", () => {
 
     const body = res.body;
 
-    const { idToken } = body;
+    const { id_token } = body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
@@ -549,10 +549,10 @@ describe("/oidc/token - id/secret auth", () => {
 
     const body = res.body;
 
-    const { idToken } = body;
+    const { id_token } = body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
@@ -799,10 +799,10 @@ describe("/oidc/token - basic auth", () => {
 
     expect(res.status).toEqual(200);
 
-    const { idToken } = res.body;
+    const { id_token } = res.body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
@@ -857,10 +857,10 @@ describe("/oidc/token - basic auth", () => {
 
     const body = res.body;
 
-    const { idToken } = body;
+    const { id_token } = body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
@@ -920,10 +920,10 @@ describe("/oidc/token - basic auth", () => {
 
     const body = res.body;
 
-    const { idToken } = body;
+    const { id_token } = body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
@@ -977,10 +977,10 @@ describe("/oidc/token - basic auth", () => {
 
     const body = res.body;
 
-    const { idToken } = body;
+    const { id_token } = body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
@@ -1042,10 +1042,10 @@ describe("/oidc/token - basic auth", () => {
 
     const body = res.body;
 
-    const { idToken } = body;
+    const { id_token } = body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",

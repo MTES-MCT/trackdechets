@@ -169,5 +169,5 @@ export const exchange = async (req, res, next) => {
   // openid connect grants are not meant to be reused
   await prisma.grant.delete({ where: { id: grant.id } });
 
-  return res.send({ idToken: jwt });
+  return res.send({ id_token: jwt, access_token: "" });
 };
