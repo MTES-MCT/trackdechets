@@ -4,9 +4,8 @@ import {
   SireneSearchResult
 } from "../types";
 import { libelleFromCodeNaf, buildAddress } from "../utils";
-import { UserInputError } from "apollo-server-express";
 import { authorizedAxiosGet } from "./token";
-import { AnonymousCompanyError } from "../errors";
+import { AnonymousCompanyError, SiretNotFoundError } from "../errors";
 import { format } from "date-fns";
 
 const SIRENE_API_BASE_URL = "https://api.insee.fr/entreprises/sirene/V3";
@@ -95,9 +94,7 @@ export async function searchCompany(
     // that falls out of the range of 2xx
     if (error.response?.status === 404) {
       // 404 "no results found"
-      throw new UserInputError("Aucun établissement trouvé avec ce SIRET", {
-        invalidArgs: ["siret"]
-      });
+      throw new SiretNotFoundError();
     }
     if (error.response?.status === 403) {
       // this is not supposed to happen anymore since https://www.insee.fr/fr/information/6683782

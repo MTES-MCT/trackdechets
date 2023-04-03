@@ -14,8 +14,7 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 import { Status } from "@prisma/client";
 import { NON_CANCELLABLE_BSDD_STATUSES } from "../createFormRevisionRequest";
-import { MARK_AS_SEALED } from "./markAsSealed.integration";
-import { SIGN_EMISSION_FORM } from "./signEmissionForm.integration";
+import { MARK_AS_SEALED, SIGN_EMISSION_FORM } from "./mutations";
 
 const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = `
   mutation SubmitFormRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
@@ -37,7 +36,7 @@ const SUBMIT_BSDD_REVISION_REQUEST_APPROVAL = `
 `;
 
 describe("Mutation.submitFormRevisionRequestApproval", () => {
-  afterEach(() => resetDatabase());
+  afterEach(resetDatabase);
 
   it("should fail if revisionRequest doesnt exist", async () => {
     const { user } = await userWithCompanyFactory("ADMIN");
