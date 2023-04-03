@@ -83,9 +83,6 @@ export function SignOperation({ siret, bsdaId }: Props) {
                       nextDestination: { company: getInitialCompany() },
                     },
                   },
-                  weight: {
-                    value: null,
-                  },
                 },
                 bsda
               ),
@@ -114,7 +111,7 @@ export function SignOperation({ siret, bsdaId }: Props) {
             {({ isSubmitting, handleReset }) => (
               <Form>
                 <div className="tw-mb-6">
-                  <Operation />
+                  <Operation bsda={bsda} />
                 </div>
 
                 <p>
