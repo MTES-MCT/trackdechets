@@ -8,7 +8,8 @@ import {
   initialData,
   readyToTakeOverData,
   readyToReceiveData,
-  readyToProcessData
+  readyToProcessData,
+  readyToPublishData
 } from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
@@ -28,7 +29,8 @@ describe("Mutation.signBsdasri operation", () => {
 
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(emitterCompany, destinationCompany),
+        ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
         ...readyToReceiveData(),
         ...{
@@ -75,7 +77,8 @@ describe("Mutation.signBsdasri operation", () => {
 
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(emitterCompany, destinationCompany),
+        ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
         ...readyToReceiveData(),
         ...readyToProcessData,
@@ -116,7 +119,8 @@ describe("Mutation.signBsdasri operation", () => {
 
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(emitterCompany, destinationCompany),
+        ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
         ...readyToReceiveData(),
         ...readyToProcessData,
@@ -157,7 +161,8 @@ describe("Mutation.signBsdasri operation", () => {
     } = readyToProcessData;
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(emitterCompany, destinationCompany),
+        ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
         ...readyToReceiveData(),
         ...processDataWithoutQuantity,
@@ -204,7 +209,8 @@ describe("Mutation.signBsdasri operation", () => {
 
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(emitterCompany, destinationCompany),
+        ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
         ...readyToReceiveData(),
         ...readyToProcessData,
