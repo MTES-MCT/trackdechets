@@ -3,7 +3,11 @@ import { resetDatabase } from "../../../integration-tests/helper";
 import { companyFactory } from "../../__tests__/factories";
 import { validateBsdasri } from "../validation";
 
-import { initialData, readyToTakeOverData } from "./factories";
+import {
+  initialData,
+  readyToPublishData,
+  readyToTakeOverData
+} from "./factories";
 
 describe("Mutation.signBsdasri emission", () => {
   afterEach(resetDatabase);
@@ -21,7 +25,8 @@ describe("Mutation.signBsdasri emission", () => {
     });
     const destination = await companyFactory();
     bsdasri = {
-      ...initialData(emitter, destination),
+      ...initialData(emitter),
+      ...readyToPublishData(destination),
       ...readyToTakeOverData({
         siret: transporter.siret,
         name: "transporteur"
@@ -32,7 +37,10 @@ describe("Mutation.signBsdasri emission", () => {
   describe("BSDASRI should be valid", () => {
     test("before emission", async () => {
       const validated = await validateBsdasri(
-        initialData(await companyFactory(), await companyFactory()),
+        {
+          ...initialData(await companyFactory()),
+          ...readyToPublishData(await companyFactory())
+        },
         {
           emissionSignature: true
         }
@@ -314,7 +322,6 @@ describe("Mutation.signBsdasri emission", () => {
 
     test("when destination is registered with the wrong profile Trackdéchets", async () => {
       const company = await companyFactory({ companyTypes: ["PRODUCER"] });
-      console.log("company", company);
       const data = {
         ...bsdasri,
         destinationCompanySiret: company.siret

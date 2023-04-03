@@ -42,7 +42,7 @@ export const bsdasriFactory = async ({
   return created;
 };
 
-export const initialData = (company, destination) => ({
+export const initialData = company => ({
   emitterCompanySiret: company.siret,
   emitterCompanyName: company.name,
   emitterCompanyContact: "Contact",
@@ -54,7 +54,10 @@ export const initialData = (company, destination) => ({
   emitterWasteWeightValue: 22,
   emitterWasteWeightIsEstimate: true,
   emitterWasteVolume: 66,
-  emitterWastePackagings: [{ type: "BOITE_CARTON", volume: 22, quantity: 3 }],
+  emitterWastePackagings: [{ type: "BOITE_CARTON", volume: 22, quantity: 3 }]
+});
+
+export const readyToPublishData = destination => ({
   destinationCompanyName: destination.name,
   destinationCompanySiret: destination.siret,
   destinationCompanyAddress: "rue Legrand",

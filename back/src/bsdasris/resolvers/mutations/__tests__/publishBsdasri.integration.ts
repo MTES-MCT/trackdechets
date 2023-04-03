@@ -2,7 +2,11 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { bsdasriFactory, initialData } from "../../../__tests__/factories";
+import {
+  bsdasriFactory,
+  initialData,
+  readyToPublishData
+} from "../../../__tests__/factories";
 import { Mutation } from "../../../../generated/graphql/types";
 const PUBLISH_DASRI = `
 mutation PublishDasri($id: ID!){
@@ -50,7 +54,8 @@ describe("Mutation.publishBsdasri", () => {
     const dasri = await bsdasriFactory({
       opt: {
         isDraft: true,
-        ...initialData(company, destination)
+        ...initialData(company),
+        ...readyToPublishData(destination)
       }
     });
 
@@ -75,7 +80,8 @@ describe("Mutation.publishBsdasri", () => {
 
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(company, destination)
+        ...initialData(company),
+        ...readyToPublishData(destination)
       }
     });
 
@@ -106,7 +112,8 @@ describe("Mutation.publishBsdasri", () => {
     const dasri = await bsdasriFactory({
       opt: {
         isDraft: true,
-        ...initialData(company, destination),
+        ...initialData(company),
+        ...readyToPublishData(destination),
         emitterCompanyName: null, // missing field
         destinationCompanyName: null // missing field
       }

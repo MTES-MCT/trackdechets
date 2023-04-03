@@ -7,7 +7,8 @@ import {
   bsdasriFactory,
   initialData,
   readyToTakeOverData,
-  readyToReceiveData
+  readyToReceiveData,
+  readyToPublishData
 } from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
@@ -29,8 +30,9 @@ describe("Mutation.signBsdasri reception", () => {
     const dasri = await bsdasriFactory({
       opt: {
         ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(destinationCompany),
+        ...readyToReceiveData(),
         destinationReceptionDate: new Date("2020-12-15T11:00:00.000Z"),
         status: BsdasriStatus.SENT
       }
@@ -75,8 +77,9 @@ describe("Mutation.signBsdasri reception", () => {
     const dasri = await bsdasriFactory({
       opt: {
         ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(destinationCompany),
+        ...readyToReceiveData(),
         handedOverToRecipientAt: new Date("2020-12-20T11:00:00.000Z"),
         status: BsdasriStatus.SENT
       }
@@ -116,8 +119,9 @@ describe("Mutation.signBsdasri reception", () => {
     const dasri = await bsdasriFactory({
       opt: {
         ...initialData(emitterCompany),
+        ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
-        ...readyToReceiveData(destinationCompany),
+        ...readyToReceiveData(),
         destinationReceptionAcceptationStatus: WasteAcceptationStatus.REFUSED,
         destinationReceptionWasteRefusalReason: "Non conforme",
         destinationReceptionWasteRefusedWeightValue: 66,
