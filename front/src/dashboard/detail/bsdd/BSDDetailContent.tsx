@@ -63,7 +63,7 @@ import { isDangerous } from "generated/constants";
 import { format } from "date-fns";
 import { isSiret } from "generated/constants/companySearchHelpers";
 import { Appendix1ProducerForm } from "form/bsdd/appendix1Producer/form";
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "form/common/components/company/query";
 
 type CompanyProps = {
