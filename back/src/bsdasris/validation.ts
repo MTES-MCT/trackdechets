@@ -491,13 +491,13 @@ export const recipientSchema: FactorySchemaOf<
     destinationCompanyName: yup
       .string()
       .requiredIf(
-        context.emissionSignature || context.receptionSignature,
+        context.publish || context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_NAME}`
       ),
     destinationCompanySiret: siret
       .label("Destination")
       .requiredIf(
-        context.emissionSignature || context.receptionSignature,
+        context.publish || context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_SIRET}`
       )
       .test(siretTests.isRegistered("DESTINATION")),
@@ -505,21 +505,21 @@ export const recipientSchema: FactorySchemaOf<
       .string()
 
       .requiredIf(
-        context.emissionSignature || context.receptionSignature,
+        context.publish || context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_ADDRESS}`
       ),
     destinationCompanyContact: yup
       .string()
 
       .requiredIf(
-        context.emissionSignature || context.receptionSignature,
+        context.publish || context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_CONTACT}`
       ),
     destinationCompanyPhone: yup
       .string()
       .ensure()
       .requiredIf(
-        context.emissionSignature || context.receptionSignature,
+        context.publish || context.receptionSignature,
         `Destinataire: ${MISSING_COMPANY_PHONE}`
       ),
     destinationCompanyMail: yup.string().email().ensure()
@@ -667,6 +667,7 @@ export type BsdasriValidationContext = {
   operationSignature?: boolean;
   isGrouping?: boolean;
   isSynthesis?: boolean;
+  publish?: boolean;
 };
 export function validateBsdasri(
   dasri: Partial<Prisma.BsdasriCreateInput>,

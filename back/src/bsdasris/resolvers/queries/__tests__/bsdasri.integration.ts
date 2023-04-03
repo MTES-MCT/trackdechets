@@ -6,7 +6,8 @@ import {
   bsdasriFactory,
   initialData,
   readyToReceiveData,
-  readyToProcessData
+  readyToProcessData,
+  readyToPublishData
 } from "../../../__tests__/factories";
 import { Query } from "../../../../generated/graphql/types";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
@@ -31,7 +32,8 @@ describe("Query.Bsdasri", () => {
     const { company: destination } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(company, destination)
+        ...initialData(company),
+        ...readyToPublishData(destination)
       }
     });
 
@@ -53,7 +55,8 @@ describe("Query.Bsdasri", () => {
     const { company: destination } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(company, destination)
+        ...initialData(company),
+        ...readyToPublishData(destination)
       }
     });
     const { user: otherUser } = await userWithCompanyFactory("MEMBER");
@@ -77,7 +80,8 @@ describe("Query.Bsdasri", () => {
     const { company: destination } = await userWithCompanyFactory("MEMBER");
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(company, destination)
+        ...initialData(company),
+        ...readyToPublishData(destination)
       }
     });
 
@@ -98,7 +102,8 @@ describe("Query.Bsdasri", () => {
     const transporterTakenOverAt = new Date();
     const toRegroup = await bsdasriFactory({
       opt: {
-        ...initialData(company, destination),
+        ...initialData(company),
+        ...readyToPublishData(destination),
         ...readyToReceiveData(),
         ...readyToProcessData,
         status: "PROCESSED",
@@ -108,7 +113,8 @@ describe("Query.Bsdasri", () => {
 
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(company, destination),
+        ...initialData(company),
+        ...readyToPublishData(destination),
         type: BsdasriType.GROUPING,
         grouping: { connect: [{ id: toRegroup.id }] }
       }
