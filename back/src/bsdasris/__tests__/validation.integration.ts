@@ -6,12 +6,12 @@ import { validateBsdasri } from "../validation";
 import { initialData, readyToTakeOverData } from "./factories";
 
 describe("Mutation.signBsdasri emission", () => {
-  afterAll(resetDatabase);
+  afterEach(resetDatabase);
 
   let bsdasri: Partial<Bsdasri>;
   let foreignTransporter: Company;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const emitter = await companyFactory();
     const transporter = await companyFactory({ companyTypes: ["TRANSPORTER"] });
     foreignTransporter = await companyFactory({
@@ -19,8 +19,9 @@ describe("Mutation.signBsdasri emission", () => {
       orgId: "IT13029381004",
       vatNumber: "IT13029381004"
     });
+    const destination = await companyFactory();
     bsdasri = {
-      ...initialData(emitter),
+      ...initialData(emitter, destination),
       ...readyToTakeOverData({
         siret: transporter.siret,
         name: "transporteur"
@@ -31,7 +32,7 @@ describe("Mutation.signBsdasri emission", () => {
   describe("BSDASRI should be valid", () => {
     test("before emission", async () => {
       const validated = await validateBsdasri(
-        initialData(await companyFactory()),
+        initialData(await companyFactory(), await companyFactory()),
         {
           emissionSignature: true
         }
@@ -99,6 +100,8 @@ describe("Mutation.signBsdasri emission", () => {
   });
 
   describe("BSDASRI should not be valid", () => {
+    afterEach(resetDatabase);
+
     test("when transporter is FR and recepisse fields are null", async () => {
       const data = {
         ...bsdasri,
@@ -237,8 +240,8 @@ describe("Mutation.signBsdasri emission", () => {
       } catch (err) {
         expect(err.errors).toEqual([
           `Le transporteur saisi sur le bordereau (SIRET: ${company.siret}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
-            " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
-            " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+          " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
+          " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
         ]);
       }
     });
@@ -264,8 +267,8 @@ describe("Mutation.signBsdasri emission", () => {
       } catch (err) {
         expect(err.errors).toEqual([
           `Le transporteur saisi sur le bordereau (numéro de TVA: ${company.vatNumber}) n'est pas inscrit sur Trackdéchets en tant qu'entreprise de transport.` +
-            " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
-            " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+          " Cette entreprise ne peut donc pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette entreprise pour" +
+          " qu'il modifie le profil de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
         ]);
       }
     });
@@ -311,6 +314,7 @@ describe("Mutation.signBsdasri emission", () => {
 
     test("when destination is registered with the wrong profile Trackdéchets", async () => {
       const company = await companyFactory({ companyTypes: ["PRODUCER"] });
+      console.log("company", company);
       const data = {
         ...bsdasri,
         destinationCompanySiret: company.siret
@@ -325,9 +329,9 @@ describe("Mutation.signBsdasri emission", () => {
       } catch (err) {
         expect(err.errors).toEqual([
           `L'installation de destination ou d’entreposage ou de reconditionnement avec le SIRET \"${company.siret}\" n'est pas inscrite` +
-            " sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc" +
-            " pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil" +
-            " de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
+          " sur Trackdéchets en tant qu'installation de traitement ou de tri transit regroupement. Cette installation ne peut donc" +
+          " pas être visée sur le bordereau. Veuillez vous rapprocher de l'administrateur de cette installation pour qu'il modifie le profil" +
+          " de l'établissement depuis l'interface Trackdéchets Mon Compte > Établissements"
         ]);
       }
     });

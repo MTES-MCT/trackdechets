@@ -19,10 +19,13 @@ describe("Mutation.signBsdasri transport", () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { user: transporter, company: transporterCompany } =
       await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(emitterCompany),
+        ...initialData(emitterCompany, destinationCompany),
         ...readyToTakeOverData(transporterCompany),
         status: BsdasriStatus.SIGNED_BY_PRODUCER
       }
@@ -51,10 +54,13 @@ describe("Mutation.signBsdasri transport", () => {
     const { company: emitterCompany } = await userWithCompanyFactory("MEMBER");
     const { user: transporter, company: transporterCompany } =
       await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
 
     const dasri = await bsdasriFactory({
       opt: {
-        ...initialData(emitterCompany),
+        ...initialData(emitterCompany, destinationCompany),
         ...readyToTakeOverData(transporterCompany),
         transporterAcceptationStatus: WasteAcceptationStatus.REFUSED,
         transporterWasteRefusalReason: "J'en veux pas",
