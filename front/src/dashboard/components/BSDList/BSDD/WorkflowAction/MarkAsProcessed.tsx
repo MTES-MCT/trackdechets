@@ -190,7 +190,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
           <div className="form__row">
             <label>
               Numéro de notification ou de document (optionnel){" "}
-              <Tooltip msg="N° du document prévu à l'annexe I-B du règlement n°1013/2006 ou le numéro de notification et numéro de saisie du document prévue à l'annexe I-B du règlement N°1013/2006" />
+              <Tooltip msg="En cas d'export, indiquer ici le N° du document prévu ou le numéro de notification prévue à l'annexe I-B du règlement N°1013/2006 - Format PPNNNN (PP: code pays NNNN: numéro d'ordre)" />
             </label>
             <Field
               type="text"
