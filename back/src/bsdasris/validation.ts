@@ -490,38 +490,23 @@ export const recipientSchema: FactorySchemaOf<
   yup.object().shape({
     destinationCompanyName: yup
       .string()
-      .requiredIf(
-        context.publish || context.receptionSignature,
-        `Destinataire: ${MISSING_COMPANY_NAME}`
-      ),
+      .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_NAME}`),
     destinationCompanySiret: siret
       .label("Destination")
-      .requiredIf(
-        context.publish || context.receptionSignature,
-        `Destinataire: ${MISSING_COMPANY_SIRET}`
-      )
+      .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_SIRET}`)
       .test(siretTests.isRegistered("DESTINATION")),
     destinationCompanyAddress: yup
       .string()
 
-      .requiredIf(
-        context.publish || context.receptionSignature,
-        `Destinataire: ${MISSING_COMPANY_ADDRESS}`
-      ),
+      .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_ADDRESS}`),
     destinationCompanyContact: yup
       .string()
 
-      .requiredIf(
-        context.publish || context.receptionSignature,
-        `Destinataire: ${MISSING_COMPANY_CONTACT}`
-      ),
+      .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_CONTACT}`),
     destinationCompanyPhone: yup
       .string()
       .ensure()
-      .requiredIf(
-        context.publish || context.receptionSignature,
-        `Destinataire: ${MISSING_COMPANY_PHONE}`
-      ),
+      .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_PHONE}`),
     destinationCompanyMail: yup.string().email().ensure()
   });
 
@@ -667,7 +652,7 @@ export type BsdasriValidationContext = {
   operationSignature?: boolean;
   isGrouping?: boolean;
   isSynthesis?: boolean;
-  publish?: boolean;
+  isDraft?: boolean;
 };
 export function validateBsdasri(
   dasri: Partial<Prisma.BsdasriCreateInput>,

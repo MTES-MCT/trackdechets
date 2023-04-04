@@ -22,7 +22,9 @@ const getValidationContext = ({
   if (isSynthesizing) {
     return { emissionSignature: true };
   }
-  return isDraft ? { isGrouping } : { emissionSignature: true, isGrouping };
+  return isDraft
+    ? { isGrouping, isDraft: true }
+    : { emissionSignature: true, isGrouping };
 };
 
 /**
