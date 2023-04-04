@@ -341,6 +341,7 @@ describe("/oidc/token - id/secret auth", () => {
 
   it("should exchange a valid code grant for a token - base scope", async () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
+    console.log(process.env.OIDC_PUBLIC_KEY);
     const alg = "RS256";
 
     const publicKey = await jose.importSPKI(spki, alg);
@@ -380,12 +381,12 @@ describe("/oidc/token - id/secret auth", () => {
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toBe(undefined);
@@ -435,12 +436,12 @@ describe("/oidc/token - id/secret auth", () => {
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toEqual(user.email);
@@ -493,12 +494,12 @@ describe("/oidc/token - id/secret auth", () => {
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toBe(undefined);
@@ -556,12 +557,12 @@ describe("/oidc/token - id/secret auth", () => {
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toBe(undefined);
@@ -806,12 +807,12 @@ describe("/oidc/token - basic auth", () => {
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toBe(undefined);
@@ -864,12 +865,12 @@ describe("/oidc/token - basic auth", () => {
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toEqual(user.email);
@@ -927,12 +928,12 @@ describe("/oidc/token - basic auth", () => {
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toEqual(user.email);
@@ -984,12 +985,12 @@ describe("/oidc/token - basic auth", () => {
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toBe(undefined);
@@ -1049,12 +1050,12 @@ describe("/oidc/token - basic auth", () => {
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toBe(undefined);
