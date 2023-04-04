@@ -26,26 +26,19 @@ export const SIGNATURE_ACCEPTATION_CONTENANT =
 
 // status badge
 export const BROUILLON = "Brouillon";
-export const EN_ATTENTE_SIGNATURE_EMETTEUR =
-  "En attente de signature par l’émetteur";
-export const EN_ATTENTE_RECEPTION = "EN ATTENTE DE RÉCEPTION";
-export const RECU = "reçu, en attente d’acceptation ou de refus";
+export const RECU = "Reçu, en attente d'acceptation";
 export const ACCEPTE = "ACCEPTÉ, EN ATTENTE DE TRAITEMENT";
 export const TRAITE = "Traité";
-export const EN_ATTENTE_REGROUPEMENT = "EN ATTENTE DE REGROUPEMENT";
-export const ANNEXE_BORDEREAU_REGROUPEMENT =
-  "ANNEXÉ À UN BORDEREAU DE REGROUPEMENT";
-export const REGROUPE_AVEC_RUPTURE_TRACABILITE =
-  "regroupé, avec autorisation de RUPTURE DE TRAÇABILITÉ";
+export const ANNEXE_BORDEREAU_SUITE = "Annexé à un bordereau suite";
+export const TRAITE_AVEC_RUPTURE_TRACABILITE =
+  "Traité (avec rupture de traçabilité)";
 export const REFUSE = "REFUSÉ";
 export const ARRIVE_ENTREPOS_PROVISOIRE =
   "ARRIVÉ À L’ENTREPOSAGE PROVISOIRE, EN ATTENTE D’ACCEPTATION";
 export const ENTREPOS_TEMPORAIREMENT =
   "entreposé temporairement ou en reconditionnement";
-export const EN_ATTENTE_SIGNATURE_ENTREPOS_PROVISOIRE =
-  "en attente de signature par l’installation d’entreposage provisoire";
-export const EN_ATTENTE_SIGNATURE = "EN ATTENTE DE RÉCEPTION pour traitement";
-export const SIGNE_PAR_PRODUCTEUR = "signé par le producteur";
+export const BSD_SUITE_PREPARE = "BSD suite préparé";
+export const SIGNE_PAR_TRANSPORTEUR = "signé par le transporteur";
 export const INITIAL = "initial";
 export const SIGNE_PAR_EMETTEUR = "signé par l’émetteur";
 export const SIGNER_PAR_ENTREPOS_PROVISOIRE =
@@ -54,7 +47,8 @@ export const PARTIELLEMENT_REFUSE = "Partiellement refusé";
 export const SUIVI_PAR_PNTTD = "Suivi via PNTTD";
 export const SIGNER_PAR_ENTREPRISE_TRAVAUX =
   "Signé par l'entreprise de travaux";
-export const EN_ATTENTE_OU_BSD_SUITE = "En attente ou associé à un BSD suite";
+export const EN_ATTENTE_BSD_SUITE = "En attente d'un bordereau suite";
+export const ANNULE = "Annulé";
 
 // Additional actions buttons
 export const apercu_action_label = "Aperçu";
@@ -155,3 +149,13 @@ export const bsvhuPublishDraft = `Cette action aura pour effet de démarrer le c
             <strong>“Pour action”</strong> du tableau de bord de l'émetteur. Le
             bordereau pourra toujours être modifié ou supprimé tant qu'aucune
             signature n'a été apposée.`;
+
+// tabs
+export const DRAFTS = "Brouillons";
+export const ACTS = "Pour action";
+export const FOLLOWS = "Suivi";
+export const ARCHIVES = "Archives";
+export const REVIEWS = "Révisions";
+export const TO_COLLECT = "À collecter";
+export const COLLECTED = "Collecté";
+export const REGISTER = "Registre";

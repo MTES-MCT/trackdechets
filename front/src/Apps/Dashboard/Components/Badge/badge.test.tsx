@@ -2,7 +2,6 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import Badge from "./Badge";
 import { BsdStatusCode } from "Apps/Common/types/bsdTypes";
-import { BsdType } from "generated/graphql/types";
 
 describe("Bsd Badge status", () => {
   describe("case: DRAFT/INITITAL(draft=true)", () => {
@@ -17,70 +16,46 @@ describe("Bsd Badge status", () => {
     });
 
     test("Bsdasri with Initial status should return Initial", () => {
-      render(
-        <Badge
-          status={BsdStatusCode.Initial}
-          isDraft
-          bsdType={BsdType.Bsdasri}
-        />
-      );
+      render(<Badge status={BsdStatusCode.Initial} isDraft />);
       expect(screen.getByText(/Brouillon/i));
     });
   });
 
   describe("case: INITITAL(draft=false)", () => {
-    test("Bsd[x] with Initial status should return 'en attente de signature par l'émetteur'", () => {
+    test("Bsd[x] with Initial status should return 'Initial'", () => {
       render(<Badge status={BsdStatusCode.Initial} isDraft={false} />);
-      expect(screen.getByText(/En attente de signature par l’émetteur/i));
+      expect(screen.getByText(/Initial/i));
     });
 
     test("Bsdasri with Initial status should return Initial", () => {
-      render(
-        <Badge
-          status={BsdStatusCode.Initial}
-          isDraft={false}
-          bsdType={BsdType.Bsdasri}
-        />
-      );
+      render(<Badge status={BsdStatusCode.Initial} isDraft={false} />);
       expect(screen.getByText(/Initial/i));
     });
 
     test("Bsvhu with Initial status should return Initial", () => {
-      render(
-        <Badge
-          status={BsdStatusCode.Initial}
-          isDraft={false}
-          bsdType={BsdType.Bsvhu}
-        />
-      );
+      render(<Badge status={BsdStatusCode.Initial} isDraft={false} />);
       expect(screen.getByText(/Initial/i));
     });
 
     test("Bsda with Initial status should return Initial", () => {
-      render(
-        <Badge
-          status={BsdStatusCode.Initial}
-          isDraft={false}
-          bsdType={BsdType.Bsda}
-        />
-      );
+      render(<Badge status={BsdStatusCode.Initial} isDraft={false} />);
       expect(screen.getByText(/Initial/i));
     });
   });
 
   test("SEALED", () => {
     render(<Badge status={BsdStatusCode.Sealed} />);
-    expect(screen.getByText(/En attente de signature par l’émetteur/i));
+    expect(screen.getByText(/Initial/i));
   });
 
   test("SENT", () => {
     render(<Badge status={BsdStatusCode.Sent} />);
-    expect(screen.getByText(/EN ATTENTE DE RÉCEPTION/i));
+    expect(screen.getByText(/Signé par le transporteur/i));
   });
 
   test("RECEIVED", () => {
     render(<Badge status={BsdStatusCode.Received} />);
-    expect(screen.getByText(/reçu, en attente d’acceptation ou de refus/i));
+    expect(screen.getByText(/Reçu, en attente d'acceptation/i));
   });
   test("ACCEPTED", () => {
     render(<Badge status={BsdStatusCode.Accepted} />);
@@ -92,17 +67,15 @@ describe("Bsd Badge status", () => {
   });
   test("AWAITING_GROUP", () => {
     render(<Badge status={BsdStatusCode.AwaitingGroup} />);
-    expect(screen.getByText(/EN ATTENTE DE REGROUPEMENT/i));
+    expect(screen.getByText(/En attente d'un bordereau suite/i));
   });
   test("GROUPED", () => {
     render(<Badge status={BsdStatusCode.Grouped} />);
-    expect(screen.getByText(/ANNEXÉ À UN BORDEREAU DE REGROUPEMENT/i));
+    expect(screen.getByText(/Annexé à un bordereau suite/i));
   });
   test("NO_TRACEABILITY", () => {
     render(<Badge status={BsdStatusCode.NoTraceability} />);
-    expect(
-      screen.getByText(/regroupé, avec autorisation de RUPTURE DE TRAÇABILITÉ/i)
-    );
+    expect(screen.getByText("Traité (avec rupture de traçabilité)"));
   });
   test("REFUSED", () => {
     render(<Badge status={BsdStatusCode.Refused} />);
@@ -124,19 +97,15 @@ describe("Bsd Badge status", () => {
   });
   test("RESEALED", () => {
     render(<Badge status={BsdStatusCode.Resealed} />);
-    expect(
-      screen.getByText(
-        /en attente de signature par l’installation d’entreposage provisoire/i
-      )
-    );
+    expect(screen.getByText(/BSD suite préparé/i));
   });
   test("RESENT", () => {
     render(<Badge status={BsdStatusCode.Resent} />);
-    expect(screen.getByText(/EN ATTENTE DE RÉCEPTION pour traitement/i));
+    expect(screen.getByText(/signé par le transporteur/i));
   });
   test("SIGNED_BY_PRODUCER", () => {
     render(<Badge status={BsdStatusCode.SignedByProducer} />);
-    expect(screen.getByText(/signé par le producteur/i));
+    expect(screen.getByText(/signé par l’émetteur/i));
   });
   test("SIGNED_BY_EMITTER", () => {
     render(<Badge status={BsdStatusCode.SignedByEmitter} />);
@@ -144,7 +113,7 @@ describe("Bsd Badge status", () => {
   });
   test("INTERMEDIATELY_PROCESSED", () => {
     render(<Badge status={BsdStatusCode.IntermediatelyProcessed} />);
-    expect(screen.getByText(/ANNEXÉ À UN BORDEREAU DE REGROUPEMENT/i));
+    expect(screen.getByText(/En attente d'un bordereau suite/i));
   });
   test("SIGNED_BY_TEMP_STORER", () => {
     render(<Badge status={BsdStatusCode.SignedByTempStorer} />);
@@ -166,6 +135,6 @@ describe("Bsd Badge status", () => {
   });
   test("AWAITING_CHILD", () => {
     render(<Badge status={BsdStatusCode.AwaitingChild} />);
-    expect(screen.getByText(/En attente ou associé à un BSD suite/i));
+    expect(screen.getByText(/Annexé à un bordereau suite/i));
   });
 });

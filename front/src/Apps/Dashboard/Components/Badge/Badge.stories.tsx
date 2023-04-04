@@ -3,7 +3,6 @@ import { ComponentMeta, ComponentStory } from "@storybook/react";
 import { withDesign } from "storybook-addon-designs";
 import Badge from "./Badge";
 import { BsdStatusCode } from "../../../Common/types/bsdTypes";
-import { BsdType } from "../../../../generated/graphql/types";
 
 export default {
   title: "COMPONENTS/DASHBOARD/BsdCard/Blocks/Badge",
@@ -50,7 +49,6 @@ InitialNotDraft.args = {
 InitialDasriNotDraft.args = {
   status: BsdStatusCode.Initial,
   isDraft: false,
-  bsdType: BsdType.Bsdasri,
 };
 
 Received.args = {

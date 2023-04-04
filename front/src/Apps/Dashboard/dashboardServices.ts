@@ -14,23 +14,19 @@ import {
 } from "../../generated/graphql/types";
 import {
   ACCEPTE,
-  ANNEXE_BORDEREAU_REGROUPEMENT,
+  ANNEXE_BORDEREAU_SUITE,
+  ANNULE,
   ARRIVE_ENTREPOS_PROVISOIRE,
   BROUILLON,
+  BSD_SUITE_PREPARE,
   ENTREPOS_TEMPORAIREMENT,
-  EN_ATTENTE_OU_BSD_SUITE,
-  EN_ATTENTE_RECEPTION,
-  EN_ATTENTE_REGROUPEMENT,
-  EN_ATTENTE_SIGNATURE,
-  EN_ATTENTE_SIGNATURE_EMETTEUR,
-  EN_ATTENTE_SIGNATURE_ENTREPOS_PROVISOIRE,
+  EN_ATTENTE_BSD_SUITE,
   FAIRE_SIGNER_EMETTEUR,
   INITIAL,
   PARTIELLEMENT_REFUSE,
   PUBLIER,
   RECU,
   REFUSE,
-  REGROUPE_AVEC_RUPTURE_TRACABILITE,
   SIGNATURE_ACCEPTATION_CONTENANT,
   SIGNATURE_ECO_ORG,
   SIGNATURE_EMETTEUR,
@@ -45,9 +41,10 @@ import {
   SIGNER_RECEPTION,
   SIGNER_TRAITEMENT,
   SIGNE_PAR_EMETTEUR,
-  SIGNE_PAR_PRODUCTEUR,
+  SIGNE_PAR_TRANSPORTEUR,
   SUIVI_PAR_PNTTD,
   TRAITE,
+  TRAITE_AVEC_RUPTURE_TRACABILITE,
   VALIDER,
   VALIDER_ACCEPTATION,
   VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE,
@@ -65,28 +62,26 @@ export const getBsdView = (bsd): BsdDisplay | null => {
 // a revoir avec harmonisation des codes status
 export const getBsdStatusLabel = (
   status: string,
-  isDraft: boolean | undefined,
-  bsdType: BsdType | undefined
+  isDraft: boolean | undefined
 ) => {
   switch (status) {
     case BsdStatusCode.Draft:
       return BROUILLON;
     case BsdStatusCode.Sealed:
-      return EN_ATTENTE_SIGNATURE_EMETTEUR;
+      return INITIAL;
     case BsdStatusCode.Sent:
-      return EN_ATTENTE_RECEPTION;
+      return SIGNE_PAR_TRANSPORTEUR;
     case BsdStatusCode.Received:
       return RECU;
     case BsdStatusCode.Accepted:
       return ACCEPTE;
     case BsdStatusCode.Processed:
       return TRAITE;
-    case BsdStatusCode.AwaitingGroup:
-      return EN_ATTENTE_REGROUPEMENT;
+    case BsdStatusCode.AwaitingChild:
     case BsdStatusCode.Grouped:
-      return ANNEXE_BORDEREAU_REGROUPEMENT;
+      return ANNEXE_BORDEREAU_SUITE;
     case BsdStatusCode.NoTraceability:
-      return REGROUPE_AVEC_RUPTURE_TRACABILITE;
+      return TRAITE_AVEC_RUPTURE_TRACABILITE;
     case BsdStatusCode.Refused:
       return REFUSE;
     case BsdStatusCode.TempStored:
@@ -94,30 +89,19 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.TempStorerAccepted:
       return ENTREPOS_TEMPORAIREMENT;
     case BsdStatusCode.Resealed:
-      return EN_ATTENTE_SIGNATURE_ENTREPOS_PROVISOIRE;
+      return BSD_SUITE_PREPARE;
     case BsdStatusCode.Resent:
-      return EN_ATTENTE_SIGNATURE;
+      return SIGNE_PAR_TRANSPORTEUR;
     case BsdStatusCode.SignedByProducer:
-      return SIGNE_PAR_PRODUCTEUR;
+      return SIGNE_PAR_EMETTEUR;
     case BsdStatusCode.Initial:
       if (isDraft) {
         return BROUILLON;
-      }
-      if (
-        !isDraft &&
-        (bsdType === BsdType.Bsdasri ||
-          bsdType === BsdType.Bsda ||
-          bsdType === BsdType.Bsvhu)
-      ) {
+      } else {
         return INITIAL;
-      } else if (!isDraft) {
-        return EN_ATTENTE_SIGNATURE_EMETTEUR;
       }
-      break;
     case BsdStatusCode.SignedByEmitter:
       return SIGNE_PAR_EMETTEUR;
-    case BsdStatusCode.IntermediatelyProcessed:
-      return ANNEXE_BORDEREAU_REGROUPEMENT;
     case BsdStatusCode.SignedByTempStorer:
       return SIGNER_PAR_ENTREPOS_PROVISOIRE;
     case BsdStatusCode.PartiallyRefused:
@@ -126,11 +110,14 @@ export const getBsdStatusLabel = (
       return SUIVI_PAR_PNTTD;
     case BsdStatusCode.SignedByWorker:
       return SIGNER_PAR_ENTREPRISE_TRAVAUX;
-    case BsdStatusCode.AwaitingChild:
-      return EN_ATTENTE_OU_BSD_SUITE;
+    case BsdStatusCode.AwaitingGroup:
+    case BsdStatusCode.IntermediatelyProcessed:
+      return EN_ATTENTE_BSD_SUITE;
+    case BsdStatusCode.Canceled:
+      return ANNULE;
 
     default:
-      return "Error unknown status";
+      return "unknown status";
   }
 };
 
