@@ -4,7 +4,8 @@ import {
   userFactory,
   userWithCompanyFactory,
   companyFactory,
-  siretify
+  siretify,
+  getDestinationInfo
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
@@ -25,21 +26,6 @@ const CREATE_DASRI = gql`
     }
   }
 `;
-
-const getDestinationInfo = async () => {
-  const destinationCompany = await companyFactory();
-  return {
-    destination: {
-      company: {
-        name: destinationCompany.name,
-        address: destinationCompany.address,
-        phone: destinationCompany.contactPhone,
-        siret: destinationCompany.siret,
-        contact: destinationCompany.contact
-      }
-    }
-  };
-};
 
 describe("Mutation.createDasri", () => {
   afterEach(async () => {

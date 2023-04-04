@@ -189,6 +189,24 @@ export const createMembershipRequest = async (
   });
 };
 
+/**
+ * Returns the destination info for a BSD
+ */
+export const getDestinationInfo = async () => {
+  const destinationCompany = await companyFactory();
+  return {
+    destination: {
+      company: {
+        name: destinationCompany.name,
+        address: destinationCompany.address,
+        phone: destinationCompany.contactPhone,
+        siret: destinationCompany.siret,
+        contact: destinationCompany.contact
+      }
+    }
+  };
+};
+
 const formdata = {
   brokerCompanyAddress: "",
   brokerCompanyContact: "",
