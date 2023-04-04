@@ -21,7 +21,7 @@ import {
   BSD_SUITE_PREPARE,
   ENTREPOS_TEMPORAIREMENT,
   EN_ATTENTE_BSD_SUITE,
-  FAIRE_SIGNER_EMETTEUR,
+  FAIRE_SIGNER,
   INITIAL,
   PARTIELLEMENT_REFUSE,
   PUBLIER,
@@ -29,23 +29,17 @@ import {
   REFUSE,
   SIGNATURE_ACCEPTATION_CONTENANT,
   SIGNATURE_ECO_ORG,
-  SIGNATURE_EMETTEUR,
-  SIGNATURE_PRODUCTEUR,
-  SIGNATURE_TRANSPORTEUR,
   SIGNER,
   SIGNER_ENLEVEMENT,
   SIGNER_ENTREPOSAGE_PROVISOIRE,
   SIGNER_EN_TANT_QUE_TRAVAUX,
   SIGNER_PAR_ENTREPOS_PROVISOIRE,
   SIGNER_PAR_ENTREPRISE_TRAVAUX,
-  SIGNER_RECEPTION,
-  SIGNER_TRAITEMENT,
   SIGNE_PAR_EMETTEUR,
   SIGNE_PAR_TRANSPORTEUR,
   SUIVI_PAR_PNTTD,
   TRAITE,
   TRAITE_AVEC_RUPTURE_TRACABILITE,
-  VALIDER,
   VALIDER_ACCEPTATION,
   VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE,
   VALIDER_ENTREPOSAGE_PROVISOIRE,
@@ -59,7 +53,6 @@ export const getBsdView = (bsd): BsdDisplay | null => {
   return bsdView;
 };
 
-// a revoir avec harmonisation des codes status
 export const getBsdStatusLabel = (
   status: string,
   isDraft: boolean | undefined
@@ -185,18 +178,6 @@ const isBsff = (type: BsdType): boolean => type === BsdType.Bsff;
 const isBsdd = (type: BsdType): boolean => type === BsdType.Bsdd;
 const isBsdasri = (type: BsdType): boolean => type === BsdType.Bsdasri;
 
-const isDraft = (bsd: BsdDisplay) => {
-  if (bsd.isDraft) {
-    return (
-      isBsda(bsd.type) ||
-      isBsff(bsd.type) ||
-      isBsdasri(bsd.type) ||
-      isBsvhu(bsd.type)
-    );
-  }
-  return false;
-};
-
 const isBsdaSign = (bsd: BsdDisplay, currentSiret: string) => {
   if (isBsda(bsd.type)) {
     return (
@@ -237,15 +218,14 @@ const getIsNonDraftLabel = (
   const isActTab = bsdCurrentTab === "actTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
 
-  if (isBsvhuSign(bsd, currentSiret)) {
-    return SIGNER;
-  }
   if (
+    isBsvhuSign(bsd, currentSiret) ||
     isBsffSign(bsd, currentSiret, bsdCurrentTab) ||
     isBsdaSign(bsd, currentSiret)
   ) {
     return SIGNER;
   }
+
   if (isBsdasri(bsd.type)) {
     const isEcoOrganisme = currentSiret === bsd.ecoOrganisme?.siret;
     const isHolder = isSameSiretEmmiter(currentSiret, bsd) || isEcoOrganisme;
@@ -255,17 +235,17 @@ const getIsNonDraftLabel = (
       if (isEcoOrganisme) {
         return SIGNATURE_ECO_ORG;
       }
-      return SIGNATURE_PRODUCTEUR;
+      return SIGNER;
     }
 
     if (isToCollectTab && isEmetteurSign(bsd, isTransporter)) {
-      return SIGNATURE_EMETTEUR;
+      return SIGNER;
     }
     return "";
   }
 
   if (isSameSiretEmmiter(currentSiret, bsd)) {
-    return SIGNATURE_EMETTEUR;
+    return SIGNER;
   }
   return "";
 };
@@ -275,15 +255,11 @@ const getDraftOrInitialBtnLabel = (
   bsd: BsdDisplay,
   bsdCurrentTab: BsdCurrentTab
 ): string => {
-  if (isBsdd(bsd.type)) {
-    return VALIDER;
-  }
-  if (isDraft(bsd)) {
-    return PUBLIER;
-  } else if (!bsd.isDraft) {
+  if (!bsd.isDraft) {
     return getIsNonDraftLabel(bsd, currentSiret, bsdCurrentTab);
+  } else {
+    return PUBLIER;
   }
-  return "";
 };
 
 const isAppendix1 = (bsd: BsdDisplay): boolean =>
@@ -299,35 +275,22 @@ const getSealedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
   if (isBsdd(bsd.type)) {
     if (!isAppendix1(bsd)) {
       if (canSkipEmission(bsd) && isSameSiretTransporter(currentSiret, bsd)) {
-        return SIGNATURE_TRANSPORTEUR;
+        return SIGNER;
       }
 
-      if (includesSiretActors(bsd, currentSiret)) {
-        if (isAppendix1Producer(bsd)) {
-          if (hasEmmiterAndEcoOrganismeSiret(bsd, currentSiret)) {
-            return SIGNATURE_EMETTEUR;
-          } else {
-            return FAIRE_SIGNER_EMETTEUR;
-          }
-        }
-        if (hasEmmiterAndEcoOrganismeSiret(bsd, currentSiret)) {
-          return SIGNATURE_EMETTEUR;
-        } else {
-          return FAIRE_SIGNER_EMETTEUR;
-        }
-      }
-    } else {
       if (includesSiretActors(bsd, currentSiret)) {
         if (isAppendix1(bsd) && isSameSiretDestination(currentSiret, bsd)) {
           return VALIDER_RECEPTION;
         }
+        if (hasEmmiterAndEcoOrganismeSiret(bsd, currentSiret)) {
+          return SIGNER;
+        } else {
+          return FAIRE_SIGNER;
+        }
       }
     }
   }
-  if (isBsda(bsd.type) || isBsff(bsd.type)) {
-    return SIGNATURE_EMETTEUR;
-  }
-  if (isBsvhu(bsd.type)) {
+  if (isBsda(bsd.type) || isBsff(bsd.type) || isBsvhu(bsd.type)) {
     return SIGNER;
   }
   return "";
@@ -344,16 +307,14 @@ const getSentBtnLabel = (
     if (isAppendix1Producer(bsd)) {
       return "";
     }
-    if (
-      isActTab &&
-      isSameSiretDestination(currentSiret, bsd) &&
-      bsd.isTempStorage
-    ) {
-      return VALIDER_ENTREPOSAGE_PROVISOIRE;
-    }
+
     if (isActTab && isSameSiretDestination(currentSiret, bsd)) {
+      if (bsd.isTempStorage) {
+        return VALIDER_ENTREPOSAGE_PROVISOIRE;
+      }
       return VALIDER_RECEPTION;
     }
+
     return "";
   }
   if (
@@ -362,14 +323,14 @@ const getSentBtnLabel = (
       currentSiret === bsd.destination?.company?.siret) ||
     (isBsff(bsd.type) && isActTab && isSameSiretDestination(currentSiret, bsd))
   ) {
-    return SIGNER_RECEPTION;
+    return VALIDER_RECEPTION;
   }
 
   if (
     isSameSiretDestination(currentSiret, bsd) &&
     (isBsvhu(bsd.type) || isBsda(bsd.type))
   ) {
-    return SIGNER_ENLEVEMENT;
+    return SIGNER;
   }
   return "";
 };
@@ -392,7 +353,7 @@ const getReceivedBtnLabel = (
     return VALIDER_ACCEPTATION;
   }
   if (isBsda(bsd.type) || isBsvhu(bsd.type)) {
-    return SIGNER_TRAITEMENT;
+    return VALIDER_TRAITEMENT;
   }
   if (
     isBsff(bsd.type) &&
@@ -408,7 +369,7 @@ const getReceivedBtnLabel = (
     isActTab &&
     isSameSiretDestination(currentSiret, bsd)
   ) {
-    return SIGNER_RECEPTION;
+    return VALIDER_RECEPTION;
   }
   return "";
 };
@@ -420,31 +381,30 @@ const getSignByProducerBtnLabel = (
 ): string => {
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
 
-  if (isBsdd(bsd.type) && isSameSiretTransporter(currentSiret, bsd)) {
-    return SIGNATURE_TRANSPORTEUR;
-  }
-
-  if (isBsdasri(bsd.type)) {
-    if (!isSameSiretTransporter(currentSiret, bsd) || !isToCollectTab) {
-      return "";
+  if (isSameSiretTransporter(currentSiret, bsd)) {
+    if (isBsdd(bsd.type)) {
+      return SIGNER;
+    }
+    if (isBsdasri(bsd.type)) {
+      if (!isSynthesis(bsd.bsdWorkflowType?.toString())) {
+        return SIGNER;
+      }
     }
 
     if (
-      isSameSiretTransporter(currentSiret, bsd) &&
-      !isSynthesis(bsd.bsdWorkflowType?.toString())
+      (isBsda(bsd.type) &&
+        currentSiret === bsd.transporter?.company?.orgId &&
+        (isGathering(bsd.bsdWorkflowType?.toString()) ||
+          isReshipment(bsd.bsdWorkflowType?.toString()) ||
+          bsd.worker?.isDisabled)) ||
+      isBsvhu(bsd.type)
     ) {
-      return SIGNATURE_TRANSPORTEUR;
+      return SIGNER;
     }
-  }
-  if (
-    (isBsda(bsd.type) &&
-      currentSiret === bsd.transporter?.company?.orgId &&
-      (isGathering(bsd.bsdWorkflowType?.toString()) ||
-        isReshipment(bsd.bsdWorkflowType?.toString()) ||
-        bsd.worker?.isDisabled)) ||
-    (isBsvhu(bsd.type) && isSameSiretTransporter(currentSiret, bsd))
-  ) {
-    return SIGNER_ENLEVEMENT;
+  } else {
+    if (isBsdasri(bsd.type) && !isToCollectTab) {
+      return "";
+    }
   }
 
   if (currentSiret === bsd.worker?.company?.siret) {
@@ -465,10 +425,10 @@ const getSignedByEmitterLabel = (
     isToCollectTab &&
     isSameSiretTransporter(currentSiret, bsd)
   ) {
-    return SIGNER_ENLEVEMENT;
+    return SIGNER;
   }
   if (isSameSiretTransporter(currentSiret, bsd)) {
-    return SIGNER_ENLEVEMENT;
+    return SIGNER;
   }
   return "";
 };
@@ -535,7 +495,7 @@ const getSignTempStorerBtnLabel = (
     isBsdd(bsd.type) &&
     isSameSiretTemporaryStorageTransporter(currentSiret, bsd)
   ) {
-    return SIGNATURE_TRANSPORTEUR;
+    return SIGNER;
   }
   return "";
 };

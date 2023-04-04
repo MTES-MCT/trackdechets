@@ -62,7 +62,6 @@
     &__infos {
       display: flex;
       flex-direction: column;
-      width: 100%;
 
       &__status {
         margin: 5px 0;
@@ -89,7 +88,7 @@
       @include desktop {
         flex-direction: row;
         align-items: center;
-        flex-wrap: wrap;
+        flex: 2;
 
         &__status {
           margin: 0;
@@ -126,6 +125,10 @@
       display: flex;
       justify-content: flex-end;
       align-items: center;
+
+      @include desktop {
+        flex: 1;
+      }
 
       .fr-btn {
         margin: 0 2px;

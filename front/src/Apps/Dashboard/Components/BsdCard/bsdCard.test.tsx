@@ -156,7 +156,7 @@ describe("Bsd card primary action label", () => {
       );
       const primaryActionBtn = screen.getByTestId("bsd-card-btn-primary");
       expect(screen.getByTestId("bsd-card-btn-primary")).toHaveTextContent(
-        "Valider"
+        "Publier"
       );
       fireEvent.click(primaryActionBtn);
       await waitFor(() => expect(onValidate).toHaveBeenCalled());
@@ -552,7 +552,7 @@ describe("Bsd card primary action label", () => {
         </MockedProvider>
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
-      expect(getByText("Signer en tant qu'émetteur")).toBeInTheDocument();
+      expect(getByText("Signer")).toBeInTheDocument();
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
@@ -653,7 +653,7 @@ describe("Bsd card primary action label", () => {
         </MockedProvider>
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
-      expect(getByText("Signer en tant qu'émetteur")).toBeInTheDocument();
+      expect(getByText("Signer")).toBeInTheDocument();
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
@@ -866,7 +866,7 @@ describe("Bsd card primary action label", () => {
         </MockedProvider>
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
-      expect(getByText("Signer la réception")).toBeInTheDocument();
+      expect(getByText("Valider la réception")).toBeInTheDocument();
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();

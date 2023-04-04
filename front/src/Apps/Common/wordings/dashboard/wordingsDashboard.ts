@@ -1,5 +1,4 @@
 // boutons d'actions primaire bsd card
-export const VALIDER = "Valider";
 export const VALIDER_TRAITEMENT = "Valider le traitement";
 export const VALIDER_ACCEPTATION = "Valider l'acceptation";
 export const PUBLIER = "Publier";
@@ -7,22 +6,16 @@ export const SIGNER = "Signer";
 export const SIGNER_EN_TANT_QUE_TRAVAUX =
   "Signer en tant qu'entreprise de travaux";
 export const SIGNATURE_ECO_ORG = "Signature Éco-organisme";
-export const SIGNATURE_PRODUCTEUR = "Signature producteur";
-export const SIGNATURE_EMETTEUR = "Signer en tant qu'émetteur";
-export const FAIRE_SIGNER_EMETTEUR = "Faire signer l'émetteur";
-export const SIGNATURE_TRANSPORTEUR = "Signature transporteur";
+export const FAIRE_SIGNER = "Faire signer";
 export const VALIDER_ENTREPOSAGE_PROVISOIRE =
   "Valider l'entreposage provisoire";
 export const VALIDER_RECEPTION = "Valider la réception";
-export const SIGNER_RECEPTION = "Signer la réception";
 export const SIGNER_ENLEVEMENT = "Signer l'enlèvement";
-export const SIGNER_TRAITEMENT = "Signer le traitement";
 export const SIGNER_ENTREPOSAGE_PROVISOIRE =
   "Signer en tant qu'entreposage provisoire";
 export const VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE =
   "Valider l'acceptation de l'entreposage provisoire";
-export const SIGNATURE_ACCEPTATION_CONTENANT =
-  "Signature acceptation et traitement par contenant";
+export const SIGNATURE_ACCEPTATION_CONTENANT = "Gérer les contenants";
 
 // status badge
 export const BROUILLON = "Brouillon";

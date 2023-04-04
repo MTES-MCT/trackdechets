@@ -199,8 +199,8 @@ export default withRouter(function Header({
   location,
   history,
 }: RouteComponentProps & HeaderProps) {
-  const { VITE_API_ENDPOINT, PROD } = import.meta.env;
-  const isProduction = PROD;
+  const { VITE_API_ENDPOINT, NODE_ENV } = import.meta.env;
+  const isProduction = NODE_ENV === "production";
 
   const [menuHidden, toggleMenu] = useState(true);
 

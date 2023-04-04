@@ -129,9 +129,9 @@ const createBsdasri = (bsdasri: Bsdasri): BsdDisplay => {
     ecoOrganisme: bsdasri.ecoOrganisme,
     updatedAt: bsdasri.updatedAt,
     emittedByEcoOrganisme: bsdasri.ecoOrganisme?.emittedByEcoOrganisme,
-    bsdWorkflowType: bsdasri.type,
-    grouping: bsdasri.grouping,
-    synthesizing: bsdasri.synthesizing,
+    bsdWorkflowType: bsdasri?.type,
+    grouping: bsdasri?.grouping,
+    synthesizing: bsdasri?.synthesizing,
   };
   return bsdasriFormatted;
 };
