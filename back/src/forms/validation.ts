@@ -122,6 +122,7 @@ type WasteDetailsAppendix1 = WasteDetailsAppendix1Producer &
     | "wasteDetailsParcelNumbers"
     | "wasteDetailsAnalysisReferences"
     | "wasteDetailsLandIdentifiers"
+    | "wasteDetailsConsistence"
   >;
 
 type WasteDetails = WasteDetailsAppendix1 &
@@ -130,7 +131,6 @@ type WasteDetails = WasteDetailsAppendix1 &
     | "wasteDetailsPackagingInfos"
     | "wasteDetailsQuantity"
     | "wasteDetailsQuantityType"
-    | "wasteDetailsConsistence"
     | "wasteDetailsPop"
   >;
 
@@ -634,7 +634,10 @@ const wasteDetailsAppendix1SchemaFn: FactorySchemaOf<
     }),
     wasteDetailsParcelNumbers: yup.array().of(parcelInfos as any),
     wasteDetailsAnalysisReferences: yup.array().of(yup.string()),
-    wasteDetailsLandIdentifiers: yup.array().of(yup.string())
+    wasteDetailsLandIdentifiers: yup.array().of(yup.string()),
+    wasteDetailsConsistence: yup
+      .mixed<Consistence>()
+      .requiredIf(!isDraft, "La consistance du déchet doit être précisée")
   });
 
 const fullWasteDetailsSchemaFn: FactorySchemaOf<
@@ -689,9 +692,6 @@ const fullWasteDetailsSchemaFn: FactorySchemaOf<
           !isDraft,
           "Le type de quantité (réelle ou estimée) doit être précisé"
         ),
-      wasteDetailsConsistence: yup
-        .mixed<Consistence>()
-        .requiredIf(!isDraft, "La consistance du déchet doit être précisée"),
       wasteDetailsPop: yup
         .boolean()
         .requiredIf(!isDraft, "La présence (ou non) de POP doit être précisée")
