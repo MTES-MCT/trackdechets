@@ -993,7 +993,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                     <th>Dénomination usuelle</th>
                     <th>Pesée (tonne)</th>
                     <th>Réelle / estimée</th>
-                    {form?.emitter?.type !== EmitterType.APPENDIX1_PRODUCER && (
+                    {form?.emitter?.type !== EmitterType.APPENDIX1 && (
                       <th>Fraction regroupée (tonne)</th>
                     )}
                     <th>Date de prise en charge initiale</th>
@@ -1008,28 +1008,30 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                         length: 10 - form.grouping.length
                       }).fill({ form: null, quantity: null })
                     ] as Array<InitialFormFraction>
-                  ).map(({ form, quantity }, index) => (
+                  ).map(({ form: groupedForm, quantity }, index) => (
                     <tr key={index}>
                       <td>{index + 1}</td>
-                      <td>{form?.readableId}</td>
-                      <td>{form?.wasteDetails?.code}</td>
-                      <td>{form?.wasteDetails?.name}</td>
+                      <td>{groupedForm?.readableId}</td>
+                      <td>{groupedForm?.wasteDetails?.code}</td>
+                      <td>{groupedForm?.wasteDetails?.name}</td>
                       <td>
-                        {form?.quantityReceived ?? form?.wasteDetails?.quantity}
+                        {groupedForm?.quantityReceived ??
+                          groupedForm?.wasteDetails?.quantity}
                       </td>
                       <td>
-                        {form?.quantityReceived
+                        {groupedForm?.quantityReceived
                           ? "R"
-                          : form?.wasteDetails?.quantityType?.charAt(0)}
+                          : groupedForm?.wasteDetails?.quantityType?.charAt(0)}
                       </td>
-                      {form?.emitter?.type !==
-                        EmitterType.APPENDIX1_PRODUCER && <td>{quantity}</td>}
+                      {form?.emitter?.type !== EmitterType.APPENDIX1 && (
+                        <td>{quantity}</td>
+                      )}
                       <td>
-                        {form?.emitter?.type === EmitterType.APPENDIX1_PRODUCER
-                          ? formatDate(form?.takenOverAt)
-                          : formatDate(form?.signedAt)}
+                        {form?.emitter?.type === EmitterType.APPENDIX1
+                          ? formatDate(groupedForm?.takenOverAt)
+                          : formatDate(groupedForm?.signedAt)}
                       </td>
-                      <td>{form?.emitterPostalCode}</td>
+                      <td>{groupedForm?.emitterPostalCode}</td>
                     </tr>
                   ))}
                 </tbody>
