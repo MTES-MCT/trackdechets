@@ -68,7 +68,7 @@ export const buildIdToken = async (
     .setProtectedHeader({ alg: TOKEN_SIGNATURE_ALG })
     .setIssuedAt()
     .setIssuer(ISSUER)
-    .setAudience(grant.application.name)
+    .setAudience(grant.applicationId)
     .setExpirationTime("1h")
     .setSubject(grant.user.id)
     .sign(privateKey);
