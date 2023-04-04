@@ -25,6 +25,22 @@ const CREATE_DASRI = gql`
     }
   }
 `;
+
+const getDestinationInfo = async () => {
+  const destinationCompany = await companyFactory();
+  return {
+    destination: {
+      company: {
+        name: destinationCompany.name,
+        address: destinationCompany.address,
+        phone: destinationCompany.contactPhone,
+        siret: destinationCompany.siret,
+        contact: destinationCompany.contact
+      }
+    }
+  };
+};
+
 describe("Mutation.createDasri", () => {
   afterEach(async () => {
     await resetDatabase();
@@ -104,7 +120,8 @@ describe("Mutation.createDasri", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -152,7 +169,8 @@ describe("Mutation.createDasri", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -228,7 +246,8 @@ describe("Mutation.createDasri", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -278,7 +297,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -325,7 +345,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -370,7 +391,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -432,7 +454,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -499,7 +522,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -571,7 +595,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -637,7 +662,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -702,7 +728,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -767,7 +794,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -809,7 +837,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -849,7 +878,8 @@ describe("Mutation.createDasri validation scenarii", () => {
             }
           ]
         }
-      }
+      },
+      ...(await getDestinationInfo())
     };
 
     const { mutate } = makeClient(user);

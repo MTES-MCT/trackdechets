@@ -72,6 +72,7 @@ export const companyFactory = async (
         set: ["PRODUCER", "TRANSPORTER", "WASTEPROCESSOR"]
       },
       name: `company_${companyIndex}`,
+      contact: "Company Contact",
       securityCode: 1234,
       verificationCode: "34567",
       address: "Champ de Mars, 5 Av. Anatole France, 75007 Paris",
