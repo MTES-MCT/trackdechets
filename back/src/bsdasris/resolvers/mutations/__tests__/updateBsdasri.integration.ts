@@ -11,7 +11,6 @@ import { BsdasriStatus } from "@prisma/client";
 import prisma from "../../../../prisma";
 import { Mutation } from "../../../../generated/graphql/types";
 import * as sirenify from "../../../sirenify";
-import { flatten } from "xstate/lib/utils";
 import { flattenBsdaDestinationInput } from "../../../../bsda/converter";
 
 const sirenifyMock = jest
