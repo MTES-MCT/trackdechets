@@ -196,6 +196,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
               type="text"
               name="nextDestination.notificationNumber"
               className="td-input"
+              placeholder="PPNNNN (PP: code pays, NNNN: numéro d'ordre)"
             />
           </div>
         </div>
