@@ -192,7 +192,7 @@ export const createMembershipRequest = async (
 /**
  * Returns the destination info for a BSD
  */
-export const getDestinationInfo = async () => {
+export const getBsdasriDestinationInfo = async () => {
   const destinationCompany = await companyFactory();
   return {
     destination: {

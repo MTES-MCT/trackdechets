@@ -5,7 +5,7 @@ import {
   companyFactory,
   ecoOrganismeFactory,
   siretify,
-  getDestinationInfo
+  getBsdasriDestinationInfo
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
@@ -55,7 +55,7 @@ describe("Mutation.createDasri", () => {
           ]
         }
       },
-      ...(await getDestinationInfo()),
+      ...(await getBsdasriDestinationInfo()),
       ecoOrganisme: { siret: ecoOrgCompany.siret, name: "eco-org" }
     };
 
@@ -106,7 +106,7 @@ describe("Mutation.createDasri", () => {
           ]
         }
       },
-      ...(await getDestinationInfo()),
+      ...(await getBsdasriDestinationInfo()),
       ecoOrganisme: { siret: ecoOrg.siret, name: "eco-org" }
     };
 
@@ -157,7 +157,7 @@ describe("Mutation.createDasri", () => {
           ]
         }
       },
-      ...(await getDestinationInfo()),
+      ...(await getBsdasriDestinationInfo()),
       ecoOrganisme: { siret: ecoOrg.siret, name: "eco-org" }
     };
 
@@ -207,7 +207,7 @@ describe("Mutation.createDasri", () => {
           ]
         }
       },
-      ...(await getDestinationInfo()),
+      ...(await getBsdasriDestinationInfo()),
       ecoOrganisme: { siret: ecoOrg.siret, name: "eco-org" }
     };
 
@@ -258,7 +258,7 @@ describe("Mutation.createDasri", () => {
           ]
         }
       },
-      ...(await getDestinationInfo()),
+      ...(await getBsdasriDestinationInfo()),
       ecoOrganisme: { siret: ecoOrgCompany.siret, name: "eco-org" }
     };
 
