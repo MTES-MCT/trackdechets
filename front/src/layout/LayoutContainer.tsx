@@ -8,7 +8,6 @@ import {
   RouteChildrenProps,
 } from "react-router-dom";
 import PrivateRoute from "login/PrivateRoute";
-import { trackPageView } from "tracker";
 import * as Sentry from "@sentry/browser";
 import Loader from "common/components/Loaders";
 import Layout from "./Layout";
@@ -17,6 +16,8 @@ import { useQuery, gql } from "@apollo/client";
 import { Query } from "../generated/graphql/types";
 import ResendActivationEmail from "login/ResendActivationEmail";
 import Login from "login/Login";
+
+import Plausible from "plausible-tracker";
 
 const Admin = lazy(() => import("admin/Admin"));
 const Dashboard = lazy(() => import("dashboard/Dashboard"));
@@ -61,16 +62,23 @@ export default withRouter(function LayoutContainer({ history }) {
   const isAdmin = (isAuthenticated && data?.me?.isAdmin) || false;
   const email = data?.me?.email;
 
-  useEffect(() => {
-    if (import.meta.env.NODE_ENV !== "production") {
-      return;
-    }
+  const { DEV } = import.meta.env;
+  const isDevelopment = DEV;
 
-    const unlisten = history.listen((location, action) =>
-      trackPageView(location.pathname)
-    );
-    return () => unlisten();
-  });
+  if (!isDevelopment) {
+    const plausibleDomain = import.meta.env.PLAUSIBLE_DOMAIN;
+
+    if (plausibleDomain) {
+      const { enableAutoPageviews } = Plausible({
+        // Var d'ENV représentant l'identifiant de l'application sur Plausible
+        domain: plausibleDomain,
+        // URL de l'application Plausible self-hosted
+        apiHost: "https://plausible.trackdechets.beta.gouv.fr",
+      });
+
+      enableAutoPageviews();
+    }
+  }
 
   useEffect(() => {
     if (import.meta.env.VITE_SENTRY_DSN && email) {

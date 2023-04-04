@@ -73,6 +73,7 @@
     "mapbox-gl": "^1.11.1",
     "node-fetch": "^2.6.7",
     "omit-deep-lodash": "^1.1.6",
+    "plausible-tracker": "^0.3.8",
     "query-string": "^6.10.1",
     "rc-tree": "^5.7.3",
     "react": "18.2.0",
