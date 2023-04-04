@@ -13,7 +13,13 @@ type Feature = {
   properties?: { score: number };
 };
 
-export default async function geocode(address: string): Promise<GeoInfo> {
+export default async function geocode(
+  address: string | null | undefined
+): Promise<GeoInfo> {
+  if (!address) {
+    return { longitude: null, latitude: null };
+  }
+
   try {
     const response = await axios.get<{ features: Feature[] }>(API_ADRESSE_URL, {
       params: { q: address }
@@ -24,7 +30,8 @@ export default async function geocode(address: string): Promise<GeoInfo> {
         const feature = features[0];
         if (
           feature.geometry?.type === "Point" &&
-          feature.properties?.score > 0.6
+          feature.properties?.score &&
+          feature.properties.score > 0.6
         ) {
           const coordinates = feature.geometry.coordinates;
           return { longitude: coordinates[0], latitude: coordinates[1] };

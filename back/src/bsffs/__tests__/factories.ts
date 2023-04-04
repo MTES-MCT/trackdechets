@@ -84,6 +84,7 @@ export function createBsffPackaging(
   return {
     type: BsffPackagingType.BOUTEILLE,
     numero: "1234",
+    emissionNumero: "1234",
     weight: 1,
     volume: 1,
     ...args,
@@ -148,7 +149,6 @@ export function createBsffPackagingBeforeTransport(
       type: "AUTRE",
       other: "BOUTEILLE de récup",
       operationSignatureAuthor: "John Snow",
-      numero: "01",
       weight: 1,
       volume: 1,
       ...args

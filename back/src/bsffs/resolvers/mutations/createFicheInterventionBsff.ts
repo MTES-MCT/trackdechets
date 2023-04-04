@@ -6,13 +6,18 @@ import {
 } from "../../converter";
 import { checkCanWriteFicheIntervention } from "../../permissions";
 import { getBsffFicheInterventionRepository } from "../../repository";
+import { sirenifyBsffFicheInterventionInput } from "../../sirenify";
 import { validateFicheIntervention } from "../../validation";
 
 const createFicheInterventionBsff: MutationResolvers["createFicheInterventionBsff"] =
   async (_, { input }, context) => {
     const user = checkIsAuthenticated(context);
 
-    const flatInput = flattenFicheInterventionBsffInput(input);
+    const sirenifiedInput = await sirenifyBsffFicheInterventionInput(
+      input,
+      user
+    );
+    const flatInput = flattenFicheInterventionBsffInput(sirenifiedInput);
     await checkCanWriteFicheIntervention(user, flatInput);
 
     await validateFicheIntervention(flatInput);

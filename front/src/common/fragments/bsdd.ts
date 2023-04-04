@@ -425,6 +425,9 @@ export const dashboardFormFragment = gql`
         name
         omiNumber
       }
+      workSite {
+        name
+      }
       isPrivateIndividual
       isForeignShip
     }

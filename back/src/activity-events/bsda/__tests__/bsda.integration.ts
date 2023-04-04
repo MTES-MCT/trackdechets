@@ -202,7 +202,7 @@ describe("ActivityEvent.Bsda", () => {
       data: {
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         wasteCode: "01 03 08",
         comment: ""
       }
@@ -327,6 +327,6 @@ describe("ActivityEvent.Bsda", () => {
       now
     );
     expect(bsdaFromEventsAfterCreate.wasteCode).toBe("06 07 01*");
-    expect(bsdaAfterUpdate.wasteCode).toBe("06 13 04*");
+    expect(bsdaAfterUpdate!.wasteCode).toBe("06 13 04*");
   });
 });

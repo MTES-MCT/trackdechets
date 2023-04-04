@@ -23,7 +23,7 @@ const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
   const me = checkIsAuthenticated(context);
 
   const { search, ...paginationArgs } = args;
-  if (!!search && context.user.auth !== AuthType.Session) {
+  if (!!search && context.user?.auth !== AuthType.Session) {
     throw new UserInputError(
       `Le paramètre de recherche "search" est réservé à usage interne et n'est pas disponible via l'api.`
     );
@@ -88,7 +88,7 @@ const myCompaniesResolver: QueryResolvers["myCompanies"] = async (
     formatNode: (company: Company) => {
       const companyPrivate: CompanyPrivate = convertUrls(company);
       const { codeNaf: naf, address } = company;
-      const libelleNaf = naf in nafCodes ? nafCodes[naf] : "";
+      const libelleNaf = naf && naf in nafCodes ? nafCodes[naf] : "";
       return { ...companyPrivate, naf, libelleNaf, address };
     },
     ...paginationArgs

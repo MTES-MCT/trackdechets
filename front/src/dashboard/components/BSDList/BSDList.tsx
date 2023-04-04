@@ -111,7 +111,7 @@ export function BSDList({
   const showBlankslate = cachedData?.bsds.totalCount === 0;
 
   const refetchWithDefaultWhere = React.useCallback(
-    ({ where, ...args }) => {
+    ({ where, ...args }: { where?; args? }) => {
       const newVariables = {
         ...args,
         where: { ...where, ...defaultWhere },

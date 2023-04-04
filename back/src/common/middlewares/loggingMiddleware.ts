@@ -25,8 +25,8 @@ export default function (graphQLPath: string) {
       requestMetadata.graphql_variables = req.body?.variables;
       requestMetadata.graphql_query = req.body?.query;
 
-      requestMetadata.graphql_operation = req.gqlInfos[0]?.operation;
-      requestMetadata.graphql_selection_name = req.gqlInfos[0]?.name;
+      requestMetadata.graphql_operation = req.gqlInfos?.[0]?.operation;
+      requestMetadata.graphql_selection_name = req.gqlInfos?.[0]?.name;
     }
 
     logger.info(message, requestMetadata);

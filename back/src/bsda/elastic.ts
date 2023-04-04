@@ -132,6 +132,7 @@ function getWhere(
 
     case BsdaStatus.REFUSED:
     case BsdaStatus.PROCESSED:
+    case BsdaStatus.CANCELED:
       for (const fieldName of siretsFilters.keys()) {
         setTab(siretsFilters, fieldName, "isArchivedFor");
       }

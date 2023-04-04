@@ -1,6 +1,6 @@
 import { Updater, registerUpdater } from "./helper/helper";
 import prisma from "../../src/prisma";
-import { Company } from ".prisma/client";
+import { Company } from "@prisma/client";
 
 @registerUpdater(
   "Clean Company VAT numbers",

@@ -11,6 +11,7 @@ import {
   getReadonlyBsdasriRepository
 } from "../../repository";
 import { checkEditionRules } from "../../edition";
+import sirenify from "../../sirenify";
 
 const buildSynthesizedBsdasriArgs = async (
   dasrisToAssociate: Bsdasri[] | null | undefined,
@@ -99,7 +100,8 @@ const updateSynthesisBsdasri = async ({
     dasrisToAssociate,
     dbBsdasri.status
   );
-  const flattenedInput = flattenBsdasriInput(rest);
+  const sirenifiedInput = await sirenify(rest, user);
+  const flattenedInput = flattenBsdasriInput(sirenifiedInput);
 
   await checkEditionRules(dbBsdasri, input, user);
 

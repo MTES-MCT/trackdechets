@@ -1,8 +1,6 @@
 import { redundant } from "../redundancy";
 import { ErrorCode } from "../../../common/errors";
-import { AnonymousCompanyError } from "../errors";
-import { ProviderErrors } from "../trackdechets/types";
-import { UserInputError } from "apollo-server-express";
+import { AnonymousCompanyError, SiretNotFoundError } from "../errors";
 
 const fn1 = jest.fn();
 const fn2 = jest.fn();
@@ -42,20 +40,16 @@ describe("redundant", () => {
     expect(fn2).not.toHaveBeenCalled();
   });
 
-  it("should not call fallback function when the first function throws UserInputError", async () => {
+  it("should not call fallback function when the first function throws SiretNotFoundError", async () => {
     const fn = redundant(fn1, fn2);
 
     // test fn1 throws UserInputError
-    fn1.mockRejectedValueOnce(
-      new UserInputError(ProviderErrors.SiretNotFound, {
-        invalidArgs: ["siret"]
-      })
-    );
+    fn1.mockRejectedValueOnce(new SiretNotFoundError());
 
     try {
       await fn("foo");
     } catch (err) {
-      expect(err).toBeInstanceOf(UserInputError);
+      expect(err).toBeInstanceOf(SiretNotFoundError);
     }
 
     // fn2 should not be called

@@ -52,6 +52,9 @@ export const COLUMNS: Record<
     accessor: dasri => (
       <>
         <div>{dasri.emitter?.company?.name ?? ""}</div>
+        {dasri.emitter?.pickupSite?.name && (
+          <div>{dasri.emitter?.pickupSite?.name}</div>
+        )}
         <div>{dasri.emitter?.company?.siret ?? ""}</div>
       </>
     ),

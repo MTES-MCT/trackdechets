@@ -49,10 +49,10 @@ export function RouteBSDasrisSignEmissionSecretCode() {
 
     fetchPolicy: "no-cache",
   });
-  const [updateBsdasri, { error: updateError }] =
-    useMutation<Pick<Mutation, "updateBsdasri">, MutationUpdateBsdasriArgs>(
-      UPDATE_BSDASRI
-    );
+  const [updateBsdasri, { error: updateError }] = useMutation<
+    Pick<Mutation, "updateBsdasri">,
+    MutationUpdateBsdasriArgs
+  >(UPDATE_BSDASRI);
   const [signBsdasriEmissionWithSecretCode, { error: signError }] = useMutation<
     Pick<Mutation, "signBsdasriEmissionWithSecretCode">,
     MutationSignBsdasriEmissionWithSecretCodeArgs

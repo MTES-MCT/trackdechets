@@ -1,5 +1,5 @@
 // OLD
-import { ApiResponse } from "@elastic/elasticsearch";
+import { ApiResponse, estypes } from "@elastic/elasticsearch";
 import {
   QueryResolvers,
   Bsd,
@@ -25,7 +25,6 @@ import { expandBsdaFromElastic } from "../../../bsda/converter";
 import { expandBsffFromElastic } from "../../../bsffs/converter";
 import { bsdSearchSchema } from "../../validation";
 import { toElasticQuery } from "../../where";
-import { QueryDslQueryContainer } from "@elastic/elasticsearch/api/types";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -98,7 +97,7 @@ async function buildQuery(
     });
 
   if (clue) {
-    (query.bool.must as QueryDslQueryContainer[]).push({
+    (query.bool.must as estypes.QueryDslQueryContainer[]).push({
       multi_match: {
         query: clue,
         fields: [

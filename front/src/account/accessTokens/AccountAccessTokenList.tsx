@@ -14,8 +14,9 @@ import AccountAccessTokenRevokeAll from "./AccountAccessTokenRevokeAll";
 export default function AccountAccessTokenList() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRevokingAll, setIsRevokingAll] = useState(false);
-  const [newAccessToken, setNewAccessToken] =
-    useState<NewAccessToken | null>(null);
+  const [newAccessToken, setNewAccessToken] = useState<NewAccessToken | null>(
+    null
+  );
 
   return (
     <AccountContentWrapper

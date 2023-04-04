@@ -160,7 +160,7 @@ passport.serializeUser((user: User, done) => {
 
 passport.deserializeUser((id: string, done) => {
   prisma.user
-    .findUnique({ where: { id } })
+    .findUniqueOrThrow({ where: { id } })
     .then(user => done(null, { ...user, auth: AuthType.Session }))
     .catch(err => done(err));
 });
@@ -252,7 +252,7 @@ async function passportCallback(
   callback?: () => Promise<any>
 ) {
   if (user) {
-    req.logIn(user, { session: false }, null);
+    req.logIn(user, { session: false }, () => undefined);
     if (callback) {
       await callback();
     }
@@ -307,7 +307,7 @@ export function applyAuthStrategies(
   context: GraphQLContext,
   strategies: AuthType[]
 ) {
-  if (context.user && !strategies.includes(context.user.auth)) {
+  if (context.user && !strategies.includes(context.user.auth!)) {
     context.user = null;
   }
   return context;
@@ -318,5 +318,5 @@ export function applyAuthStrategies(
  *
  */
 export function isSessionUser(context: GraphQLContext): boolean {
-  return context.user && context.user.auth === AuthType.Session;
+  return !!context.user && context.user.auth === AuthType.Session;
 }

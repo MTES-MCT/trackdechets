@@ -23,6 +23,7 @@ import { TdModalTrigger } from "common/components/Modal";
 import { ActionButton, Loader } from "common/components";
 import { IconCogApproved } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
+import Tooltip from "common/components/Tooltip";
 import cogoToast from "cogo-toast";
 import { GET_BSDS } from "common/queries";
 import { GET_FORM } from "form/bsdd/utils/queries";
@@ -51,6 +52,7 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
       if (nextDestination == null) {
         setFieldValue("nextDestination", {
           processingOperation: "",
+          notificationNumber: "",
           company: {
             siret: "",
             name: "",
@@ -185,6 +187,18 @@ function ProcessedInfo({ form, close }: { form: TdForm; close: () => void }) {
             skipFavorite={noTraceability === true}
             optional={noTraceability === true}
           />
+          <div className="form__row">
+            <label>
+              Numéro de notification ou de document (optionnel){" "}
+              <Tooltip msg="En cas d'export, indiquer ici le N° du document prévu ou le numéro de notification prévue à l'annexe I-B du règlement N°1013/2006 - Format PPNNNN (PP: code pays NNNN: numéro d'ordre)" />
+            </label>
+            <Field
+              type="text"
+              name="nextDestination.notificationNumber"
+              className="td-input"
+              placeholder="PPNNNN (PP: code pays, NNNN: numéro d'ordre)"
+            />
+          </div>
         </div>
       )}
       <div className="form__actions">

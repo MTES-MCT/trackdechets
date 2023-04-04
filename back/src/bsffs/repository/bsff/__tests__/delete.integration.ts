@@ -7,8 +7,7 @@ import {
   refreshElasticSearch,
   resetDatabase
 } from "../../../../../integration-tests/helper";
-import { ApiResponse } from "@elastic/elasticsearch";
-import { SearchResponse } from "@elastic/elasticsearch/api/types";
+import { ApiResponse, estypes } from "@elastic/elasticsearch";
 import {
   client,
   BsdElastic,
@@ -23,7 +22,7 @@ describe("bsffRepository.delete", () => {
 
   it("should soft delete BSFF, create event and delete document in Elasticsearch", async () => {
     async function searchBsds() {
-      const { body }: ApiResponse<SearchResponse<BsdElastic>> =
+      const { body }: ApiResponse<estypes.SearchResponse<BsdElastic>> =
         await client.search({
           index: index.alias,
           body: {
@@ -54,7 +53,7 @@ describe("bsffRepository.delete", () => {
 
     await deleteBsff({ where: { id: bsff.id } });
 
-    const deletedBsff = await prisma.bsff.findUnique({
+    const deletedBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsff.id }
     });
     expect(deletedBsff.isDeleted).toBe(true);

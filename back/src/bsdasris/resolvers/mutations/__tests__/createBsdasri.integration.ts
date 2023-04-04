@@ -11,6 +11,11 @@ import { Mutation } from "../../../../generated/graphql/types";
 import { fullGroupingBsdasriFragment } from "../../../fragments";
 import { gql } from "apollo-server-express";
 import prisma from "../../../../prisma";
+import * as sirenify from "../../../sirenify";
+
+const sirenifyMock = jest
+  .spyOn(sirenify, "default")
+  .mockImplementation(input => Promise.resolve(input));
 
 const CREATE_DASRI = gql`
   ${fullGroupingBsdasriFragment}
@@ -23,6 +28,7 @@ const CREATE_DASRI = gql`
 describe("Mutation.createDasri", () => {
   afterEach(async () => {
     await resetDatabase();
+    sirenifyMock.mockClear();
   });
 
   it("should disallow unauthenticated user", async () => {
@@ -163,11 +169,13 @@ describe("Mutation.createDasri", () => {
     expect(data.createBsdasri.status).toEqual("INITIAL");
     expect(data.createBsdasri.type).toEqual("SIMPLE");
 
-    expect(data.createBsdasri.emitter.company.siret).toEqual(company.siret);
-    const created = await prisma.bsdasri.findUnique({
+    expect(data.createBsdasri.emitter!.company!.siret).toEqual(company.siret);
+    const created = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: data.createBsdasri.id }
     });
     expect(created.synthesisEmitterSirets).toEqual([]);
+    // check input is sirenified
+    expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
 
   it("create a dasri with a default transport mode", async () => {
@@ -237,7 +245,7 @@ describe("Mutation.createDasri", () => {
     expect(data.createBsdasri.status).toEqual("INITIAL");
     expect(data.createBsdasri.type).toEqual("SIMPLE");
 
-    expect(data.createBsdasri.emitter.company.siret).toEqual(company.siret);
+    expect(data.createBsdasri.emitter!.company!.siret).toEqual(company.siret);
   });
 });
 
@@ -377,7 +385,7 @@ describe("Mutation.createDasri validation scenarii", () => {
     expect(data.createBsdasri.isDraft).toEqual(false);
     expect(data.createBsdasri.status).toEqual("INITIAL");
 
-    expect(data.createBsdasri.emitter.company.siret).toEqual(company.siret);
+    expect(data.createBsdasri.emitter!.company!.siret).toEqual(company.siret);
   });
 
   it("Transport weight isEstimate is required when value is provided", async () => {
@@ -575,7 +583,7 @@ describe("Mutation.createDasri validation scenarii", () => {
         }
       }
     );
-    expect(data.createBsdasri.identification.numbers).toEqual([
+    expect(data.createBsdasri.identification!.numbers).toEqual([
       "GRV-XY12345",
       "GRV-VB45678"
     ]);
@@ -641,7 +649,9 @@ describe("Mutation.createDasri validation scenarii", () => {
         }
       }
     );
-    expect(data.createBsdasri.transporter.transport.plates.length).toEqual(2);
+    expect(data.createBsdasri.transporter!.transport!.plates!.length).toEqual(
+      2
+    );
   });
 
   it("should fail creating the form if more than 2 plates are submitted", async () => {
@@ -773,7 +783,7 @@ describe("Mutation.createDasri validation scenarii", () => {
     expect(data.createBsdasri.isDraft).toEqual(false);
     expect(data.createBsdasri.status).toEqual("INITIAL");
 
-    expect(data.createBsdasri.emitter.company.siret).toEqual(company.siret);
+    expect(data.createBsdasri.emitter!.company!.siret).toEqual(company.siret);
   });
 
   it("should convert 18 01 02* to 18 02 02*", async () => {
@@ -812,7 +822,7 @@ describe("Mutation.createDasri validation scenarii", () => {
       }
     );
 
-    expect(data.createBsdasri.waste.code).toEqual("18 02 02*");
+    expect(data.createBsdasri.waste!.code).toEqual("18 02 02*");
   });
 
   it("should allow decimal volume", async () => {

@@ -21,6 +21,9 @@ export async function changePasswordFn(
   currentSessionId: string
 ) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) {
+    throw new Error(`Cannot find user ${userId}`);
+  }
   const passwordValid = await compare(oldPassword, user.password);
   if (!passwordValid) {
     throw new UserInputError("L'ancien mot de passe est incorrect.", {

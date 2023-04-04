@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import prisma from "../../src/prisma";
 import { registerUpdater, Updater } from "./helper/helper";
 
@@ -32,7 +33,7 @@ export class InitBsdaActivityLogs implements Updater {
         `🔢 There are ${bsdasCount} bsdas to process. Chunk size is ${CHUNK_SIZE}`
       );
 
-      let cursor = null;
+      let cursor: string | null = null;
       for (let i = 0; i < bsdasCount; i += CHUNK_SIZE) {
         const chunkBsdas = await prisma.bsda.findMany({
           where,
@@ -49,7 +50,7 @@ export class InitBsdaActivityLogs implements Updater {
             streamId: bsda.id,
             type: "BsdaCreated",
             actor: "script",
-            data: JSON.parse(JSON.stringify(bsda)),
+            data: JSON.parse(JSON.stringify(bsda)) as Prisma.InputJsonValue,
             metadata: { fake: true, origin: "initial migration" }
           }))
         });

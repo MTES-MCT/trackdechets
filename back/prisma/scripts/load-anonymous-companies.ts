@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import { Updater, registerUpdater } from "./helper/helper";
 import prisma from "../../src/prisma";
+import { Prisma } from "@prisma/client";
 
 @registerUpdater(
   "Load anonymous companies",
@@ -17,7 +18,9 @@ export class LoadAnonymousCompaniesUpdater implements Updater {
       const fixturePath =
         "./src/companies/sirene/fixtures/anonymousCompanies.json";
 
-      const data = JSON.parse(fs.readFileSync(fixturePath, "utf8"));
+      const data = JSON.parse(
+        fs.readFileSync(fixturePath, "utf8")
+      ) as Prisma.AnonymousCompanyCreateInput[];
 
       for (const companyInput of data) {
         await prisma.anonymousCompany.create({ data: companyInput });

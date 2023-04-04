@@ -78,11 +78,11 @@ async function getUpdateFromFormRevisionRequest(
   prisma: PrismaTransaction
 ): Promise<
   [
-    Partial<Prisma.FormUpdateInput>,
-    Partial<Prisma.FormUpdateWithoutForwardingInput>
+    Partial<Prisma.FormUpdateInput> | null,
+    Partial<Prisma.FormUpdateWithoutForwardingInput> | null
   ]
 > {
-  const { status: currentStatus } = await prisma.form.findUnique({
+  const { status: currentStatus } = await prisma.form.findUniqueOrThrow({
     where: { id: revisionRequest.bsddId },
     select: { status: true }
   });
@@ -98,8 +98,12 @@ async function getUpdateFromFormRevisionRequest(
     recipientCap: revisionRequest.recipientCap,
     wasteDetailsCode: revisionRequest.wasteDetailsCode,
     wasteDetailsName: revisionRequest.wasteDetailsName,
-    wasteDetailsPop: revisionRequest.wasteDetailsPop,
-    wasteDetailsPackagingInfos: revisionRequest.wasteDetailsPackagingInfos,
+    ...(revisionRequest.wasteDetailsPop && {
+      wasteDetailsPop: revisionRequest.wasteDetailsPop
+    }),
+    ...(revisionRequest.wasteDetailsPackagingInfos && {
+      wasteDetailsPackagingInfos: revisionRequest.wasteDetailsPackagingInfos
+    }),
     ...(hasTempStorage
       ? {
           quantityReceived:
@@ -165,6 +169,7 @@ function getNewStatus(
 
   if (
     status === Status.PROCESSED &&
+    newOperationCode &&
     PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(newOperationCode)
   ) {
     return Status.AWAITING_GROUP;
@@ -191,7 +196,7 @@ export async function approveAndApplyRevisionRequest(
 ): Promise<BsddRevisionRequest> {
   const { prisma, user, logMetadata } = context;
 
-  const revisionRequest = await prisma.bsddRevisionRequest.findUnique({
+  const revisionRequest = await prisma.bsddRevisionRequest.findUniqueOrThrow({
     where: { id: revisionRequestId },
     include: { bsdd: true }
   });
@@ -233,7 +238,7 @@ export async function approveAndApplyRevisionRequest(
     }
   });
 
-  prisma.addAfterCommitCallback(() =>
+  prisma.addAfterCommitCallback?.(() =>
     enqueueBsdToIndex(updatedBsdd.readableId)
   );
 

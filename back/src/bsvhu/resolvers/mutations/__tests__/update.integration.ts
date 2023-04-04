@@ -8,6 +8,11 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
+import * as sirenify from "../../../sirenify";
+
+const sirenifyMock = jest
+  .spyOn(sirenify, "default")
+  .mockImplementation(input => Promise.resolve(input));
 
 const UPDATE_VHU_FORM = `
 mutation EditVhuForm($id: ID!, $input: BsvhuInput!) {
@@ -47,7 +52,10 @@ mutation EditVhuForm($id: ID!, $input: BsvhuInput!) {
 `;
 
 describe("Mutation.Vhu.update", () => {
-  afterEach(resetDatabase);
+  afterEach(async () => {
+    await resetDatabase();
+    sirenifyMock.mockClear();
+  });
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
@@ -123,6 +131,8 @@ describe("Mutation.Vhu.update", () => {
     );
 
     expect(data.updateBsvhu.weight.value).toBe(4);
+    // check input is sirenified
+    expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
 
   it("should allow emitter fields update before emitter signature", async () => {

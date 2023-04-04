@@ -115,7 +115,7 @@ export const hashToken = (token: string) =>
 /**
  *Try extracting a valid postal code
  */
-export function extractPostalCode(address: string) {
+export function extractPostalCode(address: string | null | undefined) {
   if (address) {
     const matches = address.match(/([0-9]{5})/);
     if (matches && matches.length > 0) {
@@ -123,4 +123,29 @@ export function extractPostalCode(address: string) {
     }
   }
   return "";
+}
+
+const reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
+const reHasRegExpChar = RegExp(reRegExpChar.source);
+
+/**
+ * Escapes the `RegExp` special characters "^", "$", "\", ".", "*", "+",
+ * "?", "(", ")", "[", "]", "{", "}", and "|" in `string`.
+ *
+ * TAKEN FROM https://github.com/lodash/lodash/blob/master/escapeRegExp.js
+ *
+ * @since 3.0.0
+ * @category String
+ * @param {string} [string=''] The string to escape.
+ * @returns {string} Returns the escaped string.
+ * @see escape, escapeRegExp, unescape
+ * @example
+ *
+ * escapeRegExp('[lodash](https://lodash.com/)')
+ * // => '\[lodash\]\(https://lodash\.com/\)'
+ */
+export function escapeRegExp(string) {
+  return string && reHasRegExpChar.test(string)
+    ? string.replace(reRegExpChar, "\\$&")
+    : string || "";
 }

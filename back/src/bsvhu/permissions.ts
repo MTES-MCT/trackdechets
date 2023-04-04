@@ -49,6 +49,7 @@ export async function checkCanDeleteBsdvhu(user: User, bsvhu: Bsvhu) {
 
   const isUserOnlySignatory = async () =>
     bsvhu.status === BsvhuStatus.SIGNED_BY_PRODUCER &&
+    bsvhu.emitterCompanySiret &&
     (await getCachedUserSiretOrVat(user.id)).includes(
       bsvhu.emitterCompanySiret
     );

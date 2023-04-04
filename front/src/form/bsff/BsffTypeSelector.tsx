@@ -47,8 +47,9 @@ export function BsffTypeSelector() {
     useField<BsffFicheIntervention[]>("ficheInterventions");
   const [{ value: previousPackagings }, , { setValue: setPreviousBsffs }] =
     useField<Bsff[]>("previousPackagings");
-  const [, , { setValue: setWasteCode }] =
-    useField<string | null>("waste.code");
+  const [, , { setValue: setWasteCode }] = useField<string | null>(
+    "waste.code"
+  );
 
   return (
     <>

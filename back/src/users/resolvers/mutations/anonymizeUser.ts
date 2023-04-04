@@ -10,7 +10,7 @@ import { clearUserSessions } from "../../clearUserSessions";
 import { getUid } from "../../../utils";
 
 export async function checkCompanyAssociations(user: User): Promise<string[]> {
-  const errors = [];
+  const errors: string[] = [];
   const companyAssociations = await prisma.companyAssociation.findMany({
     where: {
       user: {
@@ -53,7 +53,7 @@ export async function checkCompanyAssociations(user: User): Promise<string[]> {
 }
 
 export async function checkApplications(user: User): Promise<string[]> {
-  const errors = [];
+  const errors: string[] = [];
   const applications = await prisma.application.findMany({
     where: {
       adminId: user.id

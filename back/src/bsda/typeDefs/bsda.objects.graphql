@@ -381,6 +381,9 @@ type BsdaRevisionRequestContent {
 
   "Conditionnement"
   packagings: [BsdaPackaging!]
+
+  "Demande d'annulation du bordereau"
+  isCanceled: Boolean
 }
 
 type BsdaRevisionRequestEmitter {

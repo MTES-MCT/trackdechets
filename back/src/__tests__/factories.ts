@@ -43,7 +43,7 @@ export const userFactory = async (
  * @param index numerical index
  */
 export function siretify(index: number | undefined) {
-  if (index === null || index > 9) {
+  if (!index || index > 9) {
     return faker.helpers.replaceCreditCardSymbols(
       Math.floor(Number(crypto.randomBytes(1))) + "############L"
     );
@@ -433,7 +433,7 @@ export const applicationFactory = async (openIdEnabled?: boolean) => {
 };
 
 export const ecoOrganismeFactory = async ({
-  siret = null,
+  siret,
   handleBsdasri = false
 }: {
   siret?: string;
@@ -455,5 +455,6 @@ export const ecoOrganismeFactory = async ({
 export const toIntermediaryCompany = (company: Company, contact = "toto") => ({
   siret: company.siret,
   name: company.name,
+  address: company.address,
   contact
 });

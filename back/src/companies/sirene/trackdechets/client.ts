@@ -1,30 +1,18 @@
-import {
-  GetResponse,
-  QueryDslQueryContainer
-} from "@elastic/elasticsearch/api/types";
-import { errors } from "@elastic/elasticsearch";
+import { errors, estypes } from "@elastic/elasticsearch";
 import logger from "../../../logging/logger";
 import { libelleFromCodeNaf, buildAddress, removeDiacritics } from "../utils";
-import { AnonymousCompanyError } from "../errors";
+import { AnonymousCompanyError, SiretNotFoundError } from "../errors";
 import { SireneSearchResult } from "../types";
 import {
   SearchHit,
   SearchOptions,
   SearchResponse,
-  SearchStockEtablissement,
-  ProviderErrors
+  SearchStockEtablissement
 } from "./types";
 import client from "./esClient";
 
 const { ResponseError } = errors;
 const index = process.env.TD_COMPANY_ELASTICSEARCH_INDEX;
-
-/**
- * Specific Error class
- * to handle falling back to INSEE API client for hidden companies in public data
- * check redundancy.ts for processing company search client errors
- */
-export class CompanyNotFoundInTrackdechetsSearch extends Error {}
 
 /**
  * Build a company object from a search response
@@ -47,6 +35,55 @@ const searchResponseToCompany = (
     etablissement.libelleCommuneEtablissement
   ]);
 
+  // Cette variable désigne la raison sociale pour les personnes morales. Il s'agit du nom sous lequel est
+  // déclarée l'unité légale.
+  let companyName = etablissement.denominationUniteLegale;
+
+  const secondaryNames = [
+    // > Dénomination usuelle de l’établissement
+    // > Cette variable désigne le nom sous lequel l'établissement est connu du grand public.
+    // > Cet élément d'identification de l'établissement a été enregistré au niveau établissement depuis l'application
+    // > de la norme d'échanges CFE de 2008. Avant la norme 2008, la dénomination usuelle était enregistrée au
+    // > niveau de l'unité légale sur trois champs (cf. variables denominationUsuelle1UniteLegale à
+    // > denominationUsuelle3UniteLegale dans le descriptif des variables du fichier StockUniteLegale).
+    "denominationUsuelleEtablissement",
+    "denominationUsuelle1UniteLegale",
+    "denominationUsuelle2UniteLegale",
+    "denominationUsuelle3UniteLegale",
+    // > Les trois variables enseigne1Etablissement, enseigne2Etablissement et enseigne3Etablissement
+    // > contiennent la ou les enseignes de l'établissement.
+    // > L'enseigne identifie l'emplacement ou le local dans lequel est exercée l'activité. Un établissement peut
+    // > posséder une enseigne, plusieurs enseignes ou aucune.
+    // > L'analyse des enseignes et de son découpage en trois variables dans Sirene montre deux cas possibles :
+    // > soit les 3 champs concernent 3 enseignes bien distinctes, soit ces trois champs correspondent au
+    // > découpage de l'enseigne qui est déclarée dans la liasse (sur un seul champ) avec une continuité des trois
+    // > champs.
+    "enseigne1Etablissement",
+    "enseigne2Etablissement",
+    "enseigne3Etablissement",
+    // > Sigle de l’unité légale
+    // > Un sigle est une forme réduite de la raison sociale ou de la dénomination d'une personne morale ou d'un
+    // > organisme public.
+    // > Il est habituellement constitué des initiales de certains des mots de la dénomination. Afin d'en faciliter la
+    // > prononciation, il arrive qu'on retienne les deux ou trois premières lettres de certains mots : il s'agit alors, au
+    // > sens strict, d'un acronyme; mais l'usage a étendu à ce cas l'utilisation du terme sigle.
+    // > Cette variable est à null pour les personnes physiques.
+    // > Elle peut être non renseignée pour les personnes morales
+    "sigleUniteLegale"
+  ];
+
+  // Try to grab useful secondary naming information in different secondary fields
+  for (const secondaryName of secondaryNames) {
+    if (
+      etablissement[secondaryName] &&
+      etablissement[secondaryName].length > 0 &&
+      etablissement[secondaryName] !== companyName
+    ) {
+      companyName = companyName.concat(` (${etablissement[secondaryName]})`);
+      break;
+    }
+  }
+
   const company: SireneSearchResult = {
     siret: etablissement.siret,
     etatAdministratif: etablissement.etatAdministratifEtablissement,
@@ -55,7 +92,7 @@ const searchResponseToCompany = (
     addressPostalCode: etablissement.codePostalEtablissement,
     addressCity: etablissement.libelleCommuneEtablissement,
     codeCommune: etablissement.codeCommuneEtablissement,
-    name: etablissement.denominationUniteLegale,
+    name: companyName,
     naf: etablissement.activitePrincipaleEtablissement,
     libelleNaf: etablissement.activitePrincipaleEtablissement
       ? libelleFromCodeNaf(etablissement.activitePrincipaleEtablissement)
@@ -93,7 +130,9 @@ export const searchCompany = async (
   siret: string
 ): Promise<SireneSearchResult> => {
   try {
-    const response = await client.get<GetResponse<SearchStockEtablissement>>({
+    const response = await client.get<
+      estypes.GetResponse<SearchStockEtablissement>
+    >({
       id: siret,
       index
     });
@@ -103,21 +142,14 @@ export const searchCompany = async (
     }
     return company;
   } catch (error) {
-    if (error instanceof AnonymousCompanyError) {
-      throw error;
-    }
-    // 404 may mean Anonymous Company
-    // rely on `redundancy` to fallback on INSEE api to verify that or if SIRET does not exists.
     if (error instanceof ResponseError && error.meta.statusCode === 404) {
-      throw new CompanyNotFoundInTrackdechetsSearch(
-        ProviderErrors.SiretNotFound
-      );
+      throw new SiretNotFoundError();
     }
-    logger.error(
-      `${ProviderErrors.ServerError}: ${error.name}, ${error.message}, \n`,
-      { stacktrace: error.stack }
-    );
-    throw new Error(ProviderErrors.ServerError);
+    logger.error(`"Erreur inconnue": ${error.name}, ${error.message}, \n`, {
+      stacktrace: error.stack
+    });
+
+    throw error;
   }
 };
 
@@ -140,7 +172,7 @@ export const searchCompanies = (
 ): Promise<SireneSearchResult[]> => {
   const qs = removeDiacritics(clue);
   // Match query on the merged field td_search_companies
-  const must: QueryDslQueryContainer[] = [
+  const must: estypes.QueryDslQueryContainer[] = [
     {
       match: {
         // field created during indexation from the copy of multiple fields
@@ -193,7 +225,7 @@ export const searchCompanies = (
       return fullTextSearchResponseToCompanies(r.body.hits.hits);
     })
     .catch(error => {
-      logger.error(`${ProviderErrors.ServerError}\n`, error);
-      throw new Error(ProviderErrors.ServerError);
+      logger.error(`Erreur inconnue\n`, error);
+      throw error;
     });
 };

@@ -32,7 +32,7 @@ function validateArgs(args: MutationSignupArgs) {
       password: yup
         .string()
         .required("Vous devez saisir un mot de passe.")
-        .test("new-user-password-meets-criteria", "", function (password) {
+        .test("new-user-password-meets-criteria", "", (password: string) => {
           checkPasswordCriteria(password);
           return true;
         })

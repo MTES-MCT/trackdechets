@@ -19,6 +19,7 @@ import {
 import { Prisma } from "@prisma/client";
 import { getFormRepository } from "../../repository";
 import prisma from "../../../prisma";
+import { sirenifyTransportSegmentInput } from "../../sirenify";
 
 const SEGMENT_NOT_FOUND = "Le segment de transport n'a pas été trouvé";
 const FORM_NOT_FOUND_OR_NOT_ALLOWED =
@@ -101,7 +102,8 @@ export async function prepareSegment(
   if (!userCompaniesSiretOrVat.includes(siret)) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
-  const nextSegmentPayload = flattenTransportSegmentInput(nextSegmentInfo);
+  const sirenified = await sirenifyTransportSegmentInput(nextSegmentInfo, user);
+  const nextSegmentPayload = flattenTransportSegmentInput(sirenified);
 
   if (!nextSegmentPayload.transporterCompanySiret) {
     throw new ForbiddenError(MISSING_COMPANY_SIRET);

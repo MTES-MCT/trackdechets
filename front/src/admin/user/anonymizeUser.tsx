@@ -12,10 +12,10 @@ const ANONYMIZE_USER = gql`
   }
 `;
 function AnonymizeUser() {
-  const [anonymizeUser, { loading, error }] =
-    useMutation<Pick<Mutation, "anonymizeUser">, MutationAnonymizeUserArgs>(
-      ANONYMIZE_USER
-    );
+  const [anonymizeUser, { loading, error }] = useMutation<
+    Pick<Mutation, "anonymizeUser">,
+    MutationAnonymizeUserArgs
+  >(ANONYMIZE_USER);
 
   return (
     <div className="tw-mx-2">

@@ -7,6 +7,8 @@ import {
   Mutation,
   MutationSubmitBsdaRevisionRequestApprovalArgs
 } from "../../../../../generated/graphql/types";
+import { NON_CANCELLABLE_BSDA_STATUSES } from "../createRevisionRequest";
+import { BsdaStatus, UserRole } from "@prisma/client";
 
 const SUBMIT_BSDA_REVISION_REQUEST_APPROVAL = `
   mutation SubmitBsdaRevisionRequestApproval($id: ID!, $isApproved: Boolean!) {
@@ -468,5 +470,173 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
     });
 
     expect(updatedBsda.status).toBe("SENT");
+  });
+
+  it("should change the bsda status to CANCELED if revision asks for cancellation", async () => {
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { mutate } = makeClient(user);
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: companyOfSomeoneElse.siret,
+        status: "SENT"
+      }
+    });
+
+    const revisionRequest = await prisma.bsdaRevisionRequest.create({
+      data: {
+        bsdaId: bsda.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret } },
+        comment: "Cancel",
+        isCanceled: true
+      }
+    });
+
+    await mutate<
+      Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+      MutationSubmitBsdaRevisionRequestApprovalArgs
+    >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    const updatedBsda = await prisma.bsda.findUnique({
+      where: { id: bsda.id }
+    });
+
+    expect(updatedBsda.status).toBe("CANCELED");
+  });
+
+  it.each(NON_CANCELLABLE_BSDA_STATUSES)(
+    "should fail if request is about cancelation & the BSDA has a non-cancellable status",
+    async (status: BsdaStatus) => {
+      const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+        "ADMIN"
+      );
+      const { user, company } = await userWithCompanyFactory("ADMIN");
+      const { mutate } = makeClient(user);
+
+      const bsda = await bsdaFactory({
+        opt: {
+          emitterCompanySiret: companyOfSomeoneElse.siret,
+          status
+        }
+      });
+
+      const revisionRequest = await prisma.bsdaRevisionRequest.create({
+        data: {
+          bsdaId: bsda.id,
+          authoringCompanyId: companyOfSomeoneElse.id,
+          approvals: { create: { approverSiret: company.siret } },
+          comment: "Cancel",
+          isCanceled: true
+        }
+      });
+
+      const { errors } = await mutate<
+        Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+        MutationSubmitBsdaRevisionRequestApprovalArgs
+      >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+        variables: {
+          id: revisionRequest.id,
+          isApproved: true
+        }
+      });
+
+      expect(errors[0].message).toBe(
+        "Impossible d'annuler un bordereau qui a été réceptionné sur l'installation de destination."
+      );
+    }
+  );
+
+  it("should free BSD from group if group parent BSD is canceled", async () => {
+    const { company: emitter } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { company: transporter } = await userWithCompanyFactory(
+      UserRole.ADMIN
+    );
+    const { user, company: destination } = await userWithCompanyFactory(
+      UserRole.ADMIN
+    );
+    const { company: ttr1 } = await userWithCompanyFactory(UserRole.ADMIN);
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: ttr1.siret,
+        transporterCompanySiret: transporter.siret,
+        destinationCompanySiret: destination.siret,
+        status: BsdaStatus.SENT
+      }
+    });
+
+    const grouped1 = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: emitter.siret,
+        transporterCompanySiret: transporter.siret,
+        destinationCompanySiret: ttr1.siret,
+        destinationOperationCode: "R 13",
+        status: BsdaStatus.SENT,
+        groupedIn: { connect: { id: bsda.id } }
+      }
+    });
+    const grouped2 = await bsdaFactory({
+      opt: {
+        status: BsdaStatus.SENT,
+        emitterCompanySiret: emitter.siret,
+        transporterCompanySiret: transporter.siret,
+        destinationCompanySiret: ttr1.siret,
+        destinationOperationCode: "R 13",
+        groupedIn: { connect: { id: bsda.id } }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+
+    // Now let's cancel the parent bsda
+    const revisionRequest = await prisma.bsdaRevisionRequest.create({
+      data: {
+        bsdaId: bsda.id,
+        authoringCompanyId: emitter.id,
+        approvals: {
+          create: [{ approverSiret: destination.siret }]
+        },
+        comment: "Cancel",
+        isCanceled: true
+      }
+    });
+
+    const { errors } = await mutate<
+      Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+      MutationSubmitBsdaRevisionRequestApprovalArgs
+    >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const newGrouped1AfterRevision = await prisma.bsda.findUnique({
+      where: { id: grouped1.id }
+    });
+    expect(newGrouped1AfterRevision.status).toEqual(BsdaStatus.SENT);
+    expect(newGrouped1AfterRevision.groupedInId).toBe(null);
+
+    const newGrouped2AfterRevision = await prisma.bsda.findUnique({
+      where: { id: grouped2.id }
+    });
+    expect(newGrouped2AfterRevision.status).toEqual(BsdaStatus.SENT);
+    expect(newGrouped2AfterRevision.groupedInId).toBe(null);
+
+    const newBsdaAfterRevision = await prisma.bsda.findUnique({
+      where: { id: bsda.id }
+    });
+    expect(newBsdaAfterRevision.status).toEqual(BsdaStatus.CANCELED);
   });
 });

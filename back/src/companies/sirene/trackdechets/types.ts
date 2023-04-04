@@ -112,11 +112,3 @@ export interface SearchHit {
   _score: number;
   _source: SearchStockEtablissement;
 }
-
-/**
- * Public API error code names
- */
-export enum ProviderErrors {
-  SiretNotFound = "Nous n'avons pas trouvé ce SIRET dans notre base de données, cherchons sur l'Api publique Sirene de l'INSEE",
-  ServerError = "Erreur inconnue"
-}

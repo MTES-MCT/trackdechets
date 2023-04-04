@@ -94,6 +94,9 @@ export const dashboardDasriFragment = gql`
       company {
         ...DashboardCompanyFragment
       }
+      pickupSite {
+        name
+      }
       emission {
         isTakenOverWithoutEmitterSignature
         isTakenOverWithSecretCode

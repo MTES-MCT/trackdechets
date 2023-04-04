@@ -9,6 +9,12 @@ export const OPERATION: Record<
     successors: GraphQL.BsffType[];
   }
 > = {
+  R1: {
+    code: "R1",
+    description:
+      "Utilisation principale comme combustible ou autre moyen de produire de l'énergie",
+    successors: []
+  },
   R2: {
     code: "R2",
     description: "Récupération ou régénération des solvants",

@@ -1,6 +1,5 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -184,7 +183,7 @@ model Company {
   verificationMode                     CompanyVerificationMode?
   verificationComment                  String?
   verifiedAt                           DateTime?                 @db.Timestamptz(6)
-  name                                 String?
+  name                                 String
   address                              String?
   codeDepartement                      String?
   longitude                            Float?
@@ -387,6 +386,7 @@ model Form {
   nextDestinationCompanyMail         String?
   nextDestinationCompanyCountry      String?
   nextDestinationCompanyVatNumber    String?
+  nextDestinationNotificationNumber  String?
   emitterWorkSiteName                String?
   emitterWorkSiteAddress             String?
   emitterWorkSiteCity                String?
@@ -709,7 +709,7 @@ model User {
   email                 String                  @unique
   password              String
   passwordVersion       Int
-  name                  String?
+  name                  String
   phone                 String?
   createdAt             DateTime                @default(now()) @db.Timestamptz(6)
   updatedAt             DateTime                @updatedAt @db.Timestamptz(6)
@@ -1167,12 +1167,13 @@ model BsffFicheIntervention {
 }
 
 model BsffPackaging {
-  id     String            @id @default(cuid())
-  type   BsffPackagingType
-  other  String?
-  volume Float?
-  weight Float
-  numero String
+  id             String            @id @default(cuid())
+  type           BsffPackagingType
+  other          String?
+  volume         Float?
+  weight         Float
+  emissionNumero String
+  numero         String
 
   acceptationDate             DateTime?               @db.Timestamptz(6)
   acceptationWeight           Float?
@@ -1237,6 +1238,7 @@ enum BsdaStatus {
   PROCESSED
   REFUSED
   AWAITING_CHILD
+  CANCELED
 }
 
 enum BsdaType {
@@ -1442,6 +1444,8 @@ model BsdaRevisionRequest {
   comment String
 
   status RevisionRequestStatus @default(PENDING)
+
+  isCanceled Boolean @default(false)
 
   @@index([authoringCompanyId], map: "_BsdaRevisionRequestAuthoringCompanyIdIdx")
   @@index([bsdaId], map: "_BsdaRevisionRequestBsdaIdIdx")

@@ -48,15 +48,15 @@ export default function BsvhuStepsList(props: Props) {
     [formQuery.data]
   );
 
-  const [createVhuForm] =
-    useMutation<Pick<Mutation, "createBsvhu">, MutationCreateBsvhuArgs>(
-      CREATE_VHU_FORM
-    );
+  const [createVhuForm] = useMutation<
+    Pick<Mutation, "createBsvhu">,
+    MutationCreateBsvhuArgs
+  >(CREATE_VHU_FORM);
 
-  const [updateVhuForm] =
-    useMutation<Pick<Mutation, "updateBsvhu">, MutationUpdateBsvhuArgs>(
-      UPDATE_VHU_FORM
-    );
+  const [updateVhuForm] = useMutation<
+    Pick<Mutation, "updateBsvhu">,
+    MutationUpdateBsvhuArgs
+  >(UPDATE_VHU_FORM);
 
   function saveForm(input: BsvhuInput): Promise<any> {
     return formState.id

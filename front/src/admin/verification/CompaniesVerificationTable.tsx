@@ -82,15 +82,15 @@ export default function CompaniesVerificationTable({
         Cell: ({ row, value }) => {
           const verificationStatus = value;
           if (verificationStatus === CompanyVerificationStatus.ToBeVerified) {
-            return "À vérifier";
+            return <>À vérifier</>;
           } else if (
             verificationStatus === CompanyVerificationStatus.LetterSent
           ) {
-            return "Courrier envoyé";
+            return <>Courrier envoyé</>;
           } else {
             const verificationMode = row.original.verificationMode;
             if (verificationMode === CompanyVerificationMode.Letter) {
-              return "Vérifié par code de sécurité";
+              return <>Vérifié par code de sécurité"</>;
             } else {
               const comment = row.original.verificationComment;
               const hasComment = comment && comment.length > 0;

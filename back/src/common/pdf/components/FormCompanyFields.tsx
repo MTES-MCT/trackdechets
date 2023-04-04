@@ -43,7 +43,9 @@ export function FormCompanyFields({
         <input
           type="checkbox"
           checked={
-            company?.vatNumber?.length > 0 && companyCountry?.cca2 !== "FR"
+            !!company?.vatNumber &&
+            company.vatNumber.length > 0 &&
+            companyCountry?.cca2 !== "FR"
           }
           readOnly
         />{" "}
@@ -96,23 +98,20 @@ export function FormCompanyFields({
   );
 }
 
-export function getcompanyCountry(company: FormCompany): Country | null {
-  // reconnaitre le pays directement dans le champ country
-  let companyCountry = company
-    ? countries.find(country => country.cca2 === company?.country) ??
-      FRENCH_COUNTRY // default
-    : null;
+export function getcompanyCountry(company: FormCompany | undefined): Country | undefined {
+  if (!company) return FRENCH_COUNTRY; // default
 
   // forcer FR si le siret est valide
-  if (company && isSiret(company.siret)) {
-    companyCountry = countries.find(country => country.cca2 === "FR");
-  } else if (company && isVat(company.vatNumber)) {
+  if (company.siret && isSiret(company.siret)) {
+    return countries.find(country => country.cca2 === "FR");
+  } else if (company.vatNumber && isVat(company.vatNumber)) {
     // trouver automatiquement le pays selon le numéro de TVA
     const vatCountryCode = checkVAT(cleanClue(company.vatNumber), vatCountries)
       ?.country?.isoCode.short;
 
-    companyCountry = countries.find(country => country.cca2 === vatCountryCode);
+    return countries.find(country => country.cca2 === vatCountryCode);
   }
 
-  return companyCountry;
+  // reconnaitre le pays directement dans le champ country
+  return countries.find(country => country.cca2 === company.country);
 }

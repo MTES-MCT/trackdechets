@@ -10,7 +10,7 @@ import {
   QueryTransportedWastesArgs,
   AllWaste
 } from "../generated/graphql/types";
-import { integer } from "@elastic/elasticsearch/api/types";
+import { estypes } from "@elastic/elasticsearch";
 
 export type GenericWaste =
   | IncomingWaste
@@ -38,7 +38,7 @@ export type WasteEdge<WasteType extends GenericWaste> = {
 };
 
 export type WasteConnection<WasteType extends GenericWaste> = {
-  totalCount: integer;
+  totalCount: estypes.integer;
   pageInfo: PageInfo;
   edges: WasteEdge<WasteType>[];
 };

@@ -164,8 +164,8 @@ export const isOmi = (clue: string): boolean => {
  * Works with any BSD in order to provide a default orgId
  */
 export const getTransporterCompanyOrgId = (form: {
-  transporterCompanySiret: string;
-  transporterCompanyVatNumber: string;
+  transporterCompanySiret: string | null;
+  transporterCompanyVatNumber: string | null;
 }): string | null => {
   if (!form) return null;
   return form.transporterCompanySiret?.length
