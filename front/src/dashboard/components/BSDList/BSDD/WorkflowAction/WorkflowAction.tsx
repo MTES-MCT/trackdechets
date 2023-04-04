@@ -48,7 +48,10 @@ export function WorkflowAction(props: WorkflowActionProps) {
               form.emitter?.company?.siret,
               form.ecoOrganisme?.siret,
               form.transporter?.company?.orgId,
-            ].includes(siret) && <SignEmissionForm {...props} />}
+            ].includes(siret) &&
+              !form.emitter?.isPrivateIndividual && (
+                <SignEmissionForm {...props} />
+              )}
 
             {props.options?.canSkipEmission &&
               form.transporter?.company?.orgId === siret && (

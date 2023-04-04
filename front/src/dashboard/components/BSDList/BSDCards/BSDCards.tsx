@@ -100,7 +100,8 @@ export function BSDCards({ bsds, columns }: BSDCardsProps) {
                     (Boolean(form.ecoOrganisme?.siret) ||
                       siretsWithAutomaticSignature.includes(
                         form.emitter?.company?.siret
-                      )),
+                      ) ||
+                      Boolean(form.emitter?.isPrivateIndividual)),
                 }}
               />
             ) : null}

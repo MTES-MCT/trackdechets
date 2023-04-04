@@ -530,7 +530,8 @@ const Appendix1 = ({
                         Boolean(container.ecoOrganisme?.siret) ||
                         siretsWithAutomaticSignature.includes(
                           form.emitter?.company?.siret
-                        ),
+                        ) ||
+                        Boolean(form.emitter?.isPrivateIndividual),
                     }}
                   />
                 </td>
