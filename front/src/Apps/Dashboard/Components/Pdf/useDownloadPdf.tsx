@@ -10,7 +10,7 @@ import {
 } from "generated/graphql/types";
 
 const FORMS_PDF = gql`
-  query FormPdf($id: ID) {
+  query FormPdf($id: ID!) {
     formPdf(id: $id) {
       downloadLink
       token
@@ -19,7 +19,7 @@ const FORMS_PDF = gql`
 `;
 
 const BSDA_PDF = gql`
-  query Bsdasridf($id: ID) {
+  query Bsdasridf($id: ID!) {
     bsdaPdf(id: $id) {
       downloadLink
       token
@@ -28,7 +28,7 @@ const BSDA_PDF = gql`
 `;
 
 const BSDASRI_PDF = gql`
-  query Bsdasridf($id: ID) {
+  query Bsdasridf($id: ID!) {
     bsdasriPdf(id: $id) {
       downloadLink
       token
@@ -37,7 +37,7 @@ const BSDASRI_PDF = gql`
 `;
 
 const BSVHU_PDF = gql`
-  query Bsdasridf($id: ID) {
+  query Bsdasridf($id: ID!) {
     bsvhuPdf(id: $id) {
       downloadLink
       token
@@ -49,7 +49,7 @@ export function useBsddDownloadPdf(
   options: LazyQueryHookOptions<Pick<Query, "formPdf">, QueryFormPdfArgs>
 ) {
   return useLazyQuery<Pick<Query, "formPdf">, QueryFormPdfArgs>(FORMS_PDF, {
-    ...options.variables,
+    ...options,
     fetchPolicy: "network-only",
     onCompleted: ({ formPdf }) => {
       if (formPdf.downloadLink == null) {
