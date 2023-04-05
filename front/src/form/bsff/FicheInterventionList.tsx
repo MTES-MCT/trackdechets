@@ -153,7 +153,7 @@ function AddFicheInterventionModal({
 
             <div className="form__row">
               <label>
-                Quantité de fluide en kg
+                Quantité de fluide retiré en kg
                 <Field
                   component={NumberInput}
                   className="td-input"
