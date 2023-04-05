@@ -1,4 +1,3 @@
-import { getUid } from "../utils";
 import * as jose from "jose";
 import {
   Grant,
@@ -61,7 +60,7 @@ export const buildIdToken = async (
     ...profile,
     ...email,
     ...companies,
-    nonce: getUid(32)
+    nonce: grant.nonce
   };
 
   const jwt = await new jose.SignJWT(payload)

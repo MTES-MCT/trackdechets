@@ -560,6 +560,7 @@ model Grant {
   applicationId String
   openIdEnabled Boolean     @default(false)
   scope         String[]    @default([])
+  nonce         String?
   application   Application @relation(fields: [applicationId], references: [id])
   userId        String
   user          User        @relation(fields: [userId], references: [id])
