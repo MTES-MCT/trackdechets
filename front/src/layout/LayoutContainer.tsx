@@ -6,6 +6,7 @@ import {
   Redirect,
   generatePath,
   RouteChildrenProps,
+  useRouteMatch,
 } from "react-router-dom";
 import PrivateRoute from "login/PrivateRoute";
 import { trackPageView } from "tracker";
@@ -20,7 +21,7 @@ import Login from "login/Login";
 
 const Admin = lazy(() => import("admin/Admin"));
 const Dashboard = lazy(() => import("dashboard/Dashboard"));
-const DashboardRoutes = lazy(() => import("Apps/Dashboard/DashboardRoutes"));
+const DashboardV2Routes = lazy(() => import("Apps/Dashboard/DashboardRoutes"));
 const Account = lazy(() => import("account/Account"));
 const AccountMembershipRequest = lazy(
   () => import("account/AccountMembershipRequest")
@@ -60,6 +61,11 @@ export default withRouter(function LayoutContainer({ history }) {
   const isAuthenticated = !loading && data != null;
   const isAdmin = (isAuthenticated && data?.me?.isAdmin) || false;
   const email = data?.me?.email;
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const dashboardRoutePrefixAdminCheck = isAdmin ? "dashboardv2" : "dashboard";
+  const dashboardRoutePrefix = !isV2Routes
+    ? "dashboard"
+    : dashboardRoutePrefixAdminCheck;
 
   useEffect(() => {
     if (import.meta.env.NODE_ENV !== "production") {
@@ -149,25 +155,18 @@ export default withRouter(function LayoutContainer({ history }) {
                 <WasteTree />
               </Route>
 
-              <Route path="/dashboard/:siret/bsds/edit/:id" exact>
+              <Route
+                path={[
+                  "/dashboard/:siret/bsds/edit/:id",
+                  "/v2/dashboard/:siret/bsds/edit/:id",
+                ]}
+                exact
+              >
                 {({
                   match,
                 }: RouteChildrenProps<{ siret: string; id: string }>) => (
                   <Redirect
-                    to={generatePath(routes.dashboard.bsdds.edit, {
-                      siret: match!.params.siret,
-                      id: match!.params.id,
-                    })}
-                  />
-                )}
-              </Route>
-
-              <Route path="/v2/dashboard/:siret/bsds/edit/:id" exact>
-                {({
-                  match,
-                }: RouteChildrenProps<{ siret: string; id: string }>) => (
-                  <Redirect
-                    to={generatePath(routes.dashboardv2.bsdds.edit, {
+                    to={generatePath(routes[dashboardRoutePrefix].bsdds.edit, {
                       siret: match!.params.siret,
                       id: match!.params.id,
                     })}
@@ -176,32 +175,33 @@ export default withRouter(function LayoutContainer({ history }) {
               </Route>
 
               <PrivateRoute
-                path={routes.dashboard.bsdds.edit}
+                path={routes[dashboardRoutePrefix].bsdds.edit}
                 isAuthenticated={isAuthenticated}
                 exact
               >
                 <FormContainer />
               </PrivateRoute>
 
-              <PrivateRoute
-                path={routes.dashboardv2.bsdds.edit}
-                isAuthenticated={isAuthenticated}
+              <Route
+                path={[
+                  "/dashboard/:siret/bsds/create",
+                  "/v2/dashboard/:siret/bsds/create",
+                ]}
                 exact
               >
-                <FormContainer />
-              </PrivateRoute>
-
-              <Route path="/dashboard/:siret/bsds/create" exact>
                 {({ match }: RouteChildrenProps<{ siret: string }>) => (
                   <Redirect
-                    to={generatePath(routes.dashboard.bsdds.create, {
-                      siret: match!.params.siret,
-                    })}
+                    to={generatePath(
+                      routes[dashboardRoutePrefix].bsdds.create,
+                      {
+                        siret: match!.params.siret,
+                      }
+                    )}
                   />
                 )}
               </Route>
               <PrivateRoute
-                path={routes.dashboard.bsdds.create}
+                path={routes[dashboardRoutePrefix].bsdds.create}
                 isAuthenticated={isAuthenticated}
                 exact
               >
@@ -209,7 +209,7 @@ export default withRouter(function LayoutContainer({ history }) {
               </PrivateRoute>
 
               <PrivateRoute
-                path={routes.dashboard.bsvhus.create}
+                path={routes[dashboardRoutePrefix].bsvhus.create}
                 isAuthenticated={isAuthenticated}
                 exact
               >
@@ -217,7 +217,7 @@ export default withRouter(function LayoutContainer({ history }) {
               </PrivateRoute>
 
               <PrivateRoute
-                path={routes.dashboard.bsvhus.edit}
+                path={routes[dashboardRoutePrefix].bsvhus.edit}
                 isAuthenticated={isAuthenticated}
                 exact
               >
@@ -225,7 +225,7 @@ export default withRouter(function LayoutContainer({ history }) {
               </PrivateRoute>
 
               <PrivateRoute
-                path={routes.dashboard.bsffs.create}
+                path={routes[dashboardRoutePrefix].bsffs.create}
                 isAuthenticated={isAuthenticated}
                 exact
               >
@@ -233,7 +233,7 @@ export default withRouter(function LayoutContainer({ history }) {
               </PrivateRoute>
 
               <PrivateRoute
-                path={routes.dashboard.bsffs.edit}
+                path={routes[dashboardRoutePrefix].bsffs.edit}
                 isAuthenticated={isAuthenticated}
                 exact
               >
@@ -241,7 +241,7 @@ export default withRouter(function LayoutContainer({ history }) {
               </PrivateRoute>
 
               <PrivateRoute
-                path={routes.dashboard.bsdasris.create}
+                path={routes[dashboardRoutePrefix].bsdasris.create}
                 isAuthenticated={isAuthenticated}
                 exact
               >
@@ -249,7 +249,7 @@ export default withRouter(function LayoutContainer({ history }) {
               </PrivateRoute>
 
               <PrivateRoute
-                path={routes.dashboard.bsdasris.edit}
+                path={routes[dashboardRoutePrefix].bsdasris.edit}
                 isAuthenticated={isAuthenticated}
                 exact
               >
@@ -257,7 +257,7 @@ export default withRouter(function LayoutContainer({ history }) {
               </PrivateRoute>
 
               <PrivateRoute
-                path={routes.dashboard.bsdas.create}
+                path={routes[dashboardRoutePrefix].bsdas.create}
                 isAuthenticated={isAuthenticated}
                 exact
               >
@@ -265,7 +265,7 @@ export default withRouter(function LayoutContainer({ history }) {
               </PrivateRoute>
 
               <PrivateRoute
-                path={routes.dashboard.bsdas.edit}
+                path={routes[dashboardRoutePrefix].bsdas.edit}
                 isAuthenticated={isAuthenticated}
                 exact
               >
@@ -283,7 +283,7 @@ export default withRouter(function LayoutContainer({ history }) {
                 path={routes.dashboardv2.index}
                 isAuthenticated={isAdmin}
               >
-                <DashboardRoutes />
+                <DashboardV2Routes />
               </PrivateRoute>
 
               <PrivateRoute

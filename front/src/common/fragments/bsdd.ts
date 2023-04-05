@@ -416,6 +416,7 @@ export const dashboardFormFragment = gql`
         other
         quantity
       }
+      quantity
     }
     emitter {
       type
@@ -466,6 +467,7 @@ export const dashboardFormFragment = gql`
         name
       }
       transporterNumberPlate
+      lastActionOn
     }
     temporaryStorageDetail {
       destination {

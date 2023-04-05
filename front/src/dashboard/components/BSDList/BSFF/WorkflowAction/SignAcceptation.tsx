@@ -80,6 +80,9 @@ const getValidationSchema = (today: Date) =>
 
 interface SignBsffAcceptationOnePackagingProps {
   bsffId: string;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+  displayActionButton?: boolean;
 }
 
 /**
@@ -88,21 +91,35 @@ interface SignBsffAcceptationOnePackagingProps {
  */
 export function SignBsffAcceptationOnePackaging({
   bsffId,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+  displayActionButton = true,
 }: SignBsffAcceptationOnePackagingProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
     <>
-      <ActionButton
-        icon={<IconCheckCircle1 size="24px" />}
-        onClick={() => setIsOpen(true)}
-      >
-        Signer l'acceptation
-      </ActionButton>
-      {isOpen && (
+      {displayActionButton && (
+        <>
+          <ActionButton
+            icon={<IconCheckCircle1 size="24px" />}
+            onClick={() => setIsOpen(true)}
+          >
+            Signer l'acceptation
+          </ActionButton>
+          {isOpen && (
+            <SignBsffAcceptationOnePackagingModal
+              bsffId={bsffId}
+              onClose={() => setIsOpen(false)}
+            />
+          )}
+        </>
+      )}
+
+      {isModalOpenFromParent && (
         <SignBsffAcceptationOnePackagingModal
           bsffId={bsffId}
-          onClose={() => setIsOpen(false)}
+          onClose={onModalCloseFromParent!}
         />
       )}
     </>

@@ -4,6 +4,16 @@ import { CompanyPrivate, CompanyType } from "generated/graphql/types";
 import DashboardCompanySelector from "../../../../dashboard/DashboardCompanySelector";
 import routes from "common/routes";
 import "./DashboardTabs.scss";
+import {
+  ACTS,
+  ARCHIVES,
+  COLLECTED,
+  DRAFTS,
+  FOLLOWS,
+  REGISTER,
+  REVIEWS,
+  TO_COLLECT,
+} from "Apps/Common/wordings/dashboard/wordingsDashboard";
 
 interface DashboardTabsProps {
   currentCompany: CompanyPrivate;
@@ -52,7 +62,7 @@ export default function DashboardTabs({
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
             >
-              Brouillon
+              {DRAFTS}
             </NavLink>
           </li>
 
@@ -64,7 +74,7 @@ export default function DashboardTabs({
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
             >
-              Pour action
+              {ACTS}
             </NavLink>
           </li>
 
@@ -76,7 +86,7 @@ export default function DashboardTabs({
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
             >
-              Suivi
+              {FOLLOWS}
             </NavLink>
           </li>
           <li>
@@ -87,7 +97,7 @@ export default function DashboardTabs({
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
             >
-              Archives
+              {ARCHIVES}
             </NavLink>
           </li>
           <li>
@@ -98,7 +108,7 @@ export default function DashboardTabs({
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
             >
-              Révisions
+              {REVIEWS}
             </NavLink>
           </li>
         </ul>
@@ -115,7 +125,7 @@ export default function DashboardTabs({
                   className="sidebar__link sidebar__link--indented"
                   activeClassName="sidebar__link--active"
                 >
-                  À collecter
+                  {TO_COLLECT}
                 </NavLink>
               </li>
               <li>
@@ -126,7 +136,7 @@ export default function DashboardTabs({
                   className="sidebar__link sidebar__link--indented"
                   activeClassName="sidebar__link--active"
                 >
-                  Collecté
+                  {COLLECTED}
                 </NavLink>
               </li>
             </ul>
@@ -142,7 +152,7 @@ export default function DashboardTabs({
               className="sidebar__link sidebar__link--chapter"
               activeClassName="sidebar__link--active"
             >
-              Registre
+              {REGISTER}
             </NavLink>
           </li>
         </ul>

@@ -153,24 +153,24 @@ export const filterPredicates: {
 export const dropdownCreateLinks = siret => [
   {
     title: dropdown_create_bsdd,
-    route: generatePath(routes.dashboard.bsdds.create, { siret }),
+    route: generatePath(routes.dashboardv2.bsdds.create, { siret }),
   },
   {
     title: dropdown_create_bsdasri,
-    route: generatePath(routes.dashboard.bsdasris.create, { siret }),
+    route: generatePath(routes.dashboardv2.bsdasris.create, { siret }),
   },
 
   {
     title: dropdown_create_bsvhu,
-    route: generatePath(routes.dashboard.bsvhus.create, { siret }),
+    route: generatePath(routes.dashboardv2.bsvhus.create, { siret }),
   },
   {
     title: dropdown_create_bsff,
-    route: generatePath(routes.dashboard.bsffs.create, { siret }),
+    route: generatePath(routes.dashboardv2.bsffs.create, { siret }),
   },
   {
     title: dropdown_create_bsda,
-    route: generatePath(routes.dashboard.bsdas.create, { siret }),
+    route: generatePath(routes.dashboardv2.bsdas.create, { siret }),
   },
 ];
 

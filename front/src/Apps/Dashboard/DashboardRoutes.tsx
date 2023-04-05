@@ -1,5 +1,16 @@
-import { useQuery, gql } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
+import { Modal } from "common/components";
+import SideMenu from "common/components/SideMenu";
+import routes from "common/routes";
+import { RouteControlPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/RouteControlPdf";
+import { RoutePublishBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RoutePublishBsdasri";
+import { RouteSignBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
+import { RouteBSDasrisSignEmissionSecretCode } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasriSecretCode";
+import { OnboardingSlideshow } from "dashboard/components/OnboardingSlideshow";
+import { BsdasriSignatureType, Query } from "generated/graphql/types";
 import { filter } from "graphql-anywhere";
+import { Location } from "history";
+import DashboardPage from "Pages/Dashboard";
 import React, { useCallback } from "react";
 import {
   generatePath,
@@ -11,34 +22,23 @@ import {
   useLocation,
   useParams,
 } from "react-router-dom";
-import { Location } from "history";
-import routes from "common/routes";
-import { Modal } from "common/components";
 import Loader from "../../common/components/Loaders";
-import Exports from "../../dashboard/exports/Exports";
+import { RouteBsdsReview } from "../../dashboard/bsds/review";
 import { ExtraSignatureType } from "../../dashboard/components/BSDList/BSDasri/types";
-import { Query, BsdasriSignatureType } from "generated/graphql/types";
-import { RouteBSDasrisSignEmissionSecretCode } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasriSecretCode";
-import { RoutePublishBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RoutePublishBsdasri";
-import { RouteSignBsdasri } from "dashboard/components/BSDList/BSDasri/WorkflowAction/RouteSignBsdasri";
-import { RouteControlPdf } from "dashboard/components/BSDList/BSDasri/BSDasriActions/RouteControlPdf";
+import { RouteBsdaRequestRevision } from "../../dashboard/components/RevisionRequestList/bsda/request";
+import { RouteBsddRequestRevision } from "../../dashboard/components/RevisionRequestList/bsdd/request/RouteBsddRequestRevision";
 import {
   RouteBSDasrisView,
-  RouteBsvhusView,
-  RouteBsffsView,
-  RouteBSDDsView,
   RouteBSDasView,
+  RouteBSDDsView,
+  RouteBsffsView,
+  RouteBsvhusView,
 } from "../../dashboard/detail";
+import Exports from "../../dashboard/exports/Exports";
 import {
-  RouteTransportToCollect,
   RouteTransportCollected,
+  RouteTransportToCollect,
 } from "../../dashboard/transport";
-import { RouteBsdsReview } from "../../dashboard/bsds/review";
-import { RouteBsddRequestRevision } from "../../dashboard/components/RevisionRequestList/bsdd/request/RouteBsddRequestRevision";
-import { RouteBsdaRequestRevision } from "../../dashboard/components/RevisionRequestList/bsda/request";
-import { OnboardingSlideshow } from "dashboard/components/OnboardingSlideshow";
-import SideMenu from "common/components/SideMenu";
-import DashboardPage from "Pages/Dashboard";
 import DashboardTabs from "./Components/DashboardTabs/DashboardTabs";
 
 import "./dashboard.scss";
@@ -165,19 +165,6 @@ function DashboardRoutes() {
               <RouteBsffsView />
             </Route>
 
-            <Route path={routes.dashboardv2.bsds.drafts}>
-              {dashboardPageComponent}
-            </Route>
-            <Route path={routes.dashboardv2.bsds.act}>
-              {dashboardPageComponent}
-            </Route>
-            <Route path={routes.dashboardv2.bsds.follow}>
-              {dashboardPageComponent}
-            </Route>
-            <Route path={routes.dashboardv2.bsds.history}>
-              {dashboardPageComponent}
-            </Route>
-
             <Route path={routes.dashboardv2.bsds.reviews}>
               <RouteBsdsReview />
             </Route>
@@ -192,6 +179,18 @@ function DashboardRoutes() {
                 companies={filter(Exports.fragments.company, companies)}
               />
             </Route>
+
+            <Route
+              path={[
+                routes.dashboardv2.bsds.drafts,
+                routes.dashboardv2.bsds.act,
+                routes.dashboardv2.bsds.follow,
+                routes.dashboardv2.bsds.history,
+              ]}
+            >
+              {dashboardPageComponent}
+            </Route>
+
             <Redirect
               to={generatePath(routes.dashboardv2.bsds.drafts, {
                 siret,
