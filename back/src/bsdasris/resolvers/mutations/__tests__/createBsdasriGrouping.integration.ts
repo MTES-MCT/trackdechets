@@ -1,7 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { ErrorCode } from "../../../../common/errors";
 import {
-  getBsdasriDestinationInfo,
+  getDestinationCompanyInfo,
   siretify,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -203,7 +203,7 @@ describe("Mutation.createDasri", () => {
           ]
         }
       },
-      ...(await getBsdasriDestinationInfo()),
+      ...(await getDestinationCompanyInfo()),
       grouping: [toRegroup1.id, toRegroup2.id]
     };
 

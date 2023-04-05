@@ -5,7 +5,7 @@ import {
   userWithCompanyFactory,
   companyFactory,
   siretify,
-  getBsdasriDestinationInfo
+  getDestinationCompanyInfo
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Mutation } from "../../../../generated/graphql/types";
@@ -107,7 +107,7 @@ describe("Mutation.createDasri", () => {
           ]
         }
       },
-      ...(await getBsdasriDestinationInfo())
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -156,7 +156,7 @@ describe("Mutation.createDasri", () => {
           ]
         }
       },
-      ...(await getBsdasriDestinationInfo())
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -233,7 +233,7 @@ describe("Mutation.createDasri", () => {
           ]
         }
       },
-      ...(await getBsdasriDestinationInfo())
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -284,7 +284,7 @@ describe("Mutation.createDasri validation scenarii", () => {
           ]
         }
       },
-      ...(await getBsdasriDestinationInfo())
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -332,7 +332,7 @@ describe("Mutation.createDasri validation scenarii", () => {
           ]
         }
       },
-      ...(await getBsdasriDestinationInfo())
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -378,7 +378,7 @@ describe("Mutation.createDasri validation scenarii", () => {
           ]
         }
       },
-      ...(await getBsdasriDestinationInfo())
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -441,7 +441,7 @@ describe("Mutation.createDasri validation scenarii", () => {
           ]
         }
       },
-      ...(await getBsdasriDestinationInfo())
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -509,7 +509,7 @@ describe("Mutation.createDasri validation scenarii", () => {
           ]
         }
       },
-      ...(await getBsdasriDestinationInfo())
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -582,7 +582,7 @@ describe("Mutation.createDasri validation scenarii", () => {
           ]
         }
       },
-      ...(await getBsdasriDestinationInfo())
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -649,7 +649,7 @@ describe("Mutation.createDasri validation scenarii", () => {
           ]
         }
       },
-      ...(await getBsdasriDestinationInfo())
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -715,7 +715,7 @@ describe("Mutation.createDasri validation scenarii", () => {
           ]
         }
       },
-      ...(await getBsdasriDestinationInfo())
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -781,7 +781,7 @@ describe("Mutation.createDasri validation scenarii", () => {
           ]
         }
       },
-      ...(await getBsdasriDestinationInfo())
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -824,7 +824,7 @@ describe("Mutation.createDasri validation scenarii", () => {
           ]
         }
       },
-      ...(await getBsdasriDestinationInfo())
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);
@@ -865,7 +865,7 @@ describe("Mutation.createDasri validation scenarii", () => {
           ]
         }
       },
-      ...(await getBsdasriDestinationInfo())
+      ...(await getDestinationCompanyInfo())
     };
 
     const { mutate } = makeClient(user);

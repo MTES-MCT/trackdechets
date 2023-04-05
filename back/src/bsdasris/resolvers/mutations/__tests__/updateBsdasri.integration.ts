@@ -4,7 +4,7 @@ import { bsdasriFactory } from "../../../__tests__/factories";
 import {
   userWithCompanyFactory,
   ecoOrganismeFactory,
-  getBsdasriDestinationInfo
+  getDestinationCompanyInfo
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
@@ -177,7 +177,7 @@ describe("Mutation.updateBsdasri", () => {
           status: BsdasriStatus.INITIAL,
           isDraft: draftStatus === "draft",
           emitterCompanySiret: company.siret,
-          ...flattenBsdaDestinationInput(await getBsdasriDestinationInfo())
+          ...flattenBsdaDestinationInput(await getDestinationCompanyInfo())
         }
       });
 
@@ -215,7 +215,7 @@ describe("Mutation.updateBsdasri", () => {
         emitterEmissionSignatureAuthor: user.name,
         emissionSignatory: { connect: { id: user.id } },
         emitterEmissionSignatureDate: new Date().toISOString(),
-        ...flattenBsdaDestinationInput(await getBsdasriDestinationInfo())
+        ...flattenBsdaDestinationInput(await getDestinationCompanyInfo())
       }
     });
 
@@ -248,7 +248,7 @@ describe("Mutation.updateBsdasri", () => {
         emitterEmissionSignatureDate: new Date().toISOString(),
         ecoOrganismeName: ecoOrgCompany.siret,
         ecoOrganismeSiret: ecoOrgCompany.name,
-        ...flattenBsdaDestinationInput(await getBsdasriDestinationInfo())
+        ...flattenBsdaDestinationInput(await getDestinationCompanyInfo())
       }
     });
 
@@ -276,7 +276,7 @@ describe("Mutation.updateBsdasri", () => {
         emitterEmissionSignatureAuthor: user.name,
         emissionSignatory: { connect: { id: user.id } },
         emitterEmissionSignatureDate: new Date().toISOString(),
-        ...flattenBsdaDestinationInput(await getBsdasriDestinationInfo()),
+        ...flattenBsdaDestinationInput(await getDestinationCompanyInfo()),
         destinationCompanySiret: destination.company.siret
       }
     });
@@ -323,7 +323,7 @@ describe("Mutation.updateBsdasri", () => {
         emitterEmissionSignatureAuthor: user.name,
         emissionSignatory: { connect: { id: user.id } },
         emitterEmissionSignatureDate: new Date().toISOString(),
-        ...flattenBsdaDestinationInput(await getBsdasriDestinationInfo()),
+        ...flattenBsdaDestinationInput(await getDestinationCompanyInfo()),
         destinationCompanySiret: destination.company.siret
       }
     });
@@ -360,7 +360,7 @@ describe("Mutation.updateBsdasri", () => {
         emitterEmissionSignatureAuthor: user.name,
         emissionSignatory: { connect: { id: user.id } },
         emitterEmissionSignatureDate: new Date().toISOString(),
-        ...flattenBsdaDestinationInput(await getBsdasriDestinationInfo())
+        ...flattenBsdaDestinationInput(await getDestinationCompanyInfo())
       }
     });
 
@@ -405,7 +405,7 @@ describe("Mutation.updateBsdasri", () => {
         transporterTransportSignatureAuthor: user.name,
         transportSignatory: { connect: { id: user.id } },
         transporterTransportSignatureDate: new Date().toISOString(),
-        ...flattenBsdaDestinationInput(await getBsdasriDestinationInfo())
+        ...flattenBsdaDestinationInput(await getDestinationCompanyInfo())
       }
     });
 
@@ -451,7 +451,7 @@ describe("Mutation.updateBsdasri", () => {
         transporterTransportSignatureAuthor: user.name,
         transportSignatory: { connect: { id: user.id } },
         transporterTransportSignatureDate: new Date().toISOString(),
-        ...flattenBsdaDestinationInput(await getBsdasriDestinationInfo())
+        ...flattenBsdaDestinationInput(await getDestinationCompanyInfo())
       }
     });
 
@@ -482,7 +482,7 @@ describe("Mutation.updateBsdasri", () => {
         destinationReceptionSignatureAuthor: user.name,
         receptionSignatory: { connect: { id: user.id } },
         destinationReceptionSignatureDate: new Date().toISOString(),
-        ...flattenBsdaDestinationInput(await getBsdasriDestinationInfo())
+        ...flattenBsdaDestinationInput(await getDestinationCompanyInfo())
       }
     });
 
@@ -526,7 +526,7 @@ describe("Mutation.updateBsdasri", () => {
         transporterTransportSignatureAuthor: user.name,
         transportSignatory: { connect: { id: user.id } },
         transporterTransportSignatureDate: new Date().toISOString(),
-        ...flattenBsdaDestinationInput(await getBsdasriDestinationInfo())
+        ...flattenBsdaDestinationInput(await getDestinationCompanyInfo())
       }
     });
 
@@ -560,7 +560,7 @@ describe("Mutation.updateBsdasri", () => {
         destinationReceptionSignatureAuthor: user.name,
         receptionSignatory: { connect: { id: user.id } },
         destinationReceptionSignatureDate: new Date().toISOString(),
-        ...flattenBsdaDestinationInput(await getBsdasriDestinationInfo())
+        ...flattenBsdaDestinationInput(await getDestinationCompanyInfo())
       }
     });
 
@@ -602,7 +602,7 @@ describe("Mutation.updateBsdasri", () => {
         destinationReceptionSignatureAuthor: user.name,
         receptionSignatory: { connect: { id: user.id } },
         destinationReceptionSignatureDate: new Date().toISOString(),
-        ...flattenBsdaDestinationInput(await getBsdasriDestinationInfo())
+        ...flattenBsdaDestinationInput(await getDestinationCompanyInfo())
       }
     });
 

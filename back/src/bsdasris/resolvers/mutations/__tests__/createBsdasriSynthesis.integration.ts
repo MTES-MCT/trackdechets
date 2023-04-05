@@ -1,7 +1,7 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
 
 import {
-  getBsdasriDestinationInfo,
+  getDestinationCompanyInfo,
   siretify,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -85,7 +85,7 @@ describe("Mutation.createDasri", () => {
           validityLimit: new Date().toISOString()
         }
       },
-      ...(await getBsdasriDestinationInfo()),
+      ...(await getDestinationCompanyInfo()),
       synthesizing: [toAssociate1.id, toAssociate2.id]
     };
 
