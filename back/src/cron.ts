@@ -5,6 +5,7 @@ import {
   sendMembershipRequestDetailsEmail,
   sendPendingMembershipRequestDetailsEmail,
   sendPendingMembershipRequestToAdminDetailsEmail,
+  sendPendingRevisionRequestToAdminDetailsEmail,
   sendSecondOnboardingEmail
 } from "./commands/onboarding.helpers";
 import { initSentry } from "./common/sentry";
@@ -73,6 +74,14 @@ if (CRON_ONBOARDING_SCHEDULE) {
       cronTime: CRON_ONBOARDING_SCHEDULE,
       onTick: async () => {
         await sendPendingMembershipRequestToAdminDetailsEmail();
+      },
+      timeZone: "Europe/Paris"
+    }),
+    // admins who did not answer to revision requests
+    new cron.CronJob({
+      cronTime: CRON_ONBOARDING_SCHEDULE,
+      onTick: async () => {
+        await sendPendingRevisionRequestToAdminDetailsEmail();
       },
       timeZone: "Europe/Paris"
     })

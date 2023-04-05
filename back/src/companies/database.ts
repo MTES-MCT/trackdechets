@@ -200,13 +200,17 @@ export async function getCompanyAdminUsers(orgId: string) {
 
 /**
  * Get all the admins from companies, by companyIds
- * @param companyIds
- * @returns
  */
-export async function getActiveAdminsByCompanyIds(companyIds: string[]) {
+export async function getActiveAdminsByCompanyIds(
+  companyIds: string[]
+): Promise<Record<string, User[]>> {
   const users = await prisma.companyAssociation
     .findMany({
-      where: { companyId: { in: companyIds }, role: "ADMIN" },
+      where: {
+        companyId: { in: companyIds },
+        role: "ADMIN",
+        user: { isActive: true }
+      },
       include: { user: true }
     })
     .then(associations =>
@@ -218,17 +222,49 @@ export async function getActiveAdminsByCompanyIds(companyIds: string[]) {
       })
     );
 
-  const res = {};
+  const res: Record<string, User[]> = {};
 
-  users
-    .filter(user => user.isActive)
-    .forEach(user => {
-      if (res[user.companyId]) res[user.companyId].push(user);
-      else res[user.companyId] = [user];
-    });
+  users.forEach(user => {
+    if (res[user.companyId]) res[user.companyId].push(user);
+    else res[user.companyId] = [user];
+  });
 
   return res;
 }
+
+/**
+ * Get all the admins from companies, by companyOrgIds
+ */
+export const getActiveAdminsByCompanyOrgIds = async (
+  orgIds: string[]
+): Promise<Record<string, User[]>> => {
+  const users = await prisma.companyAssociation
+    .findMany({
+      where: {
+        company: { orgId: { in: orgIds } },
+        role: "ADMIN",
+        user: { isActive: true }
+      },
+      include: { user: true, company: { select: { orgId: true } } }
+    })
+    .then(associations =>
+      associations.map(a => {
+        return {
+          ...a.user,
+          companyOrgId: a.company.orgId
+        };
+      })
+    );
+
+  const res: Record<string, User[]> = {};
+
+  users.forEach(user => {
+    if (res[user.companyOrgId]) res[user.companyOrgId].push(user);
+    else res[user.companyOrgId] = [user];
+  });
+
+  return res;
+};
 
 export async function getTraderReceiptOrNotFound({
   id

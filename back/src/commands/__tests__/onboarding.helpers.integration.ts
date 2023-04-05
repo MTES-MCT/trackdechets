@@ -1,18 +1,22 @@
 import { MembershipRequestStatus, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import {
+  addUserToCompany,
   companyAssociatedToExistingUserFactory,
   companyFactory,
   createMembershipRequest,
+  formFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../__tests__/factories";
 import {
   getActiveUsersWithPendingMembershipRequests,
+  getPendingBSDRevisionRequestsWithAdmins,
   getPendingMembershipRequestsAndAssociatedAdmins,
   getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest,
   xDaysAgo
 } from "../onboarding.helpers";
+import prisma from "../../prisma";
 
 const TODAY = new Date();
 const TWO_DAYS_AGO = xDaysAgo(TODAY, 2);
@@ -431,5 +435,252 @@ describe("getPendingMembershipRequestsAndAssociatedAdmins", () => {
       .sort();
 
     expect(expectedResult).toEqual(actualResult);
+  });
+});
+
+describe("getPendingBSDRevisionRequestsWithAdmins", () => {
+  afterEach(resetDatabase);
+
+  it("should return empty array if DB is empty", async () => {
+    // Given
+
+    // When
+    const pendingBSDRevisionRequest =
+      await getPendingBSDRevisionRequestsWithAdmins(2);
+
+    // Then
+    expect(pendingBSDRevisionRequest.length).toEqual(0);
+  });
+
+  it("should return pending request and company admins", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: companyOfSomeoneElse.siret }
+    });
+
+    const request = await prisma.bsddRevisionRequest.create({
+      data: {
+        createdAt: TWO_DAYS_AGO,
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret } },
+        comment: ""
+      }
+    });
+
+    // When
+    const pendingBSDRevisionRequest =
+      await getPendingBSDRevisionRequestsWithAdmins(2);
+
+    // Then
+    expect(pendingBSDRevisionRequest.length).toEqual(1);
+    expect(pendingBSDRevisionRequest[0].id).toEqual(request.id);
+    expect(pendingBSDRevisionRequest[0].admins.length).toEqual(1);
+    expect(pendingBSDRevisionRequest[0].admins[0].id).toEqual(user.id);
+  });
+
+  it("should return pending request and company admins xDaysAgo", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: companyOfSomeoneElse.siret }
+    });
+
+    // Should not be returned because 3 days ago
+    await prisma.bsddRevisionRequest.create({
+      data: {
+        createdAt: THREE_DAYS_AGO,
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret } },
+        comment: ""
+      }
+    });
+
+    // When
+    const pendingBSDRevisionRequest =
+      await getPendingBSDRevisionRequestsWithAdmins(2);
+
+    // Then
+    expect(pendingBSDRevisionRequest.length).toEqual(0);
+  });
+
+  it("should not return non-pending requests", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: companyOfSomeoneElse.siret }
+    });
+
+    // Should not be returned because not pending
+    await prisma.bsddRevisionRequest.create({
+      data: {
+        createdAt: TWO_DAYS_AGO,
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret } },
+        comment: "",
+        status: "ACCEPTED"
+      }
+    });
+
+    // When
+    const pendingBSDRevisionRequest =
+      await getPendingBSDRevisionRequestsWithAdmins(2);
+
+    // Then
+    expect(pendingBSDRevisionRequest.length).toEqual(0);
+  });
+
+  it("should return multiple pending request and company admins", async () => {
+    // Given
+
+    // Request 1
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: companyOfSomeoneElse.siret }
+    });
+
+    const request = await prisma.bsddRevisionRequest.create({
+      data: {
+        createdAt: TWO_DAYS_AGO,
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret } },
+        comment: ""
+      }
+    });
+
+    // Request 2
+    const { user: user2, company: company2 } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { company: companyOfSomeoneElse2 } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+
+    const bsdd2 = await formFactory({
+      ownerId: user2.id,
+      opt: { emitterCompanySiret: companyOfSomeoneElse2.siret }
+    });
+
+    const request2 = await prisma.bsddRevisionRequest.create({
+      data: {
+        createdAt: TWO_DAYS_AGO,
+        bsddId: bsdd2.id,
+        authoringCompanyId: companyOfSomeoneElse2.id,
+        approvals: { create: { approverSiret: company2.siret } },
+        comment: ""
+      }
+    });
+
+    // When
+    const pendingBSDRevisionRequest =
+      await getPendingBSDRevisionRequestsWithAdmins(2);
+
+    // Then
+    expect(pendingBSDRevisionRequest.length).toEqual(2);
+
+    expect(pendingBSDRevisionRequest[0].id).toEqual(request.id);
+    expect(pendingBSDRevisionRequest[0].admins.length).toEqual(1);
+    expect(pendingBSDRevisionRequest[0].admins[0].id).toEqual(user.id);
+
+    expect(pendingBSDRevisionRequest[1].id).toEqual(request2.id);
+    expect(pendingBSDRevisionRequest[1].admins.length).toEqual(1);
+    expect(pendingBSDRevisionRequest[1].admins[0].id).toEqual(user2.id);
+  });
+
+  it("should return all admins from pending companies", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const user2 = await userFactory();
+    await addUserToCompany(user2, company, "ADMIN");
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: companyOfSomeoneElse.siret }
+    });
+
+    const request = await prisma.bsddRevisionRequest.create({
+      data: {
+        createdAt: TWO_DAYS_AGO,
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret } },
+        comment: ""
+      }
+    });
+
+    // When
+    const pendingBSDRevisionRequest =
+      await getPendingBSDRevisionRequestsWithAdmins(2);
+
+    // Then
+    expect(pendingBSDRevisionRequest.length).toEqual(1);
+    expect(pendingBSDRevisionRequest[0].id).toEqual(request.id);
+    expect(pendingBSDRevisionRequest[0].admins.length).toEqual(2);
+
+    const adminIds = pendingBSDRevisionRequest[0].admins.map(a => a.id);
+    expect(adminIds.includes(user.id)).toBe(true);
+    expect(adminIds.includes(user2.id)).toBe(true);
+  });
+
+  it("should not return non-admins from pending companies", async () => {
+    // Given
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const user2 = await userFactory();
+    await addUserToCompany(user2, company, "MEMBER");
+    const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: companyOfSomeoneElse.siret }
+    });
+
+    const request = await prisma.bsddRevisionRequest.create({
+      data: {
+        createdAt: TWO_DAYS_AGO,
+        bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret } },
+        comment: ""
+      }
+    });
+
+    // When
+    const pendingBSDRevisionRequest =
+      await getPendingBSDRevisionRequestsWithAdmins(2);
+
+    // Then
+    expect(pendingBSDRevisionRequest.length).toEqual(1);
+    expect(pendingBSDRevisionRequest[0].id).toEqual(request.id);
+    expect(pendingBSDRevisionRequest[0].admins.length).toEqual(1);
+    expect(pendingBSDRevisionRequest[0].admins[0].id).toEqual(user.id);
   });
 });

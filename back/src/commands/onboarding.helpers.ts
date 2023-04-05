@@ -4,6 +4,8 @@ import {
   Company,
   CompanyAssociation,
   MembershipRequestStatus,
+  RevisionRequestApprovalStatus,
+  RevisionRequestStatus,
   User
 } from "@prisma/client";
 import * as COMPANY_CONSTANTS from "../common/constants/COMPANY_CONSTANTS";
@@ -17,6 +19,7 @@ import {
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
 import { MessageVersion } from "../mailer/types";
+import { getActiveAdminsByCompanyOrgIds } from "../companies/database";
 
 /**
  * Compute a past date relative to baseDate
@@ -291,4 +294,73 @@ export const sendPendingMembershipRequestToAdminDetailsEmail = async (
   await sendMail(payload);
 
   await prisma.$disconnect();
+};
+
+// TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO
+// TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO
+// TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO
+// TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO
+
+export const getPendingBSDRevisionRequestsWithAdmins = async (
+  daysAgo: number
+) => {
+  const now = new Date();
+
+  const requestDateGt = xDaysAgo(now, daysAgo);
+  const requestDateLt = xDaysAgo(now, daysAgo - 1);
+
+  // Get all pending requests
+  const requests = await prisma.bsddRevisionRequest.findMany({
+    where: {
+      createdAt: { gte: requestDateGt, lt: requestDateLt },
+      status: RevisionRequestStatus.PENDING
+    },
+    include: { approvals: true }
+  });
+
+  // Extract all pending company sirets
+  const companySirets: string[] = requests
+    .map(request =>
+      request.approvals
+        .filter(
+          approval => approval.status === RevisionRequestApprovalStatus.PENDING
+        )
+        .map(approvals => approvals.approverSiret)
+    )
+    .flat();
+
+  // Find company admins
+  const companyAdmins = await getActiveAdminsByCompanyOrgIds(companySirets);
+
+  // Add admins to requests
+  return requests.map(request => {
+    const requestPendingApprovalsSirets = request.approvals
+      .filter(
+        approval => approval.status === RevisionRequestApprovalStatus.PENDING
+      )
+      .map(approvals => approvals.approverSiret);
+
+    return {
+      ...request,
+      admins: requestPendingApprovalsSirets
+        .map(siret => companyAdmins[siret])
+        .flat()
+    };
+  });
+};
+
+export const getPendingBSDARevisionRequestsWithAdmins = async (
+  daysAgo: number
+) => { };
+
+/**
+ * Send an email to admins who didn't answer to a revision request
+ */
+export const sendPendingRevisionRequestToAdminDetailsEmail = async (
+  daysAgo = 5
+) => {
+  const pendingBSDRevisionRequest =
+    await getPendingBSDRevisionRequestsWithAdmins(daysAgo);
+  const pendingBSDARevisionRequest =
+    await getPendingBSDARevisionRequestsWithAdmins(daysAgo);
 };
