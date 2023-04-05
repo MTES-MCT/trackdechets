@@ -617,7 +617,10 @@ export function flattenBsdaRevisionRequestInput(
         )
       )
     ),
-    isCanceled: chain(reviewContent, c => chain(c, r => r.isCanceled))
+    isCanceled: undefinedOrDefault(
+      chain(reviewContent, c => chain(c, r => r.isCanceled)),
+      false
+    )
   });
 }
 

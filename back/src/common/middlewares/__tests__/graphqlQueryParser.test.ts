@@ -31,9 +31,9 @@ describe("graphqlQueryParserMiddleware", () => {
     const req = { body: { query: "{me {id}}" } } as Request;
     middleware(req, res, next);
 
-    expect(req.gqlInfos.length).toBe(1);
-    expect(req.gqlInfos[0].operation).toBe("query");
-    expect(req.gqlInfos[0].name).toBe("me");
+    expect(req.gqlInfos!.length).toBe(1);
+    expect(req.gqlInfos![0].operation).toBe("query");
+    expect(req.gqlInfos![0].name).toBe("me");
   });
 
   it("should return several operations info", async () => {
@@ -42,10 +42,10 @@ describe("graphqlQueryParserMiddleware", () => {
     } as Request;
     middleware(req, res, next);
 
-    expect(req.gqlInfos.length).toBe(2);
-    expect(req.gqlInfos[0].operation).toBe("query");
-    expect(req.gqlInfos[0].name).toBe("me");
-    expect(req.gqlInfos[1].operation).toBe("mutation");
-    expect(req.gqlInfos[1].name).toBe("sign");
+    expect(req.gqlInfos!.length).toBe(2);
+    expect(req.gqlInfos![0].operation).toBe("query");
+    expect(req.gqlInfos![0].name).toBe("me");
+    expect(req.gqlInfos![1].operation).toBe("mutation");
+    expect(req.gqlInfos![1].name).toBe("sign");
   });
 });

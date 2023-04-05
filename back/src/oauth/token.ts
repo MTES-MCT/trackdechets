@@ -42,7 +42,7 @@ export const buildIdToken = async (
   grant: Grant & { application: Application; user: User }
 ): Promise<string> => {
   const privateKey = await jose.importPKCS8(
-    OIDC_PRIVATE_KEY,
+    OIDC_PRIVATE_KEY!,
     TOKEN_SIGNATURE_ALG
   );
 

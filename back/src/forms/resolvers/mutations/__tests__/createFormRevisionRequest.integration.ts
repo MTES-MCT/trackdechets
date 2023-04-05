@@ -55,7 +55,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId,
           content: {},
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -84,7 +84,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: {},
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -116,7 +116,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: { isCanceled: true, quantityReceived: 10 },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -148,7 +148,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: { isCanceled: false },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -181,7 +181,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: { quantityReceived: 10 },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -212,7 +212,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: { wasteDetails: { code: "01 03 08" } },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -265,7 +265,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: { wasteDetails: { code: "01 03 08" } },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -297,7 +297,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: { wasteDetails: { code: "01 03 08" } },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -352,7 +352,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: { wasteDetails: { code: "Made up code" } },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -383,7 +383,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: { wasteDetails: { code: "01 03 08" } },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -414,7 +414,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: {},
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -445,7 +445,7 @@ describe("Mutation.createFormRevisionRequest", () => {
           formId: bsdd.id,
           content: {},
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -482,7 +482,7 @@ describe("Mutation.createFormRevisionRequest", () => {
             formId: bsdd.id,
             content: { isCanceled: true },
             comment: "A comment",
-            authoringCompanySiret: company.siret
+            authoringCompanySiret: company.siret!
           }
         }
       });
@@ -519,7 +519,7 @@ describe("Mutation.createFormRevisionRequest", () => {
             formId: bsdd.id,
             content: { isCanceled: true },
             comment: "A comment",
-            authoringCompanySiret: company.siret
+            authoringCompanySiret: company.siret!
           }
         }
       });

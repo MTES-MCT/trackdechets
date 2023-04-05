@@ -51,9 +51,10 @@ describe("{ mutation { updateTransporterReceipt } }", () => {
     expect(data.updateTransporterReceipt).toEqual(update);
 
     // check record was modified in db
-    const { id, ...updated } = await prisma.transporterReceipt.findUnique({
-      where: { id: createdReceipt.id }
-    });
+    const { id, ...updated } =
+      await prisma.transporterReceipt.findUniqueOrThrow({
+        where: { id: createdReceipt.id }
+      });
     expect(updated.receiptNumber).toEqual(update.receiptNumber);
     expect(updated.validityLimit.toISOString()).toEqual(update.validityLimit);
     expect(updated.department).toEqual(update.department);

@@ -79,7 +79,7 @@ function companyToFavorite(
     isRegistered: !!company,
     codePaysEtrangerEtablissement: !isForeignVat(company.vatNumber)
       ? "FR"
-      : checkVAT(company.vatNumber, countries)?.country?.isoCode.short,
+      : checkVAT(company.vatNumber ?? "", countries)?.country?.isoCode.short,
     transporterReceipt: company.transporterReceipt
   };
 }
@@ -116,7 +116,7 @@ async function getRecentEmitters(
     },
     select: { emitterCompanySiret: true }
   });
-  const emitterSirets = forms.map(f => f.emitterCompanySiret);
+  const emitterSirets = forms.map(f => f.emitterCompanySiret).filter(Boolean);
   const companies = await prisma.company.findMany({
     where: { siret: { in: emitterSirets } }
   });
@@ -135,7 +135,9 @@ async function getRecentRecipients(
     select: { recipientCompanySiret: true }
   });
 
-  const recipientSirets = forms.map(f => f.recipientCompanySiret);
+  const recipientSirets = forms
+    .map(f => f.recipientCompanySiret)
+    .filter(Boolean);
   const companies = await prisma.company.findMany({
     where: { siret: { in: recipientSirets } }
   });
@@ -185,7 +187,7 @@ async function getRecentNextDestinations(
   });
 
   const nextDestinationSirets = [
-    ...new Set(forms.map(f => f.nextDestinationCompanySiret))
+    ...new Set(forms.map(f => f.nextDestinationCompanySiret).filter(Boolean))
   ];
   const favorites = await Promise.all(
     nextDestinationSirets.map(async siret => {
@@ -234,10 +236,10 @@ async function getRecentTransporters(defaultWhere: Prisma.FormWhereInput) {
   });
   const transporterSirets = forms
     .map(f => f.transporterCompanySiret)
-    .filter(s => !["", null].includes(s));
+    .filter(Boolean);
   const transporterVatNumbers = forms
     .map(f => f.transporterCompanyVatNumber)
-    .filter(s => !["", null].includes(s));
+    .filter(Boolean);
 
   const companies = await prisma.company.findMany({
     where: {
@@ -262,7 +264,9 @@ async function getRecentTraders(
     select: { traderCompanySiret: true }
   });
 
-  const traderSirets = [...new Set(forms.map(f => f.traderCompanySiret))];
+  const traderSirets = [
+    ...new Set(forms.map(f => f.traderCompanySiret).filter(Boolean))
+  ];
   const favorites = await Promise.all(
     traderSirets.map(async siret => {
       try {
@@ -270,7 +274,7 @@ async function getRecentTraders(
         const favorite = companySearchResultToFavorite(company);
         const traderReceipt = await prisma.company
           .findUnique({
-            where: { siret: favorite.siret }
+            where: { orgId: favorite.orgId }
           })
           .traderReceipt();
         return { ...favorite, traderReceipt };
@@ -295,7 +299,9 @@ async function getRecentBrokers(
     select: { brokerCompanySiret: true }
   });
 
-  const brokerSirets = [...new Set(forms.map(f => f.brokerCompanySiret))];
+  const brokerSirets = [
+    ...new Set(forms.map(f => f.brokerCompanySiret).filter(Boolean))
+  ];
   const favorites = await Promise.all(
     brokerSirets.map(async siret => {
       try {
@@ -303,7 +309,7 @@ async function getRecentBrokers(
         const favorite = companySearchResultToFavorite(company);
         const brokerReceipt = await prisma.company
           .findUnique({
-            where: { siret: favorite.siret }
+            where: { orgId: favorite.orgId }
           })
           .brokerReceipt();
         return { ...favorite, brokerReceipt };
@@ -384,13 +390,16 @@ const favoritesResolver: QueryResolvers["favorites"] = async (
   const company = await getCompanyOrCompanyNotFound({ orgId: siret });
   await checkIsCompanyMember({ id: user.id }, { orgId: company.orgId });
 
-  const recentPartners = await getRecentPartners(company.siret, type);
+  const recentPartners = company.siret
+    ? await getRecentPartners(company.siret, type)
+    : [];
   const favorites: CompanyFavorite[] = recentPartners.map(recentPartner => {
     return {
       ...recentPartner,
       codePaysEtrangerEtablissement: !isForeignVat(recentPartner.vatNumber)
         ? "FR"
-        : checkVAT(recentPartner.vatNumber, countries)?.country?.isoCode.short
+        : checkVAT(recentPartner.vatNumber ?? "", countries)?.country?.isoCode
+            .short
     };
   });
 

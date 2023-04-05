@@ -39,9 +39,8 @@ export async function renewSecurityCodeFn(
 
   const currentSecurityCode = company.securityCode;
 
-  let newSecurityCode = null;
-
-  while (!newSecurityCode || newSecurityCode === currentSecurityCode) {
+  let newSecurityCode = currentSecurityCode;
+  while (newSecurityCode === currentSecurityCode) {
     newSecurityCode = randomNumber(4);
   }
 

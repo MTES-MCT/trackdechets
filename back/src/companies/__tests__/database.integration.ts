@@ -21,14 +21,14 @@ describe("getInvitedUsers", () => {
     await prisma.userAccountHash.create({
       data: {
         email: "john.snow@trackdechets.fr",
-        companySiret: company.siret,
+        companySiret: company.siret!,
         hash: "hash1",
         role: "MEMBER",
         acceptedAt: new Date()
       }
     });
     const invitedUsers = await getCompanyInvitedUsers(
-      company.siret,
+      company.siret!,
       dataloaders
     );
     expect(invitedUsers).toEqual([]);
@@ -39,13 +39,13 @@ describe("getInvitedUsers", () => {
     const invitation = await prisma.userAccountHash.create({
       data: {
         email: "john.snow@trackdechets.fr",
-        companySiret: company.siret,
+        companySiret: company.siret!,
         hash: "hash2",
         role: "MEMBER"
       }
     });
     const invitedUsers = await getCompanyInvitedUsers(
-      company.siret,
+      company.siret!,
       dataloaders
     );
     expect(invitedUsers).toHaveLength(1);

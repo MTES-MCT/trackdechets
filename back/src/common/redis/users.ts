@@ -60,7 +60,7 @@ export async function getCachedUserSiretOrVat(
     ...companies.map(c => c.siret),
     ...companies.map(c => c.vatNumber)
   ];
-  const cleanIds = ids.filter(id => !!id);
+  const cleanIds = ids.filter(Boolean);
   await setCachedUserCompanyId(userId, cleanIds);
   return cleanIds;
 }
@@ -89,7 +89,7 @@ export async function storeUserSessionsId(
 
 export async function getUserSessions(userId: string): Promise<string[]> {
   if (!userId) {
-    return;
+    return [];
   }
   return redisClient.smembers(genUserSessionsIdsKey(userId));
 }

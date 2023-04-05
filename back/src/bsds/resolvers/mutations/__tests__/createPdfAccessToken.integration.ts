@@ -139,7 +139,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       }
     );
 
-    const token = await prisma.pdfAccessToken.findFirst({
+    const token = await prisma.pdfAccessToken.findFirstOrThrow({
       where: { bsdType: BsdType.BSDD, userId: user.id, bsdId: bsdd.id }
     });
 
@@ -225,7 +225,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       }
     );
 
-    const token = await prisma.pdfAccessToken.findFirst({
+    const token = await prisma.pdfAccessToken.findFirstOrThrow({
       where: { bsdType: BsdType.BSDA, userId: user.id, bsdId: bsda.id }
     });
 
@@ -310,7 +310,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       }
     );
 
-    const token = await prisma.pdfAccessToken.findFirst({
+    const token = await prisma.pdfAccessToken.findFirstOrThrow({
       where: { bsdType: BsdType.BSDASRI, userId: user.id, bsdId: dasri.id }
     });
 
@@ -390,7 +390,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       }
     );
 
-    const token = await prisma.pdfAccessToken.findFirst({
+    const token = await prisma.pdfAccessToken.findFirstOrThrow({
       where: { bsdType: BsdType.BSFF, userId: user.id, bsdId: bsff.id }
     });
 
@@ -476,7 +476,7 @@ describe("Mutation.creatPdfAccessToken", () => {
       }
     );
 
-    const token = await prisma.pdfAccessToken.findFirst({
+    const token = await prisma.pdfAccessToken.findFirstOrThrow({
       where: { bsdType: BsdType.BSVHU, userId: user.id, bsdId: vhu.id }
     });
 

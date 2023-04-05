@@ -32,14 +32,14 @@ export const xDaysAgo = (baseDate: Date, daysAgo: number): Date => {
   return new Date(clonedDate.toDateString());
 };
 
-type getRecentlyJoinedUsersParams = {
+type GetRecentlyJoinedUsersParams = {
   daysAgo: number;
   retrieveCompanies?: boolean;
 };
 export const getRecentlyAssociatedUsers = async ({
   daysAgo,
   retrieveCompanies = false
-}: getRecentlyJoinedUsersParams) => {
+}: GetRecentlyJoinedUsersParams) => {
   const now = new Date();
 
   const associatedDateGt = xDaysAgo(now, daysAgo);

@@ -47,7 +47,7 @@ describe("joinWithInvite mutation", () => {
     const invitation = await prisma.userAccountHash.create({
       data: {
         email: invitee,
-        companySiret: company.siret,
+        companySiret: company.siret!,
         role: "MEMBER",
         hash: "hash",
         acceptedAt: new Date()
@@ -71,7 +71,7 @@ describe("joinWithInvite mutation", () => {
     const invitation = await prisma.userAccountHash.create({
       data: {
         email: invitee,
-        companySiret: company.siret,
+        companySiret: company.siret!,
         role: "MEMBER",
         hash: "hash"
       }
@@ -91,7 +91,7 @@ describe("joinWithInvite mutation", () => {
     expect(data.joinWithInvite.email).toEqual(invitee);
 
     // should mark invitation as joined
-    const updatedInvitation = await prisma.userAccountHash.findUnique({
+    const updatedInvitation = await prisma.userAccountHash.findUniqueOrThrow({
       where: {
         id: invitation.id
       }
@@ -108,7 +108,7 @@ describe("joinWithInvite mutation", () => {
       })) != null;
     expect(isCompanyMember).toEqual(true);
 
-    const createdUser = await prisma.user.findUnique({
+    const createdUser = await prisma.user.findUniqueOrThrow({
       where: { email: invitee }
     });
     expect(createdUser.activatedAt).toBeTruthy();
@@ -123,7 +123,7 @@ describe("joinWithInvite mutation", () => {
     const invitation1 = await prisma.userAccountHash.create({
       data: {
         email: invitee,
-        companySiret: company1.siret,
+        companySiret: company1.siret!,
         role: "MEMBER",
         hash: "hash1"
       }
@@ -132,7 +132,7 @@ describe("joinWithInvite mutation", () => {
     const invitation2 = await prisma.userAccountHash.create({
       data: {
         email: invitee,
-        companySiret: company2.siret,
+        companySiret: company2.siret!,
         role: "MEMBER",
         hash: "hash2"
       }
@@ -146,14 +146,16 @@ describe("joinWithInvite mutation", () => {
       }
     });
 
-    const updatedInvitation2 = await prisma.userAccountHash.findUnique({
+    const updatedInvitation2 = await prisma.userAccountHash.findUniqueOrThrow({
       where: {
         id: invitation2.id
       }
     });
     expect(updatedInvitation2.acceptedAt).not.toBeNull();
 
-    const user = await prisma.user.findUnique({ where: { email: invitee } });
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { email: invitee }
+    });
     const companies = await getUserCompanies(user.id);
 
     expect(companies.length).toEqual(2);
@@ -171,7 +173,7 @@ describe("joinWithInvite mutation", () => {
     const invitation = await prisma.userAccountHash.create({
       data: {
         email: invitee,
-        companySiret: company.siret,
+        companySiret: company.siret!,
         role: "MEMBER",
         hash: "hash"
       }

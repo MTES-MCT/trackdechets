@@ -12,6 +12,7 @@ export const whereSiretOrVatNumber = (parent: CompanyBaseIdentifiers) => {
   } else if (!!parent.vatNumber) {
     return { vatNumber: parent.vatNumber };
   }
+  throw new Error(`No siret or vatNumber provided to company filter`);
 };
 
 const companySearchResultResolvers: CompanySearchResultResolvers = {

@@ -27,7 +27,7 @@ describe("mutation resendInvitation", () => {
     const invitation = await createUserAccountHash(
       usrToInvite,
       "MEMBER",
-      company.siret
+      company.siret!
     );
 
     const { mutate } = makeClient({ ...admin, auth: AuthType.Session });

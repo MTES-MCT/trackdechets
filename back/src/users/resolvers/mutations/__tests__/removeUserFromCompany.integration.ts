@@ -38,13 +38,13 @@ describe("mutation removeUserFromCompany", () => {
         role: "MEMBER"
       }
     });
-    let isMember = await isMemberFn(user.id, company.siret);
+    let isMember = await isMemberFn(user.id, company.siret!);
     expect(isMember).toEqual(true);
     const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
     await mutate(REMOVE_USER_FROM_COMPANY, {
       variables: { userId: user.id, siret: company.siret }
     });
-    isMember = await isMemberFn(user.id, company.siret);
+    isMember = await isMemberFn(user.id, company.siret!);
     expect(isMember).toEqual(false);
   });
 

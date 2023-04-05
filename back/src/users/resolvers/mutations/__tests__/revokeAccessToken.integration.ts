@@ -27,7 +27,7 @@ describe("mutation revokeAccessToken", () => {
     expect(accessToken.isRevoked).toEqual(false);
     const { mutate } = makeClient(user);
     await mutate(REVOKE_ACCESS_TOKEN, { variables: { id: accessToken.id } });
-    const revokedAccessToken = await prisma.accessToken.findFirst({
+    const revokedAccessToken = await prisma.accessToken.findFirstOrThrow({
       where: { id: accessToken.id }
     });
     expect(revokedAccessToken.isRevoked).toEqual(true);

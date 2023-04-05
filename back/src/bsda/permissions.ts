@@ -26,11 +26,19 @@ const bsdaSiretFields = Prisma.validator<Prisma.BsdaArgs>()({
 });
 type BsdaFlatSiretsFields = Prisma.BsdaGetPayload<typeof bsdaSiretFields>;
 
+type BsdaContributorsIntermediaryFields = Pick<
+  IntermediaryBsdaAssociation,
+  "siret" | "vatNumber"
+>;
 type BsdaContributors = Partial<BsdaFlatSiretsFields> &
   Partial<{
-    intermediaries: Partial<
-      Pick<IntermediaryBsdaAssociation, "siret" | "vatNumber">
-    >[];
+    intermediaries:
+      | {
+          [P in keyof BsdaContributorsIntermediaryFields]?:
+            | BsdaContributorsIntermediaryFields[P]
+            | null;
+        }[]
+      | null;
   }>;
 
 export const BSDA_REVISION_REQUESTER_FIELDS: Record<

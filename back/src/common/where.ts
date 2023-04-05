@@ -1,7 +1,7 @@
 import { estypes } from "@elastic/elasticsearch";
 import { Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
-import { safeInput } from "../common/converter";
+import { removeEmptyKeys, safeInput } from "../common/converter";
 import {
   DateFilter,
   StringFilter,
@@ -11,14 +11,14 @@ import {
 } from "../generated/graphql/types";
 
 type EnumFilter<E> = {
-  _in?: E[];
-  _eq?: E;
+  _in?: E[] | null;
+  _eq?: E | null;
 };
 
 export type NestedWhere<W> = {
-  _or?: W[];
-  _and?: W[];
-  _not?: W;
+  _or?: W[] | null;
+  _and?: W[] | null;
+  _not?: W | null;
 };
 
 export type GenericWhere = {
@@ -88,7 +88,7 @@ export function toPrismaNestedWhereInput<
 export function toPrismaGenericWhereInput(where: GenericWhere) {
   return {
     ...(where?.id ? { id: toPrismaIdFilter(where.id) } : {}),
-    isDraft: where?.isDraft,
+    ...(where?.isDraft !== null ? { isDraft: where.isDraft } : {}),
     ...(where?.createdAt
       ? { createdAt: toPrismaDateFilter(where.createdAt) }
       : {}),
@@ -105,7 +105,7 @@ export function toPrismaDateFilter(
     return undefined;
   }
 
-  return safeInput<Prisma.DateTimeFilter>({
+  return removeEmptyKeys({
     gt: dateFilter._gt,
     gte: dateFilter._gte,
     lt: dateFilter._lt,
@@ -114,11 +114,13 @@ export function toPrismaDateFilter(
   });
 }
 
-export function toPrismaEnumFilter<E>(enumFilter: EnumFilter<E> | undefined) {
+export function toPrismaEnumFilter<E>(
+  enumFilter: EnumFilter<E> | null | undefined
+) {
   if (!enumFilter) {
     return undefined;
   }
-  return safeInput({
+  return removeEmptyKeys({
     in: enumFilter._in,
     equals: enumFilter._eq
   });
@@ -128,7 +130,7 @@ export function toPrismaIdFilter(idFilter: IdFilter | null | undefined) {
   if (!idFilter) {
     return undefined;
   }
-  return safeInput<Prisma.StringFilter>({
+  return removeEmptyKeys({
     equals: idFilter._eq,
     in: idFilter._in
   });
@@ -146,7 +148,7 @@ export function toPrismaRelationIdFilter(
   }
 
   return {
-    id: safeInput<Prisma.StringFilter>({
+    id: safeInput({
       equals: idFilter._eq,
       in: idFilter._in
     })
@@ -160,10 +162,24 @@ export function toPrismaStringFilter(
     return undefined;
   }
 
-  return safeInput<Prisma.StringFilter>({
+  return removeEmptyKeys({
     equals: stringFilter._eq,
     in: stringFilter._in,
     contains: stringFilter._contains
+  });
+}
+
+export function toPrismaStringNullableFilter(
+  stringFilter: StringFilter | null | undefined
+): Prisma.StringNullableFilter | undefined {
+  if (!stringFilter) {
+    return undefined;
+  }
+
+  return safeInput({
+    equals: stringFilter._eq,
+    in: stringFilter._in,
+    contains: stringFilter._contains ? stringFilter._contains : undefined
   });
 }
 
@@ -176,10 +192,13 @@ export function toPrismaStringNullableListFilter(
   }
 
   return safeInput<Prisma.StringNullableListFilter>({
-    hasSome: stringNullableListFilter._hasSome ?? stringNullableListFilter._in,
+    hasSome:
+      stringNullableListFilter._hasSome ??
+      stringNullableListFilter._in ??
+      undefined,
     equals: stringNullableListFilter._eq,
     has: stringNullableListFilter._has,
-    hasEvery: stringNullableListFilter._hasEvery
+    hasEvery: stringNullableListFilter._hasEvery ?? undefined
   });
 }
 
@@ -217,7 +236,7 @@ function ngramMatch(
     match: {
       [`${fieldName}.ngram`]: {
         // upper limit 5 should be the same as max_gram in ngram_tokenizer
-        query: value.match(/.{1,5}/g).join(" "),
+        query: value.match(/.{1,5}/g)?.join(" ") ?? "",
         operator: "and"
       }
     }
@@ -229,7 +248,7 @@ export function toElasticTextQuery(
   textFilter: TextFilter | null | undefined,
   maxLength = 50
 ): estypes.QueryDslQueryContainer | undefined {
-  if (!textFilter) {
+  if (!textFilter?._match) {
     return undefined;
   }
   if (textFilter._match?.length > maxLength) {
@@ -263,8 +282,8 @@ export function toElasticStringQuery(
   }
 
   if (
-    stringFilter._eq?.length > maxLength ||
-    stringFilter._contains?.length > maxLength ||
+    (stringFilter._eq && stringFilter._eq.length > maxLength) ||
+    (stringFilter._contains && stringFilter._contains.length > maxLength) ||
     stringFilter._in?.some(s => s.length > maxLength)
   ) {
     throw new MaxLengthSearchError(fieldName, maxLength);
@@ -297,8 +316,9 @@ export function toElasticStringListQuery(
     stringListFilter._hasEvery?.some(s => s.length > maxLength) ||
     stringListFilter._hasSome?.some(s => s.length > maxLength) ||
     stringListFilter._in?.some(s => s.length > maxLength) ||
-    stringListFilter._has?.length > maxLength ||
-    stringListFilter._itemContains?.length > maxLength
+    (stringListFilter._has && stringListFilter._has.length > maxLength) ||
+    (stringListFilter._itemContains &&
+      stringListFilter._itemContains.length! > maxLength)
   ) {
     throw new MaxLengthSearchError(fieldName, maxLength);
   }

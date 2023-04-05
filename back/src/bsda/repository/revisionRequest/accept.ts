@@ -18,7 +18,7 @@ import { ForbiddenError } from "apollo-server-core";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
-  { comment }: { comment?: string },
+  { comment }: { comment?: string | null },
   logMetadata?: LogMetadata
 ) => Promise<void>;
 
@@ -155,6 +155,12 @@ export async function approveAndApplyRevisionRequest(
     updatedRevisionRequest,
     prisma
   );
+
+  if (!updateData) {
+    throw new Error(
+      `Empty BSDA revision cannot be applied. Id #${updatedRevisionRequest.id}, BSDA id #${updatedRevisionRequest.bsdaId}`
+    );
+  }
 
   const updatedBsda = await prisma.bsda.update({
     where: { id: updatedRevisionRequest.bsdaId },

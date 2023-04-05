@@ -6,9 +6,9 @@ import {
 } from "../../../generated/graphql/types";
 
 type Props = {
-  waste?: BsdaWaste;
-  packagings?: BsdaPackaging[];
-  weight?: BsdaWeight;
+  waste?: BsdaWaste | null;
+  packagings?: BsdaPackaging[] | null;
+  weight?: BsdaWeight | null;
 };
 
 const CONSISTANCE = {
@@ -25,7 +25,12 @@ export function WasteDetails({ waste, packagings, weight }: Props) {
         Quantité en tonnes : {weight?.value}{" "}
         <input type="checkbox" checked={!weight?.isEstimate} readOnly /> Réelle
         <br />
-        <input type="checkbox" checked={weight?.isEstimate} readOnly /> Estimée
+        <input
+          type="checkbox"
+          checked={Boolean(weight?.isEstimate)}
+          readOnly
+        />{" "}
+        Estimée
       </p>
     </>
   );

@@ -12,7 +12,7 @@ import {
 const bsdaRevisionRequestResolvers: BsdaRevisionRequestResolvers = {
   approvals: async parent => {
     return prisma.bsdaRevisionRequest
-      .findUnique({ where: { id: parent.id } })
+      .findUniqueOrThrow({ where: { id: parent.id } })
       .approvals();
   },
   content: parent => {
@@ -20,7 +20,7 @@ const bsdaRevisionRequestResolvers: BsdaRevisionRequestResolvers = {
   },
   authoringCompany: parent => {
     return prisma.bsdaRevisionRequest
-      .findUnique({ where: { id: parent.id } })
+      .findUniqueOrThrow({ where: { id: parent.id } })
       .authoringCompany();
   },
   bsda: async (parent: BsdaRevisionRequest & { bsdaId: string }) => {

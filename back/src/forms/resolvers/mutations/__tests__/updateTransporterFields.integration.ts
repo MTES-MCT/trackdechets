@@ -39,7 +39,7 @@ describe("Forms -> updateTransporterFields mutation", () => {
   `;
       await mutate(mutation);
 
-      form = await prisma.form.findUnique({
+      form = await prisma.form.findUniqueOrThrow({
         where: { id: form.id },
         include: { forwardedIn: true }
       });
@@ -72,7 +72,7 @@ describe("Forms -> updateTransporterFields mutation", () => {
   `;
       await mutate(mutation);
 
-      form = await prisma.form.findUnique({
+      form = await prisma.form.findUniqueOrThrow({
         where: { id: form.id },
         include: { forwardedIn: true }
       });
@@ -106,7 +106,7 @@ describe("Forms -> updateTransporterFields mutation", () => {
       "Ce champ n'est pas modifiable sur un bordereau qui n'est pas en statut scellé ou signé par le producteur"
     );
 
-    form = await prisma.form.findUnique({
+    form = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
       include: { forwardedIn: true }
     });
@@ -141,7 +141,7 @@ describe("Forms -> updateTransporterFields mutation", () => {
       "Vous n'êtes pas transporteur de ce bordereau."
     );
 
-    form = await prisma.form.findUnique({
+    form = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
       include: { forwardedIn: true }
     });

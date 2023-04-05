@@ -128,7 +128,7 @@ export function searchCompanies(
   department?: string
 ): Promise<SireneSearchResult[]> {
   // list of filters to pass as "q" arguments
-  const filters = [];
+  const filters: string[] = [];
 
   const today = format(new Date(), "yyyy-MM-dd");
 

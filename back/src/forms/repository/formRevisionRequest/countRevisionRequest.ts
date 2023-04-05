@@ -1,12 +1,12 @@
 import { Prisma } from "@prisma/client";
-import { RepositoryFnDeps } from "../../../common/repository/types";
+import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 export type CountRevisionRequestsFn = (
   where: Prisma.BsddRevisionRequestWhereInput
 ) => Promise<number>;
 
 const buildCountRevisionRequests: (
-  deps: RepositoryFnDeps
+  deps: ReadRepositoryFnDeps
 ) => CountRevisionRequestsFn =
   ({ prisma }) =>
   where => {

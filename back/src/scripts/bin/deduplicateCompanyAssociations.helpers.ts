@@ -13,7 +13,7 @@ export default async function deduplicateCompanyAssociations() {
   // Duplicate may originate from bulk import script
   const duplicates: Duplicate[] =
     await prisma.$queryRaw`select "companyId", "userId", COUNT("companyId") from default$default."CompanyAssociation" group by   "companyId", "userId" having COUNT(*) > 1;`;
-  let associationsToDelete = [];
+  let associationsToDelete: string[] = [];
   for (const duplicate of duplicates) {
     const asso = await prisma.companyAssociation.findMany({
       where: {

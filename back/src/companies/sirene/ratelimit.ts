@@ -46,11 +46,11 @@ type ThrottleDecoratorArgs = {
   requestsPerSeconds?: number;
 };
 
-export function backoffIfTestEnvs<T>(fn: (...args) => Promise<T>) {
-  const backoff = async (...args): Promise<T> => {
+export function backoffIfTestEnvs<T>(fn: (...args) => Promise<T | null>) {
+  const backoff = async (...args): Promise<T | null> => {
     if (process.env.NODE_ENV === "test") {
       // do not call the APIs when running tests
-      return;
+      return null;
     } else {
       return fn(...args);
     }

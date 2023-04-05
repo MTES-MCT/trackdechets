@@ -105,7 +105,7 @@ describe("bulk create users and companies from csv files", () => {
     await expectNumberOfRecords(2, 3, 4);
 
     // check fields are OK for first user
-    const john = await prisma.user.findUnique({
+    const john = await prisma.user.findUniqueOrThrow({
       where: { email: "john.snow@trackdechets.fr" }
     });
     expect(john.name).toEqual("john.snow@trackdechets.fr");
@@ -114,7 +114,7 @@ describe("bulk create users and companies from csv files", () => {
     expect(john.firstAssociationDate).toBeTruthy();
 
     // check fields are OK for first company
-    const codeEnStock = await prisma.company.findUnique({
+    const codeEnStock = await prisma.company.findUniqueOrThrow({
       where: { siret: "85001946400013" }
     });
     expect(codeEnStock.name).toEqual("NAME FROM SIRENE");
@@ -127,7 +127,7 @@ describe("bulk create users and companies from csv files", () => {
     expect(codeEnStock.contact).toEqual("Marcel Machin");
 
     // check fields are OK for second company
-    const frontier = await prisma.company.findUnique({
+    const frontier = await prisma.company.findUniqueOrThrow({
       where: { siret: "81343950200028" }
     });
     expect(frontier.name).toEqual("NAME FROM SIRENE");
@@ -164,7 +164,7 @@ describe("bulk create users and companies from csv files", () => {
 
     await expectNumberOfRecords(2, 3, 4);
     const { firstAssociationDate, updatedAt, ...dbJohn } =
-      await prisma.user.findUnique({
+      await prisma.user.findUniqueOrThrow({
         where: { email: "john.snow@trackdechets.fr" }
       });
 
@@ -203,7 +203,7 @@ describe("bulk create users and companies from csv files", () => {
 
     // Code en Stock should be untouched
     expect(
-      await prisma.company.findUnique({ where: { siret: codeEnStock.siret } })
+      await prisma.company.findUnique({ where: { siret: codeEnStock.siret! } })
     ).toEqual(codeEnStock);
     // Association should be there
     const associations = await prisma.companyAssociation.findMany({
@@ -220,7 +220,7 @@ describe("bulk create users and companies from csv files", () => {
     const invitation = await prisma.userAccountHash.create({
       data: {
         email: "john.snow@trackdechets.fr",
-        companySiret: company.siret,
+        companySiret: company.siret!,
         role: "MEMBER",
         hash: "hash"
       }
@@ -231,7 +231,7 @@ describe("bulk create users and companies from csv files", () => {
     await expectNumberOfRecords(3, 3, 5);
 
     // John Snow user should be created
-    const john = await prisma.user.findUnique({
+    const john = await prisma.user.findUniqueOrThrow({
       where: { email: "john.snow@trackdechets.fr" }
     });
 
@@ -244,7 +244,7 @@ describe("bulk create users and companies from csv files", () => {
     expect(associations[0].role).toEqual("MEMBER");
 
     // invitation should be marked as joined
-    const updatedInvitation = await prisma.userAccountHash.findUnique({
+    const updatedInvitation = await prisma.userAccountHash.findUniqueOrThrow({
       where: {
         id: invitation.id
       }
@@ -258,7 +258,7 @@ describe("bulk create users and companies from csv files", () => {
     const invitation = await prisma.userAccountHash.create({
       data: {
         email: "john.snow@trackdechets.fr",
-        companySiret: company.siret,
+        companySiret: company.siret!,
         role: "MEMBER",
         hash: "hash"
       }
@@ -267,7 +267,7 @@ describe("bulk create users and companies from csv files", () => {
     await bulkCreateIdempotent();
     await expectNumberOfRecords(2, 3, 4);
 
-    const john = await prisma.user.findUnique({
+    const john = await prisma.user.findUniqueOrThrow({
       where: { email: "john.snow@trackdechets.fr" }
     });
 
@@ -279,7 +279,7 @@ describe("bulk create users and companies from csv files", () => {
     expect(associations[0].role).toEqual("MEMBER");
 
     // invitation should be marked as joined
-    const updatedInvitation = await prisma.userAccountHash.findUnique({
+    const updatedInvitation = await prisma.userAccountHash.findUniqueOrThrow({
       where: {
         id: invitation.id
       }

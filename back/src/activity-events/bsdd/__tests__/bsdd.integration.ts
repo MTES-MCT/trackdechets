@@ -189,7 +189,7 @@ describe("ActivityEvent.Bsdd", () => {
       data: {
         bsddId: bsdd.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         wasteDetailsCode: "01 03 08",
         comment: ""
       }
@@ -261,7 +261,7 @@ describe("ActivityEvent.Bsdd", () => {
     });
 
     // We should now be able to get the bsdd at different stages
-    const formAfterUpdate = await prisma.form.findUnique({
+    const formAfterUpdate = await prisma.form.findUniqueOrThrow({
       where: { id: formId }
     });
     const formFromEventsAfterCreate = await getBsddFromActivityEvents(

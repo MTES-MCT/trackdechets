@@ -14,17 +14,17 @@ type templateInterface = {
 };
 
 const templateIds: templateInterface = {
-  [TemplateNames.LAYOUT]: parseInt(process.env.MAIN_TEMPLATE_ID, 10),
+  [TemplateNames.LAYOUT]: parseInt(process.env.MAIN_TEMPLATE_ID!, 10),
   [TemplateNames.FIRST_ONBOARDING]: parseInt(
-    process.env.FIRST_ONBOARDING_TEMPLATE_ID,
+    process.env.FIRST_ONBOARDING_TEMPLATE_ID!,
     10
   ),
   [TemplateNames.PRODUCER_SECOND_ONBOARDING]: parseInt(
-    process.env.PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID,
+    process.env.PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID!,
     10
   ),
   [TemplateNames.PROFESSIONAL_SECOND_ONBOARDING]: parseInt(
-    process.env.PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID,
+    process.env.PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID!,
     10
   )
 };

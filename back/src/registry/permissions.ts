@@ -6,7 +6,11 @@ export const REGISTRY_WHITE_LIST_IP =
   ) ?? [];
 
 export function checkIsRegistreNational(user: Express.User) {
-  if (user.isRegistreNational && REGISTRY_WHITE_LIST_IP.includes(user.ip)) {
+  if (
+    user.isRegistreNational &&
+    user.ip &&
+    REGISTRY_WHITE_LIST_IP.includes(user.ip)
+  ) {
     return true;
   }
   return false;

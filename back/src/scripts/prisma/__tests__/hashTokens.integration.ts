@@ -29,7 +29,7 @@ describe("hashTokens", () => {
     // run the migration function
     await hashTokens();
     // let's retrieve the previously unhashed token by its hashed value
-    const newlyHashedToken = await prisma.accessToken.findUnique({
+    const newlyHashedToken = await prisma.accessToken.findUniqueOrThrow({
       where: { token: hashToken(unHashedToken.token) }
     });
     expect(newlyHashedToken.id).not.toBeNull();

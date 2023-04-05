@@ -180,7 +180,7 @@ describe("Mutation.deleteBsda", () => {
 
     expect(data.deleteBsda.id).toBeTruthy();
 
-    const updatedForwarded = await prisma.bsda.findUnique({
+    const updatedForwarded = await prisma.bsda.findUniqueOrThrow({
       where: { id: forwardedBsda.id },
       include: { forwarding: true }
     });
@@ -206,7 +206,7 @@ describe("Mutation.deleteBsda", () => {
       }
     );
 
-    const deletedBsda = await prisma.bsda.findUnique({
+    const deletedBsda = await prisma.bsda.findUniqueOrThrow({
       where: { id: bsda.id }
     });
     expect(deletedBsda.isDeleted).toBe(true);

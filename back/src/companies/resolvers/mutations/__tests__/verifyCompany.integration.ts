@@ -139,8 +139,8 @@ describe("mutation verifyCompany", () => {
     expect(data.verifyCompany.verificationStatus).toEqual(
       CompanyVerificationStatus.VERIFIED
     );
-    const updatedCompany = await prisma.company.findUnique({
-      where: { siret: company.siret }
+    const updatedCompany = await prisma.company.findUniqueOrThrow({
+      where: { siret: company.siret! }
     });
     expect(updatedCompany.verificationStatus).toEqual(
       CompanyVerificationStatus.VERIFIED
@@ -154,7 +154,9 @@ describe("mutation verifyCompany", () => {
     expect(sendMailSpy).toHaveBeenCalledWith(
       renderMail(verificationDone, {
         to: [{ email: user.email, name: user.name }],
-        variables: { company: updatedCompany }
+        variables: {
+          company: updatedCompany as any
+        }
       })
     );
   });

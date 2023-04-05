@@ -18,13 +18,13 @@ describe("acceptPendingInvitations", () => {
       const invitation = await prisma.userAccountHash.create({
         data: {
           email: "john.snow@trackdechets.fr",
-          companySiret: company.siret,
+          companySiret: company.siret!,
           role: "MEMBER",
           hash: "hash1"
         }
       });
       await acceptPendingInvitations();
-      const untouchedInvitation = await prisma.userAccountHash.findUnique({
+      const untouchedInvitation = await prisma.userAccountHash.findUniqueOrThrow({
         where: {
           id: invitation.id
         }
@@ -42,7 +42,7 @@ describe("acceptPendingInvitations", () => {
       const invitation = await prisma.userAccountHash.create({
         data: {
           email: user.email,
-          companySiret: company.siret,
+          companySiret: company.siret!,
           role: "MEMBER",
           hash: "hash2"
         }
@@ -66,13 +66,13 @@ describe("acceptPendingInvitations", () => {
       const invitation = await prisma.userAccountHash.create({
         data: {
           email: user.email,
-          companySiret: company.siret,
+          companySiret: company.siret!,
           role: "MEMBER",
           hash: "hash3"
         }
       });
       await acceptPendingInvitations();
-      const acceptedInvitation = await prisma.userAccountHash.findUnique({
+      const acceptedInvitation = await prisma.userAccountHash.findUniqueOrThrow({
         where: {
           id: invitation.id
         }

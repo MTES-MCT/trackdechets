@@ -51,7 +51,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
           bsdaId,
           content: {},
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -84,7 +84,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
           bsdaId: bsda.id,
           content: {},
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -112,7 +112,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
           bsdaId: bsda.id,
           content: {},
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -145,7 +145,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
           bsdaId: bsda.id,
           content: { waste: { code: "16 01 11*" } },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -177,7 +177,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
           bsdaId: bsda.id,
           content: { waste: { code: "16 01 11*" } },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -232,7 +232,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
           bsdaId: bsda.id,
           content: { waste: { code: "Made up code" } },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -263,7 +263,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
           bsdaId: bsda.id,
           content: { waste: { code: "16 01 11*" } },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -294,7 +294,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
           bsdaId: bsda.id,
           content: { waste: { code: "16 01 11*" } },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -326,7 +326,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
           bsdaId: bsda.id,
           content: { waste: { code: "16 01 11*" } },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -358,7 +358,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
           bsdaId: bsda.id,
           content: { isCanceled: true, waste: { code: "16 01 11*" } },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -391,7 +391,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
           bsdaId: bsda.id,
           content: { waste: { code: "16 01 11*" } },
           comment: "A comment",
-          authoringCompanySiret: company.siret
+          authoringCompanySiret: company.siret!
         }
       }
     });
@@ -428,7 +428,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
             bsdaId: bsda.id,
             content: { isCanceled: true },
             comment: "A comment",
-            authoringCompanySiret: company.siret
+            authoringCompanySiret: company.siret!
           }
         }
       });
@@ -465,7 +465,7 @@ describe("Mutation.createBsdaRevisionRequest", () => {
             bsdaId: bsda.id,
             content: { isCanceled: true },
             comment: "A comment",
-            authoringCompanySiret: company.siret
+            authoringCompanySiret: company.siret!
           }
         }
       });

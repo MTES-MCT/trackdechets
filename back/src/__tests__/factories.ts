@@ -453,7 +453,7 @@ export const ecoOrganismeFactory = async ({
 };
 
 export const toIntermediaryCompany = (company: Company, contact = "toto") => ({
-  siret: company.siret,
+  siret: company.siret!,
   name: company.name,
   address: company.address,
   contact

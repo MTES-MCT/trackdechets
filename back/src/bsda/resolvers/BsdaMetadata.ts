@@ -77,7 +77,7 @@ export const Metadata: BsdaMetadataResolvers = {
       } = prismaForm;
       try {
         await validateBsda(
-          bsda,
+          bsda as any,
           { previousBsdas: [], intermediaries: [] },
           context
         );

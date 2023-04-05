@@ -31,7 +31,7 @@ export const Bsda: BsdaResolvers = {
     const grouping = await getReadonlyBsdaRepository()
       .findRelatedEntity({ id })
       .grouping();
-    return grouping.map(bsda => toInitialBsda(expandBsdaFromDb(bsda)));
+    return grouping?.map(bsda => toInitialBsda(expandBsdaFromDb(bsda))) ?? [];
   },
   groupedIn: async (bsda, _, ctx) => {
     // use ES indexed field when requested from dashboard

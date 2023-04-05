@@ -4,7 +4,7 @@ import { SSTI_CHARS } from "../constants";
 /* eslint-disable */
 declare module "yup" {
   interface BaseSchema<TCast = any, TContext = AnyObject, TOutput = any> {
-    requiredIf<T>(condition: boolean, message?: string): this;
+    requiredIf<T>(condition: boolean | undefined, message?: string): this;
     isSafeSSTI<T>(): this;
   }
 }

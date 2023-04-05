@@ -34,7 +34,7 @@ async function renewToken(): Promise<void> {
 /**
  * Retrives token from redis cache
  */
-export async function getToken(): Promise<string> {
+export async function getToken(): Promise<string | null> {
   return redisClient.get(INSEE_TOKEN_KEY);
 }
 

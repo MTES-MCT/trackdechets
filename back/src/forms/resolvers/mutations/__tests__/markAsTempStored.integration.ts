@@ -117,7 +117,7 @@ describe("{ mutation { markAsTempStored } }", () => {
       }
     });
 
-    const formAfterMutation = await prisma.form.findUnique({
+    const formAfterMutation = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
 
@@ -171,7 +171,7 @@ describe("{ mutation { markAsTempStored } }", () => {
       }
     });
 
-    const formAfterMutation = await prisma.form.findUnique({
+    const formAfterMutation = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
 
@@ -220,7 +220,7 @@ describe("{ mutation { markAsTempStored } }", () => {
       }
     });
 
-    const updatedForm = await prisma.form.findUnique({
+    const updatedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
 
@@ -264,7 +264,7 @@ describe("{ mutation { markAsTempStored } }", () => {
       }
     });
 
-    const formAfterMutation = await prisma.form.findUnique({
+    const formAfterMutation = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
 
@@ -369,7 +369,7 @@ describe("{ mutation { markAsTempStored } }", () => {
         }
       });
 
-      const formAfterMutation = await prisma.form.findUnique({
+      const formAfterMutation = await prisma.form.findUniqueOrThrow({
         where: { id: form.id }
       });
 
@@ -424,11 +424,11 @@ describe("{ mutation { markAsTempStored } }", () => {
             data: [
               {
                 initialFormId: form1.id,
-                quantity: form1.quantityReceived
+                quantity: form1.quantityReceived!
               },
               {
                 initialFormId: form2.id,
-                quantity: form2.quantityReceived
+                quantity: form2.quantityReceived!
               }
             ]
           }
@@ -455,17 +455,17 @@ describe("{ mutation { markAsTempStored } }", () => {
       }
     });
 
-    const updatedForm1 = await prisma.form.findUnique({
+    const updatedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: form1.id }
     });
-    const updatedForm2 = await prisma.form.findUnique({
+    const updatedForm2 = await prisma.form.findUniqueOrThrow({
       where: { id: form2.id }
     });
     expect(updatedForm1.status).toEqual("AWAITING_GROUP");
     expect(updatedForm2.status).toEqual("AWAITING_GROUP");
 
     const groupement = await prisma.form
-      .findUnique({
+      .findUniqueOrThrow({
         where: { id: groupementForm.id }
       })
       .grouping({ include: { initialForm: true } });

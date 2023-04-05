@@ -1,5 +1,6 @@
 import { ForbiddenError } from "apollo-server-core";
 import { applyAuthStrategies, AuthType } from "../../../auth";
+import { removeEmptyKeys } from "../../../common/converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
@@ -28,7 +29,7 @@ const updateApplicationResolver: MutationResolvers["updateApplication"] =
 
     const updatedApplication = await prisma.application.update({
       where: { id: existingApplication.id },
-      data: input
+      data: removeEmptyKeys(input)
     });
 
     return updatedApplication;

@@ -142,7 +142,8 @@ export async function checkEditionRules(
   }
 
   const userSirets = user?.id ? await getCachedUserSiretOrVat(user.id) : [];
-  const isEmitter = userSirets.includes(bsda.emitterCompanySiret);
+  const isEmitter =
+    bsda.emitterCompanySiret && userSirets.includes(bsda.emitterCompanySiret);
 
   if (bsda.status === "SIGNED_BY_PRODUCER" && isEmitter) {
     return true;
@@ -155,7 +156,7 @@ export async function checkEditionRules(
   // Inner function used to recursively checks that the diff
   // does not contain any fields sealed by signature
   function checkSealedFields(
-    signatureType: BsdaSignatureType,
+    signatureType: BsdaSignatureType | null,
     editableFields: string[]
   ) {
     if (signatureType === null) {
@@ -229,7 +230,7 @@ async function getUpdatedFields(
       return { ...acc, [field]: bsda[field] };
     }, {}),
     ...(input.grouping ? { grouping: grouping?.map(g => g.id) } : {}),
-    ...(input.forwarding ? { forwarding: forwarding.id } : {}),
+    ...(input.forwarding ? { forwarding: forwarding?.id } : {}),
     ...(input.intermediaries
       ? {
           intermediaries: intermediaries?.map(inter => {

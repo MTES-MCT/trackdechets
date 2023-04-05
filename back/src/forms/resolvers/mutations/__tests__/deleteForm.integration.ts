@@ -43,7 +43,9 @@ describe("Mutation.deleteForm", () => {
         })
       })
     ]);
-    const intactForm = await prisma.form.findUnique({ where: { id: form.id } });
+    const intactForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
     expect(intactForm.isDeleted).toBe(false);
   });
 
@@ -67,7 +69,9 @@ describe("Mutation.deleteForm", () => {
         })
       })
     ]);
-    const intactForm = await prisma.form.findUnique({ where: { id: form.id } });
+    const intactForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
     expect(intactForm.isDeleted).toBe(false);
   });
 
@@ -92,7 +96,9 @@ describe("Mutation.deleteForm", () => {
       })
     ]);
 
-    const intactForm = await prisma.form.findUnique({ where: { id: form.id } });
+    const intactForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
     expect(intactForm.isDeleted).toBe(false);
   });
 
@@ -113,7 +119,7 @@ describe("Mutation.deleteForm", () => {
 
       expect(data.deleteForm.id).toBeTruthy();
 
-      const deletedForm = await prisma.form.findUnique({
+      const deletedForm = await prisma.form.findUniqueOrThrow({
         where: { id: form.id }
       });
       expect(deletedForm.isDeleted).toBe(true);
@@ -137,7 +143,7 @@ describe("Mutation.deleteForm", () => {
 
       expect(data.deleteForm.id).toBeTruthy();
 
-      const deletedForm = await prisma.form.findUnique({
+      const deletedForm = await prisma.form.findUniqueOrThrow({
         where: { id: form.id }
       });
       expect(deletedForm.isDeleted).toBe(true);
@@ -169,7 +175,7 @@ describe("Mutation.deleteForm", () => {
         grouping: {
           create: {
             initialFormId: appendix2.id,
-            quantity: appendix2.quantityReceived
+            quantity: appendix2.quantityReceived!
           }
         }
       }
@@ -187,14 +193,14 @@ describe("Mutation.deleteForm", () => {
 
     expect(data.deleteForm.id).toBeTruthy();
 
-    const deletedForm = await prisma.form.findUnique({
+    const deletedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
       include: { grouping: true }
     });
     expect(deletedForm.isDeleted).toBe(true);
     expect(deletedForm.grouping).toEqual([]);
 
-    const disconnectedAppendix2 = await prisma.form.findUnique({
+    const disconnectedAppendix2 = await prisma.form.findUniqueOrThrow({
       where: { id: appendix2.id },
       include: { groupedIn: true }
     });
@@ -213,8 +219,8 @@ describe("Mutation.deleteForm", () => {
     await mutate<Pick<Mutation, "deleteForm">>(DELETE_FORM, {
       variables: { id: form.id }
     });
-    const updatedForwardedInForm = await prisma.form.findUnique({
-      where: { id: forwardedIn.id }
+    const updatedForwardedInForm = await prisma.form.findUniqueOrThrow({
+      where: { id: forwardedIn!.id }
     });
     expect(updatedForwardedInForm.isDeleted).toEqual(true);
   });
