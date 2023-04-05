@@ -380,25 +380,6 @@ export const transportSchema: FactorySchemaOf<
                 )
         )
     }),
-<<<<<<< HEAD
-    transporterWasteRefusalReason: yup
-      .string()
-      .when("type", {
-        is: BsdasriType.SYNTHESIS,
-        then: schema => schema.nullable().notRequired(), // Synthesis dasri can't be refused
-        otherwise: schema =>
-          schema.when("transporterAcceptationStatus", (type, schema) =>
-            ["REFUSED", "PARTIALLY_REFUSED"].includes(type)
-              ? schema.required("Vous devez saisir un motif de refus")
-              : schema
-                  .nullable()
-                  .notRequired()
-                  .test(
-                    "is-empty",
-                    "Le champ transporterWasteRefusalReason ne doit pas être renseigné si le déchet est accepté ",
-                    v => !v
-                  )
-=======
     transporterWasteRefusalReason: yup.string().when("type", {
       is: BsdasriType.SYNTHESIS,
       then: schema => schema.nullable().notRequired(), // Synthesis dasri can't be refused
@@ -423,7 +404,6 @@ export const transportSchema: FactorySchemaOf<
         then: schema =>
           schema.required(
             "Le poids de déchets transportés en kg est obligatoire si vous renseignez le type de pesée"
->>>>>>> ff19441a0 (fix: fixing linting)
           )
       })
       .when(
@@ -439,11 +419,7 @@ export const transportSchema: FactorySchemaOf<
         "Le type de pesée (réelle ou estimée) doit être précisé si vous renseignez un poids de déchets transportés",
         function (value) {
           return !!this.parent.transporterWasteWeightValue
-<<<<<<< HEAD
             ? value != null
-=======
-            ? ![null, undefined].includes(value)
->>>>>>> ff19441a0 (fix: fixing linting)
             : true;
         }
       ),
@@ -476,11 +452,7 @@ export const transportSchema: FactorySchemaOf<
     transporterTransportPlates: yup
       .array()
       .of(yup.string())
-<<<<<<< HEAD
       .max(2, "Un maximum de 2 plaques d'immatriculation est accepté") as any
-=======
-      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
->>>>>>> ff19441a0 (fix: fixing linting)
   });
 
 export const recipientSchema: FactorySchemaOf<
@@ -497,7 +469,6 @@ export const recipientSchema: FactorySchemaOf<
       .test(siretTests.isRegistered("DESTINATION")),
     destinationCompanyAddress: yup
       .string()
-
       .requiredIf(!context.isDraft, `Destinataire: ${MISSING_COMPANY_ADDRESS}`),
     destinationCompanyContact: yup
       .string()

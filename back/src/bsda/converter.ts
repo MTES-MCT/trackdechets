@@ -295,7 +295,7 @@ function flattenBsdaEcoOrganismeInput({
   };
 }
 
-export function flattenBsdaDestinationInput({
+function flattenBsdaDestinationInput({
   destination
 }: Pick<BsdaInput, "destination">) {
   return {
