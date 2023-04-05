@@ -888,7 +888,7 @@ describe("Integration / Forms query for transporters", () => {
     expect(data.forms[0].id).toBe(form.id);
   });
 
-  it("should return my forms only if a am a foreign transporter", async () => {
+  it("should return my forms only if I am a foreign transporter", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN", {
       siret: null,
       orgId: "ESA15022510",
