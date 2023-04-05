@@ -76,8 +76,8 @@ async function getCurrentApproverSiret(
     .map(approvals => approvals.approverSiret);
 
   const userCompanies = await getUserCompanies(user.id);
-  const approvingCompaniesCandidate = userCompanies.find(company =>
-    remainingApproverSirets.includes(company.siret)
+  const approvingCompaniesCandidate = userCompanies.find(
+    company => company.siret && remainingApproverSirets.includes(company.siret)
   );
 
   if (!approvingCompaniesCandidate) {

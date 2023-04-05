@@ -9,6 +9,6 @@ export async function sendMailJob(job: Job<Mail>) {
   try {
     return sendMailSync(job.data);
   } catch (err) {
-    Sentry.captureException(err);
+    Sentry?.captureException(err);
   }
 }

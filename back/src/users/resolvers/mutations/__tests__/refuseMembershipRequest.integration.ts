@@ -131,11 +131,12 @@ describe("mutation refuseMembershipRequest", () => {
       }
     );
     expect(data.refuseMembershipRequest.users).toHaveLength(1);
-    const refusedMembershipRequest = await prisma.membershipRequest.findUnique({
-      where: {
-        id: membershipRequest.id
-      }
-    });
+    const refusedMembershipRequest =
+      await prisma.membershipRequest.findUniqueOrThrow({
+        where: {
+          id: membershipRequest.id
+        }
+      });
     expect(refusedMembershipRequest.status).toEqual("REFUSED");
     expect(refusedMembershipRequest.statusUpdatedBy).toEqual(user.email);
     const associationExists =

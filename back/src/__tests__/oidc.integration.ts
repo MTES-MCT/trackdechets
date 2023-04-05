@@ -191,7 +191,7 @@ describe("/oidc/authorize/decision", () => {
       }
     });
 
-    expect(grant.scope).toEqual(["openid", "profile", "email", "companies"]);
+    expect(grant!.scope).toEqual(["openid", "profile", "email", "companies"]);
   });
 
   it("should forbid funny scope values", async () => {
@@ -319,7 +319,7 @@ describe("/oidc/token - id/secret auth", () => {
 
     await prisma.grant.create({
       data: {
-        user: { connect: { id: application.adminId } },
+        user: { connect: { id: application.adminId! } },
         code: getUid(16),
         application: { connect: { id: application.id } },
         expires: 1 * 60, // 1 minute
@@ -341,9 +341,10 @@ describe("/oidc/token - id/secret auth", () => {
 
   it("should exchange a valid code grant for a token - base scope", async () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
+    console.log(process.env.OIDC_PUBLIC_KEY);
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -373,19 +374,19 @@ describe("/oidc/token - id/secret auth", () => {
 
     expect(res.status).toEqual(200);
 
-    const { idToken } = res.body;
+    const { id_token } = res.body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toBe(undefined);
@@ -396,7 +397,7 @@ describe("/oidc/token - id/secret auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -428,19 +429,19 @@ describe("/oidc/token - id/secret auth", () => {
 
     const body = res.body;
 
-    const { idToken } = body;
+    const { id_token } = body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toEqual(user.email);
@@ -454,7 +455,7 @@ describe("/oidc/token - id/secret auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -486,19 +487,19 @@ describe("/oidc/token - id/secret auth", () => {
 
     const body = res.body;
 
-    const { idToken } = body;
+    const { id_token } = body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toBe(undefined);
@@ -512,7 +513,7 @@ describe("/oidc/token - id/secret auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -549,19 +550,19 @@ describe("/oidc/token - id/secret auth", () => {
 
     const body = res.body;
 
-    const { idToken } = body;
+    const { id_token } = body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toBe(undefined);
@@ -739,7 +740,7 @@ describe("/oidc/token - basic auth", () => {
 
     await prisma.grant.create({
       data: {
-        user: { connect: { id: application.adminId } },
+        user: { connect: { id: application.adminId! } },
         code: getUid(16),
         application: { connect: { id: application.id } },
         expires: 1 * 60, // 1 minute
@@ -767,7 +768,7 @@ describe("/oidc/token - basic auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -799,19 +800,19 @@ describe("/oidc/token - basic auth", () => {
 
     expect(res.status).toEqual(200);
 
-    const { idToken } = res.body;
+    const { id_token } = res.body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toBe(undefined);
@@ -822,7 +823,7 @@ describe("/oidc/token - basic auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -857,19 +858,19 @@ describe("/oidc/token - basic auth", () => {
 
     const body = res.body;
 
-    const { idToken } = body;
+    const { id_token } = body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toEqual(user.email);
@@ -883,7 +884,7 @@ describe("/oidc/token - basic auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -920,19 +921,19 @@ describe("/oidc/token - basic auth", () => {
 
     const body = res.body;
 
-    const { idToken } = body;
+    const { id_token } = body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toEqual(user.email);
@@ -945,7 +946,7 @@ describe("/oidc/token - basic auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -977,19 +978,19 @@ describe("/oidc/token - basic auth", () => {
 
     const body = res.body;
 
-    const { idToken } = body;
+    const { id_token } = body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toBe(undefined);
@@ -1003,7 +1004,7 @@ describe("/oidc/token - basic auth", () => {
     const spki = process.env.OIDC_PUBLIC_KEY;
     const alg = "RS256";
 
-    const publicKey = await jose.importSPKI(spki, alg);
+    const publicKey = await jose.importSPKI(spki!, alg);
 
     const application = await applicationFactory(true);
 
@@ -1042,19 +1043,19 @@ describe("/oidc/token - basic auth", () => {
 
     const body = res.body;
 
-    const { idToken } = body;
+    const { id_token } = body;
 
     const { payload, protectedHeader } = await jose.jwtVerify(
-      idToken,
+      id_token,
       publicKey,
       {
         issuer: "trackdechets",
-        audience: application.name
+        audience: application.id
       }
     );
 
     expect(protectedHeader).toEqual({ alg: "RS256" });
-    expect(payload.aud).toEqual(application.name);
+    expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toBe(undefined);

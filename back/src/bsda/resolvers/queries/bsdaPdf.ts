@@ -6,12 +6,12 @@ import { getBsdaOrNotFound } from "../../database";
 import { checkCanAccessBsdaPdf } from "../../permissions";
 import { buildPdf } from "../../pdf/generator";
 import { DownloadHandler } from "../../../routers/downloadRouter";
-import { getBsdaRepository } from "../../repository";
+import { getReadonlyBsdaRepository } from "../../repository";
 
 export const bsdaPdfDownloadHandler: DownloadHandler<QueryBsdaPdfArgs> = {
   name: "bsdaPdf",
-  handler: async (req, res, { id }) => {
-    const bsda = await getBsdaRepository(req.user).findUnique({ id });
+  handler: async (_, res, { id }) => {
+    const bsda = await getReadonlyBsdaRepository().findUnique({ id });
     const readableStream = await buildPdf(bsda);
     readableStream.pipe(createPDFResponse(res, bsda.id));
   }

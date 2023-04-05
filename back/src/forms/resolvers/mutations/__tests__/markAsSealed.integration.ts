@@ -35,16 +35,8 @@ sendMailSpy.mockImplementation(() => Promise.resolve());
 
 // Mock external search services
 import * as search from "../../../../companies/sirene/searchCompany";
+import { MARK_AS_SEALED } from "./mutations";
 const searchCompanyMock = jest.spyOn(search, "default");
-
-export const MARK_AS_SEALED = `
-  mutation MarkAsSealed($id: ID!) {
-    markAsSealed(id: $id) {
-      id
-      status
-    }
-  }
-`;
 
 const formdataForPrivateOrShip = {
   brokerCompanyAddress: "",
@@ -159,7 +151,7 @@ describe("Mutation.markAsSealed", () => {
         }[role]);
 
       const { user, company } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: { set: [companyType(role)] }
+        companyTypes: { set: [companyType(role) as CompanyType] }
       });
 
       let form = await formFactory({
@@ -192,7 +184,7 @@ describe("Mutation.markAsSealed", () => {
         }
       });
 
-      form = await prisma.form.findUnique({
+      form = await prisma.form.findUniqueOrThrow({
         where: { id: form.id },
         include: { forwardedIn: true }
       });
@@ -222,7 +214,7 @@ describe("Mutation.markAsSealed", () => {
     const eo = await prisma.ecoOrganisme.create({
       data: {
         name: "An EO",
-        siret: ecoOrganismeCompany.siret,
+        siret: ecoOrganismeCompany.siret!,
         address: "An address"
       }
     });
@@ -246,7 +238,7 @@ describe("Mutation.markAsSealed", () => {
       }
     });
 
-    form = await prisma.form.findUnique({
+    form = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
       include: { forwardedIn: true }
     });
@@ -261,7 +253,7 @@ describe("Mutation.markAsSealed", () => {
     await prisma.ecoOrganisme.create({
       data: {
         name: eo.name,
-        siret: eo.siret,
+        siret: eo.siret!,
         address: "An address"
       }
     });
@@ -285,7 +277,7 @@ describe("Mutation.markAsSealed", () => {
       }
     });
 
-    form = await prisma.form.findUnique({
+    form = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
       include: { forwardedIn: true }
     });
@@ -300,7 +292,7 @@ describe("Mutation.markAsSealed", () => {
     await prisma.ecoOrganisme.create({
       data: {
         name: eo.name,
-        siret: eo.siret,
+        siret: eo.siret!,
         address: "An address"
       }
     });
@@ -325,7 +317,7 @@ describe("Mutation.markAsSealed", () => {
       }
     });
 
-    form = await prisma.form.findUnique({
+    form = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
       include: { forwardedIn: true }
     });
@@ -340,7 +332,7 @@ describe("Mutation.markAsSealed", () => {
     await prisma.ecoOrganisme.create({
       data: {
         name: eo.name,
-        siret: eo.siret,
+        siret: eo.siret!,
         address: "An address"
       }
     });
@@ -364,7 +356,7 @@ describe("Mutation.markAsSealed", () => {
       }
     });
 
-    form = await prisma.form.findUnique({
+    form = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
       include: { forwardedIn: true }
     });
@@ -395,7 +387,7 @@ describe("Mutation.markAsSealed", () => {
     });
     expect(errors[0].extensions.code).toBe("FORBIDDEN");
 
-    const resultingForm = await prisma.form.findUnique({
+    const resultingForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     expect(resultingForm.status).toEqual("DRAFT");
@@ -430,7 +422,7 @@ describe("Mutation.markAsSealed", () => {
       "Émetteur: Le contact dans l'entreprise est obligatoire";
     expect(errors[0].message).toBe(errMessage);
 
-    form = await prisma.form.findUnique({
+    form = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
       include: { forwardedIn: true }
     });
@@ -477,7 +469,7 @@ describe("Mutation.markAsSealed", () => {
           "Le code déchet n'est pas reconnu comme faisant partie de la liste officielle du code de l'environnement."
         )
       );
-      form = await prisma.form.findUnique({
+      form = await prisma.form.findUniqueOrThrow({
         where: { id: form.id },
         include: { forwardedIn: true }
       });
@@ -671,7 +663,7 @@ describe("Mutation.markAsSealed", () => {
         grouping: {
           create: {
             initialFormId: appendix2.id,
-            quantity: appendix2.quantityReceived
+            quantity: appendix2.quantityReceived!
           }
         }
       }
@@ -683,7 +675,7 @@ describe("Mutation.markAsSealed", () => {
       variables: { id: form.id }
     });
 
-    const appendix2grouped = await prisma.form.findUnique({
+    const appendix2grouped = await prisma.form.findUniqueOrThrow({
       where: { id: appendix2.id }
     });
     expect(appendix2grouped.status).toEqual("GROUPED");
@@ -928,12 +920,12 @@ describe("Mutation.markAsSealed", () => {
     expect(sendMailSpy).toHaveBeenCalledWith(
       renderMail(contentAwaitsGuest, {
         to: [
-          { email: form.emitterCompanyMail, name: form.emitterCompanyContact }
+          { email: form.emitterCompanyMail!, name: form.emitterCompanyContact! }
         ],
         variables: {
           company: {
-            siret: form.emitterCompanySiret,
-            name: form.emitterCompanyName
+            siret: form.emitterCompanySiret!,
+            name: form.emitterCompanyName!
           }
         }
       })
@@ -1242,7 +1234,7 @@ describe("Mutation.markAsSealed", () => {
         }[role]);
 
       const { user, company } = await userWithCompanyFactory("MEMBER", {
-        companyTypes: { set: [companyType(role)] }
+        companyTypes: { set: [companyType(role) as CompanyType] }
       });
       const { siret: recipientCompanySiret } = await destinationFactory();
 

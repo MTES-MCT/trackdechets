@@ -108,6 +108,11 @@ const getIndexDateString = (dateStr?: string) => {
 const getIndexDateFromName = (indexName: string): Date => {
   // Datetime is the last fragment in the index name
   const indexDateString = indexName.split(INDEX_ALIAS_NAME_SEPARATOR).pop();
+  if (!indexDateString) {
+    throw new Error(
+      `No "indexDateString" found for indexName ${indexName} and separator ${INDEX_ALIAS_NAME_SEPARATOR}`
+    );
+  }
   return new Date(
     indexDateString
       .toUpperCase()
@@ -351,6 +356,7 @@ async function reindexAllBsdsNoDowntime(
     logger.info(
       `reindexAll script has nothing to do, no mappings changes detected nor --force argument passed`
     );
+    return index.alias;
   }
 }
 
@@ -471,7 +477,7 @@ export async function getBsdIdentifiers(
 export async function processBsdIdentifiersByChunk(
   ids: string[],
   fn: (chunk: string[]) => Promise<any>,
-  chunkSize = parseInt(process.env.BULK_INDEX_BATCH_SIZE, 10) || 100
+  chunkSize = parseInt(process.env.BULK_INDEX_BATCH_SIZE!, 10) || 100
 ) {
   for (let i = 0; i < ids.length; i += chunkSize) {
     const chunk = ids.slice(i, i + chunkSize);
@@ -511,7 +517,7 @@ export async function indexAllBsdTypeConcurrently({
 }: IndexAllFnSignature) {
   const jobs: Job<string>[] = [];
 
-  const data = [];
+  const data: { name: string; data: string; opts?: JobOptions }[] = [];
 
   const ids = await getBsdIdentifiers(bsdName, since);
   logger.info(`Starting indexation of ${ids.length} ${bsdName}`);
@@ -534,7 +540,7 @@ export async function indexAllBsdTypeConcurrently({
   });
 
   // control concurrency of addBulk
-  const chunkSize = parseInt(process.env.BULK_INDEX_BATCH_ADD, 10) || 5;
+  const chunkSize = parseInt(process.env.BULK_INDEX_BATCH_ADD!, 10) || 5;
   for (let i = 0; i < data.length; i += chunkSize) {
     const chunk = data.slice(i, i + chunkSize);
     // all jobs are succesfully added in bulk or all jobs will fail

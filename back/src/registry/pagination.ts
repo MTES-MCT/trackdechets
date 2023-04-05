@@ -42,6 +42,10 @@ async function buildSearchAfter(
     type: index.type
   });
 
+  if (!bsd) {
+    throw new Error(`Cannot get _source from ES for cursor ${cursor}`);
+  }
+
   return sort.reduce(
     (acc, item) => [
       ...acc,
@@ -67,25 +71,15 @@ export async function getElasticPaginationArgs({
     maxPaginateBy: 100
   });
 
-  let first = args.first;
-  let last = args.last;
-
-  if (!first && !last) {
-    if (args.before) {
-      last = 50;
-    } else {
-      first = 50;
-    }
-  }
-
-  const order = last ? "DESC" : "ASC";
+  const size: number = args.first || args.last || 50;
+  const order = args.last || args.before ? "DESC" : "ASC";
   const sort = buildSort(registryType, order);
   const cursor = args.before ?? args.after;
 
   return {
-    size: first ?? last,
+    size,
     sort,
     ...(cursor ? { search_after: await buildSearchAfter(cursor, sort) } : {}),
-    isForward: !!first
+    isForward: Boolean(args.first || args.after)
   };
 }

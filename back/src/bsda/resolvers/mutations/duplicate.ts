@@ -73,6 +73,7 @@ function duplicateBsda({
     id: getReadableId(ReadableIdPrefix.BSDA),
     status: BsdaStatus.INITIAL,
     isDraft: true,
+    packagings: rest.packagings ?? Prisma.JsonNull,
     ...(intermediaries && {
       intermediaries: {
         createMany: {

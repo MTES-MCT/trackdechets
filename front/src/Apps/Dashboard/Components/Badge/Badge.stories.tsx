@@ -3,7 +3,6 @@ import { ComponentMeta, ComponentStory } from "@storybook/react";
 import { withDesign } from "storybook-addon-designs";
 import Badge from "./Badge";
 import { BsdStatusCode } from "../../../Common/types/bsdTypes";
-import { BsdType } from "../../../../generated/graphql/types";
 
 export default {
   title: "COMPONENTS/DASHBOARD/BsdCard/Blocks/Badge",
@@ -35,36 +34,35 @@ export const Sealed = Template.bind({});
 export const Refused = Template.bind({});
 
 DraftBsdd.args = {
-  status: BsdStatusCode.DRAFT,
+  status: BsdStatusCode.Draft,
 };
 
 Initial.args = {
-  status: BsdStatusCode.INITIAL,
+  status: BsdStatusCode.Initial,
   isDraft: true,
 };
 
 InitialNotDraft.args = {
-  status: BsdStatusCode.INITIAL,
+  status: BsdStatusCode.Initial,
   isDraft: false,
 };
 InitialDasriNotDraft.args = {
-  status: BsdStatusCode.INITIAL,
+  status: BsdStatusCode.Initial,
   isDraft: false,
-  bsdType: BsdType.Bsdasri,
 };
 
 Received.args = {
-  status: BsdStatusCode.RECEIVED,
+  status: BsdStatusCode.Received,
 };
 
 Processed.args = {
-  status: BsdStatusCode.PROCESSED,
+  status: BsdStatusCode.Processed,
 };
 
 Sealed.args = {
-  status: BsdStatusCode.SEALED,
+  status: BsdStatusCode.Sealed,
 };
 
 Refused.args = {
-  status: BsdStatusCode.REFUSED,
+  status: BsdStatusCode.Refused,
 };

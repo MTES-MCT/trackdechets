@@ -313,10 +313,10 @@ export const intermediarySchema: yup.SchemaOf<CompanyInput> = yup.object({
  * Validate Intermediary Input
  */
 export async function validateIntermediariesInput(
-  intermediaries: CompanyInput[]
+  intermediaries: CompanyInput[] | null | undefined
 ): Promise<CompanyInput[]> {
   if (!intermediaries || intermediaries.length === 0) {
-    return intermediaries;
+    return [];
   }
 
   if (intermediaries.length > 3) {

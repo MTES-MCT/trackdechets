@@ -2,6 +2,7 @@ import { QueryResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import prisma from "../../../prisma";
 import { applyAuthStrategies, AuthType } from "../../../auth";
+import { UserInputError } from "apollo-server-core";
 
 const myApplications: QueryResolvers["myApplications"] = async (
   _,
@@ -10,7 +11,15 @@ const myApplications: QueryResolvers["myApplications"] = async (
 ) => {
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
-  return prisma.user.findUnique({ where: { id: user.id } }).applications();
+  const applications = await prisma.user
+    .findUnique({ where: { id: user.id } })
+    .applications();
+
+  if (!applications) {
+    throw new UserInputError("Aucune application pour cet utilisateur.");
+  }
+
+  return applications;
 };
 
 export default myApplications;

@@ -101,7 +101,7 @@ input BsvhuEmitterInput {
 
 input BsvhuIdentificationInput {
   "Numéros d'identification"
-  numbers: [String]
+  numbers: [String!]
   "Type de numéros d'indentification"
   type: BsvhuIdentificationType
 }

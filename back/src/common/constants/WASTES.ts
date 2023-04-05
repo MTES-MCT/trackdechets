@@ -5642,5 +5642,8 @@ export function toWasteTree(
 }
 
 export function isDangerous(wasteCode: string): boolean {
+  if (!wasteCode) {
+    return false;
+  }
   return wasteCode.endsWith("*");
 }

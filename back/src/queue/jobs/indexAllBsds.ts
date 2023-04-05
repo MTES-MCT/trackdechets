@@ -137,7 +137,7 @@ export async function indexAllInBulk(job: Job<string>) {
             {
               name: BULK_INDEX_SCALINGO_CONTAINER_NAME,
               amount:
-                parseInt(BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_UP, 10) || 4,
+                parseInt(BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_UP!, 10) || 4,
               size: BULK_INDEX_SCALINGO_CONTAINER_SIZE_UP || "2XL"
             }
           ]
@@ -202,7 +202,7 @@ async function scaleDownScalingo() {
       containers: [
         {
           name: BULK_INDEX_SCALINGO_CONTAINER_NAME,
-          amount: parseInt(BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_DOWN, 10) || 1,
+          amount: parseInt(BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_DOWN!, 10) || 1,
           size: BULK_INDEX_SCALINGO_CONTAINER_SIZE_DOWN || "M"
         }
       ]

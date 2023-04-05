@@ -5,7 +5,7 @@ import { server } from "../server";
 /**
  * Instantiate test client
  */
-function makeClient(user?: Express.User) {
+function makeClient(user?: Express.User | null) {
   const { mutate, query, setOptions } = createTestClient({
     apolloServer: server
   });

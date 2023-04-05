@@ -1,3 +1,5 @@
+@import "src/scss/Constants";
+
 .survey-banner {
   background-color: #e3e3fd;
 
@@ -6,11 +8,15 @@
     align-items: center;
     justify-content: space-between;
     padding: 16px 32px;
-    max-width: 1920px;
+    max-width: $breakpoint-xxl;
     margin: auto;
   }
 
   &__group {
+    display: flex;
+  }
+
+  &__subgroup {
     display: flex;
   }
 
@@ -19,8 +25,11 @@
     font-weight: 700;
   }
 
+  &__icon {
+    margin: auto 16px auto 0;
+  }
+
   &__link,
-  &__icon,
   &__message {
     margin-right: 16px;
   }
@@ -30,10 +39,12 @@
     align-self: center;
   }
 
-  &__link__a {
-    box-shadow: rgb(0, 0, 145) 0px 0px 0px 1px inset;
-    padding: 0.5rem 1rem;
+  &__link a {
+    display: flex;
+    align-items: center;
     text-align: center;
+    padding: 0.5rem 1rem;
+    box-shadow: rgb(0, 0, 145) 0px 0px 0px 1px inset;
 
     &:hover {
       background-color: rgb(246, 246, 246) !important;
@@ -41,6 +52,25 @@
 
     &::after {
       display: none;
+    }
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    &__container {
+      flex-direction: column;
+    }
+
+    &__group:first-child {
+      margin-bottom: 16px;
+      flex-direction: column;
+    }
+
+    &__subgroup {
+      margin-bottom: 16px;
+    }
+
+    &__message {
+      margin-right: 0;
     }
   }
 }

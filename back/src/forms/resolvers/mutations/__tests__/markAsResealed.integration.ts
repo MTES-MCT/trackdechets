@@ -75,7 +75,7 @@ describe("Mutation markAsResealed", () => {
       }
     });
 
-    const resealedForm = await prisma.form.findUnique({
+    const resealedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     expect(resealedForm.status).toEqual("RESEALED");
@@ -141,24 +141,24 @@ describe("Mutation markAsResealed", () => {
       }
     );
 
-    const resealedForm = await prisma.form.findUnique({
+    const resealedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
       include: { forwardedIn: true }
     });
     expect(resealedForm.status).toEqual("RESEALED");
-    expect(resealedForm.forwardedIn.emitterCompanySiret).toEqual(
+    expect(resealedForm.forwardedIn!.emitterCompanySiret).toEqual(
       collector.siret
     );
-    expect(resealedForm.forwardedIn.recipientCompanySiret).toEqual(
+    expect(resealedForm.forwardedIn!.recipientCompanySiret).toEqual(
       destination.siret
     );
-    expect(resealedForm.forwardedIn.transporterCompanySiret).toEqual(
+    expect(resealedForm.forwardedIn!.transporterCompanySiret).toEqual(
       transporter.siret
     );
-    expect(resealedForm.forwardedIn.readableId).toEqual(
+    expect(resealedForm.forwardedIn!.readableId).toEqual(
       `${form.readableId}-suite`
     );
-    expect(resealedForm.forwardedIn.status).toEqual("SEALED");
+    expect(resealedForm.forwardedIn!.status).toEqual("SEALED");
   });
 
   test("it should fail if temporary storage detail is incomplete", async () => {
@@ -199,7 +199,7 @@ describe("Mutation markAsResealed", () => {
       "Destinataire: Le siret de l'entreprise est obligatoire"
     );
     expect(errors[0].extensions.code).toEqual(ErrorCode.BAD_USER_INPUT);
-    const resealedForm = await prisma.form.findUnique({
+    const resealedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     expect(resealedForm.status).toEqual("TEMP_STORER_ACCEPTED");
@@ -243,7 +243,7 @@ describe("Mutation markAsResealed", () => {
       }
     });
 
-    const resealedForm = await prisma.form.findUnique({
+    const resealedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     expect(resealedForm.status).toEqual("RESEALED");
@@ -286,12 +286,12 @@ describe("Mutation markAsResealed", () => {
       }
     });
 
-    const resealedForm = await prisma.form.findUnique({
+    const resealedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
       include: { forwardedIn: true }
     });
     expect(resealedForm.status).toEqual("RESEALED");
-    expect(resealedForm.forwardedIn.transporterCompanySiret).toEqual(
+    expect(resealedForm.forwardedIn!.transporterCompanySiret).toEqual(
       transporter.siret
     );
   });
@@ -381,7 +381,7 @@ describe("Mutation markAsResealed", () => {
       }
     });
     const tempStorage = await prisma.form
-      .findUnique({
+      .findUniqueOrThrow({
         where: { id: form.id }
       })
       .forwardedIn();
@@ -442,7 +442,7 @@ describe("Mutation markAsResealed", () => {
       }
     });
 
-    const resealedForm = await prisma.form.findUnique({
+    const resealedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     expect(resealedForm.status).toEqual("RESEALED");

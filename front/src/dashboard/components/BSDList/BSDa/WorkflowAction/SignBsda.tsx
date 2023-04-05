@@ -17,23 +17,52 @@ type Props = {
   title: string;
   bsdaId: string;
   children: (props: { bsda; onClose }) => React.ReactNode;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+  displayActionButton?: boolean;
 };
 
-export function SignBsda({ title, bsdaId, children }: Props) {
+export function SignBsda({
+  title,
+  bsdaId,
+  children,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+  displayActionButton = true,
+}: Props) {
   const [isOpen, setIsOpen] = useState(false);
+
+  const onClose = () => {
+    setIsOpen(false);
+  };
+
+  const onOpen = () => {
+    setIsOpen(true);
+  };
+
   return (
     <>
-      <ActionButton
-        icon={<IconCheckCircle1 size="24px" />}
-        onClick={() => setIsOpen(true)}
-      >
-        {title}
-      </ActionButton>
-      {isOpen && (
+      {displayActionButton && (
+        <>
+          <ActionButton
+            icon={<IconCheckCircle1 size="24px" />}
+            onClick={onOpen}
+          >
+            {title}
+          </ActionButton>
+          {isOpen && (
+            <SignBsdaModal title={title} bsdaId={bsdaId} onClose={onClose}>
+              {children}
+            </SignBsdaModal>
+          )}
+        </>
+      )}
+
+      {isModalOpenFromParent && (
         <SignBsdaModal
           title={title}
           bsdaId={bsdaId}
-          onClose={() => setIsOpen(false)}
+          onClose={onModalCloseFromParent!}
         >
           {children}
         </SignBsdaModal>

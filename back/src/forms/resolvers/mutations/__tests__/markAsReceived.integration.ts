@@ -74,7 +74,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form.findUnique({ where: { id: form.id } });
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
 
     expect(frm.status).toBe("RECEIVED");
     expect(frm.wasteAcceptationStatus).toBe(null);
@@ -123,7 +123,7 @@ describe("Test Form reception", () => {
 
     expect(errors).toBeUndefined();
 
-    const receivedForm = await prisma.form.findUnique({
+    const receivedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
 
@@ -161,7 +161,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form.findUnique({ where: { id: form.id } });
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
 
     expect(frm.status).toBe("ACCEPTED");
     expect(frm.wasteAcceptationStatus).toBe("ACCEPTED");
@@ -202,7 +202,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form.findUnique({ where: { id: form.id } });
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
     // form was not accepted, still sent
     expect(frm.status).toBe("SENT");
     expect(frm.wasteAcceptationStatus).toBe(null);
@@ -233,7 +233,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form.findUnique({ where: { id: form.id } });
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
     // form was not accepted, still sent
     expect(frm.status).toBe("SENT");
     expect(frm.wasteAcceptationStatus).toBe(null);
@@ -264,7 +264,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form.findUnique({ where: { id: form.id } });
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
 
     // form was refused
     expect(frm.status).toBe("REFUSED");
@@ -309,7 +309,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form.findUnique({ where: { id: form.id } });
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
 
     // form is still sent
     expect(frm.status).toBe("SENT");
@@ -348,7 +348,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form.findUnique({ where: { id: form.id } });
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
     // form was not accepted
     expect(frm.status).toBe("ACCEPTED");
     expect(frm.wasteAcceptationStatus).toBe("PARTIALLY_REFUSED");
@@ -399,7 +399,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form.findUnique({
+    const frm = await prisma.form.findUniqueOrThrow({
       where: { id: alreadyReceivedForm.id }
     });
     // form is not updated by the last mutation
@@ -441,7 +441,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form.findUnique({ where: { id: form.id } });
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
 
     expect(frm.status).toBe("SENT");
     expect(frm.wasteAcceptationStatus).toBe(null);
@@ -491,7 +491,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form.findUnique({ where: { id: form.id } });
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
 
     expect(frm.status).toBe("ACCEPTED");
     expect(frm.wasteAcceptationStatus).toBe("ACCEPTED");
@@ -560,7 +560,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form.findUnique({ where: { id: form.id } });
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
 
     expect(frm.status).toBe("ACCEPTED");
 
@@ -634,7 +634,9 @@ describe("Test Form reception", () => {
         }
       });
 
-      const frm = await prisma.form.findUnique({ where: { id: form.id } });
+      const frm = await prisma.form.findUniqueOrThrow({
+        where: { id: form.id }
+      });
 
       expect(frm.status).toBe(Status.RECEIVED);
       expect(frm.receivedAt).toEqual(receivedAt);
@@ -685,8 +687,8 @@ describe("Test Form reception", () => {
         grouping: {
           createMany: {
             data: [
-              { initialFormId: form1.id, quantity: form1.quantityReceived },
-              { initialFormId: form2.id, quantity: form2.quantityReceived }
+              { initialFormId: form1.id, quantity: form1.quantityReceived! },
+              { initialFormId: form2.id, quantity: form2.quantityReceived! }
             ]
           }
         }
@@ -711,10 +713,10 @@ describe("Test Form reception", () => {
       }
     );
 
-    const updatedForm1 = await prisma.form.findUnique({
+    const updatedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: form1.id }
     });
-    const updatedForm2 = await prisma.form.findUnique({
+    const updatedForm2 = await prisma.form.findUniqueOrThrow({
       where: { id: form2.id }
     });
     expect(updatedForm1.status).toEqual("AWAITING_GROUP");
@@ -923,7 +925,7 @@ describe("Test Form reception", () => {
 
       expect(data.markAsReceived.status).toBe(Status.ACCEPTED);
 
-      const refreshedItem = await prisma.form.findUnique({
+      const refreshedItem = await prisma.form.findUniqueOrThrow({
         where: { id: appendix1_item.id }
       });
       expect(refreshedItem.status).toBe(Status.ACCEPTED);
@@ -978,7 +980,7 @@ describe("Test Form reception", () => {
 
       expect(data.markAsReceived.status).toBe(Status.RECEIVED);
 
-      const refreshedItem = await prisma.form.findUnique({
+      const refreshedItem = await prisma.form.findUniqueOrThrow({
         where: { id: appendix1_item.id }
       });
       expect(refreshedItem.status).toBe(Status.RECEIVED);
@@ -1066,17 +1068,17 @@ describe("Test Form reception", () => {
       });
       expect(links.length).toBe(1);
 
-      const refreshedItem1 = await prisma.form.findUnique({
+      const refreshedItem1 = await prisma.form.findUniqueOrThrow({
         where: { id: appendix1_1.id }
       });
       expect(refreshedItem1.status).toBe(Status.RECEIVED);
 
-      const refreshedItem2 = await prisma.form.findUnique({
+      const refreshedItem2 = await prisma.form.findUniqueOrThrow({
         where: { id: appendix1_2.id }
       });
       expect(refreshedItem2.isDeleted).toBe(true);
 
-      const refreshedItem3 = await prisma.form.findUnique({
+      const refreshedItem3 = await prisma.form.findUniqueOrThrow({
         where: { id: appendix1_3.id }
       });
       expect(refreshedItem3.isDeleted).toBe(true);

@@ -48,7 +48,7 @@ describe("{ mutation { updateVhuAgrement } }", () => {
     expect(data.updateVhuAgrement).toEqual(update);
 
     // check record was modified in db
-    const { id, ...updated } = await prisma.vhuAgrement.findUnique({
+    const { id, ...updated } = await prisma.vhuAgrement.findUniqueOrThrow({
       where: { id: createdAgrement.id }
     });
     expect(updated.agrementNumber).toEqual(update.agrementNumber);

@@ -97,7 +97,8 @@ export async function checkEditionRules(
   }
 
   const userSirets = user?.id ? await getCachedUserSiretOrVat(user.id) : [];
-  const isEmitter = userSirets.includes(bsvhu.emitterCompanySiret);
+  const isEmitter =
+    bsvhu.emitterCompanySiret && userSirets.includes(bsvhu.emitterCompanySiret);
 
   if (bsvhu.status === "SIGNED_BY_PRODUCER" && isEmitter) {
     return true;
@@ -110,7 +111,7 @@ export async function checkEditionRules(
   // Inner function used to recursively checks that the diff
   // does not contain any fields sealed by signature
   function checkSealedFields(
-    signatureType: SignatureTypeInput,
+    signatureType: SignatureTypeInput | null,
     editableFields: string[]
   ) {
     if (signatureType === null) {

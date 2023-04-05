@@ -27,8 +27,20 @@ const validationSchema = yup.object({
     .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
 });
 
-type Props = { siret: string; bsdaId: string };
-export function SignOperation({ siret, bsdaId }: Props) {
+type Props = {
+  siret: string;
+  bsdaId: string;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+  displayActionButton?: boolean;
+};
+export function SignOperation({
+  siret,
+  bsdaId,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+  displayActionButton,
+}: Props) {
   const [updateBsda, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsda">,
     MutationUpdateBsdaArgs
@@ -42,7 +54,13 @@ export function SignOperation({ siret, bsdaId }: Props) {
   });
 
   return (
-    <SignBsda title="Signer le traitement" bsdaId={bsdaId}>
+    <SignBsda
+      title="Signer le traitement"
+      bsdaId={bsdaId}
+      isModalOpenFromParent={isModalOpenFromParent}
+      onModalCloseFromParent={onModalCloseFromParent}
+      displayActionButton={displayActionButton}
+    >
       {({ bsda, onClose }) =>
         bsda.metadata?.errors?.some(
           error => error.requiredFor === SignatureTypeInput.Emission
@@ -83,9 +101,6 @@ export function SignOperation({ siret, bsdaId }: Props) {
                       nextDestination: { company: getInitialCompany() },
                     },
                   },
-                  weight: {
-                    value: null,
-                  },
                 },
                 bsda
               ),
@@ -114,7 +129,7 @@ export function SignOperation({ siret, bsdaId }: Props) {
             {({ isSubmitting, handleReset }) => (
               <Form>
                 <div className="tw-mb-6">
-                  <Operation />
+                  <Operation bsda={bsda} />
                 </div>
 
                 <p>

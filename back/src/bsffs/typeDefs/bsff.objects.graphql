@@ -16,7 +16,8 @@ type Bsff {
 
   Il y a principalement deux différences entre un brouillon et un BSFF publié :
   - Il n'y a pas de champs requis sur un brouillon, là où il faut un minimum d'informations pour créer un BSFF publié.
-  - L'état de brouillon peut permettre de distinguer un BSFF prêt à circuler d'un BSFF encore en préparation. Par exemple, sur l'interface Trackdéchets les brouillons sont dans l'onglet "brouillon" et non pas "pour action" ou "à collecter".
+  - L'état de brouillon peut permettre de distinguer un BSFF prêt à circuler d'un BSFF encore en préparation.
+  Par exemple, sur l'interface Trackdéchets les brouillons sont dans l'onglet "Brouillons" et non pas "Pour action" ou "À collecter".
   """
   isDraft: Boolean!
 

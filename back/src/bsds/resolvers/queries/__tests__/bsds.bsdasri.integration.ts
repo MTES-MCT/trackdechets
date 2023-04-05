@@ -188,7 +188,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isDraftFor: [emitter.company.siret]
+              isDraftFor: [emitter.company.siret!]
             }
           }
         }
@@ -210,7 +210,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isDraftFor: [emitter.company.siret]
+              isDraftFor: [emitter.company.siret!]
             }
           }
         }
@@ -227,7 +227,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isDraftFor: [transporter.company.siret]
+              isDraftFor: [transporter.company.siret!]
             }
           }
         }
@@ -244,7 +244,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isDraftFor: [destination.company.siret]
+              isDraftFor: [destination.company.siret!]
             }
           }
         }
@@ -279,7 +279,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isForActionFor: [emitter.company.siret]
+              isForActionFor: [emitter.company.siret!]
             }
           }
         }
@@ -297,7 +297,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isToCollectFor: [transporter.company.siret]
+              isToCollectFor: [transporter.company.siret!]
             }
           }
         }
@@ -315,7 +315,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isFollowFor: [destination.company.siret]
+              isFollowFor: [destination.company.siret!]
             }
           }
         }
@@ -351,7 +351,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isFollowFor: [emitter.company.siret]
+              isFollowFor: [emitter.company.siret!]
             }
           }
         }
@@ -369,7 +369,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isToCollectFor: [transporter.company.siret]
+              isToCollectFor: [transporter.company.siret!]
             }
           }
         }
@@ -387,7 +387,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isFollowFor: [destination.company.siret]
+              isFollowFor: [destination.company.siret!]
             }
           }
         }
@@ -423,7 +423,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isFollowFor: [emitter.company.siret]
+              isFollowFor: [emitter.company.siret!]
             }
           }
         }
@@ -441,7 +441,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isCollectedFor: [transporter.company.siret]
+              isCollectedFor: [transporter.company.siret!]
             }
           }
         }
@@ -459,7 +459,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isForActionFor: [destination.company.siret]
+              isForActionFor: [destination.company.siret!]
             }
           }
         }
@@ -495,7 +495,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isFollowFor: [emitter.company.siret]
+              isFollowFor: [emitter.company.siret!]
             }
           }
         }
@@ -513,7 +513,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isFollowFor: [transporter.company.siret]
+              isFollowFor: [transporter.company.siret!]
             }
           }
         }
@@ -531,7 +531,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isForActionFor: [destination.company.siret]
+              isForActionFor: [destination.company.siret!]
             }
           }
         }
@@ -567,7 +567,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isArchivedFor: [emitter.company.siret]
+              isArchivedFor: [emitter.company.siret!]
             }
           }
         }
@@ -585,7 +585,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isArchivedFor: [transporter.company.siret]
+              isArchivedFor: [transporter.company.siret!]
             }
           }
         }
@@ -603,7 +603,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isArchivedFor: [destination.company.siret]
+              isArchivedFor: [destination.company.siret!]
             }
           }
         }
@@ -632,7 +632,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isArchivedFor: [emitter.company.siret]
+              isArchivedFor: [emitter.company.siret!]
             }
           }
         }
@@ -650,7 +650,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isArchivedFor: [transporter.company.siret]
+              isArchivedFor: [transporter.company.siret!]
             }
           }
         }
@@ -668,7 +668,7 @@ describe("Query.bsds.dasris base workflow", () => {
         {
           variables: {
             where: {
-              isArchivedFor: [destination.company.siret]
+              isArchivedFor: [destination.company.siret!]
             }
           }
         }
@@ -786,7 +786,7 @@ describe("Query.bsds.dasris mutations", () => {
     expect(data.bsds.edges).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ node: { id: dasri.id } }),
-        expect.objectContaining({ node: { id: duplicateBsdasri.id } })
+        expect.objectContaining({ node: { id: duplicateBsdasri!.id } })
       ])
     );
   });

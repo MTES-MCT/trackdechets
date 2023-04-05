@@ -54,6 +54,10 @@ export const bsdaFragment = gql`
     groupedIn {
       id
     }
+    weight {
+      value
+    }
+    bsdaUpdatedAt: updatedAt
   }
 `;
 

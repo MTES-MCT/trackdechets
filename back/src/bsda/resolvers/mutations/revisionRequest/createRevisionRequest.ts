@@ -87,6 +87,12 @@ export async function createBsdaRevisionRequest(
     bsda,
     authoringCompanySiret
   );
+
+  if (!authoringCompany.siret) {
+    throw new Error(
+      `Authoring company ${authoringCompany.id} has no siret. Cannot create BSDA revision request.`
+    );
+  }
   const approversSirets = await getApproversSirets(
     bsda,
     authoringCompany.siret

@@ -152,7 +152,7 @@ app.use(
           "https:",
           "'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='"
         ],
-        connectSrc: [process.env.API_HOST],
+        connectSrc: [process.env.API_HOST!],
         formAction: ["self"],
         upgradeInsecureRequests: NODE_ENV === "production" ? [] : null
       }
@@ -204,7 +204,7 @@ const RedisStore = redisStore(session);
 export const sess: session.SessionOptions = {
   store: new RedisStore({ client: redisClient }),
   name: SESSION_NAME || "trackdechets.connect.sid",
-  secret: SESSION_SECRET,
+  secret: SESSION_SECRET!,
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -221,7 +221,7 @@ export const sess: session.SessionOptions = {
 // For more details, see https://expressjs.com/en/guide/behind-proxies.html.
 app.set("trust proxy", TRUST_PROXY_HOPS ? parseInt(TRUST_PROXY_HOPS, 10) : 1);
 
-if (SESSION_COOKIE_SECURE === "true") {
+if (SESSION_COOKIE_SECURE === "true" && sess.cookie) {
   sess.cookie.secure = true; // serve secure cookies
 }
 
@@ -237,8 +237,8 @@ app.use(oauth2Router);
 app.use(oidcRouter);
 
 const USERS_BLACKLIST_ENV = process.env.USERS_BLACKLIST;
-let blacklist = [];
-if (USERS_BLACKLIST_ENV?.length > 0) {
+let blacklist: string[] = [];
+if (USERS_BLACKLIST_ENV && USERS_BLACKLIST_ENV.length > 0) {
   blacklist = USERS_BLACKLIST_ENV.split(",");
 }
 

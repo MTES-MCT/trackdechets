@@ -56,9 +56,8 @@ export function renderMail<V>(
 ): Mail {
   const { prepareVariables } = mailTemplate;
 
-  const preparedVariables = prepareVariables
-    ? prepareVariables(variables)
-    : variables;
+  const preparedVariables =
+    prepareVariables && variables ? prepareVariables(variables) : variables;
 
   const vars = { ...preparedVariables, ...context };
 

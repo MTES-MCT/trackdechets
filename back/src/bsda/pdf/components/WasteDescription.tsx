@@ -2,7 +2,7 @@ import * as React from "react";
 import { BsdaWaste } from "../../../generated/graphql/types";
 
 type Props = {
-  waste?: BsdaWaste;
+  waste?: BsdaWaste | null;
 };
 
 export function WasteDescription({ waste }: Props) {

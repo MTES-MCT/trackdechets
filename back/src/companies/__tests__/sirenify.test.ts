@@ -78,14 +78,36 @@ describe("sirenify", () => {
     expect(sirenified).toEqual(input);
   });
 
-  it("should by pass auto-completion of name and address if user is in by pass list", async () => {
+  it("should by pass auto-completion of name and address if company is non diffusible", async () => {
+    searchCompanySpy.mockResolvedValueOnce({
+      ...searchResult,
+      statutDiffusionEtablissement: "N"
+    });
+
+    const input: Input = {
+      company: {
+        siret: searchResult.siret,
+        name: "Cabinet médical Dumont",
+        address: "1 rue Pasteur"
+      }
+    };
+
+    const sirenified = await sirenify(input, {
+      email: "john.snow@trackdechets.fr",
+      auth: AuthType.BEARER
+    } as Express.User);
+
+    expect(sirenified).toEqual(input);
+  });
+
+  it("should by pass auto-completion of name and address if user email is in by pass list", async () => {
     const OLD_ENV = process.env;
     jest.resetModules();
 
     const email = faker.internet.email("john");
     process.env = {
       ...OLD_ENV,
-      SIRENIFY_BYPASS_USER_EMAILS: email
+      SIRENIFY_BYPASS_USER_EMAILS: `${email},trackdechets.fr`
     };
 
     const buildSirenify = require("../sirenify").default;
@@ -99,9 +121,16 @@ describe("sirenify", () => {
       }
     };
 
-    const sirenified = await sirenifyLocal(input, {
-      email: email,
-      auth: AuthType.SESSION
+    let sirenified = await sirenifyLocal(input, {
+      email,
+      auth: AuthType.BEARER
+    } as Express.User);
+
+    expect(sirenified).toEqual(input);
+
+    sirenified = await sirenifyLocal(input, {
+      email: "john@trackdechets.fr",
+      auth: AuthType.BEARER
     } as Express.User);
 
     expect(sirenified).toEqual(input);
@@ -125,6 +154,6 @@ describe("searchCompanyFailFast", () => {
   it("should return result if searchCompany takes less than 1 second to respond", async () => {
     searchCompanySpy.mockResolvedValue(searchResult);
     const r = await searchCompanyFailFast("85001946400021");
-    expect(r.name).toEqual("CODE EN STOCK");
+    expect(r!.name).toEqual("CODE EN STOCK");
   });
 });

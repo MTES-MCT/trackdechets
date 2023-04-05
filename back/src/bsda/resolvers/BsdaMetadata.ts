@@ -67,9 +67,17 @@ export const Metadata: BsdaMetadataResolvers = {
       matrix => !matrix.skip
     );
     for (const { context, requiredFor } of filteredValidationMatrix) {
+      const {
+        BsdaRevisionRequest,
+        groupedIn,
+        grouping,
+        forwardedIn,
+        forwarding,
+        ...bsda
+      } = prismaForm;
       try {
         await validateBsda(
-          prismaForm,
+          bsda as any,
           { previousBsdas: [], intermediaries: [] },
           context
         );

@@ -1,13 +1,13 @@
 import { BsddRevisionRequest, Prisma } from "@prisma/client";
-import { RepositoryFnDeps } from "../../../common/repository/types";
+import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 export type GetRevisionRequestByIdFn = (
   id: string,
   options?: Omit<Prisma.BsddRevisionRequestFindUniqueArgs, "where">
-) => Promise<BsddRevisionRequest>;
+) => Promise<BsddRevisionRequest | null>;
 
 const buildGetRevisionRequestById: (
-  deps: RepositoryFnDeps
+  deps: ReadRepositoryFnDeps
 ) => GetRevisionRequestByIdFn =
   ({ prisma }) =>
   async (id, options) => {

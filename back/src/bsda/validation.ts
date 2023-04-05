@@ -137,7 +137,7 @@ export async function validateBsda(
     intermediaries
   }: {
     previousBsdas: Bsda[];
-    intermediaries: CompanyInput[];
+    intermediaries: CompanyInput[] | null | undefined;
   },
   context: BsdaValidationContext
 ) {
@@ -153,7 +153,7 @@ async function validatePreviousBsdas(
   bsda: Partial<Prisma.BsdaCreateInput>,
   previousBsdas: Bsda[]
 ) {
-  if (!["GATHERING", "RESHIPMENT"].includes(bsda.type)) {
+  if (!bsda.type || !["GATHERING", "RESHIPMENT"].includes(bsda.type)) {
     return;
   }
 
@@ -225,6 +225,7 @@ async function validatePreviousBsdas(
     // nextBsdas of previous
     const nextBsdas = [forwardedIn, groupedIn].filter(Boolean);
     if (
+      bsda.id &&
       nextBsdas.length > 0 &&
       !nextBsdas.map(bsda => bsda.id).includes(bsda.id)
     ) {
@@ -233,7 +234,10 @@ async function validatePreviousBsdas(
       ]);
     }
 
-    if (!PARTIAL_OPERATIONS.includes(previousBsda.destinationOperationCode)) {
+    if (
+      previousBsda.destinationOperationCode &&
+      !PARTIAL_OPERATIONS.includes(previousBsda.destinationOperationCode)
+    ) {
       return acc.concat([
         `Le bordereau n°${previousBsda.id} a déclaré un traitement qui ne permet pas de lui donner la suite voulue.`
       ]);

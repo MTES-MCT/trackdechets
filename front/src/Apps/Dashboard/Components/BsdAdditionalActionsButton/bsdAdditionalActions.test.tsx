@@ -135,9 +135,9 @@ describe("BsdAdditionalActionsButton", () => {
   it("calls the `onDelete` function when the 'Supprimer' button is clicked", async () => {
     const bsdDelete = {
       ...bsd,
-      status: BsdStatusCode.DRAFT,
+      status: BsdStatusCode.Draft,
       type: BsdType.Bsdd,
-    };
+    } as BsdDisplay;
     const { getByTestId } = render(
       <BsdAdditionalActionsButton
         bsd={bsdDelete}
@@ -161,9 +161,9 @@ describe("BsdAdditionalActionsButton", () => {
   it("calls the `onUpdate` function when the 'Modifier' button is clicked", async () => {
     const bsdUpdate = {
       ...bsd,
-      status: BsdStatusCode.DRAFT,
+      status: BsdStatusCode.Draft,
       type: BsdType.Bsdd,
-    };
+    } as BsdDisplay;
     const { getByTestId } = render(
       <BsdAdditionalActionsButton
         bsd={bsdUpdate}
@@ -187,7 +187,7 @@ describe("BsdAdditionalActionsButton", () => {
   it("calls the `onRevision` function when the 'Réviser' button is clicked", async () => {
     const bsdReview = {
       ...bsd,
-      status: BsdStatusCode.PROCESSED,
+      status: BsdStatusCode.Processed,
       type: BsdType.Bsdd,
     };
     const { getByTestId } = render(

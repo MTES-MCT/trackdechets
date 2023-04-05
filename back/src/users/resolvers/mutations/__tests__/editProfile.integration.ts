@@ -6,7 +6,7 @@ import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
 
 const EDIT_PROFILE = `
-  mutation EditProfile($name: String, $phone: String){
+  mutation EditProfile($name: String!, $phone: String){
     editProfile(name: $name, phone: $phone){
       name
       email
@@ -23,7 +23,7 @@ describe("mutation editProfile", () => {
     const name = "New Name";
     const phone = "01234567891";
     await mutate(EDIT_PROFILE, { variables: { name, phone } });
-    const updatedUser = await prisma.user.findUnique({
+    const updatedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }
     });
     expect(updatedUser.name).toEqual(name);

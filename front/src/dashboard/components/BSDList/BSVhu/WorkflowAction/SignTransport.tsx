@@ -29,8 +29,20 @@ const getValidationSchema = (today: Date) =>
       .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
   });
 
-type Props = { siret: string; bsvhuId: string };
-export function SignTransport({ siret, bsvhuId }: Props) {
+type Props = {
+  siret: string;
+  bsvhuId: string;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+  displayActionButton?: boolean;
+};
+export function SignTransport({
+  siret,
+  bsvhuId,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+  displayActionButton,
+}: Props) {
   const [updateBsvhu, { loading: loadingUpdate, error: updateError }] =
     useMutation<Pick<Mutation, "updateBsvhu">, MutationUpdateBsvhuArgs>(
       UPDATE_VHU_FORM
@@ -45,7 +57,13 @@ export function SignTransport({ siret, bsvhuId }: Props) {
   const loading = loadingUpdate || loadingSign;
 
   return (
-    <SignBsvhu title="Signer l'enlèvement" bsvhuId={bsvhuId}>
+    <SignBsvhu
+      title="Signer l'enlèvement"
+      bsvhuId={bsvhuId}
+      isModalOpenFromParent={isModalOpenFromParent}
+      onModalCloseFromParent={onModalCloseFromParent}
+      displayActionButton={displayActionButton}
+    >
       {({ bsvhu, onClose }) => {
         const TODAY = new Date();
         const validationSchema = getValidationSchema(TODAY);

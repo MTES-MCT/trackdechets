@@ -4,12 +4,12 @@ import { getCompanyUsers, getUserRole } from "../database";
 
 const companyPrivateResolvers: CompanyPrivateResolvers = {
   users: async (parent, _, context) => {
-    const userId = context.user.id;
+    const userId = context.user!.id;
     const userRole = await getUserRole(userId, parent.orgId);
     if (userRole !== "ADMIN") {
       return [
         {
-          ...context.user,
+          ...context.user!,
           role: userRole,
           isPendingInvitation: false
         }
@@ -19,7 +19,7 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
     return getCompanyUsers(parent.orgId, context.dataloaders);
   },
   userRole: (parent, _, context) => {
-    const userId = context.user.id;
+    const userId = context.user!.id;
     return getUserRole(userId, parent.orgId);
   },
   transporterReceipt: parent => {

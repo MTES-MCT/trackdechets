@@ -148,7 +148,7 @@ describe("query favorites", () => {
       opt: {
         emitterCompanySiret: emitter.siret,
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       }
     });
 
@@ -279,7 +279,7 @@ describe("query favorites", () => {
       opt: {
         emitterCompanySiret: company.siret,
         transporterCompanySiret: transporter.siret,
-        transportersSirets: [transporter.siret]
+        transportersSirets: [transporter.siret!]
       }
     });
 
@@ -449,7 +449,7 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        recipientsSirets: [destination.siret]
+        recipientsSirets: [destination.siret!]
       },
       forwardedInOpts: { recipientCompanySiret: destination.siret }
     });
@@ -592,7 +592,7 @@ describe("query favorites", () => {
     });
 
     const traderSirene: CompanySearchResult = {
-      orgId: trader.siret,
+      orgId: trader.siret!,
       siret: trader.siret,
       address: "rue des 4 chemins",
       name: "Négociant",
@@ -658,7 +658,7 @@ describe("query favorites", () => {
 
     const brokerSirene: CompanySearchResult = {
       siret: broker.siret,
-      orgId: broker.siret,
+      orgId: broker.siret!,
       address: "rue des 4 chemins",
       name: "Courtier",
       isRegistered: true,
@@ -746,14 +746,14 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: emitter1.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       }
     });
     const secondForm = await formFactory({
       ownerId: user.id,
       opt: {
         emitterCompanySiret: emitter2.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       }
     });
 
@@ -794,14 +794,14 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: emitter1.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       }
     });
     const secondForm = await formFactory({
       ownerId: user.id,
       opt: {
         emitterCompanySiret: emitter2.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       }
     });
     await formFactory({
@@ -847,7 +847,7 @@ describe("query favorites", () => {
       opt: {
         emitterCompanyName: "A Name",
         emitterCompanySiret: emitter.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       }
     });
     await formFactory({
@@ -855,7 +855,7 @@ describe("query favorites", () => {
       opt: {
         emitterCompanyName: "Another Name",
         emitterCompanySiret: firstForm.emitterCompanySiret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       }
     });
 
@@ -885,7 +885,7 @@ describe("query favorites", () => {
       opt: {
         transporterCompanyName: "A Name",
         transporterCompanyVatNumber: transporter.vatNumber,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       }
     });
     await formFactory({
@@ -893,7 +893,7 @@ describe("query favorites", () => {
       opt: {
         transporterCompanyName: "Another Name",
         transporterCompanyVatNumber: transporter.vatNumber,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       }
     });
 
@@ -935,11 +935,11 @@ describe("query favorites", () => {
             recipientCompanySiret: destination.siret
           }
         },
-        recipientsSirets: [recipientCompanySiret, destination.siret]
+        recipientsSirets: [recipientCompanySiret, destination.siret!]
       }
     });
     const forwardedIn = await prisma.form
-      .findUnique({ where: { id: form.id } })
+      .findUniqueOrThrow({ where: { id: form.id } })
       .forwardedIn();
 
     const { query } = makeClient({ ...user, auth: AuthType.Session });

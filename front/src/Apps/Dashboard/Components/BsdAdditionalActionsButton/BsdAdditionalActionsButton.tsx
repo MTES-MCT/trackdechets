@@ -3,6 +3,7 @@ import classnames from "classnames";
 import FocusTrap from "focus-trap-react";
 import {
   apercu_action_label,
+  completer_bsd_suite,
   dupliquer_action_label,
   modifier_action_label,
   pdf_action_label,
@@ -18,6 +19,7 @@ import {
   canDuplicate,
   canUpdateBsd,
   canGeneratePdf,
+  hasBsdSuite,
 } from "../../dashboardServices";
 
 import "./bsdAdditionalActionsButton.scss";
@@ -31,7 +33,7 @@ function BsdAdditionalActionsButton({
   onDelete,
   onUpdate,
   onRevision,
-  children,
+  onBsdSuite,
 }: BsdAdditionalActionsButtonProps) {
   const [isOpen, setisOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLElement>(null);
@@ -85,6 +87,11 @@ function BsdAdditionalActionsButton({
     onRevision(bsd);
   };
 
+  const handleBsdSuite = () => {
+    closeMenu();
+    onBsdSuite!(bsd);
+  };
+
   const tabIndex = isOpen ? 0 : -1;
 
   return (
@@ -118,15 +125,19 @@ function BsdAdditionalActionsButton({
             "bsd-actions-kebab-menu__dropdown--active": isOpen,
           })}
         >
-          {React.Children.map(children, child => {
-            const newChildWithTabIndex = child
-              ? React.cloneElement(child as React.ReactElement<HTMLElement>, {
-                  tabIndex,
-                })
-              : null;
-
-            return newChildWithTabIndex && <li>{newChildWithTabIndex}</li>;
-          })}
+          {hasBsdSuite(bsd, currentSiret) && (
+            <li>
+              <button
+                type="button"
+                data-testid="bsd-suite-btn"
+                className="fr-btn fr-btn--tertiary-no-outline"
+                tabIndex={tabIndex}
+                onClick={handleBsdSuite}
+              >
+                {completer_bsd_suite}
+              </button>
+            </li>
+          )}
           <li>
             <button
               type="button"

@@ -52,7 +52,7 @@ const DashboardPage = () => {
   const isToCollectTab = !!useRouteMatch(
     routes.dashboardv2.transport.toCollect
   );
-  const BSD_PER_PAGE = 10;
+  const BSD_PER_PAGE = 25;
 
   const getBsdCurrentTab = (): BsdCurrentTab => {
     if (isDraftTab) {

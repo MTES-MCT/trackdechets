@@ -13,7 +13,7 @@ export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
   await deleteBsd({ id: bsdId });
 
   if (bsdId.startsWith("BSDA-")) {
-    const bsda = await prisma.bsda.findUnique({
+    const bsda = await prisma.bsda.findUniqueOrThrow({
       where: { id: bsdId },
       include: { intermediaries: true }
     });
@@ -22,19 +22,23 @@ export async function deleteBsdJob(job: Job<string>): Promise<BsdElastic> {
   }
 
   if (bsdId.startsWith("DASRI-")) {
-    const bsdasri = await prisma.bsdasri.findUnique({ where: { id: bsdId } });
+    const bsdasri = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: bsdId }
+    });
 
     return toBsdasriElastic(bsdasri);
   }
 
   if (bsdId.startsWith("VHU-")) {
-    const bsvhu = await prisma.bsvhu.findUnique({ where: { id: bsdId } });
+    const bsvhu = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: bsdId }
+    });
 
     return toBsvhuElastic(bsvhu);
   }
 
   if (bsdId.startsWith("FF-")) {
-    const bsff = await prisma.bsff.findUnique({
+    const bsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsdId },
       include: { packagings: true, ficheInterventions: true }
     });

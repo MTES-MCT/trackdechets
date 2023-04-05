@@ -27,8 +27,20 @@ const validationSchema = yup.object({
     .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
 });
 
-type Props = { siret: string; bsdaId: string };
-export function SignTransport({ siret, bsdaId }: Props) {
+type Props = {
+  siret: string;
+  bsdaId: string;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+  displayActionButton?: boolean;
+};
+export function SignTransport({
+  siret,
+  bsdaId,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+  displayActionButton,
+}: Props) {
   const [updateBsda, { error: updateError }] = useMutation<
     Pick<Mutation, "updateBsda">,
     MutationUpdateBsdaArgs
@@ -39,7 +51,13 @@ export function SignTransport({ siret, bsdaId }: Props) {
   >(SIGN_BSDA, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   return (
-    <SignBsda title="Signer l'enlèvement" bsdaId={bsdaId}>
+    <SignBsda
+      title="Signer l'enlèvement"
+      bsdaId={bsdaId}
+      isModalOpenFromParent={isModalOpenFromParent}
+      onModalCloseFromParent={onModalCloseFromParent}
+      displayActionButton={displayActionButton}
+    >
       {({ bsda, onClose }) =>
         bsda.metadata?.errors?.some(
           error => error.requiredFor === SignatureTypeInput.Transport

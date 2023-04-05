@@ -59,8 +59,8 @@ describe("Mutation.Vhu.sign", () => {
       }
     });
 
-    expect(data.signBsvhu.emitter.emission.signature.author).toBe(user.name);
-    expect(data.signBsvhu.emitter.emission.signature.date).not.toBeNull();
+    expect(data.signBsvhu.emitter!.emission!.signature!.author).toBe(user.name);
+    expect(data.signBsvhu.emitter!.emission!.signature!.date).not.toBeNull();
   });
 
   it("should use the provided date for the signature if  given", async () => {
@@ -80,7 +80,7 @@ describe("Mutation.Vhu.sign", () => {
       }
     });
 
-    expect(data.signBsvhu.emitter.emission.signature.author).toBe(user.name);
-    expect(data.signBsvhu.emitter.emission.signature.date).toBe(date);
+    expect(data.signBsvhu.emitter!.emission!.signature!.author).toBe(user.name);
+    expect(data.signBsvhu.emitter!.emission!.signature!.date).toBe(date);
   });
 });

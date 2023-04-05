@@ -51,9 +51,10 @@ describe("{ mutation { updateworkerCertification } }", () => {
     expect(data.updateWorkerCertification).toEqual(update);
 
     // check record was modified in db
-    const { id, ...updated } = await prisma.workerCertification.findUnique({
-      where: { id: createdCertification.id }
-    });
+    const { id, ...updated } =
+      await prisma.workerCertification.findUniqueOrThrow({
+        where: { id: createdCertification.id }
+      });
     expect(updated.certificationNumber).toEqual(update.certificationNumber);
   });
 });

@@ -151,8 +151,8 @@ describe("Mutation.Bsda.create", () => {
     expect(data.createBsda.id).toMatch(
       new RegExp(`^BSDA-[0-9]{8}-[A-Z0-9]{9}$`)
     );
-    expect(data.createBsda.destination.company.siret).toBe(
-      input.destination.company.siret
+    expect(data.createBsda.destination!.company!.siret).toBe(
+      input.destination!.company!.siret
     );
     // check input is sirenified
     expect(sirenifyMock).toHaveBeenCalledTimes(1);
@@ -220,8 +220,8 @@ describe("Mutation.Bsda.create", () => {
     expect(data.createBsda.id).toMatch(
       new RegExp(`^BSDA-[0-9]{8}-[A-Z0-9]{9}$`)
     );
-    expect(data.createBsda.destination.company.siret).toBe(
-      input.destination.company.siret
+    expect(data.createBsda.destination!.company!.siret).toBe(
+      input.destination!.company!.siret
     );
   });
 
@@ -286,8 +286,8 @@ describe("Mutation.Bsda.create", () => {
     expect(data.createBsda.id).toMatch(
       new RegExp(`^BSDA-[0-9]{8}-[A-Z0-9]{9}$`)
     );
-    expect(data.createBsda.destination.company.siret).toBe(
-      input.destination.company.siret
+    expect(data.createBsda.destination!.company!.siret).toBe(
+      input.destination!.company!.siret
     );
   });
 
@@ -365,7 +365,7 @@ describe("Mutation.Bsda.create", () => {
       }
     });
 
-    expect(data.createBsda.transporter.transport.plates.length).toBe(2);
+    expect(data.createBsda.transporter!.transport!.plates!.length).toBe(2);
   });
 
   it("should fail creating the form if more than 2 plates are submitted", async () => {
@@ -922,7 +922,7 @@ describe("Mutation.Bsda.create", () => {
     });
 
     expect(data.createBsda.id).toBeDefined();
-    expect(data.createBsda.intermediaries.length).toBe(1);
+    expect(data.createBsda.intermediaries!.length).toBe(1);
   });
 
   it("should fail if creating a bsda with the same intermediary several times", async () => {

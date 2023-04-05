@@ -11,7 +11,7 @@ afterAll(() => {
 describe("errorHandler", () => {
   const OLD_ENV = process.env;
 
-  let request = null;
+  let request;
 
   function setup() {
     const app = express();

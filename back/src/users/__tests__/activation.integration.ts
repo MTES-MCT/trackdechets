@@ -22,7 +22,7 @@ describe("user activation", () => {
     const userActivationHash = await createActivationHash(user);
     await request.get(`/userActivation?hash=${userActivationHash.hash}`);
 
-    const refreshedUser = await prisma.user.findUnique({
+    const refreshedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }
     });
 
@@ -51,7 +51,7 @@ describe("user activation", () => {
     });
     await request.get(`/userActivation?hash=${hash}`);
 
-    const refreshedUser = await prisma.user.findUnique({
+    const refreshedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }
     });
 

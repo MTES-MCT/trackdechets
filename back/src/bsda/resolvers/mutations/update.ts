@@ -50,7 +50,7 @@ export default async function edit(
     : existingBsda.forwarding;
 
   const groupedBsdas =
-    input.grouping?.length > 0
+    input.grouping && input.grouping.length > 0
       ? await bsdaRepository.findMany({ id: { in: input.grouping } })
       : existingBsda.grouping;
 
@@ -72,7 +72,7 @@ export default async function edit(
   };
   const previousBsdas = [forwardedBsda, ...groupedBsdas].filter(Boolean);
   await validateBsda(
-    resultingBsda,
+    resultingBsda as any,
     { previousBsdas, intermediaries },
     {
       emissionSignature: existingBsda.emitterEmissionSignatureAuthor != null,
@@ -90,19 +90,25 @@ export default async function edit(
     { id },
     {
       ...data,
-      ...(input.grouping?.length > 0 && {
-        grouping: { set: input.grouping.map(id => ({ id })) }
-      }),
+      ...(input.grouping &&
+        input.grouping.length > 0 && {
+          grouping: { set: input.grouping.map(id => ({ id })) }
+        }),
       ...(input.forwarding && {
         forwarding: { connect: { id: input.forwarding } }
       }),
       ...(shouldUpdateIntermediaries && {
-        intermediariesOrgIds: input.intermediaries
-          .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
+        intermediariesOrgIds: input
+          .intermediaries!.flatMap(intermediary => [
+            intermediary.siret,
+            intermediary.vatNumber
+          ])
           .filter(Boolean),
         intermediaries: {
           deleteMany: {},
-          createMany: { data: companyToIntermediaryInput(input.intermediaries) }
+          createMany: {
+            data: companyToIntermediaryInput(input.intermediaries!)
+          }
         }
       })
     }

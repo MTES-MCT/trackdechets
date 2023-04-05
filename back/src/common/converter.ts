@@ -27,6 +27,20 @@ export function safeInput<T extends Record<string, unknown>>(
 }
 
 /**
+ * Discard undefined or null fields in an object
+ */
+export function removeEmptyKeys<T extends Record<string, unknown>>(
+  obj: T
+): { [K in keyof T]: NonNullable<T[K]> } {
+  return Object.keys(obj).reduce((acc, curr) => {
+    return {
+      ...acc,
+      ...(obj[curr] != null ? { [curr]: obj[curr] } : {})
+    };
+  }, {} as any);
+}
+
+/**
  * Removes keys that are either null or an empty array from an object
  */
 export function removeEmpty<T extends Record<string, unknown>>(

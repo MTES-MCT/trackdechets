@@ -20,7 +20,7 @@ export const bsvhuPdfDownloadHandler: DownloadHandler<QueryBsvhuPdfArgs> = {
   }
 };
 
-const formPdfResolver: QueryResolvers["formPdf"] = async (
+const formPdfResolver: QueryResolvers["bsvhuPdf"] = async (
   _,
   { id }: QueryBsvhuPdfArgs,
   context
