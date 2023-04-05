@@ -858,6 +858,37 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
+  it(`should disallow transporter infos in a form with "PIPELINE" packaging type`, async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      wasteDetails: {
+        packagingInfos: [{ type: "PIPELINE" }]
+      },
+      transporter: {
+        siret: siretify(1)
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Le nombre de benne ou de citerne ne peut être supérieur à 2.",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+
   it(`should disallow a form with more than two "bennes"`, async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 

@@ -118,7 +118,6 @@ describe("sealedFormSchema", () => {
 
     test("with foreign transporter receipt no need for exemption R.541-50", async () => {
       const transporter = await companyFactory({
-        orgId: "BE0541696005",
         vatNumber: "BE0541696005"
       });
       const testForm: any = {
@@ -619,12 +618,12 @@ describe("receivedInfosSchema", () => {
       signedAt: new Date("2020-01-17T10:12:00+0100")
     };
 
-    it("should be valid when waste is accepted", async () => {
+    test("should be valid when waste is accepted", async () => {
       const isValid = await receivedInfoSchema.isValid(receivedInfo);
       expect(isValid).toEqual(true);
     });
 
-    it("should be invalid when quantity received is 0", async () => {
+    test("should be invalid when quantity received is 0", async () => {
       const validateFn = () =>
         receivedInfoSchema.validate({
           ...receivedInfo,
@@ -646,12 +645,12 @@ describe("receivedInfosSchema", () => {
       signedAt: new Date("2020-01-17T10:12:00+0100")
     };
 
-    it("should be valid when waste is refused", async () => {
+    test("should be valid when waste is refused", async () => {
       const isValid = await receivedInfoSchema.isValid(receivedInfo);
       expect(isValid).toEqual(true);
     });
 
-    it("should be invalid if wasteRefusalReason is missing", async () => {
+    test("should be invalid if wasteRefusalReason is missing", async () => {
       const validateFn = () =>
         receivedInfoSchema.validate({
           ...receivedInfo,
@@ -662,7 +661,7 @@ describe("receivedInfosSchema", () => {
       );
     });
 
-    it("should be invalid if quantity received is different from 0", async () => {
+    test("should be invalid if quantity received is different from 0", async () => {
       const validateFn = () =>
         receivedInfoSchema.validate({ ...receivedInfo, quantityReceived: 1.0 });
       await expect(validateFn()).rejects.toThrow(
@@ -681,12 +680,12 @@ describe("receivedInfosSchema", () => {
       signedAt: new Date("2020-01-17T10:12:00+0100")
     };
 
-    it("should be valid when waste is partially refused", async () => {
+    test("should be valid when waste is partially refused", async () => {
       const isValid = await receivedInfoSchema.isValid(receivedInfo);
       expect(isValid).toEqual(true);
     });
 
-    it("should be invalid if wasteRefusalReason is missing", async () => {
+    test("should be invalid if wasteRefusalReason is missing", async () => {
       const validateFn = () =>
         receivedInfoSchema.validate({
           ...receivedInfo,
@@ -697,7 +696,7 @@ describe("receivedInfosSchema", () => {
       );
     });
 
-    it("should be invalid when quantity received is 0", async () => {
+    test("should be invalid when quantity received is 0", async () => {
       const validateFn = () =>
         receivedInfoSchema.validate({ ...receivedInfo, quantityReceived: 0 });
       await expect(validateFn()).rejects.toThrow(
@@ -719,12 +718,12 @@ describe("draftFormSchema", () => {
     transporterValidityLimit: new Date()
   };
 
-  it("should be valid when passing empty strings", async () => {
+  test("should be valid when passing empty strings", async () => {
     const isValid = await draftFormSchema.isValid(form);
     expect(isValid).toBe(true);
   });
 
-  it("should be valid when passing null values", async () => {
+  test("should be valid when passing null values", async () => {
     const form = {
       emitterCompanySiret: null,
       recipientCompanySiret: null,
@@ -740,13 +739,13 @@ describe("draftFormSchema", () => {
     expect(isValid).toBe(true);
   });
 
-  it("should be valid when passing undefined values", async () => {
+  test("should be valid when passing undefined values", async () => {
     const isValid = await draftFormSchema.isValid({});
 
     expect(isValid).toBe(true);
   });
 
-  it("should not be valid when passing an invalid siret", async () => {
+  test("should not be valid when passing an invalid siret", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -758,7 +757,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  it("should be invalid when passing an invalid waste code", async () => {
+  test("should be invalid when passing an invalid waste code", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -770,7 +769,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  it("should be invalid when passing an invalid email", async () => {
+  test("should be invalid when passing an invalid email", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -782,7 +781,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  it("should be invalid when passing a parcelNumber with unknown properties", async () => {
+  test("should be invalid when passing a parcelNumber with unknown properties", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -798,7 +797,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  it("should be invalid when passing a parcelNumber with no city and postal code", async () => {
+  test("should be invalid when passing a parcelNumber with no city and postal code", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -815,7 +814,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  it("should be invalid when passing a parcelNumber coordinate and number", async () => {
+  test("should be invalid when passing a parcelNumber coordinate and number", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -837,7 +836,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  it("should be valid when passing a null parcelNumber coordinate and number", async () => {
+  test("should be valid when passing a null parcelNumber coordinate and number", async () => {
     const isValid = await draftFormSchema.isValid({
       ...form,
       wasteDetailsParcelNumbers: [
@@ -856,7 +855,7 @@ describe("draftFormSchema", () => {
     expect(isValid).toBe(true);
   });
 
-  it("should be valid when passing a parcelNumber coordinate and bull number", async () => {
+  test("should be valid when passing a parcelNumber coordinate and bull number", async () => {
     const isValid = await draftFormSchema.isValid({
       ...form,
       wasteDetailsParcelNumbers: [
@@ -875,7 +874,7 @@ describe("draftFormSchema", () => {
     expect(isValid).toBe(true);
   });
 
-  it("should be valid when passing a parcelNumber number", async () => {
+  test("should be valid when passing a parcelNumber number", async () => {
     const isValid = await draftFormSchema.isValid({
       ...form,
       wasteDetailsParcelNumbers: [
@@ -892,7 +891,7 @@ describe("draftFormSchema", () => {
     expect(isValid).toBe(true);
   });
 
-  it("should be valid when passing a parcelNumber coordinates", async () => {
+  test("should be valid when passing a parcelNumber coordinates", async () => {
     const isValid = await draftFormSchema.isValid({
       ...form,
       wasteDetailsParcelNumbers: [
@@ -908,7 +907,7 @@ describe("draftFormSchema", () => {
     expect(isValid).toBe(true);
   });
 
-  it("should be invalid when passing an incomplete parcelNumber number", async () => {
+  test("should be invalid when passing an incomplete parcelNumber number", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -927,7 +926,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  it("should be invalid when passing an incomplete parcelNumber coordinates", async () => {
+  test("should be invalid when passing an incomplete parcelNumber coordinates", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -945,7 +944,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  it("should be valid when emitterIsForeignShip with empty fields", async () => {
+  test("should be valid when emitterIsForeignShip with empty fields", async () => {
     const partialForm: Partial<Form> = {
       id: "cjplbvecc000d0766j32r19am",
       readableId: "BSD-20210101-AAAAAAAA",
@@ -976,6 +975,38 @@ describe("draftFormSchema", () => {
     };
     const isValid = await draftFormSchema.isValid(partialForm);
     expect(isValid).toEqual(true);
+  });
+
+  test("packaging PIPELINE can be set without any other details", async () => {
+    const isValid = await draftFormSchema.isValid({
+      wasteDetailsPackagingInfos: [
+        { type: "PIPELINE", numero: null, weight: null, volume: null }
+      ]
+    });
+
+    expect(isValid).toEqual(true);
+  });
+
+  test("packaging PIPELINE cannot be set with any other packaging", async () => {
+    const isValid = await draftFormSchema.isValid({
+      wasteDetailsPackagingInfos: [
+        { type: "PIPELINE", other: null, quantity: null },
+        { type: "FUT", other: null, quantity: 1 }
+      ]
+    });
+
+    expect(isValid).toEqual(false);
+  });
+
+  test("packaging PIPELINE cannot be set with a transporter", async () => {
+    const isValid = await draftFormSchema.isValid({
+      wasteDetailsPackagingInfos: [
+        { type: "PIPELINE", numero: null, weight: null, volume: null }
+      ],
+      transporterCompanySiret: siretify(1)
+    });
+
+    expect(isValid).toEqual(false);
   });
 });
 

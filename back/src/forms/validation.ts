@@ -663,6 +663,7 @@ const fullWasteDetailsSchemaFn: FactorySchemaOf<
           "${path} ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
           (infos: PackagingInfo[] | undefined) => {
             const hasCiterne = infos?.find(i => i.type === "CITERNE");
+            const hasPipeline = infos?.find(i => i.type === "PIPELINE");
             const hasBenne = infos?.find(i => i.type === "BENNE");
 
             if (hasCiterne && hasBenne) {
@@ -670,9 +671,9 @@ const fullWasteDetailsSchemaFn: FactorySchemaOf<
             }
 
             const hasOtherPackaging = infos?.find(
-              i => !["CITERNE", "BENNE"].includes(i.type)
+              i => !["CITERNE", "BENNE", "PIPELINE"].includes(i.type)
             );
-            if ((hasCiterne || hasBenne) && hasOtherPackaging) {
+            if ((hasCiterne || hasBenne || hasPipeline) && hasOtherPackaging) {
               return false;
             }
 
@@ -790,6 +791,23 @@ export const transporterSchemaFn: FactorySchemaOf<
       }),
     transporterValidityLimit: yup.date().nullable()
   });
+
+// 8 - Collecteur-transporteur vide dans le cas du pipeline
+export const emptyTransporterSchema: yup.SchemaOf<Transporter> = yup.object({
+  transporterCustomInfo: yup.string().nullable().oneOf([null, ""]),
+  transporterNumberPlate: yup.string().nullable().oneOf([null, ""]),
+  transporterCompanyName: yup.string().nullable().oneOf([null, ""]),
+  transporterCompanySiret: yup.string().nullable().oneOf([null, ""]),
+  transporterCompanyVatNumber: yup.string().nullable().oneOf([null, ""]),
+  transporterCompanyAddress: yup.string().nullable().oneOf([null, ""]),
+  transporterCompanyContact: yup.string().nullable().oneOf([null, ""]),
+  transporterCompanyPhone: yup.string().nullable().oneOf([null, ""]),
+  transporterCompanyMail: yup.string().nullable().oneOf([null, ""]),
+  transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
+  transporterReceipt: yup.string().nullable().oneOf([null, ""]),
+  transporterDepartment: yup.string().nullable().oneOf([null, ""]),
+  transporterValidityLimit: yup.string().nullable().oneOf([null, ""])
+});
 
 export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
   yup.object({
@@ -1221,6 +1239,21 @@ const baseFormSchemaFn = (isDraft: boolean) =>
     const lazyWasteDetailsSchema = wasteDetailsSchemaFn(isDraft).resolve({
       value
     });
+
+    const hasPipeline = value.wasteDetailsPackagingInfos?.find(
+      i => i.type === "PIPELINE"
+    );
+    if (hasPipeline) {
+      return yup
+        .object()
+        .concat(emitterSchemaFn(isDraft))
+        .concat(ecoOrganismeSchema)
+        .concat(recipientSchemaFn(isDraft))
+        .concat(emptyTransporterSchema)
+        .concat(traderSchemaFn(isDraft))
+        .concat(brokerSchemaFn(isDraft))
+        .concat(lazyWasteDetailsSchema);
+    }
 
     return yup
       .object()
