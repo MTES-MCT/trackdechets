@@ -1,6 +1,8 @@
 import prisma from "../prisma";
 import { sendMail } from "../mailer/mailing";
 import {
+  BsdaRevisionRequest,
+  BsddRevisionRequest,
   Company,
   CompanyAssociation,
   MembershipRequestStatus,
@@ -296,28 +298,12 @@ export const sendPendingMembershipRequestToAdminDetailsEmail = async (
   await prisma.$disconnect();
 };
 
-// TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO
-// TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO
-// TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO
-// TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO
-
-export const getPendingBSDRevisionRequestsWithAdmins = async (
-  daysAgo: number
+/**
+ * Will add pending approval companies' admins to requests
+ */
+export const addPendingApprovalsCompanyAdmins = async (
+  requests: BsddRevisionRequest[] | BsdaRevisionRequest[]
 ) => {
-  const now = new Date();
-
-  const requestDateGt = xDaysAgo(now, daysAgo);
-  const requestDateLt = xDaysAgo(now, daysAgo - 1);
-
-  // Get all pending requests
-  const requests = await prisma.bsddRevisionRequest.findMany({
-    where: {
-      createdAt: { gte: requestDateGt, lt: requestDateLt },
-      status: RevisionRequestStatus.PENDING
-    },
-    include: { approvals: true }
-  });
-
   // Extract all pending company sirets
   const companySirets: string[] = requests
     .map(request =>
@@ -349,9 +335,58 @@ export const getPendingBSDRevisionRequestsWithAdmins = async (
   });
 };
 
+interface PendingBsddRevisionRequest extends BsddRevisionRequest {
+  admins: User[];
+}
+export const getPendingBSDDRevisionRequestsWithAdmins = async (
+  daysAgo: number
+): Promise<PendingBsddRevisionRequest[]> => {
+  const now = new Date();
+
+  const requestDateGt = xDaysAgo(now, daysAgo);
+  const requestDateLt = xDaysAgo(now, daysAgo - 1);
+
+  // Get all pending requests
+  const requests = await prisma.bsddRevisionRequest.findMany({
+    where: {
+      createdAt: { gte: requestDateGt, lt: requestDateLt },
+      status: RevisionRequestStatus.PENDING
+    },
+    include: { approvals: true }
+  });
+
+  // Add admins to requests
+  return await addPendingApprovalsCompanyAdmins(requests);
+};
+
+interface PendingBsdaRevisionRequest extends BsdaRevisionRequest {
+  admins: User[];
+}
 export const getPendingBSDARevisionRequestsWithAdmins = async (
   daysAgo: number
-) => { };
+): Promise<PendingBsdaRevisionRequest[]> => {
+  const now = new Date();
+
+  const requestDateGt = xDaysAgo(now, daysAgo);
+  const requestDateLt = xDaysAgo(now, daysAgo - 1);
+
+  // Get all pending requests
+  const requests = await prisma.bsdaRevisionRequest.findMany({
+    where: {
+      createdAt: { gte: requestDateGt, lt: requestDateLt },
+      status: RevisionRequestStatus.PENDING
+    },
+    include: { approvals: true }
+  });
+
+  // Add admins to requests
+  return await addPendingApprovalsCompanyAdmins(requests);
+};
+
+// TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO
+// TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO
+// TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO
+// TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO
 
 /**
  * Send an email to admins who didn't answer to a revision request
@@ -359,8 +394,43 @@ export const getPendingBSDARevisionRequestsWithAdmins = async (
 export const sendPendingRevisionRequestToAdminDetailsEmail = async (
   daysAgo = 5
 ) => {
-  const pendingBSDRevisionRequest =
-    await getPendingBSDRevisionRequestsWithAdmins(daysAgo);
-  const pendingBSDARevisionRequest =
+  const pendingBsddRevisionRequest =
+    await getPendingBSDDRevisionRequestsWithAdmins(daysAgo);
+  const pendingBsdaRevisionRequest =
     await getPendingBSDARevisionRequestsWithAdmins(daysAgo);
+
+  const requests = [
+    ...pendingBsddRevisionRequest,
+    ...pendingBsdaRevisionRequest
+  ];
+
+  const messageVersions: MessageVersion[] = requests.map(request => {
+    // TODO: needed?
+    const variables = {
+      requestId: request.id
+    };
+
+    const template = renderMail(pendingMembershipRequestAdminDetailsEmail, {
+      variables,
+      messageVersions: []
+    });
+
+    return {
+      to: request.admins.map(admin => ({
+        email: admin.email,
+        name: admin.name
+      })),
+      params: {
+        body: template.body
+      }
+    };
+  });
+
+  const payload = renderMail(pendingMembershipRequestAdminDetailsEmail, {
+    messageVersions
+  });
+
+  await sendMail(payload);
+
+  await prisma.$disconnect();
 };
