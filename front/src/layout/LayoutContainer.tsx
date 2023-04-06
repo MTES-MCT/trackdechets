@@ -72,7 +72,7 @@ export default withRouter(function LayoutContainer({ history }) {
   const isDevelopment = DEV;
 
   if (!isDevelopment) {
-    const plausibleDomain = import.meta.env.PLAUSIBLE_DOMAIN;
+    const plausibleDomain = import.meta.env.VITE_PLAUSIBLE_DOMAIN;
 
     if (plausibleDomain) {
       const { enableAutoPageviews } = Plausible({
