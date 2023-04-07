@@ -459,7 +459,11 @@ export const toIntermediaryCompany = (company: Company, contact = "toto") => ({
   contact
 });
 
-export const addUserToCompany = async (user: User, company: Company, role) => {
+export const addUserToCompany = async (
+  user: User,
+  company: Company,
+  role: UserRole
+) => {
   return prisma.companyAssociation.create({
     data: {
       userId: user.id,

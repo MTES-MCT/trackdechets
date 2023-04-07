@@ -483,8 +483,14 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
     // Then
     expect(pendingBSDRevisionRequest.length).toEqual(1);
     expect(pendingBSDRevisionRequest[0].id).toEqual(request.id);
-    expect(pendingBSDRevisionRequest[0].admins.length).toEqual(1);
-    expect(pendingBSDRevisionRequest[0].admins[0].id).toEqual(user.id);
+    expect(pendingBSDRevisionRequest[0].approvals.length).toEqual(1);
+    expect(pendingBSDRevisionRequest[0].approvals[0].admins.length).toEqual(1);
+    expect(pendingBSDRevisionRequest[0].approvals[0].admins[0].id).toEqual(
+      user.id
+    );
+    expect(pendingBSDRevisionRequest[0].approvals[0].company.id).toEqual(
+      company.id
+    );
   });
 
   it("should return pending request and company admins xDaysAgo", async () => {
@@ -605,12 +611,24 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
     expect(pendingBSDRevisionRequest.length).toEqual(2);
 
     expect(pendingBSDRevisionRequest[0].id).toEqual(request.id);
-    expect(pendingBSDRevisionRequest[0].admins.length).toEqual(1);
-    expect(pendingBSDRevisionRequest[0].admins[0].id).toEqual(user.id);
+    expect(pendingBSDRevisionRequest[0].approvals.length).toEqual(1);
+    expect(pendingBSDRevisionRequest[0].approvals[0].admins.length).toEqual(1);
+    expect(pendingBSDRevisionRequest[0].approvals[0].admins[0].id).toEqual(
+      user.id
+    );
+    expect(pendingBSDRevisionRequest[0].approvals[0].company.id).toEqual(
+      company.id
+    );
 
     expect(pendingBSDRevisionRequest[1].id).toEqual(request2.id);
-    expect(pendingBSDRevisionRequest[1].admins.length).toEqual(1);
-    expect(pendingBSDRevisionRequest[1].admins[0].id).toEqual(user2.id);
+    expect(pendingBSDRevisionRequest[1].approvals.length).toEqual(1);
+    expect(pendingBSDRevisionRequest[1].approvals[0].admins.length).toEqual(1);
+    expect(pendingBSDRevisionRequest[1].approvals[0].admins[0].id).toEqual(
+      user2.id
+    );
+    expect(pendingBSDRevisionRequest[1].approvals[0].company.id).toEqual(
+      company2.id
+    );
   });
 
   it("should return all admins from pending companies", async () => {
@@ -644,9 +662,15 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
     // Then
     expect(pendingBSDRevisionRequest.length).toEqual(1);
     expect(pendingBSDRevisionRequest[0].id).toEqual(request.id);
-    expect(pendingBSDRevisionRequest[0].admins.length).toEqual(2);
+    expect(pendingBSDRevisionRequest[0].approvals.length).toEqual(1);
+    expect(pendingBSDRevisionRequest[0].approvals[0].company.id).toEqual(
+      company.id
+    );
+    expect(pendingBSDRevisionRequest[0].approvals[0].admins.length).toEqual(2);
 
-    const adminIds = pendingBSDRevisionRequest[0].admins.map(a => a.id);
+    const adminIds = pendingBSDRevisionRequest[0].approvals[0].admins.map(
+      a => a.id
+    );
     expect(adminIds.includes(user.id)).toBe(true);
     expect(adminIds.includes(user2.id)).toBe(true);
   });
@@ -682,8 +706,14 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
     // Then
     expect(pendingBSDRevisionRequest.length).toEqual(1);
     expect(pendingBSDRevisionRequest[0].id).toEqual(request.id);
-    expect(pendingBSDRevisionRequest[0].admins.length).toEqual(1);
-    expect(pendingBSDRevisionRequest[0].admins[0].id).toEqual(user.id);
+    expect(pendingBSDRevisionRequest[0].approvals.length).toEqual(1);
+    expect(pendingBSDRevisionRequest[0].approvals[0].company.id).toEqual(
+      company.id
+    );
+    expect(pendingBSDRevisionRequest[0].approvals[0].admins.length).toEqual(1);
+    expect(pendingBSDRevisionRequest[0].approvals[0].admins[0].id).toEqual(
+      user.id
+    );
   });
 });
 
@@ -732,13 +762,19 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
     // Then
     expect(pendingBSDARevisionRequest.length).toEqual(1);
     expect(pendingBSDARevisionRequest[0].id).toEqual(request.id);
-    expect(pendingBSDARevisionRequest[0].admins.length).toEqual(1);
-    expect(pendingBSDARevisionRequest[0].admins[0].id).toEqual(user.id);
+    expect(pendingBSDARevisionRequest[0].approvals.length).toEqual(1);
+    expect(pendingBSDARevisionRequest[0].approvals[0].company.id).toEqual(
+      company.id
+    );
+    expect(pendingBSDARevisionRequest[0].approvals[0].admins.length).toEqual(1);
+    expect(pendingBSDARevisionRequest[0].approvals[0].admins[0].id).toEqual(
+      user.id
+    );
   });
 
   it("should return pending request and company admins xDaysAgo", async () => {
     // Given
-    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { company } = await userWithCompanyFactory("ADMIN");
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -862,12 +898,24 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
     expect(pendingBSDARevisionRequest.length).toEqual(2);
 
     expect(pendingBSDARevisionRequest[0].id).toEqual(request.id);
-    expect(pendingBSDARevisionRequest[0].admins.length).toEqual(1);
-    expect(pendingBSDARevisionRequest[0].admins[0].id).toEqual(user.id);
+    expect(pendingBSDARevisionRequest[0].approvals.length).toEqual(1);
+    expect(pendingBSDARevisionRequest[0].approvals[0].admins.length).toEqual(1);
+    expect(pendingBSDARevisionRequest[0].approvals[0].admins[0].id).toEqual(
+      user.id
+    );
+    expect(pendingBSDARevisionRequest[0].approvals[0].company.id).toEqual(
+      company.id
+    );
 
     expect(pendingBSDARevisionRequest[1].id).toEqual(request2.id);
-    expect(pendingBSDARevisionRequest[1].admins.length).toEqual(1);
-    expect(pendingBSDARevisionRequest[1].admins[0].id).toEqual(user2.id);
+    expect(pendingBSDARevisionRequest[1].approvals.length).toEqual(1);
+    expect(pendingBSDARevisionRequest[1].approvals[0].admins.length).toEqual(1);
+    expect(pendingBSDARevisionRequest[1].approvals[0].admins[0].id).toEqual(
+      user2.id
+    );
+    expect(pendingBSDARevisionRequest[1].approvals[0].company.id).toEqual(
+      company2.id
+    );
   });
 
   it("should return all admins from pending companies", async () => {
@@ -886,7 +934,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
       }
     });
 
-    const request = await prisma.bsdaRevisionRequest.create({
+    await prisma.bsdaRevisionRequest.create({
       data: {
         createdAt: TWO_DAYS_AGO,
         bsdaId: bsda.id,
@@ -902,10 +950,15 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
 
     // Then
     expect(pendingBSDARevisionRequest.length).toEqual(1);
-    expect(pendingBSDARevisionRequest[0].id).toEqual(request.id);
-    expect(pendingBSDARevisionRequest[0].admins.length).toEqual(2);
+    expect(pendingBSDARevisionRequest[0].approvals.length).toEqual(1);
+    expect(pendingBSDARevisionRequest[0].approvals[0].company.id).toEqual(
+      company.id
+    );
+    expect(pendingBSDARevisionRequest[0].approvals[0].admins.length).toEqual(2);
 
-    const adminIds = pendingBSDARevisionRequest[0].admins.map(a => a.id);
+    const adminIds = pendingBSDARevisionRequest[0].approvals[0].admins.map(
+      a => a.id
+    );
     expect(adminIds.includes(user.id)).toBe(true);
     expect(adminIds.includes(user2.id)).toBe(true);
   });
@@ -943,7 +996,15 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
     // Then
     expect(pendingBSDARevisionRequest.length).toEqual(1);
     expect(pendingBSDARevisionRequest[0].id).toEqual(request.id);
-    expect(pendingBSDARevisionRequest[0].admins.length).toEqual(1);
-    expect(pendingBSDARevisionRequest[0].admins[0].id).toEqual(user.id);
+    expect(pendingBSDARevisionRequest[0].approvals.length).toEqual(1);
+    expect(pendingBSDARevisionRequest[0].approvals[0].company.id).toEqual(
+      company.id
+    );
+    expect(pendingBSDARevisionRequest[0].approvals[0].admins.length).toEqual(1);
+    expect(pendingBSDARevisionRequest[0].approvals[0].admins[0].id).toEqual(
+      user.id
+    );
   });
+
+  // TODO: return only PENDING approvals
 });

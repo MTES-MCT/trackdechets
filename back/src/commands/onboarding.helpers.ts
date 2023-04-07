@@ -2,7 +2,9 @@ import prisma from "../prisma";
 import { sendMail } from "../mailer/mailing";
 import {
   BsdaRevisionRequest,
+  BsdaRevisionRequestApproval,
   BsddRevisionRequest,
+  BsddRevisionRequestApproval,
   Company,
   CompanyAssociation,
   MembershipRequestStatus,
@@ -17,11 +19,13 @@ import {
   onboardingProfessionalSecondStep,
   membershipRequestDetailsEmail,
   pendingMembershipRequestDetailsEmail,
-  pendingMembershipRequestAdminDetailsEmail
+  pendingMembershipRequestAdminDetailsEmail,
+  pendingRevisionRequestAdminDetailsEmail
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
 import { MessageVersion } from "../mailer/types";
-import { getActiveAdminsByCompanyOrgIds } from "../companies/database";
+import { getCompaniesAndActiveAdminsByCompanyOrgIds } from "../companies/database";
+import { formatDate } from "../common/pdf";
 
 /**
  * Compute a past date relative to baseDate
@@ -298,11 +302,19 @@ export const sendPendingMembershipRequestToAdminDetailsEmail = async (
   await prisma.$disconnect();
 };
 
+type RequestWithApprovals =
+  | (BsddRevisionRequest & {
+      approvals: BsddRevisionRequestApproval[];
+    })
+  | (BsdaRevisionRequest & {
+      approvals: BsdaRevisionRequestApproval[];
+    });
+
 /**
  * Will add pending approval companies' admins to requests
  */
 export const addPendingApprovalsCompanyAdmins = async (
-  requests: BsddRevisionRequest[] | BsdaRevisionRequest[]
+  requests: RequestWithApprovals[]
 ) => {
   // Extract all pending company sirets
   const companySirets: string[] = requests
@@ -315,32 +327,44 @@ export const addPendingApprovalsCompanyAdmins = async (
     )
     .flat();
 
-  // Find company admins
-  const companyAdmins = await getActiveAdminsByCompanyOrgIds(companySirets);
+  // Find companies and their respective admins
+  const companiesAndAdminsByOrgIds =
+    await getCompaniesAndActiveAdminsByCompanyOrgIds(companySirets);
 
   // Add admins to requests
-  return requests.map(request => {
-    const requestPendingApprovalsSirets = request.approvals
-      .filter(
-        approval => approval.status === RevisionRequestApprovalStatus.PENDING
-      )
-      .map(approvals => approvals.approverSiret);
-
+  return requests.map((request: RequestWithApprovals) => {
     return {
       ...request,
-      admins: requestPendingApprovalsSirets
-        .map(siret => companyAdmins[siret])
-        .flat()
+      approvals: request.approvals
+        .filter(
+          approval => approval.status === RevisionRequestApprovalStatus.PENDING
+        )
+        .map(approval => ({
+          ...approval,
+          company: companiesAndAdminsByOrgIds.companies[approval.approverSiret],
+          admins: companiesAndAdminsByOrgIds.admins[approval.approverSiret]
+        }))
     };
   });
 };
 
-interface PendingBsddRevisionRequest extends BsddRevisionRequest {
-  admins: User[];
-}
+type RequestWithWrappedApprovals =
+  | (BsddRevisionRequest & {
+      approvals: (BsddRevisionRequestApproval & {
+        admins: User[];
+        company: Company;
+      })[];
+    })
+  | (BsdaRevisionRequest & {
+      approvals: (BsdaRevisionRequestApproval & {
+        admins: User[];
+        company: Company;
+      })[];
+    });
+
 export const getPendingBSDDRevisionRequestsWithAdmins = async (
   daysAgo: number
-): Promise<PendingBsddRevisionRequest[]> => {
+): Promise<RequestWithWrappedApprovals[]> => {
   const now = new Date();
 
   const requestDateGt = xDaysAgo(now, daysAgo);
@@ -359,12 +383,9 @@ export const getPendingBSDDRevisionRequestsWithAdmins = async (
   return await addPendingApprovalsCompanyAdmins(requests);
 };
 
-interface PendingBsdaRevisionRequest extends BsdaRevisionRequest {
-  admins: User[];
-}
 export const getPendingBSDARevisionRequestsWithAdmins = async (
   daysAgo: number
-): Promise<PendingBsdaRevisionRequest[]> => {
+): Promise<RequestWithWrappedApprovals[]> => {
   const now = new Date();
 
   const requestDateGt = xDaysAgo(now, daysAgo);
@@ -383,11 +404,6 @@ export const getPendingBSDARevisionRequestsWithAdmins = async (
   return await addPendingApprovalsCompanyAdmins(requests);
 };
 
-// TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO
-// TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO
-// TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO
-// TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO - TODO
-
 /**
  * Send an email to admins who didn't answer to a revision request
  */
@@ -404,29 +420,38 @@ export const sendPendingRevisionRequestToAdminDetailsEmail = async (
     ...pendingBsdaRevisionRequest
   ];
 
-  const messageVersions: MessageVersion[] = requests.map(request => {
-    // TODO: needed?
-    const variables = {
-      requestId: request.id
-    };
+  // Build a message template for each request, for each approval
+  const messageVersions: MessageVersion[] = requests
+    .map(request => {
+      return request.approvals.map(approval => {
+        const variables = {
+          requestCreatedAt: formatDate(request.createdAt),
+          bsdReadableId:
+            (request as BsddRevisionRequest).bsddId ??
+            (request as BsdaRevisionRequest).bsdaId,
+          companyName: approval.company.name,
+          companyOrgId: approval.company.orgId
+        };
 
-    const template = renderMail(pendingMembershipRequestAdminDetailsEmail, {
-      variables,
-      messageVersions: []
-    });
+        const template = renderMail(pendingRevisionRequestAdminDetailsEmail, {
+          variables,
+          messageVersions: []
+        });
 
-    return {
-      to: request.admins.map(admin => ({
-        email: admin.email,
-        name: admin.name
-      })),
-      params: {
-        body: template.body
-      }
-    };
-  });
+        return {
+          to: approval.admins.map(admin => ({
+            email: admin.email,
+            name: admin.name
+          })),
+          params: {
+            body: template.body
+          }
+        };
+      });
+    })
+    .flat();
 
-  const payload = renderMail(pendingMembershipRequestAdminDetailsEmail, {
+  const payload = renderMail(pendingRevisionRequestAdminDetailsEmail, {
     messageVersions
   });
 

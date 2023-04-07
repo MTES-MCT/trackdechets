@@ -233,37 +233,46 @@ export async function getActiveAdminsByCompanyIds(
 }
 
 /**
- * Get all the admins from companies, by companyOrgIds
+ * Get all the companies and admins from companies, by companyOrgIds
  */
-export const getActiveAdminsByCompanyOrgIds = async (
+export const getCompaniesAndActiveAdminsByCompanyOrgIds = async (
   orgIds: string[]
-): Promise<Record<string, User[]>> => {
-  const users = await prisma.companyAssociation
+): Promise<{
+  companies: Record<string, Company>;
+  admins: Record<string, User[]>;
+}> => {
+  const companiesAndAdmins = await prisma.companyAssociation
     .findMany({
       where: {
         company: { orgId: { in: orgIds } },
         role: "ADMIN",
         user: { isActive: true }
       },
-      include: { user: true, company: { select: { orgId: true } } }
+      include: { user: true, company: true }
     })
     .then(associations =>
       associations.map(a => {
         return {
-          ...a.user,
-          companyOrgId: a.company.orgId
+          admin: a.user,
+          company: a.company
         };
       })
     );
 
-  const res: Record<string, User[]> = {};
+  const companiesByOrgId: Record<string, Company> = {};
+  const adminsByOrgId: Record<string, User[]> = {};
 
-  users.forEach(user => {
-    if (res[user.companyOrgId]) res[user.companyOrgId].push(user);
-    else res[user.companyOrgId] = [user];
+  companiesAndAdmins.forEach(companyAndAdmin => {
+    companiesByOrgId[companyAndAdmin.company.orgId] = companyAndAdmin.company;
+
+    if (adminsByOrgId[companyAndAdmin.company.orgId]) {
+      adminsByOrgId[companyAndAdmin.company.orgId].push(companyAndAdmin.admin);
+    } else {
+      adminsByOrgId[companyAndAdmin.company.orgId] = [companyAndAdmin.admin];
+    }
   });
 
-  return res;
+  return { companies: companiesByOrgId, admins: adminsByOrgId };
 };
 
 export async function getTraderReceiptOrNotFound({

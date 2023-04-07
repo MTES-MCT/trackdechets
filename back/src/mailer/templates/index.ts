@@ -219,3 +219,14 @@ export const pendingMembershipRequestAdminDetailsEmail: MailTemplate<{
   body: mustacheRenderer("pending-membership-request-admin-details.html"),
   templateId: templateIds.LAYOUT
 };
+
+export const pendingRevisionRequestAdminDetailsEmail: MailTemplate<{
+  requestCreatedAt: string;
+  bsdReadableId: string;
+  companyName: string;
+  companyOrgId: string;
+}> = {
+  subject: "Votre action est attendue sur une demande de révision",
+  body: mustacheRenderer("pending-revision-request-admin-details.html"),
+  templateId: templateIds.LAYOUT
+};
