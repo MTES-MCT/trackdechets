@@ -2,7 +2,7 @@ import { gql, LazyQueryHookOptions, useLazyQuery } from "@apollo/client";
 import { Query, QueryFormPdfArgs } from "generated/graphql/types";
 
 export const FORMS_PDF = gql`
-  query FormPdf($id: ID) {
+  query FormPdf($id: ID!) {
     formPdf(id: $id) {
       downloadLink
       token

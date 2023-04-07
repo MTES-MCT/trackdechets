@@ -52,12 +52,15 @@ export async function renewSecurityCodeFn(
   });
 
   const users = await getCompanyActiveUsers(orgId);
-  const recipients = users.map(({ email, name }) => ({ email, name }));
+  const recipients = users.map(({ email, name }) => ({
+    email,
+    name: name ?? ""
+  }));
 
   const mail = renderMail(securityCodeRenewal, {
     to: recipients,
     variables: {
-      company: { siret: company.siret, name: company.name }
+      company: { orgId: company.orgId, name: company.name }
     }
   });
   sendMail(mail);

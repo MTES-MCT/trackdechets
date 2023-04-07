@@ -10,7 +10,7 @@ import {
   toPrismaStringNullableListFilter
 } from "../common/where";
 
-const toPrismaGroupableFilter = (groupable?: boolean) => {
+const toPrismaGroupableFilter = (groupable?: boolean | null) => {
   // groupable dasris should not: group, be grouped, synthesize or be synthesized, and should be SIMPLE
 
   if (!!groupable) {

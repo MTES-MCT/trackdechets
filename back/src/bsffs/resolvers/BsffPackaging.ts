@@ -11,7 +11,7 @@ export const BsffPackaging: BsffPackagingResolvers = {
     const bsff = await findUniqueGetBsff({ where: { id: packaging.id } });
 
     return {
-      ...expandBsffFromDB(bsff),
+      ...expandBsffFromDB(bsff!),
       ficheInterventions: [],
       packagings: [],
       forwarding: [],
@@ -48,7 +48,7 @@ export const BsffPackaging: BsffPackagingResolvers = {
       .map(id => bsffs.find(bsff => bsff.id === id))
       .filter(v => !!v)
       .map(bsff => ({
-        ...expandBsffFromDB(bsff),
+        ...expandBsffFromDB(bsff!),
         ficheInterventions: [],
         packagings: [],
         forwarding: [],
@@ -68,7 +68,7 @@ export const BsffPackaging: BsffPackagingResolvers = {
       .map(id => bsffs.find(bsff => bsff.id === id))
       .filter(v => !!v)
       .map(bsff => {
-        const gqlBsff = expandBsffFromDB(bsff);
+        const gqlBsff = expandBsffFromDB(bsff!);
         return {
           id: gqlBsff.id,
           type: gqlBsff.type,

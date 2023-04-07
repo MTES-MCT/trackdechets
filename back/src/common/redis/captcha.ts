@@ -52,7 +52,12 @@ export async function setCaptchaToken(
 
 export async function getCaptchaToken(captchaToken: string): Promise<string> {
   const key = getCaptchaTokenKey(captchaToken);
-  return redisClient.get(key).catch(_ => "");
+  try {
+    const token = await redisClient.get(key);
+    return token ?? "";
+  } catch (_) {
+    return "";
+  }
 }
 export async function clearCaptchaToken(captchaToken: string): Promise<void> {
   const key = getCaptchaTokenKey(captchaToken);

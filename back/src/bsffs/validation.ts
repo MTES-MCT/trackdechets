@@ -602,16 +602,16 @@ export async function validatePreviousPackagings(
     packagings?: Partial<BsffPackaging>[];
   },
   previousPackagingsIds: {
-    forwarding?: string[];
-    grouping?: string[];
-    repackaging?: string[];
+    forwarding?: string[] | null;
+    grouping?: string[] | null;
+    repackaging?: string[] | null;
   }
 ): Promise<PrismaBsffPackaging[]> {
   const { forwarding, grouping, repackaging } = previousPackagingsIds;
 
-  const isForwarding = forwarding?.length > 0;
-  const isRepackaging = repackaging?.length > 0;
-  const isGrouping = grouping?.length > 0;
+  const isForwarding = forwarding && forwarding.length > 0;
+  const isRepackaging = repackaging && repackaging.length > 0;
+  const isGrouping = grouping && grouping.length > 0;
 
   if (isForwarding && bsff.type !== BsffType.REEXPEDITION) {
     throw new UserInputError(
@@ -1067,6 +1067,7 @@ export function validateFicheIntervention(
   ficheIntervention:
     | BsffFicheIntervention
     | Prisma.BsffFicheInterventionCreateInput
+    | Prisma.BsffFicheInterventionUpdateInput
 ) {
   return ficheInterventionSchema.validate(ficheIntervention, {
     abortEarly: false

@@ -238,7 +238,7 @@ describe("Mutation.deleteBsff", () => {
             numero: p.numero,
             emissionNumero: p.numero,
             volume: p.volume,
-            weight: p.acceptationWeight,
+            weight: p.acceptationWeight!,
             previousPackagings: { connect: { id: p.id } }
           }))
         }
@@ -375,7 +375,7 @@ describe("Mutation.deleteBsff", () => {
             type: initialBsff.packagings[0].type,
             numero: initialBsff.packagings[0].numero,
             emissionNumero: initialBsff.packagings[0].numero,
-            weight: initialBsff.packagings[0].acceptationWeight,
+            weight: initialBsff.packagings[0].acceptationWeight!,
             volume: initialBsff.packagings[0].volume,
             previousPackagings: {
               connect: { id: initialBsff.packagings[0].id }

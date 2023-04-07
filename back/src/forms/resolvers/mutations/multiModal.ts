@@ -187,7 +187,7 @@ export async function prepareSegment(
     { prepareSegment: true }
   );
 
-  const segment = await prisma.transportSegment.findFirst({
+  const segment = await prisma.transportSegment.findFirstOrThrow({
     where: { segmentNumber: transportSegments.length + 1, form: { id: id } }
   });
   return expandTransportSegmentFromDb(segment);
@@ -310,8 +310,10 @@ export async function takeOverSegment(
   if (
     !nexTransporterIsFilled ||
     (nexTransporterIsFilled &&
+      form.nextTransporterSiret &&
       !userCompaniesSiretOrVat.includes(form.nextTransporterSiret)) ||
-    !userCompaniesSiretOrVat.includes(currentSegment.transporterCompanySiret)
+    (currentSegment.transporterCompanySiret &&
+      !userCompaniesSiretOrVat.includes(currentSegment.transporterCompanySiret))
   ) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }

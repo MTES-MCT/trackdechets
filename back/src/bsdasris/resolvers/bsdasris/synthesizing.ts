@@ -15,18 +15,18 @@ const synthesizing: BsdasriResolvers["synthesizing"] = async (
     // skip db query
     return [];
   }
-  let synthesizing = [];
   // use ES indexed field when requested from dashboard
   if (
     ctx?.req?.body?.operationName === dashboardOperationName &&
     isSessionUser(ctx)
   ) {
-    synthesizing = bsdasri?.synthesizing ?? [];
-  } else {
-    synthesizing = await getReadonlyBsdasriRepository()
-      .findRelatedEntity({ id: bsdasri.id })
-      .synthesizing();
+    return bsdasri?.synthesizing ?? [];
   }
+
+  const synthesizing =
+    (await getReadonlyBsdasriRepository()
+      .findRelatedEntity({ id: bsdasri.id })
+      .synthesizing()) ?? [];
 
   return synthesizing.map(bsdasri => expandSynthesizingDasri(bsdasri));
 };

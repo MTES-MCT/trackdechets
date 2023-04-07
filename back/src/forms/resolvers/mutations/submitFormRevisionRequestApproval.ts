@@ -50,6 +50,12 @@ export default async function submitFormRevisionRequestApproval(
     approval => approval.approverSiret === currentApproverSiret
   );
 
+  if (!approval) {
+    throw new Error(
+      `No approval found for current approver siret ${currentApproverSiret}`
+    );
+  }
+
   if (isApproved) {
     await formRepository.acceptRevisionRequestApproval(approval.id, {
       comment
@@ -72,8 +78,8 @@ async function getCurrentApproverSiret(
     .map(approvals => approvals.approverSiret);
 
   const userCompanies = await getUserCompanies(user.id);
-  const approvingCompaniesCandidates = userCompanies.filter(company =>
-    remainingApproverSirets.includes(company.siret)
+  const approvingCompaniesCandidates = userCompanies.filter(
+    company => company.siret && remainingApproverSirets.includes(company.siret)
   );
 
   if (approvingCompaniesCandidates.length === 0) {

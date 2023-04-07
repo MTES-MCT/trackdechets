@@ -62,10 +62,10 @@ describe("Bsff.ficheInterventions", () => {
       variables: { id: bsff.id }
     });
     expect(data.bsff.ficheInterventions).toHaveLength(1);
-    expect(data.bsff.ficheInterventions[0].operateur.company.siret).toEqual(
+    expect(data.bsff.ficheInterventions[0].operateur!.company.siret).toEqual(
       ficheIntervention.operateurCompanySiret
     );
-    expect(data.bsff.ficheInterventions[0].detenteur.company.siret).toEqual(
+    expect(data.bsff.ficheInterventions[0].detenteur!.company!.siret).toEqual(
       ficheIntervention.detenteurCompanySiret
     );
   });
@@ -88,8 +88,8 @@ describe("Bsff.ficheInterventions", () => {
       where: { id: bsff.id },
       data: {
         detenteurCompanySirets: [
-          detenteur1.company.siret,
-          detenteur2.company.siret
+          detenteur1.company.siret!,
+          detenteur2.company.siret!
         ],
         ficheInterventions: {
           connect: [
@@ -105,10 +105,10 @@ describe("Bsff.ficheInterventions", () => {
     });
 
     expect(data.bsff.ficheInterventions).toHaveLength(1);
-    expect(data.bsff.ficheInterventions[0].operateur.company.siret).toEqual(
+    expect(data.bsff.ficheInterventions[0].operateur!.company.siret).toEqual(
       ficheIntervention1.operateurCompanySiret
     );
-    expect(data.bsff.ficheInterventions[0].detenteur.company.siret).toEqual(
+    expect(data.bsff.ficheInterventions[0].detenteur!.company!.siret).toEqual(
       ficheIntervention1.detenteurCompanySiret
     );
   });

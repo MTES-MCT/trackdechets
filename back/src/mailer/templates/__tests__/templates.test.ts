@@ -303,7 +303,7 @@ describe("templates", () => {
       variables: {
         company: {
           name: companyName,
-          siret: companySiret
+          orgId: companySiret
         }
       },
       to
@@ -319,7 +319,7 @@ describe("templates", () => {
       variables: {
         company: {
           name: companyName,
-          siret: companySiret,
+          orgId: companySiret,
           verificationMode: "LETTER"
         }
       },
@@ -338,7 +338,7 @@ describe("templates", () => {
       variables: {
         company: {
           name: companyName,
-          siret: companySiret,
+          orgId: companySiret,
           verificationMode: "MANUAL"
         }
       },

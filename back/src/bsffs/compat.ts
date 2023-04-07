@@ -11,6 +11,7 @@ import { RepositoryFnDeps } from "../common/repository/types";
 import { BsffPackagingInput } from "../generated/graphql/types";
 import { isFinalOperation } from "./constants";
 import { getReadonlyBsffPackagingRepository } from "./repository";
+import { Nullable } from "../types";
 
 type BsffDestination = {
   receptionWeight: number;
@@ -29,12 +30,12 @@ type BsffDestination = {
  */
 export function toBsffDestination(
   packagings: BsffPackaging[]
-): BsffDestination {
+): Nullable<BsffDestination> {
   const hasAnyReception = packagings.some(p => !!p.acceptationSignatureDate);
 
   const receptionWeight = hasAnyReception
     ? packagings.reduce((acc, p) => {
-        return acc + p.acceptationWeight ?? 0;
+        return acc + (p.acceptationWeight ?? 0);
       }, 0)
     : null;
 
@@ -65,11 +66,9 @@ export function toBsffDestination(
 
   // returns last date
   const receptionDate = hasAnyReception
-    ? [
-        ...packagings
-          .filter(p => !!p.acceptationDate)
-          .map(p => p.acceptationDate)
-      ].sort((d1, d2) => d2.getTime() - d1.getTime())[0]
+    ? [...packagings.map(p => p.acceptationDate).filter(Boolean)].sort(
+        (d1, d2) => d2.getTime() - d1.getTime()
+      )[0]
     : null;
 
   const receptionRefusalReason = [
@@ -100,9 +99,9 @@ export function toBsffDestination(
 
   // returns last date
   const operationDate = hasAnyOperation
-    ? [
-        ...packagings.filter(p => !!p.operationDate).map(p => p.operationDate)
-      ].sort((d1, d2) => d2.getTime() - d1.getTime())[0]
+    ? [...packagings.map(p => p.operationDate).filter(Boolean)].sort(
+        (d1, d2) => d2.getTime() - d1.getTime()
+      )[0]
     : null;
 
   return {
@@ -132,10 +131,10 @@ export async function getStatus(
     (await prisma.bsff.findUnique({ where: { id: bsff.id } }).packagings());
 
   const packagings = await Promise.all(
-    packagingsSimple.map(async p => ({
+    packagingsSimple?.map(async p => ({
       ...p,
       lastPackaging: (await findNextPackagings(p.id)).reverse()[0]
-    }))
+    })) ?? []
   );
 
   let allAccepted = true,
@@ -159,17 +158,20 @@ export async function getStatus(
     const processed =
       refused ||
       (!!packaging.operationSignatureDate &&
-        (isFinalOperation(
-          packaging.operationCode,
-          packaging.operationNoTraceability
-        ) ||
+        ((!!packaging.operationCode &&
           isFinalOperation(
-            packaging.lastPackaging?.operationCode,
-            packaging.lastPackaging?.operationNoTraceability
-          )));
+            packaging.operationCode,
+            packaging.operationNoTraceability
+          )) ||
+          (!!packaging.lastPackaging?.operationCode &&
+            isFinalOperation(
+              packaging.lastPackaging.operationCode,
+              packaging.lastPackaging?.operationNoTraceability
+            ))));
     const intermediatelyProcessed =
       refused ||
       (!!packaging.operationSignatureDate &&
+        !!packaging.operationCode &&
         !isFinalOperation(
           packaging.operationCode,
           packaging.operationNoTraceability
@@ -244,7 +246,7 @@ export function toBsffPackagingWithType({
 
   return {
     ...packaging,
-    type,
+    type: type!,
     other
   };
 }

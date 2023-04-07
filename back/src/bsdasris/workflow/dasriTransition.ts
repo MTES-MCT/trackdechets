@@ -16,7 +16,7 @@ export default async function dasriTransition(
 ) {
   const currentStatus = bsdasri.status;
 
-  await validateBsdasri(bsdasri, validationContext);
+  await validateBsdasri(bsdasri as any, validationContext);
   // Use state machine to calculate new status
   const nextState = machine.transition(currentStatus, event, bsdasri);
 
@@ -27,11 +27,11 @@ export default async function dasriTransition(
 
   const nextStatus = nextState.value as BsdasriStatus;
 
-  const dasriUpdateInput: Prisma.BsdasriUpdateInput = {
+  const dasriUpdateInput = {
     status: nextStatus,
     ...event.dasriUpdateInput,
     ...extraFields
-  };
+  } as Prisma.BsdasriUpdateInput;
 
   //  dasri update payload
   return {

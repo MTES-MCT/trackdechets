@@ -12,7 +12,7 @@ const UPDATE_COMPANY = `
     $contactEmail: String,
     $contactPhone: String,
     $website: String,
-    $companyTypes: [CompanyType],
+    $companyTypes: [CompanyType!],
     $givenName: String,
     $transporterReceiptId: String,
     $traderReceiptId: String,

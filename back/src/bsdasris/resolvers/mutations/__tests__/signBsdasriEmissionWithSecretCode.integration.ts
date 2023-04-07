@@ -45,7 +45,7 @@ describe("Mutation.signBsdasri emission with secret code", () => {
         })
       })
     ]);
-    dasri = await prisma.bsdasri.findUnique({
+    dasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(dasri.status).toEqual("INITIAL");
@@ -78,7 +78,7 @@ describe("Mutation.signBsdasri emission with secret code", () => {
       }
     );
 
-    const readyTotakeOverDasri = await prisma.bsdasri.findUnique({
+    const readyTotakeOverDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(readyTotakeOverDasri.status).toEqual("SIGNED_BY_PRODUCER");

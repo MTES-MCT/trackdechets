@@ -3,14 +3,15 @@ import {
   nullIfNoValues,
   safeInput,
   processDate,
-  chain
+  chain,
+  undefinedOrDefault
 } from "../common/converter";
 import * as GraphQL from "../generated/graphql/types";
 import { BsdElastic } from "../common/elastic";
 import { BsffPackaging, BsffPackagingType } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 
-function flattenEmitterInput(input: { emitter?: GraphQL.BsffEmitter }) {
+function flattenEmitterInput(input: { emitter?: GraphQL.BsffEmitter | null }) {
   return {
     emitterCompanyName: chain(input.emitter, e =>
       chain(e.company, c => c.name)
@@ -35,7 +36,7 @@ function flattenEmitterInput(input: { emitter?: GraphQL.BsffEmitter }) {
 }
 
 function flattenTransporterInput(input: {
-  transporter?: GraphQL.BsffTransporter;
+  transporter?: GraphQL.BsffTransporter | null;
 }) {
   return {
     transporterCompanyName: chain(input.transporter, t =>
@@ -60,8 +61,9 @@ function flattenTransporterInput(input: {
       chain(t.company, c => c.mail)
     ),
     transporterCustomInfo: chain(input.transporter, t => t.customInfo),
-    transporterTransportPlates: chain(input.transporter, t =>
-      chain(t.transport, tr => tr.plates)
+    transporterTransportPlates: undefinedOrDefault(
+      chain(input.transporter, t => chain(t.transport, tr => tr.plates)),
+      []
     ),
     transporterRecepisseNumber: chain(input.transporter, t =>
       chain(t.recepisse, r => r.number)
@@ -82,7 +84,7 @@ function flattenTransporterInput(input: {
 }
 
 function flattenDestinationInput(input: {
-  destination?: GraphQL.BsffDestinationInput;
+  destination?: GraphQL.BsffDestinationInput | null;
 }) {
   return {
     destinationCompanyName: chain(input.destination, d =>
@@ -117,8 +119,8 @@ function flattenDestinationInput(input: {
 }
 
 function flattenWasteDetailsInput(input: {
-  waste?: GraphQL.BsffWasteInput;
-  weight?: GraphQL.BsffWeightInput;
+  waste?: GraphQL.BsffWasteInput | null;
+  weight?: GraphQL.BsffWeightInput | null;
 }) {
   return {
     wasteCode: chain(input.waste, w => w.code),
@@ -150,6 +152,9 @@ export function flattenBsffInput(
     | "bsffId"
   >
 > {
+  if (bsffInput.type === null) {
+    throw new Error();
+  }
   return safeInput({
     type: bsffInput.type,
     ...flattenEmitterInput(bsffInput),
@@ -254,7 +259,7 @@ export function flattenBsffPackagingInput(
   input: GraphQL.UpdateBsffPackagingInput
 ) {
   return safeInput({
-    numero: input.numero,
+    numero: input.numero ?? undefined,
     acceptationDate: chain(input.acceptation, a => a.date),
     acceptationWeight: chain(input.acceptation, a => a.weight),
     acceptationStatus: chain(input.acceptation, a => a.status),
@@ -265,7 +270,10 @@ export function flattenBsffPackagingInput(
       a => a.wasteDescription
     ),
     operationDate: chain(input.operation, o => o.date),
-    operationNoTraceability: chain(input.operation, o => o.noTraceability),
+    operationNoTraceability: undefinedOrDefault(
+      chain(input.operation, o => o.noTraceability),
+      false
+    ),
     operationCode: chain(input.operation, o => o.code),
     operationDescription: chain(input.operation, o => o.description),
     operationNextDestinationPlannedOperationCode: chain(input.operation, o =>
@@ -353,7 +361,7 @@ export function expandBsffPackagingFromDB(
     // the following fields will be resolved in BsddPackaging resolver
     nextBsffs: [],
     previousBsffs: [],
-    bsff: null
+    bsff: null as any
   };
 }
 
@@ -361,10 +369,6 @@ export function expandBsffFromElastic(
   bsff: BsdElastic["rawBsd"]
 ): GraphQL.Bsff {
   const expanded = expandBsffFromDB(bsff);
-
-  if (!expanded) {
-    return null;
-  }
 
   return {
     ...expanded,
@@ -374,21 +378,20 @@ export function expandBsffFromElastic(
 
 export function flattenFicheInterventionBsffInput(
   ficheInterventionInput: GraphQL.BsffFicheInterventionInput
-): Prisma.Prisma.BsffFicheInterventionCreateInput {
+):
+  | Prisma.Prisma.BsffFicheInterventionCreateInput
+  | Prisma.Prisma.BsffFicheInterventionUpdateInput {
   return {
     numero: ficheInterventionInput.numero,
     weight: ficheInterventionInput.weight,
     postalCode: ficheInterventionInput.postalCode,
-
-    detenteurCompanyName: chain(ficheInterventionInput, fi =>
-      chain(fi.detenteur, d => chain(d.company, c => c.name))
-    ),
+    detenteurCompanyName:
+      ficheInterventionInput?.detenteur?.company?.name ?? undefined,
     detenteurCompanySiret: chain(ficheInterventionInput, fi =>
       chain(fi.detenteur, d => chain(d.company, c => c.siret))
     ),
-    detenteurCompanyAddress: chain(ficheInterventionInput, fi =>
-      chain(fi.detenteur, d => chain(d.company, c => c.address))
-    ),
+    detenteurCompanyAddress:
+      ficheInterventionInput?.detenteur?.company?.address ?? undefined,
     detenteurCompanyContact: chain(ficheInterventionInput, fi =>
       chain(fi.detenteur, d => chain(d.company, c => c.contact))
     ),
@@ -398,27 +401,20 @@ export function flattenFicheInterventionBsffInput(
     detenteurCompanyMail: chain(ficheInterventionInput, fi =>
       chain(fi.detenteur, d => chain(d.company, c => c.mail))
     ),
-    detenteurIsPrivateIndividual: chain(ficheInterventionInput, fi =>
-      chain(fi.detenteur, d => d.isPrivateIndividual)
-    ),
-    operateurCompanyName: chain(ficheInterventionInput, fi =>
-      chain(fi.operateur, o => chain(o.company, c => c.name))
-    ),
-    operateurCompanySiret: chain(ficheInterventionInput, fi =>
-      chain(fi.operateur, o => chain(o.company, c => c.siret))
-    ),
-    operateurCompanyAddress: chain(ficheInterventionInput, fi =>
-      chain(fi.operateur, o => chain(o.company, c => c.address))
-    ),
-    operateurCompanyContact: chain(ficheInterventionInput, fi =>
-      chain(fi.operateur, o => chain(o.company, c => c.contact))
-    ),
-    operateurCompanyPhone: chain(ficheInterventionInput, fi =>
-      chain(fi.operateur, o => chain(o.company, c => c.phone))
-    ),
-    operateurCompanyMail: chain(ficheInterventionInput, fi =>
-      chain(fi.operateur, o => chain(o.company, c => c.mail))
-    )
+    detenteurIsPrivateIndividual:
+      ficheInterventionInput?.detenteur?.isPrivateIndividual ?? undefined,
+    operateurCompanyName:
+      ficheInterventionInput.operateur?.company?.name ?? undefined,
+    operateurCompanySiret:
+      ficheInterventionInput.operateur?.company?.siret ?? undefined,
+    operateurCompanyAddress:
+      ficheInterventionInput.operateur?.company?.address ?? undefined,
+    operateurCompanyContact:
+      ficheInterventionInput.operateur?.company?.contact ?? undefined,
+    operateurCompanyPhone:
+      ficheInterventionInput.operateur?.company?.phone ?? undefined,
+    operateurCompanyMail:
+      ficheInterventionInput.operateur?.company?.mail ?? undefined
   };
 }
 

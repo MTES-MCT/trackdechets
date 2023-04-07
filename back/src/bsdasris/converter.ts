@@ -46,7 +46,7 @@ import { getTransporterCompanyOrgId } from "../common/constants/companySearchHel
 export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
   return {
     id: bsdasri.id,
-    isDraft: bsdasri.isDraft,
+    isDraft: Boolean(bsdasri.isDraft),
     type: bsdasri.type,
 
     waste: nullIfNoValues<BsdasriWaste>({
@@ -188,7 +188,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
     createdAt: processDate(bsdasri.createdAt),
     updatedAt: processDate(bsdasri.updatedAt),
     status: bsdasri.status as BsdasriStatus,
-    metadata: null,
+    metadata: null as any,
     allowDirectTakeOver: null
   };
 }
@@ -197,10 +197,6 @@ export function expandBsdasriFromElastic(
   bsdasri: BsdElastic["rawBsd"]
 ): GqlBsdasri {
   const expanded = expandBsdasriFromDB(bsdasri);
-
-  if (!expanded) {
-    return null;
-  }
 
   return {
     ...expanded,
@@ -259,11 +255,13 @@ export const expandSynthesizingDasri = (dasri: Bsdasri): InitialBsdasri => ({
     extractPostalCode(dasri?.emitterCompanyAddress)
 });
 
-type computeTotalVolumeFn = (packagings: BsdasriPackagingsInput[]) => number;
+type ComputeTotalVolumeFn = (
+  packagings: BsdasriPackagingsInput[] | null | undefined
+) => number | undefined;
 /**
  * Compute total volume according to packaging infos details
  */
-const computeTotalVolume: computeTotalVolumeFn = packagings => {
+const computeTotalVolume: ComputeTotalVolumeFn = packagings => {
   if (!packagings) {
     return undefined;
   }
@@ -277,7 +275,7 @@ const computeTotalVolume: computeTotalVolumeFn = packagings => {
 };
 
 function flattenEcoOrganismeInput(input: {
-  ecoOrganisme?: BsdasriEcoOrganismeInput;
+  ecoOrganisme?: BsdasriEcoOrganismeInput | null;
 }) {
   return {
     ecoOrganismeName: chain(input.ecoOrganisme, e => e.name),
@@ -285,7 +283,7 @@ function flattenEcoOrganismeInput(input: {
   };
 }
 
-function flattenEmitterInput(input: { emitter?: BsdasriEmitterInput }) {
+function flattenEmitterInput(input: { emitter?: BsdasriEmitterInput | null }) {
   return {
     emitterCompanyName: chain(input.emitter, e =>
       chain(e.company, c => c.name)
@@ -325,7 +323,7 @@ function flattenEmitterInput(input: { emitter?: BsdasriEmitterInput }) {
   };
 }
 
-function flattenWasteInput(input: { waste?: BsdasriWasteInput }) {
+function flattenWasteInput(input: { waste?: BsdasriWasteInput | null }) {
   if (!input?.waste) {
     return null;
   }
@@ -337,7 +335,9 @@ function flattenWasteInput(input: { waste?: BsdasriWasteInput }) {
     wasteAdr: chain(input.waste, w => w.adr)
   };
 }
-function flattenEmissionInput(input: { emission?: BsdasriEmissionInput }) {
+function flattenEmissionInput(
+  input?: { emission?: BsdasriEmissionInput | null } | null
+) {
   if (!input?.emission) {
     return null;
   }
@@ -355,7 +355,7 @@ function flattenEmissionInput(input: { emission?: BsdasriEmissionInput }) {
   };
 }
 function flattenTransporterInput(input: {
-  transporter?: BsdasriTransporterInput;
+  transporter?: BsdasriTransporterInput | null;
 }) {
   return safeInput({
     transporterCompanyName: chain(input.transporter, t =>
@@ -394,13 +394,18 @@ function flattenTransporterInput(input: {
     ),
 
     transporterCustomInfo: chain(input.transporter, e => e.customInfo),
-    transporterTransportPlates: chain(input.transporter, t =>
-      chain(t.transport, e => e.plates)
+    transporterTransportPlates: undefinedOrDefault(
+      chain(input.transporter, t => chain(t.transport, e => e.plates)),
+      []
     ),
     ...flattenTransportInput(input.transporter)
   });
 }
-function flattenTransportInput(input: { transport?: BsdasriTransportInput }) {
+function flattenTransportInput(
+  input?: {
+    transport?: BsdasriTransportInput | null;
+  } | null
+) {
   if (!input?.transport) {
     return null;
   }
@@ -438,7 +443,7 @@ function flattenTransportInput(input: { transport?: BsdasriTransportInput }) {
 }
 
 function flattenDestinationInput(input: {
-  destination?: BsdasriDestinationInput;
+  destination?: BsdasriDestinationInput | null;
 }) {
   return {
     destinationCompanyName: chain(input.destination, r =>
@@ -465,7 +470,11 @@ function flattenDestinationInput(input: {
   };
 }
 
-function flattenReceptiontInput(input: { reception?: BsdasriReceptionInput }) {
+function flattenReceptiontInput(
+  input?: {
+    reception?: BsdasriReceptionInput | null;
+  } | null
+) {
   if (!input?.reception) {
     return null;
   }
@@ -494,7 +503,11 @@ function flattenReceptiontInput(input: { reception?: BsdasriReceptionInput }) {
   };
 }
 
-function flattenOperationInput(input: { operation?: BsdasriOperationInput }) {
+function flattenOperationInput(
+  input?: {
+    operation?: BsdasriOperationInput | null;
+  } | null
+) {
   if (!input?.operation) {
     return null;
   }
@@ -511,7 +524,7 @@ function flattenOperationInput(input: { operation?: BsdasriOperationInput }) {
 }
 
 function flattenContainersInput(input: {
-  identification?: BsdasriIdentificationInput;
+  identification?: BsdasriIdentificationInput | null;
 }) {
   if (!input?.identification?.numbers) {
     return null;

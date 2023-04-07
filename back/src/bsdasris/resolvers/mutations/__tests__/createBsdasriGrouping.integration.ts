@@ -216,15 +216,15 @@ describe("Mutation.createDasri", () => {
       }
     );
 
-    expect(data.createBsdasri.grouping.map(bsd => bsd.id)).toEqual([
+    expect(data.createBsdasri.grouping!.map(bsd => bsd.id)).toEqual([
       toRegroup1.id,
       toRegroup2.id
     ]);
     expect(data.createBsdasri.type).toEqual("GROUPING");
-    const grouped1 = await prisma.bsdasri.findUnique({
+    const grouped1 = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: toRegroup1.id }
     });
-    const grouped2 = await prisma.bsdasri.findUnique({
+    const grouped2 = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: toRegroup2.id }
     });
     expect(grouped1.groupedInId).toEqual(data.createBsdasri.id);

@@ -8,6 +8,7 @@ import { validateFicheIntervention } from "../../validation";
 import { getFicheInterventionBsffOrNotFound } from "../../database";
 import { checkCanWriteFicheIntervention } from "../../permissions";
 import { getBsffFicheInterventionRepository } from "../../repository";
+import { Prisma } from "@prisma/client";
 
 const updateFicheInterventionBsff: MutationResolvers["updateFicheInterventionBsff"] =
   async (_, { id, input }, context) => {
@@ -22,7 +23,7 @@ const updateFicheInterventionBsff: MutationResolvers["updateFicheInterventionBsf
     const futureFicheIntervention = {
       ...existingFicheIntervention,
       ...ficheInterventionData
-    };
+    } as Prisma.BsffFicheInterventionCreateInput;
     await checkCanWriteFicheIntervention(user, futureFicheIntervention);
 
     await validateFicheIntervention(futureFicheIntervention);

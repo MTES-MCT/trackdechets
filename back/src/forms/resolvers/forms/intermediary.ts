@@ -9,7 +9,7 @@ const intermediaryCompaniesResolver: FormResolvers["intermediaries"] =
       })
       .intermediaries();
 
-    return intermediaries ?? null;
+    return intermediaries ?? [];
   };
 
 export default intermediaryCompaniesResolver;

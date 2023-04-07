@@ -18,7 +18,7 @@ function validateArgs(args: QueryFormArgs) {
       "Vous devez préciser soit un id soit un readableId mais pas les deux"
     );
   }
-  return args;
+  return args as { id: string } | { readableId: string };
 }
 
 const formResolver: QueryResolvers["form"] = async (_, args, context) => {

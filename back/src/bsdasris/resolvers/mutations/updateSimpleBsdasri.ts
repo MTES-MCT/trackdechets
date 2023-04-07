@@ -50,13 +50,13 @@ const updateBsdasri = async ({
   const sirenifiedInput = await sirenify(input, user);
   const flattenedInput = flattenBsdasriInput(sirenifiedInput);
 
-  if (inputGrouping?.length > 0 && !isGroupingType) {
+  if (inputGrouping && inputGrouping.length > 0 && !isGroupingType) {
     throw new UserInputError(
       "Le champ grouping n'est accessible que sur les dasri de groupement."
     );
   }
 
-  if (inputSynthesizing?.length > 0) {
+  if (inputSynthesizing && inputSynthesizing.length > 0) {
     throw new UserInputError(
       "Le champ synthesizing n'est accessible que sur les dasri de synthèse."
     );
@@ -91,7 +91,7 @@ const updateBsdasri = async ({
 
   // Validate form input
 
-  await validateBsdasri(expectedBsdasri, {
+  await validateBsdasri(expectedBsdasri as any, {
     isGrouping: isGroupingType
   });
 
