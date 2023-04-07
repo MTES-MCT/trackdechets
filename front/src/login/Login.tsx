@@ -80,7 +80,9 @@ export default function Login() {
   const formRef = createRef<HTMLFormElement>();
   const { VITE_API_ENDPOINT } = import.meta.env;
 
+  const activateAccount = !!queries.activation;
   const createdWithSuccess = queries.signup === "complete";
+  const createdWithError = queries.signup === "error";
 
   if (queries.errorCode || queries.returnTo) {
     const { errorCode, returnTo, username } = queries;
@@ -106,12 +108,61 @@ export default function Login() {
     </Row>
   ) : null;
 
+  const activateAlert = activateAccount ? (
+    <Row spacing="mb-2w">
+      <Alert
+        title="Activer votre compte"
+        description={
+          <>
+            <span>
+              Veuillez cliquer sur{" "}
+              <Link
+                href={`${VITE_API_ENDPOINT}/userActivation?hash=${queries.activation}`}
+                isSimple
+              >
+                ce lien
+              </Link>{" "}
+              afin de finaliser la création de votre compte.
+            </span>
+          </>
+        }
+        type="info"
+      />
+    </Row>
+  ) : null;
+
   const createdAlert = createdWithSuccess ? (
     <Row spacing="mb-2w">
       <Alert
         title="Votre compte est créé !"
         description="Vous pouvez maintenant vous connecter puis créer ou rejoindre un établissement."
         type="success"
+      />
+    </Row>
+  ) : null;
+
+  const createdErrorAlert = createdWithError ? (
+    <Row spacing="mb-2w">
+      <Alert
+        title="Une erreur est survenue durant l'activation de votre compte"
+        description={
+          <>
+            <span>
+              Veuillez nous contacter via{" "}
+              <Link
+                href="https://faq.trackdechets.fr/pour-aller-plus-loin/assistance"
+                target="_blank"
+                isSimple
+                // @ts-ignore
+                rel="noreferrer"
+              >
+                la FAQ
+              </Link>
+              .
+            </span>
+          </>
+        }
+        type="error"
       />
     </Row>
   ) : null;
@@ -125,7 +176,9 @@ export default function Login() {
         name="login"
       >
         <Container className={styles.centralContainer} spacing="pt-10w">
+          {activateAlert}
           {createdAlert}
+          {createdErrorAlert}
           {alert}
           <Row justifyContent="center" spacing="mb-2w">
             <Col spacing="m-auto">

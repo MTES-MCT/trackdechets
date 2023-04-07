@@ -2,18 +2,17 @@ import prisma from "../prisma";
 import { getUIBaseURL } from "../utils";
 
 export const userActivationHandler = async (req, res) => {
+  const UI_BASE_URL = getUIBaseURL();
   const { hash } = req.query;
   if (hash == null) {
-    res.status(500).send("Hash manquant.");
-    return;
+    return res.redirect(`${UI_BASE_URL}/login?signup=error`);
   }
 
   const user = await prisma.userActivationHash
     .findUnique({ where: { hash } })
     .user();
   if (user == null) {
-    res.status(500).send("Hash invalide.");
-    return;
+    return res.redirect(`${UI_BASE_URL}/login?signup=error`);
   }
 
   await prisma.user.update({
@@ -23,6 +22,5 @@ export const userActivationHandler = async (req, res) => {
 
   await prisma.userActivationHash.delete({ where: { hash } });
 
-  const UI_BASE_URL = getUIBaseURL();
   return res.redirect(`${UI_BASE_URL}/login?signup=complete`);
 };
