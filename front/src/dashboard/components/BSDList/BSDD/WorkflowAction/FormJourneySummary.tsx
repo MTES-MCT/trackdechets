@@ -6,6 +6,7 @@ import {
   JourneyStopDescription,
   JourneyStopName,
 } from "common/components";
+import { formTransportIsPipeline } from "form/bsdd/utils/packagings";
 
 interface FormJourneySummaryProps {
   form: Form;
@@ -54,12 +55,15 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
         }
       >
         <JourneyStopName>Transporteur</JourneyStopName>
-        {form.transporter?.company && (
+        {form.transporter?.company && !formTransportIsPipeline(form) && (
           <JourneyStopDescription>
             {form.transporter.company.name} ({form.transporter.company.orgId})
             <br />
             {form.transporter.company.address}
           </JourneyStopDescription>
+        )}
+        {formTransportIsPipeline(form) && (
+          <JourneyStopDescription>Par pipeline</JourneyStopDescription>
         )}
       </JourneyStop>
       {form.temporaryStorageDetail && (

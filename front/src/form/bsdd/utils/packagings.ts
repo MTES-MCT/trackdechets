@@ -1,10 +1,11 @@
-import { PackagingInfo, Packagings } from "generated/graphql/types";
+import { FormInput, PackagingInfo, Packagings } from "generated/graphql/types";
 
 export const PACKAGINGS_NAMES = {
   [Packagings.Benne]: "Benne(s)",
   [Packagings.Citerne]: "Citerne(s)",
   [Packagings.Fut]: "Fût(s)",
   [Packagings.Grv]: "GRV(s)",
+  [Packagings.Pipeline]: "Pipeline",
   [Packagings.Autre]: "Autre(s)",
 };
 
@@ -31,3 +32,8 @@ export function getPackagingInfosSummary(packagingInfos: PackagingInfo[]) {
 
   return `${total} colis : ${packages}`;
 }
+
+export const formTransportIsPipeline = (form: FormInput): boolean =>
+  form.wasteDetails?.packagingInfos?.find(
+    pkg => pkg.type === Packagings.Pipeline
+  ) !== undefined;

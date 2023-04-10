@@ -14,7 +14,11 @@ import {
 } from "../../converter";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
-import { draftFormSchema, validateGroupement } from "../../validation";
+import {
+  draftFormSchema,
+  hasPipeline,
+  validateGroupement
+} from "../../validation";
 import { UserInputError } from "apollo-server-core";
 import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
@@ -58,6 +62,14 @@ const createFormResolver = async (
   }
 
   const form = flattenFormInput(formContent);
+  // Pipeline erases transporter
+  if (hasPipeline(form as any)) {
+    Object.keys(form)
+      .filter(key => key.startsWith("transporter"))
+      .forEach(key => {
+        form[key] = null;
+      });
+  }
 
   const readableId = getReadableId();
 

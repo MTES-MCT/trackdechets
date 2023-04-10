@@ -94,6 +94,7 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
       await mailToNonExistentEmitter(sealedForm, formRepository);
     }
 
+    // by-pass producer signature
     if (
       formUpdateInput &&
       (sealedForm.emitterIsForeignShip === true ||

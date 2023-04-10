@@ -222,6 +222,13 @@ type ProcessedInfo = Pick<
   | "nextDestinationNotificationNumber"
 >;
 
+export const hasPipeline = (value: {
+  wasteDetailsPackagingInfos: Array<{
+    type: Packagings;
+  }>;
+}): boolean =>
+  !!value.wasteDetailsPackagingInfos?.find(i => i.type === "PIPELINE");
+
 // *************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 1
 // *************************************************************
@@ -683,8 +690,21 @@ const fullWasteDetailsSchemaFn: FactorySchemaOf<
       wasteDetailsQuantity: weight(WeightUnits.Tonne)
         .label("Déchet")
         .when(
-          ["transporterTransportMode", "createdAt"],
-          weightConditions.transportMode(WeightUnits.Tonne)
+          [
+            "transporterTransportMode",
+            "createdAt",
+            "wasteDetailsPackagingInfos"
+          ],
+          {
+            is: (
+              _t: any,
+              _c: any,
+              wasteDetailsPackagingInfos: PackagingInfo[]
+            ) => !hasPipeline({ wasteDetailsPackagingInfos }),
+            then: weight(WeightUnits.Tonne).when(
+              weightConditions.transportMode(WeightUnits.Tonne)
+            )
+          }
         )
         .requiredIf(
           !isDraft,
@@ -969,10 +989,13 @@ export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
   quantityReceived: weight(WeightUnits.Tonne)
     .label("Réception")
     .when("wasteAcceptationStatus", weightConditions.wasteAcceptationStatus)
-    .when(
-      "transporterTransportMode",
-      weightConditions.transportMode(WeightUnits.Tonne)
-    ),
+    .when(["transporterTransportMode", "wasteDetailsPackagingInfos"], {
+      is: (_: any, wasteDetailsPackagingInfos: PackagingInfo[]) =>
+        !hasPipeline({ wasteDetailsPackagingInfos }),
+      then: weight(WeightUnits.Tonne).when(
+        weightConditions.transportMode(WeightUnits.Tonne)
+      )
+    }),
   wasteAcceptationStatus: yup
     .mixed<WasteAcceptationStatus>()
     .test(
@@ -1240,10 +1263,7 @@ const baseFormSchemaFn = (isDraft: boolean) =>
       value
     });
 
-    const hasPipeline = value.wasteDetailsPackagingInfos?.find(
-      i => i.type === "PIPELINE"
-    );
-    if (hasPipeline) {
+    if (hasPipeline(value)) {
       return yup
         .object()
         .concat(emitterSchemaFn(isDraft))
