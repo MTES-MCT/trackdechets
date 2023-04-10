@@ -48,7 +48,6 @@ oidcRouter.get(
     return done(null, client, redirectUri);
   }),
   (req: Request & { oauth2: OAuth2 }, res: Response) => {
-    // console.log(req.oauth2)
     const payload = {
       transactionID: req.oauth2.transactionID,
       user: {
