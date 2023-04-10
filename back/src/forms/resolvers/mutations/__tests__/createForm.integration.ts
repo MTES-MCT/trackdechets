@@ -71,6 +71,7 @@ const CREATE_FORM = `
         validityLimit
         numberPlate
         customInfo
+        mode
       }
       trader {
         company {
@@ -858,7 +859,7 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
-  it(`should disallow transporter infos in a form with "PIPELINE" packaging type`, async () => {
+  it("should erase transporter infos in a form with PIPELINE packaging", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 
     const createFormInput = {
@@ -868,10 +869,73 @@ describe("Mutation.createForm", () => {
         }
       },
       wasteDetails: {
-        packagingInfos: [{ type: "PIPELINE" }]
+        packagingInfos: [{ type: "PIPELINE", quantity: 1 }]
       },
       transporter: {
-        siret: siretify(1)
+        company: { siret: siretify(1) }
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+
+    expect(data.createForm.transporter).toMatchObject({
+      company: null,
+      mode: "OTHER"
+    });
+  });
+
+  it("should force transporter mode to OTHER with PIPELINE packaging", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      wasteDetails: {
+        packagingInfos: [{ type: "PIPELINE", quantity: 1 }]
+      },
+      transporter: {
+        mode: "ROAD"
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "createForm">>(CREATE_FORM, {
+      variables: { createFormInput }
+    });
+    expect(data.createForm).toMatchObject({
+      transporter: {
+        mode: "OTHER"
+      },
+      wasteDetails: {
+        packagingInfos: [
+          {
+            type: "PIPELINE",
+            quantity: 1,
+            other: null
+          }
+        ]
+      }
+    });
+  });
+
+  it("should error if any other packaging type is sent with the PIPELINE type", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const createFormInput = {
+      emitter: {
+        company: {
+          siret: company.siret
+        }
+      },
+      wasteDetails: {
+        packagingInfos: [
+          { type: "PIPELINE", quantity: 1 },
+          { type: "CITERNE", quantity: 1 }
+        ]
       }
     };
     const { mutate } = makeClient(user);
@@ -881,7 +945,8 @@ describe("Mutation.createForm", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Le nombre de benne ou de citerne ne peut être supérieur à 2.",
+        message:
+          "wasteDetailsPackagingInfos ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })

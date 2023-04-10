@@ -227,7 +227,8 @@ export const hasPipeline = (value: {
     type: Packagings;
   }>;
 }): boolean =>
-  !!value.wasteDetailsPackagingInfos?.find(i => i.type === "PIPELINE");
+  value.wasteDetailsPackagingInfos?.find(i => i.type === "PIPELINE") !==
+  undefined;
 
 // *************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 1
@@ -667,20 +668,24 @@ const fullWasteDetailsSchemaFn: FactorySchemaOf<
         .of(packagingInfoFn(isDraft) as any)
         .test(
           "is-valid-packaging-infos",
-          "${path} ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
+          "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
           (infos: PackagingInfo[] | undefined) => {
             const hasCiterne = infos?.find(i => i.type === "CITERNE");
             const hasPipeline = infos?.find(i => i.type === "PIPELINE");
             const hasBenne = infos?.find(i => i.type === "BENNE");
 
-            if (hasCiterne && hasBenne) {
+            if (
+              (hasCiterne && hasBenne) ||
+              (infos?.find(i => !["PIPELINE"].includes(i.type)) !== undefined &&
+                hasPipeline)
+            ) {
               return false;
             }
 
             const hasOtherPackaging = infos?.find(
-              i => !["CITERNE", "BENNE", "PIPELINE"].includes(i.type)
+              i => !["CITERNE", "BENNE"].includes(i.type)
             );
-            if ((hasCiterne || hasBenne || hasPipeline) && hasOtherPackaging) {
+            if ((hasCiterne || hasBenne) && hasOtherPackaging) {
               return false;
             }
 
@@ -690,21 +695,8 @@ const fullWasteDetailsSchemaFn: FactorySchemaOf<
       wasteDetailsQuantity: weight(WeightUnits.Tonne)
         .label("Déchet")
         .when(
-          [
-            "transporterTransportMode",
-            "createdAt",
-            "wasteDetailsPackagingInfos"
-          ],
-          {
-            is: (
-              _t: any,
-              _c: any,
-              wasteDetailsPackagingInfos: PackagingInfo[]
-            ) => !hasPipeline({ wasteDetailsPackagingInfos }),
-            then: weight(WeightUnits.Tonne).when(
-              weightConditions.transportMode(WeightUnits.Tonne)
-            )
-          }
+          ["transporterTransportMode", "createdAt"],
+          weightConditions.transportMode(WeightUnits.Tonne)
         )
         .requiredIf(
           !isDraft,
@@ -989,13 +981,10 @@ export const receivedInfoSchema: yup.SchemaOf<ReceivedInfo> = yup.object({
   quantityReceived: weight(WeightUnits.Tonne)
     .label("Réception")
     .when("wasteAcceptationStatus", weightConditions.wasteAcceptationStatus)
-    .when(["transporterTransportMode", "wasteDetailsPackagingInfos"], {
-      is: (_: any, wasteDetailsPackagingInfos: PackagingInfo[]) =>
-        !hasPipeline({ wasteDetailsPackagingInfos }),
-      then: weight(WeightUnits.Tonne).when(
-        weightConditions.transportMode(WeightUnits.Tonne)
-      )
-    }),
+    .when(
+      "transporterTransportMode",
+      weightConditions.transportMode(WeightUnits.Tonne)
+    ),
   wasteAcceptationStatus: yup
     .mixed<WasteAcceptationStatus>()
     .test(

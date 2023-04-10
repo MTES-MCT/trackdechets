@@ -3,7 +3,8 @@ import {
   Form,
   Form as PrismaForm,
   Prisma,
-  TransportSegment as PrismaTransportSegment
+  TransportSegment as PrismaTransportSegment,
+  TransportMode
 } from "@prisma/client";
 import DataLoader from "dataloader";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
@@ -588,7 +589,11 @@ export async function expandFormFromDb(
       customInfo: form.transporterCustomInfo,
       // transportMode has default value in DB but we do not want to return anything
       // if the transporter siret is not defined
-      mode: form.transporterCompanySiret ? form.transporterTransportMode : null
+      mode:
+        !form.transporterCompanySiret &&
+        form.transporterTransportMode === TransportMode.ROAD
+          ? null
+          : form.transporterTransportMode
     }),
     wasteDetails: nullIfNoValues<WasteDetails>({
       code: form.wasteDetailsCode,
@@ -767,9 +772,11 @@ export async function expandFormFromDb(
             customInfo: forwardedIn.transporterCustomInfo,
             // transportMode has default value in DB but we do not want to return anything
             // if the transporter siret is not defined
-            mode: forwardedIn.transporterCompanySiret
-              ? forwardedIn.transporterTransportMode
-              : null
+            mode:
+              !forwardedIn.transporterCompanySiret &&
+              forwardedIn.transporterTransportMode === TransportMode.ROAD
+                ? null
+                : forwardedIn.transporterTransportMode
           }),
           emittedAt: processDate(forwardedIn.emittedAt),
           emittedBy: forwardedIn.emittedBy,

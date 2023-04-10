@@ -102,6 +102,7 @@ enum TransportMode {
   AIR
   RIVER
   SEA
+  OTHER
 }
 
 enum UserRole {

@@ -40,7 +40,7 @@ const machine = Machine<any, Event>(
           [EventType.SignedByProducer]: [
             {
               target: Status.SIGNED_BY_PRODUCER,
-              cond: "notHasPipeline"
+              cond: "notPipeline"
             },
             {
               target: Status.SENT,
@@ -303,7 +303,7 @@ const machine = Machine<any, Event>(
         );
       },
       hasPipeline: (_, event) => hasPipeline(event.formUpdateInput as any),
-      notHasPipeline: (_, event) => !hasPipeline(event.formUpdateInput as any)
+      notPipeline: (_, event) => !hasPipeline(event.formUpdateInput as any)
     }
   }
 );

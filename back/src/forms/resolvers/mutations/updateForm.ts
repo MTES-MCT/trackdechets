@@ -1,4 +1,4 @@
-import { EmitterType, Prisma } from "@prisma/client";
+import { EmitterType, Prisma, TransportMode } from "@prisma/client";
 import { isDangerous, BSDD_WASTE_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -75,13 +75,15 @@ const updateFormResolver = async (
 
   const form = flattenFormInput(formContent);
   const futureForm = { ...existingForm, ...form };
-  // Pipeline erases transporter
+  // Pipeline erases transporter EXCEPT for transporterTransportMode
   if (hasPipeline(form as any)) {
     Object.keys(form)
       .filter(key => key.startsWith("transporter"))
       .forEach(key => {
         form[key] = null;
       });
+    form.transporterTransportMode = TransportMode.OTHER;
+    // update futureForm  only for yup validation
     Object.keys(futureForm)
       .filter(key => key.startsWith("transporter"))
       .forEach(key => {

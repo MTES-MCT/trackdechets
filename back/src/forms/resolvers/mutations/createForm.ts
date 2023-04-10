@@ -1,4 +1,4 @@
-import { EmitterType, Prisma } from "@prisma/client";
+import { EmitterType, Prisma, TransportMode } from "@prisma/client";
 import { isDangerous } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -62,13 +62,14 @@ const createFormResolver = async (
   }
 
   const form = flattenFormInput(formContent);
-  // Pipeline erases transporter
+  // Pipeline erases transporter EXCEPT for transporterTransportMode
   if (hasPipeline(form as any)) {
     Object.keys(form)
       .filter(key => key.startsWith("transporter"))
       .forEach(key => {
         form[key] = null;
       });
+    form.transporterTransportMode = TransportMode.OTHER;
   }
 
   const readableId = getReadableId();
