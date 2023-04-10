@@ -171,13 +171,14 @@ describe("/oidc/authorize/decision", () => {
       .set("Cookie", sessionCookie)
       .query({ response_type: "code" })
       .query({ client_id: application.id })
+      .query({ nonce: "" })
       .query({ redirect_uri: application.redirectUris[0] })
       .query({ scope: "openid profile email companies" });
 
     const { transactionID } = authorize.body;
 
     await request
-      .post("/oidc/authorize/decision?scope=openid")
+      .post("/oidc/authorize/decision?scope=openid&nonce=wsd123")
       .set("Cookie", sessionCookie)
       .send(`transaction_id=${transactionID}`);
 
@@ -192,6 +193,7 @@ describe("/oidc/authorize/decision", () => {
     });
 
     expect(grant!.scope).toEqual(["openid", "profile", "email", "companies"]);
+    expect(grant.nonce).toBeTruthy(); // nonce is a random value when not provided in the request
   });
 
   it("should forbid funny scope values", async () => {
@@ -784,7 +786,8 @@ describe("/oidc/token - basic auth", () => {
         expires: 10 * 60,
         redirectUri: application.redirectUris[0],
         openIdEnabled: true,
-        scope: ["openid"]
+        scope: ["openid"],
+        nonce: "xyz"
       }
     });
     const clientCredentials = Buffer.from(
@@ -814,6 +817,7 @@ describe("/oidc/token - basic auth", () => {
     expect(protectedHeader).toEqual({ alg: "RS256" });
     expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
+    expect(payload.nonce).toEqual("xyz");
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toBe(undefined);
     expect(payload.emailVerified).toBe(undefined);
@@ -1057,6 +1061,7 @@ describe("/oidc/token - basic auth", () => {
     expect(protectedHeader).toEqual({ alg: "RS256" });
     expect(payload.aud).toEqual(application.id);
     expect(payload.iss).toEqual("trackdechets");
+
     expect(payload.sub).toEqual(user.id);
     expect(payload.email).toBe(undefined);
     expect(payload.email_verified).toBe(undefined);

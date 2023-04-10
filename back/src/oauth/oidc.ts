@@ -14,7 +14,7 @@ import {
   PROFILE_SCOPE,
   COMPANIES_SCOPE
 } from "./scopes";
-
+import xss from "xss";
 // Create OpenId Connect server
 export const oidc = createServer();
 
@@ -49,6 +49,7 @@ oidc.grant(
   // @ts-ignore
   grant.code(async (client, redirectUri, user, _ares, _areq, done) => {
     const scope = _areq.scope;
+    const nonce = _ares.nonce;
 
     if (!client.openIdEnabled) {
       return done(
@@ -65,6 +66,7 @@ oidc.grant(
         new AuthorizationError("Scope is mandatory", "invalid_scope")
       );
     }
+
     //missing oid scope item
     if (!scope.includes(OID_SCOPE)) {
       return done(
@@ -89,7 +91,8 @@ oidc.grant(
         expires: 1 * 60, // 1 minute
         openIdEnabled: true,
         redirectUri,
-        scope
+        scope,
+        nonce: xss(nonce)
       }
     });
     done(null, grant.code);
