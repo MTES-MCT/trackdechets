@@ -302,8 +302,12 @@ const machine = Machine<any, Event>(
           guard(event.formUpdateInput?.forwardedIn?.update)
         );
       },
-      hasPipeline: (_, event) => hasPipeline(event.formUpdateInput as any),
-      notPipeline: (_, event) => !hasPipeline(event.formUpdateInput as any)
+      hasPipeline: (_, event) =>
+        !!event.formUpdateInput?.wasteDetailsPackagingInfos &&
+        hasPipeline(event.formUpdateInput as any),
+      notPipeline: (_, event) =>
+        !event.formUpdateInput?.wasteDetailsPackagingInfos ||
+        !hasPipeline(event.formUpdateInput as any)
     }
   }
 );
