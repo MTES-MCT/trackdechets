@@ -22,7 +22,7 @@ $shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
       height: 4px;
       border-radius: 5px;
       background: #000091;
-      margin: 3px 0;
+      margin: 2px 0;
     }
   }
 
@@ -30,14 +30,13 @@ $shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
     position: absolute;
     right: 0;
     top: 45px;
-    transition: all 0.25s ease-out;
     transform: scale(0);
     transform-origin: 100% 0;
     box-shadow: $shadow;
     background: #fff;
     z-index: 99;
     padding: 0;
-    width: max-content;
+    min-width: 200px;
 
     li {
       display: block;
@@ -48,12 +47,13 @@ $shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
         margin: 0;
         padding: 16px;
         color: #000000;
+        font-size: 0.875rem; //14px;
+        height: 40px;
       }
     }
   }
 
   &__dropdown--active {
     transform: scale(1);
-    transition: all 0.25s linear;
   }
 }
