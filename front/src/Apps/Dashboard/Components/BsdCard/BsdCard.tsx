@@ -164,22 +164,24 @@ function BsdCard({
         {bsdDisplay && (
           <>
             <div className="bsd-card__header">
-              <p className="bsd-number">N°: {bsdDisplay.readableid}</p>
-              {bsdDisplay?.isTempStorage && (
-                <InfoWithIcon labelCode={InfoIconCode.TempStorage} />
-              )}
-              {updatedAt && (
-                <InfoWithIcon
-                  labelCode={InfoIconCode.LastModificationDate}
-                  date={updatedAt}
-                />
-              )}
-              {bsdDisplay?.emittedByEcoOrganisme && (
-                <InfoWithIcon labelCode={InfoIconCode.EcoOrganism} />
-              )}
-              <p className="workflow-type">
-                {getWorkflowLabel(bsdDisplay.bsdWorkflowType)}
-              </p>
+              <div>
+                <p className="bsd-number">N°: {bsdDisplay.readableid}</p>
+                {bsdDisplay?.isTempStorage && (
+                  <InfoWithIcon labelCode={InfoIconCode.TempStorage} />
+                )}
+                {updatedAt && (
+                  <InfoWithIcon
+                    labelCode={InfoIconCode.LastModificationDate}
+                    date={updatedAt}
+                  />
+                )}
+                {bsdDisplay?.emittedByEcoOrganisme && (
+                  <InfoWithIcon labelCode={InfoIconCode.EcoOrganism} />
+                )}
+                <p className="workflow-type">
+                  {getWorkflowLabel(bsdDisplay.bsdWorkflowType)}
+                </p>
+              </div>
             </div>
             <div className="bsd-card__content">
               <div className="bsd-card__content__infos">

@@ -5,30 +5,30 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 8px;
-
-  @include desktop {
-    padding: 0;
-  }
+  padding: 0;
 
   &__header {
     display: flex;
     flex-direction: column;
     color: #161616;
-    padding: 0 15px;
+    padding: 2px 8px;
 
     p {
       font-size: 0.75rem; //12px
     }
 
     @include desktop {
-      flex-direction: row;
-      align-items: center;
-      border-bottom: 1px solid #dddddd;
+      & > div {
+        display: flex;
+
+        flex-direction: row;
+        align-items: center;
+        border-bottom: 1px solid #dddddd;
+        width: 100%;
+      }
 
       p {
-        margin: 2px;
-        padding: 2px;
+        padding: 0 4px;
       }
     }
 
@@ -52,7 +52,7 @@
   &__content {
     display: flex;
     flex-direction: column;
-    padding: 5px 15px;
+    padding: 2px 8px;
 
     @include desktop {
       flex-direction: row;

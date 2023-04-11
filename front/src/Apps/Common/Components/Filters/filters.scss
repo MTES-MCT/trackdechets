@@ -12,6 +12,7 @@
       align-items: center;
       justify-content: space-between;
       margin-bottom: 0;
+      height: 90px;
     }
 
     &__item {
@@ -54,7 +55,7 @@
   }
 
   &__primary-cta {
-    margin: 20px 0;
+    margin: 10px 0;
     text-align: right;
   }
 }

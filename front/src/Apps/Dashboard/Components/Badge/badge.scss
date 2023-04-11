@@ -55,7 +55,7 @@
     background-color: #e3fdeb;
     color: #37635f;
     @include desktop {
-      width: 200px;
+      width: 205px;
     }
   }
   &--PROCESSED,
@@ -76,10 +76,14 @@
     background-color: #e5fbfd;
     color: #006a6f;
   }
-  &--TEMP_STORED,
   &--INTERMEDIATELY_PROCESSED {
     @include desktop {
       width: 200px;
+    }
+  }
+  &--TEMP_STORED {
+    @include desktop {
+      width: 255px;
     }
   }
 }

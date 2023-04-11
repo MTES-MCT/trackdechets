@@ -37,14 +37,14 @@ $shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
     background: #fff;
     z-index: 99;
     padding: 0;
+    width: max-content;
 
     li {
       display: block;
       width: 100%;
 
       .fr-btn {
-        width: max-content;
-        height: 56px;
+        width: 100%;
         margin: 0;
         padding: 16px;
         color: #000000;
@@ -54,6 +54,6 @@ $shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
 
   &__dropdown--active {
     transform: scale(1);
-    transition: all 0.25s cubic-bezier(0.5, 1.8, 0.9, 0.8);
+    transition: all 0.25s linear;
   }
 }

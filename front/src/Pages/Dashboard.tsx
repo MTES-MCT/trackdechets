@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
-import { generatePath, useParams, useRouteMatch } from "react-router-dom";
+import { useParams, useRouteMatch } from "react-router-dom";
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { Breadcrumb, BreadcrumbItem } from "@dataesr/react-dsfr";
 import routes from "../common/routes";
 import { GET_BSDS } from "../common/queries";
 import { OrderType, Query, QueryBsdsArgs } from "generated/graphql/types";
@@ -22,11 +21,6 @@ import {
   blankstate_follow_title,
   blankstate_history_desc,
   blankstate_history_title,
-  breadcrumb_archive,
-  breadcrumb_brouillon,
-  breadcrumb_pour_action,
-  breadcrumb_suivi,
-  breadcrumb_title,
   dropdown_create_btn,
   filter_reset_btn,
   filter_show_btn,
@@ -232,20 +226,6 @@ const DashboardPage = () => {
     }
   }, [isFiltersOpen, defaultWhere, fetchWithDefaultWhere]);
 
-  const getBreadcrumbItem = () => {
-    if (isActTab) {
-      return breadcrumb_pour_action;
-    }
-    if (isDraftTab) {
-      return breadcrumb_brouillon;
-    }
-    if (isFollowTab) {
-      return breadcrumb_suivi;
-    }
-    if (isArchivesTab) {
-      return breadcrumb_archive;
-    }
-  };
   const getBlankstateTitle = () => {
     if (isActTab) {
       return blankstate_action_title;
@@ -291,16 +271,6 @@ const DashboardPage = () => {
 
   return (
     <div className="dashboard-page">
-      <Breadcrumb>
-        <BreadcrumbItem
-          href={generatePath(routes.dashboardv2.index, {
-            siret,
-          })}
-        >
-          {breadcrumb_title}
-        </BreadcrumbItem>
-        <BreadcrumbItem>{getBreadcrumbItem()}</BreadcrumbItem>
-      </Breadcrumb>
       <div className="dashboard-page__actions">
         <div className="create-btn">
           <BsdCreateDropdown

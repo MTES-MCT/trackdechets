@@ -52,13 +52,6 @@ export const revision_action_label = "Réviser";
 export const supprimer_action_label = "Supprimer";
 export const completer_bsd_suite = "Compléter le BSD suite";
 
-// breadcrumb
-export const breadcrumb_title = "Mes Bordereaux";
-export const breadcrumb_pour_action = "Pour Action";
-export const breadcrumb_brouillon = "Brouillons";
-export const breadcrumb_suivi = "Suivi";
-export const breadcrumb_archive = "Archives";
-
 // blankstate
 export const blankstate_action_title = "Il n'y a aucun bordereau à signer";
 export const blankstate_action_desc = `Bonne nouvelle, vous n'avez aucun bordereau à signer ! Des
