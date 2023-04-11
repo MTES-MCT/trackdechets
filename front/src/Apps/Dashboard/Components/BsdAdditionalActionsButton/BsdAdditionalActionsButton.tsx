@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import classnames from "classnames";
 import FocusTrap from "focus-trap-react";
 import {
+  annexe1,
   apercu_action_label,
   completer_bsd_suite,
   dupliquer_action_label,
@@ -20,6 +21,7 @@ import {
   canUpdateBsd,
   canGeneratePdf,
   hasBsdSuite,
+  hasAppendix1Cta,
 } from "../../dashboardServices";
 
 import "./bsdAdditionalActionsButton.scss";
@@ -34,6 +36,7 @@ function BsdAdditionalActionsButton({
   onUpdate,
   onRevision,
   onBsdSuite,
+  onAppendix1,
 }: BsdAdditionalActionsButtonProps) {
   const [isOpen, setisOpen] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLElement>(null);
@@ -91,6 +94,10 @@ function BsdAdditionalActionsButton({
     closeMenu();
     onBsdSuite!(bsd);
   };
+  const handleAppendix1 = () => {
+    closeMenu();
+    onAppendix1!(bsd);
+  };
 
   const tabIndex = isOpen ? 0 : -1;
 
@@ -135,6 +142,19 @@ function BsdAdditionalActionsButton({
                 onClick={handleBsdSuite}
               >
                 {completer_bsd_suite}
+              </button>
+            </li>
+          )}
+          {hasAppendix1Cta(bsd) && (
+            <li>
+              <button
+                type="button"
+                data-testid="bsd-suite-btn"
+                className="fr-btn fr-btn--tertiary-no-outline"
+                tabIndex={tabIndex}
+                onClick={handleAppendix1}
+              >
+                {annexe1}
               </button>
             </li>
           )}

@@ -176,6 +176,14 @@ function BsdCardList({
     setIsModalOpen(true);
   }, []);
 
+  const onAppendix1 = useCallback(
+    (bsd: Bsd) => {
+      const path = routes.dashboardv2.bsdds.view;
+      redirectToPath(path, bsd.id);
+    },
+    [redirectToPath]
+  );
+
   return (
     <>
       <ul className="bsd-card-list">
@@ -192,6 +200,7 @@ function BsdCardList({
                 onOverview={onBsdOverview}
                 onRevision={onBsdRevision}
                 onBsdSuite={onBsdSuite}
+                onAppendix1={onAppendix1}
               />
             </li>
           );

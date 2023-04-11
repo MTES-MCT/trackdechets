@@ -10,4 +10,5 @@ export interface BsdCardProps {
   onUpdate?: Function;
   onRevision?: Function;
   onBsdSuite?: Function;
+  onAppendix1?: Function;
 }
