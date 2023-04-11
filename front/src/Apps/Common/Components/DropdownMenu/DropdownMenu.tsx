@@ -33,6 +33,11 @@ const DropdownMenu = ({ menuTitle, links, isDisabled }: DropdownMenuProps) => {
           <div className="dropdown-menu__content">
             {links.map(link => (
               <Link to={link.route} key={link.title}>
+                {link.icon && (
+                  <span className="dropdown-menu__content__icon">
+                    {link.icon}
+                  </span>
+                )}
                 {link.title}
               </Link>
             ))}

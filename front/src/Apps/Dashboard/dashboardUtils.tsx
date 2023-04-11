@@ -1,3 +1,4 @@
+import React from "react";
 import { generatePath } from "react-router-dom";
 import routes from "../../common/routes";
 import {
@@ -23,6 +24,13 @@ import {
 } from "../Common/wordings/dashboard/wordingsDashboard";
 import { BsdType, BsdWhere } from "../../generated/graphql/types";
 import { Filter, FilterType } from "../Common/Components/Filters/filtersTypes";
+import {
+  IconBSFFMedium as IconBSFF,
+  IconBSDaThin as IconBSDa,
+  IconBSVhuThin as IconBSVhu,
+  IconBSDDThin as IconBSDD,
+  IconBSDasriThin as IconBSDasri,
+} from "common/components/Icons";
 
 export const MAX_FILTER = 5;
 
@@ -154,23 +162,28 @@ export const dropdownCreateLinks = siret => [
   {
     title: dropdown_create_bsdd,
     route: generatePath(routes.dashboardv2.bsdds.create, { siret }),
+    icon: <IconBSDD />,
   },
   {
     title: dropdown_create_bsdasri,
     route: generatePath(routes.dashboardv2.bsdasris.create, { siret }),
+    icon: <IconBSDasri />,
   },
 
   {
     title: dropdown_create_bsvhu,
     route: generatePath(routes.dashboardv2.bsvhus.create, { siret }),
+    icon: <IconBSVhu />,
   },
   {
     title: dropdown_create_bsff,
     route: generatePath(routes.dashboardv2.bsffs.create, { siret }),
+    icon: <IconBSFF />,
   },
   {
     title: dropdown_create_bsda,
     route: generatePath(routes.dashboardv2.bsdas.create, { siret }),
+    icon: <IconBSDa />,
   },
 ];
 
