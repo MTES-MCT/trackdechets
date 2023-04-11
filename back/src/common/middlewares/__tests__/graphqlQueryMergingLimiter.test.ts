@@ -5,9 +5,8 @@ import { graphqlQueryMergingLimiter } from "../graphqlQueryMergingLimiter";
 
 const graphQLPath = "/gql";
 const mockResolver = jest.fn();
-const mockFormatError = jest.fn();
 
-describe("graphqlBatchLimiterMiddleware", () => {
+describe("graphqlQueryMergingLimiter Apollo Plugin", () => {
   let request;
 
   afterEach(() => {
@@ -31,8 +30,7 @@ describe("graphqlBatchLimiterMiddleware", () => {
     const server = new ApolloServer({
       typeDefs,
       resolvers,
-      formatError: mockFormatError,
-      plugins: [graphqlQueryMergingLimiter]
+      plugins: [graphqlQueryMergingLimiter()]
     });
 
     await server.start();
@@ -55,43 +53,36 @@ describe("graphqlBatchLimiterMiddleware", () => {
     const response = await request.post(graphQLPath).send({
       query:
         "{\n" +
-        '  _34035399400023: companyInfos(siret: "34035399400023") {\n' +
-        "  }\n" +
-        '  _20002305900112: companyInfos(siret: "20002305900112") {\n' +
-        "  }\n" +
-        '  _26030017300010: companyInfos(siret: "26030017300010") {\n' +
-        "  }\n" +
-        '  _53063610900429: companyInfos(siret: "53063610900429") {\n' +
-        "  }\n" +
-        '  _18008901307630: companyInfos(siret: "18008901307630") {\n' +
-        "  }\n" +
+        "  _34035399400023: companyInfos\n" +
+        "  _20002305900112: companyInfos\n" +
+        "  _26030017300010: companyInfos\n" +
+        "  _53063610900429: companyInfos\n" +
+        "  _18008901307630: companyInfos\n" +
         "}\n"
     });
     expect(response.status).toEqual(200);
   });
 
-  it("should fail if query merging has too many operations", async () => {
+  it("should fail if query merging has more than MAX_GQL_QUERY_PER_REQUEST operations", async () => {
     const response = await request.post(graphQLPath).send({
       query:
         "{\n" +
-        '  _34035399400023: companyInfos(siret: "34035399400023") {\n' +
-        "  }\n" +
-        '  _20002305900112: companyInfos(siret: "20002305900112") {\n' +
-        "  }\n" +
-        '  _26030017300010: companyInfos(siret: "26030017300010") {\n' +
-        "  }\n" +
-        '  _53063610900429: companyInfos(siret: "53063610900429") {\n' +
-        "  }\n" +
-        '  _18008901307630: companyInfos(siret: "18008901307630") {\n' +
-        "  }\n" +
-        '  _18008901307631: companyInfos(siret: "18008901307631") {\n' +
-        "  }\n" +
+        "  _34035399400023: companyInfos\n" +
+        "  _20002305900112: companyInfos\n" +
+        "  _26030017300010: companyInfos\n" +
+        "  _53063610900429: companyInfos\n" +
+        "  _18008901307630: companyInfos\n" +
+        "  _53063610900427: companyInfos\n" +
+        "  _34035399400013: companyInfos\n" +
+        "  _20002305900122: companyInfos\n" +
+        "  _26030017300030: companyInfos\n" +
+        "  _53063610900469: companyInfos\n" +
+        "  _18008901307650: companyInfos\n" +
         "}\n"
     });
     expect(response.status).toEqual(400);
-    const { error } = JSON.parse(response.text) as any;
-    expect(error).toContain(
-      "Batching by query merging is limited to 5 operations per query."
+    expect(response.body.errors[0].message).toContain(
+      "Batching by query merging is limited to 10 operations per query."
     );
   });
 });

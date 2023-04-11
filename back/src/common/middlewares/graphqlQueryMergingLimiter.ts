@@ -7,8 +7,11 @@ import { GraphQLError, OperationDefinitionNode } from "graphql";
 export function graphqlQueryMergingLimiter(): ApolloServerPlugin {
   return {
     async requestDidStart(_: GraphQLRequestContext) {
-      const MAX_GQL_QUERY_PER_REQUEST =
-        parseInt(process.env.MAX_GQL_QUERY_PER_REQUEST, 10) ?? 10;
+      const MAX_GQL_QUERY_PER_REQUEST = isNaN(
+        parseInt(process.env.MAX_GQL_QUERY_PER_REQUEST, 10)
+      )
+        ? 10
+        : parseInt(process.env.MAX_GQL_QUERY_PER_REQUEST, 10);
       return {
         async didResolveOperation(requestContext: GraphQLRequestContext) {
           const [definition] = requestContext?.document
