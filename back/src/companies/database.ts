@@ -234,6 +234,11 @@ export async function getActiveAdminsByCompanyIds(
 
 /**
  * Get all the companies and admins from companies, by companyOrgIds
+ * Will return an object like:
+ * {
+ *   companies: { [orgId]: company},
+ *   admins: { [ordId]: user[] }
+ * }
  */
 export const getCompaniesAndActiveAdminsByCompanyOrgIds = async (
   orgIds: string[]
