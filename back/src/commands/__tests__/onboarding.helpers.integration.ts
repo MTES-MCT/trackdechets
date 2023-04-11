@@ -1,4 +1,8 @@
-import { MembershipRequestStatus, UserRole } from "@prisma/client";
+import {
+  BsdaRevisionRequest,
+  MembershipRequestStatus,
+  UserRole
+} from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import {
   addUserToCompany,
@@ -10,6 +14,7 @@ import {
   userWithCompanyFactory
 } from "../../__tests__/factories";
 import {
+  BsddRevisionRequestWithReadableId,
   getActiveUsersWithPendingMembershipRequests,
   getPendingBSDARevisionRequestsWithAdmins,
   getPendingBSDDRevisionRequestsWithAdmins,
@@ -21,6 +26,7 @@ import prisma from "../../prisma";
 import { bsdaFactory } from "../../bsda/__tests__/factories";
 
 const TODAY = new Date();
+const ONE_DAY_AGO = xDaysAgo(TODAY, 1);
 const TWO_DAYS_AGO = xDaysAgo(TODAY, 2);
 const THREE_DAYS_AGO = xDaysAgo(TODAY, 3);
 const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
@@ -483,6 +489,10 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
     // Then
     expect(pendingBSDRevisionRequest.length).toEqual(1);
     expect(pendingBSDRevisionRequest[0].id).toEqual(request.id);
+    expect(
+      (pendingBSDRevisionRequest[0] as BsddRevisionRequestWithReadableId).bsdd
+        .readableId
+    ).toEqual(bsdd.readableId);
     expect(pendingBSDRevisionRequest[0].approvals.length).toEqual(1);
     expect(pendingBSDRevisionRequest[0].approvals[0].admins.length).toEqual(1);
     expect(pendingBSDRevisionRequest[0].approvals[0].admins[0].id).toEqual(
@@ -493,7 +503,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
     );
   });
 
-  it("should return pending request and company admins xDaysAgo", async () => {
+  it("should not return pending request and company admins NOT xDaysAgo", async () => {
     // Given
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
@@ -510,6 +520,22 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
       data: {
         createdAt: THREE_DAYS_AGO,
         bsddId: bsdd.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret } },
+        comment: ""
+      }
+    });
+
+    const bsdd2 = await formFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: companyOfSomeoneElse.siret }
+    });
+
+    // Should not be returned because 1 day ago
+    await prisma.bsddRevisionRequest.create({
+      data: {
+        createdAt: ONE_DAY_AGO,
+        bsddId: bsdd2.id,
         authoringCompanyId: companyOfSomeoneElse.id,
         approvals: { create: { approverSiret: company.siret } },
         comment: ""
@@ -611,6 +637,10 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
     expect(pendingBSDRevisionRequest.length).toEqual(2);
 
     expect(pendingBSDRevisionRequest[0].id).toEqual(request.id);
+    expect(
+      (pendingBSDRevisionRequest[0] as BsddRevisionRequestWithReadableId).bsdd
+        .readableId
+    ).toEqual(bsdd.readableId);
     expect(pendingBSDRevisionRequest[0].approvals.length).toEqual(1);
     expect(pendingBSDRevisionRequest[0].approvals[0].admins.length).toEqual(1);
     expect(pendingBSDRevisionRequest[0].approvals[0].admins[0].id).toEqual(
@@ -621,6 +651,10 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
     );
 
     expect(pendingBSDRevisionRequest[1].id).toEqual(request2.id);
+    expect(
+      (pendingBSDRevisionRequest[1] as BsddRevisionRequestWithReadableId).bsdd
+        .readableId
+    ).toEqual(bsdd2.readableId);
     expect(pendingBSDRevisionRequest[1].approvals.length).toEqual(1);
     expect(pendingBSDRevisionRequest[1].approvals[0].admins.length).toEqual(1);
     expect(pendingBSDRevisionRequest[1].approvals[0].admins[0].id).toEqual(
@@ -662,6 +696,10 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
     // Then
     expect(pendingBSDRevisionRequest.length).toEqual(1);
     expect(pendingBSDRevisionRequest[0].id).toEqual(request.id);
+    expect(
+      (pendingBSDRevisionRequest[0] as BsddRevisionRequestWithReadableId).bsdd
+        .readableId
+    ).toEqual(bsdd.readableId);
     expect(pendingBSDRevisionRequest[0].approvals.length).toEqual(1);
     expect(pendingBSDRevisionRequest[0].approvals[0].company.id).toEqual(
       company.id
@@ -706,6 +744,10 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
     // Then
     expect(pendingBSDRevisionRequest.length).toEqual(1);
     expect(pendingBSDRevisionRequest[0].id).toEqual(request.id);
+    expect(
+      (pendingBSDRevisionRequest[0] as BsddRevisionRequestWithReadableId).bsdd
+        .readableId
+    ).toEqual(bsdd.readableId);
     expect(pendingBSDRevisionRequest[0].approvals.length).toEqual(1);
     expect(pendingBSDRevisionRequest[0].approvals[0].company.id).toEqual(
       company.id
@@ -762,6 +804,9 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
     // Then
     expect(pendingBSDARevisionRequest.length).toEqual(1);
     expect(pendingBSDARevisionRequest[0].id).toEqual(request.id);
+    expect(
+      (pendingBSDARevisionRequest[0] as BsdaRevisionRequest).bsdaId
+    ).toEqual(bsda.id);
     expect(pendingBSDARevisionRequest[0].approvals.length).toEqual(1);
     expect(pendingBSDARevisionRequest[0].approvals[0].company.id).toEqual(
       company.id
@@ -772,7 +817,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
     );
   });
 
-  it("should return pending request and company admins xDaysAgo", async () => {
+  it("should not return pending request and company admins NOT xDaysAgo", async () => {
     // Given
     const { company } = await userWithCompanyFactory("ADMIN");
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
@@ -791,6 +836,24 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
       data: {
         createdAt: THREE_DAYS_AGO,
         bsdaId: bsda.id,
+        authoringCompanyId: companyOfSomeoneElse.id,
+        approvals: { create: { approverSiret: company.siret } },
+        comment: ""
+      }
+    });
+
+    const bsda2 = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: company.siret,
+        transporterCompanySiret: companyOfSomeoneElse.siret
+      }
+    });
+
+    // Should not be returned because 1 day ago
+    await prisma.bsdaRevisionRequest.create({
+      data: {
+        createdAt: ONE_DAY_AGO,
+        bsdaId: bsda2.id,
         authoringCompanyId: companyOfSomeoneElse.id,
         approvals: { create: { approverSiret: company.siret } },
         comment: ""
@@ -898,6 +961,9 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
     expect(pendingBSDARevisionRequest.length).toEqual(2);
 
     expect(pendingBSDARevisionRequest[0].id).toEqual(request.id);
+    expect(
+      (pendingBSDARevisionRequest[0] as BsdaRevisionRequest).bsdaId
+    ).toEqual(bsda.id);
     expect(pendingBSDARevisionRequest[0].approvals.length).toEqual(1);
     expect(pendingBSDARevisionRequest[0].approvals[0].admins.length).toEqual(1);
     expect(pendingBSDARevisionRequest[0].approvals[0].admins[0].id).toEqual(
@@ -908,6 +974,9 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
     );
 
     expect(pendingBSDARevisionRequest[1].id).toEqual(request2.id);
+    expect(
+      (pendingBSDARevisionRequest[1] as BsdaRevisionRequest).bsdaId
+    ).toEqual(bsda2.id);
     expect(pendingBSDARevisionRequest[1].approvals.length).toEqual(1);
     expect(pendingBSDARevisionRequest[1].approvals[0].admins.length).toEqual(1);
     expect(pendingBSDARevisionRequest[1].approvals[0].admins[0].id).toEqual(
@@ -934,7 +1003,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
       }
     });
 
-    await prisma.bsdaRevisionRequest.create({
+    const request = await prisma.bsdaRevisionRequest.create({
       data: {
         createdAt: TWO_DAYS_AGO,
         bsdaId: bsda.id,
@@ -951,6 +1020,10 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
     // Then
     expect(pendingBSDARevisionRequest.length).toEqual(1);
     expect(pendingBSDARevisionRequest[0].approvals.length).toEqual(1);
+    expect(pendingBSDARevisionRequest[0].id).toEqual(request.id);
+    expect(
+      (pendingBSDARevisionRequest[0] as BsdaRevisionRequest).bsdaId
+    ).toEqual(bsda.id);
     expect(pendingBSDARevisionRequest[0].approvals[0].company.id).toEqual(
       company.id
     );
@@ -996,6 +1069,9 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
     // Then
     expect(pendingBSDARevisionRequest.length).toEqual(1);
     expect(pendingBSDARevisionRequest[0].id).toEqual(request.id);
+    expect(
+      (pendingBSDARevisionRequest[0] as BsdaRevisionRequest).bsdaId
+    ).toEqual(bsda.id);
     expect(pendingBSDARevisionRequest[0].approvals.length).toEqual(1);
     expect(pendingBSDARevisionRequest[0].approvals[0].company.id).toEqual(
       company.id

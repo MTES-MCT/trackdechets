@@ -302,12 +302,30 @@ export const sendPendingMembershipRequestToAdminDetailsEmail = async (
   await prisma.$disconnect();
 };
 
+export interface BsddRevisionRequestWithReadableId extends BsddRevisionRequest {
+  bsdd: { readableId: string };
+}
+
 type RequestWithApprovals =
-  | (BsddRevisionRequest & {
+  | (BsddRevisionRequestWithReadableId & {
       approvals: BsddRevisionRequestApproval[];
     })
   | (BsdaRevisionRequest & {
       approvals: BsdaRevisionRequestApproval[];
+    });
+
+type RequestWithWrappedApprovals =
+  | (BsddRevisionRequestWithReadableId & {
+      approvals: (BsddRevisionRequestApproval & {
+        admins: User[];
+        company: Company;
+      })[];
+    })
+  | (BsdaRevisionRequest & {
+      approvals: (BsdaRevisionRequestApproval & {
+        admins: User[];
+        company: Company;
+      })[];
     });
 
 /**
@@ -315,7 +333,7 @@ type RequestWithApprovals =
  */
 export const addPendingApprovalsCompanyAdmins = async (
   requests: RequestWithApprovals[]
-) => {
+): Promise<RequestWithWrappedApprovals[]> => {
   // Extract all pending company sirets
   const companySirets: string[] = requests
     .map(request =>
@@ -348,20 +366,6 @@ export const addPendingApprovalsCompanyAdmins = async (
   });
 };
 
-type RequestWithWrappedApprovals =
-  | (BsddRevisionRequest & {
-      approvals: (BsddRevisionRequestApproval & {
-        admins: User[];
-        company: Company;
-      })[];
-    })
-  | (BsdaRevisionRequest & {
-      approvals: (BsdaRevisionRequestApproval & {
-        admins: User[];
-        company: Company;
-      })[];
-    });
-
 export const getPendingBSDDRevisionRequestsWithAdmins = async (
   daysAgo: number
 ): Promise<RequestWithWrappedApprovals[]> => {
@@ -376,7 +380,7 @@ export const getPendingBSDDRevisionRequestsWithAdmins = async (
       createdAt: { gte: requestDateGt, lt: requestDateLt },
       status: RevisionRequestStatus.PENDING
     },
-    include: { approvals: true }
+    include: { approvals: true, bsdd: { select: { readableId: true } } }
   });
 
   // Add admins to requests
@@ -427,7 +431,7 @@ export const sendPendingRevisionRequestToAdminDetailsEmail = async (
         const variables = {
           requestCreatedAt: formatDate(request.createdAt),
           bsdReadableId:
-            (request as BsddRevisionRequest).bsddId ??
+            (request as BsddRevisionRequestWithReadableId).bsdd?.readableId ??
             (request as BsdaRevisionRequest).bsdaId,
           companyName: approval.company.name,
           companyOrgId: approval.company.orgId
