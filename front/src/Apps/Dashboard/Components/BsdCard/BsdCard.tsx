@@ -45,6 +45,7 @@ function BsdCard({
   onUpdate,
   onRevision,
   onBsdSuite,
+  onAppendix1,
 }: BsdCardProps) {
   const bsdDisplay = getBsdView(bsd);
 
@@ -234,6 +235,7 @@ function BsdCard({
                   onRevision={onRevision!}
                   onPdf={onPdf}
                   onBsdSuite={onBsdSuite}
+                  onAppendix1={onAppendix1}
                 />
               </div>
             </div>

@@ -10,4 +10,5 @@ export interface BsdAdditionalActionsButtonProps {
   onDelete: Function;
   onRevision: Function;
   onBsdSuite?: Function;
+  onAppendix1?: Function;
 }

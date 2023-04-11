@@ -723,3 +723,11 @@ export const canUpdateBsd = (bsd, siret) =>
   canUpdateBsvhu(bsd);
 
 export const canGeneratePdf = bsd => bsd.type === BsdType.Bsff || !bsd.isDraft;
+
+export const hasAppendix1Cta = (bsd: BsdDisplay): boolean => {
+  return (
+    bsd.type === BsdType.Bsdd &&
+    bsd?.emitterType === EmitterType.Appendix1 &&
+    (BsdStatusCode.Sealed === bsd.status || BsdStatusCode.Sent === bsd.status)
+  );
+};
