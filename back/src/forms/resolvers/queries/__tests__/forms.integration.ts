@@ -887,4 +887,36 @@ describe("Integration / Forms query for transporters", () => {
     expect(data.forms.length).toBe(1);
     expect(data.forms[0].id).toBe(form.id);
   });
+
+  it("should return my forms only if I am a foreign transporter", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN", {
+      siret: null,
+      orgId: "ESA15022510",
+      vatNumber: "ESA15022510",
+      companyTypes: {
+        set: ["TRANSPORTER"]
+      }
+    });
+
+    // this form should be returned
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        transporterCompanySiret: null,
+        transporterCompanyVatNumber: company.vatNumber,
+        transportersSirets: [company.vatNumber]
+      }
+    });
+
+    const anotherUser = await userFactory();
+    // this form should not be returned
+    await formFactory({ ownerId: anotherUser.id });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query<Pick<Query, "forms">>(FORMS);
+
+    expect(data.forms).toHaveLength(1);
+    expect(data.forms[0].id).toEqual(form.id);
+  });
 });
