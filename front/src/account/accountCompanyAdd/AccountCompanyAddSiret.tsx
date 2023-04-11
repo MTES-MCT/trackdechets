@@ -1,7 +1,7 @@
 import { ApolloError, gql, useLazyQuery, useMutation } from "@apollo/client";
 import { Field, Form, Formik, useFormikContext } from "formik";
 import React, { useEffect, useState } from "react";
-import { COMPANY_PRIVATE_INFOS } from "form/common/components/company/query";
+import { COMPANY_ACCOUNT_ADD_PRIVATE_INFOS } from "form/common/components/company/query";
 import AccountCompanyAddMembershipRequest from "./AccountCompanyAddMembershipRequest";
 import styles from "../AccountCompanyAdd.module.scss";
 import { Mutation, Query } from "generated/graphql/types";
@@ -153,7 +153,7 @@ export default function AccountCompanyAddSiret({
 
   const [searchCompany, { loading, error }] = useLazyQuery<
     Pick<Query, "companyPrivateInfos">
-  >(COMPANY_PRIVATE_INFOS, {
+  >(COMPANY_ACCOUNT_ADD_PRIVATE_INFOS, {
     onCompleted: data => {
       if (data?.companyPrivateInfos) {
         const companyInfos = data.companyPrivateInfos;
@@ -172,7 +172,7 @@ export default function AccountCompanyAddSiret({
           setIsRegistered(companyInfos?.isRegistered ?? false);
           setIsClosed(false);
         } else {
-          // This is just a security if we change COMPANY_PRIVATE_INFOS behavior
+          // This is just a security if we change COMPANY_ACCOUNT_ADD_PRIVATE_INFOS behavior
           // because it must raise an error in this case.
           setIsClosed(true);
         }

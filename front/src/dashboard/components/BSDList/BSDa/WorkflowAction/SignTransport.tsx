@@ -4,6 +4,7 @@ import { GET_BSDS } from "common/queries";
 import routes from "common/routes";
 import { UPDATE_BSDA } from "form/bsda/stepper/queries";
 import { Transport } from "form/bsda/stepper/steps/Transport";
+import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 import { getComputedState } from "form/common/getComputedState";
 import { Field, Form, Formik } from "formik";
 import {
@@ -148,6 +149,7 @@ export function SignTransport({
                   signant ce document, je déclare prendre en charge le déchet.
                   La signature est horodatée.
                 </p>
+                <TransporterReceipt transporter={bsda.transporter!} />
                 <div className="form__row">
                   <label>
                     Nom du signataire

@@ -13,9 +13,10 @@ import { IconPaperWrite } from "common/components/Icons";
 import { NotificationError } from "common/components/Error";
 import TdModal from "common/components/Modal";
 import ActionButton from "common/components/ActionButton";
+import TdSwitch from "common/components/Switch";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import DateInput from "form/common/components/custom-inputs/DateInput";
 import { FieldTransportModeSelect } from "common/components";
+import { isForeignVat } from "generated/constants/companySearchHelpers";
 
 const EDIT_SEGMENT = gql`
   mutation editSegment(
@@ -83,12 +84,21 @@ export default function EditSegment({ siret, segment }: Props) {
             {({ values, setFieldValue }) => (
               <FormikForm>
                 <h3>Modifier un transfert multimodal</h3>
-                <label htmlFor="id_mode">Mode de transport</label>
-                <Field
-                  id="id_mode"
-                  name="mode"
-                  component={FieldTransportModeSelect}
-                ></Field>
+                <div className="form__row">
+                  <label htmlFor="id_mode">Mode de transport</label>
+                  <Field
+                    id="id_mode"
+                    name="mode"
+                    component={FieldTransportModeSelect}
+                  ></Field>
+                  <label htmlFor="id_numberPlate">Immatriculation</label>
+                  <Field
+                    type="text"
+                    name="transporter.numberPlate"
+                    id="id_numberPlate"
+                    className="td-input"
+                  />
+                </div>
                 <h4 className="form__section-heading">Transporteur</h4>
 
                 {!segment.readyToTakeOver ? (
@@ -147,53 +157,28 @@ export default function EditSegment({ siret, segment }: Props) {
                     </div>
                   </>
                 )}
+                {!isForeignVat(values.transporter?.company?.vatNumber!) && (
+                  <>
+                    <h4 className="form__section-heading">
+                      Exemption de récépissé de déclaration de transport de
+                      déchets
+                    </h4>
 
-                <h4 className="form__section-heading">Autorisations</h4>
-                <div className="form__row">
-                  <label htmlFor="isExemptedOfReceipt" className="tw-mb-2">
-                    <Field
-                      type="checkbox"
-                      name="transporter.isExemptedOfReceipt"
-                      id="isExemptedOfReceipt"
-                      checked={values?.transporter?.isExemptedOfReceipt}
-                      className="td-input"
-                    />
-                    Le transporteur déclare être exempté de récépissé
-                    conformément aux dispositions de l'article R.541-50 du code
-                    de l'environnement.
-                  </label>
-                </div>
-                {!values?.transporter?.isExemptedOfReceipt && (
-                  <div className="form__row">
-                    <label htmlFor="id_receipt">Numéro de récépissé</label>
-                    <Field
-                      type="text"
-                      name="transporter.receipt"
-                      id="id_receipt"
-                      className="td-input"
-                    />
-                    <label htmlFor="id_department">Département</label>
-                    <Field
-                      type="text"
-                      name="transporter.department"
-                      id="id_department"
-                      className="td-input"
-                    />
-                    <label htmlFor="id_validityLimit">Limite de validité</label>
-                    <Field
-                      component={DateInput}
-                      name="transporter.validityLimit"
-                      id="id_validityLimit"
-                      className="td-input"
-                    />
-                    <label htmlFor="id_numberPlate">Immatriculation</label>
-                    <Field
-                      type="text"
-                      name="transporter.numberPlate"
-                      id="id_numberPlate"
-                      className="td-input"
-                    />
-                  </div>
+                    <div className="form__row">
+                      <TdSwitch
+                        checked={!!values.transporter?.isExemptedOfReceipt}
+                        onChange={checked =>
+                          setFieldValue(
+                            "transporter.isExemptedOfReceipt",
+                            checked
+                          )
+                        }
+                        label="Le transporteur déclare être exempté de récépissé conformément
+                      aux dispositions de l'article R.541-50 du code de
+                      l'environnement."
+                      />
+                    </div>
+                  </>
                 )}
                 {error && <NotificationError apolloError={error} />}
 

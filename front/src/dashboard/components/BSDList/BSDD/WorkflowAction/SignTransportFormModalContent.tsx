@@ -20,6 +20,7 @@ import { FormWasteTransportSummary } from "dashboard/components/BSDList/BSDD/Wor
 import { FormJourneySummary } from "dashboard/components/BSDList/BSDD/WorkflowAction/FormJourneySummary";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import SignatureCodeInput from "form/common/components/custom-inputs/SignatureCodeInput";
+import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 
 const getValidationSchema = (today: Date) =>
   yup.object({
@@ -144,7 +145,7 @@ function SignTransportFormModalContent({
           <FormikForm>
             <FormWasteTransportSummary form={form} />
             <FormJourneySummary form={form} />
-
+            <TransporterReceipt transporter={form.transporter!} />
             <p>
               En qualité de <strong>transporteur du déchet</strong>, j'atteste
               que les informations ci-dessus sont correctes. En signant ce
