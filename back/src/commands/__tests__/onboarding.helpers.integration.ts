@@ -544,7 +544,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
     const admin1 = company1.user;
 
     // Admin0 is in 2 elligible companies, but should be returned only once
-    addUserToCompany(admin0, company1.company, "MEMBER", {
+    await addUserToCompany(admin0, company1.company, "MEMBER", {
       createdAt: TWO_DAYS_AGO
     });
 
@@ -625,19 +625,19 @@ describe("getRecentlyRegisteredProfesionals", () => {
 
     // Should be returned
     const company0user1 = await userFactory();
-    addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
+    await addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
       createdAt: TWO_DAYS_AGO
     });
 
     // Should not be returned cause joined 3 days ago
     const company0user2 = await userFactory();
-    addUserToCompany(company0user2, company0AndAdmin0.company, "MEMBER", {
+    await addUserToCompany(company0user2, company0AndAdmin0.company, "MEMBER", {
       createdAt: THREE_DAYS_AGO
     });
 
     // Should not be returned cause joined 1 day ago
     const company0user3 = await userFactory();
-    addUserToCompany(company0user3, company0AndAdmin0.company, "MEMBER", {
+    await addUserToCompany(company0user3, company0AndAdmin0.company, "MEMBER", {
       createdAt: ONE_DAY_AGO
     });
 
@@ -672,7 +672,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
 
     // Should be returned
     const company0user1 = await userFactory();
-    addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
+    await addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
       createdAt: TWO_DAYS_AGO
     });
 
@@ -714,7 +714,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
 
     // Should not be returned because non-profesional
     const company0user1 = await userFactory();
-    addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
+    await addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
       createdAt: TWO_DAYS_AGO
     });
 
@@ -764,7 +764,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
 
     // Should not be returned because belongs to non-profesional company
     const company0user1 = await userFactory();
-    addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
+    await addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
       createdAt: TWO_DAYS_AGO
     });
 
@@ -795,7 +795,7 @@ describe("getRecentlyRegisteredNonProfesionals", () => {
 
     // Should be returned
     const company0user1 = await userFactory();
-    addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
+    await addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
       createdAt: TWO_DAYS_AGO
     });
 
@@ -812,7 +812,7 @@ describe("getRecentlyRegisteredNonProfesionals", () => {
 
     // Should not be returned because one day ago
     const company1user1 = await userFactory();
-    addUserToCompany(company1user1, company1AndAdmin0.company, "MEMBER", {
+    await addUserToCompany(company1user1, company1AndAdmin0.company, "MEMBER", {
       createdAt: ONE_DAY_AGO
     });
 
@@ -872,7 +872,7 @@ describe("getRecentlyRegisteredNonProfesionals", () => {
     const admin1 = company1AndAdmin1.user;
 
     // Should not be returned twice!
-    addUserToCompany(admin0, company1AndAdmin1.company, "MEMBER", {
+    await addUserToCompany(admin0, company1AndAdmin1.company, "MEMBER", {
       createdAt: TWO_DAYS_AGO
     });
 
@@ -920,7 +920,7 @@ describe("getRecentlyRegisteredNonProfesionals", () => {
 
     // Should not be returned
     const company0user1 = await userFactory();
-    addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
+    await addUserToCompany(company0user1, company0AndAdmin0.company, "MEMBER", {
       createdAt: TWO_DAYS_AGO
     });
 

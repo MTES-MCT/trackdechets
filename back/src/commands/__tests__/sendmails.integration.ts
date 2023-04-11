@@ -9,7 +9,10 @@ import {
   sendSecondOnboardingEmail
 } from "../onboarding.helpers";
 
-import { userFactory, userWithCompanyFactory } from "../../__tests__/factories";
+import {
+  //userFactory,
+  userWithCompanyFactory
+} from "../../__tests__/factories";
 import prisma from "../../prisma";
 
 // Intercept calls
@@ -235,3 +238,4 @@ describe("sendOnboardingFirstStepMails", () => {
       );
     });
   });
+});
