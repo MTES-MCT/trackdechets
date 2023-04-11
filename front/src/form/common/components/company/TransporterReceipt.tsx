@@ -56,14 +56,17 @@ export default function TransporterReceipt({
           <>
             {recepisse.number ? (
               <p>
-                Numéro {recepisse.number}, départment {recepisse.department},
-                date limite de validité {formatDate(recepisse.validityLimit!)}
+                Numéro: {recepisse.number}, département: {recepisse.department},
+                date limite de validité: {formatDate(recepisse.validityLimit!)}.
+                <br />
+                Informations complétées par le transporteur dans son profil
+                Trackdéchets.
               </p>
             ) : (
               <p>
                 L'entreprise de transport n'a pas complété ces informations dans
-                son profil. Nous ne pouvons pas afficher les information. Il lui
-                appartient de les compléter.
+                son profil Trackdéchets. Nous ne pouvons pas les afficher. Il
+                lui appartient de les compléter.
               </p>
             )}
           </>
