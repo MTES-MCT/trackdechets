@@ -7,6 +7,7 @@ updates:
     open-pull-requests-limit: 0
     allow:
       - dependency-type: "production"
+    target-branch: "dev"
   - package-ecosystem: "npm"
     directory: "/search"
     schedule:
@@ -14,6 +15,7 @@ updates:
     open-pull-requests-limit: 0
     allow:
       - dependency-type: "production"
+    target-branch: "dev"
   - package-ecosystem: "npm"
     directory: "/front"
     schedule:
@@ -21,6 +23,7 @@ updates:
     open-pull-requests-limit: 0
     allow:
       - dependency-type: "production"
+    target-branch: "dev"
   - package-ecosystem: "npm"
     directory: "/doc"
     schedule:
@@ -28,3 +31,5 @@ updates:
     open-pull-requests-limit: 0
     allow:
       - dependency-type: "production"
+    target-branch: "dev"
+
