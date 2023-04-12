@@ -19,7 +19,7 @@ import { ROAD_CONTROL_SLUG } from "./common/constants";
 import { ErrorCode } from "./common/errors";
 import errorHandler from "./common/middlewares/errorHandler";
 import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";
-import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
+import { graphqlBodyParser } from "./common/middlewares/graphqlBodyParser";
 import { graphqlQueryParserMiddleware } from "./common/middlewares/graphqlQueryParser";
 import { graphqlRateLimiterMiddleware } from "./common/middlewares/graphqlRatelimiter";
 import { graphqlRegenerateSessionMiddleware } from "./common/middlewares/graphqlRegenerateSession";
@@ -277,7 +277,7 @@ app.use(
   })
 );
 
-app.use((req, res, next) => {
+app.use(function checkBlacklist(req, res, next) {
   if (req.user && blacklist.includes(req.user.email)) {
     return res.send("Too Many Requests").status(429);
   }
