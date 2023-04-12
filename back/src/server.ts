@@ -124,6 +124,18 @@ if (Sentry) {
   app.use(Sentry.Handlers.requestHandler());
 }
 
+/**
+ * Set the following headers for cross-domain cookie
+ * Access-Control-Allow-Credentials: true
+ * Access-Control-Allow-Origin: $UI_DOMAIN
+ */
+app.use(
+  cors({
+    origin: UI_BASE_URL,
+    credentials: true
+  })
+);
+
 const RATE_LIMIT_WINDOW_SECONDS = 60;
 
 app.use(
@@ -185,18 +197,6 @@ app.use(
 app.use(loggingMiddleware(graphQLPath));
 
 app.use(graphQLPath, timeoutMiddleware());
-
-/**
- * Set the following headers for cross-domain cookie
- * Access-Control-Allow-Credentials: true
- * Access-Control-Allow-Origin: $UI_DOMAIN
- */
-app.use(
-  cors({
-    origin: UI_BASE_URL,
-    credentials: true
-  })
-);
 
 // configure session for passport local strategy
 const RedisStore = redisStore(session);
