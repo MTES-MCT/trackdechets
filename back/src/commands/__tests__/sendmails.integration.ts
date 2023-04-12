@@ -1,19 +1,24 @@
 import axios from "axios";
 import { resetDatabase } from "../../../integration-tests/helper";
-import { CompanyType } from "@prisma/client";
+import { CompanyType, MembershipRequestStatus } from "@prisma/client";
 import * as producer from "../../queue/producers/mail";
 import { backend } from "../../mailer";
 
 import {
-  // sendFirstOnboardingEmail,
-  sendSecondOnboardingEmail
+  sendMembershipRequestDetailsEmail,
+  sendPendingMembershipRequestDetailsEmail,
+  sendPendingMembershipRequestToAdminDetailsEmail,
+  sendSecondOnboardingEmail,
+  xDaysAgo
 } from "../onboarding.helpers";
 
 import {
+  companyFactory,
+  createMembershipRequest,
+  userFactory,
   //userFactory,
   userWithCompanyFactory
 } from "../../__tests__/factories";
-import prisma from "../../prisma";
 
 // Intercept calls
 const mockedSendMailBackend = jest.spyOn(backend, "sendMail");
@@ -26,7 +31,13 @@ mockAddToMailQueue.mockRejectedValue(
 const mockedAxiosPost = jest.spyOn(axios, "post");
 mockedAxiosPost.mockResolvedValue(null);
 
-describe("sendOnboardingFirstStepMails", () => {
+const TODAY = new Date();
+const ONE_DAY_AGO = xDaysAgo(TODAY, 1);
+const TWO_DAYS_AGO = xDaysAgo(TODAY, 2);
+const THREE_DAYS_AGO = xDaysAgo(TODAY, 3);
+const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
+
+describe("sendSecondOnboardingEmail", () => {
   afterEach(resetDatabase);
   beforeEach(() => {
     mockedAxiosPost.mockClear();
@@ -34,208 +45,349 @@ describe("sendOnboardingFirstStepMails", () => {
     mockAddToMailQueue.mockClear();
   });
 
-  //   it("should send a request to mail service for onboarding first step", async () => {
-  //     (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
-  //       Promise.resolve({
-  //         data: { results: "something" }
-  //       })
-  //     );
-  //     const yesterday = new Date();
-  //     yesterday.setDate(yesterday.getDate() - 1);
-  //     const user = await userFactory({ firstAssociationDate: yesterday });
-  //     // Users firstAssociationDate today and 2 days ago, should not receive any email
-  //     await userFactory();
-  //     const twoDaysAgo = new Date();
-  //     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-  //     await userFactory({ firstAssociationDate: twoDaysAgo });
-
-  //     await sendFirstOnboardingEmail();
-
-  //     expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
-  //     expect(mockedAxiosPost).toHaveBeenCalledWith(
-  //       "http://mailservice/smtp/email",
-  //       {
-  //         subject: "Bienvenue sur Trackdéchets, démarrez dès aujourd’hui !",
-  //         templateId: 12, // hardcoded console FIRST_ONBOARDING_TEMPLATE_ID template ID
-  //         sender: {
-  //           email: "us@td.test",
-  //           name: "Wastetracker corp."
-  //         },
-  //         to: [
-  //           {
-  //             email: user.email,
-  //             name: user.name
-  //           }
-  //         ],
-  //         params: {
-  //           body: ""
-  //         },
-
-  //         cc: undefined
-  //       },
-  //       expect.objectContaining({
-  //         headers: {
-  //           "Content-Type": "application/json"
-  //         },
-  //         timeout: 5000
-  //       })
-  //     );
-  //   });
-  // });
-
-  describe("sendOnboardingSecondStepMails", () => {
-    afterEach(resetDatabase);
-    beforeEach(() => {
-      mockedAxiosPost.mockClear();
-      mockedSendMailBackend.mockClear();
-      mockAddToMailQueue.mockClear();
-    });
-    it.each([1, 2, 4])(
-      "should not send any mail request for onboarding second step (users created %p days ago)",
-      async daysAgo => {
-        const someDaysAgo = new Date();
-        someDaysAgo.setDate(someDaysAgo.getDate() - daysAgo);
-
-        const { user: producer } = await userWithCompanyFactory("ADMIN", {
+  it.each([ONE_DAY_AGO, TWO_DAYS_AGO, FOUR_DAYS_AGO])(
+    "should not send any mail request for onboarding second step (users created %p days ago)",
+    async daysAgo => {
+      // Producer
+      await userWithCompanyFactory(
+        "ADMIN",
+        {
+          createdAt: FOUR_DAYS_AGO,
+          verifiedAt: FOUR_DAYS_AGO,
           companyTypes: {
             set: ["PRODUCER" as CompanyType]
           }
-        });
+        },
+        {},
+        { createdAt: daysAgo }
+      );
 
-        await prisma.user.update({
-          where: { id: producer.id },
-          data: { firstAssociationDate: someDaysAgo }
-        });
-        const { user: professional } = await userWithCompanyFactory("ADMIN", {
+      // Professional
+      await userWithCompanyFactory(
+        "ADMIN",
+        {
+          createdAt: FOUR_DAYS_AGO,
+          verifiedAt: FOUR_DAYS_AGO,
           companyTypes: {
             set: ["WASTEPROCESSOR" as CompanyType]
           }
-        }); // professional
+        },
+        {},
+        { createdAt: daysAgo }
+      );
 
-        await prisma.user.update({
-          where: { id: professional.id },
-          data: { firstAssociationDate: someDaysAgo }
-        });
+      (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+        Promise.resolve({
+          data: { results: "something" }
+        })
+      );
 
-        (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
-          Promise.resolve({
-            data: { results: "something" }
-          })
-        );
+      await sendSecondOnboardingEmail(3);
 
-        await sendSecondOnboardingEmail();
+      expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(0);
+    }
+  );
 
-        expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(0);
-      }
-    );
-    it("should send a request to mail service for onboarding second step (producers)", async () => {
-      const threeDaysAgo = new Date();
-      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-
-      const { user } = await userWithCompanyFactory("ADMIN", {
+  it("should send a request to mail service for onboarding second step (producers)", async () => {
+    // Producer
+    const { user } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: FOUR_DAYS_AGO,
+        verifiedAt: FOUR_DAYS_AGO,
         companyTypes: {
           set: ["PRODUCER" as CompanyType]
         }
-      }); // producer
+      },
+      {},
+      { createdAt: THREE_DAYS_AGO }
+    );
 
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { firstAssociationDate: threeDaysAgo }
-      });
+    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+      Promise.resolve({
+        data: { results: "something" }
+      })
+    );
 
-      (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
-        Promise.resolve({
-          data: { results: "something" }
-        })
-      );
+    await sendSecondOnboardingEmail(3);
 
-      await sendSecondOnboardingEmail();
-
-      expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
-      expect(mockedAxiosPost).toHaveBeenCalledWith(
-        "http://mailservice/smtp/email",
-        {
-          subject:
-            "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
-          templateId: 10, // hardcoded console PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID template ID
-          sender: {
-            email: "us@td.test",
-            name: "Wastetracker corp."
-          },
-          to: [
-            {
-              email: user.email,
-              name: user.name
-            }
-          ],
-          params: {
-            body: ""
-          },
-
-          cc: undefined
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
+    expect(mockedAxiosPost).toHaveBeenCalledWith(
+      "http://mailservice/smtp/email",
+      {
+        subject:
+          "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
+        templateId: 10,
+        sender: {
+          email: "us@td.test",
+          name: "Wastetracker corp."
         },
-        expect.objectContaining({
-          headers: {
-            "Content-Type": "application/json"
-          },
-          timeout: 5000
-        })
-      );
-    });
+        messageVersions: [
+          {
+            to: [
+              {
+                email: user.email,
+                name: user.name
+              }
+            ]
+          }
+        ],
+        params: {
+          body: ""
+        }
+      },
+      expect.anything()
+    );
+  });
 
-    it("should send a request to mail service for onboarding second step (professional)", async () => {
-      const threeDaysAgo = new Date();
-      threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
-
-      const { user } = await userWithCompanyFactory("ADMIN", {
+  it("should send a request to mail service for onboarding second step (professional)", async () => {
+    // Professional
+    const { user } = await userWithCompanyFactory(
+      "ADMIN",
+      {
+        createdAt: FOUR_DAYS_AGO,
+        verifiedAt: FOUR_DAYS_AGO,
         companyTypes: {
           set: ["WASTEPROCESSOR" as CompanyType]
         }
-      }); // professional
+      },
+      {},
+      { createdAt: THREE_DAYS_AGO }
+    );
 
-      await prisma.user.update({
-        where: { id: user.id },
-        data: { firstAssociationDate: threeDaysAgo }
-      });
+    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+      Promise.resolve({
+        data: { results: "something" }
+      })
+    );
 
-      (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
-        Promise.resolve({
-          data: { results: "something" }
-        })
-      );
+    await sendSecondOnboardingEmail(3);
 
-      await sendSecondOnboardingEmail();
-
-      expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
-      expect(mockedAxiosPost).toHaveBeenCalledWith(
-        "http://mailservice/smtp/email",
-        {
-          subject:
-            "Trackdéchets vous accompagne pour mettre en oeuvre la traçabilité dématérialisée",
-          templateId: 11, // hardcoded console PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID template ID
-          sender: {
-            email: "us@td.test",
-            name: "Wastetracker corp."
-          },
-          to: [
-            {
-              email: user.email,
-              name: user.name
-            }
-          ],
-          params: {
-            body: ""
-          },
-
-          cc: undefined
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
+    expect(mockedAxiosPost).toHaveBeenCalledWith(
+      "http://mailservice/smtp/email",
+      {
+        subject:
+          "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
+        templateId: 250,
+        sender: {
+          email: "us@td.test",
+          name: "Wastetracker corp."
         },
-        expect.objectContaining({
-          headers: {
-            "Content-Type": "application/json"
-          },
-          timeout: 5000
-        })
-      );
+        messageVersions: [
+          {
+            to: [
+              {
+                email: user.email,
+                name: user.name
+              }
+            ]
+          }
+        ],
+        params: {
+          body: ""
+        }
+      },
+      expect.anything()
+    );
+  });
+});
+
+describe("sendMembershipRequestDetailsEmail", () => {
+  afterEach(resetDatabase);
+  beforeEach(() => {
+    mockedAxiosPost.mockClear();
+    mockedSendMailBackend.mockClear();
+    mockAddToMailQueue.mockClear();
+  });
+
+  it("no membership request > should not send any mail", async () => {
+    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+      Promise.resolve({
+        data: { results: "something" }
+      })
+    );
+
+    await sendMembershipRequestDetailsEmail(3);
+
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(0);
+  });
+
+  it("new user without membership request > should send a mail", async () => {
+    // Should be returned
+    const user = await userFactory({ createdAt: THREE_DAYS_AGO });
+
+    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+      Promise.resolve({
+        data: { results: "something" }
+      })
+    );
+
+    await sendMembershipRequestDetailsEmail(3);
+
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
+    expect(mockedAxiosPost).toHaveBeenCalledWith(
+      "http://mailservice/smtp/email",
+      {
+        subject: "Passez à la prochaine étape sur Trackdéchets",
+        templateId: 9,
+        sender: {
+          email: "us@td.test",
+          name: "Wastetracker corp."
+        },
+        messageVersions: [
+          {
+            to: [
+              {
+                email: user.email,
+                name: user.name
+              }
+            ]
+          }
+        ],
+        params: {
+          body: expect.any(String)
+        }
+      },
+      expect.anything()
+    );
+  });
+});
+
+describe("sendPendingMembershipRequestDetailsEmail", () => {
+  afterEach(resetDatabase);
+  beforeEach(() => {
+    mockedAxiosPost.mockClear();
+    mockedSendMailBackend.mockClear();
+    mockAddToMailQueue.mockClear();
+  });
+
+  it("no pending membership request > should not send any mail", async () => {
+    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+      Promise.resolve({
+        data: { results: "something" }
+      })
+    );
+
+    await sendPendingMembershipRequestDetailsEmail(3);
+
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(0);
+  });
+
+  it("pending membership > should send a mail", async () => {
+    // Should be returned
+    const company = await companyFactory();
+
+    // Should return this user
+    const user = await userFactory();
+    await createMembershipRequest(user, company, {
+      createdAt: THREE_DAYS_AGO
     });
+
+    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+      Promise.resolve({
+        data: { results: "something" }
+      })
+    );
+
+    await sendPendingMembershipRequestDetailsEmail(3);
+
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
+    expect(mockedAxiosPost).toHaveBeenCalledWith(
+      "http://mailservice/smtp/email",
+      {
+        subject: "Suite à votre demande de rattachement sur Trackdéchets",
+        templateId: 9,
+        sender: {
+          email: "us@td.test",
+          name: "Wastetracker corp."
+        },
+        messageVersions: [
+          {
+            to: [
+              {
+                email: user.email,
+                name: user.name
+              }
+            ]
+          }
+        ],
+        params: {
+          body: expect.any(String)
+        }
+      },
+      expect.anything()
+    );
+  });
+});
+
+describe("sendPendingMembershipRequestToAdminDetailsEmail", () => {
+  afterEach(resetDatabase);
+  beforeEach(() => {
+    mockedAxiosPost.mockClear();
+    mockedSendMailBackend.mockClear();
+    mockAddToMailQueue.mockClear();
+  });
+
+  it("no pending membership request > should not send any mail", async () => {
+    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+      Promise.resolve({
+        data: { results: "something" }
+      })
+    );
+
+    await sendPendingMembershipRequestToAdminDetailsEmail(3);
+
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(0);
+  });
+
+  it("pending membership > should send a mail to admin", async () => {
+    const user = await userFactory();
+
+    const companyAndAdmin = await userWithCompanyFactory("ADMIN");
+
+    await createMembershipRequest(user, companyAndAdmin.company, {
+      createdAt: THREE_DAYS_AGO,
+      status: MembershipRequestStatus.PENDING
+    });
+
+    (mockedAxiosPost as jest.Mock<any>).mockImplementationOnce(() =>
+      Promise.resolve({
+        data: { results: "something" }
+      })
+    );
+
+    await sendPendingMembershipRequestToAdminDetailsEmail(3);
+
+    expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(1);
+    expect(mockedAxiosPost).toHaveBeenCalledWith(
+      "http://mailservice/smtp/email",
+      {
+        subject:
+          "Un utilisateur est toujours en attente de réponse de votre part",
+        templateId: 9,
+        sender: {
+          email: "us@td.test",
+          name: "Wastetracker corp."
+        },
+        messageVersions: [
+          {
+            params: {
+              body: expect.any(String)
+            },
+            to: [
+              {
+                email: companyAndAdmin.user.email,
+                name: companyAndAdmin.user.name
+              }
+            ]
+          }
+        ],
+        params: {
+          body: expect.any(String)
+        }
+      },
+      expect.anything()
+    );
   });
 });

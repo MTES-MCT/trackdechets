@@ -119,13 +119,18 @@ export const getRecentlyRegisteredProducers = async (daysAgo = 3) => {
 export const sendSecondOnboardingEmail = async (daysAgo = 3) => {
   // Pros
   const profesionals = await getRecentlyRegisteredProfesionals(daysAgo);
-  const proMessageVersions: MessageVersion[] = profesionals.map(pro => ({
-    to: [{ email: pro.email, name: pro.name }]
-  }));
-  const proPayload = renderMail(profesionalsSecondOnboardingEmail, {
-    messageVersions: proMessageVersions
-  });
-  await sendMail(proPayload);
+
+  // Send pros email (if any)
+  if (profesionals.length) {
+    const proMessageVersions: MessageVersion[] = profesionals.map(pro => ({
+      to: [{ email: pro.email, name: pro.name }]
+    }));
+    const proPayload = renderMail(profesionalsSecondOnboardingEmail, {
+      messageVersions: proMessageVersions
+    });
+
+    await sendMail(proPayload);
+  }
 
   // Producers. If already in pro list, remove (only 1 email, pro has priority)
   const producers = await getRecentlyRegisteredProducers(daysAgo);
@@ -133,15 +138,20 @@ export const sendSecondOnboardingEmail = async (daysAgo = 3) => {
   const filteredProducers = producers.filter(
     r => !profesionalsIds.includes(r.id)
   );
-  const producersMessageVersions: MessageVersion[] = filteredProducers.map(
-    producer => ({
-      to: [{ email: producer.email, name: producer.name }]
-    })
-  );
-  const producersPayload = renderMail(producersSecondOnboardingEmail, {
-    messageVersions: producersMessageVersions
-  });
-  await sendMail(producersPayload);
+
+  // Send producers email (if any)
+  if (filteredProducers.length) {
+    const producersMessageVersions: MessageVersion[] = filteredProducers.map(
+      producer => ({
+        to: [{ email: producer.email, name: producer.name }]
+      })
+    );
+    const producersPayload = renderMail(producersSecondOnboardingEmail, {
+      messageVersions: producersMessageVersions
+    });
+
+    await sendMail(producersPayload);
+  }
 
   await prisma.$disconnect();
 };
@@ -178,15 +188,17 @@ export const sendMembershipRequestDetailsEmail = async (daysAgo = 7) => {
   const recipients =
     await getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest(daysAgo);
 
-  const messageVersions: MessageVersion[] = recipients.map(recipient => ({
-    to: [{ email: recipient.email, name: recipient.name }]
-  }));
+  if (recipients.length) {
+    const messageVersions: MessageVersion[] = recipients.map(recipient => ({
+      to: [{ email: recipient.email, name: recipient.name }]
+    }));
 
-  const payload = renderMail(membershipRequestDetailsEmail, {
-    messageVersions
-  });
+    const payload = renderMail(membershipRequestDetailsEmail, {
+      messageVersions
+    });
 
-  await sendMail(payload);
+    await sendMail(payload);
+  }
 
   await prisma.$disconnect();
 };
@@ -229,15 +241,17 @@ export const sendPendingMembershipRequestDetailsEmail = async (
 ) => {
   const recipients = await getActiveUsersWithPendingMembershipRequests(daysAgo);
 
-  const messageVersions: MessageVersion[] = recipients.map(recipient => ({
-    to: [{ email: recipient.email, name: recipient.name }]
-  }));
+  if (recipients.length) {
+    const messageVersions: MessageVersion[] = recipients.map(recipient => ({
+      to: [{ email: recipient.email, name: recipient.name }]
+    }));
 
-  const payload = renderMail(pendingMembershipRequestDetailsEmail, {
-    messageVersions
-  });
+    const payload = renderMail(pendingMembershipRequestDetailsEmail, {
+      messageVersions
+    });
 
-  await sendMail(payload);
+    await sendMail(payload);
+  }
 
   await prisma.$disconnect();
 };
@@ -281,35 +295,37 @@ export const sendPendingMembershipRequestToAdminDetailsEmail = async (
     daysAgo
   );
 
-  const messageVersions: MessageVersion[] = requests.map(request => {
-    const variables = {
-      requestId: request.id,
-      email: request.user.email,
-      orgName: request.company.name,
-      orgId: request.company.orgId
-    };
+  if (requests.length) {
+    const messageVersions: MessageVersion[] = requests.map(request => {
+      const variables = {
+        requestId: request.id,
+        email: request.user.email,
+        orgName: request.company.name,
+        orgId: request.company.orgId
+      };
 
-    const template = renderMail(pendingMembershipRequestAdminDetailsEmail, {
-      variables,
-      messageVersions: []
+      const template = renderMail(pendingMembershipRequestAdminDetailsEmail, {
+        variables,
+        messageVersions: []
+      });
+
+      return {
+        to: request.company.companyAssociations.map(companyAssociation => ({
+          email: companyAssociation.user.email,
+          name: companyAssociation.user.name
+        })),
+        params: {
+          body: template.body
+        }
+      };
     });
 
-    return {
-      to: request.company.companyAssociations.map(companyAssociation => ({
-        email: companyAssociation.user.email,
-        name: companyAssociation.user.name
-      })),
-      params: {
-        body: template.body
-      }
-    };
-  });
+    const payload = renderMail(pendingMembershipRequestAdminDetailsEmail, {
+      messageVersions
+    });
 
-  const payload = renderMail(pendingMembershipRequestAdminDetailsEmail, {
-    messageVersions
-  });
-
-  await sendMail(payload);
+    await sendMail(payload);
+  }
 
   await prisma.$disconnect();
 };
