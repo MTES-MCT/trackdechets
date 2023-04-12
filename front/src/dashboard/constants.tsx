@@ -28,7 +28,18 @@ export const statusLabels: { [key: string]: string } = {
 
 export const ITEMS_PER_PAGE = 50;
 
-export const transportModeLabels: Record<TransportMode, string> = {
+/**
+ * Subset of TransportMode
+ * We don't want Other to be displayed in the front
+ */
+enum PublicTransportMode {
+  Air = "AIR",
+  Rail = "RAIL",
+  River = "RIVER",
+  Road = "ROAD",
+  Sea = "SEA",
+}
+export const transportModeLabels: Record<PublicTransportMode, string> = {
   [TransportMode.Road]: "Route",
   [TransportMode.Air]: "Voie aérienne",
   [TransportMode.Rail]: "Voie ferrée",
