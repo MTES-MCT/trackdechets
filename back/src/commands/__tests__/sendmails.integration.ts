@@ -16,7 +16,6 @@ import {
   companyFactory,
   createMembershipRequest,
   userFactory,
-  //userFactory,
   userWithCompanyFactory
 } from "../../__tests__/factories";
 
