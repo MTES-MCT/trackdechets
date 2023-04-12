@@ -1,21 +1,13 @@
 import prisma from "../prisma";
 import { sendMail } from "../mailer/mailing";
-import {
-  Company,
-  CompanyAssociation,
-  CompanyType,
-  MembershipRequestStatus,
-  User
-} from "@prisma/client";
+import { CompanyType, MembershipRequestStatus } from "@prisma/client";
 import * as COMPANY_CONSTANTS from "../common/constants/COMPANY_CONSTANTS";
 import {
-  // onboardingProducerSecondStep,
-  // onboardingProfesionalSecondStep,
   membershipRequestDetailsEmail,
   pendingMembershipRequestDetailsEmail,
   pendingMembershipRequestAdminDetailsEmail,
   profesionalsSecondOnboardingEmail,
-  nonProfesionalsSecondOnboardingEmail
+  producersSecondOnboardingEmail
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
 import { MessageVersion } from "../mailer/types";
@@ -34,82 +26,12 @@ export const xDaysAgo = (baseDate: Date, daysAgo: number): Date => {
   return new Date(clonedDate.toDateString());
 };
 
-type getRecentlyJoinedUsersParams = {
-  daysAgo: number;
-  retrieveCompanies?: boolean;
-};
-export const getRecentlyAssociatedUsers = async ({
-  daysAgo,
-  retrieveCompanies = false
-}: getRecentlyJoinedUsersParams) => {
-  const now = new Date();
-
-  const associatedDateGt = xDaysAgo(now, daysAgo);
-  const associatedDateLt = xDaysAgo(now, daysAgo - 1);
-  // retrieve users whose account was created xDaysAgo
-  // and associated company(ies) to tell apart producers and waste profesionals according to their type
-
-  return prisma.user.findMany({
-    where: {
-      firstAssociationDate: { gt: associatedDateGt, lt: associatedDateLt },
-      isActive: true
-    },
-    ...(retrieveCompanies && {
-      include: { companyAssociations: { include: { company: true } } }
-    })
-  });
-};
-
-// /**
-//  * Send first step onboarding email to active users who suscribed yesterday
-//  */
-// export const sendFirstOnboardingEmail = async (daysAgo = 1) => {
-//   const recipients = await getRecentlyAssociatedUsers({ daysAgo });
-//   await Promise.all(
-//     recipients.map(recipient => {
-//       const payload = renderMail(onboardingFirstStep, {
-//         to: [{ name: recipient.name, email: recipient.email }]
-//       });
-//       return sendMail(payload);
-//     })
-//   );
-//   await prisma.$disconnect();
-// };
-
-// type recipientType = User & {
-//   companyAssociations: (CompanyAssociation & {
-//     company: Company;
-//   })[];
-// };
-
-// TODO: no longer needed ?
-/**
- * Which email should we send ?
- * We retrieve user company(ies), then check their type
- * If the only type is PRODUCER, we send onboardingProducerSecondStep else
- * we send onboardingProfesionalSecondStep
- * We also have to handle users who belong to several companies
- */
-// export const selectSecondOnboardingEmail = (recipient: recipientType) => {
-//   const companyTypes = new Set(
-//     recipient.companyAssociations.flatMap(c => c.company.companyTypes)
-//   );
-
-//   if (
-//     [...companyTypes].some(ct => COMPANY_CONSTANTS.PROFESSIONALS.includes(ct))
-//   ) {
-//     return onboardingProfesionalSecondStep;
-//   }
-
-//   return onboardingProducerSecondStep;
-// };
-
 /**
  * Return recently "registered" profesionals. That means either:
  * - Users who joined a verified pro company x days ago
  * - Users who joined a pro company that was verified x days ago, before its verification
  */
-export const getRecentlyRegisteredProfesionals = async (daysAgo = 2) => {
+export const getRecentlyRegisteredProfesionals = async (daysAgo = 3) => {
   const now = new Date();
 
   const dateGt = xDaysAgo(now, daysAgo);
@@ -162,7 +84,7 @@ export const getRecentlyRegisteredProfesionals = async (daysAgo = 2) => {
   return uniqueUsers;
 };
 
-export const getRecentlyRegisteredNonProfesionals = async (daysAgo = 2) => {
+export const getRecentlyRegisteredProducers = async (daysAgo = 3) => {
   const now = new Date();
 
   const dateGt = xDaysAgo(now, daysAgo);
@@ -192,9 +114,9 @@ export const getRecentlyRegisteredNonProfesionals = async (daysAgo = 2) => {
 };
 
 /**
- * Second onboarding email. Different for profesionals & non-profesionals
+ * Second onboarding email. Different for profesionals & non-profesionals / producers
  */
-export const sendSecondOnboardingEmail = async (daysAgo = 2) => {
+export const sendSecondOnboardingEmail = async (daysAgo = 3) => {
   // Pros
   const profesionals = await getRecentlyRegisteredProfesionals(daysAgo);
   const proMessageVersions: MessageVersion[] = profesionals.map(pro => ({
@@ -205,21 +127,21 @@ export const sendSecondOnboardingEmail = async (daysAgo = 2) => {
   });
   await sendMail(proPayload);
 
-  // Non-pros. If already in pro list, remove (only 1 email, pro has priority)
-  const nonProfesionals = await getRecentlyRegisteredNonProfesionals(daysAgo);
+  // Producers. If already in pro list, remove (only 1 email, pro has priority)
+  const producers = await getRecentlyRegisteredProducers(daysAgo);
   const profesionalsIds = profesionals.map(p => p.id);
-  const filteredNonProfesionals = nonProfesionals.filter(
+  const filteredProducers = producers.filter(
     r => !profesionalsIds.includes(r.id)
   );
-  const nonProMessageVersions: MessageVersion[] = filteredNonProfesionals.map(
-    nonPro => ({
-      to: [{ email: nonPro.email, name: nonPro.name }]
+  const producersMessageVersions: MessageVersion[] = filteredProducers.map(
+    producer => ({
+      to: [{ email: producer.email, name: producer.name }]
     })
   );
-  const nonProPayload = renderMail(nonProfesionalsSecondOnboardingEmail, {
-    messageVersions: nonProMessageVersions
+  const producersPayload = renderMail(producersSecondOnboardingEmail, {
+    messageVersions: producersMessageVersions
   });
-  await sendMail(nonProPayload);
+  await sendMail(producersPayload);
 
   await prisma.$disconnect();
 };

@@ -11,7 +11,7 @@ import {
 import {
   getActiveUsersWithPendingMembershipRequests,
   getPendingMembershipRequestsAndAssociatedAdmins,
-  getRecentlyRegisteredNonProfesionals,
+  getRecentlyRegisteredProducers,
   getRecentlyRegisteredProfesionals,
   getRecentlyRegisteredUsersWithNoCompanyNorMembershipRequest,
   xDaysAgo
@@ -776,7 +776,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
   });
 });
 
-describe("getRecentlyRegisteredNonProfesionals", () => {
+describe("getRecentlyRegisteredProducers", () => {
   afterEach(resetDatabase);
 
   it("should return users who recently joined non-profesional companies", async () => {
@@ -817,7 +817,7 @@ describe("getRecentlyRegisteredNonProfesionals", () => {
     });
 
     // When
-    const profesionnals = await getRecentlyRegisteredNonProfesionals();
+    const profesionnals = await getRecentlyRegisteredProducers();
 
     // Then
     const expectedResult = [
@@ -877,7 +877,7 @@ describe("getRecentlyRegisteredNonProfesionals", () => {
     });
 
     // When
-    const profesionnals = await getRecentlyRegisteredNonProfesionals();
+    const profesionnals = await getRecentlyRegisteredProducers();
 
     // Then
     const expectedResult = [
@@ -925,7 +925,7 @@ describe("getRecentlyRegisteredNonProfesionals", () => {
     });
 
     // When
-    const profesionnals = await getRecentlyRegisteredNonProfesionals();
+    const profesionnals = await getRecentlyRegisteredProducers();
 
     // Then
     expect(profesionnals).toEqual([]);
