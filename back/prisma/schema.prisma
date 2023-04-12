@@ -245,13 +245,13 @@ model AnonymousCompany {
 }
 
 model CompanyAssociation {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   role      UserRole
   companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
+  company   Company   @relation(fields: [companyId], references: [id])
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime? @default(now()) @db.Timestamptz(6)
 
   @@index([userId], map: "_CompanyAssociationUserIdIdx")
   @@index([companyId], map: "_CompanyAssociationCompanyIdIdx")
