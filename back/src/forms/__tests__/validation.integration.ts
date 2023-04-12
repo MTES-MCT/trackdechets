@@ -81,12 +81,12 @@ describe("sealedFormSchema", () => {
   });
 
   describe("form can be sealed", () => {
-    test("when fully filled", async () => {
+    it("when fully filled", async () => {
       const isValid = await sealedFormSchema.isValid(sealedForm);
       expect(isValid).toEqual(true);
     });
 
-    test("with empty strings for optionnal fields", async () => {
+    it("with empty strings for optionnal fields", async () => {
       const testForm = {
         ...sealedForm,
         transporterNumberPlate: ""
@@ -95,7 +95,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(true);
     });
 
-    test("with null values for optionnal fields", async () => {
+    it("with null values for optionnal fields", async () => {
       const testForm = {
         ...sealedForm,
         transporterNumberPlate: null
@@ -104,7 +104,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(true);
     });
 
-    test("with transporter receipt exemption R.541-50 ticked and no transportation infos", async () => {
+    it("with transporter receipt exemption R.541-50 ticked and no transportation infos", async () => {
       const testForm = {
         ...sealedForm,
         transporterIsExemptedOfReceipt: true,
@@ -116,7 +116,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(true);
     });
 
-    test("with foreign transporter receipt no need for exemption R.541-50", async () => {
+    it("with foreign transporter receipt no need for exemption R.541-50", async () => {
       const transporter = await companyFactory({
         vatNumber: "BE0541696005"
       });
@@ -136,7 +136,7 @@ describe("sealedFormSchema", () => {
       expect(isValid2).toEqual(true);
     });
 
-    test("when there is an eco-organisme and emitter type is OTHER", async () => {
+    it("when there is an eco-organisme and emitter type is OTHER", async () => {
       const testForm = {
         ...sealedForm,
         emitterType: "OTHER",
@@ -150,7 +150,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(true);
     });
 
-    test("when there is no eco-organisme and emitter type is OTHER", async () => {
+    it("when there is no eco-organisme and emitter type is OTHER", async () => {
       const testForm = {
         ...sealedForm,
         emitterType: "OTHER",
@@ -178,7 +178,7 @@ describe("sealedFormSchema", () => {
       }
     );
 
-    test("when emitterIsForeignShip is true without emitter company siret", async () => {
+    it("when emitterIsForeignShip is true without emitter company siret", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         emitterIsForeignShip: true,
@@ -189,7 +189,7 @@ describe("sealedFormSchema", () => {
       const isValid = await sealedFormSchema.isValid(partialForm);
       expect(isValid).toEqual(true);
     });
-    test("when emitterIsPrivateIndividual is true without emitter company siret", async () => {
+    it("when emitterIsPrivateIndividual is true without emitter company siret", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         emitterIsPrivateIndividual: true,
@@ -201,7 +201,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(true);
     });
 
-    test("when is grouped and R0 is selected", async () => {
+    it("when is grouped and R0 is selected", async () => {
       // Given
       const processedInfo = {
         ...sealedForm,
@@ -219,7 +219,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toBeTruthy();
     });
 
-    test("when transporterVatNumber is defined and transporterCompanySiret is nullish", async () => {
+    it("when transporterVatNumber is defined and transporterCompanySiret is nullish", async () => {
       const transporter = await companyFactory({
         orgId: "ESA15022510",
         vatNumber: "ESA15022510"
@@ -234,7 +234,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(true);
     });
 
-    test("when there is 2 bennes", async () => {
+    it("when there is 2 bennes", async () => {
       const testForm = {
         ...sealedForm,
         wasteDetailsPackagingInfos: [
@@ -246,7 +246,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(true);
     });
 
-    test("when there is 2 citernes", async () => {
+    it("when there is 2 citernes", async () => {
       const testForm = {
         ...sealedForm,
         wasteDetailsPackagingInfos: [
@@ -258,7 +258,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(true);
     });
 
-    test("when there is more than 2 bennes", async () => {
+    it("when there is more than 2 bennes", async () => {
       const testForm = {
         ...sealedForm,
         wasteDetailsPackagingInfos: [
@@ -271,7 +271,7 @@ describe("sealedFormSchema", () => {
       );
     });
 
-    test("when there is more than 2 citernes", async () => {
+    it("when there is more than 2 citernes", async () => {
       const testForm = {
         ...sealedForm,
         wasteDetailsPackagingInfos: [
@@ -285,7 +285,7 @@ describe("sealedFormSchema", () => {
       );
     });
 
-    test("when there is no waste details quantity", async () => {
+    it("when there is no waste details quantity", async () => {
       const testForm = {
         ...sealedForm,
         wasteDetailsQuantity: null
@@ -297,7 +297,7 @@ describe("sealedFormSchema", () => {
   });
 
   describe("form cannot be sealed", () => {
-    test("when emitterCompanySiret is not well formatted", async () => {
+    it("when emitterCompanySiret is not well formatted", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         emitterCompanySiret: "123"
@@ -308,7 +308,7 @@ describe("sealedFormSchema", () => {
       );
     });
 
-    test("when transporterCompanySiret is not well formatted", async () => {
+    it("when transporterCompanySiret is not well formatted", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         transporterCompanySiret: "123"
@@ -319,7 +319,7 @@ describe("sealedFormSchema", () => {
       );
     });
 
-    test("when transporter is not registered in Trackdéchets", async () => {
+    it("when transporter is not registered in Trackdéchets", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         transporterCompanySiret: "85001946400021"
@@ -330,7 +330,7 @@ describe("sealedFormSchema", () => {
       );
     });
 
-    test("when foreign transporter is not registered in Trackdéchets", async () => {
+    it("when foreign transporter is not registered in Trackdéchets", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         transporterCompanyVatNumber: "IT13029381004"
@@ -341,7 +341,7 @@ describe("sealedFormSchema", () => {
       );
     });
 
-    test("when transporter is registered in Trackdéchets with wrong profile", async () => {
+    it("when transporter is registered in Trackdéchets with wrong profile", async () => {
       const company = await companyFactory({ companyTypes: ["PRODUCER"] });
       const partialForm: Partial<Form> = {
         ...sealedForm,
@@ -356,7 +356,7 @@ describe("sealedFormSchema", () => {
       );
     });
 
-    test("when foreign transporter is registered in Trackdéchets with wrong profile", async () => {
+    it("when foreign transporter is registered in Trackdéchets with wrong profile", async () => {
       const company = await companyFactory({
         companyTypes: ["PRODUCER"],
         orgId: "IT13029381004",
@@ -375,7 +375,7 @@ describe("sealedFormSchema", () => {
       );
     });
 
-    test("when recipientCompanySiret is not well formatted", async () => {
+    it("when recipientCompanySiret is not well formatted", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         recipientCompanySiret: "123"
@@ -386,7 +386,7 @@ describe("sealedFormSchema", () => {
       );
     });
 
-    test("when recipient is not registered in Trackdéchets", async () => {
+    it("when recipient is not registered in Trackdéchets", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         recipientCompanySiret: "85001946400021"
@@ -397,7 +397,7 @@ describe("sealedFormSchema", () => {
       );
     });
 
-    test("when recipient is registered in Trackdéchets with wrong profile", async () => {
+    it("when recipient is registered in Trackdéchets with wrong profile", async () => {
       const company = await companyFactory({ companyTypes: ["PRODUCER"] });
       const partialForm: Partial<Form> = {
         ...sealedForm,
@@ -412,7 +412,7 @@ describe("sealedFormSchema", () => {
       );
     });
 
-    test("when emitterIsForeignShip is true without emitterCompanyOmiNumber", async () => {
+    it("when emitterIsForeignShip is true without emitterCompanyOmiNumber", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         emitterIsForeignShip: true,
@@ -425,7 +425,7 @@ describe("sealedFormSchema", () => {
       );
     });
 
-    test("when emitterIsForeignShip and siret is defined", async () => {
+    it("when emitterIsForeignShip and siret is defined", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         emitterIsForeignShip: true,
@@ -442,7 +442,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(false);
     });
 
-    test("when emitterIsForeignShip is true with invalid emitterCompanyOmiNumber", async () => {
+    it("when emitterIsForeignShip is true with invalid emitterCompanyOmiNumber", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         emitterIsForeignShip: true,
@@ -459,7 +459,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(false);
     });
 
-    test("when emitterIsForeignShip and emitterIsPrivateIndividual both true", async () => {
+    it("when emitterIsForeignShip and emitterIsPrivateIndividual both true", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         emitterIsForeignShip: true,
@@ -477,7 +477,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(false);
     });
 
-    test("when emitterIsPrivateIndividual and siret is defined", async () => {
+    it("when emitterIsPrivateIndividual and siret is defined", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         emitterIsPrivateIndividual: true,
@@ -490,7 +490,7 @@ describe("sealedFormSchema", () => {
         "Émetteur : vous ne pouvez pas renseigner de n°SIRET lorsque l'émetteur ou le détenteur est un particulier"
       );
     });
-    test("when there is no receipt exemption and no receipt", async () => {
+    it("when there is no receipt exemption and no receipt", async () => {
       const testForm = {
         ...sealedForm,
         transporterIsExemptedOfReceipt: false,
@@ -501,7 +501,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(false);
     });
 
-    test("when there is an eco-organisme but emitter type is not OTHER", async () => {
+    it("when there is an eco-organisme but emitter type is not OTHER", async () => {
       const testForm = {
         ...sealedForm,
         emitterType: "PRODUCER",
@@ -516,7 +516,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(false);
     });
 
-    test("when there is 1 citerne and another packaging", async () => {
+    it("when there is 1 citerne and another packaging", async () => {
       const testForm = {
         ...sealedForm,
         wasteDetailsPackagingInfos: [
@@ -529,7 +529,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(false);
     });
 
-    test("when there is 1 benne and another packaging", async () => {
+    it("when there is 1 benne and another packaging", async () => {
       const testForm = {
         ...sealedForm,
         wasteDetailsPackagingInfos: [
@@ -542,7 +542,7 @@ describe("sealedFormSchema", () => {
       expect(isValid).toEqual(false);
     });
 
-    test("when is NOT grouped and R0 is selected", async () => {
+    it("when is NOT grouped and R0 is selected", async () => {
       expect.assertions(1);
 
       // Given
@@ -566,7 +566,7 @@ describe("sealedFormSchema", () => {
       }
     });
 
-    test("when there is nor transporterCompanySiret nor transporterCompanyVatNumber", async () => {
+    it("when there is nor transporterCompanySiret nor transporterCompanyVatNumber", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         transporterCompanySiret: null,
@@ -579,7 +579,7 @@ describe("sealedFormSchema", () => {
       );
     });
 
-    test("when the transporterCompanyVatNumber is invalid", async () => {
+    it("when the transporterCompanyVatNumber is invalid", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         transporterCompanySiret: null,
@@ -592,7 +592,7 @@ describe("sealedFormSchema", () => {
       );
     });
 
-    test("when the transporterCompanyVatNumber is FR", async () => {
+    it("when the transporterCompanyVatNumber is FR", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
         transporterCompanySiret: null,
@@ -618,12 +618,12 @@ describe("receivedInfosSchema", () => {
       signedAt: new Date("2020-01-17T10:12:00+0100")
     };
 
-    test("should be valid when waste is accepted", async () => {
+    it("should be valid when waste is accepted", async () => {
       const isValid = await receivedInfoSchema.isValid(receivedInfo);
       expect(isValid).toEqual(true);
     });
 
-    test("should be invalid when quantity received is 0", async () => {
+    it("should be invalid when quantity received is 0", async () => {
       const validateFn = () =>
         receivedInfoSchema.validate({
           ...receivedInfo,
@@ -645,12 +645,12 @@ describe("receivedInfosSchema", () => {
       signedAt: new Date("2020-01-17T10:12:00+0100")
     };
 
-    test("should be valid when waste is refused", async () => {
+    it("should be valid when waste is refused", async () => {
       const isValid = await receivedInfoSchema.isValid(receivedInfo);
       expect(isValid).toEqual(true);
     });
 
-    test("should be invalid if wasteRefusalReason is missing", async () => {
+    it("should be invalid if wasteRefusalReason is missing", async () => {
       const validateFn = () =>
         receivedInfoSchema.validate({
           ...receivedInfo,
@@ -661,7 +661,7 @@ describe("receivedInfosSchema", () => {
       );
     });
 
-    test("should be invalid if quantity received is different from 0", async () => {
+    it("should be invalid if quantity received is different from 0", async () => {
       const validateFn = () =>
         receivedInfoSchema.validate({ ...receivedInfo, quantityReceived: 1.0 });
       await expect(validateFn()).rejects.toThrow(
@@ -680,12 +680,12 @@ describe("receivedInfosSchema", () => {
       signedAt: new Date("2020-01-17T10:12:00+0100")
     };
 
-    test("should be valid when waste is partially refused", async () => {
+    it("should be valid when waste is partially refused", async () => {
       const isValid = await receivedInfoSchema.isValid(receivedInfo);
       expect(isValid).toEqual(true);
     });
 
-    test("should be invalid if wasteRefusalReason is missing", async () => {
+    it("should be invalid if wasteRefusalReason is missing", async () => {
       const validateFn = () =>
         receivedInfoSchema.validate({
           ...receivedInfo,
@@ -696,7 +696,7 @@ describe("receivedInfosSchema", () => {
       );
     });
 
-    test("should be invalid when quantity received is 0", async () => {
+    it("should be invalid when quantity received is 0", async () => {
       const validateFn = () =>
         receivedInfoSchema.validate({ ...receivedInfo, quantityReceived: 0 });
       await expect(validateFn()).rejects.toThrow(
@@ -718,12 +718,12 @@ describe("draftFormSchema", () => {
     transporterValidityLimit: new Date()
   };
 
-  test("should be valid when passing empty strings", async () => {
+  it("should be valid when passing empty strings", async () => {
     const isValid = await draftFormSchema.isValid(form);
     expect(isValid).toBe(true);
   });
 
-  test("should be valid when passing null values", async () => {
+  it("should be valid when passing null values", async () => {
     const form = {
       emitterCompanySiret: null,
       recipientCompanySiret: null,
@@ -739,13 +739,13 @@ describe("draftFormSchema", () => {
     expect(isValid).toBe(true);
   });
 
-  test("should be valid when passing undefined values", async () => {
+  it("should be valid when passing undefined values", async () => {
     const isValid = await draftFormSchema.isValid({});
 
     expect(isValid).toBe(true);
   });
 
-  test("should not be valid when passing an invalid siret", async () => {
+  it("should not be valid when passing an invalid siret", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -757,7 +757,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  test("should be invalid when passing an invalid waste code", async () => {
+  it("should be invalid when passing an invalid waste code", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -769,7 +769,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  test("should be invalid when passing an invalid email", async () => {
+  it("should be invalid when passing an invalid email", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -781,7 +781,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  test("should be invalid when passing a parcelNumber with unknown properties", async () => {
+  it("should be invalid when passing a parcelNumber with unknown properties", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -797,7 +797,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  test("should be invalid when passing a parcelNumber with no city and postal code", async () => {
+  it("should be invalid when passing a parcelNumber with no city and postal code", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -814,7 +814,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  test("should be invalid when passing a parcelNumber coordinate and number", async () => {
+  it("should be invalid when passing a parcelNumber coordinate and number", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -836,7 +836,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  test("should be valid when passing a null parcelNumber coordinate and number", async () => {
+  it("should be valid when passing a null parcelNumber coordinate and number", async () => {
     const isValid = await draftFormSchema.isValid({
       ...form,
       wasteDetailsParcelNumbers: [
@@ -855,7 +855,7 @@ describe("draftFormSchema", () => {
     expect(isValid).toBe(true);
   });
 
-  test("should be valid when passing a parcelNumber coordinate and bull number", async () => {
+  it("should be valid when passing a parcelNumber coordinate and bull number", async () => {
     const isValid = await draftFormSchema.isValid({
       ...form,
       wasteDetailsParcelNumbers: [
@@ -874,7 +874,7 @@ describe("draftFormSchema", () => {
     expect(isValid).toBe(true);
   });
 
-  test("should be valid when passing a parcelNumber number", async () => {
+  it("should be valid when passing a parcelNumber number", async () => {
     const isValid = await draftFormSchema.isValid({
       ...form,
       wasteDetailsParcelNumbers: [
@@ -891,7 +891,7 @@ describe("draftFormSchema", () => {
     expect(isValid).toBe(true);
   });
 
-  test("should be valid when passing a parcelNumber coordinates", async () => {
+  it("should be valid when passing a parcelNumber coordinates", async () => {
     const isValid = await draftFormSchema.isValid({
       ...form,
       wasteDetailsParcelNumbers: [
@@ -907,7 +907,7 @@ describe("draftFormSchema", () => {
     expect(isValid).toBe(true);
   });
 
-  test("should be invalid when passing an incomplete parcelNumber number", async () => {
+  it("should be invalid when passing an incomplete parcelNumber number", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -926,7 +926,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  test("should be invalid when passing an incomplete parcelNumber coordinates", async () => {
+  it("should be invalid when passing an incomplete parcelNumber coordinates", async () => {
     const validateFn = () =>
       draftFormSchema.validate({
         ...form,
@@ -944,7 +944,7 @@ describe("draftFormSchema", () => {
     );
   });
 
-  test("should be valid when emitterIsForeignShip with empty fields", async () => {
+  it("should be valid when emitterIsForeignShip with empty fields", async () => {
     const partialForm: Partial<Form> = {
       id: "cjplbvecc000d0766j32r19am",
       readableId: "BSD-20210101-AAAAAAAA",
@@ -977,7 +977,7 @@ describe("draftFormSchema", () => {
     expect(isValid).toEqual(true);
   });
 
-  test("packaging PIPELINE can be set without any other details", async () => {
+  it("packaging PIPELINE can be set without any other details", async () => {
     const isValid = await draftFormSchema.isValid({
       wasteDetailsPackagingInfos: [
         { type: "PIPELINE", numero: null, weight: null, volume: null }
@@ -987,7 +987,7 @@ describe("draftFormSchema", () => {
     expect(isValid).toEqual(true);
   });
 
-  test("packaging PIPELINE cannot be set with any other packaging", async () => {
+  it("packaging PIPELINE cannot be set with any other packaging", async () => {
     const isValid = await draftFormSchema.isValid({
       wasteDetailsPackagingInfos: [
         { type: "PIPELINE", other: null, quantity: null },
@@ -998,7 +998,7 @@ describe("draftFormSchema", () => {
     expect(isValid).toEqual(false);
   });
 
-  test("packaging PIPELINE cannot be set with a transporter", async () => {
+  it("packaging PIPELINE cannot be set with a transporter", async () => {
     const isValid = await draftFormSchema.isValid({
       wasteDetailsPackagingInfos: [
         { type: "PIPELINE", numero: null, weight: null, volume: null }
@@ -1011,7 +1011,7 @@ describe("draftFormSchema", () => {
 });
 
 describe("processedInfoSchema", () => {
-  test("noTraceability can be true when processing operation is groupement", async () => {
+  it("noTraceability can be true when processing operation is groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1030,7 +1030,7 @@ describe("processedInfoSchema", () => {
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("noTraceability can be false when processing operation is groupement", async () => {
+  it("noTraceability can be false when processing operation is groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1049,7 +1049,7 @@ describe("processedInfoSchema", () => {
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("noTraceability can be undefined when processing operation is groupement", async () => {
+  it("noTraceability can be undefined when processing operation is groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1067,7 +1067,7 @@ describe("processedInfoSchema", () => {
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("noTraceability can be null when processing operation is groupement", async () => {
+  it("noTraceability can be null when processing operation is groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1086,7 +1086,7 @@ describe("processedInfoSchema", () => {
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("nextDestinationCompany SIRET is required when no other identification is given", async () => {
+  it("nextDestinationCompany SIRET is required when no other identification is given", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1107,7 +1107,7 @@ describe("processedInfoSchema", () => {
     );
   });
 
-  test("nextDestinationCompany return an error when SIRET is given and country is not FR", async () => {
+  it("nextDestinationCompany return an error when SIRET is given and country is not FR", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1129,7 +1129,7 @@ describe("processedInfoSchema", () => {
     );
   });
 
-  test("nextDestinationCompany return an error when a foreign VAT is given and country is FR", async () => {
+  it("nextDestinationCompany return an error when a foreign VAT is given and country is FR", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1151,7 +1151,7 @@ describe("processedInfoSchema", () => {
     );
   });
 
-  test("noTraceability cannot be true when processing operation is not groupement", async () => {
+  it("noTraceability cannot be true when processing operation is not groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1166,7 +1166,7 @@ describe("processedInfoSchema", () => {
     );
   });
 
-  test("noTraceability can be false when processing operation is not groupement", async () => {
+  it("noTraceability can be false when processing operation is not groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1177,7 +1177,7 @@ describe("processedInfoSchema", () => {
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("noTraceability can be undefined when processing operation is not groupement", async () => {
+  it("noTraceability can be undefined when processing operation is not groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1187,7 +1187,7 @@ describe("processedInfoSchema", () => {
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("noTraceability can be null when processing operation is not groupement", async () => {
+  it("noTraceability can be null when processing operation is not groupement", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1198,7 +1198,7 @@ describe("processedInfoSchema", () => {
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("transporter SIRET is optional when a valid foreign vatNumber is present", async () => {
+  it("transporter SIRET is optional when a valid foreign vatNumber is present", async () => {
     const transporterCompany = await companyFactory({
       orgId: "BE0541696005",
       vatNumber: "BE0541696005"
@@ -1215,7 +1215,7 @@ describe("processedInfoSchema", () => {
     expect(await transporterSchemaFn(false).isValid(transporter)).toEqual(true);
   });
 
-  test("transporter vatNumber is optional when a valid SIRET is present", async () => {
+  it("transporter vatNumber is optional when a valid SIRET is present", async () => {
     const transporterCompany = await companyFactory({
       companyTypes: ["TRANSPORTER"]
     });
@@ -1231,7 +1231,7 @@ describe("processedInfoSchema", () => {
     expect(await transporterSchemaFn(false).isValid(transporter)).toEqual(true);
   });
 
-  test("transporter SIRET is required with a french vatNumber", async () => {
+  it("transporter SIRET is required with a french vatNumber", async () => {
     const transporter = {
       transporterCompanyName: "Code en Stock",
       transporterCompanyVatNumber: "FR87850019464",
@@ -1248,7 +1248,7 @@ describe("processedInfoSchema", () => {
     );
   });
 
-  test("transporter vatNumber should be valid", async () => {
+  it("transporter vatNumber should be valid", async () => {
     const transporter = {
       transporterCompanyName: "Code en Stock",
       transporterCompanyVatNumber: "invalid",
@@ -1266,7 +1266,7 @@ describe("processedInfoSchema", () => {
     );
   });
 
-  test("transporter SIRET or VAT number is required", async () => {
+  it("transporter SIRET or VAT number is required", async () => {
     const transporter = {
       transporterCompanyName: "Thalys",
       transporterCompanyAddress: "Bruxelles",
@@ -1282,7 +1282,7 @@ describe("processedInfoSchema", () => {
     );
   });
 
-  test("SIRET for la poste is valid", async () => {
+  it("SIRET for la poste is valid", async () => {
     const transporterCompany = await companyFactory({
       siret: "35600000040773",
       companyTypes: ["TRANSPORTER"]
@@ -1309,7 +1309,7 @@ describe("processedInfoSchema", () => {
     });
   });
 
-  test("SIRET for any valid SIRET is valid", async () => {
+  it("SIRET for any valid SIRET is valid", async () => {
     const transporterCompany = await companyFactory({
       siret: "35600000000048",
       companyTypes: ["TRANSPORTER"]
@@ -1336,7 +1336,7 @@ describe("processedInfoSchema", () => {
     });
   });
 
-  test("nextDestination should be defined when processing operation is groupement and noTraceability is false", async () => {
+  it("nextDestination should be defined when processing operation is groupement and noTraceability is false", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1362,7 +1362,7 @@ describe("processedInfoSchema", () => {
     }
   });
 
-  test("nextDestination company info is optional when noTraceability is true", async () => {
+  it("nextDestination company info is optional when noTraceability is true", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1374,7 +1374,7 @@ describe("processedInfoSchema", () => {
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("nextDestination fields can be empty when noTraceability is true", async () => {
+  it("nextDestination fields can be empty when noTraceability is true", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
@@ -1392,7 +1392,7 @@ describe("processedInfoSchema", () => {
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
   });
 
-  test("nextDestination processingOperation is required when noTraceability is true", async () => {
+  it("nextDestination processingOperation is required when noTraceability is true", async () => {
     const processedInfo = {
       processedBy: "John Snow",
       processedAt: new Date(),
