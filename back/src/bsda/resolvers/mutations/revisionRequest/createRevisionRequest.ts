@@ -25,6 +25,22 @@ import {
 import { getBsdaRepository } from "../../../repository";
 import { OPERATIONS } from "../../../validation";
 
+// If you modify this, also modify it in the frontend
+export const CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = [
+  // BsdaStatus.INITIAL,
+  // BsdaStatus.SIGNED_BY_PRODUCER,
+  BsdaStatus.SIGNED_BY_WORKER,
+  BsdaStatus.SENT
+  // BsdaStatus.PROCESSED,
+  // BsdaStatus.REFUSED,
+  // BsdaStatus.AWAITING_CHILD,
+  // BsdaStatus.CANCELED,
+];
+
+export const NON_CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = Object.values(
+  BsdaStatus
+).filter(status => !CANCELLABLE_BSDA_STATUSES.includes(status));
+
 export type RevisionRequestContent = Pick<
   Prisma.BsdaRevisionRequestCreateInput,
   | "wasteCode"
@@ -50,6 +66,7 @@ export type RevisionRequestContent = Pick<
   | "emitterPickupSiteCity"
   | "emitterPickupSitePostalCode"
   | "emitterPickupSiteInfos"
+  | "isCanceled"
 >;
 
 export async function createBsdaRevisionRequest(
@@ -70,12 +87,18 @@ export async function createBsdaRevisionRequest(
     bsda,
     authoringCompanySiret
   );
+
+  if (!authoringCompany.siret) {
+    throw new Error(
+      `Authoring company ${authoringCompany.id} has no siret. Cannot create BSDA revision request.`
+    );
+  }
   const approversSirets = await getApproversSirets(
     bsda,
     authoringCompany.siret
   );
 
-  const flatContent = await getFlatContent(content);
+  const flatContent = await getFlatContent(content, bsda);
 
   return bsdaRepository.createRevisionRequest({
     bsda: { connect: { id: bsda.id } },
@@ -103,6 +126,12 @@ async function checkIfUserCanRequestRevisionOnBsda(
   if (bsda.status === BsdaStatus.REFUSED || bsda.isDeleted) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau, il a été refusé ou supprimé."
+    );
+  }
+
+  if (bsda.status === BsdaStatus.CANCELED) {
+    throw new ForbiddenError(
+      "Impossible de créer une révision sur ce bordereau, il a été annulé."
     );
   }
 
@@ -159,13 +188,28 @@ async function getAuthoringCompany(
 }
 
 async function getFlatContent(
-  content: BsdaRevisionRequestContentInput
+  content: BsdaRevisionRequestContentInput,
+  bsda: Bsda
 ): Promise<RevisionRequestContent> {
   const flatContent = flattenBsdaRevisionRequestInput(content);
+  const { isCanceled, ...fields } = flatContent;
 
   if (Object.keys(flatContent).length === 0) {
     throw new UserInputError(
       "Impossible de créer une révision sans modifications."
+    );
+  }
+
+  if (isCanceled && Object.values(fields).length > 0) {
+    throw new UserInputError(
+      "Impossible d'annuler et de modifier un bordereau."
+    );
+  }
+
+  // One cannot request a CANCELATION if the BSDA has advanced too far in the workflow
+  if (isCanceled && NON_CANCELLABLE_BSDA_STATUSES.includes(bsda.status)) {
+    throw new ForbiddenError(
+      "Impossible d'annuler un bordereau qui a été réceptionné sur l'installation de destination."
     );
   }
 
@@ -206,5 +250,6 @@ const revisionRequestContentSchema = yup.object({
   emitterPickupSiteAddress: yup.string().nullable(),
   emitterPickupSiteCity: yup.string().nullable(),
   emitterPickupSitePostalCode: yup.string().nullable(),
-  emitterPickupSiteInfos: yup.string().nullable()
+  emitterPickupSiteInfos: yup.string().nullable(),
+  isCanceled: yup.bool().nullable()
 });

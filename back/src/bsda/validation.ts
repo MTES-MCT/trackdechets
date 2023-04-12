@@ -15,14 +15,13 @@ import {
   siret,
   siretConditions,
   siretTests,
+  validateIntermediariesInput,
   vatNumberTests,
   weight,
   weightConditions,
   WeightUnits
 } from "../common/validation";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
-import { validateCompany } from "../companies/validateCompany";
-
 import {
   INVALID_WASTE_CODE,
   MISSING_COMPANY_ADDRESS,
@@ -32,7 +31,6 @@ import {
   MISSING_COMPANY_PHONE,
   MISSING_COMPANY_SIRET
 } from "../forms/errors";
-import { intermediarySchema } from "../forms/validation";
 import { BsdaConsistence, CompanyInput } from "../generated/graphql/types";
 import prisma from "../prisma";
 
@@ -90,6 +88,7 @@ type Destination = Pick<
   | "destinationOperationDescription"
   | "destinationOperationDate"
   | "destinationOperationNextDestinationCap"
+  | "destinationOperationNextDestinationCompanySiret"
 >;
 
 type Transporter = Pick<
@@ -138,7 +137,7 @@ export async function validateBsda(
     intermediaries
   }: {
     previousBsdas: Bsda[];
-    intermediaries: CompanyInput[];
+    intermediaries: CompanyInput[] | null | undefined;
   },
   context: BsdaValidationContext
 ) {
@@ -147,44 +146,14 @@ export async function validateBsda(
   if (!context.skipPreviousBsdas) {
     await validatePreviousBsdas(bsda, previousBsdas);
   }
-  await validateIntermediaries(intermediaries);
-}
-
-async function validateIntermediaries(
-  intermediaries: CompanyInput[] | undefined
-) {
-  if (!intermediaries || intermediaries.length === 0) {
-    return;
-  }
-
-  if (intermediaries.length > 3) {
-    throw new UserInputError(
-      "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires sur un BSDA"
-    );
-  }
-
-  const intermediaryIdentifiers = intermediaries.map(
-    c => c.siret || c.vatNumber
-  );
-  const hasDuplicate =
-    new Set(intermediaryIdentifiers).size !== intermediaryIdentifiers.length;
-  if (hasDuplicate) {
-    throw new UserInputError(
-      "Intermédiaires: impossible d'ajouter le même établissement en intermédiaire plusieurs fois"
-    );
-  }
-
-  for (const intermediary of intermediaries) {
-    await intermediarySchema.validate(intermediary);
-    await validateCompany(intermediary);
-  }
+  await validateIntermediariesInput(intermediaries);
 }
 
 async function validatePreviousBsdas(
   bsda: Partial<Prisma.BsdaCreateInput>,
   previousBsdas: Bsda[]
 ) {
-  if (!["GATHERING", "RESHIPMENT"].includes(bsda.type)) {
+  if (!bsda.type || !["GATHERING", "RESHIPMENT"].includes(bsda.type)) {
     return;
   }
 
@@ -256,6 +225,7 @@ async function validatePreviousBsdas(
     // nextBsdas of previous
     const nextBsdas = [forwardedIn, groupedIn].filter(Boolean);
     if (
+      bsda.id &&
       nextBsdas.length > 0 &&
       !nextBsdas.map(bsda => bsda.id).includes(bsda.id)
     ) {
@@ -264,7 +234,10 @@ async function validatePreviousBsdas(
       ]);
     }
 
-    if (!PARTIAL_OPERATIONS.includes(previousBsda.destinationOperationCode)) {
+    if (
+      previousBsda.destinationOperationCode &&
+      !PARTIAL_OPERATIONS.includes(previousBsda.destinationOperationCode)
+    ) {
       return acc.concat([
         `Le bordereau n°${previousBsda.id} a déclaré un traitement qui ne permet pas de lui donner la suite voulue.`
       ]);
@@ -278,72 +251,74 @@ async function validatePreviousBsdas(
   }
 }
 
-const emitterSchema: FactorySchemaOf<BsdaValidationContext, Emitter> =
-  context =>
-    yup.object({
-      emitterIsPrivateIndividual: yup
-        .boolean()
-        .requiredIf(
-          context.emissionSignature,
-          `Émetteur: vous devez précisez si c'est un particulier ou un professionnel`
-        ),
-      emitterCompanyName: yup
-        .string()
-        .requiredIf(
-          context.emissionSignature,
-          `Émetteur: ${MISSING_COMPANY_NAME}`
-        ),
-      emitterCompanySiret: siret
-        .label("Émetteur")
-        .when("emitterIsPrivateIndividual", siretConditions.isPrivateIndividual)
-        .requiredIf(
-          context.emissionSignature,
-          `Émetteur: ${MISSING_COMPANY_SIRET}`
-        ),
+const emitterSchema: FactorySchemaOf<
+  BsdaValidationContext,
+  Emitter
+> = context =>
+  yup.object({
+    emitterIsPrivateIndividual: yup
+      .boolean()
+      .requiredIf(
+        context.emissionSignature,
+        `Émetteur: vous devez précisez si c'est un particulier ou un professionnel`
+      ),
+    emitterCompanyName: yup
+      .string()
+      .requiredIf(
+        context.emissionSignature,
+        `Émetteur: ${MISSING_COMPANY_NAME}`
+      ),
+    emitterCompanySiret: siret
+      .label("Émetteur")
+      .when("emitterIsPrivateIndividual", siretConditions.isPrivateIndividual)
+      .requiredIf(
+        context.emissionSignature,
+        `Émetteur: ${MISSING_COMPANY_SIRET}`
+      ),
 
-      emitterCompanyAddress: yup
+    emitterCompanyAddress: yup
+      .string()
+      .requiredIf(
+        context.emissionSignature,
+        `Émetteur: ${MISSING_COMPANY_ADDRESS}`
+      ),
+    emitterCompanyContact: yup.string().when("emitterIsPrivateIndividual", {
+      is: true,
+      then: yup.string().nullable(true),
+      otherwise: yup
         .string()
         .requiredIf(
           context.emissionSignature,
-          `Émetteur: ${MISSING_COMPANY_ADDRESS}`
-        ),
-      emitterCompanyContact: yup.string().when("emitterIsPrivateIndividual", {
-        is: true,
-        then: yup.string().nullable(true),
-        otherwise: yup
-          .string()
-          .requiredIf(
-            context.emissionSignature,
-            `Émetteur: ${MISSING_COMPANY_CONTACT}`
-          )
-      }),
-      emitterCompanyPhone: yup.string().when("emitterIsPrivateIndividual", {
+          `Émetteur: ${MISSING_COMPANY_CONTACT}`
+        )
+    }),
+    emitterCompanyPhone: yup.string().when("emitterIsPrivateIndividual", {
+      is: true,
+      then: schema => schema.nullable().notRequired(),
+      otherwise: schema =>
+        schema.requiredIf(
+          context.emissionSignature,
+          `Émetteur: ${MISSING_COMPANY_PHONE}`
+        )
+    }),
+    emitterCompanyMail: yup
+      .string()
+      .email()
+      .when("emitterIsPrivateIndividual", {
         is: true,
         then: schema => schema.nullable().notRequired(),
         otherwise: schema =>
           schema.requiredIf(
             context.emissionSignature,
-            `Émetteur: ${MISSING_COMPANY_PHONE}`
+            `Émetteur: ${MISSING_COMPANY_EMAIL}`
           )
       }),
-      emitterCompanyMail: yup
-        .string()
-        .email()
-        .when("emitterIsPrivateIndividual", {
-          is: true,
-          then: schema => schema.nullable().notRequired(),
-          otherwise: schema =>
-            schema.requiredIf(
-              context.emissionSignature,
-              `Émetteur: ${MISSING_COMPANY_EMAIL}`
-            )
-        }),
-      emitterPickupSiteAddress: yup.string().nullable(),
-      emitterPickupSiteCity: yup.string().nullable(),
-      emitterPickupSiteInfos: yup.string().nullable(),
-      emitterPickupSiteName: yup.string().nullable(),
-      emitterPickupSitePostalCode: yup.string().nullable()
-    });
+    emitterPickupSiteAddress: yup.string().nullable(),
+    emitterPickupSiteCity: yup.string().nullable(),
+    emitterPickupSiteInfos: yup.string().nullable(),
+    emitterPickupSiteName: yup.string().nullable(),
+    emitterPickupSitePostalCode: yup.string().nullable()
+  });
 
 const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
   yup.object({
@@ -480,349 +455,357 @@ const workerSchema: FactorySchemaOf<BsdaValidationContext, Worker> = context =>
       })
   });
 
-const destinationSchema: FactorySchemaOf<BsdaValidationContext, Destination> =
-  context =>
-    yup.object({
-      destinationCompanyName: yup
-        .string()
-        .requiredIf(
-          context.emissionSignature,
-          `Entreprise de destination: ${MISSING_COMPANY_NAME}`
-        ),
-      destinationCompanySiret: siret
-        .label("Destination")
-        .test(siretTests.isRegistered("DESTINATION"))
-        .requiredIf(
-          context.emissionSignature,
-          `Entreprise de destination: ${MISSING_COMPANY_SIRET}`
-        ),
-      destinationCompanyAddress: yup
-        .string()
-        .requiredIf(
-          context.emissionSignature,
-          `Entreprise de destination: ${MISSING_COMPANY_ADDRESS}`
-        ),
-      destinationCompanyContact: yup
-        .string()
-        .requiredIf(
-          context.emissionSignature,
-          `Entreprise de destination: ${MISSING_COMPANY_CONTACT}`
-        ),
-      destinationCompanyPhone: yup
-        .string()
-        .requiredIf(
-          context.emissionSignature,
-          `Entreprise de destination: ${MISSING_COMPANY_PHONE}`
-        ),
-      destinationCompanyMail: yup
-        .string()
-        .email()
-        .requiredIf(
-          context.emissionSignature,
-          `Entreprise de destination: ${MISSING_COMPANY_EMAIL}`
-        ),
-      destinationCap: yup.string().when("type", {
-        is: value =>
-          [
-            BsdaType.COLLECTION_2710,
-            BsdaType.GATHERING,
-            BsdaType.RESHIPMENT
-          ].includes(value),
-        then: schema => schema.nullable(),
-        otherwise: s =>
-          s.when("destinationPlannedOperationCode", {
-            is: value => PARTIAL_OPERATIONS.includes(value),
-            then: schema => schema.nullable(),
-            otherwise: schema =>
-              schema.requiredIf(
-                context.emissionSignature,
-                `Entreprise de destination: CAP obligatoire`
-              )
-          })
-      }),
-      destinationPlannedOperationCode: yup
-        .string()
-        .requiredIf(
-          context.emissionSignature,
-          `Entreprise de destination: vous devez préciser le code d'opération prévu`
-        )
-        .oneOf(
-          [null, "", ...OPERATIONS],
-          "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
-        ),
-      destinationReceptionDate: yup
-        .date()
-        .max(new Date())
-        .requiredIf(
-          context.operationSignature,
-          `Entreprise de destination:vous devez préciser la date de réception`
-        ) as any,
-      destinationReceptionWeight: weight(WeightUnits.Kilogramme)
-        .label("Destination")
-        .when(
-          "destinationReceptionAcceptationStatus",
-          weightConditions.wasteAcceptationStatus
-        )
-        .when(
-          "transporterTransportMode",
-          weightConditions.transportMode(WeightUnits.Kilogramme)
-        )
-        .requiredIf(
-          context.operationSignature,
-          `Entreprise de destination: vous devez préciser la quantité`
-        ),
-      destinationReceptionAcceptationStatus: yup
-        .mixed<WasteAcceptationStatus>()
-        .requiredIf(
-          context.operationSignature,
-          `Entreprise de destination: vous devez préciser le statut d'acceptation`
-        ),
-      destinationReceptionRefusalReason: yup
-        .string()
-        .when(
-          "destinationReceptionAcceptationStatus",
-          (acceptationStatus, schema) =>
-            [
-              WasteAcceptationStatus.REFUSED,
-              WasteAcceptationStatus.PARTIALLY_REFUSED
-            ].includes(acceptationStatus)
-              ? schema.ensure().required("Vous devez saisir un motif de refus")
-              : schema
-                  .ensure()
-                  .max(
-                    0,
-                    "Le motif du refus ne doit pas être renseigné si le déchet est accepté"
-                  )
-        ),
-      destinationOperationCode: yup
-        .string()
-        .when("destinationReceptionAcceptationStatus", {
-          is: value => value === WasteAcceptationStatus.REFUSED,
-          then: schema =>
-            schema
-              .oneOf(
-                [null, ""],
-                "Le code d'opération ne doit pas être renseigné lorsque le déchet est refusé"
-              )
-              .nullable(),
-          otherwise: schema =>
-            schema
-              .oneOf(
-                [null, "", ...OPERATIONS],
-                "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
-              )
-              .requiredIf(
-                context.operationSignature,
-                `Entreprise de destination: vous devez préciser le code d'opération réalisé`
-              )
-        }),
-      destinationOperationDescription: yup.string().nullable(),
-      destinationOperationDate: yup
-        .date()
-        .when("destinationReceptionAcceptationStatus", {
-          is: value => value === WasteAcceptationStatus.REFUSED,
+const destinationSchema: FactorySchemaOf<
+  BsdaValidationContext,
+  Destination
+> = context =>
+  yup.object({
+    destinationCompanyName: yup
+      .string()
+      .requiredIf(
+        context.emissionSignature,
+        `Entreprise de destination: ${MISSING_COMPANY_NAME}`
+      ),
+    destinationCompanySiret: siret
+      .label("Destination")
+      .test(siretTests.isRegistered("DESTINATION"))
+      .requiredIf(
+        context.emissionSignature,
+        `Entreprise de destination: ${MISSING_COMPANY_SIRET}`
+      ),
+    destinationCompanyAddress: yup
+      .string()
+      .requiredIf(
+        context.emissionSignature,
+        `Entreprise de destination: ${MISSING_COMPANY_ADDRESS}`
+      ),
+    destinationCompanyContact: yup
+      .string()
+      .requiredIf(
+        context.emissionSignature,
+        `Entreprise de destination: ${MISSING_COMPANY_CONTACT}`
+      ),
+    destinationCompanyPhone: yup
+      .string()
+      .requiredIf(
+        context.emissionSignature,
+        `Entreprise de destination: ${MISSING_COMPANY_PHONE}`
+      ),
+    destinationCompanyMail: yup
+      .string()
+      .email()
+      .requiredIf(
+        context.emissionSignature,
+        `Entreprise de destination: ${MISSING_COMPANY_EMAIL}`
+      ),
+    destinationCap: yup.string().when("type", {
+      is: value =>
+        [
+          BsdaType.COLLECTION_2710,
+          BsdaType.GATHERING,
+          BsdaType.RESHIPMENT
+        ].includes(value),
+      then: schema => schema.nullable(),
+      otherwise: s =>
+        s.when("destinationPlannedOperationCode", {
+          is: value => PARTIAL_OPERATIONS.includes(value),
           then: schema => schema.nullable(),
           otherwise: schema =>
-            schema
-              .max(
-                new Date(),
-                "La date d'opération doit être antérieure au moment présent"
-              )
-              .when(
-                "destinationReceptionDate",
-                (destinationReceptionDate, schema) =>
-                  destinationReceptionDate
-                    ? schema.min(
-                        destinationReceptionDate,
-                        "La date d'opération doit être postérieure à la date de réception"
-                      )
-                    : schema
-              )
-              .requiredIf(
-                context.operationSignature,
-                `Entreprise de destination: vous devez préciser la date d'opération`
-              ) as any
-        }),
-      destinationOperationNextDestinationCap: yup
-        .string()
-        .when("destinationOperationNextDestinationCompanySiret", {
-          is: value => Boolean(value),
-          then: schema =>
             schema.requiredIf(
               context.emissionSignature,
-              `Entreprise de destination ultérieure prévue: CAP obligatoire`
-            ),
-          otherwise: schema => schema.nullable()
+              `Entreprise de destination: CAP obligatoire`
+            )
         })
-    });
+    }),
+    destinationPlannedOperationCode: yup
+      .string()
+      .requiredIf(
+        context.emissionSignature,
+        `Entreprise de destination: vous devez préciser le code d'opération prévu`
+      )
+      .oneOf(
+        [null, "", ...OPERATIONS],
+        "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
+      ),
+    destinationReceptionDate: yup
+      .date()
+      .max(new Date())
+      .requiredIf(
+        context.operationSignature,
+        `Entreprise de destination:vous devez préciser la date de réception`
+      ) as any,
+    destinationReceptionWeight: weight(WeightUnits.Kilogramme)
+      .label("Destination")
+      .when(
+        "destinationReceptionAcceptationStatus",
+        weightConditions.wasteAcceptationStatus
+      )
+      .when(
+        "transporterTransportMode",
+        weightConditions.transportMode(WeightUnits.Kilogramme)
+      )
+      .requiredIf(
+        context.operationSignature,
+        `Entreprise de destination: vous devez préciser la quantité`
+      ),
+    destinationReceptionAcceptationStatus: yup
+      .mixed<WasteAcceptationStatus>()
+      .requiredIf(
+        context.operationSignature,
+        `Entreprise de destination: vous devez préciser le statut d'acceptation`
+      ),
+    destinationReceptionRefusalReason: yup
+      .string()
+      .when(
+        "destinationReceptionAcceptationStatus",
+        (acceptationStatus, schema) =>
+          [
+            WasteAcceptationStatus.REFUSED,
+            WasteAcceptationStatus.PARTIALLY_REFUSED
+          ].includes(acceptationStatus)
+            ? schema.ensure().required("Vous devez saisir un motif de refus")
+            : schema
+                .ensure()
+                .max(
+                  0,
+                  "Le motif du refus ne doit pas être renseigné si le déchet est accepté"
+                )
+      ),
+    destinationOperationCode: yup
+      .string()
+      .when("destinationReceptionAcceptationStatus", {
+        is: value => value === WasteAcceptationStatus.REFUSED,
+        then: schema =>
+          schema
+            .oneOf(
+              [null, ""],
+              "Le code d'opération ne doit pas être renseigné lorsque le déchet est refusé"
+            )
+            .nullable(),
+        otherwise: schema =>
+          schema
+            .oneOf(
+              [null, "", ...OPERATIONS],
+              "Le code de l'opération de traitement prévu ne fait pas partie de la liste reconnue : ${values}"
+            )
+            .requiredIf(
+              context.operationSignature,
+              `Entreprise de destination: vous devez préciser le code d'opération réalisé`
+            )
+      }),
+    destinationOperationDescription: yup.string().nullable(),
+    destinationOperationDate: yup
+      .date()
+      .when("destinationReceptionAcceptationStatus", {
+        is: value => value === WasteAcceptationStatus.REFUSED,
+        then: schema => schema.nullable(),
+        otherwise: schema =>
+          schema
+            .max(
+              new Date(),
+              "La date d'opération doit être antérieure au moment présent"
+            )
+            .when(
+              "destinationReceptionDate",
+              (destinationReceptionDate, schema) =>
+                destinationReceptionDate
+                  ? schema.min(
+                      destinationReceptionDate,
+                      "La date d'opération doit être postérieure à la date de réception"
+                    )
+                  : schema
+            )
+            .requiredIf(
+              context.operationSignature,
+              `Entreprise de destination: vous devez préciser la date d'opération`
+            ) as any
+      }),
+    destinationOperationNextDestinationCap: yup
+      .string()
+      .when("destinationOperationNextDestinationCompanySiret", {
+        is: value => Boolean(value),
+        then: schema =>
+          schema.requiredIf(
+            context.emissionSignature,
+            `Entreprise de destination ultérieure prévue: CAP obligatoire`
+          ),
+        otherwise: schema => schema.nullable()
+      }),
+    destinationOperationNextDestinationCompanySiret: siret
+      .label("Entreprise de destination ultérieure prévue")
+      .test(siretTests.isRegistered("DESTINATION"))
+      .nullable()
+  });
 
-const transporterSchema: FactorySchemaOf<BsdaValidationContext, Transporter> =
-  context =>
-    yup.object({
-      transporterRecepisseIsExempted: yup.boolean().nullable(),
-      transporterRecepisseDepartment: yup
-        .string()
-        .when(
-          [
-            "type",
-            "transporterRecepisseIsExempted",
-            "transporterCompanyVatNumber"
-          ],
-          {
-            is: (type, isExempted, vat) =>
-              type === BsdaType.COLLECTION_2710 ||
-              isExempted ||
-              isForeignVat(vat),
-            then: schema => schema.nullable().notRequired(),
-            otherwise: schema =>
-              schema.requiredIf(
-                context.transportSignature,
-                `Transporteur: le département associé au récépissé est obligatoire`
-              )
-          }
-        ),
-      transporterRecepisseNumber: yup
-        .string()
-        .when(
-          [
-            "type",
-            "transporterRecepisseIsExempted",
-            "transporterCompanyVatNumber"
-          ],
-          {
-            is: (type, isExempted, vat) =>
-              type === BsdaType.COLLECTION_2710 ||
-              isExempted ||
-              isForeignVat(vat),
-            then: schema => schema.nullable().notRequired(),
-            otherwise: schema =>
-              schema.requiredIf(
-                context.transportSignature,
-                `Transporteur: le numéro de récépissé est obligatoire`
-              )
-          }
-        ),
-      transporterRecepisseValidityLimit: yup
-        .date()
-        .when(
-          [
-            "type",
-            "transporterRecepisseIsExempted",
-            "transporterCompanyVatNumber"
-          ],
-          {
-            is: (type, isExempted, vat) =>
-              type === BsdaType.COLLECTION_2710 ||
-              isExempted ||
-              isForeignVat(vat),
-            then: schema => schema.nullable().notRequired(),
-            otherwise: schema =>
-              schema.requiredIf(
-                context.transportSignature,
-                `Transporteur: la date limite de validité du récépissé est obligatoire`
-              )
-          }
-        ),
-      transporterCompanyName: yup.string().when("type", {
+const transporterSchema: FactorySchemaOf<
+  BsdaValidationContext,
+  Transporter
+> = context =>
+  yup.object({
+    transporterRecepisseIsExempted: yup.boolean().nullable(),
+    transporterRecepisseDepartment: yup
+      .string()
+      .when(
+        [
+          "type",
+          "transporterRecepisseIsExempted",
+          "transporterCompanyVatNumber"
+        ],
+        {
+          is: (type, isExempted, vat) =>
+            type === BsdaType.COLLECTION_2710 ||
+            isExempted ||
+            isForeignVat(vat),
+          then: schema => schema.nullable().notRequired(),
+          otherwise: schema =>
+            schema.requiredIf(
+              context.transportSignature,
+              `Transporteur: le département associé au récépissé est obligatoire`
+            )
+        }
+      ),
+    transporterRecepisseNumber: yup
+      .string()
+      .when(
+        [
+          "type",
+          "transporterRecepisseIsExempted",
+          "transporterCompanyVatNumber"
+        ],
+        {
+          is: (type, isExempted, vat) =>
+            type === BsdaType.COLLECTION_2710 ||
+            isExempted ||
+            isForeignVat(vat),
+          then: schema => schema.nullable().notRequired(),
+          otherwise: schema =>
+            schema.requiredIf(
+              context.transportSignature,
+              `Transporteur: le numéro de récépissé est obligatoire`
+            )
+        }
+      ),
+    transporterRecepisseValidityLimit: yup
+      .date()
+      .when(
+        [
+          "type",
+          "transporterRecepisseIsExempted",
+          "transporterCompanyVatNumber"
+        ],
+        {
+          is: (type, isExempted, vat) =>
+            type === BsdaType.COLLECTION_2710 ||
+            isExempted ||
+            isForeignVat(vat),
+          then: schema => schema.nullable().notRequired(),
+          otherwise: schema =>
+            schema.requiredIf(
+              context.transportSignature,
+              `Transporteur: la date limite de validité du récépissé est obligatoire`
+            )
+        }
+      ),
+    transporterCompanyName: yup.string().when("type", {
+      is: BsdaType.COLLECTION_2710,
+      then: schema =>
+        schema
+          .nullable()
+          .max(
+            0,
+            "Impossible de saisir un transporteur pour ce type de bordereau"
+          ),
+      otherwise: schema =>
+        schema.requiredIf(
+          context.transportSignature,
+          `Transporteur: ${MISSING_COMPANY_NAME}`
+        )
+    }),
+    transporterCompanySiret: siret
+      .label("Transporteur")
+      .requiredIf(
+        context.workSignature,
+        `Transporteur: ${MISSING_COMPANY_SIRET}`
+      )
+      .when("transporterCompanyVatNumber", siretConditions.companyVatNumber)
+      .test(siretTests.isRegistered("TRANSPORTER"))
+      .when("type", {
         is: BsdaType.COLLECTION_2710,
         then: schema =>
           schema
             .nullable()
             .max(
               0,
-              "Impossible de saisir un transporteur pour ce type de bordereau"
-            ),
-        otherwise: schema =>
-          schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: ${MISSING_COMPANY_NAME}`
-          )
-      }),
-      transporterCompanySiret: siret
-        .label("Transporteur")
-        .requiredIf(
-          context.workSignature,
-          `Transporteur: ${MISSING_COMPANY_SIRET}`
-        )
-        .when("transporterCompanyVatNumber", siretConditions.companyVatNumber)
-        .test(siretTests.isRegistered("TRANSPORTER"))
-        .when("type", {
-          is: BsdaType.COLLECTION_2710,
-          then: schema =>
-            schema
-              .nullable()
-              .max(
-                0,
-                "Impossible de saisir le SIRET d'un transporteur pour ce type de bordereau"
-              )
-        }),
-      transporterCompanyVatNumber: foreignVatNumber
-        .label("Transporteur")
-        .test(vatNumberTests.isRegisteredTransporter),
-      transporterCompanyAddress: yup.string().when("type", {
-        is: BsdaType.COLLECTION_2710,
-        then: schema => schema.nullable(),
-        otherwise: schema =>
-          schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: ${MISSING_COMPANY_ADDRESS}`
-          )
-      }),
-      transporterCompanyContact: yup.string().when("type", {
-        is: BsdaType.COLLECTION_2710,
-        then: schema => schema.nullable(),
-        otherwise: schema =>
-          schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: ${MISSING_COMPANY_CONTACT}`
-          )
-      }),
-      transporterCompanyPhone: yup.string().when("type", {
-        is: BsdaType.COLLECTION_2710,
-        then: schema => schema.nullable(),
-        otherwise: schema =>
-          schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: ${MISSING_COMPANY_PHONE}`
-          )
-      }),
-      transporterCompanyMail: yup
-        .string()
-        .email()
-        .when("type", {
-          is: BsdaType.COLLECTION_2710,
-          then: schema => schema.nullable(),
-          otherwise: schema =>
-            schema.requiredIf(
-              context.transportSignature,
-              `Transporteur: ${MISSING_COMPANY_EMAIL}`
+              "Impossible de saisir le SIRET d'un transporteur pour ce type de bordereau"
             )
-        }),
-      transporterTransportMode: yup
-        .mixed<TransportMode>()
-        .nullable()
-        .oneOf(
-          [null, ...Object.values(TransportMode)],
-          "Le mode de transport ne fait pas partie de la liste reconnue : ${values}"
-        )
-        .requiredIf(
+      }),
+    transporterCompanyVatNumber: foreignVatNumber
+      .label("Transporteur")
+      .test(vatNumberTests.isRegisteredTransporter),
+    transporterCompanyAddress: yup.string().when("type", {
+      is: BsdaType.COLLECTION_2710,
+      then: schema => schema.nullable(),
+      otherwise: schema =>
+        schema.requiredIf(
           context.transportSignature,
-          "Le mode de transport utilisé par le transporteur est requis"
-        ),
-      transporterTransportPlates: yup
-        .array()
-        .of(yup.string())
-        .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
-        .when("transporterTransportMode", {
-          is: TransportMode.ROAD,
-          then: schema =>
-            schema.requiredIf(
-              context.transportSignature,
-              "L'immatriculation du transporteur doit être saisie'"
-            ),
-          otherwise: schema => schema.nullable()
-        })
-    });
+          `Transporteur: ${MISSING_COMPANY_ADDRESS}`
+        )
+    }),
+    transporterCompanyContact: yup.string().when("type", {
+      is: BsdaType.COLLECTION_2710,
+      then: schema => schema.nullable(),
+      otherwise: schema =>
+        schema.requiredIf(
+          context.transportSignature,
+          `Transporteur: ${MISSING_COMPANY_CONTACT}`
+        )
+    }),
+    transporterCompanyPhone: yup.string().when("type", {
+      is: BsdaType.COLLECTION_2710,
+      then: schema => schema.nullable(),
+      otherwise: schema =>
+        schema.requiredIf(
+          context.transportSignature,
+          `Transporteur: ${MISSING_COMPANY_PHONE}`
+        )
+    }),
+    transporterCompanyMail: yup
+      .string()
+      .email()
+      .when("type", {
+        is: BsdaType.COLLECTION_2710,
+        then: schema => schema.nullable(),
+        otherwise: schema =>
+          schema.requiredIf(
+            context.transportSignature,
+            `Transporteur: ${MISSING_COMPANY_EMAIL}`
+          )
+      }),
+    transporterTransportMode: yup
+      .mixed<TransportMode>()
+      .nullable()
+      .oneOf(
+        [null, ...Object.values(TransportMode)],
+        "Le mode de transport ne fait pas partie de la liste reconnue : ${values}"
+      )
+      .requiredIf(
+        context.transportSignature,
+        "Le mode de transport utilisé par le transporteur est requis"
+      ),
+    transporterTransportPlates: yup
+      .array()
+      .of(yup.string())
+      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
+      .when("transporterTransportMode", {
+        is: TransportMode.ROAD,
+        then: schema =>
+          schema.requiredIf(
+            context.transportSignature,
+            "L'immatriculation du transporteur doit être saisie'"
+          ),
+        otherwise: schema => schema.nullable()
+      })
+  });
 
 const packagingsSchema = yup.object({
   type: yup.string().required("Le type de conditionnement est obligatoire"),

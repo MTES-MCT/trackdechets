@@ -1,6 +1,7 @@
 import { app, startApolloServer } from "./server";
 import { closeQueues } from "./queue/producers";
 import { cleanGqlCaches } from "./temp-memory";
+import { heapSnapshotToS3Router } from "./logging/heapSnapshot";
 
 const port = process.env.API_PORT || 80;
 
@@ -17,6 +18,8 @@ async function start() {
 
   process.on("SIGTERM", shutdown);
   process.on("SIGINT", shutdown);
+
+  process.on("SIGUSR1", heapSnapshotToS3Router);
 }
 
 if (process.env.TZ !== "Europe/Paris") {

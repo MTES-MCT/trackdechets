@@ -416,6 +416,7 @@ export const dashboardFormFragment = gql`
         other
         quantity
       }
+      quantity
     }
     emitter {
       type
@@ -424,6 +425,9 @@ export const dashboardFormFragment = gql`
         siret
         name
         omiNumber
+      }
+      workSite {
+        name
       }
       isPrivateIndividual
       isForeignShip
@@ -463,6 +467,7 @@ export const dashboardFormFragment = gql`
         name
       }
       transporterNumberPlate
+      lastActionOn
     }
     temporaryStorageDetail {
       destination {

@@ -114,7 +114,7 @@ describe("Mutation.createCompany", () => {
       })) != null;
     expect(newCompanyAssociationExists).toBe(true);
 
-    const refreshedUser = await prisma.user.findUnique({
+    const refreshedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }
     });
 
@@ -173,7 +173,7 @@ describe("Mutation.createCompany", () => {
       })) != null;
     expect(newCompanyAssociationExists).toBe(true);
 
-    const refreshedUser = await prisma.user.findUnique({
+    const refreshedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }
     });
 
@@ -216,13 +216,13 @@ describe("Mutation.createCompany", () => {
       }
     );
 
-    expect(data.createCompany.transporterReceipt.receiptNumber).toEqual(
+    expect(data.createCompany.transporterReceipt!.receiptNumber).toEqual(
       transporterReceipt.receiptNumber
     );
-    expect(data.createCompany.transporterReceipt.validityLimit).toEqual(
+    expect(data.createCompany.transporterReceipt!.validityLimit).toEqual(
       transporterReceipt.validityLimit.toISOString()
     );
-    expect(data.createCompany.transporterReceipt.department).toEqual(
+    expect(data.createCompany.transporterReceipt!.department).toEqual(
       transporterReceipt.department
     );
   });
@@ -263,13 +263,13 @@ describe("Mutation.createCompany", () => {
     );
 
     // check the traderReceipt was created in db
-    expect(data.createCompany.traderReceipt.receiptNumber).toEqual(
+    expect(data.createCompany.traderReceipt!.receiptNumber).toEqual(
       traderReceipt.receiptNumber
     );
-    expect(data.createCompany.traderReceipt.validityLimit).toEqual(
+    expect(data.createCompany.traderReceipt!.validityLimit).toEqual(
       traderReceipt.validityLimit.toISOString()
     );
-    expect(data.createCompany.traderReceipt.department).toEqual(
+    expect(data.createCompany.traderReceipt!.department).toEqual(
       traderReceipt.department
     );
   });
@@ -288,7 +288,7 @@ describe("Mutation.createCompany", () => {
     };
 
     searchCompany.mockResolvedValueOnce({
-      orgId: company.siret,
+      orgId: company.siret!,
       siret: company.siret,
       etatAdministratif: "A"
     });
@@ -487,14 +487,14 @@ describe("Mutation.createCompany", () => {
     });
     expect(errors).toBeUndefined();
 
-    const company = await prisma.company.findUnique({
+    const company = await prisma.company.findUniqueOrThrow({
       where: { siret: companyInput.siret }
     });
 
     expect(sendMailSpy).toHaveBeenCalledWith(
       renderMail(verificationProcessInfo, {
         to: [{ email: user.email, name: user.name }],
-        variables: { company }
+        variables: { company: company as any }
       })
     );
 

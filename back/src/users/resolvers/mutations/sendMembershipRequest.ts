@@ -60,7 +60,7 @@ const sendMembershipRequestResolver: MutationResolvers["sendMembershipRequest"] 
     });
 
     // send membership request to all admins of the company
-    const recipients = admins.map(a => ({ email: a.email, name: a.name }));
+    const recipients = admins.map(a => ({ email: a.email, name: a.name! }));
 
     await sendMail(
       renderMail(membershipRequestMail, {

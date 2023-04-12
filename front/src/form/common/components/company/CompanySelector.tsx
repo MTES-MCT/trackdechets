@@ -19,14 +19,22 @@ import React, { useMemo, useRef, useState } from "react";
 import { debounce } from "common/helper";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import {
+  BsdasriTransporterInput,
+  BsdaTransporter,
+  BsdaTransporterInput,
+  BsvhuTransporterInput,
   CompanyFavorite,
   CompanySearchResult,
+  CompanySearchPrivate,
   FavoriteType,
   FormCompany,
+  Maybe,
   Query,
   QueryCompanyPrivateInfosArgs,
   QueryFavoritesArgs,
   QuerySearchCompaniesArgs,
+  Transporter,
+  TransporterInput,
 } from "generated/graphql/types";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -37,12 +45,16 @@ import {
   FAVORITES,
   SEARCH_COMPANIES,
 } from "./query";
+import TransporterReceipt from "./TransporterReceipt";
+import { BsffFormTransporterInput } from "form/bsff/utils/initial-state";
 
 const DEBOUNCE_DELAY = 500;
 
 interface CompanySelectorProps {
   name: string;
-  onCompanySelected?: (company: CompanySearchResult) => void;
+  onCompanySelected?: (
+    company: CompanySearchResult | CompanySearchPrivate
+  ) => void;
   allowForeignCompanies?: boolean;
   registeredOnlyCompanies?: boolean;
   heading?: string;
@@ -76,11 +88,34 @@ export default function CompanySelector({
     name: field.value?.name,
     address: field.value?.address,
   });
-  const { setFieldError, setFieldValue, setFieldTouched } = useFormikContext();
+  const { setFieldError, setFieldValue, setFieldTouched, values } =
+    useFormikContext<{
+      transporter:
+        | Maybe<TransporterInput>
+        | Maybe<BsdaTransporterInput>
+        | Maybe<BsdasriTransporterInput>
+        | Maybe<BsvhuTransporterInput>
+        | Maybe<BsffFormTransporterInput>;
+    }>();
+
+  const isExemptedOfReceipt = useMemo(
+    () =>
+      !!(values.transporter as Transporter).isExemptedOfReceipt
+        ? (values.transporter as Transporter).isExemptedOfReceipt
+        : !!(values.transporter as BsdaTransporter)?.recepisse?.isExempted
+        ? (values.transporter as BsdaTransporter)?.recepisse?.isExempted
+        : // BSFF form as specific values
+        !!(values.transporter as BsffFormTransporterInput)
+            ?.isExemptedOfRecepisse
+        ? (values.transporter as BsffFormTransporterInput)
+            ?.isExemptedOfRecepisse
+        : false,
+    [values.transporter]
+  );
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
-    (field.value.country && field.value.country !== "FR") ||
-      isForeignVat(field.value.vatNumber!!)
+    (field.value?.country && field.value?.country !== "FR") ||
+      isForeignVat(field.value?.vatNumber!!)
   );
   // this 2 input ref are to cross-link the value of the input in both search input and department input
   const departmentInputRef = useRef<HTMLInputElement>(null);
@@ -95,8 +130,8 @@ export default function CompanySelector({
   // Memoize for changes in field.value.siret and field.value.orgId
   // To support both FormCompany and Intermediary (that don't have orgId)
   const orgId = useMemo(
-    () => field.value.orgId ?? field.value.siret ?? null,
-    [field.value.siret, field.value.orgId]
+    () => field.value?.orgId ?? field.value?.siret ?? null,
+    [field.value?.siret, field.value?.orgId]
   );
   // Favorite type is deduced from the field prefix (transporter, emitter, etc)
   const favoriteType = constantCase(field.name.split(".")[0]) as FavoriteType;
@@ -148,6 +183,9 @@ export default function CompanySelector({
       clue: orgId!,
     },
     skip: !orgId,
+    onCompleted(data) {
+      onCompanySelected?.(data.companyPrivateInfos);
+    },
   });
 
   function isUnknownCompanyName(company: CompanySearchResult): boolean {
@@ -446,11 +484,11 @@ export default function CompanySelector({
           selectedItem={
             {
               orgId,
-              siret: field.value.siret,
-              vatNumber: field.value.vatNumber,
-              name: field.value.name,
-              address: field.value.address,
-              codePaysEtrangerEtablissement: field.value.country,
+              siret: field.value?.siret,
+              vatNumber: field.value?.vatNumber,
+              name: field.value?.name,
+              address: field.value?.address,
+              codePaysEtrangerEtablissement: field.value?.country,
               // complete with companyPrivateInfos data
               ...(selectedData?.companyPrivateInfos && {
                 isRegistered: selectedData?.companyPrivateInfos.isRegistered,
@@ -541,6 +579,14 @@ export default function CompanySelector({
 
           <RedErrorMessage name={`${field.name}.mail`} />
         </div>
+
+        {values.transporter &&
+          !!orgId &&
+          !isForeignCompany &&
+          !isExemptedOfReceipt &&
+          name === "transporter.company" && (
+            <TransporterReceipt transporter={values.transporter} />
+          )}
       </div>
     </>
   );

@@ -11,6 +11,11 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../__tests__/factories";
+import * as sirenify from "../../../sirenify";
+
+const sirenifyMock = jest
+  .spyOn(sirenify, "default")
+  .mockImplementation(input => Promise.resolve(input));
 
 const UPDATE_BSDA = `
   mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
@@ -45,7 +50,10 @@ const UPDATE_BSDA = `
 `;
 
 describe("Mutation.updateBsda", () => {
-  afterEach(resetDatabase);
+  afterEach(async () => {
+    await resetDatabase();
+    sirenifyMock.mockClear();
+  });
 
   it("should allow user to update a bsda", async () => {
     const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
@@ -73,6 +81,8 @@ describe("Mutation.updateBsda", () => {
     });
 
     expect(data.updateBsda.id).toBeTruthy();
+    // check input is sirenified
+    expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
 
   it("should disallow unauthenticated user from updating a bsda", async () => {
@@ -303,7 +313,7 @@ describe("Mutation.updateBsda", () => {
       }
     });
 
-    expect(data.updateBsda.transporter.recepisse.number).toEqual(
+    expect(data.updateBsda.transporter!.recepisse!.number).toEqual(
       "Num recepisse"
     );
   });
@@ -456,7 +466,7 @@ describe("Mutation.updateBsda", () => {
     expect(errors).toBeUndefined();
 
     const actualForwarded = await prisma.bsda
-      .findUnique({ where: { id: bsda.id } })
+      .findUniqueOrThrow({ where: { id: bsda.id } })
       .forwarding();
 
     expect(actualForwarded.id).toEqual(newForwarded.id);
@@ -540,7 +550,7 @@ describe("Mutation.updateBsda", () => {
         emitterCompanySiret: company.siret,
         intermediaries: {
           create: {
-            siret: company.siret,
+            siret: company.siret!,
             name: company.name,
             address: company.address,
             contact: "John Doe"
@@ -571,8 +581,8 @@ describe("Mutation.updateBsda", () => {
       }
     });
 
-    expect(data.updateBsda.intermediaries.length).toBe(1);
-    expect(data.updateBsda.intermediaries[0].siret).toBe(otherCompany.siret);
+    expect(data.updateBsda.intermediaries!.length).toBe(1);
+    expect(data.updateBsda.intermediaries![0].siret).toBe(otherCompany.siret);
   });
 
   it("should ignore intermediaries update if the value hasn't changed", async () => {
@@ -585,7 +595,7 @@ describe("Mutation.updateBsda", () => {
         transporterTransportSignatureDate: new Date(),
         intermediaries: {
           create: {
-            siret: company.siret,
+            siret: company.siret!,
             name: company.name,
             address: company.address,
             contact: "John Doe"
@@ -618,7 +628,7 @@ describe("Mutation.updateBsda", () => {
       }
     });
 
-    expect(data.updateBsda.intermediaries.length).toBe(1);
+    expect(data.updateBsda.intermediaries!.length).toBe(1);
   });
 
   it("should reject if updating intermediaries when its value is locked", async () => {
@@ -634,7 +644,7 @@ describe("Mutation.updateBsda", () => {
         transporterTransportSignatureDate: new Date(),
         intermediaries: {
           create: {
-            siret: company.siret,
+            siret: company.siret!,
             name: company.name,
             address: company.address,
             contact: "John Doe"

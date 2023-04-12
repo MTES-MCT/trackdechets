@@ -31,7 +31,9 @@ export default function BsffPackagings({
   ...props
 }: FieldProps<BsffPackagingInput[]> & InputHTMLAttributes<HTMLInputElement>) {
   const [{ value: type }] = useField<BsffType>("type");
-  const { setFieldValue } = useFormikContext();
+
+  const { setFieldValue } = useFormikContext<BsffPackagingInput>();
+
   const canEdit =
     !disabled && ![BsffType.Reexpedition, BsffType.Groupement].includes(type);
 
@@ -102,7 +104,7 @@ export default function BsffPackagings({
 
                       <div className="tw-px-2 tw-flex-shrink">
                         <label>
-                          Volume du contenant (en L)
+                          Volume du contenant en L (optionnel)
                           <Field
                             component={NumberInput}
                             className="td-input td-input--small"
@@ -114,7 +116,7 @@ export default function BsffPackagings({
 
                       <div className="tw-px-2 tw-flex-shrink">
                         <label>
-                          Masse du contenu (en kg)
+                          Masse du contenu en kg
                           <Field
                             component={NumberInput}
                             className="td-input td-input--small"
@@ -140,6 +142,13 @@ export default function BsffPackagings({
                   <RedErrorMessage name={`${fieldName}.numero`} />
                   <RedErrorMessage name={`${fieldName}.volume`} />
                   <RedErrorMessage name={`${fieldName}.weight`} />
+                  {typeof p.volume === "number" &&
+                    p.weight > p.volume * 1.5 && (
+                      <div className="notification notification--warning">
+                        Le poids renseigné semble trop élevé au regard du volume
+                        du contenant.
+                      </div>
+                    )}
                 </div>
               );
             })}
@@ -153,7 +162,7 @@ export default function BsffPackagings({
                     numero: "",
                     other: "",
                     weight: 0,
-                    volume: 0,
+                    volume: null,
                   })
                 }
               >

@@ -16,7 +16,7 @@ const {
   VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID
 } = process.env;
 
-let jobs = [];
+let jobs: cron.CronJob[] = [];
 
 if (CRON_ONBOARDING_SCHEDULE) {
   validateOnbardingCronSchedule(CRON_ONBOARDING_SCHEDULE);
@@ -76,12 +76,13 @@ const Sentry = initSentry();
 
 if (Sentry) {
   jobs.forEach(job => {
-    const onTick = job.onTick;
-    job.onTick = async () => {
-      try {
-        await onTick();
-      } catch (err) {
-        Sentry.captureException(err);
+    job.fireOnTick = async function () {
+      for (let i = this._callbacks.length - 1; i >= 0; i--) {
+        try {
+          await this._callbacks[i].call(this.context, this.onComplete);
+        } catch (err) {
+          Sentry.captureException(err);
+        }
       }
     };
   });

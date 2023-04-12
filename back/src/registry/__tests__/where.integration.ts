@@ -128,7 +128,7 @@ describe("toElasticFilter", () => {
     const bsds = await searchBsds(where);
 
     expect(bsds.map(bsd => bsd.id)).toEqual(
-      where.bsdType._in.map(t => BSDS[t].id)
+      where.bsdType!._in!.map(t => BSDS[t].id)
     );
   });
 

@@ -106,7 +106,7 @@ describe("edition rules", () => {
     await prisma.intermediaryBsdaAssociation.create({
       data: {
         bsdaId: bsda.id,
-        siret: intermediary.siret,
+        siret: intermediary.siret!,
         name: intermediary.name,
         contact: "contact"
       }
@@ -215,7 +215,7 @@ describe("edition rules", () => {
     await prisma.intermediaryBsdaAssociation.create({
       data: {
         bsdaId: bsda.id,
-        siret: intermediary.siret,
+        siret: intermediary.siret!,
         name: intermediary.name,
         contact: "contact"
       }

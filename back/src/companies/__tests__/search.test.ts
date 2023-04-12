@@ -84,7 +84,7 @@ describe("searchCompany", () => {
         ...createInput
       }
     });
-    const testCompany = await searchCompany(siret);
+    const testCompany = await searchCompany(siret!);
     expect(siret).toEqual(testCompany.siret);
     expect("FR").toEqual(testCompany.codePaysEtrangerEtablissement);
     process.env = OLD_ENV;
@@ -98,7 +98,7 @@ describe("searchCompany", () => {
         ...createInput
       }
     });
-    const testCompany = await searchCompany(siret);
+    const testCompany = await searchCompany(siret!);
     expect(siret).toEqual(testCompany.siret);
     expect("FR").toEqual(testCompany.codePaysEtrangerEtablissement);
   });

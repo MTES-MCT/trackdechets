@@ -52,7 +52,7 @@ const createTestCompany: MutationResolvers["createTestCompany"] = async (
       orgId: createInput.siret
     }
   });
-  return company.siret;
+  return company.siret!;
 };
 
 export default createTestCompany;

@@ -83,7 +83,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const acceptedForm = await prisma.form.findUnique({
+    const acceptedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
 
@@ -131,7 +131,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form.findUnique({ where: { id: form.id } });
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
     // form was not accepted, still sent
     expect(frm.status).toBe("RECEIVED");
     expect(frm.wasteAcceptationStatus).toBe(null);
@@ -170,7 +170,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form.findUnique({ where: { id: form.id } });
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
     // form was not accepted, still sent
     expect(frm.status).toBe("RECEIVED");
     expect(frm.wasteAcceptationStatus).toBe(null);
@@ -208,7 +208,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form.findUnique({ where: { id: form.id } });
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
 
     // form was refused
     expect(frm.status).toBe("REFUSED");
@@ -261,7 +261,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form.findUnique({ where: { id: form.id } });
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
 
     // form is still sent
     expect(frm.status).toBe("RECEIVED");
@@ -307,7 +307,7 @@ describe("Test Form reception", () => {
       }
     });
 
-    const frm = await prisma.form.findUnique({ where: { id: form.id } });
+    const frm = await prisma.form.findUniqueOrThrow({ where: { id: form.id } });
     // form was not accepted
     expect(frm.status).toBe("ACCEPTED");
     expect(frm.wasteAcceptationStatus).toBe("PARTIALLY_REFUSED");
@@ -366,7 +366,7 @@ describe("Test Form reception", () => {
         }
       });
 
-      const acceptedForm = await prisma.form.findUnique({
+      const acceptedForm = await prisma.form.findUniqueOrThrow({
         where: { id: form.id }
       });
 
@@ -419,8 +419,8 @@ describe("Test Form reception", () => {
         grouping: {
           createMany: {
             data: [
-              { initialFormId: form1.id, quantity: form1.quantityReceived },
-              { initialFormId: form2.id, quantity: form2.quantityReceived }
+              { initialFormId: form1.id, quantity: form1.quantityReceived! },
+              { initialFormId: form2.id, quantity: form2.quantityReceived! }
             ]
           }
         }
@@ -445,17 +445,17 @@ describe("Test Form reception", () => {
       }
     );
 
-    const updatedForm1 = await prisma.form.findUnique({
+    const updatedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: form1.id }
     });
-    const updatedForm2 = await prisma.form.findUnique({
+    const updatedForm2 = await prisma.form.findUniqueOrThrow({
       where: { id: form2.id }
     });
     expect(updatedForm1.status).toEqual("AWAITING_GROUP");
     expect(updatedForm2.status).toEqual("AWAITING_GROUP");
 
     const groupement = await prisma.form
-      .findUnique({
+      .findUniqueOrThrow({
         where: { id: groupementForm.id }
       })
       .grouping({ include: { initialForm: true } });
@@ -588,7 +588,7 @@ describe("Test Form reception", () => {
 
       expect(data.markAsAccepted.status).toBe(Status.ACCEPTED);
 
-      const refreshedItem = await prisma.form.findUnique({
+      const refreshedItem = await prisma.form.findUniqueOrThrow({
         where: { id: appendix1_item.id }
       });
       expect(refreshedItem.status).toBe(Status.ACCEPTED);

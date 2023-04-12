@@ -7,9 +7,8 @@ export interface BsdCardProps {
   currentSiret: string;
   onValidate: (bsd: Bsd) => void;
   onOverview?: Function;
-  onPdf?: Function;
-  onDuplicate?: Function;
   onUpdate?: Function;
-  onDelete?: Function;
   onRevision?: Function;
+  onBsdSuite?: Function;
+  onAppendix1?: Function;
 }

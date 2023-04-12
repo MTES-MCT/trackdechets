@@ -63,7 +63,7 @@ describe("{ mutation { editSegment } }", () => {
           }`
     );
 
-    const editedSegment = await prisma.transportSegment.findUnique({
+    const editedSegment = await prisma.transportSegment.findUniqueOrThrow({
       where: { id: segment.id }
     });
     expect(editedSegment.transporterCompanySiret).toBe(editSegmentSiret);
@@ -113,7 +113,7 @@ describe("{ mutation { editSegment } }", () => {
           }`
     );
 
-    const editedSegment = await prisma.transportSegment.findUnique({
+    const editedSegment = await prisma.transportSegment.findUniqueOrThrow({
       where: { id: segment.id }
     });
     expect(editedSegment.transporterCompanySiret).toBe(editSegmentSiret);
@@ -165,7 +165,7 @@ describe("{ mutation { editSegment } }", () => {
           }`
     );
 
-    const editedSegment = await prisma.transportSegment.findUnique({
+    const editedSegment = await prisma.transportSegment.findUniqueOrThrow({
       where: { id: segment.id }
     });
 

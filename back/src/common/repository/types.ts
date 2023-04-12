@@ -5,11 +5,12 @@ export type PrismaTransaction = Omit<
   "$connect" | "$disconnect" | "$on" | "$transaction" | "$use"
 >;
 export type RepositoryTransaction = PrismaTransaction & {
-  addAfterCommitCallback?: (callback: () => void | Promise<void>) => void;
+  addAfterCommitCallback: (callback: () => void | Promise<void>) => void;
 };
 
-export type ReadRepositoryFnDeps = { prisma: RepositoryTransaction };
-export type WriteRepositoryFnDeps = ReadRepositoryFnDeps & {
+export type ReadRepositoryFnDeps = { prisma: PrismaTransaction };
+export type WriteRepositoryFnDeps = {
+  prisma: RepositoryTransaction;
   user: Express.User;
 };
 export type RepositoryFnDeps = WriteRepositoryFnDeps;

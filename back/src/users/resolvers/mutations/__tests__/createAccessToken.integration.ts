@@ -28,7 +28,7 @@ describe("mutation createAccessToken", () => {
     >(CREATE_ACCESS_TOKEN, {
       variables: { input: { description: "TEST" } }
     });
-    const accessToken = await prisma.accessToken.findFirst({
+    const accessToken = await prisma.accessToken.findFirstOrThrow({
       where: { id: data.createAccessToken.id }
     });
     expect(accessToken).not.toBeNull();

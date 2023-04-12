@@ -2,7 +2,7 @@ export interface SearchStockEtablissement {
   siren: string;
   nic: string;
   siret: string;
-  statutDiffusionEtablissement: "O" | "N";
+  statutDiffusionEtablissement: "O" | "N" | "P";
   dateCreationEtablissement: string;
   trancheEffectifsEtablissement: string;
   anneeEffectifsEtablissement: string;
@@ -111,12 +111,4 @@ export interface SearchHit {
   _id: string;
   _score: number;
   _source: SearchStockEtablissement;
-}
-
-/**
- * Public API error code names
- */
-export enum ProviderErrors {
-  SiretNotFound = "Nous n'avons pas trouvé ce SIRET dans notre base de données, cherchons sur l'Api publique Sirene de l'INSEE",
-  ServerError = "Erreur inconnue"
 }

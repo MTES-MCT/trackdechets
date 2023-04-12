@@ -49,7 +49,7 @@ export function bsdaReducer(
       const { ...bsda } = event.data.content;
       return {
         ...currentState,
-        ...fixMissTypings(bsda as Prisma.BsdaCreateInput)
+        ...fixMissTypings(bsda as Partial<Prisma.BsdaCreateInput>)
       };
 
     default:
@@ -58,7 +58,9 @@ export function bsdaReducer(
 }
 
 function fixMissTypings(
-  update: Omit<Prisma.BsdaCreateInput, "updatedAt" | "createdAt" | "grouping">
+  update: Partial<
+    Omit<Prisma.BsdaCreateInput, "updatedAt" | "createdAt" | "grouping">
+  >
 ) {
   const patch = {
     ...update,

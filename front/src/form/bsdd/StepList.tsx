@@ -1,5 +1,4 @@
 import { useMutation, useQuery } from "@apollo/client";
-import routes from "common/routes";
 import {
   FormInput,
   Mutation,
@@ -9,7 +8,7 @@ import {
   QueryFormArgs,
 } from "generated/graphql/types";
 import React, { ReactElement, useMemo, lazy } from "react";
-import { generatePath, useHistory, useParams } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { getInitialState } from "./utils/initial-state";
 import { formSchema } from "./utils/schema";
 import { CREATE_FORM, GET_FORM, UPDATE_FORM } from "./utils/queries";
@@ -25,7 +24,6 @@ interface Props {
   formId?: string;
 }
 export default function StepsList(props: Props) {
-  const { siret } = useParams<{ siret: string }>();
   const history = useHistory();
 
   const formQuery = useQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {

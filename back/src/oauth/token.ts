@@ -1,4 +1,3 @@
-import { getUid } from "../utils";
 import * as jose from "jose";
 import {
   Grant,
@@ -42,7 +41,7 @@ export const buildIdToken = async (
   grant: Grant & { application: Application; user: User }
 ): Promise<string> => {
   const privateKey = await jose.importPKCS8(
-    OIDC_PRIVATE_KEY,
+    OIDC_PRIVATE_KEY!,
     TOKEN_SIGNATURE_ALG
   );
 
@@ -61,14 +60,14 @@ export const buildIdToken = async (
     ...profile,
     ...email,
     ...companies,
-    nonce: getUid(32)
+    nonce: grant.nonce
   };
 
   const jwt = await new jose.SignJWT(payload)
     .setProtectedHeader({ alg: TOKEN_SIGNATURE_ALG })
     .setIssuedAt()
     .setIssuer(ISSUER)
-    .setAudience(grant.application.name)
+    .setAudience(grant.applicationId)
     .setExpirationTime("1h")
     .setSubject(grant.user.id)
     .sign(privateKey);

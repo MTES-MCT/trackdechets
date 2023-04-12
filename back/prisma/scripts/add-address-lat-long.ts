@@ -18,6 +18,7 @@ export class AddAddressLatLongUpdater implements Updater {
       const companies = await prisma.company.findMany();
       for (const company of companies) {
         try {
+          if (!company.siret) continue;
           // TODO index geocoding directly in trackdechets/search module by fetching geocoded SIRENE fron data.gouv.fr
           const companyInfo = await searchCompany(company.siret);
           const { latitude, longitude } = await geocode(companyInfo.address);

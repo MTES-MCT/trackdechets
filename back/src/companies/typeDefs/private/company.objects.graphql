@@ -226,4 +226,8 @@ type CompanySearchPrivate {
   Liste des automatisations de signature reçues par l'entreprise
   """
   receivedSignatureAutomations: [SignatureAutomation!]!
+  """
+  Certification entreprise de travaux
+  """
+  workerCertification: WorkerCertification
 }

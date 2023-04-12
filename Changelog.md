@@ -5,6 +5,56 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.4.2] 25/04/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Tous BSD - transport - Ne plus proposer de champs de récépissés modifiables mais automatiquement remplir celles enregistrées dans le compte Trackdéchets de l'établissement. Informer du récépissé dans les modales de signature transporteur [PR 2205](https://github.com/MTES-MCT/trackdechets/pull/2205).
+
+### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+- Tous BSD - transport - Le récépissé transporteur du BSFF est obligatoire, sauf exemption à cocher [PR 2205](https://github.com/MTES-MCT/trackdechets/pull/2205).
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+# [2023.4.1] 04/04/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+- ETQ utilisateur je peux annuler un BSDA (via le processus de révision) [PR 2200](https://github.com/MTES-MCT/trackdechets/pull/2200)
+- ETQ destinataire d'un BSFF, je peux modifier le numéro de contenant lors de l'acceptation [PR 2208](https://github.com/MTES-MCT/trackdechets/pull/2208)
+- Ajout du code R1 sur le BSFF [PR 2194](https://github.com/MTES-MCT/trackdechets/pull/2194)
+- Ajout du champ "Notification" sur le BSDD lorsque la destination finale est à l'étranger [PR 2209](https://github.com/MTES-MCT/trackdechets/pull/2209)
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Les adresses et raisons sociales des établissements présents sur les bordereaux sont automatiquement complétées lorsqu'une correspondance est trouvée sur le n°SIRET dans la base SIRENE. [PR 2171](https://github.com/MTES-MCT/trackdechets/pull/2171)
+- Le champ `name` de `CompanyPublic` et `CompanySearchResult` contient désormais le sigle commercial ou la dénomination usuelle de l'établissement. [PR 2171](https://github.com/MTES-MCT/trackdechets/pull/2171)
+- Ajout de la possibilité de filter par le nom de l'adresse chantier / collecte dans l'interface Trackdéchets [PR 2171](https://github.com/MTES-MCT/trackdechets/pull/2171)
+- Le volume des contenants est optionnel sur le BSFF [PR 2207](https://github.com/MTES-MCT/trackdechets/pull/2207)
+- On ne peut plus renseigner une entreprise n'ayant pas le profil "Installation de traitement" dans la partie exutoire final du BSDA [PR 2211](https://github.com/MTES-MCT/trackdechets/pull/2211)
+- Modification des libellés pour le type d'émetteur sur le PDF BSFF [PR 2210](https://github.com/MTES-MCT/trackdechets/pull/2210)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Suppression de la route permettant de générer des snapshots mémoire au profit de l'utilisation des SIGNAL Unix [PR 2218](https://github.com/MTES-MCT/trackdechets/pull/2218)
+- Préparation de la code base en vue de l'activation des "strictNullCheck" [PR 2189](https://github.com/MTES-MCT/trackdechets/pull/2218)
+- Ajout d'une bannière pour mesurer la satisfaction des utilisateurs [PR 2221](https://github.com/MTES-MCT/trackdechets/pull/2221)
+- Afficher une page de debug en localhost pour un crash front [PR 2131](https://github.com/MTES-MCT/trackdechets/pull/2131)
+- Patch recherche SIRENE suite au déploiement des nouvelles modalités de diffusion [PR 2222](https://github.com/MTES-MCT/trackdechets/pull/2222)
+
 # [2023.2.2] 07/03/2023
 
 #### :rocket: Nouvelles fonctionnalités

@@ -15,9 +15,7 @@ type Column = {
     ManagedWaste &
     AllWaste);
   label: string;
-  format?: (
-    v: string | boolean | number | Date | string[]
-  ) => string | number | null;
+  format?: (v: unknown) => string | number | null;
 };
 
 const formatDate = (d: Date | null) => d?.toISOString().slice(0, 10) ?? "";

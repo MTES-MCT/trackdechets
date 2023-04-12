@@ -131,43 +131,45 @@ const INVALID_DASRI_WASTE_CODE =
 const INVALID_PROCESSING_OPERATION =
   "Cette opération d’élimination / valorisation n'existe pas ou n'est pas appropriée";
 
-export const emitterSchema: FactorySchemaOf<BsdasriValidationContext, Emitter> =
-  context =>
-    yup.object({
-      emitterCompanyName: yup.string().requiredIf(
-        // field copied from transporter returning an error message would be confusing
+export const emitterSchema: FactorySchemaOf<
+  BsdasriValidationContext,
+  Emitter
+> = context =>
+  yup.object({
+    emitterCompanyName: yup.string().requiredIf(
+      // field copied from transporter returning an error message would be confusing
+      context.emissionSignature && !context?.isSynthesis,
+      `Émetteur: ${MISSING_COMPANY_NAME}`
+    ),
+    emitterCompanySiret: siret.label("Émetteur").requiredIf(
+      // field copied from transporter returning an error message would be confusing
+      context.emissionSignature && !context?.isSynthesis,
+      `Émetteur: ${MISSING_COMPANY_SIRET}`
+    ),
+    emitterCompanyAddress: yup.string().requiredIf(
+      // field copied from transporter returning an error message would be confusing
+      context.emissionSignature && !context?.isSynthesis,
+      `Émetteur: ${MISSING_COMPANY_ADDRESS}`
+    ),
+    emitterCompanyContact: yup
+      .string()
+      .requiredIf(
         context.emissionSignature && !context?.isSynthesis,
-        `Émetteur: ${MISSING_COMPANY_NAME}`
+        `Émetteur: ${MISSING_COMPANY_CONTACT}`
       ),
-      emitterCompanySiret: siret.label("Émetteur").requiredIf(
-        // field copied from transporter returning an error message would be confusing
-        context.emissionSignature && !context?.isSynthesis,
-        `Émetteur: ${MISSING_COMPANY_SIRET}`
-      ),
-      emitterCompanyAddress: yup.string().requiredIf(
-        // field copied from transporter returning an error message would be confusing
-        context.emissionSignature && !context?.isSynthesis,
-        `Émetteur: ${MISSING_COMPANY_ADDRESS}`
-      ),
-      emitterCompanyContact: yup
-        .string()
-        .requiredIf(
-          context.emissionSignature && !context?.isSynthesis,
-          `Émetteur: ${MISSING_COMPANY_CONTACT}`
-        ),
-      emitterCompanyPhone: yup.string().requiredIf(
-        // field copied from transporter returning an error message would be confusing
-        context.emissionSignature && !context?.isSynthesis,
-        `Émetteur: ${MISSING_COMPANY_PHONE}`
-      ),
-      emitterCompanyMail: yup.string().email().ensure(),
+    emitterCompanyPhone: yup.string().requiredIf(
+      // field copied from transporter returning an error message would be confusing
+      context.emissionSignature && !context?.isSynthesis,
+      `Émetteur: ${MISSING_COMPANY_PHONE}`
+    ),
+    emitterCompanyMail: yup.string().email().ensure(),
 
-      emitterPickupSiteName: yup.string().nullable(),
-      emitterPickupSiteAddress: yup.string().nullable(),
-      emitterPickupSiteCity: yup.string().nullable(),
-      emitterPickupSitePostalCode: yup.string().nullable(),
-      emitterPickupSiteInfos: yup.string().nullable()
-    });
+    emitterPickupSiteName: yup.string().nullable(),
+    emitterPickupSiteAddress: yup.string().nullable(),
+    emitterPickupSiteCity: yup.string().nullable(),
+    emitterPickupSitePostalCode: yup.string().nullable(),
+    emitterPickupSiteInfos: yup.string().nullable()
+  });
 
 const packagingsTypes: BsdasriPackagingType[] = [
   "BOITE_CARTON",

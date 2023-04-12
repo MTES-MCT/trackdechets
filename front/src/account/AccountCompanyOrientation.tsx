@@ -110,7 +110,7 @@ export default function AccountCompanyOrientation() {
               transportez des déchets dangereux sur le territoire français.
               <br />
               Your company is not registered in France, but you transport
-              hazardous waste on the french territory.
+              hazardous waste on the French territory.
             </CalloutText>
             <Button
               title="Créer votre établissement"

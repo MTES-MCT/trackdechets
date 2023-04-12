@@ -1,5 +1,13 @@
 """
-Payload d'un établissement
+Payload d'un établissement.
+
+Nous vous invitons à construire cet input en récupérant les informations relatives à un
+établissement à partir de son numéro SIRET via la query `companyInfos`.
+
+Dans le cas où le nom ou l'adresse de l'établissement ne correspondent pas aux informations du répertoire SIRENE,
+Trackdéchets les corrigera automatiquement.
+
+Une erreur sera levée si vous tentez d'ajouter un établissement qui est fermé selon le répertoire SIRENE.
 """
 input CompanyInput {
   """

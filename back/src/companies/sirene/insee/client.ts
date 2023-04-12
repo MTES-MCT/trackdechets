@@ -4,9 +4,8 @@ import {
   SireneSearchResult
 } from "../types";
 import { libelleFromCodeNaf, buildAddress } from "../utils";
-import { UserInputError } from "apollo-server-express";
 import { authorizedAxiosGet } from "./token";
-import { AnonymousCompanyError } from "../errors";
+import { AnonymousCompanyError, SiretNotFoundError } from "../errors";
 import { format } from "date-fns";
 
 const SIRENE_API_BASE_URL = "https://api.insee.fr/entreprises/sirene/V3";
@@ -48,7 +47,10 @@ function searchResponseToCompany({
     name: etablissement.uniteLegale.denominationUniteLegale,
     naf: lastPeriod?.activitePrincipaleEtablissement,
     libelleNaf: "",
-    statutDiffusionEtablissement: etablissement.statutDiffusionEtablissement
+    statutDiffusionEtablissement:
+      etablissement.statutDiffusionEtablissement === "P"
+        ? "N" // Patch https://www.insee.fr/fr/information/6683782 for retro-compatibility
+        : etablissement.statutDiffusionEtablissement
   };
 
   if (company.naf) {
@@ -75,26 +77,32 @@ function searchResponseToCompany({
  * Search a company by SIRET
  * @param siret
  */
-export function searchCompany(siret: string): Promise<SireneSearchResult> {
+export async function searchCompany(
+  siret: string
+): Promise<SireneSearchResult> {
   const searchUrl = `${SIRENE_API_BASE_URL}/siret/${siret}`;
 
-  return authorizedAxiosGet<SearchResponseInsee>(searchUrl)
-    .then(r => searchResponseToCompany(r.data))
-    .catch(error => {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
-      if (error.response?.status === 404) {
-        // 404 "no results found"
-        throw new UserInputError("Aucun établissement trouvé avec ce SIRET", {
-          invalidArgs: ["siret"]
-        });
-      }
-      if (error.response?.status === 403) {
-        throw new AnonymousCompanyError();
-      }
+  try {
+    const response = await authorizedAxiosGet<SearchResponseInsee>(searchUrl);
+    const company = searchResponseToCompany(response.data);
+    if (company.statutDiffusionEtablissement === "N") {
+      throw new AnonymousCompanyError();
+    }
+    return company;
+  } catch (error) {
+    // The request was made and the server responded with a status code
+    // that falls out of the range of 2xx
+    if (error.response?.status === 404) {
+      // 404 "no results found"
+      throw new SiretNotFoundError();
+    }
+    if (error.response?.status === 403) {
+      // this is not supposed to happen anymore since https://www.insee.fr/fr/information/6683782
+      throw new AnonymousCompanyError();
+    }
 
-      throw error;
-    });
+    throw error;
+  }
 }
 
 /**
@@ -120,7 +128,7 @@ export function searchCompanies(
   department?: string
 ): Promise<SireneSearchResult[]> {
   // list of filters to pass as "q" arguments
-  const filters = [];
+  const filters: string[] = [];
 
   const today = format(new Date(), "yyyy-MM-dd");
 

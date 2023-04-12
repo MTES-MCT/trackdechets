@@ -101,11 +101,25 @@ function SignEmissionForm({ bsff, onCancel }: SignEmissionFormProps) {
 
 interface SignEmissionProps {
   bsffId: string;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+  displayActionButton?: boolean;
 }
 
-export function SignEmission({ bsffId }: SignEmissionProps) {
+export function SignEmission({
+  bsffId,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+  displayActionButton,
+}: SignEmissionProps) {
   return (
-    <SignBsff title="Signature émetteur" bsffId={bsffId}>
+    <SignBsff
+      title="Signature émetteur"
+      bsffId={bsffId}
+      isModalOpenFromParent={isModalOpenFromParent}
+      onModalCloseFromParent={onModalCloseFromParent}
+      displayActionButton={displayActionButton}
+    >
       {({ bsff, onClose }) => (
         <SignEmissionForm bsff={bsff} onCancel={onClose} />
       )}

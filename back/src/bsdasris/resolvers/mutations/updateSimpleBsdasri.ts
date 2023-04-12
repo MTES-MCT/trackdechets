@@ -7,6 +7,7 @@ import { UserInputError } from "apollo-server-express";
 import { emitterIsAllowedToGroup, checkDasrisAreGroupable } from "./utils";
 import { getBsdasriRepository } from "../../repository";
 import { checkEditionRules } from "../../edition";
+import sirenify from "../../sirenify";
 
 const getGroupedBsdasriArgs = (
   inputRegroupedBsdasris: string[] | null | undefined
@@ -46,7 +47,8 @@ const updateBsdasri = async ({
 }) => {
   const { grouping: inputGrouping, synthesizing: inputSynthesizing } = input;
   const isGroupingType = dbBsdasri.type === BsdasriType.GROUPING;
-  const flattenedInput = flattenBsdasriInput(input);
+  const sirenifiedInput = await sirenify(input, user);
+  const flattenedInput = flattenBsdasriInput(sirenifiedInput);
 
   if (inputGrouping?.length > 0 && !isGroupingType) {
     throw new UserInputError(

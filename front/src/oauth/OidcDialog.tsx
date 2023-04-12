@@ -3,10 +3,14 @@ import { IconCheckCircle1 } from "common/components/Icons";
 import Loader from "../common/components/Loaders";
 import styles from "./Dialog.module.scss";
 import { useOIDC, AuthorizePayload } from "./use-oidc";
+import * as queryString from "query-string";
 
+import { useLocation } from "react-router-dom";
 export default function OidcDialog() {
   const { VITE_API_ENDPOINT } = import.meta.env;
   const { loading, error, authorizePayload } = useOIDC();
+  const location = useLocation();
+  const { nonce } = queryString.parse(location.search);
 
   const authorizeDecisionUrl = `${VITE_API_ENDPOINT}/oidc/authorize/decision`;
   if (loading) {
@@ -47,6 +51,8 @@ export default function OidcDialog() {
             type="hidden"
             value={transactionID as string}
           ></input>
+
+          {!!nonce && <input name="nonce" type="hidden" value={nonce}></input>}
           <div className={styles.flex}>
             <input
               className="btn btn--primary"

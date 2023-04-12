@@ -46,7 +46,7 @@ describe("mutation changePassword", () => {
       }
     );
     expect(data.changePassword.id).toEqual(user.id);
-    const updatedUser = await prisma.user.findUnique({
+    const updatedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }
     });
     expect(await compare(newPassword, updatedUser.password)).toEqual(true);

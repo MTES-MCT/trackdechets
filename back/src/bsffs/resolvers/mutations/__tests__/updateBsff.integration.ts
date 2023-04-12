@@ -32,6 +32,11 @@ import {
   createBsffAfterReception,
   createFicheIntervention
 } from "../../../__tests__/factories";
+import * as sirenify from "../../../sirenify";
+
+const sirenifyMock = jest
+  .spyOn(sirenify, "sirenifyBsffInput")
+  .mockImplementation(input => Promise.resolve(input));
 
 const UPDATE_BSFF = gql`
   mutation UpdateBsff($id: ID!, $input: BsffInput!) {
@@ -43,7 +48,10 @@ const UPDATE_BSFF = gql`
 `;
 
 describe("Mutation.updateBsff", () => {
-  afterEach(resetDatabase);
+  afterEach(async () => {
+    await resetDatabase();
+    sirenifyMock.mockClear();
+  });
 
   it("should allow user to update a bsff", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
@@ -68,6 +76,8 @@ describe("Mutation.updateBsff", () => {
 
     expect(errors).toBeUndefined();
     expect(data.updateBsff.id).toBeTruthy();
+    // check input is sirenified
+    expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
 
   it("should allow user to update a bsff packagings", async () => {
@@ -76,7 +86,12 @@ describe("Mutation.updateBsff", () => {
       { emitter },
       {
         packagings: {
-          create: { type: BsffPackagingType.BOUTEILLE, weight: 1, numero: "1" }
+          create: {
+            type: BsffPackagingType.BOUTEILLE,
+            weight: 1,
+            numero: "1",
+            emissionNumero: "1"
+          }
         },
         isDraft: true
       }
@@ -700,6 +715,7 @@ describe("Mutation.updateBsff", () => {
           create: {
             type: BsffPackagingType.BOUTEILLE,
             numero: "numero",
+            emissionNumero: "numero",
             volume: 1,
             weight: 1,
             previousPackagings: {

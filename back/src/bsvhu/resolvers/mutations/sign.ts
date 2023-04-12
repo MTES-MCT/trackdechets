@@ -14,11 +14,12 @@ import { machine } from "../../machine";
 import { validateBsvhu } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
+import { UserInputError } from "apollo-server-core";
 
 type SignatureTypeInfos = {
   dbDateKey: keyof Bsvhu;
   dbAuthorKey: keyof Bsvhu;
-  getAuthorizedSiret: (form: Bsvhu) => string;
+  getAuthorizedSiret: (form: Bsvhu) => string | null;
 };
 
 export default async function sign(
@@ -98,9 +99,15 @@ const signatureTypeMapping: Record<SignatureTypeInput, SignatureTypeInfos> = {
 };
 
 function checkAuthorization(
-  requestInfo: { curretUserId: string; securityCode?: number },
-  signingCompanySiret: string
+  requestInfo: { curretUserId: string; securityCode?: number | null },
+  signingCompanySiret: string | null
 ) {
+  if (!signingCompanySiret) {
+    throw new UserInputError(
+      "SIRET manquant pour pouvoir apposer cette signature."
+    );
+  }
+
   // If there is a security code provided, it must be authorized
   if (requestInfo.securityCode) {
     return checkSecurityCode(signingCompanySiret, requestInfo.securityCode);

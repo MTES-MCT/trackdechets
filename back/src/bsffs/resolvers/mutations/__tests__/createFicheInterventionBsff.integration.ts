@@ -10,6 +10,11 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import * as sirenify from "../../../sirenify";
+
+const sirenifyMock = jest
+  .spyOn(sirenify, "sirenifyBsffFicheInterventionInput")
+  .mockImplementation(input => Promise.resolve(input));
 
 const ADD_FICHE_INTERVENTION = `
   mutation CreateFicheIntervention($input: BsffFicheInterventionInput!) {
@@ -57,7 +62,10 @@ const ficheInterventionInput: BsffFicheInterventionInput = {
 };
 
 describe("Mutation.createFicheInterventionBsff", () => {
-  afterEach(resetDatabase);
+  afterEach(async () => {
+    await resetDatabase();
+    sirenifyMock.mockClear();
+  });
 
   it("should allow user to create a fiche d'intervention with a company detenteur", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
@@ -78,6 +86,8 @@ describe("Mutation.createFicheInterventionBsff", () => {
     expect(data.createFicheInterventionBsff.numero).toBe(
       ficheInterventionInput.numero
     );
+    // check input is sirenified
+    expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
 
   it("should throw error if detenteur company info is missing", async () => {

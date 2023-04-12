@@ -47,6 +47,11 @@ const companySearchPrivateResolvers: CompanySearchPrivateResolvers = {
       .receivedSignatureAutomations({
         include: { from: true, to: true }
       }) as any;
+  },
+  workerCertification: parent => {
+    return prisma.company
+      .findUnique({ where: { id: parent.orgId } })
+      .workerCertification();
   }
 };
 

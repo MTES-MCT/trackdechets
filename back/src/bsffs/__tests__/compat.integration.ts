@@ -22,12 +22,14 @@ describe("toBsffDestination", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1
             },
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont2",
               weight: 1,
               volume: 1
             }
@@ -58,6 +60,7 @@ describe("toBsffDestination", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -67,6 +70,7 @@ describe("toBsffDestination", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont2",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -100,6 +104,7 @@ describe("toBsffDestination", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -110,6 +115,7 @@ describe("toBsffDestination", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont2",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -144,6 +150,7 @@ describe("toBsffDestination", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -154,6 +161,7 @@ describe("toBsffDestination", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont2",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -187,6 +195,7 @@ describe("toBsffDestination", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -199,6 +208,7 @@ describe("toBsffDestination", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont2",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -211,6 +221,7 @@ describe("toBsffDestination", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -251,6 +262,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               operationSignatureDate: new Date(),
@@ -259,6 +271,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont2",
               weight: 1,
               volume: 1,
               operationSignatureDate: new Date(),
@@ -283,6 +296,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               operationSignatureDate: new Date(),
@@ -292,6 +306,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               operationSignatureDate: new Date(),
@@ -317,6 +332,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               operationSignatureDate: new Date(),
@@ -325,6 +341,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               operationSignatureDate: new Date(),
@@ -348,6 +365,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               operationSignatureDate: new Date(),
@@ -356,6 +374,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               operationSignatureDate: new Date(),
@@ -379,6 +398,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -387,6 +407,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -410,6 +431,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -419,6 +441,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont2",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -443,6 +466,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -452,6 +476,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont2",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -475,6 +500,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -484,6 +510,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont2",
               weight: 1,
               volume: 1,
               operationSignatureDate: new Date(),
@@ -507,6 +534,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -516,6 +544,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               operationSignatureDate: new Date(),
@@ -540,6 +569,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -549,6 +579,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont2",
               weight: 1,
               volume: 1,
               operationSignatureDate: new Date(),
@@ -569,6 +600,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont3",
+              emissionNumero: "cont3",
               weight: 2,
               volume: 2,
               operationSignatureDate: new Date(),
@@ -597,6 +629,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -606,6 +639,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont2",
               weight: 1,
               volume: 1,
               operationSignatureDate: new Date(),
@@ -626,6 +660,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont3",
+              emissionNumero: "cont3",
               weight: 2,
               volume: 2,
               operationSignatureDate: new Date(),
@@ -655,6 +690,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont1",
+              emissionNumero: "cont1",
               weight: 1,
               volume: 1,
               acceptationSignatureDate: new Date(),
@@ -680,6 +716,7 @@ describe("getStatus", () => {
             {
               type: BsffPackagingType.BOUTEILLE,
               numero: "cont2",
+              emissionNumero: "cont2",
               weight: 2,
               volume: 2,
               acceptationSignatureDate: new Date(),

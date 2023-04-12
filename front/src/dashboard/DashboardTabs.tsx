@@ -47,7 +47,7 @@ export function DashboardTabs({
               className="sidebar__link sidebar__link--indented"
               activeClassName="sidebar__link--active"
             >
-              Brouillon
+              Brouillons
             </NavLink>
           </li>
 

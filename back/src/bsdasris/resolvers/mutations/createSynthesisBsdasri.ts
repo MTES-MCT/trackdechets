@@ -12,6 +12,7 @@ import { UserInputError } from "apollo-server-express";
 import { BsdasriType } from "@prisma/client";
 import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { getBsdasriRepository } from "../../repository";
+import sirenify from "../../sirenify";
 
 /**
  * Bsdasri creation mutation :
@@ -76,8 +77,10 @@ const createSynthesisBsdasri = async (
     .map(dasri => dasri.transporterWasteVolume ?? 0)
     .reduce((prev, curr) => prev + curr, 0);
 
+  const sirenifiedInput = await sirenify(rest, user);
+
   const flattenedInput = {
-    ...flattenBsdasriInput(rest),
+    ...flattenBsdasriInput(sirenifiedInput),
     emitterCompanyName: rest.transporter.company.name,
     emitterCompanySiret: rest.transporter.company.siret,
     emitterCompanyAddress: rest.transporter.company.address,

@@ -183,7 +183,7 @@ describe("Query.bsds workflow", () => {
         {
           variables: {
             where: {
-              isDraftFor: [emitter.company.siret]
+              isDraftFor: [emitter.company.siret!]
             }
           }
         }
@@ -223,7 +223,7 @@ describe("Query.bsds workflow", () => {
         {
           variables: {
             where: {
-              isDraftFor: [emitter.company.siret]
+              isDraftFor: [emitter.company.siret!]
             }
           }
         }
@@ -274,7 +274,7 @@ describe("Query.bsds workflow", () => {
         {
           variables: {
             where: {
-              isForActionFor: [emitter.company.siret]
+              isForActionFor: [emitter.company.siret!]
             }
           }
         }
@@ -292,7 +292,7 @@ describe("Query.bsds workflow", () => {
         {
           variables: {
             where: {
-              isToCollectFor: [transporter.company.siret]
+              isToCollectFor: [transporter.company.siret!]
             }
           }
         }
@@ -341,7 +341,7 @@ describe("Query.bsds workflow", () => {
         {
           variables: {
             where: {
-              isForActionFor: [recipient.company.siret]
+              isForActionFor: [recipient.company.siret!]
             }
           }
         }
@@ -359,7 +359,7 @@ describe("Query.bsds workflow", () => {
         {
           variables: {
             where: {
-              isCollectedFor: [transporter.company.siret]
+              isCollectedFor: [transporter.company.siret!]
             }
           }
         }
@@ -409,7 +409,7 @@ describe("Query.bsds workflow", () => {
         {
           variables: {
             where: {
-              isForActionFor: [recipient.company.siret]
+              isForActionFor: [recipient.company.siret!]
             }
           }
         }
@@ -457,7 +457,7 @@ describe("Query.bsds workflow", () => {
         {
           variables: {
             where: {
-              isArchivedFor: [recipient.company.siret]
+              isArchivedFor: [recipient.company.siret!]
             }
           }
         }
@@ -475,7 +475,7 @@ describe("Query.bsds workflow", () => {
         {
           variables: {
             where: {
-              isArchivedFor: [emitter.company.siret]
+              isArchivedFor: [emitter.company.siret!]
             }
           }
         }
@@ -493,7 +493,7 @@ describe("Query.bsds workflow", () => {
         {
           variables: {
             where: {
-              isArchivedFor: [transporter.company.siret]
+              isArchivedFor: [transporter.company.siret!]
             }
           }
         }
@@ -551,7 +551,7 @@ describe("Query.bsds edge cases", () => {
       {
         variables: {
           where: {
-            isCollectedFor: [recipientAndTransporter.company.siret]
+            isCollectedFor: [recipientAndTransporter.company.siret!]
           }
         }
       }
@@ -566,7 +566,7 @@ describe("Query.bsds edge cases", () => {
     res = await recipientQuery<Pick<Query, "bsds">, QueryBsdsArgs>(GET_BSDS, {
       variables: {
         where: {
-          isForActionFor: [recipientAndTransporter.company.siret]
+          isForActionFor: [recipientAndTransporter.company.siret!]
         }
       }
     });

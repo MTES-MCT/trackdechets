@@ -33,7 +33,7 @@ export default async function create(
   const previousBsdas = await getPreviousBsdas(existingBsda);
   const { intermediaries, ...bsda } = existingBsda;
   await validateBsda(
-    bsda,
+    bsda as any,
     { previousBsdas, intermediaries },
     { emissionSignature: true }
   );

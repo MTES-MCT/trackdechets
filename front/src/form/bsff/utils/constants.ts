@@ -20,6 +20,12 @@ export const OPERATION: Record<
   BsffOperationCode,
   { code: BsffOperationCode; description: string; successors: BsffType[] }
 > = {
+  [BsffOperationCode.R1]: {
+    code: BsffOperationCode.R1,
+    description:
+      "Utilisation principale comme combustible ou autre moyen de produire de l'énergie",
+    successors: [],
+  },
   [BsffOperationCode.R2]: {
     code: BsffOperationCode.R2,
     description: "Récupération ou régénération des solvants",

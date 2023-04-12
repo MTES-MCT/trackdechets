@@ -7,7 +7,7 @@ import { Company } from "@prisma/client";
 
 export async function setDepartementJob(
   job: Job<SetDepartementJobData>
-): Promise<Pick<Company, "siret" | "codeDepartement">> {
+): Promise<Pick<Company, "siret" | "codeDepartement"> | null> {
   if (!job.data.siret?.length) {
     return null;
   }
@@ -19,7 +19,7 @@ export async function setDepartementJob(
       return null;
     }
   }
-  const codeDepartement = await getDepartement(codeCommune);
+  const codeDepartement = await getDepartement(codeCommune!);
   if (codeDepartement) {
     return prisma.company.update({
       where: { siret: job.data.siret },

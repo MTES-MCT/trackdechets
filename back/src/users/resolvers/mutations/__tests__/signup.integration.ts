@@ -62,7 +62,7 @@ describe("Mutation.signup", () => {
 
     expect(data.signup).toEqual(user);
 
-    const newUser = await prisma.user.findUnique({
+    const newUser = await prisma.user.findUniqueOrThrow({
       where: { email: user.email }
     });
     expect(newUser.email).toEqual(user.email);
@@ -235,7 +235,7 @@ describe("Mutation.signup", () => {
     const invitation = await prisma.userAccountHash.create({
       data: {
         email: user.email,
-        companySiret: company.siret,
+        companySiret: company.siret!,
         hash: "hash",
         role: "MEMBER"
       }
@@ -252,11 +252,11 @@ describe("Mutation.signup", () => {
       }
     });
 
-    const newUser = await prisma.user.findUnique({
+    const newUser = await prisma.user.findUniqueOrThrow({
       where: { email: user.email }
     });
 
-    const updatedInvitation = await prisma.userAccountHash.findUnique({
+    const updatedInvitation = await prisma.userAccountHash.findUniqueOrThrow({
       where: {
         id: invitation.id
       }

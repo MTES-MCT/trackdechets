@@ -161,6 +161,14 @@ input NextDestinationInput {
   "Traitement prévue (code D/R)"
   processingOperation: String!
 
+  """
+  N° du document prévu à l'annexe I-B du règlement n°1013/2006
+  ou le numéro de notification et numéro de saisie du document
+  prévue à l'annexe I-B du règlement N°1013/2006 (si connu).
+  Format: PPNNNN, avec PP le code pays et NNNN un numéro d'ordre
+  """
+  notificationNumber: String
+
   "Établissement de destination ultérieur"
   company: InternationalCompanyInput
 }
@@ -213,7 +221,8 @@ input CreateFormInput {
   Liste d'entreprises intermédiaires. Un intermédiaire est une entreprise qui prend part à la gestion du déchet,
   mais pas à la responsabilité de la traçabilité (entreprise de travaux, bureau d'étude, maitre d'oeuvre,
   collectivité, etc.) Il pourra lire ce bordereau, sans étape de signature.
-  L'adresse et la raison sociale seront ignorés car seront automatiquement remplis à partir des données publiques de l'INSEE pour le SIRET
+
+  Le nombre maximal d'intermédiaires sur un bordereau est de 3.
   """
   intermediaries: [CompanyInput!]
 }
@@ -270,7 +279,8 @@ input UpdateFormInput {
   Liste d'entreprises intermédiaires. Un intermédiaire est une entreprise qui prend part à la gestion du déchet,
   mais pas à la responsabilité de la traçabilité (entreprise de travaux, bureau d'étude, maitre d'oeuvre,
   collectivité, etc.) Il pourra lire ce bordereau, sans étape de signature.
-  L'adresse et la raison sociale seront ignorés car seront automatiquement remplis à partir des données publiques de l'INSEE pour le SIRET
+
+  Le nombre maximal d'intermédiaires sur un bordereau est de 3.
   """
   intermediaries: [CompanyInput!]
 }
@@ -323,7 +333,8 @@ input FormInput {
   Liste d'entreprises intermédiaires. Un intermédiaire est une entreprise qui prend part à la gestion du déchet,
   mais pas à la responsabilité de la traçabilité (entreprise de travaux, bureau d'étude, maitre d'oeuvre,
   collectivité, etc.) Il pourra lire ce bordereau, sans étape de signature.
-  L'adresse et la raison sociale seront ignorées car seront automatiquement remplies à partir des données publiques de l'INSEE pour le SIRET
+
+  Le nombre maximal d'intermédiaires sur un bordereau est de 3.
   """
   intermediaries: [CompanyInput!]
 }

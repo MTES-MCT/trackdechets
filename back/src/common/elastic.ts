@@ -71,13 +71,13 @@ export interface BsdElastic {
 
   destinationOperationCode: string;
 
-  emitterEmissionDate: number;
-  workerWorkDate: number;
-  transporterTransportTakenOverAt: number;
-  destinationReceptionDate: number;
-  destinationAcceptationDate: number;
-  destinationAcceptationWeight: number;
-  destinationOperationDate: number;
+  emitterEmissionDate: number | undefined;
+  workerWorkDate: number | undefined;
+  transporterTransportTakenOverAt: number | undefined;
+  destinationReceptionDate: number | undefined;
+  destinationAcceptationDate: number | undefined;
+  destinationAcceptationWeight: number | null;
+  destinationOperationDate: number | undefined;
 
   isDraftFor: string[];
   isForActionFor: string[];

@@ -58,6 +58,8 @@ enum BsffStatus {
 
 "Liste des codes de traitement possible."
 enum BsffOperationCode {
+  "Utilisation principale comme combustible ou autre moyen de produire de l'énergie"
+  R1
   "Récupération ou régénération des solvants"
   R2
   "Recyclage ou récupération des substances organiques qui ne sont pas utilisées comme solvants (y compris les opérations de compostage et autres transformations biologiques)"

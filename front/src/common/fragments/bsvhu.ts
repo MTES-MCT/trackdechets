@@ -74,6 +74,10 @@ export const dashboardVhuFragment = gql`
       }
     }
     wasteCode
+    weight {
+      value
+    }
+    bsvhuUpdatedAt: updatedAt
   }
   ${dashboardCompanyFragment}
 `;

@@ -21,8 +21,20 @@ const validationSchema = yup.object({
     .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
 });
 
-type Props = { siret: string; bsdaId: string };
-export function SignEmission({ siret, bsdaId }: Props) {
+type Props = {
+  siret: string;
+  bsdaId: string;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+  displayActionButton?: boolean;
+};
+export function SignEmission({
+  siret,
+  bsdaId,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+  displayActionButton,
+}: Props) {
   const [signBsda, { loading, error }] = useMutation<
     Pick<Mutation, "signBsda">,
     MutationSignBsdaArgs
@@ -32,7 +44,13 @@ export function SignEmission({ siret, bsdaId }: Props) {
   });
 
   return (
-    <SignBsda title="Signature émetteur" bsdaId={bsdaId}>
+    <SignBsda
+      title="Signature émetteur"
+      bsdaId={bsdaId}
+      isModalOpenFromParent={isModalOpenFromParent}
+      onModalCloseFromParent={onModalCloseFromParent}
+      displayActionButton={displayActionButton}
+    >
       {({ bsda, onClose }) =>
         bsda.metadata?.errors?.some(
           error => error.requiredFor === SignatureTypeInput.Emission

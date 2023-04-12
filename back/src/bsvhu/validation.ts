@@ -148,170 +148,174 @@ const emitterSchema: FactorySchemaOf<VhuValidationContext, Emitter> = context =>
       )
   });
 
-const destinationSchema: FactorySchemaOf<VhuValidationContext, Destination> =
-  context =>
-    yup.object({
-      destinationType: yup
-        .mixed<BsvhuDestinationType>()
-        .requiredIf(
-          context.emissionSignature,
-          `Destinataire: le type de destination est obligatoire`
-        ),
-      destinationReceptionWeight: weight(WeightUnits.Kilogramme)
-        .label("Destinataire")
-        .when(
-          "destinationReceptionAcceptationStatus",
-          weightConditions.wasteAcceptationStatus
-        )
-        .requiredIf(
-          context.operationSignature,
-          "${path}: le poids reçu est obligatoire"
-        ),
-      destinationReceptionRefusalReason: yup.string().nullable(),
-      destinationAgrementNumber: yup
-        .string()
-        .requiredIf(
-          context.operationSignature,
-          `Destinataire: le numéro d'agrément est obligatoire`
-        ),
-      destinationReceptionAcceptationStatus: yup
-        .mixed<WasteAcceptationStatus>()
-        .requiredIf(
-          context.operationSignature,
-          `Destinataire: le statut d'acceptation est obligatoire`
-        ),
-      destinationOperationCode: yup
-        .string()
-        .oneOf([...PROCESSING_OPERATIONS_CODES, null, ""])
-        .requiredIf(
-          context.operationSignature,
-          `Destinataire: l'opération réalisée est obligatoire`
-        ),
-      destinationPlannedOperationCode: yup
-        .string()
-        .oneOf([...PROCESSING_OPERATIONS_CODES, null, ""])
-        .requiredIf(
-          context.emissionSignature,
-          `Destinataire: l'opération prévue est obligatoire`
-        ),
-      destinationCompanyName: yup
-        .string()
-        .requiredIf(
-          context.emissionSignature,
-          `Destinataire: ${MISSING_COMPANY_NAME}`
-        ),
-      destinationCompanySiret: siret
-        .label("Destination")
-        .test(siretTests.isRegistered("DESTINATION"))
-        .requiredIf(
-          context.emissionSignature,
-          `Destinataire: ${MISSING_COMPANY_SIRET}`
-        ),
-      destinationCompanyAddress: yup.string().when("$emitterSignature", {
-        is: true,
-        then: s => s.required(`Destination: ${MISSING_COMPANY_ADDRESS}`),
-        otherwise: s => s.nullable()
-      }),
-      destinationCompanyContact: yup
-        .string()
-        .requiredIf(
-          context.emissionSignature,
-          `Destinataire: ${MISSING_COMPANY_CONTACT}`
-        ),
-      destinationCompanyPhone: yup
-        .string()
-        .requiredIf(
-          context.emissionSignature,
-          `Destinataire: ${MISSING_COMPANY_PHONE}`
-        ),
-      destinationCompanyMail: yup
-        .string()
-        .email()
-        .requiredIf(
-          context.emissionSignature,
-          `Destinataire: ${MISSING_COMPANY_EMAIL}`
-        )
-    });
+const destinationSchema: FactorySchemaOf<
+  VhuValidationContext,
+  Destination
+> = context =>
+  yup.object({
+    destinationType: yup
+      .mixed<BsvhuDestinationType>()
+      .requiredIf(
+        context.emissionSignature,
+        `Destinataire: le type de destination est obligatoire`
+      ),
+    destinationReceptionWeight: weight(WeightUnits.Kilogramme)
+      .label("Destinataire")
+      .when(
+        "destinationReceptionAcceptationStatus",
+        weightConditions.wasteAcceptationStatus
+      )
+      .requiredIf(
+        context.operationSignature,
+        "${path}: le poids reçu est obligatoire"
+      ),
+    destinationReceptionRefusalReason: yup.string().nullable(),
+    destinationAgrementNumber: yup
+      .string()
+      .requiredIf(
+        context.operationSignature,
+        `Destinataire: le numéro d'agrément est obligatoire`
+      ),
+    destinationReceptionAcceptationStatus: yup
+      .mixed<WasteAcceptationStatus>()
+      .requiredIf(
+        context.operationSignature,
+        `Destinataire: le statut d'acceptation est obligatoire`
+      ),
+    destinationOperationCode: yup
+      .string()
+      .oneOf([...PROCESSING_OPERATIONS_CODES, null, ""])
+      .requiredIf(
+        context.operationSignature,
+        `Destinataire: l'opération réalisée est obligatoire`
+      ),
+    destinationPlannedOperationCode: yup
+      .string()
+      .oneOf([...PROCESSING_OPERATIONS_CODES, null, ""])
+      .requiredIf(
+        context.emissionSignature,
+        `Destinataire: l'opération prévue est obligatoire`
+      ),
+    destinationCompanyName: yup
+      .string()
+      .requiredIf(
+        context.emissionSignature,
+        `Destinataire: ${MISSING_COMPANY_NAME}`
+      ),
+    destinationCompanySiret: siret
+      .label("Destination")
+      .test(siretTests.isRegistered("DESTINATION"))
+      .requiredIf(
+        context.emissionSignature,
+        `Destinataire: ${MISSING_COMPANY_SIRET}`
+      ),
+    destinationCompanyAddress: yup.string().when("$emitterSignature", {
+      is: true,
+      then: s => s.required(`Destination: ${MISSING_COMPANY_ADDRESS}`),
+      otherwise: s => s.nullable()
+    }),
+    destinationCompanyContact: yup
+      .string()
+      .requiredIf(
+        context.emissionSignature,
+        `Destinataire: ${MISSING_COMPANY_CONTACT}`
+      ),
+    destinationCompanyPhone: yup
+      .string()
+      .requiredIf(
+        context.emissionSignature,
+        `Destinataire: ${MISSING_COMPANY_PHONE}`
+      ),
+    destinationCompanyMail: yup
+      .string()
+      .email()
+      .requiredIf(
+        context.emissionSignature,
+        `Destinataire: ${MISSING_COMPANY_EMAIL}`
+      )
+  });
 
-const transporterSchema: FactorySchemaOf<VhuValidationContext, Transporter> =
-  context =>
-    yup.object({
-      transporterRecepisseDepartment: yup
-        .string()
-        .when("transporterCompanyVatNumber", (tva, schema) => {
-          if (!tva || !isForeignVat(tva)) {
-            return schema.requiredIf(
-              context.transportSignature,
-              `Transporteur: le département associé au récépissé est obligatoire`
-            );
-          }
-          return schema.nullable().notRequired();
-        }),
-      transporterRecepisseNumber: yup
-        .string()
-        .when("transporterCompanyVatNumber", (tva, schema) => {
-          if (!tva || !isForeignVat(tva)) {
-            return schema.requiredIf(
-              context.transportSignature,
-              `Transporteur: le numéro de récépissé est obligatoire`
-            );
-          }
-          return schema.nullable().notRequired();
-        }),
-      transporterRecepisseValidityLimit: yup
-        .date()
-        .when("transporterCompanyVatNumber", (tva, schema) => {
-          if (!tva || !isForeignVat(tva)) {
-            return schema.requiredIf(
-              context.transportSignature,
-              `Transporteur: la date de validité de récépissé est obligatoire`
-            );
-          }
-          return schema.nullable().notRequired();
-        }),
-      transporterCompanyName: yup
-        .string()
-        .requiredIf(
-          context.transportSignature,
-          `Transporteur: ${MISSING_COMPANY_NAME}`
-        ),
-      transporterCompanySiret: siret
-        .label("Transporteur")
-        .test(siretTests.isRegistered("TRANSPORTER"))
-        .requiredIf(
-          context.transportSignature,
-          `Transporteur: ${MISSING_COMPANY_SIRET}`
-        )
-        .when("transporterCompanyVatNumber", siretConditions.companyVatNumber),
-      transporterCompanyVatNumber: foreignVatNumber
-        .label("Transporteur")
-        .test(vatNumberTests.isRegisteredTransporter),
-      transporterCompanyAddress: yup
-        .string()
-        .requiredIf(
-          context.transportSignature,
-          `Transporteur: ${MISSING_COMPANY_ADDRESS}`
-        ),
-      transporterCompanyContact: yup
-        .string()
-        .requiredIf(
-          context.transportSignature,
-          `Transporteur: ${MISSING_COMPANY_CONTACT}`
-        ),
-      transporterCompanyPhone: yup
-        .string()
-        .requiredIf(
-          context.transportSignature,
-          `Transporteur: ${MISSING_COMPANY_PHONE}`
-        ),
-      transporterCompanyMail: yup
-        .string()
-        .email()
-        .requiredIf(
-          context.transportSignature,
-          `Transporteur: ${MISSING_COMPANY_EMAIL}`
-        )
-    });
+const transporterSchema: FactorySchemaOf<
+  VhuValidationContext,
+  Transporter
+> = context =>
+  yup.object({
+    transporterRecepisseDepartment: yup
+      .string()
+      .when("transporterCompanyVatNumber", (tva, schema) => {
+        if (!tva || !isForeignVat(tva)) {
+          return schema.requiredIf(
+            context.transportSignature,
+            `Transporteur: le département associé au récépissé est obligatoire`
+          );
+        }
+        return schema.nullable().notRequired();
+      }),
+    transporterRecepisseNumber: yup
+      .string()
+      .when("transporterCompanyVatNumber", (tva, schema) => {
+        if (!tva || !isForeignVat(tva)) {
+          return schema.requiredIf(
+            context.transportSignature,
+            `Transporteur: le numéro de récépissé est obligatoire`
+          );
+        }
+        return schema.nullable().notRequired();
+      }),
+    transporterRecepisseValidityLimit: yup
+      .date()
+      .when("transporterCompanyVatNumber", (tva, schema) => {
+        if (!tva || !isForeignVat(tva)) {
+          return schema.requiredIf(
+            context.transportSignature,
+            `Transporteur: la date de validité de récépissé est obligatoire`
+          );
+        }
+        return schema.nullable().notRequired();
+      }),
+    transporterCompanyName: yup
+      .string()
+      .requiredIf(
+        context.transportSignature,
+        `Transporteur: ${MISSING_COMPANY_NAME}`
+      ),
+    transporterCompanySiret: siret
+      .label("Transporteur")
+      .test(siretTests.isRegistered("TRANSPORTER"))
+      .requiredIf(
+        context.transportSignature,
+        `Transporteur: ${MISSING_COMPANY_SIRET}`
+      )
+      .when("transporterCompanyVatNumber", siretConditions.companyVatNumber),
+    transporterCompanyVatNumber: foreignVatNumber
+      .label("Transporteur")
+      .test(vatNumberTests.isRegisteredTransporter),
+    transporterCompanyAddress: yup
+      .string()
+      .requiredIf(
+        context.transportSignature,
+        `Transporteur: ${MISSING_COMPANY_ADDRESS}`
+      ),
+    transporterCompanyContact: yup
+      .string()
+      .requiredIf(
+        context.transportSignature,
+        `Transporteur: ${MISSING_COMPANY_CONTACT}`
+      ),
+    transporterCompanyPhone: yup
+      .string()
+      .requiredIf(
+        context.transportSignature,
+        `Transporteur: ${MISSING_COMPANY_PHONE}`
+      ),
+    transporterCompanyMail: yup
+      .string()
+      .email()
+      .requiredIf(
+        context.transportSignature,
+        `Transporteur: ${MISSING_COMPANY_EMAIL}`
+      )
+  });
 
 const identificationSchema: FactorySchemaOf<
   VhuValidationContext,
@@ -327,16 +331,18 @@ const identificationSchema: FactorySchemaOf<
       )
   });
 
-const quantitySchema: FactorySchemaOf<VhuValidationContext, Quantity> =
-  context =>
-    yup.object({
-      quantity: yup
-        .number()
-        .requiredIf(
-          context.emissionSignature,
-          `Déchet: la quantité est obligatoire`
-        )
-    });
+const quantitySchema: FactorySchemaOf<
+  VhuValidationContext,
+  Quantity
+> = context =>
+  yup.object({
+    quantity: yup
+      .number()
+      .requiredIf(
+        context.emissionSignature,
+        `Déchet: la quantité est obligatoire`
+      )
+  });
 
 const weightSchema: FactorySchemaOf<VhuValidationContext, Weight> = context =>
   yup.object({
@@ -349,13 +355,15 @@ const weightSchema: FactorySchemaOf<VhuValidationContext, Weight> = context =>
     weightIsEstimate: yup.boolean().nullable()
   });
 
-const packagingSchema: FactorySchemaOf<VhuValidationContext, Packaging> =
-  context =>
-    yup.object({
-      packaging: yup
-        .mixed<BsvhuPackaging>()
-        .requiredIf(
-          context.emissionSignature,
-          `Déchet: le type d'empaquetage' est obligatoire`
-        )
-    });
+const packagingSchema: FactorySchemaOf<
+  VhuValidationContext,
+  Packaging
+> = context =>
+  yup.object({
+    packaging: yup
+      .mixed<BsvhuPackaging>()
+      .requiredIf(
+        context.emissionSignature,
+        `Déchet: le type d'empaquetage' est obligatoire`
+      )
+  });

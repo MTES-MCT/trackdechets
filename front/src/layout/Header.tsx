@@ -8,8 +8,6 @@ import {
   generatePath,
 } from "react-router-dom";
 
-import { trackEvent } from "tracker";
-
 import { localAuthService } from "login/auth.service";
 import { IconProfile, IconLeftArrow, IconClose } from "common/components/Icons";
 import { AccountMenuContent } from "account/AccountMenu";
@@ -74,21 +72,18 @@ const getMenuEntries = (
     {
       caption: "Ressources",
       href: "https://trackdechets.beta.gouv.fr/resources",
-      onClick: () => trackEvent("navbar", "resources"),
       navlink: null,
       target: "_blank",
     },
     {
       caption: "Développeurs",
       href: DEVELOPERS_DOCUMENTATION_URL,
-      onClick: () => trackEvent("navbar", "dev_doc"),
       navlink: false,
       target: "_blank",
     },
     {
       caption: "Site de test",
       href: "https://sandbox.trackdechets.beta.gouv.fr/",
-      onClick: () => trackEvent("navbar", "sandbox"),
       navlink: false,
       target: "_blank",
     },
@@ -98,7 +93,6 @@ const getMenuEntries = (
     {
       caption: "Panneau d'administration",
       href: routes.admin.verification,
-      onClick: () => trackEvent("navbar", "panneau-administration"),
       navlink: true,
     },
   ];
@@ -110,7 +104,6 @@ const getMenuEntries = (
             siret: currentSiret,
           })
         : "/",
-      onClick: () => trackEvent("navbar", "mon-espace-v2"),
 
       navlink: true,
     },
@@ -124,14 +117,12 @@ const getMenuEntries = (
             siret: currentSiret,
           })
         : "/",
-      onClick: () => trackEvent("navbar", "mon-espace"),
 
       navlink: true,
     },
     {
       caption: "Mon compte",
       href: routes.account.info,
-      onClick: () => trackEvent("navbar", "mon-compte"),
 
       navlink: true,
     },
@@ -160,7 +151,6 @@ const MenuLink = ({ entry, mobileCallback }) => {
           to={entry.href}
           exact={entry.href === "/"}
           onClick={() => {
-            entry.onClick();
             mobileCallback && mobileCallback();
           }}
           activeClassName={styles.headerNavLinkActive}
@@ -171,7 +161,6 @@ const MenuLink = ({ entry, mobileCallback }) => {
         <a
           className={styles.headerNavLink}
           href={entry.href}
-          onClick={entry.onClick}
           target={entry.target ?? "_self"}
         >
           {content}
@@ -348,7 +337,6 @@ export default withRouter(function Header({
                     to={routes.signup.index}
                     className={`${styles.headerSignup} btn btn--sqr-outline`}
                     onClick={() => {
-                      trackEvent("navbar", "login");
                       closeMobileMenu();
                     }}
                   >
@@ -362,7 +350,6 @@ export default withRouter(function Header({
                     to={routes.login}
                     className={`${styles.headerConnexion} btn btn--sqr`}
                     onClick={() => {
-                      trackEvent("navbar", "login");
                       closeMobileMenu();
                     }}
                   >

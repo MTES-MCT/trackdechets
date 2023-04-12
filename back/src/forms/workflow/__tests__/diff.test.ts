@@ -99,6 +99,7 @@ describe("isString", () => {
 describe("arrayEquals", () => {
   test("arrays are equal", () => {
     expect(arraysEqual([1, 2], [1, 2])).toEqual(true);
+    expect(arraysEqual([1, 2], [2, 1])).toEqual(true);
     expect(arraysEqual([], [])).toEqual(true);
     expect(arraysEqual(null, null)).toEqual(true);
     expect(arraysEqual(undefined, undefined)).toEqual(true);
@@ -111,6 +112,44 @@ describe("arrayEquals", () => {
     expect(arraysEqual([1, 2], null)).toEqual(false);
     expect(arraysEqual(undefined, [2, 3])).toEqual(false);
     expect(arraysEqual([1, 2], undefined)).toEqual(false);
+  });
+
+  test("arrays of objects are equal", () => {
+    expect(
+      arraysEqual(
+        [
+          { a: "a", b: "b" },
+          { c: "c", d: "d" }
+        ],
+        [
+          { a: "a", b: "b" },
+          { c: "c", d: "d" }
+        ]
+      )
+    ).toEqual(true);
+  });
+
+  test.skip("arrays of objects in different order are equal", () => {
+    // waiting for fix - using default Array.sort on array of objects does not work
+    expect(
+      arraysEqual(
+        [
+          { a: "a", b: "b" },
+          { c: "c", d: "d" }
+        ],
+        [
+          { c: "c", d: "d" },
+          { a: "a", b: "b" }
+        ]
+      )
+    ).toEqual(true);
+  });
+
+  test("arrays of [Object: null prototype] are equals", () => {
+    const a = Object.create(null);
+    const b = Object.create(null);
+    a.b = b;
+    expect(arraysEqual([a, a], [a, a])).toEqual(true);
   });
 });
 

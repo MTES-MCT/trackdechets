@@ -17,6 +17,7 @@ import {
 import { SireneSearchResult } from "./sirene/types";
 import { CompanyVatSearchResult } from "./vat/vies/types";
 import { AnonymousCompanyError } from "./sirene/errors";
+import { removeEmptyKeys } from "../common/converter";
 
 interface SearchCompaniesDeps {
   searchCompany: (clue: string) => Promise<CompanySearchResult>;
@@ -30,7 +31,7 @@ const SIRET_OR_VAT_ERROR =
  */
 async function findCompanyAndMergeInfos(
   cleanClue: string,
-  companyInfo: SireneSearchResult | CompanyVatSearchResult
+  companyInfo: SireneSearchResult | CompanyVatSearchResult | null
 ): Promise<CompanySearchResult> {
   const where = {
     where: { orgId: cleanClue }
@@ -60,7 +61,9 @@ async function findCompanyAndMergeInfos(
     trackdechetsId: trackdechetsCompanyInfo?.id,
     companyTypes: trackdechetsCompanyInfo?.companyTypes ?? [],
     orgId: cleanClue,
-    ...convertUrls(trackdechetsCompanyInfo),
+    ...(trackdechetsCompanyInfo != null && {
+      ...convertUrls(trackdechetsCompanyInfo)
+    }),
     // override database infos with Sirene or VAT search
     ...companyInfo
   };
@@ -100,7 +103,7 @@ export async function searchCompany(
   // Anonymous Company search
   if (anonymousCompany) {
     const companyInfo: SireneSearchResult = {
-      ...anonymousCompany,
+      ...removeEmptyKeys(anonymousCompany),
       statutDiffusionEtablissement: cleanedClue.startsWith(TEST_COMPANY_PREFIX)
         ? "O"
         : "N",
@@ -127,13 +130,15 @@ export async function searchCompany(
     if (company.isRegistered === true) {
       // shorcut to return the result directly from database
       const { country } = checkVAT(cleanedClue, countries);
-      return {
-        codePaysEtrangerEtablissement: country.isoCode.short,
-        statutDiffusionEtablissement: "O",
-        etatAdministratif: "A",
-        vatNumber: cleanedClue,
-        ...company
-      };
+      if (country) {
+        return {
+          codePaysEtrangerEtablissement: country.isoCode.short,
+          statutDiffusionEtablissement: "O",
+          etatAdministratif: "A",
+          vatNumber: cleanedClue,
+          ...company
+        };
+      }
     }
     const companyInfo = await searchVatFrOnlyOrNotFound(cleanedClue);
     return {
@@ -141,30 +146,45 @@ export async function searchCompany(
       ...companyInfo
     };
   }
+
+  throw new Error(`Unhandled search company case for clue ${clue}`);
 }
 
 // used for dependency injection in tests to easily mock `searchCompany`
 export const makeSearchCompanies =
   ({ searchCompany }: SearchCompaniesDeps) =>
-  (clue: string, department?: string): Promise<CompanySearchResult[]> => {
+  (
+    clue: string,
+    department?: string | null
+  ): Promise<CompanySearchResult[]> => {
     const cleanedClue = cleanClue(clue);
     // clue can be formatted like a SIRET or a VAT number
     if (isSiret(cleanedClue) || isVat(cleanedClue)) {
       return searchCompany(cleanedClue)
-        .then(c =>
-          // Exclude closed companies
-          [c].filter(c => c.etatAdministratif && c.etatAdministratif === "A")
-        )
+        .then(c => {
+          return (
+            [c]
+              // Exclude closed companies
+              .filter(c => c.etatAdministratif && c.etatAdministratif === "A")
+              // Exclude anonymous company not registered in TD
+              .filter(
+                c => c.statutDiffusionEtablissement !== "N" || c.isRegistered
+              )
+          );
+        })
         .catch(_ => []);
     }
     // fuzzy searching only for French companies
     return decoratedSearchCompanies(clue, department).then(async results => {
-      let existingCompanies = [];
+      if (!results) {
+        return [];
+      }
+      let existingCompanies: string[] = [];
       if (results.length) {
         existingCompanies = (
           await prisma.company.findMany({
             where: {
-              orgId: { in: results.map(r => r.siret) }
+              orgId: { in: results.map(r => r.siret!) }
             },
             select: {
               orgId: true
@@ -175,8 +195,8 @@ export const makeSearchCompanies =
 
       return results.map(company => ({
         ...company,
-        orgId: company.siret,
-        isRegistered: existingCompanies.includes(company.siret)
+        orgId: company.siret!,
+        isRegistered: existingCompanies.includes(company.siret!)
       }));
     });
   };
@@ -186,7 +206,7 @@ export const makeSearchCompanies =
  */
 async function searchSireneOrNotFound(
   siret: string
-): Promise<SireneSearchResult> {
+): Promise<SireneSearchResult | null> {
   try {
     return await redundantCachedSearchSirene(siret);
   } catch (err) {
@@ -197,7 +217,7 @@ async function searchSireneOrNotFound(
     });
     if (anonymousCompany) {
       return {
-        ...anonymousCompany,
+        ...removeEmptyKeys(anonymousCompany),
         // required to avoid leaking anonymous data to the public
         statutDiffusionEtablissement: "N",
         etatAdministratif: "A",
@@ -234,7 +254,7 @@ interface PartialCompanyVatSearchResult
  */
 async function searchVatFrOnlyOrNotFound(
   vatNumber: string
-): Promise<PartialCompanyVatSearchResult> {
+): Promise<PartialCompanyVatSearchResult | null> {
   if (isFRVat(vatNumber)) {
     throw new UserInputError(
       "Une entreprise française doit être identifiée par son SIRET et pas par sa TVA intracommunautaire",
@@ -244,11 +264,13 @@ async function searchVatFrOnlyOrNotFound(
     );
   }
   // throws UserInputError if not found
-  const viesResult = await searchVat(vatNumber);
+  const viesResult: PartialCompanyVatSearchResult | null = await searchVat(
+    vatNumber
+  );
   // delete name and adresse if === ""
   // in order to avoid db name and adresse to be replaced with empty string from the VIES api
-  if (viesResult.name === "") delete viesResult.name;
-  if (viesResult.address === "") delete viesResult.address;
+  if (viesResult && viesResult.name === "") delete viesResult.name;
+  if (viesResult && viesResult.address === "") delete viesResult.address;
   return viesResult;
 }
 

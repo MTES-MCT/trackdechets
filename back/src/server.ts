@@ -32,7 +32,6 @@ import { redisClient } from "./common/redis";
 import { initSentry } from "./common/sentry";
 import { createCompanyDataLoaders } from "./companies/dataloaders";
 import { createFormDataLoaders } from "./forms/dataloader";
-import { heapSnapshotToS3Router } from "./logging/heapSnapshot";
 import { bullBoardPath, serverAdapter } from "./queue/bull-board";
 import { authRouter } from "./routers/auth-router";
 import { downloadRouter } from "./routers/downloadRouter";
@@ -88,8 +87,9 @@ export const server = new ApolloServer({
   },
   formatError: err => {
     // Catch Yup `ValidationError` and throw a `UserInputError` instead of an `InternalServerError`
-    if (err.extensions.exception?.name === "ValidationError") {
-      return new UserInputError(err.extensions.exception.errors.join("\n"));
+    const customError = err.extensions.exception as any;
+    if (customError?.name === "ValidationError") {
+      return new UserInputError(customError.errors.join("\n"));
     }
     if (
       err.extensions.code === ErrorCode.INTERNAL_SERVER_ERROR &&
@@ -152,9 +152,9 @@ app.use(
           "https:",
           "'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='"
         ],
-        connectSrc: [process.env.API_HOST],
+        connectSrc: [process.env.API_HOST!],
         formAction: ["self"],
-        ...(NODE_ENV === "production" && { upgradeInsecureRequests: [] })
+        upgradeInsecureRequests: NODE_ENV === "production" ? [] : null
       }
     }
   })
@@ -204,7 +204,7 @@ const RedisStore = redisStore(session);
 export const sess: session.SessionOptions = {
   store: new RedisStore({ client: redisClient }),
   name: SESSION_NAME || "trackdechets.connect.sid",
-  secret: SESSION_SECRET,
+  secret: SESSION_SECRET!,
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -221,7 +221,7 @@ export const sess: session.SessionOptions = {
 // For more details, see https://expressjs.com/en/guide/behind-proxies.html.
 app.set("trust proxy", TRUST_PROXY_HOPS ? parseInt(TRUST_PROXY_HOPS, 10) : 1);
 
-if (SESSION_COOKIE_SECURE === "true") {
+if (SESSION_COOKIE_SECURE === "true" && sess.cookie) {
   sess.cookie.secure = true; // serve secure cookies
 }
 
@@ -237,8 +237,8 @@ app.use(oauth2Router);
 app.use(oidcRouter);
 
 const USERS_BLACKLIST_ENV = process.env.USERS_BLACKLIST;
-let blacklist = [];
-if (USERS_BLACKLIST_ENV?.length > 0) {
+let blacklist: string[] = [];
+if (USERS_BLACKLIST_ENV && USERS_BLACKLIST_ENV.length > 0) {
   blacklist = USERS_BLACKLIST_ENV.split(",");
 }
 
@@ -322,8 +322,6 @@ function ensureLoggedInAndAdmin() {
   };
 }
 app.use(bullBoardPath, ensureLoggedInAndAdmin(), serverAdapter.getRouter());
-// TEMP until memory leaks are fixed
-app.post("/heap/:container?", ensureLoggedInAndAdmin(), heapSnapshotToS3Router);
 
 // Apply passport auth middlewares to the graphQL endpoint
 app.use(graphQLPath, passportBearerMiddleware);

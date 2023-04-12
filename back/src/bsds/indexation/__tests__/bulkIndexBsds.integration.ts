@@ -1,5 +1,4 @@
-import { ApiResponse } from "@elastic/elasticsearch";
-import { SearchResponse } from "@elastic/elasticsearch/api/types";
+import { ApiResponse, estypes } from "@elastic/elasticsearch";
 import {
   refreshElasticSearch,
   resetDatabase
@@ -17,6 +16,8 @@ import {
   indexAllBsdTypeSync,
   processBsdIdentifiersByChunk
 } from "../bulkIndexBsds";
+
+type SearchResponse<Doc> = estypes.SearchResponse<Doc>;
 
 describe("processBsdIdentifiersByChunk", () => {
   it("should process every chunk", async () => {
@@ -82,7 +83,7 @@ describe("indexAllBsdTypeSync", () => {
     const hits = body.hits.hits;
     expect(hits).toHaveLength(bsdds.length);
     for (const hit of hits) {
-      expect(bsdds.map(bsdd => bsdd.id)).toContain(hit._source.id);
+      expect(bsdds.map(bsdd => bsdd.id)).toContain(hit._source!.id);
     }
   });
 
@@ -106,7 +107,7 @@ describe("indexAllBsdTypeSync", () => {
     const hits = body.hits.hits;
     expect(hits).toHaveLength(bsdas.length);
     for (const hit of hits) {
-      expect(bsdas.map(bsda => bsda.id)).toContain(hit._source.id);
+      expect(bsdas.map(bsda => bsda.id)).toContain(hit._source!.id);
     }
   });
 
@@ -130,7 +131,7 @@ describe("indexAllBsdTypeSync", () => {
     const hits = body.hits.hits;
     expect(hits).toHaveLength(bsdasris.length);
     for (const hit of hits) {
-      expect(bsdasris.map(bsdasri => bsdasri.id)).toContain(hit._source.id);
+      expect(bsdasris.map(bsdasri => bsdasri.id)).toContain(hit._source!.id);
     }
   });
 
@@ -154,7 +155,7 @@ describe("indexAllBsdTypeSync", () => {
     const hits = body.hits.hits;
     expect(hits).toHaveLength(bsffs.length);
     for (const hit of hits) {
-      expect(bsffs.map(bsff => bsff.id)).toContain(hit._source.id);
+      expect(bsffs.map(bsff => bsff.id)).toContain(hit._source!.id);
     }
   });
 
@@ -177,7 +178,7 @@ describe("indexAllBsdTypeSync", () => {
     const hits = body.hits.hits;
     expect(hits).toHaveLength(bsvhus.length);
     for (const hit of hits) {
-      expect(bsvhus.map(bsvhu => bsvhu.id)).toContain(hit._source.id);
+      expect(bsvhus.map(bsvhu => bsvhu.id)).toContain(hit._source!.id);
     }
   });
 });
@@ -206,12 +207,12 @@ describe("indexAllBsdTypeConcurrently", () => {
           query: { match_all: {} }
         }
       });
-    expect(jobs.length).toEqual(1);
-    expect(jobs[0].status).toEqual("fulfilled");
+    expect(jobs!.length).toEqual(1);
+    expect(jobs![0].status).toEqual("fulfilled");
     const hits = body.hits.hits;
     expect(hits).toHaveLength(bsdds.length);
     for (const hit of hits) {
-      expect(bsdds.map(bsdd => bsdd.id)).toContain(hit._source.id);
+      expect(bsdds.map(bsdd => bsdd.id)).toContain(hit._source!.id);
     }
   });
 
@@ -235,12 +236,12 @@ describe("indexAllBsdTypeConcurrently", () => {
           query: { match_all: {} }
         }
       });
-    expect(jobs.length).toEqual(1);
-    expect(jobs[0].status).toEqual("fulfilled");
+    expect(jobs!.length).toEqual(1);
+    expect(jobs![0].status).toEqual("fulfilled");
     const hits = body.hits.hits;
     expect(hits).toHaveLength(bsdas.length);
     for (const hit of hits) {
-      expect(bsdas.map(bsda => bsda.id)).toContain(hit._source.id);
+      expect(bsdas.map(bsda => bsda.id)).toContain(hit._source!.id);
     }
   });
 
@@ -264,12 +265,12 @@ describe("indexAllBsdTypeConcurrently", () => {
           query: { match_all: {} }
         }
       });
-    expect(jobs.length).toEqual(1);
-    expect(jobs[0].status).toEqual("fulfilled");
+    expect(jobs!.length).toEqual(1);
+    expect(jobs![0].status).toEqual("fulfilled");
     const hits = body.hits.hits;
     expect(hits).toHaveLength(bsdasris.length);
     for (const hit of hits) {
-      expect(bsdasris.map(bsdasri => bsdasri.id)).toContain(hit._source.id);
+      expect(bsdasris.map(bsdasri => bsdasri.id)).toContain(hit._source!.id);
     }
   });
 
@@ -293,12 +294,12 @@ describe("indexAllBsdTypeConcurrently", () => {
           query: { match_all: {} }
         }
       });
-    expect(jobs.length).toEqual(1);
-    expect(jobs[0].status).toEqual("fulfilled");
+    expect(jobs!.length).toEqual(1);
+    expect(jobs![0].status).toEqual("fulfilled");
     const hits = body.hits.hits;
     expect(hits).toHaveLength(bsffs.length);
     for (const hit of hits) {
-      expect(bsffs.map(bsff => bsff.id)).toContain(hit._source.id);
+      expect(bsffs.map(bsff => bsff.id)).toContain(hit._source!.id);
     }
   });
 
@@ -321,12 +322,12 @@ describe("indexAllBsdTypeConcurrently", () => {
           query: { match_all: {} }
         }
       });
-    expect(jobs.length).toEqual(1);
-    expect(jobs[0].status).toEqual("fulfilled");
+    expect(jobs!.length).toEqual(1);
+    expect(jobs![0].status).toEqual("fulfilled");
     const hits = body.hits.hits;
     expect(hits).toHaveLength(bsvhus.length);
     for (const hit of hits) {
-      expect(bsvhus.map(bsvhu => bsvhu.id)).toContain(hit._source.id);
+      expect(bsvhus.map(bsvhu => bsvhu.id)).toContain(hit._source!.id);
     }
   });
 });
@@ -357,7 +358,7 @@ describe("indexAllBsds", () => {
 
     expect(hits).toHaveLength(bsds.length);
     for (const hit of hits) {
-      expect(bsds.map(bsd => bsd.id)).toContain(hit._source.id);
+      expect(bsds.map(bsd => bsd.id)).toContain(hit._source!.id);
     }
   });
 
@@ -384,7 +385,7 @@ describe("indexAllBsds", () => {
 
     expect(hits).toHaveLength(bsds.length);
     for (const hit of hits) {
-      expect(bsds.map(bsd => bsd.id)).toContain(hit._source.id);
+      expect(bsds.map(bsd => bsd.id)).toContain(hit._source!.id);
     }
   });
 });

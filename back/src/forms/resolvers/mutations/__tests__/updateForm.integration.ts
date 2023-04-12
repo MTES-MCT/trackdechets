@@ -17,8 +17,12 @@ import {
   MutationUpdateFormArgs,
   UpdateFormInput
 } from "../../../../generated/graphql/types";
-import * as validation from "../../../validation";
 import getReadableId from "../../../readableId";
+import * as sirenify from "../../../sirenify";
+
+const sirenifyMock = jest
+  .spyOn(sirenify, "sirenifyFormInput")
+  .mockImplementation(input => Promise.resolve(input));
 
 const UPDATE_FORM = `
   mutation UpdateForm($updateFormInput: UpdateFormInput!) {
@@ -71,17 +75,11 @@ const UPDATE_FORM = `
   }
 `;
 
-const validateSpy = jest.spyOn(validation, "validateIntermediariesInput");
-const validateIntermediariesInputMock = jest.fn();
-validateSpy.mockImplementation((...args) =>
-  validateIntermediariesInputMock(...args)
-);
-
 describe("Mutation.updateForm", () => {
-  beforeEach(() => {
-    validateIntermediariesInputMock.mockReset();
+  afterEach(async () => {
+    await resetDatabase();
+    sirenifyMock.mockClear();
   });
-  afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
@@ -202,6 +200,8 @@ describe("Mutation.updateForm", () => {
       expect(data.updateForm.wasteDetails).toMatchObject(
         updateFormInput.wasteDetails
       );
+      // check input is sirenified
+      expect(sirenifyMock).toHaveBeenCalledTimes(1);
     }
   );
 
@@ -346,7 +346,7 @@ describe("Mutation.updateForm", () => {
       data: {
         address: "",
         name: eo.name,
-        siret: eo.siret
+        siret: eo.siret!
       }
     });
     const form = await formFactory({
@@ -448,7 +448,7 @@ describe("Mutation.updateForm", () => {
       data: {
         address: "",
         name: originalEO.name,
-        siret: originalEO.siret
+        siret: originalEO.siret!
       }
     });
     const form = await formFactory({
@@ -469,7 +469,7 @@ describe("Mutation.updateForm", () => {
       data: {
         address: "",
         name: newEO.name,
-        siret: newEO.siret
+        siret: newEO.siret!
       }
     });
 
@@ -489,7 +489,7 @@ describe("Mutation.updateForm", () => {
       }
     });
 
-    expect(data.updateForm.ecoOrganisme.siret).toBe(newEO.siret);
+    expect(data.updateForm.ecoOrganisme!.siret).toBe(newEO.siret);
   });
 
   it("should remove the eco-organisme", async () => {
@@ -503,7 +503,7 @@ describe("Mutation.updateForm", () => {
       data: {
         address: "",
         name: eo.name,
-        siret: eo.siret
+        siret: eo.siret!
       }
     });
     const form = await formFactory({
@@ -540,9 +540,7 @@ describe("Mutation.updateForm", () => {
         emitterCompanySiret: company.siret
       }
     });
-    validateIntermediariesInputMock.mockResolvedValueOnce([
-      toIntermediaryCompany(intermediary.company)
-    ]);
+
     const { mutate } = makeClient(user);
     const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
       variables: {
@@ -576,9 +574,7 @@ describe("Mutation.updateForm", () => {
         }
       }
     });
-    validateIntermediariesInputMock.mockResolvedValueOnce([
-      toIntermediaryCompany(intermediary2.company)
-    ]);
+
     const { mutate } = makeClient(user);
     const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
       variables: {
@@ -597,10 +593,6 @@ describe("Mutation.updateForm", () => {
         name: intermediary2.company.name,
         siret: intermediary2.company.siret
       })
-    ]);
-    validateIntermediariesInputMock.mockResolvedValueOnce([
-      toIntermediaryCompany(intermediary2.company),
-      toIntermediaryCompany(intermediary.company)
     ]);
     //update a 2nd time
     const { data: data2 } = await mutate<Pick<Mutation, "updateForm">>(
@@ -818,7 +810,7 @@ describe("Mutation.updateForm", () => {
       }
     });
 
-    expect(data.updateForm.temporaryStorageDetail.destination).toMatchObject(
+    expect(data.updateForm.temporaryStorageDetail!.destination).toMatchObject(
       updateFormInput.temporaryStorageDetail.destination
     );
   });
@@ -847,7 +839,7 @@ describe("Mutation.updateForm", () => {
     });
 
     const tempStorage = await prisma.form
-      .findUnique({
+      .findUniqueOrThrow({
         where: { id: form.id }
       })
       .forwardedIn();
@@ -888,7 +880,7 @@ describe("Mutation.updateForm", () => {
       }
     });
 
-    expect(data.updateForm.temporaryStorageDetail.destination).toMatchObject(
+    expect(data.updateForm.temporaryStorageDetail!.destination).toMatchObject(
       updateFormInput.temporaryStorageDetail.destination
     );
   });
@@ -950,7 +942,7 @@ describe("Mutation.updateForm", () => {
       }
     });
 
-    expect(data.updateForm.recipient.company).toMatchObject(
+    expect(data.updateForm.recipient!.company).toMatchObject(
       updateFormInput.recipient.company
     );
   });
@@ -983,7 +975,7 @@ describe("Mutation.updateForm", () => {
       }
     });
 
-    expect(data.updateForm.recipient.company).toMatchObject(
+    expect(data.updateForm.recipient!.company).toMatchObject(
       updateFormInput.recipient.company
     );
   });
@@ -1087,7 +1079,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived
+            quantity: appendixForm.quantityReceived!
           }
         }
       }
@@ -1105,13 +1097,13 @@ describe("Mutation.updateForm", () => {
     });
 
     // Old appendix form is back to AWAITING_GROUP
-    const oldAppendix2Form = await prisma.form.findUnique({
+    const oldAppendix2Form = await prisma.form.findUniqueOrThrow({
       where: { id: appendixForm.id }
     });
     expect(oldAppendix2Form.status).toBe("AWAITING_GROUP");
 
     // New appendix form is now GROUPED
-    const newAppendix2Form = await prisma.form.findUnique({
+    const newAppendix2Form = await prisma.form.findUniqueOrThrow({
       where: { id: toBeAppendixForm.id }
     });
     expect(newAppendix2Form.status).toBe("GROUPED");
@@ -1138,7 +1130,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived
+            quantity: appendixForm.quantityReceived!
           }
         }
       }
@@ -1155,7 +1147,7 @@ describe("Mutation.updateForm", () => {
         }
       }
     });
-    expect(data.updateForm.wasteDetails.code).toEqual("01 03 04*");
+    expect(data.updateForm.wasteDetails!.code).toEqual("01 03 04*");
   });
   it("should be impossible to update emitter siret on a form containing appendix 2", async () => {
     const { user: transporterUser, company: transporter } =
@@ -1184,7 +1176,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived
+            quantity: appendixForm.quantityReceived!
           }
         }
       }
@@ -1234,7 +1226,7 @@ describe("Mutation.updateForm", () => {
           grouping: {
             create: {
               initialFormId: initialAppendix2.id,
-              quantity: initialAppendix2.quantityReceived
+              quantity: initialAppendix2.quantityReceived!
             }
           }
         }
@@ -1287,7 +1279,7 @@ describe("Mutation.updateForm", () => {
           grouping: {
             create: {
               initialFormId: initialAppendix2.id,
-              quantity: initialAppendix2.quantityReceived
+              quantity: initialAppendix2.quantityReceived!
             }
           }
         }
@@ -1343,7 +1335,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived
+            quantity: appendixForm.quantityReceived!
           }
         }
       }
@@ -1488,7 +1480,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived
+            quantity: appendixForm.quantityReceived!
           }
         }
       }
@@ -1532,7 +1524,7 @@ describe("Mutation.updateForm", () => {
         grouping: {
           create: {
             initialFormId: appendixForm.id,
-            quantity: appendixForm.quantityReceived
+            quantity: appendixForm.quantityReceived!
           }
         }
       }
@@ -1798,7 +1790,7 @@ describe("Mutation.updateForm", () => {
     const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
       variables: { updateFormInput }
     });
-    expect(data.updateForm.wasteDetails.isDangerous).toBe(true);
+    expect(data.updateForm.wasteDetails!.isDangerous).toBe(true);
   });
 
   it("should perform update in transaction", async () => {
@@ -1837,7 +1829,7 @@ describe("Mutation.updateForm", () => {
       })
     ]);
 
-    const updatedForm = await prisma.form.findUnique({
+    const updatedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
 
@@ -1859,9 +1851,6 @@ describe("Mutation.updateForm", () => {
       }
     });
 
-    validateIntermediariesInputMock.mockResolvedValueOnce([
-      toIntermediaryCompany(company)
-    ]);
     const { data } = await mutate<
       Pick<Mutation, "updateForm">,
       MutationUpdateFormArgs
@@ -1876,7 +1865,7 @@ describe("Mutation.updateForm", () => {
       }
     });
 
-    const updatedForm = await prisma.form.findUnique({
+    const updatedForm = await prisma.form.findUniqueOrThrow({
       where: { id: data.updateForm.id }
     });
 
@@ -1978,9 +1967,9 @@ describe("Mutation.updateForm", () => {
       }
     });
 
-    expect(data.updateForm.grouping.length).toBe(1);
+    expect(data.updateForm.grouping!.length).toBe(1);
 
-    const updatedAppendix1_1 = await prisma.form.findUnique({
+    const updatedAppendix1_1 = await prisma.form.findUniqueOrThrow({
       where: { id: appendix1_1.id },
       include: { groupedIn: true }
     });

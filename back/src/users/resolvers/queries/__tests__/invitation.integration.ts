@@ -31,10 +31,10 @@ describe("query / invitation", () => {
     const { data } = await query<Pick<Query, "invitation">>(INVITATION, {
       variables: { hash: userAccountHash.hash }
     });
-    expect(data.invitation.email).toEqual(userAccountHash.email);
-    expect(data.invitation.companySiret).toEqual(userAccountHash.companySiret);
-    expect(data.invitation.role).toEqual(userAccountHash.role);
-    expect(data.invitation.email).toEqual(userAccountHash.email);
+    expect(data.invitation!.email).toEqual(userAccountHash.email);
+    expect(data.invitation!.companySiret).toEqual(userAccountHash.companySiret);
+    expect(data.invitation!.role).toEqual(userAccountHash.role);
+    expect(data.invitation!.email).toEqual(userAccountHash.email);
   });
 
   it("should return error if invitation does not exist", async () => {

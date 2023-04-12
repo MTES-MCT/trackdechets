@@ -114,6 +114,6 @@ oauth2server.exchange(
     // Add custom params
     const params = { user: { name: grant.user.name, email: grant.user.email } };
 
-    return done(null, clearToken, null, params);
+    return done(null, clearToken, undefined, params);
   })
 );

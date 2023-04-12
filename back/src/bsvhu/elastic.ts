@@ -4,6 +4,14 @@ import { BsdElastic, indexBsd, transportPlateFilter } from "../common/elastic";
 import { GraphQLContext } from "../types";
 import { getRegistryFields } from "./registry";
 
+type WhereKeys =
+  | "isDraftFor"
+  | "isForActionFor"
+  | "isFollowFor"
+  | "isArchivedFor"
+  | "isToCollectFor"
+  | "isCollectedFor";
+
 // | state              | emitter | transporter | destination |
 // |--------------------|---------|-------------|-------------|
 // | initial (draft)    | draft   | draft       | draft       |
@@ -13,18 +21,8 @@ import { getRegistryFields } from "./registry";
 // | processed          | archive | archive     | archive     |
 // | refused            | archive | archive     | archive     |
 
-function getWhere(
-  bsvhu: Bsvhu
-): Pick<
-  BsdElastic,
-  | "isDraftFor"
-  | "isForActionFor"
-  | "isFollowFor"
-  | "isArchivedFor"
-  | "isToCollectFor"
-  | "isCollectedFor"
-> {
-  const where = {
+function getWhere(bsvhu: Bsvhu): Pick<BsdElastic, WhereKeys> {
+  const where: Record<WhereKeys, string[]> = {
     isDraftFor: [],
     isForActionFor: [],
     isFollowFor: [],
@@ -33,7 +31,7 @@ function getWhere(
     isCollectedFor: []
   };
 
-  const formSirets: Record<string, string | null | undefined> = {
+  const formSirets: Partial<Record<keyof Bsvhu, string | null | undefined>> = {
     emitterCompanySiret: bsvhu.emitterCompanySiret,
     destinationCompanySiret: bsvhu.destinationCompanySiret,
     transporterCompanySiret: getTransporterCompanyOrgId(bsvhu)
@@ -165,7 +163,7 @@ export function toBsdElastic(bsvhu: Bsvhu): BsdElastic {
     destinationOperationCode: bsvhu.destinationOperationCode ?? "",
 
     emitterEmissionDate: bsvhu.emitterEmissionSignatureDate?.getTime(),
-    workerWorkDate: null,
+    workerWorkDate: undefined,
     transporterTransportTakenOverAt:
       bsvhu.transporterTransportTakenOverAt?.getTime(),
     destinationReceptionDate: bsvhu.destinationReceptionDate?.getTime(),

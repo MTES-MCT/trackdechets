@@ -16,7 +16,9 @@ import { USER_SESSIONS_CACHE_KEY } from "../../../../common/redis/users";
 
 const request = supertest(app);
 const cookieRegExp = new RegExp(
-  `${sess.name}=(.+); Domain=${sess.cookie.domain}; Path=/; Expires=.+; HttpOnly`
+  `${sess.name}=(.+); Domain=${
+    sess.cookie!.domain
+  }; Path=/; Expires=.+; HttpOnly`
 );
 
 jest.spyOn(utils, "getUIBaseURL").mockReturnValue("*");
@@ -54,7 +56,7 @@ describe("disconnectDeletedUser Middleware", () => {
     const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
 
     const { sessionCookie } = await logIn(app, user.email, "pass");
-    const cookieValue = sessionCookie.match(cookieRegExp)[1];
+    const cookieValue = sessionCookie.match(cookieRegExp)![1];
 
     // should be logged-in
     const res = await request
@@ -96,7 +98,7 @@ describe("disconnectDeletedUser Middleware", () => {
     const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
 
     const { sessionCookie } = await logIn(app, user.email, "pass");
-    const cookieValue = sessionCookie.match(cookieRegExp)[1];
+    const cookieValue = sessionCookie.match(cookieRegExp)![1];
 
     // should be logged-in
     const res = await request

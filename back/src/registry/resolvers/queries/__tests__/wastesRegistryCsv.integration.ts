@@ -118,7 +118,7 @@ describe("query { wastesRegistryCsv }", () => {
           : registryType === "MANAGED"
           ? traderFormFactory
           : emitterFormFactory;
-      const form = await customFormFactory(user.id, company.siret);
+      const form = await customFormFactory(user.id, company.siret!);
       await indexForm(await getFullForm(form));
       await refreshElasticSearch();
       const { query } = makeClient(user);
@@ -142,7 +142,7 @@ describe("query { wastesRegistryCsv }", () => {
 
       expect(res.status).toBe(200);
 
-      const rows = [];
+      const rows: any[] = [];
 
       parseString(res.text, { headers: true, delimiter: ";" })
         .on("data", row => rows.push(row))

@@ -33,21 +33,21 @@ const dbGetterMock = id => {
 describe("cachedGet", () => {
   test("should be able to get numeric key in cache", async () => {
     const foo = () => null;
-    const res = await cachedGet(foo, "foo", 1000);
+    const res = await cachedGet(foo as any, "foo", 1000);
 
     expect(res).toBe("redisBar");
   });
 
   test("should be able to get string key in cache", async () => {
     const foo = () => null;
-    const res = await cachedGet(foo, "foo", "1000");
+    const res = await cachedGet(foo as any, "foo", "1000");
 
     expect(res).toBe("redisBar");
   });
 
   test("should be able to get json in cache", async () => {
     const foo = () => null;
-    const res = await cachedGet<{ name: string }>(foo, "foo", "2000", {
+    const res = await cachedGet<{ name: string }>(foo as any, "foo", "2000", {
       parser: JSON
     });
 

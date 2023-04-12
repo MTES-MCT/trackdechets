@@ -8,6 +8,11 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import * as sirenify from "../../../sirenify";
+
+const sirenifyMock = jest
+  .spyOn(sirenify, "default")
+  .mockImplementation(input => Promise.resolve(input));
 
 const CREATE_VHU_FORM = `
 mutation CreateVhuForm($input: BsvhuInput!) {
@@ -41,7 +46,10 @@ mutation CreateVhuForm($input: BsvhuInput!) {
 `;
 
 describe("Mutation.Vhu.create", () => {
-  afterEach(resetDatabase);
+  afterEach(async () => {
+    await resetDatabase();
+    sirenifyMock.mockClear();
+  });
 
   it("should disallow unauthenticated user", async () => {
     const { mutate } = makeClient();
@@ -147,9 +155,11 @@ describe("Mutation.Vhu.create", () => {
     expect(data.createBsvhu.id).toMatch(
       new RegExp(`^VHU-[0-9]{8}-[A-Z0-9]{9}$`)
     );
-    expect(data.createBsvhu.destination.company.siret).toBe(
+    expect(data.createBsvhu.destination!.company!.siret).toBe(
       input.destination.company.siret
     );
+    // check input is sirenified
+    expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
 
   it("should fail if a required field like the emitter agrement is missing", async () => {

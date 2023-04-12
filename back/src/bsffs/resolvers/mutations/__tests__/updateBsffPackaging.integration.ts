@@ -13,6 +13,11 @@ import {
 } from "../../../__tests__/factories";
 import prisma from "../../../../prisma";
 import { resetDatabase } from "../../../../../integration-tests/helper";
+import * as sirenify from "../../../sirenify";
+
+const sirenifyMock = jest
+  .spyOn(sirenify, "sirenifyBsffPackagingInput")
+  .mockImplementation(input => Promise.resolve(input));
 
 const UPDATE_BSFF_PACKAGING = gql`
   mutation UpdateBsffPackaging($id: ID!, $input: UpdateBsffPackagingInput!) {
@@ -23,7 +28,10 @@ const UPDATE_BSFF_PACKAGING = gql`
 `;
 
 describe("Mutation.updateBsffPackaging", () => {
-  afterEach(resetDatabase);
+  afterEach(async () => {
+    await resetDatabase();
+    sirenifyMock.mockClear();
+  });
 
   test("before acceptation > it should be possible to update acceptation fields", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
@@ -60,6 +68,8 @@ describe("Mutation.updateBsffPackaging", () => {
     expect(updatedPackaging.acceptationStatus).toEqual(
       WasteAcceptationStatus.ACCEPTED
     );
+    // check input is sirenified
+    expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
 
   it("should throw error if the mutation is not called by the destination", async () => {
@@ -137,6 +147,88 @@ describe("Mutation.updateBsffPackaging", () => {
     );
   });
 
+  test("before acceptation > it should be possible to update numero", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const bsff = await createBsffAfterReception({
+      emitter,
+      transporter,
+      destination
+    });
+
+    const packagingId = bsff.packagings[0].id;
+
+    const { mutate } = makeClient(destination.user);
+    await mutate<
+      Pick<Mutation, "updateBsffPackaging">,
+      MutationUpdateBsffPackagingArgs
+    >(UPDATE_BSFF_PACKAGING, {
+      variables: {
+        id: packagingId,
+        input: {
+          numero: "nouveau-numero"
+        }
+      }
+    });
+
+    const updatedPackaging = await prisma.bsffPackaging.findUnique({
+      where: { id: packagingId }
+    });
+    expect(updatedPackaging.numero).toEqual("nouveau-numero");
+    expect(updatedPackaging.emissionNumero).toEqual(bsff.packagings[0].numero);
+  });
+
+  test("before acceptation > it should throw error when trying to set an empty or null numero", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporter = await userWithCompanyFactory("MEMBER");
+    const destination = await userWithCompanyFactory("MEMBER");
+    const bsff = await createBsffAfterReception({
+      emitter,
+      transporter,
+      destination
+    });
+
+    const packagingId = bsff.packagings[0].id;
+
+    const { mutate } = makeClient(destination.user);
+    const { errors: errors1 } = await mutate<
+      Pick<Mutation, "updateBsffPackaging">,
+      MutationUpdateBsffPackagingArgs
+    >(UPDATE_BSFF_PACKAGING, {
+      variables: {
+        id: packagingId,
+        input: {
+          numero: ""
+        }
+      }
+    });
+
+    expect(errors1).toEqual([
+      expect.objectContaining({
+        message: "Le numéro de contenant ne peut pas être nul ou vide"
+      })
+    ]);
+
+    const { errors: errors2 } = await mutate<
+      Pick<Mutation, "updateBsffPackaging">,
+      MutationUpdateBsffPackagingArgs
+    >(UPDATE_BSFF_PACKAGING, {
+      variables: {
+        id: packagingId,
+        input: {
+          numero: null
+        }
+      }
+    });
+
+    expect(errors2).toEqual([
+      expect.objectContaining({
+        message: "Le numéro de contenant ne peut pas être nul ou vide"
+      })
+    ]);
+  });
+
   test("after acceptation > it should not be possible to update sealed fields", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const transporter = await userWithCompanyFactory("MEMBER");
@@ -157,6 +249,7 @@ describe("Mutation.updateBsffPackaging", () => {
       variables: {
         id: packagingId,
         input: {
+          numero: "nouveau-numero",
           acceptation: {
             date: "2022-11-04" as any,
             weight: 2,
@@ -171,7 +264,7 @@ describe("Mutation.updateBsffPackaging", () => {
       expect.objectContaining({
         message:
           "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés" +
-          " : acceptationDate, acceptationWeight, acceptationWasteCode, acceptationWasteDescription"
+          " : numero, acceptationDate, acceptationWeight, acceptationWasteCode, acceptationWasteDescription"
       })
     ]);
   });

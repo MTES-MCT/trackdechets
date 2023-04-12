@@ -7,8 +7,7 @@ import {
   refreshElasticSearch,
   resetDatabase
 } from "../../../../../integration-tests/helper";
-import { ApiResponse } from "@elastic/elasticsearch";
-import { SearchResponse } from "@elastic/elasticsearch/api/types";
+import { ApiResponse, estypes } from "@elastic/elasticsearch";
 import {
   client,
   BsdElastic,
@@ -23,7 +22,7 @@ describe("bsffRepository.update", () => {
 
   it("should update record in DB, create event, and update index", async () => {
     async function searchByWasteCode(wasteCode: string) {
-      const { body }: ApiResponse<SearchResponse<BsdElastic>> =
+      const { body }: ApiResponse<estypes.SearchResponse<BsdElastic>> =
         await client.search({
           index: index.alias,
           body: {

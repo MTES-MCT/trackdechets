@@ -482,7 +482,7 @@ describe("signTransportForm", () => {
 
       expect(data.signTransportForm.status).toBe(Status.SENT);
 
-      const appendix1Container = await prisma.form.findUnique({
+      const appendix1Container = await prisma.form.findUniqueOrThrow({
         where: { id: container.id }
       });
       expect(appendix1Container.status).toBe(Status.SENT);
@@ -552,7 +552,7 @@ describe("signTransportForm", () => {
       });
 
       expect(data.signTransportForm.status).toBe(Status.SENT);
-      const appendix1Container = await prisma.form.findUnique({
+      const appendix1Container = await prisma.form.findUniqueOrThrow({
         where: { id: container.id }
       });
       expect(appendix1Container.status).toBe(Status.SENT);
@@ -664,7 +664,7 @@ describe("signTransportForm", () => {
 
       expect(data.signTransportForm.status).toBe(Status.SENT);
 
-      const appendix1Container = await prisma.form.findUnique({
+      const appendix1Container = await prisma.form.findUniqueOrThrow({
         where: { id: container.id }
       });
       expect(appendix1Container.status).toBe(Status.SENT);
@@ -721,7 +721,7 @@ describe("signTransportForm", () => {
 
       expect(data.signTransportForm.status).toBe(Status.SENT);
 
-      const appendix1Container = await prisma.form.findUnique({
+      const appendix1Container = await prisma.form.findUniqueOrThrow({
         where: { id: container.id }
       });
       expect(appendix1Container.status).toBe(Status.SENT);

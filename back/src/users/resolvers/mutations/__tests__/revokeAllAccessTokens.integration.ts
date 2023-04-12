@@ -44,16 +44,16 @@ describe("mutation revokeAllAccessTokens", () => {
     expect(accessToken4.isRevoked).toEqual(false);
     const { mutate } = makeClient(user);
     await mutate(REVOKE_ALL_ACCESS_TOKENS);
-    accessToken1 = await prisma.accessToken.findFirst({
+    accessToken1 = await prisma.accessToken.findFirstOrThrow({
       where: { id: accessToken1.id }
     });
-    accessToken2 = await prisma.accessToken.findFirst({
+    accessToken2 = await prisma.accessToken.findFirstOrThrow({
       where: { id: accessToken2.id }
     });
-    accessToken3 = await prisma.accessToken.findFirst({
+    accessToken3 = await prisma.accessToken.findFirstOrThrow({
       where: { id: accessToken3.id }
     });
-    accessToken4 = await prisma.accessToken.findFirst({
+    accessToken4 = await prisma.accessToken.findFirstOrThrow({
       where: { id: accessToken4.id }
     });
     expect(accessToken1.isRevoked).toEqual(true);

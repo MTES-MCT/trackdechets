@@ -69,7 +69,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
   const vatNumber = companyInput.vatNumber
     ? cleanClue(companyInput.vatNumber)
     : null;
-  const orgId = siret ?? vatNumber;
+  const orgId = siret ?? (vatNumber as string);
 
   if (isVat(vatNumber)) {
     if (isFRVat(vatNumber)) {
@@ -143,7 +143,9 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     ecoOrganismeAgreements: {
       set: ecoOrganismeAgreements
     },
-    allowBsdasriTakeOverWithoutSignature,
+    allowBsdasriTakeOverWithoutSignature: Boolean(
+      allowBsdasriTakeOverWithoutSignature
+    ),
     contact,
     contactEmail,
     contactPhone
@@ -211,7 +213,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
       );
     }
   }
-  if (company.siret) {
+  if (company.siret && company.address && companyInfo.codeCommune) {
     // Fill latitude, longitude and departement asynchronously
     addToGeocodeCompanyQueue({
       siret: company.siret,

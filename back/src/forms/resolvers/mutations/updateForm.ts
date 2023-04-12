@@ -23,13 +23,14 @@ import { FormCompanies } from "../../types";
 import {
   draftFormSchema,
   sealedFormSchema,
-  validateGroupement,
-  validateIntermediariesInput
+  validateGroupement
 } from "../../validation";
 import prisma from "../../../prisma";
 import { UserInputError } from "apollo-server-core";
 import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
+import { sirenifyFormInput } from "../../sirenify";
+import { validateIntermediariesInput } from "../../../common/validation";
 
 function validateArgs(args: MutationUpdateFormArgs) {
   const wasteDetailsCode = args.updateFormInput.wasteDetails?.code;
@@ -48,14 +49,15 @@ const updateFormResolver = async (
 
   const { updateFormInput } = validateArgs(args);
 
+  const id = updateFormInput.id;
+
   const {
-    id,
     appendix2Forms,
     grouping,
     temporaryStorageDetail,
     intermediaries,
     ...formContent
-  } = updateFormInput;
+  } = await sirenifyFormInput(updateFormInput, user);
 
   if (appendix2Forms && grouping) {
     throw new UserInputError(
@@ -207,6 +209,7 @@ const updateFormResolver = async (
       deleteMany: {}
     };
   } else if (intermediaries?.length) {
+    await validateIntermediariesInput(intermediaries);
     // Update the intermediaties
     const existingIntermediaries =
       await prisma.intermediaryFormAssociation.findMany({
@@ -215,8 +218,7 @@ const updateFormResolver = async (
     // combine existing info with update info
     const intermediariesInput = intermediaries.map(companyInput => {
       const match = existingIntermediaries.find(
-        ({ siret, vatNumber }) =>
-          siret === companyInput.siret || vatNumber === companyInput.vatNumber
+        ({ siret }) => siret === companyInput.siret
       );
       return {
         ...(match
@@ -237,7 +239,15 @@ const updateFormResolver = async (
     formUpdateInput.intermediaries = {
       deleteMany: {},
       createMany: {
-        data: await validateIntermediariesInput(intermediariesInput),
+        data: intermediariesInput.map(i => ({
+          name: i.name!, // enforced through validation schema
+          siret: i.siret!, // enforced through validation schema
+          contact: i.contact!, // enforced through validation schema
+          address: i.address,
+          vatNumber: i.vatNumber,
+          phone: i.phone,
+          mail: i.mail
+        })),
         skipDuplicates: true
       }
     };
