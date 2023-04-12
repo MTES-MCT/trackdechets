@@ -149,7 +149,6 @@ function BsdAdditionalActionsButton({
             <li>
               <button
                 type="button"
-                data-testid="bsd-suite-btn"
                 className="fr-btn fr-btn--tertiary-no-outline"
                 tabIndex={tabIndex}
                 onClick={handleAppendix1}
