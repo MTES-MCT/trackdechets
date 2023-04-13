@@ -31,7 +31,7 @@ export const xDaysAgo = (baseDate: Date, daysAgo: number): Date => {
  * - Users who joined a verified pro company x days ago
  * - Users who joined a pro company that was verified x days ago, before its verification
  */
-export const getRecentlyRegisteredProfesionals = async (daysAgo = 3) => {
+export const getRecentlyRegisteredProfesionals = async (daysAgo = 2) => {
   const now = new Date();
 
   const dateGt = xDaysAgo(now, daysAgo);
@@ -59,7 +59,7 @@ export const getRecentlyRegisteredProfesionals = async (daysAgo = 3) => {
   const recentlyVerifiedCompaniesCreatorsAssociations =
     await prisma.companyAssociation.findMany({
       where: {
-        createdAt: { lte: dateGt },
+        createdAt: { lte: dateLt },
         company: {
           verifiedAt: { gte: dateGt, lt: dateLt },
           companyTypes: {
@@ -84,7 +84,7 @@ export const getRecentlyRegisteredProfesionals = async (daysAgo = 3) => {
   return uniqueUsers;
 };
 
-export const getRecentlyRegisteredProducers = async (daysAgo = 3) => {
+export const getRecentlyRegisteredProducers = async (daysAgo = 2) => {
   const now = new Date();
 
   const dateGt = xDaysAgo(now, daysAgo);
@@ -116,7 +116,7 @@ export const getRecentlyRegisteredProducers = async (daysAgo = 3) => {
 /**
  * Second onboarding email. Different for profesionals & non-profesionals / producers
  */
-export const sendSecondOnboardingEmail = async (daysAgo = 3) => {
+export const sendSecondOnboardingEmail = async (daysAgo = 2) => {
   // Pros
   const profesionals = await getRecentlyRegisteredProfesionals(daysAgo);
 

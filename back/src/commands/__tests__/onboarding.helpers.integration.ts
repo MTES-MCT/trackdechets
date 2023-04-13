@@ -494,7 +494,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
     );
 
     // When
-    const profesionnals = await getRecentlyRegisteredProfesionals();
+    const profesionnals = await getRecentlyRegisteredProfesionals(2);
 
     // Then
     const expectedResult = [
@@ -549,7 +549,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
     });
 
     // When
-    const profesionnals = await getRecentlyRegisteredProfesionals();
+    const profesionnals = await getRecentlyRegisteredProfesionals(2);
 
     // Then
     const expectedResult = [
@@ -602,7 +602,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
     );
 
     // When
-    const profesionnals = await getRecentlyRegisteredProfesionals();
+    const profesionnals = await getRecentlyRegisteredProfesionals(2);
 
     // Then
     expect(profesionnals).toEqual([]);
@@ -642,7 +642,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
     });
 
     // When
-    const profesionnals = await getRecentlyRegisteredProfesionals();
+    const profesionnals = await getRecentlyRegisteredProfesionals(2);
 
     // Then
     expect(profesionnals).toEqual([
@@ -677,7 +677,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
     });
 
     // When
-    const profesionnals = await getRecentlyRegisteredProfesionals();
+    const profesionnals = await getRecentlyRegisteredProfesionals(2);
 
     // Then
     const expectedResult = [
@@ -719,7 +719,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
     });
 
     // When
-    const profesionnals = await getRecentlyRegisteredProfesionals();
+    const profesionnals = await getRecentlyRegisteredProfesionals(2);
 
     // Then
     expect(profesionnals).toEqual([]);
@@ -741,7 +741,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
     );
 
     // When
-    const profesionnals = await getRecentlyRegisteredProfesionals();
+    const profesionnals = await getRecentlyRegisteredProfesionals(2);
 
     // Then
     expect(profesionnals).toEqual([]);
@@ -769,7 +769,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
     });
 
     // When
-    const profesionnals = await getRecentlyRegisteredProfesionals();
+    const profesionnals = await getRecentlyRegisteredProfesionals(2);
 
     // Then
     expect(profesionnals).toEqual([]);
@@ -817,7 +817,7 @@ describe("getRecentlyRegisteredProducers", () => {
     });
 
     // When
-    const profesionnals = await getRecentlyRegisteredProducers();
+    const profesionnals = await getRecentlyRegisteredProducers(2);
 
     // Then
     const expectedResult = [
@@ -877,7 +877,7 @@ describe("getRecentlyRegisteredProducers", () => {
     });
 
     // When
-    const profesionnals = await getRecentlyRegisteredProducers();
+    const profesionnals = await getRecentlyRegisteredProducers(2);
 
     // Then
     const expectedResult = [
@@ -925,7 +925,7 @@ describe("getRecentlyRegisteredProducers", () => {
     });
 
     // When
-    const profesionnals = await getRecentlyRegisteredProducers();
+    const profesionnals = await getRecentlyRegisteredProducers(2);
 
     // Then
     expect(profesionnals).toEqual([]);
