@@ -21,7 +21,7 @@ export const legacyUserActivationHandler = async (req, res) => {
  * Activate a recently signed-up user
  *
  * - User receives an emailed link upon signup
- * - A click on the aforementionned link open a frontend confirm form poitning to this POST handler
+ * - A click on the aforementionned link open a frontend confirm form pointing to this POST handler
  * - The handler checks userActivation exists, then activates matching user and deletes hash
  * - redirects to /login?signup=complete if successful
  *
