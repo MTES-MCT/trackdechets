@@ -2,6 +2,8 @@ import express from "express";
 import supertest from "supertest";
 import { ApolloServer, gql } from "apollo-server-express";
 import { graphqlQueryMergingLimiter } from "../graphqlQueryMergingLimiter";
+import { ErrorCode } from "../../errors";
+import { MAX_OPERATIONS_PER_REQUEST } from "../graphqlBatchLimiter";
 
 const graphQLPath = "/gql";
 const mockResolver = jest.fn();
@@ -63,7 +65,7 @@ describe("graphqlQueryMergingLimiter Apollo Plugin", () => {
     expect(response.status).toEqual(200);
   });
 
-  it("should fail if query merging has more than MAX_GQL_QUERY_PER_REQUEST operations", async () => {
+  it("should fail if query merging has more than MAX_OPERATIONS_PER_REQUEST operations", async () => {
     const response = await request.post(graphQLPath).send({
       query:
         "{\n" +
@@ -73,16 +75,13 @@ describe("graphqlQueryMergingLimiter Apollo Plugin", () => {
         "  _53063610900429: companyInfos\n" +
         "  _18008901307630: companyInfos\n" +
         "  _53063610900427: companyInfos\n" +
-        "  _34035399400013: companyInfos\n" +
-        "  _20002305900122: companyInfos\n" +
-        "  _26030017300030: companyInfos\n" +
-        "  _53063610900469: companyInfos\n" +
-        "  _18008901307650: companyInfos\n" +
         "}\n"
     });
     expect(response.status).toEqual(400);
-    expect(response.body.errors[0].message).toContain(
-      "Batching by query merging is limited to 10 operations per query."
+    const [e, _rest] = response.body.errors;
+    expect(e.extensions.code).toEqual(ErrorCode.GRAPHQL_MAX_OPERATIONS_ERROR);
+    expect(e.message).toContain(
+      `Batching by query merging is limited to ${MAX_OPERATIONS_PER_REQUEST} operations per query.`
     );
   });
 });

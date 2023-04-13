@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
-const MAX_OPERATIONS_PER_REQUEST = 5;
+export const MAX_OPERATIONS_PER_REQUEST = 5;
 
 export function graphqlBatchLimiterMiddleware() {
   return function graphqlBatchLimiter(
