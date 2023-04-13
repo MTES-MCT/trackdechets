@@ -79,11 +79,10 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       // check security code is temp storer's
       await checkSecurityCode(form.recipientCompanySiret, securityCode);
 
-      const { forwardedIn } = await getFormRepository(user).findFullFormById(
-        id
-      );
+      const { forwardedIn } =
+        (await getFormRepository(user).findFullFormById(id)) ?? {};
 
-      const hasWasteDetailsOverride = !!forwardedIn.wasteDetailsQuantity;
+      const hasWasteDetailsOverride = !!forwardedIn?.wasteDetailsQuantity;
 
       const formUpdateInput: Prisma.FormUpdateInput = {
         ...(!hasWasteDetailsOverride && wasteDetails),

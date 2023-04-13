@@ -50,7 +50,7 @@ describe("Mutation.signBsdasri emission", () => {
     });
 
     test("before emission and transport", async () => {
-      const validated = await validateBsdasri(bsdasri, {
+      const validated = await validateBsdasri(bsdasri as any, {
         emissionSignature: true,
         transportSignature: true
       });
@@ -63,7 +63,7 @@ describe("Mutation.signBsdasri emission", () => {
         transporterCompanyVatNumber: foreignTransporter.vatNumber,
         transporterCompanySiret: null
       };
-      const validated = await validateBsdasri(data, {
+      const validated = await validateBsdasri(data as any, {
         transportSignature: true
       });
       expect(validated).toBeDefined();
@@ -78,7 +78,7 @@ describe("Mutation.signBsdasri emission", () => {
         transporterRecepisseDepartment: null,
         transporterRecepisseValidityLimit: null
       };
-      const validated = await validateBsdasri(data, {
+      const validated = await validateBsdasri(data as any, {
         transportSignature: true
       });
       expect(validated).toBeDefined();
@@ -97,7 +97,7 @@ describe("Mutation.signBsdasri emission", () => {
       expect.assertions(1);
 
       try {
-        await validateBsdasri(data, {
+        await validateBsdasri(data as any, {
           transportSignature: true
         });
       } catch (err) {
@@ -118,7 +118,7 @@ describe("Mutation.signBsdasri emission", () => {
       expect.assertions(1);
 
       try {
-        await validateBsdasri(data, {
+        await validateBsdasri(data as any, {
           transportSignature: true
         });
       } catch (err) {
@@ -137,7 +137,7 @@ describe("Mutation.signBsdasri emission", () => {
       expect.assertions(1);
 
       try {
-        await validateBsdasri(data, {
+        await validateBsdasri(data as any, {
           transportSignature: true
         });
       } catch (err) {
@@ -157,7 +157,7 @@ describe("Mutation.signBsdasri emission", () => {
       expect.assertions(1);
 
       try {
-        await validateBsdasri(data, {
+        await validateBsdasri(data as any, {
           transportSignature: true
         });
       } catch (err) {
@@ -177,7 +177,7 @@ describe("Mutation.signBsdasri emission", () => {
       expect.assertions(1);
 
       try {
-        await validateBsdasri(data, {
+        await validateBsdasri(data as any, {
           transportSignature: true
         });
       } catch (err) {
@@ -197,7 +197,7 @@ describe("Mutation.signBsdasri emission", () => {
       expect.assertions(1);
 
       try {
-        await validateBsdasri(data, {
+        await validateBsdasri(data as any, {
           transportSignature: true
         });
       } catch (err) {
@@ -217,7 +217,7 @@ describe("Mutation.signBsdasri emission", () => {
       expect.assertions(1);
 
       try {
-        await validateBsdasri(data, {
+        await validateBsdasri(data as any, {
           transportSignature: true
         });
       } catch (err) {
@@ -244,7 +244,7 @@ describe("Mutation.signBsdasri emission", () => {
       expect.assertions(1);
 
       try {
-        await validateBsdasri(data, {
+        await validateBsdasri(data as any, {
           transportSignature: true
         });
       } catch (err) {
@@ -265,7 +265,7 @@ describe("Mutation.signBsdasri emission", () => {
       expect.assertions(1);
 
       try {
-        await validateBsdasri(data, {
+        await validateBsdasri(data as any, {
           transportSignature: true
         });
       } catch (err) {
@@ -285,7 +285,7 @@ describe("Mutation.signBsdasri emission", () => {
       expect.assertions(1);
 
       try {
-        await validateBsdasri(data, {
+        await validateBsdasri(data as any, {
           transportSignature: true
         });
       } catch (err) {
@@ -305,7 +305,7 @@ describe("Mutation.signBsdasri emission", () => {
       expect.assertions(1);
 
       try {
-        await validateBsdasri(data, {
+        await validateBsdasri(data as any, {
           transportSignature: true
         });
       } catch (err) {

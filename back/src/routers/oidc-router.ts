@@ -51,7 +51,7 @@ oidcRouter.get(
     const payload = {
       transactionID: req.oauth2.transactionID,
       user: {
-        name: req.user.name
+        name: req.user?.name
       },
       client: {
         name: req.oauth2.client.name,

@@ -12,9 +12,9 @@ import { FormStatus } from "../generated/graphql/types";
  * A Prisma Form with linked objects
  */
 export interface FullForm extends Form {
-  forwardedIn: Form;
-  transportSegments: TransportSegment[];
-  intermediaries: IntermediaryFormAssociation[];
+  forwardedIn: Form | null;
+  transportSegments: TransportSegment[] | null;
+  intermediaries: IntermediaryFormAssociation[] | null;
 }
 
 export type FormCompanies = Pick<
@@ -32,7 +32,7 @@ export type FormCompanies = Pick<
     | "transporterCompanySiret"
     | "recipientCompanySiret"
     | "transporterCompanyVatNumber"
-  >;
+  > | null;
 } & {
   transportSegments?: Pick<TransportSegment, "transporterCompanySiret">[];
 } & {
@@ -43,7 +43,7 @@ export type FormCompanies = Pick<
 // shape of a BSDD v2
 export type Bsdd = {
   id: string;
-  customId: string;
+  customId: string | null;
   createdAt: Date;
   updatedAt: Date;
   isDeleted: boolean;

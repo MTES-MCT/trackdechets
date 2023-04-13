@@ -40,10 +40,10 @@ const createBsdasri = async (
   const { grouping, synthesizing, ...rest } = input;
 
   const formSirets = {
-    emitterCompanySiret: input.emitter?.company?.siret,
-    destinationCompanySiret: input.destination?.company?.siret,
-    transporterCompanySiret: input.transporter?.company?.siret,
-    transporterCompanyVatNumber: input.transporter?.company?.vatNumber,
+    emitterCompanySiret: input.emitter?.company?.siret ?? null,
+    destinationCompanySiret: input.destination?.company?.siret ?? null,
+    transporterCompanySiret: input.transporter?.company?.siret ?? null,
+    transporterCompanyVatNumber: input.transporter?.company?.vatNumber ?? null,
     ecoOrganismeSiret: input.ecoOrganisme?.siret
   };
 

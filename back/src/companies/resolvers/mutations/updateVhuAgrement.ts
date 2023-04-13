@@ -4,6 +4,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getVhuAgrementOrNotFound } from "../../database";
 import { checkCanReadUpdateDeleteVhuAgrement } from "../../permissions";
+import { removeEmptyKeys } from "../../../common/converter";
 
 /**
  * Update a VHu agrement
@@ -19,7 +20,7 @@ const updateVhuAgrementResolver: MutationResolvers["updateVhuAgrement"] =
     const receipt = await getVhuAgrementOrNotFound({ id });
     await checkCanReadUpdateDeleteVhuAgrement(user, receipt);
     return prisma.vhuAgrement.update({
-      data,
+      data: removeEmptyKeys(data),
       where: { id: receipt.id }
     });
   };

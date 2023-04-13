@@ -68,7 +68,7 @@ export async function checkEditionRules(
   // Inner function used to recursively checks that the diff
   // does not contain any fields sealed by signature
   function checkSealedFields(
-    signatureType: BsffSignatureTypeAfterReception,
+    signatureType: BsffSignatureTypeAfterReception | null,
     editableFields: string[]
   ) {
     if (signatureType === null) {

@@ -52,6 +52,7 @@ const appendixFormsResolver: QueryResolvers["appendixForms"] = async (
           : f.quantityReceived;
 
         return (
+          quantityReceived &&
           quantityReceived > 0 &&
           new Decimal(quantityReceived).greaterThan(quantityGrouped)
         );

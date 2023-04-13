@@ -138,19 +138,19 @@ export const membershipRequestRefused: MailTemplate<{
 };
 
 export const securityCodeRenewal: MailTemplate<{
-  company: { name?: string; siret: string };
+  company: { name?: string; orgId: string };
 }> = {
   subject: ({ company }) =>
-    `Renouvellement du code de signature de votre établissement "${company.name}" (${company.siret})`,
+    `Renouvellement du code de signature de votre établissement "${company.name}" (${company.orgId})`,
   body: mustacheRenderer("notification-renouvellement-code-signature.html"),
   templateId: templateIds.LAYOUT
 };
 
 export const verificationProcessInfo: MailTemplate<{
-  company: { name?: string; siret: string };
+  company: { name?: string; orgId: string };
 }> = {
   subject: ({ company }) =>
-    `Établissement ${company.siret} en cours de vérification`,
+    `Établissement ${company.orgId} en cours de vérification`,
   body: mustacheRenderer("information-process-de-verification.html"),
   templateId: templateIds.LAYOUT
 };
@@ -158,12 +158,12 @@ export const verificationProcessInfo: MailTemplate<{
 export const verificationDone: MailTemplate<{
   company: {
     name?: string;
-    siret: string;
+    orgId: string;
     verificationMode: CompanyVerificationMode;
   };
 }> = {
   subject: ({ company }) =>
-    `L'établissement ${company.siret} est désormais vérifié`,
+    `L'établissement ${company.orgId} est désormais vérifié`,
   body: mustacheRenderer("etablissement-verifie.html"),
   templateId: templateIds.LAYOUT,
   prepareVariables: ({ company }) => ({

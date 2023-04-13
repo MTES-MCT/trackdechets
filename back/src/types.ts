@@ -13,6 +13,10 @@ export type GraphQLContext = ExpressContext & {
   dataloaders: AppDataloaders;
 };
 
+export type Nullable<T> = {
+  [P in keyof T]: T[P] | null;
+};
+
 declare module "express-session" {
   interface SessionData {
     warningMessage?: string;

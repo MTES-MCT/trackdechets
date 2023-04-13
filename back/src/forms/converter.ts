@@ -10,6 +10,7 @@ import { getTransporterCompanyOrgId } from "../common/constants/companySearchHel
 import {
   chain,
   nullIfNoValues,
+  prismaJsonNoNull,
   processDate,
   safeInput,
   undefinedOrDefault
@@ -62,7 +63,7 @@ import prisma from "../prisma";
 import { extractPostalCode } from "../utils";
 
 function flattenDestinationInput(input: {
-  destination?: DestinationInput;
+  destination?: DestinationInput | null;
 }): Partial<Prisma.FormCreateInput> {
   return {
     recipientCompanyName: chain(input.destination, d =>
@@ -91,32 +92,44 @@ function flattenDestinationInput(input: {
   };
 }
 
-function flattenWasteDetailsInput(input: { wasteDetails?: WasteDetailsInput }) {
+function flattenWasteDetailsInput(input: {
+  wasteDetails?: WasteDetailsInput | null;
+}) {
   return {
     wasteDetailsCode: chain(input.wasteDetails, w => w.code),
     wasteDetailsOnuCode: chain(input.wasteDetails, w => w.onuCode),
-    wasteDetailsPackagingInfos: chain(input.wasteDetails, w =>
-      getProcessedPackagingInfos(w)
+    wasteDetailsPackagingInfos: prismaJsonNoNull(
+      chain(input.wasteDetails, w => getProcessedPackagingInfos(w))
     ),
     wasteDetailsQuantity: chain(input.wasteDetails, w => w.quantity),
     wasteDetailsQuantityType: chain(input.wasteDetails, w => w.quantityType),
     wasteDetailsName: chain(input.wasteDetails, w => w.name),
     wasteDetailsConsistence: chain(input.wasteDetails, w => w.consistence),
-    wasteDetailsPop: chain(input.wasteDetails, w => w.pop),
-    wasteDetailsIsDangerous: chain(input.wasteDetails, w => w.isDangerous),
-    wasteDetailsParcelNumbers: chain(input.wasteDetails, w =>
-      undefinedOrDefault(w.parcelNumbers, [])
+    wasteDetailsPop: undefinedOrDefault(
+      chain(input.wasteDetails, w => w.pop),
+      false
     ),
-    wasteDetailsAnalysisReferences: chain(input.wasteDetails, w =>
-      undefinedOrDefault(w.analysisReferences, [])
+    wasteDetailsIsDangerous: undefinedOrDefault(
+      chain(input.wasteDetails, w => w.isDangerous),
+      false
     ),
-    wasteDetailsLandIdentifiers: chain(input.wasteDetails, w =>
-      undefinedOrDefault(w.landIdentifiers, [])
+    wasteDetailsParcelNumbers: prismaJsonNoNull(
+      chain(input.wasteDetails, w => undefinedOrDefault(w.parcelNumbers, []))
+    ),
+    wasteDetailsAnalysisReferences: undefinedOrDefault(
+      chain(input.wasteDetails, w => w.analysisReferences),
+      []
+    ),
+    wasteDetailsLandIdentifiers: undefinedOrDefault(
+      chain(input.wasteDetails, w => undefinedOrDefault(w.landIdentifiers, [])),
+      []
     )
   };
 }
 
-function flattenTransporterInput(input: { transporter?: TransporterInput }) {
+function flattenTransporterInput(input: {
+  transporter?: TransporterInput | null;
+}) {
   return {
     transporterCompanyName: chain(input.transporter, t =>
       chain(t.company, c => c.name)
@@ -152,7 +165,7 @@ function flattenTransporterInput(input: { transporter?: TransporterInput }) {
   };
 }
 
-function flattenEmitterInput(input: { emitter?: EmitterInput }) {
+function flattenEmitterInput(input: { emitter?: EmitterInput | null }) {
   return {
     emitterType: chain(input.emitter, e => e.type),
     emitterPickupSite: chain(input.emitter, e => e.pickupSite),
@@ -200,7 +213,7 @@ function flattenEmitterInput(input: { emitter?: EmitterInput }) {
   };
 }
 
-function flattenRecipientInput(input: { recipient?: RecipientInput }) {
+function flattenRecipientInput(input: { recipient?: RecipientInput | null }) {
   return {
     recipientCap: chain(input.recipient, r => r.cap),
     recipientProcessingOperation: chain(
@@ -229,7 +242,7 @@ function flattenRecipientInput(input: { recipient?: RecipientInput }) {
   };
 }
 
-function flattenTraderInput(input: { trader?: TraderInput }) {
+function flattenTraderInput(input: { trader?: TraderInput | null }) {
   return {
     traderCompanyName: chain(input.trader, t => chain(t.company, c => c.name)),
     traderCompanySiret: chain(input.trader, t =>
@@ -251,7 +264,7 @@ function flattenTraderInput(input: { trader?: TraderInput }) {
   };
 }
 
-function flattenBrokerInput(input: { broker?: BrokerInput }) {
+function flattenBrokerInput(input: { broker?: BrokerInput | null }) {
   return {
     brokerCompanyName: chain(input.broker, t => chain(t.company, c => c.name)),
     brokerCompanySiret: chain(input.broker, t =>
@@ -275,7 +288,9 @@ function flattenBrokerInput(input: { broker?: BrokerInput }) {
   };
 }
 
-function flattenEcoOrganismeInput(input: { ecoOrganisme?: EcoOrganismeInput }) {
+function flattenEcoOrganismeInput(input: {
+  ecoOrganisme?: EcoOrganismeInput | null;
+}) {
   return {
     ecoOrganismeName: chain(input.ecoOrganisme, e => e.name),
     ecoOrganismeSiret: chain(input.ecoOrganisme, e => e.siret)
@@ -283,7 +298,7 @@ function flattenEcoOrganismeInput(input: { ecoOrganisme?: EcoOrganismeInput }) {
 }
 
 function flattenNextDestinationInput(input: {
-  nextDestination?: NextDestinationInput;
+  nextDestination?: NextDestinationInput | null;
 }) {
   return {
     nextDestinationProcessingOperation: chain(
@@ -325,7 +340,10 @@ export function flattenBsddRevisionRequestInput(
   reviewContent: FormRevisionRequestContentInput
 ) {
   return safeInput({
-    isCanceled: chain(reviewContent, c => chain(c, r => r.isCanceled)),
+    isCanceled: undefinedOrDefault(
+      chain(reviewContent, c => chain(c, r => r.isCanceled)),
+      false
+    ),
     recipientCap: chain(reviewContent, c => chain(c.recipient, r => r.cap)),
     wasteDetailsCode: chain(reviewContent, c =>
       chain(c.wasteDetails, w => w.code)
@@ -336,8 +354,8 @@ export function flattenBsddRevisionRequestInput(
     wasteDetailsPop: chain(reviewContent, c =>
       chain(c.wasteDetails, w => w.pop)
     ),
-    wasteDetailsPackagingInfos: chain(reviewContent, c =>
-      chain(c.wasteDetails, w => w.packagingInfos)
+    wasteDetailsPackagingInfos: prismaJsonNoNull(
+      chain(reviewContent, c => chain(c.wasteDetails, w => w.packagingInfos))
     ),
     quantityReceived: chain(reviewContent, c => c.quantityReceived),
     processingOperationDone: chain(
@@ -408,7 +426,7 @@ export function flattenImportPaperFormInput(
     input;
 
   return safeInput({
-    id,
+    id: id !== null ? id : undefined,
     customId,
     ...flattenEmitterInput(rest),
     ...flattenEcoOrganismeInput(rest),
@@ -492,11 +510,11 @@ export async function expandFormFromDb(
 ): Promise<GraphQLForm>;
 export async function expandFormFromDb(
   form: PrismaForm,
-  dataloader?: DataLoader<string, Form, string>
+  dataloader?: DataLoader<string, Form | null, string>
 ): Promise<GraphQLForm>;
 export async function expandFormFromDb(
   form: any,
-  dataloader?: DataLoader<string, Form, string>
+  dataloader?: DataLoader<string, Form | null, string>
 ): Promise<GraphQLForm> {
   let forwardedIn: Form | null;
   // if form is rawBsd, forwardedIn is already computed
@@ -779,7 +797,7 @@ export async function expandFormFromElastic(
 
 export async function expandInitialFormFromDb(
   prismaForm: PrismaForm,
-  dataloader?: DataLoader<string, Form, string>
+  dataloader?: DataLoader<string, Form | null, string>
 ): Promise<InitialForm> {
   const {
     id,

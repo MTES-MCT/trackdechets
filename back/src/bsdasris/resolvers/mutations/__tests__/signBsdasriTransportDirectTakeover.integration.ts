@@ -40,7 +40,7 @@ describe("Mutation.signBsdasri transport", () => {
       }
     });
 
-    const readyTotakeOverDasri = await prisma.bsdasri.findUnique({
+    const readyTotakeOverDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(readyTotakeOverDasri.status).toEqual("SENT");
@@ -149,7 +149,7 @@ describe("Mutation.signBsdasri transport", () => {
       })
     ]);
 
-    dasri = await prisma.bsdasri.findUnique({
+    dasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(dasri.status).toEqual("INITIAL"); // status did not change

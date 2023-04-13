@@ -11,18 +11,19 @@ const grouping: BsdasriResolvers["grouping"] = async (bsdasri, _, ctx) => {
     // skip db query
     return [];
   }
-  let grouping = [];
+
   // use ES indexed field when requested from dashboard
   if (
     ctx?.req?.body?.operationName === dashboardOperationName &&
     isSessionUser(ctx)
   ) {
-    grouping = bsdasri?.grouping ?? [];
-  } else {
-    grouping = await getReadonlyBsdasriRepository()
-      .findRelatedEntity({ id: bsdasri.id })
-      .grouping();
+    return bsdasri?.grouping ?? [];
   }
+  const grouping =
+    (await getReadonlyBsdasriRepository()
+      .findRelatedEntity({ id: bsdasri.id })
+      .grouping()) ?? [];
+
   return grouping.map(bsdasri => expandGroupingDasri(bsdasri));
 };
 

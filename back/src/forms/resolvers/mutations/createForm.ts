@@ -53,13 +53,14 @@ const createFormResolver = async (
   }
 
   const formCompanies: FormCompanies = {
-    emitterCompanySiret: formContent.emitter?.company?.siret,
-    recipientCompanySiret: formContent.recipient?.company?.siret,
-    transporterCompanySiret: formContent.transporter?.company?.siret,
-    transporterCompanyVatNumber: formContent.transporter?.company?.vatNumber,
-    traderCompanySiret: formContent.trader?.company?.siret,
-    brokerCompanySiret: formContent.broker?.company?.siret,
-    ecoOrganismeSiret: formContent.ecoOrganisme?.siret,
+    emitterCompanySiret: formContent.emitter?.company?.siret ?? null,
+    recipientCompanySiret: formContent.recipient?.company?.siret ?? null,
+    transporterCompanySiret: formContent.transporter?.company?.siret ?? null,
+    transporterCompanyVatNumber:
+      formContent.transporter?.company?.vatNumber ?? null,
+    traderCompanySiret: formContent.trader?.company?.siret ?? null,
+    brokerCompanySiret: formContent.broker?.company?.siret ?? null,
+    ecoOrganismeSiret: formContent.ecoOrganisme?.siret ?? null,
     ...(temporaryStorageDetail?.destination?.company?.siret
       ? {
           forwardedIn: {
@@ -72,12 +73,12 @@ const createFormResolver = async (
       : {}),
     ...(intermediaries?.length
       ? {
-          intermediariesVatNumbers: intermediaries?.map(
-            intermediary => intermediary.vatNumber ?? null
-          ),
-          intermediariesSirets: intermediaries?.map(
-            intermediary => intermediary.siret ?? null
-          )
+          intermediariesVatNumbers: intermediaries
+            ?.map(intermediary => intermediary.vatNumber)
+            .filter(Boolean),
+          intermediariesSirets: intermediaries
+            ?.map(intermediary => intermediary.siret)
+            .filter(Boolean)
         }
       : {})
   };
@@ -147,13 +148,15 @@ const createFormResolver = async (
     };
   }
 
-  const isGroupement = grouping?.length > 0 || appendix2Forms?.length > 0;
+  const isGroupement =
+    (grouping && grouping.length > 0) ||
+    (appendix2Forms && appendix2Forms.length > 0);
   const formFractions = isGroupement
     ? await validateGroupement(
         formCreateInput,
-        grouping?.length > 0
+        grouping && grouping.length > 0
           ? grouping
-          : appendix2toFormFractions(appendix2Forms)
+          : appendix2toFormFractions(appendix2Forms!)
       )
     : null;
 
@@ -167,12 +170,12 @@ const createFormResolver = async (
       newForm.emitterType === EmitterType.APPENDIX1
         ? await setAppendix1({
             form: newForm,
-            appendix1: formFractions,
+            appendix1: formFractions!,
             currentAppendix1Forms: []
           })
         : await setAppendix2({
             form: newForm,
-            appendix2: formFractions,
+            appendix2: formFractions!,
             currentAppendix2Forms: []
           });
     }

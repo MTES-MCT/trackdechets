@@ -29,9 +29,10 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
   const { findMany: findManyFicheIntervention } =
     getBsffFicheInterventionRepository(user);
 
-  const packagings = await findUniqueGetPackagings({
-    where: { id: existingBsff.id }
-  });
+  const packagings =
+    (await findUniqueGetPackagings({
+      where: { id: existingBsff.id }
+    })) ?? [];
 
   await checkCanWriteBsff(user, existingBsff);
 

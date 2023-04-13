@@ -50,7 +50,7 @@ describe("Mutation.formRevisionRequests", () => {
       data: {
         bsddId: bsdd1.id,
         authoringCompanyId: otherCompany.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -58,7 +58,7 @@ describe("Mutation.formRevisionRequests", () => {
       data: {
         bsddId: bsdd2.id,
         authoringCompanyId: company.id,
-        approvals: { create: { approverSiret: otherCompany.siret } },
+        approvals: { create: { approverSiret: otherCompany.siret! } },
         comment: ""
       }
     });
@@ -70,7 +70,7 @@ describe("Mutation.formRevisionRequests", () => {
         authoringCompanyId: company.id,
         approvals: {
           create: {
-            approverSiret: otherCompany.siret,
+            approverSiret: otherCompany.siret!,
             status: "ACCEPTED"
           }
         },
@@ -83,7 +83,7 @@ describe("Mutation.formRevisionRequests", () => {
         authoringCompanyId: company.id,
         approvals: {
           create: {
-            approverSiret: otherCompany.siret,
+            approverSiret: otherCompany.siret!,
             status: "REFUSED"
           }
         },

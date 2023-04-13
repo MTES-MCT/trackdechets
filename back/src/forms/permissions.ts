@@ -21,12 +21,12 @@ export async function formToCompanies(form: Form): Promise<FormCompanies> {
     ecoOrganismeSiret: fullForm.ecoOrganismeSiret,
     ...(fullForm.intermediaries?.length
       ? {
-          intermediariesVatNumbers: fullForm.intermediaries.map(
-            int => int.vatNumber ?? null
-          ),
-          intermediariesSirets: fullForm.intermediaries.map(
-            int => int.siret ?? null
-          )
+          intermediariesVatNumbers: fullForm.intermediaries
+            .map(int => int.vatNumber)
+            .filter(Boolean),
+          intermediariesSirets: fullForm.intermediaries
+            .map(int => int.siret)
+            .filter(Boolean)
         }
       : {}),
     ...(fullForm.transportSegments?.length
@@ -78,8 +78,10 @@ function isFormTransporter(
   }
 
   return (
-    userCompaniesSiretOrVat.includes(form.transporterCompanyVatNumber) ||
-    userCompaniesSiretOrVat.includes(form.transporterCompanySiret)
+    (form.transporterCompanyVatNumber &&
+      userCompaniesSiretOrVat.includes(form.transporterCompanyVatNumber)) ||
+    (form.transporterCompanySiret &&
+      userCompaniesSiretOrVat.includes(form.transporterCompanySiret))
   );
 }
 
@@ -118,8 +120,9 @@ function isFormDestinationAfterTempStorage(
     return false;
   }
 
-  return userCompaniesSiretOrVat.includes(
-    form.forwardedIn.recipientCompanySiret
+  return (
+    form.forwardedIn.recipientCompanySiret &&
+    userCompaniesSiretOrVat.includes(form.forwardedIn.recipientCompanySiret)
   );
 }
 
@@ -132,12 +135,14 @@ function isFormTransporterAfterTempStorage(
   }
 
   return (
-    userCompaniesSiretOrVat.includes(
-      form.forwardedIn.transporterCompanySiret
-    ) ||
-    userCompaniesSiretOrVat.includes(
-      form.forwardedIn.transporterCompanyVatNumber
-    )
+    (form.forwardedIn.transporterCompanySiret &&
+      userCompaniesSiretOrVat.includes(
+        form.forwardedIn.transporterCompanySiret
+      )) ||
+    (form.forwardedIn.transporterCompanyVatNumber &&
+      userCompaniesSiretOrVat.includes(
+        form.forwardedIn.transporterCompanyVatNumber
+      ))
   );
 }
 
@@ -152,7 +157,9 @@ function isFormMultiModalTransporter(
   const transportSegmentSirets = form.transportSegments.map(
     segment => segment.transporterCompanySiret
   );
-  return transportSegmentSirets.some(s => userCompaniesSiretOrVat.includes(s));
+  return transportSegmentSirets.some(
+    s => s && userCompaniesSiretOrVat.includes(s)
+  );
 }
 
 function isFormIntermediary(userCompanies: string[], form: FormCompanies) {
@@ -189,7 +196,7 @@ export async function isFormContributor(user: User, form: FormCompanies) {
   return isFormCompanyIdContributor || isFormSiretContributor;
 }
 
-async function isFormInitialEmitter(user: User, form: Form) {
+async function isFormInitialEmitter(user: Express.User, form: Form) {
   const { findGroupedFormsById } = getFormRepository(user);
   const appendix2Forms = await findGroupedFormsById(form.id);
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
@@ -217,7 +224,7 @@ export async function checkIsFormContributor(
   return true;
 }
 
-export async function checkCanRead(user: User, form: Form) {
+export async function checkCanRead(user: Express.User, form: Form) {
   const formCompanies = await formToCompanies(form);
   const isContributor = await isFormContributor(user, formCompanies);
   if (isContributor) {
@@ -264,6 +271,7 @@ export async function checkCanUpdate(user: User, form: Form) {
 
     if (
       form.emittedByEcoOrganisme &&
+      form.ecoOrganismeSiret &&
       !userCompaniesSiretOrVat.includes(form.ecoOrganismeSiret)
     ) {
       throw new ForbiddenError(
@@ -271,7 +279,10 @@ export async function checkCanUpdate(user: User, form: Form) {
       );
     }
 
-    if (!userCompaniesSiretOrVat.includes(form.emitterCompanySiret)) {
+    if (
+      form.emitterCompanySiret &&
+      !userCompaniesSiretOrVat.includes(form.emitterCompanySiret)
+    ) {
       throw new ForbiddenError(
         "Le producteur a signé ce bordereau, il est le seul à pouvoir le mettre à jour."
       );
@@ -297,6 +308,7 @@ export async function checkCanDelete(user: User, form: Form) {
 
     if (
       form.emittedByEcoOrganisme &&
+      form.ecoOrganismeSiret &&
       !userCompaniesSiretOrVat.includes(form.ecoOrganismeSiret)
     ) {
       throw new ForbiddenError(
@@ -304,7 +316,10 @@ export async function checkCanDelete(user: User, form: Form) {
       );
     }
 
-    if (!userCompaniesSiretOrVat.includes(form.emitterCompanySiret)) {
+    if (
+      form.emitterCompanySiret &&
+      !userCompaniesSiretOrVat.includes(form.emitterCompanySiret)
+    ) {
       throw new ForbiddenError(
         "Le producteur a signé ce bordereau, il est le seul à pouvoir le supprimer."
       );
@@ -335,10 +350,16 @@ export async function checkCanMarkAsSealed(user: User, form: Form) {
 }
 
 export async function checkCanSignFor(
-  siret: string,
+  siret: string | null,
   user: User,
-  securityCode?: number
+  securityCode?: number | null
 ) {
+  if (!siret) {
+    throw new ForbiddenError(
+      "Vous n'êtes pas autorisé à signer ce bordereau, aucun transporteur n'a été identifié"
+    );
+  }
+
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   if (userCompaniesSiretOrVat.includes(siret)) {
@@ -514,7 +535,13 @@ export async function checkCanImportForm(user: User, form: Form) {
   return true;
 }
 
-export async function checkSecurityCode(siret: string, securityCode: number) {
+export async function checkSecurityCode(
+  siret: string | null,
+  securityCode: number
+) {
+  if (!siret) {
+    throw new Error("Cannot check security code, siret is not set");
+  }
   const exists = await prisma.company.findFirst({
     where: { orgId: siret, securityCode }
   });
@@ -527,7 +554,7 @@ export async function checkSecurityCode(siret: string, securityCode: number) {
 export async function checkCanRequestRevision(
   user: User,
   form: Form,
-  forwardedIn?: Form
+  forwardedIn?: Form | null
 ) {
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 

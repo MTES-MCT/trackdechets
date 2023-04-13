@@ -103,7 +103,7 @@ describe("Mutation.createDraftBsdasri", () => {
     expect(data.createDraftBsdasri.isDraft).toBe(true);
     expect(data.createDraftBsdasri.status).toBe("INITIAL");
     expect(data.createDraftBsdasri.type).toBe("SIMPLE");
-    expect(data.createDraftBsdasri.destination.company).toMatchObject(
+    expect(data.createDraftBsdasri.destination!.company).toMatchObject(
       input.destination.company
     );
   });

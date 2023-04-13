@@ -40,14 +40,17 @@ const createSynthesisBsdasri = async (
     );
   }
 
-  if (!userCompaniesSiretOrVat.includes(input.transporter.company.siret)) {
+  if (
+    !input.transporter?.company?.siret ||
+    !userCompaniesSiretOrVat.includes(input.transporter.company.siret)
+  ) {
     throw new UserInputError(
       `Le siret du transporteur doit être un des vôtres`
     );
   }
   const { synthesizing, ...rest } = input;
 
-  if (!synthesizing.length) {
+  if (!synthesizing || !synthesizing.length) {
     throw new UserInputError(
       "Un dasri de synthèse doit comporter des bordereaux associés"
     );
@@ -55,8 +58,8 @@ const createSynthesisBsdasri = async (
   const formSirets = {
     emitterCompanySiret: input.transporter?.company?.siret,
     transporterCompanySiret: input.transporter?.company?.siret,
-    transporterCompanyVatNumber: input.transporter?.company?.vatNumber,
-    destinationCompanySiret: input.destination?.company?.siret
+    transporterCompanyVatNumber: input.transporter?.company?.vatNumber ?? null,
+    destinationCompanySiret: input.destination?.company?.siret ?? null
   };
 
   await checkIsBsdasriContributor(
@@ -81,12 +84,12 @@ const createSynthesisBsdasri = async (
 
   const flattenedInput = {
     ...flattenBsdasriInput(sirenifiedInput),
-    emitterCompanyName: rest.transporter.company.name,
-    emitterCompanySiret: rest.transporter.company.siret,
-    emitterCompanyAddress: rest.transporter.company.address,
-    emitterCompanyContact: rest.transporter.company.contact,
-    emitterCompanyPhone: rest.transporter.company.phone,
-    emitterCompanyMail: rest.transporter.company.mail,
+    emitterCompanyName: rest.transporter?.company?.name,
+    emitterCompanySiret: rest.transporter?.company?.siret,
+    emitterCompanyAddress: rest.transporter?.company?.address,
+    emitterCompanyContact: rest.transporter?.company?.contact,
+    emitterCompanyPhone: rest.transporter?.company?.phone,
+    emitterCompanyMail: rest.transporter?.company?.mail,
     emitterWastePackagings: aggregatedPackagings,
     emitterWasteVolume: summedVolumes,
     transporterWastePackagings: aggregatedPackagings,

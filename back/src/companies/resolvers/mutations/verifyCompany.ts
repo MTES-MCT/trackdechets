@@ -70,14 +70,16 @@ const verifyCompanyResolver: MutationResolvers["verifyCompany"] = async (
     throw new UserInputError("Code de vérification invalide");
   }
 
-  const verifiedCompany = await prisma.company.update({
+  const verifiedCompany = (await prisma.company.update({
     where: { id: company.id },
     data: {
       verificationStatus: CompanyVerificationStatus.VERIFIED,
       verificationMode: CompanyVerificationMode.LETTER,
       verifiedAt: new Date()
     }
-  });
+  })) as Company & {
+    verificationMode: CompanyVerificationMode;
+  };
 
   await sendMail(
     renderMail(verificationDone, {

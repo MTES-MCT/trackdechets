@@ -132,12 +132,12 @@ const updateFormResolver = async (
       form.ecoOrganismeSiret ?? formCompanies.ecoOrganismeSiret,
     ...(intermediaries?.length
       ? {
-          intermediariesVatNumbers: intermediaries?.map(
-            intermediary => intermediary.vatNumber ?? null
-          ),
-          intermediariesSirets: intermediaries?.map(
-            intermediary => intermediary.siret ?? null
-          )
+          intermediariesVatNumbers: intermediaries
+            ?.map(intermediary => intermediary.vatNumber)
+            .filter(Boolean),
+          intermediariesSirets: intermediaries
+            ?.map(intermediary => intermediary.siret)
+            .filter(Boolean)
         }
       : {
           intermediariesVatNumbers: formCompanies.intermediariesVatNumbers,
@@ -149,9 +149,11 @@ const updateFormResolver = async (
     nextFormCompanies.forwardedIn = {
       recipientCompanySiret:
         temporaryStorageDetail?.destination?.company?.siret ??
-        forwardedIn?.recipientCompanySiret,
-      transporterCompanySiret: forwardedIn?.transporterCompanySiret,
-      transporterCompanyVatNumber: forwardedIn?.transporterCompanyVatNumber
+        forwardedIn?.recipientCompanySiret ??
+        null,
+      transporterCompanySiret: forwardedIn?.transporterCompanySiret ?? null,
+      transporterCompanyVatNumber:
+        forwardedIn?.transporterCompanyVatNumber ?? null
     };
   }
 
@@ -257,11 +259,10 @@ const updateFormResolver = async (
     .findUnique({ where: { id: existingForm.id } })
     .grouping({ include: { initialForm: true } });
 
-  const existingAppendixForms = existingFormFractions.map(
-    ({ initialForm }) => initialForm
-  );
+  const existingAppendixForms =
+    existingFormFractions?.map(({ initialForm }) => initialForm) ?? [];
 
-  if (existingAppendixForms?.length) {
+  if (existingAppendixForms.length) {
     const updatedSiret = formUpdateInput?.emitterCompanySiret;
     if (!!updatedSiret && updatedSiret !== existingForm?.emitterCompanySiret) {
       throw new UserInputError(
@@ -275,7 +276,7 @@ const updateFormResolver = async (
     !!appendix2Forms ||
     futureForm.emitterType !== existingForm.emitterType;
 
-  const existingFormFractionsInput = existingFormFractions.map(
+  const existingFormFractionsInput = existingFormFractions?.map(
     ({ quantity, initialFormId }) => ({
       form: { id: initialFormId },
       quantity
@@ -301,12 +302,12 @@ const updateFormResolver = async (
       updatedForm.emitterType === EmitterType.APPENDIX1
         ? await setAppendix1({
             form: updatedForm,
-            appendix1: formFractions,
+            appendix1: formFractions!,
             currentAppendix1Forms: existingAppendixForms
           })
         : await setAppendix2({
             form: updatedForm,
-            appendix2: formFractions,
+            appendix2: formFractions!,
             currentAppendix2Forms: existingAppendixForms
           });
     }

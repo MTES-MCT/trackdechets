@@ -55,7 +55,7 @@ export async function getFormOrFormNotFound({
     form.isDeleted == true ||
     form.readableId.endsWith("-suite")
   ) {
-    throw new FormNotFound(id ? id.toString() : readableId);
+    throw new FormNotFound(id ? id.toString() : readableId!);
   }
   return form;
 }
@@ -68,7 +68,7 @@ export async function getFormOrFormNotFound({
  * @param siret the siret to filter on
  * @param roles optional [FormRole] to refine filter
  */
-export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
+export function getFormsRightFilter(siret: string, roles?: FormRole[] | null) {
   const filtersByRole: {
     [key in FormRole]: Partial<Prisma.FormWhereInput>[];
   } = {
@@ -84,7 +84,7 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[]) {
   return {
     OR: Object.keys(filtersByRole)
       .filter((role: FormRole) =>
-        roles?.length > 0 ? roles.includes(role) : true
+        roles && roles.length > 0 ? roles.includes(role) : true
       )
       .map(role => filtersByRole[role])
       .flat()

@@ -196,7 +196,7 @@ describe("Mutation.updateBsdasri", () => {
       }
     );
 
-    expect(data.updateBsdasri.grouping.map(bsd => bsd.id)).toEqual([
+    expect(data.updateBsdasri.grouping!.map(bsd => bsd.id)).toEqual([
       toRegroup.id
     ]);
   });

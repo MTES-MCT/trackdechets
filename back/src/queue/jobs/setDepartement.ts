@@ -14,7 +14,8 @@ export async function setDepartementJob(
   let codeCommune = job.data?.codeCommune;
   if (!codeCommune?.length) {
     try {
-      codeCommune = (await searchCompany(job.data.siret)).codeCommune;
+      const company = await searchCompany(job.data.siret);
+      codeCommune = company?.codeCommune;
     } catch (_) {
       return null;
     }

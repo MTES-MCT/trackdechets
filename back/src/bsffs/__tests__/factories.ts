@@ -350,13 +350,13 @@ export function createFicheIntervention({
   detenteur
 }: CreateFicheInterventionArgs) {
   const data: Prisma.BsffFicheInterventionCreateInput = {
-    operateurCompanyAddress: operateur.company.address,
+    operateurCompanyAddress: operateur.company.address!,
     operateurCompanyContact: operateur.user.name,
-    operateurCompanyMail: operateur.company.contactEmail,
+    operateurCompanyMail: operateur.company.contactEmail!,
     operateurCompanyName: operateur.company.name,
-    operateurCompanyPhone: operateur.company.contactPhone,
-    operateurCompanySiret: operateur.company.siret,
-    detenteurCompanyAddress: detenteur.company.address,
+    operateurCompanyPhone: operateur.company.contactPhone!,
+    operateurCompanySiret: operateur.company.siret!,
+    detenteurCompanyAddress: detenteur.company.address!,
     detenteurCompanyContact: detenteur.user.name,
     detenteurCompanyMail: detenteur.company.contactEmail,
     detenteurCompanyName: detenteur.company.name,

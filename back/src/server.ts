@@ -19,7 +19,7 @@ import { ROAD_CONTROL_SLUG } from "./common/constants";
 import { ErrorCode } from "./common/errors";
 import errorHandler from "./common/middlewares/errorHandler";
 import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";
-import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
+import { graphqlBodyParser } from "./common/middlewares/graphqlBodyParser";
 import { graphqlQueryParserMiddleware } from "./common/middlewares/graphqlQueryParser";
 import { graphqlRateLimiterMiddleware } from "./common/middlewares/graphqlRatelimiter";
 import { graphqlRegenerateSessionMiddleware } from "./common/middlewares/graphqlRegenerateSession";
@@ -124,6 +124,18 @@ if (Sentry) {
   app.use(Sentry.Handlers.requestHandler());
 }
 
+/**
+ * Set the following headers for cross-domain cookie
+ * Access-Control-Allow-Credentials: true
+ * Access-Control-Allow-Origin: $UI_DOMAIN
+ */
+app.use(
+  cors({
+    origin: UI_BASE_URL,
+    credentials: true
+  })
+);
+
 const RATE_LIMIT_WINDOW_SECONDS = 60;
 
 app.use(
@@ -185,18 +197,6 @@ app.use(
 app.use(loggingMiddleware(graphQLPath));
 
 app.use(graphQLPath, timeoutMiddleware());
-
-/**
- * Set the following headers for cross-domain cookie
- * Access-Control-Allow-Credentials: true
- * Access-Control-Allow-Origin: $UI_DOMAIN
- */
-app.use(
-  cors({
-    origin: UI_BASE_URL,
-    credentials: true
-  })
-);
 
 // configure session for passport local strategy
 const RedisStore = redisStore(session);
@@ -277,7 +277,7 @@ app.use(
   })
 );
 
-app.use((req, res, next) => {
+app.use(function checkBlacklist(req, res, next) {
   if (req.user && blacklist.includes(req.user.email)) {
     return res.send("Too Many Requests").status(429);
   }

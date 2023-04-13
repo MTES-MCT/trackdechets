@@ -16,16 +16,16 @@ type BsffPackagingWithPrevious = BsffPackaging & {
   previousPackagings: BsffPackaging & { bsff: Bsff };
 };
 
-export function getRegistryFields(
-  bsff: Bsff
-): Pick<
-  BsdElastic,
+type RegistryFields =
   | "isIncomingWasteFor"
   | "isOutgoingWasteFor"
   | "isTransportedWasteFor"
-  | "isManagedWasteFor"
-> {
-  const registryFields = {
+  | "isManagedWasteFor";
+
+export function getRegistryFields(
+  bsff: Bsff
+): Pick<BsdElastic, RegistryFields> {
+  const registryFields: Record<RegistryFields, string[]> = {
     isIncomingWasteFor: [],
     isOutgoingWasteFor: [],
     isTransportedWasteFor: [],
@@ -36,14 +36,18 @@ export function getRegistryFields(
     bsff.emitterEmissionSignatureDate &&
     bsff.transporterTransportSignatureDate
   ) {
-    registryFields.isOutgoingWasteFor.push(
-      bsff.emitterCompanySiret,
-      ...bsff.detenteurCompanySirets
-    );
-    registryFields.isTransportedWasteFor.push(getTransporterCompanyOrgId(bsff));
+    if (bsff.emitterCompanySiret) {
+      registryFields.isOutgoingWasteFor.push(bsff.emitterCompanySiret);
+    }
+    registryFields.isOutgoingWasteFor.push(...bsff.detenteurCompanySirets);
+
+    const transporterOrgId = getTransporterCompanyOrgId(bsff);
+    if (transporterOrgId) {
+      registryFields.isTransportedWasteFor.push(transporterOrgId);
+    }
   }
 
-  if (bsff.destinationReceptionSignatureDate) {
+  if (bsff.destinationReceptionSignatureDate && bsff.destinationCompanySiret) {
     registryFields.isIncomingWasteFor.push(bsff.destinationCompanySiret);
   }
 

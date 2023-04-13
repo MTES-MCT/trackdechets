@@ -59,9 +59,9 @@ describe("edition rules", () => {
 
     const checked = await checkEditionRules(bsff.packagings[0], {
       acceptation: {
-        weight: bsff.packagings[0].acceptationWeight,
-        date: bsff.packagings[0].acceptationDate,
-        status: bsff.packagings[0].acceptationStatus
+        weight: bsff.packagings[0].acceptationWeight!,
+        date: bsff.packagings[0].acceptationDate!,
+        status: bsff.packagings[0].acceptationStatus!
       }
     });
     expect(checked).toBe(true);
@@ -121,8 +121,8 @@ describe("edition rules", () => {
     const checked = await checkEditionRules(bsff.packagings[0], {
       operation: {
         code: bsff.packagings[0].operationCode as BsffOperationCode,
-        date: bsff.packagings[0].operationDate,
-        description: bsff.packagings[0].operationDescription
+        date: bsff.packagings[0].operationDate!,
+        description: bsff.packagings[0].operationDescription!
       }
     });
     expect(checked).toBe(true);

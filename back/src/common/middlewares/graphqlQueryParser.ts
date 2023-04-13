@@ -5,7 +5,11 @@ import { DefinitionNode, FieldNode, OperationTypeNode } from "graphql";
 export type GqlInfo = { operation: OperationTypeNode; name: string };
 
 export function graphqlQueryParserMiddleware() {
-  return function (req: Request, _: Response, next: NextFunction) {
+  return function graphqlQueryParser(
+    req: Request,
+    _: Response,
+    next: NextFunction
+  ) {
     const { body } = req;
     req.gqlInfos = parseGqlQuery(body?.query);
 

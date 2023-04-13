@@ -157,7 +157,7 @@ export const isForeignVat = (clue: string | null | undefined): boolean => {
 /**
  * Le numéro OMI est "OMI1234567" (7 chiffres)
  */
-export const isOmi = (clue: string): boolean => {
+export const isOmi = (clue: string | null | undefined): boolean => {
   if (!clue) return false;
   if (clue.match(BAD_CHARACTERS_REGEXP) !== null) return false;
   return clue.match(/^OMI[0-9]{7}$/gim) !== null;
@@ -166,10 +166,12 @@ export const isOmi = (clue: string): boolean => {
 /**
  * Works with any BSD in order to provide a default orgId
  */
-export const getTransporterCompanyOrgId = (form: {
-  transporterCompanySiret: string | null;
-  transporterCompanyVatNumber: string | null;
-}): string | null => {
+export const getTransporterCompanyOrgId = (
+  form: {
+    transporterCompanySiret: string | null;
+    transporterCompanyVatNumber: string | null;
+  } | null
+): string | null => {
   if (!form) return null;
   return form.transporterCompanySiret?.length
     ? form.transporterCompanySiret
