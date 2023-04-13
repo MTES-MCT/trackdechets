@@ -14,6 +14,7 @@ const routes = {
     details: "/signup/details",
     activation: "/signup/activation",
   },
+  userActivation: "/user-activation",
   resendActivationEmail: "/resend-activation-email",
   passwordResetRequest: "/password-reset-request",
   passwordReset: "/password-reset",
