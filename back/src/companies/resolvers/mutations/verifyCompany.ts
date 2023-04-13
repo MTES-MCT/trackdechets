@@ -1,8 +1,7 @@
 import {
   Company,
   CompanyVerificationMode,
-  CompanyVerificationStatus,
-  User
+  CompanyVerificationStatus
 } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { applyAuthStrategies, AuthType } from "../../../auth";
