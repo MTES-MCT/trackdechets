@@ -24,3 +24,18 @@ else
   # There seems to be no env to disable the psql integration, so we simply remove the config file
   rm "${POSTGRES_CONF_FILE}"
 fi
+
+REDIS_CONF_FILE="${DD_CONF_DIR}/conf.d/redisdb.d/conf.yaml"
+
+if [[ -n "${REDIS_URL}" ]] && [[ "${CONTAINER}" == "${FIRST_NODE}" ]]; then
+  REDISREGEX='^redis(s?)://([^:]*):([^@]+)@([^:]+):([^/]+)/?(.*)$'
+  if [[ $REDIS_URL =~ $POSTGREGEX ]]; then
+    sed -i "s/<DD_REDIS_HOST>/${BASH_REMATCH[4]}/g" "${REDIS_CONF_FILE}"
+    sed -i "s/<DD_REDIS_PORT>/${BASH_REMATCH[5]}/g" "${REDIS_CONF_FILE}"
+    sed -i "s/<DD_REDIS_PASSWORD>/${BASH_REMATCH[3]}/g" "${REDIS_CONF_FILE}"
+  fi
+else 
+  # Disable redis integration for every nodes but the first
+  # There seems to be no env to disable the redis integration, so we simply remove the config file
+  rm "${REDIS_CONF_FILE}"
+fi
