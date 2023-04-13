@@ -28,7 +28,7 @@ export function graphqlQueryMergingLimiter(): ApolloServerPlugin {
 
           if (mergedQueries > MAX_OPERATIONS_PER_REQUEST) {
             throw new GraphqlQueryLimit(
-              `Batching by query merging is limited to ${MAX_OPERATIONS_PER_REQUEST} operations per query.`,
+              `Batching by query merging is limited to ${MAX_OPERATIONS_PER_REQUEST} operations per query.`
             );
           }
         }
