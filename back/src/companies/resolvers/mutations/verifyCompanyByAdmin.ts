@@ -6,7 +6,11 @@ import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAdmin } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
-import { getCompanyOrCompanyNotFound } from "../../database";
+import {
+  getCompanyAdminUsers,
+  getCompanyOrCompanyNotFound
+} from "../../database";
+import { sendPostVerificationFirstOnboardingEmail } from "./verifyCompany";
 
 const verifyCompanyByAdminResolver: MutationResolvers["verifyCompanyByAdmin"] =
   async (parent, { input: { siret, verificationComment } }, context) => {
@@ -23,6 +27,13 @@ const verifyCompanyByAdminResolver: MutationResolvers["verifyCompanyByAdmin"] =
         verifiedAt: new Date()
       }
     });
+
+    const companyAdmins = await getCompanyAdminUsers(verifiedCompany.orgId);
+
+    await sendPostVerificationFirstOnboardingEmail(
+      verifiedCompany,
+      companyAdmins[0]
+    );
 
     return verifiedCompany;
   };
