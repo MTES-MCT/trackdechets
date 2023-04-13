@@ -116,7 +116,7 @@ describe("sendSecondOnboardingEmail", () => {
       {
         subject:
           "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
-        templateId: 10,
+        templateId: 248,
         sender: {
           email: "us@td.test",
           name: "Wastetracker corp."
