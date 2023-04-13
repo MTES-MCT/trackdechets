@@ -2,9 +2,10 @@ import { flattenFormInput } from "../converter";
 import { nullIfNoValues, safeInput, chain } from "../../common/converter";
 import { FormInput, WasteDetailsInput } from "../../generated/graphql/types";
 import { siretify } from "../../__tests__/factories";
+import { Prisma } from "@prisma/client";
 
 test("nullIfNoValues", () => {
-  let obj = { a: null, b: null };
+  let obj: any = { a: null, b: null };
   expect(nullIfNoValues(obj)).toEqual(null);
   obj = { a: "a", b: "b" };
   expect(nullIfNoValues(obj)).toEqual(obj);
@@ -43,7 +44,7 @@ test("chain should optionnally chain data access", () => {
     };
     baz?: {
       foo1?: string;
-    };
+    } | null;
   };
 
   const input: Input = {
@@ -53,7 +54,7 @@ test("chain should optionnally chain data access", () => {
   };
 
   const foobar1 = chain(input.foo, foo => foo.bar1);
-  expect(foobar1).toEqual(input.foo.bar1);
+  expect(foobar1).toEqual(input.foo!.bar1);
 
   const foobar2 = chain(input.foo, foo => foo.bar2);
   expect(foobar2).toBeUndefined();
@@ -114,27 +115,27 @@ describe("flattenFormInput", () => {
 
     const expected = {
       customId: input.customId,
-      emitterType: input.emitter.type,
-      emitterWorkSiteAddress: input.emitter.workSite.address,
-      emitterWorkSiteCity: input.emitter.workSite.city,
-      emitterWorkSitePostalCode: input.emitter.workSite.postalCode,
-      emitterWorkSiteInfos: input.emitter.workSite.infos,
-      emitterCompanyName: input.emitter.company.name,
-      emitterCompanySiret: input.emitter.company.siret,
-      emitterCompanyAddress: input.emitter.company.address,
-      emitterCompanyContact: input.emitter.company.contact,
-      emitterCompanyPhone: input.emitter.company.phone,
-      emitterCompanyMail: input.emitter.company.mail,
-      emitterIsPrivateIndividual: input.emitter.isPrivateIndividual,
-      emitterIsForeignShip: input.emitter.isForeignShip,
-      emitterCompanyOmiNumber: input.emitter.company.omiNumber,
-      recipientProcessingOperation: input.recipient.processingOperation,
-      recipientCompanyName: input.recipient.company.name,
-      recipientCompanySiret: input.recipient.company.siret,
-      recipientCompanyAddress: input.recipient.company.address,
-      recipientCompanyContact: input.recipient.company.contact,
-      recipientCompanyPhone: input.recipient.company.phone,
-      recipientCompanyMail: input.recipient.company.mail,
+      emitterType: input.emitter!.type,
+      emitterWorkSiteAddress: input.emitter!.workSite!.address,
+      emitterWorkSiteCity: input.emitter!.workSite!.city,
+      emitterWorkSitePostalCode: input.emitter!.workSite!.postalCode,
+      emitterWorkSiteInfos: input.emitter!.workSite!.infos,
+      emitterCompanyName: input.emitter!.company!.name,
+      emitterCompanySiret: input.emitter!.company!.siret,
+      emitterCompanyAddress: input.emitter!.company!.address,
+      emitterCompanyContact: input.emitter!.company!.contact,
+      emitterCompanyPhone: input.emitter!.company!.phone,
+      emitterCompanyMail: input.emitter!.company!.mail,
+      emitterIsPrivateIndividual: input.emitter!.isPrivateIndividual,
+      emitterIsForeignShip: input.emitter!.isForeignShip,
+      emitterCompanyOmiNumber: input.emitter!.company!.omiNumber,
+      recipientProcessingOperation: input.recipient!.processingOperation,
+      recipientCompanyName: input.recipient!.company!.name,
+      recipientCompanySiret: input.recipient!.company!.siret,
+      recipientCompanyAddress: input.recipient!.company!.address,
+      recipientCompanyContact: input.recipient!.company!.contact,
+      recipientCompanyPhone: input.recipient!.company!.phone,
+      recipientCompanyMail: input.recipient!.company!.mail,
       transporterCompanyName: null,
       transporterCompanySiret: null,
       transporterCompanyVatNumber: null,
@@ -142,22 +143,22 @@ describe("flattenFormInput", () => {
       transporterCompanyContact: null,
       transporterCompanyPhone: null,
       transporterCompanyMail: null,
-      transporterReceipt: input.transporter.receipt,
-      transporterDepartment: input.transporter.department,
-      transporterValidityLimit: input.transporter.validityLimit,
-      transporterNumberPlate: input.transporter.numberPlate,
+      transporterReceipt: input.transporter!.receipt,
+      transporterDepartment: input.transporter!.department,
+      transporterValidityLimit: input.transporter!.validityLimit,
+      transporterNumberPlate: input.transporter!.numberPlate,
       wasteDetailsCode: null,
       wasteDetailsName: null,
       wasteDetailsOnuCode: null,
-      wasteDetailsPackagingInfos: null,
+      wasteDetailsPackagingInfos: Prisma.JsonNull,
       wasteDetailsQuantity: null,
       wasteDetailsQuantityType: null,
       wasteDetailsConsistence: null,
-      wasteDetailsPop: null,
-      wasteDetailsIsDangerous: null,
-      wasteDetailsAnalysisReferences: null,
-      wasteDetailsParcelNumbers: null,
-      wasteDetailsLandIdentifiers: null
+      wasteDetailsPop: false,
+      wasteDetailsIsDangerous: false,
+      wasteDetailsAnalysisReferences: [],
+      wasteDetailsParcelNumbers: Prisma.JsonNull,
+      wasteDetailsLandIdentifiers: []
     };
 
     expect(flattened).toEqual(expected);
@@ -175,14 +176,14 @@ describe("flattenFormInput", () => {
       wasteDetailsConsistence: null,
       wasteDetailsName: null,
       wasteDetailsOnuCode: null,
-      wasteDetailsPackagingInfos: null,
-      wasteDetailsPop: null,
-      wasteDetailsIsDangerous: null,
+      wasteDetailsPackagingInfos: Prisma.JsonNull,
+      wasteDetailsPop: false,
+      wasteDetailsIsDangerous: false,
       wasteDetailsQuantity: null,
       wasteDetailsQuantityType: null,
-      wasteDetailsParcelNumbers: null,
-      wasteDetailsAnalysisReferences: null,
-      wasteDetailsLandIdentifiers: null
+      wasteDetailsParcelNumbers: Prisma.JsonNull,
+      wasteDetailsAnalysisReferences: [],
+      wasteDetailsLandIdentifiers: []
     });
   });
 

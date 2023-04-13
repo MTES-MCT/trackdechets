@@ -16,7 +16,7 @@ export type MessageVersion = {
 export type Mail = {
   cc?: Recipient[];
   subject: string;
-  body: string;
+  body?: string;
   attachment?: Attachment;
   templateId: number;
   vars?: { [id: string]: any };

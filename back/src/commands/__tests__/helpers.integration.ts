@@ -18,7 +18,7 @@ describe("Retrieve relevant users for onboarding emails", () => {
     const recipients = await getRecentlyAssociatedUsers({ daysAgo: 1 });
     expect(recipients.length).toEqual(1);
     expect(recipients[0].id).toEqual(user.id);
-    expect(recipients[0].companyAssociations).toBeUndefined();
+    expect((recipients[0] as any).companyAssociations).toBeUndefined();
   });
 
   it("should retrieve users associated yesterday with related companies info", async () => {
@@ -37,7 +37,9 @@ describe("Retrieve relevant users for onboarding emails", () => {
     });
     expect(recipients[0].id).toEqual(user.id);
 
-    expect(recipients[0].companyAssociations[0].company.id).toEqual(company.id);
+    expect((recipients[0] as any).companyAssociations[0].company.id).toEqual(
+      company.id
+    );
   });
 });
 // hardcoded values matching test .env config

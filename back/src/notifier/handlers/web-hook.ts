@@ -15,13 +15,14 @@ export async function pushWebHookUpdate(sirets: Set<string>, id: string) {
     }
 
     const value = hooksToCall.get(siret);
-    value.ids.push(id);
+    value!.ids.push(id);
   }
 }
 
-async function getSiretHookUrl(siret: string): Promise<string> {
+async function getSiretHookUrl(siret: string): Promise<string | null> {
   // Implement once webhook are setup...
   if (siret) return null;
+  return null;
 }
 
 function processAwaitingHookCalls(

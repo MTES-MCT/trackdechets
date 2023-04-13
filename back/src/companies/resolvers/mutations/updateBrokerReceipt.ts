@@ -5,6 +5,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { getBrokerReceiptOrNotFound } from "../../database";
 import { checkCanReadUpdateDeleteBrokerReceipt } from "../../permissions";
 import { receiptSchema } from "../../validation";
+import { removeEmptyKeys } from "../../../common/converter";
 
 /**
  * Update a broker receipt
@@ -21,7 +22,7 @@ const updateBrokerReceiptResolver: MutationResolvers["updateBrokerReceipt"] =
     await receiptSchema.validate({ ...receipt, ...data });
     await checkCanReadUpdateDeleteBrokerReceipt(user, receipt);
     return await prisma.brokerReceipt.update({
-      data,
+      data: removeEmptyKeys(data),
       where: { id: receipt.id }
     });
   };

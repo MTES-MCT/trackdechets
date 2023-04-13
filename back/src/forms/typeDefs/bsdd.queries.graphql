@@ -165,7 +165,7 @@ type Query {
   Ce token doit être transmis à la route /download pour obtenir le fichier.
   Il est valable 10 secondes
   """
-  formPdf("ID d'un BSD" id: ID): FileDownload!
+  formPdf("ID d'un BSD" id: ID!): FileDownload!
 
   """
   DEPRECATED - Renvoie un lien de téléchargement pour télécharger le registre BSDD

@@ -24,13 +24,13 @@ export default async function formRevisionRequests(
   // TODO support orgId instead of siret for foreign companies
   const company = await getCompanyOrCompanyNotFound({ siret });
 
-  const pageSize = Math.max(Math.min(first, MAX_SIZE), MIN_SIZE);
+  const pageSize = Math.max(Math.min(first ?? 0, MAX_SIZE), MIN_SIZE);
 
-  const { status } = inputWhere;
+  const { status } = inputWhere ?? {};
   const where = {
     OR: [
       { authoringCompanyId: company.id },
-      { approvals: { some: { approverSiret: company.siret } } }
+      { approvals: { some: { approverSiret: company.orgId } } }
     ],
     ...(status && { status })
   };

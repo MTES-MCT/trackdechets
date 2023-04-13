@@ -52,7 +52,7 @@ export function wastesReader({
             this.push(waste);
           });
           if (pageInfo.hasNextPage) {
-            this.after = pageInfo.endCursor;
+            this.after = pageInfo.endCursor!;
           } else {
             this.push(null);
           }

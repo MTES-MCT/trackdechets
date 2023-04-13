@@ -762,7 +762,7 @@ function PreviousBsffsTable({ bsff }: Pick<Props, "bsff">) {
                         WasteAcceptationStatus.ACCEPTED
                           ? p.acceptation?.weight
                           : p.weight;
-                      return w + weight;
+                      return w + (weight ?? 0);
                     }, 0)
                   )
                     .toDecimalPlaces(3) // precision to gramme

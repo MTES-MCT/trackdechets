@@ -36,7 +36,7 @@ describe("Mutation.signBsdasri transport", () => {
       }
     });
 
-    const readyTotakeOverDasri = await prisma.bsdasri.findUnique({
+    const readyTotakeOverDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(readyTotakeOverDasri.status).toEqual("SENT");
@@ -71,7 +71,7 @@ describe("Mutation.signBsdasri transport", () => {
       }
     });
 
-    const readyTotakeOverDasri = await prisma.bsdasri.findUnique({
+    const readyTotakeOverDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(readyTotakeOverDasri.status).toEqual("REFUSED");

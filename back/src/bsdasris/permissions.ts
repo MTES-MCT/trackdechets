@@ -106,6 +106,7 @@ export async function checkCanDeleteBsdasri(user: User, bsdasri: Bsdasri) {
 
   const isUserOnlySignatory = async () =>
     bsdasri.status === BsdasriStatus.SIGNED_BY_PRODUCER &&
+    bsdasri.emitterCompanySiret &&
     (await getCachedUserSiretOrVat(user.id)).includes(
       bsdasri.emitterCompanySiret
     );

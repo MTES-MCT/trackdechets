@@ -16,28 +16,28 @@ export const Bsff: BsffResolvers = {
       where: { id }
     });
     const ficheInterventions = await getFicheInterventions({
-      bsff: prismaBsff,
+      bsff: prismaBsff!,
       context
     });
     return ficheInterventions;
   },
   packagings: async (bsff, _, ctx) => {
-    let packagings = [];
     // use ES indexed field when requested from dashboard
     if (
       ctx?.req?.body?.operationName === dashboardOperationName &&
       isSessionUser(ctx)
     ) {
-      packagings = bsff?.packagings ?? [];
-    } else {
-      const { findUniqueGetPackagings } = getReadonlyBsffRepository();
-      packagings = await findUniqueGetPackagings(
+      return bsff?.packagings ?? [];
+    }
+    const { findUniqueGetPackagings } = getReadonlyBsffRepository();
+    const packagings =
+      (await findUniqueGetPackagings(
         {
           where: { id: bsff.id }
         },
         { orderBy: { numero: "asc" } }
-      );
-    }
+      )) ?? [];
+
     return packagings.map(packaging => expandBsffPackagingFromDB(packaging));
   },
   forwarding: async ({ id, type }) => {
@@ -46,12 +46,13 @@ export const Bsff: BsffResolvers = {
     }
     const { findUniqueGetPackagings } = getReadonlyBsffRepository();
     const { findPreviousPackagings } = getReadonlyBsffPackagingRepository();
-    const packagings = await findUniqueGetPackagings(
-      {
-        where: { id }
-      },
-      { select: { id: true } }
-    );
+    const packagings =
+      (await findUniqueGetPackagings(
+        {
+          where: { id }
+        },
+        { select: { id: true } }
+      )) ?? [];
     const forwarding = await findPreviousPackagings(
       packagings.map(p => p.id),
       1
@@ -64,12 +65,13 @@ export const Bsff: BsffResolvers = {
     }
     const { findUniqueGetPackagings } = getReadonlyBsffRepository();
     const { findPreviousPackagings } = getReadonlyBsffPackagingRepository();
-    const packagings = await findUniqueGetPackagings(
-      {
-        where: { id }
-      },
-      { select: { id: true } }
-    );
+    const packagings =
+      (await findUniqueGetPackagings(
+        {
+          where: { id }
+        },
+        { select: { id: true } }
+      )) ?? [];
     const repackaging = await findPreviousPackagings(
       packagings.map(p => p.id),
       1
@@ -82,12 +84,13 @@ export const Bsff: BsffResolvers = {
     }
     const { findUniqueGetPackagings } = getReadonlyBsffRepository();
     const { findPreviousPackagings } = getReadonlyBsffPackagingRepository();
-    const packagings = await findUniqueGetPackagings(
-      {
-        where: { id }
-      },
-      { select: { id: true } }
-    );
+    const packagings =
+      (await findUniqueGetPackagings(
+        {
+          where: { id }
+        },
+        { select: { id: true } }
+      )) ?? [];
     const grouping = await findPreviousPackagings(
       packagings.map(p => p.id),
       1

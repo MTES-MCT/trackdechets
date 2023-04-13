@@ -1,4 +1,4 @@
-import { Bsdasri, BsdasriStatus, User, BsdasriType } from "@prisma/client";
+import { Bsdasri, BsdasriStatus, BsdasriType, Prisma } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import {
@@ -48,7 +48,7 @@ const duplicateBsdasriResolver: MutationResolvers["duplicateBsdasri"] = async (
 };
 
 function duplicateBsdasri(
-  user: User,
+  user: Express.User,
   {
     id,
     createdAt,
@@ -102,6 +102,10 @@ function duplicateBsdasri(
 
   return bsdasriRepository.create({
     ...fieldsToCopy,
+    emitterWastePackagings:
+      fieldsToCopy.emitterWastePackagings === null
+        ? Prisma.JsonNull
+        : fieldsToCopy.emitterWastePackagings,
     id: getReadableId(ReadableIdPrefix.DASRI),
     status: BsdasriStatus.INITIAL,
     isDraft: true

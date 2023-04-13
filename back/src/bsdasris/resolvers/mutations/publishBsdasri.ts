@@ -35,7 +35,7 @@ const publishBsdasriResolver: MutationResolvers["publishBsdasri"] = async (
     grouping.map(el => el.id)
   );
 
-  await validateBsdasri(bsdasri, { emissionSignature: true });
+  await validateBsdasri(bsdasri as any, { emissionSignature: true });
 
   const bsdasriRepository = getBsdasriRepository(user);
 

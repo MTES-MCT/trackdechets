@@ -2,8 +2,7 @@ import {
   Bsda,
   BsdaStatus,
   Prisma,
-  RevisionRequestStatus,
-  User
+  RevisionRequestStatus
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
@@ -112,7 +111,7 @@ export async function createBsdaRevisionRequest(
 }
 
 async function checkIfUserCanRequestRevisionOnBsda(
-  user: User,
+  user: Express.User,
   bsda: Bsda
 ): Promise<void> {
   await checkCanRequestRevision(user, bsda);

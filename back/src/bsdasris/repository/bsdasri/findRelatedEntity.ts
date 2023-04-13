@@ -2,7 +2,7 @@ import { Bsdasri, Prisma } from "@prisma/client";
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 type ChainableBsdasri = Pick<
-  Prisma.Prisma__BsdasriClient<Bsdasri>,
+  Prisma.Prisma__BsdasriClient<Bsdasri | null, null>,
   "synthesizedIn" | "synthesizing" | "groupedIn" | "grouping"
 >;
 

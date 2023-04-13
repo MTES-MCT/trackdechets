@@ -38,7 +38,10 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
         "Impossible de mettre à jour les agréments éco-organisme de cette entreprise : elle doit en posséder au moins 1."
       );
     }
-  } else if (ecoOrganismeAgreements?.length > 0) {
+  } else if (
+    Array.isArray(ecoOrganismeAgreements) &&
+    ecoOrganismeAgreements.length > 0
+  ) {
     throw new UserInputError(
       "Impossible de mettre à jour les agréments éco-organisme de cette entreprise : il ne s'agit pas d'un éco-organisme."
     );

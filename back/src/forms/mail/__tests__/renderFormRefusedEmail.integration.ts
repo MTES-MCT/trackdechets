@@ -35,13 +35,13 @@ describe("renderFormRefusedEmail", () => {
       }
     });
     const email = await renderFormRefusedEmail(form);
-    expect(email.to).toEqual([
+    expect(email!.to).toEqual([
       { email: emitter.user.email, name: emitter.user.name }
     ]);
-    expect(email.cc).toEqual([
+    expect(email!.cc).toEqual([
       { email: destination.user.email, name: destination.user.name }
     ]);
-    expect(email.body).toContain(`<p>
+    expect(email!.body).toContain(`<p>
   Nous vous informons que la société ${destination.company.name} (${destination.company.siret}) a refusé le
   2 janvier 2022, le déchet de la
   société suivante :
@@ -114,13 +114,13 @@ describe("renderFormRefusedEmail", () => {
       }
     });
     const email = await renderFormRefusedEmail(form);
-    expect(email.to).toEqual([
+    expect(email!.to).toEqual([
       { email: emitter.user.email, name: emitter.user.name }
     ]);
-    expect(email.cc).toEqual([
+    expect(email!.cc).toEqual([
       { email: destination.user.email, name: destination.user.name }
     ]);
-    expect(email.body).toContain(`<p>
+    expect(email!.body).toContain(`<p>
   Nous vous informons que la société ${form.recipientCompanyName} (${form.recipientCompanySiret}) a refusé
   partiellement le 2 janvier 2022, le
   déchet de la société suivante :
@@ -169,11 +169,11 @@ describe("renderFormRefusedEmail", () => {
       }
     });
     const email = await renderFormRefusedEmail(form);
-    expect(email.to).toEqual([
+    expect(email!.to).toEqual([
       { email: emitter.user.email, name: emitter.user.name }
     ]);
-    expect(email.cc).toEqual([{ email: ttr.user.email, name: ttr.user.name }]);
-    expect(email.body).toContain(`<p>
+    expect(email!.cc).toEqual([{ email: ttr.user.email, name: ttr.user.name }]);
+    expect(email!.body).toContain(`<p>
   Nous vous informons que la société ${ttr.company.name} (${ttr.company.siret}) a refusé le
   2 janvier 2022, le déchet de la
   société suivante :
@@ -228,27 +228,31 @@ describe("renderFormRefusedEmail", () => {
       .forwardedIn();
     const email = await renderFormRefusedEmail(form);
 
-    expect(email.to).toEqual([
+    expect(email!.to).toEqual([
       { email: emitter.user.email, name: emitter.user.name }
     ]);
-    expect(email.cc).toEqual([
+    expect(email!.cc).toEqual([
       { email: destination.user.email, name: destination.user.name },
       { email: ttr.user.email, name: ttr.user.name }
     ]);
-    expect(email.body).toContain(`<p>
-  Nous vous informons que la société ${destination.company.name} (${destination.company.siret}) a refusé le
+    expect(email!.body).toContain(`<p>
+  Nous vous informons que la société ${destination.company.name} (${
+      destination.company.siret
+    }) a refusé le
   2 janvier 2022, le déchet de la
   société suivante :
 </p>
 <br />
 <ul>
-  <li>${emitter.company.name} (${emitter.company.siret}) - ${emitter.company.address}</li>
+  <li>${emitter.company.name} (${emitter.company.siret}) - ${
+      emitter.company.address
+    }</li>
   <li>Informations relatives aux déchets refusés :</li>
   <ul>
     <li>Numéro du BSD: ${form.readableId}</li>
     <li>Appellation du déchet : ${form.wasteDetailsName}</li>
     <li>Code déchet : ${form.wasteDetailsCode}</li>
     <li>Motif de refus :
-      <span>${forwardedIn.wasteRefusalReason}</span>`);
+      <span>${forwardedIn!.wasteRefusalReason}</span>`);
   });
 });

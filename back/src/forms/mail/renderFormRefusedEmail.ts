@@ -13,7 +13,7 @@ const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 export async function renderFormRefusedEmail(
   form: Form,
   notifyDreal = NOTIFY_DREAL_WHEN_FORM_DECLINED === "true"
-): Promise<Mail> {
+): Promise<Mail | undefined> {
   if (form.emitterIsPrivateIndividual || form.emitterIsForeignShip) {
     return;
   }
@@ -25,12 +25,12 @@ export async function renderFormRefusedEmail(
   const isFinalDestinationRefusal = forwardedIn && !!forwardedIn.sentAt;
 
   const destinationSiret = isFinalDestinationRefusal
-    ? forwardedIn.recipientCompanySiret
-    : form.recipientCompanySiret;
+    ? forwardedIn.recipientCompanySiret!
+    : form.recipientCompanySiret!;
 
   const wasteAcceptationStatus = isFinalDestinationRefusal
-    ? forwardedIn.wasteAcceptationStatus
-    : form.wasteAcceptationStatus;
+    ? forwardedIn.wasteAcceptationStatus!
+    : form.wasteAcceptationStatus!;
 
   const attachmentData = {
     file: await generateBsddPdfToBase64(form),
@@ -38,20 +38,20 @@ export async function renderFormRefusedEmail(
   };
 
   const emitterCompanyAdmins = await getCompanyAdminUsers(
-    form.emitterCompanySiret
+    form.emitterCompanySiret!
   );
   const destinationCompanyAdmins = await getCompanyAdminUsers(destinationSiret);
   const tempStorerCompanyAdmins = isFinalDestinationRefusal
-    ? await getCompanyAdminUsers(form.recipientCompanySiret)
+    ? await getCompanyAdminUsers(form.recipientCompanySiret!)
     : [];
 
-  let drealsRecipients = [];
+  let drealsRecipients: typeof DREALS = [];
 
   if (notifyDreal) {
     const companies = await prisma.company.findMany({
       where: {
         siret: {
-          in: [form.emitterCompanySiret, destinationSiret]
+          in: [form.emitterCompanySiret!, destinationSiret]
         }
       },
       select: { codeDepartement: true }
@@ -63,7 +63,7 @@ export async function renderFormRefusedEmail(
 
   const to = emitterCompanyAdmins.map(admin => ({
     email: admin.email,
-    name: admin.name
+    name: admin.name ?? ""
   }));
 
   // include drealsRecipients if settings says so
@@ -71,7 +71,7 @@ export async function renderFormRefusedEmail(
     ...destinationCompanyAdmins,
     ...tempStorerCompanyAdmins,
     ...(notifyDreal ? drealsRecipients : [])
-  ].map(admin => ({ email: admin.email, name: admin.name }));
+  ].map(admin => ({ email: admin.email, name: admin.name ?? "" }));
 
   // Get formNotAccepted or formPartiallyRefused mail function according to wasteAcceptationStatus value
   const mailTemplate = {

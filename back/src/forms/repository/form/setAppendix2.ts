@@ -9,7 +9,7 @@ class FormFraction {
 
 class SetAppendix2Args {
   form: Form;
-  appendix2: FormFraction[] | null;
+  appendix2: FormFraction[];
   currentAppendix2Forms?: Form[];
 }
 
@@ -56,7 +56,10 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
     }[] = [];
 
     for (const { form: initialForm, quantity } of appendix2) {
-      if (currentAppendix2Forms.map(f => f.id).includes(initialForm.id)) {
+      if (
+        currentAppendix2Forms &&
+        currentAppendix2Forms.map(f => f.id).includes(initialForm.id)
+      ) {
         formGroupementToUpdate.push({
           initialFormId: initialForm.id,
           quantity
@@ -104,7 +107,7 @@ const buildSetAppendix2: (deps: RepositoryFnDeps) => SetAppendix2Fn =
 
     const dirtyFormIds = [
       ...new Set([
-        ...currentAppendix2Forms.map(f => f.id),
+        ...(currentAppendix2Forms?.map(f => f.id) ?? []),
         ...appendix2.map(({ form }) => form.id)
       ])
     ];

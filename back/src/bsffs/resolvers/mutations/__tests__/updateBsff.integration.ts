@@ -98,7 +98,7 @@ describe("Mutation.updateBsff", () => {
     );
 
     let packagings = await prisma.bsff
-      .findUnique({ where: { id: bsff.id } })
+      .findUniqueOrThrow({ where: { id: bsff.id } })
       .packagings();
 
     expect(packagings.length).toEqual(1);
@@ -130,7 +130,7 @@ describe("Mutation.updateBsff", () => {
     });
 
     packagings = await prisma.bsff
-      .findUnique({ where: { id: bsff.id } })
+      .findUniqueOrThrow({ where: { id: bsff.id } })
       .packagings();
 
     expect(packagings.length).toEqual(2); // previous packagings should be deleted
@@ -407,7 +407,7 @@ describe("Mutation.updateBsff", () => {
       })
     ]);
 
-    const updatedBsff = await prisma.bsff.findUnique({
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsff.id },
       include: { packagings: true }
     });
@@ -602,7 +602,7 @@ describe("Mutation.updateBsff", () => {
 
     expect(errors).toBeUndefined();
 
-    const updatedBsff = await prisma.bsff.findUnique({
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsff.id },
       include: { packagings: true }
     });
@@ -673,7 +673,7 @@ describe("Mutation.updateBsff", () => {
 
     expect(errors).toBeUndefined();
 
-    const updatedBsff = await prisma.bsff.findUnique({
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsff.id },
       include: { packagings: true }
     });
@@ -798,7 +798,7 @@ describe("Mutation.updateBsff", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data.updateBsff.transporter.company).toEqual(
+    expect(data.updateBsff.transporter!.company).toEqual(
       expect.objectContaining(input.transporter.company)
     );
   });
@@ -952,7 +952,7 @@ describe("Mutation.updateBsff", () => {
       {
         isDraft: true,
         type: "COLLECTE_PETITES_QUANTITES",
-        detenteurCompanySirets: [detenteur1.company.siret],
+        detenteurCompanySirets: [detenteur1.company.siret!],
         ficheInterventions: {
           connect: ficheInterventions.map(({ id }) => ({ id }))
         }
@@ -978,7 +978,7 @@ describe("Mutation.updateBsff", () => {
     });
 
     expect(errors).toBeUndefined();
-    const updatedBsff = await prisma.bsff.findUnique({
+    const updatedBsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsff.id },
       include: { ficheInterventions: true }
     });

@@ -19,7 +19,7 @@ const buildUpdateForm: (deps: RepositoryFnDeps) => UpdateFormFn =
 
     // retrieves form
     // for diff calculation
-    const oldForm = await prisma.form.findUnique({
+    const oldForm = await prisma.form.findUniqueOrThrow({
       where,
       include: {
         forwardedIn: true

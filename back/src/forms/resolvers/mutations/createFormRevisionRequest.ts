@@ -3,8 +3,7 @@ import {
   Form,
   Prisma,
   RevisionRequestStatus,
-  Status,
-  User
+  Status
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
@@ -113,8 +112,8 @@ export default async function createFormRevisionRequest(
   const approversSirets = await getApproversSirets(
     existingBsdd,
     flatContent,
-    authoringCompany.siret,
-    context.user
+    authoringCompany.orgId,
+    user
   );
 
   return formRepository.createRevisionRequest({
@@ -164,9 +163,9 @@ async function getAuthoringCompany(
 }
 
 async function checkIfUserCanRequestRevisionOnBsdd(
-  user: User,
+  user: Express.User,
   bsdd: Form,
-  forwardedIn?: Form
+  forwardedIn?: Form | null
 ): Promise<void> {
   await checkCanRequestRevision(user, bsdd, forwardedIn);
   if (bsdd.emitterIsPrivateIndividual || bsdd.emitterIsForeignShip) {
@@ -271,14 +270,16 @@ async function getApproversSirets(
     bsdd.emitterCompanySiret,
     bsdd.traderCompanySiret,
     bsdd.recipientCompanySiret
-  ];
+  ].filter(Boolean);
 
   if (hasTemporaryStorageUpdate(content)) {
     const forwardedIn = await getFormRepository(user).findForwardedInById(
       bsdd.id
     );
 
-    approvers.push(forwardedIn.recipientCompanySiret);
+    if (forwardedIn?.recipientCompanySiret) {
+      approvers.push(forwardedIn.recipientCompanySiret);
+    }
   }
 
   const approversSirets = approvers.filter(
@@ -289,7 +290,14 @@ async function getApproversSirets(
   return [...new Set(approversSirets)];
 }
 
-function hasTemporaryStorageUpdate(content: RevisionRequestContent): boolean {
+function hasTemporaryStorageUpdate(
+  content: Pick<
+    RevisionRequestContent,
+    | "temporaryStorageDestinationCap"
+    | "temporaryStorageDestinationProcessingOperation"
+    | "temporaryStorageTemporaryStorerQuantityReceived"
+  >
+): boolean {
   return (
     content.temporaryStorageDestinationCap != null ||
     content.temporaryStorageDestinationProcessingOperation != null ||
@@ -299,7 +307,7 @@ function hasTemporaryStorageUpdate(content: RevisionRequestContent): boolean {
 
 const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
   .object({
-    isCanceled: yup.bool().nullable(),
+    isCanceled: yup.bool().transform(v => (v === null ? false : v)),
     recipientCap: yup.string().nullable(),
     wasteDetailsCode: yup
       .string()
@@ -309,7 +317,7 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
     wasteDetailsPackagingInfos: yup
       .array()
       .of(packagingInfoFn(false))
-      .nullable(),
+      .transform(v => (v === null ? Prisma.JsonNull : v)),
     quantityReceived: yup.number().min(0).nullable(),
     processingOperationDone: yup
       .string()

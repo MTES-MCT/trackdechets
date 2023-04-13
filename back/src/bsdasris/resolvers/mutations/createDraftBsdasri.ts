@@ -11,7 +11,7 @@ const createDraftBsdasriResolver = async (
   args: MutationCreateBsdasriArgs,
   context: GraphQLContext
 ) => {
-  if (args.input.synthesizing?.length > 0) {
+  if (args.input.synthesizing && args.input.synthesizing.length > 0) {
     throw new UserInputError(
       `La création de dasri de synthèse en brouillon n'est pas possible`
     );

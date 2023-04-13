@@ -60,5 +60,5 @@ type Query {
   Ce token doit être transmis à la route /download pour obtenir le fichier.
   Il est valable 10 secondes
   """
-  bsdasriPdf("ID d'un bordereau" id: ID): FileDownload!
+  bsdasriPdf("ID d'un bordereau" id: ID!): FileDownload!
 }
