@@ -19,6 +19,15 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 
+- Modification des mails d'onboarding (modification du contenu et des triggers) [PR 2212](https://github.com/MTES-MCT/trackdechets/pull/2212):
+  - Le premier mail d'onboarding est envoyé:
+    - Producteurs: à la **création** de l'entreprise
+    - Professionnels: à la **vérification** de l'entreprise
+    - Transporteurs étrangers (nouveau): à la **vérification** de l'entreprise
+  - Le deuxième mail d'onboarding est envoyé:
+    - Producteurs: 2 jours après la **création** de l'entreprise, ou 2 jours après avoir rejoint une entreprise
+    - Professionnels: 2 jours après la **vérification** de l'entreprise, ou 2 jours après avoir rejoint une entreprise
+
 #### :memo: Documentation
 
 #### :house: Interne
