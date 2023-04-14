@@ -59,6 +59,13 @@ const companyPrivateResolvers: CompanyPrivateResolvers = {
     return prisma.company
       .findUnique({ where: { id: parent.id } })
       .givenSignatureAutomations({ include: { from: true, to: true } }) as any;
+  },
+  receivedSignatureAutomations: parent => {
+    return prisma.company
+      .findUnique({ where: { id: parent.id } })
+      .receivedSignatureAutomations({
+        include: { from: true, to: true }
+      }) as any;
   }
 };
 

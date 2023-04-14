@@ -147,7 +147,8 @@ export function createAppendix1Form(
           wasteDetails: {
             code: "13 05 02*",
             onuCode: "Non Soumis",
-            name: "Huiles"
+            name: "Huiles",
+            consistence: "LIQUID"
           }
         }
       };

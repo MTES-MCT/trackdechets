@@ -35,6 +35,13 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Tous BSD - transport - Le récépissé transporteur du BSFF est obligatoire, sauf exemption à cocher [PR 2205](https://github.com/MTES-MCT/trackdechets/pull/2205).
 
 #### :nail_care: Améliorations
+- Améliorations sur l'annexe 1 [PR 2274](https://github.com/MTES-MCT/trackdechets/pull/2274)
+  - Ajout du code déchet 15 02 02*
+  - Ajout de la propriété `receivedSignatureAutomations` sur l'objet `CompanyPrivate` pour lister les entreprises qui ont activé la signature automatique
+  - Correction de bugs sur le PDF d'un bordereau de tournée
+  - Correction d'un bug à la signature des annexes 1 émises par des particuliers
+  - Désactivation du bouton de création de révision sur les annexes 1: seul le borereau de tournée peut être révisé
+  - Ajout des champs consistance du déchet et CAP sur le bordereau de tournée
 
 #### :memo: Documentation
 

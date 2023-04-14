@@ -42,12 +42,13 @@ const workflow: Workflow = {
     bsd: { id: "ID_BSD_CHAPEAU" }
   },
   chart: `
-graph LR
-NO_STATE(NO STATE) --> |createAppendix1Form (chapeau)| DRAFT
-DRAFT --> |markAsSealed (chapeau)| SEALED
-SEALED --> |Signature d'une annexe 1| SENT
-SENT --> |markAsReceived| RECEIVED
-RECEIVED --> |markAsProcessed| PROCESSED`
+  graph LR
+  NO_STATE(NO STATE) --> |createAppendix1Form| DRAFT
+  DRAFT --> |markAsSealed| SEALED
+  SEALED --> |Création des annexes 1| SEALED
+  SEALED --> |Signature des annexes 1| SENT
+  SENT --> |markAsReceived| RECEIVED
+  RECEIVED --> |markAsProcessed| PROCESSED`
 };
 
 export default workflow;
