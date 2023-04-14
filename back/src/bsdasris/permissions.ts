@@ -161,7 +161,7 @@ export async function checkCanDelete(user: User, bsdasri: Bsdasri) {
       : "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être supprimés";
   await checkUserPermissions(
     user,
-    authorizedOrgIds,
+    authorizedOrgIds.filter(Boolean),
     Permission.BsdCanDelete,
     errorMsg
   );

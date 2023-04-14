@@ -92,13 +92,16 @@ export async function getUserRolesFn(userId: string): Promise<{
     .companyAssociations({
       include: { company: { select: { orgId: true } } }
     });
-  return companyAssociations.reduce(
-    (roles, association) => ({
-      ...roles,
-      [association.company.orgId]: association.role
-    }),
-    {}
-  );
+  if (companyAssociations) {
+    return companyAssociations.reduce(
+      (roles, association) => ({
+        ...roles,
+        [association.company.orgId]: association.role
+      }),
+      {}
+    );
+  }
+  return {};
 }
 
 /**

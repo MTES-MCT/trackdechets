@@ -198,7 +198,7 @@ export async function checkCanDelete(user: User, bsff: Bsff) {
       : `Il n'est pas possible de supprimer un bordereau qui a été signé par un des acteurs`;
   return checkUserPermissions(
     user,
-    authorizedOrgIds,
+    authorizedOrgIds.filter(Boolean),
     Permission.BsdCanDelete,
     errorMsg
   );

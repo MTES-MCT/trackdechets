@@ -22,16 +22,6 @@ import { GetRevisionRequestByIdFn } from "./formRevisionRequest/getRevisionReque
 import { RefuseRevisionRequestFn } from "./formRevisionRequest/refuseRevisionRequestApproval";
 import { UpdateAppendix1Forms } from "./form/updateAppendix1Forms";
 
-const formWithLinkedObjects = Prisma.validator<Prisma.FormArgs>()({
-  include: {
-    forwardedIn: true,
-    transportSegments: true,
-    intermediaries: true
-  }
-});
-
-export type FullForm = Prisma.FormGetPayload<typeof formWithLinkedObjects>;
-
 export type FormActions = {
   findUnique: FindUniqueFormFn;
   findFirst: FindFirstFormFn;

@@ -14,8 +14,8 @@ import {
 import prisma from "../prisma";
 import { getFullForm } from "./database";
 import { getReadOnlyFormRepository } from "./repository";
-import { FullForm } from "./repository/types";
 import { checkSecurityCode } from "../common/permissions";
+import { FullForm } from "./types";
 
 /**
  * Retrieves companies allowed to update, delete or duplicate an existing BSDD.
@@ -87,7 +87,7 @@ function formContributors(form: FullForm, input?: UpdateFormInput): string[] {
       ? form.intermediaries.flatMap(i => [i.siret, i.vatNumber])
       : [];
 
-  const multiModalTransporters = form.transportSegments.map(
+  const multiModalTransporters = (form.transportSegments ?? []).map(
     s => s.transporterCompanySiret
   );
 
@@ -200,14 +200,14 @@ export async function checkCanUpdate(
     form.status === "SIGNED_BY_PRODUCER" &&
     form.emittedByEcoOrganisme
   ) {
-    authorizedOrgIds = [form.ecoOrganismeSiret];
+    authorizedOrgIds = [form.ecoOrganismeSiret].filter(Boolean);
     errorMsg =
       "L'éco-organisme a signé ce bordereau, il est le seul à pouvoir le mettre à jour.";
   } else if (
     form.status === "SIGNED_BY_PRODUCER" &&
     !form.emittedByEcoOrganisme
   ) {
-    authorizedOrgIds = [form.emitterCompanySiret];
+    authorizedOrgIds = [form.emitterCompanySiret].filter(Boolean);
     errorMsg =
       "Le producteur a signé ce bordereau, il est le seul à pouvoir le mettre à jour.";
   } else {
@@ -256,14 +256,14 @@ export async function checkCanDelete(user: User, form: Form) {
     form.status === "SIGNED_BY_PRODUCER" &&
     form.emittedByEcoOrganisme
   ) {
-    authorizedOrgIds = [form.ecoOrganismeSiret];
+    authorizedOrgIds = [form.ecoOrganismeSiret].filter(Boolean);
     errorMsg =
       "L'éco-organisme a signé ce bordereau, il est le seul à pouvoir le supprimer.";
   } else if (
     form.status === "SIGNED_BY_PRODUCER" &&
     !form.emittedByEcoOrganisme
   ) {
-    authorizedOrgIds = [form.ecoOrganismeSiret];
+    authorizedOrgIds = [form.ecoOrganismeSiret].filter(Boolean);
     errorMsg =
       "Le producteur a signé ce bordereau, il est le seul à pouvoir le supprimer.";
   } else {
@@ -354,7 +354,7 @@ export async function checkCanMarkAsAccepted(user: User, form: Form) {
   }
   const fullForm = await getFullForm(form);
 
-  const recipientSiret = form.forwardedInId
+  const recipientSiret = fullForm.forwardedIn
     ? fullForm.forwardedIn.recipientCompanySiret
     : form.recipientCompanySiret;
 
@@ -374,7 +374,7 @@ export async function checkCanMarkAsReceived(user: User, form: Form) {
   }
   const fullForm = await getFullForm(form);
 
-  const recipientSiret = form.forwardedInId
+  const recipientSiret = fullForm.forwardedIn
     ? fullForm.forwardedIn.recipientCompanySiret
     : form.recipientCompanySiret;
 
@@ -419,7 +419,7 @@ export async function checkCanMarkAsProcessed(user: User, form: Form) {
 
   const fullForm = await getFullForm(form);
 
-  const authorizedOrgIds = fullForm.forwardedInId
+  const authorizedOrgIds = fullForm.forwardedIn
     ? [
         fullForm.forwardedIn.recipientCompanySiret,
         // case when the temp storer decides to do an anticipated treatment
@@ -431,7 +431,7 @@ export async function checkCanMarkAsProcessed(user: User, form: Form) {
 
   return checkUserPermissions(
     user,
-    authorizedOrgIds,
+    authorizedOrgIds.filter(Boolean),
     Permission.BsdCanSign,
     "Vous n'êtes pas autorisé à marquer ce bordereau comme traité"
   );
@@ -440,7 +440,7 @@ export async function checkCanMarkAsProcessed(user: User, form: Form) {
 export async function checkCanMarkAsResent(user: User, form: Form) {
   return checkUserPermissions(
     user,
-    [form.recipientCompanySiret],
+    [form.recipientCompanySiret].filter(Boolean),
     Permission.BsdCanSign,
     "Vous n'êtes pas autorisé à marquer ce borderau comme envoyé après entreposage provisoire"
   );
