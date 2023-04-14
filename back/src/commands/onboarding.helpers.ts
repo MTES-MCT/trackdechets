@@ -308,25 +308,25 @@ export interface BsddRevisionRequestWithReadableId extends BsddRevisionRequest {
 
 type RequestWithApprovals =
   | (BsddRevisionRequestWithReadableId & {
-    approvals: BsddRevisionRequestApproval[];
-  })
+      approvals: BsddRevisionRequestApproval[];
+    })
   | (BsdaRevisionRequest & {
-    approvals: BsdaRevisionRequestApproval[];
-  });
+      approvals: BsdaRevisionRequestApproval[];
+    });
 
 type RequestWithWrappedApprovals =
   | (BsddRevisionRequestWithReadableId & {
-    approvals: (BsddRevisionRequestApproval & {
-      admins: User[];
-      company: Company;
-    })[];
-  })
+      approvals: (BsddRevisionRequestApproval & {
+        admins: User[];
+        company: Company;
+      })[];
+    })
   | (BsdaRevisionRequest & {
-    approvals: (BsdaRevisionRequestApproval & {
-      admins: User[];
-      company: Company;
-    })[];
-  });
+      approvals: (BsdaRevisionRequestApproval & {
+        admins: User[];
+        company: Company;
+      })[];
+    });
 
 /**
  * Will add pending approval companies' admins to requests
