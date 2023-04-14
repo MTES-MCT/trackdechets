@@ -20,7 +20,6 @@ import {
   checkCanMarkAsTempStored,
   checkCanSignedByTransporter
 } from "../permissions";
-import { AuthType } from "../../auth";
 import { checkSecurityCode } from "../../common/permissions";
 
 async function checkEmitterPermission(
