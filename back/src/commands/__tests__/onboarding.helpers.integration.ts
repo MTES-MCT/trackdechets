@@ -5,7 +5,6 @@ import {
 } from "@prisma/client";
 import { resetDatabase } from "../../../integration-tests/helper";
 import {
-  addUserToCompany,
   companyAssociatedToExistingUserFactory,
   companyFactory,
   createMembershipRequest,
@@ -24,6 +23,7 @@ import {
 } from "../onboarding.helpers";
 import prisma from "../../prisma";
 import { bsdaFactory } from "../../bsda/__tests__/factories";
+import { associateUserToCompany } from "../../users/database";
 
 const TODAY = new Date();
 const ONE_DAY_AGO = xDaysAgo(TODAY, 1);
@@ -669,7 +669,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
     // Given
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const user2 = await userFactory();
-    await addUserToCompany(user2, company, "ADMIN");
+    await associateUserToCompany(user2.id, company.orgId, "ADMIN");
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -717,7 +717,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
     // Given
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const user2 = await userFactory();
-    await addUserToCompany(user2, company, "MEMBER");
+    await associateUserToCompany(user2.id, company.orgId, "MEMBER");
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -991,7 +991,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
     // Given
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const user2 = await userFactory();
-    await addUserToCompany(user2, company, "ADMIN");
+    await associateUserToCompany(user2.id, company.orgId, "ADMIN");
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -1040,7 +1040,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
     // Given
     const { user, company } = await userWithCompanyFactory("ADMIN");
     const user2 = await userFactory();
-    await addUserToCompany(user2, company, "MEMBER");
+    await associateUserToCompany(user2.id, company.orgId, "MEMBER");
     const { company: companyOfSomeoneElse } = await userWithCompanyFactory(
       "ADMIN"
     );
@@ -1081,6 +1081,4 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
       user.id
     );
   });
-
-  // TODO: return only PENDING approvals
 });
