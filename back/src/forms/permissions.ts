@@ -187,7 +187,7 @@ export async function checkCanUpdate(
 
   const fullForm = await getFullForm(form);
 
-  let authorizedOrgIds: string[];
+  let authorizedOrgIds: string[] = [];
   let errorMsg = "Vous n'êtes pas autorisé à modifier ce bordereau";
 
   if (
