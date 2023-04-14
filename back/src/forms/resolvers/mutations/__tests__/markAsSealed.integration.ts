@@ -1163,16 +1163,18 @@ describe("Mutation.markAsSealed", () => {
     });
 
     const { mutate } = makeClient(user);
-    const { data } = await mutate<Pick<Mutation, "markAsSealed">>(
-      MARK_AS_SEALED,
-      {
-        variables: {
-          id: form.id
-        }
+    await mutate<Pick<Mutation, "markAsSealed">>(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
       }
-    );
+    });
 
-    expect(data.markAsSealed.status).toBe("SIGNED_BY_PRODUCER");
+    const updatedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
+    expect(updatedForm.status).toEqual("SIGNED_BY_PRODUCER");
+    expect(updatedForm.emittedAt).not.toBeNull();
+    expect(updatedForm.emittedBy).toEqual("Signature auto (particulier)");
   });
 
   it("should throw an error if any SIRET does not exists", async () => {
