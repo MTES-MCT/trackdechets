@@ -66,7 +66,7 @@ describe("roles permissions", () => {
   );
 
   test("ADMIN should have CompanyCanUpdate permission", async () => {
-    expect(can(UserRole.ADMIN, Permission.RegistryCanRead)).toEqual(true);
+    expect(can(UserRole.ADMIN, Permission.CompanyCanUpdate)).toEqual(true);
   });
 
   test("ADMIN should have CompanyCanVerify permission", async () => {
@@ -89,5 +89,31 @@ describe("roles permissions", () => {
     expect(can(UserRole.ADMIN, Permission.CompanyCanRenewSecurityCode)).toEqual(
       true
     );
+  });
+
+  test("MEMBER should not have CompanyCanUpdate permission", async () => {
+    expect(can(UserRole.MEMBER, Permission.CompanyCanUpdate)).toEqual(false);
+  });
+
+  test("MEMBER should not have CompanyCanVerify permission", async () => {
+    expect(can(UserRole.MEMBER, Permission.CompanyCanVerify)).toEqual(false);
+  });
+
+  test("MEMBER should not have CompanyCanManageSignatureAutomation permission", async () => {
+    expect(
+      can(UserRole.MEMBER, Permission.CompanyCanManageSignatureAutomation)
+    ).toEqual(false);
+  });
+
+  test("MEMBER should not have CompanyCanManageMembers permission", async () => {
+    expect(can(UserRole.MEMBER, Permission.CompanyCanManageMembers)).toEqual(
+      false
+    );
+  });
+
+  test("MEMBER should not have CompanyCanRenewSecurityCode permission", async () => {
+    expect(
+      can(UserRole.MEMBER, Permission.CompanyCanRenewSecurityCode)
+    ).toEqual(false);
   });
 });
