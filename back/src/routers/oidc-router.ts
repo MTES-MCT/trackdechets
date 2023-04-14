@@ -2,9 +2,9 @@ import prisma from "../prisma";
 import { Router, Request, Response } from "express";
 import { oidc, exchange } from "../oauth/oidc";
 import ensureLoggedIn from "../common/middlewares/ensureLoggedIn";
-import { OAuth2, AuthorizationError } from "oauth2orize";
+import { OAuth2, AuthorizationError, MiddlewareRequest } from "oauth2orize";
 import passport from "passport";
-
+import { getUid } from "../utils";
 export const oidcRouter = Router();
 // OpenID Connect router
 
@@ -51,12 +51,13 @@ oidcRouter.get(
     const payload = {
       transactionID: req.oauth2.transactionID,
       user: {
-        name: req.user.name
+        name: req.user?.name
       },
       client: {
         name: req.oauth2.client.name,
         logoUrl: req.oauth2.client.logoUrl
       },
+
       redirectURI: req.oauth2.redirectURI
     };
     return res.json(payload);
@@ -64,7 +65,14 @@ oidcRouter.get(
   oidc.errorHandler()
 );
 
-oidcRouter.post("/oidc/authorize/decision", ensureLoggedIn, oidc.decision());
+oidcRouter.post(
+  "/oidc/authorize/decision",
+  ensureLoggedIn,
+  oidc.decision(function (req: MiddlewareRequest & Request, done) {
+    const nonce = req?.body?.nonce ?? getUid(32);
+    return done(null, { nonce });
+  })
+);
 
 oidcRouter.post(
   "/oidc/token",

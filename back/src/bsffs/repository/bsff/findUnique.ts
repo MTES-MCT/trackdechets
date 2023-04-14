@@ -7,20 +7,21 @@ import {
 import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 export type FindUniqueBsffFn = (args: Prisma.BsffFindUniqueArgs) => Promise<
-  Bsff & { packagings: BsffPackaging[] } & {
-    ficheInterventions: BsffFicheIntervention[];
-  }
+  | (Bsff & { packagings: BsffPackaging[] } & {
+      ficheInterventions: BsffFicheIntervention[];
+    })
+  | null
 >;
 
 export type FindUniqueBsffGetPackagingsFn = (
   bsffFindUniqueArgs: Prisma.BsffFindUniqueArgs,
   bsffPackagingsFindManyArgs?: Prisma.BsffPackagingFindManyArgs
-) => Promise<BsffPackaging[]>;
+) => Promise<BsffPackaging[] | null>;
 
 export type FindUniqueBsffGetFicheInterventionsFn = (
   bsffFindUniqueArgs: Prisma.BsffFindUniqueArgs,
   bsffFicheInterventionsFindManyArgs?: Prisma.BsffFicheInterventionFindManyArgs
-) => Promise<BsffFicheIntervention[]>;
+) => Promise<BsffFicheIntervention[] | null>;
 
 export function buildFinduniqueBsff({
   prisma

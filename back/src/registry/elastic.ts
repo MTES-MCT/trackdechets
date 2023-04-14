@@ -1,7 +1,4 @@
-import {
-  QueryDslQueryContainer,
-  SearchHitsMetadata
-} from "@elastic/elasticsearch/api/types";
+import { estypes } from "@elastic/elasticsearch";
 import { BsdElastic, client, index } from "../common/elastic";
 import {
   OrderType,
@@ -13,8 +10,8 @@ import { toElasticFilter } from "./where";
 export function buildQuery(
   registryType: WasteRegistryType,
   sirets: string[],
-  where: WasteRegistryWhere
-): QueryDslQueryContainer {
+  where: WasteRegistryWhere | undefined | null
+): estypes.QueryDslQueryContainer {
   const elasticKey: { [key in WasteRegistryType]: keyof BsdElastic } = {
     OUTGOING: "isOutgoingWasteFor",
     INCOMING: "isIncomingWasteFor",
@@ -46,9 +43,9 @@ type ElasticPaginationArgs = {
 export async function searchBsds(
   registryType: WasteRegistryType,
   sirets: string[],
-  where: WasteRegistryWhere,
+  where: WasteRegistryWhere | undefined | null,
   { size, sort, search_after }: ElasticPaginationArgs
-): Promise<SearchHitsMetadata<BsdElastic>> {
+): Promise<estypes.SearchHitsMetadata<BsdElastic>> {
   const sortKey = Object.keys(sort[0])[0];
   const query = buildQuery(registryType, sirets, where);
 

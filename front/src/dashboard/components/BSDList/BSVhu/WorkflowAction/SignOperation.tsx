@@ -23,19 +23,37 @@ const validationSchema = yup.object({
     .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
 });
 
-type Props = { siret: string; bsvhuId: string };
-export function SignOperation({ siret, bsvhuId }: Props) {
-  const [updateBsvhu, { error: updateError }] =
-    useMutation<Pick<Mutation, "updateBsvhu">, MutationUpdateBsvhuArgs>(
-      UPDATE_VHU_FORM
-    );
+type Props = {
+  siret: string;
+  bsvhuId: string;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+  displayActionButton?: boolean;
+};
+export function SignOperation({
+  siret,
+  bsvhuId,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+  displayActionButton,
+}: Props) {
+  const [updateBsvhu, { error: updateError }] = useMutation<
+    Pick<Mutation, "updateBsvhu">,
+    MutationUpdateBsvhuArgs
+  >(UPDATE_VHU_FORM);
   const [signBsvhu, { loading, error: signError }] = useMutation<
     Pick<Mutation, "signBsvhu">,
     MutationSignBsvhuArgs
   >(SIGN_BSVHU, { refetchQueries: [GET_BSDS], awaitRefetchQueries: true });
 
   return (
-    <SignBsvhu title="Signer le traitement" bsvhuId={bsvhuId}>
+    <SignBsvhu
+      title="Signer le traitement"
+      bsvhuId={bsvhuId}
+      isModalOpenFromParent={isModalOpenFromParent}
+      onModalCloseFromParent={onModalCloseFromParent}
+      displayActionButton={displayActionButton}
+    >
       {({ bsvhu, onClose }) => (
         <Formik
           initialValues={{

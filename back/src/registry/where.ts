@@ -1,4 +1,4 @@
-import { QueryDslQueryContainer } from "@elastic/elasticsearch/api/types";
+import { estypes } from "@elastic/elasticsearch";
 import { UserInputError } from "apollo-server-express";
 import { BsdElastic } from "../common/elastic";
 import { toElasticDateQuery, toElasticStringQuery } from "../common/where";
@@ -10,6 +10,8 @@ import {
   StringFilter,
   WasteRegistryWhere
 } from "../generated/graphql/types";
+
+type QueryDslQueryContainer = estypes.QueryDslQueryContainer;
 
 /**
  * Convert WasteRegistryFilter into elastic query filter

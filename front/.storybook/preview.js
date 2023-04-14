@@ -1,5 +1,6 @@
 import "@dataesr/react-dsfr/dist/index.min.cjs.js";
 import "../src/scss/index.scss";
+import { MockedProvider } from "@apollo/client/testing"; // Use for Apollo Version 3+
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
@@ -8,6 +9,9 @@ export const parameters = {
       color: /(background|color)$/i,
       date: /Date$/,
     },
+  },
+  apolloClient: {
+    MockedProvider,
   },
 };
 

@@ -39,9 +39,8 @@ export async function renewSecurityCodeFn(
 
   const currentSecurityCode = company.securityCode;
 
-  let newSecurityCode = null;
-
-  while (!newSecurityCode || newSecurityCode === currentSecurityCode) {
+  let newSecurityCode = currentSecurityCode;
+  while (newSecurityCode === currentSecurityCode) {
     newSecurityCode = randomNumber(4);
   }
 
@@ -53,12 +52,15 @@ export async function renewSecurityCodeFn(
   });
 
   const users = await getCompanyActiveUsers(orgId);
-  const recipients = users.map(({ email, name }) => ({ email, name }));
+  const recipients = users.map(({ email, name }) => ({
+    email,
+    name: name ?? ""
+  }));
 
   const mail = renderMail(securityCodeRenewal, {
     to: recipients,
     variables: {
-      company: { siret: company.siret, name: company.name }
+      company: { orgId: company.orgId, name: company.name }
     }
   });
   sendMail(mail);

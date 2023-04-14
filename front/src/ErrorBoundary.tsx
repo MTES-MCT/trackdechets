@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import * as Sentry from "@sentry/browser";
-import Error from "Pages/Error";
+import ErrorPage from "Pages/ErrorPage";
 
 // After a deploy, users navigating from one page to another without
 // refreshing the page will encounter the error "Failed to fetch dynamically
@@ -23,7 +23,7 @@ const getLogErrorLevel = error => {
   return "error";
 };
 
-class ErrorBoundary extends Component {
+class ErrorBoundary extends Component<React.PropsWithChildren> {
   constructor(props) {
     super(props);
     this.state = {
@@ -63,8 +63,8 @@ class ErrorBoundary extends Component {
   }
 
   render() {
-    const { BUILD_ENV } = import.meta.env;
-    const isDevelopment = !BUILD_ENV;
+    const { DEV } = import.meta.env; //built-in variable exposed with Vite
+    const isDevelopment = DEV;
     const { children } = this.props;
     //@ts-ignore
     const { hasError, hideReloadPageCTA, eventId, errorInfo, error } =
@@ -105,7 +105,7 @@ class ErrorBoundary extends Component {
             width: "90%",
           }}
         >
-          <Error hideReloadPageCTA={hideReloadPageCTA} message={message} />
+          <ErrorPage hideReloadPageCTA={hideReloadPageCTA} message={message} />
           {isDevelopment && (
             <div style={{ whiteSpace: "pre-wrap" }}>
               {error?.toString()}

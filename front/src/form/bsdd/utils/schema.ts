@@ -21,7 +21,7 @@ import {
   CompanyInput,
 } from "generated/graphql/types";
 import graphlClient from "graphql-client";
-import { COMPANY_INFOS } from "form/common/components/company/query";
+import { COMPANY_INFOS_REGISTRATION } from "form/common/components/company/query";
 import {
   isVat,
   isFRVat,
@@ -48,7 +48,7 @@ const destinationSchema = companySchema.concat(
       async value => {
         if (value) {
           const { data } = await graphlClient.query({
-            query: COMPANY_INFOS,
+            query: COMPANY_INFOS_REGISTRATION,
             variables: { siret: value },
           });
           // it should be registered to TD
@@ -81,7 +81,7 @@ export const transporterSchema = object().shape({
           : schema
               .ensure()
               .required(
-                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, le numéro est donc est obligatoire"
               )
     )
     .when(
@@ -92,7 +92,7 @@ export const transporterSchema = object().shape({
           : schema
               .ensure()
               .required(
-                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, le numéro est donc est obligatoire"
               )
     ),
   department: string()
@@ -101,7 +101,9 @@ export const transporterSchema = object().shape({
       (isExemptedOfReceipt: boolean, schema: StringSchema) =>
         isExemptedOfReceipt
           ? schema.nullable(true)
-          : schema.required("Le département du transporteur est obligatoire")
+          : schema.required(
+              "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, le département est donc est obligatoire"
+            )
     )
     .when(
       "transporter.company.vatNumber",
@@ -110,7 +112,9 @@ export const transporterSchema = object().shape({
           ? schema.nullable(true)
           : schema
               .ensure()
-              .required("Le département du transporteur est obligatoire")
+              .required(
+                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, le département du transporteur est obligatoire"
+              )
     ),
   validityLimit: date().nullable(true),
   numberPlate: string().nullable(true),

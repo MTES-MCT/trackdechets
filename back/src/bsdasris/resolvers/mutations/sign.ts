@@ -22,6 +22,11 @@ import {
   getFieldsUpdate
 } from "./signatureUtils";
 import { runInTransaction } from "../../../common/repository/helper";
+import {
+  BsdasriSignatureType,
+  SignatureAuthor
+} from "../../../generated/graphql/types";
+import { GraphQLContext } from "../../../types";
 
 /**
  * When synthesized dasri is received or processed, associated dasris are updated
@@ -118,6 +123,13 @@ const sign = async ({
   securityCode = null,
   emissionSignatureAuthor = null,
   context
+}: {
+  id: string;
+  author: string;
+  type?: BsdasriSignatureType | null;
+  securityCode?: number | null;
+  emissionSignatureAuthor?: SignatureAuthor | null;
+  context: GraphQLContext;
 }) => {
   const user = checkIsAuthenticated(context);
   const bsdasri = await getBsdasriOrNotFound({ id, includeAssociated: true });
@@ -128,7 +140,8 @@ const sign = async ({
     throw new InvalidTransition();
   }
 
-  const signatureType = type ?? "EMISSION_WITH_SECRET_CODE";
+  const signatureType: BsdasriSignatureType | "EMISSION_WITH_SECRET_CODE" =
+    type ?? "EMISSION_WITH_SECRET_CODE";
 
   const signatureParams = dasriSignatureMapping[signatureType];
 

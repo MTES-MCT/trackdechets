@@ -130,7 +130,7 @@ describe("Mutation.Vhu.update", () => {
       }
     );
 
-    expect(data.updateBsvhu.weight.value).toBe(4);
+    expect(data.updateBsvhu.weight!.value).toBe(4);
     // check input is sirenified
     expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
@@ -156,7 +156,7 @@ describe("Mutation.Vhu.update", () => {
       }
     );
 
-    expect(data.updateBsvhu.emitter.agrementNumber).toBe("new agrement");
+    expect(data.updateBsvhu.emitter!.agrementNumber).toBe("new agrement");
   });
 
   it("should disallow emitter fields update after emitter signature", async () => {
@@ -224,7 +224,7 @@ describe("Mutation.Vhu.update", () => {
       }
     );
 
-    expect(data.updateBsvhu.transporter.company.vatNumber).toBe(
+    expect(data.updateBsvhu.transporter!.company!.vatNumber).toBe(
       foreignTransporter.vatNumber
     );
   });

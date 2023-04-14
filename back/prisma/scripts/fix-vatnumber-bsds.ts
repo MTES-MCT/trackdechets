@@ -3,7 +3,7 @@ import path from "path";
 import prompts from "prompts";
 import { Updater, registerUpdater } from "./helper/helper";
 import prisma from "../../src/prisma";
-import { Form } from ".prisma/client";
+import { Form } from "@prisma/client";
 
 @registerUpdater(
   "Clean BSD SIRET and VAT numbers from bad characters",
@@ -68,7 +68,7 @@ export class FixBSDVatUpdater implements Updater {
             cleanTransportersSirets = transportersSirets.map(siret => {
               if (siret === transporterCompanySiret) return cleanSiret;
               else return siret;
-            });
+            }).filter(Boolean);
           }
 
           await prisma.form.update({
@@ -108,7 +108,7 @@ export class FixBSDVatUpdater implements Updater {
         await prisma.bsda.update({
           data: {
             transporterCompanyVatNumber:
-              bsda.transporterCompanyVatNumber.replace(/[\W_]+/g, ""),
+              bsda.transporterCompanyVatNumber!.replace(/[\W_]+/g, ""),
             ...(bsda.transporterCompanySiret &&
             bsda.transporterCompanyVatNumber === bsda.transporterCompanySiret
               ? {

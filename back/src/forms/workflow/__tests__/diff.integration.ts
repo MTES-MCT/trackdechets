@@ -68,7 +68,7 @@ describe("formDiff", () => {
       temporaryStorageDetail: {
         transporter: {
           company: {
-            name: formUpdateInput.forwardedIn.update.transporterCompanyName
+            name: formUpdateInput.forwardedIn!.update!.transporterCompanyName
           }
         }
       }

@@ -13,7 +13,7 @@ class FormFraction {
 
 class SetAppendix1Args {
   form: Form;
-  appendix1: FormFraction[] | null;
+  appendix1: FormFraction[];
   currentAppendix1Forms: Form[];
 }
 
@@ -90,7 +90,7 @@ export function buildSetAppendix1({
           )
         ),
         wasteDetailsQuantity: newAppendix1Fractions.reduce(
-          (sum, fraction) => sum + fraction.form.wasteDetailsQuantity ?? 0,
+          (sum, fraction) => sum + (fraction.form.wasteDetailsQuantity ?? 0),
           0
         )
       }

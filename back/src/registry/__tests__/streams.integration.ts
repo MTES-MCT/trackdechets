@@ -137,11 +137,11 @@ describe("wastesReader", () => {
     // read forms by chunk of 4
     const reader = wastesReader({
       registryType: "INCOMING",
-      sirets: [destination.company.siret],
+      sirets: [destination.company.siret!],
       chunk: 4
     });
 
-    const incomingWastes = [];
+    const incomingWastes: any[] = [];
 
     reader.on("data", chunk => {
       incomingWastes.push(chunk);

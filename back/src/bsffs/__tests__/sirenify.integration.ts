@@ -27,14 +27,15 @@ describe("sirenifyBsffInput", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 
     const searchResults = {
-      [emitter.company.siret]: searchResult("émetteur"),
-      [transporter.company.siret]: searchResult("transporteur"),
-      [destination.company.siret]: searchResult("destinataire")
+      [emitter.company.siret!]: searchResult("émetteur"),
+      [transporter.company.siret!]: searchResult("transporteur"),
+      [destination.company.siret!]: searchResult("destinataire")
     };
 
     searchCompanySpy.mockImplementation((clue: string) => {
@@ -70,23 +71,23 @@ describe("sirenifyBsffInput", () => {
       auth: AuthType.Bearer
     } as Express.User);
 
-    expect(sirenified.emitter.company.name).toEqual(
-      searchResults[emitter.company.siret].name
+    expect(sirenified.emitter!.company!.name).toEqual(
+      searchResults[emitter.company.siret!].name
     );
-    expect(sirenified.emitter.company.address).toEqual(
-      searchResults[emitter.company.siret].address
+    expect(sirenified.emitter!.company!.address).toEqual(
+      searchResults[emitter.company.siret!].address
     );
-    expect(sirenified.transporter.company.name).toEqual(
-      searchResults[transporter.company.siret].name
+    expect(sirenified.transporter!.company!.name).toEqual(
+      searchResults[transporter.company.siret!].name
     );
-    expect(sirenified.transporter.company.address).toEqual(
-      searchResults[transporter.company.siret].address
+    expect(sirenified.transporter!.company!.address).toEqual(
+      searchResults[transporter.company.siret!].address
     );
-    expect(sirenified.destination.company.name).toEqual(
-      searchResults[destination.company.siret].name
+    expect(sirenified.destination!.company!.name).toEqual(
+      searchResults[destination.company.siret!].name
     );
-    expect(sirenified.destination.company.address).toEqual(
-      searchResults[destination.company.siret].address
+    expect(sirenified.destination!.company!.address).toEqual(
+      searchResults[destination.company.siret!].address
     );
   });
 
@@ -98,14 +99,15 @@ describe("sirenifyBsffInput", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 
     const searchResults = {
-      [emitter.company.siret]: searchResult("émetteur"),
-      [transporter.company.siret]: searchResult("transporteur"),
-      [destination.company.siret]: searchResult("destinataire")
+      [emitter.company.siret!]: searchResult("émetteur"),
+      [transporter.company.siret!]: searchResult("transporteur"),
+      [destination.company.siret!]: searchResult("destinataire")
     };
 
     searchCompanySpy.mockImplementation((clue: string) => {
@@ -135,23 +137,23 @@ describe("sirenifyBsffInput", () => {
       auth: AuthType.Bearer
     } as Express.User);
 
-    expect(sirenified.emitter.company.name).toEqual(
-      searchResults[emitter.company.siret].name
+    expect(sirenified.emitter!.company!.name).toEqual(
+      searchResults[emitter.company.siret!].name
     );
-    expect(sirenified.emitter.company.address).toEqual(
-      searchResults[emitter.company.siret].address
+    expect(sirenified.emitter!.company!.address).toEqual(
+      searchResults[emitter.company.siret!].address
     );
-    expect(sirenified.transporter.company.name).toEqual(
-      searchResults[transporter.company.siret].name
+    expect(sirenified.transporter!.company!.name).toEqual(
+      searchResults[transporter.company.siret!].name
     );
-    expect(sirenified.transporter.company.address).toEqual(
-      searchResults[transporter.company.siret].address
+    expect(sirenified.transporter!.company!.address).toEqual(
+      searchResults[transporter.company.siret!].address
     );
-    expect(sirenified.destination.company.name).toEqual(
-      searchResults[destination.company.siret].name
+    expect(sirenified.destination!.company!.name).toEqual(
+      searchResults[destination.company.siret!].name
     );
-    expect(sirenified.destination.company.address).toEqual(
-      searchResults[destination.company.siret].address
+    expect(sirenified.destination!.company!.address).toEqual(
+      searchResults[destination.company.siret!].address
     );
   });
 });
@@ -165,12 +167,13 @@ describe("sirenifyBsffPackagingInput", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 
     const searchResults = {
-      [nextDestination.company.siret]: searchResult("destination ultérieure")
+      [nextDestination.company.siret!]: searchResult("destination ultérieure")
     };
 
     searchCompanySpy.mockImplementation((clue: string) => {
@@ -197,11 +200,11 @@ describe("sirenifyBsffPackagingInput", () => {
       auth: AuthType.Bearer
     } as Express.User);
 
-    expect(sirenified.operation.nextDestination.company.name).toEqual(
-      searchResults[nextDestination.company.siret].name
+    expect(sirenified.operation!.nextDestination!.company!.name).toEqual(
+      searchResults[nextDestination.company.siret!].name
     );
-    expect(sirenified.operation.nextDestination.company.address).toEqual(
-      searchResults[nextDestination.company.siret].address
+    expect(sirenified.operation!.nextDestination!.company!.address).toEqual(
+      searchResults[nextDestination.company.siret!].address
     );
   });
 
@@ -211,12 +214,13 @@ describe("sirenifyBsffPackagingInput", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 
     const searchResults = {
-      [nextDestination.company.siret]: searchResult("destination ultérieure")
+      [nextDestination.company.siret!]: searchResult("destination ultérieure")
     };
 
     searchCompanySpy.mockImplementation((clue: string) => {
@@ -241,11 +245,11 @@ describe("sirenifyBsffPackagingInput", () => {
       auth: AuthType.Bearer
     } as Express.User);
 
-    expect(sirenified.operation.nextDestination.company.name).toEqual(
-      searchResults[nextDestination.company.siret].name
+    expect(sirenified.operation!.nextDestination!.company!.name).toEqual(
+      searchResults[nextDestination.company.siret!].name
     );
-    expect(sirenified.operation.nextDestination.company.address).toEqual(
-      searchResults[nextDestination.company.siret].address
+    expect(sirenified.operation!.nextDestination!.company!.address).toEqual(
+      searchResults[nextDestination.company.siret!].address
     );
   });
 });
@@ -260,13 +264,14 @@ describe("sirenifyBsffFicheInterventionInput", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 
     const searchResults = {
-      [detenteur.company.siret]: searchResult("détenteur"),
-      [operateur.company.siret]: searchResult("opérateur")
+      [detenteur.company.siret!]: searchResult("détenteur"),
+      [operateur.company.siret!]: searchResult("opérateur")
     };
 
     searchCompanySpy.mockImplementation((clue: string) => {
@@ -301,17 +306,17 @@ describe("sirenifyBsffFicheInterventionInput", () => {
       } as Express.User
     );
 
-    expect(sirenified.detenteur.company.name).toEqual(
-      searchResults[detenteur.company.siret].name
+    expect(sirenified.detenteur.company!.name).toEqual(
+      searchResults[detenteur.company.siret!].name
     );
-    expect(sirenified.detenteur.company.address).toEqual(
-      searchResults[detenteur.company.siret].address
+    expect(sirenified.detenteur.company!.address).toEqual(
+      searchResults[detenteur.company.siret!].address
     );
     expect(sirenified.operateur.company.name).toEqual(
-      searchResults[operateur.company.siret].name
+      searchResults[operateur.company.siret!].name
     );
     expect(sirenified.operateur.company.address).toEqual(
-      searchResults[operateur.company.siret].address
+      searchResults[operateur.company.siret!].address
     );
   });
 
@@ -322,13 +327,14 @@ describe("sirenifyBsffFicheInterventionInput", () => {
     function searchResult(companyName: string) {
       return {
         name: companyName,
-        address: `Adresse ${companyName}`
+        address: `Adresse ${companyName}`,
+        statutDiffusionEtablissement: "O"
       } as CompanySearchResult;
     }
 
     const searchResults = {
-      [detenteur.company.siret]: searchResult("détenteur"),
-      [operateur.company.siret]: searchResult("opérateur")
+      [detenteur.company.siret!]: searchResult("détenteur"),
+      [operateur.company.siret!]: searchResult("opérateur")
     };
 
     searchCompanySpy.mockImplementation((clue: string) => {
@@ -359,17 +365,17 @@ describe("sirenifyBsffFicheInterventionInput", () => {
       } as Express.User
     );
 
-    expect(sirenified.detenteur.company.name).toEqual(
-      searchResults[detenteur.company.siret].name
+    expect(sirenified.detenteur.company!.name).toEqual(
+      searchResults[detenteur.company.siret!].name
     );
-    expect(sirenified.detenteur.company.address).toEqual(
-      searchResults[detenteur.company.siret].address
+    expect(sirenified.detenteur.company!.address).toEqual(
+      searchResults[detenteur.company.siret!].address
     );
     expect(sirenified.operateur.company.name).toEqual(
-      searchResults[operateur.company.siret].name
+      searchResults[operateur.company.siret!].name
     );
     expect(sirenified.operateur.company.address).toEqual(
-      searchResults[operateur.company.siret].address
+      searchResults[operateur.company.siret!].address
     );
   });
 });

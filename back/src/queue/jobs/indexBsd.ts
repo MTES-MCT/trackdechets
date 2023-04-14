@@ -7,11 +7,13 @@ import { BsdElastic, indexBsd } from "../../common/elastic";
 import { indexForm } from "../../forms/elastic";
 import prisma from "../../prisma";
 
-export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
+export async function indexBsdJob(
+  job: Job<string>
+): Promise<BsdElastic | null> {
   const bsdId = job.data;
 
   if (bsdId.startsWith("BSDA-")) {
-    const bsda = await prisma.bsda.findUnique({
+    const bsda = await prisma.bsda.findUniqueOrThrow({
       where: { id: bsdId },
       include: {
         // required for dashboard queries
@@ -27,7 +29,7 @@ export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
     return elasticBsda;
   }
   if (bsdId.startsWith("BSD-") || bsdId.startsWith("TD-")) {
-    const fullForm = await prisma.form.findUnique({
+    const fullForm = await prisma.form.findUniqueOrThrow({
       where: { readableId: bsdId },
       include: {
         forwardedIn: true,
@@ -40,7 +42,7 @@ export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
   }
 
   if (bsdId.startsWith("DASRI-")) {
-    const bsdasri = await prisma.bsdasri.findUnique({
+    const bsdasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: bsdId },
       include: {
         // required for dashboard queries
@@ -56,7 +58,7 @@ export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
   }
 
   if (bsdId.startsWith("VHU-")) {
-    const bsvhu = await prisma.bsvhu.findUnique({
+    const bsvhu = await prisma.bsvhu.findUniqueOrThrow({
       where: { id: bsdId }
     });
 
@@ -67,7 +69,7 @@ export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
   }
 
   if (bsdId.startsWith("FF-")) {
-    const bsff = await prisma.bsff.findUnique({
+    const bsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsdId },
       include: { packagings: true, ficheInterventions: true }
     });

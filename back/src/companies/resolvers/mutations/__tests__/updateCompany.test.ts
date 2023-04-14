@@ -3,7 +3,9 @@ import { MutationUpdateCompanyArgs } from "../../../../generated/graphql/types";
 
 const updateCompanyMock = jest.fn();
 jest.mock("../../../../prisma", () => ({
-  company: { update: jest.fn((...args) => updateCompanyMock(...args)) }
+  company: {
+    update: jest.fn((...args) => updateCompanyMock(...args))
+  }
 }));
 
 describe("updateCompany", () => {
@@ -11,6 +13,8 @@ describe("updateCompany", () => {
     updateCompanyMock.mockReset();
   });
   it("should call prisma.updateCompany with proper data", async () => {
+    updateCompanyMock.mockResolvedValue({});
+
     let payload: MutationUpdateCompanyArgs = {
       id: "85001946400013",
       gerepId: "gerepId"

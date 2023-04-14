@@ -18,9 +18,9 @@ export async function doesUserLoginNeedsCaptcha(
   userEmail: string
 ): Promise<boolean> {
   const key = getUserLoginFailedKey(userEmail);
-  const redisValue = await redisClient.get(key).catch(_ => 0);
+  const redisValue = (await redisClient.get(key).catch(_ => 0)) ?? 0;
   // Captcha is displayed a the N+1th attempt, so we substract 1
-  return redisValue >= FAILED_ATTEMPTS_BEFORE_CAPTCHA - 1;
+  return +redisValue >= FAILED_ATTEMPTS_BEFORE_CAPTCHA - 1;
 }
 
 /**
@@ -52,7 +52,12 @@ export async function setCaptchaToken(
 
 export async function getCaptchaToken(captchaToken: string): Promise<string> {
   const key = getCaptchaTokenKey(captchaToken);
-  return redisClient.get(key).catch(_ => "");
+  try {
+    const token = await redisClient.get(key);
+    return token ?? "";
+  } catch (_) {
+    return "";
+  }
 }
 export async function clearCaptchaToken(captchaToken: string): Promise<void> {
   const key = getCaptchaTokenKey(captchaToken);

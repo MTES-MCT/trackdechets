@@ -19,6 +19,7 @@ import Transport from "./Transport";
 import { Loader } from "common/components";
 import companyStyles from "form/common/components/company/CompanyResult.module.scss";
 import RedErrorMessage from "common/components/RedErrorMessage";
+import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 
 /**
  *
@@ -26,21 +27,10 @@ import RedErrorMessage from "common/components/RedErrorMessage";
  * This is useful to edit these fields for direct takeover, as they're usually hidden as long as the dasri is not SIGNED_BY_TRANPORTER
  */
 export function TransporterShowingTakeOverFields({ status, stepName }) {
-  return (
-    <Transporter
-      status={status}
-      displayTakeoverFields={true}
-      stepName={stepName}
-    />
-  );
+  return <Transporter status={status} stepName={stepName} />;
 }
 
-export default function Transporter({
-  status,
-  displayTakeoverFields = false,
-
-  stepName,
-}) {
+export default function Transporter({ status, stepName }) {
   const { setFieldValue, values } = useFormikContext<Bsdasri>();
   const isSynthesizing = values.type === BsdasriType.Synthesis;
 
@@ -223,6 +213,7 @@ function CurrentCompanyWidget({ disabled = false }) {
     return (
       <div>
         <h4 className="form__section-heading">Entreprise de transport</h4>
+        <TransporterReceipt transporter={values.transporter!} />
         <div
           className={`${companyStyles.resultsItem}  ${companyStyles.isSelected}`}
         >

@@ -1,6 +1,5 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["interactiveTransactions"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -387,6 +386,7 @@ model Form {
   nextDestinationCompanyMail         String?
   nextDestinationCompanyCountry      String?
   nextDestinationCompanyVatNumber    String?
+  nextDestinationNotificationNumber  String?
   emitterWorkSiteName                String?
   emitterWorkSiteAddress             String?
   emitterWorkSiteCity                String?
@@ -560,6 +560,7 @@ model Grant {
   applicationId String
   openIdEnabled Boolean     @default(false)
   scope         String[]    @default([])
+  nonce         String?
   application   Application @relation(fields: [applicationId], references: [id])
   userId        String
   user          User        @relation(fields: [userId], references: [id])
@@ -1238,6 +1239,7 @@ enum BsdaStatus {
   PROCESSED
   REFUSED
   AWAITING_CHILD
+  CANCELED
 }
 
 enum BsdaType {
@@ -1443,6 +1445,8 @@ model BsdaRevisionRequest {
   comment String
 
   status RevisionRequestStatus @default(PENDING)
+
+  isCanceled Boolean @default(false)
 
   @@index([authoringCompanyId], map: "_BsdaRevisionRequestAuthoringCompanyIdIdx")
   @@index([bsdaId], map: "_BsdaRevisionRequestBsdaIdIdx")

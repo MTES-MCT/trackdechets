@@ -99,7 +99,9 @@ export async function checkEditionRules(
   }
 
   const userSirets = user?.id ? await getCachedUserSiretOrVat(user.id) : [];
-  const isEmitter = userSirets.includes(existingBsff.emitterCompanySiret);
+  const isEmitter =
+    existingBsff.emitterCompanySiret &&
+    userSirets.includes(existingBsff.emitterCompanySiret);
 
   if (existingBsff.status === "SIGNED_BY_EMITTER" && isEmitter) {
     return true;
@@ -114,7 +116,7 @@ export async function checkEditionRules(
   // Inner function used to recursively checks that the diff
   // does not contain any fields sealed by signature
   function checkSealedFields(
-    signatureType: BsffSignatureTypeUntilReception,
+    signatureType: BsffSignatureTypeUntilReception | null,
     editableFields: string[]
   ) {
     if (signatureType === null) {
@@ -206,7 +208,7 @@ async function getUpdatedFields(
         }
       : {}),
     ...(input.ficheInterventions
-      ? { ficheInterventions: ficheInterventions.map(p => p.id) }
+      ? { ficheInterventions: ficheInterventions?.map(p => p.id) }
       : {}),
     ...(input.grouping ? { grouping: previousPackagings.map(p => p.id) } : {}),
     ...(input.forwarding

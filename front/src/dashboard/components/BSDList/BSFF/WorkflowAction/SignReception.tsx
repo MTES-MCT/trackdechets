@@ -33,10 +33,10 @@ interface SignReceptionModalProps {
 }
 
 function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
-  const [updateBsff, updateBsffResult] =
-    useMutation<Pick<Mutation, "updateBsff">, MutationUpdateBsffArgs>(
-      UPDATE_BSFF_FORM
-    );
+  const [updateBsff, updateBsffResult] = useMutation<
+    Pick<Mutation, "updateBsff">,
+    MutationUpdateBsffArgs
+  >(UPDATE_BSFF_FORM);
   const [signBsff, signBsffResult] = useMutation<
     Pick<Mutation, "signBsff">,
     MutationSignBsffArgs
@@ -135,11 +135,25 @@ function SignReceptionModal({ bsff, onCancel }: SignReceptionModalProps) {
 
 interface SignReceptionProps {
   bsffId: string;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+  displayActionButton?: boolean;
 }
 
-export function SignReception({ bsffId }: SignReceptionProps) {
+export function SignReception({
+  bsffId,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+  displayActionButton,
+}: SignReceptionProps) {
   return (
-    <SignBsff title="Signer la réception" bsffId={bsffId}>
+    <SignBsff
+      title="Signer la réception"
+      bsffId={bsffId}
+      isModalOpenFromParent={isModalOpenFromParent}
+      onModalCloseFromParent={onModalCloseFromParent}
+      displayActionButton={displayActionButton}
+    >
       {({ bsff, onClose }) => (
         <SignReceptionModal bsff={bsff} onCancel={onClose} />
       )}

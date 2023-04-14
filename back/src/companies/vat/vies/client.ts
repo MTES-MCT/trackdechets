@@ -62,8 +62,8 @@ export const client = async (
   }
 
   const payload = {
-    vatNumber: value.slice(2),
-    countryCode: country.isoCode.short
+    vatNumber: value!.slice(2),
+    countryCode: country!.isoCode.short
   };
 
   const soapClient = await createClientAsync(viesUrl);
@@ -80,15 +80,15 @@ export const client = async (
     }
 
     // auto-correct VIES "unknown data"
-    const address = viesResult.address === "---" ? "" : viesResult.address;
-    const name = viesResult.name === "---" ? "" : viesResult.name;
+    const address = viesResult.address === "---" ? "" : viesResult.address!;
+    const name = viesResult.name === "---" ? "" : viesResult.name!;
 
     return {
       vatNumber: vatNumber,
       address: address,
       name: name,
       // Compat mapping avec SireneSearchResult
-      codePaysEtrangerEtablissement: country.isoCode.short,
+      codePaysEtrangerEtablissement: country!.isoCode.short,
       statutDiffusionEtablissement: "O",
       etatAdministratif: "A"
     };

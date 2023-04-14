@@ -141,21 +141,20 @@ export default function BsdasriStepsList(props: Props) {
     ? formQuery?.data?.bsdasri?.["bsdasriStatus"]
     : "INITIAL";
 
-  const [createDraftBsdasri, { loading: creatingDraft }] =
-    useMutation<
-      Pick<Mutation, "createDraftBsdasri">,
-      MutationCreateDraftBsdasriArgs
-    >(CREATE_DRAFT_BSDASRI);
+  const [createDraftBsdasri, { loading: creatingDraft }] = useMutation<
+    Pick<Mutation, "createDraftBsdasri">,
+    MutationCreateDraftBsdasriArgs
+  >(CREATE_DRAFT_BSDASRI);
 
-  const [createBsdasri, { loading: creating }] =
-    useMutation<Pick<Mutation, "createBsdasri">, MutationCreateBsdasriArgs>(
-      CREATE_BSDASRI
-    );
+  const [createBsdasri, { loading: creating }] = useMutation<
+    Pick<Mutation, "createBsdasri">,
+    MutationCreateBsdasriArgs
+  >(CREATE_BSDASRI);
 
-  const [updateBsdasri, { loading: updating }] =
-    useMutation<Pick<Mutation, "updateBsdasri">, MutationUpdateBsdasriArgs>(
-      UPDATE_BSDASRI
-    );
+  const [updateBsdasri, { loading: updating }] = useMutation<
+    Pick<Mutation, "updateBsdasri">,
+    MutationUpdateBsdasriArgs
+  >(UPDATE_BSDASRI);
 
   function saveForm(
     input: BsdasriInput,

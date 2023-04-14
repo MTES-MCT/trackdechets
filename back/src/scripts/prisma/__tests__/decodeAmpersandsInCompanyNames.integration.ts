@@ -12,10 +12,10 @@ describe("decodeAmpersandsInCompanyNames", () => {
     });
     const company2 = await companyFactory({ name: "TRAITEUER SAS" });
     await decodeAmpersandsInCompanyNames();
-    const updatedCompany1 = await prisma.company.findUnique({
+    const updatedCompany1 = await prisma.company.findUniqueOrThrow({
       where: { id: company1.id }
     });
-    const updatedCompany2 = await prisma.company.findUnique({
+    const updatedCompany2 = await prisma.company.findUniqueOrThrow({
       where: { id: company2.id }
     });
     expect(updatedCompany1.name).toEqual("TRANSPORTS MARCEL & FILS");

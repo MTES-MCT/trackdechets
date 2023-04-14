@@ -49,7 +49,7 @@ describe("searchCompany", () => {
           ]
         }
       }
-    });
+    } as any);
 
     const company = await searchCompany(siret);
     const expected = {
@@ -65,6 +65,94 @@ describe("searchCompany", () => {
       libelleNaf: "Programmation informatique"
     };
     expect(company).toEqual(expected);
+  });
+
+  it("should raise AnonymousCompanyError if partially diffusible", async () => {
+    const siret = siretify(6);
+
+    axiosGet.mockResolvedValueOnce({
+      ...axiosResponseDefault,
+      status: 200,
+      data: {
+        etablissement: {
+          siret,
+          statutDiffusionEtablissement: "P",
+          uniteLegale: {
+            denominationUniteLegale: "CODE EN STOCK",
+            categorieJuridiqueUniteLegale: "",
+            prenom1UniteLegale: "",
+            nomUniteLegale: ""
+          },
+          adresseEtablissement: {
+            numeroVoieEtablissement: "[ND]",
+            indiceRepetitionEtablissement: "[ND]",
+            typeVoieEtablissement: "[ND]",
+            complementAdresseEtablissement: "[ND]",
+            libelleVoieEtablissement: "[ND]",
+            codePostalEtablissement: "[ND]",
+            libelleCommuneEtablissement: "[ND]",
+            codeCommuneEtablissement: "[ND]"
+          },
+          periodesEtablissement: [
+            {
+              etatAdministratifEtablissement: "A",
+              activitePrincipaleEtablissement: "[ND]"
+            }
+          ]
+        }
+      }
+    } as any);
+
+    expect.assertions(1);
+    try {
+      await searchCompany(siret);
+    } catch (e) {
+      expect(e.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
+  });
+
+  it("should raise AnonymousCompanyError if non diffusible", async () => {
+    const siret = siretify(6);
+
+    axiosGet.mockResolvedValueOnce({
+      ...axiosResponseDefault,
+      status: 200,
+      data: {
+        etablissement: {
+          siret,
+          statutDiffusionEtablissement: "N",
+          uniteLegale: {
+            denominationUniteLegale: "CODE EN STOCK",
+            categorieJuridiqueUniteLegale: "",
+            prenom1UniteLegale: "",
+            nomUniteLegale: ""
+          },
+          adresseEtablissement: {
+            numeroVoieEtablissement: "[ND]",
+            indiceRepetitionEtablissement: "[ND]",
+            typeVoieEtablissement: "[ND]",
+            complementAdresseEtablissement: "[ND]",
+            libelleVoieEtablissement: "[ND]",
+            codePostalEtablissement: "[ND]",
+            libelleCommuneEtablissement: "[ND]",
+            codeCommuneEtablissement: "[ND]"
+          },
+          periodesEtablissement: [
+            {
+              etatAdministratifEtablissement: "A",
+              activitePrincipaleEtablissement: "[ND]"
+            }
+          ]
+        }
+      }
+    } as any);
+
+    expect.assertions(1);
+    try {
+      await searchCompany(siret);
+    } catch (e) {
+      expect(e.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
   });
 
   it(`should set name for an individual enterprise
@@ -97,7 +185,7 @@ describe("searchCompany", () => {
           ]
         }
       }
-    });
+    } as any);
     const company = await searchCompany("34393738900041");
     expect(company.name).toEqual("JOHN SNOW");
   });
@@ -169,7 +257,7 @@ describe("searchCompanies", () => {
           }
         ]
       }
-    });
+    } as any);
     const companies = await searchCompanies("code en stock");
     expect(companies).toHaveLength(1);
     const expected = {
@@ -242,7 +330,7 @@ describe("searchCompanies", () => {
           }
         ]
       }
-    });
+    } as any);
 
     const companies = await searchCompanies("boulangerie", "07");
     expect(companies).toHaveLength(1);

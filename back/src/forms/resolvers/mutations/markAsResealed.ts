@@ -19,6 +19,7 @@ import {
 } from "@prisma/client";
 import { getFormRepository } from "../../repository";
 import { sirenifyResealedFormInput } from "../../sirenify";
+import { prismaJsonNoNull } from "../../../common/converter";
 
 const markAsResealed: MutationResolvers["markAsResealed"] = async (
   parent,
@@ -33,7 +34,8 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
 
   const formRepository = getFormRepository(user);
 
-  const { forwardedIn } = await formRepository.findFullFormById(form.id);
+  const { forwardedIn } =
+    (await formRepository.findFullFormById(form.id)) ?? {};
 
   await checkCanMarkAsResealed(user, form);
 
@@ -58,7 +60,9 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
     wasteDetailsPop: form.wasteDetailsPop,
     wasteDetailsQuantityType: QuantityType.REAL,
     wasteDetailsQuantity: form.quantityReceived,
-    wasteDetailsPackagingInfos: form.wasteDetailsPackagingInfos,
+    wasteDetailsPackagingInfos: prismaJsonNoNull(
+      form.wasteDetailsPackagingInfos
+    ),
     wasteDetailsAnalysisReferences: [],
     wasteDetailsLandIdentifiers: [],
     ...flattenFormInput({ transporter, wasteDetails, recipient: destination })

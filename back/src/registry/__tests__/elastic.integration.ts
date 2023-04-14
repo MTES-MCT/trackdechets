@@ -111,7 +111,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
 
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("INCOMING", [destination.company.siret]);
+    const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
   });
 
@@ -133,7 +133,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
 
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("INCOMING", [ttr.company.siret]);
+    const bsds = await searchBsds("INCOMING", [ttr.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
   });
 
@@ -156,8 +156,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
 
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("INCOMING", [destination.company.siret]);
-    expect(bsds.map(bsd => bsd.id)).toEqual([form.forwardedIn.id]);
+    const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
+    expect(bsds.map(bsd => bsd.id)).toEqual([form.forwardedIn!.id]);
   });
 
   it("it should not list a BSDD in destination's incoming wastes before it has been received", async () => {
@@ -175,7 +175,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
 
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("INCOMING", [destination.company.siret]);
+    const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([]);
   });
 
@@ -189,7 +189,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("INCOMING", [destination.company.siret]);
+    const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
   });
   it("should not list a BSDD in destination's incoming wastes before it has been received", async () => {
@@ -202,7 +202,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("INCOMING", [destination.company.siret]);
+    const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
     expect(bsds).toEqual([]);
   });
   it("should list a BSDA in destination's incoming wastes once it has been received", async () => {
@@ -215,7 +215,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsda({ ...bsda, intermediaries: [] });
     await refreshElasticSearch();
-    const bsds = await searchBsds("INCOMING", [destination.company.siret]);
+    const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda.id]);
   });
   it("should not list a BSDA in destination's incoming wastes before it has been received", async () => {
@@ -228,7 +228,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsda({ ...bsda, intermediaries: [] });
     await refreshElasticSearch();
-    const bsds = await searchBsds("INCOMING", [destination.company.siret]);
+    const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
     expect(bsds).toEqual([]);
   });
   it("should list a BSDASRI in destination's incoming wastes once it has been received", async () => {
@@ -241,7 +241,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsdasri(bsdasri);
     await refreshElasticSearch();
-    const bsds = await searchBsds("INCOMING", [destination.company.siret]);
+    const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri.id]);
   });
   it("should not list a BSDASRI in destination's incoming wastes before it has been received", async () => {
@@ -253,7 +253,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsdasri(bsdasri);
     await refreshElasticSearch();
-    const bsds = await searchBsds("INCOMING", [destination.company.siret]);
+    const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
     expect(bsds).toEqual([]);
   });
   it("should list a BSVHU in destination's incoming wastes once it has been received", async () => {
@@ -266,7 +266,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsvhu(bsvhu);
     await refreshElasticSearch();
-    const bsds = await searchBsds("INCOMING", [destination.company.siret]);
+    const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
   });
   it("should not list a BSVHU in destination's incoming wastes before it has been received", async () => {
@@ -278,7 +278,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsvhu(bsvhu);
     await refreshElasticSearch();
-    const bsds = await searchBsds("INCOMING", [destination.company.siret]);
+    const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
     expect(bsds).toEqual([]);
   });
   it("should list a BSFF in destination's incoming wastes once it has been received", async () => {
@@ -289,7 +289,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsff(bsff);
     await refreshElasticSearch();
-    const bsds = await searchBsds("INCOMING", [destination.company.siret]);
+    const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsff.id]);
   });
   it("should not list a BSFF in destination's incoming wastes before it has been received", async () => {
@@ -300,7 +300,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsff(bsff);
     await refreshElasticSearch();
-    const bsds = await searchBsds("INCOMING", [destination.company.siret]);
+    const bsds = await searchBsds("INCOMING", [destination.company.siret!]);
     expect(bsds).toEqual([]);
   });
 
@@ -316,7 +316,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("OUTGOING", [emitter.company.siret]);
+    const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
   });
   it("should not list a BSDD in emitter's outgoing wastes before it has been sent", async () => {
@@ -329,7 +329,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("OUTGOING", [emitter.company.siret]);
+    const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
     expect(bsds).toEqual([]);
   });
   it("should list a BSDD in ttr's outgoing wastes once it has been sent after temporary storage", async () => {
@@ -353,8 +353,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
 
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("OUTGOING", [ttr.company.siret]);
-    expect(bsds.map(bsd => bsd.id)).toEqual([form.forwardedIn.id]);
+    const bsds = await searchBsds("OUTGOING", [ttr.company.siret!]);
+    expect(bsds.map(bsd => bsd.id)).toEqual([form.forwardedIn!.id]);
   });
   it("should list a BSDA in emitter's outgoing wastes once it has been sent", async () => {
     const bsda = await bsdaFactory({
@@ -366,7 +366,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsda({ ...bsda, intermediaries: [] });
     await refreshElasticSearch();
-    const bsds = await searchBsds("OUTGOING", [emitter.company.siret]);
+    const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda.id]);
   });
   it("should not list a BSDA in emitter's outgoing wastes before it has been sent", async () => {
@@ -379,7 +379,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsda({ ...bsda, intermediaries: [] });
     await refreshElasticSearch();
-    const bsds = await searchBsds("OUTGOING", [emitter.company.siret]);
+    const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
     expect(bsds).toEqual([]);
   });
   it("should list a BSDA in worker's outgoing wastes once it has been sent", async () => {
@@ -392,7 +392,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsda({ ...bsda, intermediaries: [] });
     await refreshElasticSearch();
-    const bsds = await searchBsds("OUTGOING", [worker.company.siret]);
+    const bsds = await searchBsds("OUTGOING", [worker.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda.id]);
   });
   it("should not list a BSDA in worker's outgoing wastes before it has been sent", async () => {
@@ -405,7 +405,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsda({ ...bsda, intermediaries: [] });
     await refreshElasticSearch();
-    const bsds = await searchBsds("OUTGOING", [worker.company.siret]);
+    const bsds = await searchBsds("OUTGOING", [worker.company.siret!]);
     expect(bsds).toEqual([]);
   });
   it("should list a BSDASRI in emitter's outgoing wastes once it has been sent", async () => {
@@ -418,7 +418,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsdasri(bsdasri);
     await refreshElasticSearch();
-    const bsds = await searchBsds("OUTGOING", [emitter.company.siret]);
+    const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri.id]);
   });
   it("should not list a BSDASRI in emitter's outgoing wastes before it has been sent", async () => {
@@ -431,7 +431,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsdasri(bsdasri);
     await refreshElasticSearch();
-    const bsds = await searchBsds("OUTGOING", [emitter.company.siret]);
+    const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
     expect(bsds).toEqual([]);
   });
   it("should list a BSVHU in emitter's outgoing wastes once it has been sent", async () => {
@@ -444,7 +444,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsvhu(bsvhu);
     await refreshElasticSearch();
-    const bsds = await searchBsds("OUTGOING", [emitter.company.siret]);
+    const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
   });
   it("should not list a BSVHU in emitter's outgoing wastes before it has been sent", async () => {
@@ -457,7 +457,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsvhu(bsvhu);
     await refreshElasticSearch();
-    const bsds = await searchBsds("OUTGOING", [emitter.company.siret]);
+    const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
     expect(bsds).toEqual([]);
   });
   it("should list a BSFF in emitter's outgoing wastes once it has been sent", async () => {
@@ -468,7 +468,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsff(bsff);
     await refreshElasticSearch();
-    const bsds = await searchBsds("OUTGOING", [emitter.company.siret]);
+    const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsff.id]);
   });
 
@@ -485,14 +485,14 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
         destination
       },
       {
-        detenteurCompanySirets: [detenteur.company.siret],
+        detenteurCompanySirets: [detenteur.company.siret!],
         ficheInterventions: { connect: { id: ficheIntervention.id } }
       }
     );
 
     await indexBsff(bsff);
     await refreshElasticSearch();
-    const bsds = await searchBsds("OUTGOING", [detenteur.company.siret]);
+    const bsds = await searchBsds("OUTGOING", [detenteur.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsff.id]);
   });
 
@@ -504,7 +504,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsff(bsff);
     await refreshElasticSearch();
-    const bsds = await searchBsds("OUTGOING", [emitter.company.siret]);
+    const bsds = await searchBsds("OUTGOING", [emitter.company.siret!]);
     expect(bsds).toEqual([]);
   });
 
@@ -520,7 +520,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret]);
+    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
   });
   it("should not list a BSDD in transporter' transported wastes before it has been taken over", async () => {
@@ -533,7 +533,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret]);
+    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret!]);
     expect(bsds).toEqual([]);
   });
   it("should list a BSDD in transporter's transported wastes once it has been resent after temp storage", async () => {
@@ -555,8 +555,8 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
 
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("TRANSPORTED", [transporter2.company.siret]);
-    expect(bsds.map(bsd => bsd.id)).toEqual([form.forwardedIn.id]);
+    const bsds = await searchBsds("TRANSPORTED", [transporter2.company.siret!]);
+    expect(bsds.map(bsd => bsd.id)).toEqual([form.forwardedIn!.id]);
   });
   it("should list a BSDA in transporter's transported wastes once it has been taken over", async () => {
     const bsda = await bsdaFactory({
@@ -568,7 +568,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsda({ ...bsda, intermediaries: [] });
     await refreshElasticSearch();
-    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret]);
+    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda.id]);
   });
   it("should not list a BSDA in transporter'transported wastes before it has been taken over", async () => {
@@ -581,7 +581,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsda({ ...bsda, intermediaries: [] });
     await refreshElasticSearch();
-    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret]);
+    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret!]);
     expect(bsds).toEqual([]);
   });
   it("should list a BSDASRI in transporter's transported wastes once it has been taken over", async () => {
@@ -594,7 +594,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsdasri(bsdasri);
     await refreshElasticSearch();
-    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret]);
+    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri.id]);
   });
   it("should not list a BSDASRI in transporter'transported wastes before it has been taken over", async () => {
@@ -607,7 +607,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsdasri(bsdasri);
     await refreshElasticSearch();
-    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret]);
+    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret!]);
     expect(bsds).toEqual([]);
   });
   it("should list a BSVHU in transporter's transported wastes once it has been taken over", async () => {
@@ -620,7 +620,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsvhu(bsvhu);
     await refreshElasticSearch();
-    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret]);
+    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
   });
   it("should not list a BSVHU in transporter'transported wastes before it has been delivered", async () => {
@@ -633,7 +633,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsvhu(bsvhu);
     await refreshElasticSearch();
-    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret]);
+    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret!]);
     expect(bsds).toEqual([]);
   });
   it("should list a BSFF in transporter's transported wastes once it has been taken over", async () => {
@@ -644,7 +644,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsff(bsff);
     await refreshElasticSearch();
-    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret]);
+    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsff.id]);
   });
   it("should not list a BSFF in transporter'transported wastes before it has been taken over", async () => {
@@ -655,7 +655,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsff(bsff);
     await refreshElasticSearch();
-    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret]);
+    const bsds = await searchBsds("TRANSPORTED", [transporter.company.siret!]);
     expect(bsds).toEqual([]);
   });
 
@@ -670,7 +670,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("MANAGED", [trader.company.siret]);
+    const bsds = await searchBsds("MANAGED", [trader.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
   });
   it("should list a BSDD in broker's managed wastes after it has been sent", async () => {
@@ -683,7 +683,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("MANAGED", [broker.company.siret]);
+    const bsds = await searchBsds("MANAGED", [broker.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
   });
   it("should not list a BSDD in trader's managed wastes before it has been sent", async () => {
@@ -696,7 +696,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("MANAGED", [trader.company.siret]);
+    const bsds = await searchBsds("MANAGED", [trader.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([]);
   });
   it("should not list a BSDD in broker's managed wastes before it has been sent", async () => {
@@ -709,7 +709,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("MANAGED", [broker.company.siret]);
+    const bsds = await searchBsds("MANAGED", [broker.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([]);
   });
   it("should list a BSDA in broker's managed wastes after it has been sent", async () => {
@@ -722,7 +722,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsda({ ...bsda, intermediaries: [] });
     await refreshElasticSearch();
-    const bsds = await searchBsds("MANAGED", [broker.company.siret]);
+    const bsds = await searchBsds("MANAGED", [broker.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda.id]);
   });
   it("should not list a BSDA in broker's managed wastes before it has been sent", async () => {
@@ -735,7 +735,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsda({ ...bsda, intermediaries: [] });
     await refreshElasticSearch();
-    const bsds = await searchBsds("MANAGED", [broker.company.siret]);
+    const bsds = await searchBsds("MANAGED", [broker.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([]);
   });
   // REGISTRE EXHAUSTIF
@@ -749,7 +749,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [emitter.company.siret]);
+    const bsds = await searchBsds("ALL", [emitter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
   });
   it("should list a BSDD in transporter's all wastes", async () => {
@@ -762,7 +762,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [transporter.company.siret]);
+    const bsds = await searchBsds("ALL", [transporter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
   });
   it("should list a BSDD in destination's all wastes", async () => {
@@ -776,7 +776,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [destination.company.siret]);
+    const bsds = await searchBsds("ALL", [destination.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
   });
   it("should list a BSDD in trader's all wastes", async () => {
@@ -789,7 +789,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [trader.company.siret]);
+    const bsds = await searchBsds("ALL", [trader.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
   });
   it("should list a BSDD in broker's all wastes", async () => {
@@ -801,7 +801,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [broker.company.siret]);
+    const bsds = await searchBsds("ALL", [broker.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
   });
   it("should list a BSDD in ttr's all wastes", async () => {
@@ -816,7 +816,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
 
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [ttr.company.siret]);
+    const bsds = await searchBsds("ALL", [ttr.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([form.id]);
   });
   it("should list a BSDD in transporter after temp storage 's all wastes", async () => {
@@ -830,10 +830,10 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
 
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [transporter.company.siret]);
+    const bsds = await searchBsds("ALL", [transporter.company.siret!]);
     const ids = bsds.map(bsd => bsd.id);
     expect(ids).toContain(form.id);
-    expect(ids).toContain(form.forwardedIn.id);
+    expect(ids).toContain(form.forwardedIn!.id);
   });
   it("should list a BSDD in final destination's all wastes", async () => {
     const form = await formWithTempStorageFactory({
@@ -846,10 +846,10 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
 
     await indexForm(await getFullForm(form));
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [destination.company.siret]);
+    const bsds = await searchBsds("ALL", [destination.company.siret!]);
     const ids = bsds.map(bsd => bsd.id);
     expect(ids).toContain(form.id);
-    expect(ids).toContain(form.forwardedIn.id);
+    expect(ids).toContain(form.forwardedIn!.id);
   });
   it("should list a BSDA in emitter's all wastes", async () => {
     const bsda = await bsdaFactory({
@@ -861,7 +861,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsda({ ...bsda, intermediaries: [] });
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [emitter.company.siret]);
+    const bsds = await searchBsds("ALL", [emitter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda.id]);
   });
   it("should list a BSDA in transporter's all wastes", async () => {
@@ -874,7 +874,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsda({ ...bsda, intermediaries: [] });
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [transporter.company.siret]);
+    const bsds = await searchBsds("ALL", [transporter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda.id]);
   });
   it("should list a BSDA in destination's all wastes", async () => {
@@ -888,7 +888,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsda({ ...bsda, intermediaries: [] });
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [destination.company.siret]);
+    const bsds = await searchBsds("ALL", [destination.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda.id]);
   });
   it("should list a BSDA in broker's all wastes", async () => {
@@ -901,7 +901,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsda({ ...bsda, intermediaries: [] });
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [broker.company.siret]);
+    const bsds = await searchBsds("ALL", [broker.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsda.id]);
   });
   it("should list a BSDASRI in emitter's all wastes", async () => {
@@ -914,7 +914,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsdasri(bsdasri);
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [emitter.company.siret]);
+    const bsds = await searchBsds("ALL", [emitter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri.id]);
   });
   it("should list a BSDASRI in transporter's all wastes", async () => {
@@ -927,7 +927,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsdasri(bsdasri);
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [transporter.company.siret]);
+    const bsds = await searchBsds("ALL", [transporter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri.id]);
   });
   it("should list a BSDASRI in destination's all wastes", async () => {
@@ -941,7 +941,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsdasri(bsdasri);
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [destination.company.siret]);
+    const bsds = await searchBsds("ALL", [destination.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsdasri.id]);
   });
   it("should list a BSVHU in emitter's all wastes", async () => {
@@ -954,7 +954,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsvhu(bsvhu);
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [emitter.company.siret]);
+    const bsds = await searchBsds("ALL", [emitter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
   });
   it("should list a BSVHU in transporter's all wastes", async () => {
@@ -967,7 +967,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsvhu(bsvhu);
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [transporter.company.siret]);
+    const bsds = await searchBsds("ALL", [transporter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
   });
   it("should list a BSVHU in destination's all wastes", async () => {
@@ -981,7 +981,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     });
     await indexBsvhu(bsvhu);
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [destination.company.siret]);
+    const bsds = await searchBsds("ALL", [destination.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsvhu.id]);
   });
   it("should list a BSFF in emitter's all wastes", async () => {
@@ -998,7 +998,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     );
     await indexBsff(bsff);
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [emitter.company.siret]);
+    const bsds = await searchBsds("ALL", [emitter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsff.id]);
   });
   it("should list a BSFF in transporter's all wastes", async () => {
@@ -1015,7 +1015,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     );
     await indexBsff(bsff);
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [transporter.company.siret]);
+    const bsds = await searchBsds("ALL", [transporter.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsff.id]);
   });
   it("should list a BSFF in destination's all wastes", async () => {
@@ -1033,7 +1033,7 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     );
     await indexBsff(bsff);
     await refreshElasticSearch();
-    const bsds = await searchBsds("ALL", [destination.company.siret]);
+    const bsds = await searchBsds("ALL", [destination.company.siret!]);
     expect(bsds.map(bsd => bsd.id)).toEqual([bsff.id]);
   });
 });

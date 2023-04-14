@@ -19,6 +19,7 @@ export const machine = createMachine<Record<string, never>, Event>(
     id: "bsda-workflow",
     initial: BsdaStatus.INITIAL,
     states: {
+      [BsdaStatus.CANCELED]: { type: "final" },
       [BsdaStatus.INITIAL]: {
         on: {
           EMISSION: {
@@ -90,21 +91,27 @@ export const machine = createMachine<Record<string, never>, Event>(
         event.bsda?.destinationReceptionAcceptationStatus ===
         BsdaStatus.REFUSED,
       canSkipEmissionSignature: (_, event) =>
-        event.bsda?.workerWorkHasEmitterPaperSignature ||
-        event.bsda?.emitterIsPrivateIndividual,
+        Boolean(
+          event.bsda?.workerWorkHasEmitterPaperSignature ||
+            event.bsda?.emitterIsPrivateIndividual
+        ),
       isCollectedBy2710: (_, event) =>
         event.bsda?.type === BsdaType.COLLECTION_2710,
       isCollectedBy2710AndGroupingOrReshipmentOperation: (_, event) =>
         event.bsda?.type === BsdaType.COLLECTION_2710 &&
-        PARTIAL_OPERATIONS.includes(event.bsda?.destinationOperationCode),
+        !!event.bsda?.destinationOperationCode &&
+        PARTIAL_OPERATIONS.includes(event.bsda.destinationOperationCode),
       isGroupingOrReshipmentOperation: (_, event) =>
+        !!event.bsda?.destinationOperationCode &&
         PARTIAL_OPERATIONS.includes(event.bsda?.destinationOperationCode),
       isGroupingOrForwardingOrWithNoWorkerBsda: (_, event) =>
         event.bsda?.type === BsdaType.GATHERING ||
         event.bsda?.type === BsdaType.RESHIPMENT ||
-        event.bsda?.workerIsDisabled,
+        Boolean(event.bsda?.workerIsDisabled),
       isPrivateIndividualWithNoWorkerBsda: (_, event) =>
-        event.bsda?.emitterIsPrivateIndividual && event.bsda?.workerIsDisabled
+        Boolean(
+          event.bsda?.emitterIsPrivateIndividual && event.bsda?.workerIsDisabled
+        )
     }
   }
 );

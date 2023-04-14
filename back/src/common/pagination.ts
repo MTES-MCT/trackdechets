@@ -6,17 +6,17 @@ const DEFAULT_PAGINATE_BY = 50;
 const MAX_PAGINATE_BY = 500;
 
 export type GraphqlPaginationArgs = {
-  skip?: number;
-  first?: number;
-  after?: string;
-  last?: number;
-  before?: string;
+  skip?: number | null;
+  first?: number | null;
+  after?: string | null;
+  last?: number | null;
+  before?: string | null;
 };
 
 // https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination
 export type PrismaPaginationArgs = {
   skip?: number;
-  take?: number;
+  take: number;
   cursor?: { id: string };
 };
 
@@ -143,7 +143,7 @@ export function getPrismaPaginationArgs(
     ...(after ? { cursor: { id: after }, skip: 1 } : {}),
     ...(last ? { take: -last } : {}),
     ...(before ? { cursor: { id: before }, skip: 1 } : {})
-  };
+  } as PrismaPaginationArgs;
 }
 
 export function validateGqlPaginationArgs({
@@ -157,7 +157,7 @@ export function validateGqlPaginationArgs({
   // validate number formats
   getValidationSchema(maxPaginateBy).validateSync({ first, last });
 
-  if (first & last) {
+  if (first && last) {
     throw new UserInputError(
       "L'utilisation simultanée de `first` et `last` n'est pas supportée"
     );

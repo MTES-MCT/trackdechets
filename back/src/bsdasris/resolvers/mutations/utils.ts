@@ -7,14 +7,14 @@ import { CompanyInput } from "../../../generated/graphql/types";
 
 export const getEligibleDasrisForSynthesis = async (
   synthesizingIds: string[],
-  bsdasri: Bsdasri,
+  bsdasri: Bsdasri | null,
   company?: CompanyInput
 ): Promise<Bsdasri[]> => {
   if (!synthesizingIds) {
-    return;
+    return [];
   }
   if (!synthesizingIds.length) {
-    return;
+    return [];
   }
 
   const bsdasriReadonlyRepository = getReadonlyBsdasriRepository();
@@ -36,12 +36,12 @@ export const getEligibleDasrisForSynthesis = async (
       {
         transporterCompanySiret: bsdasri
           ? bsdasri.transporterCompanySiret
-          : company.siret
+          : company?.siret
       },
       {
         transporterCompanyVatNumber: bsdasri
           ? bsdasri.transporterCompanyVatNumber
-          : company.vatNumber
+          : company?.vatNumber
       }
     ]
   });
@@ -65,8 +65,13 @@ export const getEligibleDasrisForSynthesis = async (
 
 export const checkDasrisAreGroupable = async (
   groupingIds: string[],
-  emitterSiret: string
+  emitterSiret: string | null | undefined
 ) => {
+  if (!emitterSiret) {
+    throw new UserInputError(
+      `Impossible de créer un bordereau de groupement sans préciser l'émetteur.`
+    );
+  }
   if (!groupingIds) {
     return;
   }
@@ -106,7 +111,14 @@ export const checkDasrisAreGroupable = async (
   }
 };
 
-export const emitterIsAllowedToGroup = async (emitterSiret: string) => {
+export const emitterIsAllowedToGroup = async (
+  emitterSiret: string | null | undefined
+) => {
+  if (!emitterSiret) {
+    throw new UserInputError(
+      `Aucun siret émetteur, impossible de créer un bordereau de regroupement`
+    );
+  }
   const emitterCompany = await prisma.company.findUnique({
     where: { siret: emitterSiret }
   });

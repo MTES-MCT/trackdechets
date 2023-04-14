@@ -98,6 +98,7 @@ export async function checkCanDelete(user: User, bsff: Bsff) {
 
   const isUserOnlySignatory = async () =>
     bsff.status === BsffStatus.SIGNED_BY_EMITTER &&
+    bsff.emitterCompanySiret &&
     (await getCachedUserSiretOrVat(user.id)).includes(bsff.emitterCompanySiret);
 
   if (bsff.status === BsffStatus.INITIAL || (await isUserOnlySignatory())) {

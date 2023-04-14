@@ -75,7 +75,7 @@ describe("query authorizedApplications", () => {
       expect.objectContaining({ id: application2.id, name: application2.name })
     ]);
     expect(data.authorizedApplications[0].lastConnection).toEqual(
-      accessToken2.lastUsed.toISOString()
+      accessToken2!.lastUsed!.toISOString()
     );
   });
 });

@@ -19,7 +19,7 @@ const ASSOCIATIONS = [
 
 jest.mock("../../prisma", () => ({
   company: {
-    findUnique: jest.fn(() => ({
+    findUniqueOrThrow: jest.fn(() => ({
       companyAssociations: () => Promise.resolve(ASSOCIATIONS)
     }))
   }

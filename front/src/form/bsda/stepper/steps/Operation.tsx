@@ -6,7 +6,11 @@ import { Field, useFormikContext } from "formik";
 import { Bsda } from "generated/graphql/types";
 import React, { useEffect } from "react";
 
-export default function Operation() {
+type Props = {
+  bsda: Bsda;
+};
+
+export default function Operation({ bsda }: Props) {
   const { values, setFieldValue } = useFormikContext<Bsda>();
 
   useEffect(() => {
@@ -91,9 +95,11 @@ export default function Operation() {
 
             <RedErrorMessage name="destination.reception.weight" />
           </div>
-          <p className="tw-text-sm">
-            <em>Quantité prévue: {values.weight?.value} tonnes</em>
-          </p>
+          {bsda.weight?.value && (
+            <p className="tw-text-sm">
+              <em>Quantité prévue: {bsda.weight?.value} tonnes</em>
+            </p>
+          )}
 
           <h4 className="form__section-heading">Opération</h4>
           <div className="form__row">

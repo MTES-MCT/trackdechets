@@ -17,6 +17,7 @@ const bsdaVerboseStatuses: Record<BsdaStatus, string> = {
   PROCESSED: "Traité",
   REFUSED: "Refusé",
   AWAITING_CHILD: "En attente d'un BSDA suite",
+  CANCELED: "Annulé",
 };
 
 export const COLUMNS: Record<

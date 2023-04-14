@@ -67,7 +67,7 @@ describe("associateUserToCompany", () => {
     const company = await companyFactory();
 
     await associateUserToCompany(user.id, company.siret, "MEMBER");
-    const refreshedUser = await prisma.user.findUnique({
+    const refreshedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }
     });
     const fullUser = await getFullUser(refreshedUser);

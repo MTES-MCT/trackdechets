@@ -59,7 +59,7 @@ const workflow: Workflow = {
         "Cette étape peut être répétée autant de fois que l'on veut pour renseigner N fiches d'intervention"
     },
     {
-      ...createBsff("operateur", fixtures),
+      ...createBsff("operateur", fixtures as any),
       description: `L'opérateur crée un BSFF en liant les fiches d'intervention par leur identifiant Trackdéchets`
     },
     signEmission("operateur"),

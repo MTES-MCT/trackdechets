@@ -96,6 +96,7 @@ const reviewFragment = gql`
           description
         }
       }
+      isCanceled
     }
     status
     comment

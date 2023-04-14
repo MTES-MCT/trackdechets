@@ -1,4 +1,4 @@
-import { Mail, Contact } from "../types";
+import { Mail, Contact, Recipient } from "../types";
 import axios from "axios";
 import * as Sentry from "@sentry/node";
 import logger from "../../logging/logger";
@@ -19,7 +19,7 @@ const SIB_CONTACT_URL = `${SIB_BASE_URL}/contacts`;
 export const MESSAGE_VERSIONS_BULK_LIMIT = 950;
 
 const headers = {
-  "api-key": SIB_APIKEY,
+  "api-key": SIB_APIKEY!,
   "Content-Type": "application/json"
 };
 const sendInBlueBackend = {
@@ -72,7 +72,7 @@ const sendInBlueBackend = {
     });
     return req
       .then(() => {
-        const allRecipients = [];
+        const allRecipients: Recipient[] = [];
 
         if (mail.to) {
           allRecipients.push(...mail.to);
@@ -99,7 +99,7 @@ const sendInBlueBackend = {
           Sentry.captureException(err, {
             tags: {
               Mailer: "SendInBlue",
-              Recipients: mail.to.map(el => el.email).join(" ")
+              Recipients: mail.to?.map(el => el.email).join(" ")
             }
           });
         } else {

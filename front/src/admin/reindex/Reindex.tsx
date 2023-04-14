@@ -11,10 +11,10 @@ const REINDEX_BSD = gql`
   }
 `;
 function Reindex() {
-  const [reindexBsd, { loading, error }] =
-    useMutation<Pick<Mutation, "reindexBsd">, MutationReindexBsdArgs>(
-      REINDEX_BSD
-    );
+  const [reindexBsd, { loading, error }] = useMutation<
+    Pick<Mutation, "reindexBsd">,
+    MutationReindexBsdArgs
+  >(REINDEX_BSD);
 
   return (
     <div className="tw-mx-2">

@@ -355,7 +355,7 @@ input PrivateCompanyInput {
 }
 
 input CompanyForVerificationWhere {
-  verificationStatus: CompanyVerificationStatus
+  verificationStatus: CompanyVerificationStatus!
 }
 
 input VerifyCompanyByAdminInput {

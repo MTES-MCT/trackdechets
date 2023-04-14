@@ -60,8 +60,8 @@ const formsResolver: QueryResolvers["forms"] = async (_, args, context) => {
       ...(rest.customId && { customId: rest.customId }),
       ...(status?.length && { status: { in: status } }),
       AND: [
-        getFormsRightFilter(company.siret, roles),
-        getHasNextStepFilter(company.siret, hasNextStep),
+        getFormsRightFilter(company.orgId, roles),
+        getHasNextStepFilter(company.orgId, hasNextStep),
         ...(rest.siretPresentOnForm
           ? [getFormsRightFilter(rest.siretPresentOnForm, [])]
           : [])

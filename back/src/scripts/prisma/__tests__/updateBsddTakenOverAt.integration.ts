@@ -49,19 +49,19 @@ describe("updateBsddTakenOverAt", () => {
     });
     expect(count).toEqual(1);
 
-    const updatedForm1 = await prisma.form.findUnique({
+    const updatedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: form1.id }
     });
 
     expect(updatedForm1.takenOverAt).toEqual(updatedForm1.emittedAt);
 
-    const updatedForm2 = await prisma.form.findUnique({
+    const updatedForm2 = await prisma.form.findUniqueOrThrow({
       where: { id: form2.id }
     });
 
     expect(updatedForm2.takenOverAt).not.toEqual(updatedForm2.emittedAt);
 
-    const updatedForm3 = await prisma.form.findUnique({
+    const updatedForm3 = await prisma.form.findUniqueOrThrow({
       where: { id: form3.id }
     });
 

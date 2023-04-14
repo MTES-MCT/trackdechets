@@ -76,8 +76,8 @@ describe("Query.Bsdasris", () => {
 
     expect(data.bsdasris.totalCount).toEqual(1);
     const synthesizing = data.bsdasris.edges[0].node.synthesizing;
-    expect(synthesizing.length).toEqual(1);
-    expect(synthesizing[0].id).toEqual(initialDasri.id);
+    expect(synthesizing!.length).toEqual(1);
+    expect(synthesizing![0].id).toEqual(initialDasri.id);
   });
 
   it("should retrieve associated dasris", async () => {

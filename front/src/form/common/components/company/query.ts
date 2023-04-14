@@ -45,56 +45,15 @@ export const FAVORITES = gql`
   }
 `;
 
-/**
- * TODO Clean up query, barely used anymore
- */
-export const COMPANY_INFOS = gql`
-  query CompanyInfos($siret: String!, $clue: String) {
-    companyInfos(siret: $siret, clue: $clue) {
+export const COMPANY_INFOS_REGISTRATION = gql`
+  query CompanyInfos($siret: String!) {
+    companyInfos(siret: $siret) {
       orgId
       siret
       vatNumber
       name
-      naf
-      libelleNaf
-      address
-      etatAdministratif
-      statutDiffusionEtablissement
       isRegistered
       companyTypes
-      codePaysEtrangerEtablissement
-      contactPhone
-      contactEmail
-      installation {
-        codeS3ic
-        urlFiche
-        rubriques {
-          rubrique
-          category
-        }
-      }
-      transporterReceipt {
-        receiptNumber
-        validityLimit
-        department
-      }
-      traderReceipt {
-        receiptNumber
-        validityLimit
-        department
-      }
-      brokerReceipt {
-        receiptNumber
-        validityLimit
-        department
-      }
-      workerCertification {
-        hasSubSectionFour
-        hasSubSectionThree
-        certificationNumber
-        validityLimit
-        organisation
-      }
     }
   }
 `;
@@ -152,7 +111,10 @@ export const SEARCH_COMPANIES = gql`
   }
 `;
 
-export const COMPANY_PRIVATE_INFOS = gql`
+/**
+ * Used for Account company validation
+ */
+export const COMPANY_ACCOUNT_ADD_PRIVATE_INFOS = gql`
   query CompanyPrivateInfos($clue: String!) {
     companyPrivateInfos(clue: $clue) {
       orgId
@@ -220,6 +182,11 @@ export const COMPANY_SELECTOR_PRIVATE_INFOS = gql`
       isAnonymousCompany
       companyTypes
       codePaysEtrangerEtablissement
+      transporterReceipt {
+        receiptNumber
+        validityLimit
+        department
+      }
     }
   }
 `;

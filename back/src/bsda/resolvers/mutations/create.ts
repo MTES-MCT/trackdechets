@@ -45,7 +45,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
   );
 
   const isForwarding = Boolean(input.forwarding);
-  const isGrouping = input.grouping?.length > 0;
+  const isGrouping = input.grouping && input.grouping.length > 0;
 
   if ([isForwarding, isGrouping].filter(b => b).length > 1) {
     throw new UserInputError(
@@ -68,17 +68,18 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
 
   const bsdaRepository = getBsdaRepository(user);
   const forwardedBsda = isForwarding
-    ? await getBsdaOrNotFound(input.forwarding)
+    ? await getBsdaOrNotFound(input.forwarding!)
     : null;
   const groupedBsdas = isGrouping
-    ? await bsdaRepository.findMany({ id: { in: input.grouping } })
+    ? await bsdaRepository.findMany({ id: { in: input.grouping! } })
     : [];
 
   const previousBsdas = [
     ...(isForwarding ? [forwardedBsda] : []),
     ...(isGrouping ? groupedBsdas : [])
-  ];
-  const hasIntermediaries = input.intermediaries?.length > 0;
+  ].filter(Boolean);
+  const hasIntermediaries =
+    input.intermediaries && input.intermediaries.length > 0;
 
   await validateBsda(
     bsda,
@@ -93,18 +94,21 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     id: getReadableId(ReadableIdPrefix.BSDA),
     isDraft,
     ...(isForwarding && {
-      forwarding: { connect: { id: input.forwarding } }
+      forwarding: { connect: { id: input.forwarding! } }
     }),
     ...(isGrouping && {
       grouping: { connect: groupedBsdas.map(({ id }) => ({ id })) }
     }),
     ...(hasIntermediaries && {
-      intermediariesOrgIds: input.intermediaries
-        .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
+      intermediariesOrgIds: input
+        .intermediaries!.flatMap(intermediary => [
+          intermediary.siret,
+          intermediary.vatNumber
+        ])
         .filter(Boolean),
       intermediaries: {
         createMany: {
-          data: companyToIntermediaryInput(input.intermediaries)
+          data: companyToIntermediaryInput(input.intermediaries!)
         }
       }
     })

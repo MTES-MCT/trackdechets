@@ -30,11 +30,10 @@ const RESET_PASSWORD = gql`
 export default function PasswordResetRequest() {
   const [email, setEmail] = useState("");
   const [captchaInput, setCaptchaInput] = useState("");
-  const [createPasswordResetRequest, { data, error }] =
-    useMutation<
-      Pick<Mutation, "createPasswordResetRequest">,
-      MutationCreatePasswordResetRequestArgs
-    >(RESET_PASSWORD);
+  const [createPasswordResetRequest, { data, error }] = useMutation<
+    Pick<Mutation, "createPasswordResetRequest">,
+    MutationCreatePasswordResetRequestArgs
+  >(RESET_PASSWORD);
   const { captchaLoading, captchaError, captchaData, refetchCaptcha } =
     useCaptcha(true);
 

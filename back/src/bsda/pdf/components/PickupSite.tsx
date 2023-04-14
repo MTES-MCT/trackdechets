@@ -2,7 +2,7 @@ import * as React from "react";
 import { BsdaPickupSite } from "../../../generated/graphql/types";
 
 type Props = {
-  pickupSite?: BsdaPickupSite;
+  pickupSite?: BsdaPickupSite | null;
 };
 
 export function PickupSite({ pickupSite }: Props) {

@@ -31,10 +31,10 @@ const accessors = (input: BsdaInput) => [
     })
   },
   ...(input.intermediaries ?? []).map((_, idx) => ({
-    getter: () => input.intermediaries[idx],
+    getter: () => input.intermediaries![idx],
     setter: (input: BsdaInput, companyInput: CompanyInput) => ({
       ...input,
-      intermediaries: input.intermediaries.map((current, i) =>
+      intermediaries: input.intermediaries!.map((current, i) =>
         i === idx ? companyInput : current
       )
     })

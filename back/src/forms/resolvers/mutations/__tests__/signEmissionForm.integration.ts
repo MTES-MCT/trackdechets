@@ -12,27 +12,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import getReadableId from "../../../readableId";
-
-export const SIGN_EMISSION_FORM = `
-  mutation SignEmissionForm($id: ID!, $input: SignEmissionFormInput!, $securityCode: Int) {
-    signEmissionForm(id: $id, input: $input, securityCode: $securityCode) {
-      id
-      status
-      signedByTransporter
-      sentAt
-      sentBy
-      emittedAt
-      emittedBy
-      emittedByEcoOrganisme
-      temporaryStorageDetail {
-        signedAt
-        signedBy
-        emittedAt
-        emittedBy
-      }
-    }
-  }
-`;
+import { SIGN_EMISSION_FORM } from "./mutations";
 
 describe("signEmissionForm", () => {
   afterEach(resetDatabase);

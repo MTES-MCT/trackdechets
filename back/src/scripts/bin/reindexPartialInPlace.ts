@@ -25,7 +25,7 @@ async function exitScript() {
   );
 
   const matchIsoDate = args.filter(
-    arg => arg.match(/^\d{4}-\d{2}-\d{2}$/)?.length > 0
+    arg => (arg.match(/^\d{4}-\d{2}-\d{2}$/) ?? []).length > 0
   )[0];
 
   let since;

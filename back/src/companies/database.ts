@@ -22,22 +22,17 @@ import { AppDataloaders } from "../types";
 export async function getCompanyOrCompanyNotFound({
   id,
   orgId,
-  siret,
-  vatNumber
+  siret
 }: Prisma.CompanyWhereUniqueInput) {
   if (!id && !siret && !orgId) {
-    throw new UserInputError(
-      "You should specify an id or a siret or a VAT number"
-    );
+    throw new UserInputError("You should specify an id or a siret or an orgId");
   }
   let where: Prisma.CompanyWhereUniqueInput;
   if (id) {
     where = { id };
   } else if (siret) {
     where = { siret };
-  } else if (vatNumber) {
-    where = { vatNumber };
-  } else if (orgId) {
+  } else {
     where = { orgId };
   }
   const company = await prisma.company.findUnique({
@@ -79,7 +74,7 @@ export function getInstallation(siret: string) {
  * Returns list of rubriques of an ICPE
  * @param codeS3ic
  */
-export function getRubriques(codeS3ic: string) {
+export function getRubriques(codeS3ic: string | null | undefined) {
   if (codeS3ic) {
     return prisma.rubrique.findMany({ where: { codeS3ic } });
   }
@@ -90,7 +85,7 @@ export function getRubriques(codeS3ic: string) {
  * Returns list of GEREP declarations of an ICPE
  * @param codeS3ic
  */
-export function getDeclarations(codeS3ic: string) {
+export function getDeclarations(codeS3ic: string | null | undefined) {
   if (codeS3ic) {
     return prisma.declaration.findMany({ where: { codeS3ic } });
   }
@@ -108,7 +103,7 @@ export function getDeclarations(codeS3ic: string) {
  */
 export async function getUserRole(userId: string, orgId: string) {
   const associations = await prisma.company
-    .findUnique({ where: { orgId } })
+    .findUniqueOrThrow({ where: { orgId } })
     .companyAssociations({ where: { userId } });
 
   if (associations.length > 0) {
@@ -151,19 +146,20 @@ export async function getCompanyUsers(
  * Returns company members that already have an account in TD
  * @param siret
  */
-export function getCompanyActiveUsers(orgId: string): Promise<CompanyMember[]> {
-  return prisma.company
-    .findUnique({ where: { orgId } })
-    .companyAssociations({ include: { user: true } })
-    .then(associations =>
-      associations.map(a => {
-        return {
-          ...a.user,
-          role: a.role,
-          isPendingInvitation: false
-        };
-      })
-    );
+export async function getCompanyActiveUsers(
+  orgId: string
+): Promise<CompanyMember[]> {
+  const associations = await prisma.company
+    .findUniqueOrThrow({ where: { orgId } })
+    .companyAssociations({ include: { user: true } });
+
+  return associations.map(a => {
+    return {
+      ...a.user,
+      role: a.role,
+      isPendingInvitation: false
+    };
+  });
 }
 
 /**
@@ -334,14 +330,10 @@ export async function getWorkerCertificationOrNotFound({
 
 export function convertUrls<T extends Partial<Company>>(
   company: T
-): T & { ecoOrganismeAgreements: URL[]; signatureAutomations: [] } {
-  if (!company) {
-    return null;
-  }
-
+): T & { ecoOrganismeAgreements?: URL[]; signatureAutomations: [] } {
   return {
     ...company,
-    ...(company?.ecoOrganismeAgreements && {
+    ...(company.ecoOrganismeAgreements && {
       ecoOrganismeAgreements: company.ecoOrganismeAgreements.map(
         a => new URL(a)
       )

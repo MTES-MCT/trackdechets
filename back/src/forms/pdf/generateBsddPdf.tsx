@@ -38,7 +38,10 @@ import { packagingsEqual } from "../../common/constants/formHelpers";
 import { CancelationStamp } from "../../common/pdf/components/CancelationStamp";
 
 type ReceiptFieldsProps = Partial<
-  Pick<GraphQLForm["transporter"], "department" | "receipt" | "validityLimit">
+  Pick<
+    NonNullable<GraphQLForm["transporter"]>,
+    "department" | "receipt" | "validityLimit"
+  >
 >;
 
 function ReceiptFields({
@@ -58,8 +61,8 @@ function ReceiptFields({
 }
 
 type QuantityFieldsProps = {
-  quantity?: number;
-  quantityType?: QuantityType;
+  quantity?: number | null;
+  quantityType?: QuantityType | null;
 };
 
 function QuantityFields({ quantity, quantityType }: QuantityFieldsProps) {
@@ -85,8 +88,8 @@ function QuantityFields({ quantity, quantityType }: QuantityFieldsProps) {
 }
 
 type AcceptationFieldsProps = {
-  wasteAcceptationStatus?: WasteAcceptationStatus;
-  wasteRefusalReason?: string;
+  wasteAcceptationStatus?: WasteAcceptationStatus | null;
+  wasteRefusalReason?: string | null;
 };
 
 function AcceptationFields({
@@ -124,9 +127,9 @@ function AcceptationFields({
 }
 
 type RecipientFormCompanyFieldsProps = {
-  cap?: string;
-  processingOperation?: string;
-  company?: FormCompany;
+  cap?: string | null;
+  processingOperation?: string | null;
+  company?: FormCompany | null;
 };
 
 function RecipientFormCompanyFields({
@@ -215,9 +218,9 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
 }
 
 type TransporterFormCompanyFieldsProps = {
-  transporter?: Transporter;
-  takenOverAt?: Date;
-  takenOverBy?: string;
+  transporter?: Transporter | null;
+  takenOverAt?: Date | null;
+  takenOverBy?: string | null;
 };
 
 function TransporterFormCompanyFields({
@@ -275,7 +278,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
 
   const form: GraphQLForm = {
     ...(await expandFormFromDb(fullPrismaForm)),
-    transportSegments: fullPrismaForm.transportSegments.map(
+    transportSegments: fullPrismaForm.transportSegments?.map(
       expandTransportSegmentFromDb
     ),
     grouping: await Promise.all(
@@ -374,7 +377,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             <p>
               <input
                 type="checkbox"
-                checked={form.emitter?.isPrivateIndividual}
+                checked={Boolean(form.emitter?.isPrivateIndividual)}
                 readOnly
               />{" "}
               L'émetteur est un particulier
@@ -382,15 +385,15 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
             <p>
               <input
                 type="checkbox"
-                checked={form.emitter?.isForeignShip}
+                checked={Boolean(form.emitter?.isForeignShip)}
                 readOnly
               />{" "}
               L'émetteur est un navire étranger
             </p>
             <FormCompanyFields
               company={form.emitter?.company}
-              isPrivateIndividual={form.emitter?.isPrivateIndividual}
-              isForeignShip={form.emitter?.isForeignShip}
+              isPrivateIndividual={Boolean(form.emitter?.isPrivateIndividual)}
+              isForeignShip={Boolean(form.emitter?.isForeignShip)}
             />
 
             <p>
@@ -496,7 +499,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
               Déchet dangereux :{" "}
               <input
                 type="checkbox"
-                checked={form.wasteDetails?.isDangerous}
+                checked={Boolean(form.wasteDetails?.isDangerous)}
                 readOnly
               />{" "}
               oui{" "}
@@ -741,7 +744,8 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 <p>
                   N° du document prévu à l'annexe I-B du règlement n°1013/2006
                   ou le numéro de notification et numéro de saisie du document
-                  prévue à l'annexe I-B du règlement N°1013/2006 (si connu) :
+                  prévue à l'annexe I-B du règlement N°1013/2006 (si connu) :{" "}
+                  {form.nextDestination?.notificationNumber}
                 </p>
               </div>
             </div>
@@ -820,7 +824,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                   packagingInfos={
                     isRepackging
                       ? form.temporaryStorageDetail?.wasteDetails
-                          ?.packagingInfos
+                          ?.packagingInfos ?? []
                       : []
                   }
                 />
@@ -898,7 +902,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
         )}
       </div>
 
-      {form.transportSegments.length > 0 && (
+      {form.transportSegments && form.transportSegments.length > 0 && (
         <div className="Page">
           <div className="BoxRow">
             <div className="BoxCol">
@@ -935,7 +939,7 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
         </div>
       )}
 
-      {form.grouping?.length > 0 && (
+      {form.grouping && form.grouping.length > 0 && (
         <div className="Page">
           <div className="BoxRow">
             <div className="BoxCol">

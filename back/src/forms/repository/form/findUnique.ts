@@ -8,7 +8,7 @@ export type FindUniqueFormFn = <Args extends Prisma.FormArgs>(
 
 const buildFindUniqueForm: (deps: ReadRepositoryFnDeps) => FindUniqueFormFn =
   ({ prisma }) =>
-  async <Args>(where, options?) => {
+  async <Args extends Prisma.FormArgs>(where, options?) => {
     const input = { where, ...options };
     const bsdd = await prisma.form.findUnique(input);
     return bsdd as Prisma.FormGetPayload<Args>;

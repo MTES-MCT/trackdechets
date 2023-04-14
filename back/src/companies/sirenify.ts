@@ -4,21 +4,23 @@ import { searchCompany } from "../companies/search";
 import { CompanySearchResult } from "../companies/types";
 import { CompanyInput } from "../generated/graphql/types";
 import logger from "../logging/logger";
+import { escapeRegExp } from "../utils";
 
 /**
  * List of emails or regular expressions of email of API
  * users who need extra time to adapt to this feature
  */
 const SIRENIFY_BYPASS_USER_EMAILS =
-  process.env.SIRENIFY_BYPASS_USER_EMAILS?.split(",").map(r => new RegExp(r)) ??
-  [];
+  process.env.SIRENIFY_BYPASS_USER_EMAILS?.split(",").map(
+    r => new RegExp(escapeRegExp(r))
+  ) ?? [];
 
 /**
  * Given a GraphQL BSD input type T,
  * defines a getter and a setter for a nested company input
  */
 type CompanyInputAccessor<T> = {
-  getter: () => CompanyInput;
+  getter: () => CompanyInput | null | undefined;
   setter: (input: T, companyInput: CompanyInput) => T;
 };
 
@@ -56,7 +58,9 @@ export default function buildSirenify<T>(
     // check if we found a corresponding companySearchResult based on siret
     const companySearchResults = await Promise.all(
       companyInputs.map(companyInput =>
-        companyInput ? searchCompanyFailFast(companyInput.siret) : null
+        companyInput && companyInput.siret
+          ? searchCompanyFailFast(companyInput.siret)
+          : null
       )
     );
 
@@ -71,12 +75,15 @@ export default function buildSirenify<T>(
           );
         }
 
-        const { setter, getter } = accessors[idx];
-        sirenifiedInput = setter(sirenifiedInput, {
-          ...getter(), // overwrite user provided data
-          name: companySearchResult.name,
-          address: companySearchResult.address
-        });
+        if (companySearchResult.statutDiffusionEtablissement === "O") {
+          const { setter, getter } = accessors[idx];
+
+          sirenifiedInput = setter(sirenifiedInput, {
+            ...getter(), // overwrite user provided data
+            name: companySearchResult.name,
+            address: companySearchResult.address
+          });
+        }
       }
     });
 
@@ -86,7 +93,7 @@ export default function buildSirenify<T>(
 
 export async function searchCompanyFailFast(
   siret: string
-): Promise<CompanySearchResult> {
+): Promise<CompanySearchResult | null> {
   // make sure we do not wait more thant 1s here to avoid bottlenecks
   const raceWith = new Promise<null>(resolve =>
     setTimeout(resolve, 1000, null)

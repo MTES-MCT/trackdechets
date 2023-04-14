@@ -41,17 +41,17 @@ describe("mutation inviteUserToCompany", () => {
         variables: { email: user.email, siret: company.siret, role: "MEMBER" }
       }
     );
-    expect(data.inviteUserToCompany.users.length).toBe(2);
+    expect(data.inviteUserToCompany.users!.length).toBe(2);
     expect(data.inviteUserToCompany.users).toEqual(
       expect.arrayContaining([{ email: admin.email }, { email: user.email }])
     );
     const companyAssociations = await prisma.user
-      .findUnique({ where: { id: user.id } })
+      .findUniqueOrThrow({ where: { id: user.id } })
       .companyAssociations();
     expect(companyAssociations).toHaveLength(1);
     expect(companyAssociations[0].role).toEqual("MEMBER");
     const userCompany = await prisma.companyAssociation
-      .findUnique({
+      .findUniqueOrThrow({
         where: {
           id: companyAssociations[0].id
         }
@@ -78,7 +78,7 @@ describe("mutation inviteUserToCompany", () => {
 
     // Check userAccountHash has been successfully created
     const hashes = await prisma.userAccountHash.findMany({
-      where: { email: invitedUserEmail, companySiret: company.siret }
+      where: { email: invitedUserEmail, companySiret: company.siret! }
     });
     expect(hashes.length).toEqual(1);
 

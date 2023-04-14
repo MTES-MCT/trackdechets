@@ -242,7 +242,12 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
           <div className="form__row">
             <label>
               Numéro de récépissé
-              <Field type="text" name="trader.receipt" className="td-input" />
+              <Field
+                type="text"
+                name="trader.receipt"
+                className="td-input"
+                disabled={true}
+              />
             </label>
 
             <RedErrorMessage name="trader.receipt" />
@@ -255,6 +260,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
                 name="trader.department"
                 placeholder="Ex: 83"
                 className={classNames("td-input", styles.recipientDepartment)}
+                disabled={true}
               />
             </label>
 
@@ -270,6 +276,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
                   "td-input",
                   styles.recipientValidityLimit
                 )}
+                disabled={true}
               />
             </label>
 
@@ -318,7 +325,12 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
           <div className="form__row">
             <label>
               Numéro de récépissé
-              <Field type="text" name="broker.receipt" className="td-input" />
+              <Field
+                type="text"
+                name="broker.receipt"
+                className="td-input"
+                disabled={true}
+              />
             </label>
 
             <RedErrorMessage name="broker.receipt" />
@@ -331,6 +343,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
                 name="broker.department"
                 placeholder="Ex: 83"
                 className={classNames("td-input", styles.recipientDepartment)}
+                disabled={true}
               />
             </label>
 
@@ -346,6 +359,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
                   "td-input",
                   styles.recipientValidityLimit
                 )}
+                disabled={true}
               />
             </label>
 

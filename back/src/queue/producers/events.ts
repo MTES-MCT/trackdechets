@@ -8,7 +8,7 @@ const { REDIS_URL, NODE_ENV } = process.env;
 // Events sync queue. Items are enqueued once indexation is done
 export const syncEventsQueue = new Queue<void>(
   `queue_sync_events_${NODE_ENV}`,
-  REDIS_URL,
+  REDIS_URL!,
   {
     defaultJobOptions: {
       removeOnComplete: 1000

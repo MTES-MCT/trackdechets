@@ -16,7 +16,7 @@ const sendVerificationCodeLetterResolver: MutationResolvers["sendVerificationCod
     const company = await getCompanyOrCompanyNotFound({ siret });
     await sendVerificationCodeLetter(company);
     const updatedCompany = await prisma.company.update({
-      where: { siret: company.siret },
+      where: { orgId: company.orgId },
       data: {
         verificationStatus: CompanyVerificationStatus.LETTER_SENT,
         verificationMode: CompanyVerificationMode.LETTER

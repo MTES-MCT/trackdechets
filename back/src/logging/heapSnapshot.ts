@@ -22,8 +22,8 @@ export async function heapSnapshotToS3Router() {
         endpoint: process.env.S3_ENDPOINT,
         region: process.env.S3_REGION,
         credentials: {
-          accessKeyId: process.env.S3_ACCESS_KEY_ID,
-          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY
+          accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+          secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!
         }
       }),
       params: {
@@ -35,9 +35,11 @@ export async function heapSnapshotToS3Router() {
     });
 
     parallelUploads3.on("httpUploadProgress", progress => {
-      console.log(
-        `Uploaded: ${Math.round((progress.loaded * 100) / progress.total)}%`
-      );
+      if (progress.loaded && progress.total) {
+        console.log(
+          `Uploaded: ${Math.round((progress.loaded * 100) / progress.total)}%`
+        );
+      }
     });
 
     await parallelUploads3.done();

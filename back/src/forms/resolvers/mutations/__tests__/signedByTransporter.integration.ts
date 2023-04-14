@@ -67,7 +67,7 @@ describe("Mutation.signedByTransporter", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findUnique({
+    const resultingForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     expect(resultingForm.status).toBe("SENT");
@@ -499,7 +499,7 @@ describe("Mutation.signedByTransporter", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findUnique({
+    const resultingForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     const resultingFullForm = await getFullForm(resultingForm);
@@ -559,7 +559,7 @@ describe("Mutation.signedByTransporter", () => {
         }
       );
 
-      const resultingForm = await prisma.form.findUnique({
+      const resultingForm = await prisma.form.findUniqueOrThrow({
         where: { id: form.id }
       });
       expect(resultingForm.status).toEqual(Status.SENT);

@@ -31,7 +31,7 @@ const workflow: Workflow = {
     { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
   ],
   steps: [
-    createBsda("producteur", fixtures),
+    createBsda("producteur", fixtures as any),
     signBsda("producteur", "EMISSION"),
     updateBsda("worker", fixtures.workerSignatureUpdateInput),
     signBsda("worker", "WORK"),

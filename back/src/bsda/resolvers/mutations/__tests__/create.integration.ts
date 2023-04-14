@@ -151,8 +151,8 @@ describe("Mutation.Bsda.create", () => {
     expect(data.createBsda.id).toMatch(
       new RegExp(`^BSDA-[0-9]{8}-[A-Z0-9]{9}$`)
     );
-    expect(data.createBsda.destination.company.siret).toBe(
-      input.destination.company.siret
+    expect(data.createBsda.destination!.company!.siret).toBe(
+      input.destination!.company!.siret
     );
     // check input is sirenified
     expect(sirenifyMock).toHaveBeenCalledTimes(1);
@@ -220,8 +220,8 @@ describe("Mutation.Bsda.create", () => {
     expect(data.createBsda.id).toMatch(
       new RegExp(`^BSDA-[0-9]{8}-[A-Z0-9]{9}$`)
     );
-    expect(data.createBsda.destination.company.siret).toBe(
-      input.destination.company.siret
+    expect(data.createBsda.destination!.company!.siret).toBe(
+      input.destination!.company!.siret
     );
   });
 
@@ -286,8 +286,8 @@ describe("Mutation.Bsda.create", () => {
     expect(data.createBsda.id).toMatch(
       new RegExp(`^BSDA-[0-9]{8}-[A-Z0-9]{9}$`)
     );
-    expect(data.createBsda.destination.company.siret).toBe(
-      input.destination.company.siret
+    expect(data.createBsda.destination!.company!.siret).toBe(
+      input.destination!.company!.siret
     );
   });
 
@@ -365,7 +365,7 @@ describe("Mutation.Bsda.create", () => {
       }
     });
 
-    expect(data.createBsda.transporter.transport.plates.length).toBe(2);
+    expect(data.createBsda.transporter!.transport!.plates!.length).toBe(2);
   });
 
   it("should fail creating the form if more than 2 plates are submitted", async () => {
@@ -922,7 +922,7 @@ describe("Mutation.Bsda.create", () => {
     });
 
     expect(data.createBsda.id).toBeDefined();
-    expect(data.createBsda.intermediaries.length).toBe(1);
+    expect(data.createBsda.intermediaries!.length).toBe(1);
   });
 
   it("should fail if creating a bsda with the same intermediary several times", async () => {
@@ -1107,6 +1107,84 @@ describe("Mutation.Bsda.create", () => {
 
     expect(errors[0].message).toBe(
       "Intermédiaires: impossible d'ajouter plus de 3 intermédiaires"
+    );
+  });
+
+  it("should fail if the bsda next destination is not registered as a destination", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: destinationCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const { company: finalDestinationCompany } = await userWithCompanyFactory(
+      "MEMBER",
+      {
+        companyTypes: { set: ["PRODUCER"] } // NOT a destination
+      }
+    );
+
+    const input: BsdaInput = {
+      emitter: {
+        isPrivateIndividual: false,
+        company: {
+          siret: company.siret,
+          name: "The crusher",
+          address: "Rue de la carcasse",
+          contact: "Centre amiante",
+          phone: "0101010101",
+          mail: "emitter@mail.com"
+        }
+      },
+      worker: {
+        company: {
+          siret: siretify(2),
+          name: "worker",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        }
+      },
+      waste: {
+        code: "06 07 01*",
+        adr: "ADR",
+        pop: true,
+        consistence: "SOLIDE",
+        familyCode: "Code famille",
+        materialName: "A material",
+        sealNumbers: ["1", "2"]
+      },
+      packagings: [{ quantity: 1, type: "PALETTE_FILME" }],
+      weight: { isEstimate: true, value: 1.2 },
+      destination: {
+        cap: "A cap",
+        plannedOperationCode: "D 9",
+        company: {
+          siret: destinationCompany.siret,
+          name: "destination",
+          address: "address",
+          contact: "contactEmail",
+          phone: "contactPhone",
+          mail: "contactEmail@mail.com"
+        },
+        operation: {
+          nextDestination: {
+            cap: "CAP",
+            company: { siret: finalDestinationCompany.siret }
+          }
+        }
+      }
+    };
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "createBsda">>(CREATE_BSDA, {
+      variables: {
+        input
+      }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toContain(
+      "est pas inscrite sur Trackdéchets en tant qu'installation de traitement"
     );
   });
 });

@@ -49,24 +49,48 @@ interface SignBsffProps {
   title: string;
   bsffId: string;
   children: (props: ChildrenProps) => React.ReactNode;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+  displayActionButton?: boolean;
 }
 
-export function SignBsff({ title, bsffId, children }: SignBsffProps) {
+export function SignBsff({
+  title,
+  bsffId,
+  children,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+  displayActionButton = true,
+}: SignBsffProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
     <>
-      <ActionButton
-        icon={<IconCheckCircle1 size="24px" />}
-        onClick={() => setIsOpen(true)}
-      >
-        {title}
-      </ActionButton>
-      {isOpen && (
+      {displayActionButton && (
+        <>
+          <ActionButton
+            icon={<IconCheckCircle1 size="24px" />}
+            onClick={() => setIsOpen(true)}
+          >
+            {title}
+          </ActionButton>
+          {isOpen && (
+            <SignBsffModal
+              title={title}
+              bsffId={bsffId}
+              onClose={() => setIsOpen(false)}
+            >
+              {children}
+            </SignBsffModal>
+          )}
+        </>
+      )}
+
+      {isModalOpenFromParent && (
         <SignBsffModal
           title={title}
           bsffId={bsffId}
-          onClose={() => setIsOpen(false)}
+          onClose={onModalCloseFromParent!}
         >
           {children}
         </SignBsffModal>

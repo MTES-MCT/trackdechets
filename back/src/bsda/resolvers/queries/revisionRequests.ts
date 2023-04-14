@@ -23,9 +23,9 @@ export async function bsdaRevisionRequests(
   await checkIsCompanyMember({ id: user.id }, { orgId: siret });
   const company = await getCompanyOrCompanyNotFound({ orgId: siret });
 
-  const pageSize = Math.max(Math.min(first, MAX_SIZE), MIN_SIZE);
+  const pageSize = Math.max(Math.min(first ?? 0, MAX_SIZE), MIN_SIZE);
 
-  const { status } = inputWhere;
+  const { status } = inputWhere ?? {};
   const where = {
     OR: [
       { authoringCompanyId: company.id },

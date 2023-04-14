@@ -120,7 +120,7 @@ describe("sealedFormSchema", () => {
         orgId: "BE0541696005",
         vatNumber: "BE0541696005"
       });
-      const testForm = {
+      const testForm: any = {
         ...sealedForm,
         transporterCompanyVatNumber: transporter.vatNumber,
         transporterIsExemptedOfReceipt: null,

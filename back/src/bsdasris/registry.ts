@@ -13,16 +13,16 @@ import { GenericWaste } from "../registry/types";
 import { extractPostalCode } from "../utils";
 import { getWasteDescription } from "./utils";
 
-export function getRegistryFields(
-  bsdasri: Bsdasri
-): Pick<
-  BsdElastic,
+type RegistryFields =
   | "isIncomingWasteFor"
   | "isOutgoingWasteFor"
   | "isTransportedWasteFor"
-  | "isManagedWasteFor"
-> {
-  const registryFields = {
+  | "isManagedWasteFor";
+
+export function getRegistryFields(
+  bsdasri: Bsdasri
+): Pick<BsdElastic, RegistryFields> {
+  const registryFields: Record<RegistryFields, string[]> = {
     isIncomingWasteFor: [],
     isOutgoingWasteFor: [],
     isTransportedWasteFor: [],
@@ -33,13 +33,19 @@ export function getRegistryFields(
     bsdasri.emitterEmissionSignatureDate &&
     bsdasri.transporterTransportSignatureDate
   ) {
-    registryFields.isOutgoingWasteFor.push(bsdasri.emitterCompanySiret);
-    registryFields.isTransportedWasteFor.push(
-      getTransporterCompanyOrgId(bsdasri)
-    );
+    if (bsdasri.emitterCompanySiret) {
+      registryFields.isOutgoingWasteFor.push(bsdasri.emitterCompanySiret);
+    }
+    const transporterCompanyOrgId = getTransporterCompanyOrgId(bsdasri);
+    if (transporterCompanyOrgId) {
+      registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
+    }
   }
 
-  if (bsdasri.destinationReceptionSignatureDate) {
+  if (
+    bsdasri.destinationReceptionSignatureDate &&
+    bsdasri.destinationCompanySiret
+  ) {
     registryFields.isIncomingWasteFor.push(bsdasri.destinationCompanySiret);
   }
 
@@ -48,7 +54,9 @@ export function getRegistryFields(
 
 function toGenericWaste(bsdasri: Bsdasri): GenericWaste {
   return {
-    wasteDescription: getWasteDescription(bsdasri.wasteCode),
+    wasteDescription: bsdasri.wasteCode
+      ? getWasteDescription(bsdasri.wasteCode)
+      : "",
     wasteCode: bsdasri.wasteCode,
     pop: false,
     id: bsdasri.id,

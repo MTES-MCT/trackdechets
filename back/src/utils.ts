@@ -108,7 +108,7 @@ export function base32Encode(n: number): string {
  */
 export const hashToken = (token: string) =>
   crypto
-    .createHmac("sha256", process.env.API_TOKEN_SECRET)
+    .createHmac("sha256", process.env.API_TOKEN_SECRET!)
     .update(token)
     .digest("hex");
 
@@ -123,4 +123,29 @@ export function extractPostalCode(address: string | null | undefined) {
     }
   }
   return "";
+}
+
+const reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
+const reHasRegExpChar = RegExp(reRegExpChar.source);
+
+/**
+ * Escapes the `RegExp` special characters "^", "$", "\", ".", "*", "+",
+ * "?", "(", ")", "[", "]", "{", "}", and "|" in `string`.
+ *
+ * TAKEN FROM https://github.com/lodash/lodash/blob/master/escapeRegExp.js
+ *
+ * @since 3.0.0
+ * @category String
+ * @param {string} [string=''] The string to escape.
+ * @returns {string} Returns the escaped string.
+ * @see escape, escapeRegExp, unescape
+ * @example
+ *
+ * escapeRegExp('[lodash](https://lodash.com/)')
+ * // => '\[lodash\]\(https://lodash\.com/\)'
+ */
+export function escapeRegExp(string) {
+  return string && reHasRegExpChar.test(string)
+    ? string.replace(reRegExpChar, "\\$&")
+    : string || "";
 }

@@ -117,8 +117,9 @@ export default function BsdasriTableSynthesis({
   regroupedInDB,
   disabled = false,
 }) {
-  const { values } =
-    useFormikContext<Bsdasri & { dbRegroupedBsdasris: string[] }>();
+  const { values } = useFormikContext<
+    Bsdasri & { dbRegroupedBsdasris: string[] }
+  >();
 
   const { loading, error, data, refetch } = useQuery<
     Pick<Query, "bsdasris">,

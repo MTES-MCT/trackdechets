@@ -3,7 +3,9 @@ const unwantedChars = /\*|\//g;
  * Remove * and / special chars appearing on some individual companies
  * @param name string
  */
-export const cleanupSpecialChars = (name: string): string => {
+export const cleanupSpecialChars = (
+  name: string | null | undefined
+): string => {
   if (!name) {
     return "";
   }
@@ -35,12 +37,12 @@ export const toFrFormat = (date: Date): string => {
 /**
  * Will split an array into smaller arrays of max size maxChunkSize
  */
-export const splitArrayIntoChunks = (arr: any[], maxChunkSize: number) => {
+export const splitArrayIntoChunks = <T>(arr: T[], maxChunkSize: number) => {
   if (!arr.length) {
     return [[]];
   }
 
-  const result = [];
+  const result: T[][] = [];
 
   for (let i = 0; i < arr.length; i += maxChunkSize) {
     const chunk = arr.slice(i, i + maxChunkSize);

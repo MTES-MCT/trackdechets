@@ -8,7 +8,7 @@ import { getUid } from "../../utils";
  * The logs share the same `request_id`. A `request_timing` property indicates the timing of the log (start/end)
  */
 export default function (graphQLPath: string) {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return function logging(req: Request, res: Response, next: NextFunction) {
     const message = `${req.method} ${req.path}`;
     const requestMetadata: { [key: string]: any } = {
       ip: req.ip,

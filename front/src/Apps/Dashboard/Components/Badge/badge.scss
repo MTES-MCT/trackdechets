@@ -14,56 +14,43 @@
       -webkit-mask-image: url("/icons/system/fr--error-fill.svg") !important;
     }
   }
-  &--DRAFT {
+
+  &--canceled {
+    &:before {
+      -webkit-mask-image: url("/icons/system/fr--info-fill.svg") !important;
+    }
+  }
+
+  &--DRAFT,
+  &--INITIAL,
+  &--SEALED {
     background-color: #fbf6ed;
     color: #716043;
   }
-  &--SEALED {
-    background-color: #feecc2;
-    color: #716043;
+
+  &--SIGNED_BY_PRODUCER,
+  &--SIGNED_BY_WORKER,
+  &--SENT,
+  &--RESENT,
+  &--AWAITING_CHILD,
+  &--GROUPED,
+  &--SIGNED_BY_TEMP_STORER,
+  &--SIGNED_BY_EMITTER {
+    background-color: #e6eefe;
+    color: #3558a2;
   }
-  &--SENT {
-    background-color: #e5fbfd;
-    color: #006a6f;
-  }
-  &--RECEIVED {
-    background-color: #e5fbfd;
-    color: #006a6f;
-  }
-  &--ACCEPTED {
-    background-color: #e3fdeb;
-    color: #37635f;
+  &--SIGNED_BY_WORKER,
+  &--SIGNED_BY_TEMP_STORER {
     @include desktop {
       width: 200px;
     }
   }
-  &--PROCESSED {
-    background-color: #b8fec9;
-    color: #18753c;
-  }
+  &--RECEIVED,
   &--AWAITING_GROUP {
     background-color: #e5fbfd;
     color: #006a6f;
   }
-  &--GROUPED {
-    background-color: #fbf6ed;
-    color: #716043;
-  }
-  &--NO_TRACEABILITY {
-    background-color: #ffe8e5;
-    color: #b34000;
-  }
-  &--REFUSED {
-    background-color: #ffe9e9;
-    color: #ce0500;
-  }
-  &--TEMP_STORED {
-    background-color: #e5fbfd;
-    color: #006a6f;
-    @include desktop {
-      width: 200px;
-    }
-  }
+  &--ACCEPTED,
   &--TEMP_STORER_ACCEPTED {
     background-color: #e3fdeb;
     color: #37635f;
@@ -71,61 +58,32 @@
       width: 205px;
     }
   }
-  &--RESEALED {
-    background-color: #e5fbfd;
-    color: #006a6f;
-    @include desktop {
-      width: 200px;
-    }
-  }
-  &--RESENT {
-    background-color: #e5fbfd;
-    color: #006a6f;
-  }
-  &--SIGNED_BY_PRODUCER {
-    background-color: #e6eefe;
-    color: #3558a2;
-  }
-  &--INITIAL {
-    background-color: #fbf6ed;
-    color: #716043;
-  }
-
-  &--SIGNED_BY_EMITTER {
-    background-color: #e6eefe;
-    color: #3558a2;
-  }
-  &--INTERMEDIATELY_PROCESSED {
-    background-color: #fbf6ed;
-    color: #716043;
-    @include desktop {
-      width: 200px;
-    }
-  }
-  &--SIGNED_BY_TEMP_STORER {
-    background-color: #e6eefe;
-    color: #3558a2;
-    @include desktop {
-      width: 200px;
-    }
-  }
-  &--FOLLOWED_WITH_PNTTD {
+  &--PROCESSED,
+  &--FOLLOWED_WITH_PNTTD,
+  &--NO_TRACEABILITY {
     background-color: #b8fec9;
     color: #18753c;
   }
-  &--PARTIALLY_REFUSED {
+  &--REFUSED,
+  &--PARTIALLY_REFUSED,
+  &--CANCELED {
     background-color: #ffe9e9;
     color: #ce0500;
   }
-  &--SIGNED_BY_WORKER {
-    background-color: #e6eefe;
-    color: #3558a2;
+  &--TEMP_STORED,
+  &--RESEALED,
+  &--INTERMEDIATELY_PROCESSED {
+    background-color: #e5fbfd;
+    color: #006a6f;
+  }
+  &--INTERMEDIATELY_PROCESSED {
     @include desktop {
       width: 200px;
     }
   }
-  &--AWAITING_CHILD {
-    background-color: #e5fbfd;
-    color: #006a6f;
+  &--TEMP_STORED {
+    @include desktop {
+      width: 255px;
+    }
   }
 }

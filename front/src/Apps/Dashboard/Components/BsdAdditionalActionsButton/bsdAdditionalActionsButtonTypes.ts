@@ -9,5 +9,6 @@ export interface BsdAdditionalActionsButtonProps {
   onUpdate: Function;
   onDelete: Function;
   onRevision: Function;
-  children?: React.ReactNode;
+  onBsdSuite?: Function;
+  onAppendix1?: Function;
 }

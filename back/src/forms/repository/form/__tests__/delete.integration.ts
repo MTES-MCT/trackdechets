@@ -9,8 +9,7 @@ import {
   refreshElasticSearch,
   resetDatabase
 } from "../../../../../integration-tests/helper";
-import { ApiResponse } from "@elastic/elasticsearch";
-import { SearchResponse } from "@elastic/elasticsearch/api/types";
+import { ApiResponse, estypes } from "@elastic/elasticsearch";
 import {
   client,
   BsdElastic,
@@ -27,7 +26,7 @@ describe("formRepository.delete", () => {
 
   it("should soft delete BSDD, create event and delete document in Elasticsearch", async () => {
     async function searchBsds() {
-      const { body }: ApiResponse<SearchResponse<BsdElastic>> =
+      const { body }: ApiResponse<estypes.SearchResponse<BsdElastic>> =
         await client.search({
           index: index.alias,
           body: {
@@ -55,7 +54,7 @@ describe("formRepository.delete", () => {
 
     await deleteForm({ id: form.id });
 
-    const deletedForm = await prisma.form.findUnique({
+    const deletedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     expect(deletedForm.isDeleted).toBe(true);
@@ -76,7 +75,7 @@ describe("formRepository.delete", () => {
 
   it("should soft delete BSDD with temp storage, create event and delete document in Elasticsearch", async () => {
     async function searchBsds() {
-      const { body }: ApiResponse<SearchResponse<BsdElastic>> =
+      const { body }: ApiResponse<estypes.SearchResponse<BsdElastic>> =
         await client.search({
           index: index.alias,
           body: {
@@ -92,7 +91,7 @@ describe("formRepository.delete", () => {
     const fullForm = await getFullForm(form);
 
     await indexBsd(toBsdElastic(fullForm));
-    await indexBsd(toBsdElastic(await getFullForm(fullForm.forwardedIn)));
+    await indexBsd(toBsdElastic(await getFullForm(fullForm.forwardedIn!)));
 
     await refreshElasticSearch();
 
@@ -109,12 +108,12 @@ describe("formRepository.delete", () => {
 
     await deleteForm({ id: form.id });
 
-    const deletedForm = await prisma.form.findUnique({
+    const deletedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
       include: { forwardedIn: true }
     });
     expect(deletedForm.isDeleted).toBe(true);
-    expect(deletedForm.forwardedIn.isDeleted).toBe(true);
+    expect(deletedForm.forwardedIn!.isDeleted).toBe(true);
 
     const events = await getStream(deletedForm.id);
     expect(events).toHaveLength(1);

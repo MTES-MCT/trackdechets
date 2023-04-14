@@ -219,6 +219,7 @@ type ProcessedInfo = Pick<
   | "nextDestinationCompanyPhone"
   | "nextDestinationCompanyMail"
   | "nextDestinationCompanyVatNumber"
+  | "nextDestinationNotificationNumber"
 >;
 
 // *************************************************************
@@ -636,67 +637,66 @@ const wasteDetailsAppendix1SchemaFn: FactorySchemaOf<
     wasteDetailsLandIdentifiers: yup.array().of(yup.string())
   });
 
-const fullWasteDetailsSchemaFn: FactorySchemaOf<boolean, WasteDetails> =
-  isDraft =>
-    wasteDetailsAppendix1SchemaFn(isDraft).concat(
-      yup.object({
-        // The code is redeclared as the possible values are different
-        wasteDetailsCode: yup
-          .string()
-          .requiredIf(!isDraft, "Le code déchet est obligatoire")
-          .oneOf([...BSDD_WASTE_CODES, "", null], INVALID_WASTE_CODE),
-        wasteDetailsPackagingInfos: yup
-          .array()
-          .requiredIf(!isDraft, "Le détail du conditionnement est obligatoire")
-          .of(packagingInfoFn(isDraft))
-          .test(
-            "is-valid-packaging-infos",
-            "${path} ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
-            (infos: PackagingInfo[]) => {
-              const hasCiterne = infos?.find(i => i.type === "CITERNE");
-              const hasBenne = infos?.find(i => i.type === "BENNE");
+const fullWasteDetailsSchemaFn: FactorySchemaOf<
+  boolean,
+  WasteDetails
+> = isDraft =>
+  wasteDetailsAppendix1SchemaFn(isDraft).concat(
+    yup.object({
+      // The code is redeclared as the possible values are different
+      wasteDetailsCode: yup
+        .string()
+        .requiredIf(!isDraft, "Le code déchet est obligatoire")
+        .oneOf([...BSDD_WASTE_CODES, "", null], INVALID_WASTE_CODE),
+      wasteDetailsPackagingInfos: yup
+        .array()
+        .requiredIf(!isDraft, "Le détail du conditionnement est obligatoire")
+        .of(packagingInfoFn(isDraft))
+        .test(
+          "is-valid-packaging-infos",
+          "${path} ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
+          (infos: PackagingInfo[] | undefined) => {
+            const hasCiterne = infos?.find(i => i.type === "CITERNE");
+            const hasBenne = infos?.find(i => i.type === "BENNE");
 
-              if (hasCiterne && hasBenne) {
-                return false;
-              }
-
-              const hasOtherPackaging = infos?.find(
-                i => !["CITERNE", "BENNE"].includes(i.type)
-              );
-              if ((hasCiterne || hasBenne) && hasOtherPackaging) {
-                return false;
-              }
-
-              return true;
+            if (hasCiterne && hasBenne) {
+              return false;
             }
-          ),
-        wasteDetailsQuantity: weight(WeightUnits.Tonne)
-          .label("Déchet")
-          .when(
-            ["transporterTransportMode", "createdAt"],
-            weightConditions.transportMode(WeightUnits.Tonne)
-          )
-          .requiredIf(
-            !isDraft,
-            "La quantité du déchet en tonnes est obligatoire"
-          ),
-        wasteDetailsQuantityType: yup
-          .mixed<QuantityType>()
-          .requiredIf(
-            !isDraft,
-            "Le type de quantité (réelle ou estimée) doit être précisé"
-          ),
-        wasteDetailsConsistence: yup
-          .mixed<Consistence>()
-          .requiredIf(!isDraft, "La consistance du déchet doit être précisée"),
-        wasteDetailsPop: yup
-          .boolean()
-          .requiredIf(
-            !isDraft,
-            "La présence (ou non) de POP doit être précisée"
-          )
-      })
-    );
+
+            const hasOtherPackaging = infos?.find(
+              i => !["CITERNE", "BENNE"].includes(i.type)
+            );
+            if ((hasCiterne || hasBenne) && hasOtherPackaging) {
+              return false;
+            }
+
+            return true;
+          }
+        ),
+      wasteDetailsQuantity: weight(WeightUnits.Tonne)
+        .label("Déchet")
+        .when(
+          ["transporterTransportMode", "createdAt"],
+          weightConditions.transportMode(WeightUnits.Tonne)
+        )
+        .requiredIf(
+          !isDraft,
+          "La quantité du déchet en tonnes est obligatoire"
+        ),
+      wasteDetailsQuantityType: yup
+        .mixed<QuantityType>()
+        .requiredIf(
+          !isDraft,
+          "Le type de quantité (réelle ou estimée) doit être précisé"
+        ),
+      wasteDetailsConsistence: yup
+        .mixed<Consistence>()
+        .requiredIf(!isDraft, "La consistance du déchet doit être précisée"),
+      wasteDetailsPop: yup
+        .boolean()
+        .requiredIf(!isDraft, "La présence (ou non) de POP doit être précisée")
+    })
+  );
 
 const wasteDetailsSchemaFn = isDraft =>
   yup.lazy(value => {
@@ -722,75 +722,71 @@ export const beforeSignedByTransporterSchema: yup.SchemaOf<
 });
 
 // 8 - Collecteur-transporteur
-export const transporterSchemaFn: FactorySchemaOf<boolean, Transporter> =
-  isDraft =>
-    yup.object({
-      transporterCustomInfo: yup.string().nullable(),
-      transporterNumberPlate: yup.string().nullable(),
-      transporterCompanyName: yup
-        .string()
-        .ensure()
-        .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_NAME}`),
-      transporterCompanySiret: siret
-        .label("Transporteur")
-        .test(siretTests.isRegistered("TRANSPORTER"))
-        .when(
-          "transporterCompanyVatNumber",
-          // set siret not required when vatNumber is defined and valid
-          siretConditions.companyVatNumber
-        )
-        .requiredIf(!isDraft, `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`),
-      transporterCompanyVatNumber: foreignVatNumber
-        .label("Transporteur")
-        .test(vatNumberTests.isRegisteredTransporter),
-      transporterCompanyAddress: yup
-        .string()
-        .ensure()
-        .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_ADDRESS}`),
-      transporterCompanyContact: yup
-        .string()
-        .ensure()
-        .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_CONTACT}`),
-      transporterCompanyPhone: yup
-        .string()
-        .ensure()
-        .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_PHONE}`),
-      transporterCompanyMail: yup
-        .string()
-        .email()
-        .ensure()
-        .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_EMAIL}`),
-      transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
-      transporterReceipt: yup
-        .string()
-        .when(
-          ["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"],
-          {
-            is: (isExempted, vat) => isForeignVat(vat) || isExempted,
-            then: schema => schema.notRequired().nullable(),
-            otherwise: schema =>
-              schema.requiredIf(
-                !isDraft,
-                "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
-              )
-          }
-        ),
-      transporterDepartment: yup
-        .string()
-        .when(
-          ["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"],
-          {
-            is: (isExempted, vat) => isForeignVat(vat) || isExempted,
-            then: schema => schema.notRequired().nullable(),
-            otherwise: schema =>
-              schema.requiredIf(
-                !isDraft,
-                "Le département du transporteur est obligatoire"
-              )
-          }
-        ),
-      transporterValidityLimit: yup.date().nullable()
-    });
+export const transporterSchemaFn: FactorySchemaOf<
+  boolean,
+  Transporter
+> = isDraft =>
+  yup.object({
+    transporterCustomInfo: yup.string().nullable(),
+    transporterNumberPlate: yup.string().nullable(),
+    transporterCompanyName: yup
+      .string()
+      .ensure()
+      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_NAME}`),
+    transporterCompanySiret: siret
+      .label("Transporteur")
+      .test(siretTests.isRegistered("TRANSPORTER"))
+      .when(
+        "transporterCompanyVatNumber",
+        // set siret not required when vatNumber is defined and valid
+        siretConditions.companyVatNumber
+      )
+      .requiredIf(!isDraft, `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`),
+    transporterCompanyVatNumber: foreignVatNumber
+      .label("Transporteur")
+      .test(vatNumberTests.isRegisteredTransporter),
+    transporterCompanyAddress: yup
+      .string()
+      .ensure()
+      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_ADDRESS}`),
+    transporterCompanyContact: yup
+      .string()
+      .ensure()
+      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_CONTACT}`),
+    transporterCompanyPhone: yup
+      .string()
+      .ensure()
+      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_PHONE}`),
+    transporterCompanyMail: yup
+      .string()
+      .email()
+      .ensure()
+      .requiredIf(!isDraft, `Transporteur: ${MISSING_COMPANY_EMAIL}`),
+    transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
+    transporterReceipt: yup
+      .string()
+      .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
+        is: (isExempted, vat) => isForeignVat(vat) || isExempted,
+        then: schema => schema.notRequired().nullable(),
+        otherwise: schema =>
+          schema.requiredIf(
+            !isDraft,
+            "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+          )
+      }),
+    transporterDepartment: yup
+      .string()
+      .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
+        is: (isExempted, vat) => isForeignVat(vat) || isExempted,
+        then: schema => schema.notRequired().nullable(),
+        otherwise: schema =>
+          schema.requiredIf(
+            !isDraft,
+            "Le département du transporteur est obligatoire"
+          )
+      }),
+    transporterValidityLimit: yup.date().nullable()
+  });
 
 export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
   yup.object({
@@ -1093,7 +1089,18 @@ const withNextDestination = (required: boolean) =>
       .string()
       .email()
       .ensure()
-      .requiredIf(required, `Destination ultérieure : ${MISSING_COMPANY_EMAIL}`)
+      .requiredIf(
+        required,
+        `Destination ultérieure : ${MISSING_COMPANY_EMAIL}`
+      ),
+    nextDestinationNotificationNumber: yup
+      .string()
+      .notRequired()
+      .nullable()
+      .matches(
+        /^[a-zA-Z]{2}[0-9]{4}$|^$/,
+        "Destination ultérieure : Le numéro d'identication ou de document doit être composé de 2 lettres (code pays) puis 4 chiffres (numéro d'ordre)"
+      )
   });
 
 const withoutNextDestination = yup.object().shape({
@@ -1132,6 +1139,10 @@ const withoutNextDestination = yup.object().shape({
   nextDestinationCompanyMail: yup
     .string()
     .ensure()
+    .max(0, EXTRANEOUS_NEXT_DESTINATION),
+  nextDestinationNotificationNumber: yup
+    .string()
+    .ensure()
     .max(0, EXTRANEOUS_NEXT_DESTINATION)
 });
 
@@ -1150,42 +1161,43 @@ const traceabilityBreakForbidden = yup.object({
 });
 
 // 11 - Réalisation de l’opération :
-const processedInfoSchemaFn: (value: any) => yup.SchemaOf<ProcessedInfo> =
-  value => {
-    const base = yup.object({
-      processedBy: yup
-        .string()
-        .ensure()
-        .required("Vous devez saisir un responsable de traitement."),
-      processedAt: yup.date().required(),
-      processingOperationDone: yup
-        .string()
-        .oneOf(
-          PROCESSING_AND_REUSE_OPERATIONS_CODES,
-          INVALID_PROCESSING_OPERATION
-        ),
-      processingOperationDescription: yup.string().nullable()
-    });
+const processedInfoSchemaFn: (
+  value: any
+) => yup.SchemaOf<ProcessedInfo> = value => {
+  const base = yup.object({
+    processedBy: yup
+      .string()
+      .ensure()
+      .required("Vous devez saisir un responsable de traitement."),
+    processedAt: yup.date().required(),
+    processingOperationDone: yup
+      .string()
+      .oneOf(
+        PROCESSING_AND_REUSE_OPERATIONS_CODES,
+        INVALID_PROCESSING_OPERATION
+      ),
+    processingOperationDescription: yup.string().nullable()
+  });
 
-    if (
-      PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
-        value?.processingOperationDone
-      )
-    ) {
-      if (value?.noTraceability === true) {
-        return base
-          .concat(withNextDestination(false))
-          .concat(traceabilityBreakAllowed);
-      }
+  if (
+    PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
+      value?.processingOperationDone
+    )
+  ) {
+    if (value?.noTraceability === true) {
       return base
-        .concat(withNextDestination(true))
+        .concat(withNextDestination(false))
         .concat(traceabilityBreakAllowed);
-    } else {
-      return base
-        .concat(withoutNextDestination)
-        .concat(traceabilityBreakForbidden);
     }
-  };
+    return base
+      .concat(withNextDestination(true))
+      .concat(traceabilityBreakAllowed);
+  } else {
+    return base
+      .concat(withoutNextDestination)
+      .concat(traceabilityBreakForbidden);
+  }
+};
 
 export const processedInfoSchema = yup.lazy(processedInfoSchemaFn);
 
@@ -1280,7 +1292,7 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
   }
 }
 
-const BSDD_MAX_APPENDIX2 = parseInt(process.env.BSDD_MAX_APPENDIX2, 10) || 250;
+const BSDD_MAX_APPENDIX2 = parseInt(process.env.BSDD_MAX_APPENDIX2!, 10) || 250;
 
 /**
  * Les vérifications suivantes sont effectuées :
@@ -1372,9 +1384,15 @@ export async function validateAppendix2Groupement(
   }
 
   const formFractions = initialForms.map(f => {
+    if (!f.quantityReceived) {
+      throw new Error(
+        `Error: no quantity received for form ${f.id}, cannot process groups.`
+      );
+    }
+
     const quantity = grouping.find(
       formFraction => formFraction.form.id === f.id
-    ).quantity;
+    )?.quantity;
 
     const quantityGroupedInOtherForms = f.groupedIn.reduce(
       (counter, formGroupement) => {
@@ -1412,8 +1430,8 @@ export async function validateAppendix2Groupement(
 
       const quantityLeftToGroup = new Decimal(
         initialForm.forwardedIn
-          ? initialForm.forwardedIn.quantityReceived
-          : initialForm.quantityReceived
+          ? initialForm.forwardedIn.quantityReceived!
+          : initialForm.quantityReceived!
       )
         .minus(quantityGroupedInOtherForms)
         .toDecimalPlaces(6); // set precision to gramme
@@ -1527,7 +1545,7 @@ export async function validateAppendix1Groupement(
 }
 
 export async function checkForClosedCompanies(formId: string) {
-  const form = await prisma.form.findUnique({
+  const form = await prisma.form.findUniqueOrThrow({
     where: { id: formId },
     include: { ...SIRETS_BY_ROLE_INCLUDE, forwardedIn: true }
   });

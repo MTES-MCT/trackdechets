@@ -3,6 +3,7 @@ import { RedErrorMessage } from "common/components";
 import { GET_BSDS } from "common/queries";
 import routes from "common/routes";
 import { UPDATE_VHU_FORM } from "form/bsvhu/utils/queries";
+import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 import DateInput from "form/common/components/custom-inputs/DateInput";
 import { Field, Form, Formik } from "formik";
 import {
@@ -28,8 +29,20 @@ const getValidationSchema = (today: Date) =>
       .min(1, "Le nom et prénom de l'auteur de la signature est requis"),
   });
 
-type Props = { siret: string; bsvhuId: string };
-export function SignTransport({ siret, bsvhuId }: Props) {
+type Props = {
+  siret: string;
+  bsvhuId: string;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+  displayActionButton?: boolean;
+};
+export function SignTransport({
+  siret,
+  bsvhuId,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+  displayActionButton,
+}: Props) {
   const [updateBsvhu, { loading: loadingUpdate, error: updateError }] =
     useMutation<Pick<Mutation, "updateBsvhu">, MutationUpdateBsvhuArgs>(
       UPDATE_VHU_FORM
@@ -44,7 +57,13 @@ export function SignTransport({ siret, bsvhuId }: Props) {
   const loading = loadingUpdate || loadingSign;
 
   return (
-    <SignBsvhu title="Signer l'enlèvement" bsvhuId={bsvhuId}>
+    <SignBsvhu
+      title="Signer l'enlèvement"
+      bsvhuId={bsvhuId}
+      isModalOpenFromParent={isModalOpenFromParent}
+      onModalCloseFromParent={onModalCloseFromParent}
+      displayActionButton={displayActionButton}
+    >
       {({ bsvhu, onClose }) => {
         const TODAY = new Date();
         const validationSchema = getValidationSchema(TODAY);
@@ -102,6 +121,7 @@ export function SignTransport({ siret, bsvhuId }: Props) {
                   signant ce document, je déclare prendre en charge le déchet.
                   La signature est horodatée.
                 </p>
+                <TransporterReceipt transporter={bsvhu.transporter!} />
 
                 <div className="form__row">
                   <label className="tw-font-semibold">

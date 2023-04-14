@@ -759,11 +759,11 @@ describe("Mutation.Bsda.sign", () => {
       expect(errors).toBeUndefined();
       expect(data.signBsda.id).toBeTruthy();
 
-      const newBsda1 = await prisma.bsda.findUnique({
+      const newBsda1 = await prisma.bsda.findUniqueOrThrow({
         where: { id: bsda1.id }
       });
       expect(newBsda1.status).toEqual(BsdaStatus.PROCESSED);
-      const newBsda2 = await prisma.bsda.findUnique({
+      const newBsda2 = await prisma.bsda.findUniqueOrThrow({
         where: { id: bsda2.id }
       });
       expect(newBsda2.status).toEqual(BsdaStatus.PROCESSED);
@@ -899,13 +899,13 @@ describe("Mutation.Bsda.sign", () => {
       expect(errors).toBeUndefined();
       expect(data.signBsda.id).toBeTruthy();
 
-      const newGrouped1 = await prisma.bsda.findUnique({
+      const newGrouped1 = await prisma.bsda.findUniqueOrThrow({
         where: { id: grouped1.id }
       });
       expect(newGrouped1.status).toEqual(BsdaStatus.AWAITING_CHILD);
       expect(newGrouped1.groupedInId).toBe(null);
 
-      const newGrouped2 = await prisma.bsda.findUnique({
+      const newGrouped2 = await prisma.bsda.findUniqueOrThrow({
         where: { id: grouped2.id }
       });
       expect(newGrouped2.status).toEqual(BsdaStatus.AWAITING_CHILD);
@@ -963,7 +963,7 @@ describe("Mutation.Bsda.sign", () => {
       expect(errors).toBeUndefined();
       expect(data.signBsda.id).toBeTruthy();
 
-      const newForwarding = await prisma.bsda.findUnique({
+      const newForwarding = await prisma.bsda.findUniqueOrThrow({
         where: { id: forwarding.id }
       });
       expect(newForwarding.status).toEqual(BsdaStatus.REFUSED);

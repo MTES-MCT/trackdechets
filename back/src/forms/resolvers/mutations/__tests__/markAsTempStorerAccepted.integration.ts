@@ -124,7 +124,7 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
       }
     });
 
-    const formAfterMutation = await prisma.form.findUnique({
+    const formAfterMutation = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
 
@@ -179,7 +179,7 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
       }
     });
 
-    const formAfterMutation = await prisma.form.findUnique({
+    const formAfterMutation = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
 
@@ -241,7 +241,7 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
       }
     });
 
-    const formAfterMutation = await prisma.form.findUnique({
+    const formAfterMutation = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
 
@@ -293,8 +293,8 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
         grouping: {
           createMany: {
             data: [
-              { initialFormId: form1.id, quantity: form1.quantityReceived },
-              { initialFormId: form2.id, quantity: form2.quantityReceived }
+              { initialFormId: form1.id, quantity: form1.quantityReceived! },
+              { initialFormId: form2.id, quantity: form2.quantityReceived! }
             ]
           }
         }
@@ -320,17 +320,17 @@ describe("{ mutation { markAsTempStorerAccepted } }", () => {
       }
     });
 
-    const updatedForm1 = await prisma.form.findUnique({
+    const updatedForm1 = await prisma.form.findUniqueOrThrow({
       where: { id: form1.id }
     });
-    const updatedForm2 = await prisma.form.findUnique({
+    const updatedForm2 = await prisma.form.findUniqueOrThrow({
       where: { id: form2.id }
     });
     expect(updatedForm1.status).toEqual("AWAITING_GROUP");
     expect(updatedForm2.status).toEqual("AWAITING_GROUP");
 
     const groupement = await prisma.form
-      .findUnique({
+      .findUniqueOrThrow({
         where: { id: groupementForm.id }
       })
       .grouping({ include: { initialForm: true } });

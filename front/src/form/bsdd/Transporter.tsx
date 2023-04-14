@@ -2,7 +2,6 @@ import RedErrorMessage from "common/components/RedErrorMessage";
 import TdSwitch from "common/components/Switch";
 import { FieldTransportModeSelect } from "common/components";
 import CompanySelector from "form/common/components/company/CompanySelector";
-import DateInput from "form/common/components/custom-inputs/DateInput";
 import { Field, useFormikContext } from "formik";
 import { Transporter as TransporterType } from "generated/graphql/types";
 import React from "react";
@@ -44,23 +43,16 @@ export default function Transporter() {
           }
         }}
       />
-
-      <label>
-        Mode de transport
-        <Field name="transporter.mode" component={FieldTransportModeSelect} />
-      </label>
-
-      {!isForeignVat(values.transporter?.company?.vatNumber!!) && (
+      {!isForeignVat(values.transporter?.company?.vatNumber!) && (
         <>
-          <h4 className="form__section-heading">Autorisations</h4>
+          <h4 className="form__section-heading">
+            Exemption de récépissé de déclaration de transport de déchets
+          </h4>
           <div className="form__row">
             <TdSwitch
               checked={!!values.transporter.isExemptedOfReceipt}
-              onChange={() =>
-                setFieldValue(
-                  "transporter.isExemptedOfReceipt",
-                  !values.transporter.isExemptedOfReceipt
-                )
+              onChange={checked =>
+                setFieldValue("transporter.isExemptedOfReceipt", checked)
               }
               disabled={values.transporter.company?.orgId === null}
               label="Le transporteur déclare être exempté de récépissé conformément aux
@@ -69,56 +61,23 @@ export default function Transporter() {
           </div>
         </>
       )}
-      {!values.transporter.isExemptedOfReceipt &&
-        !isForeignVat(values.transporter?.company?.vatNumber!!) && (
-          <div className="form__row">
-            <label>
-              Numéro de récépissé
-              <Field
-                type="text"
-                name="transporter.receipt"
-                className="td-input"
-              />
-            </label>
+      <div className="form__row">
+        <label>
+          Mode de transport
+          <Field name="transporter.mode" component={FieldTransportModeSelect} />
+        </label>
+        <label>
+          Immatriculation (optionnel)
+          <Field
+            type="text"
+            className={`td-input ${styles.transporterNumberPlate}`}
+            name="transporter.numberPlate"
+            placeholder="Plaque d'immatriculation du véhicule"
+          />
+        </label>
 
-            <RedErrorMessage name="transporter.receipt" />
-
-            <label>
-              Département
-              <Field
-                type="text"
-                name="transporter.department"
-                placeholder="Ex: 83"
-                className={`td-input ${styles.transporterDepartment}`}
-              />
-            </label>
-
-            <RedErrorMessage name="transporter.department" />
-
-            <label>
-              Limite de validité (optionnel)
-              <Field
-                component={DateInput}
-                name="transporter.validityLimit"
-                className={`td-input ${styles.transporterValidityLimit}`}
-              />
-            </label>
-
-            <RedErrorMessage name="transporter.validityLimit" />
-
-            <label>
-              Immatriculation (optionnel)
-              <Field
-                type="text"
-                className={`td-input ${styles.transporterNumberPlate}`}
-                name="transporter.numberPlate"
-                placeholder="Plaque d'immatriculation du véhicule"
-              />
-            </label>
-
-            <RedErrorMessage name="transporter.numberPlate" />
-          </div>
-        )}
+        <RedErrorMessage name="transporter.numberPlate" />
+      </div>
     </>
   );
 }

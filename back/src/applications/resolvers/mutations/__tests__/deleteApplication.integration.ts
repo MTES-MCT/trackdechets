@@ -20,8 +20,8 @@ describe("mutation deleteApplication", () => {
 
   it("should delete an application and revoke all associated tokens", async () => {
     const application = await applicationFactory();
-    const admin = await prisma.user.findFirst({
-      where: { id: application.adminId }
+    const admin = await prisma.user.findFirstOrThrow({
+      where: { id: application.adminId! }
     });
     const user = await userFactory();
     let applicationAccessToken = await prisma.accessToken.create({
@@ -36,10 +36,10 @@ describe("mutation deleteApplication", () => {
       where: { id: application.id }
     });
     expect(deletedApplication).toEqual(null);
-    applicationAccessToken = await prisma.accessToken.findFirst({
+    applicationAccessToken = await prisma.accessToken.findFirstOrThrow({
       where: { id: applicationAccessToken.id }
     });
-    personnalAccessToken = await prisma.accessToken.findFirst({
+    personnalAccessToken = await prisma.accessToken.findFirstOrThrow({
       where: { id: personnalAccessToken.id }
     });
     expect(applicationAccessToken.isRevoked).toEqual(true);

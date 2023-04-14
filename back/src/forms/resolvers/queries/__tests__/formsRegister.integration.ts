@@ -108,7 +108,7 @@ describe("query { formsRegister }", () => {
             ? traderFormFactory
             : emitterFormFactory;
 
-        const form = await customFormFactory(user.id, company.siret);
+        const form = await customFormFactory(user.id, company.siret!);
 
         await refreshElasticSearch();
 
@@ -134,7 +134,7 @@ describe("query { formsRegister }", () => {
 
         expect(res.status).toBe(200);
 
-        const rows = [];
+        const rows: any[] = [];
 
         parseString(res.text, { headers: true, delimiter: ";" })
           .on("data", row => rows.push(row))
@@ -164,7 +164,7 @@ describe("query { formsRegister }", () => {
             ? traderFormFactory
             : emitterFormFactory;
 
-        const form = await customFormFactory(user.id, company.siret);
+        const form = await customFormFactory(user.id, company.siret!);
         await refreshElasticSearch();
 
         const { query } = makeClient(user);

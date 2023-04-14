@@ -71,8 +71,8 @@ describe("mutation sendVerificationCodeLetter", () => {
       variables: { input: { siret: company.siret } }
     });
     expect(sendVerificationCodeLetterSpy).toHaveBeenCalledWith(company);
-    const updatedCompany = await prisma.company.findUnique({
-      where: { siret: company.siret }
+    const updatedCompany = await prisma.company.findUniqueOrThrow({
+      where: { siret: company.siret! }
     });
     expect(updatedCompany.verificationStatus).toEqual(
       CompanyVerificationStatus.LETTER_SENT

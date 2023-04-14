@@ -11,9 +11,10 @@ describe("Repository.helper", () => {
     const siret = "1".padStart(14);
     await runInTransaction(transaction => {
       transaction.addAfterCommitCallback(async () => {
-        const companyCreatedInTransaction = await prisma.company.findUnique({
-          where: { siret }
-        });
+        const companyCreatedInTransaction =
+          await prisma.company.findUniqueOrThrow({
+            where: { siret }
+          });
 
         expect(companyCreatedInTransaction.siret).toBe(siret);
       });
@@ -40,9 +41,10 @@ describe("Repository.helper", () => {
       });
 
       transaction.addAfterCommitCallback(async () => {
-        const companyCreatedInTransaction = await prisma.company.findUnique({
-          where: { siret }
-        });
+        const companyCreatedInTransaction =
+          await prisma.company.findUniqueOrThrow({
+            where: { siret }
+          });
 
         expect(companyCreatedInTransaction.siret).toBe(siret);
       });

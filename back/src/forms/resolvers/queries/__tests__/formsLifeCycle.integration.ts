@@ -216,7 +216,7 @@ describe("Test formsLifeCycle query", () => {
 
     await storeRedisCompanyInfo({
       company: otherCompany,
-      companyTypes: ["WASTE_PROCESSOR"]
+      companyTypes: ["WASTEPROCESSOR"]
     });
     await statusLogFactory({
       status: "RECEIVED",
@@ -295,7 +295,7 @@ describe("Test formsLifeCycle query", () => {
     expect(statusLogs.length).toBe(1);
     expect(statusLogs[0].status).toBe("SENT");
     expect(statusLogs[0].updatedFields.lorem).toBe("ipsum");
-    expect(statusLogs[0].form.id).toBe(form.id);
-    expect(statusLogs[0].user.id).toBe(owner.id);
+    expect(statusLogs[0].form!.id).toBe(form.id);
+    expect(statusLogs[0].user!.id).toBe(owner.id);
   });
 });

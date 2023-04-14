@@ -44,7 +44,7 @@ const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
   const wasteRegistryArgs:
     | QueryWastesRegistryCsvArgs
     | QueryWastesRegistryXlsArgs = {
-    registryType: exportTypeToRegisterType[args.exportType],
+    registryType: exportTypeToRegisterType[args.exportType ?? "ALL"],
     sirets: args.sirets,
     where: {
       bsdType: { _eq: "BSDD" },

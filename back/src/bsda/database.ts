@@ -39,7 +39,7 @@ export async function getPreviousBsdas(
     .findRelatedEntity({ id: bsda.id })
     .grouping(bsdaWithItermediaries);
 
-  return [forwardedBsda, ...groupedBsdas].filter(
+  return [forwardedBsda, ...(groupedBsdas ?? [])].filter(
     Boolean
   ) as Prisma.BsdaGetPayload<typeof bsdaWithItermediaries>[];
 }

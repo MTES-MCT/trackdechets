@@ -5,30 +5,30 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 8px;
-
-  @include desktop {
-    padding: 0;
-  }
+  padding: 0;
 
   &__header {
     display: flex;
     flex-direction: column;
     color: #161616;
-    padding: 0 15px;
+    padding: 2px 8px;
 
     p {
       font-size: 0.75rem; //12px
     }
 
     @include desktop {
-      flex-direction: row;
-      align-items: center;
-      border-bottom: 1px solid #dddddd;
+      & > div {
+        display: flex;
+
+        flex-direction: row;
+        align-items: center;
+        border-bottom: 1px solid #dddddd;
+        width: 100%;
+      }
 
       p {
-        margin: 2px;
-        padding: 2px;
+        padding: 0 4px;
       }
     }
 
@@ -46,13 +46,14 @@
     }
     .workflow-type {
       font-weight: bold;
+      margin: 0;
     }
   }
 
   &__content {
     display: flex;
     flex-direction: column;
-    padding: 5px 15px;
+    padding: 2px 8px;
 
     @include desktop {
       flex-direction: row;
@@ -62,16 +63,33 @@
     &__infos {
       display: flex;
       flex-direction: column;
-      width: 100%;
 
       &__status {
         margin: 5px 0;
       }
 
+      &__weight {
+        position: relative;
+        margin: 10px 0 0 8px;
+        font-weight: 400;
+        font-size: 0.75rem; //12px
+        line-height: 20px;
+        color: #161616;
+        span {
+          position: absolute;
+          top: -2px;
+          padding-left: 18px;
+        }
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+      }
+
       @include desktop {
         flex-direction: row;
         align-items: center;
-        flex-wrap: wrap;
+        flex: 2;
 
         &__status {
           margin: 0;
@@ -108,6 +126,10 @@
       display: flex;
       justify-content: flex-end;
       align-items: center;
+
+      @include desktop {
+        flex: 1;
+      }
 
       .fr-btn {
         margin: 0 2px;

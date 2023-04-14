@@ -43,12 +43,11 @@ function displayCaptcha(errorCode?: string) {
 }
 
 export default function Login() {
-  const location =
-    useLocation<{
-      errorCode?: string;
-      returnTo?: string;
-      username?: string;
-    }>();
+  const location = useLocation<{
+    errorCode?: string;
+    returnTo?: string;
+    username?: string;
+  }>();
 
   useEffect(() => {
     document.title = `Se connecter | ${document.title}`;

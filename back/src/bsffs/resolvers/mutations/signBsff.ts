@@ -220,9 +220,10 @@ const signatures: Record<
         transaction
       );
 
-      const packagings = await findUniqueGetPackagings({
-        where: { id }
-      });
+      const packagings =
+        (await findUniqueGetPackagings({
+          where: { id }
+        })) ?? [];
 
       const status = await getStatus(
         { ...existingBsff, packagings },
@@ -294,9 +295,10 @@ const signatures: Record<
         findUniqueGetPackagings
       } = getBsffRepository(user, transaction);
 
-      const packagings = await findUniqueGetPackagings({
-        where: { id }
-      });
+      const packagings =
+        (await findUniqueGetPackagings({
+          where: { id }
+        })) ?? [];
 
       const status = await getStatus(
         { ...existingBsff, packagings },

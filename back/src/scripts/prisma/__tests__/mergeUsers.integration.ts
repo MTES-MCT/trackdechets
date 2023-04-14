@@ -25,7 +25,7 @@ describe("mergeUsers", () => {
 
     await mergeUsers(user, heir);
 
-    const updatedForm = await prisma.form.findUnique({
+    const updatedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
       include: { owner: { select: { id: true } } }
     });
@@ -44,7 +44,7 @@ describe("mergeUsers", () => {
 
     await mergeUsers(user, heir);
 
-    const updatedStatusLog = await prisma.statusLog.findUnique({
+    const updatedStatusLog = await prisma.statusLog.findUniqueOrThrow({
       where: { id: statusLog.id },
       include: { user: { select: { id: true } } }
     });
@@ -96,7 +96,7 @@ describe("mergeUsers", () => {
 
     await mergeUsers(user, heir);
 
-    const updatedAccessToken = await prisma.accessToken.findUnique({
+    const updatedAccessToken = await prisma.accessToken.findUniqueOrThrow({
       where: { token: hashToken(accessToken) },
       include: { user: { select: { id: true } } }
     });
@@ -116,12 +116,12 @@ describe("mergeUsers", () => {
 
     await mergeUsers(user, heir);
 
-    const updatedApplication = await prisma.application.findUnique({
+    const updatedApplication = await prisma.application.findUniqueOrThrow({
       where: {
         id: application.id
       },
       include: { admin: { select: { id: true } } }
     });
-    expect(updatedApplication.admin.id).toEqual(heir.id);
+    expect(updatedApplication.admin!.id).toEqual(heir.id);
   });
 });
