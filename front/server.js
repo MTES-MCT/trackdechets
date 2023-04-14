@@ -23,6 +23,8 @@ const CONNECT_SRC = [
   "https://openmaptiles.github.io",
 ];
 
+const WORKER_SRC = ["blob:"]; // needed for MapBox
+
 app.use(
   helmet({
     frameguard: {
@@ -33,6 +35,7 @@ app.use(
       directives: {
         defaultSrc: DEFAULT_SRC,
         connectSrc: CONNECT_SRC,
+        workerSrc: WORKER_SRC,
         baseUri: "'self'",
         formAction: ["http:"], // allow external redirects for oauth workflow
         fontSrc: ["'self'", "https:", "data:"],
