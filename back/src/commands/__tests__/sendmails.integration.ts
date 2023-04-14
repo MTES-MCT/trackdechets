@@ -269,7 +269,7 @@ describe("sendPendingRevisionRequestToAdminDetailsEmail", () => {
     expect(mockedAxiosPost as jest.Mock<any>).toHaveBeenCalledTimes(0);
   });
 
-  it.only("requests > should not send mails", async () => {
+  it("requests > should not send mails", async () => {
     // Given
 
     // BSDD
