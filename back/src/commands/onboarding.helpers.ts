@@ -308,25 +308,25 @@ export interface BsddRevisionRequestWithReadableId extends BsddRevisionRequest {
 
 type RequestWithApprovals =
   | (BsddRevisionRequestWithReadableId & {
-      approvals: BsddRevisionRequestApproval[];
-    })
+    approvals: BsddRevisionRequestApproval[];
+  })
   | (BsdaRevisionRequest & {
-      approvals: BsdaRevisionRequestApproval[];
-    });
+    approvals: BsdaRevisionRequestApproval[];
+  });
 
 type RequestWithWrappedApprovals =
   | (BsddRevisionRequestWithReadableId & {
-      approvals: (BsddRevisionRequestApproval & {
-        admins: User[];
-        company: Company;
-      })[];
-    })
+    approvals: (BsddRevisionRequestApproval & {
+      admins: User[];
+      company: Company;
+    })[];
+  })
   | (BsdaRevisionRequest & {
-      approvals: (BsdaRevisionRequestApproval & {
-        admins: User[];
-        company: Company;
-      })[];
-    });
+    approvals: (BsdaRevisionRequestApproval & {
+      admins: User[];
+      company: Company;
+    })[];
+  });
 
 /**
  * Will add pending approval companies' admins to requests
@@ -359,8 +359,8 @@ export const addPendingApprovalsCompanyAdmins = async (
         )
         .map(approval => ({
           ...approval,
-          company: companiesAndAdminsByOrgIds.companies[approval.approverSiret],
-          admins: companiesAndAdminsByOrgIds.admins[approval.approverSiret]
+          company: companiesAndAdminsByOrgIds[approval.approverSiret],
+          admins: companiesAndAdminsByOrgIds[approval.approverSiret].admins
         }))
     };
   });
@@ -424,42 +424,44 @@ export const sendPendingRevisionRequestToAdminDetailsEmail = async (
     ...pendingBsdaRevisionRequest
   ];
 
-  // Build a message template for each request, for each approval
-  const messageVersions: MessageVersion[] = requests
-    .map(request => {
-      return request.approvals.map(approval => {
-        const variables = {
-          requestCreatedAt: formatDate(request.createdAt),
-          bsdReadableId:
-            (request as BsddRevisionRequestWithReadableId).bsdd?.readableId ??
-            (request as BsdaRevisionRequest).bsdaId,
-          companyName: approval.company.name,
-          companyOrgId: approval.company.orgId
-        };
+  if (requests.length) {
+    // Build a message template for each request, for each approval
+    const messageVersions: MessageVersion[] = requests
+      .map(request => {
+        return request.approvals.map(approval => {
+          const variables = {
+            requestCreatedAt: formatDate(request.createdAt),
+            bsdReadableId:
+              (request as BsddRevisionRequestWithReadableId).bsdd?.readableId ??
+              (request as BsdaRevisionRequest).bsdaId,
+            companyName: approval.company.name,
+            companyOrgId: approval.company.orgId
+          };
 
-        const template = renderMail(pendingRevisionRequestAdminDetailsEmail, {
-          variables,
-          messageVersions: []
+          const template = renderMail(pendingRevisionRequestAdminDetailsEmail, {
+            variables,
+            messageVersions: []
+          });
+
+          return {
+            to: approval.admins.map(admin => ({
+              email: admin.email,
+              name: admin.name
+            })),
+            params: {
+              body: template.body
+            }
+          };
         });
+      })
+      .flat();
 
-        return {
-          to: approval.admins.map(admin => ({
-            email: admin.email,
-            name: admin.name
-          })),
-          params: {
-            body: template.body
-          }
-        };
-      });
-    })
-    .flat();
+    const payload = renderMail(pendingRevisionRequestAdminDetailsEmail, {
+      messageVersions
+    });
 
-  const payload = renderMail(pendingRevisionRequestAdminDetailsEmail, {
-    messageVersions
-  });
-
-  await sendMail(payload);
+    await sendMail(payload);
+  }
 
   await prisma.$disconnect();
 };

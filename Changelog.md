@@ -8,6 +8,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Envoi d'un mail aux administrateurs d'une entreprise ayant ignoré une RevisionRequest pendant 5 jours (BSD + BSDA) [PR 2288](https://github.com/MTES-MCT/trackdechets/pull/2288)
+
 #### :bug: Corrections de bugs
 
 #### :boom: Breaking changes

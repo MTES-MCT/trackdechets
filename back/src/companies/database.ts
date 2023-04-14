@@ -232,48 +232,32 @@ export async function getActiveAdminsByCompanyIds(
  * Get all the companies and admins from companies, by companyOrgIds
  * Will return an object like:
  * {
- *   companies: { [orgId]: company},
- *   admins: { [ordId]: user[] }
+ *   [ordId]: { ...company, admins: user[] }
  * }
  */
 export const getCompaniesAndActiveAdminsByCompanyOrgIds = async (
   orgIds: string[]
-): Promise<{
-  companies: Record<string, Company>;
-  admins: Record<string, User[]>;
-}> => {
-  const companiesAndAdmins = await prisma.companyAssociation
-    .findMany({
-      where: {
-        company: { orgId: { in: orgIds } },
-        role: "ADMIN",
-        user: { isActive: true }
-      },
-      include: { user: true, company: true }
-    })
-    .then(associations =>
-      associations.map(a => {
-        return {
-          admin: a.user,
-          company: a.company
-        };
-      })
-    );
-
-  const companiesByOrgId: Record<string, Company> = {};
-  const adminsByOrgId: Record<string, User[]> = {};
-
-  companiesAndAdmins.forEach(companyAndAdmin => {
-    companiesByOrgId[companyAndAdmin.company.orgId] = companyAndAdmin.company;
-
-    if (adminsByOrgId[companyAndAdmin.company.orgId]) {
-      adminsByOrgId[companyAndAdmin.company.orgId].push(companyAndAdmin.admin);
-    } else {
-      adminsByOrgId[companyAndAdmin.company.orgId] = [companyAndAdmin.admin];
+): Promise<Record<string, Company & { admins: User[] }>> => {
+  const companies = await prisma.company.findMany({
+    where: { orgId: { in: orgIds } },
+    include: {
+      companyAssociations: {
+        where: { role: "ADMIN", user: { isActive: true } },
+        include: { user: true, company: true }
+      }
     }
   });
 
-  return { companies: companiesByOrgId, admins: adminsByOrgId };
+  return companies.reduce<Record<string, Company & { admins: User[] }>>(
+    (companiesAndAdminsByOrgId, { companyAssociations, ...company }) => ({
+      ...companiesAndAdminsByOrgId,
+      [company.orgId]: {
+        ...company,
+        admins: companyAssociations.map(({ user }) => user)
+      }
+    }),
+    {}
+  );
 };
 
 export async function getTraderReceiptOrNotFound({
