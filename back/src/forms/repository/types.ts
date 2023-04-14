@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import { CountFormsFn } from "./form/count";
 import { CreateFormFn } from "./form/create";
 import { DeleteFormFn } from "./form/delete";
