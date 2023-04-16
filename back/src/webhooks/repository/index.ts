@@ -7,7 +7,7 @@ import { buildCountWebhookSettings } from "./webhookSetting/count";
 import { buildCreateWebhookSetting } from "./webhookSetting/create";
 import { buildDeleteWebhookSetting } from "./webhookSetting/delete";
 import { buildUpdatWebhookSettings } from "./webhookSetting/update";
-import { buildUpdateManyWebhookSettings } from "./webhookSetting/updateMany";
+
 import {
   RepositoryFnBuilder,
   RepositoryTransaction
@@ -35,7 +35,6 @@ export function getWebhookSettingRepository(
     ...getReadonlyWebhookSettingRepository(),
     create: useTransaction(buildCreateWebhookSetting),
     delete: useTransaction(buildDeleteWebhookSetting),
-    update: useTransaction(buildUpdatWebhookSettings),
-    updateMany: useTransaction(buildUpdateManyWebhookSettings)
+    update: useTransaction(buildUpdatWebhookSettings)
   };
 }

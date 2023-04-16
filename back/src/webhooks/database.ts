@@ -1,7 +1,7 @@
 import { WebhookSettingNotFound } from "./errors";
 import { UserInputError } from "apollo-server-express";
 import { getReadonlyWebhookSettingRepository } from "./repository";
-import { WebhookSetting, Company } from "@prisma/client";
+import { WebhookSetting } from "@prisma/client";
 import prisma from "../prisma";
 
 /**
@@ -27,24 +27,7 @@ export async function getWebhookSettingOrNotFound({
   return webhookConfig;
 }
 
-export async function getUserWebhookCompanies({
-  userId
-}: {
-  userId: string;
-}): Promise<Company[]> {
-  if (!userId) {
-    throw new UserInputError("You should specify an id");
-  }
-
-  const associations = await prisma.companyAssociation.findMany({
-    where: { userId: userId, role: "ADMIN" },
-    include: { company: true }
-  });
-
-  return associations.map(a => a.company);
-}
-
-export async function getUserWebhookCompanyIds({
+export async function getUserWebhookCompanyOrgIds({
   userId
 }: {
   userId: string;
@@ -55,8 +38,8 @@ export async function getUserWebhookCompanyIds({
 
   const associations = await prisma.companyAssociation.findMany({
     where: { userId: userId, role: "ADMIN" },
-    select: { companyId: true }
+    include: { company: { select: { orgId: true } } }
   });
 
-  return associations.map(a => a.companyId);
+  return associations.map(a => a.company.orgId);
 }

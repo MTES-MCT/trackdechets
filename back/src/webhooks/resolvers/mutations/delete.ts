@@ -10,10 +10,6 @@ import { formatWebhookSettingFromDB } from "../../converter";
 import { getWebhookSettingOrNotFound } from "../../database";
 
 import { checkCanEditWebhookSetting } from "../../permissions";
-import {
-  delWebhookSetting,
-  setWebhookSettingsByOrgid
-} from "../../../common/redis/webhooksettings";
 
 const deleteWebhookSettingResolver = async (
   _: ResolversParentTypes["Mutation"],
@@ -29,14 +25,11 @@ const deleteWebhookSettingResolver = async (
 
   const webhookSettingRepository = getWebhookSettingRepository(user);
 
-  const updatedWebhookSetting = await webhookSettingRepository.delete({
+  const deletedWebhookSetting = await webhookSettingRepository.delete({
     id: id
   });
 
-  await delWebhookSetting(webhookSetting);
-  await setWebhookSettingsByOrgid(webhookSetting.orgId);
-
-  return formatWebhookSettingFromDB(updatedWebhookSetting);
+  return formatWebhookSettingFromDB(deletedWebhookSetting);
 };
 
 export default deleteWebhookSettingResolver;

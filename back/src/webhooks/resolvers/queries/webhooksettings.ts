@@ -4,7 +4,7 @@ import { getConnection } from "../../../common/pagination";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { getWebhookSettingRepository } from "../../repository";
 import { formatWebhookSettingFromDB } from "../../converter";
-import { getUserWebhookCompanyIds } from "../../database";
+import { getUserWebhookCompanyOrgIds } from "../../database";
 
 const webhookSettingsResolver: QueryResolvers["webhooksettings"] = async (
   _,
@@ -16,9 +16,9 @@ const webhookSettingsResolver: QueryResolvers["webhooksettings"] = async (
   const { ...gqlPaginationArgs } = args;
 
   // ensure query returns only webhookConfigs belonging to current user
-  const companyIds = await getUserWebhookCompanyIds({ userId: user.id });
+  const companyOrgIds = await getUserWebhookCompanyOrgIds({ userId: user.id });
 
-  const where = { companyId: { in: companyIds } };
+  const where = { orgId: { in: companyOrgIds } };
   const webhookSettingRepository = getWebhookSettingRepository(user);
 
   const totalCount = await webhookSettingRepository.count(where);

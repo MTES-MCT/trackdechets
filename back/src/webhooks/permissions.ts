@@ -1,6 +1,6 @@
 import { User, WebhookSetting } from "@prisma/client";
 
-import { getUserWebhookCompanyIds } from "./database";
+import { getUserWebhookCompanyOrgIds } from "./database";
 
 import { WebhookSettingForbidden } from "./errors";
 
@@ -8,9 +8,9 @@ export async function checkCanEditWebhookSetting(
   user: User,
   webhookSetting: WebhookSetting
 ) {
-  const companyIds = await getUserWebhookCompanyIds({ userId: user.id });
+  const companyOrgIds = await getUserWebhookCompanyOrgIds({ userId: user.id });
 
-  if (!companyIds.includes(webhookSetting.companyId)) {
+  if (!companyOrgIds.includes(webhookSetting.orgId)) {
     throw new WebhookSettingForbidden(webhookSetting.id);
   }
 }

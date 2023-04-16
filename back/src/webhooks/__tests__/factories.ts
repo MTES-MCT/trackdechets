@@ -18,7 +18,6 @@ export const webhookSettingFactory = async ({
   const encryptedToken = aesEncrypt(clearToken);
   const webhookSetting = await prisma.webhookSetting.create({
     data: {
-      company: { connect: { id: company.id } },
       endpointUri,
       token: encryptedToken,
       activated: activated,

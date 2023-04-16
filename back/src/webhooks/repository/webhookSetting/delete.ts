@@ -4,6 +4,7 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { webhookSettingEventTypes } from "./eventTypes";
+import { delWebhookSetting } from "../../../common/redis/webhooksettings";
 
 export type DeleteWebhookSettingFn = (
   where: Prisma.WebhookSettingWhereUniqueInput,
@@ -28,7 +29,8 @@ export function buildDeleteWebhookSetting(
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
-    // todo: clear redis
+
+    await delWebhookSetting(deletedWebhookSetting.orgId);
 
     return deletedWebhookSetting;
   };

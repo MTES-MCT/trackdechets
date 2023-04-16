@@ -3,8 +3,8 @@ import { WebhookSetting } from "@prisma/client";
 
 type WebhookSettingCreateInput = Pick<
   WebhookSetting,
-  "companyId" | "endpointUri" | "token" | "activated"
->;
+  "endpointUri" | "token" | "activated"
+> & { companyId: string };
 type WebhookSettingUpdateInput = Omit<WebhookSettingCreateInput, "companyId">;
 
 const webhookSettingUpdateSchema: yup.SchemaOf<WebhookSettingUpdateInput> =

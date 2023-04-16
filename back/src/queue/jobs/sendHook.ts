@@ -1,9 +1,20 @@
 import axios from "axios";
-import { getWebhookSettings } from "../../common/redis/webhooksettings";
+import {
+  getWebhookSettings,
+  handleWebhookFail
+} from "../../common/redis/webhooksettings";
 import { aesDecrypt } from "../../utils";
 import { WebhookQueueItem } from "../producers/webhooks";
 import { Job } from "bull";
 import logger from "../../logging/logger";
+
+class WebhookRequestError extends Error {
+  constructor(message: string) {
+    super(message);
+
+    this.name = "WebhookRequestError";
+  }
+}
 
 const WEBHOOK_REQUEST_TIMEMOUT = 5000;
 
@@ -16,22 +27,26 @@ export const axiosPost = async (url, action, id, clearToken) => {
 
 const apiCallProcessor = async ({
   url,
+  orgId,
   payload
 }: {
   url: string;
+  orgId: string;
   payload: { action: string; id: string; token: string };
 }) => {
   const { action, id, token } = payload;
   logger.info(`Sending webhook request to ${url}`);
-  let success = false;
+
   try {
     const clearToken = aesDecrypt(token);
     // we send the payload as an array, maybe we'll group webhooks by recipients in the future
     const res = await axiosPost(url, action, id, clearToken);
+    // Customer server endpoint are supposed to return HTTP 200 each time a request si amde
     if (res.status !== 200) {
+      // valid enpoint response, exit
       logger.error(`Webhook invalid return status (${res.status}) (${url})`);
     } else {
-      success = true;
+      return;
     }
   } catch (err) {
     logger.error(`Webhook error : ${err.message} - ${err.code} (${url})`);
@@ -46,17 +61,17 @@ const apiCallProcessor = async ({
     }
   }
 
-  if (!success) {
-    // todo: handle consecutive errors to deactivate webhooks
-  }
+  await handleWebhookFail(orgId);
+  // throw to trigger bull retry mechanism
+  throw new WebhookRequestError(`Webhook requets fail for orgId ${orgId}`);
 };
 export async function sendHookJob(job: Job<WebhookQueueItem>) {
   const { id, sirets, action } = job.data;
 
-  const uniqueSirets = new Set(sirets);
+  const uniqueOrgIds = new Set(sirets);
 
-  for (const siret of uniqueSirets) {
-    const settings = await getWebhookSettings(siret);
+  for (const orgId of uniqueOrgIds) {
+    const settings = await getWebhookSettings(orgId);
 
     if (!settings.length) {
       continue;
@@ -64,6 +79,7 @@ export async function sendHookJob(job: Job<WebhookQueueItem>) {
     for (const setting of settings) {
       await apiCallProcessor({
         url: setting.endpointUri,
+        orgId,
         payload: {
           token: setting.token,
           id,

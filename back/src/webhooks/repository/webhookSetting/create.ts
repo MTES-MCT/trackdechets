@@ -4,6 +4,7 @@ import {
   RepositoryFnDeps
 } from "../../../common/repository/types";
 import { webhookSettingEventTypes } from "./eventTypes";
+import { setWebhookSetting } from "../../../common/redis/webhooksettings";
 
 export type CreateWebhookSettingFn = (
   data: Prisma.WebhookSettingCreateInput,
@@ -28,6 +29,9 @@ export function buildCreateWebhookSetting(
       }
     });
 
+    if (webhookSetting.activated) {
+      await setWebhookSetting(webhookSetting);
+    }
     return webhookSetting;
   };
 }

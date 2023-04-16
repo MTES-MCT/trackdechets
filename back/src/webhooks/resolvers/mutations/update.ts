@@ -12,10 +12,6 @@ import { getWebhookSettingOrNotFound } from "../../database";
 import { validateWebhookUpdateInput } from "../../validation";
 import { aesEncrypt } from "../../../utils";
 import { checkCanEditWebhookSetting } from "../../permissions";
-import {
-  delWebhookSetting,
-  setWebhookSettingsByOrgid
-} from "../../../common/redis/webhooksettings";
 
 const updateWebhookSettingResolver = async (
   _: ResolversParentTypes["Mutation"],
@@ -47,12 +43,6 @@ const updateWebhookSettingResolver = async (
       ...(activated !== undefined ? { activated } : {})
     }
   );
-
-  await delWebhookSetting(webhookSetting);
-
-  if (updatedWebhookSetting.activated) {
-    await setWebhookSettingsByOrgid(webhookSetting.orgId);
-  }
 
   return formatWebhookSettingFromDB(updatedWebhookSetting);
 };

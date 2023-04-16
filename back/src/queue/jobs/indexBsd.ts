@@ -9,7 +9,7 @@ import prisma from "../../prisma";
 
 export async function indexBsdJob(
   job: Job<string>
-): Promise<BsdElastic & { siretsBeforeUpdate?: string[] }> {
+): Promise<BsdElastic & { siretsBeforeUpdate: string[] }> {
   const bsdId = job.data;
   const indexed = await getElasticBsdById(bsdId);
 

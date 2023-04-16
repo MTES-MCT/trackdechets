@@ -5,6 +5,10 @@ import {
 } from "../../../common/repository/types";
 
 import { webhookSettingEventTypes } from "./eventTypes";
+import {
+  delWebhookSetting,
+  setWebhookSetting
+} from "../../../common/redis/webhooksettings";
 
 export type UpdateWebhookSettingFn = (
   where: Prisma.WebhookSettingWhereUniqueInput,
@@ -22,7 +26,11 @@ export function buildUpdatWebhookSettings(
     const { prisma, user } = deps;
 
     const webhookSetting = await prisma.webhookSetting.update({ where, data });
-
+    await delWebhookSetting(webhookSetting.orgId);
+    console.log(webhookSetting);
+    if (webhookSetting.activated) {
+      await setWebhookSetting(webhookSetting);
+    }
     await prisma.event.create({
       data: {
         streamId: webhookSetting.id,

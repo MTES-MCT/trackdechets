@@ -7,12 +7,10 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getWebhookSettingRepository } from "../../repository";
 import { UserInputError } from "apollo-server-express";
 import { formatWebhookSettingFromDB } from "../../converter";
-import { getUserWebhookCompanyIds } from "../../database";
-import prisma from "../../../prisma";
+import { getUserWebhookCompanyOrgIds } from "../../database";
 import { validateWebhookCreateInput } from "../../validation";
 import { aesEncrypt } from "../../../utils";
-
-import { setWebhookSetting } from "../../../common/redis/webhooksettings";
+import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 
 const createWebhookSettingResolver = async (
   _: ResolversParentTypes["Mutation"],
@@ -24,21 +22,19 @@ const createWebhookSettingResolver = async (
 
   await validateWebhookCreateInput(input);
 
-  const allowedCompanies = await getUserWebhookCompanyIds({ userId: user.id });
+  const allowedCompaniesOrgIds = await getUserWebhookCompanyOrgIds({
+    userId: user.id
+  });
 
   const { companyId, endpointUri, token } = input;
 
-  if (!allowedCompanies.includes(companyId)) {
+  const company = await getCompanyOrCompanyNotFound({ id: companyId });
+
+  if (!allowedCompaniesOrgIds.includes(company.orgId)) {
     throw new UserInputError(
       "Vous n'avez pas la permission de gérer les webhooks de cet établissement."
     );
   }
-
-  const company = await prisma.company.findUnique({
-    where: {
-      id: companyId
-    }
-  });
 
   if (!company) {
     throw new UserInputError(
@@ -47,7 +43,7 @@ const createWebhookSettingResolver = async (
   }
   const webhookSettingRepository = getWebhookSettingRepository(user);
   const hasWebhookSettings = await webhookSettingRepository.count({
-    companyId
+    orgId: company.orgId
   });
 
   if (hasWebhookSettings) {
@@ -59,16 +55,12 @@ const createWebhookSettingResolver = async (
   const encryptedToken = aesEncrypt(token);
 
   const webhookSetting = await webhookSettingRepository.create({
-    company: { connect: { id: companyId } },
     endpointUri,
     token: encryptedToken,
     activated: input.activated,
     orgId: company.orgId
   });
 
-  if (webhookSetting.activated) {
-    await setWebhookSetting(webhookSetting);
-  }
   return formatWebhookSettingFromDB(webhookSetting);
 };
 
