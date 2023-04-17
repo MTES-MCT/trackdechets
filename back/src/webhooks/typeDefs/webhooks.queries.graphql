@@ -1,6 +1,5 @@
 type Query {
   """
-  USAGE INTERNE
   Renvoie les WebhooksSettings.
   Les WebhooksSettings des différentes companies de l'utilisateur sont renvoyés.
   """
@@ -43,9 +42,6 @@ type Query {
     last: Int
   ): WebhookSettingConnection!
 
-  """
-  USAGE INTERNE
-  """
   webhooksetting(
     """
     Identifiant de l'objet WebhookSetting

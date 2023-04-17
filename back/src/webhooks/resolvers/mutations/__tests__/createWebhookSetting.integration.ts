@@ -125,7 +125,34 @@ describe("Mutation.createWebhookSetting", () => {
       })
     ]);
   });
+  it("should forbid non htpps uri", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
 
+    const { mutate } = makeClient(user);
+
+    const { errors } = await mutate<Pick<Mutation, "createWebhookSetting">>(
+      CREATE_WEBHOOK_SETTING,
+      {
+        variables: {
+          input: {
+            companyId: company.id,
+            endpointUri: "http://no-https.com/webhook",
+            token: "secret_secret_secret",
+            activated: true
+          }
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "L'url doit être en https",
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
   it("should forbid to create a webhook setting for MEMBERS", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
 

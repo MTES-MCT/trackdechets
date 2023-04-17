@@ -1,0 +1,19 @@
+input WebhookSettingCreateInput {
+  "Id de l'établissement, non modifiable"
+  companyId: String!
+  "Url de notification, https obligatoire"
+  endpointUri: String!
+  "Minimum 20 caractères, modifiable mais non lisible"
+  token: String!
+  "Le webhook est-il activé ?"
+  activated: Boolean!
+}
+
+input WebhookSettingUpdateInput {
+  "Url de notification, https obligatoire"
+  endpointUri: String
+  "Minimum 20 caractères, modifiable mais non lisible"
+  token: String
+  "Le webhook est-il activé ?"
+  activated: Boolean
+}

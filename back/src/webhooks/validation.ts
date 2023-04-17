@@ -9,7 +9,16 @@ type WebhookSettingUpdateInput = Omit<WebhookSettingCreateInput, "companyId">;
 
 const webhookSettingUpdateSchema: yup.SchemaOf<WebhookSettingUpdateInput> =
   yup.object({
-    endpointUri: yup.string().url().max(300),
+    endpointUri: yup
+      .string()
+      .url()
+      .max(300)
+
+      .test(
+        "webhook-url-https",
+        "L'url doit être en https",
+        value => value === undefined || value.startsWith("https://")
+      ),
     token: yup.string().notRequired().min(20).max(100),
     activated: yup.boolean()
   });
@@ -21,7 +30,10 @@ const webhookSettingCreateSchema: yup.SchemaOf<WebhookSettingCreateInput> =
       .string()
       .url()
       .max(300)
-      .required("L'url de notification du webhook est requis"),
+      .required("L'url de notification du webhook est requise")
+      .test("webhook-url-https", "L'url doit être en https", value =>
+        value.startsWith("https://")
+      ),
     token: yup.string().notRequired().min(20).max(100),
     activated: yup.boolean()
   });

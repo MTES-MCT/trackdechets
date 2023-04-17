@@ -96,7 +96,6 @@ describe("Mutation.updateWebhookSetting", () => {
     const { mutate } = makeClient(user);
     const whs = await webhookSettingFactory({
       company,
-
       endpointUri: "https://lorem.ipsum"
     });
     const { errors } = await mutate<Pick<Mutation, "updateWebhookSetting">>(
@@ -112,6 +111,33 @@ describe("Mutation.updateWebhookSetting", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message: `token must be at least 20 characters`,
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+  });
+  it("should forbid non https uri", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const { mutate } = makeClient(user);
+    const whs = await webhookSettingFactory({
+      company,
+      endpointUri: "https://lorem.ipsum"
+    });
+    const { errors } = await mutate<Pick<Mutation, "updateWebhookSetting">>(
+      UPDATE_WEBHOOK_SETTING,
+      {
+        variables: {
+          id: whs.id,
+          input: { endpointUri: "http://no-ssl.com" }
+        }
+      }
+    );
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `L'url doit être en https`,
         extensions: expect.objectContaining({
           code: ErrorCode.BAD_USER_INPUT
         })
