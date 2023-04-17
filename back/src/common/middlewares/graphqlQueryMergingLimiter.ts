@@ -2,7 +2,7 @@ import {
   ApolloServerPlugin,
   GraphQLRequestContext
 } from "apollo-server-plugin-base";
-import { OperationDefinitionNode } from "graphql";
+import { Kind, OperationDefinitionNode } from "graphql";
 import { MAX_OPERATIONS_PER_REQUEST } from "./graphqlBatchLimiter";
 import { ErrorCode } from "../errors";
 import { ApolloError } from "apollo-server-core";
@@ -22,9 +22,19 @@ export function graphqlQueryMergingLimiter(): ApolloServerPlugin {
     async requestDidStart(_: GraphQLRequestContext) {
       return {
         async didResolveOperation(requestContext: GraphQLRequestContext) {
-          const [definition] = requestContext?.document
-            ?.definitions as OperationDefinitionNode[];
-          const mergedQueries = definition?.selectionSet?.selections?.length;
+          const operationsDefinitions =
+            requestContext?.document?.definitions.filter(
+              definition => definition.kind === Kind.OPERATION_DEFINITION
+            );
+
+          const mergedQueries = (
+            operationsDefinitions as OperationDefinitionNode[]
+          ).reduce((accumulator, definition) => {
+            const operationsLength =
+              definition?.selectionSet?.selections?.length;
+            if (isNaN(operationsLength)) return accumulator;
+            return accumulator + operationsLength;
+          }, 0);
 
           if (mergedQueries > MAX_OPERATIONS_PER_REQUEST) {
             throw new GraphqlQueryLimit(
