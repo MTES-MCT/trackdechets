@@ -213,7 +213,7 @@ describe("Mutation.createDraftBsff", () => {
       }
     });
 
-    const bsff = await prisma.bsff.findUnique({
+    const bsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: data.createDraftBsff.id }
     });
 
@@ -381,7 +381,7 @@ describe("Mutation.createDraftBsff", () => {
         data: { ...packagingData, acceptationWasteCode: "14 06 02*" }
       });
 
-      bsff = await prisma.bsff.findUnique({
+      bsff = await prisma.bsff.findUniqueOrThrow({
         where: { id: bsff.id },
         include: { packagings: true }
       });

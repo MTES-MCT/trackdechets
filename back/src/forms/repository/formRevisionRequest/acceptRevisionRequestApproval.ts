@@ -21,7 +21,7 @@ import buildRemoveAppendix2 from "../form/removeAppendix2";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
-  { comment }: { comment?: string },
+  { comment }: { comment?: string | null },
   logMetadata?: LogMetadata
 ) => Promise<void>;
 

@@ -11,6 +11,11 @@ const buildFindGroupedFormsById: (
     const grouping = await prisma.form
       .findUnique({ where: { id } })
       .grouping({ include: { initialForm: true } });
+
+    if (!grouping) {
+      return [];
+    }
+
     return grouping.map(g => g.initialForm);
   };
 

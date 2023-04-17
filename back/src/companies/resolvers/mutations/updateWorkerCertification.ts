@@ -1,4 +1,5 @@
 import { applyAuthStrategies, AuthType } from "../../../auth";
+import { removeEmptyKeys } from "../../../common/converter";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationUpdateWorkerCertificationArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
@@ -21,7 +22,7 @@ export async function updateWorkerCertification(
   await workerCertificationSchema.validate(input);
 
   return prisma.workerCertification.update({
-    data,
+    data: removeEmptyKeys(data),
     where: { id: certification.id }
   });
 }

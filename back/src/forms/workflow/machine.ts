@@ -230,7 +230,7 @@ const machine = Machine<any, Event>(
   {
     guards: {
       isExemptOfTraceability: (_, event) => {
-        function guard(update: Prisma.FormUpdateInput) {
+        function guard(update: Prisma.FormUpdateInput | undefined) {
           if (!update) return false;
           return update.noTraceability === true;
         }
@@ -240,7 +240,7 @@ const machine = Machine<any, Event>(
         );
       },
       awaitsGroup: (_, event) => {
-        function guard(update: Prisma.FormUpdateInput) {
+        function guard(update: Prisma.FormUpdateInput | undefined) {
           if (!update) return false;
           return (
             PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
@@ -257,14 +257,14 @@ const machine = Machine<any, Event>(
         );
       },
       isFollowedWithPnttd: (_, event) => {
-        function guard(update: Prisma.FormUpdateInput) {
+        function guard(update: Prisma.FormUpdateInput | undefined) {
           if (!update) return false;
           return (
             PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
               update.processingOperationDone as string
             ) &&
             isForeignNextDestination(update) &&
-            !(update.noTraceability === true)
+            update.noTraceability !== true
           );
         }
         return (
@@ -273,7 +273,7 @@ const machine = Machine<any, Event>(
         );
       },
       isFormRefused: (_, event) => {
-        function guard(update: Prisma.FormUpdateInput) {
+        function guard(update: Prisma.FormUpdateInput | undefined) {
           if (!update) return false;
           return update.wasteAcceptationStatus === "REFUSED";
         }
@@ -284,7 +284,7 @@ const machine = Machine<any, Event>(
         );
       },
       isFormAccepted: (_, event) => {
-        function guard(update: Prisma.FormUpdateInput) {
+        function guard(update: Prisma.FormUpdateInput | undefined) {
           if (!update) return false;
           return [
             WasteAcceptationStatus.ACCEPTED,
@@ -322,6 +322,7 @@ function isForeignNextDestination(update: Prisma.FormUpdateInput) {
   ) {
     return true;
   }
+  return false;
 }
 
 export default machine;

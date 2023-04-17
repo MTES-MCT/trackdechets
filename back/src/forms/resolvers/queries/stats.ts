@@ -32,6 +32,10 @@ const statsResolver: QueryResolvers["stats"] = async (
     });
 
     const stats = queriedForms.reduce((prev, cur) => {
+      if (!cur.wasteDetailsCode) {
+        return prev;
+      }
+
       prev[cur.wasteDetailsCode] = prev[cur.wasteDetailsCode] || {
         wasteCode: cur.wasteDetailsCode,
         incoming: 0,

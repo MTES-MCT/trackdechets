@@ -13,12 +13,12 @@ export const InitialBsff: BsffResolvers = {
       where: { id }
     });
     try {
-      await checkCanReadBsff(user, bsff);
+      await checkCanReadBsff(user!, bsff!);
     } catch (err) {
       throw new ForbiddenError(
         `Vous ne pouvez pas accéder au champ "emitter" du bordereau initial ${id}`
       );
     }
-    return emitter;
+    return emitter ?? null;
   }
 };

@@ -1,7 +1,6 @@
 import {
   Consistence,
   EmitterType,
-  Form,
   Prisma,
   QuantityType,
   Status,
@@ -358,7 +357,7 @@ describe("mutation / importPaperForm", () => {
   describe("update an existing BSD with imported data", () => {
     afterEach(resetDatabase);
 
-    async function getBaseData(): Promise<Partial<Form>> {
+    async function getBaseData() {
       const { company: transporterCompany } = await userWithCompanyFactory(
         "MEMBER"
       );
@@ -368,7 +367,7 @@ describe("mutation / importPaperForm", () => {
 
       return {
         status: "SEALED",
-        emitterType: "PRODUCER",
+        emitterType: EmitterType.PRODUCER,
         emitterCompanySiret: siretify(3),
         emitterCompanyName: "Émetteur",
         emitterCompanyAddress: "Somewhere",
@@ -392,9 +391,9 @@ describe("mutation / importPaperForm", () => {
         transporterCompanyMail: "trasnporteur@trackdechets.fr",
         wasteDetailsCode: "01 03 04*",
         wasteDetailsQuantity: 1.0,
-        wasteDetailsQuantityType: "ESTIMATED",
+        wasteDetailsQuantityType: QuantityType.ESTIMATED,
         wasteDetailsPackagingInfos: [{ type: "BENNE", quantity: 1 }],
-        wasteDetailsConsistence: "SOLID",
+        wasteDetailsConsistence: Consistence.SOLID,
         wasteDetailsPop: false,
         wasteDetailsIsDangerous: true,
         wasteDetailsOnuCode: "ONU"
@@ -754,7 +753,7 @@ describe("mutation / importPaperForm", () => {
         }
       });
 
-      const updatedForm = await prisma.form.findUnique({
+      const updatedForm = await prisma.form.findUniqueOrThrow({
         where: { id: form.id }
       });
       expect(updatedForm.status).toEqual(Status.AWAITING_GROUP);

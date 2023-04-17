@@ -12,14 +12,14 @@ import { Bsdasri, BsdasriStatus, BsdasriType } from "@prisma/client";
 import { BsdasriEventType } from "../../workflow/types";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 
-interface checkEmitterAllowsDirectTakeOverProps {
+interface CheckEmitterAllowsDirectTakeOverProps {
   signatureParams: BsdasriSignatureInfos;
   bsdasri: Bsdasri;
 }
 
-type checkEmitterAllowsDirectTakeOverFn = (
-  input: checkEmitterAllowsDirectTakeOverProps
-) => Promise<boolean>;
+type CheckEmitterAllowsDirectTakeOverFn = (
+  input: CheckEmitterAllowsDirectTakeOverProps
+) => Promise<boolean | undefined>;
 /**
  * Dasri can be taken over by transporter directly if:
  * - without emitter signature if emitter explicitly allows this in company preferences
@@ -28,7 +28,7 @@ type checkEmitterAllowsDirectTakeOverFn = (
  * Checking this in mutation code needs less code than doing it in the state machine, hence this util.
  * A boolean is returned to be stored on Bsdasri model iot tell apart which dasris were taken over directly.
  */
-export const checkDirectakeOverIsAllowed: checkEmitterAllowsDirectTakeOverFn =
+export const checkDirectakeOverIsAllowed: CheckEmitterAllowsDirectTakeOverFn =
   async ({ signatureParams, bsdasri }) => {
     if (signatureParams.eventType !== BsdasriEventType.SignTransport) {
       return undefined;
@@ -46,7 +46,7 @@ export const checkDirectakeOverIsAllowed: checkEmitterAllowsDirectTakeOverFn =
       }
 
       const emitterCompany = await getCompanyOrCompanyNotFound({
-        siret: bsdasri.emitterCompanySiret
+        siret: bsdasri.emitterCompanySiret!
       });
       if (!emitterCompany.allowBsdasriTakeOverWithoutSignature) {
         throw new UserInputError(
@@ -61,12 +61,12 @@ export const checkDirectakeOverIsAllowed: checkEmitterAllowsDirectTakeOverFn =
 interface checkEmitterAllowsSignatureWithCodeProps {
   signatureParams: BsdasriSignatureInfos;
   bsdasri: Bsdasri;
-  securityCode: number;
-  emissionSignatureAuthor: SignatureAuthor;
+  securityCode: number | null;
+  emissionSignatureAuthor: SignatureAuthor | null;
 }
 type checkEmitterAllowsSignatureWithCodeFn = (
   input: checkEmitterAllowsSignatureWithCodeProps
-) => Promise<boolean>;
+) => Promise<boolean | undefined>;
 /**
  * Dasri takeOver can be processed on the transporter device
  * To perform this, we expect a INITIAL -> SIGNED_BY_PRODUCER signature, then a SIGNED_BY_PRODUCER -> SENT one
@@ -100,7 +100,7 @@ export const checkEmissionSignedWithSecretCode: checkEmitterAllowsSignatureWithC
 
     if (emissionSignatureAuthor === "ECO_ORGANISME") {
       const ecoorganismeCompany = await getCompanyOrCompanyNotFound({
-        siret: bsdasri.ecoOrganismeSiret
+        siret: bsdasri.ecoOrganismeSiret!
       });
 
       if (securityCode !== ecoorganismeCompany.securityCode) {
@@ -111,7 +111,7 @@ export const checkEmissionSignedWithSecretCode: checkEmitterAllowsSignatureWithC
     }
     if (emissionSignatureAuthor === "EMITTER") {
       const emitterCompany = await getCompanyOrCompanyNotFound({
-        siret: bsdasri.emitterCompanySiret
+        siret: bsdasri.emitterCompanySiret!
       });
 
       if (securityCode !== emitterCompany.securityCode) {
@@ -159,7 +159,7 @@ export const dasriSignatureMapping: Record<
         ? [bsdasri.ecoOrganismeSiret, bsdasri.emitterCompanySiret].filter(
             Boolean
           )
-        : [bsdasri.emitterCompanySiret]
+        : [bsdasri.emitterCompanySiret!]
   },
 
   EMISSION_WITH_SECRET_CODE: {
@@ -168,7 +168,8 @@ export const dasriSignatureMapping: Record<
     eventType: BsdasriEventType.SignEmissionWithSecretCode,
     validationContext: { emissionSignature: true },
     signatoryField: "emissionSignatory",
-    authorizedSirets: bsdasri => [getTransporterCompanyOrgId(bsdasri)] // transporter can sign with emitter secret code (trs device)
+    authorizedSirets: bsdasri =>
+      [getTransporterCompanyOrgId(bsdasri)].filter(Boolean) // transporter can sign with emitter secret code (trs device)
   },
   TRANSPORT: {
     author: "transporterTransportSignatureAuthor",
@@ -177,7 +178,8 @@ export const dasriSignatureMapping: Record<
     validationContext: { emissionSignature: true, transportSignature: true }, // validate emission in case of direct takeover
 
     signatoryField: "transportSignatory",
-    authorizedSirets: bsdasri => [getTransporterCompanyOrgId(bsdasri)]
+    authorizedSirets: bsdasri =>
+      [getTransporterCompanyOrgId(bsdasri)].filter(Boolean)
   },
 
   RECEPTION: {
@@ -186,7 +188,8 @@ export const dasriSignatureMapping: Record<
     eventType: BsdasriEventType.SignReception,
     validationContext: { receptionSignature: true },
     signatoryField: "receptionSignatory",
-    authorizedSirets: bsdasri => [bsdasri.destinationCompanySiret]
+    authorizedSirets: bsdasri =>
+      [bsdasri.destinationCompanySiret].filter(Boolean)
   },
   OPERATION: {
     author: "destinationOperationSignatureAuthor",
@@ -194,7 +197,8 @@ export const dasriSignatureMapping: Record<
     eventType: BsdasriEventType.SignOperation,
     validationContext: { operationSignature: true },
     signatoryField: "operationSignatory",
-    authorizedSirets: bsdasri => [bsdasri.destinationCompanySiret]
+    authorizedSirets: bsdasri =>
+      [bsdasri.destinationCompanySiret].filter(Boolean)
   }
 };
 

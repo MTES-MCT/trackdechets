@@ -11,7 +11,7 @@ const bsdasriMetadataResolvers: BsdasriMetadataResolvers = {
     const bsdasri: Bsdasri = await getBsdasriOrNotFound({ id: metadata.id });
 
     try {
-      await validateBsdasri(bsdasri, {
+      await validateBsdasri(bsdasri as any, {
         emissionSignature: true,
         transportSignature: true,
         receptionSignature: true,

@@ -24,7 +24,7 @@ describe("Mutation.signBsdasri emission with secret code", () => {
       data: {
         address: "",
         name: "Eco-Organisme",
-        siret: ecoOrganismeCompany.siret,
+        siret: ecoOrganismeCompany.siret!,
         handleBsdasri: true
       }
     });
@@ -64,7 +64,7 @@ describe("Mutation.signBsdasri emission with secret code", () => {
         })
       })
     ]);
-    const updatedDasri = await prisma.bsdasri.findUnique({
+    const updatedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(updatedDasri.status).toEqual("INITIAL");
@@ -79,7 +79,7 @@ describe("Mutation.signBsdasri emission with secret code", () => {
       data: {
         address: "",
         name: "Eco-Organisme",
-        siret: ecoOrganismeCompany.siret,
+        siret: ecoOrganismeCompany.siret!,
         handleBsdasri: true
       }
     });
@@ -112,7 +112,7 @@ describe("Mutation.signBsdasri emission with secret code", () => {
       }
     );
 
-    const readyTotakeOverDasri = await prisma.bsdasri.findUnique({
+    const readyTotakeOverDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(readyTotakeOverDasri.status).toEqual("SIGNED_BY_PRODUCER");

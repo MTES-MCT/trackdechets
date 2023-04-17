@@ -698,7 +698,7 @@ describe("ficheInterventionSchema", () => {
       postalCode: "13001",
 
       operateurCompanyName: "Operateur",
-      operateurCompanySiret: operateurCompany.siret,
+      operateurCompanySiret: operateurCompany.siret!,
       operateurCompanyAddress: "Quelque part",
       operateurCompanyContact: "Arya Stark",
       operateurCompanyPhone: "01 00 00 00 00",

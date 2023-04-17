@@ -20,7 +20,8 @@ export function buildDeleteBsff(deps: RepositoryFnDeps): DeleteBsffFn {
     const findUniqueGetPackagings = buildFindUniqueBsffGetPackagings(deps);
     const updateManyPackagings = buildUpdateManyBsffPackagings(deps);
 
-    const packagings = await findUniqueGetPackagings({ where: args.where });
+    const packagings =
+      (await findUniqueGetPackagings({ where: args.where })) ?? [];
 
     // disconnect previous packagings
     await updateManyPackagings({

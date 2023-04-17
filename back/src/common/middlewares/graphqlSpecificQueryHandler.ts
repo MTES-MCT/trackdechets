@@ -11,7 +11,11 @@ export function graphqlSpecificQueryHandlerMiddleware(
   query: GqlQueryKey,
   middleware
 ) {
-  return function (req: Request, res: Response, next: NextFunction) {
+  return function graphqlSpecificQueryHandler(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     if (!req.gqlInfos) {
       logger.warn(
         `The "gqlInfos" is not set on the request object. The "graphqlQueryParser" middleware must be called before this one, otherwise queries won't be rate limited.`

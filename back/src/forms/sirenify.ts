@@ -52,17 +52,17 @@ const formInputAccessors = (input: FormInput) => [
       temporaryStorageDetail: {
         ...input.temporaryStorageDetail,
         destination: {
-          ...input.temporaryStorageDetail.destination,
+          ...input.temporaryStorageDetail?.destination,
           company: companyInput
         }
       }
     })
   },
   ...(input.intermediaries ?? []).map((_, idx) => ({
-    getter: () => input.intermediaries[idx],
+    getter: () => input.intermediaries![idx],
     setter: (input: FormInput, companyInput: CompanyInput) => ({
       ...input,
-      intermediaries: input.intermediaries.map((current, i) =>
+      intermediaries: input.intermediaries!.map((current, i) =>
         i === idx ? companyInput : current
       )
     })

@@ -94,20 +94,20 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
       variables: { id: form.id }
     });
 
-    expect(stateSummary.quantity).toEqual(form.wasteDetailsQuantity);
-    expect(stateSummary.packagingInfos).toEqual([
+    expect(stateSummary!.quantity).toEqual(form.wasteDetailsQuantity);
+    expect(stateSummary!.packagingInfos).toEqual([
       { type: "BENNE", quantity: 1 }
     ]);
-    expect(stateSummary.onuCode).toEqual(form.wasteDetailsOnuCode);
-    expect(stateSummary.transporter.siret).toEqual(transporter1Company.siret);
-    expect(stateSummary.transporterNumberPlate).toEqual(
+    expect(stateSummary!.onuCode).toEqual(form.wasteDetailsOnuCode);
+    expect(stateSummary!.transporter!.siret).toEqual(transporter1Company.siret);
+    expect(stateSummary!.transporterNumberPlate).toEqual(
       form.transporterNumberPlate
     );
-    expect(stateSummary.transporterCustomInfo).toEqual(
+    expect(stateSummary!.transporterCustomInfo).toEqual(
       form.transporterCustomInfo
     );
-    expect(stateSummary.emitter.siret).toEqual(emitter.company.siret);
-    expect(stateSummary.recipient.siret).toEqual(collectorCompany.siret);
+    expect(stateSummary!.emitter!.siret).toEqual(emitter.company.siret);
+    expect(stateSummary!.recipient!.siret).toEqual(collectorCompany.siret);
   });
 
   test("when the form is temp stored", async () => {
@@ -132,7 +132,7 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
       variables: { id: form.id }
     });
 
-    expect(stateSummary.quantity).toEqual(quantityTempStored);
+    expect(stateSummary!.quantity).toEqual(quantityTempStored);
   });
 
   test("when the form is resealed", async () => {
@@ -164,22 +164,24 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
     } = await query<Pick<Query, "form">, QueryFormArgs>(FORM, {
       variables: { id: form.id }
     });
-    expect(stateSummary.quantity).toEqual(
-      updatedForm.forwardedIn.wasteDetailsQuantity
+    expect(stateSummary!.quantity).toEqual(
+      updatedForm.forwardedIn!.wasteDetailsQuantity
     );
-    expect(stateSummary.packagingInfos).toEqual([{ type: "FUT", quantity: 2 }]);
-    expect(stateSummary.onuCode).toEqual(
-      updatedForm.forwardedIn.wasteDetailsOnuCode
+    expect(stateSummary!.packagingInfos).toEqual([
+      { type: "FUT", quantity: 2 }
+    ]);
+    expect(stateSummary!.onuCode).toEqual(
+      updatedForm.forwardedIn!.wasteDetailsOnuCode
     );
-    expect(stateSummary.transporter.siret).toEqual(transporter2Company.siret);
-    expect(stateSummary.transporterNumberPlate).toEqual(
-      updatedForm.forwardedIn.transporterNumberPlate
+    expect(stateSummary!.transporter!.siret).toEqual(transporter2Company.siret);
+    expect(stateSummary!.transporterNumberPlate).toEqual(
+      updatedForm.forwardedIn!.transporterNumberPlate
     );
-    expect(stateSummary.transporterCustomInfo).toEqual(
-      updatedForm.forwardedIn.transporterCustomInfo
+    expect(stateSummary!.transporterCustomInfo).toEqual(
+      updatedForm.forwardedIn!.transporterCustomInfo
     );
-    expect(stateSummary.emitter.siret).toEqual(collectorCompany.siret);
-    expect(stateSummary.recipient.siret).toEqual(traiteurCompany.siret);
+    expect(stateSummary!.emitter!.siret).toEqual(collectorCompany.siret);
+    expect(stateSummary!.recipient!.siret).toEqual(traiteurCompany.siret);
   });
 
   test("when the form is received at final destination", async () => {
@@ -209,6 +211,6 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
       variables: { id: form.id }
     });
 
-    expect(stateSummary.quantity).toEqual(quantityReceived);
+    expect(stateSummary!.quantity).toEqual(quantityReceived);
   });
 });

@@ -5,6 +5,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { getTransporterReceiptOrNotFound } from "../../database";
 import { checkCanReadUpdateDeleteTransporterReceipt } from "../../permissions";
 import { receiptSchema } from "../../validation";
+import { removeEmptyKeys } from "../../../common/converter";
 
 /**
  * Update a transporter receipt
@@ -21,7 +22,7 @@ const updateTransporterReceiptResolver: MutationResolvers["updateTransporterRece
     await checkCanReadUpdateDeleteTransporterReceipt(user, receipt);
     await receiptSchema.validate({ ...receipt, ...data });
     const transporterReceipt = await prisma.transporterReceipt.update({
-      data,
+      data: removeEmptyKeys(data),
       where: { id }
     });
     return transporterReceipt;

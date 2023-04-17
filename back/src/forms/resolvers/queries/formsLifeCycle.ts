@@ -41,7 +41,7 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
   // Select user company siret matching siret or get the first
   const selectedSiret = siret || userCompaniesSiretOrVat.shift();
 
-  const formsFilter = getFormsRightFilter(selectedSiret);
+  const formsFilter = getFormsRightFilter(selectedSiret!);
 
   const gqlPaginationArgs = {
     after: cursorAfter,
@@ -55,7 +55,11 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
       ...(loggedAfter && { gte: new Date(loggedAfter) }),
       ...(loggedBefore && { lte: new Date(loggedBefore) })
     },
-    form: { ...formsFilter, isDeleted: false, id: formId }
+    form: {
+      ...formsFilter,
+      isDeleted: false,
+      id: formId !== null ? formId : undefined
+    }
   };
 
   const totalCount = await prisma.statusLog.count({ where });

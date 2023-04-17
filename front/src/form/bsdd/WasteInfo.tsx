@@ -162,46 +162,48 @@ export default connect<{}, Values>(function WasteInfo(props) {
         </>
       )}
 
+      <h4 className="form__section-heading">Conditionnement</h4>
+
+      {values.emitter.type !== "APPENDIX1" && (
+        <Field name="wasteDetails.packagingInfos" component={Packagings} />
+      )}
+
+      <div className="form__row">
+        <fieldset>
+          <legend>Consistance</legend>
+          <div className="tw-flex">
+            <Field
+              name="wasteDetails.consistence"
+              id="SOLID"
+              label="Solide"
+              component={RadioButton}
+            />
+            <Field
+              name="wasteDetails.consistence"
+              id="LIQUID"
+              label="Liquide"
+              component={RadioButton}
+            />
+            <Field
+              name="wasteDetails.consistence"
+              id="GASEOUS"
+              label="Gazeux"
+              component={RadioButton}
+            />
+            <Field
+              name="wasteDetails.consistence"
+              id="DOUGHY"
+              label="Pâteux"
+              component={RadioButton}
+            />
+          </div>
+        </fieldset>
+
+        <RedErrorMessage name="wasteDetails.consistence" />
+      </div>
+
       {values.emitter.type !== "APPENDIX1" && (
         <>
-          <h4 className="form__section-heading">Conditionnement</h4>
-
-          <Field name="wasteDetails.packagingInfos" component={Packagings} />
-
-          <div className="form__row">
-            <fieldset>
-              <legend>Consistance</legend>
-              <div className="tw-flex">
-                <Field
-                  name="wasteDetails.consistence"
-                  id="SOLID"
-                  label="Solide"
-                  component={RadioButton}
-                />
-                <Field
-                  name="wasteDetails.consistence"
-                  id="LIQUID"
-                  label="Liquide"
-                  component={RadioButton}
-                />
-                <Field
-                  name="wasteDetails.consistence"
-                  id="GASEOUS"
-                  label="Gazeux"
-                  component={RadioButton}
-                />
-                <Field
-                  name="wasteDetails.consistence"
-                  id="DOUGHY"
-                  label="Pâteux"
-                  component={RadioButton}
-                />
-              </div>
-            </fieldset>
-
-            <RedErrorMessage name="wasteDetails.consistence" />
-          </div>
-
           <h4 className="form__section-heading">Quantité en tonnes</h4>
           <div className="form__row">
             <label>

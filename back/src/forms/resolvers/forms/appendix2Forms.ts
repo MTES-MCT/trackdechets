@@ -11,7 +11,7 @@ const appendix2FormsResolver: FormResolvers["appendix2Forms"] = async (
     return null;
   }
 
-  const { findGroupedFormsById } = getFormRepository(user);
+  const { findGroupedFormsById } = getFormRepository(user!);
   const appendix2Forms = await findGroupedFormsById(form.id);
   return appendix2Forms.map(form =>
     expandInitialFormFromDb(form, dataloaders.forwardedIns)

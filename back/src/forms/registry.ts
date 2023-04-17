@@ -14,18 +14,18 @@ import { extractPostalCode } from "../utils";
 import { formToBsdd } from "./compat";
 import { Bsdd } from "./types";
 
-export function getRegistryFields(
-  form: Form & {
-    transportSegments: TransportSegment[];
-  }
-): Pick<
-  BsdElastic,
+type RegistryFields =
   | "isIncomingWasteFor"
   | "isOutgoingWasteFor"
   | "isTransportedWasteFor"
-  | "isManagedWasteFor"
-> {
-  const registryFields = {
+  | "isManagedWasteFor";
+
+export function getRegistryFields(
+  form: Form & {
+    transportSegments: TransportSegment[] | null;
+  }
+): Pick<BsdElastic, RegistryFields> {
+  const registryFields: Record<RegistryFields, string[]> = {
     isIncomingWasteFor: [],
     isOutgoingWasteFor: [],
     isTransportedWasteFor: [],
@@ -33,21 +33,33 @@ export function getRegistryFields(
   };
 
   if (form.receivedAt) {
-    registryFields.isIncomingWasteFor.push(form.recipientCompanySiret);
-    registryFields.isTransportedWasteFor.push(getTransporterCompanyOrgId(form));
+    if (form.recipientCompanySiret) {
+      registryFields.isIncomingWasteFor.push(form.recipientCompanySiret);
+    }
+
+    const transporterCompanyOrgId = getTransporterCompanyOrgId(form);
+    if (transporterCompanyOrgId) {
+      registryFields.isTransportedWasteFor.push(transporterCompanyOrgId);
+    }
 
     if (form.transportSegments?.length) {
       for (const transportSegment of form.transportSegments) {
-        registryFields.isTransportedWasteFor.push(
-          transportSegment.transporterCompanySiret
-        );
+        if (transportSegment.transporterCompanySiret) {
+          registryFields.isTransportedWasteFor.push(
+            transportSegment.transporterCompanySiret
+          );
+        }
       }
     }
   }
 
   if (form.sentAt) {
-    registryFields.isOutgoingWasteFor.push(form.emitterCompanySiret);
-    registryFields.isTransportedWasteFor.push(form.transporterCompanySiret);
+    if (form.emitterCompanySiret) {
+      registryFields.isOutgoingWasteFor.push(form.emitterCompanySiret);
+    }
+    if (form.transporterCompanySiret) {
+      registryFields.isTransportedWasteFor.push(form.transporterCompanySiret);
+    }
     if (form.traderCompanySiret) {
       registryFields.isManagedWasteFor.push(form.traderCompanySiret);
     }
@@ -89,7 +101,7 @@ function toGenericWaste(bsdd: Bsdd): GenericWaste {
 export function toIncomingWaste(
   bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
 ): IncomingWaste {
-  const initialEmitter = {
+  const initialEmitter: Record<string, string[] | null> = {
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
@@ -157,7 +169,7 @@ export function toIncomingWaste(
 export function toOutgoingWaste(
   bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
 ): OutgoingWaste {
-  const initialEmitter = {
+  const initialEmitter: Record<string, string | string[] | null> = {
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
@@ -229,7 +241,7 @@ export function toOutgoingWaste(
 export function toTransportedWaste(
   bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
 ): TransportedWaste {
-  const initialEmitter = {
+  const initialEmitter: Record<string, string[] | null> = {
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
@@ -296,9 +308,9 @@ export function toTransportedWaste(
 }
 
 export function toManagedWaste(
-  bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
+  bsdd: Bsdd & { forwarding: Bsdd | null } & { grouping: Bsdd[] }
 ): ManagedWaste {
-  const initialEmitter = {
+  const initialEmitter: Record<string, string[] | null> = {
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,
@@ -381,7 +393,7 @@ export function toManagedWastes(
 export function toAllWaste(
   bsdd: Bsdd & { forwarding: Bsdd } & { grouping: Bsdd[] }
 ): AllWaste {
-  const initialEmitter = {
+  const initialEmitter: Record<string, string[] | null> = {
     initialEmitterCompanyAddress: null,
     initialEmitterCompanyName: null,
     initialEmitterCompanySiret: null,

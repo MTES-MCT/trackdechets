@@ -26,7 +26,7 @@ type Mutation {
   """
   Marque un dasri brouillon comme publié (isDraft=false)
   """
-  publishBsdasri("ID d'un Bsdasri" id: ID!): Bsdasri
+  publishBsdasri("ID d'un Bsdasri" id: ID!): Bsdasri!
 
   """
   Appose une signature sur un Bsdasri, verrouille les cadres correspondant.
@@ -131,7 +131,7 @@ type Mutation {
   }
   ```
   """
-  signBsdasri(id: ID!, input: BsdasriSignatureInput!): Bsdasri
+  signBsdasri(id: ID!, input: BsdasriSignatureInput!): Bsdasri!
 
   """
   Appose une signature de type EMISSION via un compte n'appartenant pas à l'émetteur.
@@ -140,14 +140,14 @@ type Mutation {
   signBsdasriEmissionWithSecretCode(
     id: ID!
     input: BsdasriSignatureWithSecretCodeInput!
-  ): Bsdasri
+  ): Bsdasri!
   """
   Duplique un bordereau Dasri (non applicable pour les bordereau de synthese ou de groupement)
   """
-  duplicateBsdasri("ID d'un Bsdasri" id: ID!): Bsdasri
+  duplicateBsdasri("ID d'un Bsdasri" id: ID!): Bsdasri!
 
   """
   Supprime un BSDASRI
   """
-  deleteBsdasri("ID d'un Dasri" id: ID!): Bsdasri
+  deleteBsdasri("ID d'un Dasri" id: ID!): Bsdasri!
 }

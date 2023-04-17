@@ -98,11 +98,15 @@ export async function getFicheInterventions({
   bsff: Bsff;
   context: GraphQLContext;
 }): Promise<BsffFicheIntervention[]> {
+  if (!user) {
+    throw new Error("The user should have been set to enter this path.");
+  }
   const { findUniqueGetFicheInterventions } = getReadonlyBsffRepository();
 
-  const ficheInterventions = await findUniqueGetFicheInterventions({
-    where: { id: bsff.id }
-  });
+  const ficheInterventions =
+    (await findUniqueGetFicheInterventions({
+      where: { id: bsff.id }
+    })) ?? [];
   const isContributor = await isBsffContributor(user, bsff);
   const isDetenteur = await isBsffDetenteur(user, bsff);
 
@@ -118,8 +122,10 @@ export async function getFicheInterventions({
     const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
     // only return detenteur's fiche d'intervention
-    return expandedFicheInterventions.filter(fi =>
-      userCompaniesSiretOrVat.includes(fi.detenteur?.company?.siret)
+    return expandedFicheInterventions.filter(
+      fi =>
+        fi.detenteur?.company?.siret &&
+        userCompaniesSiretOrVat.includes(fi.detenteur.company.siret)
     );
   }
 
@@ -152,7 +158,7 @@ export async function createBsff(
     getReadonlyBsffFicheInterventionRepository();
 
   const ficheInterventions =
-    input.ficheInterventions?.length > 0
+    input.ficheInterventions && input.ficheInterventions.length > 0
       ? await findManyFicheInterventions({
           where: { id: { in: input.ficheInterventions } }
         })
@@ -215,10 +221,12 @@ export function getPackagingCreateInput(
         numero: p.numero,
         emissionNumero: p.numero,
         volume: p.volume,
-        weight: p.acceptationWeight,
+        weight: p.acceptationWeight ?? 0,
         previousPackagings: { connect: { id: p.id } }
       }))
-    : bsff.type === BsffType.RECONDITIONNEMENT && bsff.packagings?.length > 0
+    : bsff.type === BsffType.RECONDITIONNEMENT &&
+      bsff.packagings &&
+      bsff.packagings.length > 0
     ? [
         {
           type: bsff.packagings[0].type,

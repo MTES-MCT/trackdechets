@@ -196,13 +196,17 @@ export async function getCompanyAdminUsers(orgId: string) {
 
 /**
  * Get all the admins from companies, by companyIds
- * @param companyIds
- * @returns
  */
-export async function getActiveAdminsByCompanyIds(companyIds: string[]) {
+export async function getActiveAdminsByCompanyIds(
+  companyIds: string[]
+): Promise<Record<string, User[]>> {
   const users = await prisma.companyAssociation
     .findMany({
-      where: { companyId: { in: companyIds }, role: "ADMIN" },
+      where: {
+        companyId: { in: companyIds },
+        role: "ADMIN",
+        user: { isActive: true }
+      },
       include: { user: true }
     })
     .then(associations =>
@@ -214,17 +218,47 @@ export async function getActiveAdminsByCompanyIds(companyIds: string[]) {
       })
     );
 
-  const res = {};
+  const res: Record<string, User[]> = {};
 
-  users
-    .filter(user => user.isActive)
-    .forEach(user => {
-      if (res[user.companyId]) res[user.companyId].push(user);
-      else res[user.companyId] = [user];
-    });
+  users.forEach(user => {
+    if (res[user.companyId]) res[user.companyId].push(user);
+    else res[user.companyId] = [user];
+  });
 
   return res;
 }
+
+/**
+ * Get all the companies and admins from companies, by companyOrgIds
+ * Will return an object like:
+ * {
+ *   [ordId]: { ...company, admins: user[] }
+ * }
+ */
+export const getCompaniesAndActiveAdminsByCompanyOrgIds = async (
+  orgIds: string[]
+): Promise<Record<string, Company & { admins: User[] }>> => {
+  const companies = await prisma.company.findMany({
+    where: { orgId: { in: orgIds } },
+    include: {
+      companyAssociations: {
+        where: { role: "ADMIN", user: { isActive: true } },
+        include: { user: true, company: true }
+      }
+    }
+  });
+
+  return companies.reduce<Record<string, Company & { admins: User[] }>>(
+    (companiesAndAdminsByOrgId, { companyAssociations, ...company }) => ({
+      ...companiesAndAdminsByOrgId,
+      [company.orgId]: {
+        ...company,
+        admins: companyAssociations.map(({ user }) => user)
+      }
+    }),
+    {}
+  );
+};
 
 export async function getTraderReceiptOrNotFound({
   id
@@ -280,7 +314,11 @@ export async function getWorkerCertificationOrNotFound({
 
 export function convertUrls<T extends Partial<Company>>(
   company: T
-): T & { ecoOrganismeAgreements?: URL[]; signatureAutomations: [] } {
+): T & {
+  ecoOrganismeAgreements: URL[];
+  signatureAutomations: [];
+  receivedSignatureAutomations: [];
+} {
   return {
     ...company,
     ...(company.ecoOrganismeAgreements && {
@@ -288,6 +326,7 @@ export function convertUrls<T extends Partial<Company>>(
         a => new URL(a)
       )
     }),
-    signatureAutomations: []
+    signatureAutomations: [],
+    receivedSignatureAutomations: []
   };
 }

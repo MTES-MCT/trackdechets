@@ -34,13 +34,13 @@ const workflow: Workflow = {
     { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
   ],
   steps: [
-    createInitialForm("producteur", fixtures),
+    createInitialForm("producteur", fixtures as any),
     markAsSealed("producteur"),
     signEmissionForm("producteur"),
     signTransportForm("transporteur"),
     markAsReceived("ttr"),
     markAsAwaitingGroup("ttr"),
-    createGroupementForm("ttr", fixtures)
+    createGroupementForm("ttr", fixtures as any)
   ],
   docContext: {
     producteur: { siret: "SIRET_PRODUCTEUR", securityCode: 1234 },

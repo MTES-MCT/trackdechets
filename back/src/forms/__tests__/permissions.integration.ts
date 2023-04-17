@@ -22,6 +22,7 @@ import {
   checkCanSignedByTransporter,
   checkSecurityCode
 } from "../permissions";
+import { AuthType } from "../../auth";
 
 async function checkEmitterPermission(
   permission: (user: User, form: Form) => Promise<boolean>,
@@ -83,7 +84,7 @@ async function checkEcoOrganismePermission(
   const { user, company } = await userWithCompanyFactory("MEMBER");
   const ecoOrganisme = await prisma.ecoOrganisme.create({
     data: {
-      siret: company.siret,
+      siret: company.siret!,
       name: "EO",
       address: ""
     }
@@ -402,13 +403,16 @@ describe("checkCanRed", () => {
         grouping: {
           create: {
             initialFormId: initialForm.id,
-            quantity: initialForm.quantityReceived
+            quantity: initialForm.quantityReceived!
           }
         }
       }
     });
 
-    const check = await checkCanRead(initialEmitter, groupementForm);
+    const check = await checkCanRead(
+      { ...initialEmitter, auth: AuthType.Session },
+      groupementForm
+    );
     expect(check).toBe(true);
   });
 });

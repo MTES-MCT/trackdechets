@@ -133,7 +133,7 @@ describe("Mutation.deleteBsdasri", () => {
 
     expect(errors).toBeUndefined();
 
-    const deletedBsdasri = await prisma.bsdasri.findUnique({
+    const deletedBsdasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: bsdasri.id }
     });
 
@@ -192,7 +192,7 @@ describe("Mutation.deleteBsdasri", () => {
 
     expect(data.deleteBsdasri.id).toBe(dasri.id);
 
-    const bsdasri = await prisma.bsdasri.findUnique({
+    const bsdasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(bsdasri.isDeleted).toEqual(true);

@@ -91,7 +91,7 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
 
   const ficheInterventions = await findManyFicheInterventions({
     where:
-      input.ficheInterventions?.length > 0
+      input.ficheInterventions && input.ficheInterventions.length > 0
         ? { id: { in: input.ficheInterventions } }
         : { bsffs: { some: { id: { in: [existingBsff.id] } } } }
   });
