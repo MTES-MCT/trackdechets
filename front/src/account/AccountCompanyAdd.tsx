@@ -389,6 +389,15 @@ export default function AccountCompanyAdd() {
   const isForeignCompany =
     companyInfos?.vatNumber && isForeignVat(companyInfos.vatNumber);
 
+  const handleCompanyTypeChange = (e, arrayHelpers, companyType, value) => {
+    if (e.target.checked) {
+      arrayHelpers.push(companyType.value);
+    } else {
+      const idx = value.indexOf(companyType.value);
+      arrayHelpers.remove(idx);
+    }
+  };
+
   return (
     <Container fluid className={styles.container}>
       <Row spacing="mb-2w">
@@ -674,11 +683,34 @@ export default function AccountCompanyAdd() {
                         <Field
                           name="companyTypes"
                           value={[_CompanyType.Transporter]}
-                          component={CompanyType}
                           disabled={true}
-                        />
+                        >
+                          {({ field, form, meta }) => {
+                            return (
+                              <CompanyType
+                                field={field}
+                                form={form}
+                                meta={meta}
+                                label={""}
+                                handleChange={handleCompanyTypeChange}
+                              />
+                            );
+                          }}
+                        </Field>
                       ) : (
-                        <Field name="companyTypes" component={CompanyType} />
+                        <Field name="companyTypes">
+                          {({ field, form, meta }) => {
+                            return (
+                              <CompanyType
+                                field={field}
+                                form={form}
+                                meta={meta}
+                                label={""}
+                                handleChange={handleCompanyTypeChange}
+                              />
+                            );
+                          }}
+                        </Field>
                       )}
                       <RedErrorMessage name="companyTypes" />
                     </div>
