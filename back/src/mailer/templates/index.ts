@@ -224,3 +224,14 @@ export const producersSecondOnboardingEmail: MailTemplate = {
     "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
   templateId: templateIds.PRODUCER_SECOND_ONBOARDING
 };
+
+export const pendingRevisionRequestAdminDetailsEmail: MailTemplate<{
+  requestCreatedAt: string;
+  bsdReadableId: string;
+  companyName: string;
+  companyOrgId: string;
+}> = {
+  subject: "Votre action est attendue sur une demande de révision",
+  body: mustacheRenderer("pending-revision-request-admin-details.html"),
+  templateId: templateIds.LAYOUT
+};

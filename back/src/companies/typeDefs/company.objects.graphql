@@ -108,6 +108,11 @@ type CompanyPrivate {
   Liste des automatisations de signature accordées par l'entreprise
   """
   signatureAutomations: [SignatureAutomation!]!
+
+  """
+  Liste des automatisations de signature reçues par l'entreprise
+  """
+  receivedSignatureAutomations: [SignatureAutomation!]!
 }
 
 type CompanyPrivateEdge {

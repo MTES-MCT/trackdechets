@@ -1,16 +1,30 @@
 import prisma from "../prisma";
 import { sendMail } from "../mailer/mailing";
-import { CompanyType, MembershipRequestStatus } from "@prisma/client";
+import {
+  CompanyType,
+  MembershipRequestStatus,
+  BsdaRevisionRequest,
+  BsdaRevisionRequestApproval,
+  BsddRevisionRequest,
+  BsddRevisionRequestApproval,
+  Company,
+  RevisionRequestApprovalStatus,
+  RevisionRequestStatus,
+  User
+} from "@prisma/client";
 import * as COMPANY_CONSTANTS from "../common/constants/COMPANY_CONSTANTS";
 import {
   membershipRequestDetailsEmail,
   pendingMembershipRequestDetailsEmail,
   pendingMembershipRequestAdminDetailsEmail,
   profesionalsSecondOnboardingEmail,
-  producersSecondOnboardingEmail
+  producersSecondOnboardingEmail,
+  pendingRevisionRequestAdminDetailsEmail
 } from "../mailer/templates";
 import { renderMail } from "../mailer/templates/renderers";
 import { MessageVersion } from "../mailer/types";
+import { getCompaniesAndActiveAdminsByCompanyOrgIds } from "../companies/database";
+import { formatDate } from "../common/pdf";
 
 /**
  * Compute a past date relative to baseDate
@@ -321,6 +335,170 @@ export const sendPendingMembershipRequestToAdminDetailsEmail = async (
     });
 
     const payload = renderMail(pendingMembershipRequestAdminDetailsEmail, {
+      messageVersions
+    });
+
+    await sendMail(payload);
+  }
+
+  await prisma.$disconnect();
+};
+
+export interface BsddRevisionRequestWithReadableId extends BsddRevisionRequest {
+  bsdd: { readableId: string };
+}
+
+type RequestWithApprovals =
+  | (BsddRevisionRequestWithReadableId & {
+      approvals: BsddRevisionRequestApproval[];
+    })
+  | (BsdaRevisionRequest & {
+      approvals: BsdaRevisionRequestApproval[];
+    });
+
+type RequestWithWrappedApprovals =
+  | (BsddRevisionRequestWithReadableId & {
+      approvals: (BsddRevisionRequestApproval & {
+        admins: User[];
+        company: Company;
+      })[];
+    })
+  | (BsdaRevisionRequest & {
+      approvals: (BsdaRevisionRequestApproval & {
+        admins: User[];
+        company: Company;
+      })[];
+    });
+
+/**
+ * Will add pending approval companies' admins to requests
+ */
+export const addPendingApprovalsCompanyAdmins = async (
+  requests: RequestWithApprovals[]
+): Promise<RequestWithWrappedApprovals[]> => {
+  // Extract all pending company sirets
+  const companySirets: string[] = requests
+    .map(request =>
+      request.approvals
+        .filter(
+          approval => approval.status === RevisionRequestApprovalStatus.PENDING
+        )
+        .map(approvals => approvals.approverSiret)
+    )
+    .flat();
+
+  // Find companies and their respective admins
+  const companiesAndAdminsByOrgIds =
+    await getCompaniesAndActiveAdminsByCompanyOrgIds(companySirets);
+
+  // Add admins to requests
+  return requests.map((request: RequestWithApprovals) => {
+    return {
+      ...request,
+      approvals: request.approvals
+        .filter(
+          approval => approval.status === RevisionRequestApprovalStatus.PENDING
+        )
+        .map(approval => ({
+          ...approval,
+          company: companiesAndAdminsByOrgIds[approval.approverSiret],
+          admins: companiesAndAdminsByOrgIds[approval.approverSiret].admins
+        }))
+    };
+  });
+};
+
+export const getPendingBSDDRevisionRequestsWithAdmins = async (
+  daysAgo: number
+): Promise<RequestWithWrappedApprovals[]> => {
+  const now = new Date();
+
+  const requestDateGt = xDaysAgo(now, daysAgo);
+  const requestDateLt = xDaysAgo(now, daysAgo - 1);
+
+  // Get all pending requests
+  const requests = await prisma.bsddRevisionRequest.findMany({
+    where: {
+      createdAt: { gte: requestDateGt, lt: requestDateLt },
+      status: RevisionRequestStatus.PENDING
+    },
+    include: { approvals: true, bsdd: { select: { readableId: true } } }
+  });
+
+  // Add admins to requests
+  return await addPendingApprovalsCompanyAdmins(requests);
+};
+
+export const getPendingBSDARevisionRequestsWithAdmins = async (
+  daysAgo: number
+): Promise<RequestWithWrappedApprovals[]> => {
+  const now = new Date();
+
+  const requestDateGt = xDaysAgo(now, daysAgo);
+  const requestDateLt = xDaysAgo(now, daysAgo - 1);
+
+  // Get all pending requests
+  const requests = await prisma.bsdaRevisionRequest.findMany({
+    where: {
+      createdAt: { gte: requestDateGt, lt: requestDateLt },
+      status: RevisionRequestStatus.PENDING
+    },
+    include: { approvals: true }
+  });
+
+  // Add admins to requests
+  return await addPendingApprovalsCompanyAdmins(requests);
+};
+
+/**
+ * Send an email to admins who didn't answer to a revision request
+ */
+export const sendPendingRevisionRequestToAdminDetailsEmail = async (
+  daysAgo = 5
+) => {
+  const pendingBsddRevisionRequest =
+    await getPendingBSDDRevisionRequestsWithAdmins(daysAgo);
+  const pendingBsdaRevisionRequest =
+    await getPendingBSDARevisionRequestsWithAdmins(daysAgo);
+
+  const requests = [
+    ...pendingBsddRevisionRequest,
+    ...pendingBsdaRevisionRequest
+  ];
+
+  if (requests.length) {
+    // Build a message template for each request, for each approval
+    const messageVersions: MessageVersion[] = requests
+      .map(request => {
+        return request.approvals.map(approval => {
+          const variables = {
+            requestCreatedAt: formatDate(request.createdAt),
+            bsdReadableId:
+              (request as BsddRevisionRequestWithReadableId).bsdd?.readableId ??
+              (request as BsdaRevisionRequest).bsdaId,
+            companyName: approval.company.name,
+            companyOrgId: approval.company.orgId
+          };
+
+          const template = renderMail(pendingRevisionRequestAdminDetailsEmail, {
+            variables,
+            messageVersions: []
+          });
+
+          return {
+            to: approval.admins.map(admin => ({
+              email: admin.email,
+              name: admin.name
+            })),
+            params: {
+              body: template.body
+            }
+          };
+        });
+      })
+      .flat();
+
+    const payload = renderMail(pendingRevisionRequestAdminDetailsEmail, {
       messageVersions
     });
 

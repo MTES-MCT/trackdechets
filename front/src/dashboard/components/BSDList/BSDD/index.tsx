@@ -132,7 +132,8 @@ export const COLUMNS: Record<
                 (Boolean(form.ecoOrganisme?.siret) ||
                   siretsWithAutomaticSignature.includes(
                     form.emitter?.company?.siret
-                  )),
+                  ) ||
+                  Boolean(form.emitter?.isPrivateIndividual)),
             }}
           />
         </ActionButtonContext.Provider>
