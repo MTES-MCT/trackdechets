@@ -1,5 +1,5 @@
 import type { AsyncReturnType } from "type-fest";
-import { AnonymousCompanyError, SiretNotFoundError } from "./errors";
+import { AnonymousCompanyError } from "./errors";
 
 /**
  * Loop over the functions until one of them returns a result
@@ -14,10 +14,7 @@ export function redundant<F extends (...args: any[]) => any>(...fns: F[]) {
         return response;
       } catch (error) {
         // fail fast for user-input errors
-        if (
-          error instanceof SiretNotFoundError ||
-          error instanceof AnonymousCompanyError
-        ) {
+        if (error instanceof AnonymousCompanyError) {
           throw error;
         }
 

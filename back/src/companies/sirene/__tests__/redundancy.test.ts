@@ -40,21 +40,19 @@ describe("redundant", () => {
     expect(fn2).not.toHaveBeenCalled();
   });
 
-  it("should not call fallback function when the first function throws SiretNotFoundError", async () => {
+  it("should call fallback function when the first function throws SiretNotFoundError", async () => {
     const fn = redundant(fn1, fn2);
 
     // test fn1 throws UserInputError
     fn1.mockRejectedValueOnce(new SiretNotFoundError());
+    fn2.mockResolvedValueOnce("bar");
 
-    try {
-      await fn("foo");
-    } catch (err) {
-      expect(err).toBeInstanceOf(SiretNotFoundError);
-    }
+    const response = await fn("foo");
 
-    // fn2 should not be called
+    expect(response).toEqual("bar");
     expect(fn1).toHaveBeenCalled();
-    expect(fn2).not.toHaveBeenCalled();
+    // fn2 should have been called
+    expect(fn2).toHaveBeenCalled();
   });
 
   it("should call fallback function when the first function returns 5xx", async () => {
