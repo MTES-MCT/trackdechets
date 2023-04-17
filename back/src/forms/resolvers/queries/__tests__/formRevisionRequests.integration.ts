@@ -122,6 +122,51 @@ describe("Mutation.formRevisionRequests", () => {
     );
   });
 
+  it("should filter based on status", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: company.siret }
+    });
+
+    // should be included
+    const bsdd1RevisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: company.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        comment: "",
+        status: "ACCEPTED"
+      }
+    });
+
+    // should not be included
+    await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: company.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        comment: "",
+        status: "REFUSED"
+      }
+    });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query<
+      Pick<Query, "formRevisionRequests">,
+      QueryFormRevisionRequestsArgs
+    >(FORM_REVISION_REQUESTS, {
+      variables: { siret: company.siret, where: { status: "ACCEPTED" } }
+    });
+
+    expect(data.formRevisionRequests.totalCount).toBe(1);
+    expect(data.formRevisionRequests.edges.map(_ => _.node)[0].id).toEqual(
+      bsdd1RevisionRequest.id
+    );
+  });
+
   it("should filter based on bsddId", async () => {
     const { user, company } = await userWithCompanyFactory("ADMIN");
 
