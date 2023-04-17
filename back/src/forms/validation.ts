@@ -651,6 +651,9 @@ const fullWasteDetailsSchemaFn: FactorySchemaOf<
         .string()
         .requiredIf(!isDraft, "Le code déchet est obligatoire")
         .oneOf([...BSDD_WASTE_CODES, "", null], INVALID_WASTE_CODE),
+      wasteDetailsName: yup
+        .string()
+        .requiredIf(!isDraft, "L'appellation du déchet est obligatoire."),
       wasteDetailsPackagingInfos: yup
         .array()
         .requiredIf(!isDraft, "Le détail du conditionnement est obligatoire")

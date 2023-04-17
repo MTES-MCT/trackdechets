@@ -285,6 +285,7 @@ export const forwardedInData: Partial<Prisma.FormCreateInput> = {
   recipientCap: "CAP",
   recipientProcessingOperation: "R 1",
   wasteDetailsCode: "05 01 04*",
+  wasteDetailsName: "Déchets divers",
   wasteDetailsIsDangerous: true,
   wasteDetailsOnuCode: "2003",
   wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }],

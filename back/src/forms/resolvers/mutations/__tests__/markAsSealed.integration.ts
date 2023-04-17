@@ -435,7 +435,47 @@ describe("Mutation.markAsSealed", () => {
     });
     expect(statusLogs.length).toEqual(0);
   });
+  it("the BSD can not be sealed if waste detail name is missing", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER", {
+      companyTypes: { set: [CompanyType.WASTEPROCESSOR] }
+    });
+    const recipientCompany = await destinationFactory();
+    let form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        recipientCompanySiret: recipientCompany.siret,
+        wasteDetailsCode: "05 01 04*",
+        wasteDetailsName: "" // this field is required and will make the mutation fail
+      }
+    });
 
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate(MARK_AS_SEALED, {
+      variables: {
+        id: form.id
+      }
+    });
+
+    const errMessage =
+      "Erreur, impossible de valider le bordereau car des champs obligatoires ne sont pas renseignés.\n" +
+      "Erreur(s): L'appellation du déchet est obligatoire.";
+
+    expect(errors[0].message).toBe(errMessage);
+
+    form = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: { forwardedIn: true }
+    });
+    expect(form.status).toEqual("DRAFT");
+
+    // no statusLog is created
+    const statusLogs = await prisma.statusLog.findMany({
+      where: { form: { id: form.id }, user: { id: user.id } }
+    });
+    expect(statusLogs.length).toEqual(0);
+  });
   it.each(["toto", "lorem ipsum", "01 02 03", "101309*"])(
     "wrong waste code (%p) must invalidate mutation",
     async wrongWasteCode => {

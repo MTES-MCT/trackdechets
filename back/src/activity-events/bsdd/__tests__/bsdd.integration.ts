@@ -108,6 +108,7 @@ describe("ActivityEvent.Bsdd", () => {
           },
           wasteDetails: {
             code: "01 03 04*",
+            name: "stériles acidogènes",
             onuCode: "AAA",
             packagingInfos: [
               { type: "FUT", quantity: 1 },
