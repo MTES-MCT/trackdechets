@@ -36,9 +36,8 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
   if (form.recipientIsTempStorage === true) {
     // this form can be mark as received only if it has been
     // taken over by the transporter after temp storage
-    const { forwardedIn } = await getFormRepository(user).findFullFormById(
-      form.id
-    );
+    const { forwardedIn } =
+      (await getFormRepository(user).findFullFormById(form.id)) ?? {};
 
     if (!forwardedIn?.emittedAt) {
       throw new TemporaryStorageCannotReceive();
@@ -125,7 +124,9 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
       WasteAcceptationStatus.PARTIALLY_REFUSED
   ) {
     const refusedEmail = await renderFormRefusedEmail(receivedForm);
-    sendMail(refusedEmail);
+    if (refusedEmail) {
+      sendMail(refusedEmail);
+    }
   }
 
   return expandFormFromDb(receivedForm);

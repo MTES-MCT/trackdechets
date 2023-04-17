@@ -64,9 +64,9 @@ describe("FormCompany resolver", () => {
         id: form.id
       }
     });
-    expect(data.form.emitter.company.country).toBe("FR");
-    expect(data.form.recipient.company.country).toBe("FR");
-    expect(data.form.transporter.company.country).toBe("BE");
-    expect(data.form.nextDestination.company.country).toBe("BE");
+    expect(data.form.emitter!.company!.country).toBe("FR");
+    expect(data.form.recipient!.company!.country).toBe("FR");
+    expect(data.form.transporter!.company!.country).toBe("BE");
+    expect(data.form.nextDestination!.company!.country).toBe("BE");
   });
 });

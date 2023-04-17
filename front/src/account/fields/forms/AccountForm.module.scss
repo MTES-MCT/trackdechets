@@ -31,3 +31,19 @@
     flex: 1;
   }
 }
+
+.workerCertif {
+  display: flex;
+  flex-direction: column;
+  margin-left: 35px;
+}
+
+.workerCertifItem {
+  width: 350px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.workCertifSubSectionThree {
+  width: 350px;
+}

@@ -100,7 +100,7 @@ export default function CompanySelector({
 
   const isExemptedOfReceipt = useMemo(
     () =>
-      !!(values.transporter as Transporter).isExemptedOfReceipt
+      !!(values.transporter as Transporter)?.isExemptedOfReceipt
         ? (values.transporter as Transporter).isExemptedOfReceipt
         : !!(values.transporter as BsdaTransporter)?.recepisse?.isExempted
         ? (values.transporter as BsdaTransporter)?.recepisse?.isExempted

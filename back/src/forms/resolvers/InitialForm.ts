@@ -6,10 +6,10 @@ import quantityGrouped from "./forms/quantityGrouped";
 const initialFormResolvers: InitialFormResolvers = {
   emitter: async (parent, _, { user }) => {
     const form = await prisma.form.findUnique({ where: { id: parent.id } });
-    if (!(await isFormContributor(user, form))) {
+    if (!form || !(await isFormContributor(user!, form))) {
       return null;
     }
-    return parent.emitter;
+    return parent.emitter ?? null;
   },
   quantityGrouped
 };

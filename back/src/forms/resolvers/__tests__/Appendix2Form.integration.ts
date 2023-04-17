@@ -58,7 +58,7 @@ describe("Appendix2Form", () => {
         grouping: {
           create: {
             initialFormId: appendix2.id,
-            quantity: appendix2.quantityReceived
+            quantity: appendix2.quantityReceived!
           }
         }
       }
@@ -71,6 +71,6 @@ describe("Appendix2Form", () => {
         id: regroupement.id
       }
     });
-    expect(data.form.appendix2Forms[0]).toMatchObject({ emitter: null });
+    expect(data.form.appendix2Forms![0]).toMatchObject({ emitter: null });
   });
 });

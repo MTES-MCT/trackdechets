@@ -122,6 +122,6 @@ describe("mergeUsers", () => {
       },
       include: { admin: { select: { id: true } } }
     });
-    expect(updatedApplication.admin.id).toEqual(heir.id);
+    expect(updatedApplication.admin!.id).toEqual(heir.id);
   });
 });

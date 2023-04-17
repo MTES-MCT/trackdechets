@@ -23,8 +23,8 @@ async function getForwardedIns(formIds: string[]) {
 
   return formIds.map(
     formId =>
-      initialForms.find(initialForm => initialForm.id === formId).forwardedIn ??
-      null
+      initialForms.find(initialForm => initialForm.id === formId)
+        ?.forwardedIn ?? null
   );
 }
 

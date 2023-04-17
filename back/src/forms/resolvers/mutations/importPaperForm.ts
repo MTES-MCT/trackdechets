@@ -106,6 +106,7 @@ async function createForm(input: ImportPaperFormInput, user: Express.User) {
   // check user belongs to destination company
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
   if (
+    !flattenedFormInput.recipientCompanySiret ||
     !userCompaniesSiretOrVat.includes(flattenedFormInput.recipientCompanySiret)
   ) {
     throw new UserInputError(
@@ -136,7 +137,7 @@ async function createForm(input: ImportPaperFormInput, user: Express.User) {
 }
 
 async function createOrUpdateForm(
-  id: string,
+  id: string | null | undefined,
   formInput: ImportPaperFormInput,
   user: Express.User
 ) {
@@ -154,7 +155,7 @@ const importPaperFormResolver: MutationResolvers["importPaperForm"] = async (
   { input: { id, ...rest } },
   context
 ) => {
-  checkIsAuthenticated(context);
+  const user = checkIsAuthenticated(context);
 
   // add defaults values where needed/possible
   const formInput: ImportPaperFormInput = {
@@ -164,7 +165,7 @@ const importPaperFormResolver: MutationResolvers["importPaperForm"] = async (
       : rest.wasteDetails
   };
 
-  const form = await createOrUpdateForm(id, formInput, context.user);
+  const form = await createOrUpdateForm(id, formInput, user);
 
   return expandFormFromDb(form);
 };

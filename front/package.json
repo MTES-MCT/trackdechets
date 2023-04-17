@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.6.8",
-    "@dataesr/react-dsfr": "^3.1.11",
+    "@dataesr/react-dsfr": "^3.5.6",
     "@reach/dialog": "^0.11.2",
     "@reach/menu-button": "^0.11.2",
     "@reach/tooltip": "^0.11.2",

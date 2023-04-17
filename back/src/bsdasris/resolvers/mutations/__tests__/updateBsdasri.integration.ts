@@ -193,7 +193,7 @@ describe("Mutation.updateBsdasri", () => {
         }
       );
 
-      expect(data.updateBsdasri.emitter.company.mail).toBe("test@test.test");
+      expect(data.updateBsdasri.emitter!.company!.mail).toBe("test@test.test");
       expect(data.updateBsdasri.type).toBe("SIMPLE");
       // check input is sirenified
       expect(sirenifyMock).toHaveBeenCalledTimes(1);
@@ -223,7 +223,7 @@ describe("Mutation.updateBsdasri", () => {
     await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
       variables: { id: dasri.id, input }
     });
-    const updated = await prisma.bsdasri.findUnique({
+    const updated = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(updated.ecoOrganismeSiret).toEqual(ecoOrgCompany.siret);
@@ -255,7 +255,7 @@ describe("Mutation.updateBsdasri", () => {
     await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
       variables: { id: dasri.id, input }
     });
-    const updated = await prisma.bsdasri.findUnique({
+    const updated = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(updated.ecoOrganismeSiret).toEqual(null);
@@ -377,7 +377,7 @@ describe("Mutation.updateBsdasri", () => {
       variables: { id: dasri.id, input }
     });
 
-    const updatedDasri = await prisma.bsdasri.findUnique({
+    const updatedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
 
@@ -457,7 +457,7 @@ describe("Mutation.updateBsdasri", () => {
     await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
       variables: { id: dasri.id, input }
     });
-    const updatedDasri = await prisma.bsdasri.findUnique({
+    const updatedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(updatedDasri.handedOverToRecipientAt).not.toBeNull();
@@ -501,7 +501,7 @@ describe("Mutation.updateBsdasri", () => {
         })
       })
     ]);
-    const updatedDasri = await prisma.bsdasri.findUnique({
+    const updatedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(updatedDasri.handedOverToRecipientAt).toBeNull();
@@ -533,7 +533,7 @@ describe("Mutation.updateBsdasri", () => {
     await mutate<Pick<Mutation, "updateBsdasri">>(UPDATE_DASRI, {
       variables: { id: dasri.id, input }
     });
-    const updatedDasri = await prisma.bsdasri.findUnique({
+    const updatedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(updatedDasri.destinationCompanyMail).toBe("recipient@test.test");
@@ -603,7 +603,7 @@ describe("Mutation.updateBsdasri", () => {
       variables: { id: dasri.id, input }
     });
 
-    const updatedDasri = await prisma.bsdasri.findUnique({
+    const updatedDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(updatedDasri.destinationOperationCode).toEqual("D10");

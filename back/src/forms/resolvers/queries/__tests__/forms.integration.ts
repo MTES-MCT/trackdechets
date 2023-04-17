@@ -114,17 +114,17 @@ describe("Query.forms", () => {
       {
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       },
       {
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       },
       {
         emitterCompanyName: company.name,
         emitterCompanySiret: company.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       },
       {
         recipientCompanyName: "a name",
@@ -138,10 +138,11 @@ describe("Query.forms", () => {
 
     expect(data.forms.length).toBe(3);
     expect(
-      data.forms.filter(f => f.recipient.company.siret === company.siret).length
+      data.forms.filter(f => f.recipient!.company!.siret === company.siret)
+        .length
     ).toBe(2);
     expect(
-      data.forms.filter(f => f.emitter.company.siret === company.siret).length
+      data.forms.filter(f => f.emitter!.company!.siret === company.siret).length
     ).toBe(1);
   });
 
@@ -186,12 +187,12 @@ describe("Query.forms", () => {
       {
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       },
       {
         recipientCompanyName: otherCompany.name,
         recipientCompanySiret: otherCompany.siret,
-        recipientsSirets: [otherCompany.siret]
+        recipientsSirets: [otherCompany.siret!]
       }
     ]);
 
@@ -203,7 +204,7 @@ describe("Query.forms", () => {
     });
 
     expect(data.forms.length).toBe(1);
-    expect(data.forms[0].recipient.company.siret).toBe(otherCompany.siret);
+    expect(data.forms[0].recipient!.company!.siret).toBe(otherCompany.siret);
   });
 
   it("should return forms for which user is intermediary when filtering on siret", async () => {
@@ -215,12 +216,12 @@ describe("Query.forms", () => {
       opt: {
         intermediaries: {
           create: {
-            siret: company.siret,
+            siret: company.siret!,
             name: company.name,
             contact: "John Doe"
           }
         },
-        intermediariesSirets: [company.siret]
+        intermediariesSirets: [company.siret!]
       }
     });
 
@@ -241,7 +242,7 @@ describe("Query.forms", () => {
       ownerId: user.id,
       opt: {
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret],
+        recipientsSirets: [company.siret!],
         wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }]
       }
     });
@@ -249,7 +250,7 @@ describe("Query.forms", () => {
       ownerId: user.id,
       opt: {
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret],
+        recipientsSirets: [company.siret!],
         wasteDetailsPackagingInfos: []
       }
     });
@@ -257,7 +258,7 @@ describe("Query.forms", () => {
       ownerId: user.id,
       opt: {
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret],
+        recipientsSirets: [company.siret!],
         wasteDetailsPackagingInfos: []
       }
     });
@@ -290,7 +291,7 @@ describe("Query.forms", () => {
     await createForms(user.id, [
       {
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret],
+        recipientsSirets: [company.siret!],
         wasteDetailsPackagingInfos: [
           { type: "FUT", quantity: 2 },
           { type: "AUTRE", other: "Contenant", quantity: 3 }
@@ -367,13 +368,13 @@ describe("Query.forms", () => {
       {
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret],
+        recipientsSirets: [company.siret!],
         status: "SENT"
       },
       {
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret],
+        recipientsSirets: [company.siret!],
         status: "DRAFT"
       },
       {
@@ -430,7 +431,7 @@ describe("Query.forms", () => {
     const opts = {
       recipientCompanyName: company.name,
       recipientCompanySiret: company.siret,
-      recipientsSirets: [company.siret]
+      recipientsSirets: [company.siret!]
     };
     const forms = await createNSortedForms(user.id, opts, 5);
     const f4 = forms[3];
@@ -447,7 +448,7 @@ describe("Query.forms", () => {
     const opts = {
       recipientCompanyName: company.name,
       recipientCompanySiret: company.siret,
-      recipientsSirets: [company.siret]
+      recipientsSirets: [company.siret!]
     };
     const forms = await createNSortedForms(user.id, opts, 5);
     const f1 = forms[0];
@@ -490,7 +491,7 @@ describe("Query.forms", () => {
     const opts = {
       recipientCompanyName: company.name,
       recipientCompanySiret: company.siret,
-      recipientsSirets: [company.siret]
+      recipientsSirets: [company.siret!]
     };
     const forms = await createNSortedForms(user.id, opts, 5);
     const f2 = forms[1];
@@ -507,7 +508,7 @@ describe("Query.forms", () => {
     const opts = {
       recipientCompanyName: company.name,
       recipientCompanySiret: company.siret,
-      recipientsSirets: [company.siret]
+      recipientsSirets: [company.siret!]
     };
     const forms = await createNSortedForms(user.id, opts, 5);
     const f1 = forms[0];
@@ -626,12 +627,12 @@ describe("Query.forms", () => {
       {
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       },
       {
         recipientCompanyName: otherCompany.name,
         recipientCompanySiret: otherCompany.siret,
-        recipientsSirets: [otherCompany.siret]
+        recipientsSirets: [otherCompany.siret!]
       }
     ]);
 
@@ -649,7 +650,7 @@ describe("Query.forms", () => {
     );
 
     expect(data.forms.length).toBe(1);
-    expect(data.forms[0].recipient.company.siret).toBe(otherCompany.siret);
+    expect(data.forms[0].recipient!.company!.siret).toBe(otherCompany.siret);
   });
 
   it("should filter by updatedAt", async () => {
@@ -658,12 +659,12 @@ describe("Query.forms", () => {
       {
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       },
       {
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       }
     ]);
 
@@ -707,13 +708,13 @@ describe("Query.forms", () => {
         wasteDetailsCode: "01 03 04*",
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       },
       {
         wasteDetailsCode: "01 03 05*",
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       }
     ]);
 
@@ -732,7 +733,7 @@ describe("Query.forms", () => {
     );
 
     expect(data.forms.length).toBe(1);
-    expect(data.forms[0].wasteDetails.code).toBe("01 03 04*");
+    expect(data.forms[0].wasteDetails!.code).toBe("01 03 04*");
   });
 
   it("should filter by customId", async () => {
@@ -742,19 +743,19 @@ describe("Query.forms", () => {
         customId: "custom1",
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       },
       {
         customId: "custom2",
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       },
       {
         customId: null,
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       }
     ]);
 
@@ -781,12 +782,12 @@ describe("Query.forms", () => {
       {
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret]
+        recipientsSirets: [company.siret!]
       },
       {
         recipientCompanyName: company.name,
         recipientCompanySiret: company.siret,
-        recipientsSirets: [company.siret],
+        recipientsSirets: [company.siret!],
         emitterCompanyName: otherCompany.name,
         emitterCompanySiret: otherCompany.siret
       }
@@ -806,7 +807,7 @@ describe("Query.forms", () => {
     );
 
     expect(data.forms.length).toBe(1);
-    expect(data.forms[0].emitter.company.siret).toBe(otherCompany.siret);
+    expect(data.forms[0].emitter!.company!.siret).toBe(otherCompany.siret);
   });
 });
 
@@ -829,7 +830,7 @@ describe("Integration / Forms query for transporters", () => {
       ownerId: owner.id,
       opt: {
         transporterCompanySiret: transporter.siret,
-        transportersSirets: [transporter.siret],
+        transportersSirets: [transporter.siret!],
         status: "SEALED"
       }
     });
@@ -863,7 +864,7 @@ describe("Integration / Forms query for transporters", () => {
       ownerId: owner.id,
       opt: {
         transporterCompanySiret,
-        transportersSirets: [transporterCompanySiret, transporter.siret], // pre populate with the transport segment siret
+        transportersSirets: [transporterCompanySiret, transporter.siret!], // pre populate with the transport segment siret
         status: "SEALED"
       }
     });

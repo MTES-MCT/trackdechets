@@ -3,15 +3,15 @@ import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 export type FindUniqueBsffPackagingFn = (
   args: Prisma.BsffPackagingFindUniqueArgs
-) => Promise<BsffPackaging & { bsff: Bsff }>;
+) => Promise<(BsffPackaging & { bsff: Bsff }) | null>;
 
 export type FindUniqueBsffPackagingGetBsffFn = (
   args: Prisma.BsffPackagingFindUniqueArgs
-) => Promise<Bsff>;
+) => Promise<Bsff | null>;
 
 export type FindUniqueBsffPackagingGetNextPackagingFn = (
   args: Prisma.BsffPackagingFindUniqueArgs
-) => Promise<BsffPackaging & { bsff: Bsff }>;
+) => Promise<(BsffPackaging & { bsff: Bsff }) | null>;
 
 export function buildFindUniqueBsffPackaging({
   prisma

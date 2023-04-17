@@ -35,6 +35,7 @@ const BsdaFormContainer = lazy(() => import("form/bsda/FormContainer"));
 const WasteSelector = lazy(() => import("login/WasteSelector"));
 
 const Invite = lazy(() => import("login/Invite"));
+const UserActivation = lazy(() => import("login/UserActivation"));
 const PasswordResetRequest = lazy(() => import("login/PasswordResetRequest"));
 const PasswordReset = lazy(() => import("login/PasswordReset"));
 const Signup = lazy(() => import("login/Signup"));
@@ -151,6 +152,9 @@ export default withRouter(function LayoutContainer({ history }) {
                 <PasswordReset />
               </Route>
 
+              <Route exact path={routes.userActivation}>
+                <UserActivation />
+              </Route>
               <Route exact path={routes.resendActivationEmail}>
                 <ResendActivationEmail />
               </Route>

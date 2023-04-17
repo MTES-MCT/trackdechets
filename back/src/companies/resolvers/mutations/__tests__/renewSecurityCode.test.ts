@@ -74,12 +74,12 @@ describe("renewSecurityCode", () => {
     companyMock.mockResolvedValueOnce({
       securityCode: 1234,
       name: "Code en stock",
-      siret
+      orgId: siret
     });
     randomNumberMock.mockReturnValueOnce(4567);
 
     updateCompanyMock.mockReturnValueOnce({
-      siret,
+      orgId: siret,
       name: "Code en stock",
       securityCode: 4567
     });
@@ -94,7 +94,7 @@ describe("renewSecurityCode", () => {
       variables: {
         company: {
           name: "Code en stock",
-          siret
+          orgId: siret
         }
       }
     });
@@ -105,7 +105,7 @@ describe("renewSecurityCode", () => {
     expect(sendMailMock).toHaveBeenCalledWith(mail);
 
     expect(updatedCompany).toEqual({
-      siret,
+      orgId: siret,
       name: "Code en stock",
       securityCode: 4567
     });

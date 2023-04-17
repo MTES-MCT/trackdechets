@@ -78,7 +78,7 @@ describe("Mutation.signBsdasri emission", () => {
       }
     });
 
-    const signedByEmitterDasri = await prisma.bsdasri.findUnique({
+    const signedByEmitterDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(signedByEmitterDasri.status).toEqual("SIGNED_BY_PRODUCER");

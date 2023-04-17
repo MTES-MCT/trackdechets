@@ -6,25 +6,23 @@ import { getRegistryFields } from "./registry";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { buildAddress } from "../companies/sirene/utils";
 
-/**
- * Computes which SIRET should appear on which tab in the frontend
- * (Brouillon, Pour Action, Suivi, Archives, À collecter, Collecté)
- */
-export function getSiretsByTab(
-  form: FullForm
-): Pick<
-  BsdElastic,
+type WhereKeys =
   | "isDraftFor"
   | "isForActionFor"
   | "isFollowFor"
   | "isArchivedFor"
   | "isToCollectFor"
-  | "isCollectedFor"
-> {
+  | "isCollectedFor";
+
+/**
+ * Computes which SIRET should appear on which tab in the frontend
+ * (Brouillon, Pour Action, Suivi, Archives, À collecter, Collecté)
+ */
+export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
   // we build a mapping where each key has to be unique.
   // Same siret can be used by different actors on the same form, so we can't use them as keys.
   // Instead we rely on field names and segments ids
-  const multimodalTransportersBySegmentId = form.transportSegments.reduce(
+  const multimodalTransportersBySegmentId = form.transportSegments?.reduce(
     (acc, segment) => {
       if (!!segment.transporterCompanySiret) {
         return { ...acc, [`${segment.id}`]: segment.transporterCompanySiret };
@@ -34,7 +32,7 @@ export function getSiretsByTab(
     {}
   );
 
-  const intermediarySiretsReducer = form.intermediaries.reduce(
+  const intermediarySiretsReducer = form.intermediaries?.reduce(
     (acc, intermediary) => {
       if (!!intermediary.siret) {
         return {
@@ -70,7 +68,7 @@ export function getSiretsByTab(
           ...intermediarySiretsReducer
         };
 
-  const siretsByTab = {
+  const siretsByTab: Record<WhereKeys, string[]> = {
     isDraftFor: [],
     isForActionFor: [],
     isFollowFor: [],
@@ -96,7 +94,7 @@ export function getSiretsByTab(
   }
 
   // initialize intermediaries into isFollowFor
-  form.intermediaries.forEach(({ siret }) =>
+  form.intermediaries?.forEach(({ siret }) =>
     setFieldTab(`intermediarySiret${siret}`, "isFollowFor")
   );
 
@@ -127,7 +125,7 @@ export function getSiretsByTab(
       // whether or not this BSD has been handed over by transporter n°1
       let hasBeenHandedOver = false;
 
-      form.transportSegments.forEach(segment => {
+      form.transportSegments?.forEach(segment => {
         if (segment.readyToTakeOver) {
           hasBeenHandedOver = hasBeenHandedOver || !!segment.takenOverAt;
           setFieldTab(
@@ -285,7 +283,7 @@ export function toBsdElastic(
     destinationOperationCode: form.processingOperationDone ?? "",
 
     emitterEmissionDate: form.emittedAt?.getTime(),
-    workerWorkDate: null,
+    workerWorkDate: undefined,
     transporterTransportTakenOverAt:
       form.takenOverAt?.getTime() ?? form.sentAt?.getTime(),
     destinationReceptionDate: form.receivedAt?.getTime(),
@@ -313,7 +311,7 @@ export function toBsdElastic(
 export async function indexForm(
   form: FullForm,
   ctx?: GraphQLContext
-): Promise<BsdElastic> {
+): Promise<BsdElastic | null> {
   // prevent unwanted cascaded reindexation
   if (form.isDeleted) {
     return null;

@@ -3,7 +3,7 @@ import { getcompanyCountry } from "../../../common/pdf/components/FormCompanyFie
 import { FormCompany } from "../../../generated/graphql/types";
 
 type FormCompanyFieldsProps = {
-  company?: FormCompany;
+  company?: FormCompany | null;
 };
 
 export function FormCompanyFields({ company }: FormCompanyFieldsProps) {

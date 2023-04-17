@@ -11,8 +11,10 @@ const formCompanyResolvers: FormCompanyResolvers = {
   country: parent => {
     if (isVat(parent.vatNumber)) {
       // ignore parent.country
-      const vatCountryCode = checkVAT(cleanClue(parent.vatNumber), vatCountries)
-        ?.country?.isoCode.short;
+      const vatCountryCode = checkVAT(
+        cleanClue(parent.vatNumber!),
+        vatCountries
+      )?.country?.isoCode.short;
       return vatCountryCode ? vatCountryCode : parent.country ?? "FR";
     }
     if (isSiret(parent.siret)) {
@@ -35,9 +37,7 @@ const formCompanyResolvers: FormCompanyResolvers = {
     if (parent.siret) {
       return parent.siret;
     }
-    if (parent.vatNumber) {
-      return parent.vatNumber;
-    }
+    return parent.vatNumber!;
   }
 };
 

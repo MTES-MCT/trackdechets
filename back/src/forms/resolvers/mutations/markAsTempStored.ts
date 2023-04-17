@@ -12,6 +12,7 @@ import { getFormRepository } from "../../repository";
 import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
 import { sendMail } from "../../../mailer/mailing";
 import { runInTransaction } from "../../../common/repository/helper";
+import { prismaJsonNoNull } from "../../../common/converter";
 
 const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
   parent,
@@ -40,7 +41,8 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
     // quantity type can be estimated in case of temporary storage
     quantityReceivedType: quantityType,
     currentTransporterSiret: "",
-    ...(["ACCEPTED", "PARTIALLY_REFUSED"].includes(
+    ...(tmpStoredInfos.wasteAcceptationStatus &&
+    ["ACCEPTED", "PARTIALLY_REFUSED"].includes(
       tmpStoredInfos.wasteAcceptationStatus
     )
       ? {
@@ -50,7 +52,9 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
               wasteDetailsQuantity: tmpStoredInfos.quantityReceived,
               wasteDetailsQuantityType: quantityType,
               wasteDetailsOnuCode: form.wasteDetailsOnuCode,
-              wasteDetailsPackagingInfos: form.wasteDetailsPackagingInfos
+              wasteDetailsPackagingInfos: prismaJsonNoNull(
+                form.wasteDetailsPackagingInfos
+              )
             }
           }
         }
@@ -89,7 +93,9 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
       WasteAcceptationStatus.PARTIALLY_REFUSED
   ) {
     const refusedEmail = await renderFormRefusedEmail(tempStoredForm);
-    sendMail(refusedEmail);
+    if (refusedEmail) {
+      sendMail(refusedEmail);
+    }
   }
 
   return expandFormFromDb(tempStoredForm);

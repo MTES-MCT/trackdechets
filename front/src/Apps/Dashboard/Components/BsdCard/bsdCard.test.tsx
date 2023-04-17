@@ -978,4 +978,35 @@ describe("Bsd card primary action label", () => {
       expect(screen.getByTestId("bsd-suite-btn")).toBeInTheDocument();
     });
   });
+
+  describe("case: Appendix 1", () => {
+    test("Bsdd", () => {
+      const bsdd = {
+        id: "cl32r54js30083339sw9nabhn0",
+        readableId: "BSD-20220512-6609ESJPV",
+        status: "SEALED",
+        emitter: {
+          type: "APPENDIX1",
+        },
+
+        __typename: "Form",
+      } as unknown as Form;
+
+      render(
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BsdCard
+            currentSiret={siretEmmiter}
+            bsd={bsdd}
+            onValidate={functionMock}
+            onUpdate={functionMock}
+            onOverview={functionMock}
+          />
+        </MockedProvider>
+      );
+
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
+      expect(screen.getByTestId("appendix1-btn")).toBeInTheDocument();
+    });
+  });
 });

@@ -24,7 +24,7 @@ export default {
     { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
   ],
   steps: [
-    createBsdasri("pred", fixtures),
+    createBsdasri("pred", fixtures as any),
     signForProducer("pred"),
     updateTransport("transporteur"),
     signTransport("transporteur"),

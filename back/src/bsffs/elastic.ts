@@ -80,7 +80,7 @@ export function toBsdElastic(
     destinationOperationCode: "",
 
     emitterEmissionDate: bsff.emitterEmissionSignatureDate?.getTime(),
-    workerWorkDate: null,
+    workerWorkDate: undefined,
     transporterTransportTakenOverAt:
       bsff.transporterTransportTakenOverAt?.getTime() ??
       bsff.transporterTransportSignatureDate?.getTime(),
@@ -88,18 +88,18 @@ export function toBsdElastic(
     destinationAcceptationDate: bsffDestination?.receptionDate?.getTime(),
     destinationAcceptationWeight: bsffDestination?.receptionWeight,
     destinationOperationDate: bsffDestination?.operationDate?.getTime(),
-    isDraftFor: [],
-    isForActionFor: [],
-    isFollowFor: [],
-    isArchivedFor: [],
-    isToCollectFor: [],
-    isCollectedFor: [],
+    isDraftFor: [] as string[],
+    isForActionFor: [] as string[],
+    isFollowFor: [] as string[],
+    isArchivedFor: [] as string[],
+    isToCollectFor: [] as string[],
+    isCollectedFor: [] as string[],
     sirets: [
       bsff.emitterCompanySiret,
       bsff.transporterCompanySiret,
       bsff.destinationCompanySiret,
       ...bsff.detenteurCompanySirets
-    ],
+    ].filter(Boolean),
     ...getRegistryFields(bsff),
     rawBsd: {
       ...bsff,
@@ -109,68 +109,92 @@ export function toBsdElastic(
     }
   };
 
+  const transporterCompanyOrgId = getTransporterCompanyOrgId(bsff);
   if (bsff.isDraft) {
     bsd.isDraftFor.push(
-      bsff.emitterCompanySiret,
-      getTransporterCompanyOrgId(bsff),
-      bsff.destinationCompanySiret
+      ...[
+        bsff.emitterCompanySiret,
+        getTransporterCompanyOrgId(bsff),
+        bsff.destinationCompanySiret
+      ].filter(Boolean)
     );
   } else {
     switch (bsff.status) {
       case BsffStatus.INITIAL: {
-        bsd.isForActionFor.push(bsff.emitterCompanySiret);
+        if (bsff.emitterCompanySiret) {
+          bsd.isForActionFor.push(bsff.emitterCompanySiret);
+        }
         bsd.isFollowFor.push(
-          getTransporterCompanyOrgId(bsff),
-          bsff.destinationCompanySiret,
-          ...bsff.detenteurCompanySirets
+          ...[
+            getTransporterCompanyOrgId(bsff),
+            bsff.destinationCompanySiret,
+            ...bsff.detenteurCompanySirets
+          ].filter(Boolean)
         );
         break;
       }
       case BsffStatus.SIGNED_BY_EMITTER: {
-        bsd.isToCollectFor.push(getTransporterCompanyOrgId(bsff));
+        if (transporterCompanyOrgId) {
+          bsd.isToCollectFor.push(transporterCompanyOrgId);
+        }
         bsd.isFollowFor.push(
-          bsff.emitterCompanySiret,
-          bsff.destinationCompanySiret,
-          ...bsff.detenteurCompanySirets
+          ...[
+            bsff.emitterCompanySiret,
+            bsff.destinationCompanySiret,
+            ...bsff.detenteurCompanySirets
+          ].filter(Boolean)
         );
         break;
       }
       case BsffStatus.SENT: {
-        bsd.isCollectedFor.push(getTransporterCompanyOrgId(bsff));
+        if (transporterCompanyOrgId) {
+          bsd.isCollectedFor.push(transporterCompanyOrgId);
+        }
         bsd.isFollowFor.push(
-          bsff.emitterCompanySiret,
-          ...bsff.detenteurCompanySirets
+          ...[bsff.emitterCompanySiret, ...bsff.detenteurCompanySirets].filter(
+            Boolean
+          )
         );
-        bsd.isForActionFor.push(bsff.destinationCompanySiret);
+        if (bsff.destinationCompanySiret) {
+          bsd.isForActionFor.push(bsff.destinationCompanySiret);
+        }
         break;
       }
       case BsffStatus.RECEIVED:
       case BsffStatus.PARTIALLY_REFUSED:
       case BsffStatus.ACCEPTED: {
         bsd.isFollowFor.push(
-          bsff.emitterCompanySiret,
-          getTransporterCompanyOrgId(bsff),
-          ...bsff.detenteurCompanySirets
+          ...[
+            bsff.emitterCompanySiret,
+            getTransporterCompanyOrgId(bsff),
+            ...bsff.detenteurCompanySirets
+          ].filter(Boolean)
         );
-        bsd.isForActionFor.push(bsff.destinationCompanySiret);
+        if (bsff.destinationCompanySiret) {
+          bsd.isForActionFor.push(bsff.destinationCompanySiret);
+        }
         break;
       }
       case BsffStatus.INTERMEDIATELY_PROCESSED: {
         bsd.isFollowFor.push(
-          bsff.emitterCompanySiret,
-          getTransporterCompanyOrgId(bsff),
-          bsff.destinationCompanySiret,
-          ...bsff.detenteurCompanySirets
+          ...[
+            bsff.emitterCompanySiret,
+            getTransporterCompanyOrgId(bsff),
+            bsff.destinationCompanySiret,
+            ...bsff.detenteurCompanySirets
+          ].filter(Boolean)
         );
         break;
       }
       case BsffStatus.REFUSED:
       case BsffStatus.PROCESSED: {
         bsd.isArchivedFor.push(
-          bsff.emitterCompanySiret,
-          getTransporterCompanyOrgId(bsff),
-          bsff.destinationCompanySiret,
-          ...bsff.detenteurCompanySirets
+          ...[
+            bsff.emitterCompanySiret,
+            getTransporterCompanyOrgId(bsff),
+            bsff.destinationCompanySiret,
+            ...bsff.detenteurCompanySirets
+          ].filter(Boolean)
         );
         break;
       }
@@ -187,5 +211,12 @@ export async function indexBsff(bsff: Bsff, ctx?: GraphQLContext) {
   const fullBsff = await findUnique({
     where: { id: bsff.id }
   });
+
+  if (!fullBsff) {
+    throw new Error(
+      `Cannot index BSDD ${bsff.id} as it could not be found in DB.`
+    );
+  }
+
   return indexBsd(toBsdElastic(fullBsff), ctx);
 }

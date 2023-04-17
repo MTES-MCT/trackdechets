@@ -1,4 +1,4 @@
-import { Form, Status } from "@prisma/client";
+import { Form, Prisma, Status } from "@prisma/client";
 import { RepositoryFnDeps } from "../../../common/repository/types";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
@@ -26,7 +26,7 @@ export function buildUpdateAppendix1Forms(
   return async ({ container, grouped }) => {
     const { user, prisma } = deps;
 
-    const formsToDelete = [];
+    const formsToDelete: string[] = [];
     const formUpdatesByStatus = new Map<Status, string[]>();
 
     for (const form of grouped) {
@@ -106,7 +106,7 @@ export function buildUpdateAppendix1Forms(
     }
 
     const updateManyForms = buildUpdateManyForms({ prisma, user });
-    const promises = [];
+    const promises: Promise<Prisma.BatchPayload | Form>[] = [];
 
     // Status updates
     for (const [status, ids] of formUpdatesByStatus.entries()) {

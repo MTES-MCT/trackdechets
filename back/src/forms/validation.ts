@@ -122,6 +122,7 @@ type WasteDetailsAppendix1 = WasteDetailsAppendix1Producer &
     | "wasteDetailsParcelNumbers"
     | "wasteDetailsAnalysisReferences"
     | "wasteDetailsLandIdentifiers"
+    | "wasteDetailsConsistence"
   >;
 
 type WasteDetails = WasteDetailsAppendix1 &
@@ -130,7 +131,6 @@ type WasteDetails = WasteDetailsAppendix1 &
     | "wasteDetailsPackagingInfos"
     | "wasteDetailsQuantity"
     | "wasteDetailsQuantityType"
-    | "wasteDetailsConsistence"
     | "wasteDetailsPop"
   >;
 
@@ -634,7 +634,10 @@ const wasteDetailsAppendix1SchemaFn: FactorySchemaOf<
     }),
     wasteDetailsParcelNumbers: yup.array().of(parcelInfos as any),
     wasteDetailsAnalysisReferences: yup.array().of(yup.string()),
-    wasteDetailsLandIdentifiers: yup.array().of(yup.string())
+    wasteDetailsLandIdentifiers: yup.array().of(yup.string()),
+    wasteDetailsConsistence: yup
+      .mixed<Consistence>()
+      .requiredIf(!isDraft, "La consistance du déchet doit être précisée")
   });
 
 const fullWasteDetailsSchemaFn: FactorySchemaOf<
@@ -655,7 +658,7 @@ const fullWasteDetailsSchemaFn: FactorySchemaOf<
         .test(
           "is-valid-packaging-infos",
           "${path} ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
-          (infos: PackagingInfo[]) => {
+          (infos: PackagingInfo[] | undefined) => {
             const hasCiterne = infos?.find(i => i.type === "CITERNE");
             const hasBenne = infos?.find(i => i.type === "BENNE");
 
@@ -689,9 +692,6 @@ const fullWasteDetailsSchemaFn: FactorySchemaOf<
           !isDraft,
           "Le type de quantité (réelle ou estimée) doit être précisé"
         ),
-      wasteDetailsConsistence: yup
-        .mixed<Consistence>()
-        .requiredIf(!isDraft, "La consistance du déchet doit être précisée"),
       wasteDetailsPop: yup
         .boolean()
         .requiredIf(!isDraft, "La présence (ou non) de POP doit être précisée")
@@ -1292,7 +1292,7 @@ export async function validateForwardedInCompanies(form: Form): Promise<void> {
   }
 }
 
-const BSDD_MAX_APPENDIX2 = parseInt(process.env.BSDD_MAX_APPENDIX2, 10) || 250;
+const BSDD_MAX_APPENDIX2 = parseInt(process.env.BSDD_MAX_APPENDIX2!, 10) || 250;
 
 /**
  * Les vérifications suivantes sont effectuées :
@@ -1384,9 +1384,15 @@ export async function validateAppendix2Groupement(
   }
 
   const formFractions = initialForms.map(f => {
+    if (!f.quantityReceived) {
+      throw new Error(
+        `Error: no quantity received for form ${f.id}, cannot process groups.`
+      );
+    }
+
     const quantity = grouping.find(
       formFraction => formFraction.form.id === f.id
-    ).quantity;
+    )?.quantity;
 
     const quantityGroupedInOtherForms = f.groupedIn.reduce(
       (counter, formGroupement) => {
@@ -1424,8 +1430,8 @@ export async function validateAppendix2Groupement(
 
       const quantityLeftToGroup = new Decimal(
         initialForm.forwardedIn
-          ? initialForm.forwardedIn.quantityReceived
-          : initialForm.quantityReceived
+          ? initialForm.forwardedIn.quantityReceived!
+          : initialForm.quantityReceived!
       )
         .minus(quantityGroupedInOtherForms)
         .toDecimalPlaces(6); // set precision to gramme
@@ -1539,7 +1545,7 @@ export async function validateAppendix1Groupement(
 }
 
 export async function checkForClosedCompanies(formId: string) {
-  const form = await prisma.form.findUnique({
+  const form = await prisma.form.findUniqueOrThrow({
     where: { id: formId },
     include: { ...SIRETS_BY_ROLE_INCLUDE, forwardedIn: true }
   });

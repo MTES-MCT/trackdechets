@@ -92,7 +92,7 @@ export interface BsdElastic {
   isTransportedWasteFor: string[];
   isManagedWasteFor: string[];
 
-  intermediaries?: FormCompany[];
+  intermediaries?: FormCompany[] | null;
 
   rawBsd: any;
 }

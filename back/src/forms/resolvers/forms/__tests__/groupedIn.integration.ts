@@ -67,7 +67,7 @@ describe("groupedIn resolver", () => {
         grouping: {
           create: {
             initialFormId: appendix2.id,
-            quantity: appendix2.quantityReceived
+            quantity: appendix2.quantityReceived!
           }
         }
       }

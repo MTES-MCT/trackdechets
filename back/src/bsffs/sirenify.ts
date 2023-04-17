@@ -37,13 +37,15 @@ const bsffPackagingAccessors = (input: UpdateBsffPackagingInput) => [
     getter: () => input?.operation?.nextDestination?.company,
     setter: (input: UpdateBsffPackagingInput, companyInput: CompanyInput) => ({
       ...input,
-      operation: {
-        ...input.operation,
-        nextDestination: {
-          ...input.operation.nextDestination,
-          company: companyInput
+      ...(input.operation && {
+        operation: {
+          ...input.operation,
+          nextDestination: {
+            ...input.operation?.nextDestination,
+            company: companyInput
+          }
         }
-      }
+      })
     })
   }
 ];

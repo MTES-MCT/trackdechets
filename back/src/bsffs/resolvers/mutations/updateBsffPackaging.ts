@@ -22,6 +22,7 @@ const updateBsffPackaging: MutationResolvers["updateBsffPackaging"] = async (
   const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
 
   if (
+    !existingBsffPackaging.bsff.destinationCompanySiret ||
     !userCompaniesSiretOrVat.includes(
       existingBsffPackaging.bsff.destinationCompanySiret
     )
@@ -42,9 +43,7 @@ const updateBsffPackaging: MutationResolvers["updateBsffPackaging"] = async (
 
   await checkEditionRules(existingBsffPackaging, input);
 
-  const { update: updateBsffPackaging } = getBsffPackagingRepository(
-    context.user
-  );
+  const { update: updateBsffPackaging } = getBsffPackagingRepository(user);
 
   const updatedBsffPackaging = await updateBsffPackaging({
     where: { id },

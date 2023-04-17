@@ -312,7 +312,7 @@ describe("Transported wastes registry", () => {
     process.env = { ...OLD_ENV, REGISTRY_WHITE_LIST_IP: "127.0.0.1" };
     const server = require("../../../../server").server;
     await server.start();
-    const makeClientLocal: (user?: Express.User) => {
+    const makeClientLocal: (user?: User) => {
       query: TestQuery;
     } = require("../../../../__tests__/testClient").default;
     const user = await userFactory({ isRegistreNational: true });
@@ -334,7 +334,7 @@ describe("Transported wastes registry", () => {
     process.env = { ...OLD_ENV, REGISTRY_WHITE_LIST_IP: undefined };
     const server = require("../../../../server").server;
     await server.start();
-    const makeClientLocal: (user?: Express.User) => {
+    const makeClientLocal: (user?: User) => {
       query: TestQuery;
     } = require("../../../../__tests__/testClient").default;
     const user = await userFactory({ isRegistreNational: true });

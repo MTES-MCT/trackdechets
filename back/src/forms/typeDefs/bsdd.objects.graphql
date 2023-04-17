@@ -664,7 +664,7 @@ type FormRevisionRequest {
   form: Form!
 
   "Date de création de la demande"
-  createdAt: DateTime
+  createdAt: DateTime!
 
   "Entreprise à l'origine de la demande de révision"
   authoringCompany: FormCompany!

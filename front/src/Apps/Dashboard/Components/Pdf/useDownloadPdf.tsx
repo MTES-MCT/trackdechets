@@ -19,7 +19,7 @@ const FORMS_PDF = gql`
 `;
 
 const BSDA_PDF = gql`
-  query Bsdasridf($id: ID!) {
+  query BsdaPdf($id: ID!) {
     bsdaPdf(id: $id) {
       downloadLink
       token
@@ -28,7 +28,7 @@ const BSDA_PDF = gql`
 `;
 
 const BSDASRI_PDF = gql`
-  query Bsdasridf($id: ID!) {
+  query BsdasriPdf($id: ID!) {
     bsdasriPdf(id: $id) {
       downloadLink
       token
@@ -37,7 +37,7 @@ const BSDASRI_PDF = gql`
 `;
 
 const BSVHU_PDF = gql`
-  query Bsdasridf($id: ID!) {
+  query BsvhuPdf($id: ID!) {
     bsvhuPdf(id: $id) {
       downloadLink
       token

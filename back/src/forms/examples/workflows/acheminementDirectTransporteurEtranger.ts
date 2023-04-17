@@ -26,7 +26,7 @@ const workflow: Workflow = {
     { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
   ],
   steps: [
-    createForm("producteur", fixtures),
+    createForm("producteur", fixtures as any),
     markAsSealed("producteur"),
     signEmissionForm("producteur"),
     signTransportForm("transporteur"),

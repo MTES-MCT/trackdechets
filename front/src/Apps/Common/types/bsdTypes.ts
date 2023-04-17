@@ -67,12 +67,11 @@ export interface BsdDisplay {
     weight?: Maybe<number>;
   };
   isTempStorage?: Maybe<boolean>;
-  emitter?:
-    | Maybe<Emitter>
-    | Maybe<BsdaEmitter>
-    | Maybe<BsdasriEmitter>
-    | Maybe<BsvhuEmitter>
-    | Maybe<BsffEmitter>;
+  emitter?: Maybe<Emitter> &
+    Maybe<BsdaEmitter> &
+    Maybe<BsdasriEmitter> &
+    Maybe<BsvhuEmitter> &
+    Maybe<BsffEmitter>;
   emitterType?: Maybe<EmitterType>;
   destination?:
     | Maybe<Recipient>

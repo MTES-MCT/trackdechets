@@ -1,3 +1,5 @@
+import { Prisma } from "@prisma/client";
+
 /**
  * Return null if all object values are null
  * obj otherwise
@@ -74,9 +76,26 @@ export function chain<T, K>(
   return getter(o as NonNullable<T>); // TODO remove "as" when strictNullCheck is turned on
 }
 
+/**
+ * Returns the input if its value is not null, the default value otherwise.
+ * The default value must be of the same type
+ */
 export function undefinedOrDefault<I>(value: I, defaultValue: NonNullable<I>) {
   if (value === null) {
     return defaultValue;
+  }
+
+  return value;
+}
+
+/**
+ * Returns the input if its value is not null, JsonNull otherwise.
+ * We cannot use undefinedOrDefault here as the defaultValue is not type compatible with the input.
+ * This function is usefull for JSON fields in Prisma, as we must use Prisma.JsonNull for null values.
+ */
+export function prismaJsonNoNull<I>(value: I) {
+  if (value === null) {
+    return Prisma.JsonNull;
   }
 
   return value;

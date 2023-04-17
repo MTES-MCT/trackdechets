@@ -7,6 +7,7 @@ import { checkCanDuplicate } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
 import { FullForm } from "../../types";
+import { prismaJsonNoNull } from "../../../common/converter";
 
 /**
  * Get duplicable form fields
@@ -58,12 +59,14 @@ function getDuplicateFormInput(user: User, form: Form): Prisma.FormCreateInput {
     transporterIsExemptedOfReceipt: form.transporterIsExemptedOfReceipt,
     wasteDetailsCode: form.wasteDetailsCode,
     wasteDetailsOnuCode: form.wasteDetailsOnuCode,
-    wasteDetailsPackagingInfos: form.wasteDetailsPackagingInfos,
+    wasteDetailsPackagingInfos: prismaJsonNoNull(
+      form.wasteDetailsPackagingInfos
+    ),
     wasteDetailsQuantity: form.wasteDetailsQuantity,
     wasteDetailsQuantityType: form.wasteDetailsQuantityType,
     wasteDetailsPop: form.wasteDetailsPop,
     wasteDetailsIsDangerous: form.wasteDetailsIsDangerous,
-    wasteDetailsParcelNumbers: form.wasteDetailsParcelNumbers,
+    wasteDetailsParcelNumbers: prismaJsonNoNull(form.wasteDetailsParcelNumbers),
     wasteDetailsAnalysisReferences: form.wasteDetailsAnalysisReferences,
     wasteDetailsLandIdentifiers: form.wasteDetailsLandIdentifiers,
     wasteDetailsName: form.wasteDetailsName,
@@ -100,7 +103,11 @@ function getDuplicateFormForwardedInInput(
 ): Omit<Prisma.FormCreateInput, "readableId"> {
   const forwardedIn = form.forwardedIn;
 
-  if (!forwardedIn) return null;
+  if (!forwardedIn) {
+    throw new Error(
+      `Duplication - We expected a forwardedIn for form ${form.id}`
+    );
+  }
 
   return {
     status: Status.DRAFT,
@@ -121,7 +128,9 @@ function getDuplicateFormForwardedInInput(
     recipientCompanyPhone: forwardedIn.recipientCompanyPhone,
     recipientCompanyMail: forwardedIn.recipientCompanyMail,
     wasteDetailsCode: forwardedIn.wasteDetailsCode,
-    wasteDetailsPackagingInfos: form.wasteDetailsPackagingInfos,
+    wasteDetailsPackagingInfos: prismaJsonNoNull(
+      form.wasteDetailsPackagingInfos
+    ),
     wasteDetailsOnuCode: forwardedIn.wasteDetailsOnuCode,
     wasteDetailsPop: forwardedIn.wasteDetailsPop,
     wasteDetailsIsDangerous: forwardedIn.wasteDetailsIsDangerous,
@@ -151,7 +160,7 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
   const newFormInput = getDuplicateFormInput(user, existingForm);
 
   const fullForm = await formRepository.findFullFormById(existingForm.id);
-  if (fullForm.forwardedIn) {
+  if (fullForm?.forwardedIn) {
     newFormInput.forwardedIn = {
       create: {
         ...getDuplicateFormForwardedInInput(user, fullForm),
@@ -160,7 +169,7 @@ const duplicateFormResolver: MutationResolvers["duplicateForm"] = async (
     };
   }
 
-  if (fullForm.intermediaries) {
+  if (fullForm?.intermediaries) {
     newFormInput.intermediaries = {
       createMany: {
         data: fullForm.intermediaries.map(int => ({

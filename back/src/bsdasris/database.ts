@@ -18,12 +18,14 @@ export async function getBsdasriOrNotFound({
   }
   const bsdasri = await getReadonlyBsdasriRepository().findUnique(
     { id },
-    includeAssociated && {
-      include: {
-        grouping: { select: { id: true } },
-        synthesizing: { select: { id: true } }
-      }
-    }
+    includeAssociated
+      ? {
+          include: {
+            grouping: { select: { id: true } },
+            synthesizing: { select: { id: true } }
+          }
+        }
+      : {}
   );
 
   if (bsdasri == null || bsdasri.isDeleted == true) {

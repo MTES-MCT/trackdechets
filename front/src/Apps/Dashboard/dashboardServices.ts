@@ -178,12 +178,11 @@ const isBsff = (type: BsdType): boolean => type === BsdType.Bsff;
 const isBsdd = (type: BsdType): boolean => type === BsdType.Bsdd;
 const isBsdasri = (type: BsdType): boolean => type === BsdType.Bsdasri;
 
-const isBsdaSign = (bsd: BsdDisplay, currentSiret: string) => {
+export const isBsdaSign = (bsd: BsdDisplay, currentSiret: string) => {
   if (isBsda(bsd.type)) {
     return (
       (isCollection_2710(bsd.bsdWorkflowType?.toString()) &&
         isSameSiretDestination(currentSiret, bsd)) ||
-      // @ts-ignore
       (bsd.emitter?.isPrivateIndividual &&
         bsd.worker?.isDisabled &&
         isSameSiretTransporter(currentSiret, bsd))
@@ -192,10 +191,10 @@ const isBsdaSign = (bsd: BsdDisplay, currentSiret: string) => {
   return false;
 };
 
-const isBsvhuSign = (bsd: BsdDisplay, currentSiret: string) =>
+export const isBsvhuSign = (bsd: BsdDisplay, currentSiret: string) =>
   isBsvhu(bsd.type) && isSameSiretEmmiter(currentSiret, bsd);
 
-const isBsffSign = (
+export const isBsffSign = (
   bsd: BsdDisplay,
   currentSiret: string,
   bsdCurrentTab: BsdCurrentTab
@@ -204,13 +203,13 @@ const isBsffSign = (
   return isBsff(bsd.type) && !isActTab && isSameSiretEmmiter(currentSiret, bsd);
 };
 
-const isEmetteurSign = (bsd: BsdDisplay, isTransporter: boolean) =>
+export const isEmetteurSign = (bsd: BsdDisplay, isTransporter: boolean) =>
   isTransporter && !isSynthesis(bsd.bsdWorkflowType?.toString());
 
-const isEcoOrgSign = (bsd: BsdDisplay, isHolder: boolean) =>
+export const isEcoOrgSign = (bsd: BsdDisplay, isHolder: boolean) =>
   isHolder && !isSynthesis(bsd.bsdWorkflowType?.toString());
 
-const getIsNonDraftLabel = (
+export const getIsNonDraftLabel = (
   bsd: BsdDisplay,
   currentSiret: string,
   bsdCurrentTab: BsdCurrentTab
@@ -250,7 +249,7 @@ const getIsNonDraftLabel = (
   return "";
 };
 
-const getDraftOrInitialBtnLabel = (
+export const getDraftOrInitialBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay,
   bsdCurrentTab: BsdCurrentTab
@@ -268,20 +267,32 @@ const isAppendix1 = (bsd: BsdDisplay): boolean =>
 const isAppendix1Producer = (bsd: BsdDisplay): boolean =>
   bsd.emitterType === EmitterType.Appendix1Producer;
 
-const canSkipEmission = (bsd: BsdDisplay): boolean =>
+export const canSkipEmission = (bsd: BsdDisplay): boolean =>
   isAppendix1Producer(bsd) && Boolean(bsd.ecoOrganisme?.siret);
 
-const getSealedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
+export const getSealedBtnLabel = (
+  currentSiret: string,
+  bsd: BsdDisplay
+): string => {
   if (isBsdd(bsd.type)) {
     if (!isAppendix1(bsd)) {
       if (canSkipEmission(bsd) && isSameSiretTransporter(currentSiret, bsd)) {
         return SIGNER;
       }
 
-      if (includesSiretActors(bsd, currentSiret)) {
-        if (isAppendix1(bsd) && isSameSiretDestination(currentSiret, bsd)) {
-          return VALIDER_RECEPTION;
+      if (isAppendix1Producer(bsd)) {
+        if (
+          includesSiretActors(bsd, currentSiret) &&
+          !bsd?.emitter?.isPrivateIndividual
+        ) {
+          if (hasEmmiterAndEcoOrganismeSiret(bsd, currentSiret)) {
+            return SIGNER;
+          } else {
+            return FAIRE_SIGNER;
+          }
         }
+      }
+      if (includesSiretActors(bsd, currentSiret)) {
         if (hasEmmiterAndEcoOrganismeSiret(bsd, currentSiret)) {
           return SIGNER;
         } else {
@@ -296,7 +307,7 @@ const getSealedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
   return "";
 };
 
-const getSentBtnLabel = (
+export const getSentBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay,
   bsdCurrentTab: BsdCurrentTab
@@ -335,23 +346,37 @@ const getSentBtnLabel = (
   return "";
 };
 
-const getReceivedBtnLabel = (
+export const getReceivedBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay,
   bsdCurrentTab: BsdCurrentTab
 ): string => {
   const isActTab = bsdCurrentTab === "actTab";
-  if (isBsdd(bsd.type) && isAppendix1Producer(bsd)) {
-    return "";
-  }
+
   if (
-    (isBsdd(bsd.type) &&
-      bsd.isTempStorage &&
-      isSameSiretTemporaryStorageDestination(currentSiret, bsd)) ||
-    (!bsd.isTempStorage && isSameSiretDestination(currentSiret, bsd))
+    isBsdasri(bsd.type) &&
+    isActTab &&
+    isSameSiretDestination(currentSiret, bsd)
   ) {
-    return VALIDER_ACCEPTATION;
+    return VALIDER_RECEPTION;
   }
+
+  if (isBsdd(bsd.type)) {
+    if (isAppendix1Producer(bsd)) {
+      return "";
+    }
+    if (
+      bsd.isTempStorage &&
+      isSameSiretTemporaryStorageDestination(currentSiret, bsd)
+    ) {
+      return VALIDER_ACCEPTATION;
+    }
+
+    if (!bsd.isTempStorage && isSameSiretDestination(currentSiret, bsd)) {
+      return VALIDER_ACCEPTATION;
+    }
+  }
+
   if (isBsda(bsd.type) || isBsvhu(bsd.type)) {
     return VALIDER_TRAITEMENT;
   }
@@ -364,17 +389,10 @@ const getReceivedBtnLabel = (
     return SIGNATURE_ACCEPTATION_CONTENANT;
   }
 
-  if (
-    isBsdasri(bsd.type) &&
-    isActTab &&
-    isSameSiretDestination(currentSiret, bsd)
-  ) {
-    return VALIDER_RECEPTION;
-  }
   return "";
 };
 
-const getSignByProducerBtnLabel = (
+export const getSignByProducerBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay,
   bsdCurrentTab: BsdCurrentTab
@@ -450,7 +468,10 @@ const getAcceptedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
   return "";
 };
 
-const getResentBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
+export const getResentBtnLabel = (
+  currentSiret: string,
+  bsd: BsdDisplay
+): string => {
   if (
     isBsdd(bsd.type) &&
     isSameSiretTemporaryStorageDestination(currentSiret, bsd)
@@ -460,14 +481,17 @@ const getResentBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
   return "";
 };
 
-const getResealedBtnLabel = (currentSiret: string, bsd: BsdDisplay): string => {
+export const getResealedBtnLabel = (
+  currentSiret: string,
+  bsd: BsdDisplay
+): string => {
   if (isBsdd(bsd.type) && hasTemporaryStorage(currentSiret, bsd)) {
     return SIGNER_ENTREPOSAGE_PROVISOIRE;
   }
   return "";
 };
 
-const getTempStoredBtnLabel = (
+export const getTempStoredBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay
 ): string => {
@@ -477,7 +501,7 @@ const getTempStoredBtnLabel = (
   return "";
 };
 
-const getTempStorerAcceptedBtnLabel = (
+export const getTempStorerAcceptedBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay
 ): string => {
@@ -487,7 +511,7 @@ const getTempStorerAcceptedBtnLabel = (
   return "";
 };
 
-const getSignTempStorerBtnLabel = (
+export const getSignTempStorerBtnLabel = (
   currentSiret: string,
   bsd: BsdDisplay
 ): string => {
@@ -500,7 +524,6 @@ const getSignTempStorerBtnLabel = (
   return "";
 };
 
-/* à revoir avec harmonisation libéllés et status */
 export const getCtaLabelFromStatus = (
   bsd: BsdDisplay,
   currentSiret: string,
@@ -561,7 +584,6 @@ export const canPublishBsd = (
   bsd: BsdDisplay,
   currentSiret: string
 ): boolean => {
-  // à vérifier
   if (isBsdasri(bsd.type) && bsd.isDraft) {
     if (isGrouping(bsd.bsdWorkflowType?.toString()) && !bsd.grouping?.length) {
       return false;
@@ -690,11 +712,12 @@ const canUpdateBsff = (bsd, siret) =>
 const canReviewBsda = (bsd, siret) =>
   bsd.type === BsdType.Bsda && !canDeleteBsda(bsd, siret);
 
-const canReviewBsdd = bsd =>
+export const canReviewBsdd = bsd =>
   bsd.type === BsdType.Bsdd &&
   ![BsdStatusCode.Draft, BsdStatusCode.Sealed, BsdStatusCode.Refused].includes(
     bsd.status
-  );
+  ) &&
+  bsd.emitterType !== EmitterType.Appendix1Producer;
 
 export const canReviewBsd = (bsd, siret) =>
   canReviewBsdd(bsd) || canReviewBsda(bsd, siret);

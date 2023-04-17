@@ -82,7 +82,7 @@ const createBsdd = (bsdd: Form): BsdDisplay => {
     grouping: bsdd.grouping,
     temporaryStorageDetail: bsdd.temporaryStorageDetail,
     bsdWorkflowType: bsdd.emitter?.type,
-  };
+  } as BsdDisplay;
   return bsddFormatted;
 };
 

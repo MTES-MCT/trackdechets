@@ -62,7 +62,7 @@ describe("Mutation.updateBsffPackaging", () => {
       }
     });
 
-    const updatedPackaging = await prisma.bsffPackaging.findUnique({
+    const updatedPackaging = await prisma.bsffPackaging.findUniqueOrThrow({
       where: { id: packagingId }
     });
     expect(updatedPackaging.acceptationStatus).toEqual(
@@ -139,7 +139,7 @@ describe("Mutation.updateBsffPackaging", () => {
       }
     });
 
-    const updatedPackaging = await prisma.bsffPackaging.findUnique({
+    const updatedPackaging = await prisma.bsffPackaging.findUniqueOrThrow({
       where: { id: packagingId }
     });
     expect(updatedPackaging.acceptationStatus).toEqual(
@@ -172,7 +172,7 @@ describe("Mutation.updateBsffPackaging", () => {
       }
     });
 
-    const updatedPackaging = await prisma.bsffPackaging.findUnique({
+    const updatedPackaging = await prisma.bsffPackaging.findUniqueOrThrow({
       where: { id: packagingId }
     });
     expect(updatedPackaging.numero).toEqual("nouveau-numero");
@@ -311,7 +311,7 @@ describe("Mutation.updateBsffPackaging", () => {
       }
     });
 
-    const updatedPackaging = await prisma.bsffPackaging.findUnique({
+    const updatedPackaging = await prisma.bsffPackaging.findUniqueOrThrow({
       where: { id: packagingId }
     });
     expect(updatedPackaging.operationCode).toEqual("D13");

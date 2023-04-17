@@ -7,24 +7,24 @@ import {
 
 function getLastActionOn(
   form: Form,
-  temporaryStorageDetail: TemporaryStorageDetail
+  temporaryStorageDetail: TemporaryStorageDetail | null | undefined
 ): Date {
   switch (form.status) {
     case "SENT":
-      return form.takenOverAt;
+      return form.takenOverAt!;
     case "RECEIVED":
     case "ACCEPTED":
-      return form.receivedAt;
+      return form.receivedAt!;
     case "PROCESSED":
-      return form.processedAt;
+      return form.processedAt!;
     case "TEMP_STORED":
     case "TEMP_STORER_ACCEPTED":
     case "RESEALED":
-      return temporaryStorageDetail?.temporaryStorer?.receivedAt;
+      return temporaryStorageDetail!.temporaryStorer!.receivedAt!;
     case "RESENT":
-      return temporaryStorageDetail.takenOverAt;
+      return temporaryStorageDetail!.takenOverAt!;
     default:
-      return form.createdAt;
+      return form.createdAt!;
   }
 }
 

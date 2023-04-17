@@ -21,7 +21,7 @@ describe("Mutation.signBsdasri emission", () => {
       data: {
         address: "",
         name: "Eco-Organisme",
-        siret: ecoOrganismeCompany.siret,
+        siret: ecoOrganismeCompany.siret!,
         handleBsdasri: true
       }
     });
@@ -43,7 +43,7 @@ describe("Mutation.signBsdasri emission", () => {
       }
     });
 
-    const signedByEcoOrgDasri = await prisma.bsdasri.findUnique({
+    const signedByEcoOrgDasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: dasri.id }
     });
     expect(signedByEcoOrgDasri.status).toEqual("SIGNED_BY_PRODUCER");
