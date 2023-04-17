@@ -42,7 +42,9 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
     // pre-validate when signature by producer will be by-passed at the end of this mutation
     formUpdateInput = {
       emittedAt: new Date(),
-      emittedBy: "Signature auto (particulier)",
+      emittedBy: form.emitterIsPrivateIndividual
+        ? "Signature auto (particulier)"
+        : "Signature auto (navire étranger)",
       emittedByEcoOrganisme: false,
       // required for machine to authorize signature
       emitterIsForeignShip: form.emitterIsForeignShip,

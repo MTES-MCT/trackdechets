@@ -4,6 +4,7 @@ import {
   Consistence,
   EmitterType,
   Mutation,
+  MutationMarkAsSealedArgs,
   QuantityType
 } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
@@ -1138,7 +1139,7 @@ describe("Mutation.markAsSealed", () => {
     ]);
   });
 
-  it("should seal and automatically transition to SIGNED_BY_PRODUCER when private emitter", async () => {
+  it("should seal and automatically transition to SIGNED_BY_PRODUCER when private individual emitter", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const recipientCompany = await destinationFactory();
     const options = {
@@ -1175,6 +1176,49 @@ describe("Mutation.markAsSealed", () => {
     expect(updatedForm.status).toEqual("SIGNED_BY_PRODUCER");
     expect(updatedForm.emittedAt).not.toBeNull();
     expect(updatedForm.emittedBy).toEqual("Signature auto (particulier)");
+  });
+
+  it("should seal and automatically transition to SIGNED_BY_PRODUCER when foreign ship emitter", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const recipientCompany = await destinationFactory();
+    const options = {
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT" as Status,
+        emitterType: "PRODUCER" as EmitterType,
+        recipientCompanySiret: recipientCompany.siret,
+        emitterIsForeignShip: true,
+        emitterCompanyOmiNumber: "OMI1234567",
+        emitterCompanyName: "Navire étranger",
+        emitterCompanyAddress: "Quelque part en mer",
+        transporterCompanySiret: company.siret
+      }
+    };
+    const formParams = { ...formdataForPrivateOrShip, ...options.opt };
+    const form = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        ...formParams,
+        owner: { connect: { id: options.ownerId } }
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    await mutate<Pick<Mutation, "markAsSealed">, MutationMarkAsSealedArgs>(
+      MARK_AS_SEALED,
+      {
+        variables: {
+          id: form.id
+        }
+      }
+    );
+
+    const updatedForm = await prisma.form.findUnique({
+      where: { id: form.id }
+    });
+    expect(updatedForm.status).toEqual("SIGNED_BY_PRODUCER");
+    expect(updatedForm.emittedAt).not.toBeNull();
+    expect(updatedForm.emittedBy).toEqual("Signature auto (navire étranger)");
   });
 
   it("should throw an error if any SIRET does not exists", async () => {
