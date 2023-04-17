@@ -1,7 +1,6 @@
 import * as cron from "cron";
 import cronValidator from "cron-validate";
 import {
-  sendFirstOnboardingEmail,
   sendMembershipRequestDetailsEmail,
   sendPendingMembershipRequestDetailsEmail,
   sendPendingMembershipRequestToAdminDetailsEmail,
@@ -13,8 +12,9 @@ import { initSentry } from "./common/sentry";
 const {
   CRON_ONBOARDING_SCHEDULE,
   FIRST_ONBOARDING_TEMPLATE_ID,
-  PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID,
-  PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
+  PRODUCER_SECOND_ONBOARDING,
+  PROFESIONAL_SECOND_ONBOARDING,
+  VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID
 } = process.env;
 
 let jobs: cron.CronJob[] = [];
@@ -24,8 +24,9 @@ if (CRON_ONBOARDING_SCHEDULE) {
 
   if (
     !FIRST_ONBOARDING_TEMPLATE_ID ||
-    !PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID ||
-    !PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
+    !PRODUCER_SECOND_ONBOARDING ||
+    !PROFESIONAL_SECOND_ONBOARDING ||
+    !VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID
   ) {
     throw new Error(
       `Cannot start onboarding email cron job because some email templates were not configured :
@@ -37,14 +38,6 @@ if (CRON_ONBOARDING_SCHEDULE) {
 
   jobs = [
     ...jobs,
-    // first onboarding email
-    new cron.CronJob({
-      cronTime: CRON_ONBOARDING_SCHEDULE,
-      onTick: async () => {
-        await sendFirstOnboardingEmail();
-      },
-      timeZone: "Europe/Paris"
-    }),
     // second onbarding email
     new cron.CronJob({
       cronTime: CRON_ONBOARDING_SCHEDULE,

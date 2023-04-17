@@ -78,7 +78,12 @@ export async function createUserAccountHash(
  * @param orgId
  * @param role
  */
-export async function associateUserToCompany(userId, orgId, role) {
+export async function associateUserToCompany(
+  userId,
+  orgId,
+  role,
+  opt: Partial<Prisma.CompanyAssociationCreateInput> = {}
+) {
   // check for current associations
   const associations = await prisma.companyAssociation.findMany({
     where: {
@@ -101,7 +106,8 @@ export async function associateUserToCompany(userId, orgId, role) {
     data: {
       user: { connect: { id: userId } },
       role,
-      company: { connect: { orgId } }
+      company: { connect: { orgId } },
+      ...opt
     }
   });
 

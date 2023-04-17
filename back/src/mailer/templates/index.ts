@@ -44,18 +44,6 @@ export const onboardingFirstStep: MailTemplate = {
   templateId: templateIds.FIRST_ONBOARDING
 };
 
-export const onboardingProducerSecondStep: MailTemplate = {
-  subject:
-    "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
-  templateId: templateIds.PRODUCER_SECOND_ONBOARDING
-};
-
-export const onboardingProfessionalSecondStep: MailTemplate = {
-  subject:
-    "Trackdéchets vous accompagne pour mettre en oeuvre la traçabilité dématérialisée",
-  templateId: templateIds.PROFESSIONAL_SECOND_ONBOARDING
-};
-
 export const createPasswordResetRequest: MailTemplate<{
   resetHash: string;
 }> = {
@@ -187,6 +175,11 @@ export const verificationDone: MailTemplate<{
   })
 };
 
+export const verifiedForeignTransporterCompany: MailTemplate = {
+  subject: "Welcome to Trackdéchets !",
+  templateId: templateIds.VERIFIED_FOREIGN_TRANSPORTER_COMPANY
+};
+
 export const finalDestinationModified: MailTemplate<{
   id: string;
   emitter: { name?: string; siret: string };
@@ -218,6 +211,18 @@ export const pendingMembershipRequestAdminDetailsEmail: MailTemplate<{
   subject: "Un utilisateur est toujours en attente de réponse de votre part",
   body: mustacheRenderer("pending-membership-request-admin-details.html"),
   templateId: templateIds.LAYOUT
+};
+
+export const profesionalsSecondOnboardingEmail: MailTemplate = {
+  subject:
+    "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
+  templateId: templateIds.PROFESIONAL_SECOND_ONBOARDING
+};
+
+export const producersSecondOnboardingEmail: MailTemplate = {
+  subject:
+    "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
+  templateId: templateIds.PRODUCER_SECOND_ONBOARDING
 };
 
 export const pendingRevisionRequestAdminDetailsEmail: MailTemplate<{
