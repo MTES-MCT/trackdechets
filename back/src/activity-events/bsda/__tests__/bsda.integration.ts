@@ -326,7 +326,6 @@ describe("ActivityEvent.Bsda", () => {
       bsdaId,
       now
     );
-    console.log(bsdaFromEventsAfterCreate);
     expect(bsdaFromEventsAfterCreate.wasteCode).toBe("06 07 01*");
     expect(bsdaAfterUpdate!.wasteCode).toBe("06 13 04*");
   });
