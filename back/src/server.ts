@@ -26,6 +26,7 @@ import { graphqlRegenerateSessionMiddleware } from "./common/middlewares/graphql
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
 import { rateLimiterMiddleware } from "./common/middlewares/rateLimiter";
 import { timeoutMiddleware } from "./common/middlewares/timeout";
+import { graphqlQueryMergingLimiter } from "./common/middlewares/graphqlQueryMergingLimiter";
 import { graphiqlLandingPagePlugin } from "./common/plugins/graphiql";
 import sentryReporter from "./common/plugins/sentryReporter";
 import { redisClient } from "./common/redis";
@@ -117,7 +118,11 @@ export const server = new ApolloServer({
 
     return err;
   },
-  plugins: [graphiqlLandingPagePlugin(), ...(Sentry ? [sentryReporter] : [])]
+  plugins: [
+    graphiqlLandingPagePlugin(),
+    ...(Sentry ? [sentryReporter] : []),
+    graphqlQueryMergingLimiter()
+  ]
 });
 
 export const app = express();
