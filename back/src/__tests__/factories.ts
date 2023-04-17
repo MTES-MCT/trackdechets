@@ -187,24 +187,6 @@ export const createMembershipRequest = async (
   });
 };
 
-export const addUserToCompany = async (
-  user: User,
-  company: Company,
-  role: UserRole = "MEMBER",
-  opt: Partial<Prisma.CompanyAssociationCreateInput> = {}
-) => {
-  await prisma.companyAssociation.create({
-    data: {
-      company: { connect: { id: company.id } },
-      user: { connect: { id: user.id } },
-      role: role,
-      ...opt
-    }
-  });
-
-  return company;
-};
-
 const formdata = {
   brokerCompanyAddress: "",
   brokerCompanyContact: "",
