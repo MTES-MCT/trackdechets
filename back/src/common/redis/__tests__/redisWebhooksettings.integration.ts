@@ -37,7 +37,7 @@ describe("webhooksettings redis", () => {
     expect(redisWhs[0].endpointUri).toBe("https://lorem.ipsum");
     await handleWebhookFail(company.orgId);
 
-    const updatedWhs = await prisma.webhookSetting.findUnique({
+    const updatedWhs = await prisma.webhookSetting.findUniqueOrThrow({
       where: { id: whs.id }
     });
     expect(updatedWhs.activated).toBe(false);

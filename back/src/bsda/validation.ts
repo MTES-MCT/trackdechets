@@ -39,7 +39,7 @@ configureYup();
 export const PARTIAL_OPERATIONS = ["R 13", "D 15"];
 export const OPERATIONS = ["R 5", "D 5", "D 9", ...PARTIAL_OPERATIONS];
 type Emitter = Pick<
-  Bsda,
+  Prisma.BsdaCreateInput,
   | "emitterIsPrivateIndividual"
   | "emitterCompanyName"
   | "emitterCompanySiret"
@@ -55,7 +55,7 @@ type Emitter = Pick<
 >;
 
 type Worker = Pick<
-  Bsda,
+  Prisma.BsdaCreateInput,
   | "workerCompanyName"
   | "workerCompanySiret"
   | "workerCompanyAddress"
@@ -71,7 +71,7 @@ type Worker = Pick<
 >;
 
 type Destination = Pick<
-  Bsda,
+  Prisma.BsdaCreateInput,
   | "destinationCompanyName"
   | "destinationCompanySiret"
   | "destinationCompanyAddress"
@@ -92,7 +92,7 @@ type Destination = Pick<
 >;
 
 type Transporter = Pick<
-  Bsda,
+  Prisma.BsdaCreateInput,
   | "transporterCompanyName"
   | "transporterCompanySiret"
   | "transporterCompanyAddress"
@@ -109,7 +109,7 @@ type Transporter = Pick<
 >;
 
 type WasteDescription = Pick<
-  Bsda,
+  Prisma.BsdaCreateInput,
   | "wasteCode"
   | "wasteFamilyCode"
   | "wasteMaterialName"
@@ -804,7 +804,7 @@ const transporterSchema: FactorySchemaOf<
             "L'immatriculation du transporteur doit être saisie'"
           ),
         otherwise: schema => schema.nullable()
-      })
+      }) as any
   });
 
 const packagingsSchema = yup.object({
@@ -848,14 +848,14 @@ const wasteDescriptionSchema: FactorySchemaOf<
       .requiredIf(context.workSignature, `La consistence est obligatoire`),
     wasteSealNumbers: yup.array().ensure().of(yup.string()) as any,
     wasteAdr: yup.string().nullable(),
-    wastePop: yup.boolean().nullable(),
+    wastePop: yup.boolean().notRequired(),
     packagings: yup
       .array()
       .of(packagingsSchema)
       .test(
         "has-packaging",
         "Le conditionnement est obligatoire",
-        value => !context.workSignature || value?.length > 0
+        value => !context.workSignature || (!!value && value.length > 0)
       ),
     weightIsEstimate: yup
       .boolean()

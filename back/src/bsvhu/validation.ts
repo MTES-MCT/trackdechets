@@ -1,6 +1,5 @@
 import {
   Prisma,
-  Bsvhu,
   BsvhuIdentificationType,
   BsvhuPackaging,
   WasteAcceptationStatus
@@ -30,7 +29,7 @@ import {
 } from "../common/validation";
 
 type Emitter = Pick<
-  Bsvhu,
+  Prisma.BsvhuCreateInput,
   | "emitterAgrementNumber"
   | "emitterCompanyName"
   | "emitterCompanySiret"
@@ -41,7 +40,7 @@ type Emitter = Pick<
 >;
 
 type Destination = Pick<
-  Bsvhu,
+  Prisma.BsvhuCreateInput,
   | "destinationType"
   | "destinationAgrementNumber"
   | "destinationCompanyName"
@@ -58,7 +57,7 @@ type Destination = Pick<
 >;
 
 type Transporter = Pick<
-  Bsvhu,
+  Prisma.BsvhuCreateInput,
   | "transporterCompanyName"
   | "transporterCompanySiret"
   | "transporterCompanyAddress"
@@ -72,14 +71,14 @@ type Transporter = Pick<
 >;
 
 type Identification = Pick<
-  Bsvhu,
+  Prisma.BsvhuCreateInput,
   "identificationNumbers" | "identificationType"
 >;
 
-type Quantity = Pick<Bsvhu, "quantity">;
+type Quantity = Pick<Prisma.BsvhuCreateInput, "quantity">;
 
-type Weight = Pick<Bsvhu, "weightValue" | "weightIsEstimate">;
-type Packaging = Pick<Bsvhu, "packaging">;
+type Weight = Pick<Prisma.BsvhuCreateInput, "weightValue" | "weightIsEstimate">;
+type Packaging = Pick<Prisma.BsvhuCreateInput, "packaging">;
 
 interface VhuValidationContext {
   emissionSignature?: boolean;

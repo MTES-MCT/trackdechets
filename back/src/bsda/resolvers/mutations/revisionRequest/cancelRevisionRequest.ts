@@ -29,7 +29,7 @@ export async function cancelBsdaRevisionRequest(
     );
   }
 
-  const authoringCompany = await prisma.company.findUnique({
+  const authoringCompany = await prisma.company.findUniqueOrThrow({
     where: { id: revisionRequest.authoringCompanyId }
   });
 

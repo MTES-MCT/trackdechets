@@ -311,10 +311,10 @@ export function toBsdElastic(
 export async function indexForm(
   form: FullForm,
   ctx?: GraphQLContext
-): Promise<BsdElastic | null> {
+): Promise<BsdElastic> {
   // prevent unwanted cascaded reindexation
   if (form.isDeleted) {
-    return null;
+    return toBsdElastic(form);
   }
   if (form.forwardedIn) {
     // index next BSD asynchronously

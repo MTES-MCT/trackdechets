@@ -24,13 +24,13 @@ import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 
 export const sendPostVerificationFirstOnboardingEmail = async (
   company: Company,
-  admin: { email: string; name?: string }
+  admin: { email: string; name?: string | null }
 ) => {
   // If foreign transporter company
   if (isTransporter(company) && isForeignVat(company.vatNumber)) {
     await sendMail(
       renderMail(verifiedForeignTransporterCompany, {
-        to: [{ name: admin.name, email: admin.email }],
+        to: [{ name: admin.name ?? "", email: admin.email }],
         variables: { company: company }
       })
     );
@@ -46,7 +46,7 @@ export const sendPostVerificationFirstOnboardingEmail = async (
   ) {
     await sendMail(
       renderMail(onboardingFirstStep, {
-        to: [{ email: admin.email, name: admin.name }],
+        to: [{ email: admin.email, name: admin.name ?? "" }],
         variables: { company }
       })
     );

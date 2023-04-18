@@ -16,7 +16,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": true,
     "strictFunctionTypes": false,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "strictPropertyInitialization": false,
     "jsx": "react",
     "sourceMap": true,

@@ -250,9 +250,7 @@ export const emissionSchema: FactorySchemaOf<
         "emission-quantity-type-required-if-quantity-is-provided",
         "Le type de pesée (réelle ou estimée) doit être précisé si vous renseignez un poids de déchets émis",
         function (value) {
-          return !!this.parent.emitterWasteWeightValue
-            ? ![null, undefined].includes(value)
-            : true;
+          return !!this.parent.emitterWasteWeightValue ? value != null : true;
         }
       ),
 
@@ -457,7 +455,7 @@ export const transportSchema: FactorySchemaOf<
         "Le type de pesée (réelle ou estimée) doit être précisé si vous renseignez un poids de déchets transportés",
         function (value) {
           return !!this.parent.transporterWasteWeightValue
-            ? ![null, undefined].includes(value)
+            ? value != null
             : true;
         }
       ),
@@ -490,7 +488,7 @@ export const transportSchema: FactorySchemaOf<
     transporterTransportPlates: yup
       .array()
       .of(yup.string())
-      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté")
+      .max(2, "Un maximum de 2 plaques d'immatriculation est accepté") as any
   });
 
 export const recipientSchema: FactorySchemaOf<
@@ -646,6 +644,7 @@ export const operationSchema: FactorySchemaOf<
           const recipientSiret = ctx.parent.destinationCompanySiret;
 
           if (
+            value &&
             DASRI_GROUPING_OPERATIONS_CODES.includes(value) &&
             !!recipientSiret
           ) {
@@ -655,7 +654,7 @@ export const operationSchema: FactorySchemaOf<
               }
             });
 
-            return isCollector(destinationCompany);
+            return !!destinationCompany && isCollector(destinationCompany);
           }
           return true;
         }

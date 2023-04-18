@@ -42,7 +42,7 @@ const signatures: Partial<
 
     if (args.input.emittedByEcoOrganisme) {
       await checkCanSignFor(
-        existingForm.ecoOrganismeSiret,
+        existingForm.ecoOrganismeSiret!,
         user,
         args.securityCode
       );
@@ -51,7 +51,7 @@ const signatures: Partial<
       !existingForm.emitterIsPrivateIndividual
     ) {
       await checkCanSignFor(
-        existingForm.emitterCompanySiret,
+        existingForm.emitterCompanySiret!,
         user,
         args.securityCode
       );
@@ -99,7 +99,7 @@ const signatures: Partial<
   },
   [Status.RESEALED]: async (user, args, existingForm) => {
     await checkCanSignFor(
-      existingForm.recipientCompanySiret,
+      existingForm.recipientCompanySiret!,
       user,
       args.securityCode
     );

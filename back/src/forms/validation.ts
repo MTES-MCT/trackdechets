@@ -633,8 +633,8 @@ const wasteDetailsAppendix1SchemaFn: FactorySchemaOf<
       otherwise: () => yup.string().nullable()
     }),
     wasteDetailsParcelNumbers: yup.array().of(parcelInfos as any),
-    wasteDetailsAnalysisReferences: yup.array().of(yup.string()),
-    wasteDetailsLandIdentifiers: yup.array().of(yup.string()),
+    wasteDetailsAnalysisReferences: yup.array().of(yup.string()) as any,
+    wasteDetailsLandIdentifiers: yup.array().of(yup.string()) as any,
     wasteDetailsConsistence: yup
       .mixed<Consistence>()
       .requiredIf(!isDraft, "La consistance du déchet doit être précisée")
@@ -657,7 +657,7 @@ const fullWasteDetailsSchemaFn: FactorySchemaOf<
       wasteDetailsPackagingInfos: yup
         .array()
         .requiredIf(!isDraft, "Le détail du conditionnement est obligatoire")
-        .of(packagingInfoFn(isDraft))
+        .of(packagingInfoFn(isDraft) as any)
         .test(
           "is-valid-packaging-infos",
           "${path} ne peut pas à la fois contenir 1 citerne ou 1 benne et un autre conditionnement.",
@@ -721,7 +721,7 @@ export const beforeSignedByTransporterSchema: yup.SchemaOf<
     then: schema => schema.nullable(),
     otherwise: schema =>
       schema.min(1, "Le nombre de contenants doit être supérieur à 0")
-  })
+  }) as any
 });
 
 // 8 - Collecteur-transporteur
@@ -995,7 +995,10 @@ export const acceptedInfoSchema: yup.SchemaOf<AcceptedInfo> = yup.object({
   quantityReceived: weight(WeightUnits.Tonne)
     .label("Réception")
     .required("${path} : Le poids reçu en tonnes est obligatoire")
-    .when("wasteAcceptationStatus", weightConditions.wasteAcceptationStatus),
+    .when(
+      "wasteAcceptationStatus",
+      weightConditions.wasteAcceptationStatus as any
+    ),
   wasteAcceptationStatus: yup.mixed<WasteAcceptationStatus>().required(),
   wasteRefusalReason: yup
     .string()

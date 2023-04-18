@@ -481,7 +481,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
         createdAt: TWO_DAYS_AGO,
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -526,7 +526,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
         createdAt: THREE_DAYS_AGO,
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -544,7 +544,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
         createdAt: ONE_DAY_AGO,
         bsdaId: bsda2.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -577,7 +577,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
         createdAt: TWO_DAYS_AGO,
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: "",
         status: "ACCEPTED"
       }
@@ -612,7 +612,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
         createdAt: TWO_DAYS_AGO,
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -637,7 +637,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
         createdAt: TWO_DAYS_AGO,
         bsdaId: bsda2.id,
         authoringCompanyId: companyOfSomeoneElse2.id,
-        approvals: { create: { approverSiret: company2.siret } },
+        approvals: { create: { approverSiret: company2.siret! } },
         comment: ""
       }
     });
@@ -697,7 +697,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
         createdAt: TWO_DAYS_AGO,
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -746,7 +746,7 @@ describe("getPendingBSDARevisionRequestsWithAdmins", () => {
         createdAt: TWO_DAYS_AGO,
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -803,7 +803,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
         createdAt: TWO_DAYS_AGO,
         bsddId: bsdd.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -847,7 +847,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
         createdAt: THREE_DAYS_AGO,
         bsddId: bsdd.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -863,7 +863,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
         createdAt: ONE_DAY_AGO,
         bsddId: bsdd2.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -894,7 +894,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
         createdAt: TWO_DAYS_AGO,
         bsddId: bsdd.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: "",
         status: "ACCEPTED"
       }
@@ -927,7 +927,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
         createdAt: TWO_DAYS_AGO,
         bsddId: bsdd.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -950,7 +950,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
         createdAt: TWO_DAYS_AGO,
         bsddId: bsdd2.id,
         authoringCompanyId: companyOfSomeoneElse2.id,
-        approvals: { create: { approverSiret: company2.siret } },
+        approvals: { create: { approverSiret: company2.siret! } },
         comment: ""
       }
     });
@@ -1010,7 +1010,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
         createdAt: TWO_DAYS_AGO,
         bsddId: bsdd.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -1058,7 +1058,7 @@ describe("getPendingBSDDRevisionRequestsWithAdmins", () => {
         createdAt: TWO_DAYS_AGO,
         bsddId: bsdd.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -1100,7 +1100,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
         companyTypes: ["COLLECTOR"]
       },
       {},
-      { createdAt: THREE_DAYS_AGO }
+      { createdAt: THREE_DAYS_AGO } as any
     );
     const admin0 = company0AndAdmin0.user;
 
@@ -1113,7 +1113,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
         companyTypes: ["COLLECTOR"]
       },
       {},
-      { createdAt: THREE_DAYS_AGO }
+      { createdAt: THREE_DAYS_AGO } as any
     );
 
     // Should not be returned because company got verified 1 day ago
@@ -1125,7 +1125,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
         companyTypes: ["COLLECTOR"]
       },
       {},
-      { createdAt: THREE_DAYS_AGO }
+      { createdAt: THREE_DAYS_AGO } as any
     );
 
     // Should not be returned because is company creator and company got verified 1 day ago
@@ -1137,7 +1137,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
         companyTypes: ["COLLECTOR"]
       },
       {},
-      { createdAt: TWO_DAYS_AGO }
+      { createdAt: TWO_DAYS_AGO } as any
     );
 
     // When
@@ -1173,7 +1173,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
         companyTypes: ["COLLECTOR"]
       },
       {},
-      { createdAt: THREE_DAYS_AGO }
+      { createdAt: THREE_DAYS_AGO } as any
     );
     const admin0 = company0.user;
 
@@ -1186,14 +1186,14 @@ describe("getRecentlyRegisteredProfesionals", () => {
         companyTypes: ["COLLECTOR"]
       },
       {},
-      { createdAt: THREE_DAYS_AGO }
+      { createdAt: THREE_DAYS_AGO } as any
     );
     const admin1 = company1.user;
 
     // Admin0 is in 2 elligible companies, but should be returned only once
     await associateUserToCompany(admin0.id, company1.company.orgId, "MEMBER", {
       createdAt: TWO_DAYS_AGO
-    });
+    } as any);
 
     // When
     const profesionnals = await getRecentlyRegisteredProfesionals(2);
@@ -1234,7 +1234,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
         companyTypes: ["COLLECTOR"]
       },
       {},
-      { createdAt: THREE_DAYS_AGO }
+      { createdAt: THREE_DAYS_AGO } as any
     );
 
     // Should not be returned
@@ -1245,7 +1245,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
         companyTypes: ["COLLECTOR"]
       },
       {},
-      { createdAt: TWO_DAYS_AGO }
+      { createdAt: TWO_DAYS_AGO } as any
     );
 
     // When
@@ -1267,7 +1267,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
         companyTypes: ["COLLECTOR"]
       },
       {},
-      { createdAt: FOUR_DAYS_AGO }
+      { createdAt: FOUR_DAYS_AGO } as any
     );
 
     // Should be returned
@@ -1278,7 +1278,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
       "MEMBER",
       {
         createdAt: TWO_DAYS_AGO
-      }
+      } as any
     );
 
     // Should not be returned cause joined 3 days ago
@@ -1289,7 +1289,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
       "MEMBER",
       {
         createdAt: THREE_DAYS_AGO
-      }
+      } as any
     );
 
     // Should not be returned cause joined 1 day ago
@@ -1300,7 +1300,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
       "MEMBER",
       {
         createdAt: ONE_DAY_AGO
-      }
+      } as any
     );
 
     // When
@@ -1328,7 +1328,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
         companyTypes: ["COLLECTOR"]
       },
       {},
-      { createdAt: TWO_DAYS_AGO }
+      { createdAt: TWO_DAYS_AGO } as any
     );
     const admin0 = company0AndAdmin0.user;
 
@@ -1340,7 +1340,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
       "MEMBER",
       {
         createdAt: TWO_DAYS_AGO
-      }
+      } as any
     );
 
     // When
@@ -1376,7 +1376,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
         companyTypes: ["PRODUCER"]
       },
       {},
-      { createdAt: FOUR_DAYS_AGO }
+      { createdAt: FOUR_DAYS_AGO } as any
     );
 
     // Should not be returned because non-profesional
@@ -1387,7 +1387,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
       "MEMBER",
       {
         createdAt: TWO_DAYS_AGO
-      }
+      } as any
     );
 
     // When
@@ -1409,7 +1409,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
         companyTypes: ["PRODUCER"]
       },
       {},
-      { createdAt: THREE_DAYS_AGO }
+      { createdAt: THREE_DAYS_AGO } as any
     );
 
     // When
@@ -1431,7 +1431,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
         companyTypes: ["PRODUCER"]
       },
       {},
-      { createdAt: FOUR_DAYS_AGO }
+      { createdAt: FOUR_DAYS_AGO } as any
     );
 
     // Should not be returned because belongs to non-profesional company
@@ -1442,7 +1442,7 @@ describe("getRecentlyRegisteredProfesionals", () => {
       "MEMBER",
       {
         createdAt: TWO_DAYS_AGO
-      }
+      } as any
     );
 
     // When
@@ -1467,7 +1467,7 @@ describe("getRecentlyRegisteredProducers", () => {
         companyTypes: ["PRODUCER"]
       },
       {},
-      { createdAt: TWO_DAYS_AGO }
+      { createdAt: TWO_DAYS_AGO } as any
     );
 
     // Should be returned
@@ -1478,7 +1478,7 @@ describe("getRecentlyRegisteredProducers", () => {
       "MEMBER",
       {
         createdAt: TWO_DAYS_AGO
-      }
+      } as any
     );
 
     // Should not be returned because three days ago
@@ -1489,7 +1489,7 @@ describe("getRecentlyRegisteredProducers", () => {
         companyTypes: ["PRODUCER"]
       },
       {},
-      { createdAt: THREE_DAYS_AGO }
+      { createdAt: THREE_DAYS_AGO } as any
     );
 
     // Should not be returned because one day ago
@@ -1500,7 +1500,7 @@ describe("getRecentlyRegisteredProducers", () => {
       "MEMBER",
       {
         createdAt: ONE_DAY_AGO
-      }
+      } as any
     );
 
     // When
@@ -1542,7 +1542,7 @@ describe("getRecentlyRegisteredProducers", () => {
         companyTypes: ["PRODUCER"]
       },
       {},
-      { createdAt: TWO_DAYS_AGO }
+      { createdAt: TWO_DAYS_AGO } as any
     );
     const admin0 = company0AndAdmin0.user;
 
@@ -1554,7 +1554,7 @@ describe("getRecentlyRegisteredProducers", () => {
         companyTypes: ["PRODUCER"]
       },
       {},
-      { createdAt: TWO_DAYS_AGO }
+      { createdAt: TWO_DAYS_AGO } as any
     );
     const admin1 = company1AndAdmin1.user;
 
@@ -1565,7 +1565,7 @@ describe("getRecentlyRegisteredProducers", () => {
       "MEMBER",
       {
         createdAt: TWO_DAYS_AGO
-      }
+      } as any
     );
 
     // When
@@ -1607,7 +1607,7 @@ describe("getRecentlyRegisteredProducers", () => {
         companyTypes: ["COLLECTOR"]
       },
       {},
-      { createdAt: TWO_DAYS_AGO }
+      { createdAt: TWO_DAYS_AGO } as any
     );
 
     // Should not be returned
@@ -1618,7 +1618,7 @@ describe("getRecentlyRegisteredProducers", () => {
       "MEMBER",
       {
         createdAt: TWO_DAYS_AGO
-      }
+      } as any
     );
 
     // When

@@ -165,7 +165,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
           verificationComment: "Import en masse",
           codeNaf: company.codeNaf,
           gerepId: company.gerepId,
-          name: company.name,
+          name: company.name!,
           companyTypes: {
             set: company.companyTypes as CompanyType[]
           },

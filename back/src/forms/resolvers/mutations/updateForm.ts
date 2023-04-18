@@ -235,7 +235,7 @@ const updateFormResolver = async (
     ? appendix2toFormFractions(appendix2Forms)
     : existingFormFractionsInput;
   const formFractions = isGroupementUpdated
-    ? await validateGroupement(futureForm, formFractionsInput)
+    ? await validateGroupement(futureForm as any, formFractionsInput!)
     : null;
 
   const updatedForm = await runInTransaction(async transaction => {

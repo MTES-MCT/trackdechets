@@ -44,7 +44,11 @@ const signatures: Record<
     user,
     existingBsff
   ) => {
-    await checkCanSignFor(user, existingBsff.emitterCompanySiret, securityCode);
+    await checkCanSignFor(
+      user,
+      existingBsff.emitterCompanySiret!,
+      securityCode
+    );
 
     await validateBeforeEmission(existingBsff as any);
 
@@ -66,7 +70,7 @@ const signatures: Record<
   ) => {
     await checkCanSignFor(
       user,
-      getTransporterCompanyOrgId(existingBsff),
+      getTransporterCompanyOrgId(existingBsff)!,
       securityCode
     );
 
@@ -90,7 +94,7 @@ const signatures: Record<
   ) => {
     await checkCanSignFor(
       user,
-      existingBsff.destinationCompanySiret,
+      existingBsff.destinationCompanySiret!,
       securityCode
     );
     await validateBeforeReception(existingBsff as any);
@@ -113,7 +117,7 @@ const signatures: Record<
   ) => {
     await checkCanSignFor(
       user,
-      existingBsff.destinationCompanySiret,
+      existingBsff.destinationCompanySiret!,
       securityCode
     );
 
@@ -218,7 +222,7 @@ const signatures: Record<
   ) => {
     await checkCanSignFor(
       user,
-      existingBsff.destinationCompanySiret,
+      existingBsff.destinationCompanySiret!,
       securityCode
     );
     await validateAfterReception(existingBsff as any);

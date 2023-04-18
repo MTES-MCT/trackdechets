@@ -8,18 +8,16 @@ import formsRegister from "./queries/formsRegister";
 import stats from "./queries/stats";
 import formRevisionRequests from "./queries/formRevisionRequests";
 
-export type FormQueryResolvers = Required<
-  Pick<
-    QueryResolvers,
-    | "form"
-    | "forms"
-    | "formPdf"
-    | "appendixForms"
-    | "formsLifeCycle"
-    | "formsRegister"
-    | "stats"
-    | "formRevisionRequests"
-  >
+export type FormQueryResolvers = Pick<
+  QueryResolvers,
+  | "form"
+  | "forms"
+  | "formPdf"
+  | "appendixForms"
+  | "formsLifeCycle"
+  | "formsRegister"
+  | "stats"
+  | "formRevisionRequests"
 >;
 
 const Query: FormQueryResolvers = {

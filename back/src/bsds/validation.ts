@@ -23,20 +23,20 @@ export const bsdSearchSchema: yup.SchemaOf<
 > = yup.object({
   isArchivedFor: yup
     .array()
-    .of(maxLengthString(GET_BSDS_ACTOR_MAX_LENGTH).required()),
+    .of(maxLengthString(GET_BSDS_ACTOR_MAX_LENGTH).required()) as any,
   isCollectedFor: yup
     .array()
-    .of(maxLengthString(GET_BSDS_ACTOR_MAX_LENGTH).required()),
+    .of(maxLengthString(GET_BSDS_ACTOR_MAX_LENGTH).required()) as any,
   isDraftFor: yup
     .array()
-    .of(maxLengthString(GET_BSDS_ACTOR_MAX_LENGTH).required()),
+    .of(maxLengthString(GET_BSDS_ACTOR_MAX_LENGTH).required()) as any,
   isFollowFor: yup
     .array()
-    .of(maxLengthString(GET_BSDS_ACTOR_MAX_LENGTH).required()),
+    .of(maxLengthString(GET_BSDS_ACTOR_MAX_LENGTH).required()) as any,
   isForActionFor: yup
     .array()
-    .of(maxLengthString(GET_BSDS_ACTOR_MAX_LENGTH).required()),
+    .of(maxLengthString(GET_BSDS_ACTOR_MAX_LENGTH).required()) as any,
   isToCollectFor: yup
     .array()
-    .of(maxLengthString(GET_BSDS_ACTOR_MAX_LENGTH).required())
+    .of(maxLengthString(GET_BSDS_ACTOR_MAX_LENGTH).required()) as any
 });

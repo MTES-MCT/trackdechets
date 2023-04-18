@@ -78,7 +78,7 @@ const genWebhookFailKey = (orgId: string): string =>
 export async function handleWebhookFail(orgId: string): Promise<void> {
   const key = genWebhookFailKey(orgId);
   const failCount = await redisClient.get(key);
-  if (parseInt(failCount, 10) >= WEBHOOK_FAIL_ACCEPTED) {
+  if (failCount && parseInt(failCount, 10) >= WEBHOOK_FAIL_ACCEPTED) {
     await prisma.webhookSetting.update({
       where: { orgId },
       data: { activated: false }
