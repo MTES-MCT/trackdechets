@@ -48,6 +48,7 @@ const formData: Partial<Form> = {
   transporterCompanyPhone: "03",
   transporterCompanyMail: "t@t.fr",
   wasteDetailsCode: "16 06 01*",
+  wasteDetailsName: "Déchets divers",
   wasteDetailsOnuCode: "AAA",
   wasteDetailsPackagingInfos: [
     { type: "FUT", other: null, quantity: 1 },

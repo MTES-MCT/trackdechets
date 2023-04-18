@@ -365,7 +365,6 @@ describe("signEmissionForm", () => {
         recipientCompanyName: temporaryStorage.company.name
       }
     });
-
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
 
     const { mutate } = makeClient(temporaryStorage.user);
