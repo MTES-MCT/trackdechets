@@ -40,6 +40,7 @@ const jobNames = [
 
 export const enqueueDeletedFormWebhook = async (id: string) => {
   const fullForm = await getReadOnlyFormRepository().findFullFormById(id);
+  if (!fullForm) return;
   const bsdElastic = toBsdElastic(fullForm);
   const { sirets } = bsdElastic;
   return scheduleWebhook(fullForm.readableId, sirets, DELETE_JOB_NAME);

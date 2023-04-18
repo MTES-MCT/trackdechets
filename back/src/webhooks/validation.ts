@@ -1,11 +1,14 @@
 import * as yup from "yup";
-import { WebhookSetting } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 type WebhookSettingCreateInput = Pick<
-  WebhookSetting,
+  Prisma.WebhookSettingCreateInput,
   "endpointUri" | "token" | "activated"
 > & { companyId: string };
-type WebhookSettingUpdateInput = Omit<WebhookSettingCreateInput, "companyId">;
+type WebhookSettingUpdateInput = Pick<
+  Prisma.WebhookSettingUpdateInput,
+  "endpointUri" | "token" | "activated"
+>;
 
 const webhookSettingUpdateSchema: yup.SchemaOf<WebhookSettingUpdateInput> =
   yup.object({
@@ -13,7 +16,6 @@ const webhookSettingUpdateSchema: yup.SchemaOf<WebhookSettingUpdateInput> =
       .string()
       .url()
       .max(300)
-
       .test(
         "webhook-url-https",
         "L'url doit être en https",
@@ -31,10 +33,10 @@ const webhookSettingCreateSchema: yup.SchemaOf<WebhookSettingCreateInput> =
       .url()
       .max(300)
       .required("L'url de notification du webhook est requise")
-      .test("webhook-url-https", "L'url doit être en https", value =>
+      .test("webhook-url-https", "L'url doit être en https", (value: string) =>
         value.startsWith("https://")
       ),
-    token: yup.string().notRequired().min(20).max(100),
+    token: yup.string().notRequired().min(20).max(100) as any,
     activated: yup.boolean()
   });
 
@@ -44,8 +46,6 @@ export function validateWebhookCreateInput(
   return webhookSettingCreateSchema.validate(input, { abortEarly: false });
 }
 
-export function validateWebhookUpdateInput(
-  input: Partial<WebhookSettingUpdateInput>
-) {
+export function validateWebhookUpdateInput(input: WebhookSettingUpdateInput) {
   return webhookSettingUpdateSchema.validate(input, { abortEarly: false });
 }

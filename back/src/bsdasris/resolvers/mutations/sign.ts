@@ -199,7 +199,7 @@ const sign = async ({
     [signatureParams.author]: author,
     [signatureParams.date]: new Date(),
     [signatureParams.signatoryField]: { connect: { id: user.id } },
-    ...getFieldsUpdate({ bsdasri, input: { author, type } })
+    ...getFieldsUpdate({ bsdasri, type })
   };
 
   const { where, updateData } = await dasriTransition(
@@ -208,7 +208,7 @@ const sign = async ({
     },
     {
       type: signatureParams.eventType,
-      dasriUpdateInput: data
+      dasriUpdateInput: data as any
     },
     signatureParams.validationContext,
     {

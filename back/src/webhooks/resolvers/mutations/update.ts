@@ -25,7 +25,7 @@ const updateWebhookSettingResolver = async (
 
   await checkCanEditWebhookSetting(user, webhookSetting);
 
-  await validateWebhookUpdateInput(input);
+  await validateWebhookUpdateInput(input as any);
 
   const { endpointUri, token, activated } = input;
   // exit if no change requested
@@ -40,7 +40,7 @@ const updateWebhookSettingResolver = async (
     {
       ...(endpointUri ? { endpointUri } : {}),
       ...(token ? { token: aesEncrypt(token) } : {}),
-      ...(activated !== undefined ? { activated } : {})
+      ...(activated !== undefined ? { activated: Boolean(activated) } : {})
     }
   );
 

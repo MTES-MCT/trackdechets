@@ -210,12 +210,14 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<
                         0,
                         "La description ne peut être renseigné que lorsque le type de conditionnement est 'AUTRE'."
                       )
-              ),
+              ) as any,
             volume: yup
               .number()
               .nullable()
               .notRequired()
-              .positive("Conditionnements : le volume doit être supérieur à 0"),
+              .positive(
+                "Conditionnements : le volume doit être supérieur à 0"
+              ) as any,
             numero: yup
               .string()
               .ensure()
@@ -352,7 +354,7 @@ export const acceptationSchema: yup.SchemaOf<Acceptation> = yup.object({
   acceptationWeight: weight(WeightUnits.Kilogramme)
     .label("Acceptation")
     .required("Le poids en kilogramme du déchet reçu est requis")
-    .when("acceptationStatus", weightConditions.wasteAcceptationStatus),
+    .when("acceptationStatus", weightConditions.wasteAcceptationStatus as any),
   acceptationWasteCode: yup
     .string()
     .nullable()
@@ -472,7 +474,7 @@ const withoutNextDestination = yup.object().shape({
 });
 
 const traceabilityBreakAllowed = yup.object({
-  operationNoTraceability: yup.boolean().nullable()
+  operationNoTraceability: yup.boolean().nullable() as any
 });
 
 const traceabilityBreakForbidden = yup.object({
@@ -482,7 +484,7 @@ const traceabilityBreakForbidden = yup.object({
     .notOneOf(
       [true],
       "Vous ne pouvez pas indiquer une rupture de traçabilité avec un code de traitement final"
-    )
+    ) as any
 });
 
 const operationSchemaFn: (value: any) => yup.SchemaOf<Operation> = value => {
@@ -565,7 +567,7 @@ export async function validateFicheInterventions(
   }
 
   const allowedTypes: BsffType[] = [BsffType.COLLECTE_PETITES_QUANTITES];
-  if (!allowedTypes.includes(bsff.type)) {
+  if (!bsff.type || !allowedTypes.includes(bsff.type)) {
     throw new UserInputError(
       `Le type de BSFF choisi ne permet pas d'associer des fiches d'intervention.`
     );
@@ -640,7 +642,7 @@ export async function validatePreviousPackagings(
     );
   }
 
-  if (isRepackaging && bsff.packagings?.length > 1) {
+  if (isRepackaging && bsff.packagings && bsff.packagings.length > 1) {
     throw new UserInputError(
       "Vous ne pouvez saisir qu'un seul contenant lors d'une opération de reconditionnement"
     );
@@ -679,7 +681,7 @@ export async function validatePreviousPackagings(
     ...new Set(
       forwardedPackagings
         .map(p => p.acceptationWasteCode ?? p.bsff?.wasteCode)
-        .filter(code => code?.length > 0)
+        .filter(code => code && code.length > 0)
     )
   ].sort();
 
@@ -779,7 +781,7 @@ export async function validatePreviousPackagings(
     }
 
     const operation = OPERATION[packaging.operationCode as BsffOperationCode];
-    if (!operation.successors.includes(bsff.type)) {
+    if (!bsff.type || !operation.successors.includes(bsff.type)) {
       return [
         ...acc,
         `Une opération de traitement finale a été déclarée sur le contenant n°${packaging.id} (${packaging.numero}). ` +
@@ -789,7 +791,7 @@ export async function validatePreviousPackagings(
 
     if (
       !!packaging.nextPackagingId &&
-      packaging.nextPackaging.bsffId !== bsff.id
+      packaging.nextPackaging!.bsffId !== bsff.id
     ) {
       return [
         ...acc,
@@ -972,11 +974,14 @@ export const ficheInterventionSchema: yup.SchemaOf<
   postalCode: yup
     .string()
     .required("Le code postal du lieu de l'intervention est requis"),
-  detenteurIsPrivateIndividual: yup.boolean(),
+  detenteurIsPrivateIndividual: yup.boolean() as any,
   detenteurCompanySiret: siret
     .label("Détenteur")
     .required("Le SIRET de l'entreprise détentrice de l'équipement est requis")
-    .when("detenteurIsPrivateIndividual", siretConditions.isPrivateIndividual),
+    .when(
+      "detenteurIsPrivateIndividual",
+      siretConditions.isPrivateIndividual as any
+    ),
   detenteurCompanyName: yup
     .string()
     .ensure()

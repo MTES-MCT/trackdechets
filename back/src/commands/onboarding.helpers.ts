@@ -328,9 +328,11 @@ export const sendPendingMembershipRequestToAdminDetailsEmail = async (
           email: companyAssociation.user.email,
           name: companyAssociation.user.name
         })),
-        params: {
-          body: template.body
-        }
+        ...(template.body && {
+          params: {
+            body: template.body
+          }
+        })
       };
     });
 
@@ -490,9 +492,11 @@ export const sendPendingRevisionRequestToAdminDetailsEmail = async (
               email: admin.email,
               name: admin.name
             })),
-            params: {
-              body: template.body
-            }
+            ...(template.body && {
+              params: {
+                body: template.body
+              }
+            })
           };
         });
       })

@@ -1210,7 +1210,7 @@ describe("Mutation.markAsSealed", () => {
       }
     });
 
-    const updatedForm = await prisma.form.findUnique({
+    const updatedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     expect(updatedForm.status).toEqual("SIGNED_BY_PRODUCER");
@@ -1253,7 +1253,7 @@ describe("Mutation.markAsSealed", () => {
       }
     );
 
-    const updatedForm = await prisma.form.findUnique({
+    const updatedForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     expect(updatedForm.status).toEqual("SIGNED_BY_PRODUCER");

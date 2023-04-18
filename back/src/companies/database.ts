@@ -321,11 +321,8 @@ export function convertUrls<T extends Partial<Company>>(
 } {
   return {
     ...company,
-    ...(company.ecoOrganismeAgreements && {
-      ecoOrganismeAgreements: company.ecoOrganismeAgreements.map(
-        a => new URL(a)
-      )
-    }),
+    ecoOrganismeAgreements:
+      company.ecoOrganismeAgreements?.map(a => new URL(a)) ?? [],
     signatureAutomations: [],
     receivedSignatureAutomations: []
   };

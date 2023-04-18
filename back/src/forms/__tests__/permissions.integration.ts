@@ -355,7 +355,7 @@ describe("checkSecurityCode", () => {
 
   test("securityCode is valid", async () => {
     const company = await companyFactory();
-    const check = await checkSecurityCode(company.siret, company.securityCode);
+    const check = await checkSecurityCode(company.siret!, company.securityCode);
     expect(check).toEqual(true);
   });
 
@@ -370,7 +370,7 @@ describe("checkSecurityCode", () => {
 
   test("securityCode is invalid", async () => {
     const company = await companyFactory();
-    const checkFn = () => checkSecurityCode(company.siret, 1258478956);
+    const checkFn = () => checkSecurityCode(company.siret!, 1258478956);
     expect(checkFn).rejects.toThrow("Le code de signature est invalide.");
   });
 });

@@ -905,7 +905,7 @@ describe("Integration / Forms query for transporters", () => {
       opt: {
         transporterCompanySiret: null,
         transporterCompanyVatNumber: company.vatNumber,
-        transportersSirets: [company.vatNumber]
+        transportersSirets: [company.vatNumber!]
       }
     });
 

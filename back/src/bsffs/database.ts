@@ -111,7 +111,8 @@ export async function getFicheInterventions({
     bsff.transporterCompanyVatNumber,
     bsff.destinationCompanySiret
   ].some(
-    orgId => userRoles[orgId] && can(userRoles[orgId], Permission.BsdCanRead)
+    orgId =>
+      orgId && userRoles[orgId] && can(userRoles[orgId], Permission.BsdCanRead)
   );
 
   const isDetenteur = bsff.detenteurCompanySirets.some(

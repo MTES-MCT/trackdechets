@@ -207,7 +207,7 @@ export async function checkCanDelete(user: User, bsff: Bsff) {
 export async function checkCanSignFor(
   user: User,
   orgId: string,
-  securityCode?: number
+  securityCode?: number | null
 ) {
   try {
     const hasPerm = await checkUserPermissions(

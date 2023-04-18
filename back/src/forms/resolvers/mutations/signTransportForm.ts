@@ -31,7 +31,7 @@ const signedByTransporterFn = async (
     );
   }
   await checkCanSignFor(
-    getTransporterCompanyOrgId(existingForm),
+    getTransporterCompanyOrgId(existingForm)!,
     user,
     args.securityCode
   );
@@ -181,7 +181,7 @@ const signatures: Partial<
     const existingFullForm = await getFullForm(existingForm);
 
     await checkCanSignFor(
-      getTransporterCompanyOrgId(existingFullForm.forwardedIn),
+      getTransporterCompanyOrgId(existingFullForm.forwardedIn)!,
       user,
       args.securityCode
     );

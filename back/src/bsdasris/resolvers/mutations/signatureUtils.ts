@@ -2,7 +2,6 @@ import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { BsdasriValidationContext } from "../../validation";
 
 import {
-  BsdasriSignatureInput,
   BsdasriSignatureType,
   SignatureAuthor
 } from "../../../generated/graphql/types";
@@ -201,19 +200,19 @@ export const dasriSignatureMapping: Record<
   }
 };
 
-interface getFieldsUpdateProps {
+interface GetFieldsUpdateProps {
   bsdasri: Bsdasri;
-  input: BsdasriSignatureInput;
+  type?: BsdasriSignatureType | null;
 }
 
-type getFieldsUpdateFn = (input: getFieldsUpdateProps) => Partial<Bsdasri>;
+type GetFieldsUpdateFn = (input: GetFieldsUpdateProps) => Partial<Bsdasri>;
 
 /**
  * A few fields obey to a custom logic
  */
-export const getFieldsUpdate: getFieldsUpdateFn = ({ bsdasri, input }) => {
+export const getFieldsUpdate: GetFieldsUpdateFn = ({ bsdasri, type }) => {
   // on reception signature, fill handedOverToRecipientAt if not already completed
-  if (input.type === "RECEPTION" && !bsdasri.handedOverToRecipientAt) {
+  if (type === "RECEPTION" && !bsdasri.handedOverToRecipientAt) {
     return {
       handedOverToRecipientAt: bsdasri.destinationReceptionDate
     };

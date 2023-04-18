@@ -193,7 +193,7 @@ describe("/oidc/authorize/decision", () => {
     });
 
     expect(grant!.scope).toEqual(["openid", "profile", "email", "companies"]);
-    expect(grant.nonce).toBeTruthy(); // nonce is a random value when not provided in the request
+    expect(grant!.nonce).toBeTruthy(); // nonce is a random value when not provided in the request
   });
 
   it("should forbid funny scope values", async () => {

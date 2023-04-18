@@ -437,7 +437,7 @@ describe("sendPendingRevisionRequestToAdminDetailsEmail", () => {
         createdAt: TWO_DAYS_AGO,
         bsddId: bsdd.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -462,7 +462,7 @@ describe("sendPendingRevisionRequestToAdminDetailsEmail", () => {
         createdAt: TWO_DAYS_AGO,
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse2.id,
-        approvals: { create: { approverSiret: company2.siret } },
+        approvals: { create: { approverSiret: company2.siret! } },
         comment: ""
       }
     });

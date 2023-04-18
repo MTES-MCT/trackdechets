@@ -24,7 +24,7 @@ describe("user activation", () => {
     );
 
     // this linked used to activate the user but now must redirect to a frontend page
-    const refreshedUser = await prisma.user.findUnique({
+    const refreshedUser = await prisma.user.findUniqueOrThrow({
       where: { id: user.id }
     });
     expect(refreshedUser.isActive).toEqual(false);

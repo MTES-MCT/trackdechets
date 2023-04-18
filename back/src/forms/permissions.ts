@@ -317,7 +317,7 @@ export async function checkCanSignedByTransporter(user: User, form: Form) {
 export async function checkCanSignFor(
   siret: string,
   user: User,
-  securityCode?: number
+  securityCode?: number | null
 ) {
   const userRoles = await getUserRoles(user.id);
   if (userRoles[siret] && can(userRoles[siret], Permission.BsdCanSign)) {
@@ -449,7 +449,7 @@ export async function checkCanMarkAsResent(user: User, form: Form) {
 export async function checkCanImportForm(
   user: User,
   input: ImportPaperFormInput,
-  form?: Form
+  form?: Form | null
 ) {
   const authorizedOrgIds =
     form && form.recipientCompanySiret

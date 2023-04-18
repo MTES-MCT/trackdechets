@@ -157,7 +157,7 @@ const IV_LENGTH = 12;
 
 export const aesEncrypt = (text: string): string => {
   const iv = crypto.randomBytes(IV_LENGTH);
-  const cipher = crypto.createCipheriv(ALGO, ENCRYPTION_KEY, iv);
+  const cipher = crypto.createCipheriv(ALGO, ENCRYPTION_KEY!, iv);
 
   const enc1 = cipher.update(text, "utf8");
   const enc2 = cipher.final();
@@ -172,9 +172,9 @@ export const aesDecrypt = encrypted => {
   const iv = encrypted.slice(length - 28, length - 16);
   const tag = encrypted.slice(length - 16);
   const content = encrypted.slice(0, length - 28);
-  const decipher = crypto.createDecipheriv(ALGO, ENCRYPTION_KEY, iv);
+  const decipher = crypto.createDecipheriv(ALGO, ENCRYPTION_KEY!, iv);
   decipher.setAuthTag(tag);
-  let decrypted = decipher.update(content, null, "utf8");
+  let decrypted = decipher.update(content, undefined, "utf8");
   decrypted += decipher.final("utf8");
   return decrypted;
 };
