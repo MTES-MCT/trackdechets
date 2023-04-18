@@ -185,6 +185,7 @@ describe("Mutation.deleteBsda", () => {
       include: { forwarding: true }
     });
     expect(updatedForwarding.forwardingId).toBe(null);
+    expect(updatedForwarding.forwarding).toBe(null);
   });
 
   it("should allow the producer to remove a bsda signed by himself only", async () => {

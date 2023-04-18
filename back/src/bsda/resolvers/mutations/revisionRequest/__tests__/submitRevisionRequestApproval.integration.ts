@@ -685,9 +685,11 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
     expect(errors).toBeUndefined();
 
     const updatedForwarding = await prisma.bsda.findUniqueOrThrow({
-      where: { id: forwardingBsda.id }
+      where: { id: forwardingBsda.id },
+      include: { forwarding: true }
     });
 
     expect(updatedForwarding.forwardingId).toBe(null);
+    expect(updatedForwarding.forwarding).toBe(null);
   });
 });
