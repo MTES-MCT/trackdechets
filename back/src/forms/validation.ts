@@ -670,14 +670,15 @@ const fullWasteDetailsSchemaFn: FactorySchemaOf<
           "is-valid-packaging-infos",
           "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
           (infos: PackagingInfo[] | undefined) => {
-            const hasCiterne = infos?.find(i => i.type === "CITERNE");
-            const hasPipeline = infos?.find(i => i.type === "PIPELINE");
-            const hasBenne = infos?.find(i => i.type === "BENNE");
+            const hasCiterne = infos?.some(i => i.type === "CITERNE");
+            const hasPipeline = infos?.some(i => i.type === "PIPELINE");
+            const hasBenne = infos?.some(i => i.type === "BENNE");
 
             if (
+              // citerne and benne together are not allowed
               (hasCiterne && hasBenne) ||
-              (infos?.find(i => !["PIPELINE"].includes(i.type)) !== undefined &&
-                hasPipeline)
+              // pipeline and any other Packaging is forbidden
+              (infos?.some(i => i.type !== "PIPELINE") && hasPipeline)
             ) {
               return false;
             }
