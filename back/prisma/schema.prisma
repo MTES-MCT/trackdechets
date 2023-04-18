@@ -1515,3 +1515,14 @@ model PdfAccessToken {
 
   @@index([token], map: "_PdfAccessTokenTokenIdx")
 }
+
+model WebhookSetting {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  endpointUri String
+  token       String
+  orgId       String   @unique
+  activated   Boolean  @default(value: false)
+
+  @@index([orgId], map: "_WebhookSettingOrgIdIdx")
+}

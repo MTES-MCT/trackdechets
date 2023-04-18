@@ -3,7 +3,7 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
-import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "../../database";
 
 export type CreateFormFn = (
@@ -49,7 +49,9 @@ const buildCreateForm: (deps: RepositoryFnDeps) => CreateFormFn =
       }
     });
 
-    prisma.addAfterCommitCallback(() => enqueueBsdToIndex(form.readableId));
+    prisma.addAfterCommitCallback(() =>
+      enqueueCreatedBsdToIndex(form.readableId)
+    );
 
     return form;
   };

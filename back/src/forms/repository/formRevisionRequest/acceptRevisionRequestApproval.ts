@@ -14,7 +14,7 @@ import {
   RepositoryFnDeps,
   RepositoryTransaction
 } from "../../../common/repository/types";
-import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { NON_CANCELLABLE_BSDD_STATUSES } from "../../resolvers/mutations/createFormRevisionRequest";
 import { ForbiddenError } from "apollo-server-core";
 import buildRemoveAppendix2 from "../form/removeAppendix2";
@@ -239,7 +239,7 @@ export async function approveAndApplyRevisionRequest(
   });
 
   prisma.addAfterCommitCallback?.(() =>
-    enqueueBsdToIndex(updatedBsdd.readableId)
+    enqueueUpdatedBsdToIndex(updatedBsdd.readableId)
   );
 
   return updatedRevisionRequest;
