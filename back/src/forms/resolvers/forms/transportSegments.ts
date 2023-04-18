@@ -1,11 +1,9 @@
 import prisma from "../../../prisma";
-import {
-  FormResolvers,
-  TransportSegment
-} from "../../../generated/graphql/types";
+import { FormResolvers } from "../../../generated/graphql/types";
 import { expandTransportSegmentFromDb } from "../../converter";
 import { dashboardOperationName } from "../../../common/queries";
 import { isSessionUser } from "../../../auth";
+import { TransportSegment } from "@prisma/client";
 
 const transportSegmentResolver: FormResolvers["transportSegments"] = async (
   form,
@@ -19,19 +17,15 @@ const transportSegmentResolver: FormResolvers["transportSegments"] = async (
     ctx?.req?.body?.operationName === dashboardOperationName &&
     isSessionUser(ctx)
   ) {
-    segments = form?.transportSegments ?? [];
+    segments = (form?.transportSegments as any) ?? [];
   } else {
-    const dbSegments = await prisma.form
-      .findUnique({ where: { id: form.id } })
-      .transportSegments({ orderBy: { segmentNumber: "asc" } });
     segments =
-      dbSegments?.map(segment => expandTransportSegmentFromDb(segment)) ?? [];
+      (await prisma.form
+        .findUnique({ where: { id: form.id } })
+        .transportSegments({ orderBy: { segmentNumber: "asc" } })) ?? [];
   }
 
-  return segments.map(el => ({
-    ...el,
-    ...(el.takenOverAt && { takenOverAt: el.takenOverAt })
-  }));
+  return segments.map(segment => expandTransportSegmentFromDb(segment));
 };
 
 export default transportSegmentResolver;

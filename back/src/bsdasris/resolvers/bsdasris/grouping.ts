@@ -1,6 +1,6 @@
 import { BsdasriResolvers } from "../../../generated/graphql/types";
 
-import { BsdasriType } from "@prisma/client";
+import { Bsdasri, BsdasriType } from "@prisma/client";
 import { expandGroupingDasri } from "../../converter";
 import { dashboardOperationName } from "../../../common/queries";
 import { isSessionUser } from "../../../auth";
@@ -11,15 +11,15 @@ const grouping: BsdasriResolvers["grouping"] = async (bsdasri, _, ctx) => {
     // skip db query
     return [];
   }
-
+  let grouping: Bsdasri[] = [];
   // use ES indexed field when requested from dashboard
   if (
     ctx?.req?.body?.operationName === dashboardOperationName &&
     isSessionUser(ctx)
   ) {
-    return bsdasri?.grouping ?? [];
+    grouping = (bsdasri?.grouping as any) ?? [];
   }
-  const grouping =
+  grouping =
     (await getReadonlyBsdasriRepository()
       .findRelatedEntity({ id: bsdasri.id })
       .grouping()) ?? [];
