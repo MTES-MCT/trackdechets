@@ -180,8 +180,13 @@ export async function approveAndApplyRevisionRequest(
     }
   });
 
-  // If the bsda was a grouping bsda, and is cancelled, free the children
   if (updateData.status === BsdaStatus.CANCELED) {
+    await prisma.bsda.update({
+      where: { id: updatedBsda.id },
+      data: { forwardingId: null }
+    });
+
+    // If the bsda was a grouping bsda, and is cancelled, free the children
     await prisma.bsda.updateMany({
       where: { groupedInId: updatedBsda.id },
       data: {
