@@ -36,4 +36,4 @@ export function getPackagingInfosSummary(packagingInfos: PackagingInfo[]) {
 export const formTransportIsPipeline = (form: FormInput): boolean =>
   form.wasteDetails?.packagingInfos?.some(
     pkg => pkg.type === Packagings.Pipeline
-  );
+  )!;
