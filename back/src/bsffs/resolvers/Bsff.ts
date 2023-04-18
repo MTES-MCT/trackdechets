@@ -3,7 +3,7 @@ import { getFicheInterventions } from "../database";
 import { dashboardOperationName } from "../../common/queries";
 import { isSessionUser } from "../../auth";
 import { expandBsffPackagingFromDB } from "../converter";
-import { BsffType } from "@prisma/client";
+import { BsffPackaging, BsffType } from "@prisma/client";
 import {
   getReadonlyBsffPackagingRepository,
   getReadonlyBsffRepository
@@ -22,15 +22,16 @@ export const Bsff: BsffResolvers = {
     return ficheInterventions;
   },
   packagings: async (bsff, _, ctx) => {
+    let packagings: BsffPackaging[] = [];
     // use ES indexed field when requested from dashboard
     if (
       ctx?.req?.body?.operationName === dashboardOperationName &&
       isSessionUser(ctx)
     ) {
-      return bsff?.packagings ?? [];
+      packagings = (bsff?.packagings as any) ?? [];
     }
     const { findUniqueGetPackagings } = getReadonlyBsffRepository();
-    const packagings =
+    packagings =
       (await findUniqueGetPackagings(
         {
           where: { id: bsff.id }
