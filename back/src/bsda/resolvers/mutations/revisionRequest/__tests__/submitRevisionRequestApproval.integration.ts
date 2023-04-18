@@ -639,4 +639,57 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
     });
     expect(newBsdaAfterRevision.status).toEqual(BsdaStatus.CANCELED);
   });
+
+  it("should remove forwardedIn link in canceled BSDA", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { company: transporter } = await userWithCompanyFactory(
+      UserRole.ADMIN
+    );
+    const forwardedBsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: company.siret
+      }
+    });
+    const forwardingBsda = await bsdaFactory({
+      opt: {
+        forwarding: { connect: { id: forwardedBsda.id } },
+        emitterCompanySiret: company.siret,
+        status: BsdaStatus.SENT
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    // Now let's cancel the parent bsda
+    const revisionRequest = await prisma.bsdaRevisionRequest.create({
+      data: {
+        bsdaId: forwardingBsda.id,
+        authoringCompanyId: transporter.id,
+        approvals: {
+          create: [{ approverSiret: company.siret! }]
+        },
+        comment: "Cancel",
+        isCanceled: true
+      }
+    });
+
+    const { errors } = await mutate<
+      Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+      MutationSubmitBsdaRevisionRequestApprovalArgs
+    >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedForwarding = await prisma.bsda.findUniqueOrThrow({
+      where: { id: forwardingBsda.id },
+      include: { forwarding: true }
+    });
+
+    expect(updatedForwarding.forwardingId).toBe(null);
+    expect(updatedForwarding.forwarding).toBe(null);
+  });
 });
