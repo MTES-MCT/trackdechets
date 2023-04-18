@@ -345,6 +345,22 @@ export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
   );
 }
 
+export async function getElasticBsdById(id) {
+  const result = await client.search({
+    index: index.alias,
+    body: {
+      query: {
+        term: {
+          readableId: {
+            value: id,
+            boost: "1.0"
+          }
+        }
+      }
+    }
+  });
+  return result;
+}
 /**
  * Bulk create/update a list of documents in Elastic Search.
  */

@@ -1,0 +1,24 @@
+type Mutation {
+  """
+  Crée un nouveau WebhookSetting
+  """
+  createWebhookSetting(
+    "Payload de création d'un WebhookSetting"
+    input: WebhookSettingCreateInput!
+  ): WebhookSetting!
+
+  """
+  Met à jour un WebhookSetting existant.
+  """
+  updateWebhookSetting(
+    "Identifiant unique du WebhookSetting"
+    id: ID!
+    "Payload de mise à jour d'un WebhookSetting"
+    input: WebhookSettingUpdateInput!
+  ): WebhookSetting!
+
+  """
+  Supprime un WebhookSetting
+  """
+  deleteWebhookSetting("ID d'un WebhookSetting" id: ID!): WebhookSetting
+}

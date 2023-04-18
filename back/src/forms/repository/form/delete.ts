@@ -7,6 +7,7 @@ import {
 import { GraphQLContext } from "../../../types";
 import buildRemoveAppendix2 from "./removeAppendix2";
 import buildUpdateManyForms from "./updateMany";
+import { enqueueDeletedFormWebhook } from "../../../queue/producers/webhooks";
 
 export type DeleteFormFn = (
   where: Prisma.FormWhereUniqueInput,
@@ -73,7 +74,9 @@ const buildDeleteForm: (deps: RepositoryFnDeps) => DeleteFormFn =
       const removeAppendix2 = buildRemoveAppendix2({ prisma, user });
       await removeAppendix2(deletedForm.id);
     }
-
+    prisma.addAfterCommitCallback(() =>
+      enqueueDeletedFormWebhook(deletedForm.id)
+    );
     return deletedForm;
   };
 

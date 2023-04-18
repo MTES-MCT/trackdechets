@@ -28,6 +28,7 @@ const referenceDefs = [
 
   { id: "user-company", label: "Utilisateurs et Établissements" },
   { id: "registre", label: "Registre" },
+  { id: "webhooks", label: "Webhooks" },
 ];
 
 const apiReference = referenceDefs.map(({ id, label }) => ({
@@ -96,6 +97,7 @@ module.exports = {
         "guides/sirene",
         "guides/oauth2",
         "guides/openidconnect",
+        "guides/webhooks",
       ],
     },
     {

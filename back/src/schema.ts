@@ -11,6 +11,7 @@ import bsffResolvers from "./bsffs/resolvers";
 import bsdaResolvers from "./bsda/resolvers";
 import registerResolvers from "./registry/resolvers";
 import applicationResolvers from "./applications/resolvers";
+import webhookResolvers from "./webhooks/resolvers";
 
 // Merge GraphQL schema by merging types definitions and resolvers
 // from differents modules
@@ -26,7 +27,8 @@ const repositories = [
   "bsffs",
   "bsda",
   "registry",
-  "applications"
+  "applications",
+  "webhooks"
 ];
 
 const typeDefsPath = repositories.map(
@@ -48,7 +50,8 @@ const resolvers = [
   bsffResolvers,
   bsdaResolvers,
   registerResolvers,
-  applicationResolvers
+  applicationResolvers,
+  webhookResolvers
 ];
 
 export { typeDefs, resolvers };

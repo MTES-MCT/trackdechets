@@ -3,7 +3,7 @@ import {
   LogMetadata,
   RepositoryFnDeps
 } from "../../../common/repository/types";
-import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { enqueueCreatedBsdToIndex } from "../../../queue/producers/elastic";
 import { bsdasriEventTypes } from "./eventTypes";
 
 export type CreateBsdasriFn = (
@@ -43,7 +43,7 @@ export function buildCreateBsdasri(deps: RepositoryFnDeps): CreateBsdasriFn {
       }
     });
 
-    prisma.addAfterCommitCallback(() => enqueueBsdToIndex(bsdasri.id));
+    prisma.addAfterCommitCallback(() => enqueueCreatedBsdToIndex(bsdasri.id));
 
     return bsdasri;
   };
