@@ -15,11 +15,12 @@ import {
 } from "../../../mailer/templates";
 import { renderMail } from "../../../mailer/templates/renderers";
 import prisma from "../../../prisma";
-import { checkIsCompanyAdmin } from "../../../users/permissions";
 import { convertUrls, getCompanyOrCompanyNotFound } from "../../database";
 import { isForeignVat } from "../../../common/constants/companySearchHelpers";
 import { isTransporter } from "../../validation";
 import * as COMPANY_CONSTANTS from "../../../common/constants/COMPANY_CONSTANTS";
+import { Permission, checkUserPermissions } from "../../../permissions";
+import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 
 export const sendPostVerificationFirstOnboardingEmail = async (
   company: Company,
@@ -63,7 +64,13 @@ const verifyCompanyResolver: MutationResolvers["verifyCompany"] = async (
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ orgId: siret });
-  await checkIsCompanyAdmin(user, company);
+
+  await checkUserPermissions(
+    user,
+    company.orgId,
+    Permission.CompanyCanVerify,
+    NotCompanyAdminErrorMsg(company.orgId)
+  );
 
   if (code !== company.verificationCode) {
     throw new UserInputError("Code de vérification invalide");

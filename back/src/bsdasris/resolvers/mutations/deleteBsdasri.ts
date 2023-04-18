@@ -2,8 +2,8 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getBsdasriOrNotFound } from "../../database";
 import { expandBsdasriFromDB } from "../../converter";
-import { checkCanDeleteBsdasri } from "../../permissions";
 import { getBsdasriRepository } from "../../repository";
+import { checkCanDelete } from "../../permissions";
 
 /**
  *
@@ -19,7 +19,7 @@ const deleteBsdasriResolver: MutationResolvers["deleteBsdasri"] = async (
   const bsdasri = await getBsdasriOrNotFound({
     id
   });
-  await checkCanDeleteBsdasri(user, bsdasri);
+  await checkCanDelete(user, bsdasri);
 
   const bsdasriRepository = getBsdasriRepository(user);
 

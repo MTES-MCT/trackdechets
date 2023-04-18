@@ -1,25 +1,21 @@
 import { redisClient, generateKey } from "./redis";
-import { getUserCompanies } from "../../users/database";
+import { USER_ROLES_CACHE_KEY } from "../../permissions";
 
 const CACHED_COMPANY_EXPIRATION = 10 * 60; // 10 minutes
 
-export const genUserCompanySiretCacheKey = (userId: string): string =>
-  generateKey("userSirets", userId);
-
-export const genUserCompaniesCacheKey = (userId: string): string =>
-  generateKey("userCompanies", userId);
+export const genUserRolesCacheKey = (userId: string): string =>
+  generateKey(USER_ROLES_CACHE_KEY, userId);
 
 export const getUserLoginFailedKey = (email: string): string =>
   generateKey("userLoginFailed", email);
 
 /**
- * Delete the cached sirets for a given user
+ * Unlink the cached roles for a given user
  * @param userId
  */
-export async function deleteCachedUserCompanies(userId: string): Promise<void> {
-  const sirets = genUserCompanySiretCacheKey(userId); // non-existent keys are ignored
-  const ids = genUserCompaniesCacheKey(userId); // non-existent keys are ignored
-  await Promise.all([redisClient.unlink(sirets), redisClient.unlink(ids)]);
+export async function deleteCachedUserRoles(userId: string): Promise<void> {
+  const cacheKey = genUserRolesCacheKey(userId); // non-existent keys are ignored
+  await redisClient.unlink(cacheKey);
 }
 
 /**
@@ -31,38 +27,13 @@ export async function setCachedUserCompanyId(
   userId: string,
   ids: string[]
 ): Promise<void> {
-  const key = genUserCompaniesCacheKey(userId);
+  const key = genUserRolesCacheKey(userId);
 
   await redisClient
     .pipeline()
     .sadd(key, ids)
     .expire(key, CACHED_COMPANY_EXPIRATION)
     .exec();
-}
-
-/**
- * Retrieve cached Company siret and vatNumber
- * if found in redis, or query the db and cache them
- * @param userId
- * @returns array of sirets and vatNumber
- */
-export async function getCachedUserSiretOrVat(
-  userId: string
-): Promise<string[]> {
-  const key = genUserCompaniesCacheKey(userId);
-  const exists = await redisClient.exists(key);
-  if (!!exists) {
-    return redisClient.smembers(key);
-  }
-  // refresh cache
-  const companies = await getUserCompanies(userId);
-  const ids = [
-    ...companies.map(c => c.siret),
-    ...companies.map(c => c.vatNumber)
-  ];
-  const cleanIds = ids.filter(Boolean);
-  await setCachedUserCompanyId(userId, cleanIds);
-  return cleanIds;
 }
 
 export const USER_SESSIONS_CACHE_KEY = "users-sessions-id";

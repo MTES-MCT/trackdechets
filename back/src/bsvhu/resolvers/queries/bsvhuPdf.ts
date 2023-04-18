@@ -5,11 +5,11 @@ import {
 import { getFileDownload } from "../../../common/fileDownload";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getBsvhuOrNotFound } from "../../database";
-import { checkIsBsvhuContributor } from "../../permissions";
 import { createPDFResponse } from "../../../common/pdf";
 import { buildPdf } from "../../pdf/generator";
 
 import { DownloadHandler } from "../../../routers/downloadRouter";
+import { checkCanRead } from "../../permissions";
 
 export const bsvhuPdfDownloadHandler: DownloadHandler<QueryBsvhuPdfArgs> = {
   name: "bsvhuPdf",
@@ -26,13 +26,9 @@ const formPdfResolver: QueryResolvers["bsvhuPdf"] = async (
   context
 ) => {
   const user = checkIsAuthenticated(context);
-  const form = await getBsvhuOrNotFound(id);
+  const bsvhu = await getBsvhuOrNotFound(id);
 
-  await checkIsBsvhuContributor(
-    user,
-    form,
-    "Vous n'êtes pas autorisé à accéder à ce bordereau"
-  );
+  await checkCanRead(user, bsvhu);
 
   return getFileDownload({
     handler: bsvhuPdfDownloadHandler.name,

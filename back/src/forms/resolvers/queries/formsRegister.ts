@@ -1,5 +1,4 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkIsCompanyMember } from "../../../users/permissions";
 import {
   FormsRegisterExportType,
   QueryResolvers,
@@ -9,6 +8,8 @@ import {
 } from "../../../generated/graphql/types";
 import { wastesRegistryCsvResolverFn } from "../../../registry/resolvers/queries/wastesRegistryCsv";
 import { wastesRegistryXlsResolverFn } from "../../../registry/resolvers/queries/wastesRegistryXls";
+import { can, getUserRoles, Permission } from "../../../permissions";
+import { ForbiddenError } from "apollo-server-core";
 
 // compatibility between register v1 and register v2
 const exportTypeToRegisterType: Record<
@@ -36,9 +37,16 @@ const formsRegisterResolver: QueryResolvers["formsRegister"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
+  const userRoles = await getUserRoles(user.id);
+
   for (const siret of args.sirets) {
-    // check user is member of every provided sirets
-    await checkIsCompanyMember({ id: user.id }, { orgId: siret });
+    // check user can read registry of evry provided siret
+    const role = userRoles[siret];
+    if (!role || !can(role, Permission.RegistryCanRead)) {
+      throw new ForbiddenError(
+        `Vous n'avez pas la permission d'accéder au registre de l'établissement ${siret}`
+      );
+    }
   }
 
   const wasteRegistryArgs:

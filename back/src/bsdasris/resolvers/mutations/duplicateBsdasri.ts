@@ -5,12 +5,11 @@ import {
   MutationDuplicateBsdasriArgs,
   MutationResolvers
 } from "../../../generated/graphql/types";
-
 import { expandBsdasriFromDB } from "../../converter";
 import { getBsdasriOrNotFound } from "../../database";
-import { checkIsBsdasriContributor } from "../../permissions";
 import { ForbiddenError } from "apollo-server-express";
 import { getBsdasriRepository } from "../../repository";
+import { checkCanDuplicate } from "../../permissions";
 
 /**
  *
@@ -37,11 +36,8 @@ const duplicateBsdasriResolver: MutationResolvers["duplicateBsdasri"] = async (
       "Les dasris de synthèse ou de groupement ne sont pas duplicables"
     );
   }
-  await checkIsBsdasriContributor(
-    user,
-    bsdasri,
-    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas."
-  );
+
+  await checkCanDuplicate(user, bsdasri);
 
   const newBsdasri = await duplicateBsdasri(user, bsdasri);
   return expandBsdasriFromDB(newBsdasri);

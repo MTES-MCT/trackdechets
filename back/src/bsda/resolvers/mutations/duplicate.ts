@@ -9,8 +9,8 @@ import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { MutationDuplicateBsdaArgs } from "../../../generated/graphql/types";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
-import { checkIsBsdaContributor } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
+import { checkCanDuplicate } from "../../permissions";
 
 export default async function duplicate(
   _,
@@ -23,11 +23,7 @@ export default async function duplicate(
     include: { intermediaries: true }
   });
 
-  await checkIsBsdaContributor(
-    user,
-    prismaBsda,
-    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
-  );
+  await checkCanDuplicate(user, prismaBsda);
 
   const data = duplicateBsda(prismaBsda);
   const newBsda = await getBsdaRepository(user).create(data);

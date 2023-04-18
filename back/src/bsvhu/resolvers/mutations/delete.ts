@@ -2,8 +2,8 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getBsvhuOrNotFound } from "../../database";
 import { expandVhuFormFromDb } from "../../converter";
-import { checkCanDeleteBsdvhu } from "../../permissions";
 import { getBsvhuRepository } from "../../repository";
+import { checkCanDelete } from "../../permissions";
 
 /**
  *
@@ -16,10 +16,10 @@ const deleteBsvhuResolver: MutationResolvers["deleteBsvhu"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const bshvhu = await getBsvhuOrNotFound(id);
+  const bsvhu = await getBsvhuOrNotFound(id);
   // user must belong to the vhu, and status must be INITIAL
 
-  await checkCanDeleteBsdvhu(user, bshvhu);
+  await checkCanDelete(user, bsvhu);
   const bsvhuRepository = getBsvhuRepository(user);
 
   const deletedBsvhu = await bsvhuRepository.delete({ id });

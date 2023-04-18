@@ -13,7 +13,7 @@ import {
   onboardingFirstStep,
   verificationProcessInfo
 } from "../../../mailer/templates";
-import { deleteCachedUserCompanies } from "../../../common/redis/users";
+import { deleteCachedUserRoles } from "../../../common/redis/users";
 import {
   cleanClue,
   isClosedCompany,
@@ -191,7 +191,7 @@ const createCompanyResolver: MutationResolvers["createCompany"] = async (
     },
     include: { company: true }
   });
-  await deleteCachedUserCompanies(user.id);
+  await deleteCachedUserRoles(user.id);
   const company = companyAssociation.company;
 
   // fill firstAssociationDate field if null (no need to update it if user was previously already associated)

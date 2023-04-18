@@ -1,15 +1,15 @@
 import { UserInputError } from "apollo-server-express";
-import { checkIsAuthenticated } from "../../../common/permissions";
+import {
+  checkIsAuthenticated,
+  checkSecurityCode
+} from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
 import {
   expandFormFromDb,
   flattenSignedByTransporterInput
 } from "../../converter";
-import {
-  checkCanSignedByTransporter,
-  checkSecurityCode
-} from "../../permissions";
+import { checkCanSignedByTransporter } from "../../permissions";
 import {
   beforeSignedByTransporterSchema,
   signingInfoSchema,

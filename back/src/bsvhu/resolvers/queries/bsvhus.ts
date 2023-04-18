@@ -3,11 +3,11 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { applyMask } from "../../../common/where";
 import { QueryBsvhusArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
-import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { expandVhuFormFromDb } from "../../converter";
 import { getReadonlyBsvhuRepository } from "../../repository";
 
 import { toPrismaWhereInput } from "../../where";
+import { Permission, can, getUserRoles } from "../../../permissions";
 
 export default async function bsvhus(
   _,
@@ -16,13 +16,17 @@ export default async function bsvhus(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
+  const roles = await getUserRoles(user.id);
+  const orgIdsWithListPermission = Object.keys(roles).filter(orgId =>
+    can(roles[orgId], Permission.BsdCanList)
+  );
 
   const mask = {
     OR: [
-      { emitterCompanySiret: { in: userCompaniesSiretOrVat } },
-      { transporterCompanySiret: { in: userCompaniesSiretOrVat } },
-      { destinationCompanySiret: { in: userCompaniesSiretOrVat } }
+      { emitterCompanySiret: { in: orgIdsWithListPermission } },
+      { transporterCompanySiret: { in: orgIdsWithListPermission } },
+      { transporterCompanyVatNumber: { in: orgIdsWithListPermission } },
+      { destinationCompanySiret: { in: orgIdsWithListPermission } }
     ]
   };
 

@@ -20,11 +20,11 @@ import prisma from "../../../prisma";
 import { expandFormFromElastic } from "../../../forms/converter";
 import { expandBsdasriFromElastic } from "../../../bsdasris/converter";
 import { expandVhuFormFromDb } from "../../../bsvhu/converter";
-import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { expandBsdaFromElastic } from "../../../bsda/converter";
 import { expandBsffFromElastic } from "../../../bsffs/converter";
 import { bsdSearchSchema } from "../../validation";
 import { toElasticQuery } from "../../where";
+import { Permission, can, getUserRoles } from "../../../permissions";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -118,10 +118,14 @@ async function buildQuery(
   }
 
   // Limit the scope of what the user can see to their companies
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
+  const roles = await getUserRoles(user.id);
+  const orgIdsWithListPermission = Object.keys(roles).filter(orgId =>
+    can(roles[orgId], Permission.BsdCanList)
+  );
+
   query.bool.filter.push({
     terms: {
-      sirets: userCompaniesSiretOrVat
+      sirets: orgIdsWithListPermission
     }
   });
 

@@ -53,11 +53,12 @@ export class MissingSirets extends UserInputError {
   }
 }
 
+export const NotCompanyAdminErrorMsg = (siret: string) =>
+  `Vous n'êtes pas administrateur de l'entreprise portant le siret "${siret}".`;
+
 export class NotCompanyAdmin extends ForbiddenError {
   constructor(siret: string) {
-    super(
-      `Vous n'êtes pas administrateur de l'entreprise portant le siret "${siret}".`
-    );
+    super(NotCompanyAdminErrorMsg(siret));
   }
 }
 
@@ -92,5 +93,11 @@ export class SealedFieldError extends ForbiddenError {
         ", "
       )}`
     );
+  }
+}
+
+export class InvaliSecurityCode extends ForbiddenError {
+  constructor() {
+    super("Le code de signature est invalide.");
   }
 }

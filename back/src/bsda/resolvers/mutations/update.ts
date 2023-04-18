@@ -9,10 +9,10 @@ import {
 } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
 import { checkEditionRules } from "../../edition";
-import { checkIsBsdaContributor } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
 import sirenify from "../../sirenify";
 import { validateBsda } from "../../validation";
+import { checkCanUpdate } from "../../permissions";
 
 export default async function edit(
   _,
@@ -23,25 +23,12 @@ export default async function edit(
   const existingBsda = await getBsdaOrNotFound(id, {
     include: { intermediaries: true, grouping: true, forwarding: true }
   });
-  await checkIsBsdaContributor(
-    user,
-    existingBsda,
-    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
-  );
 
   const sirenifiedInput = await sirenify(input, user);
   const data = flattenBsdaInput(sirenifiedInput);
   const intermediaries = input.intermediaries ?? existingBsda.intermediaries;
 
-  await checkIsBsdaContributor(
-    user,
-    {
-      ...existingBsda,
-      ...data,
-      intermediaries
-    },
-    "Vous ne pouvez pas enlever votre établissement du bordereau"
-  );
+  await checkCanUpdate(user, existingBsda, input);
 
   const bsdaRepository = getBsdaRepository(user);
 

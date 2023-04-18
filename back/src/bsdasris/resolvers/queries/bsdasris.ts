@@ -4,10 +4,10 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { GraphQLContext } from "../../../types";
 import { toPrismaWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
-import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { getConnection } from "../../../common/pagination";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { getBsdasriRepository } from "../../repository";
+import { Permission, can, getUserRoles } from "../../../permissions";
 
 const bsdasrisResolver: QueryResolvers["bsdasris"] = async (
   _,
@@ -18,15 +18,19 @@ const bsdasrisResolver: QueryResolvers["bsdasris"] = async (
 
   const { where: whereArgs, ...gqlPaginationArgs } = args;
 
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
+  const roles = await getUserRoles(user.id);
+  const orgIdsWithListPermission = Object.keys(roles).filter(orgId =>
+    can(roles[orgId], Permission.BsdCanList)
+  );
+
   // ensure query returns only bsds belonging to current user
   const mask = {
     OR: [
-      { emitterCompanySiret: { in: userCompaniesSiretOrVat } },
-      { transporterCompanySiret: { in: userCompaniesSiretOrVat } },
-      { transporterCompanyVatNumber: { in: userCompaniesSiretOrVat } },
-      { destinationCompanySiret: { in: userCompaniesSiretOrVat } },
-      { ecoOrganismeSiret: { in: userCompaniesSiretOrVat } }
+      { emitterCompanySiret: { in: orgIdsWithListPermission } },
+      { transporterCompanySiret: { in: orgIdsWithListPermission } },
+      { transporterCompanyVatNumber: { in: orgIdsWithListPermission } },
+      { destinationCompanySiret: { in: orgIdsWithListPermission } },
+      { ecoOrganismeSiret: { in: orgIdsWithListPermission } }
     ]
   };
 

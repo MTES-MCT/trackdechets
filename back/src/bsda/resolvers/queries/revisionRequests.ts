@@ -2,9 +2,9 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { QueryBsdaRevisionRequestsArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
-import { checkIsCompanyMember } from "../../../users/permissions";
 import { getReadonlyBsdaRepository } from "../../repository";
 import { getConnection } from "../../../common/pagination";
+import { Permission, checkUserPermissions } from "../../../permissions";
 
 const MIN_SIZE = 0;
 const MAX_SIZE = 50;
@@ -20,7 +20,14 @@ export async function bsdaRevisionRequests(
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
-  await checkIsCompanyMember({ id: user.id }, { orgId: siret });
+
+  await checkUserPermissions(
+    user,
+    [siret].filter(Boolean),
+    Permission.BsdCanList,
+    `Vous n'êtes pas membre de l'entreprise portant le siret "${siret}".`
+  );
+
   const company = await getCompanyOrCompanyNotFound({ orgId: siret });
 
   const pageSize = Math.max(Math.min(first ?? 0, MAX_SIZE), MIN_SIZE);

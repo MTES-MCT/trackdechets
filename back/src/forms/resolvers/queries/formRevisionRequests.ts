@@ -3,8 +3,8 @@ import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { QueryFormRevisionRequestsArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
-import { checkIsCompanyMember } from "../../../users/permissions";
 import { getConnection } from "../../../common/pagination";
+import { checkUserPermissions, Permission } from "../../../permissions";
 
 const MIN_SIZE = 0;
 const MAX_SIZE = 50;
@@ -20,7 +20,13 @@ export default async function formRevisionRequests(
   context: GraphQLContext
 ) {
   const user = checkIsAuthenticated(context);
-  await checkIsCompanyMember({ id: user.id }, { orgId: siret });
+
+  await checkUserPermissions(
+    user,
+    [siret].filter(Boolean),
+    Permission.BsdCanList,
+    `Vous n'êtes pas membre de l'entreprise portant le siret "${siret}".`
+  );
   // TODO support orgId instead of siret for foreign companies
   const company = await getCompanyOrCompanyNotFound({ siret });
 

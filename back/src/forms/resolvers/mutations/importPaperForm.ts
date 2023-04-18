@@ -1,7 +1,6 @@
 import { Form, Prisma, Status } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import {
   ImportPaperFormInput,
   MutationResolvers
@@ -103,17 +102,6 @@ async function createForm(input: ImportPaperFormInput, user: Express.User) {
     abortEarly: false
   });
 
-  // check user belongs to destination company
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  if (
-    !flattenedFormInput.recipientCompanySiret ||
-    !userCompaniesSiretOrVat.includes(flattenedFormInput.recipientCompanySiret)
-  ) {
-    throw new UserInputError(
-      "Vous devez apparaitre en tant que destinataire du bordereau (case 2) pour pouvoir importer ce bordereau"
-    );
-  }
-
   const noTraceability = input.processedInfo?.noTraceability === true;
   const awaitingGroup = PROCESSING_OPERATIONS_GROUPEMENT_CODES.includes(
     input.processedInfo?.processingOperationDone
@@ -141,13 +129,9 @@ async function createOrUpdateForm(
   formInput: ImportPaperFormInput,
   user: Express.User
 ) {
-  if (id) {
-    const form = await getFormOrFormNotFound({ id });
-    await checkCanImportForm(user, form);
-    return updateForm(form, formInput, user);
-  }
-
-  return createForm(formInput, user);
+  const form = id ? await getFormOrFormNotFound({ id }) : null;
+  await checkCanImportForm(user, formInput, form);
+  return form ? updateForm(form, formInput, user) : createForm(formInput, user);
 }
 
 const importPaperFormResolver: MutationResolvers["importPaperForm"] = async (

@@ -1,11 +1,11 @@
 import { Bsdasri, User, Prisma } from "@prisma/client";
 import { safeInput } from "../common/converter";
 import { SealedFieldError } from "../common/errors";
-import { getCachedUserSiretOrVat } from "../common/redis/users";
 import { objectDiff } from "../forms/workflow/diff";
 import { BsdasriInput, BsdasriSignatureType } from "../generated/graphql/types";
 import { flattenBsdasriInput } from "./converter";
 import { getReadonlyBsdasriRepository } from "./repository";
+import { getUserRoles } from "../permissions";
 
 type EditableBsdasriFields = Required<
   Omit<
@@ -141,7 +141,7 @@ export async function checkEditionRules(
     return true;
   }
 
-  const userSirets = user?.id ? await getCachedUserSiretOrVat(user.id) : [];
+  const userSirets = user?.id ? Object.keys(await getUserRoles(user.id)) : [];
   const isEmitter =
     bsdasri.emitterCompanySiret &&
     userSirets.includes(bsdasri.emitterCompanySiret);

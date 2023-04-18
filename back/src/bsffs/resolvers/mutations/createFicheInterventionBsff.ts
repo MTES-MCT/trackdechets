@@ -5,7 +5,7 @@ import {
   flattenFicheInterventionBsffInput,
   expandFicheInterventionBsffFromDB
 } from "../../converter";
-import { checkCanWriteFicheIntervention } from "../../permissions";
+import { checkCanCreateFicheIntervention } from "../../permissions";
 import { getBsffFicheInterventionRepository } from "../../repository";
 import { sirenifyBsffFicheInterventionInput } from "../../sirenify";
 import { validateFicheIntervention } from "../../validation";
@@ -18,10 +18,8 @@ const createFicheInterventionBsff: MutationResolvers["createFicheInterventionBsf
       input,
       user
     );
-    const flatInput = flattenFicheInterventionBsffInput(
-      sirenifiedInput
-    ) as Prisma.BsffFicheInterventionCreateInput;
-    await checkCanWriteFicheIntervention(user, flatInput);
+    await checkCanCreateFicheIntervention(user, input);
+    const flatInput = flattenFicheInterventionBsffInput(sirenifiedInput);
 
     await validateFicheIntervention(flatInput);
 
@@ -29,7 +27,7 @@ const createFicheInterventionBsff: MutationResolvers["createFicheInterventionBsf
       getBsffFicheInterventionRepository(user);
 
     const ficheIntervention = await createFicheIntervention({
-      data: flatInput
+      data: flatInput as Prisma.BsffFicheInterventionCreateInput
     });
 
     return expandFicheInterventionBsffFromDB(ficheIntervention);
