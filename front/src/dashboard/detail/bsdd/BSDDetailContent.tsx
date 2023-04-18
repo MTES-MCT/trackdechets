@@ -833,50 +833,53 @@ export default function BSDDetailContent({
             )}
             {/* Transporter tab panel */}
             <TabPanel className={styles.detailTabPanel}>
-              <div className={`${styles.detailGrid} `}>
-                {!formTransportIsPipeline(form) ? (
-                  <Company
-                    label={`Transporteur ${isMultiModal ? "N°1" : ""}`}
-                    company={form.transporter?.company}
-                  />
-                ) : (
+              {!formTransportIsPipeline(form) ? (
+                <>
+                  <div className={`${styles.detailGrid} `}>
+                    <Company
+                      label={`Transporteur ${isMultiModal ? "N°1" : ""}`}
+                      company={form.transporter?.company}
+                    />
+                  </div>
+
+                  <div className={styles.detailGrid}>
+                    <YesNoRow
+                      value={form?.transporter?.isExemptedOfReceipt}
+                      label="Exemption de récépissé"
+                    />
+                    <DetailRow
+                      value={form?.transporter?.receipt}
+                      label="Numéro de récépissé"
+                    />
+                    <DetailRow
+                      value={form?.transporter?.department}
+                      label="Département"
+                    />
+                    <DateRow
+                      value={form?.transporter?.validityLimit}
+                      label="Date de validité"
+                    />
+                    <DetailRow
+                      value={form?.transporter?.numberPlate}
+                      label="Immatriculation"
+                    />
+                    <YesNoRow
+                      value={form.signedByTransporter}
+                      label="Signé par le transporteur"
+                    />
+                    <DateRow
+                      value={form.takenOverAt}
+                      label="Date de prise en charge"
+                    />
+                    <DetailRow
+                      value={getTransportModeLabel(form.transporter?.mode)}
+                      label="Mode de transport"
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className={`${styles.detailGrid} `}>
                   <DetailRow value="par pipeline" label="Transport" />
-                )}
-              </div>
-              {!formTransportIsPipeline(form) && (
-                <div className={styles.detailGrid}>
-                  <YesNoRow
-                    value={form?.transporter?.isExemptedOfReceipt}
-                    label="Exemption de récépissé"
-                  />
-                  <DetailRow
-                    value={form?.transporter?.receipt}
-                    label="Numéro de récépissé"
-                  />
-                  <DetailRow
-                    value={form?.transporter?.department}
-                    label="Département"
-                  />
-                  <DateRow
-                    value={form?.transporter?.validityLimit}
-                    label="Date de validité"
-                  />
-                  <DetailRow
-                    value={form?.transporter?.numberPlate}
-                    label="Immatriculation"
-                  />
-                  <YesNoRow
-                    value={form.signedByTransporter}
-                    label="Signé par le transporteur"
-                  />
-                  <DateRow
-                    value={form.takenOverAt}
-                    label="Date de prise en charge"
-                  />
-                  <DetailRow
-                    value={getTransportModeLabel(form.transporter?.mode)}
-                    label="Mode de transport"
-                  />
                 </div>
               )}
             </TabPanel>

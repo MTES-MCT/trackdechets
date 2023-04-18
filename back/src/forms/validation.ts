@@ -227,8 +227,7 @@ export const hasPipeline = (value: {
     type: Packagings;
   }>;
 }): boolean =>
-  value.wasteDetailsPackagingInfos?.find(i => i.type === "PIPELINE") !==
-  undefined;
+  value.wasteDetailsPackagingInfos?.some(i => i.type === "PIPELINE");
 
 // *************************************************************
 // DEFINES VALIDATION SCHEMA FOR INDIVIDUAL FRAMES IN BSD PAGE 1
