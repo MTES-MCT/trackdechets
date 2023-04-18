@@ -68,7 +68,7 @@ export default connect<{}, Values>(function WasteInfo(props) {
 
       <div className="form__row">
         <label>
-          Votre appellation du déchet (optionnel)
+          Votre appellation du déchet
           <Tooltip
             msg="L'appellation du déchet est propre à votre entreprise pour vous aider
           à retrouver facilement le déchet concerné."

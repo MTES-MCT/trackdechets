@@ -575,7 +575,7 @@ input WasteDetailsInput {
   """
   code: String
 
-  "Dénomination usuelle"
+  "Dénomination usuelle. Obligatoire"
   name: String
 
   "Code ONU. Obligatoire pour les déchets dangereux. Merci d'indiquer 'non soumis' si nécessaire."

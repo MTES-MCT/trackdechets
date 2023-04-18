@@ -30,6 +30,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :rocket: Nouvelles fonctionnalités
 
 - Tous BSD - transport - Ne plus proposer de champs de récépissés modifiables mais automatiquement remplir celles enregistrées dans le compte Trackdéchets de l'établissement. Informer du récépissé dans les modales de signature transporteur [PR 2205](https://github.com/MTES-MCT/trackdechets/pull/2205).
+- Le champ wasteDetails.name (appellation du déchet) devient obigatoire sur le Bsdd à partir de l'étape SEALED [PR 2317](https://github.com/MTES-MCT/trackdechets/pull/2317).
 
 ### :bug: Corrections de bugs
 

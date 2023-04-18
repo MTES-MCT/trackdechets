@@ -82,6 +82,7 @@ describe("mutation / importPaperForm", () => {
         },
         wasteDetails: {
           code: "01 03 04*",
+          name: "Déchets divers",
           quantity: 1.0,
           quantityType: QuantityType.REAL,
           packagingInfos: [{ type: "BENNE" as Packagings, quantity: 1 }],
@@ -390,6 +391,7 @@ describe("mutation / importPaperForm", () => {
         transporterCompanyContact: "Mr Transporteur",
         transporterCompanyMail: "trasnporteur@trackdechets.fr",
         wasteDetailsCode: "01 03 04*",
+        wasteDetailsName: "stériles acidogènes",
         wasteDetailsQuantity: 1.0,
         wasteDetailsQuantityType: QuantityType.ESTIMATED,
         wasteDetailsPackagingInfos: [{ type: "BENNE", quantity: 1 }],
