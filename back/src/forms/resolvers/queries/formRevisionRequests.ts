@@ -3,7 +3,12 @@ import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import prisma from "../../../prisma";
 import { getConnection } from "../../../common/pagination";
 import { Prisma } from "@prisma/client";
-import { QueryResolvers } from "../../../generated/graphql/types";
+import {
+  Form,
+  FormCompany,
+  FormRevisionRequestContent,
+  QueryResolvers
+} from "../../../generated/graphql/types";
 import { Permission, checkUserPermissions } from "../../../permissions";
 import { toPrismaStringFilter } from "../../../common/where";
 
@@ -12,7 +17,7 @@ const MAX_SIZE = 50;
 
 const formRevisionRequestResolver: QueryResolvers["formRevisionRequests"] =
   async (_, args, context) => {
-    const { siret, where = {}, first = MAX_SIZE, after } = args;
+    const { siret, where, first = MAX_SIZE, after } = args;
 
     const user = checkIsAuthenticated(context);
 
@@ -32,8 +37,8 @@ const formRevisionRequestResolver: QueryResolvers["formRevisionRequests"] =
         { authoringCompanyId: company.id },
         { approvals: { some: { approverSiret: company.orgId } } }
       ],
-      ...(where.status ? { status: where.status } : {}),
-      ...(where.bsddId ? { bsddId: toPrismaStringFilter(where.bsddId) } : {})
+      ...(where?.status ? { status: where.status } : {}),
+      ...(where?.bsddId ? { bsddId: toPrismaStringFilter(where.bsddId) } : {})
     };
 
     const revisionRequestsTotalCount = await prisma.bsddRevisionRequest.count({
@@ -52,9 +57,9 @@ const formRevisionRequestResolver: QueryResolvers["formRevisionRequests"] =
         ...node,
         // the following fields will be resolved in FormRevisionRequest resolver
         approvals: [],
-        content: null,
-        authoringCompany: null,
-        form: null
+        content: {} as FormRevisionRequestContent,
+        authoringCompany: {} as FormCompany,
+        form: {} as Form
       }),
       ...{ after, first: pageSize }
     });

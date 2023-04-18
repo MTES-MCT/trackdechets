@@ -1,6 +1,11 @@
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
-import { QueryResolvers } from "../../../generated/graphql/types";
+import {
+  Bsda,
+  BsdaRevisionRequestContent,
+  FormCompany,
+  QueryResolvers
+} from "../../../generated/graphql/types";
 import { getReadonlyBsdaRepository } from "../../repository";
 import { getConnection } from "../../../common/pagination";
 import { Prisma } from "@prisma/client";
@@ -12,7 +17,7 @@ const MAX_SIZE = 50;
 
 export const bsdaRevisionRequests: QueryResolvers["bsdaRevisionRequests"] =
   async (_, args, context) => {
-    const { siret, after, first = MAX_SIZE, where: where = {} } = args;
+    const { siret, after, first = MAX_SIZE, where: where } = args;
     const user = checkIsAuthenticated(context);
     await checkUserPermissions(
       user,
@@ -29,8 +34,8 @@ export const bsdaRevisionRequests: QueryResolvers["bsdaRevisionRequests"] =
         { authoringCompanyId: company.id },
         { approvals: { some: { approverSiret: company.orgId } } }
       ],
-      ...(where.status ? { status: where.status } : {}),
-      ...(where.bsdaId ? { bsdaId: toPrismaStringFilter(where.bsdaId) } : {})
+      ...(where?.status ? { status: where.status } : {}),
+      ...(where?.bsdaId ? { bsdaId: toPrismaStringFilter(where.bsdaId) } : {})
     };
 
     const bsdaRepository = getReadonlyBsdaRepository();
@@ -49,9 +54,9 @@ export const bsdaRevisionRequests: QueryResolvers["bsdaRevisionRequests"] =
         ...node,
         // the following fields will be resolved in BsdaRevisionRequest resolver
         approvals: [],
-        content: null,
-        authoringCompany: null,
-        bsda: null
+        content: {} as BsdaRevisionRequestContent,
+        authoringCompany: {} as FormCompany,
+        bsda: {} as Bsda
       }),
       ...{ after, first: pageSize }
     });
