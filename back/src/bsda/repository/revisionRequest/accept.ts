@@ -181,6 +181,7 @@ export async function approveAndApplyRevisionRequest(
   });
 
   if (updateData.status === BsdaStatus.CANCELED) {
+    // Detach BSDs in a forward relationship
     await prisma.bsda.update({
       where: { id: updatedBsda.id },
       data: { forwardingId: null }
