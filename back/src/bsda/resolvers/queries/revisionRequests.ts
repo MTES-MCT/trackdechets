@@ -5,6 +5,7 @@ import { getReadonlyBsdaRepository } from "../../repository";
 import { getConnection } from "../../../common/pagination";
 import { Prisma } from "@prisma/client";
 import { Permission, checkUserPermissions } from "../../../permissions";
+import { toPrismaStringFilter } from "../../../common/where";
 
 const MIN_SIZE = 0;
 const MAX_SIZE = 50;
@@ -29,7 +30,7 @@ export const bsdaRevisionRequests: QueryResolvers["bsdaRevisionRequests"] =
         { approvals: { some: { approverSiret: company.orgId } } }
       ],
       ...(where.status ? { status: where.status } : {}),
-      ...(where.bsdaId ? { bsdaId: where.bsdaId } : {})
+      ...(where.bsdaId ? { bsdaId: toPrismaStringFilter(where.bsdaId) } : {})
     };
 
     const bsdaRepository = getReadonlyBsdaRepository();

@@ -5,6 +5,7 @@ import { getConnection } from "../../../common/pagination";
 import { Prisma } from "@prisma/client";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { Permission, checkUserPermissions } from "../../../permissions";
+import { toPrismaStringFilter } from "../../../common/where";
 
 const MIN_SIZE = 0;
 const MAX_SIZE = 50;
@@ -32,7 +33,7 @@ const formRevisionRequestResolver: QueryResolvers["formRevisionRequests"] =
         { approvals: { some: { approverSiret: company.orgId } } }
       ],
       ...(where.status ? { status: where.status } : {}),
-      ...(where.bsddId ? { bsddId: where.bsddId } : {})
+      ...(where.bsddId ? { bsddId: toPrismaStringFilter(where.bsddId) } : {})
     };
 
     const revisionRequestsTotalCount = await prisma.bsddRevisionRequest.count({

@@ -208,7 +208,7 @@ describe("Mutation.formRevisionRequests", () => {
       Pick<Query, "formRevisionRequests">,
       QueryFormRevisionRequestsArgs
     >(FORM_REVISION_REQUESTS, {
-      variables: { siret: company.siret, where: { bsddId: bsdd1.id } }
+      variables: { siret: company.siret, where: { bsddId: { _eq: bsdd1.id } } }
     });
 
     expect(data.formRevisionRequests.totalCount).toBe(1);
