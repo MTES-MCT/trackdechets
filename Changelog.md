@@ -4,6 +4,7 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
+
 # [2023.4.2] 24/04/2023
 
 #### :rocket: Nouvelles fonctionnalités
@@ -11,6 +12,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Envoi d'un mail aux administrateurs d'une entreprise ayant ignoré une RevisionRequest pendant 5 jours (BSD + BSDA) [PR 2288](https://github.com/MTES-MCT/trackdechets/pull/2288)
 
 #### :bug: Corrections de bugs
+
+- Lorsque l'émetteur est un particulier, le champ `emittedBy` ne devrait pas se remplir automatiquement avec le nom de l'utilisateur appelant la mutation `markAsSealed`. Le champ se remplit désormais avec la valeur "Signature auto (particulier)". [PR 2316](https://github.com/MTES-MCT/trackdechets/pull/2316)
 
 #### :boom: Breaking changes
 
@@ -35,8 +38,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Tous BSD - transport - Le récépissé transporteur du BSFF est obligatoire, sauf exemption à cocher [PR 2205](https://github.com/MTES-MCT/trackdechets/pull/2205).
 
 #### :nail_care: Améliorations
+
 - Améliorations sur l'annexe 1 [PR 2274](https://github.com/MTES-MCT/trackdechets/pull/2274)
-  - Ajout du code déchet 15 02 02*
+  - Ajout du code déchet 15 02 02\*
   - Ajout de la propriété `receivedSignatureAutomations` sur l'objet `CompanyPrivate` pour lister les entreprises qui ont activé la signature automatique
   - Correction de bugs sur le PDF d'un bordereau de tournée
   - Correction d'un bug à la signature des annexes 1 émises par des particuliers
