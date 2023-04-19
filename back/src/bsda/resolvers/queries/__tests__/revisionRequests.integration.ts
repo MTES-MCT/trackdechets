@@ -114,7 +114,7 @@ describe("Mutation.bsdaRevisionRequests", () => {
     );
 
     expect(errors[0].message).toBe(
-      `Vous n'êtes pas membre de l'entreprise portant le siret "${company.siret}".`
+      `Vous n'avez pas la permission de lister les demandes de révision de l'établissement ${company.siret}`
     );
   });
 
