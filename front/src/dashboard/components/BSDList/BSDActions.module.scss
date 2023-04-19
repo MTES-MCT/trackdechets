@@ -42,23 +42,18 @@
 }
 
 .BSDDropdown {
-  &[data-reach-menu-item] {
-    &[data-selected] {
-      background: hsl(211, 81%, 36%) !important;
-      color: white;
-      outline: none;
+  width: 280px;
+}
 
-      svg {
-        color: white;
-      }
+.BSDActions {
+  > div {
+    button,
+    a {
+      font-size: 0.8rem;
     }
-
-    display: inline-flex;
-    align-items: center;
-    width: 100%;
-
     svg {
-      margin-right: 8px;
+      width: 24px;
+      height: 24px;
     }
   }
 }

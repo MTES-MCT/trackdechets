@@ -1,22 +1,14 @@
 import * as React from "react";
-import { Link, generatePath, useParams, useLocation } from "react-router-dom";
-import {
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  MenuLink,
-} from "@reach/menu-button";
+import { generatePath, useParams, useLocation } from "react-router-dom";
+
 import "@reach/menu-button/styles.css";
-import classNames from "classnames";
 import routes from "common/routes";
 import {
   IconAddCircle,
-  IconChevronDown,
-  IconChevronUp,
   IconDuplicateFile,
   IconPaperWrite,
   IconPdf,
+  IconQrCode,
   IconTrash,
   IconView,
 } from "common/components/Icons";
@@ -26,7 +18,8 @@ import { useDuplicate } from "./useDuplicate";
 import { useDownloadPdf } from "./useDownloadPdf";
 import styles from "../../BSDActions.module.scss";
 import { Loader } from "common/components";
-import { TableRoadControlButton } from "../../RoadControlButton";
+import { useDisplayRoadControlButton } from "../../RoadControlButton";
+import DropdownMenu from "Apps/Common/Components/DropdownMenu/DropdownMenu";
 
 interface BSDDActionsProps {
   form: Form;
@@ -66,120 +59,99 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
       form.status
     ) && !isAppendix1Producer;
 
+  const links = [
+    {
+      title: "Contrôle routier",
+      route: generatePath(routes.dashboard.roadControl, {
+        siret,
+        id: form.id,
+      }),
+      icon: <IconQrCode color="blueLight" size="24px" />,
+      isVisible: useDisplayRoadControlButton(form),
+    },
+    {
+      title: "Aperçu",
+      route: {
+        pathname: generatePath(routes.dashboard.bsdds.view, {
+          siret,
+          id: form.id,
+        }),
+        state: { background: location },
+      },
+      icon: <IconView color="blueLight" size="24px" />,
+      isVisible: true,
+    },
+    {
+      title: "Annexe 1",
+      route: {
+        pathname: generatePath(routes.dashboard.bsdds.view, {
+          siret,
+          id: form.id,
+        }),
+        search: "?selectedTab=0",
+        state: { background: location },
+      },
+      icon: <IconAddCircle size="24px" color="blueLight" />,
+      isVisible: showAppendix1Button,
+    },
+
+    {
+      title: "Pdf",
+      route: "",
+      icon: <IconPdf size="24px" color="blueLight" />,
+      isVisible: form.status !== FormStatus.Draft,
+      isButton: true,
+      handleClick: () => downloadPdf(),
+    },
+    {
+      title: "Dupliquer",
+      route: "",
+      icon: <IconDuplicateFile size="24px" color="blueLight" />,
+      isVisible: !isAppendix1Producer,
+      isButton: true,
+      handleClick: () => duplicateForm(),
+    },
+    {
+      title: "Modifier",
+      route: generatePath(routes.dashboard.bsdds.edit, {
+        siret,
+        id: form.id,
+      }),
+      icon: <IconPaperWrite size="24px" color="blueLight" />,
+      isVisible: canDeleteAndUpdate && !isAppendix1Producer,
+    },
+    {
+      title: "Révision",
+      route: {
+        pathname: generatePath(routes.dashboard.bsdds.review, {
+          siret,
+          id: form.id,
+        }),
+        state: { background: location },
+      },
+      icon: <IconPaperWrite size="24px" color="blueLight" />,
+      isVisible: canRequestRevision,
+    },
+    {
+      title: "Supprimer",
+      route: "",
+      icon: <IconTrash color="blueLight" size="24px" />,
+      isVisible: canDeleteAndUpdate,
+      isButton: true,
+      handleClick: () => setIsDeleting(true),
+    },
+  ];
+
   return (
     <>
-      <Menu>
-        {({ isExpanded }) => (
-          <>
-            <MenuButton
-              className={classNames(
-                "btn btn--outline-primary",
-                styles.BSDDActionsToggle
-              )}
-            >
-              Actions
-              {isExpanded ? (
-                <IconChevronUp size="14px" color="blueLight" />
-              ) : (
-                <IconChevronDown size="14px" color="blueLight" />
-              )}
-            </MenuButton>
-            <MenuList
-              className={classNames(
-                "fr-raw-link fr-raw-list",
-                styles.BSDDActionsMenu
-              )}
-            >
-              <MenuLink
-                as={Link}
-                to={{
-                  pathname: generatePath(routes.dashboard.bsdds.view, {
-                    siret,
-                    id: form.id,
-                  }),
-                  state: { background: location },
-                }}
-              >
-                <IconView color="blueLight" size="24px" />
-                Aperçu
-              </MenuLink>
+      <div className={styles.BSDActions}>
+        <DropdownMenu
+          menuTitle="Actions"
+          links={links.filter(f => f.isVisible)}
+          iconAlone
+        />
+      </div>
 
-              <TableRoadControlButton siret={siret} form={form} />
-
-              {showAppendix1Button && (
-                <MenuLink
-                  as={Link}
-                  to={{
-                    pathname: generatePath(routes.dashboard.bsdds.view, {
-                      siret,
-                      id: form.id,
-                    }),
-                    search: "?selectedTab=0",
-                    state: { background: location },
-                  }}
-                >
-                  <IconAddCircle size="24px" color="blueLight" />
-                  Annexe 1
-                </MenuLink>
-              )}
-
-              {form.status !== FormStatus.Draft && (
-                <MenuItem onSelect={() => downloadPdf()}>
-                  <IconPdf size="24px" color="blueLight" />
-                  Pdf
-                </MenuItem>
-              )}
-
-              {!isAppendix1Producer && (
-                <MenuItem onSelect={() => duplicateForm()}>
-                  <IconDuplicateFile size="24px" color="blueLight" />
-                  Dupliquer
-                </MenuItem>
-              )}
-
-              {canDeleteAndUpdate && !isAppendix1Producer && (
-                <>
-                  <MenuLink
-                    as={Link}
-                    to={generatePath(routes.dashboard.bsdds.edit, {
-                      siret,
-                      id: form.id,
-                    })}
-                  >
-                    <IconPaperWrite size="24px" color="blueLight" />
-                    Modifier
-                  </MenuLink>
-                </>
-              )}
-
-              {canRequestRevision && (
-                <MenuLink
-                  as={Link}
-                  to={{
-                    pathname: generatePath(routes.dashboard.bsdds.review, {
-                      siret,
-                      id: form.id,
-                    }),
-                    state: { background: location },
-                  }}
-                >
-                  <IconPaperWrite size="24px" color="blueLight" />
-                  Révision
-                </MenuLink>
-              )}
-
-              {canDeleteAndUpdate && (
-                <>
-                  <MenuItem onSelect={() => setIsDeleting(true)}>
-                    <IconTrash color="blueLight" size="24px" />
-                    Supprimer
-                  </MenuItem>
-                </>
-              )}
-            </MenuList>
-          </>
-        )}
-      </Menu>
       {isDeleting && (
         <DeleteModal
           isOpen

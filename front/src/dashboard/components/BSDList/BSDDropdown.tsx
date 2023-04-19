@@ -1,6 +1,5 @@
 import React from "react";
-import { generatePath, Link } from "react-router-dom";
-import { Menu, MenuList, MenuButton, MenuLink } from "@reach/menu-button";
+import { generatePath } from "react-router-dom";
 import routes from "common/routes";
 import styles from "./BSDActions.module.scss";
 import {
@@ -10,60 +9,43 @@ import {
   IconBSDD,
   IconBSDasri,
 } from "../../../common/components/Icons";
+import BsdCreateDropdown from "Apps/Common/Components/DropdownMenu/DropdownMenu";
 
 type Props = { siret: string };
 
-const links = [
-  {
-    title: "Bordereau de suivi DD",
-    route: routes.dashboard.bsdds.create,
-    icon: <IconBSDD width="24px" height="24px" />,
-  },
-  {
-    title: "Bordereau de suivi DASRI",
-    route: routes.dashboard.bsdasris.create,
-    icon: <IconBSDasri width="24px" height="24px" />,
-  },
-
-  {
-    title: "Bordereau de suivi VHU",
-    route: routes.dashboard.bsvhus.create,
-    icon: <IconBSVhu width="24px" height="24px" />,
-  },
-  {
-    title: "Bordereau de suivi FF",
-    route: routes.dashboard.bsffs.create,
-    icon: <IconBSFF padding-left="6px" width="24px" height="24px" />,
-  },
-  {
-    title: "Bordereau de suivi amiante",
-    route: routes.dashboard.bsdas.create,
-    icon: <IconBSDa width="24px" height="24px" />,
-  },
-];
-
 export function BSDDropdown({ siret }: Props) {
+  const links = [
+    {
+      title: "Bordereau de suivi DD",
+      route: generatePath(routes.dashboard.bsdds.create, { siret }),
+      icon: <IconBSDD width="24px" height="24px" />,
+    },
+    {
+      title: "Bordereau de suivi DASRI",
+      route: generatePath(routes.dashboard.bsdasris.create, { siret }),
+      icon: <IconBSDasri width="24px" height="24px" />,
+    },
+
+    {
+      title: "Bordereau de suivi VHU",
+      route: generatePath(routes.dashboard.bsvhus.create, { siret }),
+      icon: <IconBSVhu width="24px" height="24px" />,
+    },
+    {
+      title: "Bordereau de suivi FF",
+      route: generatePath(routes.dashboard.bsffs.create, { siret }),
+      icon: <IconBSFF padding-left="6px" width="24px" height="24px" />,
+    },
+    {
+      title: "Bordereau de suivi amiante",
+      route: generatePath(routes.dashboard.bsdas.create, { siret }),
+      icon: <IconBSDa width="24px" height="24px" />,
+    },
+  ];
+
   return (
-    <Menu>
-      <MenuButton className="btn btn--primary">
-        Créer un bordereau{" "}
-        <span className={styles.dropdownArrow} aria-hidden>
-          ▾
-        </span>
-      </MenuButton>
-      <MenuList className="fr-raw-link fr-raw-list">
-        {links.map(link => (
-          <MenuLink
-            className={styles.BSDDropdown}
-            as={Link}
-            to={generatePath(link.route, { siret })}
-            key={link.title}
-          >
-            {link.icon}
-            {link.title}
-          </MenuLink>
-        ))}
-      </MenuList>
-    </Menu>
+    <div className={styles.BSDDropdown}>
+      <BsdCreateDropdown links={links} menuTitle="Créer un bordereau" />
+    </div>
   );
 }
