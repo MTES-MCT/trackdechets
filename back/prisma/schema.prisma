@@ -106,6 +106,8 @@ enum TransportMode {
 }
 
 enum UserRole {
+  READER
+  DRIVER
   MEMBER
   ADMIN
 }

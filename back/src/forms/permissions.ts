@@ -316,7 +316,7 @@ export async function checkCanSignedByTransporter(user: User, form: Form) {
   return checkUserPermissions(
     user,
     authorizedOrgIds,
-    Permission.BsdCanSign,
+    Permission.BsdCanSignTransport,
     "Vous n'êtes pas autorisé à signer ce bordereau pour le transport"
   );
 }

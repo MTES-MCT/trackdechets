@@ -46,9 +46,9 @@ describe("Mutation.signBsdasri emission with secret code", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message: "Erreur, le code de sécurité est invalide",
+        message: "Le code de signature est invalide.",
         extensions: expect.objectContaining({
-          code: ErrorCode.BAD_USER_INPUT
+          code: ErrorCode.FORBIDDEN
         })
       })
     ]);

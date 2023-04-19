@@ -3,6 +3,13 @@ import { ForbiddenError } from "apollo-server-core";
 import { cachedGet } from "./common/redis";
 import prisma from "./prisma";
 import * as thisModule from "./permissions";
+import {
+  BsdaSignatureType,
+  BsdasriSignatureType,
+  BsffSignatureType,
+  SignatureTypeInput
+} from "./generated/graphql/types";
+import { checkSecurityCode } from "./common/permissions";
 
 // List of all the permissions
 export enum Permission {
@@ -11,7 +18,12 @@ export enum Permission {
   BsdCanCreate = "BsdCanCreate",
   BsdCanUpdate = "BsdCanUpdate",
   BsdCanDelete = "BsdCanDelete",
-  BsdCanSign = "BsdCanSign",
+  BsdCanSign = "BsdCanSign:*",
+  BsdCanSignEmission = "BsdCanSign:Emission",
+  BsdCanSignWork = "BsdCanSign:Work",
+  BsdCanSignTransport = "BsdCanSign:Transport",
+  BsdCanSignAcceptation = "BsdCanSign:Acceptation",
+  BsdCanSignOperation = "BsdCanSign:Operation",
   BsdCanRevise = "BsdCanRevise",
   RegistryCanRead = "RegistryCanRead",
   CompanyCanRead = "CompanyCanRead",
@@ -38,11 +50,22 @@ const readerPermissions = [
   Permission.RegistryCanRead
 ];
 
+const driverPermissions = [
+  ...readerPermissions,
+  Permission.BsdCanUpdate, // the driver must be able to update immat
+  Permission.BsdCanSignTransport
+];
+
 const memberPermissions = [
   ...readerPermissions,
   Permission.BsdCanCreate,
   Permission.BsdCanUpdate,
   Permission.BsdCanSign,
+  Permission.BsdCanSignEmission,
+  Permission.BsdCanSignWork,
+  Permission.BsdCanSignTransport,
+  Permission.BsdCanSignAcceptation,
+  Permission.BsdCanSignOperation,
   Permission.BsdCanDelete,
   Permission.BsdCanRevise
 ];
@@ -56,8 +79,9 @@ const adminPermissions = [
   Permission.CompanyCanRenewSecurityCode
 ];
 
-export const grants: { [Key in UserRole | "READER"]: Permission[] } = {
-  READER: readerPermissions,
+export const grants: { [Key in UserRole]: Permission[] } = {
+  [UserRole.READER]: readerPermissions,
+  [UserRole.DRIVER]: driverPermissions,
   [UserRole.MEMBER]: memberPermissions,
   [UserRole.ADMIN]: adminPermissions
 };
@@ -150,4 +174,58 @@ export async function checkUserPermissions(
     }
   }
   throw new ForbiddenError(errorMsg);
+}
+
+type AllSignatureType =
+  | BsdaSignatureType
+  | BsdasriSignatureType
+  | SignatureTypeInput // BSVHU
+  | BsffSignatureType;
+
+export const signatureTypeToPermission: {
+  [Key in AllSignatureType]: Permission;
+} = {
+  EMISSION: Permission.BsdCanSignEmission,
+  TRANSPORT: Permission.BsdCanSignTransport,
+  WORK: Permission.BsdCanSignWork,
+  RECEPTION: Permission.BsdCanSignAcceptation,
+  ACCEPTATION: Permission.BsdCanSignAcceptation,
+  OPERATION: Permission.BsdCanSignOperation
+};
+
+export async function checkCanSignFor<SignatureType>(
+  user: User,
+  signatureType: SignatureType,
+  orgIds: string[],
+  securityCode?: number | null
+) {
+  try {
+    const hasPerm = await checkUserPermissions(
+      user,
+      orgIds,
+      signatureTypeToPermission[signatureType],
+      "Vous ne pouvez pas signer ce BSDA"
+    );
+    return hasPerm;
+  } catch (forbidenError) {
+    let error = forbidenError;
+
+    if (securityCode && orgIds.length > 0) {
+      // check if security code is valid for one of
+      // the authorized organisation identifier
+      for (const orgId of orgIds) {
+        try {
+          const securityCodeValid = await checkSecurityCode(
+            orgId,
+            securityCode
+          );
+          return securityCodeValid;
+        } catch (invaliSecurityCodeError) {
+          error = invaliSecurityCodeError;
+        }
+      }
+    }
+
+    throw error;
+  }
 }

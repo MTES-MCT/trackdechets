@@ -4,6 +4,7 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
+
 # [2023.6.1] 06/06/2023
 
 #### :rocket: Nouvelles fonctionnalités
@@ -15,6 +16,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Le destinataire est obligatoire pour sceller un BSDASRI [PR 2267](https://github.com/MTES-MCT/trackdechets/pull/2267)
 
 #### :nail_care: Améliorations
+
 - Ajout d'un bouton de déconnexion sur la page d'autorisation OpenId Connect [PR 2386](https://github.com/MTES-MCT/trackdechets/pull/2386)
 - Les informations sur les entreprises (récépissés, raison sociale, certification) sont mises à jour lors de la duplication d'un bordereau [PR 2355](https://github.com/MTES-MCT/trackdechets/pull/2355)
 - Le producteur initial d'un DASRI a accès à la suite de la traçabilité en cas de groupement [PR 2391](https://github.com/MTES-MCT/trackdechets/pull/2391)
@@ -22,6 +24,9 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :memo: Documentation
 
 #### :house: Interne
+
+- Ajout des rôles "Chauffeur" et "Lecteur" en base de données. [PR 2328](https://github.com/MTES-MCT/trackdechets/pull/2328)
+- Harmonisation du code de signature entre les différents bordereaux. [PR 2328](https://github.com/MTES-MCT/trackdechets/pull/2328)
 
 # [2023.5.4] 23/05/202
 

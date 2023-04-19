@@ -29,6 +29,8 @@ describe("Mutation.signBsdasri transport", () => {
         ...initialData(emitterCompany),
         ...readyToPublishData(destinationCompany),
         ...readyToTakeOverData(transporterCompany),
+        emitterEmissionSignatureDate: new Date(),
+        emitterEmissionSignatureAuthor: "Producteur",
         status: BsdasriStatus.SIGNED_BY_PRODUCER
       }
     });
@@ -68,7 +70,9 @@ describe("Mutation.signBsdasri transport", () => {
         transporterAcceptationStatus: WasteAcceptationStatus.REFUSED,
         transporterWasteRefusalReason: "J'en veux pas",
         transporterWasteRefusedWeightValue: 66,
-        status: BsdasriStatus.SIGNED_BY_PRODUCER
+        status: BsdasriStatus.SIGNED_BY_PRODUCER,
+        emitterEmissionSignatureDate: new Date(),
+        emitterEmissionSignatureAuthor: "Producteur"
       }
     });
     const { mutate } = makeClient(transporter); // transporter

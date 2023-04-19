@@ -1,7 +1,8 @@
 import { User, Bsff, BsffFicheIntervention, BsffStatus } from "@prisma/client";
 import {
   BsffFicheInterventionInput,
-  BsffInput
+  BsffInput,
+  BsffSignatureType
 } from "../generated/graphql/types";
 import { Permission, checkUserPermissions } from "../permissions";
 import { checkSecurityCode } from "../common/permissions";
@@ -202,25 +203,4 @@ export async function checkCanDelete(user: User, bsff: Bsff) {
     Permission.BsdCanDelete,
     errorMsg
   );
-}
-
-export async function checkCanSignFor(
-  user: User,
-  orgId: string,
-  securityCode?: number | null
-) {
-  try {
-    const hasPerm = await checkUserPermissions(
-      user,
-      [orgId].filter(Boolean),
-      Permission.BsdCanSign,
-      "Vous ne pouvez pas signer ce BSFF"
-    );
-    return hasPerm;
-  } catch (err) {
-    if (securityCode) {
-      return checkSecurityCode(orgId, securityCode);
-    }
-    throw err;
-  }
 }
