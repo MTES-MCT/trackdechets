@@ -19,9 +19,8 @@ import ActionButton from "common/components/ActionButton";
 import TdSwitch from "common/components/Switch";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { FieldTransportModeSelect, RedErrorMessage } from "common/components";
-import { transporterSchema } from "form/bsdd/utils/schema";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
-import { companySchema } from "common/validation/schema";
+import { transporterCompanySchema } from "common/validation/schema";
 
 const EDIT_SEGMENT = gql`
   mutation editSegment(
@@ -66,7 +65,7 @@ export const validationSchema = object().shape({
     }),
     validityLimit: date().nullable(true),
     numberPlate: string().nullable(true),
-    company: companySchema,
+    company: transporterCompanySchema,
   }),
 });
 
