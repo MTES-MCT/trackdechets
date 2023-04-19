@@ -177,12 +177,11 @@ export const searchCompanies = (
   // Match query on the merged field td_search_companies
   const must: estypes.QueryDslQueryContainer[] = [
     {
-      match: {
-        // field created during indexation from the copy of multiple fields
-        // check this in indexInseeSiret.ts and "stocketablissement" index mapping
+      match_phrase_prefix: {
+        // the field 'td_search_companies' is created during indexation from the copy of multiple fields
+        // check this in search/src/indexation code.
         td_search_companies: {
-          query: qs,
-          operator: "or"
+          query: qs
         }
       }
     }
@@ -204,8 +203,9 @@ export const searchCompanies = (
 
   const searchRequest: SearchOptions = {
     ...options,
+    _source_excludes: "td_search_companies",
+    size: 20,
     index,
-    // default_operator: "OR",
     body: {
       // QueryDSL docs https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
       query: {
