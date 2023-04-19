@@ -329,7 +329,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
                             type="text"
                             name="content.broker.receipt"
                             className="td-input"
-                            disabled={true}
                           />
                         </label>
 
@@ -346,7 +345,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
                               "td-input",
                               styles.recipientDepartment
                             )}
-                            disabled={true}
                           />
                         </label>
 
@@ -362,7 +360,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
                               "td-input",
                               styles.recipientValidityLimit
                             )}
-                            disabled={true}
                           />
                         </label>
 
@@ -414,7 +411,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
                             type="text"
                             name="content.trader.receipt"
                             className="td-input"
-                            disabled={true}
                           />
                         </label>
 
@@ -431,7 +427,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
                               "td-input",
                               styles.recipientDepartment
                             )}
-                            disabled={true}
                           />
                         </label>
 
@@ -447,7 +442,6 @@ export function BsddRequestRevision({ bsdd }: Props) {
                               "td-input",
                               styles.recipientValidityLimit
                             )}
-                            disabled={true}
                           />
                         </label>
 
