@@ -8,7 +8,7 @@ import {
   userFactory
 } from "../../__tests__/factories";
 import { getFullForm } from "../database";
-import { getSiretsByTab } from "../elastic";
+import { getSiretsByTab } from "../elasticHelpers";
 
 describe("getSiretsByTab", () => {
   afterEach(resetDatabase);
