@@ -924,5 +924,8 @@ input FormRevisionRequestTemporaryStorerInput {
 }
 
 input FormRevisionRequestWhere {
+  "Permet de filtrer sur un statut de demande de révision"
   status: RevisionRequestStatus
+  "Permet de filtrer sur un numéro de bordereau"
+  bsddId: StringFilter
 }

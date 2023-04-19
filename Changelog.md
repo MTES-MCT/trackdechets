@@ -49,6 +49,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
   - Correction d'un bug à la signature des annexes 1 émises par des particuliers
   - Désactivation du bouton de création de révision sur les annexes 1: seul le borereau de tournée peut être révisé
   - Ajout des champs consistance du déchet et CAP sur le bordereau de tournée
+- Ajout d'un filtre par numéro de bordereau sur les queries `formRevisionRequests` et `bsdaRevisionsRequests` [PR 2319](https://github.com/MTES-MCT/trackdechets/pull/2319)
 
 - Modification des mails d'onboarding (modification du contenu et des triggers) [PR 2212](https://github.com/MTES-MCT/trackdechets/pull/2212):
   - Le premier mail d'onboarding est envoyé:

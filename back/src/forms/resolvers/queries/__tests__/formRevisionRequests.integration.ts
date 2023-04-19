@@ -1,5 +1,8 @@
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { Query } from "../../../../generated/graphql/types";
+import {
+  Query,
+  QueryFormRevisionRequestsArgs
+} from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
 import {
   formFactory,
@@ -8,8 +11,8 @@ import {
 import makeClient from "../../../../__tests__/testClient";
 
 const FORM_REVISION_REQUESTS = `
-  query FormRevisionRequests($siret: String!) {
-    formRevisionRequests(siret: $siret) {
+  query FormRevisionRequests($siret: String!, $where:FormRevisionRequestWhere) {
+    formRevisionRequests(siret: $siret, where: $where) {
       totalCount
       pageInfo {
         hasNextPage
@@ -115,7 +118,102 @@ describe("Mutation.formRevisionRequests", () => {
     );
 
     expect(errors[0].message).toBe(
-      `Vous n'êtes pas membre de l'entreprise portant le siret "${company.siret}".`
+      `Vous n'avez pas la permission de lister les demandes de révision de l'établissement ${company.siret}`
+    );
+  });
+
+  it("should filter based on status", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: company.siret }
+    });
+
+    // should be included
+    const bsdd1RevisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: company.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        comment: "",
+        status: "ACCEPTED"
+      }
+    });
+
+    // should not be included
+    await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: company.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        comment: "",
+        status: "REFUSED"
+      }
+    });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query<
+      Pick<Query, "formRevisionRequests">,
+      QueryFormRevisionRequestsArgs
+    >(FORM_REVISION_REQUESTS, {
+      variables: { siret: company.orgId, where: { status: "ACCEPTED" } }
+    });
+
+    expect(data.formRevisionRequests.totalCount).toBe(1);
+    expect(data.formRevisionRequests.edges.map(_ => _.node)[0].id).toEqual(
+      bsdd1RevisionRequest.id
+    );
+  });
+
+  it("should filter based on bsddId", async () => {
+    const { user, company } = await userWithCompanyFactory("ADMIN");
+
+    const bsdd1 = await formFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: company.siret }
+    });
+
+    const bsdd2 = await formFactory({
+      ownerId: user.id,
+      opt: { emitterCompanySiret: company.siret }
+    });
+
+    // should be included
+    const bsdd1RevisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd1.id,
+        authoringCompanyId: company.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        comment: "",
+        status: "ACCEPTED"
+      }
+    });
+
+    // should not be included
+    await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd2.id,
+        authoringCompanyId: company.id,
+        approvals: { create: { approverSiret: company.siret! } },
+        comment: "",
+        status: "ACCEPTED"
+      }
+    });
+
+    const { query } = makeClient(user);
+
+    const { data } = await query<
+      Pick<Query, "formRevisionRequests">,
+      QueryFormRevisionRequestsArgs
+    >(FORM_REVISION_REQUESTS, {
+      variables: { siret: company.orgId, where: { bsddId: { _eq: bsdd1.id } } }
+    });
+
+    expect(data.formRevisionRequests.totalCount).toBe(1);
+    expect(data.formRevisionRequests.edges.map(_ => _.node)[0].id).toEqual(
+      bsdd1RevisionRequest.id
     );
   });
 });
