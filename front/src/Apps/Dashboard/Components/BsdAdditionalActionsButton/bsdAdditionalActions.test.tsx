@@ -4,7 +4,11 @@ import BsdAdditionalActionsButton from "./BsdAdditionalActionsButton";
 import { BsdDisplay, BsdStatusCode } from "Apps/Common/types/bsdTypes";
 import { BsdType, EmitterType } from "generated/graphql/types";
 
-const bsd = { id: "1", readableid: "1" } as unknown as BsdDisplay;
+const bsd = {
+  id: "1",
+  readableid: "1",
+  type: BsdType.Bsdd,
+} as BsdDisplay;
 const currentSiret = "12345678901234";
 
 const onOverview = jest.fn();

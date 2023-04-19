@@ -663,6 +663,7 @@ export const hasBsdSuite = (bsd: BsdDisplay, currentSiret): boolean => {
 
 const canUpdateOrDeleteBsdd = bsd =>
   bsd.type === BsdType.Bsdd &&
+  bsd.emitterType !== EmitterType.Appendix1Producer &&
   [BsdStatusCode.Draft, BsdStatusCode.Sealed].includes(bsd.status);
 
 const canDeleteBsda = (bsd, siret) =>
@@ -677,10 +678,16 @@ const canDeleteBsdasri = bsd =>
 const canDeleteBsvhu = bsd =>
   bsd.type === BsdType.Bsvhu && bsd.status === BsdStatusCode.Initial;
 
-export const canDuplicate = bsd =>
-  bsd.type === BsdType.Bsdasri
-    ? bsd.bsdWorkflowType === BsdasriType.Simple
-    : true;
+const canDuplicateBsdasri = bsd =>
+  bsd.type === BsdType.Bsdasri && bsd.bsdWorkflowType === BsdasriType.Simple;
+
+const canDuplicateBsda = bsd => bsd.type === BsdType.Bsda;
+
+const canDuplicateBsvhu = bsd => bsd.type === BsdType.Bsvhu;
+
+const canDuplicateBsdd = bsd =>
+  bsd.type === BsdType.Bsdd &&
+  bsd.emitterType !== EmitterType.Appendix1Producer;
 
 export const canDuplicateBsff = (bsd, siret) => {
   const emitterSiret = bsd.emitter?.company?.siret;
@@ -691,6 +698,13 @@ export const canDuplicateBsff = (bsd, siret) => {
     [emitterSiret, transporterSiret, destinationSiret].includes(siret)
   );
 };
+
+export const canDuplicate = (bsd, siret) =>
+  canDuplicateBsdd(bsd) ||
+  canDuplicateBsdasri(bsd) ||
+  canDuplicateBsff(bsd, siret) ||
+  canDuplicateBsda(bsd) ||
+  canDuplicateBsvhu(bsd);
 
 const canDeleteBsff = (bsd, siret) =>
   bsd.type === BsdType.Bsff &&
