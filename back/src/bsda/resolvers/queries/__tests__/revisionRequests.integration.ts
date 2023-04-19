@@ -153,7 +153,7 @@ describe("Mutation.bsdaRevisionRequests", () => {
       Pick<Query, "bsdaRevisionRequests">,
       QueryBsdaRevisionRequestsArgs
     >(BSDA_REVISION_REQUESTS, {
-      variables: { siret: company.siret, where: { status: "ACCEPTED" } }
+      variables: { siret: company.orgId, where: { status: "ACCEPTED" } }
     });
 
     expect(data.bsdaRevisionRequests.totalCount).toBe(1);
@@ -201,7 +201,7 @@ describe("Mutation.bsdaRevisionRequests", () => {
       Pick<Query, "bsdaRevisionRequests">,
       QueryBsdaRevisionRequestsArgs
     >(BSDA_REVISION_REQUESTS, {
-      variables: { siret: company.siret, where: { bsdaId: { _eq: bsda1.id } } }
+      variables: { siret: company.orgId, where: { bsdaId: { _eq: bsda1.id } } }
     });
 
     expect(data.bsdaRevisionRequests.totalCount).toBe(1);
