@@ -16,7 +16,6 @@ import useOnClickOutsideRefTarget from "../../../../common/hooks/useOnClickOutsi
 import {
   canReviewBsd,
   canDeleteBsd,
-  canDuplicateBsff,
   canDuplicate,
   canUpdateBsd,
   canGeneratePdf,
@@ -182,7 +181,7 @@ function BsdAdditionalActionsButton({
               </button>
             </li>
           )}
-          {(canDuplicate(bsd) || canDuplicateBsff(bsd, currentSiret)) && (
+          {canDuplicate(bsd, currentSiret) && (
             <li>
               <button
                 type="button"

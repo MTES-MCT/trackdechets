@@ -14,20 +14,106 @@ describe("Bsd card primary action label", () => {
   const mocks = [];
 
   describe("case: INITITAL(draft=true)", () => {
-    test("Bsdd", async () => {
-      const bsdd = {
-        id: "cktcnn4ul7181x79soidq7c3i",
-        readableId: "BSD-20210909-0FPXX37GW",
-        customId: null,
-        sentAt: null,
-        emittedAt: null,
-        emittedBy: null,
-        emittedByEcoOrganisme: null,
-        takenOverAt: null,
-        status: "DRAFT",
+    const bsdd = {
+      id: "cktcnn4ul7181x79soidq7c3i",
+      readableId: "BSD-20210909-0FPXX37GW",
+      customId: null,
+      sentAt: null,
+      emittedAt: null,
+      emittedBy: null,
+      emittedByEcoOrganisme: null,
+      takenOverAt: null,
+      status: "DRAFT",
+      wasteDetails: {
+        code: "15 01 11*",
+        name: "emballages amiante",
+        packagingInfos: [
+          {
+            type: "GRV",
+            other: "",
+            quantity: 5,
+            __typename: "PackagingInfo",
+          },
+          {
+            type: "AUTRE",
+            other: "sac",
+            quantity: 2,
+            __typename: "PackagingInfo",
+          },
+        ],
+        __typename: "WasteDetails",
+      },
+      emitter: {
+        type: "OTHER",
+        isPrivateIndividual: false,
+        company: {
+          siret: "81232991000010",
+          name: "BOULANGERIE AU 148",
+          omiNumber: null,
+          __typename: "FormCompany",
+        },
+        isForeignShip: false,
+        __typename: "Emitter",
+      },
+      recipient: {
+        company: {
+          siret: "13001045700013",
+          name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          __typename: "FormCompany",
+        },
+        isTempStorage: true,
+        __typename: "Recipient",
+      },
+      transporter: {
+        company: {
+          siret: "13001045700013",
+          __typename: "FormCompany",
+        },
+        numberPlate: null,
+        customInfo: null,
+        __typename: "Transporter",
+      },
+      ecoOrganisme: {
+        siret: "42248908800035",
+        __typename: "FormEcoOrganisme",
+      },
+      stateSummary: {
+        transporterCustomInfo: null,
+        transporterNumberPlate: null,
+        transporter: {
+          siret: "13001045700013",
+          name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          __typename: "FormCompany",
+        },
+        recipient: {
+          siret: "13001045700013",
+          name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          __typename: "FormCompany",
+        },
+        emitter: {
+          siret: "81232991000010",
+          name: "BOULANGERIE AU 148",
+          __typename: "FormCompany",
+        },
+        __typename: "StateSummary",
+      },
+      temporaryStorageDetail: {
+        destination: {
+          company: {
+            siret: "53230142100022",
+            address: "14 Rue des Marchands 17540 Vérines",
+            name: "L'ATELIER DE CELINE",
+            contact: "Céline",
+            phone: "0145454545",
+            mail: "hello@trackdechets.beta.gouv.fr",
+            __typename: "FormCompany",
+          },
+          cap: "CAP2",
+          processingOperation: "D 1",
+          __typename: "Destination",
+        },
+        transporter: null,
         wasteDetails: {
-          code: "15 01 11*",
-          name: "emballages amiante",
           packagingInfos: [
             {
               type: "GRV",
@@ -42,105 +128,19 @@ describe("Bsd card primary action label", () => {
               __typename: "PackagingInfo",
             },
           ],
+          quantity: 19,
+          quantityType: "ESTIMATED",
           __typename: "WasteDetails",
         },
-        emitter: {
-          type: "OTHER",
-          isPrivateIndividual: false,
-          company: {
-            siret: "81232991000010",
-            name: "BOULANGERIE AU 148",
-            omiNumber: null,
-            __typename: "FormCompany",
-          },
-          isForeignShip: false,
-          __typename: "Emitter",
-        },
-        recipient: {
-          company: {
-            siret: "13001045700013",
-            name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-            __typename: "FormCompany",
-          },
-          isTempStorage: true,
-          __typename: "Recipient",
-        },
-        transporter: {
-          company: {
-            siret: "13001045700013",
-            __typename: "FormCompany",
-          },
-          numberPlate: null,
-          customInfo: null,
-          __typename: "Transporter",
-        },
-        ecoOrganisme: {
-          siret: "42248908800035",
-          __typename: "FormEcoOrganisme",
-        },
-        stateSummary: {
-          transporterCustomInfo: null,
-          transporterNumberPlate: null,
-          transporter: {
-            siret: "13001045700013",
-            name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-            __typename: "FormCompany",
-          },
-          recipient: {
-            siret: "13001045700013",
-            name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-            __typename: "FormCompany",
-          },
-          emitter: {
-            siret: "81232991000010",
-            name: "BOULANGERIE AU 148",
-            __typename: "FormCompany",
-          },
-          __typename: "StateSummary",
-        },
-        temporaryStorageDetail: {
-          destination: {
-            company: {
-              siret: "53230142100022",
-              address: "14 Rue des Marchands 17540 Vérines",
-              name: "L'ATELIER DE CELINE",
-              contact: "Céline",
-              phone: "0145454545",
-              mail: "hello@trackdechets.beta.gouv.fr",
-              __typename: "FormCompany",
-            },
-            cap: "CAP2",
-            processingOperation: "D 1",
-            __typename: "Destination",
-          },
-          transporter: null,
-          wasteDetails: {
-            packagingInfos: [
-              {
-                type: "GRV",
-                other: "",
-                quantity: 5,
-                __typename: "PackagingInfo",
-              },
-              {
-                type: "AUTRE",
-                other: "sac",
-                quantity: 2,
-                __typename: "PackagingInfo",
-              },
-            ],
-            quantity: 19,
-            quantityType: "ESTIMATED",
-            __typename: "WasteDetails",
-          },
-          __typename: "TemporaryStorageDetail",
-        },
-        transportSegments: [],
-        currentTransporterSiret: null,
-        nextTransporterSiret: null,
-        __typename: "Form",
-      } as unknown as Form;
+        __typename: "TemporaryStorageDetail",
+      },
+      transportSegments: [],
+      currentTransporterSiret: null,
+      nextTransporterSiret: null,
+      __typename: "Form",
+    } as unknown as Form;
 
+    test("Bsdd", async () => {
       const onValidate = functionMock;
 
       const { queryByTestId } = render(
@@ -169,6 +169,32 @@ describe("Bsd card primary action label", () => {
       expect(queryByTestId("bsd-review-btn")).toBeFalsy();
       expect(screen.getByTestId("bsd-duplicate-btn")).toBeInTheDocument();
       expect(screen.getByTestId("bsd-update-btn")).toBeInTheDocument();
+      expect(queryByTestId("bsd-pdf-btn")).toBeFalsy();
+    });
+
+    test("Bsdd emitterType appendix1_producer", async () => {
+      const onValidate = functionMock;
+
+      const { queryByTestId } = render(
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BsdCard
+            currentSiret={siretEmmiter}
+            bsd={{ ...bsdd, emitter: { type: "APPENDIX1_PRODUCER" } } as Form}
+            onValidate={onValidate}
+            onUpdate={functionMock}
+            onOverview={functionMock}
+          />
+        </MockedProvider>
+      );
+
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
+      fireEvent.click(buttonActions);
+      expect(screen.getByTestId("bsd-overview-btn")).toBeInTheDocument();
+      expect(queryByTestId("bsd-delete-btn")).toBeFalsy();
+      expect(queryByTestId("bsd-review-btn")).toBeFalsy();
+      expect(queryByTestId("bsd-duplicate-btn")).toBeFalsy();
+      expect(queryByTestId("bsd-update-btn")).toBeFalsy();
       expect(queryByTestId("bsd-pdf-btn")).toBeFalsy();
     });
 
@@ -484,7 +510,7 @@ describe("Bsd card primary action label", () => {
       expect(screen.getByTestId("bsd-overview-btn")).toBeInTheDocument();
       expect(queryByTestId("bsd-delete-btn")).toBeFalsy();
 
-      expect(screen.getByTestId("bsd-duplicate-btn")).toBeInTheDocument();
+      expect(queryByTestId("bsd-duplicate-btn")).toBeFalsy();
       expect(queryByTestId("bsd-update-btn")).toBeFalsy();
       expect(screen.getByTestId("bsd-pdf-btn")).toBeInTheDocument();
     });
