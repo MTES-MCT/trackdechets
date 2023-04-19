@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { formatDate } from "common/datetime";
 import {
   Transporter,
@@ -10,6 +10,8 @@ import {
   TransporterInput,
 } from "generated/graphql/types";
 import { Alert, Row } from "@dataesr/react-dsfr";
+import { isForeignVat } from "generated/constants/companySearchHelpers";
+import { isExemptedOfReceiptFn } from "./utils";
 
 interface UniversalRecepisse {
   /** Numéro de récépissé */
@@ -33,6 +35,9 @@ export default function TransporterReceipt({
 }: {
   transporter: UniversalTransporter;
 }) {
+  const isExemptedOfReceipt = useMemo(isExemptedOfReceiptFn(transporter), [
+    transporter,
+  ]);
   const recepisse: UniversalRecepisse = {
     number:
       (transporter as Transporter).receipt ??
@@ -47,7 +52,8 @@ export default function TransporterReceipt({
       (transporter as NotFormTransporter)?.recepisse?.validityLimit ??
       "",
   };
-  return (
+  return !isExemptedOfReceipt &&
+    !isForeignVat(transporter.company?.vatNumber!!) ? (
     <Row spacing="mb-2w mt-2w">
       <Alert
         title={"Récépissé de déclaration de transport de déchets"}
@@ -73,5 +79,7 @@ export default function TransporterReceipt({
         }
       />
     </Row>
+  ) : (
+    <></>
   );
 }

@@ -98,20 +98,6 @@ export default function CompanySelector({
         | Maybe<BsffFormTransporterInput>;
     }>();
 
-  const isExemptedOfReceipt = useMemo(
-    () =>
-      !!(values.transporter as Transporter)?.isExemptedOfReceipt
-        ? (values.transporter as Transporter).isExemptedOfReceipt
-        : !!(values.transporter as BsdaTransporter)?.recepisse?.isExempted
-        ? (values.transporter as BsdaTransporter)?.recepisse?.isExempted
-        : // BSFF form as specific values
-        !!(values.transporter as BsffFormTransporterInput)
-            ?.isExemptedOfRecepisse
-        ? (values.transporter as BsffFormTransporterInput)
-            ?.isExemptedOfRecepisse
-        : false,
-    [values.transporter]
-  );
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
     (field.value?.country && field.value?.country !== "FR") ||
@@ -580,13 +566,9 @@ export default function CompanySelector({
           <RedErrorMessage name={`${field.name}.mail`} />
         </div>
 
-        {values.transporter &&
-          !!orgId &&
-          !isForeignCompany &&
-          !isExemptedOfReceipt &&
-          name === "transporter.company" && (
-            <TransporterReceipt transporter={values.transporter} />
-          )}
+        {values.transporter && !!orgId && name === "transporter.company" && (
+          <TransporterReceipt transporter={values.transporter} />
+        )}
       </div>
     </>
   );
