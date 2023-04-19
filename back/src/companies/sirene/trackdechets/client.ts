@@ -181,13 +181,16 @@ export const searchCompanies = (
         // the field 'td_search_companies' is created during indexation from the copy of multiple fields
         // check this in search/src/indexation code.
         td_search_companies: {
-          query: qs
+          query: qs,
+          // the query will match the phrase "quick brown fox" with up to 2 positions between the terms.
+          // So it matches "the quick brown fox" and "the brown quick fox" but not "the quick fox brown"
+          slop: 2
         }
       }
     }
   ];
 
-  if (department && department.length >= 2 && department.length <= 3) {
+  if (department?.length === 2 || department?.length === 3) {
     // this might a french department code
     must.push({
       wildcard: { codePostalEtablissement: `${department}*` }

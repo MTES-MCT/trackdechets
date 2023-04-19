@@ -1,10 +1,6 @@
 import { searchCompanies as searchCompaniesInsee } from "./insee/client";
 import { searchCompanies as searchCompaniesTD } from "./trackdechets/client";
-import {
-  backoffIfTestEnvs,
-  backoffIfTooManyRequests,
-  throttle
-} from "./ratelimit";
+import { backoffIfTestEnvs, backoffIfTooManyRequests } from "./ratelimit";
 import { redundant } from "./redundancy";
 import { SireneSearchResult } from "./types";
 
