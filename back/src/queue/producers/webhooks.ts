@@ -1,13 +1,12 @@
 // eslint-disable-next-line import/no-named-as-default
 import Queue from "bull";
-
+import prisma from "../../prisma";
 import {
   INDEX_CREATED_JOB_NAME,
   INDEX_UPDATED_JOB_NAME,
   DELETE_JOB_NAME
 } from "./jobNames";
-import { getReadOnlyFormRepository } from "../../forms/repository";
-import { toBsdElastic } from "../../forms/elastic";
+import { getSiretsByTab } from "../../forms/elasticHelpers";
 const { REDIS_URL, NODE_ENV } = process.env;
 
 export type WebhookQueueItem = {
@@ -39,11 +38,23 @@ const jobNames = [
 ];
 
 export const enqueueDeletedFormWebhook = async (id: string) => {
-  const fullForm = await getReadOnlyFormRepository().findFullFormById(id);
+  // avoid usinf form repository to
+  const fullForm = await prisma.form.findUnique({
+    where: { id },
+    include: {
+      forwardedIn: true,
+      transportSegments: true,
+      intermediaries: true
+    }
+  });
   if (!fullForm) return;
-  const bsdElastic = toBsdElastic(fullForm);
-  const { sirets } = bsdElastic;
-  return scheduleWebhook(fullForm.readableId, sirets, DELETE_JOB_NAME);
+  const siretsByTab = getSiretsByTab(fullForm);
+
+  return scheduleWebhook(
+    fullForm.readableId,
+    Object.values(siretsByTab).flat(),
+    DELETE_JOB_NAME
+  );
 };
 
 export const scheduleWebhook = (
