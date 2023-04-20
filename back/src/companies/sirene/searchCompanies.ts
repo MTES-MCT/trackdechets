@@ -1,11 +1,6 @@
 import { searchCompanies as searchCompaniesInsee } from "./insee/client";
-import { searchCompanies as searchCompaniesSocialGouv } from "./social.gouv/client";
 import { searchCompanies as searchCompaniesTD } from "./trackdechets/client";
-import {
-  backoffIfTestEnvs,
-  backoffIfTooManyRequests,
-  throttle
-} from "./ratelimit";
+import { backoffIfTestEnvs, backoffIfTooManyRequests } from "./ratelimit";
 import { redundant } from "./redundancy";
 import { SireneSearchResult } from "./types";
 
@@ -15,21 +10,11 @@ const searchCompaniesInseeThrottled = backoffIfTestEnvs<SireneSearchResult[]>(
   })
 );
 
-const searchCompaniesSocialGouvThrottled = backoffIfTestEnvs<
-  SireneSearchResult[]
->(
-  throttle(searchCompaniesSocialGouv, {
-    service: "social_gouv",
-    requestsPerSeconds: 50
-  })
-);
-
 // list different implementations of searchCompanies by
 // order of priority.
 const searchCompaniesProviders = [
   searchCompaniesTD,
-  searchCompaniesInseeThrottled,
-  searchCompaniesSocialGouvThrottled
+  searchCompaniesInseeThrottled
 ];
 
 /**

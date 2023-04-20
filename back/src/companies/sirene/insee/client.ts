@@ -151,6 +151,8 @@ export function searchCompanies(
 
   const searchUrl = `${SIRENE_API_BASE_URL}/siret?q=${q}`;
 
+  // API docs https://api.insee.fr/catalogue/site/themes/wso2/subthemes/insee/pages/item-info.jag?name=Sirene&version=V3&provider=insee#!/Etablissement/findSiretByQ
+  // Nombre d'éléments demandés dans la réponse, défaut 20
   return authorizedAxiosGet<FullTextSearchResponseInsee>(searchUrl)
     .then(r => {
       return fullTextSearchResponseToCompanies(r.data);
