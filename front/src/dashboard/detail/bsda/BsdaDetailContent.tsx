@@ -161,6 +161,10 @@ const Transporter = ({ form }: { form: Bsda }) => {
         <Company label="Transporteur" company={transporter?.company} />
       </div>
       <div className={styles.detailGrid}>
+        <YesNoRow
+          value={transporter?.recepisse?.isExempted}
+          label="Exemption de récépissé"
+        />
         <DetailRow
           value={transporter?.recepisse?.number}
           label="Numéro de récépissé"
