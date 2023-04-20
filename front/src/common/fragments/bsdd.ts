@@ -255,6 +255,7 @@ const mutableFieldsFragment = gql`
             name
             siret
           }
+          isPrivateIndividual
         }
         transporter {
           company {

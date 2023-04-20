@@ -27,7 +27,7 @@ export function buildUpdatWebhookSettings(
 
     const webhookSetting = await prisma.webhookSetting.update({ where, data });
     await delWebhookSetting(webhookSetting.orgId);
-    console.log(webhookSetting);
+
     if (webhookSetting.activated) {
       await setWebhookSetting(webhookSetting);
     }
