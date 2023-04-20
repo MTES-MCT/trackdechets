@@ -264,10 +264,9 @@ describe("searchCompanies", () => {
             bool: {
               must: [
                 {
-                  match_phrase_prefix: {
+                  match: {
                     td_search_companies: {
-                      query: "ACME OF TRACKDECHETS",
-                      slop: 2
+                      query: "ACME OF TRACKDECHETS"
                     }
                   }
                 }
