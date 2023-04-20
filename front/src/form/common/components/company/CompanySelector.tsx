@@ -20,7 +20,6 @@ import { debounce } from "common/helper";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import {
   BsdasriTransporterInput,
-  BsdaTransporter,
   BsdaTransporterInput,
   BsvhuTransporterInput,
   CompanyFavorite,
@@ -33,7 +32,6 @@ import {
   QueryCompanyPrivateInfosArgs,
   QueryFavoritesArgs,
   QuerySearchCompaniesArgs,
-  Transporter,
   TransporterInput,
 } from "generated/graphql/types";
 import { useParams } from "react-router-dom";
