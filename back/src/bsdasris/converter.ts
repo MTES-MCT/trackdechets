@@ -42,6 +42,7 @@ import { BsdElastic } from "../common/elastic";
 import { Prisma, Bsdasri, BsdasriStatus } from "@prisma/client";
 import { Decimal } from "decimal.js-light";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
+import bsdas from "../bsda/resolvers/queries/bsdas";
 
 export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
   return {
@@ -112,6 +113,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
       }),
       customInfo: bsdasri.transporterCustomInfo,
       recepisse: nullIfNoValues({
+        ixExempted: bsdasri.transporterRecepisseIsExempted,
         department: bsdasri.transporterRecepisseDepartment,
         number: bsdasri.transporterRecepisseNumber,
         validityLimit: processDate(bsdasri.transporterRecepisseValidityLimit)

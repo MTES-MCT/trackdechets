@@ -28,7 +28,11 @@ import {
   getVerboseWeightType,
   getVerboseAcceptationStatus,
 } from "dashboard/detail/common/utils";
-import { DateRow, DetailRow } from "dashboard/detail/common/Components";
+import {
+  DateRow,
+  DetailRow,
+  YesNoRow,
+} from "dashboard/detail/common/Components";
 
 import classNames from "classnames";
 
@@ -138,6 +142,10 @@ const Transporter = ({ form }: { form: Bsdasri }) => {
         <Company label="Transporteur" company={transporter?.company} />
       </div>
       <div className={styles.detailGrid}>
+        <YesNoRow
+          value={transporter?.recepisse?.isExempted}
+          label="Exemption de récépissé"
+        />
         <DetailRow
           value={transporter?.recepisse?.number}
           label="Numéro de récépissé"

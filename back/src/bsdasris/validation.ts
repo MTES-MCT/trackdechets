@@ -336,42 +336,39 @@ export const transporterSchema: FactorySchemaOf<
         `Transporteur: ${MISSING_COMPANY_PHONE}`
       ),
     transporterCompanyMail: yup.string().email().ensure(),
-    transporterRecepisseNumber: yup
-      .string()
-      .ensure()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva || !isForeignVat(tva)) {
-          return schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: le numéro de récépissé est obligatoire`
-          );
-        }
-        return schema.notRequired();
-      }),
-
+    transporterRecepisseIsExempted: yup.boolean().nullable(),
     transporterRecepisseDepartment: yup
       .string()
-      .ensure()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva || !isForeignVat(tva)) {
-          return schema.requiredIf(
+      .when(["transporterRecepisseIsExempted", "transporterCompanyVatNumber"], {
+        is: (isExempted, vat) => isExempted || isForeignVat(vat),
+        then: schema => schema.nullable().notRequired(),
+        otherwise: schema =>
+          schema.requiredIf(
             context.transportSignature,
             `Transporteur: le département associé au récépissé est obligatoire`
-          );
-        }
-        return schema.nullable().notRequired();
+          )
       }),
-
+    transporterRecepisseNumber: yup
+      .string()
+      .when(["transporterRecepisseIsExempted", "transporterCompanyVatNumber"], {
+        is: (isExempted, vat) => isExempted || isForeignVat(vat),
+        then: schema => schema.nullable().notRequired(),
+        otherwise: schema =>
+          schema.requiredIf(
+            context.transportSignature,
+            `Transporteur: le numéro de récépissé est obligatoire`
+          )
+      }),
     transporterRecepisseValidityLimit: yup
       .date()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva || !isForeignVat(tva)) {
-          return schema.requiredIf(
-            context.transportSignature || requiredForSynthesis,
-            "La date de validité du récépissé est obligatoire"
-          );
-        }
-        return schema.nullable().notRequired();
+      .when(["transporterRecepisseIsExempted", "transporterCompanyVatNumber"], {
+        is: (isExempted, vat) => isExempted || isForeignVat(vat),
+        then: schema => schema.nullable().notRequired(),
+        otherwise: schema =>
+          schema.requiredIf(
+            context.transportSignature,
+            `Transporteur: la date limite de validité du récépissé est obligatoire`
+          )
       })
   });
 };

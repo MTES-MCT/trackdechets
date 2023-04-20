@@ -1,6 +1,7 @@
 import React from "react";
 import { Document, formatDate, SignatureStamp } from "../../../common/pdf";
 import { Bsvhu } from "../../../generated/graphql/types";
+import { Recepisse } from "./Recepisse";
 
 const IDENTIFICATION_TYPES_LABELS = {
   NUMERO_ORDRE_REGISTRE_POLICE:
@@ -304,18 +305,15 @@ export function BsvhuPdf({ bsvhu, qrCode }: Props) {
           </div>
 
           <div className="BoxCol">
-            <p className="mb-3">
-              Récépissé n° : {bsvhu?.transporter?.recepisse?.number}
-            </p>
-            <div>
-              <p className="mb-3">
-                Département : {bsvhu?.transporter?.recepisse?.department}
+            {bsvhu?.transporter?.recepisse?.isExempted ? (
+              <p>
+                Le transporteur déclare être exempté de récépissé conformément
+                aux dispositions de l'article R.541-50 du code de
+                l'environnement.
               </p>
-              <p className="mb-3">
-                Date limite de validité :{" "}
-                {formatDate(bsvhu?.transporter?.recepisse?.validityLimit)}
-              </p>
-            </div>
+            ) : (
+              <Recepisse recepisse={bsvhu?.transporter?.recepisse} />
+            )}
             <p className="mb-3">
               Date de prise en charge :{" "}
               {formatDate(bsvhu?.transporter?.transport?.takenOverAt)}
@@ -370,7 +368,9 @@ export function BsvhuPdf({ bsvhu, qrCode }: Props) {
                 Adresse : {bsvhu?.destination?.company?.address}
               </p>
               <div className="Flex">
-                <p className="mb-3">Tel : {bsvhu.destination?.company?.phone}</p>
+                <p className="mb-3">
+                  Tel : {bsvhu.destination?.company?.phone}
+                </p>
                 <p className="mb-3 ml-12">
                   Mail : {bsvhu.destination?.company?.mail}
                 </p>
