@@ -12,6 +12,7 @@ export interface BsffFragment {
   };
   bsffTransporter?: {
     company?: {
+      orgId: string;
       siret?: string;
       name?: string;
     };
