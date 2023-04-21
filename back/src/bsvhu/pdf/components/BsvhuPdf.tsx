@@ -1,4 +1,4 @@
-import React from "react";
+import * as React from "react";
 import { Document, formatDate, SignatureStamp } from "../../../common/pdf";
 import { Bsvhu } from "../../../generated/graphql/types";
 import { Recepisse } from "./Recepisse";
