@@ -90,8 +90,6 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                 styles.BSDDActionsMenu
               )}
             >
-              <TableRoadControlButton siret={siret} form={form} />
-
               <MenuLink
                 as={Link}
                 to={{
