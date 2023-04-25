@@ -7,5 +7,6 @@ module.exports = {
     "^src/(.*)$": "<rootDir>/$1",
     "^tests/(.*)$": "<rootDir>/../tests/$1"
   },
-  setupFilesAfterEnv: ["../jest.setup.ts"]
+  setupFilesAfterEnv: ["../jest.setup.ts"],
+  reporters: ["default", "github-actions"]
 };

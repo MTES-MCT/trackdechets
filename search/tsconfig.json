@@ -3,7 +3,7 @@
     "experimentalDecorators": true,
     "moduleResolution": "node",
 		"module": "CommonJS",
-		"lib": ["es2020", "esnext.asynciterable", "dom"],
+		"lib": ["es2020", "esnext.asynciterable"],
     "outDir": "dist",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -16,6 +16,10 @@
     "strictFunctionTypes": false,
     "strictNullChecks": true,
     "strictPropertyInitialization": false,
+    "sourceMap": true,
+    "inlineSources": true,
+    "sourceRoot": "/",
+    "types": ["node", "jest"]
   },
   "include": ["src/**/*"]
 }
