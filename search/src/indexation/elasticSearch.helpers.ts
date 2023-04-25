@@ -17,7 +17,8 @@ import { elasticSearchClient as client } from "..";
 import {
   ElasticBulkIndexError,
   ElasticBulkNonFlatPayload,
-  IndexProcessConfig
+  ElasticBulkNonFlatPayloadWithNull,
+  IndexProcessConfig,
 } from "./types";
 import { INDEX_ALIAS_NAME_SEPARATOR } from "./indexInsee.helpers";
 
@@ -25,7 +26,7 @@ const pipeline = util.promisify(stream.pipeline);
 var pjson = require("../../../package.json");
 
 // Max size of documents to bulk index, depends on ES JVM memory available
-const CHUNK_SIZE: number = parseInt(process.env.INDEX_CHUNK_SIZE, 10) || 10_000;
+const CHUNK_SIZE: number = parseInt(`${process.env.INDEX_CHUNK_SIZE}`, 10) || 10_000;
 
 /**
  * Common index name formatter
@@ -143,9 +144,9 @@ export const bulkIndex = async (
     // append new data to the body before indexation
     if (typeof indexConfig.dataFormatterFn === "function") {
       const formattedChunk = await indexConfig.dataFormatterFn(bodyChunk, indexConfig.dataFormatterExtras);
-      return requestBulkIndex(formattedChunk.flat());
+      return requestBulkIndex(formattedChunk.flat() as BulkOperationContainer[]);
     }
-    return requestBulkIndex(bodyChunk.flat());
+    return requestBulkIndex(bodyChunk.flat() as BulkOperationContainer[]);
   };
 
   /**
@@ -157,22 +158,22 @@ export const bulkIndex = async (
   ) => {
     if (bulkResponse.errors) {
       for (let k = 0; k < bulkResponse.items.length; k++) {
-        const action = bulkResponse.items[k];
+        const action = bulkResponse.items[k]!;
         const operations: string[] = Object.keys(action);
         for (const operation of operations) {
           const opType = operation as BulkOperationType;
-          if (action[opType].error) {
+          if (opType && action[opType]?.error) {
             // If the status is 429 it means that we can retry the document
-            if (action[opType].status === 429) {
+            if (action[opType]?.status === 429) {
               logger.warn(
                 `Retrying index operation for doc ${
-                  body[k * 2].index._id
+                  body[k * 2].index?._id
                 } in index ${indexName}`
               );
               try {
                 await client.index({
                   index: indexName,
-                  id: body[k * 2].index._id as string,
+                  id: body[k * 2].index?._id as string,
                   body: body[k * 2 + 1],
                   type: "_doc",
                   refresh: false
@@ -180,7 +181,7 @@ export const bulkIndex = async (
               } catch (err) {
                 logger.error(
                   `Error retrying index operation for doc ${
-                    body[k * 2].index._id
+                    body[k * 2].index?._id
                   } in index ${indexName}`,
                   err
                 );
@@ -188,8 +189,8 @@ export const bulkIndex = async (
             }
             // otherwise it's very likely a mapping error, and you should fix the document content
             const elasticBulkIndexError: ElasticBulkIndexError = {
-              status: action[opType].status,
-              error: action[opType].error,
+              status: action[opType]?.status!,
+              error: action[opType]?.error,
               body: body[k * 2 + 1]
             };
             logger.error(`Error in bulkIndex operation`, {
@@ -227,7 +228,7 @@ export const getWritableParserAndIndexer = (
     highWaterMark: 100_000,
     objectMode: true,
     writev: (csvLines, next) => {
-      const body: ElasticBulkNonFlatPayload = csvLines.map((chunk, i) => {
+      const body: ElasticBulkNonFlatPayloadWithNull = csvLines.map((chunk, i)  => {
         const doc = chunk.chunk;
         // skip lines without "idKey" column because we cannot miss the _id in ES
         if (
@@ -258,7 +259,7 @@ export const getWritableParserAndIndexer = (
       });
 
       bulkIndex(
-        body.filter(line => line !== null),
+        body.filter(line => line !== null) as ElasticBulkNonFlatPayload,
         indexConfig,
         indexName
       )
@@ -283,7 +284,7 @@ export const unzipAndIndex = async (
   const headers = indexConfig.headers;
   const writableStream = getWritableParserAndIndexer(indexConfig, indexName);
   // stop after MAX_ROWS
-  const maxRows = parseInt(process.env.MAX_ROWS, 10);
+  const maxRows = parseInt(process.env.MAX_ROWS as string, 10);
   await pipeline(
     fs.createReadStream(csvPath),
     parse({
@@ -323,7 +324,7 @@ export const downloadAndIndex = async (
   return new Promise((resolve, reject) => {
     https
       .get(url, res => {
-        const contentLength = parseInt(res.headers["content-length"], 10);
+        const contentLength = parseInt(res.headers["content-length"] as string, 10);
         logger.info(
           `Start downloading the INSEE archive of ${
             contentLength / 1000000
