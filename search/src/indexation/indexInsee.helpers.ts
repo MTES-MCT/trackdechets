@@ -203,7 +203,15 @@ export const siretIndexConfig: IndexProcessConfig = {
           copy_to: "td_search_companies"
         },
         td_search_companies: {
-          type: "text"
+          type: "text",
+          fields: {
+            keyword: {
+              type: "keyword"
+            },
+            wildcard: {
+              type: "wildcard"
+            }
+          }
         }
       }
     }
