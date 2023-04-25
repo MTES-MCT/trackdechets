@@ -174,15 +174,14 @@ export const searchCompanies = (
   requestOptions?
 ): Promise<SireneSearchResult[]> => {
   const qs = removeDiacritics(clue);
+  const tokens = qs.split(/\s/);
   // Match query on the merged field td_search_companies
   const must: estypes.QueryDslQueryContainer[] = [
     {
-      match: {
+      terms: {
         // the field 'td_search_companies' is created during indexation from the copy of multiple fields
         // check this in search/src/indexation code.
-        td_search_companies: {
-          query: qs
-        }
+        "td_search_companies.keyword": tokens
       }
     }
   ];
