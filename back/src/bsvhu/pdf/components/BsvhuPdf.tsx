@@ -195,7 +195,7 @@ export function BsvhuPdf({ bsvhu, qrCode }: Props) {
                 checked={removeSpaces(bsvhu?.wasteCode) === "160104*"}
               />{" "}
               <label htmlFor="16 01 04*">
-                <strong>16 01 04*</strong> (véhicules hors d’usage non dépollué
+                <strong>16 01 04*</strong> (Véhicules hors d’usage non dépollués
                 par un centre agréé)
               </label>
             </div>
