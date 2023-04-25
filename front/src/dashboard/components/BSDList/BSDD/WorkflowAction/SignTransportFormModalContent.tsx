@@ -112,7 +112,6 @@ function SignTransportFormModalContent({
 
   return (
     <>
-      <h2 className="td-modal-title">{title}</h2>
       <Formik
         initialValues={{
           takenOverBy: "",
