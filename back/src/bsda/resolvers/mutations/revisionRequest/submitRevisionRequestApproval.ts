@@ -42,35 +42,40 @@ export async function submitBsdaRevisionRequestApproval(
     );
   }
 
-  const currentApproverSiret = await getCurrentApproverSiret(
+  const currentApproverSirets = await getCurrentApproverSirets(
     user,
     revisionRequest
   );
-  const approval = revisionRequest.approvals.find(
-    approval => approval.approverSiret === currentApproverSiret
-  );
 
-  if (!approval) {
-    throw new UserInputError("Vous n'êtes pas approbateur de cette révision.");
-  }
+  for (const currentApproverSiret of currentApproverSirets) {
+    const approval = revisionRequest.approvals.find(
+      approval => approval.approverSiret === currentApproverSiret
+    );
 
-  if (isApproved) {
-    await bsdaRepository.acceptRevisionRequestApproval(approval.id, {
-      comment
-    });
-  } else {
-    await bsdaRepository.refuseRevisionRequestApproval(approval.id, {
-      comment
-    });
+    if (!approval) {
+      throw new UserInputError(
+        "Vous n'êtes pas approbateur de cette révision."
+      );
+    }
+
+    if (isApproved) {
+      await bsdaRepository.acceptRevisionRequestApproval(approval.id, {
+        comment
+      });
+    } else {
+      await bsdaRepository.refuseRevisionRequestApproval(approval.id, {
+        comment
+      });
+    }
   }
 
   return bsdaRepository.findUniqueRevisionRequest({ id });
 }
 
-async function getCurrentApproverSiret(
+async function getCurrentApproverSirets(
   user: User,
   revisionRequest: BsdaRevisionRequestWithApprovals
-) {
+): Promise<string[]> {
   const remainingApproverSirets = revisionRequest.approvals
     .filter(approval => approval.status === Status.PENDING)
     .map(approvals => approvals.approverSiret);
@@ -79,15 +84,16 @@ async function getCurrentApproverSiret(
   const userOrgIds = Object.keys(roles).filter(orgId =>
     can(roles[orgId], Permission.BsdCanRevise)
   );
-  const approvingCompaniesCandidate = userOrgIds.find(orgId =>
+
+  const approvingCompaniesCandidates = userOrgIds.filter(orgId =>
     remainingApproverSirets.includes(orgId)
   );
 
-  if (!approvingCompaniesCandidate) {
+  if (!approvingCompaniesCandidates.length) {
     throw new ForbiddenError(
       "Vous n'êtes pas destinataire de cette révision, ou alors cette révision a déjà été approuvée."
     );
   }
 
-  return approvingCompaniesCandidate;
+  return approvingCompaniesCandidates;
 }

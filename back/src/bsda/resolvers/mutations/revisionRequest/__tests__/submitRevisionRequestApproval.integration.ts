@@ -1,5 +1,8 @@
 import { resetDatabase } from "../../../../../../integration-tests/helper";
-import { userWithCompanyFactory } from "../../../../../__tests__/factories";
+import {
+  companyAssociatedToExistingUserFactory,
+  userWithCompanyFactory
+} from "../../../../../__tests__/factories";
 import makeClient from "../../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../../__tests__/factories";
 import prisma from "../../../../../prisma";
@@ -691,5 +694,119 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
 
     expect(updatedForwarding.forwardingId).toBe(null);
     expect(updatedForwarding.forwarding).toBe(null);
+  });
+
+  it("if user has numerous companies involved in the bsd, his approbation should work for all companies", async () => {
+    const { user: producerAndTransporter, company: producerCompany } =
+      await userWithCompanyFactory("ADMIN");
+    const transporterCompany = await companyAssociatedToExistingUserFactory(
+      producerAndTransporter,
+      "ADMIN"
+    );
+    const { user: workerAndDestination, company: workCompany } =
+      await userWithCompanyFactory("ADMIN");
+    const destinationCompany = await companyAssociatedToExistingUserFactory(
+      workerAndDestination,
+      "ADMIN"
+    );
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: producerCompany.siret,
+        transporterCompanySiret: transporterCompany.siret,
+        workerCompanySiret: workCompany.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        status: "SENT"
+      }
+    });
+
+    const revisionRequest = await prisma.bsdaRevisionRequest.create({
+      data: {
+        bsdaId: bsda.id,
+        authoringCompanyId: producerCompany.id,
+        approvals: {
+          create: [
+            { approverSiret: workCompany.siret! },
+            { approverSiret: destinationCompany.siret! }
+          ]
+        },
+        comment: "Cancel",
+        isCanceled: true
+      }
+    });
+
+    const { mutate } = makeClient(workerAndDestination);
+    await mutate<
+      Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+      MutationSubmitBsdaRevisionRequestApprovalArgs
+    >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    const updatedBsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id }
+    });
+
+    expect(updatedBsda.status).toBe("CANCELED");
+  });
+
+  it("if user has numerous companies involved in the bsd, his refusal should work for all companies", async () => {
+    const { user: producerAndTransporter, company: producerCompany } =
+      await userWithCompanyFactory("ADMIN");
+    const transporterCompany = await companyAssociatedToExistingUserFactory(
+      producerAndTransporter,
+      "ADMIN"
+    );
+    const { user: workerAndDestination, company: workCompany } =
+      await userWithCompanyFactory("ADMIN");
+    const destinationCompany = await companyAssociatedToExistingUserFactory(
+      workerAndDestination,
+      "ADMIN"
+    );
+
+    const bsda = await bsdaFactory({
+      opt: {
+        emitterCompanySiret: producerCompany.siret,
+        transporterCompanySiret: transporterCompany.siret,
+        workerCompanySiret: workCompany.siret,
+        destinationCompanySiret: destinationCompany.siret,
+        status: "SENT"
+      }
+    });
+
+    const revisionRequest = await prisma.bsdaRevisionRequest.create({
+      data: {
+        bsdaId: bsda.id,
+        authoringCompanyId: producerCompany.id,
+        approvals: {
+          create: [
+            { approverSiret: workCompany.siret! },
+            { approverSiret: destinationCompany.siret! }
+          ]
+        },
+        comment: "Cancel",
+        isCanceled: true
+      }
+    });
+
+    const { mutate } = makeClient(workerAndDestination);
+    await mutate<
+      Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+      MutationSubmitBsdaRevisionRequestApprovalArgs
+    >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: false
+      }
+    });
+
+    const updatedBsda = await prisma.bsda.findUniqueOrThrow({
+      where: { id: bsda.id }
+    });
+
+    expect(updatedBsda.status).toBe("SENT");
   });
 });
