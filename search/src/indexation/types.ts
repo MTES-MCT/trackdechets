@@ -39,6 +39,10 @@ type ElasticBulkPayloadDocument = Record<string, any>;
 /**
  * Preprocessing Bulk payload
  */
+export type ElasticBulkNonFlatPayloadWithNull = Array<
+  [ElasticBulkPrepayload, ElasticBulkPayloadDocument] | null
+>;
+
 export type ElasticBulkNonFlatPayload = Array<
   [ElasticBulkPrepayload, ElasticBulkPayloadDocument]
 >;
