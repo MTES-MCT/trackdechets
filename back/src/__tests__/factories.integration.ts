@@ -25,7 +25,7 @@ describe("Test Factories", () => {
     const company = await companyFactory();
 
     expect(company.id).toBeTruthy();
-    expect(company.siret.length).toBe(14);
+    expect(company.siret!.length).toBe(14);
   });
 
   test("should create a user with a company", async () => {
@@ -49,7 +49,7 @@ describe("Test Factories", () => {
       }
     });
 
-    const companyAssociations = usr.companyAssociations;
+    const companyAssociations = usr!.companyAssociations;
     expect(companyAssociations.length).toBe(1);
     expect([...companyAssociations[0].company.companyTypes]).toMatchObject([
       "PRODUCER",
@@ -82,7 +82,7 @@ describe("Test Factories", () => {
       }
     });
 
-    const companyAssociations = usr.companyAssociations;
+    const companyAssociations = usr!.companyAssociations;
     expect(companyAssociations.length).toBe(1);
     expect(companyAssociations[0].company.siret).toBe(company.siret);
 
@@ -159,5 +159,5 @@ test("should create a transport segment", async () => {
   const segments = await prisma.form
     .findUnique({ where: { id: frm.id } })
     .transportSegments();
-  expect(segments.length).toEqual(1);
+  expect(segments!.length).toEqual(1);
 });

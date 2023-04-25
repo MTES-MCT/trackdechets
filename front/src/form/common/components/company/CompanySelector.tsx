@@ -19,14 +19,20 @@ import React, { useMemo, useRef, useState } from "react";
 import { debounce } from "common/helper";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 import {
+  BsdasriTransporterInput,
+  BsdaTransporterInput,
+  BsvhuTransporterInput,
   CompanyFavorite,
   CompanySearchResult,
+  CompanySearchPrivate,
   FavoriteType,
   FormCompany,
+  Maybe,
   Query,
   QueryCompanyPrivateInfosArgs,
   QueryFavoritesArgs,
   QuerySearchCompaniesArgs,
+  TransporterInput,
 } from "generated/graphql/types";
 import { useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
@@ -37,12 +43,16 @@ import {
   FAVORITES,
   SEARCH_COMPANIES,
 } from "./query";
+import TransporterReceipt from "./TransporterReceipt";
+import { BsffFormTransporterInput } from "form/bsff/utils/initial-state";
 
 const DEBOUNCE_DELAY = 500;
 
 interface CompanySelectorProps {
   name: string;
-  onCompanySelected?: (company: CompanySearchResult) => void;
+  onCompanySelected?: (
+    company: CompanySearchResult | CompanySearchPrivate
+  ) => void;
   allowForeignCompanies?: boolean;
   registeredOnlyCompanies?: boolean;
   heading?: string;
@@ -76,7 +86,16 @@ export default function CompanySelector({
     name: field.value?.name,
     address: field.value?.address,
   });
-  const { setFieldError, setFieldValue, setFieldTouched } = useFormikContext();
+  const { setFieldError, setFieldValue, setFieldTouched, values } =
+    useFormikContext<{
+      transporter:
+        | Maybe<TransporterInput>
+        | Maybe<BsdaTransporterInput>
+        | Maybe<BsdasriTransporterInput>
+        | Maybe<BsvhuTransporterInput>
+        | Maybe<BsffFormTransporterInput>;
+    }>();
+
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
     (field.value?.country && field.value?.country !== "FR") ||
@@ -541,6 +560,10 @@ export default function CompanySelector({
 
           <RedErrorMessage name={`${field.name}.mail`} />
         </div>
+
+        {values.transporter && !!orgId && name === "transporter.company" && (
+          <TransporterReceipt transporter={values.transporter} />
+        )}
       </div>
     </>
   );

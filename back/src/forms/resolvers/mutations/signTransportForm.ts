@@ -31,7 +31,7 @@ const signedByTransporterFn = async (
     );
   }
   await checkCanSignFor(
-    getTransporterCompanyOrgId(existingForm),
+    getTransporterCompanyOrgId(existingForm)!,
     user,
     args.securityCode
   );
@@ -152,10 +152,12 @@ const signatures: Partial<
     const isAppendix1WithAutomaticSignature =
       existingForm.emitterType === EmitterType.APPENDIX1_PRODUCER &&
       (existingForm.ecoOrganismeSiret ||
-        (await hasSignatureAutomation({
-          signedBy: existingForm.transporterCompanySiret,
-          signedFor: existingForm.emitterCompanySiret
-        })));
+        (existingForm.transporterCompanySiret &&
+          existingForm.emitterCompanySiret &&
+          (await hasSignatureAutomation({
+            signedBy: existingForm.transporterCompanySiret,
+            signedFor: existingForm.emitterCompanySiret
+          }))));
 
     // no signature needed for
     // - individuals
@@ -179,7 +181,7 @@ const signatures: Partial<
     const existingFullForm = await getFullForm(existingForm);
 
     await checkCanSignFor(
-      getTransporterCompanyOrgId(existingFullForm.forwardedIn),
+      getTransporterCompanyOrgId(existingFullForm.forwardedIn)!,
       user,
       args.securityCode
     );
@@ -192,7 +194,7 @@ const signatures: Partial<
           takenOverBy: args.input.takenOverBy,
           transporterNumberPlate:
             args.input.transporterNumberPlate ??
-            existingFullForm.forwardedIn.transporterNumberPlate,
+            existingFullForm.forwardedIn?.transporterNumberPlate,
 
           // The following fields are deprecated
           // but we need to fill them until we remove them completely

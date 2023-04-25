@@ -97,6 +97,21 @@ Dans le cas des erreurs `BAD_USER_INPUT` un champ additionnel `invalidArgs` pour
 }
 ```
 
+* `GRAPHQL_MAX_OPERATIONS_ERROR`: La limite du nombre d'opérations GraphQL groupées est dépassée.
+
+```json
+{
+  "errors": [
+    {
+      "message": "Batching by query merging is limited to 5 operations per query.",
+      "extensions": {
+        "code": "GRAPHQL_MAX_OPERATIONS_ERROR"
+      }
+    }
+  ]
+}
+```
+
 
 ## Liste des codes HTTP
 
@@ -109,6 +124,7 @@ Ci-dessous un tableau récapitulatif des différents codes HTTP et codes GraphQL
 | 200       | BAD_USER_INPUT       | La requête GraphQL est valide mais la valeur des arguments fournis ne l'est pas |
 | 400       | GRAPHQL_PARSE_FAILED | Erreur de syntaxe GraphQL |
 | 400       | GRAPHQL_VALIDATION_FAILED | La syntaxe de la requête GraphQL est correcte mais elle ne correspond pas au schéma |
+| 400       | GRAPHQL_MAX_OPERATIONS_ERROR | La limite du nombre d'opérations GraphQL groupées est dépassée. |
 | 502       |  N/A | Le serveur GraphQL est indisponible |
 | 503       |  N/A | Le serveur GraphQL est indisponible |
 | 504       |  N/A | Le serveur GraphQL met trop de temps à répondre |

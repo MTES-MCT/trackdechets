@@ -21,6 +21,7 @@ function sleep(ms) {
     });
     let counter = 0;
     for (const company of companies) {
+      if (!company.siret) continue;
       counter++;
 
       console.log(`Processing company ${counter}`);

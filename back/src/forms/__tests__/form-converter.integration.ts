@@ -131,22 +131,22 @@ describe("expandFormFromDb", () => {
       },
       destination: {
         cap: "CAP",
-        processingOperation: forwardedIn.recipientProcessingOperation,
+        processingOperation: forwardedIn!.recipientProcessingOperation,
         company: {
-          name: forwardedIn.recipientCompanyName,
-          siret: forwardedIn.recipientCompanySiret,
-          address: forwardedIn.recipientCompanyAddress,
-          contact: forwardedIn.recipientCompanyContact,
-          phone: forwardedIn.recipientCompanyPhone,
-          mail: forwardedIn.recipientCompanyMail
+          name: forwardedIn!.recipientCompanyName,
+          siret: forwardedIn!.recipientCompanySiret,
+          address: forwardedIn!.recipientCompanyAddress,
+          contact: forwardedIn!.recipientCompanyContact,
+          phone: forwardedIn!.recipientCompanyPhone,
+          mail: forwardedIn!.recipientCompanyMail
         },
         isFilledByEmitter: false
       },
       wasteDetails: {
-        code: forwardedIn.wasteDetailsCode,
-        name: forwardedIn.wasteDetailsName,
-        onuCode: forwardedIn.wasteDetailsOnuCode,
-        packagingInfos: forwardedIn.wasteDetailsPackagingInfos,
+        code: forwardedIn!.wasteDetailsCode,
+        name: forwardedIn!.wasteDetailsName,
+        onuCode: forwardedIn!.wasteDetailsOnuCode,
+        packagingInfos: forwardedIn!.wasteDetailsPackagingInfos,
         packagings: ["CITERNE"],
         otherPackaging: undefined,
         numberOfPackages: 1,
@@ -154,26 +154,26 @@ describe("expandFormFromDb", () => {
         quantityType: "ESTIMATED",
         consistence: "SOLID",
         pop: false,
-        isDangerous: forwardedIn.wasteDetailsIsDangerous
+        isDangerous: forwardedIn!.wasteDetailsIsDangerous
       },
       transporter: {
         company: {
-          name: forwardedIn.transporterCompanyName,
-          orgId: forwardedIn.transporterCompanySiret,
-          siret: forwardedIn.transporterCompanySiret,
-          vatNumber: forwardedIn.transporterCompanyVatNumber,
-          address: forwardedIn.transporterCompanyAddress,
-          contact: forwardedIn.transporterCompanyContact,
-          phone: forwardedIn.transporterCompanyPhone,
-          mail: forwardedIn.transporterCompanyMail
+          name: forwardedIn!.transporterCompanyName,
+          orgId: forwardedIn!.transporterCompanySiret,
+          siret: forwardedIn!.transporterCompanySiret,
+          vatNumber: forwardedIn!.transporterCompanyVatNumber,
+          address: forwardedIn!.transporterCompanyAddress,
+          contact: forwardedIn!.transporterCompanyContact,
+          phone: forwardedIn!.transporterCompanyPhone,
+          mail: forwardedIn!.transporterCompanyMail
         },
         isExemptedOfReceipt: false,
-        receipt: forwardedIn.transporterReceipt,
-        department: forwardedIn.transporterDepartment,
-        validityLimit: forwardedIn.transporterValidityLimit,
-        numberPlate: forwardedIn.transporterNumberPlate,
+        receipt: forwardedIn!.transporterReceipt,
+        department: forwardedIn!.transporterDepartment,
+        validityLimit: forwardedIn!.transporterValidityLimit,
+        numberPlate: forwardedIn!.transporterNumberPlate,
         customInfo: null,
-        mode: forwardedIn.transporterTransportMode
+        mode: forwardedIn!.transporterTransportMode
       },
       emittedAt: null,
       emittedBy: null,

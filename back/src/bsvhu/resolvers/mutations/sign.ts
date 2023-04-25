@@ -1,12 +1,10 @@
 import { Bsvhu, BsvhuStatus } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkSecurityCode } from "../../../forms/permissions";
 import {
   MutationSignBsvhuArgs,
   SignatureTypeInput
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
-import { checkIsCompanyMember } from "../../../users/permissions";
 import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
 import { AlreadySignedError, InvalidSignatureError } from "../../errors";
@@ -14,11 +12,12 @@ import { machine } from "../../machine";
 import { validateBsvhu } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
+import { checkCanSignFor } from "../../permissions";
 
 type SignatureTypeInfos = {
   dbDateKey: keyof Bsvhu;
   dbAuthorKey: keyof Bsvhu;
-  getAuthorizedSiret: (form: Bsvhu) => string;
+  getAuthorizedSiret: (form: Bsvhu) => string | null;
 };
 
 export default async function sign(
@@ -34,9 +33,10 @@ export default async function sign(
   // To sign a form for a company, you must either:
   // - be part of that company
   // - provide the company security code
-  await checkAuthorization(
-    { curretUserId: user.id, securityCode: input.securityCode },
-    signatureTypeInfos.getAuthorizedSiret(prismaForm)
+  await checkCanSignFor(
+    user,
+    signatureTypeInfos.getAuthorizedSiret(prismaForm),
+    input.securityCode
   );
 
   // Cannot re-sign a form
@@ -96,18 +96,3 @@ const signatureTypeMapping: Record<SignatureTypeInput, SignatureTypeInfos> = {
     getAuthorizedSiret: form => getTransporterCompanyOrgId(form)
   }
 };
-
-function checkAuthorization(
-  requestInfo: { curretUserId: string; securityCode?: number },
-  signingCompanySiret: string
-) {
-  // If there is a security code provided, it must be authorized
-  if (requestInfo.securityCode) {
-    return checkSecurityCode(signingCompanySiret, requestInfo.securityCode);
-  }
-
-  return checkIsCompanyMember(
-    { id: requestInfo.curretUserId },
-    { orgId: signingCompanySiret }
-  );
-}

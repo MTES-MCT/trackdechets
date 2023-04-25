@@ -4,9 +4,9 @@ import { MutationPublishBsdaArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound, getPreviousBsdas } from "../../database";
-import { checkIsBsdaContributor } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
 import { validateBsda } from "../../validation";
+import { checkCanUpdate } from "../../permissions";
 
 export default async function create(
   _,
@@ -18,11 +18,8 @@ export default async function create(
   const existingBsda = await getBsdaOrNotFound(id, {
     include: { intermediaries: true }
   });
-  await checkIsBsdaContributor(
-    user,
-    existingBsda,
-    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
-  );
+
+  await checkCanUpdate(user, existingBsda);
 
   if (!existingBsda.isDraft) {
     throw new ForbiddenError(
@@ -33,7 +30,7 @@ export default async function create(
   const previousBsdas = await getPreviousBsdas(existingBsda);
   const { intermediaries, ...bsda } = existingBsda;
   await validateBsda(
-    bsda,
+    bsda as any,
     { previousBsdas, intermediaries },
     { emissionSignature: true }
   );

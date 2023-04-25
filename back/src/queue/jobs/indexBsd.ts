@@ -3,15 +3,23 @@ import { toBsdElastic as toBsdaElastic } from "../../bsda/elastic";
 import { toBsdElastic as toBsdasriElastic } from "../../bsdasris/elastic";
 import { toBsdElastic as toBsvhuElastic } from "../../bsvhu/elastic";
 import { toBsdElastic as toBsffElastic } from "../../bsffs/elastic";
-import { BsdElastic, indexBsd } from "../../common/elastic";
+import { BsdElastic, indexBsd, getElasticBsdById } from "../../common/elastic";
 import { indexForm } from "../../forms/elastic";
 import prisma from "../../prisma";
 
-export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
+export async function indexBsdJob(
+  job: Job<string>
+): Promise<BsdElastic & { siretsBeforeUpdate: string[] }> {
   const bsdId = job.data;
+  const indexed = await getElasticBsdById(bsdId);
 
+  // we keep track of previously indexed sirets in order to be able to notify a
+  // company which would be removed from a bsd.
+  // Next they're passed to the notify jobs (sse and webhooks)
+  const siretsBeforeUpdate =
+    indexed?.body?.hits?.hits?.[0]?._source?.sirets || [];
   if (bsdId.startsWith("BSDA-")) {
-    const bsda = await prisma.bsda.findUnique({
+    const bsda = await prisma.bsda.findUniqueOrThrow({
       where: { id: bsdId },
       include: {
         // required for dashboard queries
@@ -24,10 +32,10 @@ export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
     const elasticBsda = toBsdaElastic(bsda);
     await indexBsd(elasticBsda);
 
-    return elasticBsda;
+    return { ...elasticBsda, siretsBeforeUpdate };
   }
   if (bsdId.startsWith("BSD-") || bsdId.startsWith("TD-")) {
-    const fullForm = await prisma.form.findUnique({
+    const fullForm = await prisma.form.findUniqueOrThrow({
       where: { readableId: bsdId },
       include: {
         forwardedIn: true,
@@ -36,11 +44,12 @@ export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
       }
     });
     const elasticBsdd = await indexForm(fullForm);
-    return elasticBsdd;
+
+    return { ...elasticBsdd, siretsBeforeUpdate };
   }
 
   if (bsdId.startsWith("DASRI-")) {
-    const bsdasri = await prisma.bsdasri.findUnique({
+    const bsdasri = await prisma.bsdasri.findUniqueOrThrow({
       where: { id: bsdId },
       include: {
         // required for dashboard queries
@@ -52,22 +61,22 @@ export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
     const elasticBsdasri = toBsdasriElastic(bsdasri);
     await indexBsd(elasticBsdasri);
 
-    return elasticBsdasri;
+    return { ...elasticBsdasri, siretsBeforeUpdate };
   }
 
   if (bsdId.startsWith("VHU-")) {
-    const bsvhu = await prisma.bsvhu.findUnique({
+    const bsvhu = await prisma.bsvhu.findUniqueOrThrow({
       where: { id: bsdId }
     });
 
     const elasticBsvhu = toBsvhuElastic(bsvhu);
     await indexBsd(elasticBsvhu);
 
-    return elasticBsvhu;
+    return { ...elasticBsvhu, siretsBeforeUpdate };
   }
 
   if (bsdId.startsWith("FF-")) {
-    const bsff = await prisma.bsff.findUnique({
+    const bsff = await prisma.bsff.findUniqueOrThrow({
       where: { id: bsdId },
       include: { packagings: true, ficheInterventions: true }
     });
@@ -75,7 +84,7 @@ export async function indexBsdJob(job: Job<string>): Promise<BsdElastic> {
     const elasticBsff = toBsffElastic(bsff);
     await indexBsd(elasticBsff);
 
-    return elasticBsff;
+    return { ...elasticBsff, siretsBeforeUpdate };
   }
 
   throw new Error("Indexing this type of BSD is not handled by this worker.");

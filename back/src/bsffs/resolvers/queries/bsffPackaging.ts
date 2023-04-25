@@ -2,7 +2,7 @@ import { QueryResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { expandBsffFromDB, expandBsffPackagingFromDB } from "../../converter";
 import { getBsffPackagingOrNotFound } from "../../database";
-import { checkCanReadBsff } from "../../permissions";
+import { checkCanRead } from "../../permissions";
 
 const bsffPackaging: QueryResolvers["bsffPackaging"] = async (
   _,
@@ -15,7 +15,7 @@ const bsffPackaging: QueryResolvers["bsffPackaging"] = async (
     id
   });
 
-  await checkCanReadBsff(user, bsffPackaging.bsff);
+  await checkCanRead(user, bsffPackaging.bsff);
 
   return {
     ...expandBsffPackagingFromDB(bsffPackaging),

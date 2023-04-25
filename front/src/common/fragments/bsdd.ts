@@ -255,6 +255,7 @@ const mutableFieldsFragment = gql`
             name
             siret
           }
+          isPrivateIndividual
         }
         transporter {
           company {
@@ -416,6 +417,7 @@ export const dashboardFormFragment = gql`
         other
         quantity
       }
+      quantity
     }
     emitter {
       type
@@ -466,6 +468,7 @@ export const dashboardFormFragment = gql`
         name
       }
       transporterNumberPlate
+      lastActionOn
     }
     temporaryStorageDetail {
       destination {

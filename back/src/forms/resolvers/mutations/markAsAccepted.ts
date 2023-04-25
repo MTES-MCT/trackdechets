@@ -85,7 +85,9 @@ const markAsAcceptedResolver: MutationResolvers["markAsAccepted"] = async (
       WasteAcceptationStatus.PARTIALLY_REFUSED
   ) {
     const refusedEmail = await renderFormRefusedEmail(acceptedForm);
-    sendMail(refusedEmail);
+    if (refusedEmail) {
+      sendMail(refusedEmail);
+    }
   }
 
   return expandFormFromDb(acceptedForm);

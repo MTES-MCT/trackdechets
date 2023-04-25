@@ -155,7 +155,7 @@ describe("Mutation.Vhu.create", () => {
     expect(data.createBsvhu.id).toMatch(
       new RegExp(`^VHU-[0-9]{8}-[A-Z0-9]{9}$`)
     );
-    expect(data.createBsvhu.destination.company.siret).toBe(
+    expect(data.createBsvhu.destination!.company!.siret).toBe(
       input.destination.company.siret
     );
     // check input is sirenified

@@ -9,9 +9,6 @@ import {
   TransportSegment
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
-import { getUserCompanies } from "../../../users/database";
-import { getCachedUserSiretOrVat } from "../../../common/redis/users";
-
 import {
   expandTransportSegmentFromDb,
   flattenTransportSegmentInput
@@ -20,6 +17,7 @@ import { Prisma } from "@prisma/client";
 import { getFormRepository } from "../../repository";
 import prisma from "../../../prisma";
 import { sirenifyTransportSegmentInput } from "../../sirenify";
+import { checkUserPermissions, Permission } from "../../../permissions";
 
 const SEGMENT_NOT_FOUND = "Le segment de transport n'a pas été trouvé";
 const FORM_NOT_FOUND_OR_NOT_ALLOWED =
@@ -98,10 +96,13 @@ export async function prepareSegment(
 ): Promise<TransportSegment> {
   const user = checkIsAuthenticated(context);
 
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-  if (!userCompaniesSiretOrVat.includes(siret)) {
-    throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
-  }
+  await checkUserPermissions(
+    user,
+    [siret].filter(Boolean),
+    Permission.BsdCanUpdate,
+    FORM_NOT_FOUND_OR_NOT_ALLOWED
+  );
+
   const sirenified = await sirenifyTransportSegmentInput(nextSegmentInfo, user);
   const nextSegmentPayload = flattenTransportSegmentInput(sirenified);
 
@@ -187,7 +188,7 @@ export async function prepareSegment(
     { prepareSegment: true }
   );
 
-  const segment = await prisma.transportSegment.findFirst({
+  const segment = await prisma.transportSegment.findFirstOrThrow({
     where: { segmentNumber: transportSegments.length + 1, form: { id: id } }
   });
   return expandTransportSegmentFromDb(segment);
@@ -223,11 +224,13 @@ export async function markSegmentAsReadyToTakeOver(
     throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
 
-  const userCompanies = await getUserCompanies(user.id);
-  const userCompaniesSiretOrVat = userCompanies.map(c => c.siret);
-  if (!userCompaniesSiretOrVat.includes(form.currentTransporterSiret)) {
-    throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
-  }
+  const authorizedOrgIds = [form.currentTransporterSiret].filter(Boolean);
+  await checkUserPermissions(
+    user,
+    authorizedOrgIds,
+    Permission.BsdCanUpdate,
+    FORM_NOT_FOUND_OR_NOT_ALLOWED
+  );
 
   if (currentSegment.readyToTakeOver) {
     throw new ForbiddenError(SEGMENT_ALREADY_SEALED);
@@ -303,18 +306,19 @@ export async function takeOverSegment(
     throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
 
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-
   //   user must be the nextTransporter
   const nexTransporterIsFilled = !!form.nextTransporterSiret;
-  if (
-    !nexTransporterIsFilled ||
-    (nexTransporterIsFilled &&
-      !userCompaniesSiretOrVat.includes(form.nextTransporterSiret)) ||
-    !userCompaniesSiretOrVat.includes(currentSegment.transporterCompanySiret)
-  ) {
-    throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
-  }
+
+  const authorizedOrgIds = nexTransporterIsFilled
+    ? [form.nextTransporterSiret, currentSegment.transporterCompanySiret]
+    : [];
+
+  await checkUserPermissions(
+    user,
+    authorizedOrgIds.filter(Boolean),
+    Permission.BsdCanSign,
+    FORM_NOT_FOUND_OR_NOT_ALLOWED
+  );
 
   const segmentErrors: string[] = await segmentSchema
     .validate(currentSegment, { abortEarly: false })
@@ -377,13 +381,15 @@ export async function editSegment(
 
   const nextSegmentPayload = flattenTransportSegmentInput(nextSegmentInfo);
 
-  // check user owns siret
+  const authorizedOrgIds = [userSiret].filter(Boolean);
 
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-
-  if (!userCompaniesSiretOrVat.includes(userSiret)) {
-    throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
-  }
+  // check user has update permission on SIRET
+  await checkUserPermissions(
+    user,
+    authorizedOrgIds,
+    Permission.BsdCanUpdate,
+    FORM_NOT_FOUND_OR_NOT_ALLOWED
+  );
 
   const formRepository = getFormRepository(user);
   const form = (await formRepository.findUnique(

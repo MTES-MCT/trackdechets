@@ -3,8 +3,9 @@ import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../../common/permissions";
 import { MutationCancelBsdaRevisionRequestArgs } from "../../../../generated/graphql/types";
 import { GraphQLContext } from "../../../../types";
-import { getUserCompanies } from "../../../../users/database";
 import { getBsdaRepository } from "../../../repository";
+import { Permission, can, getUserRoles } from "../../../../permissions";
+import prisma from "../../../../prisma";
 
 export async function cancelBsdaRevisionRequest(
   _,
@@ -28,12 +29,14 @@ export async function cancelBsdaRevisionRequest(
     );
   }
 
-  const userCompanies = await getUserCompanies(user.id);
+  const authoringCompany = await prisma.company.findUniqueOrThrow({
+    where: { id: revisionRequest.authoringCompanyId }
+  });
 
+  const userRoles = await getUserRoles(user.id);
   if (
-    !userCompanies.find(
-      company => company.id === revisionRequest.authoringCompanyId
-    )
+    !userRoles[authoringCompany.orgId] ||
+    !can(userRoles[authoringCompany.orgId], Permission.BsdCanRevise)
   ) {
     throw new ForbiddenError("Vous n'êtes pas l'auteur de cette révision.");
   }

@@ -19,7 +19,7 @@ describe("mutation deleteInvitation", () => {
     const accountHash = await createUserAccountHash(
       usrToInvite.email,
       "MEMBER",
-      company.siret
+      company.siret!
     );
 
     const { mutate } = makeClient({ ...admin, auth: AuthType.Session });

@@ -29,7 +29,7 @@ export function buildAddress(addressComponents: string[]): string {
 type Props = {
   bsdasri: Bsdasri;
   qrCode: string;
-  associatedBsdasris: InitialBsdasri[];
+  associatedBsdasris: InitialBsdasri[] | null;
 };
 
 export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
@@ -128,11 +128,13 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
                   Nom/raison sociale : {bsdasri.emitter?.pickupSite?.name}
                   <br />
                   Adresse :{" "}
-                  {buildAddress([
-                    bsdasri.emitter?.pickupSite?.address,
-                    bsdasri.emitter?.pickupSite?.postalCode,
-                    bsdasri.emitter?.pickupSite?.city
-                  ])}
+                  {buildAddress(
+                    [
+                      bsdasri.emitter?.pickupSite?.address,
+                      bsdasri.emitter?.pickupSite?.postalCode,
+                      bsdasri.emitter?.pickupSite?.city
+                    ].filter(Boolean)
+                  )}
                   <br />{" "}
                 </p>
               </>
@@ -524,7 +526,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
 }
 
 type SignatureProps = {
-  signature: BsdasriSignature;
+  signature: BsdasriSignature | null | undefined;
 };
 export function Signature({ signature }: SignatureProps) {
   return (

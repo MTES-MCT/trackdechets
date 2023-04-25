@@ -47,7 +47,7 @@ export async function getCompanyInfos(
     contactPhone: searchResult.contactPhone,
     website: searchResult.website,
     isRegistered: searchResult.isRegistered,
-    companyTypes: searchResult.companyTypes,
+    companyTypes: searchResult.companyTypes ?? [],
     ecoOrganismeAgreements: searchResult.ecoOrganismeAgreements ?? [],
     allowBsdasriTakeOverWithoutSignature:
       searchResult.allowBsdasriTakeOverWithoutSignature,
@@ -75,7 +75,7 @@ const companyInfosResolvers: QueryResolvers["companyInfos"] = async (
     );
   }
   const companyInfos = (await getCompanyInfos(
-    !!args.siret ? args.siret : args.clue
+    !!args.siret ? args.siret : args.clue!
   )) as CompanyPublic;
   if (companyInfos.statutDiffusionEtablissement !== "N") {
     return companyInfos;

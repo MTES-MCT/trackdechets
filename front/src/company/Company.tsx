@@ -50,7 +50,9 @@ interface GeoInfo {
   latitude: number;
   longitude: number;
 }
-
+/**
+ * Public company page component
+ */
 export default function CompanyInfo() {
   const { orgId } = useParams<{ orgId: string }>();
   const { data, loading, error } = useQuery<

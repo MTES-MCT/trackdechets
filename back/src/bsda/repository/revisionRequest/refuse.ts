@@ -9,7 +9,7 @@ import {
 
 export type RefuseRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
-  { comment }: { comment?: string },
+  { comment }: { comment?: string | null },
   logMetadata?: LogMetadata
 ) => Promise<void>;
 

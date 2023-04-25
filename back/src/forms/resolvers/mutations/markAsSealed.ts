@@ -33,7 +33,7 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
   await checkCanBeSealed(form);
 
   await validateForwardedInCompanies(form);
-  let formUpdateInput = null;
+  let formUpdateInput;
 
   if (
     form.emitterIsForeignShip === true ||
@@ -42,7 +42,9 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
     // pre-validate when signature by producer will be by-passed at the end of this mutation
     formUpdateInput = {
       emittedAt: new Date(),
-      emittedBy: user.name,
+      emittedBy: form.emitterIsPrivateIndividual
+        ? "Signature auto (particulier)"
+        : "Signature auto (navire étranger)",
       emittedByEcoOrganisme: false,
       // required for machine to authorize signature
       emitterIsForeignShip: form.emitterIsForeignShip,
@@ -128,19 +130,23 @@ async function mailToNonExistentEmitter(
     },
     { select: { id: true } }
   );
-  if (!contactAlreadyMentionned) {
+  if (
+    form.emitterCompanyMail &&
+    form.emitterCompanySiret &&
+    !contactAlreadyMentionned
+  ) {
     await sendMail(
       renderMail(contentAwaitsGuest, {
         to: [
           {
             email: form.emitterCompanyMail,
-            name: form.emitterCompanyContact
+            name: form.emitterCompanyContact ?? ""
           }
         ],
         variables: {
           company: {
             siret: form.emitterCompanySiret,
-            name: form.emitterCompanyName
+            name: form.emitterCompanyName ?? ""
           }
         }
       })

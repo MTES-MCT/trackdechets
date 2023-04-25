@@ -8,7 +8,7 @@ import {
   userFactory
 } from "../../__tests__/factories";
 import { getFullForm } from "../database";
-import { getSiretsByTab } from "../elastic";
+import { getSiretsByTab } from "../elasticHelpers";
 
 describe("getSiretsByTab", () => {
   afterEach(resetDatabase);
@@ -134,8 +134,10 @@ describe("getSiretsByTab", () => {
     const { isFollowFor, isCollectedFor, isForActionFor } =
       getSiretsByTab(fullForm);
     expect(isFollowFor).toContain(form.emitterCompanySiret);
-    expect(isFollowFor).toContain(fullForm.forwardedIn.transporterCompanySiret);
-    expect(isFollowFor).toContain(fullForm.forwardedIn.recipientCompanySiret);
+    expect(isFollowFor).toContain(
+      fullForm.forwardedIn!.transporterCompanySiret
+    );
+    expect(isFollowFor).toContain(fullForm.forwardedIn!.recipientCompanySiret);
 
     expect(isForActionFor).toContain(form.recipientCompanySiret);
     expect(isCollectedFor).toContain(form.transporterCompanySiret);
@@ -192,9 +194,9 @@ describe("getSiretsByTab", () => {
     expect(isFollowFor).toContain(form.emitterCompanySiret);
     expect(isFollowFor).toContain(form.transporterCompanySiret);
     expect(isForActionFor).toContain(form.recipientCompanySiret);
-    expect(isFollowFor).toContain(fullForm.forwardedIn.recipientCompanySiret);
+    expect(isFollowFor).toContain(fullForm.forwardedIn!.recipientCompanySiret);
     expect(isToCollectFor).toContain(
-      fullForm.forwardedIn.transporterCompanySiret
+      fullForm.forwardedIn!.transporterCompanySiret
     );
   });
 
@@ -211,10 +213,10 @@ describe("getSiretsByTab", () => {
     expect(isFollowFor).toContain(form.transporterCompanySiret);
     expect(isFollowFor).toContain(form.recipientCompanySiret);
     expect(isForActionFor).toContain(
-      fullForm.forwardedIn.recipientCompanySiret
+      fullForm.forwardedIn!.recipientCompanySiret
     );
     expect(isCollectedFor).toContain(
-      fullForm.forwardedIn.transporterCompanySiret
+      fullForm.forwardedIn!.transporterCompanySiret
     );
   });
 });

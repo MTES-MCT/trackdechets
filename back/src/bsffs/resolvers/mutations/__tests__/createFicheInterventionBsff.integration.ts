@@ -70,7 +70,7 @@ describe("Mutation.createFicheInterventionBsff", () => {
   it("should allow user to create a fiche d'intervention with a company detenteur", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
       siret: ficheInterventionInput.operateur.company.siret,
-      name: ficheInterventionInput.operateur.company.name
+      name: ficheInterventionInput.operateur.company.name!
     });
     const { mutate } = makeClient(emitter.user);
     const { data, errors } = await mutate<
@@ -93,7 +93,7 @@ describe("Mutation.createFicheInterventionBsff", () => {
   it("should throw error if detenteur company info is missing", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
       siret: ficheInterventionInput.operateur.company.siret,
-      name: ficheInterventionInput.operateur.company.name
+      name: ficheInterventionInput.operateur.company.name!
     });
     const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
@@ -130,7 +130,7 @@ describe("Mutation.createFicheInterventionBsff", () => {
   it("should allow user to create a fiche d'intervention with a private individual detenteur", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
       siret: ficheInterventionInput.operateur.company.siret,
-      name: ficheInterventionInput.operateur.company.name
+      name: ficheInterventionInput.operateur.company.name!
     });
     const { mutate } = makeClient(emitter.user);
     const { data, errors } = await mutate<
@@ -155,16 +155,18 @@ describe("Mutation.createFicheInterventionBsff", () => {
     });
 
     expect(errors).toBeUndefined();
-    expect(data.createFicheInterventionBsff.detenteur.isPrivateIndividual).toBe(
-      true
-    );
-    expect(data.createFicheInterventionBsff.detenteur.company.siret).toBeNull();
+    expect(
+      data.createFicheInterventionBsff.detenteur!.isPrivateIndividual
+    ).toBe(true);
+    expect(
+      data.createFicheInterventionBsff.detenteur!.company!.siret
+    ).toBeNull();
   });
 
   it("should throw error if detenteur private individual info is missing", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN, {
       siret: ficheInterventionInput.operateur.company.siret,
-      name: ficheInterventionInput.operateur.company.name
+      name: ficheInterventionInput.operateur.company.name!
     });
     const { mutate } = makeClient(emitter.user);
     const { errors } = await mutate<
@@ -228,8 +230,7 @@ describe("Mutation.createFicheInterventionBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Vous ne pouvez pas éditer une fiche d'intervention sur lequel le SIRET de votre entreprise n'apparaît pas."
+        message: "Seul l'opérateur peut créer une fiche d'intervention."
       })
     ]);
   });

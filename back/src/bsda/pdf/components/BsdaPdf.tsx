@@ -100,7 +100,7 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
             <p>
               <input
                 type="checkbox"
-                checked={bsda?.emitter?.isPrivateIndividual}
+                checked={Boolean(bsda?.emitter?.isPrivateIndividual)}
                 readOnly
               />{" "}
               Le MO ou le détenteur est un particulier
@@ -164,7 +164,7 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
             <p>
               <strong>2.2 Numéros de scellés :</strong>
             </p>
-            <p>{bsda?.waste?.sealNumbers.join(", ")}</p>
+            <p>{bsda?.waste?.sealNumbers?.join(", ")}</p>
           </div>
         </div>
 
@@ -268,7 +268,7 @@ export function BsdaPdf({ bsda, qrCode, previousBsdas }: Props) {
               <p>
                 <input
                   type="checkbox"
-                  checked={bsda?.worker?.work?.hasEmitterPaperSignature}
+                  checked={Boolean(bsda?.worker?.work?.hasEmitterPaperSignature)}
                   readOnly
                 />{" "}
                 je certifie disposer d’une version papier, signée du MOA et de

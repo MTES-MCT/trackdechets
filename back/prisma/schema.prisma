@@ -244,12 +244,13 @@ model AnonymousCompany {
 }
 
 model CompanyAssociation {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   role      UserRole
   companyId String
-  company   Company  @relation(fields: [companyId], references: [id])
+  company   Company   @relation(fields: [companyId], references: [id])
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime? @default(now()) @db.Timestamptz(6)
 
   @@index([userId], map: "_CompanyAssociationUserIdIdx")
   @@index([companyId], map: "_CompanyAssociationCompanyIdIdx")
@@ -560,6 +561,7 @@ model Grant {
   applicationId String
   openIdEnabled Boolean     @default(false)
   scope         String[]    @default([])
+  nonce         String?
   application   Application @relation(fields: [applicationId], references: [id])
   userId        String
   user          User        @relation(fields: [userId], references: [id])
@@ -632,6 +634,7 @@ model StatusLog {
 
   @@index([userId], map: "_StatusLogUserIdIdx")
   @@index([formId], map: "_StatusLogFormIdIdx")
+  @@index([loggedAt], map: "_StatusLogLoggedAtIdx")
 }
 
 model TraderReceipt {
@@ -1511,4 +1514,15 @@ model PdfAccessToken {
   visitedAt DateTime? @db.Timestamptz(6)
 
   @@index([token], map: "_PdfAccessTokenTokenIdx")
+}
+
+model WebhookSetting {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  endpointUri String
+  token       String
+  orgId       String   @unique
+  activated   Boolean  @default(value: false)
+
+  @@index([orgId], map: "_WebhookSettingOrgIdIdx")
 }

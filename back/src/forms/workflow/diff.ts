@@ -39,7 +39,10 @@ export function arraysEqual(a, b) {
   return true;
 }
 
-export function stringEqual(s1: string, s2: string) {
+export function stringEqual(
+  s1: string | null | undefined,
+  s2: string | null | undefined
+) {
   return (s1 ?? "") === (s2 ?? "");
 }
 
@@ -87,7 +90,10 @@ export function objectDiff(o1, o2) {
   }, {});
 }
 
-export async function tempStorageDiff(t1: Form, t2: Form) {
+export async function tempStorageDiff(
+  t1: Form | null | undefined,
+  t2: Form | null | undefined
+) {
   if (!t1 && !t2) {
     return {};
   }
@@ -119,8 +125,8 @@ export async function tempStorageDiff(t1: Form, t2: Form) {
  * Calculates expanded diff between two forms
  */
 export async function formDiff(
-  f1: Form & { forwardedIn?: Form },
-  f2: Form & { forwardedIn?: Form }
+  f1: Form & { forwardedIn?: Form | null },
+  f2: Form & { forwardedIn?: Form | null }
 ) {
   const {
     updatedAt: _u1,

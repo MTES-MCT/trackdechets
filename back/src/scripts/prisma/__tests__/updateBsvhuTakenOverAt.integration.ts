@@ -44,7 +44,7 @@ describe("updateBsvhuTakenOverAt", () => {
     });
     expect(count).toEqual(1);
 
-    const updatedBsvhu1 = await prisma.bsvhu.findUnique({
+    const updatedBsvhu1 = await prisma.bsvhu.findUniqueOrThrow({
       where: { id: bsvhu1.id }
     });
 
@@ -52,7 +52,7 @@ describe("updateBsvhuTakenOverAt", () => {
       updatedBsvhu1.emitterEmissionSignatureDate
     );
 
-    const updatedBsvhu2 = await prisma.bsvhu.findUnique({
+    const updatedBsvhu2 = await prisma.bsvhu.findUniqueOrThrow({
       where: { id: bsvhu2.id }
     });
 
@@ -60,7 +60,7 @@ describe("updateBsvhuTakenOverAt", () => {
       updatedBsvhu2.emitterEmissionSignatureDate
     );
 
-    const updatedBsvhu3 = await prisma.bsvhu.findUnique({
+    const updatedBsvhu3 = await prisma.bsvhu.findUniqueOrThrow({
       where: { id: bsvhu3.id }
     });
 

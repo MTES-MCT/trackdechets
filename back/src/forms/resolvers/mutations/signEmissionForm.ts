@@ -1,4 +1,4 @@
-import { EmitterType, Form, Prisma, Status } from "@prisma/client";
+import { EmitterType, Form, Status } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import {
   MutationResolvers,
@@ -15,8 +15,8 @@ import {
   beforeSignedByTransporterSchema,
   wasteDetailsSchema
 } from "../../validation";
-import { FullForm } from "../../types";
 import { getFormRepository } from "../../repository";
+import { prismaJsonNoNull } from "../../../common/converter";
 
 const signatures: Partial<
   Record<
@@ -42,7 +42,7 @@ const signatures: Partial<
 
     if (args.input.emittedByEcoOrganisme) {
       await checkCanSignFor(
-        existingForm.ecoOrganismeSiret,
+        existingForm.ecoOrganismeSiret!,
         user,
         args.securityCode
       );
@@ -51,15 +51,16 @@ const signatures: Partial<
       !existingForm.emitterIsPrivateIndividual
     ) {
       await checkCanSignFor(
-        existingForm.emitterCompanySiret,
+        existingForm.emitterCompanySiret!,
         user,
         args.securityCode
       );
     }
 
-    const formUpdateInput: Prisma.FormUpdateInput = {
+    const formUpdateInput = {
       wasteDetailsPackagingInfos:
-        args.input.packagingInfos ?? existingForm.wasteDetailsPackagingInfos,
+        prismaJsonNoNull(args.input.packagingInfos) ??
+        prismaJsonNoNull(existingForm.wasteDetailsPackagingInfos),
       wasteDetailsQuantity:
         args.input.quantity ?? existingForm.wasteDetailsQuantity,
       wasteDetailsOnuCode:
@@ -75,7 +76,7 @@ const signatures: Partial<
       emitterIsForeignShip: existingForm.emitterIsForeignShip,
       emitterIsPrivateIndividual: existingForm.emitterIsPrivateIndividual
     };
-    const futureForm: Prisma.FormUpdateInput = {
+    const futureForm = {
       ...existingForm,
       ...formUpdateInput
     };
@@ -98,7 +99,7 @@ const signatures: Partial<
   },
   [Status.RESEALED]: async (user, args, existingForm) => {
     await checkCanSignFor(
-      existingForm.recipientCompanySiret,
+      existingForm.recipientCompanySiret!,
       user,
       args.securityCode
     );
@@ -109,27 +110,29 @@ const signatures: Partial<
         update: {
           status: Status.SIGNED_BY_PRODUCER,
           wasteDetailsPackagingInfos:
-            args.input.packagingInfos ??
-            existingFullForm.forwardedIn.wasteDetailsPackagingInfos ??
-            existingFullForm.wasteDetailsPackagingInfos,
+            prismaJsonNoNull(args.input.packagingInfos) ??
+            prismaJsonNoNull(
+              existingFullForm.forwardedIn?.wasteDetailsPackagingInfos
+            ) ??
+            prismaJsonNoNull(existingFullForm.wasteDetailsPackagingInfos),
           wasteDetailsQuantity:
             args.input.quantity ??
-            existingFullForm.forwardedIn.wasteDetailsQuantity ??
+            existingFullForm.forwardedIn?.wasteDetailsQuantity ??
             existingFullForm.wasteDetailsQuantity,
           wasteDetailsOnuCode:
             args.input.onuCode ??
-            existingFullForm.forwardedIn.wasteDetailsOnuCode ??
+            existingFullForm.forwardedIn?.wasteDetailsOnuCode ??
             existingFullForm.wasteDetailsOnuCode,
           transporterNumberPlate:
             args.input.transporterNumberPlate ??
-            existingFullForm.forwardedIn.transporterNumberPlate,
+            existingFullForm.forwardedIn?.transporterNumberPlate,
 
           emittedAt: args.input.emittedAt,
           emittedBy: args.input.emittedBy
         }
       }
     };
-    const futureFullForm: FullForm = {
+    const futureFullForm = {
       ...existingFullForm,
       forwardedIn: {
         ...existingFullForm.forwardedIn,

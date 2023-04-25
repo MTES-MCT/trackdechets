@@ -236,6 +236,7 @@ export function BsffDetailContent({ form: bsff }: Props) {
               },
               bsffTransporter: {
                 company: {
+                  orgId: bsff.transporter?.company?.orgId!,
                   siret: bsff.transporter?.company?.orgId ?? undefined,
                   name: bsff.transporter?.company?.name ?? undefined,
                 },

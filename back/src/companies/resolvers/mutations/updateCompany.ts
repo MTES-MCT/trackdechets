@@ -3,9 +3,10 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { applyAuthStrategies, AuthType } from "../../../auth";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../database";
-import { checkIsCompanyAdmin } from "../../../users/permissions";
 import { updateCompanyFn } from "./updateCompanyService";
 import { isForeignVat } from "../../../common/constants/companySearchHelpers";
+import { checkUserPermissions, Permission } from "../../../permissions";
+import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 
 const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   parent,
@@ -15,7 +16,13 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ id: args.id });
-  await checkIsCompanyAdmin(user, company);
+
+  await checkUserPermissions(
+    user,
+    company.orgId,
+    Permission.CompanyCanUpdate,
+    NotCompanyAdminErrorMsg(company.orgId)
+  );
 
   const companyTypes = args.companyTypes || company.companyTypes;
   const { ecoOrganismeAgreements } = args;
@@ -38,7 +45,10 @@ const updateCompanyResolver: MutationResolvers["updateCompany"] = async (
         "Impossible de mettre à jour les agréments éco-organisme de cette entreprise : elle doit en posséder au moins 1."
       );
     }
-  } else if (ecoOrganismeAgreements?.length > 0) {
+  } else if (
+    Array.isArray(ecoOrganismeAgreements) &&
+    ecoOrganismeAgreements.length > 0
+  ) {
     throw new UserInputError(
       "Impossible de mettre à jour les agréments éco-organisme de cette entreprise : il ne s'agit pas d'un éco-organisme."
     );

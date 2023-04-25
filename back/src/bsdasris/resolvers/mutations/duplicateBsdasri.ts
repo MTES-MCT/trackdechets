@@ -1,16 +1,15 @@
-import { Bsdasri, BsdasriStatus, User, BsdasriType } from "@prisma/client";
+import { Bsdasri, BsdasriStatus, BsdasriType, Prisma } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import {
   MutationDuplicateBsdasriArgs,
   MutationResolvers
 } from "../../../generated/graphql/types";
-
 import { expandBsdasriFromDB } from "../../converter";
 import { getBsdasriOrNotFound } from "../../database";
-import { checkIsBsdasriContributor } from "../../permissions";
 import { ForbiddenError } from "apollo-server-express";
 import { getBsdasriRepository } from "../../repository";
+import { checkCanDuplicate } from "../../permissions";
 
 /**
  *
@@ -37,18 +36,15 @@ const duplicateBsdasriResolver: MutationResolvers["duplicateBsdasri"] = async (
       "Les dasris de synthèse ou de groupement ne sont pas duplicables"
     );
   }
-  await checkIsBsdasriContributor(
-    user,
-    bsdasri,
-    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas."
-  );
+
+  await checkCanDuplicate(user, bsdasri);
 
   const newBsdasri = await duplicateBsdasri(user, bsdasri);
   return expandBsdasriFromDB(newBsdasri);
 };
 
 function duplicateBsdasri(
-  user: User,
+  user: Express.User,
   {
     id,
     createdAt,
@@ -102,6 +98,10 @@ function duplicateBsdasri(
 
   return bsdasriRepository.create({
     ...fieldsToCopy,
+    emitterWastePackagings:
+      fieldsToCopy.emitterWastePackagings === null
+        ? Prisma.JsonNull
+        : fieldsToCopy.emitterWastePackagings,
     id: getReadableId(ReadableIdPrefix.DASRI),
     status: BsdasriStatus.INITIAL,
     isDraft: true

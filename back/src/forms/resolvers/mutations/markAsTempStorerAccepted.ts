@@ -2,7 +2,7 @@ import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import transitionForm from "../../workflow/transitionForm";
 import { getFormOrFormNotFound } from "../../database";
-import { checkCanMarkAsTempStorerAccepted } from "../../permissions";
+import { checkCanMarkAsTempStored } from "../../permissions";
 import { EventType } from "../../workflow/types";
 import { expandFormFromDb } from "../../converter";
 import { Prisma, WasteAcceptationStatus } from "@prisma/client";
@@ -11,6 +11,7 @@ import { acceptedInfoSchema } from "../../validation";
 import { renderFormRefusedEmail } from "../../mail/renderFormRefusedEmail";
 import { sendMail } from "../../../mailer/mailing";
 import { runInTransaction } from "../../../common/repository/helper";
+import { prismaJsonNoNull } from "../../../common/converter";
 
 const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccepted"] =
   async (_, args, context) => {
@@ -18,7 +19,7 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
     const { id, tempStorerAcceptedInfo } = args;
     const form = await getFormOrFormNotFound({ id });
 
-    await checkCanMarkAsTempStorerAccepted(user, form);
+    await checkCanMarkAsTempStored(user, form);
 
     await acceptedInfoSchema.validate(tempStorerAcceptedInfo);
 
@@ -33,7 +34,9 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
           wasteDetailsQuantity: tmpStorerAcceptedInfo.quantityReceived,
           wasteDetailsQuantityType: quantityType,
           wasteDetailsOnuCode: form.wasteDetailsOnuCode,
-          wasteDetailsPackagingInfos: form.wasteDetailsPackagingInfos
+          wasteDetailsPackagingInfos: prismaJsonNoNull(
+            form.wasteDetailsPackagingInfos
+          )
         }
       }
     };
@@ -68,7 +71,9 @@ const markAsTempStorerAcceptedResolver: MutationResolvers["markAsTempStorerAccep
         WasteAcceptationStatus.PARTIALLY_REFUSED
     ) {
       const refusedEmail = await renderFormRefusedEmail(tempStoredForm);
-      sendMail(refusedEmail);
+      if (refusedEmail) {
+        sendMail(refusedEmail);
+      }
     }
 
     return expandFormFromDb(tempStoredForm);

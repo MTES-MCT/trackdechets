@@ -226,7 +226,7 @@ describe("Mutation.createForm", () => {
       }
     });
     expect(errors).toBeUndefined();
-    expect(data.createForm.recipient.processingOperation).toEqual("R1");
+    expect(data.createForm.recipient!.processingOperation).toEqual("R1");
   });
 
   it("should allow an intermediary company to create a form", async () => {
@@ -357,7 +357,7 @@ describe("Mutation.createForm", () => {
     await prisma.ecoOrganisme.create({
       data: {
         address: "",
-        siret: eo.siret,
+        siret: eo.siret!,
         name: eo.name
       }
     });
@@ -374,7 +374,7 @@ describe("Mutation.createForm", () => {
       }
     });
 
-    expect(data.createForm.ecoOrganisme.siret).toBe(eo.siret);
+    expect(data.createForm.ecoOrganisme!.siret).toBe(eo.siret);
   });
 
   it("should return an error when trying to create a form with a non-existing eco-organisme", async () => {
@@ -431,7 +431,7 @@ describe("Mutation.createForm", () => {
       variables: { createFormInput }
     });
 
-    expect(data.createForm.emitter.workSite).toMatchObject(
+    expect(data.createForm.emitter!.workSite).toMatchObject(
       createFormInput.emitter.workSite
     );
   });
@@ -464,7 +464,7 @@ describe("Mutation.createForm", () => {
       variables: { createFormInput }
     });
 
-    expect(data.createForm.temporaryStorageDetail.destination).toMatchObject(
+    expect(data.createForm.temporaryStorageDetail!.destination).toMatchObject(
       createFormInput.temporaryStorageDetail.destination
     );
   });
@@ -524,10 +524,10 @@ describe("Mutation.createForm", () => {
       variables: { createFormInput }
     });
 
-    expect(data.createForm.wasteDetails.parcelNumbers[0]).toMatchObject(
+    expect(data.createForm.wasteDetails!.parcelNumbers![0]).toMatchObject(
       parcelNumbers[0]
     );
-    expect(data.createForm.wasteDetails.parcelNumbers[1]).toMatchObject(
+    expect(data.createForm.wasteDetails!.parcelNumbers![1]).toMatchObject(
       parcelNumbers[1]
     );
   });
@@ -585,7 +585,7 @@ describe("Mutation.createForm", () => {
       }
     });
 
-    expect(data.createForm.recipient.company).toMatchObject(
+    expect(data.createForm.recipient!.company).toMatchObject(
       createFormInput.recipient.company
     );
   });
@@ -793,7 +793,7 @@ describe("Mutation.createForm", () => {
           createFormInput
         }
       });
-      const form = await prisma.form.findUnique({
+      const form = await prisma.form.findUniqueOrThrow({
         where: { id: data.createForm.id }
       });
       expect(form.transporterValidityLimit).toEqual(validityLimit);
@@ -825,7 +825,7 @@ describe("Mutation.createForm", () => {
       { type: "FUT", other: null, quantity: 1 },
       { type: "AUTRE", other: "Contenant", quantity: 1 }
     ];
-    expect(data.createForm.wasteDetails.packagingInfos).toMatchObject(
+    expect(data.createForm.wasteDetails!.packagingInfos).toMatchObject(
       expectedPackagingInfos
     );
   });
@@ -916,7 +916,7 @@ describe("Mutation.createForm", () => {
     });
 
     expect(errors).toEqual(undefined);
-    expect(data.createForm.appendix2Forms[0].id).toBe(appendix2.id);
+    expect(data.createForm.appendix2Forms![0].id).toBe(appendix2.id);
   });
 
   it("should allow creating a form with an appendix 2 (using CreateFormInput.grouping)", async () => {
@@ -1067,7 +1067,7 @@ describe("Mutation.createForm", () => {
           grouping: {
             create: {
               initialFormId: appendix2.id,
-              quantity: appendix2.quantityReceived
+              quantity: appendix2.quantityReceived!
             }
           }
         }
@@ -1520,7 +1520,7 @@ describe("Mutation.createForm", () => {
         }
       }
     });
-    expect(data.createForm.wasteDetails.isDangerous).toEqual(true);
+    expect(data.createForm.wasteDetails!.isDangerous).toEqual(true);
   });
 
   it("should set isDangerous to `false` when specifying a waste code without *", async () => {
@@ -1539,7 +1539,7 @@ describe("Mutation.createForm", () => {
         }
       }
     });
-    expect(data.createForm.wasteDetails.isDangerous).toEqual(false);
+    expect(data.createForm.wasteDetails!.isDangerous).toEqual(false);
   });
 
   it("should throw an exception if trying to set `isDangerous=false` with a code containing *", async () => {
@@ -1582,7 +1582,7 @@ describe("Mutation.createForm", () => {
         }
       }
     });
-    expect(data.createForm.wasteDetails.isDangerous).toBe(true);
+    expect(data.createForm.wasteDetails!.isDangerous).toBe(true);
   });
 
   it("should not be possible to fill both a SIRET number and a FR TVA number for transporter", async () => {
@@ -1705,7 +1705,7 @@ describe("Mutation.createForm", () => {
       }
     });
 
-    const form = await prisma.form.findUnique({
+    const form = await prisma.form.findUniqueOrThrow({
       where: { id: data.createForm.id }
     });
 
@@ -1759,7 +1759,7 @@ describe("Mutation.createForm", () => {
         }
       });
 
-      const form = await prisma.form.findUnique({
+      const form = await prisma.form.findUniqueOrThrow({
         where: { id: data.createForm.id }
       });
 
@@ -1834,7 +1834,7 @@ describe("Mutation.createForm", () => {
       });
 
       expect(data.createForm.id).toBeDefined();
-      expect(data.createForm.grouping.length).toBe(2);
+      expect(data.createForm.grouping!.length).toBe(2);
     });
 
     it("should seal grouped appendix 1 items when necessary", async () => {
@@ -1894,14 +1894,14 @@ describe("Mutation.createForm", () => {
         }
       });
 
-      expect(data.createForm.grouping.length).toBe(2);
+      expect(data.createForm.grouping!.length).toBe(2);
 
-      const newAppendix1_1 = await prisma.form.findUnique({
+      const newAppendix1_1 = await prisma.form.findUniqueOrThrow({
         where: { id: appendix1_1.id }
       });
       expect(newAppendix1_1.status).toBe(Status.SEALED);
 
-      const newAppendix1_2 = await prisma.form.findUnique({
+      const newAppendix1_2 = await prisma.form.findUniqueOrThrow({
         where: { id: appendix1_2.id }
       });
       expect(newAppendix1_2.status).toBe(Status.SEALED);

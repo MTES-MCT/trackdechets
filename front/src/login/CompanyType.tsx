@@ -69,12 +69,17 @@ export const COMPANY_CONSTANTS = [
   },
 ];
 
+interface CompanyTypeFieldProps {
+  handleChange(e, arrayHelpers, companyType, value): void;
+}
 export default function CompanyTypeField({
   field: { name, value },
   id,
   label,
+  handleChange,
   ...props
-}: FieldProps & { label: string } & InputHTMLAttributes<HTMLInputElement>) {
+}: FieldProps & { label: string } & InputHTMLAttributes<HTMLInputElement> &
+  CompanyTypeFieldProps) {
   return (
     <FieldArray
       name={name}
@@ -93,14 +98,9 @@ export default function CompanyTypeField({
                   value={companyType.value}
                   checked={value.includes(companyType.value)}
                   disabled={props.disabled}
-                  onChange={e => {
-                    if (e.target.checked) {
-                      arrayHelpers.push(companyType.value);
-                    } else {
-                      const idx = value.indexOf(companyType.value);
-                      arrayHelpers.remove(idx);
-                    }
-                  }}
+                  onChange={e =>
+                    handleChange(e, arrayHelpers, companyType, value)
+                  }
                 />
                 {companyType.label}
                 <Tooltip msg={companyType.helpText} />

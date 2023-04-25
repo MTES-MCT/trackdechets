@@ -15,10 +15,11 @@ import {
 } from "../database";
 import templateIds from "../../mailer/templates/provider/templateIds";
 import {
+  CompanyType,
   CompanyVerificationMode,
   CompanyVerificationStatus
 } from "@prisma/client";
-import { CompanyRow } from "./types";
+import { CompanyInfo, CompanyRow, RoleRow } from "./types";
 
 function printHelp() {
   console.log(`
@@ -90,7 +91,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
 
   // validate roles
   const validateRole = validateRoleGenerator(companies);
-  const roles = [];
+  const roles: RoleRow[] = [];
 
   for (const role of rolesRows) {
     try {
@@ -132,7 +133,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
     process.exit(1);
   }
 
-  const sirenifiedCompanies = [];
+  const sirenifiedCompanies: (CompanyRow & CompanyInfo)[] = [];
 
   // add sirene information
   for (const c of companies) {
@@ -164,8 +165,10 @@ export async function bulkCreate(opts: Opts): Promise<void> {
           verificationComment: "Import en masse",
           codeNaf: company.codeNaf,
           gerepId: company.gerepId,
-          name: company.name,
-          companyTypes: { set: company.companyTypes },
+          name: company.name!,
+          companyTypes: {
+            set: company.companyTypes as CompanyType[]
+          },
           securityCode: randomNumber(4),
           givenName: company.givenName,
           contactEmail: company.contactEmail,
@@ -188,7 +191,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
     // check for existing user
     let user = await prisma.user.findUnique({ where: { email } });
 
-    let newUser = null;
+    let newUser: { password: string } | null = null;
 
     if (!user) {
       // No user matches this email. Creates a new one
@@ -216,13 +219,13 @@ export async function bulkCreate(opts: Opts): Promise<void> {
       usersWithRoles[email].map(async ({ role, siret }) => {
         try {
           const association = await associateUserToCompany(
-            user.id,
+            user!.id,
             siret,
             role
           );
-          if (!user.firstAssociationDate) {
+          if (!user!.firstAssociationDate) {
             await prisma.user.update({
-              where: { id: user.id },
+              where: { id: user!.id },
               data: { firstAssociationDate: new Date() }
             });
           }
@@ -232,7 +235,7 @@ export async function bulkCreate(opts: Opts): Promise<void> {
             // association already exist, return it
             const existingAssociations =
               await prisma.companyAssociation.findMany({
-                where: { company: { siret }, user: { id: user.id } }
+                where: { company: { siret }, user: { id: user!.id } }
               });
             return existingAssociations[0];
           }

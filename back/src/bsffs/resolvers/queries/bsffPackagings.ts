@@ -4,9 +4,9 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { toPrismaBsffPackagingWhereInput } from "../../where";
 import { applyMask } from "../../../common/where";
 import { getConnection } from "../../../common/pagination";
-import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { Prisma } from "@prisma/client";
 import { getBsffPackagingRepository } from "../../repository";
+import { Permission, can, getUserRoles } from "../../../permissions";
 
 const bsffPackagings: QueryResolvers["bsffPackagings"] = async (
   _,
@@ -15,15 +15,18 @@ const bsffPackagings: QueryResolvers["bsffPackagings"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
+  const roles = await getUserRoles(user.id);
+  const orgIdsWithListPermission = Object.keys(roles).filter(orgId =>
+    can(roles[orgId], Permission.BsdCanList)
+  );
 
   const mask = {
     bsff: {
       OR: [
-        { emitterCompanySiret: { in: userCompaniesSiretOrVat } },
-        { transporterCompanySiret: { in: userCompaniesSiretOrVat } },
-        { transporterCompanyVatNumber: { in: userCompaniesSiretOrVat } },
-        { destinationCompanySiret: { in: userCompaniesSiretOrVat } }
+        { emitterCompanySiret: { in: orgIdsWithListPermission } },
+        { transporterCompanySiret: { in: orgIdsWithListPermission } },
+        { transporterCompanyVatNumber: { in: orgIdsWithListPermission } },
+        { destinationCompanySiret: { in: orgIdsWithListPermission } }
       ]
     }
   };

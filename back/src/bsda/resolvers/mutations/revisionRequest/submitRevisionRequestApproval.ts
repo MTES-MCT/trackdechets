@@ -8,8 +8,8 @@ import { ForbiddenError, UserInputError } from "apollo-server-express";
 import { checkIsAuthenticated } from "../../../../common/permissions";
 import { MutationSubmitBsdaRevisionRequestApprovalArgs } from "../../../../generated/graphql/types";
 import { GraphQLContext } from "../../../../types";
-import { getUserCompanies } from "../../../../users/database";
 import { getBsdaRepository } from "../../../repository";
+import { Permission, can, getUserRoles } from "../../../../permissions";
 
 const bsdaRevisionRequestWithApprovals =
   Prisma.validator<Prisma.BsdaRevisionRequestArgs>()({
@@ -75,9 +75,12 @@ async function getCurrentApproverSiret(
     .filter(approval => approval.status === Status.PENDING)
     .map(approvals => approvals.approverSiret);
 
-  const userCompanies = await getUserCompanies(user.id);
-  const approvingCompaniesCandidate = userCompanies.find(company =>
-    remainingApproverSirets.includes(company.siret)
+  const roles = await getUserRoles(user.id);
+  const userOrgIds = Object.keys(roles).filter(orgId =>
+    can(roles[orgId], Permission.BsdCanRevise)
+  );
+  const approvingCompaniesCandidate = userOrgIds.find(orgId =>
+    remainingApproverSirets.includes(orgId)
   );
 
   if (!approvingCompaniesCandidate) {
@@ -86,5 +89,5 @@ async function getCurrentApproverSiret(
     );
   }
 
-  return approvingCompaniesCandidate.siret;
+  return approvingCompaniesCandidate;
 }

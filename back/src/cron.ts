@@ -1,10 +1,10 @@
 import * as cron from "cron";
 import cronValidator from "cron-validate";
 import {
-  sendFirstOnboardingEmail,
   sendMembershipRequestDetailsEmail,
   sendPendingMembershipRequestDetailsEmail,
   sendPendingMembershipRequestToAdminDetailsEmail,
+  sendPendingRevisionRequestToAdminDetailsEmail,
   sendSecondOnboardingEmail
 } from "./commands/onboarding.helpers";
 import { initSentry } from "./common/sentry";
@@ -12,19 +12,21 @@ import { initSentry } from "./common/sentry";
 const {
   CRON_ONBOARDING_SCHEDULE,
   FIRST_ONBOARDING_TEMPLATE_ID,
-  PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID,
-  PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
+  PRODUCER_SECOND_ONBOARDING,
+  PROFESIONAL_SECOND_ONBOARDING,
+  VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID
 } = process.env;
 
-let jobs = [];
+let jobs: cron.CronJob[] = [];
 
 if (CRON_ONBOARDING_SCHEDULE) {
   validateOnbardingCronSchedule(CRON_ONBOARDING_SCHEDULE);
 
   if (
     !FIRST_ONBOARDING_TEMPLATE_ID ||
-    !PRODUCER_SECOND_ONBOARDING_TEMPLATE_ID ||
-    !PROFESSIONAL_SECOND_ONBOARDING_TEMPLATE_ID
+    !PRODUCER_SECOND_ONBOARDING ||
+    !PROFESIONAL_SECOND_ONBOARDING ||
+    !VERIFIED_FOREIGN_TRANSPORTER_COMPANY_TEMPLATE_ID
   ) {
     throw new Error(
       `Cannot start onboarding email cron job because some email templates were not configured :
@@ -36,14 +38,6 @@ if (CRON_ONBOARDING_SCHEDULE) {
 
   jobs = [
     ...jobs,
-    // first onboarding email
-    new cron.CronJob({
-      cronTime: CRON_ONBOARDING_SCHEDULE,
-      onTick: async () => {
-        await sendFirstOnboardingEmail();
-      },
-      timeZone: "Europe/Paris"
-    }),
     // second onbarding email
     new cron.CronJob({
       cronTime: CRON_ONBOARDING_SCHEDULE,
@@ -75,6 +69,14 @@ if (CRON_ONBOARDING_SCHEDULE) {
         await sendPendingMembershipRequestToAdminDetailsEmail();
       },
       timeZone: "Europe/Paris"
+    }),
+    // admins who did not answer to revision requests
+    new cron.CronJob({
+      cronTime: CRON_ONBOARDING_SCHEDULE,
+      onTick: async () => {
+        await sendPendingRevisionRequestToAdminDetailsEmail();
+      },
+      timeZone: "Europe/Paris"
     })
   ];
 }
@@ -83,12 +85,13 @@ const Sentry = initSentry();
 
 if (Sentry) {
   jobs.forEach(job => {
-    const onTick = job.onTick;
-    job.onTick = async () => {
-      try {
-        await onTick();
-      } catch (err) {
-        Sentry.captureException(err);
+    job.fireOnTick = async function () {
+      for (let i = this._callbacks.length - 1; i >= 0; i--) {
+        try {
+          await this._callbacks[i].call(this.context, this.onComplete);
+        } catch (err) {
+          Sentry.captureException(err);
+        }
       }
     };
   });

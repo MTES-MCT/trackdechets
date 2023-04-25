@@ -7,7 +7,8 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { getCompanyOrCompanyNotFound } from "../../../companies/database";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { inviteUserToJoin } from "../../../mailer/templates";
-import { checkIsCompanyAdmin } from "../../permissions";
+import { checkUserPermissions, Permission } from "../../../permissions";
+import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 
 const resendInvitationResolver: MutationResolvers["resendInvitation"] = async (
   parent,
@@ -17,7 +18,12 @@ const resendInvitationResolver: MutationResolvers["resendInvitation"] = async (
   applyAuthStrategies(context, [AuthType.Session]);
   const user = checkIsAuthenticated(context);
   const company = await getCompanyOrCompanyNotFound({ orgId: siret });
-  await checkIsCompanyAdmin(user, company);
+  await checkUserPermissions(
+    user,
+    company.orgId,
+    Permission.CompanyCanManageMembers,
+    NotCompanyAdminErrorMsg(company.orgId)
+  );
 
   const invitations = await prisma.userAccountHash.findMany({
     where: { email, companySiret: siret }

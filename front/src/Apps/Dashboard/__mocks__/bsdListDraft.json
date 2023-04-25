@@ -21,6 +21,7 @@
             "__typename": "PackagingInfo"
           }
         ],
+        "quantity": 2,
         "__typename": "WasteDetails"
       },
       "emitter": {

@@ -1,10 +1,11 @@
+import { Prisma } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import {
   flattenFicheInterventionBsffInput,
   expandFicheInterventionBsffFromDB
 } from "../../converter";
-import { checkCanWriteFicheIntervention } from "../../permissions";
+import { checkCanCreateFicheIntervention } from "../../permissions";
 import { getBsffFicheInterventionRepository } from "../../repository";
 import { sirenifyBsffFicheInterventionInput } from "../../sirenify";
 import { validateFicheIntervention } from "../../validation";
@@ -17,8 +18,8 @@ const createFicheInterventionBsff: MutationResolvers["createFicheInterventionBsf
       input,
       user
     );
+    await checkCanCreateFicheIntervention(user, input);
     const flatInput = flattenFicheInterventionBsffInput(sirenifiedInput);
-    await checkCanWriteFicheIntervention(user, flatInput);
 
     await validateFicheIntervention(flatInput);
 
@@ -26,7 +27,7 @@ const createFicheInterventionBsff: MutationResolvers["createFicheInterventionBsf
       getBsffFicheInterventionRepository(user);
 
     const ficheIntervention = await createFicheIntervention({
-      data: flatInput
+      data: flatInput as Prisma.BsffFicheInterventionCreateInput
     });
 
     return expandFicheInterventionBsffFromDB(ficheIntervention);

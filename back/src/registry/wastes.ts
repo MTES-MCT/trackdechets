@@ -36,16 +36,21 @@ async function getWasteConnection<WasteType extends GenericWaste>(
       before: args.before
     });
 
-  const searchHits = await searchBsds(registryType, args.sirets, args.where, {
-    size,
-    sort,
-    ...(search_after ? { search_after } : {})
-  });
+  const searchHits = await searchBsds(
+    registryType,
+    args.sirets,
+    args.where ?? {},
+    {
+      size,
+      sort,
+      ...(search_after ? { search_after } : {})
+    }
+  );
 
   const hits = searchHits.hits.slice(0, size);
 
   const bsds = await toPrismaBsds(
-    searchHits.hits.map(hit => hit._source),
+    searchHits.hits.map(hit => hit._source).filter(Boolean),
     {
       BSDD: {
         forwarding: true,
@@ -69,7 +74,11 @@ async function getWasteConnection<WasteType extends GenericWaste>(
   const wastes = toWastes<WasteType>(registryType, bsds);
 
   const edges = hits.reduce<Array<WasteEdge<WasteType>>>(
-    (acc, { _source: { type, id, readableId } }) => {
+    (acc, { _source: bsd }) => {
+      if (!bsd) {
+        return acc;
+      }
+      const { type, id, readableId } = bsd;
       const waste = wastes[type].find(waste =>
         type === "BSDD"
           ? waste.id === tov1ReadableId(readableId)

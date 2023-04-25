@@ -12,7 +12,7 @@ import {
 import client from "./esClient";
 
 const { ResponseError } = errors;
-const index = process.env.TD_COMPANY_ELASTICSEARCH_INDEX;
+const index = process.env.TD_COMPANY_ELASTICSEARCH_INDEX!;
 
 /**
  * Build a company object from a search response
@@ -136,6 +136,9 @@ export const searchCompany = async (
       id: siret,
       index
     });
+    if (!response.body._source) {
+      throw new Error(`No _source in ES body for id ${siret} & index ${index}`);
+    }
     const company = searchResponseToCompany(response.body._source);
     if (company.statutDiffusionEtablissement === "N") {
       throw new AnonymousCompanyError();
@@ -175,17 +178,16 @@ export const searchCompanies = (
   const must: estypes.QueryDslQueryContainer[] = [
     {
       match: {
-        // field created during indexation from the copy of multiple fields
-        // check this in indexInseeSiret.ts and "stocketablissement" index mapping
+        // the field 'td_search_companies' is created during indexation from the copy of multiple fields
+        // check this in search/src/indexation code.
         td_search_companies: {
-          query: qs,
-          operator: "or"
+          query: qs
         }
       }
     }
   ];
 
-  if (department?.length >= 2 && department?.length <= 3) {
+  if (department?.length === 2 || department?.length === 3) {
     // this might a french department code
     must.push({
       wildcard: { codePostalEtablissement: `${department}*` }
@@ -201,8 +203,9 @@ export const searchCompanies = (
 
   const searchRequest: SearchOptions = {
     ...options,
+    _source_excludes: "td_search_companies",
+    size: 20,
     index,
-    // default_operator: "OR",
     body: {
       // QueryDSL docs https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl.html
       query: {

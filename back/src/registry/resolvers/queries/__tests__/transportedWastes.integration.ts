@@ -207,7 +207,7 @@ describe("Transported wastes registry", () => {
     expect(errors).toHaveLength(1);
     expect(errors[0]).toEqual(
       expect.objectContaining({
-        message: `Vous n'êtes pas membre de l'entreprise portant le siret "${transporter2.company.siret}".`
+        message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${transporter2.company.siret}`
       })
     );
   });
@@ -312,7 +312,7 @@ describe("Transported wastes registry", () => {
     process.env = { ...OLD_ENV, REGISTRY_WHITE_LIST_IP: "127.0.0.1" };
     const server = require("../../../../server").server;
     await server.start();
-    const makeClientLocal: (user?: Express.User) => {
+    const makeClientLocal: (user?: User) => {
       query: TestQuery;
     } = require("../../../../__tests__/testClient").default;
     const user = await userFactory({ isRegistreNational: true });
@@ -334,7 +334,7 @@ describe("Transported wastes registry", () => {
     process.env = { ...OLD_ENV, REGISTRY_WHITE_LIST_IP: undefined };
     const server = require("../../../../server").server;
     await server.start();
-    const makeClientLocal: (user?: Express.User) => {
+    const makeClientLocal: (user?: User) => {
       query: TestQuery;
     } = require("../../../../__tests__/testClient").default;
     const user = await userFactory({ isRegistreNational: true });
@@ -350,7 +350,7 @@ describe("Transported wastes registry", () => {
     );
     expect(errors).toEqual([
       expect.objectContaining({
-        message: `Vous n'êtes pas membre de l'entreprise portant le siret "${destination.company.siret}".`
+        message: `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${destination.company.siret}`
       })
     ]);
   });

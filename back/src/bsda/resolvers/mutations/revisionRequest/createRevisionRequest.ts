@@ -2,8 +2,7 @@ import {
   Bsda,
   BsdaStatus,
   Prisma,
-  RevisionRequestStatus,
-  User
+  RevisionRequestStatus
 } from "@prisma/client";
 import { ForbiddenError, UserInputError } from "apollo-server-express";
 import * as yup from "yup";
@@ -18,12 +17,9 @@ import { GraphQLContext } from "../../../../types";
 import { getUserCompanies } from "../../../../users/database";
 import { flattenBsdaRevisionRequestInput } from "../../../converter";
 import { getBsdaOrNotFound } from "../../../database";
-import {
-  BSDA_REVISION_REQUESTER_FIELDS,
-  checkCanRequestRevision
-} from "../../../permissions";
 import { getBsdaRepository } from "../../../repository";
 import { OPERATIONS } from "../../../validation";
+import { checkCanRequestRevision } from "../../../permissions";
 
 // If you modify this, also modify it in the frontend
 export const CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = [
@@ -40,6 +36,12 @@ export const CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = [
 export const NON_CANCELLABLE_BSDA_STATUSES: BsdaStatus[] = Object.values(
   BsdaStatus
 ).filter(status => !CANCELLABLE_BSDA_STATUSES.includes(status));
+
+const BSDA_REVISION_REQUESTER_FIELDS = [
+  "emitterCompanySiret",
+  "destinationCompanySiret",
+  "workerCompanySiret"
+];
 
 export type RevisionRequestContent = Pick<
   Prisma.BsdaRevisionRequestCreateInput,
@@ -87,6 +89,12 @@ export async function createBsdaRevisionRequest(
     bsda,
     authoringCompanySiret
   );
+
+  if (!authoringCompany.siret) {
+    throw new Error(
+      `Authoring company ${authoringCompany.id} has no siret. Cannot create BSDA revision request.`
+    );
+  }
   const approversSirets = await getApproversSirets(
     bsda,
     authoringCompany.siret
@@ -106,7 +114,7 @@ export async function createBsdaRevisionRequest(
 }
 
 async function checkIfUserCanRequestRevisionOnBsda(
-  user: User,
+  user: Express.User,
   bsda: Bsda
 ): Promise<void> {
   await checkCanRequestRevision(user, bsda);
@@ -144,9 +152,9 @@ async function checkIfUserCanRequestRevisionOnBsda(
 
 async function getApproversSirets(bsda: Bsda, authoringCompanySiret: string) {
   // Requesters and approvers are the same persona
-  const approversSirets = Object.values(BSDA_REVISION_REQUESTER_FIELDS)
-    .map(field => bsda[field])
-    .filter(siret => Boolean(siret) && siret !== authoringCompanySiret);
+  const approversSirets = BSDA_REVISION_REQUESTER_FIELDS.map(
+    field => bsda[field]
+  ).filter(siret => Boolean(siret) && siret !== authoringCompanySiret);
 
   // Remove duplicates
   return [...new Set(approversSirets)];
@@ -157,9 +165,9 @@ async function getAuthoringCompany(
   bsda: Bsda,
   authoringCompanySiret: string
 ) {
-  const siretConcernedByRevision = Object.values(
-    BSDA_REVISION_REQUESTER_FIELDS
-  ).map(field => bsda[field]);
+  const siretConcernedByRevision = BSDA_REVISION_REQUESTER_FIELDS.map(
+    field => bsda[field]
+  );
 
   if (!siretConcernedByRevision.includes(authoringCompanySiret)) {
     throw new UserInputError(

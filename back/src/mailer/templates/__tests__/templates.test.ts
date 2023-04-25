@@ -90,13 +90,13 @@ describe("templates", () => {
       to
     });
     expect(rendered.body).toContain(form.recipientCompanyName);
-    expect(rendered.body).toContain(toFrFormat(form.receivedAt));
+    expect(rendered.body).toContain(toFrFormat(form.receivedAt!));
     expect(rendered.body).toContain(form.emitterCompanyName);
     expect(rendered.body).toContain(form.emitterCompanyAddress);
     expect(rendered.body).toContain(form.readableId);
     expect(rendered.body).toContain(form.wasteDetailsName);
     expect(rendered.body).toContain(form.wasteDetailsCode);
-    expect(rendered.body).toContain(form.wasteDetailsQuantity.toString());
+    expect(rendered.body).toContain(form.wasteDetailsQuantity!.toString());
     expect(rendered.body).toContain(form.wasteRefusalReason);
     expect(rendered.body).toContain(form.transporterCompanyName);
     expect(rendered.body).toContain(form.sentBy);
@@ -172,13 +172,13 @@ describe("templates", () => {
       to
     });
     expect(rendered.body).toContain(form.recipientCompanyName);
-    expect(rendered.body).toContain(toFrFormat(form.receivedAt));
+    expect(rendered.body).toContain(toFrFormat(form.receivedAt!));
     expect(rendered.body).toContain(form.emitterCompanyName);
     expect(rendered.body).toContain(form.emitterCompanyAddress);
     expect(rendered.body).toContain(form.readableId);
     expect(rendered.body).toContain(form.wasteDetailsName);
     expect(rendered.body).toContain(form.wasteDetailsCode);
-    expect(rendered.body).toContain(form.wasteDetailsQuantity.toString());
+    expect(rendered.body).toContain(form.wasteDetailsQuantity!.toString());
     expect(rendered.body).toContain(form.wasteRefusalReason);
     expect(rendered.body).toContain(form.transporterCompanyName);
     expect(rendered.body).toContain(form.sentBy);
@@ -303,7 +303,7 @@ describe("templates", () => {
       variables: {
         company: {
           name: companyName,
-          siret: companySiret
+          orgId: companySiret
         }
       },
       to
@@ -319,7 +319,7 @@ describe("templates", () => {
       variables: {
         company: {
           name: companyName,
-          siret: companySiret,
+          orgId: companySiret,
           verificationMode: "LETTER"
         }
       },
@@ -338,7 +338,7 @@ describe("templates", () => {
       variables: {
         company: {
           name: companyName,
-          siret: companySiret,
+          orgId: companySiret,
           verificationMode: "MANUAL"
         }
       },

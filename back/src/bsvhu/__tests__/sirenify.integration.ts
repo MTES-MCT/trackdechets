@@ -25,9 +25,9 @@ describe("sirenify", () => {
     }
 
     const searchResults = {
-      [emitter.company.siret]: searchResult("émetteur"),
-      [transporter.company.siret]: searchResult("transporteur"),
-      [destination.company.siret]: searchResult("destinataire")
+      [emitter.company.siret!]: searchResult("émetteur"),
+      [transporter.company.siret!]: searchResult("transporteur"),
+      [destination.company.siret!]: searchResult("destinataire")
     };
 
     searchCompanySpy.mockImplementation((clue: string) => {
@@ -63,23 +63,23 @@ describe("sirenify", () => {
       auth: AuthType.Bearer
     } as Express.User);
 
-    expect(sirenified.emitter.company.name).toEqual(
-      searchResults[emitter.company.siret].name
+    expect(sirenified.emitter!.company!.name).toEqual(
+      searchResults[emitter.company.siret!].name
     );
-    expect(sirenified.emitter.company.address).toEqual(
-      searchResults[emitter.company.siret].address
+    expect(sirenified.emitter!.company!.address).toEqual(
+      searchResults[emitter.company.siret!].address
     );
-    expect(sirenified.transporter.company.name).toEqual(
-      searchResults[transporter.company.siret].name
+    expect(sirenified.transporter!.company!.name).toEqual(
+      searchResults[transporter.company.siret!].name
     );
-    expect(sirenified.transporter.company.address).toEqual(
-      searchResults[transporter.company.siret].address
+    expect(sirenified.transporter!.company!.address).toEqual(
+      searchResults[transporter.company.siret!].address
     );
-    expect(sirenified.destination.company.name).toEqual(
-      searchResults[destination.company.siret].name
+    expect(sirenified.destination!.company!.name).toEqual(
+      searchResults[destination.company.siret!].name
     );
-    expect(sirenified.destination.company.address).toEqual(
-      searchResults[destination.company.siret].address
+    expect(sirenified.destination!.company!.address).toEqual(
+      searchResults[destination.company.siret!].address
     );
   });
 
@@ -97,9 +97,9 @@ describe("sirenify", () => {
     }
 
     const searchResults = {
-      [emitter.company.siret]: searchResult("émetteur"),
-      [transporter.company.siret]: searchResult("transporteur"),
-      [destination.company.siret]: searchResult("destinataire")
+      [emitter.company.siret!]: searchResult("émetteur"),
+      [transporter.company.siret!]: searchResult("transporteur"),
+      [destination.company.siret!]: searchResult("destinataire")
     };
 
     searchCompanySpy.mockImplementation((clue: string) => {
@@ -129,23 +129,23 @@ describe("sirenify", () => {
       auth: AuthType.Bearer
     } as Express.User);
 
-    expect(sirenified.emitter.company.name).toEqual(
-      searchResults[emitter.company.siret].name
+    expect(sirenified.emitter!.company!.name).toEqual(
+      searchResults[emitter.company.siret!].name
     );
-    expect(sirenified.emitter.company.address).toEqual(
-      searchResults[emitter.company.siret].address
+    expect(sirenified.emitter!.company!.address).toEqual(
+      searchResults[emitter.company.siret!].address
     );
-    expect(sirenified.transporter.company.name).toEqual(
-      searchResults[transporter.company.siret].name
+    expect(sirenified.transporter!.company!.name).toEqual(
+      searchResults[transporter.company.siret!].name
     );
-    expect(sirenified.transporter.company.address).toEqual(
-      searchResults[transporter.company.siret].address
+    expect(sirenified.transporter!.company!.address).toEqual(
+      searchResults[transporter.company.siret!].address
     );
-    expect(sirenified.destination.company.name).toEqual(
-      searchResults[destination.company.siret].name
+    expect(sirenified.destination!.company!.name).toEqual(
+      searchResults[destination.company.siret!].name
     );
-    expect(sirenified.destination.company.address).toEqual(
-      searchResults[destination.company.siret].address
+    expect(sirenified.destination!.company!.address).toEqual(
+      searchResults[destination.company.siret!].address
     );
   });
 });

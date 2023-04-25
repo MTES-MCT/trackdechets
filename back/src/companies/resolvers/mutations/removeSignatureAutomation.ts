@@ -4,7 +4,8 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationRemoveSignatureAutomationArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
-import { checkIsCompanyAdmin } from "../../../users/permissions";
+import { checkUserPermissions, Permission } from "../../../permissions";
+import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 
 export async function removeSignatureAutomation(
   _,
@@ -23,7 +24,12 @@ export async function removeSignatureAutomation(
     throw new UserInputError("Délégation inconnue.");
   }
 
-  await checkIsCompanyAdmin(user, signatureAutomation.from);
+  await checkUserPermissions(
+    user,
+    signatureAutomation.from.orgId,
+    Permission.CompanyCanManageSignatureAutomation,
+    NotCompanyAdminErrorMsg(signatureAutomation.from.orgId)
+  );
 
   return prisma.signatureAutomation.delete({
     where: {

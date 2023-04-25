@@ -7,7 +7,7 @@ export enum InfoIconCode {
 export enum InfoIconValue {
   TempStorage = "Entreposage provisoire",
   EcoOrganism = "Éco-organisme",
-  LastModificationDate = "Dernière modification le",
+  LastModificationDate = "Modifié le",
   default = "",
 }
 

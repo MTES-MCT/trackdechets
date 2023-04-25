@@ -1,11 +1,11 @@
 import { Bsdasri, User, Prisma } from "@prisma/client";
 import { safeInput } from "../common/converter";
 import { SealedFieldError } from "../common/errors";
-import { getCachedUserSiretOrVat } from "../common/redis/users";
 import { objectDiff } from "../forms/workflow/diff";
 import { BsdasriInput, BsdasriSignatureType } from "../generated/graphql/types";
 import { flattenBsdasriInput } from "./converter";
 import { getReadonlyBsdasriRepository } from "./repository";
+import { getUserRoles } from "../permissions";
 
 type EditableBsdasriFields = Required<
   Omit<
@@ -141,8 +141,10 @@ export async function checkEditionRules(
     return true;
   }
 
-  const userSirets = user?.id ? await getCachedUserSiretOrVat(user.id) : [];
-  const isEmitter = userSirets.includes(bsdasri.emitterCompanySiret);
+  const userSirets = user?.id ? Object.keys(await getUserRoles(user.id)) : [];
+  const isEmitter =
+    bsdasri.emitterCompanySiret &&
+    userSirets.includes(bsdasri.emitterCompanySiret);
 
   if (bsdasri.status == "SIGNED_BY_PRODUCER" && isEmitter) {
     return true;
@@ -151,7 +153,7 @@ export async function checkEditionRules(
   // Inner function used to recursively checks that the diff
   // does not contain any fields sealed by signature
   function checkSealedFields(
-    signatureType: BsdasriSignatureType,
+    signatureType: BsdasriSignatureType | null,
     editableFields: string[]
   ) {
     if (signatureType === null) {

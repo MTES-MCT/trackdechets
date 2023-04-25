@@ -10,7 +10,7 @@ import { FullUser } from "./types";
 import { UserInputError } from "apollo-server-express";
 import { hash } from "bcrypt";
 import { getUid, sanitizeEmail, hashToken } from "../utils";
-import { deleteCachedUserCompanies } from "../common/redis/users";
+import { deleteCachedUserRoles } from "../common/redis/users";
 import { hashPassword, passwordVersion } from "./utils";
 
 export async function getUserCompanies(userId: string): Promise<Company[]> {
@@ -78,7 +78,12 @@ export async function createUserAccountHash(
  * @param orgId
  * @param role
  */
-export async function associateUserToCompany(userId, orgId, role) {
+export async function associateUserToCompany(
+  userId,
+  orgId,
+  role,
+  opt: Partial<Prisma.CompanyAssociationCreateInput> = {}
+) {
   // check for current associations
   const associations = await prisma.companyAssociation.findMany({
     where: {
@@ -101,7 +106,8 @@ export async function associateUserToCompany(userId, orgId, role) {
     data: {
       user: { connect: { id: userId } },
       role,
-      company: { connect: { orgId } }
+      company: { connect: { orgId } },
+      ...opt
     }
   });
 
@@ -112,7 +118,7 @@ export async function associateUserToCompany(userId, orgId, role) {
   });
 
   // clear cache
-  await deleteCachedUserCompanies(userId);
+  await deleteCachedUserRoles(userId);
 
   return association;
 }
@@ -202,7 +208,7 @@ export async function acceptNewUserCompanyInvitations(user: User) {
   }
 
   // clear cache
-  await deleteCachedUserCompanies(user.id);
+  await deleteCachedUserRoles(user.id);
 
   return prisma.userAccountHash.updateMany({
     where: {

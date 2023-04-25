@@ -71,13 +71,13 @@ export interface BsdElastic {
 
   destinationOperationCode: string;
 
-  emitterEmissionDate: number;
-  workerWorkDate: number;
-  transporterTransportTakenOverAt: number;
-  destinationReceptionDate: number;
-  destinationAcceptationDate: number;
-  destinationAcceptationWeight: number;
-  destinationOperationDate: number;
+  emitterEmissionDate: number | undefined;
+  workerWorkDate: number | undefined;
+  transporterTransportTakenOverAt: number | undefined;
+  destinationReceptionDate: number | undefined;
+  destinationAcceptationDate: number | undefined;
+  destinationAcceptationWeight: number | null;
+  destinationOperationDate: number | undefined;
 
   isDraftFor: string[];
   isForActionFor: string[];
@@ -92,7 +92,7 @@ export interface BsdElastic {
   isTransportedWasteFor: string[];
   isManagedWasteFor: string[];
 
-  intermediaries?: FormCompany[];
+  intermediaries?: FormCompany[] | null;
 
   rawBsd: any;
 }
@@ -345,6 +345,22 @@ export function indexBsd(bsd: BsdElastic, ctx?: GraphQLContext) {
   );
 }
 
+export async function getElasticBsdById(id) {
+  const result = await client.search({
+    index: index.alias,
+    body: {
+      query: {
+        term: {
+          readableId: {
+            value: id,
+            boost: "1.0"
+          }
+        }
+      }
+    }
+  });
+  return result;
+}
 /**
  * Bulk create/update a list of documents in Elastic Search.
  */

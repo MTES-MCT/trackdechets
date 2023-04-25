@@ -1,6 +1,7 @@
 import { signupFn as signup } from "../signup";
 import prisma from "../../../../prisma";
 import configureYup from "../../../../common/yup/configureYup";
+import * as redisUser from "../../../../common/redis/users";
 
 configureYup();
 
@@ -36,9 +37,12 @@ jest.mock("../../../../mailer/mailing", () => ({
   sendMail: () => null
 }));
 
-jest.mock("../../../../common/redis/users", () => ({
-  deleteCachedUserCompanies: () => jest.fn(() => Promise.resolve())
-}));
+const deletedCachedUserRolesSpy = jest.spyOn(
+  redisUser,
+  "deleteCachedUserRoles"
+);
+
+deletedCachedUserRolesSpy.mockResolvedValue();
 
 describe("signup", () => {
   beforeEach(() => {
@@ -71,5 +75,6 @@ describe("signup", () => {
       hashes.length
     );
     expect(prisma.userAccountHash.updateMany).toHaveBeenCalledTimes(1);
+    expect(deletedCachedUserRolesSpy).toHaveBeenCalledTimes(1);
   });
 });

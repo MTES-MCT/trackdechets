@@ -48,6 +48,7 @@ const formData: Partial<Form> = {
   transporterCompanyPhone: "03",
   transporterCompanyMail: "t@t.fr",
   wasteDetailsCode: "16 06 01*",
+  wasteDetailsName: "Déchets divers",
   wasteDetailsOnuCode: "AAA",
   wasteDetailsPackagingInfos: [
     { type: "FUT", other: null, quantity: 1 },
@@ -120,7 +121,7 @@ describe("sealedFormSchema", () => {
         orgId: "BE0541696005",
         vatNumber: "BE0541696005"
       });
-      const testForm = {
+      const testForm: any = {
         ...sealedForm,
         transporterCompanyVatNumber: transporter.vatNumber,
         transporterIsExemptedOfReceipt: null,

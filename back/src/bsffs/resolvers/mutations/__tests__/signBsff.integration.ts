@@ -183,7 +183,7 @@ describe("Mutation.signBsff", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message: "Vous n'êtes pas autorisé à signer pour cet acteur."
+          message: "Vous ne pouvez pas signer ce BSFF"
         })
       ]);
     });
@@ -213,7 +213,7 @@ describe("Mutation.signBsff", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          message: "Le code de sécurité est incorrect."
+          message: "Le code de signature est invalide."
         })
       ]);
     });
@@ -455,7 +455,7 @@ describe("Mutation.signBsff", () => {
         }
       });
 
-      const updatedBsff = await prisma.bsff.findUnique({
+      const updatedBsff = await prisma.bsff.findUniqueOrThrow({
         where: { id: bsff.id },
         include: { packagings: true }
       });
@@ -496,13 +496,13 @@ describe("Mutation.signBsff", () => {
         }
       });
 
-      const updatedBsff = await prisma.bsff.findUnique({
+      const updatedBsff = await prisma.bsff.findUniqueOrThrow({
         where: { id: bsff.id },
         include: { packagings: true }
       });
       expect(updatedBsff.status).toEqual(BsffStatus.INTERMEDIATELY_PROCESSED);
 
-      const refusedPackaging = await prisma.bsffPackaging.findUnique({
+      const refusedPackaging = await prisma.bsffPackaging.findUniqueOrThrow({
         where: { id: bsff.packagings[0].id },
         include: { previousPackagings: true }
       });
@@ -545,9 +545,10 @@ describe("Mutation.signBsff", () => {
         });
         expect(errors).toBeUndefined();
 
-        const acceptedBsffPackaging = await prisma.bsffPackaging.findUnique({
-          where: { id: bsff.packagings[0].id }
-        });
+        const acceptedBsffPackaging =
+          await prisma.bsffPackaging.findUniqueOrThrow({
+            where: { id: bsff.packagings[0].id }
+          });
 
         expect(acceptedBsffPackaging.acceptationWasteCode).toEqual("14 06 01*");
       }
@@ -578,7 +579,7 @@ describe("Mutation.signBsff", () => {
         });
 
         const packagings = await prisma.bsff
-          .findUnique({ where: { id: bsff.id } })
+          .findUniqueOrThrow({ where: { id: bsff.id } })
           .packagings();
 
         const { mutate } = makeClient(destination.user);
@@ -607,7 +608,7 @@ describe("Mutation.signBsff", () => {
         });
 
         const acceptedBsffPackagings = await prisma.bsff
-          .findUnique({
+          .findUniqueOrThrow({
             where: { id: bsff.id }
           })
           .packagings();
@@ -747,12 +748,12 @@ describe("Mutation.signBsff", () => {
       expect(errors).toBeUndefined();
       expect(data.signBsff.id).toBeTruthy();
 
-      const newBsff1 = await prisma.bsff.findUnique({
+      const newBsff1 = await prisma.bsff.findUniqueOrThrow({
         where: { id: bsff1.id }
       });
       expect(newBsff1.status).toEqual(BsffStatus.PROCESSED);
 
-      const newBsff2 = await prisma.bsff.findUnique({
+      const newBsff2 = await prisma.bsff.findUniqueOrThrow({
         where: { id: bsff2.id }
       });
       expect(newBsff2.status).toEqual(BsffStatus.PROCESSED);

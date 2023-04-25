@@ -1,7 +1,6 @@
 import { Bsff, BsffPackaging, User, Prisma } from "@prisma/client";
 import { safeInput } from "../../common/converter";
 import { SealedFieldError } from "../../common/errors";
-import { getCachedUserSiretOrVat } from "../../common/redis/users";
 import { objectDiff } from "../../forms/workflow/diff";
 import { BsffInput, BsffSignatureType } from "../../generated/graphql/types";
 import { flattenBsffInput } from "../converter";
@@ -9,6 +8,7 @@ import {
   getReadonlyBsffPackagingRepository,
   getReadonlyBsffRepository
 } from "../repository";
+import { getUserRoles } from "../../permissions";
 
 type BsffSignatureTypeUntilReception = Extract<
   BsffSignatureType,
@@ -98,8 +98,10 @@ export async function checkEditionRules(
     return true;
   }
 
-  const userSirets = user?.id ? await getCachedUserSiretOrVat(user.id) : [];
-  const isEmitter = userSirets.includes(existingBsff.emitterCompanySiret);
+  const userSirets = user?.id ? Object.keys(await getUserRoles(user.id)) : [];
+  const isEmitter =
+    existingBsff.emitterCompanySiret &&
+    userSirets.includes(existingBsff.emitterCompanySiret);
 
   if (existingBsff.status === "SIGNED_BY_EMITTER" && isEmitter) {
     return true;
@@ -114,7 +116,7 @@ export async function checkEditionRules(
   // Inner function used to recursively checks that the diff
   // does not contain any fields sealed by signature
   function checkSealedFields(
-    signatureType: BsffSignatureTypeUntilReception,
+    signatureType: BsffSignatureTypeUntilReception | null,
     editableFields: string[]
   ) {
     if (signatureType === null) {
@@ -206,7 +208,7 @@ async function getUpdatedFields(
         }
       : {}),
     ...(input.ficheInterventions
-      ? { ficheInterventions: ficheInterventions.map(p => p.id) }
+      ? { ficheInterventions: ficheInterventions?.map(p => p.id) }
       : {}),
     ...(input.grouping ? { grouping: previousPackagings.map(p => p.id) } : {}),
     ...(input.forwarding

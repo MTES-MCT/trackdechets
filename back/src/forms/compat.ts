@@ -20,7 +20,7 @@ export function simpleFormToBsdd(
     customId: form.customId,
     createdAt: form.createdAt,
     updatedAt: form.updatedAt,
-    isDeleted: form.isDeleted,
+    isDeleted: Boolean(form.isDeleted),
     isDraft: form.status == Status.DRAFT,
     status: form.status,
     wasteCode: form.wasteDetailsCode,
@@ -163,7 +163,9 @@ export function formToBsdd(
   form: Form & { forwarding?: Form } & {
     grouping?: { initialForm: Form }[];
   } & { transportSegments?: TransportSegment[] }
-): Bsdd & { grouping: Bsdd[] } & { forwarding: Bsdd & { grouping: Bsdd[] } } {
+): Bsdd & { grouping: Bsdd[] } & {
+  forwarding: (Bsdd & { grouping: Bsdd[] }) | null;
+} {
   let grouping: Bsdd[] = [];
 
   if (form.grouping) {
@@ -178,7 +180,7 @@ export function formToBsdd(
       ? {
           forwarding: {
             ...simpleFormToBsdd(form.forwarding),
-            grouping: null
+            grouping: []
           }
         }
       : { forwarding: null }),

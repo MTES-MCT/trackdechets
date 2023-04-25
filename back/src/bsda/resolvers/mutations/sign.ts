@@ -5,7 +5,6 @@ import {
   InvalidSignatureError
 } from "../../../bsvhu/errors";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkSecurityCode } from "../../../forms/permissions";
 import {
   BsdaSignatureInput,
   BsdaSignatureType,
@@ -15,7 +14,6 @@ import { sendMail } from "../../../mailer/mailing";
 import { finalDestinationModified } from "../../../mailer/templates";
 import { renderMail } from "../../../mailer/templates/renderers";
 import { GraphQLContext } from "../../../types";
-import { checkIsCompanyMember } from "../../../users/permissions";
 import { expandBsdaFromDb } from "../../converter";
 import { getBsdaHistory, getBsdaOrNotFound } from "../../database";
 import { machine } from "../../machine";
@@ -23,11 +21,12 @@ import { getBsdaRepository } from "../../repository";
 import { runInTransaction } from "../../../common/repository/helper";
 import { validateBsda } from "../../validation";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
+import { checkCanSignFor } from "../../permissions";
 
 type SignatureTypeInfos = {
   dbDateKey: keyof Bsda;
   dbAuthorKey: keyof Bsda;
-  getAuthorizedSiret: (form: Bsda) => string;
+  getAuthorizedSiret: (form: Bsda) => string | null;
 };
 
 export default async function sign(
@@ -43,9 +42,10 @@ export default async function sign(
   // To sign a form for a company, you must either:
   // - be part of that company
   // - provide the company security code
-  await checkAuthorization(
-    { currentUserId: user.id, securityCode: input.securityCode },
-    signatureTypeInfos.getAuthorizedSiret(bsda)
+  await checkCanSignFor(
+    user,
+    signatureTypeInfos.getAuthorizedSiret(bsda),
+    input.securityCode
   );
 
   // Cannot re-sign a form
@@ -65,7 +65,7 @@ export default async function sign(
   } = bsda;
   // Check that all necessary fields are filled
   await validateBsda(
-    simpleBsda,
+    simpleBsda as any,
     { previousBsdas: [], intermediaries: [] },
     {
       skipPreviousBsdas: true,
@@ -157,21 +157,6 @@ const signatureTypeMapping: Record<BsdaSignatureType, SignatureTypeInfos> = {
   }
 };
 
-function checkAuthorization(
-  requestInfo: { currentUserId: string; securityCode?: number },
-  signingCompanySiret: string
-) {
-  // If there is a security code provided, it must be authorized
-  if (requestInfo.securityCode) {
-    return checkSecurityCode(signingCompanySiret, requestInfo.securityCode);
-  }
-
-  return checkIsCompanyMember(
-    { id: requestInfo.currentUserId },
-    { orgId: signingCompanySiret }
-  );
-}
-
 function checkBsdaTypeSpecificRules(bsda: Bsda, input: BsdaSignatureInput) {
   if (bsda.type === BsdaType.COLLECTION_2710 && input.type !== "OPERATION") {
     throw new UserInputError(
@@ -210,23 +195,23 @@ async function sendAlertIfFollowingBsdaChangedPlannedDestination(bsda: Bsda) {
       const mail = renderMail(finalDestinationModified, {
         to: [
           {
-            email: previousBsda.emitterCompanyMail,
-            name: previousBsda.emitterCompanyName
+            email: previousBsda.emitterCompanyMail!,
+            name: previousBsda.emitterCompanyName!
           }
         ],
         variables: {
           id: previousBsda.id,
           emitter: {
-            siret: bsda.emitterCompanySiret,
-            name: bsda.emitterCompanyName
+            siret: bsda.emitterCompanySiret!,
+            name: bsda.emitterCompanyName!
           },
           destination: {
-            siret: bsda.destinationCompanySiret,
-            name: bsda.destinationCompanyName
+            siret: bsda.destinationCompanySiret!,
+            name: bsda.destinationCompanyName!
           },
           plannedDestination: {
             siret: previousBsda.destinationOperationNextDestinationCompanySiret,
-            name: previousBsda.destinationOperationNextDestinationCompanyName
+            name: previousBsda.destinationOperationNextDestinationCompanyName!
           }
         }
       });

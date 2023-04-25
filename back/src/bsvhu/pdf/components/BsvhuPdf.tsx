@@ -85,7 +85,7 @@ export function BsvhuPdf({ bsvhu, qrCode }: Props) {
               </div>
             </div>
             <p className="mb-3">
-              Nom de la personne à contacter : {bsvhu.emitter.company.contact}
+              Nom de la personne à contacter : {bsvhu.emitter?.company?.contact}
             </p>
           </div>
           {/* End Emitter */}
@@ -195,7 +195,7 @@ export function BsvhuPdf({ bsvhu, qrCode }: Props) {
                 checked={removeSpaces(bsvhu?.wasteCode) === "160104*"}
               />{" "}
               <label htmlFor="16 01 04*">
-                <strong>16 01 04*</strong> (véhicules hors d’usage non dépollué
+                <strong>16 01 04*</strong> (Véhicules hors d’usage non dépollués
                 par un centre agréé)
               </label>
             </div>
@@ -367,12 +367,12 @@ export function BsvhuPdf({ bsvhu, qrCode }: Props) {
                 NOM (Raison sociale) : {bsvhu?.destination?.company?.name}
               </p>
               <p className="mb-3">
-                Adresse : {bsvhu?.destination.company.address}
+                Adresse : {bsvhu?.destination?.company?.address}
               </p>
               <div className="Flex">
-                <p className="mb-3">Tel : {bsvhu.destination.company.phone}</p>
+                <p className="mb-3">Tel : {bsvhu.destination?.company?.phone}</p>
                 <p className="mb-3 ml-12">
-                  Mail : {bsvhu.destination.company.mail}
+                  Mail : {bsvhu.destination?.company?.mail}
                 </p>
               </div>
             </div>

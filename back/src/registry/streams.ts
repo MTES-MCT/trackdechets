@@ -20,7 +20,7 @@ export class WasteReader extends Readable {
 export interface WasteReaderArgs {
   registryType: WasteRegistryType;
   sirets: string[];
-  where?: WasteRegistryWhere;
+  where?: WasteRegistryWhere | null;
   chunk?: number;
 }
 
@@ -52,7 +52,7 @@ export function wastesReader({
             this.push(waste);
           });
           if (pageInfo.hasNextPage) {
-            this.after = pageInfo.endCursor;
+            this.after = pageInfo.endCursor!;
           } else {
             this.push(null);
           }

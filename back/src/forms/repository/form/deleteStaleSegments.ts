@@ -14,7 +14,7 @@ const buildDeleteFormStaleSegments: (
     .findUnique({ where })
     .transportSegments({ where: { takenOverAt: null } });
 
-  if (staleSegments.length > 0) {
+  if (staleSegments && staleSegments.length > 0) {
     await prisma.transportSegment.deleteMany({
       where: { id: { in: staleSegments.map(s => s.id) } }
     });

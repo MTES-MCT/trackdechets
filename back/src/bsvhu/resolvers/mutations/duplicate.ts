@@ -4,8 +4,8 @@ import getReadableId, { ReadableIdPrefix } from "../../../forms/readableId";
 import { MutationDuplicateBsvhuArgs } from "../../../generated/graphql/types";
 import { expandVhuFormFromDb } from "../../converter";
 import { getBsvhuOrNotFound } from "../../database";
-import { checkIsBsvhuContributor } from "../../permissions";
 import { getBsvhuRepository } from "../../repository";
+import { checkCanDuplicate } from "../../permissions";
 
 export default async function duplicate(
   _,
@@ -16,12 +16,7 @@ export default async function duplicate(
 
   const prismaBsvhu = await getBsvhuOrNotFound(id);
 
-  await checkIsBsvhuContributor(
-    user,
-    prismaBsvhu,
-    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
-  );
-
+  await checkCanDuplicate(user, prismaBsvhu);
   const bsvhuRepository = getBsvhuRepository(user);
   const newBsvhu = await bsvhuRepository.create(getDuplicateData(prismaBsvhu));
 

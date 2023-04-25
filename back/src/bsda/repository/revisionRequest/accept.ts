@@ -11,14 +11,14 @@ import {
   RepositoryFnDeps,
   RepositoryTransaction
 } from "../../../common/repository/types";
-import { enqueueBsdToIndex } from "../../../queue/producers/elastic";
+import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { PARTIAL_OPERATIONS } from "../../validation";
 import { NON_CANCELLABLE_BSDA_STATUSES } from "../../resolvers/mutations/revisionRequest/createRevisionRequest";
 import { ForbiddenError } from "apollo-server-core";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
-  { comment }: { comment?: string },
+  { comment }: { comment?: string | null },
   logMetadata?: LogMetadata
 ) => Promise<void>;
 
@@ -156,6 +156,12 @@ export async function approveAndApplyRevisionRequest(
     prisma
   );
 
+  if (!updateData) {
+    throw new Error(
+      `Empty BSDA revision cannot be applied. Id #${updatedRevisionRequest.id}, BSDA id #${updatedRevisionRequest.bsdaId}`
+    );
+  }
+
   const updatedBsda = await prisma.bsda.update({
     where: { id: updatedRevisionRequest.bsdaId },
     data: { ...updateData }
@@ -174,8 +180,14 @@ export async function approveAndApplyRevisionRequest(
     }
   });
 
-  // If the bsda was a grouping bsda, and is cancelled, free the children
   if (updateData.status === BsdaStatus.CANCELED) {
+    // Detach BSDs in a forward relationship
+    await prisma.bsda.update({
+      where: { id: updatedBsda.id },
+      data: { forwardingId: null }
+    });
+
+    // If the bsda was a grouping bsda, and is cancelled, free the children
     await prisma.bsda.updateMany({
       where: { groupedInId: updatedBsda.id },
       data: {
@@ -185,7 +197,7 @@ export async function approveAndApplyRevisionRequest(
   }
 
   prisma.addAfterCommitCallback?.(() =>
-    enqueueBsdToIndex(updatedRevisionRequest.bsdaId)
+    enqueueUpdatedBsdToIndex(updatedRevisionRequest.bsdaId)
   );
 
   return updatedRevisionRequest;

@@ -575,7 +575,7 @@ input WasteDetailsInput {
   """
   code: String
 
-  "Dénomination usuelle"
+  "Dénomination usuelle. Obligatoire"
   name: String
 
   "Code ONU. Obligatoire pour les déchets dangereux. Merci d'indiquer 'non soumis' si nécessaire."
@@ -924,5 +924,8 @@ input FormRevisionRequestTemporaryStorerInput {
 }
 
 input FormRevisionRequestWhere {
+  "Permet de filtrer sur un statut de demande de révision"
   status: RevisionRequestStatus
+  "Permet de filtrer sur un numéro de bordereau"
+  bsddId: StringFilter
 }

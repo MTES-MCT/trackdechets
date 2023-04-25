@@ -25,13 +25,7 @@ import {
 } from "./validation";
 import { GraphQLContext } from "../types";
 import { toBsffPackagingWithType } from "./compat";
-import {
-  checkCanWriteBsff,
-  checkCanWriteFicheIntervention,
-  isBsffContributor,
-  isBsffDetenteur
-} from "./permissions";
-import { getCachedUserSiretOrVat } from "../common/redis/users";
+import { checkCanCreate, checkCanUpdateFicheIntervention } from "./permissions";
 import {
   getBsffRepository,
   getReadonlyBsffFicheInterventionRepository,
@@ -39,6 +33,7 @@ import {
   getReadonlyBsffRepository
 } from "./repository";
 import { sirenifyBsffInput } from "./sirenify";
+import { Permission, can, getUserRoles } from "../permissions";
 
 export async function getBsffOrNotFound(where: Prisma.BsffWhereUniqueInput) {
   const { findUnique } = getReadonlyBsffRepository();
@@ -98,29 +93,50 @@ export async function getFicheInterventions({
   bsff: Bsff;
   context: GraphQLContext;
 }): Promise<BsffFicheIntervention[]> {
+  if (!user) {
+    throw new Error("The user should have been set to enter this path.");
+  }
   const { findUniqueGetFicheInterventions } = getReadonlyBsffRepository();
 
-  const ficheInterventions = await findUniqueGetFicheInterventions({
-    where: { id: bsff.id }
-  });
-  const isContributor = await isBsffContributor(user, bsff);
-  const isDetenteur = await isBsffDetenteur(user, bsff);
+  const ficheInterventions =
+    (await findUniqueGetFicheInterventions({
+      where: { id: bsff.id }
+    })) ?? [];
+
+  const userRoles = await getUserRoles(user.id);
+
+  const isBsffReader = [
+    bsff.emitterCompanySiret,
+    bsff.transporterCompanySiret,
+    bsff.transporterCompanyVatNumber,
+    bsff.destinationCompanySiret
+  ].some(
+    orgId =>
+      orgId && userRoles[orgId] && can(userRoles[orgId], Permission.BsdCanRead)
+  );
+
+  const isDetenteur = bsff.detenteurCompanySirets.some(
+    siret => userRoles[siret] && can(userRoles[siret], Permission.BsdCanRead)
+  );
 
   const expandedFicheInterventions = ficheInterventions.map(
     expandFicheInterventionBsffFromDB
   );
 
-  if (isContributor) {
+  if (isBsffReader) {
     return expandedFicheInterventions;
   }
 
   if (isDetenteur) {
-    const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
-
     // only return detenteur's fiche d'intervention
-    return expandedFicheInterventions.filter(fi =>
-      userCompaniesSiretOrVat.includes(fi.detenteur?.company?.siret)
-    );
+    return expandedFicheInterventions.filter(fi => {
+      const detenteurCompanySiret = fi.detenteur?.company?.siret;
+      if (!detenteurCompanySiret) return false;
+      return (
+        userRoles[detenteurCompanySiret] &&
+        can(userRoles[detenteurCompanySiret], Permission.BsdCanRead)
+      );
+    });
   }
 
   throw new ForbiddenError(
@@ -133,6 +149,8 @@ export async function createBsff(
   input: BsffInput,
   additionalData: Partial<Bsff> = {}
 ) {
+  await checkCanCreate(user, input);
+
   const sirenifiedInput = await sirenifyBsffInput(input, user);
 
   const flatInput: Prisma.BsffCreateInput = {
@@ -142,8 +160,6 @@ export async function createBsff(
     ...additionalData
   };
 
-  await checkCanWriteBsff(user, flatInput);
-
   if (!input.type) {
     throw new UserInputError("Vous devez préciser le type de BSFF");
   }
@@ -152,7 +168,7 @@ export async function createBsff(
     getReadonlyBsffFicheInterventionRepository();
 
   const ficheInterventions =
-    input.ficheInterventions?.length > 0
+    input.ficheInterventions && input.ficheInterventions.length > 0
       ? await findManyFicheInterventions({
           where: { id: { in: input.ficheInterventions } }
         })
@@ -160,7 +176,7 @@ export async function createBsff(
 
   const packagingsInput = input.packagings?.map(toBsffPackagingWithType);
   for (const ficheIntervention of ficheInterventions) {
-    await checkCanWriteFicheIntervention(user, ficheIntervention);
+    await checkCanUpdateFicheIntervention(user, ficheIntervention);
   }
 
   const futureBsff = {
@@ -215,10 +231,12 @@ export function getPackagingCreateInput(
         numero: p.numero,
         emissionNumero: p.numero,
         volume: p.volume,
-        weight: p.acceptationWeight,
+        weight: p.acceptationWeight ?? 0,
         previousPackagings: { connect: { id: p.id } }
       }))
-    : bsff.type === BsffType.RECONDITIONNEMENT && bsff.packagings?.length > 0
+    : bsff.type === BsffType.RECONDITIONNEMENT &&
+      bsff.packagings &&
+      bsff.packagings.length > 0
     ? [
         {
           type: bsff.packagings[0].type,

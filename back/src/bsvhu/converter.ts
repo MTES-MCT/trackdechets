@@ -2,7 +2,8 @@ import {
   nullIfNoValues,
   safeInput,
   processDate,
-  chain
+  chain,
+  undefinedOrDefault
 } from "../common/converter";
 import {
   FormCompany,
@@ -19,7 +20,8 @@ import {
   BsvhuReception,
   BsvhuOperation,
   BsvhuNextDestination,
-  BsvhuTransport
+  BsvhuTransport,
+  BsvhuTransportInput
 } from "../generated/graphql/types";
 import {
   Prisma,
@@ -131,7 +133,7 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
         takenOverAt: processDate(form.transporterTransportTakenOverAt)
       })
     }),
-    metadata: null
+    metadata: null as any
   };
 }
 
@@ -200,8 +202,11 @@ function flattenVhuDestinationInput({
     destinationReceptionWeight: chain(destination, d =>
       chain(d.reception, r => (r.weight ? r.weight * 1000 : r.weight))
     ),
-    destinationReceptionIdentificationNumbers: chain(destination, d =>
-      chain(d.reception, r => chain(r.identification, i => i.numbers))
+    destinationReceptionIdentificationNumbers: undefinedOrDefault(
+      chain(destination, d =>
+        chain(d.reception, r => chain(r.identification, i => i.numbers))
+      ),
+      []
     ),
     destinationReceptionIdentificationType: chain(destination, d =>
       chain(d.reception, r => chain(r.identification, i => i.type))
@@ -297,9 +302,14 @@ function flattenVhuTransporterInput({
   };
 }
 
-function flattenTransporterTransportInput(input: {
-  transport?: BsvhuTransport;
-}) {
+function flattenTransporterTransportInput(
+  input:
+    | {
+        transport?: BsvhuTransportInput | null;
+      }
+    | null
+    | undefined
+) {
   if (!input?.transport) {
     return {};
   }
@@ -313,7 +323,10 @@ function flattenVhuIdentificationInput({
   identification
 }: Pick<BsvhuInput, "identification">) {
   return {
-    identificationNumbers: chain(identification, i => i.numbers),
+    identificationNumbers: undefinedOrDefault(
+      chain(identification, i => i.numbers),
+      []
+    ),
     identificationType: chain(identification, i => i.type)
   };
 }

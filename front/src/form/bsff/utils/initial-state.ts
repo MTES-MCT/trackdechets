@@ -1,7 +1,24 @@
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
-import { BsffType, TransportMode } from "generated/graphql/types";
+import {
+  BsffInput,
+  BsffOperationCode,
+  BsffPackagingInput,
+  BsffTransporterInput,
+  BsffType,
+  TransportMode,
+} from "generated/graphql/types";
 
-const initialState = {
+export interface BsffFormTransporterInput extends BsffTransporterInput {
+  isExemptedOfRecepisse: boolean;
+}
+
+export interface BsffFormInput extends BsffInput {
+  transporter: BsffFormTransporterInput;
+  previousPackagings: BsffPackagingInput[];
+}
+
+// BsffInput with specific form values
+const initialState: BsffFormInput = {
   type: BsffType.CollectePetitesQuantites,
   emitter: {
     company: getInitialCompany(),
@@ -24,7 +41,7 @@ const initialState = {
   destination: {
     company: getInitialCompany(),
     cap: "",
-    plannedOperationCode: "",
+    plannedOperationCode: "" as BsffOperationCode,
   },
   packagings: [],
   waste: {

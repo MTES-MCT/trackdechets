@@ -20,7 +20,7 @@ const searchCompanyProviders = [searchCompanyTD, searchCompanyInseeThrottled];
 /**
  * Apply throttle, redundant and cache decorators to searchCompany functions
  */
-const decoratedSearchCompany = cache<SireneSearchResult>(
+const decoratedSearchCompany = cache<SireneSearchResult | null>(
   redundant(...searchCompanyProviders)
 );
 

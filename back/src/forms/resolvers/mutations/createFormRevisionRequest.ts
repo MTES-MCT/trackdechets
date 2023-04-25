@@ -99,9 +99,8 @@ export default async function createFormRevisionRequest(
   const existingBsdd = await getFormOrFormNotFound({ id: formId });
 
   const formRepository = getFormRepository(user);
-  const forwardedIn = await formRepository.findForwardedInById(formId);
 
-  await checkIfUserCanRequestRevisionOnBsdd(user, existingBsdd, forwardedIn);
+  await checkIfUserCanRequestRevisionOnBsdd(user, existingBsdd);
 
   const flatContent = await getFlatContent(content, existingBsdd);
 
@@ -113,8 +112,8 @@ export default async function createFormRevisionRequest(
   const approversSirets = await getApproversSirets(
     existingBsdd,
     flatContent,
-    authoringCompany.siret,
-    context.user
+    authoringCompany.orgId,
+    user
   );
 
   return formRepository.createRevisionRequest({
@@ -165,10 +164,9 @@ async function getAuthoringCompany(
 
 async function checkIfUserCanRequestRevisionOnBsdd(
   user: User,
-  bsdd: Form,
-  forwardedIn?: Form
+  bsdd: Form
 ): Promise<void> {
-  await checkCanRequestRevision(user, bsdd, forwardedIn);
+  await checkCanRequestRevision(user, bsdd);
   if (bsdd.emitterIsPrivateIndividual || bsdd.emitterIsForeignShip) {
     throw new ForbiddenError(
       "Impossible de créer une révision sur ce bordereau car l'émetteur est un particulier ou un navire étranger."
@@ -198,7 +196,7 @@ async function checkIfUserCanRequestRevisionOnBsdd(
   }
 
   const unsettledRevisionRequestsOnBsdd = await getFormRepository(
-    user
+    user as Express.User
   ).countRevisionRequests({
     bsddId: bsdd.id,
     status: RevisionRequestStatus.PENDING
@@ -271,14 +269,16 @@ async function getApproversSirets(
     bsdd.emitterCompanySiret,
     bsdd.traderCompanySiret,
     bsdd.recipientCompanySiret
-  ];
+  ].filter(Boolean);
 
   if (hasTemporaryStorageUpdate(content)) {
     const forwardedIn = await getFormRepository(user).findForwardedInById(
       bsdd.id
     );
 
-    approvers.push(forwardedIn.recipientCompanySiret);
+    if (forwardedIn?.recipientCompanySiret) {
+      approvers.push(forwardedIn.recipientCompanySiret);
+    }
   }
 
   const approversSirets = approvers.filter(
@@ -289,7 +289,14 @@ async function getApproversSirets(
   return [...new Set(approversSirets)];
 }
 
-function hasTemporaryStorageUpdate(content: RevisionRequestContent): boolean {
+function hasTemporaryStorageUpdate(
+  content: Pick<
+    RevisionRequestContent,
+    | "temporaryStorageDestinationCap"
+    | "temporaryStorageDestinationProcessingOperation"
+    | "temporaryStorageTemporaryStorerQuantityReceived"
+  >
+): boolean {
   return (
     content.temporaryStorageDestinationCap != null ||
     content.temporaryStorageDestinationProcessingOperation != null ||
@@ -299,7 +306,7 @@ function hasTemporaryStorageUpdate(content: RevisionRequestContent): boolean {
 
 const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
   .object({
-    isCanceled: yup.bool().nullable(),
+    isCanceled: yup.bool().transform(v => (v === null ? false : v)),
     recipientCap: yup.string().nullable(),
     wasteDetailsCode: yup
       .string()
@@ -309,7 +316,7 @@ const bsddRevisionRequestSchema: yup.SchemaOf<RevisionRequestContent> = yup
     wasteDetailsPackagingInfos: yup
       .array()
       .of(packagingInfoFn(false))
-      .nullable(),
+      .transform(v => (v === null ? Prisma.JsonNull : v)),
     quantityReceived: yup.number().min(0).nullable(),
     processingOperationDone: yup
       .string()

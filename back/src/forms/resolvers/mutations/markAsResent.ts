@@ -26,7 +26,8 @@ const markAsResentResolver: MutationResolvers["markAsResent"] = async (
 
   const formRepository = getFormRepository(user);
 
-  const { forwardedIn } = await formRepository.findFullFormById(form.id);
+  const { forwardedIn } =
+    (await formRepository.findFullFormById(form.id)) ?? {};
 
   if (forwardedIn === null) {
     throw new UserInputError(

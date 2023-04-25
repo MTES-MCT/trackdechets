@@ -1,6 +1,7 @@
 import React from "react";
 import { gql } from "@apollo/client";
 import AccountBooleanField from "./AccountBooleanField";
+import styles from "./AccountField.module.scss";
 
 import {
   CompanyPrivate,
@@ -71,7 +72,7 @@ export default function AccountFieldCompanyDasriDirectTakeOver({
               }}
             />
           ) : (
-            <span>
+            <span className={styles.field__value}>
               {company.allowBsdasriTakeOverWithoutSignature ? "Oui" : "Non"}
             </span>
           )

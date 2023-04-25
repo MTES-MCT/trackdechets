@@ -1,7 +1,6 @@
 import {
   Consistence,
   EmitterType,
-  Form,
   Prisma,
   QuantityType,
   Status,
@@ -83,6 +82,7 @@ describe("mutation / importPaperForm", () => {
         },
         wasteDetails: {
           code: "01 03 04*",
+          name: "Déchets divers",
           quantity: 1.0,
           quantityType: QuantityType.REAL,
           packagingInfos: [{ type: "BENNE" as Packagings, quantity: 1 }],
@@ -129,7 +129,7 @@ describe("mutation / importPaperForm", () => {
       const { mutate } = makeClient(user);
 
       const input = await getImportPaperFormInput();
-      input.recipient.company.siret = company.siret;
+      input.recipient!.company!.siret = company.siret;
 
       const { data } = await mutate<Pick<Mutation, "importPaperForm">>(
         IMPORT_PAPER_FORM,
@@ -168,9 +168,9 @@ describe("mutation / importPaperForm", () => {
       const { mutate } = makeClient(user);
 
       const input = await getImportPaperFormInput();
-      input.recipient.company.siret = company.siret;
+      input.recipient!.company!.siret = company.siret;
       // invalidate input
-      input.emitter.type = null;
+      input.emitter!.type = null;
 
       const { errors } = await mutate<Pick<Mutation, "importPaperForm">>(
         IMPORT_PAPER_FORM,
@@ -198,8 +198,8 @@ describe("mutation / importPaperForm", () => {
       const { mutate } = makeClient(user);
 
       const input = await getImportPaperFormInput();
-      input.emitter.type = "OTHER";
-      input.recipient.company.siret = company.siret;
+      input.emitter!.type = "OTHER";
+      input.recipient!.company!.siret = company.siret;
       input.ecoOrganisme = {
         siret: ecoOrganisme.siret,
         name: ecoOrganisme.name
@@ -230,8 +230,8 @@ describe("mutation / importPaperForm", () => {
       const { mutate } = makeClient(user);
 
       const input = await getImportPaperFormInput();
-      input.emitter.type = "OTHER";
-      input.recipient.company.siret = company.siret;
+      input.emitter!.type = "OTHER";
+      input.recipient!.company!.siret = company.siret;
       input.ecoOrganisme = {
         siret: siretify(3),
         name: "Some Eco-Organisme"
@@ -264,7 +264,7 @@ describe("mutation / importPaperForm", () => {
         const processedAt = new Date("2021-01-04");
 
         const input = await getImportPaperFormInput();
-        input.recipient.company.siret = company.siret;
+        input.recipient!.company!.siret = company.siret;
         input.signingInfo.sentAt = format(sentAt, f) as any;
         input.receivedInfo.receivedAt = format(receivedAt, f) as any;
         input.receivedInfo.signedAt = format(signedAt, f) as any;
@@ -280,7 +280,7 @@ describe("mutation / importPaperForm", () => {
         expect(data.importPaperForm.status).toEqual(Status.PROCESSED);
         expect(data.importPaperForm.isImportedFromPaper).toEqual(true);
 
-        const form = await prisma.form.findUnique({
+        const form = await prisma.form.findUniqueOrThrow({
           where: { id: data.importPaperForm.id }
         });
         expect(form.status).toEqual(Status.PROCESSED);
@@ -297,7 +297,7 @@ describe("mutation / importPaperForm", () => {
       const { mutate } = makeClient(user);
 
       const input = await getImportPaperFormInput();
-      input.recipient.company.siret = company.siret;
+      input.recipient!.company!.siret = company.siret;
       input.processedInfo.processingOperationDone = "D 13";
       input.processedInfo.nextDestination = {
         company: {
@@ -328,7 +328,7 @@ describe("mutation / importPaperForm", () => {
       const { mutate } = makeClient(user);
 
       const input = await getImportPaperFormInput();
-      input.recipient.company.siret = company.siret;
+      input.recipient!.company!.siret = company.siret;
       input.processedInfo.noTraceability = true;
       input.processedInfo.processingOperationDone = "R 13";
       input.processedInfo.nextDestination = {
@@ -358,7 +358,7 @@ describe("mutation / importPaperForm", () => {
   describe("update an existing BSD with imported data", () => {
     afterEach(resetDatabase);
 
-    async function getBaseData(): Promise<Partial<Form>> {
+    async function getBaseData() {
       const { company: transporterCompany } = await userWithCompanyFactory(
         "MEMBER"
       );
@@ -368,7 +368,7 @@ describe("mutation / importPaperForm", () => {
 
       return {
         status: "SEALED",
-        emitterType: "PRODUCER",
+        emitterType: EmitterType.PRODUCER,
         emitterCompanySiret: siretify(3),
         emitterCompanyName: "Émetteur",
         emitterCompanyAddress: "Somewhere",
@@ -391,10 +391,11 @@ describe("mutation / importPaperForm", () => {
         transporterCompanyContact: "Mr Transporteur",
         transporterCompanyMail: "trasnporteur@trackdechets.fr",
         wasteDetailsCode: "01 03 04*",
+        wasteDetailsName: "stériles acidogènes",
         wasteDetailsQuantity: 1.0,
-        wasteDetailsQuantityType: "ESTIMATED",
+        wasteDetailsQuantityType: QuantityType.ESTIMATED,
         wasteDetailsPackagingInfos: [{ type: "BENNE", quantity: 1 }],
-        wasteDetailsConsistence: "SOLID",
+        wasteDetailsConsistence: Consistence.SOLID,
         wasteDetailsPop: false,
         wasteDetailsIsDangerous: true,
         wasteDetailsOnuCode: "ONU"
@@ -448,7 +449,7 @@ describe("mutation / importPaperForm", () => {
           }
         }
       });
-      const updatedForm = await prisma.form.findUnique({
+      const updatedForm = await prisma.form.findUniqueOrThrow({
         where: { id: form.id }
       });
 
@@ -545,7 +546,7 @@ describe("mutation / importPaperForm", () => {
           }
         }
       });
-      const updatedForm = await prisma.form.findUnique({
+      const updatedForm = await prisma.form.findUniqueOrThrow({
         where: { id: form.id }
       });
       expect(updatedForm.status).toEqual("PROCESSED");
@@ -621,7 +622,7 @@ describe("mutation / importPaperForm", () => {
       );
       expect(errors).toHaveLength(1);
       expect(errors[0].message).toEqual(
-        "Vous devez apparaitre en tant que destinataire du bordereau (case 2) pour pouvoir mettre à jour ce bordereau"
+        "Vous devez apparaitre en tant que destinataire du bordereau (case 2) pour pouvoir importer ce bordereau"
       );
     });
 
@@ -754,7 +755,7 @@ describe("mutation / importPaperForm", () => {
         }
       });
 
-      const updatedForm = await prisma.form.findUnique({
+      const updatedForm = await prisma.form.findUniqueOrThrow({
         where: { id: form.id }
       });
       expect(updatedForm.status).toEqual(Status.AWAITING_GROUP);
@@ -804,7 +805,7 @@ describe("mutation / importPaperForm", () => {
         }
       });
 
-      const updatedForm = await prisma.form.findUnique({
+      const updatedForm = await prisma.form.findUniqueOrThrow({
         where: { id: form.id }
       });
       expect(updatedForm.status).toEqual(Status.NO_TRACEABILITY);

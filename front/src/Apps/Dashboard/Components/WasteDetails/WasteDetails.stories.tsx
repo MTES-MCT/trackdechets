@@ -28,33 +28,28 @@ Bsdd.args = {
   wasteType: BsdType.Bsdd,
   code: "01 01*",
   name: "le déchet dangereux",
-  weight: "450 t",
 };
 
 Bsda.args = {
   wasteType: BsdType.Bsda,
   code: "01 01*",
   name: "le déchet amiante",
-  weight: "450 t",
 };
 
 Bsff.args = {
   wasteType: BsdType.Bsff,
   code: "01 01*",
   name: "le déchet fluide frigorigène",
-  weight: "450 t",
 };
 
 Bsdasri.args = {
   wasteType: BsdType.Bsdasri,
   code: "01 01*",
   name: "le déchet d'activités de soins à risques infectieux",
-  weight: "450 t",
 };
 
 Bsvhu.args = {
   wasteType: BsdType.Bsvhu,
   code: "01 01*",
   name: "le déchet véhicule hors usage",
-  weight: "450 t",
 };

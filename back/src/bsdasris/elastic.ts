@@ -5,6 +5,14 @@ import { getRegistryFields } from "./registry";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { buildAddress } from "../companies/sirene/utils";
 
+type WhereKeys =
+  | "isDraftFor"
+  | "isForActionFor"
+  | "isFollowFor"
+  | "isArchivedFor"
+  | "isToCollectFor"
+  | "isCollectedFor";
+
 // | state              | emitter | transporter | recipient |
 // |--------------------|---------|-------------|-----------|
 // | initial (draft)    | draft   | draft       | draft     |
@@ -17,18 +25,8 @@ import { buildAddress } from "../companies/sirene/utils";
 // | refused            | archive | archive     | archive   |
 // | awaiting_group     | follow  | follow      | follow    |
 
-function getWhere(
-  bsdasri: Bsdasri
-): Pick<
-  BsdElastic,
-  | "isDraftFor"
-  | "isForActionFor"
-  | "isFollowFor"
-  | "isArchivedFor"
-  | "isToCollectFor"
-  | "isCollectedFor"
-> {
-  const where = {
+function getWhere(bsdasri: Bsdasri): Pick<BsdElastic, WhereKeys> {
+  const where: Record<WhereKeys, string[]> = {
     isDraftFor: [],
     isForActionFor: [],
     isFollowFor: [],
@@ -104,8 +102,9 @@ function getWhere(
   }
 
   for (const [fieldName, filter] of siretsFilters.entries()) {
-    if (fieldName) {
-      where[filter].push(formSirets[fieldName]);
+    const filterValue = formSirets[fieldName];
+    if (fieldName && filterValue) {
+      where[filter].push(filterValue);
     }
   }
 
@@ -180,7 +179,7 @@ export function toBsdElastic(bsdasri: Bsdasri): BsdElastic {
     destinationOperationCode: bsdasri.destinationOperationCode ?? "",
 
     emitterEmissionDate: bsdasri.emitterEmissionSignatureDate?.getTime(),
-    workerWorkDate: null,
+    workerWorkDate: undefined,
     transporterTransportTakenOverAt: bsdasri.transporterTakenOverAt?.getTime(),
     destinationReceptionDate: bsdasri.destinationReceptionDate?.getTime(),
     destinationAcceptationDate: bsdasri.destinationReceptionDate?.getTime(),

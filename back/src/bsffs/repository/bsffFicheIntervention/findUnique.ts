@@ -3,7 +3,7 @@ import { ReadRepositoryFnDeps } from "../../../common/repository/types";
 
 export type FindUniqueBsffFicheInterventionFn = (
   args: Prisma.BsffFicheInterventionFindUniqueArgs
-) => Promise<BsffFicheIntervention>;
+) => Promise<BsffFicheIntervention | null>;
 
 export function buildFinduniqueBsffFicheIntervention({
   prisma

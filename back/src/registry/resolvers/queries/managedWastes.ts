@@ -1,8 +1,8 @@
 import { QueryResolvers } from "../../../generated/graphql/types";
 import getWasteConnection from "../../wastes";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { checkIsCompanyMember } from "../../../users/permissions";
 import { checkIsRegistreNational } from "../../permissions";
+import { Permission, checkUserPermissions } from "../../../permissions";
 
 const managedWastesResolver: QueryResolvers["managedWastes"] = async (
   _,
@@ -16,7 +16,12 @@ const managedWastesResolver: QueryResolvers["managedWastes"] = async (
   // bypass authorization if the user is authenticated from a service account
   if (!isRegistreNational) {
     for (const siret of args.sirets) {
-      await checkIsCompanyMember({ id: user.id }, { orgId: siret });
+      await checkUserPermissions(
+        user,
+        [siret].filter(Boolean),
+        Permission.RegistryCanRead,
+        `Vous n'êtes pas autorisé à accéder au registre de l'établissement portant le n°SIRET ${siret}`
+      );
     }
   }
 

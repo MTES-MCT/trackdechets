@@ -6,11 +6,7 @@ import {
   ResolversParentTypes
 } from "../../../generated/graphql/types";
 import { InvalidWasteCode, MissingTempStorageFlag } from "../../errors";
-import {
-  checkCanUpdate,
-  checkIsFormContributor,
-  formToCompanies
-} from "../../permissions";
+import { checkCanUpdate } from "../../permissions";
 import { GraphQLContext } from "../../../types";
 import { getFormOrFormNotFound } from "../../database";
 import {
@@ -19,7 +15,6 @@ import {
   flattenTemporaryStorageDetailInput
 } from "../../converter";
 import { getFormRepository } from "../../repository";
-import { FormCompanies } from "../../types";
 import {
   draftFormSchema,
   sealedFormSchema,
@@ -75,7 +70,7 @@ const updateFormResolver = async (
 
   const existingForm = await getFormOrFormNotFound({ id });
 
-  await checkCanUpdate(user, existingForm);
+  await checkCanUpdate(user, existingForm, updateFormInput);
 
   const form = flattenFormInput(formContent);
   const futureForm = { ...existingForm, ...form };
@@ -113,48 +108,6 @@ const updateFormResolver = async (
     })
     .forwardedIn();
 
-  const formCompanies = await formToCompanies(existingForm);
-  const nextFormCompanies: FormCompanies = {
-    emitterCompanySiret:
-      form.emitterCompanySiret ?? formCompanies.emitterCompanySiret,
-    recipientCompanySiret:
-      form.recipientCompanySiret ?? formCompanies.recipientCompanySiret,
-    transporterCompanySiret:
-      form.transporterCompanySiret ?? formCompanies.transporterCompanySiret,
-    transporterCompanyVatNumber:
-      form.transporterCompanyVatNumber ??
-      formCompanies.transporterCompanyVatNumber,
-    traderCompanySiret:
-      form.traderCompanySiret ?? formCompanies.traderCompanySiret,
-    brokerCompanySiret:
-      form.brokerCompanySiret ?? formCompanies.brokerCompanySiret,
-    ecoOrganismeSiret:
-      form.ecoOrganismeSiret ?? formCompanies.ecoOrganismeSiret,
-    ...(intermediaries?.length
-      ? {
-          intermediariesVatNumbers: intermediaries?.map(
-            intermediary => intermediary.vatNumber ?? null
-          ),
-          intermediariesSirets: intermediaries?.map(
-            intermediary => intermediary.siret ?? null
-          )
-        }
-      : {
-          intermediariesVatNumbers: formCompanies.intermediariesVatNumbers,
-          intermediariesSirets: formCompanies.intermediariesSirets
-        })
-  };
-
-  if (temporaryStorageDetail || forwardedIn) {
-    nextFormCompanies.forwardedIn = {
-      recipientCompanySiret:
-        temporaryStorageDetail?.destination?.company?.siret ??
-        forwardedIn?.recipientCompanySiret,
-      transporterCompanySiret: forwardedIn?.transporterCompanySiret,
-      transporterCompanyVatNumber: forwardedIn?.transporterCompanyVatNumber
-    };
-  }
-
   if (isOrWillBeTempStorage && !(forwardedIn || temporaryStorageDetail)) {
     formUpdateInput.forwardedIn = {
       create: {
@@ -163,11 +116,6 @@ const updateFormResolver = async (
       }
     };
   }
-  await checkIsFormContributor(
-    user,
-    nextFormCompanies,
-    "Vous ne pouvez pas enlever votre établissement du bordereau"
-  );
 
   // Delete temporaryStorageDetail
   if (
@@ -257,11 +205,10 @@ const updateFormResolver = async (
     .findUnique({ where: { id: existingForm.id } })
     .grouping({ include: { initialForm: true } });
 
-  const existingAppendixForms = existingFormFractions.map(
-    ({ initialForm }) => initialForm
-  );
+  const existingAppendixForms =
+    existingFormFractions?.map(({ initialForm }) => initialForm) ?? [];
 
-  if (existingAppendixForms?.length) {
+  if (existingAppendixForms.length) {
     const updatedSiret = formUpdateInput?.emitterCompanySiret;
     if (!!updatedSiret && updatedSiret !== existingForm?.emitterCompanySiret) {
       throw new UserInputError(
@@ -275,7 +222,7 @@ const updateFormResolver = async (
     !!appendix2Forms ||
     futureForm.emitterType !== existingForm.emitterType;
 
-  const existingFormFractionsInput = existingFormFractions.map(
+  const existingFormFractionsInput = existingFormFractions?.map(
     ({ quantity, initialFormId }) => ({
       form: { id: initialFormId },
       quantity
@@ -288,7 +235,7 @@ const updateFormResolver = async (
     ? appendix2toFormFractions(appendix2Forms)
     : existingFormFractionsInput;
   const formFractions = isGroupementUpdated
-    ? await validateGroupement(futureForm, formFractionsInput)
+    ? await validateGroupement(futureForm as any, formFractionsInput!)
     : null;
 
   const updatedForm = await runInTransaction(async transaction => {
@@ -301,12 +248,12 @@ const updateFormResolver = async (
       updatedForm.emitterType === EmitterType.APPENDIX1
         ? await setAppendix1({
             form: updatedForm,
-            appendix1: formFractions,
+            appendix1: formFractions!,
             currentAppendix1Forms: existingAppendixForms
           })
         : await setAppendix2({
             form: updatedForm,
-            appendix2: formFractions,
+            appendix2: formFractions!,
             currentAppendix2Forms: existingAppendixForms
           });
     }

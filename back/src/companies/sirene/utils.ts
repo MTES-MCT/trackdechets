@@ -10,8 +10,8 @@ export function libelleFromCodeNaf(codeNaf: string) {
 /**
  * Build a full address string from its base components
  */
-export function buildAddress(addressComponents: string[]) {
-  return addressComponents.filter(x => !!x).join(" ");
+export function buildAddress(addressComponents: (string | null | undefined)[]) {
+  return addressComponents.filter(Boolean).join(" ");
 }
 
 export function safeParseFloat(f: string) {

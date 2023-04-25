@@ -1,31 +1,119 @@
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { fireEvent, within } from "@testing-library/dom";
+import { fireEvent, waitFor, within } from "@testing-library/dom";
 import BsdCard from "./BsdCard";
 import { Bsda, Bsdasri, Bsff, Bsvhu, Form } from "generated/graphql/types";
 import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
+import { MockedProvider } from "@apollo/client/testing";
 
 describe("Bsd card primary action label", () => {
   const siretEmmiter = "53230142100022";
   const siretTransporter = "13001045700013";
   const functionMock = jest.fn();
   const bsdCurrentTab: BsdCurrentTab = "draftTab";
+  const mocks = [];
 
   describe("case: INITITAL(draft=true)", () => {
-    test("Bsdd", () => {
-      const bsdd = {
-        id: "cktcnn4ul7181x79soidq7c3i",
-        readableId: "BSD-20210909-0FPXX37GW",
-        customId: null,
-        sentAt: null,
-        emittedAt: null,
-        emittedBy: null,
-        emittedByEcoOrganisme: null,
-        takenOverAt: null,
-        status: "DRAFT",
+    const bsdd = {
+      id: "cktcnn4ul7181x79soidq7c3i",
+      readableId: "BSD-20210909-0FPXX37GW",
+      customId: null,
+      sentAt: null,
+      emittedAt: null,
+      emittedBy: null,
+      emittedByEcoOrganisme: null,
+      takenOverAt: null,
+      status: "DRAFT",
+      wasteDetails: {
+        code: "15 01 11*",
+        name: "emballages amiante",
+        packagingInfos: [
+          {
+            type: "GRV",
+            other: "",
+            quantity: 5,
+            __typename: "PackagingInfo",
+          },
+          {
+            type: "AUTRE",
+            other: "sac",
+            quantity: 2,
+            __typename: "PackagingInfo",
+          },
+        ],
+        __typename: "WasteDetails",
+      },
+      emitter: {
+        type: "OTHER",
+        isPrivateIndividual: false,
+        company: {
+          siret: "81232991000010",
+          name: "BOULANGERIE AU 148",
+          omiNumber: null,
+          __typename: "FormCompany",
+        },
+        isForeignShip: false,
+        __typename: "Emitter",
+      },
+      recipient: {
+        company: {
+          siret: "13001045700013",
+          name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          __typename: "FormCompany",
+        },
+        isTempStorage: true,
+        __typename: "Recipient",
+      },
+      transporter: {
+        company: {
+          siret: "13001045700013",
+          __typename: "FormCompany",
+        },
+        numberPlate: null,
+        customInfo: null,
+        __typename: "Transporter",
+      },
+      ecoOrganisme: {
+        siret: "42248908800035",
+        __typename: "FormEcoOrganisme",
+      },
+      stateSummary: {
+        transporterCustomInfo: null,
+        transporterNumberPlate: null,
+        transporter: {
+          siret: "13001045700013",
+          name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          __typename: "FormCompany",
+        },
+        recipient: {
+          siret: "13001045700013",
+          name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
+          __typename: "FormCompany",
+        },
+        emitter: {
+          siret: "81232991000010",
+          name: "BOULANGERIE AU 148",
+          __typename: "FormCompany",
+        },
+        __typename: "StateSummary",
+      },
+      temporaryStorageDetail: {
+        destination: {
+          company: {
+            siret: "53230142100022",
+            address: "14 Rue des Marchands 17540 Vérines",
+            name: "L'ATELIER DE CELINE",
+            contact: "Céline",
+            phone: "0145454545",
+            mail: "hello@trackdechets.beta.gouv.fr",
+            __typename: "FormCompany",
+          },
+          cap: "CAP2",
+          processingOperation: "D 1",
+          __typename: "Destination",
+        },
+        transporter: null,
         wasteDetails: {
-          code: "15 01 11*",
-          name: "emballages amiante",
           packagingInfos: [
             {
               type: "GRV",
@@ -40,120 +128,38 @@ describe("Bsd card primary action label", () => {
               __typename: "PackagingInfo",
             },
           ],
+          quantity: 19,
+          quantityType: "ESTIMATED",
           __typename: "WasteDetails",
         },
-        emitter: {
-          type: "OTHER",
-          isPrivateIndividual: false,
-          company: {
-            siret: "81232991000010",
-            name: "BOULANGERIE AU 148",
-            omiNumber: null,
-            __typename: "FormCompany",
-          },
-          isForeignShip: false,
-          __typename: "Emitter",
-        },
-        recipient: {
-          company: {
-            siret: "13001045700013",
-            name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-            __typename: "FormCompany",
-          },
-          isTempStorage: true,
-          __typename: "Recipient",
-        },
-        transporter: {
-          company: {
-            siret: "13001045700013",
-            __typename: "FormCompany",
-          },
-          numberPlate: null,
-          customInfo: null,
-          __typename: "Transporter",
-        },
-        ecoOrganisme: {
-          siret: "42248908800035",
-          __typename: "FormEcoOrganisme",
-        },
-        stateSummary: {
-          transporterCustomInfo: null,
-          transporterNumberPlate: null,
-          transporter: {
-            siret: "13001045700013",
-            name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-            __typename: "FormCompany",
-          },
-          recipient: {
-            siret: "13001045700013",
-            name: "DIRECTION REGIONALE DE L'ENVIRONNEMENT DE L'AMENAGEMENT ET DU LOGEMENT NOUVELLE-AQUITAINE",
-            __typename: "FormCompany",
-          },
-          emitter: {
-            siret: "81232991000010",
-            name: "BOULANGERIE AU 148",
-            __typename: "FormCompany",
-          },
-          __typename: "StateSummary",
-        },
-        temporaryStorageDetail: {
-          destination: {
-            company: {
-              siret: "53230142100022",
-              address: "14 Rue des Marchands 17540 Vérines",
-              name: "L'ATELIER DE CELINE",
-              contact: "Céline",
-              phone: "0145454545",
-              mail: "hello@trackdechets.beta.gouv.fr",
-              __typename: "FormCompany",
-            },
-            cap: "CAP2",
-            processingOperation: "D 1",
-            __typename: "Destination",
-          },
-          transporter: null,
-          wasteDetails: {
-            packagingInfos: [
-              {
-                type: "GRV",
-                other: "",
-                quantity: 5,
-                __typename: "PackagingInfo",
-              },
-              {
-                type: "AUTRE",
-                other: "sac",
-                quantity: 2,
-                __typename: "PackagingInfo",
-              },
-            ],
-            quantity: 19,
-            quantityType: "ESTIMATED",
-            __typename: "WasteDetails",
-          },
-          __typename: "TemporaryStorageDetail",
-        },
-        transportSegments: [],
-        currentTransporterSiret: null,
-        nextTransporterSiret: null,
-        __typename: "Form",
-      } as unknown as Form;
+        __typename: "TemporaryStorageDetail",
+      },
+      transportSegments: [],
+      currentTransporterSiret: null,
+      nextTransporterSiret: null,
+      __typename: "Form",
+    } as unknown as Form;
+
+    test("Bsdd", async () => {
+      const onValidate = functionMock;
 
       const { queryByTestId } = render(
-        <BsdCard
-          currentSiret={siretEmmiter}
-          bsd={bsdd}
-          onValidate={functionMock}
-          onDelete={functionMock}
-          onDuplicate={functionMock}
-          onUpdate={functionMock}
-          onPdf={functionMock}
-          onOverview={functionMock}
-        />
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BsdCard
+            currentSiret={siretEmmiter}
+            bsd={bsdd}
+            onValidate={onValidate}
+            onUpdate={functionMock}
+            onOverview={functionMock}
+          />
+        </MockedProvider>
       );
+      const primaryActionBtn = screen.getByTestId("bsd-card-btn-primary");
       expect(screen.getByTestId("bsd-card-btn-primary")).toHaveTextContent(
-        "Valider"
+        "Publier"
       );
+      fireEvent.click(primaryActionBtn);
+      await waitFor(() => expect(onValidate).toHaveBeenCalled());
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
@@ -166,7 +172,33 @@ describe("Bsd card primary action label", () => {
       expect(queryByTestId("bsd-pdf-btn")).toBeFalsy();
     });
 
-    test("other than Bsdd (bsda example)", () => {
+    test("Bsdd emitterType appendix1_producer", async () => {
+      const onValidate = functionMock;
+
+      const { queryByTestId } = render(
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BsdCard
+            currentSiret={siretEmmiter}
+            bsd={{ ...bsdd, emitter: { type: "APPENDIX1_PRODUCER" } } as Form}
+            onValidate={onValidate}
+            onUpdate={functionMock}
+            onOverview={functionMock}
+          />
+        </MockedProvider>
+      );
+
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
+      fireEvent.click(buttonActions);
+      expect(screen.getByTestId("bsd-overview-btn")).toBeInTheDocument();
+      expect(queryByTestId("bsd-delete-btn")).toBeFalsy();
+      expect(queryByTestId("bsd-review-btn")).toBeFalsy();
+      expect(queryByTestId("bsd-duplicate-btn")).toBeFalsy();
+      expect(queryByTestId("bsd-update-btn")).toBeFalsy();
+      expect(queryByTestId("bsd-pdf-btn")).toBeFalsy();
+    });
+
+    test("other than Bsdd (bsda example)", async () => {
       const bsda = {
         id: "BSDA-20220805-WZD4GYBT1",
         bsdaType: "OTHER_COLLECTIONS",
@@ -220,22 +252,22 @@ describe("Bsd card primary action label", () => {
         groupedIn: null,
         __typename: "Bsda",
       } as unknown as Bsda;
-
+      const onValidate = functionMock;
       const { queryByTestId } = render(
-        <BsdCard
-          currentSiret={siretEmmiter}
-          bsd={bsda}
-          onValidate={functionMock}
-          onDelete={functionMock}
-          onDuplicate={functionMock}
-          onUpdate={functionMock}
-          onPdf={functionMock}
-          onOverview={functionMock}
-        />
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BsdCard
+            currentSiret={siretEmmiter}
+            bsd={bsda}
+            onValidate={onValidate}
+            onUpdate={functionMock}
+            onOverview={functionMock}
+          />
+        </MockedProvider>
       );
-      expect(screen.getByTestId("bsd-card-btn-primary")).toHaveTextContent(
-        "Publier"
-      );
+      const primaryActionBtn = screen.getByTestId("bsd-card-btn-primary");
+      expect(primaryActionBtn).toHaveTextContent("Publier");
+      fireEvent.click(primaryActionBtn);
+      await waitFor(() => expect(onValidate).toHaveBeenCalled());
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
@@ -357,22 +389,23 @@ describe("Bsd card primary action label", () => {
       bsffTransporter: { company: { siret: "53230142100128" } },
     };
 
-    test("Bsvhu same siret", () => {
+    test("Bsvhu same siret", async () => {
+      const onValidate = functionMock;
       const { queryByTestId } = render(
-        <BsdCard
-          currentSiret={siretEmmiter}
-          bsd={bsvhu}
-          onValidate={functionMock}
-          onDelete={functionMock}
-          onDuplicate={functionMock}
-          onUpdate={functionMock}
-          onPdf={functionMock}
-          onOverview={functionMock}
-        />
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BsdCard
+            currentSiret={siretEmmiter}
+            bsd={bsvhu}
+            onValidate={onValidate}
+            onUpdate={functionMock}
+            onOverview={functionMock}
+          />
+        </MockedProvider>
       );
-      expect(screen.getByTestId("bsd-card-btn-primary")).toHaveTextContent(
-        "Signer"
-      );
+      const primaryActionBtn = screen.getByTestId("bsd-card-btn-primary");
+      expect(primaryActionBtn).toHaveTextContent("Signer");
+      fireEvent.click(primaryActionBtn);
+      await waitFor(() => expect(onValidate).toHaveBeenCalled());
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
@@ -387,16 +420,15 @@ describe("Bsd card primary action label", () => {
 
     test("Bsvhu same siret (status processed)", () => {
       const { queryByTestId } = render(
-        <BsdCard
-          currentSiret={siretEmmiter}
-          bsd={bsvhuProcessed}
-          onValidate={functionMock}
-          onDelete={functionMock}
-          onDuplicate={functionMock}
-          onUpdate={functionMock}
-          onPdf={functionMock}
-          onOverview={functionMock}
-        />
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BsdCard
+            currentSiret={siretEmmiter}
+            bsd={bsvhuProcessed}
+            onValidate={functionMock}
+            onUpdate={functionMock}
+            onOverview={functionMock}
+          />
+        </MockedProvider>
       );
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
@@ -406,16 +438,15 @@ describe("Bsd card primary action label", () => {
 
     test("Bsvhu different siret", () => {
       const { queryByTestId } = render(
-        <BsdCard
-          currentSiret={siretTransporter}
-          bsd={bsvhu}
-          onValidate={functionMock}
-          onDelete={functionMock}
-          onDuplicate={functionMock}
-          onUpdate={functionMock}
-          onPdf={functionMock}
-          onOverview={functionMock}
-        />
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BsdCard
+            currentSiret={siretTransporter}
+            bsd={bsvhu}
+            onValidate={functionMock}
+            onUpdate={functionMock}
+            onOverview={functionMock}
+          />
+        </MockedProvider>
       );
       expect(queryByTestId("bsd-card-btn-primary")).toBeFalsy();
 
@@ -423,23 +454,27 @@ describe("Bsd card primary action label", () => {
       expect(buttonActions).toBeInTheDocument();
     });
 
-    test("Bsff same siret", () => {
+    test("Bsff same siret", async () => {
+      const onValidate = functionMock;
       render(
-        <BsdCard
-          currentSiret={siretEmmiter}
-          bsd={bsff}
-          bsdCurrentTab={bsdCurrentTab}
-          onValidate={functionMock}
-          onDelete={functionMock}
-          onDuplicate={functionMock}
-          onUpdate={functionMock}
-          onPdf={functionMock}
-          onOverview={functionMock}
-        />
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BsdCard
+            currentSiret={siretEmmiter}
+            bsd={bsff}
+            bsdCurrentTab={bsdCurrentTab}
+            onValidate={onValidate}
+            onUpdate={functionMock}
+            onOverview={functionMock}
+          />
+        </MockedProvider>
       );
 
-      const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
+      const primaryActionBtn = screen.getByTestId("bsd-card-btn-primary");
+      const { getByText } = within(primaryActionBtn);
       expect(getByText("Signer")).toBeInTheDocument();
+
+      fireEvent.click(primaryActionBtn);
+      await waitFor(() => expect(onValidate).toHaveBeenCalled());
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
@@ -454,17 +489,16 @@ describe("Bsd card primary action label", () => {
 
     test("Bsff different siret", () => {
       const { queryByTestId } = render(
-        <BsdCard
-          currentSiret={siretEmmiter}
-          bsd={bsffDifferentSiret}
-          bsdCurrentTab={bsdCurrentTab}
-          onValidate={functionMock}
-          onDelete={functionMock}
-          onDuplicate={functionMock}
-          onUpdate={functionMock}
-          onPdf={functionMock}
-          onOverview={functionMock}
-        />
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BsdCard
+            currentSiret={siretEmmiter}
+            bsd={bsffDifferentSiret}
+            bsdCurrentTab={bsdCurrentTab}
+            onValidate={functionMock}
+            onUpdate={functionMock}
+            onOverview={functionMock}
+          />
+        </MockedProvider>
       );
 
       expect(queryByTestId("bsd-card-btn-primary")).toBeFalsy();
@@ -476,7 +510,7 @@ describe("Bsd card primary action label", () => {
       expect(screen.getByTestId("bsd-overview-btn")).toBeInTheDocument();
       expect(queryByTestId("bsd-delete-btn")).toBeFalsy();
 
-      expect(screen.getByTestId("bsd-duplicate-btn")).toBeInTheDocument();
+      expect(queryByTestId("bsd-duplicate-btn")).toBeFalsy();
       expect(queryByTestId("bsd-update-btn")).toBeFalsy();
       expect(screen.getByTestId("bsd-pdf-btn")).toBeInTheDocument();
     });
@@ -533,19 +567,18 @@ describe("Bsd card primary action label", () => {
       } as unknown as Bsda;
 
       render(
-        <BsdCard
-          currentSiret={siretEmmiter}
-          bsd={bsda}
-          onValidate={functionMock}
-          onDelete={functionMock}
-          onDuplicate={functionMock}
-          onUpdate={functionMock}
-          onPdf={functionMock}
-          onOverview={functionMock}
-        />
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BsdCard
+            currentSiret={siretEmmiter}
+            bsd={bsda}
+            onValidate={functionMock}
+            onUpdate={functionMock}
+            onOverview={functionMock}
+          />
+        </MockedProvider>
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
-      expect(getByText("Signer en tant qu'émetteur")).toBeInTheDocument();
+      expect(getByText("Signer")).toBeInTheDocument();
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
@@ -635,19 +668,18 @@ describe("Bsd card primary action label", () => {
         __typename: "Form",
       } as unknown as Form;
       const { queryByTestId } = render(
-        <BsdCard
-          currentSiret={siretEmmiter}
-          bsd={bsdd}
-          onValidate={functionMock}
-          onDelete={functionMock}
-          onDuplicate={functionMock}
-          onUpdate={functionMock}
-          onPdf={functionMock}
-          onOverview={functionMock}
-        />
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BsdCard
+            currentSiret={siretEmmiter}
+            bsd={bsdd}
+            onValidate={functionMock}
+            onUpdate={functionMock}
+            onOverview={functionMock}
+          />
+        </MockedProvider>
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
-      expect(getByText("Signer en tant qu'émetteur")).toBeInTheDocument();
+      expect(getByText("Signer")).toBeInTheDocument();
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
@@ -760,16 +792,16 @@ describe("Bsd card primary action label", () => {
         __typename: "Form",
       } as unknown as Form;
       render(
-        <BsdCard
-          currentSiret={siretEmmiter}
-          bsd={bsdd}
-          onValidate={functionMock}
-          onDelete={functionMock}
-          onDuplicate={functionMock}
-          onUpdate={functionMock}
-          onPdf={functionMock}
-          onOverview={functionMock}
-        />
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BsdCard
+            currentSiret={siretEmmiter}
+            bsd={bsdd}
+            bsdCurrentTab="actTab"
+            onValidate={functionMock}
+            onUpdate={functionMock}
+            onOverview={functionMock}
+          />
+        </MockedProvider>
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
       expect(getByText("Valider la réception")).toBeInTheDocument();
@@ -848,20 +880,19 @@ describe("Bsd card primary action label", () => {
         __typename: "Bsdasri",
       } as unknown as Bsdasri;
       const { queryByTestId } = render(
-        <BsdCard
-          currentSiret={siretEmmiter}
-          bsd={bsdari}
-          bsdCurrentTab="actTab"
-          onValidate={functionMock}
-          onDelete={functionMock}
-          onDuplicate={functionMock}
-          onUpdate={functionMock}
-          onPdf={functionMock}
-          onOverview={functionMock}
-        />
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BsdCard
+            currentSiret={siretEmmiter}
+            bsd={bsdari}
+            bsdCurrentTab="actTab"
+            onValidate={functionMock}
+            onUpdate={functionMock}
+            onOverview={functionMock}
+          />
+        </MockedProvider>
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
-      expect(getByText("Signer la réception")).toBeInTheDocument();
+      expect(getByText("Valider la réception")).toBeInTheDocument();
 
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
@@ -955,16 +986,15 @@ describe("Bsd card primary action label", () => {
       } as unknown as Form;
 
       render(
-        <BsdCard
-          currentSiret={siretEmmiter}
-          bsd={bsdd}
-          onValidate={functionMock}
-          onDelete={functionMock}
-          onDuplicate={functionMock}
-          onUpdate={functionMock}
-          onPdf={functionMock}
-          onOverview={functionMock}
-        />
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BsdCard
+            currentSiret={siretEmmiter}
+            bsd={bsdd}
+            onValidate={functionMock}
+            onUpdate={functionMock}
+            onOverview={functionMock}
+          />
+        </MockedProvider>
       );
       const { getByText } = within(screen.getByTestId("bsd-card-btn-primary"));
       expect(getByText("Valider le traitement")).toBeInTheDocument();
@@ -972,6 +1002,37 @@ describe("Bsd card primary action label", () => {
       const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
       expect(buttonActions).toBeInTheDocument();
       expect(screen.getByTestId("bsd-suite-btn")).toBeInTheDocument();
+    });
+  });
+
+  describe("case: Appendix 1", () => {
+    test("Bsdd", () => {
+      const bsdd = {
+        id: "cl32r54js30083339sw9nabhn0",
+        readableId: "BSD-20220512-6609ESJPV",
+        status: "SEALED",
+        emitter: {
+          type: "APPENDIX1",
+        },
+
+        __typename: "Form",
+      } as unknown as Form;
+
+      render(
+        <MockedProvider mocks={mocks} addTypename={false}>
+          <BsdCard
+            currentSiret={siretEmmiter}
+            bsd={bsdd}
+            onValidate={functionMock}
+            onUpdate={functionMock}
+            onOverview={functionMock}
+          />
+        </MockedProvider>
+      );
+
+      const buttonActions = screen.getByTestId("bsd-actions-secondary-btn");
+      expect(buttonActions).toBeInTheDocument();
+      expect(screen.getByTestId("appendix1-btn")).toBeInTheDocument();
     });
   });
 });

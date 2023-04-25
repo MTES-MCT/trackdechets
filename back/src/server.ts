@@ -19,13 +19,14 @@ import { ROAD_CONTROL_SLUG } from "./common/constants";
 import { ErrorCode } from "./common/errors";
 import errorHandler from "./common/middlewares/errorHandler";
 import { graphqlBatchLimiterMiddleware } from "./common/middlewares/graphqlBatchLimiter";
-import graphqlBodyParser from "./common/middlewares/graphqlBodyParser";
+import { graphqlBodyParser } from "./common/middlewares/graphqlBodyParser";
 import { graphqlQueryParserMiddleware } from "./common/middlewares/graphqlQueryParser";
 import { graphqlRateLimiterMiddleware } from "./common/middlewares/graphqlRatelimiter";
 import { graphqlRegenerateSessionMiddleware } from "./common/middlewares/graphqlRegenerateSession";
 import loggingMiddleware from "./common/middlewares/loggingMiddleware";
 import { rateLimiterMiddleware } from "./common/middlewares/rateLimiter";
 import { timeoutMiddleware } from "./common/middlewares/timeout";
+import { graphqlQueryMergingLimiter } from "./common/middlewares/graphqlQueryMergingLimiter";
 import { graphiqlLandingPagePlugin } from "./common/plugins/graphiql";
 import sentryReporter from "./common/plugins/sentryReporter";
 import { redisClient } from "./common/redis";
@@ -39,7 +40,10 @@ import { oauth2Router } from "./routers/oauth2-router";
 import { oidcRouter } from "./routers/oidc-router";
 import { roadControlPdfHandler } from "./routers/roadControlPdfRouter";
 import { resolvers, typeDefs } from "./schema";
-import { userActivationHandler } from "./users/activation";
+import {
+  legacyUserActivationHandler,
+  userActivationHandler
+} from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
 import { captchaGen, captchaSound } from "./captcha/captchaGen";
@@ -114,7 +118,11 @@ export const server = new ApolloServer({
 
     return err;
   },
-  plugins: [graphiqlLandingPagePlugin(), ...(Sentry ? [sentryReporter] : [])]
+  plugins: [
+    graphiqlLandingPagePlugin(),
+    ...(Sentry ? [sentryReporter] : []),
+    graphqlQueryMergingLimiter()
+  ]
 });
 
 export const app = express();
@@ -123,6 +131,18 @@ if (Sentry) {
   // The request handler must be the first middleware on the app
   app.use(Sentry.Handlers.requestHandler());
 }
+
+/**
+ * Set the following headers for cross-domain cookie
+ * Access-Control-Allow-Credentials: true
+ * Access-Control-Allow-Origin: $UI_DOMAIN
+ */
+app.use(
+  cors({
+    origin: UI_BASE_URL,
+    credentials: true
+  })
+);
 
 const RATE_LIMIT_WINDOW_SECONDS = 60;
 
@@ -152,7 +172,7 @@ app.use(
           "https:",
           "'sha256-47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU='"
         ],
-        connectSrc: [process.env.API_HOST],
+        connectSrc: [process.env.API_HOST!],
         formAction: ["self"],
         upgradeInsecureRequests: NODE_ENV === "production" ? [] : null
       }
@@ -186,25 +206,13 @@ app.use(loggingMiddleware(graphQLPath));
 
 app.use(graphQLPath, timeoutMiddleware());
 
-/**
- * Set the following headers for cross-domain cookie
- * Access-Control-Allow-Credentials: true
- * Access-Control-Allow-Origin: $UI_DOMAIN
- */
-app.use(
-  cors({
-    origin: UI_BASE_URL,
-    credentials: true
-  })
-);
-
 // configure session for passport local strategy
 const RedisStore = redisStore(session);
 
 export const sess: session.SessionOptions = {
   store: new RedisStore({ client: redisClient }),
   name: SESSION_NAME || "trackdechets.connect.sid",
-  secret: SESSION_SECRET,
+  secret: SESSION_SECRET!,
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -221,7 +229,7 @@ export const sess: session.SessionOptions = {
 // For more details, see https://expressjs.com/en/guide/behind-proxies.html.
 app.set("trust proxy", TRUST_PROXY_HOPS ? parseInt(TRUST_PROXY_HOPS, 10) : 1);
 
-if (SESSION_COOKIE_SECURE === "true") {
+if (SESSION_COOKIE_SECURE === "true" && sess.cookie) {
   sess.cookie.secure = true; // serve secure cookies
 }
 
@@ -237,8 +245,8 @@ app.use(oauth2Router);
 app.use(oidcRouter);
 
 const USERS_BLACKLIST_ENV = process.env.USERS_BLACKLIST;
-let blacklist = [];
-if (USERS_BLACKLIST_ENV?.length > 0) {
+let blacklist: string[] = [];
+if (USERS_BLACKLIST_ENV && USERS_BLACKLIST_ENV.length > 0) {
   blacklist = USERS_BLACKLIST_ENV.split(",");
 }
 
@@ -277,7 +285,7 @@ app.use(
   })
 );
 
-app.use((req, res, next) => {
+app.use(function checkBlacklist(req, res, next) {
   if (req.user && blacklist.includes(req.user.email)) {
     return res.send("Too Many Requests").status(429);
   }
@@ -295,7 +303,9 @@ app.get("/captcha", (_, res) => captchaGen(res));
 app.get("/captcha-audio/:tokenId", (req, res) => {
   captchaSound(req.params.tokenId, res);
 });
-app.get("/userActivation", userActivationHandler);
+app.get("/userActivation", legacyUserActivationHandler); // todo: remove for 05/23 release
+app.post("/userActivation", userActivationHandler);
+
 app.get("/download", downloadRouter);
 
 app.get("/exports", (_, res) =>

@@ -12,6 +12,7 @@ import {
   MutationInviteUserToCompanyArgs,
 } from "generated/graphql/types";
 import cogoToast from "cogo-toast";
+import TdTooltip from "common/components/Tooltip";
 
 type Props = {
   company: CompanyPrivate;
@@ -45,6 +46,14 @@ const INVITE_USER_TO_COMPANY = gql`
 const yupSchema = object().shape({
   email: string().email(),
 });
+
+const roleTooltip =
+  "Collaborateur : A accès aux information de l'établissement" +
+  " Peut éditer et signer des bordereaux pour le compte de l'établissement." +
+  " Peut également exporter le registre de l'établissement\n" +
+  "Administrateur : Dispose des mêmes droits que le collaborateur." +
+  " Peut en plus modifier les informations de l'établissement et inviter" +
+  " de nouveaux collaborateurs.";
 
 export default function AccountFormCompanyInviteNewUser({ company }: Props) {
   const [inviteUserToCompany, { loading }] = useMutation<
@@ -97,10 +106,14 @@ export default function AccountFormCompanyInviteNewUser({ company }: Props) {
               className="td-input"
               placeholder="Email de la personne à inviter"
             />
+
             <Field component="select" name="role" className="td-select">
               <option value={UserRole.Member}>Collaborateur</option>
               <option value={UserRole.Admin}>Administrateur</option>
             </Field>
+            <div className={styles.roleTooltip}>
+              <TdTooltip msg={roleTooltip} />
+            </div>
             <button
               type="submit"
               className="btn btn--primary"

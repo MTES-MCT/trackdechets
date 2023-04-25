@@ -4,7 +4,7 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { QueryResolvers } from "../../../generated/graphql/types";
 import { getFormsRightFilter } from "../../database";
 import { getConnection } from "../../../common/pagination";
-import { getCachedUserSiretOrVat } from "../../../common/redis/users";
+import { getUserRoles } from "../../../permissions";
 
 const PAGINATE_BY = 100;
 
@@ -15,7 +15,8 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
 ) => {
   const user = checkIsAuthenticated(context);
 
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
+  const userRoles = await getUserRoles(user.id);
+  const userCompaniesSiretOrVat = Object.keys(userRoles);
 
   // User must be associated with a company
   if (!userCompaniesSiretOrVat.length) {
@@ -41,7 +42,7 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
   // Select user company siret matching siret or get the first
   const selectedSiret = siret || userCompaniesSiretOrVat.shift();
 
-  const formsFilter = getFormsRightFilter(selectedSiret);
+  const formsFilter = getFormsRightFilter(selectedSiret!);
 
   const gqlPaginationArgs = {
     after: cursorAfter,
@@ -55,7 +56,11 @@ const formsLifeCycleResolver: QueryResolvers["formsLifeCycle"] = async (
       ...(loggedAfter && { gte: new Date(loggedAfter) }),
       ...(loggedBefore && { lte: new Date(loggedBefore) })
     },
-    form: { ...formsFilter, isDeleted: false, id: formId }
+    form: {
+      ...formsFilter,
+      isDeleted: false,
+      id: formId !== null ? formId : undefined
+    }
   };
 
   const totalCount = await prisma.statusLog.count({ where });

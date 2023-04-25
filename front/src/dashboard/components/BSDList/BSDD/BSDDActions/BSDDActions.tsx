@@ -55,17 +55,16 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     canDeleteAndUpdate = siret === signedBySiret;
   }
 
-  const canRequestRevision = ![
-    FormStatus.Draft,
-    FormStatus.Sealed,
-    FormStatus.Refused,
-  ].includes(form.status);
-
   const isAppendix1 = form.emitter?.type === EmitterType.Appendix1;
   const isAppendix1Producer =
     form.emitter?.type === EmitterType.Appendix1Producer;
   const showAppendix1Button =
     isAppendix1 && [FormStatus.Sealed, FormStatus.Sent].includes(form.status);
+
+  const canRequestRevision =
+    ![FormStatus.Draft, FormStatus.Sealed, FormStatus.Refused].includes(
+      form.status
+    ) && !isAppendix1Producer;
 
   return (
     <>
@@ -91,8 +90,6 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
                 styles.BSDDActionsMenu
               )}
             >
-              <TableRoadControlButton siret={siret} form={form} />
-
               <MenuLink
                 as={Link}
                 to={{

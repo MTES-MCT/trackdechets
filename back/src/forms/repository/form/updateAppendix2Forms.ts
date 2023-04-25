@@ -1,4 +1,4 @@
-import { Form, Status } from "@prisma/client";
+import { Form, Prisma, Status } from "@prisma/client";
 import { Decimal } from "decimal.js-light";
 import { RepositoryFnDeps } from "../../../common/repository/types";
 import transitionForm from "../../workflow/transitionForm";
@@ -38,6 +38,7 @@ const buildUpdateAppendix2Forms: (
       .map(g => g.nextForm);
 
     const groupedInTotality =
+      quantityReceived &&
       quantityGrouped.greaterThanOrEqualTo(quantityReceived); // case > should not happen
 
     const allSealed =
@@ -96,7 +97,7 @@ const buildUpdateAppendix2Forms: (
     }
   }
 
-  const promises = [];
+  const promises: Promise<Prisma.BatchPayload>[] = [];
   for (const [status, ids] of formUpdatesByStatus.entries()) {
     promises.push(updateManyForms(ids, { status }));
   }

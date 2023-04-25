@@ -16,7 +16,7 @@ mutation DeleteVhu($id: ID!){
   }
 }
 `;
-describe("Mutation.deleteBsdasri", () => {
+describe("Mutation.deleteBsvhu", () => {
   afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
@@ -131,7 +131,7 @@ describe("Mutation.deleteBsdasri", () => {
 
     expect(errors).toBeUndefined();
 
-    const deletedBsvhu = await prisma.bsvhu.findUnique({
+    const deletedBsvhu = await prisma.bsvhu.findUniqueOrThrow({
       where: { id: bsvhu.id }
     });
 
@@ -193,7 +193,7 @@ describe("Mutation.deleteBsdasri", () => {
 
     expect(data.deleteBsvhu.id).toBe(vhu.id);
 
-    const bsdvhu = await prisma.bsvhu.findUnique({
+    const bsdvhu = await prisma.bsvhu.findUniqueOrThrow({
       where: { id: vhu.id }
     });
     expect(bsdvhu.isDeleted).toEqual(true);

@@ -9,10 +9,10 @@ import {
 } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
 import { checkEditionRules } from "../../edition";
-import { checkIsBsdaContributor } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
 import sirenify from "../../sirenify";
 import { validateBsda } from "../../validation";
+import { checkCanUpdate } from "../../permissions";
 
 export default async function edit(
   _,
@@ -23,25 +23,12 @@ export default async function edit(
   const existingBsda = await getBsdaOrNotFound(id, {
     include: { intermediaries: true, grouping: true, forwarding: true }
   });
-  await checkIsBsdaContributor(
-    user,
-    existingBsda,
-    "Vous ne pouvez pas modifier un bordereau sur lequel votre entreprise n'apparait pas"
-  );
 
   const sirenifiedInput = await sirenify(input, user);
   const data = flattenBsdaInput(sirenifiedInput);
   const intermediaries = input.intermediaries ?? existingBsda.intermediaries;
 
-  await checkIsBsdaContributor(
-    user,
-    {
-      ...existingBsda,
-      ...data,
-      intermediaries
-    },
-    "Vous ne pouvez pas enlever votre établissement du bordereau"
-  );
+  await checkCanUpdate(user, existingBsda, input);
 
   const bsdaRepository = getBsdaRepository(user);
 
@@ -50,7 +37,7 @@ export default async function edit(
     : existingBsda.forwarding;
 
   const groupedBsdas =
-    input.grouping?.length > 0
+    input.grouping && input.grouping.length > 0
       ? await bsdaRepository.findMany({ id: { in: input.grouping } })
       : existingBsda.grouping;
 
@@ -72,7 +59,7 @@ export default async function edit(
   };
   const previousBsdas = [forwardedBsda, ...groupedBsdas].filter(Boolean);
   await validateBsda(
-    resultingBsda,
+    resultingBsda as any,
     { previousBsdas, intermediaries },
     {
       emissionSignature: existingBsda.emitterEmissionSignatureAuthor != null,
@@ -90,19 +77,25 @@ export default async function edit(
     { id },
     {
       ...data,
-      ...(input.grouping?.length > 0 && {
-        grouping: { set: input.grouping.map(id => ({ id })) }
-      }),
+      ...(input.grouping &&
+        input.grouping.length > 0 && {
+          grouping: { set: input.grouping.map(id => ({ id })) }
+        }),
       ...(input.forwarding && {
         forwarding: { connect: { id: input.forwarding } }
       }),
       ...(shouldUpdateIntermediaries && {
-        intermediariesOrgIds: input.intermediaries
-          .flatMap(intermediary => [intermediary.siret, intermediary.vatNumber])
+        intermediariesOrgIds: input
+          .intermediaries!.flatMap(intermediary => [
+            intermediary.siret,
+            intermediary.vatNumber
+          ])
           .filter(Boolean),
         intermediaries: {
           deleteMany: {},
-          createMany: { data: companyToIntermediaryInput(input.intermediaries) }
+          createMany: {
+            data: companyToIntermediaryInput(input.intermediaries!)
+          }
         }
       })
     }

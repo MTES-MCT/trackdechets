@@ -306,7 +306,9 @@ describe("Mutation.duplicateForm", () => {
       wasteDetailsName,
       wasteDetailsConsistence,
       ...rest
-    } = await prisma.form.findUnique({ where: { id: form.id } }).forwardedIn();
+    } = await prisma.form
+      .findUniqueOrThrow({ where: { id: form.id } })
+      .forwardedIn();
 
     const { mutate } = makeClient(user);
     const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
@@ -317,7 +319,7 @@ describe("Mutation.duplicateForm", () => {
         }
       }
     );
-    const duplicatedForm = await prisma.form.findUnique({
+    const duplicatedForm = await prisma.form.findUniqueOrThrow({
       where: { id: data.duplicateForm.id }
     });
     const duplicatedForwardedIn = await prisma.form
@@ -558,7 +560,7 @@ describe("Mutation.duplicateForm", () => {
         }
       }
     );
-    const duplicatedForm = await prisma.form.findUnique({
+    const duplicatedForm = await prisma.form.findUniqueOrThrow({
       where: { id: data.duplicateForm.id }
     });
     expect(duplicatedForm.nextDestinationProcessingOperation).toBeNull();

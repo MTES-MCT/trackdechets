@@ -1,15 +1,15 @@
 import { UserInputError } from "apollo-server-express";
-import { checkIsAuthenticated } from "../../../common/permissions";
+import {
+  checkIsAuthenticated,
+  checkSecurityCode
+} from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
 import {
   expandFormFromDb,
   flattenSignedByTransporterInput
 } from "../../converter";
-import {
-  checkCanSignedByTransporter,
-  checkSecurityCode
-} from "../../permissions";
+import { checkCanSignedByTransporter } from "../../permissions";
 import {
   beforeSignedByTransporterSchema,
   signingInfoSchema,
@@ -77,13 +77,12 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       // BSD has already been sent, it must be a signature for frame 18
 
       // check security code is temp storer's
-      await checkSecurityCode(form.recipientCompanySiret, securityCode);
+      await checkSecurityCode(form.recipientCompanySiret!, securityCode);
 
-      const { forwardedIn } = await getFormRepository(user).findFullFormById(
-        id
-      );
+      const { forwardedIn } =
+        (await getFormRepository(user).findFullFormById(id)) ?? {};
 
-      const hasWasteDetailsOverride = !!forwardedIn.wasteDetailsQuantity;
+      const hasWasteDetailsOverride = !!forwardedIn?.wasteDetailsQuantity;
 
       const formUpdateInput: Prisma.FormUpdateInput = {
         ...(!hasWasteDetailsOverride && wasteDetails),
@@ -131,7 +130,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       await checkSecurityCode(form.ecoOrganismeSiret, signingInfo.securityCode);
     } else {
       await checkSecurityCode(
-        form.emitterCompanySiret,
+        form.emitterCompanySiret!,
         signingInfo.securityCode
       );
     }

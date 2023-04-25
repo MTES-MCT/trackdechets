@@ -35,7 +35,7 @@ declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace Express {
     interface User extends PrismaUser {
-      auth?: AuthType;
+      auth: AuthType;
       ip?: string;
     }
   }

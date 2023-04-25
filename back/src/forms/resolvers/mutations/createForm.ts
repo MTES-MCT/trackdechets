@@ -12,16 +12,15 @@ import {
   flattenFormInput,
   flattenTemporaryStorageDetailInput
 } from "../../converter";
-import { checkIsFormContributor } from "../../permissions";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
-import { FormCompanies } from "../../types";
 import { draftFormSchema, validateGroupement } from "../../validation";
 import { UserInputError } from "apollo-server-core";
 import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
-import { sirenifyFormInput } from "../../sirenify";
 import { validateIntermediariesInput } from "../../../common/validation";
+import { sirenifyFormInput } from "../../sirenify";
+import { checkCanCreate } from "../../permissions";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -52,44 +51,10 @@ const createFormResolver = async (
     formContent.wasteDetails.isDangerous = true;
   }
 
-  const formCompanies: FormCompanies = {
-    emitterCompanySiret: formContent.emitter?.company?.siret,
-    recipientCompanySiret: formContent.recipient?.company?.siret,
-    transporterCompanySiret: formContent.transporter?.company?.siret,
-    transporterCompanyVatNumber: formContent.transporter?.company?.vatNumber,
-    traderCompanySiret: formContent.trader?.company?.siret,
-    brokerCompanySiret: formContent.broker?.company?.siret,
-    ecoOrganismeSiret: formContent.ecoOrganisme?.siret,
-    ...(temporaryStorageDetail?.destination?.company?.siret
-      ? {
-          forwardedIn: {
-            recipientCompanySiret:
-              temporaryStorageDetail.destination.company.siret,
-            transporterCompanySiret: null,
-            transporterCompanyVatNumber: null
-          }
-        }
-      : {}),
-    ...(intermediaries?.length
-      ? {
-          intermediariesVatNumbers: intermediaries?.map(
-            intermediary => intermediary.vatNumber ?? null
-          ),
-          intermediariesSirets: intermediaries?.map(
-            intermediary => intermediary.siret ?? null
-          )
-        }
-      : {})
-  };
-
   // APPENDIX1_PRODUCER is the only type of forms for which you don't necessarely appear during creation.
   // The destination and transporter will be auto completed
   if (formContent?.emitter?.type !== "APPENDIX1_PRODUCER") {
-    await checkIsFormContributor(
-      user,
-      formCompanies,
-      "Vous ne pouvez pas créer un bordereau sur lequel votre entreprise n'apparait pas"
-    );
+    await checkCanCreate(user, createFormInput);
   }
 
   const form = flattenFormInput(formContent);
@@ -147,13 +112,15 @@ const createFormResolver = async (
     };
   }
 
-  const isGroupement = grouping?.length > 0 || appendix2Forms?.length > 0;
+  const isGroupement =
+    (grouping && grouping.length > 0) ||
+    (appendix2Forms && appendix2Forms.length > 0);
   const formFractions = isGroupement
     ? await validateGroupement(
         formCreateInput,
-        grouping?.length > 0
+        grouping && grouping.length > 0
           ? grouping
-          : appendix2toFormFractions(appendix2Forms)
+          : appendix2toFormFractions(appendix2Forms!)
       )
     : null;
 
@@ -167,12 +134,12 @@ const createFormResolver = async (
       newForm.emitterType === EmitterType.APPENDIX1
         ? await setAppendix1({
             form: newForm,
-            appendix1: formFractions,
+            appendix1: formFractions!,
             currentAppendix1Forms: []
           })
         : await setAppendix2({
             form: newForm,
-            appendix2: formFractions,
+            appendix2: formFractions!,
             currentAppendix2Forms: []
           });
     }

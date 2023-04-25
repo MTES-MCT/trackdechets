@@ -46,7 +46,9 @@ describe("Query.Bsda", () => {
       opt: {
         emitterCompanySiret: otherCompany.siret,
         intermediaries: {
-          create: [{ siret: company.siret, name: company.name, contact: "joe" }]
+          create: [
+            { siret: company.siret!, name: company.name, contact: "joe" }
+          ]
         }
       }
     });

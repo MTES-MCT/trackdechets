@@ -92,7 +92,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       data: {
         bsdaId: bsda.id,
         authoringCompanyId: company.id,
-        approvals: { create: { approverSiret: companyOfSomeoneElse.siret } },
+        approvals: { create: { approverSiret: companyOfSomeoneElse.siret! } },
         comment: ""
       }
     });
@@ -124,7 +124,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       data: {
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: "",
         wasteCode: "10 13 09*"
       }
@@ -158,8 +158,8 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
         authoringCompanyId: secondCompany.id,
         approvals: {
           create: [
-            { approverSiret: company.siret },
-            { approverSiret: thirdCompany.siret }
+            { approverSiret: company.siret! },
+            { approverSiret: thirdCompany.siret! }
           ]
         },
         comment: ""
@@ -180,13 +180,13 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
     expect(
       data.submitBsdaRevisionRequestApproval.approvals.find(
         val => val.approverSiret === company.siret
-      ).status
+      )!.status
     ).toBe("ACCEPTED");
 
     expect(
-      data.submitBsdaRevisionRequestApproval.approvals.find(
+      data.submitBsdaRevisionRequestApproval.approvals!.find(
         val => val.approverSiret === thirdCompany.siret
-      ).status
+      )!.status
     ).toBe("PENDING");
   });
 
@@ -206,8 +206,8 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
         authoringCompanyId: secondCompany.id,
         approvals: {
           create: [
-            { approverSiret: company.siret },
-            { approverSiret: thirdCompany.siret }
+            { approverSiret: company.siret! },
+            { approverSiret: thirdCompany.siret! }
           ]
         },
         comment: ""
@@ -226,13 +226,13 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
     expect(
       data.submitBsdaRevisionRequestApproval.approvals.find(
         val => val.approverSiret === company.siret
-      ).status
+      )!.status
     ).toBe("REFUSED");
     expect(data.submitBsdaRevisionRequestApproval.status).toBe("REFUSED");
     expect(
       data.submitBsdaRevisionRequestApproval.approvals.find(
         val => val.approverSiret === thirdCompany.siret
-      ).status
+      )!.status
     ).toBe("CANCELED");
   });
 
@@ -251,7 +251,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       data: {
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: ""
       }
     });
@@ -284,7 +284,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       data: {
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         wasteCode: "01 03 08",
         comment: ""
       }
@@ -300,7 +300,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       }
     });
 
-    const updatedBsda = await prisma.bsda.findUnique({
+    const updatedBsda = await prisma.bsda.findUniqueOrThrow({
       where: { id: bsda.id }
     });
 
@@ -323,7 +323,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       data: {
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         wasteCode: "01 03 08",
         comment: ""
       }
@@ -339,7 +339,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       }
     });
 
-    const updatedBsda = await prisma.bsda.findUnique({
+    const updatedBsda = await prisma.bsda.findUniqueOrThrow({
       where: { id: bsda.id }
     });
 
@@ -365,7 +365,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       data: {
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         destinationOperationCode: "R 13",
         comment: "Operation code error"
       }
@@ -381,7 +381,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       }
     });
 
-    const updatedBsda = await prisma.bsda.findUnique({
+    const updatedBsda = await prisma.bsda.findUniqueOrThrow({
       where: { id: bsda.id }
     });
 
@@ -407,7 +407,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       data: {
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         destinationOperationCode: "R 5",
         comment: "Operation code error"
       }
@@ -423,7 +423,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       }
     });
 
-    const updatedBsda = await prisma.bsda.findUnique({
+    const updatedBsda = await prisma.bsda.findUniqueOrThrow({
       where: { id: bsda.id }
     });
 
@@ -449,7 +449,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       data: {
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         destinationOperationCode: "R 13",
         comment: "Operation code error"
       }
@@ -465,7 +465,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       }
     });
 
-    const updatedBsda = await prisma.bsda.findUnique({
+    const updatedBsda = await prisma.bsda.findUniqueOrThrow({
       where: { id: bsda.id }
     });
 
@@ -490,7 +490,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       data: {
         bsdaId: bsda.id,
         authoringCompanyId: companyOfSomeoneElse.id,
-        approvals: { create: { approverSiret: company.siret } },
+        approvals: { create: { approverSiret: company.siret! } },
         comment: "Cancel",
         isCanceled: true
       }
@@ -506,7 +506,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       }
     });
 
-    const updatedBsda = await prisma.bsda.findUnique({
+    const updatedBsda = await prisma.bsda.findUniqueOrThrow({
       where: { id: bsda.id }
     });
 
@@ -533,7 +533,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
         data: {
           bsdaId: bsda.id,
           authoringCompanyId: companyOfSomeoneElse.id,
-          approvals: { create: { approverSiret: company.siret } },
+          approvals: { create: { approverSiret: company.siret! } },
           comment: "Cancel",
           isCanceled: true
         }
@@ -603,7 +603,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
         bsdaId: bsda.id,
         authoringCompanyId: emitter.id,
         approvals: {
-          create: [{ approverSiret: destination.siret }]
+          create: [{ approverSiret: destination.siret! }]
         },
         comment: "Cancel",
         isCanceled: true
@@ -622,21 +622,74 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
 
     expect(errors).toBeUndefined();
 
-    const newGrouped1AfterRevision = await prisma.bsda.findUnique({
+    const newGrouped1AfterRevision = await prisma.bsda.findUniqueOrThrow({
       where: { id: grouped1.id }
     });
     expect(newGrouped1AfterRevision.status).toEqual(BsdaStatus.SENT);
     expect(newGrouped1AfterRevision.groupedInId).toBe(null);
 
-    const newGrouped2AfterRevision = await prisma.bsda.findUnique({
+    const newGrouped2AfterRevision = await prisma.bsda.findUniqueOrThrow({
       where: { id: grouped2.id }
     });
     expect(newGrouped2AfterRevision.status).toEqual(BsdaStatus.SENT);
     expect(newGrouped2AfterRevision.groupedInId).toBe(null);
 
-    const newBsdaAfterRevision = await prisma.bsda.findUnique({
+    const newBsdaAfterRevision = await prisma.bsda.findUniqueOrThrow({
       where: { id: bsda.id }
     });
     expect(newBsdaAfterRevision.status).toEqual(BsdaStatus.CANCELED);
+  });
+
+  it("should remove forwardedIn link in canceled BSDA", async () => {
+    const { company, user } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { company: transporter } = await userWithCompanyFactory(
+      UserRole.ADMIN
+    );
+    const forwardedBsda = await bsdaFactory({
+      opt: {
+        destinationCompanySiret: company.siret
+      }
+    });
+    const forwardingBsda = await bsdaFactory({
+      opt: {
+        forwarding: { connect: { id: forwardedBsda.id } },
+        emitterCompanySiret: company.siret,
+        status: BsdaStatus.SENT
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    // Now let's cancel the parent bsda
+    const revisionRequest = await prisma.bsdaRevisionRequest.create({
+      data: {
+        bsdaId: forwardingBsda.id,
+        authoringCompanyId: transporter.id,
+        approvals: {
+          create: [{ approverSiret: company.siret! }]
+        },
+        comment: "Cancel",
+        isCanceled: true
+      }
+    });
+
+    const { errors } = await mutate<
+      Pick<Mutation, "submitBsdaRevisionRequestApproval">,
+      MutationSubmitBsdaRevisionRequestApprovalArgs
+    >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedForwarding = await prisma.bsda.findUniqueOrThrow({
+      where: { id: forwardingBsda.id },
+      include: { forwarding: true }
+    });
+
+    expect(updatedForwarding.forwardingId).toBe(null);
+    expect(updatedForwarding.forwarding).toBe(null);
   });
 });

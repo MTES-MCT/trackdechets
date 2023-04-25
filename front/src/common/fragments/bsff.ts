@@ -41,6 +41,10 @@ export const dashboardBsffFragment = gql`
     packagings {
       numero
     }
+    bsffWeight: weight {
+      value
+    }
+    bsffUpdatedAt: updatedAt
   }
 `;
 

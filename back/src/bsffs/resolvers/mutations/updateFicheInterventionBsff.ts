@@ -6,7 +6,7 @@ import {
 } from "../../converter";
 import { validateFicheIntervention } from "../../validation";
 import { getFicheInterventionBsffOrNotFound } from "../../database";
-import { checkCanWriteFicheIntervention } from "../../permissions";
+import { checkCanUpdateFicheIntervention } from "../../permissions";
 import { getBsffFicheInterventionRepository } from "../../repository";
 
 const updateFicheInterventionBsff: MutationResolvers["updateFicheInterventionBsff"] =
@@ -17,13 +17,16 @@ const updateFicheInterventionBsff: MutationResolvers["updateFicheInterventionBsf
     const existingFicheIntervention = await getFicheInterventionBsffOrNotFound({
       id
     });
-    await checkCanWriteFicheIntervention(user, existingFicheIntervention);
+    await checkCanUpdateFicheIntervention(
+      user,
+      existingFicheIntervention,
+      input
+    );
 
     const futureFicheIntervention = {
       ...existingFicheIntervention,
       ...ficheInterventionData
     };
-    await checkCanWriteFicheIntervention(user, futureFicheIntervention);
 
     await validateFicheIntervention(futureFicheIntervention);
 

@@ -13,7 +13,6 @@ const keepAliveMs = 30 * 1000;
 
 export async function sseHandler(req: Request, res: Response) {
   const { siret } = req.params;
-
   const headers = {
     "Cache-Control": "no-cache",
     "Content-Type": "text/event-stream",

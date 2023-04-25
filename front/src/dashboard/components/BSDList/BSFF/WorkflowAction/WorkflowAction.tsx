@@ -22,7 +22,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
   const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
   const isToCollectTab = !!useRouteMatch(routes.dashboard.transport.toCollect);
   const emitterSiret = form.bsffEmitter?.company?.siret;
-  const transporterSiret = form.bsffTransporter?.company?.siret;
+  const transporterSiret = form.bsffTransporter?.company?.orgId;
   const destinationSiret = form.bsffDestination?.company?.siret;
 
   if (

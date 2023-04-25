@@ -24,6 +24,7 @@
         },
         "__typename": "BsdaDestination"
       },
+      "weight": { "value": 2 },
       "worker": {
         "isDisabled": false,
         "company": {

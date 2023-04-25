@@ -4,7 +4,7 @@ import { resetDatabase } from "../../../integration-tests/helper";
 import { ErrorCode } from "../../common/errors";
 import { User } from "@prisma/client";
 
-let user: User = null;
+let user: User;
 
 describe("getFormOrFormNotFound", () => {
   afterAll(resetDatabase);

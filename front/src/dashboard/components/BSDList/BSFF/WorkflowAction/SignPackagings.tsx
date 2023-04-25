@@ -27,25 +27,47 @@ import { PackagingAction } from "./PackagingAction";
 
 interface SignPackagingsProps {
   bsffId: string;
+  isModalOpenFromParent?: boolean;
+  onModalCloseFromParent?: () => void;
+  displayActionButton?: boolean;
 }
 
 /**
  * Bouton d'action permettant de signer les acceptations
  * et opérations sur les contenants d'un BSFF
  */
-export function SignPackagings({ bsffId }: SignPackagingsProps) {
+export function SignPackagings({
+  bsffId,
+  isModalOpenFromParent,
+  onModalCloseFromParent,
+  displayActionButton = true,
+}: SignPackagingsProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   return (
     <>
-      <ActionButton
-        icon={<IconCheckCircle1 size="24px" />}
-        onClick={() => setIsOpen(true)}
-      >
-        Signature acceptation et traitement par contenant
-      </ActionButton>
-      {isOpen && (
-        <SignPackagingsModal bsffId={bsffId} onClose={() => setIsOpen(false)} />
+      {displayActionButton && (
+        <>
+          <ActionButton
+            icon={<IconCheckCircle1 size="24px" />}
+            onClick={() => setIsOpen(true)}
+          >
+            Signature acceptation et traitement par contenant
+          </ActionButton>
+          {isOpen && (
+            <SignPackagingsModal
+              bsffId={bsffId}
+              onClose={() => setIsOpen(false)}
+            />
+          )}
+        </>
+      )}
+
+      {isModalOpenFromParent && (
+        <SignPackagingsModal
+          bsffId={bsffId}
+          onClose={onModalCloseFromParent!}
+        />
       )}
     </>
   );

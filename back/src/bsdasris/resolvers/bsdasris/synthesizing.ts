@@ -1,6 +1,6 @@
 import { BsdasriResolvers } from "../../../generated/graphql/types";
 
-import { BsdasriType } from "@prisma/client";
+import { Bsdasri, BsdasriType } from "@prisma/client";
 import { expandSynthesizingDasri } from "../../converter";
 import { dashboardOperationName } from "../../../common/queries";
 import { isSessionUser } from "../../../auth";
@@ -15,18 +15,19 @@ const synthesizing: BsdasriResolvers["synthesizing"] = async (
     // skip db query
     return [];
   }
-  let synthesizing = [];
+  let synthesizing: Bsdasri[] = [];
   // use ES indexed field when requested from dashboard
   if (
     ctx?.req?.body?.operationName === dashboardOperationName &&
     isSessionUser(ctx)
   ) {
-    synthesizing = bsdasri?.synthesizing ?? [];
-  } else {
-    synthesizing = await getReadonlyBsdasriRepository()
-      .findRelatedEntity({ id: bsdasri.id })
-      .synthesizing();
+    synthesizing = (bsdasri?.synthesizing as any) ?? [];
   }
+
+  synthesizing =
+    (await getReadonlyBsdasriRepository()
+      .findRelatedEntity({ id: bsdasri.id })
+      .synthesizing()) ?? [];
 
   return synthesizing.map(bsdasri => expandSynthesizingDasri(bsdasri));
 };

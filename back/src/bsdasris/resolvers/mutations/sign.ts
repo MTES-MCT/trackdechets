@@ -7,13 +7,11 @@ import dasriTransition from "../../workflow/dasriTransition";
 import {
   BsdasriType,
   BsdasriStatus,
-  WasteAcceptationStatus
+  WasteAcceptationStatus,
+  User
 } from "@prisma/client";
-import { checkIsCompanyMember } from "../../../users/permissions";
 import { checkCanEditBsdasri } from "../../permissions";
-import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { getBsdasriRepository } from "../../repository";
-
 import {
   dasriSignatureMapping,
   checkDirectakeOverIsAllowed,
@@ -22,6 +20,17 @@ import {
   getFieldsUpdate
 } from "./signatureUtils";
 import { runInTransaction } from "../../../common/repository/helper";
+import {
+  Permission,
+  can,
+  checkUserPermissions,
+  getUserRoles
+} from "../../../permissions";
+import {
+  BsdasriSignatureType,
+  SignatureAuthor
+} from "../../../generated/graphql/types";
+import { GraphQLContext } from "../../../types";
 
 /**
  * When synthesized dasri is received or processed, associated dasris are updated
@@ -85,22 +94,27 @@ const cascadeOnSynthesized = async ({ dasri, bsdasriRepository }) => {
 
 const getSiretWhoSigns = async ({
   authorizedSirets,
-  userId
+  user
 }: {
   authorizedSirets: string[];
-  userId: string;
+  user: User;
 }): Promise<string> => {
   let siretWhoSigns;
   if (authorizedSirets.length === 1) {
     // One allowed siret ? let's use it
     [siretWhoSigns] = authorizedSirets;
     // Is this siret belonging to a current user ?
-    await checkIsCompanyMember({ id: userId }, { orgId: siretWhoSigns });
+    await checkUserPermissions(
+      user,
+      [siretWhoSigns].filter(Boolean),
+      Permission.BsdCanSign,
+      `Vous n'êtes pas membre de l'entreprise portant le siret "${siretWhoSigns}".`
+    );
   } else {
     // several allowed sirets ? take the first belonging to current user
-    const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(userId);
-    const userAuthorizedSirets = authorizedSirets.filter(siret =>
-      userCompaniesSiretOrVat.includes(siret)
+    const roles = await getUserRoles(user.id);
+    const userAuthorizedSirets = authorizedSirets.filter(
+      siret => roles[siret] && can(roles[siret], Permission.BsdCanSign)
     );
     if (!userAuthorizedSirets.length) {
       throw new ForbiddenError(
@@ -118,6 +132,13 @@ const sign = async ({
   securityCode = null,
   emissionSignatureAuthor = null,
   context
+}: {
+  id: string;
+  author: string;
+  type?: BsdasriSignatureType | null;
+  securityCode?: number | null;
+  emissionSignatureAuthor?: SignatureAuthor | null;
+  context: GraphQLContext;
 }) => {
   const user = checkIsAuthenticated(context);
   const bsdasri = await getBsdasriOrNotFound({ id, includeAssociated: true });
@@ -128,7 +149,8 @@ const sign = async ({
     throw new InvalidTransition();
   }
 
-  const signatureType = type ?? "EMISSION_WITH_SECRET_CODE";
+  const signatureType: BsdasriSignatureType | "EMISSION_WITH_SECRET_CODE" =
+    type ?? "EMISSION_WITH_SECRET_CODE";
 
   const signatureParams = dasriSignatureMapping[signatureType];
 
@@ -137,7 +159,7 @@ const sign = async ({
 
   const siretWhoSigns = await getSiretWhoSigns({
     authorizedSirets,
-    userId: user.id
+    user
   });
 
   const isSignedByEcoOrganisme = checkIsSignedByEcoOrganisme({
@@ -177,7 +199,7 @@ const sign = async ({
     [signatureParams.author]: author,
     [signatureParams.date]: new Date(),
     [signatureParams.signatoryField]: { connect: { id: user.id } },
-    ...getFieldsUpdate({ bsdasri, input: { author, type } })
+    ...getFieldsUpdate({ bsdasri, type })
   };
 
   const { where, updateData } = await dasriTransition(
@@ -186,7 +208,7 @@ const sign = async ({
     },
     {
       type: signatureParams.eventType,
-      dasriUpdateInput: data
+      dasriUpdateInput: data as any
     },
     signatureParams.validationContext,
     {

@@ -19,7 +19,7 @@ export async function editProfileFn(
   payload: MutationEditProfileArgs
 ) {
   const editProfileSchema = yup.object({
-    name: yup.string().ensure().isSafeSSTI(),
+    name: yup.string().required().isSafeSSTI(),
     phone: yup.string()
   });
   editProfileSchema.validateSync(payload);

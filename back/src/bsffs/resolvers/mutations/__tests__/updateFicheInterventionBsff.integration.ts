@@ -1,4 +1,4 @@
-import { Company, User, UserRole } from "@prisma/client";
+import { Company, Prisma, User, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import {
   Mutation,
@@ -57,15 +57,15 @@ describe("Mutation.updateFicheInterventionBsff", () => {
   beforeEach(async () => {
     emitter = await userWithCompanyFactory(UserRole.ADMIN, {
       siret: variables.input.operateur.company.siret,
-      name: variables.input.operateur.company.name
+      name: variables.input.operateur.company.name!
     });
 
     const ficheIntervention = await prisma.bsffFicheIntervention.create({
       data: {
-        ...flattenFicheInterventionBsffInput({
+        ...(flattenFicheInterventionBsffInput({
           ...variables.input,
           weight: variables.input.weight - 1
-        })
+        }) as Prisma.BsffFicheInterventionCreateInput)
       }
     });
     ficheInterventionId = ficheIntervention.id;
@@ -123,8 +123,7 @@ describe("Mutation.updateFicheInterventionBsff", () => {
 
     expect(errors).toEqual([
       expect.objectContaining({
-        message:
-          "Vous ne pouvez pas éditer une fiche d'intervention sur lequel le SIRET de votre entreprise n'apparaît pas."
+        message: "Seul l'opérateur peut modifier une fiche d'intervention."
       })
     ]);
   });

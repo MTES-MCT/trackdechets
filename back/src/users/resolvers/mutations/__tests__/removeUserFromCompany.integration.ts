@@ -6,7 +6,7 @@ import prisma from "../../../../prisma";
 import makeClient from "../../../../__tests__/testClient";
 import { AuthType } from "../../../../auth";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { getCachedUserSiretOrVat } from "../../../../common/redis/users";
+import { getUserRoles } from "../../../../permissions";
 
 const REMOVE_USER_FROM_COMPANY = `mutation RemoveUserFromCompany($userId: ID!, $siret: String!){
   removeUserFromCompany(userId: $userId, siret: $siret){
@@ -38,13 +38,13 @@ describe("mutation removeUserFromCompany", () => {
         role: "MEMBER"
       }
     });
-    let isMember = await isMemberFn(user.id, company.siret);
+    let isMember = await isMemberFn(user.id, company.siret!);
     expect(isMember).toEqual(true);
     const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
     await mutate(REMOVE_USER_FROM_COMPANY, {
       variables: { userId: user.id, siret: company.siret }
     });
-    isMember = await isMemberFn(user.id, company.siret);
+    isMember = await isMemberFn(user.id, company.siret!);
     expect(isMember).toEqual(false);
   });
 
@@ -59,11 +59,12 @@ describe("mutation removeUserFromCompany", () => {
       }
     });
 
-    expect(await getCachedUserSiretOrVat(user.id)).toEqual([company.siret]);
+    expect(Object.keys(await getUserRoles(user.id))).toEqual([company.siret]);
+
     const { mutate } = makeClient({ ...admin, auth: AuthType.Session });
     await mutate(REMOVE_USER_FROM_COMPANY, {
       variables: { userId: user.id, siret: company.siret }
     });
-    expect(await getCachedUserSiretOrVat(user.id)).toEqual([]);
+    expect(Object.keys(await getUserRoles(user.id))).toEqual([]);
   });
 });

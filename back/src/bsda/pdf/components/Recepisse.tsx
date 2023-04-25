@@ -2,7 +2,7 @@ import * as React from "react";
 import { formatDate } from "../../../common/pdf";
 import { BsdaRecepisse } from "../../../generated/graphql/types";
 
-type Props = { recepisse: BsdaRecepisse };
+type Props = { recepisse: BsdaRecepisse | null | undefined };
 
 export function Recepisse({ recepisse }: Props) {
   return (

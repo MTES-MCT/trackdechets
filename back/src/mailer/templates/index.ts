@@ -44,18 +44,6 @@ export const onboardingFirstStep: MailTemplate = {
   templateId: templateIds.FIRST_ONBOARDING
 };
 
-export const onboardingProducerSecondStep: MailTemplate = {
-  subject:
-    "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
-  templateId: templateIds.PRODUCER_SECOND_ONBOARDING
-};
-
-export const onboardingProfessionalSecondStep: MailTemplate = {
-  subject:
-    "Trackdéchets vous accompagne pour mettre en oeuvre la traçabilité dématérialisée",
-  templateId: templateIds.PROFESSIONAL_SECOND_ONBOARDING
-};
-
 export const createPasswordResetRequest: MailTemplate<{
   resetHash: string;
 }> = {
@@ -98,7 +86,7 @@ export const formPartiallyRefused: MailTemplate<{ form: Form }> = {
           form.transporterCompanyName
         ),
         quantityPartiallyRefused:
-          form.wasteDetailsQuantity - form.quantityReceived,
+          form.wasteDetailsQuantity! - form.quantityReceived!,
         receivedAt: form.receivedAt
           ? toFrFormat(new Date(form.receivedAt))
           : "",
@@ -150,19 +138,19 @@ export const membershipRequestRefused: MailTemplate<{
 };
 
 export const securityCodeRenewal: MailTemplate<{
-  company: { name?: string; siret: string };
+  company: { name?: string; orgId: string };
 }> = {
   subject: ({ company }) =>
-    `Renouvellement du code de signature de votre établissement "${company.name}" (${company.siret})`,
+    `Renouvellement du code de signature de votre établissement "${company.name}" (${company.orgId})`,
   body: mustacheRenderer("notification-renouvellement-code-signature.html"),
   templateId: templateIds.LAYOUT
 };
 
 export const verificationProcessInfo: MailTemplate<{
-  company: { name?: string; siret: string };
+  company: { name?: string; orgId: string };
 }> = {
   subject: ({ company }) =>
-    `Établissement ${company.siret} en cours de vérification`,
+    `Établissement ${company.orgId} en cours de vérification`,
   body: mustacheRenderer("information-process-de-verification.html"),
   templateId: templateIds.LAYOUT
 };
@@ -170,12 +158,12 @@ export const verificationProcessInfo: MailTemplate<{
 export const verificationDone: MailTemplate<{
   company: {
     name?: string;
-    siret: string;
+    orgId: string;
     verificationMode: CompanyVerificationMode;
   };
 }> = {
   subject: ({ company }) =>
-    `L'établissement ${company.siret} est désormais vérifié`,
+    `L'établissement ${company.orgId} est désormais vérifié`,
   body: mustacheRenderer("etablissement-verifie.html"),
   templateId: templateIds.LAYOUT,
   prepareVariables: ({ company }) => ({
@@ -185,6 +173,11 @@ export const verificationDone: MailTemplate<{
         company.verificationMode === CompanyVerificationMode.LETTER
     }
   })
+};
+
+export const verifiedForeignTransporterCompany: MailTemplate = {
+  subject: "Welcome to Trackdéchets !",
+  templateId: templateIds.VERIFIED_FOREIGN_TRANSPORTER_COMPANY
 };
 
 export const finalDestinationModified: MailTemplate<{
@@ -217,5 +210,28 @@ export const pendingMembershipRequestAdminDetailsEmail: MailTemplate<{
 }> = {
   subject: "Un utilisateur est toujours en attente de réponse de votre part",
   body: mustacheRenderer("pending-membership-request-admin-details.html"),
+  templateId: templateIds.LAYOUT
+};
+
+export const profesionalsSecondOnboardingEmail: MailTemplate = {
+  subject:
+    "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
+  templateId: templateIds.PROFESIONAL_SECOND_ONBOARDING
+};
+
+export const producersSecondOnboardingEmail: MailTemplate = {
+  subject:
+    "Signature dématérialisée, tableau de bord, explorez tout ce que fait Trackdéchets !",
+  templateId: templateIds.PRODUCER_SECOND_ONBOARDING
+};
+
+export const pendingRevisionRequestAdminDetailsEmail: MailTemplate<{
+  requestCreatedAt: string;
+  bsdReadableId: string;
+  companyName: string;
+  companyOrgId: string;
+}> = {
+  subject: "Votre action est attendue sur une demande de révision",
+  body: mustacheRenderer("pending-revision-request-admin-details.html"),
   templateId: templateIds.LAYOUT
 };

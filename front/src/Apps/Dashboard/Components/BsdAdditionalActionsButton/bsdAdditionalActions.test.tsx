@@ -2,9 +2,13 @@ import React from "react";
 import { render, fireEvent, waitFor } from "@testing-library/react";
 import BsdAdditionalActionsButton from "./BsdAdditionalActionsButton";
 import { BsdDisplay, BsdStatusCode } from "Apps/Common/types/bsdTypes";
-import { BsdType } from "generated/graphql/types";
+import { BsdType, EmitterType } from "generated/graphql/types";
 
-const bsd = { id: "1", readableid: "1" } as unknown as BsdDisplay;
+const bsd = {
+  id: "1",
+  readableid: "1",
+  type: BsdType.Bsdd,
+} as BsdDisplay;
 const currentSiret = "12345678901234";
 
 const onOverview = jest.fn();
@@ -13,6 +17,8 @@ const onPdf = jest.fn();
 const onDelete = jest.fn();
 const onUpdate = jest.fn();
 const onRevision = jest.fn();
+const onAppendix1 = jest.fn();
+const onBsdSuite = jest.fn();
 
 describe("BsdAdditionalActionsButton", () => {
   afterEach(() => {
@@ -135,9 +141,9 @@ describe("BsdAdditionalActionsButton", () => {
   it("calls the `onDelete` function when the 'Supprimer' button is clicked", async () => {
     const bsdDelete = {
       ...bsd,
-      status: BsdStatusCode.DRAFT,
+      status: BsdStatusCode.Draft,
       type: BsdType.Bsdd,
-    };
+    } as BsdDisplay;
     const { getByTestId } = render(
       <BsdAdditionalActionsButton
         bsd={bsdDelete}
@@ -161,9 +167,9 @@ describe("BsdAdditionalActionsButton", () => {
   it("calls the `onUpdate` function when the 'Modifier' button is clicked", async () => {
     const bsdUpdate = {
       ...bsd,
-      status: BsdStatusCode.DRAFT,
+      status: BsdStatusCode.Draft,
       type: BsdType.Bsdd,
-    };
+    } as BsdDisplay;
     const { getByTestId } = render(
       <BsdAdditionalActionsButton
         bsd={bsdUpdate}
@@ -187,7 +193,7 @@ describe("BsdAdditionalActionsButton", () => {
   it("calls the `onRevision` function when the 'Réviser' button is clicked", async () => {
     const bsdReview = {
       ...bsd,
-      status: BsdStatusCode.PROCESSED,
+      status: BsdStatusCode.Processed,
       type: BsdType.Bsdd,
     };
     const { getByTestId } = render(
@@ -207,6 +213,65 @@ describe("BsdAdditionalActionsButton", () => {
 
     await waitFor(() => {
       expect(onRevision).toHaveBeenCalledWith(bsdReview);
+    });
+  });
+
+  it("calls the `onBsdSuite` function when the 'Compléter le bsd suite' button is clicked", async () => {
+    const bsdSuite = {
+      ...bsd,
+      emitterType: EmitterType.Producer,
+      status: BsdStatusCode.Accepted,
+      destination: { company: { siret: currentSiret } },
+      isTempStorage: false,
+      type: BsdType.Bsdd,
+    } as BsdDisplay;
+
+    const { getByTestId } = render(
+      <BsdAdditionalActionsButton
+        bsd={bsdSuite}
+        currentSiret={currentSiret}
+        onOverview={onOverview}
+        onDuplicate={onDuplicate}
+        onPdf={onPdf}
+        onDelete={onDelete}
+        onUpdate={onUpdate}
+        onRevision={onRevision}
+        onBsdSuite={onBsdSuite}
+      />
+    );
+
+    fireEvent.click(getByTestId("bsd-suite-btn"));
+
+    await waitFor(() => {
+      expect(onBsdSuite).toHaveBeenCalledWith(bsdSuite);
+    });
+  });
+
+  it("calls the `onAppendix1` function when the 'Annexe 1' button is clicked", async () => {
+    const bsdAppendix1 = {
+      ...bsd,
+      emitterType: EmitterType.Appendix1,
+      status: BsdStatusCode.Sent,
+      type: BsdType.Bsdd,
+    };
+    const { getByTestId } = render(
+      <BsdAdditionalActionsButton
+        bsd={bsdAppendix1}
+        currentSiret={currentSiret}
+        onOverview={onOverview}
+        onDuplicate={onDuplicate}
+        onPdf={onPdf}
+        onDelete={onDelete}
+        onUpdate={onUpdate}
+        onRevision={onRevision}
+        onAppendix1={onAppendix1}
+      />
+    );
+
+    fireEvent.click(getByTestId("appendix1-btn"));
+
+    await waitFor(() => {
+      expect(onAppendix1).toHaveBeenCalledWith(bsdAppendix1);
     });
   });
 });

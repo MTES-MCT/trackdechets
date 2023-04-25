@@ -4,13 +4,12 @@ import {
   companyFactory,
   userWithCompanyFactory
 } from "../../__tests__/factories";
-
 import {
-  getCachedUserSiretOrVat,
-  genUserCompaniesCacheKey,
-  deleteCachedUserCompanies
+  genUserRolesCacheKey,
+  deleteCachedUserRoles
 } from "../../common/redis/users";
 import { redisClient } from "../redis";
+import { getUserRoles } from "../../permissions";
 
 describe("Test Caching", () => {
   afterAll(async () => {
@@ -29,22 +28,24 @@ describe("Test Caching", () => {
       }
     });
 
-    const key = genUserCompaniesCacheKey(user.id);
+    const key = genUserRolesCacheKey(user.id);
     // redis key does not exist yet
     let exists = await redisClient.exists(key);
     expect(exists).toBe(0);
 
-    const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
+    const userRoles = await getUserRoles(user.id);
+
+    const userCompaniesSiretOrVat = Object.keys(userRoles);
 
     expect(userCompaniesSiretOrVat.length).toEqual(2);
-    expect(userCompaniesSiretOrVat.includes(company.siret)).toBe(true);
-    expect(userCompaniesSiretOrVat.includes(otherCompany.siret)).toBe(true);
+    expect(userCompaniesSiretOrVat.includes(company.siret!)).toBe(true);
+    expect(userCompaniesSiretOrVat.includes(otherCompany.siret!)).toBe(true);
 
     // redis key exists now
     exists = await redisClient.exists(key);
     expect(exists).toBe(1);
 
-    await deleteCachedUserCompanies(user.id);
+    await deleteCachedUserRoles(user.id);
     // redis key is gone
     exists = await redisClient.exists(key);
     expect(exists).toBe(0);

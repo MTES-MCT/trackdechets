@@ -37,12 +37,15 @@
     "reindex-bsd:dev": "tsx -r dotenv/config ./src/scripts/bin/reindexBsd.ts $bsdId",
     "watch:apiqueue": "tsx watch -r dotenv/config src/queue/consumer.ts -e ts",
     "watch:indexationqueue": "tsx watch -r dotenv/config src/queue/consumerIndexation.ts -e ts",
-    "watch:queue": "concurrently -k -p \"[{name}]\" -n \"Api Queue,Indexation Queue\" -c \"yellow.bold,cyan.bold\" \"npm run watch:apiqueue\" \"npm run watch:indexationqueue\"",
+    "watch:webhooksqueue": "tsx watch -r dotenv/config src/queue/consumerWebhooks.ts -e ts",
+    "watch:queue": "concurrently -k -p \"[{name}]\" -n \"Api Queue,Indexation Queue,Webhooks Queue\" -c \"yellow.bold,cyan.bold,magenta.bold\" \"npm run watch:apiqueue\" \"npm run watch:indexationqueue\" \"npm run watch:webhooksqueue\"",
     "watch:notifier": "tsx watch -r dotenv/config src/notifier/index.ts -e ts",
     "queue": "node dist/src/queue/consumer.js",
     "queue:obliterate": "node dist/src/queue/obliterate.js",
     "purge-pdf-token": "node dist/src/scripts/bin/purgePdfAccessToken.js",
-    "purge-pdf-token:dev": "tsx -r dotenv/config ./src/scripts/bin/purgePdfAccessToken.ts"
+    "purge-pdf-token:dev": "tsx -r dotenv/config ./src/scripts/bin/purgePdfAccessToken.ts",
+    "storeAllWebhookSettings.ts": "node dist/src/webhooks/commands/storeAllWebhookSettings.js",
+    "storeAllWebhookSettings.ts:dev": "tsx -r dotenv/config ./src/webhooks/commands/storeAllWebhookSettings.ts"
   },
   "engines": {
     "node": "^18"
@@ -166,7 +169,7 @@
     "@typescript-eslint/parser": "^5.56.0",
     "concurrently": "^6.4.0",
     "copyfiles": "^2.4.1",
-    "dotenv": "^10.0.0",
+    "dotenv": "^16.0.0",
     "eslint": "^8.36.0",
     "eslint-config-prettier": "^8.8.0",
     "eslint-import-resolver-typescript": "^3.5.3",

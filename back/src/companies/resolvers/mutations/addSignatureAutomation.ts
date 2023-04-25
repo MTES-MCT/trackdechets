@@ -4,8 +4,9 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationAddSignatureAutomationArgs } from "../../../generated/graphql/types";
 import prisma from "../../../prisma";
 import { GraphQLContext } from "../../../types";
-import { checkIsCompanyAdmin } from "../../../users/permissions";
 import { getCompanyOrCompanyNotFound } from "../../database";
+import { checkUserPermissions, Permission } from "../../../permissions";
+import { NotCompanyAdminErrorMsg } from "../../../common/errors";
 
 export async function addSignatureAutomation(
   _,
@@ -17,7 +18,13 @@ export async function addSignatureAutomation(
 
   const { from, to } = input;
   const fromCompany = await getCompanyOrCompanyNotFound({ id: from });
-  await checkIsCompanyAdmin(user, fromCompany);
+
+  await checkUserPermissions(
+    user,
+    fromCompany.orgId,
+    Permission.CompanyCanManageSignatureAutomation,
+    NotCompanyAdminErrorMsg(fromCompany.orgId)
+  );
 
   const toCompany = await getCompanyOrCompanyNotFound({ id: to });
 

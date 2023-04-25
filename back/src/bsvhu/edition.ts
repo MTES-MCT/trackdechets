@@ -1,9 +1,9 @@
 import { Bsvhu, User, Prisma } from "@prisma/client";
 import { SealedFieldError } from "../common/errors";
-import { getCachedUserSiretOrVat } from "../common/redis/users";
 import { objectDiff } from "../forms/workflow/diff";
 import { BsvhuInput, SignatureTypeInput } from "../generated/graphql/types";
 import { flattenVhuInput } from "./converter";
+import { getUserRoles } from "../permissions";
 
 type EditableBsvhuFields = Required<
   Omit<
@@ -96,8 +96,9 @@ export async function checkEditionRules(
     return true;
   }
 
-  const userSirets = user?.id ? await getCachedUserSiretOrVat(user.id) : [];
-  const isEmitter = userSirets.includes(bsvhu.emitterCompanySiret);
+  const userSirets = user?.id ? Object.keys(await getUserRoles(user.id)) : [];
+  const isEmitter =
+    bsvhu.emitterCompanySiret && userSirets.includes(bsvhu.emitterCompanySiret);
 
   if (bsvhu.status === "SIGNED_BY_PRODUCER" && isEmitter) {
     return true;
@@ -110,7 +111,7 @@ export async function checkEditionRules(
   // Inner function used to recursively checks that the diff
   // does not contain any fields sealed by signature
   function checkSealedFields(
-    signatureType: SignatureTypeInput,
+    signatureType: SignatureTypeInput | null,
     editableFields: string[]
   ) {
     if (signatureType === null) {

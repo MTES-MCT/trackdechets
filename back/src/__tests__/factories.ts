@@ -119,7 +119,8 @@ export interface UserWithCompany {
 export const userWithCompanyFactory = async (
   role: UserRole,
   companyOpts: Partial<Prisma.CompanyCreateInput> = {},
-  userOpts: Partial<Prisma.UserCreateInput> = {}
+  userOpts: Partial<Prisma.UserCreateInput> = {},
+  companyAssociationOpts: Partial<Prisma.CompanyAssociationCreateInput> = {}
 ): Promise<UserWithCompany> => {
   const company = await companyFactory(companyOpts);
 
@@ -128,7 +129,8 @@ export const userWithCompanyFactory = async (
     companyAssociations: {
       create: {
         company: { connect: { id: company.id } },
-        role: role as UserRole
+        role: role as UserRole,
+        ...companyAssociationOpts
       }
     }
   });
@@ -283,6 +285,7 @@ export const forwardedInData: Partial<Prisma.FormCreateInput> = {
   recipientCap: "CAP",
   recipientProcessingOperation: "R 1",
   wasteDetailsCode: "05 01 04*",
+  wasteDetailsName: "Déchets divers",
   wasteDetailsIsDangerous: true,
   wasteDetailsOnuCode: "2003",
   wasteDetailsPackagingInfos: [{ type: "CITERNE", quantity: 1 }],
@@ -453,7 +456,7 @@ export const ecoOrganismeFactory = async ({
 };
 
 export const toIntermediaryCompany = (company: Company, contact = "toto") => ({
-  siret: company.siret,
+  siret: company.siret!,
   name: company.name,
   address: company.address,
   contact

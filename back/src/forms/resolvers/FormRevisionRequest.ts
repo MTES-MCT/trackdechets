@@ -12,7 +12,7 @@ import {
 const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
   approvals: async parent => {
     return prisma.bsddRevisionRequest
-      .findUnique({ where: { id: parent.id } })
+      .findUniqueOrThrow({ where: { id: parent.id } })
       .approvals();
   },
   content: parent => {
@@ -20,12 +20,12 @@ const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
   },
   authoringCompany: parent => {
     return prisma.bsddRevisionRequest
-      .findUnique({ where: { id: parent.id } })
+      .findUniqueOrThrow({ where: { id: parent.id } })
       .authoringCompany();
   },
   form: async (parent: FormRevisionRequest & { bsddId: string }) => {
     const fullBsdd = await prisma.bsddRevisionRequest
-      .findUnique({ where: { id: parent.id } })
+      .findUniqueOrThrow({ where: { id: parent.id } })
       .bsdd({ include: { forwardedIn: true } });
     const bsdd = await getBsddFromActivityEvents(
       parent.bsddId,

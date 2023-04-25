@@ -92,7 +92,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findUnique({
+    const resultingForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     expect(resultingForm.status).toBe("PROCESSED");
@@ -133,7 +133,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const updatedForm = await prisma.form.findFirst({
+    const updatedForm = await prisma.form.findFirstOrThrow({
       where: { id: form.id },
       include: { forwardedIn: true }
     });
@@ -178,7 +178,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const updatedForm = await prisma.form.findFirst({
+    const updatedForm = await prisma.form.findFirstOrThrow({
       where: { id: form.id },
       include: { forwardedIn: true }
     });
@@ -225,7 +225,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const updatedForm = await prisma.form.findFirst({
+    const updatedForm = await prisma.form.findFirstOrThrow({
       where: { id: form.id },
       include: { forwardedIn: true }
     });
@@ -260,14 +260,14 @@ describe("mutation.markAsProcessed", () => {
       variables: {
         id: form.id,
         processedInfo: {
-          processingOperationDone: processingOperation.code,
+          processingOperationDone: processingOperation!.code,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }
       }
     });
     expect(processingOperationDescription).toBe(
-      processingOperation.description
+      processingOperation!.description
     );
   });
 
@@ -298,7 +298,7 @@ describe("mutation.markAsProcessed", () => {
     expect(errors[0].message).toBe(
       "Cette opération d’élimination / valorisation n'existe pas."
     );
-    const resultingForm = await prisma.form.findUnique({
+    const resultingForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     expect(resultingForm.status).toBe("ACCEPTED");
@@ -348,7 +348,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findUnique({
+    const resultingForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     expect(resultingForm.status).toBe("AWAITING_GROUP");
@@ -439,7 +439,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findUnique({
+    const resultingForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
@@ -483,7 +483,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findUnique({
+    const resultingForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
@@ -518,7 +518,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findUnique({
+    const resultingForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     expect(resultingForm.status).toBe("NO_TRACEABILITY");
@@ -605,7 +605,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findUnique({
+    const resultingForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
 
@@ -650,7 +650,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findUnique({
+    const resultingForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
 
@@ -695,16 +695,16 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findUnique({
+    const resultingForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id },
       include: { forwardedIn: true }
     });
 
     expect(resultingForm.status).toBe("FOLLOWED_WITH_PNTTD");
-    expect(resultingForm.forwardedIn.nextDestinationCompanyVatNumber).toEqual(
+    expect(resultingForm.forwardedIn!.nextDestinationCompanyVatNumber).toEqual(
       "IE9513674T"
     );
-    expect(resultingForm.forwardedIn.nextDestinationCompanyCountry).toBe("IE");
+    expect(resultingForm.forwardedIn!.nextDestinationCompanyCountry).toBe("IE");
   });
 
   it("should disallow a missing siret for any next destination", async () => {
@@ -769,7 +769,7 @@ describe("mutation.markAsProcessed", () => {
         grouping: {
           create: {
             initialFormId: appendix2.id,
-            quantity: appendix2.quantityReceived
+            quantity: appendix2.quantityReceived!
           }
         }
       }
@@ -789,7 +789,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const appendix2grouped = await prisma.form.findUnique({
+    const appendix2grouped = await prisma.form.findUniqueOrThrow({
       where: { id: appendix2.id }
     });
     expect(appendix2grouped.status).toEqual("PROCESSED");
@@ -834,7 +834,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const appendix2grouped = await prisma.form.findUnique({
+    const appendix2grouped = await prisma.form.findUniqueOrThrow({
       where: { id: appendix2.id }
     });
     expect(appendix2grouped.status).toEqual("AWAITING_GROUP");
@@ -866,7 +866,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    const resultingForm = await prisma.form.findUnique({
+    const resultingForm = await prisma.form.findUniqueOrThrow({
       where: { id: form.id }
     });
     expect(resultingForm.status).toBe(Status.PROCESSED);
@@ -904,7 +904,7 @@ describe("mutation.markAsProcessed", () => {
       }
     });
 
-    expect(data.markAsProcessed.nextDestination.company).toBeNull();
+    expect(data.markAsProcessed.nextDestination!.company).toBeNull();
   });
 
   test("nextDestination.company should be mandatory when noTraceability is not true", async () => {
@@ -1005,7 +1005,7 @@ describe("mutation.markAsProcessed", () => {
       variables: {
         id: form.id,
         processedInfo: {
-          processingOperationDone: processingOperation.code,
+          processingOperationDone: processingOperation!.code,
           processedBy: "A simple bot",
           processedAt: "2018-12-11T00:00:00.000Z"
         }

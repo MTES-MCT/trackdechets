@@ -20,11 +20,11 @@ import prisma from "../../../prisma";
 import { expandFormFromElastic } from "../../../forms/converter";
 import { expandBsdasriFromElastic } from "../../../bsdasris/converter";
 import { expandVhuFormFromDb } from "../../../bsvhu/converter";
-import { getCachedUserSiretOrVat } from "../../../common/redis/users";
 import { expandBsdaFromElastic } from "../../../bsda/converter";
 import { expandBsffFromElastic } from "../../../bsffs/converter";
 import { bsdSearchSchema } from "../../validation";
 import { toElasticQuery } from "../../where";
+import { Permission, can, getUserRoles } from "../../../permissions";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -72,28 +72,34 @@ async function buildQuery(
   { clue, where = {} }: QueryBsdsArgs,
   user: Express.User
 ) {
-  const query = {
+  const query: {
+    bool: estypes.QueryDslBoolQuery & {
+      filter: estypes.QueryDslQueryContainer[];
+    };
+  } = {
     bool: {
-      ...toElasticQuery(where).bool,
+      ...toElasticQuery(where!).bool,
       filter: []
     }
   };
 
   Object.entries({
-    isDraftFor: where.isDraftFor,
-    isForActionFor: where.isForActionFor,
-    isFollowFor: where.isFollowFor,
-    isArchivedFor: where.isArchivedFor,
-    isToCollectFor: where.isToCollectFor,
-    isCollectedFor: where.isCollectedFor
+    isDraftFor: where?.isDraftFor,
+    isForActionFor: where?.isForActionFor,
+    isFollowFor: where?.isFollowFor,
+    isArchivedFor: where?.isArchivedFor,
+    isToCollectFor: where?.isToCollectFor,
+    isCollectedFor: where?.isCollectedFor
   })
     .filter(([_, value]) => value != null)
     .forEach(([key, value]) => {
-      query.bool.filter.push({
-        terms: {
-          [key]: value
-        }
-      });
+      if (Array.isArray(query.bool.filter)) {
+        query.bool.filter.push({
+          terms: {
+            [key]: value!
+          }
+        });
+      }
     });
 
   if (clue) {
@@ -112,10 +118,14 @@ async function buildQuery(
   }
 
   // Limit the scope of what the user can see to their companies
-  const userCompaniesSiretOrVat = await getCachedUserSiretOrVat(user.id);
+  const roles = await getUserRoles(user.id);
+  const orgIdsWithListPermission = Object.keys(roles).filter(orgId =>
+    can(roles[orgId], Permission.BsdCanList)
+  );
+
   query.bool.filter.push({
     terms: {
-      sirets: userCompaniesSiretOrVat
+      sirets: orgIdsWithListPermission
     }
   });
 
@@ -188,11 +198,11 @@ function buildSort({ orderBy = {} }: QueryBsdsArgs) {
     { id: "ASC" }
   ];
 
-  (Object.entries(orderBy) as Array<[keyof typeof orderBy, OrderType]>).forEach(
-    ([key, order]) => {
-      sort.unshift({ [getKeywordFieldNameFromName(key)]: order });
-    }
-  );
+  (
+    Object.entries(orderBy!) as Array<[keyof typeof orderBy, OrderType]>
+  ).forEach(([key, order]) => {
+    sort.unshift({ [getKeywordFieldNameFromName(key)]: order });
+  });
 
   return sort;
 }
@@ -232,7 +242,7 @@ async function buildSearchAfter(
           lowerCaseStr(bsd[getFieldNameFromKeyword(key)])
         )
       ),
-    []
+    [] as string[]
   );
 }
 
@@ -244,7 +254,8 @@ async function buildDasris(dasris: Bsdasri[]) {
   // build a list of emitter siret from dasris, non-INITIAL bsds are ignored
   const emitterSirets = dasris
     .filter(bsd => !!bsd.emitterCompanySiret && bsd.status === "INITIAL")
-    .map(bsd => bsd.emitterCompanySiret);
+    .map(bsd => bsd.emitterCompanySiret)
+    .filter(Boolean);
 
   // deduplicate sirets
   const uniqueSirets = Array.from(new Set(emitterSirets));
@@ -275,7 +286,7 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   const MIN_SIZE = 0;
   const MAX_SIZE = 100;
   const { first = MAX_SIZE } = args;
-  const size = Math.max(Math.min(first, MAX_SIZE), MIN_SIZE);
+  const size = Math.max(Math.min(first!, MAX_SIZE), MIN_SIZE);
   await bsdSearchSchema.validate(args.where, { abortEarly: false });
 
   const query = await buildQuery(args, user);
@@ -309,7 +320,9 @@ const bsdsResolver: QueryResolvers["bsds"] = async (_, args, context) => {
   } = await toRawBsds(hits.map(hit => hit._source));
 
   const bsds: Record<BsdType, Bsd[]> = {
-    BSDD: await Promise.all(concreteBsdds.map(expandFormFromElastic)),
+    BSDD: (await Promise.all(concreteBsdds.map(expandFormFromElastic))).filter(
+      Boolean
+    ),
     BSDASRI: await buildDasris(concreteBsdasris),
     BSVHU: concreteBsvhus.map(expandVhuFormFromDb),
     BSDA: concreteBsdas.map(expandBsdaFromElastic),

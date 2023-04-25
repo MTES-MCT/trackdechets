@@ -9,6 +9,8 @@ export const PROFESSIONALS = [
   "WASTE_VEHICLES"
 ];
 
+export const NON_PROFESSIONALS = ["PRODUCER", "WASTE_CENTER", "WORKER"];
+
 // min and max lengths for myCompanies resolver search param
 export const MIN_MY_COMPANIES_SEARCH = 3;
 export const MAX_MY_COMPANIES_SEARCH = 20;

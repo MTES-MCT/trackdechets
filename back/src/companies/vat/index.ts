@@ -14,10 +14,12 @@ const throttledSearchVat = backoffIfTestEnvs<CompanyVatSearchResult>(
   })
 );
 
-const decoratedSearchVat = cache<CompanyVatSearchResult>(throttledSearchVat);
+const decoratedSearchVat = cache<CompanyVatSearchResult | null>(
+  throttledSearchVat
+);
 
 interface SearchVatDeps {
-  searchVat: (vat: string) => Promise<CompanyVatSearchResult>;
+  searchVat: (vat: string) => Promise<CompanyVatSearchResult | null>;
 }
 
 export const makeSearchVat =

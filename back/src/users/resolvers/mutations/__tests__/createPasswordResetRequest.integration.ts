@@ -45,7 +45,7 @@ describe("mutation createPasswordResetRequest", () => {
     );
     expect(data.createPasswordResetRequest).toEqual(true);
 
-    const resetHash = await prisma.userResetPasswordHash.findFirst({
+    const resetHash = await prisma.userResetPasswordHash.findFirstOrThrow({
       where: { userId: user.id }
     });
 
