@@ -7,7 +7,7 @@
     "scalingo-postbuild": "npm run build && npm prune --production",
     "build": "tsc",
     "watch": "tsc -w",
-    "start": "npm run index",
+    "start": "npm run build",
     "index": "npm run index:sirene && npm run index:siret",
     "index:dev": "export NODE_ENV=dev && docker-compose up -d elasticsearch && npm run build && npm run index:sirene && npm run index:siret",
     "index:sirene": "node dist/src/commands/indexInseeSirene.js",
