@@ -61,6 +61,7 @@ describe("getSiretsByTab", () => {
 
     const user = await userFactory();
     const transporter2 = await companyFactory();
+    // we check that bsds indexation is OK also with a foreign transport segment
     const transporter3 = await companyFactory({
       siret: null,
       vatNumber: "ESB39052188"
