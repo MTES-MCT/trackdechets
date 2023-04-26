@@ -52,6 +52,8 @@ export default function MarkAsReceived({ form }: WorkflowActionProps) {
             </div>
           );
         }
+
+        return <></>;
       }}
     />
   );
