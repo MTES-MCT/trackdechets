@@ -13,7 +13,6 @@ import {
   BsdasriPackagingType,
   BsdasriSignatureType
 } from "../generated/graphql/types";
-import { isForeignVat } from "../common/constants/companySearchHelpers";
 import {
   MISSING_COMPANY_SIRET,
   MISSING_COMPANY_SIRET_OR_VAT
@@ -26,7 +25,8 @@ import {
   vatNumberTests,
   weight,
   weightConditions,
-  WeightUnits
+  WeightUnits,
+  transporterRecepisseSchema
 } from "../common/validation";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
@@ -336,40 +336,7 @@ export const transporterSchema: FactorySchemaOf<
         `Transporteur: ${MISSING_COMPANY_PHONE}`
       ),
     transporterCompanyMail: yup.string().email().ensure(),
-    transporterRecepisseIsExempted: yup.boolean().nullable(),
-    transporterRecepisseDepartment: yup
-      .string()
-      .when(["transporterRecepisseIsExempted", "transporterCompanyVatNumber"], {
-        is: (isExempted, vat) => isExempted || isForeignVat(vat),
-        then: schema => schema.nullable().notRequired(),
-        otherwise: schema =>
-          schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: le département associé au récépissé est obligatoire`
-          )
-      }),
-    transporterRecepisseNumber: yup
-      .string()
-      .when(["transporterRecepisseIsExempted", "transporterCompanyVatNumber"], {
-        is: (isExempted, vat) => isExempted || isForeignVat(vat),
-        then: schema => schema.nullable().notRequired(),
-        otherwise: schema =>
-          schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: le numéro de récépissé est obligatoire`
-          )
-      }),
-    transporterRecepisseValidityLimit: yup
-      .date()
-      .when(["transporterRecepisseIsExempted", "transporterCompanyVatNumber"], {
-        is: (isExempted, vat) => isExempted || isForeignVat(vat),
-        then: schema => schema.nullable().notRequired(),
-        otherwise: schema =>
-          schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: la date limite de validité du récépissé est obligatoire`
-          )
-      })
+    ...transporterRecepisseSchema(context)
   });
 };
 

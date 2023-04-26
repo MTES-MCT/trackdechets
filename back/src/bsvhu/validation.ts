@@ -16,7 +16,6 @@ import {
 import * as yup from "yup";
 import { FactorySchemaOf } from "../common/yup/configureYup";
 import { BsvhuDestinationType } from "../generated/graphql/types";
-import { isForeignVat } from "../common/constants/companySearchHelpers";
 import {
   foreignVatNumber,
   siret,
@@ -25,7 +24,8 @@ import {
   vatNumberTests,
   weight,
   weightConditions,
-  WeightUnits
+  WeightUnits,
+  transporterRecepisseSchema
 } from "../common/validation";
 
 type Emitter = Pick<
@@ -239,40 +239,6 @@ const transporterSchema: FactorySchemaOf<
   Transporter
 > = context =>
   yup.object({
-    transporterRecepisseIsExempted: yup.boolean().nullable(),
-    transporterRecepisseDepartment: yup
-      .string()
-      .when(["transporterRecepisseIsExempted", "transporterCompanyVatNumber"], {
-        is: (isExempted, vat) => isExempted || isForeignVat(vat),
-        then: schema => schema.nullable().notRequired(),
-        otherwise: schema =>
-          schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: le département associé au récépissé est obligatoire`
-          )
-      }),
-    transporterRecepisseNumber: yup
-      .string()
-      .when(["transporterRecepisseIsExempted", "transporterCompanyVatNumber"], {
-        is: (isExempted, vat) => isExempted || isForeignVat(vat),
-        then: schema => schema.nullable().notRequired(),
-        otherwise: schema =>
-          schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: le numéro de récépissé est obligatoire`
-          )
-      }),
-    transporterRecepisseValidityLimit: yup
-      .date()
-      .when(["transporterRecepisseIsExempted", "transporterCompanyVatNumber"], {
-        is: (isExempted, vat) => isExempted || isForeignVat(vat),
-        then: schema => schema.nullable().notRequired(),
-        otherwise: schema =>
-          schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: la date limite de validité du récépissé est obligatoire`
-          )
-      }),
     transporterCompanyName: yup
       .string()
       .requiredIf(
@@ -314,7 +280,8 @@ const transporterSchema: FactorySchemaOf<
       .requiredIf(
         context.transportSignature,
         `Transporteur: ${MISSING_COMPANY_EMAIL}`
-      )
+      ),
+    ...transporterRecepisseSchema(context)
   });
 
 const identificationSchema: FactorySchemaOf<
