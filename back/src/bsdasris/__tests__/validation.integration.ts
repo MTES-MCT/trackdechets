@@ -116,9 +116,9 @@ describe("Mutation.signBsdasri emission", () => {
         });
       } catch (err) {
         expect(err.errors).toEqual([
-          "Transporteur: le numéro de récépissé est obligatoire",
           "Transporteur: le département associé au récépissé est obligatoire",
-          "La date de validité du récépissé est obligatoire"
+          "Transporteur: le numéro de récépissé est obligatoire",
+          "Transporteur: la date limite de validité du récépissé est obligatoire"
         ]);
       }
     });

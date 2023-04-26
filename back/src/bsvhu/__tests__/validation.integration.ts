@@ -294,7 +294,7 @@ describe("BSVHU validation", () => {
         expect(err.errors).toEqual([
           "Transporteur: le département associé au récépissé est obligatoire",
           "Transporteur: le numéro de récépissé est obligatoire",
-          "Transporteur: la date de validité de récépissé est obligatoire"
+          "Transporteur: la date limite de validité du récépissé est obligatoire"
         ]);
       }
     });
