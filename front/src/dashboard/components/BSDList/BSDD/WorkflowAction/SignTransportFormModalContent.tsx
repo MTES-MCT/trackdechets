@@ -4,6 +4,7 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import { Field, Form as FormikForm, Formik } from "formik";
 import * as yup from "yup";
 import {
+  EmitterType,
   Mutation,
   MutationSignTransportFormArgs,
   Query,
@@ -112,7 +113,6 @@ function SignTransportFormModalContent({
 
   return (
     <>
-      <h2 className="td-modal-title">{title}</h2>
       <Formik
         initialValues={{
           takenOverBy: "",
@@ -145,7 +145,9 @@ function SignTransportFormModalContent({
           <FormikForm>
             <FormWasteTransportSummary form={form} />
             <FormJourneySummary form={form} />
-            <TransporterReceipt transporter={form.transporter!} />
+            {form.emitter?.type !== EmitterType.Appendix1Producer && (
+              <TransporterReceipt transporter={form.transporter!} />
+            )}
             <p>
               En qualité de <strong>transporteur du déchet</strong>, j'atteste
               que les informations ci-dessus sont correctes. En signant ce
