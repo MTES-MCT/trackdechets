@@ -2,6 +2,8 @@
  * Fixtures used as building blocks of mutations inputs
  */
 
+import { CompanyInput, TransporterInput } from "../../generated/graphql/types";
+
 function emitterCompanyInput(siret: string) {
   return {
     siret,
@@ -28,7 +30,7 @@ function emitterInput(siret: string) {
   };
 }
 
-function transporterCompanyInput(siret: string) {
+function transporterCompanyInput(siret: string): CompanyInput {
   return {
     siret,
     name: "Transport & Co",
@@ -39,7 +41,7 @@ function transporterCompanyInput(siret: string) {
   };
 }
 
-function transporter2CompanyInput(siret: string) {
+function transporter2CompanyInput(siret: string): CompanyInput {
   return {
     siret,
     name: "Fret & Co",
@@ -53,11 +55,11 @@ function transporter2CompanyInput(siret: string) {
 const receiptInput = {
   receipt: "12379",
   department: "07",
-  validityLimit: "2020-06-30",
+  validityLimit: new Date("2020-06-30"),
   numberPlate: "AD-007-TS"
 };
 
-function transporterInput(siret: string) {
+function transporterInput(siret: string): TransporterInput {
   return {
     company: transporterCompanyInput(siret),
     ...receiptInput
