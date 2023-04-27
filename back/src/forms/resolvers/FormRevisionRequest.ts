@@ -11,22 +11,36 @@ import {
 
 const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
   approvals: async parent => {
-    return prisma.bsddRevisionRequest
-      .findUniqueOrThrow({ where: { id: parent.id } })
+    const approvals = await prisma.bsddRevisionRequest
+      .findUnique({ where: { id: parent.id } })
       .approvals();
+
+    return approvals ?? [];
   },
   content: parent => {
     return expandBsddRevisionRequestContent(parent as any);
   },
-  authoringCompany: parent => {
-    return prisma.bsddRevisionRequest
-      .findUniqueOrThrow({ where: { id: parent.id } })
+  authoringCompany: async parent => {
+    const authoringCompany = await prisma.bsddRevisionRequest
+      .findUnique({ where: { id: parent.id } })
       .authoringCompany();
+
+    if (!authoringCompany) {
+      throw new Error(
+        `FormRevisionRequest ${parent.id} has no authoring company.`
+      );
+    }
+    return authoringCompany;
   },
   form: async (parent: FormRevisionRequest & { bsddId: string }) => {
     const fullBsdd = await prisma.bsddRevisionRequest
-      .findUniqueOrThrow({ where: { id: parent.id } })
+      .findUnique({ where: { id: parent.id } })
       .bsdd({ include: { forwardedIn: true } });
+
+    if (!fullBsdd) {
+      throw new Error(`FormRevisionRequest ${parent.id} has no form.`);
+    }
+
     const bsdd = await getBsddFromActivityEvents(
       parent.bsddId,
       parent.createdAt
