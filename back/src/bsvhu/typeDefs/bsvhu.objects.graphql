@@ -82,6 +82,8 @@ type BsvhuTransport {
 }
 
 type BsvhuRecepisse {
+  "Exemption de récépissé"
+  isExempted: Boolean
   number: String
   department: String
   validityLimit: DateTime

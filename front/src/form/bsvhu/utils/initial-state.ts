@@ -43,6 +43,7 @@ export default {
       ...getInitialCompany(),
     },
     recepisse: {
+      isExempted: false,
       number: "",
       department: "",
       validityLimit: startOfYear(addYears(new Date(), 1)).toISOString(),

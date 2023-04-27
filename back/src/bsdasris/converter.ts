@@ -112,6 +112,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
       }),
       customInfo: bsdasri.transporterCustomInfo,
       recepisse: nullIfNoValues({
+        ixExempted: bsdasri.transporterRecepisseIsExempted,
         department: bsdasri.transporterRecepisseDepartment,
         number: bsdasri.transporterRecepisseNumber,
         validityLimit: processDate(bsdasri.transporterRecepisseValidityLimit)

@@ -1,6 +1,13 @@
 import React, { ReactNode, useMemo } from "react";
 import { formatDate } from "common/datetime";
-import { PackagingInfo } from "generated/graphql/types";
+import styles from "./BSDDetailContent.module.scss";
+
+import {
+  PackagingInfo,
+  BsvhuTransporter,
+  BsdaTransporter,
+  BsdasriTransporter,
+} from "generated/graphql/types";
 import { getPackagingInfosSummary } from "form/bsdd/utils/packagings";
 const nbsp = "\u00A0";
 export const DetailRow = ({
@@ -65,5 +72,32 @@ export const PackagingRow = ({
       <dt>Conditionnement</dt>
       <dd>{formatedPackagings}</dd>
     </>
+  );
+};
+
+export const TransporterRecepisseDetails = ({
+  transporter,
+}: {
+  transporter?: BsvhuTransporter | BsdaTransporter | BsdasriTransporter | null;
+}) => {
+  return (
+    <div className={styles.detailGrid}>
+      <YesNoRow
+        value={transporter?.recepisse?.isExempted}
+        label="Exemption de récépissé"
+      />
+      <DetailRow
+        value={transporter?.recepisse?.number}
+        label="Numéro de récépissé"
+      />
+      <DetailRow
+        value={transporter?.recepisse?.department}
+        label="Département"
+      />
+      <DateRow
+        value={transporter?.recepisse?.validityLimit}
+        label="Date de validité de récépissé"
+      />
+    </div>
   );
 };
