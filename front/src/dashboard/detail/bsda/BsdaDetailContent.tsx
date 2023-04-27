@@ -23,7 +23,6 @@ import { PACKAGINGS_NAMES } from "form/bsda/components/packagings/Packagings";
 import {
   Bsda,
   BsdaNextDestination,
-  BsdaTransporter,
   BsdaType,
   FormCompany,
 } from "generated/graphql/types";
