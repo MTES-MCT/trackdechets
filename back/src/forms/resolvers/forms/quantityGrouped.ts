@@ -6,7 +6,7 @@ export default async function quantityGrouped(
   _,
   context: GraphQLContext
 ) {
-  const formGroupements = await context.dataloaders.formGoupements.load(
+  const formGroupements = await context.dataloaders.initialFormGoupements.load(
     form.id
   );
 
