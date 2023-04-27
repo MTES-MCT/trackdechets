@@ -1,10 +1,9 @@
 import React from "react";
 import { useFormikContext } from "formik";
-import TdSwitch from "common/components/Switch";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { Bsvhu } from "generated/graphql/types";
 import initialState from "./utils/initial-state";
-import { isForeignVat } from "generated/constants/companySearchHelpers";
+import TransporterReceiptEditionSwitch from "form/common/components/company/TransporterReceiptEditionSwitch";
 
 export default function Transporter({ disabled }) {
   const { setFieldValue, values } = useFormikContext<Bsvhu>();
@@ -46,24 +45,11 @@ export default function Transporter({ disabled }) {
           }
         }}
       />
-      {!isForeignVat(values.transporter?.company?.vatNumber!) && (
-        <>
-          <h4 className="form__section-heading">
-            Exemption de récépissé de déclaration de transport de déchets
-          </h4>
-          <div className="form__row">
-            <TdSwitch
-              checked={!!values.transporter?.recepisse?.isExempted}
-              onChange={checked =>
-                setFieldValue("transporter.recepisse.isExempted", checked)
-              }
-              disabled={disabled}
-              label="Le transporteur déclare être exempté de récépissé conformément aux
-            dispositions de l'article R.541-50 du code de l'environnement."
-            />
-          </div>
-        </>
-      )}
+      <TransporterReceiptEditionSwitch
+        transporter={values.transporter!}
+        disabled={disabled}
+        setFieldValue={setFieldValue}
+      />
     </>
   );
 }

@@ -4,6 +4,7 @@ import { Bsda, BsdaType } from "generated/graphql/types";
 import React from "react";
 import { Transport } from "./Transport";
 import initialState from "../initial-state";
+import TransporterReceiptEditionSwitch from "form/common/components/company/TransporterReceiptEditionSwitch";
 
 export function Transporter({ disabled }) {
   const { values, setFieldValue } = useFormikContext<Bsda>();
@@ -59,7 +60,11 @@ export function Transporter({ disabled }) {
           }
         }}
       />
-
+      <TransporterReceiptEditionSwitch
+        transporter={values.transporter!}
+        disabled={disabled}
+        setFieldValue={setFieldValue}
+      />
       <Transport disabled={disabled} />
     </>
   );

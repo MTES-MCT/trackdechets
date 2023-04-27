@@ -20,6 +20,7 @@ import { Loader } from "common/components";
 import companyStyles from "form/common/components/company/CompanyResult.module.scss";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
+import TransporterReceiptEditionSwitch from "form/common/components/company/TransporterReceiptEditionSwitch";
 
 /**
  *
@@ -91,7 +92,11 @@ export default function Transporter({ status, stepName }) {
           />
         )}
       </div>
-
+      <TransporterReceiptEditionSwitch
+        transporter={values.transporter!}
+        disabled={disabled}
+        setFieldValue={setFieldValue}
+      />
       {showHandedOverAtField ? (
         <div
           className={classNames("form__row", {
