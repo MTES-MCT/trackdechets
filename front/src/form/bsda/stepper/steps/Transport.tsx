@@ -1,39 +1,16 @@
 import React, { lazy } from "react";
-import { Field, useFormikContext } from "formik";
+import { Field } from "formik";
 import { FieldTransportModeSelect } from "common/components";
-import TdSwitch from "common/components/Switch";
 import Tooltip from "common/components/Tooltip";
 import DateInput from "form/common/components/custom-inputs/DateInput";
-import { isForeignVat } from "generated/constants/companySearchHelpers";
-import { Bsda } from "generated/graphql/types";
 
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 type Props = { disabled: boolean };
 
 export function Transport({ disabled }: Props) {
-  const { setFieldValue, values } = useFormikContext<Bsda>();
-
   return (
     <>
-      {!isForeignVat(values.transporter?.company?.vatNumber!) && (
-        <>
-          <h4 className="form__section-heading">
-            Exemption de récépissé de déclaration de transport de déchets
-          </h4>
-          <div className="form__row">
-            <TdSwitch
-              checked={!!values.transporter?.recepisse?.isExempted}
-              onChange={checked =>
-                setFieldValue("transporter.recepisse.isExempted", checked)
-              }
-              disabled={disabled}
-              label="Le transporteur déclare être exempté de récépissé conformément aux
-            dispositions de l'article R.541-50 du code de l'environnement."
-            />
-          </div>
-        </>
-      )}
       <h4 className="form__section-heading">Détails</h4>
       <div className="form__row">
         <label>

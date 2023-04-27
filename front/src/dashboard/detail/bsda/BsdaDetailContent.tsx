@@ -15,7 +15,7 @@ import styles from "dashboard/detail/common/BSDDetailContent.module.scss";
 import {
   DateRow,
   DetailRow,
-  TransporterRecepisseDetails,
+  TransporterReceiptDetails,
   YesNoRow,
 } from "dashboard/detail/common/Components";
 import { getVerboseAcceptationStatus } from "dashboard/detail/common/utils";
@@ -23,7 +23,6 @@ import { PACKAGINGS_NAMES } from "form/bsda/components/packagings/Packagings";
 import {
   Bsda,
   BsdaNextDestination,
-  BsdaTransporter,
   BsdaType,
   FormCompany,
 } from "generated/graphql/types";
@@ -162,7 +161,7 @@ const Transporter = ({ form }: { form: Bsda }) => {
       <div className={styles.detailGrid}>
         <Company label="Transporteur" company={transporter?.company} />
       </div>
-      <TransporterRecepisseDetails transporter={transporter} />
+      <TransporterReceiptDetails transporter={transporter} />
       <div className={`${styles.detailGrid} `}>
         <DateRow
           value={transporter?.transport?.takenOverAt}

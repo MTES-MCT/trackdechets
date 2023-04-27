@@ -4,7 +4,7 @@ import {
   IconWarehouseDelivery,
   IconWaterDam,
 } from "common/components/Icons";
-import { Bsvhu, BsvhuTransporter, FormCompany } from "generated/graphql/types";
+import { Bsvhu, FormCompany } from "generated/graphql/types";
 import React from "react";
 import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
@@ -13,7 +13,7 @@ import { statusLabels } from "../../constants";
 import {
   DateRow,
   DetailRow,
-  TransporterRecepisseDetails,
+  TransporterReceiptDetails,
 } from "../common/Components";
 
 import styles from "../common/BSDDetailContent.module.scss";
@@ -173,7 +173,7 @@ function Transporter({ form }: { form: Bsvhu }) {
       <div className={styles.detailGrid}>
         <Company label="Transporteur" company={transporter?.company} />
       </div>
-      <TransporterRecepisseDetails transporter={transporter} />
+      <TransporterReceiptDetails transporter={transporter} />
       <div className={styles.detailGrid}>
         <DetailRow
           value={

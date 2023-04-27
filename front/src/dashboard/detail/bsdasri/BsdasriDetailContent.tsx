@@ -31,8 +31,7 @@ import {
 import {
   DateRow,
   DetailRow,
-  TransporterRecepisseDetails,
-  YesNoRow,
+  TransporterReceiptDetails,
 } from "dashboard/detail/common/Components";
 
 import classNames from "classnames";
@@ -142,7 +141,7 @@ const Transporter = ({ form }: { form: Bsdasri }) => {
       <div className={styles.detailGrid}>
         <Company label="Transporteur" company={transporter?.company} />
       </div>
-      <TransporterRecepisseDetails transporter={transporter} />
+      <TransporterReceiptDetails transporter={transporter} />
       <div className={styles.detailGrid}>
         <DetailRow
           value={getTransportModeLabel(transporter?.transport?.mode)}

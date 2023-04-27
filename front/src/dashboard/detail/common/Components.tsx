@@ -75,7 +75,10 @@ export const PackagingRow = ({
   );
 };
 
-export const TransporterRecepisseDetails = ({
+/**
+ * Transporter Recepisse details overview for BSDA, BSVHU and BSDASRI
+ */
+export const TransporterReceiptDetails = ({
   transporter,
 }: {
   transporter?: BsvhuTransporter | BsdaTransporter | BsdasriTransporter | null;
@@ -86,18 +89,22 @@ export const TransporterRecepisseDetails = ({
         value={transporter?.recepisse?.isExempted}
         label="Exemption de récépissé"
       />
-      <DetailRow
-        value={transporter?.recepisse?.number}
-        label="Numéro de récépissé"
-      />
-      <DetailRow
-        value={transporter?.recepisse?.department}
-        label="Département"
-      />
-      <DateRow
-        value={transporter?.recepisse?.validityLimit}
-        label="Date de validité de récépissé"
-      />
+      <>
+        <dt>{"Numéro de récépissé"}</dt>
+        <dd>{transporter?.recepisse?.number}</dd>
+      </>
+      {transporter?.recepisse?.number && (
+        <>
+          <DetailRow
+            value={transporter?.recepisse?.department}
+            label="Département"
+          />
+          <DateRow
+            value={transporter?.recepisse?.validityLimit}
+            label="Date de validité de récépissé"
+          />
+        </>
+      )}
     </div>
   );
 };

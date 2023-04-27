@@ -112,7 +112,7 @@ export function expandBsdasriFromDB(bsdasri: Bsdasri): GqlBsdasri {
       }),
       customInfo: bsdasri.transporterCustomInfo,
       recepisse: nullIfNoValues({
-        ixExempted: bsdasri.transporterRecepisseIsExempted,
+        isExempted: bsdasri.transporterRecepisseIsExempted,
         department: bsdasri.transporterRecepisseDepartment,
         number: bsdasri.transporterRecepisseNumber,
         validityLimit: processDate(bsdasri.transporterRecepisseValidityLimit)
@@ -379,6 +379,9 @@ function flattenTransporterInput(input: {
     ),
     transporterCompanyVatNumber: chain(input.transporter, t =>
       chain(t.company, c => c.vatNumber)
+    ),
+    transporterRecepisseIsExempted: chain(input.transporter, t =>
+      chain(t.recepisse, recep => recep.isExempted)
     ),
     transporterRecepisseNumber: chain(input.transporter, t =>
       chain(t.recepisse, recep => recep.number)
