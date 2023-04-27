@@ -23,6 +23,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Utilisation de dataloaders pour charger les évènements Psql & Mongo [PR 2107](https://github.com/MTES-MCT/trackdechets/pull/2107)
+
 # [2023.4.2] 24/04/2023
 
 #### :rocket: Nouvelles fonctionnalités
