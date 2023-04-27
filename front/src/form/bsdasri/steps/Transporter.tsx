@@ -21,7 +21,7 @@ import companyStyles from "form/common/components/company/CompanyResult.module.s
 import RedErrorMessage from "common/components/RedErrorMessage";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
 import TransporterReceiptEditionSwitch from "form/common/components/company/TransporterReceiptEditionSwitch";
-import { onCompanySelected } from "form/bsvhu/Transporter";
+import { onTransporterSelected } from "form/bsvhu/Transporter";
 
 /**
  *
@@ -67,7 +67,7 @@ export default function Transporter({ status, stepName }) {
             optionalMail={true}
             allowForeignCompanies={true}
             registeredOnlyCompanies={true}
-            onCompanySelected={onCompanySelected(
+            onCompanySelected={onTransporterSelected(
               initialTransporter,
               setFieldValue
             )}

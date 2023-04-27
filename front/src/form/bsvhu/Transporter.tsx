@@ -5,7 +5,7 @@ import { Bsvhu } from "generated/graphql/types";
 import initialState from "./utils/initial-state";
 import TransporterReceiptEditionSwitch from "form/common/components/company/TransporterReceiptEditionSwitch";
 
-export const onCompanySelected =
+export const onTransporterSelected =
   (initialTransporter, setFieldValue) => transporter => {
     if (transporter.transporterReceipt) {
       setFieldValue(
@@ -47,7 +47,10 @@ export default function Transporter({ disabled }) {
         heading="Entreprise de transport"
         allowForeignCompanies={true}
         registeredOnlyCompanies={true}
-        onCompanySelected={onCompanySelected(initialTransporter, setFieldValue)}
+        onCompanySelected={onTransporterSelected(
+          initialTransporter,
+          setFieldValue
+        )}
       />
       <TransporterReceiptEditionSwitch
         transporter={values.transporter!}
