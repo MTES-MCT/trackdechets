@@ -16,7 +16,6 @@ import {
 import * as yup from "yup";
 import { FactorySchemaOf } from "../common/yup/configureYup";
 import { BsvhuDestinationType } from "../generated/graphql/types";
-import { isForeignVat } from "../common/constants/companySearchHelpers";
 import {
   foreignVatNumber,
   siret,
@@ -25,7 +24,8 @@ import {
   vatNumberTests,
   weight,
   weightConditions,
-  WeightUnits
+  WeightUnits,
+  transporterRecepisseSchema
 } from "../common/validation";
 
 type Emitter = Pick<
@@ -239,39 +239,6 @@ const transporterSchema: FactorySchemaOf<
   Transporter
 > = context =>
   yup.object({
-    transporterRecepisseDepartment: yup
-      .string()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva || !isForeignVat(tva)) {
-          return schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: le département associé au récépissé est obligatoire`
-          );
-        }
-        return schema.nullable().notRequired();
-      }),
-    transporterRecepisseNumber: yup
-      .string()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva || !isForeignVat(tva)) {
-          return schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: le numéro de récépissé est obligatoire`
-          );
-        }
-        return schema.nullable().notRequired();
-      }),
-    transporterRecepisseValidityLimit: yup
-      .date()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva || !isForeignVat(tva)) {
-          return schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: la date de validité de récépissé est obligatoire`
-          );
-        }
-        return schema.nullable().notRequired();
-      }),
     transporterCompanyName: yup
       .string()
       .requiredIf(
@@ -313,7 +280,8 @@ const transporterSchema: FactorySchemaOf<
       .requiredIf(
         context.transportSignature,
         `Transporteur: ${MISSING_COMPANY_EMAIL}`
-      )
+      ),
+    ...transporterRecepisseSchema(context)
   });
 
 const identificationSchema: FactorySchemaOf<

@@ -43,6 +43,12 @@ export const bsdaFragment = gql`
       transport {
         plates
       }
+      recepisse {
+        number
+        department
+        validityLimit
+        isExempted
+      }
     }
     waste {
       materialName
@@ -183,6 +189,7 @@ export const FullBsdaFragment = gql`
         number
         department
         validityLimit
+        isExempted
       }
       transport {
         mode

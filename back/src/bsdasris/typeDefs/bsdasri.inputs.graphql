@@ -196,6 +196,8 @@ input BsdasriTransportInput {
 }
 
 input BsdasriRecepisseInput {
+  "Exemption de récépissé"
+  isExempted: Boolean
   "Numéro de récépissé"
   number: String
   "Département"

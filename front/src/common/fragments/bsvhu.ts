@@ -66,6 +66,12 @@ export const dashboardVhuFragment = gql`
       company {
         ...DashboardCompanyFragment
       }
+      recepisse {
+        number
+        department
+        validityLimit
+        isExempted
+      }
     }
     destination {
       type
@@ -153,6 +159,7 @@ export const FullBsvhuFragment = gql`
         number
         department
         validityLimit
+        isExempted
       }
       transport {
         takenOverAt
