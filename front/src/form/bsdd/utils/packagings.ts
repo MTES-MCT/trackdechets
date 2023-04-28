@@ -30,7 +30,13 @@ export function getPackagingInfosSummary(packagingInfos: PackagingInfo[]) {
     })
     .join(", ");
 
-  return `${total} colis : ${packages}`;
+  return formTransportIsPipeline({
+    wasteDetails: {
+      packagingInfos,
+    },
+  })
+    ? `${packages}`
+    : `${total} colis : ${packages}`;
 }
 
 export const formTransportIsPipeline = (form: FormInput): boolean =>
