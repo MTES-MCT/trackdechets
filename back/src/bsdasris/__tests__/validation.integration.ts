@@ -83,12 +83,26 @@ describe("Mutation.signBsdasri emission", () => {
       });
       expect(validated).toBeDefined();
     });
+    test("when transporter is french and exemption of recepisse is true", async () => {
+      const data = {
+        ...bsdasri,
+        transporterRecepisseIsExempted: true,
+        transporterRecepisseDepartment: null,
+        transporterRecepisseNumber: null,
+        transporterRecepisseValidityLimit: null
+      };
+      const validated = await validateBsdasri(data as any, {
+        transportSignature: true
+      });
+      expect(validated).toBeDefined();
+    });
   });
 
   describe("BSDASRI should not be valid", () => {
     test("when transporter is FR and recepisse fields are null", async () => {
       const data = {
         ...bsdasri,
+        transporterRecepisseIsExempted: false,
         transporterRecepisseNumber: null,
         transporterRecepisseDepartment: null,
         transporterRecepisseValidityLimit: null
@@ -102,9 +116,9 @@ describe("Mutation.signBsdasri emission", () => {
         });
       } catch (err) {
         expect(err.errors).toEqual([
-          "Transporteur: le numéro de récépissé est obligatoire",
           "Transporteur: le département associé au récépissé est obligatoire",
-          "La date de validité du récépissé est obligatoire"
+          "Transporteur: le numéro de récépissé est obligatoire",
+          "Transporteur: la date limite de validité du récépissé est obligatoire"
         ]);
       }
     });

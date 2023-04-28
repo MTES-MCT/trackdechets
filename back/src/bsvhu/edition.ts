@@ -74,6 +74,7 @@ export const editionRules: {
   transporterCompanyPhone: "TRANSPORT",
   transporterCompanyMail: "TRANSPORT",
   transporterCompanyVatNumber: "TRANSPORT",
+  transporterRecepisseIsExempted: "TRANSPORT",
   transporterRecepisseNumber: "TRANSPORT",
   transporterRecepisseDepartment: "TRANSPORT",
   transporterRecepisseValidityLimit: "TRANSPORT",

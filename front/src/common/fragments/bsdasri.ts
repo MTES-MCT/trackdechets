@@ -114,6 +114,12 @@ export const dashboardDasriFragment = gql`
       transport {
         plates
       }
+      recepisse {
+        number
+        department
+        validityLimit
+        isExempted
+      }
     }
     destination {
       company {
@@ -182,6 +188,7 @@ export const fullDasriFragment = gql`
         number
         department
         validityLimit
+        isExempted
       }
 
       customInfo
