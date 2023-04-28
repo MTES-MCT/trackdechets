@@ -32,11 +32,11 @@ mis à jour au fur et mesure de la prise en charge du déchet sur les différent
     { name: "traiteur", companyTypes: ["WASTEPROCESSOR"] }
   ],
   steps: [
-    createFormMultiModal("producteur", fixtures),
+    createFormMultiModal("producteur", fixtures as any),
     markAsSealed("producteur"),
     signEmissionForm("producteur"),
     signTransportForm("transporteur1"),
-    prepareSegment("transporteur1", fixtures),
+    prepareSegment("transporteur1", fixtures as any),
     markSegmentAsReadyToTakeOver("transporteur1"),
     takeOverSegment("transporteur2"),
     markAsReceived("traiteur"),

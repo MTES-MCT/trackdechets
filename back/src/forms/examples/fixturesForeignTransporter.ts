@@ -1,4 +1,3 @@
-import { CompanyInput, TransporterInput } from "../../generated/graphql/types";
 import fixtures from "./fixtures";
 
 const {
@@ -21,7 +20,7 @@ const {
   takeOverInfoInput
 } = fixtures;
 
-function transporterCompanyInput(vatNumber: string): CompanyInput {
+function transporterCompanyInput(vatNumber: string) {
   return {
     siret: null,
     vatNumber,
@@ -33,7 +32,7 @@ function transporterCompanyInput(vatNumber: string): CompanyInput {
   };
 }
 
-function transporter2CompanyInput(vatNumber: string): CompanyInput {
+function transporter2CompanyInput(vatNumber: string) {
   return {
     siret: null,
     vatNumber,
@@ -55,7 +54,7 @@ function nextSegmentInfoInput(vatNumber: string) {
   };
 }
 
-function transporterInput(vatNumber: string): TransporterInput {
+function transporterInput(vatNumber: string) {
   return {
     company: transporterCompanyInput(vatNumber),
     receipt: null,
