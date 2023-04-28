@@ -193,7 +193,7 @@ describe("expandFormFromDb", () => {
         transporterTransportMode: "ROAD"
       }
     });
-    delete form.transporterCompanySiret;
+    form.transporterCompanySiret = null;
     const expanded = await expandFormFromDb(form);
     expect(expanded.transporter).toEqual({
       mode: null,
@@ -224,7 +224,7 @@ describe("expandFormFromDb", () => {
         transporterTransportMode: "OTHER"
       }
     });
-    delete form.transporterCompanySiret;
+    form.transporterCompanySiret = null;
     const expanded = await expandFormFromDb(form);
     expect(expanded.transporter).toEqual({
       mode: "OTHER",
