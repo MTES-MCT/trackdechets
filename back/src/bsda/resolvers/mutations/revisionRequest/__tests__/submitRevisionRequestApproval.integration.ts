@@ -741,7 +741,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       });
 
       const { mutate } = makeClient(workerAndDestination);
-      await mutate<
+      const { errors } = await mutate<
         Pick<Mutation, "submitBsdaRevisionRequestApproval">,
         MutationSubmitBsdaRevisionRequestApprovalArgs
       >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
@@ -750,6 +750,8 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
           isApproved: testData.isApproved
         }
       });
+
+      expect(errors).toBeUndefined();
 
       const updatedBsda = await prisma.bsda.findUniqueOrThrow({
         where: { id: bsda.id }
