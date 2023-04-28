@@ -13,7 +13,7 @@ const sirenifyMock = jest
   .spyOn(sirenify, "default")
   .mockImplementation(input => Promise.resolve(input));
 
-const CREATE_BSDA = `
+export const CREATE_BSDA = `
 mutation CreateBsda($input: BsdaInput!) {
   createBsda(input: $input) {
     id

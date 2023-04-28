@@ -11,6 +11,7 @@ import { expandBsdaFromDb } from "../../converter";
 import { getBsdaOrNotFound } from "../../database";
 import { getBsdaRepository } from "../../repository";
 import { checkCanDuplicate } from "../../permissions";
+import prisma from "../../../prisma";
 
 export default async function duplicate(
   _,
@@ -25,13 +26,13 @@ export default async function duplicate(
 
   await checkCanDuplicate(user, prismaBsda);
 
-  const data = duplicateBsda(prismaBsda);
+  const data = await duplicateBsda(prismaBsda);
   const newBsda = await getBsdaRepository(user).create(data);
 
   return expandBsdaFromDb(newBsda);
 }
 
-function duplicateBsda({
+async function duplicateBsda({
   id,
   createdAt,
   updatedAt,
@@ -63,7 +64,36 @@ function duplicateBsda({
   ...rest
 }: Bsda & {
   intermediaries: IntermediaryBsdaAssociation[];
-}): Prisma.BsdaCreateInput {
+}): Promise<Prisma.BsdaCreateInput> {
+  const companiesSirets: string[] = [
+    rest.emitterCompanySiret,
+    rest.transporterCompanySiret,
+    rest.brokerCompanySiret
+  ].filter((siret): siret is string => Boolean(siret));
+
+  // Batch call all companies involved
+  const companies = await prisma.company.findMany({
+    where: {
+      siret: {
+        in: companiesSirets
+      }
+    },
+    include: {
+      transporterReceipt: true,
+      brokerReceipt: true
+    }
+  });
+
+  const emitter = companies.find(
+    company => company.siret === rest.emitterCompanySiret
+  );
+  const broker = companies.find(
+    company => company.siret === rest.brokerCompanySiret
+  );
+  const transporter = companies.find(
+    company => company.siret === rest.transporterCompanySiret
+  );
+
   return {
     ...rest,
     id: getReadableId(ReadableIdPrefix.BSDA),
@@ -85,6 +115,33 @@ function duplicateBsda({
         }
       },
       intermediariesOrgIds
-    })
+    }),
+    // Emitter company info
+    emitterCompanyAddress: emitter?.address,
+    emitterCompanyMail: emitter?.contactEmail,
+    emitterCompanyPhone: emitter?.contactPhone,
+    emitterCompanyName: emitter?.name,
+    emitterCompanyContact: emitter?.contact,
+    // Transporter company info
+    transporterCompanyAddress: transporter?.address,
+    transporterCompanyMail: transporter?.contactEmail,
+    transporterCompanyPhone: transporter?.contactPhone,
+    transporterCompanyName: transporter?.name,
+    transporterCompanyContact: transporter?.contact,
+    // Transporter recepisse
+    transporterRecepisseNumber: transporter?.transporterReceipt?.receiptNumber,
+    transporterRecepisseValidityLimit:
+      transporter?.transporterReceipt?.validityLimit,
+    transporterRecepisseDepartment: transporter?.transporterReceipt?.department,
+    // Broker company info
+    brokerCompanyAddress: broker?.address,
+    brokerCompanyMail: broker?.contactEmail,
+    brokerCompanyPhone: broker?.contactPhone,
+    brokerCompanyName: broker?.name,
+    brokerCompanyContact: broker?.contact,
+    // Broker recepisse
+    brokerRecepisseNumber: broker?.brokerReceipt?.receiptNumber,
+    brokerRecepisseValidityLimit: broker?.brokerReceipt?.validityLimit,
+    brokerRecepisseDepartment: broker?.brokerReceipt?.department
   };
 }

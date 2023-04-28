@@ -78,6 +78,7 @@ export const companyFactory = async (
       codeDepartement: "75",
       contactEmail: `contact_${companyIndex}@gmail.com`,
       contactPhone: `+${companyIndex} 606060606`,
+      contact: "Contact",
       verificationStatus: "VERIFIED",
       ...opts
     }
@@ -117,7 +118,7 @@ export interface UserWithCompany {
  * @param role: user role in the company
  */
 export const userWithCompanyFactory = async (
-  role: UserRole,
+  role: UserRole = "ADMIN",
   companyOpts: Partial<Prisma.CompanyCreateInput> = {},
   userOpts: Partial<Prisma.UserCreateInput> = {},
   companyAssociationOpts: Partial<Prisma.CompanyAssociationCreateInput> = {}
