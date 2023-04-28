@@ -2,7 +2,7 @@
  * Fixtures used as building blocks of mutations inputs
  */
 
-import { CompanyInput, TransporterInput } from "../../generated/graphql/types";
+import { CompanyInput, Scalars, TransporterInput } from "../../generated/graphql/types";
 
 function emitterCompanyInput(siret: string) {
   return {
@@ -55,7 +55,7 @@ function transporter2CompanyInput(siret: string): CompanyInput {
 const receiptInput = {
   receipt: "12379",
   department: "07",
-  validityLimit: new Date("2020-06-30"),
+  validityLimit: new Date("2020-06-30T00:00:00.000Z") as Scalars["DateTime"],
   numberPlate: "AD-007-TS"
 };
 
