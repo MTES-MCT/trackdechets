@@ -170,7 +170,9 @@ passport.deserializeUser((id: string, done) => {
  * or if it was set more than one day ago
  * @param accessToken
  */
-export function updateAccessTokenLastUsed(accessToken: AccessToken) {
+export function updateAccessTokenLastUsed(
+  accessToken: Pick<AccessToken, "lastUsed" | "token">
+) {
   // use new Date(Date.now()) instead of new Date()
   // in order to mock Date.now in unit test auth.test.ts
   const now = new Date(Date.now());
@@ -194,7 +196,12 @@ passport.use(
         where: {
           token: hashToken(token)
         },
-        include: { user: true }
+        select: {
+          isRevoked: true,
+          lastUsed: true,
+          token: true,
+          user: true
+        }
       });
       if (accessToken && !accessToken.isRevoked) {
         const user = accessToken.user;

@@ -20,6 +20,8 @@ import { Loader } from "common/components";
 import companyStyles from "form/common/components/company/CompanyResult.module.scss";
 import RedErrorMessage from "common/components/RedErrorMessage";
 import TransporterReceipt from "form/common/components/company/TransporterReceipt";
+import TransporterReceiptEditionSwitch from "form/common/components/company/TransporterReceiptEditionSwitch";
+import { onTransporterSelected } from "form/bsvhu/Transporter";
 
 /**
  *
@@ -45,6 +47,7 @@ export default function Transporter({ status, stepName }) {
   );
 
   const transportEmphasis = stepName === "transport";
+  const { transporter: initialTransporter } = initialState();
   return (
     <>
       {transportEmphasis && <FillFieldsInfo />}
@@ -64,34 +67,18 @@ export default function Transporter({ status, stepName }) {
             optionalMail={true}
             allowForeignCompanies={true}
             registeredOnlyCompanies={true}
-            onCompanySelected={transporter => {
-              if (transporter.transporterReceipt) {
-                setFieldValue(
-                  "transporter.recepisse.number",
-                  transporter.transporterReceipt.receiptNumber
-                );
-                setFieldValue(
-                  "transporter.recepisse.validityLimit",
-                  transporter.transporterReceipt.validityLimit
-                );
-                setFieldValue(
-                  "transporter.recepisse.department",
-                  transporter.transporterReceipt.department
-                );
-              } else {
-                setFieldValue("transporter.recepisse.number", "");
-                setFieldValue(
-                  "transporter.recepisse.validityLimit",
-                  initialState().transporter.recepisse.validityLimit
-                );
-
-                setFieldValue("transporter.recepisse.department", "");
-              }
-            }}
+            onCompanySelected={onTransporterSelected(
+              initialTransporter,
+              setFieldValue
+            )}
           />
         )}
       </div>
-
+      <TransporterReceiptEditionSwitch
+        transporter={values.transporter!}
+        disabled={disabled}
+        setFieldValue={setFieldValue}
+      />
       {showHandedOverAtField ? (
         <div
           className={classNames("form__row", {

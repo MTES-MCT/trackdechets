@@ -167,9 +167,6 @@ export default function CompanySelector({
       clue: orgId!,
     },
     skip: !orgId,
-    onCompleted(data) {
-      onCompanySelected?.(data.companyPrivateInfos);
-    },
   });
 
   function isUnknownCompanyName(company: CompanySearchResult): boolean {

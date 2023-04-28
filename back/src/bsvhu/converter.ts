@@ -123,7 +123,8 @@ export function expandVhuFormFromDb(form: PrismaVhuForm): GraphqlVhuForm {
       recepisse: nullIfNoValues<BsvhuRecepisse>({
         number: form.transporterRecepisseNumber,
         department: form.transporterRecepisseDepartment,
-        validityLimit: processDate(form.transporterRecepisseValidityLimit)
+        validityLimit: processDate(form.transporterRecepisseValidityLimit),
+        isExempted: form.transporterRecepisseIsExempted
       }),
       transport: nullIfNoValues<BsvhuTransport>({
         signature: nullIfNoValues<Signature>({
@@ -297,6 +298,9 @@ function flattenVhuTransporterInput({
     ),
     transporterRecepisseValidityLimit: chain(transporter, t =>
       chain(t.recepisse, r => r.validityLimit)
+    ),
+    transporterRecepisseIsExempted: chain(transporter, t =>
+      chain(t.recepisse, r => r.isExempted)
     ),
     ...flattenTransporterTransportInput(transporter)
   };
