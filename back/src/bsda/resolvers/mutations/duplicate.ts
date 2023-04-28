@@ -61,15 +61,19 @@ async function duplicateBsda({
   groupedInId,
   intermediaries,
   intermediariesOrgIds,
+  emitterCompanySiret,
+  transporterCompanySiret,
+  brokerCompanySiret,
+  workerCompanySiret,
   ...rest
 }: Bsda & {
   intermediaries: IntermediaryBsdaAssociation[];
 }): Promise<Prisma.BsdaCreateInput> {
   const companiesSirets: string[] = [
-    rest.emitterCompanySiret,
-    rest.transporterCompanySiret,
-    rest.brokerCompanySiret,
-    rest.workerCompanySiret
+    emitterCompanySiret,
+    transporterCompanySiret,
+    brokerCompanySiret,
+    workerCompanySiret
   ].filter((siret): siret is string => Boolean(siret));
 
   // Batch call all companies involved
@@ -87,16 +91,16 @@ async function duplicateBsda({
   });
 
   const emitter = companies.find(
-    company => company.siret === rest.emitterCompanySiret
+    company => company.siret === emitterCompanySiret
   );
   const broker = companies.find(
-    company => company.siret === rest.brokerCompanySiret
+    company => company.siret === brokerCompanySiret
   );
   const transporter = companies.find(
-    company => company.siret === rest.transporterCompanySiret
+    company => company.siret === transporterCompanySiret
   );
   const worker = companies.find(
-    company => company.siret === rest.workerCompanySiret
+    company => company.siret === workerCompanySiret
   );
 
   return {
