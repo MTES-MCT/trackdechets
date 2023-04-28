@@ -68,7 +68,8 @@ async function duplicateBsda({
   const companiesSirets: string[] = [
     rest.emitterCompanySiret,
     rest.transporterCompanySiret,
-    rest.brokerCompanySiret
+    rest.brokerCompanySiret,
+    rest.workerCompanySiret
   ].filter((siret): siret is string => Boolean(siret));
 
   // Batch call all companies involved
@@ -80,7 +81,8 @@ async function duplicateBsda({
     },
     include: {
       transporterReceipt: true,
-      brokerReceipt: true
+      brokerReceipt: true,
+      workerCertification: true
     }
   });
 
@@ -92,6 +94,9 @@ async function duplicateBsda({
   );
   const transporter = companies.find(
     company => company.siret === rest.transporterCompanySiret
+  );
+  const worker = companies.find(
+    company => company.siret === rest.workerCompanySiret
   );
 
   return {
@@ -142,6 +147,22 @@ async function duplicateBsda({
     // Broker recepisse
     brokerRecepisseNumber: broker?.brokerReceipt?.receiptNumber,
     brokerRecepisseValidityLimit: broker?.brokerReceipt?.validityLimit,
-    brokerRecepisseDepartment: broker?.brokerReceipt?.department
+    brokerRecepisseDepartment: broker?.brokerReceipt?.department,
+    // Worker company info
+    workerCompanyAddress: worker?.address,
+    workerCompanyMail: worker?.contactEmail,
+    workerCompanyPhone: worker?.contactPhone,
+    workerCompanyName: worker?.name,
+    workerCompanyContact: worker?.contact,
+    // Worker certification
+    workerCertificationHasSubSectionFour:
+      worker?.workerCertification?.hasSubSectionFour,
+    workerCertificationHasSubSectionThree:
+      worker?.workerCertification?.hasSubSectionThree,
+    workerCertificationValidityLimit:
+      worker?.workerCertification?.validityLimit,
+    workerCertificationOrganisation: worker?.workerCertification?.organisation,
+    workerCertificationCertificationNumber:
+      worker?.workerCertification?.certificationNumber
   };
 }

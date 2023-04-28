@@ -61,6 +61,13 @@ export const DUPLICATE_BSDA = gql`
         company {
           ...CompanyFragment
         }
+        certification {
+          hasSubSectionFour
+          hasSubSectionThree
+          certificationNumber
+          validityLimit
+          organisation
+        }
       }
       destination {
         company {
@@ -97,6 +104,13 @@ const buildBsdaInput = (
       contact: workerCompany.contact,
       phone: "workerContactPhone",
       mail: "worker@mail.com"
+    },
+    certification: {
+      hasSubSectionFour: true,
+      hasSubSectionThree: true,
+      certificationNumber: "WORKER-CERTIFICATION-NBR",
+      validityLimit: TODAY.toISOString() as any,
+      organisation: "GLOBAL CERTIFICATION"
     }
   },
   transporter: {
@@ -181,7 +195,17 @@ const createCompaniesAndBsda = async () => {
       }
     }
   });
-  const { company: workerCompany } = await userWithCompanyFactory();
+  const { company: workerCompany } = await userWithCompanyFactory("ADMIN", {
+    workerCertification: {
+      create: {
+        hasSubSectionFour: true,
+        hasSubSectionThree: true,
+        certificationNumber: "WORKER-CERTIFICATION-NBR",
+        validityLimit: TODAY.toISOString() as any,
+        organisation: "GLOBAL CERTIFICATION"
+      }
+    }
+  });
   const { company: destinationCompany } = await userWithCompanyFactory();
 
   const input = buildBsdaInput(
@@ -422,5 +446,83 @@ describe("Mutation.Bsda.duplicate", () => {
     expect(emitter?.contact).toEqual("UPDATED-EMITTER-CONTACT");
     expect(emitter?.phone).toEqual("UPDATED-EMITTER-PHONE");
     expect(emitter?.mail).toEqual("UPDATED-EMITTER-MAIL");
+  });
+
+  test("worker updates his company info > duplicated bsda should have the updated data", async () => {
+    // Given
+    const { mutate, workerCompany, bsda } = await createCompaniesAndBsda();
+
+    await prisma.company.update({
+      where: {
+        id: workerCompany.id
+      },
+      data: {
+        name: "UPDATED-WORKER-NAME",
+        address: "UPDATED-WORKER-ADRESS",
+        contact: "UPDATED-WORKER-CONTACT",
+        contactPhone: "UPDATED-WORKER-PHONE",
+        contactEmail: "UPDATED-WORKER-MAIL"
+      }
+    });
+
+    // When
+    const { errors, data: duplicateBsdaData } = await duplicateBsda(
+      mutate,
+      bsda.id
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(duplicateBsdaData.duplicateBsda.status).toBe("INITIAL");
+
+    // Check transporter info
+    const worker = duplicateBsdaData.duplicateBsda.worker?.company;
+    expect(worker?.name).toEqual("UPDATED-WORKER-NAME");
+    expect(worker?.address).toEqual("UPDATED-WORKER-ADRESS");
+    expect(worker?.contact).toEqual("UPDATED-WORKER-CONTACT");
+    expect(worker?.phone).toEqual("UPDATED-WORKER-PHONE");
+    expect(worker?.mail).toEqual("UPDATED-WORKER-MAIL");
+  });
+
+  test("worker updates certification > duplicated bsda should have the updated data", async () => {
+    // Given
+    const { mutate, workerCompany, bsda } = await createCompaniesAndBsda();
+
+    await prisma.company.update({
+      where: {
+        id: workerCompany.id
+      },
+      data: {
+        workerCertification: {
+          update: {
+            hasSubSectionFour: false,
+            hasSubSectionThree: false,
+            certificationNumber: "UPDATED-WORKER-CERTIFICATION-NBR",
+            validityLimit: FOUR_DAYS_AGO.toISOString() as any,
+            organisation: "AFNOR Certification"
+          }
+        }
+      }
+    });
+
+    // When
+    const { errors, data: duplicateBsdaData } = await duplicateBsda(
+      mutate,
+      bsda.id
+    );
+
+    // Then
+    expect(errors).toBeUndefined();
+    expect(duplicateBsdaData.duplicateBsda.status).toBe("INITIAL");
+
+    // Check transporter info
+    const certification = duplicateBsdaData.duplicateBsda.worker?.certification;
+    expect(certification?.hasSubSectionFour).toEqual(false);
+    expect(certification?.hasSubSectionThree).toEqual(false);
+    expect(certification?.certificationNumber).toEqual(
+      "UPDATED-WORKER-CERTIFICATION-NBR"
+    );
+    expect(certification?.validityLimit).toEqual(FOUR_DAYS_AGO.toISOString());
+    expect(certification?.organisation).toEqual("AFNOR Certification");
   });
 });
