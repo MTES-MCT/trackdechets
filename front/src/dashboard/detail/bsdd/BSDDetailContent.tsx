@@ -123,8 +123,8 @@ const TempStorage = ({ form }) => {
     <>
       <div className={styles.detailColumns}>
         <div className={styles.detailGrid}>
-          <DetailRow value={form?.recipient?.company.name} label="Nom" />
-          <DetailRow value={form?.recipient?.company.siret} label="Siret" />
+          <DetailRow value={form?.recipient?.company?.name} label="Nom" />
+          <DetailRow value={form?.recipient?.company?.siret} label="Siret" />
           <DetailRow
             value={temporaryStorageDetail?.wasteDetails?.code}
             label="Code déchet"
