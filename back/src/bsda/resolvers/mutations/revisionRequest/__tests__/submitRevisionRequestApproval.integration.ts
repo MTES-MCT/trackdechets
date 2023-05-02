@@ -697,8 +697,16 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
   });
 
   it.each([
-    { isApproved: true, expectedStatus: "CANCELED" },
-    { isApproved: false, expectedStatus: "SENT" }
+    {
+      isApproved: true,
+      expectedRevisionStatus: "ACCEPTED",
+      expectedBsdaStatus: "CANCELED"
+    },
+    {
+      isApproved: false,
+      expectedRevisionStatus: "REFUSED",
+      expectedBsdaStatus: "SENT"
+    }
   ])(
     "if user has numerous companies involved in the bsd, his approbation should work for all his companies",
     async testData => {
@@ -741,7 +749,7 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
       });
 
       const { mutate } = makeClient(workerAndDestination);
-      const { errors } = await mutate<
+      const { errors, data: revision } = await mutate<
         Pick<Mutation, "submitBsdaRevisionRequestApproval">,
         MutationSubmitBsdaRevisionRequestApprovalArgs
       >(SUBMIT_BSDA_REVISION_REQUEST_APPROVAL, {
@@ -753,11 +761,15 @@ describe("Mutation.submitBsdaRevisionRequestApproval", () => {
 
       expect(errors).toBeUndefined();
 
+      expect(revision.submitBsdaRevisionRequestApproval.status).toBe(
+        testData.expectedRevisionStatus
+      );
+
       const updatedBsda = await prisma.bsda.findUniqueOrThrow({
         where: { id: bsda.id }
       });
 
-      expect(updatedBsda.status).toBe(testData.expectedStatus);
+      expect(updatedBsda.status).toBe(testData.expectedBsdaStatus);
     }
   );
 });
