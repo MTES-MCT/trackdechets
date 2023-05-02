@@ -3,19 +3,27 @@ import TdSwitch from "common/components/Switch";
 import { FieldTransportModeSelect } from "common/components";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { Field, useFormikContext } from "formik";
-import { Transporter as TransporterType } from "generated/graphql/types";
+import {
+  FormInput,
+  Packagings,
+  Transporter as TransporterType,
+  WasteDetailsInput,
+} from "generated/graphql/types";
 import React from "react";
 import styles from "./Transporter.module.scss";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
+import { formTransportIsPipeline } from "./utils/packagings";
 
 type Values = {
   transporter: TransporterType;
+  wasteDetails: WasteDetailsInput;
 };
+type FormValues = Pick<FormInput, "wasteDetails" | "transporter">;
 
 export default function Transporter() {
   const { setFieldValue, values } = useFormikContext<Values>();
 
-  return (
+  return !formTransportIsPipeline(values) ? (
     <>
       <h4 className="form__section-heading">Transporteur</h4>
       <CompanySelector
@@ -78,6 +86,10 @@ export default function Transporter() {
 
         <RedErrorMessage name="transporter.numberPlate" />
       </div>
+    </>
+  ) : (
+    <>
+      <h4 className="form__section-heading">Transport par pipeline</h4>
     </>
   );
 }

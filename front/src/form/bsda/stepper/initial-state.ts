@@ -50,6 +50,7 @@ const initialState = {
       number: "",
       department: "",
       validityLimit: null,
+      isExempted: false,
     },
     transport: {
       takenOverAt: null,

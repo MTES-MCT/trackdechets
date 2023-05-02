@@ -9,6 +9,26 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Ajout de l'exemption de récépisse pour Bsdasri, Bsvhu et Bsda (UI seule) [PR 2337](https://github.com/MTES-MCT/trackdechets/pull/2337)
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+- Améliorations performances back-end, sur les révisions Bsda, Bsdd et l'authentification (dataloaders et requêtes SQL) [PR 2350](https://github.com/MTES-MCT/trackdechets/pull/2350)
+
+#### :memo: Documentation
+
+#### :house: Interne
+
+- Utilisation de dataloaders pour charger les évènements Psql & Mongo [PR 2107](https://github.com/MTES-MCT/trackdechets/pull/2107)
+
+# [2023.4.2] 24/04/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
 - Envoi d'un mail aux administrateurs d'une entreprise ayant ignoré une RevisionRequest pendant 5 jours (BSD + BSDA) [PR 2288](https://github.com/MTES-MCT/trackdechets/pull/2288)
 
 #### :bug: Corrections de bugs

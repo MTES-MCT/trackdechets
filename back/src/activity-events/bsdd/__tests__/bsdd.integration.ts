@@ -127,7 +127,9 @@ describe("ActivityEvent.Bsdd", () => {
     const formAfterCreate = await prisma.form.findUnique({
       where: { id: formId }
     });
-    const formFromEventsAfterCreate = await getBsddFromActivityEvents(formId);
+    const formFromEventsAfterCreate = await getBsddFromActivityEvents({
+      bsddId: formId
+    });
     expect(formAfterCreate).toMatchObject(formFromEventsAfterCreate);
     expect(formFromEventsAfterCreate.emitterCompanyName).toBe(company.name);
 
@@ -149,7 +151,9 @@ describe("ActivityEvent.Bsdd", () => {
     const formAfterUpdate = await prisma.form.findUnique({
       where: { id: formId }
     });
-    const formFromEventsAfterUpdate = await getBsddFromActivityEvents(formId);
+    const formFromEventsAfterUpdate = await getBsddFromActivityEvents({
+      bsddId: formId
+    });
     expect(formAfterUpdate).toMatchObject(formFromEventsAfterUpdate);
     expect(formFromEventsAfterUpdate.wasteDetailsCode).toBe("01 01 01");
 
@@ -166,7 +170,9 @@ describe("ActivityEvent.Bsdd", () => {
     const formAfterSealed = await prisma.form.findUnique({
       where: { id: formId }
     });
-    const formFromEventsAfterSealed = await getBsddFromActivityEvents(formId);
+    const formFromEventsAfterSealed = await getBsddFromActivityEvents({
+      bsddId: formId
+    });
     expect(formAfterSealed).toMatchObject(formFromEventsAfterSealed);
     expect(formFromEventsAfterSealed.status).toBe("SEALED");
 
@@ -265,10 +271,10 @@ describe("ActivityEvent.Bsdd", () => {
     const formAfterUpdate = await prisma.form.findUniqueOrThrow({
       where: { id: formId }
     });
-    const formFromEventsAfterCreate = await getBsddFromActivityEvents(
-      formId,
-      now
-    );
+    const formFromEventsAfterCreate = await getBsddFromActivityEvents({
+      bsddId: formId,
+      at: now
+    });
     expect(formFromEventsAfterCreate.wasteDetailsCode).toBe("01 03 04*");
     expect(formAfterUpdate.wasteDetailsCode).toBe("01 01 01");
   });

@@ -183,4 +183,67 @@ describe("expandFormFromDb", () => {
       signedBy: null
     });
   });
+
+  it("should expand a form nulling the transporterTransportMode from db", async () => {
+    const user = await userFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        transporterCompanySiret: null,
+        transporterTransportMode: "ROAD"
+      }
+    });
+    form.transporterCompanySiret = null;
+    const expanded = await expandFormFromDb(form);
+    expect(expanded.transporter).toEqual({
+      mode: null,
+      company: {
+        name: form.transporterCompanyName,
+        orgId: null,
+        siret: form.transporterCompanySiret,
+        vatNumber: form.transporterCompanyVatNumber,
+        address: form.transporterCompanyAddress,
+        contact: form.transporterCompanyContact,
+        phone: form.transporterCompanyPhone,
+        mail: form.transporterCompanyMail
+      },
+      isExemptedOfReceipt: form.transporterIsExemptedOfReceipt,
+      receipt: form.transporterReceipt,
+      department: form.transporterDepartment,
+      validityLimit: form.transporterValidityLimit,
+      numberPlate: form.transporterNumberPlate,
+      customInfo: form.transporterCustomInfo
+    });
+  });
+
+  it("should expand a form not hiding the transporterTransportMode from db", async () => {
+    const user = await userFactory();
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        transporterTransportMode: "OTHER"
+      }
+    });
+    form.transporterCompanySiret = null;
+    const expanded = await expandFormFromDb(form);
+    expect(expanded.transporter).toEqual({
+      mode: "OTHER",
+      company: {
+        name: form.transporterCompanyName,
+        orgId: null,
+        siret: form.transporterCompanySiret,
+        vatNumber: form.transporterCompanyVatNumber,
+        address: form.transporterCompanyAddress,
+        contact: form.transporterCompanyContact,
+        phone: form.transporterCompanyPhone,
+        mail: form.transporterCompanyMail
+      },
+      isExemptedOfReceipt: form.transporterIsExemptedOfReceipt,
+      receipt: form.transporterReceipt,
+      department: form.transporterDepartment,
+      validityLimit: form.transporterValidityLimit,
+      numberPlate: form.transporterNumberPlate,
+      customInfo: form.transporterCustomInfo
+    });
+  });
 });

@@ -13,7 +13,6 @@ import {
   BsdasriPackagingType,
   BsdasriSignatureType
 } from "../generated/graphql/types";
-import { isForeignVat } from "../common/constants/companySearchHelpers";
 import {
   MISSING_COMPANY_SIRET,
   MISSING_COMPANY_SIRET_OR_VAT
@@ -26,7 +25,8 @@ import {
   vatNumberTests,
   weight,
   weightConditions,
-  WeightUnits
+  WeightUnits,
+  transporterRecepisseSchema
 } from "../common/validation";
 
 const wasteCodes = DASRI_WASTE_CODES.map(el => el.code);
@@ -336,43 +336,7 @@ export const transporterSchema: FactorySchemaOf<
         `Transporteur: ${MISSING_COMPANY_PHONE}`
       ),
     transporterCompanyMail: yup.string().email().ensure(),
-    transporterRecepisseNumber: yup
-      .string()
-      .ensure()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva || !isForeignVat(tva)) {
-          return schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: le numéro de récépissé est obligatoire`
-          );
-        }
-        return schema.notRequired();
-      }),
-
-    transporterRecepisseDepartment: yup
-      .string()
-      .ensure()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva || !isForeignVat(tva)) {
-          return schema.requiredIf(
-            context.transportSignature,
-            `Transporteur: le département associé au récépissé est obligatoire`
-          );
-        }
-        return schema.nullable().notRequired();
-      }),
-
-    transporterRecepisseValidityLimit: yup
-      .date()
-      .when("transporterCompanyVatNumber", (tva, schema) => {
-        if (!tva || !isForeignVat(tva)) {
-          return schema.requiredIf(
-            context.transportSignature || requiredForSynthesis,
-            "La date de validité du récépissé est obligatoire"
-          );
-        }
-        return schema.nullable().notRequired();
-      })
+    ...transporterRecepisseSchema(context)
   });
 };
 

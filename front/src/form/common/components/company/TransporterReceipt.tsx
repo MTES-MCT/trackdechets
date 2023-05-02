@@ -9,8 +9,9 @@ import {
   BsvhuTransporterInput,
   TransporterInput,
   BsdaTransporter,
-  Bsff,
   BsffTransporter,
+  BsdasriTransporter,
+  BsvhuTransporter,
 } from "generated/graphql/types";
 import { Alert, Row } from "@dataesr/react-dsfr";
 import { isForeignVat } from "generated/constants/companySearchHelpers";
@@ -49,6 +50,10 @@ export default function TransporterReceipt({
       return !!(transporter as Transporter).isExemptedOfReceipt;
     } else if (!!(transporter as BsdaTransporter)?.recepisse?.isExempted) {
       return !!(transporter as BsdaTransporter)?.recepisse?.isExempted;
+    } else if (!!(transporter as BsvhuTransporter)?.recepisse?.isExempted) {
+      return !!(transporter as BsvhuTransporter)?.recepisse?.isExempted;
+    } else if (!!(transporter as BsdasriTransporter)?.recepisse?.isExempted) {
+      return !!(transporter as BsdasriTransporter)?.recepisse?.isExempted;
     } else if (
       !!(transporter as BsffFormTransporterInput)?.isExemptedOfRecepisse
     ) {

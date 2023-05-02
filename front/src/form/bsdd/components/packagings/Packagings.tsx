@@ -116,22 +116,24 @@ export default function Packagings({
                         )}
                       </div>
                       <div className="tw-w-1/3 tw-px-2">
-                        <Field
-                          label="Colis"
-                          component={NumberInput}
-                          className="td-input"
-                          name={`${name}.${idx}.quantity`}
-                          placeholder="Nombre de colis"
-                          min="1"
-                          max={
-                            [
-                              PackagingsEnum.Citerne,
-                              PackagingsEnum.Benne,
-                            ].includes(p.type)
-                              ? 2
-                              : undefined
-                          }
-                        />
+                        {p.type !== "PIPELINE" && (
+                          <Field
+                            label="Colis"
+                            component={NumberInput}
+                            className="td-input"
+                            name={`${name}.${idx}.quantity`}
+                            placeholder="Nombre de colis"
+                            min="1"
+                            max={
+                              [
+                                PackagingsEnum.Citerne,
+                                PackagingsEnum.Benne,
+                              ].includes(p.type)
+                                ? 2
+                                : undefined
+                            }
+                          />
+                        )}
                       </div>
                     </div>
                     <div
