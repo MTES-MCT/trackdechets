@@ -4,13 +4,7 @@ import Tooltip from "common/components/Tooltip";
 import { CompanyType } from "../generated/graphql/types";
 import styles from "./CompanyType.module.scss";
 
-import {
-  Container,
-  Row,
-  Col,
-  Checkbox,
-  CheckboxGroup,
-} from "@dataesr/react-dsfr";
+import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
 
 export const COMPANY_CONSTANTS = [
   {
@@ -98,36 +92,49 @@ export default function CompanyTypeField({
     <FieldArray
       name={name}
       render={arrayHelpers => (
-        <CheckboxGroup legend="Profil">
-          <Container fluid>
+        <>
+          <div className="fr-grid-row fr-mb-2w">
+            <span className="fr-text">Profil</span>
+          </div>
+          <div className="fr-container-fluid">
             {COMPANY_CONSTANTS.map((companyType, idx) => (
               <div key={idx}>
-                <Row gutters key={companyType.value}>
-                  <Col n="11">
+                <div
+                  className="fr-grid-row fr-grid-row--gutters"
+                  key={companyType.value}
+                >
+                  <div className="fr-col-11">
                     <Checkbox
-                      id={companyType.value}
-                      label={companyType.label}
-                      defaultChecked={value.includes(companyType.value)}
                       disabled={props.disabled}
-                      onClick={e =>
-                        handleChange(e, arrayHelpers, companyType, value)
-                      }
+                      options={[
+                        {
+                          label: companyType.label,
+                          nativeInputProps: {
+                            name: name,
+                            defaultChecked: value.includes(companyType.value),
+                            onClick: e =>
+                              handleChange(e, arrayHelpers, companyType, value),
+                          },
+                        },
+                      ]}
                     />
-                  </Col>
+                  </div>
 
-                  <Col n="1">
+                  <div className="fr-col-1">
                     <Tooltip msg={companyType.helpText} />
-                  </Col>
-                </Row>
+                  </div>
+                </div>
                 {subfields?.[companyType.value] ? (
-                  <Row className={styles.subfields}>
-                    {subfields?.[companyType.value]}
-                  </Row>
+                  <div className={styles.subfields}>
+                    <div className="fr-grid-row">
+                      {subfields?.[companyType.value]}
+                    </div>
+                  </div>
                 ) : null}
               </div>
             ))}
-          </Container>
-        </CheckboxGroup>
+          </div>
+        </>
       )}
     />
   );

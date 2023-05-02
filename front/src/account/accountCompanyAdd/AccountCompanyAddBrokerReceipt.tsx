@@ -1,61 +1,60 @@
 import React from "react";
 import { Field } from "formik";
 import RedErrorMessage from "common/components/RedErrorMessage";
-import { Container, Row, Col, TextInput, Text } from "@dataesr/react-dsfr";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 
 /**
  * Broker receipt Formik fields for company creation
  */
 export default function AccountCompanyAddBrokerReceipt() {
   return (
-    <Container fluid>
-      <Row>
-        <Col n="12">
-          <Text as="p" bold>
-            Récépissé Courtier (optionnel)
-          </Text>
-        </Col>
-      </Row>
-      <Row gutters>
-        <Col n="4">
+    <div className="fr-container">
+      <div className="fr-grid-row">
+        <div className="fr-col-12">
+          <p className="fr-text--bold">Récépissé Courtier (optionnel)</p>
+        </div>
+      </div>
+      <div className="fr-grid-row fr-grid-row--gutters">
+        <div className="fr-col-4">
           <Field name="brokerReceiptNumber">
             {({ field }) => {
               return (
-                <TextInput label="Numéro de récépissé" {...field}></TextInput>
+                <Input
+                  label="Numéro de récépissé"
+                  nativeInputProps={field}
+                ></Input>
               );
             }}
           </Field>
           <RedErrorMessage name="brokerReceiptNumber" />
-        </Col>
-        <Col n="4">
+        </div>
+        <div className="fr-col-4">
           <Field name="brokerReceiptValidity">
             {({ field }) => {
               return (
-                <TextInput
-                  type="date"
+                <Input
                   label="Limite de validité"
-                  {...field}
-                ></TextInput>
+                  nativeInputProps={{ type: "date", ...field }}
+                ></Input>
               );
             }}
           </Field>
           <RedErrorMessage name="brokerReceiptValidity" />
-        </Col>
-        <Col n="2">
+        </div>
+        <div className="fr-col-2">
           <Field name="brokerReceiptDepartment">
             {({ field }) => {
               return (
-                <TextInput
+                <Input
                   label="Département"
-                  placeholder="75"
-                  {...field}
-                ></TextInput>
+                  nativeInputProps={{ placeholder: "75", ...field }}
+                ></Input>
               );
             }}
           </Field>
           <RedErrorMessage name="brokerReceiptDepartment" />
-        </Col>
-      </Row>
-    </Container>
+        </div>
+      </div>
+    </div>
   );
 }

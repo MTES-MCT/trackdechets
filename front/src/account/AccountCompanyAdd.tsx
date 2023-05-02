@@ -35,16 +35,11 @@ import {
   CREATE_WORKER_CERTIFICATION,
   UPDATE_COMPANY_WORKER_CERTIFICATION,
 } from "./fields/forms/AccountFormCompanyWorkerCertification";
-import {
-  Container,
-  Row,
-  Col,
-  Alert,
-  Button,
-  Checkbox,
-  Toggle,
-  TextInput,
-} from "@dataesr/react-dsfr";
+import { Checkbox } from "@codegouvfr/react-dsfr/Checkbox";
+import { ToggleSwitch } from "@codegouvfr/react-dsfr/ToggleSwitch";
+import { Alert } from "@codegouvfr/react-dsfr/Alert";
+import { Button } from "@codegouvfr/react-dsfr/Button";
+import { Input } from "@codegouvfr/react-dsfr/Input";
 
 export const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
@@ -408,9 +403,9 @@ export default function AccountCompanyAdd() {
   };
 
   return (
-    <Container fluid className={styles.container}>
-      <Row spacing="mb-2w">
-        <Col n="12">
+    <div className={`fr-container-fluid ${styles.container}`}>
+      <div className="fr-grid-row fr-mb-2w">
+        <div className="fr-col-12">
           <h5 className={styles.subtitle}>Identification</h5>
           <AccountCompanyAddSiret
             {...{
@@ -421,7 +416,7 @@ export default function AccountCompanyAdd() {
             <>
               <div className={styles.alertWrapper}>
                 <Alert
-                  type="error"
+                  severity="error"
                   title="Cet établissement n'est pas immatriculé en France"
                   description={
                     <>
@@ -438,7 +433,7 @@ export default function AccountCompanyAdd() {
                 />
               </div>
               <Button
-                tertiary
+                priority="tertiary"
                 onClick={() => {
                   history.push({
                     pathname: routes.account.companies.create.foreign,
@@ -612,11 +607,11 @@ export default function AccountCompanyAdd() {
                   <Field name="givenName">
                     {({ field }) => {
                       return (
-                        <TextInput
+                        <Input
                           label="Nom usuel (optionnel)"
-                          hint="Nom usuel de l'établissement qui permet de différencier plusieurs établissements ayant la même raison sociale"
-                          {...field}
-                        ></TextInput>
+                          hintText="Nom usuel de l'établissement qui permet de différencier plusieurs établissements ayant la même raison sociale"
+                          nativeInputProps={field}
+                        ></Input>
                       );
                     }}
                   </Field>
@@ -634,11 +629,11 @@ export default function AccountCompanyAdd() {
                       <Field name="companyName">
                         {({ field }) => {
                           return (
-                            <TextInput
+                            <Input
                               label={"Raison Sociale"}
                               disabled={!!companyInfos?.name}
-                              {...field}
-                            ></TextInput>
+                              nativeInputProps={field}
+                            ></Input>
                           );
                         }}
                       </Field>
@@ -656,11 +651,11 @@ export default function AccountCompanyAdd() {
                     <Field name="codeNaf">
                       {({ field }) => {
                         return (
-                          <TextInput
+                          <Input
                             label="Code NAF"
                             disabled={isForcedTransporter(companyInfos)}
-                            {...field}
-                          ></TextInput>
+                            nativeInputProps={field}
+                          ></Input>
                         );
                       }}
                     </Field>
@@ -678,19 +673,21 @@ export default function AccountCompanyAdd() {
                       <Field name="address">
                         {({ field }) => {
                           return (
-                            <TextInput
+                            <Input
                               label="Adresse"
                               disabled={!!companyInfos?.address}
-                              messageType={
-                                errors.address && touched.address ? "error" : ""
+                              state={
+                                errors.address && touched.address
+                                  ? "error"
+                                  : "default"
                               }
-                              message={
+                              stateRelatedMessage={
                                 errors.address && touched.address
                                   ? errors.isAllowed
                                   : ""
                               }
-                              {...field}
-                            ></TextInput>
+                              nativeInputProps={field}
+                            ></Input>
                           );
                         }}
                       </Field>
@@ -700,45 +697,45 @@ export default function AccountCompanyAdd() {
                   <Field name="contact">
                     {({ field }) => {
                       return (
-                        <TextInput
+                        <Input
                           label="Personne à contacter"
-                          hint="Optionnel"
-                          {...field}
-                        ></TextInput>
+                          hintText="Optionnel"
+                          nativeInputProps={field}
+                        ></Input>
                       );
                     }}
                   </Field>
 
-                  <Container fluid spacing="mb-4w">
-                    <Row gutters>
-                      <Col n="6">
+                  <div className="fr-container-fluid fr-mb-4w">
+                    <div className="fr-grid-row fr-grid-row--gutters">
+                      <div className="fr-col-6">
                         <Field name="contactPhone">
                           {({ field }) => {
                             return (
-                              <TextInput
+                              <Input
                                 label="Téléphone"
-                                hint="Optionnel"
-                                {...field}
-                              ></TextInput>
+                                hintText="Optionnel"
+                                nativeInputProps={field}
+                              ></Input>
                             );
                           }}
                         </Field>
-                      </Col>
-                      <Col n="6">
+                      </div>
+                      <div className="fr-col-6">
                         <Field name="contactEmail">
                           {({ field }) => {
                             return (
-                              <TextInput
+                              <Input
                                 label="E-mail"
-                                hint="Optionnel"
-                                {...field}
-                              ></TextInput>
+                                hintText="Optionnel"
+                                nativeInputProps={field}
+                              ></Input>
                             );
                           }}
                         </Field>
-                      </Col>
-                    </Row>
-                  </Container>
+                      </div>
+                    </div>
+                  </div>
 
                   <div className={styles.separator} />
 
@@ -800,11 +797,11 @@ export default function AccountCompanyAdd() {
                       <Field name="gerepId">
                         {({ field }) => {
                           return (
-                            <TextInput
+                            <Input
                               label="Identifiant GEREP"
-                              hint="Optionnel"
-                              {...field}
-                            ></TextInput>
+                              hintText="Optionnel"
+                              nativeInputProps={field}
+                            ></Input>
                           );
                         }}
                       </Field>
@@ -813,18 +810,13 @@ export default function AccountCompanyAdd() {
                         <Field name="allowBsdasriTakeOverWithoutSignature">
                           {({ field }) => {
                             return (
-                              <Toggle
-                                onChange={event => {
-                                  setFieldValue(
-                                    "allowBsdasriTakeOverWithoutSignature",
-                                    event.target.checked
-                                  );
-                                  field.onChange(event);
+                              <ToggleSwitch
+                                onChange={e => {
+                                  setFieldValue(field.name, e);
                                 }}
-                                id="allowBsdasriTakeOverWithoutSignature"
-                                checked={field.value}
+                                inputTitle={field.name}
                                 label="Mon établissement produit des DASRI. Je dispose d'une convention avec un collecteur et j'accepte que ce collecteur prenne en charge mes DASRI sans ma signature lors de la collecte si je ne suis pas disponible. Ce choix est modifiable utérieurement."
-                                description="(DASRI, Déchets d'Acivité de Soins à Risques Infectieux, par exemple les boîtes et les containers jaunes pour les seringues.)"
+                                helperText="(DASRI, Déchets d'Acivité de Soins à Risques Infectieux, par exemple les boîtes et les containers jaunes pour les seringues.)"
                               />
                             );
                           }}
@@ -838,23 +830,28 @@ export default function AccountCompanyAdd() {
                       {({ field }) => {
                         return (
                           <Checkbox
-                            label="Je certifie disposer du pouvoir pour créer un compte au
-                              nom de mon entreprise"
-                            messageType={
+                            state={
                               errors.isAllowed && touched.isAllowed
                                 ? "error"
-                                : ""
+                                : "default"
                             }
-                            message={
+                            stateRelatedMessage={
                               errors.isAllowed && touched.isAllowed
                                 ? errors.isAllowed
                                 : ""
                             }
-                            id="isAllowed"
-                            // @ts-ignore
-                            checked={field.value}
-                            onChange={field.onChange}
-                            onBlur={field.onBlur}
+                            options={[
+                              {
+                                label:
+                                  "Je certifie disposer du pouvoir pour créer un compte au nom de mon entreprise",
+                                nativeInputProps: {
+                                  name: field.name,
+                                  checked: field.value,
+                                  onChange: field.onChange,
+                                  onBlur: field.onBlur,
+                                },
+                              },
+                            ]}
                           />
                         );
                       }}
@@ -863,6 +860,7 @@ export default function AccountCompanyAdd() {
 
                   <div className={styles.alertWrapper}>
                     <Alert
+                      severity="info"
                       title="Information"
                       description={
                         <>
@@ -887,7 +885,7 @@ export default function AccountCompanyAdd() {
 
                   <div className={styles["submit-form"]}>
                     <Button
-                      tertiary
+                      priority="tertiary"
                       disabled={isSubmitting}
                       onClick={() => {
                         history.goBack();
@@ -896,7 +894,7 @@ export default function AccountCompanyAdd() {
                       Annuler
                     </Button>
 
-                    <Button submit disabled={isSubmitting}>
+                    <Button type="submit" disabled={isSubmitting}>
                       {isSubmitting ? "Création..." : "Créer"}
                     </Button>
                   </div>
@@ -932,8 +930,8 @@ export default function AccountCompanyAdd() {
               )}
             </Formik>
           )}
-        </Col>
-      </Row>
-    </Container>
+        </div>
+      </div>
+    </div>
   );
 }
