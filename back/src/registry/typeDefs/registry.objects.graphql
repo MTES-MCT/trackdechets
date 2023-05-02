@@ -53,6 +53,8 @@ type IncomingWaste {
   emitterCompanySiret: String
   "L'adresse de l'établissement expéditeur des déchets"
   emitterCompanyAddress: String
+  "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
+  emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement expéditeur des déchets"
   emitterPickupsiteAddress: String
   """
@@ -246,6 +248,8 @@ type OutgoingWaste {
 
   "L'adresse de l'établissement"
   emitterCompanyAddress: String
+  "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
+  emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
   emitterPickupsiteAddress: String
   "La raison sociale du producteur initial du déchet - optionnel lorsque les déchets proviennet de plusieurs producteurs"
@@ -504,6 +508,8 @@ type TransportedWaste {
   emitterCompanySiret: String
   "L'adresse de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyAddress: String
+  "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
+  emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
   emitterPickupsiteAddress: String
 
@@ -688,6 +694,8 @@ type ManagedWaste {
   emitterCompanySiret: String
   "L'adresse de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyAddress: String
+  "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
+  emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
   emitterPickupsiteAddress: String
 
@@ -892,6 +900,8 @@ type AllWaste {
   emitterCompanySiret: String
   "L'adresse de la personne remettant les déchets au transporteur ou au collecteur"
   emitterCompanyAddress: String
+  "Le nom du point de prise en charge lorsqu'il se distingue du nom de l'établissement"
+  emitterPickupsiteName: String
   "L'adresse de prise en charge lorsqu'elle se distingue de l'adresse de l'établissement"
   emitterPickupsiteAddress: String
   "La quantité de déchet sortant en tonne"

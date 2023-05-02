@@ -135,8 +135,8 @@ export function toIncomingWaste(
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
+    emitterPickupsiteName: bsdd.emitterPickupSiteName,
     emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteName,
       bsdd.emitterPickupSiteAddress,
       bsdd.emitterPickupSitePostalCode,
       bsdd.emitterPickupSiteCity
@@ -206,8 +206,8 @@ export function toOutgoingWaste(
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
+    emitterPickupsiteName: bsdd.emitterPickupSiteName,
     emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteName,
       bsdd.emitterPickupSiteAddress,
       bsdd.emitterPickupSitePostalCode,
       bsdd.emitterPickupSiteCity
@@ -286,8 +286,8 @@ export function toTransportedWaste(
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
+    emitterPickupsiteName: bsdd.emitterPickupSiteName,
     emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteName,
       bsdd.emitterPickupSiteAddress,
       bsdd.emitterPickupSitePostalCode,
       bsdd.emitterPickupSiteCity
@@ -350,8 +350,8 @@ export function toManagedWaste(
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
+    emitterPickupsiteName: bsdd.emitterPickupSiteName,
     emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteName,
       bsdd.emitterPickupSiteAddress,
       bsdd.emitterPickupSitePostalCode,
       bsdd.emitterPickupSiteCity
@@ -434,8 +434,8 @@ export function toAllWaste(
     emitterCompanyAddress: bsdd.emitterCompanyAddress,
     emitterCompanyName: bsdd.emitterCompanyName,
     emitterCompanySiret: bsdd.emitterCompanySiret,
+    emitterPickupsiteName: bsdd.emitterPickupSiteName,
     emitterPickupsiteAddress: buildAddress([
-      bsdd.emitterPickupSiteName,
       bsdd.emitterPickupSiteAddress,
       bsdd.emitterPickupSitePostalCode,
       bsdd.emitterPickupSiteCity

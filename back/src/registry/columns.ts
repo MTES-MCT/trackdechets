@@ -82,6 +82,7 @@ const columns: Column[] = [
   { field: "emitterCompanyName", label: "Expéditeur raison sociale" },
   { field: "emitterCompanySiret", label: "Expéditeur SIRET" },
   { field: "emitterCompanyAddress", label: "Expéditeur adresse" },
+  { field: "emitterPickupsiteName", label: "Nom du point de prise en charge" },
   { field: "emitterPickupsiteAddress", label: "Adresse de prise en charge" },
   { field: "emitterCompanyMail", label: "Expéditeur contact" },
   { field: "workerCompanyName", label: "Entreprise de travaux raison sociale" },
