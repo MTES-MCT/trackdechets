@@ -32,15 +32,20 @@ const buildDeleteForm: (deps: RepositoryFnDeps) => DeleteFormFn =
 
     // Removing an appendix1 container removes the appendix 1
     if (deletedForm.emitterType === EmitterType.APPENDIX1) {
-      const annexis1 = await prisma.formGroupement.findMany({
+      const appendix1 = await prisma.formGroupement.findMany({
         where: { nextFormId: deletedForm.id },
         select: { initialFormId: true }
       });
 
       const updateManyForms = buildUpdateManyForms({ prisma, user });
       await updateManyForms(
-        annexis1.map(form => form.initialFormId),
+        appendix1.map(form => form.initialFormId),
         { isDeleted: true }
+      );
+      await Promise.all(
+        appendix1.map(({ initialFormId }) =>
+          deleteBsd({ id: initialFormId }, { user } as GraphQLContext)
+        )
       );
     }
 
