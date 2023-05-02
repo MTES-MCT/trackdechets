@@ -171,9 +171,9 @@ const buildBsdaInput = (
 });
 
 const createCompaniesAndBsda = async () => {
+  // Companies with their initial data
   const { user: emitter, company: emitterCompany } =
     await userWithCompanyFactory();
-  // TODO: toujours utile?
   const { company: transporterCompany } = await userWithCompanyFactory(
     "ADMIN",
     {

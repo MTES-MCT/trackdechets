@@ -105,6 +105,10 @@ async function duplicateBsda({
 
   return {
     ...rest,
+    emitterCompanySiret,
+    transporterCompanySiret,
+    brokerCompanySiret,
+    workerCompanySiret,
     id: getReadableId(ReadableIdPrefix.BSDA),
     status: BsdaStatus.INITIAL,
     isDraft: true,
