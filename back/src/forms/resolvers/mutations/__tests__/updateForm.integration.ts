@@ -32,6 +32,11 @@ const UPDATE_FORM = `
         name
         code
         isDangerous
+        packagingInfos {
+          type
+          other
+          quantity
+        }
       }
       recipient {
         company {
@@ -70,6 +75,23 @@ const UPDATE_FORM = `
       intermediaries {
         siret
         name
+      }
+      transporter {
+        company {
+          siret
+          name
+          address
+          contact
+          mail
+          phone
+        }
+        isExemptedOfReceipt
+        receipt
+        department
+        validityLimit
+        numberPlate
+        customInfo
+        mode
       }
     }
   }
@@ -780,6 +802,82 @@ describe("Mutation.updateForm", () => {
     expect(data.updateForm.wasteDetails).toMatchObject(
       updateFormInput.wasteDetails
     );
+  });
+
+  it("should update a form with a PIPELINE packaging, erasing transporter infos and forcing transporter mode OTHER", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const updateFormInput = {
+      id: form.id,
+      transporter: {
+        mode: "ROAD",
+        company: {
+          siret: siretify(1)
+        }
+      },
+      wasteDetails: {
+        name: "things",
+        packagingInfos: [{ type: "PIPELINE", quantity: 1 }]
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    expect(data.updateForm.wasteDetails).toMatchObject(
+      updateFormInput.wasteDetails
+    );
+    expect(data.updateForm.transporter).toMatchObject({
+      mode: "OTHER",
+      company: { siret: null }
+    });
+  });
+
+  it("should error updating form with a PIPELINE packaging, and any other packaging", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        wasteDetailsPackagingInfos: [{ type: "PIPELINE", quantity: 1 }]
+      }
+    });
+
+    const updateFormInput = {
+      id: form.id,
+      transporter: {
+        mode: "ROAD",
+        company: {
+          siret: siretify(1)
+        }
+      },
+      wasteDetails: {
+        name: "things",
+        packagingInfos: [
+          { type: "CITERNE", quantity: 1 },
+          { type: "PIPELINE", quantity: 1 }
+        ]
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    expect(errors).toMatchObject([
+      {
+        extensions: { code: "BAD_USER_INPUT" },
+        message:
+          "wasteDetailsPackagingInfos ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement."
+      }
+    ]);
   });
 
   it("should add a temporary storage", async () => {
