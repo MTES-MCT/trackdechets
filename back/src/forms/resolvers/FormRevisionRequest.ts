@@ -44,7 +44,6 @@ const formRevisionRequestResolvers: FormRevisionRequestResolvers = {
     if (!fullBsdd) {
       throw new Error(`FormRevisionRequest ${parent.id} has no form.`);
     }
-
     const bsdd = await getBsddFromActivityEvents(
       {
         bsddId: parent.bsddId,
