@@ -141,7 +141,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               <strong>1. Producteur ou détenteur des déchets</strong>
             </p>
             <FormCompanyFields company={bsdasri.emitter?.company} />
-            {(!!bsdasri.emitter?.pickupSite?.name ||
+            {(Boolean(bsdasri.emitter?.pickupSite?.name) ||
               pickupSiteAdress !== "") && (
               <>
                 <p>
