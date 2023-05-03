@@ -32,8 +32,6 @@
   &--SIGNED_BY_WORKER,
   &--SENT,
   &--RESENT,
-  &--AWAITING_CHILD,
-  &--GROUPED,
   &--SIGNED_BY_TEMP_STORER,
   &--SIGNED_BY_EMITTER {
     background-color: #e6eefe;
@@ -72,15 +70,13 @@
   }
   &--TEMP_STORED,
   &--RESEALED,
+  &--AWAITING_CHILD,
+  &--GROUPED,
   &--INTERMEDIATELY_PROCESSED {
     background-color: #e5fbfd;
     color: #006a6f;
   }
-  &--INTERMEDIATELY_PROCESSED {
-    @include desktop {
-      width: 200px;
-    }
-  }
+
   &--TEMP_STORED {
     @include desktop {
       width: 255px;

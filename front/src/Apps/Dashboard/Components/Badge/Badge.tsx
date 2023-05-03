@@ -5,7 +5,7 @@ import "./badge.scss";
 import { BsdStatusCode } from "../../../Common/types/bsdTypes";
 import { getBsdStatusLabel } from "../../dashboardServices";
 
-function Badge({ status, isDraft }: BadgeProps): JSX.Element {
+function Badge({ status, isDraft, bsdType }: BadgeProps): JSX.Element {
   return (
     <p
       className={classnames(`fr-badge fr-badge--sm fr-badge--${status}`, {
@@ -18,7 +18,7 @@ function Badge({ status, isDraft }: BadgeProps): JSX.Element {
         "fr-badge--canceled": status === BsdStatusCode.Canceled,
       })}
     >
-      {getBsdStatusLabel(status, isDraft)}
+      {getBsdStatusLabel(status, isDraft, bsdType)}
     </p>
   );
 }
