@@ -149,14 +149,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
                 <p>
                   Nom/raison sociale : {bsdasri.emitter?.pickupSite?.name}
                   <br />
-                  Adresse :{" "}
-                  {buildAddress(
-                    [
-                      bsdasri.emitter?.pickupSite?.address,
-                      bsdasri.emitter?.pickupSite?.postalCode,
-                      bsdasri.emitter?.pickupSite?.city
-                    ].filter(Boolean)
-                  )}
+                  Adresse : {pickupSiteAdress}
                   <br />{" "}
                 </p>
               </>
