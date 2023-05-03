@@ -8,7 +8,8 @@ import {
 import {
   Bsdasri,
   InitialBsdasri,
-  BsdasriSignature
+  BsdasriSignature,
+  Maybe
 } from "../../../generated/graphql/types";
 import { TraceabilityTable } from "./TraceabilityTable";
 import { PackagingInfosTable } from "./PackagingInfosTable";
@@ -20,10 +21,25 @@ import { BsdasriType } from "@prisma/client";
  * Build full address from different fields
  * Avoid repetition if city or postalCode are already include in address field
  */
-export function buildAddress(addressComponents: string[]): string {
-  return addressComponents
-    .filter(bit => !!bit && !addressComponents[0].includes(bit))
-    .join(" ");
+export function buildAddress(
+  addressComponents: (Maybe<string> | undefined)[]
+): string {
+  // Filter nulls and undefineds
+  const nonNullAdressComponents = addressComponents.filter((c): c is string =>
+    Boolean(c)
+  );
+
+  if (!nonNullAdressComponents || !nonNullAdressComponents.length) return "";
+
+  // Remove duplicate infos (if user put all address in 1st field)
+  const noDuplicatesAddressComponents = nonNullAdressComponents.filter(
+    (bit: string) => !!bit && !nonNullAdressComponents[0].includes(bit)
+  );
+
+  // Concatenate first field + other info
+  return [nonNullAdressComponents[0], ...noDuplicatesAddressComponents].join(
+    " "
+  );
 }
 
 type Props = {
@@ -33,6 +49,12 @@ type Props = {
 };
 
 export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
+  const pickupSiteAdress = buildAddress([
+    bsdasri.emitter?.pickupSite?.address,
+    bsdasri.emitter?.pickupSite?.postalCode,
+    bsdasri.emitter?.pickupSite?.city
+  ]);
+
   return (
     <Document title={bsdasri.id}>
       <div className="Page">
@@ -119,7 +141,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               <strong>1. Producteur ou détenteur des déchets</strong>
             </p>
             <FormCompanyFields company={bsdasri.emitter?.company} />
-            {!!bsdasri.emitter?.pickupSite?.name && (
+            {pickupSiteAdress !== "" && (
               <>
                 <p>
                   <strong>Adresse de collecte</strong>
@@ -246,7 +268,7 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               <strong>Date de remise à l'installation de destination :</strong>
               {formatDate(
                 bsdasri?.transporter?.transport?.handedOverAt ??
-                  bsdasri?.destination?.reception?.date
+                bsdasri?.destination?.reception?.date
               )}
             </p>
             <hr />
@@ -294,23 +316,23 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               <br />
               {bsdasri?.transporter?.transport?.acceptation?.status ===
                 "PARTIALLY_REFUSED" && (
-                <>
-                  <p>
-                    Quantité refusée de refus:{" "}
-                    {
-                      bsdasri?.transporter?.transport?.acceptation
-                        ?.refusedWeight
-                    }
-                  </p>
-                  <p>
-                    Motif de refus:{" "}
-                    {
-                      bsdasri?.transporter?.transport?.acceptation
-                        ?.refusalReason
-                    }
-                  </p>
-                </>
-              )}
+                  <>
+                    <p>
+                      Quantité refusée de refus:{" "}
+                      {
+                        bsdasri?.transporter?.transport?.acceptation
+                          ?.refusedWeight
+                      }
+                    </p>
+                    <p>
+                      Motif de refus:{" "}
+                      {
+                        bsdasri?.transporter?.transport?.acceptation
+                          ?.refusalReason
+                      }
+                    </p>
+                  </>
+                )}
             </p>
             <p>
               Date: {formatDate(bsdasri?.transporter?.transport?.takenOverAt)}
@@ -393,23 +415,23 @@ export function BsdasriPdf({ bsdasri, qrCode, associatedBsdasris }: Props) {
               <br />
               {bsdasri?.destination?.reception?.acceptation?.status ===
                 "PARTIALLY_REFUSED" && (
-                <>
-                  <p>
-                    Quantité refusée de refus:{" "}
-                    {
-                      bsdasri?.destination?.reception?.acceptation
-                        ?.refusedWeight
-                    }
-                  </p>
-                  <p>
-                    Motif de refus:{" "}
-                    {
-                      bsdasri?.destination?.reception?.acceptation
-                        ?.refusalReason
-                    }
-                  </p>
-                </>
-              )}
+                  <>
+                    <p>
+                      Quantité refusée de refus:{" "}
+                      {
+                        bsdasri?.destination?.reception?.acceptation
+                          ?.refusedWeight
+                      }
+                    </p>
+                    <p>
+                      Motif de refus:{" "}
+                      {
+                        bsdasri?.destination?.reception?.acceptation
+                          ?.refusalReason
+                      }
+                    </p>
+                  </>
+                )}
               <p>Date: {formatDate(bsdasri?.destination?.reception?.date)}</p>
             </p>
             <hr />
