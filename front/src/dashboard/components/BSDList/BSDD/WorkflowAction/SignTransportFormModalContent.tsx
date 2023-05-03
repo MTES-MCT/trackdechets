@@ -7,6 +7,7 @@ import {
   EmitterType,
   Mutation,
   MutationSignTransportFormArgs,
+  MutationUpdateFormArgs,
   Query,
   QueryFormArgs,
 } from "generated/graphql/types";

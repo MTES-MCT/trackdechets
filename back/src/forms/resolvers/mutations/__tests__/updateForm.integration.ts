@@ -2109,7 +2109,7 @@ describe("Mutation.updateForm", () => {
     }
   );
 
-  it.only("should not allow updating appendix1 if one of them has been signed by the transporter for more than 3 days", async () => {
+  it("should not allow updating appendix1 if one of them has been signed by the transporter for more than 3 days", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { company: producerCompany } = await userWithCompanyFactory("MEMBER");
     const { mutate } = makeClient(user);
