@@ -24,7 +24,7 @@ import { INDEX_ALIAS_NAME_SEPARATOR } from "./indexInsee.helpers";
 const pipeline = util.promisify(stream.pipeline);
 var pjson = require("../../../package.json");
 
-// Max size of documents to index at once, also depends on ES JVM memory available
+// Max size of documents to bulk index, depends on ES JVM memory available
 const CHUNK_SIZE: number = parseInt(process.env.INDEX_CHUNK_SIZE, 10) || 10_000;
 
 /**
@@ -282,13 +282,15 @@ export const unzipAndIndex = async (
   await zip.close();
   const headers = indexConfig.headers;
   const writableStream = getWritableParserAndIndexer(indexConfig, indexName);
+  // stop after MAX_ROWS
+  const maxRows = parseInt(process.env.MAX_ROWS, 10);
   await pipeline(
     fs.createReadStream(csvPath),
     parse({
       headers,
       ignoreEmpty: true,
       discardUnmappedColumns: true,
-      ...(parseInt(process.env.MAX_ROWS, 10) && { maxRows: parseInt(process.env.MAX_ROWS, 10)})
+      ...(maxRows && { maxRows })
     })
       .on("error", error => {
         throw error;
@@ -307,7 +309,6 @@ export const unzipAndIndex = async (
 /**
  * Download and launch indexation
  */
-
 export const downloadAndIndex = async (
   url: string,
   indexConfig: IndexProcessConfig

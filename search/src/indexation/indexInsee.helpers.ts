@@ -6,7 +6,8 @@ import {
 import { logger } from "..";
 
 
-// ES Mapping docs: https://www.elastic.co/guide/en/elasticsearch/reference/6.8/mapping.html
+// Date dynamic mapping for all field names starting with "date*""
+// like "dateDernierTraitementUniteLegale"
 export const standardMapping = {
   _doc: {
     dynamic_templates: [
@@ -16,7 +17,6 @@ export const standardMapping = {
           match: "^date.*$",
           mapping: {
             type: "date",
-            // docs : https://www.elastic.co/guide/en/elasticsearch/reference/6.8/ignore-malformed.html
             ignore_malformed: true
           }
         }
@@ -79,7 +79,12 @@ export const sireneIndexConfig: IndexProcessConfig = {
     "nicSiegeUniteLegale",
     "economieSocialeSolidaireUniteLegale",
     "caractereEmployeurUniteLegale"
-  ]
+  ],
+  settings: {
+    // Ignore malformed errors globally
+    // Docs https://www.elastic.co/guide/en/elasticsearch/reference/7.17/ignore-malformed.html#ignore-malformed-setting
+   "index.mapping.ignore_malformed": true
+  }
 };
 
 
@@ -257,5 +262,9 @@ export const siretIndexConfig: IndexProcessConfig = {
     "activitePrincipaleEtablissement",
     "nomenclatureActivitePrincipaleEtablissement",
     "caractereEmployeurEtablissement"
-  ]
+  ],
+  settings: {
+    "index.mapping.ignore_malformed": true,
+    "index.number_of_replicas": process.env.TD_SIRENE_INDEX_NB_REPLICAS || "3"
+  }
 };
