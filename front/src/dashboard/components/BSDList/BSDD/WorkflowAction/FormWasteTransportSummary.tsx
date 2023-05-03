@@ -12,7 +12,9 @@ import {
   DataListItem,
   DataListTerm,
 } from "common/components";
+import NumberInput from "form/common/components/custom-inputs/NumberInput";
 import { IconPaperWrite } from "common/components/Icons";
+import Packagings from "form/bsdd/components/packagings/Packagings";
 
 interface FormWasteTransportSummaryProps {
   form: Form;
@@ -21,12 +23,47 @@ interface FormWasteTransportSummaryProps {
 type FormValues = Pick<SignTransportFormInput, "transporterNumberPlate">;
 type FormKeys = keyof FormValues;
 
+const SAMPLE_NUMBER_WASTE_CODES = [
+  "13 02 04*",
+  "13 02 05*",
+  "13 02 06*",
+  "13 02 07*",
+  "13 02 08*",
+];
 const EDITABLE_FIELDS: Record<FormKeys, () => JSX.Element> = {
   transporterNumberPlate: () => (
     <div className="form__row">
       <label>
         Plaque d'immatriculation{" "}
         <Field name="transporterNumberPlate" className="td-input" />
+      </label>
+    </div>
+  ),
+  quantity: () => (
+    <div className="form__row">
+      <label>
+        Poids (en tonnes)
+        <Field
+          component={NumberInput}
+          name="update.quantity"
+          className="td-input"
+        />
+      </label>
+    </div>
+  ),
+  packagingInfos: () => (
+    <div className="form__row">
+      <label>
+        Conditionnement(s)
+        <Field name="update.packagingInfos" component={Packagings} />
+      </label>
+    </div>
+  ),
+  sampleNumber: () => (
+    <div className="form__row">
+      <label>
+        Numéro d'échantillon
+        <Field name="update.sampleNumber" type="text" className="td-input" />
       </label>
     </div>
   ),
@@ -71,12 +108,23 @@ export function FormWasteTransportSummary({
                 : ""}
             </DataListDescription>
           ) : (
-            <DataListDescription>
-              {form.wasteDetails?.quantity}{" "}
-              {form.wasteDetails?.quantityType === QuantityType.Estimated
-                ? "(estimé)"
-                : ""}
-            </DataListDescription>
+            <>
+              <DataListDescription>
+                {form.wasteDetails?.quantity}{" "}
+                {form.wasteDetails?.quantityType === QuantityType.Estimated
+                  ? "(estimé)"
+                  : ""}
+              </DataListDescription>{" "}
+              {form.emitter?.type === "APPENDIX1_PRODUCER" && (
+                <button
+                  type="button"
+                  onClick={() => addField("quantity")}
+                  className="tw-ml-2"
+                >
+                  <IconPaperWrite color="blue" />
+                </button>
+              )}
+            </>
           )}
         </DataListItem>
         <DataListItem>
@@ -88,11 +136,23 @@ export function FormWasteTransportSummary({
                 .join(", ")}
             </DataListDescription>
           ) : (
-            <DataListDescription>
-              {form.wasteDetails?.packagingInfos
-                ?.map(packaging => `${packaging.quantity} ${packaging.type}`)
-                .join(", ")}
-            </DataListDescription>
+            <>
+              <DataListDescription>
+                {form.wasteDetails?.packagingInfos
+                  ?.map(packaging => `${packaging.quantity} ${packaging.type}`)
+                  .join(", ")}
+              </DataListDescription>
+
+              {form.emitter?.type === "APPENDIX1_PRODUCER" && (
+                <button
+                  type="button"
+                  onClick={() => addField("packagingInfos")}
+                  className="tw-ml-2"
+                >
+                  <IconPaperWrite color="blue" />
+                </button>
+              )}
+            </>
           )}
         </DataListItem>
         <DataListItem>
@@ -107,6 +167,24 @@ export function FormWasteTransportSummary({
             </DataListDescription>
           )}
         </DataListItem>
+        {form.emitter?.type === "APPENDIX1_PRODUCER" &&
+          SAMPLE_NUMBER_WASTE_CODES.includes(form.wasteDetails?.code) && (
+            <DataListItem>
+              <DataListTerm>Numéro d'échantillon</DataListTerm>
+
+              <DataListDescription>
+                {form.wasteDetails?.sampleNumber}
+
+                <button
+                  type="button"
+                  onClick={() => addField("sampleNumber")}
+                  className="tw-ml-2"
+                >
+                  <IconPaperWrite color="blue" />
+                </button>
+              </DataListDescription>
+            </DataListItem>
+          )}
         <DataListItem>
           <DataListTerm>Plaque d'immatriculation</DataListTerm>
           <DataListDescription>
