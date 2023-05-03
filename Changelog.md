@@ -41,6 +41,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :nail_care: Améliorations
 
 - Améliorations performances back-end, sur les révisions Bsda, Bsdd et l'authentification (dataloaders et requêtes SQL) [PR 2350](https://github.com/MTES-MCT/trackdechets/pull/2350)
+- Les éco-organismes peuvent gérer les révisions du BSDD [PR 2356](https://github.com/MTES-MCT/trackdechets/pull/2356)
 
 #### :memo: Documentation
 
