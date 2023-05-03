@@ -4,13 +4,14 @@
   - [Mise en route](#mise-en-route)
     - [Pré-requis](#pré-requis)
     - [Installation](#installation)
-    - [Installation alternative sans docker](#installation-alternative-sans-docker)
+    - [Installation alternative sans docker sur MacOS avec puce Apple](#installation-alternative-sans-docker-sur-macos-avec-puce-apple)
     - [Conventions](#conventions)
   - [Tests unitaires](#tests-unitaires)
   - [Tests d'intégration](#tests-dintégration)
   - [Créer une PR](#créer-une-pr)
   - [Déploiement](#déploiement)
   - [Migrations](#migrations)
+  - [Réindexation Elasticsearch des BSDs](#réindexation-elasticsearch-des-bsds)
   - [Guides](#guides)
     - [Mettre à jour le changelog](#mettre-à-jour-le-changelog)
     - [Mettre à jour la documentation](#mettre-à-jour-la-documentation)
@@ -20,10 +21,12 @@
     - [Créer un tampon de signature pour la génération PDF](#créer-un-tampon-de-signature-pour-la-génération-pdf)
     - [Nourrir la base de donnée avec des données par défaut](#nourrir-la-base-de-donnée-avec-des-données-par-défaut)
     - [Ajouter une nouvelle icône](#ajouter-une-nouvelle-icône)
-    - [Clef de signature token OpenID](#clefs-de-signature-token-openid)
+    - [Clefs de signature token OpenID](#clefs-de-signature-token-openid)
+    - [Reindexer un bordereau individuel](#reindexer-un-bordereau-individuel)
+    - [Réindexer un type de bordereau](#réindexer-un-type-de-bordereau)
   - [Dépannage](#dépannage)
     - [La base de donnée ne se crée pas](#la-base-de-donnée-ne-se-crée-pas)
-    - [Je n'arrive pas à (ré)indexer Elastic Search](#je-narrive-pas-à-réindexer-elastic-search)
+    - [Je n'arrive pas à (ré)indexer les BSDs sur Elastic Search](#je-narrive-pas-à-réindexer-les-bsds-sur-elastic-search)
 
 ## Mise en route
 
@@ -359,7 +362,7 @@ Attention, contrairement aux scripts SQL ces migrations ne sont pas jouées une 
 
 Toutes ces migrations sont jouées avec la commande `npm run update:dev`. (sans le suffixe `:dev` en production)
 
-## Réindexation Elasticsearch
+## Réindexation Elasticsearch des BSDs
 
 Depuis un one-off container de taille XL
 
@@ -527,7 +530,7 @@ Si la commande pour créer la base de données ne fonctionne pas (`npx prisma db
 - Enlevez complètement le paramètre schema:
   `DATABASE_URL=postgresql://username:password@postgres:5432/prisma`
 
-### Je n'arrive pas à (ré)indexer Elastic Search
+### Je n'arrive pas à (ré)indexer les BSDs sur Elastic Search
 
 Vous pouvez vérifier vos indexes Eslastic Search avec la commande suivante:
 

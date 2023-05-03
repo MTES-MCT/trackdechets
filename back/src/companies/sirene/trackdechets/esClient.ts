@@ -17,6 +17,11 @@ if (!!ssl && process.env.TD_COMPANY_ELASTICSEARCH_IGNORE_SSL === "true") {
   ssl.rejectUnauthorized = false;
 }
 
+/**
+ * Connect to an ElasticSearch server with
+ * an index "stocketablissement" created thanks to
+ * https://github.com/MTES-MCT/trackdechets-sirene-search
+ */
 const client = new Client({
   node: process.env.TD_COMPANY_ELASTICSEARCH_URL || "http://elasticsearch:9200",
   ssl
