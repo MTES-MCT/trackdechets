@@ -206,3 +206,5 @@ export function SignTransport({
     </SignBsda>
   );
 }
+
+export default React.memo(SignTransport);

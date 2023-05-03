@@ -254,4 +254,4 @@ function BsdCard({
   );
 }
 
-export default BsdCard;
+export default React.memo(BsdCard);
