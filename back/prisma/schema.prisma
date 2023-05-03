@@ -334,6 +334,7 @@ model Form {
   wasteDetailsParcelNumbers          Json                    @default("[]")
   wasteDetailsAnalysisReferences     String[]
   wasteDetailsLandIdentifiers        String[]
+  wasteDetailsSampleNumber           String?
   readableId                         String                  @unique
   status                             Status                  @default(DRAFT)
   emittedBy                          String?

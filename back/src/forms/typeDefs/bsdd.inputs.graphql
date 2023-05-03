@@ -630,6 +630,9 @@ input WasteDetailsInput {
 
   "Identifiant(s) du ou des terrains lorsque les terres ont été extraites d'un terrain placé en secteur d'information sur les sols au titre de l'article L. 125-6"
   landIdentifiers: [String!]
+
+  "Numéro d'échantillon pour les huiles noires. Ne concerne que les bordereaux parmi les codes suivants: 13 02 04*, 13 02 05*, 13 02 06*, 13 02 07*, 13 02 08*"
+  sampleNumber: String
 }
 
 """
