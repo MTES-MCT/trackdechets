@@ -836,10 +836,9 @@ const wasteDescriptionSchema: FactorySchemaOf<
       .string()
       .requiredIf(context.emissionSignature, "Le code déchet est obligatoire")
       .oneOf([...BSDA_WASTE_CODES, "", null], INVALID_WASTE_CODE),
-    wasteFamilyCode: yup.string().requiredIf(
-      context.emissionSignature,
-      "Le code famille est obligatoire"
-    ),
+    wasteFamilyCode: yup
+      .string()
+      .requiredIf(context.emissionSignature, "Le code famille est obligatoire"),
     wasteMaterialName: yup
       .string()
       .requiredIf(
