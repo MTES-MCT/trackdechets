@@ -1,10 +1,21 @@
 import React from "react";
-import { BsvhuStatus } from "generated/graphql/types";
+import { Bsvhu, BsvhuStatus } from "generated/graphql/types";
 import { SignEmission } from "dashboard/components/BSDList/BSVhu/WorkflowAction/SignEmission";
 import { SignTransport } from "dashboard/components/BSDList/BSVhu/WorkflowAction/SignTransport";
 import { SignOperation } from "dashboard/components/BSDList/BSVhu/WorkflowAction/SignOperation";
 
-const ActBsvhuValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
+interface ActBsvhuValidationProps {
+  bsd: Bsvhu;
+  currentSiret: string;
+  isOpen: boolean;
+  onClose: () => void;
+}
+const ActBsvhuValidation = ({
+  bsd,
+  currentSiret,
+  isOpen,
+  onClose,
+}: ActBsvhuValidationProps) => {
   const actionButtonAdapterProps = {
     isModalOpenFromParent: isOpen,
     onModalCloseFromParent: onClose,

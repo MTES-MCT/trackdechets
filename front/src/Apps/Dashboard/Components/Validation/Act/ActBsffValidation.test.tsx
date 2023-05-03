@@ -4,6 +4,7 @@ import { render } from "@testing-library/react";
 import { GET_BSFF_FORM } from "form/bsff/utils/queries";
 import React from "react";
 import ActBsffValidation from "./ActBsffValidation";
+import { Bsff } from "generated/graphql/types";
 
 describe("ActBsffValidation", () => {
   const onClose = jest.fn();
@@ -28,11 +29,12 @@ describe("ActBsffValidation", () => {
     },
   ];
 
+  const bsd = {
+    id: "1",
+    bsffStatus: "INITIAL",
+  } as unknown as Bsff;
+
   it("renders Initial modal", async () => {
-    const bsd = {
-      id: "1",
-      bsffStatus: "INITIAL",
-    };
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
         <ActBsffValidation bsd={bsd} isOpen onClose={onClose} />
@@ -43,13 +45,13 @@ describe("ActBsffValidation", () => {
   });
 
   it("renders SignedByEmitter modal", async () => {
-    const bsd = {
-      id: "1",
+    const signedByEmitterBsff = {
+      ...bsd,
       bsffStatus: "SIGNED_BY_EMITTER",
-    };
+    } as Bsff;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsffValidation bsd={bsd} isOpen onClose={onClose} />
+        <ActBsffValidation bsd={signedByEmitterBsff} isOpen onClose={onClose} />
       </MockedProvider>
     );
 
@@ -57,13 +59,10 @@ describe("ActBsffValidation", () => {
   });
 
   it("renders Sent modal", async () => {
-    const bsd = {
-      id: "1",
-      bsffStatus: "SENT",
-    };
+    const sentBsff = { ...bsd, bsffStatus: "SENT" } as Bsff;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsffValidation bsd={bsd} isOpen onClose={onClose} />
+        <ActBsffValidation bsd={sentBsff} isOpen onClose={onClose} />
       </MockedProvider>
     );
 
@@ -71,8 +70,8 @@ describe("ActBsffValidation", () => {
   });
 
   it("renders Received modal one packaging", async () => {
-    const bsd = {
-      id: "1",
+    const receivedBsff = {
+      ...bsd,
       bsffStatus: "RECEIVED",
       packagings: [
         {
@@ -80,10 +79,10 @@ describe("ActBsffValidation", () => {
           __typename: "BsffPackaging",
         },
       ],
-    };
+    } as unknown as Bsff;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsffValidation bsd={bsd} isOpen onClose={onClose} />
+        <ActBsffValidation bsd={receivedBsff} isOpen onClose={onClose} />
       </MockedProvider>
     );
 
@@ -91,8 +90,8 @@ describe("ActBsffValidation", () => {
   });
 
   it("renders Received modal multiple packaging", async () => {
-    const bsd = {
-      id: "1",
+    const receivedBsffMultiplePackaging = {
+      ...bsd,
       bsffStatus: "RECEIVED",
       packagings: [
         {
@@ -104,10 +103,14 @@ describe("ActBsffValidation", () => {
           __typename: "BsffPackaging",
         },
       ],
-    };
+    } as unknown as Bsff;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsffValidation bsd={bsd} isOpen onClose={onClose} />
+        <ActBsffValidation
+          bsd={receivedBsffMultiplePackaging}
+          isOpen
+          onClose={onClose}
+        />
       </MockedProvider>
     );
 
@@ -115,13 +118,10 @@ describe("ActBsffValidation", () => {
   });
 
   it("renders Accepted modal", async () => {
-    const bsd = {
-      id: "1",
-      bsffStatus: "ACCEPTED",
-    };
+    const acceptedBsff = { ...bsd, bsffStatus: "ACCEPTED" } as Bsff;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsffValidation bsd={bsd} isOpen onClose={onClose} />
+        <ActBsffValidation bsd={acceptedBsff} isOpen onClose={onClose} />
       </MockedProvider>
     );
 
@@ -129,13 +129,17 @@ describe("ActBsffValidation", () => {
   });
 
   it("renders PartiallyRefused modal", async () => {
-    const bsd = {
-      id: "1",
+    const partiallyRefusedBsff = {
+      ...bsd,
       bsffStatus: "PARTIALLY_REFUSED",
-    };
+    } as Bsff;
     render(
       <MockedProvider mocks={mocks} addTypename={false}>
-        <ActBsffValidation bsd={bsd} isOpen onClose={onClose} />
+        <ActBsffValidation
+          bsd={partiallyRefusedBsff}
+          isOpen
+          onClose={onClose}
+        />
       </MockedProvider>
     );
 

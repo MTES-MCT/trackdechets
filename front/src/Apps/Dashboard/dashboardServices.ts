@@ -153,8 +153,9 @@ const isGathering = (bsdWorkflowType: string | undefined): boolean =>
 const isReshipment = (bsdWorkflowType: string | undefined): boolean =>
   bsdWorkflowType === BsdaType.Reshipment;
 
-const isCollection_2710 = (bsdWorkflowType: string | undefined): boolean =>
-  bsdWorkflowType === BsdaType.Collection_2710;
+export const isCollection_2710 = (
+  bsdWorkflowType: string | undefined
+): boolean => bsdWorkflowType === BsdaType.Collection_2710;
 
 const hasTemporaryStorage = (currentSiret: string, bsd: BsdDisplay): boolean =>
   [
