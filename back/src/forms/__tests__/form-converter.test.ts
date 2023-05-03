@@ -158,7 +158,8 @@ describe("flattenFormInput", () => {
       wasteDetailsIsDangerous: false,
       wasteDetailsAnalysisReferences: [],
       wasteDetailsParcelNumbers: Prisma.JsonNull,
-      wasteDetailsLandIdentifiers: []
+      wasteDetailsLandIdentifiers: [],
+      wasteDetailsSampleNumber: null
     };
 
     expect(flattened).toEqual(expected);
@@ -183,7 +184,8 @@ describe("flattenFormInput", () => {
       wasteDetailsQuantityType: null,
       wasteDetailsParcelNumbers: Prisma.JsonNull,
       wasteDetailsAnalysisReferences: [],
-      wasteDetailsLandIdentifiers: []
+      wasteDetailsLandIdentifiers: [],
+      wasteDetailsSampleNumber: null
     });
   });
 

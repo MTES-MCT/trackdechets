@@ -118,7 +118,10 @@ const signedByTransporterFn = async (
           transporterNumberPlate: formUpdateInput.transporterNumberPlate,
           wasteDetailsPackagingInfos: sumPackagingInfos(
             wasteDetailsPackagingInfos
-          )
+          ),
+          wasteDetailsQuantity: appendix1Forms
+            .map(form => form.wasteDetailsQuantity ?? 0)
+            .reduce((sum, quantity) => sum + quantity, 0)
         }
       );
     }

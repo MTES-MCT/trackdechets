@@ -5,6 +5,7 @@ import {
   FormStatus,
   QuantityType,
   SignTransportFormInput,
+  WasteDetailsInput,
 } from "generated/graphql/types";
 import {
   DataList,
@@ -20,8 +21,13 @@ interface FormWasteTransportSummaryProps {
   form: Form;
 }
 
-type FormValues = Pick<SignTransportFormInput, "transporterNumberPlate">;
-type FormKeys = keyof FormValues;
+type FormValues = Pick<SignTransportFormInput, "transporterNumberPlate"> & {
+  update: Pick<
+    WasteDetailsInput,
+    "quantity" | "packagingInfos" | "sampleNumber"
+  >;
+};
+type FormKeys = "transporterNumberPlate" | keyof FormValues["update"];
 
 const SAMPLE_NUMBER_WASTE_CODES = [
   "13 02 04*",
@@ -168,7 +174,8 @@ export function FormWasteTransportSummary({
           )}
         </DataListItem>
         {form.emitter?.type === "APPENDIX1_PRODUCER" &&
-          SAMPLE_NUMBER_WASTE_CODES.includes(form.wasteDetails?.code) && (
+          form.wasteDetails?.code &&
+          SAMPLE_NUMBER_WASTE_CODES.includes(form.wasteDetails.code) && (
             <DataListItem>
               <DataListTerm>Numéro d'échantillon</DataListTerm>
 

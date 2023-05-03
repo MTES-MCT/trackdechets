@@ -196,7 +196,7 @@ export async function checkCanUpdate(
     authorizedOrgIds = formContributors(fullForm);
   } else if (
     form.emitterType === EmitterType.APPENDIX1_PRODUCER &&
-    ["DRAFT", "SEALED", "SIGNED_BY_PRODUCER"].includes(form.status)
+    ["SIGNED_BY_PRODUCER"].includes(form.status)
   ) {
     authorizedOrgIds = [form.transporterCompanySiret].filter(Boolean);
   } else if (
