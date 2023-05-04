@@ -20,7 +20,7 @@ import QRCodeIcon from "react-qr-code";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
 import { bsffVerboseStatuses } from "form/bsff/utils/constants";
-import { DateRow, DetailRow } from "../common/Components";
+import { DateRow, DetailRow, YesNoRow } from "../common/Components";
 
 import styles from "../common/BSDDetailContent.module.scss";
 import { generatePath, Link, useParams } from "react-router-dom";
@@ -316,6 +316,10 @@ function Transporter({ form }: { form: Bsff }) {
         <Company label="Raison sociale" company={form.transporter?.company} />
       </div>
       <div className={styles.detailGrid}>
+        <YesNoRow
+          value={!form?.transporter?.recepisse}
+          label="Exemption de récépissé"
+        />
         <DetailRow
           value={form.transporter?.recepisse?.number}
           label="Numéro de récépissé"

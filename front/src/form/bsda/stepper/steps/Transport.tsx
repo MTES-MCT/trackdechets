@@ -7,6 +7,7 @@ import DateInput from "form/common/components/custom-inputs/DateInput";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 type Props = { disabled: boolean };
+
 export function Transport({ disabled }: Props) {
   return (
     <>

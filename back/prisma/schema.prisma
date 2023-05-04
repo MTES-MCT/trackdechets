@@ -102,6 +102,7 @@ enum TransportMode {
   AIR
   RIVER
   SEA
+  OTHER
 }
 
 enum UserRole {
@@ -852,6 +853,7 @@ model Bsvhu {
   transporterRecepisseNumber          String?
   transporterRecepisseDepartment      String?
   transporterRecepisseValidityLimit   DateTime? @db.Timestamptz(6)
+  transporterRecepisseIsExempted      Boolean?
   transporterTransportTakenOverAt     DateTime? @db.Timestamptz(6)
   transporterTransportPlates          String[]
   transporterTransportSignatureAuthor String?
@@ -962,6 +964,7 @@ model Bsdasri {
   transporterRecepisseNumber          String?
   transporterRecepisseDepartment      String?
   transporterRecepisseValidityLimit   DateTime?               @db.Timestamptz(6)
+  transporterRecepisseIsExempted      Boolean?
   transporterCustomInfo               String? // free field
   // transport
   transporterTransportMode            TransportMode?          @default(ROAD)
