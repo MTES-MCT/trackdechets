@@ -11,7 +11,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
-- Il est désormais possible d'éditer le nom ou le numéro de téléphone indépendamment sur la page de profil
+- Il est à nouveau possible d'éditer le nom ou le numéro de téléphone indépendamment sur la page de profil [PR 2367](https://github.com/MTES-MCT/trackdechets/pull/2367)
 
 #### :boom: Breaking changes
 
