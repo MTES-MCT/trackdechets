@@ -19,16 +19,23 @@ export async function editProfileFn(
   payload: MutationEditProfileArgs
 ) {
   const editProfileSchema = yup.object({
-    name: yup.string().isSafeSSTI(),
+    name: yup
+      .string()
+      .test(
+        "empty",
+        "The name cannot be an empty string",
+        name => name?.length !== 0
+      )
+      .isSafeSSTI(),
     phone: yup.string()
   });
   editProfileSchema.validateSync(payload);
 
   const { name, phone } = payload;
 
-  const data: { name?: string; phone?: string } = {
-    ...(name !== undefined ? { name: name as string } : {}),
-    ...(phone !== undefined ? { phone: phone as string } : {})
+  const data: { name?: string; phone?: string | null } = {
+    ...(name != null ? { name } : {}),
+    ...(phone !== undefined ? { phone } : {})
   };
 
   const updatedUser = await prisma.user.update({
