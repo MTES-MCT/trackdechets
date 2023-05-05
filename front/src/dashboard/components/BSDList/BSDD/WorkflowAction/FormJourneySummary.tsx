@@ -63,7 +63,9 @@ export function FormJourneySummary({ form }: FormJourneySummaryProps) {
           </JourneyStopDescription>
         )}
         {formTransportIsPipeline(form) && (
-          <JourneyStopDescription>Par pipeline</JourneyStopDescription>
+          <JourneyStopDescription>
+            Conditionné pour Pipeline
+          </JourneyStopDescription>
         )}
       </JourneyStop>
       {form.temporaryStorageDetail && (
