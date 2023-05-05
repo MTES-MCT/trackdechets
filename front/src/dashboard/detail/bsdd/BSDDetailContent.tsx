@@ -879,7 +879,10 @@ export default function BSDDetailContent({
                 </>
               ) : (
                 <div className={`${styles.detailGrid} `}>
-                  <DetailRow value="par pipeline" label="Transport" />
+                  <DetailRow
+                    value="Conditionné pour Pipeline"
+                    label="Transport"
+                  />
                 </div>
               )}
             </TabPanel>
