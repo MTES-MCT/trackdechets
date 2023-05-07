@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useMutation, gql } from "@apollo/client";
 import { Field, Form as FormikForm, Formik } from "formik";
-import { string, object, date, boolean, StringSchema } from "yup";
+import { string, object, date, boolean } from "yup";
 import cogoToast from "cogo-toast";
 import {
   CompanySearchPrivate,
@@ -164,6 +164,7 @@ export default function EditSegment({ siret, segment }: Props) {
                     id="id_numberPlate"
                     className="td-input"
                   />
+                  <RedErrorMessage name="transporter.numberPlate" />
                 </div>
                 <h4 className="form__section-heading">Transporteur</h4>
                 {!segment.readyToTakeOver ? (
@@ -186,6 +187,7 @@ export default function EditSegment({ siret, segment }: Props) {
                           name="transporter.company.contact"
                           placeholder="NOM Prénom"
                         />
+                        <RedErrorMessage name="transporter.company.contact" />
                       </label>
 
                       <label>
@@ -195,12 +197,14 @@ export default function EditSegment({ siret, segment }: Props) {
                           name="transporter.company.phone"
                           placeholder="Numéro"
                         />
+                        <RedErrorMessage name="transporter.company.phone" />
                       </label>
 
                       <label>
                         Mail
                         <Field type="email" name="transporter.company.mail" />
                       </label>
+                      <RedErrorMessage name="transporter.company.mail" />
                     </div>
                   </>
                 )}

@@ -2,7 +2,6 @@ import { useMutation, gql } from "@apollo/client";
 import cogoToast from "cogo-toast";
 import { Field, Form as FormikForm, Formik } from "formik";
 import React, { useState } from "react";
-import * as yup from "yup";
 import {
   Mutation,
   MutationPrepareSegmentArgs,
@@ -16,7 +15,7 @@ import { NotificationError } from "common/components/Error";
 import { IconBusTransfer } from "common/components/Icons";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { WorkflowActionProps } from "../WorkflowAction";
-import TdSwitch, { FieldSwitch } from "common/components/Switch";
+import TdSwitch from "common/components/Switch";
 import { GET_BSDS, GET_DETAIL_FORM } from "common/queries";
 import {
   Loader,
