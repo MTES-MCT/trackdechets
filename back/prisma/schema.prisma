@@ -438,6 +438,8 @@ model Form {
   @@index([createdAt], map: "_FormCreatedAtIdx")
   @@index([wasteDetailsCode], map: "_FormWasteDetailsCodeIdx")
   @@index([customId], map: "_FormCustomIdIdx")
+  @@index([currentTransporterOrgId], map: "_FormCurrentTransporterOrgIdIdx")
+  @@index([nextTransporterOrgId], map: "_FormNextTransporterOrgIdIdx")
 }
 
 model FormGroupement {

@@ -19,3 +19,7 @@ ALTER TABLE "default$default"."Form"
 
 ALTER TABLE "default$default"."Form"
     DROP COLUMN "currentTransporterSiret";
+
+
+CREATE INDEX IF NOT EXISTS "_FormCurrentTransporterOrgIdIdx" ON "default$default"."Form"("currentTransporterOrgId");
+CREATE INDEX IF NOT EXISTS "_FormNextTransporterOrgIdIdx" ON "default$default"."Form"("nextTransporterOrgId");
