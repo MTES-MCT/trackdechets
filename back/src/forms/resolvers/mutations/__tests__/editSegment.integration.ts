@@ -27,14 +27,14 @@ describe("{ mutation { editSegment } }", () => {
       }
     );
 
-    const transporterSiret = company.siret;
+    const transporterOrgId = company.orgId;
     // create a form whose first transporter is another one
     const form = await formFactory({
       ownerId: owner.id,
       opt: {
-        transporterCompanySiret: transporterSiret,
+        transporterCompanySiret: transporterOrgId,
         status: "SENT",
-        currentTransporterSiret: transporterSiret
+        currentTransporterOrgId: transporterOrgId
       }
     });
     // there is already one segment
@@ -47,7 +47,7 @@ describe("{ mutation { editSegment } }", () => {
     const editSegmentSiret = siretify(2);
     await mutate(
       `mutation  {
-            editSegment(id:"${segment.id}", siret:"${transporterSiret}", nextSegmentInfo: {
+            editSegment(id:"${segment.id}", siret:"${transporterOrgId}", nextSegmentInfo: {
                 transporter: {
                   company: {
                     siret: "${editSegmentSiret}"
@@ -77,14 +77,14 @@ describe("{ mutation { editSegment } }", () => {
       }
     );
 
-    const transporterSiret = company.siret;
+    const transporterOrgId = company.orgId;
     // create a form whose first transporter is another one
     const form = await formFactory({
       ownerId: firstTransporter.id,
       opt: {
-        transporterCompanySiret: transporterSiret,
+        transporterCompanySiret: transporterOrgId,
         status: "SENT",
-        currentTransporterSiret: transporterSiret
+        currentTransporterOrgId: transporterOrgId
       }
     });
     // there is already one segment
@@ -97,7 +97,7 @@ describe("{ mutation { editSegment } }", () => {
     const editSegmentSiret = siretify(3);
     await mutate(
       `mutation  {
-            editSegment(id:"${segment.id}", siret:"${transporterSiret}",   nextSegmentInfo: {
+            editSegment(id:"${segment.id}", siret:"${transporterOrgId}",   nextSegmentInfo: {
                 transporter: {
                   company: {
                     siret: "${editSegmentSiret}"
@@ -130,14 +130,13 @@ describe("{ mutation { editSegment } }", () => {
       });
 
     const firstTransporterSiret = firstTransporterCompany.siret;
-    const secondTransporterSiret = secondTransporterCompany.siret;
     // create a form whose first transporter is another one
     const form = await formFactory({
       ownerId: firstTransporter.id,
       opt: {
         transporterCompanySiret: firstTransporterSiret,
         status: "SENT",
-        currentTransporterSiret: firstTransporterSiret
+        currentTransporterOrgId: firstTransporterSiret
       }
     });
     // there is already one readyToTakeOver segment
@@ -152,7 +151,7 @@ describe("{ mutation { editSegment } }", () => {
     const { mutate } = makeClient(secondTransporter);
     await mutate(
       `mutation  {
-            editSegment(id:"${segment.id}", siret:"${secondTransporterSiret}", nextSegmentInfo: {
+            editSegment(id:"${segment.id}", siret:"${secondTransporterCompany.orgId}", nextSegmentInfo: {
                 transporter: {
                   company: {
                     contact: "José Lannister"

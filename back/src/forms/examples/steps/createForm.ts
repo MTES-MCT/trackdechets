@@ -30,11 +30,14 @@ export function createForm(
   };
 }
 
-export function createFormMultiModal(company: string): WorkflowStep {
+export function createFormMultiModal(
+  company: string,
+  fixtures = defaultFixtures
+): WorkflowStep {
   return {
     ...createForm(company),
     variables: ({ transporteur1, producteur, traiteur }) =>
-      createForm(company).variables({
+      createForm(company, fixtures).variables({
         transporteur: transporteur1,
         producteur,
         traiteur

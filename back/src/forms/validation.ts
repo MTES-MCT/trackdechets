@@ -67,6 +67,7 @@ import {
   MISSING_COMPANY_SIRET_OR_VAT,
   MISSING_PROCESSING_OPERATION
 } from "./errors";
+import { format, sub } from "date-fns";
 // set yup default error messages
 configureYup();
 
@@ -1589,6 +1590,27 @@ export async function validateAppendix1Groupement(
     };
   });
 
+  // Once one of the appendix has been signed by the transporter,
+  // you have 3 days maximum to add new appendix
+  const currentDate = new Date();
+  const firstTransporterSignatureDate = initialForms.reduce((date, form) => {
+    const { takenOverAt } = form;
+    return takenOverAt && takenOverAt < date ? takenOverAt : date;
+  }, currentDate);
+  const limitDate = sub(currentDate, {
+    days: 2,
+    hours: currentDate.getHours(),
+    minutes: currentDate.getMinutes()
+  });
+  if (firstTransporterSignatureDate < limitDate) {
+    throw new UserInputError(
+      `Impossible d'ajouter une annexe 1. Un bordereau de tournée ne peut être utilisé que durant 3 jours consécutifs à partir du moment où la première collecte (transporteur) est signée. La première collecte a été réalisée le ${format(
+        firstTransporterSignatureDate,
+        "dd/MM/yyyy"
+      )}`
+    );
+  }
+
   return formFractions;
 }
 
@@ -1610,7 +1632,7 @@ export async function checkForClosedCompanies(formId: string) {
     emitterCompanySiret: [form.emitterCompanySiret],
     brokerCompanySiret: [form.brokerCompanySiret],
     traderCompanySiret: [form.traderCompanySiret],
-    nextTransporterSiret: [form.nextTransporterSiret]
+    nextTransporterOrgId: [form.nextTransporterOrgId]
   };
   // We request in parallel only by type in order not to overload Sirene search server
   for (const siretType in allSirets) {

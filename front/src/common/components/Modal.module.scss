@@ -4,7 +4,14 @@
 .tdModalOverlay {
   z-index: 999;
   position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.5);
+  overflow: auto;
 }
+
 .tdModal {
   position: relative;
   border-radius: $common-radius;
@@ -15,14 +22,17 @@
   min-width: 50vw;
   z-index: 1000;
   padding: 0;
+  margin: 10vh auto;
 
   @include desktop {
     width: 50vw;
   }
 }
+
 .tdModalPadding {
   padding: 2rem;
 }
+
 .tdModalWide {
   @include desktop {
     width: 90vw;

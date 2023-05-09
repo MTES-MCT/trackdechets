@@ -78,7 +78,8 @@ describe("expandFormFromDb", () => {
         isDangerous: true,
         analysisReferences: [],
         landIdentifiers: [],
-        parcelNumbers: []
+        parcelNumbers: [],
+        sampleNumber: null
       },
       trader: null,
       broker: null,
@@ -108,8 +109,8 @@ describe("expandFormFromDb", () => {
       processedAt: null,
       noTraceability: null,
       nextDestination: null,
-      currentTransporterSiret: null,
-      nextTransporterSiret: null,
+      currentTransporterOrgId: null,
+      nextTransporterOrgId: null,
       temporaryStorageDetail: null
     });
   });
