@@ -19,7 +19,7 @@ import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { NON_CANCELLABLE_BSDD_STATUSES } from "../../resolvers/mutations/createFormRevisionRequest";
 import { ForbiddenError } from "apollo-server-core";
 import buildRemoveAppendix2 from "../form/removeAppendix2";
-import { deduplicate } from "../../../common/arrays";
+import { distinct } from "../../../common/arrays";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
@@ -32,7 +32,7 @@ export type AcceptRevisionRequestApprovalFn = (
  * We have to handle eco organismes which might be present on bsdd:
  * Retrieve form
  * Get producer sirets: emitter + eco-organisme if present
- * If we have both, 2 pending approvals were egerated, one is already accepted
+ * If we have both, 2 pending approvals were generated, one is already accepted
  * Update the remaining approval to automatically accept it
  */
 const handleEcoOrganismeApprovals = async (
@@ -46,7 +46,7 @@ const handleEcoOrganismeApprovals = async (
   });
   const approverSiret = updatedApproval.approverSiret;
 
-  const producerSirets = deduplicate(
+  const producerSirets = distinct(
     [bsd?.emitterCompanySiret, bsd?.ecoOrganismeSiret].filter(Boolean)
   );
   if (producerSirets.length > 1 && producerSirets.includes(approverSiret)) {

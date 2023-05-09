@@ -25,7 +25,7 @@ import { expandBsffFromElastic } from "../../../bsffs/converter";
 import { bsdSearchSchema } from "../../validation";
 import { toElasticQuery } from "../../where";
 import { Permission, can, getUserRoles } from "../../../permissions";
-import { deduplicate } from "../../../common/arrays";
+import { distinct } from "../../../common/arrays";
 
 // complete Typescript example:
 // https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/6.x/_a_complete_example.html
@@ -258,7 +258,7 @@ async function buildDasris(dasris: Bsdasri[]) {
     .map(bsd => bsd.emitterCompanySiret)
     .filter(Boolean);
 
-  const uniqueSirets = deduplicate(emitterSirets);
+  const uniqueSirets = distinct(emitterSirets);
 
   // build an array of sirets allowing direct takeover
   const allows = (

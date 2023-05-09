@@ -7,7 +7,7 @@ import {
   clearCaptchaToken
 } from "../common/redis/captcha";
 import path from "path";
-import { deduplicate } from "../common/arrays";
+import { distinct } from "../common/arrays";
 
 const CAPTCHA_LENGTH = 5;
 
@@ -180,7 +180,7 @@ export async function captchaSound(captchaToken, res) {
   }
 
   const captchaArray = captchaString.toLowerCase().split("");
-  const letters = deduplicate(captchaArray);
+  const letters = distinct(captchaArray);
 
   const audio: string[] = [];
   const playList: number[] = [];
