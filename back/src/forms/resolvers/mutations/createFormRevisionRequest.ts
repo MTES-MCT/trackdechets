@@ -140,6 +140,7 @@ async function getAuthoringCompany(
     ![
       bsdd.emitterCompanySiret,
       bsdd.recipientCompanySiret,
+      bsdd.ecoOrganismeSiret,
       forwardedIn?.recipientCompanySiret
     ].includes(authoringCompanySiret)
   ) {
@@ -265,8 +266,16 @@ async function getApproversSirets(
   authoringCompanySiret: string,
   user: Express.User
 ) {
-  const approvers = [
+  // do not include emitter and ecoOrg sirets if authoring company is one of them
+  const authoringCompanyIsEmitterOrEcoOrg = [
     bsdd.emitterCompanySiret,
+    bsdd.ecoOrganismeSiret
+  ].includes(authoringCompanySiret);
+
+  const approvers = [
+    ...(authoringCompanyIsEmitterOrEcoOrg
+      ? []
+      : [bsdd.emitterCompanySiret, bsdd.ecoOrganismeSiret]),
     bsdd.traderCompanySiret,
     bsdd.recipientCompanySiret
   ].filter(Boolean);

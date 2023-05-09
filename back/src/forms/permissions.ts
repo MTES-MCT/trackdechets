@@ -472,6 +472,7 @@ export async function checkCanRequestRevision(user: User, form: Form) {
   const authorizedOrgIds = [
     fullForm.emitterCompanySiret,
     fullForm.recipientCompanySiret,
+    fullForm.ecoOrganismeSiret,
     fullForm.forwardedIn?.recipientCompanySiret
   ].filter(Boolean);
 
