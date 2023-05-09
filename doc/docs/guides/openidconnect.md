@@ -9,8 +9,6 @@ Avant de pouvoir implémenter le procotole OpenID Connect, vous aurez besoin d'u
 L'activation d'OpenID Connect sur une application doit être demandée au support.
 :::
 
-Une [application de test](https://github.com/MTES-MCT/trackdechets-openidconnect-demo) (client/RP) est disponible.
-
 Le [protocole Open ID Connect](https://openid.net/specs/openid-connect-core-1_0.html) permet à des logiciels tiers ("client") de construire un mécanisme d'authentification en considérant l'identité d'un utilisateur de Trackdéchets comme une ressource.
 
 ```

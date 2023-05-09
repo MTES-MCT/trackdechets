@@ -103,6 +103,8 @@ export default function MarkAsAccepted({ form }: WorkflowActionProps) {
             </div>
           );
         }
+
+        return <></>;
       }}
     />
   );

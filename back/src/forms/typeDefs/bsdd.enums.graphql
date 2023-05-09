@@ -110,7 +110,7 @@ enum Packagings {
   "Benne"
   BENNE
 
-  "Pipeline"
+  "Conditionné pour pipeline"
   PIPELINE
 
   "Autre"

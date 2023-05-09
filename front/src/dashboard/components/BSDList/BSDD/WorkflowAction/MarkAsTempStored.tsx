@@ -57,6 +57,8 @@ export default function MarkAsTempStored({ form }: WorkflowActionProps) {
               />
             );
           }
+
+          return <></>;
         }}
       />
     </div>

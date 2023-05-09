@@ -6,7 +6,14 @@ const editSegmentResolver: MutationResolvers["editSegment"] = (
   args,
   context
 ) => {
-  return editSegment(args, context);
+  return editSegment(
+    {
+      id: args.id,
+      orgId: args.siret,
+      nextSegmentInfo: args.nextSegmentInfo
+    },
+    context
+  );
 };
 
 export default editSegmentResolver;

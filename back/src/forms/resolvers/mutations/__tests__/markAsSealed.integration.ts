@@ -1350,7 +1350,7 @@ describe("Mutation.markAsSealed", () => {
           case form.emitterCompanySiret:
           case form.brokerCompanySiret:
           case form.traderCompanySiret:
-          case form.nextTransporterSiret:
+          case form.nextTransporterOrgId:
           case form.recipientCompanySiret: {
             if (siret === company.siret) {
               return Promise.resolve({

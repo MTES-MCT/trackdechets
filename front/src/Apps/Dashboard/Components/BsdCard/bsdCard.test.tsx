@@ -663,8 +663,8 @@ describe("Bsd card primary action label", () => {
         },
         temporaryStorageDetail: null,
         transportSegments: [],
-        currentTransporterSiret: null,
-        nextTransporterSiret: null,
+        currentTransporterOrgId: null,
+        nextTransporterOrgId: null,
         __typename: "Form",
       } as unknown as Form;
       const { queryByTestId } = render(
@@ -782,13 +782,13 @@ describe("Bsd card primary action label", () => {
           {
             id: "ckyef9g3a2924349syhsqc1wa",
             readyToTakeOver: false,
-            previousTransporterCompanySiret: "13001045700013",
+            previousTransporterCompanyOrgId: "13001045700013",
             takenOverAt: null,
             __typename: "TransportSegment",
           },
         ],
-        currentTransporterSiret: "13001045700013",
-        nextTransporterSiret: "13001045700013",
+        currentTransporterOrgId: "13001045700013",
+        nextTransporterOrgId: "13001045700013",
         __typename: "Form",
       } as unknown as Form;
       render(
@@ -980,8 +980,8 @@ describe("Bsd card primary action label", () => {
         },
         temporaryStorageDetail: null,
         transportSegments: [],
-        currentTransporterSiret: "",
-        nextTransporterSiret: null,
+        currentTransporterOrgId: "",
+        nextTransporterOrgId: null,
         __typename: "Form",
       } as unknown as Form;
 

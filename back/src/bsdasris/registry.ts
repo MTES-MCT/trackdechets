@@ -116,8 +116,8 @@ export function toIncomingWaste(
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
+    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
     emitterPickupsiteAddress: buildAddress([
-      bsdasri.emitterPickupSiteName,
       bsdasri.emitterPickupSiteAddress,
       bsdasri.emitterPickupSitePostalCode,
       bsdasri.emitterPickupSiteCity
@@ -176,8 +176,8 @@ export function toOutgoingWaste(
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
+    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
     emitterPickupsiteAddress: buildAddress([
-      bsdasri.emitterPickupSiteName,
       bsdasri.emitterPickupSiteAddress,
       bsdasri.emitterPickupSitePostalCode,
       bsdasri.emitterPickupSiteCity
@@ -239,8 +239,8 @@ export function toTransportedWaste(
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
+    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
     emitterPickupsiteAddress: buildAddress([
-      bsdasri.emitterPickupSiteName,
       bsdasri.emitterPickupSiteAddress,
       bsdasri.emitterPickupSitePostalCode,
       bsdasri.emitterPickupSiteCity
@@ -304,8 +304,8 @@ export function toManagedWaste(
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
+    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
     emitterPickupsiteAddress: buildAddress([
-      bsdasri.emitterPickupSiteName,
       bsdasri.emitterPickupSiteAddress,
       bsdasri.emitterPickupSitePostalCode,
       bsdasri.emitterPickupSiteCity
@@ -362,8 +362,8 @@ export function toAllWaste(
     emitterCompanyAddress: bsdasri.emitterCompanyAddress,
     emitterCompanyName: bsdasri.emitterCompanyName,
     emitterCompanySiret: bsdasri.emitterCompanySiret,
+    emitterPickupsiteName: bsdasri.emitterPickupSiteName,
     emitterPickupsiteAddress: buildAddress([
-      bsdasri.emitterPickupSiteName,
       bsdasri.emitterPickupSiteAddress,
       bsdasri.emitterPickupSitePostalCode,
       bsdasri.emitterPickupSiteCity

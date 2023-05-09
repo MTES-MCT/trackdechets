@@ -7,10 +7,11 @@ import {
   EmitterType,
   Mutation,
   MutationSignTransportFormArgs,
+  MutationUpdateFormArgs,
   Query,
   QueryFormArgs,
 } from "generated/graphql/types";
-import { GET_FORM } from "form/bsdd/utils/queries";
+import { GET_FORM, UPDATE_FORM } from "form/bsdd/utils/queries";
 import { Loader, RedErrorMessage } from "common/components";
 import {
   InlineError,
@@ -99,6 +100,11 @@ function SignTransportFormModalContent({
     },
   });
 
+  const [updateForm] = useMutation<
+    Pick<Mutation, "updateForm">,
+    MutationUpdateFormArgs
+  >(UPDATE_FORM);
+
   if (formLoading) return <Loader />;
   if (formError) return <InlineError apolloError={formError} />;
   if (!data?.form) {
@@ -120,10 +126,39 @@ function SignTransportFormModalContent({
           securityCode: "",
           transporterNumberPlate:
             form.stateSummary?.transporterNumberPlate ?? "",
+          update: {
+            quantity: 0,
+            sampleNumber: "",
+            packagingInfos: [],
+          },
         }}
         validationSchema={validationSchema}
         onSubmit={async values => {
           try {
+            const { update } = values;
+            if (
+              update.quantity ||
+              update.sampleNumber ||
+              update.packagingInfos.length > 0
+            ) {
+              await updateForm({
+                variables: {
+                  updateFormInput: {
+                    id: form.id,
+                    wasteDetails: {
+                      ...(update.quantity && { quantity: update.quantity }),
+                      ...(update.sampleNumber && {
+                        sampleNumber: update.sampleNumber,
+                      }),
+                      ...(update.packagingInfos.length > 0 && {
+                        packagingInfos: update.packagingInfos,
+                      }),
+                    },
+                  },
+                },
+              });
+            }
+
             await signTransportForm({
               variables: {
                 id: form.id,

@@ -98,8 +98,8 @@ export default function CompanySelector({
 
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
-    (field.value?.country && field.value?.country !== "FR") ||
-      isForeignVat(field.value?.vatNumber!!)
+    (field.value.country && field.value.country !== "FR") ||
+      isForeignVat(field.value.vatNumber!)
   );
   // this 2 input ref are to cross-link the value of the input in both search input and department input
   const departmentInputRef = useRef<HTMLInputElement>(null);
@@ -169,8 +169,8 @@ export default function CompanySelector({
     skip: !orgId,
   });
 
-  function isUnknownCompanyName(company: CompanySearchResult): boolean {
-    return company.name === "---" || company.name === "";
+  function isUnknownCompanyName(companyName?: string): boolean {
+    return companyName === "---" || companyName === "";
   }
 
   /**
@@ -193,7 +193,7 @@ export default function CompanySelector({
 
     // Assure la mise à jour des variables d'etat d'affichage des sous-parties du Form
     setDisplayForeignCompanyWithUnknownInfos(
-      isForeignVat(company.vatNumber!!) && isUnknownCompanyName(company)
+      isForeignVat(company.vatNumber!!) && isUnknownCompanyName(company.name!)
     );
 
     setIsForeignCompany(isForeignVat(company.vatNumber!!));
@@ -202,7 +202,8 @@ export default function CompanySelector({
       orgId: company.orgId,
       siret: company.siret,
       vatNumber: company.vatNumber,
-      name: company.name && !isUnknownCompanyName(company) ? company.name : "",
+      name:
+        company.name && !isUnknownCompanyName(company.name) ? company.name : "",
       address: company.address ?? "",
       contact: company.contact ?? "",
       phone: company.contactPhone ?? "",

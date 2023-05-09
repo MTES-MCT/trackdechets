@@ -5,7 +5,7 @@ import { FullForm } from "./types";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 
 /**
- * Computes which SIRET should appear on which tab in the frontend
+ * Computes which SIRET or VAT number should appear on which tab in the frontend
  * (Brouillon, Pour Action, Suivi, Archives, À collecter, Collecté)
  */
 
@@ -39,8 +39,11 @@ export function getSiretsByTab(form: FullForm): Pick<BsdElastic, WhereKeys> {
   // Instead we rely on field names and segments ids
   const multimodalTransportersBySegmentId = form.transportSegments?.reduce(
     (acc, segment) => {
-      if (!!segment.transporterCompanySiret) {
-        return { ...acc, [`${segment.id}`]: segment.transporterCompanySiret };
+      if (!!getTransporterCompanyOrgId(segment)) {
+        return {
+          ...acc,
+          [`${segment.id}`]: getTransporterCompanyOrgId(segment)
+        };
       }
       return acc;
     },
