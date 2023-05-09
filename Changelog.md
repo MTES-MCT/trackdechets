@@ -21,6 +21,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
+- Déplacemement trackdechets/search vers son propre dépôt git [PR 2363](https://github.com/MTES-MCT/trackdechets/pull/2363)
+
 # [2023.4.2] 24/04/2023
 
 #### :rocket: Nouvelles fonctionnalités
