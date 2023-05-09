@@ -78,7 +78,8 @@ describe("expandFormFromDb", () => {
         isDangerous: true,
         analysisReferences: [],
         landIdentifiers: [],
-        parcelNumbers: []
+        parcelNumbers: [],
+        sampleNumber: null
       },
       trader: null,
       broker: null,

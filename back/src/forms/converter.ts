@@ -124,7 +124,8 @@ function flattenWasteDetailsInput(input: {
     wasteDetailsLandIdentifiers: undefinedOrDefault(
       chain(input.wasteDetails, w => undefinedOrDefault(w.landIdentifiers, [])),
       []
-    )
+    ),
+    wasteDetailsSampleNumber: chain(input.wasteDetails, w => w.sampleNumber)
   };
 }
 
@@ -614,7 +615,8 @@ export async function expandFormFromDb(
       isDangerous: form.wasteDetailsIsDangerous,
       parcelNumbers: form.wasteDetailsParcelNumbers as ParcelNumber[],
       analysisReferences: form.wasteDetailsAnalysisReferences,
-      landIdentifiers: form.wasteDetailsLandIdentifiers
+      landIdentifiers: form.wasteDetailsLandIdentifiers,
+      sampleNumber: form.wasteDetailsSampleNumber
     }),
     trader: nullIfNoValues<Trader>({
       company: nullIfNoValues<FormCompany>({
