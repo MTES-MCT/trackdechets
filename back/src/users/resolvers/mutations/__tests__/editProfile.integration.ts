@@ -6,10 +6,9 @@ import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
 
 const EDIT_PROFILE = `
-  mutation EditProfile($name: String!, $phone: String){
+  mutation EditProfile($name: String, $phone: String){
     editProfile(name: $name, phone: $phone){
       name
-      email
       phone
     }
   }
@@ -28,6 +27,84 @@ describe("mutation editProfile", () => {
     });
     expect(updatedUser.name).toEqual(name);
     expect(updatedUser.phone).toEqual(phone);
+  });
+
+  it("should be able to edit only the phone number", async () => {
+    // Given
+    const user = await userFactory();
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const newPhone = "01234567891";
+
+    // When
+    await mutate(EDIT_PROFILE, { variables: { phone: newPhone } });
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id }
+    });
+
+    // Then
+    expect(updatedUser.name).toEqual(user.name);
+    expect(updatedUser.phone).toEqual(newPhone);
+  });
+
+  it("should be able to edit only the name", async () => {
+    // Given
+    const user = await userFactory();
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const newName = "New Name";
+
+    // When
+    await mutate(EDIT_PROFILE, { variables: { name: newName } });
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id }
+    });
+
+    // Then
+    expect(updatedUser.name).toEqual(newName);
+    expect(updatedUser.phone).toEqual(user.phone);
+  });
+
+  it("should not be able to empty the name", async () => {
+    // Given
+    const user = await userFactory();
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const newName = "";
+
+    // When
+    const { errors } = await mutate(EDIT_PROFILE, {
+      variables: { name: newName }
+    });
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id }
+    });
+
+    // Then
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: `The name cannot be an empty string`,
+        extensions: expect.objectContaining({
+          code: ErrorCode.BAD_USER_INPUT
+        })
+      })
+    ]);
+    expect(updatedUser.name).toEqual(user.name);
+    expect(updatedUser.phone).toEqual(user.phone);
+  });
+
+  it("should be able to empty the phone number", async () => {
+    // Given
+    const user = await userFactory();
+    const { mutate } = makeClient({ ...user, auth: AuthType.Session });
+    const newPhone = "";
+
+    // When
+    await mutate(EDIT_PROFILE, { variables: { phone: newPhone } });
+    const updatedUser = await prisma.user.findUniqueOrThrow({
+      where: { id: user.id }
+    });
+
+    // Then
+    expect(updatedUser.name).toEqual(user.name);
+    expect(updatedUser.phone).toEqual(newPhone);
   });
 
   it("should fail to edit profile when name payload contains unsafe chars", async () => {

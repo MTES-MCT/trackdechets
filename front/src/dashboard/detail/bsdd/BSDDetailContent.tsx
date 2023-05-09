@@ -110,8 +110,8 @@ const TransportSegmentDetail = ({ segment, siret }: SegmentProps) => {
       </div>
       {!segment.readyToTakeOver &&
         [
-          segment.transporter?.company?.siret,
-          segment.previousTransporterCompanySiret,
+          segment.transporter?.company?.orgId,
+          segment.previousTransporterCompanyOrgId,
         ].includes(siret) && <EditSegment segment={segment} siret={siret} />}
     </>
   );
@@ -879,7 +879,10 @@ export default function BSDDetailContent({
                 </>
               ) : (
                 <div className={`${styles.detailGrid} `}>
-                  <DetailRow value="par pipeline" label="Transport" />
+                  <DetailRow
+                    value="Conditionné pour Pipeline"
+                    label="Transport"
+                  />
                 </div>
               )}
             </TabPanel>

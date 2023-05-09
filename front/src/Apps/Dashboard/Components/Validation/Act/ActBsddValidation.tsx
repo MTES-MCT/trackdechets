@@ -315,7 +315,7 @@ const ActBsddValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
     const transportSegments = bsd.transportSegments ?? [];
     const lastSegment = transportSegments[transportSegments.length - 1];
 
-    if (bsd.currentTransporterSiret === currentSiret) {
+    if (bsd.currentTransporterOrgId === currentSiret) {
       if (
         // there are no segments yet, current transporter can create one
         lastSegment === null ||
@@ -329,14 +329,14 @@ const ActBsddValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
         // the last segment is still a draft
         !lastSegment.readyToTakeOver &&
         // that was created by the current user
-        lastSegment.previousTransporterCompanySiret === currentSiret
+        lastSegment.previousTransporterCompanyOrgId === currentSiret
       ) {
         return <MarkSegmentAsReadyToTakeOver form={bsd} siret={currentSiret} />;
       }
     }
 
     if (
-      bsd.nextTransporterSiret === currentSiret &&
+      bsd.nextTransporterOrgId === currentSiret &&
       lastSegment.readyToTakeOver
     ) {
       return <TakeOverSegment form={bsd} siret={currentSiret} />;

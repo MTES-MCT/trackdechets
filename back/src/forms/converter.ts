@@ -472,6 +472,9 @@ export function flattenTransportSegmentInput(
     transporterCompanySiret: chain(segmentInput.transporter, t =>
       chain(t.company, c => c.siret)
     ),
+    transporterCompanyVatNumber: chain(segmentInput.transporter, t =>
+      chain(t.company, c => c.vatNumber)
+    ),
     transporterCompanyName: chain(segmentInput.transporter, t =>
       chain(t.company, c => c.name)
     ),
@@ -711,8 +714,8 @@ export async function expandFormFromDb(
             mail: form.nextDestinationCompanyMail
           })
         }),
-    currentTransporterSiret: form.currentTransporterSiret,
-    nextTransporterSiret: form.nextTransporterSiret,
+    currentTransporterOrgId: form.currentTransporterOrgId,
+    nextTransporterOrgId: form.nextTransporterOrgId,
     intermediaries: [],
     temporaryStorageDetail: forwardedIn
       ? {
@@ -846,11 +849,15 @@ export function expandTransportSegmentFromDb(
 ): GraphQLTransportSegment {
   return {
     id: segment.id,
-    previousTransporterCompanySiret: segment.previousTransporterCompanySiret,
+    previousTransporterCompanyOrgId: segment.previousTransporterCompanyOrgId,
     transporter: nullIfNoValues({
       company: nullIfNoValues({
         name: segment.transporterCompanyName,
         siret: segment.transporterCompanySiret,
+        orgId: segment.transporterCompanySiret?.length
+          ? segment.transporterCompanySiret
+          : segment.transporterCompanyVatNumber,
+        vatNumber: segment.transporterCompanyVatNumber,
         address: segment.transporterCompanyAddress,
         contact: segment.transporterCompanyContact,
         phone: segment.transporterCompanyPhone,

@@ -308,12 +308,12 @@ describe("ActBsddValidation", () => {
     const bsd = {
       id: "1",
       status: "SENT",
-      currentTransporterSiret: "12345678901234",
+      currentTransporterOrgId: "12345678901234",
       transportSegments: [
         {
           id: "ckyef9g3a2924349syhsqc1wa",
           readyToTakeOver: false,
-          previousTransporterCompanySiret: "12345678901234",
+          previousTransporterCompanyOrgId: "12345678901234",
           takenOverAt: null,
           __typename: "TransportSegment",
         },
@@ -342,11 +342,11 @@ describe("ActBsddValidation", () => {
     const bsd = {
       id: "1",
       status: "SENT",
-      currentTransporterSiret: "12345678901234",
+      currentTransporterOrgId: "12345678901234",
       transportSegments: [
         {
           id: "ckyef9g3a2924349syhsqc1wa",
-          previousTransporterCompanySiret: "12345678901234",
+          previousTransporterCompanyOrgId: "12345678901234",
           takenOverAt: "2023-03-17",
           __typename: "TransportSegment",
         },
@@ -377,12 +377,12 @@ describe("ActBsddValidation", () => {
     const bsd = {
       id: "1",
       status: "SENT",
-      currentTransporterSiret: "12345678901234",
-      nextTransporterSiret: "12345678901234",
+      currentTransporterOrgId: "12345678901234",
+      nextTransporterOrgId: "12345678901234",
       transportSegments: [
         {
           id: "ckyef9g3a2924349syhsqc1wa",
-          previousTransporterCompanySiret: "12345678901234",
+          previousTransporterCompanyOrgId: "12345678901234",
           takenOverAt: null,
           readyToTakeOver: true,
           __typename: "TransportSegment",

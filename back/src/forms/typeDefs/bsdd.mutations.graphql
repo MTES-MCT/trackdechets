@@ -188,7 +188,7 @@ type Mutation {
   """
   importPaperForm(input: ImportPaperFormInput!): Form!
 
-  "Prépare un nouveau segment de transport multimodal"
+  "Prépare un nouveau segment de transport multimodal (Siret ou TVA pour les transporteurs étrangers seulement)"
   prepareSegment(
     id: ID!
     siret: String!

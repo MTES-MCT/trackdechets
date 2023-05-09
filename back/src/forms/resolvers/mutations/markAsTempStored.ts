@@ -40,7 +40,7 @@ const markAsTempStoredResolver: MutationResolvers["markAsTempStored"] = async (
     ...tmpStoredInfos,
     // quantity type can be estimated in case of temporary storage
     quantityReceivedType: quantityType,
-    currentTransporterSiret: "",
+    currentTransporterOrgId: "",
     ...(tmpStoredInfos.wasteAcceptationStatus &&
     ["ACCEPTED", "PARTIALLY_REFUSED"].includes(
       tmpStoredInfos.wasteAcceptationStatus

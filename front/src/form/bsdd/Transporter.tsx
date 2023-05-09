@@ -4,8 +4,6 @@ import { FieldTransportModeSelect } from "common/components";
 import CompanySelector from "form/common/components/company/CompanySelector";
 import { Field, useFormikContext } from "formik";
 import {
-  FormInput,
-  Packagings,
   Transporter as TransporterType,
   WasteDetailsInput,
 } from "generated/graphql/types";
@@ -18,7 +16,6 @@ type Values = {
   transporter: TransporterType;
   wasteDetails: WasteDetailsInput;
 };
-type FormValues = Pick<FormInput, "wasteDetails" | "transporter">;
 
 export default function Transporter() {
   const { setFieldValue, values } = useFormikContext<Values>();
