@@ -11,6 +11,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- Un utilisateur appartenant à plusieurs entreprises sur un BSDA n'accepte/refuse une révision qu'une seule fois [2343](https://github.com/MTES-MCT/trackdechets/pull/2343)
 - Il est à nouveau possible d'éditer le nom ou le numéro de téléphone indépendamment sur la page de profil [PR 2367](https://github.com/MTES-MCT/trackdechets/pull/2367)
 
 #### :boom: Breaking changes
