@@ -125,7 +125,8 @@ describe("ActivityEvent.Bsda", () => {
           waste: {
             code: "06 07 01*",
             consistence: "SOLIDE",
-            materialName: "Amiante"
+            materialName: "Amiante",
+            familyCode: "Code famille"
           }
         }
       }
@@ -302,7 +303,8 @@ describe("ActivityEvent.Bsda", () => {
           waste: {
             code: "06 07 01*",
             consistence: "SOLIDE",
-            materialName: "Amiante"
+            materialName: "Amiante",
+            familyCode: "Code famille"
           }
         }
       }
