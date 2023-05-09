@@ -5,6 +5,22 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.5.1] 16/05/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+#### :bug: Corrections de bugs
+
+- Il est à nouveau possible d'éditer le nom ou le numéro de téléphone indépendamment sur la page de profil [PR 2367](https://github.com/MTES-MCT/trackdechets/pull/2367)
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2023.4.2] 24/04/2023
 
 #### :rocket: Nouvelles fonctionnalités

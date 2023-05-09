@@ -33,7 +33,7 @@ type Mutation {
   USAGE INTERNE
   Met à jour les informations de l'utilisateur
   """
-  editProfile(name: String!, phone: String): User!
+  editProfile(name: String, phone: String): User!
 
   """
   USAGE INTERNE

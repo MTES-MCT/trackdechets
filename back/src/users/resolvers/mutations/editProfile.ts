@@ -19,15 +19,22 @@ export async function editProfileFn(
   payload: MutationEditProfileArgs
 ) {
   const editProfileSchema = yup.object({
-    name: yup.string().required().isSafeSSTI(),
+    name: yup
+      .string()
+      .test(
+        "empty",
+        "The name cannot be an empty string",
+        name => name?.length !== 0
+      )
+      .isSafeSSTI(),
     phone: yup.string()
   });
   editProfileSchema.validateSync(payload);
 
   const { name, phone } = payload;
 
-  const data = {
-    ...(name !== undefined ? { name } : {}),
+  const data: { name?: string; phone?: string | null } = {
+    ...(name != null ? { name } : {}),
     ...(phone !== undefined ? { phone } : {})
   };
 
