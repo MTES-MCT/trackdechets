@@ -163,14 +163,16 @@ export const isOmi = (clue: string | null | undefined): boolean => {
   return clue.match(/^OMI[0-9]{7}$/gim) !== null;
 };
 
+export type PartialTransporterCompany = {
+  transporterCompanySiret: string | null;
+  transporterCompanyVatNumber: string | null;
+};
+
 /**
  * Works with any BSD in order to provide a default orgId
  */
 export const getTransporterCompanyOrgId = (
-  form: {
-    transporterCompanySiret: string | null;
-    transporterCompanyVatNumber: string | null;
-  } | null
+  form: PartialTransporterCompany | null
 ): string | null => {
   if (!form) return null;
   return form.transporterCompanySiret?.length

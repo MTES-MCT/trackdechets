@@ -180,6 +180,7 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
           { label: "Citerne", value: "CITERNE" },
           { label: "GRV", value: "GRV" },
           { label: "Fûts", value: "FUT" },
+          { label: "Conditionnné pour Pipeline", value: "PIPELINE" },
           { label: getOtherPackagingLabel(packagingInfos), value: "AUTRE" }
         ].map((packagingType, index) => (
           <tr key={index}>

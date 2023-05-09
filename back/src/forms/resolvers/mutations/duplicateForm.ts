@@ -71,6 +71,7 @@ function getDuplicateFormInput(user: User, form: Form): Prisma.FormCreateInput {
     wasteDetailsLandIdentifiers: form.wasteDetailsLandIdentifiers,
     wasteDetailsName: form.wasteDetailsName,
     wasteDetailsConsistence: form.wasteDetailsConsistence,
+    wasteDetailsSampleNumber: form.wasteDetailsSampleNumber,
     traderCompanyName: form.traderCompanyName,
     traderCompanySiret: form.traderCompanySiret,
     traderCompanyAddress: form.traderCompanyAddress,

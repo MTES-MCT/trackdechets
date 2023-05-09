@@ -102,6 +102,7 @@ enum TransportMode {
   AIR
   RIVER
   SEA
+  OTHER
 }
 
 enum UserRole {
@@ -333,6 +334,7 @@ model Form {
   wasteDetailsParcelNumbers          Json                    @default("[]")
   wasteDetailsAnalysisReferences     String[]
   wasteDetailsLandIdentifiers        String[]
+  wasteDetailsSampleNumber           String?
   readableId                         String                  @unique
   status                             Status                  @default(DRAFT)
   emittedBy                          String?
@@ -396,8 +398,8 @@ model Form {
   transporterCustomInfo              String?
   recipientIsTempStorage             Boolean?                @default(false)
   signedAt                           DateTime?               @db.Timestamptz(6)
-  currentTransporterSiret            String?
-  nextTransporterSiret               String?
+  currentTransporterOrgId            String?
+  nextTransporterOrgId               String?
   isImportedFromPaper                Boolean                 @default(false)
   ecoOrganismeName                   String?
   ecoOrganismeSiret                  String?
@@ -437,6 +439,8 @@ model Form {
   @@index([createdAt], map: "_FormCreatedAtIdx")
   @@index([wasteDetailsCode], map: "_FormWasteDetailsCodeIdx")
   @@index([customId], map: "_FormCustomIdIdx")
+  @@index([currentTransporterOrgId], map: "_FormCurrentTransporterOrgIdIdx")
+  @@index([nextTransporterOrgId], map: "_FormNextTransporterOrgIdIdx")
 }
 
 model FormGroupement {
@@ -683,6 +687,7 @@ model TransportSegment {
   id                              String         @id @default(cuid())
   segmentNumber                   Int?
   transporterCompanySiret         String?
+  transporterCompanyVatNumber     String?
   transporterCompanyName          String?
   transporterCompanyAddress       String?
   transporterCompanyContact       String?
@@ -695,7 +700,7 @@ model TransportSegment {
   transporterNumberPlate          String?
   mode                            TransportMode?
   readyToTakeOver                 Boolean?       @default(false)
-  previousTransporterCompanySiret String?
+  previousTransporterCompanyOrgId String?
   takenOverAt                     DateTime?      @db.Timestamptz(6)
   takenOverBy                     String?
   createdAt                       DateTime       @default(now()) @db.Timestamptz(6)
@@ -705,6 +710,8 @@ model TransportSegment {
 
   @@index([formId], map: "_TransportSegmentFormIdIdx")
   @@index([transporterCompanySiret], map: "_TransportSegmentTransporterCompanySiretIdx")
+  @@index([transporterCompanyVatNumber], map: "_TransportSegmentTransporterCompanyVatNumberIdx")
+
 }
 
 model User {

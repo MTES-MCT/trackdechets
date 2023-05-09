@@ -124,9 +124,9 @@ export function toIncomingWaste(
     emitterCompanySiret: bsda.emitterCompanySiret,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     ...initialEmitter,
+    emitterPickupsiteName: bsda.emitterPickupSiteName,
     emitterPickupsiteAddress: buildAddress(
       [
-        bsda.emitterPickupSiteName,
         bsda.emitterPickupSiteAddress,
         bsda.emitterPickupSitePostalCode,
         bsda.emitterPickupSiteCity
@@ -194,9 +194,9 @@ export function toOutgoingWaste(
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
     emitterCompanyAddress: bsda.emitterCompanyAddress,
+    emitterPickupsiteName: bsda.emitterPickupSiteName,
     emitterPickupsiteAddress: buildAddress(
       [
-        bsda.emitterPickupSiteName,
         bsda.emitterPickupSiteAddress,
         bsda.emitterPickupSitePostalCode,
         bsda.emitterPickupSiteCity
@@ -268,9 +268,9 @@ export function toTransportedWaste(
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
+    emitterPickupsiteName: bsda.emitterPickupSiteName,
     emitterPickupsiteAddress: buildAddress(
       [
-        bsda.emitterPickupSiteName,
         bsda.emitterPickupSiteAddress,
         bsda.emitterPickupSitePostalCode,
         bsda.emitterPickupSiteCity
@@ -340,9 +340,9 @@ export function toManagedWaste(
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
+    emitterPickupsiteName: bsda.emitterPickupSiteName,
     emitterPickupsiteAddress: buildAddress(
       [
-        bsda.emitterPickupSiteName,
         bsda.emitterPickupSiteAddress,
         bsda.emitterPickupSitePostalCode,
         bsda.emitterPickupSiteCity
@@ -411,9 +411,9 @@ export function toAllWaste(
     emitterCompanyAddress: bsda.emitterCompanyAddress,
     emitterCompanyName: bsda.emitterCompanyName,
     emitterCompanySiret: bsda.emitterCompanySiret,
+    emitterPickupsiteName: bsda.emitterPickupSiteName,
     emitterPickupsiteAddress: buildAddress(
       [
-        bsda.emitterPickupSiteName,
         bsda.emitterPickupSiteAddress,
         bsda.emitterPickupSitePostalCode,
         bsda.emitterPickupSiteCity

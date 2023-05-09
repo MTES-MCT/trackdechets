@@ -3,7 +3,8 @@ import {
   Form,
   Form as PrismaForm,
   Prisma,
-  TransportSegment as PrismaTransportSegment
+  TransportSegment as PrismaTransportSegment,
+  TransportMode
 } from "@prisma/client";
 import DataLoader from "dataloader";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
@@ -123,7 +124,8 @@ function flattenWasteDetailsInput(input: {
     wasteDetailsLandIdentifiers: undefinedOrDefault(
       chain(input.wasteDetails, w => undefinedOrDefault(w.landIdentifiers, [])),
       []
-    )
+    ),
+    wasteDetailsSampleNumber: chain(input.wasteDetails, w => w.sampleNumber)
   };
 }
 
@@ -471,6 +473,9 @@ export function flattenTransportSegmentInput(
     transporterCompanySiret: chain(segmentInput.transporter, t =>
       chain(t.company, c => c.siret)
     ),
+    transporterCompanyVatNumber: chain(segmentInput.transporter, t =>
+      chain(t.company, c => c.vatNumber)
+    ),
     transporterCompanyName: chain(segmentInput.transporter, t =>
       chain(t.company, c => c.name)
     ),
@@ -588,7 +593,11 @@ export async function expandFormFromDb(
       customInfo: form.transporterCustomInfo,
       // transportMode has default value in DB but we do not want to return anything
       // if the transporter siret is not defined
-      mode: form.transporterCompanySiret ? form.transporterTransportMode : null
+      mode:
+        !form.transporterCompanySiret &&
+        form.transporterTransportMode === TransportMode.ROAD
+          ? null
+          : form.transporterTransportMode
     }),
     wasteDetails: nullIfNoValues<WasteDetails>({
       code: form.wasteDetailsCode,
@@ -606,7 +615,8 @@ export async function expandFormFromDb(
       isDangerous: form.wasteDetailsIsDangerous,
       parcelNumbers: form.wasteDetailsParcelNumbers as ParcelNumber[],
       analysisReferences: form.wasteDetailsAnalysisReferences,
-      landIdentifiers: form.wasteDetailsLandIdentifiers
+      landIdentifiers: form.wasteDetailsLandIdentifiers,
+      sampleNumber: form.wasteDetailsSampleNumber
     }),
     trader: nullIfNoValues<Trader>({
       company: nullIfNoValues<FormCompany>({
@@ -706,8 +716,8 @@ export async function expandFormFromDb(
             mail: form.nextDestinationCompanyMail
           })
         }),
-    currentTransporterSiret: form.currentTransporterSiret,
-    nextTransporterSiret: form.nextTransporterSiret,
+    currentTransporterOrgId: form.currentTransporterOrgId,
+    nextTransporterOrgId: form.nextTransporterOrgId,
     intermediaries: [],
     temporaryStorageDetail: forwardedIn
       ? {
@@ -767,9 +777,11 @@ export async function expandFormFromDb(
             customInfo: forwardedIn.transporterCustomInfo,
             // transportMode has default value in DB but we do not want to return anything
             // if the transporter siret is not defined
-            mode: forwardedIn.transporterCompanySiret
-              ? forwardedIn.transporterTransportMode
-              : null
+            mode:
+              !forwardedIn.transporterCompanySiret &&
+              forwardedIn.transporterTransportMode === TransportMode.ROAD
+                ? null
+                : forwardedIn.transporterTransportMode
           }),
           emittedAt: processDate(forwardedIn.emittedAt),
           emittedBy: forwardedIn.emittedBy,
@@ -839,11 +851,15 @@ export function expandTransportSegmentFromDb(
 ): GraphQLTransportSegment {
   return {
     id: segment.id,
-    previousTransporterCompanySiret: segment.previousTransporterCompanySiret,
+    previousTransporterCompanyOrgId: segment.previousTransporterCompanyOrgId,
     transporter: nullIfNoValues({
       company: nullIfNoValues({
         name: segment.transporterCompanyName,
         siret: segment.transporterCompanySiret,
+        orgId: segment.transporterCompanySiret?.length
+          ? segment.transporterCompanySiret
+          : segment.transporterCompanyVatNumber,
+        vatNumber: segment.transporterCompanyVatNumber,
         address: segment.transporterCompanyAddress,
         contact: segment.transporterCompanyContact,
         phone: segment.transporterCompanyPhone,

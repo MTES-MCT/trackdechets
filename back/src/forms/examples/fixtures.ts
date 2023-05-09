@@ -53,7 +53,7 @@ function transporter2CompanyInput(siret: string) {
 const receiptInput = {
   receipt: "12379",
   department: "07",
-  validityLimit: "2020-06-30",
+  validityLimit: "2020-06-30T00:00:00.000",
   numberPlate: "AD-007-TS"
 };
 

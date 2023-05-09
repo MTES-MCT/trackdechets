@@ -3,6 +3,7 @@ import testWorkflow from "../../../__tests__/testWorkflow";
 import acheminementDirectWorkflow from "../workflows/acheminementDirect";
 import acheminementDirectTransporterEtrangerWorkflow from "../workflows/acheminementDirectTransporteurEtranger";
 import multiModalWorkflow from "../workflows/multiModal";
+import multiModalTransporteurEtranger from "../workflows/multiModalTransporteurEtranger";
 import entreposageProvisoireWorkflow from "../workflows/entreposageProvisoire";
 import entreposageProvisoireTransporterEtrangerWorkflow from "../workflows/entreposageProvisoireTransporteurEtranger";
 import importBsdPapier from "../workflows/importBsdPapier";
@@ -65,6 +66,14 @@ describe("Exemples de circuit du bordereau de suivi des déchets dangereux", () 
     multiModalWorkflow.title,
     async () => {
       await testWorkflow(multiModalWorkflow);
+    },
+    60000
+  );
+
+  it(
+    multiModalTransporteurEtranger.title,
+    async () => {
+      await testWorkflow(multiModalTransporteurEtranger);
     },
     60000
   );

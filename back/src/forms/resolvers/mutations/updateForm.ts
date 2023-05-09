@@ -1,4 +1,4 @@
-import { EmitterType, Prisma } from "@prisma/client";
+import { EmitterType, Prisma, TransportMode } from "@prisma/client";
 import { isDangerous, BSDD_WASTE_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -17,6 +17,7 @@ import {
 import { getFormRepository } from "../../repository";
 import {
   draftFormSchema,
+  hasPipeline,
   sealedFormSchema,
   validateGroupement
 } from "../../validation";
@@ -74,7 +75,21 @@ const updateFormResolver = async (
 
   const form = flattenFormInput(formContent);
   const futureForm = { ...existingForm, ...form };
-
+  // Pipeline erases transporter EXCEPT for transporterTransportMode
+  if (hasPipeline(form as any)) {
+    Object.keys(form)
+      .filter(key => key.startsWith("transporter"))
+      .forEach(key => {
+        form[key] = null;
+      });
+    form.transporterTransportMode = TransportMode.OTHER;
+    // update futureForm  only for yup validation
+    Object.keys(futureForm)
+      .filter(key => key.startsWith("transporter"))
+      .forEach(key => {
+        futureForm[key] = null;
+      });
+  }
   // Construct form update payload
   // This bit is a bit confusing. We are NOT in strict mode, so Yup doesnt complain if we pass unknown values.
   // To remove those unknown values, we cast the object. This makes sure our input has a shape that fits our validator

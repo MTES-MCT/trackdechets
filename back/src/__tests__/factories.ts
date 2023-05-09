@@ -43,7 +43,7 @@ export const userFactory = async (
  * @param index numerical index
  */
 export function siretify(index: number | undefined) {
-  if (!index || index > 9) {
+  if (!index || typeof index !== "number" || index > 9) {
     return faker.helpers.replaceCreditCardSymbols(
       Math.floor(Number(crypto.randomBytes(1))) + "############L"
     );
