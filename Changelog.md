@@ -11,6 +11,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :bug: Corrections de bugs
 
+- L'adresse du pickupSite d'un DASRI apparaît dans le PDF, même si l'utilisateur ne renseigne pas de nom [PR 2360](https://github.com/MTES-MCT/trackdechets/pull/2360)
 - Un utilisateur appartenant à plusieurs entreprises sur un BSDA n'accepte/refuse une révision qu'une seule fois [2343](https://github.com/MTES-MCT/trackdechets/pull/2343)
 - Il est à nouveau possible d'éditer le nom ou le numéro de téléphone indépendamment sur la page de profil [PR 2367](https://github.com/MTES-MCT/trackdechets/pull/2367)
 
@@ -23,6 +24,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 #### :house: Interne
 
 - Déplacemement trackdechets/search vers son propre dépôt git [PR 2363](https://github.com/MTES-MCT/trackdechets/pull/2363)
+
 
 # [2023.4.2] 24/04/2023
 
