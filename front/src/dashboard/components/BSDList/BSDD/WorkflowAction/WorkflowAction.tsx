@@ -25,6 +25,7 @@ export interface WorkflowActionProps {
 }
 
 export function WorkflowAction(props: WorkflowActionProps) {
+  // siret prop contains either SIRET or a VAT number
   const { form, siret } = props;
   const isActTab = !!useRouteMatch(routes.dashboard.bsds.act);
 
@@ -93,7 +94,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       const transportSegments = form.transportSegments ?? [];
       const lastSegment = transportSegments[transportSegments.length - 1];
 
-      if (form.currentTransporterSiret === siret) {
+      if (form.currentTransporterOrgId === siret) {
         if (
           // there are no segments yet, current transporter can create one
           lastSegment == null ||
@@ -107,13 +108,13 @@ export function WorkflowAction(props: WorkflowActionProps) {
           // the last segment is still a draft
           !lastSegment.readyToTakeOver &&
           // that was created by the current user
-          lastSegment.previousTransporterCompanySiret === siret
+          lastSegment.previousTransporterCompanyOrgId === siret
         ) {
           return <MarkSegmentAsReadyToTakeOver {...props} />;
         }
       }
 
-      if (form.nextTransporterSiret === siret && lastSegment.readyToTakeOver) {
+      if (form.nextTransporterOrgId === siret && lastSegment.readyToTakeOver) {
         return <TakeOverSegment {...props} />;
       }
 

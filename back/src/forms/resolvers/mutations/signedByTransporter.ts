@@ -152,7 +152,7 @@ const signedByTransporterResolver: MutationResolvers["signedByTransporter"] =
       takenOverBy: user.name,
 
       ...wasteDetails,
-      currentTransporterSiret: getTransporterCompanyOrgId(form)
+      currentTransporterOrgId: getTransporterCompanyOrgId(form)
     };
 
     const sentForm = await formRepository.update(

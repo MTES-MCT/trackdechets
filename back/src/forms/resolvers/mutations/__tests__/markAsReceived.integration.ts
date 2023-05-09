@@ -55,7 +55,7 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: siretify(3) }
+      data: { currentTransporterOrgId: siretify(3) }
     });
     await prepareRedis({
       emitterCompany,
@@ -81,8 +81,8 @@ describe("Test Form reception", () => {
     expect(frm.receivedBy).toBe("Bill");
     expect(frm.quantityReceived).toBe(null);
 
-    // when form is received, we clean up currentTransporterSiret
-    expect(frm.currentTransporterSiret).toEqual("");
+    // when form is received, we clean up currentTransporterOrgId
+    expect(frm.currentTransporterOrgId).toEqual("");
 
     // A StatusLog object is created
     const logs = await prisma.statusLog.findMany({
@@ -101,7 +101,7 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: siretify(3) }
+      data: { currentTransporterOrgId: siretify(3) }
     });
     await prepareRedis({
       emitterCompany,
@@ -139,7 +139,7 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: siretify(3) }
+      data: { currentTransporterOrgId: siretify(3) }
     });
     await prepareRedis({
       emitterCompany,
@@ -168,8 +168,8 @@ describe("Test Form reception", () => {
     expect(frm.receivedBy).toBe("Bill");
     expect(frm.quantityReceived).toBe(11);
 
-    // when form is received, we clean up currentTransporterSiret
-    expect(frm.currentTransporterSiret).toEqual("");
+    // when form is received, we clean up currentTransporterOrgId
+    expect(frm.currentTransporterOrgId).toEqual("");
 
     // A StatusLog object is created
     const logs = await prisma.statusLog.findMany({
@@ -458,7 +458,7 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: siretify(3) }
+      data: { currentTransporterOrgId: siretify(3) }
     });
 
     // a taken over segment
@@ -498,8 +498,8 @@ describe("Test Form reception", () => {
     expect(frm.receivedBy).toBe("Bill");
     expect(frm.quantityReceived).toBe(11);
 
-    // when form is received, we clean up currentTransporterSiret
-    expect(frm.currentTransporterSiret).toEqual("");
+    // when form is received, we clean up currentTransporterOrgId
+    expect(frm.currentTransporterOrgId).toEqual("");
 
     // A StatusLog object is created
     const logs = await prisma.statusLog.findMany({
@@ -518,7 +518,7 @@ describe("Test Form reception", () => {
     } = await prepareDB();
     const form = await prisma.form.update({
       where: { id: initialForm.id },
-      data: { currentTransporterSiret: siretify(3) }
+      data: { currentTransporterOrgId: siretify(3) }
     });
 
     // a taken over segment
@@ -564,8 +564,8 @@ describe("Test Form reception", () => {
 
     expect(frm.status).toBe("ACCEPTED");
 
-    // currentTransporterSiret was cleaned up
-    expect(frm.currentTransporterSiret).toEqual("");
+    // currentTransporterOrgId was cleaned up
+    expect(frm.currentTransporterOrgId).toEqual("");
 
     const deleted = await prisma.transportSegment.findFirst({
       where: { id: staleSegment.id }

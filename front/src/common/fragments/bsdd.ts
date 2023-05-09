@@ -159,6 +159,7 @@ export const segmentFragment = gql`
       receipt
       company {
         siret
+        vatNumber
         orgId
         name
         address
@@ -170,7 +171,7 @@ export const segmentFragment = gql`
     mode
     takenOverAt
     takenOverBy
-    previousTransporterCompanySiret
+    previousTransporterCompanyOrgId
     segmentNumber
   }
 `;
@@ -291,8 +292,8 @@ const mutableFieldsFragment = gql`
     temporaryStorageDetail {
       ...TemporaryStorageDetailFragment
     }
-    currentTransporterSiret
-    nextTransporterSiret
+    currentTransporterOrgId
+    nextTransporterOrgId
     transportSegments {
       ...Segment
     }
@@ -323,8 +324,8 @@ export const transporterFormFragment = gql`
   fragment TransporterFormFragment on Form {
     ...MutableFieldsFragment
     ...StaticFieldsFragment
-    currentTransporterSiret
-    nextTransporterSiret
+    currentTransporterOrgId
+    nextTransporterOrgId
     transportSegments {
       ...Segment
     }
@@ -509,10 +510,10 @@ export const dashboardFormFragment = gql`
     transportSegments {
       id
       readyToTakeOver
-      previousTransporterCompanySiret
+      previousTransporterCompanyOrgId
       takenOverAt
     }
-    currentTransporterSiret
-    nextTransporterSiret
+    currentTransporterOrgId
+    nextTransporterOrgId
   }
 `;

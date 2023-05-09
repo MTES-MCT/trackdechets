@@ -108,8 +108,8 @@ describe("expandFormFromDb", () => {
       processedAt: null,
       noTraceability: null,
       nextDestination: null,
-      currentTransporterSiret: null,
-      nextTransporterSiret: null,
+      currentTransporterOrgId: null,
+      nextTransporterOrgId: null,
       temporaryStorageDetail: null
     });
   });

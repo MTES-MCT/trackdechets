@@ -1,11 +1,10 @@
 import { ForbiddenError, UserInputError } from "apollo-server-express";
-import * as Yup from "yup";
+import * as yup from "yup";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
-  MutationEditSegmentArgs,
   MutationMarkSegmentAsReadyToTakeOverArgs,
-  MutationPrepareSegmentArgs,
   MutationTakeOverSegmentArgs,
+  NextSegmentInfoInput,
   TransportSegment
 } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
@@ -18,6 +17,25 @@ import { getFormRepository } from "../../repository";
 import prisma from "../../../prisma";
 import { sirenifyTransportSegmentInput } from "../../sirenify";
 import { checkUserPermissions, Permission } from "../../../permissions";
+import {
+  PartialTransporterCompany,
+  getTransporterCompanyOrgId,
+  isForeignVat
+} from "../../../common/constants/companySearchHelpers";
+import {
+  MISSING_COMPANY_ADDRESS,
+  MISSING_COMPANY_CONTACT,
+  MISSING_COMPANY_EMAIL,
+  MISSING_COMPANY_PHONE,
+  MISSING_COMPANY_SIRET_OR_VAT
+} from "../../errors";
+import {
+  foreignVatNumber,
+  siret,
+  siretConditions,
+  siretTests,
+  vatNumberTests
+} from "../../../common/validation";
 
 const SEGMENT_NOT_FOUND = "Le segment de transport n'a pas été trouvé";
 const FORM_NOT_FOUND_OR_NOT_ALLOWED =
@@ -28,50 +46,59 @@ const SEGMENT_ALREADY_SEALED = "Ce segment de transport est déjà scellé";
 const SEGMENTS_ALREADY_PREPARED =
   "Il y a d'autres segments après le vôtre, vous ne pouvez pas ajouter de segment";
 
-const MISSING_COMPANY_SIRET =
-  "Le siret est obligatoire. Les entreprises étrangères ne sont pas supportées pour le moment.";
-
-const segmentSchema = Yup.object<any>().shape({
-  // id: Yup.string().label("Identifiant (id)").required(),
-  mode: Yup.string().label("Mode de transport").required(),
-  transporterCompanySiret: Yup.string()
-    .label("Siret du transporteur")
-    .required("La sélection d'une entreprise est obligatoire"),
-  transporterCompanyAddress: Yup.string().required(),
-  transporterCompanyContact: Yup.string().required(
-    "Le contact dans l'entreprise est obligatoire"
-  ),
-  transporterCompanyPhone: Yup.string().required(
-    "Le téléphone de l'entreprise est obligatoire"
-  ),
-  transporterCompanyMail: Yup.string()
+const segmentSchema = yup.object<any>().shape({
+  mode: yup.string().label("Mode de transport").required(),
+  transporterCompanySiret: siret
+    .label("Transporteur")
+    .test(siretTests.isRegistered("TRANSPORTER"))
+    .when(
+      "transporterCompanyVatNumber",
+      // set siret not required when vatNumber is defined and valid
+      siretConditions.companyVatNumber
+    ),
+  transporterCompanyVatNumber: foreignVatNumber
+    .label("Transporteur")
+    .test(vatNumberTests.isRegisteredTransporter),
+  transporterCompanyAddress: yup
+    .string()
+    .required(`Transporteur: ${MISSING_COMPANY_ADDRESS}`),
+  transporterCompanyContact: yup
+    .string()
+    .required(`Transporteur: ${MISSING_COMPANY_CONTACT}`),
+  transporterCompanyPhone: yup
+    .string()
+    .required(`Transporteur: ${MISSING_COMPANY_PHONE}`),
+  transporterCompanyMail: yup
+    .string()
     .email("Le format d'adresse email est incorrect")
-    .required("L'email est obligatoire"),
-  transporterIsExemptedOfReceipt: Yup.boolean().nullable(true),
-  transporterReceipt: Yup.string().when(
-    "transporterIsExemptedOfReceipt",
-    (isExemptedOfReceipt, schema) =>
-      isExemptedOfReceipt
-        ? schema.nullable(true)
-        : schema.required(
-            "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
-          )
-  ),
-  transporterDepartment: Yup.string().when(
-    "transporterIsExemptedOfReceipt",
-    (isExemptedOfReceipt, schema) =>
-      isExemptedOfReceipt
-        ? schema.nullable(true)
-        : schema.required("Le département du transporteur est obligatoire")
-  ),
+    .required(`Transporteur: ${MISSING_COMPANY_EMAIL}`),
+  transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
+  transporterReceipt: yup
+    .string()
+    .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
+      is: (isExempted, vat) => isForeignVat(vat) || isExempted,
+      then: schema => schema.notRequired().nullable(),
+      otherwise: schema =>
+        schema.required(
+          "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+        )
+    }),
+  transporterDepartment: yup
+    .string()
+    .when(["transporterIsExemptedOfReceipt", "transporterCompanyVatNumber"], {
+      is: (isExempted, vat) => isForeignVat(vat) || isExempted,
+      then: schema => schema.notRequired().nullable(),
+      otherwise: schema =>
+        schema.required("Le département du transporteur est obligatoire")
+    }),
 
-  transporterValidityLimit: Yup.date().nullable(),
-  transporterNumberPlate: Yup.string().nullable(true)
+  transporterValidityLimit: yup.date().nullable(),
+  transporterNumberPlate: yup.string().nullable(true)
 });
 
-const takeOverInfoSchema = Yup.object<any>().shape({
-  takenOverAt: Yup.date().required(),
-  takenOverBy: Yup.string().required("Le nom du responsable est obligatoire")
+const takeOverInfoSchema = yup.object<any>().shape({
+  takenOverAt: yup.date().required(),
+  takenOverBy: yup.string().required("Le nom du responsable est obligatoire")
 });
 
 const formWithOwnerIdAndTransportSegments = Prisma.validator<Prisma.FormArgs>()(
@@ -91,24 +118,32 @@ type MultiModalForm = Prisma.FormGetPayload<
  * Prepare a new transport segment
  */
 export async function prepareSegment(
-  { id, siret, nextSegmentInfo }: MutationPrepareSegmentArgs,
+  {
+    id,
+    orgId,
+    nextSegmentInfo
+  }: { id: string; orgId: string; nextSegmentInfo: NextSegmentInfoInput },
   context: GraphQLContext
 ): Promise<TransportSegment> {
   const user = checkIsAuthenticated(context);
 
   await checkUserPermissions(
     user,
-    [siret].filter(Boolean),
+    [orgId].filter(Boolean),
     Permission.BsdCanUpdate,
     FORM_NOT_FOUND_OR_NOT_ALLOWED
   );
 
   const sirenified = await sirenifyTransportSegmentInput(nextSegmentInfo, user);
   const nextSegmentPayload = flattenTransportSegmentInput(sirenified);
+  const nextSegmentPayloadOrgId = getTransporterCompanyOrgId(
+    nextSegmentPayload as PartialTransporterCompany
+  );
 
-  if (!nextSegmentPayload.transporterCompanySiret) {
-    throw new ForbiddenError(MISSING_COMPANY_SIRET);
+  if (!nextSegmentPayloadOrgId) {
+    throw new ForbiddenError(MISSING_COMPANY_SIRET_OR_VAT);
   }
+
   const formRepository = getFormRepository(user);
   // get form and segments
   const form = (await formRepository.findUnique(
@@ -130,7 +165,7 @@ export async function prepareSegment(
   // user must be the currentTransporter or form owner
   const userIsOwner = user.id === form.owner.id;
   const userIsCurrentTransporter =
-    !!form.currentTransporterSiret && siret === form.currentTransporterSiret;
+    !!form.currentTransporterOrgId && orgId === form.currentTransporterOrgId;
 
   if (!userIsOwner && !userIsCurrentTransporter) {
     throw new ForbiddenError(
@@ -161,24 +196,23 @@ export async function prepareSegment(
     : null;
   if (
     !!lastSegment &&
-    (!lastSegment.takenOverAt || lastSegment.transporterCompanySiret !== siret)
+    (!lastSegment.takenOverAt ||
+      getTransporterCompanyOrgId(
+        lastSegment as unknown as PartialTransporterCompany
+      ) !== orgId)
   ) {
     throw new ForbiddenError(SEGMENTS_ALREADY_PREPARED);
   }
 
-  if (!nextSegmentPayload.transporterCompanySiret) {
-    throw new UserInputError(MISSING_COMPANY_SIRET);
-  }
-
   const segmentInput = {
     ...nextSegmentPayload,
-    previousTransporterCompanySiret: siret,
+    previousTransporterCompanyOrgId: orgId,
     segmentNumber: transportSegments.length + 1 // additional segments begin at index 1
   };
   await formRepository.update(
     { id },
     {
-      nextTransporterSiret: nextSegmentPayload.transporterCompanySiret,
+      nextTransporterOrgId: nextSegmentPayloadOrgId,
       transportSegments: {
         create: {
           ...segmentInput
@@ -224,7 +258,7 @@ export async function markSegmentAsReadyToTakeOver(
     throw new ForbiddenError(FORM_MUST_BE_SENT);
   }
 
-  const authorizedOrgIds = [form.currentTransporterSiret].filter(Boolean);
+  const authorizedOrgIds = [form.currentTransporterOrgId].filter(Boolean);
   await checkUserPermissions(
     user,
     authorizedOrgIds,
@@ -307,10 +341,10 @@ export async function takeOverSegment(
   }
 
   //   user must be the nextTransporter
-  const nexTransporterIsFilled = !!form.nextTransporterSiret;
+  const nexTransporterIsFilled = !!form.nextTransporterOrgId;
 
   const authorizedOrgIds = nexTransporterIsFilled
-    ? [form.nextTransporterSiret, currentSegment.transporterCompanySiret]
+    ? [form.nextTransporterOrgId, getTransporterCompanyOrgId(currentSegment)]
     : [];
 
   await checkUserPermissions(
@@ -335,8 +369,8 @@ export async function takeOverSegment(
   await formRepository.update(
     { id: currentSegment.form.id },
     {
-      currentTransporterSiret: currentSegment.transporterCompanySiret,
-      nextTransporterSiret: "",
+      currentTransporterOrgId: getTransporterCompanyOrgId(currentSegment),
+      nextTransporterOrgId: "",
       transportSegments: {
         update: {
           where: { id },
@@ -352,14 +386,18 @@ export async function takeOverSegment(
 
 /**
  *
- * Edit an existing segment
+ * Edit an existing segment by a SIRET or a VAT number
  * Can be performed by form owner when in DRAFT state, everything is editable,
  * By current transporter if segment is not readyToTakeOver yet, everything is editable
- * By next transporter if segment is readyToTakeOver and not taken over, siret is not editable
+ * By next transporter if segment is readyToTakeOver and not taken over, nor the SIRET nor the VAT is not editable
 
  */
 export async function editSegment(
-  { id, siret: userSiret, nextSegmentInfo }: MutationEditSegmentArgs,
+  {
+    id,
+    orgId,
+    nextSegmentInfo
+  }: { id: string; orgId: string; nextSegmentInfo: NextSegmentInfoInput },
   context: GraphQLContext
 ): Promise<TransportSegment> {
   const user = checkIsAuthenticated(context);
@@ -380,8 +418,11 @@ export async function editSegment(
   }
 
   const nextSegmentPayload = flattenTransportSegmentInput(nextSegmentInfo);
+  const nextSegmentPayloadOrgId = getTransporterCompanyOrgId(
+    nextSegmentPayload as PartialTransporterCompany
+  );
 
-  const authorizedOrgIds = [userSiret].filter(Boolean);
+  const authorizedOrgIds = [orgId].filter(Boolean);
 
   // check user has update permission on SIRET
   await checkUserPermissions(
@@ -398,8 +439,8 @@ export async function editSegment(
   )) as MultiModalForm;
 
   const userIsOwner = user.id === form.owner.id;
-  const userIsCurrentTransporter = userSiret === form.currentTransporterSiret;
-  const userIsNextTransporter = userSiret === form.nextTransporterSiret;
+  const userIsCurrentTransporter = orgId === form.currentTransporterOrgId;
+  const userIsNextTransporter = orgId === form.nextTransporterOrgId;
 
   // segments can be edited by form transporter when form is sent
   const transporterIsForbiddenToEditSentForm =
@@ -441,20 +482,22 @@ export async function editSegment(
     }
   }
 
-  // siret can't be edited once segment is marked as ready
+  // VAT or SIRET can't be edited once segment is marked as ready
   if (
     currentSegment.readyToTakeOver &&
-    !!nextSegmentPayload.transporterCompanySiret &&
-    nextSegmentPayload.transporterCompanySiret !==
-      currentSegment.transporterCompanySiret
+    !!nextSegmentPayloadOrgId &&
+    nextSegmentPayloadOrgId !==
+      getTransporterCompanyOrgId(currentSegment as PartialTransporterCompany)
   ) {
-    throw new ForbiddenError("Le siret ne peut pas être modifié");
+    throw new ForbiddenError(
+      "L'entreprise de transport ne peut pas être modifiée une fois le segment scellé."
+    );
   }
 
   await formRepository.update(
     { id: currentSegment.form.id },
     {
-      nextTransporterSiret: nextSegmentPayload.transporterCompanySiret,
+      nextTransporterOrgId: nextSegmentPayloadOrgId,
       transportSegments: {
         update: {
           where: { id },

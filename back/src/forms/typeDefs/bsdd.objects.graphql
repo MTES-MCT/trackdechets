@@ -137,8 +137,8 @@ type Form {
 
   transportSegments: [TransportSegment!]
 
-  currentTransporterSiret: String
-  nextTransporterSiret: String
+  currentTransporterOrgId: String
+  nextTransporterOrgId: String
 
   """
   Entreprises intermédiaires. Un intermédiaire est une entreprise qui prend part à la gestion du déchet,
@@ -613,7 +613,7 @@ type TransportSegment {
   id: ID!
 
   "Siret du transporteur précédent"
-  previousTransporterCompanySiret: String
+  previousTransporterCompanyOrgId: String
 
   "Transporteur du segment"
   transporter: Transporter
