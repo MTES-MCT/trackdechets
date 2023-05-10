@@ -320,18 +320,22 @@ function Transporter({ form }: { form: Bsff }) {
           value={!form?.transporter?.recepisse}
           label="Exemption de récépissé"
         />
-        <DetailRow
-          value={form.transporter?.recepisse?.number}
-          label="Numéro de récépissé"
-        />
-        <DetailRow
-          value={form.transporter?.recepisse?.department}
-          label="Département"
-        />
-        <DateRow
-          value={form.transporter?.recepisse?.validityLimit}
-          label="Date de validité"
-        />
+        {!!form?.transporter?.recepisse?.number && (
+          <>
+            <DetailRow
+              value={form.transporter?.recepisse?.number}
+              label="Numéro de récépissé"
+            />
+            <DetailRow
+              value={form.transporter?.recepisse?.department}
+              label="Département"
+            />
+            <DateRow
+              value={form.transporter?.recepisse?.validityLimit}
+              label="Date de validité"
+            />
+          </>
+        )}
         <DetailRow
           value={
             form.transporter?.transport?.mode

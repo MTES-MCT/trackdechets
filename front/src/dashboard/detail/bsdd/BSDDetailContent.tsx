@@ -847,18 +847,22 @@ export default function BSDDetailContent({
                       value={form?.transporter?.isExemptedOfReceipt}
                       label="Exemption de récépissé"
                     />
-                    <DetailRow
-                      value={form?.transporter?.receipt}
-                      label="Numéro de récépissé"
-                    />
-                    <DetailRow
-                      value={form?.transporter?.department}
-                      label="Département"
-                    />
-                    <DateRow
-                      value={form?.transporter?.validityLimit}
-                      label="Date de validité"
-                    />
+                    {!form?.transporter?.isExemptedOfReceipt && (
+                      <>
+                        <DetailRow
+                          value={form?.transporter?.receipt}
+                          label="Numéro de récépissé"
+                        />
+                        <DetailRow
+                          value={form?.transporter?.department}
+                          label="Département"
+                        />
+                        <DateRow
+                          value={form?.transporter?.validityLimit}
+                          label="Date de validité"
+                        />
+                      </>
+                    )}
                     <DetailRow
                       value={form?.transporter?.numberPlate}
                       label="Immatriculation"
