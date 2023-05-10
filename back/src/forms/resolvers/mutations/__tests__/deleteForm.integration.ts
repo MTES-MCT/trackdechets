@@ -224,4 +224,28 @@ describe("Mutation.deleteForm", () => {
     });
     expect(updatedForwardedInForm.isDeleted).toEqual(true);
   });
+
+  it("emitter can delete a form he is the only one to have signed", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: company.siret,
+        emittedAt: new Date()
+      }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "deleteForm">>(DELETE_FORM, {
+      variables: { id: form.id }
+    });
+
+    expect(data.deleteForm.id).toBeTruthy();
+
+    const deletedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id }
+    });
+    expect(deletedForm.isDeleted).toBe(true);
+  });
 });

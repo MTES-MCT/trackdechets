@@ -266,7 +266,7 @@ export async function checkCanDelete(user: User, form: Form) {
     form.status === "SIGNED_BY_PRODUCER" &&
     !form.emittedByEcoOrganisme
   ) {
-    authorizedOrgIds = [form.ecoOrganismeSiret].filter(Boolean);
+    authorizedOrgIds = [form.emitterCompanySiret].filter(Boolean);
     errorMsg =
       "Le producteur a signé ce bordereau, il est le seul à pouvoir le supprimer.";
   } else {
