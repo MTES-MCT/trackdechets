@@ -4,6 +4,16 @@ import { Prisma } from "@prisma/client";
  * Return null if all object values are null
  * obj otherwise
  */
+export function nullIfAllNull<T extends Record<string, unknown>>(obj: {
+  [P in keyof T]?: T[P] | null; // Allow null values on the input, even if forbidden by gql
+}): T | null {
+  return Object.values(obj).every(v => v === null) ? null : (obj as T);
+}
+
+/**
+ * Return null if all object values are null or an empty string
+ * obj otherwise
+ */
 export function nullIfNoValues<T extends Record<string, unknown>>(obj: {
   [P in keyof T]?: T[P] | null; // Allow null values on the input, even if forbidden by gql
 }): T | null {
