@@ -9,17 +9,20 @@ import {
   BsdasriTransporter,
 } from "generated/graphql/types";
 import { getPackagingInfosSummary } from "form/bsdd/utils/packagings";
+import { isForeignVat } from "generated/constants/companySearchHelpers";
 const nbsp = "\u00A0";
 export const DetailRow = ({
   value,
   label,
   units = null,
+  showEmpty = false,
 }: {
   value: string | number | ReactNode | undefined | null;
   label: string;
   units?: string | undefined | null;
+  showEmpty?: boolean | undefined;
 }) => {
-  if (!value) {
+  if (!value && !showEmpty) {
     return null;
   }
 
@@ -83,7 +86,7 @@ export const TransporterReceiptDetails = ({
 }: {
   transporter?: BsvhuTransporter | BsdaTransporter | BsdasriTransporter | null;
 }) => {
-  return (
+  return !isForeignVat(transporter?.company?.vatNumber!!) ? (
     <div className={styles.detailGrid}>
       <YesNoRow
         value={transporter?.recepisse?.isExempted}
@@ -91,10 +94,11 @@ export const TransporterReceiptDetails = ({
       />
       {!transporter?.recepisse?.isExempted && (
         <>
-          <>
-            <dt>{"Numéro de récépissé"}</dt>
-            <dd>{transporter?.recepisse?.number}</dd>
-          </>
+          <DetailRow
+            value={transporter?.recepisse?.number}
+            label="Numéro de récépissé"
+            showEmpty={true}
+          />
           {transporter?.recepisse?.number && (
             <>
               <DetailRow
@@ -110,5 +114,7 @@ export const TransporterReceiptDetails = ({
         </>
       )}
     </div>
+  ) : (
+    <></>
   );
 };
