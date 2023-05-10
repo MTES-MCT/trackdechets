@@ -4,7 +4,11 @@ import { BsdCardListProps } from "./bsdCardListTypes";
 import BsdCard from "../BsdCard/BsdCard";
 import {
   Bsd,
+  Bsda,
   BsdasriStatus,
+  Bsff,
+  Bsvhu,
+  Form,
   FormStatus,
 } from "../../../../generated/graphql/types";
 
@@ -218,7 +222,7 @@ function BsdCardList({
 
       {validationWorkflowType === "ACT_BSDD" && (
         <ActBsddValidation
-          bsd={bsdClicked}
+          bsd={bsdClicked as Form}
           currentSiret={siret}
           isOpen={isModalOpen}
           onClose={onClose}
@@ -233,7 +237,7 @@ function BsdCardList({
       )}
       {validationWorkflowType === "ACT_BSDA" && (
         <ActBsdaValidation
-          bsd={bsdClicked}
+          bsd={bsdClicked as Bsda}
           currentSiret={siret}
           isOpen={isModalOpen}
           onClose={onClose}
@@ -241,14 +245,14 @@ function BsdCardList({
       )}
       {validationWorkflowType === "ACT_BSFF" && (
         <ActBsffValidation
-          bsd={bsdClicked}
+          bsd={bsdClicked as Bsff}
           isOpen={isModalOpen}
           onClose={onClose}
         />
       )}
       {validationWorkflowType === "ACT_BSVHU" && (
         <ActBsvhuValidation
-          bsd={bsdClicked}
+          bsd={bsdClicked as Bsvhu}
           currentSiret={siret}
           isOpen={isModalOpen}
           onClose={onClose}

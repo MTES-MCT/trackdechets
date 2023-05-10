@@ -191,3 +191,4 @@ export function SignOperation({
     </SignBsda>
   );
 }
+export default React.memo(SignOperation);

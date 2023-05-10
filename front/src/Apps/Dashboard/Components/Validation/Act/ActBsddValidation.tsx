@@ -12,6 +12,7 @@ import { TakeOverSegment } from "dashboard/components/BSDList/BSDD/WorkflowActio
 import { GET_FORM } from "form/bsdd/utils/queries";
 import {
   EmitterType,
+  Form,
   FormStatus,
   Mutation,
   MutationMarkAsAcceptedArgs,
@@ -48,8 +49,18 @@ const MARK_AS_ACCEPTED = gql`
   }
   ${statusChangeFragment}
 `;
-
-const ActBsddValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
+interface ActBsddValidationProps {
+  bsd: Form;
+  currentSiret: string;
+  isOpen: boolean;
+  onClose: () => void;
+}
+const ActBsddValidation = ({
+  bsd,
+  currentSiret,
+  isOpen,
+  onClose,
+}: ActBsddValidationProps) => {
   const [getBsdd, { error: bsddGetError, data, loading: bsddGetLoading }] =
     useLazyQuery<Pick<Query, "form">, QueryFormArgs>(GET_FORM, {
       variables: {
@@ -305,7 +316,7 @@ const ActBsddValidation = ({ bsd, currentSiret, isOpen, onClose }) => {
             <ReceivedInfo
               form={data?.form}
               close={onClose}
-              isTempStorage={isTempStorage}
+              isTempStorage={isTempStorage as boolean}
             />
           </TdModal>
         );

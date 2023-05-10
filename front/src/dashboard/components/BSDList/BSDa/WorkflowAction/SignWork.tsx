@@ -184,3 +184,5 @@ export function SignWork({
     </SignBsda>
   );
 }
+
+export default React.memo(SignWork);
