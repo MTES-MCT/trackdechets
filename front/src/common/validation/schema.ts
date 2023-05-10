@@ -2,6 +2,9 @@ import * as yup from "yup";
 import countries from "world-countries";
 import { isOmi, isVat } from "generated/constants/companySearchHelpers";
 
+/**
+ * Company Schema for the general case (FR company)
+ */
 export const companySchema = yup.object().shape({
   name: yup.string().required(),
   siret: yup.string().when("country", {
@@ -11,11 +14,15 @@ export const companySchema = yup.object().shape({
       .required("La sélection d'une entreprise est obligatoire"),
     otherwise: yup.string().nullable(),
   }),
-  vatNumber: yup.string().test(
-    "is-vat",
-    ({ originalValue }) => `${originalValue} n'est pas un numéro de TVA valide`,
-    value => !value || isVat(value)
-  ),
+  vatNumber: yup
+    .string()
+    .nullable()
+    .test(
+      "is-vat",
+      ({ originalValue }) =>
+        `${originalValue} n'est pas un numéro de TVA valide`,
+      value => !value || isVat(value)
+    ),
   address: yup.string().required("L'adresse de l'entreprise est requis"),
   country: yup
     .string()
@@ -45,6 +52,9 @@ export const companySchema = yup.object().shape({
     ),
 });
 
+/**
+ * Transporter Company Schema (FR or foreign)
+ */
 export const transporterCompanySchema = companySchema.concat(
   yup.object().shape({
     siret: yup.string().when("vatNumber", {
@@ -55,11 +65,5 @@ export const transporterCompanySchema = companySchema.concat(
         ),
       otherwise: schema => schema.nullable(),
     }),
-    vatNumber: yup.string().test(
-      "is-vat",
-      ({ originalValue }) =>
-        `${originalValue} n'est pas un numéro de TVA valide`,
-      value => !value || isVat(value)
-    ),
   })
 );
