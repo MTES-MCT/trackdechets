@@ -43,6 +43,7 @@ const AnonymousCompanyInputSchema: yup.SchemaOf<AnonymousCompanyInput> =
     name: yup.string().required(),
     vatNumber: yup
       .string()
+      .nullable()
       .test(
         "is-vat",
         ({ originalValue }) =>
