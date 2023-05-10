@@ -58,9 +58,7 @@ export default function WorkSiteAddress({
         dispatch({ type: "search_done", payload: [] });
         return;
       }
-      fetch(
-        `https://api-adresse.data.gouv.fr/search/?q=${state.searchInput}&type=housenumber&autocomplete=1`
-      )
+      fetch(`https://api-adresse.data.gouv.fr/search/?q=${state.searchInput}`)
         .then(res => res.json())
         .then(res => dispatch({ type: "search_done", payload: res.features }));
     }, 300);
