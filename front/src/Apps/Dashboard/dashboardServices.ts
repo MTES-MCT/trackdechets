@@ -55,7 +55,8 @@ export const getBsdView = (bsd): BsdDisplay | null => {
 
 export const getBsdStatusLabel = (
   status: string,
-  isDraft: boolean | undefined
+  isDraft: boolean | undefined,
+  bsdType?: BsdType
 ) => {
   switch (status) {
     case BsdStatusCode.Draft:
@@ -65,13 +66,22 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.Sent:
       return SIGNE_PAR_TRANSPORTEUR;
     case BsdStatusCode.Received:
+      if (bsdType === BsdType.Bsdasri) {
+        return ACCEPTE;
+      }
       return RECU;
     case BsdStatusCode.Accepted:
       return ACCEPTE;
     case BsdStatusCode.Processed:
+      if (bsdType === BsdType.Bsff) {
+        return TRAITE_AVEC_RUPTURE_TRACABILITE;
+      }
       return TRAITE;
     case BsdStatusCode.AwaitingChild:
     case BsdStatusCode.Grouped:
+      if (bsdType === BsdType.Bsda || bsdType === BsdType.Bsff) {
+        return EN_ATTENTE_BSD_SUITE;
+      }
       return ANNEXE_BORDEREAU_SUITE;
     case BsdStatusCode.NoTraceability:
       return TRAITE_AVEC_RUPTURE_TRACABILITE;
@@ -105,6 +115,9 @@ export const getBsdStatusLabel = (
       return SIGNER_PAR_ENTREPRISE_TRAVAUX;
     case BsdStatusCode.AwaitingGroup:
     case BsdStatusCode.IntermediatelyProcessed:
+      if (bsdType === BsdType.Bsdasri) {
+        return ANNEXE_BORDEREAU_SUITE;
+      }
       return EN_ATTENTE_BSD_SUITE;
     case BsdStatusCode.Canceled:
       return ANNULE;

@@ -2,6 +2,7 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import Badge from "./Badge";
 import { BsdStatusCode } from "Apps/Common/types/bsdTypes";
+import { BsdType } from "generated/graphql/types";
 
 describe("Bsd Badge status", () => {
   describe("case: DRAFT/INITITAL(draft=true)", () => {
@@ -57,6 +58,10 @@ describe("Bsd Badge status", () => {
     render(<Badge status={BsdStatusCode.Received} />);
     expect(screen.getByText(/Reçu, en attente d'acceptation/i));
   });
+  test("RECEIVED bsdasri", () => {
+    render(<Badge status={BsdStatusCode.Received} bsdType={BsdType.Bsdasri} />);
+    expect(screen.getByText(/ACCEPTÉ, EN ATTENTE DE TRAITEMENT/i));
+  });
   test("ACCEPTED", () => {
     render(<Badge status={BsdStatusCode.Accepted} />);
     expect(screen.getByText(/ACCEPTÉ, EN ATTENTE DE TRAITEMENT/i));
@@ -65,9 +70,19 @@ describe("Bsd Badge status", () => {
     render(<Badge status={BsdStatusCode.Processed} />);
     expect(screen.getByText(/Traité/i));
   });
+  test("PROCESSED bsff", () => {
+    render(<Badge status={BsdStatusCode.Processed} bsdType={BsdType.Bsff} />);
+    expect(screen.getByText("Traité (avec rupture de traçabilité)"));
+  });
   test("AWAITING_GROUP", () => {
     render(<Badge status={BsdStatusCode.AwaitingGroup} />);
     expect(screen.getByText(/En attente d'un bordereau suite/i));
+  });
+  test("AWAITING_GROUP bsdasri", () => {
+    render(
+      <Badge status={BsdStatusCode.AwaitingGroup} bsdType={BsdType.Bsdasri} />
+    );
+    expect(screen.getByText(/Annexé à un bordereau suite/i));
   });
   test("GROUPED", () => {
     render(<Badge status={BsdStatusCode.Grouped} />);
@@ -136,5 +151,17 @@ describe("Bsd Badge status", () => {
   test("AWAITING_CHILD", () => {
     render(<Badge status={BsdStatusCode.AwaitingChild} />);
     expect(screen.getByText(/Annexé à un bordereau suite/i));
+  });
+  test("AWAITING_CHILD bsda", () => {
+    render(
+      <Badge status={BsdStatusCode.AwaitingChild} bsdType={BsdType.Bsda} />
+    );
+    expect(screen.getByText(/En attente d'un bordereau suite/i));
+  });
+  test("AWAITING_CHILD bsff", () => {
+    render(
+      <Badge status={BsdStatusCode.AwaitingChild} bsdType={BsdType.Bsff} />
+    );
+    expect(screen.getByText(/En attente d'un bordereau suite/i));
   });
 });
