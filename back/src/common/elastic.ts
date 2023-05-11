@@ -375,7 +375,9 @@ export function indexBsds(indexName: string, bsds: BsdElastic[]) {
         }
       },
       bsd
-    ])
+    ]),
+    // lighten the response
+    _source_excludes: ["items.index._*", "took"]
   });
 }
 
