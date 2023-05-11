@@ -62,7 +62,7 @@ export const TableRoadControlButton = ({ siret, form }) => {
   );
 };
 
-const useDisplayRoadControlButton = bsd => {
+export const useDisplayRoadControlButton = bsd => {
   const statusKey = {
     Form: "status",
     Bsdasri: "bsdasriStatus",

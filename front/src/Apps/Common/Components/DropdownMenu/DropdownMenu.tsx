@@ -1,12 +1,18 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import FocusTrap from "focus-trap-react";
-import useOnClickOutsideRefTarget from "../../../../common/hooks/useOnClickOutsideRefTarget";
+import useOnClickOutsideRefTarget from "common/hooks/useOnClickOutsideRefTarget";
 import { DropdownMenuProps } from "./dropdownMenuTypes";
+import classNames from "classnames";
 
 import "./dropdownMenu.scss";
 
-const DropdownMenu = ({ menuTitle, links, isDisabled }: DropdownMenuProps) => {
+const DropdownMenu = ({
+  menuTitle,
+  links,
+  isDisabled,
+  iconAlone,
+}: DropdownMenuProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const { targetRef } = useOnClickOutsideRefTarget({
     onClickOutside: () => setIsOpen(false),
@@ -23,25 +29,57 @@ const DropdownMenu = ({ menuTitle, links, isDisabled }: DropdownMenuProps) => {
         className="dropdown-menu"
       >
         <button
-          className="fr-btn fr-btn--secondary"
+          className={classNames("menu-btn fr-btn fr-btn--secondary", {
+            isOpen: isOpen,
+            "menu-btn__iconAlone": iconAlone,
+          })}
           disabled={isDisabled}
           onClick={onClick}
         >
           {menuTitle}
         </button>
         {isOpen && (
-          <div className="dropdown-menu__content">
-            {links.map(link => (
-              <Link to={link.route} key={link.title}>
-                {link.icon && (
-                  <span className="dropdown-menu__content__icon">
-                    {link.icon}
-                  </span>
-                )}
-                {link.title}
-              </Link>
-            ))}
-          </div>
+          <ul
+            className={classNames("dropdown-menu__content", {
+              "dropdown-menu__content__iconAlone": iconAlone,
+            })}
+          >
+            {links.map(link => {
+              return (
+                <li key={link.title}>
+                  {link.isButton ? (
+                    <button
+                      type="button"
+                      className="fr-btn fr-btn--tertiary-no-outline"
+                      onClick={link.handleClick}
+                    >
+                      {link.icon && (
+                        <span className="dropdown-menu__content__icon">
+                          {link.icon}
+                        </span>
+                      )}
+                      {link.title}
+                    </button>
+                  ) : (
+                    <Link
+                      to={
+                        typeof link.route === "string"
+                          ? link.route
+                          : { ...link.route }
+                      }
+                    >
+                      {link.icon && (
+                        <span className="dropdown-menu__content__icon">
+                          {link.icon}
+                        </span>
+                      )}
+                      {link.title}
+                    </Link>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         )}
       </div>
     </FocusTrap>
