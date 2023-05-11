@@ -1,0 +1,12 @@
+@import "src/scss/Mixins.scss";
+
+.bsd-filter {
+  .rmsc .dropdown-content {
+    width: 430px;
+    .item-renderer {
+      input[type="checkbox"] {
+        width: 15px;
+      }
+    }
+  }
+}

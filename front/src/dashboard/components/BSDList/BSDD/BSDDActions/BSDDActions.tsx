@@ -1,7 +1,6 @@
 import * as React from "react";
 import { generatePath, useParams, useLocation } from "react-router-dom";
 
-import "@reach/menu-button/styles.css";
 import routes from "common/routes";
 import {
   IconAddCircle,
