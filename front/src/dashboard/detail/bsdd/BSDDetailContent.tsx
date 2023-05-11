@@ -61,7 +61,10 @@ import EditSegment from "./EditSegment";
 import { Loader, Modal } from "common/components";
 import { isDangerous } from "generated/constants";
 import { format } from "date-fns";
-import { isSiret } from "generated/constants/companySearchHelpers";
+import {
+  isForeignVat,
+  isSiret,
+} from "generated/constants/companySearchHelpers";
 import { Appendix1ProducerForm } from "form/bsdd/appendix1Producer/form";
 import { useQuery } from "@apollo/client";
 import { COMPANY_RECEIVED_SIGNATURE_AUTOMATIONS } from "form/common/components/company/query";
@@ -843,22 +846,32 @@ export default function BSDDetailContent({
                   </div>
 
                   <div className={styles.detailGrid}>
-                    <YesNoRow
-                      value={form?.transporter?.isExemptedOfReceipt}
-                      label="Exemption de récépissé"
-                    />
-                    <DetailRow
-                      value={form?.transporter?.receipt}
-                      label="Numéro de récépissé"
-                    />
-                    <DetailRow
-                      value={form?.transporter?.department}
-                      label="Département"
-                    />
-                    <DateRow
-                      value={form?.transporter?.validityLimit}
-                      label="Date de validité"
-                    />
+                    {!isForeignVat(form?.transporter?.company?.vatNumber!!) && (
+                      <>
+                        <YesNoRow
+                          value={form?.transporter?.isExemptedOfReceipt}
+                          label="Exemption de récépissé"
+                        />
+                        {!form?.transporter?.isExemptedOfReceipt && (
+                          <>
+                            <DetailRow
+                              value={form?.transporter?.receipt}
+                              label="Numéro de récépissé"
+                              showEmpty={true}
+                            />
+                            <DetailRow
+                              value={form?.transporter?.department}
+                              label="Département"
+                              showEmpty={true}
+                            />
+                            <DateRow
+                              value={form?.transporter?.validityLimit}
+                              label="Date de validité"
+                            />
+                          </>
+                        )}
+                      </>
+                    )}
                     <DetailRow
                       value={form?.transporter?.numberPlate}
                       label="Immatriculation"
