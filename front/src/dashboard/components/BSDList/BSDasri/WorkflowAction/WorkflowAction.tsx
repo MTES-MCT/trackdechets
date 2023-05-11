@@ -3,7 +3,6 @@ import React from "react";
 import { ActionLink } from "common/components";
 import { generatePath, useLocation, useRouteMatch } from "react-router-dom";
 
-import "@reach/menu-button/styles.css";
 import {
   IconCheckCircle1,
   IconShipmentSignSmartphone,

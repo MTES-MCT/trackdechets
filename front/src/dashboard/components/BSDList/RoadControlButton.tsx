@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 import { IconQrCode } from "common/components/Icons";
 import routes from "common/routes";
-import { MenuLink } from "@reach/menu-button";
 
 export const CardRoadControlButton = ({ siret, form }) => {
   const location = useLocation();
@@ -41,8 +40,7 @@ export const TableRoadControlButton = ({ siret, form }) => {
   }
 
   return (
-    <MenuLink
-      as={Link}
+    <Link
       to={{
         pathname: generatePath(routes.dashboard.roadControl, {
           siret,
@@ -58,7 +56,7 @@ export const TableRoadControlButton = ({ siret, form }) => {
         <br />
         routier
       </span>
-    </MenuLink>
+    </Link>
   );
 };
 

@@ -8,8 +8,10 @@ interface SelectProps {
   options: { value: string; label: string }[];
   selected?: any;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  placeholder?: string;
   isMultiple?: boolean;
-  disableSearch?: boolean;
+  showRendererText?: boolean;
+  disableSearch?: boolean; // hide react-multi-select-component search textbox
   defaultValue?: string;
 }
 
@@ -24,6 +26,8 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
       selected,
       disableSearch,
       defaultValue,
+      placeholder = filter_type_select_option_placeholder,
+      showRendererText = true,
     },
     ref
   ) => {
@@ -44,7 +48,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
               defaultValue={defaultValue}
             >
               <option value="" disabled hidden>
-                {filter_type_select_option_placeholder}
+                {placeholder}
               </option>
               {options?.map(option => (
                 <option key={option.value} value={option.value}>
@@ -57,7 +61,9 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
               options={options}
               selected={selected}
               onChange={onChange}
+              placeholder={placeholder}
               disableSearch={disableSearch}
+              showRendererText={showRendererText}
             />
           )}
         </div>
