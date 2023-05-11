@@ -310,6 +310,47 @@ describe("Mutation.updateBsda", () => {
     );
   });
 
+  it("should allow updating worker if they didn't sign", async () => {
+    const { company } = await userWithCompanyFactory(UserRole.ADMIN);
+    const { company: company2, user: user2 } = await userWithCompanyFactory(
+      UserRole.ADMIN
+    );
+
+    const bsda = await bsdaFactory({
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: company.siret,
+        emitterEmissionSignatureDate: new Date(),
+        workerCompanySiret: company2.siret,
+        destinationCompanySiret: company2.siret,
+        transporterCompanySiret: company2.siret
+      }
+    });
+
+    const { mutate } = makeClient(user2);
+
+    const input = {
+      worker: {
+        company: {
+          siret: company.siret
+        }
+      }
+    };
+    const { data } = await mutate<
+      Pick<Mutation, "updateBsda">,
+      MutationUpdateBsdaArgs
+    >(UPDATE_BSDA, {
+      variables: {
+        id: bsda.id,
+        input
+      }
+    });
+
+    expect(data.updateBsda.transporter!.recepisse!.number).toEqual(
+      "Num recepisse"
+    );
+  });
+
   it("should not update transporter if they signed already", async () => {
     const emitter = await userWithCompanyFactory(UserRole.ADMIN);
     const transporter = await userWithCompanyFactory(UserRole.ADMIN);

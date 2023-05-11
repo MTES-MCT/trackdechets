@@ -7,6 +7,7 @@ import {
   userWithCompanyFactory
 } from "../../../__tests__/factories";
 import { resetDatabase } from "../../../../integration-tests/helper";
+import { UserRole } from "@prisma/client";
 
 describe("edition rules", () => {
   afterAll(resetDatabase);
@@ -24,7 +25,7 @@ describe("edition rules", () => {
   });
 
   it("should be possible to update any fields when bsda status is SIGNED_BY_PRODUCER", async () => {
-    const { user, company } = await userWithCompanyFactory("ADMIN");
+    const { user, company } = await userWithCompanyFactory(UserRole.ADMIN);
     const bsda = await bsdaFactory({
       opt: {
         workerCompanySiret: company.siret,
