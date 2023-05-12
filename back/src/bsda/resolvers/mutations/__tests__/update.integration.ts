@@ -310,7 +310,7 @@ describe("Mutation.updateBsda", () => {
     );
   });
 
-  it("should allow updating worker if they didn't sign", async () => {
+  it("should not allow the transporter to update the worker if already signed by the producer", async () => {
     const { company } = await userWithCompanyFactory(UserRole.ADMIN);
     const { company: company2, user: user2 } = await userWithCompanyFactory(
       UserRole.ADMIN
@@ -336,7 +336,7 @@ describe("Mutation.updateBsda", () => {
         }
       }
     };
-    const { data } = await mutate<
+    const { errors } = await mutate<
       Pick<Mutation, "updateBsda">,
       MutationUpdateBsdaArgs
     >(UPDATE_BSDA, {
@@ -346,9 +346,12 @@ describe("Mutation.updateBsda", () => {
       }
     });
 
-    expect(data.updateBsda.transporter!.recepisse!.number).toEqual(
-      "Num recepisse"
-    );
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : workerCompanySiret"
+      })
+    ]);
   });
 
   it("should not update transporter if they signed already", async () => {
