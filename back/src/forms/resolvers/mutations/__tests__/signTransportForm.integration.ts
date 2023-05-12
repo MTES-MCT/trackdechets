@@ -401,6 +401,40 @@ describe("signTransportForm", () => {
     ]);
   });
 
+  it("should throw a validation error if transporter info is not valid", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("ADMIN");
+    const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.SIGNED_BY_PRODUCER,
+        transporterCompanySiret: transporter.company.siret,
+        transporterCompanyAddress: null
+      }
+    });
+
+    const { mutate } = makeClient(transporter.user);
+    const { errors } = await mutate<
+      Pick<Mutation, "signTransportForm">,
+      MutationSignTransportFormArgs
+    >(SIGN_TRANSPORT_FORM, {
+      variables: {
+        id: form.id,
+        input: {
+          takenOverAt: takenOverAt.toISOString() as unknown as Date,
+          takenOverBy: transporter.user.name
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Transporteur: L'adresse de l'entreprise est obligatoire"
+      })
+    ]);
+  });
+
   describe("Annexe 1", () => {
     it("should forbid marking an appendix1 container as sent through signature", async () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");

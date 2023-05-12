@@ -210,9 +210,17 @@ export async function checkCanUpdate(
     form.status === "SIGNED_BY_PRODUCER" &&
     !form.emittedByEcoOrganisme
   ) {
-    authorizedOrgIds = [form.emitterCompanySiret].filter(Boolean);
-    errorMsg =
-      "Le producteur a signé ce bordereau, il est le seul à pouvoir le mettre à jour.";
+    const inputKeys = Object.keys(input);
+
+    if (inputKeys.every(k => ["transporter", "id"].includes(k))) {
+      // Les infos de transport peuvent être modifiées par tous les acteurs
+      // du BSDD tant que le déchet n'a pas été enlevé
+      authorizedOrgIds = formContributors(fullForm);
+    } else {
+      authorizedOrgIds = [form.emitterCompanySiret].filter(Boolean);
+      errorMsg =
+        "Le producteur a signé ce bordereau, il est le seul à pouvoir le mettre à jour.";
+    }
   } else {
     errorMsg =
       "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être modifiés";
