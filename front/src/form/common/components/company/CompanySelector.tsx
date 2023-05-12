@@ -317,11 +317,14 @@ export default function CompanySelector({
 
   // Disable the name field for foreign companies whose name is filled
   const disableNameField =
-    !!selectedCompanyDetails.name && !displayForeignCompanyWithUnknownInfos;
+    disabled ||
+    (!!selectedCompanyDetails.name && !displayForeignCompanyWithUnknownInfos);
 
   // Disable the address field for foreign companies whose address is filled
   const disableAddressField =
-    !!selectedCompanyDetails.address && !displayForeignCompanyWithUnknownInfos;
+    disabled ||
+    (!!selectedCompanyDetails.address &&
+      !displayForeignCompanyWithUnknownInfos);
 
   return (
     <>
