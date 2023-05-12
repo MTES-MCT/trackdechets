@@ -1,5 +1,5 @@
 // https://github.com/focus-trap/tabbable#testing-in-jsdom
-const lib = jest.requireActual("focus-trap-react/node_modules/tabbable");
+const lib = jest.requireActual("tabbable");
 
 const tabbable = {
   ...lib,
