@@ -9,6 +9,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Support des transporteurs étrangers dans le multimodal des BSDD [PR 2058](https://github.com/MTES-MCT/trackdechets/pull/2058)
+
 #### :bug: Corrections de bugs
 
 - L'interface d'aperçu ne crash plus quand on regarde l'aperçu d'un BSDD sans destinataire [2359](https://github.com/MTES-MCT/trackdechets/pull/2359)
