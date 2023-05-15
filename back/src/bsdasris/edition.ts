@@ -20,6 +20,7 @@ type EditableBsdasriFields = Required<
     | "groupedIn"
     | "synthesizedIn"
     | "synthesisEmitterSirets"
+    | "groupingEmitterSirets"
     | "transportSignatory"
     | "emissionSignatory"
     | "emitterEmissionSignatureDate"

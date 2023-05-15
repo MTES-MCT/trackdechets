@@ -132,6 +132,7 @@ describe("Mutation.updateBsdasri", () => {
 
     // synthesized emitter sirets are denormalized in `synthesisEmitterSirets`
     expect(updatedDasri.synthesisEmitterSirets).toEqual([emitterCompanySiret]);
+    expect(updatedDasri.groupingEmitterSirets).toEqual([]);
   });
 
   it("should forbid empty associated bsds fields on INITIAL synthesis dasri", async () => {

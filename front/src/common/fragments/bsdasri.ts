@@ -246,6 +246,9 @@ export const fullDasriFragment = gql`
     synthesizedIn {
       id
     }
+    groupedIn {
+      id
+    }
     createdAt
     updatedAt
     allowDirectTakeOver

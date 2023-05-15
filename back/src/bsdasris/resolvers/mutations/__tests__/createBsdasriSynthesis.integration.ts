@@ -138,6 +138,7 @@ describe("Mutation.createDasri", () => {
       toAssociate1.emitterCompanySiret,
       toAssociate2.emitterCompanySiret
     ]);
+    expect(created.groupingEmitterSirets).toEqual([]);
   });
 
   it("should forbid to mix grouping and synthesis arguments", async () => {

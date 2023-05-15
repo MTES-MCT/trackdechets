@@ -1027,6 +1027,7 @@ model Bsdasri {
 
   // Denormalized fields, storing associated dasri sirets to speed up some queries
   synthesisEmitterSirets String[] @default([])
+  groupingEmitterSirets String[] @default([])
 
   // partial indices _BsdasriTypeIdx, _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
   // gin index see 119_dasri_denormalized_sirets.sql

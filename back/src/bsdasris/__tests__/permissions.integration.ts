@@ -42,6 +42,7 @@ describe("Dasri permission helpers", () => {
 
     expect(grant).toBe(true);
   });
+
   it("should deny synthesis dasri reading access to user whose siret is not emitter on the associated form", async () => {
     const { user } = await userWithCompanyFactory("MEMBER");
     const mainCompany = await companyFactory();
@@ -86,6 +87,56 @@ describe("Dasri permission helpers", () => {
     });
 
     const grant = await checkCanRead(user, synthesisBsdasri);
+
+    expect(grant).toBe(true);
+  });
+
+  it("should deny grouping dasri reading access to user whose siret is not emitter on the grouped form", async () => {
+    const { user } = await userWithCompanyFactory("MEMBER");
+    const initialCompany = await companyFactory();
+    const mainCompany = await companyFactory();
+
+    const initialBsdasri = await bsdasriFactory({
+      opt: {
+        ...initialData(initialCompany)
+      }
+    });
+    const groupingBsdasri = await bsdasriFactory({
+      opt: {
+        type: BsdasriType.GROUPING,
+        ...initialData(mainCompany),
+        grouping: { connect: [{ id: initialBsdasri.id }] }
+      }
+    });
+
+    try {
+      await checkCanRead(user, groupingBsdasri);
+    } catch (err) {
+      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
+    }
+  });
+
+  it("should grant grouping dasri reading access to user whose siret is emitter on the grouped form", async () => {
+    const { user, company: initialCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+
+    const mainCompany = await companyFactory();
+
+    const initialBsdasri = await bsdasriFactory({
+      opt: {
+        ...initialData(initialCompany)
+      }
+    });
+    const groupingBsdasri = await bsdasriFactory({
+      opt: {
+        type: BsdasriType.GROUPING,
+        ...initialData(mainCompany),
+        grouping: { connect: [{ id: initialBsdasri.id }] }
+      }
+    });
+
+    const grant = await checkCanRead(user, groupingBsdasri);
 
     expect(grant).toBe(true);
   });
