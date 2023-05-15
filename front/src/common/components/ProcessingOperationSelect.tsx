@@ -8,6 +8,7 @@ import styles from "./ProcessingOperationSelect.module.scss";
 
 const ProcessingOperationSelect = ({
   field: { value, name, onChange, enableReuse = false },
+  disabled,
 }) => {
   const operations = enableReuse
     ? PROCESSING_AND_REUSE_OPERATIONS
@@ -22,6 +23,7 @@ const ProcessingOperationSelect = ({
         value={value}
         onChange={onChange}
         className={classNames("td-select", styles.processingOperationSelect)}
+        disabled={disabled}
       >
         <option value="">Choisissez...</option>
         {operations.map(operation => (

@@ -21,6 +21,7 @@ const GET_ECO_ORGANISMES = gql`
 
 interface EcoOrganismesProps {
   name: string;
+  disabled: boolean;
 }
 
 export default function EcoOrganismes(props: EcoOrganismesProps) {
@@ -47,6 +48,7 @@ export default function EcoOrganismes(props: EcoOrganismesProps) {
           checked={hasEcoOrganisme}
           onChange={handleEcoOrganismeToggle}
           label="Un éco-organisme est responsable de la prise en charge des déchets"
+          disabled={props.disabled}
         />
       </div>
 

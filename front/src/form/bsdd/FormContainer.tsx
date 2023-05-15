@@ -8,18 +8,50 @@ import WasteInfo from "./WasteInfo";
 import { useParams } from "react-router-dom";
 
 export default function FormContainer() {
-  const { id } = useParams<{ id?: string }>();
+  const { id, siret } = useParams<{ id?: string; siret: string }>();
+
   return (
     <main className="main">
       <div className="container">
         <StepList formId={id}>
-          <StepContainer component={Emitter} title="Émetteur du déchet" />
-          <StepContainer component={WasteInfo} title="Détail du déchet" />
-          <StepContainer component={Recipient} title="Destination du déchet" />
-          <StepContainer
-            component={Transporter}
-            title="Transporteur du déchet"
-          />
+          {form => {
+            const isEmitter = form?.emitter?.company?.siret === siret;
+
+            const disabledAfterEmission =
+              // le BSDD existe ET
+              !!form &&
+              // le déchet a été enlevé par le transporteur OU
+              (!!form.takenOverAt ||
+                // le BSDD a été émis et l'utilisateur courant n'est pas l'émetteur
+                (!!form.emittedAt && !isEmitter));
+
+            const disabledAfterTransport = !!form && !!form.takenOverAt;
+
+            return (
+              <>
+                <StepContainer
+                  component={Emitter}
+                  title="Émetteur du déchet"
+                  disabled={disabledAfterEmission}
+                />
+                <StepContainer
+                  component={WasteInfo}
+                  title="Détail du déchet"
+                  disabled={disabledAfterEmission}
+                />
+                <StepContainer
+                  component={Recipient}
+                  title="Destination du déchet"
+                  disabled={disabledAfterEmission}
+                />
+                <StepContainer
+                  component={Transporter}
+                  title="Transporteur du déchet"
+                  disabled={disabledAfterTransport}
+                />
+              </>
+            );
+          }}
         </StepList>
       </div>
     </main>

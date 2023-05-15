@@ -81,20 +81,22 @@ export default function Packagings({
                                 key={optionValue}
                                 value={optionValue}
                                 disabled={
-                                  value?.length > 1 &&
-                                  ([
-                                    PackagingsEnum.Citerne,
-                                    PackagingsEnum.Benne,
-                                  ].includes(optionValue) ||
-                                    value.some(p =>
-                                      [
-                                        PackagingsEnum.Citerne,
-                                        PackagingsEnum.Benne,
-                                        ...(optionValue !== PackagingsEnum.Autre
-                                          ? [optionValue]
-                                          : []),
-                                      ].includes(p.type)
-                                    ))
+                                  props.disabled ||
+                                  (value?.length > 1 &&
+                                    ([
+                                      PackagingsEnum.Citerne,
+                                      PackagingsEnum.Benne,
+                                    ].includes(optionValue) ||
+                                      value.some(p =>
+                                        [
+                                          PackagingsEnum.Citerne,
+                                          PackagingsEnum.Benne,
+                                          ...(optionValue !==
+                                          PackagingsEnum.Autre
+                                            ? [optionValue]
+                                            : []),
+                                        ].includes(p.type)
+                                      )))
                                 }
                               >
                                 {optionLabel}
@@ -111,6 +113,7 @@ export default function Packagings({
                               className="td-input"
                               name={`${name}.${idx}.other`}
                               placeholder="..."
+                              disabled={props.disabled}
                             />
                           </label>
                         )}
@@ -119,6 +122,7 @@ export default function Packagings({
                         {p.type !== "PIPELINE" && (
                           <Field
                             label="Colis"
+                            disabled={props.disabled}
                             component={NumberInput}
                             className="td-input"
                             name={`${name}.${idx}.quantity`}
@@ -140,7 +144,7 @@ export default function Packagings({
                       className="tw-px-2"
                       onClick={() => arrayHelpers.remove(idx)}
                     >
-                      <button type="button">
+                      <button type="button" disabled={props.disabled}>
                         <IconClose />
                       </button>
                     </div>
@@ -154,7 +158,7 @@ export default function Packagings({
             <button
               type="button"
               className="btn btn--outline-primary"
-              disabled={isAddButtonDisabled}
+              disabled={props.disabled || isAddButtonDisabled}
               onClick={() =>
                 arrayHelpers.push({
                   type: PackagingsEnum.Autre,
