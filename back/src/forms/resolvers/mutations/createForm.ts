@@ -1,4 +1,4 @@
-import { EmitterType, Prisma } from "@prisma/client";
+import { EmitterType, Prisma, TransportMode } from "@prisma/client";
 import { isDangerous } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
@@ -14,7 +14,11 @@ import {
 } from "../../converter";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
-import { draftFormSchema, validateGroupement } from "../../validation";
+import {
+  draftFormSchema,
+  hasPipeline,
+  validateGroupement
+} from "../../validation";
 import { UserInputError } from "apollo-server-core";
 import { appendix2toFormFractions } from "../../compat";
 import { runInTransaction } from "../../../common/repository/helper";
@@ -58,6 +62,15 @@ const createFormResolver = async (
   }
 
   const form = flattenFormInput(formContent);
+  // Pipeline erases transporter EXCEPT for transporterTransportMode
+  if (hasPipeline(form as any)) {
+    Object.keys(form)
+      .filter(key => key.startsWith("transporter"))
+      .forEach(key => {
+        form[key] = null;
+      });
+    form.transporterTransportMode = TransportMode.OTHER;
+  }
 
   const readableId = getReadableId();
 

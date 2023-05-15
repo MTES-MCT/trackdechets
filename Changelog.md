@@ -5,30 +5,38 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
-# [2023.4.2] 24/04/2023
+# [2023.5.1] 16/05/2023
 
 #### :rocket: Nouvelles fonctionnalités
 
-- Ajout de l'exemption de récépisse pour Bsdasri, Bsvhu et Bsda (UI seule) [PR 2337](https://github.com/MTES-MCT/trackdechets/pull/2337)
+- Support des transporteurs étrangers dans le multimodal des BSDD [PR 2058](https://github.com/MTES-MCT/trackdechets/pull/2058)
 
 #### :bug: Corrections de bugs
+
+- L'interface d'aperçu ne crash plus quand on regarde l'aperçu d'un BSDD sans destinataire [2359](https://github.com/MTES-MCT/trackdechets/pull/2359)
+- L'adresse du pickupSite d'un DASRI apparaît dans le PDF, même si l'utilisateur ne renseigne pas de nom [PR 2360](https://github.com/MTES-MCT/trackdechets/pull/2360)
+- Un utilisateur appartenant à plusieurs entreprises sur un BSDA n'accepte/refuse une révision qu'une seule fois [2343](https://github.com/MTES-MCT/trackdechets/pull/2343)
+- Il est à nouveau possible d'éditer le nom ou le numéro de téléphone indépendamment sur la page de profil [PR 2367](https://github.com/MTES-MCT/trackdechets/pull/2367)
 
 #### :boom: Breaking changes
 
 #### :nail_care: Améliorations
 
-- Améliorations performances back-end, sur les révisions Bsda, Bsdd et l'authentification (dataloaders et requêtes SQL) [PR 2350](https://github.com/MTES-MCT/trackdechets/pull/2350)
+- Les éco-organismes peuvent gérer les révisions du BSDD [PR 2356](https://github.com/MTES-MCT/trackdechets/pull/2356)
 
 #### :memo: Documentation
 
 #### :house: Interne
 
-- Utilisation de dataloaders pour charger les évènements Psql & Mongo [PR 2107](https://github.com/MTES-MCT/trackdechets/pull/2107)
+- Déplacemement trackdechets/search vers son propre dépôt git [PR 2363](https://github.com/MTES-MCT/trackdechets/pull/2363)
 
-# [2023.4.2] 24/04/2023
+# [2023.4.2] 25/04/2023
 
 #### :rocket: Nouvelles fonctionnalités
 
+- Ajout de l'exemption de récépisse pour Bsdasri, Bsvhu et Bsda (UI seule) [PR 2337](https://github.com/MTES-MCT/trackdechets/pull/2337)
+- Tous BSD - transport - Ne plus proposer de champs de récépissés modifiables mais automatiquement remplir celles enregistrées dans le compte Trackdéchets de l'établissement. Informer du récépissé dans les modales de signature transporteur [PR 2205](https://github.com/MTES-MCT/trackdechets/pull/2205).
+- Le champ wasteDetails.name (appellation du déchet) devient obigatoire sur le Bsdd à partir de l'étape SEALED [PR 2317](https://github.com/MTES-MCT/trackdechets/pull/2317).
 - Envoi d'un mail aux administrateurs d'une entreprise ayant ignoré une RevisionRequest pendant 5 jours (BSD + BSDA) [PR 2288](https://github.com/MTES-MCT/trackdechets/pull/2288)
 
 #### :bug: Corrections de bugs
@@ -38,29 +46,14 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :boom: Breaking changes
 
-#### :nail_care: Améliorations
-
-- L'activation d'un nouvel utilisateur passe par une étape manuelle pour éviter les activations impromptues générées par les crwalers des webmails [PR 2271](https://github.com/MTES-MCT/trackdechets/pull/2271)
-
-#### :memo: Documentation
-
-#### :house: Interne
-
-# [2023.4.2] 25/04/2023
-
-#### :rocket: Nouvelles fonctionnalités
-
-- Tous BSD - transport - Ne plus proposer de champs de récépissés modifiables mais automatiquement remplir celles enregistrées dans le compte Trackdéchets de l'établissement. Informer du récépissé dans les modales de signature transporteur [PR 2205](https://github.com/MTES-MCT/trackdechets/pull/2205).
-- Le champ wasteDetails.name (appellation du déchet) devient obigatoire sur le Bsdd à partir de l'étape SEALED [PR 2317](https://github.com/MTES-MCT/trackdechets/pull/2317).
-
-### :bug: Corrections de bugs
-
-#### :boom: Breaking changes
-
 - Tous BSD - transport - Le récépissé transporteur du BSFF est obligatoire, sauf exemption à cocher [PR 2205](https://github.com/MTES-MCT/trackdechets/pull/2205).
+- Interdiction des requêtes groupées de plus de 5 query gql parallèles [PR 2256](https://github.com/MTES-MCT/trackdechets/pull/2256)
 
 #### :nail_care: Améliorations
 
+- Améliorations performances back-end, sur les révisions Bsda, Bsdd et l'authentification (dataloaders et requêtes SQL) [PR 2350](https://github.com/MTES-MCT/trackdechets/pull/2350)
+- Améliorations performances back-end, sur les révisions Bsda, Bsdd et l'authentification (dataloaders et requêtes SQL) [PR 2350](https://github.com/MTES-MCT/trackdechets/pull/2350)
+- L'activation d'un nouvel utilisateur passe par une étape manuelle pour éviter les activations impromptues générées par les crwalers des webmails [PR 2271](https://github.com/MTES-MCT/trackdechets/pull/2271)
 - Améliorations sur l'annexe 1 [PR 2274](https://github.com/MTES-MCT/trackdechets/pull/2274)
 
   - Ajout du code déchet 15 02 02\*
@@ -69,6 +62,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
   - Correction d'un bug à la signature des annexes 1 émises par des particuliers
   - Désactivation du bouton de création de révision sur les annexes 1: seul le borereau de tournée peut être révisé
   - Ajout des champs consistance du déchet et CAP sur le bordereau de tournée
+
 - Ajout d'un filtre par numéro de bordereau sur les queries `formRevisionRequests` et `bsdaRevisionsRequests` [PR 2319](https://github.com/MTES-MCT/trackdechets/pull/2319)
 
 - Modification des mails d'onboarding (modification du contenu et des triggers) [PR 2212](https://github.com/MTES-MCT/trackdechets/pull/2212):
@@ -84,22 +78,7 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :house: Interne
 
-# [2023.4.2] 25/04/2023
-
-#### :rocket: Nouvelles fonctionnalités
-
-#### :bug: Corrections de bugs
-
-#### :boom: Breaking changes
-
-- Interdiction des requêtes groupées de plus de 5 query gql parallèles [PR 2256](https://github.com/MTES-MCT/trackdechets/pull/2256)
-
-#### :nail_care: Améliorations
-
-#### :memo: Documentation
-
-#### :house: Interne
-
+- Utilisation de dataloaders pour charger les évènements Psql & Mongo [PR 2107](https://github.com/MTES-MCT/trackdechets/pull/2107)
 - Les permissions associées à chaque rôle (`ADMIN` ou `MEMBER`) sont désormais rendues explicites dans le code backend [PR 2229](https://github.com/MTES-MCT/trackdechets/pull/2229)
 
 # [2023.4.1] 04/04/2023

@@ -3,6 +3,7 @@ import {
   Form,
   Prisma,
   RevisionRequestApprovalStatus,
+  BsddRevisionRequestApproval,
   RevisionRequestStatus,
   Status
 } from "@prisma/client";
@@ -18,12 +19,74 @@ import { enqueueUpdatedBsdToIndex } from "../../../queue/producers/elastic";
 import { NON_CANCELLABLE_BSDD_STATUSES } from "../../resolvers/mutations/createFormRevisionRequest";
 import { ForbiddenError } from "apollo-server-core";
 import buildRemoveAppendix2 from "../form/removeAppendix2";
+import { distinct } from "../../../common/arrays";
 
 export type AcceptRevisionRequestApprovalFn = (
   revisionRequestApprovalId: string,
   { comment }: { comment?: string | null },
   logMetadata?: LogMetadata
 ) => Promise<void>;
+
+/**
+ *
+ * We have to handle eco organismes which might be present on bsdd:
+ * Retrieve form
+ * Get producer sirets: emitter + eco-organisme if present
+ * If we have both, 2 pending approvals were generated, one is already accepted
+ * Update the remaining approval to automatically accept it
+ */
+const handleEcoOrganismeApprovals = async (
+  prisma: RepositoryTransaction,
+  updatedApproval: BsddRevisionRequestApproval & {
+    revisionRequest: BsddRevisionRequest;
+  }
+) => {
+  const bsd = await prisma.form.findUnique({
+    where: { id: updatedApproval.revisionRequest.bsddId }
+  });
+  const approverSiret = updatedApproval.approverSiret;
+
+  const producerSirets = distinct(
+    [bsd?.emitterCompanySiret, bsd?.ecoOrganismeSiret].filter(Boolean)
+  );
+  if (producerSirets.length > 1 && producerSirets.includes(approverSiret)) {
+    const otherSiret = producerSirets.filter(
+      siret => siret !== approverSiret
+    )[0];
+
+    const otherApproval = await prisma.bsddRevisionRequestApproval.findFirst({
+      where: {
+        revisionRequestId: updatedApproval.revisionRequest.id,
+        approverSiret: otherSiret
+      }
+    });
+    if (otherApproval) {
+      await prisma.bsddRevisionRequestApproval.update({
+        where: {
+          id: otherApproval.id
+        },
+        data: {
+          status: RevisionRequestApprovalStatus.ACCEPTED,
+          comment: "Auto approval"
+        }
+      });
+
+      await prisma.event.create({
+        data: {
+          streamId: otherApproval.revisionRequestId,
+          actor: "system",
+          type: "BsddRevisionRequestAccepted",
+          data: {
+            content: {
+              status: RevisionRequestApprovalStatus.ACCEPTED,
+              comment: "Auto"
+            }
+          }
+        }
+      });
+    }
+  }
+};
 
 const buildAcceptRevisionRequestApproval: (
   deps: RepositoryFnDeps
@@ -37,9 +100,9 @@ const buildAcceptRevisionRequestApproval: (
       data: {
         status: RevisionRequestApprovalStatus.ACCEPTED,
         comment
-      }
+      },
+      include: { revisionRequest: true }
     });
-
     await prisma.event.create({
       data: {
         streamId: updatedApproval.revisionRequestId,
@@ -54,6 +117,9 @@ const buildAcceptRevisionRequestApproval: (
         metadata: { ...logMetadata, authType: user.auth }
       }
     });
+
+    // when eco organisme is present onf bsdd
+    await handleEcoOrganismeApprovals(prisma, updatedApproval);
 
     // If it was the last approval:
     // - mark the revision as approved

@@ -67,12 +67,12 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
             ...receivedInfo
           }
         },
-        currentTransporterSiret: ""
+        currentTransporterOrgId: ""
       }
     : {
         ...receivedInfo,
         quantityReceivedType: QuantityType.REAL,
-        currentTransporterSiret: ""
+        currentTransporterOrgId: ""
       };
 
   const groupedForms = await getFormRepository(user).findGroupedFormsById(

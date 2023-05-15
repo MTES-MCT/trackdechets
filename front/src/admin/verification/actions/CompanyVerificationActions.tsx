@@ -1,7 +1,6 @@
 import { CompanyForVerification } from "generated/graphql/types";
 import React, { useState } from "react";
 import CompanyVerifyModal from "./CompanyVerifyModal";
-import "@reach/menu-button/styles.css";
 import SendVerificationCodeLetterModal from "./SendVerificationCodeLetterModal";
 import { isSiret } from "generated/constants/companySearchHelpers";
 

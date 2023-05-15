@@ -6,6 +6,7 @@ import {
   isSiret
 } from "../../common/constants/companySearchHelpers";
 import { Event, EventType } from "./types";
+import { hasPipeline } from "../validation";
 
 /**
  * Workflow state machine
@@ -38,7 +39,12 @@ const machine = Machine<any, Event>(
           ],
           [EventType.SignedByProducer]: [
             {
-              target: Status.SIGNED_BY_PRODUCER
+              target: Status.SIGNED_BY_PRODUCER,
+              cond: "notPipeline"
+            },
+            {
+              target: Status.SENT,
+              cond: "hasPipeline"
             }
           ]
         }
@@ -295,7 +301,13 @@ const machine = Machine<any, Event>(
           guard(event.formUpdateInput) ||
           guard(event.formUpdateInput?.forwardedIn?.update)
         );
-      }
+      },
+      hasPipeline: (_, event) =>
+        !!event.formUpdateInput?.wasteDetailsPackagingInfos &&
+        hasPipeline(event.formUpdateInput as any),
+      notPipeline: (_, event) =>
+        !event.formUpdateInput?.wasteDetailsPackagingInfos ||
+        !hasPipeline(event.formUpdateInput as any)
     }
   }
 );

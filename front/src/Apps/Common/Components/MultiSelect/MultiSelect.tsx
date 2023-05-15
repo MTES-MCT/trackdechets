@@ -1,16 +1,28 @@
 import React from "react";
-import { MultiSelect } from "react-multi-select-component";
-import {
-  filter_type_select_option_placeholder,
-  multi_select_select_all_label,
-} from "../../wordings/dashboard/wordingsDashboard";
+import { MultiSelect, Option } from "react-multi-select-component";
+import { multi_select_select_all_label } from "../../wordings/dashboard/wordingsDashboard";
 
 import "./multiSelect.scss";
 
-const MultiSelectWrapper = ({ options, onChange, selected, disableSearch }) => {
+interface MultiSelectWrapperProps {
+  options: Option[];
+  onChange: Function;
+  selected: Option[];
+  placeholder: string;
+  showRendererText?: boolean;
+  disableSearch?: boolean;
+}
+const MultiSelectWrapper = ({
+  options,
+  onChange,
+  selected,
+  placeholder,
+  disableSearch,
+  showRendererText = true,
+}: MultiSelectWrapperProps) => {
   const valueRenderer = (selected: typeof options) => {
-    if (!selected.length) {
-      return filter_type_select_option_placeholder;
+    if (!selected.length || !showRendererText) {
+      return placeholder;
     }
     return selected.length === 1
       ? `${selected[0].label}`
@@ -26,7 +38,7 @@ const MultiSelectWrapper = ({ options, onChange, selected, disableSearch }) => {
       value={selected}
       onChange={onChange}
       valueRenderer={valueRenderer}
-      labelledBy={filter_type_select_option_placeholder}
+      labelledBy={placeholder}
       disableSearch={disableSearch}
       overrideStrings={{
         allItemsAreSelected: "",

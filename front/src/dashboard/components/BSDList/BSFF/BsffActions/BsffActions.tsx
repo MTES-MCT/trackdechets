@@ -1,33 +1,25 @@
 import * as React from "react";
-import { Link, generatePath, useParams, useLocation } from "react-router-dom";
-import {
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuLink,
-  MenuItem,
-} from "@reach/menu-button";
-import "@reach/menu-button/styles.css";
-import classNames from "classnames";
+import { generatePath, useParams, useLocation } from "react-router-dom";
+
 import routes from "common/routes";
 import {
-  IconChevronDown,
-  IconChevronUp,
   IconView,
   IconPaperWrite,
   IconPdf,
   IconTrash,
   IconDuplicateFile,
+  IconQrCode,
 } from "common/components/Icons";
 import { BsffStatus } from "generated/graphql/types";
 import { BsffFragment } from "../types";
 import { DeleteBsffModal } from "./DeleteModal";
 import { useDownloadPdf } from "./useDownloadPdf";
-import { TableRoadControlButton } from "../../RoadControlButton";
+import { useDisplayRoadControlButton } from "../../RoadControlButton";
 import { useDuplicate } from "./useDuplicate";
 
 import styles from "../../BSDActions.module.scss";
 import { Loader } from "common/components";
+import DropdownMenu from "Apps/Common/Components/DropdownMenu/DropdownMenu";
 
 interface BsffActionsProps {
   form: BsffFragment;
@@ -49,85 +41,74 @@ export const BsffActions = ({ form }: BsffActionsProps) => {
     form.bsffStatus === BsffStatus.Initial ||
     (form.bsffStatus === BsffStatus.SignedByEmitter && siret === emitterSiret);
 
+  const links = [
+    {
+      title: "Contrôle routier",
+      route: generatePath(routes.dashboard.roadControl, {
+        siret,
+        id: form.id,
+      }),
+      icon: <IconQrCode color="blueLight" size="24px" />,
+      isVisible: useDisplayRoadControlButton(form),
+    },
+    {
+      title: "Aperçu",
+      route: {
+        pathname: generatePath(routes.dashboard.bsffs.view, {
+          siret,
+          id: form.id,
+        }),
+        state: { background: location },
+      },
+      icon: <IconView color="blueLight" size="24px" />,
+      isVisible: true,
+    },
+    {
+      title: "Pdf",
+      route: "",
+      icon: <IconPdf size="24px" color="blueLight" />,
+      isVisible: !form.isDraft,
+      isButton: true,
+      handleClick: () => downloadPdf(),
+    },
+    {
+      title: "Dupliquer",
+      route: "",
+      icon: <IconDuplicateFile size="24px" color="blueLight" />,
+      isVisible: true,
+      isButton: true,
+      handleClick: () => duplicateBsff(),
+    },
+    {
+      title: "Modifier",
+      route: generatePath(routes.dashboard.bsffs.edit, {
+        siret,
+        id: form.id,
+      }),
+      icon: <IconPaperWrite size="24px" color="blueLight" />,
+      isVisible: [BsffStatus.Initial, BsffStatus.SignedByEmitter].includes(
+        form.bsffStatus
+      ),
+    },
+    {
+      title: "Supprimer",
+      route: "",
+      icon: <IconTrash color="blueLight" size="24px" />,
+      isVisible: canDelete,
+      isButton: true,
+      handleClick: () => setIsDeleting(true),
+    },
+  ];
   return (
     <>
-      <Menu>
-        {({ isExpanded }) => (
-          <>
-            <MenuButton
-              className={classNames(
-                "btn btn--outline-primary",
-                styles.BSDDActionsToggle
-              )}
-            >
-              Actions
-              {isExpanded ? (
-                <IconChevronUp size="14px" color="blueLight" />
-              ) : (
-                <IconChevronDown size="14px" color="blueLight" />
-              )}
-            </MenuButton>
-            <MenuList
-              className={classNames(
-                "fr-raw-link fr-raw-list",
-                styles.BSDDActionsMenu
-              )}
-            >
-              <TableRoadControlButton siret={siret} form={form} />
+      <div className={styles.BSDActions}>
+        <DropdownMenu
+          menuTitle="Actions"
+          links={links.filter(f => f.isVisible)}
+          iconAlone
+        />
+      </div>
 
-              <MenuLink
-                as={Link}
-                to={{
-                  pathname: generatePath(routes.dashboard.bsffs.view, {
-                    siret,
-                    id: form.id,
-                  }),
-                  state: { background: location },
-                }}
-              >
-                <IconView color="blueLight" size="24px" />
-                Aperçu
-              </MenuLink>
-
-              {!form.isDraft && (
-                <MenuItem onSelect={() => downloadPdf()}>
-                  <IconPdf size="24px" color="blueLight" />
-                  Pdf
-                </MenuItem>
-              )}
-
-              <MenuItem onSelect={() => duplicateBsff()}>
-                <IconDuplicateFile size="24px" color="blueLight" />
-                Dupliquer
-              </MenuItem>
-
-              {[BsffStatus.Initial, BsffStatus.SignedByEmitter].includes(
-                form.bsffStatus
-              ) && (
-                <>
-                  <MenuLink
-                    as={Link}
-                    to={generatePath(routes.dashboard.bsffs.edit, {
-                      siret,
-                      id: form.id,
-                    })}
-                  >
-                    <IconPaperWrite size="24px" color="blueLight" />
-                    Modifier
-                  </MenuLink>
-                </>
-              )}
-
-              {canDelete && (
-                <MenuItem onSelect={() => setIsDeleting(true)}>
-                  <IconTrash color="blueLight" size="24px" />
-                  Supprimer
-                </MenuItem>
-              )}
-            </MenuList>
-          </>
-        )}
-      </Menu>
       {isDeleting && (
         <DeleteBsffModal
           isOpen

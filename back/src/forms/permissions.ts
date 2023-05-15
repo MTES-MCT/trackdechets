@@ -180,7 +180,6 @@ export async function checkCanUpdate(
   form: Form,
   input: UpdateFormInput
 ) {
-  // TODO: should we limit which field remains editable for appendix 1 ?
   if (form.emitterType === EmitterType.APPENDIX1 && form.status === "SENT") {
     return true;
   }
@@ -192,10 +191,14 @@ export async function checkCanUpdate(
 
   if (
     ["DRAFT", "SEALED"].includes(form.status) ||
-    // TODO: should we limit which field remains editable for appendix 1 ?
     (form.emitterType === EmitterType.APPENDIX1 && form.status === "SENT")
   ) {
     authorizedOrgIds = formContributors(fullForm);
+  } else if (
+    form.emitterType === EmitterType.APPENDIX1_PRODUCER &&
+    ["SIGNED_BY_PRODUCER"].includes(form.status)
+  ) {
+    authorizedOrgIds = [form.transporterCompanySiret].filter(Boolean);
   } else if (
     form.status === "SIGNED_BY_PRODUCER" &&
     form.emittedByEcoOrganisme
@@ -469,6 +472,7 @@ export async function checkCanRequestRevision(user: User, form: Form) {
   const authorizedOrgIds = [
     fullForm.emitterCompanySiret,
     fullForm.recipientCompanySiret,
+    fullForm.ecoOrganismeSiret,
     fullForm.forwardedIn?.recipientCompanySiret
   ].filter(Boolean);
 

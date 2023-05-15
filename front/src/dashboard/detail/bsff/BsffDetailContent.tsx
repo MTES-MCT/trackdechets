@@ -39,6 +39,7 @@ import {
 } from "common/components";
 import { formatDate } from "common/datetime";
 import { PACKAGINGS_NAMES } from "form/bsff/components/packagings/Packagings";
+import { isForeignVat } from "generated/constants/companySearchHelpers";
 
 type CompanyProps = {
   company?: FormCompany | null;
@@ -316,22 +317,32 @@ function Transporter({ form }: { form: Bsff }) {
         <Company label="Raison sociale" company={form.transporter?.company} />
       </div>
       <div className={styles.detailGrid}>
-        <YesNoRow
-          value={!form?.transporter?.recepisse}
-          label="Exemption de récépissé"
-        />
-        <DetailRow
-          value={form.transporter?.recepisse?.number}
-          label="Numéro de récépissé"
-        />
-        <DetailRow
-          value={form.transporter?.recepisse?.department}
-          label="Département"
-        />
-        <DateRow
-          value={form.transporter?.recepisse?.validityLimit}
-          label="Date de validité"
-        />
+        {!isForeignVat(form?.transporter?.company?.vatNumber!!) && (
+          <>
+            <YesNoRow
+              value={!form?.transporter?.recepisse}
+              label="Exemption de récépissé"
+            />
+            {form?.transporter?.recepisse !== null && (
+              <>
+                <DetailRow
+                  value={form.transporter?.recepisse?.number}
+                  label="Numéro de récépissé"
+                  showEmpty={true}
+                />
+                <DetailRow
+                  value={form.transporter?.recepisse?.department}
+                  label="Département"
+                  showEmpty={true}
+                />
+                <DateRow
+                  value={form.transporter?.recepisse?.validityLimit}
+                  label="Date de validité"
+                />
+              </>
+            )}
+          </>
+        )}
         <DetailRow
           value={
             form.transporter?.transport?.mode

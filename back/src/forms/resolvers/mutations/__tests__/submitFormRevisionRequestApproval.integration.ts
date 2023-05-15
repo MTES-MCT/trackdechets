@@ -149,7 +149,121 @@ describe("Mutation.submitFormRevisionRequestApproval", () => {
 
     expect(data.submitFormRevisionRequestApproval.status).toBe("ACCEPTED");
   });
+  it("when an eco-organisme is on the bsdd, its approval should auto-approve the emitter's approval", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { company: emittercompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company: ecoOrganismecompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { mutate } = makeClient(user);
 
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: emittercompany.siret,
+        ecoOrganismeSiret: ecoOrganismecompany.siret
+      }
+    });
+
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: recipientCompany.id,
+        approvals: {
+          create: [
+            { approverSiret: emittercompany.siret! },
+            { approverSiret: ecoOrganismecompany.siret! }
+          ]
+        },
+        comment: ""
+      }
+    });
+
+    const { data } = await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+
+    expect(data.submitFormRevisionRequestApproval.status).toBe("ACCEPTED");
+
+    const emitterApproval = await prisma.bsddRevisionRequestApproval.findFirst({
+      where: {
+        revisionRequestId: revisionRequest.id,
+        approverSiret: emittercompany.siret!
+      }
+    });
+    expect(emitterApproval?.status).toBe("ACCEPTED");
+    expect(emitterApproval?.comment).toBe("Auto approval");
+    const ecoOrgApproval = await prisma.bsddRevisionRequestApproval.findFirst({
+      where: {
+        revisionRequestId: revisionRequest.id,
+        approverSiret: ecoOrganismecompany.siret!
+      }
+    });
+    expect(ecoOrgApproval?.status).toBe("ACCEPTED");
+  });
+  it("when an eco-organisme is on the bsdd, emitter's approval should auto-approve the eco-orgaisme's approval", async () => {
+    const { company: recipientCompany } = await userWithCompanyFactory("ADMIN");
+    const { user, company: emittercompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { company: ecoOrganismecompany } = await userWithCompanyFactory(
+      "ADMIN"
+    );
+    const { mutate } = makeClient(user);
+
+    const bsdd = await formFactory({
+      ownerId: user.id,
+      opt: {
+        emitterCompanySiret: emittercompany.siret,
+        ecoOrganismeSiret: ecoOrganismecompany.siret
+      }
+    });
+
+    const revisionRequest = await prisma.bsddRevisionRequest.create({
+      data: {
+        bsddId: bsdd.id,
+        authoringCompanyId: recipientCompany.id,
+        approvals: {
+          create: [
+            { approverSiret: emittercompany.siret! },
+            { approverSiret: ecoOrganismecompany.siret! }
+          ]
+        },
+        comment: ""
+      }
+    });
+
+    const { data } = await mutate<
+      Pick<Mutation, "submitFormRevisionRequestApproval">
+    >(SUBMIT_BSDD_REVISION_REQUEST_APPROVAL, {
+      variables: {
+        id: revisionRequest.id,
+        isApproved: true
+      }
+    });
+    expect(data.submitFormRevisionRequestApproval.status).toBe("ACCEPTED");
+
+    const emitterApproval = await prisma.bsddRevisionRequestApproval.findFirst({
+      where: {
+        revisionRequestId: revisionRequest.id,
+        approverSiret: emittercompany.siret!
+      }
+    });
+    expect(emitterApproval?.status).toBe("ACCEPTED");
+    const ecoOrgApproval = await prisma.bsddRevisionRequestApproval.findFirst({
+      where: {
+        revisionRequestId: revisionRequest.id,
+        approverSiret: ecoOrganismecompany.siret!
+      }
+    });
+    expect(ecoOrgApproval?.status).toBe("ACCEPTED");
+    expect(ecoOrgApproval?.comment).toBe("Auto approval");
+  });
   it("should work if one of the approvers approves the revisionRequest, but not mark the revisionRequest as accepted", async () => {
     const { company: secondCompany } = await userWithCompanyFactory("ADMIN");
     const { company: thirdCompany } = await userWithCompanyFactory("ADMIN");

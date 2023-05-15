@@ -17,20 +17,8 @@
     margin: 15px 8px;
 
     .create-btn {
-      .fr-btn {
-        margin: 5px 0;
-        box-sizing: content-box;
-        padding: 0px 10px;
-        justify-content: center;
-
-        &:after {
-          content: "";
-          display: inline-block;
-          background: url("/icons/dashboard/arrow-s-line.svg");
-          width: 16px;
-          height: 16px;
-          margin-left: 5px;
-        }
+      .dropdown-menu__content {
+        width: 280px;
       }
     }
 

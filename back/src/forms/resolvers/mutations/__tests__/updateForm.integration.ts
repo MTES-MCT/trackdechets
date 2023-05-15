@@ -19,6 +19,7 @@ import {
 } from "../../../../generated/graphql/types";
 import getReadableId from "../../../readableId";
 import * as sirenify from "../../../sirenify";
+import { sub } from "date-fns";
 
 const sirenifyMock = jest
   .spyOn(sirenify, "sirenifyFormInput")
@@ -32,6 +33,11 @@ const UPDATE_FORM = `
         name
         code
         isDangerous
+        packagingInfos {
+          type
+          other
+          quantity
+        }
       }
       recipient {
         company {
@@ -70,6 +76,23 @@ const UPDATE_FORM = `
       intermediaries {
         siret
         name
+      }
+      transporter {
+        company {
+          siret
+          name
+          address
+          contact
+          mail
+          phone
+        }
+        isExemptedOfReceipt
+        receipt
+        department
+        validityLimit
+        numberPlate
+        customInfo
+        mode
       }
     }
   }
@@ -780,6 +803,82 @@ describe("Mutation.updateForm", () => {
     expect(data.updateForm.wasteDetails).toMatchObject(
       updateFormInput.wasteDetails
     );
+  });
+
+  it("should update a form with a PIPELINE packaging, erasing transporter infos and forcing transporter mode OTHER", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret
+      }
+    });
+
+    const updateFormInput = {
+      id: form.id,
+      transporter: {
+        mode: "ROAD",
+        company: {
+          siret: siretify(1)
+        }
+      },
+      wasteDetails: {
+        name: "things",
+        packagingInfos: [{ type: "PIPELINE", quantity: 1 }]
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { data } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    expect(data.updateForm.wasteDetails).toMatchObject(
+      updateFormInput.wasteDetails
+    );
+    expect(data.updateForm.transporter).toMatchObject({
+      mode: "OTHER",
+      company: { siret: null }
+    });
+  });
+
+  it("should error updating form with a PIPELINE packaging, and any other packaging", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: company.siret,
+        wasteDetailsPackagingInfos: [{ type: "PIPELINE", quantity: 1 }]
+      }
+    });
+
+    const updateFormInput = {
+      id: form.id,
+      transporter: {
+        mode: "ROAD",
+        company: {
+          siret: siretify(1)
+        }
+      },
+      wasteDetails: {
+        name: "things",
+        packagingInfos: [
+          { type: "CITERNE", quantity: 1 },
+          { type: "PIPELINE", quantity: 1 }
+        ]
+      }
+    };
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    expect(errors).toMatchObject([
+      {
+        extensions: { code: "BAD_USER_INPUT" },
+        message:
+          "wasteDetailsPackagingInfos ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement."
+      }
+    ]);
   });
 
   it("should add a temporary storage", async () => {
@@ -2009,4 +2108,77 @@ describe("Mutation.updateForm", () => {
       expect(errors).toBeUndefined();
     }
   );
+
+  it("should not allow updating appendix1 if one of them has been signed by the transporter for more than 3 days", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { company: producerCompany } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+
+    const threeDaysAgo = sub(new Date(), { days: 3 });
+    const appendix1_1 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.SENT,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: producerCompany.siret,
+        emitterCompanyName: "ProducerCompany",
+        emitterCompanyAddress: "rue de l'annexe",
+        emitterCompanyContact: "Contact",
+        emitterCompanyPhone: "01 01 01 01 01",
+        emitterCompanyMail: "annexe1@test.com",
+        wasteDetailsCode: "16 06 01*",
+        owner: { connect: { id: user.id } },
+        takenOverAt: threeDaysAgo
+      }
+    });
+
+    // Group with appendix1_1
+    const form = await formFactory({
+      ownerId: user.id,
+      opt: {
+        status: Status.SENT,
+        wasteDetailsCode: "16 06 01*",
+        emitterCompanySiret: company.siret,
+        emitterType: EmitterType.APPENDIX1,
+        grouping: { create: { initialFormId: appendix1_1.id, quantity: 0 } }
+      }
+    });
+
+    const appendix1_2 = await prisma.form.create({
+      data: {
+        readableId: getReadableId(),
+        status: Status.DRAFT,
+        emitterType: EmitterType.APPENDIX1_PRODUCER,
+        emitterCompanySiret: producerCompany.siret,
+        emitterCompanyName: "ProducerCompany",
+        emitterCompanyAddress: "rue de l'annexe",
+        emitterCompanyContact: "Contact",
+        emitterCompanyPhone: "01 01 01 01 01",
+        emitterCompanyMail: "annexe1@test.com",
+        wasteDetailsCode: "16 06 01*",
+        owner: { connect: { id: user.id } }
+      }
+    });
+
+    // Add appendix1_2
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          grouping: [
+            { form: { id: appendix1_1.id } },
+            { form: { id: appendix1_2.id } }
+          ]
+        }
+      }
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0].message).toContain(
+      "Impossible d'ajouter une annexe 1. Un bordereau de tournée ne peut être utilisé que durant 3 jours consécutifs à partir du moment où la première collecte"
+    );
+  });
 });

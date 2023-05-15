@@ -45,11 +45,18 @@ function BsdAdditionalActionsButton({
 
   useEffect(() => {
     const { current } = dropdownRef;
+    const dropdownBound = current?.getBoundingClientRect();
+    const headerHeight = document.getElementById("header")?.clientHeight;
+    const windowHeight = document.getElementsByTagName("body")[0].clientHeight;
+    const scrollPosition = window.scrollY;
+
     if (
       current &&
       isOpen &&
-      window.innerHeight - current.getBoundingClientRect().bottom <
-        current.scrollHeight
+      dropdownBound &&
+      dropdownBound.height + dropdownBound.y > windowHeight &&
+      headerHeight &&
+      scrollPosition > headerHeight
     ) {
       current.style.top = `-${current.offsetHeight + 20}px`;
       current.style.transition = `none`;

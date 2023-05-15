@@ -12,6 +12,10 @@ import {
 import client from "./esClient";
 
 const { ResponseError } = errors;
+/**
+ * Index "stocketablissement" created thanks to
+ * https://github.com/MTES-MCT/trackdechets-sirene-search
+ */
 const index = process.env.TD_COMPANY_ELASTICSEARCH_INDEX!;
 
 /**
@@ -165,7 +169,7 @@ const fullTextSearchResponseToCompanies = (
   r.map(({ _source }) => searchResponseToCompany(_source));
 
 /**
- * Full text search
+ * Search a Company with a full-text search query
  */
 export const searchCompanies = (
   clue: string,

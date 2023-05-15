@@ -2,7 +2,7 @@ import {
   userWithCompanyFactory,
   formFactory,
   userFactory,
-  siretify
+  companyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
@@ -25,22 +25,24 @@ describe("{ mutation { markSegmentAsReadyToTakeOver} }", () => {
         companyTypes: { set: ["TRANSPORTER"] }
       }
     );
-
-    const transporterSiret = company.siret;
+    const secondTransporter = await companyFactory({
+      companyTypes: { set: ["TRANSPORTER"] }
+    });
+    const transporterOrgId = company.orgId;
     // create a form whose first transporter is another one
     const form = await formFactory({
       ownerId: owner.id,
       opt: {
-        transporterCompanySiret: transporterSiret,
+        transporterCompanySiret: transporterOrgId,
         status: "SENT",
-        currentTransporterSiret: transporterSiret // siret cached to ease multimodal management
+        currentTransporterOrgId: transporterOrgId // orgId cached to ease multimodal management
       }
     });
     // there is already one segment
     const segment = await prisma.transportSegment.create({
       data: {
         form: { connect: { id: form.id } },
-        transporterCompanySiret: siretify(4),
+        transporterCompanySiret: secondTransporter.orgId,
         mode: "ROAD",
         transporterCompanyAddress: "40 Boulevard Voltaire 13001 Marseille",
         transporterCompanyPhone: "01 00 00 00 00",
