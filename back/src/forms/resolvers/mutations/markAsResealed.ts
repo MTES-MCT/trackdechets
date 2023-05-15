@@ -5,7 +5,8 @@ import { expandFormFromDb, flattenFormInput } from "../../converter";
 import { checkCanMarkAsResealed } from "../../permissions";
 import {
   validateForwardedInCompanies,
-  sealedFormSchema
+  sealedFormSchema,
+  checkForClosedCompanies
 } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
@@ -95,6 +96,12 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
             update: { ...updateInput, status: Status.SEALED }
           }
         };
+  /**
+   * Check for closed companies or throw an exception
+   */
+  if (process.env.VERIFY_COMPANY === "true") {
+    await checkForClosedCompanies(form.id);
+  }
 
   let resealedForm: Form | null = null;
   if (form.status === Status.RESEALED) {

@@ -7,7 +7,8 @@ import {
   beforeSignedByTransporterSchema,
   checkCanBeSealed,
   validateForwardedInCompanies,
-  wasteDetailsSchema
+  wasteDetailsSchema,
+  checkForClosedCompanies
 } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
@@ -16,7 +17,6 @@ import { renderMail } from "../../../mailer/templates/renderers";
 import { contentAwaitsGuest } from "../../../mailer/templates";
 import { EmitterType, Form, Status } from "@prisma/client";
 import { FormRepository, getFormRepository } from "../../repository";
-import { sirenifyFormInput } from "../../sirenify";
 import prisma from "../../../prisma";
 import { runInTransaction } from "../../../common/repository/helper";
 
@@ -65,9 +65,11 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
     : false;
 
   /**
-   * Check for closed companies or throw BAD_USER_INPUT exception
+   * Check for closed companies or throw an exception
    */
-  await sirenifyFormInput(form, user);
+  if (process.env.VERIFY_COMPANY === "true") {
+    await checkForClosedCompanies(form.id);
+  }
 
   const resultingForm = await runInTransaction(async transaction => {
     const formRepository = getFormRepository(user, transaction);
