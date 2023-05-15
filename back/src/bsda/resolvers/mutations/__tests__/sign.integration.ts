@@ -116,9 +116,9 @@ describe("Mutation.Bsda.sign", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          extensions: {
+          extensions: expect.objectContaining({
             code: "BAD_USER_INPUT"
-          }
+          })
         })
       ]);
     });
@@ -368,9 +368,9 @@ describe("Mutation.Bsda.sign", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          extensions: {
+          extensions: expect.objectContaining({
             code: "BAD_USER_INPUT"
-          }
+          })
         })
       ]);
     });
@@ -443,9 +443,9 @@ describe("Mutation.Bsda.sign", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          extensions: {
+          extensions: expect.objectContaining({
             code: "BAD_USER_INPUT"
-          }
+          })
         })
       ]);
     });
@@ -691,9 +691,9 @@ describe("Mutation.Bsda.sign", () => {
 
       expect(errors).toEqual([
         expect.objectContaining({
-          extensions: {
+          extensions: expect.objectContaining({
             code: "BAD_USER_INPUT"
-          }
+          })
         })
       ]);
     });

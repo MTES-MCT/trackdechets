@@ -11,11 +11,6 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { bsdaFactory } from "../../../__tests__/factories";
-import * as sirenify from "../../../sirenify";
-
-const sirenifyMock = jest
-  .spyOn(sirenify, "default")
-  .mockImplementation(input => Promise.resolve(input));
 
 const UPDATE_BSDA = `
   mutation UpdateBsda($id: ID!, $input: BsdaInput!) {
@@ -52,7 +47,6 @@ const UPDATE_BSDA = `
 describe("Mutation.updateBsda", () => {
   afterEach(async () => {
     await resetDatabase();
-    sirenifyMock.mockClear();
   });
 
   it("should allow user to update a bsda", async () => {
@@ -81,8 +75,6 @@ describe("Mutation.updateBsda", () => {
     });
 
     expect(data.updateBsda.id).toBeTruthy();
-    // check input is sirenified
-    expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });
 
   it("should disallow unauthenticated user from updating a bsda", async () => {

@@ -19,9 +19,10 @@ import {
   CompanyInput,
   EcoOrganismeInput,
   PickupSiteInput
-} from "../../generated/graphql/types";
-import { flattenBsdaInput } from "../converter";
-import { editionRules, isAwaitingSignature } from "../edition";
+} from "../../../generated/graphql/types";
+import { flattenBsdaInput } from "../../converter";
+import { isAwaitingSignature } from "../edition";
+import { editionRules } from "../rules";
 
 describe("edition", () => {
   test("an edition rule should be defined for every key in BsdaInput", () => {

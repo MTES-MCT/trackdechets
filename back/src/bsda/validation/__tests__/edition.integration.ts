@@ -1,11 +1,11 @@
-import { bsdaFactory } from "./factories";
-import prisma from "../../prisma";
+import { bsdaFactory } from "../../__tests__/factories";
+import prisma from "../../../prisma";
 import { checkEditionRules } from "../edition";
 import {
   companyFactory,
   userWithCompanyFactory
-} from "../../__tests__/factories";
-import { resetDatabase } from "../../../integration-tests/helper";
+} from "../../../__tests__/factories";
+import { resetDatabase } from "../../../../integration-tests/helper";
 
 describe("edition rules", () => {
   afterAll(resetDatabase);

@@ -3,10 +3,10 @@ import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationPublishBsdaArgs } from "../../../generated/graphql/types";
 import { GraphQLContext } from "../../../types";
 import { expandBsdaFromDb } from "../../converter";
-import { getBsdaOrNotFound, getPreviousBsdas } from "../../database";
+import { getBsdaOrNotFound } from "../../database";
 import { getBsdaRepository } from "../../repository";
-import { validateBsda } from "../../validation";
 import { checkCanUpdate } from "../../permissions";
+import { parseBsda } from "../../validation/validate";
 
 export default async function create(
   _,
@@ -15,24 +15,25 @@ export default async function create(
 ) {
   const user = checkIsAuthenticated(context);
 
-  const existingBsda = await getBsdaOrNotFound(id, {
-    include: { intermediaries: true }
+  const bsda = await getBsdaOrNotFound(id, {
+    include: { intermediaries: true, grouping: true, forwarding: true }
   });
 
-  await checkCanUpdate(user, existingBsda);
+  await checkCanUpdate(user, bsda);
 
-  if (!existingBsda.isDraft) {
+  if (!bsda.isDraft) {
     throw new ForbiddenError(
       "Impossible de publier un bordereau qui n'est pas un brouillon"
     );
   }
 
-  const previousBsdas = await getPreviousBsdas(existingBsda);
-  const { intermediaries, ...bsda } = existingBsda;
-  await validateBsda(
-    bsda as any,
-    { previousBsdas, intermediaries },
-    { emissionSignature: true }
+  await parseBsda(
+    {
+      ...bsda,
+      grouping: bsda.grouping?.map(g => g.id),
+      forwarding: bsda.forwarding?.id
+    },
+    { currentSignatureType: "EMISSION" }
   );
 
   const updatedBsda = await getBsdaRepository(user).update(

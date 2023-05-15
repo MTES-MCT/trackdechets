@@ -97,6 +97,12 @@ export const server = new ApolloServer({
     if (customError?.name === "ValidationError") {
       return new UserInputError(customError.errors.join("\n"));
     }
+    if (customError?.name === "ZodError") {
+      return new UserInputError(
+        customError.issues.map(issue => issue.message).join("\n"),
+        { issues: customError.issues }
+      );
+    }
     if (
       err.extensions.code === ErrorCode.INTERNAL_SERVER_ERROR &&
       NODE_ENV === "production"

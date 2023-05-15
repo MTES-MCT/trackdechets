@@ -88,7 +88,7 @@ const getBsdaObject = (): Prisma.BsdaCreateInput => ({
   destinationReceptionAcceptationStatus: "ACCEPTED",
   destinationReceptionRefusalReason: null,
   destinationOperationCode: "D 9",
-  destinationOperationDate: "2019-11-27T00:00:00.000Z",
+  destinationOperationDate: "2019-11-28T00:00:00.000Z",
 
   workerIsDisabled: false,
   workerCompanyName: "Entreprise de travaux",

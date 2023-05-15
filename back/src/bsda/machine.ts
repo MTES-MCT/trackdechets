@@ -1,7 +1,7 @@
 import { Bsda, BsdaType, BsdaStatus } from "@prisma/client";
 import { createMachine } from "xstate";
 import { BsdaSignatureType } from "../generated/graphql/types";
-import { PARTIAL_OPERATIONS } from "./validation";
+import { PARTIAL_OPERATIONS } from "./validation/constants";
 
 export enum EventType {
   ProducerSignature,

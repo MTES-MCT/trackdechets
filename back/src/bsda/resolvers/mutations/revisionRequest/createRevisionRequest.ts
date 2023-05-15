@@ -18,7 +18,7 @@ import { getUserCompanies } from "../../../../users/database";
 import { flattenBsdaRevisionRequestInput } from "../../../converter";
 import { getBsdaOrNotFound } from "../../../database";
 import { getBsdaRepository } from "../../../repository";
-import { OPERATIONS } from "../../../validation";
+import { OPERATIONS } from "../../../validation/constants";
 import { checkCanRequestRevision } from "../../../permissions";
 
 // If you modify this, also modify it in the frontend
