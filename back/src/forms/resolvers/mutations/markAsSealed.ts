@@ -64,11 +64,6 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
       })) > 0
     : false;
 
-  /**
-   * Check for closed companies or throw BAD_USER_INPUT exception
-   */
-  await sirenifyFormInput(form, user);
-
   const resultingForm = await runInTransaction(async transaction => {
     const formRepository = getFormRepository(user, transaction);
     const sealedForm = await formRepository.update(
