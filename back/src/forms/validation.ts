@@ -1301,6 +1301,7 @@ export const processedFormSchema = yup.lazy((value: any) =>
     .concat(signingInfoSchema)
     .concat(receivedInfoSchema)
     .concat(processedInfoSchemaFn(value))
+    .concat(beforeTransportSchema.resolve({ value }))
 );
 
 // *******************************************************************

@@ -10,11 +10,7 @@ import {
   flattenSignedByTransporterInput
 } from "../../converter";
 import { checkCanSignedByTransporter } from "../../permissions";
-import {
-  beforeTransportSchema,
-  signingInfoSchema,
-  validateBeforeTransport
-} from "../../validation";
+import { signingInfoSchema, validateBeforeTransport } from "../../validation";
 import transitionForm from "../../workflow/transitionForm";
 import { EventType } from "../../workflow/types";
 import { getFormRepository } from "../../repository";

@@ -5,7 +5,8 @@ import {
   ecoOrganismeSchema,
   receivedInfoSchema,
   processedInfoSchema,
-  transporterSchemaFn
+  transporterSchemaFn,
+  beforeTransportSchema
 } from "../validation";
 import { ReceivedFormInput } from "../../generated/graphql/types";
 import { companyFactory, siretify } from "../../__tests__/factories";
@@ -118,7 +119,7 @@ describe("sealedFormSchema", () => {
 
     it("with foreign transporter receipt no need for exemption R.541-50", async () => {
       const transporter = await companyFactory({
-        vatNumber: "BE0541696005"
+        vatNumber: "GB809734507"
       });
       const testForm: any = {
         ...sealedForm,
@@ -490,16 +491,6 @@ describe("sealedFormSchema", () => {
         "Émetteur : vous ne pouvez pas renseigner de n°SIRET lorsque l'émetteur ou le détenteur est un particulier"
       );
     });
-    it("when there is no receipt exemption and no receipt", async () => {
-      const testForm = {
-        ...sealedForm,
-        transporterIsExemptedOfReceipt: false,
-        transporterReceipt: null
-      };
-
-      const isValid = await sealedFormSchema.isValid(testForm);
-      expect(isValid).toEqual(false);
-    });
 
     it("when there is an eco-organisme but emitter type is not OTHER", async () => {
       const testForm = {
@@ -566,19 +557,6 @@ describe("sealedFormSchema", () => {
       }
     });
 
-    it("when there is nor transporterCompanySiret nor transporterCompanyVatNumber", async () => {
-      const partialForm: Partial<Form> = {
-        ...sealedForm,
-        transporterCompanySiret: null,
-        transporterCompanyVatNumber: null
-      };
-      const validateFn = () => sealedFormSchema.validate(partialForm);
-
-      await expect(validateFn()).rejects.toThrow(
-        "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
-      );
-    });
-
     it("when the transporterCompanyVatNumber is invalid", async () => {
       const partialForm: Partial<Form> = {
         ...sealedForm,
@@ -604,6 +582,122 @@ describe("sealedFormSchema", () => {
         "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
       );
     });
+  });
+});
+
+describe("beforeTransportSchema", () => {
+  let beforeTransportForm: Partial<Form>;
+
+  afterAll(resetDatabase);
+  beforeAll(async () => {
+    const emitterCompany = await companyFactory({
+      companyTypes: ["PRODUCER"]
+    });
+    const transporterCompany = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+    const destinationCompany = await companyFactory({
+      companyTypes: ["WASTEPROCESSOR"]
+    });
+    beforeTransportForm = {
+      ...formData,
+      emitterCompanySiret: emitterCompany.siret,
+      transporterCompanySiret: transporterCompany.siret,
+      recipientCompanySiret: destinationCompany.siret
+    };
+  });
+
+  it("should not be valid when there is no receipt exemption and no receipt", async () => {
+    const testForm = {
+      ...beforeTransportForm,
+      transporterIsExemptedOfReceipt: false,
+      transporterReceipt: null
+    };
+
+    const validateFn = () => beforeTransportSchema.validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
+    );
+  });
+
+  it("should not be valid when there is nor transporterCompanySiret nor transporterCompanyVatNumber", async () => {
+    const testForm: Partial<Form> = {
+      ...beforeTransportForm,
+      transporterCompanySiret: null,
+      transporterCompanyVatNumber: null
+    };
+    const validateFn = () => beforeTransportSchema.validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
+    );
+  });
+
+  it("transporter SIRET is optional when a valid foreign vatNumber is present", async () => {
+    const transporterCompany = await companyFactory({
+      vatNumber: "BE0541696005"
+    });
+
+    const testForm: Partial<Form> = {
+      ...beforeTransportForm,
+      transporterCompanySiret: null,
+      transporterCompanyVatNumber: transporterCompany.vatNumber
+    };
+    expect(await beforeTransportSchema.isValid(testForm)).toEqual(true);
+  });
+
+  it("transporter vatNumber is optional when a valid SIRET is present", async () => {
+    const transporterCompany = await companyFactory({
+      companyTypes: ["TRANSPORTER"]
+    });
+
+    const testForm: Partial<Form> = {
+      ...beforeTransportForm,
+      transporterCompanySiret: transporterCompany.siret,
+      transporterCompanyVatNumber: null
+    };
+    expect(await beforeTransportSchema.isValid(testForm)).toEqual(true);
+  });
+
+  it("transporter SIRET is required with a french vatNumber", async () => {
+    const testForm: Partial<Form> = {
+      ...beforeTransportForm,
+      transporterCompanySiret: null,
+      transporterCompanyVatNumber: "FR87850019464"
+    };
+    const validateFn = () => beforeTransportSchema.validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
+    );
+  });
+
+  it("transporter vatNumber should be valid", async () => {
+    const testForm: Partial<Form> = {
+      ...beforeTransportForm,
+      transporterCompanySiret: null,
+      transporterCompanyVatNumber: "invalid"
+    };
+
+    const validateFn = () => beforeTransportSchema.validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Transporteur: invalid n'est pas un numéro de TVA valide"
+    );
+  });
+
+  it("transporter SIRET or VAT number is required", async () => {
+    const testForm: Partial<Form> = {
+      ...beforeTransportForm,
+      transporterCompanySiret: null,
+      transporterCompanyVatNumber: null
+    };
+    const validateFn = () => beforeTransportSchema.validate(testForm);
+
+    await expect(validateFn()).rejects.toThrow(
+      "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
+    );
   });
 });
 
@@ -1196,90 +1290,6 @@ describe("processedInfoSchema", () => {
       noTraceability: null
     };
     expect(await processedInfoSchema.isValid(processedInfo)).toEqual(true);
-  });
-
-  it("transporter SIRET is optional when a valid foreign vatNumber is present", async () => {
-    const transporterCompany = await companyFactory({
-      orgId: "BE0541696005",
-      vatNumber: "BE0541696005"
-    });
-    const transporter = {
-      transporterCompanyName: "Thalys",
-      transporterCompanyVatNumber: transporterCompany.vatNumber,
-      transporterCompanyAddress: "Bruxelles",
-      transporterCompanyContact: "Contact",
-      transporterCompanyPhone: "00 00 00 00 00",
-      transporterCompanyMail: "contact@thalys.com",
-      transporterIsExemptedOfReceipt: null
-    };
-    expect(await transporterSchemaFn(false).isValid(transporter)).toEqual(true);
-  });
-
-  it("transporter vatNumber is optional when a valid SIRET is present", async () => {
-    const transporterCompany = await companyFactory({
-      companyTypes: ["TRANSPORTER"]
-    });
-    const transporter = {
-      transporterCompanyName: "Code en Stock",
-      transporterCompanySiret: transporterCompany.siret,
-      transporterCompanyAddress: "Marseille",
-      transporterCompanyContact: "Contact",
-      transporterCompanyPhone: "00 00 00 00 00",
-      transporterCompanyMail: "contact@codeenstock.fr",
-      transporterIsExemptedOfReceipt: true
-    };
-    expect(await transporterSchemaFn(false).isValid(transporter)).toEqual(true);
-  });
-
-  it("transporter SIRET is required with a french vatNumber", async () => {
-    const transporter = {
-      transporterCompanyName: "Code en Stock",
-      transporterCompanyVatNumber: "FR87850019464",
-      transporterCompanyAddress: "Marseille",
-      transporterCompanyContact: "Contact",
-      transporterCompanyPhone: "00 00 00 00 00",
-      transporterCompanyMail: "contact@codeenstock.fr",
-      transporterIsExemptedOfReceipt: true
-    };
-    const validateFn = () => transporterSchemaFn(false).validate(transporter);
-
-    await expect(validateFn()).rejects.toThrow(
-      "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
-    );
-  });
-
-  it("transporter vatNumber should be valid", async () => {
-    const transporter = {
-      transporterCompanyName: "Code en Stock",
-      transporterCompanyVatNumber: "invalid",
-      transporterCompanyAddress: "Marseille",
-      transporterCompanyContact: "Contact",
-      transporterCompanyPhone: "00 00 00 00 00",
-      transporterCompanyMail: "contact@codeenstock.fr",
-      transporterIsExemptedOfReceipt: true
-    };
-
-    const validateFn = () => transporterSchemaFn(false).validate(transporter);
-
-    await expect(validateFn()).rejects.toThrow(
-      "Transporteur: invalid n'est pas un numéro de TVA valide"
-    );
-  });
-
-  it("transporter SIRET or VAT number is required", async () => {
-    const transporter = {
-      transporterCompanyName: "Thalys",
-      transporterCompanyAddress: "Bruxelles",
-      transporterCompanyContact: "Contact",
-      transporterCompanyPhone: "00 00 00 00 00",
-      transporterCompanyMail: "contact@thalys.com",
-      transporterIsExemptedOfReceipt: true
-    };
-    const validateFn = () => transporterSchemaFn(false).validate(transporter);
-
-    await expect(validateFn()).rejects.toThrow(
-      "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
-    );
   });
 
   it("SIRET for la poste is valid", async () => {
