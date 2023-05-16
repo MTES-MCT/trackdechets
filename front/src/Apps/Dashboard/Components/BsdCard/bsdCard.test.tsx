@@ -782,7 +782,7 @@ describe("Bsd card primary action label", () => {
           {
             id: "ckyef9g3a2924349syhsqc1wa",
             readyToTakeOver: false,
-            previousTransporterCompanyOrgId: "13001045700013",
+            previousTransporterCompanySiret: "13001045700013",
             takenOverAt: null,
             __typename: "TransportSegment",
           },

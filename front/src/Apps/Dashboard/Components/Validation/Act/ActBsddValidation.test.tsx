@@ -314,7 +314,7 @@ describe("ActBsddValidation", () => {
         {
           id: "ckyef9g3a2924349syhsqc1wa",
           readyToTakeOver: false,
-          previousTransporterCompanyOrgId: "12345678901234",
+          previousTransporterCompanySiret: "12345678901234",
           takenOverAt: null,
           __typename: "TransportSegment",
         },
@@ -347,7 +347,7 @@ describe("ActBsddValidation", () => {
       transportSegments: [
         {
           id: "ckyef9g3a2924349syhsqc1wa",
-          previousTransporterCompanyOrgId: "12345678901234",
+          previousTransporterCompanySiret: "12345678901234",
           takenOverAt: "2023-03-17",
           __typename: "TransportSegment",
         },
@@ -383,7 +383,7 @@ describe("ActBsddValidation", () => {
       transportSegments: [
         {
           id: "ckyef9g3a2924349syhsqc1wa",
-          previousTransporterCompanyOrgId: "12345678901234",
+          previousTransporterCompanySiret: "12345678901234",
           takenOverAt: null,
           readyToTakeOver: true,
           __typename: "TransportSegment",

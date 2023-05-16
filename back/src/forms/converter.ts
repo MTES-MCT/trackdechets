@@ -851,7 +851,9 @@ export function expandTransportSegmentFromDb(
 ): GraphQLTransportSegment {
   return {
     id: segment.id,
-    previousTransporterCompanyOrgId: segment.previousTransporterCompanyOrgId,
+    // GraphQLTransportSegment specifications was not changed to previousTransporterCompanyOrgId
+    // in order to keep the public API intact
+    previousTransporterCompanySiret: segment.previousTransporterCompanyOrgId,
     transporter: nullIfNoValues({
       company: nullIfNoValues({
         name: segment.transporterCompanyName,
