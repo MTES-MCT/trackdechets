@@ -23,7 +23,6 @@ import {
 import {
   BAD_CHARACTERS_REGEXP,
   countries as vatCountries,
-  isClosedCompany,
   isForeignVat,
   isOmi,
   isSiret,
@@ -41,16 +40,12 @@ import {
   WeightUnits
 } from "../common/validation";
 import configureYup, { FactorySchemaOf } from "../common/yup/configureYup";
-import { searchCompany } from "../companies/search";
-import { AnonymousCompanyError } from "../companies/sirene/errors";
 import {
-  CompanySearchResult,
   InitialFormFractionInput,
   PackagingInfo,
   Packagings
 } from "../generated/graphql/types";
 import prisma from "../prisma";
-import { getFormSiretsByRole, SIRETS_BY_ROLE_INCLUDE } from "./database";
 import {
   EXTRANEOUS_NEXT_DESTINATION,
   INVALID_COMPANY_OMI_NUMBER,

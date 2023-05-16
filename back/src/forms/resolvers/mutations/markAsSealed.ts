@@ -16,7 +16,6 @@ import { renderMail } from "../../../mailer/templates/renderers";
 import { contentAwaitsGuest } from "../../../mailer/templates";
 import { EmitterType, Form, Status } from "@prisma/client";
 import { FormRepository, getFormRepository } from "../../repository";
-import { sirenifyFormInput } from "../../sirenify";
 import prisma from "../../../prisma";
 import { runInTransaction } from "../../../common/repository/helper";
 
