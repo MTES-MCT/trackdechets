@@ -168,6 +168,3 @@ Trackdéchets implémente 3 valeurs standard et une valeur spécifique:
     - vat_number : numéro de tva si disponible, utilisé pour identifier les entreprises étrangères
     - verified: true|false, précise si l'établissement est vérifié (la vérification n'est effectuée que sur certains type d'établissements )
 
-:::tip
-Une application Openid de démonstration a été créée à l'adresse [https://openid-demo.trackdechets.beta.gouv.fr/](https://openid-demo.trackdechets.beta.gouv.fr/)
-:::
