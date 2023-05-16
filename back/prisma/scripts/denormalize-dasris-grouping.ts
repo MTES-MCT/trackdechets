@@ -24,7 +24,7 @@ export class UpdateBsdasrisGroupedEmitters implements Updater {
         data: {
           groupingEmitterSirets: [
             ...new Set(bsd.grouping.map(grouped => grouped.emitterCompanySiret))
-          ].filter(Boolean) as string[]
+          ].filter(Boolean)
         }
       });
     }
