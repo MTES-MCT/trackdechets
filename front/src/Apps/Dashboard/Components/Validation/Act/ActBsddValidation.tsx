@@ -340,7 +340,7 @@ const ActBsddValidation = ({
         // the last segment is still a draft
         !lastSegment.readyToTakeOver &&
         // that was created by the current user
-        lastSegment.previousTransporterCompanyOrgId === currentSiret
+        lastSegment.previousTransporterCompanySiret === currentSiret
       ) {
         return <MarkSegmentAsReadyToTakeOver form={bsd} siret={currentSiret} />;
       }
