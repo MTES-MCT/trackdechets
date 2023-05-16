@@ -108,7 +108,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
           // the last segment is still a draft
           !lastSegment.readyToTakeOver &&
           // that was created by the current user
-          lastSegment.previousTransporterCompanyOrgId === siret
+          lastSegment.previousTransporterCompanySiret === siret
         ) {
           return <MarkSegmentAsReadyToTakeOver {...props} />;
         }

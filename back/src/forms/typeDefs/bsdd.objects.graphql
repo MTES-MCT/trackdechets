@@ -615,8 +615,8 @@ type formsLifeCycleData {
 type TransportSegment {
   id: ID!
 
-  "Siret du transporteur précédent"
-  previousTransporterCompanyOrgId: String
+  "Siret ou numéro de TVA intra-communautaire du transporteur précédent"
+  previousTransporterCompanySiret: String
 
   "Transporteur du segment"
   transporter: Transporter

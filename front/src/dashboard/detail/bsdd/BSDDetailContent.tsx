@@ -114,7 +114,7 @@ const TransportSegmentDetail = ({ segment, siret }: SegmentProps) => {
       {!segment.readyToTakeOver &&
         [
           segment.transporter?.company?.orgId,
-          segment.previousTransporterCompanyOrgId,
+          segment.previousTransporterCompanySiret,
         ].includes(siret) && <EditSegment segment={segment} siret={siret} />}
     </>
   );

@@ -171,7 +171,7 @@ export const segmentFragment = gql`
     mode
     takenOverAt
     takenOverBy
-    previousTransporterCompanyOrgId
+    previousTransporterCompanySiret
     segmentNumber
   }
 `;
@@ -510,7 +510,7 @@ export const dashboardFormFragment = gql`
     transportSegments {
       id
       readyToTakeOver
-      previousTransporterCompanyOrgId
+      previousTransporterCompanySiret
       takenOverAt
     }
     currentTransporterOrgId
