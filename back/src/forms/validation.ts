@@ -1284,13 +1284,18 @@ export const beforeTransportSchema = yup.lazy(value => {
 
 export async function validateBeforeTransport(form: Form) {
   await beforeTransportSchema.validate(form, { abortEarly: false });
-  const wasteDetailsBeforeTransportSchema = yup.object({
-    wasteDetailsPackagingInfos: yup
-      .array()
-      .min(1, "Le nombre de contenants doit être supérieur à 0")
-  });
-  // make sure at least one packaging is defined
-  await wasteDetailsBeforeTransportSchema.validate(form);
+
+  if (form.emitterType !== "APPENDIX1_PRODUCER") {
+    // Vérifie qu'au moins un packaging a été déini sauf dans le cas
+    // d'un bordereau d'annexe 1 pour lequel il est possible de ne pas définir
+    // de packaging
+    const wasteDetailsBeforeTransportSchema = yup.object({
+      wasteDetailsPackagingInfos: yup
+        .array()
+        .min(1, "Le nombre de contenants doit être supérieur à 0")
+    });
+    await wasteDetailsBeforeTransportSchema.validate(form);
+  }
   return form;
 }
 
@@ -1298,10 +1303,10 @@ export async function validateBeforeTransport(form: Form) {
 export const processedFormSchema = yup.lazy((value: any) =>
   sealedFormSchema
     .resolve({ value })
+    .concat(transporterSchemaFn(true))
     .concat(signingInfoSchema)
     .concat(receivedInfoSchema)
     .concat(processedInfoSchemaFn(value))
-    .concat(beforeTransportSchema.resolve({ value }))
 );
 
 // *******************************************************************
