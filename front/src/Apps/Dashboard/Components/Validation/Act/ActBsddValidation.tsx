@@ -326,7 +326,7 @@ const ActBsddValidation = ({
     const transportSegments = bsd.transportSegments ?? [];
     const lastSegment = transportSegments[transportSegments.length - 1];
 
-    if (bsd.currentTransporterOrgId === currentSiret) {
+    if (bsd.currentTransporterSiret === currentSiret) {
       if (
         // there are no segments yet, current transporter can create one
         lastSegment === null ||
@@ -347,7 +347,7 @@ const ActBsddValidation = ({
     }
 
     if (
-      bsd.nextTransporterOrgId === currentSiret &&
+      bsd.nextTransporterSiret === currentSiret &&
       lastSegment.readyToTakeOver
     ) {
       return <TakeOverSegment form={bsd} siret={currentSiret} />;

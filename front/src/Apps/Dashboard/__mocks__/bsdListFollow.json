@@ -78,8 +78,8 @@
       },
       "temporaryStorageDetail": null,
       "transportSegments": [],
-      "currentTransporterOrgId": "",
-      "nextTransporterOrgId": null,
+      "currentTransporterSiret": "",
+      "nextTransporterSiret": null,
       "__typename": "Form"
     },
     "__typename": "BsdEdge"
