@@ -13,7 +13,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v2.1.2
         with:
-          node-version: "14.x"
+          node-version: "18.x"
       - uses: actions/cache@v2
         with:
           path: ~/.npm
@@ -21,7 +21,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
       - name: Generate files
         run: npm run generate
       - name: Run linter
