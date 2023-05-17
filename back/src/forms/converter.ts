@@ -716,8 +716,8 @@ export async function expandFormFromDb(
             mail: form.nextDestinationCompanyMail
           })
         }),
-    currentTransporterOrgId: form.currentTransporterOrgId,
-    nextTransporterOrgId: form.nextTransporterOrgId,
+    currentTransporterSiret: form.currentTransporterOrgId,
+    nextTransporterSiret: form.nextTransporterOrgId,
     intermediaries: [],
     temporaryStorageDetail: forwardedIn
       ? {

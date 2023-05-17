@@ -94,7 +94,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
       const transportSegments = form.transportSegments ?? [];
       const lastSegment = transportSegments[transportSegments.length - 1];
 
-      if (form.currentTransporterOrgId === siret) {
+      if (form.currentTransporterSiret === siret) {
         if (
           // there are no segments yet, current transporter can create one
           lastSegment == null ||
@@ -114,7 +114,7 @@ export function WorkflowAction(props: WorkflowActionProps) {
         }
       }
 
-      if (form.nextTransporterOrgId === siret && lastSegment.readyToTakeOver) {
+      if (form.nextTransporterSiret === siret && lastSegment.readyToTakeOver) {
         return <TakeOverSegment {...props} />;
       }
 
