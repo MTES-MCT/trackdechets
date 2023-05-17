@@ -8,5 +8,4 @@ const pool = new Pool({
 
 migrate({ client: pool }, path.join(__dirname, "migrations"))
   .then(() => console.log("Migration successful"))
-  .catch(err => console.error(err))
   .finally(() => pool.end());

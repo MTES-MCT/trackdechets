@@ -309,7 +309,7 @@ describe("ActBsddValidation", () => {
     const sentBsdSegmentDraft = {
       id: "1",
       status: "SENT",
-      currentTransporterOrgId: "12345678901234",
+      currentTransporterSiret: "12345678901234",
       transportSegments: [
         {
           id: "ckyef9g3a2924349syhsqc1wa",
@@ -343,7 +343,7 @@ describe("ActBsddValidation", () => {
     const sentBsdSegmetnTakenOverAt = {
       id: "1",
       status: "SENT",
-      currentTransporterOrgId: "12345678901234",
+      currentTransporterSiret: "12345678901234",
       transportSegments: [
         {
           id: "ckyef9g3a2924349syhsqc1wa",
@@ -378,8 +378,8 @@ describe("ActBsddValidation", () => {
     const sentBsdSegmentReadyToTakenOver = {
       id: "1",
       status: "SENT",
-      currentTransporterOrgId: "12345678901234",
-      nextTransporterOrgId: "12345678901234",
+      currentTransporterSiret: "12345678901234",
+      nextTransporterSiret: "12345678901234",
       transportSegments: [
         {
           id: "ckyef9g3a2924349syhsqc1wa",

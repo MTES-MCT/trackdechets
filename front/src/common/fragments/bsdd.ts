@@ -292,8 +292,8 @@ const mutableFieldsFragment = gql`
     temporaryStorageDetail {
       ...TemporaryStorageDetailFragment
     }
-    currentTransporterOrgId
-    nextTransporterOrgId
+    currentTransporterSiret
+    nextTransporterSiret
     transportSegments {
       ...Segment
     }
@@ -324,8 +324,8 @@ export const transporterFormFragment = gql`
   fragment TransporterFormFragment on Form {
     ...MutableFieldsFragment
     ...StaticFieldsFragment
-    currentTransporterOrgId
-    nextTransporterOrgId
+    currentTransporterSiret
+    nextTransporterSiret
     transportSegments {
       ...Segment
     }
@@ -513,7 +513,7 @@ export const dashboardFormFragment = gql`
       previousTransporterCompanySiret
       takenOverAt
     }
-    currentTransporterOrgId
-    nextTransporterOrgId
+    currentTransporterSiret
+    nextTransporterSiret
   }
 `;

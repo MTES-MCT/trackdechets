@@ -137,8 +137,8 @@ type Form {
 
   transportSegments: [TransportSegment!]
 
-  currentTransporterOrgId: String
-  nextTransporterOrgId: String
+  currentTransporterSiret: String
+  nextTransporterSiret: String
 
   """
   Entreprises intermédiaires. Un intermédiaire est une entreprise qui prend part à la gestion du déchet,
