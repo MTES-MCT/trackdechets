@@ -248,12 +248,7 @@ const SIGNATURES_HIERARCHY: {
  */
 export function isAwaitingSignature(
   type: BsffSignatureTypeUntilReception,
-  bsff: Pick<
-    Bsff,
-    | "emitterEmissionSignatureDate"
-    | "transporterTransportSignatureDate"
-    | "destinationReceptionSignatureDate"
-  >
+  bsff: Bsff
 ) {
   const signature = SIGNATURES_HIERARCHY[type];
   if (bsff[signature.field]) {

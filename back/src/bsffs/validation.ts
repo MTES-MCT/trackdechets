@@ -25,7 +25,6 @@ import {
   weightConditions,
   WeightUnits
 } from "../common/validation";
-import { isAwaitingSignature } from "./edition/bsffEdition";
 
 configureYup();
 
@@ -111,28 +110,10 @@ type BsffLike = (Bsff | Prisma.BsffCreateInput) & {
 };
 
 // Context used to determine if some fields are required or not
-type BsffValidationContext = Pick<
-  Bsff,
-  | "isDraft"
-  | "emitterEmissionSignatureDate"
-  | "transporterTransportSignatureDate"
-  | "destinationReceptionSignatureDate"
->;
-
-function toBsffValidationContext(bsff: BsffLike): BsffValidationContext {
-  return {
-    isDraft: bsff.isDraft ?? true,
-    emitterEmissionSignatureDate: bsff.emitterEmissionSignatureDate
-      ? new Date(bsff.emitterEmissionSignatureDate)
-      : null,
-    transporterTransportSignatureDate: bsff.transporterTransportSignatureDate
-      ? new Date(bsff.transporterTransportSignatureDate)
-      : null,
-    destinationReceptionSignatureDate: bsff.destinationReceptionSignatureDate
-      ? new Date(bsff.destinationReceptionSignatureDate)
-      : null
-  };
-}
+type BsffValidationContext = {
+  isDraft: boolean;
+  transporterSignature: boolean;
+};
 
 export const emitterSchemaFn: FactorySchemaOf<
   Pick<BsffValidationContext, "isDraft">,
@@ -169,21 +150,18 @@ export const emitterSchemaFn: FactorySchemaOf<
 export const transporterSchemaFn: FactorySchemaOf<
   BsffValidationContext,
   Transporter
-> = bsff => {
-  // fields are required for transporter signature
-  const isRequired = !isAwaitingSignature("TRANSPORT", bsff);
-
+> = ({ transporterSignature }) => {
   return yup.object({
     transporterCompanyName: yup
       .string()
       .requiredIf(
-        isRequired,
+        transporterSignature,
         "Transporteur : le nom de l'établissement est requis"
       ),
     transporterCompanySiret: siret
       .label("Transporteur")
       .requiredIf(
-        isRequired,
+        transporterSignature,
         "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
       )
       .when("transporterCompanyVatNumber", siretConditions.companyVatNumber)
@@ -194,22 +172,28 @@ export const transporterSchemaFn: FactorySchemaOf<
     transporterCompanyAddress: yup
       .string()
       .requiredIf(
-        isRequired,
+        transporterSignature,
         "Transporteur : l'adresse de l'établissement est requise"
       ),
     transporterCompanyContact: yup
       .string()
-      .requiredIf(isRequired, "Transporteur : le nom du contact est requis"),
+      .requiredIf(
+        transporterSignature,
+        "Transporteur : le nom du contact est requis"
+      ),
     transporterCompanyPhone: yup
       .string()
       .requiredIf(
-        isRequired,
+        transporterSignature,
         "Transporteur : le numéro de téléphone est requis"
       ),
     transporterCompanyMail: yup
       .string()
       .email("Transporteur : l'adresse email est invalide")
-      .requiredIf(isRequired, "Transporteur : l'adresse email est requise"),
+      .requiredIf(
+        transporterSignature,
+        "Transporteur : l'adresse email est requise"
+      ),
     transporterRecepisseNumber: yup.string().nullable(),
     transporterRecepisseDepartment: yup.string().nullable(),
     transporterRecepisseValidityLimit: yup.date().nullable()
@@ -571,9 +555,12 @@ const bsffSchemaFn = (bsff: BsffValidationContext) =>
     .concat(transporterSchemaFn(bsff))
     .concat(destinationSchemaFn(bsff));
 
-export async function validateBsff(bsff: BsffLike) {
+export async function validateBsff(
+  bsff: BsffLike,
+  context: BsffValidationContext
+) {
   try {
-    const validationSchema = bsffSchemaFn(toBsffValidationContext(bsff));
+    const validationSchema = bsffSchemaFn(context);
     await validationSchema.validate(bsff, {
       abortEarly: false
     });
@@ -838,8 +825,11 @@ export async function validatePreviousPackagings(
   return previousPackagings;
 }
 
-const beforeEmissionSchemaFn = (bsff: BsffLike) =>
-  bsffSchemaFn(toBsffValidationContext(bsff)).concat(
+const beforeEmissionSchemaFn = (
+  bsff: BsffLike,
+  context: BsffValidationContext
+) =>
+  bsffSchemaFn(context).concat(
     yup.object({
       isDraft: yup
         .boolean()
@@ -859,13 +849,19 @@ const beforeEmissionSchemaFn = (bsff: BsffLike) =>
   );
 
 export function validateBeforeEmission(bsff: BsffLike) {
-  return beforeEmissionSchemaFn(bsff).validate(bsff, {
+  return beforeEmissionSchemaFn(bsff, {
+    isDraft: false,
+    transporterSignature: false
+  }).validate(bsff, {
     abortEarly: false
   });
 }
 
-const beforeTransportSchemaFn = (bsff: BsffLike) =>
-  bsffSchemaFn(toBsffValidationContext(bsff))
+const beforeTransportSchemaFn = (
+  bsff: BsffLike,
+  context: BsffValidationContext
+) =>
+  bsffSchemaFn(context)
     .concat(transportSchema)
     .concat(
       yup.object({
@@ -887,13 +883,19 @@ const beforeTransportSchemaFn = (bsff: BsffLike) =>
     );
 
 export function validateBeforeTransport(bsff: BsffLike) {
-  return beforeTransportSchemaFn(bsff).validate(bsff, {
+  return beforeTransportSchemaFn(bsff, {
+    isDraft: false,
+    transporterSignature: true
+  }).validate(bsff, {
     abortEarly: false
   });
 }
 
-export const beforeReceptionSchemaFn = (bsff: BsffLike) =>
-  bsffSchemaFn(toBsffValidationContext(bsff))
+export const beforeReceptionSchemaFn = (
+  bsff: BsffLike,
+  context: BsffValidationContext
+) =>
+  bsffSchemaFn(context)
     .concat(transportSchema)
     .concat(receptionSchema)
     .concat(
@@ -916,13 +918,16 @@ export const beforeReceptionSchemaFn = (bsff: BsffLike) =>
     );
 
 export function validateBeforeReception(bsff: BsffLike) {
-  return beforeReceptionSchemaFn(bsff).validate(bsff, {
+  return beforeReceptionSchemaFn(bsff, {
+    isDraft: false,
+    transporterSignature: true
+  }).validate(bsff, {
     abortEarly: false
   });
 }
 
-export const afterReceptionSchemaFn = (bsff: BsffLike) =>
-  bsffSchemaFn(toBsffValidationContext(bsff))
+export const afterReceptionSchemaFn = (context: BsffValidationContext) =>
+  bsffSchemaFn(context)
     .concat(transportSchema)
     .concat(receptionSchema)
     .concat(
@@ -937,7 +942,10 @@ export const afterReceptionSchemaFn = (bsff: BsffLike) =>
     );
 
 export function validateAfterReception(bsff: BsffLike) {
-  return afterReceptionSchemaFn(bsff).validate(bsff, {
+  return afterReceptionSchemaFn({
+    isDraft: false,
+    transporterSignature: true
+  }).validate(bsff, {
     abortEarly: false
   });
 }

@@ -76,9 +76,7 @@ describe("transporterSchema", () => {
 
   const transporterSchema = transporterSchemaFn({
     isDraft: false,
-    emitterEmissionSignatureDate: new Date(),
-    transporterTransportSignatureDate: new Date(),
-    destinationReceptionSignatureDate: null
+    transporterSignature: true
   });
 
   test("valid data", async () => {

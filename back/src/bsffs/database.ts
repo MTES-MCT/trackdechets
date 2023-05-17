@@ -184,7 +184,10 @@ export async function createBsff(
     packagings: packagingsInput
   };
 
-  await validateBsff(futureBsff);
+  await validateBsff(futureBsff, {
+    isDraft: true,
+    transporterSignature: false
+  });
   await validateFicheInterventions(futureBsff, ficheInterventions);
   const { forwarding, grouping, repackaging } = input;
 

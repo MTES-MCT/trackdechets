@@ -58,7 +58,7 @@ const publishBsffResolver: MutationResolvers["publishBsff"] = async (
 
   const fullBsff = { ...existingBsff, packagings, isDraft: false };
 
-  await validateBsff(fullBsff);
+  await validateBsff(fullBsff, { isDraft: false, transporterSignature: false });
   await validateFicheInterventions(fullBsff, ficheInterventions);
   await validatePreviousPackagings(fullBsff, previousPackagingsIds);
 
