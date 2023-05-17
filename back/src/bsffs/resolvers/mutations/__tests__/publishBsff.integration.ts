@@ -127,4 +127,54 @@ describe("publishBsff", () => {
 
     expect(data.publishBsff.isDraft).toEqual(false);
   });
+
+  it("should be possible to publish a BSFF without transporter info", async () => {
+    const emitter = await userWithCompanyFactory(UserRole.ADMIN);
+    const destination = await userWithCompanyFactory(UserRole.ADMIN);
+    const bsff = await prisma.bsff.create({
+      data: {
+        isDraft: true,
+        id: getReadableId(ReadableIdPrefix.FF),
+        type: "TRACER_FLUIDE",
+        emitterCompanySiret: emitter.company.siret,
+        emitterCompanyName: emitter.company.name,
+        emitterCompanyAddress: emitter.company.address,
+        emitterCompanyContact: "John Snow",
+        emitterCompanyPhone: "0000000000",
+        emitterCompanyMail: "john.snow@trackdechets.fr",
+        destinationCompanySiret: destination.company.siret,
+        destinationCompanyName: destination.company.name,
+        destinationCompanyAddress: destination.company.address,
+        destinationCompanyContact: "John Snow",
+        destinationCompanyPhone: "0000000000",
+        destinationCompanyMail: "john.snow@trackdechets.fr",
+        destinationPlannedOperationCode: "R2",
+        wasteCode: "14 06 01*",
+        wasteAdr: "adr",
+        wasteDescription: "fluide",
+        weightValue: 1,
+        weightIsEstimate: false,
+        packagings: {
+          create: {
+            type: BsffPackagingType.BOUTEILLE,
+            numero: "123",
+            emissionNumero: "123",
+            weight: 1,
+            volume: 1
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    const { data, errors } = await mutate<
+      Pick<Mutation, "publishBsff">,
+      MutationPublishBsffArgs
+    >(PUBLISH_BSFF, { variables: { id: bsff.id } });
+
+    expect(errors).toBeUndefined();
+
+    expect(data.publishBsff.isDraft).toEqual(false);
+  });
 });

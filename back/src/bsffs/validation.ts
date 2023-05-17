@@ -25,6 +25,7 @@ import {
   weightConditions,
   WeightUnits
 } from "../common/validation";
+import { isAwaitingSignature } from "./edition/bsffEdition";
 
 configureYup();
 
@@ -100,7 +101,43 @@ type Operation = Pick<
   | "operationNextDestinationCompanyMail"
 >;
 
-export const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
+// Validation function can be called either on an existing Bsff
+// or on a create payload
+type BsffLike = (Bsff | Prisma.BsffCreateInput) & {
+  packagings?: Pick<
+    BsffPackaging,
+    "type" | "name" | "other" | "numero" | "volume" | "weight"
+  >[];
+};
+
+// Context used to determine if some fields are required or not
+type BsffValidationContext = Pick<
+  Bsff,
+  | "isDraft"
+  | "emitterEmissionSignatureDate"
+  | "transporterTransportSignatureDate"
+  | "destinationReceptionSignatureDate"
+>;
+
+function toBsffValidationContext(bsff: BsffLike): BsffValidationContext {
+  return {
+    isDraft: bsff.isDraft ?? true,
+    emitterEmissionSignatureDate: bsff.emitterEmissionSignatureDate
+      ? new Date(bsff.emitterEmissionSignatureDate)
+      : null,
+    transporterTransportSignatureDate: bsff.transporterTransportSignatureDate
+      ? new Date(bsff.transporterTransportSignatureDate)
+      : null,
+    destinationReceptionSignatureDate: bsff.destinationReceptionSignatureDate
+      ? new Date(bsff.destinationReceptionSignatureDate)
+      : null
+  };
+}
+
+export const emitterSchemaFn: FactorySchemaOf<
+  Pick<BsffValidationContext, "isDraft">,
+  Emitter
+> = ({ isDraft }) =>
   yup.object({
     emitterCompanyName: yup
       .string()
@@ -130,20 +167,23 @@ export const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
   });
 
 export const transporterSchemaFn: FactorySchemaOf<
-  boolean,
+  BsffValidationContext,
   Transporter
-> = isDraft =>
-  yup.object({
+> = bsff => {
+  // fields are required for transporter signature
+  const isRequired = !isAwaitingSignature("TRANSPORT", bsff);
+
+  return yup.object({
     transporterCompanyName: yup
       .string()
       .requiredIf(
-        !isDraft,
+        isRequired,
         "Transporteur : le nom de l'établissement est requis"
       ),
     transporterCompanySiret: siret
       .label("Transporteur")
       .requiredIf(
-        !isDraft,
+        isRequired,
         "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
       )
       .when("transporterCompanyVatNumber", siretConditions.companyVatNumber)
@@ -154,28 +194,32 @@ export const transporterSchemaFn: FactorySchemaOf<
     transporterCompanyAddress: yup
       .string()
       .requiredIf(
-        !isDraft,
+        isRequired,
         "Transporteur : l'adresse de l'établissement est requise"
       ),
     transporterCompanyContact: yup
       .string()
-      .requiredIf(!isDraft, "Transporteur : le nom du contact est requis"),
+      .requiredIf(isRequired, "Transporteur : le nom du contact est requis"),
     transporterCompanyPhone: yup
       .string()
-      .requiredIf(!isDraft, "Transporteur : le numéro de téléphone est requis"),
+      .requiredIf(
+        isRequired,
+        "Transporteur : le numéro de téléphone est requis"
+      ),
     transporterCompanyMail: yup
       .string()
       .email("Transporteur : l'adresse email est invalide")
-      .requiredIf(!isDraft, "Transporteur : l'adresse email est requise"),
+      .requiredIf(isRequired, "Transporteur : l'adresse email est requise"),
     transporterRecepisseNumber: yup.string().nullable(),
     transporterRecepisseDepartment: yup.string().nullable(),
     transporterRecepisseValidityLimit: yup.date().nullable()
   });
+};
 
 export const wasteDetailsSchemaFn: FactorySchemaOf<
-  boolean,
+  Pick<BsffValidationContext, "isDraft">,
   WasteDetails
-> = isDraft => {
+> = ({ isDraft }) => {
   const packagings = isDraft
     ? yup.array().nullable().notRequired()
     : yup
@@ -264,9 +308,9 @@ export const wasteDetailsSchemaFn: FactorySchemaOf<
 };
 
 export const destinationSchemaFn: FactorySchemaOf<
-  boolean,
+  Pick<BsffValidationContext, "isDraft">,
   Destination
-> = isDraft =>
+> = ({ isDraft }) =>
   yup.object({
     destinationCompanyName: yup
       .string()
@@ -521,26 +565,15 @@ const operationSchemaFn: (value: any) => yup.SchemaOf<Operation> = value => {
 
 export const operationSchema = yup.lazy(operationSchemaFn);
 
-// validation schema for BSFF before it can be published
-const baseBsffSchemaFn = (isDraft: boolean) =>
-  emitterSchemaFn(isDraft)
-    .concat(wasteDetailsSchemaFn(isDraft))
-    .concat(transporterSchemaFn(isDraft))
-    .concat(destinationSchemaFn(isDraft));
+const bsffSchemaFn = (bsff: BsffValidationContext) =>
+  emitterSchemaFn(bsff)
+    .concat(wasteDetailsSchemaFn(bsff))
+    .concat(transporterSchemaFn(bsff))
+    .concat(destinationSchemaFn(bsff));
 
-export const bsffSchema = baseBsffSchemaFn(false);
-export const draftBsffSchema = baseBsffSchemaFn(true);
-
-export async function validateBsff(
-  bsff: Partial<Bsff | Prisma.BsffCreateInput> & {
-    packagings?: Pick<
-      BsffPackaging,
-      "type" | "name" | "other" | "numero" | "volume" | "weight"
-    >[];
-  }
-) {
+export async function validateBsff(bsff: BsffLike) {
   try {
-    const validationSchema = bsff.isDraft ? draftBsffSchema : bsffSchema;
+    const validationSchema = bsffSchemaFn(toBsffValidationContext(bsff));
     await validationSchema.validate(bsff, {
       abortEarly: false
     });
@@ -557,9 +590,7 @@ export async function validateBsff(
 }
 
 export async function validateFicheInterventions(
-  bsff: Partial<Bsff | Prisma.BsffCreateInput> & {
-    packagings?: Partial<BsffPackaging>[];
-  },
+  bsff: BsffLike,
   ficheInterventions: BsffFicheIntervention[]
 ) {
   if (ficheInterventions.length === 0) {
@@ -600,9 +631,7 @@ export async function validateFicheInterventions(
  *   - il n'a pas été inclus dans un autre BSFF de groupement / reconditionnement / reéxpédition
  */
 export async function validatePreviousPackagings(
-  bsff: Partial<Bsff | Prisma.BsffCreateInput> & {
-    packagings?: Partial<BsffPackaging>[];
-  },
+  bsff: BsffLike,
   previousPackagingsIds: {
     forwarding?: string[] | null;
     grouping?: string[] | null;
@@ -809,108 +838,106 @@ export async function validatePreviousPackagings(
   return previousPackagings;
 }
 
-const beforeEmissionSchema = bsffSchema.concat(
-  yup.object({
-    isDraft: yup
-      .boolean()
-      .oneOf(
-        [false],
-        "Il n'est pas possible de signer un BSFF à l'état de brouillon"
-      ),
-    emitterEmissionSignatureDate: yup
-      .date()
-      .nullable()
-      .test(
-        "is-not-signed",
-        "L'entreprise émettrice a déjà signé ce bordereau",
-        value => value == null
-      ) as any // https://github.com/jquense/yup/issues/1302
-  })
-);
-
-export function validateBeforeEmission(
-  bsff: (typeof beforeEmissionSchema)["__outputType"]
-) {
-  return beforeEmissionSchema.validate(bsff, {
-    abortEarly: false
-  });
-}
-
-const beforeTransportSchema = bsffSchema.concat(transportSchema).concat(
-  yup.object({
-    emitterEmissionSignatureDate: yup
-      .date()
-      .nullable()
-      .required(
-        "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
-      ) as any, // https://github.com/jquense/yup/issues/1302
-    transporterTransportSignatureDate: yup
-      .date()
-      .nullable()
-      .test(
-        "is-not-signed",
-        "Le transporteur a déjà signé ce bordereau",
-        value => value == null
-      ) as any // https://github.com/jquense/yup/issues/1302
-  })
-);
-
-export function validateBeforeTransport(
-  bsff: (typeof beforeTransportSchema)["__outputType"]
-) {
-  return beforeTransportSchema.validate(bsff, {
-    abortEarly: false
-  });
-}
-
-export const beforeReceptionSchema = bsffSchema
-  .concat(transportSchema)
-  .concat(receptionSchema)
-  .concat(
+const beforeEmissionSchemaFn = (bsff: BsffLike) =>
+  bsffSchemaFn(toBsffValidationContext(bsff)).concat(
     yup.object({
-      transporterTransportSignatureDate: yup
-        .date()
-        .nullable()
-        .required(
-          "L'installation de destination ne peut pas signer la réception avant que le transporteur ait signé le bordereau"
-        ) as any, // https://github.com/jquense/yup/issues/1302
-      destinationReceptionSignatureDate: yup
+      isDraft: yup
+        .boolean()
+        .oneOf(
+          [false],
+          "Il n'est pas possible de signer un BSFF à l'état de brouillon"
+        ),
+      emitterEmissionSignatureDate: yup
         .date()
         .nullable()
         .test(
           "is-not-signed",
-          "L'installation de destination a déjà signé la réception du déchet",
+          "L'entreprise émettrice a déjà signé ce bordereau",
           value => value == null
         ) as any // https://github.com/jquense/yup/issues/1302
     })
   );
 
-export function validateBeforeReception(
-  bsff: (typeof beforeReceptionSchema)["__outputType"]
-) {
-  return beforeReceptionSchema.validate(bsff, {
+export function validateBeforeEmission(bsff: BsffLike) {
+  return beforeEmissionSchemaFn(bsff).validate(bsff, {
     abortEarly: false
   });
 }
 
-export const afterReceptionSchema = bsffSchema
-  .concat(transportSchema)
-  .concat(receptionSchema)
-  .concat(
-    yup.object({
-      destinationReceptionSignatureDate: yup
-        .date()
-        .nullable()
-        .required(
-          "L'installation de destination n'a pas encore signé la réception"
-        )
-    })
-  );
+const beforeTransportSchemaFn = (bsff: BsffLike) =>
+  bsffSchemaFn(toBsffValidationContext(bsff))
+    .concat(transportSchema)
+    .concat(
+      yup.object({
+        emitterEmissionSignatureDate: yup
+          .date()
+          .nullable()
+          .required(
+            "Le transporteur ne peut pas signer l'enlèvement avant que l'émetteur ait signé le bordereau"
+          ) as any, // https://github.com/jquense/yup/issues/1302
+        transporterTransportSignatureDate: yup
+          .date()
+          .nullable()
+          .test(
+            "is-not-signed",
+            "Le transporteur a déjà signé ce bordereau",
+            value => value == null
+          ) as any // https://github.com/jquense/yup/issues/1302
+      })
+    );
 
-export function validateAfterReception(
-  bsff: (typeof beforeReceptionSchema)["__outputType"]
-) {
-  return afterReceptionSchema.validate(bsff, {
+export function validateBeforeTransport(bsff: BsffLike) {
+  return beforeTransportSchemaFn(bsff).validate(bsff, {
+    abortEarly: false
+  });
+}
+
+export const beforeReceptionSchemaFn = (bsff: BsffLike) =>
+  bsffSchemaFn(toBsffValidationContext(bsff))
+    .concat(transportSchema)
+    .concat(receptionSchema)
+    .concat(
+      yup.object({
+        transporterTransportSignatureDate: yup
+          .date()
+          .nullable()
+          .required(
+            "L'installation de destination ne peut pas signer la réception avant que le transporteur ait signé le bordereau"
+          ) as any, // https://github.com/jquense/yup/issues/1302
+        destinationReceptionSignatureDate: yup
+          .date()
+          .nullable()
+          .test(
+            "is-not-signed",
+            "L'installation de destination a déjà signé la réception du déchet",
+            value => value == null
+          ) as any // https://github.com/jquense/yup/issues/1302
+      })
+    );
+
+export function validateBeforeReception(bsff: BsffLike) {
+  return beforeReceptionSchemaFn(bsff).validate(bsff, {
+    abortEarly: false
+  });
+}
+
+export const afterReceptionSchemaFn = (bsff: BsffLike) =>
+  bsffSchemaFn(toBsffValidationContext(bsff))
+    .concat(transportSchema)
+    .concat(receptionSchema)
+    .concat(
+      yup.object({
+        destinationReceptionSignatureDate: yup
+          .date()
+          .nullable()
+          .required(
+            "L'installation de destination n'a pas encore signé la réception"
+          )
+      })
+    );
+
+export function validateAfterReception(bsff: BsffLike) {
+  return afterReceptionSchemaFn(bsff).validate(bsff, {
     abortEarly: false
   });
 }

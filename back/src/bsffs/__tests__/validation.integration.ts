@@ -30,7 +30,7 @@ describe("emitterSchema", () => {
     };
   });
 
-  const emitterSchema = emitterSchemaFn(false);
+  const emitterSchema = emitterSchemaFn({ isDraft: false });
 
   test("valid data", () => {
     emitterSchema.validateSync(emitterData);
@@ -74,7 +74,12 @@ describe("transporterSchema", () => {
     };
   });
 
-  const transporterSchema = transporterSchemaFn(false);
+  const transporterSchema = transporterSchemaFn({
+    isDraft: false,
+    emitterEmissionSignatureDate: new Date(),
+    transporterTransportSignatureDate: new Date(),
+    destinationReceptionSignatureDate: null
+  });
 
   test("valid data", async () => {
     expect(await transporterSchema.isValid(transporterData)).toEqual(true);
@@ -236,7 +241,7 @@ describe("destinationSchema", () => {
     };
   });
 
-  const destinationSchema = destinationSchemaFn(false);
+  const destinationSchema = destinationSchemaFn({ isDraft: false });
 
   test("valid data", async () => {
     expect(await destinationSchema.isValid(destinationData)).toEqual(true);
@@ -336,7 +341,7 @@ describe("wasteDetailsSchema", () => {
     ]
   };
 
-  const wasteDetailsSchema = wasteDetailsSchemaFn(false);
+  const wasteDetailsSchema = wasteDetailsSchemaFn({ isDraft: false });
 
   test("valid data", () => {
     expect(wasteDetailsSchema.isValidSync(wasteDetails)).toEqual(true);
