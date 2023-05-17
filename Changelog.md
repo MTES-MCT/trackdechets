@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.5.2] 17/05/2023
+#### :bug: Corrections de bugs
+
+- Lancer un erreur pour une migration ratée pour stopper le déploiement [PR 2398](https://github.com/MTES-MCT/trackdechets/pull/2398)
+- Restaurer les champs GQL Form.nextTransporterSiret and Form.currentTransporterSiret [PR 2399](https://github.com/MTES-MCT/trackdechets/pull/2399)
+
 # [2023.5.1] 16/05/2023
 
 #### :rocket: Nouvelles fonctionnalités
