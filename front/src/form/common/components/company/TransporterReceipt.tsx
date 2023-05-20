@@ -62,7 +62,7 @@ export default function TransporterReceipt({
       !!(transporter as BsffTransporter)?.company?.orgId &&
       (transporter as BsffTransporter)?.recepisse === null
     ) {
-      // specific for the Bsff transporter signature dialog
+      // specific for the Bsff transporter signature dialog where recepisse === null means exempted
       return true;
     } else {
       return false;

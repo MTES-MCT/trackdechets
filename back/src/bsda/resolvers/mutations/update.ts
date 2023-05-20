@@ -12,6 +12,8 @@ import { checkCanUpdate } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
 import { parseBsda } from "../../validation/validate";
 import { canBypassSirenify } from "../../../companies/sirenify";
+import { recipify } from "../../validation/recipify";
+import { sirenify } from "../../validation/sirenify";
 
 export default async function edit(
   _,
@@ -23,11 +25,15 @@ export default async function edit(
     include: { intermediaries: true, grouping: true, forwarding: true }
   });
 
+  const sirenifiedInput = await sirenify(input);
+
+  const autocompletedInput = await recipify(sirenifiedInput);
+
   await checkCanUpdate(user, existingBsda, input);
 
   await checkEditionRules(existingBsda, input, user);
 
-  const flattenedInput = flattenBsdaInput(input);
+  const flattenedInput = flattenBsdaInput(autocompletedInput);
   const unparsedBsda = {
     ...existingBsda,
     ...flattenedInput,

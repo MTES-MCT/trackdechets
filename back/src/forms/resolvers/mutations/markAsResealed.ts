@@ -22,6 +22,7 @@ import {
 } from "@prisma/client";
 import { getFormRepository } from "../../repository";
 import { sirenifyResealedFormInput } from "../../sirenify";
+import { recipifyResealedFormInput } from "../../recipify";
 import { prismaJsonNoNull } from "../../../common/converter";
 
 const markAsResealed: MutationResolvers["markAsResealed"] = async (
@@ -46,8 +47,9 @@ const markAsResealed: MutationResolvers["markAsResealed"] = async (
 
   await checkCanMarkAsResealed(user, form);
 
+  const sirenified = await sirenifyResealedFormInput(resealedInfos, user);
   const { destination, transporter, wasteDetails } =
-    await sirenifyResealedFormInput(resealedInfos, user);
+    await recipifyResealedFormInput(sirenified);
 
   // copy basic info from initial BSD and overwrite it with resealedInfos
   const updateInput = {

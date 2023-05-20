@@ -12,6 +12,8 @@ import {
   flattenBsdaInput
 } from "../../converter";
 import { getBsdaRepository } from "../../repository";
+import { sirenify } from "../../validation/sirenify";
+import { recipify } from "../../validation/recipify";
 import { checkCanCreate } from "../../permissions";
 import { parseBsda } from "../../validation/validate";
 import { canBypassSirenify } from "../../../companies/sirenify";
@@ -33,6 +35,9 @@ export default async function create(
 export async function genericCreate({ isDraft, input, context }: CreateBsda) {
   const user = checkIsAuthenticated(context);
 
+  const sirenifiedInput = await sirenify(input);
+  const autocompletedInput = await recipify(sirenifiedInput);
+
   await checkCanCreate(user, input);
 
   const companies = await getUserCompanies(user.id);
@@ -48,7 +53,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     );
   }
 
-  const unparsedBsda = flattenBsdaInput(input);
+  const unparsedBsda = flattenBsdaInput(autocompletedInput);
   const bsda = await parseBsda(
     { ...unparsedBsda, isDraft },
     {

@@ -1,5 +1,4 @@
 /* eslint-disable import/no-anonymous-default-export */
-import { startOfYear, addYears } from "date-fns";
 import { getInitialCompany } from "form/bsdd/utils/initial-state";
 
 export default {
@@ -44,9 +43,6 @@ export default {
     },
     recepisse: {
       isExempted: false,
-      number: "",
-      department: "",
-      validityLimit: startOfYear(addYears(new Date(), 1)).toISOString(),
     },
   },
 };

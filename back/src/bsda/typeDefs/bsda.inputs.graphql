@@ -315,11 +315,23 @@ input BsdaTransporterInput {
   company: CompanyInput
   "Champ libre"
   customInfo: String
+  ""
   recepisse: BsdaRecepisseInput
   transport: BsdaTransportInput
 }
 
 input BsdaRecepisseInput {
+  "Exemption de récépissé (conformément aux dispositions de l'article R.541-50 du code de l'environnement)"
+  isExempted: Boolean
+  "Numéro de récépissé"
+  number: String @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
+  "Département"
+  department: String @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
+  "Date limite de validité"
+  validityLimit: DateTime @deprecated(reason: "Ignoré - Complété par Trackdéchets en fonction des informations renseignées par l'entreprise de transport ")
+}
+
+input BsdaBrokerRecepisseInput {
   "Exemption de récépissé (conformément aux dispositions de l'article R.541-50 du code de l'environnement)"
   isExempted: Boolean
   "Numéro de récépissé"
@@ -343,7 +355,7 @@ input BsdaBrokerInput {
   "Coordonnées de l'entreprise courtier"
   company: CompanyInput
   "Récépissé courtier"
-  recepisse: BsdaRecepisseInput
+  recepisse: BsdaBrokerRecepisseInput
 }
 
 input BsdaSignatureInput {

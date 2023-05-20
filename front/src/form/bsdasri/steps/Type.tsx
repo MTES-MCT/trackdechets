@@ -12,7 +12,6 @@ import {
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Tooltip from "common/components/Tooltip";
-import initialState from "../utils/initial-state";
 
 type Props = { disabled: boolean };
 
@@ -109,28 +108,6 @@ export function Type({ disabled }: Props) {
       );
       setFieldValue("transporter.company.address", data?.companyInfos.address);
       setFieldValue("transporter.company.name", data?.companyInfos.name);
-      if (data?.companyInfos?.transporterReceipt) {
-        setFieldValue(
-          "transporter.recepisse.number",
-          data?.companyInfos?.transporterReceipt.receiptNumber
-        );
-        setFieldValue(
-          "transporter.recepisse.validityLimit",
-          data?.companyInfos?.transporterReceipt.validityLimit
-        );
-        setFieldValue(
-          "transporter.recepisse.department",
-          data?.companyInfos?.transporterReceipt.department
-        );
-      } else {
-        setFieldValue("transporter.recepisse.number", "");
-        setFieldValue(
-          "transporter.recepisse.validityLimit",
-          initialState().transporter.recepisse.validityLimit
-        );
-
-        setFieldValue("transporter.recepisse.department", "");
-      }
       setFieldValue("grouping", []);
     }
   }, [type, setFieldValue, data]);

@@ -18,7 +18,7 @@ import {
 } from "../../repository";
 import { checkEditionRules } from "../../edition/bsffEdition";
 import { sirenifyBsffInput } from "../../sirenify";
-
+import { recipify } from "../../recipify";
 const updateBsff: MutationResolvers["updateBsff"] = async (
   _,
   { id, input },
@@ -63,7 +63,8 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     delete input.ficheInterventions;
   }
   const sirenifiedInput = await sirenifyBsffInput(input, user);
-  const flatInput = flattenBsffInput(sirenifiedInput);
+  const autocompletedInput = await recipify(sirenifiedInput);
+  const flatInput = flattenBsffInput(autocompletedInput);
 
   const futureBsff = {
     ...existingBsff,

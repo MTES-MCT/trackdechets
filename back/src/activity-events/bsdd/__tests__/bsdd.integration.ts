@@ -7,7 +7,9 @@ import {
 import prisma from "../../../prisma";
 import {
   formFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  transporterReceiptFactory,
+  companyFactory
 } from "../../../__tests__/factories";
 import makeClient from "../../../__tests__/testClient";
 import { getStream } from "../../data";
@@ -56,6 +58,12 @@ describe("ActivityEvent.Bsdd", () => {
         companyTypes: { set: ["WASTEPROCESSOR", "TRANSPORTER"] }
       }
     );
+    const transporterCompany = await companyFactory({
+      companyTypes: { set: ["TRANSPORTER"] }
+    });
+    await transporterReceiptFactory({
+      company: transporterCompany
+    });
     const { mutate } = makeClient(user);
 
     // Create form
@@ -94,13 +102,10 @@ describe("ActivityEvent.Bsdd", () => {
             isTempStorage: false
           },
           transporter: {
-            receipt: "sdfg",
-            department: "82",
-            validityLimit: "2018-12-11T00:00:00.000Z",
             numberPlate: "12345",
             company: {
-              name: destinationCompany.name,
-              siret: destinationCompany.siret,
+              name: transporterCompany.name,
+              siret: transporterCompany.siret,
               address: "8 rue du Général de Gaulle",
               contact: "Transporteur",
               phone: "03",

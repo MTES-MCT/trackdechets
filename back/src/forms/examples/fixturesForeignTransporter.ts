@@ -3,7 +3,6 @@ import fixtures from "./fixtures";
 const {
   emitterCompanyInput,
   emitterInput,
-  receiptInput,
   traiteurCompanyInput,
   recipientInput,
   ttrCompanyInput,
@@ -47,8 +46,7 @@ function transporter2CompanyInput(vatNumber: string) {
 function nextSegmentInfoInput(vatNumber: string) {
   return {
     transporter: {
-      company: transporter2CompanyInput(vatNumber),
-      ...receiptInput
+      company: transporter2CompanyInput(vatNumber)
     },
     mode: "RAIL"
   };
@@ -57,9 +55,6 @@ function nextSegmentInfoInput(vatNumber: string) {
 function transporterInput(vatNumber: string) {
   return {
     company: transporterCompanyInput(vatNumber),
-    receipt: null,
-    department: null,
-    validityLimit: null,
     numberPlate: null
   };
 }
@@ -82,7 +77,6 @@ export default {
   ttrInput,
   wasteDetailsInput,
   workSiteInput,
-  receiptInput,
   signEmissionFormInput,
   signTransportFormInput,
   receivedInfoInput,

@@ -208,11 +208,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
         mutation {
             updateBsda(id: "${id}", input: {
               transporter: {
-                recepisse: {
-                  number: "recepisse number"
-                  department: "75"
-                  validityLimit: "2020-06-30"
-                }
                 transport: {
                   mode: ROAD,
                   plates: ["AA-XX-00"]
@@ -401,11 +396,6 @@ describe("Exemples de circuit du bordereau de suivi des déchets d'amiante", () 
         mutation {
             updateBsda(id: "${id}", input: {
               transporter: {
-                recepisse: {
-                  number: "recepisse number"
-                  department: "75"
-                  validityLimit: "2020-06-30"
-                }
                 transport: {
                   mode: ROAD,
                   plates: ["AA-XX-00"]

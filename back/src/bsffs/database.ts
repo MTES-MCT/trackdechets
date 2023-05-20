@@ -34,6 +34,7 @@ import {
 } from "./repository";
 import { sirenifyBsffInput } from "./sirenify";
 import { Permission, can, getUserRoles } from "../permissions";
+import { recipify } from "./recipify";
 
 export async function getBsffOrNotFound(where: Prisma.BsffWhereUniqueInput) {
   const { findUnique } = getReadonlyBsffRepository();
@@ -152,11 +153,12 @@ export async function createBsff(
   await checkCanCreate(user, input);
 
   const sirenifiedInput = await sirenifyBsffInput(input, user);
+  const autocompletedInput = await recipify(sirenifiedInput);
 
   const flatInput: Prisma.BsffCreateInput = {
     id: getReadableId(ReadableIdPrefix.FF),
     isDraft,
-    ...flattenBsffInput(sirenifiedInput)
+    ...flattenBsffInput(autocompletedInput)
   };
 
   if (!input.type) {

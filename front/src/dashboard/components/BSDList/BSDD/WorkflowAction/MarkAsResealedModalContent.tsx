@@ -45,9 +45,6 @@ const emptyState = {
   },
   transporter: {
     isExemptedOfReceipt: false,
-    receipt: "",
-    department: "",
-    validityLimit: null,
     numberPlate: "",
     company: {
       siret: "",

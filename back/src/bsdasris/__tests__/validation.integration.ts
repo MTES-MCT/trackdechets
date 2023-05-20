@@ -129,11 +129,13 @@ describe("Mutation.signBsdasri emission", () => {
           transportSignature: true
         });
       } catch (err) {
-        expect(err.errors).toEqual([
-          "Transporteur: le département associé au récépissé est obligatoire",
-          "Transporteur: le numéro de récépissé est obligatoire",
-          "Transporteur: la date limite de validité du récépissé est obligatoire"
-        ]);
+        expect(err.errors).toEqual(
+          expect.arrayContaining([
+            "Transporteur: le département associé au récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets",
+            "Transporteur: le numéro de récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets",
+            "Transporteur: la date limite de validité du récépissé est obligatoire - l'établissement doit renseigner son récépissé dans Trackdéchets"
+          ])
+        );
       }
     });
 

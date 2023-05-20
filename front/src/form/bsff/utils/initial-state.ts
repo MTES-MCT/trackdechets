@@ -28,11 +28,6 @@ const initialState: BsffFormInput = {
       ...getInitialCompany(),
     },
     isExemptedOfRecepisse: false,
-    recepisse: {
-      number: "",
-      department: "",
-      validityLimit: "",
-    },
     transport: {
       mode: TransportMode.Road,
       plates: [],

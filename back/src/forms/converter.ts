@@ -159,9 +159,6 @@ export function flattenTransporterInput(input: {
       input.transporter,
       t => t.isExemptedOfReceipt
     ),
-    transporterReceipt: chain(input.transporter, t => t.receipt),
-    transporterDepartment: chain(input.transporter, t => t.department),
-    transporterValidityLimit: chain(input.transporter, t => t.validityLimit),
     transporterNumberPlate: chain(input.transporter, t => t.numberPlate),
     transporterCustomInfo: chain(input.transporter, t => t.customInfo),
     transporterTransportMode: chain(input.transporter, t => t.mode)

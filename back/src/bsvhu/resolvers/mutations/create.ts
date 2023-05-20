@@ -10,6 +10,8 @@ import { expandVhuFormFromDb, flattenVhuInput } from "../../converter";
 import { validateBsvhu } from "../../validation";
 import { getBsvhuRepository } from "../../repository";
 import sirenify from "../../sirenify";
+import { recipify } from "../../recipify";
+
 import { checkCanCreate } from "../../permissions";
 
 type CreateBsvhu = {
@@ -30,8 +32,10 @@ export async function genericCreate({ isDraft, input, context }: CreateBsvhu) {
   const user = checkIsAuthenticated(context);
 
   const sirenifiedInput = await sirenify(input, user);
+  const autocompletedInput = await recipify(sirenifiedInput);
+
   await checkCanCreate(user, input);
-  const form = flattenVhuInput(sirenifiedInput);
+  const form = flattenVhuInput(autocompletedInput);
 
   await validateBsvhu(form, { emissionSignature: !isDraft });
   const bsvhuRepository = getBsvhuRepository(user);

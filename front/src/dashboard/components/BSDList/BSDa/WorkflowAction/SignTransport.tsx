@@ -100,9 +100,6 @@ export function SignTransport({
                   transporter: {
                     recepisse: {
                       isExempted: false,
-                      number: "",
-                      department: "",
-                      validityLimit: null,
                     },
                     transport: {
                       mode: TransportMode.Road,

@@ -7,7 +7,8 @@ import {
   statusLogFactory,
   transportSegmentFactory,
   userFactory,
-  userWithCompanyFactory
+  userWithCompanyFactory,
+  transporterReceiptFactory
 } from "./factories";
 
 describe("Test Factories", () => {
@@ -160,4 +161,16 @@ test("should create a transport segment", async () => {
     .findUnique({ where: { id: frm.id } })
     .transporters({ where: { number: { gte: 2 } } });
   expect(transporters!.length).toEqual(1);
+});
+
+test("should create a transporter receipt and associate it to a company", async () => {
+  const company = await companyFactory();
+
+  const receipt = await transporterReceiptFactory({ company });
+
+  const retrievedCompany = await prisma.company.findUnique({
+    where: { id: company.id }
+  });
+
+  expect(retrievedCompany?.transporterReceiptId).toEqual(receipt.id);
 });
