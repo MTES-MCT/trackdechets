@@ -152,7 +152,7 @@ async function checkMultiModalTransporterPermission(
       status: formStatus
     }
   });
-  await prisma.transportSegment.create({
+  await prisma.bsddTransporter.create({
     data: {
       form: { connect: { id: form.id } },
       transporterCompanySiret: company.siret

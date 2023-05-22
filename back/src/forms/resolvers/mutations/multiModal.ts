@@ -105,7 +105,7 @@ const formWithOwnerIdAndTransportSegments = Prisma.validator<Prisma.FormArgs>()(
   {
     include: {
       owner: { select: { id: true } },
-      transportSegments: { select: { mode: true } }
+      transportSegments: { select: { transporterTransportMode: true } }
     }
   }
 );
@@ -153,7 +153,7 @@ export async function prepareSegment(
   if (!form) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
-  const transportSegments = await prisma.transportSegment.findMany({
+  const transportSegments = await prisma.bsddTransporter.findMany({
     where: {
       form: { id: id }
     },
@@ -222,7 +222,7 @@ export async function prepareSegment(
     { prepareSegment: true }
   );
 
-  const segment = await prisma.transportSegment.findFirstOrThrow({
+  const segment = await prisma.bsddTransporter.findFirstOrThrow({
     where: { segmentNumber: transportSegments.length + 1, form: { id: id } }
   });
   return expandTransportSegmentFromDb(segment);
@@ -234,7 +234,7 @@ export async function markSegmentAsReadyToTakeOver(
 ): Promise<TransportSegment> {
   const user = checkIsAuthenticated(context);
 
-  const currentSegment = await prisma.transportSegment.findUnique({
+  const currentSegment = await prisma.bsddTransporter.findUnique({
     where: { id },
     include: {
       form: {
@@ -316,7 +316,7 @@ export async function takeOverSegment(
     );
   }
 
-  const currentSegment = await prisma.transportSegment.findUnique({
+  const currentSegment = await prisma.bsddTransporter.findUnique({
     where: { id },
     include: {
       form: {
@@ -402,7 +402,7 @@ export async function editSegment(
 ): Promise<TransportSegment> {
   const user = checkIsAuthenticated(context);
 
-  const currentSegment = await prisma.transportSegment.findUnique({
+  const currentSegment = await prisma.bsddTransporter.findUnique({
     where: { id },
     include: {
       form: {

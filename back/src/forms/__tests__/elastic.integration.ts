@@ -104,7 +104,7 @@ describe("getSiretsByTab", () => {
     // next segment is marked as ready to take over
     // BSDD should appear in transporter n°1 "collected" tab and
     // in transporter n°2 to "to collect" tab
-    await prisma.transportSegment.updateMany({
+    await prisma.bsddTransporter.updateMany({
       where: { formId: form.id, transporterCompanySiret: transporter2.siret },
       data: { readyToTakeOver: true }
     });
@@ -122,7 +122,7 @@ describe("getSiretsByTab", () => {
     // waste is taken over by transporter n°2. BSDD should
     // be in transporter n°1 "Follow" tab and in transporter n°2
     // "Collected" tab
-    await prisma.transportSegment.updateMany({
+    await prisma.bsddTransporter.updateMany({
       where: { formId: form.id, transporterCompanySiret: transporter2.siret },
       data: { takenOverAt: new Date() }
     });
@@ -140,7 +140,7 @@ describe("getSiretsByTab", () => {
     // next segment is marked as ready to take over
     // BSDD should appear in transporter n°2 "collected" tab and
     // in transporter n°3 to "to collect" tab
-    await prisma.transportSegment.updateMany({
+    await prisma.bsddTransporter.updateMany({
       where: {
         formId: form.id,
         transporterCompanyVatNumber: transporter3.vatNumber
@@ -161,7 +161,7 @@ describe("getSiretsByTab", () => {
     // waste is taken over by transporter n°2. BSDD should
     // be in transporter n°1 "Follow" tab and in transporter n°2
     // "Collected" tab
-    await prisma.transportSegment.updateMany({
+    await prisma.bsddTransporter.updateMany({
       where: {
         formId: form.id,
         transporterCompanyVatNumber: transporter3.vatNumber

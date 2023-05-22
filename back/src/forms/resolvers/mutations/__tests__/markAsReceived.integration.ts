@@ -567,7 +567,7 @@ describe("Test Form reception", () => {
     // currentTransporterOrgId was cleaned up
     expect(frm.currentTransporterOrgId).toEqual("");
 
-    const deleted = await prisma.transportSegment.findFirst({
+    const deleted = await prisma.bsddTransporter.findFirst({
       where: { id: staleSegment.id }
     });
     expect(deleted).toEqual(null);

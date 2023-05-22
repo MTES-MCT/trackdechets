@@ -310,7 +310,7 @@ export const forwardedInData: Partial<Prisma.FormCreateInput> = {
 };
 
 export const transportSegmentFactory = async ({ formId, segmentPayload }) => {
-  return prisma.transportSegment.create({
+  return prisma.bsddTransporter.create({
     data: {
       form: { connect: { id: formId } },
       ...segmentPayload

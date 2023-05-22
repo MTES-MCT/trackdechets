@@ -39,11 +39,11 @@ describe("{ mutation { markSegmentAsReadyToTakeOver} }", () => {
       }
     });
     // there is already one segment
-    const segment = await prisma.transportSegment.create({
+    const segment = await prisma.bsddTransporter.create({
       data: {
         form: { connect: { id: form.id } },
         transporterCompanySiret: secondTransporter.orgId,
-        mode: "ROAD",
+        transporterTransportMode: "ROAD",
         transporterCompanyAddress: "40 Boulevard Voltaire 13001 Marseille",
         transporterCompanyPhone: "01 00 00 00 00",
         transporterCompanyMail: "john.snow@trackdechets.fr",
@@ -63,7 +63,7 @@ describe("{ mutation { markSegmentAsReadyToTakeOver} }", () => {
     );
 
     const readyToTakeOverSegment =
-      await prisma.transportSegment.findUniqueOrThrow({
+      await prisma.bsddTransporter.findUniqueOrThrow({
         where: { id: segment.id }
       });
     expect(readyToTakeOverSegment.readyToTakeOver).toBe(true);

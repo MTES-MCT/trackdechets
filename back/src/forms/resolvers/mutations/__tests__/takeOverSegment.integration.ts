@@ -68,7 +68,7 @@ describe("{ mutation { takeOverSegment } }", () => {
     );
 
     // segment take over fields are filled
-    const takenOverSegment = await prisma.transportSegment.findUniqueOrThrow({
+    const takenOverSegment = await prisma.bsddTransporter.findUniqueOrThrow({
       where: { id: segment.id }
     });
 

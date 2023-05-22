@@ -405,9 +405,9 @@ model Form {
   ecoOrganismeSiret                  String?
   signedBy                           String?
 
-  transportSegments TransportSegment[]
-  groupedIn         FormGroupement[]   @relation("GroupedIn")
-  grouping          FormGroupement[]   @relation("Grouping")
+  transportSegments BsddTransporter[]
+  groupedIn         FormGroupement[]  @relation("GroupedIn")
+  grouping          FormGroupement[]  @relation("Grouping")
 
   ownerId              String
   owner                User                          @relation(fields: [ownerId], references: [id])
@@ -683,7 +683,7 @@ model WorkerCertification {
   Company             Company[]
 }
 
-model TransportSegment {
+model BsddTransporter {
   id                              String         @id @default(cuid())
   segmentNumber                   Int?
   transporterCompanySiret         String?
@@ -698,7 +698,7 @@ model TransportSegment {
   transporterDepartment           String?
   transporterValidityLimit        DateTime?      @db.Timestamptz(6)
   transporterNumberPlate          String?
-  mode                            TransportMode?
+  transporterTransportMode        TransportMode?
   readyToTakeOver                 Boolean?       @default(false)
   previousTransporterCompanyOrgId String?
   takenOverAt                     DateTime?      @db.Timestamptz(6)
@@ -708,10 +708,9 @@ model TransportSegment {
   formId                          String
   form                            Form           @relation(fields: [formId], references: [id])
 
-  @@index([formId], map: "_TransportSegmentFormIdIdx")
-  @@index([transporterCompanySiret], map: "_TransportSegmentTransporterCompanySiretIdx")
-  @@index([transporterCompanyVatNumber], map: "_TransportSegmentTransporterCompanyVatNumberIdx")
-
+  @@index([formId], map: "_BsddTransporterFormIdIdx")
+  @@index([transporterCompanySiret], map: "_BsddTransporterCompanySiretIdx")
+  @@index([transporterCompanyVatNumber], map: "_BsddTransporterCompanyVatNumberIdx")
 }
 
 model User {

@@ -60,7 +60,7 @@ describe("{ mutation { prepareSegment } }", () => {
       }`
     );
 
-    const segment = await prisma.transportSegment.findUniqueOrThrow({
+    const segment = await prisma.bsddTransporter.findUniqueOrThrow({
       where: { id: data.prepareSegment.id }
     });
 
@@ -109,7 +109,7 @@ describe("{ mutation { prepareSegment } }", () => {
       }`
     );
 
-    const segment = await prisma.transportSegment.findUniqueOrThrow({
+    const segment = await prisma.bsddTransporter.findUniqueOrThrow({
       where: { id: data.prepareSegment.id }
     });
 
@@ -189,7 +189,7 @@ describe("{ mutation { prepareSegment } }", () => {
     expect(data.prepareSegment.transporter!.company!.siret).toBe(
       company2.siret
     );
-    const segment = await prisma.transportSegment.findFirstOrThrow({
+    const segment = await prisma.bsddTransporter.findFirstOrThrow({
       where: { form: { id: form.id } }
     });
 

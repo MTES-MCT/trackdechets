@@ -1,4 +1,4 @@
-import { Form, TransportSegment } from "@prisma/client";
+import { Form, BsddTransporter } from "@prisma/client";
 import { getTransporterCompanyOrgId } from "../common/constants/companySearchHelpers";
 import { BsdElastic } from "../common/elastic";
 import { buildAddress } from "../companies/sirene/utils";
@@ -22,7 +22,7 @@ type RegistryFields =
 
 export function getRegistryFields(
   form: Form & {
-    transportSegments: TransportSegment[] | null;
+    transportSegments: BsddTransporter[] | null;
   }
 ): Pick<BsdElastic, RegistryFields> {
   const registryFields: Record<RegistryFields, string[]> = {
@@ -378,7 +378,7 @@ export function toManagedWaste(
 export function toManagedWastes(
   form: Form & { forwarding: Form } & {
     grouping: { initialForm: Form }[];
-  } & { transportSegments: TransportSegment[] }
+  } & { transportSegments: BsddTransporter[] }
 ): ManagedWaste[] {
   const bsdd = formToBsdd(form);
   if (bsdd.forwarding) {

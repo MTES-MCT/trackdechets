@@ -3,7 +3,7 @@ import {
   Form,
   Form as PrismaForm,
   Prisma,
-  TransportSegment as PrismaTransportSegment,
+  BsddTransporter as PrismaBsddTransporter,
   TransportMode
 } from "@prisma/client";
 import DataLoader from "dataloader";
@@ -847,7 +847,7 @@ export async function expandInitialFormFromDb(
 }
 
 export function expandTransportSegmentFromDb(
-  segment: PrismaTransportSegment
+  segment: PrismaBsddTransporter
 ): GraphQLTransportSegment {
   return {
     id: segment.id,
@@ -874,7 +874,7 @@ export function expandTransportSegmentFromDb(
       numberPlate: segment.transporterNumberPlate,
       customInfo: null
     }),
-    mode: segment.mode,
+    mode: segment.transporterTransportMode,
     takenOverAt: processDate(segment.takenOverAt),
     takenOverBy: segment.takenOverBy,
     readyToTakeOver: segment.readyToTakeOver,

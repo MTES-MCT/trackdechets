@@ -1,6 +1,6 @@
 import {
   Form,
-  TransportSegment,
+  BsddTransporter,
   Prisma,
   TransportMode,
   WasteAcceptationStatus,
@@ -13,7 +13,7 @@ import { FormStatus } from "../generated/graphql/types";
  */
 export interface FullForm extends Form {
   forwardedIn: Form | null;
-  transportSegments: TransportSegment[] | null;
+  transportSegments: BsddTransporter[] | null;
   intermediaries: IntermediaryFormAssociation[] | null;
 }
 
@@ -34,7 +34,7 @@ export type FormCompanies = Pick<
     | "transporterCompanyVatNumber"
   > | null;
 } & {
-  transportSegments?: Pick<TransportSegment, "transporterCompanySiret">[];
+  transportSegments?: Pick<BsddTransporter, "transporterCompanySiret">[];
 } & {
   intermediariesVatNumbers?: string[];
   intermediariesSirets?: string[];

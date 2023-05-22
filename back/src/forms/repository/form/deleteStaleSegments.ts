@@ -15,7 +15,7 @@ const buildDeleteFormStaleSegments: (
     .transportSegments({ where: { takenOverAt: null } });
 
   if (staleSegments && staleSegments.length > 0) {
-    await prisma.transportSegment.deleteMany({
+    await prisma.bsddTransporter.deleteMany({
       where: { id: { in: staleSegments.map(s => s.id) } }
     });
   }
