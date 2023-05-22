@@ -21,33 +21,24 @@ export class UpdateAppendix1ProducerForm implements Updater {
 
     for (const appendix1Form of appendix1Forms) {
       if (appendix1Form.grouping) {
-        const appendix1ProducerForms = await prisma.form.findMany({
+        const appendix1ProducersFormIds = appendix1Form.grouping.map(
+          g => g.initialFormId
+        );
+
+        await prisma.form.updateMany({
           where: {
-            id: { in: appendix1Form.grouping.map(g => g.initialFormId) }
+            id: { in: appendix1ProducersFormIds },
+            emitterType: "APPENDIX1_PRODUCER"
+          },
+          data: {
+            transporterIsExemptedOfReceipt:
+              appendix1Form.transporterIsExemptedOfReceipt,
+            transporterReceipt: appendix1Form.transporterReceipt,
+            transporterDepartment: appendix1Form.transporterDepartment,
+            transporterValidityLimit: appendix1Form.transporterValidityLimit,
+            transporterTransportMode: appendix1Form.transporterTransportMode
           }
         });
-        for (const appendix1ProducerForm of appendix1ProducerForms) {
-          await prisma.form.update({
-            where: { id: appendix1ProducerForm.id },
-            data: {
-              transporterIsExemptedOfReceipt:
-                appendix1ProducerForm.transporterIsExemptedOfReceipt ??
-                appendix1Form.transporterIsExemptedOfReceipt,
-              transporterReceipt:
-                appendix1ProducerForm.transporterReceipt ??
-                appendix1Form.transporterReceipt,
-              transporterDepartment:
-                appendix1ProducerForm.transporterDepartment ??
-                appendix1Form.transporterDepartment,
-              transporterValidityLimit:
-                appendix1ProducerForm.transporterValidityLimit ??
-                appendix1Form.transporterValidityLimit,
-              transporterTransportMode:
-                appendix1ProducerForm.transporterTransportMode ??
-                appendix1Form.transporterTransportMode
-            }
-          });
-        }
       }
     }
   }
