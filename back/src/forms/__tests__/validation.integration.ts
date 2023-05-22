@@ -1306,7 +1306,10 @@ describe("processedInfoSchema", () => {
       transporterCompanyMail: "contact@laposte.com",
       transporterIsExemptedOfReceipt: true
     };
-    const validateFn = () => transporterSchemaFn(false).validate(transporter);
+    const validateFn = () =>
+      transporterSchemaFn({ transporterSignature: false }).validate(
+        transporter
+      );
 
     await expect(validateFn()).resolves.toMatchObject({
       transporterCompanyAddress: "paris",
@@ -1333,7 +1336,10 @@ describe("processedInfoSchema", () => {
       transporterCompanyMail: "contact@laposte.com",
       transporterIsExemptedOfReceipt: true
     };
-    const validateFn = () => transporterSchemaFn(false).validate(transporter);
+    const validateFn = () =>
+      transporterSchemaFn({ transporterSignature: false }).validate(
+        transporter
+      );
 
     await expect(validateFn()).resolves.toMatchObject({
       transporterCompanyAddress: "paris",

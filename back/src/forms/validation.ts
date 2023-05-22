@@ -217,6 +217,12 @@ type ProcessedInfo = Pick<
   | "nextDestinationNotificationNumber"
 >;
 
+// Context used to determine if some fields are required or not
+type FormValidationContext = {
+  isDraft: boolean;
+  transporterSignature: boolean;
+};
+
 export const hasPipeline = (value: {
   wasteDetailsPackagingInfos: Array<{
     type: Packagings;
@@ -229,7 +235,9 @@ export const hasPipeline = (value: {
 // *************************************************************
 
 // 1 - Émetteur du bordereau
-const emitterSchemaFn: FactorySchemaOf<boolean, Emitter> = isDraft =>
+const emitterSchemaFn: FactorySchemaOf<FormValidationContext, Emitter> = ({
+  isDraft
+}) =>
   yup.object({
     emitterPickupSite: yup.string().nullable(),
     emitterWorkSiteAddress: yup.string().nullable(),
@@ -435,7 +443,9 @@ export const ecoOrganismeSchema = yup.object().shape({
 });
 
 // 2 - Installation de destination ou d’entreposage ou de reconditionnement prévue
-const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
+const recipientSchemaFn: FactorySchemaOf<FormValidationContext, Recipient> = ({
+  isDraft
+}) =>
   yup.object({
     recipientCap: yup
       .string()
@@ -508,7 +518,9 @@ const recipientSchemaFn: FactorySchemaOf<boolean, Recipient> = isDraft =>
       .requiredIf(!isDraft, `Destinataire: ${MISSING_COMPANY_EMAIL}`)
   });
 
-export const packagingInfoFn = (isDraft: boolean) =>
+export const packagingInfoFn = ({
+  isDraft
+}: Pick<FormValidationContext, "isDraft">) =>
   yup.object().shape({
     type: yup
       .mixed<Packagings>()
@@ -599,9 +611,9 @@ const parcelInfos = yup.lazy(value => {
 // 5 - Conditionnement
 // 6 - Quantité
 const baseWasteDetailsSchemaFn: FactorySchemaOf<
-  boolean,
+  Pick<FormValidationContext, "isDraft">,
   WasteDetailsCommon
-> = isDraft =>
+> = ({ isDraft }) =>
   yup.object({
     wasteDetailsCode: yup
       .string()
@@ -643,10 +655,10 @@ const baseWasteDetailsSchemaFn: FactorySchemaOf<
 
 // Schéma lorsque emitterType = APPENDIX1
 const wasteDetailsAppendix1SchemaFn: FactorySchemaOf<
-  boolean,
+  Pick<FormValidationContext, "isDraft">,
   WasteDetailsAppendix1
-> = isDraft =>
-  baseWasteDetailsSchemaFn(isDraft).concat(
+> = ({ isDraft }) =>
+  baseWasteDetailsSchemaFn({ isDraft }).concat(
     yup.object({
       wasteDetailsName: yup.string().nullable(),
       wasteDetailsCode: yup
@@ -661,15 +673,15 @@ const wasteDetailsAppendix1SchemaFn: FactorySchemaOf<
 
 // Schéma lorsque emitterType n'est pas APPENDIX1
 const wasteDetailsNormalSchemaFn: FactorySchemaOf<
-  boolean,
+  Pick<FormValidationContext, "isDraft">,
   WasteDetails
-> = isDraft =>
-  baseWasteDetailsSchemaFn(isDraft).concat(
+> = ({ isDraft }) =>
+  baseWasteDetailsSchemaFn({ isDraft }).concat(
     yup.object({
       wasteDetailsPackagingInfos: yup
         .array()
         .requiredIf(!isDraft, "Le détail du conditionnement est obligatoire")
-        .of(packagingInfoFn(isDraft) as any)
+        .of(packagingInfoFn({ isDraft }) as any)
         .test(
           "is-valid-packaging-infos",
           "${path} ne peut pas à la fois contenir 1 citerne, 1 pipeline ou 1 benne et un autre conditionnement.",
@@ -719,30 +731,35 @@ const wasteDetailsNormalSchemaFn: FactorySchemaOf<
     })
   );
 
-const wasteDetailsSchemaFn = (isDraft: boolean) =>
+const wasteDetailsSchemaFn = (
+  context: Pick<FormValidationContext, "isDraft">
+) =>
   yup.lazy(value => {
     if (value.emitterType === EmitterType.APPENDIX1_PRODUCER) {
       return yup.object();
     }
 
     if (value.emitterType === EmitterType.APPENDIX1) {
-      return wasteDetailsAppendix1SchemaFn(isDraft);
+      return wasteDetailsAppendix1SchemaFn(context);
     }
-    return wasteDetailsNormalSchemaFn(isDraft);
+    return wasteDetailsNormalSchemaFn(context);
   });
 
 // 8 - Collecteur-transporteur
 export const transporterSchemaFn: FactorySchemaOf<
-  boolean,
+  Pick<FormValidationContext, "transporterSignature">,
   Transporter
-> = isRequired =>
+> = ({ transporterSignature }) =>
   yup.object({
     transporterCustomInfo: yup.string().nullable(),
     transporterNumberPlate: yup.string().nullable(),
     transporterCompanyName: yup
       .string()
       .ensure()
-      .requiredIf(isRequired, `Transporteur: ${MISSING_COMPANY_NAME}`),
+      .requiredIf(
+        transporterSignature,
+        `Transporteur: ${MISSING_COMPANY_NAME}`
+      ),
     transporterCompanySiret: siret
       .label("Transporteur")
       .test(siretTests.isRegistered("TRANSPORTER"))
@@ -751,27 +768,42 @@ export const transporterSchemaFn: FactorySchemaOf<
         // set siret not required when vatNumber is defined and valid
         siretConditions.companyVatNumber
       )
-      .requiredIf(isRequired, `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`),
+      .requiredIf(
+        transporterSignature,
+        `Transporteur : ${MISSING_COMPANY_SIRET_OR_VAT}`
+      ),
     transporterCompanyVatNumber: foreignVatNumber
       .label("Transporteur")
       .test(vatNumberTests.isRegisteredTransporter),
     transporterCompanyAddress: yup
       .string()
       .ensure()
-      .requiredIf(isRequired, `Transporteur: ${MISSING_COMPANY_ADDRESS}`),
+      .requiredIf(
+        transporterSignature,
+        `Transporteur: ${MISSING_COMPANY_ADDRESS}`
+      ),
     transporterCompanyContact: yup
       .string()
       .ensure()
-      .requiredIf(isRequired, `Transporteur: ${MISSING_COMPANY_CONTACT}`),
+      .requiredIf(
+        transporterSignature,
+        `Transporteur: ${MISSING_COMPANY_CONTACT}`
+      ),
     transporterCompanyPhone: yup
       .string()
       .ensure()
-      .requiredIf(isRequired, `Transporteur: ${MISSING_COMPANY_PHONE}`),
+      .requiredIf(
+        transporterSignature,
+        `Transporteur: ${MISSING_COMPANY_PHONE}`
+      ),
     transporterCompanyMail: yup
       .string()
       .email()
       .ensure()
-      .requiredIf(isRequired, `Transporteur: ${MISSING_COMPANY_EMAIL}`),
+      .requiredIf(
+        transporterSignature,
+        `Transporteur: ${MISSING_COMPANY_EMAIL}`
+      ),
     transporterIsExemptedOfReceipt: yup.boolean().notRequired().nullable(),
     transporterReceipt: yup
       .string()
@@ -780,7 +812,7 @@ export const transporterSchemaFn: FactorySchemaOf<
         then: schema => schema.notRequired().nullable(),
         otherwise: schema =>
           schema.requiredIf(
-            isRequired,
+            transporterSignature,
             "Vous n'avez pas précisé bénéficier de l'exemption de récépissé, il est donc est obligatoire"
           )
       }),
@@ -791,7 +823,7 @@ export const transporterSchemaFn: FactorySchemaOf<
         then: schema => schema.notRequired().nullable(),
         otherwise: schema =>
           schema.requiredIf(
-            isRequired,
+            transporterSignature,
             "Le département du transporteur est obligatoire"
           )
       }),
@@ -815,7 +847,9 @@ export const emptyTransporterSchema: yup.SchemaOf<Transporter> = yup.object({
   transporterValidityLimit: yup.string().nullable().oneOf([null, ""])
 });
 
-export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
+export const traderSchemaFn: FactorySchemaOf<FormValidationContext, Trader> = ({
+  isDraft
+}) =>
   yup.object({
     traderCompanySiret: siret.label("Négociant"),
     traderCompanyName: yup.string().when("traderCompanySiret", {
@@ -885,7 +919,9 @@ export const traderSchemaFn: FactorySchemaOf<boolean, Trader> = isDraft =>
     })
   });
 
-export const brokerSchemaFn: FactorySchemaOf<boolean, Broker> = isDraft =>
+export const brokerSchemaFn: FactorySchemaOf<FormValidationContext, Broker> = ({
+  isDraft
+}) =>
   yup.object({
     brokerCompanySiret: siret.label("Courtier"),
     brokerCompanyName: yup.string().when("brokerCompanySiret", {
@@ -1236,49 +1272,59 @@ export const processedInfoSchema = yup.lazy(processedInfoSchemaFn);
 // *******************************************************************
 
 // validation schema for BSD before it can be sealed
-const baseFormSchemaFn = (isDraft: boolean) =>
+const baseFormSchemaFn = (context: FormValidationContext) =>
   yup.lazy(value => {
     if (value.emitterType === EmitterType.APPENDIX1_PRODUCER) {
-      return emitterSchemaFn(isDraft).noUnknown();
+      return emitterSchemaFn(context).noUnknown();
     }
 
-    const lazyWasteDetailsSchema = wasteDetailsSchemaFn(isDraft).resolve({
+    const lazyWasteDetailsSchema = wasteDetailsSchemaFn(context).resolve({
       value
     });
 
     if (hasPipeline(value)) {
       return yup
         .object()
-        .concat(emitterSchemaFn(isDraft))
+        .concat(emitterSchemaFn(context))
         .concat(ecoOrganismeSchema)
-        .concat(recipientSchemaFn(isDraft))
+        .concat(recipientSchemaFn(context))
         .concat(emptyTransporterSchema)
-        .concat(traderSchemaFn(isDraft))
-        .concat(brokerSchemaFn(isDraft))
+        .concat(traderSchemaFn(context))
+        .concat(brokerSchemaFn(context))
         .concat(lazyWasteDetailsSchema);
     }
 
     return yup
       .object()
-      .concat(emitterSchemaFn(isDraft))
+      .concat(emitterSchemaFn(context))
       .concat(ecoOrganismeSchema)
-      .concat(recipientSchemaFn(isDraft))
-      .concat(transporterSchemaFn(false))
-      .concat(traderSchemaFn(isDraft))
-      .concat(brokerSchemaFn(isDraft))
+      .concat(recipientSchemaFn(context))
+      .concat(transporterSchemaFn(context))
+      .concat(traderSchemaFn(context))
+      .concat(brokerSchemaFn(context))
       .concat(lazyWasteDetailsSchema);
   });
-export const sealedFormSchema = baseFormSchemaFn(false);
-export const draftFormSchema = baseFormSchemaFn(true);
-export const wasteDetailsSchema = wasteDetailsSchemaFn(false);
+export const sealedFormSchema = baseFormSchemaFn({
+  isDraft: false,
+  transporterSignature: false
+});
+export const draftFormSchema = baseFormSchemaFn({
+  isDraft: true,
+  transporterSignature: false
+});
+export const wasteDetailsSchema = wasteDetailsSchemaFn({
+  isDraft: false
+});
 
 export const beforeTransportSchema = yup.lazy(value => {
-  const lazyWasteDetailsSchema = wasteDetailsSchemaFn(false).resolve({
+  const lazyWasteDetailsSchema = wasteDetailsSchemaFn({
+    isDraft: false
+  }).resolve({
     value
   });
   return yup
     .object()
-    .concat(transporterSchemaFn(true))
+    .concat(transporterSchemaFn({ transporterSignature: true }))
     .concat(lazyWasteDetailsSchema);
 });
 
@@ -1303,7 +1349,7 @@ export async function validateBeforeTransport(form: Form) {
 export const processedFormSchema = yup.lazy((value: any) =>
   sealedFormSchema
     .resolve({ value })
-    .concat(transporterSchemaFn(true))
+    .concat(transporterSchemaFn({ transporterSignature: true }))
     .concat(signingInfoSchema)
     .concat(receivedInfoSchema)
     .concat(processedInfoSchemaFn(value))
