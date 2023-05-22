@@ -1,6 +1,11 @@
 @import "src/scss/Mixins.scss";
 
 .bsd-filter {
+  .rmsc .dropdown-heading .dropdown-heading-value {
+    width: 50px;
+    padding: 0.5rem 0;
+  }
+
   .rmsc .dropdown-content {
     width: 430px;
     .item-renderer {
