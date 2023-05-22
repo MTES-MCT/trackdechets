@@ -5,6 +5,22 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.6.1] 06/06/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Généralisation au BSDD et BSFF de la possibilité de publier et signer un bordereau (par l'émetteur) avant d'avoir renseigné un transporteur. Les informations du transporteur sont modifiables jusqu'au moment dernier moment par tous les acteurs du bordereau (et non plus par l'émetteur seulement). [PR 2385](https://github.com/MTES-MCT/trackdechets/pull/2385)
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2023.5.3] 22/05/2023
 
 #### :bug: Corrections de bugs
