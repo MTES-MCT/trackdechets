@@ -36,7 +36,6 @@ sendMailSpy.mockImplementation(() => Promise.resolve());
 // Mock external search services
 import * as search from "../../../../companies/sirene/searchCompany";
 import { MARK_AS_SEALED } from "./mutations";
-import { UserInputError } from "apollo-server-core";
 const searchCompanyMock = jest.spyOn(search, "default");
 
 const formdataForPrivateOrShip = {

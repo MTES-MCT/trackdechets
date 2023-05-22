@@ -1,6 +1,5 @@
 import { hash } from "bcrypt";
 import { faker } from "@faker-js/faker";
-import crypto from "crypto";
 import getReadableId from "../forms/readableId";
 import {
   CompanyType,
