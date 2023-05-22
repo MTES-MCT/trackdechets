@@ -45,10 +45,13 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
   const links = [
     {
       title: "Contrôle routier",
-      route: generatePath(routes.dashboard.roadControl, {
-        siret,
-        id: form.id,
-      }),
+      route: {
+        pathname: generatePath(routes.dashboard.roadControl, {
+          siret,
+          id: form.id,
+        }),
+        state: { background: location },
+      },
       icon: <IconQrCode color="blueLight" size="24px" />,
       isVisible: useDisplayRoadControlButton(form),
     },
