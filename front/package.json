@@ -1,6 +1,7 @@
 {
   "name": "bnsd",
   "version": "0.1.0",
+  "private": true,
   "scripts": {
     "generate": "npm run generate:constants && npm run generate:graphql && npm run generate:tailwind",
     "generate:dev": "npm run generate:constants && npm run generate:graphql && npm run generate:tailwind:dev",
@@ -24,7 +25,7 @@
     "run-storybook": "npx http-server storybook-static/"
   },
   "engines": {
-    "node": "18.15"
+    "node": "^18"
   },
   "eslintConfig": {
     "extends": [

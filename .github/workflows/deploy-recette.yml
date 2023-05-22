@@ -17,7 +17,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run npm ci
-        run: npm --prefix back ci & npm --prefix front ci --legacy-peer-deps
+        run: npm --prefix back ci & npm --prefix front ci
 
       - name: Run build
         run: npm --prefix back run build & npm --prefix front run build
