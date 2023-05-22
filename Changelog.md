@@ -5,6 +5,12 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.5.3] 22/05/2023
+
+#### :bug: Corrections de bugs
+
+- Le tableau de bord des chauffeurs est tronqué [PR 2401](https://github.com/MTES-MCT/trackdechets/pull/2401)
+
 # [2023.5.2] 17/05/2023
 
 #### :bug: Corrections de bugs
