@@ -72,6 +72,8 @@ export function buildSetAppendix1({
         transporterDepartment: form.transporterDepartment,
         transporterValidityLimit: form.transporterValidityLimit,
         transporterTransportMode: form.transporterTransportMode,
+        transporterNumberPlate: form.transporterNumberPlate,
+        transporterCustomInfo: form.transporterCustomInfo,
         recipientCompanySiret: form.recipientCompanySiret,
         recipientCompanyName: form.recipientCompanyName,
         recipientCompanyAddress: form.recipientCompanyAddress,

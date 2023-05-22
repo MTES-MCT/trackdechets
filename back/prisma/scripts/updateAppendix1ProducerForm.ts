@@ -36,7 +36,9 @@ export class UpdateAppendix1ProducerForm implements Updater {
             transporterReceipt: appendix1Form.transporterReceipt,
             transporterDepartment: appendix1Form.transporterDepartment,
             transporterValidityLimit: appendix1Form.transporterValidityLimit,
-            transporterTransportMode: appendix1Form.transporterTransportMode
+            transporterTransportMode: appendix1Form.transporterTransportMode,
+            transporterNumberPlate: appendix1Form.transporterNumberPlate,
+            transporterCustomInfo: appendix1Form.transporterCustomInfo
           }
         });
       }
