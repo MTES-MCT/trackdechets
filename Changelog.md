@@ -5,6 +5,13 @@ Les changements importants de Trackdéchets sont documentés dans ce fichier.
 Le format est basé sur [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 et le projet suit un schéma de versionning inspiré de [Calendar Versioning](https://calver.org/).
 
+# [2023.5.4] 23/05/202
+
+#### :bug: Corrections de bugs
+
+- Fix bug CompanySelector quand field.value est `null` [PR 2407](https://github.com/MTES-MCT/trackdechets/pull/2407)
+- Changement adresses email de la DREAL 16-86 [PR 2409](https://github.com/MTES-MCT/trackdechets/pull/2409)
+
 # [2023.5.3] 22/05/2023
 
 #### :bug: Corrections de bugs

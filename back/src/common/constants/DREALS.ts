@@ -93,7 +93,7 @@ const Dreals = [
     DrealRegion: "DREAL Nouvelle-Aquitaine",
     name: "UD 16-86 (Unité bi-départementale Charente et Vienne)",
     Dept: "16",
-    email: "ud-16.dreal-na@developpement-durable.gouv.fr"
+    email: "ud-16-86.dreal-na@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DREAL Nouvelle-Aquitaine",
@@ -556,7 +556,7 @@ const Dreals = [
     DrealRegion: "DREAL Nouvelle-Aquitaine",
     name: "UD 16-86 (Unité bi-départementale Charente et Vienne)",
     Dept: "86",
-    email: "ud-86.dreal-na@developpement-durable.gouv.fr"
+    email: "ud-16-86.dreal-na@developpement-durable.gouv.fr"
   },
   {
     DrealRegion: "DREAL Nouvelle-Aquitaine",
