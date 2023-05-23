@@ -184,7 +184,12 @@ describe("Mutation.duplicateForm", () => {
       "recipientsSirets",
       "transportersSirets",
       "intermediariesSirets",
-      "forwardedIn"
+      "forwardedIn",
+      "transporter1Id",
+      "transporter2Id",
+      "transporter3Id",
+      "transporter4Id",
+      "transporter5Id"
     ];
 
     // make sure this test breaks when a new field is added to the Form model
@@ -464,7 +469,12 @@ describe("Mutation.duplicateForm", () => {
       "brokerReceipt",
       "brokerValidityLimit",
       "ecoOrganismeName",
-      "ecoOrganismeSiret"
+      "ecoOrganismeSiret",
+      "transporter1Id",
+      "transporter2Id",
+      "transporter3Id",
+      "transporter4Id",
+      "transporter5Id"
     ];
 
     // make sure this test breaks when a new field is added to the Form model
