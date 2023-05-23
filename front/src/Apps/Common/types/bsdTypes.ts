@@ -107,12 +107,12 @@ export interface BsdDisplay {
 }
 
 export enum WorkflowDisplayType {
-  GRP = "Grp",
+  GRP = "Regroupement",
   TRANSIT = "Transit",
   SYNTH = "Synth",
-  TOURNEE = "Tournée",
+  TOURNEE = "Tournée dédiée",
   ANNEXE_1 = "Annexe 1",
-  ANNEXE_2 = "Grp",
+  ANNEXE_2 = "Regroupement",
 
   DEFAULT = "",
 }

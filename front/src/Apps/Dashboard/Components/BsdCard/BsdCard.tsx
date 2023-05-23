@@ -179,9 +179,6 @@ function BsdCard({
                 {bsdDisplay?.emittedByEcoOrganisme && (
                   <InfoWithIcon labelCode={InfoIconCode.EcoOrganism} />
                 )}
-                <p className="workflow-type">
-                  {getWorkflowLabel(bsdDisplay.bsdWorkflowType)}
-                </p>
               </div>
             </div>
             <div className="bsd-card__content">
@@ -204,6 +201,7 @@ function BsdCard({
                     wasteType={bsdDisplay.type}
                     code={bsdDisplay.wasteDetails.code!}
                     name={bsdDisplay.wasteDetails.name!}
+                    workflowType={getWorkflowLabel(bsdDisplay.bsdWorkflowType)}
                   />
 
                   <Actors

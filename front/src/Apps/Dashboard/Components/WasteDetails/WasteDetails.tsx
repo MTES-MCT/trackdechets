@@ -14,6 +14,7 @@ function WasteDetails({
   wasteType,
   code,
   name,
+  workflowType,
 }: WasteDetailsProps): JSX.Element {
   const displayIconWaste = () => {
     switch (wasteType) {
@@ -36,6 +37,7 @@ function WasteDetails({
       <div>{displayIconWaste()}</div>
       <div className="waste-details__infos">
         <p className="waste-details__infos__code">{code}</p>
+        <p className="waste-details__infos__workflow">{workflowType}</p>
         <p className="waste-details__infos__name">{name}</p>
       </div>
     </div>
