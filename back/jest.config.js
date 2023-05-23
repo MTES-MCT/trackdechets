@@ -8,5 +8,8 @@ module.exports = {
     "^src/(.*)$": "<rootDir>/src/$1",
     "^integration-tests/(.*)$": "<rootDir>/integration-tests/$1"
   },
-  reporters: ["default", "github-actions"]
+  reporters: ["default", "github-actions"],
+  transform: {
+    "^.+\\.(t|j)sx?$": "@swc/jest"
+  }
 };
