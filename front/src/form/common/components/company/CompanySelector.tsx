@@ -98,8 +98,8 @@ export default function CompanySelector({
 
   // determine if the current Form company is foreign
   const [isForeignCompany, setIsForeignCompany] = useState(
-    (field.value.country && field.value.country !== "FR") ||
-      isForeignVat(field.value.vatNumber!)
+    (field.value?.country && field.value?.country !== "FR") ||
+      isForeignVat(field.value?.vatNumber!)
   );
   // this 2 input ref are to cross-link the value of the input in both search input and department input
   const departmentInputRef = useRef<HTMLInputElement>(null);
@@ -112,7 +112,7 @@ export default function CompanySelector({
   ] = useState<boolean>(false);
 
   // Memoize for changes in field.value.siret and field.value.orgId
-  // To support both FormCompany and Intermediary (that don't have orgId)
+  // To support both FormCompany and Intermediary (which doesn't have orgId)
   const orgId = useMemo(
     () => field.value?.orgId ?? field.value?.siret ?? null,
     [field.value?.siret, field.value?.orgId]
