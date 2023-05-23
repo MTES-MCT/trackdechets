@@ -41,10 +41,7 @@ import { oauth2Router } from "./routers/oauth2-router";
 import { oidcRouter } from "./routers/oidc-router";
 import { roadControlPdfHandler } from "./routers/roadControlPdfRouter";
 import { resolvers, typeDefs } from "./schema";
-import {
-  legacyUserActivationHandler,
-  userActivationHandler
-} from "./users/activation";
+import { userActivationHandler } from "./users/activation";
 import { createUserDataLoaders } from "./users/dataloaders";
 import { getUIBaseURL } from "./utils";
 import { captchaGen, captchaSound } from "./captcha/captchaGen";
@@ -305,7 +302,7 @@ app.get("/captcha", (_, res) => captchaGen(res));
 app.get("/captcha-audio/:tokenId", (req, res) => {
   captchaSound(req.params.tokenId, res);
 });
-app.get("/userActivation", legacyUserActivationHandler); // todo: remove for 05/23 release
+
 app.post("/userActivation", userActivationHandler);
 
 app.get("/download", downloadRouter);
