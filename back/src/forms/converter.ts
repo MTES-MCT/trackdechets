@@ -502,7 +502,7 @@ export function flattenTransportSegmentInput(
       segmentInput.transporter,
       t => t.validityLimit
     ),
-    mode: segmentInput.mode
+    transporterTransportMode: segmentInput.mode
   });
 }
 

@@ -53,7 +53,7 @@ describe("{ mutation { takeOverSegment } }", () => {
         transporterReceipt: "R2D2",
         transporterDepartment: "83",
         readyToTakeOver: true,
-        mode: "ROAD"
+        transporterTransportMode: "ROAD"
       }
     });
     const { mutate } = makeClient(secondTransporter);

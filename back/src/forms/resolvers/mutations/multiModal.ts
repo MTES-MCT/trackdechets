@@ -47,7 +47,7 @@ const SEGMENTS_ALREADY_PREPARED =
   "Il y a d'autres segments après le vôtre, vous ne pouvez pas ajouter de segment";
 
 const segmentSchema = yup.object<any>().shape({
-  mode: yup.string().label("Mode de transport").required(),
+  transporterTransportMode: yup.string().label("Mode de transport").required(),
   transporterCompanySiret: siret
     .label("Transporteur")
     .test(siretTests.isRegistered("TRANSPORTER"))
