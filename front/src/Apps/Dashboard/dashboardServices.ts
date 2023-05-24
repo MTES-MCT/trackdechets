@@ -114,8 +114,9 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.SignedByWorker:
       return SIGNER_PAR_ENTREPRISE_TRAVAUX;
     case BsdStatusCode.AwaitingGroup:
+      return EN_ATTENTE_BSD_SUITE;
     case BsdStatusCode.IntermediatelyProcessed:
-      if (bsdType === BsdType.Bsdasri) {
+      if (bsdType === BsdType.Bsdasri || bsdType === BsdType.Bsff) {
         return ANNEXE_BORDEREAU_SUITE;
       }
       return EN_ATTENTE_BSD_SUITE;
