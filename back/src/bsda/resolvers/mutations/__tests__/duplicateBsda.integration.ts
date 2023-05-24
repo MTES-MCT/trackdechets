@@ -2,7 +2,6 @@ import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import makeClient from "../../../../__tests__/testClient";
 import { BsdaInput, Mutation } from "../../../../generated/graphql/types";
-import { CREATE_BSDA } from "./create.integration";
 import { gql } from "apollo-server-core";
 import { Company } from "@prisma/client";
 import { TestQuery } from "../../../../__tests__/apollo-integration-testing";
@@ -21,6 +20,32 @@ const CompanyFragment = gql`
     phone
     mail
   }
+`;
+
+const CREATE_BSDA = `
+mutation CreateBsda($input: BsdaInput!) {
+  createBsda(input: $input) {
+    id
+    destination {
+      company {
+          siret
+      }
+    }
+    emitter {
+      company {
+          siret
+      }
+    }
+    transporter {
+      transport {
+        plates
+      }
+    }
+    intermediaries {
+      siret
+    }
+  }
+}
 `;
 
 export const DUPLICATE_BSDA = gql`

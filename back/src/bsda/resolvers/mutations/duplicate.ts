@@ -65,7 +65,7 @@ async function duplicateBsda({
   transporterCompanySiret,
   brokerCompanySiret,
   workerCompanySiret,
-  ...rest
+  ...bsda
 }: Bsda & {
   intermediaries: IntermediaryBsdaAssociation[];
 }): Promise<Prisma.BsdaCreateInput> {
@@ -104,7 +104,7 @@ async function duplicateBsda({
   );
 
   return {
-    ...rest,
+    ...bsda,
     emitterCompanySiret,
     transporterCompanySiret,
     brokerCompanySiret,
@@ -112,7 +112,7 @@ async function duplicateBsda({
     id: getReadableId(ReadableIdPrefix.BSDA),
     status: BsdaStatus.INITIAL,
     isDraft: true,
-    packagings: rest.packagings ?? Prisma.JsonNull,
+    packagings: bsda.packagings ?? Prisma.JsonNull,
     ...(intermediaries && {
       intermediaries: {
         createMany: {
@@ -130,47 +130,65 @@ async function duplicateBsda({
       intermediariesOrgIds
     }),
     // Emitter company info
-    emitterCompanyAddress: emitter?.address,
-    emitterCompanyMail: emitter?.contactEmail,
-    emitterCompanyPhone: emitter?.contactPhone,
-    emitterCompanyName: emitter?.name,
-    emitterCompanyContact: emitter?.contact,
+    emitterCompanyAddress: emitter?.address ?? bsda.emitterCompanyAddress,
+    emitterCompanyMail: emitter?.contactEmail ?? bsda.emitterCompanyMail,
+    emitterCompanyPhone: emitter?.contactPhone ?? bsda.emitterCompanyPhone,
+    emitterCompanyName: emitter?.name ?? bsda.emitterCompanyName,
+    emitterCompanyContact: emitter?.contact ?? bsda.emitterCompanyContact,
     // Transporter company info
-    transporterCompanyAddress: transporter?.address,
-    transporterCompanyMail: transporter?.contactEmail,
-    transporterCompanyPhone: transporter?.contactPhone,
-    transporterCompanyName: transporter?.name,
-    transporterCompanyContact: transporter?.contact,
+    transporterCompanyAddress:
+      transporter?.address ?? bsda.transporterCompanyAddress,
+    transporterCompanyMail:
+      transporter?.contactEmail ?? bsda.transporterCompanyMail,
+    transporterCompanyPhone:
+      transporter?.contactPhone ?? bsda.transporterCompanyPhone,
+    transporterCompanyName: transporter?.name ?? bsda.transporterCompanyName,
+    transporterCompanyContact:
+      transporter?.contact ?? bsda.transporterCompanyContact,
     // Transporter recepisse
-    transporterRecepisseNumber: transporter?.transporterReceipt?.receiptNumber,
+    transporterRecepisseNumber:
+      transporter?.transporterReceipt?.receiptNumber ??
+      bsda.transporterRecepisseNumber,
     transporterRecepisseValidityLimit:
-      transporter?.transporterReceipt?.validityLimit,
-    transporterRecepisseDepartment: transporter?.transporterReceipt?.department,
+      transporter?.transporterReceipt?.validityLimit ??
+      bsda.transporterRecepisseValidityLimit,
+    transporterRecepisseDepartment:
+      transporter?.transporterReceipt?.department ??
+      bsda.transporterRecepisseDepartment,
     // Broker company info
-    brokerCompanyAddress: broker?.address,
-    brokerCompanyMail: broker?.contactEmail,
-    brokerCompanyPhone: broker?.contactPhone,
-    brokerCompanyName: broker?.name,
-    brokerCompanyContact: broker?.contact,
+    brokerCompanyAddress: broker?.address ?? bsda.brokerCompanyAddress,
+    brokerCompanyMail: broker?.contactEmail ?? bsda.brokerCompanyMail,
+    brokerCompanyPhone: broker?.contactPhone ?? bsda.brokerCompanyPhone,
+    brokerCompanyName: broker?.name ?? bsda.brokerCompanyName,
+    brokerCompanyContact: broker?.contact ?? bsda.brokerCompanyContact,
     // Broker recepisse
-    brokerRecepisseNumber: broker?.brokerReceipt?.receiptNumber,
-    brokerRecepisseValidityLimit: broker?.brokerReceipt?.validityLimit,
-    brokerRecepisseDepartment: broker?.brokerReceipt?.department,
+    brokerRecepisseNumber:
+      broker?.brokerReceipt?.receiptNumber ?? bsda.brokerRecepisseNumber,
+    brokerRecepisseValidityLimit:
+      broker?.brokerReceipt?.validityLimit ?? bsda.brokerRecepisseValidityLimit,
+    brokerRecepisseDepartment:
+      broker?.brokerReceipt?.department ?? bsda.brokerRecepisseDepartment,
     // Worker company info
-    workerCompanyAddress: worker?.address,
-    workerCompanyMail: worker?.contactEmail,
-    workerCompanyPhone: worker?.contactPhone,
-    workerCompanyName: worker?.name,
-    workerCompanyContact: worker?.contact,
+    workerCompanyAddress: worker?.address ?? bsda.workerCompanyAddress,
+    workerCompanyMail: worker?.contactEmail ?? bsda.workerCompanyMail,
+    workerCompanyPhone: worker?.contactPhone ?? bsda.workerCompanyPhone,
+    workerCompanyName: worker?.name ?? bsda.workerCompanyName,
+    workerCompanyContact: worker?.contact ?? bsda.workerCompanyContact,
     // Worker certification
     workerCertificationHasSubSectionFour:
-      worker?.workerCertification?.hasSubSectionFour,
+      worker?.workerCertification?.hasSubSectionFour ??
+      bsda.workerCertificationHasSubSectionFour,
     workerCertificationHasSubSectionThree:
-      worker?.workerCertification?.hasSubSectionThree,
+      worker?.workerCertification?.hasSubSectionThree ??
+      bsda.workerCertificationHasSubSectionThree,
     workerCertificationValidityLimit:
-      worker?.workerCertification?.validityLimit,
-    workerCertificationOrganisation: worker?.workerCertification?.organisation,
+      worker?.workerCertification?.validityLimit ??
+      bsda.workerCertificationValidityLimit,
+    workerCertificationOrganisation:
+      worker?.workerCertification?.organisation ??
+      bsda.workerCertificationOrganisation,
     workerCertificationCertificationNumber:
-      worker?.workerCertification?.certificationNumber
+      worker?.workerCertification?.certificationNumber ??
+      bsda.workerCertificationCertificationNumber
   };
 }
