@@ -62,25 +62,29 @@ async function duplicateBsda({
   intermediaries,
   intermediariesOrgIds,
   emitterCompanySiret,
+  destinationCompanySiret,
   transporterCompanySiret,
+  transporterCompanyVatNumber,
   brokerCompanySiret,
   workerCompanySiret,
   ...bsda
 }: Bsda & {
   intermediaries: IntermediaryBsdaAssociation[];
 }): Promise<Prisma.BsdaCreateInput> {
-  const companiesSirets: string[] = [
+  const companiesOrgIds: string[] = [
     emitterCompanySiret,
     transporterCompanySiret,
+    transporterCompanyVatNumber,
     brokerCompanySiret,
-    workerCompanySiret
-  ].filter((siret): siret is string => Boolean(siret));
+    workerCompanySiret,
+    destinationCompanySiret
+  ].filter(Boolean);
 
   // Batch call all companies involved
   const companies = await prisma.company.findMany({
     where: {
-      siret: {
-        in: companiesSirets
+      orgId: {
+        in: companiesOrgIds
       }
     },
     include: {
@@ -91,22 +95,28 @@ async function duplicateBsda({
   });
 
   const emitter = companies.find(
-    company => company.siret === emitterCompanySiret
+    company => company.orgId === emitterCompanySiret
+  );
+  const destination = companies.find(
+    company => company.orgId === destinationCompanySiret
   );
   const broker = companies.find(
-    company => company.siret === brokerCompanySiret
+    company => company.orgId === brokerCompanySiret
   );
   const transporter = companies.find(
-    company => company.siret === transporterCompanySiret
+    company =>
+      company.orgId === transporterCompanySiret ||
+      company.orgId === transporterCompanyVatNumber
   );
   const worker = companies.find(
-    company => company.siret === workerCompanySiret
+    company => company.orgId === workerCompanySiret
   );
 
   return {
     ...bsda,
     emitterCompanySiret,
     transporterCompanySiret,
+    transporterCompanyVatNumber,
     brokerCompanySiret,
     workerCompanySiret,
     id: getReadableId(ReadableIdPrefix.BSDA),
@@ -135,6 +145,16 @@ async function duplicateBsda({
     emitterCompanyPhone: emitter?.contactPhone ?? bsda.emitterCompanyPhone,
     emitterCompanyName: emitter?.name ?? bsda.emitterCompanyName,
     emitterCompanyContact: emitter?.contact ?? bsda.emitterCompanyContact,
+    // Destination company info
+    destinationCompanyAddress:
+      destination?.address ?? bsda.destinationCompanyAddress,
+    destinationCompanyMail:
+      destination?.contactEmail ?? bsda.destinationCompanyMail,
+    destinationCompanyPhone:
+      destination?.contactPhone ?? bsda.destinationCompanyPhone,
+    destinationCompanyName: destination?.name ?? bsda.destinationCompanyName,
+    destinationCompanyContact:
+      destination?.contact ?? bsda.destinationCompanyContact,
     // Transporter company info
     transporterCompanyAddress:
       transporter?.address ?? bsda.transporterCompanyAddress,

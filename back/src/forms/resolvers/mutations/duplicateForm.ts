@@ -1,13 +1,4 @@
-import {
-  BrokerReceipt,
-  Company,
-  Form,
-  Prisma,
-  Status,
-  TraderReceipt,
-  TransporterReceipt,
-  User
-} from "@prisma/client";
+import { Form, Prisma, Status, User } from "@prisma/client";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { getFormOrFormNotFound } from "../../database";
@@ -19,20 +10,10 @@ import { FullForm } from "../../types";
 import { prismaJsonNoNull } from "../../../common/converter";
 import prisma from "../../../prisma";
 
-type FormCompanies = {
-  emitter: Company | undefined;
-  transporter:
-    | (Company & { transporterReceipt: TransporterReceipt | null })
-    | undefined;
-  recipient: Company | undefined;
-  trader: (Company & { traderReceipt: TraderReceipt | null }) | undefined;
-  broker: (Company & { brokerReceipt: BrokerReceipt | null }) | undefined;
-};
-
 /**
  * Retrieves companies present on the form that a registered in TD
  */
-async function getFormCompanies(form: Form): Promise<FormCompanies> {
+async function getFormCompanies(form: Form) {
   const companiesOrgIds = [
     form.emitterCompanySiret,
     form.transporterCompanySiret,
@@ -44,7 +25,7 @@ async function getFormCompanies(form: Form): Promise<FormCompanies> {
 
   // Batch fetch all companies involved in the form
   const companies = await prisma.company.findMany({
-    where: { siret: { in: companiesOrgIds } },
+    where: { orgId: { in: companiesOrgIds } },
     include: {
       transporterReceipt: true,
       traderReceipt: true,

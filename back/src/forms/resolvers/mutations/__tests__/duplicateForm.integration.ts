@@ -8,10 +8,10 @@ import {
   formWithTempStorageFactory,
   siretify,
   toIntermediaryCompany,
-  userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { xDaysAgo } from "../../../../commands/onboarding.helpers";
 
 const DUPLICATE_FORM = `
   mutation DuplicateForm($id: ID!) {
@@ -26,6 +26,7 @@ const DUPLICATE_FORM = `
 `;
 
 const TODAY = new Date();
+const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
 
 async function createForm(opt: Partial<Prisma.FormCreateInput> = {}) {
   const emitter = await userWithCompanyFactory("MEMBER");
@@ -708,6 +709,15 @@ describe("Mutation.duplicateForm", () => {
       }
     });
 
+    await prisma.transporterReceipt.update({
+      where: { id: transporter.company.transporterReceiptId! },
+      data: {
+        receiptNumber: "UPDATED-TRANSPORTER-RECEIPT-NUMBER",
+        validityLimit: FOUR_DAYS_AGO.toISOString(),
+        department: "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
+      }
+    });
+
     await prisma.company.update({
       where: { id: recipient.company.id },
       data: {
@@ -730,6 +740,15 @@ describe("Mutation.duplicateForm", () => {
       }
     });
 
+    await prisma.traderReceipt.update({
+      where: { id: trader.company.traderReceiptId! },
+      data: {
+        receiptNumber: "UPDATED-TRADER-RECEIPT-NUMBER",
+        validityLimit: FOUR_DAYS_AGO.toISOString(),
+        department: "UPDATED-TRADER-RECEIPT-DEPARTMENT"
+      }
+    });
+
     await prisma.company.update({
       where: { id: broker.company.id },
       data: {
@@ -738,6 +757,15 @@ describe("Mutation.duplicateForm", () => {
         contact: "UPDATED-BROKER-CONTACT",
         contactPhone: "UPDATED-BROKER-PHONE",
         contactEmail: "UPDATED-BROKER-MAIL"
+      }
+    });
+
+    await prisma.brokerReceipt.update({
+      where: { id: broker.company.brokerReceiptId! },
+      data: {
+        receiptNumber: "UPDATED-BROKER-RECEIPT-NUMBER",
+        validityLimit: FOUR_DAYS_AGO.toISOString(),
+        department: "UPDATED-BROKER-RECEIPT-DEPARTMENT"
       }
     });
 
@@ -763,6 +791,7 @@ describe("Mutation.duplicateForm", () => {
     );
     expect(duplicatedForm.emitterCompanyMail).toEqual("UPDATED-EMITTER-MAIL");
     expect(duplicatedForm.emitterCompanyPhone).toEqual("UPDATED-EMITTER-PHONE");
+
     expect(duplicatedForm.transporterCompanyName).toEqual(
       "UPDATED-TRANSPORTER-NAME"
     );
@@ -778,6 +807,15 @@ describe("Mutation.duplicateForm", () => {
     expect(duplicatedForm.transporterCompanyPhone).toEqual(
       "UPDATED-TRANSPORTER-PHONE"
     );
+
+    expect(duplicatedForm.transporterReceipt).toEqual(
+      "UPDATED-TRANSPORTER-RECEIPT-NUMBER"
+    );
+    expect(duplicatedForm.transporterValidityLimit).toEqual(FOUR_DAYS_AGO);
+    expect(duplicatedForm.transporterDepartment).toEqual(
+      "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
+    );
+
     expect(duplicatedForm.recipientCompanyName).toEqual(
       "UPDATED-RECIPIENT-NAME"
     );
@@ -793,6 +831,10 @@ describe("Mutation.duplicateForm", () => {
     expect(duplicatedForm.recipientCompanyPhone).toEqual(
       "UPDATED-RECIPIENT-PHONE"
     );
+    expect(duplicatedForm.recipientCompanyPhone).toEqual(
+      "UPDATED-RECIPIENT-PHONE"
+    );
+
     expect(duplicatedForm.traderCompanyName).toEqual("UPDATED-TRADER-NAME");
     expect(duplicatedForm.traderCompanyAddress).toEqual(
       "UPDATED-TRADER-ADDRESS"
@@ -802,9 +844,15 @@ describe("Mutation.duplicateForm", () => {
     );
     expect(duplicatedForm.traderCompanyMail).toEqual("UPDATED-TRADER-MAIL");
     expect(duplicatedForm.traderCompanyPhone).toEqual("UPDATED-TRADER-PHONE");
-    expect(duplicatedForm.recipientCompanyPhone).toEqual(
-      "UPDATED-RECIPIENT-PHONE"
+
+    expect(duplicatedForm.traderReceipt).toEqual(
+      "UPDATED-TRADER-RECEIPT-NUMBER"
     );
+    expect(duplicatedForm.traderValidityLimit).toEqual(FOUR_DAYS_AGO);
+    expect(duplicatedForm.traderDepartment).toEqual(
+      "UPDATED-TRADER-RECEIPT-DEPARTMENT"
+    );
+
     expect(duplicatedForm.brokerCompanyName).toEqual("UPDATED-BROKER-NAME");
     expect(duplicatedForm.brokerCompanyAddress).toEqual(
       "UPDATED-BROKER-ADDRESS"
@@ -814,6 +862,14 @@ describe("Mutation.duplicateForm", () => {
     );
     expect(duplicatedForm.brokerCompanyMail).toEqual("UPDATED-BROKER-MAIL");
     expect(duplicatedForm.brokerCompanyPhone).toEqual("UPDATED-BROKER-PHONE");
+
+    expect(duplicatedForm.brokerReceipt).toEqual(
+      "UPDATED-BROKER-RECEIPT-NUMBER"
+    );
+    expect(duplicatedForm.brokerValidityLimit).toEqual(FOUR_DAYS_AGO);
+    expect(duplicatedForm.brokerDepartment).toEqual(
+      "UPDATED-BROKER-RECEIPT-DEPARTMENT"
+    );
   });
 
   test(
