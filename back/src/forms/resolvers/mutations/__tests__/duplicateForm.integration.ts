@@ -1,4 +1,4 @@
-import { UserRole } from "@prisma/client";
+import { Prisma, UserRole } from "@prisma/client";
 import { resetDatabase } from "../../../../../integration-tests/helper";
 import { Mutation } from "../../../../generated/graphql/types";
 import prisma from "../../../../prisma";
@@ -8,6 +8,7 @@ import {
   formWithTempStorageFactory,
   siretify,
   toIntermediaryCompany,
+  userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
@@ -23,6 +24,98 @@ const DUPLICATE_FORM = `
     }
   }
 `;
+
+const TODAY = new Date();
+
+async function createForm(opt: Partial<Prisma.FormCreateInput> = {}) {
+  const emitter = await userWithCompanyFactory("MEMBER");
+  const transporter = await userWithCompanyFactory("MEMBER", {
+    transporterReceipt: {
+      create: {
+        receiptNumber: "TRANSPORTER-RECEIPT-NUMBER",
+        validityLimit: TODAY.toISOString() as any,
+        department: "TRANSPORTER- RECEIPT-DEPARTMENT"
+      }
+    }
+  });
+  const transporterReceipt = await prisma.transporterReceipt.findUniqueOrThrow({
+    where: { id: transporter.company.transporterReceiptId! }
+  });
+  const recipient = await userWithCompanyFactory("MEMBER");
+  const broker = await userWithCompanyFactory("ADMIN", {
+    brokerReceipt: {
+      create: {
+        receiptNumber: "BROKER-RECEIPT-NUMBER",
+        validityLimit: TODAY.toISOString() as any,
+        department: "BROKER-RECEIPT-DEPARTMENT"
+      }
+    }
+  });
+  const brokerReceipt = await prisma.brokerReceipt.findUniqueOrThrow({
+    where: { id: broker.company.brokerReceiptId! }
+  });
+  const trader = await userWithCompanyFactory("ADMIN", {
+    traderReceipt: {
+      create: {
+        receiptNumber: "TRADER-RECEIPT-NUMBER",
+        validityLimit: TODAY.toISOString() as any,
+        department: "TRADER-RECEIPT-DEPARTMENT"
+      }
+    }
+  });
+
+  const traderReceipt = await prisma.traderReceipt.findUniqueOrThrow({
+    where: { id: trader.company.traderReceiptId! }
+  });
+
+  const form = await formFactory({
+    ownerId: emitter.user.id,
+    opt: {
+      emitterCompanySiret: emitter.company.siret,
+      emitterCompanyName: emitter.company.name,
+      emitterCompanyAddress: emitter.company.address,
+      emitterCompanyContact: emitter.company.contact,
+      emitterCompanyPhone: emitter.company.contactPhone,
+      emitterCompanyMail: emitter.company.contactEmail,
+      transporterCompanySiret: transporter.company.siret,
+      transporterCompanyName: transporter.company.name,
+      transporterCompanyAddress: transporter.company.address,
+      transporterCompanyContact: transporter.company.contact,
+      transporterCompanyPhone: transporter.company.contactPhone,
+      transporterCompanyMail: transporter.company.contactEmail,
+      transporterReceipt: transporterReceipt.receiptNumber,
+      transporterDepartment: transporterReceipt.department,
+      transporterValidityLimit: transporterReceipt.validityLimit,
+      recipientCompanySiret: recipient.company.siret,
+      recipientCompanyName: recipient.company.name,
+      recipientCompanyAddress: recipient.company.address,
+      recipientCompanyContact: recipient.company.contact,
+      recipientCompanyPhone: recipient.company.contactPhone,
+      recipientCompanyMail: recipient.company.contactEmail,
+      brokerCompanySiret: broker.company.siret,
+      brokerCompanyName: broker.company.name,
+      brokerCompanyAddress: broker.company.address,
+      brokerCompanyContact: broker.company.contact,
+      brokerCompanyPhone: broker.company.contactPhone,
+      brokerCompanyMail: broker.company.contactEmail,
+      brokerReceipt: brokerReceipt.receiptNumber,
+      brokerDepartment: brokerReceipt.department,
+      brokerValidityLimit: brokerReceipt.validityLimit,
+      traderCompanySiret: trader.company.siret,
+      traderCompanyName: trader.company.name,
+      traderCompanyAddress: trader.company.address,
+      traderCompanyContact: trader.company.contact,
+      traderCompanyPhone: trader.company.contactPhone,
+      traderCompanyMail: trader.company.contactEmail,
+      traderReceipt: traderReceipt.receiptNumber,
+      traderDepartment: traderReceipt.department,
+      traderValidityLimit: traderReceipt.validityLimit,
+      ...opt
+    }
+  });
+
+  return { form, emitter, transporter, recipient, broker, trader };
+}
 
 const validateIntermediariesInputMock = jest.fn();
 jest.mock("../../../validation", () => ({
@@ -53,7 +146,8 @@ describe("Mutation.duplicateForm", () => {
       }
     ]
   ])("should duplicate a form %s", async (_, opt) => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { form, emitter } = await createForm(opt);
+
     const {
       id,
       emitterType,
@@ -127,13 +221,7 @@ describe("Mutation.duplicateForm", () => {
       ecoOrganismeName,
       ecoOrganismeSiret,
       ...rest
-    } = await formFactory({
-      ownerId: user.id,
-      opt: {
-        emitterCompanySiret: company.siret,
-        ...opt
-      }
-    });
+    } = form;
 
     const expectedSkipped = [
       "createdAt",
@@ -191,7 +279,7 @@ describe("Mutation.duplicateForm", () => {
     // it will ensure we think of adding necessary fields to the duplicate input
     expect(Object.keys(rest).sort()).toEqual(expectedSkipped.sort());
 
-    const { mutate } = makeClient(user);
+    const { mutate } = makeClient(emitter.user);
     const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
       DUPLICATE_FORM,
       {
@@ -200,6 +288,7 @@ describe("Mutation.duplicateForm", () => {
         }
       }
     );
+
     const duplicatedForm = await prisma.form.findUnique({
       where: { id: data.duplicateForm.id }
     });
@@ -280,9 +369,25 @@ describe("Mutation.duplicateForm", () => {
 
   it("should duplicate the temporary storage detail", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
+    const ttr = await companyFactory();
+    const destination = await companyFactory();
     const form = await formWithTempStorageFactory({
       ownerId: user.id,
-      opt: { emitterCompanySiret: company.siret }
+      opt: { emitterCompanySiret: company.siret },
+      forwardedInOpts: {
+        emitterCompanySiret: ttr.siret,
+        emitterCompanyName: ttr.name,
+        emitterCompanyAddress: ttr.address,
+        emitterCompanyContact: ttr.contact,
+        emitterCompanyPhone: ttr.contactPhone,
+        emitterCompanyMail: ttr.contactEmail,
+        recipientCompanySiret: destination.siret,
+        recipientCompanyName: destination.name,
+        recipientCompanyAddress: destination.address,
+        recipientCompanyContact: destination.contact,
+        recipientCompanyPhone: destination.contactPhone,
+        recipientCompanyMail: destination.contactEmail
+      }
     });
     const {
       emitterType,
@@ -576,4 +681,234 @@ describe("Mutation.duplicateForm", () => {
     expect(duplicatedForm.nextDestinationCompanyPhone).toBeNull();
     expect(duplicatedForm.nextDestinationCompanyVatNumber).toBeNull();
   });
+
+  test("duplicated BSDD should have the updated data when company info changes", async () => {
+    const { form, emitter, transporter, recipient, trader, broker } =
+      await createForm();
+
+    await prisma.company.update({
+      where: { id: emitter.company.id },
+      data: {
+        name: "UPDATED-EMITTER-NAME",
+        address: "UPDATED-EMITTER-ADDRESS",
+        contact: "UPDATED-EMITTER-CONTACT",
+        contactPhone: "UPDATED-EMITTER-PHONE",
+        contactEmail: "UPDATED-EMITTER-MAIL"
+      }
+    });
+
+    await prisma.company.update({
+      where: { id: transporter.company.id },
+      data: {
+        name: "UPDATED-TRANSPORTER-NAME",
+        address: "UPDATED-TRANSPORTER-ADDRESS",
+        contact: "UPDATED-TRANSPORTER-CONTACT",
+        contactPhone: "UPDATED-TRANSPORTER-PHONE",
+        contactEmail: "UPDATED-TRANSPORTER-MAIL"
+      }
+    });
+
+    await prisma.company.update({
+      where: { id: recipient.company.id },
+      data: {
+        name: "UPDATED-RECIPIENT-NAME",
+        address: "UPDATED-RECIPIENT-ADDRESS",
+        contact: "UPDATED-RECIPIENT-CONTACT",
+        contactPhone: "UPDATED-RECIPIENT-PHONE",
+        contactEmail: "UPDATED-RECIPIENT-MAIL"
+      }
+    });
+
+    await prisma.company.update({
+      where: { id: trader.company.id },
+      data: {
+        name: "UPDATED-TRADER-NAME",
+        address: "UPDATED-TRADER-ADDRESS",
+        contact: "UPDATED-TRADER-CONTACT",
+        contactPhone: "UPDATED-TRADER-PHONE",
+        contactEmail: "UPDATED-TRADER-MAIL"
+      }
+    });
+
+    await prisma.company.update({
+      where: { id: broker.company.id },
+      data: {
+        name: "UPDATED-BROKER-NAME",
+        address: "UPDATED-BROKER-ADDRESS",
+        contact: "UPDATED-BROKER-CONTACT",
+        contactPhone: "UPDATED-BROKER-PHONE",
+        contactEmail: "UPDATED-BROKER-MAIL"
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+    const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+      DUPLICATE_FORM,
+      {
+        variables: {
+          id: form.id
+        }
+      }
+    );
+    const duplicatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: data.duplicateForm.id }
+    });
+
+    expect(duplicatedForm.emitterCompanyName).toEqual("UPDATED-EMITTER-NAME");
+    expect(duplicatedForm.emitterCompanyAddress).toEqual(
+      "UPDATED-EMITTER-ADDRESS"
+    );
+    expect(duplicatedForm.emitterCompanyContact).toEqual(
+      "UPDATED-EMITTER-CONTACT"
+    );
+    expect(duplicatedForm.emitterCompanyMail).toEqual("UPDATED-EMITTER-MAIL");
+    expect(duplicatedForm.emitterCompanyPhone).toEqual("UPDATED-EMITTER-PHONE");
+    expect(duplicatedForm.transporterCompanyName).toEqual(
+      "UPDATED-TRANSPORTER-NAME"
+    );
+    expect(duplicatedForm.transporterCompanyAddress).toEqual(
+      "UPDATED-TRANSPORTER-ADDRESS"
+    );
+    expect(duplicatedForm.transporterCompanyContact).toEqual(
+      "UPDATED-TRANSPORTER-CONTACT"
+    );
+    expect(duplicatedForm.transporterCompanyMail).toEqual(
+      "UPDATED-TRANSPORTER-MAIL"
+    );
+    expect(duplicatedForm.transporterCompanyPhone).toEqual(
+      "UPDATED-TRANSPORTER-PHONE"
+    );
+    expect(duplicatedForm.recipientCompanyName).toEqual(
+      "UPDATED-RECIPIENT-NAME"
+    );
+    expect(duplicatedForm.recipientCompanyAddress).toEqual(
+      "UPDATED-RECIPIENT-ADDRESS"
+    );
+    expect(duplicatedForm.recipientCompanyContact).toEqual(
+      "UPDATED-RECIPIENT-CONTACT"
+    );
+    expect(duplicatedForm.recipientCompanyMail).toEqual(
+      "UPDATED-RECIPIENT-MAIL"
+    );
+    expect(duplicatedForm.recipientCompanyPhone).toEqual(
+      "UPDATED-RECIPIENT-PHONE"
+    );
+    expect(duplicatedForm.traderCompanyName).toEqual("UPDATED-TRADER-NAME");
+    expect(duplicatedForm.traderCompanyAddress).toEqual(
+      "UPDATED-TRADER-ADDRESS"
+    );
+    expect(duplicatedForm.traderCompanyContact).toEqual(
+      "UPDATED-TRADER-CONTACT"
+    );
+    expect(duplicatedForm.traderCompanyMail).toEqual("UPDATED-TRADER-MAIL");
+    expect(duplicatedForm.traderCompanyPhone).toEqual("UPDATED-TRADER-PHONE");
+    expect(duplicatedForm.recipientCompanyPhone).toEqual(
+      "UPDATED-RECIPIENT-PHONE"
+    );
+    expect(duplicatedForm.brokerCompanyName).toEqual("UPDATED-BROKER-NAME");
+    expect(duplicatedForm.brokerCompanyAddress).toEqual(
+      "UPDATED-BROKER-ADDRESS"
+    );
+    expect(duplicatedForm.brokerCompanyContact).toEqual(
+      "UPDATED-BROKER-CONTACT"
+    );
+    expect(duplicatedForm.brokerCompanyMail).toEqual("UPDATED-BROKER-MAIL");
+    expect(duplicatedForm.brokerCompanyPhone).toEqual("UPDATED-BROKER-PHONE");
+  });
+
+  test(
+    "duplicated BSDD with temp storage should have updated data" +
+      " in temp storage detail when company info changes",
+    async () => {
+      const { user, company } = await userWithCompanyFactory("MEMBER");
+      const ttr = await companyFactory();
+      const destination = await companyFactory();
+      const form = await formWithTempStorageFactory({
+        ownerId: user.id,
+        opt: { emitterCompanySiret: company.siret },
+        forwardedInOpts: {
+          emitterCompanySiret: ttr.siret,
+          emitterCompanyName: ttr.name,
+          emitterCompanyAddress: ttr.address,
+          emitterCompanyContact: ttr.contact,
+          emitterCompanyPhone: ttr.contactPhone,
+          emitterCompanyMail: ttr.contactEmail,
+          recipientCompanySiret: destination.siret,
+          recipientCompanyName: destination.name,
+          recipientCompanyAddress: destination.address,
+          recipientCompanyContact: destination.contact,
+          recipientCompanyPhone: destination.contactPhone,
+          recipientCompanyMail: destination.contactEmail
+        }
+      });
+      const { mutate } = makeClient(user);
+
+      await prisma.company.update({
+        where: { id: ttr.id },
+        data: {
+          name: "UPDATED-TTR-NAME",
+          address: "UPDATED-TTR-ADDRESS",
+          contact: "UPDATED-TTR-CONTACT",
+          contactPhone: "UPDATED-TTR-PHONE",
+          contactEmail: "UPDATED-TTR-MAIL"
+        }
+      });
+
+      await prisma.company.update({
+        where: { id: destination.id },
+        data: {
+          name: "UPDATED-DESTINATION-NAME",
+          address: "UPDATED-DESTINATION-ADDRESS",
+          contact: "UPDATED-DESTINATION-CONTACT",
+          contactPhone: "UPDATED-DESTINATION-PHONE",
+          contactEmail: "UPDATED-DESTINATION-MAIL"
+        }
+      });
+
+      const { data } = await mutate<Pick<Mutation, "duplicateForm">>(
+        DUPLICATE_FORM,
+        {
+          variables: {
+            id: form.id
+          }
+        }
+      );
+      const duplicatedForwardedIn = await prisma.form
+        .findUniqueOrThrow({
+          where: { id: data.duplicateForm.id }
+        })
+        .forwardedIn();
+
+      expect(duplicatedForwardedIn.emitterCompanyName).toEqual(
+        "UPDATED-TTR-NAME"
+      );
+      expect(duplicatedForwardedIn.emitterCompanyAddress).toEqual(
+        "UPDATED-TTR-ADDRESS"
+      );
+      expect(duplicatedForwardedIn.emitterCompanyContact).toEqual(
+        "UPDATED-TTR-CONTACT"
+      );
+      expect(duplicatedForwardedIn.emitterCompanyPhone).toEqual(
+        "UPDATED-TTR-PHONE"
+      );
+      expect(duplicatedForwardedIn.emitterCompanyMail).toEqual(
+        "UPDATED-TTR-MAIL"
+      );
+      expect(duplicatedForwardedIn.recipientCompanyName).toEqual(
+        "UPDATED-DESTINATION-NAME"
+      );
+      expect(duplicatedForwardedIn.recipientCompanyAddress).toEqual(
+        "UPDATED-DESTINATION-ADDRESS"
+      );
+      expect(duplicatedForwardedIn.recipientCompanyContact).toEqual(
+        "UPDATED-DESTINATION-CONTACT"
+      );
+      expect(duplicatedForwardedIn.recipientCompanyPhone).toEqual(
+        "UPDATED-DESTINATION-PHONE"
+      );
+      expect(duplicatedForwardedIn.recipientCompanyMail).toEqual(
+        "UPDATED-DESTINATION-MAIL"
+      );
+    }
+  );
 });
