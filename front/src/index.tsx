@@ -11,7 +11,6 @@ import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import * as Sentry from "@sentry/browser";
 import "remixicon/fonts/remixicon.css";
-import "@reach/tooltip/styles.css";
 import "./scss/index.scss";
 
 try {

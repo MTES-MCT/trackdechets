@@ -1,64 +1,70 @@
 import React from "react";
 import { Field, FieldArray, useField } from "formik";
-import className from "classnames";
-import { IconTrash } from "common/components/Icons";
 import RedErrorMessage from "common/components/RedErrorMessage";
-import styles from "../AccountCompanyAdd.module.scss";
+import {
+  Container,
+  Row,
+  Col,
+  TextInput,
+  Text,
+  Button,
+} from "@dataesr/react-dsfr";
 
 export default function AccountCompanyAddEcoOrganisme() {
   const fieldProps = { name: "ecoOrganismeAgreements" };
   const [field] = useField<string[]>(fieldProps);
 
   return (
-    <div className={styles.field}>
-      <label className={`text-right ${styles.bold}`}>
-        Agréments éco-organisme
-      </label>
-      <div className={styles.field__value}>
-        <table>
-          <tbody>
-            <tr>
-              <td>URL</td>
-              <td>
-                <FieldArray {...fieldProps}>
-                  {({ push, remove }) => (
-                    <>
-                      {field.value.map((url, index) => (
-                        <div key={index} className={styles.inputGroup}>
-                          <Field
-                            type="url"
-                            name={`ecoOrganismeAgreements.${index}`}
-                            className={className([
-                              "td-input",
-                              styles.inputGroupInput,
-                            ])}
-                          />
-                          <button
-                            type="button"
-                            className="btn btn--outline-danger"
-                            onClick={() => remove(index)}
-                            aria-label="Supprimer"
-                          >
-                            <IconTrash />
-                          </button>
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        className="btn btn--primary"
-                        onClick={() => push("")}
-                      >
-                        Ajouter un agrément
-                      </button>
-                    </>
-                  )}
-                </FieldArray>
-                <RedErrorMessage name="ecoOrganismeAgreements" />
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+    <Container fluid>
+      <Row>
+        <Col n="12">
+          <Text as="p" bold>
+            Agréments éco-organisme
+          </Text>
+          <RedErrorMessage name="ecoOrganismeAgreements" />
+        </Col>
+      </Row>
+      <FieldArray {...fieldProps}>
+        {({ push, remove }) => (
+          <>
+            {field.value.map((url, index) => (
+              <Row gutters key="index">
+                <Col n="1">
+                  <Text as="span">URL</Text>
+                </Col>
+                <Col n="9">
+                  <Field name={`ecoOrganismeAgreements.${index}`}>
+                    {({ field }) => {
+                      return (
+                        <TextInput
+                          type="text"
+                          placeholder="https://"
+                          {...field}
+                        ></TextInput>
+                      );
+                    }}
+                  </Field>
+                </Col>
+                <Col n="2">
+                  <Button
+                    icon="ri-delete-bin-line"
+                    onClick={() => remove(index)}
+                  >
+                    Supprimer
+                  </Button>
+                </Col>
+              </Row>
+            ))}
+            <Row spacing="pt-1w">
+              <Col n="12">
+                <Button icon="ri-add-line" onClick={() => push("")}>
+                  Ajouter un agrément
+                </Button>
+              </Col>
+            </Row>
+          </>
+        )}
+      </FieldArray>
+    </Container>
   );
 }

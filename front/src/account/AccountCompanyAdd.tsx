@@ -12,16 +12,17 @@ import AccountCompanyAddTraderReceipt from "./accountCompanyAdd/AccountCompanyAd
 import AccountCompanyAddBrokerReceipt from "./accountCompanyAdd/AccountCompanyAddBrokerReceipt";
 import AccountCompanyAddSiret from "./accountCompanyAdd/AccountCompanyAddSiret";
 import AccountCompanyAddEcoOrganisme from "./accountCompanyAdd/AccountCompanyAddEcoOrganisme";
+import AccountCompanyAddWorker from "./accountCompanyAdd/AccountCompanyAddWorker";
+import AccountCompanyAddVhuAgrement from "./accountCompanyAdd/AccountCompanyAddVhuAgrement";
+
 import styles from "./AccountCompanyAdd.module.scss";
+
 import {
   Mutation,
   MutationCreateCompanyArgs,
   CompanyType as _CompanyType,
   CompanySearchResult,
 } from "generated/graphql/types";
-import Tooltip from "common/components/Tooltip";
-import AccountCompanyAddVhuAgrement from "./accountCompanyAdd/AccountCompanyAddVhuAgrement";
-import { InlineRadioButton } from "form/common/components/custom-inputs/RadioButton";
 import classNames from "classnames";
 import { MY_COMPANIES } from "./AccountCompanyList";
 import {
@@ -34,8 +35,16 @@ import {
   CREATE_WORKER_CERTIFICATION,
   UPDATE_COMPANY_WORKER_CERTIFICATION,
 } from "./fields/forms/AccountFormCompanyWorkerCertification";
-import DateInput from "form/common/components/custom-inputs/DateInput";
-import { Container, Row, Col, Alert, Button } from "@dataesr/react-dsfr";
+import {
+  Container,
+  Row,
+  Col,
+  Alert,
+  Button,
+  Checkbox,
+  Toggle,
+  TextInput,
+} from "@dataesr/react-dsfr";
 
 export const CREATE_COMPANY = gql`
   mutation CreateCompany($companyInput: PrivateCompanyInput!) {
@@ -93,7 +102,7 @@ const CREATE_VHU_AGREMENT = gql`
   }
 `;
 
-interface Values extends FormikValues {
+export interface Values extends FormikValues {
   siret: string;
   vatNumber: string;
   companyName: string;
@@ -598,86 +607,142 @@ export default function AccountCompanyAdd() {
               }}
               onSubmit={onSubmit}
             >
-              {({ values, setFieldValue, isSubmitting }) => (
+              {({ values, setFieldValue, isSubmitting, errors, touched }) => (
                 <Form className={styles.companyAddForm}>
-                  <div className={styles.field}>
-                    <label className={`text-right ${styles.bold}`}>
-                      Raison sociale
-                    </label>
+                  <Field name="givenName">
+                    {({ field }) => {
+                      return (
+                        <TextInput
+                          label="Nom usuel (optionnel)"
+                          hint="Nom usuel de l'établissement qui permet de différencier plusieurs établissements ayant la même raison sociale"
+                          {...field}
+                        ></TextInput>
+                      );
+                    }}
+                  </Field>
 
-                    <div className={styles.field__value}>
-                      {companyInfos?.name || (
-                        <>
-                          <Field
-                            type="text"
-                            name="companyName"
-                            className={`td-input ${styles.textField}`}
-                            disabled={!!companyInfos?.name}
-                          />
-                          <RedErrorMessage name="companyName" />
-                        </>
-                      )}
-                    </div>
+                  <div className={styles.field}>
+                    {companyInfos?.name ? (
+                      <>
+                        <label className={`text-right`}>Raison sociale</label>
+
+                        <div className={styles.field__value}>
+                          {companyInfos.name}
+                        </div>
+                      </>
+                    ) : (
+                      <Field name="companyName">
+                        {({ field }) => {
+                          return (
+                            <TextInput
+                              label={"Raison Sociale"}
+                              disabled={!!companyInfos?.name}
+                              {...field}
+                            ></TextInput>
+                          );
+                        }}
+                      </Field>
+                    )}
                   </div>
 
-                  <div className={styles.field}>
-                    <label className={`text-right ${styles.bold}`}>
-                      Nom usuel{" "}
-                      <Tooltip msg="Nom usuel de l'établissement qui permet de différencier plusieurs établissements ayant la même raison sociale" />
-                      (optionnel)
-                    </label>
-                    <div className={styles.field__value}>
-                      <Field
-                        type="text"
-                        name="givenName"
-                        className={`td-input ${styles.textField}`}
-                      />
+                  {companyInfos?.naf ? (
+                    <div className={styles.field}>
+                      <label className={`text-right`}>Code NAF</label>
+                      <div className={styles.field__value}>
+                        {`${companyInfos?.naf} - ${companyInfos?.libelleNaf}`}
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <Field name="codeNaf">
+                      {({ field }) => {
+                        return (
+                          <TextInput
+                            label="Code NAF"
+                            disabled={isForcedTransporter(companyInfos)}
+                            {...field}
+                          ></TextInput>
+                        );
+                      }}
+                    </Field>
+                  )}
 
-                  <div className={styles.field}>
-                    <label className={`text-right ${styles.bold}`}>
-                      Code NAF
-                    </label>
-                    <div className={styles.field__value}>
-                      {companyInfos?.naf ? (
-                        `${companyInfos?.naf} - ${companyInfos?.libelleNaf}`
-                      ) : (
-                        <Field
-                          type="text"
-                          name="codeNaf"
-                          className={`td-input ${styles.textField}`}
-                          disabled={isForcedTransporter(companyInfos)}
-                        />
-                      )}
+                  {companyInfos?.address ? (
+                    <div className={styles.field}>
+                      <label className={`text-right`}>Adresse</label>
+                      <div className={styles.field__value}>
+                        {companyInfos?.address}
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    <>
+                      <Field name="address">
+                        {({ field }) => {
+                          return (
+                            <TextInput
+                              label="Adresse"
+                              disabled={!!companyInfos?.address}
+                              messageType={
+                                errors.address && touched.address ? "error" : ""
+                              }
+                              message={
+                                errors.address && touched.address
+                                  ? errors.isAllowed
+                                  : ""
+                              }
+                              {...field}
+                            ></TextInput>
+                          );
+                        }}
+                      </Field>
+                    </>
+                  )}
+
+                  <Field name="contact">
+                    {({ field }) => {
+                      return (
+                        <TextInput
+                          label="Personne à contacter"
+                          hint="Optionnel"
+                          {...field}
+                        ></TextInput>
+                      );
+                    }}
+                  </Field>
+
+                  <Container fluid spacing="mb-4w">
+                    <Row gutters>
+                      <Col n="6">
+                        <Field name="contactPhone">
+                          {({ field }) => {
+                            return (
+                              <TextInput
+                                label="Téléphone"
+                                hint="Optionnel"
+                                {...field}
+                              ></TextInput>
+                            );
+                          }}
+                        </Field>
+                      </Col>
+                      <Col n="6">
+                        <Field name="contactEmail">
+                          {({ field }) => {
+                            return (
+                              <TextInput
+                                label="E-mail"
+                                hint="Optionnel"
+                                {...field}
+                              ></TextInput>
+                            );
+                          }}
+                        </Field>
+                      </Col>
+                    </Row>
+                  </Container>
+
+                  <div className={styles.separator} />
 
                   <div className={styles.field}>
-                    <label className={`text-right ${styles.bold}`}>
-                      Adresse
-                    </label>
-                    <div className={styles.field__value}>
-                      {companyInfos?.address || (
-                        <>
-                          <Field
-                            type="text"
-                            name="address"
-                            className={`td-input ${styles.textField}`}
-                            disabled={!!companyInfos?.address}
-                          />
-                          <RedErrorMessage name="address" />
-                        </>
-                      )}
-                    </div>
-                  </div>
-
-                  <h5 className={styles.subtitle}>Activité</h5>
-
-                  <div className={styles.field}>
-                    <label className={`text-right ${styles.bold}`}>
-                      Profil
-                    </label>
                     <div className={styles.field__value}>
                       {isForcedTransporter(companyInfos) ? (
                         <Field
@@ -698,231 +763,109 @@ export default function AccountCompanyAdd() {
                           }}
                         </Field>
                       ) : (
-                        <Field name="companyTypes">
-                          {({ field, form, meta }) => {
-                            return (
-                              <CompanyType
-                                field={field}
-                                form={form}
-                                meta={meta}
-                                label={""}
-                                handleChange={handleCompanyTypeChange}
-                              />
-                            );
+                        <Field
+                          name="companyTypes"
+                          component={CompanyType}
+                          handleChange={handleCompanyTypeChange}
+                          subfields={{
+                            [_CompanyType.Transporter]: isTransporter(
+                              values.companyTypes
+                            ) && <AccountCompanyAddTransporterReceipt />,
+                            [_CompanyType.Worker]: isWorker(
+                              values.companyTypes
+                            ) && <AccountCompanyAddWorker />,
+                            [_CompanyType.Trader]: isTrader(
+                              values.companyTypes
+                            ) && <AccountCompanyAddTraderReceipt />,
+                            [_CompanyType.Broker]: isBroker(
+                              values.companyTypes
+                            ) && <AccountCompanyAddBrokerReceipt />,
+                            [_CompanyType.EcoOrganisme]: isEcoOrganisme(
+                              values.companyTypes
+                            ) && <AccountCompanyAddEcoOrganisme />,
+                            [_CompanyType.WasteVehicles]: isVhu(
+                              values.companyTypes
+                            ) && <AccountCompanyAddVhuAgrement />,
                           }}
-                        </Field>
+                        />
                       )}
                       <RedErrorMessage name="companyTypes" />
                     </div>
                   </div>
 
-                  {isTransporter(values.companyTypes) && (
-                    <AccountCompanyAddTransporterReceipt />
-                  )}
-
-                  {isWorker(values.companyTypes) && (
-                    <>
-                      <div className={styles.workerCertif}>
-                        <div className={styles.workerCertifItem}>
-                          <label>Travaux relevant de la sous-section 4</label>
-                          <Field
-                            type="checkbox"
-                            name="hasSubSectionFour"
-                            className="td-checkbox"
-                          />
-                        </div>
-                        <div className={styles.workerCertifItem}>
-                          <label>
-                            Travaux relevant de la sous-section 3{" "}
-                            <Tooltip msg="Ce profil correspond à une entreprise disposant d'une certification Amiante (NFX 46-010)" />
-                          </label>
-                          <Field
-                            type="checkbox"
-                            name="hasSubSectionThree"
-                            className="td-checkbox"
-                          />
-                        </div>
-                        <div className={styles.workCertifSubSectionThree}>
-                          {values.hasSubSectionThree && (
-                            <div>
-                              <div>
-                                <label>N° certification</label>
-                                <Field
-                                  type="text"
-                                  name="certificationNumber"
-                                  className="td-input"
-                                />
-                                <RedErrorMessage name="certificationNumber" />
-                              </div>
-                              <div>
-                                <label>Date de validité</label>
-                                <Field
-                                  name="validityLimit"
-                                  component={DateInput}
-                                  className="td-input td-date"
-                                />
-                                <RedErrorMessage name="validityLimit" />
-                              </div>
-                              <div>
-                                <label>Organisme</label>
-                                <Field
-                                  as="select"
-                                  name="organisation"
-                                  className="td-select"
-                                >
-                                  <option value="...">
-                                    Sélectionnez une valeur...
-                                  </option>
-                                  <option value="AFNOR Certification">
-                                    AFNOR Certification
-                                  </option>
-                                  <option value="GLOBAL CERTIFICATION">
-                                    GLOBAL CERTIFICATION
-                                  </option>
-                                  <option value="QUALIBAT">QUALIBAT</option>
-                                </Field>
-                                <RedErrorMessage name="organisation" />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </>
-                  )}
-
-                  {isTrader(values.companyTypes) && (
-                    <AccountCompanyAddTraderReceipt />
-                  )}
-
-                  {isBroker(values.companyTypes) && (
-                    <AccountCompanyAddBrokerReceipt />
-                  )}
-
-                  {isEcoOrganisme(values.companyTypes) && (
-                    <AccountCompanyAddEcoOrganisme />
-                  )}
-
-                  {isVhu(values.companyTypes) && (
-                    <AccountCompanyAddVhuAgrement />
-                  )}
+                  <div className={styles.separator} />
 
                   {!isForcedTransporter(companyInfos) && (
                     <>
-                      <div className={styles.field}>
-                        <label className={`text-right ${styles.bold}`}>
-                          Identifiant GEREP (optionnel){" "}
-                          <Tooltip msg="Toute installation de traitement classée et reconnue par l’état (ICPE) et toute entreprise produisant plus de 2 tonnes de déchets et/ou 2000 tonnes de déchets non dangereux est tenue de réaliser annuellement une déclaration d’émissions polluantes et de déchets en ligne. Elle peut le faire via l’application ministérielle web GEREP. Pour ce faire, elle dispose d’un identifiant GEREP." />
-                        </label>
-                        <div className={styles.field__value}>
-                          <Field
-                            type="text"
-                            name="gerepId"
-                            className={`td-input ${styles.textField}`}
-                          />
-                        </div>
-                      </div>
+                      <Field name="gerepId">
+                        {({ field }) => {
+                          return (
+                            <TextInput
+                              label="Identifiant GEREP"
+                              hint="Optionnel"
+                              {...field}
+                            ></TextInput>
+                          );
+                        }}
+                      </Field>
 
                       <div className={classNames(styles.field)}>
-                        <div>
-                          <label className="tw-flex tw-items-center">
-                            <Field
-                              type="checkbox"
-                              name="willManageDasris"
-                              className="td-checkbox"
-                              onChange={() => {
-                                setFieldValue(
-                                  "allowBsdasriTakeOverWithoutSignature",
-                                  null
-                                );
-                                setFieldValue(
-                                  "willManageDasris",
-                                  !values.willManageDasris
-                                );
-                              }}
-                            />
-                            Cet établissement est susceptible de produire des
-                            DASRI (déchets d'activité de soins à risques
-                            infectieux)
-                          </label>
-                          {values.willManageDasris && (
-                            <>
-                              <div className="form__row">
-                                <fieldset className="tw-flex tw-items-center">
-                                  <legend className="tw-font-semibold tw-mb-3">
-                                    J'autorise l'emport direct de Dasri
-                                  </legend>
-                                  <Field
-                                    name="allowBsdasriTakeOverWithoutSignature"
-                                    checked={
-                                      values.allowBsdasriTakeOverWithoutSignature ===
-                                      true
-                                    }
-                                    id="Oui"
-                                    label="Oui"
-                                    component={InlineRadioButton}
-                                    onChange={() =>
-                                      setFieldValue(
-                                        "allowBsdasriTakeOverWithoutSignature",
-                                        true
-                                      )
-                                    }
-                                  />
-                                  <Field
-                                    name="allowBsdasriTakeOverWithoutSignature"
-                                    checked={
-                                      values.allowBsdasriTakeOverWithoutSignature ===
-                                      false
-                                    }
-                                    id="Non"
-                                    label="Non"
-                                    component={InlineRadioButton}
-                                    onChange={() =>
-                                      setFieldValue(
-                                        "allowBsdasriTakeOverWithoutSignature",
-                                        false
-                                      )
-                                    }
-                                  />
-                                </fieldset>
-                                <RedErrorMessage name="allowBsdasriTakeOverWithoutSignature" />
-                                <div className="notification tw-mt-2">
-                                  <p className="tw-italic">
-                                    En cochant "oui", j'atteste avoir signé une
-                                    convention avec un collecteur pour mes DASRI
-                                    et j'accepte que ce collecteur les prenne en
-                                    charge sans ma signature (lors de la
-                                    collecte) si je ne suis pas disponible. Dans
-                                    ce cas, je suis informé que je pourrai
-                                    suivre les bordereaux sur Trackdéchets et
-                                    disposer de leur archivage sur la
-                                    plateforme.
-                                  </p>
-                                  <p className="tw-italic">
-                                    Je pourrai modifier ce choix ultérieurement.
-                                  </p>
-                                </div>
-                              </div>
-                            </>
-                          )}
-                        </div>
+                        <Field name="allowBsdasriTakeOverWithoutSignature">
+                          {({ field }) => {
+                            return (
+                              <Toggle
+                                onChange={event => {
+                                  setFieldValue(
+                                    "allowBsdasriTakeOverWithoutSignature",
+                                    event.target.checked
+                                  );
+                                  field.onChange(event);
+                                }}
+                                id="allowBsdasriTakeOverWithoutSignature"
+                                checked={field.value}
+                                label="Mon établissement produit des DASRI. Je dispose d'une convention avec un collecteur et j'accepte que ce collecteur prenne en charge mes DASRI sans ma signature lors de la collecte si je ne suis pas disponible. Ce choix est modifiable utérieurement."
+                                description="(DASRI, Déchets d'Acivité de Soins à Risques Infectieux, par exemple les boîtes et les containers jaunes pour les seringues.)"
+                              />
+                            );
+                          }}
+                        </Field>
                       </div>
                     </>
                   )}
                   <hr />
                   <div className={styles.field}>
-                    <div>
-                      <label className="tw-flex tw-items-center">
-                        <Field
-                          type="checkbox"
-                          name="isAllowed"
-                          className="td-checkbox"
-                        />
-                        Je certifie disposer du pouvoir pour créer un compte au
-                        nom de mon entreprise
-                      </label>
-                      <RedErrorMessage name="isAllowed" />
-                      <div className="notification tw-mt-2">
-                        <p className="tw-italic">
+                    <Field name="isAllowed">
+                      {({ field }) => {
+                        return (
+                          <Checkbox
+                            label="Je certifie disposer du pouvoir pour créer un compte au
+                              nom de mon entreprise"
+                            messageType={
+                              errors.isAllowed && touched.isAllowed
+                                ? "error"
+                                : ""
+                            }
+                            message={
+                              errors.isAllowed && touched.isAllowed
+                                ? errors.isAllowed
+                                : ""
+                            }
+                            id="isAllowed"
+                            // @ts-ignore
+                            checked={field.value}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                          />
+                        );
+                      }}
+                    </Field>
+                  </div>
+
+                  <div className={styles.alertWrapper}>
+                    <Alert
+                      title="Information"
+                      description={
+                        <>
                           En tant qu'administrateur de l'établissement, j'ai
                           pris connaissance des{" "}
                           <a
@@ -932,36 +875,30 @@ export default function AccountCompanyAdd() {
                           >
                             modalités de gestion des membres
                           </a>
-                          .
-                        </p>
-                        <p className="tw-italic">
+                          .<br />
                           Je m'engage notamment à traiter les éventuelles
                           demandes de rattachement et à ce que, à tout moment,
                           au moins un administrateur ait accès à cet
                           établissement dans Trackdéchets.
-                        </p>
-                      </div>
-                    </div>
+                        </>
+                      }
+                    />
                   </div>
 
                   <div className={styles["submit-form"]}>
-                    <button
-                      className="btn btn--outline-primary"
+                    <Button
+                      tertiary
                       disabled={isSubmitting}
                       onClick={() => {
                         history.goBack();
                       }}
                     >
                       Annuler
-                    </button>
+                    </Button>
 
-                    <button
-                      className="btn btn--primary"
-                      type="submit"
-                      disabled={isSubmitting}
-                    >
+                    <Button submit disabled={isSubmitting}>
                       {isSubmitting ? "Création..." : "Créer"}
-                    </button>
+                    </Button>
                   </div>
                   {/* // ERRORS */}
                   {createTransporterReceiptError && (
