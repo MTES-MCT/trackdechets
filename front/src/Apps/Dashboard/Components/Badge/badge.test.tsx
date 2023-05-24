@@ -82,7 +82,13 @@ describe("Bsd Badge status", () => {
     render(
       <Badge status={BsdStatusCode.AwaitingGroup} bsdType={BsdType.Bsdasri} />
     );
-    expect(screen.getByText(/Annexé à un bordereau suite/i));
+    expect(screen.getByText(/En attente d'un bordereau suite/i));
+  });
+  test("AWAITING_GROUP bsff", () => {
+    render(
+      <Badge status={BsdStatusCode.AwaitingGroup} bsdType={BsdType.Bsff} />
+    );
+    expect(screen.getByText(/En attente d'un bordereau suite/i));
   });
   test("GROUPED", () => {
     render(<Badge status={BsdStatusCode.Grouped} />);
@@ -125,6 +131,28 @@ describe("Bsd Badge status", () => {
   test("SIGNED_BY_EMITTER", () => {
     render(<Badge status={BsdStatusCode.SignedByEmitter} />);
     expect(screen.getByText(/signé par l’émetteur/i));
+  });
+  test("INTERMEDIATELY_PROCESSED", () => {
+    render(<Badge status={BsdStatusCode.IntermediatelyProcessed} />);
+    expect(screen.getByText(/En attente d'un bordereau suite/i));
+  });
+  test("INTERMEDIATELY_PROCESSED bsff", () => {
+    render(
+      <Badge
+        status={BsdStatusCode.IntermediatelyProcessed}
+        bsdType={BsdType.Bsff}
+      />
+    );
+    expect(screen.getByText(/Annexé à un bordereau suite/i));
+  });
+  test("INTERMEDIATELY_PROCESSED bsdasri", () => {
+    render(
+      <Badge
+        status={BsdStatusCode.IntermediatelyProcessed}
+        bsdType={BsdType.Bsdasri}
+      />
+    );
+    expect(screen.getByText(/Annexé à un bordereau suite/i));
   });
   test("INTERMEDIATELY_PROCESSED", () => {
     render(<Badge status={BsdStatusCode.IntermediatelyProcessed} />);
