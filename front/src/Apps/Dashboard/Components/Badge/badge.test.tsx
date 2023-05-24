@@ -82,7 +82,7 @@ describe("Bsd Badge status", () => {
     render(
       <Badge status={BsdStatusCode.AwaitingGroup} bsdType={BsdType.Bsdasri} />
     );
-    expect(screen.getByText(/En attente d'un bordereau suite/i));
+    expect(screen.getByText(/Annexé à un bordereau suite/i));
   });
   test("AWAITING_GROUP bsff", () => {
     render(
