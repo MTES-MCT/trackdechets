@@ -5,10 +5,7 @@ import {
   Mutation,
   MutationDuplicateBsffArgs
 } from "../../../../generated/graphql/types";
-import {
-  companyFactory,
-  userWithCompanyFactory
-} from "../../../../__tests__/factories";
+import { userWithCompanyFactory } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { createBsff } from "../../../__tests__/factories";
 import { xDaysAgo } from "../../../../commands/onboarding.helpers";
