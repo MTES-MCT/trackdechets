@@ -30,7 +30,7 @@ export const ENTREPOS_TEMPORAIREMENT =
   "entreposé temporairement ou en reconditionnement";
 export const BSD_SUITE_PREPARE = "BSD suite préparé";
 export const SIGNE_PAR_TRANSPORTEUR = "signé par le transporteur";
-export const INITIAL = "initial";
+export const INITIAL = "publié";
 export const SIGNE_PAR_EMETTEUR = "signé par l’émetteur";
 export const SIGNER_PAR_ENTREPOS_PROVISOIRE =
   "Signé par l'installation d'entreposage provisoire";
