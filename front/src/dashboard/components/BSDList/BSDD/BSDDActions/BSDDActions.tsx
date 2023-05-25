@@ -1,5 +1,10 @@
 import * as React from "react";
-import { generatePath, useParams, useLocation } from "react-router-dom";
+import {
+  generatePath,
+  useParams,
+  useLocation,
+  useRouteMatch,
+} from "react-router-dom";
 
 import routes from "common/routes";
 import {
@@ -58,11 +63,14 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
       form.status
     ) && !isAppendix1Producer;
 
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
+
   const links = [
     {
       title: "Contrôle routier",
       route: {
-        pathname: generatePath(routes.dashboard.roadControl, {
+        pathname: generatePath(routes[dashboardRoutePrefix].roadControl, {
           siret,
           id: form.id,
         }),
@@ -74,7 +82,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     {
       title: "Aperçu",
       route: {
-        pathname: generatePath(routes.dashboard.bsdds.view, {
+        pathname: generatePath(routes[dashboardRoutePrefix].bsdds.view, {
           siret,
           id: form.id,
         }),
@@ -86,7 +94,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     {
       title: "Annexe 1",
       route: {
-        pathname: generatePath(routes.dashboard.bsdds.view, {
+        pathname: generatePath(routes[dashboardRoutePrefix].bsdds.view, {
           siret,
           id: form.id,
         }),
@@ -115,7 +123,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     },
     {
       title: "Modifier",
-      route: generatePath(routes.dashboard.bsdds.edit, {
+      route: generatePath(routes[dashboardRoutePrefix].bsdds.edit, {
         siret,
         id: form.id,
       }),
@@ -125,7 +133,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     {
       title: "Révision",
       route: {
-        pathname: generatePath(routes.dashboard.bsdds.review, {
+        pathname: generatePath(routes[dashboardRoutePrefix].bsdds.review, {
           siret,
           id: form.id,
         }),
