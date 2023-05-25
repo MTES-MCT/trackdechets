@@ -545,6 +545,12 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                 </React.Fragment>
               ))}
             </p>
+            {form.wasteDetails?.sampleNumber && (
+              <p>
+                Numéro d'échantillon :<br />
+                {form.wasteDetails.sampleNumber}
+              </p>
+            )}
           </div>
 
           <div className="BoxCol">
@@ -1002,6 +1008,9 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                     )}
                     <th>Date de prise en charge initiale</th>
                     <th>Code postal lieu de collecte</th>
+                    {form?.emitter?.type === EmitterType.APPENDIX1 && (
+                      <th>N° d'échantillon</th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -1036,6 +1045,9 @@ export async function generateBsddPdf(prismaForm: PrismaForm) {
                           : formatDate(groupedForm?.signedAt)}
                       </td>
                       <td>{groupedForm?.emitterPostalCode}</td>
+                      {form?.emitter?.type === EmitterType.APPENDIX1 && (
+                        <td>{groupedForm?.wasteDetails?.sampleNumber}</td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
