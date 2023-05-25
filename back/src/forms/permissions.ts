@@ -25,7 +25,6 @@ import {
 import { getReadOnlyFormRepository } from "./repository";
 import { checkSecurityCode } from "../common/permissions";
 import { FullForm } from "./types";
-import { editionRules, getUpdatedFields } from "./edition";
 import { ForbiddenError } from "../common/errors";
 
 /**
@@ -211,62 +210,28 @@ export async function checkCanUpdate(
   form: Form,
   input: UpdateFormInput
 ) {
-  if (form.emitterType === EmitterType.APPENDIX1 && form.status === "SENT") {
-    return true;
-  }
-
   const fullForm = await getFullForm(form);
 
-  const transporter = getFirstTransporterSync(fullForm);
-
-  let authorizedOrgIds: string[] = [];
-  let errorMsg = "Vous n'êtes pas autorisé à modifier ce bordereau";
-
-  if (
-    ["DRAFT", "SEALED"].includes(form.status) ||
-    (form.emitterType === EmitterType.APPENDIX1 && form.status === "SENT")
-  ) {
-    authorizedOrgIds = formContributors(fullForm);
-  } else if (form.status === "SIGNED_BY_PRODUCER") {
-    const updatedFields = await getUpdatedFields(form, input);
-    if (form.emitterType === EmitterType.APPENDIX1_PRODUCER) {
-      // Le transporteur peut modifier les données de l'annexe 1 jusqu'à sa signature
-      authorizedOrgIds = [transporter?.transporterCompanySiret].filter(Boolean);
-    } else if (updatedFields.every(f => editionRules[f] === "TRANSPORT")) {
-      // Les infos de transport peuvent être modifiées par tous les acteurs
-      // du BSDD tant que le déchet n'a pas été enlevé
-      authorizedOrgIds = formContributors(fullForm);
-    } else {
-      if (form.emittedByEcoOrganisme) {
-        authorizedOrgIds = [form.ecoOrganismeSiret].filter(Boolean);
-        errorMsg =
-          "L'éco-organisme a signé ce bordereau, seules les informations de transport peuvent être mises à jour.";
-      } else {
-        authorizedOrgIds = [form.emitterCompanySiret].filter(Boolean);
-        errorMsg =
-          "Le producteur a signé ce bordereau, seules les informations de transport peuvent être mises à jour.";
-      }
-    }
-  } else {
-    errorMsg =
-      "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être modifiés";
-  }
+  const authorizedOrgIds = formContributors(fullForm);
 
   await checkUserPermissions(
     user,
     authorizedOrgIds,
     Permission.BsdCanUpdate,
-    errorMsg
+    "Vous n'êtes pas autorisé à modifier ce bordereau"
   );
 
-  const futureContributors = formContributors(fullForm, input);
+  if (input) {
+    const futureContributors = formContributors(fullForm, input);
+    return checkUserPermissions(
+      user,
+      futureContributors,
+      Permission.BsdCanUpdate,
+      "Vous ne pouvez pas enlever votre établissement du bordereau"
+    );
+  }
 
-  return checkUserPermissions(
-    user,
-    futureContributors,
-    Permission.BsdCanUpdate,
-    "Vous ne pouvez pas enlever votre établissement du bordereau"
-  );
+  return true;
 }
 
 export async function checkCanDuplicate(user: User, form: Form) {

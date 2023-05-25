@@ -94,7 +94,8 @@ export function buildSetAppendix1({
                 transporterValidityLimit: transporter?.transporterValidityLimit,
                 transporterTransportMode: transporter?.transporterTransportMode,
                 transporterNumberPlate: transporter?.transporterNumberPlate,
-                transporterCustomInfo: transporter?.transporterCustomInfo
+                transporterCustomInfo: transporter?.transporterCustomInfo,
+                readyToTakeOver: true
               }
             }
           }

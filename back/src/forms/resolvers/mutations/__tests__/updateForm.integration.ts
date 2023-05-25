@@ -3,6 +3,7 @@ import { resetDatabase } from "../../../../../integration-tests/helper";
 import prisma from "../../../../prisma";
 import { ErrorCode } from "../../../../common/errors";
 import {
+  bsddTransporterFactory,
   companyFactory,
   formFactory,
   formWithTempStorageFactory,
@@ -22,6 +23,7 @@ import {
 import getReadableId from "../../../readableId";
 import * as sirenify from "../../../sirenify";
 import { sub } from "date-fns";
+import { getFirstTransporter, getTransportersSync } from "../../../database";
 
 const sirenifyMock = jest
   .spyOn(sirenify, "sirenifyFormInput")
@@ -173,6 +175,8 @@ describe("Mutation.updateForm", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
+        emittedAt: new Date(),
+        takenOverAt: new Date(),
         emitterCompanySiret: company.siret,
         status: "SENT"
       }
@@ -192,12 +196,172 @@ describe("Mutation.updateForm", () => {
     expect(errors).toEqual([
       expect.objectContaining({
         message:
-          "Seuls les bordereaux en brouillon ou en attente de collecte peuvent être modifiés",
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : wasteDetailsCode",
         extensions: expect.objectContaining({
           code: ErrorCode.FORBIDDEN
         })
       })
     ]);
+  });
+
+  it("should not be possible for the TTR to update final destination when emitter has signed", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const ttr = await userWithCompanyFactory("ADMIN");
+    const destination = await companyFactory();
+
+    const form = await formWithTempStorageFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: ttr.company.siret,
+        emittedAt: new Date()
+      },
+      forwardedInOpts: {
+        recipientCompanySiret: destination.siret
+      }
+    });
+    const { mutate } = makeClient(ttr.user);
+
+    const newDestination = await companyFactory();
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      temporaryStorageDetail: {
+        destination: { company: { siret: newDestination.siret } }
+      }
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : forwardedIn"
+      })
+    ]);
+  });
+
+  it("should be possible for the TTR to resend the same data on the temporaryStorateDetail input", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const ttr = await userWithCompanyFactory("ADMIN");
+    const destination = await companyFactory();
+
+    const form = await formWithTempStorageFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: ttr.company.siret,
+        emittedAt: new Date()
+      },
+      forwardedInOpts: {
+        recipientCompanySiret: destination.siret
+      }
+    });
+    const { mutate } = makeClient(ttr.user);
+
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      temporaryStorageDetail: {
+        destination: { company: { siret: destination.siret } }
+      }
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toBeUndefined();
+  });
+
+  it("should not be possible to update intermediaries whe emitter has signed", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+    const intermediary1 = await companyFactory();
+    const intermediary2 = await companyFactory();
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret,
+        emittedAt: new Date(),
+        intermediaries: { create: toIntermediaryCompany(intermediary1) }
+      }
+    });
+    const { mutate } = makeClient(destination.user);
+
+    // Try changing the list of intermediaries
+    const { errors: errors1 } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          intermediaries: [toIntermediaryCompany(intermediary2)]
+        }
+      }
+    });
+
+    expect(errors1).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : intermediaries"
+      })
+    ]);
+
+    // Try changing one field on the same intermediary
+    const { errors: errors2 } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          intermediaries: [
+            { ...toIntermediaryCompany(intermediary2), name: "new name" }
+          ]
+        }
+      }
+    });
+
+    expect(errors2).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : intermediaries"
+      })
+    ]);
+  });
+
+  it("should be possible to resend same intermediaries data when emitter has signed", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const destination = await userWithCompanyFactory("ADMIN");
+    const intermediary1 = await companyFactory();
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "SIGNED_BY_PRODUCER",
+        emitterCompanySiret: emitter.company.siret,
+        recipientCompanySiret: destination.company.siret,
+        emittedAt: new Date(),
+        intermediaries: { create: toIntermediaryCompany(intermediary1) }
+      }
+    });
+    const { mutate } = makeClient(destination.user);
+
+    const { errors } = await mutate<
+      Pick<Mutation, "updateForm">,
+      MutationUpdateFormArgs
+    >(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          intermediaries: [toIntermediaryCompany(intermediary1)]
+        }
+      }
+    });
+
+    expect(errors).toBeUndefined();
   });
 
   it.each(["emitter", "trader", "broker", "recipient", "transporter"])(
@@ -2442,5 +2606,716 @@ describe("Mutation.updateForm", () => {
     expect(data.updateForm.transporter?.department).toBeUndefined();
     expect(data.updateForm.transporter?.validityLimit).toBeUndefined();
     expect(data.updateForm.transporter?.company?.siret).toBeUndefined();
+  });
+
+  it("should be possible to update transporters with the `transporters` field", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+    const transporter3 = await userWithCompanyFactory("MEMBER");
+    const transporter4 = await userWithCompanyFactory("MEMBER");
+    const transporter5 = await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.DRAFT,
+        emitterCompanySiret: emitter.company.siret
+      }
+    });
+
+    const [
+      bsddTransporter1,
+      bsddTransporter2,
+      bsddTransporter3,
+      bsddTransporter4,
+      bsddTransporter5
+    ] = await Promise.all(
+      [
+        transporter1,
+        transporter2,
+        transporter3,
+        transporter4,
+        transporter5
+      ].map((transporter, idx) => {
+        return prisma.bsddTransporter.create({
+          data: {
+            number: idx + 1,
+            transporterCompanySiret: transporter.company.siret
+          }
+        });
+      })
+    );
+
+    // Initiate the form with two transporters
+    await prisma.form.update({
+      where: { id: form.id },
+      data: {
+        transporters: {
+          connect: [{ id: bsddTransporter1.id }, { id: bsddTransporter2.id }]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // Update the form by removing the initial two transporters
+    // and adding three others
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      transporters: [
+        bsddTransporter3.id,
+        bsddTransporter4.id,
+        bsddTransporter5.id
+      ]
+    };
+    await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: { transporters: true }
+    });
+
+    const transporters = getTransportersSync(updatedForm);
+
+    expect(transporters).toHaveLength(3);
+    expect(transporters[0]).toMatchObject({
+      id: bsddTransporter3.id,
+      number: 1 // number should have been set correctly
+    });
+    expect(transporters[1]).toMatchObject({
+      id: bsddTransporter4.id,
+      number: 2 // number should have been set correctly
+    });
+    expect(transporters[2]).toMatchObject({
+      id: bsddTransporter5.id,
+      number: 3 // number should have been set correctly
+    });
+
+    const transporter6 = await userWithCompanyFactory("MEMBER");
+    const bsddTransporter6 = await prisma.bsddTransporter.create({
+      data: {
+        number: 6,
+        transporterCompanySiret: transporter6.company.siret
+      }
+    });
+
+    // it should not be possible though to set more than 5 transporters
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: {
+        updateFormInput: {
+          id: form.id,
+          transporters: [
+            bsddTransporter1.id,
+            bsddTransporter2.id,
+            bsddTransporter3.id,
+            bsddTransporter4.id,
+            bsddTransporter5.id,
+            bsddTransporter6.id
+          ]
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous ne pouvez pas ajouter plus de 5 transporteurs"
+      })
+    ]);
+  });
+
+  it("should be possible to swap the order of the different transporters", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.DRAFT,
+        emitterCompanySiret: emitter.company.siret
+      }
+    });
+
+    const [bsddTransporter1, bsddTransporter2] = await Promise.all(
+      [transporter1, transporter2].map((transporter, idx) => {
+        return prisma.bsddTransporter.create({
+          data: {
+            number: idx + 1,
+            transporterCompanySiret: transporter.company.siret
+          }
+        });
+      })
+    );
+
+    // Initiate the form with two transporters in a given order
+    await prisma.form.update({
+      where: { id: form.id },
+      data: {
+        transporters: {
+          deleteMany: {},
+          connect: [{ id: bsddTransporter1.id }, { id: bsddTransporter2.id }]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // swap the order
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      transporters: [bsddTransporter2.id, bsddTransporter1.id]
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: { transporters: true }
+    });
+
+    const transporters = getTransportersSync(updatedForm);
+
+    expect(transporters).toHaveLength(2);
+    expect(transporters[0]).toMatchObject({
+      id: bsddTransporter2.id,
+      number: 1 // number should have been set correctly
+    });
+    expect(transporters[1]).toMatchObject({
+      id: bsddTransporter1.id,
+      number: 2 // number should have been set correctly
+    });
+  });
+
+  it("should be possible to empty transporters list", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.DRAFT,
+        emitterCompanySiret: emitter.company.siret
+      }
+    });
+
+    const [bsddTransporter1, bsddTransporter2] = await Promise.all(
+      [transporter1, transporter2].map((transporter, idx) => {
+        return prisma.bsddTransporter.create({
+          data: {
+            number: idx + 1,
+            transporterCompanySiret: transporter.company.siret
+          }
+        });
+      })
+    );
+
+    // Initiate the form with two transporters
+    await prisma.form.update({
+      where: { id: form.id },
+      data: {
+        transporters: {
+          deleteMany: {},
+          connect: [{ id: bsddTransporter1.id }, { id: bsddTransporter2.id }]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // update first transporter with deprecated field `transporter`
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      transporters: []
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: { transporters: true }
+    });
+
+    const transporters = getTransportersSync(updatedForm);
+    expect(transporters).toHaveLength(0);
+  });
+
+  it("should throw exception if transporters ID's don't exist", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.DRAFT,
+        emitterCompanySiret: emitter.company.siret
+      }
+    });
+    const { mutate } = makeClient(emitter.user);
+
+    // update first transporter with deprecated field `transporter`
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      transporters: ["ID1", "ID2"]
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Aucun transporteur ne possède le ou les identifiants suivants : ID1, ID2"
+      })
+    ]);
+  });
+
+  it("should update the first transporter and do not updates next transporters", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.DRAFT,
+        emitterCompanySiret: emitter.company.siret
+      }
+    });
+
+    const [bsddTransporter1, bsddTransporter2] = await Promise.all(
+      [transporter1, transporter2].map((transporter, idx) => {
+        return prisma.bsddTransporter.create({
+          data: {
+            number: idx + 1,
+            transporterCompanySiret: transporter.company.siret
+          }
+        });
+      })
+    );
+
+    // Initiate the form with two transporters
+    await prisma.form.update({
+      where: { id: form.id },
+      data: {
+        transporters: {
+          deleteMany: {},
+          connect: [{ id: bsddTransporter1.id }, { id: bsddTransporter2.id }]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // update first transporter with deprecated field `transporter`
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      transporter: { company: { name: "Transport Gégé" } }
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: { transporters: true }
+    });
+
+    const transporters = getTransportersSync(updatedForm);
+    expect(transporters).toHaveLength(2);
+    expect(transporters[0].id).toEqual(bsddTransporter1.id);
+    expect(transporters[0].number).toEqual(1);
+    expect(transporters[1].id).toEqual(bsddTransporter2.id);
+    expect(transporters[1].number).toEqual(bsddTransporter2.number);
+    expect(transporters[0].transporterCompanyName).toEqual("Transport Gégé");
+  });
+
+  it("should delete first transporter and do not updates next transporters", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+    const transporter3 = await userWithCompanyFactory("MEMBER");
+
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.DRAFT,
+        emitterCompanySiret: emitter.company.siret
+      }
+    });
+
+    const [bsddTransporter1, bsddTransporter2, bsddTransporter3] =
+      await Promise.all(
+        [transporter1, transporter2, transporter3].map((transporter, idx) => {
+          return prisma.bsddTransporter.create({
+            data: {
+              number: idx + 1,
+              transporterCompanySiret: transporter.company.siret
+            }
+          });
+        })
+      );
+
+    // Initiate the form with two transporters
+    await prisma.form.update({
+      where: { id: form.id },
+      data: {
+        transporters: {
+          deleteMany: {},
+          connect: [
+            { id: bsddTransporter1.id },
+            { id: bsddTransporter2.id },
+            { id: bsddTransporter3.id }
+          ]
+        }
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // set first transporter to `null` with deprecated field `transporter`
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      transporter: null
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toBeUndefined();
+
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: form.id },
+      include: { transporters: true }
+    });
+
+    const transporters = getTransportersSync(updatedForm);
+    expect(transporters).toHaveLength(2);
+
+    // transporters ordering should have been decremented
+    expect(transporters[0].id).toEqual(bsddTransporter2.id);
+    expect(transporters[0].number).toEqual(1);
+    expect(transporters[1].id).toEqual(bsddTransporter3.id);
+    expect(transporters[1].number).toEqual(bsddTransporter2.number);
+  });
+
+  it("should not be possible to update `transporters` when the form has been received", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+
+    // Create a form that has already been received
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.ACCEPTED,
+        emittedAt: new Date(),
+        takenOverAt: new Date(),
+        receivedAt: new Date(),
+        emitterCompanySiret: emitter.company.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter1.company.siret,
+            number: 1,
+            readyToTakeOver: true,
+            takenOverAt: new Date()
+          }
+        }
+      }
+    });
+
+    const bsddTransporter1 = await getFirstTransporter(form);
+
+    const bsddTransporter2 = await prisma.bsddTransporter.create({
+      data: {
+        number: 0,
+        transporterCompanySiret: transporter2.company.siret,
+        readyToTakeOver: true
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // Trying adding a new transporter
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      transporters: [bsddTransporter1!.id, bsddTransporter2.id]
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : transporters"
+      })
+    ]);
+  });
+
+  it("should not be possible to remove or permutate a transporter that has already signed when status is SENT", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+
+    // Create a form that has already been sent
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.SENT,
+        emittedAt: new Date(),
+        takenOverAt: new Date(),
+        emitterCompanySiret: emitter.company.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter1.company.siret,
+            number: 1,
+            readyToTakeOver: true,
+            takenOverAt: new Date()
+          }
+        }
+      }
+    });
+
+    const bsddTransporter1 = await getFirstTransporter(form);
+
+    const bsddTransporter2 = await prisma.bsddTransporter.create({
+      data: {
+        number: 0,
+        transporterCompanySiret: transporter2.company.siret,
+        readyToTakeOver: true
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // Trying permuting two transporters
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      transporters: [bsddTransporter2.id, bsddTransporter1!.id]
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : transporters[0]"
+      })
+    ]);
+  });
+
+  it("should be possible to remove or permute transporters that has not signed yet when status is SENT", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+    const transporter3 = await userWithCompanyFactory("MEMBER");
+
+    // Create a form that has already been signed by the first transporter
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.SENT,
+        emittedAt: new Date(),
+        takenOverAt: new Date(),
+        emitterCompanySiret: emitter.company.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter1.company.siret,
+            number: 1,
+            readyToTakeOver: true,
+            takenOverAt: new Date()
+          }
+        }
+      }
+    });
+
+    const bsddTransporter1 = await getFirstTransporter(form);
+
+    // Transporter n°2 (not signed yet)
+    const bsddTransporter2 = await bsddTransporterFactory({
+      formId: form.id,
+      opts: {
+        transporterCompanySiret: transporter2.company.siret,
+        takenOverAt: null
+      }
+    });
+
+    // Transporter n°3 (not signed yet)
+    const bsddTransporter3 = await bsddTransporterFactory({
+      formId: form.id,
+      opts: {
+        transporterCompanySiret: transporter3.company.siret,
+        takenOverAt: null
+      }
+    });
+
+    // Permute transporter 2 and transporter 2
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      transporters: [
+        bsddTransporter1!.id,
+        bsddTransporter3.id,
+        bsddTransporter2.id
+      ]
+    };
+    const { mutate } = makeClient(emitter.user);
+
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toBeUndefined();
+  });
+
+  it("should not be possible to update `transporter` (first transporter) when the form has been sent", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter = await userWithCompanyFactory("MEMBER");
+
+    // Create a form that has already been sent
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.SENT,
+        emittedAt: new Date(),
+        takenOverAt: new Date(),
+        emitterCompanySiret: emitter.company.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            number: 1,
+            readyToTakeOver: true,
+            takenOverAt: new Date()
+          }
+        }
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // Try update first transporter
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      transporter: { mode: "RAIL" }
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : transporter"
+      })
+    ]);
+  });
+
+  it("should be possible to add a new transporter while the form has not been received", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+
+    // Create a form that has already been received
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.SENT,
+        emittedAt: new Date(),
+        takenOverAt: new Date(),
+        emitterCompanySiret: emitter.company.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter1.company.siret,
+            number: 1,
+            readyToTakeOver: true,
+            takenOverAt: new Date()
+          }
+        }
+      }
+    });
+
+    const bsddTransporter1 = await getFirstTransporter(form);
+
+    const bsddTransporter2 = await prisma.bsddTransporter.create({
+      data: {
+        number: 0,
+        transporterCompanySiret: transporter2.company.siret,
+        readyToTakeOver: true
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // Trying adding a new transporter after the first one
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      transporters: [bsddTransporter1!.id, bsddTransporter2.id]
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toBeUndefined();
+  });
+
+  it("should not be possible to remove a transporter that has already signed", async () => {
+    const emitter = await userWithCompanyFactory("ADMIN");
+    const transporter1 = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await userWithCompanyFactory("MEMBER");
+
+    // Create a form that has already been received
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: Status.SENT,
+        emittedAt: new Date(),
+        takenOverAt: new Date(),
+        emitterCompanySiret: emitter.company.siret,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter1.company.siret,
+            number: 1,
+            readyToTakeOver: true,
+            takenOverAt: new Date()
+          }
+        }
+      }
+    });
+
+    const bsddTransporter2 = await prisma.bsddTransporter.create({
+      data: {
+        number: 0,
+        transporterCompanySiret: transporter2.company.siret,
+        readyToTakeOver: true
+      }
+    });
+
+    const { mutate } = makeClient(emitter.user);
+
+    // Trying removing first transporter and set a different one
+    const updateFormInput: UpdateFormInput = {
+      id: form.id,
+      transporters: [bsddTransporter2.id]
+    };
+    const { errors } = await mutate<Pick<Mutation, "updateForm">>(UPDATE_FORM, {
+      variables: { updateFormInput }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Des champs ont été verrouillés via signature et ne peuvent plus être modifiés : transporters[0]"
+      })
+    ]);
   });
 });

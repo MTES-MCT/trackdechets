@@ -42,6 +42,7 @@ import {
   vatNumberTests
 } from "../../../common/validation";
 import { ForbiddenError, UserInputError } from "../../../common/errors";
+import { getTransporters } from "../../database";
 
 const SEGMENT_NOT_FOUND = "Le segment de transport n'a pas été trouvé";
 const FORM_NOT_FOUND_OR_NOT_ALLOWED =
@@ -156,14 +157,8 @@ export async function prepareSegment(
   if (!form) {
     throw new ForbiddenError(FORM_NOT_FOUND_OR_NOT_ALLOWED);
   }
-  const transportSegments = await prisma.bsddTransporter.findMany({
-    where: {
-      form: { id: id }
-    },
-    orderBy: {
-      number: "asc"
-    }
-  });
+
+  const transportSegments = await getTransporters(form);
 
   // user must be the currentTransporter or form owner
   const userIsOwner = user.id === form.owner.id;
@@ -254,7 +249,7 @@ export async function markSegmentAsReadyToTakeOver(
   const formUpdateInput = await recipifyTransporterInDb(currentSegment);
   const formRepository = getFormRepository(user);
   const form = await formRepository.findUnique(
-    { id: currentSegment.form.id },
+    { id: currentSegment.form?.id },
     formWithOwnerIdAndTransportSegments
   );
 
@@ -287,7 +282,7 @@ export async function markSegmentAsReadyToTakeOver(
   }
 
   await formRepository.update(
-    { id: currentSegment.form.id },
+    { id: currentSegment.form?.id },
     {
       transporters: {
         update: {
@@ -347,7 +342,7 @@ export async function takeOverSegment(
 
   const formRepository = getFormRepository(user);
   const form = await formRepository.findUnique(
-    { id: currentSegment.form.id },
+    { id: currentSegment.form?.id },
     formWithOwnerIdAndTransportSegments
   );
   if (form.status !== "SENT") {
@@ -382,7 +377,7 @@ export async function takeOverSegment(
   const formUpdateInput = await recipifyTransporterInDb(currentSegment);
 
   await formRepository.update(
-    { id: currentSegment.form.id },
+    { id: currentSegment.form?.id },
     {
       currentTransporterOrgId: getTransporterCompanyOrgId(currentSegment),
       nextTransporterOrgId: "",
@@ -457,7 +452,7 @@ export async function editSegment(
 
   const formRepository = getFormRepository(user);
   const form = (await formRepository.findUnique(
-    { id: currentSegment.form.id },
+    { id: currentSegment.form?.id },
     formWithOwnerIdAndTransportSegments
   )) as MultiModalForm;
 
@@ -518,7 +513,7 @@ export async function editSegment(
   }
 
   await formRepository.update(
-    { id: currentSegment.form.id },
+    { id: currentSegment.form?.id },
     {
       nextTransporterOrgId: nextSegmentPayloadOrgId,
       transporters: {

@@ -196,6 +196,104 @@ describe("Mutation.createForm", () => {
     }
   );
 
+  it("should be possible to create a form and connect existing bsddTransporters", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter1 = await prisma.bsddTransporter.create({
+      data: { number: 0 }
+    });
+    const transporter2 = await prisma.bsddTransporter.create({
+      data: { number: 0 }
+    });
+
+    const { mutate } = makeClient(user);
+    const { data, errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          transporters: [transporter1.id, transporter2.id]
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+    const form = await prisma.form.findUniqueOrThrow({
+      where: { id: data.createForm.id },
+      include: { transporters: true }
+    });
+    expect(form.transporters.length).toEqual(2);
+    expect(form.transporters.map(t => t.id)).toContain(transporter1.id);
+    expect(form.transporters.map(t => t.id)).toContain(transporter2.id);
+    const updatedTransporter1 = form.transporters.find(
+      t => t.id === transporter1.id
+    )!;
+    expect(updatedTransporter1.number).toEqual(1);
+    const updatedTransporter2 = form.transporters.find(
+      t => t.id === transporter2.id
+    )!;
+    expect(updatedTransporter2.number).toEqual(2);
+  });
+
+  it("should throw an error when trying to connect a non existant bsddTransporter", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          transporters: ["ID1", "ID2"]
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Aucun transporteur ne possède le ou les identifiants suivants : ID1, ID2"
+      })
+    ]);
+  });
+
+  it("should not be possible to add more than 5 transporters", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+
+    const transporters = await Promise.all(
+      [...Array(6).keys()].map(() =>
+        prisma.bsddTransporter.create({
+          data: { number: 0 }
+        })
+      )
+    );
+
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          transporters: transporters.map(t => t.id)
+        }
+      }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous ne pouvez pas ajouter plus de 5 transporteurs"
+      })
+    ]);
+  });
+
   it("should allow to create a form without space in recipientProcessingOperation", async () => {
     const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
     const transporter = await companyFactory();
@@ -1770,7 +1868,7 @@ describe("Mutation.createForm", () => {
 
   it("should not be possible to fill both a SIRET number and a FR TVA number for transporter", async () => {
     const { user, company: emitter } = await userWithCompanyFactory("MEMBER");
-    const transporter = await companyFactory();
+    const transporter = await companyFactory({ vatNumber: "FR87850019464" });
     const { mutate } = makeClient(user);
     const { errors } = await mutate<
       Pick<Mutation, "createForm">,
@@ -1782,7 +1880,10 @@ describe("Mutation.createForm", () => {
             company: { siret: emitter.siret }
           },
           transporter: {
-            company: { siret: transporter.siret, vatNumber: "FR87850019464" }
+            company: {
+              siret: transporter.siret,
+              vatNumber: transporter.vatNumber
+            }
           }
         }
       }
@@ -1919,6 +2020,35 @@ describe("Mutation.createForm", () => {
       expect.objectContaining({
         message:
           "Déchet : le poids doit être inférieur à 40 tonnes lorsque le transport se fait par la route"
+      })
+    ]);
+  });
+
+  it("should not be possible to use `transporter` and `transporters` in the same input", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory();
+    const bsddTransporter = await prisma.bsddTransporter.create({
+      data: { number: 0 }
+    });
+    const { mutate } = makeClient(user);
+    const { errors } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          emitter: {
+            company: { siret: company.siret }
+          },
+          transporter: { company: { siret: transporter.siret } },
+          transporters: [bsddTransporter.id]
+        }
+      }
+    });
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message:
+          "Vous ne pouvez pas utiliser les champs `transporter` et `transporters` en même temps"
       })
     ]);
   });

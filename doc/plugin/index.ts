@@ -31,6 +31,7 @@ export default function plugin(): Plugin<any> {
         bsdd: {
           acheminementDirect: parseWorkflow(bsdWorkflows.acheminementDirect),
           multiModal: parseWorkflow(bsdWorkflows.multiModal),
+          multiModalv2: parseWorkflow(bsdWorkflows.multiModalv2),
           entreposageProvisoire: parseWorkflow(
             bsdWorkflows.entreposageProvisoire
           ),

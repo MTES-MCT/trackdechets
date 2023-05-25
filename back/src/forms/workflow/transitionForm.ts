@@ -14,8 +14,8 @@ export default function transitionForm(form: Form, event: Event): Status {
   // Use state machine to calculate new status
   const nextState = machine.transition(currentStatus, event);
 
-  // This transition is not possible
-  if (!nextState.changed) {
+  if (nextState.transitions.length === 0) {
+    // This transition is not possible
     throw new InvalidTransition();
   }
 

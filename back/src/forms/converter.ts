@@ -510,6 +510,7 @@ export function expandTransporterFromDb(
   transporter: BsddTransporter
 ): Transporter | null {
   return nullIfNoValues<Transporter>({
+    id: transporter.id,
     company: nullIfNoValues<FormCompany>({
       name: transporter.transporterCompanyName,
       orgId: getTransporterCompanyOrgId(transporter),
@@ -619,6 +620,7 @@ export async function expandFormFromDb(
       })
     }),
     transporter: transporter ? expandTransporterFromDb(transporter) : null,
+    transporters: transporters.map(t => expandTransporterFromDb(t)!),
     recipient: nullIfNoValues<Recipient>({
       cap: form.recipientCap,
       processingOperation: form.recipientProcessingOperation,
@@ -874,6 +876,7 @@ export function expandTransportSegmentFromDb(
     // in order to keep the public API intact
     previousTransporterCompanySiret: segment.previousTransporterCompanyOrgId,
     transporter: nullIfNoValues({
+      id: segment.id,
       company: nullIfNoValues({
         name: segment.transporterCompanyName,
         siret: segment.transporterCompanySiret,

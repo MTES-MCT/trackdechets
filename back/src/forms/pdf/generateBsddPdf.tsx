@@ -224,7 +224,7 @@ function PackagingInfosTable({ packagingInfos }: PackagingInfosTableProps) {
 }
 
 type TransporterFormCompanyFieldsProps = {
-  transporter?: Transporter | null;
+  transporter?: Omit<Transporter, "id"> | null;
   takenOverAt?: Date | null;
   takenOverBy?: string | null;
 };

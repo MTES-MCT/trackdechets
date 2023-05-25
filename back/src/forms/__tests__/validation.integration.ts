@@ -6,7 +6,7 @@ import {
   receivedInfoSchema,
   processedInfoSchema,
   transporterSchemaFn,
-  beforeTransportSchema
+  beforeTransportSchemaFn
 } from "../validation";
 import { ReceivedFormInput } from "../../generated/graphql/types";
 import { companyFactory, siretify } from "../../__tests__/factories";
@@ -16,7 +16,7 @@ import { REQUIRED_RECEIPT_NUMBER } from "../../common/validation";
 const siret1 = siretify(1);
 const siret2 = siretify(2);
 const siret3 = siretify(3);
-const formData: Partial<Form & BsddTransporter> = {
+const formData: Partial<Form> = {
   id: "cjplbvecc000d0766j32r19am",
   readableId: "BSD-20210101-AAAAAAAA",
   status: "DRAFT",
@@ -40,15 +40,7 @@ const formData: Partial<Form & BsddTransporter> = {
   recipientCompanyContact: "Destination",
   recipientCompanyPhone: "02",
   recipientCompanyMail: "d@d.fr",
-  transporterReceipt: "sdfg",
-  transporterDepartment: "82",
-  transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
-  transporterCompanyName: "A company 4",
-  transporterCompanySiret: siret3,
-  transporterCompanyAddress: "8 rue du Général de Gaulle",
-  transporterCompanyContact: "Transporteur",
-  transporterCompanyPhone: "03",
-  transporterCompanyMail: "t@t.fr",
+
   wasteDetailsCode: "16 06 01*",
   wasteDetailsName: "Déchets divers",
   wasteDetailsOnuCode: "AAA",
@@ -62,8 +54,21 @@ const formData: Partial<Form & BsddTransporter> = {
   wasteDetailsPop: false
 };
 
+const transporterData: Partial<BsddTransporter> = {
+  transporterReceipt: "sdfg",
+  transporterDepartment: "82",
+  transporterValidityLimit: new Date("2018-12-11T00:00:00.000Z"),
+  transporterCompanyName: "A company 4",
+  transporterCompanySiret: siret3,
+  transporterCompanyAddress: "8 rue du Général de Gaulle",
+  transporterCompanyContact: "Transporteur",
+  transporterCompanyPhone: "03",
+  transporterCompanyMail: "t@t.fr",
+  number: 1
+};
+
 describe("sealedFormSchema", () => {
-  let sealedForm: Partial<Form & BsddTransporter>;
+  let sealedForm: Partial<Form> & { transporters: Partial<BsddTransporter>[] };
 
   afterAll(resetDatabase);
   beforeAll(async () => {
@@ -77,8 +82,13 @@ describe("sealedFormSchema", () => {
     sealedForm = {
       ...formData,
       emitterCompanySiret: emitterCompany.siret,
-      transporterCompanySiret: transporterCompany.siret,
-      recipientCompanySiret: destinationCompany.siret
+      recipientCompanySiret: destinationCompany.siret,
+      transporters: [
+        {
+          ...transporterData,
+          transporterCompanySiret: transporterCompany.siret
+        }
+      ]
     };
   });
 
@@ -91,8 +101,11 @@ describe("sealedFormSchema", () => {
     it("with empty strings for optionnal fields", async () => {
       const testForm = {
         ...sealedForm,
-        transporterNumberPlate: ""
+        transporters: [
+          { ...sealedForm.transporters[0], transporterNumberPlate: "" }
+        ]
       };
+      await sealedFormSchema.validate(testForm);
       const isValid = await sealedFormSchema.isValid(testForm);
       expect(isValid).toEqual(true);
     });
@@ -100,7 +113,9 @@ describe("sealedFormSchema", () => {
     it("with null values for optionnal fields", async () => {
       const testForm = {
         ...sealedForm,
-        transporterNumberPlate: null
+        transporters: [
+          { ...sealedForm.transporters[0], transporterNumberPlate: null }
+        ]
       };
       const isValid = await sealedFormSchema.isValid(testForm);
       expect(isValid).toEqual(true);
@@ -109,9 +124,14 @@ describe("sealedFormSchema", () => {
     it("with transporter receipt exemption R.541-50 ticked and no transportation infos", async () => {
       const testForm = {
         ...sealedForm,
-        transporterIsExemptedOfReceipt: true,
-        transporterReceipt: null,
-        transporterDepartment: null
+        transporters: [
+          {
+            ...sealedForm.transporters[0],
+            transporterIsExemptedOfReceipt: true,
+            transporterReceipt: null,
+            transporterDepartment: null
+          }
+        ]
       };
 
       const isValid = await sealedFormSchema.isValid(testForm);
@@ -124,10 +144,15 @@ describe("sealedFormSchema", () => {
       });
       const testForm: any = {
         ...sealedForm,
-        transporterCompanyVatNumber: transporter.vatNumber,
-        transporterIsExemptedOfReceipt: null,
-        transporterReceipt: null,
-        transporterDepartment: null
+        transporters: [
+          {
+            ...sealedForm.transporters[0],
+            transporterCompanyVatNumber: transporter.vatNumber,
+            transporterIsExemptedOfReceipt: null,
+            transporterReceipt: null,
+            transporterDepartment: null
+          }
+        ]
       };
       delete testForm.transporterCompanySiret;
       const isValid = await sealedFormSchema.isValid(testForm);
@@ -221,21 +246,6 @@ describe("sealedFormSchema", () => {
       expect(isValid).toBeTruthy();
     });
 
-    it("when transporterVatNumber is defined and transporterCompanySiret is nullish", async () => {
-      const transporter = await companyFactory({
-        orgId: "ESA15022510",
-        vatNumber: "ESA15022510"
-      });
-      const partialForm: Partial<Form & BsddTransporter> = {
-        ...sealedForm,
-        transporterCompanySiret: null,
-        transporterCompanyVatNumber: transporter.vatNumber
-      };
-      await sealedFormSchema.validate(partialForm);
-      const isValid = await sealedFormSchema.isValid(partialForm);
-      expect(isValid).toEqual(true);
-    });
-
     it("when there is 2 bennes", async () => {
       const testForm = {
         ...sealedForm,
@@ -311,9 +321,13 @@ describe("sealedFormSchema", () => {
     });
 
     it("when transporterCompanySiret is not well formatted", async () => {
-      const partialForm: Partial<Form & BsddTransporter> = {
+      const partialForm: Partial<Form> & {
+        transporters: Partial<BsddTransporter>[];
+      } = {
         ...sealedForm,
-        transporterCompanySiret: "123"
+        transporters: [
+          { ...sealedForm.transporters[0], transporterCompanySiret: "123" }
+        ]
       };
       const validateFn = () => sealedFormSchema.validate(partialForm);
       await expect(validateFn()).rejects.toThrow(
@@ -322,9 +336,16 @@ describe("sealedFormSchema", () => {
     });
 
     it("when transporter is not registered in Trackdéchets", async () => {
-      const partialForm: Partial<Form & BsddTransporter> = {
+      const partialForm: Partial<Form> & {
+        transporters: Partial<BsddTransporter>[];
+      } = {
         ...sealedForm,
-        transporterCompanySiret: "85001946400021"
+        transporters: [
+          {
+            ...sealedForm.transporters[0],
+            transporterCompanySiret: "85001946400021"
+          }
+        ]
       };
       const validateFn = () => sealedFormSchema.validate(partialForm);
       await expect(validateFn()).rejects.toThrow(
@@ -333,9 +354,16 @@ describe("sealedFormSchema", () => {
     });
 
     it("when foreign transporter is not registered in Trackdéchets", async () => {
-      const partialForm: Partial<Form & BsddTransporter> = {
+      const partialForm: Partial<Form> & {
+        transporters: Partial<BsddTransporter>[];
+      } = {
         ...sealedForm,
-        transporterCompanyVatNumber: "IT13029381004"
+        transporters: [
+          {
+            ...sealedForm.transporters[0],
+            transporterCompanyVatNumber: "IT13029381004"
+          }
+        ]
       };
       const validateFn = () => sealedFormSchema.validate(partialForm);
       await expect(validateFn()).rejects.toThrow(
@@ -345,9 +373,16 @@ describe("sealedFormSchema", () => {
 
     it("when transporter is registered in Trackdéchets with wrong profile", async () => {
       const company = await companyFactory({ companyTypes: ["PRODUCER"] });
-      const partialForm: Partial<Form & BsddTransporter> = {
+      const partialForm: Partial<Form> & {
+        transporters: Partial<BsddTransporter>[];
+      } = {
         ...sealedForm,
-        transporterCompanySiret: company.siret
+        transporters: [
+          {
+            ...sealedForm.transporters[0],
+            transporterCompanySiret: company.siret
+          }
+        ]
       };
       const validateFn = () => sealedFormSchema.validate(partialForm);
       await expect(validateFn()).rejects.toThrow(
@@ -364,9 +399,16 @@ describe("sealedFormSchema", () => {
         orgId: "IT13029381004",
         vatNumber: "IT13029381004"
       });
-      const partialForm: Partial<Form & BsddTransporter> = {
+      const partialForm: Partial<Form> & {
+        transporters: Partial<BsddTransporter>[];
+      } = {
         ...sealedForm,
-        transporterCompanyVatNumber: company.vatNumber
+        transporters: [
+          {
+            ...sealedForm.transporters[0],
+            transporterCompanyVatNumber: company.vatNumber
+          }
+        ]
       };
       const validateFn = () => sealedFormSchema.validate(partialForm);
       await expect(validateFn()).rejects.toThrow(
@@ -559,10 +601,16 @@ describe("sealedFormSchema", () => {
     });
 
     it("when the transporterCompanyVatNumber is invalid", async () => {
-      const partialForm: Partial<Form & BsddTransporter> = {
+      const partialForm: Partial<Form> & {
+        transporters: Partial<BsddTransporter>[];
+      } = {
         ...sealedForm,
-        transporterCompanySiret: null,
-        transporterCompanyVatNumber: "invalid"
+        transporters: [
+          {
+            ...sealedForm.transporters[0],
+            transporterCompanyVatNumber: "invalid"
+          }
+        ]
       };
       const validateFn = () => sealedFormSchema.validate(partialForm);
 
@@ -572,10 +620,17 @@ describe("sealedFormSchema", () => {
     });
 
     it("when the transporterCompanyVatNumber is FR", async () => {
-      const partialForm: Partial<Form & BsddTransporter> = {
+      const partialForm: Partial<Form> & {
+        transporters: Partial<BsddTransporter>[];
+      } = {
         ...sealedForm,
-        transporterCompanySiret: null,
-        transporterCompanyVatNumber: "FR35552049447"
+        transporters: [
+          {
+            ...sealedForm.transporters[0],
+            transporterCompanySiret: null,
+            transporterCompanyVatNumber: "FR35552049447"
+          }
+        ]
       };
       const validateFn = () => sealedFormSchema.validate(partialForm);
 
@@ -613,10 +668,17 @@ describe("sealedFormSchema", () => {
 
   describe("Emitter transports own waste", () => {
     it("allowed if exemption", async () => {
-      const partialForm: Partial<Form & BsddTransporter> = {
+      const partialForm: Partial<Form> & {
+        transporters: Partial<BsddTransporter>[];
+      } = {
         ...sealedForm,
-        transporterCompanySiret: sealedForm.emitterCompanySiret,
-        transporterIsExemptedOfReceipt: true
+        transporters: [
+          {
+            ...sealedForm.transporters[0],
+            transporterCompanySiret: sealedForm.emitterCompanySiret,
+            transporterIsExemptedOfReceipt: true
+          }
+        ]
       };
 
       expect.assertions(1);
@@ -627,10 +689,17 @@ describe("sealedFormSchema", () => {
     });
 
     it("NOT allowed if no exemption", async () => {
-      const partialForm: Partial<Form & BsddTransporter> = {
+      const partialForm: Partial<Form> & {
+        transporters: Partial<BsddTransporter>[];
+      } = {
         ...sealedForm,
-        transporterCompanySiret: sealedForm.emitterCompanySiret,
-        transporterIsExemptedOfReceipt: false
+        transporters: [
+          {
+            ...sealedForm.transporters[0],
+            transporterCompanySiret: sealedForm.emitterCompanySiret,
+            transporterIsExemptedOfReceipt: false
+          }
+        ]
       };
 
       expect.assertions(1);
@@ -643,7 +712,9 @@ describe("sealedFormSchema", () => {
 });
 
 describe("beforeTransportSchema", () => {
-  let beforeTransportForm: Partial<Form & BsddTransporter>;
+  let beforeTransportForm: Partial<Form> & {
+    transporters: Partial<BsddTransporter>[];
+  };
 
   afterAll(resetDatabase);
   beforeAll(async () => {
@@ -659,34 +730,35 @@ describe("beforeTransportSchema", () => {
     beforeTransportForm = {
       ...formData,
       emitterCompanySiret: emitterCompany.siret,
-      transporterCompanySiret: transporterCompany.siret,
-      recipientCompanySiret: destinationCompany.siret
+      recipientCompanySiret: destinationCompany.siret,
+      transporters: [
+        {
+          ...transporterData,
+          transporterCompanySiret: transporterCompany.siret
+        }
+      ]
     };
   });
 
   it("should not be valid when there is no receipt exemption and no receipt", async () => {
     const testForm = {
       ...beforeTransportForm,
-      transporterIsExemptedOfReceipt: false,
-      transporterReceipt: null
+      transporters: [
+        {
+          ...beforeTransportForm.transporters[0],
+          transporterIsExemptedOfReceipt: false,
+          transporterReceipt: null
+        }
+      ]
     };
 
-    const validateFn = () => beforeTransportSchema.validate(testForm);
+    const validateFn = () =>
+      beforeTransportSchemaFn({
+        signingTransporterOrgId:
+          testForm.transporters[0].transporterCompanySiret
+      }).validate(testForm);
 
     await expect(validateFn()).rejects.toThrow(REQUIRED_RECEIPT_NUMBER);
-  });
-
-  it("should not be valid when there is nor transporterCompanySiret nor transporterCompanyVatNumber", async () => {
-    const testForm: Partial<Form & BsddTransporter> = {
-      ...beforeTransportForm,
-      transporterCompanySiret: null,
-      transporterCompanyVatNumber: null
-    };
-    const validateFn = () => beforeTransportSchema.validate(testForm);
-
-    await expect(validateFn()).rejects.toThrow(
-      "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
-    );
   });
 
   it("transporter SIRET is optional when a valid foreign vatNumber is present", async () => {
@@ -694,12 +766,23 @@ describe("beforeTransportSchema", () => {
       vatNumber: "BE0541696005"
     });
 
-    const testForm: Partial<Form & BsddTransporter> = {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
       ...beforeTransportForm,
-      transporterCompanySiret: null,
-      transporterCompanyVatNumber: transporterCompany.vatNumber
+      transporters: [
+        {
+          ...beforeTransportForm.transporters[0],
+          transporterCompanySiret: null,
+          transporterCompanyVatNumber: null
+        }
+      ]
     };
-    expect(await beforeTransportSchema.isValid(testForm)).toEqual(true);
+    expect(
+      await beforeTransportSchemaFn({
+        signingTransporterOrgId: transporterCompany.vatNumber
+      }).isValid(testForm)
+    ).toEqual(true);
   });
 
   it("transporter vatNumber is optional when a valid SIRET is present", async () => {
@@ -707,21 +790,42 @@ describe("beforeTransportSchema", () => {
       companyTypes: ["TRANSPORTER"]
     });
 
-    const testForm: Partial<Form & BsddTransporter> = {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
       ...beforeTransportForm,
-      transporterCompanySiret: transporterCompany.siret,
-      transporterCompanyVatNumber: null
+      transporters: [
+        {
+          ...beforeTransportForm.transporters[0],
+          transporterCompanySiret: transporterCompany.siret,
+          transporterCompanyVatNumber: null
+        }
+      ]
     };
-    expect(await beforeTransportSchema.isValid(testForm)).toEqual(true);
+    expect(
+      await beforeTransportSchemaFn({
+        signingTransporterOrgId: transporterCompany.siret
+      }).isValid(testForm)
+    ).toEqual(true);
   });
 
   it("transporter SIRET is required with a french vatNumber", async () => {
-    const testForm: Partial<Form & BsddTransporter> = {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
       ...beforeTransportForm,
-      transporterCompanySiret: null,
-      transporterCompanyVatNumber: "FR87850019464"
+      transporters: [
+        {
+          ...beforeTransportForm.transporters[0],
+          transporterCompanySiret: null,
+          transporterCompanyVatNumber: "FR87850019464"
+        }
+      ]
     };
-    const validateFn = () => beforeTransportSchema.validate(testForm);
+    const validateFn = () =>
+      beforeTransportSchemaFn({
+        signingTransporterOrgId: "FR87850019464"
+      }).validate(testForm);
 
     await expect(validateFn()).rejects.toThrow(
       "Transporteur : Impossible d'utiliser le numéro de TVA pour un établissement français, veuillez renseigner son SIRET uniquement"
@@ -729,39 +833,46 @@ describe("beforeTransportSchema", () => {
   });
 
   it("transporter vatNumber should be valid", async () => {
-    const testForm: Partial<Form & BsddTransporter> = {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
       ...beforeTransportForm,
-      transporterCompanySiret: null,
-      transporterCompanyVatNumber: "invalid"
+      transporters: [
+        {
+          ...beforeTransportForm.transporters[0],
+          transporterCompanySiret: null,
+          transporterCompanyVatNumber: "invalid"
+        }
+      ]
     };
 
-    const validateFn = () => beforeTransportSchema.validate(testForm);
+    const validateFn = () =>
+      beforeTransportSchemaFn({ signingTransporterOrgId: "invalid" }).validate(
+        testForm
+      );
 
     await expect(validateFn()).rejects.toThrow(
       "Transporteur: invalid n'est pas un numéro de TVA valide"
     );
   });
 
-  it("transporter SIRET or VAT number is required", async () => {
-    const testForm: Partial<Form & BsddTransporter> = {
-      ...beforeTransportForm,
-      transporterCompanySiret: null,
-      transporterCompanyVatNumber: null
-    };
-    const validateFn = () => beforeTransportSchema.validate(testForm);
-
-    await expect(validateFn()).rejects.toThrow(
-      "Transporteur : Le n°SIRET ou le numéro de TVA intracommunautaire est obligatoire"
-    );
-  });
-
   it("transporter plate is required if transporter mode is ROAD", async () => {
-    const testForm: Partial<Form & BsddTransporter> = {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
       ...beforeTransportForm,
-      transporterTransportMode: "ROAD",
-      transporterNumberPlate: undefined
+      transporters: [
+        {
+          ...transporterData,
+          transporterTransportMode: "ROAD",
+          transporterNumberPlate: undefined
+        }
+      ]
     };
-    const validateFn = () => beforeTransportSchema.validate(testForm);
+    const validateFn = () =>
+      beforeTransportSchemaFn({
+        signingTransporterOrgId: transporterData.transporterCompanySiret
+      }).validate(testForm);
 
     await expect(validateFn()).rejects.toThrow(
       "La plaque d'immatriculation est requise"
@@ -769,12 +880,22 @@ describe("beforeTransportSchema", () => {
   });
 
   it("transporter plate is required if transporter mode is ROAD - empty string", async () => {
-    const testForm: Partial<Form & BsddTransporter> = {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
       ...beforeTransportForm,
-      transporterTransportMode: "ROAD",
-      transporterNumberPlate: ""
+      transporters: [
+        {
+          ...transporterData,
+          transporterTransportMode: "ROAD",
+          transporterNumberPlate: ""
+        }
+      ]
     };
-    const validateFn = () => beforeTransportSchema.validate(testForm);
+    const validateFn = () =>
+      beforeTransportSchemaFn({
+        signingTransporterOrgId: transporterData.transporterCompanySiret
+      }).validate(testForm);
 
     await expect(validateFn()).rejects.toThrow(
       "La plaque d'immatriculation est requise"
@@ -782,23 +903,41 @@ describe("beforeTransportSchema", () => {
   });
 
   it("transporter plate is not required if transport mode is not ROAD", async () => {
-    const testForm: Partial<Form & BsddTransporter> = {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
       ...beforeTransportForm,
-      transporterTransportMode: "AIR",
-      transporterNumberPlate: undefined
+      transporters: [
+        {
+          ...transporterData,
+          transporterTransportMode: "AIR",
+          transporterNumberPlate: ""
+        }
+      ]
     };
-    const isValid = beforeTransportSchema.isValid(testForm);
+    const isValid = beforeTransportSchemaFn({
+      signingTransporterOrgId: transporterData.transporterCompanySiret
+    }).isValid(testForm);
 
     expect(isValid).toBeTruthy();
   });
 
   it("should work if transport mode is ROAD & plates are defined", async () => {
-    const testForm: Partial<Form & BsddTransporter> = {
+    const testForm: Partial<Form> & {
+      transporters: Partial<BsddTransporter>[];
+    } = {
       ...beforeTransportForm,
-      transporterTransportMode: "ROAD",
-      transporterNumberPlate: "TRANSPORTER-PLATES"
+      transporters: [
+        {
+          ...transporterData,
+          transporterTransportMode: "ROAD",
+          transporterNumberPlate: "TRANSPORTER-PLATES"
+        }
+      ]
     };
-    const isValid = beforeTransportSchema.isValid(testForm);
+    const isValid = beforeTransportSchemaFn({
+      signingTransporterOrgId: transporterData.transporterCompanySiret
+    }).isValid(testForm);
 
     expect(isValid).toBeTruthy();
   });
@@ -1196,14 +1335,17 @@ describe("draftFormSchema", () => {
   });
 
   it("packaging PIPELINE cannot be set with a transporter", async () => {
-    const isValid = await draftFormSchema.isValid({
-      wasteDetailsPackagingInfos: [
-        { type: "PIPELINE", numero: null, weight: null, volume: null }
-      ],
-      transporterCompanySiret: siretify(1)
-    });
+    const validateFn = () =>
+      draftFormSchema.validate({
+        wasteDetailsPackagingInfos: [
+          { type: "PIPELINE", numero: null, weight: null, volume: null }
+        ],
+        transporters: [{ transporterCompanySiret: siretify(1) }]
+      });
 
-    expect(isValid).toEqual(false);
+    await expect(validateFn()).rejects.toThrow(
+      "Vous ne devez pas spécifier de transporteur dans le cas d'un transport par pipeline"
+    );
   });
 });
 
@@ -1410,9 +1552,9 @@ describe("processedInfoSchema", () => {
       transporterIsExemptedOfReceipt: true
     };
     const validateFn = () =>
-      transporterSchemaFn({ transporterSignature: false }).validate(
-        transporter
-      );
+      transporterSchemaFn({
+        signingTransporterOrgId: transporter.transporterCompanySiret
+      }).validate(transporter);
 
     await expect(validateFn()).resolves.toMatchObject({
       transporterCompanyAddress: "paris",
@@ -1440,9 +1582,9 @@ describe("processedInfoSchema", () => {
       transporterIsExemptedOfReceipt: true
     };
     const validateFn = () =>
-      transporterSchemaFn({ transporterSignature: false }).validate(
-        transporter
-      );
+      transporterSchemaFn({
+        signingTransporterOrgId: transporter.transporterCompanySiret
+      }).validate(transporter);
 
     await expect(validateFn()).resolves.toMatchObject({
       transporterCompanyAddress: "paris",

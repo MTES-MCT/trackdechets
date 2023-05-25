@@ -40,6 +40,12 @@ export class FormNotFound extends UserInputError {
   }
 }
 
+export class FormTransporterNotFound extends UserInputError {
+  constructor(id: string) {
+    super(`Le transporteur avec l'identifiant "${id}" n'existe pas.`);
+  }
+}
+
 export class MissingIdOrReadableId extends UserInputError {
   constructor() {
     super(

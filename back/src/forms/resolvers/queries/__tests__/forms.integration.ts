@@ -6,7 +6,7 @@ import {
   companyFactory,
   formFactory,
   siretify,
-  transportSegmentFactory,
+  bsddTransporterFactory,
   userFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -879,9 +879,9 @@ describe("Integration / Forms query for transporters", () => {
       }
     });
     // our transporter is on one segment
-    await transportSegmentFactory({
+    await bsddTransporterFactory({
       formId: form.id,
-      segmentPayload: {
+      opts: {
         transporterCompanySiret: transporter.siret
       }
     });

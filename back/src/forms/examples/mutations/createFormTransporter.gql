@@ -1,0 +1,5 @@
+mutation CreateFormTransporter($input: TransporterInput!) {
+  createFormTransporter(input: $input) {
+    id
+  }
+}

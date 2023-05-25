@@ -702,8 +702,8 @@ model BsddTransporter {
   takenOverBy                     String?
   createdAt                       DateTime       @default(now()) @db.Timestamptz(6)
   updatedAt                       DateTime       @updatedAt @db.Timestamptz(6)
-  formId                          String
-  form                            Form           @relation(fields: [formId], references: [id], onDelete: Cascade)
+  formId                          String?
+  form                            Form?          @relation(fields: [formId], references: [id], onDelete: Cascade)
 
   @@index([formId], map: "_BsddTransporterFormIdIdx")
   @@index([transporterCompanySiret], map: "_BsddTransporterCompanySiretIdx")

@@ -211,6 +211,22 @@ export const getDestinationCompanyInfo = async () => {
   };
 };
 
+const bsddTransporterData: Omit<Prisma.BsddTransporterCreateInput, "number"> = {
+  transporterCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
+  transporterCompanyContact: "transporter",
+  transporterCompanyMail: "transporter@td.io",
+  transporterCompanyName: "WASTE TRANSPORTER",
+  transporterCompanyPhone: "06 18 76 02 66",
+  transporterCompanySiret: siretify(1),
+  transporterDepartment: "86",
+  transporterIsExemptedOfReceipt: false,
+  transporterTransportMode: TransportMode.ROAD,
+  transporterNumberPlate: "aa22",
+  transporterReceipt: "33AA",
+  transporterValidityLimit: "2019-11-27T00:00:00.000Z",
+  readyToTakeOver: true
+};
+
 const formdata: Partial<Prisma.FormCreateInput> = {
   brokerCompanyAddress: "",
   brokerCompanyContact: "",
@@ -269,21 +285,7 @@ const formdata: Partial<Prisma.FormCreateInput> = {
   traderReceipt: "",
   traderValidityLimit: null,
   transporters: {
-    create: {
-      number: 1,
-      transporterCompanyAddress: "16 rue Jean Jaurès 92400 Courbevoie",
-      transporterCompanyContact: "transporter",
-      transporterCompanyMail: "transporter@td.io",
-      transporterCompanyName: "WASTE TRANSPORTER",
-      transporterCompanyPhone: "06 18 76 02 66",
-      transporterCompanySiret: siretify(1),
-      transporterDepartment: "86",
-      transporterIsExemptedOfReceipt: false,
-      transporterTransportMode: TransportMode.ROAD,
-      transporterNumberPlate: "aa22",
-      transporterReceipt: "33AA",
-      transporterValidityLimit: "2019-11-27T00:00:00.000Z"
-    }
+    create: { ...bsddTransporterData, number: 1 }
   },
   wasteAcceptationStatus: null,
   wasteDetailsCode: "05 01 04*",
@@ -323,39 +325,27 @@ export const forwardedInData: Partial<Prisma.FormCreateInput> = {
   wasteDetailsConsistence: "SOLID" as Consistence,
   wasteDetailsQuantityType: "ESTIMATED",
   transporters: {
-    create: {
-      number: 1,
-      transporterCompanyName: "Transporteur",
-      transporterCompanySiret: siretify(4),
-      transporterCompanyAddress: "6 chemin des pneus, 07100 Bourg d'ici",
-      transporterCompanyContact: "Mathieu O'connor",
-      transporterCompanyPhone: "0700000000",
-      transporterCompanyMail: "mathieu@transporteur.org",
-      transporterIsExemptedOfReceipt: false,
-      transporterReceipt: "xxxxxx",
-      transporterDepartment: "07",
-      transporterValidityLimit: "2019-11-27T00:00:00.000Z",
-      transporterNumberPlate: "AD-007-XX"
-    }
+    create: { ...bsddTransporterData, number: 1 }
   },
 
   signedByTransporter: true,
   signedBy: "Mathieu O'connor"
 };
 
-export const transportSegmentFactory = async ({
+export const bsddTransporterFactory = async ({
   formId,
-  segmentPayload
+  opts
 }: {
   formId: string;
-  segmentPayload: Omit<Prisma.BsddTransporterCreateWithoutFormInput, "number">;
+  opts: Omit<Prisma.BsddTransporterCreateWithoutFormInput, "number">;
 }) => {
   const count = await prisma.bsddTransporter.count({ where: { formId } });
   return prisma.bsddTransporter.create({
     data: {
       form: { connect: { id: formId } },
+      ...bsddTransporterData,
       number: count + 1,
-      ...segmentPayload
+      ...opts
     }
   });
 };

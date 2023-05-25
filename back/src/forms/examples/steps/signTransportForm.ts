@@ -6,10 +6,9 @@ export function signTransportForm(company: string): WorkflowStep {
   return {
     description: `Le transporteur signe l'enlèvement.`,
     mutation: mutations.signTransportForm,
-    variables: ({ bsd, producteur }) => ({
+    variables: ({ bsd }) => ({
       id: bsd.id,
-      input: fixtures.signTransportFormInput(),
-      securityCode: producteur.securityCode
+      input: fixtures.signTransportFormInput()
     }),
     expected: { status: "SENT" },
     data: response => response.signTransportForm,

@@ -1,9 +1,9 @@
 import { MutationResolvers } from "../../../generated/graphql/types";
 import { checkIsAuthenticated } from "../../../common/permissions";
-import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
+import { getFormOrFormNotFound, getTransporters } from "../../database";
 import transitionForm from "../../workflow/transitionForm";
 import { checkCanMarkAsReceived } from "../../permissions";
-import { receivedInfoSchema } from "../../validation";
+import { Transporter, receivedInfoSchema } from "../../validation";
 import { EventType } from "../../workflow/types";
 import { expandFormFromDb } from "../../converter";
 import { TemporaryStorageCannotReceive } from "../../errors";
@@ -31,9 +31,7 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
 
   await checkCanMarkAsReceived(user, form);
 
-  const transporter = await getFirstTransporter(form);
-
-  let transporterTransportMode = transporter?.transporterTransportMode;
+  let transporters: Transporter[] = [];
 
   if (form.recipientIsTempStorage === true) {
     // this form can be mark as received only if it has been
@@ -44,15 +42,14 @@ const markAsReceivedResolver: MutationResolvers["markAsReceived"] = async (
     if (!forwardedIn?.emittedAt) {
       throw new TemporaryStorageCannotReceive();
     }
-
-    const forwardedInTransporter = await getFirstTransporter(forwardedIn);
-
-    transporterTransportMode = forwardedInTransporter?.transporterTransportMode;
+    transporters = await getTransporters(forwardedIn);
+  } else {
+    transporters = await getTransporters(form);
   }
 
   await receivedInfoSchema.validate({
     ...receivedInfo,
-    transporterTransportMode
+    transporters
   });
 
   const formUpdateInput: Prisma.FormUpdateInput = form.forwardedInId

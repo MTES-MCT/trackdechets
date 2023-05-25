@@ -33,8 +33,14 @@ type Form {
   "Installation de destination ou d’entreposage ou de reconditionnement prévue (case 2)"
   recipient: Recipient
 
-  "Transporteur du déchet (case 8)"
+  "Premier transporteur du déchet (case 8)"
   transporter: Transporter
+
+  """
+  Liste des transporteurs du déchet. Contient 1 seul transporteur en cas d'achemniment direct.
+  Peut contenir un maximum de 5 transporteurs différents en cas de transport multi-modal
+  """
+  transporters: [Transporter!]!
 
   "Détails du déchet (case 3)"
   wasteDetails: WasteDetails
@@ -136,6 +142,9 @@ type Form {
   stateSummary: StateSummary
 
   transportSegments: [TransportSegment!]
+    @deprecated(
+      reason: "Utiliser `Form.transporters` qui permet de lister le premier transporteur et les suivants"
+    )
 
   currentTransporterSiret: String
   nextTransporterSiret: String
@@ -376,6 +385,9 @@ type Recipient {
 
 "Collecteur - transporteur (case 8)"
 type Transporter {
+  "Identifiant du transporteur"
+  id: ID!
+
   "Établissement collecteur - transporteur"
   company: FormCompany
 

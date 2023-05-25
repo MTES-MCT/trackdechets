@@ -2,10 +2,10 @@ import {
   userWithCompanyFactory,
   formFactory,
   userFactory,
-  transportSegmentFactory,
   siretify,
   transporterReceiptFactory,
-  companyFactory
+  companyFactory,
+  bsddTransporterFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { resetDatabase } from "../../../../../integration-tests/helper";
@@ -300,9 +300,9 @@ describe("{ mutation { prepareSegment } }", () => {
       ownerId: owner.id
     });
     const transporterCompanySiret = siretify(3);
-    await transportSegmentFactory({
+    await bsddTransporterFactory({
       formId: otherForm.id,
-      segmentPayload: { transporterCompanySiret }
+      opts: { transporterCompanySiret }
     });
 
     const transporterOrgId = company.orgId;

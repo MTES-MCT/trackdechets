@@ -6,10 +6,9 @@ export function signEmissionForm(company: string): WorkflowStep {
   return {
     description: `Le producteur signe l'enlèvement.`,
     mutation: mutations.signEmissionForm,
-    variables: ({ bsd, producteur }) => ({
+    variables: ({ bsd }) => ({
       id: bsd.id,
-      input: fixtures.signEmissionFormInput(),
-      securityCode: producteur.securityCode
+      input: fixtures.signEmissionFormInput()
     }),
     expected: { status: "SIGNED_BY_PRODUCER" },
     data: response => response.signEmissionForm,

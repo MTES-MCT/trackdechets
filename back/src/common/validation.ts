@@ -60,7 +60,19 @@ export const weight = (unit = WeightUnits.Kilogramme) =>
 type WeightConditions = {
   wasteAcceptationStatus: ConditionBuilder<yup.NumberSchema>;
   transportMode: (unit: WeightUnits) => ConditionConfig<yup.NumberSchema>;
+  // Same condition as `transportMode` except that is take
+  // into account all transporters (including multi-modal)
+  transporters: (unit: WeightUnits) => ConditionConfig<yup.NumberSchema>;
 };
+
+const maxWeightByRoad = (unit: WeightUnits) =>
+  unit == WeightUnits.Kilogramme
+    ? MAX_WEIGHT_BY_ROAD_TONNES * 1000
+    : MAX_WEIGHT_BY_ROAD_TONNES;
+
+const maxWeightByRoadErrorMessage =
+  `\${path} : le poids doit être inférieur à ${MAX_WEIGHT_BY_ROAD_TONNES}` +
+  ` tonnes lorsque le transport se fait par la route`;
 
 export const weightConditions: WeightConditions = {
   wasteAcceptationStatus: (status, weight) => {
@@ -91,13 +103,25 @@ export const weightConditions: WeightConditions = {
       );
     },
     then: weight =>
-      weight.max(
-        unit == WeightUnits.Kilogramme
-          ? MAX_WEIGHT_BY_ROAD_TONNES * 1000
-          : MAX_WEIGHT_BY_ROAD_TONNES,
-        `\${path} : le poids doit être inférieur à ${MAX_WEIGHT_BY_ROAD_TONNES}` +
-          ` tonnes lorsque le transport se fait par la route`
-      )
+      weight.max(maxWeightByRoad(unit), maxWeightByRoadErrorMessage)
+  }),
+  // Same condition as `transportMode` except that is take into account all
+  // transporters (including multi-modal)
+  transporters: unit => ({
+    is: (
+      transporters: { transporterTransportMode: TransportMode }[],
+      createdAt?: Date
+    ) => {
+      return (
+        transporters &&
+        transporters.some(
+          t => t.transporterTransportMode === TransportMode.ROAD
+        ) &&
+        (!createdAt || createdAt > MAX_WEIGHT_BY_ROAD_VALIDATE_AFTER)
+      );
+    },
+    then: weight =>
+      weight.max(maxWeightByRoad(unit), maxWeightByRoadErrorMessage)
   })
 };
 

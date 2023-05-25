@@ -24,6 +24,9 @@ import importPaperForm from "./mutations/importPaperForm";
 import createFormRevisionRequest from "./mutations/createFormRevisionRequest";
 import submitFormRevisionRequestApproval from "./mutations/submitFormRevisionRequestApproval";
 import cancelFormRevisionRequest from "./mutations/cancelFormRevisionRequest";
+import createFormTransporter from "./mutations/createFormTransporter";
+import updateFormTransporter from "./mutations/updateFormTransporter";
+import deleteFormTransporter from "./mutations/deleteFormTransporter";
 
 const Mutation: MutationResolvers = {
   createForm,
@@ -50,7 +53,10 @@ const Mutation: MutationResolvers = {
   takeOverSegment,
   createFormRevisionRequest: createFormRevisionRequest as any, // TODO better typing ?
   cancelFormRevisionRequest,
-  submitFormRevisionRequestApproval: submitFormRevisionRequestApproval as any
+  submitFormRevisionRequestApproval: submitFormRevisionRequestApproval as any,
+  createFormTransporter,
+  updateFormTransporter,
+  deleteFormTransporter
 };
 
 export default Mutation;
