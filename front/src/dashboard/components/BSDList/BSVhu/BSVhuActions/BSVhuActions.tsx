@@ -1,5 +1,10 @@
 import * as React from "react";
-import { generatePath, useParams, useLocation } from "react-router-dom";
+import {
+  generatePath,
+  useParams,
+  useLocation,
+  useRouteMatch,
+} from "react-router-dom";
 
 import routes from "common/routes";
 import {
@@ -42,11 +47,14 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
     status === BsvhuStatus.Initial ||
     (status === BsvhuStatus.SignedByProducer && siret === emitterSiret);
 
+  const isV2Routes = !!useRouteMatch("/v2/dashboard/");
+  const dashboardRoutePrefix = !isV2Routes ? "dashboard" : "dashboardv2";
+
   const links = [
     {
       title: "Contrôle routier",
       route: {
-        pathname: generatePath(routes.dashboard.roadControl, {
+        pathname: generatePath(routes[dashboardRoutePrefix].roadControl, {
           siret,
           id: form.id,
         }),
@@ -58,7 +66,7 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
     {
       title: "Aperçu",
       route: {
-        pathname: generatePath(routes.dashboard.bsvhus.view, {
+        pathname: generatePath(routes[dashboardRoutePrefix].bsvhus.view, {
           siret,
           id: form.id,
         }),
@@ -85,7 +93,7 @@ export const BSVhuActions = ({ form }: BSVhuActionsProps) => {
     },
     {
       title: "Modifier",
-      route: generatePath(routes.dashboard.bsvhus.edit, {
+      route: generatePath(routes[dashboardRoutePrefix].bsvhus.edit, {
         siret,
         id: form.id,
       }),

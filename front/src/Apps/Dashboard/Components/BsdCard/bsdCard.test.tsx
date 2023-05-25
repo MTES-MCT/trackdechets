@@ -399,6 +399,7 @@ describe("Bsd card primary action label", () => {
             onValidate={onValidate}
             onUpdate={functionMock}
             onOverview={functionMock}
+            bsdCurrentTab="actTab"
           />
         </MockedProvider>
       );
@@ -461,7 +462,7 @@ describe("Bsd card primary action label", () => {
           <BsdCard
             currentSiret={siretEmmiter}
             bsd={bsff}
-            bsdCurrentTab={bsdCurrentTab}
+            bsdCurrentTab="actTab"
             onValidate={onValidate}
             onUpdate={functionMock}
             onOverview={functionMock}
@@ -574,6 +575,7 @@ describe("Bsd card primary action label", () => {
             onValidate={functionMock}
             onUpdate={functionMock}
             onOverview={functionMock}
+            bsdCurrentTab="actTab"
           />
         </MockedProvider>
       );
