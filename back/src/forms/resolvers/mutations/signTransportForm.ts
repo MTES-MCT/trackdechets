@@ -108,6 +108,12 @@ const signTransportFn = async (
         form => form.wasteDetailsPackagingInfos as PackagingInfo[]
       );
 
+      // TODO multi-modal
+      // Déterminer quel transporteur est en train de signer pour mettre à jour le bon champ `transporter2`, `transporter3`, etc
+      // Si le bordereau a été signé à l'étape N, le bordereau apparait dans `A collecter` de tous les transporteurs N+1
+      // Le bordereau peut être signé par le transporteur N+2 même si le transporteur N+1 n'a pas signé (on garde le transporteur N+1 à titre indicatif)
+      // Lorsque le transporteur N signe, on ne peut plus modifier ses infos, ni le supprimer, ni le permuter
+      // Si le transporteur N+2 a signé avant le transporteur N+1, le transporteur N+1 ne peut plus signer
       await update(
         { id: appendix1ContainerId },
         {

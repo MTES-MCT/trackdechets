@@ -1836,6 +1836,60 @@ describe("Mutation.createForm", () => {
     ]);
   });
 
+  it("should set multi-modal transporters 2 to 5", async () => {
+    const { user, company } = await userWithCompanyFactory("MEMBER");
+    const transporter = await companyFactory();
+    const transporter2 = await companyFactory();
+    const transporter3 = await companyFactory();
+    const transporter4 = await companyFactory();
+    const transporter5 = await companyFactory();
+    const { mutate } = makeClient(user);
+    const { errors, data } = await mutate<
+      Pick<Mutation, "createForm">,
+      MutationCreateFormArgs
+    >(CREATE_FORM, {
+      variables: {
+        createFormInput: {
+          wasteDetails: { quantity: 50 },
+          emitter: {
+            company: { siret: company.siret }
+          },
+          transporter: { company: { siret: transporter.siret } },
+          transporter2: { company: { siret: transporter2.siret } },
+          transporter3: { company: { siret: transporter3.siret } },
+          transporter4: { company: { siret: transporter4.siret } },
+          transporter5: { company: { siret: transporter5.siret } }
+        }
+      }
+    });
+    expect(errors).toBeUndefined();
+    const form = await prisma.form.findUniqueOrThrow({
+      where: { id: data.createForm.id },
+      include: {
+        transporter2: true,
+        transporter3: true,
+        transporter4: true,
+        transporter5: true
+      }
+    });
+    expect(form.transporter2?.transporterCompanySiret).toEqual(
+      transporter2.siret
+    );
+    expect(form.transporter3?.transporterCompanySiret).toEqual(
+      transporter3.siret
+    );
+    expect(form.transporter4?.transporterCompanySiret).toEqual(
+      transporter4.siret
+    );
+    expect(form.transporter5?.transporterCompanySiret).toEqual(
+      transporter5.siret
+    );
+  });
+
+  it.skip("it should not be possible to set transporter 2 if transporter 1 is not defined", () => {});
+
+  it.skip("it should not be possible to set transporter N+1 if transporter N is not defined", () => {});
+
   describe("Annexe 1", () => {
     it("should create an APPENDIX1_PRODUCER form", async () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");

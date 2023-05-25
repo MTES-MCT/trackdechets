@@ -110,7 +110,6 @@ export const editionRules: {
   transporterNumberPlate: "TRANSPORT",
   transporterCustomInfo: "TRANSPORT",
   transporterTransportMode: "TRANSPORT",
-  transporter1: "TRANSPORT",
   transporter2: "TRANSPORT",
   transporter3: "TRANSPORT",
   transporter4: "TRANSPORT",

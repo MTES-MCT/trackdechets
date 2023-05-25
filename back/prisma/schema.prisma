@@ -312,8 +312,6 @@ model Form {
   recipientCompanyContact            String?
   recipientCompanyPhone              String?
   recipientCompanyMail               String?
-  transporter1                       BsddTransporter?        @relation("transporter1", fields: [transporter1Id], references: [id])
-  transporter1Id                     String?                 @unique
   transporter2                       BsddTransporter?        @relation("transporter2", fields: [transporter2Id], references: [id])
   transporter2Id                     String?                 @unique
   transporter3                       BsddTransporter?        @relation("transporter3", fields: [transporter3Id], references: [id])
@@ -709,6 +707,7 @@ model BsddTransporter {
   transporterValidityLimit        DateTime?      @db.Timestamptz(6)
   transporterNumberPlate          String?
   transporterTransportMode        TransportMode?
+  transporterCustomInfo           String?
   readyToTakeOver                 Boolean?       @default(false)
   previousTransporterCompanyOrgId String?
   takenOverAt                     DateTime?      @db.Timestamptz(6)
@@ -718,7 +717,6 @@ model BsddTransporter {
   formId                          String
   form                            Form           @relation("transportSegments", fields: [formId], references: [id])
 
-  transporter1OnForm Form? @relation("transporter1")
   transporter2OnForm Form? @relation("transporter2")
   transporter3OnForm Form? @relation("transporter3")
   transporter4OnForm Form? @relation("transporter4")

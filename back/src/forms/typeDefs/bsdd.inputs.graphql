@@ -194,6 +194,18 @@ input CreateFormInput {
   "Transporteur du déchet (case 8)"
   transporter: TransporterInput
 
+  "Transporteur n°2 - en cas de transport multi-modal"
+  transporter2: TransporterInput
+
+  "Transporteur n°3 - en cas de transport multi-modal"
+  transporter3: TransporterInput
+
+  "Transporteur n°4 - en cas de transport multi-modal"
+  transporter4: TransporterInput
+
+  "Transporteur n°5 - en cas de transport multi-modal"
+  transporter5: TransporterInput
+
   "Détails du déchet (case 3 à 6)"
   wasteDetails: WasteDetailsInput
 
@@ -255,6 +267,18 @@ input UpdateFormInput {
   "Transporteur du déchet (case 8)"
   transporter: TransporterInput
 
+  "Transporteur n°2 - en cas de transport multi-modal"
+  transporter2: TransporterInput
+
+  "Transporteur n°3 - en cas de transport multi-modal"
+  transporter3: TransporterInput
+
+  "Transporteur n°4 - en cas de transport multi-modal"
+  transporter4: TransporterInput
+
+  "Transporteur n°5 - en cas de transport multi-modal"
+  transporter5: TransporterInput
+
   "Détails du déchet (case 3 à 6)"
   wasteDetails: WasteDetailsInput
 
@@ -308,6 +332,18 @@ input FormInput {
 
   "Transporteur du déchet (case 8)"
   transporter: TransporterInput
+
+  "Transporteur n°2 - en cas de transport multi-modal"
+  transporter2: TransporterInput
+
+  "Transporteur n°3 - en cas de transport multi-modal"
+  transporter3: TransporterInput
+
+  "Transporteur n°4 - en cas de transport multi-modal"
+  transporter4: TransporterInput
+
+  "Transporteur n°5 - en cas de transport multi-modal"
+  transporter5: TransporterInput
 
   "Détails du déchet (case 3 à 6)"
   wasteDetails: WasteDetailsInput

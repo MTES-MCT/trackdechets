@@ -1,7 +1,8 @@
-import { EmitterType, Prisma, TransportMode } from "@prisma/client";
+import { EmitterType, Form, Prisma, TransportMode } from "@prisma/client";
 import { isDangerous } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
+  CreateFormInput,
   MutationCreateFormArgs,
   ResolversParentTypes
 } from "../../../generated/graphql/types";
@@ -10,7 +11,8 @@ import { MissingTempStorageFlag } from "../../errors";
 import {
   expandFormFromDb,
   flattenFormInput,
-  flattenTemporaryStorageDetailInput
+  flattenTemporaryStorageDetailInput,
+  flattenTransporterInput
 } from "../../converter";
 import getReadableId from "../../readableId";
 import { getFormRepository } from "../../repository";
@@ -25,6 +27,7 @@ import { runInTransaction } from "../../../common/repository/helper";
 import { validateIntermediariesInput } from "../../../common/validation";
 import { sirenifyFormInput } from "../../sirenify";
 import { checkCanCreate } from "../../permissions";
+import { UpdateFormFn } from "../../repository/form/update";
 
 const createFormResolver = async (
   parent: ResolversParentTypes["Mutation"],
@@ -38,6 +41,10 @@ const createFormResolver = async (
     grouping,
     temporaryStorageDetail,
     intermediaries,
+    transporter2,
+    transporter3,
+    transporter4,
+    transporter5,
     ...formContent
   } = await sirenifyFormInput(createFormInput, user);
 
@@ -138,7 +145,7 @@ const createFormResolver = async (
     : null;
 
   const newForm = await runInTransaction(async transaction => {
-    const { create, setAppendix1, setAppendix2 } = getFormRepository(
+    const { create, setAppendix1, setAppendix2, update } = getFormRepository(
       user,
       transaction
     );
@@ -157,6 +164,19 @@ const createFormResolver = async (
           });
     }
 
+    if (transporter2 || transporter3 || transporter4 || transporter5) {
+      await setMultiModalTransporters(
+        newForm,
+        {
+          transporter2,
+          transporter3,
+          transporter4,
+          transporter5
+        },
+        update
+      );
+    }
+
     return newForm;
   });
 
@@ -164,3 +184,38 @@ const createFormResolver = async (
 };
 
 export default createFormResolver;
+
+/**
+ * To keep the compatibility with `transportSegments`, we need to explicitely
+ * set the `form` foreign key on the transporter objects. That's why multi modal
+ * transporters are not created as part of the create input but thanks to an extra
+ * call to prisma.form.update
+ */
+async function setMultiModalTransporters(
+  newForm: Form,
+  { transporter2, transporter3, transporter4, transporter5 }: CreateFormInput,
+  updateForm: UpdateFormFn
+) {
+  const formUpdateInput: Prisma.FormUpdateInput = {};
+
+  // TODO : we should throw an error here if there is no transporter N
+  // and we try to set transporter N+1
+
+  [transporter2, transporter3, transporter4, transporter5].forEach(
+    (transporterN, idx) => {
+      const N = idx + 2;
+      if (transporterN) {
+        formUpdateInput[`transporter${N}`] = {
+          create: {
+            ...flattenTransporterInput({ transporter: transporterN }),
+            form: { connect: { id: newForm.id } },
+            segmentNumber: N - 1,
+            readyToTakeOver: true
+          }
+        };
+      }
+    }
+  );
+
+  await updateForm({ id: newForm.id }, formUpdateInput);
+}

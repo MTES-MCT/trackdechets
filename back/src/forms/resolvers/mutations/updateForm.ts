@@ -1,9 +1,10 @@
-import { EmitterType, Prisma, TransportMode } from "@prisma/client";
+import { EmitterType, Form, Prisma, TransportMode } from "@prisma/client";
 import { isDangerous, BSDD_WASTE_CODES } from "../../../common/constants";
 import { checkIsAuthenticated } from "../../../common/permissions";
 import {
   MutationUpdateFormArgs,
-  ResolversParentTypes
+  ResolversParentTypes,
+  UpdateFormInput
 } from "../../../generated/graphql/types";
 import { InvalidWasteCode, MissingTempStorageFlag } from "../../errors";
 import { checkCanUpdate } from "../../permissions";
@@ -12,7 +13,8 @@ import { getFormOrFormNotFound } from "../../database";
 import {
   expandFormFromDb,
   flattenFormInput,
-  flattenTemporaryStorageDetailInput
+  flattenTemporaryStorageDetailInput,
+  flattenTransporterInput
 } from "../../converter";
 import { getFormRepository } from "../../repository";
 import {
@@ -52,6 +54,10 @@ const updateFormResolver = async (
     grouping,
     temporaryStorageDetail,
     intermediaries,
+    transporter2,
+    transporter3,
+    transporter4,
+    transporter5,
     ...formContent
   } = await sirenifyFormInput(updateFormInput, user);
 
@@ -98,7 +104,7 @@ const updateFormResolver = async (
   // So this is a 2 way constraint:
   // - casting remove keys in the input but unknown to the validator
   // - then we remove keys present in the casting result but not present in the input
-  const formUpdateInput: Prisma.FormUpdateInput = draftFormSchema.cast(form);
+  let formUpdateInput: Prisma.FormUpdateInput = draftFormSchema.cast(form);
   for (const key of Object.keys(formUpdateInput)) {
     if (!(key in form)) {
       delete formUpdateInput[key];
@@ -253,6 +259,20 @@ const updateFormResolver = async (
     ? await validateGroupement(futureForm as any, formFractionsInput!)
     : null;
 
+  if (
+    transporter2 !== undefined ||
+    transporter3 !== undefined ||
+    transporter4 !== undefined ||
+    transporter5 !== undefined
+  ) {
+    formUpdateInput = {
+      ...formUpdateInput,
+      ...(await getMultiModalTransportersUpdateInput(
+        existingForm,
+        updateFormInput
+      ))
+    };
+  }
   const updatedForm = await runInTransaction(async transaction => {
     const { update, setAppendix1, setAppendix2 } = getFormRepository(
       user,
@@ -279,3 +299,42 @@ const updateFormResolver = async (
 };
 
 export default updateFormResolver;
+
+async function getMultiModalTransportersUpdateInput(
+  form: Form,
+  { transporter2, transporter3, transporter4, transporter5 }: UpdateFormInput
+): Promise<Prisma.FormUpdateInput> {
+  const multiModalFormUpdateInput: Prisma.FormUpdateInput = {};
+
+  // TODO : we should throw an error here if there is no transporter N
+  // and we try to set transporter N+1
+
+  [transporter2, transporter3, transporter4, transporter5].forEach(
+    (transporterN, idx) => {
+      const N = idx + 2;
+
+      if (transporterN === null && form[`transporter${N}Id`]) {
+        multiModalFormUpdateInput[`transporter${N}`] = { delete: true };
+      }
+      if (transporterN && !form[`transporter${N}Id`]) {
+        multiModalFormUpdateInput[`transporter${N}`] = {
+          create: {
+            ...flattenTransporterInput({ transporter: transporterN }),
+            form: { connect: { id: form.id } },
+            segmentNumber: N - 1,
+            readyToTakeOver: true
+          }
+        };
+      }
+      if (transporterN && form[`transporter${N}Id`]) {
+        multiModalFormUpdateInput[`transporter${N}`] = {
+          update: {
+            ...flattenTransporterInput({ transporter: transporterN })
+          }
+        };
+      }
+    }
+  );
+
+  return multiModalFormUpdateInput;
+}

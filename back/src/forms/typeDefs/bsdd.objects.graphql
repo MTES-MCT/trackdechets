@@ -36,6 +36,18 @@ type Form {
   "Transporteur du déchet (case 8)"
   transporter: Transporter
 
+  "Transporteur n°2 - en cas de transport multi-modal"
+  transporter2: Transporter
+
+  "Transporteur n°3 - en cas de transport multi-modal"
+  transporter3: Transporter
+
+  "Transporteur n°4 - en cas de transport multi-modal"
+  transporter4: Transporter
+
+  "Transporteur n°5 - en cas de transport multi-modal"
+  transporter5: Transporter
+
   "Détails du déchet (case 3)"
   wasteDetails: WasteDetails
 

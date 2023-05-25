@@ -129,10 +129,10 @@ function flattenWasteDetailsInput(input: {
   };
 }
 
-function flattenTransporterInput(input: {
+export function flattenTransporterInput(input: {
   transporter?: TransporterInput | null;
-}) {
-  return {
+}): Omit<Prisma.BsddTransporterCreateInput, "form"> {
+  return safeInput({
     transporterCompanyName: chain(input.transporter, t =>
       chain(t.company, c => c.name)
     ),
@@ -164,7 +164,7 @@ function flattenTransporterInput(input: {
     transporterNumberPlate: chain(input.transporter, t => t.numberPlate),
     transporterCustomInfo: chain(input.transporter, t => t.customInfo),
     transporterTransportMode: chain(input.transporter, t => t.mode)
-  };
+  });
 }
 
 function flattenEmitterInput(input: { emitter?: EmitterInput | null }) {
@@ -506,11 +506,11 @@ export function flattenTransportSegmentInput(
   });
 }
 
-/**
+export /**
  * Expand form data from db
  * Overlaoded function to handle prisma and elastic bsds
  */
-export async function expandFormFromDb(
+async function expandFormFromDb(
   form: BsdElastic["rawBsd"]
 ): Promise<GraphQLForm>;
 export async function expandFormFromDb(
@@ -879,6 +879,32 @@ export function expandTransportSegmentFromDb(
     takenOverBy: segment.takenOverBy,
     readyToTakeOver: segment.readyToTakeOver,
     segmentNumber: segment.segmentNumber
+  };
+}
+
+export function expandBsddTransporterFromDB(
+  transporter: PrismaBsddTransporter
+): Transporter {
+  return {
+    company: nullIfNoValues({
+      name: transporter.transporterCompanyName,
+      siret: transporter.transporterCompanySiret,
+      orgId: transporter.transporterCompanySiret?.length
+        ? transporter.transporterCompanySiret
+        : transporter.transporterCompanyVatNumber,
+      vatNumber: transporter.transporterCompanyVatNumber,
+      address: transporter.transporterCompanyAddress,
+      contact: transporter.transporterCompanyContact,
+      phone: transporter.transporterCompanyPhone,
+      mail: transporter.transporterCompanyMail
+    }),
+    mode: transporter.transporterTransportMode,
+    customInfo: null,
+    department: transporter.transporterDepartment,
+    receipt: transporter.transporterDepartment,
+    validityLimit: transporter.transporterValidityLimit,
+    numberPlate: transporter.transporterNumberPlate,
+    isExemptedOfReceipt: transporter.transporterIsExemptedOfReceipt
   };
 }
 

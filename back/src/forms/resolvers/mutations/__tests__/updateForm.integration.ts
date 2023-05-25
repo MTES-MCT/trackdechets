@@ -2216,4 +2216,78 @@ describe("Mutation.updateForm", () => {
       );
     }
   );
+
+  it.each([2, 3, 4, 5])("should update transporter %p", async N => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const transporter2 = await companyFactory();
+    const transporter3 = await companyFactory();
+    const transporter4 = await companyFactory();
+    const transporter5 = await companyFactory();
+    const form = await formFactory({
+      ownerId: emitter.user.id,
+      opt: {
+        status: "DRAFT",
+        emitterCompanySiret: emitter.company.siret
+      }
+    });
+    await prisma.form.update({
+      where: { id: form.id },
+      data: {
+        transporter2: {
+          create: {
+            transporterCompanySiret: transporter2.siret,
+            transporterCompanyContact: "Mr transporteur 2",
+            form: { connect: { id: form.id } }
+          }
+        },
+        transporter3: {
+          create: {
+            transporterCompanySiret: transporter3.siret,
+            transporterCompanyContact: "Mr transporteur 3",
+            form: { connect: { id: form.id } }
+          }
+        },
+        transporter4: {
+          create: {
+            transporterCompanySiret: transporter4.siret,
+            transporterCompanyContact: "Mr transporteur 4",
+            form: { connect: { id: form.id } }
+          }
+        },
+        transporter5: {
+          create: {
+            transporterCompanySiret: transporter5.siret,
+            transporterCompanyContact: "Mr transporteur 5",
+            form: { connect: { id: form.id } }
+          }
+        }
+      }
+    });
+    const { mutate } = makeClient(emitter.user);
+    const updateFormInput: FormInput = {
+      id: form.id
+    };
+    updateFormInput[`transporter${N}`] = {
+      company: { contact: `Mme transporteur ${N}` }
+    };
+    const { data, errors } = await mutate<Pick<Mutation, "updateForm">>(
+      UPDATE_FORM,
+      {
+        variables: { updateFormInput }
+      }
+    );
+    expect(errors).toBeUndefined();
+    const updatedForm = await prisma.form.findUniqueOrThrow({
+      where: { id: data.updateForm.id },
+      include: { [`transporter${N}`]: true }
+    });
+    expect(updatedForm[`transporter${N}`]["transporterCompanyContact"]).toEqual(
+      `Mme transporteur ${N}`
+    );
+  });
+
+  it.skip.each([2, 3, 4, 5])("should remove transporter N", () => {});
+  it.skip("should not be possible to remove transporter N if there is a transporter N+1", () => {});
+  it.skip.each([2, 3, 4, 5])("should add transporter N", () => {});
+  it.skip("should not be possible to add a transporter N if there is no transporter N-1", () => {});
 });
