@@ -128,6 +128,12 @@ describe("Bsd Badge status", () => {
     render(<Badge status={BsdStatusCode.SignedByProducer} />);
     expect(screen.getByText(/signé par l’émetteur/i));
   });
+  test("SIGNED_BY_PRODUCER bsdd", () => {
+    render(
+      <Badge status={BsdStatusCode.SignedByProducer} bsdType={BsdType.Bsdd} />
+    );
+    expect(screen.getByText(/publié/i));
+  });
   test("SIGNED_BY_EMITTER", () => {
     render(<Badge status={BsdStatusCode.SignedByEmitter} />);
     expect(screen.getByText(/signé par l’émetteur/i));

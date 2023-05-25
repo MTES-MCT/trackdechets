@@ -96,6 +96,9 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.Resent:
       return SIGNE_PAR_TRANSPORTEUR;
     case BsdStatusCode.SignedByProducer:
+      if (bsdType === BsdType.Bsdd) {
+        return INITIAL;
+      }
       return SIGNE_PAR_EMETTEUR;
     case BsdStatusCode.Initial:
       if (isDraft) {
