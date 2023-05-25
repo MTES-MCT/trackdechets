@@ -211,6 +211,15 @@ export const isBsdaSign = (bsd: BsdDisplay, currentSiret: string) => {
   }
   return false;
 };
+export const isBsdaSignWorker = (bsd: BsdDisplay, currentSiret: string) => {
+  if (isBsda(bsd.type)) {
+    return (
+      bsd.emitter?.isPrivateIndividual &&
+      currentSiret === bsd.worker?.company?.siret
+    );
+  }
+  return false;
+};
 
 export const isBsvhuSign = (bsd: BsdDisplay, currentSiret: string) =>
   isBsvhu(bsd.type) && isSameSiretEmmiter(currentSiret, bsd);
@@ -236,14 +245,19 @@ export const getIsNonDraftLabel = (
   bsdCurrentTab: BsdCurrentTab
 ): string => {
   const isActTab = bsdCurrentTab === "actTab";
+  const isFollowTab = bsdCurrentTab === "followTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
 
   if (
-    isBsvhuSign(bsd, currentSiret) ||
-    isBsffSign(bsd, currentSiret, bsdCurrentTab) ||
-    isBsdaSign(bsd, currentSiret)
+    !isFollowTab &&
+    (isBsvhuSign(bsd, currentSiret) ||
+      isBsffSign(bsd, currentSiret, bsdCurrentTab) ||
+      isBsdaSign(bsd, currentSiret))
   ) {
     return SIGNER;
+  }
+  if (isActTab && isBsdaSignWorker(bsd, currentSiret)) {
+    return SIGNER_EN_TANT_QUE_TRAVAUX;
   }
 
   if (isBsdasri(bsd.type)) {
@@ -264,7 +278,7 @@ export const getIsNonDraftLabel = (
     return "";
   }
 
-  if (isSameSiretEmmiter(currentSiret, bsd)) {
+  if (!isFollowTab && isSameSiretEmmiter(currentSiret, bsd)) {
     return SIGNER;
   }
   return "";
