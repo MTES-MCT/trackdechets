@@ -207,7 +207,17 @@ describe("Mutation.updateForm", () => {
         ownerId: user.id,
         opt: {
           status: "DRAFT",
-          [`${role}CompanySiret`]: company.siret
+          ...(role === "transporter"
+            ? {
+                transporters: {
+                  create: {
+                    [`${role}CompanySiret`]: company.siret
+                  }
+                }
+              }
+            : {
+                [`${role}CompanySiret`]: company.siret
+              })
         }
       });
 
@@ -236,8 +246,18 @@ describe("Mutation.updateForm", () => {
       const form = await formFactory({
         ownerId: user.id,
         opt: {
-          [`${role}CompanySiret`]: company.siret,
           status: "SEALED",
+          ...(role === "transporter"
+            ? {
+                transporters: {
+                  create: {
+                    [`${role}CompanySiret`]: company.siret
+                  }
+                }
+              }
+            : {
+                [`${role}CompanySiret`]: company.siret
+              }),
           ...(["trader", "broker"].includes(role)
             ? {
                 [`${role}CompanyName`]: "Trader or Broker",
@@ -838,7 +858,7 @@ describe("Mutation.updateForm", () => {
     );
     expect(data.updateForm.transporter).toMatchObject({
       mode: "OTHER",
-      company: { siret: null }
+      company: null
     });
   });
 
@@ -1272,11 +1292,15 @@ describe("Mutation.updateForm", () => {
         status: "SEALED",
         emitterCompanySiret: ttr.siret,
         emitterType: EmitterType.APPENDIX2,
-        transporterCompanySiret: transporter.siret,
         grouping: {
           create: {
             initialFormId: appendixForm.id,
             quantity: appendixForm.quantityReceived!
+          }
+        },
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.siret
           }
         }
       }
@@ -1984,7 +2008,11 @@ describe("Mutation.updateForm", () => {
         emitterCompanySiret: company.siret,
         emitterType: EmitterType.APPENDIX2,
         wasteDetailsCode: "01 03 04*",
-        transporterTransportMode: "ROAD"
+        transporters: {
+          create: {
+            transporterTransportMode: "ROAD"
+          }
+        }
       }
     });
     const { errors } = await mutate<
@@ -2090,8 +2118,12 @@ describe("Mutation.updateForm", () => {
           emitterCompanySiret: company.siret,
           emitterType: EmitterType.APPENDIX2,
           wasteDetailsCode: "01 03 04*",
-          transporterTransportMode: "ROAD",
-          wasteDetailsQuantity: 50
+          wasteDetailsQuantity: 50,
+          transporters: {
+            create: {
+              transporterTransportMode: "ROAD"
+            }
+          }
         }
       });
       const { errors } = await mutate<
@@ -2243,15 +2275,19 @@ describe("Mutation.updateForm", () => {
         emitterCompanyContact: emitter.company.contact,
         emitterCompanyPhone: emitter.company.contactPhone,
         emitterCompanyMail: emitter.company.contactEmail,
-        transporterCompanySiret: transporter.company.siret,
-        transporterCompanyName: transporter.company.name,
-        transporterCompanyAddress: transporter.company.address,
-        transporterCompanyContact: transporter.company.contact,
-        transporterCompanyPhone: transporter.company.contactPhone,
-        transporterCompanyMail: transporter.company.contactEmail,
-        transporterReceipt: transporterReceipt.receiptNumber,
-        transporterDepartment: transporterReceipt.department,
-        transporterValidityLimit: transporterReceipt.validityLimit
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name,
+            transporterCompanyAddress: transporter.company.address,
+            transporterCompanyContact: transporter.company.contact,
+            transporterCompanyPhone: transporter.company.contactPhone,
+            transporterCompanyMail: transporter.company.contactEmail,
+            transporterReceipt: transporterReceipt.receiptNumber,
+            transporterDepartment: transporterReceipt.department,
+            transporterValidityLimit: transporterReceipt.validityLimit
+          }
+        }
       }
     });
     const { mutate } = makeClient(emitter.user);

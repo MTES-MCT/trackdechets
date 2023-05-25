@@ -45,10 +45,14 @@ function transporterFormFactory(ownerId: string, siret: string) {
   return formFactory({
     ownerId,
     opt: {
-      transporterCompanySiret: siret,
       status: "PROCESSED",
       sentAt: new Date(),
-      receivedAt: new Date()
+      receivedAt: new Date(),
+      transporters: {
+        create: {
+          transporterCompanySiret: siret
+        }
+      }
     }
   });
 }

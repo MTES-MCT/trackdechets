@@ -1,4 +1,4 @@
-import { Form } from "@prisma/client";
+import { BsddTransporter, Form } from "@prisma/client";
 import prisma from "../../prisma";
 import { getCompanyAdminUsers } from "../../companies/database";
 import { Mail } from "../../mailer/types";
@@ -7,6 +7,7 @@ import DREALS from "../../common/constants/DREALS";
 import { formNotAccepted, formPartiallyRefused } from "../../mailer/templates";
 import { renderMail } from "../../mailer/templates/renderers";
 import { getTransporterCompanyOrgId } from "../../common/constants/companySearchHelpers";
+import { getFirstTransporter } from "../database";
 
 const { NOTIFY_DREAL_WHEN_FORM_DECLINED } = process.env;
 
@@ -79,6 +80,12 @@ export async function renderFormRefusedEmail(
     PARTIALLY_REFUSED: formPartiallyRefused
   }[wasteAcceptationStatus];
 
+  const transporter = await getFirstTransporter(form);
+  let forwardedInTransporter: BsddTransporter | null = null;
+  if (forwardedIn) {
+    forwardedInTransporter = await getFirstTransporter(forwardedIn);
+  }
+
   return renderMail(mailTemplate, {
     to,
     cc,
@@ -97,10 +104,13 @@ export async function renderFormRefusedEmail(
               recipientCompanySiret: forwardedIn.recipientCompanySiret,
               wasteRefusalReason: forwardedIn.wasteRefusalReason,
               transporterIsExemptedOfReceipt:
-                forwardedIn.transporterIsExemptedOfReceipt,
-              transporterCompanyName: forwardedIn.transporterCompanyName,
-              transporterCompanySiret: getTransporterCompanyOrgId(forwardedIn),
-              transporterReceipt: forwardedIn.transporterReceipt,
+                forwardedInTransporter?.transporterIsExemptedOfReceipt,
+              transporterCompanyName:
+                forwardedInTransporter?.transporterCompanyName,
+              transporterCompanySiret: getTransporterCompanyOrgId(
+                forwardedInTransporter
+              ),
+              transporterReceipt: forwardedInTransporter?.transporterReceipt,
               sentBy: forwardedIn.sentBy,
               quantityReceived: forwardedIn.quantityReceived
             }
@@ -110,10 +120,10 @@ export async function renderFormRefusedEmail(
               recipientCompanySiret: form.recipientCompanySiret,
               wasteRefusalReason: form.wasteRefusalReason,
               transporterIsExemptedOfReceipt:
-                form.transporterIsExemptedOfReceipt,
-              transporterCompanyName: form.transporterCompanyName,
-              transporterCompanySiret: getTransporterCompanyOrgId(form),
-              transporterReceipt: form.transporterReceipt,
+                transporter?.transporterIsExemptedOfReceipt,
+              transporterCompanyName: transporter?.transporterCompanyName,
+              transporterCompanySiret: getTransporterCompanyOrgId(transporter),
+              transporterReceipt: transporter?.transporterReceipt,
               sentBy: form.sentBy,
               quantityReceived: form.quantityReceived
             })

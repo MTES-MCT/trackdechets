@@ -2141,17 +2141,29 @@ describe("toElasticFilter", () => {
     const testInput_1 = { transporterCompanySiret: siretify(1) };
     const form1 = await formFactory({
       ownerId: user.id,
-      opt: testInput_1
+      opt: { transporters: { create: testInput_1 } }
     });
 
     const form2 = await formFactory({
       ownerId: user.id,
-      opt: { transporterCompanySiret: siretify(2) }
+      opt: {
+        transporters: {
+          create: {
+            transporterCompanySiret: siretify(2)
+          }
+        }
+      }
     });
 
     const form3 = await formFactory({
       ownerId: user.id,
-      opt: { transporterCompanySiret: siretify(3) }
+      opt: {
+        transporters: {
+          create: {
+            transporterCompanySiret: siretify(3)
+          }
+        }
+      }
     });
 
     await Promise.all(
@@ -2292,18 +2304,20 @@ describe("toElasticFilter", () => {
     const testInput = { transporterCompanySiret: siretify(1) };
     const form1 = await formFactory({
       ownerId: user.id,
-      opt: testInput
+      opt: { transporters: { create: testInput } }
     });
 
     const testInput_1 = { transporterCompanySiret: siretify(2) };
     const form2 = await formFactory({
       ownerId: user.id,
-      opt: testInput_1
+      opt: { transporters: { create: testInput_1 } }
     });
 
     const form3 = await formFactory({
       ownerId: user.id,
-      opt: { transporterCompanySiret: siretify(3) }
+      opt: {
+        transporters: { create: { transporterCompanySiret: siretify(3) } }
+      }
     });
 
     await Promise.all(
@@ -2459,17 +2473,21 @@ describe("toElasticFilter", () => {
     const testInput_5 = { transporterCompanySiret: siretify(1) };
     const form1 = await formFactory({
       ownerId: user.id,
-      opt: testInput_5
+      opt: { transporters: { create: testInput_5 } }
     });
 
     const form2 = await formFactory({
       ownerId: user.id,
-      opt: { transporterCompanySiret: siretify(2) }
+      opt: {
+        transporters: { create: { transporterCompanySiret: siretify(2) } }
+      }
     });
 
     const form3 = await formFactory({
       ownerId: user.id,
-      opt: { transporterCompanySiret: siretify(3) }
+      opt: {
+        transporters: { create: { transporterCompanySiret: siretify(3) } }
+      }
     });
 
     await Promise.all(

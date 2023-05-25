@@ -32,7 +32,11 @@ describe("{ mutation { editSegment } }", () => {
     const form = await formFactory({
       ownerId: owner.id,
       opt: {
-        transporterCompanySiret: transporterOrgId,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterOrgId
+          }
+        },
         status: "SENT",
         currentTransporterOrgId: transporterOrgId
       }
@@ -63,7 +67,7 @@ describe("{ mutation { editSegment } }", () => {
           }`
     );
 
-    const editedSegment = await prisma.transportSegment.findUniqueOrThrow({
+    const editedSegment = await prisma.bsddTransporter.findUniqueOrThrow({
       where: { id: segment.id }
     });
     expect(editedSegment.transporterCompanySiret).toBe(editSegmentSiret);
@@ -82,7 +86,12 @@ describe("{ mutation { editSegment } }", () => {
     const form = await formFactory({
       ownerId: firstTransporter.id,
       opt: {
-        transporterCompanySiret: transporterOrgId,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterOrgId,
+            number: 1
+          }
+        },
         status: "SENT",
         currentTransporterOrgId: transporterOrgId
       }
@@ -113,7 +122,7 @@ describe("{ mutation { editSegment } }", () => {
           }`
     );
 
-    const editedSegment = await prisma.transportSegment.findUniqueOrThrow({
+    const editedSegment = await prisma.bsddTransporter.findUniqueOrThrow({
       where: { id: segment.id }
     });
     expect(editedSegment.transporterCompanySiret).toBe(editSegmentSiret);
@@ -134,7 +143,11 @@ describe("{ mutation { editSegment } }", () => {
     const form = await formFactory({
       ownerId: firstTransporter.id,
       opt: {
-        transporterCompanySiret: firstTransporterSiret,
+        transporters: {
+          create: {
+            transporterCompanySiret: firstTransporterSiret
+          }
+        },
         status: "SENT",
         currentTransporterOrgId: firstTransporterSiret
       }
@@ -164,7 +177,7 @@ describe("{ mutation { editSegment } }", () => {
           }`
     );
 
-    const editedSegment = await prisma.transportSegment.findUniqueOrThrow({
+    const editedSegment = await prisma.bsddTransporter.findUniqueOrThrow({
       where: { id: segment.id }
     });
 

@@ -53,9 +53,9 @@ async function getWasteConnection<WasteType extends GenericWaste>(
     searchHits.hits.map(hit => hit._source).filter(Boolean),
     {
       BSDD: {
-        forwarding: true,
+        forwarding: { include: { transporters: true } },
         grouping: { include: { initialForm: true } },
-        transportSegments: true
+        transporters: true
       },
       BSDA: { grouping: true, forwarding: true },
       BSDASRI: { grouping: true },

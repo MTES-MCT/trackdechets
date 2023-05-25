@@ -11,7 +11,6 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import getReadableId from "../../../readableId";
 import { SIGN_EMISSION_FORM } from "./mutations";
 
 describe("signEmissionForm", () => {
@@ -135,8 +134,12 @@ describe("signEmissionForm", () => {
         sentBy: null,
         emitterCompanySiret: emitter.company.siret,
         emitterCompanyName: emitter.company.name,
-        transporterCompanySiret: transporter.company.siret,
-        transporterCompanyName: transporter.company.name
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name
+          }
+        }
       }
     });
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
@@ -185,8 +188,12 @@ describe("signEmissionForm", () => {
         sentBy: null,
         emitterCompanySiret: emitter.company.siret,
         emitterCompanyName: emitter.company.name,
-        transporterCompanySiret: transporter.company.siret,
-        transporterCompanyName: transporter.company.name
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name
+          }
+        }
       }
     });
 
@@ -272,10 +279,14 @@ describe("signEmissionForm", () => {
         sentBy: null,
         emitterCompanySiret: emitter.company.siret,
         emitterCompanyName: emitter.company.name,
-        transporterCompanySiret: transporter.company.siret,
-        transporterCompanyName: transporter.company.name,
         ecoOrganismeSiret: ecoOrganisme.company.siret,
-        ecoOrganismeName: ecoOrganisme.company.name
+        ecoOrganismeName: ecoOrganisme.company.name,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name
+          }
+        }
       }
     });
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
@@ -326,10 +337,14 @@ describe("signEmissionForm", () => {
         sentBy: null,
         emitterCompanySiret: emitter.company.siret,
         emitterCompanyName: emitter.company.name,
-        transporterCompanySiret: transporter.company.siret,
-        transporterCompanyName: transporter.company.name,
         ecoOrganismeSiret: ecoOrganisme.company.siret,
-        ecoOrganismeName: ecoOrganisme.company.name
+        ecoOrganismeName: ecoOrganisme.company.name,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name
+          }
+        }
       }
     });
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
@@ -409,7 +424,13 @@ describe("signEmissionForm", () => {
           recipientCompanySiret: temporaryStorage.company.siret,
           recipientCompanyName: temporaryStorage.company.name
         },
-        forwardedInOpts: { transporterTransportMode: "ROAD" }
+        forwardedInOpts: {
+          transporters: {
+            create: {
+              transporterTransportMode: "ROAD"
+            }
+          }
+        }
       });
 
       const emittedAt = new Date("2018-12-11T00:00:00.000Z");
@@ -451,8 +472,12 @@ describe("signEmissionForm", () => {
         recipientCompanyName: temporaryStorage.company.name
       },
       forwardedInOpts: {
-        transporterCompanySiret: transporter.company.siret,
-        transporterCompanyName: transporter.company.name
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name
+          }
+        }
       }
     });
 
@@ -491,22 +516,24 @@ describe("signEmissionForm", () => {
   it("should throw an error if temporary storage's security code is invalid", async () => {
     const temporaryStorage = await userWithCompanyFactory("ADMIN");
     const transporter = await userWithCompanyFactory("ADMIN");
-    const form = await formFactory({
+
+    const form = await formWithTempStorageFactory({
       ownerId: temporaryStorage.user.id,
       opt: {
         status: "RESEALED",
         recipientCompanySiret: temporaryStorage.company.siret,
-        recipientCompanyName: temporaryStorage.company.name,
-        forwardedIn: {
+        recipientCompanyName: temporaryStorage.company.name
+      },
+      forwardedInOpts: {
+        transporters: {
           create: {
-            readableId: getReadableId(),
-            ownerId: temporaryStorage.user.id,
             transporterCompanySiret: transporter.company.siret,
             transporterCompanyName: transporter.company.name
           }
         }
       }
     });
+
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
 
     const { mutate } = makeClient(transporter.user);
@@ -572,7 +599,11 @@ describe("signEmissionForm", () => {
         emitterType: EmitterType.APPENDIX1,
         emitterCompanySiret: company.siret,
         emitterCompanyName: company.name,
-        transporterCompanySiret: company.siret
+        transporters: {
+          create: {
+            transporterCompanySiret: company.siret
+          }
+        }
       }
     });
 

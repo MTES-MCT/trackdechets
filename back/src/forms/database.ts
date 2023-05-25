@@ -2,7 +2,7 @@
  * PRISMA HELPER FUNCTIONS
  */
 
-import { Form, Prisma } from "@prisma/client";
+import { BsddTransporter, Form, Prisma } from "@prisma/client";
 import { UserInputError } from "apollo-server-express";
 import prisma from "../prisma";
 import { FormRole } from "../generated/graphql/types";
@@ -17,12 +17,12 @@ import { FullForm } from "./types";
 export async function getFullForm(form: Form): Promise<FullForm> {
   const forwardedIn = await prisma.form
     .findUnique({ where: { id: form.id } })
-    .forwardedIn();
-  const transportSegments = await prisma.form
+    .forwardedIn({ include: { transporters: true } });
+  const transporters = await prisma.form
     .findUnique({
       where: { id: form.id }
     })
-    .transportSegments();
+    .transporters();
   const intermediaries = await prisma.form
     .findUnique({
       where: { id: form.id }
@@ -32,7 +32,7 @@ export async function getFullForm(form: Form): Promise<FullForm> {
   return {
     ...form,
     forwardedIn,
-    transportSegments,
+    transporters,
     intermediaries
   };
 }
@@ -92,10 +92,20 @@ export function getFormsRightFilter(siret: string, roles?: FormRole[] | null) {
 }
 
 export const SIRETS_BY_ROLE_INCLUDE = {
-  transportSegments: { select: { transporterCompanySiret: true } },
+  transporters: {
+    select: { transporterCompanySiret: true, transporterCompanyVatNumber: true }
+  },
   intermediaries: { select: { siret: true } },
   forwardedIn: {
-    select: { recipientCompanySiret: true, transporterCompanySiret: true }
+    select: {
+      recipientCompanySiret: true,
+      transporters: {
+        select: {
+          transporterCompanySiret: true,
+          transporterCompanyVatNumber: true
+        }
+      }
+    }
   }
 };
 
@@ -110,14 +120,47 @@ export function getFormSiretsByRole(
       form.forwardedIn?.recipientCompanySiret
     ].filter(Boolean),
     transportersSirets: [
-      form.transporterCompanySiret,
-      form.transporterCompanyVatNumber,
-      ...form.transportSegments?.map(
-        segment => segment.transporterCompanySiret
-      ),
-      form.forwardedIn?.transporterCompanySiret
+      ...(form.transporters ?? []).flatMap(t => [
+        t.transporterCompanySiret,
+        t.transporterCompanyVatNumber
+      ]),
+      ...(form.forwardedIn?.transporters ?? []).flatMap(t => [
+        t.transporterCompanySiret,
+        t.transporterCompanyVatNumber
+      ])
     ].filter(Boolean),
     intermediariesSirets:
       form.intermediaries?.map(intermediary => intermediary.siret) ?? []
   };
+}
+
+export async function getTransporters(
+  form: Pick<Form, "id">
+): Promise<BsddTransporter[]> {
+  const transporters = await prisma.form
+    .findUnique({ where: { id: form.id } })
+    .transporters({ orderBy: { number: "asc" } });
+  return transporters ?? [];
+}
+
+export function getTransportersSync(
+  form: Form & { transporters: BsddTransporter[] | null }
+): BsddTransporter[] {
+  return form.transporters ?? [];
+}
+
+export async function getFirstTransporter(
+  form: Pick<Form, "id">
+): Promise<BsddTransporter | null> {
+  const transporters = await getTransporters(form);
+  const [firstTransporter] = transporters.filter(t => t.number === 1);
+  return firstTransporter ?? null;
+}
+
+export function getFirstTransporterSync(
+  form: Form & { transporters: BsddTransporter[] | null }
+): BsddTransporter | null {
+  const transporters = getTransportersSync(form);
+  const [firstTransporter] = transporters.filter(t => t.number === 1);
+  return firstTransporter ?? null;
 }

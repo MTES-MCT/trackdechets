@@ -1,4 +1,4 @@
-import { CompanyVerificationMode, Form } from "@prisma/client";
+import { BsddTransporter, CompanyVerificationMode, Form } from "@prisma/client";
 import { cleanupSpecialChars, toFrFormat } from "../helpers";
 import { MailTemplate } from "../types";
 import templateIds from "./provider/templateIds";
@@ -52,7 +52,7 @@ export const createPasswordResetRequest: MailTemplate<{
   templateId: templateIds.LAYOUT
 };
 
-export const formNotAccepted: MailTemplate<{ form: Form }> = {
+export const formNotAccepted: MailTemplate<{ form: Form & BsddTransporter }> = {
   subject: "Refus de prise en charge de votre déchet",
   body: mustacheRenderer("refus-total-dechet.html"),
   templateId: templateIds.LAYOUT,
@@ -73,7 +73,9 @@ export const formNotAccepted: MailTemplate<{ form: Form }> = {
   }
 };
 
-export const formPartiallyRefused: MailTemplate<{ form: Form }> = {
+export const formPartiallyRefused: MailTemplate<{
+  form: Form & BsddTransporter;
+}> = {
   subject: "Refus partiel de prise en charge de votre déchet",
   body: mustacheRenderer("refus-partiel-dechet.html"),
   templateId: templateIds.LAYOUT,

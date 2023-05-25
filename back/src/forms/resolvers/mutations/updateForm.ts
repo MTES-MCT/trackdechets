@@ -8,11 +8,12 @@ import {
 import { InvalidWasteCode, MissingTempStorageFlag } from "../../errors";
 import { checkCanUpdate } from "../../permissions";
 import { GraphQLContext } from "../../../types";
-import { getFormOrFormNotFound } from "../../database";
+import { getFirstTransporter, getFormOrFormNotFound } from "../../database";
 import {
   expandFormFromDb,
   flattenFormInput,
-  flattenTemporaryStorageDetailInput
+  flattenTemporaryStorageDetailInput,
+  flattenTransporterInput
 } from "../../converter";
 import { getFormRepository } from "../../repository";
 import {
@@ -70,26 +71,29 @@ const updateFormResolver = async (
   }
 
   const existingForm = await getFormOrFormNotFound({ id });
+  const existingTransporter = await getFirstTransporter(existingForm);
 
   await checkCanUpdate(user, existingForm, updateFormInput);
 
   const form = flattenFormInput(formContent);
-  const futureForm = { ...existingForm, ...form };
+  let transporter: Omit<Prisma.BsddTransporterCreateInput, "form"> =
+    flattenTransporterInput(formContent);
+
   // Pipeline erases transporter EXCEPT for transporterTransportMode
   if (hasPipeline(form as any)) {
-    Object.keys(form)
-      .filter(key => key.startsWith("transporter"))
-      .forEach(key => {
-        form[key] = null;
-      });
-    form.transporterTransportMode = TransportMode.OTHER;
-    // update futureForm  only for yup validation
-    Object.keys(futureForm)
-      .filter(key => key.startsWith("transporter"))
-      .forEach(key => {
-        futureForm[key] = null;
-      });
+    if (existingTransporter || Object.keys(transporter).length > 0)
+      transporter = {
+        ...flattenTransporterInput({ transporter: null }),
+        transporterTransportMode: TransportMode.OTHER
+      };
   }
+
+  const futureForm = {
+    ...existingTransporter, // make sure not to move this after `existingForm` to prevent overwriting `id` and `createdAt`
+    ...transporter,
+    ...existingForm,
+    ...form
+  };
   // Construct form update payload
   // This bit is a bit confusing. We are NOT in strict mode, so Yup doesnt complain if we pass unknown values.
   // To remove those unknown values, we cast the object. This makes sure our input has a shape that fits our validator
@@ -103,6 +107,24 @@ const updateFormResolver = async (
   for (const key of Object.keys(formUpdateInput)) {
     if (!(key in form)) {
       delete formUpdateInput[key];
+    }
+  }
+
+  if (Object.keys(transporter).length > 0) {
+    if (existingTransporter) {
+      if (formContent.transporter === null) {
+        formUpdateInput.transporters = {
+          delete: { id: existingTransporter.id }
+        };
+      } else {
+        formUpdateInput.transporters = {
+          update: { data: transporter, where: { id: existingTransporter.id } }
+        };
+      }
+    } else {
+      if (formContent.transporter !== null) {
+        formUpdateInput.transporters = { create: transporter };
+      }
     }
   }
 

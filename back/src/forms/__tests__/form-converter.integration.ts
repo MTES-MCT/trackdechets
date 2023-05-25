@@ -4,11 +4,13 @@ import {
   userFactory
 } from "../../__tests__/factories";
 import { expandFormFromDb } from "../converter";
+import { getFirstTransporter } from "../database";
 
 describe("expandFormFromDb", () => {
   it("should expand normal form from db", async () => {
     const user = await userFactory();
     const form = await formFactory({ ownerId: user.id });
+    const transporter = await getFirstTransporter(form);
     const expanded = await expandFormFromDb(form);
     expect(expanded).toEqual({
       id: form.id,
@@ -46,22 +48,22 @@ describe("expandFormFromDb", () => {
       },
       transporter: {
         company: {
-          name: form.transporterCompanyName,
-          orgId: form.transporterCompanySiret,
-          siret: form.transporterCompanySiret,
-          vatNumber: form.transporterCompanyVatNumber,
-          address: form.transporterCompanyAddress,
-          contact: form.transporterCompanyContact,
-          phone: form.transporterCompanyPhone,
-          mail: form.transporterCompanyMail
+          name: transporter!.transporterCompanyName,
+          orgId: transporter!.transporterCompanySiret,
+          siret: transporter!.transporterCompanySiret,
+          vatNumber: transporter!.transporterCompanyVatNumber,
+          address: transporter!.transporterCompanyAddress,
+          contact: transporter!.transporterCompanyContact,
+          phone: transporter!.transporterCompanyPhone,
+          mail: transporter!.transporterCompanyMail
         },
-        isExemptedOfReceipt: form.transporterIsExemptedOfReceipt,
-        receipt: form.transporterReceipt,
-        department: form.transporterDepartment,
-        validityLimit: form.transporterValidityLimit,
-        numberPlate: form.transporterNumberPlate,
-        customInfo: form.transporterCustomInfo,
-        mode: form.transporterTransportMode
+        isExemptedOfReceipt: transporter!.transporterIsExemptedOfReceipt,
+        receipt: transporter!.transporterReceipt,
+        department: transporter!.transporterDepartment,
+        validityLimit: transporter!.transporterValidityLimit,
+        numberPlate: transporter!.transporterNumberPlate,
+        customInfo: transporter!.transporterCustomInfo,
+        mode: transporter!.transporterTransportMode
       },
       wasteDetails: {
         code: form.wasteDetailsCode,
@@ -121,6 +123,7 @@ describe("expandFormFromDb", () => {
       ownerId: user.id
     });
     const expanded = await expandFormFromDb(form);
+    const transporter = await getFirstTransporter(forwardedIn!);
     expect(expanded.temporaryStorageDetail).toEqual({
       temporaryStorer: {
         quantityType: null,
@@ -159,22 +162,22 @@ describe("expandFormFromDb", () => {
       },
       transporter: {
         company: {
-          name: forwardedIn!.transporterCompanyName,
-          orgId: forwardedIn!.transporterCompanySiret,
-          siret: forwardedIn!.transporterCompanySiret,
-          vatNumber: forwardedIn!.transporterCompanyVatNumber,
-          address: forwardedIn!.transporterCompanyAddress,
-          contact: forwardedIn!.transporterCompanyContact,
-          phone: forwardedIn!.transporterCompanyPhone,
-          mail: forwardedIn!.transporterCompanyMail
+          name: transporter!.transporterCompanyName,
+          orgId: transporter!.transporterCompanySiret,
+          siret: transporter!.transporterCompanySiret,
+          vatNumber: transporter!.transporterCompanyVatNumber,
+          address: transporter!.transporterCompanyAddress,
+          contact: transporter!.transporterCompanyContact,
+          phone: transporter!.transporterCompanyPhone,
+          mail: transporter!.transporterCompanyMail
         },
         isExemptedOfReceipt: false,
-        receipt: forwardedIn!.transporterReceipt,
-        department: forwardedIn!.transporterDepartment,
-        validityLimit: forwardedIn!.transporterValidityLimit,
-        numberPlate: forwardedIn!.transporterNumberPlate,
+        receipt: transporter!.transporterReceipt,
+        department: transporter!.transporterDepartment,
+        validityLimit: transporter!.transporterValidityLimit,
+        numberPlate: transporter!.transporterNumberPlate,
         customInfo: null,
-        mode: forwardedIn!.transporterTransportMode
+        mode: transporter!.transporterTransportMode
       },
       emittedAt: null,
       emittedBy: null,
@@ -190,30 +193,34 @@ describe("expandFormFromDb", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
-        transporterCompanySiret: null,
-        transporterTransportMode: "ROAD"
+        transporters: {
+          create: {
+            transporterCompanySiret: null,
+            transporterTransportMode: "ROAD"
+          }
+        }
       }
     });
-    form.transporterCompanySiret = null;
+    const transporter = await getFirstTransporter(form);
     const expanded = await expandFormFromDb(form);
     expect(expanded.transporter).toEqual({
       mode: null,
       company: {
-        name: form.transporterCompanyName,
+        name: transporter!.transporterCompanyName,
         orgId: null,
-        siret: form.transporterCompanySiret,
-        vatNumber: form.transporterCompanyVatNumber,
-        address: form.transporterCompanyAddress,
-        contact: form.transporterCompanyContact,
-        phone: form.transporterCompanyPhone,
-        mail: form.transporterCompanyMail
+        siret: transporter!.transporterCompanySiret,
+        vatNumber: transporter!.transporterCompanyVatNumber,
+        address: transporter!.transporterCompanyAddress,
+        contact: transporter!.transporterCompanyContact,
+        phone: transporter!.transporterCompanyPhone,
+        mail: transporter!.transporterCompanyMail
       },
-      isExemptedOfReceipt: form.transporterIsExemptedOfReceipt,
-      receipt: form.transporterReceipt,
-      department: form.transporterDepartment,
-      validityLimit: form.transporterValidityLimit,
-      numberPlate: form.transporterNumberPlate,
-      customInfo: form.transporterCustomInfo
+      isExemptedOfReceipt: transporter!.transporterIsExemptedOfReceipt,
+      receipt: transporter!.transporterReceipt,
+      department: transporter!.transporterDepartment,
+      validityLimit: transporter!.transporterValidityLimit,
+      numberPlate: transporter!.transporterNumberPlate,
+      customInfo: transporter!.transporterCustomInfo
     });
   });
 
@@ -222,29 +229,33 @@ describe("expandFormFromDb", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
-        transporterTransportMode: "OTHER"
+        transporters: {
+          create: {
+            transporterTransportMode: "OTHER"
+          }
+        }
       }
     });
-    form.transporterCompanySiret = null;
+    const transporter = await getFirstTransporter(form);
     const expanded = await expandFormFromDb(form);
     expect(expanded.transporter).toEqual({
       mode: "OTHER",
       company: {
-        name: form.transporterCompanyName,
-        orgId: null,
-        siret: form.transporterCompanySiret,
-        vatNumber: form.transporterCompanyVatNumber,
-        address: form.transporterCompanyAddress,
-        contact: form.transporterCompanyContact,
-        phone: form.transporterCompanyPhone,
-        mail: form.transporterCompanyMail
+        name: transporter!.transporterCompanyName,
+        orgId: transporter!.transporterCompanySiret,
+        siret: transporter!.transporterCompanySiret,
+        vatNumber: transporter!.transporterCompanyVatNumber,
+        address: transporter!.transporterCompanyAddress,
+        contact: transporter!.transporterCompanyContact,
+        phone: transporter!.transporterCompanyPhone,
+        mail: transporter!.transporterCompanyMail
       },
-      isExemptedOfReceipt: form.transporterIsExemptedOfReceipt,
-      receipt: form.transporterReceipt,
-      department: form.transporterDepartment,
-      validityLimit: form.transporterValidityLimit,
-      numberPlate: form.transporterNumberPlate,
-      customInfo: form.transporterCustomInfo
+      isExemptedOfReceipt: transporter!.transporterIsExemptedOfReceipt,
+      receipt: transporter!.transporterReceipt,
+      department: transporter!.transporterDepartment,
+      validityLimit: transporter!.transporterValidityLimit,
+      numberPlate: transporter!.transporterNumberPlate,
+      customInfo: transporter!.transporterCustomInfo
     });
   });
 });

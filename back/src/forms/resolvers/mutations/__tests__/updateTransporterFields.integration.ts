@@ -6,6 +6,7 @@ import {
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
 import { Status as FormStatus } from "@prisma/client";
+import { getFirstTransporter } from "../../../database";
 jest.mock("axios", () => ({
   default: {
     get: jest.fn(() => Promise.resolve({ data: {} }))
@@ -26,7 +27,11 @@ describe("Forms -> updateTransporterFields mutation", () => {
         ownerId: emitter.id,
         opt: {
           status,
-          transporterCompanySiret: transporterCompany.siret
+          transporters: {
+            create: {
+              transporterCompanySiret: transporterCompany.siret
+            }
+          }
         }
       });
       const { mutate } = makeClient(transporter);
@@ -44,7 +49,9 @@ describe("Forms -> updateTransporterFields mutation", () => {
         include: { forwardedIn: true }
       });
 
-      expect(form.transporterNumberPlate).toEqual("ZBLOP 83");
+      const formTransporter = await getFirstTransporter(form);
+
+      expect(formTransporter!.transporterNumberPlate).toEqual("ZBLOP 83");
     }
   );
 
@@ -59,7 +66,11 @@ describe("Forms -> updateTransporterFields mutation", () => {
         ownerId: emitter.id,
         opt: {
           status,
-          transporterCompanySiret: transporterCompany.siret
+          transporters: {
+            create: {
+              transporterCompanySiret: transporterCompany.siret
+            }
+          }
         }
       });
       const { mutate } = makeClient(transporter);
@@ -77,7 +88,9 @@ describe("Forms -> updateTransporterFields mutation", () => {
         include: { forwardedIn: true }
       });
 
-      expect(form.transporterCustomInfo).toEqual("tournée 493");
+      const formTransporter = await getFirstTransporter(form);
+
+      expect(formTransporter!.transporterCustomInfo).toEqual("tournée 493");
     }
   );
 
@@ -90,7 +103,11 @@ describe("Forms -> updateTransporterFields mutation", () => {
       ownerId: emitter.id,
       opt: {
         status: "SENT",
-        transporterCompanySiret: transporterCompany.siret
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterCompany.siret
+          }
+        }
       }
     });
     const { mutate } = makeClient(transporter);
@@ -111,7 +128,9 @@ describe("Forms -> updateTransporterFields mutation", () => {
       include: { forwardedIn: true }
     });
 
-    expect(form.transporterCustomInfo).toEqual(null);
+    const formTransporter = await getFirstTransporter(form);
+
+    expect(formTransporter!.transporterCustomInfo).toEqual(null);
   });
 
   it("should not update form if user is not made by a transporter", async () => {
@@ -124,7 +143,11 @@ describe("Forms -> updateTransporterFields mutation", () => {
       ownerId: emitter.id,
       opt: {
         status: "SEALED",
-        transporterCompanySiret: transporterCompany.siret
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterCompany.siret
+          }
+        }
       }
     });
     const { mutate } = makeClient(emitter); // not a transporter
@@ -146,6 +169,8 @@ describe("Forms -> updateTransporterFields mutation", () => {
       include: { forwardedIn: true }
     });
 
-    expect(form.transporterCustomInfo).toEqual(null);
+    const formTransporter = await getFirstTransporter(form);
+
+    expect(formTransporter!.transporterCustomInfo).toEqual(null);
   });
 });

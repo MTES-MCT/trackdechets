@@ -5,6 +5,7 @@ import { ErrorCode } from "../../../../common/errors";
 import {
   companyFactory,
   formFactory,
+  formWithTempStorageFactory,
   toIntermediaryCompany,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
@@ -12,8 +13,6 @@ import makeClient from "../../../../__tests__/testClient";
 import { allowedFormats } from "../../../../common/dates";
 import { Status, UserRole } from "@prisma/client";
 import { Mutation } from "../../../../generated/graphql/types";
-import { getFullForm } from "../../../../forms/database";
-import getReadableId from "../../../readableId";
 
 jest.mock("axios", () => ({
   default: {
@@ -41,8 +40,12 @@ describe("Mutation.signedByTransporter", () => {
         status: "SEALED",
         emitterCompanyName: emitterCompany.name,
         emitterCompanySiret: emitterCompany.siret,
-        transporterCompanyName: company.name,
-        transporterCompanySiret: company.siret
+        transporters: {
+          create: {
+            transporterCompanyName: company.name,
+            transporterCompanySiret: company.siret
+          }
+        }
       }
     });
 
@@ -83,8 +86,12 @@ describe("Mutation.signedByTransporter", () => {
         status: "SEALED",
         emitterCompanyName: emitter.company.name,
         emitterCompanySiret: emitter.company.siret,
-        transporterCompanyName: transporter.company.name,
-        transporterCompanySiret: transporter.company.siret
+        transporters: {
+          create: {
+            transporterCompanyName: transporter.company.name,
+            transporterCompanySiret: transporter.company.siret
+          }
+        }
       }
     });
     const sentAt = new Date("2018-12-11T00:00:00.000Z");
@@ -137,7 +144,11 @@ describe("Mutation.signedByTransporter", () => {
         status: "SEALED",
         wasteDetailsCode: "01 03 04*",
         emitterCompanySiret: emitter.siret,
-        transporterCompanySiret: transporter.siret
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.siret
+          }
+        }
       }
     });
 
@@ -184,7 +195,11 @@ describe("Mutation.signedByTransporter", () => {
         wasteDetailsCode: "01 01 01",
         wasteDetailsIsDangerous: false,
         emitterCompanySiret: emitter.siret,
-        transporterCompanySiret: transporter.siret
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.siret
+          }
+        }
       }
     });
 
@@ -221,8 +236,12 @@ describe("Mutation.signedByTransporter", () => {
         status: "SEALED",
         emitterCompanyName: emitterCompany.name,
         emitterCompanySiret: emitterCompany.siret,
-        transporterCompanyName: company.name,
-        transporterCompanySiret: company.siret
+        transporters: {
+          create: {
+            transporterCompanyName: company.name,
+            transporterCompanySiret: company.siret
+          }
+        }
       }
     });
 
@@ -265,8 +284,12 @@ describe("Mutation.signedByTransporter", () => {
         status: "SEALED",
         emitterCompanyName: emitterCompany.name,
         emitterCompanySiret: emitterCompany.siret,
-        transporterCompanyName: company.name,
-        transporterCompanySiret: company.siret
+        transporters: {
+          create: {
+            transporterCompanyName: company.name,
+            transporterCompanySiret: company.siret
+          }
+        }
       }
     });
 
@@ -309,8 +332,12 @@ describe("Mutation.signedByTransporter", () => {
         status: "SEALED",
         emitterCompanyName: emitterCompany.name,
         emitterCompanySiret: emitterCompany.siret,
-        transporterCompanyName: company.name,
-        transporterCompanySiret: company.siret
+        transporters: {
+          create: {
+            transporterCompanyName: company.name,
+            transporterCompanySiret: company.siret
+          }
+        }
       }
     });
 
@@ -354,8 +381,12 @@ describe("Mutation.signedByTransporter", () => {
         status: "SEALED",
         emitterCompanyName: emitterCompany.name,
         emitterCompanySiret: emitterCompany.siret,
-        transporterCompanyName: company.name,
-        transporterCompanySiret: company.siret,
+        transporters: {
+          create: {
+            transporterCompanyName: company.name,
+            transporterCompanySiret: company.siret
+          }
+        },
         intermediaries: {
           create: [toIntermediaryCompany(intermediary.company)]
         }
@@ -410,8 +441,12 @@ describe("Mutation.signedByTransporter", () => {
         status: "SEALED",
         emitterCompanyName: emitter.name,
         emitterCompanySiret: emitter.siret,
-        transporterCompanyName: transporter.name,
-        transporterCompanySiret: transporter.siret,
+        transporters: {
+          create: {
+            transporterCompanyName: transporter.name,
+            transporterCompanySiret: transporter.siret
+          }
+        },
         ecoOrganismeName: ecoOrganisme.name,
         ecoOrganismeSiret: ecoOrganisme.siret
       }
@@ -449,26 +484,28 @@ describe("Mutation.signedByTransporter", () => {
     const transporter = await userWithCompanyFactory("ADMIN");
     const temporaryStorage = await userWithCompanyFactory("ADMIN");
     const finalRecipient = await userWithCompanyFactory("ADMIN");
-    const form = await formFactory({
+
+    const form = await formWithTempStorageFactory({
       ownerId: transporter.user.id,
       opt: {
         status: "RESEALED",
         recipientCompanyName: temporaryStorage.company.name,
         recipientCompanySiret: temporaryStorage.company.siret,
-        sentAt: "2019-11-20T00:00:00.000Z",
-        forwardedIn: {
+        takenOverAt: "2019-11-20T00:00:00.000Z",
+        sentAt: "2019-11-20T00:00:00.000Z"
+      },
+      forwardedInOpts: {
+        quantityReceived: 2.4,
+        wasteAcceptationStatus: "ACCEPTED",
+        receivedAt: "2019-11-20T00:00:00.000Z",
+        receivedBy: temporaryStorage.user.name,
+        signedAt: "2019-11-20T00:00:00.000Z",
+        recipientCompanyName: finalRecipient.company.name,
+        recipientCompanySiret: finalRecipient.company.siret,
+        recipientCap: "",
+        recipientProcessingOperation: "R 6",
+        transporters: {
           create: {
-            readableId: getReadableId(),
-            ownerId: transporter.user.id,
-            quantityReceived: 2.4,
-            wasteAcceptationStatus: "ACCEPTED",
-            receivedAt: "2019-11-20T00:00:00.000Z",
-            receivedBy: temporaryStorage.user.name,
-            signedAt: "2019-11-20T00:00:00.000Z",
-            recipientCompanyName: finalRecipient.company.name,
-            recipientCompanySiret: finalRecipient.company.siret,
-            recipientCap: "",
-            recipientProcessingOperation: "R 6",
             transporterCompanyName: transporter.company.name,
             transporterCompanySiret: transporter.company.siret,
             transporterIsExemptedOfReceipt: false,
@@ -480,6 +517,7 @@ describe("Mutation.signedByTransporter", () => {
         }
       }
     });
+
     const resentAt = new Date("2018-12-11T00:00:00.000Z");
 
     const { mutate } = makeClient(transporter.user);
@@ -500,10 +538,11 @@ describe("Mutation.signedByTransporter", () => {
     });
 
     const resultingForm = await prisma.form.findUniqueOrThrow({
-      where: { id: form.id }
+      where: { id: form.id },
+      include: { forwardedIn: true }
     });
-    const resultingFullForm = await getFullForm(resultingForm);
-    expect(resultingFullForm).toEqual(
+
+    expect(resultingForm).toEqual(
       expect.objectContaining({
         status: "RESENT",
         forwardedIn: expect.objectContaining({
@@ -534,8 +573,12 @@ describe("Mutation.signedByTransporter", () => {
           status: "SEALED",
           emitterCompanyName: emitterCompany.name,
           emitterCompanySiret: emitterCompany.siret,
-          transporterCompanyName: company.name,
-          transporterCompanySiret: company.siret
+          transporters: {
+            create: {
+              transporterCompanyName: company.name,
+              transporterCompanySiret: company.siret
+            }
+          }
         }
       });
 
@@ -579,9 +622,13 @@ describe("Mutation.signedByTransporter", () => {
         status: "SEALED",
         wasteDetailsCode: "01 01 01",
         emitterCompanySiret: emitter.siret,
-        transporterCompanySiret: transporter.siret,
         wasteDetailsQuantity: 0,
-        wasteDetailsPackagingInfos: []
+        wasteDetailsPackagingInfos: [],
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.siret
+          }
+        }
       }
     });
 

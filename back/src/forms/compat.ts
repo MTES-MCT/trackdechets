@@ -1,4 +1,4 @@
-import { Form, QuantityType, Status, TransportSegment } from "@prisma/client";
+import { Form, QuantityType, Status, BsddTransporter } from "@prisma/client";
 import {
   AppendixFormInput,
   InitialFormFractionInput
@@ -11,9 +11,9 @@ import { Bsdd } from "./types";
  * @returns
  */
 export function simpleFormToBsdd(
-  form: Form & { transportSegments?: TransportSegment[] }
+  form: Form & { transporters?: BsddTransporter[] }
 ): Bsdd {
-  const [transporter2, transporter3] = form.transportSegments ?? [];
+  const [transporter, transporter2, transporter3] = form.transporters ?? [];
 
   return {
     id: tov1ReadableId(form.readableId),
@@ -65,24 +65,24 @@ export function simpleFormToBsdd(
     weightValue: form.wasteDetailsQuantity,
     wasteAdr: form.wasteDetailsOnuCode,
     weightIsEstimate: form.wasteDetailsQuantityType == QuantityType.ESTIMATED,
-    transporterCompanyName: form.transporterCompanyName,
-    transporterCompanySiret: form.transporterCompanySiret,
-    transporterCompanyVatNumber: form.transporterCompanyVatNumber,
-    transporterCompanyAddress: form.transporterCompanyAddress,
-    transporterCompanyContact: form.transporterCompanyContact,
-    transporterCompanyPhone: form.transporterCompanyPhone,
-    transporterCompanyMail: form.transporterCompanyMail,
-    transporterCustomInfo: form.transporterCustomInfo,
-    transporterRecepisseIsExempted: form.transporterIsExemptedOfReceipt,
-    transporterRecepisseNumber: form.transporterReceipt,
-    transporterRecepisseDepartment: form.transporterDepartment,
-    transporterRecepisseValidityLimit: form.transporterValidityLimit,
-    transporterTransportMode: form.transporterTransportMode,
+    transporterCompanyName: transporter.transporterCompanyName,
+    transporterCompanySiret: transporter.transporterCompanySiret,
+    transporterCompanyVatNumber: transporter.transporterCompanyVatNumber,
+    transporterCompanyAddress: transporter.transporterCompanyAddress,
+    transporterCompanyContact: transporter.transporterCompanyContact,
+    transporterCompanyPhone: transporter.transporterCompanyPhone,
+    transporterCompanyMail: transporter.transporterCompanyMail,
+    transporterCustomInfo: transporter.transporterCustomInfo,
+    transporterRecepisseIsExempted: transporter.transporterIsExemptedOfReceipt,
+    transporterRecepisseNumber: transporter.transporterReceipt,
+    transporterRecepisseDepartment: transporter.transporterDepartment,
+    transporterRecepisseValidityLimit: transporter.transporterValidityLimit,
+    transporterTransportMode: transporter.transporterTransportMode,
     transporterTransportTakenOverAt: form.sentAt,
     transporterTransportSignatureAuthor: null,
     transporterTransportSignatureDate: form.sentAt,
-    transporterNumberPlates: form.transporterNumberPlate
-      ? [form.transporterNumberPlate]
+    transporterNumberPlates: transporter.transporterNumberPlate
+      ? [transporter.transporterNumberPlate]
       : [],
     transporter2CompanyName: transporter2?.transporterCompanyName,
     transporter2CompanySiret: transporter2?.transporterCompanySiret,
@@ -97,7 +97,7 @@ export function simpleFormToBsdd(
     transporter2RecepisseNumber: transporter2?.transporterReceipt,
     transporter2RecepisseDepartment: transporter2?.transporterDepartment,
     transporter2RecepisseValidityLimit: transporter2?.transporterValidityLimit,
-    transporter2TransportMode: transporter2?.mode,
+    transporter2TransportMode: transporter2?.transporterTransportMode,
     transporter2TransportTakenOverAt: transporter2?.takenOverAt,
     transporter2TransportSignatureAuthor: transporter2?.takenOverBy,
     transporter2TransportSignatureDate: transporter2?.takenOverAt,
@@ -117,7 +117,7 @@ export function simpleFormToBsdd(
     transporter3RecepisseNumber: transporter3?.transporterReceipt,
     transporter3RecepisseDepartment: transporter3?.transporterDepartment,
     transporter3RecepisseValidityLimit: transporter3?.transporterValidityLimit,
-    transporter3TransportMode: transporter3?.mode,
+    transporter3TransportMode: transporter3?.transporterTransportMode,
     transporter3TransportTakenOverAt: transporter3?.takenOverAt,
     transporter3TransportSignatureAuthor: transporter3?.takenOverBy,
     transporter3TransportSignatureDate: transporter3?.takenOverAt,
@@ -163,7 +163,7 @@ export function simpleFormToBsdd(
 export function formToBsdd(
   form: Form & { forwarding?: Form } & {
     grouping?: { initialForm: Form }[];
-  } & { transportSegments?: TransportSegment[] }
+  } & { transportSegments?: BsddTransporter[] }
 ): Bsdd & { grouping: Bsdd[] } & {
   forwarding: (Bsdd & { grouping: Bsdd[] }) | null;
 } {

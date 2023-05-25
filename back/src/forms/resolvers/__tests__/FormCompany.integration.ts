@@ -53,7 +53,11 @@ describe("FormCompany resolver", () => {
         status: Status.SEALED,
         emitterCompanySiret: emitter.siret,
         recipientCompanySiret: destination.siret,
-        transporterCompanyVatNumber: "BE0541696005",
+        transporters: {
+          create: {
+            transporterCompanyVatNumber: "BE0541696005"
+          }
+        },
         quantityReceived: 1,
         nextDestinationCompanyVatNumber: "BE0541696005"
       }

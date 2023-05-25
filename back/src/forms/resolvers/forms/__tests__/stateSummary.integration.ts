@@ -9,6 +9,7 @@ import {
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
+import { getFirstTransporterSync } from "../../../database";
 
 const FORM = gql`
   query Form($id: ID!) {
@@ -61,9 +62,13 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
         status: "SENT",
         emitterCompanySiret: emitter.company.siret,
         recipientCompanySiret: collectorCompany.siret,
-        transporterCompanySiret: transporter1Company.siret,
-        transporterNumberPlate: "plate 1",
-        transporterCustomInfo: "info 1",
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter1Company.siret,
+            transporterNumberPlate: "plate 1",
+            transporterCustomInfo: "info 1"
+          }
+        },
         wasteDetailsQuantity: 1,
         wasteDetailsOnuCode: "onu 1",
         wasteDetailsPackagingInfos: [
@@ -78,7 +83,11 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
         wasteDetailsOnuCode: null,
         wasteDetailsPackagingInfos: [],
         wasteDetailsQuantity: null,
-        transporterCompanySiret: transporter2Company.siret
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter2Company.siret
+          }
+        }
       }
     });
   });
@@ -100,12 +109,8 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
     ]);
     expect(stateSummary!.onuCode).toEqual(form.wasteDetailsOnuCode);
     expect(stateSummary!.transporter!.siret).toEqual(transporter1Company.siret);
-    expect(stateSummary!.transporterNumberPlate).toEqual(
-      form.transporterNumberPlate
-    );
-    expect(stateSummary!.transporterCustomInfo).toEqual(
-      form.transporterCustomInfo
-    );
+    expect(stateSummary!.transporterNumberPlate).toEqual("plate 1");
+    expect(stateSummary!.transporterCustomInfo).toEqual("info 1");
     expect(stateSummary!.emitter!.siret).toEqual(emitter.company.siret);
     expect(stateSummary!.recipient!.siret).toEqual(collectorCompany.siret);
   });
@@ -147,13 +152,24 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
             wasteDetailsPackagingInfos: [
               { type: "FUT", quantity: 2, other: null }
             ],
-            transporterNumberPlate: "plate 2",
-            transporterCustomInfo: "info 2"
+            transporters: {
+              updateMany: {
+                where: { number: 1 },
+                data: {
+                  transporterNumberPlate: "plate 2",
+                  transporterCustomInfo: "info 2"
+                }
+              }
+            }
           }
         }
       },
-      include: { forwardedIn: true }
+      include: { forwardedIn: { include: { transporters: true } } }
     });
+
+    const forwardedInTransporter = getFirstTransporterSync(
+      updatedForm.forwardedIn!
+    );
 
     const { query } = makeClient(emitter.user);
 
@@ -175,10 +191,10 @@ describe("stateSummary of a form with temporaryStorageDetail", () => {
     );
     expect(stateSummary!.transporter!.siret).toEqual(transporter2Company.siret);
     expect(stateSummary!.transporterNumberPlate).toEqual(
-      updatedForm.forwardedIn!.transporterNumberPlate
+      forwardedInTransporter!.transporterNumberPlate
     );
     expect(stateSummary!.transporterCustomInfo).toEqual(
-      updatedForm.forwardedIn!.transporterCustomInfo
+      forwardedInTransporter!.transporterCustomInfo
     );
     expect(stateSummary!.emitter!.siret).toEqual(collectorCompany.siret);
     expect(stateSummary!.recipient!.siret).toEqual(traiteurCompany.siret);

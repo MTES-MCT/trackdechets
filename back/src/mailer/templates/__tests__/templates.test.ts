@@ -1,4 +1,4 @@
-import { Form } from "@prisma/client";
+import { BsddTransporter, Form } from "@prisma/client";
 import {
   onSignup,
   inviteUserToJoin,
@@ -70,7 +70,7 @@ describe("templates", () => {
   });
 
   test("formNotAccepted", () => {
-    const form: Partial<Form> = {
+    const form: Partial<Form & BsddTransporter> = {
       recipientCompanyName: "Recipient",
       receivedAt: new Date("2021-01-01"),
       emitterCompanyName: "Emitter",
@@ -103,7 +103,7 @@ describe("templates", () => {
   });
 
   test("formNotAccepted with exemption of receipt", () => {
-    const form: Partial<Form> = {
+    const form: Partial<Form & BsddTransporter> = {
       recipientCompanyName: "Recipient",
       receivedAt: new Date("2021-01-01"),
       emitterCompanyName: "Emitter",
@@ -128,7 +128,7 @@ describe("templates", () => {
   });
 
   test("formNotAccepted with wasteRefusalReason nullish", () => {
-    const form: Partial<Form> = {
+    const form: Partial<Form & BsddTransporter> = {
       recipientCompanyName: "Recipient",
       receivedAt: new Date("2021-01-01"),
       emitterCompanyName: "Emitter",
@@ -151,7 +151,7 @@ describe("templates", () => {
   });
 
   test("formPartiallyRefused", () => {
-    const form: Partial<Form> = {
+    const form: Partial<Form & BsddTransporter> = {
       recipientCompanyName: "Recipient",
       receivedAt: new Date("2021-01-01"),
       emitterCompanyName: "Emitter",
@@ -185,7 +185,7 @@ describe("templates", () => {
   });
 
   test("formPartiallyRefused with exemption of receipt", () => {
-    const form: Partial<Form> = {
+    const form: Partial<Form & BsddTransporter> = {
       recipientCompanyName: "Recipient",
       receivedAt: new Date("2021-01-01"),
       emitterCompanyName: "Emitter",
@@ -211,7 +211,7 @@ describe("templates", () => {
   });
 
   test("formPartiallyRefused with wasteRefusalReason nullish", () => {
-    const form: Partial<Form> = {
+    const form: Partial<Form & BsddTransporter> = {
       recipientCompanyName: "Recipient",
       receivedAt: new Date("2021-01-01"),
       emitterCompanyName: "Emitter",

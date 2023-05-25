@@ -3,7 +3,7 @@ import {
   Form,
   Form as PrismaForm,
   Prisma,
-  TransportSegment as PrismaTransportSegment,
+  BsddTransporter,
   TransportMode
 } from "@prisma/client";
 import DataLoader from "dataloader";
@@ -62,6 +62,7 @@ import {
 } from "../generated/graphql/types";
 import prisma from "../prisma";
 import { extractPostalCode } from "../utils";
+import { getFirstTransporter, getFirstTransporterSync } from "./database";
 
 function flattenDestinationInput(input: {
   destination?: DestinationInput | null;
@@ -129,10 +130,10 @@ function flattenWasteDetailsInput(input: {
   };
 }
 
-function flattenTransporterInput(input: {
+export function flattenTransporterInput(input: {
   transporter?: TransporterInput | null;
 }) {
-  return {
+  return safeInput({
     transporterCompanyName: chain(input.transporter, t =>
       chain(t.company, c => c.name)
     ),
@@ -164,7 +165,7 @@ function flattenTransporterInput(input: {
     transporterNumberPlate: chain(input.transporter, t => t.numberPlate),
     transporterCustomInfo: chain(input.transporter, t => t.customInfo),
     transporterTransportMode: chain(input.transporter, t => t.mode)
-  };
+  });
 }
 
 function flattenEmitterInput(input: { emitter?: EmitterInput | null }) {
@@ -403,7 +404,6 @@ export function flattenFormInput(
     customId: formInput.customId,
     ...flattenEmitterInput(formInput),
     ...flattenRecipientInput(formInput),
-    ...flattenTransporterInput(formInput),
     ...flattenWasteDetailsInput(formInput),
     ...flattenTraderInput(formInput),
     ...flattenBrokerInput(formInput),
@@ -433,7 +433,6 @@ export function flattenImportPaperFormInput(
     ...flattenEmitterInput(rest),
     ...flattenEcoOrganismeInput(rest),
     ...flattenRecipientInput(rest),
-    ...flattenTransporterInput(rest),
     ...flattenWasteDetailsInput(rest),
     ...flattenTraderInput(rest),
     ...flattenBrokerInput(rest),
@@ -502,7 +501,37 @@ export function flattenTransportSegmentInput(
       segmentInput.transporter,
       t => t.validityLimit
     ),
-    mode: segmentInput.mode
+    transporterTransportMode: segmentInput.mode
+  });
+}
+
+export function expandTransporterFromDb(
+  transporter: BsddTransporter
+): Transporter | null {
+  return nullIfNoValues<Transporter>({
+    company: nullIfNoValues<FormCompany>({
+      name: transporter.transporterCompanyName,
+      orgId: getTransporterCompanyOrgId(transporter),
+      siret: transporter.transporterCompanySiret,
+      vatNumber: transporter.transporterCompanyVatNumber,
+      address: transporter.transporterCompanyAddress,
+      contact: transporter.transporterCompanyContact,
+      phone: transporter.transporterCompanyPhone,
+      mail: transporter.transporterCompanyMail
+    }),
+    isExemptedOfReceipt: transporter.transporterIsExemptedOfReceipt,
+    receipt: transporter.transporterReceipt,
+    department: transporter.transporterDepartment,
+    validityLimit: processDate(transporter.transporterValidityLimit),
+    numberPlate: transporter.transporterNumberPlate,
+    customInfo: transporter.transporterCustomInfo,
+    // transportMode has default value in DB but we do not want to return anything
+    // if the transporter siret is not defined
+    mode:
+      !transporter.transporterCompanySiret &&
+      transporter.transporterTransportMode === TransportMode.ROAD
+        ? null
+        : transporter.transporterTransportMode
   });
 }
 
@@ -530,8 +559,26 @@ export async function expandFormFromDb(
     forwardedIn = form.forwardedInId
       ? dataloader
         ? await dataloader.load(form.id)
-        : await prisma.form.findUnique({ where: { id: form.id } }).forwardedIn()
+        : await prisma.form
+            .findUnique({ where: { id: form.id } })
+            .forwardedIn({ include: { transporters: true } })
       : null;
+  }
+
+  const transporter = form["transporters"]
+    ? getFirstTransporterSync(form) // avoid retrieving transporters twice if it is already passed
+    : await getFirstTransporter(form);
+
+  let forwardedInTransporter: BsddTransporter | null = null;
+
+  if (forwardedIn) {
+    if (forwardedIn["transporters"]) {
+      forwardedInTransporter = await getFirstTransporterSync(
+        forwardedIn as any
+      ); // avoid retrieving transporters twice if it is already passed
+    } else {
+      forwardedInTransporter = await getFirstTransporter(forwardedIn);
+    }
   }
 
   return {
@@ -561,6 +608,7 @@ export async function expandFormFromDb(
         omiNumber: form.emitterCompanyOmiNumber
       })
     }),
+    transporter: transporter ? expandTransporterFromDb(transporter) : null,
     recipient: nullIfNoValues<Recipient>({
       cap: form.recipientCap,
       processingOperation: form.recipientProcessingOperation,
@@ -574,31 +622,7 @@ export async function expandFormFromDb(
       }),
       isTempStorage: form.recipientIsTempStorage
     }),
-    transporter: nullIfNoValues<Transporter>({
-      company: nullIfNoValues<FormCompany>({
-        name: form.transporterCompanyName,
-        orgId: getTransporterCompanyOrgId(form),
-        siret: form.transporterCompanySiret,
-        vatNumber: form.transporterCompanyVatNumber,
-        address: form.transporterCompanyAddress,
-        contact: form.transporterCompanyContact,
-        phone: form.transporterCompanyPhone,
-        mail: form.transporterCompanyMail
-      }),
-      isExemptedOfReceipt: form.transporterIsExemptedOfReceipt,
-      receipt: form.transporterReceipt,
-      department: form.transporterDepartment,
-      validityLimit: processDate(form.transporterValidityLimit),
-      numberPlate: form.transporterNumberPlate,
-      customInfo: form.transporterCustomInfo,
-      // transportMode has default value in DB but we do not want to return anything
-      // if the transporter siret is not defined
-      mode:
-        !form.transporterCompanySiret &&
-        form.transporterTransportMode === TransportMode.ROAD
-          ? null
-          : form.transporterTransportMode
-    }),
+
     wasteDetails: nullIfNoValues<WasteDetails>({
       code: form.wasteDetailsCode,
       name: form.wasteDetailsName,
@@ -729,6 +753,9 @@ export async function expandFormFromDb(
             receivedAt: processDate(form.receivedAt),
             receivedBy: form.receivedBy
           },
+          transporter: forwardedInTransporter
+            ? expandTransporterFromDb(forwardedInTransporter)
+            : null,
           destination: nullIfNoValues<Destination>({
             cap: forwardedIn.recipientCap,
             processingOperation: forwardedIn.recipientProcessingOperation,
@@ -757,31 +784,6 @@ export async function expandFormFromDb(
             consistence: forwardedIn.wasteDetailsConsistence,
             pop: forwardedIn.wasteDetailsPop,
             isDangerous: forwardedIn.wasteDetailsIsDangerous
-          }),
-          transporter: nullIfNoValues<Transporter>({
-            company: nullIfNoValues<FormCompany>({
-              name: forwardedIn.transporterCompanyName,
-              orgId: getTransporterCompanyOrgId(forwardedIn),
-              siret: forwardedIn.transporterCompanySiret,
-              vatNumber: forwardedIn.transporterCompanyVatNumber,
-              address: forwardedIn.transporterCompanyAddress,
-              contact: forwardedIn.transporterCompanyContact,
-              phone: forwardedIn.transporterCompanyPhone,
-              mail: forwardedIn.transporterCompanyMail
-            }),
-            isExemptedOfReceipt: forwardedIn.transporterIsExemptedOfReceipt,
-            receipt: forwardedIn.transporterReceipt,
-            department: forwardedIn.transporterDepartment,
-            validityLimit: processDate(forwardedIn.transporterValidityLimit),
-            numberPlate: forwardedIn.transporterNumberPlate,
-            customInfo: forwardedIn.transporterCustomInfo,
-            // transportMode has default value in DB but we do not want to return anything
-            // if the transporter siret is not defined
-            mode:
-              !forwardedIn.transporterCompanySiret &&
-              forwardedIn.transporterTransportMode === TransportMode.ROAD
-                ? null
-                : forwardedIn.transporterTransportMode
           }),
           emittedAt: processDate(forwardedIn.emittedAt),
           emittedBy: forwardedIn.emittedBy,
@@ -849,7 +851,7 @@ export async function expandInitialFormFromDb(
 }
 
 export function expandTransportSegmentFromDb(
-  segment: PrismaTransportSegment
+  segment: BsddTransporter
 ): GraphQLTransportSegment {
   return {
     id: segment.id,
@@ -876,11 +878,11 @@ export function expandTransportSegmentFromDb(
       numberPlate: segment.transporterNumberPlate,
       customInfo: null
     }),
-    mode: segment.mode,
+    mode: segment.transporterTransportMode,
     takenOverAt: processDate(segment.takenOverAt),
     takenOverBy: segment.takenOverBy,
     readyToTakeOver: segment.readyToTakeOver,
-    segmentNumber: segment.segmentNumber
+    segmentNumber: segment.number
   };
 }
 

@@ -36,7 +36,9 @@ describe("Mutation.creatPdfAccessToken", () => {
     await formFactory({
       ownerId: user.id,
       opt: {
-        transporterCompanySiret: company.siret
+        transporters: {
+          create: { transporterCompanySiret: company.siret }
+        }
       }
     });
     const { mutate } = makeClient(user);
@@ -64,7 +66,9 @@ describe("Mutation.creatPdfAccessToken", () => {
     const bsdd = await formFactory({
       ownerId: user.id,
       opt: {
-        transporterCompanySiret: company.siret,
+        transporters: {
+          create: { transporterCompanySiret: company.siret }
+        },
         status: Status.SENT
       }
     });
@@ -93,7 +97,9 @@ describe("Mutation.creatPdfAccessToken", () => {
     const bsdd = await formFactory({
       ownerId: user.id,
       opt: {
-        transporterCompanySiret: company.siret,
+        transporters: {
+          create: { transporterCompanySiret: company.siret }
+        },
         status: Status.RECEIVED
       }
     });
@@ -124,7 +130,9 @@ describe("Mutation.creatPdfAccessToken", () => {
     const bsdd = await formFactory({
       ownerId: user.id,
       opt: {
-        transporterCompanySiret: company.siret,
+        transporters: {
+          create: { transporterCompanySiret: company.siret }
+        },
         status: Status.SENT
       }
     });

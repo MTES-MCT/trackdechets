@@ -11,8 +11,8 @@ const buildFindFullFormById: (
     prisma.form.findUnique({
       where: { id },
       include: {
-        forwardedIn: true,
-        transportSegments: true,
+        forwardedIn: { include: { transporters: true } },
+        transporters: true,
         intermediaries: true
       }
     });

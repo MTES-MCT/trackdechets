@@ -340,13 +340,18 @@ describe("Mutation.createFormRevisionRequest", () => {
             recipientCompanySiret: company.siret,
             recipientCap: "",
             recipientProcessingOperation: "R 6",
-            transporterCompanyName: "Transporter",
-            transporterCompanySiret: siretify(4),
-            transporterIsExemptedOfReceipt: false,
-            transporterReceipt: "Dabcd",
-            transporterDepartment: "10",
-            transporterValidityLimit: "2054-11-20T00:00:00.000Z",
-            transporterNumberPlate: ""
+            transporters: {
+              create: {
+                transporterCompanyName: "Transporter",
+                transporterCompanySiret: siretify(4),
+                transporterIsExemptedOfReceipt: false,
+                transporterReceipt: "Dabcd",
+                transporterDepartment: "10",
+                transporterValidityLimit: "2054-11-20T00:00:00.000Z",
+                transporterNumberPlate: "",
+                number: 1
+              }
+            }
           }
         }
       }

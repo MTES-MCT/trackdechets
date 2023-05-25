@@ -829,9 +829,13 @@ describe("Integration / Forms query for transporters", () => {
     const form = await formFactory({
       ownerId: owner.id,
       opt: {
-        transporterCompanySiret: transporter.siret,
         transportersSirets: [transporter.siret!],
-        status: "SEALED"
+        status: "SEALED",
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.siret
+          }
+        }
       }
     });
 
@@ -863,9 +867,13 @@ describe("Integration / Forms query for transporters", () => {
     const form = await formFactory({
       ownerId: owner.id,
       opt: {
-        transporterCompanySiret,
         transportersSirets: [transporterCompanySiret, transporter.siret!], // pre populate with the transport segment siret
-        status: "SEALED"
+        status: "SEALED",
+        transporters: {
+          create: {
+            transporterCompanySiret
+          }
+        }
       }
     });
     // our transporter is on one segment
@@ -903,9 +911,13 @@ describe("Integration / Forms query for transporters", () => {
     const form = await formFactory({
       ownerId: user.id,
       opt: {
-        transporterCompanySiret: null,
-        transporterCompanyVatNumber: company.vatNumber,
-        transportersSirets: [company.vatNumber!]
+        transportersSirets: [company.vatNumber!],
+        transporters: {
+          create: {
+            transporterCompanySiret: null,
+            transporterCompanyVatNumber: company.vatNumber
+          }
+        }
       }
     });
 

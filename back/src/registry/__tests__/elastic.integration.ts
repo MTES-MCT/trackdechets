@@ -102,10 +102,14 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       ownerId: emitter.user.id,
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         recipientCompanySiret: destination.company.siret,
         status: Status.ACCEPTED,
-        receivedAt: new Date()
+        receivedAt: new Date(),
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret
+          }
+        }
       }
     });
 
@@ -121,10 +125,14 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       ownerId: emitter.user.id,
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         recipientCompanySiret: ttr.company.siret,
         status: Status.TEMP_STORER_ACCEPTED,
-        receivedAt: new Date()
+        receivedAt: new Date(),
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret
+          }
+        }
       },
       forwardedInOpts: {
         recipientCompanySiret: destination.company.siret
@@ -143,10 +151,14 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       ownerId: emitter.user.id,
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         recipientCompanySiret: ttr.company.siret,
         status: Status.ACCEPTED,
-        receivedAt: new Date()
+        receivedAt: new Date(),
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret
+          }
+        }
       },
       forwardedInOpts: {
         recipientCompanySiret: destination.company.siret,
@@ -166,10 +178,14 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       ownerId: emitter.user.id,
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         recipientCompanySiret: destination.company.siret,
         status: Status.SENT,
-        receivedAt: null
+        receivedAt: null,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret
+          }
+        }
       }
     });
 
@@ -337,11 +353,15 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       ownerId: emitter.user.id,
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         recipientCompanySiret: ttr.company.siret,
         status: Status.RESENT,
         receivedAt: new Date(),
-        signedAt: new Date()
+        signedAt: new Date(),
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret
+          }
+        }
       },
       forwardedInOpts: {
         emitterCompanySiret: ttr.company.siret,
@@ -514,8 +534,12 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     const form = await formFactory({
       ownerId: transporter.user.id,
       opt: {
-        transporterCompanySiret: transporter.company.siret,
-        sentAt: new Date()
+        sentAt: new Date(),
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret
+          }
+        }
       }
     });
     await indexForm(await getFullForm(form));
@@ -527,8 +551,12 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     const form = await formFactory({
       ownerId: transporter.user.id,
       opt: {
-        transporterCompanySiret: transporter.company.siret,
-        sentAt: null
+        sentAt: null,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret
+          }
+        }
       }
     });
     await indexForm(await getFullForm(form));
@@ -541,15 +569,23 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
       ownerId: emitter.user.id,
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         recipientCompanySiret: ttr.company.siret,
-        status: Status.RESENT
+        status: Status.RESENT,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret
+          }
+        }
       },
       forwardedInOpts: {
         recipientCompanySiret: destination.company.siret,
-        transporterCompanySiret: transporter2.company.siret,
         sentAt: new Date(),
-        status: Status.SENT
+        status: Status.SENT,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter2.company.siret
+          }
+        }
       }
     });
 
@@ -756,8 +792,12 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     const form = await formFactory({
       ownerId: transporter.user.id,
       opt: {
-        transporterCompanySiret: transporter.company.siret,
-        sentAt: new Date()
+        sentAt: new Date(),
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret
+          }
+        }
       }
     });
     await indexForm(await getFullForm(form));
@@ -823,8 +863,12 @@ describe("Retrieval of bsds in ES based on waste registry type", () => {
     const form = await formWithTempStorageFactory({
       ownerId: emitter.user.id,
       forwardedInOpts: {
-        transporterCompanySiret: transporter.company.siret,
-        sentAt: new Date()
+        sentAt: new Date(),
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret
+          }
+        }
       }
     });
 

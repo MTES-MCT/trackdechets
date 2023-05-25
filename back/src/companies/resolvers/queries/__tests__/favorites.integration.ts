@@ -278,7 +278,9 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        transporterCompanySiret: transporter.siret,
+        transporters: {
+          create: { transporterCompanySiret: transporter.siret }
+        },
         transportersSirets: [transporter.siret!]
       }
     });
@@ -322,7 +324,11 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        transporterCompanyVatNumber: transporter.vatNumber
+        transporters: {
+          create: {
+            transporterCompanyVatNumber: transporter.vatNumber
+          }
+        }
       }
     });
 
@@ -360,7 +366,11 @@ describe("query favorites", () => {
       ownerId: user.id,
       opt: {
         emitterCompanySiret: company.siret,
-        transporterCompanySiret: siretify(1)
+        transporters: {
+          create: {
+            transporterCompanySiret: siretify(1)
+          }
+        }
       }
     });
     const { query } = makeClient({ ...user, auth: AuthType.Session });
@@ -883,16 +893,24 @@ describe("query favorites", () => {
     await formFactory({
       ownerId: user.id,
       opt: {
-        transporterCompanyName: "A Name",
-        transporterCompanyVatNumber: transporter.vatNumber,
+        transporters: {
+          create: {
+            transporterCompanyName: "A Name",
+            transporterCompanyVatNumber: transporter.vatNumber
+          }
+        },
         recipientsSirets: [company.siret!]
       }
     });
     await formFactory({
       ownerId: user.id,
       opt: {
-        transporterCompanyName: "Another Name",
-        transporterCompanyVatNumber: transporter.vatNumber,
+        transporters: {
+          create: {
+            transporterCompanyName: "Another Name",
+            transporterCompanyVatNumber: transporter.vatNumber
+          }
+        },
         recipientsSirets: [company.siret!]
       }
     });

@@ -76,7 +76,6 @@ describe("Transported wastes registry", () => {
       ownerId: transporter.user.id,
       opt: {
         emitterCompanySiret: emitter.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         recipientCompanySiret: destination.company.siret,
         wasteDetailsCode: "05 01 02*",
         status: Status.PROCESSED,
@@ -85,7 +84,12 @@ describe("Transported wastes registry", () => {
         sentAt: new Date("2021-04-01"),
         receivedAt: new Date("2021-04-01"),
         processedAt: new Date("2021-04-01"),
-        processingOperationDone: "R 1"
+        processingOperationDone: "R 1",
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret
+          }
+        }
       }
     });
     bsd2 = await bsdaFactory({

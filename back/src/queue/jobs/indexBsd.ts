@@ -38,8 +38,8 @@ export async function indexBsdJob(
     const fullForm = await prisma.form.findUniqueOrThrow({
       where: { readableId: bsdId },
       include: {
-        forwardedIn: true,
-        transportSegments: true,
+        forwardedIn: { include: { transporters: true } },
+        transporters: true,
         intermediaries: true
       }
     });

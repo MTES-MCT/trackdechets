@@ -51,7 +51,15 @@ describe("Query.form", () => {
     async type => {
       const { user, company } = await userWithCompanyFactory("ADMIN");
       const form = await createForm({
-        [`${type}CompanySiret`]: company.siret
+        ...(type === "transporter"
+          ? {
+              transporters: {
+                create: {
+                  [`${type}CompanySiret`]: company.siret
+                }
+              }
+            }
+          : { [`${type}CompanySiret`]: company.siret })
       });
 
       const { query } = makeClient(user);

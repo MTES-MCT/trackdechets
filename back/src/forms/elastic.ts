@@ -6,6 +6,7 @@ import { getRegistryFields } from "./registry";
 import { getSiretsByTab, getRecipient } from "./elasticHelpers";
 
 import { buildAddress } from "../companies/sirene/utils";
+import { getFirstTransporterSync } from "./database";
 
 /**
  * Convert a BSD from the forms table to Elastic Search's BSD model.
@@ -14,7 +15,10 @@ export function toBsdElastic(
   form: FullForm & { forwarding?: Form }
 ): BsdElastic {
   const siretsByTab = getSiretsByTab(form);
+
   const recipient = getRecipient(form);
+
+  const transporter1 = getFirstTransporterSync(form);
 
   return {
     type: "BSDD",
@@ -45,13 +49,14 @@ export function toBsdElastic(
     workerCompanySiret: "",
     workerCompanyAddress: "",
 
-    transporterCompanyName: form.transporterCompanyName ?? "",
-    transporterCompanySiret: form.transporterCompanySiret ?? "",
-    transporterCompanyVatNumber: form.transporterCompanyVatNumber ?? "",
-    transporterCompanyAddress: form.transporterCompanyAddress ?? "",
-    transporterCustomInfo: form.transporterCustomInfo ?? "",
-    transporterTransportPlates: form.transporterNumberPlate
-      ? [transportPlateFilter(form.transporterNumberPlate)]
+    transporterCompanyName: transporter1?.transporterCompanyName ?? "",
+    transporterCompanySiret: transporter1?.transporterCompanySiret ?? "",
+    transporterCompanyVatNumber:
+      transporter1?.transporterCompanyVatNumber ?? "",
+    transporterCompanyAddress: transporter1?.transporterCompanyAddress ?? "",
+    transporterCustomInfo: transporter1?.transporterCustomInfo ?? "",
+    transporterTransportPlates: transporter1?.transporterNumberPlate
+      ? [transportPlateFilter(transporter1?.transporterNumberPlate)]
       : [],
 
     destinationCompanyName: recipient.name ?? "",
@@ -117,7 +122,6 @@ export async function indexForm(
     indexBsd(
       toBsdElastic({
         ...form.forwardedIn,
-        transportSegments: [],
         intermediaries: [],
         forwardedIn: null,
         forwarding: form

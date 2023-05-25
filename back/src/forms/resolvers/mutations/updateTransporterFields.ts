@@ -27,7 +27,14 @@ const updateTransporterFieldsResolver: MutationResolvers["updateTransporterField
 
     const updatedForm = await getFormRepository(user).update(
       { id },
-      { transporterNumberPlate, transporterCustomInfo }
+      {
+        transporters: {
+          updateMany: {
+            where: { number: 1 },
+            data: { transporterNumberPlate, transporterCustomInfo }
+          }
+        }
+      }
     );
 
     return expandFormFromDb(updatedForm);

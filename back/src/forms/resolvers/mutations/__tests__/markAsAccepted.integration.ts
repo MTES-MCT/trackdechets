@@ -509,7 +509,11 @@ describe("Test Form reception", () => {
           status: Status.RECEIVED,
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: company.siret,
-          transporterCompanySiret: company.siret,
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret
+            }
+          },
           owner: { connect: { id: user.id } }
         }
       });
@@ -550,7 +554,11 @@ describe("Test Form reception", () => {
           status: Status.RECEIVED,
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: company.siret,
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret
+            }
+          },
           owner: { connect: { id: user.id } }
         }
       });
@@ -562,7 +570,11 @@ describe("Test Form reception", () => {
           emitterType: EmitterType.APPENDIX1,
           emitterCompanySiret: company.siret,
           emitterCompanyName: company.name,
-          transporterCompanySiret: company.siret,
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret
+            }
+          },
           recipientCompanySiret: company.siret,
           grouping: {
             create: { initialFormId: appendix1_item.id, quantity: 0 }

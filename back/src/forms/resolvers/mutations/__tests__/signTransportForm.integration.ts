@@ -7,11 +7,11 @@ import {
 import prisma from "../../../../prisma";
 import {
   formFactory,
+  formWithTempStorageFactory,
   toIntermediaryCompany,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import getReadableId from "../../../readableId";
 
 const SIGN_TRANSPORT_FORM = `
   mutation SignTransportForm($id: ID!, $input: SignTransportFormInput!, $securityCode: Int) {
@@ -47,13 +47,17 @@ describe("signTransportForm", () => {
         status: "SIGNED_BY_PRODUCER",
         emitterCompanySiret: emitter.company.siret,
         emitterCompanyName: emitter.company.name,
-        transporterCompanySiret: transporter.company.siret,
-        transporterCompanyName: transporter.company.name,
         signedByTransporter: null,
         sentAt: null,
         sentBy: null,
         emittedAt: emittedAt,
-        emittedBy: emitter.user.name
+        emittedBy: emitter.user.name,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name
+          }
+        }
       }
     });
 
@@ -97,13 +101,17 @@ describe("signTransportForm", () => {
         status: "SIGNED_BY_PRODUCER",
         emitterCompanySiret: emitter.company.siret,
         emitterCompanyName: emitter.company.name,
-        transporterCompanySiret: transporter.company.siret,
-        transporterCompanyName: transporter.company.name,
         signedByTransporter: null,
         sentAt: null,
         sentBy: null,
         emittedAt: emittedAt,
-        emittedBy: emitter.user.name
+        emittedBy: emitter.user.name,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name
+          }
+        }
       }
     });
 
@@ -148,13 +156,17 @@ describe("signTransportForm", () => {
         status: "SIGNED_BY_PRODUCER",
         emitterCompanySiret: emitter.company.siret,
         emitterCompanyName: emitter.company.name,
-        transporterCompanySiret: transporter.company.siret,
-        transporterCompanyName: transporter.company.name,
         signedByTransporter: null,
         sentAt: null,
         sentBy: null,
         emittedAt: emittedAt,
-        emittedBy: emitter.user.name
+        emittedBy: emitter.user.name,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyName: transporter.company.name
+          }
+        }
       }
     });
 
@@ -181,18 +193,19 @@ describe("signTransportForm", () => {
     const transporter = await userWithCompanyFactory("ADMIN");
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
     const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
-    const form = await formFactory({
+
+    const form = await formWithTempStorageFactory({
       ownerId: temporaryStorage.user.id,
       opt: {
         status: "SIGNED_BY_TEMP_STORER",
         recipientCompanySiret: temporaryStorage.company.siret,
-        recipientCompanyName: temporaryStorage.company.name,
-        forwardedIn: {
+        recipientCompanyName: temporaryStorage.company.name
+      },
+      forwardedInOpts: {
+        emittedAt: emittedAt,
+        emittedBy: temporaryStorage.user.name,
+        transporters: {
           create: {
-            readableId: getReadableId(),
-            ownerId: temporaryStorage.user.id,
-            emittedAt: emittedAt,
-            emittedBy: temporaryStorage.user.name,
             transporterCompanySiret: transporter.company.siret,
             transporterCompanyName: transporter.company.name
           }
@@ -234,18 +247,19 @@ describe("signTransportForm", () => {
     const transporter = await userWithCompanyFactory("ADMIN");
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
     const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
-    const form = await formFactory({
+
+    const form = await formWithTempStorageFactory({
       ownerId: temporaryStorage.user.id,
       opt: {
         status: "SIGNED_BY_TEMP_STORER",
         recipientCompanySiret: temporaryStorage.company.siret,
-        recipientCompanyName: temporaryStorage.company.name,
-        forwardedIn: {
+        recipientCompanyName: temporaryStorage.company.name
+      },
+      forwardedInOpts: {
+        emittedAt: emittedAt,
+        emittedBy: temporaryStorage.user.name,
+        transporters: {
           create: {
-            readableId: getReadableId(),
-            ownerId: temporaryStorage.user.id,
-            emittedAt: emittedAt,
-            emittedBy: temporaryStorage.user.name,
             transporterCompanySiret: transporter.company.siret,
             transporterCompanyName: transporter.company.name
           }
@@ -288,18 +302,19 @@ describe("signTransportForm", () => {
     const transporter = await userWithCompanyFactory("ADMIN");
     const emittedAt = new Date("2018-12-11T00:00:00.000Z");
     const takenOverAt = new Date("2018-12-12T00:00:00.000Z");
-    const form = await formFactory({
+
+    const form = await formWithTempStorageFactory({
       ownerId: temporaryStorage.user.id,
       opt: {
         status: "SIGNED_BY_TEMP_STORER",
         recipientCompanySiret: temporaryStorage.company.siret,
-        recipientCompanyName: temporaryStorage.company.name,
-        forwardedIn: {
+        recipientCompanyName: temporaryStorage.company.name
+      },
+      forwardedInOpts: {
+        emittedAt: emittedAt,
+        emittedBy: temporaryStorage.user.name,
+        transporters: {
           create: {
-            readableId: getReadableId(),
-            ownerId: temporaryStorage.user.id,
-            emittedAt: emittedAt,
-            emittedBy: temporaryStorage.user.name,
             transporterCompanySiret: transporter.company.siret,
             transporterCompanyName: transporter.company.name
           }
@@ -337,11 +352,15 @@ describe("signTransportForm", () => {
       opt: {
         status: "SIGNED_BY_PRODUCER",
         recipientCompanySiret: recipient.company.siret,
-        transporterCompanySiret: transporter.company.siret,
         recipientCompanyName: recipient.company.name,
         emittedAt,
         intermediaries: {
           create: [toIntermediaryCompany(intermediary.company)]
+        },
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret
+          }
         }
       }
     });
@@ -409,8 +428,12 @@ describe("signTransportForm", () => {
       ownerId: emitter.user.id,
       opt: {
         status: Status.SIGNED_BY_PRODUCER,
-        transporterCompanySiret: transporter.company.siret,
-        transporterCompanyAddress: null
+        transporters: {
+          create: {
+            transporterCompanySiret: transporter.company.siret,
+            transporterCompanyAddress: null
+          }
+        }
       }
     });
 
@@ -445,7 +468,11 @@ describe("signTransportForm", () => {
           emitterType: EmitterType.APPENDIX1,
           emitterCompanySiret: company.siret,
           emitterCompanyName: company.name,
-          transporterCompanySiret: company.siret
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret
+            }
+          }
         }
       });
 
@@ -475,14 +502,18 @@ describe("signTransportForm", () => {
       );
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const appendix1_item = await formFactory({
+      const appendix1Item = await formFactory({
         ownerId: user.id,
         opt: {
           status: Status.SIGNED_BY_PRODUCER,
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
           emitterCompanyName: company.name,
-          transporterCompanySiret: company.siret
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret
+            }
+          }
         }
       });
 
@@ -493,7 +524,11 @@ describe("signTransportForm", () => {
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
           emitterCompanyName: company.name,
-          transporterCompanySiret: company.siret
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret
+            }
+          }
         }
       });
 
@@ -504,9 +539,13 @@ describe("signTransportForm", () => {
           emitterType: EmitterType.APPENDIX1,
           emitterCompanySiret: company.siret,
           emitterCompanyName: company.name,
-          transporterCompanySiret: company.siret,
           grouping: {
-            create: { initialFormId: appendix1_item.id, quantity: 0 }
+            create: { initialFormId: appendix1Item.id, quantity: 0 }
+          },
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret
+            }
           }
         }
       });
@@ -517,7 +556,7 @@ describe("signTransportForm", () => {
         MutationSignTransportFormArgs
       >(SIGN_TRANSPORT_FORM, {
         variables: {
-          id: appendix1_item.id,
+          id: appendix1Item.id,
           input: {
             takenOverAt: new Date().toISOString() as unknown as Date,
             takenOverBy: "Collecteur annexe 1"
@@ -546,18 +585,26 @@ describe("signTransportForm", () => {
           status: Status.SENT,
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: company.siret
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret
+            }
+          }
         }
       });
 
       // This second item will be signed
-      const appendix1_item = await formFactory({
+      const appendix1Item = await formFactory({
         ownerId: user.id,
         opt: {
           status: Status.SIGNED_BY_PRODUCER,
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: company.siret
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret
+            }
+          }
         }
       });
 
@@ -569,13 +616,17 @@ describe("signTransportForm", () => {
           emitterType: EmitterType.APPENDIX1,
           emitterCompanySiret: company.siret,
           emitterCompanyName: company.name,
-          transporterCompanySiret: company.siret,
           grouping: {
             createMany: {
               data: [
                 { initialFormId: appendix1_signed.id, quantity: 0 },
-                { initialFormId: appendix1_item.id, quantity: 0 }
+                { initialFormId: appendix1Item.id, quantity: 0 }
               ]
+            }
+          },
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret
             }
           }
         }
@@ -587,7 +638,7 @@ describe("signTransportForm", () => {
         MutationSignTransportFormArgs
       >(SIGN_TRANSPORT_FORM, {
         variables: {
-          id: appendix1_item.id,
+          id: appendix1Item.id,
           input: {
             takenOverAt: new Date().toISOString() as unknown as Date,
             takenOverBy: "Collecteur annexe 1"
@@ -608,13 +659,17 @@ describe("signTransportForm", () => {
       );
       const { user, company } = await userWithCompanyFactory("MEMBER");
 
-      const appendix1_item = await formFactory({
+      const appendix1Item = await formFactory({
         ownerId: user.id,
         opt: {
           status: Status.SIGNED_BY_PRODUCER,
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: company.siret
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret
+            }
+          }
         }
       });
 
@@ -625,9 +680,13 @@ describe("signTransportForm", () => {
           emitterType: EmitterType.APPENDIX1,
           emitterCompanySiret: company.siret,
           emitterCompanyName: company.name,
-          transporterCompanySiret: company.siret,
           grouping: {
-            create: { initialFormId: appendix1_item.id, quantity: 0 }
+            create: { initialFormId: appendix1Item.id, quantity: 0 }
+          },
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret
+            }
           }
         }
       });
@@ -638,7 +697,7 @@ describe("signTransportForm", () => {
         MutationSignTransportFormArgs
       >(SIGN_TRANSPORT_FORM, {
         variables: {
-          id: appendix1_item.id,
+          id: appendix1Item.id,
           input: {
             takenOverAt: new Date().toISOString() as unknown as Date,
             takenOverBy: "Collecteur annexe 1"
@@ -666,13 +725,17 @@ describe("signTransportForm", () => {
         }
       });
 
-      const appendix1_item = await formFactory({
+      const appendix1Item = await formFactory({
         ownerId: user.id,
         opt: {
           status: Status.SEALED, // Item is SEALED, not SIGNED_BY_PRODUCER
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: company.siret
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret
+            }
+          }
         }
       });
 
@@ -683,9 +746,13 @@ describe("signTransportForm", () => {
           emitterType: EmitterType.APPENDIX1,
           emitterCompanySiret: company.siret,
           emitterCompanyName: company.name,
-          transporterCompanySiret: company.siret,
           grouping: {
-            create: { initialFormId: appendix1_item.id, quantity: 0 }
+            create: { initialFormId: appendix1Item.id, quantity: 0 }
+          },
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret
+            }
           }
         }
       });
@@ -696,7 +763,7 @@ describe("signTransportForm", () => {
         MutationSignTransportFormArgs
       >(SIGN_TRANSPORT_FORM, {
         variables: {
-          id: appendix1_item.id,
+          id: appendix1Item.id,
           input: {
             takenOverAt: new Date().toISOString() as unknown as Date,
             takenOverBy: "Collecteur annexe 1"
@@ -719,14 +786,18 @@ describe("signTransportForm", () => {
       const { user, company } = await userWithCompanyFactory("MEMBER");
       const ecoOrganisme = await userWithCompanyFactory("ADMIN");
 
-      const appendix1_item = await formFactory({
+      const appendix1Item = await formFactory({
         ownerId: user.id,
         opt: {
           status: Status.SEALED, // Item is SEALED, not SIGNED_BY_PRODUCER
           emitterType: EmitterType.APPENDIX1_PRODUCER,
           emitterCompanySiret: producerCompany.siret,
-          transporterCompanySiret: company.siret,
-          ecoOrganismeSiret: "49337909300039" // Container has an eco organisme (copied here)
+          ecoOrganismeSiret: "49337909300039", // Container has an eco organisme (copied here)
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret
+            }
+          }
         }
       });
 
@@ -737,11 +808,15 @@ describe("signTransportForm", () => {
           emitterType: EmitterType.APPENDIX1,
           emitterCompanySiret: company.siret,
           emitterCompanyName: company.name,
-          transporterCompanySiret: company.siret,
           ecoOrganismeName: ecoOrganisme.company.name,
           ecoOrganismeSiret: ecoOrganisme.company.siret, // Container has an eco organisme => no emitter signature needed
           grouping: {
-            create: { initialFormId: appendix1_item.id, quantity: 0 }
+            create: { initialFormId: appendix1Item.id, quantity: 0 }
+          },
+          transporters: {
+            create: {
+              transporterCompanySiret: company.siret
+            }
           }
         }
       });
@@ -752,7 +827,7 @@ describe("signTransportForm", () => {
         MutationSignTransportFormArgs
       >(SIGN_TRANSPORT_FORM, {
         variables: {
-          id: appendix1_item.id,
+          id: appendix1Item.id,
           input: {
             takenOverAt: new Date().toISOString() as unknown as Date,
             takenOverBy: "Collecteur annexe 1"

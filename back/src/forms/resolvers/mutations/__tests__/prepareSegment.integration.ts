@@ -33,7 +33,14 @@ describe("{ mutation { prepareSegment } }", () => {
     const form = await formFactory({
       ownerId: owner.id,
       opt: {
-        transporterCompanySiret: transporterOrgId,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterOrgId,
+            number: 1,
+            takenOverAt: new Date(),
+            takenOverBy: "John Snow"
+          }
+        },
         status: "SENT",
         currentTransporterOrgId: transporterOrgId
       }
@@ -60,7 +67,7 @@ describe("{ mutation { prepareSegment } }", () => {
       }`
     );
 
-    const segment = await prisma.transportSegment.findUniqueOrThrow({
+    const segment = await prisma.bsddTransporter.findUniqueOrThrow({
       where: { id: data.prepareSegment.id }
     });
 
@@ -82,7 +89,14 @@ describe("{ mutation { prepareSegment } }", () => {
     const form = await formFactory({
       ownerId: firstTransporter.id,
       opt: {
-        transporterCompanySiret: transporterOrgId,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterOrgId,
+            number: 1,
+            takenOverAt: new Date(),
+            takenOverBy: "John Snow"
+          }
+        },
         status: "SENT",
         currentTransporterOrgId: transporterOrgId
       }
@@ -109,7 +123,7 @@ describe("{ mutation { prepareSegment } }", () => {
       }`
     );
 
-    const segment = await prisma.transportSegment.findUniqueOrThrow({
+    const segment = await prisma.bsddTransporter.findUniqueOrThrow({
       where: { id: data.prepareSegment.id }
     });
 
@@ -151,7 +165,13 @@ describe("{ mutation { prepareSegment } }", () => {
     const form = await formFactory({
       ownerId: owner.id,
       opt: {
-        transporterCompanySiret: transporterOrgId,
+        transporters: {
+          create: {
+            transporterCompanySiret: transporterOrgId,
+            takenOverAt: new Date(),
+            takenOverBy: "John Snow"
+          }
+        },
         status: "SENT",
         currentTransporterOrgId: transporterOrgId
       }
@@ -189,8 +209,8 @@ describe("{ mutation { prepareSegment } }", () => {
     expect(data.prepareSegment.transporter!.company!.siret).toBe(
       company2.siret
     );
-    const segment = await prisma.transportSegment.findFirstOrThrow({
-      where: { form: { id: form.id } }
+    const segment = await prisma.bsddTransporter.findFirstOrThrow({
+      where: { form: { id: form.id }, number: 2 }
     });
 
     expect(segment.id).toBe(data.prepareSegment.id);
