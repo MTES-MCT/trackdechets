@@ -1,5 +1,6 @@
 import { useQuery, gql } from "@apollo/client";
 import React, { useEffect, useState } from "react";
+import * as Sentry from "@sentry/browser";
 import { useParams } from "react-router-dom";
 import { InlineError } from "common/components/Error";
 import "./Company.scss";
@@ -92,6 +93,10 @@ export default function CompanyInfo() {
               }
             }
           }
+        })
+        .catch(error => {
+          // it just doesn't display the map if there is an error.
+          Sentry.captureException(error);
         });
     }
   }, [data]);
