@@ -40,13 +40,13 @@ import {
   SIGNATURE_ACCEPTATION_CONTENANT,
   SIGNATURE_ECO_ORG,
   SIGNER,
-  SIGNER_ENTREPOSAGE_PROVISOIRE,
   SIGNER_EN_TANT_QUE_TRAVAUX,
   VALIDER_ACCEPTATION,
   VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE,
   VALIDER_ENTREPOSAGE_PROVISOIRE,
   VALIDER_RECEPTION,
   VALIDER_TRAITEMENT,
+  completer_bsd_suite,
 } from "Apps/Common/wordings/dashboard/wordingsDashboard";
 
 describe("dashboardServices", () => {
@@ -513,7 +513,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(VALIDER_RECEPTION);
     });
 
-    it("should return SIGNER for BSDA in actTab and same destination siret", () => {
+    it("should return VALIDER_TRAITEMENT for BSDA in actTab and same destination siret", () => {
       const currentSiret = "123456789";
       const bsd = {
         type: BsdType.Bsda,
@@ -524,10 +524,10 @@ describe("dashboardServices", () => {
 
       const result = getSentBtnLabel(currentSiret, bsd, bsdCurrentTab);
 
-      expect(result).toEqual(SIGNER);
+      expect(result).toEqual(VALIDER_TRAITEMENT);
     });
 
-    it("should return SIGNER for BSVHU in actTab and same destination siret", () => {
+    it("should return VALIDER_TRAITEMENT for BSVHU in actTab and same destination siret", () => {
       const currentSiret = "123456789";
       const bsd = {
         type: BsdType.Bsvhu,
@@ -538,7 +538,7 @@ describe("dashboardServices", () => {
 
       const result = getSentBtnLabel(currentSiret, bsd, bsdCurrentTab);
 
-      expect(result).toEqual(SIGNER);
+      expect(result).toEqual(VALIDER_TRAITEMENT);
     });
   });
 
@@ -585,7 +585,7 @@ describe("dashboardServices", () => {
 
       const result = getResealedBtnLabel(currentSiret, bsd);
 
-      expect(result).toEqual(SIGNER_ENTREPOSAGE_PROVISOIRE);
+      expect(result).toEqual(SIGNER);
     });
 
     it("should return an empty string when siret is not same as temporary storage transporter", () => {
@@ -637,12 +637,27 @@ describe("dashboardServices", () => {
       type: BsdType.Bsdd,
       destination: { company: { siret: "1234567890" } },
     } as BsdDisplay;
+    const withBsdSuite = {
+      type: BsdType.Bsdd,
+      destination: { company: { siret: "1234567890" } },
+      temporaryStorageDetail: {
+        transporter: { company: { siret: "1234567890" } },
+      },
+    } as BsdDisplay;
     it('should return the correct label when bsd type is "Bsdd" and siret is same as destination', () => {
       const currentSiret = "1234567890";
 
       const result = getTempStorerAcceptedBtnLabel(currentSiret, bsd);
 
       expect(result).toEqual(VALIDER_TRAITEMENT);
+    });
+
+    it("should return the correct label when bsd suite", () => {
+      const currentSiret = "1234567890";
+
+      const result = getTempStorerAcceptedBtnLabel(currentSiret, withBsdSuite);
+
+      expect(result).toEqual(completer_bsd_suite);
     });
 
     it("should return an empty string when siret is not same as destination", () => {
@@ -761,7 +776,7 @@ describe("dashboardServices", () => {
       expect(result).toEqual(SIGNATURE_ACCEPTATION_CONTENANT);
     });
 
-    it("should return VALIDER_RECEPTION for bsdasri type with actTab and same siret destination", () => {
+    it("should return VALIDER_TRAITEMENT for bsdasri type with actTab and same siret destination", () => {
       const result = getReceivedBtnLabel(
         currentSiret,
         {
@@ -771,7 +786,7 @@ describe("dashboardServices", () => {
         },
         bsdCurrentTab
       );
-      expect(result).toEqual(VALIDER_RECEPTION);
+      expect(result).toEqual(VALIDER_TRAITEMENT);
     });
   });
 

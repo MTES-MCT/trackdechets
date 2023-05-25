@@ -11,42 +11,42 @@ describe("Bsd Badge status", () => {
       expect(screen.getByText(/Brouillon/i));
     });
 
-    test("Bsd[x] with Initial status should return Initial", () => {
+    test("Bsd[x] with Initial status should return Brouillon", () => {
       render(<Badge status={BsdStatusCode.Initial} isDraft />);
       expect(screen.getByText(/Brouillon/i));
     });
 
-    test("Bsdasri with Initial status should return Initial", () => {
+    test("Bsdasri with Initial status should return Brouillon", () => {
       render(<Badge status={BsdStatusCode.Initial} isDraft />);
       expect(screen.getByText(/Brouillon/i));
     });
   });
 
   describe("case: INITITAL(draft=false)", () => {
-    test("Bsd[x] with Initial status should return 'Initial'", () => {
+    test("Bsd[x] with Initial status should return 'publié'", () => {
       render(<Badge status={BsdStatusCode.Initial} isDraft={false} />);
-      expect(screen.getByText(/Initial/i));
+      expect(screen.getByText(/publié/i));
     });
 
-    test("Bsdasri with Initial status should return Initial", () => {
+    test("Bsdasri with Initial status should return publié", () => {
       render(<Badge status={BsdStatusCode.Initial} isDraft={false} />);
-      expect(screen.getByText(/Initial/i));
+      expect(screen.getByText(/publié/i));
     });
 
-    test("Bsvhu with Initial status should return Initial", () => {
+    test("Bsvhu with Initial status should return publié", () => {
       render(<Badge status={BsdStatusCode.Initial} isDraft={false} />);
-      expect(screen.getByText(/Initial/i));
+      expect(screen.getByText(/publié/i));
     });
 
-    test("Bsda with Initial status should return Initial", () => {
+    test("Bsda with Initial status should return publié", () => {
       render(<Badge status={BsdStatusCode.Initial} isDraft={false} />);
-      expect(screen.getByText(/Initial/i));
+      expect(screen.getByText(/publié/i));
     });
   });
 
   test("SEALED", () => {
     render(<Badge status={BsdStatusCode.Sealed} />);
-    expect(screen.getByText(/Initial/i));
+    expect(screen.getByText(/publié/i));
   });
 
   test("SENT", () => {
@@ -82,7 +82,7 @@ describe("Bsd Badge status", () => {
     render(
       <Badge status={BsdStatusCode.AwaitingGroup} bsdType={BsdType.Bsdasri} />
     );
-    expect(screen.getByText(/En attente d'un bordereau suite/i));
+    expect(screen.getByText(/Annexé à un bordereau suite/i));
   });
   test("AWAITING_GROUP bsff", () => {
     render(

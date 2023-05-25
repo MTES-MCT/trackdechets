@@ -246,6 +246,38 @@ describe("BsdAdditionalActionsButton", () => {
       expect(onBsdSuite).toHaveBeenCalledWith(bsdSuite);
     });
   });
+  it("calls the `onBsdSuite` function when the 'Valider le traitement' button is clicked", async () => {
+    const bsdSuite = {
+      ...bsd,
+      emitterType: EmitterType.Producer,
+      status: BsdStatusCode.TempStorerAccepted,
+      destination: { company: { siret: currentSiret } },
+      temporaryStorageDetail: {
+        transporter: { company: { siret: "1234567890" } },
+      },
+      type: BsdType.Bsdd,
+    } as BsdDisplay;
+
+    const { getByTestId } = render(
+      <BsdAdditionalActionsButton
+        bsd={bsdSuite}
+        currentSiret={currentSiret}
+        onOverview={onOverview}
+        onDuplicate={onDuplicate}
+        onPdf={onPdf}
+        onDelete={onDelete}
+        onUpdate={onUpdate}
+        onRevision={onRevision}
+        onBsdSuite={onBsdSuite}
+      />
+    );
+
+    fireEvent.click(getByTestId("valider-traitement-btn"));
+
+    await waitFor(() => {
+      expect(onBsdSuite).toHaveBeenCalledWith(bsdSuite);
+    });
+  });
 
   it("calls the `onAppendix1` function when the 'Annexe 1' button is clicked", async () => {
     const bsdAppendix1 = {

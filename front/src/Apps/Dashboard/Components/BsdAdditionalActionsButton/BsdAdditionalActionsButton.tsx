@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import classnames from "classnames";
 import FocusTrap from "focus-trap-react";
 import {
+  VALIDER_TRAITEMENT,
   annexe1,
   apercu_action_label,
   completer_bsd_suite,
@@ -142,12 +143,18 @@ function BsdAdditionalActionsButton({
             <li>
               <button
                 type="button"
-                data-testid="bsd-suite-btn"
+                data-testid={
+                  !bsd?.temporaryStorageDetail
+                    ? "bsd-suite-btn"
+                    : "valider-traitement-btn"
+                }
                 className="fr-btn fr-btn--tertiary-no-outline"
                 tabIndex={tabIndex}
                 onClick={handleBsdSuite}
               >
-                {completer_bsd_suite}
+                {!bsd?.temporaryStorageDetail
+                  ? completer_bsd_suite
+                  : VALIDER_TRAITEMENT}
               </button>
             </li>
           )}

@@ -31,7 +31,6 @@ import {
   SIGNATURE_ECO_ORG,
   SIGNER,
   SIGNER_ENLEVEMENT,
-  SIGNER_ENTREPOSAGE_PROVISOIRE,
   SIGNER_EN_TANT_QUE_TRAVAUX,
   SIGNER_PAR_ENTREPOS_PROVISOIRE,
   SIGNER_PAR_ENTREPRISE_TRAVAUX,
@@ -45,6 +44,7 @@ import {
   VALIDER_ENTREPOSAGE_PROVISOIRE,
   VALIDER_RECEPTION,
   VALIDER_TRAITEMENT,
+  completer_bsd_suite,
 } from "../Common/wordings/dashboard/wordingsDashboard";
 import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
 
@@ -114,6 +114,9 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.SignedByWorker:
       return SIGNER_PAR_ENTREPRISE_TRAVAUX;
     case BsdStatusCode.AwaitingGroup:
+      if (bsdType === BsdType.Bsdasri) {
+        return ANNEXE_BORDEREAU_SUITE;
+      }
       return EN_ATTENTE_BSD_SUITE;
     case BsdStatusCode.IntermediatelyProcessed:
       if (bsdType === BsdType.Bsdasri || bsdType === BsdType.Bsff) {
@@ -356,7 +359,7 @@ export const getSentBtnLabel = (
     isSameSiretDestination(currentSiret, bsd) &&
     (isBsvhu(bsd.type) || isBsda(bsd.type))
   ) {
-    return SIGNER;
+    return VALIDER_TRAITEMENT;
   }
   return "";
 };
@@ -373,7 +376,7 @@ export const getReceivedBtnLabel = (
     isActTab &&
     isSameSiretDestination(currentSiret, bsd)
   ) {
-    return VALIDER_RECEPTION;
+    return VALIDER_TRAITEMENT;
   }
 
   if (isBsdd(bsd.type)) {
@@ -501,7 +504,7 @@ export const getResealedBtnLabel = (
   bsd: BsdDisplay
 ): string => {
   if (isBsdd(bsd.type) && hasTemporaryStorage(currentSiret, bsd)) {
-    return SIGNER_ENTREPOSAGE_PROVISOIRE;
+    return SIGNER;
   }
   return "";
 };
@@ -521,7 +524,11 @@ export const getTempStorerAcceptedBtnLabel = (
   bsd: BsdDisplay
 ): string => {
   if (isBsdd(bsd.type) && isSameSiretDestination(currentSiret, bsd)) {
-    return VALIDER_TRAITEMENT;
+    if (bsd?.temporaryStorageDetail) {
+      return completer_bsd_suite;
+    } else {
+      return VALIDER_TRAITEMENT;
+    }
   }
   return "";
 };
