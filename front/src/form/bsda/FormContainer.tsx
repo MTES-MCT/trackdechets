@@ -12,6 +12,7 @@ import {
   WasteInfo,
 } from "./stepper/steps";
 import { Type } from "./stepper/steps/Type";
+import { getBsdaEditionDisabledSteps } from "./utils/getBsdaEditionDisabledSteps";
 
 export default function FormContainer() {
   const { id, siret } = useParams<{ id?: string; siret: string }>();
@@ -25,18 +26,8 @@ export default function FormContainer() {
       <div className="container">
         <StepList formId={id} initialStep={initialStep}>
           {bsda => {
-            const transporterSigned =
-              bsda?.transporter?.transport?.signature?.author != null;
-            const workerSigned =
-              bsda?.worker?.work?.signature?.author != null ||
-              transporterSigned;
-            const emitterSigned =
-              bsda?.emitter?.emission?.signature?.author != null ||
-              workerSigned;
-            const isEmitter = bsda?.emitter?.company?.siret === siret;
-            // emitter can still update any field after his own signature
-            const disabledAfterEmission =
-              (emitterSigned && !isEmitter) || transporterSigned;
+            const { disabledAfterEmission, workerSigned, transporterSigned } =
+              getBsdaEditionDisabledSteps(bsda, siret);
 
             return (
               <>
@@ -53,7 +44,7 @@ export default function FormContainer() {
                 <StepContainer
                   component={WasteInfo}
                   title="Détail du déchet"
-                  disabled={disabledAfterEmission}
+                  disabled={workerSigned}
                 />
                 <StepContainer
                   component={Worker}
