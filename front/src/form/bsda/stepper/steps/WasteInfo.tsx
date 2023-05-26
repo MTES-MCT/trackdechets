@@ -1,4 +1,4 @@
-import React, { lazy } from "react";
+import React, { lazy, useContext } from "react";
 import { useParams } from "react-router-dom";
 import { Field, useFormikContext } from "formik";
 import NumberInput from "form/common/components/custom-inputs/NumberInput";
@@ -8,13 +8,15 @@ import Tooltip from "common/components/Tooltip";
 import { Bsda, BsdaConsistence, BsdaType } from "generated/graphql/types";
 import { FieldSwitch } from "common/components";
 import { BSDA_WASTES } from "generated/constants";
+import { BsdaContext } from "form/bsda/FormContainer";
 const TagsInput = lazy(() => import("common/components/tags-input/TagsInput"));
 
 export function WasteInfo({ disabled }) {
-  const { values, initialValues } = useFormikContext<Bsda>();
+  const bsdaContext = useContext(BsdaContext);
+  const { values } = useFormikContext<Bsda>();
   const { siret } = useParams<{ siret: string }>();
   const { disabledAfterEmission } = getBsdaEditionDisabledSteps(
-    initialValues,
+    bsdaContext!,
     siret
   );
   const isEntreposageProvisoire = values?.type === BsdaType.Reshipment;
