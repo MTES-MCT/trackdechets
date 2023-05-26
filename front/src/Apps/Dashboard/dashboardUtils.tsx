@@ -172,12 +172,14 @@ export const filterPredicates: {
   },
   {
     filterName: FilterName.pickupSiteName,
-    where: value => ({ emitter: { pickupSite: { name: value } } }),
+    where: value => ({ emitter: { pickupSite: { name: { _match: value } } } }),
     order: "name",
   },
   {
     filterName: FilterName.pickupSiteAddress,
-    where: value => ({ emitter: { pickupSite: { address: value } } }),
+    where: value => ({
+      emitter: { pickupSite: { address: { _match: value } } },
+    }),
     order: "address",
   },
 ];
