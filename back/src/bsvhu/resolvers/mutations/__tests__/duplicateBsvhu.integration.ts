@@ -1,44 +1,44 @@
+import { gql } from "apollo-server-core";
+import { xDaysAgo } from "../../../../commands/onboarding.helpers";
 import { resetDatabase } from "../../../../../integration-tests/helper";
-import { ErrorCode } from "../../../../common/errors";
 import {
   companyFactory,
   userWithCompanyFactory
 } from "../../../../__tests__/factories";
 import makeClient from "../../../../__tests__/testClient";
-import { bsdasriFactory, initialData } from "../../../__tests__/factories";
+import { bsvhuFactory } from "../../../__tests__/factories.vhu";
 import { Mutation } from "../../../../generated/graphql/types";
-import { BsdasriType } from "@prisma/client";
+import { ErrorCode } from "../../../../common/errors";
 import prisma from "../../../../prisma";
-import { xDaysAgo } from "../../../../commands/onboarding.helpers";
 
 const TODAY = new Date();
 const FOUR_DAYS_AGO = xDaysAgo(TODAY, 4);
 
-const DUPLICATE_DASRI = `
-mutation DuplicateDasri($id: ID!){
-  duplicateBsdasri(id: $id)  {
-    id
-    status
-    isDraft
+const DUPLICATE_BVHU = gql`
+  mutation DuplicateBsvhu($id: ID!) {
+    duplicateBsvhu(id: $id) {
+      id
+      status
+    }
   }
-}
 `;
-describe("Mutation.duplicateBsdasri", () => {
+
+describe("mutaion.duplicateBsvhu", () => {
   afterEach(resetDatabase);
 
   it("should disallow unauthenticated user", async () => {
     const { company } = await userWithCompanyFactory("MEMBER");
-    const dasri = await bsdasriFactory({
+    const bsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: company.siret
       }
     });
     const { mutate } = makeClient(); // unauthenticated user
     const { errors } = await mutate<Pick<Mutation, "duplicateBsdasri">>(
-      DUPLICATE_DASRI,
+      DUPLICATE_BVHU,
       {
         variables: {
-          id: dasri.id
+          id: bsvhu.id
         }
       }
     );
@@ -52,98 +52,25 @@ describe("Mutation.duplicateBsdasri", () => {
       })
     ]);
   });
-  it("should disallow users not belonging to the duplicated dasri", async () => {
-    const { user } = await userWithCompanyFactory("MEMBER");
-    const { company: otherCompany } = await userWithCompanyFactory("MEMBER");
 
-    const dasri = await bsdasriFactory({
-      opt: {
-        ...initialData(otherCompany)
-      }
+  it("should duplicate a BSVHU", async () => {
+    const emitter = await userWithCompanyFactory("MEMBER");
+    const bsvhu = await bsvhuFactory({
+      opt: { emitterCompanySiret: emitter.company.siret }
     });
+    const { mutate } = makeClient(emitter.user);
 
-    const { mutate } = makeClient(user); // emitter
-
-    const { errors } = await mutate<Pick<Mutation, "duplicateBsdasri">>(
-      DUPLICATE_DASRI,
+    const { data } = await mutate<Pick<Mutation, "duplicateBsvhu">>(
+      DUPLICATE_BVHU,
       {
-        variables: {
-          id: dasri.id
-        }
+        variables: { id: bsvhu.id }
       }
     );
 
-    expect(errors).toEqual([
-      expect.objectContaining({
-        message:
-          "Vous ne pouvez pas dupliquer un bordereau sur lequel votre entreprise n'apparait pas",
-        extensions: expect.objectContaining({
-          code: ErrorCode.FORBIDDEN
-        })
-      })
-    ]);
+    expect(data.duplicateBsvhu.status).toEqual("INITIAL");
   });
 
-  it.each([BsdasriType.GROUPING, BsdasriType.SYNTHESIS])(
-    "should disallow %p  bsdasri duplication",
-    async dasriType => {
-      const { user, company } = await userWithCompanyFactory("MEMBER");
-
-      const dasri = await bsdasriFactory({
-        opt: {
-          ...initialData(company),
-          type: dasriType
-        }
-      });
-
-      const { mutate } = makeClient(user); // emitter
-
-      const { errors } = await mutate<Pick<Mutation, "duplicateBsdasri">>(
-        DUPLICATE_DASRI,
-        {
-          variables: {
-            id: dasri.id
-          }
-        }
-      );
-
-      expect(errors).toEqual([
-        expect.objectContaining({
-          message:
-            "Les dasris de synthèse ou de groupement ne sont pas duplicables",
-          extensions: expect.objectContaining({
-            code: ErrorCode.FORBIDDEN
-          })
-        })
-      ]);
-    }
-  );
-
-  it("should duplicate a  dasri", async () => {
-    const { user, company } = await userWithCompanyFactory("MEMBER");
-
-    const dasri = await bsdasriFactory({
-      opt: {
-        ...initialData(company)
-      }
-    });
-
-    const { mutate } = makeClient(user); // emitter
-
-    const { data } = await mutate<Pick<Mutation, "duplicateBsdasri">>(
-      DUPLICATE_DASRI,
-      {
-        variables: {
-          id: dasri.id
-        }
-      }
-    );
-
-    expect(data.duplicateBsdasri.status).toBe("INITIAL");
-    expect(data.duplicateBsdasri.isDraft).toBe(true);
-  });
-
-  test("duplicated BSDASRI should have the updated data when company info changes", async () => {
+  test("duplicated BSVHU should have the updated data when company info changes", async () => {
     const emitter = await userWithCompanyFactory("MEMBER");
     const transporterCompany = await companyFactory({
       transporterReceipt: {
@@ -158,8 +85,15 @@ describe("Mutation.duplicateBsdasri", () => {
       await prisma.transporterReceipt.findUniqueOrThrow({
         where: { id: transporterCompany.transporterReceiptId! }
       });
-    const destinationCompany = await companyFactory();
-    const bsdasri = await bsdasriFactory({
+    const destinationCompany = await companyFactory({
+      vhuAgrementDemolisseur: {
+        create: {
+          agrementNumber: "UPDATED-AGREEMENT-NUMBER",
+          department: "UPDATED-DEPARTMENT"
+        }
+      }
+    });
+    const bsvhu = await bsvhuFactory({
       opt: {
         emitterCompanySiret: emitter.company.siret,
         emitterCompanyName: emitter.company.name,
@@ -184,6 +118,7 @@ describe("Mutation.duplicateBsdasri", () => {
         destinationCompanyPhone: destinationCompany.contactPhone
       }
     });
+
     const { mutate } = makeClient(emitter.user);
 
     await prisma.company.update({
@@ -228,74 +163,70 @@ describe("Mutation.duplicateBsdasri", () => {
       }
     });
 
-    const { data } = await mutate<Pick<Mutation, "duplicateBsdasri">>(
-      DUPLICATE_DASRI,
+    const { data } = await mutate<Pick<Mutation, "duplicateBsvhu">>(
+      DUPLICATE_BVHU,
       {
         variables: {
-          id: bsdasri.id
+          id: bsvhu.id
         }
       }
     );
 
-    const duplicatedBsdasri = await prisma.bsdasri.findUniqueOrThrow({
-      where: { id: data.duplicateBsdasri.id }
+    const duplicatedBsvhu = await prisma.bsvhu.findUniqueOrThrow({
+      where: { id: data.duplicateBsvhu.id }
     });
 
-    expect(duplicatedBsdasri.emitterCompanyName).toEqual(
-      "UPDATED-EMITTER-NAME"
-    );
-    expect(duplicatedBsdasri.emitterCompanyAddress).toEqual(
+    expect(duplicatedBsvhu.emitterCompanyName).toEqual("UPDATED-EMITTER-NAME");
+    expect(duplicatedBsvhu.emitterCompanyAddress).toEqual(
       "UPDATED-EMITTER-ADDRESS"
     );
-    expect(duplicatedBsdasri.emitterCompanyContact).toEqual(
+    expect(duplicatedBsvhu.emitterCompanyContact).toEqual(
       "UPDATED-EMITTER-CONTACT"
     );
-    expect(duplicatedBsdasri.emitterCompanyMail).toEqual(
-      "UPDATED-EMITTER-MAIL"
-    );
-    expect(duplicatedBsdasri.emitterCompanyPhone).toEqual(
+    expect(duplicatedBsvhu.emitterCompanyMail).toEqual("UPDATED-EMITTER-MAIL");
+    expect(duplicatedBsvhu.emitterCompanyPhone).toEqual(
       "UPDATED-EMITTER-PHONE"
     );
 
-    expect(duplicatedBsdasri.transporterCompanyName).toEqual(
+    expect(duplicatedBsvhu.transporterCompanyName).toEqual(
       "UPDATED-TRANSPORTER-NAME"
     );
-    expect(duplicatedBsdasri.transporterCompanyAddress).toEqual(
+    expect(duplicatedBsvhu.transporterCompanyAddress).toEqual(
       "UPDATED-TRANSPORTER-ADDRESS"
     );
-    expect(duplicatedBsdasri.transporterCompanyContact).toEqual(
+    expect(duplicatedBsvhu.transporterCompanyContact).toEqual(
       "UPDATED-TRANSPORTER-CONTACT"
     );
-    expect(duplicatedBsdasri.transporterCompanyMail).toEqual(
+    expect(duplicatedBsvhu.transporterCompanyMail).toEqual(
       "UPDATED-TRANSPORTER-MAIL"
     );
-    expect(duplicatedBsdasri.transporterCompanyPhone).toEqual(
+    expect(duplicatedBsvhu.transporterCompanyPhone).toEqual(
       "UPDATED-TRANSPORTER-PHONE"
     );
 
-    expect(duplicatedBsdasri.transporterRecepisseNumber).toEqual(
+    expect(duplicatedBsvhu.transporterRecepisseNumber).toEqual(
       "UPDATED-TRANSPORTER-RECEIPT-NUMBER"
     );
-    expect(duplicatedBsdasri.transporterRecepisseValidityLimit).toEqual(
+    expect(duplicatedBsvhu.transporterRecepisseValidityLimit).toEqual(
       FOUR_DAYS_AGO
     );
-    expect(duplicatedBsdasri.transporterRecepisseDepartment).toEqual(
+    expect(duplicatedBsvhu.transporterRecepisseDepartment).toEqual(
       "UPDATED-TRANSPORTER-RECEIPT-DEPARTMENT"
     );
 
-    expect(duplicatedBsdasri.destinationCompanyName).toEqual(
+    expect(duplicatedBsvhu.destinationCompanyName).toEqual(
       "UPDATED-DESTINATION-NAME"
     );
-    expect(duplicatedBsdasri.destinationCompanyAddress).toEqual(
+    expect(duplicatedBsvhu.destinationCompanyAddress).toEqual(
       "UPDATED-DESTINATION-ADDRESS"
     );
-    expect(duplicatedBsdasri.destinationCompanyContact).toEqual(
+    expect(duplicatedBsvhu.destinationCompanyContact).toEqual(
       "UPDATED-DESTINATION-CONTACT"
     );
-    expect(duplicatedBsdasri.destinationCompanyMail).toEqual(
+    expect(duplicatedBsvhu.destinationCompanyMail).toEqual(
       "UPDATED-DESTINATION-MAIL"
     );
-    expect(duplicatedBsdasri.destinationCompanyPhone).toEqual(
+    expect(duplicatedBsvhu.destinationCompanyPhone).toEqual(
       "UPDATED-DESTINATION-PHONE"
     );
   });
