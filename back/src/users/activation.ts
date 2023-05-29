@@ -3,21 +3,6 @@ import { getUIBaseURL } from "../utils";
 
 /**
  *
- * GET handler for user activations. Used to cause some problems with email clients eagerly fetching email links.
- * Replaced with a redirect to a confirm form poiting to `userActivationHandler`
- */
-export const legacyUserActivationHandler = async (req, res) => {
-  const { hash } = req.query;
-  if (hash == null) {
-    res.status(500).send("Hash manquant.");
-    return;
-  }
-  const UI_BASE_URL = getUIBaseURL();
-  return res.redirect(`${UI_BASE_URL}/user-activation?hash=${hash}`);
-};
-
-/**
- *
  * Activate a recently signed-up user
  *
  * - User receives an emailed link upon signup
