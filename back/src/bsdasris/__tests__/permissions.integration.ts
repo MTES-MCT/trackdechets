@@ -1,8 +1,6 @@
 import { checkCanRead } from "../permissions";
 import { BsdasriType } from "@prisma/client";
-
 import { resetDatabase } from "../../../integration-tests/helper";
-import { ErrorCode } from "../../common/errors";
 import { bsdasriFactory, initialData } from "../__tests__/factories";
 import {
   userWithCompanyFactory,
@@ -22,11 +20,9 @@ describe("Dasri permission helpers", () => {
       }
     });
 
-    try {
-      await checkCanRead(user, dasri);
-    } catch (err) {
-      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
-    }
+    await expect(checkCanRead(user, dasri)).rejects.toThrow(
+      "Vous n'êtes pas autorisé à accéder à ce bordereau"
+    );
   });
 
   it("should grant dasri reading access to user whose siret belongs to the form", async () => {
@@ -60,11 +56,10 @@ describe("Dasri permission helpers", () => {
         synthesizing: { connect: [{ id: initialBsdasri.id }] }
       }
     });
-    try {
-      await checkCanRead(user, synthesisBsdasri);
-    } catch (err) {
-      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
-    }
+
+    await expect(checkCanRead(user, synthesisBsdasri)).rejects.toThrow(
+      "Vous n'êtes pas autorisé à accéder à ce bordereau"
+    );
   });
 
   it("should grant synthesis dasri reading access to user whose siret is emitter on the associated form", async () => {
@@ -109,11 +104,9 @@ describe("Dasri permission helpers", () => {
       }
     });
 
-    try {
-      await checkCanRead(user, groupingBsdasri);
-    } catch (err) {
-      expect(err.extensions.code).toEqual(ErrorCode.FORBIDDEN);
-    }
+    await expect(checkCanRead(user, groupingBsdasri)).rejects.toThrow(
+      "Vous n'êtes pas autorisé à accéder à ce bordereau"
+    );
   });
 
   it("should grant grouping dasri reading access to user whose siret is emitter on the grouped form", async () => {
