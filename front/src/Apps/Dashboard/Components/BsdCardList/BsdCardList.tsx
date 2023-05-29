@@ -111,7 +111,11 @@ function BsdCardList({
   const handleActValidation = useCallback(
     (bsd: Bsd) => {
       if (bsd.__typename === "Form") {
-        setValidationWorkflowType("ACT_BSDD");
+        if (!bsd?.temporaryStorageDetail) {
+          setValidationWorkflowType("ACT_BSDD");
+        } else {
+          setValidationWorkflowType("ACT_BSD_SUITE");
+        }
         setBsdClicked(bsd);
         setIsModalOpen(true);
       }
@@ -175,7 +179,11 @@ function BsdCardList({
   );
 
   const onBsdSuite = useCallback((bsd: Bsd) => {
-    setValidationWorkflowType("ACT_BSD_SUITE");
+    if (!bsd["temporaryStorageDetail"]) {
+      setValidationWorkflowType("ACT_BSD_SUITE");
+    } else {
+      setValidationWorkflowType("ACT_BSDD");
+    }
     setBsdClicked(bsd);
     setIsModalOpen(true);
   }, []);

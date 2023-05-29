@@ -14,12 +14,12 @@ import {
   dropdown_create_bsvhu,
   filter_bsd_number,
   filter_bsd_type,
-  // filter_chantier_adress,
-  // filter_chantier_name,
-  // filter_contenant_number,
+  filter_chantier_adress,
+  filter_chantier_name,
+  filter_contenant_number,
   filter_free_text,
   filter_immat_number,
-  // filter_siret,
+  filter_siret,
   filter_waste_code,
 } from "../Common/wordings/dashboard/wordingsDashboard";
 import { BsdType, BsdWhere } from "../../generated/graphql/types";
@@ -63,6 +63,10 @@ enum FilterName {
   readableId = "readableId",
   transporterNumberPlate = "transporterNumberPlate",
   transporterCustomInfo = "transporterCustomInfo",
+  sirets = "sirets",
+  packagingNumbers = "packagingNumbers",
+  pickupSiteName = "name",
+  pickupSiteAddress = "address",
 }
 
 export const filterList: Filter[] = [
@@ -74,12 +78,12 @@ export const filterList: Filter[] = [
     options: bsdTypeFilterSelectOptions,
     isActive: true,
   },
-  // {
-  //   name: "siret",
-  //   order: "siret",
-  //   label: filter_siret,
-  //   type: FilterType.input,
-  // },
+  {
+    name: FilterName.sirets,
+    label: filter_siret,
+    type: FilterType.input,
+    isActive: true,
+  },
   {
     name: FilterName.waste,
     label: filter_waste_code,
@@ -92,30 +96,30 @@ export const filterList: Filter[] = [
     type: FilterType.input,
     isActive: true,
   },
-  // {
-  //   name: "readableId",
-  //   order: "readableId",
-  //   label: filter_contenant_number,
-  //   type: FilterType.input,
-  // },
+  {
+    name: FilterName.packagingNumbers,
+    label: filter_contenant_number,
+    type: FilterType.input,
+    isActive: true,
+  },
   {
     name: FilterName.transporterNumberPlate,
     label: filter_immat_number,
     type: FilterType.input,
     isActive: true,
   },
-  // {
-  //   name: "chantier_name",
-  //   order: "chantier_name",
-  //   label: filter_chantier_name,
-  //   type: FilterType.input,
-  // },
-  // {
-  //   name: "chantier_adress",
-  //   order: "chantier_adress",
-  //   label: filter_chantier_adress,
-  //   type: FilterType.input,
-  // },
+  {
+    name: FilterName.pickupSiteName,
+    label: filter_chantier_name,
+    type: FilterType.input,
+    isActive: true,
+  },
+  {
+    name: FilterName.pickupSiteAddress,
+    label: filter_chantier_adress,
+    type: FilterType.input,
+    isActive: true,
+  },
   {
     name: FilterName.transporterCustomInfo,
     label: filter_free_text,
@@ -155,6 +159,28 @@ export const filterPredicates: {
     filterName: FilterName.transporterCustomInfo,
     where: value => ({ transporter: { customInfo: { _match: value } } }),
     order: "transporterCustomInfo",
+  },
+  {
+    filterName: FilterName.sirets,
+    where: value => ({ sirets: { _has: value } }),
+    order: "sirets",
+  },
+  {
+    filterName: FilterName.packagingNumbers,
+    where: value => ({ packagingNumbers: { _has: value } }),
+    order: "packagingNumbers",
+  },
+  {
+    filterName: FilterName.pickupSiteName,
+    where: value => ({ emitter: { pickupSite: { name: { _match: value } } } }),
+    order: "name",
+  },
+  {
+    filterName: FilterName.pickupSiteAddress,
+    where: value => ({
+      emitter: { pickupSite: { address: { _match: value } } },
+    }),
+    order: "address",
   },
 ];
 

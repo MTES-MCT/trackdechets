@@ -11,8 +11,6 @@ export const VALIDER_ENTREPOSAGE_PROVISOIRE =
   "Valider l'entreposage provisoire";
 export const VALIDER_RECEPTION = "Valider la réception";
 export const SIGNER_ENLEVEMENT = "Signer l'enlèvement";
-export const SIGNER_ENTREPOSAGE_PROVISOIRE =
-  "Signer en tant qu'entreposage provisoire";
 export const VALIDER_ACCEPTATION_ENTREPOSAGE_PROVISOIRE =
   "Valider l'acceptation de l'entreposage provisoire";
 export const SIGNATURE_ACCEPTATION_CONTENANT = "Gérer les contenants";
@@ -32,7 +30,7 @@ export const ENTREPOS_TEMPORAIREMENT =
   "entreposé temporairement ou en reconditionnement";
 export const BSD_SUITE_PREPARE = "BSD suite préparé";
 export const SIGNE_PAR_TRANSPORTEUR = "signé par le transporteur";
-export const INITIAL = "initial";
+export const INITIAL = "publié";
 export const SIGNE_PAR_EMETTEUR = "signé par l’émetteur";
 export const SIGNER_PAR_ENTREPOS_PROVISOIRE =
   "Signé par l'installation d'entreposage provisoire";

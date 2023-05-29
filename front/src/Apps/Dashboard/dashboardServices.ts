@@ -31,7 +31,6 @@ import {
   SIGNATURE_ECO_ORG,
   SIGNER,
   SIGNER_ENLEVEMENT,
-  SIGNER_ENTREPOSAGE_PROVISOIRE,
   SIGNER_EN_TANT_QUE_TRAVAUX,
   SIGNER_PAR_ENTREPOS_PROVISOIRE,
   SIGNER_PAR_ENTREPRISE_TRAVAUX,
@@ -45,6 +44,7 @@ import {
   VALIDER_ENTREPOSAGE_PROVISOIRE,
   VALIDER_RECEPTION,
   VALIDER_TRAITEMENT,
+  completer_bsd_suite,
 } from "../Common/wordings/dashboard/wordingsDashboard";
 import { BsdCurrentTab } from "Apps/Common/types/commonTypes";
 
@@ -96,6 +96,9 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.Resent:
       return SIGNE_PAR_TRANSPORTEUR;
     case BsdStatusCode.SignedByProducer:
+      if (bsdType === BsdType.Bsdd) {
+        return INITIAL;
+      }
       return SIGNE_PAR_EMETTEUR;
     case BsdStatusCode.Initial:
       if (isDraft) {
@@ -114,6 +117,9 @@ export const getBsdStatusLabel = (
     case BsdStatusCode.SignedByWorker:
       return SIGNER_PAR_ENTREPRISE_TRAVAUX;
     case BsdStatusCode.AwaitingGroup:
+      if (bsdType === BsdType.Bsdasri) {
+        return ANNEXE_BORDEREAU_SUITE;
+      }
       return EN_ATTENTE_BSD_SUITE;
     case BsdStatusCode.IntermediatelyProcessed:
       if (bsdType === BsdType.Bsdasri || bsdType === BsdType.Bsff) {
@@ -205,6 +211,15 @@ export const isBsdaSign = (bsd: BsdDisplay, currentSiret: string) => {
   }
   return false;
 };
+export const isBsdaSignWorker = (bsd: BsdDisplay, currentSiret: string) => {
+  if (isBsda(bsd.type)) {
+    return (
+      bsd.emitter?.isPrivateIndividual &&
+      currentSiret === bsd.worker?.company?.siret
+    );
+  }
+  return false;
+};
 
 export const isBsvhuSign = (bsd: BsdDisplay, currentSiret: string) =>
   isBsvhu(bsd.type) && isSameSiretEmmiter(currentSiret, bsd);
@@ -230,14 +245,19 @@ export const getIsNonDraftLabel = (
   bsdCurrentTab: BsdCurrentTab
 ): string => {
   const isActTab = bsdCurrentTab === "actTab";
+  const isFollowTab = bsdCurrentTab === "followTab";
   const isToCollectTab = bsdCurrentTab === "toCollectTab";
 
   if (
-    isBsvhuSign(bsd, currentSiret) ||
-    isBsffSign(bsd, currentSiret, bsdCurrentTab) ||
-    isBsdaSign(bsd, currentSiret)
+    !isFollowTab &&
+    (isBsvhuSign(bsd, currentSiret) ||
+      isBsffSign(bsd, currentSiret, bsdCurrentTab) ||
+      isBsdaSign(bsd, currentSiret))
   ) {
     return SIGNER;
+  }
+  if (isActTab && isBsdaSignWorker(bsd, currentSiret)) {
+    return SIGNER_EN_TANT_QUE_TRAVAUX;
   }
 
   if (isBsdasri(bsd.type)) {
@@ -258,7 +278,7 @@ export const getIsNonDraftLabel = (
     return "";
   }
 
-  if (isSameSiretEmmiter(currentSiret, bsd)) {
+  if (!isFollowTab && isSameSiretEmmiter(currentSiret, bsd)) {
     return SIGNER;
   }
   return "";
@@ -356,7 +376,7 @@ export const getSentBtnLabel = (
     isSameSiretDestination(currentSiret, bsd) &&
     (isBsvhu(bsd.type) || isBsda(bsd.type))
   ) {
-    return SIGNER;
+    return VALIDER_TRAITEMENT;
   }
   return "";
 };
@@ -373,7 +393,7 @@ export const getReceivedBtnLabel = (
     isActTab &&
     isSameSiretDestination(currentSiret, bsd)
   ) {
-    return VALIDER_RECEPTION;
+    return VALIDER_TRAITEMENT;
   }
 
   if (isBsdd(bsd.type)) {
@@ -501,7 +521,7 @@ export const getResealedBtnLabel = (
   bsd: BsdDisplay
 ): string => {
   if (isBsdd(bsd.type) && hasTemporaryStorage(currentSiret, bsd)) {
-    return SIGNER_ENTREPOSAGE_PROVISOIRE;
+    return SIGNER;
   }
   return "";
 };
@@ -521,7 +541,11 @@ export const getTempStorerAcceptedBtnLabel = (
   bsd: BsdDisplay
 ): string => {
   if (isBsdd(bsd.type) && isSameSiretDestination(currentSiret, bsd)) {
-    return VALIDER_TRAITEMENT;
+    if (bsd?.temporaryStorageDetail) {
+      return completer_bsd_suite;
+    } else {
+      return VALIDER_TRAITEMENT;
+    }
   }
   return "";
 };
