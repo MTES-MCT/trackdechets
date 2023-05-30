@@ -79,7 +79,6 @@ export const companyFactory = async (
       codeDepartement: "75",
       contactEmail: `contact_${companyIndex}@gmail.com`,
       contactPhone: `+${companyIndex} 606060606`,
-      contact: "Contact",
       verificationStatus: "VERIFIED",
       ...opts
     }
