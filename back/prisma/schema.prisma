@@ -711,7 +711,6 @@ model TransportSegment {
   @@index([formId], map: "_TransportSegmentFormIdIdx")
   @@index([transporterCompanySiret], map: "_TransportSegmentTransporterCompanySiretIdx")
   @@index([transporterCompanyVatNumber], map: "_TransportSegmentTransporterCompanyVatNumberIdx")
-
 }
 
 model User {
@@ -1026,7 +1025,10 @@ model Bsdasri {
   synthesizedInId                             String?
 
   // Denormalized fields, storing associated dasri sirets to speed up some queries
+  // Emitter sirets list in case of synthesis bsd 
   synthesisEmitterSirets String[] @default([])
+  // Emitter sirets list in case of grouping bsd 
+  groupingEmitterSirets  String[] @default([])
 
   // partial indices _BsdasriTypeIdx, _BsdasriIsDraftIdx, _BsdasriIsDeletedIdx see migration82_missing_indices.sql
   // gin index see 119_dasri_denormalized_sirets.sql

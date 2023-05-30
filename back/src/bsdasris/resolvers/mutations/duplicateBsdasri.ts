@@ -91,6 +91,7 @@ async function duplicateBsdasri(user: Express.User, bsdasri: Bsdasri) {
     synthesizedInId,
     identificationNumbers,
     synthesisEmitterSirets,
+    groupingEmitterSirets,
     ...fieldsToCopy
   } = bsdasri;
 

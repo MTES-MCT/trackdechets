@@ -12,7 +12,7 @@ import makeClient from "../../../../__tests__/testClient";
 import { BsdasriStatus } from "@prisma/client";
 import { ErrorCode } from "../../../../common/errors";
 import { Mutation } from "../../../../generated/graphql/types";
-
+import prisma from "../../../../prisma";
 const UPDATE_DASRI = `
 mutation UpdateDasri($id: ID!, $input: BsdasriInput!) {
   updateBsdasri(id: $id, input: $input) {
@@ -204,6 +204,15 @@ describe("Mutation.updateBsdasri", () => {
 
     expect(data.updateBsdasri.grouping!.map(bsd => bsd.id)).toEqual([
       toRegroup.id
+    ]);
+
+    const updatedDasri = await prisma.bsdasri.findUniqueOrThrow({
+      where: { id: dasri.id }
+    });
+
+    expect(updatedDasri.synthesisEmitterSirets).toEqual([]);
+    expect(updatedDasri.groupingEmitterSirets).toEqual([
+      toRegroup.emitterCompanySiret
     ]);
   });
 });

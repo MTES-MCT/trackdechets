@@ -178,6 +178,7 @@ describe("Mutation.createDasri", () => {
       where: { id: data.createBsdasri.id }
     });
     expect(created.synthesisEmitterSirets).toEqual([]);
+    expect(created.groupingEmitterSirets).toEqual([]);
     // check input is sirenified
     expect(sirenifyMock).toHaveBeenCalledTimes(1);
   });

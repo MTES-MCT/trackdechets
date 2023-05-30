@@ -142,4 +142,64 @@ describe("Query.BsdasriPdf", () => {
 
     expect(data.bsdasriPdf.token).toBeTruthy();
   });
+
+  it("should forbid access to user not on the bsd (grouping dasri)", async () => {
+    const { user } = await userWithCompanyFactory("MEMBER");
+    const initialCompany = await companyFactory();
+    const mainCompany = await companyFactory();
+
+    const initialBsdasri = await bsdasriFactory({
+      opt: {
+        ...initialData(initialCompany)
+      }
+    });
+    const groupingBsdasri = await bsdasriFactory({
+      opt: {
+        type: BsdasriType.GROUPING,
+        ...initialData(mainCompany),
+        grouping: { connect: [{ id: initialBsdasri.id }] }
+      }
+    });
+    const { query } = makeClient(user);
+
+    const { errors } = await query<Pick<Query, "bsdasriPdf">>(BSDASRI_PDF, {
+      variables: { id: groupingBsdasri.id }
+    });
+
+    expect(errors).toEqual([
+      expect.objectContaining({
+        message: "Vous n'êtes pas autorisé à accéder à ce bordereau",
+        extensions: expect.objectContaining({
+          code: ErrorCode.FORBIDDEN
+        })
+      })
+    ]);
+  });
+  it("should return a token for requested id (grouping dasri)", async () => {
+    const { user, company: initialCompany } = await userWithCompanyFactory(
+      "MEMBER"
+    );
+    const mainCompany = await companyFactory();
+
+    const initialBsdasri = await bsdasriFactory({
+      opt: {
+        ...initialData(initialCompany)
+      }
+    });
+    const groupingBsdasri = await bsdasriFactory({
+      opt: {
+        type: BsdasriType.GROUPING,
+        ...initialData(mainCompany),
+        grouping: { connect: [{ id: initialBsdasri.id }] }
+      }
+    });
+    // user from inital company tries to access pdf
+    const { query } = makeClient(user);
+
+    const { data } = await query<Pick<Query, "bsdasriPdf">>(BSDASRI_PDF, {
+      variables: { id: groupingBsdasri.id }
+    });
+
+    expect(data.bsdasriPdf.token).toBeTruthy();
+  });
 });

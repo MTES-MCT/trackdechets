@@ -16,22 +16,8 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 
 #### :nail_care: Améliorations
 - Ajout d'un bouton de déconnexion sur la page d'autorisation OpenId Connect [PR 2386](https://github.com/MTES-MCT/trackdechets/pull/2386)
-
-#### :memo: Documentation
-
-#### :house: Interne
-
-# [2023.6.1] 06/06/2023
-
-#### :rocket: Nouvelles fonctionnalités
-
-#### :bug: Corrections de bugs
-
-#### :boom: Breaking changes
-
-#### :nail_care: Améliorations
-
 - Les informations sur les entreprises (récépissés, raison sociale, certification) sont mises à jour lors de la duplication d'un bordereau [PR 2355](https://github.com/MTES-MCT/trackdechets/pull/2355)
+- Le producteur initial d'un DASRI a accès à la suite de la traçabilité en cas de groupement [PR 2391](https://github.com/MTES-MCT/trackdechets/pull/2391)
 
 #### :memo: Documentation
 

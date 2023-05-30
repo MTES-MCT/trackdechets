@@ -6,6 +6,7 @@ import {
   BsdasriType
 } from "@prisma/client";
 import getReadableId, { ReadableIdPrefix } from "../../forms/readableId";
+import { distinct } from "../../common/arrays";
 
 const dasriData = () => ({
   status: "INITIAL" as BsdasriStatus,
@@ -23,19 +24,27 @@ export const bsdasriFactory = async ({
     data: {
       ...dasriParams
     },
-    include: { synthesizing: true }
+    include: { synthesizing: true, grouping: true }
   });
 
   if (created.type === BsdasriType.SYNTHESIS) {
-    const synthesisEmitterSirets = [
-      ...new Set(
-        created.synthesizing.map(associated => associated.emitterCompanySiret)
-      )
-    ].filter(Boolean);
+    const synthesisEmitterSirets = distinct(
+      created.synthesizing.map(associated => associated.emitterCompanySiret)
+    ).filter(Boolean);
 
     return prisma.bsdasri.update({
       where: { id: created.id },
       data: { synthesisEmitterSirets }
+    });
+  }
+  if (created.type === BsdasriType.GROUPING) {
+    const groupingEmitterSirets = distinct(
+      created.grouping.map(grouped => grouped.emitterCompanySiret)
+    ).filter(Boolean);
+
+    return prisma.bsdasri.update({
+      where: { id: created.id },
+      data: { groupingEmitterSirets }
     });
   }
 

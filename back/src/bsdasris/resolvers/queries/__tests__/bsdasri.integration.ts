@@ -96,7 +96,7 @@ describe("Query.Bsdasri", () => {
     expect(data.bsdasri.grouping).toStrictEqual([]);
   });
 
-  it("should retrieve regrouped dasris", async () => {
+  it("should retrieve grouped dasris", async () => {
     const { user, company } = await userWithCompanyFactory("MEMBER");
     const { company: destination } = await userWithCompanyFactory("MEMBER");
     const transporterTakenOverAt = new Date();
