@@ -12,7 +12,7 @@ import { formFactory, userFactory } from "../../../__tests__/factories";
 import {
   getBsdIdentifiers,
   indexAllBsds,
-  indexAllBsdTypeConcurrently,
+  indexAllBsdTypeConcurrentJobs,
   indexAllBsdTypeSync,
   processBsdIdentifiersByChunk
 } from "../bulkIndexBsds";
@@ -70,7 +70,11 @@ describe("indexAllBsdTypeSync", () => {
       formFactory({ ownerId: user.id })
     ]);
 
-    await indexAllBsdTypeSync({ bsdName: "bsdd", index: index.alias });
+    await indexAllBsdTypeSync({
+      bsdName: "bsdd",
+      index: index.alias,
+      indexConfig: index
+    });
     await refreshElasticSearch();
 
     const { body }: ApiResponse<SearchResponse<BsdElastic>> =
@@ -94,7 +98,11 @@ describe("indexAllBsdTypeSync", () => {
       bsdaFactory({})
     ]);
 
-    await indexAllBsdTypeSync({ bsdName: "bsda", index: index.alias });
+    await indexAllBsdTypeSync({
+      bsdName: "bsda",
+      index: index.alias,
+      indexConfig: index
+    });
     await refreshElasticSearch();
 
     const { body }: ApiResponse<SearchResponse<BsdElastic>> =
@@ -118,7 +126,11 @@ describe("indexAllBsdTypeSync", () => {
       bsdasriFactory({})
     ]);
 
-    await indexAllBsdTypeSync({ bsdName: "bsdasri", index: index.alias });
+    await indexAllBsdTypeSync({
+      bsdName: "bsdasri",
+      index: index.alias,
+      indexConfig: index
+    });
     await refreshElasticSearch();
 
     const { body }: ApiResponse<SearchResponse<BsdElastic>> =
@@ -142,7 +154,11 @@ describe("indexAllBsdTypeSync", () => {
       createBsff({})
     ]);
 
-    await indexAllBsdTypeSync({ bsdName: "bsff", index: index.alias });
+    await indexAllBsdTypeSync({
+      bsdName: "bsff",
+      index: index.alias,
+      indexConfig: index
+    });
     await refreshElasticSearch();
 
     const { body }: ApiResponse<SearchResponse<BsdElastic>> =
@@ -165,7 +181,11 @@ describe("indexAllBsdTypeSync", () => {
       bsvhuFactory({}),
       bsvhuFactory({})
     ]);
-    await indexAllBsdTypeSync({ bsdName: "bsvhu", index: index.alias });
+    await indexAllBsdTypeSync({
+      bsdName: "bsvhu",
+      index: index.alias,
+      indexConfig: index
+    });
     await refreshElasticSearch();
 
     const { body }: ApiResponse<SearchResponse<BsdElastic>> =
@@ -194,9 +214,10 @@ describe("indexAllBsdTypeConcurrently", () => {
       formFactory({ ownerId: user.id })
     ]);
 
-    const jobs = await indexAllBsdTypeConcurrently({
+    const jobs = await indexAllBsdTypeConcurrentJobs({
       bsdName: "bsdd",
-      index: index.alias
+      index: index.alias,
+      indexConfig: index
     });
     await refreshElasticSearch();
 
@@ -223,9 +244,10 @@ describe("indexAllBsdTypeConcurrently", () => {
       bsdaFactory({})
     ]);
 
-    const jobs = await indexAllBsdTypeConcurrently({
+    const jobs = await indexAllBsdTypeConcurrentJobs({
       bsdName: "bsda",
-      index: index.alias
+      index: index.alias,
+      indexConfig: index
     });
     await refreshElasticSearch();
 
@@ -252,9 +274,10 @@ describe("indexAllBsdTypeConcurrently", () => {
       bsdasriFactory({})
     ]);
 
-    const jobs = await indexAllBsdTypeConcurrently({
+    const jobs = await indexAllBsdTypeConcurrentJobs({
       bsdName: "bsdasri",
-      index: index.alias
+      index: index.alias,
+      indexConfig: index
     });
     await refreshElasticSearch();
 
@@ -281,9 +304,10 @@ describe("indexAllBsdTypeConcurrently", () => {
       createBsff({})
     ]);
 
-    const jobs = await indexAllBsdTypeConcurrently({
+    const jobs = await indexAllBsdTypeConcurrentJobs({
       bsdName: "bsff",
-      index: index.alias
+      index: index.alias,
+      indexConfig: index
     });
     await refreshElasticSearch();
 
@@ -309,9 +333,10 @@ describe("indexAllBsdTypeConcurrently", () => {
       bsvhuFactory({}),
       bsvhuFactory({})
     ]);
-    const jobs = await indexAllBsdTypeConcurrently({
+    const jobs = await indexAllBsdTypeConcurrentJobs({
       bsdName: "bsvhu",
-      index: index.alias
+      index: index.alias,
+      indexConfig: index
     });
     await refreshElasticSearch();
 
@@ -344,7 +369,7 @@ describe("indexAllBsds", () => {
     const bsvhu = await bsvhuFactory({});
     const bsds = [form, bsda, bsdasri, bsff, bsvhu];
 
-    await indexAllBsds(index.alias, false);
+    await indexAllBsds(index.alias, index, false);
     await refreshElasticSearch();
 
     const { body }: ApiResponse<SearchResponse<BsdElastic>> =
@@ -371,7 +396,7 @@ describe("indexAllBsds", () => {
     const bsvhu = await bsvhuFactory({});
     const bsds = [form, bsda, bsdasri, bsff, bsvhu];
 
-    await indexAllBsds(index.alias, true);
+    await indexAllBsds(index.alias, index, true);
     await refreshElasticSearch();
 
     const { body }: ApiResponse<SearchResponse<BsdElastic>> =

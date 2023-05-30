@@ -229,10 +229,7 @@ export function applyMask<W extends GenericWhereInput>(
 
 // Conversion functions between GraphQL filters and Elastic query
 
-function ngramMatch(
-  fieldName: string,
-  value: string
-): estypes.QueryDslQueryContainer {
+function ngramMatch(fieldName: string, value: string): estypes.QueryContainer {
   return {
     match: {
       [`${fieldName}.ngram`]: {
@@ -248,7 +245,7 @@ export function toElasticTextQuery(
   fieldName: string,
   textFilter: TextFilter | null | undefined,
   maxLength = 50
-): estypes.QueryDslQueryContainer | undefined {
+): estypes.QueryContainer | undefined {
   if (!textFilter?._match) {
     return undefined;
   }
@@ -277,7 +274,7 @@ export function toElasticStringQuery(
   fieldName: string,
   stringFilter: StringFilter | null | undefined,
   maxLength = 50
-): estypes.QueryDslQueryContainer | undefined {
+): estypes.QueryContainer | undefined {
   if (!stringFilter) {
     return undefined;
   }
@@ -308,7 +305,7 @@ export function toElasticStringListQuery(
   stringListFilter: StringNullableListFilter | null | undefined,
   maxLength = 50,
   filter = (s: string) => s // optional pre-processing function
-): estypes.QueryDslQueryContainer | undefined {
+): estypes.QueryContainer | undefined {
   if (!stringListFilter) {
     return undefined;
   }
@@ -364,7 +361,7 @@ export function toElasticStringListQuery(
 export function toElasticDateQuery(
   fieldName: string,
   dateFilter: DateFilter | null | undefined
-): estypes.QueryDslQueryContainer | undefined {
+): estypes.QueryContainer | undefined {
   if (!dateFilter) {
     return undefined;
   }

@@ -2,7 +2,7 @@ import { isValid, parseISO } from "date-fns";
 import prompts from "prompts";
 import logger from "../../logging/logger";
 import prisma from "../../prisma";
-import { reindexPartialInPlace } from "../../bsds/indexation/bulkIndexBsds";
+import { reindexPartialInPlace } from "../../bsds/indexation/reindexPartialInPlace";
 import { index } from "../../common/elastic";
 import { BsdType } from "../../generated/graphql/types";
 import { closeQueues } from "../../queue/producers";

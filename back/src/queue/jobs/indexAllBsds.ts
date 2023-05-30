@@ -1,11 +1,9 @@
 import axios from "axios";
 import { Job } from "bull";
-import { BsdIndex } from "../../common/elastic";
-import {
-  findManyAndIndexBsds,
-  FindManyAndIndexBsdsFnSignature,
-  reindexAllBsdsInBulk
-} from "../../bsds/indexation/bulkIndexBsds";
+import { BsdIndexationConfig } from "../../common/elastic";
+import { findManyAndIndexBsds } from "../../bsds/indexation/bulkIndexBsds";
+import { FindManyAndIndexBsdsFnSignature } from "../../bsds/indexation/types";
+import { reindexAllBsdsInBulk } from "../../bsds/indexation";
 import logger from "../../logging/logger";
 
 const {
@@ -44,17 +42,18 @@ async function getBearerToken(scalingoToken) {
  */
 export async function indexChunkBsdJob(job: Job<string>) {
   try {
-    const { bsdName, index, ids } = JSON.parse(
+    const { bsdName, index, ids, elasticSearchUrl } = JSON.parse(
       job.data
     ) as FindManyAndIndexBsdsFnSignature;
     logger.info(
       `Started job indexChunk for the following bsd and index names : "${bsdName}", "${index}"`
     );
-    // will index a chunk of BSD
+    // will index a chunk of BSD to the given elasticSearchUrl
     await findManyAndIndexBsds({
       bsdName,
       index,
-      ids
+      ids,
+      elasticSearchUrl
     });
     return null;
   } catch (error) {
@@ -119,10 +118,10 @@ const sleepUntil = async (
  *  BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_UP,
  *  BULK_INDEX_SCALINGO_CONTAINER_AMOUNT_DOWN
  */
-export async function indexAllInBulk(job: Job<string>) {
+export async function indexAllInBulkJob(job: Job<string>) {
   try {
     const { index, force } = JSON.parse(job.data) as {
-      index: BsdIndex;
+      index: BsdIndexationConfig;
       force: boolean;
     };
     let operationsUrl;

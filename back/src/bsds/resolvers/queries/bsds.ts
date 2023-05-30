@@ -75,8 +75,8 @@ async function buildQuery(
   user: Express.User
 ) {
   const query: {
-    bool: estypes.QueryDslBoolQuery & {
-      filter: estypes.QueryDslQueryContainer[];
+    bool: estypes.BoolQuery & {
+      filter: estypes.QueryContainer[];
     };
   } = {
     bool: {
@@ -105,7 +105,7 @@ async function buildQuery(
     });
 
   if (clue) {
-    (query.bool.must as estypes.QueryDslQueryContainer[]).push({
+    (query.bool.must as estypes.QueryContainer[]).push({
       multi_match: {
         query: clue,
         fields: [
@@ -225,8 +225,7 @@ async function buildSearchAfter(
     body: { _source: bsd }
   }: ApiResponse<GetResponse<BsdElastic>> = await client.get({
     id: args.after,
-    index: index.alias,
-    type: index.type
+    index: index.alias
   });
   // we need to lowercase bsd ids to make pagination work, as ids are lowercased by stringfield's normalizer and
   // appear as such in result sort
