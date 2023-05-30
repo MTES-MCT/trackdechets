@@ -16,11 +16,12 @@ import { getFormRepository } from "../../repository";
 import { getTransporterCompanyOrgId } from "../../../common/constants/companySearchHelpers";
 import { runInTransaction } from "../../../common/repository/helper";
 import { sumPackagingInfos } from "../../repository/helper";
+import { validateBeforeTransport } from "../../validation";
 
 /**
  * Common function for signing
  */
-const signedByTransporterFn = async (
+const signTransportFn = async (
   user: Express.User,
   args: MutationSignTransportFormArgs,
   existingForm: Form
@@ -35,6 +36,9 @@ const signedByTransporterFn = async (
     user,
     args.securityCode
   );
+
+  await validateBeforeTransport(existingForm);
+
   const formUpdateInput = {
     takenOverAt: args.input.takenOverAt,
     takenOverBy: args.input.takenOverBy,
@@ -171,7 +175,7 @@ const signatures: Partial<
       isForeignShip ||
       isAppendix1WithAutomaticSignature
     ) {
-      return signedByTransporterFn(user, args, existingForm);
+      return signTransportFn(user, args, existingForm);
     } else {
       throw new ForbiddenError(
         "Vous n'êtes pas autorisé à signer ce bordereau"
@@ -179,7 +183,7 @@ const signatures: Partial<
     }
   },
   [Status.SIGNED_BY_PRODUCER]: async (user, args, existingForm) =>
-    signedByTransporterFn(user, args, existingForm),
+    signTransportFn(user, args, existingForm),
   [Status.SIGNED_BY_TEMP_STORER]: async (user, args, existingForm) => {
     const existingFullForm = await getFullForm(existingForm);
 

@@ -80,7 +80,10 @@ const updateBsff: MutationResolvers["updateBsff"] = async (
     !!input.repackaging ||
     !!input.packagings;
 
-  await validateBsff(futureBsff);
+  await validateBsff(futureBsff, {
+    isDraft: existingBsff.isDraft,
+    transporterSignature: !!existingBsff.transporterTransportSignatureDate
+  });
 
   const existingPreviousPackagings = await findPreviousPackagings(
     existingBsff.packagings.map(p => p.id),

@@ -44,6 +44,22 @@ et le projet suit un schéma de versionning inspiré de [Calendar Versioning](ht
 - Fix bug CompanySelector quand field.value est `null` [PR 2407](https://github.com/MTES-MCT/trackdechets/pull/2407)
 - Changement adresses email de la DREAL 16-86 [PR 2409](https://github.com/MTES-MCT/trackdechets/pull/2409)
 
+# [2023.6.1] 06/06/2023
+
+#### :rocket: Nouvelles fonctionnalités
+
+- Généralisation au BSDD et BSFF de la possibilité de publier et signer un bordereau (par l'émetteur) avant d'avoir renseigné un transporteur. Les informations du transporteur sont modifiables jusqu'au moment dernier moment par tous les acteurs du bordereau (et non plus par l'émetteur seulement). [PR 2385](https://github.com/MTES-MCT/trackdechets/pull/2385)
+
+#### :bug: Corrections de bugs
+
+#### :boom: Breaking changes
+
+#### :nail_care: Améliorations
+
+#### :memo: Documentation
+
+#### :house: Interne
+
 # [2023.5.3] 22/05/2023
 
 #### :bug: Corrections de bugs

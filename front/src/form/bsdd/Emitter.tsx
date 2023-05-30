@@ -23,10 +23,12 @@ export default function Emitter({ disabled }) {
   const isGrouping = [EmitterType.Appendix2, EmitterType.Appendix1].some(
     type => values.emitter?.type === type
   );
+
+  const isForeignShipOrPrivateIndividual =
+    values.emitter?.isForeignShip || values.emitter?.isPrivateIndividual;
+
   const lockEmitterProducer =
-    hasInitialGrouping ||
-    values.emitter?.isForeignShip ||
-    values.emitter?.isPrivateIndividual;
+    disabled || hasInitialGrouping || isForeignShipOrPrivateIndividual;
 
   useEffect(() => {
     if (values.emitter?.isForeignShip || values.emitter?.isPrivateIndividual) {
@@ -59,6 +61,12 @@ export default function Emitter({ disabled }) {
 
   return (
     <>
+      {disabled && (
+        <div className="notification notification--error">
+          Les champs grisés ci-dessous ont été scellés via signature et ne sont
+          plus modifiables.
+        </div>
+      )}
       <div className="form__row">
         <label htmlFor="id_customId">Autre Numéro Libre (optionnel)</label>
         <Field
@@ -67,12 +75,13 @@ export default function Emitter({ disabled }) {
           className="td-input"
           placeholder="Utilisez votre propre numéro de BSD si nécessaire."
           name="customId"
+          disabled={disabled}
         />
       </div>
 
-      <EcoOrganismes name="ecoOrganisme" />
+      <EcoOrganismes name="ecoOrganisme" disabled={disabled} />
 
-      {lockEmitterProducer && (
+      {isForeignShipOrPrivateIndividual && (
         <div className="form__row notification notification--warning">
           Lorsqu'un particulier ou un navire étranger est émetteur du déchet, le
           type d'émetteur est verrouillé à "Producteur". La signature de
@@ -320,6 +329,7 @@ export default function Emitter({ disabled }) {
           <CompanySelector
             name="emitter.company"
             heading="Entreprise émettrice"
+            disabled={disabled}
           />
         )}
 
@@ -329,6 +339,7 @@ export default function Emitter({ disabled }) {
           headingTitle="Adresse chantier"
           designation="du chantier ou lieu de collecte"
           getInitialEmitterWorkSiteFn={getInitialEmitterWorkSite}
+          disabled={disabled}
         />
       )}
     </>

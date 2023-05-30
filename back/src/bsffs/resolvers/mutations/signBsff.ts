@@ -50,7 +50,7 @@ const signatures: Record<
       securityCode
     );
 
-    await validateBeforeEmission(existingBsff as any);
+    await validateBeforeEmission(existingBsff);
 
     const { update: updateBsff } = getBsffRepository(user);
 
@@ -74,7 +74,7 @@ const signatures: Record<
       securityCode
     );
 
-    await validateBeforeTransport(existingBsff as any);
+    await validateBeforeTransport(existingBsff);
 
     const { update: updateBsff } = getBsffRepository(user);
 
@@ -97,7 +97,7 @@ const signatures: Record<
       existingBsff.destinationCompanySiret!,
       securityCode
     );
-    await validateBeforeReception(existingBsff as any);
+    await validateBeforeReception(existingBsff);
 
     const { update: updateBsff } = getBsffRepository(user);
 
@@ -121,7 +121,7 @@ const signatures: Record<
       securityCode
     );
 
-    await validateAfterReception(existingBsff as any);
+    await validateAfterReception(existingBsff);
 
     return runInTransaction(async transaction => {
       const {
@@ -225,7 +225,7 @@ const signatures: Record<
       existingBsff.destinationCompanySiret!,
       securityCode
     );
-    await validateAfterReception(existingBsff as any);
+    await validateAfterReception(existingBsff);
 
     return runInTransaction(async transaction => {
       const {

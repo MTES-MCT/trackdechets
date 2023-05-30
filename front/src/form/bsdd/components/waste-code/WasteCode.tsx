@@ -27,7 +27,11 @@ function formatWasteCode(wasteCode: string) {
   return trimmed;
 }
 
-export function WasteCodeSelect({ field, form }: FieldProps) {
+export function WasteCodeSelect({
+  field,
+  form,
+  disabled,
+}: FieldProps & { disabled: boolean }) {
   const [openModal, setOpenModal] = useState(false);
 
   const waste = BSDD_WASTES.find(waste => waste.code === field.value);
@@ -62,6 +66,7 @@ export function WasteCodeSelect({ field, form }: FieldProps) {
           <input
             {...field}
             type="text"
+            disabled={disabled}
             className={`td-input ${styles.wasteCodeInput}`}
             onChange={e => {
               e.target.value = formatWasteCode(e.target.value);
@@ -72,6 +77,7 @@ export function WasteCodeSelect({ field, form }: FieldProps) {
             type="button"
             className="btn btn--outline-primary"
             onClick={() => setOpenModal(true)}
+            disabled={disabled}
           >
             Liste des codes déchets
           </button>

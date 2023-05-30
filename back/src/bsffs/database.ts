@@ -147,7 +147,7 @@ export async function getFicheInterventions({
 export async function createBsff(
   user: Express.User,
   input: BsffInput,
-  additionalData: Partial<Bsff> = {}
+  { isDraft } = { isDraft: false }
 ) {
   await checkCanCreate(user, input);
 
@@ -155,9 +155,8 @@ export async function createBsff(
 
   const flatInput: Prisma.BsffCreateInput = {
     id: getReadableId(ReadableIdPrefix.FF),
-    isDraft: false,
-    ...flattenBsffInput(sirenifiedInput),
-    ...additionalData
+    isDraft,
+    ...flattenBsffInput(sirenifiedInput)
   };
 
   if (!input.type) {
@@ -184,7 +183,10 @@ export async function createBsff(
     packagings: packagingsInput
   };
 
-  await validateBsff(futureBsff);
+  await validateBsff(futureBsff, {
+    isDraft,
+    transporterSignature: false
+  });
   await validateFicheInterventions(futureBsff, ficheInterventions);
   const { forwarding, grouping, repackaging } = input;
 

@@ -278,6 +278,39 @@ describe("Mutation.signBsff", () => {
         })
       ]);
     });
+
+    it("should be possible for the emitter to sign a BSFF where the transporter is not yet specified", async () => {
+      const bsff = await createBsffBeforeEmission(
+        { emitter, destination },
+        {
+          emitterEmissionSignatureDate: null,
+          emitterEmissionSignatureAuthor: null
+        }
+      );
+
+      const { mutate } = makeClient(emitter.user);
+      const { errors } = await mutate<
+        Pick<Mutation, "signBsff">,
+        MutationSignBsffArgs
+      >(SIGN, {
+        variables: {
+          id: bsff.id,
+          input: {
+            type: "EMISSION",
+            date: new Date().toISOString() as any,
+            author: transporter.user.name
+          }
+        }
+      });
+
+      expect(errors).toBeUndefined();
+
+      const signedBsff = await prisma.bsff.findUniqueOrThrow({
+        where: { id: bsff.id }
+      });
+
+      expect(signedBsff.status).toEqual("SIGNED_BY_EMITTER");
+    });
   });
 
   describe("TRANSPORT", () => {

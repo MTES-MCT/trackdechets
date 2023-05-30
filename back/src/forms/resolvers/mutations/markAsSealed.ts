@@ -4,7 +4,6 @@ import { getFormOrFormNotFound } from "../../database";
 import { expandFormFromDb } from "../../converter";
 import { checkCanMarkAsSealed } from "../../permissions";
 import {
-  beforeSignedByTransporterSchema,
   checkCanBeSealed,
   validateForwardedInCompanies,
   wasteDetailsSchema
@@ -54,7 +53,6 @@ const markAsSealedResolver: MutationResolvers["markAsSealed"] = async (
       ...formUpdateInput
     };
     await wasteDetailsSchema.validate(futureForm);
-    await beforeSignedByTransporterSchema.validate(futureForm);
   }
 
   const emitterCompanyExists = form.emitterCompanySiret

@@ -38,9 +38,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
   });
   const [isDeleting, setIsDeleting] = React.useState(false);
 
-  let canDeleteAndUpdate = [FormStatus.Draft, FormStatus.Sealed].includes(
-    form.status
-  );
+  let canDelete = [FormStatus.Draft, FormStatus.Sealed].includes(form.status);
 
   if (form.status === FormStatus.SignedByProducer) {
     // if the bsd is only signed by the emitter, they can still update/delete it
@@ -49,8 +47,14 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
     const signedBySiret = form.emittedByEcoOrganisme
       ? form.ecoOrganisme?.siret
       : form.emitter?.company?.siret;
-    canDeleteAndUpdate = siret === signedBySiret;
+    canDelete = siret === signedBySiret;
   }
+
+  const canUpdate = [
+    FormStatus.Draft,
+    FormStatus.Sealed,
+    FormStatus.SignedByProducer,
+  ].includes(form.status);
 
   const isAppendix1 = form.emitter?.type === EmitterType.Appendix1;
   const isAppendix1Producer =
@@ -128,7 +132,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
         id: form.id,
       }),
       icon: <IconPaperWrite size="24px" color="blueLight" />,
-      isVisible: canDeleteAndUpdate && !isAppendix1Producer,
+      isVisible: canUpdate && !isAppendix1Producer,
     },
     {
       title: "Révision",
@@ -146,7 +150,7 @@ export const BSDDActions = ({ form }: BSDDActionsProps) => {
       title: "Supprimer",
       route: "",
       icon: <IconTrash color="blueLight" size="24px" />,
-      isVisible: canDeleteAndUpdate,
+      isVisible: canDelete,
       isButton: true,
       handleClick: () => setIsDeleting(true),
     },

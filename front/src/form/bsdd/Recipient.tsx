@@ -25,7 +25,7 @@ type IntermediariesSelect = {
   label: string;
 };
 
-export default function Recipient() {
+export default function Recipient({ disabled }) {
   const { values, setFieldValue } = useFormikContext<Form>();
   const hasTrader = !!values.trader;
   const hasBroker = !!values.broker;
@@ -119,6 +119,12 @@ export default function Recipient() {
 
   return (
     <>
+      {disabled && (
+        <div className="notification notification--error">
+          Les champs grisés ci-dessous ont été scellés via signature et ne sont
+          plus modifiables.
+        </div>
+      )}
       {!isChapeau && (
         <div className="form__row">
           <TdSwitch
@@ -126,6 +132,7 @@ export default function Recipient() {
             onChange={handleTempStorageToggle}
             label="Le BSD va passer par une étape d'entreposage provisoire ou
           reconditionnement"
+            disabled={disabled}
           />
         </div>
       )}
@@ -160,6 +167,7 @@ export default function Recipient() {
       <CompanySelector
         name="recipient.company"
         registeredOnlyCompanies={true}
+        disabled={disabled}
       />
       <h4 className="form__section-heading">Informations complémentaires</h4>
       <div className="form__row">
@@ -167,6 +175,7 @@ export default function Recipient() {
           component={ProcessingOperation}
           name="recipient.processingOperation"
           enableReuse={isGrouping}
+          disabled={disabled}
         />
         <RedErrorMessage name="recipient.processingOperation" />
       </div>
@@ -185,6 +194,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
             type="text"
             name="recipient.cap"
             className={classNames("td-input", styles.recipientCap)}
+            disabled={disabled}
           />
         </label>
       </div>
@@ -207,6 +217,7 @@ Il est important car il qualifie les conditions de gestion et de traitement du d
               }
             }}
             classNamePrefix="react-select"
+            isDisabled={disabled}
           />
         </div>
       </div>
