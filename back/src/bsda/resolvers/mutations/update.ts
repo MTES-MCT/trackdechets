@@ -11,6 +11,7 @@ import { checkEditionRules } from "../../validation/edition";
 import { checkCanUpdate } from "../../permissions";
 import { getBsdaRepository } from "../../repository";
 import { parseBsda } from "../../validation/validate";
+import { canBypassSirenify } from "../../../companies/sirenify";
 
 export default async function edit(
   _,
@@ -35,7 +36,7 @@ export default async function edit(
     forwarding: input.forwarding || existingBsda.forwarding?.id
   };
   const bsda = await parseBsda(unparsedBsda, {
-    enableSirenification: true,
+    enableSirenification: !canBypassSirenify(user),
     enablePreviousBsdasChecks: true,
     currentSignatureType: getCurrentSignatureType(unparsedBsda)
   });

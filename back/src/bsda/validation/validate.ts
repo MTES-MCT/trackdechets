@@ -44,7 +44,7 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
     })
     .superRefine(async (val, ctx) => {
       // Some signatures may be skipped, so always check all the hierarchy
-      const signaturesToCheck = getSignaturesLeadingToTarget(
+      const signaturesToCheck = getSignatureHierarchy(
         validationContext.currentSignatureType
       );
 
@@ -57,7 +57,7 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
       for (const [field, rule] of sealedRules) {
         if (rule.superRefineWhenSealed instanceof Function) {
           // @ts-expect-error TODO: superRefineWhenSealed first param is inferred as never ?
-          await rule.superRefineWhenSealed(val[field], ctx);
+          rule.superRefineWhenSealed(val[field], ctx);
         }
 
         const fieldIsRequired =
@@ -83,29 +83,16 @@ function getContextualBsdaSchema(validationContext: BsdaValidationContext) {
     });
 }
 
-function getSignaturesLeadingToTarget(
+function getSignatureHierarchy(
   targetSignature: BsdaSignatureType | undefined
-) {
+): BsdaSignatureType[] {
   if (!targetSignature) return [];
 
-  const signaturesLeadingToTarget: BsdaSignatureType[] = [
-    targetSignature
-  ].filter(Boolean);
-  let currentSignature: BsdaSignatureType = "EMISSION";
+  const parent = Object.entries(SIGNATURES_HIERARCHY).find(
+    ([_, details]) => details.next === targetSignature
+  )?.[0];
 
-  while (currentSignature !== targetSignature) {
-    signaturesLeadingToTarget.push(currentSignature);
-
-    const nextSignature = SIGNATURES_HIERARCHY[currentSignature].next;
-    if (!nextSignature) {
-      throw new Error(
-        `Signature hierarchy error. ${currentSignature} has no next singature but target isn't reached yet.`
-      );
-    }
-    currentSignature = nextSignature;
-  }
-
-  return signaturesLeadingToTarget;
+  return [targetSignature, ...getSignatureHierarchy(parent as BsdaSignatureType)];
 }
 
 async function validatePreviousBsdas(bsda: ZodBsda, ctx: RefinementCtx) {

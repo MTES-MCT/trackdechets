@@ -14,6 +14,7 @@ import {
 import { getBsdaRepository } from "../../repository";
 import { checkCanCreate } from "../../permissions";
 import { parseBsda } from "../../validation/validate";
+import { canBypassSirenify } from "../../../companies/sirenify";
 
 type CreateBsda = {
   isDraft: boolean;
@@ -52,7 +53,7 @@ export async function genericCreate({ isDraft, input, context }: CreateBsda) {
     { ...unparsedBsda, isDraft },
     {
       enableSirenification: true,
-      enablePreviousBsdasChecks: true,
+      enablePreviousBsdasChecks: !canBypassSirenify(user),
       currentSignatureType: !isDraft ? "EMISSION" : undefined
     }
   );
